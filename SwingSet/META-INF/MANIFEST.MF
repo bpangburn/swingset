@@ -1,0 +1,36 @@
+Manifest-Version: 1.0
+Created-By: Prasanth Pasala, The Pangburn Company.
+
+Name: com/nqadmin/swingSet/SSTextDocument.class
+Java-Bean: True
+
+Name: com/nqadmin/swingSet/SSDataNavigator.class
+Java-Bean: True
+
+Name: com/nqadmin/swingSet/SSDBComboBox.class
+Java-Bean: False
+
+Name: com/nqadmin/swingSet/SSTextField.class
+Java-Bean: True
+
+Name: com/nqadmin/swingSet/SSDBCheckBox.class
+Java-Bean: True
+
+Name: com/nqadmin/swingSet/SSTableModel.class
+Java-Bean: True
+
+Name: com/nqadmin/swingSet/SSDataGrid.class
+Java-Bean: True
+
+Name: com/nqadmin/swingSet/SSComboBox.class
+Java-Bean: True
+
+Name: com/nqadmin/swingSet/SSTableKeyAdapter.class
+Java-Bean: True
+
+Name: com/nqadmin/swingSet/datasources/SSConnection.class
+Java-Bean: True
+
+Name: com/nqadmin/swingSet/datasources/SSJdbcRowSetImpl.class
+Java-Bean: True
+
