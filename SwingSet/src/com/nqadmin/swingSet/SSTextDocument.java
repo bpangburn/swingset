@@ -474,7 +474,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                         rs.updateNull(columnName);
                     } else {
                         // CONVERT THE GIVEN STRING TO BOOLEAN TYPE
-                        boolean boolValue = Boolean.getBoolean(strValue);
+                        boolean boolValue = Boolean.valueOf(strValue).booleanValue();
                         rs.updateBoolean(columnName, boolValue);
                     }
                     break;
@@ -611,6 +611,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.14  2004/11/01 15:53:30  yoda2
+ * Fixed various JavaDoc errors.
+ *
  * Revision 1.13  2004/11/01 15:48:39  yoda2
  * Added support for NUMERIC.  Made type support consistent across SwingSet: INTEGER, SMALLINT, TINYINT (Integer); BIGINT (Long); FLOAT (Float); DOUBLE, NUMERIC (Double); BOOLEAN, BIT (Boolean); DATE (Date); CHAR, VARCHAR, LONGVARCHAR (String).
  *
