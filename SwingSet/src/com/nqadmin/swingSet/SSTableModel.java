@@ -66,31 +66,41 @@ import java.util.StringTokenizer;
  */
 public class SSTableModel  extends AbstractTableModel {
 	
-	RowSet rowset = null;
-	ResultSetMetaData metaData = null;
-	int rowCount 			= 0;
-	int columnCount			= 0;
-//	int[] columnsWithDefaults = null;
-//	Object[] defaultValues	  = null;
-	HashMap defaultValuesMap = null;
+	protected transient RowSet rowset = null;
+	
+	protected transient ResultSetMetaData metaData = null;
+	
+	protected transient int rowCount 			= 0;
+	protected transient int columnCount			= 0;
+	
+	// MAP TO STORE THE DEFAULT VALUES OF DIFFERENT COLUMNS
+	protected HashMap defaultValuesMap = null;
+	
+	// BOOLEAN TO INDICATE IF THE ROWSET IS ON INSERT ROW.
 	private boolean inInsertRow = false;
-	//SSDataGrid grid = null;
+
 	
 	// MESSAGE WINDOW
-	Component component = null;
+	protected transient Component component = null;
 	
-	JTable table = null;
+	// JTABLE FOR WHICH PRESENT CLASS IS A TABLE MODEL
+	protected transient JTable table = null;
 	
-	String[] headers = null;
+	// HEADERS FOR THE JTABLE.
+	protected transient String[] headers = null;
 	
+	// PRIMARY COLUMN NUMBER
 	int primaryColumn = -1;
-	Object primaryValue = null;
-	SSDataValue		dataValue	= null;
-	SSCellEditing  cellEditing = null;
 	
+	protected SSDataValue	 dataValue	 = null;
+	protected SSCellEditing  cellEditing = null;
 	
-	int[] uneditableColumns  = null;
-	int[] hiddenColumns		 = null;
+	// LIST OF UNEDITABLE COLUMNS	
+	protected int[] uneditableColumns  = null;
+	
+	// LIST OF HIDDEN COLUMNS
+	protected int[] hiddenColumns	   = null;
+	
 	/**
 	 * Constructs a SSTableModel object.
 	 *If this contructor is used the setRowSet method has to be used to set the rowset
@@ -137,6 +147,7 @@ public class SSTableModel  extends AbstractTableModel {
 	 */
 	private void init(){
 		try{
+			
 			metaData = rowset.getMetaData();
 			columnCount = metaData.getColumnCount();
 			rowset.last();
@@ -194,6 +205,8 @@ public class SSTableModel  extends AbstractTableModel {
 		return true;
 	}
 	
+	
+	
 	/**
 	 *Returns the value for the cell at  _row and _column.
 	 *@param _row    - the row whose value to be queried.
@@ -203,7 +216,6 @@ public class SSTableModel  extends AbstractTableModel {
 	public Object getValueAt(int _row, int _column){
 		
 		Object value = null;
-		
 		if(_row == rowCount){
 	        value = getDefaultValue(_column);
 	        return value;
@@ -728,6 +740,9 @@ public class SSTableModel  extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.5  2004/03/08 16:43:37  prasanth
+ * Updated copy right year.
+ *
  * Revision 1.4  2003/12/18 20:12:20  prasanth
  * Update class description.
  *
