@@ -38,7 +38,7 @@ import java.awt.*;
 import java.io.ObjectInputStream;
 import java.io.IOException;
 import java.util.StringTokenizer;
-import javax.sql.RowSet;
+import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
  * SSTextField.java
@@ -80,16 +80,6 @@ public class SSTextField extends JTextField {
 	// NUMBER OF DECIMALS REQUIRED
 	private int numDecimals = 2;
 	
-	/**
-	 * This function is provided to know if the object has been deserialized.
-	 * In which case the listeners have to be added again.
-     *
-     * @param _objIn    object to read in
-	 */
-	private void readObject(ObjectInputStream _objIn) throws IOException, ClassNotFoundException {
-		_objIn.defaultReadObject();
-		init();
-	}
 	
 	/**
 	 * Constructs a new TextField with the specified mask and initialized
@@ -177,10 +167,10 @@ public class SSTextField extends JTextField {
       * Binds the text field to a SSTextDocument which is in turn bound to
       * a particular column in a RowSet.
       *
-      * @param _rowset  RowSet containing column to bind to
+      * @param _rowset  SSRowSet containing column to bind to
       * @param _columnName  name of column within RowSet to bind to
       */
-	 public void bind(RowSet _rowset, String _columnName) {
+	 public void bind(SSRowSet _rowset, String _columnName) {
 	 	this.setDocument(new SSTextDocument(_rowset, _columnName));
 	 }
 	 
@@ -385,6 +375,10 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.9  2004/10/19 21:17:03  prasanth
+ * Transfering focus on enter key. It was doing so only if a mask was applied
+ * to the text field.
+ *
  * Revision 1.8  2004/10/07 14:35:27  prasanth
  * Updated the way the masks work.
  *

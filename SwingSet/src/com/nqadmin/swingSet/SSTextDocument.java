@@ -41,6 +41,7 @@ import javax.swing.event.*;
 import java.util.GregorianCalendar;
 import java.util.Calendar;
 import java.util.StringTokenizer;
+import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
  * SSTextDocument.java
@@ -52,13 +53,13 @@ import java.util.StringTokenizer;
  * SSDataNavigator to allow for both editing and navigation of the rows in a
  * database table.
  *
- * The SSTextDocument takes a RowSet and either a column index or a column name
+ * The SSTextDocument takes a SSRowSet and either a column index or a column name
  * as arguments.  Whenever the cursor is moved (e.g. navigation occurs on the
  * SSDataNavigator), the document property of the bound Swing control changes to
  * reflect the new value for the database column.
  *
- * Note that a RowSet insert doesn't implicitly modify the cursor which is why
- * the SSDBNavImp is provided for clearing controls followoing an insert.
+ * Note that a SSRowSet insert doesn't implicitly modify the cursor which is why
+ * the SSDBNavImp is provided for clearing controls following an insert.
  *</pre><p>
  * @author	$Author$
  * @version	$Revision$
@@ -66,50 +67,33 @@ import java.util.StringTokenizer;
 public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 	protected int columnType = -1;
-	protected transient RowSet rs = null;
+	protected SSRowSet rs = null;
 	protected String columnName = null;
 	protected int columnIndex = -1;
 	protected SimpleAttributeSet attribute = new SimpleAttributeSet();
-	protected transient boolean deserialized = false;
 	
 	protected MyRowSetListener rowSetListener = new MyRowSetListener();
 	protected MyDocumentListener documentListener = new MyDocumentListener();
 
-	/**
-	 * This function is provided to know if the object has been deserialized.
-	 * In which case the listeners have to be added again while the rowset is set.
-	 */
-	private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
-		objIn.defaultReadObject();
-		System.out.println("SSTextField Read");
-		deserialized = true;
-	}
-	
-	private void writeObject(ObjectOutputStream objOut) throws IOException {
-    // MAY WANT TO ADD A CALL TO INIT()
-		objOut.defaultWriteObject();
-		System.out.println("SSTextField Written");
-	}
-	
+
 	/**
 	 * Constructs a Document with the given rowset and column index.
 	 * The document is bound to the specified column in the rowset
      *
-     * @param _rs   RowSet upon which document will be based
-     * @param _columnName   column name within RowSet upon which document will be based
+     * @param _rs   SSRowSet upon which document will be based
+     * @param _columnName   column name within SSRowSet upon which document will be based
 	 */
-	public SSTextDocument(javax.sql.RowSet _rs, String _columnName) {
+	public SSTextDocument(SSRowSet _rs, String _columnName) {
 
 		rs = _rs;
 		columnName = _columnName;
 		try {
-			// FINDS THE COLUMN INDEX (REQUIRED TO GET ANY META DATA)
-			columnIndex = rs.findColumn(columnName);
-			ResultSetMetaData metaData = rs.getMetaData();
-			// GETS THE COLUMN DATA TYPE
-			columnType = metaData.getColumnType(columnIndex);
-			// IF ROWS PRESENT IN PRESENT ROWSET THEN INITIALIZE THE DOCUMENT WITH THE TEXT
-			// GETROW RETURNS ZERO IF THERE ARE NO ROWS IN ROWSET
+		// FINDS THE COLUMN INDEX (REQUIRED TO GET ANY META DATA)
+			columnIndex = rs.getColumnIndex(columnName);
+		// GETS THE COLUMN DATA TYPE
+			columnType = rs.getColumnType(columnIndex);
+		// IF ROWS PRESENT IN PRESENT ROWSET THEN INITIALIZE THE DOCUMENT WITH THE TEXT
+		// GETROW RETURNS ZERO IF THERE ARE NO ROWS IN ROWSET
 			if (rs.getRow() != 0) {
 				String value = getText();
 				insertString(0,value, attribute);
@@ -125,25 +109,25 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 		rs.addRowSetListener(rowSetListener);
 		addDocumentListener(documentListener);
 
-	} // end public SSTextDocument(javax.sql.RowSet _rs, String _columnName) {
+	} // end public SSTextDocument(javax.sql.SSRowSet _rs, String _columnName) {
 
 	/**
 	 * Constructs a Document with the given rowset and column index.
 	 * The document is bound to the specified column in the rowset\
      *
-     * @param _rs   RowSet upon which document will be based
-     * @param _columnName   column index within RowSet upon which document will be based     
+     * @param _rs   SSRowSet upon which document will be based
+     * @param _columnName   column index within SSRowSet upon which document will be based     
 	 */
-	public SSTextDocument(javax.sql.RowSet _rs, int _columnIndex) {
+	public SSTextDocument(SSRowSet _rs, int _columnIndex) {
 
 		rs = _rs;
 		columnIndex = _columnIndex;
 
 		try {
-			ResultSetMetaData metaData = rs.getMetaData();
-			// GET THE COLUMN TYPE AND COLUMN NAME FROM THE META DATA
-			columnType = metaData.getColumnType(columnIndex);
-			columnName = metaData.getColumnName(columnIndex);
+
+		// GET THE COLUMN TYPE AND COLUMN NAME FROM THE META DATA
+			columnType = rs.getColumnType(columnIndex);
+			columnName = rs.getColumnName(columnIndex);
 //			System.out.println(columnType + "   " + columnName);// + "  " + metaData.getSchemaName(columnIndex));
 
 			// CHECK IF THERE ARE ROWS IN THE ROWSET THEN
@@ -209,7 +193,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
      *
 	 * @return returns the rowset being used.
 	 */
-	public RowSet getRowSet() {
+	public SSRowSet getSSRowSet() {
 		return rs;
 	}
 	
@@ -219,23 +203,21 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
      *
 	 * @param _rowset    rowset to be used for binding the document to the specified column.
 	 */
-	public void setRowSet(RowSet _rowset) throws SQLException {
+	public void setSSRowSet(SSRowSet _rowset) throws SQLException {
 		rs = _rowset;
 		try {
 			if (columnName != null) {
 			// FINDS THE COLUMN INDEX (REQUIRED TO GET ANY META DATA)
-				columnIndex = rs.findColumn(columnName);
+				columnIndex = rs.getColumnIndex(columnName);
 			} else if(columnIndex != -1) {
 				// do nothing
 			} else {
 				throw new SQLException("Column Name not specified");
 			}
 			
-			ResultSetMetaData metaData = rs.getMetaData();
-		
 		// GET THE COLUMN TYPE AND COLUMN NAME FROM THE META DATA
-			columnType = metaData.getColumnType(columnIndex);
-			columnName = metaData.getColumnName(columnIndex);
+			columnType = rs.getColumnType(columnIndex);
+			columnName = rs.getColumnName(columnIndex);
 		
 		// CHECK IF THERE ARE ROWS IN THE ROWSET THEN
 		// SET THE DOCUMENT TO THE TEXT CORRESPONDING TO THE COLUMN
@@ -252,16 +234,8 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 			ble.printStackTrace();
 		}
         
-	// IF THE OBJECT IS DESERIALIZED THEN THE LISTENERS ARE LOST
-	// SO ADD THEM BACK AND RESET THE VARIABLE.
-		if (deserialized) {
-		// ADD LISTENER TO THE ROWSET
-			rs.addRowSetListener(rowSetListener);
-			addDocumentListener(documentListener);
-			deserialized = false;
-		}	
 		
-	} // end public void setRowSet(RowSet _rowset) throws SQLException {
+	} // end public void setSSRowSet(SSRowSet _rowset) throws SQLException {
 
 	/**
 	 * Initializes the values to default values.
@@ -626,6 +600,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.10  2004/10/22 16:27:24  prasanth
+ * Added CHAR types to the list of supported data types.
+ *
  * Revision 1.9  2004/08/11 15:59:49  prasanth
  * Removed check for \r' in one of the constructors.
  *

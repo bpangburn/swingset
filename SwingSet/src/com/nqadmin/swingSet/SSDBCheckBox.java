@@ -35,7 +35,7 @@ package com.nqadmin.swingSet;
 
 import java.io.*;
 import java.sql.*;
-import javax.sql.RowSet;
+import com.nqadmin.swingSet.datasources.SSRowSet;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -98,7 +98,7 @@ public class SSDBCheckBox extends JCheckBox {
 	 * @param _rowset    datasource to be used.
 	 * @param _columnName    name of the column to which this check box should be bound
 	 */
-	public SSDBCheckBox(RowSet _rowset, String _columnName) {
+	public SSDBCheckBox(SSRowSet _rowset, String _columnName) {
 		columnName = _columnName;
 		textField.setDocument(new SSTextDocument(_rowset, _columnName));
 	} 
@@ -129,7 +129,7 @@ public class SSDBCheckBox extends JCheckBox {
 	 * @param _rowset    datasource to be used.
 	 * @param _columnName    Name of the column to which this check box should be bound
 	 */
-	public void bind(RowSet _rowset, String _columnName) {
+	public void bind(SSRowSet _rowset, String _columnName) {
 		columnName = _columnName;
 		textField.setDocument(new SSTextDocument(_rowset, _columnName));
 	}
@@ -162,14 +162,6 @@ public class SSDBCheckBox extends JCheckBox {
 		initCheckBox();
 	}
 	
-	// CALLS EXECUTE ONCE THE OBJECT HAS BEEN DESERIALIZED
-	private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
-		objIn.defaultReadObject();
-	}
-	
-	private void writeObject(ObjectOutputStream objOut) throws IOException {
-		objOut.defaultWriteObject();
-	} 
 
 	// INITIALIZES THE CHECK BOX.
 	private void initCheckBox() {
@@ -269,6 +261,9 @@ public class SSDBCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.5  2004/08/10 22:06:59  yoda2
+ * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
+ *
  * Revision 1.4  2004/08/02 15:13:43  prasanth
  * 1. Deprecated getTextField, setTextField and constructor which takes a
  *      TextField.

@@ -32,7 +32,7 @@
 
 package com.nqadmin.swingSet;
 
-import javax.sql.*;
+//import javax.sql.*;
 import javax.swing.table.*;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
  * SSTableModel.java
@@ -61,9 +62,7 @@ import java.util.StringTokenizer;
  */
 public class SSTableModel extends AbstractTableModel {
 	
-	protected transient RowSet rowset = null;
-	
-	protected transient ResultSetMetaData metaData = null;
+	protected SSRowSet rowset = null;
 	
 	protected transient int rowCount 			= 0;
 	protected transient int columnCount			= 0;
@@ -113,7 +112,7 @@ public class SSTableModel extends AbstractTableModel {
      *
 	 * @param _rowset    rowset object whose records has to be displayed in JTable.
 	 */
-	public SSTableModel(RowSet _rowset) throws SQLException {
+	public SSTableModel(SSRowSet _rowset) throws SQLException {
 		super();
 		rowset = _rowset;
 		init();
@@ -125,7 +124,7 @@ public class SSTableModel extends AbstractTableModel {
      *
 	 * @param _rowset    rowset object whose records has to be displayed in JTable.
 	 */
-	public void setRowSet(RowSet _rowset) throws SQLException {
+	public void setRowSet(SSRowSet _rowset) throws SQLException {
 		rowset = _rowset;
 		init();
 	}	
@@ -155,8 +154,7 @@ public class SSTableModel extends AbstractTableModel {
 	private void init() {
 		try {
 			
-			metaData = rowset.getMetaData();
-			columnCount = metaData.getColumnCount();
+			columnCount = rowset.getColumnCount();
 			rowset.last();
 			// ROWS IN THE ROWSET ARE NUMBERED FROM 1, SO LAST ROW NUMBER GIVES THE 
 			// ROW COUNT
@@ -244,7 +242,7 @@ public class SSTableModel extends AbstractTableModel {
 			// ROW NUMBERS IN ROWSET START FROM 1 WHERE AS ROW NUMBERING FOR JTABLE START FROM 0
 			rowset.absolute(_row + 1);
 			// COLUMN NUMBERS IN ROWSET START FROM 1 WHERE AS COLUMN NUMBERING FOR JTABLE START FROM 0
-			int type = metaData.getColumnType(_column + 1);
+			int type = rowset.getColumnType(_column + 1);
 			switch(type) {
 				case Types.INTEGER:
 	        	case Types.SMALLINT:
@@ -332,7 +330,7 @@ public class SSTableModel extends AbstractTableModel {
     			return;
     		}
     		
-    		int type = metaData.getColumnType(_column + 1);
+    		int type = rowset.getColumnType(_column + 1);
     		switch(type) {
 				case Types.INTEGER:
 	        	case Types.SMALLINT:
@@ -409,7 +407,7 @@ public class SSTableModel extends AbstractTableModel {
     				
     		}
             
-    		int type = metaData.getColumnType(_column + 1);
+    		int type = rowset.getColumnType(_column + 1);
             
 			switch(type) {
 				case Types.INTEGER:
@@ -482,7 +480,7 @@ public class SSTableModel extends AbstractTableModel {
 	        	Integer column = (Integer)iterator.next();
 //	        	System.out.println("Column number is:" + column);
 	        	// COLUMNS SPECIFIED START FROM 0 BUT FOR ROWSET THEY START FROM 1
-	        	int type = metaData.getColumnType(column.intValue() +1 );
+	        	int type = rowset.getColumnType(column.intValue() +1 );
 				switch(type) {
 					case Types.INTEGER:
 		        	case Types.SMALLINT:
@@ -532,7 +530,7 @@ public class SSTableModel extends AbstractTableModel {
     public Class getColumnClass(int _column) {
         int type;
         try {
-            type = metaData.getColumnType(_column+1);
+            type = rowset.getColumnType(_column+1);
         } catch (SQLException e) {
             return super.getColumnClass(_column);
         }
@@ -681,7 +679,7 @@ public class SSTableModel extends AbstractTableModel {
     private void setPrimaryColumn() {
     	try {
     		
-    		int type = metaData.getColumnType(primaryColumn +1);
+    		int type = rowset.getColumnType(primaryColumn +1);
             
 			switch(type) {
 				case Types.INTEGER:
@@ -797,6 +795,11 @@ public class SSTableModel extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.9  2004/10/19 21:13:07  prasanth
+ * In getSQLDate function. checking if a / occurs in the string.
+ * If not assuming that its in standard format yyyy-mm-dd and trying to convert
+ * in to a date.
+ *
  * Revision 1.8  2004/09/27 15:48:17  prasanth
  * Added function to disable insertions.
  *

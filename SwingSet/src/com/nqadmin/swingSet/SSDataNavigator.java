@@ -37,7 +37,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.sql.*;
 import java.io.*;
-import javax.sql.RowSet;
+//import javax.sql.RowSet;
+import com.nqadmin.swingSet.datasources.SSRowSet;
 import javax.sql.RowSetListener;
 import javax.sql.RowSetEvent;
 
@@ -90,7 +91,7 @@ public class SSDataNavigator extends JPanel {
 	protected boolean callExecute = true;
 	
 	// ROWSET TO WHICH THE NAVIGATOR IS LINKED TO
-	protected transient RowSet rowset = null;
+	protected SSRowSet rowset = null;
 
 	// The container (Frame or Internal frame in which the navigator is present
 	protected SSDBNav dbNav = null;
@@ -178,7 +179,7 @@ public class SSDataNavigator extends JPanel {
      *
 	 * @param _rowset    The rowset to which the SSDataNavigator has to be bound
 	 */
-	public SSDataNavigator(RowSet _rowset) {
+	public SSDataNavigator(SSRowSet _rowset) {
 		setRowSet(_rowset);
 		addToolTips();
 		createPanel();
@@ -192,7 +193,7 @@ public class SSDataNavigator extends JPanel {
 	 * @param _rowset    the rowset to which the navigator is bound to
 	 * @param _buttonSize    the size to which the button on navigator have to be set
 	 */
-	public SSDataNavigator(RowSet _rowset, Dimension _buttonSize) {
+	public SSDataNavigator(SSRowSet _rowset, Dimension _buttonSize) {
 		buttonSize = _buttonSize;
 		setRowSet(_rowset);
 		addToolTips();
@@ -352,7 +353,7 @@ public class SSDataNavigator extends JPanel {
       *
 	  * @return returns the rowset being used.
 	  */
-	 public RowSet getRowSet() {
+	 public SSRowSet getRowSet() {
 	 	return rowset;
 	 } 
 	 
@@ -380,7 +381,7 @@ public class SSDataNavigator extends JPanel {
      *
 	 * @param _rowset    a RowSet object to which the navigator has to be bound
 	 */
-	public void setRowSet(RowSet _rowset) {
+	public void setRowSet(SSRowSet _rowset) {
 		if(rowset != null){
 			rowset.removeRowSetListener(rowsetListener);
 		}
@@ -957,6 +958,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.20  2004/09/21 18:58:28  prasanth
+ * removing the rowset listener while doing the refresh ops.
+ *
  * Revision 1.19  2004/09/21 14:15:33  prasanth
  * Displaying error messages when an exception occurs, when the user presses
  * any button.

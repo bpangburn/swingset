@@ -40,7 +40,8 @@ import java.sql.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.sql.*;
+//import javax.sql.*;
+import com.nqadmin.swingSet.datasources.SSRowSet;
 import javax.swing.border.*;
 import javax.swing.text.*;
 import javax.swing.event.*;
@@ -156,7 +157,7 @@ public class SSDBComboBox extends JComponent {
     private int numberOfItems = 0;
 
     // ROWSET USED TO RETRIEVE THE INFO FROM THE DATABASE.
-    private transient RowSet rowset = null;
+    private SSRowSet rowset = null;
 
     // INSTANCE OF THE LISTENER FOR THE COMBO BOX.
     final MyComboListener cmbListener = new MyComboListener();
@@ -235,7 +236,7 @@ public class SSDBComboBox extends JComponent {
      *
      * @param _rowset  rowset to which the combo has to update values.
      */
-    public void setRowSet(RowSet _rowset) {
+    public void setRowSet(SSRowSet _rowset) {
         rowset = _rowset;
     }
 
@@ -503,7 +504,7 @@ public class SSDBComboBox extends JComponent {
      * @param _rowset   rowset to which updates have to be made.
      * @param -column   column name in the rowset to which these updates have to be made.
      */
-    public void bind(RowSet _rs, String _column) {
+    public void bind(SSRowSet _rs, String _column) {
         textField.setDocument(new SSTextDocument(_rs,_column));
         cmbDisplayed.addFocusListener(new FocusAdapter(){
             public void focusLost(FocusEvent fe){
@@ -938,6 +939,9 @@ public class SSDBComboBox extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.11  2004/08/24 22:08:54  prasanth
+ * Updating the numberOfItems variable in deleteItem & addItem.
+ *
  * Revision 1.10  2004/08/12 23:52:36  prasanth
  * If seleted index is -1 the column value was not updated.
  * Now setting to null if the selected index is -1.

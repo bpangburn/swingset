@@ -42,6 +42,7 @@ import javax.swing.text.*;
 import javax.swing.event.*;
 import java.beans.*;
 import javax.sql.*;
+import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
  * SSComboBox.java
@@ -103,7 +104,7 @@ public class SSComboBox extends JComponent {
 		protected int[] mappingValues = null;
 		
 		// ROWSET TO WHICH THE COMBO WILL GET VALUES FROM
-		protected transient RowSet rowset;
+		protected SSRowSet rowset;
 		
 		// COLUMN NAME TO WHICH THE COMBO WILL BE BOUND TO
 		protected String columnName;
@@ -206,11 +207,11 @@ public class SSComboBox extends JComponent {
 		}
 		
 		/**
-		 * Returns the rowset being used to get the values.
+		 * Returns the SSRowSet being used to get the values.
          *
-		 * @return returns the rowset being used.
+		 * @return returns the SSRowSet being used.
 		 */
-		public RowSet getRowSet() {
+		public SSRowSet getSSRowSet() {
 			return rowset;
 		} 
 		  
@@ -225,11 +226,11 @@ public class SSComboBox extends JComponent {
 		} 
 		
 		/**
-		 * Sets the rowset to be used.
+		 * Sets the SSRowSet to be used.
          *
-		 * @param _rowset    rowset to be used for getting the values.
+		 * @param _rowset    SSRowSet to be used for getting the values.
 		 */
-		public void setRowSet(RowSet _rowset) {
+		public void setSSRowSet(SSRowSet _rowset) {
 			rowset = _rowset;
 		}
 		
@@ -295,10 +296,10 @@ public class SSComboBox extends JComponent {
 		 * Binds the combo box to the specified column of the rowset.
 		 * As the rowset changes the combo box item displayed changes accordingly.
          *
-		 * @param _rowset    RowSet to be used for getting the value.
+		 * @param _rowset    SSRowSet to be used for getting the value.
 		 * @param _columnName    Column to which the combo box has to be bound.
 		 */
-		public void bind(RowSet _rowset, String _columnName) {
+		public void bind(SSRowSet _rowset, String _columnName) {
 			rowset = _rowset;
 			columnName = _columnName;
 			bind();
@@ -706,6 +707,9 @@ public class SSComboBox extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.15  2004/09/21 18:57:47  prasanth
+ * Added Unisex as an option.
+ *
  * Revision 1.14  2004/09/21 14:14:14  prasanth
  * Swapped the codes for FEMALE & MALE.
  *

@@ -35,7 +35,7 @@ package com.nqadmin.swingSet;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
-import javax.sql.RowSet;
+import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
  * SSTextArea.java
@@ -51,12 +51,12 @@ public class SSTextArea extends JTextArea {
 	 
     /**
      * Binds the text field to a SSTextDocument which is in turn bound to
-     * a particular column in a RowSet.
+     * a particular column in a SSRowSet.
      *
-     * @param _rowset  RowSet containing column to bind to
+     * @param _rowset  SSRowSet containing column to bind to
      * @param _columnName  name of column within RowSet to bind to
      */
-	public void bind(RowSet _rowset, String _columnName) {
+	public void bind(SSRowSet _rowset, String _columnName) {
         this.setDocument(new SSTextDocument(_rowset, _columnName));
     }
 	
@@ -66,5 +66,8 @@ public class SSTextArea extends JTextArea {
 
 /*
  * $Log$
+ * Revision 1.1  2004/10/01 20:43:53  yoda2
+ * Added SSTextArea which is a simple extension of JTextArea with support for rowset binding.
+ *
   *
  */

@@ -37,7 +37,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-import javax.sql.*;
+//import javax.sql.*;
 import java.sql.SQLException;
 import java.sql.Date;
 import java.util.GregorianCalendar;
@@ -45,7 +45,7 @@ import java.util.Calendar;
 import java.util.StringTokenizer;
 import java.util.EventObject;
 import java.util.Vector;
-
+import com.nqadmin.swingSet.datasources.SSRowSet;
 /**
  * SSDataGrid.java
  *<p>
@@ -138,7 +138,7 @@ public class SSDataGrid extends JTable {
 	protected Component window = null;
     
 	// ROWSET CONTAINING THE VALUES
-	private transient RowSet rowset = null;
+	private SSRowSet rowset = null;
     
 	// NUMBER OF COLUMNS IN THE ROWSET
 	private	int columnCount = -1;
@@ -181,7 +181,7 @@ public class SSDataGrid extends JTable {
      *
 	 * @param _rowset    rowset from which values have to be retrieved.
 	 */
-    public SSDataGrid(RowSet _rowset) {
+    public SSDataGrid(SSRowSet _rowset) {
 		super();
 //super(VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED );		
 		rowset = _rowset;	
@@ -411,7 +411,7 @@ public class SSDataGrid extends JTable {
      *
 	 * @param _rowset    the rowset which acts as the data source.
 	 */
-	 public void setRowSet(RowSet _rowset) {
+	 public void setRowSet(SSRowSet _rowset) {
 	 	// VARIABLE TO DETERMINE IF UI HAS TO BE UPDATED
 	 	boolean updateUI = false;
 	 	// IF A ROW SET ALREADY EXISTS THEN UI HAS TO BE UPDATED
@@ -499,7 +499,7 @@ public class SSDataGrid extends JTable {
 	 		columnNumbers = new int[_columnNames.length];
 	 	
 	 	 	for (int i=0; i< _columnNames.length;i++) {
-	 			columnNumbers[i] = rowset.findColumn(_columnNames[i]) -1 ;
+	 			columnNumbers[i] = rowset.getColumnIndex(_columnNames[i]) -1 ;
             }
 	 	}
 	 	
@@ -528,7 +528,7 @@ public class SSDataGrid extends JTable {
 	  * @throws SQLException is the specified column name is not present in the rowset
 	  */
 	 public Object getDefaultValue(String _columnName) throws SQLException {
-	 	int columnNumber = rowset.findColumn(_columnName);
+	 	int columnNumber = rowset.getColumnIndex(_columnName);
 	 	return tableModel.getDefaultValue(columnNumber -1);
 	 }
 	 
@@ -563,7 +563,7 @@ public class SSDataGrid extends JTable {
 	 * @param _columnName    the column which is the primary column.
 	 */	
 	public void setPrimaryColumn(String _columnName) throws SQLException {
-		int columnNumber = rowset.findColumn(_columnName) -1;
+		int columnNumber = rowset.getColumnIndex(_columnName) -1;
     	tableModel.setPrimaryColumn(columnNumber);
     }
     
@@ -599,7 +599,7 @@ public class SSDataGrid extends JTable {
      * @param _column  column name for which a date renderer is needed.
      */    
     public void setDateRenderer(String _column) throws SQLException {
-    	int column = rowset.findColumn(_column) -1;
+    	int column = rowset.getColumnIndex(_column) -1;
     	TableColumnModel columnModel = getColumnModel();
     	TableColumn tableColumn = columnModel.getColumn(column);
     	tableColumn.setCellRenderer(new DateRenderer());
@@ -664,7 +664,7 @@ public class SSDataGrid extends JTable {
      * @param _columnWidth required minimum width for this column
      */
     public void setComboRenderer(String _column, Object[] _displayItems, Object[] _underlyingValues, int _columnWidth) throws SQLException {
-    	int column = rowset.findColumn(_column)-1;
+    	int column = rowset.getColumnIndex(_column)-1;
     	setRowHeight(20);
     	TableColumnModel columnModel = getColumnModel();
     	TableColumn tableColumn = columnModel.getColumn(column);
@@ -710,7 +710,7 @@ public class SSDataGrid extends JTable {
     		columnNumbers = new int[_columnNames.length];
     	
     		for (int i=0;i<_columnNames.length;i++) {
-    			columnNumbers[i] = rowset.findColumn(_columnNames[i]) -1;
+    			columnNumbers[i] = rowset.getColumnIndex(_columnNames[i]) -1;
             }
     	}
     		
@@ -755,7 +755,7 @@ public class SSDataGrid extends JTable {
     	if (_columnNames != null) {
     		hiddenColumns = new int[_columnNames.length];
     		for(int i=0; i<_columnNames.length; i++) {
-    			hiddenColumns[i] = rowset.findColumn(_columnNames[i]) -1;
+    			hiddenColumns[i] = rowset.getColumnIndex(_columnNames[i]) -1;
     		}
 		}
 		hideColumns();
@@ -980,6 +980,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.14  2004/10/22 17:38:56  prasanth
+ * Using SSTextField for date mask.
+ *
  * Revision 1.13  2004/10/19 21:14:36  prasanth
  * Added getCellEditorValue function for  date cell editor class.
  * This way the editor will return a Date object rather than a string as value
