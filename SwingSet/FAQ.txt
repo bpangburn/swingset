@@ -9,7 +9,7 @@ $Id$
 FAQ
 ==============================================================================
 
-1.  I am trying to run the samples. I see "Processing....." and nothing
+1.  I am trying to run the samples. I see "Processing...." and nothing
     happens.  What is wrong?
 
     You might be missing one or more required jar files.  Please make sure

@@ -4,6 +4,7 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 
 $Id$
 
+
 ==============================================================================
 SwingSet 0.9.3-beta - 
 ==============================================================================
@@ -14,7 +15,11 @@ Changes:
         2. Updated JavaDoc to reflect it. 
 
     SSTextDocument:
-        1. Fixed boolean rowset update. 
+        1. Fixed boolean rowset update.
+        
+    (all classes, readme.txt, FAQ.txt, & ChangeLog.txt)
+        1. Converted all tabs to soft tabs comprised of four actual spaces.
+
 
 ==============================================================================
 SwingSet 0.9.2-beta - Released 11-01-2004
@@ -23,7 +28,7 @@ SwingSet 0.9.2-beta - Released 11-01-2004
 Changes:
     SSJdbcRowSetImpl:
         1. Fixed issue with setCommand() not updating underlying JdbcRowSetImpl.
-		
+        
     SSTableModel:
         1. Added support for NUMERIC.  Made type support consistent across
            SwingSet: INTEGER, SMALLINT, TINYINT (Integer); BIGINT (Long);
@@ -31,7 +36,7 @@ Changes:
            DATE (Date); CHAR, VARCHAR, LONGVARCHAR (String).
         2. Added this.fireTableDataChanged(); to init() to alert listeners to
            change in data.
-		
+        
     SSTextDocument:
         1. Added support for NUMERIC.  Made type support consistent across
            SwingSet: INTEGER, SMALLINT, TINYINT (Integer); BIGINT (Long);
@@ -41,100 +46,102 @@ Changes:
     (all classes)
         1. Fixed JavaDoc errors.
 
+
 ==============================================================================
 SwingSet 0.9.1-beta - Released 10-28-2004
 ==============================================================================
 
 Changes:
-	SSJdbcRowSetImpl:
-		1. Calling the setType & SetConcurrency methods on the 
-		   JdbcRowSetImpl instance variable.
+    SSJdbcRowSetImpl:
+        1. Calling the setType & SetConcurrency methods on the 
+           JdbcRowSetImpl instance variable.
+
 
 ==============================================================================
 SwingSet 0.9.0-beta - Released 10-26-2004
 ==============================================================================
 
 Changes:
-	Classes or Interfaces added in SwingSet-0.9.0:
-		1. SSConnection
-		2. SSRowSet
-		3. SSRowSetAdapter
-		4. SSJdbcRowSetImpl
+    Classes or Interfaces added in SwingSet-0.9.0:
+        1. SSConnection
+        2. SSRowSet
+        3. SSRowSetAdapter
+        4. SSJdbcRowSetImpl
 
-	SSConnection:
-		This acts as a wrapper class for Connection & supports serialization.
+    SSConnection:
+        This acts as a wrapper class for Connection & supports serialization.
 
-	SSRowSet:
-		This interface is based on RowSet, with just the required functions.
-		Also extends Serializable interface.
+    SSRowSet:
+        This interface is based on RowSet, with just the required functions.
+        Also extends Serializable interface.
 
-	SSRowSetAdapter:
-		This class provides empty functions for SSRowSet interface functions.
+    SSRowSetAdapter:
+        This class provides empty functions for SSRowSet interface functions.
 
-	SSJdbcRowSetImpl:
-		This class extends SSRowSetAdapter. This is a wrapper for JdbcRowSetImpl
-		with support for serialization.
+    SSJdbcRowSetImpl:
+        This class extends SSRowSetAdapter. This is a wrapper for JdbcRowSetImpl
+        with support for serialization.
 
-	SSComboBox:
-		1. Using SSRowSet instead of RowSet.
-	
-	SSDBCheckBox:
-		1. Using SSRowSet instead of RowSet.
-	
-	SSDBComboBox:
-		1. Using SSRowSet instead of RowSet.
-		2. Using SSConnection instead of Connection.
+    SSComboBox:
+        1. Using SSRowSet instead of RowSet.
+    
+    SSDBCheckBox:
+        1. Using SSRowSet instead of RowSet.
+    
+    SSDBComboBox:
+        1. Using SSRowSet instead of RowSet.
+        2. Using SSConnection instead of Connection.
 
-	SSDataGrid:
-		1. Using SSRowSet instead of RowSet.
+    SSDataGrid:
+        1. Using SSRowSet instead of RowSet.
 
-	SSTableModel:
-		1. Using SSRowSet instead of RowSet.
+    SSTableModel:
+        1. Using SSRowSet instead of RowSet.
 
-	SSDataNavigator:
-		1. Using SSRowSet instead of RowSet.
-			
+    SSDataNavigator:
+        1. Using SSRowSet instead of RowSet.
+            
 
 ==============================================================================
 SwingSet 0.8.3-beta - Released 10-22-2004
 ==============================================================================
 
 Changes:
-	Classes or Interfaces added in SwingSet-0.8.3:
-		1. SSTextArea.
-	
-	SSDataGrid:
-		1.Using SSTextField as editor when a date editor is needed, rather 
-		  than having all the date mask code in the SSDataGrid again.
-		2.New function is provided to specify default column width for grid.
-		3.Column width can be specified when requesting a combo renderor.
-		  For this additional functions are provided for specifying column 
-		  width.
-		4.Added getCellEditorValue function for DateEditor sub-class. Because
-		  of this cell values (for columns of type Date) will be returned as
-		  Date objects rather than as Strings.
-		  This would require changes in SSCellEditing interface implementations
-		  if String is expected as _newValue for Date columns.
-		5.Calling the createDefaultColumnModel function when a new rowset is
-		  specified. This fixes the problem of not displaying any new columns
-		  being added to the rowset. (If the initial query has 2 columns and 
-		  then a new rowset has been specified with 3 columns DataGrid was 
-		  still showing only 2 columns).
-		  
-	SSTableModel:
-		1.Value for Date column can be set using a String (accepted formats
-	  	  mm/dd/yyyy or yyyy-mm-dd) or Date object.This helps the copy & paste
-		  functionality in copying dates.
-	
-	SSTextDocument:
-		1.Added support for CHAR types.
-		
-	SSTextField:
-		1.The way the masks work is modified to handle more keys.
-		2.Enter key will transfer the focus to next component irrespective
-		  of whether the mask being used.
-		3.Added focus listener to select complete text when the text field
-		  receives focus.
+    Classes or Interfaces added in SwingSet-0.8.3:
+        1. SSTextArea.
+    
+    SSDataGrid:
+        1.Using SSTextField as editor when a date editor is needed, rather 
+          than having all the date mask code in the SSDataGrid again.
+        2.New function is provided to specify default column width for grid.
+        3.Column width can be specified when requesting a combo renderor.
+          For this additional functions are provided for specifying column 
+          width.
+        4.Added getCellEditorValue function for DateEditor sub-class. Because
+          of this cell values (for columns of type Date) will be returned as
+          Date objects rather than as Strings.
+          This would require changes in SSCellEditing interface implementations
+          if String is expected as _newValue for Date columns.
+        5.Calling the createDefaultColumnModel function when a new rowset is
+          specified. This fixes the problem of not displaying any new columns
+          being added to the rowset. (If the initial query has 2 columns and 
+          then a new rowset has been specified with 3 columns DataGrid was 
+          still showing only 2 columns).
+          
+    SSTableModel:
+        1.Value for Date column can be set using a String (accepted formats
+          mm/dd/yyyy or yyyy-mm-dd) or Date object.This helps the copy & paste
+          functionality in copying dates.
+    
+    SSTextDocument:
+        1.Added support for CHAR types.
+        
+    SSTextField:
+        1.The way the masks work is modified to handle more keys.
+        2.Enter key will transfer the focus to next component irrespective
+          of whether the mask being used.
+        3.Added focus listener to select complete text when the text field
+          receives focus.
 
 
 ==============================================================================
@@ -142,35 +149,35 @@ SwingSet 0.8.2-beta - Released 09-21-2004
 ==============================================================================
 
 Changes:
-	SSDataNavigator:
-		1. Changed button names in code to more meaningful names
+    SSDataNavigator:
+        1. Changed button names in code to more meaningful names
            (e.g. button1 -> firstButton)
         2.Refresh was calling next() twice. This was causing a problem
           when the rowset has just one record.
-		3.Moving to the last record when the user presses the commit
-		  button to save the record. This would keep the user in the
-		  added record.
-		4.Added rowset listener to keep track of the record number,
-		  if the rowset is navigated out side of the navigation bar 
-		  (using rowset navigation methods).
-		5.Displaying exception messages, if one occurs when a button
-		  is pressed.
-	
-	SSComboBox:
-		1.Added support for mapping values in setDisplay function.
-		2.Combo Listener was not handling mapping values so added that.
-		3.Added a constant to indicate that there is no selection in combobox.
- 		  This value will be returned when  the selected index in combo box 
- 		  is -1.
-		4.Changed the codes for MALE & FEMALE constants, also changed
-		  the order in which they are added to the combo.
+        3.Moving to the last record when the user presses the commit
+          button to save the record. This would keep the user in the
+          added record.
+        4.Added rowset listener to keep track of the record number,
+          if the rowset is navigated out side of the navigation bar 
+          (using rowset navigation methods).
+        5.Displaying exception messages, if one occurs when a button
+          is pressed.
+    
+    SSComboBox:
+        1.Added support for mapping values in setDisplay function.
+        2.Combo Listener was not handling mapping values so added that.
+        3.Added a constant to indicate that there is no selection in combobox.
+          This value will be returned when  the selected index in combo box 
+          is -1.
+        4.Changed the codes for MALE & FEMALE constants, also changed
+          the order in which they are added to the combo.
 
-	SSDBComboBox:
-		1.Updating the numberOfItems variable in deleteItem & addItem
-		  functions.
+    SSDBComboBox:
+        1.Updating the numberOfItems variable in deleteItem & addItem
+          functions.
            
     SSTextField:
-    	1.The default mask is set to nothing. Previously it was MMDDYYYY.
+        1.The default mask is set to nothing. Previously it was MMDDYYYY.
         
         
 ==============================================================================
@@ -178,113 +185,113 @@ SwingSet 0.8.1-beta - Released 08-13-2004
 ==============================================================================
 
 Changes:
-	SSComboBox:
-		1. When the selected index in the combo box is -1 the value for that
-		   will be set to null in the database.
-		   
-	SSDBComboBox:
-		1. When the selected index in the combo box is -1 the value for that
-		   will be set to null in the database.
-		   
-	SSDataNavigator:
-		1. When a record is deleted or added to the current rowset with the 
-		   help of delete or add buttons on the navigator the row count
-		   displayed will change.
-		2. Default size of the buttons has been reduced a bit and that of 
-		   text field and label which display current row number and row count
-		   has been increased.
-		   
+    SSComboBox:
+        1. When the selected index in the combo box is -1 the value for that
+           will be set to null in the database.
+           
+    SSDBComboBox:
+        1. When the selected index in the combo box is -1 the value for that
+           will be set to null in the database.
+           
+    SSDataNavigator:
+        1. When a record is deleted or added to the current rowset with the 
+           help of delete or add buttons on the navigator the row count
+           displayed will change.
+        2. Default size of the buttons has been reduced a bit and that of 
+           text field and label which display current row number and row count
+           has been increased.
+           
            
 ==============================================================================
 SwingSet 0.8.0-beta - Released 08-11-2004
 ==============================================================================
 
 Changes:
-	Classes or Interfaces added in SwingSet-0.8.0:
-		1. SSTableKeyAdapter.
-		
-	SSCellEditingAdapter:
-		1. Implements Serializable.
-	
-	SSComboBox:
-		1. Made all the variables protected.
-		2. Added getColumnName function. This function returns the column name
+    Classes or Interfaces added in SwingSet-0.8.0:
+        1. SSTableKeyAdapter.
+        
+    SSCellEditingAdapter:
+        1. Implements Serializable.
+    
+    SSComboBox:
+        1. Made all the variables protected.
+        2. Added getColumnName function. This function returns the column name
            to which the combo box is bound to.
-		3. Added getRowSet function. This function returns the rowset being
+        3. Added getRowSet function. This function returns the rowset being
            used for binding.
-		4. Added setColumnName function. This function sets the column name to
+        4. Added setColumnName function. This function sets the column name to
            which the combo box has to be bound.
-		5. Added setRowSet function. This function sets the rowset to be used
+        5. Added setRowSet function. This function sets the rowset to be used
            for binding to the specified column.
-		6. Added setSelectedValue function. This function sets the value of
+        6. Added setSelectedValue function. This function sets the value of
            the combo box to the specified value. (Item displayed will be the
            one corresponding to the given value, the bound column value will
            also change).
-		7. Added addComponent and removeListener functions. These are private
+        7. Added addComponent and removeListener functions. These are private
            functions.
         8. The inner classes for listeners also implement Serializable
            interface.
-		
-	SSDataGrid:
-		1. Added functions getSelectedColumns and getSelectedColumnCount.
+        
+    SSDataGrid:
+        1. Added functions getSelectedColumns and getSelectedColumnCount.
            Overriding the methods in JTable. This is needed to avoid the
            hidden columns being selected. This is needed for copy and paste
            support.
-		2. Added copy and paste support for the SSDataGrid, this is achieved
+        2. Added copy and paste support for the SSDataGrid, this is achieved
            with the help of SSTableKeyAdapter.
-		3. The default item selected in a combo box renderer when a default
+        3. The default item selected in a combo box renderer when a default
            value is not specified for the column will be -1. In the previous
            release it was the first item.
-	
-	SSDataNavigator:
-		1. Added getXXX functions for rowset, button size, modification,
+    
+    SSDataNavigator:
+        1. Added getXXX functions for rowset, button size, modification,
            deletion, insertion, confirm deletes.
-		2. Added rowCount and currentRow variables to keep track of current
+        2. Added rowCount and currentRow variables to keep track of current
            row number and total number of rows in the current rowset.
-		3. Added a text field and a label to the navigator to display the
+        3. Added a text field and a label to the navigator to display the
            total number of rows and current record number.
-		  
-	SSDBCheckBox:
-		1. Added a new constructor which takes a rowset and column name as
+          
+    SSDBCheckBox:
+        1. Added a new constructor which takes a rowset and column name as
            arguments.
-		2. Added  bind function which takes a rowset and column name as
+        2. Added  bind function which takes a rowset and column name as
            arguments.
-		3. Added getColumnName function. This function returns the column name
+        3. Added getColumnName function. This function returns the column name
            to which the check box is bound to.
-		4. setTextField, getTextField functions are deprecated, also the
+        4. setTextField, getTextField functions are deprecated, also the
            constructor that takes a TextField as an argument is also
            deprecated
-		5. Added key listener to transfer focus when enter key is pressed.
-		
-	SSDBComboBox:
-		1. setTextField function is deprecated.
-		2. Added setSelectedValue function. This function sets the selected
+        5. Added key listener to transfer focus when enter key is pressed.
+        
+    SSDBComboBox:
+        1. setTextField function is deprecated.
+        2. Added setSelectedValue function. This function sets the selected
            item to the one corresponding to the specified value.
-		3. Added key listener to transfer focus when enter key is pressed.
-		4. Removing items from combo before adding new items.
-	
-	SSDBNavAdapter:
-		1. Implements Serializable.
-	
-	SSDBNavImp:
-		1. Default item selected in the combo box will be -1 rather than 0.
+        3. Added key listener to transfer focus when enter key is pressed.
+        4. Removing items from combo before adding new items.
+    
+    SSDBNavAdapter:
+        1. Implements Serializable.
+    
+    SSDBNavImp:
+        1. Default item selected in the combo box will be -1 rather than 0.
            This way the column value can be null if a value is not selected.
-		
-	SSTableKeyAdapter:
-		1. This class added a key listener to the JTable and provides copy and
+        
+    SSTableKeyAdapter:
+        1. This class added a key listener to the JTable and provides copy and
            paste support for the given JTable.
-		   
-	SSTableModel:
-		1. Made all the variables protected.
-	
-	SSTextDocument:
-		1. Added setColumnName, setColumnIndex, and setRowSet functions.
-		2. Added getColumnName, getColumnIndex, and getRowSet functions.
-		3. Added bind function so find the text field to a column in the
+           
+    SSTableModel:
+        1. Made all the variables protected.
+    
+    SSTextDocument:
+        1. Added setColumnName, setColumnIndex, and setRowSet functions.
+        2. Added getColumnName, getColumnIndex, and getRowSet functions.
+        3. Added bind function so find the text field to a column in the
            rowset.
         4. Added tranfer focus in the key listener. Focus will be tranferred
            to next component when enter key is pressed.
-	
+    
 
 ==============================================================================
 SwingSet 0.7.0-beta - Released 02-23-2004
@@ -336,7 +343,6 @@ Also added in the 0.6.0 release of SwingSet is the SSTextField, which extends
 the JTextField.  The SSTextField provides editing masks for data entry
 (e.g. dates, social security numbers, specified number of decimals, etc.).
 
-
 Classes or Interfaces added in SwingSet-0.6.0:
 
     1.SSCellEditing
@@ -345,7 +351,6 @@ Classes or Interfaces added in SwingSet-0.6.0:
     4.SSDataValue
     5.SSTableModel
     6.SSTextField
-
 
 New functions added to existing Classes or Interfaces in SwingSet 0.6.0
 

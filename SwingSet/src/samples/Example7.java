@@ -40,91 +40,95 @@ import javax.swing.event.*;
 import java.sql.*;
 
 public class Example7 extends JFrame {
-	
-	SSConnection ssConnection = null;
- 	SSJdbcRowSetImpl rowset   = null;
-	SSDataGrid dataGrid = new SSDataGrid();
-	
-	public Example7(){
-		super("Example 7");
-		setSize(650,350);
-		init();
-	}
-	
-	private void init(){
-		
-		
-		try{
-			ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
-				"swingset", "test");
- 			ssConnection.setDriverName("org.postgresql.Driver");
- 			ssConnection.createConnection();
- 			rowset = new SSJdbcRowSetImpl(ssConnection);
- 			rowset.setCommand("SELECT supplier_id, part_id,quantity, ship_date, supplier_part_id FROM supplier_part_data ORDER BY supplier_id, part_id;");
-			
- 			//  SET THE HEADER BEFORE SETTING THE ROWSET
-			dataGrid.setHeaders(new String[]{"Supplier Name", "Part Name", "Quantity", " Ship Date"});
-			dataGrid.setRowSet(rowset);
-			
-			dataGrid.updateUI();
-			
-			// HIDE THE PART ID COLUMN
- 			// THIS SETS THE WIDTH OF THE COLUMN TO 0
- 			dataGrid.setHiddenColumns(new String[]{"supplier_part_id"});
-			
- 			dataGrid.setDateRenderer("ship_date");
- 			if (this == null) {
- 				System.out.println("This frame is null");
-			}
- 			dataGrid.setMessageWindow(this);
- 			dataGrid.setUneditableColumns(new int[]{4});
- 			ResultSet rs = ssConnection.getConnection().createStatement().executeQuery("SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;");
- 			rs.last();
- 			String[] displayItems  = new String[rs.getRow()];
- 			Integer[] underlyingNumbers = new Integer[rs.getRow()];
- 			rs.beforeFirst();
- 			
- 			for( int i=0; i<displayItems.length; i++)
- 			{
- 				rs.next();
- 				displayItems[i] = rs.getString("supplier_name");
- 				underlyingNumbers[i] = new Integer(rs.getInt("supplier_id")); 
- 				
- 			}
- 			
- 			dataGrid.setComboRenderer("supplier_id",displayItems,underlyingNumbers);
- 			
- 			rs = ssConnection.getConnection().createStatement().executeQuery("SELECT part_name, part_id FROM part_data ORDER BY part_name;");
- 			rs.last();
- 			displayItems  = new String[rs.getRow()];
- 			underlyingNumbers = new Integer[rs.getRow()];
- 			rs.beforeFirst();
- 			
- 			for( int i=0; i<displayItems.length; i++)
- 			{
- 				rs.next();
- 				displayItems[i] = rs.getString("part_name");
- 				underlyingNumbers[i] = new Integer(rs.getInt("part_id")); 
- 				
- 			}
- 			
- 			dataGrid.setComboRenderer("part_id",displayItems,underlyingNumbers);
- 			
- 		}catch(SQLException se){
- 			se.printStackTrace();
- 		}catch(ClassNotFoundException cnfe){
- 			cnfe.printStackTrace();
- 		}
- 		
- 		getContentPane().add(dataGrid.getComponent());
- 		
- 		setVisible(true);
- 		
- 	} // END OF INIT FUNCTION
- 	
- }// END OF EXAMPLE 5.
+
+    SSConnection ssConnection = null;
+    SSJdbcRowSetImpl rowset   = null;
+    SSDataGrid dataGrid = new SSDataGrid();
+
+    public Example7(){
+        super("Example 7");
+        setSize(650,350);
+        init();
+    }
+
+    private void init(){
+
+
+        try{
+            ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
+                "swingset", "test");
+            ssConnection.setDriverName("org.postgresql.Driver");
+            ssConnection.createConnection();
+            rowset = new SSJdbcRowSetImpl(ssConnection);
+            rowset.setCommand("SELECT supplier_id, part_id,quantity, ship_date, supplier_part_id FROM supplier_part_data ORDER BY supplier_id, part_id;");
+
+            //  SET THE HEADER BEFORE SETTING THE ROWSET
+            dataGrid.setHeaders(new String[]{"Supplier Name", "Part Name", "Quantity", " Ship Date"});
+            dataGrid.setRowSet(rowset);
+
+            dataGrid.updateUI();
+
+            // HIDE THE PART ID COLUMN
+            // THIS SETS THE WIDTH OF THE COLUMN TO 0
+            dataGrid.setHiddenColumns(new String[]{"supplier_part_id"});
+
+            dataGrid.setDateRenderer("ship_date");
+            if (this == null) {
+                System.out.println("This frame is null");
+            }
+            dataGrid.setMessageWindow(this);
+            dataGrid.setUneditableColumns(new int[]{4});
+            ResultSet rs = ssConnection.getConnection().createStatement().executeQuery("SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;");
+            rs.last();
+            String[] displayItems  = new String[rs.getRow()];
+            Integer[] underlyingNumbers = new Integer[rs.getRow()];
+            rs.beforeFirst();
+
+            for( int i=0; i<displayItems.length; i++)
+            {
+                rs.next();
+                displayItems[i] = rs.getString("supplier_name");
+                underlyingNumbers[i] = new Integer(rs.getInt("supplier_id"));
+
+            }
+
+            dataGrid.setComboRenderer("supplier_id",displayItems,underlyingNumbers);
+
+            rs = ssConnection.getConnection().createStatement().executeQuery("SELECT part_name, part_id FROM part_data ORDER BY part_name;");
+            rs.last();
+            displayItems  = new String[rs.getRow()];
+            underlyingNumbers = new Integer[rs.getRow()];
+            rs.beforeFirst();
+
+            for( int i=0; i<displayItems.length; i++)
+            {
+                rs.next();
+                displayItems[i] = rs.getString("part_name");
+                underlyingNumbers[i] = new Integer(rs.getInt("part_id"));
+
+            }
+
+            dataGrid.setComboRenderer("part_id",displayItems,underlyingNumbers);
+
+        }catch(SQLException se){
+            se.printStackTrace();
+        }catch(ClassNotFoundException cnfe){
+            cnfe.printStackTrace();
+        }
+
+        getContentPane().add(dataGrid.getComponent());
+
+        setVisible(true);
+
+    } // END OF INIT FUNCTION
+
+ }// END OF EXAMPLE 7
+
 /*
  * $Log$
+ * Revision 1.3  2004/10/25 22:01:15  yoda2
+ * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ *
  * Revision 1.2  2004/10/25 19:52:12  prasanth
  * Modified to work with new SwingSet (SSConnection & SSRowSet)
  *

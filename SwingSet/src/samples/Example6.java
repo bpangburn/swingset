@@ -40,78 +40,82 @@ import javax.swing.event.*;
 import java.sql.*;
 
 public class Example6 extends JFrame {
-	
-	SSConnection ssConnection = null;
- 	SSJdbcRowSetImpl rowset   = null;
-	SSDataGrid dataGrid = new SSDataGrid();
-	
-	public Example6(){
-		super("Example 6");
-		setSize(300,350);
-		init();
-	}
-	
-	private void init(){
-		
-		
-		try{
-			ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
-				"swingset", "test");
- 			ssConnection.setDriverName("org.postgresql.Driver");
- 			ssConnection.createConnection();
- 			rowset = new SSJdbcRowSetImpl(ssConnection);
- 			rowset.setCommand("SELECT part_name,color_code, weight, city,part_id FROM part_data ORDER BY part_name;");
- 			//  SET THE HEADER BEFORE SETTING THE ROWSET
- 			dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
-			dataGrid.setRowSet(rowset);
- 			// HIDE THE PART ID COLUMN
- 			// THIS SETS THE WIDTH OF THE COLUMN TO 0
- 			//dataGrid.setHiddenColumns(new String[]{"part_id"});
- 			dataGrid.setHiddenColumns(new String[]{"part_id"});
- 			
- 			dataGrid.setMessageWindow(this);
- 			dataGrid.setUneditableColumns(new String[]{"part_id"});
- 			
- 			dataGrid.setComboRenderer("color_code",new String[]{"Red","Green","Blue"}, 
- 					new Integer[]{new Integer(0),new Integer(1),new Integer(2)});
- 			dataGrid.setDefaultValues(new int[]{1,2,3},new Object[]{new Integer(0),
- 					new Integer(20),new String("New Orleans")});		
- 			
- 			dataGrid.setPrimaryColumn("part_id");
- 			dataGrid.setSSDataValue(new SSDataValue(){
- 				public Object getPrimaryColumnValue(){
- 					// YOUR PRIMARY KEY VALUE GENERATION GOES HERE
- 					// IF ITS SOME THING USER ENTERS THEN NO PROBLEM
- 					// IF ITS AN AUTO INCREMENT FIELD THEN IT DEPENDS ON
- 					// THE DATABASE DRIVER YOU ARE USING.
- 					// IF THE UPDATEROW CAN RETRIEVE THE VALUES FOR THE ROW
- 					// WITH OUT KNOWING THE PRIMARY  KEY VALUE ITS FINE
- 					// BUT POSTGRES CAN'T UPDATE ROW WITH OUT THE PRIMARY
- 					// COLUMN.
- 					
- 					// YOUR PRIMARY KEY VALUE GENERATION GOES HERE.
- 					// the database does not allow updates so just returning
- 					// a fixed value. in your code you have to generate unique value.
- 					return new Integer(4);
- 				}
- 			});		
- 					
- 			
- 		}catch(SQLException se){
- 			se.printStackTrace();
- 		}catch(ClassNotFoundException cnfe){
- 			cnfe.printStackTrace();
- 		}
- 		
- 		getContentPane().add(dataGrid.getComponent());
- 		
- 		setVisible(true);
- 		
- 	} // END OF INIT FUNCTION
- 	
- }// END OF EXAMPLE 5.
+
+    SSConnection ssConnection = null;
+    SSJdbcRowSetImpl rowset   = null;
+    SSDataGrid dataGrid = new SSDataGrid();
+
+    public Example6(){
+        super("Example 6");
+        setSize(300,350);
+        init();
+    }
+
+    private void init(){
+
+
+        try{
+            ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
+                "swingset", "test");
+            ssConnection.setDriverName("org.postgresql.Driver");
+            ssConnection.createConnection();
+            rowset = new SSJdbcRowSetImpl(ssConnection);
+            rowset.setCommand("SELECT part_name,color_code, weight, city,part_id FROM part_data ORDER BY part_name;");
+            //  SET THE HEADER BEFORE SETTING THE ROWSET
+            dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
+            dataGrid.setRowSet(rowset);
+            // HIDE THE PART ID COLUMN
+            // THIS SETS THE WIDTH OF THE COLUMN TO 0
+            //dataGrid.setHiddenColumns(new String[]{"part_id"});
+            dataGrid.setHiddenColumns(new String[]{"part_id"});
+
+            dataGrid.setMessageWindow(this);
+            dataGrid.setUneditableColumns(new String[]{"part_id"});
+
+            dataGrid.setComboRenderer("color_code",new String[]{"Red","Green","Blue"},
+                    new Integer[]{new Integer(0),new Integer(1),new Integer(2)});
+            dataGrid.setDefaultValues(new int[]{1,2,3},new Object[]{new Integer(0),
+                    new Integer(20),new String("New Orleans")});
+
+            dataGrid.setPrimaryColumn("part_id");
+            dataGrid.setSSDataValue(new SSDataValue(){
+                public Object getPrimaryColumnValue(){
+                    // YOUR PRIMARY KEY VALUE GENERATION GOES HERE
+                    // IF ITS SOME THING USER ENTERS THEN NO PROBLEM
+                    // IF ITS AN AUTO INCREMENT FIELD THEN IT DEPENDS ON
+                    // THE DATABASE DRIVER YOU ARE USING.
+                    // IF THE UPDATEROW CAN RETRIEVE THE VALUES FOR THE ROW
+                    // WITH OUT KNOWING THE PRIMARY  KEY VALUE ITS FINE
+                    // BUT POSTGRES CAN'T UPDATE ROW WITH OUT THE PRIMARY
+                    // COLUMN.
+
+                    // YOUR PRIMARY KEY VALUE GENERATION GOES HERE.
+                    // the database does not allow updates so just returning
+                    // a fixed value. in your code you have to generate unique value.
+                    return new Integer(4);
+                }
+            });
+
+
+        }catch(SQLException se){
+            se.printStackTrace();
+        }catch(ClassNotFoundException cnfe){
+            cnfe.printStackTrace();
+        }
+
+        getContentPane().add(dataGrid.getComponent());
+
+        setVisible(true);
+
+    } // END OF INIT FUNCTION
+
+ }// END OF EXAMPLE 6
+
 /*
  * $Log$
+ * Revision 1.3  2004/10/25 22:01:15  yoda2
+ * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ *
  * Revision 1.2  2004/10/25 19:52:12  prasanth
  * Modified to work with new SwingSet (SSConnection & SSRowSet)
  *

@@ -40,52 +40,56 @@ import javax.swing.event.*;
 import java.sql.*;
 
 public class Example5 extends JFrame {
-	
-	SSConnection ssConnection = null;
- 	SSJdbcRowSetImpl rowset   = null;
-	SSDataGrid dataGrid = new SSDataGrid();
-	
-	public Example5(){
-		super("Example 5");
-		setSize(300,350);
-		init();
-	}
-	
-	private void init(){
-		
-		
-		try{
-			ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
-				"swingset", "test");
- 			ssConnection.setDriverName("org.postgresql.Driver");
- 			ssConnection.createConnection();
- 			rowset = new SSJdbcRowSetImpl(ssConnection);
- 			rowset.setCommand("SELECT part_name,color_code, weight, city,part_id FROM part_data ORDER BY part_name;");
- 			//  SET THE HEADER BEFORE SETTING THE ROWSET
- 			dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
- 			dataGrid.setRowSet(rowset);
- 			dataGrid.setMessageWindow(this);
- 			// HIDE THE PART ID COLUMN
- 			// THIS SETS THE WIDTH OF THE COLUMN TO 0
- 			dataGrid.setHiddenColumns(new String[]{"part_id"});
- 			dataGrid.setUneditableColumns(new String[]{"part_id"});
- 			
- 			
- 		}catch(SQLException se){
- 			se.printStackTrace();
- 		}catch(ClassNotFoundException cnfe){
- 			cnfe.printStackTrace();
- 		}
- 		
- 		getContentPane().add(dataGrid.getComponent());
- 		
- 		setVisible(true);
- 		
- 	} // END OF INIT FUNCTION
- 	
- }// END OF EXAMPLE 5.
+
+    SSConnection ssConnection = null;
+    SSJdbcRowSetImpl rowset   = null;
+    SSDataGrid dataGrid = new SSDataGrid();
+
+    public Example5(){
+        super("Example 5");
+        setSize(300,350);
+        init();
+    }
+
+    private void init(){
+
+
+        try{
+            ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
+                "swingset", "test");
+            ssConnection.setDriverName("org.postgresql.Driver");
+            ssConnection.createConnection();
+            rowset = new SSJdbcRowSetImpl(ssConnection);
+            rowset.setCommand("SELECT part_name,color_code, weight, city,part_id FROM part_data ORDER BY part_name;");
+            //  SET THE HEADER BEFORE SETTING THE ROWSET
+            dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
+            dataGrid.setRowSet(rowset);
+            dataGrid.setMessageWindow(this);
+            // HIDE THE PART ID COLUMN
+            // THIS SETS THE WIDTH OF THE COLUMN TO 0
+            dataGrid.setHiddenColumns(new String[]{"part_id"});
+            dataGrid.setUneditableColumns(new String[]{"part_id"});
+
+
+        }catch(SQLException se){
+            se.printStackTrace();
+        }catch(ClassNotFoundException cnfe){
+            cnfe.printStackTrace();
+        }
+
+        getContentPane().add(dataGrid.getComponent());
+
+        setVisible(true);
+
+    } // END OF INIT FUNCTION
+
+ }// END OF EXAMPLE 5
+
 /*
  * $Log$
+ * Revision 1.3  2004/10/25 22:01:16  yoda2
+ * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ *
  * Revision 1.2  2004/10/25 19:52:12  prasanth
  * Modified to work with new SwingSet (SSConnection & SSRowSet)
  *

@@ -75,9 +75,9 @@ important ways:
      deserialization in the rest of the SwingSet components
   2. SSRowSet only contains methods necessary to support the data types in used
      by SSTextDocument which will make writing SSRowSet implementations for
-	 non-updatable RowSets and other non-database datasources (e.g. a HashMap)
-	 much easier
-	 
+     non-updatable RowSets and other non-database datasources (e.g. a HashMap)
+     much easier
+     
 A SSJdbcRowSetImpl implementation of SSRowSet is provided to replace the
 JdbcRowSetImpl used in most existing SwingSet applications.  It is basically a
 serialized wrapper of JdbcRowSetImpl.  It can be used in conjunction with the
@@ -109,17 +109,17 @@ to transition to 0.9.0 and later versions of SwingSet:
 
     Connection conn = null;
     JdbcRowSetImpl rowset = null;
-	
+    
     Class.forName("org.postgresql.Driver");
     conn = DriverManager.getConnection
         ("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
         "swingset","test");
-    rowset = new JdbcRowSetImpl(conn);	
+    rowset = new JdbcRowSetImpl(conn);  
 
     ***************************
     NEW - SSConnection/SSRowSet
     ***************************
-    import java.sql.*;	// still needed
+    import java.sql.*;  // still needed
     import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
     import com.nqadmin.swingSet.datasources.SSConnection;
 
@@ -132,7 +132,7 @@ to transition to 0.9.0 and later versions of SwingSet:
     ssConnection.setDriverName("org.postgresql.Driver");
     ssConnection.createConnection();
     rowset = new SSJdbcRowSetImpl(ssConnection);
-================================================================================	
+================================================================================    
 
 Our goal for the 0.9.X series is to focus on bug squashing and possibly some
 minor feature enhancements.  We hope to have a 1.0 production release by the
@@ -434,13 +434,13 @@ e.g.
 
     // CREATE A TEXTFIELD - OLD WAY
     //    JTextField myText = new JTextField();
-	// CREATE A TEXTFIELD - PREFERRED WAY
-		SSTextField myText = new SSTextField();
+    // CREATE A TEXTFIELD - PREFERRED WAY
+        SSTextField myText = new SSTextField();
         
     // BIND TEXTFIELD - OLD WAY
     //  myText.setDocument(new SSTextDocument(ssJdbcRowSet, "quantity");
     // BIND TEXTFIELD - PREFERRED WAY.
-    	myText.bind(ssJdbcRowSet, "quantity");
+        myText.bind(ssJdbcRowSet, "quantity");
            
      } catch(Exception e) {
      // EXCEPTION HANDLER HERE...
