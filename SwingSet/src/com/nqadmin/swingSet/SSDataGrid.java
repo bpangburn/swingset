@@ -138,13 +138,13 @@ public class SSDataGrid extends JTable {
     protected Component window = null;
 
     // SSROWSET CONTAINING THE VALUES
-    private SSRowSet rowset = null;
+    protected SSRowSet rowset = null;
 
     // NUMBER OF COLUMNS IN THE SSROWSET
-    private int columnCount = -1;
+    protected int columnCount = -1;
 
     // NUMBER OF RECORDS RETRIVED
-    private int rowCount = -1;
+    protected int rowCount = -1;
 
     /**
      * Minimum width of the columns in the data grid.
@@ -154,7 +154,7 @@ public class SSDataGrid extends JTable {
     /**
      * Table model to construct the JTable
      */
-    protected SSTableModel tableModel = null;
+    protected SSTableModel tableModel = new SSTableModel();
 
     /**
      * Scrollpane used to scroll datagrid.
@@ -182,19 +182,21 @@ public class SSDataGrid extends JTable {
      * @param _rowset    SSRowSet from which values have to be retrieved.
      */
     public SSDataGrid(SSRowSet _rowset) {
-        super();
+        //super();
 //super(VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED );
         rowset = _rowset;
 //      addComponent();
         init();
+        bind();
     }
 
     /**
      *  Constructs an empty data grid.
      */
     public SSDataGrid() {
-        super();
-        tableModel = new SSTableModel();
+        //super();
+        //tableModel = new SSTableModel();
+        init();
 
 //super(VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_ALWAYS);
     }
@@ -305,10 +307,93 @@ public class SSDataGrid extends JTable {
     }
 
     /**
+     * Initialization code.
+     */
+    private void init() {
+    
+        // ADD KEY LISTENER TO JTABLE.
+        // THIS IS USED FOR DELETING THE ROWS
+        // ALLOWS MULTIPLE ROW DELETION.
+        // KEY SEQUENCE FOR DELETING ROWS IS CTRL-X.
+            this.addKeyListener(new KeyAdapter() {
+                private boolean controlPressed = false;
+    
+            // IF THE KEY PRESSED IS CONTROL STORE THAT INFO.
+                public void keyPressed(KeyEvent ke) {
+                    if (ke.getKeyCode() == KeyEvent.VK_CONTROL) {
+                        controlPressed = true;
+                    }
+                }
+    
+            // HANDLE KEY RELEASES
+                public void keyReleased(KeyEvent ke) {
+                // IF CONTROL KEY IS RELEASED SET THAT CONTROL IS NOT PRESSED.
+                    if (ke.getKeyCode() == KeyEvent.VK_CONTROL) {
+                        controlPressed = false;
+                    }
+                // IF X IS PRESSED WHILE THE CONTROL KEY IS STILL PRESSED
+                // DELETE THE SELECTED ROWS.
+                    if (ke.getKeyCode() == KeyEvent.VK_X) {
+                        if (! controlPressed) {
+                            return;
+                        }
+                    // GET THE NUMBER OF ROWS SELECTED
+                        int numRows = getSelectedRowCount();
+                        if (numRows == 0) {
+                            return;
+                        }
+                    // GET LIST OF ROWS SELECTED
+                        int[] rows = getSelectedRows();
+                    // IF USER HAS PROVIDED A PARENT COMPONENT FOR ERROR MESSAGES
+                    // CONFIRM THE DELETION
+                        if (window != null) {
+                            int returnValue = JOptionPane.showConfirmDialog(window,"You are about to delete " + rows.length + " rows. " +
+                                "\nAre you sure you want to delete the rows?");
+                            if (returnValue != JOptionPane.YES_OPTION) {
+                                return;
+                            }
+                        }
+                    // START DELETING THE ROWS IN BOTTON UP FASHION
+                    // IN DOING SO YOU RETAIN THE ROW NUMBERS THAT HAVE TO BE DELETED
+                    // IF YOU DO IT TOP DOWN THE ROW NUMBERING CHANGES AS SOON AS A
+                    // ROW IS DELETED AS A RESULT LOT OF CARE HAS TO BE TAKEN
+                    // TO IDENTIFY THE NEW ROW NUMBERS AND THEN DELETE THE ROWS
+                    // INSTEAD OF THAT ITS MUCH EASIER IF YOU DO IT BOTTOM UP.
+                        for (int i=rows.length -1;i>=0;i--) {
+                            tableModel.deleteRow(rows[i]);
+                        }
+                        updateUI();
+                    }
+                }
+            });
+
+        // CREATE AN INSTANCE OF KEY ADAPTER ADD PROVIDE THE PRESET GRID TO THE ADAPTER.
+        // THIS IS FOR COPY AND PASTE SUPPORT
+            SSTableKeyAdapter keyAdapter = new SSTableKeyAdapter(this);
+            keyAdapter.setAllowInsertion(true);
+            
+        // SET THE TABLE MODEL FOR JTABLE
+        //    this.setModel(tableModel);
+    
+        // SPECIFY THE MESSAGE WINDOW TO WHICH THE TABLE MODEL HAS TO POP UP
+        // ERROR MESSAGES.
+            tableModel.setMessageWindow(window);
+            tableModel.setJTable(this);            
+            
+        // THIS CAUSES THE JTABLE TO DISPLAY THE HORIZONTAL SCROLL BAR AS NEEDED.
+            this.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            
+        // ADD THE JTABLE TO A SCROLL BAR
+            scrollPane = new JScrollPane(this,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
+
+    } // end private void init() {
+        
+    /**
      * Initializes the data grid control. Collects metadata information about the
      * given SSRowSet.
      */
-    private void init() {
+    private void bind() {
+        
         try {
         // EXECUTE THE QUERY
             if (callExecute) {
@@ -316,96 +401,36 @@ public class SSDataGrid extends JTable {
             }
 
         // SPECIFY THE SSROWSET TO THE TABLE MODEL.
-            if (tableModel == null) {
-                tableModel = new SSTableModel(rowset);
-            } else {
+        //    if (tableModel == null) {
+        //        tableModel = new SSTableModel(rowset);
+        //    } else {
                 tableModel.setRowSet(rowset);
-            }
+        //    }
+        
+        // SET THE TABLE MODEL FOR JTABLE
+            this.setModel(tableModel);        
 
         // GET THE ROW COUNT
             rowCount = tableModel.getRowCount();
+            
         // GET THE COLUMN COUNT
             columnCount = tableModel.getColumnCount();
 
         } catch(SQLException se) {
             se.printStackTrace();
         }
-    // SET THE TABLE MODEL FOR JTABLE
-        this.setModel(tableModel);
+        
+        // THIS IS NEEDED IF THE NUMBER OF COLUMNS IN THE NEW SSROWSET
+        // DOES NOT MATCH WITH THE OLD COLUMNS.
+            createDefaultColumnModel();        
+        
+        // HIDE COLUMNS AS NEEDED - ALSO CALLS updateUI()
+            hideColumns();
+            
+        // UPDATE DISPLAY
+        //    updateUI();
 
-    // SPECIFY THE MESSAGE WINDOW TO WHICH THE TABLE MODEL HAS TO POP UP
-    // ERROR MESSAGES.
-        tableModel.setMessageWindow(window);
-        tableModel.setJTable(this);
-        hideColumns();
-
-    // ADD KEY LISTENER TO JTABLE.
-    // THIS IS USED FOR DELETING THE ROWS
-    // ALLOWS MULTIPLE ROW DELETION.
-    // KEY SEQUENCE FOR DELETING ROWS IS CTRL-X.
-        this.addKeyListener(new KeyAdapter() {
-            private boolean controlPressed = false;
-
-        // IF THE KEY PRESSED IS CONTROL STORE THAT INFO.
-            public void keyPressed(KeyEvent ke) {
-                if (ke.getKeyCode() == KeyEvent.VK_CONTROL) {
-                    controlPressed = true;
-                }
-            }
-
-
-            public void keyReleased(KeyEvent ke) {
-            // IF CONTROL KEY IS RELEASED SET THAT CONTROL IS NOT PRESSED.
-                if (ke.getKeyCode() == KeyEvent.VK_CONTROL) {
-                    controlPressed = false;
-                }
-            // IF X IS PRESSED WHILE THE CONTROL KEY IS STILL PRESSED
-            // DELETE THE SELECTED ROWS.
-                if (ke.getKeyCode() == KeyEvent.VK_X) {
-                    if (! controlPressed) {
-                        return;
-                    }
-                // GET THE NUMBER OF ROWS SELECTED
-                    int numRows = getSelectedRowCount();
-                    if (numRows == 0) {
-                        return;
-                    }
-                // GET LIST OF ROWS SELECTED
-                    int[] rows = getSelectedRows();
-                // IF USER HAS PROVIDED A PARENT COMPONENT FOR ERROR MESSAGES
-                // CONFIRM THE DELETION
-                    if (window != null) {
-                        int returnValue = JOptionPane.showConfirmDialog(window,"You are about to delete " + rows.length + " rows. " +
-                            "\nAre you sure you want to delete the rows?");
-                        if (returnValue != JOptionPane.YES_OPTION) {
-                            return;
-                        }
-                    }
-                // START DELETING THE ROWS IN BOTTON UP FASHION
-                // IN DOING SO YOU RETAIN THE ROW NUMBERS THAT HAVE TO BE DELETED
-                // IF YOU DO IT TOP DOWN THE ROW NUMBERING CHANGES AS SOON AS A
-                // ROW IS DELETED AS A RESULT LOT OF CARE HAS TO BE TAKEN
-                // TO IDENTIFY THE NEW ROW NUMBERS AND THEN DELETE THE ROWS
-                // INSTEAD OF THAT ITS MUCH EASIER IF YOU DO IT BOTTOM UP.
-                    for (int i=rows.length -1;i>=0;i--) {
-                        tableModel.deleteRow(rows[i]);
-                    }
-                    updateUI();
-                }
-            }
-        });
-
-
-        // CREATE AN INSTANCE OF KEY ADAPTER ADD PROVIDE THE PRESET GRID TO THE ADAPTER.
-        // THIS IS FOR COPY AND PASTE SUPPORT
-            SSTableKeyAdapter keyAdapter = new SSTableKeyAdapter(this);
-            keyAdapter.setAllowInsertion(true);
-        // THIS CAUSES THE JTABLE TO DISPLAY THE HORIZONTAL SCROLL BAR AS NEEDED.
-            this.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        // ADD THE JTABLE TO A SCROLL BAR
-            scrollPane = new JScrollPane(this,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
-
-    } // end private void init() {
+    } // end private void bind() {        
 
     /**
      * Binds the SSRowSet to the grid.
@@ -414,6 +439,7 @@ public class SSDataGrid extends JTable {
      * @param _rowset    the SSRowSet which acts as the data source.
      */
      public void setRowSet(SSRowSet _rowset) {
+/*         
         // VARIABLE TO DETERMINE IF UI HAS TO BE UPDATED
         boolean updateUI = false;
         // IF A ROW SET ALREADY EXISTS THEN UI HAS TO BE UPDATED
@@ -440,6 +466,10 @@ public class SSDataGrid extends JTable {
         if (updateUI) {
             updateUI();
         }
+*/
+        // UPDATE ROWSET & BIND
+            rowset = _rowset;
+            bind();
      } // end public void setRowSet(SSRowSet _rowset) {
 
      /**
@@ -472,10 +502,10 @@ public class SSDataGrid extends JTable {
       * @param _values the values for the column numbers specified in _columnNumbers.
       */
      public void setDefaultValues(int[] _columnNumbers, Object[] _values) {
-         if (tableModel == null) {
-            tableModel = new SSTableModel();
-         }
-        tableModel.setDefaultValues(_columnNumbers,_values);
+         //if (tableModel == null) {
+         //   tableModel = new SSTableModel();
+         //}
+         tableModel.setDefaultValues(_columnNumbers,_values);
      }
 
      /**
@@ -494,9 +524,9 @@ public class SSDataGrid extends JTable {
 
         int[] columnNumbers = null;
 
-        if (tableModel == null) {
-            tableModel = new SSTableModel();
-        }
+        //if (tableModel == null) {
+        //    tableModel = new SSTableModel();
+        //}
 
         if ( _columnNames != null) {
             columnNumbers = new int[_columnNames.length];
@@ -1106,6 +1136,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.20  2004/12/10 18:59:47  prasanth
+ * Modified the getCellEditorValue function of CheckBoxEditor inner class.
+ *
  * Revision 1.19  2004/12/09 18:36:04  prasanth
  * Added CheckBox rendering support.
  *

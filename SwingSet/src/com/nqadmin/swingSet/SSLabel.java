@@ -41,6 +41,8 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.text.*;
 import javax.swing.event.*;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 /**
  * SSLabel.java
@@ -55,21 +57,24 @@ import javax.swing.event.*;
 public class SSLabel extends JLabel {
 
     // TEXT FIELD BOUND TO THE DATABASE
-    private JTextField textField = new JTextField();
+    protected JTextField textField = new JTextField();
+
+    // SSROWSET FROM WHICH THE LABEL WILL GET/SET VALUES
+    protected SSRowSet rowset;
 
     // BINDING INFORMATION
-    private String columnName;
-    private int columnType;
+    protected String columnName;
 
     // LISTENER FOR LABEL & TEXT FIELD
-    private MyLabelListener labelListener = new MyLabelListener();
-    private MyTextFieldListener textFieldListener = new MyTextFieldListener();
+    private MyLabelTextListener labelTextListener = new MyLabelTextListener();
+    private MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
     /**
      * Empty constructor needed for deserialization. Creates a SSLabel instance
      * with no image and with an empty string for the title.
      */
     public SSLabel() {
+        init();
     }
 
     /**
@@ -79,6 +84,7 @@ public class SSLabel extends JLabel {
      */
     public SSLabel(Icon _image) {
 		super(_image);
+        init();
     }
 
     /**
@@ -89,6 +95,7 @@ public class SSLabel extends JLabel {
      */
     public SSLabel(Icon _image, int _horizontalAlignment) {
 		super(_image, _horizontalAlignment);
+        init();
     }
 
     /**
@@ -102,121 +109,164 @@ public class SSLabel extends JLabel {
         columnName = _columnName;
         textField = new JTextField();
         textField.setDocument(new SSTextDocument(_rowset, _columnName));
-        columnType = _rowset.getColumnType(_columnName);
+        init();
     }
-
+    
     /**
-     * Sets the datasource and the columnName in the datasource to which the
-     * SSLabel has to be bound to.
-     *
-     * @param _rowset    datasource to be used.
-     * @param _columnName    Name of the column to which this label should be bound
+     * Initialization code.
      */
-    public void bind(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
-        columnName = _columnName;
-        textField.setDocument(new SSTextDocument(_rowset, _columnName));
-        columnType = _rowset.getColumnType(_columnName);
+    protected void init() {
+        // SET PREFERRED AND MAXIMUM DIMENSIONS
+            setPreferredSize(new Dimension(200,20));
+            setMaximumSize(new Dimension(200,20));            
     }
 
     /**
-     * returns the column name to which this label is bound to.
+     * Returns the column name to which the combo is bound.
      *
-     * @return column name to which the label is bound.
+     * @return returns the column name to which to combo box is bound.
      */
     public String getColumnName() {
         return columnName;
     }
 
     /**
-     * Initializes the label by getting the value corresponding to
-     * specified column from the SSRowSet.
+     * Returns the SSRowSet being used to get the values.
+     *
+     * @return returns the SSRowSet being used.
      */
-    public void execute() {
-        initLabel();
+    public SSRowSet getSSRowSet() {
+        return rowset;
     }
 
     /**
-     * Initializes the label.
+     * Sets the column name to which the combo box has to be bound
+     *
+     * @param _columnName    column name in the SSRowSet to which the combo box
+     *    is bound.
      */
-    private void initLabel() {
+    public void setColumnName(String _columnName) {
+        columnName = _columnName;
+        bind();
+    }
 
-        // ADD LISTENER FOR THE TEXT FIELD
-            textField.getDocument().addDocumentListener(textFieldListener);
+    /**
+     * Sets the SSRowSet to be used.
+     *
+     * @param _rowset    SSRowSet to be used for getting the values.
+     */
+    public void setSSRowSet(SSRowSet _rowset) {
+        rowset = _rowset;
+        bind();
+    }
 
+    /**
+     * The column name and the SSRowSet should be set before calling this function.
+     * If the column name and SSRowSet are set seperately then this function has to
+     * be called to bind the combo box to the column in the SSRowSet.
+     */
+    private void bind() {
+        
+        // CHECK FOR NULL COLUMN/ROWSET
+            if (columnName==null || rowset==null) {
+                return;
+            }
+
+        // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
+            textField.setDocument(new SSTextDocument(rowset, columnName));
+
+        // SET THE LABEL DISPLAY
+            setDisplay();
+
+        // ADDS LISTENERS FOR TEXT FIELD AND COMBO
+        // IF BIND IS CALLED MULTIPLE TIMES OLD LISTENERS HAVE TO BE REMOVED
+            removeListeners();
+            addListeners();
+               
+    }    
+
+    /**
+     * Binds the combo box to the specified column of the SSRowSet.
+     * As the SSRowSet changes the combo box item displayed changes accordingly.
+     *
+     * @param _rowset    SSRowSet to be used for getting the value.
+     * @param _columnName    Column to which the combo box has to be bound.
+     */
+    public void bind(SSRowSet _rowset, String _columnName) {
+        rowset = _rowset;
+        columnName = _columnName;
+        bind();
+    }
+    
+    // INITIALIZES THE LABEL DISPLAY
+    private void setDisplay() {
+            
         // SET THE LABEL BASED ON THE VALUE IN THE TEXT FIELD
             setText(textField.getText());
 
-        // ADD LISTENER FOR THE LABEL
-        // REMOVE HAS TO BE CALLED SO MAKE SURE THAT YOU ARE NOT STACKING UP
-        // LISTENERS WHEN EXECUTE IS CALLED MULTIPLE TIMES.
-        //    removeChangeListener(labelListener);
-        //    addChangeListener(labelListener);
+    } // end private void setDisplay() {    
 
-    } // end private void initLabel() {
+    // ADDS LISTENERS FOR THE COMBO BOX AND TEXT FIELD
+    private void addListeners() {
+        textField.getDocument().addDocumentListener(textFieldDocumentListener);
+        addPropertyChangeListener("text", labelTextListener);
+    }
+
+    // REMOVES THE LISTENERS FOR TEXT FIELD AND THE COMBO BOX DISPLAYED
+    private void removeListeners() {
+        textField.getDocument().removeDocumentListener(textFieldDocumentListener);
+        removePropertyChangeListener("text", labelTextListener);
+    }
 
     /**
      * Listener for the text document.
      */
-    private class MyTextFieldListener implements DocumentListener, Serializable {
-        private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
-            objIn.defaultReadObject();
-        }
-
-        private void writeObject(ObjectOutputStream objOut) throws IOException {
-            objOut.defaultWriteObject();
-        }
-
+    private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
         public void changedUpdate(DocumentEvent de) {
-            //removeChangeListener(labelListener);
+            removePropertyChangeListener("text", labelTextListener);
 
-            setText(textField.getText());
+            //setText(textField.getText());
+            setDisplay();
 
-            //addChangeListener(labelListener);
+            addPropertyChangeListener("text", labelTextListener);
         }
 
         // WHEN EVER THERE IS A CHANGE IN THE VALUE IN THE TEXT FIELD CHANGE THE LABEL
         // ACCORDINGLY.
         public void insertUpdate(DocumentEvent de) {
-            //removeChangeListener(labelListener);
+            removePropertyChangeListener("text", labelTextListener);
 
-            setText(textField.getText());
+            //setText(textField.getText());
+            setDisplay();
 
-            //addChangeListener(labelListener);
+            addPropertyChangeListener("text", labelTextListener);
         }
 
         // IF A REMOVE UPDATE OCCURS ON THE TEXT FIELD CHECK THE CHANGE AND SET THE
         // CHECK BOX ACCORDINGLY.
         public void removeUpdate(DocumentEvent de) {
-            //removeChangeListener(labelListener);
+            removePropertyChangeListener("text", labelTextListener);
 
-            setText(textField.getText());
+            //setText(textField.getText());
+            setDisplay();
 
-            //addChangeListener(labelListener);
+            addPropertyChangeListener("text", labelTextListener);
         }
-    } // end private class MyTextFieldListener implements DocumentListener, Serializable {
+    } // end private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
     /**
      * Listener for the label.
      */
-    private class MyLabelListener implements ChangeListener, Serializable {
-
-        private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
-            objIn.defaultReadObject();
-        }
-
-        private void writeObject(ObjectOutputStream objOut) throws IOException {
-            objOut.defaultWriteObject();
-        }
-
-        public void stateChanged(ChangeEvent ce) {
-            textField.getDocument().removeDocumentListener(textFieldListener);
+    private class MyLabelTextListener implements PropertyChangeListener, Serializable {
+        public void propertyChange(PropertyChangeEvent pce) {
+            textField.getDocument().removeDocumentListener(textFieldDocumentListener);
 
             textField.setText(getText());
 
-            textField.getDocument().addDocumentListener(textFieldListener);
+            textField.getDocument().addDocumentListener(textFieldDocumentListener);
         }
 
-    } // end private class MyLabelListener implements ChangeListener, Serializable {
+    } // end private class MyLabelTextListener implements ChangeListener, Serializable {
 
 } // end public class SSLabel extends JLabel {
 
@@ -224,6 +274,9 @@ public class SSLabel extends JLabel {
 
 /*
  * $Log$
+ * Revision 1.3  2005/01/03 02:58:03  yoda2
+ * Added appropriate super() calls to non-empty constructors.
+ *
  * Revision 1.2  2005/01/02 18:33:48  yoda2
  * Added back empty constructor needed for deserialization along with other potentially useful constructors from parent classes.
  *

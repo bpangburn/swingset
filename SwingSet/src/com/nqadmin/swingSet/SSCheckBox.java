@@ -229,7 +229,10 @@ public class SSCheckBox extends JCheckBox {
 
         public void changedUpdate(DocumentEvent de){
             removeChangeListener(checkBoxListener);
+            
+            setDisplay();
 
+            /*
             switch(columnType) {
                 case java.sql.Types.INTEGER:
                 case java.sql.Types.SMALLINT:
@@ -255,14 +258,19 @@ public class SSCheckBox extends JCheckBox {
                 default:
                     break;
             }
+            */
             
-            addChangeListener( checkBoxListener );
+            addChangeListener(checkBoxListener);
         }
 
         // WHEN EVER THERE IS A CHANGE IN THE VALUE IN THE TEXT FIELD CHANGE THE CHECK BOX
         // ACCORDINGLY.
         public void insertUpdate(DocumentEvent de) {
-            removeChangeListener( checkBoxListener );
+            removeChangeListener(checkBoxListener);
+            
+            setDisplay();
+            
+            /*
 
             switch(columnType) {
                 case java.sql.Types.INTEGER:
@@ -289,6 +297,7 @@ public class SSCheckBox extends JCheckBox {
                 default:
                     break;
             }
+            */
             
             addChangeListener( checkBoxListener );
         }
@@ -296,7 +305,11 @@ public class SSCheckBox extends JCheckBox {
         // IF A REMOVE UPDATE OCCURS ON THE TEXT FIELD CHECK THE CHANGE AND SET THE
         // CHECK BOX ACCORDINGLY.
         public void removeUpdate(DocumentEvent de) {
-            removeChangeListener( checkBoxListener );
+            removeChangeListener(checkBoxListener);
+            
+            setDisplay();
+            
+            /*
 
             switch(columnType) {
                 case java.sql.Types.INTEGER:
@@ -323,6 +336,7 @@ public class SSCheckBox extends JCheckBox {
                 default:
                     break;
             }
+            */
             
             addChangeListener( checkBoxListener );
         }
@@ -400,6 +414,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.3  2005/01/21 22:55:00  yoda2
+ * API cleanup.
+ *
  * Revision 1.2  2005/01/19 20:54:43  yoda2
  * API cleanup.
  *
