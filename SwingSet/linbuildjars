@@ -21,16 +21,22 @@ mkdir ./release_jars/images
 mkdir ./release_jars/images/icons
 
 # RECOMPILE SWINGSET
-javac -source 1.4 -target 1.4 -d ./release_jars/bin ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/*.java
+javac -source 1.4 -target 1.4 -d ./release_jars/bin ./src/com/nqadmin/swingSet/*.java ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/formatting/*.java ./src/com/nqadmin/swingSet/formatting/helpers/*.java ./src/com/nqadmin/swingSet/utils/*.java
 
 # REBUILD JAVADOCS
-javadoc -d ./release_jars/docs ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/*.java
+javadoc -d ./release_jars/docs ./src/com/nqadmin/swingSet/*.java ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/formatting/*.java ./src/com/nqadmin/swingSet/formatting/helpers/*.java ./src/com/nqadmin/swingSet/utils/*.java
 
 # COPY SOURCE CODE
 cp ./src/com/nqadmin/swingSet/*.java ./release_jars/src/com/nqadmin/swingSet/
 rm ./release_jars/src/com/nqadmin/swingSet/*.java~
 cp ./src/com/nqadmin/swingSet/datasources/*.java ./release_jars/src/com/nqadmin/swingSet/datasources/
 rm ./release_jars/src/com/nqadmin/swingSet/datasources/*.java~
+cp ./src/com/nqadmin/swingSet/utils/*.java ./release_jars/src/com/nqadmin/swingSet/utils/
+rm ./release_jars/src/com/nqadmin/swingSet/utils/*.java~
+cp ./src/com/nqadmin/swingSet/formatting/*.java ./release_jars/src/com/nqadmin/swingSet/formatting/
+rm ./release_jars/src/com/nqadmin/swingSet/formatting/*.java~
+cp ./src/com/nqadmin/swingSet/formatting/helpers/*.java ./release_jars/src/com/nqadmin/swingSet/formatting/helpers/
+rm ./release_jars/src/com/nqadmin/swingSet/formatting/helpers/*.java~
 
 # COPY IMAGES & LICENSE
 cp ./src/images/* ./release_jars/images
