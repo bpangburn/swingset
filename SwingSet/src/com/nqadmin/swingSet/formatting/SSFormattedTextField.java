@@ -212,7 +212,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
             
             System.out.println("F3 ");
             calculator = new javax.swing.JPopupMenu();
-            calculator.add(new com.nqadmin.swingSet.formatting.utils.JCalculator());
+            //calculator.add(new com.nqadmin.swingSet.formatting.utils.JCalculator());
             JFormattedTextField ob = (JFormattedTextField)(e.getSource());
             java.awt.Dimension d = ob.getSize();
             calculator.show(ob, 0, d.height);
@@ -650,6 +650,9 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
 
 /*
  * $Log$
+ * Revision 1.6  2005/01/18 22:36:55  dags
+ * Helpers refactoring
+ *
  * Revision 1.5  2005/01/18 22:34:30  dags
  * sincronization update
  *
