@@ -22,11 +22,18 @@ Changes:
            SSTextFieldBeanInfo, SSConnectionBeanInfo, SSJdbcRowSetImplBeanInfo -
            new support classes for managing bean-related properties.  Currently
            only handle icon display.
+           
+    SSComboBox:
+        1. Rewrote to extend JComboBox rather than JComponent.
     
     SSDBCheckBox:
-        1. Added support for boolean database columns. Only tested with Postgresql.
-        2. Updated JavaDoc to reflect it.
-        3. Deprecated in favor of SSCheckBox to match naming conventions.
+        1. Rewrote to extend JComboBox rather than JComponent.
+        2. Added support for boolean database columns. Only tested with Postgresql.
+        3. Updated JavaDoc to reflect it.
+        4. Deprecated in favor of SSCheckBox to match naming conventions.
+        
+    SSDBComboBox:
+        1. Added support for non-numeric primary keys.
 
     SSTextDocument:
         1. Fixed boolean rowset update.
