@@ -120,8 +120,8 @@ public class SSComboBox extends JComponent {
 		 */
 		public static final int SEX_OPTION = 1;
 		public static final int GENDER_OPTION = 1;
-		public static final int MALE = 1;
-		public static final int FEMALE = 0;
+		public static final int MALE = 0;
+		public static final int FEMALE = 1;
         
 		/**	
 		 *	Type used for combo box.
@@ -496,8 +496,8 @@ public class SSComboBox extends JComponent {
 				cmbDisplayed.addItem(new String("NO"));
 				cmbDisplayed.addItem(new String("YES"));
 			} else if (_options == SEX_OPTION || _options == GENDER_OPTION) {
-				cmbDisplayed.addItem(new String("FEMALE"));
 				cmbDisplayed.addItem(new String("MALE"));
+				cmbDisplayed.addItem(new String("FEMALE"));
 			} else if (_options == INCLUDE_EXCLUDE_OPTION) {
 				cmbDisplayed.addItem(new String("INCLUDE"));
 				cmbDisplayed.addItem(new String("EXCLUDE"));
@@ -704,6 +704,10 @@ public class SSComboBox extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.13  2004/09/13 15:41:25  prasanth
+ * Added a constant to indicate that there is no selection in combobox.
+ * This value will be returned when  the selected index in combo box is -1.
+ *
  * Revision 1.12  2004/09/02 16:20:17  prasanth
  * Added support for mapping values in setDisplay function.
  * Combo Listener was not handling mapping values  so added that.
