@@ -672,6 +672,7 @@ public class SSDataGrid extends JTable {
     	tableColumn.setCellEditor(new ComboEditor(_displayItems, _underlyingValues));
     	tableColumn.setMinWidth(_columnWidth);
     }
+    	
     
     /**
      * Sets the header for the JTable.
@@ -809,37 +810,9 @@ public class SSDataGrid extends JTable {
     	    	
     	// CONSTRUCTOR FOR THE EDITOR CLASS
    		public DateEditor(){
-   			super(new JTextField());
-   			super.setClickCountToStart(2);
-   			KeyListener[] keyListeners = getComponent().getKeyListeners();
-   			for (int i=0;i<keyListeners.length;i++) {
-   				getComponent().removeKeyListener(keyListeners[i]);
-            }
-   				
-   			getComponent().addKeyListener(new KeyListener(){
-   				public void keyReleased(KeyEvent ke){}
-   				public void keyTyped(KeyEvent ke){}
-   				public synchronized void keyPressed (KeyEvent ke){
-   					if (ke.getKeyCode() == KeyEvent.VK_DELETE     ||
-   						ke.getKeyCode() == KeyEvent.VK_BACK_SPACE ||
-   						ke.getKeyCode() == KeyEvent.VK_LEFT       ||
-	 					ke.getKeyCode() == KeyEvent.VK_RIGHT      ||
-	 					ke.getKeyCode() == KeyEvent.VK_HOME       ||
-	 					ke.getKeyCode() == KeyEvent.VK_END	      ||
-	 					ke.getKeyCode() == KeyEvent.VK_ENTER) {
-   						return;
-                    }
-   					String str = ((JTextField)(DateEditor.this.getComponent())).getText();
-//   					System.out.println(str);
-   					String newStr = dateMask(str,ke);
-//   					System.out.println(newStr);
-   					((JTextField)(DateEditor.this.getComponent())).setText(newStr);
-   				}
-   			});
-   				
-   			   			
+   			super(new SSTextField(SSTextField.MMDDYYYY));
    		}
-        
+     
    		// RETURNS THE TEXTFIELD WITH THE GIVEN DATE IN THE TEXTFIELD
    		// (AFTER THE FORMAT IS CHANGED TO MM/DD/YYYY
    		public synchronized Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
@@ -892,9 +865,7 @@ public class SSDataGrid extends JTable {
     				calendar.get(Calendar.DAY_OF_MONTH)  + "/" + calendar.get(Calendar.YEAR);
     			setHorizontalAlignment(SwingConstants.CENTER);	
     			setText(strDate);
-//    			System.out.println(" Indeed date instance");
     		} else {
-//    			System.out.println("Not a date instance");
     			super.setValue(value);
     		}
     	}
@@ -1001,40 +972,7 @@ public class SSDataGrid extends JTable {
     	}
     }	
 
-     // HANDLES THE DATE MASK.
-	 // SETTING THE SLASHES FOR THE USER.
-	 private String dateMask(String str, KeyEvent ke) {
-//	 	System.out.println("Length: " + str.length());
-//	 	System.out.println("Key Char :" + ke.getKeyChar());
-	 	
-	 	switch(str.length()) {
-	 		case 1:
-	 			if (ke.getKeyChar() == '/') {
-	 				str =  "0" + str ;
-	 			}
-	 			break;
-			case 2:
-				if ( ke.getKeyChar() == '/' ) {
-					// do nothing
-				} else {
-					str = str +  "/";
-				}
-				break;
-			case 4:
-				if ( ke.getKeyChar() == '/' ){ 
-					String newStr = str.substring(0,3);
-					newStr = newStr + "0" + str.substring(3,4);
-					str = newStr;
-				}
-				break;
-			case 5:
-				if ( ke.getKeyChar() != '/' ) {
-					str = str + "/";
-				}
-				break;
-		}
-		return str;	
-	} // end private String dateMask(String str, KeyEvent ke) {
+
         
 } // end public class SSDataGrid extends JTable {
 
@@ -1042,6 +980,11 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.13  2004/10/19 21:14:36  prasanth
+ * Added getCellEditorValue function for  date cell editor class.
+ * This way the editor will return a Date object rather than a string as value
+ * of the cell.
+ *
  * Revision 1.12  2004/10/06 23:14:12  prasanth
  * Added function to set minimum column widths.
  * Added function to set combo box column widths.
