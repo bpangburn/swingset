@@ -75,7 +75,7 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
     
     private SSFormattedTextField target = null;
     private JScrollPane sc;
-    private SSConnection connection;
+    private SSConnection connection = null;
     private SelectorListModel model = null;
     private SelectorList lista;
     private int colType = 0;
@@ -153,18 +153,22 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
     
     public void setTable(String table) {
         this.table = table;
+        createHelper();
     }
     
     public void setDataColumn(String dataColumn) {
         this.dataColumn = dataColumn;
+        createHelper();
     }
     
     public void setListColumn(String listColumn) {
         this.listColumn = listColumn;
+        createHelper();
     }
     
     public void setOrderBy(String orderBy) {
         this.orderBy = orderBy;
+        createHelper();
     }
     
     public void setConnection(SSConnection connection) {
@@ -177,13 +181,16 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
         } catch(java.lang.Exception ex) {
             
         }
+        createHelper();
     }
     
     public void setColumnType(int colType) {
         this.colType = colType;
     }
     
-    public void createHelper() {
+    private void createHelper() {
+        
+        if (connection == null || table == null || dataColumn == null || listColumn == null) return;
         
         try {
             connection.createConnection();
