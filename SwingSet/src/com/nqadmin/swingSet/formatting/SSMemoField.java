@@ -83,12 +83,12 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
     
     public void setColumnName(String columnName) {
         this.columnName = columnName;
-        bind(rowset, columnName);
+        bind();
     }
     
     public void setRowSet(SSRowSet rowset) {
         this.rowset = rowset;
-        bind(rowset, columnName);
+        bind();
     }
     
     public void setNavigator(SSDataNavigator navigator) {
@@ -121,9 +121,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
         }
     }
     
-    public void bind(com.nqadmin.swingSet.datasources.SSRowSet rowset, String columnName) {
-        this.columnName = columnName;
-        this.rowset = rowset;
+    private void bind() {
         
         if (this.columnName == null) return;
         if (this.rowset  == null) return;

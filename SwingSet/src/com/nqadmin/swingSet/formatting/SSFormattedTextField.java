@@ -132,26 +132,25 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     
     public void setColumnName(String colName) {
         this.colName = colName;
-        bind(rowset, colName);
+        bind();
     }
     
     public void setRowSet(SSRowSet rowset) {
         this.rowset = rowset;
-        bind(rowset, colName);
+        bind();
     }
     
     public void setNavigator(SSDataNavigator navigator) {
         this.navigator = navigator;
         setRowSet(navigator.getRowSet());
+        bind();
     }
     
     public SSDataNavigator getNavigator() {
         return this.navigator;
     }
     
-    public void bind(com.nqadmin.swingSet.datasources.SSRowSet rowset, String colName) {
-        this.colName = colName;
-        this.rowset = rowset;
+    private void bind() {
     
         if (this.colName == null) return;
         if (this.rowset  == null) return;
@@ -650,6 +649,9 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
 
 /*
  * $Log$
+ * Revision 1.7  2005/01/18 22:43:08  dags
+ * Eliminate JCalculator test code, due to licence issues
+ *
  * Revision 1.6  2005/01/18 22:36:55  dags
  * Helpers refactoring
  *

@@ -80,12 +80,12 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
     
     public void setColumnName(String columnName) {
         this.columnName = columnName;
-        bind(rowset, columnName);
+        bind();
     }
     
     public void setRowSet(SSRowSet rowset) {
         this.rowset = rowset;
-        bind(rowset, columnName);
+        bind();
     }
     
     public void setNavigator(SSDataNavigator navigator) {
@@ -129,9 +129,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
         }
     }
     
-    public void bind(com.nqadmin.swingSet.datasources.SSRowSet rowset, String columnName) {
-        this.columnName = columnName;
-        this.rowset = rowset;
+    private void bind() {
         
         if (this.columnName == null) return;
         if (this.rowset  == null) return;
@@ -269,6 +267,9 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 
 /*
  * $Log$
+ * Revision 1.5  2005/01/14 00:06:42  dags
+ * Deep Refactoring
+ *
  * Revision 1.4  2004/12/21 05:07:02  dags
  * Remove SSFormattedTextField dependency. Simplified, I hope.
  *
