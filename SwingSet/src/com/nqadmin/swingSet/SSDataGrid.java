@@ -37,6 +37,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
+import javax.swing.border.LineBorder;
 import java.sql.SQLException;
 import java.sql.Date;
 import java.util.GregorianCalendar;
@@ -761,7 +762,142 @@ public class SSDataGrid extends JTable {
     public void setSSCellEditing(SSCellEditing _cellEditing) {
         tableModel.setSSCellEditing( _cellEditing );
     }
+    
+    /**
+     *    This is the default editor for Numeric, String & Object column types.
+     */
+    class DefaultEditor extends DefaultCellEditor{
+        /**
+         *  Value of the editor.
+         */
+        Object value;
+        
+        /**
+         *  Constructor to instanciate an object of column type from a string.
+         */
+        java.lang.reflect.Constructor constructor;
+        
+              
+        /**
+         *  Constructs Default Editor.
+         */
+        public DefaultEditor() {
+            super(new SSTextField());
+            MyListener listener = new MyListener();
+            getComponent().addFocusListener(listener);
+            getComponent().addKeyListener(listener);
+        }
+        
+        /**
+         *  Implementation of KeyListener & FocusListener for the editor component.
+         */
+        private class MyListener implements KeyListener, FocusListener{
+            
+            int keyPressed = 0;
+            boolean hasFocus = false;
+            
+        // ASSUMPTION HERE IS THAT THE EDITOR WILL NOT GET THE KEY PRESSED EVENT
+        // FOR THE FIRST KEY (WHICH TRIGGERS THE EDITOR, EVENT IS CONSUMED BY JTABLE)
+            /**
+             *  Increment the key pressed variable when ever there is a key pressed event.
+             *only exception is tab key.
+             */
+            public void keyPressed(KeyEvent ke){
+                if(ke.getKeyCode() != KeyEvent.VK_TAB)
+                    keyPressed++;
+            }
+            
+            /**
+             *  Based on if this is first key release event the contents will be cleared
+             */
+            public void keyReleased(KeyEvent ke){
+                JComponent editor = (JComponent)DefaultEditor.this.getComponent();
+                if(editor instanceof JTextField){
+                    if(keyPressed == 0 && Character.isLetterOrDigit(ke.getKeyChar())){
+                        ((JTextField)editor).setText(String.valueOf(ke.getKeyChar()));
+                    }
+                }
+                keyPressed--;
+                if(keyPressed < 0)
+                    keyPressed = 0;
+                
+            }   
+            
+            public void keyTyped(KeyEvent ke){
+            } 
+            
+            /**
+             * 
+             */
+            public void focusGained(FocusEvent fe){
+                ((SSTextField)getComponent()).selectAll();
+                hasFocus = true;
+            }
+            
+            /**
+             *  sets the keyPressed variable to zero.
+             */
+            public void focusLost(FocusEvent fe){
+            // SET THE KEYPRESSED TO ZERO AS THE EDITOR HAS LOST THE FOCUS.    
+                hasFocus = false;
+                keyPressed = 0;
+            }
+        }
 
+        public boolean stopCellEditing() {
+            String s = (String)super.getCellEditorValue();
+            
+            if (s.trim().equals("")){
+                if (constructor.getDeclaringClass() == String.class) {
+                    value = s;
+                }
+                super.stopCellEditing();
+            }
+    
+            try {
+                value = constructor.newInstance(new Object[]{s});
+            }catch (Exception e) {
+            // DRAW A RED BORDER IF THE VALUE OBJECT CAN'T BE CREATED.
+            // PROBABLY THE DATA ENTERED IS NOT RIGHT (STRING IN NUMBER FIELD OR VICE-VERSA)    
+                ((JComponent)getComponent()).setBorder(new LineBorder(Color.red));
+                return false;
+            }
+            
+            return super.stopCellEditing();
+        }
+    
+        public Component getTableCellEditorComponent(JTable table, Object value,
+                             boolean isSelected, int row, int column) {
+        // SET INITIAL VALUE TO NULL.    
+            this.value = null;
+            
+            ((JComponent)getComponent()).setBorder(new LineBorder(Color.black));
+            
+        // GET A CONSTRUCTOR FOR AN OBJECT OF THE CURRENT COLUMN TYPE.
+        // THIS IS NEEDED FOR RETURNING THE VALUE IN COLUMN CLASS OBJECT 
+            try {
+                Class type = table.getColumnClass(column);
+                if (type == Object.class) {
+                    type = String.class;
+                }
+                constructor = type.getConstructor(new Class[]{String.class});
+            }catch (Exception e) {
+                return null;
+            }
+            
+            return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+        }
+    
+        /**
+         *  Returns the cell value.
+         */
+        public Object getCellEditorValue() {
+            return value;
+        }
+    
+    }
+
+    
     /**
      * Initialization code.
      */
@@ -769,6 +905,9 @@ public class SSDataGrid extends JTable {
         
         // FORCE JTABLE TO SURRENDER TO THE EDITOR WHEN KEYSTROKES CAUSE THE EDITOR TO BE ACTIVATED
             setSurrendersFocusOnKeystroke(true);
+            setDefaultEditor(Number.class, new DefaultEditor());
+            setDefaultEditor(String.class, new DefaultEditor());
+            setDefaultEditor(Object.class, new DefaultEditor());
             
         // ADD KEY LISTENER TO JTABLE.
         // THIS IS USED FOR DELETING THE ROWS
@@ -932,6 +1071,28 @@ public class SSDataGrid extends JTable {
         // CONSTRUCTOR FOR THE EDITOR CLASS
         public DateEditor(){
             super(new SSTextField(SSTextField.MMDDYYYY));
+            getComponent().addKeyListener(new KeyAdapter(){
+                int keyPressed = 0;
+                public void keyPressed(KeyEvent ke){
+                    if(ke.getKeyCode() != KeyEvent.VK_TAB)
+                        keyPressed++;
+                    System.out.println("Key Pressed true");
+                }
+                public void keyReleased(KeyEvent ke){
+                    System.out.println("Key Released number editor");
+                    JComponent editor = (JComponent)DateEditor.this.getComponent();
+                    if(editor instanceof JTextField){
+                        System.out.println("Instance of JTextField");
+                        if(keyPressed == 0){
+                            ((JTextField)editor).setText(String.valueOf(ke.getKeyChar()));
+                        }
+                    }
+                    System.out.println("Key Pressed is false");
+                    keyPressed--;
+                    if(keyPressed < 0)
+                        keyPressed = 0;
+                }
+            });
         }
 
         // RETURNS THE TEXTFIELD WITH THE GIVEN DATE IN THE TEXTFIELD
@@ -1111,28 +1272,32 @@ public class SSDataGrid extends JTable {
 	/**
      * Renderer for combo box fields.
      */
-    protected class ComboRenderer extends JComboBox implements TableCellRenderer {
-
+//    protected class ComboRenderer extends JComboBox implements TableCellRenderer {
+    protected class ComboRenderer extends DefaultTableCellRenderer.UIResource {
         Object[] underlyingValues = null;
-        JLabel label = new JLabel();
+//        JLabel label = new JLabel();
         Object[] displayValues = null;
 
         public ComboRenderer(Object[] _items, Object[] _underlyingValues) {
-            super(_items);
+//            super(_items);
             underlyingValues = _underlyingValues;
             displayValues = _items;
         }
 
         public Component getTableCellRendererComponent(JTable _table, Object _value,
             boolean _selected, boolean _hasFocus, int _row, int _column){
+                
+            JLabel label = (JLabel)super.getTableCellRendererComponent(_table, _value, _selected, _hasFocus, _row, _column);
+            
             int index = -1;
-            if (getItemCount() > 0) {
+            if (displayValues.length > 0) {
 //              setSelectedIndex(getIndexOf(_value));
                 index = getIndexOf(_value);
             } else {
                 System.out.println("Combo Renderer: No item in combo that corresponds to " + _value );
             }
 //          return this;
+
             if (index == -1) {
                 label.setText("");
             } else {
@@ -1236,6 +1401,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.32  2005/03/03 15:04:44  yoda2
+ * Added setSurrendersFocusOnKeystroke(true); to init() to force the JTable to surrender the focus to the editor following keystroke-based navigation.  This seems to fix the problem with editors not working in the DataGrid following tab-based cell navigation.
+ *
  * Revision 1.31  2005/02/22 15:16:09  yoda2
  * Removed preferredSize datamember along with setter & getter.  These all exist in the parent class.
  *
