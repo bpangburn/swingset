@@ -204,7 +204,7 @@ public class SSDataNavigator extends JPanel {
 	 * This causes the navigator to skip the execute function call on the specified SSRowSet.
 	 * (See FAQ for further details)
      *
-	 * @param _mySQL    true if using MySQL database else false.
+	 * @param _execute    true if using MySQL database else false.
 	 */
 	public void setCallExecute(boolean _execute) {
 		callExecute = _execute;
@@ -957,6 +957,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.22  2004/10/25 22:03:17  yoda2
+ * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ *
  * Revision 1.21  2004/10/25 19:51:02  prasanth
  * Modified to use the new SSRowSet instead of  RowSet.
  *

@@ -251,7 +251,7 @@
   	 * not update the underlying data source; instead the updateRow or insertRow methods are called
   	 * to update the underlying data source.
   	 *@param columnIndex - index number of the column. first column is 1, second column is 2......
-  	 *@param x - new column value
+  	 *@param value - new column value
   	 *@throws throws an SQL exception if an access error occurs.
   	 */
   	public void updateBoolean(int columnIndex, boolean value) throws SQLException{
@@ -264,7 +264,7 @@
   	 * not update the underlying data source; instead the updateRow or insertRow methods are called
   	 * to update the underlying data source.
   	 *@param columnIndex - index number of the column. first column is 1, second column is 2......
-  	 *@param x - new column value
+  	 *@param value - new column value
   	 *@throws throws an SQL exception if an access error occurs.
   	 */
   	public void updateInt(int columnIndex, int value) throws SQLException{
@@ -277,7 +277,7 @@
   	 * not update the underlying data source; instead the updateRow or insertRow methods are called
   	 * to update the underlying data source.
   	 *@param columnIndex - index number of the column. first column is 1, second column is 2......
-  	 *@param x - new column value
+  	 *@param value - new column value
   	 *@throws throws an SQL exception if an access error occurs.
   	 */
   	public void updateLong(int columnIndex, long value) throws SQLException{
@@ -290,7 +290,7 @@
   	 * not update the underlying data source; instead the updateRow or insertRow methods are called
   	 * to update the underlying data source.
   	 *@param columnIndex - index number of the column. first column is 1, second column is 2......
-  	 *@param x - new column value
+  	 *@param value - new column value
   	 *@throws throws an SQL exception if an access error occurs.
   	 */
   	public void updateFloat(int columnIndex, float value) throws SQLException{
@@ -303,7 +303,7 @@
   	 * not update the underlying data source; instead the updateRow or insertRow methods are called
   	 * to update the underlying data source.
   	 *@param columnIndex - index number of the column. first column is 1, second column is 2......
-  	 *@param x - new column value
+  	 *@param value - new column value
   	 *@throws throws an SQL exception if an access error occurs.
   	 */
   	public void updateDouble(int columnIndex, double value) throws SQLException{
@@ -316,7 +316,7 @@
   	 * not update the underlying data source; instead the updateRow or insertRow methods are called
   	 * to update the underlying data source.
   	 *@param columnIndex - index number of the column. first column is 1, second column is 2......
-  	 *@param x - new column value
+  	 *@param value - new column value
   	 *@throws throws an SQL exception if an access error occurs.
   	 */
   	public void updateString(int columnIndex, String value) throws SQLException{
@@ -329,7 +329,7 @@
   	 * not update the underlying data source; instead the updateRow or insertRow methods are called
   	 * to update the underlying data source.
   	 *@param columnIndex - index number of the column. first column is 1, second column is 2......
-  	 *@param x - new column value
+  	 *@param value - new column value
   	 *@throws throws an SQL exception if an access error occurs.
   	 */
   	public void updateDate(int columnIndex, Date value) throws SQLException{
@@ -438,7 +438,7 @@
   	 * not update the underlying data source; instead the updateRow or insertRow methods are called
   	 * to update the underlying data source.
   	 *@param columnName - name of the column
-  	 *@param x - new column value
+  	 *@param value - new column value
   	 *@throws throws an SQL exception if an access error occurs.
   	 */
   	public void updateBoolean(String columnName, boolean value) throws SQLException{
@@ -451,7 +451,7 @@
   	 * not update the underlying data source; instead the updateRow or insertRow methods are called
   	 * to update the underlying data source.
   	 *@param columnName - name of the column
-  	 *@param x - new column value
+  	 *@param value - new column value
   	 *@throws throws an SQL exception if an access error occurs.
   	 */
   	public void updateInt(String columnName, int value) throws SQLException{
@@ -464,7 +464,7 @@
   	 * not update the underlying data source; instead the updateRow or insertRow methods are called
   	 * to update the underlying data source.
   	 *@param columnName - name of the column
-  	 *@param x - new column value
+  	 *@param value - new column value
   	 *@throws throws an SQL exception if an access error occurs.
   	 */
   	public void updateLong(String columnName, long value) throws SQLException{
@@ -477,7 +477,7 @@
   	 * not update the underlying data source; instead the updateRow or insertRow methods are called
   	 * to update the underlying data source.
   	 *@param columnName - name of the column
-  	 *@param x - new column value
+  	 *@param value - new column value
   	 *@throws throws an SQL exception if an access error occurs.
   	 */
   	public void updateFloat(String columnName, float value) throws SQLException{
@@ -490,7 +490,7 @@
   	 * not update the underlying data source; instead the updateRow or insertRow methods are called
   	 * to update the underlying data source.
   	 *@param columnName - name of the column
-  	 *@param x - new column value
+  	 *@param value - new column value
   	 *@throws throws an SQL exception if an access error occurs.
   	 */
   	public void updateDouble(String columnName, double value) throws SQLException{
@@ -503,7 +503,7 @@
   	 * not update the underlying data source; instead the updateRow or insertRow methods are called
   	 * to update the underlying data source.
   	 *@param columnName - name of the column
-  	 *@param x - new column value
+  	 *@param value - new column value
   	 *@throws throws an SQL exception if an access error occurs.
   	 */
   	public void updateString(String columnName, String value) throws SQLException{
@@ -516,7 +516,7 @@
   	 * not update the underlying data source; instead the updateRow or insertRow methods are called
   	 * to update the underlying data source.
   	 *@param columnName - name of the column
-  	 *@param x - new column value
+  	 *@param value - new column value
   	 *@throws throws an SQL exception if an access error occurs.
   	 */
   	public void updateDate(String columnName, Date value) throws SQLException{
@@ -668,7 +668,7 @@
  	
  	/**
  	 *Retrieves whether the cursor is on the first row of this ResultSet object. 
-	 *@param true if the cursor is on the first row; false otherwise 
+	 *@return true if the cursor is on the first row; false otherwise 
  	 *@throws SQLException - if a data access error occurs
  	 */
  	public boolean isFirst() throws SQLException{
@@ -680,7 +680,7 @@
  	 * Note: Calling the method isLast may be expensive because the JDBC driver might
  	 * need to fetch ahead one row in order to determine whether the current row is the
  	 * last row in the result set. 
-	 *@param true if the cursor is on the last row; false otherwise 
+	 *@return true if the cursor is on the last row; false otherwise 
  	 *@throws SQLException - if a data access error occurs
  	 */
  	public boolean isLast() throws SQLException{
@@ -807,6 +807,9 @@
 } 
  /*
   * $Log$
+  * Revision 1.3  2004/10/29 20:45:30  yoda2
+  * Fixed issue with setCommand() not updating underlying JdbcRowSetImpl.
+  *
   * Revision 1.2  2004/10/28 15:27:17  prasanth
   * Calling setType & setConcurrency after instanciating JdbcRowSetImpl
   *

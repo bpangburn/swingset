@@ -277,7 +277,7 @@ public class SSDBComboBox extends JComponent {
      * When a display column is of type date you can choose the format in which it has
      * to be displayed. For the pattern refer SimpleDateFormat in java.text package.
      *
-     * @param _pattern pattern in which date has to be displayed.
+     * @param _format pattern in which date has to be displayed.
      */
      public void setDateFormat(String _format) {
         datePattern = _format;
@@ -498,8 +498,8 @@ public class SSDBComboBox extends JComponent {
     /**
      * Binds the comboBox to the specified column in the given SSRowSet.
      *
-     * @param _rowset   SSRowSet to which updates have to be made.
-     * @param -column   column name in the SSRowSet to which these updates have to be made.
+     * @param _rs   SSRowSet to which updates have to be made.
+     * @param _column   column name in the SSRowSet to which these updates have to be made.
      */
     public void bind(SSRowSet _rs, String _column) {
         textField.setDocument(new SSTextDocument(_rs,_column));
@@ -818,7 +818,7 @@ public class SSDBComboBox extends JComponent {
       *	Deletes the item which has name equal to _name. If there are
       * more than one item with the same name then the first occurance is deleted.
       *
-      * @param _value  value of the item to be deleted.
+      * @param _name  value of the item to be deleted.
       *
       * @return returns true on successful deletion else returns false.
       */
@@ -936,6 +936,9 @@ public class SSDBComboBox extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.14  2004/10/25 22:57:40  prasanth
+ * Changed Connection to SSConnection.
+ *
  * Revision 1.13  2004/10/25 22:03:18  yoda2
  * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
  *

@@ -800,7 +800,7 @@ public class SSDataGrid extends JTable {
 	 * If the user has to decide on which cell has to be editable and which is not
 	 * then SSCellEditable interface has to be implemented and set it for the SSTableModel.
      *
-	 * @param _cellEditable    implementation of SSCellEditable interface.
+	 * @param _cellEditing    implementation of SSCellEditable interface.
 	 */
 	 public void setSSCellEditing(SSCellEditing _cellEditing) {
 	 	tableModel.setSSCellEditing( _cellEditing );
@@ -982,6 +982,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.16  2004/10/25 22:03:17  yoda2
+ * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ *
  * Revision 1.15  2004/10/25 19:51:02  prasanth
  * Modified to use the new SSRowSet instead of  RowSet.
  *

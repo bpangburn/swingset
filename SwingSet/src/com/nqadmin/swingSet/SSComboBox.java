@@ -146,7 +146,7 @@ public class SSComboBox extends JComponent {
 	 * Creates an instance of SSComboBox and sets the text field with which the combo
 	 * box will be synchronized with.
 	 *
-	 * @depricated
+	 * @deprecated
 	 */
 	public SSComboBox(SSTextDocument document) {
 
@@ -366,8 +366,8 @@ public class SSComboBox extends JComponent {
 	 *
 	 * @param _document    text document to which the combo box has to be bound
 	 *
-	 * @depricated
-	 * @see bind
+	 * @deprecated
+	 * @see #bind
 	 */
 	public void setDocument(SSTextDocument _document) {
 			textField.setDocument(_document);
@@ -467,9 +467,6 @@ public class SSComboBox extends JComponent {
 	 *
 	 * @param _options    predefined options to be displayed in the combo box.
 	 * @param _mappings    integer values that correspond to the options in the combo box.
-	 *
-	 * @return returns true if the options and mappings are set successfully.
-	 *    returns false the values could not be set.
 	 */
 	public void setOption(int _options, int[]_mappings) {
 		// COPY THE MAPPING VALUES
@@ -708,6 +705,9 @@ public class SSComboBox extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.18  2004/10/25 23:09:01  prasanth
+ * In setOption using the class variable rather than function argument.
+ *
  * Revision 1.17  2004/10/25 22:03:18  yoda2
  * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
  *

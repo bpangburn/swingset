@@ -116,7 +116,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 	 * The document is bound to the specified column in the SSRowSet.
      *
      * @param _rs   SSRowSet upon which document will be based
-     * @param _columnName   column index within SSRowSet upon which document will be based     
+     * @param _columnIndex   column index within SSRowSet upon which document will be based     
 	 */
 	public SSTextDocument(SSRowSet _rs, int _columnIndex) {
 
@@ -611,6 +611,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.13  2004/11/01 15:48:39  yoda2
+ * Added support for NUMERIC.  Made type support consistent across SwingSet: INTEGER, SMALLINT, TINYINT (Integer); BIGINT (Long); FLOAT (Float); DOUBLE, NUMERIC (Double); BOOLEAN, BIT (Boolean); DATE (Date); CHAR, VARCHAR, LONGVARCHAR (String).
+ *
  * Revision 1.12  2004/10/25 22:13:43  yoda2
  * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
  *

@@ -129,7 +129,7 @@ public interface SSDBNav {
      *
 	 * @param _navigationType    this indicates the type of navigation.
 	 */
-	public void performNavigationOps(int navigationType);
+	public void performNavigationOps(int _navigationType);
 	 
 	/**
 	 * This function is called when the user what to refresh the information.
@@ -143,6 +143,9 @@ public interface SSDBNav {
 
 /*
  * $Log$
+ * Revision 1.7  2004/10/25 22:13:44  yoda2
+ * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ *
  * Revision 1.6  2004/08/10 22:06:59  yoda2
  * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
  *

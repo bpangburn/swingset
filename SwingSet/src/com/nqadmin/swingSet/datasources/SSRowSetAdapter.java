@@ -546,7 +546,7 @@
  	
  	/**
  	 *Retrieves whether the cursor is on the first row of this ResultSet object. 
-	 *@param true if the cursor is on the first row; false otherwise 
+	 *@return true if the cursor is on the first row; false otherwise 
  	 *@throws SQLException - if a data access error occurs
  	 */
  	public boolean isFirst() throws SQLException{
@@ -558,7 +558,7 @@
  	 * Note: Calling the method isLast may be expensive because the JDBC driver might
  	 * need to fetch ahead one row in order to determine whether the current row is the
  	 * last row in the result set. 
-	 *@param true if the cursor is on the last row; false otherwise 
+	 *@return true if the cursor is on the last row; false otherwise 
  	 *@throws SQLException - if a data access error occurs
  	 */
  	public boolean isLast() throws SQLException{
@@ -698,4 +698,7 @@
  
 /*
  * $Log$
+ * Revision 1.1  2004/10/25 21:47:50  prasanth
+ * Initial Commit
+ *
  */

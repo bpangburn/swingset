@@ -76,7 +76,7 @@ public class SSDBCheckBox extends JCheckBox {
 	 * Creates a object of SSDBCheckBox which synchronizes with the value in the specified
 	 * text field.
      *
-	 * @param _textfield the text field with which the check box will be in sync.
+	 * @param _textField the text field with which the check box will be in sync.
      *
 	 * @deprecated
 	 */
@@ -109,7 +109,7 @@ public class SSDBCheckBox extends JCheckBox {
 	 * @param _textField    the text field with which the check box will be in sync.
      *
 	 * @deprecated
-	 * @see bind
+	 * @see #bind
 	 */
 	public void setTextField(JTextField _textField) {
         // IF THE OLD ONE IS NOT NULL REMOVE ANY LISTENERS BEING ADDED.
@@ -261,6 +261,9 @@ public class SSDBCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.7  2004/10/25 22:03:18  yoda2
+ * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ *
  * Revision 1.6  2004/10/25 19:51:03  prasanth
  * Modified to use the new SSRowSet instead of  RowSet.
  *
