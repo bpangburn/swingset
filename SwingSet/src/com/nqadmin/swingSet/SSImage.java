@@ -51,26 +51,34 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import java.io.IOException;
 import javax.swing.JScrollPane;
-
 import com.nqadmin.swingSet.datasources.SSRowSet;
 
-public class SSImage extends JPanel{
-    
+/**
+ * SSImage.java
+ *<p>
+ * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+ *<p><pre>
+ * Used to load, store, & display images stored in a database.
+ *</pre><p>
+ * @author  $Author$
+ * @version $Revision$
+ */public class SSImage extends JPanel {
+
     /**
      * ImageIcon to store the image.
      */
     protected ImageIcon img;
-    
+
     /**
      * Label to display the image
      */
     protected JLabel lblImage = new JLabel("No Picture");
-    
+
     /**
      * Button to update the image.
      */
     protected JButton btnUpdateImage = new JButton("Update");
-    
+
     /**
      * SSRowSet from which component will get/set values.
      */
@@ -80,12 +88,12 @@ public class SSImage extends JPanel{
      * SSRowSet column to which the component will be bound.
      */
     protected String columnName;
-    
+
     /**
      * RowSet listener
      */
     private final MyRowSetListener rowsetListener = new MyRowSetListener();
-    
+
     /**
      *
      *  Construct a default SSImage Object.
@@ -93,7 +101,7 @@ public class SSImage extends JPanel{
     public SSImage() {
         init();
     }
-    
+
     /**
      * Constructs a SSImage Object bound to the specified column in the specified rowset.
      *
@@ -106,12 +114,12 @@ public class SSImage extends JPanel{
         init();
         bind();
     }
-    
+
     /**
      * Initialization code.
      */
     protected void init() {
-        
+
         // ADD UPDATE BUTTON LISTENER
             btnUpdateImage.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent ae){
@@ -142,22 +150,22 @@ public class SSImage extends JPanel{
                             }
                             else{
                                 return;
-                            }                   
+                            }
                         }
                     }catch(SQLException se){
                         se.printStackTrace();
                     }catch(IOException ioe){
                         ioe.printStackTrace();
-                    }   
+                    }
                 }
-            });        
-           
+            });
+
         // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,200));
-            
+
         // ADD LABEL & BUTTON TO PANEL
-            addComponents(); 
-    }      
+            addComponents();
+    }
 
     /**
      *  Adds the label and button to the panel
@@ -174,7 +182,7 @@ public class SSImage extends JPanel{
         constraints.gridy = 1;
         add(btnUpdateImage, constraints);
     }
-    
+
     /**
      * Sets the SSRowSet to which the component is bound.
      *
@@ -183,7 +191,7 @@ public class SSImage extends JPanel{
     public void setSSRowSet(SSRowSet _rowset) {
         rowset = _rowset;
         bind();
-    }    
+    }
 
     /**
      * Sets the SSRowSet column name to which the component is bound.
@@ -195,7 +203,7 @@ public class SSImage extends JPanel{
         columnName = _columnName;
         bind();
     }
-    
+
     /**
      * Returns the SSRowSet column name to which the component is bound.
      *
@@ -204,7 +212,7 @@ public class SSImage extends JPanel{
     public String getColumnName() {
         return columnName;
     }
-    
+
     /**
      * Returns the SSRowSet to which the component is bound.
      *
@@ -212,14 +220,14 @@ public class SSImage extends JPanel{
      */
     public SSRowSet getSSRowSet() {
         return rowset;
-    }      
-    
+    }
+
     /**
      * Changes the image to the specified image.
      *
      * @param _img GIF or JPEG to store to rowset & display
      */
-/*     
+/*
     public void setImage(ImageIcon _img){
         img = _img;
         if(img != null){
@@ -232,17 +240,17 @@ public class SSImage extends JPanel{
         }
         updateUI();
     }
-*/    
-    
+*/
+
     /**
      * Returns the current image.
      */
-/*     
+/*
     public void getImage(ImageIcon _img) {
         return(img);
     }
-*/    
-    
+*/
+
     /**
      * Sets the SSRowSet and column name to which the component is to be bound.
      *
@@ -254,25 +262,25 @@ public class SSImage extends JPanel{
         columnName = _columnName;
         bind();
     }
-    
+
     /**
      * Method for handling binding of component to a SSRowSet column.
      */
     protected void bind() {
-        
+
         // CHECK FOR NULL COLUMN/ROWSET
             if (columnName==null || rowset==null) {
                 return;
             }
-            
+
         // REMOVE LISTENERS TO PREVENT DUPLICATION
             removeListeners();
-            
+
         // UPDATE DISPLAY
             setDisplay();
-        
+
         // ADD BACK LISTENERS
-            addListeners();        
+            addListeners();
     }
 
     /**
@@ -287,8 +295,8 @@ public class SSImage extends JPanel{
      */
     private void removeListeners() {
         rowset.removeRowSetListener(rowsetListener);
-    }    
-    
+    }
+
     /**
      * Updates the value displayed in the component based on the SSRowSet column
      * binding.
@@ -309,9 +317,9 @@ public class SSImage extends JPanel{
             se.printStackTrace();
             img = null;
         }
-        
+
         lblImage.setIcon(img);
-        updateUI();            
+        updateUI();
 
     }
 
@@ -323,19 +331,19 @@ public class SSImage extends JPanel{
             //System.out.println("Cursor Moved");
             setDisplay();
         }
-        
+
         public void rowChanged(RowSetEvent rse){
             //System.out.println("Row Changed");
             setDisplay();
         }
-        
+
         public void rowSetChanged(RowSetEvent rse){
             //System.out.println("RowSet Changed");
-            setDisplay();   
+            setDisplay();
         }
-                
+
     }
-    
+
     /**
      * Sets the preferred size of this component.
      *
@@ -346,7 +354,7 @@ public class SSImage extends JPanel{
         btnUpdateImage.setPreferredSize(new Dimension((int)dimension.getWidth(), 20));
         super.setPreferredSize(dimension);
     }
-    
+
     /**
      * Removes the current image. The image is not removed from the underlying rowset.
      */
@@ -361,6 +369,9 @@ public class SSImage extends JPanel{
 
 /*
  *$Log$
+ *Revision 1.4  2005/02/07 22:54:52  yoda2
+ *JavaDoc cleanup.
+ *
  *Revision 1.3  2005/02/04 22:48:54  yoda2
  *API cleanup & updated Copyright info.
  *
