@@ -31,7 +31,7 @@
  *
  */
 
-package com.nqadmin.swingSet.testing;
+package com.nqadmin.swingSet.formatting;
 
 import javax.swing.text.MaskFormatter;
 import java.util.Locale;
@@ -73,4 +73,7 @@ public class SSNFormatterFactory extends javax.swing.text.DefaultFormatterFactor
 
 /*
  * $Log$
+ * Revision 1.2  2004/12/13 18:46:13  prasanth
+ * Added License.
+ *
  */

@@ -31,7 +31,7 @@
  *
  */
 
-package com.nqadmin.swingSet.testing;
+package com.nqadmin.swingSet.formatting;
 
 /**
  *
@@ -48,4 +48,7 @@ public class SSStringField extends SSFormattedTextField{
 
 /*
  * $Log$
+ * Revision 1.2  2004/12/13 18:46:13  prasanth
+ * Added License.
+ *
  */

@@ -31,7 +31,7 @@
  *
  */
 
-package com.nqadmin.swingSet.testing;
+package com.nqadmin.swingSet.formatting;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -525,4 +525,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
 
 /*
  * $Log$
+ * Revision 1.2  2004/12/13 18:46:13  prasanth
+ * Added License.
+ *
  */
