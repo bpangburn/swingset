@@ -5,6 +5,16 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 $Id$
 
 ==============================================================================
+SwingSet 0.x.x-beta - Released TBA
+==============================================================================
+
+Changes:
+	SSDataNavigator:
+		1. Changed button names in code to more meaningful names
+           (e.g. button1 -> firstButton)
+
+           
+==============================================================================
 SwingSet 0.8.1-beta - Released 08-13-2004
 ==============================================================================
 
@@ -25,6 +35,7 @@ Changes:
 		   text field and label which display current row number and row count
 		   has been increased.
 		   
+           
 ==============================================================================
 SwingSet 0.8.0-beta - Released 08-11-2004
 ==============================================================================

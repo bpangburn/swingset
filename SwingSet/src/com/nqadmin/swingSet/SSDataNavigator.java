@@ -62,18 +62,18 @@ import javax.sql.RowSet;
  */
 public class SSDataNavigator extends JPanel {
 
-	protected JButton button1 = new JButton();
-	protected JButton button2 = new JButton();
+	protected JButton firstButton = new JButton();
+	protected JButton previousButton = new JButton();
 	protected JTextField txtCurrentRow = new JTextField();
-	protected JButton button3 = new JButton();
-	protected JButton button4 = new JButton();
+	protected JButton nextButton = new JButton();
+	protected JButton lastButton = new JButton();
 
-	protected JButton button5 = new JButton(); // Commit button
-	protected JButton button6 = new JButton();
-	protected JButton button7 = new JButton(); // REFRESH BUTTON
-	protected JButton button8 = new JButton();
-	protected JButton button9 = new JButton();
-	protected JLabel  lblRowCount = new JLabel();
+	protected JButton commitButton = new JButton(); // Commit button
+	protected JButton undoButton = new JButton();
+	protected JButton refreshButton = new JButton(); // REFRESH BUTTON
+	protected JButton addButton = new JButton();
+	protected JButton deleteButton = new JButton();
+	protected JLabel lblRowCount = new JLabel();
 
 	// BASED ON THIS SSDataNavigator ALLOWS OR DISALLOWS MODIFICATION TO THE ROWSET
 	protected boolean modification = true;
@@ -134,37 +134,37 @@ public class SSDataNavigator extends JPanel {
 	private void addToolTips() {
 
 		try {
-			button1.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/first.gif")));
-			button2.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/prev.gif")));
-			button3.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/next.gif")));
-			button4.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/last.gif")));
-			button5.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/commit.gif")));
-			button6.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/undo.gif")));		
-			button7.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/refresh.gif")));
-			button8.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/add.gif")));
-			button9.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/delete.gif")));
+			firstButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/first.gif")));
+			previousButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/prev.gif")));
+			nextButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/next.gif")));
+			lastButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/last.gif")));
+			commitButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/commit.gif")));
+			undoButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/undo.gif")));		
+			refreshButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/refresh.gif")));
+			addButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/add.gif")));
+			deleteButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/delete.gif")));
 		} catch(Exception e) {
-			button1.setText("<<");
-			button2.setText("<");
-			button3.setText(">");
-			button4.setText(">>");
-			button5.setText("Commit");
-			button6.setText("Undo");
-			button7.setText("Refresh");
-			button8.setText("Add");
-			button9.setText("Delete");
+			firstButton.setText("<<");
+			previousButton.setText("<");
+			nextButton.setText(">");
+			lastButton.setText(">>");
+			commitButton.setText("Commit");
+			undoButton.setText("Undo");
+			refreshButton.setText("Refresh");
+			addButton.setText("Add");
+			deleteButton.setText("Delete");
 			System.out.println("Unable to load images for navigator buttons");
 		}
 
-		button1.setToolTipText("First");
-		button2.setToolTipText("Previous");
-		button3.setToolTipText("Next");
-		button4.setToolTipText("Last");
-		button5.setToolTipText("Commit");
-		button6.setToolTipText("Undo");
-		button7.setToolTipText("Refresh");
-		button8.setToolTipText("Add Record");
-		button9.setToolTipText("Delete Record");
+		firstButton.setToolTipText("First");
+		previousButton.setToolTipText("Previous");
+		nextButton.setToolTipText("Next");
+		lastButton.setToolTipText("Last");
+		commitButton.setToolTipText("Commit");
+		undoButton.setToolTipText("Undo");
+		refreshButton.setToolTipText("Refresh");
+		addButton.setToolTipText("Add Record");
+		deleteButton.setToolTipText("Delete Record");
 
 	} // end private void addToolTips() {
 
@@ -248,15 +248,15 @@ public class SSDataNavigator extends JPanel {
 	public void setModification(boolean _modification) {
 		modification = _modification;
 		if (!modification) {
-			button5.setEnabled(false);
-			button6.setEnabled(false);
-			button8.setEnabled(false);
-			button9.setEnabled(false);
+			commitButton.setEnabled(false);
+			undoButton.setEnabled(false);
+			addButton.setEnabled(false);
+			deleteButton.setEnabled(false);
 		} else {
-			button5.setEnabled(true);
-			button6.setEnabled(true);
-			button8.setEnabled(true);
-			button9.setEnabled(true);
+			commitButton.setEnabled(true);
+			undoButton.setEnabled(true);
+			addButton.setEnabled(true);
+			deleteButton.setEnabled(true);
 		}
 	}
 	
@@ -280,9 +280,9 @@ public class SSDataNavigator extends JPanel {
 	public void setDeletion(boolean deletion) {
 		allowDeletions = deletion;
 		if (!deletion) {
-			button9.setEnabled(false);
+			deleteButton.setEnabled(false);
 		} else {
-			button9.setEnabled(true);
+			deleteButton.setEnabled(true);
 		}
 	}
 	
@@ -306,9 +306,9 @@ public class SSDataNavigator extends JPanel {
 	public void setInsertion(boolean insertion){
 		allowInsertions = insertion;
 		if (!insertion) {
-			button8.setEnabled(false);
+			addButton.setEnabled(false);
 		} else{
-			button8.setEnabled(true);
+			addButton.setEnabled(true);
 		}
 	}
 	
@@ -407,25 +407,25 @@ public class SSDataNavigator extends JPanel {
 		// IF THE INITIAL ROWSET HAS ZERO ROWS NEXT IF THE USER SETS A NEW ROWSET THEN THE
 		// BUTTONS HAVE TO BE ENABLED
 		if (rowCount == 0) {
-			button1.setEnabled(false);
-			button2.setEnabled(false);
-			button3.setEnabled(false);
-			button4.setEnabled(false);
+			firstButton.setEnabled(false);
+			previousButton.setEnabled(false);
+			nextButton.setEnabled(false);
+			lastButton.setEnabled(false);
 		} else{
-			button1.setEnabled(true);
-			button2.setEnabled(true);
-			button3.setEnabled(true);
-			button4.setEnabled(true);
+			firstButton.setEnabled(true);
+			previousButton.setEnabled(true);
+			nextButton.setEnabled(true);
+			lastButton.setEnabled(true);
 		}
 
 		try {
 			if (rowset.isLast()) {
-				button3.setEnabled(false);
-				button4.setEnabled(false);
+				nextButton.setEnabled(false);
+				lastButton.setEnabled(false);
 			}
 			if (rowset.isFirst()) {
-				button1.setEnabled(false);
-				button2.setEnabled(false);
+				firstButton.setEnabled(false);
+				previousButton.setEnabled(false);
 			}
 				
 		} catch(SQLException se) {
@@ -437,29 +437,29 @@ public class SSDataNavigator extends JPanel {
 	private void setButtonSizes() {
 
 		// SET THE PREFERRED SIZES
-            button1.setPreferredSize(buttonSize);
-            button2.setPreferredSize(buttonSize);
-            button3.setPreferredSize(buttonSize);
-            button4.setPreferredSize(buttonSize);
-            button5.setPreferredSize(buttonSize);
-            button6.setPreferredSize(buttonSize);
-            button7.setPreferredSize(buttonSize);
-            button8.setPreferredSize(buttonSize);
-            button9.setPreferredSize(buttonSize);
+            firstButton.setPreferredSize(buttonSize);
+            previousButton.setPreferredSize(buttonSize);
+            nextButton.setPreferredSize(buttonSize);
+            lastButton.setPreferredSize(buttonSize);
+            commitButton.setPreferredSize(buttonSize);
+            undoButton.setPreferredSize(buttonSize);
+            refreshButton.setPreferredSize(buttonSize);
+            addButton.setPreferredSize(buttonSize);
+            deleteButton.setPreferredSize(buttonSize);
             txtCurrentRow.setPreferredSize(txtFieldSize);
             lblRowCount.setPreferredSize(txtFieldSize);
             lblRowCount.setHorizontalAlignment(SwingConstants.CENTER);
 
 		// SET MINIMUM BUTTON SIZES
-            button1.setMinimumSize(buttonSize);
-            button2.setMinimumSize(buttonSize);
-            button3.setMinimumSize(buttonSize);
-            button4.setMinimumSize(buttonSize);
-            button5.setMinimumSize(buttonSize);
-            button6.setMinimumSize(buttonSize);
-            button7.setMinimumSize(buttonSize);
-            button8.setMinimumSize(buttonSize);
-            button9.setMinimumSize(buttonSize);
+            firstButton.setMinimumSize(buttonSize);
+            previousButton.setMinimumSize(buttonSize);
+            nextButton.setMinimumSize(buttonSize);
+            lastButton.setMinimumSize(buttonSize);
+            commitButton.setMinimumSize(buttonSize);
+            undoButton.setMinimumSize(buttonSize);
+            refreshButton.setMinimumSize(buttonSize);
+            addButton.setMinimumSize(buttonSize);
+            deleteButton.setMinimumSize(buttonSize);
             txtCurrentRow.setMinimumSize(txtFieldSize);
             lblRowCount.setMinimumSize(txtFieldSize);
 	}
@@ -472,16 +472,16 @@ public class SSDataNavigator extends JPanel {
 		setLayout(new BoxLayout(this,BoxLayout.LINE_AXIS) );
 
 		// ADD BUTTONS TO THE PANEL
-		add(button1);
-		add(button2);
+		add(firstButton);
+		add(previousButton);
 		add(txtCurrentRow);
-		add(button3);
-		add(button4);
-		add(button5);
-		add(button6);
-		add(button7);
-		add(button8);
-		add(button9);
+		add(nextButton);
+		add(lastButton);
+		add(commitButton);
+		add(undoButton);
+		add(refreshButton);
+		add(addButton);
+		add(deleteButton);
 		add(lblRowCount);
 		//pack();
 
@@ -493,7 +493,7 @@ public class SSDataNavigator extends JPanel {
 		// WHEN THIS BUTTON IS PRESSED THE RECORD ON WHICH USER WAS WORKING IS SAVED
 		// AND MOVES THE ROWSET TO THE FIRST ROW
 		// SINCE ROW SET IS IN FIRST ROW DISABLE PREVIOUS BUTTON AND ENABLE NEXT BUTTON
-		button1.addActionListener(new ActionListener(){ 
+		firstButton.addActionListener(new ActionListener(){ 
 			public void actionPerformed(ActionEvent ae) {
 				try {
 					if ( modification ) {
@@ -501,14 +501,14 @@ public class SSDataNavigator extends JPanel {
                     }
 					rowset.first();
 					
-					button1.setEnabled(false);
-					button2.setEnabled(false);
+					firstButton.setEnabled(false);
+					previousButton.setEnabled(false);
 					if (!rowset.isLast()) {
-						button3.setEnabled(true);
-						button4.setEnabled(true);
+						nextButton.setEnabled(true);
+						lastButton.setEnabled(true);
 					} else {
-						button3.setEnabled(false);
-						button4.setEnabled(false);
+						nextButton.setEnabled(false);
+						lastButton.setEnabled(false);
 					}
 					if ( dbNav != null ) {
 						dbNav.performNavigationOps(SSDBNav.NAVIGATION_FIRST);
@@ -526,7 +526,7 @@ public class SSDataNavigator extends JPanel {
 		// MOVED TO PREVIOUS RECORD
 		// CALLING PREVIOUS ON ENPTY ROWSET IS ILLEGAL SO A CHECK IS MADE FOR THAT
 		// IF NUMBER OF ROWS == 0 THEN ROWSET IS EMPTY
-		button2.addActionListener(new ActionListener() {
+		previousButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				try {
 					//if( rowset.rowUpdated() )
@@ -538,14 +538,14 @@ public class SSDataNavigator extends JPanel {
 					}
 					// IF IN THE FIRST RECORD DISABLE PREVIOUS BUTTON
 					if (rowset.isFirst() || rowset.getRow() == 0){
-						button1.setEnabled(false);
-						button2.setEnabled(false);
+						firstButton.setEnabled(false);
+						previousButton.setEnabled(false);
 					}
 
 					// IF NEXT BUTTON IS DISABLED ENABLE IT.
 					if ( !rowset.isLast() ) {
-						button3.setEnabled(true);
-						button4.setEnabled(true);
+						nextButton.setEnabled(true);
+						lastButton.setEnabled(true);
 					}
 						
 					if ( dbNav != null ) {
@@ -563,7 +563,7 @@ public class SSDataNavigator extends JPanel {
 		// WHEN BUTTON 3 PRESSED THE CURRENT RECORD IS SAVED AND THE ROWSET IS
 		// MOVED TO NEXT RECORD. IF THIS IS THE LAST RECORD THEN BUTTON 3 IS DISABLED
 		// ALSO IF THE PREVIOUS BUTTON IS NOT ENABLED THEN IT IS ENABLED
-		button3.addActionListener(new ActionListener() {
+		nextButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				try {
 					//if( rowset.rowUpdated() )
@@ -571,20 +571,20 @@ public class SSDataNavigator extends JPanel {
 						rowset.updateRow();
                     }
 					if ( !rowset.next() ) {
-						button3.setEnabled(false);
-						button4.setEnabled(false);
+						nextButton.setEnabled(false);
+						lastButton.setEnabled(false);
 						rowset.last();
 					}
 					// IF LAST RECORD THEN DISABLE NEXT BUTTON
 					if ( rowset.isLast() ) {
-						button3.setEnabled(false);
-						button4.setEnabled(false);
+						nextButton.setEnabled(false);
+						lastButton.setEnabled(false);
 					}
 
 					// IF THIS IS NOT FIRST ROW ENABLE FIRST AND PREVIOUS BUTTONS
 					if ( !rowset.isFirst() ) {
-						button2.setEnabled(true);
-						button1.setEnabled(true);	
+						previousButton.setEnabled(true);
+						firstButton.setEnabled(true);	
 					}
 											
 					if ( dbNav != null ) {
@@ -604,7 +604,7 @@ public class SSDataNavigator extends JPanel {
 		// BEFORE MOVING CURRENT RECORD IS SAVED
 		// AFTER MOVING TO LAST RECORD THE NEXT BUTTON IS DIAABLED AND PREVIOUS BUTTON
 		// ENABLED
-		button4.addActionListener(new ActionListener() {
+		lastButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				try {
 					//if( rowset.rowUpdated() )
@@ -613,14 +613,14 @@ public class SSDataNavigator extends JPanel {
                     }
 					rowset.last();
 					
-					button3.setEnabled(false);
-					button4.setEnabled(false);
+					nextButton.setEnabled(false);
+					lastButton.setEnabled(false);
 					if (!rowset.isFirst()) {
-						button1.setEnabled(true);
-						button2.setEnabled(true);
+						firstButton.setEnabled(true);
+						previousButton.setEnabled(true);
 					} else {
-						button1.setEnabled(false);
-						button2.setEnabled(false);
+						firstButton.setEnabled(false);
+						previousButton.setEnabled(false);
 					}
 					if ( dbNav != null ) {
 						dbNav.performNavigationOps(SSDBNav.NAVIGATION_LAST);
@@ -637,7 +637,7 @@ public class SSDataNavigator extends JPanel {
 		// THIS BUTTON INSERTS THE ROW AND MOVES TO THE NEWLY INSERTED ROW.
 		// WHEN INSERT BUTTON IS PRESSED NAVIGATION WILL BE DISABLED SO THOSE HAVE TO BE
 		// ENABLED HERE
-		button5.addActionListener(new ActionListener() {
+		commitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				try {
 					if (onInsertRow) {
@@ -663,20 +663,20 @@ public class SSDataNavigator extends JPanel {
 					onInsertRow = false;
 					
 					if (!rowset.isFirst()) {
-						button1.setEnabled(true);
-						button2.setEnabled(true);
+						firstButton.setEnabled(true);
+						previousButton.setEnabled(true);
 					}
 					if (!rowset.isLast()) {
-						button3.setEnabled(true);
-						button4.setEnabled(true);
+						nextButton.setEnabled(true);
+						lastButton.setEnabled(true);
 					}
-					button7.setEnabled(true);
+					refreshButton.setEnabled(true);
 					
 					if (allowInsertions) {
-						button8.setEnabled(true);
+						addButton.setEnabled(true);
                     }
 					if (allowDeletions) {
-						button9.setEnabled(true);
+						deleteButton.setEnabled(true);
                     }
 				} catch(SQLException se) {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while inserting row.\n"+se.getMessage());
@@ -688,7 +688,7 @@ public class SSDataNavigator extends JPanel {
 		// THIS BUTTON IS USED TO CANCEL THE CHANGES MADE TO THE RECORD.
 		// IT CAN ALSO BE USED TO CANCEL INSERT ROW.
 		// SO THE BUTTONS DIASABLED AT THE INSERT BUTTON EVENT HAVE TO BE ENABLED
-		button6.addActionListener(new ActionListener() {
+		undoButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				try {
 					rowset.cancelRowUpdates();
@@ -698,16 +698,16 @@ public class SSDataNavigator extends JPanel {
                     }
 					//rowset.deleteRow();
 					//rowset.moveToCurrentRow();
-					button1.setEnabled(true);
-					button2.setEnabled(true);
-					button3.setEnabled(true);
-					button4.setEnabled(true);
-					button7.setEnabled(true);
+					firstButton.setEnabled(true);
+					previousButton.setEnabled(true);
+					nextButton.setEnabled(true);
+					lastButton.setEnabled(true);
+					refreshButton.setEnabled(true);
 					if (allowInsertions) {
-						button8.setEnabled(true);
+						addButton.setEnabled(true);
                     }
 					if (allowDeletions) {
-						button9.setEnabled(true);
+						deleteButton.setEnabled(true);
                     }
 				} catch(SQLException se) {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while undoing changes.\n"+se.getMessage());
@@ -720,7 +720,7 @@ public class SSDataNavigator extends JPanel {
 		// RECORD IF THERE ARE NO RECORDS NAVIGATION BUTTONS ARE DIABLED
 		// EVEN IS THERE ARE RECORDS PREVIOUS BUTTON IS DISABLED BECAUSE THE ROWSET IS ON
 		// THE FIRST ROW
-		button7.addActionListener(new ActionListener() {
+		refreshButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				try {
 					if (callExecute) {
@@ -745,15 +745,15 @@ public class SSDataNavigator extends JPanel {
                     }
 						
 					if ( rowset.next() ) {
-						button1.setEnabled(true);
-						button2.setEnabled(false);
-						button3.setEnabled(true);
-						button4.setEnabled(true);
+						firstButton.setEnabled(true);
+						previousButton.setEnabled(false);
+						nextButton.setEnabled(true);
+						lastButton.setEnabled(true);
 					} else {
-						button1.setEnabled(false);
-						button2.setEnabled(false);
-						button3.setEnabled(false);
-						button4.setEnabled(false);
+						firstButton.setEnabled(false);
+						previousButton.setEnabled(false);
+						nextButton.setEnabled(false);
+						lastButton.setEnabled(false);
 					}
 				} catch(SQLException se) {
 					se.printStackTrace();
@@ -764,7 +764,7 @@ public class SSDataNavigator extends JPanel {
 		// INSERT ROW BUTTON MOVES THE ROWSET TO THE INSERT ROW POSITION
 		// AT THIS TIME NAVIGATION HAS TO BE DISABLED
 		// ONLY COMMIT AND CANCEL ARE ENABLED
-		button8.addActionListener(new ActionListener() {
+		addButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				try {
 					rowset.moveToInsertRow();
@@ -776,15 +776,15 @@ public class SSDataNavigator extends JPanel {
 					//rowset.updateString("client_name", "prasanh reddy");
 					//rowset.insertRow();
 					//rowset.moveToCurrentRow();
-					button1.setEnabled(false);
-					button2.setEnabled(false);
-					button3.setEnabled(false);
-					button4.setEnabled(false);
-					button5.setEnabled(true);
-					button6.setEnabled(true);
-					button7.setEnabled(false);
-					button8.setEnabled(false);
-					button9.setEnabled(false);
+					firstButton.setEnabled(false);
+					previousButton.setEnabled(false);
+					nextButton.setEnabled(false);
+					lastButton.setEnabled(false);
+					commitButton.setEnabled(true);
+					undoButton.setEnabled(true);
+					refreshButton.setEnabled(false);
+					addButton.setEnabled(false);
+					deleteButton.setEnabled(false);
 
 				} catch(SQLException se) {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while moving to insert row.\n"+se.getMessage());
@@ -796,7 +796,7 @@ public class SSDataNavigator extends JPanel {
 		// DELETES THE CURRENT ROW AND MOVES TO NEXT ROW
 		// IF THE DELETED ROW IS THE LAST ROW THEN MOVES TO LAST ROW IN ROWSET
 		// AFTER THE DELETION IS MADE( THATS THE PREVIOUS ROW TO THE DELETED ROW)
-		button9.addActionListener(new ActionListener() {
+		deleteButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				try {
 					int answer = JOptionPane.showConfirmDialog(SSDataNavigator.this,"Are you sure you want to delete this record?","Delete Present Record", JOptionPane.YES_NO_OPTION);
@@ -857,6 +857,11 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.12  2004/08/13 14:55:28  prasanth
+ * Changed the default size of buttons (decreased).
+ * Also that of text field  & label (increased).
+ * Displaying "of" before rowcount.
+ *
  * Revision 1.11  2004/08/12 23:50:24  prasanth
  * Changing the row count when a new row is added or a row is deleted.
  *
