@@ -123,7 +123,7 @@ public class SSTableModel extends AbstractTableModel {
      *
      * @param _rowset    SSRowSet object whose records has to be displayed in JTable.
      */
-    public void setRowSet(SSRowSet _rowset) throws SQLException {
+    public void setSSRowSet(SSRowSet _rowset) throws SQLException {
         rowset = _rowset;
         init();
     }
@@ -820,13 +820,34 @@ public class SSTableModel extends AbstractTableModel {
     public void setHiddenColumns(int[] _columnNumbers) {
         hiddenColumns = _columnNumbers;
     }
+    
+    
+    
+// DEPRECATED STUFF....................
 
+    /**
+     * Sets the SSRowSet for SSTableModel to the given SSRowSet.
+     * This SSRowSet will be used to get the data for JTable.
+     *
+     * @param _rowset    SSRowSet object whose records has to be displayed in JTable.
+     *
+     * @deprecated
+     * @see #setSSRowSet        
+     */
+    public void setSSRowSet(SSRowSet _rowset) throws SQLException {
+        rowset = _rowset;
+        init();
+    }
+    
 } // end public class SSTableModel extends AbstractTableModel {
 
 
 
 /*
  * $Log$
+ * Revision 1.15  2005/02/04 23:05:10  yoda2
+ * no message
+ *
  * Revision 1.14  2005/02/04 22:48:54  yoda2
  * API cleanup & updated Copyright info.
  *
