@@ -644,14 +644,19 @@ public class SSComboBox extends JComponent {
 				try {
 					String strValueInText = textField.getText();
 					int valueOfText = -1;
-					strValueInText.trim();
+					strValueInText = strValueInText.trim();
 					if ( !strValueInText.equals("") ) {
 						valueOfText = Integer.parseInt(strValueInText);
                     }
-			//		System.out.println("text value = " + valueOfText + "   " + index);
+
 					if ( valueOfText != index ) {
-						textField.setText( String.valueOf(index) );
-			//			System.out.println("TextChangedTo " + String.valueOf(index) );
+					// IF THE SELECTED INDEX IS -1
+					// SET TEXT TO EMPTY 	
+						if(index == -1){
+							textField.setText("");
+						}else{
+							textField.setText( String.valueOf(index) );
+						}
 					}
                     
 				} catch(NullPointerException npe) {
@@ -671,6 +676,9 @@ public class SSComboBox extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.10  2004/08/10 22:06:59  yoda2
+ * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
+ *
  * Revision 1.9  2004/08/09 21:31:13  prasanth
  * Corrected wrong function call. removeAll() --> removeAllItems()
  *
