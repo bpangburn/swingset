@@ -908,6 +908,15 @@ public class SSDataNavigator extends JPanel {
             undoButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     try {
+                    // CALL MOVE TO CURRENT ROW IF ON INSERT ROW.    
+                        if(onInsertRow){
+                            sSRowSet.moveToCurrentRow();
+                        }
+                    // THIS FUNCTION IS NOT NEED IF ON INSERT ROW
+                    // BUT MOVETOINSERTROW WILL NOT TRIGGER ANY EVENT SO FOR THE SCREEN
+                    // TO UPDATE WE NEED TO TRIGGER SOME THING.
+                    // SINCE USER IS MOVED TO CURRENT ROW PRIOR TO INSERT IT IS SAFE TO
+                    // CALL CANCELROWUPDATE TO GET A TRIGGER    
                         sSRowSet.cancelRowUpdates();
                         onInsertRow = false;
                         if (dBNav != null) {
@@ -926,6 +935,11 @@ public class SSDataNavigator extends JPanel {
                         if (deletion) {
                             deleteButton.setEnabled(true);
                         }
+                        
+                    // IF MOVED FROM INSERT ROW NEED TO UPDATE THE CURRENT ROW NUMBER.
+                        int row = sSRowSet.getRow();
+                        txtCurrentRow.setText(String.valueOf(currentRow));
+                            
                     } catch(SQLException se) {
                         JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while undoing changes.\n"+se.getMessage());
                         se.printStackTrace();
@@ -1168,6 +1182,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.34  2005/02/13 15:38:20  yoda2
+ * Removed redundant PropertyChangeListener and VetoableChangeListener class variables and methods from components with JComponent as an ancestor.
+ *
  * Revision 1.33  2005/02/12 03:29:26  yoda2
  * Added bound properties (for beans).
  *
