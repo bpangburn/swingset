@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003, The Pangburn Company, Inc. and Prasanth R. Pasala.
+ * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -89,7 +89,7 @@ public class SSDataNavigator extends JPanel{
 	
 	boolean confirmDeletes = true;
 
-	boolean mySQL = false;
+	boolean callExecute = true;
 	
 	// ROWSET TO WHICH THE NAVIGATOR IS LINKED TO
 	RowSet rowset = null;
@@ -215,8 +215,8 @@ public class SSDataNavigator extends JPanel{
 	 *(See FAQ for further details)
 	 *@param _mySQL true if using MySQL database else false.
 	 */
-	public void setMySQLDB(boolean _mysql){
-		mySQL = _mysql;
+	public void setCallExecute(boolean _execute){
+		callExecute = _execute;
 	}
 	 
 	/**
@@ -331,7 +331,7 @@ public class SSDataNavigator extends JPanel{
 
 		//SEE IF THERE ARE ANY ROWS IN THE GIVEN ROWSET
 		try{
-			if(!mySQL)
+			if(callExecute)
 				rowset.execute();
 
 			if(!rowset.next())
@@ -627,7 +627,9 @@ public class SSDataNavigator extends JPanel{
 		button7.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent ae){
 				try{
-					rowset.execute();
+					if(callExecute)	
+						rowset.execute();
+						
 					if( dbNav != null )
 						dbNav.performRefreshOps();
 						
@@ -716,6 +718,10 @@ public class SSDataNavigator extends JPanel{
 
 /*
  * $Log$
+ * Revision 1.6  2004/02/23 16:36:00  prasanth
+ * Added  setMySQLDB function.
+ * Skipping execute call on the rowset if mySQL is true.
+ *
  * Revision 1.5  2004/01/27 17:13:03  prasanth
  * Changed the behaviour of commit button. When not on insert row will update
  * present row.
