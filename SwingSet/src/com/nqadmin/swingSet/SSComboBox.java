@@ -87,51 +87,99 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
 //public class SSComboBox extends JComponent {
 public class SSComboBox extends JComboBox {
 
-    // THIS VALUE WILL BE RETURNED WHEN NO ITEM IS SELECTED IN THE COMBO BOX
+    /**
+     * Value to represent that no item has been selected in the combo box.
+     */
     public static final int NON_SELECTED = (int)((Math.pow(2, 32) -1)/(-2));
 
-    // TEXT FIELD THAT WILL BE BOUND TO THE DATABASE
+    /**
+     * Text field bound to the SSRowSet.
+     */
     protected JTextField textField = new JTextField();
 
-    // INSTANCE OF LISTENER FOR COMBO BOX
+    /**
+     * Component listener.
+     */
     private MyComboListener cmbListener = new MyComboListener();
 
-    // INSTANCE  OF LISTENER FOR THE TEXT FIELD BOUND TO DATABASE
+    /**
+     * Bound text field document listener.
+     */
     private MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
-    // PREDEFINED SET OF OPTIONS/CHOICES TO BE DISPLAYED IN A COMBO BOX
-    protected int option = 0;
-
-    // MAPPINGS FOR THE COMBO BOX ITEMS IF DIFFERENT FROM DEFAULTS (0,1,2,..)
+    /**
+     * Underlying values for each combo box choice if different from defaults
+     * of 0, 1, 2, 3, etc.
+     */
     protected int[] mappingValues = null;
 
-    // SSROWSET FROM WHICH THE COMBO WILL GET/SET VALUES
+    /**
+     * SSRowSet from which component will get/set values.
+     */
     protected SSRowSet rowset;
 
-    // COLUMN NAME TO WHICH THE COMBO WILL BE BOUND TO
+    /**
+     * SSRowSet column to which the component will be bound.
+     */
     protected String columnName;
+    
+    /**
+     * Set of predefined options to be displayed in the combo box (e.g. yes/no,
+     * exclude/include, etc.
+     */
+    protected int option = 0;    
 
     /**
-     *  Type used for combo box.
+     * Constant indicating that combo box should display predefined yes/no
+     * options.
      */
     public static final int YES_NO_OPTION = 0;
+    
+    /**
+     * Predefined "yes" option.
+     */
     public static final int YES = 1;
+    
+    /**
+     * Predefined "no" option.
+     */    
     public static final int NO  = 0;
-
+    
     /**
-     *  Type used for combo box.
-     */
-    public static final int SEX_OPTION = 1;
+     * Constant indicating that combo box should display predefined gender
+     * options.
+     */    
     public static final int GENDER_OPTION = 1;
+    
+   /**
+     * Predefined "male" option.
+     */
     public static final int MALE = 0;
+    
+    /**
+     * Predefined "female" option.
+     */    
     public static final int FEMALE = 1;
-    public static final int UNI_SEX = 2;
+    
+    /**
+     * Predefined "unisex" option.
+     */    
+    public static final int UNISEX = 2;    
 
     /**
-     *  Type used for combo box.
-     */
+     * Constant indicating that combo box should display predefined
+     * include/exclude options.
+     */ 
     public static final int INCLUDE_EXCLUDE_OPTION  = 2;
+    
+    /**
+     * Predefined "exclude" option.
+     */    
     public static final int EXCLUDE = 0;
+    
+    /**
+     * Predefined "include" option.
+     */    
     public static final int INCLUDE = 1;
 
     /**
@@ -158,15 +206,6 @@ public class SSComboBox extends JComboBox {
         // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,20));
     }
-
-    /**
-     * Returns the index of the selected item in the combo box.
-     *
-     * @return index of selected item. -1 if none selected.
-     */
-    //public int getSelectedIndex() {
-    //    return cmbDisplayed.getSelectedIndex();
-    //}
 
     /**
      * Returns the value associated with the selected item.
@@ -207,10 +246,10 @@ public class SSComboBox extends JComboBox {
     }
 
     /**
-     * Sets the column name to which the combo box has to be bound
+     * Sets the SSRowSet column name to which the component is bound.
      *
-     * @param _columnName    column name in the SSRowSet to which the combo box
-     *    is bound.
+     * @param _columnName    column name in the SSRowSet to which the component
+     *    is bound
      */
     public void setColumnName(String _columnName) {
         columnName = _columnName;
@@ -218,9 +257,9 @@ public class SSComboBox extends JComboBox {
     }
 
     /**
-     * Sets the SSRowSet to be used.
+     * Sets the SSRowSet to which the component is bound.
      *
-     * @param _rowset    SSRowSet to be used for getting the values.
+     * @param _rowset    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _rowset) {
         rowset = _rowset;
@@ -237,30 +276,7 @@ public class SSComboBox extends JComboBox {
     }
 
     /**
-     * Sets preferred dimensions for combo box
-     *
-     * @param _dimension    preferred dimensions for combo box
-     */
-    //public void setPreferredSize(Dimension _dimension) {
-    //    cmbDisplayed.setPreferredSize(_dimension);
-    //}
-
-    /**
-     * Added the combo box to the JComponent
-     */
-    //private void addComponent() {
-    //    // SET THE BOX LAYOUT
-    //        setLayout(new BoxLayout(this,BoxLayout.LINE_AXIS));
-    //    // SET PREFERRED SIZE FOR COMBO BOX
-    //        cmbDisplayed.setPreferredSize(new Dimension(150,20));
-    //    // ADD THE COMBO BOX TO THE JCOMPONENT
-    //        add(cmbDisplayed);
-    //}
-
-    /**
-     * The column name and the SSRowSet should be set before calling this function.
-     * If the column name and SSRowSet are set seperately then this function has to
-     * be called to bind the combo box to the column in the SSRowSet.
+     * Method for handling binding of component to a SSRowSet column.
      */
     protected void bind() {
         
@@ -284,11 +300,10 @@ public class SSComboBox extends JComboBox {
     }
 
     /**
-     * Binds the combo box to the specified column of the SSRowSet.
-     * As the SSRowSet changes the combo box item displayed changes accordingly.
+     * Sets the SSRowSet and column name to which the component is to be bound.
      *
-     * @param _rowset    SSRowSet to be used for getting the value.
-     * @param _columnName    Column to which the combo box has to be bound.
+     * @param _rowset    datasource to be used.
+     * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _rowset, String _columnName) {
         rowset = _rowset;
@@ -296,8 +311,11 @@ public class SSComboBox extends JComboBox {
         bind();
     }
 
-    // SET THE COMBO BOX ITEM TO THE ITEM THAT CORRESPONDS TO THE VALUE IN TEXT FIELD
-    protected void setDisplay(){
+    /**
+     * Updates the value displayed in the component based on the SSRowSet column
+     * binding.
+     */
+    protected void setDisplay() {
         try {
             String text = textField.getText().trim();
             // GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD
@@ -352,20 +370,24 @@ public class SSComboBox extends JComboBox {
 
     }
     
-    // ADDS LISTENERS FOR THE COMBO BOX AND TEXT FIELD
+    /**
+     * Adds listeners for component and bound text field (where applicable).
+     */
     private void addListeners() {
         textField.getDocument().addDocumentListener(textFieldDocumentListener);
         addActionListener(cmbListener);
     }
 
-    // REMOVES THE LISTENERS FOR TEXT FIELD AND THE COMBO BOX DISPLAYED
+    /**
+     * Removes listeners for component and bound text field (where applicable).
+     */
     private void removeListeners() {
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
         removeActionListener(cmbListener);
     }
 
     /**
-     * Adds the given array of strings as combo box items.
+     * Adds an array of strings as combo box items.
      *
      * @param _options    the list of options that you want to appear in the combo box.
      */
@@ -403,9 +425,9 @@ public class SSComboBox extends JComboBox {
      *@param _options    options to be displayed in the combo box.
      *@param _mappings    integer values that correspond to the options in the combo box.
      *
-     *@return returns true if the options and mappings are set successfully.
+     *@return returns true if the options and mappings are set successfully -
      *    returns false if the size of arrays do not match or if the values could
-     *    not be set.
+     *    not be set
      */
     public boolean setOption(String[] _options, int[]_mappings) {
         if (_options.length != _mappings.length) {
@@ -447,7 +469,8 @@ public class SSComboBox extends JComboBox {
     }
 
     /**
-     * Sets the option to be displayed in the combo box.
+     * Sets the options to be displayed in the combo box based on common
+     * predefined options.
      *
      * @param _option predefined options to be displayed in the combo box.
      */
@@ -459,15 +482,15 @@ public class SSComboBox extends JComboBox {
             removeAllItems();
         }
         if (option == YES_NO_OPTION) {
-            addItem(new String("NO"));
-            addItem(new String("YES"));
+            addItem(new String("No"));
+            addItem(new String("Yes"));
         } else if (option == SEX_OPTION || option == GENDER_OPTION) {
-            addItem(new String("MALE"));
-            addItem(new String("FEMALE"));
-            addItem(new String("UNI_SEX"));
+            addItem(new String("Male"));
+            addItem(new String("Female"));
+            addItem(new String("Unisex"));
         } else if (option == INCLUDE_EXCLUDE_OPTION) {
-            addItem(new String("INCLUDE"));
-            addItem(new String("EXCLUDE"));
+            addItem(new String("Include"));
+            addItem(new String("Exclude"));
         } else {
             return false;
         }
@@ -475,7 +498,10 @@ public class SSComboBox extends JComboBox {
         return true;
     }
 
-    // LISTENER FOR THE TEXT FIELD THAT CONTAINS THE INTEGER VALUE
+    /**
+     * Listener(s) for the bound text field used to propigate values back to the
+     * component's value.
+     */
     private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
         public void changedUpdate(DocumentEvent de) {
@@ -497,8 +523,10 @@ public class SSComboBox extends JComboBox {
         }
     }
 
-    // LISTENER FOR THE COMBO BOX. CHANGES MADE IN THE COMBO BOX ARE PASSED ON TO THE
-    // TEXT FIELD THEY BY MOVING THE CHANGE TO UNDERLYING STRUCTURE (DATABASE).
+    /**
+     * Listener(s) for the component's value used to propigate changes back to
+     * bound text field.
+     */
     private class MyComboListener implements ActionListener, Serializable {
 
         public void actionPerformed(ActionEvent ae) {
@@ -534,6 +562,23 @@ public class SSComboBox extends JComboBox {
 
 
 // DEPRECATED STUFF....................
+    /**
+     * Constant indicating that combo box should display predefined gender
+     * options.
+     *
+     * @deprecated
+     * @see #GENDER_OPTION     
+     */
+    public static final int SEX_OPTION = 1;
+    
+    /**
+     * Predefined "unisex" option.
+     *
+     * @deprecated
+     * @see #UNISEX     
+     */    
+    public static final int UNI_SEX = 2;
+
     /**
      * Creates an instance of SSComboBox and sets the text field with which the combo
      * box will be synchronized with.
@@ -597,6 +642,9 @@ public class SSComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.26  2005/02/04 22:48:52  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.25  2005/02/03 23:50:56  prasanth
  * 1. Removed commented out code.
  * 2. Modified setDisplay function to change value only when underlying value
