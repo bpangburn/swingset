@@ -9,7 +9,7 @@ $Id$
 LICENSE
 ==============================================================================
 
-Copyright (c) 2003, The Pangburn Company, Inc. and Prasanth R. Pasala.
+Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,34 @@ components to be made database-aware.  While there are several commercially
 available solutions that perform similar tasks, SwingSet is the first known
 open source solution.
 
+The SwingSet feature-set currently includes:
+1. database binding for textboxes, comboboxes, and checkboxes
+2. masked editing of textboxes
+3. binding of a "hidden" numeric column for comboboxes with text choices
+   (e.g. 0, 1, & 2 are stored for "Yes," "No," & "Maybe," respectively)
+4. population of comboboxes based on columns in a database query (can also
+   be used for combobox-based record navigation)
+5. a graphical record navigator (allows for database traversal, insertion,
+   deletion, commit, and rollback)
+6. a data grid component for creating datasheet/spreadsheet/table views of
+   queries
+    (a) allows custom column headings
+    (b) allows hiding of specified columns
+    (c) allows disabling of specified columns
+    (d) allows columns to be displayed as textboxes or comboboxes
+    (e) allows addition and deletion of records
+    (f) allows deletion of multiple, non-consecutive records
+    (g) allows data entry "masks" to be applied to text columns
+    
+Version 0.7.0 includes several usability enhancments and bug fixes, a
+workaround for the mysql-connector-java MySQL JDBC driver, and a graphical
+data navigator.  See ChangeLog.txt for more information.
+    
+    
+==============================================================================
+DETAILS
+==============================================================================
+
 SwingSet utilizes SSTextDocument, an extension of the standard PlainDocument
 class to link the JTextField or JTextArea to a database column within a
 RowSet.  In addition, custom classes are provided to replace the standard
@@ -57,23 +85,22 @@ and their corresponding text choices are stored in a table (e.g.
 my_table!part_id is stored as a foreign key, but my_table!part_name is
 displayed).  By writing a custom event listener, SSDBComboBox may also be used
 to navigate a RowSet based on a combobox selection.  The SSCheckBox allows a
-checkbox to be linked to an underlying numeric database column.  Finally, a
-SSDataNavigator class is provided to allow traversal, insertion, deletion,
-commit, and rollback  of a RowSet. Changes to the current record are auto-
-committed when a navigation takes place (also similar to Access).
+checkbox to be linked to an underlying numeric database column.  
 
-For the 0.6.0 release of SwingSet, a grid control, SSDataGrid, has been added,
-which can display database information in a "datasheet" or "spreadsheet" style
-view.  SSDataGrid provides functions to set column headers, hide columns, and
-make columns uneditable.  In addition, individual columns in the SSDataGrid
-can be displayed as either text fields or comboboxes.  For text columns,
-editing masks can be specified.  SSDataGrid uses the SSTableModel, which
-extends AbstractTableModel. The SSCellEditing and SSDataValue interfaces
+The SSTextField, which extends the JTextField, provides editing masks for data
+entry (e.g. dates, social security numbers, specified number of decimals, etc.).
+
+The SSDataGrid can display database information in a "datasheet" or
+"spreadsheet" style view.  It provides functions to set column headers, hide
+columns, and make columns uneditable.  In addition, individual columns in the
+SSDataGrid can be displayed as either text fields or comboboxes.  For text
+columns, editing masks can be specified.  SSDataGrid uses the SSTableModel,
+which extends AbstractTableModel. The SSCellEditing and SSDataValue interfaces
 provide fine control over the working of the grid.
 
-Also added in the 0.6.0 release of SwingSet is the SSTextField, which extends
-the JTextField.  The SSTextField provides editing masks for data entry
-(e.g. dates, social security numbers, specified number of decimals, etc.).
+The SSDataNavigator class provides traversal, insertion, deletion, commit, and
+rollback  of a RowSet. Changes to the current record are auto-committed when a
+navigation takes place (also similar to Access).
 
 More information on SwingSet is available from:
 http://swingset.sourceforge.net 
@@ -88,22 +115,23 @@ swingset@nqadmin.com
 INSTALLATION
 ==============================================================================
 
-Currently SwingSet requires Sun's Reference Implementation of the JDBC RowSet,
-which is available in a Zip file from:
+If SwingSet is to be used with a J2SE prior to 1.5, Sun's Reference
+Implementation of the JDBC RowSet is required (free registration required).
+It is available in a Zip file from:
 http://developer.java.sun.com/developer/earlyAccess/jdbc/jdbc-rowset.html
 
-Please note that a free registration is required to download the file.
+If using J2SE 1.5.0 Beta 1 or later, RowSet is already included.
 
 Download the latest SwingSet binary JAR file from:
 http://sourceforge.net/projects/swingset
 
-Unzip the file rowset.jar from the Sun file to the same location as
+If needed, unzip the file rowset.jar from the Sun file to the same location as
 swingset.jar and add both JAR files to your CLASSPATH. Alternatively, you can
 copy both files to the the /jre/lib/ext subdirectory of your JDK (for
 compiling) and the /lib/ext subdirectory of your JRE (for execution).
 
-SwingSet has been tested with J2SE 1.4.2, but should work with all J2SE 1.4
-releases.
+SwingSet has been tested with J2SE 1.4.2 and 1.5.0 Beta 1, but should work with
+all J2SE 1.4 or 1.5 releases.
 
 Note that you will also need a JDBC driver for your target database.  If the
 driver is available as a JAR file, it should be added to your CLASSPATH or
@@ -119,7 +147,7 @@ database based on the suppliers-and-parts database referenced in the classic
 database textbook, "An Introduction to Database Systems,"  by C. J. Date.
 Therefore the PostgreSQL JDBC driver is required.  The JDBC JAR file is
 available from:
-http://jdbc.postgresql.org/download/pg73jdbc3.jar
+http://jdbc.postgresql.org/download/pg74.1jdbc3.jar
 
 This file should be added to your CLASSPATH or placed in the same /lib/ext
 subdirectories mentioned under "INSTALLATION."
@@ -133,10 +161,10 @@ the JAR file ssdemo.jar to launch the demo.  If that doesn't work then type:
   java -jar <demo jar file name here>
   
   e.g.
-       java -jar swingset-demo_0.6.0_beta.jar
+       java -jar swingset-demo_0.7.0_beta.jar
   
 Please note that the demo requires both the rowset.jar and latest SwingSet
-binary JAR files (e.g. swingset-bin_0.6.0_beta.jar). See the "INSTALLATION"
+binary JAR files (e.g. swingset-bin_0.7.0_beta.jar). See the "INSTALLATION"
 section above for more information.
 
 The demo will attempt to connect to a small, remote, read only database so an
@@ -313,7 +341,7 @@ e.g.
 
     // CREATE A TEXTFIELD
         JTextField myText = new JTextField();
-     	myText.setDocument(new SSTextDocument(rowset, "quantity");
+        myText.setDocument(new SSTextDocument(rowset, "quantity");
            
      } catch(Exception e) {
      // EXCEPTION HANDLER HERE...
@@ -324,7 +352,7 @@ e.g.
           getContentPane().add(combo.getComboBox());
           
      // ADD THE JTEXTFIELD TO THE JFRAME
- 	  getContentPane().add(myText);	     
+          getContentPane().add(myText);      
      
 
 ***********************
@@ -450,7 +478,7 @@ being added.
 
 
 ***********************
-SSTableModel	
+SSTableModel    
 ***********************
 SSTableModel provides an implementation of the TableModel interface.
 The SSDataGrid uses this class for providing a grid view for a rowset. 
