@@ -4,7 +4,7 @@
  * Created on 17 de diciembre de 2004, 13:13
  */
 
-package com.nqadmin.swingSet.formatting.selectors;
+package com.nqadmin.swingSet.formatting.helpers;
 import java.awt.event.ActionListener;
 
 
@@ -36,12 +36,12 @@ public class SelectorPopupPanel extends javax.swing.JPanel implements ActionList
         java.awt.GridBagConstraints gridBagConstraints;
 
         sSConnection1 = new com.nqadmin.swingSet.datasources.SSConnection();
-        selectorListModel1 = new com.nqadmin.swingSet.formatting.selectors.SelectorListModel();
+        selectorListModel1 = new com.nqadmin.swingSet.formatting.helpers.SelectorListModel();
         jPanel1 = new javax.swing.JPanel();
         jTextField1 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        selectorList1 = new com.nqadmin.swingSet.formatting.selectors.SelectorList();
+        selectorList1 = new com.nqadmin.swingSet.formatting.helpers.SelectorList();
         jLabel1 = new javax.swing.JLabel();
 
         sSConnection1.setDriverName("org.postgresql.Driver");
@@ -166,8 +166,8 @@ public class SelectorPopupPanel extends javax.swing.JPanel implements ActionList
     javax.swing.JScrollPane jScrollPane1;
     javax.swing.JTextField jTextField1;
     com.nqadmin.swingSet.datasources.SSConnection sSConnection1;
-    com.nqadmin.swingSet.formatting.selectors.SelectorList selectorList1;
-    com.nqadmin.swingSet.formatting.selectors.SelectorListModel selectorListModel1;
+    com.nqadmin.swingSet.formatting.helpers.SelectorList selectorList1;
+    com.nqadmin.swingSet.formatting.helpers.SelectorListModel selectorListModel1;
     // End of variables declaration//GEN-END:variables
       
     public static void main(String args[])

@@ -4,7 +4,7 @@
  * Created on 20 de diciembre de 2004, 12:25
  */
 
-package com.nqadmin.swingSet.formatting.selectors;
+package com.nqadmin.swingSet.formatting.helpers;
 
 import com.nqadmin.swingSet.datasources.SSConnection;
 import com.nqadmin.swingSet.formatting.SSFormattedTextField;

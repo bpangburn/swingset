@@ -4,7 +4,7 @@
  * Created on 24 de marzo de 2004, 15:17
  */
 
-package com.nqadmin.swingSet.formatting.selectors;
+package com.nqadmin.swingSet.formatting.helpers;
 
 /**
  *

@@ -4,11 +4,11 @@
  * Created on 17 de diciembre de 2004, 15:23
  */
 
-package com.nqadmin.swingSet.formatting.selectors;
+package com.nqadmin.swingSet.formatting.helpers;
 
 import javax.swing.*;
 import java.sql.*;
-import com.nqadmin.swingSet.formatting.selectors.*;
+import com.nqadmin.swingSet.formatting.helpers.*;
 /**
  *
  * @author  dags

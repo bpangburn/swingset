@@ -4,7 +4,7 @@
  * Created on 17 de diciembre de 2004, 15:30
  */
 
-package com.nqadmin.swingSet.formatting.selectors;
+package com.nqadmin.swingSet.formatting.helpers;
 
 import java.sql.*;
 import java.util.regex.Pattern;

@@ -4,7 +4,7 @@
  * Created on 4 de diciembre de 2004, 12:46
  */
 
-package com.nqadmin.swingSet.formatting.selectors;
+package com.nqadmin.swingSet.formatting.helpers;
 
 /**
  *
@@ -24,9 +24,9 @@ public class SelectorTest extends javax.swing.JFrame {
      */
     private void initComponents() {//GEN-BEGIN:initComponents
         sSConnection1 = new com.nqadmin.swingSet.datasources.SSConnection();
-        helperPopup1 = new com.nqadmin.swingSet.formatting.selectors.HelperPopup();
-        helperPopup2 = new com.nqadmin.swingSet.formatting.selectors.HelperPopup();
-        helperPopup3 = new com.nqadmin.swingSet.formatting.selectors.HelperPopup();
+        helperPopup1 = new com.nqadmin.swingSet.formatting.helpers.HelperPopup();
+        helperPopup2 = new com.nqadmin.swingSet.formatting.helpers.HelperPopup();
+        helperPopup3 = new com.nqadmin.swingSet.formatting.helpers.HelperPopup();
         jPanel1 = new javax.swing.JPanel();
         sSFormattedTextField1 = new com.nqadmin.swingSet.formatting.SSFormattedTextField();
         sSFormattedTextField2 = new com.nqadmin.swingSet.formatting.SSFormattedTextField();
@@ -101,9 +101,9 @@ public class SelectorTest extends javax.swing.JFrame {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    com.nqadmin.swingSet.formatting.selectors.HelperPopup helperPopup1;
-    com.nqadmin.swingSet.formatting.selectors.HelperPopup helperPopup2;
-    com.nqadmin.swingSet.formatting.selectors.HelperPopup helperPopup3;
+    com.nqadmin.swingSet.formatting.helpers.HelperPopup helperPopup1;
+    com.nqadmin.swingSet.formatting.helpers.HelperPopup helperPopup2;
+    com.nqadmin.swingSet.formatting.helpers.HelperPopup helperPopup3;
     javax.swing.JPanel jPanel1;
     com.nqadmin.swingSet.datasources.SSConnection sSConnection1;
     com.nqadmin.swingSet.formatting.SSFormattedTextField sSFormattedTextField1;
