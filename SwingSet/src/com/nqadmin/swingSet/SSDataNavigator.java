@@ -102,7 +102,9 @@ public class SSDataNavigator extends JPanel {
 	protected boolean onInsertRow = false;
 
 	// SIZE OF THE BUTTONS TO WHICH THEY HAVE TO BE SET
-	protected Dimension buttonSize = new Dimension( 50, 20);
+	protected Dimension buttonSize = new Dimension( 40, 20);
+	
+	protected Dimension txtFieldSize = new Dimension( 65, 20);
 
 	/**
 	 * Creates a object of SSDataNavigator.
@@ -393,8 +395,9 @@ public class SSDataNavigator extends JPanel {
 				currentRow = rowset.getRow();
 			}
 		// SET THE ROW COUNT AS LABEL
-			lblRowCount.setText(String.valueOf(rowCount));	
+			lblRowCount.setText("of " + rowCount);	
 			txtCurrentRow.setText(String.valueOf(currentRow));
+
 		} catch(SQLException se) {
 			se.printStackTrace();
 		}
@@ -443,8 +446,8 @@ public class SSDataNavigator extends JPanel {
             button7.setPreferredSize(buttonSize);
             button8.setPreferredSize(buttonSize);
             button9.setPreferredSize(buttonSize);
-            txtCurrentRow.setPreferredSize(buttonSize);
-            lblRowCount.setPreferredSize(buttonSize);
+            txtCurrentRow.setPreferredSize(txtFieldSize);
+            lblRowCount.setPreferredSize(txtFieldSize);
             lblRowCount.setHorizontalAlignment(SwingConstants.CENTER);
 
 		// SET MINIMUM BUTTON SIZES
@@ -457,8 +460,8 @@ public class SSDataNavigator extends JPanel {
             button7.setMinimumSize(buttonSize);
             button8.setMinimumSize(buttonSize);
             button9.setMinimumSize(buttonSize);
-            txtCurrentRow.setMinimumSize(buttonSize);
-            lblRowCount.setMinimumSize(buttonSize);
+            txtCurrentRow.setMinimumSize(txtFieldSize);
+            lblRowCount.setMinimumSize(txtFieldSize);
 	}
 
 	// ADDS THE BUTTONS ON TO THE PANEL
@@ -647,7 +650,7 @@ public class SSDataNavigator extends JPanel {
 					// INCREMENT THE ROW COUNT
 						rowCount++;
 					// SET THE ROW COUNT AS LABEL
-						lblRowCount.setText(String.valueOf(rowCount));
+						lblRowCount.setText("of " + rowCount);	
 					// GET CURRENT ROW NUMBER
 						currentRow = rowset.getRow();
 					// UPDATE THE TEXT FEILD
@@ -733,7 +736,7 @@ public class SSDataNavigator extends JPanel {
 							currentRow = rowset.getRow();
 						}
 					// SET THE ROW COUNT AS LABEL
-						lblRowCount.setText(String.valueOf(rowCount));	
+						lblRowCount.setText("of " + rowCount);	
 						txtCurrentRow.setText(String.valueOf(currentRow));
                     }
 						
@@ -815,7 +818,7 @@ public class SSDataNavigator extends JPanel {
                 // SEEMS DELETION WAS SUCCESSFULL DECREMENT ROWCOUNT
                 	rowCount--;
                 // SET THE ROW COUNT AS LABEL
-					lblRowCount.setText(String.valueOf(rowCount));
+					lblRowCount.setText("of " + rowCount);	
 				// GET CURRENT ROW NUMBER
 					currentRow = rowset.getRow();
 				// UPDATE THE TEXT FEILD
@@ -854,6 +857,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.11  2004/08/12 23:50:24  prasanth
+ * Changing the row count when a new row is added or a row is deleted.
+ *
  * Revision 1.10  2004/08/11 20:29:01  prasanth
  * When rowset has no rows the values in text field and row count label were
  * not updated so corrected this.
