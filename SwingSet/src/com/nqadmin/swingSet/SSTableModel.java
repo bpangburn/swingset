@@ -70,7 +70,7 @@ public class SSTableModel extends AbstractTableModel {
     protected HashMap defaultValuesMap = null;
 
     // BOOLEAN TO INDICATE IF THE SSROWSET IS ON INSERT ROW.
-    private boolean inInsertRow = false;
+    protected boolean inInsertRow = false;
 
     // MESSAGE WINDOW
     protected transient Component component = null;
@@ -150,7 +150,7 @@ public class SSTableModel extends AbstractTableModel {
      * Initializes the SSTableModel. (Gets  the column count and rowcount for the
      * given SSRowSet.)
      */
-    private void init() {
+    protected void init() {
         try {
 
             columnCount = rowset.getColumnCount();
@@ -402,7 +402,7 @@ public class SSTableModel extends AbstractTableModel {
      * @param _value   value entererd of a column
      * @param _column  the column number for which the value is entered.
      */
-    private void insertRow(Object _value, int _column) {
+    protected void insertRow(Object _value, int _column) {
         if (_value == null) {
             return;
         }
@@ -482,13 +482,13 @@ public class SSTableModel extends AbstractTableModel {
        }
 //     System.out.println("Successfully added row");
 
-    } // end private void insertRow(Object _value, int _column) {
+    } // end protected void insertRow(Object _value, int _column) {
 
     /**
      * This functions sets the default values provided by the user
      * to the present row.
      */
-    private void setDefaults() {
+    protected void setDefaults() {
         if (defaultValuesMap == null) {
             return;
         }
@@ -541,7 +541,7 @@ public class SSTableModel extends AbstractTableModel {
                 JOptionPane.showMessageDialog(component,"Error while inserting row.\n" + se.getMessage());
             }
         }
-    } // end private void setDefaults() {
+    } // end protected void setDefaults() {
 
     /**
      * Returns the type of the column appearing in the view at column position column.
@@ -704,7 +704,7 @@ public class SSTableModel extends AbstractTableModel {
         dataValue = _dataValue;
     }
 
-    private void setPrimaryColumn() {
+    protected void setPrimaryColumn() {
         try {
 
             int type = rowset.getColumnType(primaryColumn +1);
@@ -746,10 +746,10 @@ public class SSTableModel extends AbstractTableModel {
                 JOptionPane.showMessageDialog(component,"Error while inserting Primary Key value.\n" + se.getMessage());
             }
         }
-    } // end private void setPrimaryColumn() {
+    } // end protected void setPrimaryColumn() {
 
 
-    private Date getSQLDate(String _strDate) {
+    protected Date getSQLDate(String _strDate) {
         if (_strDate.trim().equals("")) {
             return null;
         }
@@ -827,6 +827,9 @@ public class SSTableModel extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.14  2005/02/04 22:48:54  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.13  2004/11/11 14:45:48  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *

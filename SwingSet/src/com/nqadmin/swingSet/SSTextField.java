@@ -75,10 +75,10 @@ public class SSTextField extends JTextField {
      public static final int DECIMAL = 4;
 
     // TYPE OF MASK TO BE USED FOR THIS TEXTFIELD
-    private int mask = 0;
+    protected int mask = 0;
 
     // NUMBER OF DECIMALS REQUIRED
-    private int numDecimals = 2;
+    protected int numDecimals = 2;
 
 
     /**
@@ -188,7 +188,7 @@ public class SSTextField extends JTextField {
      /**
       * Initializes the text field.
       */
-     private void init() {
+     protected void init() {
 
      // ADD FOCUS LISTENER TO THE TEXT FEILD SO THAT WHEN THE FOCUS IS GAINED
      // COMPLETE TEXT SHOULD BE SELECTED
@@ -225,7 +225,7 @@ public class SSTextField extends JTextField {
 
         });
 
-     } // end private void init() {
+     } // end protected void init() {
 
      protected void mask(KeyEvent ke){
         String str = getText();
@@ -282,7 +282,7 @@ public class SSTextField extends JTextField {
       *
       * @return returns the formated string.
       */
-     private String dateMask(String str, KeyEvent ke) {
+     protected String dateMask(String str, KeyEvent ke) {
         switch(str.length()) {
             case 1:
                 if (ke.getKeyChar() == '/') {
@@ -312,7 +312,7 @@ public class SSTextField extends JTextField {
 
         return str;
 
-    } // end private String dateMask(String str, KeyEvent ke) {
+    } // end protected String dateMask(String str, KeyEvent ke) {
 
     /**
      * Fucntion to format SSN
@@ -322,7 +322,7 @@ public class SSTextField extends JTextField {
      *
      * @return returns the formated string.
      */
-    private String ssnMask(String str, KeyEvent ke) {
+    protected String ssnMask(String str, KeyEvent ke) {
         switch(str.length()) {
             case 3:
             case 6:
@@ -348,7 +348,7 @@ public class SSTextField extends JTextField {
      *
      * @return returns the formatted string.
      */
-    private String decimalMask(String str, int numDecimals) {
+    protected String decimalMask(String str, int numDecimals) {
         StringTokenizer strtok = new StringTokenizer(str,".",false);
         String intPart = "";
         String decimalPart = "";
@@ -375,6 +375,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.13  2005/02/04 22:48:54  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.12  2004/11/11 14:45:48  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *

@@ -115,7 +115,7 @@ public class SSDBNavImp extends SSDBNavAdapter {
     } // end public void performPreInsertOps() {
 
     // FUNCTION TO CLEAR THE JTEXTFIELDS AND COMBOBOXES RECURSIVELY INSIDE A JPANEL OR JTABBEDPANE
-    private void setComponents(Container innerContainer) {
+    protected void setComponents(Container innerContainer) {
 
         Component[] comps = innerContainer.getComponents();
 
@@ -153,7 +153,7 @@ public class SSDBNavImp extends SSDBNavAdapter {
 
         }
 
-    } // end private void setComponents(Container innerContainer) {
+    } // end protected void setComponents(Container innerContainer) {
 
 } // end public class SSDBNavImp extends SSDBNavAdapter {
 
@@ -161,6 +161,9 @@ public class SSDBNavImp extends SSDBNavAdapter {
 
 /*
  * $Log$
+ * Revision 1.11  2005/02/04 22:48:53  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.10  2005/01/19 16:46:11  yoda2
  * Updated SSDBComboBox stuff to get rid of getComboBox() calls.
  *

@@ -240,7 +240,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
     /**
      * Initializes the values to default values.
      */
-    private void init(){
+    protected void init(){
         columnIndex = -1;
         columnName = null;
         columnType = -1;
@@ -414,7 +414,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
     // THIS FUNCTION UPDATES THE VALUE OF THE COLUM IN THE SSROWSET.
     // FOR THIS LOOK AT THE DATA TYPE OF THE COLUMN AND THEN CALL THE
     // APPROPIATE FUNCTION
-    private void updateText(String strValue) {
+    protected void updateText(String strValue) {
         try {
             strValue.trim();
 //          System.out.println("Update Text:" + columnName);
@@ -511,11 +511,11 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 //          System.out.println(nfe.getMessage());
         }
 
-    } // end private void updateText(String strValue) {
+    } // end protected void updateText(String strValue) {
 
     // THIS METHOD IS USED IN THE LISTENER OF THE SSROWSET TO GET THE NEW TEXT WHEN EVEN
     // THE SSROWSET EVENTS ARE TRIGGERED
-    private String getText() {
+    protected String getText() {
         String value = null;
         try {
             // BASED ON THE COLUMN DATA TYPE THE CORRESPONDING FUNCTION
@@ -588,7 +588,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
         return value;
 
-    } // end private String getText() {
+    } // end protected String getText() {
 
     /**
      * Converts a date str (mm/dd/yyyy) in to a sql Date.
@@ -611,6 +611,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.17  2005/02/04 22:48:54  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.16  2004/11/11 14:45:33  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *

@@ -55,11 +55,11 @@ import javax.swing.event.*;
 public class SSSlider extends JSlider {
 
     // TEXT FIELD BOUND TO THE DATABASE
-    private JTextField textField = new JTextField();
+    protected JTextField textField = new JTextField();
 
     // BINDING INFORMATION
-    private String columnName;
-    private int columnType;
+    protected String columnName;
+    protected int columnType;
 
     // LISTENER FOR SLIDER AND TEXT FIELD
     private MySliderListener sliderListener = new MySliderListener();
@@ -135,7 +135,7 @@ public class SSSlider extends JSlider {
     }
 
     // INITIALIZES THE SLIDER.
-    private void initSlider() {
+    protected void initSlider() {
 
         // ADD LISTENER FOR THE TEXT FIELD
             textField.getDocument().addDocumentListener(textFieldListener);
@@ -161,17 +161,10 @@ public class SSSlider extends JSlider {
         // LISTENERS WHEN EXECUTE IS CALLED MULTIPLE TIMES.
             removeChangeListener(sliderListener);
             addChangeListener( sliderListener );
-    } // end private void initSlider() {
+    } // end protected void initSlider() {
 
     // LISTENER FOR THE TEXT FIELD
     private class MyTextFieldListener implements DocumentListener, Serializable {
-        private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
-            objIn.defaultReadObject();
-        }
-
-        private void writeObject(ObjectOutputStream objOut) throws IOException {
-            objOut.defaultWriteObject();
-        }
 
         public void changedUpdate(DocumentEvent de){
             removeChangeListener(sliderListener);
@@ -249,14 +242,6 @@ public class SSSlider extends JSlider {
     // TEXT FIELD FOR FURTHER PROPOGATION TO THE UNDERLYING STORAGE STRUCTURE.
     private class MySliderListener implements ChangeListener, Serializable {
 
-        private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
-            objIn.defaultReadObject();
-        }
-
-        private void writeObject(ObjectOutputStream objOut) throws IOException {
-            objOut.defaultWriteObject();
-        }
-
         public void stateChanged(ChangeEvent ce) {
             textField.getDocument().removeDocumentListener(textFieldListener);
 
@@ -273,6 +258,9 @@ public class SSSlider extends JSlider {
 
 /*
  * $Log$
+ * Revision 1.4  2005/02/04 22:48:54  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.3  2005/01/03 02:58:04  yoda2
  * Added appropriate super() calls to non-empty constructors.
  *
