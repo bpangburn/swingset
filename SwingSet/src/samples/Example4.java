@@ -29,9 +29,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
- 
 
- 
+
+
  import com.nqadmin.swingSet.*;
  import javax.swing.*;
  import javax.swing.event.*;
@@ -42,53 +42,56 @@
  import com.sun.rowset.JdbcRowSetImpl;
 
  /**
-  * This example demostrates the use of SSDBComboBox for navigating through the records.
-  *In this navigation can be done either by the part name or using the SSDataNavigator.
-  *Since the Part name is used for navigation it can't be updated.
+  * This example demonstrates the use of SSDBComboBox for record navigation.
+  * Navigation can be accomplished using either the Part combobox or the
+  * navigation bar. Since the part name is used for navigation it can't be
+  * updated (note that none of the fields in these examples can actually be
+  * updated since the database is read only).
   *
-  *Since the navigation is taking place by two components they have to be synchronized.
-  *This is done using an intermediate text box. Where the part ID is stored.
+  * Since the navigation can take place by multiple methods, the navigation
+  * controls have to be synchronized.  This is done using a hidden JTextField
+  * containing the part_id and an event listener.
+  *
+  * This example also demonstrates the use of SSTextDocument to display
+  * information in SSComboBox (Color) and JTextField (Weight and City).
   */
  public class Example4 extends JFrame{
- 	
+
   	JLabel lblSelectPart   = new JLabel("Part");
   	JLabel lblPartColor  = new JLabel("Color");
  	JLabel lblPartWeight     = new JLabel("Weight");
  	JLabel lblPartCity       = new JLabel("City");
- 	
+
  	SSDBComboBox cmbSelectPart  = null;
  	SSComboBox cmbPartColor = null;
  	JTextField txtPartWeight  = new JTextField();
  	JTextField txtPartCity  = new JTextField();
- 	
- 	
- 	
+
+
+
  	Connection conn         = null;
  	JdbcRowSetImpl rowset       = null;
  	SSDataNavigator navigator = null;
- 	
+
  	JTextField txtPartID = new JTextField();
 	JTextField txtPartIDLinkedToCombo = new JTextField();
  	// LISTENER OBJECTS FOR TEXTFILED LINKED TO COMBO AND THE TEXT FIELD BOUND TO
 	// PART_ID COLUMN
 	MyPartIDDocumentListener partIDListener = new MyPartIDDocumentListener();
 	MyPartIDDocumentLinkedToComboListener partIDLinkedToComboListener = new MyPartIDDocumentLinkedToComboListener();
-	
- 	
+
+
  	public Example4(){
- 		
+
  		super("Example4");
  		setSize(600,200);
- 		
- 		 		
+
+
  		try{
  			Class.forName("org.postgresql.Driver");
- 			conn = DriverManager.getConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
- 									"swingset","test");
+ 			conn = DriverManager.getConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts","swingset","test");
  			rowset = new JdbcRowSetImpl(conn);
- 			//rowset.setUrl("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts");
- 			//rowset.setUsername("swingset");
-	 		//rowset.setPassword("test");
+
 	 		// POSTGRES RAISES AN EXCEPTIN WHEN YOU TRY TO USE THE UPDATEROW() METHOD
 	 		// IF THERE IS A SEMICOLON AT THE END OF THE QUERY WITH OUT ANY CLAUSES
 	 		// OR WHERE CONDITIONS AT THE END.
@@ -100,49 +103,49 @@
  			// ADDITION AND DELETION BUTTONS ARE DIAABLED
  			// ANY CHANGES MADE TO PRESENT RECORD WILL BE NEGLECTED.
  			navigator.setModification(false);
- 			navigator.setDBNav( new SSDBNavImp(getContentPane())); 
+ 			navigator.setDBNav( new SSDBNavImp(getContentPane()));
  		}catch(SQLException se){
  			se.printStackTrace();
  		}catch(ClassNotFoundException cnfe){
  			cnfe.printStackTrace();
  		}
- 		
+
  		txtPartID.setDocument(new SSTextDocument(rowset,"part_id"));
- 		txtPartIDLinkedToCombo.setText(txtPartID.getText());		
- 				
+ 		txtPartIDLinkedToCombo.setText(txtPartID.getText());
+
 		String query = "SELECT * FROM part_data;";
 		cmbSelectPart = new SSDBComboBox(conn, query, "part_id", "part_name",txtPartIDLinkedToCombo);
  		//cmbSelectPart.bind(rowset,"part_id");
 		try{
- 			cmbSelectPart.execute();	 		
+ 			cmbSelectPart.execute();
 		}catch(SQLException se){
 			se.printStackTrace();
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		
+
 		cmbPartColor = new SSComboBox();
 		cmbPartColor.setOption(new String[]{"Red","Green","Blue"});
 		cmbPartColor.bind(rowset,"color_code");
-		
+
  		txtPartWeight.setDocument(new SSTextDocument(rowset,"weight"));
  		txtPartCity.setDocument(new SSTextDocument(rowset,"city"));
- 		
- 		 	
- 		lblSelectPart.setPreferredSize(new Dimension(75,20));	
+
+
+ 		lblSelectPart.setPreferredSize(new Dimension(75,20));
  		lblPartColor.setPreferredSize(new Dimension(75,20));
  		lblPartWeight.setPreferredSize(new Dimension(75,20));
  		lblPartCity.setPreferredSize(new Dimension(75,20));
- 		
+
  		cmbSelectPart.getComboBox().setPreferredSize(new Dimension(150,20));
  		cmbPartColor.getComboBox().setPreferredSize(new Dimension(150,20));
  		txtPartWeight.setPreferredSize(new Dimension(150,20));
  		txtPartCity.setPreferredSize(new Dimension(150,20));
- 		
+
  		Container contentPane = getContentPane();
  		contentPane.setLayout(new GridBagLayout());
  		GridBagConstraints constraints = new GridBagConstraints();
- 		
+
  		constraints.gridx = 0;
  		constraints.gridy = 0;
  		contentPane.add(lblSelectPart, constraints);
@@ -152,7 +155,7 @@
  		contentPane.add(lblPartWeight, constraints);
  		constraints.gridy = 3;
  		contentPane.add(lblPartCity, constraints);
- 		
+
  		constraints.gridx = 1;
  		constraints.gridy = 0;
  		contentPane.add(cmbSelectPart.getComboBox(), constraints);
@@ -162,28 +165,28 @@
  		contentPane.add(txtPartWeight, constraints);
  		constraints.gridy = 3;
  		contentPane.add(txtPartCity, constraints);
- 				
+
  		constraints.gridx = 0;
  		constraints.gridy = 4;
  		constraints.gridwidth = 2;
  		contentPane.add(navigator,constraints);
- 		
+
  		txtPartID.getDocument().addDocumentListener(partIDListener);
 		txtPartIDLinkedToCombo.getDocument().addDocumentListener(partIDLinkedToComboListener);
-		
-		
+
+
  		setVisible(true);
- 			
+
  	}
- 	
+
  		// LISTENER FOR THE TEXT FIELD BOUND TO THE Part_ID COLUMN
 	private class MyPartIDDocumentListener implements DocumentListener{
-		
+
 		public void changedUpdate(DocumentEvent de) {
-			
+
 		}
 		// WHEN EVER THE PART ID CHANGES, CHANGE THE PART ID IN TEXT FIELD
-		// LINKED TO COMBO SO THAT COMBO ALSO SHOW THE RIGHT PART NAME 
+		// LINKED TO COMBO SO THAT COMBO ALSO SHOW THE RIGHT PART NAME
 		public void insertUpdate(DocumentEvent de) {
 			txtPartIDLinkedToCombo.getDocument().removeDocumentListener(partIDLinkedToComboListener);
 			if(txtPartIDLinkedToCombo.getText() != txtPartID.getText()){
@@ -192,17 +195,17 @@
 			txtPartIDLinkedToCombo.getDocument().addDocumentListener(partIDLinkedToComboListener);
 		}
 		public void removeUpdate(DocumentEvent de) {
-		
-		}
-	}									
 
-	// LISTENER FOR THE TEXT FIELD LINKED TO THE PART SELECTION COMBO 
+		}
+	}
+
+	// LISTENER FOR THE TEXT FIELD LINKED TO THE PART SELECTION COMBO
 	private class MyPartIDDocumentLinkedToComboListener implements DocumentListener {
 		long partID = -1;
 		public void changedUpdate(DocumentEvent de) {
-			
+
 		}
-		// WHEN THERE IS A CHANGE IN THIS TEXT FIELD MOVE THE ROWSET TO THE APPROPRIATE 
+		// WHEN THERE IS A CHANGE IN THIS TEXT FIELD MOVE THE ROWSET TO THE APPROPRIATE
 		// RECORD
 		public void insertUpdate(DocumentEvent de) {
 			Document doc = txtPartIDLinkedToCombo.getDocument();
@@ -220,14 +223,14 @@
 					// MOVE THE RECORD SET TO THE RECORD NUMBER EQUAL TO THE SELECTED
 					// ITEM NUMBER IN COMBO
 					// COMBO BOX ITEM NUMBERING STARTS FROM ZERO
-					// FOR ROWSET IT STARTS FROM ONE.					
+					// FOR ROWSET IT STARTS FROM ONE.
 					int index = cmbSelectPart.getComboBox().getSelectedIndex() + 1;
 					rowset.absolute(index);
 					int numRecords = cmbSelectPart.getComboBox().getItemCount();
 					int count = 0;
 					// CHECK IF THE CURRENT RECORD CORRESPONDS TO THAT OF THE DESIRED ONE.
 					while(partID != rowset.getLong("part_id") ) {
-						// ABOVE CONDITION SHOULD ALWAYS FAIL EXCEPT IF SOME ONE DELETED 
+						// ABOVE CONDITION SHOULD ALWAYS FAIL EXCEPT IF SOME ONE DELETED
 						// A ROW OUT SIDE OF THIS APPLICATION
 						// IN SUCH CASE LOOK FOR THE CORRECT RECORD
 						if( !rowset.next()) {
@@ -246,7 +249,7 @@
 				}
 				// ADD BACK THE LISTENER
 				txtPartID.getDocument().addDocumentListener(partIDListener);
-											
+
 			}catch(SQLException se){
 				se.printStackTrace();
 			}catch(NumberFormatException nfe){
@@ -256,14 +259,14 @@
 			}
 		}
 		public void removeUpdate(DocumentEvent de) {
-		
-		}
-	}				
-	
 
- 	
+		}
+	}
+
+
+
  	public static void main(String[] args){
  		new Example4();
  	}
- 	
+
  }
