@@ -5,12 +5,45 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 $Id$
 
 ==============================================================================
-SwingSet 0.8.X-beta - Released TBA
+SwingSet 0.8.3-beta - Released 10-22-2004
 ==============================================================================
 
 Changes:
-	Classes or Interfaces added in SwingSet-0.8.X:
+	Classes or Interfaces added in SwingSet-0.8.3:
 		1. SSTextArea.
+	
+	SSDataGrid:
+		1.Using SSTextField as editor when a date editor is needed, rather 
+		  than having all the date mask code in the SSDataGrid again.
+		2.New function is provided to specify default column width for grid.
+		3.Column width can be specified when requesting a combo renderor.
+		  For this additional functions are provided for specifying column 
+		  width.
+		4.Added getCellEditorValue function for DateEditor sub-class. Because
+		  of this cell values (for columns of type Date) will be returned as
+		  Date objects rather than as Strings.
+		  This would require changes in SSCellEditing interface implementations
+		  if String is expected as _newValue for Date columns.
+		5.Calling the createDefaultColumnModel function when a new rowset is
+		  specified. This fixes the problem of not displaying any new columns
+		  being added to the rowset. (If the initial query has 2 columns and 
+		  then a new rowset has been specified with 3 columns DataGrid was 
+		  still showing only 2 columns).
+		  
+	SSTableModel:
+		1.Value for Date column can be set using a String (accepted formats
+	  	  mm/dd/yyyy or yyyy-mm-dd) or Date object.This helps the copy & paste
+		  functionality in copying dates.
+	
+	SSTextDocument:
+		1.Added support for CHAR types.
+		
+	SSTextField:
+		1.The way the masks work is modified to handle more keys.
+		2.Enter key will transfer the focus to next component irrespective
+		  of whether the mask being used.
+		3.Added focus listener to select complete text when the text field
+		  receives focus.
 
 
 ==============================================================================
