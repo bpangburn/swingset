@@ -138,7 +138,7 @@ public class SSDBNavImp extends SSDBNavAdapter {
 			else if (comps[i] instanceof JComboBox ){
 				JComboBox combo = ((JComboBox)comps[i]);
 				if(combo.getItemCount() > 0){
-					combo.setSelectedIndex(0);
+					combo.setSelectedIndex(-1);
 				}
 			}
 			// IF ITS A SSComboBox THEN SEE IF THERE ARE ANY ITEMS INSIDE IT  IF YES SET IT TO
@@ -146,7 +146,7 @@ public class SSDBNavImp extends SSDBNavAdapter {
 			else if (comps[i] instanceof SSComboBox ){
 				JComboBox combo = ((SSComboBox)comps[i]).getComboBox();
 				if(combo.getItemCount() > 0){
-					combo.setSelectedIndex(0);
+					combo.setSelectedIndex(-1);
 				}
 			}
 			// IF ITS A SSDBComboBox THEN SEE IF THERE ARE ANY ITEMS INSIDE IT  IF YES SET IT TO
@@ -154,7 +154,7 @@ public class SSDBNavImp extends SSDBNavAdapter {
 			else if (comps[i] instanceof SSDBComboBox ){
 				JComboBox combo = ((SSDBComboBox)comps[i]).getComboBox();
 				if(combo.getItemCount() > 0){
-					combo.setSelectedIndex(0);
+					combo.setSelectedIndex(-1);
 				}
 			}
 			else if(comps[i] instanceof  JPanel) {
@@ -173,6 +173,9 @@ public class SSDBNavImp extends SSDBNavAdapter {
 
 /*
  * $Log$
+ * Revision 1.4  2004/03/08 16:43:37  prasanth
+ * Updated copy right year.
+ *
  * Revision 1.3  2003/12/16 18:01:40  prasanth
  * Documented versions for release 0.6.0
  *
