@@ -203,53 +203,70 @@ public class SSTextField extends JTextField {
 	 	// ADD KEY LISTENER FOR THE TEXT FIELD
 	 	this.addKeyListener( new KeyListener() {
 	 			
-	 		public void keyPressed(KeyEvent ke) {
+	 		public void keyReleased(KeyEvent ke) {
+	 			if(mask == DECIMAL || mask == SSN){
+	 				int position = SSTextField.this.getCaretPosition();
+	 				mask(ke);
+	 				SSTextField.this.setCaretPosition(position);
+	 			}
 	 		}
 	 		
 	 		public void keyTyped(KeyEvent ke) {
 	 		}
 	 		
-	 		public synchronized void keyReleased(KeyEvent ke) {
-	 			
-                String str = SSTextField.this.getText();
-            
-                // IF THE KEY PRESSED IS ANY OF THE FOLLOWING DO NOTHING
-                if (ke.getKeyCode() == KeyEvent.VK_BACK_SPACE  || 
-                        ke.getKeyCode() == KeyEvent.VK_DELETE  ||
-                        ke.getKeyCode() == KeyEvent.VK_LEFT    ||
-                        ke.getKeyCode() == KeyEvent.VK_RIGHT   ||
-                        ke.getKeyCode() == KeyEvent.VK_HOME    ||
-                        ke.getKeyCode() == KeyEvent.VK_END	   ||
-                        ke.getKeyCode() == KeyEvent.VK_ENTER) {
-                            
-                    // TRANSFER FOCUS TO NEXT COMPONENT WHEN ENTER KEY IS PRESSED		 			
-                        if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
-                            ((Component)ke.getSource()).transferFocus();
-                        }
-                        
-                        return;
-                }
-                
-                // BASED ON TYPE OF MASK REQUESTED MODIFY THE TEXT
-                // ACCORDINGLY
-                switch(mask) {
-                    case MMDDYYYY:
-                    case DDMMYYYY:
-                        SSTextField.this.setText(dateMask(str, ke));
-                        break;
-                    case SSN:
-                        SSTextField.this.setText(ssnMask(str,ke));
-                        break;
-                    case DECIMAL:
-                        SSTextField.this.setText(decimalMask(str,numDecimals));
-                        break;	
-                } // end switch
-	 				 				 			
-	 		} // end public synchronized void keyReleased(KeyEvent ke) {
+	 		public synchronized void keyPressed(KeyEvent ke) {
+	 			if(mask == MMDDYYYY || mask == DDMMYYYY){
+	 				mask(ke);
+	 			}
+	 		} 
                 
 	  	});
         
 	 } // end private void init() {
+	 	
+	 protected void mask(KeyEvent ke){
+	 	String str = getText();
+            
+     // IF THE KEY PRESSED IS ANY OF THE FOLLOWING DO NOTHING
+        if (ke.getKeyCode() == KeyEvent.VK_BACK_SPACE  || 
+                ke.getKeyCode() == KeyEvent.VK_DELETE  ||
+                ke.getKeyCode() == KeyEvent.VK_LEFT    ||
+                ke.getKeyCode() == KeyEvent.VK_RIGHT   ||
+                ke.getKeyCode() == KeyEvent.VK_HOME    ||
+                ke.getKeyCode() == KeyEvent.VK_END	   ||
+                ke.getKeyCode() == KeyEvent.VK_ENTER) {
+                    
+            // TRANSFER FOCUS TO NEXT COMPONENT WHEN ENTER KEY IS PRESSED		 			
+                if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
+                    ((Component)ke.getSource()).transferFocus();
+                }
+                
+                return;
+        }
+        
+        if(getSelectionStart() != getSelectionEnd()){
+        	str = str.substring(0,getSelectionStart()) 
+        		+ str.substring(getSelectionEnd(), str.length());
+        }
+        
+     // BASED ON TYPE OF MASK REQUESTED MODIFY THE TEXT
+     // ACCORDINGLY
+        switch(mask) {
+            case MMDDYYYY:
+            case DDMMYYYY:
+            	if(getCaretPosition() < str.length()){
+        			return;
+        		}
+                setText(dateMask(str, ke));
+                break;
+            case SSN:
+                setText(ssnMask(str,ke));
+                break;
+            case DECIMAL:
+                setText(decimalMask(str,numDecimals));
+                break;	
+        } // end switch
+	 }	
 	 
 	 /**
 	  *	Function to manage formatting date strings with slashes as the user types
@@ -262,32 +279,28 @@ public class SSTextField extends JTextField {
 	  */
 	 private String dateMask(String str, KeyEvent ke) {
 	 	switch(str.length()) {
+			case 1:
+	 			if (ke.getKeyChar() == '/') {
+	 				str =  "0" + str ;
+	 			}
+	 			break;
 			case 2:
 				if ( ke.getKeyChar() == '/' ) {
-					str =  "0" + str ;
+					// do nothing
 				} else {
-					str = str + "/";
-				}
-				break;
-			case 5:
-				if ( ke.getKeyChar() == '/' ) {
-					String newStr = str.substring(0,3);
-					newStr = newStr + "0" + str.substring(3,4) + "/";
-					str = newStr;
-				} else {
-					str = str + "/";
-				}
-				break;
-			case 3:
-			case 6:
-				if ( ke.getKeyChar() != '/' ) {
-					str = str + "/";
+					str = str +  "/";
 				}
 				break;
 			case 4:
-			case 7:
-				if ( ke.getKeyChar() == '/' ) {
-					str = str.substring(0,str.length()-1);
+				if ( ke.getKeyChar() == '/' ){ 
+					String newStr = str.substring(0,3);
+					newStr = newStr + "0" + str.substring(3,4);
+					str = newStr;
+				}
+				break;
+			case 5:
+				if ( ke.getKeyChar() != '/' ) {
+					str = str + "/";
 				}
 				break;
 		} // end switch
@@ -357,6 +370,10 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.7  2004/09/13 15:42:15  prasanth
+ * Changed the default mask to non.
+ * It used to be MMDDYYYY.
+ *
  * Revision 1.6  2004/08/10 22:06:59  yoda2
  * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
  *
