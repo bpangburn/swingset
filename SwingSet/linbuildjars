@@ -27,7 +27,9 @@ javadoc -d ./release_jars/docs ./src/com/nqadmin/swingSet/datasources/*.java ./s
 
 # COPY SOURCE CODE
 cp ./src/com/nqadmin/swingSet/*.java ./release_jars/src/com/nqadmin/swingSet/
+rm ./release_jars/src/com/nqadmin/swingSet/*.java~
 cp ./src/com/nqadmin/swingSet/datasources/*.java ./release_jars/src/com/nqadmin/swingSet/datasources/
+rm ./release_jars/src/com/nqadmin/swingSet/datasources/*.java~
 
 # COPY IMAGES & LICENSE
 cp ./src/images/* ./release_jars/images
@@ -46,6 +48,7 @@ javac -d ./release_jars/demo -classpath ./release_jars/swingset-bin_current.jar 
 
 # COPY DEMO SOURCE CODE
 cp ./src/samples/* ./release_jars/demo/
+rm ./release_jars/demo/*.java~
 
 # BUILD DEMO JAR
 jar -mcvf ./META-INF/MANIFEST-DEMO.MF ./release_jars/swingset-demo_current.jar -C ./release_jars/demo . readme.txt
