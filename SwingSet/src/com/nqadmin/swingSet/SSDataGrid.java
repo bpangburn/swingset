@@ -863,7 +863,7 @@ public class SSDataGrid extends JTable
     	
     	private int getIndexOf(Object _value){
     		if(_value == null)
-    			return 0;
+    			return -1;
     		if(underlyingValues == null)
     			return ((Integer)_value).intValue();
     		for(int i=0;i<underlyingValues.length;i++){
@@ -921,7 +921,7 @@ public class SSDataGrid extends JTable
     			if(underlyingValues[i].equals(_value))
     				return i;
     		}
-    		return 0;
+    		return -1;
     	}
     }	
     
@@ -1030,6 +1030,10 @@ public class SSDataGrid extends JTable
 
 /*
  * $Log$
+ * Revision 1.8  2004/08/02 14:48:39  prasanth
+ * 1. Added getSelectedColumnCount and getSelectedColumns functions.
+ * 2. Added the SSTableKeyAdapter instance for copy and paste support.
+ *
  * Revision 1.7  2004/03/08 16:59:32  prasanth
  * Added callExecute function to let users decide whether execute should
  * be called or not.
