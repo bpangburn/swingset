@@ -4,6 +4,20 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 
 $Id$
 
+==============================================================================
+SwingSet 1.0.0-PR2 - Released xx-xx-2005
+==============================================================================
+
+Changes:
+    SSDBNavImp:
+        1. Added support for JScrollPane in setComponents. This should clear 
+            the components in JScrollPane.
+    
+    SSDataNavigator:
+        1. Updated the undoButton listener. Based on the insertRow flag calling
+            moveToCurrentRow(). 
+        2. Updating the current row number in the undoButton listener.
+
 
 ==============================================================================
 SwingSet 1.0.0-PR1 - Released 02-21-2005
