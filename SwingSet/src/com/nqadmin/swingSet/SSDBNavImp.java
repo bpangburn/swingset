@@ -122,6 +122,9 @@ public class SSDBNavImp extends SSDBNavAdapter {
             } else if(comps[i] instanceof JTabbedPane) {
             // IF IT IS A JTabbedPane RECURSIVELY SET THE FIELDS
                 setComponents((Container)comps[i]);
+            } else if(comps[i] instanceof JScrollPane) {
+            // IF IT IS A JScrollPane GET THE VIEW PORT AND RECURSIVELY SET THE FIELDS IN VIEW PORT    
+                setComponents((Container) ((JScrollPane)comps[i]).getViewport());
             }
         }
 
@@ -133,6 +136,9 @@ public class SSDBNavImp extends SSDBNavAdapter {
 
 /*
  * $Log$
+ * Revision 1.13  2005/02/09 17:12:53  yoda2
+ * Consolidated logic, added text area, check box, slider, & SSLabel, and cleaned up JavaDoc.
+ *
  * Revision 1.12  2005/02/04 23:05:02  yoda2
  * no message
  *
