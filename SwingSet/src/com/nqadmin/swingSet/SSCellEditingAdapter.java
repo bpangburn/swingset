@@ -41,40 +41,43 @@ import java.io.Serializable;
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  *<p><pre>
  * This abstract adapter class is provided as a convenience for creating
- * custom SSCellEditing objects.  Extend this class to create a SSCellEditing
+ * custom SSCellEditing objects. Extend this class to create a SSCellEditing
  * implementation.
  *
  * SSCellEditingAdapter defines empty functions so that the programmer can define
- * only the functions desired.  Both isCellEditable() and cellUpdateRequested()
+ * only the functions desired. Both isCellEditable() and cellUpdateRequested()
  * always return true.
  *</pre><p>
- * @author	$Author$
- * @version	$Revision$ 
+ * @author  $Author$
+ * @version $Revision$
  */
 public abstract class SSCellEditingAdapter implements SSCellEditing, Serializable {
-	
-	/**
-	 * This empty implementation always returns true.
-	 * For description about the function look in SSCellEditing class.
-	 */
-	public boolean isCellEditable(int _row, int _column) {
-		return true;
-	}
-	
-	/**
-	 * This empty implementation always returns true.
-	 * For description about the function look in SSCellEditing class.
-	 */
-	public boolean cellUpdateRequested(int _row, int _column, Object _oldValue, Object _newValue){
-		return true;
-	}
-    
+
+    /**
+     * This empty implementation always returns true.
+     * For description about the function look in SSCellEditing class.
+     */
+    public boolean isCellEditable(int _row, int _column) {
+        return true;
+    }
+
+    /**
+     * This empty implementation always returns true.
+     * For description about the function look in SSCellEditing class.
+     */
+    public boolean cellUpdateRequested(int _row, int _column, Object _oldValue, Object _newValue){
+        return true;
+    }
+
 } // end public abstract class SSCellEditingAdapter
 
 
 
 /*
  * $Log$
+ * Revision 1.5  2004/08/10 22:06:58  yoda2
+ * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
+ *
  * Revision 1.4  2004/08/02 14:29:46  prasanth
  * implements serializable.
  *

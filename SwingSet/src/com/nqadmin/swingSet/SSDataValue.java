@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
- 
+
 package com.nqadmin.swingSet;
 
 /**
@@ -40,27 +40,30 @@ package com.nqadmin.swingSet;
  * The SSDataValue interface specifies methods for SSTableModel
  * to retrieve the value for primary column in JTable.
  *</pre><p>
- * @author	$Author$
- * @version	$Revision$
+ * @author  $Author$
+ * @version $Revision$
  */
 public interface SSDataValue {
-	
-	/**
-	 * Returns the value for the primary column in the JTable (SSRowSet
-	 * used for building the JTable). When a addtion of row is taking
-	 * place in the JTable, SSTableModel tries to insert a primary
-	 * key value in to that row returned by this function.
+
+    /**
+     * Returns the value for the primary column in the JTable (SSRowSet
+     * used for building the JTable). When a addtion of row is taking
+     * place in the JTable, SSTableModel tries to insert a primary
+     * key value in to that row returned by this function.
      *
-	 * @return the value for the primary key column.
-	 */
-	public Object getPrimaryColumnValue();
-    
+     * @return the value for the primary key column.
+     */
+    public Object getPrimaryColumnValue();
+
 } // end public interface SSDataValue {
 
 
 
 /*
  * $Log$
+ * Revision 1.5  2004/10/25 22:03:17  yoda2
+ * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ *
  * Revision 1.4  2004/08/10 22:06:59  yoda2
  * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
  *
@@ -70,5 +73,4 @@ public interface SSDataValue {
  * Revision 1.2  2003/12/16 18:01:40  prasanth
  * Documented versions for release 0.6.0
  *
- */	
-		
+ */

@@ -62,80 +62,80 @@ package com.nqadmin.swingSet;
  *      Note that both the performPreDeletionOps() and performPostDeletionOps()
  *      will be executed when the user presses the delete button.
  *</pre><p>
- * @author	$Author$
- * @version	$Revision$
+ * @author  $Author$
+ * @version $Revision$
  */
 public interface SSDBNav {
-	
-	/**
-	 *	Constant indicating the navigation button next.
-	 */
-	public static final int NAVIGATION_NEXT      = 1;
-    
-	/**
-	 *	Constant indicating the navigation button previous.
-	 */
-	public static final int NAVIGATION_PREVIOUS  = 2;
-    
-	/**
-	 *	Constant indicating the navigation button first.
-	 */
-	public static final int NAVIGATION_FIRST     = 3;
-    
-	/**
-	 *	Constant indicating the navigation button last.
-	 */
-	public static final int NAVIGATION_LAST      = 4;
 
-	/**
-	 * if the user intends to perform some actions before insertin the row this function should be used
-	 */
-	public void performPreInsertOps();
+    /**
+     *  Constant indicating the navigation button next.
+     */
+    public static final int NAVIGATION_NEXT      = 1;
 
-	/**
-	 * Post insert operations should be performed in this function.
-	 *
-	 * In addition to this you can have a listener on the SSRowSet attached to SSDataNavigator
-	 * to get notiifcation when a row is inserted.
-	 */
-	public void performPostInsertOps();
-	
-	/**
-	 * This function is called when the user is on the insert row and cancels the insert
-	 * by clicking on the undo button.
-	 */
-	public void performCancelOps();
+    /**
+     *  Constant indicating the navigation button previous.
+     */
+    public static final int NAVIGATION_PREVIOUS  = 2;
 
-	/**
-	 * The user should perform the pre deletion operations using this function.
-	 *
-	 * SSRowSet does not provide any notifications before the deletion of a row. but a notification
-	 * will be received after the deletion if you have listener for the SSRowSet.
-	 */
-	public void performPreDeletionOps();
+    /**
+     *  Constant indicating the navigation button first.
+     */
+    public static final int NAVIGATION_FIRST     = 3;
 
-	/**
-	 * This function should perform post deletion operations if the user intends to do so.
-	 *
-	 * The SSRowSet listener also provides the notification after the deletion of the row.
-	 */
-	public void performPostDeletionOps();
-	
-	/**
-	 * This function is called when ever navigation takes place.
+    /**
+     *  Constant indicating the navigation button last.
+     */
+    public static final int NAVIGATION_LAST      = 4;
+
+    /**
+     * if the user intends to perform some actions before insertin the row this function should be used
+     */
+    public void performPreInsertOps();
+
+    /**
+     * Post insert operations should be performed in this function.
      *
-	 * Possible values are NAVIGATION_NEXT, NAVIGATION_PREVIOUS, NAVIGATION_FIRST,
-	 * NAVIGATION_LAST.
+     * In addition to this you can have a listener on the SSRowSet attached to SSDataNavigator
+     * to get notiifcation when a row is inserted.
+     */
+    public void performPostInsertOps();
+
+    /**
+     * This function is called when the user is on the insert row and cancels the insert
+     * by clicking on the undo button.
+     */
+    public void performCancelOps();
+
+    /**
+     * The user should perform the pre deletion operations using this function.
      *
-	 * @param _navigationType    this indicates the type of navigation.
-	 */
-	public void performNavigationOps(int _navigationType);
-	 
-	/**
-	 * This function is called when the user what to refresh the information.
-	 * (When the user presses the refresh button on the navigator.
-	 */
-	public void performRefreshOps();
+     * SSRowSet does not provide any notifications before the deletion of a row. but a notification
+     * will be received after the deletion if you have listener for the SSRowSet.
+     */
+    public void performPreDeletionOps();
+
+    /**
+     * This function should perform post deletion operations if the user intends to do so.
+     *
+     * The SSRowSet listener also provides the notification after the deletion of the row.
+     */
+    public void performPostDeletionOps();
+
+    /**
+     * This function is called when ever navigation takes place.
+     *
+     * Possible values are NAVIGATION_NEXT, NAVIGATION_PREVIOUS, NAVIGATION_FIRST,
+     * NAVIGATION_LAST.
+     *
+     * @param _navigationType    this indicates the type of navigation.
+     */
+    public void performNavigationOps(int _navigationType);
+
+    /**
+     * This function is called when the user what to refresh the information.
+     * (When the user presses the refresh button on the navigator.
+     */
+    public void performRefreshOps();
 
 } // end public interface SSDBNav {
 
@@ -143,6 +143,9 @@ public interface SSDBNav {
 
 /*
  * $Log$
+ * Revision 1.8  2004/11/01 15:53:30  yoda2
+ * Fixed various JavaDoc errors.
+ *
  * Revision 1.7  2004/10/25 22:13:44  yoda2
  * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
  *

@@ -46,31 +46,31 @@ import java.io.Serializable;
  * own SSDBNav implementations can just extend the abstract class and override
  * the desired methods.
  *</pre><p>
- * @author	$Author$
- * @version	$Revision$
+ * @author  $Author$
+ * @version $Revision$
  */
 public class SSDBNavAdapter implements SSDBNav, Serializable {
 
-	public void performPreInsertOps(){
-	}
+    public void performPreInsertOps(){
+    }
 
-	public void performPostInsertOps(){
-	}
+    public void performPostInsertOps(){
+    }
 
-	public void performPreDeletionOps(){
-	}
+    public void performPreDeletionOps(){
+    }
 
-	public void performPostDeletionOps(){
-	}
-	
-	public void performNavigationOps(int _navigationType){
-	}
-	
-	public void performRefreshOps(){
-	}
-    
-	public void performCancelOps(){
-	}
+    public void performPostDeletionOps(){
+    }
+
+    public void performNavigationOps(int _navigationType){
+    }
+
+    public void performRefreshOps(){
+    }
+
+    public void performCancelOps(){
+    }
 
 } // end public class SSDBNavAdapter implements SSDBNav, Serializable {
 
@@ -78,6 +78,9 @@ public class SSDBNavAdapter implements SSDBNav, Serializable {
 
 /*
  * $Log$
+ * Revision 1.6  2004/08/10 22:06:59  yoda2
+ * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
+ *
  * Revision 1.5  2004/08/02 15:22:51  prasanth
  * Implements Serializable.
  *

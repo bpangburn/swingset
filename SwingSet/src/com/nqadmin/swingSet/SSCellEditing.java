@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
- 
+
 package com.nqadmin.swingSet;
 
 /**
@@ -41,40 +41,40 @@ package com.nqadmin.swingSet;
  * determine whether or not a given cell can be edited or if a user-specified
  * value for a cell is valid or invalid.
   *</pre><p>
- * @author	$Author$
- * @version	$Revision$
+ * @author  $Author$
+ * @version $Revision$
  */
 public interface SSCellEditing {
-	
-	/**
-	 * Returns true if the cell at row _row and at column _column is editable else
-	 * false. 
-	 *
-	 * SSTableModel first looks in to uneditable columns, if the column is not
-	 * in the uneditable columns list then this function is called (If SSCellEditing 
-	 * is implemented).
+
+    /**
+     * Returns true if the cell at row _row and at column _column is editable else
+     * false.
      *
-	 * @param _row    the row to which the cell belongs.
-	 * @param _column    the column to which the cell belongs.
+     * SSTableModel first looks in to uneditable columns, if the column is not
+     * in the uneditable columns list then this function is called (If SSCellEditing
+     * is implemented).
      *
-	 * @return returns true is the cell is editable else false.
-	 */
-	public boolean isCellEditable(int _row, int _column);
-	
-	/**
-	 * This function is called when ever a update to a cell is done but before 
-	 * the value is updated in the database.<BR>
-	 * If the function returns false the update is cancelled, if it returns true
-	 * the value will be updated in the database.<BR>
-	 *
-	 * @param _row    the row in which update is taking place.
-	 * @param _column    the column at which update is taking place.
-	 * @param _oldValue    the present value in the cell being edited.
-	 * @param _newValue    the new value entered in the cell being edited.
+     * @param _row    the row to which the cell belongs.
+     * @param _column    the column to which the cell belongs.
      *
-	 * @return returns true if update should be made else false.
-	 */
-	public boolean cellUpdateRequested(int _row, int _column, Object _oldValue, Object _newValue); 
+     * @return returns true is the cell is editable else false.
+     */
+    public boolean isCellEditable(int _row, int _column);
+
+    /**
+     * This function is called when ever a update to a cell is done but before
+     * the value is updated in the database.<BR>
+     * If the function returns false the update is cancelled, if it returns true
+     * the value will be updated in the database.<BR>
+     *
+     * @param _row    the row in which update is taking place.
+     * @param _column    the column at which update is taking place.
+     * @param _oldValue    the present value in the cell being edited.
+     * @param _newValue    the new value entered in the cell being edited.
+     *
+     * @return returns true if update should be made else false.
+     */
+    public boolean cellUpdateRequested(int _row, int _column, Object _oldValue, Object _newValue);
 
 } // end public interface SSCellEditing {
 
@@ -82,6 +82,9 @@ public interface SSCellEditing {
 
 /*
  * $Log$
+ * Revision 1.4  2004/08/10 22:06:59  yoda2
+ * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
+ *
  * Revision 1.3  2004/03/08 16:43:37  prasanth
  * Updated copyright year.
  *

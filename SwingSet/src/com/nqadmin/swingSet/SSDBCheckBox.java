@@ -1,4 +1,3 @@
-
 /* $Id$
  *
  * Tab Spacing = 4
@@ -49,131 +48,131 @@ import javax.swing.event.*;
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  *<p><pre>
  * Used to display the boolean values stored in the database. The SSDBCheckBox
- * can be bound to a numeric or boolean database column.  Currently, binding to 
+ * can be bound to a numeric or boolean database column.  Currently, binding to
  * a boolean column has been tested only with postgresql. If bound to a numeric
  * database column, a checked SSDBCheckBox returns a '1' to the database and
  * an uncheck SSDBCheckBox will returns a '0'.  In the future an option may be
  * added to allow the user to specify the values returned for the checked and
  *  unchecked checkbox states.
  *</pre><p>
- * @author	$Author$
- * @version	$Revision$
+ * @author  $Author$
+ * @version $Revision$
  */
 public class SSDBCheckBox extends JCheckBox {
 
-	// TEXT FIELD BOUND TO THE DATABASE
-	private JTextField textField = new JTextField();
-	
-	private String columnName;
-	private int columnType = java.sql.Types.BIT;
+    // TEXT FIELD BOUND TO THE DATABASE
+    private JTextField textField = new JTextField();
 
-	// LISTENER FOR CHECK BOX AND TEXT FEILD
-	private MyCheckBoxListener  checkBoxListener  = new MyCheckBoxListener();
-	private MyTextFieldListener textFieldListener = new MyTextFieldListener();
+    private String columnName;
+    private int columnType = java.sql.Types.BIT;
 
-	// INITIALIZE CHECKED AND UNCHECKED VALUES
-	private int CHECKED = 1;
-	private int UNCHECKED = 0;
+    // LISTENER FOR CHECK BOX AND TEXT FEILD
+    private MyCheckBoxListener  checkBoxListener  = new MyCheckBoxListener();
+    private MyTextFieldListener textFieldListener = new MyTextFieldListener();
 
-	// INITIALIZE CHECKED AND UNCHECKED VALUES FOR BOOLEAN COLUMN
-	private static String BOOLEAN_CHECKED = "true";
-	private static String BOOLEAN_UNCHECKED = "false";
+    // INITIALIZE CHECKED AND UNCHECKED VALUES
+    private int CHECKED = 1;
+    private int UNCHECKED = 0;
 
-	/**
-	 * Creates a object of SSDBCheckBox which synchronizes with the value in the specified
-	 * text field.
+    // INITIALIZE CHECKED AND UNCHECKED VALUES FOR BOOLEAN COLUMN
+    private static String BOOLEAN_CHECKED = "true";
+    private static String BOOLEAN_UNCHECKED = "false";
+
+    /**
+     * Creates a object of SSDBCheckBox which synchronizes with the value in the specified
+     * text field.
      *
-	 * @param _textField the text field with which the check box will be in sync.
+     * @param _textField the text field with which the check box will be in sync.
      *
-	 * @deprecated
-	 */
-	public SSDBCheckBox(JTextField _textField) {
-		textField = _textField;
-	}
+     * @deprecated
+     */
+    public SSDBCheckBox(JTextField _textField) {
+        textField = _textField;
+    }
 
-	/**
-	 * Creates an object of SSDBCheckBox.
-	 */
-	public SSDBCheckBox() {
-		textField = new JTextField();
-	}
-	
-	/**
-	 * Creates an object of SSDBCheckBox binding it so the specified column
-	 * in the given SSRowSet.
-     *
-	 * @param _rowset    datasource to be used.
-	 * @param _columnName    name of the column to which this check box should be bound
-	 */
-	public SSDBCheckBox(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
-		columnName = _columnName;
-		textField.setDocument(new SSTextDocument(_rowset, _columnName));
-		columnType = _rowset.getColumnType(_columnName);
-	} 
+    /**
+     * Creates an object of SSDBCheckBox.
+     */
+    public SSDBCheckBox() {
+        textField = new JTextField();
+    }
 
-	/**
-	 * Sets the text field with which the check box has to be synchronized.
+    /**
+     * Creates an object of SSDBCheckBox binding it so the specified column
+     * in the given SSRowSet.
      *
-	 * @param _textField    the text field with which the check box will be in sync.
+     * @param _rowset    datasource to be used.
+     * @param _columnName    name of the column to which this check box should be bound
+     */
+    public SSDBCheckBox(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
+        columnName = _columnName;
+        textField.setDocument(new SSTextDocument(_rowset, _columnName));
+        columnType = _rowset.getColumnType(_columnName);
+    }
+
+    /**
+     * Sets the text field with which the check box has to be synchronized.
      *
-	 * @deprecated
-	 * @see #bind
-	 */
-	public void setTextField(JTextField _textField) {
+     * @param _textField    the text field with which the check box will be in sync.
+     *
+     * @deprecated
+     * @see #bind
+     */
+    public void setTextField(JTextField _textField) {
         // IF THE OLD ONE IS NOT NULL REMOVE ANY LISTENERS BEING ADDED.
         // IT DOES NOT HURT TO CALL REMOVE IF WE ADDED ONE THEN IT WILL BE DELETED.
-        // ELSE NOTHING HAPPENS	
+        // ELSE NOTHING HAPPENS
             if (textField != null) {
                 textField.getDocument().removeDocumentListener(textFieldListener);
             }
-                
+
             textField = _textField;
-	}
-	
-	/**
-	 * Sets the datasource and the columnName in the datasource to which the
-	 * SSCheckBox has to be bound to.
-     *
-	 * @param _rowset    datasource to be used.
-	 * @param _columnName    Name of the column to which this check box should be bound
-	 */
-	public void bind(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
-		columnName = _columnName;
-		textField.setDocument(new SSTextDocument(_rowset, _columnName));
-		columnType = _rowset.getColumnType(_columnName);
-	}
-	
-	/**
-	 * returns the column name to which this check box is bound to.
-     *
-	 * @return column name to which the check box is bound.
-	 */
-	public String getColumnName() {
-		return columnName;
-	} 
+    }
 
-	/**
-	 * Returns the text field with which the check box is synchronizing.
+    /**
+     * Sets the datasource and the columnName in the datasource to which the
+     * SSCheckBox has to be bound to.
      *
-	 * @return returns a JTextField which is used to set the check box.
+     * @param _rowset    datasource to be used.
+     * @param _columnName    Name of the column to which this check box should be bound
+     */
+    public void bind(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
+        columnName = _columnName;
+        textField.setDocument(new SSTextDocument(_rowset, _columnName));
+        columnType = _rowset.getColumnType(_columnName);
+    }
+
+    /**
+     * returns the column name to which this check box is bound to.
      *
-	 * @deprecated
-	 */
-	public JTextField getTextField() {
-		return textField;
-	}
+     * @return column name to which the check box is bound.
+     */
+    public String getColumnName() {
+        return columnName;
+    }
 
-	/**
-	 * Initializes the check box by getting the value corresponding to
-	 * specified column from the SSRowSet.
-	 */
-	public void execute() {
-		initCheckBox();
-	}
-	
+    /**
+     * Returns the text field with which the check box is synchronizing.
+     *
+     * @return returns a JTextField which is used to set the check box.
+     *
+     * @deprecated
+     */
+    public JTextField getTextField() {
+        return textField;
+    }
 
-	// INITIALIZES THE CHECK BOX.
-	private void initCheckBox() {
+    /**
+     * Initializes the check box by getting the value corresponding to
+     * specified column from the SSRowSet.
+     */
+    public void execute() {
+        initCheckBox();
+    }
+
+
+    // INITIALIZES THE CHECK BOX.
+    private void initCheckBox() {
 
         // ADD LISTENER FOR THE TEXT FIELD
             textField.getDocument().addDocumentListener(textFieldListener);
@@ -182,7 +181,7 @@ public class SSDBCheckBox extends JCheckBox {
                 case java.sql.Types.INTEGER:
                 case java.sql.Types.SMALLINT:
                 case java.sql.Types.TINYINT:
-		    // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
+            // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
                     if ( textField.getText().equals(String.valueOf(CHECKED)) ) {
                         setSelected(true);
                     } else {
@@ -192,7 +191,7 @@ public class SSDBCheckBox extends JCheckBox {
 
                 case java.sql.Types.BIT:
                 case java.sql.Types.BOOLEAN:
-		    // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
+            // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
                     if ( textField.getText().equals(BOOLEAN_CHECKED) ) {
                         setSelected(true);
                     } else {
@@ -203,166 +202,168 @@ public class SSDBCheckBox extends JCheckBox {
                 default:
                     break;
             }
-            
+
         //ADD LISTENER FOR THE CHECK BOX.
         // REMOVE HAS TO BE CALLED SO MAKE SURE THAT YOU ARE NOT STACKING UP
         // LISTENERS WHEN EXECUTE IS CALLED MULTIPLE TIMES.
             removeChangeListener(checkBoxListener);
             addChangeListener( checkBoxListener );
-	} // end private void initCheckBox() {
+    } // end private void initCheckBox() {
 
-	// LISTENER FOR THE TEXT FIELD
-	private class MyTextFieldListener implements DocumentListener, Serializable {
-		private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
-			objIn.defaultReadObject();
-		}
-		
-		private void writeObject(ObjectOutputStream objOut) throws IOException {
-			objOut.defaultWriteObject();
-		} 
-		
-		public void changedUpdate(DocumentEvent de){
-			removeChangeListener( checkBoxListener );
-            
-                        switch(columnType) {
-                            case java.sql.Types.INTEGER:
-                            case java.sql.Types.SMALLINT:
-                            case java.sql.Types.TINYINT:
-		                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                                if ( textField.getText().equals(String.valueOf(CHECKED)) ) {
-                                    setSelected(true);
-                                } else {
-                                    setSelected(false);
-                                }
-                                break;
-            
-                            case java.sql.Types.BIT:
-                            case java.sql.Types.BOOLEAN:
-		                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                                if ( textField.getText().equals(BOOLEAN_CHECKED) ) {
-                                    setSelected(true);
-                                } else {
-                                    setSelected(false);
-                                }
-                                break;
-            
-                            default:
-                                break;
-                        }
-			addChangeListener( checkBoxListener );
-		}
+    // LISTENER FOR THE TEXT FIELD
+    private class MyTextFieldListener implements DocumentListener, Serializable {
+        private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
+            objIn.defaultReadObject();
+        }
 
-		// WHEN EVER THERE IS A CHANGE IN THE VALUE IN THE TEXT FIELD CHANGE THE CHECK BOX
-		// ACCORDINGLY.
-		public void insertUpdate(DocumentEvent de) {
-			removeChangeListener( checkBoxListener );
-                        switch(columnType) {
-                            case java.sql.Types.INTEGER:
-                            case java.sql.Types.SMALLINT:
-                            case java.sql.Types.TINYINT:
-		                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                                if ( textField.getText().equals(String.valueOf(CHECKED)) ) {
-                                    setSelected(true);
-                                } else {
-                                    setSelected(false);
-                                }
-                                break;
-            
-                            case java.sql.Types.BIT:
-                            case java.sql.Types.BOOLEAN:
-		                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                                if ( textField.getText().equals(BOOLEAN_CHECKED) ) {
-                                    setSelected(true);
-                                } else {
-                                    setSelected(false);
-                                }
-                                break;
-            
-                            default:
-                                break;
-                        }
-			addChangeListener( checkBoxListener );
-		}
+        private void writeObject(ObjectOutputStream objOut) throws IOException {
+            objOut.defaultWriteObject();
+        }
 
-		// IF A REMOVE UPDATE OCCURS ON THE TEXT FIELD CHECK THE CHANGE AND SET THE
-		// CHECK BOX ACCORDINGLY.
-		public void removeUpdate(DocumentEvent de) {
-			removeChangeListener( checkBoxListener );
-                        switch(columnType) {
-                            case java.sql.Types.INTEGER:
-                            case java.sql.Types.SMALLINT:
-                            case java.sql.Types.TINYINT:
-		                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                                if ( textField.getText().equals(String.valueOf(CHECKED)) ) {
-                                    setSelected(true);
-                                } else {
-                                    setSelected(false);
-                                }
-                                break;
-            
-                            case java.sql.Types.BIT:
-                            case java.sql.Types.BOOLEAN:
-		                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                                if ( textField.getText().equals(BOOLEAN_CHECKED) ) {
-                                    setSelected(true);
-                                } else {
-                                    setSelected(false);
-                                }
-                                break;
-            
-                            default:
-                                break;
-                        }
-			addChangeListener( checkBoxListener );
-		}
-	} // end private class MyTextFieldListener implements DocumentListener, Serializable {
+        public void changedUpdate(DocumentEvent de){
+            removeChangeListener(checkBoxListener);
 
-	// LISTENER FOR THE CHECK BOX.
-	// ANY CHANGES MADE TO THE CHECK BOX BY THE USER ARE PROPOGATED BACK TO THE
-	// TEXT FIELD FOR FURTHER PROPOGATION TO THE UNDERLYING STORAGE STRUCTURE.
-	private class MyCheckBoxListener implements ChangeListener, Serializable {
+            switch(columnType) {
+                case java.sql.Types.INTEGER:
+                case java.sql.Types.SMALLINT:
+                case java.sql.Types.TINYINT:
+                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
+                    if ( textField.getText().equals(String.valueOf(CHECKED)) ) {
+                        setSelected(true);
+                    } else {
+                        setSelected(false);
+                    }
+                    break;
 
-		private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
-			objIn.defaultReadObject();
-		}
-		
-		private void writeObject(ObjectOutputStream objOut) throws IOException {
-			objOut.defaultWriteObject();
-		}
-		
-		public void stateChanged(ChangeEvent ce) {
-			textField.getDocument().removeDocumentListener(textFieldListener);
+                case java.sql.Types.BIT:
+                case java.sql.Types.BOOLEAN:
+                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
+                    if ( textField.getText().equals(BOOLEAN_CHECKED) ) {
+                        setSelected(true);
+                    } else {
+                        setSelected(false);
+                    }
+                    break;
 
-			if ( ((JCheckBox)ce.getSource()).isSelected() ) {
-                            switch(columnType) {
-                                case java.sql.Types.INTEGER:
-                                case java.sql.Types.SMALLINT:
-                                case java.sql.Types.TINYINT:
-				    textField.setText(String.valueOf(CHECKED));
-                                    break;
-				case java.sql.Types.BIT:
-				case java.sql.Types.BOOLEAN:
-				    textField.setText(BOOLEAN_CHECKED);
-                                    break;
-                            }
-			} else {
-                            switch(columnType) {
-                                case java.sql.Types.INTEGER:
-                                case java.sql.Types.SMALLINT:
-                                case java.sql.Types.TINYINT:
-				    textField.setText(String.valueOf(UNCHECKED));
-                                    break;
-				case java.sql.Types.BIT:
-				case java.sql.Types.BOOLEAN:
-                                    textField.setText(BOOLEAN_UNCHECKED);
-                                    break;
-                            }
-			}
+                default:
+                    break;
+            }
+            addChangeListener( checkBoxListener );
+        }
 
-			textField.getDocument().addDocumentListener(textFieldListener);
-		}
+        // WHEN EVER THERE IS A CHANGE IN THE VALUE IN THE TEXT FIELD CHANGE THE CHECK BOX
+        // ACCORDINGLY.
+        public void insertUpdate(DocumentEvent de) {
+            removeChangeListener( checkBoxListener );
 
-	} // end private class MyCheckBoxListener implements ChangeListener, Serializable {
+            switch(columnType) {
+                case java.sql.Types.INTEGER:
+                case java.sql.Types.SMALLINT:
+                case java.sql.Types.TINYINT:
+                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
+                    if ( textField.getText().equals(String.valueOf(CHECKED)) ) {
+                        setSelected(true);
+                    } else {
+                        setSelected(false);
+                    }
+                    break;
+
+                case java.sql.Types.BIT:
+                case java.sql.Types.BOOLEAN:
+                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
+                    if ( textField.getText().equals(BOOLEAN_CHECKED) ) {
+                        setSelected(true);
+                    } else {
+                        setSelected(false);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            addChangeListener( checkBoxListener );
+        }
+
+        // IF A REMOVE UPDATE OCCURS ON THE TEXT FIELD CHECK THE CHANGE AND SET THE
+        // CHECK BOX ACCORDINGLY.
+        public void removeUpdate(DocumentEvent de) {
+            removeChangeListener( checkBoxListener );
+
+            switch(columnType) {
+                case java.sql.Types.INTEGER:
+                case java.sql.Types.SMALLINT:
+                case java.sql.Types.TINYINT:
+                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
+                    if ( textField.getText().equals(String.valueOf(CHECKED)) ) {
+                        setSelected(true);
+                    } else {
+                        setSelected(false);
+                    }
+                    break;
+
+                case java.sql.Types.BIT:
+                case java.sql.Types.BOOLEAN:
+                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
+                    if ( textField.getText().equals(BOOLEAN_CHECKED) ) {
+                        setSelected(true);
+                    } else {
+                        setSelected(false);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            addChangeListener( checkBoxListener );
+        }
+    } // end private class MyTextFieldListener implements DocumentListener, Serializable {
+
+    // LISTENER FOR THE CHECK BOX.
+    // ANY CHANGES MADE TO THE CHECK BOX BY THE USER ARE PROPOGATED BACK TO THE
+    // TEXT FIELD FOR FURTHER PROPOGATION TO THE UNDERLYING STORAGE STRUCTURE.
+    private class MyCheckBoxListener implements ChangeListener, Serializable {
+
+        private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
+            objIn.defaultReadObject();
+        }
+
+        private void writeObject(ObjectOutputStream objOut) throws IOException {
+            objOut.defaultWriteObject();
+        }
+
+        public void stateChanged(ChangeEvent ce) {
+            textField.getDocument().removeDocumentListener(textFieldListener);
+
+            if ( ((JCheckBox)ce.getSource()).isSelected() ) {
+                switch(columnType) {
+                    case java.sql.Types.INTEGER:
+                    case java.sql.Types.SMALLINT:
+                    case java.sql.Types.TINYINT:
+                        textField.setText(String.valueOf(CHECKED));
+                        break;
+                    case java.sql.Types.BIT:
+                    case java.sql.Types.BOOLEAN:
+                        textField.setText(BOOLEAN_CHECKED);
+                        break;
+                }
+            } else {
+                switch(columnType) {
+                    case java.sql.Types.INTEGER:
+                    case java.sql.Types.SMALLINT:
+                    case java.sql.Types.TINYINT:
+                        textField.setText(String.valueOf(UNCHECKED));
+                        break;
+                    case java.sql.Types.BIT:
+                    case java.sql.Types.BOOLEAN:
+                        textField.setText(BOOLEAN_UNCHECKED);
+                        break;
+                }
+            }
+
+            textField.getDocument().addDocumentListener(textFieldListener);
+        }
+
+    } // end private class MyCheckBoxListener implements ChangeListener, Serializable {
 
 } // end public class SSDBCheckBox extends JCheckBox {
 
@@ -370,6 +371,9 @@ public class SSDBCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.9  2004/11/10 22:45:50  dags
+ * Added support for boolean bound column. Tested only in postgresql.
+ *
  * Revision 1.8  2004/11/01 15:53:30  yoda2
  * Fixed various JavaDoc errors.
  *
