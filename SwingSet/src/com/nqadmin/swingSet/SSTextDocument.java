@@ -507,6 +507,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                     }
                     break;
                 case Types.VARCHAR:
+                case Types.CHAR:
                     // SINCE THIS IS TEXT FILED WE CAN INSERT AN EMPTY STRING TO THE DATABASE
     //				System.out.println( columnName + "      " + strValue);
                     rs.updateString(columnName, strValue);
@@ -568,6 +569,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                         value = String.valueOf(str);
                     }
                     break;
+                case Types.CHAR:
+                	value = rs.getString(columnName);
+                	break;    
                 case Types.DATE:
                     Date date = rs.getDate(columnName);
                     if (date == null) {
@@ -622,6 +626,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.9  2004/08/11 15:59:49  prasanth
+ * Removed check for \r' in one of the constructors.
+ *
  * Revision 1.8  2004/08/10 22:06:59  yoda2
  * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
  *
