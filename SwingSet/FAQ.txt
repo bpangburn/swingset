@@ -1,0 +1,53 @@
+
+1.  I am trying to run the samples. I see "Processing....." and nothing
+	happens.
+
+Ans: You might be missing one or more jar files. 
+		  Please make sure that you have the following jar files.
+		1.swingSet.jar
+		2.rowset.jar    ( You have to download it from java.sun.com)
+		3.pg73jdbc3.jar ( Driver for postgresql database (remote database)
+			that the application uses)
+
+	If you still have the problem.
+	Unzip the jar file and extract the files to a folder.
+	From command prompt go to that folder and type 
+		 java  MainClass
+	Now you can see any errors on your command prompt screen.
+	
+2.	I have set the headers but I don't see them on the screen.
+
+Ans: You have to set the headers before you set the rowset. If you reverse
+	the order you will not see the headers. So if you want to set the 
+	headers use the empty constructor.
+
+3.	I am getting an exception while setting the renderers.
+
+Ans: You have to set the renderer only after you have set the rowset.
+	Till you set the rowset the JTable does not have any columns. So when
+	you try to set a renderer SSDataGrid tries to access the specified 
+	column from JTable causing an exception.
+	
+
+4. What happens to my default values and all other stuff I have set when I change
+	my underlying RowSet?
+
+Ans: All the defaults and other information like headers, renderer will remain the 
+	same even after changing the RowSet for the SSDataGrid. If you want to change
+	any thing or unset them you have to call the setXXXXXXX functions to change the 
+	behaviour.
+	Example: You have a RowSet and set the default value for column 3 to be "XYZ".
+	Now you have changed your query for the RowSet and set it to SSDataGrid now you 
+	have to call the setDefaultValues  like this
+		dataGrid.setDefaultValues(null,null);
+	This will remove all the default values used.
+	
+5. I have the same query in my rowset but my renderer, hidden columns are not working
+	in the right way.
+	
+Ans: When you say the same query the order in which columns are selected should also 
+	remain the same. When you set a renderer, specify a column as hidden you specify
+	either column number or column name (in which case swing set internally converts
+	them to column number). Now if you change the selection order in the query and 
+	specify the new rowset to the swing set it still has the old column numbers. So 
+	you have to specify the new hidden columns and uneditable columns.
