@@ -72,16 +72,19 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  *
  *      // next line is assuming myrowset has been initialized and my_column is a
  *      // column in myrowset
- *      combo.bind(myrowset,"my_column");
+ *      combo.setBinding(myrowset,"my_column");
  *
  *      Note that if you DO NOT want to use the default mappings, the custom
- *      mappings must be set before calling the bind() method to bind the
+ *      mappings must be set before calling the setBinding() method to bind the
  *      combobox to a database column.
  *</pre><p>
  * @author  $Author$
  * @version $Revision$
  */
-public class SSComboBox extends JComponent {
+//public class SSComboBox extends JComponent {
+public class SSComboBox extends JComboBox {    
+    
+// ADD getComboBox()    
 
     // THIS VALUE WILL BE RETURNED WHEN NO ITEM IS SELECTED IN THE COMBO BOX
     public static final int NON_SELECTED = (int)((Math.pow(2, 32) -1)/(-2));
@@ -90,7 +93,7 @@ public class SSComboBox extends JComponent {
     protected JTextField textField = new JTextField();
 
     // COMBO BOX THAT DISPLAYS THE DESIRED ITEMS
-    protected JComboBox  cmbDisplayed  = new JComboBox();
+    //protected JComboBox  cmbDisplayed  = new JComboBox();
 
     // INSTANCE OF LISTENER FOR COMBO BOX
     protected MyComboListener cmbListener = new MyComboListener();
@@ -137,9 +140,9 @@ public class SSComboBox extends JComponent {
      *  Creates an object of SSComboBox.
      */
     public SSComboBox() {
-        super();
+        //super();
         init();
-        addComponent();
+        //addComponent();
     }
 
     /**
@@ -150,9 +153,9 @@ public class SSComboBox extends JComponent {
      */
     public SSComboBox(SSTextDocument document) {
 
-        super();
+        //super();
         init();
-        addComponent();
+        //addComponent();
 
         this.setDocument(document);
     }
@@ -163,7 +166,8 @@ public class SSComboBox extends JComponent {
     protected void init() {
     // ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
     // KEY IS PRESSED.
-        cmbDisplayed.addKeyListener(new KeyAdapter() {
+        //cmbDisplayed.addKeyListener(new KeyAdapter() {
+        addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent ke) {
                 if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
                     ((Component)ke.getSource()).transferFocus();
@@ -177,9 +181,9 @@ public class SSComboBox extends JComponent {
      *
      * @return index of selected item. -1 if none selected.
      */
-    public int getSelectedIndex() {
-        return cmbDisplayed.getSelectedIndex();
-    }
+    //public int getSelectedIndex() {
+    //    return cmbDisplayed.getSelectedIndex();
+    //}
 
     /**
      * Returns the value associated with the selected item.
@@ -187,14 +191,17 @@ public class SSComboBox extends JComponent {
      * @return returns the value associated with the item selected. -1 if none selected.
      */
     public int getSelectedValue() {
-        if(cmbDisplayed.getSelectedIndex() == -1){
+        //if (cmbDisplayed.getSelectedIndex() == -1) {
+        if (getSelectedIndex() == -1) {
             return NON_SELECTED;
         }
 
         if (mappingValues != null) {
-            return mappingValues[cmbDisplayed.getSelectedIndex()];
+            //return mappingValues[cmbDisplayed.getSelectedIndex()];
+            return mappingValues[getSelectedIndex()];
         }
-        return cmbDisplayed.getSelectedIndex();
+        //return cmbDisplayed.getSelectedIndex();
+        return getSelectedIndex();
 
     }
 
@@ -221,6 +228,9 @@ public class SSComboBox extends JComponent {
      *
      * @param _columnName    column name in the SSRowSet to which the combo box
      *    is bound.
+     *
+     * @deprecated
+     * @see #setBinding     
      */
     public void setColumnName(String _columnName) {
         columnName = _columnName;
@@ -230,6 +240,9 @@ public class SSComboBox extends JComponent {
      * Sets the SSRowSet to be used.
      *
      * @param _rowset    SSRowSet to be used for getting the values.
+     *
+     * @deprecated
+     * @see #setBinding     
      */
     public void setSSRowSet(SSRowSet _rowset) {
         rowset = _rowset;
@@ -249,27 +262,29 @@ public class SSComboBox extends JComponent {
      *
      * @param _dimension    preferred dimensions for combo box
      */
-    public void setPreferredSize(Dimension _dimension) {
-        cmbDisplayed.setPreferredSize(_dimension);
-    }
+    //public void setPreferredSize(Dimension _dimension) {
+    //    cmbDisplayed.setPreferredSize(_dimension);
+    //}
 
     /**
-     *  Added the combo box to the JComponent
+     * Added the combo box to the JComponent
      */
-    private void addComponent() {
-        // SET THE BOX LAYOUT
-            setLayout(new BoxLayout(this,BoxLayout.LINE_AXIS));
-        // SET PREFERRED SIZE FOR COMBO BOX
-            cmbDisplayed.setPreferredSize(new Dimension(150,20));
-        // ADD THE COMBO BOX TO THE JCOMPONENT
-            add(cmbDisplayed);
-    }
-
+    //private void addComponent() {
+    //    // SET THE BOX LAYOUT
+    //        setLayout(new BoxLayout(this,BoxLayout.LINE_AXIS));
+    //    // SET PREFERRED SIZE FOR COMBO BOX
+    //        cmbDisplayed.setPreferredSize(new Dimension(150,20));
+    //    // ADD THE COMBO BOX TO THE JCOMPONENT
+    //        add(cmbDisplayed);
+    //}
 
     /**
      * The column name and the SSRowSet should be set before calling this function.
      * If the column name and SSRowSet are set seperately then this function has to
      * be called to bind the combo box to the column in the SSRowSet.
+     *
+     * @deprecated
+     * @see #setBinding     
      */
     public void bind() {
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
@@ -278,7 +293,7 @@ public class SSComboBox extends JComponent {
         // FOR THE PRESENT RECORD IN THE SSROWSET.
         // THIS IS REQUIRED AS THE TEXT FIELD CAN UPDATE ITSELF ONLY WHEN THE SSROWSET
         // CHANGES OR MOVES.
-            textField.setDocument(new SSTextDocument(rowset, columnName));
+        //    textField.setDocument(new SSTextDocument(rowset, columnName));
         // SET THE COMBO BOX ITEM DISPLAYED
             setDisplay();
         // ADDS LISTENERS FOR TEXT FIELD AND COMBO
@@ -295,12 +310,31 @@ public class SSComboBox extends JComponent {
      *
      * @param _rowset    SSRowSet to be used for getting the value.
      * @param _columnName    Column to which the combo box has to be bound.
+     *
+     * @deprecated
+     * @see #setBinding
      */
     public void bind(SSRowSet _rowset, String _columnName) {
         rowset = _rowset;
         columnName = _columnName;
         bind();
     }
+    
+    /**
+     * Binds the combo box to the specified column of the SSRowSet.
+     * As the SSRowSet changes the combo box item displayed changes accordingly.
+     *
+     * @param _rowset    SSRowSet to be used for getting the value.
+     * @param _columnName    Column to which the combo box has to be bound.
+     */
+    public void setBinding(SSRowSet _rowset, String _columnName) {
+        rowset = _rowset;
+        columnName = _columnName;
+        textField.setDocument(new SSTextDocument(rowset, columnName));
+        setDisplay();
+        removeListeners();
+        addListeners();
+    }    
 
     // SET THE COMBO BOX ITEM TO THE ITEM THAT CORRESPONDS TO THE VALUE IN TEXT FIELD
     private void setDisplay() {
@@ -310,8 +344,10 @@ public class SSComboBox extends JComponent {
                 int intValue = Integer.parseInt(text);
 
                 if (mappingValues == null ) {
-                    if (intValue != cmbDisplayed.getSelectedIndex()) {
-                        cmbDisplayed.setSelectedIndex(intValue);
+                    //if (intValue != cmbDisplayed.getSelectedIndex()) {
+                    if (intValue != getSelectedIndex()) {
+                        //cmbDisplayed.setSelectedIndex(intValue);
+                        setSelectedIndex(intValue);
                     }
                 } else {
                 // SEARCH THE MAPPING VALUES FOR THIS INT VALUE.
@@ -320,21 +356,24 @@ public class SSComboBox extends JComponent {
                     int i = 0;
                     for(i=0; i<mappingValues.length; i++){
                         if(mappingValues[i] == intValue){
-                            cmbDisplayed.setSelectedIndex(i);
+                            //cmbDisplayed.setSelectedIndex(i);
+                            setSelectedIndex(i);
                             break;
                         }
                     }
                 // IF I == MAPPING VALUES LENGTH THEN IT MEANS THE VALUE IS NOT FOUND
                 // IN THE SPECIFIED MAPPINGS SO SET THE SELECTED ITEM TO BLANK
                     if(i == mappingValues.length){
-                        cmbDisplayed.setSelectedIndex(-1);
+                        //cmbDisplayed.setSelectedIndex(-1);
+                        setSelectedIndex(-1);
                     }
 
                 }
             }
         // IF TEXT IS EMPTY THEN SET COMBO TO BLANK
-            else{
-                cmbDisplayed.setSelectedIndex(-1);
+            else {
+                //cmbDisplayed.setSelectedIndex(-1);
+                setSelectedIndex(-1);
             }
 
         } catch(NullPointerException npe) {
@@ -347,13 +386,15 @@ public class SSComboBox extends JComponent {
     // ADDS LISTENERS FOR THE COMBO BOX AND TEXT FIELD
     private void addListeners() {
         textField.getDocument().addDocumentListener(textFieldDocumentListener);
-        cmbDisplayed.addActionListener(cmbListener);
+        //cmbDisplayed.addActionListener(cmbListener);
+        addActionListener(cmbListener);
     }
 
     // REMOVES THE LISTENERS FOR TEXT FIELD AND THE COMBO BOX DISPLAYED
     private void removeListeners() {
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
-        cmbDisplayed.removeActionListener(cmbListener);
+        //cmbDisplayed.removeActionListener(cmbListener);
+        removeActionListener(cmbListener);
     }
 
     /**
@@ -363,7 +404,7 @@ public class SSComboBox extends JComponent {
      * @param _document    text document to which the combo box has to be bound
      *
      * @deprecated
-     * @see #bind
+     * @see #setBinding
      */
     public void setDocument(SSTextDocument _document) {
             textField.setDocument(_document);
@@ -379,18 +420,24 @@ public class SSComboBox extends JComponent {
      * returns the combo box that has to be displayed on screen.
      *
      * @return returns the combo box that displays the items.
+     *
+     * @deprecated
      */
     public JComboBox getComboBox() {
-        return cmbDisplayed;
+        //return cmbDisplayed;
+        return this;
     }
 
     /**
      * Returns the combo box to be displayed on the screen.
      *
      * @return returns the combo box that displays the items.
+     *
+     * @deprecated
      */
     public Component getComponent() {
-        return cmbDisplayed;
+        //return cmbDisplayed;
+        return this;
     }
 
     /**
@@ -402,11 +449,14 @@ public class SSComboBox extends JComponent {
         // ADD THE SPECIFIED ITEMS TO THE COMBO BOX
         // REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
         // THE DISPLAYED ITEMS
-        if (cmbDisplayed.getItemCount() != 0) {
-            cmbDisplayed.removeAllItems();
+        //if (cmbDisplayed.getItemCount() != 0) {
+        //    cmbDisplayed.removeAllItems();
+        if (getItemCount() != 0) {
+            removeAllItems();
         }
         for (int i=0;i<_options.length;i++) {
-            cmbDisplayed.addItem(_options[i]);
+            //cmbDisplayed.addItem(_options[i]);
+            addItem(_options[i]);
         }
 
         return true;
@@ -443,11 +493,14 @@ public class SSComboBox extends JComponent {
         // add the items to combo
         // REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
         // THE DISPLAYED ITEMS
-        if (cmbDisplayed.getItemCount() != 0) {
-            cmbDisplayed.removeAllItems();
+        //if (cmbDisplayed.getItemCount() != 0) {
+        //    cmbDisplayed.removeAllItems();
+        if (getItemCount() != 0) {
+            removeAllItems();
         }
         for (int i=0;i<_options.length;i++) {
-            cmbDisplayed.addItem(_options[i]);
+            //cmbDisplayed.addItem(_options[i]);
+            addItem(_options[i]);
         }
         // COPY THE MAPPING VALUES
         mappingValues = new int[_mappings.length];
@@ -485,6 +538,7 @@ public class SSComboBox extends JComponent {
 //          System.out.println("Requested  Option: " + options);
         // REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
         // THE DISPLAYED ITEMS
+/*        
         if(cmbDisplayed.getItemCount() != 0) {
             cmbDisplayed.removeAllItems();
         }
@@ -501,6 +555,23 @@ public class SSComboBox extends JComponent {
         } else {
             return false;
         }
+*/
+        if (getItemCount() != 0) {
+            removeAllItems();
+        }
+        if (option == YES_NO_OPTION) {
+            addItem(new String("NO"));
+            addItem(new String("YES"));
+        } else if (option == SEX_OPTION || option == GENDER_OPTION) {
+            addItem(new String("MALE"));
+            addItem(new String("FEMALE"));
+            addItem(new String("UNI_SEX"));
+        } else if (option == INCLUDE_EXCLUDE_OPTION) {
+            addItem(new String("INCLUDE"));
+            addItem(new String("EXCLUDE"));
+        } else {
+            return false;
+        }
 
         return true;
     }
@@ -510,7 +581,8 @@ public class SSComboBox extends JComponent {
 
         public void changedUpdate(DocumentEvent de) {
         //  System.out.println("changed Document Changed: " + de);
-            cmbDisplayed.removeActionListener(cmbListener);
+            //cmbDisplayed.removeActionListener(cmbListener);
+            removeActionListener(cmbListener);
             Document doc = textField.getDocument();
             try {
 
@@ -528,16 +600,23 @@ public class SSComboBox extends JComponent {
                     // IN CASE TWO: YOU HAVE TO CHECK IF THE VALUE IN THE MAPPINGVALUES ARRAY AT INDEX EQUAL
                     // TO THE SELECTED INDEX OF THE COMBO BOX EQUALS THE VALUE IN TEXT FIELD
                     // IF THESE CONDITIONS ARE MET YOU NEED NOT CHANGE COMBO BOX SELECTED ITEM
+/*                    
                     if ( (mappingValues==null && intValue != cmbDisplayed.getSelectedIndex()) ||
                          (mappingValues!=null && cmbDisplayed.getSelectedIndex() == -1)       ||
                          (mappingValues!=null && mappingValues[cmbDisplayed.getSelectedIndex()] != intValue) ) {
+*/                             
+                    if ( (mappingValues==null && intValue != getSelectedIndex()) ||
+                         (mappingValues!=null && getSelectedIndex() == -1)       ||
+                         (mappingValues!=null && mappingValues[getSelectedIndex()] != intValue) ) {
 
-                        if (mappingValues==null && (intValue <0 || intValue >= cmbDisplayed.getItemCount() )) {
+                        //if (mappingValues==null && (intValue <0 || intValue >= cmbDisplayed.getItemCount() )) {
+                        if (mappingValues==null && (intValue <0 || intValue >= getItemCount() )) {
                         // IF EXPLICIT VALUES FOR THE ITEMS IN COMBO ARE NOT SPECIFIED THEN CODES START
                         // FROM ZERO. IN SUCH A CASE CHECK IF THE NUMBER EXCEEDS THE NUMBER OF ITEMS
                         // IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)
 //                              System.out.println("Option: " + option );
-                            System.out.println("Error: value from DB:" + intValue + "  items in combo box: " + cmbDisplayed.getItemCount());
+                            //System.out.println("Error: value from DB:" + intValue + "  items in combo box: " + cmbDisplayed.getItemCount());
+                            System.out.println("Error: value from DB:" + intValue + "  items in combo box: " + getItemCount());
                         } else {
                         // IF MAPPINGS  ARE SPECIFIED THEN GET THE INDEX AT WHICH THE VALUE IN TEXT FIELD
                         // APPEARS IN THE MAPPINGVALUES ARRAY. SET THE SELECTED ITEM OF COMBO SO THAT INDEX
@@ -545,7 +624,8 @@ public class SSComboBox extends JComponent {
                                 int i=0;
                                 for (;i<mappingValues.length;i++) {
                                     if (mappingValues[i] == intValue) {
-                                        cmbDisplayed.setSelectedIndex(i);
+                                        //cmbDisplayed.setSelectedIndex(i);
+                                        setSelectedIndex(i);
                                         break;
                                     }
                                 }
@@ -559,7 +639,8 @@ public class SSComboBox extends JComponent {
                             } else {
                             // IF MAPPINGS ARE NOT SPECIFIED SET THE SELECTED ITEM AS THE ITEM AT INDEX
                             // EQUAL TO THE VALUE IN TEXT FIELD
-                                cmbDisplayed.setSelectedIndex(intValue);
+                                //cmbDisplayed.setSelectedIndex(intValue);
+                                setSelectedIndex(intValue);
                             }
                         }
                     }
@@ -573,13 +654,15 @@ public class SSComboBox extends JComponent {
                 nfe.printStackTrace();
             }
 
-            cmbDisplayed.addActionListener(cmbListener);
+            //cmbDisplayed.addActionListener(cmbListener);
+            addActionListener(cmbListener);
 
         } // end public void changedUpdate(DocumentEvent de) {
 
         public void insertUpdate(DocumentEvent de) {
         //  System.out.println("insert Document Changed: " + de);
-            cmbDisplayed.removeActionListener(cmbListener);
+            //cmbDisplayed.removeActionListener(cmbListener);
+            removeActionListener(cmbListener);
             Document doc = textField.getDocument();
             try {
 
@@ -597,18 +680,26 @@ public class SSComboBox extends JComponent {
                     // IN CASE TWO: YOU HAVE TO CHECK IF THE VALUE IN THE MAPPINGVALUES ARRAY AT INDEX EQUAL
                     // TO THE SELECTED INDEX OF THE COMBO BOX EQUALS THE VALUE IN TEXT FIELD
                     // IF THESE CONDITIONS ARE MET YOU NEED NOT CHANGE COMBO BOX SELECTED ITEM
+/*                    
                     if ( (mappingValues==null && intValue != cmbDisplayed.getSelectedIndex()) ||
                          (mappingValues!=null && cmbDisplayed.getSelectedIndex() == -1)       ||
                          (mappingValues!=null && mappingValues[cmbDisplayed.getSelectedIndex()] != intValue) ) {
+*/                             
+                    if ( (mappingValues==null && intValue != getSelectedIndex()) ||
+                         (mappingValues!=null && getSelectedIndex() == -1)       ||
+                         (mappingValues!=null && mappingValues[getSelectedIndex()] != intValue) ) {                             
 
-                        if (mappingValues==null && (intValue <0 || intValue >= cmbDisplayed.getItemCount())) {
+                        //if (mappingValues==null && (intValue <0 || intValue >= cmbDisplayed.getItemCount())) {
+                        if (mappingValues==null && (intValue <0 || intValue >= getItemCount())) {
                         // IF EXPLICIT VALUES FOR THE ITEMS IN COMBO ARE NOT SPECIFIED THEN CODES START
                         // FROM ZERO. IN SUCH A CASE CHECK IF THE NUMBER EXCEEDS THE NUMBER OF ITEMS
                         // IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)
 //                              System.out.println("Option: " +option );
                         // SET IT TO EMPTY
-                            cmbDisplayed.setSelectedIndex(-1);
-                            System.out.println("Error: value from DB:" + intValue + "  items in combo box: " + cmbDisplayed.getItemCount());
+                            //cmbDisplayed.setSelectedIndex(-1);
+                            setSelectedIndex(-1);
+                            //System.out.println("Error: value from DB:" + intValue + "  items in combo box: " + cmbDisplayed.getItemCount());
+                            System.out.println("Error: value from DB:" + intValue + "  items in combo box: " + getItemCount());
                         } else {
                         // IF MAPPINGS  ARE SPECIFIED THEN GET THE INDEX AT WHICH THE VALUE IN TEXT FIELD
                         // APPEARS IN THE MAPPINGVALUES ARRAY. SET THE SELECTED ITEM OF COMBO SO THAT INDEX
@@ -616,7 +707,8 @@ public class SSComboBox extends JComponent {
                                 int i=0;
                                 for (;i<mappingValues.length;i++) {
                                     if (mappingValues[i] == intValue) {
-                                        cmbDisplayed.setSelectedIndex(i);
+                                        //cmbDisplayed.setSelectedIndex(i);
+                                        setSelectedIndex(i);
                                         break;
                                     }
                                 }
@@ -624,14 +716,16 @@ public class SSComboBox extends JComponent {
                                 if (i==mappingValues.length) {
                                     System.out.println("insert ERROR: could not find a corresponding item in combo for value " + intValue);
                                 // SET IT TO EMPTY
-                                    cmbDisplayed.setSelectedIndex(-1);
+                                    //cmbDisplayed.setSelectedIndex(-1);
+                                    setSelectedIndex(-1);
 //                                      System.out.println(cmbDisplayed.getItemAt(0));
 //                                      System.out.println(cmbDisplayed.getSelectedItem());
                                 }
                             } else {
                             // IF MAPPINGS ARE NOT SPECIFIED SET THE SELECTED ITEM AS THE ITEM AT INDEX
                             // EQUAL TO THE VALUE IN TEXT FIELD
-                                cmbDisplayed.setSelectedIndex(intValue);
+                                //cmbDisplayed.setSelectedIndex(intValue);
+                                setSelectedIndex(intValue);
                             }
                         }
                     }
@@ -645,7 +739,8 @@ public class SSComboBox extends JComponent {
                 nfe.printStackTrace();
             }
 
-            cmbDisplayed.addActionListener(cmbListener);
+            //cmbDisplayed.addActionListener(cmbListener);
+            addActionListener(cmbListener);
 
         } // public void insertUpdate(DocumentEvent de) {
 
@@ -664,12 +759,12 @@ public class SSComboBox extends JComponent {
         //  System.out.println("action performed triggered prasanth");
             textField.getDocument().removeDocumentListener(textFieldDocumentListener);
             //System.out.flush();
-            int index = cmbDisplayed.getSelectedIndex();
+            //int index = cmbDisplayed.getSelectedIndex();
+            int index = getSelectedIndex();
             try {
-                if(index == -1){
+                if (index == -1) {
                     textField.setText("");
-                }
-                else{
+                } else {
                     String strValueInText = textField.getText();
                     int valueOfText = -1;
                     strValueInText = strValueInText.trim();
@@ -695,12 +790,16 @@ public class SSComboBox extends JComponent {
         }
     }
 
-} // end public class SSComboBox extends JComponent {
+//} // end public class SSComboBox extends JComponent {
+} // end public class SSComboBox extends JComboBox {
 
 
 
 /*
  * $Log$
+ * Revision 1.20  2004/11/11 14:45:48  yoda2
+ * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
+ *
  * Revision 1.19  2004/11/01 15:53:30  yoda2
  * Fixed various JavaDoc errors.
  *

@@ -91,7 +91,8 @@ public class SSDBNavImp extends SSDBNavAdapter {
             } else if (comps[i] instanceof SSComboBox) {
             // IF ITS A SSComboBox THEN SEE IF THERE ARE ANY ITEMS INSIDE IT. IF YES, SET IT TO
             // 'EMPTY' ITEM BEFORE FIRST ITEM
-                JComboBox combo = ((SSComboBox)comps[i]).getComboBox();
+                //JComboBox combo = ((SSComboBox)comps[i]).getComboBox();
+                JComboBox combo = ((SSComboBox)comps[i]);
                 combo.setSelectedIndex(-1);
             } else if (comps[i] instanceof SSDBComboBox) {
             // IF ITS A SSDBComboBox THEN SEE IF THERE ARE ANY ITEMS INSIDE IT  IF YES SET IT TO
@@ -129,7 +130,8 @@ public class SSDBNavImp extends SSDBNavAdapter {
             } else if (comps[i] instanceof SSComboBox) {
             // IF ITS A SSComboBox THEN SEE IF THERE ARE ANY ITEMS INSIDE IT  IF YES SET IT TO
             // 'EMPTY' ITEM BEFORE FIRST ITEM
-                JComboBox combo = ((SSComboBox)comps[i]).getComboBox();
+                //JComboBox combo = ((SSComboBox)comps[i]).getComboBox();
+                JComboBox combo = ((SSComboBox)comps[i]);
                 combo.setSelectedIndex(-1);
             } else if (comps[i] instanceof SSDBComboBox) {
             // IF ITS A SSDBComboBox THEN SEE IF THERE ARE ANY ITEMS INSIDE IT  IF YES SET IT TO
@@ -157,6 +159,9 @@ public class SSDBNavImp extends SSDBNavAdapter {
 
 /*
  * $Log$
+ * Revision 1.8  2005/01/18 21:00:47  prasanth
+ * Added support for SSImage in performPreInsertOps.
+ *
  * Revision 1.7  2004/11/11 14:45:48  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *
