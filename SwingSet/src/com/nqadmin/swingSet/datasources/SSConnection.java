@@ -59,7 +59,7 @@
  public class SSConnection implements Serializable {
 
     /**
-     *  Url to the database.
+     * URL to the database.
      */
     protected String url = "";
 
@@ -74,30 +74,30 @@
     protected String password = "";
 
     /**
-     *  Database driver class name.
+     * Database driver class name.
      */
     protected String driverName = "";
 
     /**
-     *  Database connection object.
+     * Database connection object.
      */
     transient protected Connection connection;
 
 	/**
-	 *	Convenience class for providing the property change listener support
+	 *Convenience class for providing the property change listener support
 	 */
 	private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 	 
     /**
-     *  Constructs a default SSConnection object.
+     * Constructs a default SSConnection object.
      */
     public SSConnection(){
     }
 
 
     /**
-     *  Constructs a SSConnection object with the specified database url.
-     *@param url - url to the database to which connection has to be established.
+     * Constructs a SSConnection object with the specified database url.
+     * @param url - url to the database to which connection has to be established.
      * the url should be of the form jdbc:subprotocol:subname
      */
     public SSConnection(String url){
@@ -105,11 +105,11 @@
     }
 
     /**
-     *  Constructs a SSConnection object with the specified database url.
-     *@param url - url to the database to which connection has to be established.
+     * Constructs a SSConnection object with the specified database url.
+     * @param url - url to the database to which connection has to be established.
      * the url should be of the form jdbc:subprotocol:subname
-     *@param username - the database username on whose behalf the connection is being made
-     *@param password - the user's password
+     * @param username - the database username on whose behalf the connection is being made
+     * @param password - the user's password
      */
     public SSConnection(String url, String username, String password){
         this.url = url;
@@ -118,12 +118,12 @@
     }
 
     /**
-     *  Constructs a SSConnection object with the specified database url.
-     *@param url - url to the database to which connection has to be established.
+     * Constructs a SSConnection object with the specified database url.
+     * @param url - url to the database to which connection has to be established.
      * the url should be of the form jdbc:subprotocol:subname
-     *@param username - the database username on whose behalf the connection is being made
-     *@param password - the user's password
-     *@param driverName - name of the database driver to be used.
+     * @param username - the database username on whose behalf the connection is being made
+     * @param password - the user's password
+     * @param driverName - name of the database driver to be used.
      */
     public SSConnection(String url, String username, String password, String driverName){
         this.url = url;
@@ -133,8 +133,8 @@
     }
 
     /**
-     *  Sets the url to the database.
-     *@param url - url to the database to which connection has to be established.
+     * Sets the url to the database.
+     * @param url - url to the database to which connection has to be established.
      * the url should be of the form jdbc:subprotocol:subname
      */
     public void setUrl(String url){
@@ -145,8 +145,8 @@
     }
 
     /**
-     *  Sets the username to be used while connecting to the database.
-     *@param username - the database username on whose behalf the connection is being made
+     * Sets the username to be used while connecting to the database.
+     * @param username - the database username on whose behalf the connection is being made
      */
     public void setUsername(String username){
     	String oldValue = this.username;
@@ -155,8 +155,8 @@
     }
 
     /**
-     *  Sets the password to be used while connecting to the database.
-     *@param password - the user's password to be used.
+     * Sets the password to be used while connecting to the database.
+     * @param password - the user's password to be used.
      */
     public void setPassword(String password){
     	String oldValue = this.password;
@@ -165,8 +165,8 @@
     }
 
     /**
-     *  Sets the database driver class name.
-     *@param driverName - name of the database driver to be used.
+     * Sets the database driver class name.
+     * @param driverName - name of the database driver to be used.
      */
     public void setDriverName(String driverName){
     	String oldValue = this.driverName;
@@ -175,56 +175,66 @@
     }
 
     /**
-     *  Returns the url to the database.
-     *@return returns the database url.
+     * Returns the url to the database.
+     * @return returns the database url.
      */
     public String getUrl(){
         return url;
     }
 
     /**
-     *  Returns the username being used to connect to the database.
-     *@return returns the database username.
+     * Returns the username being used to connect to the database.
+     * @return returns the database username.
      */
     public String getUsername(){
         return username;
     }
 
     /**
-     *  Returns the password being used to connect to the database.
-     *@return returns the user's password.
+     * Returns the password being used to connect to the database.
+     * @return returns the user's password.
      */
     public String getPassword(){
         return password;
     }
 
     /**
-     *  Returns the database driver being used.
-     *@return returns the database driver being used.
+     * Returns the database driver being used.
+     * @return returns the database driver being used.
      */
     public String getDriverName(){
         return driverName;
     }
 
     /**
-     *  Returns the database connection object.
-     *@return returns the database connection object.
+     * Returns the database connection object.
+     * @return returns the database connection object.
      */
     public Connection getConnection(){
         return connection;
     }
     
-    public void addPropertyChangeListener(PropertyChangeListener listener){
-    	changeSupport.addPropertyChangeListener(listener);
+    /**
+     * Method to add bean property change listeners.
+     *
+     * @param _listener bean property change listener
+     */
+    public void addPropertyChangeListener(PropertyChangeListener _listener){
+    	changeSupport.addPropertyChangeListener(_listener);
     }
     
-    public void removePropertyChangeListener(PropertyChangeListener listener){
-    	changeSupport.removePropertyChangeListener(listener);
+    /**
+     * Method to remove bean property change listeners.
+     *
+     * @param _listener bean property change listener
+     */    
+    public void removePropertyChangeListener(PropertyChangeListener _listener){
+    	changeSupport.removePropertyChangeListener(_listener);
     }
 
     /**
-     *  Creates a connection to the database based on the information provided
-     *by the user.
+     * Creates a connection to the database based on the information provided
+     * by the user.
      */
     public void createConnection() throws SQLException, ClassNotFoundException{
         Class.forName(driverName);
@@ -232,7 +242,7 @@
     }
 
     /**
-     *  Recreates the connection when the object is deserialized.
+     * Recreates the connection when the object is deserialized.
      */
     protected void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
         objIn.defaultReadObject();
@@ -246,6 +256,9 @@
 
 /*
  * $Log$
+ * Revision 1.4  2005/02/09 06:39:06  prasanth
+ * Added PropertyChangeSupport
+ *
  * Revision 1.3  2005/02/04 22:49:09  yoda2
  * API cleanup & updated Copyright info.
  *
