@@ -46,151 +46,220 @@
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  *<p><pre>
- * Used to synchronize the data navigator and combo box.
+ * Used to synchronize a data navigator and a navigation combo box.
  *</pre><p>
  * @author  $Author$
  * @version $Revision$
  */
+public class SSSyncManager {
 
- 	public class SSSyncManager{
+    /**
+     * SSDBComboBox used for record navigation.
+     */
+    protected SSDBComboBox comboBox;
 
- 		protected SSDBComboBox comboBox;
- 		protected SSDataNavigator dataNavigator;
- 		protected SSRowSet rowset;
- 		protected String columnName;
+    /**
+     * SSDataNavigator to be synchronized with navigation combo box.
+     */
+    protected SSDataNavigator dataNavigator;
 
- 		protected MyComboListener comboListener = new MyComboListener();
- 		protected MyRowSetListener rowsetListener = new MyRowSetListener();
+    /**
+     * SSRowSet navigated with data navigator and combo box.
+     */
+    protected SSRowSet rowset;
 
- 		public SSSyncManager(SSDBComboBox comboBox, SSDataNavigator dataNavigator){
- 			this.comboBox = comboBox;
- 			this.dataNavigator = dataNavigator;
- 			rowset = dataNavigator.getSSRowSet();
- 		}
+    /**
+     * SSRowSet column used as basis for synchronization.
+     */
+    protected String columnName;
 
- 		public void setColumnName(String columnName){
- 			this.columnName = columnName;
- 		}
+    /**
+     * Listener on combo box to detect combo-based navigations.
+     */
+    private final MyComboListener comboListener = new MyComboListener();
 
- 		public void setDataNavigator(SSDataNavigator dataNavigator){
- 			this.dataNavigator = dataNavigator;
- 			rowset = dataNavigator.getSSRowSet();
- 		}
+    /**
+     * Listener on SSRowSet to detect data navigator-based navigations.
+     */
+    private final MyRowSetListener rowsetListener = new MyRowSetListener();
 
- 		public void setComboBox(SSDBComboBox comboBox){
- 			this.comboBox = comboBox;
- 		}
+    /**
 
- 		public void sync(){
- 			addListeners();
- 			adjustValue();
- 		}
+     * Creates a SSSyncManager with the specified combo box and data navigator.
+     *
+     * @param _comboBox SSDBComboBox used for record navigation
+     * @param _dataNavigator    SSDataNavigator to be synchronized
+     * with navigation combo box
+     */
+    public SSSyncManager(SSDBComboBox _comboBox, SSDataNavigator _dataNavigator) {
+        comboBox = _comboBox;
+        dataNavigator = _dataNavigator;
+        rowset = dataNavigator.getSSRowSet();
+    }
 
- 		public void async(){
- 			removeListeners();
- 		}
+    /**
+     * Sets column to be used as basis for synchronization.
+     *
+     * @param _columnName   SSRowSet column used as basis for synchronization.
+     */
+    public void setColumnName(String _columnName) {
+        columnName = _columnName;
+    }
 
- 		private void addListeners(){
- 			comboBox.addActionListener(comboListener);
- 			dataNavigator.getSSRowSet().addRowSetListener(rowsetListener);
- 		}
+    /**
+     * Sets data navigator to be synchronized.
+     *
+     * @param _dataNavigator    data navigator to be synchronized
+     */
+    public void setDataNavigator(SSDataNavigator _dataNavigator) {
+        dataNavigator = _dataNavigator;
+        rowset = dataNavigator.getSSRowSet();
+    }
 
- 		private void removeListeners(){
- 			comboBox.removeActionListener(comboListener);
- 			dataNavigator.getSSRowSet().removeRowSetListener(rowsetListener);
- 		}
+    /**
+     * Sets combo box to be synchronized.
+     *
+     * @param _comboBox combo box to be synchronized
+     */
+
+    public void setComboBox(SSDBComboBox _comboBox) {
+        comboBox = _comboBox;
+    }
+
+    /**
+     * Start synchronization between navigation components.
+     */
+    public void sync() {
+        addListeners();
+        adjustValue();
+    }
+
+    /**
+     * Stop synchronization between navigation components.
+     */
+    public void async() {
+        removeListeners();
+    }
+
+    /**
+     * Adds listeners to combo box & rowset.
+     */
+    private void addListeners() {
+        comboBox.addActionListener(comboListener);
+        dataNavigator.getSSRowSet().addRowSetListener(rowsetListener);
+    }
+
+    /**
+     * Removes listeners from combo box & rowset.
+     */
+    private void removeListeners() {
+        comboBox.removeActionListener(comboListener);
+        dataNavigator.getSSRowSet().removeRowSetListener(rowsetListener);
+    }
+
+    /**
+     *  Listener for rowset.
+     */
+    private class MyRowSetListener implements RowSetListener {
+
+        public void cursorMoved(RowSetEvent rse) {
+            adjustValue();
+        }
+
+        public void rowChanged(RowSetEvent rse) {
+            adjustValue();
+        }
+
+        public void rowSetChanged(RowSetEvent rse) {
+            adjustValue();
+        }
+
+    }
+
+    /**
+
+     * Method to update combo box based on rowset.
+     */
+    protected void adjustValue() {
+        comboBox.removeActionListener(comboListener);
+        try{
+            if(rowset != null & rowset.getRow() > 0){
+                //comboBox.setSelectedValue(rowset.getLong(columnName));
+                comboBox.setSelectedStringValue(rowset.getString(columnName));
+            } else {
+                comboBox.setSelectedIndex(-1);
+            }
+        } catch(SQLException se) {
+            se.printStackTrace();
+        }
+        comboBox.addActionListener(comboListener);
+    }
 
 
-	 	/**
-		 *	Listener for column name.
-		 */
-		public class MyRowSetListener implements RowSetListener{
+    /**
+     *Listener for combo box to update data navigator when
+     * combo box-based navigation occurs.
+     */
+    private class MyComboListener implements ActionListener {
+        //protected long id = -1;
+        protected String id = "";
 
-			public void cursorMoved(RowSetEvent rse) {
-				adjustValue();
-			}
+    // WHEN THERE IS A CHANGE IN THIS VALUE MOVE THE ROWSET SO THAT
+    // ITS POSITIONED AT THE RIGHT RECORD.
+        public void actionPerformed(ActionEvent ae) {
+            try {
 
-			public void rowChanged(RowSetEvent rse) {
-				adjustValue();
-			}
+                if(rowset == null || rowset.getRow() < 1 || comboBox.getSelectedIndex() == -1){
+                    return;
+                }
 
-			public void rowSetChanged(RowSetEvent rse) {
-				adjustValue();
-			}
+                //id = comboBox.getSelectedValue();
+                id = comboBox.getSelectedStringValue();
+                rowset.removeRowSetListener(rowsetListener);
 
-		}
+            // UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
+                dataNavigator.updatePresentRow();
 
-		protected void adjustValue(){
-			comboBox.removeActionListener(comboListener);
-			try{
-				if(rowset != null & rowset.getRow() > 0){
-					comboBox.setSelectedValue(rowset.getLong(columnName));
-				}
-				else{
-					comboBox.setSelectedIndex(-1);
-				}
-			}catch(SQLException se){
-				se.printStackTrace();
-			}
-			comboBox.addActionListener(comboListener);
-		}
+                //if(id != rowset.getLong(columnName)) {
+                if(!id.equals(rowset.getString(columnName))) {
 
+                    int index = comboBox.getSelectedIndex() + 1;
+                    rowset.absolute(index);
+                    int numRecords = comboBox.getItemCount();
+                    int count = 0;
+                    //while (id != rowset.getLong(columnName)) {
+                    while (!id.equals(rowset.getString(columnName))) {
+                        if (!rowset.next()) {
+                            rowset.beforeFirst();
+                            rowset.next();
+                        }
 
-		/**
-		 *	Listener for ComboBox
-		 */
-		private class MyComboListener implements ActionListener {
-			protected long id = -1;
+                        count++;
 
-		// WHEN THERE IS A CHANGE IN THIS VALUE MOVE THE ROWSET SO THAT
-		// ITS POSITIONED AT THE RIGHT RECORD.
-			public void actionPerformed(ActionEvent ae) {
-				try {
+                        //number of items in combo is the number of records in resultset.
+                        //so if for some reason item is in combo but deleted in rowset
+                        //To avoid infinite loop in such scenario
+                        if (count > numRecords + 5) {
+                            //JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin about this","Row not found",JOptionPane.OK_OPTION);
+                            break;
+                        }
+                    }
+                }
+                rowset.addRowSetListener(rowsetListener);
 
-					if(rowset == null || rowset.getRow() < 1 || comboBox.getSelectedIndex() == -1){
-						return;
-					}
+            } catch(SQLException se) {
+                se.printStackTrace();
+            }
+        }
+    } // private class MyComboListener implements ActionListener {
 
-
-					id = comboBox.getSelectedValue();
-					rowset.removeRowSetListener(rowsetListener);
-
-				// UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
-					dataNavigator.updatePresentRow();
-
-					if(id != rowset.getLong(columnName) ){
-
-						int index = comboBox.getSelectedIndex() + 1;
-						rowset.absolute(index);
-						int numRecords = comboBox.getItemCount();
-						int count = 0;
-						while(id != rowset.getLong(columnName) ) {
-							if( !rowset.next()) {
-								rowset.beforeFirst();
-								rowset.next();
-							}
-								count++;
-							//number of items in combo is the number of records in resultset.
-							//so if for some reason item is in combo but deleted in rowset
-							//To avoid infinite loop in such scenario
-							if(count > numRecords + 5){
-								//JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin about this","Row not found",JOptionPane.OK_OPTION);
-								break;
-							}
-						}
-					}
-					rowset.addRowSetListener(rowsetListener);
-
-				}catch(SQLException se){
-					se.printStackTrace();
-				}
-			}
-		} // END OF COMBO LISTENER
-
- 	} // END OF SYNC MANAGER
+} // end public class SSSyncManager {
 
 /*
  * $Log$
+ * Revision 1.3  2005/02/05 15:06:56  yoda2
+ * Got rid of depreciated calls.
+ *
  * Revision 1.2  2005/02/04 22:49:15  yoda2
  * API cleanup & updated Copyright info.
  *
