@@ -64,13 +64,13 @@ committed when a navigation takes place (also similar to Access).
 
 
 SwingSet also provides a Grid Control which can display the information 
-retrieved from a database. It provided functions to set the headers
-hide the columns and make columns uneditable. The Grid Control used
+retrieved from a database. It provides functions to set the headers,
+hide the columns and make columns uneditable. The Grid Control uses
 the SSTableModel which extends AbstractTableModel. The SSCellEditing
-and SSDataValue interface provide fine control over the working of the
+and SSDataValue interfaces provide fine control over the working of the
 grid.
 
-SSTextFeild, extends JTextFeild, provides different masks like date mask
+SSTextFeild, extends JTextFeild, provides different masks like date mask,
 SSN mask etc.
 
 
