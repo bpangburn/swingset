@@ -305,6 +305,7 @@ public class SSTableModel extends AbstractTableModel {
                     value = new Boolean(rowset.getBoolean(_column+1));
                     break;
                 case Types.DATE:
+                case Types.TIMESTAMP:
                     value = rowset.getDate(_column+1);
                     break;
                 case Types.CHAR:
@@ -398,6 +399,7 @@ public class SSTableModel extends AbstractTableModel {
                     rowset.updateBoolean(_column+1, ((Boolean)_value).booleanValue());
                     break;
                 case Types.DATE:
+                case Types.TIMESTAMP:
                 //  IF A DATE RENDERER AND EDITOR IS USED THE DATE IS DISPLAYED AS STRING.
                 // SO A STRING WILL BE SENT FOR UPDATE
                 // IN SUCH A CASE CHECK IS THE STRING IS EMPTY IF SO UPDATE NULL FOR THE FEILD
@@ -891,6 +893,9 @@ public class SSTableModel extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.18  2005/02/09 22:20:05  yoda2
+ * JavaDoc cleanup.
+ *
  * Revision 1.17  2005/02/07 22:55:34  yoda2
  * Fixed accidental renaming in deprecated method.
  *
