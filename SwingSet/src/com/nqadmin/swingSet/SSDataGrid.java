@@ -1157,7 +1157,7 @@ public class SSDataGrid extends JTable {
      * @see #setSSRowSet     
      */
     public void setRowSet(SSRowSet _rowset) {
-        setRowSet(_rowset);
+        setSSRowSet(_rowset);
     }      
 
 } // end public class SSDataGrid extends JTable {
@@ -1166,6 +1166,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.23  2005/02/07 22:20:32  yoda2
+ * JavaDoc cleanup.
+ *
  * Revision 1.22  2005/02/04 22:48:53  yoda2
  * API cleanup & updated Copyright info.
  *
