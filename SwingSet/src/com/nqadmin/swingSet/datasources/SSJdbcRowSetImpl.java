@@ -30,18 +30,21 @@
  *
  */
 
- package com.nqadmin.swingSet.datasources;
+package com.nqadmin.swingSet.datasources;
 
- import java.sql.SQLException;
- import java.sql.Connection;
- import java.sql.ResultSet;
- import java.sql.ResultSetMetaData;
- import java.io.ObjectInputStream;
- import java.io.IOException;
- import java.sql.Date;
- import javax.sql.RowSetListener;
- import com.sun.rowset.JdbcRowSetImpl;
- import java.beans.PropertyChangeSupport;
+import java.sql.SQLException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.io.ObjectInputStream;
+import java.io.IOException;
+import java.sql.Date;
+import javax.sql.RowSetListener;
+import com.sun.rowset.JdbcRowSetImpl;
+import java.beans.PropertyChangeSupport;
+import java.beans.PropertyChangeListener;
+import java.beans.VetoableChangeSupport;
+import java.beans.VetoableChangeListener;
  
 /**
  * SSJdbcRowSetImpl.java
@@ -81,10 +84,15 @@
      */
     transient protected ResultSetMetaData metaData;
     
-    /**
-     * Bean property change listener.
-     */
-    private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+	/**
+	 * Convenience class for providing the property change listener support
+	 */
+	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
+    
+	/**
+	 * Convenience class for providing the vetoable change listener support
+	 */
+	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);
 
     /**
      * Constructs a default SSJdbcRowSetImpl object.
@@ -111,6 +119,42 @@
         this.sSConnection = ssConnection;
         this.query      = query;
     }
+    
+    /**
+     * Method to add bean property change listeners.
+     *
+     * @param _listener bean property change listener
+     */
+    public void addPropertyChangeListener(PropertyChangeListener _listener) {
+    	pChangeSupport.addPropertyChangeListener(_listener);
+    }
+    
+    /**
+     * Method to remove bean property change listeners.
+     *
+     * @param _listener bean property change listener
+     */    
+    public void removePropertyChangeListener(PropertyChangeListener _listener) {
+    	pChangeSupport.removePropertyChangeListener(_listener);
+    }
+    
+    /**
+     * Method to add bean vetoable change listeners.
+     *
+     * @param _listener bean vetoable change listener
+     */
+    public void addVetoableChangeListener(VetoableChangeListener _listener) {
+    	vChangeSupport.addVetoableChangeListener(_listener);
+    }
+    
+    /**
+     * Method to remove bean veto change listeners.
+     *
+     * @param _listener bean veto change listener
+     */    
+    public void removeVetoableChangeListener(VetoableChangeListener _listener) {
+    	vChangeSupport.removeVetoableChangeListener(_listener);
+    }
 
     /**
      * Sets the connection object to be used.
@@ -119,7 +163,7 @@
     public void setSSConnection(SSConnection ssConnection){
         SSConnection connection = this.sSConnection;
         this.sSConnection = ssConnection;
-        changeSupport.firePropertyChange("ssConnection", connection, this.sSConnection);
+        pChangeSupport.firePropertyChange("ssConnection", connection, this.sSConnection);
     }
 
     /**
@@ -129,7 +173,7 @@
     public void setCommand(String query){
     	String oldValue = this.query;
         this.query = query;
-        changeSupport.firePropertyChange("query", oldValue, this.query);
+        pChangeSupport.firePropertyChange("query", oldValue, this.query);
 
         try {
             if (rowset != null) {
@@ -898,6 +942,9 @@
 }
  /*
   * $Log$
+  * Revision 1.10  2005/02/10 15:53:09  yoda2
+  * Added class descriptions to JavaDoc.
+  *
   * Revision 1.9  2005/02/09 23:04:01  yoda2
   * JavaDoc cleanup.
   *

@@ -39,6 +39,10 @@ import java.io.ObjectInputStream;
 import java.io.IOException;
 import java.util.StringTokenizer;
 import com.nqadmin.swingSet.datasources.SSRowSet;
+import java.beans.PropertyChangeSupport;
+import java.beans.PropertyChangeListener;
+import java.beans.VetoableChangeSupport;
+import java.beans.VetoableChangeListener;
 
 /**
  * SSTextField.java
@@ -93,7 +97,16 @@ public class SSTextField extends JTextField {
      * Default number of decimals to show for float, double, etc.
      */
     protected int numberOfDecimalPlaces = 2;
-
+    
+	/**
+	 * Convenience class for providing the property change listener support
+	 */
+	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
+    
+	/**
+	 * Convenience class for providing the vetoable change listener support
+	 */
+	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);    
 
     /**
      * Constructs a new text field with the specified text & mask.
@@ -176,6 +189,42 @@ public class SSTextField extends JTextField {
         columnName = _columnName;
         init();
         bind();
+    }
+    
+    /**
+     * Method to add bean property change listeners.
+     *
+     * @param _listener bean property change listener
+     */
+    public void addPropertyChangeListener(PropertyChangeListener _listener) {
+    	pChangeSupport.addPropertyChangeListener(_listener);
+    }
+    
+    /**
+     * Method to remove bean property change listeners.
+     *
+     * @param _listener bean property change listener
+     */    
+    public void removePropertyChangeListener(PropertyChangeListener _listener) {
+    	pChangeSupport.removePropertyChangeListener(_listener);
+    }
+    
+    /**
+     * Method to add bean vetoable change listeners.
+     *
+     * @param _listener bean vetoable change listener
+     */
+    public void addVetoableChangeListener(VetoableChangeListener _listener) {
+    	vChangeSupport.addVetoableChangeListener(_listener);
+    }
+    
+    /**
+     * Method to remove bean veto change listeners.
+     *
+     * @param _listener bean veto change listener
+     */    
+    public void removeVetoableChangeListener(VetoableChangeListener _listener) {
+    	vChangeSupport.removeVetoableChangeListener(_listener);
     }
     
     /**
@@ -489,6 +538,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.17  2005/02/10 20:13:04  yoda2
+ * Setter/getter cleanup & method reordering for consistency.
+ *
  * Revision 1.16  2005/02/09 19:46:32  yoda2
  * JavaDoc cleanup.
  *

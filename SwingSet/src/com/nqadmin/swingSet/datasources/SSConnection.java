@@ -30,19 +30,21 @@
  *
  */
 
- package com.nqadmin.swingSet.datasources;
+package com.nqadmin.swingSet.datasources;
 
- import java.sql.Connection;
- import java.sql.DriverManager;
- import java.sql.SQLException;
- import java.io.IOException;
- import java.lang.ClassNotFoundException;
- import java.io.ObjectInputStream;
- import java.io.Serializable;
- import java.beans.PropertyChangeSupport;
- import java.beans.PropertyChangeListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.io.IOException;
+import java.lang.ClassNotFoundException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.beans.PropertyChangeSupport;
+import java.beans.PropertyChangeListener;
+import java.beans.VetoableChangeSupport;
+import java.beans.VetoableChangeListener;
  
- /**
+/**
  * SSConnection.java
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
@@ -84,9 +86,14 @@
     transient protected Connection connection;
 
 	/**
-	 *Convenience class for providing the property change listener support
+	 * Convenience class for providing the property change listener support
 	 */
-	private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
+    
+	/**
+	 * Convenience class for providing the vetoable change listener support
+	 */
+	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);
 	 
     /**
      * Constructs a default SSConnection object.
@@ -133,6 +140,42 @@
         password = _password;
         driverName = _driverName;
     }
+    
+    /**
+     * Method to add bean property change listeners.
+     *
+     * @param _listener bean property change listener
+     */
+    public void addPropertyChangeListener(PropertyChangeListener _listener) {
+    	pChangeSupport.addPropertyChangeListener(_listener);
+    }
+    
+    /**
+     * Method to remove bean property change listeners.
+     *
+     * @param _listener bean property change listener
+     */    
+    public void removePropertyChangeListener(PropertyChangeListener _listener) {
+    	pChangeSupport.removePropertyChangeListener(_listener);
+    }
+    
+    /**
+     * Method to add bean vetoable change listeners.
+     *
+     * @param _listener bean vetoable change listener
+     */
+    public void addVetoableChangeListener(VetoableChangeListener _listener) {
+    	vChangeSupport.addVetoableChangeListener(_listener);
+    }
+    
+    /**
+     * Method to remove bean veto change listeners.
+     *
+     * @param _listener bean veto change listener
+     */    
+    public void removeVetoableChangeListener(VetoableChangeListener _listener) {
+    	vChangeSupport.removeVetoableChangeListener(_listener);
+    }     
 
     /**
      * Sets the url to the database.
@@ -143,7 +186,7 @@
     public void setUrl(String _url) {
         String oldValue = url;
         url = _url;
-        changeSupport.firePropertyChange("url", oldValue, url);
+        pChangeSupport.firePropertyChange("url", oldValue, url);
         
     }
     
@@ -164,7 +207,7 @@
     public void setUsername(String _username) {
     	String oldValue = username;
         username = _username;
-        changeSupport.firePropertyChange("username", oldValue, username);
+        pChangeSupport.firePropertyChange("username", oldValue, username);
     }
     
     /**
@@ -184,7 +227,7 @@
     public void setPassword(String _password) {
     	String oldValue = password;
         password = _password;
-        changeSupport.firePropertyChange("password", oldValue, password);
+        pChangeSupport.firePropertyChange("password", oldValue, password);
     }
     
     /**
@@ -204,7 +247,7 @@
     public void setDriverName(String _driverName) {
     	String oldValue = driverName;
         driverName = _driverName;
-        changeSupport.firePropertyChange("driverName", oldValue, password);
+        pChangeSupport.firePropertyChange("driverName", oldValue, password);
     }
     
     /**
@@ -224,24 +267,6 @@
     public Connection getConnection() {
         return connection;
     }    
-
-    /**
-     * Method to add bean property change listeners.
-     *
-     * @param _listener bean property change listener
-     */
-    public void addPropertyChangeListener(PropertyChangeListener _listener) {
-    	changeSupport.addPropertyChangeListener(_listener);
-    }
-    
-    /**
-     * Method to remove bean property change listeners.
-     *
-     * @param _listener bean property change listener
-     */    
-    public void removePropertyChangeListener(PropertyChangeListener _listener) {
-    	changeSupport.removePropertyChangeListener(_listener);
-    }
 
     /**
      * Creates a connection to the database based on the information provided
@@ -267,6 +292,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/10 20:13:20  yoda2
+ * Setter/getter cleanup & method reordering for consistency.
+ *
  * Revision 1.5  2005/02/09 23:04:01  yoda2
  * JavaDoc cleanup.
  *

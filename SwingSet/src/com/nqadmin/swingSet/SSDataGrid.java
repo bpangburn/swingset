@@ -45,6 +45,10 @@ import java.util.StringTokenizer;
 import java.util.EventObject;
 import java.util.Vector;
 import com.nqadmin.swingSet.datasources.SSRowSet;
+import java.beans.PropertyChangeSupport;
+import java.beans.PropertyChangeListener;
+import java.beans.VetoableChangeSupport;
+import java.beans.VetoableChangeListener;
 
 /**
  * SSDataGrid.java
@@ -194,6 +198,16 @@ public class SSDataGrid extends JTable {
      * inserting new rows.
      */
     protected boolean insertion = true;
+    
+	/**
+	 * Convenience class for providing the property change listener support
+	 */
+	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
+    
+	/**
+	 * Convenience class for providing the vetoable change listener support
+	 */
+	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);
 
     /**
      * Constructs a data grid with the data source set to the given SSRowSet.
@@ -211,6 +225,42 @@ public class SSDataGrid extends JTable {
      */
     public SSDataGrid() {
         init();
+    }
+    
+    /**
+     * Method to add bean property change listeners.
+     *
+     * @param _listener bean property change listener
+     */
+    public void addPropertyChangeListener(PropertyChangeListener _listener) {
+    	pChangeSupport.addPropertyChangeListener(_listener);
+    }
+    
+    /**
+     * Method to remove bean property change listeners.
+     *
+     * @param _listener bean property change listener
+     */    
+    public void removePropertyChangeListener(PropertyChangeListener _listener) {
+    	pChangeSupport.removePropertyChangeListener(_listener);
+    }
+    
+    /**
+     * Method to add bean vetoable change listeners.
+     *
+     * @param _listener bean vetoable change listener
+     */
+    public void addVetoableChangeListener(VetoableChangeListener _listener) {
+    	vChangeSupport.addVetoableChangeListener(_listener);
+    }
+    
+    /**
+     * Method to remove bean veto change listeners.
+     *
+     * @param _listener bean veto change listener
+     */    
+    public void removeVetoableChangeListener(VetoableChangeListener _listener) {
+    	vChangeSupport.removeVetoableChangeListener(_listener);
     }
     
     /**
@@ -1248,6 +1298,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.26  2005/02/10 20:13:00  yoda2
+ * Setter/getter cleanup & method reordering for consistency.
+ *
  * Revision 1.25  2005/02/07 22:47:14  yoda2
  * Replaced internal calls to setRowSet() with calls to setSSRowSet().
  *

@@ -41,6 +41,10 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.text.*;
 import javax.swing.event.*;
+import java.beans.PropertyChangeSupport;
+import java.beans.PropertyChangeListener;
+import java.beans.VetoableChangeSupport;
+import java.beans.VetoableChangeListener;
 
 /**
  * SSSlider.java
@@ -83,6 +87,16 @@ public class SSSlider extends JSlider {
      * Bound text field document listener.
      */    
     private final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
+    
+	/**
+	 * Convenience class for providing the property change listener support
+	 */
+	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
+    
+	/**
+	 * Convenience class for providing the vetoable change listener support
+	 */
+	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);    
 
     /**
      * Empty constructor needed for deserialization. Creates a horizontal
@@ -126,7 +140,42 @@ public class SSSlider extends JSlider {
         init();
         bind();
     }
-
+    
+    /**
+     * Method to add bean property change listeners.
+     *
+     * @param _listener bean property change listener
+     */
+    public void addPropertyChangeListener(PropertyChangeListener _listener) {
+    	pChangeSupport.addPropertyChangeListener(_listener);
+    }
+    
+    /**
+     * Method to remove bean property change listeners.
+     *
+     * @param _listener bean property change listener
+     */    
+    public void removePropertyChangeListener(PropertyChangeListener _listener) {
+    	pChangeSupport.removePropertyChangeListener(_listener);
+    }
+    
+    /**
+     * Method to add bean vetoable change listeners.
+     *
+     * @param _listener bean vetoable change listener
+     */
+    public void addVetoableChangeListener(VetoableChangeListener _listener) {
+    	vChangeSupport.addVetoableChangeListener(_listener);
+    }
+    
+    /**
+     * Method to remove bean veto change listeners.
+     *
+     * @param _listener bean veto change listener
+     */    
+    public void removeVetoableChangeListener(VetoableChangeListener _listener) {
+    	vChangeSupport.removeVetoableChangeListener(_listener);
+    }
     /**
      * Sets the SSRowSet column name to which the component is bound.
      *
@@ -313,6 +362,9 @@ public class SSSlider extends JSlider {
 
 /*
  * $Log$
+ * Revision 1.10  2005/02/10 20:13:03  yoda2
+ * Setter/getter cleanup & method reordering for consistency.
+ *
  * Revision 1.9  2005/02/10 03:46:47  yoda2
  * Replaced all setDisplay() methods & calls with updateDisplay() methods & calls to prevent any setter/getter confusion.
  *

@@ -43,6 +43,10 @@ import javax.swing.text.*;
 import javax.swing.event.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeSupport;
+import java.beans.PropertyChangeListener;
+import java.beans.VetoableChangeSupport;
+import java.beans.VetoableChangeListener;
 
 /**
  * SSLabel.java
@@ -80,6 +84,16 @@ public class SSLabel extends JLabel {
      * Bound text field document listener.
      */    
     private final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
+    
+	/**
+	 * Convenience class for providing the property change listener support
+	 */
+	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
+    
+	/**
+	 * Convenience class for providing the vetoable change listener support
+	 */
+	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);    
 
     /**
      * Empty constructor needed for deserialization. Creates a SSLabel instance
@@ -123,6 +137,42 @@ public class SSLabel extends JLabel {
         columnName = _columnName;
         init();
         bind();
+    }
+    
+    /**
+     * Method to add bean property change listeners.
+     *
+     * @param _listener bean property change listener
+     */
+    public void addPropertyChangeListener(PropertyChangeListener _listener) {
+    	pChangeSupport.addPropertyChangeListener(_listener);
+    }
+    
+    /**
+     * Method to remove bean property change listeners.
+     *
+     * @param _listener bean property change listener
+     */    
+    public void removePropertyChangeListener(PropertyChangeListener _listener) {
+    	pChangeSupport.removePropertyChangeListener(_listener);
+    }
+    
+    /**
+     * Method to add bean vetoable change listeners.
+     *
+     * @param _listener bean vetoable change listener
+     */
+    public void addVetoableChangeListener(VetoableChangeListener _listener) {
+    	vChangeSupport.addVetoableChangeListener(_listener);
+    }
+    
+    /**
+     * Method to remove bean veto change listeners.
+     *
+     * @param _listener bean veto change listener
+     */    
+    public void removeVetoableChangeListener(VetoableChangeListener _listener) {
+    	vChangeSupport.removeVetoableChangeListener(_listener);
     }
     
     /**
@@ -291,6 +341,9 @@ public class SSLabel extends JLabel {
 
 /*
  * $Log$
+ * Revision 1.11  2005/02/10 21:10:23  yoda2
+ * Added default label text to empty constructor so that label will be visible in BDK.
+ *
  * Revision 1.10  2005/02/10 20:13:03  yoda2
  * Setter/getter cleanup & method reordering for consistency.
  *

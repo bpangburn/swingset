@@ -45,6 +45,10 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 import javax.swing.border.*;
 import javax.swing.text.*;
 import javax.swing.event.*;
+import java.beans.PropertyChangeSupport;
+import java.beans.PropertyChangeListener;
+import java.beans.VetoableChangeSupport;
+import java.beans.VetoableChangeListener;
 
 /**
  * SSDBComboBox.java
@@ -206,6 +210,16 @@ public class SSDBComboBox extends JComboBox {
      * Format for any date columns displayed in combo box.
      */
     protected String dateFormat = "MM/dd/yyyy";
+    
+	/**
+	 * Convenience class for providing the property change listener support
+	 */
+	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
+    
+	/**
+	 * Convenience class for providing the vetoable change listener support
+	 */
+	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);    
 
     /**
      * Creates an object of the SSDBComboBox.
@@ -231,15 +245,40 @@ public class SSDBComboBox extends JComboBox {
     }
     
     /**
-     * Initialization code.
+     * Method to add bean property change listeners.
+     *
+     * @param _listener bean property change listener
      */
-    protected void init() {
-        // ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
-        // THIS IS HANDLED IN MyKeyListener
-            
-        // SET PREFERRED DIMENSIONS
-            setPreferredSize(new Dimension(200,20));
-    }      
+    public void addPropertyChangeListener(PropertyChangeListener _listener) {
+    	pChangeSupport.addPropertyChangeListener(_listener);
+    }
+    
+    /**
+     * Method to remove bean property change listeners.
+     *
+     * @param _listener bean property change listener
+     */    
+    public void removePropertyChangeListener(PropertyChangeListener _listener) {
+    	pChangeSupport.removePropertyChangeListener(_listener);
+    }
+    
+    /**
+     * Method to add bean vetoable change listeners.
+     *
+     * @param _listener bean vetoable change listener
+     */
+    public void addVetoableChangeListener(VetoableChangeListener _listener) {
+    	vChangeSupport.addVetoableChangeListener(_listener);
+    }
+    
+    /**
+     * Method to remove bean veto change listeners.
+     *
+     * @param _listener bean veto change listener
+     */    
+    public void removeVetoableChangeListener(VetoableChangeListener _listener) {
+    	vChangeSupport.removeVetoableChangeListener(_listener);
+    }
     
     /**
      * Sets the new SSRowSet for the combo box.
@@ -639,7 +678,18 @@ public class SSDBComboBox extends JComboBox {
         setSelectedIndex(index);
         addActionListener(cmbListener);
         return true;
-    }       
+    }
+    
+    /**
+     * Initialization code.
+     */
+    protected void init() {
+        // ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
+        // THIS IS HANDLED IN MyKeyListener
+            
+        // SET PREFERRED DIMENSIONS
+            setPreferredSize(new Dimension(200,20));
+    }    
     
     /**
      * Method for handling binding of component to a SSRowSet column.
@@ -1117,6 +1167,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.25  2005/02/10 20:12:57  yoda2
+ * Setter/getter cleanup & method reordering for consistency.
+ *
  * Revision 1.24  2005/02/10 03:46:47  yoda2
  * Replaced all setDisplay() methods & calls with updateDisplay() methods & calls to prevent any setter/getter confusion.
  *
