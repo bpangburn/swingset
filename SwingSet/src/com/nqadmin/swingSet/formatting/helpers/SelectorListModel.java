@@ -33,10 +33,12 @@
 
 package com.nqadmin.swingSet.formatting.helpers;
 
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.swing.TextFilterList;
 import java.sql.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import com.nqadmin.swingSet.datasources.*;
+import javax.swing.JTextField;
 
 /**
  *
@@ -44,8 +46,8 @@ import com.nqadmin.swingSet.datasources.*;
  */
 public class SelectorListModel extends javax.swing.AbstractListModel {
     
-    private java.util.ArrayList data = new java.util.ArrayList();
-    
+    private BasicEventList data    = new BasicEventList();
+    private TextFilterList fildata = new TextFilterList(data);
     
     /**
      * Holds value of property dataColumn.
@@ -94,7 +96,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
         this(null, table, bcolumn, lcolumn, orderBy);
     }
     
-    public SelectorListModel(SSConnection ssConnection, String table, String bcolumn, String lcolumn, String orderBy) { 
+    public SelectorListModel(SSConnection ssConnection, String table, String bcolumn, String lcolumn, String orderBy) {
         super();
         propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
         setSsConnection(ssConnection);
@@ -102,18 +104,17 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
         setDataColumn(bcolumn);
         setListColumn(lcolumn);
         setOrderBy(orderBy);
-                
+        
         //populateModel();
     }
     
     public void refresh() {
-        System.out.println("---------------------- refresh() ---------------------");
-        data = new java.util.ArrayList();
+        data = new BasicEventList();
         this.populateModel();
     }
     
     public Object getSelectedBoundData(int index) {
-        Object itm = data.get(index);
+        Object itm = fildata.get(index);
         
         if (itm != null) {
             return ((SelectorElement)(itm)).getDataValue();
@@ -122,73 +123,62 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
         }
     }
     
+    public void setFilterText(String[] newFilter) {
+        fildata.setFilterText(newFilter);
+    }
+    
     private void populateModel() {
         
         String sql = null;
         
-//        System.out.println("populateModel();");
-        
-        //  if (table == null) table = "publications";
-        
         if (dataColumn == null || listColumn == null || table == null) {
-            System.out.println("dataColumn = " + dataColumn);
-            System.out.println("listColumn = " + listColumn);
-            System.out.println("table      = " + table);
-            System.out.println("Sample Model");
-            data.add(new SelectorElement(new String("0") , "Option 0"));
-            data.add(new SelectorElement(new String("1") , "Option 1"));
-            data.add(new SelectorElement(new String("2") , "Option 2"));
-            data.add(new SelectorElement(new String("0") , "Option 3"));
-            data.add(new SelectorElement(new String("1") , "Option 4"));
-            data.add(new SelectorElement(new String("2") , "Option 5"));
-            data.add(new SelectorElement(new String("0") , "Option 6"));
-            data.add(new SelectorElement(new String("1") , "Option 7"));
-            data.add(new SelectorElement(new String("2") , "Option 8"));
-            data.add(new SelectorElement(new String("0") , "Option 9"));
-            data.add(new SelectorElement(new String("1") , "Option 0"));
-            data.add(new SelectorElement(new String("2") , "Option 1"));
-            data.add(new SelectorElement(new String("0") , "Option 2"));
-            data.add(new SelectorElement(new String("1") , "Option 3"));
-            data.add(new SelectorElement(new String("2") , "Option 4"));
+
+            // create sample data
+            data.clear();
+            data.add(new SelectorElement(new String( "0") , "Sample Option  0"));
+            data.add(new SelectorElement(new String( "1") , "Sample Option  1"));
+            data.add(new SelectorElement(new String( "2") , "Sample Option  2"));
+            data.add(new SelectorElement(new String( "3") , "Sample Option  3"));
+            data.add(new SelectorElement(new String( "4") , "Sample Option  4"));
+            data.add(new SelectorElement(new String( "5") , "Sample Option  5"));
+            data.add(new SelectorElement(new String( "6") , "Sample Option  6"));
+            data.add(new SelectorElement(new String( "7") , "Sample Option  7"));
+            data.add(new SelectorElement(new String( "8") , "Sample Option  8"));
+            data.add(new SelectorElement(new String( "9") , "Sample Option  9"));
+            data.add(new SelectorElement(new String("10") , "Sample Option 10"));
+            data.add(new SelectorElement(new String("11") , "Sample Option 11"));
+            data.add(new SelectorElement(new String("12") , "Sample Option 12"));
+            data.add(new SelectorElement(new String("13") , "Sample Option 13"));
+            data.add(new SelectorElement(new String("14") , "Sample Option 14"));
+            fildata = new TextFilterList(data);
             return;
         }
-        
-        System.out.println(dataColumn + " " + listColumn + " " + table);
-        System.out.println("-----------------------------------------------------------");
+    
+        data.clear();
         
         if (orderBy != null) {
             sql = "select " + dataColumn + ", " + listColumn + " from " + table + " ORDER BY " + orderBy;
-        }
-        else 
+        } else
             sql = "select " + dataColumn + ", " + listColumn + " from " + table;
-
-//        System.out.println("sql1 = " + sql);
-               
+        
         ssRowset = new SSJdbcRowSetImpl();
         ssRowset.setSSConnection(ssConnection);
-        
-        
-//       System.out.println("sql2 = " + sql);
-        
         ssRowset.setCommand(sql);
         
         try {
             ssRowset.execute();
             ssRowset.last();
-System.out.println("Hay " + ssRowset.getRow() + " registros");
+            System.out.println("Hay " + ssRowset.getRow() + " registros");
         } catch (SQLException se) {
             System.out.println("sql = " + sql);
             System.out.println("ssRowset.execute() " + se);
         }
-        
-        //data.add(new SelectorElement(new String("-1"), selectText));
         
         try {
             ssRowset.beforeFirst();
             while (ssRowset.next()) {
                 String s1 = ssRowset.getString(1);
                 String s2 = ssRowset.getString(2);
-//                System.out.println(s2);
                 data.add(new SelectorElement(s1,s2));
             }
         } catch (SQLException se) {
@@ -197,8 +187,15 @@ System.out.println("Hay " + ssRowset.getRow() + " registros");
             System.out.println(np);
         }
         
+        fildata = new TextFilterList(data);
+        
+        this.fireContentsChanged(this, 0, fildata.size()-1);
+        this.fireIntervalAdded(this, 0, 1);
+        this.fireIntervalRemoved(this, 0, 1);
+
         ssRowset = null;
         ssConnection = null;
+        
     }
     
     public void setSelectedItem(String bdata) {
@@ -209,13 +206,13 @@ System.out.println("Hay " + ssRowset.getRow() + " registros");
         
         System.out.println("setSelectedItem = " + tofind);
         
-        for (int i=0; i < data.size(); i++) {
-            cual = (SelectorElement)(data.get(i));
+        for (int i=0; i < fildata.size(); i++) {
+            cual = (SelectorElement)(fildata.get(i));
             
             System.out.println("BoundData = '" + cual.getDataValue() + "'");
             
             if ((cual.getDataValue()).equals(bdata)) {
-                //                super.setSelectedItem(cual);
+              //                super.setSelectedItem(cual);
                 return;
             }
         }
@@ -327,11 +324,11 @@ System.out.println("Hay " + ssRowset.getRow() + " registros");
         }
         //this.refresh();
     }
-
+    
     public String getOrderBy() {
         return orderBy;
     }
-
+    
     /**
      * Getter for property selectText.
      * @return Value of property selectText.
@@ -387,10 +384,31 @@ System.out.println("Hay " + ssRowset.getRow() + " registros");
     }
     
     public Object getElementAt(int index) {
-        return data.get(index);
+        //return data.get(index);
+        return fildata.get(index);
+        
     }
     
     public int getSize() {
-        return data.size();
+        //return data.size();
+        return fildata.size();
+    }
+    
+    public JTextField getFilterEdit() {
+        return fildata.getFilterEdit();
+    }
+    
+    public void setFilterEdit(JTextField filter) {
+        fildata.setFilterEdit(filter);
+    }
+    
+    public void addListEventListener(ListEventListener listChangeListener) {
+        fildata.addListEventListener(listChangeListener);
+        System.out.println("addListEventListener = " + listChangeListener);
+    } 
+
+    public void addListDataListener(javax.swing.event.ListDataListener l) {
+        super.addListDataListener(l);
+        System.out.println("addListDataListener = " + l);
     }
 }

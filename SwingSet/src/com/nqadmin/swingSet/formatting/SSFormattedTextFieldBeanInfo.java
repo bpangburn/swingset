@@ -16,8 +16,9 @@ public class SSFormattedTextFieldBeanInfo extends SimpleBeanInfo {
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( SSFormattedTextField.class , SSFormattedTextFieldCustomizer.class );
-        beanDescriptor.setDisplayName ( "SwingSet's SSFormattedTextField" );
+        BeanDescriptor beanDescriptor = new BeanDescriptor  ( SSFormattedTextField.class , null );
+        beanDescriptor.setPreferred ( true );
+        beanDescriptor.setDisplayName ( "SSFormattedTextField" );
         beanDescriptor.setShortDescription ( "A FormattedTextField bound to a jdbc column" );//GEN-HEADEREND:BeanDescriptor
         
         // Here you can add code for customizing the BeanDescriptor.

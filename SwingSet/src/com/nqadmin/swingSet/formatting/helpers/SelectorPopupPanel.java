@@ -33,6 +33,9 @@
 
 package com.nqadmin.swingSet.formatting.helpers;
 import java.awt.event.ActionListener;
+import javax.swing.JFrame;
+import javax.swing.ListModel;
+
 
 /**
  *
@@ -40,16 +43,17 @@ import java.awt.event.ActionListener;
  */
 public class SelectorPopupPanel extends javax.swing.JPanel implements ActionListener {
     
-    private javax.swing.ListModel model = null;
+    private ListModel model = null;
     
     /** Creates new form SelectorPopupPanel */
     public SelectorPopupPanel() {
         initComponents();
-        selectorList1.setModel(selectorListModel1);        
+        ((SelectorListModel)selectorListModel1).setFilterEdit(jTextField1);
     }
     
     public SelectorPopupPanel(javax.swing.ListModel model) {
         initComponents();
+        ((SelectorListModel)model).setFilterEdit(jTextField1);
         selectorList1.setModel(model);
     }
     
@@ -63,12 +67,12 @@ public class SelectorPopupPanel extends javax.swing.JPanel implements ActionList
 
         sSConnection1 = new com.nqadmin.swingSet.datasources.SSConnection();
         selectorListModel1 = new com.nqadmin.swingSet.formatting.helpers.SelectorListModel();
-        jPanel1 = new javax.swing.JPanel();
-        jTextField1 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         selectorList1 = new com.nqadmin.swingSet.formatting.helpers.SelectorList();
         jLabel1 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+
+        FormListener formListener = new FormListener();
 
         sSConnection1.setDriverName("org.postgresql.Driver");
         sSConnection1.setUrl("jdbc:postgresql://localhost/mag");
@@ -93,43 +97,8 @@ public class SelectorPopupPanel extends javax.swing.JPanel implements ActionList
 
         setBorder(new javax.swing.border.TitledBorder("Selector"));
         setFocusable(false);
-        jPanel1.setLayout(new java.awt.GridBagLayout());
-
-        jTextField1.setColumns(20);
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
-            }
-        });
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 0.8;
-        jPanel1.add(jTextField1, gridBagConstraints);
-
-        jButton1.setFont(new java.awt.Font("Dialog", 1, 10));
-        jButton1.setText("Buscar");
-        jButton1.setBorder(new javax.swing.border.EmptyBorder(new java.awt.Insets(1, 1, 1, 1)));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.weightx = 0.2;
-        jPanel1.add(jButton1, gridBagConstraints);
-
-        add(jPanel1, java.awt.BorderLayout.SOUTH);
-
         jScrollPane1.setFocusable(false);
+        selectorList1.setModel(selectorListModel1);
         selectorList1.setDoubleBuffered(true);
         jScrollPane1.setViewportView(selectorList1);
 
@@ -139,73 +108,81 @@ public class SelectorPopupPanel extends javax.swing.JPanel implements ActionList
         jLabel1.setText("Selecci\u00f3n");
         add(jLabel1, java.awt.BorderLayout.NORTH);
 
-    }//GEN-END:initComponents
+        jTextField1.setColumns(20);
+        jTextField1.addActionListener(formListener);
 
+        add(jTextField1, java.awt.BorderLayout.SOUTH);
+
+    }
+
+    // Code for dispatching events from components to event handlers.
+
+    private class FormListener implements java.awt.event.ActionListener {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            if (evt.getSource() == jTextField1) {
+                SelectorPopupPanel.this.jTextField1ActionPerformed(evt);
+            }
+        }
+    }//GEN-END:initComponents
+    
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         // TODO add your handling code here:
         
+        SelectorListModel model = null;
         javax.swing.JTextField s;
+        
         int j, n;
-        // text to find 
-        String toFind = null;
+
+        // text to find
+        String toFind      = null;
+        String[] newFilter = new String[2];
+        
         s= ((javax.swing.JTextField)evt.getSource());
         toFind = s.getText().toUpperCase();
-        s.setText(toFind);
-        System.out.println("Texto a buscar : " + toFind);
-        n = selectorList1.getModel().getSize();
         
-        /**
-         * Here implements list search logic. 
-         *
-         *
-         */
+        newFilter[0] = s.getText();
+        model = (SelectorListModel)(selectorList1.getModel());
+        model.setFilterText(newFilter);
         
-        for (j= 0; j < n; j++) {
-            String texto = selectorList1.getModel().getElementAt(j).toString().toUpperCase();
-            System.out.println("Comparando con " + texto);
-            if (texto.startsWith(toFind)) {
-                selectorList1.setSelectedIndex(j);
-                selectorList1.ensureIndexIsVisible(j);
-                selectorList1.requestFocus();
-                break;
-            }
-        }
     }//GEN-LAST:event_jTextField1ActionPerformed
-
+    
     public void setModel(javax.swing.ListModel model) {
         this.model = model;
         selectorList1.setModel(this.model);
     }
     
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
-        System.out.println("Search Action Performed");
-        
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    javax.swing.JButton jButton1;
     javax.swing.JLabel jLabel1;
-    javax.swing.JPanel jPanel1;
     javax.swing.JScrollPane jScrollPane1;
     javax.swing.JTextField jTextField1;
     com.nqadmin.swingSet.datasources.SSConnection sSConnection1;
     com.nqadmin.swingSet.formatting.helpers.SelectorList selectorList1;
     com.nqadmin.swingSet.formatting.helpers.SelectorListModel selectorListModel1;
     // End of variables declaration//GEN-END:variables
-      
-    public static void main(String args[])
-    {
+    
+    public static void main(String args[]) {
         // ejemplo
         javax.swing.JFrame frame = new javax.swing.JFrame();
-        frame.setLayout(new java.awt.BorderLayout());
-        frame.add(new SelectorPopupPanel(), java.awt.BorderLayout.CENTER);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(new java.awt.BorderLayout());
+        frame.getContentPane().add(new SelectorPopupPanel(), java.awt.BorderLayout.CENTER);
         frame.setSize(640, 480);
         frame.setVisible(true);
     }
-
+    
     public void actionPerformed(java.awt.event.ActionEvent e) {
+    }
+    
+    private void setFilter() {
+        
+        SelectorListModel model = null;
+        String[] newFilter = new String[1];
+        newFilter[0] = jTextField1.getText().toUpperCase();
+        model = (SelectorListModel)(selectorList1.getModel());
+        model.setFilterText(newFilter);
+        
+        this.selectorList1.setModel(this.selectorListModel1);
+        this.selectorList1.repaint();
+        
     }
 }

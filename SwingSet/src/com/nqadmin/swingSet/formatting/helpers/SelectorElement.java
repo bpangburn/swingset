@@ -33,17 +33,18 @@
 
 package com.nqadmin.swingSet.formatting.helpers;
 
+import ca.odell.glazedlists.TextFilterable;
+
 /**
  *
  * @author  dags
  */
-public class SelectorElement extends Object
-{
+public class SelectorElement extends Object implements TextFilterable {
     
     /**
      * Holds value of property listValue.
      */
-    private Object listValue;
+    private Object listValue = null;
     
     /**
      * Utility field used by bound properties.
@@ -53,20 +54,19 @@ public class SelectorElement extends Object
     /**
      * Holds value of property dataValue.
      */
-    private Object dataValue;
+    private Object dataValue = null;
     
     public SelectorElement() {
-        
+        listValue = new String("listValue");
+        dataValue = new String("dataValue");
     }
     
-    public SelectorElement(Object bD, Object lD)
-    {
+    public SelectorElement(Object bD, Object lD) {
         this.setDataValue(bD);
         this.setListValue(lD);
     }
     
-    public String toString()
-    {
+    public String toString() {
         return listValue.toString().trim() + " (" + dataValue.toString().trim() + ")";
     }
     
@@ -74,8 +74,7 @@ public class SelectorElement extends Object
      * Adds a PropertyChangeListener to the listener list.
      * @param l The listener to add.
      */
-    public void addPropertyChangeListener(java.beans.PropertyChangeListener l)
-    {
+    public void addPropertyChangeListener(java.beans.PropertyChangeListener l) {
         
         propertyChangeSupport.addPropertyChangeListener(l);
     }
@@ -84,8 +83,7 @@ public class SelectorElement extends Object
      * Removes a PropertyChangeListener from the listener list.
      * @param l The listener to remove.
      */
-    public void removePropertyChangeListener(java.beans.PropertyChangeListener l)
-    {
+    public void removePropertyChangeListener(java.beans.PropertyChangeListener l) {
         
         propertyChangeSupport.removePropertyChangeListener(l);
     }
@@ -94,9 +92,7 @@ public class SelectorElement extends Object
      * Getter for property listValue.
      * @return Value of property listValue.
      */
-    public Object getListValue()
-    
-    {
+    public Object getListValue() {
         
         return this.listValue;
     }
@@ -105,9 +101,7 @@ public class SelectorElement extends Object
      * Setter for property listValue.
      * @param listValue New value of property listValue.
      */
-    public void setListValue(Object listValue)
-    {
-        
+    public void setListValue(Object listValue) {
         Object oldListValue = this.listValue;
         this.listValue = listValue;
         propertyChangeSupport.firePropertyChange("listValue", oldListValue, listValue);
@@ -117,10 +111,7 @@ public class SelectorElement extends Object
      * Getter for property dataValue.
      * @return Value of property dataValue.
      */
-    public Object getDataValue()
-    
-    {
-        
+    public Object getDataValue() {
         return this.dataValue;
     }
     
@@ -128,13 +119,15 @@ public class SelectorElement extends Object
      * Setter for property dataValue.
      * @param dataValue New value of property dataValue.
      */
-    public void setDataValue(Object dataValue)
-    {
+    public void setDataValue(Object dataValue) {
         Object olddataValue = this.dataValue;
         this.dataValue = dataValue;
         propertyChangeSupport.firePropertyChange("dataValue", olddataValue, dataValue);
     }
     
-    
-    
+    public void getFilterStrings(java.util.List list) {
+        list.add(listValue.toString());
+        list.add(dataValue.toString());
+    }
 }
+

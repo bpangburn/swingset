@@ -33,14 +33,17 @@
 
 package com.nqadmin.swingSet.formatting.helpers;
 
+import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.event.ListEvent;
+
 import javax.swing.*;
-import java.sql.*;
-import com.nqadmin.swingSet.formatting.helpers.*;
+import javax.swing.event.ListDataListener;
+
 /**
  *
  * @author  dags
  */
-public class SelectorList extends JList {
+public class SelectorList extends JList implements ListDataListener, ListEventListener {
     
     /**
      * Creates a new instance of SelectorList
@@ -48,10 +51,15 @@ public class SelectorList extends JList {
     
     public SelectorList() {
         super(new SelectorListModel());
+
+        //        this.getModel().addListDataListener(this);
+//        ((SelectorListModel)this.getModel()).addListEventListener(this);
     }
     
     public SelectorList(SelectorListModel model) {
         this.setModel(model);
+//        model.addListDataListener(this);
+//        model.addListEventListener(this);
     }
     
     private void Init() {
@@ -63,5 +71,30 @@ public class SelectorList extends JList {
      */
     public Object getDataValue() {
         return ((SelectorListModel)getModel()).getSelectedBoundData(this.getSelectedIndex());
+    }
+    
+    public void intervalRemoved(javax.swing.event.ListDataEvent e) {
+        System.out.println("SelectorList --> intervalRemoved");
+    }
+    
+    public void intervalAdded(javax.swing.event.ListDataEvent e) {
+        System.out.println("SelectorList ---> intervalAdded");
+    }
+    
+    public void contentsChanged(javax.swing.event.ListDataEvent e) {
+        System.out.println("SelectorList ---> contentsChanged");
+    }
+
+    public void listChanged(ca.odell.glazedlists.event.ListEvent listEvent) {
+        System.out.println("SelectorList --> listChanged");
+        this.repaint();
+    }
+
+    public void setModel(ListModel model) {
+
+        super.setModel(model);
+        ((SelectorListModel)model).addListDataListener(this);
+        ((SelectorListModel)model).addListEventListener(this);
+        
     }
 }
