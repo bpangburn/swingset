@@ -6,13 +6,19 @@ $Id$
 
 
 ==============================================================================
-SwingSet 0.9.3-beta - 
+SwingSet 1.0.0-RC1
 ==============================================================================
 
 Changes:
+    Classes or Interfaces added in SwingSet-1.0.0-RC1
+        1. SSCheckBox added to replace deprecated SSDBCheckBox.
+        2. SSLabel - new read-only label component based on JLabel
+        3. SSSlider - new slider component based on JSlider
+    
     SSDBCheckBox:
         1. Added support for boolean database columns. Only tested with Postgresql.
-        2. Updated JavaDoc to reflect it. 
+        2. Updated JavaDoc to reflect it.
+        3. Deprecated in favor of SSCheckBox to match naming conventions.
 
     SSTextDocument:
         1. Fixed boolean rowset update.
