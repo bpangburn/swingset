@@ -1132,7 +1132,7 @@ public class SSDataNavigator extends JPanel {
      * @see #setSSRowSet     
      */
     public void setRowSet(SSRowSet _rowset) {
-        setRowSet(_rowset);
+        setSSRowSet(_rowset);
     }
     
      /**
@@ -1153,6 +1153,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.27  2005/02/07 20:27:26  yoda2
+ * JavaDoc cleanup & made private listener data members final.
+ *
  * Revision 1.26  2005/02/04 22:48:54  yoda2
  * API cleanup & updated Copyright info.
  *
