@@ -45,8 +45,14 @@ import java.util.Set;
 import java.util.HashSet;
 
 /**
- *
- * @author dags
+ * SSFormattedTextField.java
+ *<p>
+ * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+ *<p><pre>
+ * SSFormattedTextField extends the JFormattedTextField. 
+ *</pre><p>
+ * @author $Author$
+ * @version $Revision$
  */
 public class SSFormattedTextField extends JFormattedTextField implements RowSetListener, KeyListener, FocusListener {
     
@@ -56,7 +62,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     private com.nqadmin.swingSet.datasources.SSRowSet rowset;
     
     
-    /** Creates a new instance of SSMoneyField */
+    /** Creates a new instance of SSFormattedTextField */
     public SSFormattedTextField() {
         super();
         
@@ -525,6 +531,9 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
 
 /*
  * $Log$
+ * Revision 1.3  2004/12/13 20:50:16  dags
+ * Fix package name
+ *
  * Revision 1.2  2004/12/13 18:46:13  prasanth
  * Added License.
  *
