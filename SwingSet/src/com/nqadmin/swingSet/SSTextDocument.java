@@ -398,7 +398,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 					rs.updateNull(columnName);
 				}
 				else if(strValue.length() ==10){
-					System.out.println(strValue);
+//					System.out.println(strValue);
 //					Date dateValue = Date.valueOf(strValue);
 					rs.updateDate(columnName, getSQLDate(strValue));
 				}
@@ -459,13 +459,23 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 				else{
 					GregorianCalendar calendar = new GregorianCalendar();
     				calendar.setTime(date);
-    				value = "" + (calendar.get(Calendar.MONTH) + 1) + "/" +calendar.get(Calendar.DAY_OF_MONTH) + "/" + calendar.get(Calendar.YEAR);
+    				value = "";
+    				if(calendar.get(Calendar.MONTH) + 1 < 10 )
+    					value = "0"; 
+    				value = value + (calendar.get(Calendar.MONTH) + 1) + "/";
+    				
+    				if(calendar.get(Calendar.DAY_OF_MONTH) < 10 )	
+    					value = value + "0";
+    				value = value + calendar.get(Calendar.DAY_OF_MONTH) + "/";
+    				value = value + calendar.get(Calendar.YEAR);
 					//value = String.valueOf(rs.getDate(columnName));
 				}
 				break;
 			default:
 				System.out.println( columnName + " : UNKNOWN DATA TYPE ");
 		}
+		if(columnName == "fiscal_end")
+			System.out.println(value);
 		}catch(SQLException se){
 			se.printStackTrace();
 		}
@@ -494,6 +504,12 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.3  2003/10/31 16:08:46  prasanth
+ * Added method getSQLDate().
+ * Corrected a bug.( when a text field is linked to a date column, the column
+ * should not be updated until the user enters the complete date.)
+ * The text document waits till a 10 char date is entered.
+ *
  * Revision 1.2  2003/09/25 14:27:45  yoda2
  * Removed unused Import statements and added preformatting tags to JavaDoc descriptions.
  *
