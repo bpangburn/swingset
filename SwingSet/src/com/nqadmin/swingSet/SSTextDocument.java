@@ -67,88 +67,40 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
 public class SSTextDocument extends javax.swing.text.PlainDocument {
 
     protected int columnType = -1;
-    protected SSRowSet rs = null;
+    protected SSRowSet rowset = null;
     protected String columnName = null;
     protected int columnIndex = -1;
     protected SimpleAttributeSet attribute = new SimpleAttributeSet();
 
-    protected MyRowSetListener rowSetListener = new MyRowSetListener();
-    protected MyDocumentListener documentListener = new MyDocumentListener();
+    private MyRowSetListener rowSetListener = new MyRowSetListener();
+    private MyDocumentListener documentListener = new MyDocumentListener();
 
 
     /**
      * Constructs a Document with the given SSRowSet and column index.
      * The document is bound to the specified column in the SSRowSet
      *
-     * @param _rs   SSRowSet upon which document will be based
+     * @param _rowset   SSRowSet upon which document will be based
      * @param _columnName   column name within SSRowSet upon which document will be based
      */
-    public SSTextDocument(SSRowSet _rs, String _columnName) {
-
-        rs = _rs;
+    public SSTextDocument(SSRowSet _rowset, String _columnName) {
+        rowset = _rowset;
         columnName = _columnName;
-        try {
-        // FINDS THE COLUMN INDEX (REQUIRED TO GET ANY META DATA)
-            columnIndex = rs.getColumnIndex(columnName);
-        // GETS THE COLUMN DATA TYPE
-            columnType = rs.getColumnType(columnIndex);
-        // IF ROWS PRESENT IN PRESENT SSROWSET THEN INITIALIZE THE DOCUMENT WITH THE TEXT
-        // GETROW RETURNS ZERO IF THERE ARE NO ROWS IN SSROWSET
-            if (rs.getRow() != 0) {
-                String value = getText();
-                insertString(0,value, attribute);
-                insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength()  , DocumentEvent.EventType.INSERT), attribute );
-            }
-
-        } catch(SQLException se) {
-            se.printStackTrace();
-        } catch(BadLocationException ble) {
-            ble.printStackTrace();
-        }
-        // ADD LISTENERS FOR THE SSROWSET AND THE DOCUMENT
-        rs.addRowSetListener(rowSetListener);
-        addDocumentListener(documentListener);
-
-    } // end public SSTextDocument(javax.sql.SSRowSet _rs, String _columnName) {
+        bind();
+    } // end public SSTextDocument(javax.sql.SSRowSet _rowset, String _columnName) {
 
     /**
      * Constructs a Document with the given SSRowSet and column index.
      * The document is bound to the specified column in the SSRowSet.
      *
-     * @param _rs   SSRowSet upon which document will be based
+     * @param _rowset   SSRowSet upon which document will be based
      * @param _columnIndex   column index within SSRowSet upon which document will be based
      */
-    public SSTextDocument(SSRowSet _rs, int _columnIndex) {
-
-        rs = _rs;
+    public SSTextDocument(SSRowSet _rowset, int _columnIndex) {
+        rowset = _rowset;
         columnIndex = _columnIndex;
-
-        try {
-
-        // GET THE COLUMN TYPE AND COLUMN NAME FROM THE META DATA
-            columnType = rs.getColumnType(columnIndex);
-            columnName = rs.getColumnName(columnIndex);
-//          System.out.println(columnType + "   " + columnName);// + "  " + metaData.getSchemaName(columnIndex));
-
-            // CHECK IF THERE ARE ROWS IN THE SSROWSET THEN
-            // SET THE DOCUMENT TO THE TEXT CORRESPONDING TO THE COLUMN
-            if (rs.getRow() != 0) {
-                String value = getText();
-                insertString(0,value, attribute);
-                insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength()  , DocumentEvent.EventType.INSERT), attribute );
-            }
-
-        } catch(SQLException se) {
-            se.printStackTrace();
-        } catch(BadLocationException ble) {
-            ble.printStackTrace();
-        }
-
-    // ADD LISTENERS TO THE DOCUMENT AND SSROWSET
-        rs.addRowSetListener(rowSetListener);
-        addDocumentListener(documentListener);
-
-    } // end public SSTextDocument(javax.sql.RowSet _rs, int _columnIndex) {
+        bind();
+    } // end public SSTextDocument(javax.sql.RowSet _rowset, int _columnIndex) {
 
     /**
      * Sets the column name to which the document has to be bound to.
@@ -194,7 +146,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
      * @return returns the SSRowSet being used.
      */
     public SSRowSet getSSRowSet() {
-        return rs;
+        return rowset;
     }
 
     /**
@@ -203,50 +155,66 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
      *
      * @param _rowset    SSRowSet to be used for binding the document to the specified column.
      */
-    public void setSSRowSet(SSRowSet _rowset) throws SQLException {
-        rs = _rowset;
-        try {
-            if (columnName != null) {
-            // FINDS THE COLUMN INDEX (REQUIRED TO GET ANY META DATA)
-                columnIndex = rs.getColumnIndex(columnName);
-            } else if(columnIndex != -1) {
-                // do nothing
-            } else {
-                throw new SQLException("Column Name not specified");
-            }
-
-        // GET THE COLUMN TYPE AND COLUMN NAME FROM THE META DATA
-            columnType = rs.getColumnType(columnIndex);
-            columnName = rs.getColumnName(columnIndex);
-
-        // CHECK IF THERE ARE ROWS IN THE SSROWSET THEN
-        // SET THE DOCUMENT TO THE TEXT CORRESPONDING TO THE COLUMN
-            if (rs.getRow() != 0) {
-                String value = getText();
-                if (value != null && value.length() > 0) {
-                    value = value.replace('\r',' ');
-                    insertString(0,value, attribute);
-                    insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength()  , DocumentEvent.EventType.INSERT), attribute );
-                }
-            }
-
-        } catch(BadLocationException ble) {
-            ble.printStackTrace();
-        }
-
-
+    //public void setSSRowSet(SSRowSet _rowset) throws SQLException {
+    public void setSSRowSet(SSRowSet _rowset) {
+        rowset = _rowset;
+        bind();
     } // end public void setSSRowSet(SSRowSet _rowset) throws SQLException {
 
     /**
-     * Initializes the values to default values.
+     * Retrieves meta data for column & initializes document text if applicable.
      */
-    protected void init(){
-        columnIndex = -1;
-        columnName = null;
-        columnType = -1;
-        if (rs != null) {
-            rs.removeRowSetListener(rowSetListener);
-        }
+    protected void bind() {
+
+        // CHECK FOR NULL COLUMN/ROWSET
+            if ((columnName==null && columnIndex==-1) || rowset==null) {
+                return;
+            }
+
+        // REMOVE LISTENERS TO PREVENT DUPLICATION
+            removeListeners();
+
+        // EXTRACT META DATA AND INITIALIZE DOCUMENT TEXT IF APPLICABLE
+            try {
+                // IF COLUMN NAME ISN'T NULL, GET COLUMN INDEX - OTHERWISE, GET
+                // COLUMN NAME
+                    if (columnName != null) {
+                        columnIndex = rowset.getColumnIndex(columnName);
+                    } else {
+                        columnName = rowset.getColumnName(columnIndex);
+                    }
+
+                // GET COLUMN TYPE
+                    columnType = rowset.getColumnType(columnIndex);
+
+                // IF ROWS PRESENT IN PRESENT SSROWSET THEN INITIALIZE THE DOCUMENT WITH THE TEXT
+                // GETROW RETURNS ZERO IF THERE ARE NO ROWS IN SSROWSET
+                    if (rowset.getRow() != 0) {
+                        String value = getText();
+                        insertString(0,value, attribute);
+                        insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength()  , DocumentEvent.EventType.INSERT), attribute );
+                    }
+
+            } catch(SQLException se) {
+                se.printStackTrace();
+            } catch(BadLocationException ble) {
+                ble.printStackTrace();
+            }
+
+        // ADD BACK LISTENERS
+            addListeners();
+
+    } // end protected void bind() {
+
+    // ADDS LISTENERS FOR THE SLIDER AND TEXT FIELD
+    private void addListeners() {
+        rowset.addRowSetListener(rowSetListener);
+        addDocumentListener(documentListener);
+    }
+
+    // REMOVES THE LISTENERS FOR TEXT FIELD AND THE SLIDER DISPLAYED
+    private void removeListeners() {
+        rowset.removeRowSetListener(rowSetListener);
         removeDocumentListener(documentListener);
     }
 
@@ -258,7 +226,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
         // IN SSROWSET  FIRST REMOVE THE LISTENER ON SSROWSET THEN MAKE THE CHANGES TO THE COLUMN VALUE.
         // AFTER THE CHANGES  ARE MADE ADD BACK THE LISTENER TO SSROWSET.
         public void removeUpdate(DocumentEvent de) {
-            rs.removeRowSetListener(rowSetListener);
+            rowset.removeRowSetListener(rowSetListener);
 
             try {
             //  System.out.println("remove update" + getText(0,getLength()) );
@@ -266,7 +234,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
             } catch(BadLocationException ble) {
                 ble.printStackTrace();
             }
-            rs.addRowSetListener(rowSetListener);
+            rowset.addRowSetListener(rowSetListener);
         }
 
         public void changedUpdate(DocumentEvent de) {
@@ -278,14 +246,14 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
         // AND UPDATE THE COLUMN IN THE SSROWSET
         public void insertUpdate(DocumentEvent de) {
 
-            rs.removeRowSetListener(rowSetListener);
+            rowset.removeRowSetListener(rowSetListener);
             try {
             //  System.out.println("insert update" + getText(0,getLength()));
                 updateText(getText( 0,getLength() ) );
             } catch(BadLocationException ble) {
                 ble.printStackTrace();
             }
-            rs.addRowSetListener(rowSetListener);
+            rowset.addRowSetListener(rowSetListener);
         }
 
     } // end private class MyDocumentListener implements DocumentListener, Serializable {
@@ -301,33 +269,8 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
         public void cursorMoved(RowSetEvent event) {
             removeDocumentListener(documentListener);
 //          System.out.println("Cursor Moved");
-            try {
-                if (rs.getRow() != 0) {
-                    String value = getText();
-                    if (value == null) {
-                        value = "";
-                    }
-                    replace(0, getLength(), value, null);
-    /*              if( getLength() > 0 ){
-                        remove(0,getLength() );
-                        removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
-                    }
-                    if(value!=null && value.length() > 0) {
-                        insertString(0,value, attribute);
-    //                  insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.INSERT), attribute );
-                    }
+            updateDocument();
 
-    */          } else {
-                    if ( getLength() > 0 ) {
-                        remove(0,getLength() );
-    //                  removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
-                    }
-                }
-            } catch(SQLException se) {
-                se.printStackTrace();
-            } catch(BadLocationException ble) {
-                ble.printStackTrace();
-            }
             addDocumentListener(documentListener);
         }
 
@@ -338,33 +281,8 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
         public void rowChanged(RowSetEvent event) {
             removeDocumentListener(documentListener);
 //          System.out.println("Row Changed");
-            try {
-                if ( rs.getRow() != 0 ) {
-                    String value = getText();
-                    if (value == null) {
-                        value = "";
-                    }
-                    replace(0, getLength(), value, null);
+            updateDocument();
 
-    /*              if( getLength() > 0 ){
-                        remove(0,getLength() );
-                        //removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
-                    }
-                    if(value!=null && value.length() > 0) {
-                        insertString(0,value, attribute);
-    //                  insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.INSERT), attribute );
-                    }
-    */          } else {
-                    if ( getLength() > 0 ) {
-                        remove(0,getLength() );
-    //                  removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
-                    }
-                }
-            } catch(SQLException se) {
-                se.printStackTrace();
-            } catch(BadLocationException ble) {
-                ble.printStackTrace();
-            }
             addDocumentListener(documentListener);
         }
 
@@ -375,23 +293,23 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
         public void rowSetChanged(RowSetEvent event) {
             removeDocumentListener(documentListener);
 //          System.out.println("RowSet Changed");
+            updateDocument();
+
+            addDocumentListener(documentListener);
+        }
+
+    } // end private class MyRowSetListener implements RowSetListener, Serializable {
+
+    // THIS METHOD IS USED BY THE ROWSET LISTENERS TO UPDATE THE DOCUMENT
+    protected void updateDocument() {
             try {
-                if ( rs.getRow() != 0 ) {
+                if ( rowset.getRow() != 0 ) {
                     String value = getText();
                     if (value == null) {
                         value = "";
                     }
                     replace(0, getLength(), value, null);
-
-    /*              if( getLength() > 0 ){
-                        remove(0,getLength() );
-                        //removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
-                    }
-                    if(value!=null && value.length() > 0) {
-                        insertString(0,value, attribute);
-    //                  insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.INSERT), attribute );
-                    }
-    */          } else {
+         		} else {
                     if ( getLength() > 0 ) {
                         remove(0,getLength() );
     //                  removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
@@ -402,10 +320,8 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
             } catch(BadLocationException ble) {
                 ble.printStackTrace();
             }
-            addDocumentListener(documentListener);
-        }
 
-    } // end private class MyRowSetListener implements RowSetListener, Serializable {
+    } // end protected void updateDocument() {
 
     // THIS METHOD IS USED BY THE DOCUMENT LISTENERS WHEN EVER THE USER CHANGES THE TEXT IN
     // THE DOCUMENT THE CHANGES ARE PROPOGATED TO THE BOUND SSROWSET.
@@ -429,30 +345,30 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                 case Types.TINYINT:
                     // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
                     if ( strValue.equals("") ) {
-                        rs.updateNull(columnName);
+                        rowset.updateNull(columnName);
                     } else {
                         int intValue = Integer.parseInt(strValue);
-                        rs.updateInt(columnName, intValue);
+                        rowset.updateInt(columnName, intValue);
                     }
                     break;
 
                 case Types.BIGINT:
                     // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
                     if ( strValue.equals("") ) {
-                        rs.updateNull(columnName);
+                        rowset.updateNull(columnName);
                     } else {
                         long longValue = Long.parseLong(strValue);
-                        rs.updateLong(columnName, longValue);
+                        rowset.updateLong(columnName, longValue);
                     }
                     break;
 
                 case Types.FLOAT:
                     // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
                     if ( strValue.equals("") ) {
-                        rs.updateNull(columnName);
+                        rowset.updateNull(columnName);
                     } else {
                         float floatValue = Float.parseFloat(strValue);
-                        rs.updateFloat(columnName, floatValue);
+                        rowset.updateFloat(columnName, floatValue);
                     }
                     break;
 
@@ -461,32 +377,32 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                     // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
     //              System.out.println("ppr" + strValue + "ppr");
                     if ( strValue.equals("") ) {
-                        rs.updateNull(columnName);
+                        rowset.updateNull(columnName);
                     } else {
                         double doubleValue = Double.parseDouble(strValue);
-                        rs.updateDouble(columnName, doubleValue);
+                        rowset.updateDouble(columnName, doubleValue);
                     }
                     break;
 
                 case Types.BOOLEAN:
                 case Types.BIT:
                     if (strValue.equals("")) {
-                        rs.updateNull(columnName);
+                        rowset.updateNull(columnName);
                     } else {
                         // CONVERT THE GIVEN STRING TO BOOLEAN TYPE
                         boolean boolValue = Boolean.valueOf(strValue).booleanValue();
-                        rs.updateBoolean(columnName, boolValue);
+                        rowset.updateBoolean(columnName, boolValue);
                     }
                     break;
 
                 case Types.DATE:
                     // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
                     if ( strValue.equals("") ) {
-                        rs.updateNull(columnName);
+                        rowset.updateNull(columnName);
                     } else if (strValue.length() == 10) {
     //                  System.out.println(strValue);
     //                  Date dateValue = Date.valueOf(strValue);
-                        rs.updateDate(columnName, getSQLDate(strValue));
+                        rowset.updateDate(columnName, getSQLDate(strValue));
                     } else {
                         // do nothing
                     }
@@ -497,7 +413,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                 case Types.LONGVARCHAR:
                     // SINCE THIS IS TEXT FILED WE CAN INSERT AN EMPTY STRING TO THE DATABASE
     //              System.out.println( columnName + "      " + strValue);
-                    rs.updateString(columnName, strValue);
+                    rowset.updateString(columnName, strValue);
                     break;
 
                 default:
@@ -524,29 +440,29 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                 case Types.INTEGER:
                 case Types.SMALLINT:
                 case Types.TINYINT:
-                    value = String.valueOf(rs.getInt(columnName));
+                    value = String.valueOf(rowset.getInt(columnName));
                     break;
 
                 case Types.BIGINT:
-                    value = String.valueOf(rs.getLong(columnName));
+                    value = String.valueOf(rowset.getLong(columnName));
                     break;
 
                 case Types.FLOAT:
-                    value = String.valueOf(rs.getFloat(columnName));
+                    value = String.valueOf(rowset.getFloat(columnName));
                     break;
 
                 case Types.DOUBLE:
                 case Types.NUMERIC:
-                    value = String.valueOf(rs.getDouble(columnName));
+                    value = String.valueOf(rowset.getDouble(columnName));
                     break;
 
                 case Types.BOOLEAN:
                 case Types.BIT:
-                    value = String.valueOf(rs.getBoolean(columnName));
+                    value = String.valueOf(rowset.getBoolean(columnName));
                     break;
 
                 case Types.DATE:
-                    Date date = rs.getDate(columnName);
+                    Date date = rowset.getDate(columnName);
                     if (date == null) {
                         value = "";
                     } else {
@@ -563,14 +479,14 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                         }
                         value = value + calendar.get(Calendar.DAY_OF_MONTH) + "/";
                         value = value + calendar.get(Calendar.YEAR);
-                        //value = String.valueOf(rs.getDate(columnName));
+                        //value = String.valueOf(rowset.getDate(columnName));
                     }
                     break;
 
                 case Types.CHAR:
                 case Types.VARCHAR:
                 case Types.LONGVARCHAR:
-                    String str = rs.getString(columnName);
+                    String str = rowset.getString(columnName);
                     if (str == null) {
                         value = "";
                     } else {
@@ -611,6 +527,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.18  2005/02/04 23:05:10  yoda2
+ * no message
+ *
  * Revision 1.17  2005/02/04 22:48:54  yoda2
  * API cleanup & updated Copyright info.
  *
