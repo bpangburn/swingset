@@ -3,7 +3,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala
+ * Copyright (c) 2003-2005, The Pangburn Company, Inc. and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -91,20 +91,34 @@ public class SSImage extends JPanel{
      *  Construct a default SSImage Object.
      */
     public SSImage(){
-        setPreferredSize(new Dimension(200,200));
-        addListener();
-        addComponents();    
+        init();
     }
     
     /**
-     *    Constructs a SSImage Object bound to the specified column in the specified rowset.
-     *@param rowset - rowset from/to which data has to be read/written
-     *@param columnName - column in the rowset to which the component should be bound.
+     * Constructs a SSImage Object bound to the specified column in the specified rowset.
+     *
+     * @param rowset - rowset from/to which data has to be read/written
+     * @param columnName - column in the rowset to which the component should be bound.
      */
-    public SSImage(SSRowSet rowset, String columnName){
-        this();
-        bind(rowset, columnName);
+    public SSImage(SSRowSet _rowset, String _columnName) {
+        rowset = _rowset;
+        columnName = _columnName;
+        init();
+        bind();
     }
+    
+    /**
+     * Initialization code.
+     */
+    protected void init() {
+           
+        // SET PREFERRED DIMENSIONS
+            setPreferredSize(new Dimension(200,200));
+            
+// ADD LISTENERS & COMPONENTS
+        addListener();
+        addComponents(); 
+    }      
     
     /**
      *  adds listener to the update button.
@@ -187,13 +201,20 @@ public class SSImage extends JPanel{
      *@param rowset - rowset from/to which data has to be read/written
      *@param columnName - column in the rowset to which the component should be bound.
      */
-    public void bind(SSRowSet rowset, String columnName){
-        if(this.rowset != null)
-            this.rowset.removeRowSetListener(rowsetListener);
-        this.rowset = rowset;
-        this.columnName = columnName;
-        this.rowset.addRowSetListener(rowsetListener);
-
+    public void bind(SSRowSet _rowset, String _columnName){
+        if(rowset != null)
+            rowset.removeRowSetListener(rowsetListener);
+        rowset = _rowset;
+        columnName = _columnName;
+        rowset.addRowSetListener(rowsetListener);
+        
+        bind();
+    }
+    
+    /**
+     * Binds SSImage to the columnName in the rowset.
+     */
+    private void bind(){
         try{
             byte[] imageData = rowset.getRow() >0 ? rowset.getBytes(columnName) : null;
             if(imageData != null){
@@ -211,7 +232,7 @@ public class SSImage extends JPanel{
         }
         lblImage.setIcon(img);
         updateUI();
-    }
+    }    
     
     /**
      *  Reads the image from the rowset and sets it to the label for display.
@@ -284,4 +305,7 @@ public class SSImage extends JPanel{
 
 /*
  *$Log$
+ *Revision 1.1  2005/01/18 20:59:13  prasanth
+ *Initial Commit.
+ *
  */

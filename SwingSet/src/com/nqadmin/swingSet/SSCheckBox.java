@@ -102,8 +102,8 @@ public class SSCheckBox extends JCheckBox {
      * @param _columnName    name of the column to which this check box should be bound
      */
     public SSCheckBox(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
-        columnName = _columnName;
         rowset = _rowset;
+        columnName = _columnName;
         //textField.setDocument(new SSTextDocument(_rowset, _columnName));
         columnType = _rowset.getColumnType(_columnName);
         init();
@@ -177,6 +177,7 @@ public class SSCheckBox extends JCheckBox {
      * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
+        rowset = _rowset;
         columnName = _columnName;
         //textField.setDocument(new SSTextDocument(_rowset, _columnName));
         columnType = _rowset.getColumnType(_columnName);
@@ -414,6 +415,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.4  2005/02/01 17:32:37  yoda2
+ * API cleanup.
+ *
  * Revision 1.3  2005/01/21 22:55:00  yoda2
  * API cleanup.
  *
