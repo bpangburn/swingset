@@ -1,0 +1,19 @@
+New Roads, LA - February 21, 2005 - We have just released SwingSet 1.0.0-PR1 (Preview Release 1), an open source Java toolkit containing data-aware replacements for many of the standard Java Swing components.
+
+For SwingSet 1.0.0-PR1 the API & JavaDoc have undergone a major rewrite for consistency.  The image, label, slider, & formatting components are new for this release.  A utility class called SSSyncManager was also added for this release to simplify creation of screens with both combo box-based and navigator-based navigation (see Example4.java for an example).
+
+The following tasks remain to be done prior to the release of SwingSet 1.0.0-RC1 (Release Candidate 1):
+1. Bean property editors of some sort for connection/rowset/column properties.
+2. JavaDoc & examples for new formatting components.
+3. CVS tree/package reorganization of the formatting classes (if needed).
+4. Integration of the formatting classes into SSDataGrid.
+5. Deprecation of the formatting related methods in SSTextField.
+
+Hopefully these will be wrapped up in the next month, at which time we will release the first release candidate.  Any release candidates will be quickly followed by the first production release of SwingSet.
+
+A Java Web Start version of the SwingSet demo application is available from http://swingset.sourceforge.net/SwingSet.jnlp
+
+More information on SwingSet is available from:
+http://swingset.sourceforge.net 
+and
+http://sourceforge.net/projects/swingset
