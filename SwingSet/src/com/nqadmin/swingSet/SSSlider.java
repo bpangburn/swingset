@@ -53,19 +53,35 @@ import javax.swing.event.*;
  * @version $Revision$
  */
 public class SSSlider extends JSlider {
-
-    // TEXT FIELD BOUND TO THE DATABASE
-    protected JTextField textField = new JTextField();
     
-    // SSROWSET FROM WHICH THE LABEL WILL GET/SET VALUES
+    /**
+     * Text field bound to the SSRowSet.
+     */
+    protected JTextField textField = new JTextField();
+
+    /**
+     * SSRowSet from which component will get/set values.
+     */
     protected SSRowSet rowset;
 
-    // BINDING INFORMATION
+    /**
+     * SSRowSet column to which the component will be bound.
+     */
     protected String columnName;
-    protected int columnType;
 
-    // LISTENER FOR SLIDER AND TEXT FIELD
+    /**
+     * Column SQL data type.
+     */
+    protected int columnType;    
+
+    /**
+     * Component listener.
+     */
     private final MySliderListener sliderListener = new MySliderListener();
+    
+    /**
+     * Bound text field document listener.
+     */    
     private final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
     /**
@@ -121,28 +137,28 @@ public class SSSlider extends JSlider {
     }
 
     /**
-     * Returns the column name to which the slider is bound.
+     * Returns the SSRowSet column name to which the component is bound.
      *
-     * @return returns the column name to which to slider is bound.
+     * @return column name to which the component is bound
      */
     public String getColumnName() {
         return columnName;
     }
 
     /**
-     * Returns the SSRowSet being used to get the values.
+     * Returns the SSRowSet to which the component is bound.
      *
-     * @return returns the SSRowSet being used.
+     * @return SSRowSet to which the component is bound
      */
     public SSRowSet getSSRowSet() {
         return rowset;
     }
 
     /**
-     * Sets the column name to which the slider has to be bound
+     * Sets the SSRowSet column name to which the component is bound.
      *
-     * @param _columnName    column name in the SSRowSet to which the slider
-     *    is bound.
+     * @param _columnName    column name in the SSRowSet to which the component
+     *    is bound
      */
     public void setColumnName(String _columnName) throws java.sql.SQLException {
         columnName = _columnName;
@@ -150,9 +166,9 @@ public class SSSlider extends JSlider {
     }
 
     /**
-     * Sets the SSRowSet to be used.
+     * Sets the SSRowSet to which the component is bound.
      *
-     * @param _rowset    SSRowSet to be used for getting the values.
+     * @param _rowset    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _rowset) throws java.sql.SQLException {
         rowset = _rowset;
@@ -160,9 +176,7 @@ public class SSSlider extends JSlider {
     }
 
     /**
-     * The column name and the SSRowSet should be set before calling this function.
-     * If the column name and SSRowSet are set seperately then this function has to
-     * be called to bind the slider to the column in the SSRowSet.
+     * Method for handling binding of component to a SSRowSet column.
      */
     protected void bind() throws java.sql.SQLException {
 
@@ -189,11 +203,10 @@ public class SSSlider extends JSlider {
     }
 
     /**
-     * Sets the datasource and the columnName in the datasource to which the
-     * SSLabel has to be bound to.
+     * Sets the SSRowSet and column name to which the component is to be bound.
      *
      * @param _rowset    datasource to be used.
-     * @param _columnName    Name of the column to which this label should be bound
+     * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
 		rowset = _rowset;
@@ -201,6 +214,10 @@ public class SSSlider extends JSlider {
         bind();
     }
 
+    /**
+     * Updates the value displayed in the component based on the SSRowSet column
+     * binding.
+     */
 	protected void setDisplay() {
 
 		// SET THE SLIDER BASED ON THE VALUE IN THE TEXT FIELD
@@ -222,19 +239,26 @@ public class SSSlider extends JSlider {
 
     } // end protected void setDisplay() {
 
-    // ADDS LISTENERS FOR THE SLIDER AND TEXT FIELD
+    /**
+     * Adds listeners for component and bound text field (where applicable).
+     */
     private void addListeners() {
         textField.getDocument().addDocumentListener(textFieldDocumentListener);
         addChangeListener(sliderListener);
     }
 
-    // REMOVES THE LISTENERS FOR TEXT FIELD AND THE SLIDER DISPLAYED
+    /**
+     * Removes listeners for component and bound text field (where applicable).
+     */
     private void removeListeners() {
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
         removeChangeListener(sliderListener);
     }
 
-    // LISTENER FOR THE TEXT FIELD
+    /**
+     * Listener(s) for the bound text field used to propigate values back to the
+     * component's value.
+     */
     private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
         public void changedUpdate(DocumentEvent de) {
@@ -267,9 +291,10 @@ public class SSSlider extends JSlider {
 
     } // end private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
-    // LISTENER FOR THE SLIDER.
-    // ANY CHANGES MADE TO THE SLIDER BY THE USER ARE PROPOGATED BACK TO THE
-    // TEXT FIELD FOR FURTHER PROPOGATION TO THE UNDERLYING STORAGE STRUCTURE.
+    /**
+     * Listener(s) for the component's value used to propigate changes back to
+     * bound text field.
+     */
     private class MySliderListener implements ChangeListener, Serializable {
 
         public void stateChanged(ChangeEvent ce) {
@@ -288,6 +313,9 @@ public class SSSlider extends JSlider {
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/07 20:36:40  yoda2
+ * Made private listener data members final.
+ *
  * Revision 1.6  2005/02/05 05:16:33  yoda2
  * API cleanup.
  *

@@ -49,10 +49,14 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  */
 public class SSTextArea extends JTextArea {
     
-    // SSROWSET FROM WHICH THE LABEL WILL GET/SET VALUES
+    /**
+     * SSRowSet from which component will get/set values.
+     */
     protected SSRowSet rowset;
 
-    // BINDING INFORMATION
+    /**
+     * SSRowSet column to which the component will be bound.
+     */
     protected String columnName;
 
     /**
@@ -96,28 +100,28 @@ public class SSTextArea extends JTextArea {
     }
 
     /**
-     * Returns the column name to which the text area is bound.
+     * Returns the SSRowSet column name to which the component is bound.
      *
-     * @return returns the column name to which to text area is bound.
+     * @return column name to which the component is bound
      */
     public String getColumnName() {
         return columnName;
     }
 
     /**
-     * Returns the SSRowSet being used to get the values.
+     * Returns the SSRowSet to which the component is bound.
      *
-     * @return returns the SSRowSet being used.
+     * @return SSRowSet to which the component is bound
      */
     public SSRowSet getSSRowSet() {
         return rowset;
     }
 
     /**
-     * Sets the column name to which the text area has to be bound
+     * Sets the SSRowSet column name to which the component is bound.
      *
-     * @param _columnName    column name in the SSRowSet to which the text area
-     *    is bound.
+     * @param _columnName    column name in the SSRowSet to which the component
+     *    is bound
      */
     public void setColumnName(String _columnName) {
         columnName = _columnName;
@@ -125,9 +129,9 @@ public class SSTextArea extends JTextArea {
     }
 
     /**
-     * Sets the SSRowSet to be used.
+     * Sets the SSRowSet to which the component is bound.
      *
-     * @param _rowset    SSRowSet to be used for getting the values.
+     * @param _rowset    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _rowset) {
         rowset = _rowset;
@@ -135,9 +139,7 @@ public class SSTextArea extends JTextArea {
     }
 
     /**
-     * The column name and the SSRowSet should be set before calling this function.
-     * If the column name and SSRowSet are set seperately then this function has to
-     * be called to bind the slider to the column in the SSRowSet.
+     * Method for handling binding of component to a SSRowSet column.
      */
     protected void bind() {
 
@@ -158,11 +160,10 @@ public class SSTextArea extends JTextArea {
     }    
 
     /**
-     * Binds the text field to a SSTextDocument which is in turn bound to
-     * a particular column in a SSRowSet.
+     * Sets the SSRowSet and column name to which the component is to be bound.
      *
-     * @param _rowset  SSRowSet containing column to bind to
-     * @param _columnName  name of column within SSRowSet to bind to
+     * @param _rowset    datasource to be used.
+     * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _rowset, String _columnName) {
         rowset = _rowset;
@@ -176,6 +177,9 @@ public class SSTextArea extends JTextArea {
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/07 22:20:10  yoda2
+ * Added constructor to set component dimensions.
+ *
  * Revision 1.6  2005/02/05 05:16:33  yoda2
  * API cleanup.
  *
