@@ -306,8 +306,17 @@ public class SSTextField extends JTextField {
                 public void keyReleased(KeyEvent ke) {
                     if(mask == DECIMAL || mask == SSN){
                         int position = SSTextField.this.getCaretPosition();
-                        mask(ke);
-                        SSTextField.this.setCaretPosition(position);
+                        int length = SSTextField.this.getText().length();
+                        if(mask(ke)){
+                           int newLength = SSTextField.this.getText().length();
+                           if(newLength > length){
+                                SSTextField.this.setCaretPosition(position+1);
+                            }
+                            else{
+                                SSTextField.this.setCaretPosition(position);
+                            }    
+                        }
+                            
                     }
                 }
 
@@ -354,8 +363,10 @@ public class SSTextField extends JTextField {
      * Function to manage keystrokes for masks.
      *
      * @param _ke    the KeyEvent that occured
+     *@return returns true if function has detected a key it does not want to respond to
+     *like function keys etc else true.
      */
-    protected void mask(KeyEvent _ke) {
+    protected boolean mask(KeyEvent _ke) {
          // DECLARATIONS
             String str = getText();
             char ch = _ke.getKeyChar();
@@ -367,13 +378,13 @@ public class SSTextField extends JTextField {
                     _ke.getKeyCode() == KeyEvent.VK_ENTER   ||
                     _ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
 
-                return;
+                return false;
             } else if ( (_ke.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) == KeyEvent.CTRL_DOWN_MASK ||
                      (_ke.getModifiersEx() & KeyEvent.ALT_DOWN_MASK)  == KeyEvent.ALT_DOWN_MASK    ) {
 
-                return;
+                return false;
             } else if(!Character.isDefined(ch)) {
-                return;
+                return false;
             }
 
             if (getSelectionStart() != getSelectionEnd()) {
@@ -387,7 +398,7 @@ public class SSTextField extends JTextField {
                 case MMDDYYYY:
                 case DDMMYYYY:
                     if (getCaretPosition() < str.length()) {
-                        return;
+                        return false;
                     }
                     setText(dateMask(str, _ke));
                     break;
@@ -398,7 +409,7 @@ public class SSTextField extends JTextField {
                     setText(decimalMask(str, numberOfDecimalPlaces));
                     break;
             } // end switch
-
+            return true;
      } // end protected void mask(KeyEvent _ke) {
 
     /**
@@ -503,6 +514,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.22  2005/02/21 16:31:33  prasanth
+ * In bind checking for empty columnName before binding the component.
+ *
  * Revision 1.21  2005/02/13 15:40:15  yoda2
  * Removed redundant PropertyChangeListener and VetoableChangeListener class variables and methods from components with JComponent as an ancestor.  Also removed call to init() from setMask() method.
  *
