@@ -34,6 +34,8 @@ public class SSDataGrid extends JTable
 	SSTableModel tableModel 			= null;
 	
 	JScrollPane scrollPane = null; //ew JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	
+	int[] hiddenColumns = null;
 
 	/**
 	 *	Constructs a data grid with the data source set to the given rowset.
@@ -93,6 +95,27 @@ public class SSDataGrid extends JTable
 		
 		setHeader();
 		
+		// SET THE MINIMUM WIDTH OF COLUMNS TO 20
+		TableColumnModel columnModel = this.getColumnModel();
+		TableColumn column;
+		for(int i=0; i<columnModel.getColumnCount();i++){
+			column = columnModel.getColumn(i);
+			int j = -1;
+			if(hiddenColumns != null){
+				for(j=0; j<hiddenColumns.length;j++){
+					if(hiddenColumns[j] == i +1){
+						column.setMaxWidth(0);
+						break;
+					}
+				}
+				if(j == hiddenColumns.length)
+					column.setMinWidth(100);
+			}
+			else{
+				column.setMinWidth(100);
+			}
+		}
+		
 		this.addKeyListener(new KeyAdapter(){
 			private boolean controlPressed = false;
 			
@@ -110,7 +133,7 @@ public class SSDataGrid extends JTable
 						return;
 					
 					int numRows = getSelectedRowCount();
-					System.out.println("Num Rows Selected : " + numRows);
+//					System.out.println("Num Rows Selected : " + numRows);
 					if (numRows == 0)
 						return;
 					int[] rows = getSelectedRows();
@@ -120,8 +143,8 @@ public class SSDataGrid extends JTable
 						if( returnValue != JOptionPane.YES_OPTION)	
 							return;
 					}
-					for(int i=0;i<rows.length;i++){
-						System.out.println("Selected Rows " + rows[i]);
+					for(int i=rows.length -1;i>=0;i--){
+//						System.out.println("Selected Rows " + rows[i]);
 						tableModel.deleteRow(rows[i]);
 					}
 					//setModel(tableModel);
@@ -147,7 +170,8 @@ public class SSDataGrid extends JTable
 		constraints.gridwidth = columnCount;
 		this.add(grid,constraints);
 */			
-		scrollPane = new JScrollPane(this);
+		this.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		scrollPane = new JScrollPane(this,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
 
 		
 	}
@@ -178,11 +202,21 @@ public class SSDataGrid extends JTable
 	 			se.printStackTrace();
 	 		}
 	 	}
+	 	
 	 	if(updateUI)
 	 		updateUI();
 	 }
 	 
+	 /**
+	  *	return the value of the cell corresponding to _row and _column.
+	  *The rows and columns are numbers as 1, 2, so on.
+	  */
+	 public Object getValue(int _row, int _column){
+	 	return tableModel.getValueAt(_row-1, _column-1);
+	 }
+	 
 	 public void setPreferredSize(Dimension _dimension){
+	 	System.out.println("Setting Dimension of data grid.");
 	 	scrollPane.setPreferredSize(_dimension);
 	 }
 	 
@@ -196,6 +230,10 @@ public class SSDataGrid extends JTable
 	 	tableModel.setDefaultValues(_columnNumbers,_values);
 	 }	
 	 
+	 public Object getDefaultValue(int _columnNumber){
+	 	return tableModel.getDefaultValue(_columnNumber);
+	 }
+	 
 	 public void updateUI(){
 	 	super.updateUI();
 	 }
@@ -208,6 +246,7 @@ public class SSDataGrid extends JTable
     	tableModel.setSSDataValue(_dataValue);
     }	
     
+        
     public void setDateRenderer(int _column){
     	TableColumnModel columnModel = getColumnModel();
     	TableColumn tableColumn = columnModel.getColumn(_column -1);
@@ -221,6 +260,7 @@ public class SSDataGrid extends JTable
     	TableColumn tableColumn = columnModel.getColumn(_column -1);
     	tableColumn.setCellRenderer(new ComboRenderer(_displayItems, _underlyingValues));
     	tableColumn.setCellEditor(new ComboEditor(_displayItems, _underlyingValues));
+    	tableColumn.setMinWidth(250);
     }
     
     public void setHeaders(String[] _headers){
@@ -231,14 +271,19 @@ public class SSDataGrid extends JTable
     	tableModel.setUneditableColumns(_columnNumbers);
     }
     
+    public void setHiddenColumns(int[] _columnNumbers){
+    	hiddenColumns = _columnNumbers;
+    	tableModel.setHiddenColumns(_columnNumbers);
+    }
+    
     /**
 	 *	If the user has to decide on which cell has to be editable and which is not
 	 *then SSCellEditable interface has to be implemented and set it for the SSTableModel.
 	 *@param _cellEditable implementation of SSCellEditable interface.
 	 *
 	 */
-	 public void setSSCellEditable(SSCellEditable _cellEditable){
-	 	tableModel.setSSCellEditable( _cellEditable );
+	 public void setSSCellEditing(SSCellEditing _cellEditing){
+	 	tableModel.setSSCellEditing( _cellEditing );
 	 }
 	 
     
@@ -251,6 +296,21 @@ public class SSDataGrid extends JTable
    		public DateEditor(){
    			super(new JTextField());
    			super.setClickCountToStart(2);
+   			getComponent().addKeyListener(new KeyListener(){
+   				public void keyPressed(KeyEvent ke){}
+   				public void keyTyped(KeyEvent ke){}
+   				public void keyReleased(KeyEvent ke){
+   					if(ke.getKeyCode() == KeyEvent.VK_DELETE      ||
+   						ke.getKeyCode() == KeyEvent.VK_BACK_SPACE ||
+   						ke.getKeyCode() == KeyEvent.VK_LEFT       ||
+	 					ke.getKeyCode() == KeyEvent.VK_RIGHT      
+	 				  )
+   						return;
+   					String str = ((JTextField)(DateEditor.this.getComponent())).getText();
+   					((JTextField)(DateEditor.this.getComponent())).setText(dateMask(str,ke));
+   				}
+   			});
+   				
    			   			
    		}
    		// RETURNS THE TEXTFIELD WITH THE GIVEN DATE IN THE TEXTFIELD
@@ -314,7 +374,10 @@ public class SSDataGrid extends JTable
     	
     	public Component getTableCellRendererComponent(JTable _table, Object _value, 
     		boolean _selected, boolean _hasFocus, int _row, int _column){
-    		setSelectedIndex(getIndexOf(_value));
+    		if(getItemCount() > 0 )
+    			setSelectedIndex(getIndexOf(_value));
+    		else
+    			System.out.println("Combo Renderer: No item in combo that corresponds to " + _value );	
     		return this;		
     	}
     	
@@ -361,31 +424,13 @@ public class SSDataGrid extends JTable
     			return new Integer( ((JComboBox)getComponent()).getSelectedIndex()); 
     			
     		int index = ((JComboBox)getComponent()).getSelectedIndex(); 	
-    		System.out.println("Index is "+ index);
+//    		System.out.println("Index is "+ index);
     		if (index == -1)
     				return underlyingValues[0];
     				
     		return underlyingValues[index];
     	}
-/*    	
-    	public boolean shouldSelectCell(EventObject event){
-    		return true;
-    	}
-    	
-    	public void cancelCellEditing(){
-    		
-    	}
-    	
-    	public void addCellEditorListener(CellEditorListener l){
-    	}
-    	
-    	public void removeCellEditorListener(CellEditorListener l){
-    	}
-    	
-    	public boolean stopCellEditing(){
-    		return true;
-    	}
- */   	
+  	
     	private int getIndexOf(Object _value){
     		if(underlyingValues == null)
     			return ((Integer)_value).intValue();
@@ -395,6 +440,107 @@ public class SSDataGrid extends JTable
     		}
     		return 0;
     	}
-    }	    		 
+    }	
+    
+    
+/*    private class DBComboRenderer extends SSDBComboBox implements TableCellRenderer {
+    	
+      	public Component getTableCellRendererComponent(JTable _table, Object _value, 
+    		boolean _selected, boolean _hasFocus, int _row, int _column){
+    		super.getTextField().setText(_value);
+    		return this;		
+    	}
+    	
+   	}    
+   	
+   	private class DBComboEditor extends DefaultCellEditor{    	
+    	
+    	int clickCountToStart = 2;
+    	    	
+    	public DBComboEditor(Connection _conn, String _query, String _columnName, String _displayColumnName) {
+    		super(new SSDBComboBox());
+    		underlyingValues = _underlyingValues;	
+      	}
+    	
+    	public boolean isCellEditable(EventObject event){
+    		if(event instanceof MouseEvent){
+    			return ((MouseEvent)event).getClickCount() >= clickCountToStart;
+    		}
+    		return true;
+    	}
+    	
+    	public Component getTableCellEditorComponent(JTable _table, Object _value, 
+    	    					boolean _selected, int _row, int _column){
+    		JComboBox comboBox = (JComboBox)getComponent();
+    		comboBox.setSelectedIndex(getIndexOf(_value));
+    		return comboBox;
+    	}
+    	
+    	public Object getCellEditorValue(){
+    		if( underlyingValues == null)
+    			return new Integer( ((JComboBox)getComponent()).getSelectedIndex()); 
+    			
+    		int index = ((JComboBox)getComponent()).getSelectedIndex(); 	
+//    		System.out.println("Index is "+ index);
+    		if (index == -1)
+    				return underlyingValues[0];
+    				
+    		return underlyingValues[index];
+    	}
+  	
+    	private int getIndexOf(Object _value){
+    		if(underlyingValues == null)
+    			return ((Integer)_value).intValue();
+    		for(int i=0;i<underlyingValues.length;i++){
+    			if(underlyingValues[i].equals(_value))
+    				return i;
+    		}
+    		return 0;
+    	}
+    }	
+*/     // HANDLES THE DATE MASK.
+	 // SETTING THE SLASHES FOR THE USER.
+	 private String dateMask(String str, KeyEvent ke){
+	 	switch(str.length()){
+			case 2:
+				if( ke.getKeyChar() == '/' ){
+					
+					str =  "0" + str ;
+					
+				}
+				else{
+					str = str + "/";
+					
+				}
+				break;
+			case 5:
+				if( ke.getKeyChar() == '/' ){
+					String newStr = str.substring(0,3);
+					newStr = newStr + "0" + str.substring(3,4) + "/";
+					str = newStr;
+					
+				}
+				else{
+					str = str + "/";
+					
+				}
+				break;
+			case 3:
+			case 6:
+				if( ke.getKeyChar() != '/' ){
+					str = str + "/";
+					
+				}
+				break;
+			case 4:
+			case 7:
+				if( ke.getKeyChar() == '/' ){
+					str = str.substring(0,str.length()-1);
+					
+				}
+				break;
+		}
+		return str;	
+	}    		 
 }
 	
