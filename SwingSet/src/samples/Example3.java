@@ -53,7 +53,6 @@ import com.nqadmin.swingSet.datasources.SSConnection;
  	SSDBComboBox cmbPartName = null;
  	JTextField txtQuantity   = new JTextField();
 
-
  	SSConnection ssConnection = null;
  	SSJdbcRowSetImpl rowset   = null;
  	SSDataNavigator navigator = null;
@@ -88,11 +87,11 @@ import com.nqadmin.swingSet.datasources.SSConnection;
  		}
 
  		String query = "SELECT * FROM supplier_data;";
- 		cmbSupplierName = new SSDBComboBox(ssConnection.getConnection(), query, "supplier_id", "supplier_name");
+ 		cmbSupplierName = new SSDBComboBox(ssConnection, query, "supplier_id", "supplier_name");
  		cmbSupplierName.bind(rowset,"supplier_id");
 
 		query = "SELECT * FROM part_data;";
-		cmbPartName = new SSDBComboBox(ssConnection.getConnection(), query, "part_id", "part_name");
+		cmbPartName = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
  		cmbPartName.bind(rowset,"part_id");
 
  		txtQuantity.setDocument(new SSTextDocument(rowset,"quantity"));
@@ -150,4 +149,7 @@ import com.nqadmin.swingSet.datasources.SSConnection;
  }
 /*
  * $Log$
+ * Revision 1.5  2004/10/25 22:01:16  yoda2
+ * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ *
  */ 

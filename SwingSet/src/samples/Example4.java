@@ -113,7 +113,7 @@ import com.nqadmin.swingSet.datasources.SSConnection;
  		txtPartIDLinkedToCombo.setText(txtPartID.getText());
 
 		String query = "SELECT * FROM part_data;";
-		cmbSelectPart = new SSDBComboBox(ssConnection.getConnection(), query,
+		cmbSelectPart = new SSDBComboBox(ssConnection, query,
 			"part_id", "part_name", txtPartIDLinkedToCombo);
 		try{
  			cmbSelectPart.execute();
@@ -269,4 +269,7 @@ import com.nqadmin.swingSet.datasources.SSConnection;
  }
 /*
  * $Log$
+ * Revision 1.5  2004/10/25 22:01:16  yoda2
+ * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ *
  */
