@@ -145,6 +145,11 @@ public class SSDataGrid extends JTable {
 	// NUMBER OF RECORDS RETRIVED
 	private int rowCount = -1;
     
+    /**
+     * Minimum width of the columns in the data grid.
+     */
+    protected int minColumnWidth = 100;
+     
 	/**
      * Table model to construct the JTable
      */
@@ -193,6 +198,15 @@ public class SSDataGrid extends JTable {
 //super(VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_ALWAYS);
 	}
 	
+	
+	/**
+	 *	Sets the minimum column width for the data grid.
+	 *@param _width - minimum column width of the each column.
+	 */
+	public void setColumnWidth(int _width){
+		minColumnWidth = _width;
+	} 
+	 
 	/**
 	 * Set the component on which the error messages will be popped up.
 	 * The error dialog will use this component as its parent component.
@@ -602,12 +616,26 @@ public class SSDataGrid extends JTable {
      *  item in the combo box is selected.
      */
     public void setComboRenderer(int _column, Object[] _displayItems, Object[] _underlyingValues) {
+    	setComboRenderer(_column, _displayItems, _underlyingValues, 250);	
+    }
+    
+    /**
+     * Sets a combo box renderer for the specified column.
+     * This is use full to limit the values that go with a column or if an underlying code
+     * is do be displayed in a more meaningfull manner.
+     *
+     * @param _column  column number for which combo renderer is to be provided.
+     * @param _displayItems    the actual Objects to be displayed in the combo box.
+     * @param _underlyingValues    the values that have to be written to the database when an
+     *  item in the combo box is selected.
+     */
+    public void setComboRenderer(int _column, Object[] _displayItems, Object[] _underlyingValues, int _columnWidth) {
     	setRowHeight(20);
     	TableColumnModel columnModel = getColumnModel();
     	TableColumn tableColumn = columnModel.getColumn(_column);
     	tableColumn.setCellRenderer(new ComboRenderer(_displayItems, _underlyingValues));
     	tableColumn.setCellEditor(new ComboEditor(_displayItems, _underlyingValues));
-    	tableColumn.setMinWidth(250);
+    	tableColumn.setMinWidth(_columnWidth);
     }
     
     /**
@@ -620,13 +648,28 @@ public class SSDataGrid extends JTable {
      *  item in the combo box is selected.
      */
     public void setComboRenderer(String _column, Object[] _displayItems, Object[] _underlyingValues) throws SQLException {
+    	setComboRenderer(_column, _displayItems, _underlyingValues, 250);
+    }
+    
+    
+    /**
+     * Sets a combo box renderer for the specified column.
+     * This is use full to limit the values that go with a column or if an underlying code
+     * is do be displayed in a more meaningfull manner.
+     * @param _column  column name for which combo renderer is to be provided.
+     * @param _displayItems    the actual Objects to be displayed in the combo box.
+     * @param _underlyingValues    the values that have to be written to the database when an
+     *  item in the combo box is selected.
+     * @param _columnWidth required minimum width for this column
+     */
+    public void setComboRenderer(String _column, Object[] _displayItems, Object[] _underlyingValues, int _columnWidth) throws SQLException {
     	int column = rowset.findColumn(_column)-1;
     	setRowHeight(20);
     	TableColumnModel columnModel = getColumnModel();
     	TableColumn tableColumn = columnModel.getColumn(column);
     	tableColumn.setCellRenderer(new ComboRenderer(_displayItems, _underlyingValues));
     	tableColumn.setCellEditor(new ComboEditor(_displayItems, _underlyingValues));
-    	tableColumn.setMinWidth(250);
+    	tableColumn.setMinWidth(_columnWidth);
     }
     
     /**
@@ -738,11 +781,11 @@ public class SSDataGrid extends JTable {
 					}
 				}
 				if (j == hiddenColumns.length) {
-					column.setMinWidth(100);
+					column.setMinWidth(minColumnWidth);
                 }
 			} else {
 			// SET OTHER COLUMNS MIN WIDTH TO 100
-				column.setMinWidth(100);
+				column.setMinWidth(minColumnWidth);
 			}
 		}
 		updateUI();
@@ -849,20 +892,30 @@ public class SSDataGrid extends JTable {
     private class ComboRenderer extends JComboBox implements TableCellRenderer {
     	
     	Object[] underlyingValues = null;
+    	JLabel label = new JLabel();
+    	Object[] displayValues = null;
     	
     	public ComboRenderer(Object[] _items, Object[] _underlyingValues) {
     		super(_items);
     		underlyingValues = _underlyingValues;
+    		displayValues = _items;
     	}
     	
     	public Component getTableCellRendererComponent(JTable _table, Object _value, 
     		boolean _selected, boolean _hasFocus, int _row, int _column){
+    		int index = -1;	
             if (getItemCount() > 0) {
-    			setSelectedIndex(getIndexOf(_value));
+//    			setSelectedIndex(getIndexOf(_value));
+    			index = getIndexOf(_value);
     		} else {
     			System.out.println("Combo Renderer: No item in combo that corresponds to " + _value );
             }
-    		return this;		
+//    		return this;
+			if(index == -1)
+				label.setText("");
+			else
+				label.setText(displayValues[index].toString());
+			return label;
     	}
     	
     	private int getIndexOf(Object _value) {
@@ -977,6 +1030,10 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.11  2004/09/27 15:47:19  prasanth
+ * Added hideColumns function.
+ * Calling createDefaultColumnModel function in setRowSet if the rowset is not null.
+ *
  * Revision 1.10  2004/08/10 22:06:59  yoda2
  * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
  *
