@@ -86,28 +86,87 @@ http://sourceforge.net/projects/swingset
 
 Unzip the file rowset.jar from the Sun file to the same location as
 swingset.jar and add both JAR files to your CLASSPATH. Alternatively, you can
-copy both files to the the /jre/lib/ext subdirectory of both your JDK and JRE.
+copy both files to the the /jre/lib/ext subdirectory of your JDK (for
+compiling) and the /lib/ext subdirectory of your JRE (for execution).
 
 SwingSet has been tested with J2SE 1.4.2, but should work with all J2SE 1.4
 releases.
 
+Note that you will also need a JDBC driver for your target database.  If the
+driver is available as a JAR file, it should be added to your CLASSPATH or
+placed in the same /lib/ext subdirectories mentioned above.
+
 
 ==============================================================================
-DEMO PROGRAMS
+SAMPLE/DEMO PROGRAMS
 ==============================================================================
 
-Download the latest SwingSet demo JAR file from:
+The sample/demo programs provided with SwingSet utilize a read only PostgreSQL
+database based on the suppliers-and-parts database referenced in the classic
+database textbook, "An Introduction to Database Systems,"  by C. J. Date.
+Therefore the PostgreSQL JDBC driver is required.  The JDBC JAR file is
+available from:
+http://jdbc.postgresql.org/download/pg73jdbc3.jar
+
+This file should be added to your CLASSPATH or placed in the same /lib/ext
+subdirectories mentioned under "INSTALLATION."
+
+After installing the JDBC driver, download the latest SwingSet demo JAR file
+to the location of your choice.  The file is available from:
 http://sourceforge.net/projects/swingset
 
 This is an executable JAR so on many platforms, you only need to double-click
 the JAR file ssdemo.jar to launch the demo.  If that doesn't work then type:
-  java -jar ssdemo.jar
+  java -jar <demo jar file name here>
   
-Please note that the demo requires both the rowset.jar and swingset.jar files.
-See the "INSTALLATION" section above for more information.
+  e.g.
+       java -jar swingset-demo_0.5.0_alpha.jar
+  
+Please note that the demo requires both the rowset.jar and latest SwingSet
+binary JAR files (e.g. swingset-bin_0.5.0_alpha.jar). See the "INSTALLATION"
+section above for more information.
 
 The demo will attempt to connect to a small, remote, read only database so an
 Internet connection is required.
+
+***********************
+Example1
+***********************
+This example demonstrates the use of SSTextDocument to display information in
+JTextField (Name, City, and Status). The navigation is done with
+SSDataNavigator.
+
+
+***********************
+Example2
+***********************
+This example demonstrates the use of SSTextDocument to display information in
+JTextField (Name and City) and SSComboBox (Status). The navigation is done with
+SSDataNavigator.
+
+***********************
+Example3
+***********************
+This example demonstrates the use of SSTextDocument to display information in
+SSDBComboBox (Supplier and Part) and JTextField (Quantity). The navigation
+is done with SSDataNavigator.
+
+
+***********************
+Example4
+***********************
+This example demonstrates the use of SSDBComboBox for record navigation.
+Navigation can be accomplished using either the Part combobox or the
+navigation bar. Since the part name is used for navigation it can't be
+updated (note that none of the fields in these examples can actually be
+updated since the database is read only).
+
+Since the navigation can take place by multiple methods, the navigation
+controls have to be synchronized.  This is done using a hidden JTextField
+containing the part_id and an event listener.
+
+This example also demonstrates the use of SSTextDocument to display
+information in SSComboBox (Color) and JTextField (Weight and City).
 
 
 ==============================================================================
