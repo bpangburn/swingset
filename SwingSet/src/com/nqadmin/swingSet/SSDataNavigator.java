@@ -662,7 +662,14 @@ public class SSDataNavigator extends JPanel {
 						if ( dbNav != null ) {
 							dbNav.performPostInsertOps();
                         }
+					
 						rowset.moveToCurrentRow();
+					// MOVE TO CURRENT ROW MOVES ROWSET TO RECORD AT WHICH ADD WAS PRESSED.
+					// BUT IT NICE TO BE ON THE ADDED ROW WHICH IS THE LAST ONE IN THE ROWSET.
+					// ALSO MOVE TO CURRENT ROW MOVES THE ROWSET POSITION BUT DOES NOT TRIGGER
+					// ANY EVENT FOR THE LISTENERS AS A RESULT VALUES ON THE SCREEN WILL NOT
+					// DISPLAY THE CURRENT RECORD VALUES.
+						rowset.last();
 					// INCREMENT THE ROW COUNT
 						rowCount++;
 					// SET THE ROW COUNT AS LABEL
@@ -744,10 +751,11 @@ public class SSDataNavigator extends JPanel {
 						if (!rowset.next()) {
 							rowCount = 0;
 							currentRow = 0;
-							firstButton.setEnabled(true);
+							firstButton.setEnabled(false);
 							previousButton.setEnabled(false);
-							nextButton.setEnabled(true);
-							lastButton.setEnabled(true);
+							nextButton.setEnabled(false);
+							lastButton.setEnabled(false);
+							
 						} else {
 						// IF THERE ARE ROWS GET THE ROW COUNT	
 							rowset.last();
@@ -756,8 +764,8 @@ public class SSDataNavigator extends JPanel {
 							currentRow = rowset.getRow();
 							firstButton.setEnabled(false);
 							previousButton.setEnabled(false);
-							nextButton.setEnabled(false);
-							lastButton.setEnabled(false);
+							nextButton.setEnabled(true);
+							lastButton.setEnabled(true);
 						}
 					// SET THE ROW COUNT AS LABEL
 						lblRowCount.setText("of " + rowCount);	
@@ -870,6 +878,11 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.16  2004/09/01 18:42:08  prasanth
+ * Was calling next in the refresh listener. This would move to second record
+ * if refresh is pressed. If there is only one record then user will not be able to
+ * see as the navigation buttons are also disabled.
+ *
  * Revision 1.15  2004/08/26 22:00:00  prasanth
  * Setting all the buttons when a new rowset is set.
  *
