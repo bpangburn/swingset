@@ -22,6 +22,9 @@ Java-Bean: True
 Name: com/nqadmin/swingSet/SSSlider.class
 Java-Bean: True
 
+Name: com/nqadmin/swingSet/SSImage.class
+Java-Bean: True
+
 Name: com/nqadmin/swingSet/SSDataNavigator.class
 Java-Bean: True
 
