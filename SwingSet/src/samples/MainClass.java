@@ -46,6 +46,9 @@ public class MainClass extends JFrame {
 	JButton btnExample2 = new JButton("Example2");
 	JButton btnExample3 = new JButton("Example3");
 	JButton btnExample4 = new JButton("Example4");
+	JButton btnExample5 = new JButton("Example5");
+	JButton btnExample6 = new JButton("Example6");
+	JButton btnExample7 = new JButton("Example7");
 		
 	public MainClass(){
 		
@@ -58,17 +61,26 @@ public class MainClass extends JFrame {
 		btnExample2.addActionListener( new MyButtonListener());
 		btnExample3.addActionListener( new MyButtonListener());
 		btnExample4.addActionListener( new MyButtonListener());
+		btnExample5.addActionListener( new MyButtonListener());
+		btnExample6.addActionListener( new MyButtonListener());
+		btnExample7.addActionListener( new MyButtonListener());
 		
 		btnExample1.setPreferredSize(new Dimension(150,25));
 		btnExample2.setPreferredSize(new Dimension(150,25));
 		btnExample3.setPreferredSize(new Dimension(150,25));
 		btnExample4.setPreferredSize(new Dimension(150,25));
+		btnExample5.setPreferredSize(new Dimension(150,25));
+		btnExample6.setPreferredSize(new Dimension(150,25));
+		btnExample7.setPreferredSize(new Dimension(150,25));
 		
 		getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
 		getContentPane().add(btnExample1);
 		getContentPane().add(btnExample2);
 		getContentPane().add(btnExample3);
 		getContentPane().add(btnExample4);
+		getContentPane().add(btnExample5);
+		getContentPane().add(btnExample6);
+		getContentPane().add(btnExample7);
 		
 		setVisible(true);
 		pack();
@@ -92,6 +104,15 @@ public class MainClass extends JFrame {
 			}
 			else if(ae.getSource().equals(btnExample4)){
 				new Example4();
+			}
+			else if(ae.getSource().equals(btnExample5)){
+				new Example5();
+			}
+			else if(ae.getSource().equals(btnExample6)){
+				new Example6();
+			}
+			else if(ae.getSource().equals(btnExample7)){
+				new Example7();
 			}
 		}
 	}
