@@ -30,8 +30,6 @@
  *
  */
 
-
-
 package com.nqadmin.swingSet;
 
 import java.io.Serializable;
@@ -70,15 +68,19 @@ public class SSDBNavAdapter implements SSDBNav, Serializable {
 	
 	public void performRefreshOps(){
 	}
+    
 	public void performCancelOps(){
 	}
 
-}
+} // end public class SSDBNavAdapter implements SSDBNav, Serializable {
 
 
 
 /*
  * $Log$
+ * Revision 1.5  2004/08/02 15:22:51  prasanth
+ * Implements Serializable.
+ *
  * Revision 1.4  2004/03/08 16:43:37  prasanth
  * Updated copy right year.
  *

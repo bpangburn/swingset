@@ -29,51 +29,55 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
- 
- 
+
 package com.nqadmin.swingSet;
 
 import javax.swing.*;
 import java.io.Serializable;
 
 /**
-  * SSCellEditingAdapter.java
+ * SSCellEditingAdapter.java
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- *<p><pre
+ *<p><pre>
+ * This abstract adapter class is provided as a convenience for creating
+ * custom SSCellEditing objects.  Extend this class to create a SSCellEditing
+ * implementation.
  *
- *	This abstract adapter class is provided as a convenience for creating
- *custom SSCellEditing objects.  Extend this class to create a SSCellEditing
- *implementation.
- *
- *	SSCellEditingAdapter defines empty functions so that the programmer can define
- *only the functions desired.  Both isCellEditable() and cellUpdateRequested()
- *always return true.
- *
+ * SSCellEditingAdapter defines empty functions so that the programmer can define
+ * only the functions desired.  Both isCellEditable() and cellUpdateRequested()
+ * always return true.
+ *</pre><p>
+ * @author	$Author$
+ * @version	$Revision$ 
  */
-public abstract class SSCellEditingAdapter implements SSCellEditing, Serializable{
+public abstract class SSCellEditingAdapter implements SSCellEditing, Serializable {
 	
 	/**
-	 *	This empty implementation always returns true.
-	 *For description about the function look in SSCellEditing class.
+	 * This empty implementation always returns true.
+	 * For description about the function look in SSCellEditing class.
 	 */
-	public boolean isCellEditable(int _row, int _column){
+	public boolean isCellEditable(int _row, int _column) {
 		return true;
 	}
 	
 	/**
-	 *	This empty implementation always returns true.
-	 *For description about the function look in SSCellEditing class.
+	 * This empty implementation always returns true.
+	 * For description about the function look in SSCellEditing class.
 	 */
 	public boolean cellUpdateRequested(int _row, int _column, Object _oldValue, Object _newValue){
 		return true;
 	}
-}
+    
+} // end public abstract class SSCellEditingAdapter
 
 
 
 /*
  * $Log$
+ * Revision 1.4  2004/08/02 14:29:46  prasanth
+ * implements serializable.
+ *
  * Revision 1.3  2004/03/08 16:43:37  prasanth
  * Updated copy right year.
  *

@@ -30,16 +30,10 @@
  *
  */
 
-
-
 package com.nqadmin.swingSet;
-
-
 
 import java.awt.*;
 import javax.swing.*;
-
-
 
 /**
  * SSDBNavImp.java
@@ -69,110 +63,98 @@ public class SSDBNavImp extends SSDBNavAdapter {
 	Container container = null;
 
 	/**
-	 * constructs a SSDBNavImp with the specified container.
+	 * Constructs a SSDBNavImp with the specified container.
 	 */
 	public SSDBNavImp( Container _container ) {
 		container = _container;
 	}
 
 	/**
-	 * clears all the JTextFields and resets the combo boxes to first item.
+	 * Clears all the JTextFields and resets the combo boxes to first item.
 	 *
-	 *	This is done for all the JTextFields and combo boxes recursively looking in to the
-	 *JTabbedPanes and JPanels inside the given container.
+	 * This is done for all the JTextFields and combo boxes recursively looking in to the
+	 * JTabbedPanes and JPanels inside the given container.
 	 */
-	public void performPreInsertOps(){
+	public void performPreInsertOps() {
 
 		Component[] comps = container.getComponents();
 
-		for(int i=0; i< comps.length; i++ ){
-			//IF ITS TEXTFIELD SET ITS TEXT TO EMPTY STRING
-			if(comps[i] instanceof JTextField){
+		for (int i=0; i< comps.length; i++ ) {
+			if (comps[i] instanceof JTextField) {
+			// IF IT IS A TEXTFIELD SET ITS TEXT TO EMPTY STRING
 				((JTextField)comps[i]).setText("");
-			}
-			else if (comps[i] instanceof JComboBox ){
-				JComboBox combo = ((JComboBox)comps[i]);
-				if(combo.getItemCount() > 0){
-					combo.setSelectedIndex(0);
-				}
-			}
-			// IF ITS A SSComboBox THEN SEE IF THERE ARE ANY ITEMS INSIDE IT  IF YES SET IT TO
-			// FIRST ITEM IN THE COMBO
-			else if (comps[i] instanceof SSComboBox ){
+			} else if (comps[i] instanceof JComboBox) {
+			// IF ITS A JComboBox THEN SEE IF THERE ARE ANY ITEMS INSIDE IT. IF YES, SET IT TO
+			// 'EMPTY' ITEM BEFORE FIRST ITEM
+                JComboBox combo = ((JComboBox)comps[i]);
+				combo.setSelectedIndex(-1);
+			} else if (comps[i] instanceof SSComboBox) {
+			// IF ITS A SSComboBox THEN SEE IF THERE ARE ANY ITEMS INSIDE IT. IF YES, SET IT TO
+			// 'EMPTY' ITEM BEFORE FIRST ITEM
 				JComboBox combo = ((SSComboBox)comps[i]).getComboBox();
-				if(combo.getItemCount() > 0){
-					combo.setSelectedIndex(0);
-				}
-			}
+				combo.setSelectedIndex(-1);
+			} else if (comps[i] instanceof SSDBComboBox) {
 			// IF ITS A SSDBComboBox THEN SEE IF THERE ARE ANY ITEMS INSIDE IT  IF YES SET IT TO
-			// FIRST ITEM IN THE COMBO
-			else if (comps[i] instanceof SSDBComboBox ){
+			// 'EMPTY' ITEM BEFORE FIRST ITEM
 				JComboBox combo = ((SSDBComboBox)comps[i]).getComboBox();
-				if(combo.getItemCount() > 0){
-					combo.setSelectedIndex(0);
-				}
-			}
-			//IF ITS A JPANEL RECURSIVELY SET THE FIELDS
-			else if(comps[i] instanceof  JPanel) {
+				combo.setSelectedIndex(-1);
+			} else if(comps[i] instanceof  JPanel) {
+			// IF ITS A JPANEL RECURSIVELY SET THE FIELDS
+				setComponents((Container)comps[i]);
+			} else if(comps[i] instanceof JTabbedPane) {
+			// IF ITS A JTABBEDPANE RECURSIVELY SET THE FIELDS
 				setComponents((Container)comps[i]);
 			}
-			//IF ITS A JTABBEDPANE RECURSIVELY SET THE FIELDS
-			else if(comps[i] instanceof JTabbedPane) {
-				setComponents((Container)comps[i]);
-			}
-
 
 		}
-	}
+	} // end public void performPreInsertOps() {
 	
-	/**
-	 * function to clear the JTextFields and ComboBoxes recursively inside a JPanel or JTabbedPane
-	 */
-	private void setComponents(Container innerContainer){
+	// FUNCTION TO CLEAR THE JTEXTFIELDS AND COMBOBOXES RECURSIVELY INSIDE A JPANEL OR JTABBEDPANE
+	private void setComponents(Container innerContainer) {
+        
 		Component[] comps = innerContainer.getComponents();
 
-		for(int i=0; i< comps.length; i++ ){
-			if(comps[i] instanceof JTextField){
+		for (int i=0; i< comps.length; i++ ) {
+			if (comps[i] instanceof JTextField) {
+            // IF IT IS A TEXTFIELD SET ITS TEXT TO EMPTY STRING
 				((JTextField)comps[i]).setText("");
-			}
-			else if (comps[i] instanceof JComboBox ){
-				JComboBox combo = ((JComboBox)comps[i]);
-				if(combo.getItemCount() > 0){
-					combo.setSelectedIndex(-1);
-				}
-			}
+			} else if (comps[i] instanceof JComboBox) {
+			// IF ITS A JComboBox THEN SEE IF THERE ARE ANY ITEMS INSIDE IT. IF YES, SET IT TO
+			// 'EMPTY' ITEM BEFORE FIRST ITEM
+                JComboBox combo = ((JComboBox)comps[i]);
+				combo.setSelectedIndex(-1);
+			} else if (comps[i] instanceof SSComboBox) {
 			// IF ITS A SSComboBox THEN SEE IF THERE ARE ANY ITEMS INSIDE IT  IF YES SET IT TO
-			// FIRST ITEM IN THE COMBO
-			else if (comps[i] instanceof SSComboBox ){
+			// 'EMPTY' ITEM BEFORE FIRST ITEM
 				JComboBox combo = ((SSComboBox)comps[i]).getComboBox();
-				if(combo.getItemCount() > 0){
-					combo.setSelectedIndex(-1);
-				}
-			}
+				combo.setSelectedIndex(-1);
+			} else if (comps[i] instanceof SSDBComboBox) {
 			// IF ITS A SSDBComboBox THEN SEE IF THERE ARE ANY ITEMS INSIDE IT  IF YES SET IT TO
-			// FIRST ITEM IN THE COMBO
-			else if (comps[i] instanceof SSDBComboBox ){
+			// 'EMPTY' ITEM BEFORE FIRST ITEM
 				JComboBox combo = ((SSDBComboBox)comps[i]).getComboBox();
-				if(combo.getItemCount() > 0){
-					combo.setSelectedIndex(-1);
-				}
-			}
-			else if(comps[i] instanceof  JPanel) {
+				combo.setSelectedIndex(-1);
+			} else if(comps[i] instanceof JPanel) {
+            // IF ITS A JPANEL RECURSIVELY SET THE FIELDS
 				setComponents((Container)comps[i]);
-			}
-			else if(comps[i] instanceof JTabbedPane) {
+			} else if(comps[i] instanceof JTabbedPane) {
+            // IF ITS A JTABBEDPANE RECURSIVELY SET THE FIELDS
 				setComponents((Container)comps[i]);
 			}
 
 		}
-	}
+        
+	} // end private void setComponents(Container innerContainer) {
 
-}
+} // end public class SSDBNavImp extends SSDBNavAdapter {
 
 
 
 /*
  * $Log$
+ * Revision 1.5  2004/08/09 21:28:50  prasanth
+ * The default selection of first item is removed.
+ * Now no item will be selected (setting the selection to -1)
+ *
  * Revision 1.4  2004/03/08 16:43:37  prasanth
  * Updated copy right year.
  *

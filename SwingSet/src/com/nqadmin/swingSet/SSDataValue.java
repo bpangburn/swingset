@@ -37,26 +37,33 @@ package com.nqadmin.swingSet;
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  *<p><pre>
- *
- *	The SSDataValue interface specifies methods for SSTableModel
- *to retrieve the value for primary column in JTable.
+ * The SSDataValue interface specifies methods for SSTableModel
+ * to retrieve the value for primary column in JTable.
+ *</pre><p>
+ * @author	$Author$
+ * @version	$Revision$
  */
 public interface SSDataValue {
 	
 	/**
-	 *	Returns the value for the primary column in the JTable( Rowset
-	 *used for building the JTable). When a addtion of row is taking
-	 *place in the JTable, SSTableModel tries to insert a primary
-	 *key value in to that row returned by this function.
-	 *@return the value for the primary key column.
+	 * Returns the value for the primary column in the JTable( Rowset
+	 * used for building the JTable). When a addtion of row is taking
+	 * place in the JTable, SSTableModel tries to insert a primary
+	 * key value in to that row returned by this function.
+     *
+	 * @return the value for the primary key column.
 	 */
 	public Object getPrimaryColumnValue();
-}
-	
-	
+    
+} // end public interface SSDataValue {
+
+
 
 /*
  * $Log$
+ * Revision 1.3  2004/03/08 16:43:37  prasanth
+ * Updated copy right year.
+ *
  * Revision 1.2  2003/12/16 18:01:40  prasanth
  * Documented versions for release 0.6.0
  *
