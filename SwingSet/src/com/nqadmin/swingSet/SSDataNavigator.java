@@ -758,6 +758,7 @@ public class SSDataNavigator extends JPanel {
 		// THE FIRST ROW
 		refreshButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
+				rowset.removeRowSetListener(rowsetListener);
 				try {
 					if (callExecute) {
 						rowset.execute();
@@ -793,6 +794,7 @@ public class SSDataNavigator extends JPanel {
 					se.printStackTrace();
 					JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured refreshing the data.\n"+se.getMessage());
 				}
+				rowset.addRowSetListener(rowsetListener);
 			}
 		});
 
@@ -955,6 +957,10 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.19  2004/09/21 14:15:33  prasanth
+ * Displaying error messages when an exception occurs, when the user presses
+ * any button.
+ *
  * Revision 1.18  2004/09/08 18:41:54  prasanth
  * Added a rowset listener.
  *
