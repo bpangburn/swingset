@@ -488,6 +488,71 @@ public class SSDataNavigator extends JPanel {
             txtCurrentRow.setMinimumSize(txtFieldSize);
             lblRowCount.setMinimumSize(txtFieldSize);
     }
+    
+    /**
+     *	Calls the doClick on First Button.
+     */
+    public void doFirstButtonClick(){
+    	firstButton.doClick();
+    }
+    
+    /**
+     *	Calls the doClick on Previous Button.
+     */
+    public void doPreviousButtonClick(){
+    	previousButton.doClick();
+    }
+    
+    /**
+     *	Calls the doClick on Next Button.
+     */
+    public void doNextButtonClick(){
+    	nextButton.doClick();
+    }
+    
+    /**
+     *	Calls the doClick on Last Button.
+     */
+    public void doLastButtonClick(){
+    	lastButton.doClick();
+    }
+    
+    /**
+     *	Calls the doClick on Refresh Button.
+     */
+    public void doRefreshButtonClick(){
+    	refreshButton.doClick();
+    }
+    
+    /**
+     *	Calls the doClick on Commit Button.
+     */
+    public void doCommitButtonClick(){
+    	commitButton.doClick();
+    }
+    
+    /**
+     *	Calls the doClick on Undo Button.
+     */
+    public void doUndoButtonClick(){
+    	undoButton.doClick();
+    }
+    
+    /**
+     *	Calls the doClick on Add Button.
+     */
+    public void doAddButtonClick(){
+    	addButton.doClick();
+    }
+    
+    /**
+     *	Calls the doClick on Delete Button.
+     */
+    public void doDeleteButtonClick(){
+    	deleteButton.doClick();
+    }
+    
+     
 
     // ADDS THE BUTTONS ON TO THE PANEL
     private void createPanel() {
@@ -957,6 +1022,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.24  2004/11/11 14:45:48  yoda2
+ * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
+ *
  * Revision 1.23  2004/11/01 15:53:30  yoda2
  * Fixed various JavaDoc errors.
  *
