@@ -744,12 +744,20 @@ public class SSDataNavigator extends JPanel {
 						if (!rowset.next()) {
 							rowCount = 0;
 							currentRow = 0;
+							firstButton.setEnabled(true);
+							previousButton.setEnabled(false);
+							nextButton.setEnabled(true);
+							lastButton.setEnabled(true);
 						} else {
 						// IF THERE ARE ROWS GET THE ROW COUNT	
 							rowset.last();
 							rowCount = rowset.getRow();
 							rowset.first();
 							currentRow = rowset.getRow();
+							firstButton.setEnabled(false);
+							previousButton.setEnabled(false);
+							nextButton.setEnabled(false);
+							lastButton.setEnabled(false);
 						}
 					// SET THE ROW COUNT AS LABEL
 						lblRowCount.setText("of " + rowCount);	
@@ -760,17 +768,6 @@ public class SSDataNavigator extends JPanel {
 						dbNav.performRefreshOps();
                     }
 						
-					if ( rowset.next() ) {
-						firstButton.setEnabled(true);
-						previousButton.setEnabled(false);
-						nextButton.setEnabled(true);
-						lastButton.setEnabled(true);
-					} else {
-						firstButton.setEnabled(false);
-						previousButton.setEnabled(false);
-						nextButton.setEnabled(false);
-						lastButton.setEnabled(false);
-					}
 				} catch(SQLException se) {
 					se.printStackTrace();
 				}
@@ -873,6 +870,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.15  2004/08/26 22:00:00  prasanth
+ * Setting all the buttons when a new rowset is set.
+ *
  * Revision 1.14  2004/08/24 22:21:03  prasanth
  * Changed the way images are loaded.
  *
