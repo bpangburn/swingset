@@ -77,21 +77,18 @@ public class SelectorTest extends javax.swing.JFrame {
         helperPopup1.setTable("publications");
         helperPopup1.setTarget(null);
         helperPopup1.setConnection(sSConnection1);
-        helperPopup1.createHelper();
 
         helperPopup2.setDataColumn("party_id");
         helperPopup2.setListColumn("party_name");
         helperPopup2.setOrderBy("party_name");
         helperPopup2.setTable("parties");
         helperPopup2.setConnection(sSConnection1);
-        helperPopup2.createHelper();
 
         helperPopup3.setConnection(sSConnection1);
         helperPopup3.setDataColumn("account_id");
         helperPopup3.setListColumn("account_name");
         helperPopup3.setOrderBy("account_name");
         helperPopup3.setTable("accounts");
-        helperPopup3.createHelper();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("SwingSet tests");

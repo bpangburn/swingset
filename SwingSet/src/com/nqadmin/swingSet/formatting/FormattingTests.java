@@ -107,27 +107,27 @@ public class FormattingTests extends javax.swing.JFrame implements SSDBNav {
         rowSetHelperPopup1.setListColumn("account_name");
         rowSetHelperPopup1.setOrderBy("account_name");
         rowSetHelperPopup1.setRowSet(sSJdbcRowSetImpl1);
-        rowSetHelperPopup1.createHelper();
+
         helperPopup1.setConnection(sSConnection1);
         helperPopup1.setDataColumn("account_id");
         helperPopup1.setListColumn("account_name");
         helperPopup1.setOrderBy("account_name");
         helperPopup1.setTable("accounts");
-        helperPopup1.createHelper();
+
         helperPopup2.setColumnType(1);
         helperPopup2.setConnection(sSConnection1);
         helperPopup2.setDataColumn("currency_id");
         helperPopup2.setListColumn("currency_name");
         helperPopup2.setOrderBy("currency_name");
         helperPopup2.setTable("currencies");
-        helperPopup2.createHelper();
+        
         helperPopup3.setColumnType(0);
         helperPopup3.setConnection(sSConnection1);
         helperPopup3.setDataColumn("account_type_id");
         helperPopup3.setListColumn("account_type_name");
         helperPopup3.setOrderBy("account_type_name");
         helperPopup3.setTable("accounts_types");
-        helperPopup3.createHelper();
+        
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         sSDataNavigator1.setDBNav(this);
@@ -163,7 +163,7 @@ public class FormattingTests extends javax.swing.JFrame implements SSDBNav {
 
         sSDateField2.setColumnName("valid_until");
         sSDateField2.setNavigator(sSDataNavigator1);
-        sSDateField2.bind(sSJdbcRowSetImpl1, "valid_until");
+
         jPanel1.add(sSDateField2);
         sSDateField2.setBounds(120, 150, 110, 19);
 

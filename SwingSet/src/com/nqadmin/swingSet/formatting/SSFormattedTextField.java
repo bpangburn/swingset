@@ -152,8 +152,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     
     private void bind() {
     
-        if (this.colName == null) return;
-        if (this.rowset  == null) return;
+        if (colName == null || rowset  == null) return;
         
         try {
             colType = rowset.getColumnType(colName);
@@ -649,6 +648,9 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
 
 /*
  * $Log$
+ * Revision 1.8  2005/01/19 19:12:40  dags
+ * bind refactoring
+ *
  * Revision 1.7  2005/01/18 22:43:08  dags
  * Eliminate JCalculator test code, due to licence issues
  *
