@@ -453,7 +453,7 @@ public class SSDBComboBox  extends JComponent{
 					rowset.beforeFirst();
 				else
 					rowset.absolute(rowNumber);
-				System.out.println(" present row number " + rowset.getRow());
+//				System.out.println(" present row number " + rowset.getRow());
 			}
 
 			// STORE THE NUMBER OF ITEMS IN THE COMBO BOX.
@@ -857,7 +857,7 @@ public class SSDBComboBox  extends JComponent{
 		  *for navigation you need not call the updateRow.)
 		  */
 		  public boolean updateItem(long _value, String _name){
-		  	System.out.println("Update item : " + _value + " with " + _name);
+//		  	System.out.println("Update item : " + _value + " with " + _name);
 		  	int index = columnVector.indexOf(new Long(_value));
 		  	System.out.println(index);
 		 	if(index == -1)
@@ -901,6 +901,9 @@ public class SSDBComboBox  extends JComponent{
 
 /*
  * $Log$
+ * Revision 1.4  2003/11/26 21:21:14  prasanth
+ * Functionality to format a date object before displaying in the combo.
+ *
  * Revision 1.3  2003/10/31 16:06:25  prasanth
  * Added method setSeperator().
  *

@@ -112,15 +112,21 @@ public class SSComboBox   extends JComponent {
 		 *	Type used for combo box.
 		 */
 		public static final int YES_NO_OPTION        	= 0;
+		public static final int YES = 1;
+		public static final int NO  = 0;
 		/**	
 		 *	Type used for combo box.
 		 */
 		public static final int SEX_OPTION           	= 1;
+		public static final int GENDER_OPTION		   	= 1;
+		public static final int MALE  	= 1;
+		public static final int FEMALE  = 0;
 		/**	
 		 *	Type used for combo box.
 		 */
 		public static final int INCLUDE_EXCLUDE_OPTION  = 2;
-
+		public static final int EXCLUDE = 0;
+		public static final int INCLUDE = 1;
 		/**
 		 *	Creates an object of SSComboBox.
 		 */
@@ -317,7 +323,7 @@ public class SSComboBox   extends JComponent {
 				cmbDisplayed.addItem(new String("NO"));
 				cmbDisplayed.addItem(new String("YES"));
 			}
-			else if( options == SEX_OPTION ) {
+			else if( options == SEX_OPTION || options == GENDER_OPTION) {
 				cmbDisplayed.addItem(new String("FEMALE"));
 				cmbDisplayed.addItem(new String("MALE"));
 			}
@@ -364,7 +370,7 @@ public class SSComboBox   extends JComponent {
 		// IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)
 
 							if(mappingValues==null && (intValue <0 || intValue >= cmbDisplayed.getItemCount() )){
-								System.out.println("Option: " +option );
+//								System.out.println("Option: " +option );
 								System.out.println("Error: value from DB:" + intValue + "  items in combo box: " + cmbDisplayed.getItemCount());
 							}
 		// IF MAPPINGS  ARE SPECIFIED THEN GET THE INDEX AT WHICH THE VALUE IN TEXT FIELD
@@ -431,7 +437,7 @@ public class SSComboBox   extends JComponent {
 		// IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)
 
 							if(mappingValues==null && (intValue <0 || intValue >= cmbDisplayed.getItemCount()) ){
-								System.out.println("Option: " +option );
+//								System.out.println("Option: " +option );
 								System.out.println("Error: value from DB:" + intValue + "  items in combo box: " + cmbDisplayed.getItemCount());
 							}
 		// IF MAPPINGS  ARE SPECIFIED THEN GET THE INDEX AT WHICH THE VALUE IN TEXT FIELD
@@ -448,8 +454,8 @@ public class SSComboBox   extends JComponent {
 									// IF THAT VALUE IS NOT FOUND IN THE GIVEN MAPPING VALUES PRINT AN ERROR MESSAGE
 									if(i==mappingValues.length){
 										System.out.println("insert ERROR: could not find a corresponding item in combo for value " + intValue);
-										System.out.println(cmbDisplayed.getItemAt(0));
-										System.out.println(cmbDisplayed.getSelectedItem());
+//										System.out.println(cmbDisplayed.getItemAt(0));
+//										System.out.println(cmbDisplayed.getSelectedItem());
 									}
 
 								}
@@ -580,6 +586,9 @@ public class SSComboBox   extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.4  2003/12/16 18:01:40  prasanth
+ * Documented versions for release 0.6.0
+ *
  * Revision 1.3  2003/10/31 16:04:44  prasanth
  * Added method getSelectedIndex() and getSelectedValue().
  *
