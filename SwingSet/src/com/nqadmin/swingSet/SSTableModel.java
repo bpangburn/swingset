@@ -98,7 +98,7 @@ public class SSTableModel extends AbstractTableModel {
 
     /**
      * Constructs a SSTableModel object.
-     * If this contructor is used the setRowSet method has to be used to set the SSRowSet
+     * If this contructor is used the setSSRowSet() method has to be used to set the SSRowSet
      * before constructing the JTable.
      */
     public SSTableModel() {
@@ -834,7 +834,7 @@ public class SSTableModel extends AbstractTableModel {
      * @deprecated
      * @see #setSSRowSet        
      */
-    public void setSSRowSet(SSRowSet _rowset) throws SQLException {
+    public void setRowSet(SSRowSet _rowset) throws SQLException {
         rowset = _rowset;
         init();
     }
@@ -845,6 +845,9 @@ public class SSTableModel extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.16  2005/02/07 22:46:29  yoda2
+ * Deprecated setRowSet().
+ *
  * Revision 1.15  2005/02/04 23:05:10  yoda2
  * no message
  *
