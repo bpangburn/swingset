@@ -124,7 +124,7 @@ public class SSDBNavImp extends SSDBNavAdapter {
 
 		}
 	}
-
+	
 	/**
 	 * function to clear the JTextFields and ComboBoxes recursively inside a JPanel or JTabbedPane
 	 */
@@ -173,6 +173,9 @@ public class SSDBNavImp extends SSDBNavAdapter {
 
 /*
  * $Log$
+ * Revision 1.2  2003/09/25 14:27:45  yoda2
+ * Removed unused Import statements and added preformatting tags to JavaDoc descriptions.
+ *
  * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
  * Initial CVS import for SwingSet.
  *

@@ -87,6 +87,7 @@ import javax.sql.*;
  * @author	$Author$
  * @version	$Revision$
  */
+ 
 public class SSComboBox   extends JComponent {
 
 
@@ -107,9 +108,17 @@ public class SSComboBox   extends JComponent {
 		// MAPPINGS FOR THE COMBO BOX ITEMS IF DIFFERENT FROM DEFAULTS (0,1,2,..)
 		int[] mappingValues = null;
 
-
+		/**	
+		 *	Type used for combo box.
+		 */
 		public static final int YES_NO_OPTION        	= 0;
+		/**	
+		 *	Type used for combo box.
+		 */
 		public static final int SEX_OPTION           	= 1;
+		/**	
+		 *	Type used for combo box.
+		 */
 		public static final int INCLUDE_EXCLUDE_OPTION  = 2;
 
 		/**
@@ -149,6 +158,7 @@ public class SSComboBox   extends JComponent {
 		  	if(mappingValues != null)
 		  		return mappingValues[cmbDisplayed.getSelectedIndex()];
 		  	return cmbDisplayed.getSelectedIndex();
+		  	
 		  }
 
 		/**
@@ -301,7 +311,7 @@ public class SSComboBox   extends JComponent {
 		public boolean setOption(int options) {
 
 			option = options;
-			System.out.println("Requested  Option: " + options);
+//			System.out.println("Requested  Option: " + options);
 				
 			if( options == YES_NO_OPTION) {
 				cmbDisplayed.addItem(new String("NO"));
@@ -323,7 +333,8 @@ public class SSComboBox   extends JComponent {
 			return true;
 		}
 
-
+		
+	
 		// LISTENER FOR THE TEXT FIELD THAT CONTAINS THE INTEGER VALUE
 		private class MyTextFieldDocumentListener implements DocumentListener {
 
@@ -370,8 +381,8 @@ public class SSComboBox   extends JComponent {
 									// IF THAT VALUE IS NOT FOUND IN THE GIVEN MAPPING VALUES PRINT AN ERROR MESSAGE
 									if(i==mappingValues.length){
 										System.out.println("change ERROR: could not find a corresponding item in combo for value " + intValue);
-										System.out.println(cmbDisplayed.getItemAt(0));
-										System.out.println(cmbDisplayed.getSelectedItem());
+//										System.out.println(cmbDisplayed.getItemAt(0));
+//										System.out.println(cmbDisplayed.getSelectedItem());
 									}
 
 								}
@@ -569,6 +580,9 @@ public class SSComboBox   extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.3  2003/10/31 16:04:44  prasanth
+ * Added method getSelectedIndex() and getSelectedValue().
+ *
  * Revision 1.2  2003/09/25 14:27:45  yoda2
  * Removed unused Import statements and added preformatting tags to JavaDoc descriptions.
  *

@@ -106,7 +106,7 @@ public interface SSDBNav {
 	 *by clicking on the undo button.
 	 *
 	 */
-	 public void performCancelOps();
+	public void performCancelOps();
 
 	/**
 	 * The user should perform the pre deletion operations using this function.
@@ -129,13 +129,13 @@ public interface SSDBNav {
 	 *Possible values are NAVIGATION_NEXT, NAVIGATION_PREVIOUS, NAVIGATION_FIRST,
 	 *	NAVIGATION_LAST.
 	 */
-	 public void performNavigationOps(int navigationType);
+	public void performNavigationOps(int navigationType);
 	 
-	 /**
-	  *	This function is called when the user what to refresh the information.
-	  *(When the user presses the refresh button on the navigator.
-	  */
-	  public void performRefreshOps();
+	/**
+	 *	This function is called when the user what to refresh the information.
+	 *(When the user presses the refresh button on the navigator.
+	 */
+	public void performRefreshOps();
 	  
 
 }
@@ -144,6 +144,9 @@ public interface SSDBNav {
 
 /*
  * $Log$
+ * Revision 1.3  2003/11/26 21:21:50  prasanth
+ * Added function performCancelOps().
+ *
  * Revision 1.2  2003/09/25 14:27:45  yoda2
  * Removed unused Import statements and added preformatting tags to JavaDoc descriptions.
  *
