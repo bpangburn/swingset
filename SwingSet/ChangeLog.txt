@@ -5,13 +5,12 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 $Id$
 
 ==============================================================================
-SwingSet 0.8.0-beta - Released 08-3-2004
+SwingSet 0.8.0-beta - Released 08-11-2004
 ==============================================================================
 
 Changes:
-	Classes or Interfaces added in SwingSet-0.6.0:
+	Classes or Interfaces added in SwingSet-0.8.0:
 		1. SSTableKeyAdapter.
-		
 		
 	SSCellEditingAdapter:
 		1. Implements Serializable.
@@ -84,7 +83,7 @@ Changes:
 		1. Added setColumnName, setColumnIndex, and setRowSet functions.
 		2. Added getColumnName, getColumnIndex, and getRowSet functions.
 		3. Added bind function so find the text field to a column in the rowset.
-                4. Added tranfer focus in the key listener. Focus will be tranferred to next
+        4. Added tranfer focus in the key listener. Focus will be tranferred to next
 		   component when enter key is pressed.
 	
 
