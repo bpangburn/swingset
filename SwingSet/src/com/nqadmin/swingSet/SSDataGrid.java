@@ -45,11 +45,6 @@ import java.util.StringTokenizer;
 import java.util.EventObject;
 import java.util.Vector;
 import com.nqadmin.swingSet.datasources.SSRowSet;
-import java.beans.PropertyChangeSupport;
-import java.beans.PropertyChangeListener;
-import java.beans.VetoableChangeSupport;
-import java.beans.VetoableChangeListener;
-import java.beans.PropertyVetoException;
 
 /**
  * SSDataGrid.java
@@ -200,16 +195,6 @@ public class SSDataGrid extends JTable {
      */
     protected boolean insertion = true;
 
-	/**
-	 * Convenience class for providing the property change listener support
-	 */
-	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
-
-	/**
-	 * Convenience class for providing the vetoable change listener support
-	 */
-	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);
-
     /**
      * Constructs a data grid with the data source set to the given SSRowSet.
      *
@@ -229,42 +214,6 @@ public class SSDataGrid extends JTable {
     }
 
     /**
-     * Method to add bean property change listeners.
-     *
-     * @param _listener bean property change listener
-     */
-    public void addPropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.addPropertyChangeListener(_listener);
-    }
-
-    /**
-     * Method to remove bean property change listeners.
-     *
-     * @param _listener bean property change listener
-     */
-    public void removePropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.removePropertyChangeListener(_listener);
-    }
-
-    /**
-     * Method to add bean vetoable change listeners.
-     *
-     * @param _listener bean vetoable change listener
-     */
-    public void addVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.addVetoableChangeListener(_listener);
-    }
-
-    /**
-     * Method to remove bean veto change listeners.
-     *
-     * @param _listener bean veto change listener
-     */
-    public void removeVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.removeVetoableChangeListener(_listener);
-    }
-
-    /**
      * Sets the minimum column width for the data grid.
      *
      * @param _columnWidth   minimum column width of the each column
@@ -272,7 +221,7 @@ public class SSDataGrid extends JTable {
     public void setColumnWidth(int _columnWidth) {
         int oldValue = columnWidth;
         columnWidth = _columnWidth;
-        pChangeSupport.firePropertyChange("columnWidth", oldValue, columnWidth);
+        firePropertyChange("columnWidth", oldValue, columnWidth);
     }
 
     /**
@@ -293,7 +242,7 @@ public class SSDataGrid extends JTable {
     public void setMessageWindow(Component _messageWindow) {
         Component oldValue = messageWindow;
         messageWindow = _messageWindow;
-        pChangeSupport.firePropertyChange("messageWindow", oldValue, messageWindow);
+        firePropertyChange("messageWindow", oldValue, messageWindow);
         tableModel.setMessageWindow(messageWindow);
     }
 
@@ -317,7 +266,7 @@ public class SSDataGrid extends JTable {
     public void setCallExecute(boolean _callExecute) {
         boolean oldValue = callExecute;
         callExecute = _callExecute;
-        pChangeSupport.firePropertyChange("callExecute", oldValue, callExecute);
+        firePropertyChange("callExecute", oldValue, callExecute);
     }
 
     /**
@@ -340,7 +289,7 @@ public class SSDataGrid extends JTable {
     public void setInsertion(boolean _insertion) {
         boolean oldValue = insertion;
         insertion = _insertion;
-        pChangeSupport.firePropertyChange("insertion", oldValue, insertion);
+        firePropertyChange("insertion", oldValue, insertion);
         tableModel.setInsertion(_insertion);
         updateUI();
     }
@@ -429,7 +378,7 @@ public class SSDataGrid extends JTable {
      public void setSSRowSet(SSRowSet _sSRowSet) {
         SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
-        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        firePropertyChange("sSRowSet", oldValue, sSRowSet);
         bind();
      } // end public void setSSRowSet(SSRowSet _sSRowSet) {
 
@@ -450,7 +399,7 @@ public class SSDataGrid extends JTable {
      public void setPreferredSize(Dimension _preferredSize) {
         Dimension oldValue = preferredSize;
         preferredSize = _preferredSize;
-        pChangeSupport.firePropertyChange("preferredSize", oldValue, preferredSize);
+        firePropertyChange("preferredSize", oldValue, preferredSize);
         scrollPane.setPreferredSize(_preferredSize);
      }
 
@@ -1310,6 +1259,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.29  2005/02/12 03:29:26  yoda2
+ * Added bound properties (for beans).
+ *
  * Revision 1.28  2005/02/11 22:59:28  yoda2
  * Imported PropertyVetoException and added some bound properties.
  *

@@ -40,11 +40,6 @@ import java.io.*;
 import com.nqadmin.swingSet.datasources.SSRowSet;
 import javax.sql.RowSetListener;
 import javax.sql.RowSetEvent;
-import java.beans.PropertyChangeSupport;
-import java.beans.PropertyChangeListener;
-import java.beans.VetoableChangeSupport;
-import java.beans.VetoableChangeListener;
-import java.beans.PropertyVetoException;
 
 /**
  * SSDataNavigator.java
@@ -190,16 +185,6 @@ public class SSDataNavigator extends JPanel {
      */
     private final SSDBNavRowSetListener sSRowSetListener = new SSDBNavRowSetListener();
 
-	/**
-	 * Convenience class for providing the property change listener support
-	 */
-	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
-
-	/**
-	 * Convenience class for providing the vetoable change listener support
-	 */
-	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);
-
     /**
      * Creates a object of SSDataNavigator.
      * Note: you have to set the SSRowSet before you can start using it.
@@ -238,42 +223,6 @@ public class SSDataNavigator extends JPanel {
     }
 
     /**
-     * Method to add bean property change listeners.
-     *
-     * @param _listener bean property change listener
-     */
-    public void addPropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.addPropertyChangeListener(_listener);
-    }
-
-    /**
-     * Method to remove bean property change listeners.
-     *
-     * @param _listener bean property change listener
-     */
-    public void removePropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.removePropertyChangeListener(_listener);
-    }
-
-    /**
-     * Method to add bean vetoable change listeners.
-     *
-     * @param _listener bean vetoable change listener
-     */
-    public void addVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.addVetoableChangeListener(_listener);
-    }
-
-    /**
-     * Method to remove bean veto change listeners.
-     *
-     * @param _listener bean veto change listener
-     */
-    public void removeVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.removeVetoableChangeListener(_listener);
-    }
-
-    /**
      * Returns true if the SSRowSet contains one or more rows, else false.
      *
      * @return return true if SSRowSet contains data else false.
@@ -296,7 +245,7 @@ public class SSDataNavigator extends JPanel {
     public void setCallExecute(boolean _callExecute) {
         boolean oldValue = callExecute;
         callExecute = _callExecute;
-        pChangeSupport.firePropertyChange("callExecute", oldValue, callExecute);
+        firePropertyChange("callExecute", oldValue, callExecute);
     }
 
     /**
@@ -317,7 +266,7 @@ public class SSDataNavigator extends JPanel {
     public void setButtonSize(Dimension _buttonSize) {
         Dimension oldValue = buttonSize;
         buttonSize = _buttonSize;
-        pChangeSupport.firePropertyChange("buttonSize", oldValue, buttonSize);
+        firePropertyChange("buttonSize", oldValue, buttonSize);
         setButtonSizes();
     }
 
@@ -341,7 +290,7 @@ public class SSDataNavigator extends JPanel {
     public void setDBNav(SSDBNav _dBNav) {
         SSDBNav oldValue = dBNav;
         dBNav = _dBNav;
-        pChangeSupport.firePropertyChange("dBNav", oldValue, dBNav);
+        firePropertyChange("dBNav", oldValue, dBNav);
     }
 
     /**
@@ -365,7 +314,7 @@ public class SSDataNavigator extends JPanel {
     public void setModification(boolean _modification) {
         boolean oldValue = modification;
         modification = _modification;
-        pChangeSupport.firePropertyChange("modification", oldValue, modification);
+        firePropertyChange("modification", oldValue, modification);
 
         if (!modification) {
             commitButton.setEnabled(false);
@@ -399,7 +348,7 @@ public class SSDataNavigator extends JPanel {
     public void setDeletion(boolean _deletion) {
         boolean oldValue = deletion;
         deletion = _deletion;
-        pChangeSupport.firePropertyChange("deletion", oldValue, deletion);
+        firePropertyChange("deletion", oldValue, deletion);
 
         if (!deletion) {
             deleteButton.setEnabled(false);
@@ -426,7 +375,7 @@ public class SSDataNavigator extends JPanel {
     public void setInsertion(boolean _insertion) {
         boolean oldValue = insertion;
         insertion = _insertion;
-        pChangeSupport.firePropertyChange("insertion", oldValue, insertion);
+        firePropertyChange("insertion", oldValue, insertion);
 
         if (!insertion) {
             addButton.setEnabled(false);
@@ -454,7 +403,7 @@ public class SSDataNavigator extends JPanel {
     public void setConfirmDeletes(boolean _confirmDeletes) {
         boolean oldValue = confirmDeletes;
         confirmDeletes = _confirmDeletes;
-        pChangeSupport.firePropertyChange("confirmDeletes", oldValue, confirmDeletes);
+        firePropertyChange("confirmDeletes", oldValue, confirmDeletes);
     }
 
     /**
@@ -481,7 +430,7 @@ public class SSDataNavigator extends JPanel {
 
         SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
-        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        firePropertyChange("sSRowSet", oldValue, sSRowSet);
 
         // SEE IF THERE ARE ANY ROWS IN THE GIVEN SSROWSET
         try {
@@ -1219,6 +1168,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.33  2005/02/12 03:29:26  yoda2
+ * Added bound properties (for beans).
+ *
  * Revision 1.32  2005/02/11 22:59:28  yoda2
  * Imported PropertyVetoException and added some bound properties.
  *

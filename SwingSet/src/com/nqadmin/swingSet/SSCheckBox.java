@@ -41,11 +41,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.text.*;
 import javax.swing.event.*;
-import java.beans.PropertyChangeSupport;
-import java.beans.PropertyChangeListener;
-import java.beans.VetoableChangeSupport;
-import java.beans.VetoableChangeListener;
-import java.beans.PropertyVetoException;
 
 /**
  * SSCheckBox.java
@@ -116,16 +111,6 @@ public class SSCheckBox extends JCheckBox {
      * Unchecked value for Boolean columns.
      */
     protected static String BOOLEAN_UNCHECKED = "false";
-    
-	/**
-	 * Convenience class for providing the property change listener support
-	 */
-	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
-    
-	/**
-	 * Convenience class for providing the vetoable change listener support
-	 */
-	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);
 
     /**
      * Creates an object of SSCheckBox.
@@ -149,42 +134,6 @@ public class SSCheckBox extends JCheckBox {
     }
     
     /**
-     * Method to add bean property change listeners.
-     *
-     * @param _listener bean property change listener
-     */
-    public void addPropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.addPropertyChangeListener(_listener);
-    }
-    
-    /**
-     * Method to remove bean property change listeners.
-     *
-     * @param _listener bean property change listener
-     */    
-    public void removePropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.removePropertyChangeListener(_listener);
-    }
-    
-    /**
-     * Method to add bean vetoable change listeners.
-     *
-     * @param _listener bean vetoable change listener
-     */
-    public void addVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.addVetoableChangeListener(_listener);
-    }
-    
-    /**
-     * Method to remove bean veto change listeners.
-     *
-     * @param _listener bean veto change listener
-     */    
-    public void removeVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.removeVetoableChangeListener(_listener);
-    }    
-    
-    /**
      * Sets the SSRowSet column name to which the component is bound.
      *
      * @param _columnName    column name in the SSRowSet to which the component
@@ -193,7 +142,7 @@ public class SSCheckBox extends JCheckBox {
     public void setColumnName(String _columnName) throws java.sql.SQLException {
         String oldValue = columnName;
         columnName = _columnName;
-        pChangeSupport.firePropertyChange("columnName", oldValue, columnName);
+        firePropertyChange("columnName", oldValue, columnName);
         bind();
     }    
     
@@ -214,7 +163,7 @@ public class SSCheckBox extends JCheckBox {
     public void setSSRowSet(SSRowSet _sSRowSet) throws java.sql.SQLException {
         SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
-        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        firePropertyChange("sSRowSet", oldValue, sSRowSet);
         bind();
     }     
     
@@ -236,11 +185,13 @@ public class SSCheckBox extends JCheckBox {
     public void bind(SSRowSet _sSRowSet, String _columnName) throws java.sql.SQLException {
         SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
-        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        //pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        firePropertyChange("sSRowSet", oldValue, sSRowSet);
         
         String oldValue2 = columnName;
         columnName = _columnName;
-        pChangeSupport.firePropertyChange("columnName", oldValue2, columnName);
+        //pChangeSupport.firePropertyChange("columnName", oldValue2, columnName);
+        firePropertyChange("columnName", oldValue2, columnName);
         
         bind();
     }
@@ -454,6 +405,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.13  2005/02/11 22:59:23  yoda2
+ * Imported PropertyVetoException and added some bound properties.
+ *
  * Revision 1.12  2005/02/11 20:15:57  yoda2
  * Added infrastructure to support property & vetoable change listeners (for beans).
  *

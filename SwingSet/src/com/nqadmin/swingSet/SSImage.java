@@ -51,11 +51,6 @@ import javax.swing.JFileChooser;
 import java.io.IOException;
 import javax.swing.JScrollPane;
 import com.nqadmin.swingSet.datasources.SSRowSet;
-import java.beans.PropertyChangeSupport;
-import java.beans.PropertyChangeListener;
-import java.beans.VetoableChangeSupport;
-import java.beans.VetoableChangeListener;
-import java.beans.PropertyVetoException;
 
 /**
  * SSImage.java
@@ -103,16 +98,6 @@ import java.beans.PropertyVetoException;
      */
     private final MyRowSetListener sSRowSetListener = new MyRowSetListener();
 
-	/**
-	 * Convenience class for providing the property change listener support
-	 */
-	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
-
-	/**
-	 * Convenience class for providing the vetoable change listener support
-	 */
-	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);
-
     /**
      *
      *  Construct a default SSImage Object.
@@ -135,42 +120,6 @@ import java.beans.PropertyVetoException;
     }
 
     /**
-     * Method to add bean property change listeners.
-     *
-     * @param _listener bean property change listener
-     */
-    public void addPropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.addPropertyChangeListener(_listener);
-    }
-
-    /**
-     * Method to remove bean property change listeners.
-     *
-     * @param _listener bean property change listener
-     */
-    public void removePropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.removePropertyChangeListener(_listener);
-    }
-
-    /**
-     * Method to add bean vetoable change listeners.
-     *
-     * @param _listener bean vetoable change listener
-     */
-    public void addVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.addVetoableChangeListener(_listener);
-    }
-
-    /**
-     * Method to remove bean veto change listeners.
-     *
-     * @param _listener bean veto change listener
-     */
-    public void removeVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.removeVetoableChangeListener(_listener);
-    }
-
-    /**
      * Sets the SSRowSet to which the component is bound.
      *
      * @param _sSRowSet    SSRowSet to which the component is bound
@@ -178,7 +127,7 @@ import java.beans.PropertyVetoException;
     public void setSSRowSet(SSRowSet _sSRowSet) {
         SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
-        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        firePropertyChange("sSRowSet", oldValue, sSRowSet);
         bind();
     }
 
@@ -200,7 +149,7 @@ import java.beans.PropertyVetoException;
     public void setColumnName(String _columnName) {
         String oldValue = columnName;
         columnName = _columnName;
-        pChangeSupport.firePropertyChange("columnName", oldValue, columnName);
+        firePropertyChange("columnName", oldValue, columnName);
         bind();
     }
 
@@ -250,7 +199,7 @@ import java.beans.PropertyVetoException;
     public void setPreferredSize(Dimension _preferredSize) {
         Dimension oldValue = preferredSize;
         preferredSize = _preferredSize;
-        pChangeSupport.firePropertyChange("preferredSize", oldValue, preferredSize);
+        firePropertyChange("preferredSize", oldValue, preferredSize);
 
         lblImage.setPreferredSize(new Dimension((int)_preferredSize.getWidth(), (int)_preferredSize.getHeight() - 20));
         btnUpdateImage.setPreferredSize(new Dimension((int)_preferredSize.getWidth(), 20));
@@ -286,11 +235,11 @@ import java.beans.PropertyVetoException;
     public void bind(SSRowSet _sSRowSet, String _columnName) {
         SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
-        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        firePropertyChange("sSRowSet", oldValue, sSRowSet);
 
         String oldValue2 = columnName;
         columnName = _columnName;
-        pChangeSupport.firePropertyChange("columnName", oldValue2, columnName);
+        firePropertyChange("columnName", oldValue2, columnName);
 
         bind();
     }
@@ -446,6 +395,9 @@ import java.beans.PropertyVetoException;
 
 /*
  *$Log$
+ *Revision 1.10  2005/02/12 03:29:26  yoda2
+ *Added bound properties (for beans).
+ *
  *Revision 1.9  2005/02/11 22:59:46  yoda2
  *Imported PropertyVetoException and added some bound properties.
  *

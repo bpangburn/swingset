@@ -43,11 +43,6 @@ import javax.swing.event.*;
 import java.beans.*;
 import javax.sql.*;
 import com.nqadmin.swingSet.datasources.SSRowSet;
-import java.beans.PropertyChangeSupport;
-import java.beans.PropertyChangeListener;
-import java.beans.VetoableChangeSupport;
-import java.beans.VetoableChangeListener;
-import java.beans.PropertyVetoException;
 
 /**
  * SSComboBox.java
@@ -195,57 +190,11 @@ public class SSComboBox extends JComboBox {
      */    
     public static final int INCLUDE = 1;
     
-	/**
-	 * Convenience class for providing the property change listener support
-	 */
-	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
-    
-	/**
-	 * Convenience class for providing the vetoable change listener support
-	 */
-	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);
-
     /**
      *  Creates an object of SSComboBox.
      */
     public SSComboBox() {
         init();
-    }
-    
-    /**
-     * Method to add bean property change listeners.
-     *
-     * @param _listener bean property change listener
-     */
-    public void addPropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.addPropertyChangeListener(_listener);
-    }
-    
-    /**
-     * Method to remove bean property change listeners.
-     *
-     * @param _listener bean property change listener
-     */    
-    public void removePropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.removePropertyChangeListener(_listener);
-    }
-    
-    /**
-     * Method to add bean vetoable change listeners.
-     *
-     * @param _listener bean vetoable change listener
-     */
-    public void addVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.addVetoableChangeListener(_listener);
-    }
-    
-    /**
-     * Method to remove bean veto change listeners.
-     *
-     * @param _listener bean veto change listener
-     */    
-    public void removeVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.removeVetoableChangeListener(_listener);
     }
 
     /**
@@ -291,7 +240,7 @@ public class SSComboBox extends JComboBox {
     public void setColumnName(String _columnName) {
         String oldValue = columnName;
         columnName = _columnName;
-        pChangeSupport.firePropertyChange("columnName", oldValue, columnName);
+        firePropertyChange("columnName", oldValue, columnName);
         bind();
     }    
 
@@ -312,7 +261,7 @@ public class SSComboBox extends JComboBox {
     public void setSSRowSet(SSRowSet _sSRowSet) {
         SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
-        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        firePropertyChange("sSRowSet", oldValue, sSRowSet);
         bind();
     }     
 
@@ -334,7 +283,7 @@ public class SSComboBox extends JComboBox {
     public void setMappings(int[] _mappings) {
         int[] oldValue = (int[])_mappings.clone();
         mappings = (int[])_mappings.clone();
-        pChangeSupport.firePropertyChange("mappings", oldValue, mappings);
+        firePropertyChange("mappings", oldValue, mappings);
         // INITIALIZE THE ARRAY AND COPY THE MAPPING VALUES
         //mappings = new int[_mappings.length];
         //for (int i=0;i<_mappings.length;i++) {
@@ -360,7 +309,7 @@ public class SSComboBox extends JComboBox {
     public void setOptions(String[] _options) {
         String[] oldValue = (String[])_options.clone();
         options = (String[])_options.clone();
-        pChangeSupport.firePropertyChange("options", oldValue, options);
+        firePropertyChange("options", oldValue, options);
             
         // ADD THE SPECIFIED ITEMS TO THE COMBO BOX
         // REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
@@ -447,7 +396,7 @@ public class SSComboBox extends JComboBox {
         }
         
         predefinedOptions = _predefinedOptions;
-        pChangeSupport.firePropertyChange("predefinedOptions", oldValue, predefinedOptions);
+        firePropertyChange("predefinedOptions", oldValue, predefinedOptions);
         
         return true;
     
@@ -499,11 +448,11 @@ public class SSComboBox extends JComboBox {
     public void bind(SSRowSet _sSRowSet, String _columnName) {
         SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
-        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        firePropertyChange("sSRowSet", oldValue, sSRowSet);
         
         String oldValue2 = columnName;
         columnName = _columnName;
-        pChangeSupport.firePropertyChange("columnName", oldValue2, columnName);
+        firePropertyChange("columnName", oldValue2, columnName);
         
         bind();
     }
@@ -843,6 +792,9 @@ public class SSComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.32  2005/02/11 22:59:25  yoda2
+ * Imported PropertyVetoException and added some bound properties.
+ *
  * Revision 1.31  2005/02/11 20:15:58  yoda2
  * Added infrastructure to support property & vetoable change listeners (for beans).
  *
