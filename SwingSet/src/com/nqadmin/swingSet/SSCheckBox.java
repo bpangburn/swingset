@@ -106,6 +106,7 @@ public class SSCheckBox extends JCheckBox {
         rowset = _rowset;
         //textField.setDocument(new SSTextDocument(_rowset, _columnName));
         columnType = _rowset.getColumnType(_columnName);
+        init();
         bind();
     }
     
@@ -399,6 +400,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.2  2005/01/19 20:54:43  yoda2
+ * API cleanup.
+ *
  * Revision 1.1  2005/01/10 15:09:11  yoda2
  * Added to replace deprecated SSDBCheckBox to match naming conventions.
  *
