@@ -62,7 +62,7 @@ public class SSSlider extends JSlider {
     /**
      * SSRowSet from which component will get/set values.
      */
-    protected SSRowSet rowset;
+    protected SSRowSet sSRowSet;
 
     /**
      * SSRowSet column to which the component will be bound.
@@ -117,41 +117,14 @@ public class SSSlider extends JSlider {
      * Creates a horizontal slider with the range 0 to 100 and binds it
      * to the specified SSRowSet column.
      *
-     * @param _rowset    datasource to be used.
+     * @param _sSRowSet    datasource to be used.
      * @param _columnName    name of the column to which this slider should be bound
      */
-    public SSSlider(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
-		rowset = _rowset;
+    public SSSlider(SSRowSet _sSRowSet, String _columnName) throws java.sql.SQLException {
+		sSRowSet = _sSRowSet;
         columnName = _columnName;
         init();
         bind();
-    }
-
-    /**
-     * Initialization code.
-     */
-    protected void init() {
-
-        // SET PREFERRED DIMENSIONS
-            setPreferredSize(new Dimension(200,20));
-    }
-
-    /**
-     * Returns the SSRowSet column name to which the component is bound.
-     *
-     * @return column name to which the component is bound
-     */
-    public String getColumnName() {
-        return columnName;
-    }
-
-    /**
-     * Returns the SSRowSet to which the component is bound.
-     *
-     * @return SSRowSet to which the component is bound
-     */
-    public SSRowSet getSSRowSet() {
-        return rowset;
     }
 
     /**
@@ -166,14 +139,53 @@ public class SSSlider extends JSlider {
     }
 
     /**
+     * Returns the SSRowSet column name to which the component is bound.
+     *
+     * @return column name to which the component is bound
+     */
+    public String getColumnName() {
+        return columnName;
+    }
+    
+    /**
      * Sets the SSRowSet to which the component is bound.
      *
-     * @param _rowset    SSRowSet to which the component is bound
+     * @param _sSRowSet    SSRowSet to which the component is bound
      */
-    public void setSSRowSet(SSRowSet _rowset) throws java.sql.SQLException {
-        rowset = _rowset;
+    public void setSSRowSet(SSRowSet _sSRowSet) throws java.sql.SQLException {
+        sSRowSet = _sSRowSet;
         bind();
+    }    
+
+    /**
+     * Returns the SSRowSet to which the component is bound.
+     *
+     * @return SSRowSet to which the component is bound
+     */
+    public SSRowSet getSSRowSet() {
+        return sSRowSet;
     }
+
+    /**
+     * Sets the SSRowSet and column name to which the component is to be bound.
+     *
+     * @param _sSRowSet    datasource to be used.
+     * @param _columnName    Name of the column to which this check box should be bound
+     */
+    public void bind(SSRowSet _sSRowSet, String _columnName) throws java.sql.SQLException {
+		sSRowSet = _sSRowSet;
+        columnName = _columnName;
+        bind();
+    }    
+
+    /**
+     * Initialization code.
+     */
+    protected void init() {
+
+        // SET PREFERRED DIMENSIONS
+            setPreferredSize(new Dimension(200,20));
+    }    
 
     /**
      * Method for handling binding of component to a SSRowSet column.
@@ -181,7 +193,7 @@ public class SSSlider extends JSlider {
     protected void bind() throws java.sql.SQLException {
 
         // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || rowset==null) {
+            if (columnName==null || sSRowSet==null) {
                 return;
             }
 
@@ -189,10 +201,10 @@ public class SSSlider extends JSlider {
             removeListeners();
 
         // DETERMINE COLUMN TYPE
-			columnType = rowset.getColumnType(columnName);
+			columnType = sSRowSet.getColumnType(columnName);
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
-            textField.setDocument(new SSTextDocument(rowset, columnName));
+            textField.setDocument(new SSTextDocument(sSRowSet, columnName));
 
         // SET THE LABEL DISPLAY
             updateDisplay();
@@ -200,18 +212,6 @@ public class SSSlider extends JSlider {
         // ADD BACK LISTENERS
             addListeners();
 
-    }
-
-    /**
-     * Sets the SSRowSet and column name to which the component is to be bound.
-     *
-     * @param _rowset    datasource to be used.
-     * @param _columnName    Name of the column to which this check box should be bound
-     */
-    public void bind(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
-		rowset = _rowset;
-        columnName = _columnName;
-        bind();
     }
 
     /**
@@ -313,6 +313,9 @@ public class SSSlider extends JSlider {
 
 /*
  * $Log$
+ * Revision 1.9  2005/02/10 03:46:47  yoda2
+ * Replaced all setDisplay() methods & calls with updateDisplay() methods & calls to prevent any setter/getter confusion.
+ *
  * Revision 1.8  2005/02/09 19:01:59  yoda2
  * JavaDoc cleanup.
  *

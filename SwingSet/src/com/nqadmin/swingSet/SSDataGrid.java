@@ -137,12 +137,12 @@ public class SSDataGrid extends JTable {
     /**
      * Component where messages should be popped up.
      */
-    protected Component window = null;
+    protected Component messageWindow = null;
 
     /**
      * SSRowSet from which component will get/set values.
      */
-    protected SSRowSet rowset = null;
+    protected SSRowSet sSRowSet = null;
 
     /**
      * Number of columns in the SSRowSet.
@@ -157,7 +157,7 @@ public class SSDataGrid extends JTable {
     /**
      * Minimum width of the columns in the data grid.
      */
-    protected int minColumnWidth = 100;
+    protected int columnWidth = 100;
 
     /**
      * Table model to construct the JTable
@@ -168,6 +168,11 @@ public class SSDataGrid extends JTable {
      * Scrollpane used to scroll datagrid.
      */
     protected JScrollPane scrollPane = null; //new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    
+    /**
+     * The preferred size of the scroll pane in which the JTable is embedded.
+     */
+    protected Dimension preferredSize;
 
     /**
      * Array used to store the column numbers that have to be hidden.
@@ -183,14 +188,20 @@ public class SSDataGrid extends JTable {
      * Variable to indicate if execute() should be called on the SSRowSet.
      */
     protected boolean callExecute = true;
+    
+    /**
+     * Variable to indicate if the data grid will display an additional row for
+     * inserting new rows.
+     */
+    protected boolean insertion = true;
 
     /**
      * Constructs a data grid with the data source set to the given SSRowSet.
      *
-     * @param _rowset    SSRowSet from which values have to be retrieved.
+     * @param _sSRowSet    SSRowSet from which values have to be retrieved.
      */
-    public SSDataGrid(SSRowSet _rowset) {
-        rowset = _rowset;
+    public SSDataGrid(SSRowSet _sSRowSet) {
+        sSRowSet = _sSRowSet;
         init();
         bind();
     }
@@ -201,54 +212,96 @@ public class SSDataGrid extends JTable {
     public SSDataGrid() {
         init();
     }
-
-
+    
     /**
      * Sets the minimum column width for the data grid.
      *
-     * @param _width - minimum column width of the each column.
+     * @param _columnWidth   minimum column width of the each column
      */
-    public void setColumnWidth(int _width){
-        minColumnWidth = _width;
+    public void setColumnWidth(int _columnWidth){
+        columnWidth = _columnWidth;
     }
+    
+    /**
+     * Returns the minimum column width for the data grid.
+     *
+     * @return minimum column width of the each column
+     */
+    public int getColumnWidth() {
+        return columnWidth;
+    }    
 
     /**
-     * Set the component on which the error messages will be popped up.
+     * Sets the component on which error messages will be popped up.
      * The error dialog will use this component as its parent component.
      *
-     * @param _window    the component that should be used when displaying error messages.
+     * @param _messageWindow    the component that should be used when displaying error messages
      */
-    public void setMessageWindow(Component _window) {
-        window = _window;
-        tableModel.setMessageWindow(window);
+    public void setMessageWindow(Component _messageWindow) {
+        messageWindow = _messageWindow;
+        tableModel.setMessageWindow(messageWindow);
     }
+    
+    /**
+     * Returns the component on which error messages will be popped up.
+     * The error dialog will use this component as its parent component.
+     *
+     * @return the component that should be used when displaying error messages
+     */
+    public Component getMessageWindow() {
+        return messageWindow;
+    }     
 
     /**
      * Sets the callExecute property.
      * If set to true causes the navigator to skip the execute function call on the specified SSRowSet.
      * (See FAQ for further details)
      *
-     * @param _execute  true if execute function call has to be skipped else false.
+     * @param _callExecute  true if execute function call has to be skipped else false
      */
-    public void setCallExecute(boolean _execute) {
-        callExecute = _execute;
+    public void setCallExecute(boolean _callExecute) {
+        callExecute = _callExecute;
     }
+    
+    /**
+     * Returns the callExecute property.
+     * If set to true causes the navigator to skip the execute function call on the specified SSRowSet.
+     * (See FAQ for further details).
+     *
+     * @return true if execute function call has to be skipped else false
+     */
+    public boolean getCallExecute() {
+        return callExecute;
+    }      
 
     /**
      * Sets the allowInsertion property of the table.
-     * If set to true an addition row for inserting new rows will be displayed
+     * If set to true an additional row for inserting new rows will be displayed
      *
-     * @param _insertions - true if new rows can be added else false.
+     * @param _insertion true if new rows can be added else false.
      */
-    public void setInsertion(boolean _insertions){
-        tableModel.setInsertion(_insertions);
+    public void setInsertion(boolean _insertion) {
+        insertion = _insertion;
+        tableModel.setInsertion(_insertion);
         updateUI();
     }
+    
+    /**
+     * Returns the allowInsertion property of the table.
+     * If set to true an additional row for inserting new rows will be displayed
+     *
+     * @return true if new rows can be added else false.
+     */
+    public boolean getInsertion() {
+        return insertion;
+    }    
 
     /**
      * Returns the list of selected columns.
      * This function gets the list of selected columns from parent class
      * and removes any columns which are present in hidden columns.
+     *
+     * Currently not a bean property since there is no associated variable     
      *
      * @return array of selected columns
      */
@@ -295,9 +348,11 @@ public class SSDataGrid extends JTable {
     /**
      * Returns number of selected columns.
      *
+     * Currently not a bean property since there is no associated variable.   
+     *
      * @return number of selected columns
      */
-    public int getSelectedColumnCount(){
+    public int getSelectedColumnCount() {
         int[] selectedColumns = this.getSelectedColumns();
         if (selectedColumns == null) {
             return 0;
@@ -305,7 +360,423 @@ public class SSDataGrid extends JTable {
 
         return selectedColumns.length;
     }
+    
+    /**
+     * Binds the SSRowSet to the grid.
+     * Data is taken from the new SSRowSet.
+     *
+     * @param _sSRowSet    the SSRowSet which acts as the data source.
+     */
+     public void setSSRowSet(SSRowSet _sSRowSet) {
+        // UPDATE ROWSET & BIND
+            sSRowSet = _sSRowSet;
+            bind();
+     } // end public void setSSRowSet(SSRowSet _sSRowSet) {
+         
+    /**
+     * Returns the SSRowSet being used to get the values.
+     *
+     * @return returns the SSRowSet being used.
+     */
+    public SSRowSet getSSRowSet() {
+        return sSRowSet;
+    }         
 
+    /**
+     * Sets the preferred size of the scroll pane in which the JTable is embedded.
+     *
+     * @param _preferredSize    required dimension for JTable
+     */
+     public void setPreferredSize(Dimension _preferredSize) {
+        preferredSize = _preferredSize;
+        scrollPane.setPreferredSize(_preferredSize);
+     }
+     
+    /**
+     * Returns the preferred size of the scroll pane in which the JTable is embedded.
+     *
+     * @return returns preferred size of the scroll pane in which the JTable is embedded.
+     */
+    public Dimension getPreferredSize() {
+        return preferredSize;
+    }       
+
+    /**
+     * Returns scroll pane with the JTable embedded in it.
+     *
+     * Currently not a bean property since there is no associated variable.       
+     *
+     * @return scroll pane with embedded JTable
+     */
+     public Component getComponent(){
+        return scrollPane;
+     }
+
+    /**
+     * Sets the default values for different columns.
+     * When a new row is added these default values will be added to the columns.
+     * Please make sure that the object specified for each column is of the same type
+     * as that of the column in the database.
+     * Use the getColumnClass function in JTable to determine the exact data type.
+     *
+     * Currently not a bean property since there is no associated variable.      
+     *
+     * @param _columnNumbers    array containing the column numbers for which the
+     *    defaults apply.
+     * @param _values the values for the column numbers specified in _columnNumbers.
+     */
+     public void setDefaultValues(int[] _columnNumbers, Object[] _values) {
+         //if (tableModel == null) {
+         //   tableModel = new SSTableModel();
+         //}
+         tableModel.setDefaultValues(_columnNumbers,_values);
+     }
+
+    /**
+     * Sets the default values for different columns.
+     * When a new row is added these default values will be added to the columns.
+     * Please make sure that the object specified for each column is of the same type
+     * as that of the column in the database.
+     * Use the getColumnClass function in JTable to determine the exact data type.
+     *
+     * Currently not a bean property since there is no associated variable.
+     *
+     * @param _columnNames    array containing the column names for which the
+     *    defaults apply.
+     * @param _values    the values for the column names specified in _columnNames.
+     *
+     * @throws SQLException is the specified column name is not present in the SSRowSet
+     */
+     public void setDefaultValues(String[] _columnNames, Object[] _values) throws SQLException {
+
+        int[] columnNumbers = null;
+
+        //if (tableModel == null) {
+        //    tableModel = new SSTableModel();
+        //}
+
+        if ( _columnNames != null) {
+            columnNumbers = new int[_columnNames.length];
+
+            for (int i=0; i< _columnNames.length;i++) {
+                columnNumbers[i] = sSRowSet.getColumnIndex(_columnNames[i]) -1 ;
+            }
+        }
+
+        tableModel.setDefaultValues(columnNumbers, _values);
+     }
+
+    /**
+     * Returns the default value being used for the specified column.
+     * Returns null if a default is not in use.
+     *
+     * Currently not a bean property since there is no associated variable.      
+     *
+     * @param _columnNumber    the column number for which default value is to be returned.
+     *
+     * @return returns an object containing the default value for the requested column.
+     */
+     public Object getDefaultValue(int _columnNumber) {
+        return tableModel.getDefaultValue(_columnNumber);
+     }
+
+    /**
+     * Returns the default value being used for the specified column.
+     * Returns null if a default is not in use.
+     *
+     * Currently not a bean property since there is no associated variable.
+     *
+     * @param _columnName    the column name for which default value is to be returned.
+     *
+     * @return returns an object containing the default value for the requested column.
+     *
+     * @throws SQLException is the specified column name is not present in the SSRowSet
+     */
+     public Object getDefaultValue(String _columnName) throws SQLException {
+        int columnNumber = sSRowSet.getColumnIndex(_columnName);
+        return tableModel.getDefaultValue(columnNumber -1);
+     }
+
+    /**
+     * Sets the column number which is the primary column for the table.
+     * This is required if new rows have to be added to the JTable.
+     * For this to properly work the SSDataValue object should also be provided
+     * SSDataValue is used to get the value for the primary column.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _columnNumber    the column which is the primary column.
+     */
+    public void setPrimaryColumn(int _columnNumber) {
+        tableModel.setPrimaryColumn(_columnNumber);
+    }
+
+    /**
+     * Sets the column number which is the primary column for the table.
+     * This is required if new rows have to be added to the JTable.
+     * For this to properly work the SSDataValue object should also be provided
+     * SSDataValue is used to get the value for the primary column.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _columnName    the column which is the primary column.
+     */
+    public void setPrimaryColumn(String _columnName) throws SQLException {
+        int columnNumber = sSRowSet.getColumnIndex(_columnName) -1;
+        tableModel.setPrimaryColumn(columnNumber);
+    }
+
+    /**
+     * Sets the SSDataValue interface implemention. This interface specifies
+     * function to retrieve primary column values for a new row to be added.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _dataValue   implementation of SSDataValue
+     */
+    public void setSSDataValue(SSDataValue _dataValue) {
+        tableModel.setSSDataValue(_dataValue);
+    }
+
+    /**
+     * Sets a date renderer for the specified column.
+     * The date will be displayed in mm/dd/yyyy format. If a date renderer
+     * is not requested then the date will be displayed in a standard format(yyyy-mm-dd).
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _column   column number for which a date renderer is needed.
+     */
+    public void setDateRenderer(int _column) {
+        TableColumnModel columnModel = getColumnModel();
+        TableColumn tableColumn = columnModel.getColumn(_column);
+        tableColumn.setCellRenderer(new DateRenderer());
+        tableColumn.setCellEditor(new DateEditor());
+    }
+
+    /**
+     * Sets a date renderer for the specified column.
+     * The date will be displayed in mm/dd/yyyy format. If a date renderer
+     * is not requested then the date will be displayed in a standard format(yyyy-mm-dd).
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _column  column name for which a date renderer is needed.
+     */
+    public void setDateRenderer(String _column) throws SQLException {
+        int column = sSRowSet.getColumnIndex(_column) -1;
+        TableColumnModel columnModel = getColumnModel();
+        TableColumn tableColumn = columnModel.getColumn(column);
+        tableColumn.setCellRenderer(new DateRenderer());
+        tableColumn.setCellEditor(new DateEditor());
+    }
+
+    /**
+     * Sets a combo box renderer for the specified column.
+     * This is use full to limit the values that go with a column or if an underlying code
+     * is do be displayed in a more meaningfull manner.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _column  column number for which combo renderer is to be provided.
+     * @param _displayItems    the actual Objects to be displayed in the combo box.
+     * @param _underlyingValues    the values that have to be written to the database when an
+     *  item in the combo box is selected.
+     */
+    public void setComboRenderer(int _column, Object[] _displayItems, Object[] _underlyingValues) {
+        setComboRenderer(_column, _displayItems, _underlyingValues, 250);
+    }
+
+    /**
+     * Sets a combo box renderer for the specified column.
+     * This is use full to limit the values that go with a column or if an underlying code
+     * is do be displayed in a more meaningfull manner.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _column  column number for which combo renderer is to be provided.
+     * @param _displayItems    the actual Objects to be displayed in the combo box.
+     * @param _underlyingValues    the values that have to be written to the database when an
+     *  item in the combo box is selected.
+     */
+    public void setComboRenderer(int _column, Object[] _displayItems, Object[] _underlyingValues, int _columnWidth) {
+        setRowHeight(20);
+        TableColumnModel columnModel = getColumnModel();
+        TableColumn tableColumn = columnModel.getColumn(_column);
+        tableColumn.setCellRenderer(new ComboRenderer(_displayItems, _underlyingValues));
+        tableColumn.setCellEditor(new ComboEditor(_displayItems, _underlyingValues));
+        tableColumn.setMinWidth(_columnWidth);
+    }
+
+    /**
+     * Sets a combo box renderer for the specified column.
+     * This is use full to limit the values that go with a column or if an underlying code
+     * is do be displayed in a more meaningfull manner.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _column  column name for which combo renderer is to be provided.
+     * @param _displayItems    the actual Objects to be displayed in the combo box.
+     * @param _underlyingValues    the values that have to be written to the database when an
+     *  item in the combo box is selected.
+     */
+    public void setComboRenderer(String _column, Object[] _displayItems, Object[] _underlyingValues) throws SQLException {
+        setComboRenderer(_column, _displayItems, _underlyingValues, 250);
+    }
+
+    /**
+     * Sets a combo box renderer for the specified column.
+     * This is use full to limit the values that go with a column or if an underlying code
+     * is do be displayed in a more meaningfull manner.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _column  column name for which combo renderer is to be provided.
+     * @param _displayItems    the actual Objects to be displayed in the combo box.
+     * @param _underlyingValues    the values that have to be written to the database when an
+     *  item in the combo box is selected.
+     * @param _columnWidth required minimum width for this column
+     */
+    public void setComboRenderer(String _column, Object[] _displayItems, Object[] _underlyingValues, int _columnWidth) throws SQLException {
+        int column = sSRowSet.getColumnIndex(_column)-1;
+        setComboRenderer(column, _displayItems, _underlyingValues, _columnWidth);
+    }
+    
+    /**
+     * Sets a check box renderer for the specified column.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _column - name ofthe column for which check box rendering is needed.
+     */
+    public void setCheckBoxRenderer(String _column) throws SQLException{
+    	int column = sSRowSet.getColumnIndex(_column) - 1;
+    	setCheckBoxRenderer(column);
+    }
+    
+    /**
+     * Sets a check box renderer for the specified column.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _column - column number for which check box rendering is needed.
+     */
+    public void setCheckBoxRenderer(int _column) throws SQLException{
+    	TableColumnModel columnModel = getColumnModel();
+    	TableColumn tableColumn = columnModel.getColumn(_column);
+    	tableColumn.setCellRenderer(new CheckBoxRenderer());
+    	tableColumn.setCellEditor(new CheckBoxEditor());
+    }
+
+    /**
+     * Sets the header for the JTable.
+     * This function has to be called before setting the SSRowSet for SSDataGrid.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _headers array of string objects representing the header of each column.
+     */
+    public void setHeaders(String[] _headers) {
+        tableModel.setHeaders(_headers);
+    }
+
+    /**
+     * Sets the uneditable columns.
+     * The columns specified as uneditable will not be available for user to edit.
+     * This overrides the isCellEditable function in SSCellEditing.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _columnNumbers  array specifying the column numbers which should be
+     *  uneditable.
+     */
+    public void setUneditableColumns(int[] _columnNumbers) {
+        tableModel.setUneditableColumns(_columnNumbers);
+    }
+
+    /**
+     * Sets the uneditable columns.
+     * The columns specified as uneditable will not be available for user to edit.
+     * This overrides the isCellEditable function in SSCellEditing.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _columnNames  array specifying the column names which should be
+     *  uneditable.
+     */
+    public void setUneditableColumns(String[] _columnNames) throws SQLException {
+        int[] columnNumbers = null;
+        if (_columnNames != null) {
+            columnNumbers = new int[_columnNames.length];
+
+            for (int i=0;i<_columnNames.length;i++) {
+                columnNumbers[i] = sSRowSet.getColumnIndex(_columnNames[i]) -1;
+            }
+        }
+
+        tableModel.setUneditableColumns(columnNumbers);
+    }
+
+    /**
+     * Sets the column numbers that should be hidden.
+     * The SSDataGrid sets the column width of these columns to 0.
+     * The columns are set to zero width rather than removing the column from the table.
+     * Thus preserving the column numbering.If a column is removed then the column numbers
+     * for columns after the removed column will change.
+     * Even if the column is specified as hidden user will be seeing a tiny strip.
+     * Make sure that you specify the hidden column numbers in the uneditable column
+     * list.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _columnNumbers   array specifying the column numbers which should be
+     *  hidden
+     */
+    public void setHiddenColumns(int[] _columnNumbers) {
+        hiddenColumns = _columnNumbers;
+        tableModel.setHiddenColumns(_columnNumbers);
+        hideColumns();
+    }
+
+    /**
+     * Sets the column numbers that should be hidden.
+     * The SSDataGrid sets the column width of these columns to 0.
+     * The columns are set to zero width rather than removing the column from the table.
+     * Thus preserving the column numbering.If a column is removed then the column numbers
+     * for columns after the removed column will change.
+     * Even if the column is specified as hidden user will be seeing a tiny strip.
+     * Make sure that you specify the hidden column numbers in the uneditable column
+     * list.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _columnNames    array specifying the column names which should be
+     *  hidden
+     */
+    public void setHiddenColumns(String[] _columnNames) throws SQLException {
+        hiddenColumns = null;
+        tableModel.setHiddenColumns(hiddenColumns);
+        if (_columnNames != null) {
+            hiddenColumns = new int[_columnNames.length];
+            for(int i=0; i<_columnNames.length; i++) {
+                hiddenColumns[i] = sSRowSet.getColumnIndex(_columnNames[i]) -1;
+            }
+        }
+        hideColumns();
+    }
+
+    /**
+     * If the user has to decide on which cell has to be editable and which is not
+     * then SSCellEditable interface has to be implemented and set it for the SSTableModel.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _cellEditing    implementation of SSCellEditable interface.
+     */
+    public void setSSCellEditing(SSCellEditing _cellEditing) {
+        tableModel.setSSCellEditing( _cellEditing );
+    }
+     
     /**
      * Initialization code.
      */
@@ -346,8 +817,8 @@ public class SSDataGrid extends JTable {
                         int[] rows = getSelectedRows();
                     // IF USER HAS PROVIDED A PARENT COMPONENT FOR ERROR MESSAGES
                     // CONFIRM THE DELETION
-                        if (window != null) {
-                            int returnValue = JOptionPane.showConfirmDialog(window,"You are about to delete " + rows.length + " rows. " +
+                        if (messageWindow != null) {
+                            int returnValue = JOptionPane.showConfirmDialog(messageWindow,"You are about to delete " + rows.length + " rows. " +
                                 "\nAre you sure you want to delete the rows?");
                             if (returnValue != JOptionPane.YES_OPTION) {
                                 return;
@@ -377,7 +848,7 @@ public class SSDataGrid extends JTable {
     
         // SPECIFY THE MESSAGE WINDOW TO WHICH THE TABLE MODEL HAS TO POP UP
         // ERROR MESSAGES.
-            tableModel.setMessageWindow(window);
+            tableModel.setMessageWindow(messageWindow);
             tableModel.setJTable(this);            
             
         // THIS CAUSES THE JTABLE TO DISPLAY THE HORIZONTAL SCROLL BAR AS NEEDED.
@@ -386,7 +857,7 @@ public class SSDataGrid extends JTable {
         // ADD THE JTABLE TO A SCROLL BAR
             scrollPane = new JScrollPane(this,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
 
-    } // end protected void init() {
+    } // end protected void init() {    
         
     /**
      * Initializes the data grid control. Collects metadata information about the
@@ -397,14 +868,14 @@ public class SSDataGrid extends JTable {
         try {
         // EXECUTE THE QUERY
             if (callExecute) {
-                rowset.execute();
+                sSRowSet.execute();
             }
 
         // SPECIFY THE SSROWSET TO THE TABLE MODEL.
         //    if (tableModel == null) {
-        //        tableModel = new SSTableModel(rowset);
+        //        tableModel = new SSTableModel(sSRowSet);
         //    } else {
-                tableModel.setSSRowSet(rowset);
+                tableModel.setSSRowSet(sSRowSet);
         //    }
         
         // SET THE TABLE MODEL FOR JTABLE
@@ -433,385 +904,6 @@ public class SSDataGrid extends JTable {
     } // end protected void bind() {        
 
     /**
-     * Binds the SSRowSet to the grid.
-     * Data is taken from the new SSRowSet.
-     *
-     * @param _rowset    the SSRowSet which acts as the data source.
-     */
-     public void setSSRowSet(SSRowSet _rowset) {
-/*         
-        // VARIABLE TO DETERMINE IF UI HAS TO BE UPDATED
-        boolean updateUI = false;
-        // IF A ROW SET ALREADY EXISTS THEN UI HAS TO BE UPDATED
-        // ELSE YOU WILL NOT SEE CHANGES IN THE JTABLE
-        if (rowset != null) {
-            updateUI = true;
-        }
-
-        if (rowset == null) {
-            rowset = _rowset;
-            init();
-        } else {
-            rowset = _rowset;
-            try {
-                tableModel.setRowSet(rowset);
-            } catch(SQLException se) {
-                se.printStackTrace();
-            }
-        // THIS IS NEEDED IF THE NUMBER OF COLUMNS IN THE NEW SSROWSET
-        // DOES NOT MATCH WITH THE OLD COLUMNS.
-            createDefaultColumnModel();
-        }
-        // UPDATE UI IF NEEDED
-        if (updateUI) {
-            updateUI();
-        }
-*/
-        // UPDATE ROWSET & BIND
-            rowset = _rowset;
-            bind();
-     } // end public void setSSRowSet(SSRowSet _rowset) {
-         
-    /**
-     * Returns the SSRowSet being used to get the values.
-     *
-     * @return returns the SSRowSet being used.
-     */
-    public SSRowSet getSSRowSet() {
-        return rowset;
-    }         
-
-     /**
-      * Sets the preferred size of the scroll pane in which the JTable is embedded.
-      *
-      * @param _dimension    required dimension for JTable
-      */
-     public void setPreferredSize(Dimension _dimension) {
-        scrollPane.setPreferredSize(_dimension);
-     }
-
-     /**
-      * Returns scroll pane with the JTable embedded in it.
-      *
-      * @return scroll pane with embedded JTable
-      */
-     public Component getComponent(){
-        return scrollPane;
-     }
-
-     /**
-      * Sets the default values for different columns.
-      * When a new row is added these default values will be added to the columns.
-      * Please make sure that the object specified for each column is of the same type
-      * as that of the column in the database.
-      * Use the getColumnClass function in JTable to determine the exact data type.
-      *
-      * @param _columnNumbers    array containing the column numbers for which the
-      *    defaults apply.
-      * @param _values the values for the column numbers specified in _columnNumbers.
-      */
-     public void setDefaultValues(int[] _columnNumbers, Object[] _values) {
-         //if (tableModel == null) {
-         //   tableModel = new SSTableModel();
-         //}
-         tableModel.setDefaultValues(_columnNumbers,_values);
-     }
-
-     /**
-      * Sets the default values for different columns.
-      * When a new row is added these default values will be added to the columns.
-      * Please make sure that the object specified for each column is of the same type
-      * as that of the column in the database.
-      * Use the getColumnClass function in JTable to determine the exact data type.
-      * @param _columnNames    array containing the column names for which the
-      *    defaults apply.
-      * @param _values    the values for the column names specified in _columnNames.
-      *
-      * @throws SQLException is the specified column name is not present in the SSRowSet
-      */
-     public void setDefaultValues(String[] _columnNames, Object[] _values) throws SQLException {
-
-        int[] columnNumbers = null;
-
-        //if (tableModel == null) {
-        //    tableModel = new SSTableModel();
-        //}
-
-        if ( _columnNames != null) {
-            columnNumbers = new int[_columnNames.length];
-
-            for (int i=0; i< _columnNames.length;i++) {
-                columnNumbers[i] = rowset.getColumnIndex(_columnNames[i]) -1 ;
-            }
-        }
-
-        tableModel.setDefaultValues(columnNumbers, _values);
-     }
-
-     /**
-      * Returns the default value being used for the specified column.
-      * Returns null if a default is not in use.
-      *
-      * @param _columnNumber    the column number for which default value is to be returned.
-      *
-      * @return returns an object containing the default value for the requested column.
-      */
-     public Object getDefaultValue(int _columnNumber) {
-        return tableModel.getDefaultValue(_columnNumber);
-     }
-
-     /**
-      * Returns the default value being used for the specified column.
-      * Returns null if a default is not in use.
-      * @param _columnName    the column name for which default value is to be returned.
-      *
-      * @return returns an object containing the default value for the requested column.
-      *
-      * @throws SQLException is the specified column name is not present in the SSRowSet
-      */
-     public Object getDefaultValue(String _columnName) throws SQLException {
-        int columnNumber = rowset.getColumnIndex(_columnName);
-        return tableModel.getDefaultValue(columnNumber -1);
-     }
-
-    /**
-     * Sets the column number which is the primary column for the table.
-     * This is required if new rows have to be added to the JTable.
-     * For this to properly work the SSDataValue object should also be provided
-     * SSDataValue is used to get the value for the primary column.
-     *
-     * @param _columnNumber    the column which is the primary column.
-     */
-    public void setPrimaryColumn(int _columnNumber) {
-        tableModel.setPrimaryColumn(_columnNumber);
-    }
-
-    /**
-     * Sets the column number which is the primary column for the table.
-     * This is required if new rows have to be added to the JTable.
-     * For this to properly work the SSDataValue object should also be provided
-     * SSDataValue is used to get the value for the primary column.
-     *
-     * @param _columnName    the column which is the primary column.
-     */
-    public void setPrimaryColumn(String _columnName) throws SQLException {
-        int columnNumber = rowset.getColumnIndex(_columnName) -1;
-        tableModel.setPrimaryColumn(columnNumber);
-    }
-
-    /**
-     * Sets the SSDataValue interface implemention. This interface specifies
-     * function to retrieve primary column values for a new row to be added.
-     *
-     * @param _dataValue   implementation of SSDataValue
-     */
-    public void setSSDataValue(SSDataValue _dataValue) {
-        tableModel.setSSDataValue(_dataValue);
-    }
-
-    /**
-     * Sets a date renderer for the specified column.
-     * The date will be displayed in mm/dd/yyyy format. If a date renderer
-     * is not requested then the date will be displayed in a standard format(yyyy-mm-dd).
-     *
-     * @param _column   column number for which a date renderer is needed.
-     */
-    public void setDateRenderer(int _column) {
-        TableColumnModel columnModel = getColumnModel();
-        TableColumn tableColumn = columnModel.getColumn(_column);
-        tableColumn.setCellRenderer(new DateRenderer());
-        tableColumn.setCellEditor(new DateEditor());
-    }
-
-    /**
-     * Sets a date renderer for the specified column.
-     * The date will be displayed in mm/dd/yyyy format. If a date renderer
-     * is not requested then the date will be displayed in a standard format(yyyy-mm-dd).
-     *
-     * @param _column  column name for which a date renderer is needed.
-     */
-    public void setDateRenderer(String _column) throws SQLException {
-        int column = rowset.getColumnIndex(_column) -1;
-        TableColumnModel columnModel = getColumnModel();
-        TableColumn tableColumn = columnModel.getColumn(column);
-        tableColumn.setCellRenderer(new DateRenderer());
-        tableColumn.setCellEditor(new DateEditor());
-    }
-
-    /**
-     * Sets a combo box renderer for the specified column.
-     * This is use full to limit the values that go with a column or if an underlying code
-     * is do be displayed in a more meaningfull manner.
-     *
-     * @param _column  column number for which combo renderer is to be provided.
-     * @param _displayItems    the actual Objects to be displayed in the combo box.
-     * @param _underlyingValues    the values that have to be written to the database when an
-     *  item in the combo box is selected.
-     */
-    public void setComboRenderer(int _column, Object[] _displayItems, Object[] _underlyingValues) {
-        setComboRenderer(_column, _displayItems, _underlyingValues, 250);
-    }
-
-    /**
-     * Sets a combo box renderer for the specified column.
-     * This is use full to limit the values that go with a column or if an underlying code
-     * is do be displayed in a more meaningfull manner.
-     *
-     * @param _column  column number for which combo renderer is to be provided.
-     * @param _displayItems    the actual Objects to be displayed in the combo box.
-     * @param _underlyingValues    the values that have to be written to the database when an
-     *  item in the combo box is selected.
-     */
-    public void setComboRenderer(int _column, Object[] _displayItems, Object[] _underlyingValues, int _columnWidth) {
-        setRowHeight(20);
-        TableColumnModel columnModel = getColumnModel();
-        TableColumn tableColumn = columnModel.getColumn(_column);
-        tableColumn.setCellRenderer(new ComboRenderer(_displayItems, _underlyingValues));
-        tableColumn.setCellEditor(new ComboEditor(_displayItems, _underlyingValues));
-        tableColumn.setMinWidth(_columnWidth);
-    }
-
-    /**
-     * Sets a combo box renderer for the specified column.
-     * This is use full to limit the values that go with a column or if an underlying code
-     * is do be displayed in a more meaningfull manner.
-     *
-     * @param _column  column name for which combo renderer is to be provided.
-     * @param _displayItems    the actual Objects to be displayed in the combo box.
-     * @param _underlyingValues    the values that have to be written to the database when an
-     *  item in the combo box is selected.
-     */
-    public void setComboRenderer(String _column, Object[] _displayItems, Object[] _underlyingValues) throws SQLException {
-        setComboRenderer(_column, _displayItems, _underlyingValues, 250);
-    }
-
-    /**
-     * Sets a combo box renderer for the specified column.
-     * This is use full to limit the values that go with a column or if an underlying code
-     * is do be displayed in a more meaningfull manner.
-     *
-     * @param _column  column name for which combo renderer is to be provided.
-     * @param _displayItems    the actual Objects to be displayed in the combo box.
-     * @param _underlyingValues    the values that have to be written to the database when an
-     *  item in the combo box is selected.
-     * @param _columnWidth required minimum width for this column
-     */
-    public void setComboRenderer(String _column, Object[] _displayItems, Object[] _underlyingValues, int _columnWidth) throws SQLException {
-        int column = rowset.getColumnIndex(_column)-1;
-        setComboRenderer(column, _displayItems, _underlyingValues, _columnWidth);
-    }
-    
-    /**
-     * Sets a check box renderer for the specified column.
-     *
-     * @param _column - name ofthe column for which check box rendering is needed.
-     */
-    public void setCheckBoxRenderer(String _column) throws SQLException{
-    	int column = rowset.getColumnIndex(_column) - 1;
-    	setCheckBoxRenderer(column);
-    }
-    
-    /**
-     * Sets a check box renderer for the specified column.
-     *
-     * @param _column - column number for which check box rendering is needed.
-     */
-    public void setCheckBoxRenderer(int _column) throws SQLException{
-    	TableColumnModel columnModel = getColumnModel();
-    	TableColumn tableColumn = columnModel.getColumn(_column);
-    	tableColumn.setCellRenderer(new CheckBoxRenderer());
-    	tableColumn.setCellEditor(new CheckBoxEditor());
-    }
-
-
-    /**
-     * Sets the header for the JTable.
-     * This function has to be called before setting the SSRowSet for SSDataGrid.
-     *
-     * @param _headers array of string objects representing the header of each column.
-     */
-    public void setHeaders(String[] _headers) {
-        tableModel.setHeaders(_headers);
-    }
-
-    /**
-     * Sets the uneditable columns.
-     * The columns specified as uneditable will not be available for user to edit.
-     * This overrides the isCellEditable function in SSCellEditing.
-     *
-     * @param _columnNumbers  array specifying the column numbers which should be
-     *  uneditable.
-     */
-    public void setUneditableColumns(int[] _columnNumbers) {
-        tableModel.setUneditableColumns(_columnNumbers);
-    }
-
-    /**
-     * Sets the uneditable columns.
-     * The columns specified as uneditable will not be available for user to edit.
-     * This overrides the isCellEditable function in SSCellEditing.
-     *
-     * @param _columnNames  array specifying the column names which should be
-     *  uneditable.
-     */
-    public void setUneditableColumns(String[] _columnNames) throws SQLException {
-        int[] columnNumbers = null;
-        if (_columnNames != null) {
-            columnNumbers = new int[_columnNames.length];
-
-            for (int i=0;i<_columnNames.length;i++) {
-                columnNumbers[i] = rowset.getColumnIndex(_columnNames[i]) -1;
-            }
-        }
-
-        tableModel.setUneditableColumns(columnNumbers);
-    }
-
-    /**
-     * Sets the column numbers that should be hidden.
-     * The SSDataGrid sets the column width of these columns to 0.
-     * The columns are set to zero width rather than removing the column from the table.
-     * Thus preserving the column numbering.If a column is removed then the column numbers
-     * for columns after the removed column will change.
-     * Even if the column is specified as hidden user will be seeing a tiny strip.
-     * Make sure that you specify the hidden column numbers in the uneditable column
-     * list.
-     *
-     * @param _columnNumbers   array specifying the column numbers which should be
-     *  hidden
-     */
-    public void setHiddenColumns(int[] _columnNumbers) {
-        hiddenColumns = _columnNumbers;
-        tableModel.setHiddenColumns(_columnNumbers);
-        hideColumns();
-    }
-
-    /**
-     * Sets the column numbers that should be hidden.
-     * The SSDataGrid sets the column width of these columns to 0.
-     * The columns are set to zero width rather than removing the column from the table.
-     * Thus preserving the column numbering.If a column is removed then the column numbers
-     * for columns after the removed column will change.
-     * Even if the column is specified as hidden user will be seeing a tiny strip.
-     * Make sure that you specify the hidden column numbers in the uneditable column
-     * list.
-     *
-     * @param _columnNames    array specifying the column names which should be
-     *  hidden
-     */
-    public void setHiddenColumns(String[] _columnNames) throws SQLException {
-        hiddenColumns = null;
-        tableModel.setHiddenColumns(hiddenColumns);
-        if (_columnNames != null) {
-            hiddenColumns = new int[_columnNames.length];
-            for(int i=0; i<_columnNames.length; i++) {
-                hiddenColumns[i] = rowset.getColumnIndex(_columnNames[i]) -1;
-            }
-        }
-        hideColumns();
-    }
-
-    /**
      * Hides the columns specified in the hidden columns list.
      */
     protected void hideColumns(){
@@ -833,25 +925,15 @@ public class SSDataGrid extends JTable {
                     }
                 }
                 if (j == hiddenColumns.length) {
-                    column.setMinWidth(minColumnWidth);
+                    column.setMinWidth(columnWidth);
                 }
             } else {
             // SET OTHER COLUMNS MIN WIDTH TO 100
-                column.setMinWidth(minColumnWidth);
+                column.setMinWidth(columnWidth);
             }
         }
         updateUI();
     }
-
-    /**
-     * If the user has to decide on which cell has to be editable and which is not
-     * then SSCellEditable interface has to be implemented and set it for the SSTableModel.
-     *
-     * @param _cellEditing    implementation of SSCellEditable interface.
-     */
-     public void setSSCellEditing(SSCellEditing _cellEditing) {
-        tableModel.setSSCellEditing( _cellEditing );
-     }
 
     /**
      * Editor for date fields.  Used the SSTextField as the editor, but changes
@@ -1151,13 +1233,13 @@ public class SSDataGrid extends JTable {
     /**
      * Sets the new SSRowSet for the combo box.
      *
-     * @param _rowset  SSRowSet to which the combo has to update values.
+     * @param _sSRowSet  SSRowSet to which the combo has to update values.
      *
      * @deprecated
      * @see #setSSRowSet     
      */
-    public void setRowSet(SSRowSet _rowset) {
-        setSSRowSet(_rowset);
+    public void setRowSet(SSRowSet _sSRowSet) {
+        setSSRowSet(_sSRowSet);
     }      
 
 } // end public class SSDataGrid extends JTable {
@@ -1166,6 +1248,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.25  2005/02/07 22:47:14  yoda2
+ * Replaced internal calls to setRowSet() with calls to setSSRowSet().
+ *
  * Revision 1.24  2005/02/07 22:34:10  yoda2
  * Fixed infinite loop in deprecated setRowSet() which was calling setRowSet() rather than setSSRowSet()
  *
@@ -1210,7 +1295,7 @@ public class SSDataGrid extends JTable {
  *
  * Revision 1.11  2004/09/27 15:47:19  prasanth
  * Added hideColumns function.
- * Calling createDefaultColumnModel function in setRowSet if the rowset is not null.
+ * Calling createDefaultColumnModel function in setRowSet if the sSRowSet is not null.
  *
  * Revision 1.10  2004/08/10 22:06:59  yoda2
  * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.

@@ -70,7 +70,7 @@ public class SSCheckBox extends JCheckBox {
     /**
      * SSRowSet from which component will get/set values.
      */
-    protected SSRowSet rowset;
+    protected SSRowSet sSRowSet;
 
     /**
      * SSRowSet column to which the component will be bound.
@@ -123,13 +123,65 @@ public class SSCheckBox extends JCheckBox {
      * Creates an object of SSCheckBox binding it so the specified column
      * in the given SSRowSet.
      *
-     * @param _rowset    datasource to be used.
+     * @param _sSRowSet    datasource to be used.
      * @param _columnName    name of the column to which this check box should be bound
      */
-    public SSCheckBox(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
-        rowset = _rowset;
+    public SSCheckBox(SSRowSet _sSRowSet, String _columnName) throws java.sql.SQLException {
+        sSRowSet = _sSRowSet;
         columnName = _columnName;
         init();
+        bind();
+    }
+    
+    /**
+     * Sets the SSRowSet column name to which the component is bound.
+     *
+     * @param _columnName    column name in the SSRowSet to which the component
+     *    is bound
+     */
+    public void setColumnName(String _columnName) throws java.sql.SQLException {
+        columnName = _columnName;
+        bind();
+    }    
+    
+    /**
+     * Returns the SSRowSet column name to which the component is bound.
+     *
+     * @return column name to which the component is bound
+     */
+    public String getColumnName() {
+        return columnName;
+    }
+    
+
+    /**
+     * Sets the SSRowSet to which the component is bound.
+     *
+     * @param _sSRowSet    SSRowSet to which the component is bound
+     */
+    public void setSSRowSet(SSRowSet _sSRowSet) throws java.sql.SQLException {
+        sSRowSet = _sSRowSet;
+        bind();
+    }     
+    
+    /**
+     * Returns the SSRowSet to which the component is bound.
+     *
+     * @return SSRowSet to which the component is bound
+     */
+    public SSRowSet getSSRowSet() {
+        return sSRowSet;
+    }
+
+    /**
+     * Sets the SSRowSet and column name to which the component is to be bound.
+     *
+     * @param _sSRowSet    datasource to be used.
+     * @param _columnName    Name of the column to which this check box should be bound
+     */
+    public void bind(SSRowSet _sSRowSet, String _columnName) throws java.sql.SQLException {
+        sSRowSet = _sSRowSet;
+        columnName = _columnName;
         bind();
     }
     
@@ -151,7 +203,7 @@ public class SSCheckBox extends JCheckBox {
         // SET PREFERRED AND MAXIMUM DIMENSIONS
             setPreferredSize(new Dimension(20,20));
             setMaximumSize(new Dimension(20,20));            
-    }    
+    }
     
     /**
      * Method for handling binding of component to a SSRowSet column.
@@ -159,7 +211,7 @@ public class SSCheckBox extends JCheckBox {
     protected void bind() throws java.sql.SQLException {
         
         // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || rowset==null) {
+            if (columnName==null || sSRowSet==null) {
                 return;
             }
             
@@ -167,10 +219,10 @@ public class SSCheckBox extends JCheckBox {
             removeListeners();
 
         // DETERMINE COLUMN TYPE
-			columnType = rowset.getColumnType(columnName);            
+			columnType = sSRowSet.getColumnType(columnName);            
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
-            textField.setDocument(new SSTextDocument(rowset, columnName));
+            textField.setDocument(new SSTextDocument(sSRowSet, columnName));
 
         // SET THE COMBO BOX ITEM DISPLAYED
             updateDisplay();
@@ -198,56 +250,6 @@ public class SSCheckBox extends JCheckBox {
         removeChangeListener(checkBoxListener);
     }    
 
-    /**
-     * Sets the SSRowSet and column name to which the component is to be bound.
-     *
-     * @param _rowset    datasource to be used.
-     * @param _columnName    Name of the column to which this check box should be bound
-     */
-    public void bind(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
-        rowset = _rowset;
-        columnName = _columnName;
-        bind();
-    }
-
-    /**
-     * Returns the SSRowSet column name to which the component is bound.
-     *
-     * @return column name to which the component is bound
-     */
-    public String getColumnName() {
-        return columnName;
-    }
-    
-    /**
-     * Returns the SSRowSet to which the component is bound.
-     *
-     * @return SSRowSet to which the component is bound
-     */
-    public SSRowSet getSSRowSet() {
-        return rowset;
-    }
-
-    /**
-     * Sets the SSRowSet column name to which the component is bound.
-     *
-     * @param _columnName    column name in the SSRowSet to which the component
-     *    is bound
-     */
-    public void setColumnName(String _columnName) throws java.sql.SQLException {
-        columnName = _columnName;
-        bind();
-    }
-
-    /**
-     * Sets the SSRowSet to which the component is bound.
-     *
-     * @param _rowset    SSRowSet to which the component is bound
-     */
-    public void setSSRowSet(SSRowSet _rowset) throws java.sql.SQLException {
-        rowset = _rowset;
-        bind();
-    }    
 
     /**
      * Updates the value displayed in the component based on the SSRowSet column
@@ -392,6 +394,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.10  2005/02/10 03:46:47  yoda2
+ * Replaced all setDisplay() methods & calls with updateDisplay() methods & calls to prevent any setter/getter confusion.
+ *
  * Revision 1.9  2005/02/07 20:36:33  yoda2
  * Made private listener data members final.
  *

@@ -69,7 +69,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
     /**
      * SSRowSet from which document will get/set values.
      */
-    protected SSRowSet rowset;
+    protected SSRowSet sSRowSet;
 
     /**
      * Name of SSRowSet column to which the document will be bound.
@@ -107,27 +107,27 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
      * Constructs a SSTextDocument with the given SSRowSet and column name.
      * The document is bound to the specified column in the SSRowSet
      *
-     * @param _rowset   SSRowSet upon which document will be based
+     * @param _sSRowSet   SSRowSet upon which document will be based
      * @param _columnName   column name within SSRowSet upon which document will be based
      */
-    public SSTextDocument(SSRowSet _rowset, String _columnName) {
-        rowset = _rowset;
+    public SSTextDocument(SSRowSet _sSRowSet, String _columnName) {
+        sSRowSet = _sSRowSet;
         columnName = _columnName;
         bind();
-    } // end public SSTextDocument(javax.sql.SSRowSet _rowset, String _columnName) {
+    } // end public SSTextDocument(javax.sql.SSRowSet _sSRowSet, String _columnName) {
 
     /**
      * Constructs a SSTextDocument with the given SSRowSet and column index.
      * The document is bound to the specified column in the SSRowSet.
      *
-     * @param _rowset   SSRowSet upon which document will be based
+     * @param _sSRowSet   SSRowSet upon which document will be based
      * @param _columnIndex   column index within SSRowSet upon which document will be based
      */
-    public SSTextDocument(SSRowSet _rowset, int _columnIndex) {
-        rowset = _rowset;
+    public SSTextDocument(SSRowSet _sSRowSet, int _columnIndex) {
+        sSRowSet = _sSRowSet;
         columnIndex = _columnIndex;
         bind();
-    } // end public SSTextDocument(SSRowSet _rowset, int _columnIndex) {
+    } // end public SSTextDocument(SSRowSet _sSRowSet, int _columnIndex) {
 
     /**
      * Sets the column name to which the document is to be bound.
@@ -138,6 +138,15 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
         columnName = _columnName;
         columnIndex = -1;
     }
+    
+    /**
+     * Returns the column name to which the document is bound.
+     *
+     * @return returns the column name to which the document is bound.
+     */
+    public String getColumnName() {
+        return columnName;
+    }    
 
     /**
      * Sets the column index to which the document is to be bound.
@@ -150,15 +159,6 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
     }
 
     /**
-     * Returns the column name to which the document is bound.
-     *
-     * @return returns the column name to which the document is bound.
-     */
-    public String getColumnName() {
-        return columnName;
-    }
-
-    /**
      * Returns the index of the column to which the document is bound.
      *
      * @return returns the index of the column to which the document is bound
@@ -166,6 +166,18 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
     public int getColumnIndex() {
         return columnIndex;
     }
+    
+
+    /**
+     * Sets the SSRowSet to which the document is bound.
+     *
+     * @param _sSRowSet    SSRowSet to which the component is bound
+     */
+    //public void setSSRowSet(SSRowSet _sSRowSet) throws SQLException {
+    public void setSSRowSet(SSRowSet _sSRowSet) {
+        sSRowSet = _sSRowSet;
+        bind();
+    } // end public void setSSRowSet(SSRowSet _sSRowSet) throws SQLException {    
 
     /**
      * Returns the SSRowSet to which the document is bound.
@@ -173,19 +185,8 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
      * @return SSRowSet to which the document is bound
      */
     public SSRowSet getSSRowSet() {
-        return rowset;
+        return sSRowSet;
     }
-
-    /**
-     * Sets the SSRowSet to which the document is bound.
-     *
-     * @param _rowset    SSRowSet to which the component is bound
-     */
-    //public void setSSRowSet(SSRowSet _rowset) throws SQLException {
-    public void setSSRowSet(SSRowSet _rowset) {
-        rowset = _rowset;
-        bind();
-    } // end public void setSSRowSet(SSRowSet _rowset) throws SQLException {
 
     /**
      * Retrieves meta data for column & initializes document text if applicable.
@@ -193,7 +194,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
     protected void bind() {
 
         // CHECK FOR NULL COLUMN/ROWSET
-            if ((columnName==null && columnIndex==-1) || rowset==null) {
+            if ((columnName==null && columnIndex==-1) || sSRowSet==null) {
                 return;
             }
 
@@ -205,17 +206,17 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                 // IF COLUMN NAME ISN'T NULL, GET COLUMN INDEX - OTHERWISE, GET
                 // COLUMN NAME
                     if (columnName != null) {
-                        columnIndex = rowset.getColumnIndex(columnName);
+                        columnIndex = sSRowSet.getColumnIndex(columnName);
                     } else {
-                        columnName = rowset.getColumnName(columnIndex);
+                        columnName = sSRowSet.getColumnName(columnIndex);
                     }
 
                 // GET COLUMN TYPE
-                    columnType = rowset.getColumnType(columnIndex);
+                    columnType = sSRowSet.getColumnType(columnIndex);
 
                 // IF ROWS PRESENT IN PRESENT SSROWSET THEN INITIALIZE THE DOCUMENT WITH THE TEXT
                 // GETROW RETURNS ZERO IF THERE ARE NO ROWS IN SSROWSET
-                    if (rowset.getRow() != 0) {
+                    if (sSRowSet.getRow() != 0) {
                         String value = getText();
                         insertString(0,value, attribute);
                         insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength()  , DocumentEvent.EventType.INSERT), attribute );
@@ -231,12 +232,240 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
             addListeners();
 
     } // end protected void bind() {
+        
+    /**
+     * Method used by sSRowSet listeners to update the bound document.
+     */
+    protected void updateDocument() {
+            try {
+                if ( sSRowSet.getRow() != 0 ) {
+                    String value = getText();
+                    if (value == null) {
+                        value = "";
+                    }
+                    replace(0, getLength(), value, null);
+         		} else {
+                    if ( getLength() > 0 ) {
+                        remove(0,getLength() );
+    //                  removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
+                    }
+                }
+            } catch(SQLException se) {
+                se.printStackTrace();
+            } catch(BadLocationException ble) {
+                ble.printStackTrace();
+            }
+
+    } // end protected void updateDocument() {
+
+    /**
+     * Method used by document listeners to update the underlying sSRowSet.
+     */
+    protected void updateText(String strValue) {
+    // THIS METHOD IS USED BY THE DOCUMENT LISTENERS WHEN EVER THE USER CHANGES THE TEXT IN
+    // THE DOCUMENT THE CHANGES ARE PROPOGATED TO THE BOUND SSROWSET.
+    // THE UPDATE ROW WILL NOT BE CALLED BY THIS.
+    //
+    // THIS FUNCTION UPDATES THE VALUE OF THE COLUM IN THE SSROWSET.
+    // FOR THIS LOOK AT THE DATA TYPE OF THE COLUMN AND THEN CALL THE
+    // APPROPIATE FUNCTION        
+        try {
+            strValue.trim();
+//          System.out.println("Update Text:" + columnName);
+
+            switch(columnType) {
+                // IF THE TEXT IS EMPTY THEN YOU HAVE TO INSERT A NULL
+                // THIS IS ESPECIALLY THE CASE IF THE DATA TYPE IS NOT TEXT.
+                // SO CHECK TO SEE IF THE GIVEN TEXT IS EMPTY IF SO AND NULL TO THE DATABASE
+
+                case Types.INTEGER:
+                case Types.SMALLINT:
+                case Types.TINYINT:
+                    // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
+                    if ( strValue.equals("") ) {
+                        sSRowSet.updateNull(columnName);
+                    } else {
+                        int intValue = Integer.parseInt(strValue);
+                        sSRowSet.updateInt(columnName, intValue);
+                    }
+                    break;
+
+                case Types.BIGINT:
+                    // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
+                    if ( strValue.equals("") ) {
+                        sSRowSet.updateNull(columnName);
+                    } else {
+                        long longValue = Long.parseLong(strValue);
+                        sSRowSet.updateLong(columnName, longValue);
+                    }
+                    break;
+
+                case Types.FLOAT:
+                    // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
+                    if ( strValue.equals("") ) {
+                        sSRowSet.updateNull(columnName);
+                    } else {
+                        float floatValue = Float.parseFloat(strValue);
+                        sSRowSet.updateFloat(columnName, floatValue);
+                    }
+                    break;
+
+                case Types.DOUBLE:
+                case Types.NUMERIC:
+                    // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
+    //              System.out.println("ppr" + strValue + "ppr");
+                    if ( strValue.equals("") ) {
+                        sSRowSet.updateNull(columnName);
+                    } else {
+                        double doubleValue = Double.parseDouble(strValue);
+                        sSRowSet.updateDouble(columnName, doubleValue);
+                    }
+                    break;
+
+                case Types.BOOLEAN:
+                case Types.BIT:
+                    if (strValue.equals("")) {
+                        sSRowSet.updateNull(columnName);
+                    } else {
+                        // CONVERT THE GIVEN STRING TO BOOLEAN TYPE
+                        boolean boolValue = Boolean.valueOf(strValue).booleanValue();
+                        sSRowSet.updateBoolean(columnName, boolValue);
+                    }
+                    break;
+
+                case Types.DATE:
+                    // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
+                    if ( strValue.equals("") ) {
+                        sSRowSet.updateNull(columnName);
+                    } else if (strValue.length() == 10) {
+    //                  System.out.println(strValue);
+    //                  Date dateValue = Date.valueOf(strValue);
+                        sSRowSet.updateDate(columnName, getSQLDate(strValue));
+                    } else {
+                        // do nothing
+                    }
+                    break;
+
+                case Types.CHAR:
+                case Types.VARCHAR:
+                case Types.LONGVARCHAR:
+                    // SINCE THIS IS TEXT FILED WE CAN INSERT AN EMPTY STRING TO THE DATABASE
+    //              System.out.println( columnName + "      " + strValue);
+                    sSRowSet.updateString(columnName, strValue);
+                    break;
+
+                default:
+                    System.out.println("Unknown data type");
+            } // end switch
+
+        } catch(SQLException se) {
+            se.printStackTrace();
+//          System.out.println(se.getMessage());
+        } catch(NumberFormatException nfe) {
+//          System.out.println(nfe.getMessage());
+        }
+
+    } // end protected void updateText(String strValue) {
+
+    /**
+     * Method used by sSRowSet listeners to get the new text when the SSRowSet
+     * events are triggered.
+     */
+    protected String getText() {
+        String value = null;
+        try {
+            // BASED ON THE COLUMN DATA TYPE THE CORRESPONDING FUNCTION
+            // IS CALLED TO GET THE VALUE IN THE COLUMN
+            switch(columnType) {
+                case Types.INTEGER:
+                case Types.SMALLINT:
+                case Types.TINYINT:
+                    value = String.valueOf(sSRowSet.getInt(columnName));
+                    break;
+
+                case Types.BIGINT:
+                    value = String.valueOf(sSRowSet.getLong(columnName));
+                    break;
+
+                case Types.FLOAT:
+                    value = String.valueOf(sSRowSet.getFloat(columnName));
+                    break;
+
+                case Types.DOUBLE:
+                case Types.NUMERIC:
+                    value = String.valueOf(sSRowSet.getDouble(columnName));
+                    break;
+
+                case Types.BOOLEAN:
+                case Types.BIT:
+                    value = String.valueOf(sSRowSet.getBoolean(columnName));
+                    break;
+
+                case Types.DATE:
+                    Date date = sSRowSet.getDate(columnName);
+                    if (date == null) {
+                        value = "";
+                    } else {
+                        GregorianCalendar calendar = new GregorianCalendar();
+                        calendar.setTime(date);
+                        value = "";
+                        if (calendar.get(Calendar.MONTH) + 1 < 10 ) {
+                            value = "0";
+                        }
+                        value = value + (calendar.get(Calendar.MONTH) + 1) + "/";
+
+                        if (calendar.get(Calendar.DAY_OF_MONTH) < 10) {
+                            value = value + "0";
+                        }
+                        value = value + calendar.get(Calendar.DAY_OF_MONTH) + "/";
+                        value = value + calendar.get(Calendar.YEAR);
+                        //value = String.valueOf(sSRowSet.getDate(columnName));
+                    }
+                    break;
+
+                case Types.CHAR:
+                case Types.VARCHAR:
+                case Types.LONGVARCHAR:
+                    String str = sSRowSet.getString(columnName);
+                    if (str == null) {
+                        value = "";
+                    } else {
+                        value = String.valueOf(str);
+                    }
+                    break;
+
+                default:
+                    System.out.println(columnName + " : UNKNOWN DATA TYPE ");
+            } // end switch
+
+        } catch(SQLException se) {
+            se.printStackTrace();
+        }
+
+        return value;
+
+    } // end protected String getText() {
+    
+    /**
+     * Converts a date string in "MM/dd/yyyy" format to an SQL Date.
+     *
+     * @param _strDate   date string in "MM/dd/yyyy" format
+     *
+     * @return return SQL date for the string specified
+     */
+    protected Date getSQLDate(String _strDate) {
+        StringTokenizer strtok = new StringTokenizer(_strDate,"/",false);
+        String month = strtok.nextToken();
+        String day   = strtok.nextToken();
+        String newStrDate = strtok.nextToken() + "-" + month + "-" + day;
+        return Date.valueOf(newStrDate);
+    }          
 
     /**
      * Adds listeners for component and bound text field (where applicable).
      */
     private void addListeners() {
-        rowset.addRowSetListener(rowSetListener);
+        sSRowSet.addRowSetListener(rowSetListener);
         addDocumentListener(documentListener);
     }
 
@@ -244,7 +473,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
      * Removes listeners for component and bound text field (where applicable).
      */
     private void removeListeners() {
-        rowset.removeRowSetListener(rowSetListener);
+        sSRowSet.removeRowSetListener(rowSetListener);
         removeDocumentListener(documentListener);
     }
 
@@ -259,7 +488,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
         // IN SSROWSET  FIRST REMOVE THE LISTENER ON SSROWSET THEN MAKE THE CHANGES TO THE COLUMN VALUE.
         // AFTER THE CHANGES  ARE MADE ADD BACK THE LISTENER TO SSROWSET.
         public void removeUpdate(DocumentEvent de) {
-            rowset.removeRowSetListener(rowSetListener);
+            sSRowSet.removeRowSetListener(rowSetListener);
 
             try {
             //  System.out.println("remove update" + getText(0,getLength()) );
@@ -267,7 +496,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
             } catch(BadLocationException ble) {
                 ble.printStackTrace();
             }
-            rowset.addRowSetListener(rowSetListener);
+            sSRowSet.addRowSetListener(rowSetListener);
         }
 
         public void changedUpdate(DocumentEvent de) {
@@ -279,14 +508,14 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
         // AND UPDATE THE COLUMN IN THE SSROWSET
         public void insertUpdate(DocumentEvent de) {
 
-            rowset.removeRowSetListener(rowSetListener);
+            sSRowSet.removeRowSetListener(rowSetListener);
             try {
             //  System.out.println("insert update" + getText(0,getLength()));
                 updateText(getText( 0,getLength() ) );
             } catch(BadLocationException ble) {
                 ble.printStackTrace();
             }
-            rowset.addRowSetListener(rowSetListener);
+            sSRowSet.addRowSetListener(rowSetListener);
         }
 
     } // end private class MyDocumentListener implements DocumentListener, Serializable {
@@ -334,240 +563,15 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
     } // end private class MyRowSetListener implements RowSetListener, Serializable {
 
-    /**
-     * Method used by rowset listeners to update the bound document.
-     */
-    protected void updateDocument() {
-            try {
-                if ( rowset.getRow() != 0 ) {
-                    String value = getText();
-                    if (value == null) {
-                        value = "";
-                    }
-                    replace(0, getLength(), value, null);
-         		} else {
-                    if ( getLength() > 0 ) {
-                        remove(0,getLength() );
-    //                  removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
-                    }
-                }
-            } catch(SQLException se) {
-                se.printStackTrace();
-            } catch(BadLocationException ble) {
-                ble.printStackTrace();
-            }
-
-    } // end protected void updateDocument() {
-
-    /**
-     * Method used by document listeners to update the underlying rowset.
-     */
-    protected void updateText(String strValue) {
-    // THIS METHOD IS USED BY THE DOCUMENT LISTENERS WHEN EVER THE USER CHANGES THE TEXT IN
-    // THE DOCUMENT THE CHANGES ARE PROPOGATED TO THE BOUND SSROWSET.
-    // THE UPDATE ROW WILL NOT BE CALLED BY THIS.
-    //
-    // THIS FUNCTION UPDATES THE VALUE OF THE COLUM IN THE SSROWSET.
-    // FOR THIS LOOK AT THE DATA TYPE OF THE COLUMN AND THEN CALL THE
-    // APPROPIATE FUNCTION        
-        try {
-            strValue.trim();
-//          System.out.println("Update Text:" + columnName);
-
-            switch(columnType) {
-                // IF THE TEXT IS EMPTY THEN YOU HAVE TO INSERT A NULL
-                // THIS IS ESPECIALLY THE CASE IF THE DATA TYPE IS NOT TEXT.
-                // SO CHECK TO SEE IF THE GIVEN TEXT IS EMPTY IF SO AND NULL TO THE DATABASE
-
-                case Types.INTEGER:
-                case Types.SMALLINT:
-                case Types.TINYINT:
-                    // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-                    if ( strValue.equals("") ) {
-                        rowset.updateNull(columnName);
-                    } else {
-                        int intValue = Integer.parseInt(strValue);
-                        rowset.updateInt(columnName, intValue);
-                    }
-                    break;
-
-                case Types.BIGINT:
-                    // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-                    if ( strValue.equals("") ) {
-                        rowset.updateNull(columnName);
-                    } else {
-                        long longValue = Long.parseLong(strValue);
-                        rowset.updateLong(columnName, longValue);
-                    }
-                    break;
-
-                case Types.FLOAT:
-                    // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-                    if ( strValue.equals("") ) {
-                        rowset.updateNull(columnName);
-                    } else {
-                        float floatValue = Float.parseFloat(strValue);
-                        rowset.updateFloat(columnName, floatValue);
-                    }
-                    break;
-
-                case Types.DOUBLE:
-                case Types.NUMERIC:
-                    // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-    //              System.out.println("ppr" + strValue + "ppr");
-                    if ( strValue.equals("") ) {
-                        rowset.updateNull(columnName);
-                    } else {
-                        double doubleValue = Double.parseDouble(strValue);
-                        rowset.updateDouble(columnName, doubleValue);
-                    }
-                    break;
-
-                case Types.BOOLEAN:
-                case Types.BIT:
-                    if (strValue.equals("")) {
-                        rowset.updateNull(columnName);
-                    } else {
-                        // CONVERT THE GIVEN STRING TO BOOLEAN TYPE
-                        boolean boolValue = Boolean.valueOf(strValue).booleanValue();
-                        rowset.updateBoolean(columnName, boolValue);
-                    }
-                    break;
-
-                case Types.DATE:
-                    // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-                    if ( strValue.equals("") ) {
-                        rowset.updateNull(columnName);
-                    } else if (strValue.length() == 10) {
-    //                  System.out.println(strValue);
-    //                  Date dateValue = Date.valueOf(strValue);
-                        rowset.updateDate(columnName, getSQLDate(strValue));
-                    } else {
-                        // do nothing
-                    }
-                    break;
-
-                case Types.CHAR:
-                case Types.VARCHAR:
-                case Types.LONGVARCHAR:
-                    // SINCE THIS IS TEXT FILED WE CAN INSERT AN EMPTY STRING TO THE DATABASE
-    //              System.out.println( columnName + "      " + strValue);
-                    rowset.updateString(columnName, strValue);
-                    break;
-
-                default:
-                    System.out.println("Unknown data type");
-            } // end switch
-
-        } catch(SQLException se) {
-            se.printStackTrace();
-//          System.out.println(se.getMessage());
-        } catch(NumberFormatException nfe) {
-//          System.out.println(nfe.getMessage());
-        }
-
-    } // end protected void updateText(String strValue) {
-
-    /**
-     * Method used by rowset listeners to get the new text when the SSRowSet
-     * events are triggered.
-     */
-    protected String getText() {
-        String value = null;
-        try {
-            // BASED ON THE COLUMN DATA TYPE THE CORRESPONDING FUNCTION
-            // IS CALLED TO GET THE VALUE IN THE COLUMN
-            switch(columnType) {
-                case Types.INTEGER:
-                case Types.SMALLINT:
-                case Types.TINYINT:
-                    value = String.valueOf(rowset.getInt(columnName));
-                    break;
-
-                case Types.BIGINT:
-                    value = String.valueOf(rowset.getLong(columnName));
-                    break;
-
-                case Types.FLOAT:
-                    value = String.valueOf(rowset.getFloat(columnName));
-                    break;
-
-                case Types.DOUBLE:
-                case Types.NUMERIC:
-                    value = String.valueOf(rowset.getDouble(columnName));
-                    break;
-
-                case Types.BOOLEAN:
-                case Types.BIT:
-                    value = String.valueOf(rowset.getBoolean(columnName));
-                    break;
-
-                case Types.DATE:
-                    Date date = rowset.getDate(columnName);
-                    if (date == null) {
-                        value = "";
-                    } else {
-                        GregorianCalendar calendar = new GregorianCalendar();
-                        calendar.setTime(date);
-                        value = "";
-                        if (calendar.get(Calendar.MONTH) + 1 < 10 ) {
-                            value = "0";
-                        }
-                        value = value + (calendar.get(Calendar.MONTH) + 1) + "/";
-
-                        if (calendar.get(Calendar.DAY_OF_MONTH) < 10) {
-                            value = value + "0";
-                        }
-                        value = value + calendar.get(Calendar.DAY_OF_MONTH) + "/";
-                        value = value + calendar.get(Calendar.YEAR);
-                        //value = String.valueOf(rowset.getDate(columnName));
-                    }
-                    break;
-
-                case Types.CHAR:
-                case Types.VARCHAR:
-                case Types.LONGVARCHAR:
-                    String str = rowset.getString(columnName);
-                    if (str == null) {
-                        value = "";
-                    } else {
-                        value = String.valueOf(str);
-                    }
-                    break;
-
-                default:
-                    System.out.println(columnName + " : UNKNOWN DATA TYPE ");
-            } // end switch
-
-        } catch(SQLException se) {
-            se.printStackTrace();
-        }
-
-        return value;
-
-    } // end protected String getText() {
-
-    /**
-     * Converts a date string in "MM/dd/yyyy" format to an SQL Date.
-     *
-     * @param _strDate   date string in "MM/dd/yyyy" format
-     *
-     * @return return SQL date for the string specified
-     */
-    public Date getSQLDate(String _strDate) {
-        StringTokenizer strtok = new StringTokenizer(_strDate,"/",false);
-        String month = strtok.nextToken();
-        String day   = strtok.nextToken();
-        String newStrDate = strtok.nextToken() + "-" + month + "-" + day;
-        return Date.valueOf(newStrDate);
-    }
-
 } // end public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 
 
 /*
  * $Log$
+ * Revision 1.21  2005/02/09 22:42:34  yoda2
+ * JavaDoc cleanup.
+ *
  * Revision 1.20  2005/02/07 20:36:41  yoda2
  * Made private listener data members final.
  *

@@ -56,7 +56,7 @@ import javax.swing.event.*;
  * value represents a foreign key to another table, and the combobox needs to
  * diplay a list of one (or more) columns from the other table.
  *
- * Note, if changing both a rowset and column name consider using the bind()
+ * Note, if changing both a sSRowSet and column name consider using the bind()
  * method rather than individual setSSRowSet() and setColumName() calls. 
  *
  * e.g.
@@ -75,7 +75,7 @@ import javax.swing.event.*;
  *      table.
  *
  *      SSConnection connection = null;
- *      SSJdbcRowSetImpl rowset = null;
+ *      SSJdbcRowSetImpl sSRowSet = null;
  *      SSDataNavigator navigator = null;
  *      SSDBComboBox combo = null;
  *
@@ -85,14 +85,14 @@ import javax.swing.event.*;
  *           SSConnection connection = new SSConnection(........);
  *
  *      // CREATE AN INSTANCE OF SSJDBCROWSETIMPL
- *           SSJdbcRowsetImpl rowset = new SSJdbcRowsetImpl(connection);
- *           rowset.setCommand("SELECT * FROM shipment_data;");
+ *           SSJdbcRowsetImpl sSRowSet = new SSJdbcRowsetImpl(connection);
+ *           sSRowSet.setCommand("SELECT * FROM shipment_data;");
  *
  *      // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE SSROWSET.
  *      // IF YOU ARE NOT USING THE DATA NAVIGATOR YOU HAVE TO INCLUDE THOSE.
- *      //   rowset.execute();
- *      //   rowset.next();
- *           SSDataNavigator navigator = new SSDataNavigator(rowset);
+ *      //   sSRowSet.execute();
+ *      //   sSRowSet.next();
+ *           SSDataNavigator navigator = new SSDataNavigator(sSRowSet);
  *
  *      // QUERY FOR THE COMBOBOX.
  *           String query = "SELECT * FROM part_data;";
@@ -103,12 +103,12 @@ import javax.swing.event.*;
  *
  *      // THIS BASICALLY SPECIFIES THE COLUMN AND THE SSROWSET WHERE UPDATES HAVE
  *      // TO BE MADE.
- *           combo.bind(rowset,"part_id");
+ *           combo.bind(sSRowSet,"part_id");
  *           combo.execute();
  *
  *      // CREATE A TEXTFIELD
  *           JTextField myText = new JTextField();
- *           myText.setDocument(new SSTextDocument(rowset, "quantity");
+ *           myText.setDocument(new SSTextDocument(sSRowSet, "quantity");
  *
  *      } catch(Exception e) {
  *      // EXCEPTION HANDLER HERE...
@@ -135,7 +135,7 @@ public class SSDBComboBox extends JComboBox {
     /**
      * Database connection used to execute queries for combo population.
      */
-    protected SSConnection conn = null;
+    protected SSConnection sSConnection = null;
 
     /**
      * Query used to populate combo box.
@@ -147,22 +147,22 @@ public class SSDBComboBox extends JComboBox {
      * chooses an item in the combo box.  This is generally the PK of the table
      * to which a foreign key is mapped.
      */
-    protected String queryPKColumnName = null;
+    protected String primaryKeyColumnName = null;
 
     /**
      * The database column used to populate the first visible column of the
      * combo box.
      */
-    protected String queryDisplayColumnName1 = null;
+    protected String displayColumnName = null;
 
     /**
      * The database column used to populate the second (optional) visible column
      * of the combo box.
      */
-    protected String queryDisplayColumnName2 = null;
+    protected String secondDisplayColumnName = null;
 
     /**
-     * Vector used to store all of the queryPKColumnName values for the
+     * Vector used to store all of the primaryKeyColumnName values for the
      * combo box.
      */
     protected Vector columnVector = new Vector();
@@ -175,7 +175,7 @@ public class SSDBComboBox extends JComboBox {
     /**
      * SSRowSet from which component will get/set values.
      */
-    protected SSRowSet rowset;
+    protected SSRowSet sSRowSet;
 
     /**
      * SSRowSet column to which the component will be bound.
@@ -205,7 +205,7 @@ public class SSDBComboBox extends JComboBox {
     /**
      * Format for any date columns displayed in combo box.
      */
-    protected String datePattern = "MM/dd/yyyy";
+    protected String dateFormat = "MM/dd/yyyy";
 
     /**
      * Creates an object of the SSDBComboBox.
@@ -217,16 +217,16 @@ public class SSDBComboBox extends JComboBox {
     /**
      * Constructs a SSDBComboBox  with the given parameters.
      *
-     * @param _conn database connection to be used.
+     * @param _sSConnection database connection to be used.
      * @param _query query to be used to retrieve the values from the database.
-     * @param _queryPKColumnName column name whose value has to be stored.
-     * @param _queryDisplayColumnName1 column name whose values are displayed in the combo box.
+     * @param _primaryKeyColumnName column name whose value has to be stored.
+     * @param _displayColumnName column name whose values are displayed in the combo box.
      */
-    public SSDBComboBox(SSConnection _conn, String _query, String _queryPKColumnName, String _queryDisplayColumnName1) {
-        conn = _conn;
+    public SSDBComboBox(SSConnection _sSConnection, String _query, String _primaryKeyColumnName, String _displayColumnName) {
+        sSConnection = _sSConnection;
         query = _query;
-        queryPKColumnName = _queryPKColumnName;
-        queryDisplayColumnName1 = _queryDisplayColumnName1;
+        primaryKeyColumnName = _primaryKeyColumnName;
+        displayColumnName = _displayColumnName;
         init();
     }
     
@@ -244,21 +244,39 @@ public class SSDBComboBox extends JComboBox {
     /**
      * Sets the new SSRowSet for the combo box.
      *
-     * @param _rowset  SSRowSet to which the combo has to update values.
+     * @param _sSRowSet  SSRowSet to which the combo has to update values.
      */
-    public void setSSRowSet(SSRowSet _rowset) {
-        rowset = _rowset;
+    public void setSSRowSet(SSRowSet _sSRowSet) {
+        sSRowSet = _sSRowSet;
         bind();
-    }    
+    }
+    
+    /**
+     * Returns the SSRowSet being used to get the values.
+     *
+     * @return returns the SSRowSet being used.
+     */
+    public SSRowSet getSSRowSet() {
+        return sSRowSet;
+    }      
 
     /**
      * Sets the connection object to be used.
      *
-     * @param _conn    connection object used for database.
+     * @param _sSConnection    connection object used for database.
      */
-    public void setSSConnection(SSConnection _conn) {
-        conn = _conn;
-    }    
+    public void setSSConnection(SSConnection _sSConnection) {
+        sSConnection = _sSConnection;
+    }
+
+    /**
+     * Returns connection object used to get values from database.
+     *
+     * @return returns a SSConnection object.
+     */
+    public SSConnection getSSConnection() {
+        return sSConnection;
+    }       
 
     /**
      * Sets the query used to display items in the combo box.
@@ -270,6 +288,15 @@ public class SSDBComboBox extends JComboBox {
     }
 
     /**
+     * Returns the query used to retrieve values from database for the combo box.
+     *
+     * @return returns the query used.
+     */
+    public String getQuery() {
+        return query;
+    }    
+
+    /**
      * Sets the column name for the combo box
      *
      * @param _columnName   name of column
@@ -278,67 +305,7 @@ public class SSDBComboBox extends JComboBox {
         columnName = _columnName;
         bind();
     }
-
-    /**
-     * Sets the column name whose values have to be displayed in combo box.
-     *
-     * @param _queryDisplayColumnName1   column name whose values have to be displayed.
-     */
-    public void setDisplayColumnName(String _queryDisplayColumnName1) {
-        queryDisplayColumnName1 = _queryDisplayColumnName1;
-    }
-
-    /**
-     * When a display column is of type date you can choose the format in which it has
-     * to be displayed. For the pattern refer SimpleDateFormat in java.text package.
-     *
-     * @param _format pattern in which date has to be displayed.
-     */
-     public void setDateFormat(String _format) {
-        datePattern = _format;
-     }
-
-    /**
-     * Sets the second display name.
-     * If more than one column have to displayed then use this.
-     * For the parts example given above. If you have a part description in part table.
-     * Then you can display both part name and part description.
-     *
-     * @param _queryDisplayColumnName2    column name whose values have to be
-     *  displayed in the combo in addition to the first column name.
-     */
-    public void setSecondDisplayColumnName(String _queryDisplayColumnName2) {
-        queryDisplayColumnName2 = _queryDisplayColumnName2;
-    }
-
-   
-    /**
-     * Returns connection object used to get values from database.
-     *
-     * @return returns a SSConnection object.
-     */
-    public SSConnection getSSConnection() {
-        return conn;
-    }    
-
-    /**
-     * Returns the number of items present in the combo box.
-     *
-     * @return returns the number of items present in the combo box.
-     */
-    public int getNumberOfItems() {
-        return numberOfItems;
-    }
-
-    /**
-     * Returns the query used to retrieve values from database for the combo box.
-     *
-     * @return returns the query used.
-     */
-    public String getQuery() {
-        return query;
-    }
-
+    
     /**
      * Returns the column name to which the combo is bound.
      *
@@ -346,26 +313,58 @@ public class SSDBComboBox extends JComboBox {
      */
     public String getColumnName() {
         return columnName;
-    }
-    
-    /**
-     * Returns the SSRowSet being used to get the values.
-     *
-     * @return returns the SSRowSet being used.
-     */
-    public SSRowSet getSSRowSet() {
-        return rowset;
     }    
 
+    /**
+     * Sets the column name whose values have to be displayed in combo box.
+     *
+     * @param _displayColumnName   column name whose values have to be displayed.
+     */
+    public void setDisplayColumnName(String _displayColumnName) {
+        displayColumnName = _displayColumnName;
+    }
+    
     /**
      * Returns the column name whose values are displayed in the combo box.
      *
      * @return returns the name of the column used to get values for combo box items.
      */
     public String getDisplayColumnName() {
-        return queryDisplayColumnName1;
-    }
+        return displayColumnName;
+    }    
 
+    /**
+     * When a display column is of type date you can choose the format in which it has
+     * to be displayed. For the pattern refer SimpleDateFormat in java.text package.
+     *
+     * @param _dateFormat pattern in which dates have to be displayed
+     */
+     public void setDateFormat(String _dateFormat) {
+        dateFormat = _dateFormat;
+     }
+     
+    /**
+     * Returns the pattern in which dates have to be displayed
+     *
+     * @return returns the pattern in which dates have to be displayed
+     */
+    public String getDateFormat() {
+        return dateFormat;
+    }        
+
+    /**
+     * Sets the second display name.
+     * If more than one column have to displayed then use this.
+     * For the parts example given above. If you have a part description in part table.
+     * Then you can display both part name and part description.
+     *
+     * @param _secondDisplayColumnName    column name whose values have to be
+     *  displayed in the combo in addition to the first column name.
+     */
+    public void setSecondDisplayColumnName(String _secondDisplayColumnName) {
+        secondDisplayColumnName = _secondDisplayColumnName;
+    }
+    
     /**
      * Returns the second column name whose values are also displayed in the combo box.
      *
@@ -373,9 +372,9 @@ public class SSDBComboBox extends JComboBox {
      *  returns NULL if the second display column is not provided.
      */
     public String getSecondDisplayColumnName() {
-        return queryDisplayColumnName2;
+        return secondDisplayColumnName;
     }
-
+    
     /**
      * Set the seperator to be used when multiple columns are displayed
      *
@@ -395,7 +394,31 @@ public class SSDBComboBox extends JComboBox {
      }
 
     /**
+     * Returns the number of items present in the combo box.
+     *
+     * This is a read-only bean property.
+     *
+     * @return returns the number of items present in the combo box.
+     */
+    public int getNumberOfItems() {
+        return numberOfItems;
+    }
+
+    /**
+     * Sets the currently selected value
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _value    value to set as currently selected.
+     */
+    public void setSelectedValue(long _value) {
+        textField.setText(String.valueOf(_value));
+    }
+    
+    /**
      * Returns the value of the selected item.
+     *
+     * Currently not a bean property since there is no associated variable.     
      *
      * @return value corresponding to the selected item in the combo.
      *     return -1 if no item is selected.
@@ -411,18 +434,22 @@ public class SSDBComboBox extends JComboBox {
         return Long.valueOf((String)columnVector.get(index)).longValue();
 
     }
-
+    
     /**
      * Sets the currently selected value
      *
+     * Currently not a bean property since there is no associated variable.     
+     *
      * @param _value    value to set as currently selected.
      */
-    public void setSelectedValue(long _value) {
-        textField.setText(String.valueOf(_value));
-    }
+    public void setSelectedStringValue(String _value) {
+        textField.setText(_value);
+    }    
     
     /**
      * Returns the value of the selected item.
+     *
+     * Currently not a bean property since there is no associated variable.     
      *
      * @return value corresponding to the selected item in the combo.
      *     return null if no item is selected.
@@ -440,15 +467,6 @@ public class SSDBComboBox extends JComboBox {
     }
 
     /**
-     * Sets the currently selected value
-     *
-     * @param _value    value to set as currently selected.
-     */
-    public void setSelectedStringValue(String _value) {
-        textField.setText(_value);
-    }    
-
-    /**
      * Executes the query and adds items to the combo box based on the values
      * retrieved from the database.
      */
@@ -458,7 +476,7 @@ public class SSDBComboBox extends JComboBox {
             removeListeners();
 
         // DATABASE SETUP
-            Statement statement = conn.getConnection().createStatement();
+            Statement statement = sSConnection.getConnection().createStatement();
     
             if (query.equals("")) {
                 throw new Exception("Query is empty");
@@ -474,13 +492,13 @@ public class SSDBComboBox extends JComboBox {
             int i = 0;
             while (rs.next()) {
                 // IF TWO COLUMNS HAVE TO BE DISPLAYED IN THE COMBO THEY SEPERATED BY SEMI-COLON
-                if ( queryDisplayColumnName2 != null) {
-                    addItem(getStringValue(rs,queryDisplayColumnName1) + seperator + rs.getString(queryDisplayColumnName2));
+                if ( secondDisplayColumnName != null) {
+                    addItem(getStringValue(rs,displayColumnName) + seperator + rs.getString(secondDisplayColumnName));
                 } else {
-                    addItem(getStringValue(rs,queryDisplayColumnName1));
+                    addItem(getStringValue(rs,displayColumnName));
                 }
                 // ADD THE PK TO A VECTOR.
-                columnVector.add(i,rs.getString(queryPKColumnName));
+                columnVector.add(i,rs.getString(primaryKeyColumnName));
                 i++;
             }
 
@@ -492,6 +510,160 @@ public class SSDBComboBox extends JComboBox {
             addListeners();
 
     } // end public void execute() throws SQLException, Exception {
+
+    /**
+     * Sets the SSRowSet and column name to which the component is to be bound.
+     *
+     * @param _sSRowSet    datasource to be used.
+     * @param _columnName    Name of the column to which this check box should be bound
+     */
+    public void bind(SSRowSet _sSRowSet, String _columnName) {
+        sSRowSet  = _sSRowSet;
+        columnName = _columnName;
+        bind();
+    }
+    
+    /**
+     * Adds an item to the existing list of items in the combo box.
+     *
+     * @param _name   name that should be displayed in the combo
+     * @param _value   value corresponding the the name
+     */
+     public void addItem(String _name, long _value) {
+        columnVector.add(Long.toString(_value));
+        addItem(_name);
+        numberOfItems++;
+     }
+     
+    /**
+     * Adds an item to the existing list of items in the combo box.
+     *
+     * @param _name   name that should be displayed in the combo
+     * @param _value   value corresponding the the name
+     */
+     public void addStringItem(String _name, String _value) {
+        columnVector.add(_value);
+        addItem(_name);
+        numberOfItems++;
+     }     
+
+     /**
+      * Deletes the item which has value equal to _value.
+      * If more than one item is present in the combo for that value the first one is changed.      
+      *
+      * @param _value  value of the item to be deleted.
+      *
+      * @return returns true on successful deletion else returns false.
+      */
+     public boolean deleteItem(long _value) {
+        int index = columnVector.indexOf(Long.toString(_value));
+        if (index == -1) {
+            return false;
+        }
+        columnVector.removeElementAt(index);
+        removeItemAt(index);
+        numberOfItems--;
+        return true;
+     }
+     
+     /**
+      * Deletes the item which has value equal to _value.
+      * If more than one item is present in the combo for that value the first one is changed.      
+      *
+      * @param _value  value of the item to be deleted.
+      *
+      * @return returns true on successful deletion else returns false.
+      */
+     public boolean deleteStringItem(String _value) {
+        int index = columnVector.indexOf(_value);
+        if (index == -1) {
+            return false;
+        }
+        columnVector.removeElementAt(index);
+        removeItemAt(index);
+        numberOfItems--;
+        return true;
+     }     
+
+    /**
+     * Updates the string thats being displayed.
+     * If more than one item is present in the combo for that value the first one is changed.
+     *
+     * NOTE: To retain changes made to current SSRowSet call updateRow before calling the
+     * updateItem on SSDBComboBox. (Only if you are using the SSDBComboBox and SSDataNavigator
+     * for navigation in the screen. If you are not using the SSDBComboBox for navigation
+     * then no need to call updateRow on the SSRowSet. Also if you are using only SSDBComboBox
+     * for navigation you need not call the updateRow.)
+     *
+     * @param _value  the value corresponding to the item in combo to be updated.
+     * @param _name   the new name that replace old one.
+     *
+     * @return returns true if successful else false.
+     */
+    public boolean updateItem(long _value, String _name) {
+        int index = columnVector.indexOf(Long.toString(_value));
+        if (index == -1) {
+            return false;
+        }
+        removeActionListener(cmbListener);
+        insertItemAt(_name,index+1);
+        removeItemAt(index);
+        setSelectedIndex(index);
+        addActionListener(cmbListener);
+        return true;
+    }
+    
+    /**
+     * Updates the string thats being displayed.
+     * If more than one item is present in the combo for that value the first one is changed.
+     *
+     * NOTE: To retain changes made to current SSRowSet call updateRow before calling the
+     * updateItem on SSDBComboBox. (Only if you are using the SSDBComboBox and SSDataNavigator
+     * for navigation in the screen. If you are not using the SSDBComboBox for navigation
+     * then no need to call updateRow on the SSRowSet. Also if you are using only SSDBComboBox
+     * for navigation you need not call the updateRow.)
+     *
+     * @param _value  the value corresponding to the item in combo to be updated.
+     * @param _name   the new name that replace old one.
+     *
+     * @return returns true if successful else false.
+     */
+    public boolean updateStringItem(String _value, String _name) {
+        int index = columnVector.indexOf(_value);
+        if (index == -1) {
+            return false;
+        }
+        removeActionListener(cmbListener);
+        insertItemAt(_name,index+1);
+        removeItemAt(index);
+        setSelectedIndex(index);
+        addActionListener(cmbListener);
+        return true;
+    }       
+    
+    /**
+     * Method for handling binding of component to a SSRowSet column.
+     */
+    protected void bind() {
+        
+        // CHECK FOR NULL COLUMN/ROWSET
+            if (columnName==null || sSRowSet==null) {
+                return;
+            }
+            
+        // REMOVE LISTENERS TO PREVENT DUPLICATION
+            removeListeners();            
+
+        // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
+            textField.setDocument(new SSTextDocument(sSRowSet, columnName));
+
+        // SET THE COMBO BOX ITEM DISPLAYED
+            updateDisplay();
+
+        // ADD BACK LISTENERS
+            addListeners();
+
+    }       
 
     /**
      * Updates the value displayed in the component based on the SSRowSet column
@@ -526,40 +698,32 @@ public class SSDBComboBox extends JComboBox {
     }
     
     /**
-     * Method for handling binding of component to a SSRowSet column.
-     */
-    protected void bind() {
-        
-        // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || rowset==null) {
-                return;
-            }
-            
-        // REMOVE LISTENERS TO PREVENT DUPLICATION
-            removeListeners();            
-
-        // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
-            textField.setDocument(new SSTextDocument(rowset, columnName));
-
-        // SET THE COMBO BOX ITEM DISPLAYED
-            updateDisplay();
-
-        // ADD BACK LISTENERS
-            addListeners();
-
-    }    
-
-    /**
-     * Sets the SSRowSet and column name to which the component is to be bound.
+     * Method to return string equalivent of a given resultset column.
      *
-     * @param _rowset    datasource to be used.
-     * @param _columnName    Name of the column to which this check box should be bound
+     * @param _rs   ResultSet containing column to analyize
+     * @param _columnName   column to convert to string
+     *
+     * @return string equilivent of specified resultset column
      */
-    public void bind(SSRowSet _rowset, String _columnName) {
-        rowset  = _rowset;
-        columnName = _columnName;
-        bind();
-    }
+    protected String getStringValue(ResultSet _rs, String _columnName) {
+        String strValue = "";
+        try {
+            int type = _rs.getMetaData().getColumnType(_rs.findColumn(_columnName));
+            switch(type){
+                case Types.DATE:
+                    SimpleDateFormat myDateFormat = new SimpleDateFormat(dateFormat);
+                    strValue = myDateFormat.format(_rs.getDate(_columnName));
+                break;
+                default:
+                    strValue = _rs.getString(_columnName);
+                break;
+            }
+        } catch(SQLException se) {
+            se.printStackTrace();
+        }
+        return strValue;
+
+    }     
 
     /**
      * Adds listeners for component and bound text field (where applicable).
@@ -787,153 +951,6 @@ public class SSDBComboBox extends JComboBox {
         }
         
     } // private class MyComboListener implements ActionListener {
-
-    /**
-     * Adds an item to the existing list of items in the combo box.
-     *
-     * @param _name   name that should be displayed in the combo
-     * @param _value   value corresponding the the name
-     */
-     public void addItem(String _name, long _value) {
-        columnVector.add(Long.toString(_value));
-        addItem(_name);
-        numberOfItems++;
-     }
-     
-    /**
-     * Adds an item to the existing list of items in the combo box.
-     *
-     * @param _name   name that should be displayed in the combo
-     * @param _value   value corresponding the the name
-     */
-     public void addStringItem(String _name, String _value) {
-        columnVector.add(_value);
-        addItem(_name);
-        numberOfItems++;
-     }     
-
-     /**
-      * Deletes the item which has value equal to _value.
-      * If more than one item is present in the combo for that value the first one is changed.      
-      *
-      * @param _value  value of the item to be deleted.
-      *
-      * @return returns true on successful deletion else returns false.
-      */
-     public boolean deleteItem(long _value) {
-        int index = columnVector.indexOf(Long.toString(_value));
-        if (index == -1) {
-            return false;
-        }
-        columnVector.removeElementAt(index);
-        removeItemAt(index);
-        numberOfItems--;
-        return true;
-     }
-     
-     /**
-      * Deletes the item which has value equal to _value.
-      * If more than one item is present in the combo for that value the first one is changed.      
-      *
-      * @param _value  value of the item to be deleted.
-      *
-      * @return returns true on successful deletion else returns false.
-      */
-     public boolean deleteStringItem(String _value) {
-        int index = columnVector.indexOf(_value);
-        if (index == -1) {
-            return false;
-        }
-        columnVector.removeElementAt(index);
-        removeItemAt(index);
-        numberOfItems--;
-        return true;
-     }     
-
-    /**
-     * Updates the string thats being displayed.
-     * If more than one item is present in the combo for that value the first one is changed.
-     *
-     * NOTE: To retain changes made to current SSRowSet call updateRow before calling the
-     * updateItem on SSDBComboBox. (Only if you are using the SSDBComboBox and SSDataNavigator
-     * for navigation in the screen. If you are not using the SSDBComboBox for navigation
-     * then no need to call updateRow on the SSRowSet. Also if you are using only SSDBComboBox
-     * for navigation you need not call the updateRow.)
-     *
-     * @param _value  the value corresponding to the item in combo to be updated.
-     * @param _name   the new name that replace old one.
-     *
-     * @return returns true if successful else false.
-     */
-    public boolean updateItem(long _value, String _name) {
-        int index = columnVector.indexOf(Long.toString(_value));
-        if (index == -1) {
-            return false;
-        }
-        removeActionListener(cmbListener);
-        insertItemAt(_name,index+1);
-        removeItemAt(index);
-        setSelectedIndex(index);
-        addActionListener(cmbListener);
-        return true;
-    }
-    
-    /**
-     * Updates the string thats being displayed.
-     * If more than one item is present in the combo for that value the first one is changed.
-     *
-     * NOTE: To retain changes made to current SSRowSet call updateRow before calling the
-     * updateItem on SSDBComboBox. (Only if you are using the SSDBComboBox and SSDataNavigator
-     * for navigation in the screen. If you are not using the SSDBComboBox for navigation
-     * then no need to call updateRow on the SSRowSet. Also if you are using only SSDBComboBox
-     * for navigation you need not call the updateRow.)
-     *
-     * @param _value  the value corresponding to the item in combo to be updated.
-     * @param _name   the new name that replace old one.
-     *
-     * @return returns true if successful else false.
-     */
-    public boolean updateStringItem(String _value, String _name) {
-        int index = columnVector.indexOf(_value);
-        if (index == -1) {
-            return false;
-        }
-        removeActionListener(cmbListener);
-        insertItemAt(_name,index+1);
-        removeItemAt(index);
-        setSelectedIndex(index);
-        addActionListener(cmbListener);
-        return true;
-    }    
-
-    /**
-     * Method to return string equalivent of a given resultset column.
-     *
-     * @param _rs   ResultSet containing column to analyize
-     * @param _columnName   column to convert to string
-     *
-     * @return string equilivent of specified resultset column
-     */
-    protected String getStringValue(ResultSet _rs, String _columnName) {
-        String strValue = "";
-        try {
-            int type = _rs.getMetaData().getColumnType(_rs.findColumn(_columnName));
-            switch(type){
-                case Types.DATE:
-                    SimpleDateFormat dateFormat = new SimpleDateFormat(datePattern);
-                    strValue = dateFormat.format(_rs.getDate(_columnName));
-                break;
-                default:
-                    strValue = _rs.getString(_columnName);
-                break;
-            }
-        } catch(SQLException se) {
-            se.printStackTrace();
-        }
-        return strValue;
-
-    }
-    
     
     
 // DEPRECATED STUFF....................
@@ -941,20 +958,20 @@ public class SSDBComboBox extends JComboBox {
     /**
      * Constructs a SSDBComboBox  with the given parameters.
      *
-     * @param _conn    database connection to be used.
+     * @param _sSConnection    database connection to be used.
      * @param _query   query to be used to retrieve the values from the database.
-     * @param _queryPKColumnName  column name whose value has to be stored.
-     * @param _queryDisplayColumnName1   column name whose values are displayed in the combo box.
+     * @param _primaryKeyColumnName  column name whose value has to be stored.
+     * @param _displayColumnName   column name whose values are displayed in the combo box.
      * @param _textField   a text field to which the combo box has to be synchronized
      *
      * @deprecated
      */
-    public SSDBComboBox(SSConnection _conn, String _query, String _queryPKColumnName, String _queryDisplayColumnName1, JTextField _textField) {
+    public SSDBComboBox(SSConnection _sSConnection, String _query, String _primaryKeyColumnName, String _displayColumnName, JTextField _textField) {
 
-        conn                = _conn;
+        sSConnection                = _sSConnection;
         query               = _query;
-        queryPKColumnName   = _queryPKColumnName;
-        queryDisplayColumnName1  = _queryDisplayColumnName1;
+        primaryKeyColumnName   = _primaryKeyColumnName;
+        displayColumnName  = _displayColumnName;
         textField           = _textField;
 
     }
@@ -962,26 +979,26 @@ public class SSDBComboBox extends JComboBox {
     /**
      * Sets the connection object to be used.
      *
-     * @param _conn    connection object used for database.
+     * @param _sSConnection    connection object used for database.
      *
      * @deprecated
      * @see #setSSConnection
      */
-    public void setConnection(SSConnection _conn) {
-        conn = _conn;
+    public void setConnection(SSConnection _sSConnection) {
+        sSConnection = _sSConnection;
     }
         
 
     /**
      * Sets the new SSRowSet for the combo box.
      *
-     * @param _rowset  SSRowSet to which the combo has to update values.
+     * @param _sSRowSet  SSRowSet to which the combo has to update values.
      *
      * @deprecated
      * @see #setSSRowSet     
      */
-    public void setRowSet(SSRowSet _rowset) {
-        rowset = _rowset;
+    public void setRowSet(SSRowSet _sSRowSet) {
+        sSRowSet = _sSRowSet;
         bind();
     }
 
@@ -1006,7 +1023,7 @@ public class SSDBComboBox extends JComboBox {
      * @see #getSSConnection     
      */
     public SSConnection getConnection() {
-        return conn;
+        return sSConnection;
     }
 
     /**
@@ -1100,6 +1117,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.24  2005/02/10 03:46:47  yoda2
+ * Replaced all setDisplay() methods & calls with updateDisplay() methods & calls to prevent any setter/getter confusion.
+ *
  * Revision 1.23  2005/02/07 20:26:06  yoda2
  * Updated to allow non-numeric primary keys. JavaDoc cleanup.
  *

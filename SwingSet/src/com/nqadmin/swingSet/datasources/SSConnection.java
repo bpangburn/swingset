@@ -91,135 +91,146 @@
     /**
      * Constructs a default SSConnection object.
      */
-    public SSConnection(){
-    }
-
-
-    /**
-     * Constructs a SSConnection object with the specified database url.
-     * @param url - url to the database to which connection has to be established.
-     * the url should be of the form jdbc:subprotocol:subname
-     */
-    public SSConnection(String url){
-        this.url = url;
+    public SSConnection() {
     }
 
     /**
      * Constructs a SSConnection object with the specified database url.
-     * @param url - url to the database to which connection has to be established.
+     *
+     * @param _url - url to the database to which connection has to be established.
      * the url should be of the form jdbc:subprotocol:subname
-     * @param username - the database username on whose behalf the connection is being made
-     * @param password - the user's password
      */
-    public SSConnection(String url, String username, String password){
-        this.url = url;
-        this.username = username;
-        this.password = password;
+    public SSConnection(String _url) {
+        url = _url;
     }
 
     /**
      * Constructs a SSConnection object with the specified database url.
-     * @param url - url to the database to which connection has to be established.
+     *
+     * @param _url - url to the database to which connection has to be established.
      * the url should be of the form jdbc:subprotocol:subname
-     * @param username - the database username on whose behalf the connection is being made
-     * @param password - the user's password
-     * @param driverName - name of the database driver to be used.
+     * @param _username - the database username on whose behalf the connection is being made
+     * @param _password - the user's password
      */
-    public SSConnection(String url, String username, String password, String driverName){
-        this.url = url;
-        this.username = username;
-        this.password = password;
-        this.driverName = driverName;
+    public SSConnection(String _url, String _username, String _password) {
+        url = _url;
+        username = _username;
+        password = _password;
+    }
+
+    /**
+     * Constructs a SSConnection object with the specified database url.
+     *
+     * @param _url - url to the database to which connection has to be established.
+     * the url should be of the form jdbc:subprotocol:subname
+     * @param _username - the database username on whose behalf the connection is being made
+     * @param _password - the user's password
+     * @param _driverName - name of the database driver to be used.
+     */
+    public SSConnection(String _url, String _username, String _password, String _driverName) {
+        url = _url;
+        username = _username;
+        password = _password;
+        driverName = _driverName;
     }
 
     /**
      * Sets the url to the database.
-     * @param url - url to the database to which connection has to be established.
+     *
+     * @param _url - url to the database to which connection has to be established.
      * the url should be of the form jdbc:subprotocol:subname
      */
-    public void setUrl(String url){
-        String oldValue = this.url;
-        this.url = url;
-        changeSupport.firePropertyChange("url", oldValue, this.url);
+    public void setUrl(String _url) {
+        String oldValue = url;
+        url = _url;
+        changeSupport.firePropertyChange("url", oldValue, url);
         
     }
+    
+    /**
+     * Returns the url to the database.
+     *
+     * @return returns the database url.
+     */
+    public String getUrl() {
+        return url;
+    }    
 
     /**
      * Sets the username to be used while connecting to the database.
-     * @param username - the database username on whose behalf the connection is being made
+     *
+     * @param _username - the database username on whose behalf the connection is being made
      */
-    public void setUsername(String username){
-    	String oldValue = this.username;
-        this.username = username;
-        changeSupport.firePropertyChange("username", oldValue, this.username);
+    public void setUsername(String _username) {
+    	String oldValue = username;
+        username = _username;
+        changeSupport.firePropertyChange("username", oldValue, username);
     }
+    
+    /**
+     * Returns the username being used to connect to the database.
+     *
+     * @return returns the database username.
+     */
+    public String getUsername() {
+        return username;
+    }    
 
     /**
      * Sets the password to be used while connecting to the database.
-     * @param password - the user's password to be used.
+     *
+     * @param _password - the user's password to be used.
      */
-    public void setPassword(String password){
-    	String oldValue = this.password;
-        this.password = password;
-        changeSupport.firePropertyChange("password", oldValue, this.password);
+    public void setPassword(String _password) {
+    	String oldValue = password;
+        password = _password;
+        changeSupport.firePropertyChange("password", oldValue, password);
     }
+    
+    /**
+     * Returns the password being used to connect to the database.
+     *
+     * @return returns the user's password.
+     */
+    public String getPassword() {
+        return password;
+    }    
 
     /**
      * Sets the database driver class name.
-     * @param driverName - name of the database driver to be used.
+     *
+     * @param _driverName - name of the database driver to be used.
      */
-    public void setDriverName(String driverName){
-    	String oldValue = this.driverName;
-        this.driverName = driverName;
-        changeSupport.firePropertyChange("driverName", oldValue, this.password);
-    }
-
-    /**
-     * Returns the url to the database.
-     * @return returns the database url.
-     */
-    public String getUrl(){
-        return url;
-    }
-
-    /**
-     * Returns the username being used to connect to the database.
-     * @return returns the database username.
-     */
-    public String getUsername(){
-        return username;
-    }
-
-    /**
-     * Returns the password being used to connect to the database.
-     * @return returns the user's password.
-     */
-    public String getPassword(){
-        return password;
-    }
-
-    /**
-     * Returns the database driver being used.
-     * @return returns the database driver being used.
-     */
-    public String getDriverName(){
-        return driverName;
-    }
-
-    /**
-     * Returns the database connection object.
-     * @return returns the database connection object.
-     */
-    public Connection getConnection(){
-        return connection;
+    public void setDriverName(String _driverName) {
+    	String oldValue = driverName;
+        driverName = _driverName;
+        changeSupport.firePropertyChange("driverName", oldValue, password);
     }
     
+    /**
+     * Returns the database driver being used.
+     *
+     * @return returns the database driver being used.
+     */
+    public String getDriverName() {
+        return driverName;
+    }
+    
+    /**
+     * Returns the database connection object.
+     *
+     * @return returns the database connection object.
+     */
+    public Connection getConnection() {
+        return connection;
+    }    
+
     /**
      * Method to add bean property change listeners.
      *
      * @param _listener bean property change listener
      */
-    public void addPropertyChangeListener(PropertyChangeListener _listener){
+    public void addPropertyChangeListener(PropertyChangeListener _listener) {
     	changeSupport.addPropertyChangeListener(_listener);
     }
     
@@ -228,7 +239,7 @@
      *
      * @param _listener bean property change listener
      */    
-    public void removePropertyChangeListener(PropertyChangeListener _listener){
+    public void removePropertyChangeListener(PropertyChangeListener _listener) {
     	changeSupport.removePropertyChangeListener(_listener);
     }
 
@@ -248,7 +259,7 @@
         objIn.defaultReadObject();
         try{
             createConnection();
-        }catch(SQLException se){
+        }catch(SQLException se) {
             se.printStackTrace();
         }
     }
@@ -256,6 +267,9 @@
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/09 23:04:01  yoda2
+ * JavaDoc cleanup.
+ *
  * Revision 1.4  2005/02/09 06:39:06  prasanth
  * Added PropertyChangeSupport
  *

@@ -58,13 +58,13 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  * mappings must be set before calling the bind() method to bind the
  * combobox to a database column.
  *
- * Also, if changing both a rowset and column name consider using the bind()
+ * Also, if changing both a sSRowSet and column name consider using the bind()
  * method rather than individual setSSRowSet() and setColumName() calls. 
  *
  * e.g.
  *      SSComboBox combo = new SSComboBox();
  *      String[] options = {"111", "2222", "33333"};
- *      combo.setOption(options);
+ *      combo.setOptions(options);
  *
  *      For the above items the combobox assumes that the values start from zero:
  *           "111" -> 0, "2222" -> 1, "33333" -> 2
@@ -75,17 +75,20 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  *      SSComboBox combo = new SSComboBox();
  *      String[] options = {"111", "2222", "33333"};
  *      int[] mappings = { 1,5,7 };
- *      combo.setOption(options, mappings);
+ *      combo.setOptions(options, mappings);
  *
- *      // next line is assuming myrowset has been initialized and my_column is a
- *      // column in myrowset
- *      combo.bind(myrowset,"my_column");
+ *      // next line is assuming mysSRowSet has been initialized and my_column is a
+ *      // column in mysSRowSet
+ *      combo.bind(mysSRowSet,"my_column");
  *</pre><p>
  * @author  $Author$
  * @version $Revision$
  */
 //public class SSComboBox extends JComponent {
 public class SSComboBox extends JComboBox {
+    
+/* NOTE: It would probably be best to retool mappings such that they are stored
+         as strings, similar to SSDBComboBox. */
 
     /**
      * Value to represent that no item has been selected in the combo box.
@@ -111,12 +114,12 @@ public class SSComboBox extends JComboBox {
      * Underlying values for each combo box choice if different from defaults
      * of 0, 1, 2, 3, etc.
      */
-    protected int[] mappingValues = null;
+    protected int[] mappings = null;
 
     /**
      * SSRowSet from which component will get/set values.
      */
-    protected SSRowSet rowset;
+    protected SSRowSet sSRowSet;
 
     /**
      * SSRowSet column to which the component will be bound.
@@ -124,10 +127,15 @@ public class SSComboBox extends JComboBox {
     protected String columnName;
     
     /**
-     * Set of predefined options to be displayed in the combo box (e.g. yes/no,
-     * exclude/include, etc.
+     * Options to be displayed in combo box.
      */
-    protected int option = 0;    
+    protected String[] options;
+    
+    /**
+     * Code representing of predefined options to be displayed in the combo box
+     * (e.g. yes/no, exclude/include, etc.
+     */
+    protected int predefinedOptions = -1;    
 
     /**
      * Constant indicating that combo box should display predefined yes/no
@@ -190,6 +198,226 @@ public class SSComboBox extends JComboBox {
     }
 
     /**
+     * Sets the value stored in the component.
+     *
+     * Currently not a bean property since there is no associated variable.     
+     *
+     * @param _value    value to assign to combo box
+     */
+    public void setSelectedValue(int _value) {
+        textField.setText(String.valueOf(_value));
+    }
+
+    /**
+     * Returns the combo box value associated with the currently selected item.
+     *
+     * Currently not a bean property since there is no associated variable.
+     *
+     * @return returns the value associated with the selected item OR -1 if
+     * nothing is selected.
+     */
+    public int getSelectedValue() {
+        //if (cmbDisplayed.getSelectedIndex() == -1) {
+        if (getSelectedIndex() == -1) {
+            return NON_SELECTED;
+        }
+
+        if (mappings != null) {
+            //return mappings[cmbDisplayed.getSelectedIndex()];
+            return mappings[getSelectedIndex()];
+        }
+        //return cmbDisplayed.getSelectedIndex();
+        return getSelectedIndex();
+
+    }
+    
+    /**
+     * Sets the SSRowSet column name to which the component is bound.
+     *
+     * @param _columnName    column name in the SSRowSet to which the component
+     *    is bound
+     */
+    public void setColumnName(String _columnName) {
+        columnName = _columnName;
+        bind();
+    }    
+
+    /**
+     * Returns the column name to which the combo is bound.
+     *
+     * @return returns the column name to which to combo box is bound.
+     */
+    public String getColumnName() {
+        return columnName;
+    }
+    
+    /**
+     * Sets the SSRowSet to which the component is bound.
+     *
+     * @param _sSRowSet    SSRowSet to which the component is bound
+     */
+    public void setSSRowSet(SSRowSet _sSRowSet) {
+        sSRowSet = _sSRowSet;
+        bind();
+    }    
+
+    /**
+     * Returns the SSRowSet being used to get the values.
+     *
+     * @return returns the SSRowSet being used.
+     */
+    public SSRowSet getSSRowSet() {
+        return sSRowSet;
+    }
+    
+    /**
+     * Sets the underlying values for each of the items in the combo box
+     * (e.g. the values that map to the items displayed in the combo box)
+     *
+     * @param _mappings    an array of values that correspond to those in the combo box.
+     */
+    public void setMappings(int[] _mappings) {
+        // INITIALIZE THE ARRAY AND COPY THE MAPPING VALUES
+        mappings = new int[_mappings.length];
+        for (int i=0;i<_mappings.length;i++) {
+            mappings[i] = _mappings[i];
+        }
+    }
+    
+    /**
+     * Returns the underlying values for each of the items in the combo box
+     * (e.g. the values that map to the items displayed in the combo box)
+     *
+     * @return returns the underlying values for each of the items in the combo box
+     */
+    public int[] getMappings() {
+        return mappings;
+    }
+    
+    /**
+     * Adds an array of strings as combo box items.
+     *
+     * @param _options    the list of options that you want to appear in the combo box.
+     */
+    public boolean setOptions(String[] _options) {
+        // UPDATE OPTIONS VARIABLE
+            options = _options;
+            
+        // ADD THE SPECIFIED ITEMS TO THE COMBO BOX
+        // REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
+        // THE DISPLAYED ITEMS
+            if (getItemCount() != 0) {
+                removeAllItems();
+            }
+            for (int i=0;i<_options.length;i++) {
+                addItem(_options[i]);
+            }
+        // INDICATE SUCCESS
+            return true;
+    }
+
+    /**
+     * Returns the items displayed in the combo box.
+     *
+     * @return returns the items displayed in the combo box
+     */
+    public String[] getOptions() {
+        return options;
+// if developer is adding items with addItem() then options won't have the data
+// may be better to loop through all items and return that way...
+    }    
+
+    /**
+     * Sets the options to be displayed in the combo box and their corresponding values.
+     *
+     * @param _options    options to be displayed in the combo box.
+     * @param _mappings    integer values that correspond to the options in the combo box.
+     *
+     * @return returns true if the options and mappings are set successfully -
+     *    returns false if the size of arrays do not match or if the values could
+     *    not be set
+     */
+    public boolean setOptions(String[] _options, int[]_mappings) {
+        if (_options.length != _mappings.length) {
+            return false;
+        }
+        
+        options = _options;
+        
+        // REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
+        // THE DISPLAYED ITEMS
+        if (getItemCount() != 0) {
+            removeAllItems();
+        }
+        // ADD THE ITEMS TO THE COMBOBOX
+        for (int i=0;i<_options.length;i++) {
+            addItem(_options[i]);
+        }
+        // COPY THE MAPPING VALUES
+        mappings = new int[_mappings.length];
+        for (int i=0;i<_mappings.length;i++) {
+            mappings[i] = _mappings[i];
+        }
+
+        return true;
+    }
+
+    /**
+     * Sets the options to be displayed in the combo box based on common
+     * predefined options.
+     *
+     * @param _predefinedOptions predefined options to be displayed in the combo box.
+     */
+    public boolean setPredefinedOptions(int _predefinedOptions) {
+        
+        if (getItemCount() != 0) {
+            removeAllItems();
+        }
+        if (_predefinedOptions == YES_NO_OPTION) {
+            addItem(new String("No"));
+            addItem(new String("Yes"));
+            options = new String[]{"No", "Yes"};
+        } else if (_predefinedOptions == SEX_OPTION || _predefinedOptions == GENDER_OPTION) {
+            addItem(new String("Male"));
+            addItem(new String("Female"));
+            addItem(new String("Unisex"));
+            options = new String[]{"Male", "Female", "Unisex"};
+        } else if (_predefinedOptions == INCLUDE_EXCLUDE_OPTION) {
+            addItem(new String("Include"));
+            addItem(new String("Exclude"));
+            options = new String[]{"Include", "Exclude"};
+        } else {
+            return false;
+        }
+        
+        predefinedOptions = _predefinedOptions;
+
+        return true;
+    }
+    
+    /**
+     * Returns the option code used to display predefined options in the
+     * combo box.
+     *
+     * @return returns the predefined option code
+     */
+    public int getPredefinedOptions() {
+        return predefinedOptions;
+    }
+
+    /**
+     * Sets the SSRowSet and column name to which the component is to be bound.
+     *
+     * @param _sSRowSet    datasource to be used.
+     * @param _columnName    Name of the column to which this check box should be bound
+     */
+    public void bind(SSRowSet _sSRowSet, String _columnName) {
+        sSRowSet = _sSRowSet;
+        columnName = _columnName;
+        bind();
+    }
+    
+    /**
      * Initialization code.
      */
     protected void init() {
@@ -205,75 +433,7 @@ public class SSComboBox extends JComboBox {
             
         // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,20));
-    }
-
-    /**
-     * Returns the value associated with the selected item.
-     *
-     * @return returns the value associated with the item selected. -1 if none selected.
-     */
-    public int getSelectedValue() {
-        //if (cmbDisplayed.getSelectedIndex() == -1) {
-        if (getSelectedIndex() == -1) {
-            return NON_SELECTED;
-        }
-
-        if (mappingValues != null) {
-            //return mappingValues[cmbDisplayed.getSelectedIndex()];
-            return mappingValues[getSelectedIndex()];
-        }
-        //return cmbDisplayed.getSelectedIndex();
-        return getSelectedIndex();
-
-    }
-
-    /**
-     * Returns the column name to which the combo is bound.
-     *
-     * @return returns the column name to which to combo box is bound.
-     */
-    public String getColumnName() {
-        return columnName;
-    }
-
-    /**
-     * Returns the SSRowSet being used to get the values.
-     *
-     * @return returns the SSRowSet being used.
-     */
-    public SSRowSet getSSRowSet() {
-        return rowset;
-    }
-
-    /**
-     * Sets the SSRowSet column name to which the component is bound.
-     *
-     * @param _columnName    column name in the SSRowSet to which the component
-     *    is bound
-     */
-    public void setColumnName(String _columnName) {
-        columnName = _columnName;
-        bind();
-    }
-
-    /**
-     * Sets the SSRowSet to which the component is bound.
-     *
-     * @param _rowset    SSRowSet to which the component is bound
-     */
-    public void setSSRowSet(SSRowSet _rowset) {
-        rowset = _rowset;
-        bind();
-    }
-
-    /**
-     * Sets the value.
-     *
-     * @param _value    value to assign to combo box
-     */
-    public void setSelectedValue(int _value) {
-        textField.setText(String.valueOf(_value));
-    }
+    }    
 
     /**
      * Method for handling binding of component to a SSRowSet column.
@@ -281,7 +441,7 @@ public class SSComboBox extends JComboBox {
     protected void bind() {
         
         // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || rowset==null) {
+            if (columnName==null || sSRowSet==null) {
                 return;
             }
             
@@ -289,7 +449,7 @@ public class SSComboBox extends JComboBox {
             removeListeners();
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
-            textField.setDocument(new SSTextDocument(rowset, columnName));
+            textField.setDocument(new SSTextDocument(sSRowSet, columnName));
 
         // SET THE COMBO BOX ITEM DISPLAYED
             updateDisplay();
@@ -297,18 +457,6 @@ public class SSComboBox extends JComboBox {
         // ADD BACK LISTENERS
             addListeners();
                
-    }
-
-    /**
-     * Sets the SSRowSet and column name to which the component is to be bound.
-     *
-     * @param _rowset    datasource to be used.
-     * @param _columnName    Name of the column to which this check box should be bound
-     */
-    public void bind(SSRowSet _rowset, String _columnName) {
-        rowset = _rowset;
-        columnName = _columnName;
-        bind();
     }
 
     /**
@@ -330,11 +478,11 @@ public class SSComboBox extends JComboBox {
             // IN CASE TWO: YOU HAVE TO CHECK IF THE VALUE IN THE MAPPINGVALUES ARRAY AT INDEX EQUAL
             // TO THE SELECTED INDEX OF THE COMBO BOX EQUALS THE VALUE IN TEXT FIELD
             // IF THESE CONDITIONS ARE MET YOU NEED NOT CHANGE COMBO BOX SELECTED ITEM
-            if ( (mappingValues==null && intValue != getSelectedIndex()) ||
-                 (mappingValues!=null && getSelectedIndex() == -1)       ||
-                 (mappingValues!=null && mappingValues[getSelectedIndex()] != intValue) ) {
+            if ( (mappings==null && intValue != getSelectedIndex()) ||
+                 (mappings!=null && getSelectedIndex() == -1)       ||
+                 (mappings!=null && mappings[getSelectedIndex()] != intValue) ) {
 
-                if (mappingValues==null && (intValue <0 || intValue >= getItemCount() )) {
+                if (mappings==null && (intValue <0 || intValue >= getItemCount() )) {
                 // IF EXPLICIT VALUES FOR THE ITEMS IN COMBO ARE NOT SPECIFIED THEN CODES START
                 // FROM ZERO. IN SUCH A CASE CHECK IF THE NUMBER EXCEEDS THE NUMBER OF ITEMS
                 // IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)
@@ -343,16 +491,16 @@ public class SSComboBox extends JComboBox {
                 } else {
                 // IF MAPPINGS  ARE SPECIFIED THEN GET THE INDEX AT WHICH THE VALUE IN TEXT FIELD
                 // APPEARS IN THE MAPPINGVALUES ARRAY. SET THE SELECTED ITEM OF COMBO SO THAT INDEX
-                    if (mappingValues!=null) {
+                    if (mappings!=null) {
                         int i=0;
-                        for (;i<mappingValues.length;i++) {
-                            if (mappingValues[i] == intValue) {
+                        for (;i<mappings.length;i++) {
+                            if (mappings[i] == intValue) {
                                 setSelectedIndex(i);
                                 break;
                             }
                         }
                         // IF THAT VALUE IS NOT FOUND IN THE GIVEN MAPPING VALUES PRINT AN ERROR MESSAGE
-                        if (i==mappingValues.length) {
+                        if (i==mappings.length) {
                             System.out.println("change ERROR: could not find a corresponding item in combo for value " + intValue);
                             setSelectedIndex(-1);
                         }
@@ -384,118 +532,6 @@ public class SSComboBox extends JComboBox {
     private void removeListeners() {
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
         removeActionListener(cmbListener);
-    }
-
-    /**
-     * Adds an array of strings as combo box items.
-     *
-     * @param _options    the list of options that you want to appear in the combo box.
-     */
-    public boolean setOption(String[] _options){
-        // ADD THE SPECIFIED ITEMS TO THE COMBO BOX
-        // REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
-        // THE DISPLAYED ITEMS
-        if (getItemCount() != 0) {
-            removeAllItems();
-        }
-        for (int i=0;i<_options.length;i++) {
-            addItem(_options[i]);
-        }
-
-        return true;
-    }
-
-    /**
-     * Sets the values for each of the items in the combo. (Values that map to the
-     * items in the combo box)
-     *
-     * @param _mappings    an array of values that correspond to those in the combo box.
-     */
-    public void setMappingValues(int[] _mappings) {
-        // INITIALIZE THE ARRAY AND COPY THE MAPPING VALUES
-        mappingValues = new int[_mappings.length];
-        for (int i=0;i<_mappings.length;i++) {
-            mappingValues[i] = _mappings[i];
-        }
-    }
-
-    /**
-     * Sets the options to be displayed in the combo box and their corresponding values.
-     *
-     *@param _options    options to be displayed in the combo box.
-     *@param _mappings    integer values that correspond to the options in the combo box.
-     *
-     *@return returns true if the options and mappings are set successfully -
-     *    returns false if the size of arrays do not match or if the values could
-     *    not be set
-     */
-    public boolean setOption(String[] _options, int[]_mappings) {
-        if (_options.length != _mappings.length) {
-            return false;
-        }
-        
-        // REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
-        // THE DISPLAYED ITEMS
-        if (getItemCount() != 0) {
-            removeAllItems();
-        }
-        // ADD THE ITEMS TO THE COMBOBOX
-        for (int i=0;i<_options.length;i++) {
-            addItem(_options[i]);
-        }
-        // COPY THE MAPPING VALUES
-        mappingValues = new int[_mappings.length];
-        for (int i=0;i<_mappings.length;i++) {
-            mappingValues[i] = _mappings[i];
-        }
-
-        return true;
-    }
-
-    /**
-     * Sets the options to be displayed in the combo box and their corresponding values.
-     *
-     * @param _options    predefined options to be displayed in the combo box.
-     * @param _mappings    integer values that correspond to the options in the combo box.
-     */
-    public void setOption(int _options, int[]_mappings) {
-        // COPY THE MAPPING VALUES
-        mappingValues = new int[_mappings.length];
-        for (int i=0;i<_mappings.length;i++) {
-            mappingValues[i] = _mappings[i];
-        }
-        // SET THE OPTIONS IN THE COMBO BOX
-        setOption(_options);
-    }
-
-    /**
-     * Sets the options to be displayed in the combo box based on common
-     * predefined options.
-     *
-     * @param _option predefined options to be displayed in the combo box.
-     */
-    public boolean setOption(int _option) {
-
-        option = _option;
-
-        if (getItemCount() != 0) {
-            removeAllItems();
-        }
-        if (option == YES_NO_OPTION) {
-            addItem(new String("No"));
-            addItem(new String("Yes"));
-        } else if (option == SEX_OPTION || option == GENDER_OPTION) {
-            addItem(new String("Male"));
-            addItem(new String("Female"));
-            addItem(new String("Unisex"));
-        } else if (option == INCLUDE_EXCLUDE_OPTION) {
-            addItem(new String("Include"));
-            addItem(new String("Exclude"));
-        } else {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -543,11 +579,11 @@ public class SSComboBox extends JComboBox {
                         valueOfText = Integer.parseInt(strValueInText);
                     }
 
-                    if ( mappingValues == null && valueOfText != index ) {
+                    if ( mappings == null && valueOfText != index ) {
                         textField.setText( String.valueOf(index) );
                     }
-                    else if(mappingValues != null && mappingValues.length > index && valueOfText != mappingValues[index]){
-                        textField.setText(String.valueOf(mappingValues[index]));
+                    else if(mappings != null && mappings.length > index && valueOfText != mappings[index]){
+                        textField.setText(String.valueOf(mappings[index]));
                     }
                 }
             } catch(NullPointerException npe) {
@@ -634,7 +670,81 @@ public class SSComboBox extends JComboBox {
     public Component getComponent() {
         return this;
     }
+    
+    /**
+     * Adds an array of strings as combo box items.
+     *
+     * @param _options    the list of options that you want to appear in the combo box.
+     *
+     * @return returns true if the options and mappings are set successfully -
+     *    returns false if the size of arrays do not match or if the values could
+     *    not be set     
+     *
+     * @deprecated
+     * @see #setOptions     
+     */
+    public boolean setOption(String[] _options) {
+        return setOptions(_options);
+        
+    }
+    
+    /**
+     * Sets the options to be displayed in the combo box and their corresponding values.
+     *
+     * @param _options    options to be displayed in the combo box.
+     * @param _mappings    integer values that correspond to the options in the combo box.
+     *
+     * @return returns true if the options and mappings are set successfully -
+     *    returns false if the size of arrays do not match or if the values could
+     *    not be set
+     *
+     * @deprecated
+     * @see #setOptions
+     */
+    public boolean setOption(String[] _options, int[]_mappings) {
+        return setOptions(_options, _mappings);
+    }
 
+    /**
+     * Sets the options to be displayed in the combo box and their corresponding values.
+     *
+     * @param _options    predefined options to be displayed in the combo box.
+     * @param _mappings    integer values that correspond to the options in the combo box.
+     *
+     * @deprecated
+     * @see #setPredefinedOptions
+     * @see #setMappings    
+     */
+    public void setOption(int _options, int[]_mappings) {
+        setPredefinedOptions(_options);
+        setMappings(_mappings);
+    }
+
+    /**
+     * Sets the options to be displayed in the combo box based on common
+     * predefined options.
+     *
+     * @param _option predefined options to be displayed in the combo box.
+     *
+     * @deprecated
+     * @see #setPredefinedOptions     
+     */
+    public boolean setOption(int _option) {
+        return setPredefinedOptions(_option);
+    }
+    
+    /**
+     * Sets the underlying values for each of the items in the combo box
+     * (e.g. the values that map to the items displayed in the combo box)
+     *
+     * @param _mappings    an array of values that correspond to those in the combo box.
+     *
+     * @deprecated
+     * @see #setMappings       
+     */
+    public void setMappingValues(int[] _mappings) {
+        setMappings(_mappings);
+    }    
 
 } // end public class SSComboBox extends JComboBox {
 
@@ -642,6 +752,9 @@ public class SSComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.29  2005/02/10 03:46:47  yoda2
+ * Replaced all setDisplay() methods & calls with updateDisplay() methods & calls to prevent any setter/getter confusion.
+ *
  * Revision 1.28  2005/02/07 20:36:35  yoda2
  * Made private listener data members final.
  *
@@ -712,8 +825,8 @@ public class SSComboBox extends JComboBox {
  * 2. Added key listener to transfer focus on enter key.
  *
  * Revision 1.7  2004/08/02 14:41:10  prasanth
- * 1. Added set methods for rowset, columnname, selectedvalue.
- * 2. Added get methods for rowset, columname.
+ * 1. Added set methods for sSRowSet, columnname, selectedvalue.
+ * 2. Added get methods for sSRowSet, columname.
  * 3. Added addComponent and removeListener functions (private).
  *
  * Revision 1.6  2004/03/08 16:43:37  prasanth

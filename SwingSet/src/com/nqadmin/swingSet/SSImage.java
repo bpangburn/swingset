@@ -82,17 +82,23 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
     /**
      * SSRowSet from which component will get/set values.
      */
-    protected SSRowSet rowset;
+    protected SSRowSet sSRowSet;
 
     /**
      * SSRowSet column to which the component will be bound.
      */
     protected String columnName;
+    
+    /**
+     * The preferred size of the image component.
+     */
+    protected Dimension preferredSize;
+    
 
     /**
      * RowSet listener
      */
-    private final MyRowSetListener rowsetListener = new MyRowSetListener();
+    private final MyRowSetListener sSRowSetListener = new MyRowSetListener();
 
     /**
      *
@@ -103,18 +109,130 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
     }
 
     /**
-     * Constructs a SSImage Object bound to the specified column in the specified rowset.
+     * Constructs a SSImage Object bound to the specified column in the specified sSRowSet.
      *
-     * @param _rowset - rowset from/to which data has to be read/written
-     * @param _columnName - column in the rowset to which the component should be bound.
+     * @param _sSRowSet - sSRowSet from/to which data has to be read/written
+     * @param _columnName - column in the sSRowSet to which the component should be bound.
      */
-    public SSImage(SSRowSet _rowset, String _columnName) {
-        rowset = _rowset;
+    public SSImage(SSRowSet _sSRowSet, String _columnName) {
+        sSRowSet = _sSRowSet;
         columnName = _columnName;
         init();
         bind();
     }
 
+    /**
+     * Sets the SSRowSet to which the component is bound.
+     *
+     * @param _sSRowSet    SSRowSet to which the component is bound
+     */
+    public void setSSRowSet(SSRowSet _sSRowSet) {
+        sSRowSet = _sSRowSet;
+        bind();
+    }
+
+    /**
+     * Returns the SSRowSet to which the component is bound.
+     *
+     * @return SSRowSet to which the component is bound
+     */
+    public SSRowSet getSSRowSet() {
+        return sSRowSet;
+    }    
+
+    /**
+     * Sets the SSRowSet column name to which the component is bound.
+     *
+     * @param _columnName    column name in the SSRowSet to which the component
+     *    is bound
+     */
+    public void setColumnName(String _columnName) {
+        columnName = _columnName;
+        bind();
+    }
+
+    /**
+     * Returns the SSRowSet column name to which the component is bound.
+     *
+     * @return column name to which the component is bound
+     */
+    public String getColumnName() {
+        return columnName;
+    }
+
+    /**
+     * Changes the image to the specified image.
+     *
+     * @param _img GIF or JPEG to store to sSRowSet & display
+     */
+/*
+    public void setImage(ImageIcon _img){
+        img = _img;
+        if(img != null){
+            lblImage.setIcon(img);
+            lblImage.setText("");
+        }
+        else{
+            lblImage.setIcon(null);
+            lblImage.setText("No Picture");
+        }
+        updateUI();
+    }
+*/
+
+    /**
+     * Returns the current image.
+     */
+/*
+    public void getImage(ImageIcon _img) {
+        return(img);
+    }
+*/
+
+    /**
+     * Sets the preferred size of the image component.
+     *
+     * @param _preferredSize - preferred size of the image component
+     */
+    public void setPreferredSize(Dimension _preferredSize) {
+        preferredSize = _preferredSize;
+        lblImage.setPreferredSize(new Dimension((int)_preferredSize.getWidth(), (int)_preferredSize.getHeight() - 20));
+        btnUpdateImage.setPreferredSize(new Dimension((int)_preferredSize.getWidth(), 20));
+        super.setPreferredSize(_preferredSize);
+    }
+    
+    /**
+     * Returns the preferred size of the image component.
+     *
+     * @return returns preferred size of the image component
+     */
+    public Dimension getPreferredSize() {
+        return preferredSize;
+    }       
+
+    /**
+     * Removes the current image. The image is not removed from the underlying sSRowSet.
+     */
+    public void clearImage(){
+        lblImage.setIcon(null);
+        lblImage.setText("No Picture");
+        Dimension dimension = getPreferredSize();
+        lblImage.setPreferredSize(new Dimension((int)dimension.getWidth(), (int)dimension.getHeight()-20));
+        updateUI();
+    }
+
+    /**
+     * Sets the SSRowSet and column name to which the component is to be bound.
+     *
+     * @param _sSRowSet    datasource to be used.
+     * @param _columnName    Name of the column to which this check box should be bound
+     */
+    public void bind(SSRowSet _sSRowSet, String _columnName) {
+        sSRowSet = _sSRowSet;
+        columnName = _columnName;
+        bind();
+    }
+    
     /**
      * Initialization code.
      */
@@ -124,7 +242,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
             btnUpdateImage.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent ae){
                     try{
-                        if(rowset != null){
+                        if(sSRowSet != null){
                             FileInputStream inStream = null;
                             File inFile = null;
                             JFileChooser fileChooser = new JFileChooser();
@@ -141,7 +259,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
                                     else
                                         bytesRead += read;
                                 }
-                                rowset.updateBytes(columnName, bytes);
+                                sSRowSet.updateBytes(columnName, bytes);
                                 img = new ImageIcon(bytes);
                                 lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
                                 lblImage.setIcon(img);
@@ -181,87 +299,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
         add(scrollPane, constraints);
         constraints.gridy = 1;
         add(btnUpdateImage, constraints);
-    }
-
-    /**
-     * Sets the SSRowSet to which the component is bound.
-     *
-     * @param _rowset    SSRowSet to which the component is bound
-     */
-    public void setSSRowSet(SSRowSet _rowset) {
-        rowset = _rowset;
-        bind();
-    }
-
-    /**
-     * Sets the SSRowSet column name to which the component is bound.
-     *
-     * @param _columnName    column name in the SSRowSet to which the component
-     *    is bound
-     */
-    public void setColumnName(String _columnName) {
-        columnName = _columnName;
-        bind();
-    }
-
-    /**
-     * Returns the SSRowSet column name to which the component is bound.
-     *
-     * @return column name to which the component is bound
-     */
-    public String getColumnName() {
-        return columnName;
-    }
-
-    /**
-     * Returns the SSRowSet to which the component is bound.
-     *
-     * @return SSRowSet to which the component is bound
-     */
-    public SSRowSet getSSRowSet() {
-        return rowset;
-    }
-
-    /**
-     * Changes the image to the specified image.
-     *
-     * @param _img GIF or JPEG to store to rowset & display
-     */
-/*
-    public void setImage(ImageIcon _img){
-        img = _img;
-        if(img != null){
-            lblImage.setIcon(img);
-            lblImage.setText("");
-        }
-        else{
-            lblImage.setIcon(null);
-            lblImage.setText("No Picture");
-        }
-        updateUI();
-    }
-*/
-
-    /**
-     * Returns the current image.
-     */
-/*
-    public void getImage(ImageIcon _img) {
-        return(img);
-    }
-*/
-
-    /**
-     * Sets the SSRowSet and column name to which the component is to be bound.
-     *
-     * @param _rowset    datasource to be used.
-     * @param _columnName    Name of the column to which this check box should be bound
-     */
-    public void bind(SSRowSet _rowset, String _columnName) {
-        rowset = _rowset;
-        columnName = _columnName;
-        bind();
-    }
+    }    
 
     /**
      * Method for handling binding of component to a SSRowSet column.
@@ -269,7 +307,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
     protected void bind() {
 
         // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || rowset==null) {
+            if (columnName==null || sSRowSet==null) {
                 return;
             }
 
@@ -282,21 +320,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
         // ADD BACK LISTENERS
             addListeners();
     }
-
-    /**
-     * Adds listeners for component and bound text field (where applicable).
-     */
-    private void addListeners() {
-        rowset.addRowSetListener(rowsetListener);
-    }
-
-    /**
-     * Removes listeners for component and bound text field (where applicable).
-     */
-    private void removeListeners() {
-        rowset.removeRowSetListener(rowsetListener);
-    }
-
+    
     /**
      * Updates the value displayed in the component based on the SSRowSet column
      * binding.
@@ -304,7 +328,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
     protected void updateDisplay() {
 
         try {
-            byte[] imageData = rowset.getRow() >0 ? rowset.getBytes(columnName) : null;
+            byte[] imageData = sSRowSet.getRow() >0 ? sSRowSet.getBytes(columnName) : null;
             if(imageData != null){
                 img = new ImageIcon(imageData);
                 lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
@@ -321,6 +345,20 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
         lblImage.setIcon(img);
         updateUI();
 
+    }    
+
+    /**
+     * Adds listeners for component and bound text field (where applicable).
+     */
+    private void addListeners() {
+        sSRowSet.addRowSetListener(sSRowSetListener);
+    }
+
+    /**
+     * Removes listeners for component and bound text field (where applicable).
+     */
+    private void removeListeners() {
+        sSRowSet.removeRowSetListener(sSRowSetListener);
     }
 
     /**
@@ -343,32 +381,13 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
         }
 
     }
-
-    /**
-     * Sets the preferred size of this component.
-     *
-     * @param dimension - preferred dimension for component.
-     */
-    public void setPreferredSize(Dimension dimension){
-        lblImage.setPreferredSize(new Dimension((int)dimension.getWidth(), (int)dimension.getHeight() - 20));
-        btnUpdateImage.setPreferredSize(new Dimension((int)dimension.getWidth(), 20));
-        super.setPreferredSize(dimension);
-    }
-
-    /**
-     * Removes the current image. The image is not removed from the underlying rowset.
-     */
-    public void clearImage(){
-        lblImage.setIcon(null);
-        lblImage.setText("No Picture");
-        Dimension dimension = getPreferredSize();
-        lblImage.setPreferredSize(new Dimension((int)dimension.getWidth(), (int)dimension.getHeight()-20));
-        updateUI();
-    }
 }
 
 /*
  *$Log$
+ *Revision 1.6  2005/02/10 03:46:47  yoda2
+ *Replaced all setDisplay() methods & calls with updateDisplay() methods & calls to prevent any setter/getter confusion.
+ *
  *Revision 1.5  2005/02/10 03:39:17  yoda2
  *Added JavaDoc for class description.
  *

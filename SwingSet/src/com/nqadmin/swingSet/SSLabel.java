@@ -64,7 +64,7 @@ public class SSLabel extends JLabel {
     /**
      * SSRowSet from which component will get/set values.
      */
-    protected SSRowSet rowset;
+    protected SSRowSet sSRowSet;
 
     /**
      * SSRowSet column to which the component will be bound.
@@ -114,43 +114,16 @@ public class SSLabel extends JLabel {
      * Creates a SSLabel instance with no image and binds it to the specified
      * SSRowSet column.
      *
-     * @param _rowset    datasource to be used.
+     * @param _sSRowSet    datasource to be used.
      * @param _columnName    name of the column to which this label should be bound
      */
-    public SSLabel(SSRowSet _rowset, String _columnName) {
-        rowset = _rowset;
+    public SSLabel(SSRowSet _sSRowSet, String _columnName) {
+        sSRowSet = _sSRowSet;
         columnName = _columnName;
         init();
         bind();
     }
-
-    /**
-     * Initialization code.
-     */
-    protected void init() {
-
-        // SET PREFERRED DIMENSIONS
-            setPreferredSize(new Dimension(200,20));
-    }
-
-    /**
-     * Returns the SSRowSet column name to which the component is bound.
-     *
-     * @return column name to which the component is bound
-     */
-    public String getColumnName() {
-        return columnName;
-    }
-
-    /**
-     * Returns the SSRowSet to which the component is bound.
-     *
-     * @return SSRowSet to which the component is bound
-     */
-    public SSRowSet getSSRowSet() {
-        return rowset;
-    }
-
+    
     /**
      * Sets the SSRowSet column name to which the component is bound.
      *
@@ -160,25 +133,64 @@ public class SSLabel extends JLabel {
     public void setColumnName(String _columnName) {
         columnName = _columnName;
         bind();
-    }
+    }    
 
+    /**
+     * Returns the SSRowSet column name to which the component is bound.
+     *
+     * @return column name to which the component is bound
+     */
+    public String getColumnName() {
+        return columnName;
+    }
+    
     /**
      * Sets the SSRowSet to which the component is bound.
      *
-     * @param _rowset    SSRowSet to which the component is bound
+     * @param _sSRowSet    SSRowSet to which the component is bound
      */
-    public void setSSRowSet(SSRowSet _rowset) {
-        rowset = _rowset;
+    public void setSSRowSet(SSRowSet _sSRowSet) {
+        sSRowSet = _sSRowSet;
         bind();
-    }
+    }    
 
+    /**
+     * Returns the SSRowSet to which the component is bound.
+     *
+     * @return SSRowSet to which the component is bound
+     */
+    public SSRowSet getSSRowSet() {
+        return sSRowSet;
+    }
+    
+    /**
+     * Sets the SSRowSet and column name to which the component is to be bound.
+     *
+     * @param _sSRowSet    datasource to be used.
+     * @param _columnName    Name of the column to which this check box should be bound
+     */
+    public void bind(SSRowSet _sSRowSet, String _columnName) {
+        sSRowSet = _sSRowSet;
+        columnName = _columnName;
+        bind();
+    }     
+
+    /**
+     * Initialization code.
+     */
+    protected void init() {
+
+        // SET PREFERRED DIMENSIONS
+            setPreferredSize(new Dimension(200,20));
+    }
+   
     /**
      * Method for handling binding of component to a SSRowSet column.
      */
     protected void bind() {
 
         // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || rowset==null) {
+            if (columnName==null || sSRowSet==null) {
                 return;
             }
 
@@ -186,7 +198,7 @@ public class SSLabel extends JLabel {
             removeListeners();
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
-            textField.setDocument(new SSTextDocument(rowset, columnName));
+            textField.setDocument(new SSTextDocument(sSRowSet, columnName));
 
         // SET THE LABEL DISPLAY
             updateDisplay();
@@ -194,18 +206,6 @@ public class SSLabel extends JLabel {
         // ADD BACK LISTENERS
             addListeners();;
 
-    }
-
-    /**
-     * Sets the SSRowSet and column name to which the component is to be bound.
-     *
-     * @param _rowset    datasource to be used.
-     * @param _columnName    Name of the column to which this check box should be bound
-     */
-    public void bind(SSRowSet _rowset, String _columnName) {
-        rowset = _rowset;
-        columnName = _columnName;
-        bind();
     }
 
     /**
@@ -290,6 +290,9 @@ public class SSLabel extends JLabel {
 
 /*
  * $Log$
+ * Revision 1.9  2005/02/10 03:46:47  yoda2
+ * Replaced all setDisplay() methods & calls with updateDisplay() methods & calls to prevent any setter/getter confusion.
+ *
  * Revision 1.8  2005/02/09 17:29:55  yoda2
  * JavaDoc cleanup.
  *

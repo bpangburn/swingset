@@ -77,7 +77,7 @@ public class SSTextField extends JTextField {
     /**
      * SSRowSet from which component will get/set values.
      */
-    protected SSRowSet rowset;
+    protected SSRowSet sSRowSet;
 
     /**
      * SSRowSet column to which the component will be bound.
@@ -92,7 +92,7 @@ public class SSTextField extends JTextField {
     /**
      * Default number of decimals to show for float, double, etc.
      */
-    protected int numDecimals = 2;
+    protected int numberOfDecimalPlaces = 2;
 
 
     /**
@@ -130,11 +130,11 @@ public class SSTextField extends JTextField {
      * decimal places. Use this constructor only if you are using a decimal mask.
      *
      * @param _mask    the mask required for this textfield.
-     * @param _numDecimals    number of decimal places required
+     * @param _numberOfDecimalPlaces    number of decimal places required
      */
-     public SSTextField(int _mask, int _numDecimals) {
+     public SSTextField(int _mask, int _numberOfDecimalPlaces) {
         mask = _mask;
-        numDecimals = _numDecimals;
+        numberOfDecimalPlaces = _numberOfDecimalPlaces;
         init();
      }
 
@@ -154,12 +154,12 @@ public class SSTextField extends JTextField {
      * Use this constructor only if you are using a decimal mask.
      *</pre>
      * @param _mask    the mask required for this text field.
-     * @param _numDecimals    number of decimal places required
+     * @param _numberOfDecimalPlaces    number of decimal places required
      * @param _align    alignment required
      */
-     public SSTextField(int _mask, int _numDecimals, int _align) {
+     public SSTextField(int _mask, int _numberOfDecimalPlaces, int _align) {
         mask = _mask;
-        numDecimals = _numDecimals;
+        numberOfDecimalPlaces = _numberOfDecimalPlaces;
         setHorizontalAlignment(_align);
         init();
      }
@@ -168,16 +168,55 @@ public class SSTextField extends JTextField {
      * Creates a SSTextField instance and binds it to the specified
      * SSRowSet column.
      *
-     * @param _rowset    datasource to be used.
+     * @param _sSRowSet    datasource to be used.
      * @param _columnName    name of the column to which this label should be bound
      */
-    public SSTextField(SSRowSet _rowset, String _columnName) {
-		rowset = _rowset;
+    public SSTextField(SSRowSet _sSRowSet, String _columnName) {
+		sSRowSet = _sSRowSet;
         columnName = _columnName;
         init();
         bind();
-    }     
+    }
+    
+    /**
+     * Sets the SSRowSet column name to which the component is bound.
+     *
+     * @param _columnName    column name in the SSRowSet to which the component
+     *    is bound
+     */
+    public void setColumnName(String _columnName) {
+        columnName = _columnName;
+        bind();
+    }    
 
+    /**
+     * Returns the SSRowSet column name to which the component is bound.
+     *
+     * @return column name to which the component is bound
+     */
+    public String getColumnName() {
+        return columnName;
+    }
+    
+    /**
+     * Sets the SSRowSet to which the component is bound.
+     *
+     * @param _sSRowSet    SSRowSet to which the component is bound
+     */
+    public void setSSRowSet(SSRowSet _sSRowSet) {
+        sSRowSet = _sSRowSet;
+        bind();
+    }    
+
+    /**
+     * Returns the SSRowSet to which the component is bound.
+     *
+     * @return SSRowSet to which the component is bound
+     */
+    public SSRowSet getSSRowSet() {
+        return sSRowSet;
+    }
+    
     /**
      * Sets the text field mask.
      *
@@ -187,11 +226,54 @@ public class SSTextField extends JTextField {
         mask = _mask;
         init();
      }
+     
+    /**
+     * Returns the text field mask.
+     *
+     * @return editing mask for text field
+     */
+    public int getMask() {
+        return mask;
+    }     
 
+    /**
+     * Sets the number of decimal places required.
+     * This number is used only when mask is set to DECIMAL.
+     * Default value is 2.
+     *
+     * @param _numberOfDecimalPlaces desired # of decimal places
+     */
+     public void setNumberOfDecimalPlaces(int _numberOfDecimalPlaces) {
+        numberOfDecimalPlaces = _numberOfDecimalPlaces;
+     }
+     
+    /**
+     * Returns the number of decimal places required.
+     * This number is used only when mask is set to DECIMAL.
+     * Default value is 2.
+     *
+     * @return desired # of decimal places
+     */
+    public int getNumberOfDecimalPlaces() {
+        return numberOfDecimalPlaces;
+    }         
+
+    /**
+     * Sets the SSRowSet and column name to which the component is to be bound.
+     *
+     * @param _sSRowSet    datasource to be used.
+     * @param _columnName    Name of the column to which this check box should be bound
+     */
+     public void bind(SSRowSet _sSRowSet, String _columnName) {
+        sSRowSet = _sSRowSet;
+        columnName = _columnName;
+        bind();
+     }    
+    
     /**
      * Initialization code.
      */
-     protected void init() {
+    protected void init() {
          
         // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,20));         
@@ -231,46 +313,7 @@ public class SSTextField extends JTextField {
     
             });
 
-     } // end protected void init() {
-
-    /**
-     * Returns the SSRowSet column name to which the component is bound.
-     *
-     * @return column name to which the component is bound
-     */
-    public String getColumnName() {
-        return columnName;
-    }
-
-    /**
-     * Returns the SSRowSet to which the component is bound.
-     *
-     * @return SSRowSet to which the component is bound
-     */
-    public SSRowSet getSSRowSet() {
-        return rowset;
-    }
-
-    /**
-     * Sets the SSRowSet column name to which the component is bound.
-     *
-     * @param _columnName    column name in the SSRowSet to which the component
-     *    is bound
-     */
-    public void setColumnName(String _columnName) {
-        columnName = _columnName;
-        bind();
-    }
-
-    /**
-     * Sets the SSRowSet to which the component is bound.
-     *
-     * @param _rowset    SSRowSet to which the component is bound
-     */
-    public void setSSRowSet(SSRowSet _rowset) {
-        rowset = _rowset;
-        bind();
-    }
+    } // end protected void init() {    
 
     /**
      * Method for handling binding of component to a SSRowSet column.
@@ -278,7 +321,7 @@ public class SSTextField extends JTextField {
     protected void bind() {
 
         // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || rowset==null) {
+            if (columnName==null || sSRowSet==null) {
                 return;
             }
 
@@ -286,43 +329,19 @@ public class SSTextField extends JTextField {
         //    removeListeners();
 
         // BIND THE TEXT AREA TO THE SPECIFIED COLUMN
-            setDocument(new SSTextDocument(rowset, columnName));
+            setDocument(new SSTextDocument(sSRowSet, columnName));
 
         // ADD BACK LISTENERS
         //    addListeners();;
 
     }    
-     
 
     /**
-     * Sets the SSRowSet and column name to which the component is to be bound.
+     * Function to manage keystrokes for masks.
      *
-     * @param _rowset    datasource to be used.
-     * @param _columnName    Name of the column to which this check box should be bound
+     * @param _ke    the KeyEvent that occured
      */
-     public void bind(SSRowSet _rowset, String _columnName) {
-        rowset = _rowset;
-        columnName = _columnName;
-        bind();
-     }
-
-     /**
-      * Sets the number of decimal places required.
-      * This number is used only when mask is set to DECIMAL.
-      * Default value is 2.
-      *
-      * @param _numDecimals desired # of decimals
-      */
-     public void setNumberOfDecimalPlaces(int _numDecimals) {
-        numDecimals = _numDecimals;
-     }
-
-     /**
-      * Function to manage keystrokes for masks.
-      *
-      * @param _ke    the KeyEvent that occured
-      */
-     protected void mask(KeyEvent _ke) {
+    protected void mask(KeyEvent _ke) {
          // DECLARATIONS
             String str = getText();
             char ch = _ke.getKeyChar();
@@ -362,22 +381,22 @@ public class SSTextField extends JTextField {
                     setText(ssnMask(str, _ke));
                     break;
                 case DECIMAL:
-                    setText(decimalMask(str, numDecimals));
+                    setText(decimalMask(str, numberOfDecimalPlaces));
                     break;
             } // end switch
             
      } // end protected void mask(KeyEvent _ke) {
 
-     /**
-      * Function to manage formatting date _strings with slashes as the user types
-      * to format date _string.
-      *
-      * @param _str    the present string in the text field.
-      * @param _ke    the KeyEvent that occured
-      *
-      * @return returns the formated string.
-      */
-     protected String dateMask(String _str, KeyEvent _ke) {
+    /**
+     * Function to manage formatting date _strings with slashes as the user types
+     * to format date _string.
+     *
+     * @param _str    the present string in the text field.
+     * @param _ke    the KeyEvent that occured
+     *
+     * @return returns the formated string.
+     */
+    protected String dateMask(String _str, KeyEvent _ke) {
         switch(_str.length()) {
             case 1:
                 if (_ke.getKeyChar() == '/') {
@@ -439,11 +458,11 @@ public class SSTextField extends JTextField {
      * Function to modify the text for a decimal number as needed.
      *
      * @param _str    the present string in the text field.
-     * @param numDecimals    number of decimal places allowed
+     * @param numberOfDecimalPlaces    number of decimal places allowed
      *
      * @return returns the formatted string.
      */
-    protected String decimalMask(String _str, int numDecimals) {
+    protected String decimalMask(String _str, int numberOfDecimalPlaces) {
         StringTokenizer strtok = new StringTokenizer(_str,".",false);
         String intPart = "";
         String decimalPart = "";
@@ -457,8 +476,8 @@ public class SSTextField extends JTextField {
         }
         // IF THE DECIMAL PART IS MORE THAN SPECIFIED
         // TRUNCATE THE EXTRA DECIMAL PLACES
-        if ( decimalPart.length() > numDecimals ) {
-            returnStr = intPart +"."+ decimalPart.substring(0,numDecimals);
+        if ( decimalPart.length() > numberOfDecimalPlaces ) {
+            returnStr = intPart +"."+ decimalPart.substring(0,numberOfDecimalPlaces);
         }
 
         return returnStr;
@@ -470,6 +489,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.16  2005/02/09 19:46:32  yoda2
+ * JavaDoc cleanup.
+ *
  * Revision 1.15  2005/02/05 05:16:33  yoda2
  * API cleanup.
  *
@@ -514,7 +536,7 @@ public class SSTextField extends JTextField {
  *
  * Revision 1.2  2004/02/23 16:45:51  prasanth
  * Added new constructor
- * public SSTextField(int _mask, int _numDecimals, int _align)
+ * public SSTextField(int _mask, int _numberOfDecimalPlaces, int _align)
  *
  * Revision 1.1  2003/12/16 18:02:47  prasanth
  * Initial version.
