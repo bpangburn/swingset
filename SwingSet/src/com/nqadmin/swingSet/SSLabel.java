@@ -189,7 +189,7 @@ public class SSLabel extends JLabel {
             textField.setDocument(new SSTextDocument(rowset, columnName));
 
         // SET THE LABEL DISPLAY
-            setDisplay();
+            updateDisplay();
 
         // ADD BACK LISTENERS
             addListeners();;
@@ -212,12 +212,12 @@ public class SSLabel extends JLabel {
      * Updates the value displayed in the component based on the SSRowSet column
      * binding.
      */
-    protected void setDisplay() {
+    protected void updateDisplay() {
 
         // SET THE LABEL BASED ON THE VALUE IN THE TEXT FIELD
             setText(textField.getText());
 
-    } // end protected void setDisplay() {
+    } // end protected void updateDisplay() {
 
     /**
      * Adds listeners for component and bound text field (where applicable).
@@ -243,7 +243,7 @@ public class SSLabel extends JLabel {
         public void changedUpdate(DocumentEvent de) {
             removePropertyChangeListener("text", labelTextListener);
 
-            setDisplay();
+            updateDisplay();
 
             addPropertyChangeListener("text", labelTextListener);
         }
@@ -253,7 +253,7 @@ public class SSLabel extends JLabel {
         public void insertUpdate(DocumentEvent de) {
             removePropertyChangeListener("text", labelTextListener);
 
-            setDisplay();
+            updateDisplay();
 
             addPropertyChangeListener("text", labelTextListener);
         }
@@ -263,7 +263,7 @@ public class SSLabel extends JLabel {
         public void removeUpdate(DocumentEvent de) {
             removePropertyChangeListener("text", labelTextListener);
 
-            setDisplay();
+            updateDisplay();
 
             addPropertyChangeListener("text", labelTextListener);
         }
@@ -290,6 +290,9 @@ public class SSLabel extends JLabel {
 
 /*
  * $Log$
+ * Revision 1.8  2005/02/09 17:29:55  yoda2
+ * JavaDoc cleanup.
+ *
  * Revision 1.7  2005/02/07 20:36:38  yoda2
  * Made private listener data members final.
  *

@@ -488,7 +488,7 @@ public class SSDBComboBox extends JComboBox {
             numberOfItems = i;
 
         // DISPLAYS THE ITEM CORRESPONDING TO THE PRESENT VALUE IN THE DATABASE BASE.
-            setDisplay();
+            updateDisplay();
             addListeners();
 
     } // end public void execute() throws SQLException, Exception {
@@ -497,7 +497,7 @@ public class SSDBComboBox extends JComboBox {
      * Updates the value displayed in the component based on the SSRowSet column
      * binding.
      */
-    protected void setDisplay() {
+    protected void updateDisplay() {
 
         //try {
             // GET THE VALUE FROM TEXT FIELD
@@ -542,7 +542,7 @@ public class SSDBComboBox extends JComboBox {
             textField.setDocument(new SSTextDocument(rowset, columnName));
 
         // SET THE COMBO BOX ITEM DISPLAYED
-            setDisplay();
+            updateDisplay();
 
         // ADD BACK LISTENERS
             addListeners();
@@ -590,19 +590,19 @@ public class SSDBComboBox extends JComboBox {
 
         public void changedUpdate(DocumentEvent de) {
             removeActionListener(cmbListener);
-            setDisplay();
+            updateDisplay();
             addActionListener(cmbListener);
         }
 
         public void insertUpdate(DocumentEvent de) {
             removeActionListener(cmbListener);
-            setDisplay();
+            updateDisplay();
             addActionListener(cmbListener);
         }
 
         public void removeUpdate(DocumentEvent de) {
             removeActionListener(cmbListener);
-            setDisplay();
+            updateDisplay();
             addActionListener(cmbListener);
         }
 
@@ -1100,6 +1100,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.23  2005/02/07 20:26:06  yoda2
+ * Updated to allow non-numeric primary keys. JavaDoc cleanup.
+ *
  * Revision 1.22  2005/02/04 22:48:53  yoda2
  * API cleanup & updated Copyright info.
  *

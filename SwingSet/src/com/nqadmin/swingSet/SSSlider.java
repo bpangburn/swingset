@@ -195,7 +195,7 @@ public class SSSlider extends JSlider {
             textField.setDocument(new SSTextDocument(rowset, columnName));
 
         // SET THE LABEL DISPLAY
-            setDisplay();
+            updateDisplay();
 
         // ADD BACK LISTENERS
             addListeners();
@@ -218,7 +218,7 @@ public class SSSlider extends JSlider {
      * Updates the value displayed in the component based on the SSRowSet column
      * binding.
      */
-	protected void setDisplay() {
+	protected void updateDisplay() {
 
 		// SET THE SLIDER BASED ON THE VALUE IN THE TEXT FIELD
             switch(columnType) {
@@ -237,7 +237,7 @@ public class SSSlider extends JSlider {
                     break;
             }
 
-    } // end protected void setDisplay() {
+    } // end protected void updateDisplay() {
 
     /**
      * Adds listeners for component and bound text field (where applicable).
@@ -264,7 +264,7 @@ public class SSSlider extends JSlider {
         public void changedUpdate(DocumentEvent de) {
             removeChangeListener(sliderListener);
 
-        	setDisplay();
+        	updateDisplay();
 
             addChangeListener(sliderListener);
         }
@@ -274,7 +274,7 @@ public class SSSlider extends JSlider {
         public void insertUpdate(DocumentEvent de) {
             removeChangeListener(sliderListener);
 
-            setDisplay();
+            updateDisplay();
 
             addChangeListener(sliderListener);
         }
@@ -284,7 +284,7 @@ public class SSSlider extends JSlider {
         public void removeUpdate(DocumentEvent de) {
             removeChangeListener(sliderListener);
 
-            setDisplay();
+            updateDisplay();
 
             addChangeListener(sliderListener);
         }
@@ -313,6 +313,9 @@ public class SSSlider extends JSlider {
 
 /*
  * $Log$
+ * Revision 1.8  2005/02/09 19:01:59  yoda2
+ * JavaDoc cleanup.
+ *
  * Revision 1.7  2005/02/07 20:36:40  yoda2
  * Made private listener data members final.
  *

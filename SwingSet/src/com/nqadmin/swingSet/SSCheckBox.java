@@ -173,7 +173,7 @@ public class SSCheckBox extends JCheckBox {
             textField.setDocument(new SSTextDocument(rowset, columnName));
 
         // SET THE COMBO BOX ITEM DISPLAYED
-            setDisplay();
+            updateDisplay();
             
         // ADD BACK LISTENERS
             addListeners();
@@ -253,7 +253,7 @@ public class SSCheckBox extends JCheckBox {
      * Updates the value displayed in the component based on the SSRowSet column
      * binding.
      */
-    protected void setDisplay() {
+    protected void updateDisplay() {
             
         // SELECT/DESELECT BASED ON UNDERLYING SQL TYPE
             switch(columnType) {
@@ -282,7 +282,7 @@ public class SSCheckBox extends JCheckBox {
                     break;
             }
 
-    } // end protected void setDisplay() {
+    } // end protected void updateDisplay() {
 
     /**
      * Listener(s) for the bound text field used to propigate values back to the
@@ -293,7 +293,7 @@ public class SSCheckBox extends JCheckBox {
         public void changedUpdate(DocumentEvent de){
             removeChangeListener(checkBoxListener);
             
-            setDisplay();
+            updateDisplay();
             
             addChangeListener(checkBoxListener);
         }
@@ -303,7 +303,7 @@ public class SSCheckBox extends JCheckBox {
         public void insertUpdate(DocumentEvent de) {
             removeChangeListener(checkBoxListener);
             
-            setDisplay();
+            updateDisplay();
             
             addChangeListener( checkBoxListener );
         }
@@ -313,7 +313,7 @@ public class SSCheckBox extends JCheckBox {
         public void removeUpdate(DocumentEvent de) {
             removeChangeListener(checkBoxListener);
             
-            setDisplay();
+            updateDisplay();
             
             addChangeListener( checkBoxListener );
         }
@@ -392,6 +392,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.9  2005/02/07 20:36:33  yoda2
+ * Made private listener data members final.
+ *
  * Revision 1.8  2005/02/05 18:13:29  yoda2
  * JavaDoc cleanup.
  *

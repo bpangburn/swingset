@@ -277,7 +277,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
             removeListeners();
 
         // UPDATE DISPLAY
-            setDisplay();
+            updateDisplay();
 
         // ADD BACK LISTENERS
             addListeners();
@@ -301,7 +301,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
      * Updates the value displayed in the component based on the SSRowSet column
      * binding.
      */
-    protected void setDisplay() {
+    protected void updateDisplay() {
 
         try {
             byte[] imageData = rowset.getRow() >0 ? rowset.getBytes(columnName) : null;
@@ -329,17 +329,17 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
     private class MyRowSetListener  implements RowSetListener {
         public void cursorMoved(RowSetEvent rse){
             //System.out.println("Cursor Moved");
-            setDisplay();
+            updateDisplay();
         }
 
         public void rowChanged(RowSetEvent rse){
             //System.out.println("Row Changed");
-            setDisplay();
+            updateDisplay();
         }
 
         public void rowSetChanged(RowSetEvent rse){
             //System.out.println("RowSet Changed");
-            setDisplay();
+            updateDisplay();
         }
 
     }
@@ -369,6 +369,9 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /*
  *$Log$
+ *Revision 1.5  2005/02/10 03:39:17  yoda2
+ *Added JavaDoc for class description.
+ *
  *Revision 1.4  2005/02/07 22:54:52  yoda2
  *JavaDoc cleanup.
  *

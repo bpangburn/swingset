@@ -292,7 +292,7 @@ public class SSComboBox extends JComboBox {
             textField.setDocument(new SSTextDocument(rowset, columnName));
 
         // SET THE COMBO BOX ITEM DISPLAYED
-            setDisplay();
+            updateDisplay();
 
         // ADD BACK LISTENERS
             addListeners();
@@ -315,7 +315,7 @@ public class SSComboBox extends JComboBox {
      * Updates the value displayed in the component based on the SSRowSet column
      * binding.
      */
-    protected void setDisplay() {
+    protected void updateDisplay() {
         try {
             String text = textField.getText().trim();
             // GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD
@@ -506,13 +506,13 @@ public class SSComboBox extends JComboBox {
 
         public void changedUpdate(DocumentEvent de) {
             removeActionListener(cmbListener);            
-            setDisplay();            
+            updateDisplay();            
             addActionListener(cmbListener);
         } // end public void changedUpdate(DocumentEvent de) 
 
         public void insertUpdate(DocumentEvent de) {
             removeActionListener(cmbListener);
-            setDisplay();
+            updateDisplay();
             addActionListener(cmbListener);
         } // end public void insertUpdate(DocumentEvent de) 
 
@@ -605,7 +605,7 @@ public class SSComboBox extends JComboBox {
      */
     public void setDocument(SSTextDocument _document) {
             textField.setDocument(_document);
-            setDisplay();
+            updateDisplay();
         // NEEDED, IF THIS FUNCTION IS CALLED MORE THAN ONCE.
         // SO THAT WE DON'T STACK UP LISTENERS AS THE NUMBER OF CALLS TO THIS
         // FUNCTION INCREASES
@@ -642,6 +642,9 @@ public class SSComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.28  2005/02/07 20:36:35  yoda2
+ * Made private listener data members final.
+ *
  * Revision 1.27  2005/02/07 04:20:13  yoda2
  * JavaDoc cleanup.
  *
