@@ -34,6 +34,7 @@
 package com.nqadmin.swingSet;
 
 import javax.swing.*;
+import java.io.Serializable;
 
 /**
   * SSCellEditingAdapter.java
@@ -50,7 +51,7 @@ import javax.swing.*;
  *always return true.
  *
  */
-public abstract class SSCellEditingAdapter implements SSCellEditing {
+public abstract class SSCellEditingAdapter implements SSCellEditing, Serializable{
 	
 	/**
 	 *	This empty implementation always returns true.
@@ -73,6 +74,9 @@ public abstract class SSCellEditingAdapter implements SSCellEditing {
 
 /*
  * $Log$
+ * Revision 1.3  2004/03/08 16:43:37  prasanth
+ * Updated copy right year.
+ *
  * Revision 1.2  2003/12/18 20:13:00  prasanth
  * Update class description.
  *
