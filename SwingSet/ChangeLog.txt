@@ -6,12 +6,12 @@ $Id$
 
 
 ==============================================================================
-SwingSet 1.0.0-RC1
+SwingSet 1.0.0-PR1 - Released 02-21-2005
 ==============================================================================
 
 Changes:
-    Classes or Interfaces added in SwingSet-1.0.0-RC1
-        1. SSCheckBox added to replace deprecated SSDBCheckBox.
+    Classes or Interfaces added in SwingSet-1.0.0-PR1
+        1. SSCheckBox - added to replace deprecated SSDBCheckBox.
         2. SSLabel - new read-only label component based on JLabel
         3. SSSlider - new slider component based on JSlider
         4. SSImage - new image component capable of storing, retrieving, &
@@ -22,6 +22,9 @@ Changes:
            SSTextFieldBeanInfo, SSConnectionBeanInfo, SSJdbcRowSetImplBeanInfo -
            new support classes for managing bean-related properties.  Currently
            only handle icon display.
+        6. SSSyncManager - added to com.nqadmin.swingSet.utils package to
+           simplify creation of screens with both combo box-based and
+           navigator-based navigation
            
     SSComboBox:
         1. Rewrote to extend JComboBox rather than JComponent.

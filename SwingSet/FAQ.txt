@@ -103,3 +103,70 @@ FAQ
     (P.S.: This is a work around provided for MySQL DB users based on the
      feedback from lopes. See
      http://sourceforge.net/forum/forum.php?thread_id=1005899&forum_id=313186)
+     
+     
+7. I'm currently using a SwingSet release prior to 0.9.0.  What is this new
+   SSConnection and SSRowSet?  How do I fix my programs?
+   
+   For version 0.9.0 a datasource abstraction layer was added to SwingSet. All
+   of the SwingSet components are now based on a new SSRowSet interface rather
+   than Sun's existing RowSet interface.  The SSRowSet differs from RowSet in
+   two important ways:
+     1. SSRowSet extends serializable which greatly facilitates serialization/
+        deserialization in the rest of the SwingSet components
+     2. SSRowSet only contains methods necessary to support the data types in
+        used by SSTextDocument which will make writing SSRowSet implementations
+        for non-updatable RowSets and other non-database datasources (e.g. a
+        HashMap) much easier
+     
+   A SSJdbcRowSetImpl implementation of SSRowSet is provided to replace the
+   JdbcRowSetImpl used in most existing SwingSet applications.  It is basically
+   a serialized wrapper of JdbcRowSetImpl.  It can be used in conjunction with
+   the new SSConnection, a serialized wrapper of the Connection interface, which
+   handles serialization/deserialization of database connection info (path,
+   username, password, etc.).  Finally, an SSRowSetAdapter is provided with
+   empty method implementations of everything in SSRowSet.  This adapter can be
+   easily extended with non-empty method implementations for non-database
+   datasources.
+
+   To accommodate non-updatable RowSets, SSJdbcRowSetImpl can be extended with
+   custom updateXYZ() methods to handle database updates via INSERT/UPDATE
+   queries. SSJdbcRowSetImpl can also serve as a template for writing SSRowSet
+   wrappers for other RowSets (e.g. CachedRowSet, WebRowSet, etc.).
+
+   Unfortunately, the introduction of the SSRowSet requires modification of
+   existing SwingSet applications, but with the SSJdbcRowSetImpl and
+   SSConnection, these changes should be minimal. Below is an example of changes
+   required to transition to 0.9.0 and later versions of SwingSet:
+
+    ***********************
+    OLD - Connection/RowSet
+    ***********************
+    import java.sql.*;
+    import com.sun.rowset.JdbcRowSetImpl;
+
+    Connection conn = null;
+    JdbcRowSetImpl rowset = null;
+    
+    Class.forName("org.postgresql.Driver");
+    conn = DriverManager.getConnection
+        ("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
+        "swingset","test");
+    rowset = new JdbcRowSetImpl(conn);  
+
+    ***************************
+    NEW - SSConnection/SSRowSet
+    ***************************
+    import java.sql.*;  // still needed
+    import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+    import com.nqadmin.swingSet.datasources.SSConnection;
+
+    SSConnection ssConnection = null;
+    SSJdbcRowSetImpl rowset = null;
+
+    ssConnection = new SSConnection
+        ("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
+        "swingset", "test");
+    ssConnection.setDriverName("org.postgresql.Driver");
+    ssConnection.createConnection();
+    rowset = new SSJdbcRowSetImpl(ssConnection);
