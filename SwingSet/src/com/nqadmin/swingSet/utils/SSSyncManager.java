@@ -184,8 +184,13 @@ public class SSSyncManager {
         comboBox.removeActionListener(comboListener);
         try{
             if(rowset != null & rowset.getRow() > 0){
-                //comboBox.setSelectedValue(rowset.getLong(columnName));
-                comboBox.setSelectedStringValue(rowset.getString(columnName));
+            // GET THE CURRENT VALUE FROM THE ROWSET.    
+                String currentRowValue = rowset.getString(columnName);
+            // CHECK IF THE COMBO BOX IS DISPLAYING THE SAME ONE.    
+                if(!comboBox.getSelectedStringValue().equals(currentRowValue)){
+                // IF NOT CHANGE THE SELECTION OF THE COMBO BOX.    
+                    comboBox.setSelectedStringValue(rowset.getString(columnName));
+                }
             } else {
                 comboBox.setSelectedIndex(-1);
             }
@@ -257,6 +262,9 @@ public class SSSyncManager {
 
 /*
  * $Log$
+ * Revision 1.4  2005/02/10 03:36:08  yoda2
+ * JavaDoc cleanup and updated to support string columns used for synchronization (to match recent changes in SSDBComboBox).
+ *
  * Revision 1.3  2005/02/05 15:06:56  yoda2
  * Got rid of depreciated calls.
  *
