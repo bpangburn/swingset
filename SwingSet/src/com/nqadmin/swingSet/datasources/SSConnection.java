@@ -266,6 +266,18 @@ import java.beans.PropertyVetoException;
      * @return returns the database connection object.
      */
     public Connection getConnection() {
+    // IF THE CONNECTION IS NOT YET CREATED BUT WE HAVE ALL THE INFORMATION TO CREATE ONE
+    // THEN GO AHEAD AND TRY CREATING THE CONNECTION	
+    	if(connection == null && url != null && driverName != null && username != null && password != null &&
+    		!url.trim().equals("") && !driverName.trim().equals("")){
+    		try{
+    			createConnection();	
+    		}catch(SQLException se){
+    			se.printStackTrace();
+    		}catch(ClassNotFoundException cnfe){
+    			cnfe.printStackTrace();
+    		}
+    	}
         return connection;
     }    
 
@@ -293,6 +305,9 @@ import java.beans.PropertyVetoException;
 
 /*
  * $Log$
+ * Revision 1.8  2005/02/11 22:59:55  yoda2
+ * Imported PropertyVetoException and added some bound properties.
+ *
  * Revision 1.7  2005/02/11 20:16:27  yoda2
  * Added infrastructure to support property & vetoable change listeners (for beans).
  *
