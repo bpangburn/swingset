@@ -56,6 +56,9 @@ public class SSSlider extends JSlider {
 
     // TEXT FIELD BOUND TO THE DATABASE
     protected JTextField textField = new JTextField();
+    
+    // SSROWSET FROM WHICH THE LABEL WILL GET/SET VALUES
+    protected SSRowSet rowset;
 
     // BINDING INFORMATION
     protected String columnName;
@@ -63,13 +66,14 @@ public class SSSlider extends JSlider {
 
     // LISTENER FOR SLIDER AND TEXT FIELD
     private MySliderListener sliderListener = new MySliderListener();
-    private MyTextFieldListener textFieldListener = new MyTextFieldListener();
+    private MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
     /**
      * Empty constructor needed for deserialization. Creates a horizontal
      * slider with the range 0 to 100.
      */
     public SSSlider() {
+		init();
     }
 
     /**
@@ -79,6 +83,7 @@ public class SSSlider extends JSlider {
      */
     public SSSlider(int _orientation) {
 		super(_orientation);
+		init();
     }
 
     /**
@@ -89,6 +94,7 @@ public class SSSlider extends JSlider {
      */
     public SSSlider(int _min, int _max) {
 		super(_min, _max);
+		init();
     }
 
     /**
@@ -99,9 +105,87 @@ public class SSSlider extends JSlider {
      * @param _columnName    name of the column to which this slider should be bound
      */
     public SSSlider(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
+		rowset = _rowset;
         columnName = _columnName;
-        textField.setDocument(new SSTextDocument(_rowset, _columnName));
-        columnType = _rowset.getColumnType(_columnName);
+        init();
+        bind();
+    }
+
+    /**
+     * Initialization code.
+     */
+    protected void init() {
+
+        // SET PREFERRED DIMENSIONS
+            setPreferredSize(new Dimension(200,20));
+    }
+
+    /**
+     * Returns the column name to which the slider is bound.
+     *
+     * @return returns the column name to which to slider is bound.
+     */
+    public String getColumnName() {
+        return columnName;
+    }
+
+    /**
+     * Returns the SSRowSet being used to get the values.
+     *
+     * @return returns the SSRowSet being used.
+     */
+    public SSRowSet getSSRowSet() {
+        return rowset;
+    }
+
+    /**
+     * Sets the column name to which the slider has to be bound
+     *
+     * @param _columnName    column name in the SSRowSet to which the slider
+     *    is bound.
+     */
+    public void setColumnName(String _columnName) throws java.sql.SQLException {
+        columnName = _columnName;
+        bind();
+    }
+
+    /**
+     * Sets the SSRowSet to be used.
+     *
+     * @param _rowset    SSRowSet to be used for getting the values.
+     */
+    public void setSSRowSet(SSRowSet _rowset) throws java.sql.SQLException {
+        rowset = _rowset;
+        bind();
+    }
+
+    /**
+     * The column name and the SSRowSet should be set before calling this function.
+     * If the column name and SSRowSet are set seperately then this function has to
+     * be called to bind the slider to the column in the SSRowSet.
+     */
+    protected void bind() throws java.sql.SQLException {
+
+        // CHECK FOR NULL COLUMN/ROWSET
+            if (columnName==null || rowset==null) {
+                return;
+            }
+
+        // REMOVE LISTENERS TO PREVENT DUPLICATION
+            removeListeners();
+
+        // DETERMINE COLUMN TYPE
+			columnType = rowset.getColumnType(columnName);
+
+        // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
+            textField.setDocument(new SSTextDocument(rowset, columnName));
+
+        // SET THE LABEL DISPLAY
+            setDisplay();
+
+        // ADD BACK LISTENERS
+            addListeners();
+
     }
 
     /**
@@ -112,34 +196,14 @@ public class SSSlider extends JSlider {
      * @param _columnName    Name of the column to which this label should be bound
      */
     public void bind(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
+		rowset = _rowset;
         columnName = _columnName;
-        textField.setDocument(new SSTextDocument(_rowset, _columnName));
-        columnType = _rowset.getColumnType(_columnName);
+        bind();
     }
 
-    /**
-     * returns the column name to which this label is bound to.
-     *
-     * @return column name to which the label is bound.
-     */
-    public String getColumnName() {
-        return columnName;
-    }
+	protected void setDisplay() {
 
-    /**
-     * Initializes the label by getting the value corresponding to
-     * specified column from the SSRowSet.
-     */
-    public void execute() {
-        initSlider();
-    }
-
-    // INITIALIZES THE SLIDER.
-    protected void initSlider() {
-
-        // ADD LISTENER FOR THE TEXT FIELD
-            textField.getDocument().addDocumentListener(textFieldListener);
-
+		// SET THE SLIDER BASED ON THE VALUE IN THE TEXT FIELD
             switch(columnType) {
                 case java.sql.Types.INTEGER:
                 case java.sql.Types.SMALLINT:
@@ -156,86 +220,52 @@ public class SSSlider extends JSlider {
                     break;
             }
 
-        //ADD LISTENER FOR THE SLIDER.
-        // REMOVE HAS TO BE CALLED SO MAKE SURE THAT YOU ARE NOT STACKING UP
-        // LISTENERS WHEN EXECUTE IS CALLED MULTIPLE TIMES.
-            removeChangeListener(sliderListener);
-            addChangeListener( sliderListener );
-    } // end protected void initSlider() {
+    } // end protected void setDisplay() {
+
+    // ADDS LISTENERS FOR THE SLIDER AND TEXT FIELD
+    private void addListeners() {
+        textField.getDocument().addDocumentListener(textFieldDocumentListener);
+        addChangeListener(sliderListener);
+    }
+
+    // REMOVES THE LISTENERS FOR TEXT FIELD AND THE SLIDER DISPLAYED
+    private void removeListeners() {
+        textField.getDocument().removeDocumentListener(textFieldDocumentListener);
+        removeChangeListener(sliderListener);
+    }
 
     // LISTENER FOR THE TEXT FIELD
-    private class MyTextFieldListener implements DocumentListener, Serializable {
+    private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
-        public void changedUpdate(DocumentEvent de){
+        public void changedUpdate(DocumentEvent de) {
             removeChangeListener(sliderListener);
 
-            switch(columnType) {
-                case java.sql.Types.INTEGER:
-                case java.sql.Types.SMALLINT:
-                case java.sql.Types.TINYINT:
-                case java.sql.Types.BIGINT:
-                case java.sql.Types.FLOAT:
-                case java.sql.Types.DOUBLE:
-                case java.sql.Types.NUMERIC:
-            	// SET THE SLIDER BASED ON THE VALUE IN TEXT FIELD
-            		setValue(Integer.parseInt(textField.getText()));
-                    break;
+        	setDisplay();
 
-                default:
-                    break;
-            }
-
-            addChangeListener( sliderListener );
+            addChangeListener(sliderListener);
         }
 
         // WHEN EVER THERE IS A CHANGE IN THE VALUE IN THE TEXT FIELD CHANGE THE SLIDER
         // ACCORDINGLY.
         public void insertUpdate(DocumentEvent de) {
-            removeChangeListener( sliderListener );
+            removeChangeListener(sliderListener);
 
-            switch(columnType) {
-                case java.sql.Types.INTEGER:
-                case java.sql.Types.SMALLINT:
-                case java.sql.Types.TINYINT:
-                case java.sql.Types.BIGINT:
-                case java.sql.Types.FLOAT:
-                case java.sql.Types.DOUBLE:
-                case java.sql.Types.NUMERIC:
-            	// SET THE SLIDER BASED ON THE VALUE IN TEXT FIELD
-            		setValue(Integer.parseInt(textField.getText()));
-                    break;
+            setDisplay();
 
-                default:
-                    break;
-            }
-
-            addChangeListener( sliderListener );
+            addChangeListener(sliderListener);
         }
 
         // IF A REMOVE UPDATE OCCURS ON THE TEXT FIELD CHECK THE CHANGE AND SET THE
         // SLIDER ACCORDINGLY.
         public void removeUpdate(DocumentEvent de) {
-            removeChangeListener( sliderListener );
+            removeChangeListener(sliderListener);
 
-            switch(columnType) {
-                case java.sql.Types.INTEGER:
-                case java.sql.Types.SMALLINT:
-                case java.sql.Types.TINYINT:
-                case java.sql.Types.BIGINT:
-                case java.sql.Types.FLOAT:
-                case java.sql.Types.DOUBLE:
-                case java.sql.Types.NUMERIC:
-            	// SET THE SLIDER BASED ON THE VALUE IN TEXT FIELD
-            		setValue(Integer.parseInt(textField.getText()));
-                    break;
+            setDisplay();
 
-                default:
-                    break;
-            }
-
-            addChangeListener( sliderListener );
+            addChangeListener(sliderListener);
         }
-    } // end private class MyTextFieldListener implements DocumentListener, Serializable {
+
+    } // end private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
     // LISTENER FOR THE SLIDER.
     // ANY CHANGES MADE TO THE SLIDER BY THE USER ARE PROPOGATED BACK TO THE
@@ -243,11 +273,11 @@ public class SSSlider extends JSlider {
     private class MySliderListener implements ChangeListener, Serializable {
 
         public void stateChanged(ChangeEvent ce) {
-            textField.getDocument().removeDocumentListener(textFieldListener);
+            textField.getDocument().removeDocumentListener(textFieldDocumentListener);
 
             textField.setText(String.valueOf(getValue()));
 
-            textField.getDocument().addDocumentListener(textFieldListener);
+            textField.getDocument().addDocumentListener(textFieldDocumentListener);
         }
 
     } // end private class MySliderListener implements ChangeListener, Serializable {
@@ -258,6 +288,9 @@ public class SSSlider extends JSlider {
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/04 23:05:10  yoda2
+ * no message
+ *
  * Revision 1.4  2005/02/04 22:48:54  yoda2
  * API cleanup & updated Copyright info.
  *

@@ -56,23 +56,29 @@ public class SSTextField extends JTextField {
     /**
      * use this mask if mm/dd/yyyy format is required.
      */
-    public static final int  MMDDYYYY =1;
+    public static final int MMDDYYYY = 1;
 
     /**
      * use this mask if mm/dd/yyyy format is required.
      */
-    public static final int  DDMMYYYY =2;
+    public static final int DDMMYYYY = 2;
 
     /**
      * use this if the text field contains SSN
      */
-     public static final int SSN =3;
+    public static final int SSN = 3;
 
     /**
      * use this if the text field contains decimal number and want to limit
      * number of decimal places.
      */
-     public static final int DECIMAL = 4;
+    public static final int DECIMAL = 4;
+    
+    // SSROWSET FROM WHICH THE LABEL WILL GET/SET VALUES
+    protected SSRowSet rowset;
+
+    // BINDING INFORMATION
+    protected String columnName;
 
     // TYPE OF MASK TO BE USED FOR THIS TEXTFIELD
     protected int mask = 0;
@@ -112,7 +118,6 @@ public class SSTextField extends JTextField {
      * string is null, and the number of columns is set to 0.
      */
     public SSTextField() {
-        super();
         init();
     }
 
@@ -162,6 +167,127 @@ public class SSTextField extends JTextField {
         setHorizontalAlignment(_align);
         init();
      }
+     
+    /**
+     * Creates a text box and binds it to the specified SSRowSet column.
+     *
+     * @param _rowset    datasource to be used.
+     * @param _columnName    name of the column to which this text box should be bound
+     */
+    public SSTextField(SSRowSet _rowset, String _columnName) {
+		rowset = _rowset;
+        columnName = _columnName;
+        init();
+        bind();
+    }
+
+    /**
+     * Initialization code.
+     */
+     protected void init() {
+         
+        // SET PREFERRED DIMENSIONS
+            setPreferredSize(new Dimension(200,20));         
+
+         // ADD FOCUS LISTENER TO THE TEXT FEILD SO THAT WHEN THE FOCUS IS GAINED
+         // COMPLETE TEXT SHOULD BE SELECTED
+            this.addFocusListener(new FocusAdapter(){
+                public void focusGained(FocusEvent fe){
+                    SSTextField.this.selectAll();
+                }
+            });
+    
+         // ADD KEY LISTENER FOR THE TEXT FIELD
+            this.addKeyListener(new KeyListener() {
+    
+                public void keyReleased(KeyEvent ke) {
+                    if(mask == DECIMAL || mask == SSN){
+                        int position = SSTextField.this.getCaretPosition();
+                        mask(ke);
+                        SSTextField.this.setCaretPosition(position);
+                    }
+                }
+    
+                public void keyTyped(KeyEvent ke) {
+                }
+    
+                public synchronized void keyPressed(KeyEvent ke) {
+                // TRANSFER FOCUS TO NEXT COMPONENT WHEN ENTER KEY IS PRESSED
+                    if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
+                        ((Component)ke.getSource()).transferFocus();
+                    }
+    
+                    if(mask == MMDDYYYY || mask == DDMMYYYY){
+                        mask(ke);
+                    }
+                }
+    
+            });
+
+     } // end protected void init() {
+
+    /**
+     * Returns the column name to which the text area is bound.
+     *
+     * @return returns the column name to which to text area is bound.
+     */
+    public String getColumnName() {
+        return columnName;
+    }
+
+    /**
+     * Returns the SSRowSet being used to get the values.
+     *
+     * @return returns the SSRowSet being used.
+     */
+    public SSRowSet getSSRowSet() {
+        return rowset;
+    }
+
+    /**
+     * Sets the column name to which the text area has to be bound
+     *
+     * @param _columnName    column name in the SSRowSet to which the text area
+     *    is bound.
+     */
+    public void setColumnName(String _columnName) {
+        columnName = _columnName;
+        bind();
+    }
+
+    /**
+     * Sets the SSRowSet to be used.
+     *
+     * @param _rowset    SSRowSet to be used for getting the values.
+     */
+    public void setSSRowSet(SSRowSet _rowset) {
+        rowset = _rowset;
+        bind();
+    }
+
+    /**
+     * The column name and the SSRowSet should be set before calling this function.
+     * If the column name and SSRowSet are set seperately then this function has to
+     * be called to bind the slider to the column in the SSRowSet.
+     */
+    protected void bind() {
+
+        // CHECK FOR NULL COLUMN/ROWSET
+            if (columnName==null || rowset==null) {
+                return;
+            }
+
+        // REMOVE LISTENERS TO PREVENT DUPLICATION
+        //    removeListeners();
+
+        // BIND THE TEXT AREA TO THE SPECIFIED COLUMN
+            setDocument(new SSTextDocument(rowset, columnName));
+
+        // ADD BACK LISTENERS
+        //    addListeners();;
+
+    }    
+     
 
      /**
       * Binds the text field to a SSTextDocument which is in turn bound to
@@ -171,7 +297,9 @@ public class SSTextField extends JTextField {
       * @param _columnName  name of column within SSRowSet to bind to
       */
      public void bind(SSRowSet _rowset, String _columnName) {
-        this.setDocument(new SSTextDocument(_rowset, _columnName));
+        rowset = _rowset;
+        columnName = _columnName;
+        bind();
      }
 
      /**
@@ -186,92 +314,57 @@ public class SSTextField extends JTextField {
      }
 
      /**
-      * Initializes the text field.
+      * Function to manage keystrokes for masks.
+      *
+      * @param ke    the KeyEvent that occured
       */
-     protected void init() {
+     protected void mask(KeyEvent ke) {
+         // DECLARATIONS
+            String str = getText();
+            char ch = ke.getKeyChar();
 
-     // ADD FOCUS LISTENER TO THE TEXT FEILD SO THAT WHEN THE FOCUS IS GAINED
-     // COMPLETE TEXT SHOULD BE SELECTED
-        this.addFocusListener(new FocusAdapter(){
-            public void focusGained(FocusEvent fe){
-                SSTextField.this.selectAll();
+         // IF THE KEY PRESSED IS ANY OF THE FOLLOWING DO NOTHING
+            if (ke.getKeyCode() == KeyEvent.VK_BACK_SPACE  ||
+                    ke.getKeyCode() == KeyEvent.VK_DELETE  ||
+                    ke.getKeyCode() == KeyEvent.VK_END     ||
+                    ke.getKeyCode() == KeyEvent.VK_ENTER   ||
+                    ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
+    
+                return;
             }
-        });
-
-     // ADD KEY LISTENER FOR THE TEXT FIELD
-        this.addKeyListener( new KeyListener() {
-
-            public void keyReleased(KeyEvent ke) {
-                if(mask == DECIMAL || mask == SSN){
-                    int position = SSTextField.this.getCaretPosition();
-                    mask(ke);
-                    SSTextField.this.setCaretPosition(position);
-                }
+            else if( (ke.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) == KeyEvent.CTRL_DOWN_MASK ||
+                     (ke.getModifiersEx() & KeyEvent.ALT_DOWN_MASK)  == KeyEvent.ALT_DOWN_MASK    ){
+    
+                return;
             }
-
-            public void keyTyped(KeyEvent ke) {
+            else if(!Character.isDefined(ch)){
+                return;
             }
-
-            public synchronized void keyPressed(KeyEvent ke) {
-            // TRANSFER FOCUS TO NEXT COMPONENT WHEN ENTER KEY IS PRESSED
-                if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
-                    ((Component)ke.getSource()).transferFocus();
-                }
-
-                if(mask == MMDDYYYY || mask == DDMMYYYY){
-                    mask(ke);
-                }
+    
+            if(getSelectionStart() != getSelectionEnd()){
+                str = str.substring(0,getSelectionStart())
+                    + str.substring(getSelectionEnd(), str.length());
             }
-
-        });
-
-     } // end protected void init() {
-
-     protected void mask(KeyEvent ke){
-        String str = getText();
-        char ch = ke.getKeyChar();
-
-     // IF THE KEY PRESSED IS ANY OF THE FOLLOWING DO NOTHING
-        if (ke.getKeyCode() == KeyEvent.VK_BACK_SPACE  ||
-                ke.getKeyCode() == KeyEvent.VK_DELETE  ||
-                ke.getKeyCode() == KeyEvent.VK_END     ||
-                ke.getKeyCode() == KeyEvent.VK_ENTER   ||
-                ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
-
-            return;
-        }
-        else if( (ke.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) == KeyEvent.CTRL_DOWN_MASK ||
-                 (ke.getModifiersEx() & KeyEvent.ALT_DOWN_MASK)  == KeyEvent.ALT_DOWN_MASK    ){
-
-            return;
-        }
-        else if(!Character.isDefined(ch)){
-            return;
-        }
-
-        if(getSelectionStart() != getSelectionEnd()){
-            str = str.substring(0,getSelectionStart())
-                + str.substring(getSelectionEnd(), str.length());
-        }
-
-     // BASED ON TYPE OF MASK REQUESTED MODIFY THE TEXT
-     // ACCORDINGLY
-        switch(mask) {
-            case MMDDYYYY:
-            case DDMMYYYY:
-                if(getCaretPosition() < str.length()){
-                    return;
-                }
-                setText(dateMask(str, ke));
-                break;
-            case SSN:
-                setText(ssnMask(str,ke));
-                break;
-            case DECIMAL:
-                setText(decimalMask(str,numDecimals));
-                break;
-        } // end switch
-     }
+    
+         // BASED ON TYPE OF MASK REQUESTED MODIFY THE TEXT
+         // ACCORDINGLY
+            switch(mask) {
+                case MMDDYYYY:
+                case DDMMYYYY:
+                    if(getCaretPosition() < str.length()){
+                        return;
+                    }
+                    setText(dateMask(str, ke));
+                    break;
+                case SSN:
+                    setText(ssnMask(str,ke));
+                    break;
+                case DECIMAL:
+                    setText(decimalMask(str,numDecimals));
+                    break;
+            } // end switch
+            
+     } // end protected void mask(KeyEvent ke) {
 
      /**
       * Function to manage formatting date strings with slashes as the user types
@@ -375,6 +468,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.14  2005/02/04 23:05:10  yoda2
+ * no message
+ *
  * Revision 1.13  2005/02/04 22:48:54  yoda2
  * API cleanup & updated Copyright info.
  *

@@ -104,8 +104,6 @@ public class SSCheckBox extends JCheckBox {
     public SSCheckBox(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
         rowset = _rowset;
         columnName = _columnName;
-        //textField.setDocument(new SSTextDocument(_rowset, _columnName));
-        columnType = _rowset.getColumnType(_columnName);
         init();
         bind();
     }
@@ -133,9 +131,9 @@ public class SSCheckBox extends JCheckBox {
     /**
      * The column name and the SSRowSet should be set before calling this function.
      * If the column name and SSRowSet are set seperately then this function has to
-     * be called to bind the combo box to the column in the SSRowSet.
+     * be called to bind the check box to the column in the SSRowSet.
      */
-    protected void bind() {
+    protected void bind() throws java.sql.SQLException {
         
         // CHECK FOR NULL COLUMN/ROWSET
             if (columnName==null || rowset==null) {
@@ -143,7 +141,10 @@ public class SSCheckBox extends JCheckBox {
             }
             
         // REMOVE LISTENERS TO PREVENT DUPLICATION
-            removeListeners();            
+            removeListeners();
+
+        // DETERMINE COLUMN TYPE
+			columnType = rowset.getColumnType(columnName);            
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
             textField.setDocument(new SSTextDocument(rowset, columnName));
@@ -180,8 +181,6 @@ public class SSCheckBox extends JCheckBox {
     public void bind(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
         rowset = _rowset;
         columnName = _columnName;
-        //textField.setDocument(new SSTextDocument(_rowset, _columnName));
-        columnType = _rowset.getColumnType(_columnName);
         bind();
     }
 
@@ -201,6 +200,27 @@ public class SSCheckBox extends JCheckBox {
      */
     public SSRowSet getSSRowSet() {
         return rowset;
+    }
+
+    /**
+     * Sets the column name to which the check box has to be bound
+     *
+     * @param _columnName    column name in the SSRowSet to which the check box
+     *    is bound.
+     */
+    public void setColumnName(String _columnName) throws java.sql.SQLException {
+        columnName = _columnName;
+        bind();
+    }
+
+    /**
+     * Sets the SSRowSet to be used.
+     *
+     * @param _rowset    SSRowSet to be used for getting the values.
+     */
+    public void setSSRowSet(SSRowSet _rowset) throws java.sql.SQLException {
+        rowset = _rowset;
+        bind();
     }    
 
     // INITIALIZES THE CHECK BOX.
@@ -242,34 +262,6 @@ public class SSCheckBox extends JCheckBox {
             removeChangeListener(checkBoxListener);
             
             setDisplay();
-
-            /*
-            switch(columnType) {
-                case java.sql.Types.INTEGER:
-                case java.sql.Types.SMALLINT:
-                case java.sql.Types.TINYINT:
-                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                    if ( textField.getText().equals(String.valueOf(CHECKED)) ) {
-                        setSelected(true);
-                    } else {
-                        setSelected(false);
-                    }
-                    break;
-
-                case java.sql.Types.BIT:
-                case java.sql.Types.BOOLEAN:
-                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                    if ( textField.getText().equals(BOOLEAN_CHECKED) ) {
-                        setSelected(true);
-                    } else {
-                        setSelected(false);
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-            */
             
             addChangeListener(checkBoxListener);
         }
@@ -281,35 +273,6 @@ public class SSCheckBox extends JCheckBox {
             
             setDisplay();
             
-            /*
-
-            switch(columnType) {
-                case java.sql.Types.INTEGER:
-                case java.sql.Types.SMALLINT:
-                case java.sql.Types.TINYINT:
-                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                    if ( textField.getText().equals(String.valueOf(CHECKED)) ) {
-                        setSelected(true);
-                    } else {
-                        setSelected(false);
-                    }
-                    break;
-
-                case java.sql.Types.BIT:
-                case java.sql.Types.BOOLEAN:
-                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                    if ( textField.getText().equals(BOOLEAN_CHECKED) ) {
-                        setSelected(true);
-                    } else {
-                        setSelected(false);
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-            */
-            
             addChangeListener( checkBoxListener );
         }
 
@@ -319,35 +282,6 @@ public class SSCheckBox extends JCheckBox {
             removeChangeListener(checkBoxListener);
             
             setDisplay();
-            
-            /*
-
-            switch(columnType) {
-                case java.sql.Types.INTEGER:
-                case java.sql.Types.SMALLINT:
-                case java.sql.Types.TINYINT:
-                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                    if ( textField.getText().equals(String.valueOf(CHECKED)) ) {
-                        setSelected(true);
-                    } else {
-                        setSelected(false);
-                    }
-                    break;
-
-                case java.sql.Types.BIT:
-                case java.sql.Types.BOOLEAN:
-                // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                    if ( textField.getText().equals(BOOLEAN_CHECKED) ) {
-                        setSelected(true);
-                    } else {
-                        setSelected(false);
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-            */
             
             addChangeListener( checkBoxListener );
         }
@@ -425,6 +359,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/04 22:48:52  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.5  2005/02/02 23:37:19  yoda2
  * API cleanup.
  *

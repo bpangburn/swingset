@@ -48,6 +48,103 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  * @version $Revision$
  */
 public class SSTextArea extends JTextArea {
+    
+    // SSROWSET FROM WHICH THE LABEL WILL GET/SET VALUES
+    protected SSRowSet rowset;
+
+    // BINDING INFORMATION
+    protected String columnName;
+
+    /**
+     * Empty constructor needed for deserialization.
+     */
+    public SSTextArea() {
+		init();
+    }    
+    
+    /**
+     * Creates a multi-line text box and binds it to the specified SSRowSet column.
+     *
+     * @param _rowset    datasource to be used.
+     * @param _columnName    name of the column to which this text area should be bound
+     */
+    public SSTextArea(SSRowSet _rowset, String _columnName) {
+		rowset = _rowset;
+        columnName = _columnName;
+        init();
+        bind();
+    }
+
+    /**
+     * Initialization code.
+     */
+    protected void init() {
+
+        // SET PREFERRED DIMENSIONS
+            setPreferredSize(new Dimension(200,80));
+    }
+
+    /**
+     * Returns the column name to which the text area is bound.
+     *
+     * @return returns the column name to which to text area is bound.
+     */
+    public String getColumnName() {
+        return columnName;
+    }
+
+    /**
+     * Returns the SSRowSet being used to get the values.
+     *
+     * @return returns the SSRowSet being used.
+     */
+    public SSRowSet getSSRowSet() {
+        return rowset;
+    }
+
+    /**
+     * Sets the column name to which the text area has to be bound
+     *
+     * @param _columnName    column name in the SSRowSet to which the text area
+     *    is bound.
+     */
+    public void setColumnName(String _columnName) {
+        columnName = _columnName;
+        bind();
+    }
+
+    /**
+     * Sets the SSRowSet to be used.
+     *
+     * @param _rowset    SSRowSet to be used for getting the values.
+     */
+    public void setSSRowSet(SSRowSet _rowset) {
+        rowset = _rowset;
+        bind();
+    }
+
+    /**
+     * The column name and the SSRowSet should be set before calling this function.
+     * If the column name and SSRowSet are set seperately then this function has to
+     * be called to bind the slider to the column in the SSRowSet.
+     */
+    protected void bind() {
+
+        // CHECK FOR NULL COLUMN/ROWSET
+            if (columnName==null || rowset==null) {
+                return;
+            }
+
+        // REMOVE LISTENERS TO PREVENT DUPLICATION
+        //    removeListeners();
+
+        // BIND THE TEXT AREA TO THE SPECIFIED COLUMN
+            setDocument(new SSTextDocument(rowset, columnName));
+
+        // ADD BACK LISTENERS
+        //    addListeners();;
+
+    }    
 
     /**
      * Binds the text field to a SSTextDocument which is in turn bound to
@@ -57,7 +154,9 @@ public class SSTextArea extends JTextArea {
      * @param _columnName  name of column within SSRowSet to bind to
      */
     public void bind(SSRowSet _rowset, String _columnName) {
-        this.setDocument(new SSTextDocument(_rowset, _columnName));
+        rowset = _rowset;
+        columnName = _columnName;
+        bind();
     }
 
 } // end public class SSTextArea extends JTextArea {
@@ -66,6 +165,9 @@ public class SSTextArea extends JTextArea {
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/04 22:48:54  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.4  2004/11/11 14:45:48  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *

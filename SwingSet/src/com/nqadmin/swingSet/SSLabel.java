@@ -111,21 +111,20 @@ public class SSLabel extends JLabel {
         init();
         bind();
     }
-    
+
     /**
      * Initialization code.
      */
     protected void init() {
-        
-        // SET PREFERRED AND MAXIMUM DIMENSIONS
+
+        // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,20));
-            setMaximumSize(new Dimension(200,20));            
     }
 
     /**
-     * Returns the column name to which the combo is bound.
+     * Returns the column name to which the label is bound.
      *
-     * @return returns the column name to which to combo box is bound.
+     * @return returns the column name to which to label is bound.
      */
     public String getColumnName() {
         return columnName;
@@ -141,9 +140,9 @@ public class SSLabel extends JLabel {
     }
 
     /**
-     * Sets the column name to which the combo box has to be bound
+     * Sets the column name to which the label has to be bound
      *
-     * @param _columnName    column name in the SSRowSet to which the combo box
+     * @param _columnName    column name in the SSRowSet to which the label
      *    is bound.
      */
     public void setColumnName(String _columnName) {
@@ -164,17 +163,17 @@ public class SSLabel extends JLabel {
     /**
      * The column name and the SSRowSet should be set before calling this function.
      * If the column name and SSRowSet are set seperately then this function has to
-     * be called to bind the combo box to the column in the SSRowSet.
+     * be called to bind the label to the column in the SSRowSet.
      */
     protected void bind() {
-        
+
         // CHECK FOR NULL COLUMN/ROWSET
             if (columnName==null || rowset==null) {
                 return;
             }
-            
+
         // REMOVE LISTENERS TO PREVENT DUPLICATION
-            removeListeners();            
+            removeListeners();
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
             textField.setDocument(new SSTextDocument(rowset, columnName));
@@ -184,37 +183,37 @@ public class SSLabel extends JLabel {
 
         // ADD BACK LISTENERS
             addListeners();;
-               
-    }    
+
+    }
 
     /**
-     * Binds the combo box to the specified column of the SSRowSet.
-     * As the SSRowSet changes the combo box item displayed changes accordingly.
+     * Binds the label to the specified column of the SSRowSet.
+     * As the SSRowSet changes the label item displayed changes accordingly.
      *
      * @param _rowset    SSRowSet to be used for getting the value.
-     * @param _columnName    Column to which the combo box has to be bound.
+     * @param _columnName    Column to which the label has to be bound.
      */
     public void bind(SSRowSet _rowset, String _columnName) {
         rowset = _rowset;
         columnName = _columnName;
         bind();
     }
-    
+
     // INITIALIZES THE LABEL DISPLAY
     protected void setDisplay() {
-            
+
         // SET THE LABEL BASED ON THE VALUE IN THE TEXT FIELD
             setText(textField.getText());
 
-    } // end protected void setDisplay() {    
+    } // end protected void setDisplay() {
 
-    // ADDS LISTENERS FOR THE COMBO BOX AND TEXT FIELD
+    // ADDS LISTENERS FOR THE LABEL AND TEXT FIELD
     private void addListeners() {
         textField.getDocument().addDocumentListener(textFieldDocumentListener);
         addPropertyChangeListener("text", labelTextListener);
     }
 
-    // REMOVES THE LISTENERS FOR TEXT FIELD AND THE COMBO BOX DISPLAYED
+    // REMOVES THE LISTENERS FOR TEXT FIELD AND THE LABEL DISPLAYED
     private void removeListeners() {
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
         removePropertyChangeListener("text", labelTextListener);
@@ -273,6 +272,9 @@ public class SSLabel extends JLabel {
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/04 22:48:54  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.4  2005/02/01 17:32:38  yoda2
  * API cleanup.
  *
