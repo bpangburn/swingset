@@ -60,8 +60,8 @@ import javax.sql.RowSet;
  * user changes the text in the text fields then the columns will be updated to
  * the new values when the user navigates the RowSet. If the user wants to revert
  * the changes he made he can press the Undo button, however this must be done
- * be done before any navigation.  Once navigation takes place changes can't be
- * reverted using Undo button (has to be done manually by the user).
+ * before any navigation.  Once navigation takes place changes can't be reverted
+ * using Undo button (has to be done manually by the user).
  *</pre><p>
  * @author	$Author$
  * @version	$Revision$
@@ -206,7 +206,7 @@ public class SSDataNavigator extends JPanel{
 
 	/**
 	 *enables or disables the modification buttons on the SSDataNavigator
-	 *if you wanth the user to just navigate through the records with out making any changes
+	 *if you want the user to just navigate through the records with out making any changes
 	 *set this to false. Default vaule is true. So if the modification is not set then the
 	 *modification buttons are enabled
 	 *
@@ -299,6 +299,20 @@ public class SSDataNavigator extends JPanel{
 		// THE COMMIT BUTTON IS SHOULB BE USED ONLY AFTER INSERT ROW IS REQUESTED
 		// THIS BUTTONS COMMITES THE INSERTED ROW
 		button5.setEnabled(false);
+		
+		try{
+			if( rowset.isLast()){
+				button3.setEnabled(false);
+				button4.setEnabled(false);
+			}
+			if( rowset.isFirst()){
+				button1.setEnabled(false);
+				button2.setEnabled(false);
+			}
+				
+		}catch(SQLException se){
+			se.printStackTrace();
+		}
 	}
 
 	private void setButtonSizes(){
@@ -417,6 +431,10 @@ public class SSDataNavigator extends JPanel{
 					// IF PREVIOUS BUTTON IS DISABLED THEN ENABLE THE PREVIOUS BUTTON
 					if( !button2.isEnabled() )
 						button2.setEnabled(true);
+					
+					// IF THE FIRST BUTTON IS DISABLED THEN ENABLE IT
+					if(!button1.isEnabled())
+						button1.setEnabled(true);	
 				}catch(SQLException se){
 					se.printStackTrace();
 				}
@@ -437,6 +455,8 @@ public class SSDataNavigator extends JPanel{
 					rowset.last();
 					button3.setEnabled(false);
 					button2.setEnabled(true);
+					if(!rowset.isFirst())
+						button1.setEnabled(true);
 				}catch(SQLException se){
 					se.printStackTrace();
 				}
@@ -563,7 +583,7 @@ public class SSDataNavigator extends JPanel{
 				}
 			}
 		});
-
+		
 	}
 
 }
@@ -572,6 +592,9 @@ public class SSDataNavigator extends JPanel{
 
 /*
  * $Log$
+ * Revision 1.2  2003/09/25 14:27:45  yoda2
+ * Removed unused Import statements and added preformatting tags to JavaDoc descriptions.
+ *
  * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
  * Initial CVS import for SwingSet.
  *
