@@ -109,8 +109,8 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         lblPartName.setPreferredSize(new Dimension(75,20));
         lblQuantity.setPreferredSize(new Dimension(75,20));
 
-        cmbSupplierName.getComboBox().setPreferredSize(new Dimension(150,20));
-        cmbPartName.getComboBox().setPreferredSize(new Dimension(150,20));
+        cmbSupplierName.setPreferredSize(new Dimension(150,20));
+        cmbPartName.setPreferredSize(new Dimension(150,20));
         txtQuantity.setPreferredSize(new Dimension(150,20));
 
         Container contentPane = getContentPane();
@@ -127,9 +127,9 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
         constraints.gridx = 1;
         constraints.gridy = 0;
-        contentPane.add(cmbSupplierName.getComboBox(), constraints);
+        contentPane.add(cmbSupplierName, constraints);
         constraints.gridy = 1;
-        contentPane.add(cmbPartName.getComboBox(), constraints);
+        contentPane.add(cmbPartName, constraints);
         constraints.gridy = 2;
         contentPane.add(txtQuantity, constraints);
 
@@ -150,6 +150,9 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
 /*
  * $Log$
+ * Revision 1.8  2005/02/04 22:40:12  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.7  2004/11/11 15:04:38  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *

@@ -39,6 +39,7 @@ import java.sql.*;
 import java.awt.*;
 import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
 import com.nqadmin.swingSet.datasources.SSConnection;
+import com.nqadmin.swingSet.utils.SSSyncManager;
 
  /**
   * This example demonstrates the use of SSDBComboBox for record navigation.
@@ -69,17 +70,11 @@ import com.nqadmin.swingSet.datasources.SSConnection;
     SSConnection ssConnection = null;
     SSJdbcRowSetImpl rowset   = null;
     SSDataNavigator navigator = null;
+    SSSyncManager syncManager;
 
     JTextField txtPartID = new JTextField();
-    JTextField txtPartIDLinkedToCombo = new JTextField();
-    // LISTENER OBJECTS FOR TEXTFIELD LINKED TO COMBO AND THE TEXT FIELD BOUND TO
-    // PART_ID COLUMN
-    MyPartIDDocumentListener partIDListener = new MyPartIDDocumentListener();
-    MyPartIDDocumentLinkedToComboListener partIDLinkedToComboListener
-        = new MyPartIDDocumentLinkedToComboListener();
 
-
-    public Example4(){
+   public Example4(){
 
         super("Example4");
         setSize(600,200);
@@ -110,11 +105,9 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         }
 
         txtPartID.setDocument(new SSTextDocument(rowset,"part_id"));
-        txtPartIDLinkedToCombo.setText(txtPartID.getText());
 
         String query = "SELECT * FROM part_data;";
-        cmbSelectPart = new SSDBComboBox(ssConnection, query,
-            "part_id", "part_name", txtPartIDLinkedToCombo);
+        cmbSelectPart = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
         try{
             cmbSelectPart.execute();
         }catch(SQLException se){
@@ -123,6 +116,15 @@ import com.nqadmin.swingSet.datasources.SSConnection;
             e.printStackTrace();
         }
 
+       // SYNC MANAGER WILL TAKE CARE OF KEEPING THE COMBO BOX AND DATANAVIGATOR IN SYNC.
+       // WHILE CHANGEING THE QUERY OR REEXECUTING THE QUERY FOR COMBO BOX
+       // YOU HAVE TO CALL ASYNC ON THE SYNC MANAGER AND AFTER CALLING EXECUTE ON COMBO BOX
+       // CALL SYNC ON SYNC MANAGER. 
+       // THESE THREE LINE OF CODE IS USED A REPLACEMENT FOR THE TWO LISTENER CLASS WE HAD.
+        syncManager = new SSSyncManager(cmbSelectPart, navigator);
+        syncManager.setColumnName("part_id");
+        syncManager.sync();
+        
         cmbPartColor = new SSComboBox();
         cmbPartColor.setOption(new String[]{"Red","Green","Blue"});
         cmbPartColor.bind(rowset,"color_code");
@@ -135,8 +137,8 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         lblPartWeight.setPreferredSize(new Dimension(75,20));
         lblPartCity.setPreferredSize(new Dimension(75,20));
 
-        cmbSelectPart.getComboBox().setPreferredSize(new Dimension(150,20));
-        cmbPartColor.getComboBox().setPreferredSize(new Dimension(150,20));
+        cmbSelectPart.setPreferredSize(new Dimension(150,20));
+        cmbPartColor.setPreferredSize(new Dimension(150,20));
         txtPartWeight.setPreferredSize(new Dimension(150,20));
         txtPartCity.setPreferredSize(new Dimension(150,20));
 
@@ -156,9 +158,9 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
         constraints.gridx = 1;
         constraints.gridy = 0;
-        contentPane.add(cmbSelectPart.getComboBox(), constraints);
+        contentPane.add(cmbSelectPart, constraints);
         constraints.gridy = 1;
-        contentPane.add(cmbPartColor.getComboBox(), constraints);
+        contentPane.add(cmbPartColor, constraints);
         constraints.gridy = 2;
         contentPane.add(txtPartWeight, constraints);
         constraints.gridy = 3;
@@ -169,98 +171,9 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         constraints.gridwidth = 2;
         contentPane.add(navigator,constraints);
 
-        txtPartID.getDocument().addDocumentListener(partIDListener);
-        txtPartIDLinkedToCombo.getDocument().addDocumentListener(partIDLinkedToComboListener);
-
         setVisible(true);
 
     }
-
-        // LISTENER FOR THE TEXT FIELD BOUND TO THE Part_ID COLUMN
-    private class MyPartIDDocumentListener implements DocumentListener{
-
-        public void changedUpdate(DocumentEvent de) {
-
-        }
-        // WHEN EVER THE PART ID CHANGES, CHANGE THE PART ID IN TEXT FIELD
-        // LINKED TO COMBO SO THAT COMBO ALSO SHOW THE RIGHT PART NAME
-        public void insertUpdate(DocumentEvent de) {
-            txtPartIDLinkedToCombo.getDocument().removeDocumentListener(partIDLinkedToComboListener);
-            if(txtPartIDLinkedToCombo.getText() != txtPartID.getText()){
-                txtPartIDLinkedToCombo.setText(txtPartID.getText());
-            }
-            txtPartIDLinkedToCombo.getDocument().addDocumentListener(partIDLinkedToComboListener);
-        }
-        public void removeUpdate(DocumentEvent de) {
-
-        }
-    }
-
-    // LISTENER FOR THE TEXT FIELD LINKED TO THE PART SELECTION COMBO
-    private class MyPartIDDocumentLinkedToComboListener implements DocumentListener {
-        long partID = -1;
-        public void changedUpdate(DocumentEvent de) {
-
-        }
-        // WHEN THERE IS A CHANGE IN THIS TEXT FIELD MOVE THE ROWSET TO THE APPROPRIATE
-        // RECORD
-        public void insertUpdate(DocumentEvent de) {
-            Document doc = txtPartIDLinkedToCombo.getDocument();
-            try {
-                // GET THE NEW PART ID IN TEXT FIELD LINKED TO COMBO
-                String strPartID = doc.getText(0,doc.getLength());
-                partID = -1;
-                if( !strPartID.equals("") ) {
-                    partID = Integer.parseInt(strPartID);
-                }
-                // REMOVE LISTENER FOR THE PART_ID TEXT FIELD BOUND TO DB
-                txtPartID.getDocument().removeDocumentListener(partIDListener);
-                // CHECK IF THE CURRENT RECORD CORRESPONDS TO THAT OF THE DESIRED ONE.
-                if(partID != rowset.getLong("part_id") ){
-                    // MOVE THE RECORD SET TO THE RECORD NUMBER EQUAL TO THE SELECTED
-                    // ITEM NUMBER IN COMBO
-                    // COMBO BOX ITEM NUMBERING STARTS FROM ZERO
-                    // FOR ROWSET IT STARTS FROM ONE.
-                    int index = cmbSelectPart.getComboBox().getSelectedIndex() + 1;
-                    rowset.absolute(index);
-                    int numRecords = cmbSelectPart.getComboBox().getItemCount();
-                    int count = 0;
-                    // CHECK IF THE CURRENT RECORD CORRESPONDS TO THAT OF THE DESIRED ONE.
-                    while(partID != rowset.getLong("part_id") ) {
-                        // ABOVE CONDITION SHOULD ALWAYS FAIL EXCEPT IF SOME ONE DELETED
-                        // A ROW OUT SIDE OF THIS APPLICATION
-                        // IN SUCH CASE LOOK FOR THE CORRECT RECORD
-                        if( !rowset.next()) {
-                            rowset.beforeFirst();
-                            rowset.next();
-                        }
-                            count++;
-                        //number of items in combo is the number of records in resultset.
-                        //so if for some reason item is in combo but deleted in rowset
-                        //To avoid infinite loop in such scenario
-                        if(count > numRecords + 5){
-                            //JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin about this","Row not found",JOptionPane.OK_OPTION);
-                            break;
-                        }
-                    }
-                }
-                // ADD BACK THE LISTENER
-                txtPartID.getDocument().addDocumentListener(partIDListener);
-
-            }catch(SQLException se){
-                se.printStackTrace();
-            }catch(NumberFormatException nfe){
-                nfe.printStackTrace();
-            }catch(BadLocationException ble){
-                ble.printStackTrace();
-            }
-        }
-        public void removeUpdate(DocumentEvent de) {
-
-        }
-    }
-
-
 
     public static void main(String[] args){
         new Example4();
@@ -270,6 +183,9 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
 /*
  * $Log$
+ * Revision 1.8  2005/02/04 22:40:12  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.7  2004/11/11 15:04:38  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *

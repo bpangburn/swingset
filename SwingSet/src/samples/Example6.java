@@ -63,7 +63,7 @@ public class Example6 extends JFrame {
             rowset.setCommand("SELECT part_name,color_code, weight, city,part_id FROM part_data ORDER BY part_name;");
             //  SET THE HEADER BEFORE SETTING THE ROWSET
             dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
-            dataGrid.setRowSet(rowset);
+            dataGrid.setSSRowSet(rowset);
             // HIDE THE PART ID COLUMN
             // THIS SETS THE WIDTH OF THE COLUMN TO 0
             //dataGrid.setHiddenColumns(new String[]{"part_id"});
@@ -113,6 +113,9 @@ public class Example6 extends JFrame {
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/04 22:40:12  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.4  2004/11/11 15:04:38  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *

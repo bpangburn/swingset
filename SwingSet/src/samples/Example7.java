@@ -64,7 +64,7 @@ public class Example7 extends JFrame {
 
             //  SET THE HEADER BEFORE SETTING THE ROWSET
             dataGrid.setHeaders(new String[]{"Supplier Name", "Part Name", "Quantity", " Ship Date"});
-            dataGrid.setRowSet(rowset);
+            dataGrid.setSSRowSet(rowset);
 
             dataGrid.updateUI();
 
@@ -126,6 +126,9 @@ public class Example7 extends JFrame {
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/04 22:40:12  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.4  2004/11/11 15:04:38  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *

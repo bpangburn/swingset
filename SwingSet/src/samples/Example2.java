@@ -107,7 +107,7 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
         txtSupplierName.setPreferredSize(new Dimension(150,20));
         txtSupplierCity.setPreferredSize(new Dimension(150,20));
-        cmbSupplierStatus.getComboBox().setPreferredSize(new Dimension(150,20));
+        cmbSupplierStatus.setPreferredSize(new Dimension(150,20));
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new GridBagLayout());
@@ -127,7 +127,7 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         constraints.gridy = 1;
         contentPane.add(txtSupplierCity, constraints);
         constraints.gridy = 2;
-        contentPane.add(cmbSupplierStatus.getComboBox(), constraints);
+        contentPane.add(cmbSupplierStatus, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 3;
@@ -146,6 +146,9 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/04 22:40:12  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.6  2004/11/11 15:04:38  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *

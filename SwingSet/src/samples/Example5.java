@@ -43,7 +43,7 @@ public class Example5 extends JFrame {
 
     SSConnection ssConnection = null;
     SSJdbcRowSetImpl rowset   = null;
-    SSDataGrid dataGrid = new SSDataGrid();
+    SSDataGrid dataGrid = null; //new SSDataGrid();
 
     public Example5(){
         super("Example 5");
@@ -62,8 +62,9 @@ public class Example5 extends JFrame {
             rowset = new SSJdbcRowSetImpl(ssConnection);
             rowset.setCommand("SELECT part_name,color_code, weight, city,part_id FROM part_data ORDER BY part_name;");
             //  SET THE HEADER BEFORE SETTING THE ROWSET
+            dataGrid = new SSDataGrid();
             dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
-            dataGrid.setRowSet(rowset);
+            dataGrid.setSSRowSet(rowset);
             dataGrid.setMessageWindow(this);
             // HIDE THE PART ID COLUMN
             // THIS SETS THE WIDTH OF THE COLUMN TO 0
@@ -76,7 +77,7 @@ public class Example5 extends JFrame {
         }catch(ClassNotFoundException cnfe){
             cnfe.printStackTrace();
         }
-
+        dataGrid.setPreferredSize(new Dimension(200,200));
         getContentPane().add(dataGrid.getComponent());
 
         setVisible(true);
@@ -87,6 +88,9 @@ public class Example5 extends JFrame {
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/04 22:40:12  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.4  2004/11/11 15:04:38  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *
