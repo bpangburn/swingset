@@ -38,6 +38,8 @@ import javax.swing.*;
 import java.sql.*;
 import java.io.*;
 import javax.sql.RowSet;
+import javax.sql.RowSetListener;
+import javax.sql.RowSetEvent;
 
 /**
  * SSDataNavigator.java
@@ -106,6 +108,8 @@ public class SSDataNavigator extends JPanel {
 	
 	protected Dimension txtFieldSize = new Dimension( 65, 20);
 
+
+	protected SSDBNavRowSetListener rowsetListener = new SSDBNavRowSetListener();
 	/**
 	 * Creates a object of SSDataNavigator.
 	 * Note: you have to set the rowset before you can start using it.
@@ -377,8 +381,12 @@ public class SSDataNavigator extends JPanel {
 	 * @param _rowset    a RowSet object to which the navigator has to be bound
 	 */
 	public void setRowSet(RowSet _rowset) {
+		if(rowset != null){
+			rowset.removeRowSetListener(rowsetListener);
+		}
+		
 		rowset = _rowset;
-
+		
 		//SEE IF THERE ARE ANY ROWS IN THE GIVEN ROWSET
 		try {
 			if (callExecute) {
@@ -399,6 +407,7 @@ public class SSDataNavigator extends JPanel {
 			lblRowCount.setText("of " + rowCount);	
 			txtCurrentRow.setText(String.valueOf(currentRow));
 
+			rowset.addRowSetListener(rowsetListener);
 		} catch(SQLException se) {
 			se.printStackTrace();
 		}
@@ -871,6 +880,69 @@ public class SSDataNavigator extends JPanel {
 		});
 		
 	}
+	
+	private class SSDBNavRowSetListener implements RowSetListener{
+		
+		public void cursorMoved(RowSetEvent rse){
+		// IF THERE ARE ROWS GET THE ROW COUNT	
+			try{
+				currentRow = rowset.getRow();
+				updateInfo();
+			}catch(SQLException se){
+				se.printStackTrace();
+			}
+		}
+		
+		public void rowChanged(RowSetEvent rse){
+		// DO NOTHING
+		}
+		
+		public void rowSetChanged(RowSetEvent rse){
+		// IF THERE ARE ROWS GET THE ROW COUNT		
+			try{
+				rowset.last();
+				rowCount = rowset.getRow();
+				rowset.first();
+				currentRow = rowset.getRow();
+				updateInfo();
+			}catch(SQLException se){
+				se.printStackTrace();
+			}
+			updateInfo();
+		}
+		
+		protected void updateInfo(){
+		// SET THE ROW COUNT AS LABEL
+			lblRowCount.setText("of " + rowCount);	
+			txtCurrentRow.setText(String.valueOf(currentRow));
+		// ENABLE OR DISABLE BUTTONS
+			if (rowCount == 0) {
+				firstButton.setEnabled(false);
+				previousButton.setEnabled(false);
+				nextButton.setEnabled(false);
+				lastButton.setEnabled(false);
+			} else{
+				firstButton.setEnabled(true);
+				previousButton.setEnabled(true);
+				nextButton.setEnabled(true);
+				lastButton.setEnabled(true);
+			}
+	
+			try {
+				if (rowset.isLast()) {
+					nextButton.setEnabled(false);
+					lastButton.setEnabled(false);
+				}
+				if (rowset.isFirst()) {
+					firstButton.setEnabled(false);
+					previousButton.setEnabled(false);
+				}
+					
+			} catch(SQLException se) {
+				se.printStackTrace();
+			}
+		}
+	}
 		
 } // end public class SSDataNavigator extends JPanel {
 
@@ -878,6 +950,10 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.17  2004/09/02 16:37:05  prasanth
+ * Moving to the last record if your has added a record & pressed commit button.
+ * This would keep the user in the added record.
+ *
  * Revision 1.16  2004/09/01 18:42:08  prasanth
  * Was calling next in the refresh listener. This would move to second record
  * if refresh is pressed. If there is only one record then user will not be able to
