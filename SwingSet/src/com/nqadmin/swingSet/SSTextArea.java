@@ -60,8 +60,19 @@ public class SSTextArea extends JTextArea {
      */
     public SSTextArea() {
 		init();
-    }    
-    
+    }
+
+    /**
+     * Constructs a new empty SSTextArea with the specified number of rows and columns.    
+     *
+     * @param _rows     the number of rows >= 0
+     * @param _columns     the number of columns >= 0
+     */
+    public SSTextArea(int _rows, int _columns) {
+        super(_rows, _columns);
+		//init(); - NO NEED TO SET DIMENSIONS AS THAT IS THE POINT OF THIS CONSTRUCTOR
+    }     
+
     /**
      * Creates a multi-line text box and binds it to the specified SSRowSet column.
      *
@@ -165,6 +176,9 @@ public class SSTextArea extends JTextArea {
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/05 05:16:33  yoda2
+ * API cleanup.
+ *
  * Revision 1.5  2005/02/04 22:48:54  yoda2
  * API cleanup & updated Copyright info.
  *
