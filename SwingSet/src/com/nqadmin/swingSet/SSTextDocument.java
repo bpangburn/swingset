@@ -71,18 +71,31 @@ import java.util.StringTokenizer;
  */
 public class SSTextDocument extends javax.swing.text.PlainDocument {
 
-	int columnType = -1;
-	RowSet rs = null;
-	String columnName = null;
-	int columnIndex = -1;
-	int pkIndex = -1;
-	long pkValue = -1;
-	SimpleAttributeSet attribute = new SimpleAttributeSet();
+	protected int columnType = -1;
+	protected transient RowSet rs = null;
+	protected String columnName = null;
+	protected int columnIndex = -1;
+	protected SimpleAttributeSet attribute = new SimpleAttributeSet();
+	protected transient boolean deserialized = false;
+	
+	protected MyRowSetListener rowSetListener = new MyRowSetListener();
+	protected MyDocumentListener documentListener = new MyDocumentListener();
 
-	MyRowSetListener rowSetListener = new MyRowSetListener();
-	MyDocumentListener documentListener = new MyDocumentListener();
-
-
+	/**
+	 * This function is provided to know if the object has been deserialized.
+	 *In which case the listeners have to be added again while the rowset is set.
+	 */
+	private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException{
+		objIn.defaultReadObject();
+		System.out.println("SSTextField Read");
+		deserialized = true;
+	}
+	
+	private void writeObject(ObjectOutputStream objOut) throws IOException{
+		objOut.defaultWriteObject();
+		System.out.println("SSTextField Written");
+	}
+	
 	/**
 	 * Constructs a Document with the given rowset and column index.
 	 *The document is bound to the specified column in the rowset
@@ -149,13 +162,119 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 			ble.printStackTrace();
 		}
 
-		// ADD LISTENERS TO THE DOCUMENT AND ROWSET
+	// ADD LISTENERS TO THE DOCUMENT AND ROWSET
 		rs.addRowSetListener(rowSetListener);
 		addDocumentListener(documentListener);
+	
 	}
 
+	/**
+	 *	Sets the column name to which the document has to be bound to.
+	 *@param _columnName  - Column Name to which the document has to be bound to.
+	 */
+	public void setColumnName(String _columnName){
+		columnName = _columnName;
+		columnIndex = -1;
+	}
+	
+	/**
+	 *	Sets the column index to which the document has to be bound to.
+	 *@param _columnIndex - Column index to which the document has to be bound to.
+	 */
+	public void setColumnIndex(int _columnIndex){
+		columnIndex = _columnIndex;
+		columnName = null;
+	}
+	
+	/**
+	 *	Returns the column name to which the document is bound to.
+	 *@return - returns the column name to which the document is bound to.
+	 */
+	public String getColumnName(){
+		return columnName;
+	}
+	
+	/**
+	 *	Returns the index of the column to which this document is bound.
+	 *@return - returns the index of the column to which this document is bound.
+	 */
+	public int getColumnIndex(){
+		return columnIndex;
+	}
+	
+	/**
+	 *	Returns the rowset being used for getting the values.
+	 *@return returns the rowset being used.
+	 */
+	public RowSet getRowSet(){
+		return rs;
+	}
+	
+	/**
+	 *	Sets the rowset to be used for binding the document to the specified column.
+	 *The column name or column index has to be specified prior to setting the rowset.
+	 *@param _rowset - rowset to be used for binding the document to the specified column.
+	 */
+	public void setRowSet(RowSet _rowset) throws SQLException{
+		rs = _rowset;
+		try{
+			if(columnName != null){
+			// FINDS THE COLUMN INDEX (REQUIRED TO GET ANY META DATA)
+				columnIndex = rs.findColumn(columnName);
+			}
+			else if(columnIndex != -1){
+				
+			}
+			else{
+				throw new SQLException("Column Name not specified");
+			}
+			
+			ResultSetMetaData metaData = rs.getMetaData();
+		
+		// GET THE COLUMN TYPE AND COLUMN NAME FROM THE META DATA
+			columnType = metaData.getColumnType(columnIndex);
+			columnName = metaData.getColumnName(columnIndex);
+		
+		// CHECK IF THERE ARE ROWS IN THE ROWSET THEN
+		// SET THE DOCUMENT TO THE TEXT CORRESPONDING TO THE COLUMN
+			if( rs.getRow() != 0) {
+				String value = getText();
+				if( value != null && value.length() > 0) {
+					value = value.replace('\r',' ');
+					insertString(0,value, attribute);
+					insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength()  , DocumentEvent.EventType.INSERT), attribute );
+				}
+			}
+			
+		}catch(BadLocationException ble){
+			ble.printStackTrace();
+		}
+	// IF THE OBJECT IS DESERIALIZED THEN THE LISTENERS ARE LOST
+	// SO ADD THEM BACK AND RESET THE VARIABLE.
+		if(deserialized){
+		// ADD LISTENER TO THE ROWSET
+			rs.addRowSetListener(rowSetListener);
+			addDocumentListener(documentListener);
+			deserialized = false;
+		}	
+		
+		
+	}
 
-	private class MyDocumentListener implements DocumentListener {
+	/**
+	 *	Initializes the values to default values.
+	 */
+	private void init(){
+		columnIndex = -1;
+		columnName = null;
+		columnType = -1;
+		if(rs != null){
+			rs.removeRowSetListener(rowSetListener);
+		}
+		removeDocumentListener(documentListener);
+	}
+	
+	private class MyDocumentListener implements DocumentListener, Serializable {
 		// WHEN EVER THERE IS ANY CHANGE IN THE DOCUMENT CAN BE REMOVE UPDATE
 		// CHANGED UPDATE OR INSERT UPDATE GET THE TEXT IN THE DOCUMENT
 		// AND UPDATE THE COLUMN IN THE ROWSET
@@ -197,7 +316,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 	// REMOVE UPDATES ARE NOT REQUIRED WHEN DOING A IMMEDIATE INSERT AND
 	// CALLING  INSERT UPDATE
-	private class MyRowSetListener implements RowSetListener {
+	private class MyRowSetListener implements RowSetListener, Serializable {
 		// WHEN EVER THERE IS A CHANGE IN ROWSET CAN BE ROW-CHANGED OR ROWSET-CHANGED
 		// OR CURSOR-MOVED GET THE NEW TEXT CORRESPONDING TO THE COLUMN AND UPDATE THE DOCUMENT
 		// WHILE DOING SO YOU CAN CAUSE A EVENT TO FIRE WHEN DOCUMENT CHANGES SO REMOVE THE
@@ -508,6 +627,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.6  2004/03/08 16:43:37  prasanth
+ * Updated copy right year.
+ *
  * Revision 1.5  2004/01/27 19:09:22  prasanth
  * In the RowSet Listener replaces remove and insert functions with
  * replace function.
