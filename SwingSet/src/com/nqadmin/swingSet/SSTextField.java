@@ -39,6 +39,7 @@ import java.io.ObjectInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.StringTokenizer;
+import javax.sql.RowSet;
 
 
 /**
@@ -124,6 +125,7 @@ public class SSTextField extends JTextField {
 	 */
 	public SSTextField(){
 		super();
+		init();
 	}
 	
 	/**
@@ -171,6 +173,10 @@ public class SSTextField extends JTextField {
 	 	init();
 	 }
 	 
+	 public void bind(RowSet _rowset, String _columnName){
+	 	this.setDocument(new SSTextDocument(_rowset, _columnName));
+	 }
+	 
 	 /**
 	  *	sets the number of decimal places required.
 	  *This number is used only when mask is set to DECIMAL.
@@ -207,8 +213,13 @@ public class SSTextField extends JTextField {
 		 					ke.getKeyCode() == KeyEvent.VK_RIGHT   ||
 		 					ke.getKeyCode() == KeyEvent.VK_HOME    ||
 		 					ke.getKeyCode() == KeyEvent.VK_END	   ||
-		 					ke.getKeyCode() == KeyEvent.VK_ENTER	)
+		 					ke.getKeyCode() == KeyEvent.VK_ENTER	) {
+					// TRANSFER FOCUS TO NEXT COMPONENT WHEN ENTER KEY IS PRESSED		 			
+		 				if(ke.getKeyCode() == KeyEvent.VK_ENTER){
+							((Component)ke.getSource()).transferFocus();
+						}		
 		 				return;
+		 			}
 		 			
 		 			// BASED ON TYPE OF MASK REQUESTED MODIFY THE TEXT
 		 			// ACCORDINGLY
@@ -335,6 +346,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.4  2004/08/02 15:48:09  prasanth
+ * 1. Added the readObject method.
+ *
  * Revision 1.3  2004/03/08 16:43:37  prasanth
  * Updated copy right year.
  *
