@@ -200,7 +200,15 @@ public class SSTextField extends JTextField {
 	  */
 	 private void init() {
 	 	
-	 	// ADD KEY LISTENER FOR THE TEXT FIELD
+	 // ADD FOCUS LISTENER TO THE TEXT FEILD SO THAT WHEN THE FOCUS IS GAINED
+	 // COMPLETE TEXT SHOULD BE SELECTED		
+	 	this.addFocusListener(new FocusAdapter(){
+	 		public void focusGained(FocusEvent fe){
+	 			SSTextField.this.selectAll();
+	 		}
+	 	});
+	 	
+	 // ADD KEY LISTENER FOR THE TEXT FIELD
 	 	this.addKeyListener( new KeyListener() {
 	 			
 	 		public void keyReleased(KeyEvent ke) {
@@ -215,6 +223,11 @@ public class SSTextField extends JTextField {
 	 		}
 	 		
 	 		public synchronized void keyPressed(KeyEvent ke) {
+	 		// TRANSFER FOCUS TO NEXT COMPONENT WHEN ENTER KEY IS PRESSED		 			
+                if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
+                    ((Component)ke.getSource()).transferFocus();
+                }
+                
 	 			if(mask == MMDDYYYY || mask == DDMMYYYY){
 	 				mask(ke);
 	 			}
@@ -226,22 +239,24 @@ public class SSTextField extends JTextField {
 	 	
 	 protected void mask(KeyEvent ke){
 	 	String str = getText();
-            
+		char ch = ke.getKeyChar();            
+		
      // IF THE KEY PRESSED IS ANY OF THE FOLLOWING DO NOTHING
-        if (ke.getKeyCode() == KeyEvent.VK_BACK_SPACE  || 
+     	if (ke.getKeyCode() == KeyEvent.VK_BACK_SPACE  || 
                 ke.getKeyCode() == KeyEvent.VK_DELETE  ||
-                ke.getKeyCode() == KeyEvent.VK_LEFT    ||
-                ke.getKeyCode() == KeyEvent.VK_RIGHT   ||
-                ke.getKeyCode() == KeyEvent.VK_HOME    ||
                 ke.getKeyCode() == KeyEvent.VK_END	   ||
-                ke.getKeyCode() == KeyEvent.VK_ENTER) {
-                    
-            // TRANSFER FOCUS TO NEXT COMPONENT WHEN ENTER KEY IS PRESSED		 			
-                if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
-                    ((Component)ke.getSource()).transferFocus();
-                }
-                
-                return;
+                ke.getKeyCode() == KeyEvent.VK_ENTER   ||	
+                ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                       
+         	return;
+        }
+        else if( (ke.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) == KeyEvent.CTRL_DOWN_MASK ||
+        		 (ke.getModifiersEx() & KeyEvent.ALT_DOWN_MASK)  == KeyEvent.ALT_DOWN_MASK    ){
+        		 	
+        	return;	 	
+        }	
+        else if(!Character.isDefined(ch)){
+        	return;
         }
         
         if(getSelectionStart() != getSelectionEnd()){
@@ -370,6 +385,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.8  2004/10/07 14:35:27  prasanth
+ * Updated the way the masks work.
+ *
  * Revision 1.7  2004/09/13 15:42:15  prasanth
  * Changed the default mask to non.
  * It used to be MMDDYYYY.
