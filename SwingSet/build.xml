@@ -1,69 +1,81 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- You may freely edit this file. See commented blocks below for -->
-<!-- some examples of how to customize the build. -->
-<!-- (If you delete it and reopen the project it will be recreated.) -->
-<project name="SwingSet" default="default" basedir=".">
-    <description>Builds, tests, and runs the project SwingSet.</description>
-    <import file="nbproject/build-impl.xml"/>
-    <!--
+<project name="SwingSet" default="all" basedir=".">
 
-    There exist several targets which are by default empty and which can be 
-    used for execution of your tasks. These targets are usually executed 
-    before and after some main targets. They are: 
+	<property name="srcdir" value="./src" />
+	<property name="classesdir" value="./classes" />
+	<property name="javadocdir" value="./javadoc" />
+	<property name="lib" value="./lib" />
+	<property name="deploydir" value="./deploy" />
+	<property name="manifestdir" value="./META-INF" />
+	
+	<path id="1">
+		<pathelement location="${lib}/rowset.jar" />
+	</path>
+	
+	<path id="2">
+		<pathelement location="${lib}/rowset.jar" />
+		<pathelement location="${classesdir}" />
+	</path>
+	
+	<target name="all" depends="clean, prepare, compile, docs, build">
+		
+	</target>
+	
+	<target name="clean">
+		<delete dir="${classesdir}" />
+		<delete dir="${deploydir}" />
+		<delete dir="${javadocdir}" />
+	</target>
+	
+	<target name="prepare" depends="clean">
+		<mkdir dir="${classesdir}" />
+		<mkdir dir="${classesdir}/samples" />
+		<mkdir dir="${javadocdir}" />
+		<mkdir dir="${deploydir}" />
+	</target>
+	
+	<target name="compile" depends="prepare">
+		<javac srcdir="${srcdir}/com" destdir="${classesdir}" >
+			<classpath refid="1" />
+		</javac>
+		
+		<javac srcdir="${srcdir}/samples" destdir="${classesdir}/samples" >
+			<classpath refid="2" />
+		</javac>
+		
+	</target>
+	
+	<target name="docs" depends="compile">
+		<javadoc source="${srcdir}" destdir="${javadocdir}">
+			<sourcepath>
+				<pathelement location="${srcdir}"/>
+			</sourcepath>
+			<classpath>
+				<path path="${classesdir}" />
+			</classpath>
+			<fileset dir="${srcdir}" >
+				<exclude name="samples/**" />
+				<exclude name="images/**" />
+			</fileset>
+		</javadoc>
+	</target>
+	
+	<target name="build" depends="docs">
+		<jar jarfile="${deploydir}/swingset-bin.jar" basedir="${classesdir}"  manifest="${manifestdir}/MANIFEST.MF">
+			<exclude name="samples/**/*" />
+			<fileset dir="${srcdir}" >
+				<include name="images" />
+			</fileset>
+		</jar>
 
-      -pre-init:                 called before initialization of project properties
-      -post-init:                called after initialization of project properties
-      -pre-compile:              called before javac compilation
-      -post-compile:             called after javac compilation
-      -pre-compile-single:       called before javac compilation of single file
-      -post-compile-single:      called after javac compilation of single file
-      -pre-compile-test:         called before javac compilation of JUnit tests
-      -post-compile-test:        called after javac compilation of JUnit tests
-      -pre-compile-test-single:  called before javac compilation of single JUnit test
-      -post-compile-test-single: called after javac compilation of single JUunit test
-      -pre-jar:                  called before JAR building
-      -post-jar:                 called after JAR building
-      -post-clean:               called after cleaning build products
-
-    (Targets beginning with '-' are not intended to be called on their own.)
-
-    Example of inserting an obfuscator after compilation could look like this:
-
-        <target name="-post-compile">
-            <obfuscate>
-                <fileset dir="${build.classes.dir}"/>
-            </obfuscate>
-        </target>
-
-    For list of available properties check the imported 
-    nbproject/build-impl.xml file. 
-
-
-    Another way to customize the build is by overriding existing main targets.
-    The targets of interest are: 
-
-      -init-macrodef-javac:     defines macro for javac compilation
-      -init-macrodef-junit:     defines macro for junit execution
-      -init-macrodef-debug:     defines macro for class debugging
-      -init-macrodef-java:      defines macro for class execution
-      -do-jar-with-manifest:    JAR building (if you are using a manifest)
-      -do-jar-without-manifest: JAR building (if you are not using a manifest)
-      run:                      execution of project 
-      -javadoc-build:           Javadoc generation
-      test-report:              JUnit report generation
-
-    An example of overriding the target for project execution could look like this:
-
-        <target name="run" depends="SwingSet-impl.jar">
-            <exec dir="bin" executable="launcher.exe">
-                <arg file="${dist.jar}"/>
-            </exec>
-        </target>
-
-    Notice that the overridden target depends on the jar target and not only on 
-    the compile target as the regular run target does. Again, for a list of available 
-    properties which you can use, check the target you are overriding in the
-    nbproject/build-impl.xml file. 
-
-    -->
+		<jar jarfile="${deploydir}/swingset-demo.jar" basedir="${classesdir}/samples"  manifest="${manifestdir}/MANIFEST-DEMO.MF" />
+		
+		<jar jarfile="${deploydir}/swingset-docs.jar" basedir="${javadocdir}" />
+		
+		<jar jarfile="${deploydir}/swingset-src.jar" basedir="${srcdir}" >
+			<exclude name="samples/*" />
+		</jar>
+	</target>
+	
 </project>
+
+
