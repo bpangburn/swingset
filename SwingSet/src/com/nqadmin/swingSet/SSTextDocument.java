@@ -334,6 +334,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                     break;
 
                 case Types.DATE:
+                case Types.TIMESTAMP:
                     // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
                     if ( strValue.equals("") ) {
                         sSRowSet.updateNull(columnName);
@@ -402,6 +403,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                     break;
 
                 case Types.DATE:
+                case Types.TIMESTAMP:
                     Date date = sSRowSet.getDate(columnName);
                     if (date == null) {
                         value = "";
@@ -441,7 +443,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
         } catch(SQLException se) {
             se.printStackTrace();
         }
-
+              
         return value;
 
     } // end protected String getText() {
@@ -569,6 +571,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.22  2005/02/10 20:13:03  yoda2
+ * Setter/getter cleanup & method reordering for consistency.
+ *
  * Revision 1.21  2005/02/09 22:42:34  yoda2
  * JavaDoc cleanup.
  *
