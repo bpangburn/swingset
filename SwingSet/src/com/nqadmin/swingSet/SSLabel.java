@@ -55,8 +55,9 @@ import javax.swing.event.*;
 public class SSLabel extends JLabel {
 
     // TEXT FIELD BOUND TO THE DATABASE
-    private JTextField textField;
+    private JTextField textField = new JTextField();
 
+    // BINDING INFORMATION
     private String columnName;
     private int columnType;
 
@@ -65,15 +66,32 @@ public class SSLabel extends JLabel {
     private MyTextFieldListener textFieldListener = new MyTextFieldListener();
 
     /**
-     * Creates an object of SSLabel.
+     * Empty constructor needed for deserialization. Creates a SSLabel instance
+     * with no image and with an empty string for the title.
      */
     public SSLabel() {
-        textField = new JTextField();
     }
 
     /**
-     * Creates an object of SSLabel binding it so the specified column
-     * in the given SSRowSet.
+     * Creates a SSLabel instance with the specified image.
+     *
+     * @param _image    specified image for label
+     */
+    public SSLabel(Icon _image) {
+    }
+
+    /**
+     * Creates a SSLabel instance with the specified image and horizontal alignment.
+     *
+     * @param _image    specified image for label
+     * @param _horizontalAlignment	horizontal alignment
+     */
+    public SSLabel(Icon _image, int _horizontalAlignment) {
+    }
+
+    /**
+     * Creates a SSLabel instance with no image and binds it to the specified
+     * SSRowSet column.
      *
      * @param _rowset    datasource to be used.
      * @param _columnName    name of the column to which this label should be bound
@@ -204,4 +222,7 @@ public class SSLabel extends JLabel {
 
 /*
  * $Log$
+ * Revision 1.1  2005/01/01 05:05:47  yoda2
+ * Adding preliminary SwingSet implementations for JLabel & JSlider.
+ *
  */

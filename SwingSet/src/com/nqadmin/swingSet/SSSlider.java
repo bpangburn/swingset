@@ -55,32 +55,49 @@ import javax.swing.event.*;
 public class SSSlider extends JSlider {
 
     // TEXT FIELD BOUND TO THE DATABASE
-    private JTextField textField;
+    private JTextField textField = new JTextField();
 
+    // BINDING INFORMATION
     private String columnName;
     private int columnType;
 
-    // LISTENER FOR SLIDER AND TEXT FEILD
+    // LISTENER FOR SLIDER AND TEXT FIELD
     private MySliderListener sliderListener = new MySliderListener();
     private MyTextFieldListener textFieldListener = new MyTextFieldListener();
 
     /**
-     * Creates an object of SSSlider.
+     * Empty constructor needed for deserialization. Creates a horizontal
+     * slider with the range 0 to 100.
      */
     public SSSlider() {
-        textField = new JTextField();
     }
 
     /**
-     * Creates an object of SSSlider binding it so the specified column
-     * in the given SSRowSet.
+     * Creates a slider using the specified orientation with the range 0 to 100.
+     *
+     * @param _orientation	slider spatial orientation
+     */
+    public SSSlider(int _orientation) {
+    }
+
+    /**
+     * Creates a horizontal slider using the specified min and max.
+     *
+     * @param _min	minimum slider value
+     * @param _max	maximum slider value
+     */
+    public SSSlider(int _min, int _max) {
+    }
+
+    /**
+     * Creates a horizontal slider with the range 0 to 100 and binds it
+     * to the specified SSRowSet column.
      *
      * @param _rowset    datasource to be used.
      * @param _columnName    name of the column to which this slider should be bound
      */
     public SSSlider(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
         columnName = _columnName;
-        textField = new JTextField();
         textField.setDocument(new SSTextDocument(_rowset, _columnName));
         columnType = _rowset.getColumnType(_columnName);
     }
@@ -114,7 +131,6 @@ public class SSSlider extends JSlider {
     public void execute() {
         initSlider();
     }
-
 
     // INITIALIZES THE SLIDER.
     private void initSlider() {
@@ -255,4 +271,7 @@ public class SSSlider extends JSlider {
 
 /*
  * $Log$
+ * Revision 1.1  2005/01/01 05:05:48  yoda2
+ * Adding preliminary SwingSet implementations for JLabel & JSlider.
+ *
  */
