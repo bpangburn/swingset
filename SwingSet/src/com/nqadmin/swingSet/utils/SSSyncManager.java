@@ -65,7 +65,7 @@
  		public SSSyncManager(SSDBComboBox comboBox, SSDataNavigator dataNavigator){
  			this.comboBox = comboBox;
  			this.dataNavigator = dataNavigator;
- 			rowset = dataNavigator.getRowSet();
+ 			rowset = dataNavigator.getSSRowSet();
  		}
 
  		public void setColumnName(String columnName){
@@ -74,7 +74,7 @@
 
  		public void setDataNavigator(SSDataNavigator dataNavigator){
  			this.dataNavigator = dataNavigator;
- 			rowset = dataNavigator.getRowSet();
+ 			rowset = dataNavigator.getSSRowSet();
  		}
 
  		public void setComboBox(SSDBComboBox comboBox){
@@ -91,13 +91,13 @@
  		}
 
  		private void addListeners(){
- 			comboBox.getComboBox().addActionListener(comboListener);
- 			dataNavigator.getRowSet().addRowSetListener(rowsetListener);
+ 			comboBox.addActionListener(comboListener);
+ 			dataNavigator.getSSRowSet().addRowSetListener(rowsetListener);
  		}
 
  		private void removeListeners(){
- 			comboBox.getComboBox().removeActionListener(comboListener);
- 			dataNavigator.getRowSet().removeRowSetListener(rowsetListener);
+ 			comboBox.removeActionListener(comboListener);
+ 			dataNavigator.getSSRowSet().removeRowSetListener(rowsetListener);
  		}
 
 
@@ -121,18 +121,18 @@
 		}
 
 		protected void adjustValue(){
-			comboBox.getComboBox().removeActionListener(comboListener);
+			comboBox.removeActionListener(comboListener);
 			try{
 				if(rowset != null & rowset.getRow() > 0){
 					comboBox.setSelectedValue(rowset.getLong(columnName));
 				}
 				else{
-					comboBox.getComboBox().setSelectedIndex(-1);
+					comboBox.setSelectedIndex(-1);
 				}
 			}catch(SQLException se){
 				se.printStackTrace();
 			}
-			comboBox.getComboBox().addActionListener(comboListener);
+			comboBox.addActionListener(comboListener);
 		}
 
 
@@ -147,7 +147,7 @@
 			public void actionPerformed(ActionEvent ae) {
 				try {
 
-					if(rowset == null || rowset.getRow() < 1 || comboBox.getComboBox().getSelectedIndex() == -1){
+					if(rowset == null || rowset.getRow() < 1 || comboBox.getSelectedIndex() == -1){
 						return;
 					}
 
@@ -160,9 +160,9 @@
 
 					if(id != rowset.getLong(columnName) ){
 
-						int index = comboBox.getComboBox().getSelectedIndex() + 1;
+						int index = comboBox.getSelectedIndex() + 1;
 						rowset.absolute(index);
-						int numRecords = comboBox.getComboBox().getItemCount();
+						int numRecords = comboBox.getItemCount();
 						int count = 0;
 						while(id != rowset.getLong(columnName) ) {
 							if( !rowset.next()) {
@@ -191,6 +191,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2005/02/04 22:49:15  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.1  2005/01/03 19:53:43  prasanth
  * Initial Commit.
  *
