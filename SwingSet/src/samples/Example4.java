@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003, The Pangburn Company, Inc. and Prasanth R. Pasala
+ * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,17 +30,15 @@
  *
  */
 
-
-
- import com.nqadmin.swingSet.*;
- import javax.swing.*;
- import javax.swing.event.*;
- import javax.swing.text.*;
- import javax.sql.*;
- import java.sql.*;
- import java.awt.*;
- import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
- import com.nqadmin.swingSet.datasources.SSConnection; 
+import com.nqadmin.swingSet.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.text.*;
+import javax.sql.*;
+import java.sql.*;
+import java.awt.*;
+import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+import com.nqadmin.swingSet.datasources.SSConnection; 
 
  /**
   * This example demonstrates the use of SSDBComboBox for record navigation.
@@ -58,17 +56,15 @@
   */
  public class Example4 extends JFrame{
 
-  	JLabel lblSelectPart   = new JLabel("Part");
-  	JLabel lblPartColor  = new JLabel("Color");
- 	JLabel lblPartWeight     = new JLabel("Weight");
- 	JLabel lblPartCity       = new JLabel("City");
+  	JLabel lblSelectPart	= new JLabel("Part");
+  	JLabel lblPartColor		= new JLabel("Color");
+ 	JLabel lblPartWeight	= new JLabel("Weight");
+ 	JLabel lblPartCity		= new JLabel("City");
 
- 	SSDBComboBox cmbSelectPart  = null;
- 	SSComboBox cmbPartColor = null;
- 	JTextField txtPartWeight  = new JTextField();
- 	JTextField txtPartCity  = new JTextField();
-
-
+ 	SSDBComboBox cmbSelectPart	= null;
+ 	SSComboBox cmbPartColor		= null;
+ 	JTextField txtPartWeight	= new JTextField();
+ 	JTextField txtPartCity		= new JTextField();
 
  	SSConnection ssConnection = null;
  	SSJdbcRowSetImpl rowset   = null;
@@ -76,10 +72,11 @@
 
  	JTextField txtPartID = new JTextField();
 	JTextField txtPartIDLinkedToCombo = new JTextField();
- 	// LISTENER OBJECTS FOR TEXTFILED LINKED TO COMBO AND THE TEXT FIELD BOUND TO
+ 	// LISTENER OBJECTS FOR TEXTFIELD LINKED TO COMBO AND THE TEXT FIELD BOUND TO
 	// PART_ID COLUMN
 	MyPartIDDocumentListener partIDListener = new MyPartIDDocumentListener();
-	MyPartIDDocumentLinkedToComboListener partIDLinkedToComboListener = new MyPartIDDocumentLinkedToComboListener();
+	MyPartIDDocumentLinkedToComboListener partIDLinkedToComboListener 
+		= new MyPartIDDocumentLinkedToComboListener();
 
 
  	public Example4(){
@@ -87,14 +84,14 @@
  		super("Example4");
  		setSize(600,200);
 
-
  		try{
- 			ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts","swingset","test");
+ 			ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
+				"swingset", "test");
  			ssConnection.setDriverName("org.postgresql.Driver");
  			ssConnection.createConnection();
  			rowset = new SSJdbcRowSetImpl(ssConnection);
 
-	 		// POSTGRES RAISES AN EXCEPTIN WHEN YOU TRY TO USE THE UPDATEROW() METHOD
+	 		// POSTGRES RAISES AN EXCEPTION WHEN YOU TRY TO USE THE UPDATEROW() METHOD
 	 		// IF THERE IS A SEMICOLON AT THE END OF THE QUERY WITH OUT ANY CLAUSES
 	 		// OR WHERE CONDITIONS AT THE END.
 	 		// IF YOU REMOVE THE SEMICOLON IT WILL NOT RAISE THE EXCEPTION BUT
@@ -102,7 +99,7 @@
  			rowset.setCommand("SELECT * FROM part_data");
  			navigator = new SSDataNavigator(rowset);
  			// THIS DISABLES MODIFICATIONS TO THE DATA
- 			// ADDITION AND DELETION BUTTONS ARE DIAABLED
+ 			// ADDITION AND DELETION BUTTONS ARE DISABLED
  			// ANY CHANGES MADE TO PRESENT RECORD WILL BE NEGLECTED.
  			navigator.setModification(false);
  			navigator.setDBNav( new SSDBNavImp(getContentPane()));
@@ -116,8 +113,8 @@
  		txtPartIDLinkedToCombo.setText(txtPartID.getText());
 
 		String query = "SELECT * FROM part_data;";
-		cmbSelectPart = new SSDBComboBox(ssConnection.getConnection(), query, "part_id", "part_name",txtPartIDLinkedToCombo);
- 		//cmbSelectPart.bind(rowset,"part_id");
+		cmbSelectPart = new SSDBComboBox(ssConnection.getConnection(), query,
+			"part_id", "part_name", txtPartIDLinkedToCombo);
 		try{
  			cmbSelectPart.execute();
 		}catch(SQLException se){
@@ -132,7 +129,6 @@
 
  		txtPartWeight.setDocument(new SSTextDocument(rowset,"weight"));
  		txtPartCity.setDocument(new SSTextDocument(rowset,"city"));
-
 
  		lblSelectPart.setPreferredSize(new Dimension(75,20));
  		lblPartColor.setPreferredSize(new Dimension(75,20));
@@ -175,7 +171,6 @@
 
  		txtPartID.getDocument().addDocumentListener(partIDListener);
 		txtPartIDLinkedToCombo.getDocument().addDocumentListener(partIDLinkedToComboListener);
-
 
  		setVisible(true);
 
@@ -272,3 +267,6 @@
  	}
 
  }
+/*
+ * $Log$
+ */

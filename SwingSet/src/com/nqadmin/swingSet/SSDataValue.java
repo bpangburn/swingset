@@ -46,7 +46,7 @@ package com.nqadmin.swingSet;
 public interface SSDataValue {
 	
 	/**
-	 * Returns the value for the primary column in the JTable( Rowset
+	 * Returns the value for the primary column in the JTable (SSRowSet
 	 * used for building the JTable). When a addtion of row is taking
 	 * place in the JTable, SSTableModel tries to insert a primary
 	 * key value in to that row returned by this function.
@@ -61,6 +61,9 @@ public interface SSDataValue {
 
 /*
  * $Log$
+ * Revision 1.4  2004/08/10 22:06:59  yoda2
+ * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
+ *
  * Revision 1.3  2004/03/08 16:43:37  prasanth
  * Updated copy right year.
  *

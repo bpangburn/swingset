@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003, The Pangburn Company, Inc. and Prasanth R. Pasala
+ * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,15 +30,13 @@
  *
  */
 
-
-
- import com.nqadmin.swingSet.*;
- import javax.swing.*;
- import javax.sql.*;
- import java.sql.*;
- import java.awt.*;
- import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
- import com.nqadmin.swingSet.datasources.SSConnection;
+import com.nqadmin.swingSet.*;
+import javax.swing.*;
+import javax.sql.*;
+import java.sql.*;
+import java.awt.*;
+import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+import com.nqadmin.swingSet.datasources.SSConnection;
 
  /**
   * This example demonstrates the use of SSTextDocument to display information in
@@ -65,16 +63,13 @@
  		super("Example3");
  		setSize(600,200);
 
-
  		try{
- 			ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts","swingset","test");
+ 			ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
+				"swingset", "test");
  			ssConnection.setDriverName("org.postgresql.Driver");
  			ssConnection.createConnection();
  			rowset = new SSJdbcRowSetImpl(ssConnection);
- 			//rowset.setUrl("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts");
- 			//rowset.setUsername("swingset");
-	 		//rowset.setPassword("test");
-	 		// POSTGRES RAISES AN EXCEPTIN WHEN YOU TRY TO USE THE UPDATEROW() METHOD
+	 		// POSTGRES RAISES AN EXCEPTION WHEN YOU TRY TO USE THE UPDATEROW() METHOD
 	 		// IF THERE IS A SEMICOLON AT THE END OF THE QUERY WITH OUT ANY CLAUSES
 	 		// OR WHERE CONDITIONS AT THE END.
 	 		// IF YOU REMOVE THE SEMICOLON IT WILL NOT RAISE THE EXCEPTION BUT
@@ -82,7 +77,7 @@
  			rowset.setCommand("SELECT * FROM supplier_part_data");
  			navigator = new SSDataNavigator(rowset);
  			// THIS DISABLES MODIFICATIONS TO THE DATA
- 			// ADDITION AND DELETION BUTTONS ARE DIAABLED
+ 			// ADDITION AND DELETION BUTTONS ARE DISABLED
  			// ANY CHANGES MADE TO PRESENT RECORD WILL BE NEGLECTED.
  			navigator.setModification(false);
  			navigator.setDBNav( new SSDBNavImp(getContentPane()));
@@ -95,7 +90,6 @@
  		String query = "SELECT * FROM supplier_data;";
  		cmbSupplierName = new SSDBComboBox(ssConnection.getConnection(), query, "supplier_id", "supplier_name");
  		cmbSupplierName.bind(rowset,"supplier_id");
-
 
 		query = "SELECT * FROM part_data;";
 		cmbPartName = new SSDBComboBox(ssConnection.getConnection(), query, "part_id", "part_name");
@@ -111,8 +105,6 @@
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-
-
 
  		lblSupplierName.setPreferredSize(new Dimension(75,20));
  		lblPartName.setPreferredSize(new Dimension(75,20));
@@ -156,3 +148,6 @@
  	}
 
  }
+/*
+ * $Log$
+ */ 

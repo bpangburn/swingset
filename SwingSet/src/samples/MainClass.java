@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003 - 2004, The Pangburn Company, Inc. and Prasanth R. Pasala
+ * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,19 +29,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
- 
 
 
- import com.nqadmin.swingSet.*;
- import javax.swing.*;
- import javax.sql.*;
- import java.sql.*;
- import java.awt.*;
- import java.awt.event.*;
- import com.sun.rowset.JdbcRowSetImpl;
- 
- 
- 
+
+import com.nqadmin.swingSet.*;
+import javax.swing.*;
+import javax.sql.*;
+import java.sql.*;
+import java.awt.*;
+import java.awt.event.*;
+
+
+
 public class MainClass extends JFrame {
 	
 	JButton btnExample1 = new JButton("Example1");

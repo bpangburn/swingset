@@ -37,7 +37,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.sql.*;
 import java.io.*;
-//import javax.sql.RowSet;
 import com.nqadmin.swingSet.datasources.SSRowSet;
 import javax.sql.RowSetListener;
 import javax.sql.RowSetEvent;
@@ -48,14 +47,14 @@ import javax.sql.RowSetEvent;
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  *<p><pre>
  * Component that can be used for data navigation. It provides buttons for
- * navigation, insertion, and deletion of records in a RowSet. The modification
- * of a RowSet can be prevented using the setModificaton() method.  Any changes
+ * navigation, insertion, and deletion of records in a SSRowSet. The modification
+ * of a SSRowSet can be prevented using the setModificaton() method.  Any changes
  * made to the columns of a record will be updated whenever there is a
  * navigation.
  *
  * For example if you are displaying three columns using the JTextField and the
  * user changes the text in the text fields then the columns will be updated to
- * the new values when the user navigates the RowSet. If the user wants to revert
+ * the new values when the user navigates the SSRowSet. If the user wants to revert
  * the changes he made he can press the Undo button, however this must be done
  * before any navigation.  Once navigation takes place changes can't be reverted
  * using Undo button (has to be done manually by the user).
@@ -78,7 +77,7 @@ public class SSDataNavigator extends JPanel {
 	protected JButton deleteButton = new JButton();
 	protected JLabel lblRowCount = new JLabel();
 
-	// BASED ON THIS SSDataNavigator ALLOWS OR DISALLOWS MODIFICATION TO THE ROWSET
+	// BASED ON THIS SSDataNavigator ALLOWS OR DISALLOWS MODIFICATION TO THE SSROWSET
 	protected boolean modification = true;
 	
 	// USERS CAN ALSO UPDATES TO PRESENT RECORDS BUT DISALLOW DELETION OF RECORDS
@@ -90,18 +89,18 @@ public class SSDataNavigator extends JPanel {
 
 	protected boolean callExecute = true;
 	
-	// ROWSET TO WHICH THE NAVIGATOR IS LINKED TO
+	// SSROWSET TO WHICH THE NAVIGATOR IS LINKED TO
 	protected SSRowSet rowset = null;
 
 	// The container (Frame or Internal frame in which the navigator is present
 	protected SSDBNav dbNav = null;
 
-	// Is set to zero if next() on rowset returns false
+	// Is set to zero if next() on SSRowSet returns false
 	protected int rowCount = 0;
 	
 	protected int currentRow = 0;
 
-	// true if the rowset is on insert row else false
+	// true if the SSRowSet is on insert row else false
 	protected boolean onInsertRow = false;
 
 	// SIZE OF THE BUTTONS TO WHICH THEY HAVE TO BE SET
@@ -109,11 +108,10 @@ public class SSDataNavigator extends JPanel {
 	
 	protected Dimension txtFieldSize = new Dimension( 65, 20);
 
-
 	protected SSDBNavRowSetListener rowsetListener = new SSDBNavRowSetListener();
 	/**
 	 * Creates a object of SSDataNavigator.
-	 * Note: you have to set the rowset before you can start using it.
+	 * Note: you have to set the SSRowSet before you can start using it.
 	 */
 	public SSDataNavigator() {
         addToolTips();
@@ -122,9 +120,9 @@ public class SSDataNavigator extends JPanel {
 	}
 
 	/**
-	 * Returns true if the rowset contains one or more rows else false
+	 * Returns true if the SSRowSet contains one or more rows, else false
      *
-	 * @return return true if rowset contains data else false.
+	 * @return return true if SSRowSet contains data else false.
 	 */
 	 public boolean containsRows() {
 
@@ -175,9 +173,9 @@ public class SSDataNavigator extends JPanel {
 	} // end private void addToolTips() {
 
 	/**
-	 * Constructors a SSDataNavigator for the given rowset
+	 * Constructors a SSDataNavigator for the given SSRowSet
      *
-	 * @param _rowset    The rowset to which the SSDataNavigator has to be bound
+	 * @param _rowset The SSRowSet to which the SSDataNavigator has to be bound
 	 */
 	public SSDataNavigator(SSRowSet _rowset) {
 		setRowSet(_rowset);
@@ -187,10 +185,10 @@ public class SSDataNavigator extends JPanel {
 	}
 
 	/**
-	 * Constructs the SSDataNavigator with the given rowset and sets the size of the buttons
+	 * Constructs the SSDataNavigator with the given SSRowSet and sets the size of the buttons
 	 * on the navigator to the given size
      *
-	 * @param _rowset    the rowset to which the navigator is bound to
+	 * @param _rowset    the SSRowSet to which the navigator is bound to
 	 * @param _buttonSize    the size to which the button on navigator have to be set
 	 */
 	public SSDataNavigator(SSRowSet _rowset, Dimension _buttonSize) {
@@ -203,7 +201,7 @@ public class SSDataNavigator extends JPanel {
 	
 	/**
 	 * Sets the mySQL property to true.
-	 * This causes the navigator to skip the execute function call on the specified rowset.
+	 * This causes the navigator to skip the execute function call on the specified SSRowSet.
 	 * (See FAQ for further details)
      *
 	 * @param _mySQL    true if using MySQL database else false.
@@ -267,7 +265,7 @@ public class SSDataNavigator extends JPanel {
 	}
 	
 	/**
-	 * Returns true if the user can modify the data in the rowset else false.
+	 * Returns true if the user can modify the data in the SSRowSet, else false.
      *
 	 * @return returns true if the user modifications are written back to the 
 	 *    database else false.
@@ -303,7 +301,7 @@ public class SSDataNavigator extends JPanel {
 	} 
 
 	/**
-	 * Enables or diables the row insertion button
+	 * Enables or disables the row insertion button
 	 * This method should be used if row insertions have to be disallowed
 	 * The default value is true
      *
@@ -321,7 +319,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Returns true if insertions are allowed else false.
      *
-	 * @return returns true if insertiona are allowed else false.
+	 * @return returns true if insertions are allowed else false.
 	 */
 	public boolean getInsertion() {
 		return allowInsertions;
@@ -349,9 +347,9 @@ public class SSDataNavigator extends JPanel {
 	 } 
 	 
 	 /**
-	  *	Returns the rowset being used.
+	  *	Returns the SSRowSet being used.
       *
-	  * @return returns the rowset being used.
+	  * @return returns the SSRowSet being used.
 	  */
 	 public SSRowSet getRowSet() {
 	 	return rowset;
@@ -376,10 +374,11 @@ public class SSDataNavigator extends JPanel {
 	  }
 
 	/**
-	 * This method changes the rowset to which the navigator is bound
-	 * You have to call execute() and next() on the rowset before you set rowset to the SSDataNavigator
+	 * This method changes the SSRowSet to which the navigator is bound
+	 * You have to call execute() and next() on the SSRowSet before you set
+	 * SSRowSet to the SSDataNavigator
      *
-	 * @param _rowset    a RowSet object to which the navigator has to be bound
+	 * @param _rowset    a SSRowSet object to which the navigator has to be bound
 	 */
 	public void setRowSet(SSRowSet _rowset) {
 		if(rowset != null){
@@ -388,7 +387,7 @@ public class SSDataNavigator extends JPanel {
 		
 		rowset = _rowset;
 		
-		//SEE IF THERE ARE ANY ROWS IN THE GIVEN ROWSET
+		//SEE IF THERE ARE ANY ROWS IN THE GIVEN SSROWSET
 		try {
 			if (callExecute) {
 				rowset.execute();
@@ -414,8 +413,8 @@ public class SSDataNavigator extends JPanel {
 		}
 
 		//IF NO ROWS ARE PRESENT DISABLE NAVIGATION
-		//ELSE ENABLE THEN ELSE IS USEFUL WHEN THE ROWSET IS CHNAGED
-		// IF THE INITIAL ROWSET HAS ZERO ROWS NEXT IF THE USER SETS A NEW ROWSET THEN THE
+		//ELSE ENABLE THEN ELSE IS USEFUL WHEN THE SSROWSET IS CHNAGED
+		// IF THE INITIAL SSROWSET HAS ZERO ROWS NEXT IF THE USER SETS A NEW SSROWSET THEN THE
 		// BUTTONS HAVE TO BE ENABLED
 		if (rowCount == 0) {
 			firstButton.setEnabled(false);
@@ -448,7 +447,7 @@ public class SSDataNavigator extends JPanel {
 		// THIS IS NEEDED TO HANDLE USER LEAVING THE SCREEN IN AN INCONSISTENT 
 		// STATE EXAMPLE: USER CLICKS ADD BUTTON, THIS DISABLES ALL THE BUTTONS
 		// EXCEPT COMMIT & UNDO. WITH OUT COMMITING OR UNDOING THE ADD USER
-		// CLOSES THE SCREEN. NOW IF THE SCREEN IS OPENED WITH A NEW ROWSET.
+		// CLOSES THE SCREEN. NOW IF THE SCREEN IS OPENED WITH A NEW SSROWSET.
 		// THE REFRESH, ADD & DELETE WILL BE DISABLED.
 		refreshButton.setEnabled(true);
 		if (allowInsertions) {
@@ -517,7 +516,7 @@ public class SSDataNavigator extends JPanel {
 	private void addListeners() {
 
 		// WHEN THIS BUTTON IS PRESSED THE RECORD ON WHICH USER WAS WORKING IS SAVED
-		// AND MOVES THE ROWSET TO THE FIRST ROW
+		// AND MOVES THE SSROWSET TO THE FIRST ROW
 		// SINCE ROW SET IS IN FIRST ROW DISABLE PREVIOUS BUTTON AND ENABLE NEXT BUTTON
 		firstButton.addActionListener(new ActionListener(){ 
 			public void actionPerformed(ActionEvent ae) {
@@ -549,10 +548,10 @@ public class SSDataNavigator extends JPanel {
 			}
 		});
 
-		// WHEN BUTTON 2 IS PRESSED THE CURRENT RECORD IS SAVED AND ROWSET IS
+		// WHEN BUTTON 2 IS PRESSED THE CURRENT RECORD IS SAVED AND SSROWSET IS
 		// MOVED TO PREVIOUS RECORD
-		// CALLING PREVIOUS ON ENPTY ROWSET IS ILLEGAL SO A CHECK IS MADE FOR THAT
-		// IF NUMBER OF ROWS == 0 THEN ROWSET IS EMPTY
+		// CALLING PREVIOUS ON ENPTY SSROWSET IS ILLEGAL SO A CHECK IS MADE FOR THAT
+		// IF NUMBER OF ROWS == 0 THEN SSROWSET IS EMPTY
 		previousButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				try {
@@ -588,7 +587,7 @@ public class SSDataNavigator extends JPanel {
 			}
 		});
 
-		// WHEN BUTTON 3 PRESSED THE CURRENT RECORD IS SAVED AND THE ROWSET IS
+		// WHEN BUTTON 3 PRESSED THE CURRENT RECORD IS SAVED AND THE SSROWSET IS
 		// MOVED TO NEXT RECORD. IF THIS IS THE LAST RECORD THEN BUTTON 3 IS DISABLED
 		// ALSO IF THE PREVIOUS BUTTON IS NOT ENABLED THEN IT IS ENABLED
 		nextButton.addActionListener(new ActionListener() {
@@ -629,7 +628,7 @@ public class SSDataNavigator extends JPanel {
 		});
 
 
-		// BUTTON 4 ( "LAST" BUTTON )  CAUSED THE ROWSET TO MOVE TO LAST RECORD.
+		// BUTTON 4 ( "LAST" BUTTON )  CAUSED THE SSROWSET TO MOVE TO LAST RECORD.
 		// BEFORE MOVING CURRENT RECORD IS SAVED
 		// AFTER MOVING TO LAST RECORD THE NEXT BUTTON IS DIAABLED AND PREVIOUS BUTTON
 		// ENABLED
@@ -678,9 +677,9 @@ public class SSDataNavigator extends JPanel {
                         }
 					
 						rowset.moveToCurrentRow();
-					// MOVE TO CURRENT ROW MOVES ROWSET TO RECORD AT WHICH ADD WAS PRESSED.
-					// BUT IT NICE TO BE ON THE ADDED ROW WHICH IS THE LAST ONE IN THE ROWSET.
-					// ALSO MOVE TO CURRENT ROW MOVES THE ROWSET POSITION BUT DOES NOT TRIGGER
+					// MOVE TO CURRENT ROW MOVES SSROWSET TO RECORD AT WHICH ADD WAS PRESSED.
+					// BUT IT NICE TO BE ON THE ADDED ROW WHICH IS THE LAST ONE IN THE SSROWSET.
+					// ALSO MOVE TO CURRENT ROW MOVES THE SSROWSET POSITION BUT DOES NOT TRIGGER
 					// ANY EVENT FOR THE LISTENERS AS A RESULT VALUES ON THE SCREEN WILL NOT
 					// DISPLAY THE CURRENT RECORD VALUES.
 						rowset.last();
@@ -724,7 +723,7 @@ public class SSDataNavigator extends JPanel {
 
 		// THIS BUTTON IS USED TO CANCEL THE CHANGES MADE TO THE RECORD.
 		// IT CAN ALSO BE USED TO CANCEL INSERT ROW.
-		// SO THE BUTTONS DIASABLED AT THE INSERT BUTTON EVENT HAVE TO BE ENABLED
+		// SO THE BUTTONS DISABLED AT THE INSERT BUTTON EVENT HAVE TO BE ENABLED
 		undoButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				try {
@@ -755,7 +754,7 @@ public class SSDataNavigator extends JPanel {
 
 		// REFETCH REFETCHES THE ROWS FROMS THE DATABASE AND MOVES THE CURSOR TO THE FIRST
 		// RECORD IF THERE ARE NO RECORDS NAVIGATION BUTTONS ARE DIABLED
-		// EVEN IS THERE ARE RECORDS PREVIOUS BUTTON IS DISABLED BECAUSE THE ROWSET IS ON
+		// EVEN IS THERE ARE RECORDS PREVIOUS BUTTON IS DISABLED BECAUSE THE SSROWSET IS ON
 		// THE FIRST ROW
 		refreshButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -799,7 +798,7 @@ public class SSDataNavigator extends JPanel {
 			}
 		});
 
-		// INSERT ROW BUTTON MOVES THE ROWSET TO THE INSERT ROW POSITION
+		// INSERT ROW BUTTON MOVES THE SSROWSET TO THE INSERT ROW POSITION
 		// AT THIS TIME NAVIGATION HAS TO BE DISABLED
 		// ONLY COMMIT AND CANCEL ARE ENABLED
 		addButton.addActionListener(new ActionListener() {
@@ -832,8 +831,8 @@ public class SSDataNavigator extends JPanel {
 		});
 
 		// DELETES THE CURRENT ROW AND MOVES TO NEXT ROW
-		// IF THE DELETED ROW IS THE LAST ROW THEN MOVES TO LAST ROW IN ROWSET
-		// AFTER THE DELETION IS MADE( THATS THE PREVIOUS ROW TO THE DELETED ROW)
+		// IF THE DELETED ROW IS THE LAST ROW THEN MOVES TO LAST ROW IN SSROWSET
+		// AFTER THE DELETION IS MADE (THATS THE PREVIOUS ROW TO THE DELETED ROW)
 		deleteButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				try {
@@ -870,7 +869,7 @@ public class SSDataNavigator extends JPanel {
 		
 	// LISTENER FOR THE TEXT FIELD. USER CAN ENTER A ROW NUMBER IN THE TEXT
 	// FIELD TO MOVE THE THE SPEICIFIED ROW. 
-	// IF ITS NOT A NUMBER OR IF ITS NOT VALID FOR THE CURRENT ROWSET
+	// IF ITS NOT A NUMBER OR IF ITS NOT VALID FOR THE CURRENT SSROWSET
 	// NOTHING HAPPENS.	
 		txtCurrentRow.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent ke) {
@@ -958,6 +957,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.21  2004/10/25 19:51:02  prasanth
+ * Modified to use the new SSRowSet instead of  RowSet.
+ *
  * Revision 1.20  2004/09/21 18:58:28  prasanth
  * removing the rowset listener while doing the refresh ops.
  *

@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003, The Pangburn Company, Inc. and Prasanth R. Pasala
+ * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,13 +33,11 @@
 import com.nqadmin.swingSet.*;
 import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
 import com.nqadmin.swingSet.datasources.SSConnection;
-
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.sql.*;
-
 
 public class Example7 extends JFrame {
 	
@@ -57,26 +55,28 @@ public class Example7 extends JFrame {
 		
 		
 		try{
-			ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts","swingset","test");
+			ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
+				"swingset", "test");
  			ssConnection.setDriverName("org.postgresql.Driver");
  			ssConnection.createConnection();
  			rowset = new SSJdbcRowSetImpl(ssConnection);
  			rowset.setCommand("SELECT supplier_id, part_id,quantity, ship_date, supplier_part_id FROM supplier_part_data ORDER BY supplier_id, part_id;");
+			
  			//  SET THE HEADER BEFORE SETTING THE ROWSET
- 			
 			dataGrid.setHeaders(new String[]{"Supplier Name", "Part Name", "Quantity", " Ship Date"});
 			dataGrid.setRowSet(rowset);
 			
 			dataGrid.updateUI();
+			
 			// HIDE THE PART ID COLUMN
  			// THIS SETS THE WIDTH OF THE COLUMN TO 0
- 			//dataGrid.setHiddenColumns(new String[]{"part_id"});
  			dataGrid.setHiddenColumns(new String[]{"supplier_part_id"});
+			
  			dataGrid.setDateRenderer("ship_date");
- 			if(this == null)
+ 			if (this == null) {
  				System.out.println("This frame is null");
+			}
  			dataGrid.setMessageWindow(this);
- 			//dataGrid.setUneditableColumns(new String[]{"supplier_part_id"});
  			dataGrid.setUneditableColumns(new int[]{4});
  			ResultSet rs = ssConnection.getConnection().createStatement().executeQuery("SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;");
  			rs.last();
@@ -110,9 +110,6 @@ public class Example7 extends JFrame {
  			
  			dataGrid.setComboRenderer("part_id",displayItems,underlyingNumbers);
  			
- 			
- 								
- 			
  		}catch(SQLException se){
  			se.printStackTrace();
  		}catch(ClassNotFoundException cnfe){
@@ -128,6 +125,9 @@ public class Example7 extends JFrame {
  }// END OF EXAMPLE 5.
 /*
  * $Log$
+ * Revision 1.2  2004/10/25 19:52:12  prasanth
+ * Modified to work with new SwingSet (SSConnection & SSRowSet)
+ *
  * Revision 1.1  2003/12/18 20:14:43  prasanth
  * Initial commit.
  *

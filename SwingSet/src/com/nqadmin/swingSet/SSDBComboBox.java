@@ -40,7 +40,6 @@ import java.sql.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-//import javax.sql.*;
 import com.nqadmin.swingSet.datasources.SSRowSet;
 import javax.swing.border.*;
 import javax.swing.text.*;
@@ -71,24 +70,21 @@ import javax.swing.event.*;
  *      want to store the id of the part chosen by the user in the shipment
  *      table.
  *
- *      Connection connection = null;
- *      JdbcRowSet rowset = null;
+ *      SSConnection connection = null;
+ *      SSJdbcRowSetImpl rowset = null;
  *      SSDataNavigator navigator = null;
  *      SSDBComboBox combo = null;
  *
  *      try {
  *
  *      // CREATE A DATABASE CONNECTION OBJECT
- *           Connection connection = new Connection(........);
+ *           SSConnection connection = new SSConnection(........);
  *
- *      // CREATE AN INSTANCE OF JDBC ROWSET
- *           JdbcRowset rowset = new JdbcRowSet();
- *           rowset.setUrl("<database path>");
- *           rowset.setUsername("user");
- *           rowset.setPassword("pass");
+ *      // CREATE AN INSTANCE OF SSJDBCROWSETIMPL
+ *           SSJdbcRowsetImpl rowset = new SSJdbcRowsetImpl(connection);
  *           rowset.setCommand("SELECT * FROM shipment_data;");
  *
- *      // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE ROWSET.
+ *      // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE SSROWSET.
  *      // IF YOU ARE NOT USING THE DATA NAVIGATOR YOU HAVE TO INCLUDE THOSE.
  *      //   rowset.execute();
  *      //   rowset.next();
@@ -101,14 +97,14 @@ import javax.swing.event.*;
  *      // QUERY AND COLUMN NAMES
  *           combo = new SSDBComboBox(connection,query,"part_id","part_name");
  *
- *      // THIS BASICALLY SPECIFIES THE COLUMN AND THE ROWSET WHERE UPDATES HAVE
+ *      // THIS BASICALLY SPECIFIES THE COLUMN AND THE SSROWSET WHERE UPDATES HAVE
  *      // TO BE MADE.
  *           combo.bind(rowset,"part_id");
  *           combo.execute();
  *
- *     // CREATE A TEXTFIELD
- *         JTextField myText = new JTextField();
- *      	myText.setDocument(new SSTextDocument(rowset, "quantity");
+ *      // CREATE A TEXTFIELD
+ *           JTextField myText = new JTextField();
+ *      	 myText.setDocument(new SSTextDocument(rowset, "quantity");
  *
  *      } catch(Exception e) {
  *      // EXCEPTION HANDLER HERE...
@@ -119,7 +115,7 @@ import javax.swing.event.*;
  *           getContentPane().add(combo.getComboBox());
  *
  *      // ADD THE JTEXTFIELD TO THE JFRAME
- *  	  getContentPane().add(myText);
+ *  	     getContentPane().add(myText);
  *</pre><p>
  * @author	$Author$
  * @version	$Revision$
@@ -156,7 +152,7 @@ public class SSDBComboBox extends JComponent {
     // NUMBER OF ITEMS IN THE COMBO BOX.
     private int numberOfItems = 0;
 
-    // ROWSET USED TO RETRIEVE THE INFO FROM THE DATABASE.
+    // SSROWSET USED TO RETRIEVE THE INFO FROM THE DATABASE.
     private SSRowSet rowset = null;
 
     // INSTANCE OF THE LISTENER FOR THE COMBO BOX.
@@ -232,9 +228,9 @@ public class SSDBComboBox extends JComponent {
     }
 
     /**
-     * Sets the new rowset for the combo box.
+     * Sets the new SSRowSet for the combo box.
      *
-     * @param _rowset  rowset to which the combo has to update values.
+     * @param _rowset  SSRowSet to which the combo has to update values.
      */
     public void setRowSet(SSRowSet _rowset) {
         rowset = _rowset;
@@ -376,9 +372,9 @@ public class SSDBComboBox extends JComponent {
     }
 
     /**
-     * Returns the text field used to synchronize with the rowset.
+     * Returns the text field used to synchronize with the SSRowSet.
      *
-     * @return returns the text field used to synchronize with the rowset.
+     * @return returns the text field used to synchronize with the SSRowSet.
      */
     public JTextField getTextField() {
         return textField;
@@ -499,10 +495,10 @@ public class SSDBComboBox extends JComponent {
     }
 
     /**
-     * Binds the comboBox to the specified column in the given rowset.
+     * Binds the comboBox to the specified column in the given SSRowSet.
      *
-     * @param _rowset   rowset to which updates have to be made.
-     * @param -column   column name in the rowset to which these updates have to be made.
+     * @param _rowset   SSRowSet to which updates have to be made.
+     * @param -column   column name in the SSRowSet to which these updates have to be made.
      */
     public void bind(SSRowSet _rs, String _column) {
         textField.setDocument(new SSTextDocument(_rs,_column));
@@ -884,10 +880,10 @@ public class SSDBComboBox extends JComponent {
      * Updates the string thats being displayed.
      * If more than one item is present in the combo for that value the first one is changed.
      *
-     * NOTE: To retain changes made to current rowset call updateRow before calling the 
+     * NOTE: To retain changes made to current SSRowSet call updateRow before calling the 
      * updateItem on SSDBComboBox. (Only if you are using the SSDBComboBox and SSDataNavigator
      * for navigation in the screen. If you are not using the SSDBComboBox for navigation
-     * then no need to call updateRow on the rowset. Also if you are using only SSDBComboBox
+     * then no need to call updateRow on the SSRowSet. Also if you are using only SSDBComboBox
      * for navigation you need not call the updateRow.)      
      *
      * @param _value  the value corresponding to the item in combo to be updated.
@@ -939,6 +935,9 @@ public class SSDBComboBox extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.12  2004/10/25 19:51:03  prasanth
+ * Modified to use the new SSRowSet instead of  RowSet.
+ *
  * Revision 1.11  2004/08/24 22:08:54  prasanth
  * Updating the numberOfItems variable in deleteItem & addItem.
  *

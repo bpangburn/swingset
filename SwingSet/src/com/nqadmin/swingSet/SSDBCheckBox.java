@@ -93,7 +93,7 @@ public class SSDBCheckBox extends JCheckBox {
 	
 	/**
 	 * Creates an object of SSDBCheckBox binding it so the specified column
-	 * in the given rowset.
+	 * in the given SSRowSet.
      *
 	 * @param _rowset    datasource to be used.
 	 * @param _columnName    name of the column to which this check box should be bound
@@ -156,7 +156,7 @@ public class SSDBCheckBox extends JCheckBox {
 
 	/**
 	 * Initializes the check box by getting the value corresponding to
-	 * specified column from the rowset.
+	 * specified column from the SSRowSet.
 	 */
 	public void execute() {
 		initCheckBox();
@@ -261,6 +261,9 @@ public class SSDBCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.6  2004/10/25 19:51:03  prasanth
+ * Modified to use the new SSRowSet instead of  RowSet.
+ *
  * Revision 1.5  2004/08/10 22:06:59  yoda2
  * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
  *
