@@ -114,13 +114,13 @@ public class FormattingTests extends javax.swing.JFrame implements SSDBNav {
 
         jPanel1.setLayout(null);
 
-        sSIntegerField2.setNavigator(sSDataNavigator1);
         sSIntegerField2.setColumnName("account_id");
+        sSIntegerField2.setNavigator(sSDataNavigator1);
         jPanel1.add(sSIntegerField2);
         sSIntegerField2.setBounds(120, 30, 80, 19);
 
-        sSDateField1.setNavigator(sSDataNavigator1);
         sSDateField1.setColumnName("valid_since");
+        sSDateField1.setNavigator(sSDataNavigator1);
         jPanel1.add(sSDateField1);
         sSDateField1.setBounds(120, 120, 110, 19);
 

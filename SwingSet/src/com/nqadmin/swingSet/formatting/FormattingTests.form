@@ -299,7 +299,7 @@
           <Properties>
             <Property name="columnName" type="java.lang.String" value="account_name"/>
             <Property name="helper" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.ComponentChooserEditor">
-              <ComponentRef name="null"/>
+              <ComponentRef name="default"/>
             </Property>
             <Property name="navigator" type="com.nqadmin.swingSet.SSDataNavigator" editor="org.netbeans.modules.form.ComponentChooserEditor">
               <ComponentRef name="sSDataNavigator1"/>
