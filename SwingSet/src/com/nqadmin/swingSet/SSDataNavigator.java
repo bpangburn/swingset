@@ -134,15 +134,16 @@ public class SSDataNavigator extends JPanel {
 	private void addToolTips() {
 
 		try {
-			firstButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/first.gif")));
-			previousButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/prev.gif")));
-			nextButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/next.gif")));
-			lastButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/last.gif")));
-			commitButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/commit.gif")));
-			undoButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/undo.gif")));		
-			refreshButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/refresh.gif")));
-			addButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/add.gif")));
-			deleteButton.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/delete.gif")));
+			ClassLoader cl = this.getClass().getClassLoader();
+			firstButton.setIcon(new ImageIcon(cl.getResource("images/first.gif")));
+			previousButton.setIcon(new ImageIcon(cl.getResource("images/prev.gif")));
+			nextButton.setIcon(new ImageIcon(cl.getResource("images/next.gif")));
+			lastButton.setIcon(new ImageIcon(cl.getResource("images/last.gif")));
+			commitButton.setIcon(new ImageIcon(cl.getResource("images/commit.gif")));
+			undoButton.setIcon(new ImageIcon(cl.getResource("images/undo.gif")));		
+			refreshButton.setIcon(new ImageIcon(cl.getResource("images/refresh.gif")));
+			addButton.setIcon(new ImageIcon(cl.getResource("images/add.gif")));
+			deleteButton.setIcon(new ImageIcon(cl.getResource("images/delete.gif")));
 		} catch(Exception e) {
 			firstButton.setText("<<");
 			previousButton.setText("<");
@@ -857,6 +858,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.13  2004/08/16 20:51:16  yoda2
+ * Gave button names in code more meaningful names (e.g. button1 -> firstButton).
+ *
  * Revision 1.12  2004/08/13 14:55:28  prasanth
  * Changed the default size of buttons (decreased).
  * Also that of text field  & label (increased).
