@@ -42,6 +42,7 @@ import java.sql.SQLException;
 import java.sql.Date;
 import java.util.GregorianCalendar;
 import java.util.Calendar;
+import java.util.StringTokenizer;
 import java.util.EventObject;
 import java.util.Vector;
 
@@ -856,6 +857,17 @@ public class SSDataGrid extends JTable {
    			
    		}
    		
+   		// RETURNS A DATE OBJECT REPRESENTING THE VALUE IN THE CELL.
+   		public Object getCellEditorValue(){
+   			String strDate = ((JTextField)(DateEditor.this.getComponent())).getText();
+   			StringTokenizer strtok = new StringTokenizer(strDate, "/", false);
+   			Calendar calendar = Calendar.getInstance();
+   			calendar.set(Calendar.MONTH, Integer.parseInt(strtok.nextToken())-1);
+   			calendar.set(Calendar.DATE, Integer.parseInt(strtok.nextToken()));
+   			calendar.set(Calendar.YEAR, Integer.parseInt(strtok.nextToken()));
+   			return new Date(calendar.getTimeInMillis());
+   		}
+   		
    		public boolean isCellEditable(EventObject event){
    			// IF NUMBER OF CLICKS IS LESS THAN THE CLICKCOUNTTOSTART RETURN FALSE
    			// FOR CELL EDITING.
@@ -1030,6 +1042,10 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.12  2004/10/06 23:14:12  prasanth
+ * Added function to set minimum column widths.
+ * Added function to set combo box column widths.
+ *
  * Revision 1.11  2004/09/27 15:47:19  prasanth
  * Added hideColumns function.
  * Calling createDefaultColumnModel function in setRowSet if the rowset is not null.
