@@ -170,11 +170,6 @@ public class SSDataGrid extends JTable {
     protected JScrollPane scrollPane = null; //new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
     /**
-     * The preferred size of the scroll pane in which the JTable is embedded.
-     */
-    protected Dimension preferredSize = new Dimension(200, 200);
-
-    /**
      * Array used to store the column numbers that have to be hidden.
      */
     protected int[] hiddenColumns = null;
@@ -389,27 +384,6 @@ public class SSDataGrid extends JTable {
      */
     public SSRowSet getSSRowSet() {
         return sSRowSet;
-    }
-
-    /**
-     * Sets the preferred size of the scroll pane in which the JTable is embedded.
-     *
-     * @param _preferredSize    required dimension for JTable
-     */
-     public void setPreferredSize(Dimension _preferredSize) {
-        Dimension oldValue = preferredSize;
-        preferredSize = _preferredSize;
-        firePropertyChange("preferredSize", oldValue, preferredSize);
-        scrollPane.setPreferredSize(_preferredSize);
-     }
-
-    /**
-     * Returns the preferred size of the scroll pane in which the JTable is embedded.
-     *
-     * @return returns preferred size of the scroll pane in which the JTable is embedded.
-     */
-    public Dimension getPreferredSize() {
-        return preferredSize;
     }
 
     /**
@@ -1259,6 +1233,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.30  2005/02/13 15:38:20  yoda2
+ * Removed redundant PropertyChangeListener and VetoableChangeListener class variables and methods from components with JComponent as an ancestor.
+ *
  * Revision 1.29  2005/02/12 03:29:26  yoda2
  * Added bound properties (for beans).
  *
