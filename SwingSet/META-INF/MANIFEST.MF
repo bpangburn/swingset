@@ -1,9 +1,6 @@
 Manifest-Version: 1.0
 Created-By: Prasanth Pasala, The Pangburn Company.
 
-Name: com/nqadmin/swingSet/SSTextDocument.class
-Java-Bean: True
-
 Name: com/nqadmin/swingSet/SSLabel.class
 Java-Bean: True
 
@@ -28,13 +25,7 @@ Java-Bean: True
 Name: com/nqadmin/swingSet/SSDataNavigator.class
 Java-Bean: True
 
-Name: com/nqadmin/swingSet/SSTableModel.class
-Java-Bean: True
-
 Name: com/nqadmin/swingSet/SSDataGrid.class
-Java-Bean: True
-
-Name: com/nqadmin/swingSet/SSTableKeyAdapter.class
 Java-Bean: True
 
 Name: com/nqadmin/swingSet/datasources/SSConnection.class
