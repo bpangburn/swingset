@@ -4,25 +4,34 @@ Created-By: Prasanth Pasala, The Pangburn Company.
 Name: com/nqadmin/swingSet/SSTextDocument.class
 Java-Bean: True
 
-Name: com/nqadmin/swingSet/SSDataNavigator.class
+Name: com/nqadmin/swingSet/SSLabel.class
 Java-Bean: True
-
-Name: com/nqadmin/swingSet/SSDBComboBox.class
-Java-Bean: False
 
 Name: com/nqadmin/swingSet/SSTextField.class
 Java-Bean: True
 
-Name: com/nqadmin/swingSet/SSDBCheckBox.class
+Name: com/nqadmin/swingSet/SSTextArea.class
+Java-Bean: True
+
+Name: com/nqadmin/swingSet/SSComboBox.class
+Java-Bean: True
+
+Name: com/nqadmin/swingSet/SSDBComboBox.class
+Java-Bean: True
+
+Name: com/nqadmin/swingSet/SSCheckBox.class
+Java-Bean: True
+
+Name: com/nqadmin/swingSet/SSSlider.class
+Java-Bean: True
+
+Name: com/nqadmin/swingSet/SSDataNavigator.class
 Java-Bean: True
 
 Name: com/nqadmin/swingSet/SSTableModel.class
 Java-Bean: True
 
 Name: com/nqadmin/swingSet/SSDataGrid.class
-Java-Bean: True
-
-Name: com/nqadmin/swingSet/SSComboBox.class
 Java-Bean: True
 
 Name: com/nqadmin/swingSet/SSTableKeyAdapter.class
@@ -33,4 +42,3 @@ Java-Bean: True
 
 Name: com/nqadmin/swingSet/datasources/SSJdbcRowSetImpl.class
 Java-Bean: True
-

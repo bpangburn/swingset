@@ -1,4 +1,5 @@
 Manifest-Version: 1.0
 Created-By: Prasanth Pasala, The Pangburn Company.
-Main-Class: MainClass
+
 Name: com/nqadmin
+Main-Class: MainClass
