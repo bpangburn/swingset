@@ -481,7 +481,7 @@ public class SSComboBox extends JComboBox {
     protected void bind() {
         
         // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || sSRowSet==null) {
+            if (columnName==null || columnName.trim().equals("") || sSRowSet==null) {
                 return;
             }
             
@@ -792,6 +792,9 @@ public class SSComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.33  2005/02/13 15:38:20  yoda2
+ * Removed redundant PropertyChangeListener and VetoableChangeListener class variables and methods from components with JComponent as an ancestor.
+ *
  * Revision 1.32  2005/02/11 22:59:25  yoda2
  * Imported PropertyVetoException and added some bound properties.
  *

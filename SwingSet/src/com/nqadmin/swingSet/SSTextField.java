@@ -335,7 +335,7 @@ public class SSTextField extends JTextField {
     protected void bind() {
 
         // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || sSRowSet==null) {
+            if (columnName==null || columnName.trim().equals("") || sSRowSet==null) {
                 return;
             }
 
@@ -503,6 +503,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.21  2005/02/13 15:40:15  yoda2
+ * Removed redundant PropertyChangeListener and VetoableChangeListener class variables and methods from components with JComponent as an ancestor.  Also removed call to init() from setMask() method.
+ *
  * Revision 1.20  2005/02/12 03:29:26  yoda2
  * Added bound properties (for beans).
  *

@@ -222,7 +222,7 @@ public class SSCheckBox extends JCheckBox {
     protected void bind() throws java.sql.SQLException {
         
         // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || sSRowSet==null) {
+            if (columnName==null || columnName.trim().equals("") || sSRowSet==null) {
                 return;
             }
             
@@ -405,6 +405,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.14  2005/02/13 15:38:19  yoda2
+ * Removed redundant PropertyChangeListener and VetoableChangeListener class variables and methods from components with JComponent as an ancestor.
+ *
  * Revision 1.13  2005/02/11 22:59:23  yoda2
  * Imported PropertyVetoException and added some bound properties.
  *
