@@ -54,7 +54,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  * JTable), but the cell renderers and hidden columns features of the SSDataGrid
  * will not be available.
  *
- * SSTableModel can be used with  a JTable to get a Grid view of the data.
+ * SSTableModel can be used with a JTable to get a Grid view of the data.
  *</pre><p>
  * @author  $Author$
  * @version $Revision$
@@ -63,37 +63,72 @@ public class SSTableModel extends AbstractTableModel {
 
     protected SSRowSet rowset = null;
 
-    protected transient int rowCount            = 0;
-    protected transient int columnCount         = 0;
+    /**
+     * Number of rows in the SSRowSet.
+     */
+    protected transient int rowCount = 0;
+    
+    /**
+     * Number of columns in the SSRowSet.
+     */
+    protected transient int columnCount = 0;
 
-    // MAP TO STORE THE DEFAULT VALUES OF DIFFERENT COLUMNS
+    /**
+     * Map to store the default values of different columns.
+     */
     protected HashMap defaultValuesMap = null;
 
-    // BOOLEAN TO INDICATE IF THE SSROWSET IS ON INSERT ROW.
+    /**
+     * Indicator to determine if the SSRowSet is on the insertion row.
+     */
     protected boolean inInsertRow = false;
 
-    // MESSAGE WINDOW
+    /**
+     * Window where messages should be displayed.
+     */
     protected transient Component component = null;
 
-    // JTABLE FOR WHICH PRESENT CLASS IS A TABLE MODEL
+    /**
+     * JTable being modeled.
+     */
     protected transient JTable table = null;
 
-    // HEADERS FOR THE JTABLE.
+    /**
+     * JTable headers.
+     */
     protected transient String[] headers = null;
 
-    // PRIMARY COLUMN NUMBER
+    /**
+     * Column containing primary key.
+     */
     int primaryColumn = -1;
 
-    protected SSDataValue    dataValue   = null;
-    protected SSCellEditing  cellEditing = null;
+    /**
+     * Implementation of SSDataValue interface used to determine PK value for
+     * new rows.
+     */
+    protected SSDataValue dataValue   = null;
+    
+    /**
+     * Implementation of SSCellEditing interface used to determine dynamically
+     * if a given cell can be edited and to determine if a given value is
+     * valid.
+     */
+    protected SSCellEditing cellEditing = null;
 
-    // LIST OF UNEDITABLE COLUMNS
+    /**
+     * List of uneditable columns.
+     */
     protected int[] uneditableColumns  = null;
 
-    // LIST OF HIDDEN COLUMNS
+    /**
+     * List of hidden columns.
+     */
     protected int[] hiddenColumns      = null;
 
-    // BOOLEAN INDICATING IF INSERTIONS SHOULD BE ALLOWED
+    /**
+     * Indicator to determine if insertions are allowed.
+     */
     protected boolean allowInsertion = true;
 
     /**
@@ -129,8 +164,9 @@ public class SSTableModel extends AbstractTableModel {
     }
 
     /**
-     * If the user has to decide on which cell has to be editable and which is not
-     * then SSCellEditing interface has to be implemented and set it for the SSTableModel.
+     * Used to set an implementation of SSCellEditing interface which can be
+     * used to determine dynamically if a given cell can be edited and to
+     * determine if a given value is valid.
      *
      * @param _cellEditing    implementation of SSCellEditing interface.
      */
@@ -139,15 +175,16 @@ public class SSTableModel extends AbstractTableModel {
      }
 
      /**
-      * Sets whether insertions should be allowed or not.
-      *@param _insert - true if user can insert new rows else false.
+      * Sets row insertion indicator.
+      *
+      *@param _insert   true if user can insert new rows, else false.
       */
      public void setInsertion(boolean _insert){
         allowInsertion = _insert;
      }
 
     /**
-     * Initializes the SSTableModel. (Gets  the column count and rowcount for the
+     * Initializes the SSTableModel. (Gets  the column count and row count for the
      * given SSRowSet.)
      */
     protected void init() {
@@ -197,7 +234,7 @@ public class SSTableModel extends AbstractTableModel {
 
     /**
      * Returns true if the cell at rowIndex and columnIndex is editable. Otherwise,
-     * setValueAt on the cell will not change the value of that cell.
+     * a call to setValueAt() on the cell will not change the value of that cell.
      *
      * @param _row    the row whose value to be queried
      * @param _column    the column whose value to be queried
@@ -227,7 +264,7 @@ public class SSTableModel extends AbstractTableModel {
     } // end public boolean isCellEditable(int _row, int _column) {
 
     /**
-     * Returns the value for the cell at  _row and _column.
+     * Returns the value for the cell at the specified row & column.
      *
      * @param _row    the row whose value to be queried.
      * @param _column    the column whose value to be queried.
@@ -395,8 +432,8 @@ public class SSTableModel extends AbstractTableModel {
 
     /**
      * Inserts a new row into the database.
-     * While doing so it inserts all the defaults provided by user and also
-     * if the primary column is specified along with SSDataValue implementation
+     * While doing so it inserts all the defaults provided by user and if the
+     * primary column is specified along with an SSDataValue implementation
      * then the primary column value will be inserted.
      *
      * @param _value   value entererd of a column
@@ -485,8 +522,7 @@ public class SSTableModel extends AbstractTableModel {
     } // end protected void insertRow(Object _value, int _column) {
 
     /**
-     * This functions sets the default values provided by the user
-     * to the present row.
+     * This function sets the default values for the present row.
      */
     protected void setDefaults() {
         if (defaultValuesMap == null) {
@@ -544,12 +580,11 @@ public class SSTableModel extends AbstractTableModel {
     } // end protected void setDefaults() {
 
     /**
-     * Returns the type of the column appearing in the view at column position column.
+     * Returns the type for the column specified for the current view.
      *
      * @param _column    the column in the view being queried
      *
-     * @return the type of the column at position _column in the view where the first
-     *  column is column 0
+     * @return  type for the specified column (first column is 0)
      */
     public Class getColumnClass(int _column) {
         int type;
@@ -595,7 +630,7 @@ public class SSTableModel extends AbstractTableModel {
 
     /**
      * Deletes the specified row from the database.
-     * The rows  are numbered as 0,1,......
+     * The rows are numbered as: 0, 1, ..., n-1
      *
      * @param _row the row number that has to be deleted.
      *
@@ -627,7 +662,7 @@ public class SSTableModel extends AbstractTableModel {
      * These values will be used while inserting a new row.
      *
      * @param _columnNumbers    the column numbers for which defaults are required
-     * @param _values    the values for all the columns specified in argument 1.
+     * @param _values    the values for all the columns specified in first argument
      */
     public void setDefaultValues(int[] _columnNumbers, Object[] _values) {
         if (_columnNumbers == null || _values == null) {
@@ -698,12 +733,16 @@ public class SSTableModel extends AbstractTableModel {
      * Sets the SSDataValue interface implemention. This interface specifies
      * function to retrieve primary column values for a new row to be added.
      *
-     * @param _dataValue   implementation of
+     * @param _dataValue   implementation of SSDataValue for determining PK
      */
     public void setSSDataValue(SSDataValue _dataValue) {
         dataValue = _dataValue;
     }
 
+    /**
+     * Updates the primary key column based on the SSDataValue implementation
+     * specified for the SSTableModel and the underlying SQL data type.
+     */
     protected void setPrimaryColumn() {
         try {
 
@@ -749,6 +788,13 @@ public class SSTableModel extends AbstractTableModel {
     } // end protected void setPrimaryColumn() {
 
 
+    /**
+     * Returns an SQL date for a string date formatted as "MM/dd/yyyy".
+     *
+     * @param _strDate  String containing a date in "MM/dd/yyyy" format.
+     *
+     * @return String date reformatted as an SQL date
+     */
     protected Date getSQLDate(String _strDate) {
         if (_strDate.trim().equals("")) {
             return null;
@@ -764,10 +810,10 @@ public class SSTableModel extends AbstractTableModel {
     }
 
     /**
-     * Sets the header for the JTable.
+     * Sets the headers for the JTable.
      * This function has to be called before setting the SSRowSet for SSDataGrid.
      *
-     * @param _headers array of string objects representing the header of each column.
+     * @param _headers array of string objects representing the header for each column.
      */
     public void setHeaders(String[] _headers) {
         headers = _headers;
@@ -776,10 +822,10 @@ public class SSTableModel extends AbstractTableModel {
     /**
      * Returns the name of the column appearing in the view at column position column.
      *
-     * @param _columnNumber  the column in the view being querie
+     * @param _columnNumber  the column in the view being queried
      *
-     * @return the name of the column at position column in the view where the first
-     *  column is column 0
+     * @return the name of the column at the position specified for the current
+     * vew where column numbering begins at 0
      */
     public String getColumnName(int _columnNumber) {
         if (headers != null) {
@@ -808,7 +854,7 @@ public class SSTableModel extends AbstractTableModel {
      * Sets the column numbers that should be hidden.
      * The SSDataGrid sets the column width of these columns to 0.
      * The columns are set to zero width rather than removing the column from the table.
-     * Thus preserving the column numbering.If a column is removed then the column numbers
+     * Thus preserving the column numbering. If a column is removed then the column numbers
      * for columns after the removed column will change.
      * Even if the column is specified as hidden user will be seeing a tiny strip.
      * Make sure that you specify the hidden column numbers in the uneditable column
@@ -845,6 +891,9 @@ public class SSTableModel extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.17  2005/02/07 22:55:34  yoda2
+ * Fixed accidental renaming in deprecated method.
+ *
  * Revision 1.16  2005/02/07 22:46:29  yoda2
  * Deprecated setRowSet().
  *
