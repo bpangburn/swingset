@@ -9,6 +9,51 @@ SwingSet 0.8.3-beta - Released 10-22-2004
 ==============================================================================
 
 Changes:
+	Classes or Interfaces added in SwingSet-0.9.0:
+		1. SSConnection
+		2. SSRowSet
+		3. SSRowSetAdapter
+		4. SSJdbcRowSetImpl
+
+	SSConnection:
+		This acts as a wrapper class for Connection & supports serialization.
+
+	SSRowSet:
+		This interface is based on RowSet, with just the required functions.
+		Also extends Serializable interface.
+
+	SSRowSetAdapter:
+		This class provides empty functions for SSRowSet interface functions.
+
+	SSJdbcRowSetImpl:
+		This class extends SSRowSetAdapter. This is a wrapper for JdbcRowSetImpl
+		with support for serialization.
+
+	SSComboBox:
+		1. Using SSRowSet instead of RowSet.
+	
+	SSDBCheckBox:
+		1. Using SSRowSet instead of RowSet.
+	
+	SSDBComboBox:
+		1. Using SSRowSet instead of RowSet.
+		2. Using SSConnection instead of Connection.
+
+	SSDataGrid:
+		1. Using SSRowSet instead of RowSet.
+
+	SSTableModel:
+		1. Using SSRowSet instead of RowSet.
+
+	SSDataNavigator:
+		1. Using SSRowSet instead of RowSet.
+			
+
+==============================================================================
+SwingSet 0.8.3-beta - Released 10-22-2004
+==============================================================================
+
+Changes:
 	Classes or Interfaces added in SwingSet-0.8.3:
 		1. SSTextArea.
 	
