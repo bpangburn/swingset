@@ -37,7 +37,22 @@
  import java.sql.Date;
  import java.sql.SQLException;
 
- public class SSRowSetAdapter implements SSRowSet{
+/**
+ * SSRowSetAdapter.java
+ *<p>
+ * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+ *<p><pre>
+ * Abstract class that provides empty implementations of all the methods for the
+ * SSRowSet interface.
+ *
+ * This class is provided for convenience. so that users wishing to write their
+ * own SSRowSet implementations can just extend the abstract class and override
+ * the desired methods.
+ *</pre><p>
+ * @author  $Author$
+ * @version $Revision$
+ */
+ public class SSRowSetAdapter implements SSRowSet {
 
     /**
      * Retrieves the value of the designated column in the current row of this DataSet
@@ -748,6 +763,9 @@
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/09 23:04:02  yoda2
+ * JavaDoc cleanup.
+ *
  * Revision 1.5  2005/02/04 22:49:10  yoda2
  * API cleanup & updated Copyright info.
  *

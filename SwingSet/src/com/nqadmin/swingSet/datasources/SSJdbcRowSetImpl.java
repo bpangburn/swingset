@@ -43,7 +43,17 @@
  import com.sun.rowset.JdbcRowSetImpl;
  import java.beans.PropertyChangeSupport;
  
-
+/**
+ * SSJdbcRowSetImpl.java
+ *<p>
+ * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+ *<p><pre>
+ * The SSJdbcRowSetImpl class is a wrapper for JdbcRowSetImpl.
+ * It provides all rowset-related functionality for linking SwingSet components
+ * to an SSConnection.
+ * @author  $Author$
+ * @version $Revision$
+ */
  public class SSJdbcRowSetImpl extends SSRowSetAdapter {
 
     /**
@@ -888,6 +898,9 @@
 }
  /*
   * $Log$
+  * Revision 1.9  2005/02/09 23:04:01  yoda2
+  * JavaDoc cleanup.
+  *
   * Revision 1.8  2005/02/09 06:39:44  prasanth
   * Added PropertyChangeSupport
   *
