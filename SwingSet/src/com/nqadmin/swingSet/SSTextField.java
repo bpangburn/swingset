@@ -39,11 +39,6 @@ import java.io.ObjectInputStream;
 import java.io.IOException;
 import java.util.StringTokenizer;
 import com.nqadmin.swingSet.datasources.SSRowSet;
-import java.beans.PropertyChangeSupport;
-import java.beans.PropertyChangeListener;
-import java.beans.VetoableChangeSupport;
-import java.beans.VetoableChangeListener;
-import java.beans.PropertyVetoException;
 
 /**
  * SSTextField.java
@@ -98,16 +93,6 @@ public class SSTextField extends JTextField {
      * Default number of decimals to show for float, double, etc.
      */
     protected int numberOfDecimalPlaces = 2;
-
-	/**
-	 * Convenience class for providing the property change listener support
-	 */
-	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
-
-	/**
-	 * Convenience class for providing the vetoable change listener support
-	 */
-	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);
 
     /**
      * Constructs a new text field with the specified text & mask.
@@ -193,42 +178,6 @@ public class SSTextField extends JTextField {
     }
 
     /**
-     * Method to add bean property change listeners.
-     *
-     * @param _listener bean property change listener
-     */
-    public void addPropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.addPropertyChangeListener(_listener);
-    }
-
-    /**
-     * Method to remove bean property change listeners.
-     *
-     * @param _listener bean property change listener
-     */
-    public void removePropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.removePropertyChangeListener(_listener);
-    }
-
-    /**
-     * Method to add bean vetoable change listeners.
-     *
-     * @param _listener bean vetoable change listener
-     */
-    public void addVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.addVetoableChangeListener(_listener);
-    }
-
-    /**
-     * Method to remove bean veto change listeners.
-     *
-     * @param _listener bean veto change listener
-     */
-    public void removeVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.removeVetoableChangeListener(_listener);
-    }
-
-    /**
      * Sets the SSRowSet column name to which the component is bound.
      *
      * @param _columnName    column name in the SSRowSet to which the component
@@ -237,7 +186,7 @@ public class SSTextField extends JTextField {
     public void setColumnName(String _columnName) {
         String oldValue = columnName;
         columnName = _columnName;
-        pChangeSupport.firePropertyChange("columnName", oldValue, columnName);
+        firePropertyChange("columnName", oldValue, columnName);
         bind();
     }
 
@@ -258,7 +207,7 @@ public class SSTextField extends JTextField {
     public void setSSRowSet(SSRowSet _sSRowSet) {
         SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
-        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        firePropertyChange("sSRowSet", oldValue, sSRowSet);
         bind();
     }
 
@@ -279,9 +228,9 @@ public class SSTextField extends JTextField {
     public void setMask(int _mask) {
         int oldValue = mask;
         mask = _mask;
-        pChangeSupport.firePropertyChange("mask", oldValue, mask);
+        firePropertyChange("mask", oldValue, mask);
 
-        init();
+        //init();
     }
 
     /**
@@ -303,7 +252,7 @@ public class SSTextField extends JTextField {
     public void setNumberOfDecimalPlaces(int _numberOfDecimalPlaces) {
         int oldValue = numberOfDecimalPlaces;
         numberOfDecimalPlaces = _numberOfDecimalPlaces;
-        pChangeSupport.firePropertyChange("numberOfDecimalPlaces", oldValue, numberOfDecimalPlaces);
+        firePropertyChange("numberOfDecimalPlaces", oldValue, numberOfDecimalPlaces);
     }
 
     /**
@@ -326,11 +275,11 @@ public class SSTextField extends JTextField {
      public void bind(SSRowSet _sSRowSet, String _columnName) {
         SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
-        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        firePropertyChange("sSRowSet", oldValue, sSRowSet);
 
         String oldValue2 = columnName;
         columnName = _columnName;
-        pChangeSupport.firePropertyChange("columnName", oldValue2, columnName);
+        firePropertyChange("columnName", oldValue2, columnName);
 
         bind();
      }
@@ -554,6 +503,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.20  2005/02/12 03:29:26  yoda2
+ * Added bound properties (for beans).
+ *
  * Revision 1.19  2005/02/11 22:59:46  yoda2
  * Imported PropertyVetoException and added some bound properties.
  *
