@@ -1,7 +1,7 @@
 /*
  * SSBooleanFieldBeanInfo.java
  *
- * Created on 21 de marzo de 2005, 14:46
+ * Created on 23 de marzo de 2005, 15:42
  */
 
 package com.nqadmin.swingSet.formatting;
@@ -30,30 +30,36 @@ public class SSBooleanFieldBeanInfo extends SimpleBeanInfo {
     private static final int PROPERTY_locale = 2;
     private static final int PROPERTY_navigator = 3;
     private static final int PROPERTY_preferredSize = 4;
-    private static final int PROPERTY_rowSet = 5;
-    private static final int PROPERTY_text = 6;
-    private static final int PROPERTY_toolTipText = 7;
+    private static final int PROPERTY_selected = 5;
+    private static final int PROPERTY_SSRowSet = 6;
+    private static final int PROPERTY_text = 7;
+    private static final int PROPERTY_toolTipText = 8;
+    private static final int PROPERTY_visible = 9;
 
     // Property array 
     /*lazy PropertyDescriptor*/
     private static PropertyDescriptor[] getPdescriptor(){
-        PropertyDescriptor[] properties = new PropertyDescriptor[8];
+        PropertyDescriptor[] properties = new PropertyDescriptor[10];
     
         try {
             properties[PROPERTY_border] = new PropertyDescriptor ( "border", SSBooleanField.class, "getBorder", "setBorder" );
-            properties[PROPERTY_columnName] = new PropertyDescriptor ( "columnName", SSBooleanField.class, null, "setColumnName" );
+            properties[PROPERTY_columnName] = new PropertyDescriptor ( "columnName", SSBooleanField.class, "getColumnName", "setColumnName" );
             properties[PROPERTY_columnName].setPreferred ( true );
+            properties[PROPERTY_columnName].setDisplayName ( "Column Name" );
             properties[PROPERTY_locale] = new PropertyDescriptor ( "locale", SSBooleanField.class, "getLocale", "setLocale" );
             properties[PROPERTY_navigator] = new PropertyDescriptor ( "navigator", SSBooleanField.class, "getNavigator", "setNavigator" );
             properties[PROPERTY_navigator].setPreferred ( true );
             properties[PROPERTY_navigator].setDisplayName ( "SSDataNavigator" );
             properties[PROPERTY_preferredSize] = new PropertyDescriptor ( "preferredSize", SSBooleanField.class, "getPreferredSize", "setPreferredSize" );
-            properties[PROPERTY_rowSet] = new PropertyDescriptor ( "rowSet", SSBooleanField.class, null, "setRowSet" );
-            properties[PROPERTY_rowSet].setPreferred ( true );
-            properties[PROPERTY_rowSet].setDisplayName ( "SSRowSet" );
+            properties[PROPERTY_selected] = new PropertyDescriptor ( "selected", SSBooleanField.class, "isSelected", "setSelected" );
+            properties[PROPERTY_SSRowSet] = new PropertyDescriptor ( "SSRowSet", SSBooleanField.class, "getSSRowSet", "setSSRowSet" );
+            properties[PROPERTY_SSRowSet].setPreferred ( true );
+            properties[PROPERTY_SSRowSet].setDisplayName ( "SSRowSet" );
             properties[PROPERTY_text] = new PropertyDescriptor ( "text", SSBooleanField.class, "getText", "setText" );
             properties[PROPERTY_text].setPreferred ( true );
             properties[PROPERTY_toolTipText] = new PropertyDescriptor ( "toolTipText", SSBooleanField.class, "getToolTipText", "setToolTipText" );
+            properties[PROPERTY_toolTipText].setPreferred ( true );
+            properties[PROPERTY_visible] = new PropertyDescriptor ( "visible", SSBooleanField.class, "isVisible", "setVisible" );
         }
         catch( IntrospectionException e) {}//GEN-HEADEREND:Properties
         
@@ -77,6 +83,14 @@ public class SSBooleanFieldBeanInfo extends SimpleBeanInfo {
         
         return methods;     }//GEN-LAST:Methods
     
+    private static java.awt.Image iconColor16 = null;//GEN-BEGIN:IconsDef
+    private static java.awt.Image iconColor32 = null;
+    private static java.awt.Image iconMono16 = null;
+    private static java.awt.Image iconMono32 = null;//GEN-END:IconsDef
+    private static String iconNameC16 = "/images/icons/sstextfield.gif";//GEN-BEGIN:Icons
+    private static String iconNameC32 = "/images/icons/sstextfield32.gif";
+    private static String iconNameM16 = "/images/icons/sstextfield.gif";
+    private static String iconNameM32 = "/images/icons/sstextfield32.gif";//GEN-END:Icons
     
     private static final int defaultPropertyIndex = -1;//GEN-BEGIN:Idx
     private static final int defaultEventIndex = -1;//GEN-END:Idx
@@ -159,5 +173,65 @@ public class SSBooleanFieldBeanInfo extends SimpleBeanInfo {
     public int getDefaultEventIndex() {
         return defaultEventIndex;
     }
+    
+    /**
+     * This method returns an image object that can be used to
+     * represent the bean in toolboxes, toolbars, etc.   Icon images
+     * will typically be GIFs, but may in future include other formats.
+     * <p>
+     * Beans aren't required to provide icons and may return null from
+     * this method.
+     * <p>
+     * There are four possible flavors of icons (16x16 color,
+     * 32x32 color, 16x16 mono, 32x32 mono).  If a bean choses to only
+     * support a single icon we recommend supporting 16x16 color.
+     * <p>
+     * We recommend that icons have a "transparent" background
+     * so they can be rendered onto an existing background.
+     *
+     * @param  iconKind  The kind of icon requested.  This should be
+     *    one of the constant values ICON_COLOR_16x16, ICON_COLOR_32x32,
+     *    ICON_MONO_16x16, or ICON_MONO_32x32.
+     * @return  An image object representing the requested icon.  May
+     *    return null if no suitable icon is available.
+     */
+    public java.awt.Image getIcon(int iconKind) {
+        switch ( iconKind ) {
+            case ICON_COLOR_16x16:
+                if ( iconNameC16 == null )
+                    return null;
+                else {
+                    if( iconColor16 == null )
+                        iconColor16 = loadImage( iconNameC16 );
+                    return iconColor16;
+                }
+            case ICON_COLOR_32x32:
+                if ( iconNameC32 == null )
+                    return null;
+                else {
+                    if( iconColor32 == null )
+                        iconColor32 = loadImage( iconNameC32 );
+                    return iconColor32;
+                }
+            case ICON_MONO_16x16:
+                if ( iconNameM16 == null )
+                    return null;
+                else {
+                    if( iconMono16 == null )
+                        iconMono16 = loadImage( iconNameM16 );
+                    return iconMono16;
+                }
+            case ICON_MONO_32x32:
+                if ( iconNameM32 == null )
+                    return null;
+                else {
+                    if( iconMono32 == null )
+                        iconMono32 = loadImage( iconNameM32 );
+                    return iconMono32;
+                }
+            default: return null;
+        }
+    }
+    
 }
 

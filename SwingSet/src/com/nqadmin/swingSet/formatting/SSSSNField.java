@@ -33,6 +33,7 @@
 package com.nqadmin.swingSet.formatting;
 
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
+import com.nqadmin.swingSet.formatting.SSNFormatterFactory;
 
 /**
  *
@@ -54,6 +55,9 @@ public class SSSSNField extends SSFormattedTextField {
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/04 22:42:06  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.4  2005/01/18 23:38:01  dags
  * Diego's name fix
  *

@@ -81,6 +81,10 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
         this.setInputVerifier(new internalVerifier());
     }
     
+    public String getColumnName() {
+        return this.columnName;
+    }
+    
     public void setColumnName(String columnName) {
         this.columnName = columnName;
         bind();
@@ -89,6 +93,10 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
     public void setRowSet(SSRowSet rowset) {
         this.rowset = rowset;
         bind();
+    }
+    
+    public SSRowSet getRowSet() {
+        return this.rowset;
     }
     
     public void setNavigator(SSDataNavigator navigator) {

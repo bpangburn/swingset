@@ -63,8 +63,8 @@ import java.beans.beancontext.BeanContextProxy;
  */
 public class SSFormattedTextField extends JFormattedTextField implements RowSetListener, KeyListener, FocusListener, MouseListener, BeanContextProxy {
     
-        
-	private BeanContextChildSupport beanContextChildSupport = new BeanContextChildSupport();
+    
+    private BeanContextChildSupport beanContextChildSupport = new BeanContextChildSupport();
     
     private JPopupMenu menu       = null;
     private JPopupMenu calculator = null;
@@ -114,8 +114,8 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
          *
          */
         addMouseListener(this);
-
-
+        
+        
         /*
          *
          */
@@ -174,7 +174,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     }
     
     private void bind() {
-    
+        
         if (columnName == null || rowset  == null) return;
         
         try {
@@ -185,25 +185,25 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         
         rowset.addRowSetListener(this);
         
-        DbToFm();
+        DbToFm("bind");
     }
     
     public void rowSetChanged(javax.sql.RowSetEvent event) {
-//        System.out.println("rowSetChanged");
+        //        System.out.println("rowSetChanged");
         
     }
     
     public void rowChanged(javax.sql.RowSetEvent event) {
-//       System.out.println("rowChanged " + event);
+        //       System.out.println("rowChanged " + event);
         
     }
     
     public void cursorMoved(javax.sql.RowSetEvent event) {
         /*
-         * 
+         *
          *
          */
-        DbToFm();
+        DbToFm("cursorMoved");
     }
     
     public void keyTyped(KeyEvent e) {
@@ -308,8 +308,8 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
      *
      */
     
-    private void DbToFm() {
-        
+    private void DbToFm(String texto) {
+        System.out.println("DbToFm.texto = " + texto);
         try {
             
             switch(colType) {
@@ -327,7 +327,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                     
                 case java.sql.Types.BLOB://2004
                     break;
-
+                    
                 case java.sql.Types.CLOB://2005
                     break;
                     
@@ -403,40 +403,40 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     }
     
     public void mouseExited(MouseEvent e) {
-//        System.out.println("mouseExited");
+        //        System.out.println("mouseExited");
     }
     
     public void mouseEntered(MouseEvent e) {
-//        System.out.println("mouseEntered");
+        //        System.out.println("mouseEntered");
     }
     
     public void mouseClicked(MouseEvent e) {
-//        System.out.println("mouseClicked");
-//        System.out.println("x= " + e.getComponent().getX() + " y= " + e.getComponent().getY());
+        //        System.out.println("mouseClicked");
+        //        System.out.println("x= " + e.getComponent().getX() + " y= " + e.getComponent().getY());
     }
     
     public void mousePressed(MouseEvent evt) {
-//        System.out.println("mousePressed");
+        //        System.out.println("mousePressed");
         if (evt.isPopupTrigger()) {
-//            System.out.println("isPopupTrigger");
+            //            System.out.println("isPopupTrigger");
             menu.show(evt.getComponent(), evt.getX(), evt.getY());
         }
     }
     
     public void mouseReleased(MouseEvent evt) {
-//        System.out.println("mouseReleased");
+        //        System.out.println("mouseReleased");
         if (evt.isPopupTrigger()) {
-//            System.out.println("isPopupTrigger");
+            //            System.out.println("isPopupTrigger");
             menu.show(evt.getComponent(), evt.getX(), evt.getY());
         }
     }
     
     public void setHelper(JPopupMenu helper) {
         this.helper = helper;
-
+        
         if (helper instanceof HelperPopup)
             ((HelperPopup)this.helper).setTarget(this);
-  
+        
         if (helper instanceof RowSetHelperPopup)
             ((RowSetHelperPopup)this.helper).setTarget(this);
         
@@ -668,14 +668,22 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         }
     }
     
-	public BeanContextChild getBeanContextProxy(){
-		System.err.println("getBeanContextProxy Called");
-		return beanContextChildSupport;
-	}
+    public BeanContextChild getBeanContextProxy(){
+        System.err.println("getBeanContextProxy Called");
+        return beanContextChildSupport;
+    }
 }
 
 /*
  * $Log$
+ * Revision 1.13  2005/03/21 20:09:37  dags
+ *
+ *  Removed Files:
+ *  	SSFormattedTextFieldColumnNamePropertyEditor.java
+ *  	SSFormattedTextFieldCustomizer.form
+ *  	SSFormattedTextFieldCustomizer.java
+ *  ----------------------------------------------------------------------
+ *
  * Revision 1.12  2005/02/22 15:14:34  yoda2
  * Fixed some JavaDoc & deprecation errors/warnings.
  *
