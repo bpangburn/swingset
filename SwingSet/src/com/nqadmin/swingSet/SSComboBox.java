@@ -72,19 +72,17 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  *
  *      // next line is assuming myrowset has been initialized and my_column is a
  *      // column in myrowset
- *      combo.setBinding(myrowset,"my_column");
+ *      combo.bind(myrowset,"my_column");
  *
  *      Note that if you DO NOT want to use the default mappings, the custom
- *      mappings must be set before calling the setBinding() method to bind the
+ *      mappings must be set before calling the bind() method to bind the
  *      combobox to a database column.
  *</pre><p>
  * @author  $Author$
  * @version $Revision$
  */
 //public class SSComboBox extends JComponent {
-public class SSComboBox extends JComboBox {    
-    
-// ADD getComboBox()    
+public class SSComboBox extends JComboBox {
 
     // THIS VALUE WILL BE RETURNED WHEN NO ITEM IS SELECTED IN THE COMBO BOX
     public static final int NON_SELECTED = (int)((Math.pow(2, 32) -1)/(-2));
@@ -146,22 +144,7 @@ public class SSComboBox extends JComboBox {
     }
 
     /**
-     * Creates an instance of SSComboBox and sets the text field with which the combo
-     * box will be synchronized with.
-     *
-     * @deprecated
-     */
-    public SSComboBox(SSTextDocument document) {
-
-        //super();
-        init();
-        //addComponent();
-
-        this.setDocument(document);
-    }
-
-    /**
-     *  Any initialization code.
+     * Initialization code.
      */
     protected void init() {
     // ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
@@ -228,24 +211,20 @@ public class SSComboBox extends JComboBox {
      *
      * @param _columnName    column name in the SSRowSet to which the combo box
      *    is bound.
-     *
-     * @deprecated
-     * @see #setBinding     
      */
     public void setColumnName(String _columnName) {
         columnName = _columnName;
+        bind();
     }
 
     /**
      * Sets the SSRowSet to be used.
      *
      * @param _rowset    SSRowSet to be used for getting the values.
-     *
-     * @deprecated
-     * @see #setBinding     
      */
     public void setSSRowSet(SSRowSet _rowset) {
         rowset = _rowset;
+        bind();
     }
 
     /**
@@ -282,24 +261,21 @@ public class SSComboBox extends JComboBox {
      * The column name and the SSRowSet should be set before calling this function.
      * If the column name and SSRowSet are set seperately then this function has to
      * be called to bind the combo box to the column in the SSRowSet.
-     *
-     * @deprecated
-     * @see #setBinding     
      */
-    public void bind() {
+    private void bind() {
+	// CHECK FOR NULL COLUMN/ROWSET
+		if (columnName==null || rowset==null) {
+			return;
+		}
+
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
             textField.setDocument(new SSTextDocument(rowset, columnName));
-        // INITIALIZE THE VALUE OF THE TEXT FIELD TO THAT OF THE COLUMN VALUE
-        // FOR THE PRESENT RECORD IN THE SSROWSET.
-        // THIS IS REQUIRED AS THE TEXT FIELD CAN UPDATE ITSELF ONLY WHEN THE SSROWSET
-        // CHANGES OR MOVES.
-        //    textField.setDocument(new SSTextDocument(rowset, columnName));
+
         // SET THE COMBO BOX ITEM DISPLAYED
             setDisplay();
+
         // ADDS LISTENERS FOR TEXT FIELD AND COMBO
-        // IF BIND IS CALLED FOR SECOND TIME OLD LISTENERS HAVE TO BE REMOVED
-        // INSTEAD OF THIS WE CAN HAVE SOME VARIABLE TO INDICATE IT LISTENERS
-        // ARE ADDED ALREADY
+        // IF BIND IS CALLED MULTIPLE TIMES OLD LISTENERS HAVE TO BE REMOVED
             removeListeners();
             addListeners();
     }
@@ -310,31 +286,12 @@ public class SSComboBox extends JComboBox {
      *
      * @param _rowset    SSRowSet to be used for getting the value.
      * @param _columnName    Column to which the combo box has to be bound.
-     *
-     * @deprecated
-     * @see #setBinding
      */
     public void bind(SSRowSet _rowset, String _columnName) {
         rowset = _rowset;
         columnName = _columnName;
         bind();
     }
-    
-    /**
-     * Binds the combo box to the specified column of the SSRowSet.
-     * As the SSRowSet changes the combo box item displayed changes accordingly.
-     *
-     * @param _rowset    SSRowSet to be used for getting the value.
-     * @param _columnName    Column to which the combo box has to be bound.
-     */
-    public void setBinding(SSRowSet _rowset, String _columnName) {
-        rowset = _rowset;
-        columnName = _columnName;
-        textField.setDocument(new SSTextDocument(rowset, columnName));
-        setDisplay();
-        removeListeners();
-        addListeners();
-    }    
 
     // SET THE COMBO BOX ITEM TO THE ITEM THAT CORRESPONDS TO THE VALUE IN TEXT FIELD
     private void setDisplay() {
@@ -395,49 +352,6 @@ public class SSComboBox extends JComboBox {
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
         //cmbDisplayed.removeActionListener(cmbListener);
         removeActionListener(cmbListener);
-    }
-
-    /**
-     * Sets the document to which the combo box will be bound to. Changes to this
-     * will immediately reflect in the combo box.
-     *
-     * @param _document    text document to which the combo box has to be bound
-     *
-     * @deprecated
-     * @see #setBinding
-     */
-    public void setDocument(SSTextDocument _document) {
-            textField.setDocument(_document);
-            setDisplay();
-        // NEEDED, IF THIS FUNCTION IS CALLED MORE THAN ONCE.
-        // SO THAT WE DON'T STACK UP LISTENERS AS THE NUMBER OF CALLS TO THIS
-        // FUNCTION INCREASES
-            removeListeners();
-            addListeners();
-    }
-
-    /**
-     * returns the combo box that has to be displayed on screen.
-     *
-     * @return returns the combo box that displays the items.
-     *
-     * @deprecated
-     */
-    public JComboBox getComboBox() {
-        //return cmbDisplayed;
-        return this;
-    }
-
-    /**
-     * Returns the combo box to be displayed on the screen.
-     *
-     * @return returns the combo box that displays the items.
-     *
-     * @deprecated
-     */
-    public Component getComponent() {
-        //return cmbDisplayed;
-        return this;
     }
 
     /**
@@ -538,7 +452,7 @@ public class SSComboBox extends JComboBox {
 //          System.out.println("Requested  Option: " + options);
         // REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
         // THE DISPLAYED ITEMS
-/*        
+/*
         if(cmbDisplayed.getItemCount() != 0) {
             cmbDisplayed.removeAllItems();
         }
@@ -600,11 +514,11 @@ public class SSComboBox extends JComboBox {
                     // IN CASE TWO: YOU HAVE TO CHECK IF THE VALUE IN THE MAPPINGVALUES ARRAY AT INDEX EQUAL
                     // TO THE SELECTED INDEX OF THE COMBO BOX EQUALS THE VALUE IN TEXT FIELD
                     // IF THESE CONDITIONS ARE MET YOU NEED NOT CHANGE COMBO BOX SELECTED ITEM
-/*                    
+/*
                     if ( (mappingValues==null && intValue != cmbDisplayed.getSelectedIndex()) ||
                          (mappingValues!=null && cmbDisplayed.getSelectedIndex() == -1)       ||
                          (mappingValues!=null && mappingValues[cmbDisplayed.getSelectedIndex()] != intValue) ) {
-*/                             
+*/
                     if ( (mappingValues==null && intValue != getSelectedIndex()) ||
                          (mappingValues!=null && getSelectedIndex() == -1)       ||
                          (mappingValues!=null && mappingValues[getSelectedIndex()] != intValue) ) {
@@ -680,14 +594,14 @@ public class SSComboBox extends JComboBox {
                     // IN CASE TWO: YOU HAVE TO CHECK IF THE VALUE IN THE MAPPINGVALUES ARRAY AT INDEX EQUAL
                     // TO THE SELECTED INDEX OF THE COMBO BOX EQUALS THE VALUE IN TEXT FIELD
                     // IF THESE CONDITIONS ARE MET YOU NEED NOT CHANGE COMBO BOX SELECTED ITEM
-/*                    
+/*
                     if ( (mappingValues==null && intValue != cmbDisplayed.getSelectedIndex()) ||
                          (mappingValues!=null && cmbDisplayed.getSelectedIndex() == -1)       ||
                          (mappingValues!=null && mappingValues[cmbDisplayed.getSelectedIndex()] != intValue) ) {
-*/                             
+*/
                     if ( (mappingValues==null && intValue != getSelectedIndex()) ||
                          (mappingValues!=null && getSelectedIndex() == -1)       ||
-                         (mappingValues!=null && mappingValues[getSelectedIndex()] != intValue) ) {                             
+                         (mappingValues!=null && mappingValues[getSelectedIndex()] != intValue) ) {
 
                         //if (mappingValues==null && (intValue <0 || intValue >= cmbDisplayed.getItemCount())) {
                         if (mappingValues==null && (intValue <0 || intValue >= getItemCount())) {
@@ -790,6 +704,68 @@ public class SSComboBox extends JComboBox {
         }
     }
 
+
+
+// DEPRECATED STUFF....................
+    /**
+     * Creates an instance of SSComboBox and sets the text field with which the combo
+     * box will be synchronized with.
+     *
+     * @deprecated
+     */
+    public SSComboBox(SSTextDocument document) {
+
+        //super();
+        init();
+        //addComponent();
+
+        this.setDocument(document);
+    }
+
+    /**
+     * Sets the document to which the combo box will be bound to. Changes to this
+     * will immediately reflect in the combo box.
+     *
+     * @param _document    text document to which the combo box has to be bound
+     *
+     * @deprecated
+     * @see #bind
+     */
+    public void setDocument(SSTextDocument _document) {
+            textField.setDocument(_document);
+            setDisplay();
+        // NEEDED, IF THIS FUNCTION IS CALLED MORE THAN ONCE.
+        // SO THAT WE DON'T STACK UP LISTENERS AS THE NUMBER OF CALLS TO THIS
+        // FUNCTION INCREASES
+            removeListeners();
+            addListeners();
+    }
+
+    /**
+     * returns the combo box that has to be displayed on screen.
+     *
+     * @return returns the combo box that displays the items.
+     *
+     * @deprecated
+     */
+    public JComboBox getComboBox() {
+        //return cmbDisplayed;
+        return this;
+    }
+
+    /**
+     * Returns the combo box to be displayed on the screen.
+     *
+     * @return returns the combo box that displays the items.
+     *
+     * @deprecated
+     */
+    public Component getComponent() {
+        //return cmbDisplayed;
+        return this;
+    }
+
+
 //} // end public class SSComboBox extends JComponent {
 } // end public class SSComboBox extends JComboBox {
 
@@ -797,6 +773,9 @@ public class SSComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.21  2005/01/18 22:27:24  yoda2
+ * Changed to extend JComboBox rather than JComponent.  Deprecated bind(), setSSRowSet(), & setColumnName().
+ *
  * Revision 1.20  2004/11/11 14:45:48  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *
