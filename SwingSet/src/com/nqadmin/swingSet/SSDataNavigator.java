@@ -81,6 +81,13 @@ public class SSDataNavigator extends JPanel{
 
 	// BASED ON THIS SSDataNavigator ALLOWS OR DISALLOWS MODIFICATION TO THE ROWSET
 	boolean modification = true;
+	
+	// USERS CAN ALSO UPDATES TO PRESENT RECORDS BUT DISALLOW DELETION OF RECORDS
+	// BY SETTING THIS TO FALSE	
+	boolean allowDeletions = true;
+	boolean allowInsertions = true;
+	
+	boolean confirmDeletes = true;
 
 	// ROWSET TO WHICH THE NAVIGATOR IS LINKED TO
 	RowSet rowset = null;
@@ -92,6 +99,9 @@ public class SSDataNavigator extends JPanel{
 	int numRows = -1;
 
 //	Vector defaultValues = null;
+
+	// true if the rowset is on insert row else false
+	boolean onInsertRow = false;
 
 	// SIZE OF THE BUTTONS TO WHICH THEY HAVE TO BE SET
 	Dimension buttonSize = new Dimension( 60, 20);
@@ -118,8 +128,8 @@ public class SSDataNavigator extends JPanel{
 
 	 	return true;
 	 }
-
-
+	 
+	 
 	private void addToolTips(){
 
 //	JButton button5 = new JButton("" + '\u2714'); // Commit button
@@ -235,6 +245,7 @@ public class SSDataNavigator extends JPanel{
 	 *@param deletion - true or false
 	 */
 	public void setDeletion(boolean deletion){
+		allowDeletions = deletion;
 		if(!deletion){
 			button9.setEnabled(false);
 		}
@@ -250,6 +261,7 @@ public class SSDataNavigator extends JPanel{
 	 *@param insertion - true or false
 	 */
 	public void setInsertion(boolean insertion){
+		allowInsertions = insertion;
 		if(!insertion){
 			button8.setEnabled(false);
 		}
@@ -257,6 +269,33 @@ public class SSDataNavigator extends JPanel{
 			button8.setEnabled(true);
 		}
 	}
+	
+	/**
+	 *	Sets the confirm deletes. If set to true, every time delete button is pressed
+	 *navigator pops up a confirmation dialog to the user. So that he can continue
+	 *with deletion or cancel the deletion. Default value is true.
+	 *@param _confirmDeletes  true or false
+	 */
+	 public void setConfirmDeletes(boolean _confirmDeletes){
+	 	confirmDeletes = _confirmDeletes;
+	 }
+	 
+	 /**
+	  *	 Updates the present row. This is done automatically when navigation takes place.
+	  *In addition to that if the user wants to update present row this function has to
+	  *be called.
+	  *@return returns true if update succeeds else false.
+	  */
+	  public boolean updatePresentRow(){
+	  	System.out.println("Requested update row  :" + onInsertRow);
+	  	try{
+	  		if(!onInsertRow)
+	  			rowset.updateRow();
+	  		return true;
+	  	}catch(Exception e){
+	  		return false;
+	  	}
+	  }
 
 //	public void setDefaultValue(String columnName, Object
 
@@ -378,6 +417,8 @@ public class SSDataNavigator extends JPanel{
 					rowset.first();
 					button2.setEnabled(false);
 					button3.setEnabled(true);
+					if( dbNav != null )
+						dbNav.performNavigationOps(SSDBNav.NAVIGATION_FIRST);
 				}catch(SQLException se){
 					se.printStackTrace();
 				}
@@ -405,6 +446,8 @@ public class SSDataNavigator extends JPanel{
 					// IF NEXT BUTTON IS DISABLED ENABLE IT.
 					if( !button3.isEnabled() )
 						button3.setEnabled(true);
+					if( dbNav != null )
+						dbNav.performNavigationOps(SSDBNav.NAVIGATION_PREVIOUS);	
 				}catch(SQLException se){
 					se.printStackTrace();
 				}
@@ -435,6 +478,8 @@ public class SSDataNavigator extends JPanel{
 					// IF THE FIRST BUTTON IS DISABLED THEN ENABLE IT
 					if(!button1.isEnabled())
 						button1.setEnabled(true);	
+					if( dbNav != null )
+						dbNav.performNavigationOps(SSDBNav.NAVIGATION_NEXT);	
 				}catch(SQLException se){
 					se.printStackTrace();
 				}
@@ -457,6 +502,8 @@ public class SSDataNavigator extends JPanel{
 					button2.setEnabled(true);
 					if(!rowset.isFirst())
 						button1.setEnabled(true);
+					if( dbNav != null )
+						dbNav.performNavigationOps(SSDBNav.NAVIGATION_LAST);	
 				}catch(SQLException se){
 					se.printStackTrace();
 				}
@@ -469,21 +516,26 @@ public class SSDataNavigator extends JPanel{
 		button5.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent ae){
 				try{
-
+					
 					rowset.insertRow();
-
+					if( dbNav != null )
+						dbNav.performPostInsertOps();
 					rowset.moveToCurrentRow();
-
-
+					
+					onInsertRow = false;
+					
 					button1.setEnabled(true);
 					button2.setEnabled(true);
 					button3.setEnabled(true);
 					button4.setEnabled(true);
 					button5.setEnabled(false);
 					button7.setEnabled(true);
-					button8.setEnabled(true);
-					button9.setEnabled(true);
+					if(allowInsertions)
+						button8.setEnabled(true);
+					if(allowDeletions)
+						button9.setEnabled(true);
 				}catch(SQLException se){
+					JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while inserting row.\n"+se.getMessage());
 					se.printStackTrace();
 				}
 			}
@@ -496,6 +548,8 @@ public class SSDataNavigator extends JPanel{
 			public void actionPerformed(ActionEvent ae){
 				try{
 					rowset.cancelRowUpdates();
+					if(dbNav != null)
+						dbNav.performCancelOps();
 					//rowset.deleteRow();
 					//rowset.moveToCurrentRow();
 					button1.setEnabled(true);
@@ -503,9 +557,12 @@ public class SSDataNavigator extends JPanel{
 					button3.setEnabled(true);
 					button4.setEnabled(true);
 					button7.setEnabled(true);
-					button8.setEnabled(true);
-					button9.setEnabled(true);
+					if(allowInsertions)
+						button8.setEnabled(true);
+					if(allowDeletions)
+						button9.setEnabled(true);
 				}catch(SQLException se){
+					JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while undoing changes.\n"+se.getMessage());
 					se.printStackTrace();
 				}
 			}
@@ -519,6 +576,9 @@ public class SSDataNavigator extends JPanel{
 			public void actionPerformed(ActionEvent ae){
 				try{
 					rowset.execute();
+					if( dbNav != null )
+						dbNav.performRefreshOps();
+						
 					if( rowset.next() ){
 						button1.setEnabled(true);
 						button2.setEnabled(false);
@@ -534,6 +594,7 @@ public class SSDataNavigator extends JPanel{
 
 
 				}catch(SQLException se){
+					
 					se.printStackTrace();
 				}
 			}
@@ -546,6 +607,7 @@ public class SSDataNavigator extends JPanel{
 			public void actionPerformed(ActionEvent ae){
 				try{
 					rowset.moveToInsertRow();
+					onInsertRow = true;
 
 					if( dbNav != null )
 						dbNav.performPreInsertOps();
@@ -563,6 +625,7 @@ public class SSDataNavigator extends JPanel{
 					button9.setEnabled(false);
 
 				}catch(SQLException se){
+					JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while moving to insert row.\n"+se.getMessage());
 					se.printStackTrace();
 				}
 			}
@@ -574,11 +637,20 @@ public class SSDataNavigator extends JPanel{
 		button9.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent ae){
 				try{
+					int answer = JOptionPane.showConfirmDialog(SSDataNavigator.this,"Are you sure you want to delete this record?","Delete Present Record", JOptionPane.YES_NO_OPTION);
+					if( answer != JOptionPane.YES_OPTION )
+						return;
+						
+					if( dbNav != null )
+						dbNav.performPreDeletionOps();
 					rowset.deleteRow();
+					if( dbNav != null )
+						dbNav.performPostDeletionOps();
 
 					if(! rowset.next() )
 						rowset.last();
 				}catch(SQLException se){
+					JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while deleting row.\n"+se.getMessage());
 					se.printStackTrace();
 				}
 			}
@@ -592,6 +664,10 @@ public class SSDataNavigator extends JPanel{
 
 /*
  * $Log$
+ * Revision 1.3  2003/10/31 16:02:52  prasanth
+ * Added login to disable the navigation buttons when only one record is present
+ * in the rowset.
+ *
  * Revision 1.2  2003/09/25 14:27:45  yoda2
  * Removed unused Import statements and added preformatting tags to JavaDoc descriptions.
  *
