@@ -18,6 +18,7 @@ mkdir ./release_jars/src/com/nqadmin/swingSet
 mkdir ./release_jars/src/com/nqadmin/swingSet/datasources
 mkdir ./release_jars/demo
 mkdir ./release_jars/images
+mkdir ./release_jars/images/icons
 
 # RECOMPILE SWINGSET
 javac -source 1.4 -target 1.4 -d ./release_jars/bin ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/*.java
@@ -33,6 +34,7 @@ rm ./release_jars/src/com/nqadmin/swingSet/datasources/*.java~
 
 # COPY IMAGES & LICENSE
 cp ./src/images/* ./release_jars/images
+cp ./src/images/icons/* ./release_jars/images/icons
 
 # BUILD BIN JAR
 jar -mcvf ./META-INF/MANIFEST.MF ./release_jars/swingset-bin_current.jar -C ./release_jars/bin com -C ./release_jars images readme.txt ChangeLog.txt FAQ.txt
