@@ -143,7 +143,7 @@ public class SSDBComboBox  extends JComponent{
 
 		/*	Database connection object
 		 */
-		private Connection conn = null;
+		private transient Connection conn = null;
 
 		/*	Query used to retrieve all possible values.
 		 */
@@ -169,7 +169,7 @@ public class SSDBComboBox  extends JComponent{
 		private int numberOfItems = 0;
 
 		// rowset used to retrieve the info from the database.
-		private RowSet rowset = null;
+		private transient RowSet rowset = null;
 
 		// instance of the listener for the combo box.
 		final MyComboListener cmbListener = new MyComboListener();
@@ -187,6 +187,7 @@ public class SSDBComboBox  extends JComponent{
 		 */
 		public SSDBComboBox() {
 			super();
+			addComponent();
 		}
 
 		/**
@@ -196,21 +197,21 @@ public class SSDBComboBox  extends JComponent{
 		 *@param _columnName column name whose value has to be stored.
 		 *@param _displayColumnName column name whose values are displayed in the combo box.
 		 *@param _textField a text field to which the combo box has to be synchronized
+		 *@deprecated
 		 */
 		public SSDBComboBox(Connection _conn, String _query, String _columnName, String _displayColumnName, JTextField _textField){
 
 			super();
-
+			
 			conn 				= _conn;
 			query 				= _query;
 			columnName 			= _columnName;
 			displayColumnName 	= _displayColumnName;
 			textField  			= _textField;
 			textField.setPreferredSize(new Dimension(200,20));
-			cmbDisplayed.setPreferredSize(new Dimension(200,20));
 			textField.setMaximumSize(new Dimension(200,20));
-			cmbDisplayed.setMaximumSize(new Dimension(200,20));
-
+			
+			addComponent();
 
 		}
 
@@ -298,6 +299,12 @@ public class SSDBComboBox  extends JComponent{
 			secondDisplayColumnName = _secondDisplayColumnName;
 		}
 
+		/**
+		 *	Sets the text field to which the underlying value is written to.
+		 *@param _textField - text field to which the selected item value has to
+		 *be written.
+		 *@deprecated
+		 */
 		public void setTextField(JTextField _textField){
 			textField = _textField;
 		}
@@ -394,6 +401,14 @@ public class SSDBComboBox  extends JComponent{
 		  	return ((Long)columnVector.get(index)).longValue();
 		  	
 		  }
+		  
+		/**
+		 *	Sets the value.
+		 */  
+		public void setSelectedValue(long _value){
+			textField.setText(String.valueOf(_value));
+		}
+		 
 		/**
 		 *	Executes the query and adds items to the combo box based on the values
 		 *retrieved from the database.
@@ -416,8 +431,8 @@ public class SSDBComboBox  extends JComponent{
 			// USER CAN SPECIFY A ROWSET INSTEAD OF THE QUERY.
 			// IN SUCH A CASE THE VALUES HAVE TO BE TAKEN FROM ROWSET
 			int i = 0;
-			if(rowset == null) {
-				while(rs.next()){
+/*			if(rowset == null) {
+*/				while(rs.next()){
 					// IF TWO COLUMNS HAVE TO BE DISPLAYED IN THE COMBO THEY SEPERATED BY SEMI-COLON
 					if( secondDisplayColumnName != null){
 						cmbDisplayed.addItem(getStringValue(rs,displayColumnName) + seperator + rs.getString(secondDisplayColumnName));
@@ -429,7 +444,8 @@ public class SSDBComboBox  extends JComponent{
 					i++;
 				}
 			// IF THE ROWSET IS GIVEN GET VALUES FROM ROWSET
-			}else {
+/*			}
+			else {
 				// NOTE THE POSITION OF ROWSET , MOVE TO THE FIRST RECORD AND GET ALL VALUES
 				// AND THEN MOVE THE ROWSET BACK TO ITS PREVIOUS POSITION.
 				int rowNumber = rowset.getRow();
@@ -455,7 +471,7 @@ public class SSDBComboBox  extends JComponent{
 					rowset.absolute(rowNumber);
 //				System.out.println(" present row number " + rowset.getRow());
 			}
-
+*/
 			// STORE THE NUMBER OF ITEMS IN THE COMBO BOX.
 			numberOfItems = i;
 
@@ -497,6 +513,11 @@ public class SSDBComboBox  extends JComponent{
 		 */
 		public void bind(RowSet rs, String column){
 			textField.setDocument(new SSTextDocument(rs,column));
+			cmbDisplayed.addFocusListener(new FocusAdapter(){
+				public void focusLost(FocusEvent fe){
+					myKeyListener.resetSearchString();
+				}
+			});
 		}
 
 		// ADDS LISTENERS FOR TEXT FIELD AND COMBO BOX.
@@ -504,11 +525,6 @@ public class SSDBComboBox  extends JComponent{
 
 			cmbDisplayed.addActionListener(cmbListener);
 			cmbDisplayed.addKeyListener(myKeyListener);
-			cmbDisplayed.addFocusListener(new FocusAdapter(){
-				public void focusLost(FocusEvent fe){
-					myKeyListener.resetSearchString();
-				}
-			});
 			textField.getDocument().addDocumentListener(textFieldDocumentListener);
 
 		}
@@ -724,11 +740,9 @@ public class SSDBComboBox  extends JComponent{
 
 				textField.getDocument().removeDocumentListener(textFieldDocumentListener);
 
-				//System.out.println("action performed triggered");
 				// GET THE INDEX CORRESPONDING TO THE SELECTED TEXT IN COMBO
 				int index = cmbDisplayed.getSelectedIndex();
-//				System.out.println(index);
-				//System.out.println(index);
+
 				// IF THE USER WANTS TO REMOVE COMPLETELY THE VALUE IN THE FIELD HE CHOOSES
 				// THE EMPTY STRING IN COMBO THEN THE TEXT FIELD IS SET TO EMPTY STRING
 				if( index != -1 ) {
@@ -743,14 +757,13 @@ public class SSDBComboBox  extends JComponent{
 						// IF THE TEXT IS NOT NULL PARSE ITS LONG VALUE
 						if(!strValueinTextField.equals("") )
 							valueInText = Long.parseLong(strValueinTextField);
-						//System.out.println("Value in text: " + valueInText );
+
 
 						// IF THE LONG VALUE CORRESPONDING TO THE SELECTED TEXT OF COMBO NOT EQUAL
 						// TO THAT IN THE TEXT FIELD THEN CHANGE THE TEXT IN THE TEXT FIELD TO THAT VALUE
 						// IF ITS THE SAME LEAVE IT AS IS
 						if( valueInText != valueCorresponingToIndex){
 							textField.setText( String.valueOf(valueCorresponingToIndex) );
-							//System.out.println(textField.getText());
 						}
 
 					}catch(NullPointerException npe) {
@@ -760,16 +773,35 @@ public class SSDBComboBox  extends JComponent{
 
 				textField.getDocument().addDocumentListener(textFieldDocumentListener);
 
-				//System.out.println("Option :" + option + "  Item : " + textField.getText());
 			}
 		}
-
-
+		
+		/**
+		 *	Added the combo box to the JComponent
+		 */
+		private void addComponent(){
+		//SET THE BOX LAYOUT
+			setLayout(new BoxLayout(this,BoxLayout.LINE_AXIS) );
+		// SET PREFERRED SIZE FOR COMBO BOX	
+			cmbDisplayed.setPreferredSize(new Dimension(150,20));
+		// ADD THE COMBO BOX TO THE JCOMPONENT	
+			add(cmbDisplayed);
+		}
+		
+		
 		/**
 		 *	Returns the combobox so that it can be added to a container.
 		 *@returns a JComboBox which displays the required items.
 		 */
 		public JComboBox getComboBox() {
+			return cmbDisplayed;
+		}
+		
+		/**
+		 *	Returns the combo box to be displayed on the screen.
+		 *@return returns the combo box that displays the items.
+		 */
+		public Component getComponent(){
 			return cmbDisplayed;
 		}
 		
@@ -781,9 +813,6 @@ public class SSDBComboBox  extends JComponent{
 		 public void addItem(String _name, long _value){
 		 	columnVector.add(new Long(_value));
 		 	cmbDisplayed.addItem(_name);
-//		 	System.out.println("added a new item to combo " + _name);
-		 	
-		 	
 		 }
 		 
 		 /**
@@ -828,12 +857,8 @@ public class SSDBComboBox  extends JComponent{
 		  */
 		 public boolean deleteItem(String _name, long _value){
 		 	for(int i=0; i<cmbDisplayed.getItemCount();i++){
-//		 		System.out.println("_name  "+   cmbDisplayed.getItemAt(i));
 		 		if( ((String)cmbDisplayed.getItemAt(i)).equals(_name) ){
-//		 			System.out.println(" true");
-//		 			System.out.println(_value + "     " + ((Long)(columnVector.elementAt(i))).longValue());
 		 			if( ((Long)(columnVector.elementAt(i))).longValue() == _value) {
-//		 				System.out.println(" true");
 		 				cmbDisplayed.removeItemAt(i);
 		 				columnVector.removeElementAt(i);	
 		 				return true;
@@ -857,9 +882,7 @@ public class SSDBComboBox  extends JComponent{
 		  *for navigation you need not call the updateRow.)
 		  */
 		  public boolean updateItem(long _value, String _name){
-//		  	System.out.println("Update item : " + _value + " with " + _name);
 		  	int index = columnVector.indexOf(new Long(_value));
-		  	System.out.println(index);
 		 	if(index == -1)
 		 		return false;
 		 	cmbDisplayed.removeActionListener(cmbListener);	
@@ -901,6 +924,9 @@ public class SSDBComboBox  extends JComponent{
 
 /*
  * $Log$
+ * Revision 1.6  2004/03/08 16:43:37  prasanth
+ * Updated copy right year.
+ *
  * Revision 1.5  2004/02/23 16:37:41  prasanth
  * Added GENDER_OPTION.
  *
