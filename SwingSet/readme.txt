@@ -88,7 +88,8 @@ Unzip the file rowset.jar from the Sun file to the same location as
 swingset.jar and add both JAR files to your CLASSPATH. Alternatively, you can
 copy both files to the the /jre/lib/ext subdirectory of both your JDK and JRE.
 
-SwingSet has been tested with J2SE 1.4.2.
+SwingSet has been tested with J2SE 1.4.2, but should work with all J2SE 1.4
+releases.
 
 
 ==============================================================================
