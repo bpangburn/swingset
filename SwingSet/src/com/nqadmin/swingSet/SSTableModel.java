@@ -723,10 +723,13 @@ public class SSTableModel extends AbstractTableModel {
     	if (_strDate.trim().equals("")) {
     		return null;
         }
-    	StringTokenizer strtok = new StringTokenizer(_strDate,"/",false);
-    	String month = strtok.nextToken();
-    	String day = strtok.nextToken();
-    	String newStrDate = strtok.nextToken() + "-" + month + "-" + day;
+        String newStrDate = _strDate;
+        if(_strDate.indexOf("/") != -1){
+           	StringTokenizer strtok = new StringTokenizer(_strDate,"/",false);
+    		String month = strtok.nextToken();
+    		String day = strtok.nextToken();
+    		newStrDate = strtok.nextToken() + "-" + month + "-" + day;
+    	}
     	return Date.valueOf(newStrDate);
     }
     
@@ -794,6 +797,9 @@ public class SSTableModel extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.8  2004/09/27 15:48:17  prasanth
+ * Added function to disable insertions.
+ *
  * Revision 1.7  2004/08/10 22:06:58  yoda2
  * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
  *
