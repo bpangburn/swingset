@@ -97,7 +97,8 @@ public class SSDBNavImp extends SSDBNavAdapter {
             } else if (comps[i] instanceof SSDBComboBox) {
             // IF ITS A SSDBComboBox THEN SEE IF THERE ARE ANY ITEMS INSIDE IT  IF YES SET IT TO
             // 'EMPTY' ITEM BEFORE FIRST ITEM
-                JComboBox combo = ((SSDBComboBox)comps[i]).getComboBox();
+                //JComboBox combo = ((SSDBComboBox)comps[i]).getComboBox();
+                JComboBox combo = ((SSDBComboBox)comps[i]);
                 combo.setSelectedIndex(-1);
             } else if(comps[i] instanceof SSImage) {
             // IF ITS SSIMAGE CLEAR THE IMAGE.
@@ -136,7 +137,8 @@ public class SSDBNavImp extends SSDBNavAdapter {
             } else if (comps[i] instanceof SSDBComboBox) {
             // IF ITS A SSDBComboBox THEN SEE IF THERE ARE ANY ITEMS INSIDE IT  IF YES SET IT TO
             // 'EMPTY' ITEM BEFORE FIRST ITEM
-                JComboBox combo = ((SSDBComboBox)comps[i]).getComboBox();
+                //JComboBox combo = ((SSDBComboBox)comps[i]).getComboBox();
+                JComboBox combo = ((SSDBComboBox)comps[i]);
                 combo.setSelectedIndex(-1);
             } else if(comps[i] instanceof SSImage) {
             // IF ITS SSIMAGE CLEAR THE IMAGE.
@@ -159,6 +161,9 @@ public class SSDBNavImp extends SSDBNavAdapter {
 
 /*
  * $Log$
+ * Revision 1.9  2005/01/18 22:27:28  yoda2
+ * Changed to extend JComboBox rather than JComponent.  Deprecated bind(), setSSRowSet(), & setColumnName().
+ *
  * Revision 1.8  2005/01/18 21:00:47  prasanth
  * Added support for SSImage in performPreInsertOps.
  *
