@@ -336,6 +336,25 @@ public class SSTableModel extends AbstractTableModel {
      * @param _column    the column whose value is to be changed
      */
     public void setValueAt(Object _value, int _row, int _column) {
+            
+        // GET THE TYPE OF THE COLUMN    
+            int type = -1;
+            try{
+                type = rowset.getColumnType(_column + 1);        
+            } catch(SQLException se) {
+                se.printStackTrace();
+                if (component != null) {
+                    JOptionPane.showMessageDialog(component,"Error while updating the value.\n" + se.getMessage());
+                }
+                return;
+            }
+            
+            
+        // IF COPYING VALUES THE DATE WILL COME AS STRING SO CONVERT IT TO DATE OBJECT.
+            if(type == Types.TIMESTAMP || type == Types.DATE){
+                if(_value instanceof String)
+                    _value = getSQLDate((String)_value);
+            }
 
         // IF CELL EDITING INTERFACE IMPLEMENTATION IS PROVIDED INFO THE USER
         // THAT AN UPDATE FOR CELL HAS BEEN REQUESTED.
@@ -376,7 +395,7 @@ public class SSTableModel extends AbstractTableModel {
                 return;
             }
 
-            int type = rowset.getColumnType(_column + 1);
+            
             switch(type) {
                 case Types.INTEGER:
                 case Types.SMALLINT:
@@ -515,6 +534,7 @@ public class SSTableModel extends AbstractTableModel {
 
        } catch(SQLException se) {
             se.printStackTrace();
+            inInsertRow = false;
             if (component != null) {
                 JOptionPane.showMessageDialog(component,"Error while trying to insert row.\n" + se.getMessage());
             }
@@ -893,6 +913,9 @@ public class SSTableModel extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.19  2005/03/09 21:45:26  prasanth
+ * Added TIMESTAMP column type in setValueAt & getValueAt functions.
+ *
  * Revision 1.18  2005/02/09 22:20:05  yoda2
  * JavaDoc cleanup.
  *
