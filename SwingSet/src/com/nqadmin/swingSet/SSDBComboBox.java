@@ -41,6 +41,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import com.nqadmin.swingSet.datasources.SSRowSet;
+import com.nqadmin.swingSet.datasources.SSConnection;
 import javax.swing.border.*;
 import javax.swing.text.*;
 import javax.swing.event.*;
@@ -131,7 +132,7 @@ public class SSDBComboBox extends JComponent {
     private JComboBox  cmbDisplayed  = new JComboBox();
 
     // DATABASE CONNECTION OBJECT
-    private transient Connection conn = null;
+    private SSConnection conn = null;
 
     // QUERY USED TO RETRIEVE ALL POSSIBLE VALUES.
     private String query = null;
@@ -187,7 +188,7 @@ public class SSDBComboBox extends JComponent {
      *
      * @deprecated
      */
-    public SSDBComboBox(Connection _conn, String _query, String _columnName, String _displayColumnName, JTextField _textField) {
+    public SSDBComboBox(SSConnection _conn, String _query, String _columnName, String _displayColumnName, JTextField _textField) {
 
         super();
         
@@ -211,7 +212,7 @@ public class SSDBComboBox extends JComponent {
      * @param _columnName column name whose value has to be stored.
      * @param _displayColumnName column name whose values are displayed in the combo box.
      */
-    public SSDBComboBox(Connection _conn, String _query, String _columnName, String _displayColumnName) {
+    public SSDBComboBox(SSConnection _conn, String _query, String _columnName, String _displayColumnName) {
 
         super();
 
@@ -241,7 +242,7 @@ public class SSDBComboBox extends JComponent {
      *
      * @param _conn    connection object used for database.
      */
-    public void setConnection(Connection _conn) {
+    public void setConnection(SSConnection _conn) {
         conn = _conn;
     }
 
@@ -319,9 +320,9 @@ public class SSDBComboBox extends JComponent {
     /**
      * Returns connection object used to get values from database.
      *
-     * @return returns a Connection object.
+     * @return returns a SSConnection object.
      */
-    public Connection getConnection() {
+    public SSConnection getConnection() {
         return conn;
     }
 
@@ -433,7 +434,7 @@ public class SSDBComboBox extends JComponent {
 
         this.removeListeners();
 
-        Statement statement = conn.createStatement();
+        Statement statement = conn.getConnection().createStatement();
 
         if (query.equals("")) {
             throw new Exception("Query is empty");
@@ -935,6 +936,9 @@ public class SSDBComboBox extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.13  2004/10/25 22:03:18  yoda2
+ * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ *
  * Revision 1.12  2004/10/25 19:51:03  prasanth
  * Modified to use the new SSRowSet instead of  RowSet.
  *
