@@ -159,6 +159,11 @@ public class SSTableModel extends AbstractTableModel {
 			// ROW COUNT
 			rowCount = rowset.getRow();
 			rowset.first();
+			
+// following code added 11-01-2004 per forum suggestion from Diego Gil (dags)
+			// IF DATA CHANGES, ALERT LISTENERS
+			this.fireTableDataChanged();
+// end additions			
 		
 		} catch(SQLException se) {
 			se.printStackTrace();
@@ -250,11 +255,15 @@ public class SSTableModel extends AbstractTableModel {
 	        		break;
 	        	case Types.BIGINT:
 	       			value = new Long(rowset.getLong(_column+1));
-	        		break;	
+	        		break;
+				case Types.FLOAT:
+					value = new Float(rowset.getFloat(_column+1));
+					break;
 	        	case Types.DOUBLE:
-	        	case Types.FLOAT:	
+				case Types.NUMERIC:
 	       			value = new Double(rowset.getDouble(_column+1));
 	        		break;
+				case Types.BOOLEAN:
 	        	case Types.BIT:
 		   			value = new Boolean(rowset.getBoolean(_column+1));
 	        		break;
@@ -337,11 +346,17 @@ public class SSTableModel extends AbstractTableModel {
 	        		rowset.updateInt(_column+1, ((Integer)_value).intValue());
 	        		break;
 	        	case Types.BIGINT:
-	        		break;	
+// adding update long support 11-01-2004
+					rowset.updateLong(_column+1,((Long)_value).longValue());
+	        		break;
+				case Types.FLOAT:
+					rowset.updateFloat(_column+1, ((Float)_value).floatValue());
+					break;
 	        	case Types.DOUBLE:
-	        	case Types.FLOAT:	
+				case Types.NUMERIC:
 	        		rowset.updateDouble(_column+1, ((Double)_value).doubleValue());
 	        		break;
+				case Types.BOOLEAN:
 	        	case Types.BIT:
 	        		rowset.updateBoolean(_column+1, ((Boolean)_value).booleanValue());
 	        		break;
@@ -415,11 +430,17 @@ public class SSTableModel extends AbstractTableModel {
 	        		rowset.updateInt(_column+1, ((Integer)_value).intValue());
 	        		break;
 	        	case Types.BIGINT:
-	        		break;	
+// adding update long support 11-01-2004
+					rowset.updateLong(_column+1,((Long)_value).longValue());				
+	        		break;
+				case Types.FLOAT:
+					rowset.updateFloat(_column+1, ((Float)_value).floatValue());
+					break;
 	        	case Types.DOUBLE:
-	        	case Types.FLOAT:	
+				case Types.NUMERIC:
 	        		rowset.updateDouble(_column+1, ((Double)_value).doubleValue());
 	        		break;
+				case Types.BOOLEAN:
 	        	case Types.BIT:
 	        		rowset.updateBoolean(_column+1, ((Boolean)_value).booleanValue());
 	        		break;
@@ -488,11 +509,15 @@ public class SSTableModel extends AbstractTableModel {
 		        		break;
 		        	case Types.BIGINT:
 		        		rowset.updateLong(column.intValue()+1, ((Long)defaultValuesMap.get(column)).longValue());
-		        		break;	
+		        		break;
+					case Types.FLOAT:
+						rowset.updateFloat(column.intValue()+1, ((Float)defaultValuesMap.get(column)).floatValue());
+						break;
 		        	case Types.DOUBLE:
-		        	case Types.FLOAT:	
+					case Types.NUMERIC:
 		        		rowset.updateDouble(column.intValue()+1, ((Double)defaultValuesMap.get(column)).doubleValue());
 		        		break;
+					case Types.BOOLEAN:
 		        	case Types.BIT:
 		        		rowset.updateBoolean(column.intValue()+1, ((Boolean)defaultValuesMap.get(column)).booleanValue());
 		        		break;
@@ -535,28 +560,32 @@ public class SSTableModel extends AbstractTableModel {
         }
 
         switch(type) {
-            case Types.CHAR:
-            case Types.VARCHAR:
-            case Types.LONGVARCHAR:
-                return String.class;
-    
-            case Types.BIT:
-                return Boolean.class;
-    
-            case Types.TINYINT:
-            case Types.SMALLINT:
             case Types.INTEGER:
+            case Types.SMALLINT:
+            case Types.TINYINT:
                 return Integer.class;
-    
+				
             case Types.BIGINT:
                 return Long.class;
-    
-            case Types.FLOAT:
+				
+			case Types.FLOAT:
+				return Float.class;
+				
             case Types.DOUBLE:
+			case Types.NUMERIC:
                 return Double.class;
+    
+            case Types.BOOLEAN:
+			case Types.BIT:
+                return Boolean.class;
     
             case Types.DATE:
                 return java.sql.Date.class;
+				
+			case Types.CHAR:
+            case Types.VARCHAR:
+            case Types.LONGVARCHAR:
+                return String.class;
     
             default:
                 return Object.class;
@@ -688,11 +717,15 @@ public class SSTableModel extends AbstractTableModel {
 	        		break;
 	        	case Types.BIGINT:
 	        		rowset.updateLong(primaryColumn+1,((Long)dataValue.getPrimaryColumnValue()).longValue());
-	        		break;	
-	        	case Types.DOUBLE:
-	        	case Types.FLOAT:	
+	        		break;
+				case Types.FLOAT:
+					rowset.updateFloat(primaryColumn+1,((Float)dataValue.getPrimaryColumnValue()).floatValue());
+					break;
+				case Types.DOUBLE:
+				case Types.NUMERIC:
 	        		rowset.updateDouble(primaryColumn+1,((Double)dataValue.getPrimaryColumnValue()).doubleValue());
 	        		break;
+				case Types.BOOLEAN:
 	        	case Types.BIT:
 	        		rowset.updateBoolean(primaryColumn+1,((Boolean)dataValue.getPrimaryColumnValue()).booleanValue());
 	        		break;
@@ -794,6 +827,9 @@ public class SSTableModel extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.11  2004/10/25 22:13:43  yoda2
+ * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ *
  * Revision 1.10  2004/10/25 19:51:03  prasanth
  * Modified to use the new SSRowSet instead of  RowSet.
  *

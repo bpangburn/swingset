@@ -423,18 +423,10 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                 // IF THE TEXT IS EMPTY THEN YOU HAVE TO INSERT A NULL
                 // THIS IS ESPECIALLY THE CASE IF THE DATA TYPE IS NOT TEXT.
                 // SO CHECK TO SEE IF THE GIVEN TEXT IS EMPTY IF SO AND NULL TO THE DATABASE
-    
-                // IF DATA TYPE IS BOOLEAN THEN CALL UPDATEBOOLEAN FUNCTION
-                case Types.BOOLEAN:
-                    if (strValue.equals("")) {
-                        rs.updateNull(columnName);
-                    } else {
-                        // CONVERT THE GIVEN STRING TO BOOLEAN TYPE
-                        boolean boolValue = Boolean.getBoolean(strValue);
-                        rs.updateBoolean(columnName, boolValue);
-                    }
-                    break;
-                case Types.SMALLINT:
+				
+				case Types.INTEGER:
+				case Types.SMALLINT:
+				case Types.TINYINT:
                     // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
                     if ( strValue.equals("") ) {
                         rs.updateNull(columnName);
@@ -443,15 +435,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                         rs.updateInt(columnName, intValue);
                     }
                     break;
-                case Types.INTEGER:
-                    // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-                    if ( strValue.equals("") ) {
-                        rs.updateNull(columnName);
-                    } else {
-                        int intValue = Integer.parseInt(strValue);
-                        rs.updateInt(columnName, intValue);
-                    }
-                    break;
+					
                 case Types.BIGINT:
                     // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
                     if ( strValue.equals("") ) {
@@ -461,7 +445,19 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                         rs.updateLong(columnName, longValue);
                     }
                     break;
+					
+                case Types.FLOAT:
+                    // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
+                    if ( strValue.equals("") ) {
+                        rs.updateNull(columnName);
+                    } else {
+                        float floatValue = Float.parseFloat(strValue);
+                        rs.updateFloat(columnName, floatValue);
+                    }
+                    break;					
+					
                 case Types.DOUBLE:
+				case Types.NUMERIC:
                     // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
     //				System.out.println("ppr" + strValue + "ppr");
                     if ( strValue.equals("") ) {
@@ -471,26 +467,23 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                         rs.updateDouble(columnName, doubleValue);
                     }
                     break;
-                case Types.FLOAT:
-                    // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-                    if ( strValue.equals("") ) {
+    
+                case Types.BOOLEAN:
+				case Types.BIT:				
+                    if (strValue.equals("")) {
                         rs.updateNull(columnName);
                     } else {
-                        float floatValue = Float.parseFloat(strValue);
-                        rs.updateFloat(columnName, floatValue);
+                        // CONVERT THE GIVEN STRING TO BOOLEAN TYPE
+                        boolean boolValue = Boolean.getBoolean(strValue);
+                        rs.updateBoolean(columnName, boolValue);
                     }
                     break;
-                case Types.VARCHAR:
-                case Types.CHAR:
-                    // SINCE THIS IS TEXT FILED WE CAN INSERT AN EMPTY STRING TO THE DATABASE
-    //				System.out.println( columnName + "      " + strValue);
-                    rs.updateString(columnName, strValue);
-                    break;
+
                 case Types.DATE:
                     // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
                     if ( strValue.equals("") ) {
                         rs.updateNull(columnName);
-                    } else if (strValue.length() ==10) {
+                    } else if (strValue.length() == 10) {
     //					System.out.println(strValue);
     //					Date dateValue = Date.valueOf(strValue);
                         rs.updateDate(columnName, getSQLDate(strValue));
@@ -498,6 +491,15 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                         // do nothing                    
                     }
                     break;
+
+                case Types.CHAR:
+                case Types.VARCHAR:
+				case Types.LONGVARCHAR:
+                    // SINCE THIS IS TEXT FILED WE CAN INSERT AN EMPTY STRING TO THE DATABASE
+    //				System.out.println( columnName + "      " + strValue);
+                    rs.updateString(columnName, strValue);
+                    break;
+
                 default:
                     System.out.println("Unknown data type");
             } // end switch
@@ -519,33 +521,30 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 			// BASED ON THE COLUMN DATA TYPE THE CORRESPONDING FUNCTION
 			// IS CALLED TO GET THE VALUE IN THE COLUMN
             switch(columnType) {
-                case Types.BOOLEAN:
-                    value = String.valueOf(rs.getBoolean(columnName));
-                    break;
                 case Types.INTEGER:
                 case Types.SMALLINT:
+				case Types.TINYINT:
                     value = String.valueOf(rs.getInt(columnName));
                     break;
+					
                 case Types.BIGINT:
                     value = String.valueOf(rs.getLong(columnName));
                     break;
-                case Types.DOUBLE:
-                    value = String.valueOf(rs.getDouble(columnName));
-                    break;
+
                 case Types.FLOAT:
                     value = String.valueOf(rs.getFloat(columnName));
                     break;
-                case Types.VARCHAR:
-                    String str = rs.getString(columnName);
-                    if (str == null) {
-                        value = "";
-                    } else {
-                        value = String.valueOf(str);
-                    }
+					
+                case Types.DOUBLE:
+				case Types.NUMERIC:
+                    value = String.valueOf(rs.getDouble(columnName));
                     break;
-                case Types.CHAR:
-                	value = rs.getString(columnName);
-                	break;    
+					
+                case Types.BOOLEAN:
+				case Types.BIT:
+                    value = String.valueOf(rs.getBoolean(columnName));
+                    break;
+
                 case Types.DATE:
                     Date date = rs.getDate(columnName);
                     if (date == null) {
@@ -567,6 +566,18 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                         //value = String.valueOf(rs.getDate(columnName));
                     }
                     break;
+
+                case Types.CHAR:
+				case Types.VARCHAR:
+				case Types.LONGVARCHAR:
+                    String str = rs.getString(columnName);
+                    if (str == null) {
+                        value = "";
+                    } else {
+                        value = String.valueOf(str);
+                    }
+                    break;
+
                 default:
                     System.out.println(columnName + " : UNKNOWN DATA TYPE ");
             } // end switch
@@ -600,6 +611,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.12  2004/10/25 22:13:43  yoda2
+ * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ *
  * Revision 1.11  2004/10/25 19:51:03  prasanth
  * Modified to use the new SSRowSet instead of  RowSet.
  *
