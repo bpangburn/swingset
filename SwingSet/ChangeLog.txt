@@ -5,15 +5,39 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 $Id$
 
 ==============================================================================
-SwingSet 0.x.x-beta - Released TBA
+SwingSet 0.8.2-beta - Released TBA
 ==============================================================================
 
 Changes:
 	SSDataNavigator:
 		1. Changed button names in code to more meaningful names
            (e.g. button1 -> firstButton)
+        2.Refresh was calling next() twice. This was causing a problem
+          when the rowset has just one record.
+		3.Moving to the last record when the user presses the commit
+		  button to save the record. This would keep the user in the
+		  added record.
+		4.Added rowset listener to keep track of the record number,
+		  if the rowset is navigated out side of the navigation bar 
+		  (using rowset navigation methods).
+		5.Displaying exception messages, if one occurs when a button
+		  is pressed.
+	
+	SSComboBox:
+		1.Added support for mapping values in setDisplay function.
+		2.Combo Listener was not handling mapping values so added that.
+		3.Added a constant to indicate that there is no selection in combobox.
+ 		  This value will be returned when  the selected index in combo box 
+ 		  is -1.
+		4.Changed the codes for MALE & FEMALE constants, also changed
+		  the order in which they are added to the combo.
 
+	SSDBComboBox:
+		1.Updating the numberOfItems variable in deleteItem & addItem
+		  functions.
            
+    SSTextField:
+    	1.The default mask is set to nothing. Previously it was MMDDYYYY.
 ==============================================================================
 SwingSet 0.8.1-beta - Released 08-13-2004
 ==============================================================================
