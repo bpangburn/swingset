@@ -57,34 +57,34 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
 public class SSImage extends JPanel{
     
     /**
-     *  ImageIcon to store the image.
+     * ImageIcon to store the image.
      */
     protected ImageIcon img;
     
     /**
-     *  Label to display the image
+     * Label to display the image
      */
     protected JLabel lblImage = new JLabel("No Picture");
     
     /**
-     *  Button to update the image.
+     * Button to update the image.
      */
     protected JButton btnUpdateImage = new JButton("Update");
     
     /**
-     *  RowSet to which image has to be written or from which image has to be read.
+     * SSRowSet from which component will get/set values.
      */
     protected SSRowSet rowset;
-    
+
     /**
-     *  Column name in which image is stored.
+     * SSRowSet column to which the component will be bound.
      */
     protected String columnName;
     
     /**
-     *  RowSet listener
+     * RowSet listener
      */
-    protected MyRowSetListener rowsetListener = new MyRowSetListener();
+    private final MyRowSetListener rowsetListener = new MyRowSetListener();
     
     /**
      *
@@ -97,8 +97,8 @@ public class SSImage extends JPanel{
     /**
      * Constructs a SSImage Object bound to the specified column in the specified rowset.
      *
-     * @param rowset - rowset from/to which data has to be read/written
-     * @param columnName - column in the rowset to which the component should be bound.
+     * @param _rowset - rowset from/to which data has to be read/written
+     * @param _columnName - column in the rowset to which the component should be bound.
      */
     public SSImage(SSRowSet _rowset, String _columnName) {
         rowset = _rowset;
@@ -162,7 +162,7 @@ public class SSImage extends JPanel{
     /**
      *  Adds the label and button to the panel
      */
-    protected void addComponents(){
+    protected void addComponents() {
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
@@ -176,9 +176,9 @@ public class SSImage extends JPanel{
     }
     
     /**
-     * Sets the new SSRowSet for the image component.
+     * Sets the SSRowSet to which the component is bound.
      *
-     * @param _rowset  SSRowSet to which the image has to update values.
+     * @param _rowset    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _rowset) {
         rowset = _rowset;
@@ -186,9 +186,10 @@ public class SSImage extends JPanel{
     }    
 
     /**
-     * Sets the column name for the combo box
+     * Sets the SSRowSet column name to which the component is bound.
      *
-     * @param _columnName   name of column
+     * @param _columnName    column name in the SSRowSet to which the component
+     *    is bound
      */
     public void setColumnName(String _columnName) {
         columnName = _columnName;
@@ -196,23 +197,22 @@ public class SSImage extends JPanel{
     }
     
     /**
-     * Returns the column name to which the combo is bound.
+     * Returns the SSRowSet column name to which the component is bound.
      *
-     * @return returns the column name to which to combo box is bound.
+     * @return column name to which the component is bound
      */
     public String getColumnName() {
         return columnName;
     }
     
     /**
-     * Returns the SSRowSet being used to get the values.
+     * Returns the SSRowSet to which the component is bound.
      *
-     * @return returns the SSRowSet being used.
+     * @return SSRowSet to which the component is bound
      */
     public SSRowSet getSSRowSet() {
         return rowset;
     }      
-    
     
     /**
      * Changes the image to the specified image.
@@ -244,9 +244,10 @@ public class SSImage extends JPanel{
 */    
     
     /**
-     *  Binds SSImage to the columnName in the rowset.
-     *@param rowset - rowset from/to which data has to be read/written
-     *@param columnName - column in the rowset to which the component should be bound.
+     * Sets the SSRowSet and column name to which the component is to be bound.
+     *
+     * @param _rowset    datasource to be used.
+     * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _rowset, String _columnName) {
         rowset = _rowset;
@@ -255,7 +256,7 @@ public class SSImage extends JPanel{
     }
     
     /**
-     * Binds SSImage to the columnName in the rowset.
+     * Method for handling binding of component to a SSRowSet column.
      */
     protected void bind() {
         
@@ -274,18 +275,23 @@ public class SSImage extends JPanel{
             addListeners();        
     }
 
-    // ADDS LISTENERS FOR THE COMBO BOX AND TEXT FIELD
+    /**
+     * Adds listeners for component and bound text field (where applicable).
+     */
     private void addListeners() {
         rowset.addRowSetListener(rowsetListener);
     }
 
-    // REMOVES THE LISTENERS FOR TEXT FIELD AND THE COMBO BOX DISPLAYED
+    /**
+     * Removes listeners for component and bound text field (where applicable).
+     */
     private void removeListeners() {
         rowset.removeRowSetListener(rowsetListener);
     }    
     
     /**
-     * Reads the image from the rowset and sets it to the label for display.
+     * Updates the value displayed in the component based on the SSRowSet column
+     * binding.
      */
     protected void setDisplay() {
 
@@ -355,6 +361,9 @@ public class SSImage extends JPanel{
 
 /*
  *$Log$
+ *Revision 1.3  2005/02/04 22:48:54  yoda2
+ *API cleanup & updated Copyright info.
+ *
  *Revision 1.2  2005/02/02 23:37:19  yoda2
  *API cleanup.
  *
