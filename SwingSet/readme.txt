@@ -67,37 +67,50 @@ The SwingSet feature-set currently includes:
     (g) allows deletion of multiple, non-consecutive records
     (h) allows data entry "masks" to be applied to text columns
     
-For version 0.8.0 all components have been made into Java Beans which will
-allow for better integration with Java IDEs.  As part of this, the SwingSet
-components were serialized and the methods for accessing each component were
-standardized across the toolkit.  Major usability enhancements include cut &
-paste support from the data grid to/from spreadsheet programs and/or other
-data grids, addition of current record index and total record count to the data
-navigator, and default selection of an "empty" item for combo boxes.  See
-ChangeLog.txt for more information.
+For version 0.9.0 a datasource abstraction layer has been added to SwingSet.
+All of the SwingSet components now based on a new SSRowSet interface rather than
+Sun's existing RowSet interface.  The SSRowSet differs from RowSet in two
+important ways:
+  1. SSRowSet extends serializable which greatly facilitates serialization/
+     deserialization in the rest of the SwingSet components
+  2. SSRowSet only contains methods necessary to support the data types in used
+     by SSTextDocument which will make writing SSRowSet implementations for
+	 non-updatable RowSets and other non-database datasources (e.g. a HashMap)
+	 much easier
+	 
+A SSJdbcRowSetImpl implementation of SSRowSet is provided to replace the
+JdbcRowSetImpl used in most existing SwingSet applications.  It is basically a
+serialized wrapper of JdbcRowSetImpl.  It can be used in conjunction with the
+new SSConnection, a serialized wrapper of the Connection interface, which
+handles serialization/deserialization of database connection info (path,
+username, password, etc.).  Finally, an SSRowSetAdapter is provided with empty
+method implementations of everything in SSRowSet.  This adapter can be easily
+extended with non-empty method implementations for non-database datasources.
 
-Note that the 0.8.3 release is the last planned release in the 0.8.X series and
-contains primarily bug fixes and usability enhancements.  The 0.9.0 release will
-follow shortly and will contain a new serialized datasource abstraction layer.
-This will greatly facilitate serialization/deserialization of the various
-SwingSet components and will pave the way for SwingSet compatibility with non-
-up datable rowsets and other non-database datasources.  Unfortunately,
-applications written for 0.8.X and earlier versions of SwingSet will require
-some small changes related to database connections and rowset objects in order
-to work with the 0.9.X and later versions.  We will make every effort to
-constrain and minimize the required changes.  The 0.8.3 release should supply
-developers with the latest fixes and provide the maximum migration time as
-0.8.3 and 0.9.0 should be identical in all aspects other than the datasource
-abstraction layer.
-    
-    
+To accommodate non-updatable RowSets, SSJdbcRowSetImpl can be extended with
+custom setXYZ() methods to handle database updates via INSERT/UPDATE queries.
+SSJdbcRowSetImpl can also serve as a template for writing SSRowSet wrappers for
+other RowSets (e.g. CachedRowSet, WebRowSet, etc.).
+
+Unfortunately, the introduction of the SSRowSet require modification of
+existing SwingSet applications, but with the SSJdbcRowSetImpl and SSConnection,
+these changes should be minimal.  In order to provide maximum migration time,
+the 0.8.3-beta version of SwingSet was released on 10-22-2004 with all of the
+latest bugfixes and enhancements.  Other than the new datasource abstraction
+layer, 0.8.3 and 0.9.0 are identical.
+
+Our goal for the 0.9.X series is to focus on bug squashing and possibly some
+minor feature enhancements.  We hope to have a 1.0 production release by the
+end of the year.
+
+
 ==============================================================================
 DETAILS
 ==============================================================================
 
 SwingSet utilizes SSTextDocument, an extension of the standard PlainDocument
 class to link the JTextField or JTextArea to a database column within a
-RowSet.  In addition, custom classes are provided to replace the standard
+SSRowSet.  In addition, custom classes are provided to replace the standard
 JComboBox and JCheckBox. The SSComboBox provides an Access-like combobox that
 can be used to display user-specified text choices based on an underlying
 numeric column (e.g. allows my_table!choice_code, an integer column with valid
@@ -127,6 +140,12 @@ rollback  of a RowSet. The numerical index is show for the current record and
 the total number of records is displayed. Changes to the current record are
 auto-committed when a navigation takes place (also similar to Access).
 
+
+
+
+
+
+
 More information on SwingSet is available from:
 http://swingset.sourceforge.net 
 and
@@ -145,7 +164,7 @@ Implementation of the JDBC RowSet is required (free registration required).
 It is available in a Zip file from:
 http://developer.java.sun.com/developer/earlyAccess/jdbc/jdbc-rowset.html
 
-If using J2SE 1.5.0 Beta 1 or later, RowSet is already included.
+If using J2SE 1.5.0 Beta 1 or later, JdbcRowSetImpl is already included.
 
 Download the latest SwingSet binary JAR file from:
 http://sourceforge.net/projects/swingset
@@ -191,10 +210,10 @@ the JAR file ssdemo.jar to launch the demo.  If that doesn't work then type:
   java -jar <demo jar file name here>
   
   e.g.
-       java -jar swingset-demo_0.8.3_beta.jar
+       java -jar swingset-demo_0.9.0_beta.jar
   
 Please note that the demo requires both the rowset.jar and latest SwingSet
-binary JAR files (e.g. swingset-bin_0.8.3_beta.jar). See the "INSTALLATION"
+binary JAR files (e.g. swingset-bin_0.9.0_beta.jar). See the "INSTALLATION"
 section above for more information.
 
 The demo will attempt to connect to a small, remote, read only database so an
@@ -271,14 +290,14 @@ CLASS DESCRIPTIONS - SWINGSET COMPONENTS
 ***********************
 SSTextField
 ***********************
-SSTextField extends the JTextField. This class provides different masks
-including a date mask, a social security number mask, etc.
+SSTextField extends the JTextField. This class provides SSRowSet binding and
+different masks including a date mask, a social security number mask, etc.
 
 
 ***********************
 SSTextArea
 ***********************
-SSTextArea extends the JTextArea to include rowset binding.
+SSTextArea extends the JTextArea to include SSRowSet binding.
 
 
 ***********************
@@ -348,48 +367,47 @@ e.g.
      want to store the id of the part chosen by the user in the shipment
      table.
 
-     Connection connection = null;
-     JdbcRowSet rowset = null;
+     SSConnection ssConnection = null;
+     SSJdbcRowSetImpl ssJdbcRowSet = null;
      SSDataNavigator navigator = null;
      SSDBComboBox combo = null;
      
      try {
 
-     // CREATE A DATABASE CONNECTION OBJECT
-          Connection connection = new Connection(........);
+    // CREATE A DATABASE CONNECTION OBJECT
+        ssConnection = new SSConnection(........);
           
-     // CREATE AN INSTANCE OF JDBC ROWSET
-          JdbcRowset rowset = new JdbcRowSet();
-          rowset.setUrl("<database path>");
-          rowset.setUsername("user");
-          rowset.setPassword("pass");
-          rowset.setCommand("SELECT * FROM shipment_data;");
+    // CREATE AN INSTANCE OF SSJdbcRowSetImpl
+        ssJdbcRowSet = new SSJdbcRowSetImpl(ssConnection);
+        ssJdbcRowSet.setCommand("SELECT * FROM shipment_data;");
           
-     // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE ROWSET.
-     // IF YOU ARE NOT USING THE DATA NAVIGATOR YOU HAVE TO INCLUDE THOSE.
-     //   rowset.execute();
-     //   rowset.next();
-          SSDataNavigator navigator = new SSDataNavigator(rowset);
+    // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE ROWSET.
+    // IF YOU ARE NOT USING THE DATA NAVIGATOR YOU HAVE TO INCLUDE THOSE.
+    //   ssJdbcRowSet.execute();
+    //   ssJdbcRowSet.next();
+        SSDataNavigator navigator = new SSDataNavigator(ssJdbcRowSet);
 
-     // QUERY FOR THE COMBOBOX.
-          String query = "SELECT * FROM part_data;";
+    // QUERY FOR THE COMBOBOX.
+        String query = "SELECT * FROM part_data;";
           
-     // CREATE AN INSTANCE OF THE SSDBCOMBOBOX WITH THE CONNECTION OBJECT
-     // QUERY AND COLUMN NAMES
-          combo = new SSDBComboBox(connection,query,"part_id","part_name");
+    // CREATE AN INSTANCE OF THE SSDBCOMBOBOX WITH THE CONNECTION OBJECT
+    // QUERY AND COLUMN NAMES
+        combo = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
           
-     // THIS BASICALLY SPECIFIES THE COLUMN AND THE ROWSET WHERE UPDATES HAVE
-     // TO BE MADE.
-          combo.bind(rowset,"part_id");
-          combo.execute();
+    // THIS BASICALLY SPECIFIES THE COLUMN AND THE ROWSET WHERE UPDATES HAVE
+    // TO BE MADE.
+        combo.bind(ssJdbcRowSet, "part_id");
+        combo.execute();
 
-    // CREATE A TEXTFIELD
-        JTextField myText = new JTextField();
+    // CREATE A TEXTFIELD - OLD WAY
+    //    JTextField myText = new JTextField();
+	// CREATE A TEXTFIELD - PREFERRED WAY
+		SSTextField myText = new SSTextField();
         
     // BIND TEXTFIELD - OLD WAY
-    //  myText.setDocument(new SSTextDocument(rowset, "quantity");
+    //  myText.setDocument(new SSTextDocument(ssJdbcRowSet, "quantity");
     // BIND TEXTFIELD - PREFERRED WAY.
-    	myText.bind(rowset, "quantity");
+    	myText.bind(ssJdbcRowSet, "quantity");
            
      } catch(Exception e) {
      // EXCEPTION HANDLER HERE...
@@ -407,14 +425,14 @@ e.g.
 SSDataNavigator
 ***********************
 Component that can be used for data navigation. It provides buttons for
-navigation, insertion, and deletion of records in a RowSet. The modification
-of a RowSet can be prevented using the setModificaton() method.  Any changes
+navigation, insertion, and deletion of records in a SSRowSet. The modification
+of a SSRowSet can be prevented using the setModificaton() method.  Any changes
 made to the columns of a record will be updated whenever there is a
 navigation.
 
 For example if you are displaying three columns using the JTextField and the
 user changes the text in the text fields then the columns will be updated to
-the new values when the user navigates the RowSet. If the user wants to revert
+the new values when the user navigates the SSRowSet. If the user wants to revert
 the changes he made he can press the Undo button, however this must be done
 before any navigation.  Once navigation takes place changes can't be reverted
 using Undo button (has to be done manually by the user).
@@ -424,7 +442,7 @@ using Undo button (has to be done manually by the user).
 SSDataGrid
 ***********************
 SSDataGrid provides a way to display information from a database in a table 
-format (aka "spreadsheet" or "datasheet" view). The SSDataGrid takes a rowset
+format (aka "spreadsheet" or "datasheet" view). The SSDataGrid takes a SSRowSet
 as a source of data. It also provides different cell renderers including a
 combo box renderer and a date renderer.
 
@@ -452,8 +470,6 @@ being added.
 ==============================================================================
 CLASS DESCRIPTIONS - SUPPORTING CLASSES
 ==============================================================================
-
-
 ***********************
 SSDBNav
 ***********************
@@ -489,7 +505,7 @@ SSDBNavAdapter
 Abstract class that provides empty implementations of all the methods for the
 SSDBNav interface.  
 
-This class is provided for convenience. so that users wishing to write their
+This class is provided for convenience so that users wishing to write their
 own SSDBNav implementations can just extend the abstract class and override
 the desired methods.
 
@@ -573,3 +589,46 @@ implementation.
 SSCellEditingAdapter defines empty functions so that the programmer can define
 only the functions desired.  Both isCellEditable() and cellUpdateRequested()
 always return true.
+
+
+==============================================================================
+CLASS DESCRIPTIONS - DATASOURCES
+==============================================================================
+***********************
+SSRowSet
+***********************
+Interface that extends serializable and basically clones the RowSet interface
+methods required by SSTextDocument.  Used as the basis for datasources
+throughout the SwingSet components.
+
+
+***********************
+SSRowSetAdapter
+***********************
+Abstract class that provides empty implementations of all the methods for the
+SSRowSet interface.  
+
+This class is provided for convenience so that users wishing to write their
+own SSRowSet implementations can just extend the abstract class and override
+the desired methods.
+
+
+***********************
+SSJdbcRowSetImpl
+***********************
+Implementation of SSRowSet that is basically a serializable wrapper for Sun's
+JdbcRowSetImpl.
+
+SSJdbcRowSetImpl can be extended with custom setXYZ() methods to handle
+database updates via INSERT/UPDATE queries.  SSJdbcRowSetImpl can also serve as
+a template for writing SSRowSet wrappers for other RowSets (e.g. CachedRowSet,
+WebRowSet, etc.).
+
+
+***********************
+SSConnection
+***********************
+Serializable wrapper for Sun's Connection interface.
+
+SSConnection handles serialization/deserialization of database connection info
+(path, username, password, etc.).
