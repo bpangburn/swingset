@@ -384,16 +384,17 @@ public class SSDataNavigator extends JPanel {
 
 			if (!rowset.next()) {
 				rowCount = 0;
+				currentRow = 0;
 			} else {
 			// IF THERE ARE ROWS GET THE ROW COUNT	
 				rowset.last();
 				rowCount = rowset.getRow();
 				rowset.first();
 				currentRow = rowset.getRow();
-			// SET THE ROW COUNT AS LABEL
-				lblRowCount.setText(String.valueOf(rowCount));	
-				txtCurrentRow.setText(String.valueOf(currentRow));
 			}
+		// SET THE ROW COUNT AS LABEL
+			lblRowCount.setText(String.valueOf(rowCount));	
+			txtCurrentRow.setText(String.valueOf(currentRow));
 		} catch(SQLException se) {
 			se.printStackTrace();
 		}
@@ -824,6 +825,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.9  2004/08/10 22:06:59  yoda2
+ * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
+ *
  * Revision 1.8  2004/08/02 15:04:06  prasanth
  * 1. Added a text field to display current row number.
  * 2. Added a label to display the total number of rows in the rowset.
