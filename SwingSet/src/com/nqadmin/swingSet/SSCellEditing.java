@@ -38,9 +38,9 @@ package com.nqadmin.swingSet;
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  *<p><pre>
  *
- *	The SSCellEditing interface specifies methods the SSTableModel will use to
- *interrogate whether a cell can be edited or if the specified value can be allowed
- *for the cell.
+ *	The SSCellEditing interface specifies the methods the SSTableModel will use to
+ *determine whether or not a given cell can be edited or if a user-specified
+ *value for a cell is valid or invalid.
  */
 public interface SSCellEditing {
 	
@@ -79,4 +79,7 @@ public interface SSCellEditing {
 
 /*
  * $Log$
+ * Revision 1.1  2003/12/16 18:02:47  prasanth
+ * Initial version.
+ *
  */

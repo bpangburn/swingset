@@ -41,11 +41,14 @@ import javax.swing.*;
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  *<p><pre
  *
- *	This abstract adapter class is provided as convenience for creating SSCellEditing objects.
- *Extend this class to create a SSCellEditing implementation.
+ *	This abstract adapter class is provided as a convenience for creating
+ *custom SSCellEditing objects.  Extend this class to create a SSCellEditing
+ *implementation.
  *
- *This class defines empty functions so that you can define only functions that you want to.
- *Both isCellEditable and  cellUpdateRequested always return true.
+ *	SSCellEditingAdapter defines empty functions so that the programmer can define
+ *only the functions desired.  Both isCellEditable() and cellUpdateRequested()
+ *always return true.
+ *
  */
 public abstract class SSCellEditingAdapter implements SSCellEditing {
 	
@@ -70,4 +73,7 @@ public abstract class SSCellEditingAdapter implements SSCellEditing {
 
 /*
  * $Log$
+ * Revision 1.1  2003/12/16 18:02:47  prasanth
+ * Initial version.
+ *
  */

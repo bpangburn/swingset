@@ -51,31 +51,35 @@ import java.util.EventObject;
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  *<p><pre>	
- *	SSDataGrid provided a way to display information in the database in a table 
- *format. The data grid takes a rowset as a source of data. It also provides
- *different renderers like combo boxes and date renderer.
+ *	SSDataGrid provides a way to display information from a database in a table 
+ *format (aka "spreadsheet" or "datasheet" view). The SSDataGrid takes a rowset
+ *as a source of data. It also provides different cell renderers including a
+ *comboboxes renderer and a date renderer.
  *
- *SSDataGrid internally uses the SSTableModel to display the information in a 
+ *	SSDataGrid internally uses the SSTableModel to display the information in a 
  *table format. SSDataGrid also provides an easy means for displaying headers.
- *Columns can be hidden or make uneditable. Inaddition to that it also provides
- *much finer control as to which cell can be edited and which can't be. It uses the
- *SSCellEditing  interface for acheiving this. Implemention of this interface also
- *provides a way to decide as to what kind of information is valid for each cell.
+ *Columns can be hidden or made uneditable. In addition, it provides much finer
+ *control over which cells can be edited and which cells can't be edited.  It
+ *uses the SSCellEditing interface for achieving this. The implementation of
+ *this interface also provides a way to specify what kind of information is valid
+ *for each cell.
  *
- *It uses the function in SSCellEditing to interogate as to weather a cell is editable
- *or not.  It further informs when a update is requested. While doing so it provides
- *the present value in the cell and also the new value. Based on this information the
- *new value can be rejected or accepted.
+ *	SSDataGrid uses the isCellEditable() method in SSCellEditing to determine if a
+ *cell is editable or not.  The cellUpdateRequested() method of SSCellEditing is
+ *used to notify a user program when an update is requested. While doing so it
+ *provides the present value in the cell and also the new value. Based on this
+ *information the new value can be rejected or accepted by the program.
  *
- *It also provides an extra row facilitating addition of rows to the table.
- *Default values for various columns can be set programatically also its possible to
- *specify which is the primary column field and supply a primary key for that column
- *when a new row is being added.
+ *	SSDataGrid also provides an "extra" row to facilitate the addition of rows to
+ *the table.  Default values for various columns can be set programmatically.  A
+ *programmer can also specify which column is the primary key column for the
+ *underlying rowset and supply a primary key for that column when a new row is
+ *being added.
  *
- *While using the headers always set them before you set the rowset.
+ *	While using the headers always set them before you set the rowset.
  *Otherwise the headers will not appear.
  *
- *Also if you are using column names rather than column numbers for different function
+ *	Also if you are using column names rather than column numbers for different function
  *you have to call them only after setting the rowset. Because SSDataGrid uses the 
  *rowset to convert the column names to column numbers. If you specify the column
  *numbers you can do before or after setting the rowset, it does not matter.
@@ -947,4 +951,7 @@ public class SSDataGrid extends JTable
 
 /*
  * $Log$
+ * Revision 1.3  2003/12/16 18:01:40  prasanth
+ * Documented versions for release 0.6.0
+ *
  */

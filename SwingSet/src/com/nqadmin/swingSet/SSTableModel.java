@@ -53,12 +53,13 @@ import java.util.StringTokenizer;
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  *<p><pre>
+ *	
+ *	SSTableModel provides an implementation of the TableModel interface.
+ *The SSDataGrid uses this class for providing a grid view for a rowset. 
+ *SSTableModel can be used without the SSDataGrid (e.g. in conjunction with a
+ *JTable), but the cell renderers and hidden columns features of the SSDataGrid
+ *will not be available.
  *
- *	SSTableModel provides an implementation of TableModel interface.
- *The SSDataGrid used this class for providing a Grid View for the 
- *data. This can be used with out using the SSDataGrid but the renderers
- *and hidden columns feature will not be availble if this is used directly
- *bypassing the SSDataGrid.
  *
  *	SSTableModel can be used with  a JTable to get a Grid view of the data.
  *
@@ -727,4 +728,7 @@ public class SSTableModel  extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.3  2003/12/16 18:01:40  prasanth
+ * Documented versions for release 0.6.0
+ *
  */
