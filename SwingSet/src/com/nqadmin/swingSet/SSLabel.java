@@ -86,6 +86,7 @@ public class SSLabel extends JLabel {
      * with no image and with an empty string for the title.
      */
     public SSLabel() {
+        super("<label text here>");
         init();
     }
 
@@ -290,6 +291,9 @@ public class SSLabel extends JLabel {
 
 /*
  * $Log$
+ * Revision 1.10  2005/02/10 20:13:03  yoda2
+ * Setter/getter cleanup & method reordering for consistency.
+ *
  * Revision 1.9  2005/02/10 03:46:47  yoda2
  * Replaced all setDisplay() methods & calls with updateDisplay() methods & calls to prevent any setter/getter confusion.
  *
