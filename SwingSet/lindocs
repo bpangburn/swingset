@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+# $Id$
+#
+# LINUX JAVADOC GENERATION SCRIPT FOR SWINGSET
+#
+javadoc -d javadoc ./com/nqadmin/swingSet/*.java
