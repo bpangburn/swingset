@@ -298,27 +298,39 @@ public class SSComboBox extends JComponent {
 
 		// SET THE COMBO BOX ITEM TO THE ITEM THAT CORRESPONDS TO THE VALUE IN TEXT FIELD
 		private void setDisplay() {
-			// GET THE DOCUMENT OF THE TEXT FIELD
-			Document doc = textField.getDocument();
 			try {
-
-				String text = doc.getText(0,doc.getLength());
-				if (text != null) {
-					int intValue = 0;
-					if ( !(text.trim().equals("")) ) {
-						intValue = Integer.parseInt(text);
-                    }
+				String text = textField.getText().trim();
+				if (!text.equals("")) {
+					int intValue = Integer.parseInt(text);
+                    
 					if (mappingValues == null ) {
 						if (intValue != cmbDisplayed.getSelectedIndex()) {
 							cmbDisplayed.setSelectedIndex(intValue);
                         }
 					} else {
-// SHOULD ADD CODE TO DEAL WITH THE MAPPING VALUES
+					// SEARCH THE MAPPING VALUES FOR THIS INT VALUE.
+					// AND SET THE SELECTED INDEX OF COMBO TO THE INDEX AT WHICH 
+					// THE INT VALUE IS FOUND IN THE MAPPINGS ARRAY.	
+						int i = 0;
+						for(i=0; i<mappingValues.length; i++){
+							if(mappingValues[i] == intValue){
+								cmbDisplayed.setSelectedIndex(i);
+								break;
+							}
+						}
+					// IF I == MAPPING VALUES LENGTH THEN IT MEANS THE VALUE IS NOT FOUND
+					// IN THE SPECIFIED MAPPINGS SO SET THE SELECTED ITEM TO BLANK	
+						if(i == mappingValues.length){
+							cmbDisplayed.setSelectedIndex(-1);
+						}
+						
 					}
 				}
+			// IF TEXT IS EMPTY THEN SET COMBO TO BLANK	
+				else{
+					cmbDisplayed.setSelectedIndex(-1);
+				}
 
-			} catch(BadLocationException ble) {
-				ble.printStackTrace();
 			} catch(NullPointerException npe) {
 				npe.printStackTrace();
 			} catch(NumberFormatException nfe) {
@@ -512,7 +524,9 @@ public class SSComboBox extends JComponent {
 						// IN CASE TWO: YOU HAVE TO CHECK IF THE VALUE IN THE MAPPINGVALUES ARRAY AT INDEX EQUAL
 						// TO THE SELECTED INDEX OF THE COMBO BOX EQUALS THE VALUE IN TEXT FIELD
 						// IF THESE CONDITIONS ARE MET YOU NEED NOT CHANGE COMBO BOX SELECTED ITEM
-						if ( (mappingValues==null && intValue != cmbDisplayed.getSelectedIndex()) || (mappingValues!=null && mappingValues[cmbDisplayed.getSelectedIndex()] != intValue) ) {
+						if ( (mappingValues==null && intValue != cmbDisplayed.getSelectedIndex()) || 
+							 (mappingValues!=null && cmbDisplayed.getSelectedIndex() == -1)       ||
+							 (mappingValues!=null && mappingValues[cmbDisplayed.getSelectedIndex()] != intValue) ) {
 
 							if (mappingValues==null && (intValue <0 || intValue >= cmbDisplayed.getItemCount() )) {
                             // IF EXPLICIT VALUES FOR THE ITEMS IN COMBO ARE NOT SPECIFIED THEN CODES START
@@ -579,13 +593,17 @@ public class SSComboBox extends JComponent {
 						// IN CASE TWO: YOU HAVE TO CHECK IF THE VALUE IN THE MAPPINGVALUES ARRAY AT INDEX EQUAL
 						// TO THE SELECTED INDEX OF THE COMBO BOX EQUALS THE VALUE IN TEXT FIELD
 						// IF THESE CONDITIONS ARE MET YOU NEED NOT CHANGE COMBO BOX SELECTED ITEM
-						if ( (mappingValues==null && intValue != cmbDisplayed.getSelectedIndex()) || (mappingValues!=null && mappingValues[cmbDisplayed.getSelectedIndex()] != intValue) ) {
+						if ( (mappingValues==null && intValue != cmbDisplayed.getSelectedIndex()) || 
+							 (mappingValues!=null && cmbDisplayed.getSelectedIndex() == -1)       ||
+							 (mappingValues!=null && mappingValues[cmbDisplayed.getSelectedIndex()] != intValue) ) {
 
 							if (mappingValues==null && (intValue <0 || intValue >= cmbDisplayed.getItemCount())) {
                             // IF EXPLICIT VALUES FOR THE ITEMS IN COMBO ARE NOT SPECIFIED THEN CODES START
                             // FROM ZERO. IN SUCH A CASE CHECK IF THE NUMBER EXCEEDS THE NUMBER OF ITEMS
                             // IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)                                
 //								System.out.println("Option: " +option );
+							// SET IT TO EMPTY
+								cmbDisplayed.setSelectedIndex(-1);
 								System.out.println("Error: value from DB:" + intValue + "  items in combo box: " + cmbDisplayed.getItemCount());
 							} else {
                             // IF MAPPINGS  ARE SPECIFIED THEN GET THE INDEX AT WHICH THE VALUE IN TEXT FIELD
@@ -601,6 +619,8 @@ public class SSComboBox extends JComponent {
 									// IF THAT VALUE IS NOT FOUND IN THE GIVEN MAPPING VALUES PRINT AN ERROR MESSAGE
 									if (i==mappingValues.length) {
 										System.out.println("insert ERROR: could not find a corresponding item in combo for value " + intValue);
+									// SET IT TO EMPTY	
+										cmbDisplayed.setSelectedIndex(-1);
 //										System.out.println(cmbDisplayed.getItemAt(0));
 //										System.out.println(cmbDisplayed.getSelectedItem());
 									}
@@ -642,23 +662,24 @@ public class SSComboBox extends JComponent {
 				//System.out.flush();
 				int index = cmbDisplayed.getSelectedIndex();
 				try {
-					String strValueInText = textField.getText();
-					int valueOfText = -1;
-					strValueInText = strValueInText.trim();
-					if ( !strValueInText.equals("") ) {
-						valueOfText = Integer.parseInt(strValueInText);
-                    }
-
-					if ( valueOfText != index ) {
-					// IF THE SELECTED INDEX IS -1
-					// SET TEXT TO EMPTY 	
-						if(index == -1){
-							textField.setText("");
-						}else{
+					if(index == -1){
+						textField.setText("");
+					}
+					else{
+						String strValueInText = textField.getText();
+						int valueOfText = -1;
+						strValueInText = strValueInText.trim();
+						if ( !strValueInText.equals("") ) {
+							valueOfText = Integer.parseInt(strValueInText);
+	                    }
+	
+						if ( mappingValues == null && valueOfText != index ) {
 							textField.setText( String.valueOf(index) );
 						}
-					}
-                    
+						else if(mappingValues != null && mappingValues.length > index && valueOfText != mappingValues[index]){
+							textField.setText(String.valueOf(mappingValues[index]));
+						}
+                    }
 				} catch(NullPointerException npe) {
 					npe.printStackTrace();
 				} catch(NumberFormatException nfe) {
@@ -676,6 +697,9 @@ public class SSComboBox extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.11  2004/08/12 23:51:16  prasanth
+ * Updating the value to null if the selected index is -1.
+ *
  * Revision 1.10  2004/08/10 22:06:59  yoda2
  * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
  *
