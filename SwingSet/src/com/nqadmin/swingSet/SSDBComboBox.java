@@ -767,6 +767,9 @@ public class SSDBComboBox extends JComponent {
                 } catch(NumberFormatException nfe) {
                 }
             }
+            else{
+            	textField.setText("");
+            }
 
             textField.getDocument().addDocumentListener(textFieldDocumentListener);
 
@@ -931,6 +934,9 @@ public class SSDBComboBox extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.9  2004/08/10 22:06:58  yoda2
+ * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
+ *
  * Revision 1.8  2004/08/09 15:39:48  prasanth
  * Added key listener to transfer focus on enter key.
  *
