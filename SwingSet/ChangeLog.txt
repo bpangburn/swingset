@@ -14,6 +14,14 @@ Changes:
         1. SSCheckBox added to replace deprecated SSDBCheckBox.
         2. SSLabel - new read-only label component based on JLabel
         3. SSSlider - new slider component based on JSlider
+        4. SSImage - new image component capable of storing, retrieving, &
+           displaying GIF & JPEG files.
+        5. SSCheckBoxBeanInfo, SSComboBoxBeanInfo, SSDataGridBeanInfo,
+           SSDataNavigatorBeanInfo, SSDBComboBoxBeanInfo, SSImageBeanInfo,
+           SSLabelBeanInfo, SSSliderBeanInfo, SSTextAreaBeanInfo,
+           SSTextFieldBeanInfo, SSConnectionBeanInfo, SSJdbcRowSetImplBeanInfo -
+           new support classes for managing bean-related properties.  Currently
+           only handle icon display.
     
     SSDBCheckBox:
         1. Added support for boolean database columns. Only tested with Postgresql.
@@ -22,6 +30,15 @@ Changes:
 
     SSTextDocument:
         1. Fixed boolean rowset update.
+        
+    (all classes)
+        1. cleaned up entire API to make methods as consistent as possible
+           across all components
+        2. deprecated methods, etc. which followed older naming conventions
+           (e.g. setRowSet() rather than setSSRowSet())
+        3. made any private data members or methods protected unless they were
+           listener-related
+        4. added, debugged, & standardized JavaDoc across all components
         
     (all classes, readme.txt, FAQ.txt, & ChangeLog.txt)
         1. Converted all tabs to soft tabs comprised of four actual spaces.
