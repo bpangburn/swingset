@@ -92,21 +92,27 @@ public class SSComboBox   extends JComponent {
 
 
 		// TEXT FIELD THAT WILL BE BOUND TO THE DATABASE
-		private JTextField textField = new JTextField();
+		protected  JTextField textField = new JTextField();
 
 		// COMBO BOX THAT DISPLAYS THE DESIRED ITEMS
-		private JComboBox  cmbDisplayed  = new JComboBox();
+		protected  JComboBox  cmbDisplayed  = new JComboBox();
 
 		// INSTANCE OF LISTENER FOR COMBO BOX
-		final MyComboListener cmbListener = new MyComboListener();
+		protected MyComboListener cmbListener = new MyComboListener();
 
 		// INSTANCE  OF LISTENER FOR THE TEXT FIELD BOUND TO DATABASE
-		final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
+		protected MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
-		private int option = 0;
+		protected  int option = 0;
 
 		// MAPPINGS FOR THE COMBO BOX ITEMS IF DIFFERENT FROM DEFAULTS (0,1,2,..)
-		int[] mappingValues = null;
+		protected int[] mappingValues = null;
+		
+		// ROWSET TO WHICH THE COMBO WILL GET VALUES FROM
+		protected transient RowSet rowset;
+		
+		// COLUMN NAME TO WHICH THE COMBO WILL BE BOUND TO
+		protected String columnName;
 
 		/**	
 		 *	Type used for combo box.
@@ -132,61 +138,135 @@ public class SSComboBox   extends JComponent {
 		 */
 		public SSComboBox() {
 			super();
+			addComponent();			
 		}
 
 		/**
 		 *	Creates an instance of SSComboBox and sets the text field with which the combo
 		 *box will be synchronized with.
+		 *@depricated
+		 *
 		 */
 		public SSComboBox(SSTextDocument document) {
 
 			super();
 
+			addComponent();
+	
 			this.setDocument(document);
-
 		}
 		
 		/**
 		 * Returns the index of the selected item in the combo box.
 		 *@return index of selected item. -1 if none selected.
 		 */
-		 public int getSelectedIndex(){
-		 	return cmbDisplayed.getSelectedIndex();
-		 	
-		 }
+		public int getSelectedIndex(){
+			return cmbDisplayed.getSelectedIndex();
+		}
 		 
-		 /**
-		  * Returns the value associated with the selected item.
-		  *@return returns the value associated with the item selected. Returns
-		  * -1 if none selected.
-		  */
-		  public int getSelectedValue(){
+		/**
+		 * Returns the value associated with the selected item.
+		 *@return returns the value associated with the item selected. Returns
+		 * -1 if none selected.
+		 */
+		public int getSelectedValue(){
 		  	if(mappingValues != null)
 		  		return mappingValues[cmbDisplayed.getSelectedIndex()];
 		  	return cmbDisplayed.getSelectedIndex();
 		  	
-		  }
-
+		}
+		
 		/**
-		 *	Binds the combo box to the specified column of the rowset.
-		 *As the rowset changes the combo box item displayed changes accordingly.
+		 *	Returns the column name to which the combo is bound.
+		 *@return returns the column name to which to combo box is bound.
 		 */
-		public void bind(RowSet rowset, String columnName){
+		public String getColumnName(){
+			return columnName;
+		}
+		
+		/**
+		 *	Returns the rowset being used to get the values.
+		 *@return returns the rowset being used.
+		 */
+		public RowSet getRowSet(){
+			return rowset;
+		} 
+		  
+		/**
+		 *	Sets the column name to which the combo box has to be bound
+		 *@param columnName - column name in the rowset to which the combo box 
+		 *is bound to.
+		 */
+		public void setColumnName(String _columnName){
+			columnName = _columnName;
+		} 
+		
+		/**
+		 *	Sets the rowset to be used.
+		 *@param _rowset - rowset to be used for getting the values.
+		 */
+		public void setRowSet(RowSet _rowset){
+			rowset = _rowset;
+		}
+		
+		/**
+		 *	Sets the value.
+		 */  
+		public void setSelectedValue(int _value){
+			textField.setText(String.valueOf(_value));
+		}
+		
+		
+		/**
+		 *	Added the combo box to the JComponent
+		 */
+		private void addComponent(){
+		//SET THE BOX LAYOUT
+			setLayout(new BoxLayout(this,BoxLayout.LINE_AXIS) );
+		// SET PREFERRED SIZE FOR COMBO BOX	
+			cmbDisplayed.setPreferredSize(new Dimension(150,20));
+		// ADD THE COMBO BOX TO THE JCOMPONENT	
+			add(cmbDisplayed);
+		} 
+		
+		
+		/**
+		 *	The column name and the rowset should be set before calling this function.
+		 *If the column name and rowset are set seperately then this function has to
+		 *be called to bind the combo box to the column in the rowset.
+		 */
+		public void bind(){
 			// bind the text field to the specified column
 			textField.setDocument(new SSTextDocument(rowset,columnName));
-			try{
+//			try{
 				// INITIALIZE THE VALUE OF THE TEXT FIELD TO THAT OF THE COLUMN VALUE
 				// FOR THE PRESENT RECORD IN THE ROWSET.
 				// THIS IS REQUIRED AS THE TEXT FIELD CAN UPDATE ITSELF ONLY WHEN THE ROWSET
 				// CHANGES OR MOVES.
-				textField.setText(String.valueOf(rowset.getInt(columnName)));
-			}catch(SQLException se){
-				se.printStackTrace();
-			}
-			// SET THE COMBO BOX ITEM DISPLAYED
+				textField.setDocument(new SSTextDocument(rowset, columnName));
+//			}catch(SQLException se){
+//				se.printStackTrace();
+//			}
+		// SET THE COMBO BOX ITEM DISPLAYED
 			setDisplay();
-			// ADDS LISTENERS FOR TEXT FIELD AND COMBO
+		// ADDS LISTENERS FOR TEXT FIELD AND COMBO
+		// IF BIND IS CALLED FOR SECOND TIME OLD LISTENERS HAVE TO BE REMOVED
+		// INSTEAD OF THIS WE CAN HAVE SOME VARIABLE TO INDICATE IT LISTENERS
+		// ARE ADDED ALREADY
+			removeListeners();
 			addListeners();
+		}
+			 
+		/**
+		 *	Binds the combo box to the specified column of the rowset.
+		 *As the rowset changes the combo box item displayed changes accordingly.
+		 *@param _rowset - RowSet to be used for getting the value.
+		 *@param _columnName - Column to which the combo has to be bound.
+		 */
+		public void bind(RowSet _rowset, String _columnName){
+			rowset = _rowset;
+			columnName = _columnName;
+			bind();
 		}
 
 		// SET THE COMBO BOX ITEM TO THE ITEM THAT CORRESPONDS TO THE VALUE IN TEXT FEILD
@@ -222,15 +302,27 @@ public class SSComboBox   extends JComponent {
 			textField.getDocument().addDocumentListener(textFieldDocumentListener);
 			cmbDisplayed.addActionListener(cmbListener);
 		}
+		
+		// REMOVES THE LISTENERS FOR TEXT FIELD AND THE COMBO BOX DISPLAYED
+		private void removeListeners(){
+			textField.getDocument().removeDocumentListener(textFieldDocumentListener);
+			cmbDisplayed.removeActionListener(cmbListener);
+		}
 
 		/**
 		 *	Sets the document to which the combo box will be bound to. Changes to this
 		 *will immediately reflect in the combo box.
 		 *@param document text document to which the combo box has to be bound
+		 *@depricated
+		 *@see bind
 		 */
 		public void setDocument(SSTextDocument document) {
 				textField.setDocument(document);
 				setDisplay();
+			// NEEDED, IF THIS FUNCTION IS CALLED MORE THAN ONCE.	
+			// SO THAT WE DON'T STACK UP LISTENERS AS THE NUMBER OF CALLS TO THIS
+			// FUNCTION INCREASES
+				removeListeners();
 				addListeners();
 		}
 
@@ -241,6 +333,14 @@ public class SSComboBox   extends JComponent {
 		public JComboBox getComboBox() {
 			return cmbDisplayed;
 		}
+		
+		/**
+		 *	Returns the combo box to be displayed on the screen.
+		 *@return returns the combo box that displays the items.
+		 */
+		public Component getComponent(){
+			return cmbDisplayed;
+		} 
 
 		/**
 		 *	adds the given array of strings as combo box items.
@@ -342,7 +442,7 @@ public class SSComboBox   extends JComponent {
 		
 	
 		// LISTENER FOR THE TEXT FIELD THAT CONTAINS THE INTEGER VALUE
-		private class MyTextFieldDocumentListener implements DocumentListener {
+		private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
 			public void changedUpdate(DocumentEvent de) {
 			//	System.out.println("changed Document Changed: " + de);
@@ -552,7 +652,7 @@ public class SSComboBox   extends JComponent {
 
 		// LISTENER FOR THE COMBO BOX. CHANGES MADE IN THE COMBO BOX ARE PASSED ON TO THE
 		// TEXT FIELD THEY BY MOVING THE CHANGE TO UNDERLYING STRUCTURE (DATABASE).
-		private class MyComboListener implements ActionListener{
+		private class MyComboListener implements ActionListener, Serializable{
 
 			public void actionPerformed(ActionEvent ae){
 			//	System.out.println("action performed triggered prasanth");
@@ -586,6 +686,9 @@ public class SSComboBox   extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.6  2004/03/08 16:43:37  prasanth
+ * Updated copy right year.
+ *
  * Revision 1.5  2004/02/23 16:39:35  prasanth
  * Added GENDER_OPTION.
  *
