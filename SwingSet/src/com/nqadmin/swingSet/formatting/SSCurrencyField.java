@@ -3,7 +3,7 @@
  * Tab Spacing = 4
  *
  * Copyright (c) 2004, The Pangburn Company, Inc, Prasanth R. Pasala and
- * Deigo Gil
+ * Diego Gil
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import javax.swing.JFormattedTextField.AbstractFormatterFactory;
+import java.util.Locale;
 import javax.swing.JTextField;
 
 /**
@@ -59,17 +59,29 @@ public class SSCurrencyField extends SSFormattedTextField {
     public SSCurrencyField(int precision, int decimals) {
         this(new SSCurrencyFormatterFactory(precision, decimals));
     }
-            
+    
+    public SSCurrencyField(int precision, int decimals, Locale editor, Locale display) {
+        this(new SSCurrencyFormatterFactory(precision, decimals, editor, display));
+    }
     
     public SSCurrencyField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         this.setHorizontalAlignment(JTextField.RIGHT);
+        this.setValue(new java.lang.Double(0.00));
     }
     
+    /**
+     * Getter for property precision.
+     * @return Value of property precision.
+     */
     public int getPrecision() {
         return precision;
     }
     
+    /**
+     * Getter for property decimals.
+     * @return Value of property decimals.
+     */
     public int getDecimals() {
         return decimals;
     }
@@ -81,29 +93,15 @@ public class SSCurrencyField extends SSFormattedTextField {
     
     public void setDecimals(int decimals) {
         this.decimals = decimals;
-    }
-
-    /**
-     * Getter for property minimumIntegerDigits.
-     * @return Value of property minimumIntegerDigits.
-     */
-    public int getMinimumIntegerDigits() {
-
-        return this.minimumIntegerDigits;
-    }
-
-    /**
-     * Setter for property minimumIntegerDigits.
-     * @param minimumIntegerDigits New value of property minimumIntegerDigits.
-     */
-    public void setMinimumIntegerDigits(int minimumIntegerDigits) {
-
-        this.minimumIntegerDigits = minimumIntegerDigits;
+        this.setFormatterFactory(new SSCurrencyFormatterFactory(precision, decimals));
     }
 }
 
 /*
  * $Log$
+ * Revision 1.3  2004/12/13 20:50:16  dags
+ * Fix package name
+ *
  * Revision 1.2  2004/12/13 18:46:13  prasanth
  * Added License.
  *

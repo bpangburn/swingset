@@ -34,6 +34,7 @@ package com.nqadmin.swingSet.formatting;
 
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import com.nqadmin.swingSet.formatting.SSPercentFormatterFactory;
+import javax.swing.JTextField;
 
 public class SSPercentField extends SSFormattedTextField {
     
@@ -44,6 +45,8 @@ public class SSPercentField extends SSFormattedTextField {
     
     public SSPercentField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
+        this.setHorizontalAlignment(JTextField.RIGHT);        
+        this.setValue(new java.lang.Double(0.00));
     }
     
 }

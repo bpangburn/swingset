@@ -3,7 +3,7 @@
  * Tab Spacing = 4
  *
  * Copyright (c) 2004, The Pangburn Company, Inc, Prasanth R. Pasala and
- * Deigo Gil
+ * Diego Gil
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,38 +33,53 @@
 
 package com.nqadmin.swingSet.formatting;
 
+import com.nqadmin.swingSet.SSDataNavigator;
+import com.nqadmin.swingSet.datasources.SSRowSet;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.text.DefaultFormatterFactory;
 
 import javax.sql.RowSetListener;
 import javax.swing.JFormattedTextField;
-import java.text.*;
 import java.util.Set;
 import java.util.HashSet;
+
+import com.nqadmin.swingSet.SSDataNavigator;
+import com.nqadmin.swingSet.formatting.selectors.*;
+
 
 /**
  * SSFormattedTextField.java
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  *<p><pre>
- * SSFormattedTextField extends the JFormattedTextField. 
+ * SSFormattedTextField extends the JFormattedTextField.
  *</pre><p>
  * @author $Author$
  * @version $Revision$
  */
-public class SSFormattedTextField extends JFormattedTextField implements RowSetListener, KeyListener, FocusListener {
+public class SSFormattedTextField extends JFormattedTextField implements RowSetListener, KeyListener, FocusListener, MouseListener {
+    
+    private JPopupMenu menu       = null;
+    private JPopupMenu calculator = null;
+    private JPopupMenu helper     = null;
     
     private java.awt.Color std_color = null;
     private String colName = null;
     private int colType = -99;
-    private com.nqadmin.swingSet.datasources.SSRowSet rowset;
+    private SSDataNavigator navigator = null;
+    private SSRowSet rowset = null;
     
     
     /** Creates a new instance of SSFormattedTextField */
     public SSFormattedTextField() {
         super();
+        
+        /*
+         *
+         *
+         */
         
         Set forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
         Set newForwardKeys = new HashSet(forwardKeys);
@@ -77,29 +92,72 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         newBackwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_UP, java.awt.event.InputEvent.SHIFT_MASK ));
         setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,newBackwardKeys);
         
+        /*
+         * add this as a self KeyListener
+         *
+         */
         addKeyListener(this);
+        
+        /*
+         * add this as a self FocusListener
+         *
+         */
         addFocusListener(this);
         
-        setInputVerifier(new internalVerifier());
+        /*
+         * add this as a self MouseListener
+         *
+         */
+        addMouseListener(this);
+
+
+        /*
+         *
+         */
+        menu = new JPopupMenu();
+        menu.add("Opcion 1");
+        menu.add("Opcion 2");
         
+        /*
+         * set InputVerifier. Rowset's updates are handled by this class. Is the preferred method instead of focus change.
+         *
+         */
+        setInputVerifier(new internalVerifier());
     }
     
     public SSFormattedTextField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         this();
-        
         this.setFormatterFactory(factory);
+    }
+    
+    public void setColumnName(String colName) {
+        this.colName = colName;
+        bind(rowset, colName);
+    }
+    
+    public void setRowSet(SSRowSet rowset) {
+        this.rowset = rowset;
+        bind(rowset, colName);
+    }
+    
+    public void setNavigator(SSDataNavigator navigator) {
+        this.navigator = navigator;
+        setRowSet(navigator.getRowSet());
+    }
+    
+    public SSDataNavigator getNavigator() {
+        return this.navigator;
     }
     
     public void bind(com.nqadmin.swingSet.datasources.SSRowSet rowset, String colName) {
         this.colName = colName;
         this.rowset = rowset;
+    
+        if (this.colName == null) return;
+        if (this.rowset  == null) return;
         
         try {
             colType = rowset.getColumnType(colName);
-            System.out.println("BIND ---------------------------------------------------");
-            System.out.println("bind() ---> colName = " + colName);
-            System.out.println("bind() ---> colType = " + colType);
-            System.out.println("--------------------------------------------------------");
         } catch(java.sql.SQLException sqe) {
             System.out.println("bind error = " + sqe);
         }
@@ -110,80 +168,86 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     }
     
     public void rowSetChanged(javax.sql.RowSetEvent event) {
+//        System.out.println("rowSetChanged");
         
     }
     
     public void rowChanged(javax.sql.RowSetEvent event) {
+//       System.out.println("rowChanged " + event);
         
     }
     
     public void cursorMoved(javax.sql.RowSetEvent event) {
+        /*
+         * 
+         *
+         */
         DbToFm();
     }
     
     public void keyTyped(KeyEvent e) {
+        
     }
     
     public void keyReleased(KeyEvent e) {
+        
     }
     
     /**
      *  Catch severals keys, to implement some forms functionality (To be done).
-     *
-     *
-     *
+     *  This is to mimic console legacy systems behavior.
      *
      */
     public void keyPressed(KeyEvent e) {
         
         if (e.getKeyCode() == KeyEvent.VK_F1) {
-            System.out.println("F1 = HELP ");
-            //((Component)e.getSource()).transferFocus();
+            showHelper(e);
         }
         
         if (e.getKeyCode() == KeyEvent.VK_F2) {
-            System.out.println("F2 ");
-            //((Component)e.getSource()).transferFocus();
+            
         }
         
         if (e.getKeyCode() == KeyEvent.VK_F3) {
+            
             System.out.println("F3 ");
-            //((Component)e.getSource()).transferFocus();
+            calculator = new javax.swing.JPopupMenu();
+            calculator.add(new com.nqadmin.swingSet.formatting.utils.JCalculator());
+            JFormattedTextField ob = (JFormattedTextField)(e.getSource());
+            java.awt.Dimension d = ob.getSize();
+            calculator.show(ob, 0, d.height);
         }
         
         if (e.getKeyCode() == KeyEvent.VK_F4) {
             System.out.println("F4 ");
-            //((Component)e.getSource()).transferFocus();
         }
         
         if (e.getKeyCode() == KeyEvent.VK_F5) {
             System.out.println("F5 = PROCESS");
+            navigator.doCommitButtonClick();
         }
         
         if (e.getKeyCode() == KeyEvent.VK_F6) {
             System.out.println("F6 = DELETE");
+            navigator.doDeleteButtonClick();
         }
         
         if (e.getKeyCode() == KeyEvent.VK_F8) {
             System.out.println("F8 ");
-            //((Component)e.getSource()).transferFocus();
+            navigator.doUndoButtonClick();
         }
         
         if (e.getKeyCode() == KeyEvent.VK_END) {
             System.out.println("END ");
-            //((Component)e.getSource()).transferFocus();
         }
         
         if (e.getKeyCode() == KeyEvent.VK_DELETE) {
             System.out.println("DELETE ");
-            //((Component)e.getSource()).transferFocus();
         }
         
         if (e.getKeyCode() == KeyEvent.VK_HOME) {
             System.out.println("HOME ");
-            //((Component)e.getSource()).transferFocus();
         }
-        
     }
     
     public void focusLost(FocusEvent e) {
@@ -218,16 +282,17 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     }
     
     /**
-     *
-     *
-     *
+     * This method perform the actual data transfer from rowset to this object Value field.
+     * depending on the column Type.
      *
      */
     
     private void DbToFm() {
         
         try {
+            
             switch(colType) {
+                
                 case java.sql.Types.ARRAY://2003
                     break;
                     
@@ -235,17 +300,13 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                     break;
                     
                 case java.sql.Types.BIT://-7
-                    //                    System.out.println("BIT");
+                case java.sql.Types.BOOLEAN://16
                     this.setValue(new Boolean(rowset.getBoolean(colName)));
                     break;
                     
                 case java.sql.Types.BLOB://2004
                     break;
-                    
-                case java.sql.Types.BOOLEAN://16
-                    System.out.println("BOOLEAN");
-                    break;
-                    
+
                 case java.sql.Types.CLOB://2005
                     break;
                     
@@ -320,9 +381,58 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         }
     }
     
+    public void mouseExited(MouseEvent e) {
+//        System.out.println("mouseExited");
+    }
+    
+    public void mouseEntered(MouseEvent e) {
+//        System.out.println("mouseEntered");
+    }
+    
+    public void mouseClicked(MouseEvent e) {
+//        System.out.println("mouseClicked");
+//        System.out.println("x= " + e.getComponent().getX() + " y= " + e.getComponent().getY());
+    }
+    
+    public void mousePressed(MouseEvent evt) {
+//        System.out.println("mousePressed");
+        if (evt.isPopupTrigger()) {
+//            System.out.println("isPopupTrigger");
+            menu.show(evt.getComponent(), evt.getX(), evt.getY());
+        }
+    }
+    
+    public void mouseReleased(MouseEvent evt) {
+//        System.out.println("mouseReleased");
+        if (evt.isPopupTrigger()) {
+//            System.out.println("isPopupTrigger");
+            menu.show(evt.getComponent(), evt.getX(), evt.getY());
+        }
+    }
+    
+    public void setHelper(JPopupMenu helper) {
+        this.helper = helper;
+
+        if (helper instanceof HelperPopup)
+            ((HelperPopup)this.helper).setTarget(this);
+  
+        if (helper instanceof RowSetHelperPopup)
+            ((RowSetHelperPopup)this.helper).setTarget(this);
+        
+    }
+    
+    public void showHelper(KeyEvent e) {
+        if (helper == null) return;
+        
+        JFormattedTextField ob = (JFormattedTextField)(e.getSource());
+        java.awt.Dimension d = ob.getSize();
+        helper.requestFocusInWindow();
+        helper.show(ob, 0, d.height);
+    }
+    
     /**
      * This method should implements validation AND, most important for our purposes
-     * implements actual rowset fields updates.
+     * implements actual rowset's fields updates.
      *
      */
     
@@ -338,6 +448,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
              */
             
             SSFormattedTextField tf = (SSFormattedTextField) input;
+            aux = tf.getValue();
             
             /**
              * future NULL validation ....
@@ -363,6 +474,12 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
             //if (val < minValue) passed = false;
             //if (val > maxValue) passed = false;
             
+            System.out.println("inputVerifier(): " + colName);
+            
+            //            if (aux == null) {
+            //                passed = false;
+            //            }
+            
             if (passed == true) {
                 
                 setBackground(java.awt.Color.WHITE);
@@ -378,6 +495,9 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                     rowset.removeRowSetListener(tf);
                     
                     aux = tf.getValue();
+                    if (aux == null) {
+                        return false;
+                    }
                     
                     switch(colType) {
                         
@@ -389,7 +509,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                             
                         case java.sql.Types.BIT://-7
                             System.out.println("BIT - Set");
-                            rowset.updateBoolean(colName, Boolean.parseBoolean(tf.getText()));
+                            rowset.updateBoolean(colName, ((Boolean)tf.getValue()).booleanValue());
                             break;
                             
                         case java.sql.Types.BLOB://2004
@@ -426,7 +546,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                             } else if (aux instanceof Float) {
                                 System.out.println("Float    = colName => " + colName);
                                 System.out.println("getValue() = " + aux);
-                                rowset.updateInt(colName, ((Float)aux).intValue());
+                                rowset.updateFloat(colName, ((Float)aux).intValue());
                             } else {
                                 System.out.println("ELSE ???");
                             }
@@ -448,7 +568,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                             } else if (aux instanceof Long) {
                                 System.out.println("Long    = colName => " + colName);
                                 System.out.println("getValue() = " + aux);
-                                rowset.updateInt(colName, ((Long)aux).intValue());
+                                rowset.updateLong(colName, ((Long)aux).intValue());
                             } else {
                                 System.out.println("ELSE ???");
                             }
@@ -499,7 +619,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                             System.out.println("default = " + colType);
                             System.out.println("ColName = " + colName);
                             System.out.println("============================================================================");
-
+                            
                             if (aux instanceof java.lang.Double
                                     && ((java.lang.Double) aux).doubleValue() < 0.0) {
                                 tf.setForeground(Color.RED);
@@ -510,10 +630,9 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                     }
                     rowset.addRowSetListener(tf);
                 } catch (java.sql.SQLException se) {
-                    System.out.println("SQLException");
-                }
-                catch(java.lang.NullPointerException np) {
-                    System.out.println("NullPointerException " + np);
+                    System.out.println("---> SQLException -----------> " + se);
+                } catch(java.lang.NullPointerException np) {
+                    System.out.println("---> NullPointerException ---> " + np);
                 }
                 return true;
             } else {
@@ -531,6 +650,9 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
 
 /*
  * $Log$
+ * Revision 1.4  2004/12/13 20:58:49  dags
+ * Added some javadoc tags
+ *
  * Revision 1.3  2004/12/13 20:50:16  dags
  * Fix package name
  *

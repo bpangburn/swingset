@@ -3,7 +3,7 @@
  * Tab Spacing = 4
  *
  * Copyright (c) 2004, The Pangburn Company, Inc, Prasanth R. Pasala and
- * Deigo Gil
+ * Diego Gil
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,22 +42,31 @@ public class SSBaseFormatterFactory extends javax.swing.text.DefaultFormatterFac
 
 
     public SSBaseFormatterFactory() {
+        this("##-########-#");
+    }
+    
+    public SSBaseFormatterFactory(String mask) {
         
         try {
-            this.setDefaultFormatter(new MaskFormatter("##-########-#"));
+            this.setDefaultFormatter(new MaskFormatter(mask));
             this.setNullFormatter(null);
-            this.setEditFormatter(new MaskFormatter("###########"));
-            this.setDisplayFormatter(new MaskFormatter("##-########-#"));
+            this.setEditFormatter(new MaskFormatter(mask));
+            this.setDisplayFormatter(new MaskFormatter(mask));
         }
         catch (java.text.ParseException pe) {
-            
+            pe.printStackTrace();
         }
     }
+    
+    
 }
 
 
 /*
  * $Log$
+ * Revision 1.3  2004/12/13 20:50:16  dags
+ * Fix package name
+ *
  * Revision 1.2  2004/12/13 18:46:13  prasanth
  * Added License.
  *

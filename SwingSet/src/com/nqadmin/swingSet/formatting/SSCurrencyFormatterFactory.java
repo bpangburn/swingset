@@ -46,11 +46,16 @@ import java.text.ParseException;
  */
 public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
     
+    /**
+     *  SSCurrencyFormatterFactory constructor, without arguments.
+     *  Creates a SSCurrencyFormatter with default Locale for
+     */
+    
     public SSCurrencyFormatterFactory() {
         this.setDefaultFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
         this.setNullFormatter(null);
         this.setEditFormatter(new NumberFormatter(NumberFormat.getInstance(Locale.US)));
-        this.setEditFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
+        this.setDisplayFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
     }
     
     public SSCurrencyFormatterFactory(int precision, int decimals) {
@@ -66,10 +71,35 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
         this.setEditFormatter(new NumberFormatter(NumberFormat.getInstance(Locale.US)));
         this.setDisplayFormatter(new NumberFormatter(nfd));
     }
+    
+    public SSCurrencyFormatterFactory(int precision, int decimals, Locale editor_locale, Locale display_locale) {
+        
+        NumberFormat nfe = NumberFormat.getCurrencyInstance(editor_locale);
+        nfe.setMaximumFractionDigits(decimals);
+        nfe.setMinimumFractionDigits(decimals);
+        nfe.setMaximumIntegerDigits(precision);
+        nfe.setMinimumIntegerDigits(1);
+        this.setEditFormatter(new NumberFormatter(nfe));
+        
+        NumberFormat nfd = NumberFormat.getCurrencyInstance(display_locale);
+        nfd.setMaximumFractionDigits(decimals);
+        nfd.setMinimumFractionDigits(decimals);
+        nfd.setMaximumIntegerDigits(precision);
+        nfd.setMinimumIntegerDigits(1);
+        this.setDisplayFormatter(new NumberFormatter(nfd));        
+        
+        this.setDefaultFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
+        this.setNullFormatter(null);
+
+    }
+    
 }
 
 /*
  * $Log$
+ * Revision 1.3  2004/12/13 20:50:16  dags
+ * Fix package name
+ *
  * Revision 1.2  2004/12/13 18:46:13  prasanth
  * Added License.
  *
