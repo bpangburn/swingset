@@ -68,45 +68,49 @@ import javax.sql.RowSet;
  */
 public class SSDataNavigator extends JPanel{
 
-	JButton button1 = new JButton();
-	JButton button2 = new JButton();
-	JButton button3 = new JButton();
-	JButton button4 = new JButton();
+	protected JButton button1 = new JButton();
+	protected JButton button2 = new JButton();
+	protected JTextField txtCurrentRow = new JTextField();
+	protected JButton button3 = new JButton();
+	protected JButton button4 = new JButton();
 
-	JButton button5 = new JButton(); // Commit button
-	JButton button6 = new JButton();
-	JButton button7 = new JButton(); // REFRESH BUTTON
-	JButton button8 = new JButton();
-	JButton button9 = new JButton();
+	protected JButton button5 = new JButton(); // Commit button
+	protected JButton button6 = new JButton();
+	protected JButton button7 = new JButton(); // REFRESH BUTTON
+	protected JButton button8 = new JButton();
+	protected JButton button9 = new JButton();
+	protected JLabel  lblRowCount = new JLabel();
 
 	// BASED ON THIS SSDataNavigator ALLOWS OR DISALLOWS MODIFICATION TO THE ROWSET
-	boolean modification = true;
+	protected boolean modification = true;
 	
 	// USERS CAN ALSO UPDATES TO PRESENT RECORDS BUT DISALLOW DELETION OF RECORDS
 	// BY SETTING THIS TO FALSE	
-	boolean allowDeletions = true;
-	boolean allowInsertions = true;
+	protected boolean allowDeletions = true;
+	protected boolean allowInsertions = true;
 	
-	boolean confirmDeletes = true;
+	protected boolean confirmDeletes = true;
 
-	boolean callExecute = true;
+	protected boolean callExecute = true;
 	
 	// ROWSET TO WHICH THE NAVIGATOR IS LINKED TO
-	RowSet rowset = null;
+	protected transient RowSet rowset = null;
 
 	// The container (Frame or Internal frame in which the navigator is present
-	SSDBNav dbNav = null;
+	protected SSDBNav dbNav = null;
 
 	// Is set to zero if next() on rowset returns false
-	int numRows = -1;
+	protected int rowCount = 0;
+	
+	protected int currentRow = 0;
 
 //	Vector defaultValues = null;
 
 	// true if the rowset is on insert row else false
-	boolean onInsertRow = false;
+	protected boolean onInsertRow = false;
 
 	// SIZE OF THE BUTTONS TO WHICH THEY HAVE TO BE SET
-	Dimension buttonSize = new Dimension( 50, 20);
+	protected Dimension buttonSize = new Dimension( 50, 20);
 
 	/**
 	 *	Creates a object of SSDataNavigator.
@@ -125,7 +129,7 @@ public class SSDataNavigator extends JPanel{
 	 */
 	 public boolean containsRows(){
 
-	 	if( numRows == 0 )
+	 	if( rowCount == 0 )
 	 		return false;
 
 	 	return true;
@@ -134,39 +138,29 @@ public class SSDataNavigator extends JPanel{
 	 
 	private void addToolTips(){
 
-//	JButton button5 = new JButton("" + '\u2714'); // Commit button
-//	JButton button6 = new JButton("" + '\u2716');
-//	JButton button7 = new JButton("" + '\u2672'); // REFRESH BUTTON
-//	JButton button8 = new JButton("" + '\u271A');
-//	JButton button9 = new JButton("" + '\u2620');
-/*
-		button2.setFont(new Font("windings 3",Font.BOLD,14));
-		button3.setFont(new Font("windings 3",Font.BOLD,14));
-		button5.setFont(new Font("windings 3",Font.BOLD,12));
-		button6.setFont(new Font("windings 3",Font.BOLD,14));
-		button7.setFont(new Font("windings 3",Font.BOLD,12));
-		button8.setFont(new Font("windings 3",Font.BOLD,12));
-		button9.setFont(new Font("windings 3",Font.BOLD,12));
+		try{
+			button1.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/first.gif")));
+			button2.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/prev.gif")));
+			button3.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/next.gif")));
+			button4.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/last.gif")));
+			button5.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/commit.gif")));
+			button6.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/undo.gif")));		
+			button7.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/refresh.gif")));
+			button8.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/add.gif")));
+			button9.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/delete.gif")));
+		}catch(Exception e){
+			button1.setText("<<");
+			button2.setText("<");
+			button3.setText(">");
+			button4.setText(">>");
+			button5.setText("Commit");
+			button6.setText("Undo");
+			button7.setText("Refresh");
+			button8.setText("Add");
+			button9.setText("Delete");
+			System.out.println("Unable to load images for navigator buttons");
+		}
 
-*/
-//		button2.setText("<");
-//		button3.setText(">");
-//		ImageIcon icon = new ImageIcon("images/first.gif");
-		button1.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/first.gif")));
-		button2.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/prev.gif")));
-		button3.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/next.gif")));
-		button4.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/last.gif")));
-		button5.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/commit.gif")));
-		button6.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/undo.gif")));		
-		button7.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/refresh.gif")));
-		button8.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/add.gif")));
-		button9.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/delete.gif")));
-
-//		button5.setText("Commit");
-//		button6.setText("Undo");
-//		button7.setText("Refresh");
-//		button8.setText("Add");
-//		button9.setText("Delete");
 
 
 		button1.setToolTipText("First");
@@ -227,6 +221,15 @@ public class SSDataNavigator extends JPanel{
 		buttonSize = _buttonSize;
 		setButtonSizes();
 	}
+	
+	/**
+	 *	Returns the size of buttons on the data navigator.
+	 *@return returns a Dimension object representing the size of each button 
+	 *on the data navigator.
+	 */
+	public Dimension getButtonSize(){
+		return buttonSize;
+	} 
 
 	/**
 	 * function that passes the implementation of the SSDBNav interface this is used when the
@@ -260,6 +263,15 @@ public class SSDataNavigator extends JPanel{
 			button9.setEnabled(true);
 		}
 	}
+	
+	/**
+	 *	Returns true if the user can modify the data in the rowset else false.
+	 *@return returns true if the user modifications are written back to the 
+	 *database else false.
+	 */
+	public  boolean getModification(){
+		return modification;
+	}
 
 	/**
 	 * Enables or diables the row deletion button
@@ -276,6 +288,15 @@ public class SSDataNavigator extends JPanel{
 			button9.setEnabled(true);
 		}
 	}
+	
+	/**
+	 *	Returns true if deletions are allowed else false.
+	 *@return returns true if deletions are allowed on the present data
+	 *else false.
+	 */
+	public boolean getDeletion(){
+		return allowDeletions;
+	} 
 
 	/**
 	 * Enables or diables the row insertion button
@@ -294,6 +315,14 @@ public class SSDataNavigator extends JPanel{
 	}
 	
 	/**
+	 *	Returns true if insertions are allowed else false.
+	 *@return returns true if insertiona are allowed else false.
+	 */
+	public boolean getInsertion(){
+		return allowInsertions;
+	}
+	 
+	/**
 	 *	Sets the confirm deletes. If set to true, every time delete button is pressed
 	 *navigator pops up a confirmation dialog to the user. So that he can continue
 	 *with deletion or cancel the deletion. Default value is true.
@@ -302,6 +331,23 @@ public class SSDataNavigator extends JPanel{
 	 public void setConfirmDeletes(boolean _confirmDeletes){
 	 	confirmDeletes = _confirmDeletes;
 	 }
+	 
+	 /**
+	  *	Returns true if deletions are confirmed by user else false.
+	  *@return returns true if a confirmation dialog is displayed when the user 
+	  *deletes a record else false.
+	  */
+	 public boolean getConfirmDeletes(){
+	 	return confirmDeletes;
+	 } 
+	 
+	 /**
+	  *	Returns the rowset being used.
+	  *@return returns the rowset being used.
+	  */
+	 public RowSet getRowSet(){
+	 	return rowset;
+	 } 
 	 
 	 /**
 	  *	 Updates the present row. This is done automatically when navigation takes place.
@@ -335,9 +381,17 @@ public class SSDataNavigator extends JPanel{
 				rowset.execute();
 
 			if(!rowset.next())
-				numRows = 0;
-			else
-				numRows = -1;
+				rowCount = 0;
+			else{
+			// IF THERE ARE ROWS GET THE ROW COUNT	
+				rowset.last();
+				rowCount = rowset.getRow();
+				rowset.first();
+				currentRow = rowset.getRow();
+			// SET THE ROW COUNT AS LABEL
+				lblRowCount.setText(String.valueOf(rowCount));	
+				txtCurrentRow.setText(String.valueOf(currentRow));
+			}
 		}catch(SQLException se){
 			se.printStackTrace();
 		}
@@ -346,7 +400,7 @@ public class SSDataNavigator extends JPanel{
 		//ELSE ENABLE THEN ELSE IS USEFUL WHEN THE ROWSET IS CHNAGED
 		// IF THE INITIAL ROWSET HAS ZERO ROWS NEXT IF THE USER SETS A NEW ROWSET THEN THE
 		// BUTTONS HAVE TO BE ENABLED
-		if(  numRows == 0){
+		if(rowCount == 0){
 			button1.setEnabled(false);
 			button2.setEnabled(false);
 			button3.setEnabled(false);
@@ -386,6 +440,9 @@ public class SSDataNavigator extends JPanel{
 		button7.setPreferredSize(buttonSize);
 		button8.setPreferredSize(buttonSize);
 		button9.setPreferredSize(buttonSize);
+		txtCurrentRow.setPreferredSize(buttonSize);
+		lblRowCount.setPreferredSize(buttonSize);
+		lblRowCount.setHorizontalAlignment(SwingConstants.CENTER);
 
 		// SET MINIMUM BUTTON SIZES
 		button1.setMinimumSize(buttonSize);
@@ -397,6 +454,8 @@ public class SSDataNavigator extends JPanel{
 		button7.setMinimumSize(buttonSize);
 		button8.setMinimumSize(buttonSize);
 		button9.setMinimumSize(buttonSize);
+		txtCurrentRow.setMinimumSize(buttonSize);
+		lblRowCount.setMinimumSize(buttonSize);
 	}
 
 	/**
@@ -411,6 +470,7 @@ public class SSDataNavigator extends JPanel{
 		// ADD BUTTONS TO THE PANEL
 		add(button1);
 		add(button2);
+		add(txtCurrentRow);
 		add(button3);
 		add(button4);
 		add(button5);
@@ -418,6 +478,7 @@ public class SSDataNavigator extends JPanel{
 		add(button7);
 		add(button8);
 		add(button9);
+		add(lblRowCount);
 		//pack();
 
 	}
@@ -436,6 +497,7 @@ public class SSDataNavigator extends JPanel{
 					if( modification )
 						rowset.updateRow();
 					rowset.first();
+					
 					button1.setEnabled(false);
 					button2.setEnabled(false);
 					if(!rowset.isLast()){
@@ -448,6 +510,9 @@ public class SSDataNavigator extends JPanel{
 					}
 					if( dbNav != null )
 						dbNav.performNavigationOps(SSDBNav.NAVIGATION_FIRST);
+				// GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD	
+					currentRow = 1;
+					txtCurrentRow.setText(String.valueOf(currentRow));	
 				}catch(SQLException se){
 					se.printStackTrace();
 				}
@@ -482,6 +547,9 @@ public class SSDataNavigator extends JPanel{
 						
 					if( dbNav != null )
 						dbNav.performNavigationOps(SSDBNav.NAVIGATION_PREVIOUS);	
+				// GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD		
+					currentRow = rowset.getRow();	
+					txtCurrentRow.setText(String.valueOf(currentRow));
 				}catch(SQLException se){
 					se.printStackTrace();
 				}
@@ -516,6 +584,9 @@ public class SSDataNavigator extends JPanel{
 											
 					if( dbNav != null )
 						dbNav.performNavigationOps(SSDBNav.NAVIGATION_NEXT);	
+				// GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD	
+					currentRow = rowset.getRow();
+					txtCurrentRow.setText(String.valueOf(currentRow));
 				}catch(SQLException se){
 					se.printStackTrace();
 				}
@@ -534,6 +605,7 @@ public class SSDataNavigator extends JPanel{
 					if( modification )
 						rowset.updateRow();
 					rowset.last();
+					
 					button3.setEnabled(false);
 					button4.setEnabled(false);
 					if(!rowset.isFirst()){
@@ -546,6 +618,9 @@ public class SSDataNavigator extends JPanel{
 					}
 					if( dbNav != null )
 						dbNav.performNavigationOps(SSDBNav.NAVIGATION_LAST);	
+				// GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD	
+					currentRow = rowset.getRow();
+					txtCurrentRow.setText(String.valueOf(currentRow));	
 				}catch(SQLException se){
 					se.printStackTrace();
 				}
@@ -710,14 +785,35 @@ public class SSDataNavigator extends JPanel{
 			}
 		});
 		
+	// LISTENER FOR THE TEXT FIELD. USER CAN ENTER A ROW NUMBER IN THE TEXT
+	// FIELD TO MOVE THE THE SPEICIFIED ROW. 
+	// IF ITS NOT A NUMBER OR IF ITS NOT VALID FOR THE CURRENT ROWSET
+	// NOTHING HAPPENS.	
+		txtCurrentRow.addKeyListener(new KeyAdapter(){
+			public void keyReleased(KeyEvent ke){
+				if(ke.getKeyCode() == KeyEvent.VK_ENTER){
+					try{
+						int row = Integer.parseInt(txtCurrentRow.getText().trim());
+						if(row <= rowCount && row >0){
+							rowset.absolute(row);
+						}
+					}catch(Exception e){
+					}
+				}
+			}
+		});
+		
 	}
-
+		
 }
 
 
 
 /*
  * $Log$
+ * Revision 1.7  2004/03/08 16:40:00  prasanth
+ * Added the if condition to check for callExecute in the listener for refresh button.
+ *
  * Revision 1.6  2004/02/23 16:36:00  prasanth
  * Added  setMySQLDB function.
  * Skipping execute call on the rowset if mySQL is true.
