@@ -33,6 +33,8 @@
 package com.nqadmin.swingSet.datasources;
 
 import java.beans.*;
+import java.beans.PropertyDescriptor;
+import java.beans.IntrospectionException;
 
 /**
  * SSJdbcRowSetImplBeanInfo.java
@@ -71,11 +73,29 @@ import java.beans.*;
         return null;
         
     } // end public java.awt.Image getIcon(int _iconKind) {
+    	
+    
+    public PropertyDescriptor[] getPropertyDescriptors(){
+    	try{
+	    	PropertyDescriptor connDescriptor = new PropertyDescriptor("sSConnection", SSJdbcRowSetImpl.class, "getSSConnection", "setSSConnection");
+	    	connDescriptor.setBound(true);
+	    	connDescriptor.setPropertyEditorClass(SSConnectionEditor.class);
+	    	PropertyDescriptor queryDescriptor = new PropertyDescriptor("query", SSJdbcRowSetImpl.class, "getCommand", "setCommand");
+	    	queryDescriptor.setBound(true);    	
+	    	return new PropertyDescriptor[]{connDescriptor, queryDescriptor};
+	    }catch(IntrospectionException ie){
+	    	ie.printStackTrace();
+	    }
+	    return null;
+    }	
 
 }
 
 /*
  * $Log$
+ * Revision 1.4  2005/02/07 19:56:17  yoda2
+ * Fixing JavaDoc errors with _iconKind parameter name.
+ *
  * Revision 1.3  2005/02/04 22:41:35  yoda2
  * Updated Copyright info.
  *
