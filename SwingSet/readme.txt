@@ -353,7 +353,11 @@ e.g.
 
     // CREATE A TEXTFIELD
         JTextField myText = new JTextField();
-        myText.setDocument(new SSTextDocument(rowset, "quantity");
+        
+    // BIND TEXTFIELD - OLD WAY
+    //  myText.setDocument(new SSTextDocument(rowset, "quantity");
+    // BIND TEXTFIELD - PREFERRED WAY.
+    	myText.bind(rowset, "quantity");
            
      } catch(Exception e) {
      // EXCEPTION HANDLER HERE...
@@ -439,8 +443,8 @@ For example if you are displaying three columns using the JTextField and the
 user changes the text in the text fields then the columns will be updated to
 the new values when the user navigates the RowSet. If the user wants to revert
 the changes he made he can press the Undo button, however this must be done
-be done before any navigation.  Once navigation takes place changes can't be
-reverted using Undo button (has to be done manually by the user).
+before any navigation.  Once navigation takes place changes can't be reverted
+using Undo button (has to be done manually by the user).
 
 
 ***********************
