@@ -88,26 +88,26 @@ public interface SSDBNav {
     public static final int NAVIGATION_LAST      = 4;
 
     /**
-     * if the user intends to perform some actions before insertin the row this function should be used
+     * Method to perform pre-insertion operations.
      */
     public void performPreInsertOps();
 
     /**
-     * Post insert operations should be performed in this function.
+     * Method to perform post-insertion operations.
      *
-     * In addition to this you can have a listener on the SSRowSet attached to SSDataNavigator
-     * to get notiifcation when a row is inserted.
+     * In addition to this you can have a listener on the SSRowSet attached
+     * to a SSDataNavigator to get notified when a row is inserted.
      */
     public void performPostInsertOps();
 
     /**
-     * This function is called when the user is on the insert row and cancels the insert
-     * by clicking on the undo button.
+     * Method to perform operations when the user is on the insert row and
+     * cancels the insert by clicking on the undo button.
      */
     public void performCancelOps();
 
     /**
-     * The user should perform the pre deletion operations using this function.
+     * Method to perform pre-deletion operations.
      *
      * SSRowSet does not provide any notifications before the deletion of a row. but a notification
      * will be received after the deletion if you have listener for the SSRowSet.
@@ -115,14 +115,14 @@ public interface SSDBNav {
     public void performPreDeletionOps();
 
     /**
-     * This function should perform post deletion operations if the user intends to do so.
+     * Method to perform post-deletion operations.
      *
      * The SSRowSet listener also provides the notification after the deletion of the row.
      */
     public void performPostDeletionOps();
 
     /**
-     * This function is called when ever navigation takes place.
+     * Method to perform navigation-related operations.
      *
      * Possible values are NAVIGATION_NEXT, NAVIGATION_PREVIOUS, NAVIGATION_FIRST,
      * NAVIGATION_LAST.
@@ -132,8 +132,7 @@ public interface SSDBNav {
     public void performNavigationOps(int _navigationType);
 
     /**
-     * This function is called when the user what to refresh the information.
-     * (When the user presses the refresh button on the navigator.
+     * Method to perform operations when the user hits the refresh button.
      */
     public void performRefreshOps();
 
@@ -143,6 +142,9 @@ public interface SSDBNav {
 
 /*
  * $Log$
+ * Revision 1.10  2005/02/04 22:48:53  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.9  2004/11/11 14:45:48  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *

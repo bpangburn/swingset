@@ -51,25 +51,60 @@ import java.io.Serializable;
  */
 public class SSDBNavAdapter implements SSDBNav, Serializable {
 
+    /**
+     * Method to perform pre-insertion operations.
+     */
     public void performPreInsertOps(){
     }
 
+    /**
+     * Method to perform post-insertion operations.
+     *
+     * In addition to this you can have a listener on the SSRowSet attached
+     * to a SSDataNavigator to get notified when a row is inserted.
+     */
     public void performPostInsertOps(){
     }
 
+    /**
+     * Method to perform operations when the user is on the insert row and
+     * cancels the insert by clicking on the undo button.
+     */    
+    public void performCancelOps(){
+    }
+    
+    /**
+     * Method to perform pre-deletion operations.
+     *
+     * SSRowSet does not provide any notifications before the deletion of a row. but a notification
+     * will be received after the deletion if you have listener for the SSRowSet.
+     */
     public void performPreDeletionOps(){
     }
 
+    /**
+     * Method to perform post-deletion operations.
+     *
+     * The SSRowSet listener also provides the notification after the deletion of the row.
+     */    
     public void performPostDeletionOps(){
     }
 
+    /**
+     * Method to perform navigation-related operations.
+     *
+     * Possible values are NAVIGATION_NEXT, NAVIGATION_PREVIOUS, NAVIGATION_FIRST,
+     * NAVIGATION_LAST.
+     *
+     * @param _navigationType    this indicates the type of navigation.
+     */    
     public void performNavigationOps(int _navigationType){
     }
 
+    /**
+     * Method to perform operations when the user hits the refresh button.
+     */    
     public void performRefreshOps(){
-    }
-
-    public void performCancelOps(){
     }
 
 } // end public class SSDBNavAdapter implements SSDBNav, Serializable {
@@ -78,6 +113,9 @@ public class SSDBNavAdapter implements SSDBNav, Serializable {
 
 /*
  * $Log$
+ * Revision 1.8  2005/02/04 22:48:53  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.7  2004/11/11 14:45:48  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *
