@@ -55,7 +55,7 @@ values of 0, 1, & 2, to be displayed as "yes," "no," & "maybe").  The
 SSDBComboBox operates in a similar fashion, but is used when both the values
 and their corresponding text choices are stored in a table (e.g.
 my_table!part_id is stored as a foreign key, but my_table!part_name is
-diplayed).  By writing a custom event listener, SSDBComboBox may also be used
+displayed).  By writing a custom event listener, SSDBComboBox may also be used
 to navigate a RowSet based on a combobox selection.  The SSCheckBox allows a
 checkbox to be linked to an underlying numeric database column.  Finally, a
 SSDataNavigator class is provided to allow traversal, insertion, deletion,
