@@ -217,6 +217,16 @@ public class SSDataGrid extends JTable {
 	
 	
 	/**
+	 *	Sets the allowInsertion property of the table.
+	 *If set to true an addition row for inserting new rows will be displayed
+	 *@param _insertions - true if new rows can be added else false.
+	 */
+	public void setInsertion(boolean _insertions){
+		tableModel.setInsertion(_insertions);
+		updateUI();
+	} 
+	
+	/**
 	 * Returns the list of selected columns.
 	 * This function gets the list of selected columns from parent class 
 	 * and removes any columns which are present in hidden columns.
@@ -228,7 +238,6 @@ public class SSDataGrid extends JTable {
 	// A PROBLEM WITH COPY AND PASTE OPERATIONS. SO MAKE SURE THAT THIS
 	// LIST DOES NOT CONTAIN HIDDEN COLUMNS
 	public int[] getSelectedColumns() {
-//		System.out.println("SSDataGrid getSelectedColumns()");
         // IF THERE ARE NO HIDDEN COLUMNS THEN RETURN THE SAME LIST
             if (hiddenColumns == null) {
                 return super.getSelectedColumns();
@@ -284,81 +293,43 @@ public class SSDataGrid extends JTable {
 	 */
     private void init() {
 		try {
-			// EXECUTE THE QUERY
+		// EXECUTE THE QUERY
 			if (callExecute) {
 				rowset.execute();
             }
 			
-			// SPECIFY THE ROWSET TO THE TABLE MODEL.
+		// SPECIFY THE ROWSET TO THE TABLE MODEL.
 			if (tableModel == null) {
 				tableModel = new SSTableModel(rowset);
 			} else {
 				tableModel.setRowSet(rowset);
             }
 			
-			// GET THE ROW COUNT 	
+		// GET THE ROW COUNT 	
 			rowCount = tableModel.getRowCount();
-			// GET THE COLUMN COUNT
+		// GET THE COLUMN COUNT
 			columnCount = tableModel.getColumnCount();
-/*			btnSelectRow = new JButton[rowCount];
-			Dimension dimension = new Dimension(15,15);
-			for(int i=0;i<rowCount;i++)
-			{
-				
-				btnSelectRow[i] = new JButton();
-				if(i == rowCount -1)
-					btnSelectRow[i].setText("*");
-				btnSelectRow[i].setPreferredSize(dimension);
-			}
-			
-*/		} catch(SQLException se) {
+
+		} catch(SQLException se) {
 			se.printStackTrace();
 		}
-		// SET THE TABLE MODEL FOR JTABLE
+	// SET THE TABLE MODEL FOR JTABLE
 		this.setModel(tableModel);
         
-		// SPECIFY THE MESSAGE WINDOW TO WHICH THE TABLE MODEL HAS TO POP UP
-		// ERROR MESSAGES.
+	// SPECIFY THE MESSAGE WINDOW TO WHICH THE TABLE MODEL HAS TO POP UP
+	// ERROR MESSAGES.
 		tableModel.setMessageWindow(window);
 		tableModel.setJTable(this);
+		hideColumns();
 		
-			
-		// SET THE MINIMUM WIDTH OF COLUMNS
-		TableColumnModel columnModel = this.getColumnModel();
-		TableColumn column;
-		for (int i=columnModel.getColumnCount()-1;i>=0;i--) {
-			column = columnModel.getColumn(i);
-			int j = -1;
-
-			if (hiddenColumns != null) {
-			// SET THE WIDTH OF HIDDEN COLUMNS AS 0                
-				for (j=0; j<hiddenColumns.length;j++) {
-					if (hiddenColumns[j] == i) {
-						
-						//columnModel.removeColumn(column);
-						column.setMaxWidth(0);
-						column.setMinWidth(0);
-						column.setPreferredWidth(0);
-						break;
-					}
-				}
-				if (j == hiddenColumns.length) {
-					column.setMinWidth(100);
-                }
-			} else {
-			// SET OTHER COLUMNS MIN WIDTH TO 100
-				column.setMinWidth(100);
-			}
-		}
-		
-		// ADD KEY LISTENER TO JTABLE.
-		// THIS IS USED FOR DELETING THE ROWS
-		// ALLOWS MULTIPLE ROW DELETION. 
-		// KEY SEQUENCE FOR DELETING ROWS IS CTRL-X.
+	// ADD KEY LISTENER TO JTABLE.
+	// THIS IS USED FOR DELETING THE ROWS
+	// ALLOWS MULTIPLE ROW DELETION. 
+	// KEY SEQUENCE FOR DELETING ROWS IS CTRL-X.
 		this.addKeyListener(new KeyAdapter() {
 			private boolean controlPressed = false;
 			
-			// IF THE KEY PRESSED IS CONTROL STORE THAT INFO.
+		// IF THE KEY PRESSED IS CONTROL STORE THAT INFO.
 			public void keyPressed(KeyEvent ke) {
 				if (ke.getKeyCode() == KeyEvent.VK_CONTROL) {
 					controlPressed = true;
@@ -367,26 +338,25 @@ public class SSDataGrid extends JTable {
 			
 			
 			public void keyReleased(KeyEvent ke) {
-				// IF CONTROL KEY IS RELEASED SET THAT CONTROL IS NOT PRESSED.
+			// IF CONTROL KEY IS RELEASED SET THAT CONTROL IS NOT PRESSED.
 				if (ke.getKeyCode() == KeyEvent.VK_CONTROL) {
 					controlPressed = false;
                 }
-				// IF X IS PRESSED WHILE THE CONTROL KEY IS STILL PRESSED
-				// DELETE THE SELECTED ROWS.	
+			// IF X IS PRESSED WHILE THE CONTROL KEY IS STILL PRESSED
+			// DELETE THE SELECTED ROWS.	
 				if (ke.getKeyCode() == KeyEvent.VK_X) {
 					if (! controlPressed) {
 						return;
                     }
-					// GET THE NUMBER OF ROWS SELECTED 
+				// GET THE NUMBER OF ROWS SELECTED 
 					int numRows = getSelectedRowCount();
-//					System.out.println("Num Rows Selected : " + numRows);
                     if (numRows == 0) {
 						return;
                     }
-					// GET LIST OF ROWS SELECTED	
+				// GET LIST OF ROWS SELECTED	
 					int[] rows = getSelectedRows();
-					// IF USER HAS PROVIDED A PARENT COMPONENT FOR ERROR MESSAGES
-					// CONFIRM THE DELETION
+				// IF USER HAS PROVIDED A PARENT COMPONENT FOR ERROR MESSAGES
+				// CONFIRM THE DELETION
 					if (window != null) {
 						int returnValue = JOptionPane.showConfirmDialog(window,"You are about to delete " + rows.length + " rows. " +
 							"\nAre you sure you want to delete the rows?");
@@ -394,39 +364,21 @@ public class SSDataGrid extends JTable {
 							return;
                         }
 					}
-					// START DELETING THE ROWS IN BOTTON UP FASHION
-					// IN DOING SO YOU RETAIN THE ROW NUMBERS THAT HAVE TO BE DELETED
-					// IF YOU DO IT TOP DOWN THE ROW NUMBERING CHANGES AS SOON AS A 
-					// ROW IS DELETED AS A RESULT LOT OF CARE HAS TO BE TAKEN
-					// TO IDENTIFY THE NEW ROW NUMBERS AND THEN DELETE THE ROWS
-					// INSTEAD OF THAT ITS MUCH EASIER IF YOU DO IT BOTTOM UP.
+				// START DELETING THE ROWS IN BOTTON UP FASHION
+				// IN DOING SO YOU RETAIN THE ROW NUMBERS THAT HAVE TO BE DELETED
+				// IF YOU DO IT TOP DOWN THE ROW NUMBERING CHANGES AS SOON AS A 
+				// ROW IS DELETED AS A RESULT LOT OF CARE HAS TO BE TAKEN
+				// TO IDENTIFY THE NEW ROW NUMBERS AND THEN DELETE THE ROWS
+				// INSTEAD OF THAT ITS MUCH EASIER IF YOU DO IT BOTTOM UP.
 					for (int i=rows.length -1;i>=0;i--) {
-//						System.out.println("Selected Rows " + rows[i]);
 						tableModel.deleteRow(rows[i]);
 					}
-					//setModel(tableModel);
 					updateUI();
 				}
 			}
 		});
 		
-/*		this.setLayout(new GridBagLayout());
-		GridBagConstraints constraints = new GridBagConstraints();
-		constraints.gridx =0;
-		for(int i=0;i<rowCount;i++)
-		{
-			constraints.gridy =i;
-			this.add(btnSelectRow[i],constraints);
-		}
-		//constraints.weightx = 1;
-		//constraints.weighty = 1;
-		constraints.gridx = 1;
-		constraints.gridy = 0;
-		constraints.gridheight = rowCount;
-		constraints.gridwidth = columnCount;
-		this.add(grid,constraints);
-*/		
-	
+
         // CREATE AN INSTANCE OF KEY ADAPTER ADD PROVIDE THE PRESET GRID TO THE ADAPTER.
         // THIS IS FOR COPY AND PASTE SUPPORT
             SSTableKeyAdapter keyAdapter = new SSTableKeyAdapter(this);
@@ -463,6 +415,9 @@ public class SSDataGrid extends JTable {
 	 		} catch(SQLException se) {
 	 			se.printStackTrace();
 	 		}
+	 	// THIS IS NEEDED IF THE NUMBER OF COLUMNS IN THE NEW ROWSET
+	 	// DOES NOT MATCH WITH THE OLD COLUMNS.	
+	 		createDefaultColumnModel();
 	 	}
 	 	// UPDATE UI IF NEEDED
 	 	if (updateUI) {
@@ -733,6 +688,7 @@ public class SSDataGrid extends JTable {
     public void setHiddenColumns(int[] _columnNumbers) {
     	hiddenColumns = _columnNumbers;
     	tableModel.setHiddenColumns(_columnNumbers);
+    	hideColumns();
     }
     
     /**
@@ -749,32 +705,47 @@ public class SSDataGrid extends JTable {
      *  hidden
      */
     public void setHiddenColumns(String[] _columnNames) throws SQLException {
-    	
     	hiddenColumns = null;
+    	tableModel.setHiddenColumns(hiddenColumns);
     	if (_columnNames != null) {
     		hiddenColumns = new int[_columnNames.length];
-//    		System.out.println("Hidden Columns");
     		for(int i=0; i<_columnNames.length; i++) {
     			hiddenColumns[i] = rowset.findColumn(_columnNames[i]) -1;
-//    			System.out.println(hiddenColumns[i]);
     		}
-    		
-    		// SET THE MINIMUM WIDTH OF COLUMNS
-			TableColumnModel columnModel = this.getColumnModel();
-			TableColumn column;
-		
-			// SET THE WIDTH OF HIDDEN COLUMNS AS 0
-			for (int j=0; j<hiddenColumns.length;j++) {
-				column = columnModel.getColumn(hiddenColumns[j]);								
-				column.setMinWidth(0);
-				column.setMaxWidth(0);
-				column.setPreferredWidth(0);
-//				System.out.println("Set column " + hiddenColumns[j] + " width to zero");
+		}
+		hideColumns();
+    }
+    
+    /**
+     *	Hides the columns specified in the hidden columns list.
+     */
+    private void hideColumns(){
+	// SET THE MINIMUM WIDTH OF COLUMNS
+		TableColumnModel columnModel = this.getColumnModel();
+		TableColumn column;
+		for (int i=columnModel.getColumnCount()-1;i>=0;i--) {
+			column = columnModel.getColumn(i);
+			int j = -1;
+
+			if (hiddenColumns != null) {
+			// SET THE WIDTH OF HIDDEN COLUMNS AS 0                
+				for (j=0; j<hiddenColumns.length;j++) {
+					if (hiddenColumns[j] == i) {
+						column.setMaxWidth(0);
+						column.setMinWidth(0);
+						column.setPreferredWidth(0);
+						break;
+					}
+				}
+				if (j == hiddenColumns.length) {
+					column.setMinWidth(100);
+                }
+			} else {
+			// SET OTHER COLUMNS MIN WIDTH TO 100
+				column.setMinWidth(100);
 			}
-			updateUI();
-		}	
-    	
-    	tableModel.setHiddenColumns(hiddenColumns);
+		}
+		updateUI();
     }
     
     /**
@@ -1006,6 +977,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.10  2004/08/10 22:06:59  yoda2
+ * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
+ *
  * Revision 1.9  2004/08/09 21:29:44  prasanth
  * The default selection of first item in combo box renderer is removed.
  * If a default value is specified it will be selected else no selected item.
