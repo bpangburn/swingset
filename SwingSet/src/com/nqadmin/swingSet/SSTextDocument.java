@@ -44,6 +44,7 @@ import javax.swing.text.*;
 import javax.swing.event.*;
 import java.util.GregorianCalendar;
 import java.util.Calendar;
+import java.util.StringTokenizer;
 
 
 
@@ -194,6 +195,8 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 	}
 
 
+	// REMOVE UPDATES ARE NOT REQUIRED WHEN DOING A IMMEDIATE INSERT AND
+	// CALLING  INSERT UPDATE
 	private class MyRowSetListener implements RowSetListener {
 		// WHEN EVER THERE IS A CHANGE IN ROWSET CAN BE ROW-CHANGED OR ROWSET-CHANGED
 		// OR CURSOR-MOVED GET THE NEW TEXT CORRESPONDING TO THE COLUMN AND UPDATE THE DOCUMENT
@@ -205,10 +208,12 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 			try{
 			if( rs.getRow() != 0 ){
 				String value = getText();
+				if(value == null)
+					value = "";
 			//	System.out.println("new Text " + value);
 				if( getLength() > 0 ){
 					remove(0,getLength() );
-					removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
+					//removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
 				}
 				if(value!=null && value.length() > 0) {
 					insertString(0,value, attribute);
@@ -239,10 +244,12 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 			try{
 			if( rs.getRow() != 0 ){
 				String value = getText();
+				if(value == null)
+					value = "";
 		//		System.out.println("new Text " + value);
 				if( getLength() > 0 ){
 					remove(0,getLength() );
-					removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
+					//removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
 				}
 				if(value!=null && value.length() > 0) {
 					insertString(0,value, attribute);
@@ -273,9 +280,11 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 			try{
 			if( rs.getRow() != 0 ){
 				String value = getText();
+				if(value == null)
+					value = "";
 				if( getLength() > 0 ){
 					remove(0,getLength() );
-					removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
+					//removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
 				}
 				if(value!=null && value.length() > 0) {
 					insertString(0,value, attribute);
@@ -388,9 +397,13 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 				if( strValue.equals("") ){
 					rs.updateNull(columnName);
 				}
-				else {
-					Date dateValue = Date.valueOf(strValue);
-					rs.updateDate(columnName, dateValue);
+				else if(strValue.length() ==10){
+					System.out.println(strValue);
+//					Date dateValue = Date.valueOf(strValue);
+					rs.updateDate(columnName, getSQLDate(strValue));
+				}
+				else{
+										
 				}
 				break;
 			default:
@@ -460,6 +473,19 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 		 return value;
 
 	}
+	
+	/**
+	 *	Converts a date str (mm/dd/yyyy) in to a sql Date.
+	 *@param _strDate date in mm/dd/yyyy format
+	 *@return return java.sql.Date corresponding to _strDate. 
+	 */
+	public Date getSQLDate(String _strDate){
+    	StringTokenizer strtok = new StringTokenizer(_strDate,"/",false);
+    	String month = strtok.nextToken();
+    	String day   = strtok.nextToken();
+    	String newStrDate = strtok.nextToken() + "-" + month + "-" + day;
+    	return Date.valueOf(newStrDate);
+    }
 
 
 }
@@ -468,6 +494,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.2  2003/09/25 14:27:45  yoda2
+ * Removed unused Import statements and added preformatting tags to JavaDoc descriptions.
+ *
  * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
  * Initial CVS import for SwingSet.
  *
