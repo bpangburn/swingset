@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# $Id$
+#
+# LINUX COMPILATION SCRIPT FOR SWINGSET DEMO
+#
+# DELETE ANY EXISTING .class FILES AND RE-COMPILE ALL .java FILES FOR SWINGSET DEMO
+#
+rm ./*.class
+javac ./MainClass.java
