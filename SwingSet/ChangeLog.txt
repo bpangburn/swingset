@@ -5,6 +5,27 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 $Id$
 
 ==============================================================================
+SwingSet 0.8.0-beta - Released 08-13-2004
+==============================================================================
+
+Changes:
+	SSComboBox:
+		1. When the selected index in the combo box is -1 the value for that
+		   will be set to null in the database.
+		   
+	SSDBComboBox:
+		1. When the selected index in the combo box is -1 the value for that
+		   will be set to null in the database.
+		   
+	SSDataNavigator:
+		1. When a record is deleted or added to the current rowset with the 
+		   help of delete or add buttons on the navigator the row count
+		   displayed will change.
+		2. Default size of the buttons has been reduced a bit and that of 
+		   text field and label which display current row number and row count
+		   has been increased.
+		   
+==============================================================================
 SwingSet 0.8.0-beta - Released 08-11-2004
 ==============================================================================
 
