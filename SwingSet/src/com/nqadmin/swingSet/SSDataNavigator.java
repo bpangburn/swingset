@@ -89,6 +89,8 @@ public class SSDataNavigator extends JPanel{
 	
 	boolean confirmDeletes = true;
 
+	boolean mySQL = false;
+	
 	// ROWSET TO WHICH THE NAVIGATOR IS LINKED TO
 	RowSet rowset = null;
 
@@ -104,7 +106,7 @@ public class SSDataNavigator extends JPanel{
 	boolean onInsertRow = false;
 
 	// SIZE OF THE BUTTONS TO WHICH THEY HAVE TO BE SET
-	Dimension buttonSize = new Dimension( 60, 20);
+	Dimension buttonSize = new Dimension( 50, 20);
 
 	/**
 	 *	Creates a object of SSDataNavigator.
@@ -206,6 +208,17 @@ public class SSDataNavigator extends JPanel{
 		addListeners();
 	}
 
+	
+	/**
+	 *	Sets the mySQL property to true.
+	 *This causes the navigator to skip the execute function call on the specified rowset.
+	 *(See FAQ for further details)
+	 *@param _mySQL true if using MySQL database else false.
+	 */
+	public void setMySQLDB(boolean _mysql){
+		mySQL = _mysql;
+	}
+	 
 	/**
 	 * sets the preferredSize and the MinimumSize of the buttons to the specified size
 	 *@param _buttonSize the required dimension of the buttons
@@ -318,7 +331,8 @@ public class SSDataNavigator extends JPanel{
 
 		//SEE IF THERE ARE ANY ROWS IN THE GIVEN ROWSET
 		try{
-			rowset.execute();
+			if(!mySQL)
+				rowset.execute();
 
 			if(!rowset.next())
 				numRows = 0;
@@ -392,7 +406,7 @@ public class SSDataNavigator extends JPanel{
 
 		setButtonSizes();
 		//SET THE BOX LAYOUT
-		setLayout(new BoxLayout(this,BoxLayout.X_AXIS) );
+		setLayout(new BoxLayout(this,BoxLayout.LINE_AXIS) );
 
 		// ADD BUTTONS TO THE PANEL
 		add(button1);
@@ -404,6 +418,7 @@ public class SSDataNavigator extends JPanel{
 		add(button7);
 		add(button8);
 		add(button9);
+		//pack();
 
 	}
 
@@ -701,6 +716,12 @@ public class SSDataNavigator extends JPanel{
 
 /*
  * $Log$
+ * Revision 1.5  2004/01/27 17:13:03  prasanth
+ * Changed the behaviour of commit button. When not on insert row will update
+ * present row.
+ *
+ * Also modified enabling and disabling of navigation buttons.
+ *
  * Revision 1.4  2003/11/26 21:24:49  prasanth
  * Calling performCancelOps().
  *
