@@ -543,6 +543,7 @@ public class SSDataNavigator extends JPanel {
 					txtCurrentRow.setText(String.valueOf(currentRow));	
 				} catch(SQLException se) {
 					se.printStackTrace();
+					JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while updating row or moving the cursor.\n"+se.getMessage());
 				}
 			}
 		});
@@ -581,6 +582,7 @@ public class SSDataNavigator extends JPanel {
 					txtCurrentRow.setText(String.valueOf(currentRow));
 				} catch(SQLException se) {
 					se.printStackTrace();
+					JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while updating row or moving the cursor.\n"+se.getMessage());
 				}
 			}
 		});
@@ -620,6 +622,7 @@ public class SSDataNavigator extends JPanel {
 					txtCurrentRow.setText(String.valueOf(currentRow));
 				} catch(SQLException se) {
 					se.printStackTrace();
+					JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while updating row or moving the cursor.\n"+se.getMessage());
 				}
 			}
 		});
@@ -655,6 +658,7 @@ public class SSDataNavigator extends JPanel {
 					txtCurrentRow.setText(String.valueOf(currentRow));	
 				} catch(SQLException se) {
 					se.printStackTrace();
+					JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while updating row or moving the cursor.\n"+se.getMessage());
 				}
 			}
 		});
@@ -787,6 +791,7 @@ public class SSDataNavigator extends JPanel {
 						
 				} catch(SQLException se) {
 					se.printStackTrace();
+					JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured refreshing the data.\n"+se.getMessage());
 				}
 			}
 		});
@@ -950,6 +955,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.18  2004/09/08 18:41:54  prasanth
+ * Added a rowset listener.
+ *
  * Revision 1.17  2004/09/02 16:37:05  prasanth
  * Moving to the last record if your has added a record & pressed commit button.
  * This would keep the user in the added record.
