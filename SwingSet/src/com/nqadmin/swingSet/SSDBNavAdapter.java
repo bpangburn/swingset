@@ -34,7 +34,7 @@
 
 package com.nqadmin.swingSet;
 
-
+import java.io.Serializable;
 
 /**
  * SSDBNavAdapter.java
@@ -51,7 +51,7 @@ package com.nqadmin.swingSet;
  * @author	$Author$
  * @version	$Revision$
  */
-public class SSDBNavAdapter implements SSDBNav {
+public class SSDBNavAdapter implements SSDBNav, Serializable {
 
 	public void performPreInsertOps(){
 	}
@@ -79,6 +79,9 @@ public class SSDBNavAdapter implements SSDBNav {
 
 /*
  * $Log$
+ * Revision 1.4  2004/03/08 16:43:37  prasanth
+ * Updated copy right year.
+ *
  * Revision 1.3  2003/11/26 21:22:11  prasanth
  * Added function performCancelOps().
  *
