@@ -68,10 +68,10 @@ import javax.sql.RowSet;
  */
 public class SSDataNavigator extends JPanel{
 
-	JButton button1 = new JButton("<<");
-	JButton button2 = new JButton("<");
-	JButton button3 = new JButton(">");
-	JButton button4 = new JButton(">>");
+	JButton button1 = new JButton();
+	JButton button2 = new JButton();
+	JButton button3 = new JButton();
+	JButton button4 = new JButton();
 
 	JButton button5 = new JButton(); // Commit button
 	JButton button6 = new JButton();
@@ -147,14 +147,24 @@ public class SSDataNavigator extends JPanel{
 		button9.setFont(new Font("windings 3",Font.BOLD,12));
 
 */
-		button2.setText("<");
-		button3.setText(">");
-		button5.setText("Commit");
-		button6.setText("Undo");
+//		button2.setText("<");
+//		button3.setText(">");
+//		ImageIcon icon = new ImageIcon("images/first.gif");
+		button1.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/first.gif")));
+		button2.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/prev.gif")));
+		button3.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/next.gif")));
+		button4.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/last.gif")));
+		button5.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/commit.gif")));
+		button6.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/undo.gif")));		
+		button7.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/refresh.gif")));
+		button8.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/add.gif")));
+		button9.setIcon(new ImageIcon(java.net.URLClassLoader.getSystemResource("images/delete.gif")));
 
-		button7.setText("Refresh");
-		button8.setText("Add");
-		button9.setText("Delete");
+//		button5.setText("Commit");
+//		button6.setText("Undo");
+//		button7.setText("Refresh");
+//		button8.setText("Add");
+//		button9.setText("Delete");
 
 
 		button1.setToolTipText("First");
@@ -287,7 +297,6 @@ public class SSDataNavigator extends JPanel{
 	  *@return returns true if update succeeds else false.
 	  */
 	  public boolean updatePresentRow(){
-	  	System.out.println("Requested update row  :" + onInsertRow);
 	  	try{
 	  		if(!onInsertRow)
 	  			rowset.updateRow();
@@ -335,10 +344,7 @@ public class SSDataNavigator extends JPanel{
 			button3.setEnabled(true);
 			button4.setEnabled(true);
 		}
-		// THE COMMIT BUTTON IS SHOULB BE USED ONLY AFTER INSERT ROW IS REQUESTED
-		// THIS BUTTONS COMMITES THE INSERTED ROW
-		button5.setEnabled(false);
-		
+
 		try{
 			if( rowset.isLast()){
 				button3.setEnabled(false);
@@ -415,8 +421,16 @@ public class SSDataNavigator extends JPanel{
 					if( modification )
 						rowset.updateRow();
 					rowset.first();
+					button1.setEnabled(false);
 					button2.setEnabled(false);
-					button3.setEnabled(true);
+					if(!rowset.isLast()){
+						button3.setEnabled(true);
+						button4.setEnabled(true);
+					}
+					else{
+						button3.setEnabled(false);
+						button4.setEnabled(false);
+					}
 					if( dbNav != null )
 						dbNav.performNavigationOps(SSDBNav.NAVIGATION_FIRST);
 				}catch(SQLException se){
@@ -440,12 +454,17 @@ public class SSDataNavigator extends JPanel{
 						rowset.first();
 					}
 					// IF IN THE FIRST RECORD DISABLE PREVIOUS BUTTON
-					if( rowset.isFirst() || rowset.getRow() == 0)
-							button2.setEnabled(false);
+					if( rowset.isFirst() || rowset.getRow() == 0){
+						button1.setEnabled(false);
+						button2.setEnabled(false);
+					}
 
 					// IF NEXT BUTTON IS DISABLED ENABLE IT.
-					if( !button3.isEnabled() )
+					if( !rowset.isLast() ){
 						button3.setEnabled(true);
+						button4.setEnabled(true);
+					}
+						
 					if( dbNav != null )
 						dbNav.performNavigationOps(SSDBNav.NAVIGATION_PREVIOUS);	
 				}catch(SQLException se){
@@ -465,19 +484,21 @@ public class SSDataNavigator extends JPanel{
 						rowset.updateRow();
 					if( !rowset.next() ) {
 						button3.setEnabled(false);
+						button4.setEnabled(false);
 						rowset.last();
 					}
 					// IF LAST RECORD THEN DISABLE NEXT BUTTON
-					if( rowset.isLast() )
+					if( rowset.isLast() ){
 						button3.setEnabled(false);
+						button4.setEnabled(false);
+					}
 
-					// IF PREVIOUS BUTTON IS DISABLED THEN ENABLE THE PREVIOUS BUTTON
-					if( !button2.isEnabled() )
+					// IF THIS IS NOT FIRST ROW ENABLE FIRST AND PREVIOUS BUTTONS
+					if( !rowset.isFirst() ){
 						button2.setEnabled(true);
-					
-					// IF THE FIRST BUTTON IS DISABLED THEN ENABLE IT
-					if(!button1.isEnabled())
 						button1.setEnabled(true);	
+					}
+											
 					if( dbNav != null )
 						dbNav.performNavigationOps(SSDBNav.NAVIGATION_NEXT);	
 				}catch(SQLException se){
@@ -499,9 +520,15 @@ public class SSDataNavigator extends JPanel{
 						rowset.updateRow();
 					rowset.last();
 					button3.setEnabled(false);
-					button2.setEnabled(true);
-					if(!rowset.isFirst())
+					button4.setEnabled(false);
+					if(!rowset.isFirst()){
 						button1.setEnabled(true);
+						button2.setEnabled(true);
+					}
+					else{
+						button1.setEnabled(false);
+						button2.setEnabled(false);
+					}
 					if( dbNav != null )
 						dbNav.performNavigationOps(SSDBNav.NAVIGATION_LAST);	
 				}catch(SQLException se){
@@ -516,20 +543,29 @@ public class SSDataNavigator extends JPanel{
 		button5.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent ae){
 				try{
-					
-					rowset.insertRow();
-					if( dbNav != null )
-						dbNav.performPostInsertOps();
-					rowset.moveToCurrentRow();
-					
+				// IF ON INSERT ROW ADD THE ROW.	
+					if(onInsertRow){
+						rowset.insertRow();
+						if( dbNav != null )
+							dbNav.performPostInsertOps();
+						rowset.moveToCurrentRow();
+					}
+				// ELSE UPDATE THE PRESENT ROW VALUES.	
+					else
+						rowset.updateRow();
+						
 					onInsertRow = false;
 					
-					button1.setEnabled(true);
-					button2.setEnabled(true);
-					button3.setEnabled(true);
-					button4.setEnabled(true);
-					button5.setEnabled(false);
+					if(!rowset.isFirst()){
+						button1.setEnabled(true);
+						button2.setEnabled(true);
+					}
+					if(!rowset.isLast()){
+						button3.setEnabled(true);
+						button4.setEnabled(true);
+					}
 					button7.setEnabled(true);
+					
 					if(allowInsertions)
 						button8.setEnabled(true);
 					if(allowDeletions)
@@ -548,6 +584,7 @@ public class SSDataNavigator extends JPanel{
 			public void actionPerformed(ActionEvent ae){
 				try{
 					rowset.cancelRowUpdates();
+					onInsertRow = false;
 					if(dbNav != null)
 						dbNav.performCancelOps();
 					//rowset.deleteRow();
@@ -664,6 +701,9 @@ public class SSDataNavigator extends JPanel{
 
 /*
  * $Log$
+ * Revision 1.4  2003/11/26 21:24:49  prasanth
+ * Calling performCancelOps().
+ *
  * Revision 1.3  2003/10/31 16:02:52  prasanth
  * Added login to disable the navigation buttons when only one record is present
  * in the rowset.
