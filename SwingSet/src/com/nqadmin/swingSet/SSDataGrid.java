@@ -766,7 +766,10 @@ public class SSDataGrid extends JTable {
      * Initialization code.
      */
     protected void init() {
-
+        
+        // FORCE JTABLE TO SURRENDER TO THE EDITOR WHEN KEYSTROKES CAUSE THE EDITOR TO BE ACTIVATED
+            setSurrendersFocusOnKeystroke(true);
+            
         // ADD KEY LISTENER TO JTABLE.
         // THIS IS USED FOR DELETING THE ROWS
         // ALLOWS MULTIPLE ROW DELETION.
@@ -1233,6 +1236,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.31  2005/02/22 15:16:09  yoda2
+ * Removed preferredSize datamember along with setter & getter.  These all exist in the parent class.
+ *
  * Revision 1.30  2005/02/13 15:38:20  yoda2
  * Removed redundant PropertyChangeListener and VetoableChangeListener class variables and methods from components with JComponent as an ancestor.
  *
