@@ -73,9 +73,22 @@ components were serialized and the methods for accessing each component were
 standardized across the toolkit.  Major usability enhancements include cut &
 paste support from the data grid to/from spreadsheet programs and/or other
 data grids, addition of current record index and total record count to the data
-navigator, and default selection of an "empty" item for combo boxes.  Finally,
-the 0.8.0 release includes a number of smaller bug fixes, enhancements, and code
-improvements. See ChangeLog.txt for more information.
+navigator, and default selection of an "empty" item for combo boxes.  See
+ChangeLog.txt for more information.
+
+Note that the 0.8.3 release is the last planned release in the 0.8.X series and
+contains primarily bug fixes and usability enhancements.  The 0.9.0 release will
+follow shortly and will contain a new serialized datasource abstraction layer.
+This will greatly facilitate serialization/deserialization of the various
+SwingSet components and will pave the way for SwingSet compatibility with non-
+up datable rowsets and other non-database datasources.  Unfortunately,
+applications written for 0.8.X and earlier versions of SwingSet will require
+some small changes related to database connections and rowset objects in order
+to work with the 0.9.X and later versions.  We will make every effort to
+constrain and minimize the required changes.  The 0.8.3 release should supply
+developers with the latest fixes and provide the maximum migration time as
+0.8.3 and 0.9.0 should be identical in all aspects other than the datasource
+abstraction layer.
     
     
 ==============================================================================
@@ -142,7 +155,7 @@ swingset.jar and add both JAR files to your CLASSPATH. Alternatively, you can
 copy both files to the the /jre/lib/ext subdirectory of your JDK (for
 compiling) and the /lib/ext subdirectory of your JRE (for execution).
 
-SwingSet has been tested with J2SE 1.4.2 and 1.5.0 Beta 2, but should work with
+SwingSet has been tested with J2SE 1.4.2 and 1.5.0, but should work with
 all J2SE 1.4 or 1.5 releases.
 
 Note that you will also need a JDBC driver for your target database.  If the
@@ -154,11 +167,16 @@ placed in the same /lib/ext subdirectories mentioned above.
 SAMPLE/DEMO PROGRAMS
 ==============================================================================
 
-The sample/demo programs provided with SwingSet utilize a read only PostgreSQL
+The sample/demo programs provided with SwingSet utilize a read-only PostgreSQL
 database based on the suppliers-and-parts database referenced in the classic
 database textbook, "An Introduction to Database Systems,"  by C. J. Date.
-Therefore the PostgreSQL JDBC driver is required.  The JDBC JAR file is
-available from:
+
+The demo is available as a Java Web Start application from:
+http://swingset.sourceforge.net/SwingSet.jnlp
+
+Alternatively, the demo can be downloaded and run from the command line.  This
+method also requires downloading the PostgreSQL JDBC driver.  The JDBC JAR file
+is available from:
 http://jdbc.postgresql.org/download.html
 
 This file should be added to your CLASSPATH or placed in the same /lib/ext
@@ -173,14 +191,15 @@ the JAR file ssdemo.jar to launch the demo.  If that doesn't work then type:
   java -jar <demo jar file name here>
   
   e.g.
-       java -jar swingset-demo_0.8.0_beta.jar
+       java -jar swingset-demo_0.8.3_beta.jar
   
 Please note that the demo requires both the rowset.jar and latest SwingSet
-binary JAR files (e.g. swingset-bin_0.8.0_beta.jar). See the "INSTALLATION"
+binary JAR files (e.g. swingset-bin_0.8.3_beta.jar). See the "INSTALLATION"
 section above for more information.
 
 The demo will attempt to connect to a small, remote, read only database so an
 Internet connection is required.
+
 
 ***********************
 Example1
@@ -247,8 +266,31 @@ table.
 
 
 ==============================================================================
-CLASS DESCRIPTIONS
+CLASS DESCRIPTIONS - SWINGSET COMPONENTS
 ==============================================================================
+***********************
+SSTextField
+***********************
+SSTextField extends the JTextField. This class provides different masks
+including a date mask, a social security number mask, etc.
+
+
+***********************
+SSTextArea
+***********************
+SSTextArea extends the JTextArea to include rowset binding.
+
+
+***********************
+SSDBCheckBox
+***********************
+Used to display the boolean values stored in the database. The SSDBCheckBox
+can currently only be bound to a numeric database column.  A checked
+SSDBCheckBox returns a '1' to the database and an uncheck SSDBCheckBox will
+returns a '0'.  In the future an option may be added to allow the user to
+specify the values returned for the checked and unchecked checkbox states.
+
+
 ***********************
 SSComboBox
 ***********************
@@ -281,16 +323,6 @@ e.g.
      Note that if you DO NOT want to use the default mappings, the custom
      mappings must be set before calling the bind() method to bind the
      combobox to a database column.
-  
-  
-***********************
-SSDBCheckBox
-***********************
-Used to display the boolean values stored in the database. The SSDBCheckBox
-can currently only be bound to a numeric database column.  A checked
-SSDBCheckBox returns a '1' to the database and an uncheck SSDBCheckBox will
-returns a '0'.  In the future an option may be added to allow the user to
-specify the values returned for the checked and unchecked checkbox states.
 
 
 ***********************
@@ -368,8 +400,59 @@ e.g.
           getContentPane().add(combo.getComboBox());
           
      // ADD THE JTEXTFIELD TO THE JFRAME
-          getContentPane().add(myText);      
-     
+          getContentPane().add(myText);
+
+
+***********************
+SSDataNavigator
+***********************
+Component that can be used for data navigation. It provides buttons for
+navigation, insertion, and deletion of records in a RowSet. The modification
+of a RowSet can be prevented using the setModificaton() method.  Any changes
+made to the columns of a record will be updated whenever there is a
+navigation.
+
+For example if you are displaying three columns using the JTextField and the
+user changes the text in the text fields then the columns will be updated to
+the new values when the user navigates the RowSet. If the user wants to revert
+the changes he made he can press the Undo button, however this must be done
+before any navigation.  Once navigation takes place changes can't be reverted
+using Undo button (has to be done manually by the user).
+
+
+***********************
+SSDataGrid
+***********************
+SSDataGrid provides a way to display information from a database in a table 
+format (aka "spreadsheet" or "datasheet" view). The SSDataGrid takes a rowset
+as a source of data. It also provides different cell renderers including a
+combo box renderer and a date renderer.
+
+SSDataGrid internally uses the SSTableModel to display the information in a 
+table format. SSDataGrid also provides an easy means for displaying headers.
+Columns can be hidden or made uneditable. In addition, it provides much finer
+control over which cells can be edited and which cells can't be edited.  It
+uses the SSCellEditing interface for achieving this. The implementation of
+this interface also provides a way to specify what kind of information is valid
+for each cell.
+
+SSDataGrid uses the isCellEditable() method in SSCellEditing to determine if a
+cell is editable or not.  The cellUpdateRequested() method of SSCellEditing is
+used to notify a user program when an update is requested. While doing so it
+provides the present value in the cell and also the new value. Based on this
+information the new value can be rejected or accepted by the program.
+
+SSDataGrid also provides an "extra" row to facilitate the addition of rows to
+the table.  Default values for various columns can be set programmatically.  A
+programmer can also specify which column is the primary key column for the
+underlying rowset and supply a primary key for that column when a new row is
+being added.
+
+
+==============================================================================
+CLASS DESCRIPTIONS - SUPPORTING CLASSES
+==============================================================================
+
 
 ***********************
 SSDBNav
@@ -431,23 +514,6 @@ JTabbedPane inside the specified container.
 
 
 ***********************
-SSDataNavigator
-***********************
-Component that can be used for data navigation. It provides buttons for
-navigation, insertion, and deletion of records in a RowSet. The modification
-of a RowSet can be prevented using the setModificaton() method.  Any changes
-made to the columns of a record will be updated whenever there is a
-navigation.
-
-For example if you are displaying three columns using the JTextField and the
-user changes the text in the text fields then the columns will be updated to
-the new values when the user navigates the RowSet. If the user wants to revert
-the changes he made he can press the Undo button, however this must be done
-before any navigation.  Once navigation takes place changes can't be reverted
-using Undo button (has to be done manually by the user).
-
-
-***********************
 SSTextDocument
 ***********************
 Java PlainDocument that is 'database-aware'.  When developing a database
@@ -465,35 +531,6 @@ the SSDBNavImp is provided for clearing controls followoing an insert.
 
 
 ***********************
-SSDataGrid
-***********************
-SSDataGrid provides a way to display information from a database in a table 
-format (aka "spreadsheet" or "datasheet" view). The SSDataGrid takes a rowset
-as a source of data. It also provides different cell renderers including a
-combo box renderer and a date renderer.
-
-SSDataGrid internally uses the SSTableModel to display the information in a 
-table format. SSDataGrid also provides an easy means for displaying headers.
-Columns can be hidden or made uneditable. In addition, it provides much finer
-control over which cells can be edited and which cells can't be edited.  It
-uses the SSCellEditing interface for achieving this. The implementation of
-this interface also provides a way to specify what kind of information is valid
-for each cell.
-
-SSDataGrid uses the isCellEditable() method in SSCellEditing to determine if a
-cell is editable or not.  The cellUpdateRequested() method of SSCellEditing is
-used to notify a user program when an update is requested. While doing so it
-provides the present value in the cell and also the new value. Based on this
-information the new value can be rejected or accepted by the program.
-
-SSDataGrid also provides an "extra" row to facilitate the addition of rows to
-the table.  Default values for various columns can be set programmatically.  A
-programmer can also specify which column is the primary key column for the
-underlying rowset and supply a primary key for that column when a new row is
-being added.
-
-
-***********************
 SSTableModel    
 ***********************
 SSTableModel provides an implementation of the TableModel interface.
@@ -501,6 +538,13 @@ The SSDataGrid uses this class for providing a grid view for a rowset.
 SSTableModel can be used without the SSDataGrid (e.g. in conjunction with a
 JTable), but the cell renderers and hidden columns features of the SSDataGrid
 will not be available.
+
+
+***********************
+SSDataValue
+***********************
+The SSDataValue interface specifies methods for SSTableModel to retrieve new
+values for the primary key column in a JTable.
 
 
 ***********************
@@ -529,17 +573,3 @@ implementation.
 SSCellEditingAdapter defines empty functions so that the programmer can define
 only the functions desired.  Both isCellEditable() and cellUpdateRequested()
 always return true.
-
-
-***********************
-SSDataValue
-***********************
-The SSDataValue interface specifies methods for SSTableModel to retrieve new
-values for the primary key column in a JTable.
-
-
-***********************
-SSTextField
-***********************
-SSTextField extends the JTextField. This class provides different masks
-including a date mask, a social security number mask, etc.
