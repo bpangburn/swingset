@@ -46,11 +46,11 @@ available solutions that perform similar tasks, SwingSet is the first known
 open source solution.
 
 The SwingSet feature-set currently includes:
-1. database binding for textboxes, comboboxes, and checkboxes
-2. masked editing of textboxes
-3. binding of a "hidden" numeric column for comboboxes with text choices
+1. database binding for text boxes, text areas, combo boxes, and check boxes
+2. masked editing of text boxes
+3. binding of a "hidden" numeric column for combo boxes with text choices
    (e.g. 0, 1, & 2 are stored for "Yes," "No," & "Maybe," respectively)
-4. population of comboboxes based on columns in a database query (can also
+4. population of combo boxes based on columns in a database query (can also
    be used for combobox-based record navigation)
 5. a graphical record navigator
     (a) allows for database traversal, insertion, deletion, commit,
@@ -62,7 +62,7 @@ The SwingSet feature-set currently includes:
     (b) allows custom column headings
     (c) allows hiding of specified columns
     (d) allows disabling of specified columns
-    (e) allows columns to be displayed as textboxes or comboboxes
+    (e) allows columns to be displayed as text boxes or combo boxes
     (f) allows addition and deletion of records
     (g) allows deletion of multiple, non-consecutive records
     (h) allows data entry "masks" to be applied to text columns
@@ -73,7 +73,7 @@ components were serialized and the methods for accessing each component were
 standardized across the toolkit.  Major usability enhancements include cut &
 paste support from the data grid to/from spreadsheet programs and/or other
 data grids, addition of current record index and total record count to the data
-navigator, and default selection of an "empty" item for comboboxes.  Finally,
+navigator, and default selection of an "empty" item for combo boxes.  Finally,
 the 0.8.0 release includes a number of smaller bug fixes, enhancements, and code
 improvements. See ChangeLog.txt for more information.
     
@@ -102,7 +102,7 @@ entry (e.g. dates, social security numbers, specified number of decimals, etc.).
 The SSDataGrid can display database information in a "datasheet" or
 "spreadsheet" style view.  It provides functions to set column headers, hide
 columns, and make columns uneditable.  In addition, individual columns in the
-SSDataGrid can be displayed as either text fields or comboboxes.  For text
+SSDataGrid can be displayed as either text fields or combo boxes.  For text
 columns, editing masks can be specified.  SSDataGrid uses the SSTableModel,
 which extends AbstractTableModel. The SSCellEditing and SSDataValue interfaces
 provide fine control over the working of the grid.  The SSTableKeyAdapter
@@ -242,7 +242,7 @@ This example demonstrates the use of SSDataGrid with a combobox renderer.
 Example7
 ***********************
 This example demonstrates the use of SSDataGrid with two combobox renderers
-and a date renderer. The mappings for the comboboxes are retrieved from another
+and a date renderer. The mappings for the combo boxes are retrieved from another
 table.
 
 
@@ -309,7 +309,7 @@ e.g.
   
      Assume you would like to develop a screen for the shipment table and you
      want to have a screen with a combobox where the user can choose a
-     part and a textbox where the user can specify a  quantity.
+     part and a text box where the user can specify a  quantity.
 
      In the combobox you would want to display the part name rather than
      part_id so that it is easier for the user to choose. At the same time you
@@ -470,7 +470,7 @@ SSDataGrid
 SSDataGrid provides a way to display information from a database in a table 
 format (aka "spreadsheet" or "datasheet" view). The SSDataGrid takes a rowset
 as a source of data. It also provides different cell renderers including a
-comboboxes renderer and a date renderer.
+combo box renderer and a date renderer.
 
 SSDataGrid internally uses the SSTableModel to display the information in a 
 table format. SSDataGrid also provides an easy means for displaying headers.

@@ -39,15 +39,15 @@ Changes:
 	SSComboBox:
 		1. Made all the variables protected.
 		2. Added getColumnName function. This function returns the column name
-           to which the combobox is bound to.
+           to which the combo box is bound to.
 		3. Added getRowSet function. This function returns the rowset being
            used for binding.
 		4. Added setColumnName function. This function sets the column name to
-           which the combobox has to be bound.
+           which the combo box has to be bound.
 		5. Added setRowSet function. This function sets the rowset to be used
            for binding to the specified column.
 		6. Added setSelectedValue function. This function sets the value of
-           the combobox to the specified value. (Item displayed will be the
+           the combo box to the specified value. (Item displayed will be the
            one corresponding to the given value, the bound column value will
            also change).
 		7. Added addComponent and removeListener functions. These are private
@@ -157,7 +157,7 @@ For the 0.6.0 release of SwingSet, a grid control, SSDataGrid, has been added,
 which can display database information in a "datasheet" or "spreadsheet" style
 view.  SSDataGrid provides functions to set column headers, hide columns, and
 make columns uneditable.  In addition, individual columns in the SSDataGrid
-can be displayed as either text fields or comboboxes.  For text columns,
+can be displayed as either text fields or combo boxes.  For text columns,
 editing masks can be specified.  SSDataGrid uses the SSTableModel, which
 extends AbstractTableModel. The SSCellEditing and SSDataValue interfaces
 provide fine control over the working of the grid.
@@ -181,7 +181,7 @@ New functions added to existing Classes or Interfaces in SwingSet 0.6.0
 
     SSComboBox:
         1. getSelectedIndex()  
-                - Returns the index of the selected item in the combobox.
+                - Returns the index of the selected item in the combo box.
         2. getSelectedValue()   
                 - Returns the value associated with the selected item.
         
@@ -194,12 +194,12 @@ New functions added to existing Classes or Interfaces in SwingSet 0.6.0
         
     SSDBCheckBox:       
         1. execute()           
-                - Initializes the checkbox by getting the value from the
+                - Initializes the check box by getting the value from the
                   textfield.
         
     SSDBComboBox:
         1. addItem(String _name, long _value) 
-                - Adds an item to the existing list of items in the combobox.
+                - Adds an item to the existing list of items in the combo box.
         2. deleteItem(String _name)
                 - Deletes the item which has name equal to _name.
         3. deleteItem(long _value)
