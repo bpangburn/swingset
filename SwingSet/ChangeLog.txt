@@ -5,7 +5,7 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 $Id$
 
 ==============================================================================
-SwingSet 1.0.0-PR2 - Released xx-xx-2005
+SwingSet 1.0.0-PR2 - Released 03-09-2005
 ==============================================================================
 
 Changes:
