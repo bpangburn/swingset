@@ -813,6 +813,7 @@ public class SSDBComboBox extends JComponent {
      public void addItem(String _name, long _value) {
         columnVector.add(new Long(_value));
         cmbDisplayed.addItem(_name);
+        numberOfItems++;
      }
      
      /**
@@ -828,6 +829,7 @@ public class SSDBComboBox extends JComponent {
             if ( ((String)cmbDisplayed.getItemAt(i)).equals(_name) ) {
                 cmbDisplayed.removeItemAt(i);
                 columnVector.removeElementAt(i);	
+                numberOfItems--;
                 return true;
             }
         }
@@ -849,6 +851,7 @@ public class SSDBComboBox extends JComponent {
         }
         columnVector.removeElementAt(index);
         cmbDisplayed.removeItemAt(index);
+        numberOfItems--;
         return true;
      }	
      
@@ -867,7 +870,8 @@ public class SSDBComboBox extends JComponent {
             if ( ((String)cmbDisplayed.getItemAt(i)).equals(_name) ) {
                 if (((Long)(columnVector.elementAt(i))).longValue() == _value) {
                     cmbDisplayed.removeItemAt(i);
-                    columnVector.removeElementAt(i);	
+                    columnVector.removeElementAt(i);
+                    numberOfItems--;
                     return true;
                 }
             }
@@ -934,6 +938,10 @@ public class SSDBComboBox extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.10  2004/08/12 23:52:36  prasanth
+ * If seleted index is -1 the column value was not updated.
+ * Now setting to null if the selected index is -1.
+ *
  * Revision 1.9  2004/08/10 22:06:58  yoda2
  * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
  *
