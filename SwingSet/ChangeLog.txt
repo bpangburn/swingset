@@ -5,7 +5,7 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 $Id$
 
 ==============================================================================
-SwingSet 0.8.3-beta - Released 10-22-2004
+SwingSet 0.9.0-beta - Released 10-26-2004
 ==============================================================================
 
 Changes:
