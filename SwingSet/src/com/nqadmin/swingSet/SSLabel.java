@@ -56,17 +56,29 @@ import java.beans.PropertyChangeEvent;
  */
 public class SSLabel extends JLabel {
 
-    // TEXT FIELD BOUND TO THE DATABASE
+    /**
+     * Text field bound to the SSRowSet.
+     */
     protected JTextField textField = new JTextField();
 
-    // SSROWSET FROM WHICH THE LABEL WILL GET/SET VALUES
+    /**
+     * SSRowSet from which component will get/set values.
+     */
     protected SSRowSet rowset;
 
-    // BINDING INFORMATION
+    /**
+     * SSRowSet column to which the component will be bound.
+     */
     protected String columnName;
 
-    // LISTENER FOR LABEL & TEXT FIELD
+    /**
+     * Component listener.
+     */
     private final MyLabelTextListener labelTextListener = new MyLabelTextListener();
+    
+    /**
+     * Bound text field document listener.
+     */    
     private final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
     /**
@@ -122,28 +134,28 @@ public class SSLabel extends JLabel {
     }
 
     /**
-     * Returns the column name to which the label is bound.
+     * Returns the SSRowSet column name to which the component is bound.
      *
-     * @return returns the column name to which to label is bound.
+     * @return column name to which the component is bound
      */
     public String getColumnName() {
         return columnName;
     }
 
     /**
-     * Returns the SSRowSet being used to get the values.
+     * Returns the SSRowSet to which the component is bound.
      *
-     * @return returns the SSRowSet being used.
+     * @return SSRowSet to which the component is bound
      */
     public SSRowSet getSSRowSet() {
         return rowset;
     }
 
     /**
-     * Sets the column name to which the label has to be bound
+     * Sets the SSRowSet column name to which the component is bound.
      *
-     * @param _columnName    column name in the SSRowSet to which the label
-     *    is bound.
+     * @param _columnName    column name in the SSRowSet to which the component
+     *    is bound
      */
     public void setColumnName(String _columnName) {
         columnName = _columnName;
@@ -151,9 +163,9 @@ public class SSLabel extends JLabel {
     }
 
     /**
-     * Sets the SSRowSet to be used.
+     * Sets the SSRowSet to which the component is bound.
      *
-     * @param _rowset    SSRowSet to be used for getting the values.
+     * @param _rowset    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _rowset) {
         rowset = _rowset;
@@ -161,9 +173,7 @@ public class SSLabel extends JLabel {
     }
 
     /**
-     * The column name and the SSRowSet should be set before calling this function.
-     * If the column name and SSRowSet are set seperately then this function has to
-     * be called to bind the label to the column in the SSRowSet.
+     * Method for handling binding of component to a SSRowSet column.
      */
     protected void bind() {
 
@@ -187,11 +197,10 @@ public class SSLabel extends JLabel {
     }
 
     /**
-     * Binds the label to the specified column of the SSRowSet.
-     * As the SSRowSet changes the label item displayed changes accordingly.
+     * Sets the SSRowSet and column name to which the component is to be bound.
      *
-     * @param _rowset    SSRowSet to be used for getting the value.
-     * @param _columnName    Column to which the label has to be bound.
+     * @param _rowset    datasource to be used.
+     * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _rowset, String _columnName) {
         rowset = _rowset;
@@ -199,7 +208,10 @@ public class SSLabel extends JLabel {
         bind();
     }
 
-    // INITIALIZES THE LABEL DISPLAY
+    /**
+     * Updates the value displayed in the component based on the SSRowSet column
+     * binding.
+     */
     protected void setDisplay() {
 
         // SET THE LABEL BASED ON THE VALUE IN THE TEXT FIELD
@@ -207,20 +219,25 @@ public class SSLabel extends JLabel {
 
     } // end protected void setDisplay() {
 
-    // ADDS LISTENERS FOR THE LABEL AND TEXT FIELD
+    /**
+     * Adds listeners for component and bound text field (where applicable).
+     */
     private void addListeners() {
         textField.getDocument().addDocumentListener(textFieldDocumentListener);
         addPropertyChangeListener("text", labelTextListener);
     }
 
-    // REMOVES THE LISTENERS FOR TEXT FIELD AND THE LABEL DISPLAYED
+    /**
+     * Removes listeners for component and bound text field (where applicable).
+     */
     private void removeListeners() {
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
         removePropertyChangeListener("text", labelTextListener);
     }
 
     /**
-     * Listener for the text document.
+     * Listener(s) for the bound text field used to propigate values back to the
+     * component's value.
      */
     private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
         public void changedUpdate(DocumentEvent de) {
@@ -253,7 +270,8 @@ public class SSLabel extends JLabel {
     } // end private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
     /**
-     * Listener for the label.
+     * Listener(s) for the component's value used to propigate changes back to
+     * bound text field.
      */
     private class MyLabelTextListener implements PropertyChangeListener, Serializable {
         public void propertyChange(PropertyChangeEvent pce) {
@@ -272,6 +290,9 @@ public class SSLabel extends JLabel {
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/07 20:36:38  yoda2
+ * Made private listener data members final.
+ *
  * Revision 1.6  2005/02/05 05:16:33  yoda2
  * API cleanup.
  *
