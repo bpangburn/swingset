@@ -3,7 +3,7 @@
  * Tab Spacing = 4
  *
  * Copyright (c) 2004, The Pangburn Company, Inc, Prasanth R. Pasala and
- * Deigo Gil
+ * Diego Gil
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -97,6 +97,9 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
 
 /*
  * $Log$
+ * Revision 1.4  2005/01/18 22:34:29  dags
+ * sincronization update
+ *
  * Revision 1.3  2004/12/13 20:50:16  dags
  * Fix package name
  *

@@ -3,7 +3,7 @@
  * Tab Spacing = 4
  *
  * Copyright (c) 2004, The Pangburn Company, Inc, Prasanth R. Pasala and
- * Deigo Gil
+ * Diego Gil
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -98,6 +98,9 @@ public class SSIntegerField extends SSFormattedTextField {
 
 /*
  * $Log$
+ * Revision 1.3  2004/12/13 20:50:16  dags
+ * Fix package name
+ *
  * Revision 1.2  2004/12/13 18:46:13  prasanth
  * Added License.
  *
