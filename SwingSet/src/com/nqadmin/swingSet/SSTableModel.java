@@ -95,6 +95,9 @@ public class SSTableModel extends AbstractTableModel {
 	// LIST OF HIDDEN COLUMNS
 	protected int[] hiddenColumns	   = null;
 	
+	// BOOLEAN INDICATING IF INSERTIONS SHOULD BE ALLOWED
+	protected boolean allowInsertion = true;
+	
 	/**
 	 * Constructs a SSTableModel object.
 	 * If this contructor is used the setRowSet method has to be used to set the rowset
@@ -136,6 +139,14 @@ public class SSTableModel extends AbstractTableModel {
 	 public void setSSCellEditing(SSCellEditing _cellEditing) {
 	 	cellEditing = _cellEditing;
 	 }
+	 
+	 /**
+	  *	Sets whether insertions should be allowed or not.
+	  *@param _insert - true if user can insert new rows else false.
+	  */
+	 public void setInsertion(boolean _insert){
+	 	allowInsertion = _insert;
+	 } 
 	
 	/**
 	 * Initializes the SSTableModel. (Gets  the column count and rowcount for the
@@ -176,7 +187,10 @@ public class SSTableModel extends AbstractTableModel {
 	public int getRowCount() {
 		// RETURN THE NUMBER OF ROWS AS ONE GREATER THAN THOSE IN DATABASE
 		// ITS USED FOR INSERTING NEW ROWS
-		return rowCount +1;
+		if(allowInsertion)
+			return rowCount +1;
+		// IF INSERTION IS NOT ALLOWED THEN RETURN THE ACTUAL ROW COUNT
+		return rowCount;	
 	}
 	
 	/**
@@ -780,6 +794,9 @@ public class SSTableModel extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.7  2004/08/10 22:06:58  yoda2
+ * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
+ *
  * Revision 1.6  2004/08/02 15:27:15  prasanth
  * Made all variabled protected.
  *
