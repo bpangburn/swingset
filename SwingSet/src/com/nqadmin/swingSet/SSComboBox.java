@@ -369,7 +369,9 @@ public class SSComboBox   extends JComponent {
 			// ADD THE SPECIFIED ITEMS TO THE COMBO BOX
 			// REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
 			// THE DISPLAYED ITEMS
-			cmbDisplayed.removeAll();
+			if(cmbDisplayed.getItemCount() != 0){
+				cmbDisplayed.removeAllItems();
+			}
 			for(int i=0;i<options.length;i++){
 				cmbDisplayed.addItem(options[i]);
 			}
@@ -405,7 +407,9 @@ public class SSComboBox   extends JComponent {
 			// add the items to combo
 			// REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
 			// THE DISPLAYED ITEMS
-			cmbDisplayed.removeAll();
+			if(cmbDisplayed.getItemCount() != 0){
+				cmbDisplayed.removeAllItems();
+			}
 			for(int i=0;i<options.length;i++){
 				cmbDisplayed.addItem(options[i]);
 			}
@@ -445,7 +449,9 @@ public class SSComboBox   extends JComponent {
 //			System.out.println("Requested  Option: " + options);
 			// REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
 			// THE DISPLAYED ITEMS
-			cmbDisplayed.removeAll();	
+			if(cmbDisplayed.getItemCount() != 0){
+				cmbDisplayed.removeAllItems();
+			}
 			if( options == YES_NO_OPTION) {
 				cmbDisplayed.addItem(new String("NO"));
 				cmbDisplayed.addItem(new String("YES"));
@@ -713,6 +719,10 @@ public class SSComboBox   extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.8  2004/08/09 15:37:36  prasanth
+ * 1. Removing elements in the combo before adding any new one.
+ * 2. Added key listener to transfer focus on enter key.
+ *
  * Revision 1.7  2004/08/02 14:41:10  prasanth
  * 1. Added set methods for rowset, columnname, selectedvalue.
  * 2. Added get methods for rowset, columname.
