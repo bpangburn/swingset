@@ -1,0 +1,53 @@
+Classes or Interfaces Added in SwingSet-0.6.0
+
+1.SSCellEditing
+2.SSCellEditingAdapter
+3.SSDataGrid
+4.SSDataValue
+5.SSTableModel
+6.SSTextField
+
+
+New Functions Added for the older Classes or Interfaces
+
+SSComboBox:
+	1. getSelectedIndex()  
+		- Returns the index of the selected item in the combo box.
+	2.getSelectedValue()   
+		- Returns the value associated with the selected item.
+	
+SSDataNavigator:
+	1. setConfirmDeletes() 
+		- If set to true, every time delete button is pressed
+		navigator pops up a confirmation dialog to the user.
+	2. updatePresentRow()  
+		- Updates the present row.			 
+	
+SSDBCheckBox:	
+	1. execute() 	       
+		-  Initializes the check box by getting the value from the
+		textfield.
+	
+SSDBComboBox:
+	1. addItem(String _name, long _value) 
+		- Adds an item to the existing list of items in the combo box.
+	2. deleteItem(String _name)
+		- Deletes the item which has name equal to _name.
+	3. deleteItem(long _value)
+		- Deletes the item which has value equal to _value.
+	4. deleteItem(String _name, long _value)
+		- Deletes the item which has display name equal to _name and 
+		corresponding value as _value.
+	5. updateItem(long _value, String _name)
+		- Updates the string thats being displayed.
+
+SSDBNav:
+	1. performCancelOps()
+		- This function is called when the user is on the insert row 
+		and cancels the insert by clicking on the undo button.
+	2. performNavigationOps(int navigationType)
+		- This function is called when ever navigation takes place.
+	3. performRefreshOps()
+		- This function is called when the user what to refresh the 
+		information.
+			       
