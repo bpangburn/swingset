@@ -21,7 +21,17 @@ Changes:
     SSDataGrid:
         1. Added custom editor to Numeric, String & Object type columns.
         2. Modified the ComboRenderer to extend DefaultCellRenderer.UIResource
+        3. Added setSurrendersFocusOnKeystroke(true); to the init() method to
+           force JTable to surrender to the editor when keystrokes cause the
+           editor to be activated 
 
+    SSTableModel:
+        1. Added TIMESTAMP type to the list of column types that are handled.
+           TimeStamp is also handled in the same way as date no special treatment.
+           
+    SSTextDocument:
+        1. Added TIMESTAMP type to the list of sql types that are handled.
+           TimeStamp is also handled in the same way as date no special treatment.
 
 
 ==============================================================================
