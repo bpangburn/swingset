@@ -33,6 +33,7 @@
 package com.nqadmin.swingSet.datasources;
 
 import java.beans.*;
+import java.beans.IntrospectionException;
 
 /**
  * SSConnectionBeanInfo.java
@@ -71,11 +72,34 @@ import java.beans.*;
         return null;
         
     } // end public java.awt.Image getIcon(int _iconKind) {
+    	
+    public PropertyDescriptor[] getPropertyDescriptors(){
+    	try{
+    	
+	    	PropertyDescriptor urlDescriptor = new PropertyDescriptor("url", SSConnection.class, "getUrl", "setUrl");
+	    	urlDescriptor.setBound(true);
+	    	PropertyDescriptor usernameDescriptor = new PropertyDescriptor("username", SSConnection.class, "getUsername", "setUsername");
+	    	usernameDescriptor.setBound(true);
+	    	PropertyDescriptor passwordDescriptor = new PropertyDescriptor("password", SSConnection.class, "getPassword", "setPassword");
+	    	passwordDescriptor.setBound(true);
+	    	PropertyDescriptor driverNameDescriptor = new PropertyDescriptor("driverName", SSConnection.class, "getDriverName", "setDriverName");
+	    	driverNameDescriptor.setBound(true);
+	    	
+	    	PropertyDescriptor[] propertyDescriptors = new PropertyDescriptor[]{urlDescriptor, usernameDescriptor, passwordDescriptor, driverNameDescriptor};
+	    	return propertyDescriptors;
+	    }catch(IntrospectionException ie){
+	    	ie.printStackTrace();
+	    }
+	    return null;
+    }	
 
 }
 
 /*
  * $Log$
+ * Revision 1.4  2005/02/07 19:56:16  yoda2
+ * Fixing JavaDoc errors with _iconKind parameter name.
+ *
  * Revision 1.3  2005/02/04 22:41:35  yoda2
  * Updated Copyright info.
  *
