@@ -243,6 +243,18 @@
     public Date getDate(int columnIndex) throws SQLException{
         return rowset.getDate(columnIndex);
     }
+    
+    /**
+     * Retrieves the value of the designated column in the current row of this ResultSet
+     * object as a byte array in the Java programming language. The bytes represent the
+     * raw values returned by the driver.
+     *@param columnIndex - index number of the column
+     *@return  returns the column value; if the value is SQL NULL, the value returned is null 
+     *@throws throws an SQLException - if a database access error occurs
+     */ 
+    public byte[] getBytes(int columnIndex)  throws SQLException {
+        return rowset.getBytes(columnIndex);
+    }
 
     /**
      * Updates the designated column with a boolean value. The updater methods are used to
@@ -333,6 +345,19 @@
      */
     public void updateDate(int columnIndex, Date value) throws SQLException{
         rowset.updateDate(columnIndex, value);
+    }
+    
+    /**
+     *    Updates the designated column with a byte array value. The updater methods are
+     * used to update column values in the current row or the insert row. The updater
+     * methods do not update the underlying database; instead the updateRow or insertRow
+     * methods are called to update the database.
+     *@param columnIndex - the index number of the column
+     *@param value - the new column value 
+     *@throws throws an SQLException - if a database access error occurs
+     */
+    public void updateBytes(int columnIndex, byte[] value) throws SQLException {
+        rowset.updateBytes(columnIndex, value);
     }
 
     /**
@@ -430,6 +455,18 @@
     public Date getDate(String columnName) throws SQLException{
         return rowset.getDate(columnName);
     }
+    
+    /**
+     * Retrieves the value of the designated column in the current row of this ResultSet
+     * object as a byte array in the Java programming language. The bytes represent the
+     * raw values returned by the driver.
+     *@param columnName - the SQL name of the column
+     *@return  returns the column value; if the value is SQL NULL, the value returned is null 
+     *@throws throws an SQLException - if a database access error occurs
+     */    
+    public byte[] getBytes(String columnName)  throws SQLException {
+        return rowset.getBytes(columnName);
+    }
 
     /**
      * Updates the designated column with a boolean value. The updater methods are used to
@@ -520,6 +557,19 @@
      */
     public void updateDate(String columnName, Date value) throws SQLException{
         rowset.updateDate(columnName, value);
+    }
+    
+    /**
+     *    Updates the designated column with a byte array value. The updater methods are
+     * used to update column values in the current row or the insert row. The updater
+     * methods do not update the underlying database; instead the updateRow or insertRow
+     * methods are called to update the database.
+     *@param columnName - the name of the column
+     *@param value - the new column value 
+     *@throws throws an SQLException - if a database access error occurs
+     */
+    public void updateBytes(String columnName, byte[] value) throws SQLException {
+        rowset.updateBytes(columnName, value);
     }
 
     /**
@@ -806,6 +856,9 @@
 }
  /*
   * $Log$
+  * Revision 1.5  2004/11/11 14:45:57  yoda2
+  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
+  *
   * Revision 1.4  2004/11/01 15:53:19  yoda2
   * Fixed various JavaDoc errors.
   *
