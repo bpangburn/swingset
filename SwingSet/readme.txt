@@ -63,12 +63,12 @@ commit, and rollback  of a RowSet. Changes to the current record are auto-
 committed when a navigation takes place (also similar to Access).
 
 For the 0.6.0 release of SwingSet, a grid control, SSDataGrid, has been added,
-which can display database information in a "datasheet" or "spreadsheet"
-style view.  SSDataGrid provides functions to set column headers,
-hide columns, and make columns uneditable.  In addition, individual columns in
-the SSDataGrid can be displayed as either text fields or comboboxes.  For text
-columns, editing masks can be specified.  SSDataGrid uses the SSTableModel,
-which extends AbstractTableModel. The SSCellEditing and SSDataValue interfaces
+which can display database information in a "datasheet" or "spreadsheet" style
+view.  SSDataGrid provides functions to set column headers, hide columns, and
+make columns uneditable.  In addition, individual columns in the SSDataGrid
+can be displayed as either text fields or comboboxes.  For text columns,
+editing masks can be specified.  SSDataGrid uses the SSTableModel, which
+extends AbstractTableModel. The SSCellEditing and SSDataValue interfaces
 provide fine control over the working of the grid.
 
 Also added in the 0.6.0 release of SwingSet is the SSTextField, which extends
