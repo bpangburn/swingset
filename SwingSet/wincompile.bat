@@ -7,4 +7,4 @@ REM
 echo off
 rmdir .\bin /s
 mkdir .\bin
-javac -d .\bin .\src\com\nqadmin\swingSet\datasources\*.java .\src\com\nqadmin\swingSet\*.java
+javac -source 1.4 -target 1.4 -Xlint:deprecation -Xlint:unchecked -d .\bin .\src\com\nqadmin\swingSet\*.java .\src\com\nqadmin\swingSet\datasources\*.java .\src\com\nqadmin\swingSet\formatting\*.java .\src\com\nqadmin\swingSet\formatting\helpers\*.java .\src\com\nqadmin\swingSet\utils\*.java 
