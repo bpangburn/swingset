@@ -52,21 +52,30 @@ The SwingSet feature-set currently includes:
    (e.g. 0, 1, & 2 are stored for "Yes," "No," & "Maybe," respectively)
 4. population of comboboxes based on columns in a database query (can also
    be used for combobox-based record navigation)
-5. a graphical record navigator (allows for database traversal, insertion,
-   deletion, commit, and rollback)
+5. a graphical record navigator
+    (a) allows for database traversal, insertion, deletion, commit,
+        and rollback
+    (b) supplies current record index (editable) and total record count
 6. a data grid component for creating datasheet/spreadsheet/table views of
    queries
-    (a) allows custom column headings
-    (b) allows hiding of specified columns
-    (c) allows disabling of specified columns
-    (d) allows columns to be displayed as textboxes or comboboxes
-    (e) allows addition and deletion of records
-    (f) allows deletion of multiple, non-consecutive records
-    (g) allows data entry "masks" to be applied to text columns
+    (a) allows cut & paste to/from spreadsheet programs or other data grids
+    (b) allows custom column headings
+    (c) allows hiding of specified columns
+    (d) allows disabling of specified columns
+    (e) allows columns to be displayed as textboxes or comboboxes
+    (f) allows addition and deletion of records
+    (g) allows deletion of multiple, non-consecutive records
+    (h) allows data entry "masks" to be applied to text columns
     
-Version 0.7.0 includes several usability enhancments and bug fixes, a
-workaround for the mysql-connector-java MySQL JDBC driver, and a graphical
-data navigator.  See ChangeLog.txt for more information.
+For version 0.8.0 all components have been made into Java Beans which will
+allow for better integration with Java IDEs.  As part of this, the SwingSet
+components were serialized and the methods for accessing each component were
+standardized across the toolkit.  Major usability enhancements include cut &
+paste support from the data grid to/from spreadsheet programs and/or other
+data grids, addition of current record index and total record count to the data
+navigator, and default selection of an "empty" item for comboboxes.  Finally,
+the 0.8.0 release includes a number of smaller bug fixes, enhancements, and code
+improvements. See ChangeLog.txt for more information.
     
     
 ==============================================================================
@@ -96,11 +105,14 @@ columns, and make columns uneditable.  In addition, individual columns in the
 SSDataGrid can be displayed as either text fields or comboboxes.  For text
 columns, editing masks can be specified.  SSDataGrid uses the SSTableModel,
 which extends AbstractTableModel. The SSCellEditing and SSDataValue interfaces
-provide fine control over the working of the grid.
+provide fine control over the working of the grid.  The SSTableKeyAdapter
+provides support for cut & paste from a data grid to/from spreadsheet programs
+and/or other data grids.
 
 The SSDataNavigator class provides traversal, insertion, deletion, commit, and
-rollback  of a RowSet. Changes to the current record are auto-committed when a
-navigation takes place (also similar to Access).
+rollback  of a RowSet. The numerical index is show for the current record and
+the total number of records is displayed. Changes to the current record are
+auto-committed when a navigation takes place (also similar to Access).
 
 More information on SwingSet is available from:
 http://swingset.sourceforge.net 
@@ -130,7 +142,7 @@ swingset.jar and add both JAR files to your CLASSPATH. Alternatively, you can
 copy both files to the the /jre/lib/ext subdirectory of your JDK (for
 compiling) and the /lib/ext subdirectory of your JRE (for execution).
 
-SwingSet has been tested with J2SE 1.4.2 and 1.5.0 Beta 1, but should work with
+SwingSet has been tested with J2SE 1.4.2 and 1.5.0 Beta 2, but should work with
 all J2SE 1.4 or 1.5 releases.
 
 Note that you will also need a JDBC driver for your target database.  If the
@@ -147,7 +159,7 @@ database based on the suppliers-and-parts database referenced in the classic
 database textbook, "An Introduction to Database Systems,"  by C. J. Date.
 Therefore the PostgreSQL JDBC driver is required.  The JDBC JAR file is
 available from:
-http://jdbc.postgresql.org/download/pg74.1jdbc3.jar
+http://jdbc.postgresql.org/download.html
 
 This file should be added to your CLASSPATH or placed in the same /lib/ext
 subdirectories mentioned under "INSTALLATION."
@@ -161,10 +173,10 @@ the JAR file ssdemo.jar to launch the demo.  If that doesn't work then type:
   java -jar <demo jar file name here>
   
   e.g.
-       java -jar swingset-demo_0.7.0_beta.jar
+       java -jar swingset-demo_0.8.0_beta.jar
   
 Please note that the demo requires both the rowset.jar and latest SwingSet
-binary JAR files (e.g. swingset-bin_0.7.0_beta.jar). See the "INSTALLATION"
+binary JAR files (e.g. swingset-bin_0.8.0_beta.jar). See the "INSTALLATION"
 section above for more information.
 
 The demo will attempt to connect to a small, remote, read only database so an

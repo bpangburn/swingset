@@ -17,51 +17,58 @@ Changes:
 	
 	SSComboBox:
 		1. Made all the variables protected.
-		2. Added getColumnName function. This function returns the column name to 
-		   which the combobox is bound to.
-		3. Added getRowSet function. This function returns the rowset being used
-		   for binding.
-		4. Added setColumnName function. This function sets the column name to which
-		   the combobox has to be bound.
-		5. Added setRowSet function. This function sets the rowset to be used for 
-		   binding to the specified column.
-		6. Added setSelectedValue function. This function sets the value of the combobox
-		   to the specified value. (Item displayed will be the one corresponding to the
-		   given value, the bound column value will also change).
-		7. Added addComponent and removeListener functions. These are private functions.
-		8. The inner classes for listeners also implement Serializable interface.
+		2. Added getColumnName function. This function returns the column name
+           to which the combobox is bound to.
+		3. Added getRowSet function. This function returns the rowset being
+           used for binding.
+		4. Added setColumnName function. This function sets the column name to
+           which the combobox has to be bound.
+		5. Added setRowSet function. This function sets the rowset to be used
+           for binding to the specified column.
+		6. Added setSelectedValue function. This function sets the value of
+           the combobox to the specified value. (Item displayed will be the
+           one corresponding to the given value, the bound column value will
+           also change).
+		7. Added addComponent and removeListener functions. These are private
+           functions.
+        8. The inner classes for listeners also implement Serializable
+           interface.
 		
 	SSDataGrid:
-		1. Added functions getSelectedColumns and getSelectedColumnCount. Overriding 
-		   the methods in JTable. This is needed to avoid the hidden columns being selected.
-		   This is needed for copy and paste support.
-		2. Added copy and paste support for the SSDataGrid, this is achieved with the help
-		   of SSTableKeyAdapter.
-		3. The default item selected in a combo box renderer when a default value is not 
-		   specified for the column will be -1. In the previous release it was the first
-		   item.
+		1. Added functions getSelectedColumns and getSelectedColumnCount.
+           Overriding the methods in JTable. This is needed to avoid the
+           hidden columns being selected. This is needed for copy and paste
+           support.
+		2. Added copy and paste support for the SSDataGrid, this is achieved
+           with the help of SSTableKeyAdapter.
+		3. The default item selected in a combo box renderer when a default
+           value is not specified for the column will be -1. In the previous
+           release it was the first item.
 	
 	SSDataNavigator:
-		1. Added getXXX functions for rowset, button size, modification, deletion, insertion,
-		   confirm deletes.
-		2. Added rowCount and currentRow variables to keep track of current row number and
-		   total number of rows in the current rowset.
-		3. Added a text field and a label to the navigator to display the total number of
-		   rows and current record number.
+		1. Added getXXX functions for rowset, button size, modification,
+           deletion, insertion, confirm deletes.
+		2. Added rowCount and currentRow variables to keep track of current
+           row number and total number of rows in the current rowset.
+		3. Added a text field and a label to the navigator to display the
+           total number of rows and current record number.
 		  
 	SSDBCheckBox:
-		1. Added a new constructor which takes a rowset and column name as arguments.
-		2. Added  bind function which takes a rowset and column name as arguments.
-		3. Added getColumnName function. This function returns the column name to which
-		   the check box is bound to.
-		4. setTextField, getTextField functions are deprecated, also the constructor
-		   that takes a TextField as an argument is also deprecated
+		1. Added a new constructor which takes a rowset and column name as
+           arguments.
+		2. Added  bind function which takes a rowset and column name as
+           arguments.
+		3. Added getColumnName function. This function returns the column name
+           to which the check box is bound to.
+		4. setTextField, getTextField functions are deprecated, also the
+           constructor that takes a TextField as an argument is also
+           deprecated
 		5. Added key listener to transfer focus when enter key is pressed.
 		
 	SSDBComboBox:
 		1. setTextField function is deprecated.
-		2. Added setSelectedValue function. This function sets the selected item to the 
-		   one corresponding to the specified value.
+		2. Added setSelectedValue function. This function sets the selected
+           item to the one corresponding to the specified value.
 		3. Added key listener to transfer focus when enter key is pressed.
 		4. Removing items from combo before adding new items.
 	
@@ -69,12 +76,12 @@ Changes:
 		1. Implements Serializable.
 	
 	SSDBNavImp:
-		1. Default item selected in the combo box will be -1 rather than 0. This way the column
-		   value can be null if a value is not selected.
+		1. Default item selected in the combo box will be -1 rather than 0.
+           This way the column value can be null if a value is not selected.
 		
 	SSTableKeyAdapter:
-		1. This class added a key listener to the JTable and provides copy and paste support 
-		   for the given JTable.
+		1. This class added a key listener to the JTable and provides copy and
+           paste support for the given JTable.
 		   
 	SSTableModel:
 		1. Made all the variables protected.
@@ -82,9 +89,10 @@ Changes:
 	SSTextDocument:
 		1. Added setColumnName, setColumnIndex, and setRowSet functions.
 		2. Added getColumnName, getColumnIndex, and getRowSet functions.
-		3. Added bind function so find the text field to a column in the rowset.
-        4. Added tranfer focus in the key listener. Focus will be tranferred to next
-		   component when enter key is pressed.
+		3. Added bind function so find the text field to a column in the
+           rowset.
+        4. Added tranfer focus in the key listener. Focus will be tranferred
+           to next component when enter key is pressed.
 	
 
 ==============================================================================
@@ -95,28 +103,29 @@ Changes:
 
     SSDataNavigator:
         1. Reduced the default size of the buttons to 50 * 20.
-        2. First & Last buttons will be disabled when the rowset is at first & last row
-           respectively.
-        3. Commit button will be enabled all the time. When rowset is on insert row, pressing
-           of commit button will insert the row. When not on insert row it will update the 
-           present row.
+        2. First & Last buttons will be disabled when the rowset is at first
+           & last row respectively.
+        3. Commit button will be enabled all the time. When rowset is on
+           insert row, pressing of commit button will insert the row. When not
+           on insert row it will update the present row.
         4. Button graphics have been added.
-        5. Added the function setCallExecute(). This function can be used to indicate to the
-           Navigator that a MySQL database is being used. If this is set to false, the Navigator
-           will not call the execute() method on the specified rowset. See question #6 in the 
-           FAQ for further explanation.
+        5. Added the function setCallExecute(). This function can be used to
+           indicate to the Navigator that a MySQL database is being used. If
+           this is set to false, the Navigator will not call the execute()
+           method on the specified rowset. See question #6 in the FAQ for
+           further explanation.
 
     SSTextDocument:
-        1. In the rowset listener, replaced the function calls remove, removeUpdate, 
-           insertString & insertUpdate with single function call replace.
-           This seems to fix the problems of NullPointerException caused occasionally
-           when the SSTextDocument is set to a JTextArea (NPE was occurring only when
-           text had new line characters).
+        1. In the rowset listener, replaced the function calls remove,
+           removeUpdate, insertString & insertUpdate with single function call
+           replace. This seems to fix the problems of NullPointerException
+           caused occasionally when the SSTextDocument is set to a JTextArea
+           (NPE was occurring only when text had new line characters).
 
     SSComboBox:
-        1. GENDER_OPTION has been added as one of the options. When this is used as 
-           setOption argument the combo box will display "Male" & "Female"  as items
-           in the combo box.
+        1. GENDER_OPTION has been added as one of the options. When this is
+           used as setOption argument the combo box will display "Male" &
+           "Female" as items in the combo box.
 
                 
 ==============================================================================

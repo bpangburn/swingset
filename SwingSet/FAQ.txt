@@ -14,14 +14,15 @@ FAQ
 
     You might be missing one or more required jar files.  Please make sure
     that you have the following jar files:
-        1.swingSet.jar
-        2.rowset.jar (Available from:
-          http://developer.java.sun.com/developer/earlyAccess/jdbc/jdbc-rowset.html)
-        3.pg73jdbc3.jar (Driver for remote PostgreSQL database.  Available
-          from: http://jdbc.postgresql.org/download/pg73jdbc3.jar)
+        1. Latest SwingSet binary jar file (e.g. swingset-bin_0.8.0_beta.jar)
+        2. Latest PostgreSQL JDBC drive (e.g. pg74.214.jdbc3.jar) from:
+           http://jdbc.postgresql.org/download.html
+        3. For JDK/JRE prior to 1.5, early RowSet implementation (e.g.
+           rowset.jar) from:
+           http://java.sun.com/developer/earlyAccess/jdbc/jdbc-rowset.html
 
     If you still have problems:
-        1. Unzip the jar file and extract the files to a folder.
+        1. Unzip the demo jar file and extract the files to a folder.
         2. From a command prompt go to that folder and type:
             java  MainClass
         3. You will now see any remaining errors on the command prompt screen.
@@ -74,19 +75,19 @@ FAQ
     have to supply new renderers/hidden columns for the reordered columns.
     
     
-6. I'm having trouble getting SwingSet to work with MySQL.  Are there any special
-   instructions?
+6. I'm having trouble getting SwingSet to work with MySQL.  Are there any
+   special instructions?
 
-    Yes.  The mysql-connector-java MySQL driver has a unique ResultSet implementation.
-    The default ResultSet is not updatable so an UpdatableResultSet is needed for
-    creating updatable GUI's with SwingSet.  Rather than creating a RowSet using a
-    connection string and query, the developer should instantiate their RowSet with an
-    UpdatableResultSet.  
+    Yes.  The mysql-connector-java MySQL driver has a unique ResultSet
+    implementation. The default ResultSet is not updatable so an
+    UpdatableResultSet is needed for creating updatable GUI's with SwingSet.
+    Rather than creating a RowSet using a connection string and query,
+    the developer should instantiate their RowSet with an UpdatableResultSet.  
     
-    In addition, since there is no connection  string or query, the SSDataNavigator
-    needs to be explicitly told not to call the execute() method of RowSet and to
-    assume that the RowSet already contains the query results.  This is done with the
-    setCallExecute() method.
+    In addition, since there is no connection  string or query, the
+    SSDataNavigator needs to be explicitly told not to call the execute()
+    method of RowSet and to assume that the RowSet already contains the query
+    results.  This is done with the setCallExecute() method.
     
     Example:
         Let rs be your UpdatableResultSet object.
@@ -95,8 +96,10 @@ FAQ
         dataNavigator.setCallExecute(false);
         dataNavigator.setRowSet(rowset);
         
-        If you want to change the query, change the rs object as needed, re-instantiate
-        your RowSet, and re-call the setRowSet method of your SSDataNavigator.
+        If you want to change the query, change the rs object as needed,
+        re-instantiate your RowSet, and re-call the setRowSet method of your
+        SSDataNavigator.
 
-    (P.S.: This is a work around provided for MySQL DB users based on the feedback from lopes.
-     see http://sourceforge.net/forum/forum.php?thread_id=1005899&forum_id=313186)
+    (P.S.: This is a work around provided for MySQL DB users based on the
+     feedback from lopes. See
+     http://sourceforge.net/forum/forum.php?thread_id=1005899&forum_id=313186)
