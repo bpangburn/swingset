@@ -32,7 +32,6 @@
 
 package com.nqadmin.swingSet;
 
-//import javax.sql.*;
 import javax.swing.table.*;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -50,7 +49,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  *<p><pre>
  * SSTableModel provides an implementation of the TableModel interface.
- * The SSDataGrid uses this class for providing a grid view for a rowset. 
+ * The SSDataGrid uses this class for providing a grid view for a SSRowSet. 
  * SSTableModel can be used without the SSDataGrid (e.g. in conjunction with a
  * JTable), but the cell renderers and hidden columns features of the SSDataGrid
  * will not be available.
@@ -70,7 +69,7 @@ public class SSTableModel extends AbstractTableModel {
 	// MAP TO STORE THE DEFAULT VALUES OF DIFFERENT COLUMNS
 	protected HashMap defaultValuesMap = null;
 	
-	// BOOLEAN TO INDICATE IF THE ROWSET IS ON INSERT ROW.
+	// BOOLEAN TO INDICATE IF THE SSROWSET IS ON INSERT ROW.
 	private boolean inInsertRow = false;
 	
 	// MESSAGE WINDOW
@@ -99,7 +98,7 @@ public class SSTableModel extends AbstractTableModel {
 	
 	/**
 	 * Constructs a SSTableModel object.
-	 * If this contructor is used the setRowSet method has to be used to set the rowset
+	 * If this contructor is used the setRowSet method has to be used to set the SSRowSet
 	 * before constructing the JTable.
 	 */	
 	public SSTableModel() {
@@ -107,10 +106,10 @@ public class SSTableModel extends AbstractTableModel {
 	}
 	
 	/**
-	 * Constructs a SSTableModel object with the given rowset.
-	 * This will call the execute method on the given rowset.
+	 * Constructs a SSTableModel object with the given SSRowSet.
+	 * This will call the execute method on the given SSRowSet.
      *
-	 * @param _rowset    rowset object whose records has to be displayed in JTable.
+	 * @param _rowset    SSRowSet object whose records has to be displayed in JTable.
 	 */
 	public SSTableModel(SSRowSet _rowset) throws SQLException {
 		super();
@@ -119,10 +118,10 @@ public class SSTableModel extends AbstractTableModel {
 	}
 	
 	/**
-	 * Sets the rowset for SSTableModel to the given rowset.
-	 * This rowset will be used to get the data for JTable.
+	 * Sets the SSRowSet for SSTableModel to the given SSRowSet.
+	 * This SSRowSet will be used to get the data for JTable.
      *
-	 * @param _rowset    rowset object whose records has to be displayed in JTable.
+	 * @param _rowset    SSRowSet object whose records has to be displayed in JTable.
 	 */
 	public void setRowSet(SSRowSet _rowset) throws SQLException {
 		rowset = _rowset;
@@ -149,14 +148,14 @@ public class SSTableModel extends AbstractTableModel {
 	
 	/**
 	 * Initializes the SSTableModel. (Gets  the column count and rowcount for the
-	 * given rowset.)
+	 * given SSRowSet.)
 	 */
 	private void init() {
 		try {
 			
 			columnCount = rowset.getColumnCount();
 			rowset.last();
-			// ROWS IN THE ROWSET ARE NUMBERED FROM 1, SO LAST ROW NUMBER GIVES THE 
+			// ROWS IN THE SSROWSET ARE NUMBERED FROM 1, SO LAST ROW NUMBER GIVES THE 
 			// ROW COUNT
 			rowCount = rowset.getRow();
 			rowset.first();
@@ -239,9 +238,9 @@ public class SSTableModel extends AbstractTableModel {
 		}
 		
 		try {
-			// ROW NUMBERS IN ROWSET START FROM 1 WHERE AS ROW NUMBERING FOR JTABLE START FROM 0
+			// ROW NUMBERS IN SSROWSET START FROM 1 WHERE AS ROW NUMBERING FOR JTABLE START FROM 0
 			rowset.absolute(_row + 1);
-			// COLUMN NUMBERS IN ROWSET START FROM 1 WHERE AS COLUMN NUMBERING FOR JTABLE START FROM 0
+			// COLUMN NUMBERS IN SSROWSET START FROM 1 WHERE AS COLUMN NUMBERING FOR JTABLE START FROM 0
 			int type = rowset.getColumnType(_column + 1);
 			switch(type) {
 				case Types.INTEGER:
@@ -295,7 +294,7 @@ public class SSTableModel extends AbstractTableModel {
     	// THAT AN UPDATE FOR CELL HAS BEEN REQUESTED.
     	if (cellEditing != null) {
     		// THE ROW AND COLUMN NUMBERING STARTS FROM 0 FOR JTABLE BUT THE COLUMNS AND
-    		// ROWS ARE NUMBERED FROM 1 FOR ROWSET.
+    		// ROWS ARE NUMBERED FROM 1 FOR SSROWSET.
     		boolean allowEdit;
             
     		// IF ITS NEW ROW SEND A NULL FOR THE OLD VALUE
@@ -321,7 +320,7 @@ public class SSTableModel extends AbstractTableModel {
         
 //    	System.out.println("Set value at "+ _row + "  " + _column + " with "+ _value);	
     	try{
-    		// YOU SHOULD BE ON THE RIGHT ROW IN THE ROWSET
+    		// YOU SHOULD BE ON THE RIGHT ROW IN THE SSROWSET
     		if (rowset.getRow() != _row +1) {
     			rowset.absolute(_row +1);
             }
@@ -479,7 +478,7 @@ public class SSTableModel extends AbstractTableModel {
 	        while (iterator.hasNext()) {
 	        	Integer column = (Integer)iterator.next();
 //	        	System.out.println("Column number is:" + column);
-	        	// COLUMNS SPECIFIED START FROM 0 BUT FOR ROWSET THEY START FROM 1
+	        	// COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
 	        	int type = rowset.getColumnType(column.intValue() +1 );
 				switch(type) {
 					case Types.INTEGER:
@@ -733,7 +732,7 @@ public class SSTableModel extends AbstractTableModel {
     
     /**
      * Sets the header for the JTable.
-     * This function has to be called before setting the rowset for SSDataGrid.
+     * This function has to be called before setting the SSRowSet for SSDataGrid.
      *
      * @param _headers array of string objects representing the header of each column.
      */
@@ -795,6 +794,9 @@ public class SSTableModel extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.10  2004/10/25 19:51:03  prasanth
+ * Modified to use the new SSRowSet instead of  RowSet.
+ *
  * Revision 1.9  2004/10/19 21:13:07  prasanth
  * In getSQLDate function. checking if a / occurs in the string.
  * If not assuming that its in standard format yyyy-mm-dd and trying to convert

@@ -42,7 +42,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  *<p><pre>	
- * SSTextArea extends the JTextArea to add rowset binding.
+ * SSTextArea extends the JTextArea to add SSRowSet binding.
  *</pre><p>
  * @author $Author$
  * @version	$Revision$
@@ -54,7 +54,7 @@ public class SSTextArea extends JTextArea {
      * a particular column in a SSRowSet.
      *
      * @param _rowset  SSRowSet containing column to bind to
-     * @param _columnName  name of column within RowSet to bind to
+     * @param _columnName  name of column within SSRowSet to bind to
      */
 	public void bind(SSRowSet _rowset, String _columnName) {
         this.setDocument(new SSTextDocument(_rowset, _columnName));
@@ -66,6 +66,9 @@ public class SSTextArea extends JTextArea {
 
 /*
  * $Log$
+ * Revision 1.2  2004/10/25 19:51:03  prasanth
+ * Modified to use the new SSRowSet instead of  RowSet.
+ *
  * Revision 1.1  2004/10/01 20:43:53  yoda2
  * Added SSTextArea which is a simple extension of JTextArea with support for rowset binding.
  *

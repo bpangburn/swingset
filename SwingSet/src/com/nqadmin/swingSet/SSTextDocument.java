@@ -77,8 +77,8 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 
 	/**
-	 * Constructs a Document with the given rowset and column index.
-	 * The document is bound to the specified column in the rowset
+	 * Constructs a Document with the given SSRowSet and column index.
+	 * The document is bound to the specified column in the SSRowSet
      *
      * @param _rs   SSRowSet upon which document will be based
      * @param _columnName   column name within SSRowSet upon which document will be based
@@ -92,8 +92,8 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 			columnIndex = rs.getColumnIndex(columnName);
 		// GETS THE COLUMN DATA TYPE
 			columnType = rs.getColumnType(columnIndex);
-		// IF ROWS PRESENT IN PRESENT ROWSET THEN INITIALIZE THE DOCUMENT WITH THE TEXT
-		// GETROW RETURNS ZERO IF THERE ARE NO ROWS IN ROWSET
+		// IF ROWS PRESENT IN PRESENT SSROWSET THEN INITIALIZE THE DOCUMENT WITH THE TEXT
+		// GETROW RETURNS ZERO IF THERE ARE NO ROWS IN SSROWSET
 			if (rs.getRow() != 0) {
 				String value = getText();
 				insertString(0,value, attribute);
@@ -105,15 +105,15 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 		} catch(BadLocationException ble) {
 			ble.printStackTrace();
 		}
-		// ADD LISTENERS FOR THE ROWSET AND THE DOCUMENT
+		// ADD LISTENERS FOR THE SSROWSET AND THE DOCUMENT
 		rs.addRowSetListener(rowSetListener);
 		addDocumentListener(documentListener);
 
 	} // end public SSTextDocument(javax.sql.SSRowSet _rs, String _columnName) {
 
 	/**
-	 * Constructs a Document with the given rowset and column index.
-	 * The document is bound to the specified column in the rowset\
+	 * Constructs a Document with the given SSRowSet and column index.
+	 * The document is bound to the specified column in the SSRowSet.
      *
      * @param _rs   SSRowSet upon which document will be based
      * @param _columnName   column index within SSRowSet upon which document will be based     
@@ -130,7 +130,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 			columnName = rs.getColumnName(columnIndex);
 //			System.out.println(columnType + "   " + columnName);// + "  " + metaData.getSchemaName(columnIndex));
 
-			// CHECK IF THERE ARE ROWS IN THE ROWSET THEN
+			// CHECK IF THERE ARE ROWS IN THE SSROWSET THEN
 			// SET THE DOCUMENT TO THE TEXT CORRESPONDING TO THE COLUMN
 			if (rs.getRow() != 0) {
 				String value = getText();
@@ -144,7 +144,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 			ble.printStackTrace();
 		}
 
-	// ADD LISTENERS TO THE DOCUMENT AND ROWSET
+	// ADD LISTENERS TO THE DOCUMENT AND SSROWSET
 		rs.addRowSetListener(rowSetListener);
 		addDocumentListener(documentListener);
 	
@@ -189,19 +189,19 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 	}
 	
 	/**
-	 * Returns the rowset being used for getting the values.
+	 * Returns the SSRowSet being used for getting the values.
      *
-	 * @return returns the rowset being used.
+	 * @return returns the SSRowSet being used.
 	 */
 	public SSRowSet getSSRowSet() {
 		return rs;
 	}
 	
 	/**
-	 * Sets the rowset to be used for binding the document to the specified column.
-	 * The column name or column index has to be specified prior to setting the rowset.
+	 * Sets the SSRowSet to be used for binding the document to the specified column.
+	 * The column name or column index has to be specified prior to setting the SSRowSet.
      *
-	 * @param _rowset    rowset to be used for binding the document to the specified column.
+	 * @param _rowset    SSRowSet to be used for binding the document to the specified column.
 	 */
 	public void setSSRowSet(SSRowSet _rowset) throws SQLException {
 		rs = _rowset;
@@ -219,7 +219,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 			columnType = rs.getColumnType(columnIndex);
 			columnName = rs.getColumnName(columnIndex);
 		
-		// CHECK IF THERE ARE ROWS IN THE ROWSET THEN
+		// CHECK IF THERE ARE ROWS IN THE SSROWSET THEN
 		// SET THE DOCUMENT TO THE TEXT CORRESPONDING TO THE COLUMN
 			if (rs.getRow() != 0) {
 				String value = getText();
@@ -253,10 +253,10 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 	private class MyDocumentListener implements DocumentListener, Serializable {
 		// WHEN EVER THERE IS ANY CHANGE IN THE DOCUMENT CAN BE REMOVE UPDATE
 		// CHANGED UPDATE OR INSERT UPDATE GET THE TEXT IN THE DOCUMENT
-		// AND UPDATE THE COLUMN IN THE ROWSET
-		// TO AVOID THE TRIGGERING OF UPDATE ON THE ROWSET AS A RESULT OF UPDATING THE COLUMN VALUE
-		// IN ROWSET  FIRST REMOVE THE LISTENER ON ROWSET THEN MAKE THE CHANGES TO THE COLUMN VALUE.
-		// AFTER THE CHANGES  ARE MADE ADD BACK THE LISTENER TO ROWSET.
+		// AND UPDATE THE COLUMN IN THE SSROWSET
+		// TO AVOID THE TRIGGERING OF UPDATE ON THE SSROWSET AS A RESULT OF UPDATING THE COLUMN VALUE
+		// IN SSROWSET  FIRST REMOVE THE LISTENER ON SSROWSET THEN MAKE THE CHANGES TO THE COLUMN VALUE.
+		// AFTER THE CHANGES  ARE MADE ADD BACK THE LISTENER TO SSROWSET.
 		public void removeUpdate(DocumentEvent de) {
 			rs.removeRowSetListener(rowSetListener);
 
@@ -275,7 +275,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
         
 		// WHEN EVER THERE IS ANY CHANGE IN THE DOCUMENT CAN BE REMOVE UPDATE
 		// CHANGED UPDATE OR INSERT UPDATE GET THE TEXT IN THE DOCUMENT
-		// AND UPDATE THE COLUMN IN THE ROWSET
+		// AND UPDATE THE COLUMN IN THE SSROWSET
 		public void insertUpdate(DocumentEvent de) {
 
 			rs.removeRowSetListener(rowSetListener);
@@ -294,7 +294,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 	// REMOVE UPDATES ARE NOT REQUIRED WHEN DOING A IMMEDIATE INSERT AND
 	// CALLING  INSERT UPDATE
 	private class MyRowSetListener implements RowSetListener, Serializable {
-		// WHEN EVER THERE IS A CHANGE IN ROWSET CAN BE ROW-CHANGED OR ROWSET-CHANGED
+		// WHEN EVER THERE IS A CHANGE IN SSROWSET CAN BE ROW-CHANGED OR SSROWSET-CHANGED
 		// OR CURSOR-MOVED GET THE NEW TEXT CORRESPONDING TO THE COLUMN AND UPDATE THE DOCUMENT
 		// WHILE DOING SO YOU CAN CAUSE A EVENT TO FIRE WHEN DOCUMENT CHANGES SO REMOVE THE
 		// LISTENER ON THE DOCUMENT THEN CHANGE THE DOCUMENT AND THEN ADD BACK THE LISTENER
@@ -331,7 +331,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 			addDocumentListener(documentListener);
 		}
 
-		// WHEN EVER THERE IS A CHANGE IN ROWSET CAN BE ROW-CHANGED OR ROWSET-CHANGED
+		// WHEN EVER THERE IS A CHANGE IN SSROWSET CAN BE ROW-CHANGED OR SSROWSET-CHANGED
 		// OR CURSOR-MOVED GET THE NEW TEXT CORRESPONDING TO THE COLUMN AND UPDATE THE DOCUMENT
 		// WHILE DOING SO YOU CAN CAUSE A EVENT TO FIRE WHEN DOCUMENT CHANGES SO REMOVE THE
 		// LISTENER ON THE DOCUMENT THEN CHANGE THE DOCUMENT AND THEN ADD BACK THE LISTENER
@@ -368,7 +368,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 			addDocumentListener(documentListener);
 		}
 
-		// WHEN EVER THERE IS A CHANGE IN ROWSET CAN BE ROW-CHANGED OR ROWSET-CHANGED
+		// WHEN EVER THERE IS A CHANGE IN SSROWSET CAN BE ROW-CHANGED OR SSROWSET-CHANGED
 		// OR CURSOR-MOVED GET THE NEW TEXT CORRESPONDING TO THE COLUMN AND UPDATE THE DOCUMENT
 		// WHILE DOING SO YOU CAN CAUSE A EVENT TO FIRE WHEN DOCUMENT CHANGES SO REMOVE THE
 		// LISTENER ON THE DOCUMENT THEN CHANGE THE DOCUMENT AND THEN ADD BACK THE LISTENER
@@ -408,10 +408,10 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 	} // end private class MyRowSetListener implements RowSetListener, Serializable {
 
  	// THIS METHOD IS USED BY THE DOCUMENT LISTENERS WHEN EVER THE USER CHANGES THE TEXT IN
- 	// THE DOCUMENT THE CHANGES ARE PROPOGATED TO THE BOUND ROWSET.
+ 	// THE DOCUMENT THE CHANGES ARE PROPOGATED TO THE BOUND SSROWSET.
  	// THE UPDATE ROW WILL NOT BE CALLED BY THIS.
  	//
-	// THIS FUNCTION UPDATES THE VALUE OF THE COLUM IN THE ROWSET.
+	// THIS FUNCTION UPDATES THE VALUE OF THE COLUM IN THE SSROWSET.
 	// FOR THIS LOOK AT THE DATA TYPE OF THE COLUMN AND THEN CALL THE
 	// APPROPIATE FUNCTION
 	private void updateText(String strValue) {
@@ -511,8 +511,8 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
         
 	} // end private void updateText(String strValue) {
 
-	// THIS METHOD IS USED IN THE LISTENER OF THE ROWSET TO GET THE NEW TEXT WHEN EVEN
-	// THE ROWSET EVENTS ARE TRIGGERED
+	// THIS METHOD IS USED IN THE LISTENER OF THE SSROWSET TO GET THE NEW TEXT WHEN EVEN
+	// THE SSROWSET EVENTS ARE TRIGGERED
 	private String getText() {
 		String value = null;
 		try {
@@ -600,6 +600,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.11  2004/10/25 19:51:03  prasanth
+ * Modified to use the new SSRowSet instead of  RowSet.
+ *
  * Revision 1.10  2004/10/22 16:27:24  prasanth
  * Added CHAR types to the list of supported data types.
  *

@@ -54,10 +54,10 @@ package com.nqadmin.swingSet;
  *
  *      performPreDeletionOps() is called when the user presses the delete
  *           button, but just before the deleteRow() method is called on the
- *           RowSet.
+ *           SSRowSet.
  *
  *      performPostDeletionOps() is called when the user presses the delete
- *           button and after the deleteRow() method is called on the RowSet.
+ *           button and after the deleteRow() method is called on the SSRowSet.
  *
  *      Note that both the performPreDeletionOps() and performPostDeletionOps()
  *      will be executed when the user presses the delete button.
@@ -95,7 +95,7 @@ public interface SSDBNav {
 	/**
 	 * Post insert operations should be performed in this function.
 	 *
-	 * In addition to this you can have a listener on the rowset attached to SSDataNavigator
+	 * In addition to this you can have a listener on the SSRowSet attached to SSDataNavigator
 	 * to get notiifcation when a row is inserted.
 	 */
 	public void performPostInsertOps();
@@ -109,15 +109,15 @@ public interface SSDBNav {
 	/**
 	 * The user should perform the pre deletion operations using this function.
 	 *
-	 * Rowset does not provide any notifications before the deletion of a row. but a notification
-	 * will be received after the deletion if you have listener for the rowset.
+	 * SSRowSet does not provide any notifications before the deletion of a row. but a notification
+	 * will be received after the deletion if you have listener for the SSRowSet.
 	 */
 	public void performPreDeletionOps();
 
 	/**
 	 * This function should perform post deletion operations if the user intends to do so.
 	 *
-	 * The rowset listener also provides the notification after the deletion of the row.
+	 * The SSRowSet listener also provides the notification after the deletion of the row.
 	 */
 	public void performPostDeletionOps();
 	
@@ -143,6 +143,9 @@ public interface SSDBNav {
 
 /*
  * $Log$
+ * Revision 1.6  2004/08/10 22:06:59  yoda2
+ * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
+ *
  * Revision 1.5  2004/03/08 16:43:37  prasanth
  * Updated copy right year.
  *

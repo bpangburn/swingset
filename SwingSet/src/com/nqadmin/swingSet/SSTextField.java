@@ -165,10 +165,10 @@ public class SSTextField extends JTextField {
 	 
      /**
       * Binds the text field to a SSTextDocument which is in turn bound to
-      * a particular column in a RowSet.
+      * a particular column in a SSRowSet.
       *
       * @param _rowset  SSRowSet containing column to bind to
-      * @param _columnName  name of column within RowSet to bind to
+      * @param _columnName  name of column within SSRowSet to bind to
       */
 	 public void bind(SSRowSet _rowset, String _columnName) {
 	 	this.setDocument(new SSTextDocument(_rowset, _columnName));
@@ -375,6 +375,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.10  2004/10/25 19:51:03  prasanth
+ * Modified to use the new SSRowSet instead of  RowSet.
+ *
  * Revision 1.9  2004/10/19 21:17:03  prasanth
  * Transfering focus on enter key. It was doing so only if a mask was applied
  * to the text field.
