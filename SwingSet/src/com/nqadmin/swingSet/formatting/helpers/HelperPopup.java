@@ -96,28 +96,29 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
         buttons = new JPanel();
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
         
-        searchButton = new JButton("Search");
-        searchButton.addActionListener(this);
+        //searchButton = new JButton("Search");
+        //searchButton.addActionListener(this);
         
-        closeButton = new JButton("Close");
-        closeButton.addActionListener(this);
+        //closeButton = new JButton("Close");
+        //closeButton.addActionListener(this);
         
         refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(this);
         
-        helpButton = new JButton("Help");
-        helpButton.addActionListener(this);
+        //helpButton = new JButton("Help");
+        //helpButton.addActionListener(this);
         
         searchText = new JTextField();
         searchText.setColumns(20);
         searchText.addActionListener(this);
         searchText.addFocusListener(this);
-        tpane.add(searchText, BorderLayout.NORTH);
+        //tpane.add(searchText, BorderLayout.NORTH);
         
-        buttons.add(searchButton);
-        buttons.add(closeButton);
+        //buttons.add(searchButton);
+        //buttons.add(closeButton);
+        buttons.add(searchText);
         buttons.add(refreshButton);
-        buttons.add(helpButton);
+        //buttons.add(helpButton);
         
         tpane.add(buttons, BorderLayout.SOUTH);
         
@@ -142,6 +143,7 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
     public void setModel(SelectorListModel model) {
         this.model = model;
         lista.setModel(model);
+        model.setFilterEdit(searchText);
     }
     
     public void setTarget(SSFormattedTextField target) {
@@ -202,6 +204,7 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
         
         model = new SelectorListModel(connection, table, dataColumn, listColumn, orderBy);
         model.refresh();
+        model.setFilterEdit(searchText);
         
         lista.setModel(model);
         lista.getSelectionModel().addListSelectionListener(this);
@@ -265,6 +268,8 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
             
             model = new SelectorListModel(connection, table, dataColumn, listColumn, orderBy);
             model.refresh();
+            model.setFilterEdit(searchText);
+            
             lista.setModel(model);
             lista.updateUI();
             lista.getSelectionModel().addListSelectionListener(this);
@@ -353,7 +358,9 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
         Object dataval = null;
         
         System.out.println("popupMenuWillBecomeVisible();");
+        
         // trying to select current value
+        /*
         if (current == null) return;
         
         for (int j= 0; j < lista.getModel().getSize(); j++) {
@@ -365,6 +372,7 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
                 break;
             }
         }
+         */
         //this.setSize(target.getWidth(), searchText.getHeight() * 15);
         searchText.requestFocusInWindow();
     }
@@ -372,6 +380,7 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
     public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent e) {
         int index;
         System.out.println("popupMenuWillBecomeInvisible();");
+        /*
         index = lista.getSelectedIndex();
         
         if (index > -1 && target != null) {
@@ -386,6 +395,7 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
                     break;
             }
         }
+         */
     }
     
     public void popupMenuCanceled(javax.swing.event.PopupMenuEvent e) {

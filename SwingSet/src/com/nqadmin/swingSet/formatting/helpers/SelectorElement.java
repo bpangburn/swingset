@@ -67,7 +67,8 @@ public class SelectorElement extends Object implements TextFilterable {
     }
     
     public String toString() {
-        return listValue.toString().trim() + " (" + dataValue.toString().trim() + ")";
+        //return listValue.toString().trim() + " (" + dataValue.toString().trim() + ")";
+        return listValue.toString().trim();
     }
     
     /**

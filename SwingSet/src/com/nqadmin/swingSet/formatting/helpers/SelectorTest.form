@@ -31,6 +31,9 @@
     </Menu>
     <Menu class="com.nqadmin.swingSet.formatting.helpers.HelperPopup" name="helperPopup2">
       <Properties>
+        <Property name="connection" type="com.nqadmin.swingSet.datasources.SSConnection" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection component="sSConnection1" type="bean"/>
+        </Property>
         <Property name="dataColumn" type="java.lang.String" value="party_id"/>
         <Property name="listColumn" type="java.lang.String" value="party_name"/>
         <Property name="orderBy" type="java.lang.String" value="party_name"/>
@@ -78,7 +81,9 @@
         </Constraint>
       </Constraints>
 
-      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout">
+        <Property name="axis" type="int" value="1"/>
+      </Layout>
       <SubComponents>
         <Component class="com.nqadmin.swingSet.formatting.SSFormattedTextField" name="sSFormattedTextField1">
           <Properties>
@@ -89,14 +94,6 @@
               <Connection code="new Integer(85)" type="code"/>
             </Property>
           </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sSFormattedTextField1ActionPerformed"/>
-          </Events>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-              <BorderConstraints direction="North"/>
-            </Constraint>
-          </Constraints>
         </Component>
         <Component class="com.nqadmin.swingSet.formatting.SSFormattedTextField" name="sSFormattedTextField2">
           <Properties>
@@ -107,11 +104,6 @@
               <Connection code="new Integer(1016)" type="code"/>
             </Property>
           </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-              <BorderConstraints direction="Center"/>
-            </Constraint>
-          </Constraints>
         </Component>
         <Component class="com.nqadmin.swingSet.formatting.SSFormattedTextField" name="sSFormattedTextField3">
           <Properties>
@@ -122,11 +114,6 @@
               <Connection code="new Integer(119)" type="code"/>
             </Property>
           </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-              <BorderConstraints direction="South"/>
-            </Constraint>
-          </Constraints>
         </Component>
       </SubComponents>
     </Container>

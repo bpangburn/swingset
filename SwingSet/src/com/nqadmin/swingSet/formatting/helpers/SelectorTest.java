@@ -59,8 +59,6 @@ public class SelectorTest extends javax.swing.JFrame {
         sSFormattedTextField2 = new com.nqadmin.swingSet.formatting.SSFormattedTextField();
         sSFormattedTextField3 = new com.nqadmin.swingSet.formatting.SSFormattedTextField();
 
-        FormListener formListener = new FormListener();
-
         sSConnection1.setDriverName("org.postgresql.Driver");
         sSConnection1.setUrl("jdbc:postgresql://localhost/mag");
         sSConnection1.setUsername("dags");
@@ -80,6 +78,7 @@ public class SelectorTest extends javax.swing.JFrame {
         helperPopup1.setTable("publications");
         helperPopup1.setTarget(sSFormattedTextField1);
 
+        helperPopup2.setConnection(sSConnection1);
         helperPopup2.setDataColumn("party_id");
         helperPopup2.setListColumn("party_name");
         helperPopup2.setOrderBy("party_name");
@@ -94,41 +93,25 @@ public class SelectorTest extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("SwingSet tests");
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.Y_AXIS));
 
         sSFormattedTextField1.setHelper(helperPopup1);
         sSFormattedTextField1.setValue(new Integer(85));
-        sSFormattedTextField1.addActionListener(formListener);
-
-        jPanel1.add(sSFormattedTextField1, java.awt.BorderLayout.NORTH);
+        jPanel1.add(sSFormattedTextField1);
 
         sSFormattedTextField2.setHelper(helperPopup2);
         sSFormattedTextField2.setValue(new Integer(1016));
-        jPanel1.add(sSFormattedTextField2, java.awt.BorderLayout.CENTER);
+        jPanel1.add(sSFormattedTextField2);
 
         sSFormattedTextField3.setHelper(helperPopup3);
         sSFormattedTextField3.setValue(new Integer(119));
-        jPanel1.add(sSFormattedTextField3, java.awt.BorderLayout.SOUTH);
+        jPanel1.add(sSFormattedTextField3);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         setBounds((screenSize.width-490)/2, (screenSize.height-142)/2, 490, 142);
-    }
-
-    // Code for dispatching events from components to event handlers.
-
-    private class FormListener implements java.awt.event.ActionListener {
-        public void actionPerformed(java.awt.event.ActionEvent evt) {
-            if (evt.getSource() == sSFormattedTextField1) {
-                SelectorTest.this.sSFormattedTextField1ActionPerformed(evt);
-            }
-        }
     }//GEN-END:initComponents
-
-    private void sSFormattedTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sSFormattedTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_sSFormattedTextField1ActionPerformed
     
     /**
      * @param args the command line arguments

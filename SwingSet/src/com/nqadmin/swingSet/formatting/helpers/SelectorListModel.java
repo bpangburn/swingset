@@ -47,7 +47,7 @@ import javax.swing.JTextField;
 public class SelectorListModel extends javax.swing.AbstractListModel {
     
     private BasicEventList data    = new BasicEventList();
-    private TextFilterList fildata = new TextFilterList(data);
+    private TextFilterList filtered_data = new TextFilterList(data);
     
     /**
      * Holds value of property dataColumn.
@@ -74,15 +74,19 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
      */
     private String selectText;
     
+    /**
+     * Holds value of property orderBy.
+     */
     private String orderBy;
     
     /**
      * Holds value of property ssConnection.
      */
     private SSConnection     ssConnection;
+    
     private SSJdbcRowSetImpl ssRowset;
     
-    /** Creates a new instance of AccountSelectorModel */
+    /** Creates a new instance of SelectorListModel */
     
     public SelectorListModel() {
         this(null, null, null, null);
@@ -104,8 +108,6 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
         setDataColumn(bcolumn);
         setListColumn(lcolumn);
         setOrderBy(orderBy);
-        
-        //populateModel();
     }
     
     public void refresh() {
@@ -114,7 +116,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
     }
     
     public Object getSelectedBoundData(int index) {
-        Object itm = fildata.get(index);
+        Object itm = filtered_data.get(index);
         
         if (itm != null) {
             return ((SelectorElement)(itm)).getDataValue();
@@ -124,7 +126,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
     }
     
     public void setFilterText(String[] newFilter) {
-        fildata.setFilterText(newFilter);
+        filtered_data.setFilterText(newFilter);
     }
     
     private void populateModel() {
@@ -150,7 +152,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
             data.add(new SelectorElement(new String("12") , "Sample Option 12"));
             data.add(new SelectorElement(new String("13") , "Sample Option 13"));
             data.add(new SelectorElement(new String("14") , "Sample Option 14"));
-            fildata = new TextFilterList(data);
+            filtered_data = new TextFilterList(data);
             return;
         }
     
@@ -187,9 +189,9 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
             System.out.println(np);
         }
         
-        fildata = new TextFilterList(data);
+        filtered_data = new TextFilterList(data);
         
-        this.fireContentsChanged(this, 0, fildata.size()-1);
+        this.fireContentsChanged(this, 0, filtered_data.size()-1);
         this.fireIntervalAdded(this, 0, 1);
         this.fireIntervalRemoved(this, 0, 1);
 
@@ -206,8 +208,8 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
         
         System.out.println("setSelectedItem = " + tofind);
         
-        for (int i=0; i < fildata.size(); i++) {
-            cual = (SelectorElement)(fildata.get(i));
+        for (int i=0; i < filtered_data.size(); i++) {
+            cual = (SelectorElement)(filtered_data.get(i));
             
             System.out.println("BoundData = '" + cual.getDataValue() + "'");
             
@@ -385,25 +387,25 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
     
     public Object getElementAt(int index) {
         //return data.get(index);
-        return fildata.get(index);
+        return filtered_data.get(index);
         
     }
     
     public int getSize() {
         //return data.size();
-        return fildata.size();
+        return filtered_data.size();
     }
     
     public JTextField getFilterEdit() {
-        return fildata.getFilterEdit();
+        return filtered_data.getFilterEdit();
     }
     
     public void setFilterEdit(JTextField filter) {
-        fildata.setFilterEdit(filter);
+        filtered_data.setFilterEdit(filter);
     }
     
     public void addListEventListener(ListEventListener listChangeListener) {
-        fildata.addListEventListener(listChangeListener);
+        filtered_data.addListEventListener(listChangeListener);
         System.out.println("addListEventListener = " + listChangeListener);
     } 
 
