@@ -31,7 +31,8 @@
  */
 
 import com.nqadmin.swingSet.*;
-import com.sun.rowset.JdbcRowSetImpl;
+import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+import com.nqadmin.swingSet.datasources.SSConnection;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -42,8 +43,8 @@ import java.sql.*;
 
 public class Example7 extends JFrame {
 	
-	Connection conn = null;
-	JdbcRowSetImpl rowset = null;
+	SSConnection ssConnection = null;
+ 	SSJdbcRowSetImpl rowset   = null;
 	SSDataGrid dataGrid = new SSDataGrid();
 	
 	public Example7(){
@@ -56,9 +57,10 @@ public class Example7 extends JFrame {
 		
 		
 		try{
-			Class.forName("org.postgresql.Driver");	
- 			conn = DriverManager.getConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts","swingset","test");
- 			rowset = new JdbcRowSetImpl(conn); 
+			ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts","swingset","test");
+ 			ssConnection.setDriverName("org.postgresql.Driver");
+ 			ssConnection.createConnection();
+ 			rowset = new SSJdbcRowSetImpl(ssConnection);
  			rowset.setCommand("SELECT supplier_id, part_id,quantity, ship_date, supplier_part_id FROM supplier_part_data ORDER BY supplier_id, part_id;");
  			//  SET THE HEADER BEFORE SETTING THE ROWSET
  			
@@ -76,7 +78,7 @@ public class Example7 extends JFrame {
  			dataGrid.setMessageWindow(this);
  			//dataGrid.setUneditableColumns(new String[]{"supplier_part_id"});
  			dataGrid.setUneditableColumns(new int[]{4});
- 			ResultSet rs = conn.createStatement().executeQuery("SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;");
+ 			ResultSet rs = ssConnection.getConnection().createStatement().executeQuery("SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;");
  			rs.last();
  			String[] displayItems  = new String[rs.getRow()];
  			Integer[] underlyingNumbers = new Integer[rs.getRow()];
@@ -92,7 +94,7 @@ public class Example7 extends JFrame {
  			
  			dataGrid.setComboRenderer("supplier_id",displayItems,underlyingNumbers);
  			
- 			rs = conn.createStatement().executeQuery("SELECT part_name, part_id FROM part_data ORDER BY part_name;");
+ 			rs = ssConnection.getConnection().createStatement().executeQuery("SELECT part_name, part_id FROM part_data ORDER BY part_name;");
  			rs.last();
  			displayItems  = new String[rs.getRow()];
  			underlyingNumbers = new Integer[rs.getRow()];
@@ -126,4 +128,7 @@ public class Example7 extends JFrame {
  }// END OF EXAMPLE 5.
 /*
  * $Log$
+ * Revision 1.1  2003/12/18 20:14:43  prasanth
+ * Initial commit.
+ *
  */

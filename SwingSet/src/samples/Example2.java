@@ -31,14 +31,15 @@
  */
 
 
-package samples;
+
 
  import com.nqadmin.swingSet.*;
  import javax.swing.*;
  import javax.sql.*;
  import java.sql.*;
  import java.awt.*;
- import com.sun.rowset.JdbcRowSetImpl;
+ import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+ import com.nqadmin.swingSet.datasources.SSConnection;
  /**
   * This example demonstrates the use of SSTextDocument to display information in
   * JTextField (Name and City) and SSComboBox (Status). The navigation is done with
@@ -54,8 +55,8 @@ package samples;
  	JTextField txtSupplierCity   = new JTextField();
  	SSComboBox cmbSupplierStatus = new SSComboBox();
 
- 	Connection conn = null;
- 	JdbcRowSetImpl rowset       = null;
+ 	SSConnection ssConnection = null;
+ 	SSJdbcRowSetImpl rowset   = null;
  	SSDataNavigator navigator = null;
 
  	public Example2(){
@@ -65,9 +66,10 @@ package samples;
 
 
  		try{
- 			Class.forName("org.postgresql.Driver");
- 			conn = DriverManager.getConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts","swingset","test");
- 			rowset = new JdbcRowSetImpl(conn);
+ 			ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts","swingset","test");
+ 			ssConnection.setDriverName("org.postgresql.Driver");
+ 			ssConnection.createConnection();
+ 			rowset = new SSJdbcRowSetImpl(ssConnection);
 
 	 		// POSTGRES RAISES AN EXCEPTIN WHEN YOU TRY TO USE THE UPDATEROW() METHOD
 	 		// IF THERE IS A SEMICOLON AT THE END OF THE QUERY WITH OUT ANY CLAUSES

@@ -31,7 +31,8 @@
  */
 
 import com.nqadmin.swingSet.*;
-import com.sun.rowset.JdbcRowSetImpl;
+import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+import com.nqadmin.swingSet.datasources.SSConnection;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -42,8 +43,8 @@ import java.sql.*;
 
 public class Example6 extends JFrame {
 	
-	Connection conn = null;
-	JdbcRowSetImpl rowset = null;
+	SSConnection ssConnection = null;
+ 	SSJdbcRowSetImpl rowset   = null;
 	SSDataGrid dataGrid = new SSDataGrid();
 	
 	public Example6(){
@@ -56,9 +57,10 @@ public class Example6 extends JFrame {
 		
 		
 		try{
-			Class.forName("org.postgresql.Driver");	
- 			conn = DriverManager.getConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts","swingset","test");
- 			rowset = new JdbcRowSetImpl(conn); 
+			ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts","swingset","test");
+ 			ssConnection.setDriverName("org.postgresql.Driver");
+ 			ssConnection.createConnection();
+ 			rowset = new SSJdbcRowSetImpl(ssConnection);
  			rowset.setCommand("SELECT part_name,color_code, weight, city,part_id FROM part_data ORDER BY part_name;");
  			//  SET THE HEADER BEFORE SETTING THE ROWSET
  			dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
@@ -111,4 +113,7 @@ public class Example6 extends JFrame {
  }// END OF EXAMPLE 5.
 /*
  * $Log$
+ * Revision 1.1  2003/12/18 20:14:43  prasanth
+ * Initial commit.
+ *
  */

@@ -30,14 +30,15 @@
  *
  */
 
-package samples;
+
 
  import com.nqadmin.swingSet.*;
  import javax.swing.*;
  import javax.sql.*;
  import java.sql.*;
  import java.awt.*;
- import com.sun.rowset.JdbcRowSetImpl;
+ import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+ import com.nqadmin.swingSet.datasources.SSConnection;
 
  /**
   * This example demonstrates the use of SSTextDocument to display information in
@@ -55,8 +56,8 @@ package samples;
  	JTextField txtQuantity   = new JTextField();
 
 
- 	Connection conn         = null;
- 	JdbcRowSetImpl rowset       = null;
+ 	SSConnection ssConnection = null;
+ 	SSJdbcRowSetImpl rowset   = null;
  	SSDataNavigator navigator = null;
 
  	public Example3(){
@@ -66,9 +67,10 @@ package samples;
 
 
  		try{
- 			Class.forName("org.postgresql.Driver");
- 			conn = DriverManager.getConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts","swingset","test");
- 			rowset = new JdbcRowSetImpl(conn);
+ 			ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts","swingset","test");
+ 			ssConnection.setDriverName("org.postgresql.Driver");
+ 			ssConnection.createConnection();
+ 			rowset = new SSJdbcRowSetImpl(ssConnection);
  			//rowset.setUrl("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts");
  			//rowset.setUsername("swingset");
 	 		//rowset.setPassword("test");
@@ -91,12 +93,12 @@ package samples;
  		}
 
  		String query = "SELECT * FROM supplier_data;";
- 		cmbSupplierName = new SSDBComboBox(conn, query, "supplier_id", "supplier_name");
+ 		cmbSupplierName = new SSDBComboBox(ssConnection.getConnection(), query, "supplier_id", "supplier_name");
  		cmbSupplierName.bind(rowset,"supplier_id");
 
 
 		query = "SELECT * FROM part_data;";
-		cmbPartName = new SSDBComboBox(conn, query, "part_id", "part_name");
+		cmbPartName = new SSDBComboBox(ssConnection.getConnection(), query, "part_id", "part_name");
  		cmbPartName.bind(rowset,"part_id");
 
  		txtQuantity.setDocument(new SSTextDocument(rowset,"quantity"));
