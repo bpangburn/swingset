@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003, The Pangburn Company, Inc. and Prasanth R. Pasala
+ * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -73,6 +73,9 @@ public abstract class SSCellEditingAdapter implements SSCellEditing {
 
 /*
  * $Log$
+ * Revision 1.2  2003/12/18 20:13:00  prasanth
+ * Update class description.
+ *
  * Revision 1.1  2003/12/16 18:02:47  prasanth
  * Initial version.
  *

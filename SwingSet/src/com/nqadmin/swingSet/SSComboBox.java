@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003, The Pangburn Company, Inc. and Prasanth R. Pasala.
+ * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -586,6 +586,9 @@ public class SSComboBox   extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.5  2004/02/23 16:39:35  prasanth
+ * Added GENDER_OPTION.
+ *
  * Revision 1.4  2003/12/16 18:01:40  prasanth
  * Documented versions for release 0.6.0
  *

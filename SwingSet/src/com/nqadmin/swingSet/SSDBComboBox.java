@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003, The Pangburn Company, Inc. and Prasanth R. Pasala.
+ * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -901,6 +901,9 @@ public class SSDBComboBox  extends JComponent{
 
 /*
  * $Log$
+ * Revision 1.5  2004/02/23 16:37:41  prasanth
+ * Added GENDER_OPTION.
+ *
  * Revision 1.4  2003/11/26 21:21:14  prasanth
  * Functionality to format a date object before displaying in the combo.
  *

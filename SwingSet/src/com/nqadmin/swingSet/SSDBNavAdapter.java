@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003, The Pangburn Company, Inc. and Prasanth R. Pasala.
+ * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -79,6 +79,9 @@ public class SSDBNavAdapter implements SSDBNav {
 
 /*
  * $Log$
+ * Revision 1.3  2003/11/26 21:22:11  prasanth
+ * Added function performCancelOps().
+ *
  * Revision 1.2  2003/09/25 14:27:45  yoda2
  * Removed unused Import statements and added preformatting tags to JavaDoc descriptions.
  *

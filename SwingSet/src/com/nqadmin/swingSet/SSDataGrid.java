@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003, The Pangburn Company, Inc. and Prasanth R. Pasala
+ * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -951,6 +951,9 @@ public class SSDataGrid extends JTable
 
 /*
  * $Log$
+ * Revision 1.5  2004/02/23 16:47:41  prasanth
+ * Println statements are commented out.
+ *
  * Revision 1.4  2003/12/18 20:12:01  prasanth
  * Update class description.
  *

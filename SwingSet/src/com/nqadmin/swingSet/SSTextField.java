@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003, The Pangburn Company, Inc. and Prasanth R. Pasala
+ * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -320,6 +320,10 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.2  2004/02/23 16:45:51  prasanth
+ * Added new constructor
+ * public SSTextField(int _mask, int _numDecimals, int _align)
+ *
  * Revision 1.1  2003/12/16 18:02:47  prasanth
  * Initial version.
  *

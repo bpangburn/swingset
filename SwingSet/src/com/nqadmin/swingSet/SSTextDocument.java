@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003, The Pangburn Company, Inc. and Prasanth R. Pasala
+ * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -213,14 +213,14 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 				replace(0, getLength(), value, null);	
 /*				if( getLength() > 0 ){
 					remove(0,getLength() );
-					//removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
+					removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
 				}
 				if(value!=null && value.length() > 0) {
 					insertString(0,value, attribute);
 //					insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.INSERT), attribute );
 				}
-*/				
-			}
+				
+*/			}
 			else {
 				if( getLength() > 0 ){
 					remove(0,getLength() );
@@ -508,6 +508,10 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.5  2004/01/27 19:09:22  prasanth
+ * In the RowSet Listener replaces remove and insert functions with
+ * replace function.
+ *
  * Revision 1.4  2003/11/26 21:31:51  prasanth
  * Calling performCancelOps().
  *
