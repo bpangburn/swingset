@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004, The Pangburn Company, Inc, Prasanth R. Pasala and
+ * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -267,6 +267,9 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 
 /*
  * $Log$
+ * Revision 1.6  2005/01/19 19:12:26  dags
+ * bind refactoring
+ *
  * Revision 1.5  2005/01/14 00:06:42  dags
  * Deep Refactoring
  *

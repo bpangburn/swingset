@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2005, The Pangburn Company, Inc. and Prasanth R. Pasala.
+ * Copyright (c) 2005, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,4 +76,7 @@ import java.beans.*;
 
 /*
  * $Log$
+ * Revision 1.1  2005/02/02 23:38:19  yoda2
+ * Adding BeanInfo classes for JavaBeans.  Currently only handling displaying of icons.
+ *
  */

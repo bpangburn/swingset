@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004, The Pangburn Company, Inc, Prasanth R. Pasala and
+ * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -64,6 +64,9 @@ public class SSBaseFormatterFactory extends javax.swing.text.DefaultFormatterFac
 
 /*
  * $Log$
+ * Revision 1.4  2005/01/18 22:34:26  dags
+ * sincronization update
+ *
  * Revision 1.3  2004/12/13 20:50:16  dags
  * Fix package name
  *
