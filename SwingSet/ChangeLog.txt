@@ -5,6 +5,18 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 $Id$
 
 ==============================================================================
+SwingSet 0.9.3-beta - 
+==============================================================================
+
+Changes:
+    SSDBCheckBox:
+        1. Added support for boolean database columns. Only tested with Postgresql.
+        2. Updated JavaDoc to reflect it. 
+
+    SSTextDocument:
+        1. Fixed boolean rowset update. 
+
+==============================================================================
 SwingSet 0.9.2-beta - Released 11-01-2004
 ==============================================================================
 
