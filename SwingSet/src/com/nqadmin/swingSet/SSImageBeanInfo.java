@@ -53,16 +53,16 @@ import java.beans.*;
      *
      * @return An image object representing the requested icon. May return null if no suitable icon is available.
      */
-    public java.awt.Image getIcon(int iconKind) {
+    public java.awt.Image getIcon(int _iconKind) {
         
-        if (iconKind == BeanInfo.ICON_MONO_16x16 ||
-            iconKind == BeanInfo.ICON_COLOR_16x16 )
+        if (_iconKind == BeanInfo.ICON_MONO_16x16 ||
+            _iconKind == BeanInfo.ICON_COLOR_16x16 )
         {
             java.awt.Image img = loadImage("/images/icons/ssimage.gif");
             return img;
         }
-        if (iconKind == BeanInfo.ICON_MONO_32x32 ||
-            iconKind == BeanInfo.ICON_COLOR_32x32 )
+        if (_iconKind == BeanInfo.ICON_MONO_32x32 ||
+            _iconKind == BeanInfo.ICON_COLOR_32x32 )
         {
             java.awt.Image img = loadImage("/images/icons/ssimage32.gif");
             return img;
@@ -70,12 +70,15 @@ import java.beans.*;
         
         return null;
         
-    } // end public java.awt.Image getIcon(int iconKind) {
+    } // end public java.awt.Image getIcon(int _iconKind) {
 
 }
 
 /*
  * $Log$
+ * Revision 1.2  2005/02/04 22:41:06  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.1  2005/02/02 23:38:19  yoda2
  * Adding BeanInfo classes for JavaBeans.  Currently only handling displaying of icons.
  *
