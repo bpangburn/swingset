@@ -4,7 +4,56 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 
 $Id$
 
+==============================================================================
+SwingSet 0.6.1-beta - Released 
+==============================================================================
 
+Changes:
+
+	SSDataNavigator:
+	
+		1. Reduced the default size of the buttons to 50 * 20.
+		2. First & Last buttons will be disabled when the rowset is at first & last row
+			respectively.
+		3. Commit button will be enabled all the time. When rowset is on inset row pressing
+			of commit button will insert the row. When not on insert row it will update the 
+			present row.
+		4. Button graphics have been added.
+		5. Added the function setMySQLDB(). This function can be used to indicate to the Navigator
+			that MySQL database is being used. If this is set to true navigator will not call the 
+			execute method on the specified rowset. The ResultSet class in the MySQL driver is not
+			updatable. For updatable ResultSet UpdatableResultSet class has to be used. But
+			when execute is called on the RowSet it will generate a ResultSet not UpdatableResultSet.
+			So when generating a RowSet using MySQL database first generate a UpdatableResultSet
+			object and then set this to the RowSet. This rowset should be used in building the 
+			SSDataNavigator.
+			
+			Example:
+				Let rs be your UpdatableResultSet object.
+				JdbcRowSetImpl rowset = new JdbcRowSetImpl(rs);
+				SSDataNavigator dataNavigator = new SSDataNavigator();
+				dataNavigator.setMySQLDB(true);
+				dataNavigator.setRowSet(rowset);
+			If you want to change the query change the rs object and set it to rowset again.
+			Set this new rowset to SSDataNavigator.
+			
+			(P.S: This is a work around provided for MySQL DB users based on the feedback from lopes.
+			 see https://sourceforge.net/forum/forum.php?thread_id=1005899&forum_id=313186)
+			 
+						
+	SSTextDocument:
+		1. In the rowset listener replaced the function calls remove, removeUpdate, 
+			insertString & insertUpdate with single function call replace.
+			This seems to fix the problems of NullPointerException caused occasionally
+			when the SSTextDocument is set to a JTextArea (NPE was occurring only when
+			text had new line characters).
+			
+	SSComboBox:
+		1. GENDER_OPTION has been added as one of the options. When this is used as 
+			setOption argument the combo box will display "Male" & "Female"  as items
+			in the combo box.
+	
+		
 ==============================================================================
 SwingSet 0.6.0-beta - Released 12-18-2003
 ==============================================================================
