@@ -2,37 +2,31 @@
 
 <Form version="1.0" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
-    <Component class="com.nqadmin.swingSet.datasources.SSConnection" name="sSConnection1">
+    <Component class="com.nqadmin.swingSet.datasources.SSConnection" name="sSConnection2">
       <Properties>
         <Property name="driverName" type="java.lang.String" value="org.postgresql.Driver"/>
         <Property name="url" type="java.lang.String" value="jdbc:postgresql://localhost/mag"/>
         <Property name="username" type="java.lang.String" value="dags"/>
       </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="try {&#xa;    sSConnection1.createConnection();&#xa;}&#xa;catch(java.lang.ClassNotFoundException nfe) {&#xa;    System.out.println(nfe);&#xa;}&#xa;catch(java.lang.Exception ex) {&#xa;    System.out.println(ex);&#xa;}&#xa;"/>
-      </AuxValues>
     </Component>
-    <Component class="com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl" name="sSJdbcRowSetImpl1">
+    <Component class="com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl" name="sSJdbcRowSetImpl2">
       <Properties>
-        <Property name="SSConnection" type="com.nqadmin.swingSet.datasources.SSConnection" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection component="sSConnection1" type="bean"/>
+        <Property name="query" type="java.lang.String" value="select * from accounts ORDER BY account_id"/>
+        <Property name="sSConnection" type="com.nqadmin.swingSet.datasources.SSConnection" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection component="sSConnection2" type="bean"/>
         </Property>
-        <Property name="command" type="java.lang.String" value="select * from accounts ORDER BY account_id"/>
       </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="&#xa; try {&#xa;    sSJdbcRowSetImpl1.execute();&#xa;}&#xa;catch (java.sql.SQLException se) {&#xa;    System.out.println(se);&#xa;}&#xa;"/>
-      </AuxValues>
     </Component>
     <Menu class="com.nqadmin.swingSet.formatting.helpers.RowSetHelperPopup" name="rowSetHelperPopup1">
       <Properties>
         <Property name="connection" type="com.nqadmin.swingSet.datasources.SSConnection" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection component="sSConnection1" type="bean"/>
+          <Connection component="sSConnection2" type="bean"/>
         </Property>
         <Property name="dataColumn" type="java.lang.String" value="account_id"/>
         <Property name="listColumn" type="java.lang.String" value="account_name"/>
         <Property name="orderBy" type="java.lang.String" value="account_name"/>
         <Property name="rowSet" type="com.nqadmin.swingSet.datasources.SSRowSet" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection component="sSJdbcRowSetImpl1" type="bean"/>
+          <Connection component="sSJdbcRowSetImpl2" type="bean"/>
         </Property>
       </Properties>
       <AuxValues>
@@ -42,46 +36,37 @@
     <Menu class="com.nqadmin.swingSet.formatting.helpers.HelperPopup" name="helperPopup1">
       <Properties>
         <Property name="connection" type="com.nqadmin.swingSet.datasources.SSConnection" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection component="sSConnection1" type="bean"/>
+          <Connection component="sSConnection2" type="bean"/>
         </Property>
         <Property name="dataColumn" type="java.lang.String" value="account_id"/>
         <Property name="listColumn" type="java.lang.String" value="account_name"/>
         <Property name="orderBy" type="java.lang.String" value="account_name"/>
         <Property name="table" type="java.lang.String" value="accounts"/>
       </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="helperPopup1.createHelper();"/>
-      </AuxValues>
     </Menu>
     <Menu class="com.nqadmin.swingSet.formatting.helpers.HelperPopup" name="helperPopup2">
       <Properties>
         <Property name="columnType" type="int" value="1"/>
         <Property name="connection" type="com.nqadmin.swingSet.datasources.SSConnection" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="sSConnection1" type="code"/>
+          <Connection component="sSConnection2" type="bean"/>
         </Property>
         <Property name="dataColumn" type="java.lang.String" value="currency_id"/>
         <Property name="listColumn" type="java.lang.String" value="currency_name"/>
         <Property name="orderBy" type="java.lang.String" value="currency_name"/>
         <Property name="table" type="java.lang.String" value="currencies"/>
       </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="helperPopup2.createHelper();"/>
-      </AuxValues>
     </Menu>
     <Menu class="com.nqadmin.swingSet.formatting.helpers.HelperPopup" name="helperPopup3">
       <Properties>
         <Property name="columnType" type="int" value="0"/>
         <Property name="connection" type="com.nqadmin.swingSet.datasources.SSConnection" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection component="sSConnection1" type="bean"/>
+          <Connection component="sSConnection2" type="bean"/>
         </Property>
         <Property name="dataColumn" type="java.lang.String" value="account_type_id"/>
         <Property name="listColumn" type="java.lang.String" value="account_type_name"/>
         <Property name="orderBy" type="java.lang.String" value="account_type_name"/>
         <Property name="table" type="java.lang.String" value="accounts_types"/>
       </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="helperPopup3.createHelper();"/>
-      </AuxValues>
     </Menu>
   </NonVisualComponents>
   <Properties>
@@ -101,12 +86,8 @@
   <SubComponents>
     <Component class="com.nqadmin.swingSet.SSDataNavigator" name="sSDataNavigator1">
       <Properties>
-        <Property name="DBNav" type="com.nqadmin.swingSet.SSDBNav" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="this" type="code"/>
-        </Property>
-        <Property name="focusable" type="boolean" value="false"/>
-        <Property name="rowSet" type="com.nqadmin.swingSet.datasources.SSRowSet" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection component="sSJdbcRowSetImpl1" type="bean"/>
+        <Property name="SSRowSet" type="com.nqadmin.swingSet.datasources.SSRowSet" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection component="sSJdbcRowSetImpl2" type="bean"/>
         </Property>
       </Properties>
       <Constraints>
@@ -126,37 +107,16 @@
         <Property name="useNullLayout" type="boolean" value="true"/>
       </Layout>
       <SubComponents>
-        <Component class="com.nqadmin.swingSet.formatting.SSFormattedTextField" name="sSFormattedTextField1">
+        <Component class="com.nqadmin.swingSet.formatting.SSIntegerField" name="sSIntegerField2">
           <Properties>
-            <Property name="columns" type="int" value="10"/>
-            <Property name="horizontalAlignment" type="int" value="4"/>
             <Property name="columnName" type="java.lang.String" value="account_id"/>
-            <Property name="helper" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection component="rowSetHelperPopup1" type="bean"/>
-            </Property>
-            <Property name="navigator" type="com.nqadmin.swingSet.SSDataNavigator" editor="org.netbeans.modules.form.ComponentChooserEditor">
-              <ComponentRef name="sSDataNavigator1"/>
-            </Property>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sSFormattedTextField1ActionPerformed"/>
-          </Events>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="120" y="30" width="70" height="-1"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="com.nqadmin.swingSet.formatting.SSFormattedTextField" name="sSFormattedTextField2">
-          <Properties>
-            <Property name="columnName" type="java.lang.String" value="account_name"/>
-            <Property name="navigator" type="com.nqadmin.swingSet.SSDataNavigator" editor="org.netbeans.modules.form.ComponentChooserEditor">
-              <ComponentRef name="sSDataNavigator1"/>
+            <Property name="navigator" type="com.nqadmin.swingSet.SSDataNavigator" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection component="sSDataNavigator1" type="bean"/>
             </Property>
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="120" y="60" width="310" height="-1"/>
+              <AbsoluteConstraints x="120" y="30" width="80" height="-1"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -175,49 +135,25 @@
         </Component>
         <Component class="com.nqadmin.swingSet.formatting.SSDateField" name="sSDateField2">
           <Properties>
-            <Property name="columnName" type="java.lang.String" value="valid_until"/>
             <Property name="navigator" type="com.nqadmin.swingSet.SSDataNavigator" editor="org.netbeans.modules.form.ComponentChooserEditor">
               <ComponentRef name="sSDataNavigator1"/>
             </Property>
+            <Property name="columnName" type="java.lang.String" value="valid_until"/>
           </Properties>
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="sSDateField2.bind(sSJdbcRowSetImpl1, &quot;valid_until&quot;);"/>
-          </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
               <AbsoluteConstraints x="120" y="150" width="110" height="-1"/>
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="com.nqadmin.swingSet.formatting.SSBooleanField" name="sSBooleanField1">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Habilitada"/>
-            <Property name="columnName" type="java.lang.String" value="is_enabled"/>
-            <Property name="navigator" type="com.nqadmin.swingSet.SSDataNavigator" editor="org.netbeans.modules.form.ComponentChooserEditor">
-              <ComponentRef name="sSDataNavigator1"/>
-            </Property>
-            <Property name="rowSet" type="com.nqadmin.swingSet.datasources.SSRowSet" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="sSJdbcRowSetImpl1" type="code"/>
-            </Property>
-          </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="210" y="30" width="110" height="-1"/>
-            </Constraint>
-          </Constraints>
-        </Component>
         <Component class="com.nqadmin.swingSet.formatting.SSFormattedTextField" name="sSFormattedTextField3">
           <Properties>
-            <Property name="columns" type="int" value="6"/>
             <Property name="columnName" type="java.lang.String" value="currency_id"/>
             <Property name="helper" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.ComponentChooserEditor">
               <ComponentRef name="helperPopup2"/>
             </Property>
             <Property name="navigator" type="com.nqadmin.swingSet.SSDataNavigator" editor="org.netbeans.modules.form.ComponentChooserEditor">
               <ComponentRef name="sSDataNavigator1"/>
-            </Property>
-            <Property name="rowSet" type="com.nqadmin.swingSet.datasources.SSRowSet" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="sSJdbcRowSetImpl1" type="code"/>
             </Property>
           </Properties>
           <Constraints>
@@ -234,9 +170,6 @@
             </Property>
             <Property name="navigator" type="com.nqadmin.swingSet.SSDataNavigator" editor="org.netbeans.modules.form.ComponentChooserEditor">
               <ComponentRef name="sSDataNavigator1"/>
-            </Property>
-            <Property name="rowSet" type="com.nqadmin.swingSet.datasources.SSRowSet" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection component="sSJdbcRowSetImpl1" type="bean"/>
             </Property>
           </Properties>
           <Constraints>
@@ -264,7 +197,7 @@
                   <ComponentRef name="sSFormattedTextField1"/>
                 </Property>
                 <Property name="rowSet" type="com.nqadmin.swingSet.datasources.SSRowSet" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="sSJdbcRowSetImpl1" type="code"/>
+                  <Connection component="sSDataNavigator1" name="getSSRowSet" type="method"/>
                 </Property>
               </Properties>
             </Component>
@@ -344,6 +277,40 @@
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
               <AbsoluteConstraints x="10" y="210" width="100" height="-1"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="com.nqadmin.swingSet.formatting.SSBooleanField" name="sSBooleanField1">
+          <Properties>
+            <Property name="navigator" type="com.nqadmin.swingSet.SSDataNavigator" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="sSDataNavigator1" type="code"/>
+            </Property>
+            <Property name="columnName" type="java.lang.String" value="is_enabled"/>
+            <Property name="text" type="java.lang.String" value="Habilitada"/>
+            <Property name="toolTipText" type="java.lang.String" value="Indica si la cuenta esta habilitada o no."/>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
+              <AbsoluteConstraints x="220" y="30" width="127" height="-1"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="com.nqadmin.swingSet.formatting.SSFormattedTextField" name="sSFormattedTextField1">
+          <Properties>
+            <Property name="columnName" type="java.lang.String" value="account_name"/>
+            <Property name="helper" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.ComponentChooserEditor">
+              <ComponentRef name="null"/>
+            </Property>
+            <Property name="navigator" type="com.nqadmin.swingSet.SSDataNavigator" editor="org.netbeans.modules.form.ComponentChooserEditor">
+              <ComponentRef name="sSDataNavigator1"/>
+            </Property>
+            <Property name="SSRowSet" type="com.nqadmin.swingSet.datasources.SSRowSet" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection component="sSJdbcRowSetImpl2" type="bean"/>
+            </Property>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
+              <AbsoluteConstraints x="120" y="60" width="430" height="-1"/>
             </Constraint>
           </Constraints>
         </Component>

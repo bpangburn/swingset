@@ -33,7 +33,6 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import com.nqadmin.swingSet.SSDataNavigator;
 import com.nqadmin.swingSet.datasources.SSRowSet;
 
 import java.awt.*;
@@ -47,6 +46,9 @@ import java.util.HashSet;
 
 import com.nqadmin.swingSet.SSDataNavigator;
 import com.nqadmin.swingSet.formatting.helpers.*;
+import java.beans.beancontext.BeanContextChild;
+import java.beans.beancontext.BeanContextChildSupport;
+import java.beans.beancontext.BeanContextProxy;
 
 
 /**
@@ -59,7 +61,10 @@ import com.nqadmin.swingSet.formatting.helpers.*;
  * @author $Author$
  * @version $Revision$
  */
-public class SSFormattedTextField extends JFormattedTextField implements RowSetListener, KeyListener, FocusListener, MouseListener {
+public class SSFormattedTextField extends JFormattedTextField implements RowSetListener, KeyListener, FocusListener, MouseListener, BeanContextProxy {
+    
+        
+	private BeanContextChildSupport beanContextChildSupport = new BeanContextChildSupport();
     
     private JPopupMenu menu       = null;
     private JPopupMenu calculator = null;
@@ -662,10 +667,18 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
             }
         }
     }
+    
+	public BeanContextChild getBeanContextProxy(){
+		System.err.println("getBeanContextProxy Called");
+		return beanContextChildSupport;
+	}
 }
 
 /*
  * $Log$
+ * Revision 1.12  2005/02/22 15:14:34  yoda2
+ * Fixed some JavaDoc & deprecation errors/warnings.
+ *
  * Revision 1.11  2005/02/04 22:42:06  yoda2
  * Updated Copyright info.
  *
