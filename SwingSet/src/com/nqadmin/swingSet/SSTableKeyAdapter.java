@@ -70,10 +70,14 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
      */
     protected int offMask = KeyEvent.ALT_DOWN_MASK | KeyEvent.SHIFT_DOWN_MASK;
 
+    /**
+     * Indicates whether or not row insertions are allowed via cut/copy & paste.
+     */
     protected boolean allowInsertion = false;
 
- // THIS IS A SPECIAL FIELD TO ACCOMODATE SSDATAGRID.
- // LAST ROW IN SSDATAGRID IS FOR INSERTION
+    /**
+     * Indicates row used for insertion in SSDataGrid.
+     */
     protected boolean forSSDataGrid = false;
 
     /**
@@ -86,19 +90,22 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
     }
 
     /**
-     *  Sets allowInsertion. Set true if new rows can be added to JTable for copying
-     *the data else false. Default value if false.
-     *@param _allowInsertion true if new rows can be added when copying data from clipboard
-     *else false.
+     * Sets allowInsertion indicator. Set true if new rows can be added to
+     * JTable via cut/copy & paste - otherwise false.  False by default.
+     *
+     * @param _allowInsertion  true if new rows can be added when pasting data
+     *  from clipboard, else false.
      */
     public void setAllowInsertion(boolean _allowInsertion) {
         allowInsertion = _allowInsertion;
     }
 
     /**
-     *  Sets if this key adapter is used for SSDataGrid. True if the key adapter is
-     *used for SSDataGrid else false. Default value is false.
-     *@param _forSSDataGrid - true if this key adapter is used for SSDataGrid else false.
+     * Sets forSSDataGrid indicator. True if the key adapter is
+     * used for SSDataGrid -- otherwise false. False by default.
+     *
+     * @param _forSSDataGrid - true if this key adapter is used for SSDataGrid,
+     *  else false.
      */
     public void setForSSDataGrid(boolean _forSSDataGrid) {
         forSSDataGrid = _forSSDataGrid;
@@ -324,7 +331,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
     /**
      * Takes the column number and string value to be set for that column and
      * converts the string in to appropriate class.
-     * The class is found by calling the getColumnClass on the JTable.
+     * The class is found by calling the getColumnClass() method of the JTable.
      *
      * @param _jTable   JTable containing target object
      * @param _column   the column number for which new value has to be set.
@@ -356,6 +363,9 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/04 22:48:54  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.4  2004/11/11 14:45:48  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *
