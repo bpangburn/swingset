@@ -308,6 +308,10 @@ public class SSDBComboBox  extends JComponent{
 		public void setTextField(JTextField _textField){
 			textField = _textField;
 		}
+		
+		public void setPreferredSize(Dimension _dimension){
+			cmbDisplayed.setPreferredSize(_dimension);
+		}
 
 		/**
 		 *	returns connection object used to get values from database.
@@ -635,7 +639,10 @@ public class SSDBComboBox  extends JComponent{
 						ke.getKeyCode() == KeyEvent.VK_DOWN      ||
 						ke.getKeyCode() == KeyEvent.VK_ENTER       ){
 					searchString = null;
-					searchStack.removeAllElements();		
+					searchStack.removeAllElements();
+					if(ke.getKeyCode() == KeyEvent.VK_ENTER){
+						((Component)ke.getSource()).transferFocus();
+					}					
 					return;		
 					
 				}
@@ -924,6 +931,11 @@ public class SSDBComboBox  extends JComponent{
 
 /*
  * $Log$
+ * Revision 1.7  2004/08/02 15:21:55  prasanth
+ * 1. Deprecated  setTextField function.
+ * 2. Added setSelectedValue function.
+ * 3. Also added addComponent (private) method.
+ *
  * Revision 1.6  2004/03/08 16:43:37  prasanth
  * Updated copy right year.
  *
