@@ -35,6 +35,7 @@
  
  import java.sql.SQLException;
  import java.sql.Connection;
+ import java.sql.ResultSet;
  import java.sql.ResultSetMetaData;
  import java.io.ObjectInputStream;
  import java.io.IOException;
@@ -117,6 +118,8 @@
  	public void execute() throws SQLException{
  		if(rowset == null){
  			rowset = new JdbcRowSetImpl(ssConnection.getConnection());
+ 			rowset.setType(ResultSet.TYPE_SCROLL_INSENSITIVE);
+ 			rowset.setConcurrency(ResultSet.CONCUR_UPDATABLE);
  			rowset.setCommand(query);
  		}
  		rowset.execute();
@@ -133,7 +136,9 @@
 		try{
 		// CREATE NEW INSTANCE OF JDBC ROWSET.	
 			rowset = new JdbcRowSetImpl(connection);
-		
+			rowset.setType(ResultSet.TYPE_SCROLL_INSENSITIVE);
+ 			rowset.setConcurrency(ResultSet.CONCUR_UPDATABLE);
+ 			
 		// SET THE COMMAND FOR ROWSET	
 			rowset.setCommand(query);
 
@@ -794,4 +799,7 @@
 } 
  /*
   * $Log$
+  * Revision 1.1  2004/10/25 21:47:50  prasanth
+  * Initial Commit
+  *
   */
