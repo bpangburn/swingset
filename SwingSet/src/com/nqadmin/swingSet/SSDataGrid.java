@@ -45,6 +45,7 @@ import java.sql.Date;
 import java.util.GregorianCalendar;
 import java.util.Calendar;
 import java.util.EventObject;
+import java.util.Vector;
 
 /**
  * SSDataGrid.java
@@ -132,7 +133,7 @@ import java.util.EventObject;
 public class SSDataGrid extends JTable
 {
 	// COMPONENT WHERE MESSAGES HAVE TO BE POPPED UP.
-	Component window = null;
+	protected Component window = null;
 	
 	
 	// JTABLE TO DISPLAY THE VALUES
@@ -140,17 +141,17 @@ public class SSDataGrid extends JTable
 	// BUTTONS TO THE RIGHT OF EACH ROW
 //	private  JButton[]  btnSelectRow 	= null;
 	// ROWSET CONTAINING THE VALUES
-	private  RowSet  	rowset 			= null;
+	private  transient RowSet  	rowset 			= null;
 	// NUMBER OF COLUMNS IN THE ROW SET
 	private	 int 		columnCount 	= -1;
 	// NUMBER OF RECORDS RETRIVED
 	private  int 		rowCount    	= -1;
 	// METADATA INFO OF THE GIVEN ROWSET
-	private  RowSetMetaData  metaData	= null;
+	private  transient RowSetMetaData  metaData	= null;
 	//TABLE MODEL TO CONSTRUCT THE JTABLE
 	SSTableModel tableModel 			= null;
 	
-	JScrollPane scrollPane = null; //ew JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	protected JScrollPane scrollPane = null; //ew JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	
 	/**
 	 *	Array used to store the column numbers that have to hidden.
@@ -176,6 +177,7 @@ public class SSDataGrid extends JTable
 		super();
 //super(VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED );		
 		rowset = _rowset;	
+//		addComponent();
 		init();
 	}
 	
@@ -185,6 +187,7 @@ public class SSDataGrid extends JTable
 	public SSDataGrid(){
 		super();
 		tableModel = new SSTableModel();
+		
 //super(VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_ALWAYS);
 	}
 	
@@ -207,6 +210,61 @@ public class SSDataGrid extends JTable
 	public void setCallExecute(boolean _execute){
 		callExecute = _execute;
 	}
+	
+	
+	/**
+	 *Returns the list of selected columns.
+	 *This function gets the list of selected columns from parent class 
+	 *and removes any columns which are present in hidden columns.
+	 */
+	// THIS IS A STRANGE BEHAVIOUR. FOR SOME REASON SOME TIMES THE 
+	// LIST OF SELECTED COLUMNS INCLUDED HIDDEN COLUMNS THIS CAUSES
+	// A PROBLEM WITH COPY AND PASTE OPERATIONS. SO MAKE SURE THAT THIS
+	// LIST DOES NOT CONTAIN HIDDEN COLUMNS
+	public int[] getSelectedColumns(){
+		System.out.println("SSDataGrid getSelectedColumns()");
+	// IF THERE ARE NO HIDDEN COLUMNS THEN RETURN THE SAME LIST
+		if(hiddenColumns == null){
+			return super.getSelectedColumns();
+		}
+			
+	// GET THE LIST OF SELECTED COLUMNS FROM SUPER CLASS.	
+		int[] selectedColumns = super.getSelectedColumns();
+		Vector filteredColumns = new Vector();
+	// FILTER OUT THE HIDDEN COLUMNS FROM THIS LIST.	
+		for(int i=0; i<selectedColumns.length; i++){
+			boolean found = false;
+		// CHECK THIS COLUMN NUMBER WITH HIDDEN COLUMNS	
+			for(int j=0; j<hiddenColumns.length; j++){
+			// IF ITS THERES INDICATE THE SAME AND BREAK OUT.	
+				if(selectedColumns[i] == hiddenColumns[j]){
+					found = true;
+					break;
+				}
+			}
+		// IF THIS COLUMN IS NOT IN HIDDEN COLUMNS ADD IT TO FILTERED LIST	
+			if(!found){
+				filteredColumns.add(new Integer(selectedColumns[i]));
+			}
+		}
+	// CREATE AN INT ARRAY CONTAINING THE FILETED LIST OF COLUMNS	
+		int[] result = new int[filteredColumns.size()];
+		for(int i=0; i<filteredColumns.size(); i++){
+			result[i] = ((Integer)filteredColumns.elementAt(i)).intValue();
+		}
+		
+		return result;
+	} 
+	
+	
+	public int getSelectedColumnCount(){
+		int[] selectedColumns = this.getSelectedColumns();
+		if(selectedColumns == null)
+			return 0;
+		
+		return selectedColumns.length;
+	}
+	
 	
 	/**
 	 *	Initializes the data grid control. Collects metadata information about the 
@@ -332,7 +390,6 @@ public class SSDataGrid extends JTable
 				}
 			}
 		});
-						
 		
 /*		this.setLayout(new GridBagLayout());
 		GridBagConstraints constraints = new GridBagConstraints();
@@ -350,9 +407,14 @@ public class SSDataGrid extends JTable
 		constraints.gridwidth = columnCount;
 		this.add(grid,constraints);
 */		
-		// THIS CAUSES THE JTABLE TO DISPLAY THE HORIZONTAL SCROLL BAR AS NEEDED.	
+	
+	// CREATE AN INSTANCE OF KEY ADAPTER ADD PROVIDE THE PRESET GRID TO THE ADAPTER.
+	// THIS IS FOR COPY AND PASTE SUPPORT
+		SSTableKeyAdapter keyAdapter = new SSTableKeyAdapter(this);
+		keyAdapter.setAllowInsertion(true);
+	// THIS CAUSES THE JTABLE TO DISPLAY THE HORIZONTAL SCROLL BAR AS NEEDED.	
 		this.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		// ADD THE JTABLE TO A SCROLL BAR
+	// ADD THE JTABLE TO A SCROLL BAR
 		scrollPane = new JScrollPane(this,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
 		
 	}
@@ -400,7 +462,7 @@ public class SSDataGrid extends JTable
 	 /**
 	  *	 Returns scroll pane with the JTable embedded in it.
 	  */
-	 public JComponent getComponent(){
+	 public Component getComponent(){
 	 	return scrollPane;
 	 }
 	 
@@ -696,6 +758,7 @@ public class SSDataGrid extends JTable
     // TO MM/DD/YYYY FORMAT FROM YYYY-MM-DD FORMAT.
     private class DateEditor extends DefaultCellEditor {
     	
+    	    	
     	// CONSTRUCTOR FOR THE EDITOR CLASS
    		public DateEditor(){
    			super(new JTextField());
@@ -748,7 +811,7 @@ public class SSDataGrid extends JTable
    			// FOR CELL EDITING.
    			if(event instanceof MouseEvent){
    				return ((MouseEvent)event).getClickCount() >= getClickCountToStart();
-   			}
+ 			}
     		return true;
     	}
     }
@@ -967,6 +1030,10 @@ public class SSDataGrid extends JTable
 
 /*
  * $Log$
+ * Revision 1.7  2004/03/08 16:59:32  prasanth
+ * Added callExecute function to let users decide whether execute should
+ * be called or not.
+ *
  * Revision 1.6  2004/03/08 16:43:37  prasanth
  * Updated copy right year.
  *
