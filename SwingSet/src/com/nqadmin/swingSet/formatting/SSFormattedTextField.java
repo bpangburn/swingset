@@ -142,7 +142,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     /**
      *
      * @deprecated
-     * @see setSSRowSet
+     * @see #setSSRowSet
      *
      */
     public void setRowSet(SSRowSet rowset) {
@@ -160,7 +160,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     
     public void setNavigator(SSDataNavigator navigator) {
         this.navigator = navigator;
-        setSSRowSet(navigator.getRowSet());
+        setSSRowSet(navigator.getSSRowSet());
         bind();
     }
     
@@ -666,6 +666,9 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
 
 /*
  * $Log$
+ * Revision 1.11  2005/02/04 22:42:06  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.10  2005/01/24 14:04:16  dags
  * bean preparation
  *

@@ -313,7 +313,7 @@ System.out.println("Hay " + ssRowset.getRow() + " registros");
     
     /**
      * Setter for property orderBy.
-     * @param table New value of property table.
+     * @param orderBy New value of orderBy property
      */
     public void setOrderBy(String orderBy) {
         

@@ -93,7 +93,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
     
     public void setNavigator(SSDataNavigator navigator) {
         this.navigator = navigator;
-        setRowSet(navigator.getRowSet());
+        setRowSet(navigator.getSSRowSet());
     }
     
     public SSDataNavigator getNavigator() {

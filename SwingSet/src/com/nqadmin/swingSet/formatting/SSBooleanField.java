@@ -90,7 +90,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
     
     public void setNavigator(SSDataNavigator navigator) {
         this.navigator = navigator;
-        setRowSet(navigator.getRowSet());
+        setRowSet(navigator.getSSRowSet());
     }
     
     public SSDataNavigator getNavigator() {
@@ -267,6 +267,9 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/04 22:42:06  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.6  2005/01/19 19:12:26  dags
  * bind refactoring
  *

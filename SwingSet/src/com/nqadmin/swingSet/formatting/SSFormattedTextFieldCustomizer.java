@@ -31,7 +31,7 @@ public class SSFormattedTextFieldCustomizer extends javax.swing.JPanel implement
 
     }
     
-    public Dimension preferredSize() {
+    public Dimension getPreferredSize() {
         return new Dimension(400, 152);
     }
     

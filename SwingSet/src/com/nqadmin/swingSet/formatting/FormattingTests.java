@@ -132,7 +132,7 @@ public class FormattingTests extends javax.swing.JFrame implements SSDBNav {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         sSDataNavigator1.setDBNav(this);
         sSDataNavigator1.setFocusable(false);
-        sSDataNavigator1.setRowSet(sSJdbcRowSetImpl1);
+        sSDataNavigator1.setSSRowSet(sSJdbcRowSetImpl1);
         getContentPane().add(sSDataNavigator1, java.awt.BorderLayout.SOUTH);
 
         jPanel1.setLayout(null);
@@ -178,14 +178,14 @@ public class FormattingTests extends javax.swing.JFrame implements SSDBNav {
         sSFormattedTextField3.setColumnName("currency_id");
         sSFormattedTextField3.setHelper(helperPopup2);
         sSFormattedTextField3.setNavigator(sSDataNavigator1);
-        sSFormattedTextField3.setRowSet(sSJdbcRowSetImpl1);
+        sSFormattedTextField3.setSSRowSet(sSJdbcRowSetImpl1);
         jPanel1.add(sSFormattedTextField3);
         sSFormattedTextField3.setBounds(120, 90, 70, 19);
 
         sSIntegerField1.setColumnName("account_type_id");
         sSIntegerField1.setHelper(helperPopup3);
         sSIntegerField1.setNavigator(sSDataNavigator1);
-        sSIntegerField1.setRowSet(sSJdbcRowSetImpl1);
+        sSIntegerField1.setSSRowSet(sSJdbcRowSetImpl1);
         jPanel1.add(sSIntegerField1);
         sSIntegerField1.setBounds(120, 180, 60, 19);
 

@@ -296,7 +296,7 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
     
     /**
      * Setter for property orderBy.
-     * @param table New value of property table.
+     * @param orderBy New value of orderBy property
      */
     public void setOrderBy(String orderBy) {
         
