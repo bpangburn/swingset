@@ -75,7 +75,7 @@ public class SSTextField extends JTextField {
 	 public static final int DECIMAL = 4;
 	 	 	
 	// TYPE OF MASK TO BE USED FOR THIS TEXTFIELD
-	private int mask = MMDDYYYY;
+	private int mask = 0;
 	
 	// NUMBER OF DECIMALS REQUIRED
 	private int numDecimals = 2;
@@ -357,6 +357,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.6  2004/08/10 22:06:59  yoda2
+ * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
+ *
  * Revision 1.5  2004/08/09 15:34:40  prasanth
  * 1. Added bind function.
  * 2. In the key listener transferring focus on enter key.
