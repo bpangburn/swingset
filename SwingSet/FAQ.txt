@@ -20,7 +20,7 @@ FAQ
         3.pg73jdbc3.jar (Driver for remote PostgreSQL database.  Available
           from: http://jdbc.postgresql.org/download/pg73jdbc3.jar)
 
-    If you still have probles:
+    If you still have problems:
         1. Unzip the jar file and extract the files to a folder.
 	2. From a command prompt go to that folder and type:
 	    java  MainClass
@@ -64,7 +64,7 @@ FAQ
     columns.  Why are my renderers and/or hidden columns not working as
     expected?
     
-    When modify a query for a SSDataGrid's rowset, you must insure that the 
+    When modifying a query for a SSDataGrid's rowset, you must insure that the 
     columns are returned in the same order!  When you set a renderer, or
     specify a column as hidden you specify either a column number or column
     name (in which case SwingSet internally converts the name to a column 
