@@ -38,6 +38,9 @@ Changes:
 		   This is needed for copy and paste support.
 		2. Added copy and paste support for the SSDataGrid, this is achieved with the help
 		   of SSTableKeyAdapter.
+		3. The default item selected in a combo box renderer when a default value is not 
+		   specified for the column will be -1. In the previous release it was the first
+		   item.
 	
 	SSDataNavigator:
 		1. Added getXXX functions for rowset, button size, modification, deletion, insertion,
@@ -65,6 +68,10 @@ Changes:
 	
 	SSDBNavAdapter:
 		1. Implements Serializable.
+	
+	SSDBNavImp:
+		1. Default item selected in the combo box will be -1 rather than 0. This way the column
+		   value can be null if a value is not selected.
 		
 	SSTableKeyAdapter:
 		1. This class added a key listener to the JTable and provides copy and paste support 
