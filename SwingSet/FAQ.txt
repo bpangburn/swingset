@@ -1,53 +1,64 @@
 
 1.  I am trying to run the samples. I see "Processing....." and nothing
-	happens.
+    happens.  What is wrong?
 
-Ans: You might be missing one or more jar files. 
-		  Please make sure that you have the following jar files.
-		1.swingSet.jar
-		2.rowset.jar    ( You have to download it from java.sun.com)
-		3.pg73jdbc3.jar ( Driver for postgresql database (remote database)
-			that the application uses)
+    You might be missing one or more required jar files.  Please make sure
+    that you have the following jar files:
+        1.swingSet.jar
+        2.rowset.jar (Available from:
+          http://developer.java.sun.com/developer/earlyAccess/jdbc/jdbc-rowset.html)
+        3.pg73jdbc3.jar (Driver for remote PostgreSQL database.  Available
+          from: http://jdbc.postgresql.org/download/pg73jdbc3.jar)
 
-	If you still have the problem.
-	Unzip the jar file and extract the files to a folder.
-	From command prompt go to that folder and type 
-		 java  MainClass
-	Now you can see any errors on your command prompt screen.
-	
-2.	I have set the headers but I don't see them on the screen.
-
-Ans: You have to set the headers before you set the rowset. If you reverse
-	the order you will not see the headers. So if you want to set the 
-	headers use the empty constructor.
-
-3.	I am getting an exception while setting the renderers.
-
-Ans: You have to set the renderer only after you have set the rowset.
-	Till you set the rowset the JTable does not have any columns. So when
-	you try to set a renderer SSDataGrid tries to access the specified 
-	column from JTable causing an exception.
+    If you still have probles:
+        1. Unzip the jar file and extract the files to a folder.
+	2. From a command prompt go to that folder and type:
+	    java  MainClass
+	3. You will now see any remaining errors on the command prompt screen.
 	
 
-4. What happens to my default values and all other stuff I have set when I change
-	my underlying RowSet?
+2.  I have set the headers for a SSDataGrid, so why I don't see them on the
+    screen?
 
-Ans: All the defaults and other information like headers, renderer will remain the 
-	same even after changing the RowSet for the SSDataGrid. If you want to change
-	any thing or unset them you have to call the setXXXXXXX functions to change the 
-	behaviour.
-	Example: You have a RowSet and set the default value for column 3 to be "XYZ".
-	Now you have changed your query for the RowSet and set it to SSDataGrid now you 
-	have to call the setDefaultValues  like this
-		dataGrid.setDefaultValues(null,null);
-	This will remove all the default values used.
+    You have to set the headers before you set the rowset. If you reverse the
+    order, you will not see the headers.  If you want to specify headers, use
+    the empty constructor.
+
+
+3.  Why am I getting an exception, while setting the renderers.
+
+    You have to set the renderer only after you have set the rowset.  Until
+    you set the rowset the JTable does not have any columns, so when you try
+    to set a renderer SSDataGrid tries to access the specified column from
+    JTable, which causes an exception.
 	
-5. I have the same query in my rowset but my renderer, hidden columns are not working
-	in the right way.
+
+4.  What happens to my default values and any other custom settings when I
+    change my underlying rowset?
+
+    All the defaults and other information like headers, renderer will remain
+    the same even after changing the rowset for a SSDataGrid. If you want to
+    change any settings or remove the defaults and/or headers, you have to
+    call the setXXXXX() functions to change the behavior.
+    
+    Example: You have a rowset for a SSDataGrid and have set the default value
+             for the third column to be "XYZ". If you then change the query
+             for the rowset and want to remove the defaults for the SSDataGrid,
+             you have to call the setDefaultValues() method like this:
+                 dataGrid.setDefaultValues(null,null);
+                 
+	     This will remove all the default values used.
 	
-Ans: When you say the same query the order in which columns are selected should also 
-	remain the same. When you set a renderer, specify a column as hidden you specify
-	either column number or column name (in which case swing set internally converts
-	them to column number). Now if you change the selection order in the query and 
-	specify the new rowset to the swing set it still has the old column numbers. So 
-	you have to specify the new hidden columns and uneditable columns.
+5.  I setup a SSDataGrid based on a rowset querying columns "X," "Y," and "Z."
+    I made a small change to the underlying query but return the same set of 
+    columns.  Why are my renderers and/or hidden columns not working as
+    expected?
+    
+    When modify a query for a SSDataGrid's rowset, you must insure that the 
+    columns are returned in the same order!  When you set a renderer, or
+    specify a column as hidden you specify either a column number or column
+    name (in which case SwingSet internally converts the name to a column 
+    number).  If you change the column ordering for the underlying query and 
+    apply the modified rowset to your SSDataGrid, SwingSet continues to use
+    the "old" column numbers for any renderers or hidden columns.  You will
+    have to supply new renderers/hidden columns for the reordered columns.
