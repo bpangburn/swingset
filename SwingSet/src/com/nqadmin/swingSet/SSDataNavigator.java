@@ -258,7 +258,7 @@ public class SSDataNavigator extends JPanel {
      * @param _rowset The SSRowSet to which the SSDataNavigator has to be bound
      */
     public SSDataNavigator(SSRowSet _rowset) {
-        setRowSet(_rowset);
+        setSSRowSet(_rowset);
         addToolTips();
         createPanel();
         addListeners();
@@ -273,7 +273,7 @@ public class SSDataNavigator extends JPanel {
      */
     public SSDataNavigator(SSRowSet _rowset, Dimension _buttonSize) {
         buttonSize = _buttonSize;
-        setRowSet(_rowset);
+        setSSRowSet(_rowset);
         addToolTips();
         createPanel();
         addListeners();
@@ -1153,6 +1153,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.28  2005/02/07 22:19:33  yoda2
+ * Fixed infinite loop in deprecated setRowSet() which was calling setRowSet() rather than setSSRowSet()
+ *
  * Revision 1.27  2005/02/07 20:27:26  yoda2
  * JavaDoc cleanup & made private listener data members final.
  *

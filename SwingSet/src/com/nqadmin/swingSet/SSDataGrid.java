@@ -93,7 +93,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  *
  *      //  SET THE HEADER BEFORE SETTING THE SSROWSET
  *          dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
- *          dataGrid.setRowSet(ssRowSet);
+ *          dataGrid.setSSRowSet(ssRowSet);
  *          // HIDE THE PART ID COLUMN
  *          // THIS SETS THE WIDTH OF THE COLUMN TO 0
  *          //dataGrid.setHiddenColumns(new String[]{"part_id"});
@@ -404,7 +404,7 @@ public class SSDataGrid extends JTable {
         //    if (tableModel == null) {
         //        tableModel = new SSTableModel(rowset);
         //    } else {
-                tableModel.setRowSet(rowset);
+                tableModel.setSSRowSet(rowset);
         //    }
         
         // SET THE TABLE MODEL FOR JTABLE
@@ -470,7 +470,7 @@ public class SSDataGrid extends JTable {
         // UPDATE ROWSET & BIND
             rowset = _rowset;
             bind();
-     } // end public void setRowSet(SSRowSet _rowset) {
+     } // end public void setSSRowSet(SSRowSet _rowset) {
          
     /**
      * Returns the SSRowSet being used to get the values.
@@ -1166,6 +1166,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.24  2005/02/07 22:34:10  yoda2
+ * Fixed infinite loop in deprecated setRowSet() which was calling setRowSet() rather than setSSRowSet()
+ *
  * Revision 1.23  2005/02/07 22:20:32  yoda2
  * JavaDoc cleanup.
  *
