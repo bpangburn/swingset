@@ -432,6 +432,21 @@ public class SSDataNavigator extends JPanel {
 		} catch(SQLException se) {
 			se.printStackTrace();
 		}
+		
+	// ENABLE OTHER BUTTONS IF NEED BE.
+		
+		// THIS IS NEEDED TO HANDLE USER LEAVING THE SCREEN IN AN INCONSISTENT 
+		// STATE EXAMPLE: USER CLICKS ADD BUTTON, THIS DISABLES ALL THE BUTTONS
+		// EXCEPT COMMIT & UNDO. WITH OUT COMMITING OR UNDOING THE ADD USER
+		// CLOSES THE SCREEN. NOW IF THE SCREEN IS OPENED WITH A NEW ROWSET.
+		// THE REFRESH, ADD & DELETE WILL BE DISABLED.
+		refreshButton.setEnabled(true);
+		if (allowInsertions) {
+			addButton.setEnabled(true);
+        }
+		if (allowDeletions) {
+			deleteButton.setEnabled(true);
+        }
 	}
 
     // SET BUTTON DIMENSIONS
@@ -858,6 +873,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.14  2004/08/24 22:21:03  prasanth
+ * Changed the way images are loaded.
+ *
  * Revision 1.13  2004/08/16 20:51:16  yoda2
  * Gave button names in code more meaningful names (e.g. button1 -> firstButton).
  *
