@@ -93,9 +93,6 @@ public class SSComboBox extends JComboBox {
     // TEXT FIELD THAT WILL BE BOUND TO THE DATABASE
     protected JTextField textField = new JTextField();
 
-    // COMBO BOX THAT DISPLAYS THE DESIRED ITEMS
-    //protected JComboBox  cmbDisplayed  = new JComboBox();
-
     // INSTANCE OF LISTENER FOR COMBO BOX
     private MyComboListener cmbListener = new MyComboListener();
 
@@ -141,9 +138,7 @@ public class SSComboBox extends JComboBox {
      *  Creates an object of SSComboBox.
      */
     public SSComboBox() {
-        //super();
         init();
-        //addComponent();
     }
 
     /**
@@ -152,7 +147,6 @@ public class SSComboBox extends JComboBox {
     protected void init() {
         // ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
         // KEY IS PRESSED.
-            //cmbDisplayed.addKeyListener(new KeyAdapter() {
             addKeyListener(new KeyAdapter() {
                 public void keyReleased(KeyEvent ke) {
                     if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -163,7 +157,6 @@ public class SSComboBox extends JComboBox {
             
         // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,20));
-        //    setMaximumSize(new Dimension(200,20));            
     }
 
     /**
@@ -303,63 +296,70 @@ public class SSComboBox extends JComboBox {
     }
 
     // SET THE COMBO BOX ITEM TO THE ITEM THAT CORRESPONDS TO THE VALUE IN TEXT FIELD
-    private void setDisplay() {
+    private void setDisplay(){
         try {
             String text = textField.getText().trim();
-            if (!text.equals("")) {
-                int intValue = Integer.parseInt(text);
+            // GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD
+            int intValue = 0;
+            if ( !(text.trim().equals("")) ) {
+                intValue = Integer.parseInt(text);
+            }
+            // CHECK IF THE VALUE DISPLAYED IS THE SAME AS THAT IN TEXT FIELD
+            // TWO CASES 1. THE MAPPINGS FOR THE STRINGS DISPLAYED ARE GIVEN BY USER
+            //  2. VALUES FOR THE ITEMS IN COMBO START FROM ZERO
+            // IN CASE ONE: YOU CAN JUST CHECK FOR EQUALITY OF THE SELECTEDINDEX AND VALUE IN TEXT FIELD
+            // IN CASE TWO: YOU HAVE TO CHECK IF THE VALUE IN THE MAPPINGVALUES ARRAY AT INDEX EQUAL
+            // TO THE SELECTED INDEX OF THE COMBO BOX EQUALS THE VALUE IN TEXT FIELD
+            // IF THESE CONDITIONS ARE MET YOU NEED NOT CHANGE COMBO BOX SELECTED ITEM
+            if ( (mappingValues==null && intValue != getSelectedIndex()) ||
+                 (mappingValues!=null && getSelectedIndex() == -1)       ||
+                 (mappingValues!=null && mappingValues[getSelectedIndex()] != intValue) ) {
 
-                if (mappingValues == null ) {
-                    //if (intValue != cmbDisplayed.getSelectedIndex()) {
-                    if (intValue != getSelectedIndex()) {
-                        //cmbDisplayed.setSelectedIndex(intValue);
+                if (mappingValues==null && (intValue <0 || intValue >= getItemCount() )) {
+                // IF EXPLICIT VALUES FOR THE ITEMS IN COMBO ARE NOT SPECIFIED THEN CODES START
+                // FROM ZERO. IN SUCH A CASE CHECK IF THE NUMBER EXCEEDS THE NUMBER OF ITEMS
+                // IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)
+                    System.out.println("Error: value from DB:" + intValue + "  items in combo box: " + getItemCount());
+                    setSelectedIndex(-1);
+                } else {
+                // IF MAPPINGS  ARE SPECIFIED THEN GET THE INDEX AT WHICH THE VALUE IN TEXT FIELD
+                // APPEARS IN THE MAPPINGVALUES ARRAY. SET THE SELECTED ITEM OF COMBO SO THAT INDEX
+                    if (mappingValues!=null) {
+                        int i=0;
+                        for (;i<mappingValues.length;i++) {
+                            if (mappingValues[i] == intValue) {
+                                setSelectedIndex(i);
+                                break;
+                            }
+                        }
+                        // IF THAT VALUE IS NOT FOUND IN THE GIVEN MAPPING VALUES PRINT AN ERROR MESSAGE
+                        if (i==mappingValues.length) {
+                            System.out.println("change ERROR: could not find a corresponding item in combo for value " + intValue);
+                            setSelectedIndex(-1);
+                        }
+                    } else {
+                    // IF MAPPINGS ARE NOT SPECIFIED SET THE SELECTED ITEM AS THE ITEM AT INDEX
+                    // EQUAL TO THE VALUE IN TEXT FIELD
                         setSelectedIndex(intValue);
                     }
-                } else {
-                // SEARCH THE MAPPING VALUES FOR THIS INT VALUE.
-                // AND SET THE SELECTED INDEX OF COMBO TO THE INDEX AT WHICH
-                // THE INT VALUE IS FOUND IN THE MAPPINGS ARRAY.
-                    int i = 0;
-                    for(i=0; i<mappingValues.length; i++){
-                        if(mappingValues[i] == intValue){
-                            //cmbDisplayed.setSelectedIndex(i);
-                            setSelectedIndex(i);
-                            break;
-                        }
-                    }
-                // IF I == MAPPING VALUES LENGTH THEN IT MEANS THE VALUE IS NOT FOUND
-                // IN THE SPECIFIED MAPPINGS SO SET THE SELECTED ITEM TO BLANK
-                    if(i == mappingValues.length){
-                        //cmbDisplayed.setSelectedIndex(-1);
-                        setSelectedIndex(-1);
-                    }
-
                 }
             }
-        // IF TEXT IS EMPTY THEN SET COMBO TO BLANK
-            else {
-                //cmbDisplayed.setSelectedIndex(-1);
-                setSelectedIndex(-1);
-            }
 
-        } catch(NullPointerException npe) {
-            npe.printStackTrace();
         } catch(NumberFormatException nfe) {
             nfe.printStackTrace();
         }
-    }
 
+    }
+    
     // ADDS LISTENERS FOR THE COMBO BOX AND TEXT FIELD
     private void addListeners() {
         textField.getDocument().addDocumentListener(textFieldDocumentListener);
-        //cmbDisplayed.addActionListener(cmbListener);
         addActionListener(cmbListener);
     }
 
     // REMOVES THE LISTENERS FOR TEXT FIELD AND THE COMBO BOX DISPLAYED
     private void removeListeners() {
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
-        //cmbDisplayed.removeActionListener(cmbListener);
         removeActionListener(cmbListener);
     }
 
@@ -372,13 +372,10 @@ public class SSComboBox extends JComboBox {
         // ADD THE SPECIFIED ITEMS TO THE COMBO BOX
         // REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
         // THE DISPLAYED ITEMS
-        //if (cmbDisplayed.getItemCount() != 0) {
-        //    cmbDisplayed.removeAllItems();
         if (getItemCount() != 0) {
             removeAllItems();
         }
         for (int i=0;i<_options.length;i++) {
-            //cmbDisplayed.addItem(_options[i]);
             addItem(_options[i]);
         }
 
@@ -413,16 +410,14 @@ public class SSComboBox extends JComboBox {
         if (_options.length != _mappings.length) {
             return false;
         }
-        // add the items to combo
+        
         // REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
         // THE DISPLAYED ITEMS
-        //if (cmbDisplayed.getItemCount() != 0) {
-        //    cmbDisplayed.removeAllItems();
         if (getItemCount() != 0) {
             removeAllItems();
         }
+        // ADD THE ITEMS TO THE COMBOBOX
         for (int i=0;i<_options.length;i++) {
-            //cmbDisplayed.addItem(_options[i]);
             addItem(_options[i]);
         }
         // COPY THE MAPPING VALUES
@@ -458,27 +453,7 @@ public class SSComboBox extends JComboBox {
     public boolean setOption(int _option) {
 
         option = _option;
-//          System.out.println("Requested  Option: " + options);
-        // REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
-        // THE DISPLAYED ITEMS
-/*
-        if(cmbDisplayed.getItemCount() != 0) {
-            cmbDisplayed.removeAllItems();
-        }
-        if (option == YES_NO_OPTION) {
-            cmbDisplayed.addItem(new String("NO"));
-            cmbDisplayed.addItem(new String("YES"));
-        } else if (option == SEX_OPTION || option == GENDER_OPTION) {
-            cmbDisplayed.addItem(new String("MALE"));
-            cmbDisplayed.addItem(new String("FEMALE"));
-            cmbDisplayed.addItem(new String("UNI_SEX"));
-        } else if (option == INCLUDE_EXCLUDE_OPTION) {
-            cmbDisplayed.addItem(new String("INCLUDE"));
-            cmbDisplayed.addItem(new String("EXCLUDE"));
-        } else {
-            return false;
-        }
-*/
+
         if (getItemCount() != 0) {
             removeAllItems();
         }
@@ -503,169 +478,16 @@ public class SSComboBox extends JComboBox {
     private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
         public void changedUpdate(DocumentEvent de) {
-        //  System.out.println("changed Document Changed: " + de);
-            //cmbDisplayed.removeActionListener(cmbListener);
-            removeActionListener(cmbListener);
-            Document doc = textField.getDocument();
-            try {
-
-                String text = doc.getText(0,doc.getLength());
-                if (text != null) {
-                    // GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD
-                    int intValue = 0;
-                    if ( !(text.trim().equals("")) ) {
-                        intValue = Integer.parseInt(text);
-                    }
-                    // CHECK IF THE VALUE DISPLAYED IS THE SAME AS THAT IN TEXT FIELD
-                    // TWO CASES 1. THE MAPPINGS FOR THE STRINGS DISPLAYED ARE GIVEN BY USER
-                    //  2. VALUES FOR THE ITEMS IN COMBO START FROM ZERO
-                    // IN CASE ONE: YOU CAN JUST CHECK FOR EQUALITY OF THE SELECTEDINDEX AND VALUE IN TEXT FIELD
-                    // IN CASE TWO: YOU HAVE TO CHECK IF THE VALUE IN THE MAPPINGVALUES ARRAY AT INDEX EQUAL
-                    // TO THE SELECTED INDEX OF THE COMBO BOX EQUALS THE VALUE IN TEXT FIELD
-                    // IF THESE CONDITIONS ARE MET YOU NEED NOT CHANGE COMBO BOX SELECTED ITEM
-/*
-                    if ( (mappingValues==null && intValue != cmbDisplayed.getSelectedIndex()) ||
-                         (mappingValues!=null && cmbDisplayed.getSelectedIndex() == -1)       ||
-                         (mappingValues!=null && mappingValues[cmbDisplayed.getSelectedIndex()] != intValue) ) {
-*/
-                    if ( (mappingValues==null && intValue != getSelectedIndex()) ||
-                         (mappingValues!=null && getSelectedIndex() == -1)       ||
-                         (mappingValues!=null && mappingValues[getSelectedIndex()] != intValue) ) {
-
-                        //if (mappingValues==null && (intValue <0 || intValue >= cmbDisplayed.getItemCount() )) {
-                        if (mappingValues==null && (intValue <0 || intValue >= getItemCount() )) {
-                        // IF EXPLICIT VALUES FOR THE ITEMS IN COMBO ARE NOT SPECIFIED THEN CODES START
-                        // FROM ZERO. IN SUCH A CASE CHECK IF THE NUMBER EXCEEDS THE NUMBER OF ITEMS
-                        // IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)
-//                              System.out.println("Option: " + option );
-                            //System.out.println("Error: value from DB:" + intValue + "  items in combo box: " + cmbDisplayed.getItemCount());
-                            System.out.println("Error: value from DB:" + intValue + "  items in combo box: " + getItemCount());
-                        } else {
-                        // IF MAPPINGS  ARE SPECIFIED THEN GET THE INDEX AT WHICH THE VALUE IN TEXT FIELD
-                        // APPEARS IN THE MAPPINGVALUES ARRAY. SET THE SELECTED ITEM OF COMBO SO THAT INDEX
-                            if (mappingValues!=null) {
-                                int i=0;
-                                for (;i<mappingValues.length;i++) {
-                                    if (mappingValues[i] == intValue) {
-                                        //cmbDisplayed.setSelectedIndex(i);
-                                        setSelectedIndex(i);
-                                        break;
-                                    }
-                                }
-                                // IF THAT VALUE IS NOT FOUND IN THE GIVEN MAPPING VALUES PRINT AN ERROR MESSAGE
-                                if (i==mappingValues.length) {
-                                    System.out.println("change ERROR: could not find a corresponding item in combo for value " + intValue);
-//                                      System.out.println(cmbDisplayed.getItemAt(0));
-//                                      System.out.println(cmbDisplayed.getSelectedItem());
-                                }
-
-                            } else {
-                            // IF MAPPINGS ARE NOT SPECIFIED SET THE SELECTED ITEM AS THE ITEM AT INDEX
-                            // EQUAL TO THE VALUE IN TEXT FIELD
-                                //cmbDisplayed.setSelectedIndex(intValue);
-                                setSelectedIndex(intValue);
-                            }
-                        }
-                    }
-                }
-
-            } catch(BadLocationException ble) {
-                ble.printStackTrace();
-            } catch(NullPointerException npe) {
-                npe.printStackTrace();
-            } catch(NumberFormatException nfe) {
-                nfe.printStackTrace();
-            }
-
-            //cmbDisplayed.addActionListener(cmbListener);
+            removeActionListener(cmbListener);            
+            setDisplay();            
             addActionListener(cmbListener);
-
-        } // end public void changedUpdate(DocumentEvent de) {
+        } // end public void changedUpdate(DocumentEvent de) 
 
         public void insertUpdate(DocumentEvent de) {
-        //  System.out.println("insert Document Changed: " + de);
-            //cmbDisplayed.removeActionListener(cmbListener);
             removeActionListener(cmbListener);
-            Document doc = textField.getDocument();
-            try {
-
-                String text = doc.getText(0,doc.getLength());
-                if (text != null) {
-                    // GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD
-                    int intValue = 0;
-                    if( !(text.trim().equals("")) ) {
-                        intValue = Integer.parseInt(text);
-                    }
-                    // CHECK IF THE VALUE DISPLAYED IS THE SAME AS THAT IN TEXT FIELD
-                    // TWO CASES 1. THE MAPPINGS FOR THE STRINGS DISPLAYED ARE GIVEN BY USER
-                    //  2. VALUES FOR THE ITEMS IN COMBO START FROM ZERO
-                    // IN CASE ONE: YOU CAN JUST CHECK FOR EQUALITY OF THE SELECTEDINDEX AND VALUE IN TEXT FIELD
-                    // IN CASE TWO: YOU HAVE TO CHECK IF THE VALUE IN THE MAPPINGVALUES ARRAY AT INDEX EQUAL
-                    // TO THE SELECTED INDEX OF THE COMBO BOX EQUALS THE VALUE IN TEXT FIELD
-                    // IF THESE CONDITIONS ARE MET YOU NEED NOT CHANGE COMBO BOX SELECTED ITEM
-/*
-                    if ( (mappingValues==null && intValue != cmbDisplayed.getSelectedIndex()) ||
-                         (mappingValues!=null && cmbDisplayed.getSelectedIndex() == -1)       ||
-                         (mappingValues!=null && mappingValues[cmbDisplayed.getSelectedIndex()] != intValue) ) {
-*/
-                    if ( (mappingValues==null && intValue != getSelectedIndex()) ||
-                         (mappingValues!=null && getSelectedIndex() == -1)       ||
-                         (mappingValues!=null && mappingValues[getSelectedIndex()] != intValue) ) {
-
-                        //if (mappingValues==null && (intValue <0 || intValue >= cmbDisplayed.getItemCount())) {
-                        if (mappingValues==null && (intValue <0 || intValue >= getItemCount())) {
-                        // IF EXPLICIT VALUES FOR THE ITEMS IN COMBO ARE NOT SPECIFIED THEN CODES START
-                        // FROM ZERO. IN SUCH A CASE CHECK IF THE NUMBER EXCEEDS THE NUMBER OF ITEMS
-                        // IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)
-//                              System.out.println("Option: " +option );
-                        // SET IT TO EMPTY
-                            //cmbDisplayed.setSelectedIndex(-1);
-                            setSelectedIndex(-1);
-                            //System.out.println("Error: value from DB:" + intValue + "  items in combo box: " + cmbDisplayed.getItemCount());
-                            System.out.println("Error: value from DB:" + intValue + "  items in combo box: " + getItemCount());
-                        } else {
-                        // IF MAPPINGS  ARE SPECIFIED THEN GET THE INDEX AT WHICH THE VALUE IN TEXT FIELD
-                        // APPEARS IN THE MAPPINGVALUES ARRAY. SET THE SELECTED ITEM OF COMBO SO THAT INDEX
-                            if (mappingValues!=null) {
-                                int i=0;
-                                for (;i<mappingValues.length;i++) {
-                                    if (mappingValues[i] == intValue) {
-                                        //cmbDisplayed.setSelectedIndex(i);
-                                        setSelectedIndex(i);
-                                        break;
-                                    }
-                                }
-                                // IF THAT VALUE IS NOT FOUND IN THE GIVEN MAPPING VALUES PRINT AN ERROR MESSAGE
-                                if (i==mappingValues.length) {
-                                    System.out.println("insert ERROR: could not find a corresponding item in combo for value " + intValue);
-                                // SET IT TO EMPTY
-                                    //cmbDisplayed.setSelectedIndex(-1);
-                                    setSelectedIndex(-1);
-//                                      System.out.println(cmbDisplayed.getItemAt(0));
-//                                      System.out.println(cmbDisplayed.getSelectedItem());
-                                }
-                            } else {
-                            // IF MAPPINGS ARE NOT SPECIFIED SET THE SELECTED ITEM AS THE ITEM AT INDEX
-                            // EQUAL TO THE VALUE IN TEXT FIELD
-                                //cmbDisplayed.setSelectedIndex(intValue);
-                                setSelectedIndex(intValue);
-                            }
-                        }
-                    }
-                }
-
-            } catch(BadLocationException ble) {
-                ble.printStackTrace();
-            } catch(NullPointerException npe) {
-                npe.printStackTrace();
-            } catch(NumberFormatException nfe) {
-                nfe.printStackTrace();
-            }
-
-            //cmbDisplayed.addActionListener(cmbListener);
+            setDisplay();
             addActionListener(cmbListener);
-
-        } // public void insertUpdate(DocumentEvent de) {
+        } // end public void insertUpdate(DocumentEvent de) 
 
         public void removeUpdate(DocumentEvent de) {
 
@@ -679,10 +501,7 @@ public class SSComboBox extends JComboBox {
     private class MyComboListener implements ActionListener, Serializable {
 
         public void actionPerformed(ActionEvent ae) {
-        //  System.out.println("action performed triggered prasanth");
             textField.getDocument().removeDocumentListener(textFieldDocumentListener);
-            //System.out.flush();
-            //int index = cmbDisplayed.getSelectedIndex();
             int index = getSelectedIndex();
             try {
                 if (index == -1) {
@@ -707,8 +526,6 @@ public class SSComboBox extends JComboBox {
             } catch(NumberFormatException nfe) {
                 nfe.printStackTrace();
             }
-            //System.out.println("Option :" + option + "  Item : " + textField.getText());
-
             textField.getDocument().addDocumentListener(textFieldDocumentListener);
         }
     }
@@ -758,7 +575,6 @@ public class SSComboBox extends JComboBox {
      * @deprecated
      */
     public JComboBox getComboBox() {
-        //return cmbDisplayed;
         return this;
     }
 
@@ -770,18 +586,19 @@ public class SSComboBox extends JComboBox {
      * @deprecated
      */
     public Component getComponent() {
-        //return cmbDisplayed;
         return this;
     }
 
 
-//} // end public class SSComboBox extends JComponent {
 } // end public class SSComboBox extends JComboBox {
 
 
 
 /*
  * $Log$
+ * Revision 1.24  2005/02/02 23:36:58  yoda2
+ * Removed setMaximiumSize() calls.
+ *
  * Revision 1.23  2005/01/19 20:54:43  yoda2
  * API cleanup.
  *
