@@ -134,6 +134,29 @@ public class SSTextField extends JTextField {
 	 }
 	 
 	 /**
+	 *	sets the mask for this textfield to _mask and aligns the text as specified
+	 *(Horizontal alignment).
+	 *Valid keys are: 
+	 *	JTextField.LEFT 
+	 *	JTextField.CENTER 
+	 *	JTextField.RIGHT 
+	 *	JTextField.LEADING 
+	 *	JTextField.TRAILING 
+	 *
+	 *Use this constructor only if you are using a decimal mask.
+	 *@param _mask the mask required for this textfield.
+	 *@param _numDecimals  number of decimal places required
+	 *@param _align alignment required. Valid values are JTextField
+	 *
+	 */
+	 public SSTextField(int _mask, int _numDecimals, int _align){
+	 	mask = _mask;
+	 	numDecimals = _numDecimals;
+	 	setHorizontalAlignment(_align);
+	 	init();
+	 }
+	 
+	 /**
 	  *	sets the number of decimal places required.
 	  *This number is used only when mask is set to DECIMAL.
 	  *Default value is 2.
@@ -297,4 +320,7 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.1  2003/12/16 18:02:47  prasanth
+ * Initial version.
+ *
  */
