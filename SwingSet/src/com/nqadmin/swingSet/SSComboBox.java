@@ -122,6 +122,7 @@ public class SSComboBox extends JComponent {
 		public static final int GENDER_OPTION = 1;
 		public static final int MALE = 0;
 		public static final int FEMALE = 1;
+		public static final int UNI_SEX = 2;
         
 		/**	
 		 *	Type used for combo box.
@@ -498,6 +499,7 @@ public class SSComboBox extends JComponent {
 			} else if (_options == SEX_OPTION || _options == GENDER_OPTION) {
 				cmbDisplayed.addItem(new String("MALE"));
 				cmbDisplayed.addItem(new String("FEMALE"));
+				cmbDisplayed.addItem(new String("UNI_SEX"));
 			} else if (_options == INCLUDE_EXCLUDE_OPTION) {
 				cmbDisplayed.addItem(new String("INCLUDE"));
 				cmbDisplayed.addItem(new String("EXCLUDE"));
@@ -704,6 +706,9 @@ public class SSComboBox extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.14  2004/09/21 14:14:14  prasanth
+ * Swapped the codes for FEMALE & MALE.
+ *
  * Revision 1.13  2004/09/13 15:41:25  prasanth
  * Added a constant to indicate that there is no selection in combobox.
  * This value will be returned when  the selected index in combo box is -1.
