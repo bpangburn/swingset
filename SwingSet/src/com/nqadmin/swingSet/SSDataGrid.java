@@ -140,7 +140,7 @@ public class SSDataGrid extends JTable {
     protected Component window = null;
 
     /**
-     * SSRowSet containing values for component.
+     * SSRowSet from which component will get/set values.
      */
     protected SSRowSet rowset = null;
 
@@ -170,17 +170,17 @@ public class SSDataGrid extends JTable {
     protected JScrollPane scrollPane = null; //new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
     /**
-     * Array used to store the column numbers that have to hidden.
+     * Array used to store the column numbers that have to be hidden.
      */
     protected int[] hiddenColumns = null;
 
     /**
-     * Array used to store the column numbers that have to hidden.
+     * Array used to store the column names that have to hidden.
      */
     protected String[] hiddenColumnNames = null;
 
     /**
-     * Variable to indicate if execute should be called on the SSRowSet.
+     * Variable to indicate if execute() should be called on the SSRowSet.
      */
     protected boolean callExecute = true;
 
@@ -190,10 +190,7 @@ public class SSDataGrid extends JTable {
      * @param _rowset    SSRowSet from which values have to be retrieved.
      */
     public SSDataGrid(SSRowSet _rowset) {
-        //super();
-//super(VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED );
         rowset = _rowset;
-//      addComponent();
         init();
         bind();
     }
@@ -202,11 +199,7 @@ public class SSDataGrid extends JTable {
      *  Constructs an empty data grid.
      */
     public SSDataGrid() {
-        //super();
-        //tableModel = new SSTableModel();
         init();
-
-//super(VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_ALWAYS);
     }
 
 
@@ -259,7 +252,7 @@ public class SSDataGrid extends JTable {
      *
      * @return array of selected columns
      */
-    // THIS IS A STRANGE BEHAVIOUR. FOR SOME REASON SOME TIMES THE
+    // THIS IS A STRANGE BEHAVIOUR. FOR SOME REASON SOMETIMES THE
     // LIST OF SELECTED COLUMNS INCLUDED HIDDEN COLUMNS THIS CAUSES
     // A PROBLEM WITH COPY AND PASTE OPERATIONS. SO MAKE SURE THAT THIS
     // LIST DOES NOT CONTAIN HIDDEN COLUMNS
@@ -682,6 +675,7 @@ public class SSDataGrid extends JTable {
      * Sets a combo box renderer for the specified column.
      * This is use full to limit the values that go with a column or if an underlying code
      * is do be displayed in a more meaningfull manner.
+     *
      * @param _column  column name for which combo renderer is to be provided.
      * @param _displayItems    the actual Objects to be displayed in the combo box.
      * @param _underlyingValues    the values that have to be written to the database when an
@@ -695,6 +689,7 @@ public class SSDataGrid extends JTable {
      * Sets a combo box renderer for the specified column.
      * This is use full to limit the values that go with a column or if an underlying code
      * is do be displayed in a more meaningfull manner.
+     *
      * @param _column  column name for which combo renderer is to be provided.
      * @param _displayItems    the actual Objects to be displayed in the combo box.
      * @param _underlyingValues    the values that have to be written to the database when an
@@ -707,8 +702,9 @@ public class SSDataGrid extends JTable {
     }
     
     /**
-     *	Sets a Check box renderer for the specified column.
-     *@param _column - name ofthe column for which check box rendering is needed.
+     * Sets a check box renderer for the specified column.
+     *
+     * @param _column - name ofthe column for which check box rendering is needed.
      */
     public void setCheckBoxRenderer(String _column) throws SQLException{
     	int column = rowset.getColumnIndex(_column) - 1;
@@ -716,8 +712,9 @@ public class SSDataGrid extends JTable {
     }
     
     /**
-     *	Sets a Check box renderer for the specified column.
-     *@param _column - column number for which check box rendering is needed.
+     * Sets a check box renderer for the specified column.
+     *
+     * @param _column - column number for which check box rendering is needed.
      */
     public void setCheckBoxRenderer(int _column) throws SQLException{
     	TableColumnModel columnModel = getColumnModel();
@@ -780,7 +777,7 @@ public class SSDataGrid extends JTable {
      * Make sure that you specify the hidden column numbers in the uneditable column
      * list.
      *
-     *@param _columnNumbers   array specifying the column numbers which should be
+     * @param _columnNumbers   array specifying the column numbers which should be
      *  hidden
      */
     public void setHiddenColumns(int[] _columnNumbers) {
@@ -815,7 +812,7 @@ public class SSDataGrid extends JTable {
     }
 
     /**
-     *  Hides the columns specified in the hidden columns list.
+     * Hides the columns specified in the hidden columns list.
      */
     protected void hideColumns(){
     // SET THE MINIMUM WIDTH OF COLUMNS
@@ -856,9 +853,10 @@ public class SSDataGrid extends JTable {
         tableModel.setSSCellEditing( _cellEditing );
      }
 
-    // EDITOR TO EDIT THE DATE FIELD.
-    // USES THE TEXT FIELD AS THE EDITOR BUT CHANGES THE FORMAT
-    // TO MM/DD/YYYY FORMAT FROM YYYY-MM-DD FORMAT.
+    /**
+     * Editor for date fields.  Used the SSTextField as the editor, but changes
+     * the format to mm/dd/yyy from yyyy-mm-dd.
+     */
     protected class DateEditor extends DefaultCellEditor {
 
         // CONSTRUCTOR FOR THE EDITOR CLASS
@@ -905,7 +903,9 @@ public class SSDataGrid extends JTable {
         }
     }
 
-	// CHECK BOX RENDERER FOR COLUMNS.
+	/**
+     * Renderer for check box fields.
+     */
 	protected class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
 		
 		public CheckBoxRenderer(){
@@ -941,8 +941,10 @@ public class SSDataGrid extends JTable {
         
     }
     
-    
-    protected class CheckBoxEditor extends DefaultCellEditor{
+	/**
+     * Editor for check box fields.
+     */
+    protected class CheckBoxEditor extends DefaultCellEditor {
     // VARIABLE TO STORE THE COLUMN CLASS.		
 	   	protected int columnClass = 0;
     	
@@ -1015,8 +1017,10 @@ public class SSDataGrid extends JTable {
             }
         }
     }
-    // DATE RENDERER CLASS FOR RENDERER DATE COLUMNS.
-    // DISPLAYS THE DATE IN MM/DD/YYYY FORMAT.
+    
+	/**
+     * Renderer for date fields.  Displays dates using mm/dd/yyyy format.
+     */
     protected class DateRenderer extends DefaultTableCellRenderer {
 
         public  void setValue(Object value) {
@@ -1034,7 +1038,9 @@ public class SSDataGrid extends JTable {
         }
     }
 
-    // COMBORENDERER RENDERS THE VALUES OF THE CELL IN A COMBO BOX.
+	/**
+     * Renderer for combo box fields.
+     */
     protected class ComboRenderer extends JComboBox implements TableCellRenderer {
 
         Object[] underlyingValues = null;
@@ -1081,7 +1087,9 @@ public class SSDataGrid extends JTable {
         }
     }
 
-    // COMBO BOX EDITOR FOR COLUMNS HAVING COMBO RENDERERS.
+	/**
+     * Editor for combo box fields.
+     */
     protected class ComboEditor extends DefaultCellEditor {
         Object[] underlyingValues = null;
         // SET THE CLICK COUNT TO EDIT THE COMBO AS 2
@@ -1158,6 +1166,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.22  2005/02/04 22:48:53  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.21  2005/02/01 17:32:37  yoda2
  * API cleanup.
  *
