@@ -54,6 +54,13 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  * different mapping for the items in the combobox then a string of integers
  * containing the corresponding numeric values for each choice must be provided.
  *
+ * Note that if you DO NOT want to use the default mappings, the custom
+ * mappings must be set before calling the bind() method to bind the
+ * combobox to a database column.
+ *
+ * Also, if changing both a rowset and column name consider using the bind()
+ * method rather than individual setSSRowSet() and setColumName() calls. 
+ *
  * e.g.
  *      SSComboBox combo = new SSComboBox();
  *      String[] options = {"111", "2222", "33333"};
@@ -73,10 +80,6 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  *      // next line is assuming myrowset has been initialized and my_column is a
  *      // column in myrowset
  *      combo.bind(myrowset,"my_column");
- *
- *      Note that if you DO NOT want to use the default mappings, the custom
- *      mappings must be set before calling the bind() method to bind the
- *      combobox to a database column.
  *</pre><p>
  * @author  $Author$
  * @version $Revision$
@@ -94,10 +97,10 @@ public class SSComboBox extends JComboBox {
     //protected JComboBox  cmbDisplayed  = new JComboBox();
 
     // INSTANCE OF LISTENER FOR COMBO BOX
-    protected MyComboListener cmbListener = new MyComboListener();
+    private MyComboListener cmbListener = new MyComboListener();
 
     // INSTANCE  OF LISTENER FOR THE TEXT FIELD BOUND TO DATABASE
-    protected MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
+    private MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
     // PREDEFINED SET OF OPTIONS/CHOICES TO BE DISPLAYED IN A COMBO BOX
     protected int option = 0;
@@ -147,16 +150,20 @@ public class SSComboBox extends JComboBox {
      * Initialization code.
      */
     protected void init() {
-    // ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
-    // KEY IS PRESSED.
-        //cmbDisplayed.addKeyListener(new KeyAdapter() {
-        addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent ke) {
-                if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
-                    ((Component)ke.getSource()).transferFocus();
+        // ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
+        // KEY IS PRESSED.
+            //cmbDisplayed.addKeyListener(new KeyAdapter() {
+            addKeyListener(new KeyAdapter() {
+                public void keyReleased(KeyEvent ke) {
+                    if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
+                        ((Component)ke.getSource()).transferFocus();
+                    }
                 }
-            }
-        });
+            });
+            
+        // SET PREFERRED AND MAXIMUM DIMENSIONS
+            setPreferredSize(new Dimension(200,20));
+            setMaximumSize(new Dimension(200,20));            
     }
 
     /**
@@ -263,10 +270,11 @@ public class SSComboBox extends JComboBox {
      * be called to bind the combo box to the column in the SSRowSet.
      */
     private void bind() {
-	// CHECK FOR NULL COLUMN/ROWSET
-		if (columnName==null || rowset==null) {
-			return;
-		}
+        
+        // CHECK FOR NULL COLUMN/ROWSET
+            if (columnName==null || rowset==null) {
+                return;
+            }
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
             textField.setDocument(new SSTextDocument(rowset, columnName));
@@ -278,6 +286,7 @@ public class SSComboBox extends JComboBox {
         // IF BIND IS CALLED MULTIPLE TIMES OLD LISTENERS HAVE TO BE REMOVED
             removeListeners();
             addListeners();
+               
     }
 
     /**
@@ -773,6 +782,9 @@ public class SSComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.22  2005/01/19 03:15:44  yoda2
+ * Got rid of setBinding and retooled public/private bind() methods and how they are called.
+ *
  * Revision 1.21  2005/01/18 22:27:24  yoda2
  * Changed to extend JComboBox rather than JComponent.  Deprecated bind(), setSSRowSet(), & setColumnName().
  *

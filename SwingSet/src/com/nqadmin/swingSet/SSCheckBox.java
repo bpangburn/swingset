@@ -63,40 +63,35 @@ import javax.swing.event.*;
 public class SSCheckBox extends JCheckBox {
 
     // TEXT FIELD BOUND TO THE DATABASE
-    private JTextField textField = new JTextField();
+    protected JTextField textField = new JTextField();
 
-    private String columnName;
-    private int columnType = java.sql.Types.BIT;
+    // SSROWSET FROM WHICH THE COMBO WILL GET/SET VALUES
+    protected SSRowSet rowset;
+
+    // COLUMN NAME TO WHICH THE COMBO WILL BE BOUND TO
+    protected String columnName;
+
+    // SQL DATA TYPE OF COLUMN
+    protected int columnType = java.sql.Types.BIT;
 
     // LISTENER FOR CHECK BOX AND TEXT FEILD
-    private MyCheckBoxListener  checkBoxListener  = new MyCheckBoxListener();
-    private MyTextFieldListener textFieldListener = new MyTextFieldListener();
+    private MyCheckBoxListener checkBoxListener = new MyCheckBoxListener();
+    private MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
     // INITIALIZE CHECKED AND UNCHECKED VALUES
-    private int CHECKED = 1;
-    private int UNCHECKED = 0;
+    protected int CHECKED = 1;
+    protected int UNCHECKED = 0;
 
     // INITIALIZE CHECKED AND UNCHECKED VALUES FOR BOOLEAN COLUMN
-    private static String BOOLEAN_CHECKED = "true";
-    private static String BOOLEAN_UNCHECKED = "false";
-
-    /**
-     * Creates a object of SSCheckBox which synchronizes with the value in the specified
-     * text field.
-     *
-     * @param _textField the text field with which the check box will be in sync.
-     *
-     * @deprecated
-     */
-    public SSCheckBox(JTextField _textField) {
-        textField = _textField;
-    }
+    protected static String BOOLEAN_CHECKED = "true";
+    protected static String BOOLEAN_UNCHECKED = "false";
 
     /**
      * Creates an object of SSCheckBox.
      */
     public SSCheckBox() {
-        textField = new JTextField();
+        //textField = new JTextField();
+        init();
     }
 
     /**
@@ -108,9 +103,70 @@ public class SSCheckBox extends JCheckBox {
      */
     public SSCheckBox(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
         columnName = _columnName;
-        textField.setDocument(new SSTextDocument(_rowset, _columnName));
+        rowset = _rowset;
+        //textField.setDocument(new SSTextDocument(_rowset, _columnName));
         columnType = _rowset.getColumnType(_columnName);
+        bind();
     }
+    
+    /**
+     * Initialization code.
+     */
+    protected void init() {
+        // ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
+        // KEY IS PRESSED.
+            //cmbDisplayed.addKeyListener(new KeyAdapter() {
+            addKeyListener(new KeyAdapter() {
+                public void keyReleased(KeyEvent ke) {
+                    if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
+                        ((Component)ke.getSource()).transferFocus();
+                    }
+                }
+            });
+            
+        // SET PREFERRED AND MAXIMUM DIMENSIONS
+            setPreferredSize(new Dimension(20,20));
+            setMaximumSize(new Dimension(20,20));            
+    }    
+    
+    /**
+     * The column name and the SSRowSet should be set before calling this function.
+     * If the column name and SSRowSet are set seperately then this function has to
+     * be called to bind the combo box to the column in the SSRowSet.
+     */
+    private void bind() {
+        
+        // CHECK FOR NULL COLUMN/ROWSET
+            if (columnName==null || rowset==null) {
+                return;
+            }
+
+        // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
+            textField.setDocument(new SSTextDocument(rowset, columnName));
+
+        // SET THE COMBO BOX ITEM DISPLAYED
+            setDisplay();
+            
+        // ADDS LISTENERS FOR TEXT FIELD AND CHECKBOX
+        // IF BIND IS CALLED MULTIPLE TIMES OLD LISTENERS HAVE TO BE REMOVED
+            removeListeners();
+            addListeners();
+               
+    }
+    
+    // ADDS LISTENERS FOR THE COMBO BOX AND TEXT FIELD
+    private void addListeners() {
+        textField.getDocument().addDocumentListener(textFieldDocumentListener);
+        //cmbDisplayed.addActionListener(cmbListener);
+        addChangeListener(checkBoxListener);   
+    }
+
+    // REMOVES THE LISTENERS FOR TEXT FIELD AND THE COMBO BOX DISPLAYED
+    private void removeListeners() {
+        textField.getDocument().removeDocumentListener(textFieldDocumentListener);
+        //cmbDisplayed.removeActionListener(cmbListener);
+        removeChangeListener(checkBoxListener);
+    }    
 
     /**
      * Sets the datasource and the columnName in the datasource to which the
@@ -121,8 +177,9 @@ public class SSCheckBox extends JCheckBox {
      */
     public void bind(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
         columnName = _columnName;
-        textField.setDocument(new SSTextDocument(_rowset, _columnName));
+        //textField.setDocument(new SSTextDocument(_rowset, _columnName));
         columnType = _rowset.getColumnType(_columnName);
+        bind();
     }
 
     /**
@@ -134,27 +191,16 @@ public class SSCheckBox extends JCheckBox {
         return columnName;
     }
 
-    /**
-     * Initializes the check box by getting the value corresponding to
-     * specified column from the SSRowSet.
-     */
-    public void execute() {
-        initCheckBox();
-    }
-
-
     // INITIALIZES THE CHECK BOX.
-    private void initCheckBox() {
-
-        // ADD LISTENER FOR THE TEXT FIELD
-            textField.getDocument().addDocumentListener(textFieldListener);
-
+    private void setDisplay() {
+            
+        // SELECT/DESELECT BASED ON UNDERLYING SQL TYPE
             switch(columnType) {
                 case java.sql.Types.INTEGER:
                 case java.sql.Types.SMALLINT:
                 case java.sql.Types.TINYINT:
             // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                    if ( textField.getText().equals(String.valueOf(CHECKED)) ) {
+                    if (textField.getText().equals(String.valueOf(CHECKED))) {
                         setSelected(true);
                     } else {
                         setSelected(false);
@@ -164,7 +210,7 @@ public class SSCheckBox extends JCheckBox {
                 case java.sql.Types.BIT:
                 case java.sql.Types.BOOLEAN:
             // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                    if ( textField.getText().equals(BOOLEAN_CHECKED) ) {
+                    if (textField.getText().equals(BOOLEAN_CHECKED)) {
                         setSelected(true);
                     } else {
                         setSelected(false);
@@ -175,22 +221,10 @@ public class SSCheckBox extends JCheckBox {
                     break;
             }
 
-        //ADD LISTENER FOR THE CHECK BOX.
-        // REMOVE HAS TO BE CALLED SO MAKE SURE THAT YOU ARE NOT STACKING UP
-        // LISTENERS WHEN EXECUTE IS CALLED MULTIPLE TIMES.
-            removeChangeListener(checkBoxListener);
-            addChangeListener( checkBoxListener );
-    } // end private void initCheckBox() {
+    } // end private void setDisplay() {
 
     // LISTENER FOR THE TEXT FIELD
-    private class MyTextFieldListener implements DocumentListener, Serializable {
-        private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
-            objIn.defaultReadObject();
-        }
-
-        private void writeObject(ObjectOutputStream objOut) throws IOException {
-            objOut.defaultWriteObject();
-        }
+    private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
         public void changedUpdate(DocumentEvent de){
             removeChangeListener(checkBoxListener);
@@ -220,6 +254,7 @@ public class SSCheckBox extends JCheckBox {
                 default:
                     break;
             }
+            
             addChangeListener( checkBoxListener );
         }
 
@@ -253,6 +288,7 @@ public class SSCheckBox extends JCheckBox {
                 default:
                     break;
             }
+            
             addChangeListener( checkBoxListener );
         }
 
@@ -286,25 +322,18 @@ public class SSCheckBox extends JCheckBox {
                 default:
                     break;
             }
+            
             addChangeListener( checkBoxListener );
         }
-    } // end private class MyTextFieldListener implements DocumentListener, Serializable {
+    } // end private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
     // LISTENER FOR THE CHECK BOX.
     // ANY CHANGES MADE TO THE CHECK BOX BY THE USER ARE PROPOGATED BACK TO THE
     // TEXT FIELD FOR FURTHER PROPOGATION TO THE UNDERLYING STORAGE STRUCTURE.
     private class MyCheckBoxListener implements ChangeListener, Serializable {
 
-        private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
-            objIn.defaultReadObject();
-        }
-
-        private void writeObject(ObjectOutputStream objOut) throws IOException {
-            objOut.defaultWriteObject();
-        }
-
         public void stateChanged(ChangeEvent ce) {
-            textField.getDocument().removeDocumentListener(textFieldListener);
+            textField.getDocument().removeDocumentListener(textFieldDocumentListener);
 
             if ( ((JCheckBox)ce.getSource()).isSelected() ) {
                 switch(columnType) {
@@ -332,10 +361,37 @@ public class SSCheckBox extends JCheckBox {
                 }
             }
 
-            textField.getDocument().addDocumentListener(textFieldListener);
+            textField.getDocument().addDocumentListener(textFieldDocumentListener);
         }
 
     } // end private class MyCheckBoxListener implements ChangeListener, Serializable {
+        
+        
+        
+// DEPRECATED STUFF....................
+
+    /**
+     * Creates a object of SSCheckBox which synchronizes with the value in the specified
+     * text field.
+     *
+     * @param _textField the text field with which the check box will be in sync.
+     *
+     * @deprecated
+     */
+    public SSCheckBox(JTextField _textField) {
+        textField = _textField;
+    }
+
+    /**
+     * Initializes the check box by getting the value corresponding to
+     * specified column from the SSRowSet.
+     *
+     * @deprecated
+     */
+    public void execute() {
+        //init();
+    }    
+        
 
 } // end public class SSCheckBox extends JCheckBox {
 
@@ -343,4 +399,7 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.1  2005/01/10 15:09:11  yoda2
+ * Added to replace deprecated SSDBCheckBox to match naming conventions.
+ *
  */
