@@ -62,6 +62,19 @@ SSDataNavigator class is provided to allow traversal, insertion, deletion,
 commit, and rollback  of a RowSet. Changes to the current record are auto-
 committed when a navigation takes place (also similar to Access).
 
+
+SwingSet also provides a Grid Control which can display the information 
+retrieved from a database. It provided functions to set the headers
+hide the columns and make columns uneditable. The Grid Control used
+the SSTableModel which extends AbstractTableModel. The SSCellEditing
+and SSDataValue interface provide fine control over the working of the
+grid.
+
+SSTextFeild, extends JTextFeild, provides different masks like date mask
+SSN mask etc.
+
+
+
 More information on SwingSet is available from:
 http://swingset.sourceforge.net 
 and
@@ -168,6 +181,27 @@ containing the part_id and an event listener.
 This example also demonstrates the use of SSTextDocument to display
 information in SSComboBox (Color) and JTextField (Weight and City).
 
+
+***********************
+Example5
+***********************
+This example demonstrates the use of SSDataGrid to display information
+in a table format. To delete a row select the row to be deleted and 
+press Ctrl-X. By default confirmation message is displayed before deletion.
+
+
+***********************
+Example6
+***********************
+This example demonstrates the use of SSDataGrid with combo box renderer.
+
+
+***********************
+Example7
+***********************
+This example demonstrated the use of SSDataGrid with combo box renderer
+and date renderer. The mappings for the combo boxes are retrieved from another
+table.
 
 ==============================================================================
 CLASS DESCRIPTIONS
@@ -381,3 +415,74 @@ reflect the new value for the database column.
 
 Note that a RowSet insert doesn't implicitly modify the cursor which is why 
 the SSDBNavImp is provided for clearing controls followoing an insert.
+
+
+***********************
+SSDataGrid
+***********************
+SSDataGrid provided a way to display information in the database in a table 
+format. The data grid takes a rowset as a source of data. It also provides
+different renderers like combo boxes and date renderer.
+
+SSDataGrid internally uses the SSTableModel to display the information in a 
+table format. SSDataGrid also provides an easy means for displaying headers.
+Columns can be hidden or made uneditable. In addition to that it also provides
+much finer control as to which cell can be edited and which can't be. It uses the
+SSCellEditing  interface for achieving this. Implementation of this interface also
+provides a way to decide as to what kind of information is valid for each cell.
+
+It uses the function in SSCellEditing to interrogate as to weather a cell is editable
+or not.  It further informs when a update is requested. While doing so it provides
+the present value in the cell and also the new value. Based on this information the
+new value can be rejected or accepted.
+
+It also provides an extra row facilitating addition of rows to the table.
+Default values for various columns can be set programmatically also its possible to
+specify which is the primary column field and supply a primary key for that column
+when a new row is being added.
+
+
+***********************
+SSTableModel	
+***********************
+SSTableModel provides an implementation of TableModel interface.
+The SSDataGrid used this class for providing a Grid View for the 
+data. This can be used with out using the SSDataGrid but the renderers
+and hidden columns feature will not be available if this is used directly
+bypassing the SSDataGrid.
+
+SSTableModel can be used with a JTable to get a Grid view of the data.
+
+
+***********************
+SSCellEditing
+***********************
+The SSCellEditing interface specifies methods the SSTableModel will use to
+interrogate whether a cell can be edited or if the specified value can be allowed
+for the cell.
+
+
+***********************
+SSCellEditingAdapter
+***********************
+This abstract adapter class is provided as convenience for creating SSCellEditing objects.
+Extend this class to create a SSCellEditing implementation.
+
+This class defines empty functions so that you can define only functions that you want to.
+Both isCellEditable and  cellUpdateRequested always return true.
+
+
+***********************
+SSDataValue
+***********************
+The SSDataValue interface specifies methods for SSTableModel
+to retrieve the value for primary column in JTable.
+
+
+***********************
+SSTextField
+***********************
+SSTextField extends the JTextField. This class provides different masks
+like date mask, SSN mask etc.
+
+ 
