@@ -187,7 +187,7 @@ public class SSSyncManager {
             // GET THE CURRENT VALUE FROM THE ROWSET.    
                 String currentRowValue = rowset.getString(columnName);
             // CHECK IF THE COMBO BOX IS DISPLAYING THE SAME ONE.    
-                if(!comboBox.getSelectedStringValue().equals(currentRowValue)){
+                if(comboBox.getSelectedStringValue() == null || !comboBox.getSelectedStringValue().equals(currentRowValue)){
                 // IF NOT CHANGE THE SELECTION OF THE COMBO BOX.    
                     comboBox.setSelectedStringValue(rowset.getString(columnName));
                 }
@@ -262,6 +262,10 @@ public class SSSyncManager {
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/10 16:51:23  prasanth
+ * On rowset events checking if the combo box is displaying the right value
+ * or not. Changing the selection only if it is not displaying the right one.
+ *
  * Revision 1.4  2005/02/10 03:36:08  yoda2
  * JavaDoc cleanup and updated to support string columns used for synchronization (to match recent changes in SSDBComboBox).
  *
