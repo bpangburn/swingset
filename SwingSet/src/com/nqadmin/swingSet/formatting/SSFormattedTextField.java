@@ -46,7 +46,7 @@ import java.util.Set;
 import java.util.HashSet;
 
 import com.nqadmin.swingSet.SSDataNavigator;
-import com.nqadmin.swingSet.formatting.selectors.*;
+import com.nqadmin.swingSet.formatting.helpers.*;
 
 
 /**
@@ -650,6 +650,9 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
 
 /*
  * $Log$
+ * Revision 1.5  2005/01/18 22:34:30  dags
+ * sincronization update
+ *
  * Revision 1.4  2004/12/13 20:58:49  dags
  * Added some javadoc tags
  *
