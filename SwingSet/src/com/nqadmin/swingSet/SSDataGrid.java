@@ -907,6 +907,9 @@ public class SSDataGrid extends JTable {
     
     
     private class CheckBoxEditor extends DefaultCellEditor{
+    // VARIABLE TO STORE THE COLUMN CLASS.		
+	   	protected int columnClass = 0;
+    	
     	public CheckBoxEditor(){
     		super(new JCheckBox());
     	}
@@ -914,9 +917,15 @@ public class SSDataGrid extends JTable {
     	public Component getTableCellEditorComponent(JTable _table, Object _value,
             boolean _selected, int _row, int _column) {
 
+		// GET THE COMPONENT RENDERING THE VALUE.
 			JCheckBox checkBox = (JCheckBox)getComponent();
 			
+		// CHECK THE TYPE OF COLUMN, IT SHOULD BE THE SAME AS THE TYPE OF _VALUE.	
             if(_value instanceof Boolean){
+            // STORE THE TYPE OF COLUMN WE NEED THIS WHEN EDITOR HAS TO RETURN 
+            // VALUE BACK.	
+            	columnClass = java.sql.Types.BOOLEAN;
+            // BASED ON THE VALUE CHECK THE BOX OR UNCHECK IT.	
             	if(((Boolean)_value).booleanValue()){
             		checkBox.setSelected(true);
             	}
@@ -924,7 +933,13 @@ public class SSDataGrid extends JTable {
             		checkBox.setSelected(false);
             	}
             }
+        // IF THE COLUMN CLASS IS INTEGER    
             else if(_value instanceof Integer){
+            // STORE THE COLUMN CLASS.	
+            	columnClass = java.sql.Types.INTEGER;
+            // BASED ON THE INTEGER VALUE CHECK OR UNCHECK THE CHECK BOX.
+            // A VALUE OF 0 IS CONSIDERED TRUE - CHECK BOX IS CHECKED.
+            // ANY OTHER VALUE IS CONSIDERED FALSE - UNCHECK THE CHECK BOX.	
             	if( ((Integer)_value).intValue() != 0){
             		checkBox.setSelected(true);
             	}
@@ -932,21 +947,35 @@ public class SSDataGrid extends JTable {
             		checkBox.setSelected(false);
             	}
             }
+        // IF THE COLUMN CLASS IS NOT BOOLEAN OR INTEGER 
+        // PRINT OUT ERROR MESSAGE.    
             else{
             	System.out.println("Can't set check box value. Unknown data type.");
             	System.out.println("Column type should be Boolean or Integer for check box columns.");
             }
-
-            
+		// RETURN THE EDITOR COMPONENT           
             return checkBox;
         }
 
         public Object getCellEditorValue() {
+        // GET THE COMPONENT AND CHECK IF IT IS CHECKED OR NOT.	
             if(((JCheckBox)getComponent()).isSelected()){
-            	return new Boolean(true);
+            // CHECK THE COLUMN TYPE AND RETURN CORRESPONDING OBJECT.
+            // IF IT IS INTEGER THEN 1 IS CONSIDERED TRUE & 0 FALSE.	
+            	if(columnClass == java.sql.Types.BOOLEAN){
+            		return new Boolean(true);
+            	}
+            	else{
+            		return new Integer(1);
+            	}
             }
             else{
-            	return new Boolean(false);
+            	if(columnClass == java.sql.Types.BOOLEAN){
+            		return new Boolean(false);            		
+            	}
+            	else{
+            		return new Integer(0);            		
+            	}
             }
         }
     }
@@ -1077,6 +1106,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.19  2004/12/09 18:36:04  prasanth
+ * Added CheckBox rendering support.
+ *
  * Revision 1.18  2004/11/11 14:45:33  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *
