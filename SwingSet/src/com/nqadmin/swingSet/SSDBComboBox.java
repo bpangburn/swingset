@@ -127,50 +127,84 @@ import javax.swing.event.*;
 //public class SSDBComboBox extends JComponent {
 public class SSDBComboBox extends JComboBox {
 
-
-    // TEXT FIELD THAT IS USED AS AN INTERMEDIATERY STORAGE POINT BETWEEN THE DATABASE
-    // AND THE COMBO.
+    /**
+     * Text field bound to the SSRowSet.
+     */
     protected JTextField textField = new JTextField();
 
-    // DATABASE CONNECTION OBJECT
+    /**
+     * Database connection used to execute queries for combo population.
+     */
     protected SSConnection conn = null;
 
-    // QUERY USED TO RETRIEVE ALL POSSIBLE VALUES.
+    /**
+     * Query used to populate combo box.
+     */
     protected String query = null;
 
-    // THE COLUMN NAME WHOSE VALUE HAS TO BE WRITTEN BACK
-    // TO THE DATABASE WHEN USER CHOOSES AN ITEM IN THE COMBO. THIS IS GENERALLY THE
-    // COLUMN IN THE FOREIGN TABLE TO WHICH THE FOREIGN KEY MAPS TO.
+    /**
+     * The column name whose value is written back to the database when the user
+     * chooses an item in the combo box.  This is generally the PK of the table
+     * to which a foreign key is mapped.
+     */
     protected String queryPKColumnName = null;
 
-    // THE COLUMN NAME WHOSE VALUES HAVE TO BE DISPLAYED IN THE COMBO.
+    /**
+     * The database column used to populate the first visible column of the
+     * combo box.
+     */
     protected String queryDisplayColumnName1 = null;
 
-    // AN ADDITIONAL COLUMN (IF DESIRED) WHOSE VALUES WILL ALSO BE DISPLAYED IN THE COMBO
+    /**
+     * The database column used to populate the second (optional) visible column
+     * of the combo box.
+     */
     protected String queryDisplayColumnName2 = null;
 
+    /**
+     * Vector used to store all of the queryPKColumnName values for the
+     * combo box.
+     */
     protected Vector columnVector = new Vector();
 
-    // NUMBER OF ITEMS IN THE COMBO BOX.
+    /**
+     * Number of items in the combo box.
+     */
     protected int numberOfItems = 0;
     
-    // COLUMN NAME TO WHICH THE COMBO WILL BE BOUND TO
-    protected String columnName;    
+    /**
+     * SSRowSet from which component will get/set values.
+     */
+    protected SSRowSet rowset;
 
-    // SSROWSET USED TO RETRIEVE THE INFO FROM THE DATABASE.
-    protected SSRowSet rowset = null;
+    /**
+     * SSRowSet column to which the component will be bound.
+     */
+    protected String columnName;
 
-    // INSTANCE OF THE LISTENER FOR THE COMBO BOX.
-    final MyComboListener cmbListener = new MyComboListener();
+    /**
+     * Component listener.
+     */
+    private final MyComboListener cmbListener = new MyComboListener();
 
-    // INSTANCE OF THE LISTENER FOR THE TEXT FIELD.
-    final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
+    /**
+     * Bound text field document listener.
+     */
+    private final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
-    final MyKeyListener myKeyListener = new MyKeyListener();
+    /**
+     * Keystroke-based item selection listener.
+     */
+    private final MyKeyListener myKeyListener = new MyKeyListener();
 
-    // SEPERATOR TO BE USED IF TWO COLUMN VALUES ARE DISPLAYED
+    /**
+     * Alphanumeric separator used to separate values in multi-column combo boxes.
+     */
     protected String seperator = " - ";
 
+    /**
+     * Format for any date columns displayed in combo box.
+     */
     protected String datePattern = "MM/dd/yyyy";
 
     /**
@@ -374,7 +408,7 @@ public class SSDBComboBox extends JComboBox {
             return -1;
         }
 
-        return ((Long)columnVector.get(index)).longValue();
+        return Long.valueOf((String)columnVector.get(index)).longValue();
 
     }
 
@@ -386,6 +420,33 @@ public class SSDBComboBox extends JComboBox {
     public void setSelectedValue(long _value) {
         textField.setText(String.valueOf(_value));
     }
+    
+    /**
+     * Returns the value of the selected item.
+     *
+     * @return value corresponding to the selected item in the combo.
+     *     return null if no item is selected.
+     */
+    public String getSelectedStringValue() {
+
+        int index = getSelectedIndex();
+
+        if (index == -1) {
+            return null;
+        }
+
+        return (String)columnVector.get(index);
+
+    }
+
+    /**
+     * Sets the currently selected value
+     *
+     * @param _value    value to set as currently selected.
+     */
+    public void setSelectedStringValue(String _value) {
+        textField.setText(_value);
+    }    
 
     /**
      * Executes the query and adds items to the combo box based on the values
@@ -418,8 +479,8 @@ public class SSDBComboBox extends JComboBox {
                 } else {
                     addItem(getStringValue(rs,queryDisplayColumnName1));
                 }
-                // ADD THE ID OF THE ITEM TO A VECTOR.
-                columnVector.add(i,new Long(rs.getLong(queryPKColumnName)));
+                // ADD THE PK TO A VECTOR.
+                columnVector.add(i,rs.getString(queryPKColumnName));
                 i++;
             }
 
@@ -432,37 +493,40 @@ public class SSDBComboBox extends JComboBox {
 
     } // end public void execute() throws SQLException, Exception {
 
-    // SETS THE COMBOBOX ITEM TO THE ONE CORRESPONDING TO THE VALUE PRESENT AT
-    // COLUMN TO WHICH COMBO IS BOUND.
+    /**
+     * Updates the value displayed in the component based on the SSRowSet column
+     * binding.
+     */
     protected void setDisplay() {
 
-        try {
+        //try {
             // GET THE VALUE FROM TEXT FIELD
             String text = textField.getText().trim();
             if (!text.equals("")) {
-                long valueInText = Long.parseLong(text);
+                //long valueInText = Long.parseLong(text);
                 // GET THE INDEX WHERE THIS VALUE IS IN THE VECTOR.
-                int indexCorrespondingToLong = columnVector.indexOf(new Long(valueInText));
+                //int indexCorrespondingToLong = columnVector.indexOf(new Long(valueInText));
+                int columnVectorIndex = columnVector.indexOf(text);
                 // SET THE SELECTED ITEM OF COMBO TO THE ITEM AT THE INDEX FOUND FROM
                 // ABOVE STATEMENT
-                if (indexCorrespondingToLong != getSelectedIndex()) {
-                    setSelectedIndex(indexCorrespondingToLong);
+                //if (indexCorrespondingToLong != getSelectedIndex()) {
+                if (columnVectorIndex != getSelectedIndex()) {
+                    //setSelectedIndex(indexCorrespondingToLong);
+                    setSelectedIndex(columnVectorIndex);
                 }
             }
             else{
                 setSelectedIndex(-1);
             }
-        }catch(NumberFormatException nfe) {
-            System.out.println("Possible reason underlying column is not a number field");
-            nfe.printStackTrace();
-        }
+        //} catch(NumberFormatException nfe) {
+        //    System.out.println("Possible reason underlying column is not a number field");
+        //    nfe.printStackTrace();
+        //}
 
     }
     
     /**
-     * The column name and the SSRowSet should be set before calling this function.
-     * If the column name and SSRowSet are set seperately then this function has to
-     * be called to bind the combo box to the column in the SSRowSet.
+     * Method for handling binding of component to a SSRowSet column.
      */
     protected void bind() {
         
@@ -486,10 +550,10 @@ public class SSDBComboBox extends JComboBox {
     }    
 
     /**
-     * Binds the comboBox to the specified column in the given SSRowSet.
+     * Sets the SSRowSet and column name to which the component is to be bound.
      *
-     * @param _rowset   SSRowSet to which updates have to be made.
-     * @param _columnName   column name in the SSRowSet to which these updates have to be made.
+     * @param _rowset    datasource to be used.
+     * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _rowset, String _columnName) {
         rowset  = _rowset;
@@ -497,7 +561,9 @@ public class SSDBComboBox extends JComboBox {
         bind();
     }
 
-    // ADDS LISTENERS FOR TEXT FIELD AND COMBO BOX.
+    /**
+     * Adds listeners for component and bound text field (where applicable).
+     */
     private void addListeners() {
         addActionListener(cmbListener);
         addFocusListener(cmbListener);
@@ -505,7 +571,9 @@ public class SSDBComboBox extends JComboBox {
         textField.getDocument().addDocumentListener(textFieldDocumentListener);         
     }
 
-    // REMOVES THE LISTENERS FOR THE COMBOBOX AND TEXT FIELD
+    /**
+     * Removes listeners for component and bound text field (where applicable).
+     */
     private void removeListeners() {
         removeActionListener(cmbListener);
         removeFocusListener(cmbListener);
@@ -514,7 +582,10 @@ public class SSDBComboBox extends JComboBox {
           
     }
 
-    // LISTENER FOR THE TEXT FIELD
+    /**
+     * Listener(s) for the bound text field used to propigate values back to the
+     * component's value.
+     */
     private class MyTextFieldDocumentListener implements DocumentListener {
 
         public void changedUpdate(DocumentEvent de) {
@@ -537,7 +608,9 @@ public class SSDBComboBox extends JComboBox {
 
     } // end private class MyTextFieldDocumentListener implements DocumentListener {
 
-    // KEYSTROKE LISTENER
+    /**
+     * Listener for keystroke-based, string matching, combo box navigation.
+     */
     private class MyKeyListener extends KeyAdapter {
 
         String searchString = null;
@@ -655,7 +728,10 @@ public class SSDBComboBox extends JComboBox {
         }
     } // end private class MyKeyListener extends KeyAdapter {
 
-    // LISTENER FOR THE COMBO BOX.
+    /**
+     * Listener(s) for the component's value used to propigate changes back to
+     * bound text field.
+     */
     private class MyComboListener extends FocusAdapter implements ActionListener {
 
         public void actionPerformed(ActionEvent ae) {
@@ -667,26 +743,32 @@ public class SSDBComboBox extends JComboBox {
 
             // IF THE USER WANTS TO REMOVE COMPLETELY THE VALUE IN THE FIELD HE CHOOSES
             // THE EMPTY STRING IN COMBO THEN THE TEXT FIELD IS SET TO EMPTY STRING
-            if ( index != -1 ) {
+            if (index != -1) {
                 try {
                     // NOW LOOK UP THE VECTOR AND GET THE VALUE CORRESPONDING TO THE TEXT SELECTED IN THE COMBO
-                    long valueCorresponingToIndex = ( (Long)columnVector.get(index) ).longValue() ;
+                    //long valueCorresponingToIndex = ( (Long)columnVector.get(index) ).longValue() ;
                     //GET THE TEXT IN THE TEXT FIELD
-                    String strValueinTextField = textField.getText();
+                    //String strValueinTextField = textField.getText();
                     //INITIALIZE THE  LONG VALUE IN TEXT TO -1
-                    long valueInText = -1;
+                    //long valueInText = -1;
                     // IF THE TEXT IS NOT NULL PARSE ITS LONG VALUE
-                    if (!strValueinTextField.equals("")) {
-                        valueInText = Long.parseLong(strValueinTextField);
+                    //if (!strValueinTextField.equals("")) {
+                    //    valueInText = Long.parseLong(strValueinTextField);
+                    //}
+                    String textFieldText = textField.getText();
+                    String columnVectorText = (String)columnVector.get(index);
+                    
+                    if (!textFieldText.equals(columnVectorText)) {
+                        textField.setText(columnVectorText);
                     }
 
 
                     // IF THE LONG VALUE CORRESPONDING TO THE SELECTED TEXT OF COMBO NOT EQUAL
                     // TO THAT IN THE TEXT FIELD THEN CHANGE THE TEXT IN THE TEXT FIELD TO THAT VALUE
                     // IF ITS THE SAME LEAVE IT AS IS
-                    if (valueInText != valueCorresponingToIndex) {
-                        textField.setText( String.valueOf(valueCorresponingToIndex) );
-                    }
+                    //if (valueInText != valueCorresponingToIndex) {
+                    //    textField.setText( String.valueOf(valueCorresponingToIndex) );
+                    //}
 
                 } catch(NullPointerException npe) {
                 } catch(NumberFormatException nfe) {
@@ -706,16 +788,6 @@ public class SSDBComboBox extends JComboBox {
         
     } // private class MyComboListener implements ActionListener {
 
-    // ADD THE COMBO BOX TO THE JCOMPONENT
-    //private void addComponent() {
-    //    //SET THE BOX LAYOUT
-    //        setLayout(new BoxLayout(this,BoxLayout.LINE_AXIS));
-    //    // SET PREFERRED SIZE FOR COMBO BOX
-    //        cmbDisplayed.setPreferredSize(new Dimension(150,20));
-    //    // ADD THE COMBO BOX TO THE JCOMPONENT
-    //        add(cmbDisplayed);
-    //}
-
     /**
      * Adds an item to the existing list of items in the combo box.
      *
@@ -723,42 +795,33 @@ public class SSDBComboBox extends JComboBox {
      * @param _value   value corresponding the the name
      */
      public void addItem(String _name, long _value) {
-        columnVector.add(new Long(_value));
+        columnVector.add(Long.toString(_value));
         addItem(_name);
         numberOfItems++;
      }
+     
+    /**
+     * Adds an item to the existing list of items in the combo box.
+     *
+     * @param _name   name that should be displayed in the combo
+     * @param _value   value corresponding the the name
+     */
+     public void addStringItem(String _name, String _value) {
+        columnVector.add(_value);
+        addItem(_name);
+        numberOfItems++;
+     }     
 
      /**
-      * Deletes the item which has name equal to _name. If there are
-      * more than one item with the same name then the first occurance is deleted.
-      *
-      * @param _name  value of the item to be deleted.
-      *
-      * @return returns true on successful deletion else returns false.
-      */
-     public boolean deleteItem(String _name) {
-
-        for (int i=0; i<getItemCount();i++) {
-            if ( ((String)getItemAt(i)).equals(_name) ) {
-                removeItemAt(i);
-                columnVector.removeElementAt(i);
-                numberOfItems--;
-                return true;
-            }
-        }
-        return false;
-     }
-
-     /**
-      * Deletes the item which has value equal to _value. If there are
-      * more than one item with the same value then the first occurance is deleted.
+      * Deletes the item which has value equal to _value.
+      * If more than one item is present in the combo for that value the first one is changed.      
       *
       * @param _value  value of the item to be deleted.
       *
       * @return returns true on successful deletion else returns false.
       */
      public boolean deleteItem(long _value) {
-        int index = columnVector.indexOf(new Long(_value));
+        int index = columnVector.indexOf(Long.toString(_value));
         if (index == -1) {
             return false;
         }
@@ -767,30 +830,25 @@ public class SSDBComboBox extends JComboBox {
         numberOfItems--;
         return true;
      }
-
+     
      /**
-      * Deletes the item which has display name equal to _name and corresponding value
-      * as _value. If there is more than one item with same name and value then the first
-      * occurance is deleted.
+      * Deletes the item which has value equal to _value.
+      * If more than one item is present in the combo for that value the first one is changed.      
       *
-      * @param _name   name of item to be deleted
       * @param _value  value of the item to be deleted.
       *
       * @return returns true on successful deletion else returns false.
       */
-     public boolean deleteItem(String _name, long _value) {
-        for (int i=0; i<getItemCount();i++) {
-            if ( ((String)getItemAt(i)).equals(_name) ) {
-                if (((Long)(columnVector.elementAt(i))).longValue() == _value) {
-                    removeItemAt(i);
-                    columnVector.removeElementAt(i);
-                    numberOfItems--;
-                    return true;
-                }
-            }
+     public boolean deleteStringItem(String _value) {
+        int index = columnVector.indexOf(_value);
+        if (index == -1) {
+            return false;
         }
-        return false;
-     }
+        columnVector.removeElementAt(index);
+        removeItemAt(index);
+        numberOfItems--;
+        return true;
+     }     
 
     /**
      * Updates the string thats being displayed.
@@ -808,7 +866,7 @@ public class SSDBComboBox extends JComboBox {
      * @return returns true if successful else false.
      */
     public boolean updateItem(long _value, String _name) {
-        int index = columnVector.indexOf(new Long(_value));
+        int index = columnVector.indexOf(Long.toString(_value));
         if (index == -1) {
             return false;
         }
@@ -819,19 +877,54 @@ public class SSDBComboBox extends JComboBox {
         addActionListener(cmbListener);
         return true;
     }
+    
+    /**
+     * Updates the string thats being displayed.
+     * If more than one item is present in the combo for that value the first one is changed.
+     *
+     * NOTE: To retain changes made to current SSRowSet call updateRow before calling the
+     * updateItem on SSDBComboBox. (Only if you are using the SSDBComboBox and SSDataNavigator
+     * for navigation in the screen. If you are not using the SSDBComboBox for navigation
+     * then no need to call updateRow on the SSRowSet. Also if you are using only SSDBComboBox
+     * for navigation you need not call the updateRow.)
+     *
+     * @param _value  the value corresponding to the item in combo to be updated.
+     * @param _name   the new name that replace old one.
+     *
+     * @return returns true if successful else false.
+     */
+    public boolean updateStringItem(String _value, String _name) {
+        int index = columnVector.indexOf(_value);
+        if (index == -1) {
+            return false;
+        }
+        removeActionListener(cmbListener);
+        insertItemAt(_name,index+1);
+        removeItemAt(index);
+        setSelectedIndex(index);
+        addActionListener(cmbListener);
+        return true;
+    }    
 
-    // RETURN STRING EQUILIVENT OF DATA IN A COLUMN
-    protected String getStringValue(ResultSet _rs, String _queryPKColumnName) {
+    /**
+     * Method to return string equalivent of a given resultset column.
+     *
+     * @param _rs   ResultSet containing column to analyize
+     * @param _columnName   column to convert to string
+     *
+     * @return string equilivent of specified resultset column
+     */
+    protected String getStringValue(ResultSet _rs, String _columnName) {
         String strValue = "";
         try {
-            int type = _rs.getMetaData().getColumnType(_rs.findColumn(_queryPKColumnName));
+            int type = _rs.getMetaData().getColumnType(_rs.findColumn(_columnName));
             switch(type){
                 case Types.DATE:
                     SimpleDateFormat dateFormat = new SimpleDateFormat(datePattern);
-                    strValue = dateFormat.format(_rs.getDate(_queryPKColumnName));
+                    strValue = dateFormat.format(_rs.getDate(_columnName));
                 break;
                 default:
-                    strValue = _rs.getString(_queryPKColumnName);
+                    strValue = _rs.getString(_columnName);
                 break;
             }
         } catch(SQLException se) {
@@ -947,7 +1040,59 @@ public class SSDBComboBox extends JComboBox {
      */
     public Component getComponent() {
         return this;
-    }    
+    }
+    
+
+     /**
+      * Deletes the item which has name equal to _name. If there are
+      * more than one item with the same name then the first occurance is deleted.
+      *
+      * @param _name  value of the item to be deleted.
+      *
+      * @return returns true on successful deletion else returns false.
+      *
+      * @deprecated      
+      */
+     public boolean deleteItem(String _name) {
+
+        for (int i=0; i<getItemCount();i++) {
+            if ( ((String)getItemAt(i)).equals(_name) ) {
+                removeItemAt(i);
+                columnVector.removeElementAt(i);
+                numberOfItems--;
+                return true;
+            }
+        }
+        return false;
+     }
+     
+
+     /**
+      * Deletes the item which has display name equal to _name and corresponding value
+      * as _value. If there is more than one item with same name and value then the first
+      * occurance is deleted.
+      *
+      * @param _name   name of item to be deleted
+      * @param _value  value of the item to be deleted.
+      *
+      * @return returns true on successful deletion else returns false.
+      *
+      * @deprecated       
+      */
+     public boolean deleteItem(String _name, long _value) {
+        for (int i=0; i<getItemCount();i++) {
+            if ( ((String)getItemAt(i)).equals(_name) ) {
+                if (((String)columnVector.elementAt(i)).equals(Long.toString(_value))) {
+                    removeItemAt(i);
+                    columnVector.removeElementAt(i);
+                    numberOfItems--;
+                    return true;
+                }
+            }
+        }
+        return false;
+     }
+     
 
 } // end public class SSDBComboBox extends JComponent {
 
@@ -955,6 +1100,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.22  2005/02/04 22:48:53  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.21  2005/02/04 00:02:48  prasanth
  * 1. Removed commented out code.
  * 2. Using setDisplay in document listener.
