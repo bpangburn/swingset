@@ -81,6 +81,9 @@ import javax.sql.*;
  * @version	$Revision$
  */
 public class SSComboBox extends JComponent {
+	
+	// THIS VALUE WILL BE RETURNED WHEN NO ITEM IS SELECTED IN THE COMBO BOX
+		public static final int NON_SELECTED = (int)((Math.pow(2, 32) -1)/(-2));
 
 		// TEXT FIELD THAT WILL BE BOUND TO THE DATABASE
 		protected  JTextField textField = new JTextField();
@@ -181,6 +184,10 @@ public class SSComboBox extends JComponent {
 		 * @return returns the value associated with the item selected. -1 if none selected.
 		 */
 		public int getSelectedValue() {
+			if(cmbDisplayed.getSelectedIndex() == -1){
+	  			return NON_SELECTED;
+	  		}
+
 		  	if (mappingValues != null) {
 		  		return mappingValues[cmbDisplayed.getSelectedIndex()];
             }
@@ -697,6 +704,10 @@ public class SSComboBox extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.12  2004/09/02 16:20:17  prasanth
+ * Added support for mapping values in setDisplay function.
+ * Combo Listener was not handling mapping values  so added that.
+ *
  * Revision 1.11  2004/08/12 23:51:16  prasanth
  * Updating the value to null if the selected index is -1.
  *
