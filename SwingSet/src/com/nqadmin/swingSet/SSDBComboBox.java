@@ -498,7 +498,7 @@ public class SSDBComboBox extends JComboBox {
             int i = 0;
             while (rs.next()) {
                 // IF TWO COLUMNS HAVE TO BE DISPLAYED IN THE COMBO THEY SEPERATED BY SEMI-COLON
-                if ( secondDisplayColumnName != null) {
+                if ( secondDisplayColumnName != null && !secondDisplayColumnName.trim().equals("")) {
                     addItem(getStringValue(rs,displayColumnName) + seperator + rs.getString(secondDisplayColumnName));
                 } else {
                     addItem(getStringValue(rs,displayColumnName));
@@ -1140,6 +1140,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.30  2005/02/21 16:31:32  prasanth
+ * In bind checking for empty columnName before binding the component.
+ *
  * Revision 1.29  2005/02/13 15:38:20  yoda2
  * Removed redundant PropertyChangeListener and VetoableChangeListener class variables and methods from components with JComponent as an ancestor.
  *
