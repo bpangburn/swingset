@@ -40,14 +40,14 @@ package com.nqadmin.swingSet;
  * SSDBNavAdapter.java
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- *<p>
+ *<p><pre>
  * Abstract class that provides empty implementations of all the methods for the
  * SSDBNav interface.
  *
  * This class is provided for convenience. so that users wishing to write their
  * own SSDBNav implementations can just extend the abstract class and override
  * the desired methods.
- *<p>
+ *</pre><p>
  * @author	$Author$
  * @version	$Revision$
  */
@@ -71,4 +71,7 @@ public abstract class SSDBNavAdapter implements SSDBNav {
 
 /*
  * $Log$
+ * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
+ * Initial CVS import for SwingSet.
+ *
  */

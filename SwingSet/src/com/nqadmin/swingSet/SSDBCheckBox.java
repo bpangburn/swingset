@@ -53,13 +53,13 @@ import javax.swing.event.*;
  * SSDBCheckBox.java
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- *<p>
+ *<p><pre>
  * Used to display the boolean values stored in the database. The SSDBCheckBox
  * can currently only be bound to a numeric database column.  A checked
  * SSDBCheckBox returns a '1' to the database and an uncheck SSDBCheckBox will
  * returns a '0'.  In the future an option may be added to allow the user to
  * specify the values returned for the checked and unchecked checkbox states.
- *<p>
+ *</pre><p>
  * @author	$Author$
  * @version	$Revision$
  */
@@ -194,4 +194,7 @@ public class SSDBCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
+ * Initial CVS import for SwingSet.
+ *
  */

@@ -45,7 +45,7 @@ import javax.swing.*;
  * SSDBNavImp.java
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- *<p>
+ *<p><pre>
  * Custom implementation of SSDBNav that clears/resets the various database-aware
  * fields on a screen when the user adds a new record.  To achieve this, special
  * implementation of the performPreInsertOps() method is provided.  An instance of
@@ -60,7 +60,7 @@ import javax.swing.*;
  *
  * This recursive behavior performed on all the components inside the JPanel or
  * JTabbedPane inside the specified container.
- *<p>
+ *</pre><p>
  * @author	$Author$
  * @version	$Revision$
  */
@@ -173,4 +173,7 @@ public class SSDBNavImp extends SSDBNavAdapter {
 
 /*
  * $Log$
+ * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
+ * Initial CVS import for SwingSet.
+ *
  */

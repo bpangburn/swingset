@@ -42,9 +42,6 @@ import javax.swing.*;
 import java.sql.*;
 import java.io.*;
 import javax.sql.RowSet;
-import sun.jdbc.rowset.CachedRowSet;
-import sun.jdbc.rowset.JdbcRowSet;
-import org.netbeans.lib.sql.ConnectionSource;
 
 
 
@@ -52,7 +49,7 @@ import org.netbeans.lib.sql.ConnectionSource;
  * SSDataNavigator.java
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- *<p>
+ *<p><pre>
  * Component that can be used for data navigation. It provides buttons for
  * navigation, insertion, and deletion of records in a RowSet. The modification
  * of a RowSet can be prevented using the setModificaton() method.  Any changes
@@ -65,7 +62,7 @@ import org.netbeans.lib.sql.ConnectionSource;
  * the changes he made he can press the Undo button, however this must be done
  * be done before any navigation.  Once navigation takes place changes can't be
  * reverted using Undo button (has to be done manually by the user).
- *<p>
+ *</pre><p>
  * @author	$Author$
  * @version	$Revision$
  */
@@ -575,4 +572,7 @@ public class SSDataNavigator extends JPanel{
 
 /*
  * $Log$
+ * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
+ * Initial CVS import for SwingSet.
+ *
  */

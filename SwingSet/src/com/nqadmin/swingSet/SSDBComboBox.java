@@ -46,7 +46,6 @@ import javax.sql.*;
 import javax.swing.border.*;
 import javax.swing.text.*;
 import javax.swing.event.*;
-import sun.jdbc.rowset.*;
 
 
 
@@ -54,7 +53,7 @@ import sun.jdbc.rowset.*;
  * SSDBComboBox.java
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- *<p>
+ *<p><pre>
  * Similar to the SSComboBox, but used when both the 'bound' values and the
  * 'display' values are pulled from a database table.  Generally the bound
  * value represents a foreign key to another table, and the combobox needs to
@@ -124,7 +123,7 @@ import sun.jdbc.rowset.*;
  *
  *      // ADD THE JTEXTFIELD TO THE JFRAME
  *  	  getContentPane().add(myText);
- *<p>
+ *</pre><p>
  * @author	$Author$
  * @version	$Revision$
  */
@@ -611,4 +610,7 @@ public class SSDBComboBox  extends JComponent{
 
 /*
  * $Log$
+ * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
+ * Initial CVS import for SwingSet.
+ *
  */

@@ -40,7 +40,7 @@ package com.nqadmin.swingSet;
  * SSDBNav.java
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- *<p>
+ *<p><pre>
  * Interface that provides a set of functions to perform some custom operation
  * before a record is added, after a record is added, before a record is deleted
  * and after a record is deleted.
@@ -65,7 +65,7 @@ package com.nqadmin.swingSet;
  *
  *      Note that both the performPreDeletionOps() and performPostDeletionOps()
  *      will be executed when the user presses the delete button.
- *<p>
+ *</pre><p>
  * @author	$Author$
  * @version	$Revision$
  */
@@ -105,4 +105,7 @@ public interface SSDBNav {
 
 /*
  * $Log$
+ * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
+ * Initial CVS import for SwingSet.
+ *
  */

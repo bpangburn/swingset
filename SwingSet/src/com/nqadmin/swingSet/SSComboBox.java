@@ -53,7 +53,7 @@ import javax.sql.*;
  * SSComboBox.java
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- *<p>
+ *<p><pre>
  * Provides a way of displaying text corresponding to codes that are stored in
  * the database. By default the codes start from zero. If you want to provide a
  * different mapping for the items in the combobox then a string of integers
@@ -83,7 +83,7 @@ import javax.sql.*;
  *      Note that if you DO NOT want to use the default mappings, the custom
  *      mappings must be set before calling the bind() method to bind the
  *      combobox to a database column.
- *<p>
+ *</pre><p>
  * @author	$Author$
  * @version	$Revision$
  */
@@ -548,4 +548,7 @@ public class SSComboBox   extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
+ * Initial CVS import for SwingSet.
+ *
  */

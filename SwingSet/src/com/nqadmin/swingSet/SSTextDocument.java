@@ -51,7 +51,7 @@ import java.util.Calendar;
  * SSTextDocument.java
  *<p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- *<p>
+ *<p><pre>
  * Java PlainDocument that is 'database-aware'.  When developing a database
  * application the SSTextDocument can be used in conjunction with the
  * SSDataNavigator to allow for both editing and navigation of the rows in a
@@ -64,7 +64,7 @@ import java.util.Calendar;
  *
  * Note that a RowSet insert doesn't implicitly modify the cursor which is why
  * the SSDBNavImp is provided for clearing controls followoing an insert.
- *<p>
+ *</pre><p>
  * @author	$Author$
  * @version	$Revision$
  */
@@ -468,4 +468,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
+ * Initial CVS import for SwingSet.
+ *
  */
