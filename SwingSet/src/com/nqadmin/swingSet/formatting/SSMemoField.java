@@ -276,16 +276,13 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
             SSMemoField tf = (SSMemoField) input;
             aux = tf.getText();
             
-            System.out.println("inputVerifier():");
-            
-            if (aux == null) {
-                passed = false;
-            }
-            
             if (passed == true) {
                 
                 setBackground(java.awt.Color.WHITE);
-                
+             
+                // if not linked to a db field, returns.
+                if (columnName == null || rowset == null) return true;
+
                 try {
                     rowset.removeRowSetListener(tf);
                     
@@ -302,9 +299,9 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
                     }
                     rowset.addRowSetListener(tf);
                 } catch (java.sql.SQLException se) {
-                    System.out.println("---> SQLException -----------> " + se);
+                    System.out.println("SSMemoField ---> SQLException -----------> " + se);
                 } catch(java.lang.NullPointerException np) {
-                    System.out.println("---> NullPointerException ---> " + np);
+                    System.out.println("SSMemoField ---> NullPointerException ---> " + np);
                 }
                 return true;
             } else {

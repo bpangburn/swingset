@@ -243,6 +243,9 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
             boolean selected = tf.isSelected();
             
             setBackground(java.awt.Color.WHITE);
+
+            // if not linked to a db field, returns.
+            if (columnName == null || rowset == null) return true;
             
             try {
                 rowset.removeRowSetListener(tf);
@@ -273,9 +276,9 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
                 }
                 rowset.addRowSetListener(tf);
             } catch (java.sql.SQLException se) {
-                System.out.println("---> SQLException -----------> " + se);
+                System.out.println("SSBooleanField ---> SQLException -----------> " + se);
             } catch(java.lang.NullPointerException np) {
-                System.out.println("---> NullPointerException ---> " + np);
+                System.out.println("SSBooleanField ---> NullPointerException ---> " + np);
             }
             return true;
         }
@@ -284,6 +287,9 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 
 /*
  * $Log$
+ * Revision 1.9  2005/03/28 14:46:42  dags
+ * syncro commit
+ *
  * Revision 1.8  2005/02/22 15:14:34  yoda2
  * Fixed some JavaDoc & deprecation errors/warnings.
  *

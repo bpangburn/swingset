@@ -49,6 +49,7 @@ import com.nqadmin.swingSet.formatting.helpers.*;
 import java.beans.beancontext.BeanContextChild;
 import java.beans.beancontext.BeanContextChildSupport;
 import java.beans.beancontext.BeanContextProxy;
+import java.text.ParseException;
 
 
 /**
@@ -80,6 +81,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     /** Creates a new instance of SSFormattedTextField */
     public SSFormattedTextField() {
         super();
+        this.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
         
         /*
          *
@@ -335,6 +337,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                     break;
                     
                 case java.sql.Types.DATE://91
+                    System.out.println("DbToFm() DATE " + rowset.getDate(columnName));
                     this.setValue(new java.util.Date(rowset.getDate(columnName).getTime()));
                     break;
                     
@@ -495,11 +498,14 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
             //if (val < minValue) passed = false;
             //if (val > maxValue) passed = false;
             
-            System.out.println("inputVerifier(): " + columnName);
+            //System.out.println("inputVerifier(): " + columnName + " Name: " + this.getClass().getName());
             
             //            if (aux == null) {
             //                passed = false;
+            
             //            }
+            
+            
             
             if (passed == true) {
                 
@@ -507,16 +513,21 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                 
                 try {
                     tf.commitEdit();
-                    System.out.println("Committed();");
                 } catch (java.text.ParseException pe) {
-                    System.out.println("ParseException");
+                    System.out.println("inputVerifier --> ParseException");
                 }
+                
+                if (columnName == null) return true;
+                if (colType    == -99 ) return true;
+                if (rowset     == null) return true;
                 
                 try {
                     rowset.removeRowSetListener(tf);
                     
-                    aux = tf.getValue();
+                    // aux = tf.getValue();
+                    
                     if (aux == null) {
+                        System.out.println("aux IS null");
                         return false;
                     }
                     
@@ -653,7 +664,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                 } catch (java.sql.SQLException se) {
                     System.out.println("---> SQLException -----------> " + se);
                 } catch(java.lang.NullPointerException np) {
-                    System.out.println("---> NullPointerException ---> " + np);
+                    System.out.println("<---> NullPointerException <---> " + np + " columnName : " + columnName);
                 }
                 return true;
             } else {
@@ -672,10 +683,38 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         System.err.println("getBeanContextProxy Called");
         return beanContextChildSupport;
     }
+    
+    protected void processFocusEvent(FocusEvent e) {
+        if ( e.getID() == FocusEvent.FOCUS_LOST ) {
+            try {
+                if ( this.getText().length() == 0 ) {
+                    setValue(null);
+                }
+            } catch (NullPointerException npe) {
+                System.out.println("processFocusEvent() --> NullPointerException");
+            }
+        }
+        super.processFocusEvent(e);
+    }
+    
+    /**
+     * Overridden from superclass
+     */
+    public void commitEdit() throws ParseException {
+        AbstractFormatter format = getFormatter();
+        
+        if (getText()==null || getText().length()==0){
+            System.out.println("getTex() == null || getText().length() == 0");
+            setValue(null);
+        } else super.commitEdit();
+    }
 }
 
 /*
  * $Log$
+ * Revision 1.14  2005/03/28 14:46:42  dags
+ * syncro commit
+ *
  * Revision 1.13  2005/03/21 20:09:37  dags
  *
  *  Removed Files:
