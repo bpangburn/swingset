@@ -639,11 +639,11 @@ public class SSDataGrid extends JTable
     	if(_columnNames != null)
     	{
     		hiddenColumns = new int[_columnNames.length];
-    		System.out.println("Hidden Columns");
+//    		System.out.println("Hidden Columns");
     		for(int i=0; i<_columnNames.length; i++)
     		{
     			hiddenColumns[i] = rowset.findColumn(_columnNames[i]) -1;
-    			System.out.println(hiddenColumns[i]);
+//    			System.out.println(hiddenColumns[i]);
     		}
     		
     		// SET THE MINIMUM WIDTH OF COLUMNS
@@ -656,7 +656,7 @@ public class SSDataGrid extends JTable
 				column.setMinWidth(0);
 				column.setMaxWidth(0);
 				column.setPreferredWidth(0);
-				System.out.println("Set column " + hiddenColumns[j] + " width to zero");
+//				System.out.println("Set column " + hiddenColumns[j] + " width to zero");
 			}
 			updateUI();
 		}	
@@ -701,9 +701,9 @@ public class SSDataGrid extends JTable
 	 					ke.getKeyCode() == KeyEvent.VK_ENTER	)
    						return;
    					String str = ((JTextField)(DateEditor.this.getComponent())).getText();
-   					System.out.println(str);
+//   					System.out.println(str);
    					String newStr = dateMask(str,ke);
-   					System.out.println(newStr);
+//   					System.out.println(newStr);
    					((JTextField)(DateEditor.this.getComponent())).setText(newStr);
    				}
    			});
@@ -906,8 +906,8 @@ public class SSDataGrid extends JTable
      // HANDLES THE DATE MASK.
 	 // SETTING THE SLASHES FOR THE USER.
 	 private String dateMask(String str, KeyEvent ke){
-	 	System.out.println("Length: " + str.length());
-	 	System.out.println("Key Char :" + ke.getKeyChar());
+//	 	System.out.println("Length: " + str.length());
+//	 	System.out.println("Key Char :" + ke.getKeyChar());
 	 	
 	 	switch(str.length()){
 	 		case 1:
@@ -951,6 +951,9 @@ public class SSDataGrid extends JTable
 
 /*
  * $Log$
+ * Revision 1.4  2003/12/18 20:12:01  prasanth
+ * Update class description.
+ *
  * Revision 1.3  2003/12/16 18:01:40  prasanth
  * Documented versions for release 0.6.0
  *
