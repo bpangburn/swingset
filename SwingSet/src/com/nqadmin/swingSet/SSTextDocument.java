@@ -150,11 +150,8 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 			// SET THE DOCUMENT TO THE TEXT CORRESPONDING TO THE COLUMN
 			if (rs.getRow() != 0) {
 				String value = getText();
-				if (value != null && value.length() > 0) {
-					value = value.replace('\r',' ');
-					insertString(0,value, attribute);
-					insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength()  , DocumentEvent.EventType.INSERT), attribute );
-				}
+				insertString(0,value, attribute);
+				insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength()  , DocumentEvent.EventType.INSERT), attribute );
 			}
 
 		} catch(SQLException se) {
@@ -625,6 +622,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.8  2004/08/10 22:06:59  yoda2
+ * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
+ *
  * Revision 1.7  2004/08/02 15:47:14  prasanth
  * 1. Added setColumnName, setColumnIndex, and setRowSet functions.
  * 2. Added getColumnName, getColumnIndex, and getRowSet functions.
