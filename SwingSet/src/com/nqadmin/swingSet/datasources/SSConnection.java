@@ -39,7 +39,9 @@
  import java.lang.ClassNotFoundException;
  import java.io.ObjectInputStream;
  import java.io.Serializable;
-
+ import java.beans.PropertyChangeSupport;
+ import java.beans.PropertyChangeListener;
+ 
  /**
  * SSConnection.java
  *<p>
@@ -59,28 +61,33 @@
     /**
      *  Url to the database.
      */
-    protected String url;
+    protected String url = "";
 
     /**
      * Username to be used while connecting to the database.
      */
-    protected String username;
+    protected String username = "";
 
     /**
      * Password to be used for the username specified.
      */
-    protected String password;
+    protected String password = "";
 
     /**
      *  Database driver class name.
      */
-    protected String driverName;
+    protected String driverName = "";
 
     /**
      *  Database connection object.
      */
     transient protected Connection connection;
 
+	/**
+	 *	Convenience class for providing the property change listener support
+	 */
+	private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+	 
     /**
      *  Constructs a default SSConnection object.
      */
@@ -131,7 +138,10 @@
      * the url should be of the form jdbc:subprotocol:subname
      */
     public void setUrl(String url){
+        String oldValue = this.url;
         this.url = url;
+        changeSupport.firePropertyChange("url", oldValue, this.url);
+        
     }
 
     /**
@@ -139,7 +149,9 @@
      *@param username - the database username on whose behalf the connection is being made
      */
     public void setUsername(String username){
+    	String oldValue = this.username;
         this.username = username;
+        changeSupport.firePropertyChange("username", oldValue, this.username);
     }
 
     /**
@@ -147,7 +159,9 @@
      *@param password - the user's password to be used.
      */
     public void setPassword(String password){
+    	String oldValue = this.password;
         this.password = password;
+        changeSupport.firePropertyChange("password", oldValue, this.password);
     }
 
     /**
@@ -155,7 +169,9 @@
      *@param driverName - name of the database driver to be used.
      */
     public void setDriverName(String driverName){
+    	String oldValue = this.driverName;
         this.driverName = driverName;
+        changeSupport.firePropertyChange("driverName", oldValue, this.password);
     }
 
     /**
@@ -197,6 +213,14 @@
     public Connection getConnection(){
         return connection;
     }
+    
+    public void addPropertyChangeListener(PropertyChangeListener listener){
+    	changeSupport.addPropertyChangeListener(listener);
+    }
+    
+    public void removePropertyChangeListener(PropertyChangeListener listener){
+    	changeSupport.removePropertyChangeListener(listener);
+    }
 
     /**
      *  Creates a connection to the database based on the information provided
@@ -222,6 +246,9 @@
 
 /*
  * $Log$
+ * Revision 1.3  2005/02/04 22:49:09  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.2  2004/11/11 14:45:57  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *

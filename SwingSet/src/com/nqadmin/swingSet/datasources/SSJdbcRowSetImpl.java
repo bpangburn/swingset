@@ -41,14 +41,18 @@
  import java.sql.Date;
  import javax.sql.RowSetListener;
  import com.sun.rowset.JdbcRowSetImpl;
+ import java.beans.PropertyChangeSupport;
+ 
 
  public class SSJdbcRowSetImpl extends SSRowSetAdapter {
 
-    protected SSConnection ssConnection;
-    protected String query;
+    protected SSConnection sSConnection = new SSConnection();
+    protected String query = "";
     transient protected Connection connection;
     transient protected JdbcRowSetImpl rowset;
     transient protected ResultSetMetaData metaData;
+    
+    private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /**
      *  Constructs a default SSJdbcRowSetImpl object.
@@ -61,7 +65,9 @@
      *@param ssConnection - SSConnection object to be used to connect to the database.
      */
     public SSJdbcRowSetImpl(SSConnection ssConnection){
-        this.ssConnection = ssConnection;
+    	
+        this.sSConnection = ssConnection;
+        
     }
 
     /**
@@ -70,7 +76,7 @@
      *@param query - SQL query to be executed.
      */
     public SSJdbcRowSetImpl(SSConnection ssConnection, String query){
-        this.ssConnection = ssConnection;
+        this.sSConnection = ssConnection;
         this.query      = query;
     }
 
@@ -79,7 +85,9 @@
      *@param ssConnection - connection object to be used to connect to the database.
      */
     public void setSSConnection(SSConnection ssConnection){
-        this.ssConnection = ssConnection;
+        SSConnection connection = this.sSConnection;
+        this.sSConnection = ssConnection;
+        changeSupport.firePropertyChange("ssConnection", connection, this.sSConnection);
     }
 
     /**
@@ -87,7 +95,9 @@
      *@param query - query to be executed.
      */
     public void setCommand(String query){
+    	String oldValue = this.query;
         this.query = query;
+        changeSupport.firePropertyChange("query", oldValue, this.query);
 
         try {
             if (rowset != null) {
@@ -103,7 +113,7 @@
      *@return returns the SSConnection object being used.
      */
     public SSConnection getSSConnection(){
-        return ssConnection;
+        return sSConnection;
     }
 
     /**
@@ -124,7 +134,7 @@
      */
     public void execute() throws SQLException{
         if(rowset == null){
-            rowset = new JdbcRowSetImpl(ssConnection.getConnection());
+            rowset = new JdbcRowSetImpl(sSConnection.getConnection());
             rowset.setType(ResultSet.TYPE_SCROLL_INSENSITIVE);
             rowset.setConcurrency(ResultSet.CONCUR_UPDATABLE);
             rowset.setCommand(query);
@@ -139,7 +149,7 @@
     protected void readObject(ObjectInputStream inStream) throws ClassNotFoundException, IOException{
         inStream.defaultReadObject();
     // GET THE CONNECTION OBJECT FROM THE SSCONNECTION.
-        connection = ssConnection.getConnection();
+        connection = sSConnection.getConnection();
         try{
         // CREATE NEW INSTANCE OF JDBC ROWSET.
             rowset = new JdbcRowSetImpl(connection);
@@ -856,6 +866,9 @@
 }
  /*
   * $Log$
+  * Revision 1.7  2005/02/04 22:49:09  yoda2
+  * API cleanup & updated Copyright info.
+  *
   * Revision 1.6  2005/01/18 20:58:11  prasanth
   * Added function to get & set bytes.
   *
