@@ -655,7 +655,6 @@ public class SSDataGrid extends JTable {
         setComboRenderer(_column, _displayItems, _underlyingValues, 250);
     }
 
-
     /**
      * Sets a combo box renderer for the specified column.
      * This is use full to limit the values that go with a column or if an underlying code
@@ -668,12 +667,27 @@ public class SSDataGrid extends JTable {
      */
     public void setComboRenderer(String _column, Object[] _displayItems, Object[] _underlyingValues, int _columnWidth) throws SQLException {
         int column = rowset.getColumnIndex(_column)-1;
-        setRowHeight(20);
-        TableColumnModel columnModel = getColumnModel();
-        TableColumn tableColumn = columnModel.getColumn(column);
-        tableColumn.setCellRenderer(new ComboRenderer(_displayItems, _underlyingValues));
-        tableColumn.setCellEditor(new ComboEditor(_displayItems, _underlyingValues));
-        tableColumn.setMinWidth(_columnWidth);
+        setComboRenderer(column, _displayItems, _underlyingValues, _columnWidth);
+    }
+    
+    /**
+     *	Sets a Check box renderer for the specified column.
+     *@param _column - name ofthe column for which check box rendering is needed.
+     */
+    public void setCheckBoxRenderer(String _column) throws SQLException{
+    	int column = rowset.getColumnIndex(_column) - 1;
+    	setCheckBoxRenderer(column);
+    }
+    
+    /**
+     *	Sets a Check box renderer for the specified column.
+     *@param _column - column number for which check box rendering is needed.
+     */
+    public void setCheckBoxRenderer(int _column) throws SQLException{
+    	TableColumnModel columnModel = getColumnModel();
+    	TableColumn tableColumn = columnModel.getColumn(_column);
+    	tableColumn.setCellRenderer(new CheckBoxRenderer());
+    	tableColumn.setCellEditor(new CheckBoxEditor());
     }
 
 
@@ -855,6 +869,87 @@ public class SSDataGrid extends JTable {
         }
     }
 
+	// CHECK BOX RENDERER FOR COLUMNS.
+	private class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
+		
+		public CheckBoxRenderer(){
+			super();
+		}
+		
+		public Component getTableCellRendererComponent(JTable _table, Object _value,
+            boolean _selected, boolean _hasFocus, int _row, int _column){
+            	
+            if(_value instanceof Boolean){
+            	if(((Boolean)_value).booleanValue()){
+            		this.setSelected(true);
+            	}
+            	else{
+            		this.setSelected(false);
+            	}
+            }
+            else if(_value instanceof Integer){
+            	if( ((Integer)_value).intValue() != 0){
+            		this.setSelected(true);
+            	}
+            	else{
+            		this.setSelected(false);
+            	}
+            }
+            else{
+            	System.out.println("Can't set check box value. Unknown data type.");
+            	System.out.println("Column type should be Boolean or Integer for check box columns.");
+            }
+            
+            return this;
+        }
+        
+    }
+    
+    
+    private class CheckBoxEditor extends DefaultCellEditor{
+    	public CheckBoxEditor(){
+    		super(new JCheckBox());
+    	}
+    	
+    	public Component getTableCellEditorComponent(JTable _table, Object _value,
+            boolean _selected, int _row, int _column) {
+
+			JCheckBox checkBox = (JCheckBox)getComponent();
+			
+            if(_value instanceof Boolean){
+            	if(((Boolean)_value).booleanValue()){
+            		checkBox.setSelected(true);
+            	}
+            	else{
+            		checkBox.setSelected(false);
+            	}
+            }
+            else if(_value instanceof Integer){
+            	if( ((Integer)_value).intValue() != 0){
+            		checkBox.setSelected(true);
+            	}
+            	else{
+            		checkBox.setSelected(false);
+            	}
+            }
+            else{
+            	System.out.println("Can't set check box value. Unknown data type.");
+            	System.out.println("Column type should be Boolean or Integer for check box columns.");
+            }
+
+            
+            return checkBox;
+        }
+
+        public Object getCellEditorValue() {
+            if(((JCheckBox)getComponent()).isSelected()){
+            	return new Boolean(true);
+            }
+            else{
+            	return new Boolean(false);
+            }
+        }
+    }
     // DATE RENDERER CLASS FOR RENDERER DATE COLUMNS.
     // DISPLAYS THE DATE IN MM/DD/YYYY FORMAT.
     private class DateRenderer extends DefaultTableCellRenderer {
@@ -982,6 +1077,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.18  2004/11/11 14:45:33  yoda2
+ * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
+ *
  * Revision 1.17  2004/11/01 15:53:30  yoda2
  * Fixed various JavaDoc errors.
  *
