@@ -53,8 +53,12 @@ import javax.swing.event.*;
  * database column, a checked SSDBCheckBox returns a '1' to the database and
  * an uncheck SSDBCheckBox will returns a '0'.  In the future an option may be
  * added to allow the user to specify the values returned for the checked and
- *  unchecked checkbox states.
+ * unchecked checkbox states.
  *</pre><p>
+ *
+ * @deprecated
+ * @see SSCheckBox
+ *
  * @author  $Author$
  * @version $Revision$
  */
@@ -371,6 +375,9 @@ public class SSDBCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.10  2004/11/11 14:45:48  yoda2
+ * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
+ *
  * Revision 1.9  2004/11/10 22:45:50  dags
  * Added support for boolean bound column. Tested only in postgresql.
  *
