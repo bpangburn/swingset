@@ -70,6 +70,23 @@ package com.nqadmin.swingSet;
  * @version	$Revision$
  */
 public interface SSDBNav {
+	
+	/**
+	 *	Constant indicating the navigation button next.
+	 */
+	public static final int NAVIGATION_NEXT      = 1;
+	/**
+	 *	Constant indicating the navigation button previous.
+	 */
+	public static final int NAVIGATION_PREVIOUS  = 2;
+	/**
+	 *	Constant indicating the navigation button first.
+	 */
+	public static final int NAVIGATION_FIRST     = 3; 
+	/**
+	 *	Constant indicating the navigation button last.
+	 */
+	public static final int NAVIGATION_LAST      = 4;  
 
 	/**
 	 * if the user intends to perform some actions before insertin the row this function should be used
@@ -83,12 +100,19 @@ public interface SSDBNav {
 	 *to get notiifcation when a row is inserted.
 	 */
 	public void performPostInsertOps();
+	
+	/**
+	 *	This function is called when the user is on the insert row and cancels the insert
+	 *by clicking on the undo button.
+	 *
+	 */
+	 public void performCancelOps();
 
 	/**
 	 * The user should perform the pre deletion operations using this function.
 	 *
 	 *	Rowset does not provide any notifications before the deletion of a row. but a notification
-	 *will be receied after the deletion if you have listener for the rowset.
+	 *will be received after the deletion if you have listener for the rowset.
 	 */
 	public void performPreDeletionOps();
 
@@ -98,6 +122,21 @@ public interface SSDBNav {
 	 *	The rowset listener also provides the notification after the deletion of the row.
 	 */
 	public void performPostDeletionOps();
+	
+	/**
+	 *	This function is called when ever navigation takes place.
+	 *@param _navigationType this indicates the type of navigation.
+	 *Possible values are NAVIGATION_NEXT, NAVIGATION_PREVIOUS, NAVIGATION_FIRST,
+	 *	NAVIGATION_LAST.
+	 */
+	 public void performNavigationOps(int navigationType);
+	 
+	 /**
+	  *	This function is called when the user what to refresh the information.
+	  *(When the user presses the refresh button on the navigator.
+	  */
+	  public void performRefreshOps();
+	  
 
 }
 
@@ -105,6 +144,9 @@ public interface SSDBNav {
 
 /*
  * $Log$
+ * Revision 1.2  2003/09/25 14:27:45  yoda2
+ * Removed unused Import statements and added preformatting tags to JavaDoc descriptions.
+ *
  * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
  * Initial CVS import for SwingSet.
  *

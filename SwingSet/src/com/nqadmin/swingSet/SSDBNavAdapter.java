@@ -51,7 +51,7 @@ package com.nqadmin.swingSet;
  * @author	$Author$
  * @version	$Revision$
  */
-public abstract class SSDBNavAdapter implements SSDBNav {
+public class SSDBNavAdapter implements SSDBNav {
 
 	public void performPreInsertOps(){
 	}
@@ -64,6 +64,14 @@ public abstract class SSDBNavAdapter implements SSDBNav {
 
 	public void performPostDeletionOps(){
 	}
+	
+	public void performNavigationOps(int _navigationType){
+	}
+	
+	public void performRefreshOps(){
+	}
+	public void performCancelOps(){
+	}
 
 }
 
@@ -71,6 +79,9 @@ public abstract class SSDBNavAdapter implements SSDBNav {
 
 /*
  * $Log$
+ * Revision 1.2  2003/09/25 14:27:45  yoda2
+ * Removed unused Import statements and added preformatting tags to JavaDoc descriptions.
+ *
  * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
  * Initial CVS import for SwingSet.
  *
