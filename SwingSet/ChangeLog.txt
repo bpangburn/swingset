@@ -5,6 +5,83 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 $Id$
 
 ==============================================================================
+SwingSet 0.8.0-beta - Released 08-3-2004
+==============================================================================
+
+Changes:
+	Classes or Interfaces added in SwingSet-0.6.0:
+		1. SSTableKeyAdapter.
+		
+		
+	SSCellEditingAdapter:
+		1. Implements Serializable.
+	
+	SSComboBox:
+		1. Made all the variables protected.
+		2. Added getColumnName function. This function returns the column name to 
+		   which the combobox is bound to.
+		3. Added getRowSet function. This function returns the rowset being used
+		   for binding.
+		4. Added setColumnName function. This function sets the column name to which
+		   the combobox has to be bound.
+		5. Added setRowSet function. This function sets the rowset to be used for 
+		   binding to the specified column.
+		6. Added setSelectedValue function. This function sets the value of the combobox
+		   to the specified value. (Item displayed will be the one corresponding to the
+		   given value, the bound column value will also change).
+		7. Added addComponent and removeListener functions. These are private functions.
+		8. The inner classes for listeners also implement Serializable interface.
+		
+	SSDataGrid:
+		1. Added functions getSelectedColumns and getSelectedColumnCount. Overriding 
+		   the methods in JTable. This is needed to avoid the hidden columns being selected.
+		   This is needed for copy and paste support.
+		2. Added copy and paste support for the SSDataGrid, this is achieved with the help
+		   of SSTableKeyAdapter.
+	
+	SSDataNavigator:
+		1. Added getXXX functions for rowset, button size, modification, deletion, insertion,
+		   confirm deletes.
+		2. Added rowCount and currentRow variables to keep track of current row number and
+		   total number of rows in the current rowset.
+		3. Added a text field and a label to the navigator to display the total number of
+		   rows and current record number.
+		  
+	SSDBCheckBox:
+		1. Added a new constructor which takes a rowset and column name as arguments.
+		2. Added  bind function which takes a rowset and column name as arguments.
+		3. Added getColumnName function. This function returns the column name to which
+		   the check box is bound to.
+		4. setTextField, getTextField functions are deprecated, also the constructor
+		   that takes a TextField as an argument is also deprecated
+		5. Added key listener to transfer focus when enter key is pressed.
+		
+	SSDBComboBox:
+		1. setTextField function is deprecated.
+		2. Added setSelectedValue function. This function sets the selected item to the 
+		   one corresponding to the specified value.
+		3. Added key listener to transfer focus when enter key is pressed.
+		4. Removing items from combo before adding new items.
+	
+	SSDBNavAdapter:
+		1. Implements Serializable.
+		
+	SSTableKeyAdapter:
+		1. This class added a key listener to the JTable and provides copy and paste support 
+		   for the given JTable.
+		   
+	SSTableModel:
+		1. Made all the variables protected.
+	
+	SSTextDocument:
+		1. Added setColumnName, setColumnIndex, and setRowSet functions.
+		2. Added getColumnName, getColumnIndex, and getRowSet functions.
+		3. Added bind function so find the text field to a column in the rowset.
+                4. Added tranfer focus in the key listener. Focus will be tranferred to next
+		   component when enter key is pressed.
+	
+
+==============================================================================
 SwingSet 0.7.0-beta - Released 02-23-2004
 ==============================================================================
 
