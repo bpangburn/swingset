@@ -43,6 +43,7 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.beans.VetoableChangeListener;
+import java.beans.PropertyVetoException;
  
 /**
  * SSConnection.java
@@ -292,6 +293,9 @@ import java.beans.VetoableChangeListener;
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/11 20:16:27  yoda2
+ * Added infrastructure to support property & vetoable change listeners (for beans).
+ *
  * Revision 1.6  2005/02/10 20:13:20  yoda2
  * Setter/getter cleanup & method reordering for consistency.
  *

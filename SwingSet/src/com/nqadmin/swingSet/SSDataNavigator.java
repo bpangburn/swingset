@@ -44,6 +44,7 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.beans.VetoableChangeListener;
+import java.beans.PropertyVetoException;
 
 /**
  * SSDataNavigator.java
@@ -1199,6 +1200,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.31  2005/02/11 20:16:04  yoda2
+ * Added infrastructure to support property & vetoable change listeners (for beans).
+ *
  * Revision 1.30  2005/02/10 20:13:00  yoda2
  * Setter/getter cleanup & method reordering for consistency.
  *

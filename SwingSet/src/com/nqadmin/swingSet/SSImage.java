@@ -56,6 +56,7 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.beans.VetoableChangeListener;
+import java.beans.PropertyVetoException;
 
 /**
  * SSImage.java
@@ -91,12 +92,12 @@ import java.beans.VetoableChangeListener;
     /**
      * SSRowSet column to which the component will be bound.
      */
-    protected String columnName;
+    protected String columnName = "";
     
     /**
      * The preferred size of the image component.
      */
-    protected Dimension preferredSize;
+    protected Dimension preferredSize = new Dimension(200,200);
     
     /**
      * RowSet listener
@@ -288,10 +289,10 @@ import java.beans.VetoableChangeListener;
     protected void init() {
 
         // ADD UPDATE BUTTON LISTENER
-            btnUpdateImage.addActionListener(new ActionListener(){
-                public void actionPerformed(ActionEvent ae){
+            btnUpdateImage.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
                     try{
-                        if(sSRowSet != null){
+                        if (sSRowSet != null) {
                             FileInputStream inStream = null;
                             File inFile = null;
                             JFileChooser fileChooser = new JFileChooser();
@@ -314,8 +315,7 @@ import java.beans.VetoableChangeListener;
                                 lblImage.setIcon(img);
                                 lblImage.setText("");
                                 updateUI();
-                            }
-                            else{
+                            } else {
                                 return;
                             }
                         }
@@ -328,7 +328,7 @@ import java.beans.VetoableChangeListener;
             });
 
         // SET PREFERRED DIMENSIONS
-            setPreferredSize(new Dimension(200,200));
+            setPreferredSize(preferredSize);
 
         // ADD LABEL & BUTTON TO PANEL
             addComponents();
@@ -434,6 +434,9 @@ import java.beans.VetoableChangeListener;
 
 /*
  *$Log$
+ *Revision 1.8  2005/02/11 20:16:05  yoda2
+ *Added infrastructure to support property & vetoable change listeners (for beans).
+ *
  *Revision 1.7  2005/02/10 20:13:02  yoda2
  *Setter/getter cleanup & method reordering for consistency.
  *

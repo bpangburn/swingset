@@ -49,6 +49,7 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.beans.VetoableChangeListener;
+import java.beans.PropertyVetoException;
 
 /**
  * SSDataGrid.java
@@ -176,7 +177,7 @@ public class SSDataGrid extends JTable {
     /**
      * The preferred size of the scroll pane in which the JTable is embedded.
      */
-    protected Dimension preferredSize;
+    protected Dimension preferredSize = new Dimension(200, 200);
 
     /**
      * Array used to store the column numbers that have to be hidden.
@@ -1298,6 +1299,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.27  2005/02/11 20:16:02  yoda2
+ * Added infrastructure to support property & vetoable change listeners (for beans).
+ *
  * Revision 1.26  2005/02/10 20:13:00  yoda2
  * Setter/getter cleanup & method reordering for consistency.
  *

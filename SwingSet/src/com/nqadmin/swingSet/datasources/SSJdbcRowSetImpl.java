@@ -45,6 +45,7 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.beans.VetoableChangeListener;
+import java.beans.PropertyVetoException;
  
 /**
  * SSJdbcRowSetImpl.java
@@ -942,6 +943,9 @@ import java.beans.VetoableChangeListener;
 }
  /*
   * $Log$
+  * Revision 1.11  2005/02/11 20:16:31  yoda2
+  * Added infrastructure to support property & vetoable change listeners (for beans).
+  *
   * Revision 1.10  2005/02/10 15:53:09  yoda2
   * Added class descriptions to JavaDoc.
   *

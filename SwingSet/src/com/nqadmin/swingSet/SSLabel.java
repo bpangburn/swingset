@@ -47,6 +47,7 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.beans.VetoableChangeListener;
+import java.beans.PropertyVetoException;
 
 /**
  * SSLabel.java
@@ -73,7 +74,7 @@ public class SSLabel extends JLabel {
     /**
      * SSRowSet column to which the component will be bound.
      */
-    protected String columnName;
+    protected String columnName = "";
 
     /**
      * Component listener.
@@ -341,6 +342,9 @@ public class SSLabel extends JLabel {
 
 /*
  * $Log$
+ * Revision 1.12  2005/02/11 20:16:05  yoda2
+ * Added infrastructure to support property & vetoable change listeners (for beans).
+ *
  * Revision 1.11  2005/02/10 21:10:23  yoda2
  * Added default label text to empty constructor so that label will be visible in BDK.
  *

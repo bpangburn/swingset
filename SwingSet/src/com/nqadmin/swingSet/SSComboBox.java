@@ -47,6 +47,7 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.beans.VetoableChangeListener;
+import java.beans.PropertyVetoException;
 
 /**
  * SSComboBox.java
@@ -128,7 +129,7 @@ public class SSComboBox extends JComboBox {
     /**
      * SSRowSet column to which the component will be bound.
      */
-    protected String columnName;
+    protected String columnName = "";
     
     /**
      * Options to be displayed in combo box.
@@ -288,7 +289,9 @@ public class SSComboBox extends JComboBox {
      *    is bound
      */
     public void setColumnName(String _columnName) {
+        String oldValue = columnName;
         columnName = _columnName;
+        pChangeSupport.firePropertyChange("columnName", oldValue, columnName);
         bind();
     }    
 
@@ -307,9 +310,11 @@ public class SSComboBox extends JComboBox {
      * @param _sSRowSet    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _sSRowSet) {
+        SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
+        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
         bind();
-    }    
+    }     
 
     /**
      * Returns the SSRowSet being used to get the values.
@@ -327,11 +332,14 @@ public class SSComboBox extends JComboBox {
      * @param _mappings    an array of values that correspond to those in the combo box.
      */
     public void setMappings(int[] _mappings) {
+        int[] oldValue = (int[])_mappings.clone();
+        mappings = (int[])_mappings.clone();
+        pChangeSupport.firePropertyChange("mappings", oldValue, mappings);
         // INITIALIZE THE ARRAY AND COPY THE MAPPING VALUES
-        mappings = new int[_mappings.length];
-        for (int i=0;i<_mappings.length;i++) {
-            mappings[i] = _mappings[i];
-        }
+        //mappings = new int[_mappings.length];
+        //for (int i=0;i<_mappings.length;i++) {
+        //    mappings[i] = _mappings[i];
+        //}
     }
     
     /**
@@ -349,9 +357,10 @@ public class SSComboBox extends JComboBox {
      *
      * @param _options    the list of options that you want to appear in the combo box.
      */
-    public boolean setOptions(String[] _options) {
-        // UPDATE OPTIONS VARIABLE
-            options = _options;
+    public void setOptions(String[] _options) {
+        String[] oldValue = (String[])_options.clone();
+        options = (String[])_options.clone();
+        pChangeSupport.firePropertyChange("options", oldValue, options);
             
         // ADD THE SPECIFIED ITEMS TO THE COMBO BOX
         // REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
@@ -362,8 +371,6 @@ public class SSComboBox extends JComboBox {
             for (int i=0;i<_options.length;i++) {
                 addItem(_options[i]);
             }
-        // INDICATE SUCCESS
-            return true;
     }
 
     /**
@@ -392,24 +399,32 @@ public class SSComboBox extends JComboBox {
             return false;
         }
         
-        options = _options;
+        setOptions(_options);
+        
+        setMappings(_mappings);
+        
+        return true;
+        
+        //options = _options;
+        //options = (int[])_options.clone();
         
         // REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
         // THE DISPLAYED ITEMS
-        if (getItemCount() != 0) {
-            removeAllItems();
-        }
+        //if (getItemCount() != 0) {
+        //    removeAllItems();
+        //}
         // ADD THE ITEMS TO THE COMBOBOX
-        for (int i=0;i<_options.length;i++) {
-            addItem(_options[i]);
-        }
+        //for (int i=0;i<_options.length;i++) {
+        //    addItem(_options[i]);
+        //}
         // COPY THE MAPPING VALUES
-        mappings = new int[_mappings.length];
-        for (int i=0;i<_mappings.length;i++) {
-            mappings[i] = _mappings[i];
-        }
+        //mappings = new int[_mappings.length];
+        //for (int i=0;i<_mappings.length;i++) {
+        //    mappings[i] = _mappings[i];
+        //}
+        //mappings = (int[])_mappings.clone();
 
-        return true;
+        //return true;
     }
 
     /**
@@ -419,6 +434,25 @@ public class SSComboBox extends JComboBox {
      * @param _predefinedOptions predefined options to be displayed in the combo box.
      */
     public boolean setPredefinedOptions(int _predefinedOptions) {
+        int oldValue = predefinedOptions;
+        
+        if (_predefinedOptions == YES_NO_OPTION) {
+            setOptions(new String[]{"No", "Yes"});
+        } else if (_predefinedOptions == SEX_OPTION || _predefinedOptions == GENDER_OPTION) {
+            setOptions(new String[]{"Male", "Female", "Unisex"}); 
+        } else if (_predefinedOptions == INCLUDE_EXCLUDE_OPTION) {
+            setOptions(new String[]{"Include", "Exclude"});
+        } else {
+            return false;
+        }
+        
+        predefinedOptions = _predefinedOptions;
+        pChangeSupport.firePropertyChange("predefinedOptions", oldValue, predefinedOptions);
+        
+        return true;
+    
+    
+/*
         
         if (getItemCount() != 0) {
             removeAllItems();
@@ -443,6 +477,7 @@ public class SSComboBox extends JComboBox {
         predefinedOptions = _predefinedOptions;
 
         return true;
+*/        
     }
     
     /**
@@ -462,8 +497,14 @@ public class SSComboBox extends JComboBox {
      * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _sSRowSet, String _columnName) {
+        SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
+        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        
+        String oldValue2 = columnName;
         columnName = _columnName;
+        pChangeSupport.firePropertyChange("columnName", oldValue2, columnName);
+        
         bind();
     }
     
@@ -734,8 +775,8 @@ public class SSComboBox extends JComboBox {
      * @see #setOptions     
      */
     public boolean setOption(String[] _options) {
-        return setOptions(_options);
-        
+        setOptions(_options);
+        return true;
     }
     
     /**
@@ -765,7 +806,7 @@ public class SSComboBox extends JComboBox {
      * @see #setPredefinedOptions
      * @see #setMappings    
      */
-    public void setOption(int _options, int[]_mappings) {
+    public void setOption(int _options, int[]_mappings) throws PropertyVetoException {
         setPredefinedOptions(_options);
         setMappings(_mappings);
     }
@@ -802,6 +843,9 @@ public class SSComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.31  2005/02/11 20:15:58  yoda2
+ * Added infrastructure to support property & vetoable change listeners (for beans).
+ *
  * Revision 1.30  2005/02/10 20:12:54  yoda2
  * Setter/getter cleanup & method reordering for consistency.
  *

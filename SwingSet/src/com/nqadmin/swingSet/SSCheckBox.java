@@ -45,6 +45,7 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.beans.VetoableChangeListener;
+import java.beans.PropertyVetoException;
 
 /**
  * SSCheckBox.java
@@ -79,7 +80,7 @@ public class SSCheckBox extends JCheckBox {
     /**
      * SSRowSet column to which the component will be bound.
      */
-    protected String columnName;
+    protected String columnName = "";
 
     /**
      * Column SQL data type.
@@ -190,7 +191,9 @@ public class SSCheckBox extends JCheckBox {
      *    is bound
      */
     public void setColumnName(String _columnName) throws java.sql.SQLException {
+        String oldValue = columnName;
         columnName = _columnName;
+        pChangeSupport.firePropertyChange("columnName", oldValue, columnName);
         bind();
     }    
     
@@ -209,7 +212,9 @@ public class SSCheckBox extends JCheckBox {
      * @param _sSRowSet    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _sSRowSet) throws java.sql.SQLException {
+        SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
+        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
         bind();
     }     
     
@@ -229,8 +234,14 @@ public class SSCheckBox extends JCheckBox {
      * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _sSRowSet, String _columnName) throws java.sql.SQLException {
+        SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
+        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        
+        String oldValue2 = columnName;
         columnName = _columnName;
+        pChangeSupport.firePropertyChange("columnName", oldValue2, columnName);
+        
         bind();
     }
     
@@ -443,6 +454,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.12  2005/02/11 20:15:57  yoda2
+ * Added infrastructure to support property & vetoable change listeners (for beans).
+ *
  * Revision 1.11  2005/02/10 20:12:36  yoda2
  * Setter/getter cleanup & method reordering for consistency.
  *

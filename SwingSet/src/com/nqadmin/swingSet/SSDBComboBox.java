@@ -49,6 +49,7 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.beans.VetoableChangeListener;
+import java.beans.PropertyVetoException;
 
 /**
  * SSDBComboBox.java
@@ -1167,6 +1168,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.26  2005/02/11 20:16:01  yoda2
+ * Added infrastructure to support property & vetoable change listeners (for beans).
+ *
  * Revision 1.25  2005/02/10 20:12:57  yoda2
  * Setter/getter cleanup & method reordering for consistency.
  *

@@ -40,6 +40,7 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.beans.VetoableChangeListener;
+import java.beans.PropertyVetoException;
 
 /**
  * SSTextArea.java
@@ -61,7 +62,7 @@ public class SSTextArea extends JTextArea {
     /**
      * SSRowSet column to which the component will be bound.
      */
-    protected String columnName;
+    protected String columnName = "";
     
 	/**
 	 * Convenience class for providing the property change listener support
@@ -228,6 +229,9 @@ public class SSTextArea extends JTextArea {
 
 /*
  * $Log$
+ * Revision 1.10  2005/02/11 20:16:06  yoda2
+ * Added infrastructure to support property & vetoable change listeners (for beans).
+ *
  * Revision 1.9  2005/02/10 20:13:03  yoda2
  * Setter/getter cleanup & method reordering for consistency.
  *
