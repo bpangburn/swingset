@@ -54,43 +54,49 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
 public class SSTextField extends JTextField {
 
     /**
-     * use this mask if mm/dd/yyyy format is required.
+     * Use this mask if mm/dd/yyyy format is required.
      */
     public static final int MMDDYYYY = 1;
 
     /**
-     * use this mask if mm/dd/yyyy format is required.
+     * Use this mask if mm/dd/yyyy format is required.
      */
     public static final int DDMMYYYY = 2;
 
     /**
-     * use this if the text field contains SSN
+     * Use this if the text field contains SSN
      */
     public static final int SSN = 3;
 
     /**
-     * use this if the text field contains decimal number and want to limit
+     * Use this if the text field contains decimal number and want to limit
      * number of decimal places.
      */
     public static final int DECIMAL = 4;
     
-    // SSROWSET FROM WHICH THE LABEL WILL GET/SET VALUES
+    /**
+     * SSRowSet from which component will get/set values.
+     */
     protected SSRowSet rowset;
 
-    // BINDING INFORMATION
+    /**
+     * SSRowSet column to which the component will be bound.
+     */
     protected String columnName;
 
-    // TYPE OF MASK TO BE USED FOR THIS TEXTFIELD
+    /**
+     * Type of mask to be used for text field (default = none).
+     */
     protected int mask = 0;
 
-    // NUMBER OF DECIMALS REQUIRED
+    /**
+     * Default number of decimals to show for float, double, etc.
+     */
     protected int numDecimals = 2;
 
 
     /**
-     * Constructs a new TextField with the specified mask and initialized
-     * with given text. A default model is created, the initial string is
-     * null, and the number of columns is set to 0.
+     * Constructs a new text field with the specified text & mask.
      *
      * @param _text    the text to be displayed.
      * @param _mask    the mask required for this textfield.
@@ -102,10 +108,9 @@ public class SSTextField extends JTextField {
     }
 
     /**
-     * Constructs a new TextField with the specified mask. A default model
-     * is created, the initial string is null, and the number of columns
-     * is set to 0.
-     *   the mask required for this textfield.
+     * Constructs a new, empty text field with the specified mask.
+     *
+     * @param _mask the mask required for this textfield.
      */
     public SSTextField(int _mask) {
         super();
@@ -114,26 +119,15 @@ public class SSTextField extends JTextField {
     }
 
     /**
-     * Constructs a new TextField. A default model is created, the initial
-     * string is null, and the number of columns is set to 0.
+     * Constructs a new, empty text field.
      */
     public SSTextField() {
         init();
     }
-
+    
     /**
-     * Sets the mask for this textfield to _mask.
-     *
-     * @param _mask    the mask required for this textfield.
-     */
-     public void setMask(int _mask){
-        mask = _mask;
-        init();
-     }
-
-    /**
-     * Sets the mask for this textfield to _mask.
-     * Use this constructor only if you are using a decimal mask.
+     * Constructs a new, empty text field with the specified mask & number of
+     * decimal places. Use this constructor only if you are using a decimal mask.
      *
      * @param _mask    the mask required for this textfield.
      * @param _numDecimals    number of decimal places required
@@ -145,10 +139,12 @@ public class SSTextField extends JTextField {
      }
 
     /**
-     * Sets the mask for this textfield to _mask and aligns the text as specified
+     * Constructs a new, empty text field with the specified mask, number of
+     * decimal places, & alignment. Use this constructor only if you are using
+     * a decimal mask.
      *<pre>
      * (Horizontal alignment).
-     * Valid keys are:
+     * Valid aligmnets are:
      *  JTextField.LEFT
      *  JTextField.CENTER
      *  JTextField.RIGHT
@@ -157,9 +153,9 @@ public class SSTextField extends JTextField {
      *
      * Use this constructor only if you are using a decimal mask.
      *</pre>
-     * @param _mask    the mask required for this textfield.
+     * @param _mask    the mask required for this text field.
      * @param _numDecimals    number of decimal places required
-     * @param _align    alignment required. Valid values are JTextField
+     * @param _align    alignment required
      */
      public SSTextField(int _mask, int _numDecimals, int _align) {
         mask = _mask;
@@ -169,17 +165,28 @@ public class SSTextField extends JTextField {
      }
      
     /**
-     * Creates a text box and binds it to the specified SSRowSet column.
+     * Creates a SSTextField instance and binds it to the specified
+     * SSRowSet column.
      *
      * @param _rowset    datasource to be used.
-     * @param _columnName    name of the column to which this text box should be bound
+     * @param _columnName    name of the column to which this label should be bound
      */
     public SSTextField(SSRowSet _rowset, String _columnName) {
 		rowset = _rowset;
         columnName = _columnName;
         init();
         bind();
-    }
+    }     
+
+    /**
+     * Sets the text field mask.
+     *
+     * @param _mask    the mask required for this text field.
+     */
+     public void setMask(int _mask){
+        mask = _mask;
+        init();
+     }
 
     /**
      * Initialization code.
@@ -227,28 +234,28 @@ public class SSTextField extends JTextField {
      } // end protected void init() {
 
     /**
-     * Returns the column name to which the text area is bound.
+     * Returns the SSRowSet column name to which the component is bound.
      *
-     * @return returns the column name to which to text area is bound.
+     * @return column name to which the component is bound
      */
     public String getColumnName() {
         return columnName;
     }
 
     /**
-     * Returns the SSRowSet being used to get the values.
+     * Returns the SSRowSet to which the component is bound.
      *
-     * @return returns the SSRowSet being used.
+     * @return SSRowSet to which the component is bound
      */
     public SSRowSet getSSRowSet() {
         return rowset;
     }
 
     /**
-     * Sets the column name to which the text area has to be bound
+     * Sets the SSRowSet column name to which the component is bound.
      *
-     * @param _columnName    column name in the SSRowSet to which the text area
-     *    is bound.
+     * @param _columnName    column name in the SSRowSet to which the component
+     *    is bound
      */
     public void setColumnName(String _columnName) {
         columnName = _columnName;
@@ -256,9 +263,9 @@ public class SSTextField extends JTextField {
     }
 
     /**
-     * Sets the SSRowSet to be used.
+     * Sets the SSRowSet to which the component is bound.
      *
-     * @param _rowset    SSRowSet to be used for getting the values.
+     * @param _rowset    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _rowset) {
         rowset = _rowset;
@@ -266,9 +273,7 @@ public class SSTextField extends JTextField {
     }
 
     /**
-     * The column name and the SSRowSet should be set before calling this function.
-     * If the column name and SSRowSet are set seperately then this function has to
-     * be called to bind the slider to the column in the SSRowSet.
+     * Method for handling binding of component to a SSRowSet column.
      */
     protected void bind() {
 
@@ -289,13 +294,12 @@ public class SSTextField extends JTextField {
     }    
      
 
-     /**
-      * Binds the text field to a SSTextDocument which is in turn bound to
-      * a particular column in a SSRowSet.
-      *
-      * @param _rowset  SSRowSet containing column to bind to
-      * @param _columnName  name of column within SSRowSet to bind to
-      */
+    /**
+     * Sets the SSRowSet and column name to which the component is to be bound.
+     *
+     * @param _rowset    datasource to be used.
+     * @param _columnName    Name of the column to which this check box should be bound
+     */
      public void bind(SSRowSet _rowset, String _columnName) {
         rowset = _rowset;
         columnName = _columnName;
@@ -316,32 +320,30 @@ public class SSTextField extends JTextField {
      /**
       * Function to manage keystrokes for masks.
       *
-      * @param ke    the KeyEvent that occured
+      * @param _ke    the KeyEvent that occured
       */
-     protected void mask(KeyEvent ke) {
+     protected void mask(KeyEvent _ke) {
          // DECLARATIONS
             String str = getText();
-            char ch = ke.getKeyChar();
+            char ch = _ke.getKeyChar();
 
          // IF THE KEY PRESSED IS ANY OF THE FOLLOWING DO NOTHING
-            if (ke.getKeyCode() == KeyEvent.VK_BACK_SPACE  ||
-                    ke.getKeyCode() == KeyEvent.VK_DELETE  ||
-                    ke.getKeyCode() == KeyEvent.VK_END     ||
-                    ke.getKeyCode() == KeyEvent.VK_ENTER   ||
-                    ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            if (_ke.getKeyCode() == KeyEvent.VK_BACK_SPACE  ||
+                    _ke.getKeyCode() == KeyEvent.VK_DELETE  ||
+                    _ke.getKeyCode() == KeyEvent.VK_END     ||
+                    _ke.getKeyCode() == KeyEvent.VK_ENTER   ||
+                    _ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
     
                 return;
-            }
-            else if( (ke.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) == KeyEvent.CTRL_DOWN_MASK ||
-                     (ke.getModifiersEx() & KeyEvent.ALT_DOWN_MASK)  == KeyEvent.ALT_DOWN_MASK    ){
+            } else if ( (_ke.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) == KeyEvent.CTRL_DOWN_MASK ||
+                     (_ke.getModifiersEx() & KeyEvent.ALT_DOWN_MASK)  == KeyEvent.ALT_DOWN_MASK    ) {
     
                 return;
-            }
-            else if(!Character.isDefined(ch)){
+            } else if(!Character.isDefined(ch)) {
                 return;
             }
     
-            if(getSelectionStart() != getSelectionEnd()){
+            if (getSelectionStart() != getSelectionEnd()) {
                 str = str.substring(0,getSelectionStart())
                     + str.substring(getSelectionEnd(), str.length());
             }
@@ -351,101 +353,101 @@ public class SSTextField extends JTextField {
             switch(mask) {
                 case MMDDYYYY:
                 case DDMMYYYY:
-                    if(getCaretPosition() < str.length()){
+                    if (getCaretPosition() < str.length()) {
                         return;
                     }
-                    setText(dateMask(str, ke));
+                    setText(dateMask(str, _ke));
                     break;
                 case SSN:
-                    setText(ssnMask(str,ke));
+                    setText(ssnMask(str, _ke));
                     break;
                 case DECIMAL:
-                    setText(decimalMask(str,numDecimals));
+                    setText(decimalMask(str, numDecimals));
                     break;
             } // end switch
             
-     } // end protected void mask(KeyEvent ke) {
+     } // end protected void mask(KeyEvent _ke) {
 
      /**
-      * Function to manage formatting date strings with slashes as the user types
-      * to format date string.
+      * Function to manage formatting date _strings with slashes as the user types
+      * to format date _string.
       *
-      * @param str    the present string in the text field.
-      * @param ke    the KeyEvent that occured
+      * @param _str    the present string in the text field.
+      * @param _ke    the KeyEvent that occured
       *
       * @return returns the formated string.
       */
-     protected String dateMask(String str, KeyEvent ke) {
-        switch(str.length()) {
+     protected String dateMask(String _str, KeyEvent _ke) {
+        switch(_str.length()) {
             case 1:
-                if (ke.getKeyChar() == '/') {
-                    str =  "0" + str ;
+                if (_ke.getKeyChar() == '/') {
+                    _str =  "0" + _str ;
                 }
                 break;
             case 2:
-                if ( ke.getKeyChar() == '/' ) {
+                if ( _ke.getKeyChar() == '/' ) {
                     // do nothing
                 } else {
-                    str = str +  "/";
+                    _str = _str +  "/";
                 }
                 break;
             case 4:
-                if ( ke.getKeyChar() == '/' ){
-                    String newStr = str.substring(0,3);
-                    newStr = newStr + "0" + str.substring(3,4);
-                    str = newStr;
+                if ( _ke.getKeyChar() == '/' ){
+                    String newStr = _str.substring(0,3);
+                    newStr = newStr + "0" + _str.substring(3,4);
+                    _str = newStr;
                 }
                 break;
             case 5:
-                if ( ke.getKeyChar() != '/' ) {
-                    str = str + "/";
+                if ( _ke.getKeyChar() != '/' ) {
+                    _str = _str + "/";
                 }
                 break;
         } // end switch
 
-        return str;
+        return _str;
 
-    } // end protected String dateMask(String str, KeyEvent ke) {
+    } // end protected String dateMask(String _str, KeyEvent _ke) {
 
     /**
-     * Fucntion to format SSN
+     * Function to format SSN
      *
-     * @param str    the present string in the text field.
-     * @param ke    the KeyEvent that occured
+     * @param _str    the present string in the text field.
+     * @param _ke    the KeyEvent that occured
      *
      * @return returns the formated string.
      */
-    protected String ssnMask(String str, KeyEvent ke) {
-        switch(str.length()) {
+    protected String ssnMask(String _str, KeyEvent _ke) {
+        switch(_str.length()) {
             case 3:
             case 6:
-                str = str + "-";
+                _str = _str + "-";
                 break;
             case 5:
             case 8:
-                if (ke.getKeyChar() == '-') {
-                    str = str.substring(0,str.length()-1);
+                if (_ke.getKeyChar() == '-') {
+                    _str = _str.substring(0,_str.length()-1);
                 }
                 break;
         }
 
-        return str;
+        return _str;
 
     }
 
     /**
      * Function to modify the text for a decimal number as needed.
      *
-     * @param str    the present string in the text field.
+     * @param _str    the present string in the text field.
      * @param numDecimals    number of decimal places allowed
      *
      * @return returns the formatted string.
      */
-    protected String decimalMask(String str, int numDecimals) {
-        StringTokenizer strtok = new StringTokenizer(str,".",false);
+    protected String decimalMask(String _str, int numDecimals) {
+        StringTokenizer strtok = new StringTokenizer(_str,".",false);
         String intPart = "";
         String decimalPart = "";
-        String returnStr = str;
+        String returnStr = _str;
         //  BREAK THE STRING IN TO INTERGER AND DECIMAL PARTS
         if (strtok.hasMoreTokens()) {
             intPart = strtok.nextToken();
@@ -468,6 +470,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.15  2005/02/05 05:16:33  yoda2
+ * API cleanup.
+ *
  * Revision 1.14  2005/02/04 23:05:10  yoda2
  * no message
  *
