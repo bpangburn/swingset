@@ -65,11 +65,11 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     private JPopupMenu calculator = null;
     private JPopupMenu helper     = null;
     
-    private java.awt.Color std_color = null;
-    private String colName = null;
-    private int colType = -99;
+    private java.awt.Color std_color  = null;
+    private String columnName         = null;
+    private int colType               = -99;
     private SSDataNavigator navigator = null;
-    private SSRowSet rowset = null;
+    private SSRowSet rowset           = null;
     
     
     /** Creates a new instance of SSFormattedTextField */
@@ -130,19 +130,37 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         this.setFormatterFactory(factory);
     }
     
-    public void setColumnName(String colName) {
-        this.colName = colName;
+    public void setColumnName(String columnName) {
+        this.columnName = columnName;
         bind();
     }
     
+    public String getColumnName() {
+        return columnName;
+    }
+    
+    /**
+     *
+     * @deprecated
+     * @see setSSRowSet
+     *
+     */
     public void setRowSet(SSRowSet rowset) {
         this.rowset = rowset;
         bind();
     }
     
+    public void setSSRowSet(SSRowSet rowset) {
+        this.rowset = rowset;
+    }
+    
+    public SSRowSet getSSRowSet() {
+        return rowset;
+    }
+    
     public void setNavigator(SSDataNavigator navigator) {
         this.navigator = navigator;
-        setRowSet(navigator.getRowSet());
+        setSSRowSet(navigator.getRowSet());
         bind();
     }
     
@@ -152,10 +170,10 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     
     private void bind() {
     
-        if (colName == null || rowset  == null) return;
+        if (columnName == null || rowset  == null) return;
         
         try {
-            colType = rowset.getColumnType(colName);
+            colType = rowset.getColumnType(columnName);
         } catch(java.sql.SQLException sqe) {
             System.out.println("bind error = " + sqe);
         }
@@ -299,7 +317,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                     
                 case java.sql.Types.BIT://-7
                 case java.sql.Types.BOOLEAN://16
-                    this.setValue(new Boolean(rowset.getBoolean(colName)));
+                    this.setValue(new Boolean(rowset.getBoolean(columnName)));
                     break;
                     
                 case java.sql.Types.BLOB://2004
@@ -312,7 +330,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                     break;
                     
                 case java.sql.Types.DATE://91
-                    this.setValue(new java.util.Date(rowset.getDate(colName).getTime()));
+                    this.setValue(new java.util.Date(rowset.getDate(columnName).getTime()));
                     break;
                     
                 case java.sql.Types.DECIMAL://3
@@ -331,7 +349,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                 case java.sql.Types.BIGINT://-5
                 case java.sql.Types.SMALLINT://5
                 case java.sql.Types.TINYINT://-6
-                    this.setValue(new Integer(rowset.getInt(colName)));
+                    this.setValue(new Integer(rowset.getInt(columnName)));
                     break;
                     
                 case java.sql.Types.JAVA_OBJECT://2000
@@ -344,7 +362,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                 case java.sql.Types.VARCHAR://
                 case java.sql.Types.LONGVARCHAR://-1
                 case java.sql.Types.CHAR://1
-                    this.setValue(rowset.getString(colName));
+                    this.setValue(rowset.getString(columnName));
                     break;
                     
                 case java.sql.Types.NULL://0
@@ -472,7 +490,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
             //if (val < minValue) passed = false;
             //if (val > maxValue) passed = false;
             
-            System.out.println("inputVerifier(): " + colName);
+            System.out.println("inputVerifier(): " + columnName);
             
             //            if (aux == null) {
             //                passed = false;
@@ -507,7 +525,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                             
                         case java.sql.Types.BIT://-7
                             System.out.println("BIT - Set");
-                            rowset.updateBoolean(colName, ((Boolean)tf.getValue()).booleanValue());
+                            rowset.updateBoolean(columnName, ((Boolean)tf.getValue()).booleanValue());
                             break;
                             
                         case java.sql.Types.BLOB://2004
@@ -524,7 +542,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                             break;
                             
                         case java.sql.Types.DATE://91
-                            rowset.updateDate(colName, new java.sql.Date(((java.util.Date) aux).getTime()));
+                            rowset.updateDate(columnName, new java.sql.Date(((java.util.Date) aux).getTime()));
                             break;
                             
                         case java.sql.Types.DECIMAL://3
@@ -538,13 +556,13 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                         case java.sql.Types.DOUBLE://8
                             System.out.println("DOUBLE");
                             if (aux instanceof Double) {
-                                System.out.println("Double = colName => " + colName);
+                                System.out.println("Double = columnName => " + columnName);
                                 System.out.println("getValue() = " + aux);
-                                rowset.updateDouble(colName, ((Double)aux).intValue());
+                                rowset.updateDouble(columnName, ((Double)aux).intValue());
                             } else if (aux instanceof Float) {
-                                System.out.println("Float    = colName => " + colName);
+                                System.out.println("Float    = columnName => " + columnName);
                                 System.out.println("getValue() = " + aux);
-                                rowset.updateFloat(colName, ((Float)aux).intValue());
+                                rowset.updateFloat(columnName, ((Float)aux).intValue());
                             } else {
                                 System.out.println("ELSE ???");
                             }
@@ -560,13 +578,13 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                         case java.sql.Types.TINYINT:    //-6
                             
                             if (aux instanceof Integer) {
-                                System.out.println("Integer = colName => " + colName);
+                                System.out.println("Integer = columnName => " + columnName);
                                 System.out.println("getValue() = " + aux);
-                                rowset.updateInt(colName, ((Integer)aux).intValue());
+                                rowset.updateInt(columnName, ((Integer)aux).intValue());
                             } else if (aux instanceof Long) {
-                                System.out.println("Long    = colName => " + colName);
+                                System.out.println("Long    = columnName => " + columnName);
                                 System.out.println("getValue() = " + aux);
-                                rowset.updateLong(colName, ((Long)aux).intValue());
+                                rowset.updateLong(columnName, ((Long)aux).intValue());
                             } else {
                                 System.out.println("ELSE ???");
                             }
@@ -583,9 +601,9 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                         case java.sql.Types.VARCHAR://
                         case java.sql.Types.LONGVARCHAR://-1
                         case java.sql.Types.CHAR://1
-                            System.out.println("CHAR    = colName => " + colName);
+                            System.out.println("CHAR    = columnName => " + columnName);
                             System.out.println("getValue() = " + aux);
-                            rowset.updateString(colName, aux.toString());
+                            rowset.updateString(columnName, aux.toString());
                             break;
                             
                         case java.sql.Types.NULL://0
@@ -615,7 +633,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                         default:
                             System.out.println("============================================================================");
                             System.out.println("default = " + colType);
-                            System.out.println("ColName = " + colName);
+                            System.out.println("columnName = " + columnName);
                             System.out.println("============================================================================");
                             
                             if (aux instanceof java.lang.Double
@@ -648,6 +666,9 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
 
 /*
  * $Log$
+ * Revision 1.9  2005/01/19 19:33:50  dags
+ * bind refactoring
+ *
  * Revision 1.8  2005/01/19 19:12:40  dags
  * bind refactoring
  *
