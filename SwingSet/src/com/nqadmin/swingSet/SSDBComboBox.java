@@ -132,9 +132,6 @@ public class SSDBComboBox extends JComboBox {
     // AND THE COMBO.
     protected JTextField textField = new JTextField();
 
-    // COMBOBOX USED TO DISPLAY THE VALUES.
-    //protected JComboBox  cmbDisplayed  = new JComboBox();
-
     // DATABASE CONNECTION OBJECT
     protected SSConnection conn = null;
 
@@ -180,8 +177,6 @@ public class SSDBComboBox extends JComboBox {
      * Creates an object of the SSDBComboBox.
      */
     public SSDBComboBox() {
-        //super();
-        //addComponent();
         init();
     }
     
@@ -198,13 +193,6 @@ public class SSDBComboBox extends JComboBox {
         query = _query;
         queryPKColumnName = _queryPKColumnName;
         queryDisplayColumnName1 = _queryDisplayColumnName1;
-        //textField = new JTextField();
-        //textField.setPreferredSize(new Dimension(200,20));
-        //cmbDisplayed.setPreferredSize(new Dimension(200,20));
-        //setPreferredSize(new Dimension(200,20));
-        //textField.setMaximumSize(new Dimension(200,20));
-        //cmbDisplayed.setMaximumSize(new Dimension(200,20));
-        //setMaximumSize(new Dimension(200,20));
         init();
     }
     
@@ -217,7 +205,6 @@ public class SSDBComboBox extends JComboBox {
             
         // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,20));
-        //    setMaximumSize(new Dimension(200,20));
     }      
     
     /**
@@ -290,15 +277,7 @@ public class SSDBComboBox extends JComboBox {
         queryDisplayColumnName2 = _queryDisplayColumnName2;
     }
 
-    /**
-     * Sets preferred dimensions for combo box.
-     *
-     * @param _dimension    dimensions for combo box
-     */
-    //public void setPreferredSize(Dimension _dimension) {
-    //    cmbDisplayed.setPreferredSize(_dimension);
-    //}
-    
+   
     /**
      * Returns connection object used to get values from database.
      *
@@ -389,7 +368,6 @@ public class SSDBComboBox extends JComboBox {
      */
     public long getSelectedValue() {
 
-        //int index = cmbDisplayed.getSelectedIndex();
         int index = getSelectedIndex();
 
         if (index == -1) {
@@ -428,7 +406,6 @@ public class SSDBComboBox extends JComboBox {
             ResultSet rs = statement.executeQuery(query);
 
         // CLEAR ALL ITEMS FROM COMBO AND VECTOR STORING ITS CORRESPONDING VALUES.
-            //cmbDisplayed.removeAllItems();
             removeAllItems();
             columnVector.clear();
 
@@ -437,10 +414,8 @@ public class SSDBComboBox extends JComboBox {
             while (rs.next()) {
                 // IF TWO COLUMNS HAVE TO BE DISPLAYED IN THE COMBO THEY SEPERATED BY SEMI-COLON
                 if ( queryDisplayColumnName2 != null) {
-                    //cmbDisplayed.addItem(getStringValue(rs,queryDisplayColumnName1) + seperator + rs.getString(queryDisplayColumnName2));
                     addItem(getStringValue(rs,queryDisplayColumnName1) + seperator + rs.getString(queryDisplayColumnName2));
                 } else {
-                    //cmbDisplayed.addItem(getStringValue(rs,queryDisplayColumnName1));
                     addItem(getStringValue(rs,queryDisplayColumnName1));
                 }
                 // ADD THE ID OF THE ITEM TO A VECTOR.
@@ -461,26 +436,25 @@ public class SSDBComboBox extends JComboBox {
     // COLUMN TO WHICH COMBO IS BOUND.
     private void setDisplay() {
 
-        Document doc = textField.getDocument();
         try {
             // GET THE VALUE FROM TEXT FIELD
-            String text = doc.getText(0,doc.getLength());
-            if (text != null) {
+            String text = textField.getText().trim();
+            if (!text.equals("")) {
                 long valueInText = Long.parseLong(text);
                 // GET THE INDEX WHERE THIS VALUE IS IN THE VECTOR.
                 int indexCorrespondingToLong = columnVector.indexOf(new Long(valueInText));
                 // SET THE SELECTED ITEM OF COMBO TO THE ITEM AT THE INDEX FOUND FROM
                 // ABOVE STATEMENT
-                //if (indexCorrespondingToLong != cmbDisplayed.getSelectedIndex()) {
                 if (indexCorrespondingToLong != getSelectedIndex()) {
-                    //cmbDisplayed.setSelectedIndex(indexCorrespondingToLong);
                     setSelectedIndex(indexCorrespondingToLong);
                 }
             }
-        } catch(BadLocationException ble) {
-            ble.printStackTrace();
-        } catch(NullPointerException npe) {
-        } catch(NumberFormatException nfe) {
+            else{
+                setSelectedIndex(-1);
+            }
+        }catch(NumberFormatException nfe) {
+            System.out.println("Possible reason underlying column is not a number field");
+            nfe.printStackTrace();
         }
 
     }
@@ -524,20 +498,16 @@ public class SSDBComboBox extends JComboBox {
 
     // ADDS LISTENERS FOR TEXT FIELD AND COMBO BOX.
     private void addListeners() {
-        //cmbDisplayed.addActionListener(cmbListener);
         addActionListener(cmbListener);
         addFocusListener(cmbListener);
-        //cmbDisplayed.addKeyListener(myKeyListener);
         addKeyListener(myKeyListener);
         textField.getDocument().addDocumentListener(textFieldDocumentListener);         
     }
 
     // REMOVES THE LISTENERS FOR THE COMBOBOX AND TEXT FIELD
     private void removeListeners() {
-        //cmbDisplayed.removeActionListener(cmbListener);
         removeActionListener(cmbListener);
         removeFocusListener(cmbListener);
-        //cmbDisplayed.removeKeyListener(myKeyListener);
         removeKeyListener(myKeyListener);
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
           
@@ -547,91 +517,20 @@ public class SSDBComboBox extends JComboBox {
     private class MyTextFieldDocumentListener implements DocumentListener {
 
         public void changedUpdate(DocumentEvent de) {
-            //System.out.println("changed Document Changed: " + de);
-
-            //cmbDisplayed.removeActionListener(cmbListener);
             removeActionListener(cmbListener);
-
-            Document doc = textField.getDocument();
-            try {
-                String text = doc.getText(0,doc.getLength());
-                if (text != null) {
-                    long valueInText = Long.parseLong(text);
-                    int indexCorrespondingToLong = columnVector.indexOf(new Long(valueInText));
-                    //if (indexCorrespondingToLong != cmbDisplayed.getSelectedIndex()) {
-                    if (indexCorrespondingToLong != getSelectedIndex()) {
-                        //cmbDisplayed.setSelectedIndex(indexCorrespondingToLong);
-                        setSelectedIndex(indexCorrespondingToLong);
-                    }
-                }
-
-            } catch(BadLocationException ble) {
-                ble.printStackTrace();
-            } catch(NullPointerException npe) {
-            } catch(NumberFormatException nfe) {
-            }
-
-            //cmbDisplayed.addActionListener(cmbListener);
+            setDisplay();
             addActionListener(cmbListener);
-
         }
 
         public void insertUpdate(DocumentEvent de) {
-            //System.out.println("insert Document Changed: " + de);
-            //cmbDisplayed.removeActionListener(cmbListener);
             removeActionListener(cmbListener);
-
-            Document doc = textField.getDocument();
-            try {
-
-                String text = doc.getText(0,doc.getLength());
-                if (text != null) {
-                    long valueInText = Long.parseLong(text);
-                    int indexCorrespondingToLong = columnVector.indexOf(new Long(valueInText));
-                    //if (indexCorrespondingToLong != cmbDisplayed.getSelectedIndex()) {
-                    if (indexCorrespondingToLong != getSelectedIndex()) {
-                        //cmbDisplayed.setSelectedIndex(indexCorrespondingToLong);
-                        setSelectedIndex(indexCorrespondingToLong);
-                    }
-                }
-
-            } catch(BadLocationException ble) {
-                ble.printStackTrace();
-            } catch(NullPointerException npe) {
-            } catch(NumberFormatException nfe) {
-            }
-
-            //cmbDisplayed.addActionListener(cmbListener);
+            setDisplay();
             addActionListener(cmbListener);
         }
 
         public void removeUpdate(DocumentEvent de) {
-
-            //System.out.println("remove Document Changed: " + de);
-            //cmbDisplayed.removeActionListener(cmbListener);
             removeActionListener(cmbListener);
-
-            Document doc = textField.getDocument();
-            try {
-
-                String text = doc.getText(0,doc.getLength());
-                if (text != null) {
-                    long valueInText = Long.parseLong(text);
-                    int indexCorrespondingToLong = columnVector.indexOf(new Long(valueInText));
-                    //if (indexCorrespondingToLong != cmbDisplayed.getSelectedIndex()) {
-                    if (indexCorrespondingToLong != getSelectedIndex()) {
-                        //cmbDisplayed.setSelectedIndex(indexCorrespondingToLong);
-                        setSelectedIndex(indexCorrespondingToLong);
-                    }
-                }
-
-            } catch(BadLocationException ble) {
-                ble.printStackTrace();
-            } catch(NullPointerException npe) {
-            } catch(NumberFormatException nfe) {
-            }
-
-            //cmbDisplayed.addActionListener(cmbListener);
+            setDisplay();
             addActionListener(cmbListener);
         }
 
@@ -664,11 +563,9 @@ public class SSDBComboBox extends JComboBox {
                 return;
 
             }
-//              System.out.println("Initial String is " + searchString);
-//              System.out.println("ppr" + new String(new char[]{ke.getKeyChar()}) + "ppr");
+
             if (ke.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
                 if (searchString == null ) {
-                    //cmbDisplayed.setSelectedIndex(0);
                     setSelectedIndex(0);
                     searchStack.removeAllElements();
                     previousIndex = 0;
@@ -689,10 +586,7 @@ public class SSDBComboBox extends JComboBox {
                 searchString = searchString + new String(new char[]{ke.getKeyChar()});
             }
 
-//              System.out.println("Search String is " + searchString);
-
             if (searchString == null) {
-                //cmbDisplayed.setSelectedIndex(0);
                 setSelectedIndex(0);
                 return;
             }
@@ -700,7 +594,6 @@ public class SSDBComboBox extends JComboBox {
             if (ke.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
 
                 if (searchStack.empty()) {
-                    //cmbDisplayed.setSelectedIndex(0);
                     setSelectedIndex(0);
                     return;
                 } else {
@@ -709,12 +602,10 @@ public class SSDBComboBox extends JComboBox {
                     // PREVIOUS POSITION IN COMBO
                     if(!searchStack.empty()) {
                         previousIndex = ((Integer)searchStack.peek()).intValue();
-                        //cmbDisplayed.setSelectedIndex(previousIndex);
                         setSelectedIndex(previousIndex);
                         return;
                     } else {
                         previousIndex = 0;
-                        //cmbDisplayed.setSelectedIndex(0);
                         setSelectedIndex(0);
                         return;
                     }
@@ -722,25 +613,12 @@ public class SSDBComboBox extends JComboBox {
 
             } else {
 
-                //for (i=previousIndex;i<cmbDisplayed.getItemCount();i++) {
                 for (i=previousIndex;i<getItemCount();i++) {
                     if (searchString.length() == 0) {
-                        //cmbDisplayed.setSelectedIndex(0);
                         setSelectedIndex(0);
                     } else {
-/*                        
-                        if (((String)cmbDisplayed.getItemAt(i)).length() >= searchString.length()) {
-                            if (searchString.equalsIgnoreCase( ((String)cmbDisplayed.getItemAt(i)).substring(0,searchString.length())) ) {
-    //                          System.out.println("Found Match at index " + i);
-                                cmbDisplayed.setSelectedIndex(i);
-                                searchStack.push(new Integer(i));
-                                return;
-                            }
-                        }
-*/
                         if (((String)getItemAt(i)).length() >= searchString.length()) {
                             if (searchString.equalsIgnoreCase( ((String)getItemAt(i)).substring(0,searchString.length())) ) {
-    //                          System.out.println("Found Match at index " + i);
                                 setSelectedIndex(i);
                                 searchStack.push(new Integer(i));
                                 return;
@@ -749,23 +627,7 @@ public class SSDBComboBox extends JComboBox {
                     }
 
                 }
-/*                
-                if (i == cmbDisplayed.getItemCount()) {
-                    for (i=0;i<previousIndex;i++) {
-                        if (searchString.length() == 0) {
-                            cmbDisplayed.setSelectedIndex(0);
-                        } else {
-                            if (((String)cmbDisplayed.getItemAt(i)).length() >= searchString.length()) {
-                                if (searchString.equalsIgnoreCase( ((String)cmbDisplayed.getItemAt(i)).substring(0,searchString.length())) ){
-                                    cmbDisplayed.setSelectedIndex(i);
-                                    searchStack.push(new Integer(i));
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
-*/
+
                 if (i == getItemCount()) {
                     for (i=0;i<previousIndex;i++) {
                         if (searchString.length() == 0) {
@@ -784,10 +646,8 @@ public class SSDBComboBox extends JComboBox {
             }
 
             if (searchStack.empty()) {
-                //cmbDisplayed.setSelectedIndex(0);
                 setSelectedIndex(0);
             } else {
-                //cmbDisplayed.setSelectedIndex(((Integer)searchStack.peek()).intValue());
                 setSelectedIndex(((Integer)searchStack.peek()).intValue());
             }
 
@@ -802,7 +662,6 @@ public class SSDBComboBox extends JComboBox {
             textField.getDocument().removeDocumentListener(textFieldDocumentListener);
 
             // GET THE INDEX CORRESPONDING TO THE SELECTED TEXT IN COMBO
-            //int index = cmbDisplayed.getSelectedIndex();
             int index = getSelectedIndex();
 
             // IF THE USER WANTS TO REMOVE COMPLETELY THE VALUE IN THE FIELD HE CHOOSES
@@ -811,7 +670,6 @@ public class SSDBComboBox extends JComboBox {
                 try {
                     // NOW LOOK UP THE VECTOR AND GET THE VALUE CORRESPONDING TO THE TEXT SELECTED IN THE COMBO
                     long valueCorresponingToIndex = ( (Long)columnVector.get(index) ).longValue() ;
-//                      System.out.println("Value Corresponding To CMB: " + valueCorresponingToIndex);
                     //GET THE TEXT IN THE TEXT FIELD
                     String strValueinTextField = textField.getText();
                     //INITIALIZE THE  LONG VALUE IN TEXT TO -1
@@ -865,7 +723,6 @@ public class SSDBComboBox extends JComboBox {
      */
      public void addItem(String _name, long _value) {
         columnVector.add(new Long(_value));
-        //cmbDisplayed.addItem(_name);
         addItem(_name);
         numberOfItems++;
      }
@@ -879,11 +736,9 @@ public class SSDBComboBox extends JComboBox {
       * @return returns true on successful deletion else returns false.
       */
      public boolean deleteItem(String _name) {
-        //for (int i=0; i<cmbDisplayed.getItemCount();i++) {
+
         for (int i=0; i<getItemCount();i++) {
-            //if ( ((String)cmbDisplayed.getItemAt(i)).equals(_name) ) {
             if ( ((String)getItemAt(i)).equals(_name) ) {
-                //cmbDisplayed.removeItemAt(i);
                 removeItemAt(i);
                 columnVector.removeElementAt(i);
                 numberOfItems--;
@@ -907,7 +762,6 @@ public class SSDBComboBox extends JComboBox {
             return false;
         }
         columnVector.removeElementAt(index);
-        //cmbDisplayed.removeItemAt(index);
         removeItemAt(index);
         numberOfItems--;
         return true;
@@ -924,18 +778,6 @@ public class SSDBComboBox extends JComboBox {
       * @return returns true on successful deletion else returns false.
       */
      public boolean deleteItem(String _name, long _value) {
-/*         
-        for (int i=0; i<cmbDisplayed.getItemCount();i++) {
-            if ( ((String)cmbDisplayed.getItemAt(i)).equals(_name) ) {
-                if (((Long)(columnVector.elementAt(i))).longValue() == _value) {
-                    cmbDisplayed.removeItemAt(i);
-                    columnVector.removeElementAt(i);
-                    numberOfItems--;
-                    return true;
-                }
-            }
-        }
-*/
         for (int i=0; i<getItemCount();i++) {
             if ( ((String)getItemAt(i)).equals(_name) ) {
                 if (((Long)(columnVector.elementAt(i))).longValue() == _value) {
@@ -969,13 +811,6 @@ public class SSDBComboBox extends JComboBox {
         if (index == -1) {
             return false;
         }
-/*        
-        cmbDisplayed.removeActionListener(cmbListener);
-        cmbDisplayed.insertItemAt(_name,index+1);
-        cmbDisplayed.removeItemAt(index);
-        cmbDisplayed.setSelectedIndex(index);
-        cmbDisplayed.addActionListener(cmbListener);
-*/
         removeActionListener(cmbListener);
         insertItemAt(_name,index+1);
         removeItemAt(index);
@@ -991,11 +826,7 @@ public class SSDBComboBox extends JComboBox {
             int type = _rs.getMetaData().getColumnType(_rs.findColumn(_queryPKColumnName));
             switch(type){
                 case Types.DATE:
-                    //Calendar calendar = Calendar.getInstance();
-                    //calendar.setTime(_rs.getDate(_queryPKColumnName));
                     SimpleDateFormat dateFormat = new SimpleDateFormat(datePattern);
-                    //dateFormat.setCalendar(calendar);
-                    //strValue = dateFormat.toLocalizedPattern();
                     strValue = dateFormat.format(_rs.getDate(_queryPKColumnName));
                 break;
                 default:
@@ -1031,10 +862,6 @@ public class SSDBComboBox extends JComboBox {
         queryPKColumnName   = _queryPKColumnName;
         queryDisplayColumnName1  = _queryDisplayColumnName1;
         textField           = _textField;
-        //textField.setPreferredSize(new Dimension(200,20));
-        //textField.setMaximumSize(new Dimension(200,20));
-
-        //addComponent();
 
     }
     
@@ -1107,7 +934,6 @@ public class SSDBComboBox extends JComboBox {
      * @deprecated
      */
     public JComboBox getComboBox() {
-        //return cmbDisplayed;
         return this;
     }
 
@@ -1119,7 +945,6 @@ public class SSDBComboBox extends JComboBox {
      * @deprecated
      */
     public Component getComponent() {
-        //return cmbDisplayed;
         return this;
     }    
 
@@ -1129,6 +954,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.20  2005/02/02 23:36:58  yoda2
+ * Removed setMaximiumSize() calls.
+ *
  * Revision 1.19  2005/01/19 20:54:44  yoda2
  * API cleanup.
  *
