@@ -51,7 +51,7 @@ The SwingSet feature-set currently includes:
 3. binding of a "hidden" numeric column for combo boxes with text choices
    (e.g. 0, 1, & 2 are stored for "Yes," "No," & "Maybe," respectively)
 4. population of combo boxes based on columns in a database query (can also
-   be used for combobox-based record navigation)
+   be used for combo box-based record navigation)
 5. a graphical record navigator
     (a) allows for database traversal, insertion, deletion, commit,
         and rollback
@@ -88,16 +88,51 @@ method implementations of everything in SSRowSet.  This adapter can be easily
 extended with non-empty method implementations for non-database datasources.
 
 To accommodate non-updatable RowSets, SSJdbcRowSetImpl can be extended with
-custom setXYZ() methods to handle database updates via INSERT/UPDATE queries.
+custom updateXYZ() methods to handle database updates via INSERT/UPDATE queries.
 SSJdbcRowSetImpl can also serve as a template for writing SSRowSet wrappers for
 other RowSets (e.g. CachedRowSet, WebRowSet, etc.).
 
-Unfortunately, the introduction of the SSRowSet require modification of
+Unfortunately, the introduction of the SSRowSet requires modification of
 existing SwingSet applications, but with the SSJdbcRowSetImpl and SSConnection,
 these changes should be minimal.  In order to provide maximum migration time,
 the 0.8.3-beta version of SwingSet was released on 10-22-2004 with all of the
 latest bugfixes and enhancements.  Other than the new datasource abstraction
-layer, 0.8.3 and 0.9.0 are identical.
+layer, 0.8.3 and 0.9.0 are identical.  Below is an example of changes required
+to transition to 0.9.0 and later versions of SwingSet:
+
+================================================================================
+    ***********************
+    OLD - Connection/RowSet
+    ***********************
+    import java.sql.*;
+    import com.sun.rowset.JdbcRowSetImpl;
+
+    Connection conn = null;
+    JdbcRowSetImpl rowset = null;
+	
+    Class.forName("org.postgresql.Driver");
+    conn = DriverManager.getConnection
+        ("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
+        "swingset","test");
+    rowset = new JdbcRowSetImpl(conn);	
+
+    ***************************
+    NEW - SSConnection/SSRowSet
+    ***************************
+    import java.sql.*;	// still needed
+    import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+    import com.nqadmin.swingSet.datasources.SSConnection;
+
+    SSConnection ssConnection = null;
+    SSJdbcRowSetImpl rowset = null;
+
+    ssConnection = new SSConnection
+        ("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
+        "swingset", "test");
+    ssConnection.setDriverName("org.postgresql.Driver");
+    ssConnection.createConnection();
+    rowset = new SSJdbcRowSetImpl(ssConnection);
+================================================================================	
 
 Our goal for the 0.9.X series is to focus on bug squashing and possibly some
 minor feature enhancements.  We hope to have a 1.0 production release by the
@@ -109,21 +144,24 @@ DETAILS
 ==============================================================================
 
 SwingSet utilizes SSTextDocument, an extension of the standard PlainDocument
-class to link the JTextField or JTextArea to a database column within a
-SSRowSet.  In addition, custom classes are provided to replace the standard
-JComboBox and JCheckBox. The SSComboBox provides an Access-like combobox that
-can be used to display user-specified text choices based on an underlying
-numeric column (e.g. allows my_table!choice_code, an integer column with valid
-values of 0, 1, & 2, to be displayed as "yes," "no," & "maybe").  The
-SSDBComboBox operates in a similar fashion, but is used when both the values
-and their corresponding text choices are stored in a table (e.g.
-my_table!part_id is stored as a foreign key, but my_table!part_name is
-displayed).  By writing a custom event listener, SSDBComboBox may also be used
-to navigate a RowSet based on a combobox selection.  The SSCheckBox allows a
-checkbox to be linked to an underlying numeric database column.  
+class to link the standard JTextField/JTextArea or custom SSTextField/
+SSTextArea to a database column within a SSRowSet.  In addition, custom classes
+are provided to replace the standard JComboBox and JCheckBox. The SSComboBox
+provides an Access-like combo box that can be used to display user-specified
+text choices based on an underlying numeric column (e.g. allows
+my_table!choice_code, an integer column with valid values of 0, 1, & 2, to be
+displayed as "yes," "no," & "maybe").  The SSDBComboBox operates in a similar
+fashion, but is used when both the values and their corresponding text choices
+are stored in a table (e.g. my_table!part_id is stored as a foreign key, but
+my_table!part_name is displayed).  By writing a custom event listener,
+SSDBComboBox may also be used to navigate a SSRowSet based on a combo box
+selection.  The SSCheckBox allows a check box to be linked to an underlying
+numeric database column.  
 
 The SSTextField, which extends the JTextField, provides editing masks for data
 entry (e.g. dates, social security numbers, specified number of decimals, etc.).
+Both SSTextField and SSTextArea provide bind() methods to simplify datasource
+binding.
 
 The SSDataGrid can display database information in a "datasheet" or
 "spreadsheet" style view.  It provides functions to set column headers, hide
@@ -136,15 +174,9 @@ provides support for cut & paste from a data grid to/from spreadsheet programs
 and/or other data grids.
 
 The SSDataNavigator class provides traversal, insertion, deletion, commit, and
-rollback  of a RowSet. The numerical index is show for the current record and
+rollback of a SSRowSet. The numerical index is show for the current record and
 the total number of records is displayed. Changes to the current record are
 auto-committed when a navigation takes place (also similar to Access).
-
-
-
-
-
-
 
 More information on SwingSet is available from:
 http://swingset.sourceforge.net 
@@ -164,7 +196,8 @@ Implementation of the JDBC RowSet is required (free registration required).
 It is available in a Zip file from:
 http://developer.java.sun.com/developer/earlyAccess/jdbc/jdbc-rowset.html
 
-If using J2SE 1.5.0 Beta 1 or later, JdbcRowSetImpl is already included.
+If using J2SE 1.5.0 Beta 1 or later, a reference implementation is already
+included.
 
 Download the latest SwingSet binary JAR file from:
 http://sourceforge.net/projects/swingset
@@ -248,7 +281,7 @@ is done with SSDataNavigator.
 Example4
 ***********************
 This example demonstrates the use of SSDBComboBox for record navigation.
-Navigation can be accomplished using either the Part combobox or the
+Navigation can be accomplished using either the Part combo box or the
 navigation bar. Since the part name is used for navigation it can't be
 updated (note that none of the fields in these examples can actually be
 updated since the demo database is read only).
@@ -273,13 +306,13 @@ confirmation message is displayed before deletion.
 ***********************
 Example6
 ***********************
-This example demonstrates the use of SSDataGrid with a combobox renderer.
+This example demonstrates the use of SSDataGrid with a combo box renderer.
 
 
 ***********************
 Example7
 ***********************
-This example demonstrates the use of SSDataGrid with two combobox renderers
+This example demonstrates the use of SSDataGrid with two combo box renderers
 and a date renderer. The mappings for the combo boxes are retrieved from another
 table.
 
@@ -307,7 +340,7 @@ Used to display the boolean values stored in the database. The SSDBCheckBox
 can currently only be bound to a numeric database column.  A checked
 SSDBCheckBox returns a '1' to the database and an uncheck SSDBCheckBox will
 returns a '0'.  In the future an option may be added to allow the user to
-specify the values returned for the checked and unchecked checkbox states.
+specify the values returned for the checked and unchecked check box states.
 
 
 ***********************
@@ -315,7 +348,7 @@ SSComboBox
 ***********************
 Provides a way of displaying text corresponding to codes that are stored in
 the database. By default the codes start from zero. If you want to provide a
-different mapping for the items in the combobox then a string of integers
+different mapping for the items in the combo box then a string of integers
 containing the corresponding numeric values for each choice must be provided.
 
 e.g.
@@ -323,7 +356,7 @@ e.g.
      String[] options = {"111", "2222", "33333"};
      combo.setOption(options);
   
-     For the above items the combobox assumes that the values start from zero:
+     For the above items the combo box assumes that the values start from zero:
           "111" -> 0, "2222" -> 1, "33333" -> 2
     
      To give your own mappings  you can set the mappings separately or pass
@@ -341,7 +374,7 @@ e.g.
   
      Note that if you DO NOT want to use the default mappings, the custom
      mappings must be set before calling the bind() method to bind the
-     combobox to a database column.
+     combo box to a database column.
 
 
 ***********************
@@ -349,7 +382,7 @@ SSDBComboBox
 ***********************
 Similar to the SSComboBox, but used when both the 'bound' values and the
 'display' values are pulled from a database table.  Generally the bound
-value represents a foreign key to another table, and the combobox needs to
+value represents a foreign key to another table, and the combo box needs to
 diplay a list of one (or more) columns from the other table.
   
 e.g.
@@ -359,10 +392,10 @@ e.g.
        2. shipment_data (shipment_id, part_id, quantity, ...)
   
      Assume you would like to develop a screen for the shipment table and you
-     want to have a screen with a combobox where the user can choose a
+     want to have a screen with a combo box where the user can choose a
      part and a text box where the user can specify a  quantity.
 
-     In the combobox you would want to display the part name rather than
+     In the combo box you would want to display the part name rather than
      part_id so that it is easier for the user to choose. At the same time you
      want to store the id of the part chosen by the user in the shipment
      table.
@@ -381,20 +414,20 @@ e.g.
         ssJdbcRowSet = new SSJdbcRowSetImpl(ssConnection);
         ssJdbcRowSet.setCommand("SELECT * FROM shipment_data;");
           
-    // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE ROWSET.
+    // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE SSROWSET.
     // IF YOU ARE NOT USING THE DATA NAVIGATOR YOU HAVE TO INCLUDE THOSE.
     //   ssJdbcRowSet.execute();
     //   ssJdbcRowSet.next();
         SSDataNavigator navigator = new SSDataNavigator(ssJdbcRowSet);
 
-    // QUERY FOR THE COMBOBOX.
+    // QUERY FOR THE COMBO BOX.
         String query = "SELECT * FROM part_data;";
           
     // CREATE AN INSTANCE OF THE SSDBCOMBOBOX WITH THE CONNECTION OBJECT
     // QUERY AND COLUMN NAMES
         combo = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
           
-    // THIS BASICALLY SPECIFIES THE COLUMN AND THE ROWSET WHERE UPDATES HAVE
+    // THIS BASICALLY SPECIFIES THE COLUMN AND THE SSROWSET WHERE UPDATES HAVE
     // TO BE MADE.
         combo.bind(ssJdbcRowSet, "part_id");
         combo.execute();
@@ -463,7 +496,7 @@ information the new value can be rejected or accepted by the program.
 SSDataGrid also provides an "extra" row to facilitate the addition of rows to
 the table.  Default values for various columns can be set programmatically.  A
 programmer can also specify which column is the primary key column for the
-underlying rowset and supply a primary key for that column when a new row is
+underlying SSRowSet and supply a primary key for that column when a new row is
 being added.
 
 
@@ -490,10 +523,10 @@ SSDataNavigator.
 
      performPreDeletionOps() is called when the user presses the delete
           button, but just before the deleteRow() method is called on the
-          RowSet.
+          SSRowSet.
 
      performPostDeletionOps() is called when the user presses the delete
-          button and after the deleteRow() method is called on the RowSet.
+          button and after the deleteRow() method is called on the SSRowSet.
 
      Note that both the performPreDeletionOps() and performPostDeletionOps()
      will be executed when the user presses the delete button.
@@ -537,12 +570,12 @@ application the SSTextDocument can be used in conjunction with the
 SSDataNavigator to allow for both editing and navigation of the rows in a
 database table.
 
-The SSTextDocument takes a RowSet and either a column index or a column name
+The SSTextDocument takes a SSRowSet and either a column index or a column name
 as arguments.  Whenever the cursor is moved (e.g. navigation occurs on the 
 SSDataNavigator), the document property of the bound Swing control changes to
 reflect the new value for the database column.
 
-Note that a RowSet insert doesn't implicitly modify the cursor which is why 
+Note that a SSRowSet insert doesn't implicitly modify the cursor which is why 
 the SSDBNavImp is provided for clearing controls followoing an insert.
 
 
@@ -550,7 +583,7 @@ the SSDBNavImp is provided for clearing controls followoing an insert.
 SSTableModel    
 ***********************
 SSTableModel provides an implementation of the TableModel interface.
-The SSDataGrid uses this class for providing a grid view for a rowset. 
+The SSDataGrid uses this class for providing a grid view for a SSRowSet. 
 SSTableModel can be used without the SSDataGrid (e.g. in conjunction with a
 JTable), but the cell renderers and hidden columns features of the SSDataGrid
 will not be available.
