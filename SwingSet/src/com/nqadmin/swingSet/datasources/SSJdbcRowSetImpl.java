@@ -89,6 +89,14 @@
  	 */	
  	public void setCommand(String query){
  		this.query = query;
+		
+        try {
+			if (rowset != null) {
+				rowset.setCommand(query);
+			}
+		}catch(SQLException se){
+			se.printStackTrace();
+		}
  	}
  	
  	/**
@@ -799,6 +807,9 @@
 } 
  /*
   * $Log$
+  * Revision 1.2  2004/10/28 15:27:17  prasanth
+  * Calling setType & setConcurrency after instanciating JdbcRowSetImpl
+  *
   * Revision 1.1  2004/10/25 21:47:50  prasanth
   * Initial Commit
   *
