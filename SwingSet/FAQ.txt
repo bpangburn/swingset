@@ -72,3 +72,27 @@ FAQ
     apply the modified rowset to your SSDataGrid, SwingSet continues to use
     the "old" column numbers for any renderers or hidden columns.  You will
     have to supply new renderers/hidden columns for the reordered columns.
+    
+    
+6. Why should I use the setMySQL() function?
+
+	This function can be used to indicate to the Navigator that MySQL database
+	is being used. If this is set to true navigator will not call the execute
+	method on the specified rowset. The ResultSet class in the MySQL driver is
+	not	updatable. For updatable ResultSet UpdatableResultSet class has to be
+	used. But when execute is called on the RowSet it will generate a ResultSet
+	not UpdatableResultSet.	So when generating a RowSet using MySQL database
+	first generate a UpdatableResultSet	object and then set this to the RowSet.
+	This rowset should be used in building the SSDataNavigator.
+
+	Example:
+		Let rs be your UpdatableResultSet object.
+		JdbcRowSetImpl rowset = new JdbcRowSetImpl(rs);
+		SSDataNavigator dataNavigator = new SSDataNavigator();
+		dataNavigator.setMySQLDB(true);
+		dataNavigator.setRowSet(rowset);
+	If you want to change the query change the rs object and set it to rowset again.
+	Set this new rowset to SSDataNavigator.
+
+	(P.S: This is a work around provided for MySQL DB users based on the feedback from lopes.
+	 see https://sourceforge.net/forum/forum.php?thread_id=1005899&forum_id=313186)
