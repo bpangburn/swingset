@@ -161,6 +161,11 @@ public class SSDataGrid extends JTable
 	 *	Array used to store the column numbers that have to hidden.
 	 */
 	protected String[] hiddenColumnNames = null;
+	
+	/**
+	 *	Variable to indicate if execute should be called on the rowset.
+	 */
+	boolean callExecute = true;
 
 	/**
 	 *	Constructs a data grid with the data source set to the given rowset.
@@ -194,6 +199,16 @@ public class SSDataGrid extends JTable
 	}
 	
 	/**
+	 *	Sets the callExecute property.
+	 *If set to true causes the navigator to skip the execute function call on the specified rowset.
+	 *(See FAQ for further details)
+	 *@param _execute true if execute function call has to be skipped else false.
+	 */
+	public void setCallExecute(boolean _execute){
+		callExecute = _execute;
+	}
+	
+	/**
 	 *	Initializes the data grid control. Collects metadata information about the 
 	 *given rowset.
 	 */
@@ -201,7 +216,8 @@ public class SSDataGrid extends JTable
 	{
 		try{
 			// EXECUTE THE QUERY
-			rowset.execute();
+			if(callExecute)
+				rowset.execute();
 			
 			// SPECIFY THE ROWSET TO THE TABLE MODEL.
 			if(tableModel == null)
@@ -951,6 +967,9 @@ public class SSDataGrid extends JTable
 
 /*
  * $Log$
+ * Revision 1.6  2004/03/08 16:43:37  prasanth
+ * Updated copy right year.
+ *
  * Revision 1.5  2004/02/23 16:47:41  prasanth
  * Println statements are commented out.
  *
