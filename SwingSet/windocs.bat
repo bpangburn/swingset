@@ -3,4 +3,6 @@ REM
 REM WINDOWS JAVADOC GENERATION SCRIPT FOR SWINGSET
 REM
 echo off
-javadoc -d javadoc ./com/nqadmin/swingSet/*.java
+rmdir .\javadoc /s
+mkdir .\javadoc
+javadoc -d javadoc .\src\com\nqadmin\swingSet\*.java

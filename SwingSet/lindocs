@@ -4,4 +4,6 @@
 #
 # LINUX JAVADOC GENERATION SCRIPT FOR SWINGSET
 #
-javadoc -d javadoc ./com/nqadmin/swingSet/*.java
+rm -r ./javadoc
+mkdir ./javadoc
+javadoc -d ./javadoc ./src/com/nqadmin/swingSet/*.java

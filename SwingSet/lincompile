@@ -6,5 +6,6 @@
 #
 # DELETE ANY EXISTING .class FILES AND RE-COMPILE ALL .java FILES FOR SWINGSET
 #
-rm ./com/nqadmin/swingSet/*.class
-javac com/nqadmin/swingSet/*.java
+rm -r ./bin
+mkdir ./bin
+javac -d ./bin ./src/com/nqadmin/swingSet/*.java

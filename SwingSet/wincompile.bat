@@ -5,5 +5,6 @@ REM
 REM DELETE ANY EXISTING .class FILES AND RE-COMPILE ALL .java FILES FOR SWINGSET
 REM
 echo off
-del .\com\nqadmin\swingSet\*.class
-javac com/nqadmin/swingSet/*.java
+rmdir .\bin /s
+mkdir .\bin
+javac -d .\bin .\src\com\nqadmin\swingSet\*.java
