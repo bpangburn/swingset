@@ -40,6 +40,7 @@ package com.nqadmin.swingSet;
 import java.io.*;
 import java.util.Vector;
 import java.sql.*;
+import javax.sql.RowSet;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -67,7 +68,11 @@ public class SSDBCheckBox extends JCheckBox {
 
 
 	// TEXT FIELD BOUND TO THE DATABASE
-	private JTextField textField = null;
+	private JTextField textField = new JTextField();
+	
+	private String columnName;
+	
+	private int columnIndex;
 
 	// LISTENER FOR CHECK BOX AND TEXT FEILD
 	private MyCheckBoxListener  checkBoxListener  = new MyCheckBoxListener();
@@ -81,6 +86,7 @@ public class SSDBCheckBox extends JCheckBox {
 	 *	Creates a object of SSDBCheckBox which synchronizes with the value in the specified
 	 *text field.
 	 *@param _textfield the text field with which the check box will be in sync.
+	 *@deprecated
 	 */
 	public SSDBCheckBox(JTextField _textField){
 		textField = _textField;
@@ -92,34 +98,85 @@ public class SSDBCheckBox extends JCheckBox {
 	public SSDBCheckBox(){
 		textField = new JTextField();
 	}
+	
+	/**
+	 *	Creates an object of SSDBCheckBox binding it so the specified column
+	 *in the given rowset.
+	 *@param _rowset - datasource to be used.
+	 *@param _columnName - Name of the column to which this check box should be bound
+	 */
+	public SSDBCheckBox(RowSet _rowset, String _columnName){
+		columnName = _columnName;
+		textField.setDocument(new SSTextDocument(_rowset, _columnName));
+	} 
 
 	/**
 	 *	Sets the text field with which the check box has to be synchronized.
 	 *@param _textField the text field with which the check box will be in sync.
+	 *@deprecated
+	 *@see bind
 	 */
 	public void setTextField(JTextField _textField){
+	// IF THE OLD ONE IS NOT NULL REMOVE ANY LISTENERS BEING ADDED.
+	// IT DOES NOT HURT TO CALL REMOVE IF WE ADDED ONE THEN IT WILL BE DELETED.
+	// ELSE NOTHING HAPPENS	
+		if(textField != null)
+			textField.getDocument().removeDocumentListener(textFieldListener);
+			
 		textField = _textField;
 	}
+	
+	/**
+	 *	Sets the datasource and the columnName in the datasource to which the
+	 *SSCheckBox has to be bound to.
+	 *@param _rowset - datasource to be used.
+	 *@param _columnName - Name of the column to which this check box should be bound
+	 */
+	public void bind(RowSet _rowset, String _columnName){
+		columnName = _columnName;
+		textField.setDocument(new SSTextDocument(_rowset, _columnName));
+	}
+	
+	/**
+	 * returns the column name to which this check box is bound to.
+	 *@return column name to which the check box is bound.
+	 */
+	public String getColumnName(){
+		return columnName;
+	} 
 
 	/**
 	 *	returns the text field with which the check box is synchronizing.
 	 *@return returns a JTextField which is used to  set the check box.
+	 *@deprecated
 	 */
 	public JTextField getTextField(){
 		return textField;
 	}
 
 	/**
-	 *	Initializes the check box by getting the value from the textfield.
+	 *	Initializes the check box by getting the value corresponding to
+	 *specified column from the rowset.
 	 */
 	public void execute() {
 		initCheckBox();
 	}
+	
+	/**
+	 *	Calls execute once the object has been deserialized
+	 */
+	private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException{
+		objIn.defaultReadObject();
+	}
+	
+	private void writeObject(ObjectOutputStream objOut) throws IOException {
+		objOut.defaultWriteObject();
+	} 
 
 	// Initializes the check box.
 	private void initCheckBox(){
 
-		// ADD LISTENER FOR THE TEXT FIELD
+	// ADD LISTENER FOR THE TEXT FIELD
 		textField.getDocument().addDocumentListener(textFieldListener);
 
 		// SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
@@ -129,14 +186,32 @@ public class SSDBCheckBox extends JCheckBox {
 		else {
 			setSelected(false);
 		}
-		//ADD LISTENER FOR THE CHECK BOX.
+	//ADD LISTENER FOR THE CHECK BOX.
+	// REMOVE HAS TO BE CALLED SO MAKE SURE THAT YOU ARE NOT STACKING UP
+	// LISTENERS WHEN EXECUTE IS CALLED MULTIPLE TIMES.
+		removeChangeListener(checkBoxListener);
 		addChangeListener( checkBoxListener );
 	}
 
 	// LISTENER FOR THE TEXT FIELD
-	private class MyTextFieldListener implements DocumentListener {
-
+	private class MyTextFieldListener implements DocumentListener, Serializable{
+		private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException{
+			objIn.defaultReadObject();
+		}
+		
+		private void writeObject(ObjectOutputStream objOut) throws IOException {
+			objOut.defaultWriteObject();
+		} 
+		
 		public void changedUpdate(DocumentEvent de){
+			removeChangeListener( checkBoxListener );
+			if( textField.getText().equals(String.valueOf(CHECKED)) ) {
+				setSelected(true);
+			}
+			else {
+				setSelected(false);
+			}
+			addChangeListener( checkBoxListener );
 		}
 
 		// WHEN EVER THERE IS A CHANGE IN THE VALUE IN THE TEXT FIELD CHANGE THE CHECK BOX
@@ -155,7 +230,6 @@ public class SSDBCheckBox extends JCheckBox {
 		// IF A REMOVE UPDATE OCCURS ON THE TEXT FIELD CHECK THE CHANGE AND SET THE
 		// CHECK BOX ACCORDINGLY.
 		public void removeUpdate(DocumentEvent de){
-
 			removeChangeListener( checkBoxListener );
 			if( textField.getText().equals( String.valueOf(CHECKED)) ) {
 				setSelected(true);
@@ -170,10 +244,17 @@ public class SSDBCheckBox extends JCheckBox {
 	// LISTENER FOR THE CHECK BOX.
 	// ANY CHANGES MADE TO THE CHECK BOX BY THE USER ARE PROPOGATED BACK TO THE
 	// TEXT FIELD FOR FURTHER PROPOGATION TO THE UNDERLYING STORAGE STRUCTURE.
-	private class MyCheckBoxListener implements ChangeListener {
+	private class MyCheckBoxListener implements ChangeListener, Serializable {
 
+		private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException{
+			objIn.defaultReadObject();
+		}
+		
+		private void writeObject(ObjectOutputStream objOut) throws IOException {
+			objOut.defaultWriteObject();
+		}
+		
 		public void stateChanged(ChangeEvent ce){
-
 			textField.getDocument().removeDocumentListener(textFieldListener);
 
 			if ( ((JCheckBox)ce.getSource()).isSelected() ) {
@@ -194,6 +275,9 @@ public class SSDBCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.3  2004/03/08 16:43:37  prasanth
+ * Updated copy right year.
+ *
  * Revision 1.2  2003/09/25 14:27:45  yoda2
  * Removed unused Import statements and added preformatting tags to JavaDoc descriptions.
  *
