@@ -173,6 +173,9 @@ public class SSDBComboBox  extends JComponent{
 
 		// instance of the listener for the text field.
 		final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
+		
+		// seperator to be used if two column values are displayed
+		String seperator = " - ";
 
 		/**
 		 *	Creates an object of the SSDBComboBox.
@@ -348,6 +351,15 @@ public class SSDBComboBox  extends JComponent{
 */
 
 		/**
+		 *	set the seperator to be used when multiple columns are displayed
+		 *@param _seperator seperator to be used.
+		 *
+		 */
+		 public void setSeperator(String _seperator){
+		 	seperator = _seperator;
+		 }
+		 
+		/**
 		 *	Executes the query and adds items to the combo box based on the values
 		 *retrieved from the database.
 		 */
@@ -373,7 +385,7 @@ public class SSDBComboBox  extends JComponent{
 				while(rs.next()){
 					// IF TWO COLUMNS HAVE TO BE DISPLAYED IN THE COMBO THEY SEPERATED BY SEMI-COLON
 					if( secondDisplayColumnName != null){
-						cmbDisplayed.addItem(rs.getString(displayColumnName) + " : " + rs.getString(secondDisplayColumnName));
+						cmbDisplayed.addItem(rs.getString(displayColumnName) + seperator + rs.getString(secondDisplayColumnName));
 					} else {
 						cmbDisplayed.addItem(rs.getString(displayColumnName));
 					}
@@ -610,6 +622,9 @@ public class SSDBComboBox  extends JComponent{
 
 /*
  * $Log$
+ * Revision 1.2  2003/09/25 14:27:45  yoda2
+ * Removed unused Import statements and added preformatting tags to JavaDoc descriptions.
+ *
  * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
  * Initial CVS import for SwingSet.
  *
