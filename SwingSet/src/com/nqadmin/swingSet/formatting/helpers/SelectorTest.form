@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.0" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+  <NonVisualComponents>
+    <Component class="com.nqadmin.swingSet.datasources.SSConnection" name="sSConnection1">
+      <Properties>
+        <Property name="driverName" type="java.lang.String" value="org.postgresql.Driver"/>
+        <Property name="url" type="java.lang.String" value="jdbc:postgresql://localhost/mag"/>
+        <Property name="username" type="java.lang.String" value="dags"/>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="try {&#xa;    sSConnection1.createConnection();&#xa;}&#xa;catch(java.lang.ClassNotFoundException nf){&#xa;    &#xa;}&#xa;catch (java.lang.Exception exe) {&#xa;    &#xa;}"/>
+      </AuxValues>
+    </Component>
+    <Menu class="com.nqadmin.swingSet.formatting.helpers.HelperPopup" name="helperPopup1">
+      <Properties>
+        <Property name="dataColumn" type="java.lang.String" value="publication_id"/>
+        <Property name="listColumn" type="java.lang.String" value="publication_title"/>
+        <Property name="orderBy" type="java.lang.String" value="publication_title"/>
+        <Property name="table" type="java.lang.String" value="publications"/>
+        <Property name="target" type="com.nqadmin.swingSet.formatting.SSFormattedTextField" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="null"/>
+        </Property>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="helperPopup1.setConnection(sSConnection1);&#xa;helperPopup1.createHelper();&#xa;"/>
+      </AuxValues>
+    </Menu>
+    <Menu class="com.nqadmin.swingSet.formatting.helpers.HelperPopup" name="helperPopup2">
+      <Properties>
+        <Property name="dataColumn" type="java.lang.String" value="party_id"/>
+        <Property name="listColumn" type="java.lang.String" value="party_name"/>
+        <Property name="orderBy" type="java.lang.String" value="party_name"/>
+        <Property name="table" type="java.lang.String" value="parties"/>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="helperPopup2.setConnection(sSConnection1);&#xa;helperPopup2.createHelper();&#xa;"/>
+      </AuxValues>
+    </Menu>
+    <Menu class="com.nqadmin.swingSet.formatting.helpers.HelperPopup" name="helperPopup3">
+      <Properties>
+        <Property name="connection" type="com.nqadmin.swingSet.datasources.SSConnection" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="sSConnection1" type="code"/>
+        </Property>
+        <Property name="dataColumn" type="java.lang.String" value="account_id"/>
+        <Property name="listColumn" type="java.lang.String" value="account_name"/>
+        <Property name="orderBy" type="java.lang.String" value="account_name"/>
+        <Property name="table" type="java.lang.String" value="accounts"/>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="helperPopup3.createHelper();"/>
+      </AuxValues>
+    </Menu>
+  </NonVisualComponents>
+  <Properties>
+    <Property name="defaultCloseOperation" type="int" value="3"/>
+    <Property name="title" type="java.lang.String" value="SwingSet tests"/>
+  </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+  </SyntheticProperties>
+
+  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+  <SubComponents>
+    <Container class="javax.swing.JPanel" name="jPanel1">
+      <Constraints>
+        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+          <BorderConstraints direction="Center"/>
+        </Constraint>
+      </Constraints>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+      <SubComponents>
+        <Component class="com.nqadmin.swingSet.formatting.SSFormattedTextField" name="sSFormattedTextField1">
+          <Properties>
+            <Property name="columns" type="int" value="30"/>
+            <Property name="helper" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="helperPopup1" type="code"/>
+            </Property>
+            <Property name="value" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new Integer(85)" type="code"/>
+            </Property>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+              <BorderConstraints direction="Center"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="com.nqadmin.swingSet.formatting.SSFormattedTextField" name="sSFormattedTextField2">
+          <Properties>
+            <Property name="columns" type="int" value="30"/>
+            <Property name="helper" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection component="helperPopup2" type="bean"/>
+            </Property>
+            <Property name="value" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new Integer(1016)" type="code"/>
+            </Property>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+              <BorderConstraints direction="North"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="com.nqadmin.swingSet.formatting.SSFormattedTextField" name="sSFormattedTextField3">
+          <Properties>
+            <Property name="helper" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.ComponentChooserEditor">
+              <ComponentRef name="helperPopup3"/>
+            </Property>
+            <Property name="value" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new Integer(119)" type="code"/>
+            </Property>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+              <BorderConstraints direction="South"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+      </SubComponents>
+    </Container>
+  </SubComponents>
+</Form>
