@@ -170,3 +170,28 @@ FAQ
     ssConnection.setDriverName("org.postgresql.Driver");
     ssConnection.createConnection();
     rowset = new SSJdbcRowSetImpl(ssConnection);
+    
+8. I'm building some screens graphically in NetBeans using the SwingSet
+   JavaBeans.  I've setup my SSConnection and SSRowSet properly, but when I
+   launch the screen, I'm getting null pointer exceptions on the bind() methods
+   of the individual SwingSet components?  How do I correct this?
+   
+   When building an application in NetBeans you have to call the execute()
+   method explicitly on SSJdbcRowSetImpl. This has to be done in the post
+   initialization code for the last rowset/connection property you set.
+
+   Assuming that you are setting the four connection-related properties for
+   SSConnection followed by the two connection-related properties for
+   SSJdbcRowSetImpl, you would put the following code in the post initialization
+   code for the last property set for SSJdbcRowSetImpl:
+
+    // ASSUMING THAT THE ROWSET VARIABLE NAME IS sSJdbcRowSetImpl1
+        try {
+            sSJdbcRowSetImpl1.execute();
+        } catch(SQLException se) {
+            se.printStackTrace();
+        }
+        
+   Note that in NetBeans you should add your SSConnection and SSJdbcRowSetImpl,
+   set their properties, and add the above call to execute() before adding and
+   binding individual SwingSet components to SSRowSet column names.
