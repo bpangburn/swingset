@@ -210,20 +210,21 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 				String value = getText();
 				if(value == null)
 					value = "";
-			//	System.out.println("new Text " + value);
-				if( getLength() > 0 ){
+				replace(0, getLength(), value, null);	
+/*				if( getLength() > 0 ){
 					remove(0,getLength() );
 					//removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
 				}
 				if(value!=null && value.length() > 0) {
 					insertString(0,value, attribute);
-					insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.INSERT), attribute );
+//					insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.INSERT), attribute );
 				}
+*/				
 			}
 			else {
 				if( getLength() > 0 ){
 					remove(0,getLength() );
-					removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
+//					removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
 				}
 			}
 			}catch(SQLException se){
@@ -246,20 +247,21 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 				String value = getText();
 				if(value == null)
 					value = "";
-		//		System.out.println("new Text " + value);
-				if( getLength() > 0 ){
+				replace(0, getLength(), value, null);		
+
+/*				if( getLength() > 0 ){
 					remove(0,getLength() );
 					//removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
 				}
 				if(value!=null && value.length() > 0) {
 					insertString(0,value, attribute);
-					insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.INSERT), attribute );
+//					insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.INSERT), attribute );
 				}
-			}
+*/			}
 			else {
 				if( getLength() > 0 ){
 					remove(0,getLength() );
-					removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
+//					removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
 				}
 			}
 			}catch(SQLException se){
@@ -282,19 +284,21 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 				String value = getText();
 				if(value == null)
 					value = "";
-				if( getLength() > 0 ){
+				replace(0, getLength(), value, null);	
+				
+/*				if( getLength() > 0 ){
 					remove(0,getLength() );
 					//removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
 				}
 				if(value!=null && value.length() > 0) {
 					insertString(0,value, attribute);
-					insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.INSERT), attribute );
+//					insertUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.INSERT), attribute );
 				}
-			}
+*/			}
 			else {
 				if( getLength() > 0 ){
 					remove(0,getLength() );
-					removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
+//					removeUpdate( new AbstractDocument.DefaultDocumentEvent(0,getLength() , DocumentEvent.EventType.REMOVE) );
 				}
 			}
 			}catch(SQLException se){
@@ -504,6 +508,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.4  2003/11/26 21:31:51  prasanth
+ * Calling performCancelOps().
+ *
  * Revision 1.3  2003/10/31 16:08:46  prasanth
  * Added method getSQLDate().
  * Corrected a bug.( when a text field is linked to a date column, the column
