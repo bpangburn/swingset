@@ -98,6 +98,9 @@ public class SSDBNavImp extends SSDBNavAdapter {
             // 'EMPTY' ITEM BEFORE FIRST ITEM
                 JComboBox combo = ((SSDBComboBox)comps[i]).getComboBox();
                 combo.setSelectedIndex(-1);
+            } else if(comps[i] instanceof SSImage) {
+            // IF ITS SSIMAGE CLEAR THE IMAGE.
+                ((SSImage)comps[i]).clearImage();
             } else if(comps[i] instanceof  JPanel) {
             // IF ITS A JPANEL RECURSIVELY SET THE FIELDS
                 setComponents((Container)comps[i]);
@@ -133,7 +136,10 @@ public class SSDBNavImp extends SSDBNavAdapter {
             // 'EMPTY' ITEM BEFORE FIRST ITEM
                 JComboBox combo = ((SSDBComboBox)comps[i]).getComboBox();
                 combo.setSelectedIndex(-1);
-            } else if(comps[i] instanceof JPanel) {
+            } else if(comps[i] instanceof SSImage) {
+            // IF ITS SSIMAGE CLEAR THE IMAGE.
+                ((SSImage)comps[i]).clearImage();
+            }  else if(comps[i] instanceof JPanel) {
             // IF ITS A JPANEL RECURSIVELY SET THE FIELDS
                 setComponents((Container)comps[i]);
             } else if(comps[i] instanceof JTabbedPane) {
@@ -151,6 +157,9 @@ public class SSDBNavImp extends SSDBNavAdapter {
 
 /*
  * $Log$
+ * Revision 1.7  2004/11/11 14:45:48  yoda2
+ * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
+ *
  * Revision 1.6  2004/08/10 22:06:58  yoda2
  * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
  *
