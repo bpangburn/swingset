@@ -500,6 +500,14 @@ will not be available.
 
 
 ***********************
+SSTableKeyAdapter    
+***********************
+The SSTableKeyAdapter class provides copy & paste support for JTable. This is 
+also used by SSDataGrid. This class facilitates copy & paste between two
+JTables or between a spread sheet and a JTable.
+
+
+***********************
 SSCellEditing
 ***********************
 The SSCellEditing interface specifies the methods the SSTableModel will use to
