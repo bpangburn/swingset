@@ -30,31 +30,34 @@
  *
  */
  
+package samples;
+ 
  import com.nqadmin.swingSet.*;
  import javax.swing.*;
  import javax.sql.*;
  import java.sql.*;
  import java.awt.*;
- import sun.jdbc.rowset.JdbcRowSet;
+ import java.awt.event.*; 
+ //import sun.jdbc.rowset.JdbcRowSet;
  
  
  
-public class MainClass extends JFrame {
+public class Main extends JFrame {
 	
 	JButton btnExample1 = new JButton("Example1");
 	JButton btnExample2 = new JButton("Example2");
 	JButton btnExample3 = new JButton("Example3");
 	JButton btnExample4 = new JButton("Example4");
 		
-	public MainClass(){
+	public Main(){
 		
 		super("SwingSet Demo");
 		setSize(400,500);
 		
-		btnExample1.addListener( new MyButtonListener());
-		btnExample2.addListener( new MyButtonListener());
-		btnExample3.addListener( new MyButtonListener());
-		btnExample4.addListener( new MyButtonListener());
+	//	btnExample1.addListener( new MyButtonListener());
+	//	btnExample2.addListener( new MyButtonListener());
+	//	btnExample3.addListener( new MyButtonListener());
+	//	btnExample4.addListener( new MyButtonListener());
 		
 		setVisible(true);
 		pack();

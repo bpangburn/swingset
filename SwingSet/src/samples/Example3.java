@@ -30,7 +30,7 @@
  *
  */
 
-
+package samples;
 
  import com.nqadmin.swingSet.*;
  import javax.swing.*;
