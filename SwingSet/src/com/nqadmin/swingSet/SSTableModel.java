@@ -2,6 +2,7 @@ package com.nqadmin.swingSet;
 
 import javax.sql.*;
 import javax.swing.table.*;
+import javax.swing.JOptionPane;
 import java.sql.*;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -26,10 +27,11 @@ public class SSTableModel  extends AbstractTableModel {
 	int primaryColumn = -1;
 	Object primaryValue = null;
 	SSDataValue		dataValue	= null;
-	SSCellEditable  cellEditable = null;
+	SSCellEditing  cellEditing = null;
 	
 	
 	int[] uneditableColumns  = null;
+	int[] hiddenColumns		 = null;
 	/**
 	 * Constructs a SSTableModel object.
 	 *If this contructor is used the setRowSet method has to be used to set the rowset
@@ -62,12 +64,12 @@ public class SSTableModel  extends AbstractTableModel {
 	
 	/**
 	 *	If the user has to decide on which cell has to be editable and which is not
-	 *then SSCellEditable interface has to be implemented and set it for the SSTableModel.
-	 *@param _cellEditable implementation of SSCellEditable interface.
+	 *then SSCellEditing interface has to be implemented and set it for the SSTableModel.
+	 *@param _cellEditing implementation of SSCellEditing interface.
 	 *
 	 */
-	 public void setSSCellEditable(SSCellEditable _cellEditable){
-	 	cellEditable = _cellEditable;
+	 public void setSSCellEditing(SSCellEditing _cellEditing){
+	 	cellEditing = _cellEditing;
 	 }
 	
 	/**
@@ -126,8 +128,8 @@ public class SSTableModel  extends AbstractTableModel {
 					return false;
 			}
 		}
-		if(cellEditable != null)
-			return cellEditable.isCellEditable(_row, _column);
+		if(cellEditing != null)
+			return cellEditing.isCellEditable(_row+1, _column+1);
 		return true;
 	}
 	
@@ -180,6 +182,9 @@ public class SSTableModel  extends AbstractTableModel {
 	        }
 	     }catch(SQLException se){
 	     	se.printStackTrace();
+	     	if(grid != null)
+	     		JOptionPane.showMessageDialog(grid,"Error while retrieving value.\n" + se.getMessage());
+	    
 	     }
 	     return value;
     }
@@ -192,11 +197,28 @@ public class SSTableModel  extends AbstractTableModel {
      */
     public void setValueAt(Object _value, int _row, int _column){
     	
+    	// IF CELL EDITING INTERFACE IMPLEMENTATION IS PROVIDED INFO THE USER
+    	// THAT AN UPDATE FOR CELL HAS BEEN REQUESTED.
+    	if(cellEditing != null){
+    		// THE ROW AND COLUMN NUMBERING STARTS FROM 0 FOR JTABLE BUT THE COLUMNS AND
+    		// ROWS ARE NUMBERED FROM 1 FOR ROWSET.
+    		boolean allowEdit;
+    		// IF ITS NEW ROW SEND A NULL FOR THE OLD VALUE
+    		if(_row == rowCount)
+    			allowEdit = cellEditing.cellUpdateRequested(_row+1, _column+1, null, _value);
+    		 else
+    		 	allowEdit = cellEditing.cellUpdateRequested(_row+1, _column+1, getValueAt(_row,_column), _value);
+    		// IF THE USER DOES NOT PERMIT THE UPDATE RETURN ELSE GO AHEAD AND UPDATE THE
+    		// DATABASE.
+    		if(!allowEdit)
+    			return;
+    	}
+    	
     	if( _row == rowCount ){
     		insertRow(_value,_column);
     		return;
     	}
-    	System.out.println("Set value at "+ _row + "  " + _column + " with "+ _value);	
+//    	System.out.println("Set value at "+ _row + "  " + _column + " with "+ _value);	
     	try{
     		if(rowset.getRow() != _row +1)
     			rowset.absolute(_row +1);
@@ -204,6 +226,7 @@ public class SSTableModel  extends AbstractTableModel {
     			rowset.updateNull(_column+1);
     			return;
     		}
+    		
     		
     		int type = metaData.getColumnType(_column + 1);
     		switch(type){
@@ -223,8 +246,15 @@ public class SSTableModel  extends AbstractTableModel {
 	        		rowset.updateBoolean(_column+1, ((Boolean)_value).booleanValue());
 	        		break;
 	        	case Types.DATE:
-	        		if(_value instanceof String)
-	        			rowset.updateDate(_column+1,getSQLDate((String)_value));
+	        	//  IF A DATE RENDERER AND EDITOR IS USED THE DATE IS DISPLAYED AS STRING.
+	        	// SO A STRING WILL BE SENT FOR UPDATE
+	        	// IN SUCH A CASE CHECK IS THE STRING IS EMPTY IF SO UPDATE NULL FOR THE FEILD
+	        		if(_value instanceof String){
+	        			if(getSQLDate((String)_value) == null)
+	        				rowset.updateNull(_column+1);
+	        			else
+	        				rowset.updateDate(_column+1,getSQLDate((String)_value));
+	        		}	
 	        		else
 	        			rowset.updateDate(_column+1,(Date)_value);
 	        		break;
@@ -237,9 +267,11 @@ public class SSTableModel  extends AbstractTableModel {
 	        		System.out.println("SSTableModel.setValueAt(): Unknown data type");	
 	        }
 	        rowset.updateRow();
-	        System.out.println("Updated value: " + getValueAt(_row,_column));
+//	        System.out.println("Updated value: " + getValueAt(_row,_column));
 	     }catch(SQLException se){
 	     	se.printStackTrace();
+	     	if(grid != null)
+	     		JOptionPane.showMessageDialog(grid,"Error while updating the value.\n" + se.getMessage());
 	     }
     }
     
@@ -293,7 +325,7 @@ public class SSTableModel  extends AbstractTableModel {
 	    		rowset.first();
 	    	}
 	    	rowset.refreshRow();
-	    	System.out.println("Row number of inserted row : "+ rowset.getRow());
+//	    	System.out.println("Row number of inserted row : "+ rowset.getRow());
 	    	if(grid != null)
 	    		grid.updateUI();	
 	        inInsertRow = false;
@@ -303,7 +335,7 @@ public class SSTableModel  extends AbstractTableModel {
 	   }catch(SQLException se){
 	     	se.printStackTrace();
 	   }
-	   System.out.println("Successfully added row");
+//	   System.out.println("Successfully added row");
 	}
 	
 	public void setDefaults(){
@@ -315,6 +347,7 @@ public class SSTableModel  extends AbstractTableModel {
         try{
 	        while(iterator.hasNext()){
 	        	Integer column = (Integer)iterator.next();
+	        	System.out.println("Column number is:" + column);
 	        	int type = metaData.getColumnType(column.intValue());
 				switch(type){
 					case Types.INTEGER:
@@ -435,7 +468,7 @@ public class SSTableModel  extends AbstractTableModel {
     	}
     }
     
-    private Object getDefaultValue(int _columnNumber){
+    public Object getDefaultValue(int _columnNumber){
     	Object value = null;
     	if(defaultValuesMap != null){
     		value = defaultValuesMap.get(new Integer(_columnNumber));
@@ -494,6 +527,8 @@ public class SSTableModel  extends AbstractTableModel {
     
     
     public Date getSQLDate(String _strDate){
+    	if(_strDate.trim().equals(""))
+    		return null;
     	StringTokenizer strtok = new StringTokenizer(_strDate,"/",false);
     	String month = strtok.nextToken();
     	String day   = strtok.nextToken();
@@ -508,17 +543,20 @@ public class SSTableModel  extends AbstractTableModel {
     public String getColumnName(int _columnNumber){
     	if(headers != null){
     		if(_columnNumber < headers.length){
-    			System.out.println("sending header " + headers[_columnNumber]);
+//    			System.out.println("sending header " + headers[_columnNumber]);
     			return headers[_columnNumber];
     		}
     	}
-    	System.out.println(" Not able to supply header name");
+//    	System.out.println(" Not able to supply header name");
     	return "";
     }
     		
     public void setUneditableColumns(int[] _columnNumbers){
     	uneditableColumns = _columnNumbers;
     }
-    	
+    
+    public void setHiddenColumns(int[] _columnNumbers){
+    	hiddenColumns = _columnNumbers;
+    }	
     
 }
