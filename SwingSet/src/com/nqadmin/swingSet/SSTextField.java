@@ -35,6 +35,9 @@ package com.nqadmin.swingSet;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
+import java.io.ObjectInputStream;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.StringTokenizer;
 
 
@@ -77,6 +80,18 @@ public class SSTextField extends JTextField {
 	
 	// NUMBER OF DECIMALS REQUIRED
 	private int numDecimals = 2;
+	
+	
+	
+	/**
+	 * This function is provided to know if the object has been deserialized.
+	 *In which case the listeners have to be added again.
+	 */
+	private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException{
+		objIn.defaultReadObject();
+		init();
+	}
+	
 	
 	/**
 	 *Constructs a new TextField with the specified mask and initialized
@@ -320,6 +335,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.3  2004/03/08 16:43:37  prasanth
+ * Updated copy right year.
+ *
  * Revision 1.2  2004/02/23 16:45:51  prasanth
  * Added new constructor
  * public SSTextField(int _mask, int _numDecimals, int _align)
