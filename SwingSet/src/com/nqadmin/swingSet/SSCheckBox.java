@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company, Inc. and Prasanth R. Pasala.
+ * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -135,12 +135,15 @@ public class SSCheckBox extends JCheckBox {
      * If the column name and SSRowSet are set seperately then this function has to
      * be called to bind the combo box to the column in the SSRowSet.
      */
-    private void bind() {
+    protected void bind() {
         
         // CHECK FOR NULL COLUMN/ROWSET
             if (columnName==null || rowset==null) {
                 return;
             }
+            
+        // REMOVE LISTENERS TO PREVENT DUPLICATION
+            removeListeners();            
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
             textField.setDocument(new SSTextDocument(rowset, columnName));
@@ -148,9 +151,7 @@ public class SSCheckBox extends JCheckBox {
         // SET THE COMBO BOX ITEM DISPLAYED
             setDisplay();
             
-        // ADDS LISTENERS FOR TEXT FIELD AND CHECKBOX
-        // IF BIND IS CALLED MULTIPLE TIMES OLD LISTENERS HAVE TO BE REMOVED
-            removeListeners();
+        // ADD BACK LISTENERS
             addListeners();
                
     }
@@ -192,9 +193,18 @@ public class SSCheckBox extends JCheckBox {
     public String getColumnName() {
         return columnName;
     }
+    
+    /**
+     * Returns the SSRowSet being used to get the values.
+     *
+     * @return returns the SSRowSet being used.
+     */
+    public SSRowSet getSSRowSet() {
+        return rowset;
+    }    
 
     // INITIALIZES THE CHECK BOX.
-    private void setDisplay() {
+    protected void setDisplay() {
             
         // SELECT/DESELECT BASED ON UNDERLYING SQL TYPE
             switch(columnType) {
@@ -223,7 +233,7 @@ public class SSCheckBox extends JCheckBox {
                     break;
             }
 
-    } // end private void setDisplay() {
+    } // end protected void setDisplay() {
 
     // LISTENER FOR THE TEXT FIELD
     private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
@@ -415,6 +425,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/02 23:37:19  yoda2
+ * API cleanup.
+ *
  * Revision 1.4  2005/02/01 17:32:37  yoda2
  * API cleanup.
  *

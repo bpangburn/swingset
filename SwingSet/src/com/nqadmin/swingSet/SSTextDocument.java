@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala
+ * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -611,6 +611,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.16  2004/11/11 14:45:33  yoda2
+ * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
+ *
  * Revision 1.15  2004/11/10 22:55:51  dags
  * Modified boolean support, as a side efect of SSDBCheckBox update.
  *

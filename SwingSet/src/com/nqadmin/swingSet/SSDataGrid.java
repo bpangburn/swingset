@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala
+ * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -134,16 +134,24 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
 
 public class SSDataGrid extends JTable {
 
-    // COMPONENT WHERE MESSAGES HAVE TO BE POPPED UP.
+    /**
+     * Component where messages should be popped up.
+     */
     protected Component window = null;
 
-    // SSROWSET CONTAINING THE VALUES
+    /**
+     * SSRowSet containing values for component.
+     */
     protected SSRowSet rowset = null;
 
-    // NUMBER OF COLUMNS IN THE SSROWSET
+    /**
+     * Number of columns in the SSRowSet.
+     */
     protected int columnCount = -1;
 
-    // NUMBER OF RECORDS RETRIVED
+    /**
+     * Number of records retrieved from the SSRowSet.
+     */
     protected int rowCount = -1;
 
     /**
@@ -233,7 +241,6 @@ public class SSDataGrid extends JTable {
         callExecute = _execute;
     }
 
-
     /**
      * Sets the allowInsertion property of the table.
      * If set to true an addition row for inserting new rows will be displayed
@@ -309,7 +316,7 @@ public class SSDataGrid extends JTable {
     /**
      * Initialization code.
      */
-    private void init() {
+    protected void init() {
     
         // ADD KEY LISTENER TO JTABLE.
         // THIS IS USED FOR DELETING THE ROWS
@@ -386,13 +393,13 @@ public class SSDataGrid extends JTable {
         // ADD THE JTABLE TO A SCROLL BAR
             scrollPane = new JScrollPane(this,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
 
-    } // end private void init() {
+    } // end protected void init() {
         
     /**
      * Initializes the data grid control. Collects metadata information about the
      * given SSRowSet.
      */
-    private void bind() {
+    protected void bind() {
         
         try {
         // EXECUTE THE QUERY
@@ -430,7 +437,7 @@ public class SSDataGrid extends JTable {
         // UPDATE DISPLAY
         //    updateUI();
 
-    } // end private void bind() {        
+    } // end protected void bind() {        
 
     /**
      * Binds the SSRowSet to the grid.
@@ -438,7 +445,7 @@ public class SSDataGrid extends JTable {
      *
      * @param _rowset    the SSRowSet which acts as the data source.
      */
-     public void setRowSet(SSRowSet _rowset) {
+     public void setSSRowSet(SSRowSet _rowset) {
 /*         
         // VARIABLE TO DETERMINE IF UI HAS TO BE UPDATED
         boolean updateUI = false;
@@ -471,6 +478,15 @@ public class SSDataGrid extends JTable {
             rowset = _rowset;
             bind();
      } // end public void setRowSet(SSRowSet _rowset) {
+         
+    /**
+     * Returns the SSRowSet being used to get the values.
+     *
+     * @return returns the SSRowSet being used.
+     */
+    public SSRowSet getSSRowSet() {
+        return rowset;
+    }         
 
      /**
       * Sets the preferred size of the scroll pane in which the JTable is embedded.
@@ -564,16 +580,6 @@ public class SSDataGrid extends JTable {
         int columnNumber = rowset.getColumnIndex(_columnName);
         return tableModel.getDefaultValue(columnNumber -1);
      }
-
-    /**
-     * Notification from the UIManager that the L&F has changed. Replaces the current
-     * UI object with the latest version from the UIManager.
-     * This also causes the JTable to request new values for each cell.
-     * Thus refreshes the screen.
-     */
-    public void updateUI() {
-        super.updateUI();
-    }
 
     /**
      * Sets the column number which is the primary column for the table.
@@ -811,7 +817,7 @@ public class SSDataGrid extends JTable {
     /**
      *  Hides the columns specified in the hidden columns list.
      */
-    private void hideColumns(){
+    protected void hideColumns(){
     // SET THE MINIMUM WIDTH OF COLUMNS
         TableColumnModel columnModel = this.getColumnModel();
         TableColumn column;
@@ -853,7 +859,7 @@ public class SSDataGrid extends JTable {
     // EDITOR TO EDIT THE DATE FIELD.
     // USES THE TEXT FIELD AS THE EDITOR BUT CHANGES THE FORMAT
     // TO MM/DD/YYYY FORMAT FROM YYYY-MM-DD FORMAT.
-    private class DateEditor extends DefaultCellEditor {
+    protected class DateEditor extends DefaultCellEditor {
 
         // CONSTRUCTOR FOR THE EDITOR CLASS
         public DateEditor(){
@@ -900,7 +906,7 @@ public class SSDataGrid extends JTable {
     }
 
 	// CHECK BOX RENDERER FOR COLUMNS.
-	private class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
+	protected class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
 		
 		public CheckBoxRenderer(){
 			super();
@@ -936,7 +942,7 @@ public class SSDataGrid extends JTable {
     }
     
     
-    private class CheckBoxEditor extends DefaultCellEditor{
+    protected class CheckBoxEditor extends DefaultCellEditor{
     // VARIABLE TO STORE THE COLUMN CLASS.		
 	   	protected int columnClass = 0;
     	
@@ -1011,7 +1017,7 @@ public class SSDataGrid extends JTable {
     }
     // DATE RENDERER CLASS FOR RENDERER DATE COLUMNS.
     // DISPLAYS THE DATE IN MM/DD/YYYY FORMAT.
-    private class DateRenderer extends DefaultTableCellRenderer {
+    protected class DateRenderer extends DefaultTableCellRenderer {
 
         public  void setValue(Object value) {
             if (value instanceof java.sql.Date) {
@@ -1029,7 +1035,7 @@ public class SSDataGrid extends JTable {
     }
 
     // COMBORENDERER RENDERS THE VALUES OF THE CELL IN A COMBO BOX.
-    private class ComboRenderer extends JComboBox implements TableCellRenderer {
+    protected class ComboRenderer extends JComboBox implements TableCellRenderer {
 
         Object[] underlyingValues = null;
         JLabel label = new JLabel();
@@ -1059,7 +1065,7 @@ public class SSDataGrid extends JTable {
             return label;
         }
 
-        private int getIndexOf(Object _value) {
+        protected int getIndexOf(Object _value) {
             if (_value == null) {
                 return -1;
             }
@@ -1076,7 +1082,7 @@ public class SSDataGrid extends JTable {
     }
 
     // COMBO BOX EDITOR FOR COLUMNS HAVING COMBO RENDERERS.
-    private class ComboEditor extends DefaultCellEditor {
+    protected class ComboEditor extends DefaultCellEditor {
         Object[] underlyingValues = null;
         // SET THE CLICK COUNT TO EDIT THE COMBO AS 2
         int clickCountToStart = 2;
@@ -1116,7 +1122,7 @@ public class SSDataGrid extends JTable {
             return underlyingValues[index];
         }
 
-        private int getIndexOf(Object _value) {
+        protected int getIndexOf(Object _value) {
             if (underlyingValues == null) {
                 return ((Integer)_value).intValue();
             }
@@ -1129,6 +1135,22 @@ public class SSDataGrid extends JTable {
             return -1;
         }
     }
+    
+    
+    
+// DEPRECATED STUFF....................
+    
+    /**
+     * Sets the new SSRowSet for the combo box.
+     *
+     * @param _rowset  SSRowSet to which the combo has to update values.
+     *
+     * @deprecated
+     * @see #setSSRowSet     
+     */
+    public void setRowSet(SSRowSet _rowset) {
+        setRowSet(_rowset);
+    }      
 
 } // end public class SSDataGrid extends JTable {
 
@@ -1136,6 +1158,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.21  2005/02/01 17:32:37  yoda2
+ * API cleanup.
+ *
  * Revision 1.20  2004/12/10 18:59:47  prasanth
  * Modified the getCellEditorValue function of CheckBoxEditor inner class.
  *

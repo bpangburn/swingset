@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2005, The Pangburn Company, Inc. and Prasanth R. Pasala.
+ * Copyright (c) 2005, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -273,6 +273,9 @@ public class SSSlider extends JSlider {
 
 /*
  * $Log$
+ * Revision 1.3  2005/01/03 02:58:04  yoda2
+ * Added appropriate super() calls to non-empty constructors.
+ *
  * Revision 1.2  2005/01/02 18:33:49  yoda2
  * Added back empty constructor needed for deserialization along with other potentially useful constructors from parent classes.
  *

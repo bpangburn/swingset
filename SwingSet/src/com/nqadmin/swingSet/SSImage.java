@@ -3,7 +3,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company, Inc. and Prasanth R. Pasala
+ * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -90,7 +90,7 @@ public class SSImage extends JPanel{
      *
      *  Construct a default SSImage Object.
      */
-    public SSImage(){
+    public SSImage() {
         init();
     }
     
@@ -111,59 +111,54 @@ public class SSImage extends JPanel{
      * Initialization code.
      */
     protected void init() {
+        
+        // ADD UPDATE BUTTON LISTENER
+            btnUpdateImage.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent ae){
+                    try{
+                        if(rowset != null){
+                            FileInputStream inStream = null;
+                            File inFile = null;
+                            JFileChooser fileChooser = new JFileChooser();
+                            if(fileChooser.showOpenDialog(btnUpdateImage) == JFileChooser.APPROVE_OPTION){
+                                inFile = fileChooser.getSelectedFile();
+                                inStream = new FileInputStream(inFile);
+                                int totalLength = (int)inFile.length();
+                                byte[] bytes = new byte[totalLength];
+                                int bytesRead = inStream.read(bytes);
+                                while (bytesRead < totalLength){
+                                    int read = inStream.read(bytes, bytesRead, totalLength - bytesRead);
+                                    if(read == -1)
+                                        break;
+                                    else
+                                        bytesRead += read;
+                                }
+                                rowset.updateBytes(columnName, bytes);
+                                img = new ImageIcon(bytes);
+                                lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
+                                lblImage.setIcon(img);
+                                lblImage.setText("");
+                                updateUI();
+                            }
+                            else{
+                                return;
+                            }                   
+                        }
+                    }catch(SQLException se){
+                        se.printStackTrace();
+                    }catch(IOException ioe){
+                        ioe.printStackTrace();
+                    }   
+                }
+            });        
            
         // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,200));
             
-// ADD LISTENERS & COMPONENTS
-        addListener();
-        addComponents(); 
+        // ADD LABEL & BUTTON TO PANEL
+            addComponents(); 
     }      
-    
-    /**
-     *  adds listener to the update button.
-     */
-    protected void addListener(){
-        btnUpdateImage.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent ae){
-                try{
-                    if(rowset != null){
-                        FileInputStream inStream = null;
-                        File inFile = null;
-                        JFileChooser fileChooser = new JFileChooser();
-                        if(fileChooser.showOpenDialog(btnUpdateImage) == JFileChooser.APPROVE_OPTION){
-                            inFile = fileChooser.getSelectedFile();
-                            inStream = new FileInputStream(inFile);
-                            int totalLength = (int)inFile.length();
-                            byte[] bytes = new byte[totalLength];
-                            int bytesRead = inStream.read(bytes);
-                            while (bytesRead < totalLength){
-                                int read = inStream.read(bytes, bytesRead, totalLength - bytesRead);
-                                if(read == -1)
-                                    break;
-                                else
-                                    bytesRead += read;
-                            }
-                            rowset.updateBytes(columnName, bytes);
-                            img = new ImageIcon(bytes);
-                            lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
-                            lblImage.setIcon(img);
-                            lblImage.setText("");
-                            updateUI();
-                        }
-                        else{
-                            return;
-                        }                   
-                    }
-                }catch(SQLException se){
-                    se.printStackTrace();
-                }catch(IOException ioe){
-                    ioe.printStackTrace();
-                }   
-            }
-        });
-    }
-    
+
     /**
      *  Adds the label and button to the panel
      */
@@ -181,10 +176,52 @@ public class SSImage extends JPanel{
     }
     
     /**
-     *    Changes the image to the specified image.
+     * Sets the new SSRowSet for the image component.
+     *
+     * @param _rowset  SSRowSet to which the image has to update values.
      */
-    public void setImage(ImageIcon img){
-        this.img = img;
+    public void setSSRowSet(SSRowSet _rowset) {
+        rowset = _rowset;
+        bind();
+    }    
+
+    /**
+     * Sets the column name for the combo box
+     *
+     * @param _columnName   name of column
+     */
+    public void setColumnName(String _columnName) {
+        columnName = _columnName;
+        bind();
+    }
+    
+    /**
+     * Returns the column name to which the combo is bound.
+     *
+     * @return returns the column name to which to combo box is bound.
+     */
+    public String getColumnName() {
+        return columnName;
+    }
+    
+    /**
+     * Returns the SSRowSet being used to get the values.
+     *
+     * @return returns the SSRowSet being used.
+     */
+    public SSRowSet getSSRowSet() {
+        return rowset;
+    }      
+    
+    
+    /**
+     * Changes the image to the specified image.
+     *
+     * @param _img GIF or JPEG to store to rowset & display
+     */
+/*     
+    public void setImage(ImageIcon _img){
+        img = _img;
         if(img != null){
             lblImage.setIcon(img);
             lblImage.setText("");
@@ -195,69 +232,81 @@ public class SSImage extends JPanel{
         }
         updateUI();
     }
+*/    
+    
+    /**
+     * Returns the current image.
+     */
+/*     
+    public void getImage(ImageIcon _img) {
+        return(img);
+    }
+*/    
     
     /**
      *  Binds SSImage to the columnName in the rowset.
      *@param rowset - rowset from/to which data has to be read/written
      *@param columnName - column in the rowset to which the component should be bound.
      */
-    public void bind(SSRowSet _rowset, String _columnName){
-        if(rowset != null)
-            rowset.removeRowSetListener(rowsetListener);
+    public void bind(SSRowSet _rowset, String _columnName) {
         rowset = _rowset;
         columnName = _columnName;
-        rowset.addRowSetListener(rowsetListener);
-        
         bind();
     }
     
     /**
      * Binds SSImage to the columnName in the rowset.
      */
-    private void bind(){
-        try{
+    protected void bind() {
+        
+        // CHECK FOR NULL COLUMN/ROWSET
+            if (columnName==null || rowset==null) {
+                return;
+            }
+            
+        // REMOVE LISTENERS TO PREVENT DUPLICATION
+            removeListeners();
+            
+        // UPDATE DISPLAY
+            setDisplay();
+        
+        // ADD BACK LISTENERS
+            addListeners();        
+    }
+
+    // ADDS LISTENERS FOR THE COMBO BOX AND TEXT FIELD
+    private void addListeners() {
+        rowset.addRowSetListener(rowsetListener);
+    }
+
+    // REMOVES THE LISTENERS FOR TEXT FIELD AND THE COMBO BOX DISPLAYED
+    private void removeListeners() {
+        rowset.removeRowSetListener(rowsetListener);
+    }    
+    
+    /**
+     * Reads the image from the rowset and sets it to the label for display.
+     */
+    protected void setDisplay() {
+
+        try {
             byte[] imageData = rowset.getRow() >0 ? rowset.getBytes(columnName) : null;
             if(imageData != null){
                 img = new ImageIcon(imageData);
                 lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
                 lblImage.setText("");
-            }
-            else{
+            } else {
                 img = null;
                 lblImage.setText("No Picture");
             }
-        }catch(SQLException se){
+        } catch(SQLException se) {
             se.printStackTrace();
             img = null;
         }
+        
         lblImage.setIcon(img);
-        updateUI();
-    }    
-    
-    /**
-     *  Reads the image from the rowset and sets it to the label for display.
-     *@param rse - RowSetEvent that triggered the event.
-     */
-    protected void updateImage(RowSetEvent rse){
-        try{
-            RowSet rs = (RowSet)rse.getSource();
-            byte[] imageData = rs.getRow() >0 ? rs.getBytes(columnName) : null;
-            if(imageData != null){
-                img = new ImageIcon(imageData);
-                lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
-                lblImage.setText("");
-            }
-            else{
-                img = null;
-                lblImage.setText("No Picture");
-            }
-                        
-        }catch(SQLException se){
-            se.printStackTrace();
-            img = null;
-        }
-        lblImage.setIcon(img);
-        updateUI();
+        updateUI();            
+
     }
 
     /**
@@ -265,25 +314,26 @@ public class SSImage extends JPanel{
      */
     private class MyRowSetListener  implements RowSetListener {
         public void cursorMoved(RowSetEvent rse){
-            System.out.println("Cursor Moved");
-            updateImage(rse);
+            //System.out.println("Cursor Moved");
+            setDisplay();
         }
         
         public void rowChanged(RowSetEvent rse){
-            System.out.println("Row Changed");
-            updateImage(rse);
+            //System.out.println("Row Changed");
+            setDisplay();
         }
         
         public void rowSetChanged(RowSetEvent rse){
-            System.out.println("RowSet Changed");
-            updateImage(rse);   
+            //System.out.println("RowSet Changed");
+            setDisplay();   
         }
                 
     }
     
     /**
-     *  Sets the preferred size of this component.
-     *@param dimension - preferred dimension for component.
+     * Sets the preferred size of this component.
+     *
+     * @param dimension - preferred dimension for component.
      */
     public void setPreferredSize(Dimension dimension){
         lblImage.setPreferredSize(new Dimension((int)dimension.getWidth(), (int)dimension.getHeight() - 20));
@@ -292,7 +342,7 @@ public class SSImage extends JPanel{
     }
     
     /**
-     *  Removes the current image. The image is not removed from the underlying rowset.
+     * Removes the current image. The image is not removed from the underlying rowset.
      */
     public void clearImage(){
         lblImage.setIcon(null);
@@ -305,6 +355,9 @@ public class SSImage extends JPanel{
 
 /*
  *$Log$
+ *Revision 1.2  2005/02/02 23:37:19  yoda2
+ *API cleanup.
+ *
  *Revision 1.1  2005/01/18 20:59:13  prasanth
  *Initial Commit.
  *

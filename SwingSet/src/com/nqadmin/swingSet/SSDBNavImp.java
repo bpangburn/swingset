@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala.
+ * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -161,6 +161,9 @@ public class SSDBNavImp extends SSDBNavAdapter {
 
 /*
  * $Log$
+ * Revision 1.10  2005/01/19 16:46:11  yoda2
+ * Updated SSDBComboBox stuff to get rid of getComboBox() calls.
+ *
  * Revision 1.9  2005/01/18 22:27:28  yoda2
  * Changed to extend JComboBox rather than JComponent.  Deprecated bind(), setSSRowSet(), & setColumnName().
  *

@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala
+ * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -82,6 +82,9 @@ public interface SSCellEditing {
 
 /*
  * $Log$
+ * Revision 1.5  2004/11/11 14:45:33  yoda2
+ * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
+ *
  * Revision 1.4  2004/08/10 22:06:59  yoda2
  * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
  *

@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala.
+ * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -133,8 +133,8 @@ public class SSDataNavigator extends JPanel {
          return true;
      }
 
-    // METHOD TO ADD TOOLTIPS AND BUTTON GRPAHICS OR TEXT
-    private void addToolTips() {
+    // METHOD TO ADD TOOLTIPS AND BUTTON GRAPHICS OR TEXT
+    protected void addToolTips() {
 
         try {
             ClassLoader cl = this.getClass().getClassLoader();
@@ -170,7 +170,7 @@ public class SSDataNavigator extends JPanel {
         addButton.setToolTipText("Add Record");
         deleteButton.setToolTipText("Delete Record");
 
-    } // end private void addToolTips() {
+    } // end protected void addToolTips() {
 
     /**
      * Constructors a SSDataNavigator for the given SSRowSet
@@ -351,7 +351,7 @@ public class SSDataNavigator extends JPanel {
       *
       * @return returns the SSRowSet being used.
       */
-     public SSRowSet getRowSet() {
+     public SSRowSet getSSRowSet() {
         return rowset;
      }
 
@@ -380,7 +380,7 @@ public class SSDataNavigator extends JPanel {
      *
      * @param _rowset    a SSRowSet object to which the navigator has to be bound
      */
-    public void setRowSet(SSRowSet _rowset) {
+    public void setSSRowSet(SSRowSet _rowset) {
         if(rowset != null){
             rowset.removeRowSetListener(rowsetListener);
         }
@@ -459,7 +459,7 @@ public class SSDataNavigator extends JPanel {
     }
 
     // SET BUTTON DIMENSIONS
-    private void setButtonSizes() {
+    protected void setButtonSizes() {
 
         // SET THE PREFERRED SIZES
             firstButton.setPreferredSize(buttonSize);
@@ -555,7 +555,7 @@ public class SSDataNavigator extends JPanel {
      
 
     // ADDS THE BUTTONS ON TO THE PANEL
-    private void createPanel() {
+    protected void createPanel() {
 
         setButtonSizes();
         //SET THE BOX LAYOUT
@@ -953,7 +953,7 @@ public class SSDataNavigator extends JPanel {
 
     }
 
-    private class SSDBNavRowSetListener implements RowSetListener{
+    private class SSDBNavRowSetListener implements RowSetListener {
 
         public void cursorMoved(RowSetEvent rse){
         // IF THERE ARE ROWS GET THE ROW COUNT
@@ -1015,6 +1015,33 @@ public class SSDataNavigator extends JPanel {
             }
         }
     }
+    
+    
+// DEPRECATED STUFF....................
+    
+    /**
+     * Sets the new SSRowSet for the combo box.
+     *
+     * @param _rowset  SSRowSet to which the combo has to update values.
+     *
+     * @deprecated
+     * @see #setSSRowSet     
+     */
+    public void setRowSet(SSRowSet _rowset) {
+        setRowSet(_rowset);
+    }
+    
+     /**
+      * Returns the SSRowSet being used.
+      *
+      * @return returns the SSRowSet being used.
+      *
+      * @deprecated
+      * @see #getSSRowSet        
+      */
+     public SSRowSet getRowSet() {
+        return rowset;
+     }    
 
 } // end public class SSDataNavigator extends JPanel {
 
@@ -1022,6 +1049,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.25  2005/01/09 03:56:14  prasanth
+ * Added public methods to programmatically perform different button clicks.
+ *
  * Revision 1.24  2004/11/11 14:45:48  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *

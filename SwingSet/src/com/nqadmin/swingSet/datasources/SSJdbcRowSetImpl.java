@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004, The Pangburn Company, Inc. and Prasanth R. Pasala
+ * Copyright (c) 2004-2005, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -136,7 +136,7 @@
     /**
      * Recreates the rowset object during the deserialization process.
      */
-    private void readObject(ObjectInputStream inStream) throws ClassNotFoundException, IOException{
+    protected void readObject(ObjectInputStream inStream) throws ClassNotFoundException, IOException{
         inStream.defaultReadObject();
     // GET THE CONNECTION OBJECT FROM THE SSCONNECTION.
         connection = ssConnection.getConnection();
@@ -856,6 +856,9 @@
 }
  /*
   * $Log$
+  * Revision 1.6  2005/01/18 20:58:11  prasanth
+  * Added function to get & set bytes.
+  *
   * Revision 1.5  2004/11/11 14:45:57  yoda2
   * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
   *

@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala.
+ * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -434,7 +434,7 @@ public class SSDBComboBox extends JComboBox {
 
     // SETS THE COMBOBOX ITEM TO THE ONE CORRESPONDING TO THE VALUE PRESENT AT
     // COLUMN TO WHICH COMBO IS BOUND.
-    private void setDisplay() {
+    protected void setDisplay() {
 
         try {
             // GET THE VALUE FROM TEXT FIELD
@@ -464,12 +464,15 @@ public class SSDBComboBox extends JComboBox {
      * If the column name and SSRowSet are set seperately then this function has to
      * be called to bind the combo box to the column in the SSRowSet.
      */
-    private void bind() {
+    protected void bind() {
         
         // CHECK FOR NULL COLUMN/ROWSET
             if (columnName==null || rowset==null) {
                 return;
             }
+            
+        // REMOVE LISTENERS TO PREVENT DUPLICATION
+            removeListeners();            
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
             textField.setDocument(new SSTextDocument(rowset, columnName));
@@ -477,9 +480,7 @@ public class SSDBComboBox extends JComboBox {
         // SET THE COMBO BOX ITEM DISPLAYED
             setDisplay();
 
-        // ADDS LISTENERS FOR TEXT FIELD AND COMBO
-        // IF BIND IS CALLED MULTIPLE TIMES OLD LISTENERS HAVE TO BE REMOVED
-            removeListeners();
+        // ADD BACK LISTENERS
             addListeners();
 
     }    
@@ -820,7 +821,7 @@ public class SSDBComboBox extends JComboBox {
     }
 
     // RETURN STRING EQUILIVENT OF DATA IN A COLUMN
-    private String getStringValue(ResultSet _rs, String _queryPKColumnName) {
+    protected String getStringValue(ResultSet _rs, String _queryPKColumnName) {
         String strValue = "";
         try {
             int type = _rs.getMetaData().getColumnType(_rs.findColumn(_queryPKColumnName));
@@ -954,6 +955,10 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.21  2005/02/04 00:02:48  prasanth
+ * 1. Removed commented out code.
+ * 2. Using setDisplay in document listener.
+ *
  * Revision 1.20  2005/02/02 23:36:58  yoda2
  * Removed setMaximiumSize() calls.
  *

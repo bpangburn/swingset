@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004, The Pangburn Company, Inc. and Prasanth R. Pasala
+ * Copyright (c) 2004-2005, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -210,7 +210,7 @@
     /**
      *  Recreates the connection when the object is deserialized.
      */
-    private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
+    protected void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
         objIn.defaultReadObject();
         try{
             createConnection();
@@ -222,6 +222,9 @@
 
 /*
  * $Log$
+ * Revision 1.2  2004/11/11 14:45:57  yoda2
+ * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
+ *
  * Revision 1.1  2004/10/25 21:47:50  prasanth
  * Initial Commit
  *

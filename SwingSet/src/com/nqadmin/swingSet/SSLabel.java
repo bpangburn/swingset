@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2005, The Pangburn Company, Inc. and Prasanth R. Pasala.
+ * Copyright (c) 2005, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -105,17 +105,18 @@ public class SSLabel extends JLabel {
      * @param _rowset    datasource to be used.
      * @param _columnName    name of the column to which this label should be bound
      */
-    public SSLabel(SSRowSet _rowset, String _columnName) throws java.sql.SQLException {
+    public SSLabel(SSRowSet _rowset, String _columnName) {
+        rowset = _rowset;
         columnName = _columnName;
-        textField = new JTextField();
-        textField.setDocument(new SSTextDocument(_rowset, _columnName));
         init();
+        bind();
     }
     
     /**
      * Initialization code.
      */
     protected void init() {
+        
         // SET PREFERRED AND MAXIMUM DIMENSIONS
             setPreferredSize(new Dimension(200,20));
             setMaximumSize(new Dimension(200,20));            
@@ -165,12 +166,15 @@ public class SSLabel extends JLabel {
      * If the column name and SSRowSet are set seperately then this function has to
      * be called to bind the combo box to the column in the SSRowSet.
      */
-    private void bind() {
+    protected void bind() {
         
         // CHECK FOR NULL COLUMN/ROWSET
             if (columnName==null || rowset==null) {
                 return;
             }
+            
+        // REMOVE LISTENERS TO PREVENT DUPLICATION
+            removeListeners();            
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
             textField.setDocument(new SSTextDocument(rowset, columnName));
@@ -178,10 +182,8 @@ public class SSLabel extends JLabel {
         // SET THE LABEL DISPLAY
             setDisplay();
 
-        // ADDS LISTENERS FOR TEXT FIELD AND COMBO
-        // IF BIND IS CALLED MULTIPLE TIMES OLD LISTENERS HAVE TO BE REMOVED
-            removeListeners();
-            addListeners();
+        // ADD BACK LISTENERS
+            addListeners();;
                
     }    
 
@@ -199,12 +201,12 @@ public class SSLabel extends JLabel {
     }
     
     // INITIALIZES THE LABEL DISPLAY
-    private void setDisplay() {
+    protected void setDisplay() {
             
         // SET THE LABEL BASED ON THE VALUE IN THE TEXT FIELD
             setText(textField.getText());
 
-    } // end private void setDisplay() {    
+    } // end protected void setDisplay() {    
 
     // ADDS LISTENERS FOR THE COMBO BOX AND TEXT FIELD
     private void addListeners() {
@@ -225,7 +227,6 @@ public class SSLabel extends JLabel {
         public void changedUpdate(DocumentEvent de) {
             removePropertyChangeListener("text", labelTextListener);
 
-            //setText(textField.getText());
             setDisplay();
 
             addPropertyChangeListener("text", labelTextListener);
@@ -236,7 +237,6 @@ public class SSLabel extends JLabel {
         public void insertUpdate(DocumentEvent de) {
             removePropertyChangeListener("text", labelTextListener);
 
-            //setText(textField.getText());
             setDisplay();
 
             addPropertyChangeListener("text", labelTextListener);
@@ -247,7 +247,6 @@ public class SSLabel extends JLabel {
         public void removeUpdate(DocumentEvent de) {
             removePropertyChangeListener("text", labelTextListener);
 
-            //setText(textField.getText());
             setDisplay();
 
             addPropertyChangeListener("text", labelTextListener);
@@ -274,6 +273,9 @@ public class SSLabel extends JLabel {
 
 /*
  * $Log$
+ * Revision 1.4  2005/02/01 17:32:38  yoda2
+ * API cleanup.
+ *
  * Revision 1.3  2005/01/03 02:58:03  yoda2
  * Added appropriate super() calls to non-empty constructors.
  *

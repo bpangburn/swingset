@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2004, The Pangburn Company, Inc. and Prasanth R. Pasala.
+ * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -262,12 +262,15 @@ public class SSComboBox extends JComboBox {
      * If the column name and SSRowSet are set seperately then this function has to
      * be called to bind the combo box to the column in the SSRowSet.
      */
-    private void bind() {
+    protected void bind() {
         
         // CHECK FOR NULL COLUMN/ROWSET
             if (columnName==null || rowset==null) {
                 return;
             }
+            
+        // REMOVE LISTENERS TO PREVENT DUPLICATION
+            removeListeners();
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
             textField.setDocument(new SSTextDocument(rowset, columnName));
@@ -275,9 +278,7 @@ public class SSComboBox extends JComboBox {
         // SET THE COMBO BOX ITEM DISPLAYED
             setDisplay();
 
-        // ADDS LISTENERS FOR TEXT FIELD AND COMBO
-        // IF BIND IS CALLED MULTIPLE TIMES OLD LISTENERS HAVE TO BE REMOVED
-            removeListeners();
+        // ADD BACK LISTENERS
             addListeners();
                
     }
@@ -296,7 +297,7 @@ public class SSComboBox extends JComboBox {
     }
 
     // SET THE COMBO BOX ITEM TO THE ITEM THAT CORRESPONDS TO THE VALUE IN TEXT FIELD
-    private void setDisplay(){
+    protected void setDisplay(){
         try {
             String text = textField.getText().trim();
             // GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD
@@ -596,6 +597,12 @@ public class SSComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.25  2005/02/03 23:50:56  prasanth
+ * 1. Removed commented out code.
+ * 2. Modified setDisplay function to change value only when underlying value
+ *      does not match with that displayed.
+ * 3. Using setDisplay in document listener.
+ *
  * Revision 1.24  2005/02/02 23:36:58  yoda2
  * Removed setMaximiumSize() calls.
  *

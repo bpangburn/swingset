@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2005, The Pangburn Company, Inc. and Prasanth R. Pasala.
+ * Copyright (c) 2005, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -120,7 +120,7 @@
 
 		}
 
-		private void adjustValue(){
+		protected void adjustValue(){
 			comboBox.getComboBox().removeActionListener(comboListener);
 			try{
 				if(rowset != null & rowset.getRow() > 0){
@@ -191,4 +191,7 @@
 
 /*
  * $Log$
+ * Revision 1.1  2005/01/03 19:53:43  prasanth
+ * Initial Commit.
+ *
  */
