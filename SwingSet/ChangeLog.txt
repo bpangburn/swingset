@@ -10,24 +10,24 @@ SwingSet 0.9.2-beta - Released 11-01-2004
 
 Changes:
     SSJdbcRowSetImpl:
-		1. Fixed issue with setCommand() not updating underlying JdbcRowSetImpl.
+        1. Fixed issue with setCommand() not updating underlying JdbcRowSetImpl.
 		
-	SSTableModel:
-		1. Added support for NUMERIC.  Made type support consistent across
-		   SwingSet: INTEGER, SMALLINT, TINYINT (Integer); BIGINT (Long);
-		   FLOAT (Float); DOUBLE, NUMERIC (Double); BOOLEAN, BIT (Boolean);
-		   DATE (Date); CHAR, VARCHAR, LONGVARCHAR (String).
-	    2. Added this.fireTableDataChanged(); to init() to alert listeners to
-		   change in data.
+    SSTableModel:
+        1. Added support for NUMERIC.  Made type support consistent across
+           SwingSet: INTEGER, SMALLINT, TINYINT (Integer); BIGINT (Long);
+           FLOAT (Float); DOUBLE, NUMERIC (Double); BOOLEAN, BIT (Boolean);
+           DATE (Date); CHAR, VARCHAR, LONGVARCHAR (String).
+        2. Added this.fireTableDataChanged(); to init() to alert listeners to
+           change in data.
 		
     SSTextDocument:
-		1. Added support for NUMERIC.  Made type support consistent across
-		   SwingSet: INTEGER, SMALLINT, TINYINT (Integer); BIGINT (Long);
-		   FLOAT (Float); DOUBLE, NUMERIC (Double); BOOLEAN, BIT (Boolean);
-		   DATE (Date); CHAR, VARCHAR, LONGVARCHAR (String).
+        1. Added support for NUMERIC.  Made type support consistent across
+           SwingSet: INTEGER, SMALLINT, TINYINT (Integer); BIGINT (Long);
+           FLOAT (Float); DOUBLE, NUMERIC (Double); BOOLEAN, BIT (Boolean);
+           DATE (Date); CHAR, VARCHAR, LONGVARCHAR (String).
 
     (all classes)
-   		1. Fixed JavaDoc errors.
+        1. Fixed JavaDoc errors.
 
 ==============================================================================
 SwingSet 0.9.1-beta - Released 10-28-2004
