@@ -495,14 +495,14 @@ public class SSComboBox extends JComponent {
 		if(cmbDisplayed.getItemCount() != 0) {
 			cmbDisplayed.removeAllItems();
 		}
-		if (_options == YES_NO_OPTION) {
+		if (option == YES_NO_OPTION) {
 			cmbDisplayed.addItem(new String("NO"));
 			cmbDisplayed.addItem(new String("YES"));
-		} else if (_options == SEX_OPTION || _options == GENDER_OPTION) {
+		} else if (option == SEX_OPTION || option == GENDER_OPTION) {
 			cmbDisplayed.addItem(new String("MALE"));
 			cmbDisplayed.addItem(new String("FEMALE"));
 			cmbDisplayed.addItem(new String("UNI_SEX"));
-		} else if (_options == INCLUDE_EXCLUDE_OPTION) {
+		} else if (option == INCLUDE_EXCLUDE_OPTION) {
 			cmbDisplayed.addItem(new String("INCLUDE"));
 			cmbDisplayed.addItem(new String("EXCLUDE"));
 		} else {
@@ -708,6 +708,9 @@ public class SSComboBox extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.17  2004/10/25 22:03:18  yoda2
+ * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ *
  * Revision 1.16  2004/10/25 19:51:02  prasanth
  * Modified to use the new SSRowSet instead of  RowSet.
  *
