@@ -138,21 +138,24 @@ public class SSDBComboBox extends JComboBox {
     // QUERY USED TO RETRIEVE ALL POSSIBLE VALUES.
     private String query = null;
 
-    // THE COLUMN NAME  WHOSE VALUE HAS TO BE WRITTEN BACK
+    // THE COLUMN NAME WHOSE VALUE HAS TO BE WRITTEN BACK
     // TO THE DATABASE WHEN USER CHOOSES AN ITEM IN THE COMBO. THIS IS GENERALLY THE
     // COLUMN IN THE FOREIGN TABLE TO WHICH THE FOREIGN KEY MAPS TO.
-    private String columnName = null;
+    private String queryPKColumnName = null;
 
     // THE COLUMN NAME WHOSE VALUES HAVE TO BE DISPLAYED IN THE COMBO.
-    private String displayColumnName = null;
+    private String queryDisplayColumnName1 = null;
 
     // AN ADDITIONAL COLUMN (IF DESIRED) WHOSE VALUES WILL ALSO BE DISPLAYED IN THE COMBO
-    private String secondDisplayColumnName = null;
+    private String queryDisplayColumnName2 = null;
 
     private Vector columnVector = new Vector();
 
     // NUMBER OF ITEMS IN THE COMBO BOX.
     private int numberOfItems = 0;
+    
+    // COLUMN NAME TO WHICH THE COMBO WILL BE BOUND TO
+    protected String columnName;    
 
     // SSROWSET USED TO RETRIEVE THE INFO FROM THE DATABASE.
     private SSRowSet rowset = null;
@@ -183,23 +186,23 @@ public class SSDBComboBox extends JComboBox {
      *
      * @param _conn    database connection to be used.
      * @param _query   query to be used to retrieve the values from the database.
-     * @param _columnName  column name whose value has to be stored.
-     * @param _displayColumnName   column name whose values are displayed in the combo box.
+     * @param _queryPKColumnName  column name whose value has to be stored.
+     * @param _queryDisplayColumnName1   column name whose values are displayed in the combo box.
      * @param _textField   a text field to which the combo box has to be synchronized
      *
      * @deprecated
      */
-    public SSDBComboBox(SSConnection _conn, String _query, String _columnName, String _displayColumnName, JTextField _textField) {
-
-        //super();
+    public SSDBComboBox(SSConnection _conn, String _query, String _queryPKColumnName, String _queryDisplayColumnName1, JTextField _textField) {
+//check with prasanth
+        super();
 
         conn                = _conn;
         query               = _query;
-        columnName          = _columnName;
-        displayColumnName   = _displayColumnName;
+        queryPKColumnName   = _queryPKColumnName;
+        queryDisplayColumnName1  = _queryDisplayColumnName1;
         textField           = _textField;
-        textField.setPreferredSize(new Dimension(200,20));
-        textField.setMaximumSize(new Dimension(200,20));
+        //textField.setPreferredSize(new Dimension(200,20));
+        //textField.setMaximumSize(new Dimension(200,20));
 
         //addComponent();
 
@@ -210,22 +213,24 @@ public class SSDBComboBox extends JComboBox {
      *
      * @param _conn database connection to be used.
      * @param _query query to be used to retrieve the values from the database.
-     * @param _columnName column name whose value has to be stored.
-     * @param _displayColumnName column name whose values are displayed in the combo box.
+     * @param _queryPKColumnName column name whose value has to be stored.
+     * @param _queryDisplayColumnName1 column name whose values are displayed in the combo box.
      */
-    public SSDBComboBox(SSConnection _conn, String _query, String _columnName, String _displayColumnName) {
+    public SSDBComboBox(SSConnection _conn, String _query, String _queryPKColumnName, String _queryDisplayColumnName1) {
 
-        //super();
+        super();
 
         conn                = _conn;
         query               = _query;
-        columnName          = _columnName;
-        displayColumnName   = _displayColumnName;
+        queryPKColumnName          = _queryPKColumnName;
+        queryDisplayColumnName1   = _queryDisplayColumnName1;
         textField           = new JTextField();
         textField.setPreferredSize(new Dimension(200,20));
-        cmbDisplayed.setPreferredSize(new Dimension(200,20));
+        //cmbDisplayed.setPreferredSize(new Dimension(200,20));
+        setPreferredSize(new Dimension(200,20));
         textField.setMaximumSize(new Dimension(200,20));
-        cmbDisplayed.setMaximumSize(new Dimension(200,20));
+        //cmbDisplayed.setMaximumSize(new Dimension(200,20));
+        setMaximumSize(new Dimension(200,20));
 
     }
 
@@ -239,7 +244,7 @@ public class SSDBComboBox extends JComboBox {
      */
     public void setRowSet(SSRowSet _rowset) {
         rowset = _rowset;
-	bind();
+        bind();
     }
     
     /**
@@ -249,7 +254,7 @@ public class SSDBComboBox extends JComboBox {
      */
     public void setSSRowSet(SSRowSet _rowset) {
         rowset = _rowset;
-	bind();
+        bind();
     }    
 
     /**
@@ -276,7 +281,7 @@ public class SSDBComboBox extends JComboBox {
     /**
      * Sets the query used to display items in the combo box.
      *
-     * @param _query   query to be used to get values from database( to display combo box items)
+     * @param _query   query to be used to get values from database (to display combo box items)
      */
     public void setQuery(String _query) {
         query = _query;
@@ -289,16 +294,16 @@ public class SSDBComboBox extends JComboBox {
      */
     public void setColumnName(String _columnName) {
         columnName = _columnName;
-	bind();
+        bind();
     }
 
     /**
      * Sets the column name whose values have to be displayed in combo box.
      *
-     * @param _displayColumnName   column name whose values have to be displayed.
+     * @param _queryDisplayColumnName1   column name whose values have to be displayed.
      */
-    public void setDisplayColumnName(String _displayColumnName) {
-        displayColumnName = _displayColumnName;
+    public void setDisplayColumnName(String _queryDisplayColumnName1) {
+        queryDisplayColumnName1 = _queryDisplayColumnName1;
     }
 
     /**
@@ -317,11 +322,11 @@ public class SSDBComboBox extends JComboBox {
      * For the parts example given above. If you have a part description in part table.
      * Then you can display both part name and part description.
      *
-     * @param _secondDisplayColumnName    column name whose values have to be
+     * @param _queryDisplayColumnName2    column name whose values have to be
      *  displayed in the combo in addition to the first column name.
      */
-    public void setSecondDisplayColumnName(String _secondDisplayColumnName) {
-        secondDisplayColumnName = _secondDisplayColumnName;
+    public void setSecondDisplayColumnName(String _queryDisplayColumnName2) {
+        queryDisplayColumnName2 = _queryDisplayColumnName2;
     }
 
     /**
@@ -385,13 +390,22 @@ public class SSDBComboBox extends JComboBox {
     }
 
     /**
-     * Returns the name of column from which values for items in combo are taken from.
+     * Returns the column name to which the combo is bound.
      *
-     * @return returns column name representing the values for combo box items.
+     * @return returns the column name to which to combo box is bound.
      */
     public String getColumnName() {
         return columnName;
     }
+    
+    /**
+     * Returns the SSRowSet being used to get the values.
+     *
+     * @return returns the SSRowSet being used.
+     */
+    public SSRowSet getSSRowSet() {
+        return rowset;
+    }    
 
     /**
      * Returns the column name whose values are displayed in the combo box.
@@ -399,7 +413,7 @@ public class SSDBComboBox extends JComboBox {
      * @return returns the name of the column used to get values for combo box items.
      */
     public String getDisplayColumnName() {
-        return displayColumnName;
+        return queryDisplayColumnName1;
     }
 
     /**
@@ -409,7 +423,7 @@ public class SSDBComboBox extends JComboBox {
      *  returns NULL if the second display column is not provided.
      */
     public String getSecondDisplayColumnName() {
-        return secondDisplayColumnName;
+        return queryDisplayColumnName2;
     }
 
     /**
@@ -433,10 +447,10 @@ public class SSDBComboBox extends JComboBox {
      }
 
      /**
-     * Returns the seperator used when multiple columns are displayed
-     *
-     * @return seperator used.
-     */
+      * Returns the seperator used when multiple columns are displayed
+      *
+      * @return seperator used.
+      */
      public String getSeperator() {
         return seperator;
      }
@@ -494,15 +508,15 @@ public class SSDBComboBox extends JComboBox {
             int i = 0;
             while (rs.next()) {
                 // IF TWO COLUMNS HAVE TO BE DISPLAYED IN THE COMBO THEY SEPERATED BY SEMI-COLON
-                if ( secondDisplayColumnName != null) {
-                    //cmbDisplayed.addItem(getStringValue(rs,displayColumnName) + seperator + rs.getString(secondDisplayColumnName));
-                    addItem(getStringValue(rs,displayColumnName) + seperator + rs.getString(secondDisplayColumnName));
+                if ( queryDisplayColumnName2 != null) {
+                    //cmbDisplayed.addItem(getStringValue(rs,queryDisplayColumnName1) + seperator + rs.getString(queryDisplayColumnName2));
+                    addItem(getStringValue(rs,queryDisplayColumnName1) + seperator + rs.getString(queryDisplayColumnName2));
                 } else {
-                    //cmbDisplayed.addItem(getStringValue(rs,displayColumnName));
-                    addItem(getStringValue(rs,displayColumnName));
+                    //cmbDisplayed.addItem(getStringValue(rs,queryDisplayColumnName1));
+                    addItem(getStringValue(rs,queryDisplayColumnName1));
                 }
                 // ADD THE ID OF THE ITEM TO A VECTOR.
-                columnVector.add(i,new Long(rs.getLong(columnName)));
+                columnVector.add(i,new Long(rs.getLong(queryPKColumnName)));
                 i++;
             }
 
@@ -529,9 +543,10 @@ public class SSDBComboBox extends JComboBox {
                 int indexCorrespondingToLong = columnVector.indexOf(new Long(valueInText));
                 // SET THE SELECTED ITEM OF COMBO TO THE ITEM AT THE INDEX FOUND FROM
                 // ABOVE STATEMENT
-                if (indexCorrespondingToLong != cmbDisplayed.getSelectedIndex()) {
+                //if (indexCorrespondingToLong != cmbDisplayed.getSelectedIndex()) {
+                if (indexCorrespondingToLong != getSelectedIndex()) {
                     //cmbDisplayed.setSelectedIndex(indexCorrespondingToLong);
-		    setSelectedIndex(indexCorrespondingToLong);
+                    setSelectedIndex(indexCorrespondingToLong);
                 }
             }
         } catch(BadLocationException ble) {
@@ -557,19 +572,13 @@ public class SSDBComboBox extends JComboBox {
             textField.setDocument(new SSTextDocument(rowset, columnName));
 
         // SET THE COMBO BOX ITEM DISPLAYED
-            setDisplay();
+            setCmbDisplay();
 
         // ADDS LISTENERS FOR TEXT FIELD AND COMBO
         // IF BIND IS CALLED MULTIPLE TIMES OLD LISTENERS HAVE TO BE REMOVED
             removeListeners();
             addListeners();
-            
-        // ADD FOCUS LISTENER
-            addFocusListener(new FocusAdapter(){
-                public void focusLost(FocusEvent fe){
-                    myKeyListener.resetSearchString();
-                }
-            });        
+
     }    
 
     /**
@@ -588,18 +597,21 @@ public class SSDBComboBox extends JComboBox {
     private void addListeners() {
         //cmbDisplayed.addActionListener(cmbListener);
         addActionListener(cmbListener);
+        addFocusListener(cmbListener);
         //cmbDisplayed.addKeyListener(myKeyListener);
         addKeyListener(myKeyListener);
-        textField.getDocument().addDocumentListener(textFieldDocumentListener);
+        textField.getDocument().addDocumentListener(textFieldDocumentListener);         
     }
 
     // REMOVES THE LISTENERS FOR THE COMBOBOX AND TEXT FIELD
     private void removeListeners() {
         //cmbDisplayed.removeActionListener(cmbListener);
         removeActionListener(cmbListener);
+        removeFocusListener(cmbListener);
         //cmbDisplayed.removeKeyListener(myKeyListener);
         removeKeyListener(myKeyListener);
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
+          
     }
 
     // LISTENER FOR THE TEXT FIELD
@@ -854,7 +866,7 @@ public class SSDBComboBox extends JComboBox {
     } // end private class MyKeyListener extends KeyAdapter {
 
     // LISTENER FOR THE COMBO BOX.
-    private class MyComboListener implements ActionListener {
+    private class MyComboListener extends FocusAdapter implements ActionListener {
 
         public void actionPerformed(ActionEvent ae) {
 
@@ -899,6 +911,11 @@ public class SSDBComboBox extends JComboBox {
             textField.getDocument().addDocumentListener(textFieldDocumentListener);
 
         }
+        
+        public void focusLost(FocusEvent fe){
+            myKeyListener.resetSearchString();
+        }
+        
     } // private class MyComboListener implements ActionListener {
 
     // ADD THE COMBO BOX TO THE JCOMPONENT
@@ -1063,21 +1080,21 @@ public class SSDBComboBox extends JComboBox {
     }
 
     // RETURN STRING EQUILIVENT OF DATA IN A COLUMN
-    private String getStringValue(ResultSet _rs, String _columnName) {
+    private String getStringValue(ResultSet _rs, String _queryPKColumnName) {
         String strValue = "";
         try {
-            int type = _rs.getMetaData().getColumnType(_rs.findColumn(_columnName));
+            int type = _rs.getMetaData().getColumnType(_rs.findColumn(_queryPKColumnName));
             switch(type){
                 case Types.DATE:
                     //Calendar calendar = Calendar.getInstance();
-                    //calendar.setTime(_rs.getDate(_columnName));
+                    //calendar.setTime(_rs.getDate(_queryPKColumnName));
                     SimpleDateFormat dateFormat = new SimpleDateFormat(datePattern);
                     //dateFormat.setCalendar(calendar);
                     //strValue = dateFormat.toLocalizedPattern();
-                    strValue = dateFormat.format(_rs.getDate(_columnName));
+                    strValue = dateFormat.format(_rs.getDate(_queryPKColumnName));
                 break;
                 default:
-                    strValue = _rs.getString(_columnName);
+                    strValue = _rs.getString(_queryPKColumnName);
                 break;
             }
         } catch(SQLException se) {
@@ -1093,6 +1110,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.17  2005/01/19 03:17:08  yoda2
+ * Rewrote to extend JComboBox rather than JComponent.
+ *
  * Revision 1.16  2004/11/11 14:45:48  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *
