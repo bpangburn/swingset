@@ -130,6 +130,26 @@ public class SSComboBox   extends JComponent {
 			this.setDocument(document);
 
 		}
+		
+		/**
+		 * Returns the index of the selected item in the combo box.
+		 *@return index of selected item. -1 if none selected.
+		 */
+		 public int getSelectedIndex(){
+		 	return cmbDisplayed.getSelectedIndex();
+		 	
+		 }
+		 
+		 /**
+		  * Returns the value associated with the selected item.
+		  *@return returns the value associated with the item selected. Returns
+		  * -1 if none selected.
+		  */
+		  public int getSelectedValue(){
+		  	if(mappingValues != null)
+		  		return mappingValues[cmbDisplayed.getSelectedIndex()];
+		  	return cmbDisplayed.getSelectedIndex();
+		  }
 
 		/**
 		 *	Binds the combo box to the specified column of the rowset.
@@ -281,7 +301,8 @@ public class SSComboBox   extends JComponent {
 		public boolean setOption(int options) {
 
 			option = options;
-
+			System.out.println("Requested  Option: " + options);
+				
 			if( options == YES_NO_OPTION) {
 				cmbDisplayed.addItem(new String("NO"));
 				cmbDisplayed.addItem(new String("YES"));
@@ -548,6 +569,9 @@ public class SSComboBox   extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.2  2003/09/25 14:27:45  yoda2
+ * Removed unused Import statements and added preformatting tags to JavaDoc descriptions.
+ *
  * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
  * Initial CVS import for SwingSet.
  *
