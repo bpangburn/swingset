@@ -9,6 +9,15 @@ SwingSet 0.9.0-beta - Released 10-26-2004
 ==============================================================================
 
 Changes:
+	SSJdbcRowSetImpl:
+		1. Calling the setType & SetConcurrency methods on the 
+		   JdbcRowSetImpl instance variable.
+
+==============================================================================
+SwingSet 0.9.0-beta - Released 10-26-2004
+==============================================================================
+
+Changes:
 	Classes or Interfaces added in SwingSet-0.9.0:
 		1. SSConnection
 		2. SSRowSet
