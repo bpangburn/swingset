@@ -17,6 +17,11 @@ Changes:
         1. Updated the undoButton listener. Based on the insertRow flag calling
             moveToCurrentRow(). 
         2. Updating the current row number in the undoButton listener.
+        
+    SSDataGrid:
+        1. Added custom editor to Numeric, String & Object type columns.
+        2. Modified the ComboRenderer to extend DefaultCellRenderer.UIResource
+
 
 
 ==============================================================================
