@@ -1,0 +1,39 @@
+Steps to follow:
+
+1. Create a folder called Release_X.X.X_XXX in SwingSet.
+
+2. Create folder called classes in this the release folder that we created in step 1.
+
+3. Copy the complete directory structure and classes in the classes folder (i.e, copy
+   the com folder). Also copy the images folder to this folder.
+
+4. Create a folder called source in the folder created in step 1.
+
+5. Copy the source code along with directory structure to the source folder.
+
+6. Create a folder called samples in the folder created in step 1.
+
+7. Copy the samples source and class files with the directory structure in to samples folder.
+   Also copy the images directory to source directory.
+
+8. copy the changelog.txt, FAQ.txt, and readme.txt to the folder created in step 1.
+
+9. Now we have placed all the  required files. Lets create the docs.
+
+10. Go to command prompt and go the the source folder created in step 4.
+
+11. type "javadoc -d ../javadoc  com.nqadmin.swingSet" ( this will create the javadoc folder in the folder
+we created in step 1 and place all the doc files in that folder.
+
+12. Create a folder called META-INF. Copy the manifest files from prior release folder (manifest.bin.mf
+& manifest.samples.mf). Now we are ready to make the jar files.
+
+13. Go to command prompt and go the the folder created in step 1.
+
+14. type "jar -mcvf META-INF/manifest.bin.mf swingset-bin_X.X.X_XXXX.jar  -C classes com -C classes images readme.txt ChangeLog.txt FAQ.txt" 	this will create the binaries jar file and also include the readme.txt and changelog.txt
+
+15. type "jar -mcvf META-INF/MANIFEST.samples.mf swingset-demo_X.X.X_XXXX.jar  -C samples .  readme.txt"
+
+16. type  "jar -cvf swingset-docs_X.X.X_XXX.jar -C javadoc . readme.txt FAQ.txt ChangeLog.txt"
+
+17. type "jar -cvf swingset-src_X.X.X_XXX.jar -C source com  -C source images readme.txt  Changelog.txt FAQ.txt"
