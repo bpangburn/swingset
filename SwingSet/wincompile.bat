@@ -7,4 +7,4 @@ REM
 echo off
 rmdir .\bin /s
 mkdir .\bin
-javac -d .\bin .\src\com\nqadmin\swingSet\*.java
+javac -d .\bin .\src\com\nqadmin\swingSet\datasources\*.java .\src\com\nqadmin\swingSet\*.java
