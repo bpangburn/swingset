@@ -65,8 +65,8 @@ public class SSSlider extends JSlider {
     protected int columnType;
 
     // LISTENER FOR SLIDER AND TEXT FIELD
-    private MySliderListener sliderListener = new MySliderListener();
-    private MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
+    private final MySliderListener sliderListener = new MySliderListener();
+    private final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
     /**
      * Empty constructor needed for deserialization. Creates a horizontal
@@ -288,6 +288,9 @@ public class SSSlider extends JSlider {
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/05 05:16:33  yoda2
+ * API cleanup.
+ *
  * Revision 1.5  2005/02/04 23:05:10  yoda2
  * no message
  *

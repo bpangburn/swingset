@@ -72,8 +72,8 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
     protected int columnIndex = -1;
     protected SimpleAttributeSet attribute = new SimpleAttributeSet();
 
-    private MyRowSetListener rowSetListener = new MyRowSetListener();
-    private MyDocumentListener documentListener = new MyDocumentListener();
+    private final MyRowSetListener rowSetListener = new MyRowSetListener();
+    private final MyDocumentListener documentListener = new MyDocumentListener();
 
 
     /**
@@ -527,6 +527,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.19  2005/02/05 18:16:20  yoda2
+ * API cleanup.
+ *
  * Revision 1.18  2005/02/04 23:05:10  yoda2
  * no message
  *

@@ -85,12 +85,12 @@ public class SSCheckBox extends JCheckBox {
     /**
      * Component listener.
      */
-    private MyCheckBoxListener checkBoxListener = new MyCheckBoxListener();
+    private final MyCheckBoxListener checkBoxListener = new MyCheckBoxListener();
     
     /**
      * Bound text field document listener.
      */
-    private MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
+    private final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
     /**
      * Checked value for numeric columns.
@@ -392,6 +392,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.8  2005/02/05 18:13:29  yoda2
+ * JavaDoc cleanup.
+ *
  * Revision 1.7  2005/02/05 05:16:33  yoda2
  * API cleanup.
  *

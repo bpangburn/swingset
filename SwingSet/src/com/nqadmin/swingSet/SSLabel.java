@@ -66,8 +66,8 @@ public class SSLabel extends JLabel {
     protected String columnName;
 
     // LISTENER FOR LABEL & TEXT FIELD
-    private MyLabelTextListener labelTextListener = new MyLabelTextListener();
-    private MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
+    private final MyLabelTextListener labelTextListener = new MyLabelTextListener();
+    private final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
     /**
      * Empty constructor needed for deserialization. Creates a SSLabel instance
@@ -272,6 +272,9 @@ public class SSLabel extends JLabel {
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/05 05:16:33  yoda2
+ * API cleanup.
+ *
  * Revision 1.5  2005/02/04 22:48:54  yoda2
  * API cleanup & updated Copyright info.
  *

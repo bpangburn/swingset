@@ -100,12 +100,12 @@ public class SSComboBox extends JComboBox {
     /**
      * Component listener.
      */
-    private MyComboListener cmbListener = new MyComboListener();
+    private final MyComboListener cmbListener = new MyComboListener();
 
     /**
      * Bound text field document listener.
      */
-    private MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
+    private final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
     /**
      * Underlying values for each combo box choice if different from defaults
@@ -642,6 +642,9 @@ public class SSComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.27  2005/02/07 04:20:13  yoda2
+ * JavaDoc cleanup.
+ *
  * Revision 1.26  2005/02/04 22:48:52  yoda2
  * API cleanup & updated Copyright info.
  *
