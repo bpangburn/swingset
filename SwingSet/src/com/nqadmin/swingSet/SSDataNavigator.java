@@ -64,51 +64,129 @@ import javax.sql.RowSetEvent;
  */
 public class SSDataNavigator extends JPanel {
 
+    /**
+     * Button to navigate to the first record in the SSRowSet.
+     */
     protected JButton firstButton = new JButton();
+    
+    /**
+     * Button to navigate to the previous record in the SSRowSet.
+     */    
     protected JButton previousButton = new JButton();
+    
+    /**
+     * Text field for viewing/changing the current record number.
+     */    
     protected JTextField txtCurrentRow = new JTextField();
+    
+    /**
+     * Button to navigate to the next record in the SSRowSet.
+     */    
     protected JButton nextButton = new JButton();
+    
+    /**
+     * Button to navigate to the last record in the SSRowSet.
+     */    
     protected JButton lastButton = new JButton();
 
+    /**
+     * Button to commit screen changes to the SSRowSet.
+     */    
     protected JButton commitButton = new JButton(); // Commit button
+    
+    /**
+     * Button to revert screen changes based on the SSRowSet.
+     */    
     protected JButton undoButton = new JButton();
+    
+    /**
+     * Button to refresh the screen based on any changes to the SSRowSet.
+     */    
     protected JButton refreshButton = new JButton(); // REFRESH BUTTON
+    
+    /**
+     * Button to add a record to the SSRowSet.
+     */    
     protected JButton addButton = new JButton();
+    
+    /**
+     * Button to delete the current record in the SSRowSet.
+     */    
     protected JButton deleteButton = new JButton();
+    
+    /**
+     * Label to display the total number of records in the SSRowSet.
+     */    
     protected JLabel lblRowCount = new JLabel();
 
-    // BASED ON THIS SSDataNavigator ALLOWS OR DISALLOWS MODIFICATION TO THE SSROWSET
+    /**
+     * Indicator to allow/disallow changes to the SSRowSet.
+     */
     protected boolean modification = true;
 
-    // USERS CAN ALSO UPDATES TO PRESENT RECORDS BUT DISALLOW DELETION OF RECORDS
-    // BY SETTING THIS TO FALSE
+    /**
+     * Indicator to allow/disallow deletions from the SSRowSet.
+     */
     protected boolean allowDeletions = true;
+    
+    /**
+     * Indicator to allow/disallow insertions to the SSRowSet.
+     */    
     protected boolean allowInsertions = true;
-
+    
+    /**
+     * Indicator to force confirmation of SSRowSet deletions.
+     */        
     protected boolean confirmDeletes = true;
 
+    /**
+     * Indicator to cause the navigator to skip the execute() function call on
+     * the specified SSRowSet.  Must be false for MySQL (see FAQ).
+     */
     protected boolean callExecute = true;
 
-    // SSROWSET TO WHICH THE NAVIGATOR IS LINKED TO
+    /**
+     * SSRowSet from which component will get/set values.
+     */
     protected SSRowSet rowset = null;
 
-    // The container (Frame or Internal frame in which the navigator is present
+    /**
+     * Container (frame or internal frame) which contains the navigator.
+     */
     protected SSDBNav dbNav = null;
 
-    // Is set to zero if next() on SSRowSet returns false
+    /**
+     * Number of rows in SSRowSet.  Set to zero if next() method returns false.
+     */
     protected int rowCount = 0;
 
+    /**
+     * Row number for current record in SSRowSet.
+     */
     protected int currentRow = 0;
 
-    // true if the SSRowSet is on insert row else false
+    /**
+     * Indicator used to determine if a row is being inserted into the SSRowSet.
+     */
     protected boolean onInsertRow = false;
 
-    // SIZE OF THE BUTTONS TO WHICH THEY HAVE TO BE SET
-    protected Dimension buttonSize = new Dimension( 40, 20);
+    /**
+     * Navigator button dimensions.
+     */
+    protected Dimension buttonSize = new Dimension(40, 20);
 
-    protected Dimension txtFieldSize = new Dimension( 65, 20);
+    /**
+     * Current record text field dimensions.
+     */
+    protected Dimension txtFieldSize = new Dimension(65, 20);
 
-    protected SSDBNavRowSetListener rowsetListener = new SSDBNavRowSetListener();
+    /**
+     * Listener on the SSRowSet used by data navigator.
+     */
+    private final SSDBNavRowSetListener rowsetListener = new SSDBNavRowSetListener();
+    
+    
+    
     /**
      * Creates a object of SSDataNavigator.
      * Note: you have to set the SSRowSet before you can start using it.
@@ -120,7 +198,7 @@ public class SSDataNavigator extends JPanel {
     }
 
     /**
-     * Returns true if the SSRowSet contains one or more rows, else false
+     * Returns true if the SSRowSet contains one or more rows, else false.
      *
      * @return return true if SSRowSet contains data else false.
      */
@@ -133,7 +211,9 @@ public class SSDataNavigator extends JPanel {
          return true;
      }
 
-    // METHOD TO ADD TOOLTIPS AND BUTTON GRAPHICS OR TEXT
+    /**
+     * Method to add tooltips and button graphics (or text) to navigator components.
+     */
     protected void addToolTips() {
 
         try {
@@ -173,7 +253,7 @@ public class SSDataNavigator extends JPanel {
     } // end protected void addToolTips() {
 
     /**
-     * Constructors a SSDataNavigator for the given SSRowSet
+     * Constructs a SSDataNavigator for the given SSRowSet
      *
      * @param _rowset The SSRowSet to which the SSDataNavigator has to be bound
      */
@@ -200,15 +280,24 @@ public class SSDataNavigator extends JPanel {
     }
 
     /**
-     * Sets the mySQL property to true.
-     * This causes the navigator to skip the execute function call on the specified SSRowSet.
-     * (See FAQ for further details)
+     * Method to cause the navigator to skip the execute() function call on the
+     * underlying SSRowSet. This is necessary for MySQL (see FAQ).
      *
-     * @param _execute    true if using MySQL database else false.
+     * @param _execute    false if using MySQL database - otherwise true
      */
     public void setCallExecute(boolean _execute) {
         callExecute = _execute;
     }
+    
+    /**
+     * Indicates if the navigator will skip the execute function call on the
+     * underlying SSRowSet (needed for MySQL - see FAQ).
+     *
+     * @return value of execute() indicator
+     */
+    public boolean getCallExecute() {
+        return callExecute;
+    }    
 
     /**
      * Sets the preferredSize and the MinimumSize of the buttons to the specified size
@@ -231,23 +320,33 @@ public class SSDataNavigator extends JPanel {
     }
 
     /**
-     * Function that passes the implementation of the SSDBNav interface this is used when the
-     * insert button is pressed. The user of the SSDataNavigator can implement this and can perform
-     * some actions when the insert button is pressed
+     * Function that passes the implementation of the SSDBNav interface.  This
+     * interface can be implemented by the developer to perform custom actions
+     * when the insert button is pressed
      *
      * @param _dbNav    implementation of the SSDBNav interface
      */
     public void setDBNav(SSDBNav _dbNav) {
         dbNav = _dbNav;
     }
+    
+    /**
+     * Returns any custom implementation of the SSDBNav interface, which is used
+     * when the insert button is pressed to perform custom actions.
+     *
+     * @return any custom implementation of the SSDBNav interface
+     */
+    public SSDBNav getDBNav() {
+        return dbNav;
+    }    
 
     /**
-     * Enables or disables the modification buttons on the SSDataNavigator
-     * if you want the user to just navigate through the records with out making any changes
-     * set this to false. Default vaule is true. So if the modification is not set then the
-     * modification buttons are enabled
+     * Enables or disables the modification-related buttons on the SSDataNavigator.
+     * If the user can only navigate through the records with out making any changes
+     * set this to false.  By default, the modification-related buttons are enabled.
      *
-     * @param _modification    true or false
+     * @param _modification    indicates whether or not the modification-related
+     *  buttons are enabled.
      */
     public void setModification(boolean _modification) {
         modification = _modification;
@@ -268,16 +367,15 @@ public class SSDataNavigator extends JPanel {
      * Returns true if the user can modify the data in the SSRowSet, else false.
      *
      * @return returns true if the user modifications are written back to the
-     *    database else false.
+     *  database, else false.
      */
     public  boolean getModification() {
         return modification;
     }
 
     /**
-     * Enables or disables the row deletion button
-     * This method should be used if row deletions have to be disallowed
-     * The default value is true
+     * Enables or disables the row deletion button. This method should be used
+     * if row deletions are not allowed.  True by default.
      *
      * @param deletion    indicates whether or not to allow deletions
      */
@@ -291,19 +389,17 @@ public class SSDataNavigator extends JPanel {
     }
 
     /**
-     * Returns true if deletions are allowed else false.
+     * Returns true if deletions are allowed, else false.
      *
-     * @return returns true if deletions are allowed on the present data
-     *    else false.
+     * @return returns true if deletions are allowed, else false.
      */
     public boolean getDeletion(){
         return allowDeletions;
     }
 
     /**
-     * Enables or disables the row insertion button
-     * This method should be used if row insertions have to be disallowed
-     * The default value is true
+     * Enables or disables the row insertion button.  This method should be used
+     * if row insertions are not allowed.  True by default.
      *
      * @param insertion    indicates whether or not to allow insertions
      */
@@ -317,18 +413,18 @@ public class SSDataNavigator extends JPanel {
     }
 
     /**
-     * Returns true if insertions are allowed else false.
+     * Returns true if insertions are allowed, else false.
      *
-     * @return returns true if insertions are allowed else false.
+     * @return returns true if insertions are allowed, else false.
      */
     public boolean getInsertion() {
         return allowInsertions;
     }
 
     /**
-     * Sets the confirm deletes. If set to true, every time delete button is pressed
-     * navigator pops up a confirmation dialog to the user. So that he can continue
-     * with deletion or cancel the deletion. Default value is true.
+     * Sets the confirm deletion indicator. If set to true, every time delete
+     * button is pressed, the navigator pops up a confirmation dialog to the
+     * user. Default value is true.
      *
      * @param _confirmDeletes    indicates whether or not to confirm deletions
      */
@@ -337,10 +433,10 @@ public class SSDataNavigator extends JPanel {
      }
 
      /**
-      * Returns true if deletions are confirmed by user else false.
+      * Returns true if deletions must be confirmed by user, else false.
       *
       * @return returns true if a confirmation dialog is displayed when the user
-      *    deletes a record else false.
+      *    deletes a record, else false.
       */
      public boolean getConfirmDeletes() {
         return confirmDeletes;
@@ -356,9 +452,8 @@ public class SSDataNavigator extends JPanel {
      }
 
      /**
-      * Updates the present row. This is done automatically when navigation takes place.
-      * In addition to that if the user wants to update present row this function has to
-      * be called.
+      * Writes the present row back to the SSRowSet. This is done automatically
+      * when any navigation takes place, but can also be called manually.
       *
       * @return returns true if update succeeds else false.
       */
@@ -374,11 +469,11 @@ public class SSDataNavigator extends JPanel {
       }
 
     /**
-     * This method changes the SSRowSet to which the navigator is bound
-     * You have to call execute() and next() on the SSRowSet before you set
-     * SSRowSet to the SSDataNavigator
+     * This method changes the SSRowSet to which the navigator is bound.
+     * The execute() and next() methods MUST be called on the SSRowSet
+     * before you set the SSRowSet for the SSDataNavigator.
      *
-     * @param _rowset    a SSRowSet object to which the navigator has to be bound
+     * @param _rowset    a SSRowSet object to which the navigator will be bound
      */
     public void setSSRowSet(SSRowSet _rowset) {
         if(rowset != null){
@@ -458,7 +553,9 @@ public class SSDataNavigator extends JPanel {
         }
     }
 
-    // SET BUTTON DIMENSIONS
+    /**
+     * Sets the dimensions for the navigator components.
+     */
     protected void setButtonSizes() {
 
         // SET THE PREFERRED SIZES
@@ -554,7 +651,9 @@ public class SSDataNavigator extends JPanel {
     
      
 
-    // ADDS THE BUTTONS ON TO THE PANEL
+    /**
+     * Adds the navigator components to the navigator panel.
+     */
     protected void createPanel() {
 
         setButtonSizes();
@@ -577,382 +676,387 @@ public class SSDataNavigator extends JPanel {
 
     }
 
-    // ADDS THE LISTENERS FOR THE BUTTONS ON THE PANEL
+    /**
+     * Adds the listeners for the navigator components.
+     */
     private void addListeners() {
 
         // WHEN THIS BUTTON IS PRESSED THE RECORD ON WHICH USER WAS WORKING IS SAVED
         // AND MOVES THE SSROWSET TO THE FIRST ROW
         // SINCE ROW SET IS IN FIRST ROW DISABLE PREVIOUS BUTTON AND ENABLE NEXT BUTTON
-        firstButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent ae) {
-                try {
-                    if ( modification ) {
-                        rowset.updateRow();
+            firstButton.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent ae) {
+                    try {
+                        if ( modification ) {
+                            rowset.updateRow();
+                        }
+                        rowset.first();
+    
+                        firstButton.setEnabled(false);
+                        previousButton.setEnabled(false);
+                        if (!rowset.isLast()) {
+                            nextButton.setEnabled(true);
+                            lastButton.setEnabled(true);
+                        } else {
+                            nextButton.setEnabled(false);
+                            lastButton.setEnabled(false);
+                        }
+                        if ( dbNav != null ) {
+                            dbNav.performNavigationOps(SSDBNav.NAVIGATION_FIRST);
+                        }
+                    // GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD
+                        currentRow = 1;
+                        txtCurrentRow.setText(String.valueOf(currentRow));
+                    } catch(SQLException se) {
+                        se.printStackTrace();
+                        JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while updating row or moving the cursor.\n"+se.getMessage());
                     }
-                    rowset.first();
-
-                    firstButton.setEnabled(false);
-                    previousButton.setEnabled(false);
-                    if (!rowset.isLast()) {
-                        nextButton.setEnabled(true);
-                        lastButton.setEnabled(true);
-                    } else {
-                        nextButton.setEnabled(false);
-                        lastButton.setEnabled(false);
-                    }
-                    if ( dbNav != null ) {
-                        dbNav.performNavigationOps(SSDBNav.NAVIGATION_FIRST);
-                    }
-                // GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD
-                    currentRow = 1;
-                    txtCurrentRow.setText(String.valueOf(currentRow));
-                } catch(SQLException se) {
-                    se.printStackTrace();
-                    JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while updating row or moving the cursor.\n"+se.getMessage());
                 }
-            }
-        });
+            });
 
         // WHEN BUTTON 2 IS PRESSED THE CURRENT RECORD IS SAVED AND SSROWSET IS
         // MOVED TO PREVIOUS RECORD
         // CALLING PREVIOUS ON ENPTY SSROWSET IS ILLEGAL SO A CHECK IS MADE FOR THAT
         // IF NUMBER OF ROWS == 0 THEN SSROWSET IS EMPTY
-        previousButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                try {
-                    //if( rowset.rowUpdated() )
-                    if ( modification ) {
-                        rowset.updateRow();
+            previousButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    try {
+                        //if( rowset.rowUpdated() )
+                        if ( modification ) {
+                            rowset.updateRow();
+                        }
+                        if ( rowset.getRow() != 0 && !rowset.previous() ) {
+                            rowset.first();
+                        }
+                        // IF IN THE FIRST RECORD DISABLE PREVIOUS BUTTON
+                        if (rowset.isFirst() || rowset.getRow() == 0){
+                            firstButton.setEnabled(false);
+                            previousButton.setEnabled(false);
+                        }
+    
+                        // IF NEXT BUTTON IS DISABLED ENABLE IT.
+                        if ( !rowset.isLast() ) {
+                            nextButton.setEnabled(true);
+                            lastButton.setEnabled(true);
+                        }
+    
+                        if ( dbNav != null ) {
+                            dbNav.performNavigationOps(SSDBNav.NAVIGATION_PREVIOUS);
+                        }
+                    // GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD
+                        currentRow = rowset.getRow();
+                        txtCurrentRow.setText(String.valueOf(currentRow));
+                    } catch(SQLException se) {
+                        se.printStackTrace();
+                        JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while updating row or moving the cursor.\n"+se.getMessage());
                     }
-                    if ( rowset.getRow() != 0 && !rowset.previous() ) {
-                        rowset.first();
-                    }
-                    // IF IN THE FIRST RECORD DISABLE PREVIOUS BUTTON
-                    if (rowset.isFirst() || rowset.getRow() == 0){
-                        firstButton.setEnabled(false);
-                        previousButton.setEnabled(false);
-                    }
-
-                    // IF NEXT BUTTON IS DISABLED ENABLE IT.
-                    if ( !rowset.isLast() ) {
-                        nextButton.setEnabled(true);
-                        lastButton.setEnabled(true);
-                    }
-
-                    if ( dbNav != null ) {
-                        dbNav.performNavigationOps(SSDBNav.NAVIGATION_PREVIOUS);
-                    }
-                // GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD
-                    currentRow = rowset.getRow();
-                    txtCurrentRow.setText(String.valueOf(currentRow));
-                } catch(SQLException se) {
-                    se.printStackTrace();
-                    JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while updating row or moving the cursor.\n"+se.getMessage());
                 }
-            }
-        });
+            });
 
         // WHEN BUTTON 3 PRESSED THE CURRENT RECORD IS SAVED AND THE SSROWSET IS
         // MOVED TO NEXT RECORD. IF THIS IS THE LAST RECORD THEN BUTTON 3 IS DISABLED
         // ALSO IF THE PREVIOUS BUTTON IS NOT ENABLED THEN IT IS ENABLED
-        nextButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                try {
-                    //if( rowset.rowUpdated() )
-                    if ( modification ) {
-                        rowset.updateRow();
+            nextButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    try {
+                        //if( rowset.rowUpdated() )
+                        if ( modification ) {
+                            rowset.updateRow();
+                        }
+                        if ( !rowset.next() ) {
+                            nextButton.setEnabled(false);
+                            lastButton.setEnabled(false);
+                            rowset.last();
+                        }
+                        // IF LAST RECORD THEN DISABLE NEXT BUTTON
+                        if ( rowset.isLast() ) {
+                            nextButton.setEnabled(false);
+                            lastButton.setEnabled(false);
+                        }
+    
+                        // IF THIS IS NOT FIRST ROW ENABLE FIRST AND PREVIOUS BUTTONS
+                        if ( !rowset.isFirst() ) {
+                            previousButton.setEnabled(true);
+                            firstButton.setEnabled(true);
+                        }
+    
+                        if ( dbNav != null ) {
+                            dbNav.performNavigationOps(SSDBNav.NAVIGATION_NEXT);
+                        }
+                    // GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD
+                        currentRow = rowset.getRow();
+                        txtCurrentRow.setText(String.valueOf(currentRow));
+                    } catch(SQLException se) {
+                        se.printStackTrace();
+                        JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while updating row or moving the cursor.\n"+se.getMessage());
                     }
-                    if ( !rowset.next() ) {
-                        nextButton.setEnabled(false);
-                        lastButton.setEnabled(false);
-                        rowset.last();
-                    }
-                    // IF LAST RECORD THEN DISABLE NEXT BUTTON
-                    if ( rowset.isLast() ) {
-                        nextButton.setEnabled(false);
-                        lastButton.setEnabled(false);
-                    }
-
-                    // IF THIS IS NOT FIRST ROW ENABLE FIRST AND PREVIOUS BUTTONS
-                    if ( !rowset.isFirst() ) {
-                        previousButton.setEnabled(true);
-                        firstButton.setEnabled(true);
-                    }
-
-                    if ( dbNav != null ) {
-                        dbNav.performNavigationOps(SSDBNav.NAVIGATION_NEXT);
-                    }
-                // GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD
-                    currentRow = rowset.getRow();
-                    txtCurrentRow.setText(String.valueOf(currentRow));
-                } catch(SQLException se) {
-                    se.printStackTrace();
-                    JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while updating row or moving the cursor.\n"+se.getMessage());
                 }
-            }
-        });
+            });
 
 
         // BUTTON 4 ( "LAST" BUTTON )  CAUSED THE SSROWSET TO MOVE TO LAST RECORD.
         // BEFORE MOVING CURRENT RECORD IS SAVED
         // AFTER MOVING TO LAST RECORD THE NEXT BUTTON IS DIAABLED AND PREVIOUS BUTTON
         // ENABLED
-        lastButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                try {
-                    //if( rowset.rowUpdated() )
-                    if ( modification ) {
-                        rowset.updateRow();
+            lastButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    try {
+                        //if( rowset.rowUpdated() )
+                        if ( modification ) {
+                            rowset.updateRow();
+                        }
+                        rowset.last();
+    
+                        nextButton.setEnabled(false);
+                        lastButton.setEnabled(false);
+                        if (!rowset.isFirst()) {
+                            firstButton.setEnabled(true);
+                            previousButton.setEnabled(true);
+                        } else {
+                            firstButton.setEnabled(false);
+                            previousButton.setEnabled(false);
+                        }
+                        if ( dbNav != null ) {
+                            dbNav.performNavigationOps(SSDBNav.NAVIGATION_LAST);
+                        }
+                    // GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD
+                        currentRow = rowset.getRow();
+                        txtCurrentRow.setText(String.valueOf(currentRow));
+                    } catch(SQLException se) {
+                        se.printStackTrace();
+                        JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while updating row or moving the cursor.\n"+se.getMessage());
                     }
-                    rowset.last();
-
-                    nextButton.setEnabled(false);
-                    lastButton.setEnabled(false);
-                    if (!rowset.isFirst()) {
-                        firstButton.setEnabled(true);
-                        previousButton.setEnabled(true);
-                    } else {
-                        firstButton.setEnabled(false);
-                        previousButton.setEnabled(false);
-                    }
-                    if ( dbNav != null ) {
-                        dbNav.performNavigationOps(SSDBNav.NAVIGATION_LAST);
-                    }
-                // GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD
-                    currentRow = rowset.getRow();
-                    txtCurrentRow.setText(String.valueOf(currentRow));
-                } catch(SQLException se) {
-                    se.printStackTrace();
-                    JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while updating row or moving the cursor.\n"+se.getMessage());
                 }
-            }
-        });
+            });
 
         // THIS BUTTON INSERTS THE ROW AND MOVES TO THE NEWLY INSERTED ROW.
         // WHEN INSERT BUTTON IS PRESSED NAVIGATION WILL BE DISABLED SO THOSE HAVE TO BE
         // ENABLED HERE
-        commitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                try {
-                    if (onInsertRow) {
-                    // IF ON INSERT ROW ADD THE ROW.
-                        rowset.insertRow();
-                        if ( dbNav != null ) {
-                            dbNav.performPostInsertOps();
+            commitButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    try {
+                        if (onInsertRow) {
+                        // IF ON INSERT ROW ADD THE ROW.
+                            rowset.insertRow();
+                            if ( dbNav != null ) {
+                                dbNav.performPostInsertOps();
+                            }
+    
+                            rowset.moveToCurrentRow();
+                        // MOVE TO CURRENT ROW MOVES SSROWSET TO RECORD AT WHICH ADD WAS PRESSED.
+                        // BUT IT NICE TO BE ON THE ADDED ROW WHICH IS THE LAST ONE IN THE SSROWSET.
+                        // ALSO MOVE TO CURRENT ROW MOVES THE SSROWSET POSITION BUT DOES NOT TRIGGER
+                        // ANY EVENT FOR THE LISTENERS AS A RESULT VALUES ON THE SCREEN WILL NOT
+                        // DISPLAY THE CURRENT RECORD VALUES.
+                            rowset.last();
+                        // INCREMENT THE ROW COUNT
+                            rowCount++;
+                        // SET THE ROW COUNT AS LABEL
+                            lblRowCount.setText("of " + rowCount);
+                        // GET CURRENT ROW NUMBER
+                            currentRow = rowset.getRow();
+                        // UPDATE THE TEXT FEILD
+                            txtCurrentRow.setText(String.valueOf(currentRow));
+                        } else {
+                        // ELSE UPDATE THE PRESENT ROW VALUES.
+                            rowset.updateRow();
                         }
+    
+                        onInsertRow = false;
+    
+                        if (!rowset.isFirst()) {
+                            firstButton.setEnabled(true);
+                            previousButton.setEnabled(true);
+                        }
+                        if (!rowset.isLast()) {
+                            nextButton.setEnabled(true);
+                            lastButton.setEnabled(true);
+                        }
+                        refreshButton.setEnabled(true);
+    
+                        if (allowInsertions) {
+                            addButton.setEnabled(true);
+                        }
+                        if (allowDeletions) {
+                            deleteButton.setEnabled(true);
+                        }
+                    } catch(SQLException se) {
+                        JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while inserting row.\n"+se.getMessage());
+                        se.printStackTrace();
+                    }
+                }
+            });
 
-                        rowset.moveToCurrentRow();
-                    // MOVE TO CURRENT ROW MOVES SSROWSET TO RECORD AT WHICH ADD WAS PRESSED.
-                    // BUT IT NICE TO BE ON THE ADDED ROW WHICH IS THE LAST ONE IN THE SSROWSET.
-                    // ALSO MOVE TO CURRENT ROW MOVES THE SSROWSET POSITION BUT DOES NOT TRIGGER
-                    // ANY EVENT FOR THE LISTENERS AS A RESULT VALUES ON THE SCREEN WILL NOT
-                    // DISPLAY THE CURRENT RECORD VALUES.
-                        rowset.last();
-                    // INCREMENT THE ROW COUNT
-                        rowCount++;
+        // THIS BUTTON IS USED TO CANCEL THE CHANGES MADE TO THE RECORD.
+        // IT CAN ALSO BE USED TO CANCEL INSERT ROW.
+        // SO THE BUTTONS DISABLED AT THE INSERT BUTTON EVENT HAVE TO BE ENABLED
+            undoButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    try {
+                        rowset.cancelRowUpdates();
+                        onInsertRow = false;
+                        if (dbNav != null) {
+                            dbNav.performCancelOps();
+                        }
+                        //rowset.deleteRow();
+                        //rowset.moveToCurrentRow();
+                        firstButton.setEnabled(true);
+                        previousButton.setEnabled(true);
+                        nextButton.setEnabled(true);
+                        lastButton.setEnabled(true);
+                        refreshButton.setEnabled(true);
+                        if (allowInsertions) {
+                            addButton.setEnabled(true);
+                        }
+                        if (allowDeletions) {
+                            deleteButton.setEnabled(true);
+                        }
+                    } catch(SQLException se) {
+                        JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while undoing changes.\n"+se.getMessage());
+                        se.printStackTrace();
+                    }
+                }
+            });
+
+        // REFETCH REFETCHES THE ROWS FROMS THE DATABASE AND MOVES THE CURSOR TO THE FIRST
+        // RECORD IF THERE ARE NO RECORDS NAVIGATION BUTTONS ARE DIABLED
+        // EVEN IS THERE ARE RECORDS PREVIOUS BUTTON IS DISABLED BECAUSE THE SSROWSET IS ON
+        // THE FIRST ROW
+            refreshButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    rowset.removeRowSetListener(rowsetListener);
+                    try {
+                        if (callExecute) {
+                            rowset.execute();
+                            if (!rowset.next()) {
+                                rowCount = 0;
+                                currentRow = 0;
+                                firstButton.setEnabled(false);
+                                previousButton.setEnabled(false);
+                                nextButton.setEnabled(false);
+                                lastButton.setEnabled(false);
+    
+                            } else {
+                            // IF THERE ARE ROWS GET THE ROW COUNT
+                                rowset.last();
+                                rowCount = rowset.getRow();
+                                rowset.first();
+                                currentRow = rowset.getRow();
+                                firstButton.setEnabled(false);
+                                previousButton.setEnabled(false);
+                                nextButton.setEnabled(true);
+                                lastButton.setEnabled(true);
+                            }
+                        // SET THE ROW COUNT AS LABEL
+                            lblRowCount.setText("of " + rowCount);
+                            txtCurrentRow.setText(String.valueOf(currentRow));
+                        }
+    
+                        if ( dbNav != null ) {
+                            dbNav.performRefreshOps();
+                        }
+    
+                    } catch(SQLException se) {
+                        se.printStackTrace();
+                        JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured refreshing the data.\n"+se.getMessage());
+                    }
+                    rowset.addRowSetListener(rowsetListener);
+                }
+            });
+
+        // INSERT ROW BUTTON MOVES THE SSROWSET TO THE INSERT ROW POSITION
+        // AT THIS TIME NAVIGATION HAS TO BE DISABLED
+        // ONLY COMMIT AND CANCEL ARE ENABLED
+            addButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    try {
+                        rowset.moveToInsertRow();
+                        onInsertRow = true;
+    
+                        if ( dbNav != null ) {
+                            dbNav.performPreInsertOps();
+                        }
+                        //rowset.updateString("client_name", "prasanh reddy");
+                        //rowset.insertRow();
+                        //rowset.moveToCurrentRow();
+                        firstButton.setEnabled(false);
+                        previousButton.setEnabled(false);
+                        nextButton.setEnabled(false);
+                        lastButton.setEnabled(false);
+                        commitButton.setEnabled(true);
+                        undoButton.setEnabled(true);
+                        refreshButton.setEnabled(false);
+                        addButton.setEnabled(false);
+                        deleteButton.setEnabled(false);
+    
+                    } catch(SQLException se) {
+                        JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while moving to insert row.\n"+se.getMessage());
+                        se.printStackTrace();
+                    }
+                }
+            });
+
+        // DELETES THE CURRENT ROW AND MOVES TO NEXT ROW
+        // IF THE DELETED ROW IS THE LAST ROW THEN MOVES TO LAST ROW IN SSROWSET
+        // AFTER THE DELETION IS MADE (THATS THE PREVIOUS ROW TO THE DELETED ROW)
+            deleteButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent ae) {
+                    try {
+                        int answer = JOptionPane.showConfirmDialog(SSDataNavigator.this,"Are you sure you want to delete this record?","Delete Present Record", JOptionPane.YES_NO_OPTION);
+                        if ( answer != JOptionPane.YES_OPTION ) {
+                            return;
+                        }
+    
+                        if ( dbNav != null ) {
+                            dbNav.performPreDeletionOps();
+                        }
+                        rowset.deleteRow();
+                        if ( dbNav != null ) {
+                            dbNav.performPostDeletionOps();
+                        }
+    
+                        if (! rowset.next() ) {
+                            rowset.last();
+                        }
+                    // SEEMS DELETION WAS SUCCESSFULL DECREMENT ROWCOUNT
+                        rowCount--;
                     // SET THE ROW COUNT AS LABEL
                         lblRowCount.setText("of " + rowCount);
                     // GET CURRENT ROW NUMBER
                         currentRow = rowset.getRow();
                     // UPDATE THE TEXT FEILD
                         txtCurrentRow.setText(String.valueOf(currentRow));
-                    } else {
-                    // ELSE UPDATE THE PRESENT ROW VALUES.
-                        rowset.updateRow();
+                    } catch(SQLException se) {
+                        JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while deleting row.\n"+se.getMessage());
+                        se.printStackTrace();
                     }
-
-                    onInsertRow = false;
-
-                    if (!rowset.isFirst()) {
-                        firstButton.setEnabled(true);
-                        previousButton.setEnabled(true);
-                    }
-                    if (!rowset.isLast()) {
-                        nextButton.setEnabled(true);
-                        lastButton.setEnabled(true);
-                    }
-                    refreshButton.setEnabled(true);
-
-                    if (allowInsertions) {
-                        addButton.setEnabled(true);
-                    }
-                    if (allowDeletions) {
-                        deleteButton.setEnabled(true);
-                    }
-                } catch(SQLException se) {
-                    JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while inserting row.\n"+se.getMessage());
-                    se.printStackTrace();
                 }
-            }
-        });
+            });
 
-        // THIS BUTTON IS USED TO CANCEL THE CHANGES MADE TO THE RECORD.
-        // IT CAN ALSO BE USED TO CANCEL INSERT ROW.
-        // SO THE BUTTONS DISABLED AT THE INSERT BUTTON EVENT HAVE TO BE ENABLED
-        undoButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                try {
-                    rowset.cancelRowUpdates();
-                    onInsertRow = false;
-                    if (dbNav != null) {
-                        dbNav.performCancelOps();
-                    }
-                    //rowset.deleteRow();
-                    //rowset.moveToCurrentRow();
-                    firstButton.setEnabled(true);
-                    previousButton.setEnabled(true);
-                    nextButton.setEnabled(true);
-                    lastButton.setEnabled(true);
-                    refreshButton.setEnabled(true);
-                    if (allowInsertions) {
-                        addButton.setEnabled(true);
-                    }
-                    if (allowDeletions) {
-                        deleteButton.setEnabled(true);
-                    }
-                } catch(SQLException se) {
-                    JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while undoing changes.\n"+se.getMessage());
-                    se.printStackTrace();
-                }
-            }
-        });
-
-        // REFETCH REFETCHES THE ROWS FROMS THE DATABASE AND MOVES THE CURSOR TO THE FIRST
-        // RECORD IF THERE ARE NO RECORDS NAVIGATION BUTTONS ARE DIABLED
-        // EVEN IS THERE ARE RECORDS PREVIOUS BUTTON IS DISABLED BECAUSE THE SSROWSET IS ON
-        // THE FIRST ROW
-        refreshButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                rowset.removeRowSetListener(rowsetListener);
-                try {
-                    if (callExecute) {
-                        rowset.execute();
-                        if (!rowset.next()) {
-                            rowCount = 0;
-                            currentRow = 0;
-                            firstButton.setEnabled(false);
-                            previousButton.setEnabled(false);
-                            nextButton.setEnabled(false);
-                            lastButton.setEnabled(false);
-
-                        } else {
-                        // IF THERE ARE ROWS GET THE ROW COUNT
-                            rowset.last();
-                            rowCount = rowset.getRow();
-                            rowset.first();
-                            currentRow = rowset.getRow();
-                            firstButton.setEnabled(false);
-                            previousButton.setEnabled(false);
-                            nextButton.setEnabled(true);
-                            lastButton.setEnabled(true);
+        // LISTENER FOR THE TEXT FIELD. USER CAN ENTER A ROW NUMBER IN THE TEXT
+        // FIELD TO MOVE THE THE SPEICIFIED ROW.
+        // IF ITS NOT A NUMBER OR IF ITS NOT VALID FOR THE CURRENT SSROWSET
+        // NOTHING HAPPENS.
+            txtCurrentRow.addKeyListener(new KeyAdapter() {
+                public void keyReleased(KeyEvent ke) {
+                    if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
+                        try {
+                            int row = Integer.parseInt(txtCurrentRow.getText().trim());
+                            if (row <= rowCount && row >0) {
+                                rowset.absolute(row);
+                            }
+                        } catch(Exception e) {
+                            // do nothing
                         }
-                    // SET THE ROW COUNT AS LABEL
-                        lblRowCount.setText("of " + rowCount);
-                        txtCurrentRow.setText(String.valueOf(currentRow));
-                    }
-
-                    if ( dbNav != null ) {
-                        dbNav.performRefreshOps();
-                    }
-
-                } catch(SQLException se) {
-                    se.printStackTrace();
-                    JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured refreshing the data.\n"+se.getMessage());
-                }
-                rowset.addRowSetListener(rowsetListener);
-            }
-        });
-
-        // INSERT ROW BUTTON MOVES THE SSROWSET TO THE INSERT ROW POSITION
-        // AT THIS TIME NAVIGATION HAS TO BE DISABLED
-        // ONLY COMMIT AND CANCEL ARE ENABLED
-        addButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                try {
-                    rowset.moveToInsertRow();
-                    onInsertRow = true;
-
-                    if ( dbNav != null ) {
-                        dbNav.performPreInsertOps();
-                    }
-                    //rowset.updateString("client_name", "prasanh reddy");
-                    //rowset.insertRow();
-                    //rowset.moveToCurrentRow();
-                    firstButton.setEnabled(false);
-                    previousButton.setEnabled(false);
-                    nextButton.setEnabled(false);
-                    lastButton.setEnabled(false);
-                    commitButton.setEnabled(true);
-                    undoButton.setEnabled(true);
-                    refreshButton.setEnabled(false);
-                    addButton.setEnabled(false);
-                    deleteButton.setEnabled(false);
-
-                } catch(SQLException se) {
-                    JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while moving to insert row.\n"+se.getMessage());
-                    se.printStackTrace();
-                }
-            }
-        });
-
-        // DELETES THE CURRENT ROW AND MOVES TO NEXT ROW
-        // IF THE DELETED ROW IS THE LAST ROW THEN MOVES TO LAST ROW IN SSROWSET
-        // AFTER THE DELETION IS MADE (THATS THE PREVIOUS ROW TO THE DELETED ROW)
-        deleteButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                try {
-                    int answer = JOptionPane.showConfirmDialog(SSDataNavigator.this,"Are you sure you want to delete this record?","Delete Present Record", JOptionPane.YES_NO_OPTION);
-                    if ( answer != JOptionPane.YES_OPTION ) {
-                        return;
-                    }
-
-                    if ( dbNav != null ) {
-                        dbNav.performPreDeletionOps();
-                    }
-                    rowset.deleteRow();
-                    if ( dbNav != null ) {
-                        dbNav.performPostDeletionOps();
-                    }
-
-                    if (! rowset.next() ) {
-                        rowset.last();
-                    }
-                // SEEMS DELETION WAS SUCCESSFULL DECREMENT ROWCOUNT
-                    rowCount--;
-                // SET THE ROW COUNT AS LABEL
-                    lblRowCount.setText("of " + rowCount);
-                // GET CURRENT ROW NUMBER
-                    currentRow = rowset.getRow();
-                // UPDATE THE TEXT FEILD
-                    txtCurrentRow.setText(String.valueOf(currentRow));
-                } catch(SQLException se) {
-                    JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while deleting row.\n"+se.getMessage());
-                    se.printStackTrace();
-                }
-            }
-        });
-
-    // LISTENER FOR THE TEXT FIELD. USER CAN ENTER A ROW NUMBER IN THE TEXT
-    // FIELD TO MOVE THE THE SPEICIFIED ROW.
-    // IF ITS NOT A NUMBER OR IF ITS NOT VALID FOR THE CURRENT SSROWSET
-    // NOTHING HAPPENS.
-        txtCurrentRow.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent ke) {
-                if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
-                    try {
-                        int row = Integer.parseInt(txtCurrentRow.getText().trim());
-                        if (row <= rowCount && row >0) {
-                            rowset.absolute(row);
-                        }
-                    } catch(Exception e) {
-                        // do nothing
                     }
                 }
-            }
-        });
+            });
 
     }
 
+    /**
+     * Adds the listeners on the SSRowSet used by data navigator.
+     */
     private class SSDBNavRowSetListener implements RowSetListener {
 
         public void cursorMoved(RowSetEvent rse){
@@ -1049,6 +1153,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.26  2005/02/04 22:48:54  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.25  2005/01/09 03:56:14  prasanth
  * Added public methods to programmatically perform different button clicks.
  *
