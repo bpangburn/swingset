@@ -5,7 +5,16 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 $Id$
 
 ==============================================================================
-SwingSet 0.8.2-beta - Released TBA
+SwingSet 0.8.X-beta - Released TBA
+==============================================================================
+
+Changes:
+	Classes or Interfaces added in SwingSet-0.8.X:
+		1. SSTextArea.
+
+
+==============================================================================
+SwingSet 0.8.2-beta - Released 09-21-2004
 ==============================================================================
 
 Changes:
@@ -38,6 +47,8 @@ Changes:
            
     SSTextField:
     	1.The default mask is set to nothing. Previously it was MMDDYYYY.
+        
+        
 ==============================================================================
 SwingSet 0.8.1-beta - Released 08-13-2004
 ==============================================================================
