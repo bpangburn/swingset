@@ -78,7 +78,7 @@ public class SSTextField extends JTextField {
      * number of decimal places.
      */
     public static final int DECIMAL = 4;
-    
+
     /**
      * SSRowSet from which component will get/set values.
      */
@@ -98,16 +98,16 @@ public class SSTextField extends JTextField {
      * Default number of decimals to show for float, double, etc.
      */
     protected int numberOfDecimalPlaces = 2;
-    
+
 	/**
 	 * Convenience class for providing the property change listener support
 	 */
 	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
-    
+
 	/**
 	 * Convenience class for providing the vetoable change listener support
 	 */
-	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);    
+	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);
 
     /**
      * Constructs a new text field with the specified text & mask.
@@ -138,7 +138,7 @@ public class SSTextField extends JTextField {
     public SSTextField() {
         init();
     }
-    
+
     /**
      * Constructs a new, empty text field with the specified mask & number of
      * decimal places. Use this constructor only if you are using a decimal mask.
@@ -177,7 +177,7 @@ public class SSTextField extends JTextField {
         setHorizontalAlignment(_align);
         init();
      }
-     
+
     /**
      * Creates a SSTextField instance and binds it to the specified
      * SSRowSet column.
@@ -191,7 +191,7 @@ public class SSTextField extends JTextField {
         init();
         bind();
     }
-    
+
     /**
      * Method to add bean property change listeners.
      *
@@ -200,16 +200,16 @@ public class SSTextField extends JTextField {
     public void addPropertyChangeListener(PropertyChangeListener _listener) {
     	pChangeSupport.addPropertyChangeListener(_listener);
     }
-    
+
     /**
      * Method to remove bean property change listeners.
      *
      * @param _listener bean property change listener
-     */    
+     */
     public void removePropertyChangeListener(PropertyChangeListener _listener) {
     	pChangeSupport.removePropertyChangeListener(_listener);
     }
-    
+
     /**
      * Method to add bean vetoable change listeners.
      *
@@ -218,16 +218,16 @@ public class SSTextField extends JTextField {
     public void addVetoableChangeListener(VetoableChangeListener _listener) {
     	vChangeSupport.addVetoableChangeListener(_listener);
     }
-    
+
     /**
      * Method to remove bean veto change listeners.
      *
      * @param _listener bean veto change listener
-     */    
+     */
     public void removeVetoableChangeListener(VetoableChangeListener _listener) {
     	vChangeSupport.removeVetoableChangeListener(_listener);
     }
-    
+
     /**
      * Sets the SSRowSet column name to which the component is bound.
      *
@@ -235,9 +235,11 @@ public class SSTextField extends JTextField {
      *    is bound
      */
     public void setColumnName(String _columnName) {
+        String oldValue = columnName;
         columnName = _columnName;
+        pChangeSupport.firePropertyChange("columnName", oldValue, columnName);
         bind();
-    }    
+    }
 
     /**
      * Returns the SSRowSet column name to which the component is bound.
@@ -247,16 +249,18 @@ public class SSTextField extends JTextField {
     public String getColumnName() {
         return columnName;
     }
-    
+
     /**
      * Sets the SSRowSet to which the component is bound.
      *
      * @param _sSRowSet    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _sSRowSet) {
+        SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
+        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
         bind();
-    }    
+    }
 
     /**
      * Returns the SSRowSet to which the component is bound.
@@ -266,17 +270,20 @@ public class SSTextField extends JTextField {
     public SSRowSet getSSRowSet() {
         return sSRowSet;
     }
-    
+
     /**
      * Sets the text field mask.
      *
      * @param _mask    the mask required for this text field.
      */
-     public void setMask(int _mask){
+    public void setMask(int _mask) {
+        int oldValue = mask;
         mask = _mask;
+        pChangeSupport.firePropertyChange("mask", oldValue, mask);
+
         init();
-     }
-     
+    }
+
     /**
      * Returns the text field mask.
      *
@@ -284,7 +291,7 @@ public class SSTextField extends JTextField {
      */
     public int getMask() {
         return mask;
-    }     
+    }
 
     /**
      * Sets the number of decimal places required.
@@ -293,10 +300,12 @@ public class SSTextField extends JTextField {
      *
      * @param _numberOfDecimalPlaces desired # of decimal places
      */
-     public void setNumberOfDecimalPlaces(int _numberOfDecimalPlaces) {
+    public void setNumberOfDecimalPlaces(int _numberOfDecimalPlaces) {
+        int oldValue = numberOfDecimalPlaces;
         numberOfDecimalPlaces = _numberOfDecimalPlaces;
-     }
-     
+        pChangeSupport.firePropertyChange("numberOfDecimalPlaces", oldValue, numberOfDecimalPlaces);
+    }
+
     /**
      * Returns the number of decimal places required.
      * This number is used only when mask is set to DECIMAL.
@@ -306,7 +315,7 @@ public class SSTextField extends JTextField {
      */
     public int getNumberOfDecimalPlaces() {
         return numberOfDecimalPlaces;
-    }         
+    }
 
     /**
      * Sets the SSRowSet and column name to which the component is to be bound.
@@ -315,18 +324,24 @@ public class SSTextField extends JTextField {
      * @param _columnName    Name of the column to which this check box should be bound
      */
      public void bind(SSRowSet _sSRowSet, String _columnName) {
+        SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
+        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+
+        String oldValue2 = columnName;
         columnName = _columnName;
+        pChangeSupport.firePropertyChange("columnName", oldValue2, columnName);
+
         bind();
-     }    
-    
+     }
+
     /**
      * Initialization code.
      */
     protected void init() {
-         
+
         // SET PREFERRED DIMENSIONS
-            setPreferredSize(new Dimension(200,20));         
+            setPreferredSize(new Dimension(200,20));
 
          // ADD FOCUS LISTENER TO THE TEXT FEILD SO THAT WHEN THE FOCUS IS GAINED
          // COMPLETE TEXT SHOULD BE SELECTED
@@ -335,10 +350,10 @@ public class SSTextField extends JTextField {
                     SSTextField.this.selectAll();
                 }
             });
-    
+
          // ADD KEY LISTENER FOR THE TEXT FIELD
             this.addKeyListener(new KeyListener() {
-    
+
                 public void keyReleased(KeyEvent ke) {
                     if(mask == DECIMAL || mask == SSN){
                         int position = SSTextField.this.getCaretPosition();
@@ -346,24 +361,24 @@ public class SSTextField extends JTextField {
                         SSTextField.this.setCaretPosition(position);
                     }
                 }
-    
+
                 public void keyTyped(KeyEvent ke) {
                 }
-    
+
                 public synchronized void keyPressed(KeyEvent ke) {
                 // TRANSFER FOCUS TO NEXT COMPONENT WHEN ENTER KEY IS PRESSED
                     if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
                         ((Component)ke.getSource()).transferFocus();
                     }
-    
+
                     if(mask == MMDDYYYY || mask == DDMMYYYY){
                         mask(ke);
                     }
                 }
-    
+
             });
 
-    } // end protected void init() {    
+    } // end protected void init() {
 
     /**
      * Method for handling binding of component to a SSRowSet column.
@@ -384,7 +399,7 @@ public class SSTextField extends JTextField {
         // ADD BACK LISTENERS
         //    addListeners();;
 
-    }    
+    }
 
     /**
      * Function to manage keystrokes for masks.
@@ -402,21 +417,21 @@ public class SSTextField extends JTextField {
                     _ke.getKeyCode() == KeyEvent.VK_END     ||
                     _ke.getKeyCode() == KeyEvent.VK_ENTER   ||
                     _ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
-    
+
                 return;
             } else if ( (_ke.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) == KeyEvent.CTRL_DOWN_MASK ||
                      (_ke.getModifiersEx() & KeyEvent.ALT_DOWN_MASK)  == KeyEvent.ALT_DOWN_MASK    ) {
-    
+
                 return;
             } else if(!Character.isDefined(ch)) {
                 return;
             }
-    
+
             if (getSelectionStart() != getSelectionEnd()) {
                 str = str.substring(0,getSelectionStart())
                     + str.substring(getSelectionEnd(), str.length());
             }
-    
+
          // BASED ON TYPE OF MASK REQUESTED MODIFY THE TEXT
          // ACCORDINGLY
             switch(mask) {
@@ -434,7 +449,7 @@ public class SSTextField extends JTextField {
                     setText(decimalMask(str, numberOfDecimalPlaces));
                     break;
             } // end switch
-            
+
      } // end protected void mask(KeyEvent _ke) {
 
     /**
@@ -539,6 +554,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.19  2005/02/11 22:59:46  yoda2
+ * Imported PropertyVetoException and added some bound properties.
+ *
  * Revision 1.18  2005/02/11 20:16:06  yoda2
  * Added infrastructure to support property & vetoable change listeners (for beans).
  *

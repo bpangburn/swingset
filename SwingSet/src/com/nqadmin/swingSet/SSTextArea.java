@@ -53,7 +53,7 @@ import java.beans.PropertyVetoException;
  * @version $Revision$
  */
 public class SSTextArea extends JTextArea {
-    
+
     /**
      * SSRowSet from which component will get/set values.
      */
@@ -63,16 +63,16 @@ public class SSTextArea extends JTextArea {
      * SSRowSet column to which the component will be bound.
      */
     protected String columnName = "";
-    
+
 	/**
 	 * Convenience class for providing the property change listener support
 	 */
 	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
-    
+
 	/**
 	 * Convenience class for providing the vetoable change listener support
 	 */
-	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);    
+	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);
 
     /**
      * Empty constructor needed for deserialization.
@@ -82,7 +82,7 @@ public class SSTextArea extends JTextArea {
     }
 
     /**
-     * Constructs a new empty SSTextArea with the specified number of rows and columns.    
+     * Constructs a new empty SSTextArea with the specified number of rows and columns.
      *
      * @param _rows     the number of rows >= 0
      * @param _columns     the number of columns >= 0
@@ -90,7 +90,7 @@ public class SSTextArea extends JTextArea {
     public SSTextArea(int _rows, int _columns) {
         super(_rows, _columns);
 		//init(); - NO NEED TO SET DIMENSIONS AS THAT IS THE POINT OF THIS CONSTRUCTOR
-    }     
+    }
 
     /**
      * Creates a multi-line text box and binds it to the specified SSRowSet column.
@@ -104,7 +104,7 @@ public class SSTextArea extends JTextArea {
         init();
         bind();
     }
-    
+
     /**
      * Method to add bean property change listeners.
      *
@@ -113,16 +113,16 @@ public class SSTextArea extends JTextArea {
     public void addPropertyChangeListener(PropertyChangeListener _listener) {
     	pChangeSupport.addPropertyChangeListener(_listener);
     }
-    
+
     /**
      * Method to remove bean property change listeners.
      *
      * @param _listener bean property change listener
-     */    
+     */
     public void removePropertyChangeListener(PropertyChangeListener _listener) {
     	pChangeSupport.removePropertyChangeListener(_listener);
     }
-    
+
     /**
      * Method to add bean vetoable change listeners.
      *
@@ -131,12 +131,12 @@ public class SSTextArea extends JTextArea {
     public void addVetoableChangeListener(VetoableChangeListener _listener) {
     	vChangeSupport.addVetoableChangeListener(_listener);
     }
-    
+
     /**
      * Method to remove bean veto change listeners.
      *
      * @param _listener bean veto change listener
-     */    
+     */
     public void removeVetoableChangeListener(VetoableChangeListener _listener) {
     	vChangeSupport.removeVetoableChangeListener(_listener);
     }
@@ -148,7 +148,9 @@ public class SSTextArea extends JTextArea {
      *    is bound
      */
     public void setColumnName(String _columnName) {
+        String oldValue = columnName;
         columnName = _columnName;
+        pChangeSupport.firePropertyChange("columnName", oldValue, columnName);
         bind();
     }
 
@@ -167,7 +169,9 @@ public class SSTextArea extends JTextArea {
      * @param _sSRowSet    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _sSRowSet) {
+        SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
+        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
         bind();
     }
 
@@ -179,7 +183,7 @@ public class SSTextArea extends JTextArea {
     public SSRowSet getSSRowSet() {
         return sSRowSet;
     }
-    
+
     /**
      * Sets the SSRowSet and column name to which the component is to be bound.
      *
@@ -187,11 +191,17 @@ public class SSTextArea extends JTextArea {
      * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _sSRowSet, String _columnName) {
+        SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
+        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+
+        String oldValue2 = columnName;
         columnName = _columnName;
+        pChangeSupport.firePropertyChange("columnName", oldValue2, columnName);
+
         bind();
     }
-    
+
     /**
      * Initialization code.
      */
@@ -199,7 +209,7 @@ public class SSTextArea extends JTextArea {
 
         // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,80));
-    }    
+    }
 
     /**
      * Method for handling binding of component to a SSRowSet column.
@@ -220,7 +230,7 @@ public class SSTextArea extends JTextArea {
         // ADD BACK LISTENERS
         //    addListeners();;
 
-    }    
+    }
 
 
 } // end public class SSTextArea extends JTextArea {
@@ -229,6 +239,9 @@ public class SSTextArea extends JTextArea {
 
 /*
  * $Log$
+ * Revision 1.11  2005/02/11 22:59:46  yoda2
+ * Imported PropertyVetoException and added some bound properties.
+ *
  * Revision 1.10  2005/02/11 20:16:06  yoda2
  * Added infrastructure to support property & vetoable change listeners (for beans).
  *

@@ -46,7 +46,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.beans.VetoableChangeListener;
 import java.beans.PropertyVetoException;
- 
+
 /**
  * SSJdbcRowSetImpl.java
  *<p>
@@ -64,32 +64,32 @@ import java.beans.PropertyVetoException;
      * SSConnection used to populate SSRowSet.
      */
     protected SSConnection sSConnection = new SSConnection();
-    
+
     /**
      * Query used to populate SSRowSet.
      */
-    protected String query = "";
-    
+    protected String command = "";
+
     /**
      * JDBC connection wrapped by SSConnection.
      */
     transient protected Connection connection;
-    
+
     /**
      * Instance of JdbcRowSetImpl wrapped by SSJdbcRowSetImpl.
      */
     transient protected JdbcRowSetImpl rowset;
-    
+
     /**
      * Metadata for query.
      */
     transient protected ResultSetMetaData metaData;
-    
+
 	/**
 	 * Convenience class for providing the property change listener support
 	 */
 	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
-    
+
 	/**
 	 * Convenience class for providing the vetoable change listener support
 	 */
@@ -103,24 +103,22 @@ import java.beans.PropertyVetoException;
 
     /**
      * Constructs a SSJdbcRowSetImpl object with the specified SSConnection.
-     * @param ssConnection - SSConnection object to be used to connect to the database.
+     * @param _ssConnection  SSConnection object to be used to connect to the database.
      */
-    public SSJdbcRowSetImpl(SSConnection ssConnection){
-    	
-        this.sSConnection = ssConnection;
-        
+    public SSJdbcRowSetImpl(SSConnection _ssConnection) {
+    	sSConnection = _ssConnection;
     }
 
     /**
-     * Constructs a SSJdbcRowSetImpl object with the specified SSConnection & query.
-     * @param ssConnection - SSConnection object to be used to connect to the database.
-     * @param query - SQL query to be executed.
+     * Constructs a SSJdbcRowSetImpl object with the specified SSConnection & command.
+     * @param _ssConnection  SSConnection object to be used to connect to the database.
+     * @param _command   SQL query to be executed.
      */
-    public SSJdbcRowSetImpl(SSConnection ssConnection, String query){
-        this.sSConnection = ssConnection;
-        this.query      = query;
+    public SSJdbcRowSetImpl(SSConnection _ssConnection, String _command) {
+        sSConnection = _ssConnection;
+        command = _command;
     }
-    
+
     /**
      * Method to add bean property change listeners.
      *
@@ -129,16 +127,16 @@ import java.beans.PropertyVetoException;
     public void addPropertyChangeListener(PropertyChangeListener _listener) {
     	pChangeSupport.addPropertyChangeListener(_listener);
     }
-    
+
     /**
      * Method to remove bean property change listeners.
      *
      * @param _listener bean property change listener
-     */    
+     */
     public void removePropertyChangeListener(PropertyChangeListener _listener) {
     	pChangeSupport.removePropertyChangeListener(_listener);
     }
-    
+
     /**
      * Method to add bean vetoable change listeners.
      *
@@ -147,38 +145,38 @@ import java.beans.PropertyVetoException;
     public void addVetoableChangeListener(VetoableChangeListener _listener) {
     	vChangeSupport.addVetoableChangeListener(_listener);
     }
-    
+
     /**
      * Method to remove bean veto change listeners.
      *
      * @param _listener bean veto change listener
-     */    
+     */
     public void removeVetoableChangeListener(VetoableChangeListener _listener) {
     	vChangeSupport.removeVetoableChangeListener(_listener);
     }
 
     /**
      * Sets the connection object to be used.
-     * @param ssConnection - connection object to be used to connect to the database.
+     * @param _ssConnection  connection object to be used to connect to the database.
      */
-    public void setSSConnection(SSConnection ssConnection){
-        SSConnection connection = this.sSConnection;
-        this.sSConnection = ssConnection;
-        pChangeSupport.firePropertyChange("ssConnection", connection, this.sSConnection);
+    public void setSSConnection(SSConnection _ssConnection) {
+        SSConnection oldValue = sSConnection;
+        sSConnection = _ssConnection;
+        pChangeSupport.firePropertyChange("ssConnection", oldValue, sSConnection);
     }
 
     /**
      * Sets the command for the rowset.
-     * @param query - query to be executed.
+     * @param _command    query to be executed.
      */
-    public void setCommand(String query){
-    	String oldValue = this.query;
-        this.query = query;
-        pChangeSupport.firePropertyChange("query", oldValue, this.query);
+    public void setCommand(String _command) {
+    	String oldValue = command;
+        command = _command;
+        pChangeSupport.firePropertyChange("command", oldValue, command);
 
         try {
             if (rowset != null) {
-                rowset.setCommand(query);
+                rowset.setCommand(command);
             }
         }catch(SQLException se){
             se.printStackTrace();
@@ -198,7 +196,7 @@ import java.beans.PropertyVetoException;
      * @return returns the query being used.
      */
     public String getCommand(){
-        return query;
+        return command;
     }
 
     /**
@@ -214,7 +212,7 @@ import java.beans.PropertyVetoException;
             rowset = new JdbcRowSetImpl(sSConnection.getConnection());
             rowset.setType(ResultSet.TYPE_SCROLL_INSENSITIVE);
             rowset.setConcurrency(ResultSet.CONCUR_UPDATABLE);
-            rowset.setCommand(query);
+            rowset.setCommand(command);
         }
         rowset.execute();
         metaData = rowset.getMetaData();
@@ -234,10 +232,10 @@ import java.beans.PropertyVetoException;
             rowset.setConcurrency(ResultSet.CONCUR_UPDATABLE);
 
         // SET THE COMMAND FOR ROWSET
-            rowset.setCommand(query);
+            rowset.setCommand(command);
 
         // CALL EXECUTE ONLY IF THE QUERY IS NOT EMPTY.
-            if(!query.equals("")){
+            if(!command.equals("")){
                 rowset.execute();
                 metaData = rowset.getMetaData();
             }
@@ -330,15 +328,15 @@ import java.beans.PropertyVetoException;
     public Date getDate(int columnIndex) throws SQLException{
         return rowset.getDate(columnIndex);
     }
-    
+
     /**
      * Retrieves the value of the designated column in the current row of this ResultSet
      * object as a byte array in the Java programming language. The bytes represent the
      * raw values returned by the driver.
      * @param columnIndex - index number of the column
-     * @return  returns the column value; if the value is SQL NULL, the value returned is null 
+     * @return  returns the column value; if the value is SQL NULL, the value returned is null
      * @throws throws an SQLException - if a database access error occurs
-     */ 
+     */
     public byte[] getBytes(int columnIndex)  throws SQLException {
         return rowset.getBytes(columnIndex);
     }
@@ -433,14 +431,14 @@ import java.beans.PropertyVetoException;
     public void updateDate(int columnIndex, Date value) throws SQLException{
         rowset.updateDate(columnIndex, value);
     }
-    
+
     /**
      * Updates the designated column with a byte array value. The updater methods are
      * used to update column values in the current row or the insert row. The updater
      * methods do not update the underlying database; instead the updateRow or insertRow
      * methods are called to update the database.
      * @param columnIndex - the index number of the column
-     * @param value - the new column value 
+     * @param value - the new column value
      * @throws throws an SQLException - if a database access error occurs
      */
     public void updateBytes(int columnIndex, byte[] value) throws SQLException {
@@ -542,15 +540,15 @@ import java.beans.PropertyVetoException;
     public Date getDate(String columnName) throws SQLException{
         return rowset.getDate(columnName);
     }
-    
+
     /**
      * Retrieves the value of the designated column in the current row of this ResultSet
      * object as a byte array in the Java programming language. The bytes represent the
      * raw values returned by the driver.
      * @param columnName - the SQL name of the column
-     * @return  returns the column value; if the value is SQL NULL, the value returned is null 
+     * @return  returns the column value; if the value is SQL NULL, the value returned is null
      * @throws throws an SQLException - if a database access error occurs
-     */    
+     */
     public byte[] getBytes(String columnName)  throws SQLException {
         return rowset.getBytes(columnName);
     }
@@ -645,14 +643,14 @@ import java.beans.PropertyVetoException;
     public void updateDate(String columnName, Date value) throws SQLException{
         rowset.updateDate(columnName, value);
     }
-    
+
     /**
      * Updates the designated column with a byte array value. The updater methods are
      * used to update column values in the current row or the insert row. The updater
      * methods do not update the underlying database; instead the updateRow or insertRow
      * methods are called to update the database.
      * @param columnName - the name of the column
-     * @param value - the new column value 
+     * @param value - the new column value
      * @throws throws an SQLException - if a database access error occurs
      */
     public void updateBytes(String columnName, byte[] value) throws SQLException {
@@ -943,6 +941,9 @@ import java.beans.PropertyVetoException;
 }
  /*
   * $Log$
+  * Revision 1.12  2005/02/11 22:59:56  yoda2
+  * Imported PropertyVetoException and added some bound properties.
+  *
   * Revision 1.11  2005/02/11 20:16:31  yoda2
   * Added infrastructure to support property & vetoable change listeners (for beans).
   *

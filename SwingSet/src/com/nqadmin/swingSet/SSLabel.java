@@ -80,21 +80,21 @@ public class SSLabel extends JLabel {
      * Component listener.
      */
     private final MyLabelTextListener labelTextListener = new MyLabelTextListener();
-    
+
     /**
      * Bound text field document listener.
-     */    
+     */
     private final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
-    
+
 	/**
 	 * Convenience class for providing the property change listener support
 	 */
 	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
-    
+
 	/**
 	 * Convenience class for providing the vetoable change listener support
 	 */
-	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);    
+	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);
 
     /**
      * Empty constructor needed for deserialization. Creates a SSLabel instance
@@ -139,7 +139,7 @@ public class SSLabel extends JLabel {
         init();
         bind();
     }
-    
+
     /**
      * Method to add bean property change listeners.
      *
@@ -148,16 +148,16 @@ public class SSLabel extends JLabel {
     public void addPropertyChangeListener(PropertyChangeListener _listener) {
     	pChangeSupport.addPropertyChangeListener(_listener);
     }
-    
+
     /**
      * Method to remove bean property change listeners.
      *
      * @param _listener bean property change listener
-     */    
+     */
     public void removePropertyChangeListener(PropertyChangeListener _listener) {
     	pChangeSupport.removePropertyChangeListener(_listener);
     }
-    
+
     /**
      * Method to add bean vetoable change listeners.
      *
@@ -166,16 +166,16 @@ public class SSLabel extends JLabel {
     public void addVetoableChangeListener(VetoableChangeListener _listener) {
     	vChangeSupport.addVetoableChangeListener(_listener);
     }
-    
+
     /**
      * Method to remove bean veto change listeners.
      *
      * @param _listener bean veto change listener
-     */    
+     */
     public void removeVetoableChangeListener(VetoableChangeListener _listener) {
     	vChangeSupport.removeVetoableChangeListener(_listener);
     }
-    
+
     /**
      * Sets the SSRowSet column name to which the component is bound.
      *
@@ -183,9 +183,11 @@ public class SSLabel extends JLabel {
      *    is bound
      */
     public void setColumnName(String _columnName) {
+        String oldValue = columnName;
         columnName = _columnName;
+        pChangeSupport.firePropertyChange("columnName", oldValue, columnName);
         bind();
-    }    
+    }
 
     /**
      * Returns the SSRowSet column name to which the component is bound.
@@ -195,16 +197,18 @@ public class SSLabel extends JLabel {
     public String getColumnName() {
         return columnName;
     }
-    
+
     /**
      * Sets the SSRowSet to which the component is bound.
      *
      * @param _sSRowSet    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _sSRowSet) {
+        SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
+        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
         bind();
-    }    
+    }
 
     /**
      * Returns the SSRowSet to which the component is bound.
@@ -214,7 +218,7 @@ public class SSLabel extends JLabel {
     public SSRowSet getSSRowSet() {
         return sSRowSet;
     }
-    
+
     /**
      * Sets the SSRowSet and column name to which the component is to be bound.
      *
@@ -222,10 +226,16 @@ public class SSLabel extends JLabel {
      * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _sSRowSet, String _columnName) {
+        SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
+        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+
+        String oldValue2 = columnName;
         columnName = _columnName;
+        pChangeSupport.firePropertyChange("columnName", oldValue2, columnName);
+
         bind();
-    }     
+    }
 
     /**
      * Initialization code.
@@ -235,7 +245,7 @@ public class SSLabel extends JLabel {
         // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,20));
     }
-   
+
     /**
      * Method for handling binding of component to a SSRowSet column.
      */
@@ -342,6 +352,9 @@ public class SSLabel extends JLabel {
 
 /*
  * $Log$
+ * Revision 1.13  2005/02/11 22:59:46  yoda2
+ * Imported PropertyVetoException and added some bound properties.
+ *
  * Revision 1.12  2005/02/11 20:16:05  yoda2
  * Added infrastructure to support property & vetoable change listeners (for beans).
  *

@@ -62,7 +62,7 @@ import java.beans.PropertyVetoException;
  * diplay a list of one (or more) columns from the other table.
  *
  * Note, if changing both a sSRowSet and column name consider using the bind()
- * method rather than individual setSSRowSet() and setColumName() calls. 
+ * method rather than individual setSSRowSet() and setColumName() calls.
  *
  * e.g.
  *
@@ -145,26 +145,26 @@ public class SSDBComboBox extends JComboBox {
     /**
      * Query used to populate combo box.
      */
-    protected String query = null;
+    protected String query = "";
 
     /**
      * The column name whose value is written back to the database when the user
      * chooses an item in the combo box.  This is generally the PK of the table
      * to which a foreign key is mapped.
      */
-    protected String primaryKeyColumnName = null;
+    protected String primaryKeyColumnName = "";
 
     /**
      * The database column used to populate the first visible column of the
      * combo box.
      */
-    protected String displayColumnName = null;
+    protected String displayColumnName = "";
 
     /**
      * The database column used to populate the second (optional) visible column
      * of the combo box.
      */
-    protected String secondDisplayColumnName = null;
+    protected String secondDisplayColumnName = "";
 
     /**
      * Vector used to store all of the primaryKeyColumnName values for the
@@ -176,7 +176,7 @@ public class SSDBComboBox extends JComboBox {
      * Number of items in the combo box.
      */
     protected int numberOfItems = 0;
-    
+
     /**
      * SSRowSet from which component will get/set values.
      */
@@ -185,7 +185,7 @@ public class SSDBComboBox extends JComboBox {
     /**
      * SSRowSet column to which the component will be bound.
      */
-    protected String columnName;
+    protected String columnName = "";
 
     /**
      * Component listener.
@@ -211,16 +211,16 @@ public class SSDBComboBox extends JComboBox {
      * Format for any date columns displayed in combo box.
      */
     protected String dateFormat = "MM/dd/yyyy";
-    
+
 	/**
 	 * Convenience class for providing the property change listener support
 	 */
 	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
-    
+
 	/**
 	 * Convenience class for providing the vetoable change listener support
 	 */
-	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);    
+	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);
 
     /**
      * Creates an object of the SSDBComboBox.
@@ -228,7 +228,7 @@ public class SSDBComboBox extends JComboBox {
     public SSDBComboBox() {
         init();
     }
-    
+
     /**
      * Constructs a SSDBComboBox  with the given parameters.
      *
@@ -244,7 +244,7 @@ public class SSDBComboBox extends JComboBox {
         displayColumnName = _displayColumnName;
         init();
     }
-    
+
     /**
      * Method to add bean property change listeners.
      *
@@ -253,16 +253,16 @@ public class SSDBComboBox extends JComboBox {
     public void addPropertyChangeListener(PropertyChangeListener _listener) {
     	pChangeSupport.addPropertyChangeListener(_listener);
     }
-    
+
     /**
      * Method to remove bean property change listeners.
      *
      * @param _listener bean property change listener
-     */    
+     */
     public void removePropertyChangeListener(PropertyChangeListener _listener) {
     	pChangeSupport.removePropertyChangeListener(_listener);
     }
-    
+
     /**
      * Method to add bean vetoable change listeners.
      *
@@ -271,26 +271,28 @@ public class SSDBComboBox extends JComboBox {
     public void addVetoableChangeListener(VetoableChangeListener _listener) {
     	vChangeSupport.addVetoableChangeListener(_listener);
     }
-    
+
     /**
      * Method to remove bean veto change listeners.
      *
      * @param _listener bean veto change listener
-     */    
+     */
     public void removeVetoableChangeListener(VetoableChangeListener _listener) {
     	vChangeSupport.removeVetoableChangeListener(_listener);
     }
-    
+
     /**
      * Sets the new SSRowSet for the combo box.
      *
      * @param _sSRowSet  SSRowSet to which the combo has to update values.
      */
     public void setSSRowSet(SSRowSet _sSRowSet) {
+        SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
+        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
         bind();
     }
-    
+
     /**
      * Returns the SSRowSet being used to get the values.
      *
@@ -298,7 +300,7 @@ public class SSDBComboBox extends JComboBox {
      */
     public SSRowSet getSSRowSet() {
         return sSRowSet;
-    }      
+    }
 
     /**
      * Sets the connection object to be used.
@@ -306,7 +308,10 @@ public class SSDBComboBox extends JComboBox {
      * @param _sSConnection    connection object used for database.
      */
     public void setSSConnection(SSConnection _sSConnection) {
+        SSConnection oldValue = sSConnection;
         sSConnection = _sSConnection;
+        pChangeSupport.firePropertyChange("sSConnection", oldValue, sSConnection);
+        bind();
     }
 
     /**
@@ -316,7 +321,7 @@ public class SSDBComboBox extends JComboBox {
      */
     public SSConnection getSSConnection() {
         return sSConnection;
-    }       
+    }
 
     /**
      * Sets the query used to display items in the combo box.
@@ -324,7 +329,9 @@ public class SSDBComboBox extends JComboBox {
      * @param _query   query to be used to get values from database (to display combo box items)
      */
     public void setQuery(String _query) {
+        String oldValue = query;
         query = _query;
+        pChangeSupport.firePropertyChange("query", oldValue, query);
     }
 
     /**
@@ -334,7 +341,7 @@ public class SSDBComboBox extends JComboBox {
      */
     public String getQuery() {
         return query;
-    }    
+    }
 
     /**
      * Sets the column name for the combo box
@@ -342,10 +349,12 @@ public class SSDBComboBox extends JComboBox {
      * @param _columnName   name of column
      */
     public void setColumnName(String _columnName) {
+        String oldValue = columnName;
         columnName = _columnName;
+        pChangeSupport.firePropertyChange("columnName", oldValue, columnName);
         bind();
     }
-    
+
     /**
      * Returns the column name to which the combo is bound.
      *
@@ -353,7 +362,7 @@ public class SSDBComboBox extends JComboBox {
      */
     public String getColumnName() {
         return columnName;
-    }    
+    }
 
     /**
      * Sets the column name whose values have to be displayed in combo box.
@@ -361,9 +370,11 @@ public class SSDBComboBox extends JComboBox {
      * @param _displayColumnName   column name whose values have to be displayed.
      */
     public void setDisplayColumnName(String _displayColumnName) {
+        String oldValue = displayColumnName;
         displayColumnName = _displayColumnName;
+        pChangeSupport.firePropertyChange("displayColumnName", oldValue, displayColumnName);
     }
-    
+
     /**
      * Returns the column name whose values are displayed in the combo box.
      *
@@ -371,7 +382,7 @@ public class SSDBComboBox extends JComboBox {
      */
     public String getDisplayColumnName() {
         return displayColumnName;
-    }    
+    }
 
     /**
      * When a display column is of type date you can choose the format in which it has
@@ -380,9 +391,11 @@ public class SSDBComboBox extends JComboBox {
      * @param _dateFormat pattern in which dates have to be displayed
      */
      public void setDateFormat(String _dateFormat) {
+        String oldValue = dateFormat;
         dateFormat = _dateFormat;
+        pChangeSupport.firePropertyChange("dateFormat", oldValue, dateFormat);
      }
-     
+
     /**
      * Returns the pattern in which dates have to be displayed
      *
@@ -390,7 +403,7 @@ public class SSDBComboBox extends JComboBox {
      */
     public String getDateFormat() {
         return dateFormat;
-    }        
+    }
 
     /**
      * Sets the second display name.
@@ -402,9 +415,11 @@ public class SSDBComboBox extends JComboBox {
      *  displayed in the combo in addition to the first column name.
      */
     public void setSecondDisplayColumnName(String _secondDisplayColumnName) {
+        String oldValue = secondDisplayColumnName;
         secondDisplayColumnName = _secondDisplayColumnName;
+        pChangeSupport.firePropertyChange("secondDisplayColumnName", oldValue, secondDisplayColumnName);
     }
-    
+
     /**
      * Returns the second column name whose values are also displayed in the combo box.
      *
@@ -414,14 +429,16 @@ public class SSDBComboBox extends JComboBox {
     public String getSecondDisplayColumnName() {
         return secondDisplayColumnName;
     }
-    
+
     /**
      * Set the seperator to be used when multiple columns are displayed
      *
      * @param _seperator   seperator to be used.
      */
      public void setSeperator(String _seperator) {
+        String oldValue = seperator;
         seperator = _seperator;
+        pChangeSupport.firePropertyChange("seperator", oldValue, seperator);
      }
 
      /**
@@ -447,18 +464,18 @@ public class SSDBComboBox extends JComboBox {
     /**
      * Sets the currently selected value
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _value    value to set as currently selected.
      */
     public void setSelectedValue(long _value) {
         textField.setText(String.valueOf(_value));
     }
-    
+
     /**
      * Returns the value of the selected item.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @return value corresponding to the selected item in the combo.
      *     return -1 if no item is selected.
@@ -474,22 +491,22 @@ public class SSDBComboBox extends JComboBox {
         return Long.valueOf((String)columnVector.get(index)).longValue();
 
     }
-    
+
     /**
      * Sets the currently selected value
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _value    value to set as currently selected.
      */
     public void setSelectedStringValue(String _value) {
         textField.setText(_value);
-    }    
-    
+    }
+
     /**
      * Returns the value of the selected item.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @return value corresponding to the selected item in the combo.
      *     return null if no item is selected.
@@ -517,11 +534,11 @@ public class SSDBComboBox extends JComboBox {
 
         // DATABASE SETUP
             Statement statement = sSConnection.getConnection().createStatement();
-    
+
             if (query.equals("")) {
                 throw new Exception("Query is empty");
             }
-    
+
             ResultSet rs = statement.executeQuery(query);
 
         // CLEAR ALL ITEMS FROM COMBO AND VECTOR STORING ITS CORRESPONDING VALUES.
@@ -558,11 +575,17 @@ public class SSDBComboBox extends JComboBox {
      * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _sSRowSet, String _columnName) {
-        sSRowSet  = _sSRowSet;
+        SSRowSet oldValue = sSRowSet;
+        sSRowSet = _sSRowSet;
+        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+
+        String oldValue2 = columnName;
         columnName = _columnName;
+        pChangeSupport.firePropertyChange("columnName", oldValue2, columnName);
+
         bind();
     }
-    
+
     /**
      * Adds an item to the existing list of items in the combo box.
      *
@@ -574,7 +597,7 @@ public class SSDBComboBox extends JComboBox {
         addItem(_name);
         numberOfItems++;
      }
-     
+
     /**
      * Adds an item to the existing list of items in the combo box.
      *
@@ -585,11 +608,11 @@ public class SSDBComboBox extends JComboBox {
         columnVector.add(_value);
         addItem(_name);
         numberOfItems++;
-     }     
+     }
 
      /**
       * Deletes the item which has value equal to _value.
-      * If more than one item is present in the combo for that value the first one is changed.      
+      * If more than one item is present in the combo for that value the first one is changed.
       *
       * @param _value  value of the item to be deleted.
       *
@@ -605,10 +628,10 @@ public class SSDBComboBox extends JComboBox {
         numberOfItems--;
         return true;
      }
-     
+
      /**
       * Deletes the item which has value equal to _value.
-      * If more than one item is present in the combo for that value the first one is changed.      
+      * If more than one item is present in the combo for that value the first one is changed.
       *
       * @param _value  value of the item to be deleted.
       *
@@ -623,7 +646,7 @@ public class SSDBComboBox extends JComboBox {
         removeItemAt(index);
         numberOfItems--;
         return true;
-     }     
+     }
 
     /**
      * Updates the string thats being displayed.
@@ -652,7 +675,7 @@ public class SSDBComboBox extends JComboBox {
         addActionListener(cmbListener);
         return true;
     }
-    
+
     /**
      * Updates the string thats being displayed.
      * If more than one item is present in the combo for that value the first one is changed.
@@ -680,30 +703,30 @@ public class SSDBComboBox extends JComboBox {
         addActionListener(cmbListener);
         return true;
     }
-    
+
     /**
      * Initialization code.
      */
     protected void init() {
         // ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
         // THIS IS HANDLED IN MyKeyListener
-            
+
         // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,20));
-    }    
-    
+    }
+
     /**
      * Method for handling binding of component to a SSRowSet column.
      */
     protected void bind() {
-        
+
         // CHECK FOR NULL COLUMN/ROWSET
             if (columnName==null || sSRowSet==null) {
                 return;
             }
-            
+
         // REMOVE LISTENERS TO PREVENT DUPLICATION
-            removeListeners();            
+            removeListeners();
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
             textField.setDocument(new SSTextDocument(sSRowSet, columnName));
@@ -714,7 +737,7 @@ public class SSDBComboBox extends JComboBox {
         // ADD BACK LISTENERS
             addListeners();
 
-    }       
+    }
 
     /**
      * Updates the value displayed in the component based on the SSRowSet column
@@ -747,7 +770,7 @@ public class SSDBComboBox extends JComboBox {
         //}
 
     }
-    
+
     /**
      * Method to return string equalivent of a given resultset column.
      *
@@ -774,7 +797,7 @@ public class SSDBComboBox extends JComboBox {
         }
         return strValue;
 
-    }     
+    }
 
     /**
      * Adds listeners for component and bound text field (where applicable).
@@ -783,7 +806,7 @@ public class SSDBComboBox extends JComboBox {
         addActionListener(cmbListener);
         addFocusListener(cmbListener);
         addKeyListener(myKeyListener);
-        textField.getDocument().addDocumentListener(textFieldDocumentListener);         
+        textField.getDocument().addDocumentListener(textFieldDocumentListener);
     }
 
     /**
@@ -794,7 +817,7 @@ public class SSDBComboBox extends JComboBox {
         removeFocusListener(cmbListener);
         removeKeyListener(myKeyListener);
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
-          
+
     }
 
     /**
@@ -972,7 +995,7 @@ public class SSDBComboBox extends JComboBox {
                     //}
                     String textFieldText = textField.getText();
                     String columnVectorText = (String)columnVector.get(index);
-                    
+
                     if (!textFieldText.equals(columnVectorText)) {
                         textField.setText(columnVectorText);
                     }
@@ -996,14 +1019,14 @@ public class SSDBComboBox extends JComboBox {
             textField.getDocument().addDocumentListener(textFieldDocumentListener);
 
         }
-        
+
         public void focusLost(FocusEvent fe){
             myKeyListener.resetSearchString();
         }
-        
+
     } // private class MyComboListener implements ActionListener {
-    
-    
+
+
 // DEPRECATED STUFF....................
 
     /**
@@ -1026,7 +1049,7 @@ public class SSDBComboBox extends JComboBox {
         textField           = _textField;
 
     }
-    
+
     /**
      * Sets the connection object to be used.
      *
@@ -1038,7 +1061,7 @@ public class SSDBComboBox extends JComboBox {
     public void setConnection(SSConnection _sSConnection) {
         sSConnection = _sSConnection;
     }
-        
+
 
     /**
      * Sets the new SSRowSet for the combo box.
@@ -1046,7 +1069,7 @@ public class SSDBComboBox extends JComboBox {
      * @param _sSRowSet  SSRowSet to which the combo has to update values.
      *
      * @deprecated
-     * @see #setSSRowSet     
+     * @see #setSSRowSet
      */
     public void setRowSet(SSRowSet _sSRowSet) {
         sSRowSet = _sSRowSet;
@@ -1063,7 +1086,7 @@ public class SSDBComboBox extends JComboBox {
      */
     public void setTextField(JTextField _textField) {
         textField = _textField;
-    }    
+    }
 
     /**
      * Returns connection object used to get values from database.
@@ -1071,7 +1094,7 @@ public class SSDBComboBox extends JComboBox {
      * @return returns a SSConnection object.
      *
      * @deprecated
-     * @see #getSSConnection     
+     * @see #getSSConnection
      */
     public SSConnection getConnection() {
         return sSConnection;
@@ -1109,7 +1132,7 @@ public class SSDBComboBox extends JComboBox {
     public Component getComponent() {
         return this;
     }
-    
+
 
      /**
       * Deletes the item which has name equal to _name. If there are
@@ -1119,7 +1142,7 @@ public class SSDBComboBox extends JComboBox {
       *
       * @return returns true on successful deletion else returns false.
       *
-      * @deprecated      
+      * @deprecated
       */
      public boolean deleteItem(String _name) {
 
@@ -1133,7 +1156,7 @@ public class SSDBComboBox extends JComboBox {
         }
         return false;
      }
-     
+
 
      /**
       * Deletes the item which has display name equal to _name and corresponding value
@@ -1145,7 +1168,7 @@ public class SSDBComboBox extends JComboBox {
       *
       * @return returns true on successful deletion else returns false.
       *
-      * @deprecated       
+      * @deprecated
       */
      public boolean deleteItem(String _name, long _value) {
         for (int i=0; i<getItemCount();i++) {
@@ -1160,7 +1183,7 @@ public class SSDBComboBox extends JComboBox {
         }
         return false;
      }
-     
+
 
 } // end public class SSDBComboBox extends JComponent {
 
@@ -1168,6 +1191,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.27  2005/02/11 22:59:27  yoda2
+ * Imported PropertyVetoException and added some bound properties.
+ *
  * Revision 1.26  2005/02/11 20:16:01  yoda2
  * Added infrastructure to support property & vetoable change listeners (for beans).
  *

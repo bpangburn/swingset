@@ -73,55 +73,55 @@ public class SSDataNavigator extends JPanel {
      * Button to navigate to the first record in the SSRowSet.
      */
     protected JButton firstButton = new JButton();
-    
+
     /**
      * Button to navigate to the previous record in the SSRowSet.
-     */    
+     */
     protected JButton previousButton = new JButton();
-    
+
     /**
      * Text field for viewing/changing the current record number.
-     */    
+     */
     protected JTextField txtCurrentRow = new JTextField();
-    
+
     /**
      * Button to navigate to the next record in the SSRowSet.
-     */    
+     */
     protected JButton nextButton = new JButton();
-    
+
     /**
      * Button to navigate to the last record in the SSRowSet.
-     */    
+     */
     protected JButton lastButton = new JButton();
 
     /**
      * Button to commit screen changes to the SSRowSet.
-     */    
+     */
     protected JButton commitButton = new JButton(); // Commit button
-    
+
     /**
      * Button to revert screen changes based on the SSRowSet.
-     */    
+     */
     protected JButton undoButton = new JButton();
-    
+
     /**
      * Button to refresh the screen based on any changes to the SSRowSet.
-     */    
+     */
     protected JButton refreshButton = new JButton(); // REFRESH BUTTON
-    
+
     /**
      * Button to add a record to the SSRowSet.
-     */    
+     */
     protected JButton addButton = new JButton();
-    
+
     /**
      * Button to delete the current record in the SSRowSet.
-     */    
+     */
     protected JButton deleteButton = new JButton();
-    
+
     /**
      * Label to display the total number of records in the SSRowSet.
-     */    
+     */
     protected JLabel lblRowCount = new JLabel();
 
     /**
@@ -133,15 +133,15 @@ public class SSDataNavigator extends JPanel {
      * Indicator to allow/disallow deletions from the SSRowSet.
      */
     protected boolean deletion = true;
-    
+
     /**
      * Indicator to allow/disallow insertions to the SSRowSet.
-     */    
+     */
     protected boolean insertion = true;
-    
+
     /**
      * Indicator to force confirmation of SSRowSet deletions.
-     */        
+     */
     protected boolean confirmDeletes = true;
 
     /**
@@ -189,17 +189,17 @@ public class SSDataNavigator extends JPanel {
      * Listener on the SSRowSet used by data navigator.
      */
     private final SSDBNavRowSetListener sSRowSetListener = new SSDBNavRowSetListener();
-    
+
 	/**
 	 * Convenience class for providing the property change listener support
 	 */
 	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
-    
+
 	/**
 	 * Convenience class for providing the vetoable change listener support
 	 */
 	private VetoableChangeSupport vChangeSupport = new VetoableChangeSupport(this);
-    
+
     /**
      * Creates a object of SSDataNavigator.
      * Note: you have to set the SSRowSet before you can start using it.
@@ -209,7 +209,7 @@ public class SSDataNavigator extends JPanel {
         createPanel();
         addListeners();
     }
-    
+
     /**
      * Constructs a SSDataNavigator for the given SSRowSet
      *
@@ -236,7 +236,7 @@ public class SSDataNavigator extends JPanel {
         createPanel();
         addListeners();
     }
-    
+
     /**
      * Method to add bean property change listeners.
      *
@@ -245,16 +245,16 @@ public class SSDataNavigator extends JPanel {
     public void addPropertyChangeListener(PropertyChangeListener _listener) {
     	pChangeSupport.addPropertyChangeListener(_listener);
     }
-    
+
     /**
      * Method to remove bean property change listeners.
      *
      * @param _listener bean property change listener
-     */    
+     */
     public void removePropertyChangeListener(PropertyChangeListener _listener) {
     	pChangeSupport.removePropertyChangeListener(_listener);
     }
-    
+
     /**
      * Method to add bean vetoable change listeners.
      *
@@ -263,12 +263,12 @@ public class SSDataNavigator extends JPanel {
     public void addVetoableChangeListener(VetoableChangeListener _listener) {
     	vChangeSupport.addVetoableChangeListener(_listener);
     }
-    
+
     /**
      * Method to remove bean veto change listeners.
      *
      * @param _listener bean veto change listener
-     */    
+     */
     public void removeVetoableChangeListener(VetoableChangeListener _listener) {
     	vChangeSupport.removeVetoableChangeListener(_listener);
     }
@@ -294,9 +294,11 @@ public class SSDataNavigator extends JPanel {
      * @param _callExecute    false if using MySQL database - otherwise true
      */
     public void setCallExecute(boolean _callExecute) {
+        boolean oldValue = callExecute;
         callExecute = _callExecute;
+        pChangeSupport.firePropertyChange("callExecute", oldValue, callExecute);
     }
-    
+
     /**
      * Indicates if the navigator will skip the execute function call on the
      * underlying SSRowSet (needed for MySQL - see FAQ).
@@ -305,7 +307,7 @@ public class SSDataNavigator extends JPanel {
      */
     public boolean getCallExecute() {
         return callExecute;
-    }    
+    }
 
     /**
      * Sets the preferredSize and the MinimumSize of the buttons to the specified size
@@ -313,7 +315,9 @@ public class SSDataNavigator extends JPanel {
      * @param _buttonSize    the required dimension of the buttons
      */
     public void setButtonSize(Dimension _buttonSize) {
+        Dimension oldValue = buttonSize;
         buttonSize = _buttonSize;
+        pChangeSupport.firePropertyChange("buttonSize", oldValue, buttonSize);
         setButtonSizes();
     }
 
@@ -335,9 +339,11 @@ public class SSDataNavigator extends JPanel {
      * @param _dBNav    implementation of the SSDBNav interface
      */
     public void setDBNav(SSDBNav _dBNav) {
+        SSDBNav oldValue = dBNav;
         dBNav = _dBNav;
+        pChangeSupport.firePropertyChange("dBNav", oldValue, dBNav);
     }
-    
+
     /**
      * Returns any custom implementation of the SSDBNav interface, which is used
      * when the insert button is pressed to perform custom actions.
@@ -346,7 +352,7 @@ public class SSDataNavigator extends JPanel {
      */
     public SSDBNav getDBNav() {
         return dBNav;
-    }    
+    }
 
     /**
      * Enables or disables the modification-related buttons on the SSDataNavigator.
@@ -357,7 +363,10 @@ public class SSDataNavigator extends JPanel {
      *  buttons are enabled.
      */
     public void setModification(boolean _modification) {
+        boolean oldValue = modification;
         modification = _modification;
+        pChangeSupport.firePropertyChange("modification", oldValue, modification);
+
         if (!modification) {
             commitButton.setEnabled(false);
             undoButton.setEnabled(false);
@@ -388,7 +397,10 @@ public class SSDataNavigator extends JPanel {
      * @param _deletion    indicates whether or not to allow deletions
      */
     public void setDeletion(boolean _deletion) {
+        boolean oldValue = deletion;
         deletion = _deletion;
+        pChangeSupport.firePropertyChange("deletion", oldValue, deletion);
+
         if (!deletion) {
             deleteButton.setEnabled(false);
         } else {
@@ -411,8 +423,11 @@ public class SSDataNavigator extends JPanel {
      *
      * @param _insertion    indicates whether or not to allow insertions
      */
-    public void setInsertion(boolean _insertion){
+    public void setInsertion(boolean _insertion) {
+        boolean oldValue = insertion;
         insertion = _insertion;
+        pChangeSupport.firePropertyChange("insertion", oldValue, insertion);
+
         if (!insertion) {
             addButton.setEnabled(false);
         } else{
@@ -437,7 +452,9 @@ public class SSDataNavigator extends JPanel {
      * @param _confirmDeletes    indicates whether or not to confirm deletions
      */
     public void setConfirmDeletes(boolean _confirmDeletes) {
+        boolean oldValue = confirmDeletes;
         confirmDeletes = _confirmDeletes;
+        pChangeSupport.firePropertyChange("confirmDeletes", oldValue, confirmDeletes);
     }
 
     /**
@@ -449,7 +466,7 @@ public class SSDataNavigator extends JPanel {
     public boolean getConfirmDeletes() {
         return confirmDeletes;
     }
-     
+
     /**
      * This method changes the SSRowSet to which the navigator is bound.
      * The execute() and next() methods MUST be called on the SSRowSet
@@ -462,7 +479,9 @@ public class SSDataNavigator extends JPanel {
             sSRowSet.removeRowSetListener(sSRowSetListener);
         }
 
+        SSRowSet oldValue = sSRowSet;
         sSRowSet = _sSRowSet;
+        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
 
         // SEE IF THERE ARE ANY ROWS IN THE GIVEN SSROWSET
         try {
@@ -533,7 +552,7 @@ public class SSDataNavigator extends JPanel {
         if (deletion) {
             deleteButton.setEnabled(true);
         }
-    }     
+    }
 
     /**
      * Returns the SSRowSet being used.
@@ -560,69 +579,69 @@ public class SSDataNavigator extends JPanel {
             return false;
         }
     }
-    
+
     /**
      *	Calls the doClick on First Button.
      */
     public void doFirstButtonClick(){
     	firstButton.doClick();
     }
-    
+
     /**
      *	Calls the doClick on Previous Button.
      */
     public void doPreviousButtonClick(){
     	previousButton.doClick();
     }
-    
+
     /**
      *	Calls the doClick on Next Button.
      */
     public void doNextButtonClick(){
     	nextButton.doClick();
     }
-    
+
     /**
      *	Calls the doClick on Last Button.
      */
     public void doLastButtonClick(){
     	lastButton.doClick();
     }
-    
+
     /**
      *	Calls the doClick on Refresh Button.
      */
     public void doRefreshButtonClick(){
     	refreshButton.doClick();
     }
-    
+
     /**
      *	Calls the doClick on Commit Button.
      */
     public void doCommitButtonClick(){
     	commitButton.doClick();
     }
-    
+
     /**
      *	Calls the doClick on Undo Button.
      */
     public void doUndoButtonClick(){
     	undoButton.doClick();
     }
-    
+
     /**
      *	Calls the doClick on Add Button.
      */
     public void doAddButtonClick(){
     	addButton.doClick();
     }
-    
+
     /**
      *	Calls the doClick on Delete Button.
      */
     public void doDeleteButtonClick(){
     	deleteButton.doClick();
-    }    
+    }
 
     /**
      * Method to add tooltips and button graphics (or text) to navigator components.
@@ -663,7 +682,7 @@ public class SSDataNavigator extends JPanel {
         addButton.setToolTipText("Add Record");
         deleteButton.setToolTipText("Delete Record");
 
-    } // end protected void addToolTips() {    
+    } // end protected void addToolTips() {
 
     /**
      * Sets the dimensions for the navigator components.
@@ -738,7 +757,7 @@ public class SSDataNavigator extends JPanel {
                             sSRowSet.updateRow();
                         }
                         sSRowSet.first();
-    
+
                         firstButton.setEnabled(false);
                         previousButton.setEnabled(false);
                         if (!sSRowSet.isLast()) {
@@ -780,13 +799,13 @@ public class SSDataNavigator extends JPanel {
                             firstButton.setEnabled(false);
                             previousButton.setEnabled(false);
                         }
-    
+
                         // IF NEXT BUTTON IS DISABLED ENABLE IT.
                         if ( !sSRowSet.isLast() ) {
                             nextButton.setEnabled(true);
                             lastButton.setEnabled(true);
                         }
-    
+
                         if ( dBNav != null ) {
                             dBNav.performNavigationOps(SSDBNav.NAVIGATION_PREVIOUS);
                         }
@@ -820,13 +839,13 @@ public class SSDataNavigator extends JPanel {
                             nextButton.setEnabled(false);
                             lastButton.setEnabled(false);
                         }
-    
+
                         // IF THIS IS NOT FIRST ROW ENABLE FIRST AND PREVIOUS BUTTONS
                         if ( !sSRowSet.isFirst() ) {
                             previousButton.setEnabled(true);
                             firstButton.setEnabled(true);
                         }
-    
+
                         if ( dBNav != null ) {
                             dBNav.performNavigationOps(SSDBNav.NAVIGATION_NEXT);
                         }
@@ -853,7 +872,7 @@ public class SSDataNavigator extends JPanel {
                             sSRowSet.updateRow();
                         }
                         sSRowSet.last();
-    
+
                         nextButton.setEnabled(false);
                         lastButton.setEnabled(false);
                         if (!sSRowSet.isFirst()) {
@@ -888,7 +907,7 @@ public class SSDataNavigator extends JPanel {
                             if ( dBNav != null ) {
                                 dBNav.performPostInsertOps();
                             }
-    
+
                             sSRowSet.moveToCurrentRow();
                         // MOVE TO CURRENT ROW MOVES SSROWSET TO RECORD AT WHICH ADD WAS PRESSED.
                         // BUT IT NICE TO BE ON THE ADDED ROW WHICH IS THE LAST ONE IN THE SSROWSET.
@@ -908,9 +927,9 @@ public class SSDataNavigator extends JPanel {
                         // ELSE UPDATE THE PRESENT ROW VALUES.
                             sSRowSet.updateRow();
                         }
-    
+
                         onInsertRow = false;
-    
+
                         if (!sSRowSet.isFirst()) {
                             firstButton.setEnabled(true);
                             previousButton.setEnabled(true);
@@ -920,7 +939,7 @@ public class SSDataNavigator extends JPanel {
                             lastButton.setEnabled(true);
                         }
                         refreshButton.setEnabled(true);
-    
+
                         if (insertion) {
                             addButton.setEnabled(true);
                         }
@@ -982,7 +1001,7 @@ public class SSDataNavigator extends JPanel {
                                 previousButton.setEnabled(false);
                                 nextButton.setEnabled(false);
                                 lastButton.setEnabled(false);
-    
+
                             } else {
                             // IF THERE ARE ROWS GET THE ROW COUNT
                                 sSRowSet.last();
@@ -998,11 +1017,11 @@ public class SSDataNavigator extends JPanel {
                             lblRowCount.setText("of " + rowCount);
                             txtCurrentRow.setText(String.valueOf(currentRow));
                         }
-    
+
                         if ( dBNav != null ) {
                             dBNav.performRefreshOps();
                         }
-    
+
                     } catch(SQLException se) {
                         se.printStackTrace();
                         JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured refreshing the data.\n"+se.getMessage());
@@ -1019,7 +1038,7 @@ public class SSDataNavigator extends JPanel {
                     try {
                         sSRowSet.moveToInsertRow();
                         onInsertRow = true;
-    
+
                         if ( dBNav != null ) {
                             dBNav.performPreInsertOps();
                         }
@@ -1035,7 +1054,7 @@ public class SSDataNavigator extends JPanel {
                         refreshButton.setEnabled(false);
                         addButton.setEnabled(false);
                         deleteButton.setEnabled(false);
-    
+
                     } catch(SQLException se) {
                         JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while moving to insert row.\n"+se.getMessage());
                         se.printStackTrace();
@@ -1053,7 +1072,7 @@ public class SSDataNavigator extends JPanel {
                         if ( answer != JOptionPane.YES_OPTION ) {
                             return;
                         }
-    
+
                         if ( dBNav != null ) {
                             dBNav.performPreDeletionOps();
                         }
@@ -1061,7 +1080,7 @@ public class SSDataNavigator extends JPanel {
                         if ( dBNav != null ) {
                             dBNav.performPostDeletionOps();
                         }
-    
+
                         if (! sSRowSet.next() ) {
                             sSRowSet.last();
                         }
@@ -1166,33 +1185,33 @@ public class SSDataNavigator extends JPanel {
             }
         }
     }
-    
-    
+
+
 // DEPRECATED STUFF....................
-    
+
     /**
      * Sets the new SSRowSet for the combo box.
      *
      * @param _sSRowSet  SSRowSet to which the combo has to update values.
      *
      * @deprecated
-     * @see #setSSRowSet     
+     * @see #setSSRowSet
      */
     public void setRowSet(SSRowSet _sSRowSet) {
         setSSRowSet(_sSRowSet);
     }
-    
+
     /**
      * Returns the SSRowSet being used.
      *
      * @return returns the SSRowSet being used.
      *
      * @deprecated
-     * @see #getSSRowSet        
+     * @see #getSSRowSet
      */
      public SSRowSet getRowSet() {
         return sSRowSet;
-     }    
+     }
 
 } // end public class SSDataNavigator extends JPanel {
 
@@ -1200,6 +1219,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.32  2005/02/11 22:59:28  yoda2
+ * Imported PropertyVetoException and added some bound properties.
+ *
  * Revision 1.31  2005/02/11 20:16:04  yoda2
  * Added infrastructure to support property & vetoable change listeners (for beans).
  *

@@ -173,7 +173,7 @@ public class SSDataGrid extends JTable {
      * Scrollpane used to scroll datagrid.
      */
     protected JScrollPane scrollPane = null; //new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-    
+
     /**
      * The preferred size of the scroll pane in which the JTable is embedded.
      */
@@ -193,18 +193,18 @@ public class SSDataGrid extends JTable {
      * Variable to indicate if execute() should be called on the SSRowSet.
      */
     protected boolean callExecute = true;
-    
+
     /**
      * Variable to indicate if the data grid will display an additional row for
      * inserting new rows.
      */
     protected boolean insertion = true;
-    
+
 	/**
 	 * Convenience class for providing the property change listener support
 	 */
 	private PropertyChangeSupport pChangeSupport = new PropertyChangeSupport(this);
-    
+
 	/**
 	 * Convenience class for providing the vetoable change listener support
 	 */
@@ -227,7 +227,7 @@ public class SSDataGrid extends JTable {
     public SSDataGrid() {
         init();
     }
-    
+
     /**
      * Method to add bean property change listeners.
      *
@@ -236,16 +236,16 @@ public class SSDataGrid extends JTable {
     public void addPropertyChangeListener(PropertyChangeListener _listener) {
     	pChangeSupport.addPropertyChangeListener(_listener);
     }
-    
+
     /**
      * Method to remove bean property change listeners.
      *
      * @param _listener bean property change listener
-     */    
+     */
     public void removePropertyChangeListener(PropertyChangeListener _listener) {
     	pChangeSupport.removePropertyChangeListener(_listener);
     }
-    
+
     /**
      * Method to add bean vetoable change listeners.
      *
@@ -254,25 +254,27 @@ public class SSDataGrid extends JTable {
     public void addVetoableChangeListener(VetoableChangeListener _listener) {
     	vChangeSupport.addVetoableChangeListener(_listener);
     }
-    
+
     /**
      * Method to remove bean veto change listeners.
      *
      * @param _listener bean veto change listener
-     */    
+     */
     public void removeVetoableChangeListener(VetoableChangeListener _listener) {
     	vChangeSupport.removeVetoableChangeListener(_listener);
     }
-    
+
     /**
      * Sets the minimum column width for the data grid.
      *
      * @param _columnWidth   minimum column width of the each column
      */
-    public void setColumnWidth(int _columnWidth){
+    public void setColumnWidth(int _columnWidth) {
+        int oldValue = columnWidth;
         columnWidth = _columnWidth;
+        pChangeSupport.firePropertyChange("columnWidth", oldValue, columnWidth);
     }
-    
+
     /**
      * Returns the minimum column width for the data grid.
      *
@@ -280,7 +282,7 @@ public class SSDataGrid extends JTable {
      */
     public int getColumnWidth() {
         return columnWidth;
-    }    
+    }
 
     /**
      * Sets the component on which error messages will be popped up.
@@ -289,10 +291,12 @@ public class SSDataGrid extends JTable {
      * @param _messageWindow    the component that should be used when displaying error messages
      */
     public void setMessageWindow(Component _messageWindow) {
+        Component oldValue = messageWindow;
         messageWindow = _messageWindow;
+        pChangeSupport.firePropertyChange("messageWindow", oldValue, messageWindow);
         tableModel.setMessageWindow(messageWindow);
     }
-    
+
     /**
      * Returns the component on which error messages will be popped up.
      * The error dialog will use this component as its parent component.
@@ -301,7 +305,7 @@ public class SSDataGrid extends JTable {
      */
     public Component getMessageWindow() {
         return messageWindow;
-    }     
+    }
 
     /**
      * Sets the callExecute property.
@@ -311,9 +315,11 @@ public class SSDataGrid extends JTable {
      * @param _callExecute  true if execute function call has to be skipped else false
      */
     public void setCallExecute(boolean _callExecute) {
+        boolean oldValue = callExecute;
         callExecute = _callExecute;
+        pChangeSupport.firePropertyChange("callExecute", oldValue, callExecute);
     }
-    
+
     /**
      * Returns the callExecute property.
      * If set to true causes the navigator to skip the execute function call on the specified SSRowSet.
@@ -323,7 +329,7 @@ public class SSDataGrid extends JTable {
      */
     public boolean getCallExecute() {
         return callExecute;
-    }      
+    }
 
     /**
      * Sets the allowInsertion property of the table.
@@ -332,11 +338,13 @@ public class SSDataGrid extends JTable {
      * @param _insertion true if new rows can be added else false.
      */
     public void setInsertion(boolean _insertion) {
+        boolean oldValue = insertion;
         insertion = _insertion;
+        pChangeSupport.firePropertyChange("insertion", oldValue, insertion);
         tableModel.setInsertion(_insertion);
         updateUI();
     }
-    
+
     /**
      * Returns the allowInsertion property of the table.
      * If set to true an additional row for inserting new rows will be displayed
@@ -345,14 +353,14 @@ public class SSDataGrid extends JTable {
      */
     public boolean getInsertion() {
         return insertion;
-    }    
+    }
 
     /**
      * Returns the list of selected columns.
      * This function gets the list of selected columns from parent class
      * and removes any columns which are present in hidden columns.
      *
-     * Currently not a bean property since there is no associated variable     
+     * Currently not a bean property since there is no associated variable
      *
      * @return array of selected columns
      */
@@ -399,7 +407,7 @@ public class SSDataGrid extends JTable {
     /**
      * Returns number of selected columns.
      *
-     * Currently not a bean property since there is no associated variable.   
+     * Currently not a bean property since there is no associated variable.
      *
      * @return number of selected columns
      */
@@ -411,7 +419,7 @@ public class SSDataGrid extends JTable {
 
         return selectedColumns.length;
     }
-    
+
     /**
      * Binds the SSRowSet to the grid.
      * Data is taken from the new SSRowSet.
@@ -419,11 +427,12 @@ public class SSDataGrid extends JTable {
      * @param _sSRowSet    the SSRowSet which acts as the data source.
      */
      public void setSSRowSet(SSRowSet _sSRowSet) {
-        // UPDATE ROWSET & BIND
-            sSRowSet = _sSRowSet;
-            bind();
+        SSRowSet oldValue = sSRowSet;
+        sSRowSet = _sSRowSet;
+        pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        bind();
      } // end public void setSSRowSet(SSRowSet _sSRowSet) {
-         
+
     /**
      * Returns the SSRowSet being used to get the values.
      *
@@ -431,7 +440,7 @@ public class SSDataGrid extends JTable {
      */
     public SSRowSet getSSRowSet() {
         return sSRowSet;
-    }         
+    }
 
     /**
      * Sets the preferred size of the scroll pane in which the JTable is embedded.
@@ -439,10 +448,12 @@ public class SSDataGrid extends JTable {
      * @param _preferredSize    required dimension for JTable
      */
      public void setPreferredSize(Dimension _preferredSize) {
+        Dimension oldValue = preferredSize;
         preferredSize = _preferredSize;
+        pChangeSupport.firePropertyChange("preferredSize", oldValue, preferredSize);
         scrollPane.setPreferredSize(_preferredSize);
      }
-     
+
     /**
      * Returns the preferred size of the scroll pane in which the JTable is embedded.
      *
@@ -450,12 +461,12 @@ public class SSDataGrid extends JTable {
      */
     public Dimension getPreferredSize() {
         return preferredSize;
-    }       
+    }
 
     /**
      * Returns scroll pane with the JTable embedded in it.
      *
-     * Currently not a bean property since there is no associated variable.       
+     * Currently not a bean property since there is no associated variable.
      *
      * @return scroll pane with embedded JTable
      */
@@ -470,7 +481,7 @@ public class SSDataGrid extends JTable {
      * as that of the column in the database.
      * Use the getColumnClass function in JTable to determine the exact data type.
      *
-     * Currently not a bean property since there is no associated variable.      
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _columnNumbers    array containing the column numbers for which the
      *    defaults apply.
@@ -521,7 +532,7 @@ public class SSDataGrid extends JTable {
      * Returns the default value being used for the specified column.
      * Returns null if a default is not in use.
      *
-     * Currently not a bean property since there is no associated variable.      
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _columnNumber    the column number for which default value is to be returned.
      *
@@ -554,7 +565,7 @@ public class SSDataGrid extends JTable {
      * For this to properly work the SSDataValue object should also be provided
      * SSDataValue is used to get the value for the primary column.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _columnNumber    the column which is the primary column.
      */
@@ -568,7 +579,7 @@ public class SSDataGrid extends JTable {
      * For this to properly work the SSDataValue object should also be provided
      * SSDataValue is used to get the value for the primary column.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _columnName    the column which is the primary column.
      */
@@ -581,7 +592,7 @@ public class SSDataGrid extends JTable {
      * Sets the SSDataValue interface implemention. This interface specifies
      * function to retrieve primary column values for a new row to be added.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _dataValue   implementation of SSDataValue
      */
@@ -594,7 +605,7 @@ public class SSDataGrid extends JTable {
      * The date will be displayed in mm/dd/yyyy format. If a date renderer
      * is not requested then the date will be displayed in a standard format(yyyy-mm-dd).
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _column   column number for which a date renderer is needed.
      */
@@ -610,7 +621,7 @@ public class SSDataGrid extends JTable {
      * The date will be displayed in mm/dd/yyyy format. If a date renderer
      * is not requested then the date will be displayed in a standard format(yyyy-mm-dd).
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _column  column name for which a date renderer is needed.
      */
@@ -627,7 +638,7 @@ public class SSDataGrid extends JTable {
      * This is use full to limit the values that go with a column or if an underlying code
      * is do be displayed in a more meaningfull manner.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _column  column number for which combo renderer is to be provided.
      * @param _displayItems    the actual Objects to be displayed in the combo box.
@@ -643,7 +654,7 @@ public class SSDataGrid extends JTable {
      * This is use full to limit the values that go with a column or if an underlying code
      * is do be displayed in a more meaningfull manner.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _column  column number for which combo renderer is to be provided.
      * @param _displayItems    the actual Objects to be displayed in the combo box.
@@ -664,7 +675,7 @@ public class SSDataGrid extends JTable {
      * This is use full to limit the values that go with a column or if an underlying code
      * is do be displayed in a more meaningfull manner.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _column  column name for which combo renderer is to be provided.
      * @param _displayItems    the actual Objects to be displayed in the combo box.
@@ -680,7 +691,7 @@ public class SSDataGrid extends JTable {
      * This is use full to limit the values that go with a column or if an underlying code
      * is do be displayed in a more meaningfull manner.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _column  column name for which combo renderer is to be provided.
      * @param _displayItems    the actual Objects to be displayed in the combo box.
@@ -692,11 +703,11 @@ public class SSDataGrid extends JTable {
         int column = sSRowSet.getColumnIndex(_column)-1;
         setComboRenderer(column, _displayItems, _underlyingValues, _columnWidth);
     }
-    
+
     /**
      * Sets a check box renderer for the specified column.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _column - name ofthe column for which check box rendering is needed.
      */
@@ -704,11 +715,11 @@ public class SSDataGrid extends JTable {
     	int column = sSRowSet.getColumnIndex(_column) - 1;
     	setCheckBoxRenderer(column);
     }
-    
+
     /**
      * Sets a check box renderer for the specified column.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _column - column number for which check box rendering is needed.
      */
@@ -723,7 +734,7 @@ public class SSDataGrid extends JTable {
      * Sets the header for the JTable.
      * This function has to be called before setting the SSRowSet for SSDataGrid.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _headers array of string objects representing the header of each column.
      */
@@ -736,7 +747,7 @@ public class SSDataGrid extends JTable {
      * The columns specified as uneditable will not be available for user to edit.
      * This overrides the isCellEditable function in SSCellEditing.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _columnNumbers  array specifying the column numbers which should be
      *  uneditable.
@@ -750,7 +761,7 @@ public class SSDataGrid extends JTable {
      * The columns specified as uneditable will not be available for user to edit.
      * This overrides the isCellEditable function in SSCellEditing.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _columnNames  array specifying the column names which should be
      *  uneditable.
@@ -778,7 +789,7 @@ public class SSDataGrid extends JTable {
      * Make sure that you specify the hidden column numbers in the uneditable column
      * list.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _columnNumbers   array specifying the column numbers which should be
      *  hidden
@@ -799,7 +810,7 @@ public class SSDataGrid extends JTable {
      * Make sure that you specify the hidden column numbers in the uneditable column
      * list.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _columnNames    array specifying the column names which should be
      *  hidden
@@ -820,33 +831,33 @@ public class SSDataGrid extends JTable {
      * If the user has to decide on which cell has to be editable and which is not
      * then SSCellEditable interface has to be implemented and set it for the SSTableModel.
      *
-     * Currently not a bean property since there is no associated variable.     
+     * Currently not a bean property since there is no associated variable.
      *
      * @param _cellEditing    implementation of SSCellEditable interface.
      */
     public void setSSCellEditing(SSCellEditing _cellEditing) {
         tableModel.setSSCellEditing( _cellEditing );
     }
-     
+
     /**
      * Initialization code.
      */
     protected void init() {
-    
+
         // ADD KEY LISTENER TO JTABLE.
         // THIS IS USED FOR DELETING THE ROWS
         // ALLOWS MULTIPLE ROW DELETION.
         // KEY SEQUENCE FOR DELETING ROWS IS CTRL-X.
             this.addKeyListener(new KeyAdapter() {
                 private boolean controlPressed = false;
-    
+
             // IF THE KEY PRESSED IS CONTROL STORE THAT INFO.
                 public void keyPressed(KeyEvent ke) {
                     if (ke.getKeyCode() == KeyEvent.VK_CONTROL) {
                         controlPressed = true;
                     }
                 }
-    
+
             // HANDLE KEY RELEASES
                 public void keyReleased(KeyEvent ke) {
                 // IF CONTROL KEY IS RELEASED SET THAT CONTROL IS NOT PRESSED.
@@ -893,29 +904,29 @@ public class SSDataGrid extends JTable {
         // THIS IS FOR COPY AND PASTE SUPPORT
             SSTableKeyAdapter keyAdapter = new SSTableKeyAdapter(this);
             keyAdapter.setAllowInsertion(true);
-            
+
         // SET THE TABLE MODEL FOR JTABLE
         //    this.setModel(tableModel);
-    
+
         // SPECIFY THE MESSAGE WINDOW TO WHICH THE TABLE MODEL HAS TO POP UP
         // ERROR MESSAGES.
             tableModel.setMessageWindow(messageWindow);
-            tableModel.setJTable(this);            
-            
+            tableModel.setJTable(this);
+
         // THIS CAUSES THE JTABLE TO DISPLAY THE HORIZONTAL SCROLL BAR AS NEEDED.
             this.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-            
+
         // ADD THE JTABLE TO A SCROLL BAR
             scrollPane = new JScrollPane(this,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
 
-    } // end protected void init() {    
-        
+    } // end protected void init() {
+
     /**
      * Initializes the data grid control. Collects metadata information about the
      * given SSRowSet.
      */
     protected void bind() {
-        
+
         try {
         // EXECUTE THE QUERY
             if (callExecute) {
@@ -928,31 +939,31 @@ public class SSDataGrid extends JTable {
         //    } else {
                 tableModel.setSSRowSet(sSRowSet);
         //    }
-        
+
         // SET THE TABLE MODEL FOR JTABLE
-            this.setModel(tableModel);        
+            this.setModel(tableModel);
 
         // GET THE ROW COUNT
             rowCount = tableModel.getRowCount();
-            
+
         // GET THE COLUMN COUNT
             columnCount = tableModel.getColumnCount();
 
         } catch(SQLException se) {
             se.printStackTrace();
         }
-        
+
         // THIS IS NEEDED IF THE NUMBER OF COLUMNS IN THE NEW SSROWSET
         // DOES NOT MATCH WITH THE OLD COLUMNS.
-            createDefaultColumnModel();        
-        
+            createDefaultColumnModel();
+
         // HIDE COLUMNS AS NEEDED - ALSO CALLS updateUI()
             hideColumns();
-            
+
         // UPDATE DISPLAY
         //    updateUI();
 
-    } // end protected void bind() {        
+    } // end protected void bind() {
 
     /**
      * Hides the columns specified in the hidden columns list.
@@ -1040,14 +1051,14 @@ public class SSDataGrid extends JTable {
      * Renderer for check box fields.
      */
 	protected class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
-		
+
 		public CheckBoxRenderer(){
 			super();
 		}
-		
+
 		public Component getTableCellRendererComponent(JTable _table, Object _value,
             boolean _selected, boolean _hasFocus, int _row, int _column){
-            	
+
             if(_value instanceof Boolean){
             	if(((Boolean)_value).booleanValue()){
             		this.setSelected(true);
@@ -1068,35 +1079,35 @@ public class SSDataGrid extends JTable {
             	System.out.println("Can't set check box value. Unknown data type.");
             	System.out.println("Column type should be Boolean or Integer for check box columns.");
             }
-            
+
             return this;
         }
-        
+
     }
-    
+
 	/**
      * Editor for check box fields.
      */
     protected class CheckBoxEditor extends DefaultCellEditor {
-    // VARIABLE TO STORE THE COLUMN CLASS.		
+    // VARIABLE TO STORE THE COLUMN CLASS.
 	   	protected int columnClass = 0;
-    	
+
     	public CheckBoxEditor(){
     		super(new JCheckBox());
     	}
-    	
+
     	public Component getTableCellEditorComponent(JTable _table, Object _value,
             boolean _selected, int _row, int _column) {
 
 		// GET THE COMPONENT RENDERING THE VALUE.
 			JCheckBox checkBox = (JCheckBox)getComponent();
-			
-		// CHECK THE TYPE OF COLUMN, IT SHOULD BE THE SAME AS THE TYPE OF _VALUE.	
+
+		// CHECK THE TYPE OF COLUMN, IT SHOULD BE THE SAME AS THE TYPE OF _VALUE.
             if(_value instanceof Boolean){
-            // STORE THE TYPE OF COLUMN WE NEED THIS WHEN EDITOR HAS TO RETURN 
-            // VALUE BACK.	
+            // STORE THE TYPE OF COLUMN WE NEED THIS WHEN EDITOR HAS TO RETURN
+            // VALUE BACK.
             	columnClass = java.sql.Types.BOOLEAN;
-            // BASED ON THE VALUE CHECK THE BOX OR UNCHECK IT.	
+            // BASED ON THE VALUE CHECK THE BOX OR UNCHECK IT.
             	if(((Boolean)_value).booleanValue()){
             		checkBox.setSelected(true);
             	}
@@ -1104,13 +1115,13 @@ public class SSDataGrid extends JTable {
             		checkBox.setSelected(false);
             	}
             }
-        // IF THE COLUMN CLASS IS INTEGER    
+        // IF THE COLUMN CLASS IS INTEGER
             else if(_value instanceof Integer){
-            // STORE THE COLUMN CLASS.	
+            // STORE THE COLUMN CLASS.
             	columnClass = java.sql.Types.INTEGER;
             // BASED ON THE INTEGER VALUE CHECK OR UNCHECK THE CHECK BOX.
             // A VALUE OF 0 IS CONSIDERED TRUE - CHECK BOX IS CHECKED.
-            // ANY OTHER VALUE IS CONSIDERED FALSE - UNCHECK THE CHECK BOX.	
+            // ANY OTHER VALUE IS CONSIDERED FALSE - UNCHECK THE CHECK BOX.
             	if( ((Integer)_value).intValue() != 0){
             		checkBox.setSelected(true);
             	}
@@ -1118,21 +1129,21 @@ public class SSDataGrid extends JTable {
             		checkBox.setSelected(false);
             	}
             }
-        // IF THE COLUMN CLASS IS NOT BOOLEAN OR INTEGER 
-        // PRINT OUT ERROR MESSAGE.    
+        // IF THE COLUMN CLASS IS NOT BOOLEAN OR INTEGER
+        // PRINT OUT ERROR MESSAGE.
             else{
             	System.out.println("Can't set check box value. Unknown data type.");
             	System.out.println("Column type should be Boolean or Integer for check box columns.");
             }
-		// RETURN THE EDITOR COMPONENT           
+		// RETURN THE EDITOR COMPONENT
             return checkBox;
         }
 
         public Object getCellEditorValue() {
-        // GET THE COMPONENT AND CHECK IF IT IS CHECKED OR NOT.	
+        // GET THE COMPONENT AND CHECK IF IT IS CHECKED OR NOT.
             if(((JCheckBox)getComponent()).isSelected()){
             // CHECK THE COLUMN TYPE AND RETURN CORRESPONDING OBJECT.
-            // IF IT IS INTEGER THEN 1 IS CONSIDERED TRUE & 0 FALSE.	
+            // IF IT IS INTEGER THEN 1 IS CONSIDERED TRUE & 0 FALSE.
             	if(columnClass == java.sql.Types.BOOLEAN){
             		return new Boolean(true);
             	}
@@ -1142,15 +1153,15 @@ public class SSDataGrid extends JTable {
             }
             else{
             	if(columnClass == java.sql.Types.BOOLEAN){
-            		return new Boolean(false);            		
+            		return new Boolean(false);
             	}
             	else{
-            		return new Integer(0);            		
+            		return new Integer(0);
             	}
             }
         }
     }
-    
+
 	/**
      * Renderer for date fields.  Displays dates using mm/dd/yyyy format.
      */
@@ -1276,22 +1287,22 @@ public class SSDataGrid extends JTable {
             return -1;
         }
     }
-    
-    
-    
+
+
+
 // DEPRECATED STUFF....................
-    
+
     /**
      * Sets the new SSRowSet for the combo box.
      *
      * @param _sSRowSet  SSRowSet to which the combo has to update values.
      *
      * @deprecated
-     * @see #setSSRowSet     
+     * @see #setSSRowSet
      */
     public void setRowSet(SSRowSet _sSRowSet) {
         setSSRowSet(_sSRowSet);
-    }      
+    }
 
 } // end public class SSDataGrid extends JTable {
 
@@ -1299,6 +1310,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.28  2005/02/11 22:59:28  yoda2
+ * Imported PropertyVetoException and added some bound properties.
+ *
  * Revision 1.27  2005/02/11 20:16:02  yoda2
  * Added infrastructure to support property & vetoable change listeners (for beans).
  *
