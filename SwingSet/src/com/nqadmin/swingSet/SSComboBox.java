@@ -138,6 +138,7 @@ public class SSComboBox   extends JComponent {
 		 */
 		public SSComboBox() {
 			super();
+			init();
 			addComponent();			
 		}
 
@@ -150,10 +151,25 @@ public class SSComboBox   extends JComponent {
 		public SSComboBox(SSTextDocument document) {
 
 			super();
-
+			init();
 			addComponent();
 	
 			this.setDocument(document);
+		}
+		
+		/**
+		 *	Any initialization code.
+		 */
+		protected void init(){
+		// ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
+		// KEY IS PRESSED.
+			cmbDisplayed.addKeyListener(new KeyAdapter(){
+				public void keyReleased(KeyEvent ke){
+					if(ke.getKeyCode() == KeyEvent.VK_ENTER){
+						((Component)ke.getSource()).transferFocus();
+					}
+				}
+			});
 		}
 		
 		/**
@@ -216,6 +232,9 @@ public class SSComboBox   extends JComponent {
 			textField.setText(String.valueOf(_value));
 		}
 		
+		public void setPreferredSize(Dimension _dimension){
+			cmbDisplayed.setPreferredSize(_dimension);
+		}
 		
 		/**
 		 *	Added the combo box to the JComponent
@@ -348,6 +367,9 @@ public class SSComboBox   extends JComponent {
 		 */
 		public boolean setOption(String[] options){
 			// ADD THE SPECIFIED ITEMS TO THE COMBO BOX
+			// REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
+			// THE DISPLAYED ITEMS
+			cmbDisplayed.removeAll();
 			for(int i=0;i<options.length;i++){
 				cmbDisplayed.addItem(options[i]);
 			}
@@ -381,6 +403,9 @@ public class SSComboBox   extends JComponent {
 			if(options.length != mappings.length)
 				return false;
 			// add the items to combo
+			// REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
+			// THE DISPLAYED ITEMS
+			cmbDisplayed.removeAll();
 			for(int i=0;i<options.length;i++){
 				cmbDisplayed.addItem(options[i]);
 			}
@@ -418,7 +443,9 @@ public class SSComboBox   extends JComponent {
 
 			option = options;
 //			System.out.println("Requested  Option: " + options);
-				
+			// REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
+			// THE DISPLAYED ITEMS
+			cmbDisplayed.removeAll();	
 			if( options == YES_NO_OPTION) {
 				cmbDisplayed.addItem(new String("NO"));
 				cmbDisplayed.addItem(new String("YES"));
@@ -686,6 +713,11 @@ public class SSComboBox   extends JComponent {
 
 /*
  * $Log$
+ * Revision 1.7  2004/08/02 14:41:10  prasanth
+ * 1. Added set methods for rowset, columnname, selectedvalue.
+ * 2. Added get methods for rowset, columname.
+ * 3. Added addComponent and removeListener functions (private).
+ *
  * Revision 1.6  2004/03/08 16:43:37  prasanth
  * Updated copy right year.
  *
