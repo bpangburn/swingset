@@ -77,7 +77,6 @@ public class Example5 extends JFrame {
         }catch(ClassNotFoundException cnfe){
             cnfe.printStackTrace();
         }
-        dataGrid.setPreferredSize(new Dimension(200,200));
         getContentPane().add(dataGrid.getComponent());
 
         setVisible(true);
@@ -88,6 +87,9 @@ public class Example5 extends JFrame {
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/14 18:50:25  prasanth
+ * Updated to remove calls to deprecated methods.
+ *
  * Revision 1.5  2005/02/04 22:40:12  yoda2
  * Updated Copyright info.
  *
