@@ -1,0 +1,25 @@
+SwingSet is an open source toolkit for making Java Swing database-aware.  It was developed by Prasanth R. Pasala in conjunction with The Pangburn  Company and has been released under the BSD License.
+
+SwingSet utilizes SSTextDocument, an extension of the standard PlainDocument class to link the JTextField or JTextArea to a database column within a RowSet.  In addition, custom classes are provided to replace the standard JComboBox and JCheckBox. The SSComboBox provides an Access-like combobox that can be used to display user-specified text choices based on an underlying numeric column (e.g. allows my_table!choice_code, an integer column with valid values of 0, 1, & 2, to be displayed as "yes," "no," & "maybe").  The SSDBComboBox operates in a similar fashion, but is used where both values and their corresponding text choices are stored in a table (e.g. my_table!part_id is stored as a foreign key, but my_table!part_name is displayed).  By writing a custom event listener, SSDBComboBox may also be used to navigate a RowSet based on a combobox selection.  The SSCheckBox allows a checkbox to be linked to an underlying numeric database column.  Finally, a SSDataNavigator class is provided to allow traversal, insertion, deletion, commit, and rollback  of a RowSet. Changes to the current record are auto-committed when a navigation takes place (also similar to Access). 
+
+The SwingSet feature-set now includes:
+1. database binding for textboxes, comboboxes, and checkboxes
+2. masked editing of textboxes
+3. binding of a "hidden" numeric column for comboboxes with text choices (e.g. 0, 1, & 2 are stored for "Yes," "No," & "Maybe," respectively)
+4. population of comboboxes based on columns in a database query (can also be used for combobox-based record navigation)
+5. a record navigator (allows for database traversal, insertion, deletion, commit, and rollback)
+6. a data grid component for creating datasheet/spreadsheet/table views of queries
+    (a) allows custom column headings
+    (b) allows hiding of specified columns
+    (c) allows disabling of specified columns
+    (d) allows columns to be displayed as textboxes or comboboxes
+    (e) allows addition and deletion of records
+    (f) allows deletion of multiple, non-consecutive records
+    (g) allows data entry "masks" to be applied to text columns
+
+While there are several commercially available solutions that perform similar tasks, SwingSet is the first known open source solution.  Although listed as a beta, it is being used daily in various applications by the author and there are no known  bugs.  SwingSet includes full JavaDoc documentation and a detailed demo application.  Future plans include adding graphics to the record navigator and verifying correct behavior with multiple database platforms.
+
+More information on SwingSet is available from:
+http://swingset.sourceforge.net 
+and
+http://sourceforge.net/projects/swingset

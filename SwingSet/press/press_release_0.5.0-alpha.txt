@@ -1,0 +1,10 @@
+Open Toolkit for Making Java Swing Database-Aware 
+
+New Roads, LA -- September 24, 2003 -- SwingSet is an open source Java toolkit that allows the standard Java Swing components to be made database-aware.  While there are several commercially available solutions that perform similar tasks, SwingSet is the first known open source solution.
+
+SwingSet utilizes SSTextDocument, an extension of the standard PlainDocument class to link the JTextField or JTextArea to a database column within a RowSet.  In addition, custom classes are provided to replace the standard JComboBox and JCheckBox. The SSComboBox provides an Access-like combobox that can be used to display user-specified text choices based on an underlying numeric column (e.g. allows my_table!choice_code, an integer column with valid values of 0, 1, & 2, to be displayed as "yes," "no," & "maybe").  The SSDBComboBox operates in a similar fashion, but is used where both values and their corresponding text choices are stored in a table (e.g. my_table!part_id is stored as a foreign key, but my_table!part_name is displayed).  By writing a custom event listener, SSDBComboBox may also be used to navigate a RowSet based on a combobox selection.  The SSCheckBox allows a checkbox to be linked to an underlying numeric database column.  Finally, a SSDataNavigator class is provided to allow traversal, insertion, deletion, commit, and rollback  of a RowSet. Changes to the current record are auto-committed when a navigation takes place (also similar to Access).
+
+More information on SwingSet is available from:
+http://swingset.sourceforge.net 
+and
+http://sourceforge.net/projects/swingset
