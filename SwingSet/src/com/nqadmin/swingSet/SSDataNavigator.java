@@ -644,6 +644,14 @@ public class SSDataNavigator extends JPanel {
 							dbNav.performPostInsertOps();
                         }
 						rowset.moveToCurrentRow();
+					// INCREMENT THE ROW COUNT
+						rowCount++;
+					// SET THE ROW COUNT AS LABEL
+						lblRowCount.setText(String.valueOf(rowCount));
+					// GET CURRENT ROW NUMBER
+						currentRow = rowset.getRow();
+					// UPDATE THE TEXT FEILD
+						txtCurrentRow.setText(String.valueOf(currentRow));		
 					} else {
                     // ELSE UPDATE THE PRESENT ROW VALUES.	
 						rowset.updateRow();
@@ -714,6 +722,19 @@ public class SSDataNavigator extends JPanel {
 				try {
 					if (callExecute) {
 						rowset.execute();
+						if (!rowset.next()) {
+							rowCount = 0;
+							currentRow = 0;
+						} else {
+						// IF THERE ARE ROWS GET THE ROW COUNT	
+							rowset.last();
+							rowCount = rowset.getRow();
+							rowset.first();
+							currentRow = rowset.getRow();
+						}
+					// SET THE ROW COUNT AS LABEL
+						lblRowCount.setText(String.valueOf(rowCount));	
+						txtCurrentRow.setText(String.valueOf(currentRow));
                     }
 						
 					if ( dbNav != null ) {
@@ -791,6 +812,14 @@ public class SSDataNavigator extends JPanel {
 					if (! rowset.next() ) {
 						rowset.last();
                     }
+                // SEEMS DELETION WAS SUCCESSFULL DECREMENT ROWCOUNT
+                	rowCount--;
+                // SET THE ROW COUNT AS LABEL
+					lblRowCount.setText(String.valueOf(rowCount));
+				// GET CURRENT ROW NUMBER
+					currentRow = rowset.getRow();
+				// UPDATE THE TEXT FEILD
+					txtCurrentRow.setText(String.valueOf(currentRow));			
 				} catch(SQLException se) {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while deleting row.\n"+se.getMessage());
 					se.printStackTrace();
@@ -825,6 +854,10 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.10  2004/08/11 20:29:01  prasanth
+ * When rowset has no rows the values in text field and row count label were
+ * not updated so corrected this.
+ *
  * Revision 1.9  2004/08/10 22:06:59  yoda2
  * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
  *
