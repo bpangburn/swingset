@@ -75,5 +75,5 @@ import java.beans.*;
 }
 
 /*
- * $Log
+ * $Log$
  */
