@@ -215,9 +215,9 @@ public class SSDBComboBox extends JComboBox {
         // ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
         // THIS IS HANDLED IN MyKeyListener
             
-        // SET PREFERRED AND MAXIMUM DIMENSIONS
+        // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,20));
-            setMaximumSize(new Dimension(200,20));
+        //    setMaximumSize(new Dimension(200,20));
     }      
     
     /**
@@ -1129,6 +1129,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.19  2005/01/19 20:54:44  yoda2
+ * API cleanup.
+ *
  * Revision 1.18  2005/01/19 16:47:25  yoda2
  * Finished debugging and renamed some private variables to better distinguish between the bound column name and the column name representing the PK from the DB query.
  *

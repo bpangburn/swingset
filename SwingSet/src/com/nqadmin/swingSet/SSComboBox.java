@@ -161,9 +161,9 @@ public class SSComboBox extends JComboBox {
                 }
             });
             
-        // SET PREFERRED AND MAXIMUM DIMENSIONS
+        // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,20));
-            setMaximumSize(new Dimension(200,20));            
+        //    setMaximumSize(new Dimension(200,20));            
     }
 
     /**
@@ -782,6 +782,9 @@ public class SSComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.23  2005/01/19 20:54:43  yoda2
+ * API cleanup.
+ *
  * Revision 1.22  2005/01/19 03:15:44  yoda2
  * Got rid of setBinding and retooled public/private bind() methods and how they are called.
  *
