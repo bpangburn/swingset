@@ -78,6 +78,7 @@ public class SSSlider extends JSlider {
      * @param _orientation	slider spatial orientation
      */
     public SSSlider(int _orientation) {
+		super(_orientation);
     }
 
     /**
@@ -87,6 +88,7 @@ public class SSSlider extends JSlider {
      * @param _max	maximum slider value
      */
     public SSSlider(int _min, int _max) {
+		super(_min, _max);
     }
 
     /**
@@ -271,6 +273,9 @@ public class SSSlider extends JSlider {
 
 /*
  * $Log$
+ * Revision 1.2  2005/01/02 18:33:49  yoda2
+ * Added back empty constructor needed for deserialization along with other potentially useful constructors from parent classes.
+ *
  * Revision 1.1  2005/01/01 05:05:48  yoda2
  * Adding preliminary SwingSet implementations for JLabel & JSlider.
  *

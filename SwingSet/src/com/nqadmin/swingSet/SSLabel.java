@@ -78,6 +78,7 @@ public class SSLabel extends JLabel {
      * @param _image    specified image for label
      */
     public SSLabel(Icon _image) {
+		super(_image);
     }
 
     /**
@@ -87,6 +88,7 @@ public class SSLabel extends JLabel {
      * @param _horizontalAlignment	horizontal alignment
      */
     public SSLabel(Icon _image, int _horizontalAlignment) {
+		super(_image, _horizontalAlignment);
     }
 
     /**
@@ -222,6 +224,9 @@ public class SSLabel extends JLabel {
 
 /*
  * $Log$
+ * Revision 1.2  2005/01/02 18:33:48  yoda2
+ * Added back empty constructor needed for deserialization along with other potentially useful constructors from parent classes.
+ *
  * Revision 1.1  2005/01/01 05:05:47  yoda2
  * Adding preliminary SwingSet implementations for JLabel & JSlider.
  *
