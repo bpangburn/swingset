@@ -62,35 +62,60 @@ import javax.swing.event.*;
  */
 public class SSCheckBox extends JCheckBox {
 
-    // TEXT FIELD BOUND TO THE DATABASE
+    /**
+     * Text field bound to the SSRowSet.
+     */
     protected JTextField textField = new JTextField();
 
-    // SSROWSET FROM WHICH THE COMBO WILL GET/SET VALUES
+    /**
+     * SSRowSet from which component will get/set values.
+     */
     protected SSRowSet rowset;
 
-    // COLUMN NAME TO WHICH THE COMBO WILL BE BOUND TO
+    /**
+     * SSRowSet column to which the component will be bound.
+     */
     protected String columnName;
 
-    // SQL DATA TYPE OF COLUMN
+    /**
+     * Column SQL data type.
+     */
     protected int columnType = java.sql.Types.BIT;
 
-    // LISTENER FOR CHECK BOX AND TEXT FEILD
+    /**
+     * Component listener.
+     */
     private MyCheckBoxListener checkBoxListener = new MyCheckBoxListener();
+    
+    /**
+     * Bound text field document listener.
+     */
     private MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
-    // INITIALIZE CHECKED AND UNCHECKED VALUES
+    /**
+     * Checked value for numeric columns.
+     */
     protected int CHECKED = 1;
+    
+    /**
+     * Unchecked value for numeric columns.
+     */
     protected int UNCHECKED = 0;
 
-    // INITIALIZE CHECKED AND UNCHECKED VALUES FOR BOOLEAN COLUMN
+    /**
+     * Checked value for Boolean columns.
+     */
     protected static String BOOLEAN_CHECKED = "true";
+    
+    /**
+     * Unchecked value for Boolean columns.
+     */
     protected static String BOOLEAN_UNCHECKED = "false";
 
     /**
      * Creates an object of SSCheckBox.
      */
     public SSCheckBox() {
-        //textField = new JTextField();
         init();
     }
 
@@ -129,9 +154,7 @@ public class SSCheckBox extends JCheckBox {
     }    
     
     /**
-     * The column name and the SSRowSet should be set before calling this function.
-     * If the column name and SSRowSet are set seperately then this function has to
-     * be called to bind the check box to the column in the SSRowSet.
+     * Method for handling binding of component to a SSRowSet column.
      */
     protected void bind() throws java.sql.SQLException {
         
@@ -157,14 +180,18 @@ public class SSCheckBox extends JCheckBox {
                
     }
     
-    // ADDS LISTENERS FOR THE COMBO BOX AND TEXT FIELD
+    /**
+     * Adds listeners for component and bound text field (where applicable).
+     */
     private void addListeners() {
         textField.getDocument().addDocumentListener(textFieldDocumentListener);
         //cmbDisplayed.addActionListener(cmbListener);
         addChangeListener(checkBoxListener);   
     }
 
-    // REMOVES THE LISTENERS FOR TEXT FIELD AND THE COMBO BOX DISPLAYED
+    /**
+     * Removes listeners for component and bound text field (where applicable).
+     */
     private void removeListeners() {
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
         //cmbDisplayed.removeActionListener(cmbListener);
@@ -172,8 +199,7 @@ public class SSCheckBox extends JCheckBox {
     }    
 
     /**
-     * Sets the datasource and the columnName in the datasource to which the
-     * SSCheckBox has to be bound to.
+     * Sets the SSRowSet and column name to which the component is to be bound.
      *
      * @param _rowset    datasource to be used.
      * @param _columnName    Name of the column to which this check box should be bound
@@ -185,28 +211,28 @@ public class SSCheckBox extends JCheckBox {
     }
 
     /**
-     * returns the column name to which this check box is bound to.
+     * Returns the SSRowSet column name to which the component is bound.
      *
-     * @return column name to which the check box is bound.
+     * @return column name to which the component is bound
      */
     public String getColumnName() {
         return columnName;
     }
     
     /**
-     * Returns the SSRowSet being used to get the values.
+     * Returns the SSRowSet to which the component is bound.
      *
-     * @return returns the SSRowSet being used.
+     * @return SSRowSet to which the component is bound
      */
     public SSRowSet getSSRowSet() {
         return rowset;
     }
 
     /**
-     * Sets the column name to which the check box has to be bound
+     * Sets the SSRowSet column name to which the component is bound.
      *
-     * @param _columnName    column name in the SSRowSet to which the check box
-     *    is bound.
+     * @param _columnName    column name in the SSRowSet to which the component
+     *    is bound
      */
     public void setColumnName(String _columnName) throws java.sql.SQLException {
         columnName = _columnName;
@@ -214,16 +240,19 @@ public class SSCheckBox extends JCheckBox {
     }
 
     /**
-     * Sets the SSRowSet to be used.
+     * Sets the SSRowSet to which the component is bound.
      *
-     * @param _rowset    SSRowSet to be used for getting the values.
+     * @param _rowset    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _rowset) throws java.sql.SQLException {
         rowset = _rowset;
         bind();
     }    
 
-    // INITIALIZES THE CHECK BOX.
+    /**
+     * Updates the value displayed in the component based on the SSRowSet column
+     * binding.
+     */
     protected void setDisplay() {
             
         // SELECT/DESELECT BASED ON UNDERLYING SQL TYPE
@@ -255,7 +284,10 @@ public class SSCheckBox extends JCheckBox {
 
     } // end protected void setDisplay() {
 
-    // LISTENER FOR THE TEXT FIELD
+    /**
+     * Listener(s) for the bound text field used to propigate values back to the
+     * component's value.
+     */
     private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
         public void changedUpdate(DocumentEvent de){
@@ -287,9 +319,10 @@ public class SSCheckBox extends JCheckBox {
         }
     } // end private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
-    // LISTENER FOR THE CHECK BOX.
-    // ANY CHANGES MADE TO THE CHECK BOX BY THE USER ARE PROPOGATED BACK TO THE
-    // TEXT FIELD FOR FURTHER PROPOGATION TO THE UNDERLYING STORAGE STRUCTURE.
+    /**
+     * Listener(s) for the component's value used to propigate changes back to
+     * bound text field.
+     */
     private class MyCheckBoxListener implements ChangeListener, Serializable {
 
         public void stateChanged(ChangeEvent ce) {
@@ -359,6 +392,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/05 05:16:33  yoda2
+ * API cleanup.
+ *
  * Revision 1.6  2005/02/04 22:48:52  yoda2
  * API cleanup & updated Copyright info.
  *
