@@ -85,10 +85,21 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
  		init(_jTable);
  	}
  	
+ 	/**
+ 	 *	Sets allowInsertion. Set true if new rows can be added to JTable for copying
+ 	 *the data else false. Default value if false.
+ 	 *@param _allowInsertion true if new rows can be added when copying data from clipboard
+ 	 *else false.
+ 	 */
  	public void setAllowInsertion(boolean _allowInsertion) {
  		allowInsertion = _allowInsertion;
  	}
  	
+ 	/**
+ 	 *	Sets if this key adapter is used for SSDataGrid. True if the key adapter is
+ 	 *used for SSDataGrid else false. Default value is false.
+ 	 *@param _forSSDataGrid - true if this key adapter is used for SSDataGrid else false.
+ 	 */	
  	public void setForSSDataGrid(boolean _forSSDataGrid) {
  		forSSDataGrid = _forSSDataGrid;
  	}
@@ -100,6 +111,9 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
  		_jTable.addKeyListener(this);
  	}
  	
+ 	/**
+ 	 *	Invoked when a key is released.
+ 	 */
  	public void keyReleased(KeyEvent ke) {
  		StringBuffer strBuf = new StringBuffer();
  		
@@ -342,6 +356,9 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
  
 /*
  * $Log$
+ * Revision 1.2  2004/08/10 22:06:59  yoda2
+ * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
+ *
  * Revision 1.1  2004/07/30 22:38:54  prasanth
  * Table listener for copy and paste support.
  *
