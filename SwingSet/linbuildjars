@@ -20,7 +20,7 @@ mkdir ./release_jars/demo
 mkdir ./release_jars/images
 
 # RECOMPILE SWINGSET
-javac -d ./release_jars/bin ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/*.java
+javac -source 1.4 -target 1.4 -d ./release_jars/bin ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/*.java
 
 # REBUILD JAVADOCS
 javadoc -d ./release_jars/docs ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/*.java
@@ -44,7 +44,7 @@ jar -cvf ./release_jars/swingset-docs_current.jar -C ./release_jars/docs . readm
 jar -cvf ./release_jars/swingset-src_current.jar -C ./release_jars/src com -C ./release_jars images readme.txt ChangeLog.txt FAQ.txt
 
 # COMPILE DEMO
-javac -d ./release_jars/demo -classpath ./release_jars/swingset-bin_current.jar  ./src/samples/*.java
+javac -source 1.4 -target 1.4 -d ./release_jars/demo -classpath ./release_jars/swingset-bin_current.jar  ./src/samples/*.java
 
 # COPY DEMO SOURCE CODE
 cp ./src/samples/* ./release_jars/demo/
