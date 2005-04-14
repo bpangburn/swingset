@@ -351,8 +351,15 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                 case Types.VARCHAR:
                 case Types.LONGVARCHAR:
                     // SINCE THIS IS TEXT FILED WE CAN INSERT AN EMPTY STRING TO THE DATABASE
-    //              System.out.println( columnName + "      " + strValue);
-                    sSRowSet.updateString(columnName, strValue);
+                    // BUT IF THERE ARE UNIQUE CONSTRAINTS ON THIS COLUMN THEN THERE IS NO WAY
+                    // FOR USER TO REMOVE THE VALUE SO INSERT NULL IF THE VALUE IS EMPTY STRING.
+                    if ( strValue.equals("") ) {
+                        sSRowSet.updateNull(columnName);
+                    }
+                    else{
+                        sSRowSet.updateString(columnName, strValue);
+                    }
+                    
                     break;
 
                 default:
@@ -571,6 +578,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.23  2005/03/09 21:55:20  prasanth
+ * Added TIMESTAMP column type in updateText & getText functions.
+ *
  * Revision 1.22  2005/02/10 20:13:03  yoda2
  * Setter/getter cleanup & method reordering for consistency.
  *
