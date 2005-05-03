@@ -5,6 +5,24 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 $Id$
 
 ==============================================================================
+SwingSet 1.0.0-PR3 - Released xx-xx-2005
+==============================================================================
+
+Changes:
+	SSDBNav:
+		1. Added two new functions to the interface.
+			a) allowInsertion
+			b) allowDeletion
+	
+	SSDBNavAdapter:
+		1. Added default implementations for allowInsertion & allowDeletion
+			Both functions return true by default.
+	
+	SSDataNavigator:
+		1. Calling the functions allowInsertion & allowDeletion prior to adding
+			row or deleting the row.
+			
+==============================================================================
 SwingSet 1.0.0-PR2 - Released 03-09-2005
 ==============================================================================
 
