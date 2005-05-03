@@ -852,26 +852,33 @@ public class SSDataNavigator extends JPanel {
                     try {
                         if (onInsertRow) {
                         // IF ON INSERT ROW ADD THE ROW.
-                            sSRowSet.insertRow();
-                            if ( dBNav != null ) {
+                        // CHECK IF THE ROW CAN BE INSERTED.        
+                            if(dBNav==null || (dBNav != null && dBNav.allowInsertion()) ){
+                                sSRowSet.insertRow();
                                 dBNav.performPostInsertOps();
+                            // INCREMENT THE ROW COUNT
+                                rowCount++;
+ 
+                                sSRowSet.moveToCurrentRow();
+                            // MOVE TO CURRENT ROW MOVES SSROWSET TO RECORD AT WHICH ADD WAS PRESSED.
+                            // BUT IT NICE TO BE ON THE ADDED ROW WHICH IS THE LAST ONE IN THE SSROWSET.
+                            // ALSO MOVE TO CURRENT ROW MOVES THE SSROWSET POSITION BUT DOES NOT TRIGGER
+                            // ANY EVENT FOR THE LISTENERS AS A RESULT VALUES ON THE SCREEN WILL NOT
+                            // DISPLAY THE CURRENT RECORD VALUES.
+                                sSRowSet.last();
+                            
+                            // SET THE ROW COUNT AS LABEL
+                                lblRowCount.setText("of " + rowCount);
+                            // GET CURRENT ROW NUMBER
+                                currentRow = sSRowSet.getRow();
+                            // UPDATE THE TEXT FEILD
+                                txtCurrentRow.setText(String.valueOf(currentRow));
                             }
-
-                            sSRowSet.moveToCurrentRow();
-                        // MOVE TO CURRENT ROW MOVES SSROWSET TO RECORD AT WHICH ADD WAS PRESSED.
-                        // BUT IT NICE TO BE ON THE ADDED ROW WHICH IS THE LAST ONE IN THE SSROWSET.
-                        // ALSO MOVE TO CURRENT ROW MOVES THE SSROWSET POSITION BUT DOES NOT TRIGGER
-                        // ANY EVENT FOR THE LISTENERS AS A RESULT VALUES ON THE SCREEN WILL NOT
-                        // DISPLAY THE CURRENT RECORD VALUES.
-                            sSRowSet.last();
-                        // INCREMENT THE ROW COUNT
-                            rowCount++;
-                        // SET THE ROW COUNT AS LABEL
-                            lblRowCount.setText("of " + rowCount);
-                        // GET CURRENT ROW NUMBER
-                            currentRow = sSRowSet.getRow();
-                        // UPDATE THE TEXT FEILD
-                            txtCurrentRow.setText(String.valueOf(currentRow));
+                            else{
+                            // INSERTION IS NOT ALLOWED SO MOVE BACK TO PREVIOUS RECORD.    
+                                sSRowSet.moveToCurrentRow();
+                            }
+                            
                         } else {
                         // ELSE UPDATE THE PRESENT ROW VALUES.
                             sSRowSet.updateRow();
@@ -1039,22 +1046,24 @@ public class SSDataNavigator extends JPanel {
                         if ( dBNav != null ) {
                             dBNav.performPreDeletionOps();
                         }
-                        sSRowSet.deleteRow();
-                        if ( dBNav != null ) {
+                        
+                        if ( dBNav ==null || (dBNav != null && dBNav.allowDeletion()) ) {
+                        // DELETE ROW IS ALLOW DELETION RETURN TRUE.    
+                            sSRowSet.deleteRow();
                             dBNav.performPostDeletionOps();
+                         // SEEMS DELETION WAS SUCCESSFULL DECREMENT ROWCOUNT
+                            rowCount--;    
+                            if (! sSRowSet.next() ) {
+                               sSRowSet.last();
+                            }
+                        // SET THE ROW COUNT AS LABEL
+                            lblRowCount.setText("of " + rowCount);
+                        // GET CURRENT ROW NUMBER
+                            currentRow = sSRowSet.getRow();
+                        // UPDATE THE TEXT FEILD
+                            txtCurrentRow.setText(String.valueOf(currentRow));
                         }
-
-                        if (! sSRowSet.next() ) {
-                            sSRowSet.last();
-                        }
-                    // SEEMS DELETION WAS SUCCESSFULL DECREMENT ROWCOUNT
-                        rowCount--;
-                    // SET THE ROW COUNT AS LABEL
-                        lblRowCount.setText("of " + rowCount);
-                    // GET CURRENT ROW NUMBER
-                        currentRow = sSRowSet.getRow();
-                    // UPDATE THE TEXT FEILD
-                        txtCurrentRow.setText(String.valueOf(currentRow));
+                    
                     } catch(SQLException se) {
                         JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while deleting row.\n"+se.getMessage());
                         se.printStackTrace();
@@ -1182,6 +1191,12 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.35  2005/03/08 16:13:50  prasanth
+ * In undoButton listener based on insertRow flag changing the function call.
+ * cancelRowUpdates throws exception if current row is on insertRow.
+ * Used to work in 1.4.2 (though java docs say it would not).
+ * Also updating the current row number when undo is pressed.
+ *
  * Revision 1.34  2005/02/13 15:38:20  yoda2
  * Removed redundant PropertyChangeListener and VetoableChangeListener class variables and methods from components with JComponent as an ancestor.
  *
