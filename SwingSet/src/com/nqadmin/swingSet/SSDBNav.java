@@ -93,6 +93,12 @@ public interface SSDBNav {
     public void performPreInsertOps();
 
     /**
+     *    This function is called just before inserting the row into the database
+     *@return true is row can be inserted else false.
+     */
+    public boolean allowInsertion();
+    
+    /**
      * Method to perform post-insertion operations.
      *
      * In addition to this you can have a listener on the SSRowSet attached
@@ -106,6 +112,13 @@ public interface SSDBNav {
      */
     public void performCancelOps();
 
+    /**
+     *  This function will be called after performPreDeletionOps is  called but before
+     *the row is deleted.
+     *@return true is the row can be deleted else false.
+     */
+    public boolean allowDeletion();
+    
     /**
      * Method to perform pre-deletion operations.
      *
@@ -142,6 +155,9 @@ public interface SSDBNav {
 
 /*
  * $Log$
+ * Revision 1.11  2005/02/09 17:21:21  yoda2
+ * JavaDoc cleanup.
+ *
  * Revision 1.10  2005/02/04 22:48:53  yoda2
  * API cleanup & updated Copyright info.
  *
