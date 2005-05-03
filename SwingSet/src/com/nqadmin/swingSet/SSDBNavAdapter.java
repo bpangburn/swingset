@@ -58,6 +58,14 @@ public class SSDBNavAdapter implements SSDBNav, Serializable {
     }
 
     /**
+     *  This function always return true. This would allow the insertions
+     *if an implementation is not provided.
+     */ 
+    public boolean allowInsertion(){
+        return true;
+    }
+    
+    /**
      * Method to perform post-insertion operations.
      *
      * In addition to this you can have a listener on the SSRowSet attached
@@ -82,6 +90,15 @@ public class SSDBNavAdapter implements SSDBNav, Serializable {
     public void performPreDeletionOps(){
     }
 
+    /**
+     *  This function returns true by default. This allows for deletion of rows
+     *if an implementation is not provided.
+     *@return returns true.
+     */
+    public boolean allowDeletion(){
+        return true;
+    }
+    
     /**
      * Method to perform post-deletion operations.
      *
@@ -113,6 +130,9 @@ public class SSDBNavAdapter implements SSDBNav, Serializable {
 
 /*
  * $Log$
+ * Revision 1.9  2005/02/09 17:21:21  yoda2
+ * JavaDoc cleanup.
+ *
  * Revision 1.8  2005/02/04 22:48:53  yoda2
  * API cleanup & updated Copyright info.
  *
