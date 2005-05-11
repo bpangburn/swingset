@@ -62,8 +62,7 @@ import java.text.ParseException;
  * @author $Author$
  * @version $Revision$
  */
-public class SSFormattedTextField extends JFormattedTextField implements RowSetListener, KeyListener, FocusListener, MouseListener, BeanContextProxy {
-    
+public class SSFormattedTextField extends JFormattedTextField implements RowSetListener, KeyListener, MouseListener, BeanContextProxy, FocusListener {
     
     private BeanContextChildSupport beanContextChildSupport = new BeanContextChildSupport();
     
@@ -77,10 +76,23 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     private SSDataNavigator navigator = null;
     private SSRowSet rowset           = null;
     
+    private SSFormattedComboBox combo = null;
+    
+    /**
+     * Holds value of property nullable.
+     */
+    private boolean nullable = true;
+    
+    /**
+     * Utility field used by bound properties.
+     */
+    //private java.beans.PropertyChangeSupport propertyChangeSupport =  new java.beans.PropertyChangeSupport(this);
+    
     
     /** Creates a new instance of SSFormattedTextField */
     public SSFormattedTextField() {
         super();
+        this.setFont(new Font(this.getFont().getName(), Font.BOLD, 11));
         this.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
         
         /*
@@ -124,6 +136,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         menu = new JPopupMenu();
         menu.add("Opcion 1");
         menu.add("Opcion 2");
+        menu.add("Opcion 3");
         
         /*
          * set InputVerifier. Rowset's updates are handled by this class. Is the preferred method instead of focus change.
@@ -146,6 +159,16 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         return columnName;
     }
     
+    public void setSSFormattedComboBox(SSFormattedComboBox combo) {
+        this.combo = combo;
+        if (this.combo != null)
+            combo.setSelectedIndex(((SSFormattedComboBoxModel)combo.getModel()).indexOf(this.getValue()));
+    }
+    
+    public SSFormattedComboBox getSSFormattedComboBox() {
+        return combo;
+    }
+    
     /**
      *
      * @deprecated
@@ -159,6 +182,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     
     public void setSSRowSet(SSRowSet rowset) {
         this.rowset = rowset;
+        bind();
     }
     
     public SSRowSet getSSRowSet() {
@@ -184,36 +208,27 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         } catch(java.sql.SQLException sqe) {
             System.out.println("bind error = " + sqe);
         }
-        
         rowset.addRowSetListener(this);
-        
         DbToFm("bind");
     }
     
     public void rowSetChanged(javax.sql.RowSetEvent event) {
-        //        System.out.println("rowSetChanged");
-        
+        //System.out.println("rowSetChanged" + event.getSource());
     }
     
     public void rowChanged(javax.sql.RowSetEvent event) {
-        //       System.out.println("rowChanged " + event);
-        
+        //System.out.println("rowChanged " + event.getSource());
     }
     
     public void cursorMoved(javax.sql.RowSetEvent event) {
-        /*
-         *
-         *
-         */
+        //System.out.println("cursorMoved " + event.getSource());
         DbToFm("cursorMoved");
     }
     
     public void keyTyped(KeyEvent e) {
-        
     }
     
     public void keyReleased(KeyEvent e) {
-        
     }
     
     /**
@@ -311,7 +326,10 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
      */
     
     private void DbToFm(String texto) {
-        System.out.println("DbToFm.texto = " + texto);
+        Object oValue = null;
+        Object nValue = null;
+        
+        //System.out.println("DbToFm.texto = " + texto);
         try {
             
             switch(colType) {
@@ -324,7 +342,8 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                     
                 case java.sql.Types.BIT://-7
                 case java.sql.Types.BOOLEAN://16
-                    this.setValue(new Boolean(rowset.getBoolean(columnName)));
+                    nValue = new Boolean(rowset.getBoolean(columnName));
+                    this.setValue(nValue);
                     break;
                     
                 case java.sql.Types.BLOB://2004
@@ -337,8 +356,8 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                     break;
                     
                 case java.sql.Types.DATE://91
-                    System.out.println("DbToFm() DATE " + rowset.getDate(columnName));
-                    this.setValue(new java.util.Date(rowset.getDate(columnName).getTime()));
+                    nValue = new java.util.Date(rowset.getDate(columnName).getTime());
+                    this.setValue(nValue);
                     break;
                     
                 case java.sql.Types.DECIMAL://3
@@ -348,16 +367,21 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                     break;
                     
                 case java.sql.Types.DOUBLE://8
+                    nValue = new Double(rowset.getFloat(columnName));
+                    this.setValue(nValue);
                     break;
                     
                 case java.sql.Types.FLOAT://6
+                    nValue = new Float(rowset.getFloat(columnName));
+                    this.setValue(nValue);
                     break;
                     
                 case java.sql.Types.INTEGER://4
                 case java.sql.Types.BIGINT://-5
                 case java.sql.Types.SMALLINT://5
                 case java.sql.Types.TINYINT://-6
-                    this.setValue(new Integer(rowset.getInt(columnName)));
+                    nValue = new Integer(rowset.getInt(columnName));
+                    this.setValue(nValue);
                     break;
                     
                 case java.sql.Types.JAVA_OBJECT://2000
@@ -370,7 +394,8 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                 case java.sql.Types.VARCHAR://
                 case java.sql.Types.LONGVARCHAR://-1
                 case java.sql.Types.CHAR://1
-                    this.setValue(rowset.getString(columnName));
+                    nValue = rowset.getString(columnName);
+                    this.setValue(nValue);
                     break;
                     
                 case java.sql.Types.NULL://0
@@ -403,6 +428,15 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         } catch (java.sql.SQLException sqe) {
             System.out.println("Error in DbToFm() = " + sqe);
         }
+        
+        //System.out.println("nValue = " + nValue);
+        
+        if (combo != null) {
+            combo.setSelectedIndex(((SSFormattedComboBoxModel)combo.getModel()).indexOf(nValue));
+        }
+        
+        this.firePropertyChange("value", oValue, nValue);
+        oValue = nValue;
     }
     
     public void mouseExited(MouseEvent e) {
@@ -464,71 +498,54 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         
         public boolean verify(JComponent input) {
             
+            SSFormattedTextField tf = null;
             Object aux = null;
             boolean passed = true;
             
+            System.out.println("Entro a internalVerifier()");
             /**
              * field to be validated and updated
              */
             
-            SSFormattedTextField tf = (SSFormattedTextField) input;
+            if (input instanceof SSFormattedTextField) {
+                tf = (SSFormattedTextField) input;
+            } else if (input instanceof SSFormattedComboBoxEditor){
+                tf = ((SSFormattedComboBoxEditor)input).getEditorField() ;
+            } else if (input instanceof SSFormattedComboBox){
+                tf = ( ( (SSFormattedComboBoxEditor) ((SSFormattedComboBox)input).getEditor())).getEditorField();
+            }
+            
+            try {
+                tf.commitEdit();
+            } catch (java.text.ParseException pe) {
+                System.out.println("inputVerifier --> ParseException");
+            }
+            
             aux = tf.getValue();
             
-            /**
-             * future NULL validation ....
-             *
-             * test null
-             */
-            //if (tf.isNullable() == false && tf.getValue().equals(null)) {
-            //    passed = false;
-            //}
-            
-            /**
-             *
-             * future test of numeric ranges
-             *
-             * properties to add:
-             *      minValue
-             *      maxValue
-             *
-             * If value is outside range, returns false and focus transfer is canceled (stay in same field, background set to RED).
-             */
-            
-            //int val = ((Integer)tf.getValue()).intValue();
-            //if (val < minValue) passed = false;
-            //if (val > maxValue) passed = false;
-            
-            //System.out.println("inputVerifier(): " + columnName + " Name: " + this.getClass().getName());
-            
-            //            if (aux == null) {
-            //                passed = false;
-            
-            //            }
-            
-            
+            passed = validateField(aux);
             
             if (passed == true) {
                 
                 setBackground(java.awt.Color.WHITE);
                 
-                try {
-                    tf.commitEdit();
-                } catch (java.text.ParseException pe) {
-                    System.out.println("inputVerifier --> ParseException");
-                }
+                aux = tf.getValue();
+                System.out.println("inputVerifier(): " + columnName + " aux = " + aux);
                 
                 if (columnName == null) return true;
                 if (colType    == -99 ) return true;
                 if (rowset     == null) return true;
                 
                 try {
-                    rowset.removeRowSetListener(tf);
                     
-                    // aux = tf.getValue();
+                    rowset.removeRowSetListener(tf);
                     
                     if (aux == null) {
                         System.out.println("aux IS null");
-                        return false;
+                        rowset.updateNull(columnName);
+                        rowset.addRowSetListener(tf);
+                        tf.firePropertyChange("value", null, aux);
+                        return true;
                     }
                     
                     switch(colType) {
@@ -540,7 +557,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                             break;
                             
                         case java.sql.Types.BIT://-7
-                            System.out.println("BIT - Set");
+                            //System.out.println("BIT - Set");
                             rowset.updateBoolean(columnName, ((Boolean)tf.getValue()).booleanValue());
                             break;
                             
@@ -570,19 +587,22 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                             
                         case java.sql.Types.FLOAT://6
                         case java.sql.Types.DOUBLE://8
-                            System.out.println("DOUBLE");
+                            //System.out.println("DOUBLE");
                             if (aux instanceof Double) {
-                                System.out.println("Double = columnName => " + columnName);
-                                System.out.println("getValue() = " + aux);
-                                rowset.updateDouble(columnName, ((Double)aux).intValue());
+                                //System.out.println("Double = columnName => " + columnName);
+                                rowset.updateDouble(columnName, ((Double)aux).doubleValue());
                             } else if (aux instanceof Float) {
-                                System.out.println("Float    = columnName => " + columnName);
-                                System.out.println("getValue() = " + aux);
-                                rowset.updateFloat(columnName, ((Float)aux).intValue());
+                                //System.out.println("Float    = columnName => " + columnName);
+                                rowset.updateFloat(columnName, ((Float)aux).floatValue());
                             } else {
                                 System.out.println("ELSE ???");
                             }
-                            System.out.println("getValue() = " + aux);
+                            
+                            if (aux instanceof Double && ((Double) aux).doubleValue() < 0.0) {
+                                tf.setForeground(Color.RED);
+                            } else {
+                                tf.setForeground(Color.BLACK);
+                            }
                             break;
                             
                         case java.sql.Types.INTEGER:    //4
@@ -594,17 +614,14 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                         case java.sql.Types.TINYINT:    //-6
                             
                             if (aux instanceof Integer) {
-                                System.out.println("Integer = columnName => " + columnName);
-                                System.out.println("getValue() = " + aux);
+                                //System.out.println("Integer = columnName => " + columnName);
                                 rowset.updateInt(columnName, ((Integer)aux).intValue());
                             } else if (aux instanceof Long) {
-                                System.out.println("Long    = columnName => " + columnName);
-                                System.out.println("getValue() = " + aux);
+                                //System.out.println("Long    = columnName => " + columnName);
                                 rowset.updateLong(columnName, ((Long)aux).intValue());
                             } else {
                                 System.out.println("ELSE ???");
                             }
-                            System.out.println("getValue() = " + aux);
                             break;
                             
                         case java.sql.Types.JAVA_OBJECT://2000
@@ -617,8 +634,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                         case java.sql.Types.VARCHAR://
                         case java.sql.Types.LONGVARCHAR://-1
                         case java.sql.Types.CHAR://1
-                            System.out.println("CHAR    = columnName => " + columnName);
-                            System.out.println("getValue() = " + aux);
+                            //System.out.println("CHAR    = columnName => " + columnName);
                             rowset.updateString(columnName, aux.toString());
                             break;
                             
@@ -651,22 +667,19 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                             System.out.println("default = " + colType);
                             System.out.println("columnName = " + columnName);
                             System.out.println("============================================================================");
-                            
-                            if (aux instanceof java.lang.Double
-                                    && ((java.lang.Double) aux).doubleValue() < 0.0) {
-                                tf.setForeground(Color.RED);
-                            } else {
-                                tf.setForeground(Color.BLACK);
-                            }
                             break;
                     }
-                    rowset.addRowSetListener(tf);
                 } catch (java.sql.SQLException se) {
                     System.out.println("---> SQLException -----------> " + se);
                 } catch(java.lang.NullPointerException np) {
                     System.out.println("<---> NullPointerException <---> " + np + " columnName : " + columnName);
                 }
+                
+                rowset.addRowSetListener(tf);
+                System.out.println("inputVerifier : " + columnName + " nValue = " + aux);
+                tf.firePropertyChange("value", null, aux);
                 return true;
+                
             } else {
                 /*
                  * Validation fails.
@@ -683,9 +696,13 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         System.err.println("getBeanContextProxy Called");
         return beanContextChildSupport;
     }
+   /*
     
     protected void processFocusEvent(FocusEvent e) {
+        System.out.println("processFocusEvent()" + e);
+    
         if ( e.getID() == FocusEvent.FOCUS_LOST ) {
+            System.out.println("FOCUS_LOST");
             try {
                 if ( this.getText().length() == 0 ) {
                     setValue(null);
@@ -696,22 +713,53 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         }
         super.processFocusEvent(e);
     }
+    */
     
     /**
      * Overridden from superclass
      */
     public void commitEdit() throws ParseException {
-        AbstractFormatter format = getFormatter();
         
         if (getText()==null || getText().length()==0){
-            System.out.println("getTex() == null || getText().length() == 0");
             setValue(null);
         } else super.commitEdit();
+    }
+    
+    // this method can be override to make custom validation.
+    public boolean validateField(Object value) {
+        
+        if (nullable == false && value == null)
+            return false;
+        else
+            return true;
+    }
+    
+    /**
+     * Getter for property nullable.
+     * @return Value of property nullable.
+     */
+    public boolean isNullable() {
+        
+        return this.nullable;
+    }
+    
+    /**
+     * Setter for property nullable.
+     * @param nullable New value of property nullable.
+     */
+    public void setNullable(boolean nullable) {
+        
+        boolean oldNullable = this.nullable;
+        this.nullable = nullable;
+        this.firePropertyChange("nullable", new Boolean(oldNullable), new Boolean(nullable));
     }
 }
 
 /*
  * $Log$
+ * Revision 1.15  2005/03/30 13:03:51  dags
+ * Accept null dates values
+ *
  * Revision 1.14  2005/03/28 14:46:42  dags
  * syncro commit
  *

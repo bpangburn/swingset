@@ -27,34 +27,44 @@ public class SSFormattedTextFieldBeanInfo extends SimpleBeanInfo {
     
     
     // Property identifiers//GEN-FIRST:Properties
-    private static final int PROPERTY_border = 0;
-    private static final int PROPERTY_columnName = 1;
-    private static final int PROPERTY_editable = 2;
-    private static final int PROPERTY_enabled = 3;
-    private static final int PROPERTY_formatterFactory = 4;
-    private static final int PROPERTY_helper = 5;
-    private static final int PROPERTY_horizontalAlignment = 6;
-    private static final int PROPERTY_locale = 7;
-    private static final int PROPERTY_navigator = 8;
-    private static final int PROPERTY_nextFocusableComponent = 9;
-    private static final int PROPERTY_preferredSize = 10;
-    private static final int PROPERTY_SSRowSet = 11;
-    private static final int PROPERTY_text = 12;
-    private static final int PROPERTY_toolTipText = 13;
-    private static final int PROPERTY_value = 14;
+    private static final int PROPERTY_background = 0;
+    private static final int PROPERTY_border = 1;
+    private static final int PROPERTY_columnName = 2;
+    private static final int PROPERTY_columns = 3;
+    private static final int PROPERTY_editable = 4;
+    private static final int PROPERTY_enabled = 5;
+    private static final int PROPERTY_font = 6;
+    private static final int PROPERTY_foreground = 7;
+    private static final int PROPERTY_formatterFactory = 8;
+    private static final int PROPERTY_helper = 9;
+    private static final int PROPERTY_horizontalAlignment = 10;
+    private static final int PROPERTY_locale = 11;
+    private static final int PROPERTY_navigator = 12;
+    private static final int PROPERTY_nextFocusableComponent = 13;
+    private static final int PROPERTY_nullable = 14;
+    private static final int PROPERTY_preferredSize = 15;
+    private static final int PROPERTY_SSRowSet = 16;
+    private static final int PROPERTY_text = 17;
+    private static final int PROPERTY_toolTipText = 18;
+    private static final int PROPERTY_value = 19;
+    private static final int PROPERTY_width = 20;
 
     // Property array 
     /*lazy PropertyDescriptor*/
     private static PropertyDescriptor[] getPdescriptor(){
-        PropertyDescriptor[] properties = new PropertyDescriptor[15];
+        PropertyDescriptor[] properties = new PropertyDescriptor[21];
     
         try {
+            properties[PROPERTY_background] = new PropertyDescriptor ( "background", SSFormattedTextField.class, "getBackground", "setBackground" );
             properties[PROPERTY_border] = new PropertyDescriptor ( "border", SSFormattedTextField.class, "getBorder", "setBorder" );
             properties[PROPERTY_columnName] = new PropertyDescriptor ( "columnName", SSFormattedTextField.class, "getColumnName", "setColumnName" );
             properties[PROPERTY_columnName].setPreferred ( true );
             properties[PROPERTY_columnName].setDisplayName ( "Column Name" );
+            properties[PROPERTY_columns] = new PropertyDescriptor ( "columns", SSFormattedTextField.class, "getColumns", "setColumns" );
             properties[PROPERTY_editable] = new PropertyDescriptor ( "editable", SSFormattedTextField.class, "isEditable", "setEditable" );
             properties[PROPERTY_enabled] = new PropertyDescriptor ( "enabled", SSFormattedTextField.class, "isEnabled", "setEnabled" );
+            properties[PROPERTY_font] = new PropertyDescriptor ( "font", SSFormattedTextField.class, "getFont", "setFont" );
+            properties[PROPERTY_foreground] = new PropertyDescriptor ( "foreground", SSFormattedTextField.class, "getForeground", "setForeground" );
             properties[PROPERTY_formatterFactory] = new PropertyDescriptor ( "formatterFactory", SSFormattedTextField.class, "getFormatterFactory", "setFormatterFactory" );
             properties[PROPERTY_helper] = new PropertyDescriptor ( "helper", SSFormattedTextField.class, null, "setHelper" );
             properties[PROPERTY_helper].setPreferred ( true );
@@ -66,6 +76,8 @@ public class SSFormattedTextFieldBeanInfo extends SimpleBeanInfo {
             properties[PROPERTY_navigator].setDisplayName ( "SSDataNavigator" );
             properties[PROPERTY_navigator].setShortDescription ( "Linked SSDataNavigator" );
             properties[PROPERTY_nextFocusableComponent] = new PropertyDescriptor ( "nextFocusableComponent", SSFormattedTextField.class, "getNextFocusableComponent", "setNextFocusableComponent" );
+            properties[PROPERTY_nullable] = new PropertyDescriptor ( "nullable", SSFormattedTextField.class, "isNullable", "setNullable" );
+            properties[PROPERTY_nullable].setPreferred ( true );
             properties[PROPERTY_preferredSize] = new PropertyDescriptor ( "preferredSize", SSFormattedTextField.class, "getPreferredSize", "setPreferredSize" );
             properties[PROPERTY_SSRowSet] = new PropertyDescriptor ( "SSRowSet", SSFormattedTextField.class, "getSSRowSet", "setSSRowSet" );
             properties[PROPERTY_SSRowSet].setPreferred ( true );
@@ -74,6 +86,7 @@ public class SSFormattedTextFieldBeanInfo extends SimpleBeanInfo {
             properties[PROPERTY_toolTipText] = new PropertyDescriptor ( "toolTipText", SSFormattedTextField.class, "getToolTipText", "setToolTipText" );
             properties[PROPERTY_toolTipText].setPreferred ( true );
             properties[PROPERTY_value] = new PropertyDescriptor ( "value", SSFormattedTextField.class, "getValue", "setValue" );
+            properties[PROPERTY_width] = new PropertyDescriptor ( "width", SSFormattedTextField.class, "getWidth", null );
         }
         catch( IntrospectionException e) {}//GEN-HEADEREND:Properties
         
