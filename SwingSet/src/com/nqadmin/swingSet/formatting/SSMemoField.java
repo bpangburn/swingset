@@ -65,6 +65,9 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
     public SSMemoField() {
         super();
         
+        this.setLineWrap(true);
+        this.setWrapStyleWord(true);
+        
         Set forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
         Set newForwardKeys = new HashSet(forwardKeys);
         newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));

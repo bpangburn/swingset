@@ -25,25 +25,34 @@ public class SSMemoFieldBeanInfo extends SimpleBeanInfo {
     
     // Property identifiers//GEN-FIRST:Properties
     private static final int PROPERTY_border = 0;
-    private static final int PROPERTY_columnName = 1;
-    private static final int PROPERTY_editable = 2;
-    private static final int PROPERTY_navigator = 3;
-    private static final int PROPERTY_rowSet = 4;
-    private static final int PROPERTY_text = 5;
-    private static final int PROPERTY_toolTipText = 6;
-    private static final int PROPERTY_visible = 7;
+    private static final int PROPERTY_caret = 1;
+    private static final int PROPERTY_columnName = 2;
+    private static final int PROPERTY_editable = 3;
+    private static final int PROPERTY_enabled = 4;
+    private static final int PROPERTY_foreground = 5;
+    private static final int PROPERTY_lineWrap = 6;
+    private static final int PROPERTY_navigator = 7;
+    private static final int PROPERTY_rowSet = 8;
+    private static final int PROPERTY_text = 9;
+    private static final int PROPERTY_toolTipText = 10;
+    private static final int PROPERTY_visible = 11;
+    private static final int PROPERTY_wrapStyleWord = 12;
 
     // Property array 
     /*lazy PropertyDescriptor*/
     private static PropertyDescriptor[] getPdescriptor(){
-        PropertyDescriptor[] properties = new PropertyDescriptor[8];
+        PropertyDescriptor[] properties = new PropertyDescriptor[13];
     
         try {
             properties[PROPERTY_border] = new PropertyDescriptor ( "border", SSMemoField.class, "getBorder", "setBorder" );
+            properties[PROPERTY_caret] = new PropertyDescriptor ( "caret", SSMemoField.class, "getCaret", "setCaret" );
             properties[PROPERTY_columnName] = new PropertyDescriptor ( "columnName", SSMemoField.class, "getColumnName", "setColumnName" );
             properties[PROPERTY_columnName].setPreferred ( true );
             properties[PROPERTY_columnName].setDisplayName ( "Column Name" );
             properties[PROPERTY_editable] = new PropertyDescriptor ( "editable", SSMemoField.class, "isEditable", "setEditable" );
+            properties[PROPERTY_enabled] = new PropertyDescriptor ( "enabled", SSMemoField.class, "isEnabled", "setEnabled" );
+            properties[PROPERTY_foreground] = new PropertyDescriptor ( "foreground", SSMemoField.class, "getForeground", "setForeground" );
+            properties[PROPERTY_lineWrap] = new PropertyDescriptor ( "lineWrap", SSMemoField.class, "getLineWrap", "setLineWrap" );
             properties[PROPERTY_navigator] = new PropertyDescriptor ( "navigator", SSMemoField.class, "getNavigator", "setNavigator" );
             properties[PROPERTY_navigator].setPreferred ( true );
             properties[PROPERTY_navigator].setDisplayName ( "SSDataNavigator" );
@@ -54,6 +63,7 @@ public class SSMemoFieldBeanInfo extends SimpleBeanInfo {
             properties[PROPERTY_toolTipText] = new PropertyDescriptor ( "toolTipText", SSMemoField.class, "getToolTipText", "setToolTipText" );
             properties[PROPERTY_toolTipText].setPreferred ( true );
             properties[PROPERTY_visible] = new PropertyDescriptor ( "visible", SSMemoField.class, "isVisible", "setVisible" );
+            properties[PROPERTY_wrapStyleWord] = new PropertyDescriptor ( "wrapStyleWord", SSMemoField.class, "getWrapStyleWord", "setWrapStyleWord" );
         }
         catch( IntrospectionException e) {}//GEN-HEADEREND:Properties
         
