@@ -296,5 +296,13 @@ public class FormattingTests extends javax.swing.JFrame implements SSDBNav {
     
     public void performCancelOps() {
     }
+
+    public boolean allowInsertion() {
+        return true;
+    }
+
+    public boolean allowDeletion() {
+        return true;
+    }
     
 }
