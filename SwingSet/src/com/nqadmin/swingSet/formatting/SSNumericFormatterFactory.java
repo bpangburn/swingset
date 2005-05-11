@@ -48,11 +48,24 @@ import javax.swing.JFormattedTextField;
  */
 public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
 
+    NumberFormatter snf = null;
+    NumberFormatter enf = null;
+    NumberFormatter dnf = null;
+    
     public SSNumericFormatterFactory() {
-        this.setDefaultFormatter(new NumberFormatter(NumberFormat.getInstance()));
+        snf = new NumberFormatter(NumberFormat.getInstance());
+        snf.setCommitsOnValidEdit(true);
+        this.setDefaultFormatter(snf);
+        
         this.setNullFormatter(null);
-        this.setEditFormatter(new NumberFormatter(NumberFormat.getInstance(Locale.US)));
-        this.setDisplayFormatter(new NumberFormatter(NumberFormat.getInstance()));
+
+        enf = new NumberFormatter(NumberFormat.getInstance(Locale.US));
+        enf.setCommitsOnValidEdit(true);
+        this.setEditFormatter(enf);
+
+        dnf = new NumberFormatter(NumberFormat.getInstance());
+        dnf.setCommitsOnValidEdit(true);
+        this.setDisplayFormatter(dnf);
     }
     
     public SSNumericFormatterFactory(int precision, int decimals) {
@@ -62,17 +75,28 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
         
         nfd.setMaximumIntegerDigits(precision);
         nfd.setMinimumIntegerDigits(1);
+    
+        snf = new NumberFormatter(NumberFormat.getInstance());
+        snf.setCommitsOnValidEdit(true);
+        this.setDefaultFormatter(snf);
         
-        this.setDefaultFormatter(new NumberFormatter(NumberFormat.getInstance()));
         this.setNullFormatter(null);
-        this.setEditFormatter(new NumberFormatter(NumberFormat.getInstance(Locale.US)));
-        this.setDisplayFormatter(new NumberFormatter(nfd));
 
+        enf = new NumberFormatter(NumberFormat.getInstance(Locale.US));
+        enf.setCommitsOnValidEdit(true);
+        this.setEditFormatter(enf);
+
+        dnf = new NumberFormatter(nfd);
+        dnf.setCommitsOnValidEdit(true);
+        this.setDisplayFormatter(dnf);
     }
 }
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/04 22:42:06  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.4  2005/01/18 23:38:01  dags
  * Diego's name fix
  *
