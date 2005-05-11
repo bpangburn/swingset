@@ -48,12 +48,11 @@ public class SelectorPopupPanel extends javax.swing.JPanel implements ActionList
     /** Creates new form SelectorPopupPanel */
     public SelectorPopupPanel() {
         initComponents();
-        ((SelectorListModel)selectorListModel1).setFilterEdit(jTextField1);
     }
     
     public SelectorPopupPanel(javax.swing.ListModel model) {
         initComponents();
-        ((SelectorListModel)model).setFilterEdit(jTextField1);
+
         selectorList1.setModel(model);
     }
     
@@ -142,7 +141,6 @@ public class SelectorPopupPanel extends javax.swing.JPanel implements ActionList
         
         newFilter[0] = s.getText();
         model = (SelectorListModel)(selectorList1.getModel());
-        model.setFilterText(newFilter);
         
     }//GEN-LAST:event_jTextField1ActionPerformed
     
@@ -179,7 +177,6 @@ public class SelectorPopupPanel extends javax.swing.JPanel implements ActionList
         String[] newFilter = new String[1];
         newFilter[0] = jTextField1.getText().toUpperCase();
         model = (SelectorListModel)(selectorList1.getModel());
-        model.setFilterText(newFilter);
         
         this.selectorList1.setModel(this.selectorListModel1);
         this.selectorList1.repaint();

@@ -38,21 +38,23 @@ import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.swing.TextFilterList;
 import java.sql.*;
 import com.nqadmin.swingSet.datasources.*;
+import javax.swing.ComboBoxModel;
 import javax.swing.JTextField;
 
 /**
  *
  * @author  dags
  */
-public class SelectorListModel extends javax.swing.AbstractListModel {
+public class SelectorListModel extends javax.swing.AbstractListModel implements ComboBoxModel {
     
-    private BasicEventList data    = new BasicEventList();
+    private Object selectedOne = null;
+    private BasicEventList data = new BasicEventList();
     private TextFilterList filtered_data = new TextFilterList(data);
     
     /**
      * Holds value of property dataColumn.
      */
-    private String dataColumn;
+    private String dataColumn = null;
     
     /**
      * Utility field used by bound properties.
@@ -62,12 +64,12 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
     /**
      * Holds value of property listColumn.
      */
-    private String listColumn;
+    private String listColumn = null;
     
     /**
      * Holds value of property table.
      */
-    private String table;
+    private String table = null;
     
     /**
      * Holds value of property selectText.
@@ -77,14 +79,14 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
     /**
      * Holds value of property orderBy.
      */
-    private String orderBy;
+    private String orderBy = null;
     
     /**
      * Holds value of property ssConnection.
      */
-    private SSConnection     ssConnection;
+    private SSConnection ssConnection = null;
     
-    private SSJdbcRowSetImpl ssRowset;
+    private SSJdbcRowSetImpl ssRowset = null;
     
     /** Creates a new instance of SelectorListModel */
     
@@ -94,6 +96,14 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
     
     public SelectorListModel(String table, String bcolumn, String lcolumn) {
         this(table, bcolumn, lcolumn, null);
+    }
+    
+    public int indexOf(Object object) {
+        SelectorElement tmpEl = null;
+        
+        tmpEl = (SelectorElement)object;
+        
+        return data.indexOf(object);
     }
     
     public SelectorListModel(String table, String bcolumn, String lcolumn, String orderBy) {
@@ -131,31 +141,16 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
     
     private void populateModel() {
         
+        Object dataValue = null;
+        Object listValue = null;
         String sql = null;
         
-        if (dataColumn == null || listColumn == null || table == null) {
-
-            // create sample data
+        if (ssConnection == null || dataColumn == null || listColumn == null || table == null) {
             data.clear();
-            data.add(new SelectorElement(new String( "0") , "Sample Option  0"));
-            data.add(new SelectorElement(new String( "1") , "Sample Option  1"));
-            data.add(new SelectorElement(new String( "2") , "Sample Option  2"));
-            data.add(new SelectorElement(new String( "3") , "Sample Option  3"));
-            data.add(new SelectorElement(new String( "4") , "Sample Option  4"));
-            data.add(new SelectorElement(new String( "5") , "Sample Option  5"));
-            data.add(new SelectorElement(new String( "6") , "Sample Option  6"));
-            data.add(new SelectorElement(new String( "7") , "Sample Option  7"));
-            data.add(new SelectorElement(new String( "8") , "Sample Option  8"));
-            data.add(new SelectorElement(new String( "9") , "Sample Option  9"));
-            data.add(new SelectorElement(new String("10") , "Sample Option 10"));
-            data.add(new SelectorElement(new String("11") , "Sample Option 11"));
-            data.add(new SelectorElement(new String("12") , "Sample Option 12"));
-            data.add(new SelectorElement(new String("13") , "Sample Option 13"));
-            data.add(new SelectorElement(new String("14") , "Sample Option 14"));
             filtered_data = new TextFilterList(data);
             return;
         }
-    
+        
         data.clear();
         
         if (orderBy != null) {
@@ -170,7 +165,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
         try {
             ssRowset.execute();
             ssRowset.last();
-            System.out.println("Hay " + ssRowset.getRow() + " registros");
+            //            System.out.println("Hay " + ssRowset.getRow() + " registros");
         } catch (SQLException se) {
             System.out.println("sql = " + sql);
             System.out.println("ssRowset.execute() " + se);
@@ -179,14 +174,129 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
         try {
             ssRowset.beforeFirst();
             while (ssRowset.next()) {
-                String s1 = ssRowset.getString(1);
-                String s2 = ssRowset.getString(2);
-                data.add(new SelectorElement(s1,s2));
+                
+                switch(ssRowset.getColumnType(1)) {
+                    
+                    case java.sql.Types.ARRAY://2003
+                        dataValue = new String("<unsupported type: ARRAY>");
+                        break;
+                        
+                    case java.sql.Types.BINARY://-2
+                        dataValue = new String("<unsupported type: BINARY>");
+                        break;
+                        
+                    case java.sql.Types.BIT://-7
+                    case java.sql.Types.BOOLEAN://16
+                        dataValue = new Boolean(ssRowset.getBoolean(1));
+                        break;
+                        
+                    case java.sql.Types.BLOB://2004
+                        dataValue = new String("<unsupported type: BLOB>");
+                        break;
+                        
+                    case java.sql.Types.CLOB://2005
+                        dataValue = new String("<unsupported type: CLOB>");
+                        break;
+                        
+                    case java.sql.Types.DATALINK://70
+                        dataValue = new String("<unsupported type: DATALINK>");
+                        break;
+                        
+                    case java.sql.Types.DATE://91
+                        dataValue = new java.util.Date(ssRowset.getDate(1).getTime());
+                        break;
+                        
+                    case java.sql.Types.DECIMAL://3
+                        dataValue = new String("<unsupported type: DECIMAL>");
+                        break;
+                        
+                    case java.sql.Types.DISTINCT://2001
+                        dataValue = new String("<unsupported type: DISTINCT>");
+                        break;
+                        
+                    case java.sql.Types.DOUBLE://8
+                        dataValue = new Double(ssRowset.getDouble(1));
+                        break;
+                        
+                    case java.sql.Types.FLOAT://6
+                        dataValue = new Float(ssRowset.getFloat(1));
+                        break;
+                        
+                    case java.sql.Types.INTEGER://4
+                        dataValue = new Integer(ssRowset.getInt(1));
+                        break;
+                        
+                    case java.sql.Types.BIGINT://-5
+                        dataValue = new Long(ssRowset.getLong(1));
+                        break;
+                        
+                    case java.sql.Types.SMALLINT://5
+                    case java.sql.Types.TINYINT://-6
+                        dataValue  = new Integer(ssRowset.getInt(1));
+                        break;
+                        
+                    case java.sql.Types.JAVA_OBJECT://2000
+                        dataValue = new String("<unsupported type: JAVA_OBJECT>");
+                        break;
+                        
+                    case java.sql.Types.LONGVARBINARY://-4
+                        dataValue = new String("<unsupported type: LONGVARBINARY>");
+                        break;
+
+                    case java.sql.Types.VARBINARY://-3
+                        dataValue = new String("<unsupported type: VARBINARY>");
+                        break;
+                        
+                    case java.sql.Types.VARCHAR://
+                    case java.sql.Types.LONGVARCHAR://-1
+                    case java.sql.Types.CHAR://1
+                        dataValue = ssRowset.getString(1);
+                        break;
+                        
+                    case java.sql.Types.NULL://0
+                        dataValue = new String("<unsupported type: NULL>");
+                        break;
+                        
+                    case java.sql.Types.NUMERIC://2
+                        dataValue = new String("<unsupported type: NUMERIC>");
+                        break;
+                        
+                    case java.sql.Types.OTHER://1111
+                        dataValue = new String("<unsupported type: OTHER>");
+                        break;
+                        
+                    case java.sql.Types.REAL://7
+                        dataValue = new String("<unsupported type: REAL>");
+                        break;
+                        
+                    case java.sql.Types.REF://2006
+                        dataValue = new String("<unsupported type: REF>");
+                        break;
+                        
+                    case java.sql.Types.STRUCT://2002
+                        dataValue = new String("<unsupported type: STRUCT>");
+                        break;
+                        
+                    case java.sql.Types.TIME://92
+                        dataValue = new String("<unsupported type: TIME>");
+
+                        break;
+                        
+                    case java.sql.Types.TIMESTAMP://93
+                        dataValue = new String("<unsupported type: TIMESTAMP>");
+                        break;
+                        
+                    default:
+                        dataValue = new String("<unknown type>");
+                        break;
+                }
+                listValue = ssRowset.getString(2);
+                data.add(new SelectorElement(dataValue,listValue));
             }
         } catch (SQLException se) {
-            System.out.println("ssRowset.next()" + se);
+            System.out.println("SelectorListModel :" + se);
         } catch (java.lang.NullPointerException np) {
-            System.out.println(np);
+            System.out.println("SelectorListModel :" + np);
         }
         
         filtered_data = new TextFilterList(data);
@@ -194,10 +304,21 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
         this.fireContentsChanged(this, 0, filtered_data.size()-1);
         this.fireIntervalAdded(this, 0, 1);
         this.fireIntervalRemoved(this, 0, 1);
-
+        
         ssRowset = null;
         ssConnection = null;
         
+    }
+    
+    public void addElement(Object ob) {
+        data.add(ob);
+    }
+    
+    public void createFilteredData() {
+        filtered_data = new TextFilterList(data);
+        this.fireContentsChanged(this, 0, filtered_data.size()-1);
+        this.fireIntervalAdded(this, 0, 1);
+        this.fireIntervalRemoved(this, 0, 1);
     }
     
     public void setSelectedItem(String bdata) {
@@ -214,7 +335,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
             System.out.println("BoundData = '" + cual.getDataValue() + "'");
             
             if ((cual.getDataValue()).equals(bdata)) {
-              //                super.setSelectedItem(cual);
+                //                super.setSelectedItem(cual);
                 return;
             }
         }
@@ -257,7 +378,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
         } catch(java.lang.NullPointerException npe) {
             
         }
-        //this.refresh();
+        this.refresh();
     }
     
     /**
@@ -281,7 +402,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
         } catch(java.lang.NullPointerException npe) {
             
         }
-        //this.refresh();
+        this.refresh();
         
     }
     
@@ -307,7 +428,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
         } catch(java.lang.NullPointerException npe) {
             
         }
-        //this.refresh();
+        this.refresh();
     }
     
     /**
@@ -324,7 +445,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
         } catch(java.lang.NullPointerException npe) {
             
         }
-        //this.refresh();
+        this.refresh();
     }
     
     public String getOrderBy() {
@@ -373,9 +494,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
      * Setter for property ssConnection.
      * @param ssConnection New value of property ssConnection.
      */
-    public void setSsConnection(com.nqadmin.swingSet.datasources.SSConnection ssConnection)
-    
-    {
+    public void setSsConnection(com.nqadmin.swingSet.datasources.SSConnection ssConnection) {
         try {
             com.nqadmin.swingSet.datasources.SSConnection oldSsConnection = this.ssConnection;
             this.ssConnection = ssConnection;
@@ -383,6 +502,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
         } catch(java.lang.NullPointerException nop) {
             
         }
+        this.refresh();
     }
     
     public Object getElementAt(int index) {
@@ -406,11 +526,20 @@ public class SelectorListModel extends javax.swing.AbstractListModel {
     
     public void addListEventListener(ListEventListener listChangeListener) {
         filtered_data.addListEventListener(listChangeListener);
-        System.out.println("addListEventListener = " + listChangeListener);
-    } 
-
+    }
+    
     public void addListDataListener(javax.swing.event.ListDataListener l) {
         super.addListDataListener(l);
-        System.out.println("addListDataListener = " + l);
+    }
+    
+    public void setSelectedItem(Object anItem) {
+        System.out.println("setSelectedItem = " + anItem);
+        selectedOne = anItem;
+    }
+    
+    public Object getSelectedItem() {
+        System.out.println("getSelectedItem = " + selectedOne);
+        
+        return selectedOne;
     }
 }

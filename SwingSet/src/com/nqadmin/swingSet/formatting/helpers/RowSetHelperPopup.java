@@ -60,7 +60,7 @@ import javax.swing.event.PopupMenuListener;
  * @author dags
  */
 public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyListener, ActionListener, ListSelectionListener, PopupMenuListener, FocusListener {
-    
+
     private JPanel spane;
     private JPanel buttons;
     private JPanel tpane;
@@ -79,7 +79,7 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
     private SSFormattedTextField target = null;
     private JScrollPane sc;
     private SSConnection connection;
-    private DefaultListModel model = null;
+    private SelectorListModel model = null;
     private SelectorList lista;
     
     private SSRowSet rowset = null;
@@ -100,28 +100,15 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
         buttons = new JPanel();
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
         
-        searchButton = new JButton("Search");
-        searchButton.addActionListener(this);
-        
-        closeButton = new JButton("Close");
-        closeButton.addActionListener(this);
-        
         refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(this);
-        
-        helpButton = new JButton("Help");
-        helpButton.addActionListener(this);
         
         searchText = new JTextField();
         searchText.setColumns(20);
         searchText.addActionListener(this);
         searchText.addFocusListener(this);
-        tpane.add(searchText, BorderLayout.NORTH);
-        
-        buttons.add(searchButton);
-        buttons.add(closeButton);
+        buttons.add(searchText);
         buttons.add(refreshButton);
-        buttons.add(helpButton);
         
         tpane.add(buttons, BorderLayout.SOUTH);
         
@@ -141,13 +128,16 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
         this.setFocusable(true);
         this.addFocusListener(this);
         this.pack();
+
+        
     }
     
     public  void setRowSet(SSRowSet rowset) {
         this.rowset = rowset;
+        createHelper();
     }
     
-    public void setModel(DefaultListModel model) {
+    public void setModel(SelectorListModel model) {
         this.model = model;
         lista.setModel(model);
     }
@@ -156,23 +146,26 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
         this.target = target;
         
         //if (target != null) this.setPreferredSize(new Dimension(target.getWidth(),300));
-        
     }
     
     public void setTable(String table) {
         this.table = table;
+        createHelper();
     }
     
     public void setDataColumn(String dataColumn) {
         this.dataColumn = dataColumn;
+        createHelper();
     }
     
     public void setListColumn(String listColumn) {
         this.listColumn = listColumn;
+        createHelper();
     }
     
     public void setOrderBy(String orderBy) {
         this.orderBy = orderBy;
+        createHelper();
     }
     
     public void setConnection(SSConnection connection) {
@@ -185,6 +178,7 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
         } catch(java.lang.Exception ex) {
             
         }
+        createHelper();
     }
     
     public void createHelper() {
@@ -197,16 +191,21 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
             
         }
         */
-        model = new DefaultListModel();
+        
+        if (dataColumn == null 
+                || listColumn == null
+                || rowset == null) return;
+
+         model = new SelectorListModel();
         
          try {
-            System.out.println("beforeFirst();");
-            System.out.println("dataColumn = " + dataColumn);
-            System.out.println("listColumn = " + listColumn);
+//            System.out.println("beforeFirst();");
+//            System.out.println("dataColumn = " + dataColumn);
+//            System.out.println("listColumn = " + listColumn);
             
             rowset.beforeFirst();
             while (rowset.next()) {
-                System.out.println("rowset.next() =" + rowset.getString(listColumn));
+//                System.out.println("rowset.next() =" + rowset.getString(listColumn));
                 String s1 = rowset.getString(dataColumn);
                 String s2 = rowset.getString(listColumn);
                 model.addElement(new SelectorElement(s1,s2));
@@ -217,6 +216,7 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
             System.out.println(np);
         }
         
+        model.setFilterEdit(searchText);
         lista.setModel(model);
         lista.getSelectionModel().addListSelectionListener(this);
         lista.setVisibleRowCount(10);
@@ -349,8 +349,8 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
             
             System.out.println("--------------------- selected --------------------------------------");
             SelectorElement se3 = (SelectorElement) (lista.getModel().getElementAt(selected));
-            //            System.out.println("DataValue = " + se3.getDataValue().toString());
-            //            System.out.println("ListValue = " + se3.getListValue().toString());
+                        System.out.println("DataValue = " + se3.getDataValue().toString());
+                        System.out.println("ListValue = " + se3.getListValue().toString());
             
         }
     }

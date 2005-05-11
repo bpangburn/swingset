@@ -97,4 +97,12 @@ public class SelectorList extends JList implements ListDataListener, ListEventLi
         ((SelectorListModel)model).addListEventListener(this);
         
     }
+
+    public int getSelectedIndex() {
+
+        int retValue;
+        
+        retValue = super.getSelectedIndex();
+        return retValue;
+    }
 }
