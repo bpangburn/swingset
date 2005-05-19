@@ -333,6 +333,11 @@ public class SSDBComboBox extends JComboBox {
         return displayColumnName;
     }
 
+    public void setPrimaryKeyColumnName(String _primaryKeyColumnName){
+        String oldValue = primaryKeyColumnName;
+        primaryKeyColumnName = _primaryKeyColumnName;
+        firePropertyChange("primaryKeyColumnName", oldValue, primaryKeyColumnName);
+    }
     /**
      * When a display column is of type date you can choose the format in which it has
      * to be displayed. For the pattern refer SimpleDateFormat in java.text package.
@@ -1140,6 +1145,10 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.31  2005/02/22 16:07:10  prasanth
+ * While checking if secondDisplayColumnName has  to be used for displaying
+ * text, in addition to checking for null, checking for empty string.
+ *
  * Revision 1.30  2005/02/21 16:31:32  prasanth
  * In bind checking for empty columnName before binding the component.
  *
