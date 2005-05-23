@@ -16,7 +16,7 @@ public class SSCurrencyFieldBeanInfo extends SimpleBeanInfo {
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( SSCurrencyField.class , null );
+        BeanDescriptor beanDescriptor = new BeanDescriptor  ( com.nqadmin.swingSet.formatting.SSCurrencyField.class , null );
         beanDescriptor.setShortDescription ( "A FormattedTextField with currency formating capabilities" );//GEN-HEADEREND:BeanDescriptor
         
         // Here you can add code for customizing the BeanDescriptor.
@@ -43,28 +43,28 @@ public class SSCurrencyFieldBeanInfo extends SimpleBeanInfo {
         PropertyDescriptor[] properties = new PropertyDescriptor[11];
     
         try {
-            properties[PROPERTY_border] = new PropertyDescriptor ( "border", SSCurrencyField.class, "getBorder", "setBorder" );
-            properties[PROPERTY_columnName] = new PropertyDescriptor ( "columnName", SSCurrencyField.class, null, "setColumnName" );
+            properties[PROPERTY_border] = new PropertyDescriptor ( "border", com.nqadmin.swingSet.formatting.SSCurrencyField.class, "getBorder", "setBorder" );
+            properties[PROPERTY_columnName] = new PropertyDescriptor ( "columnName", com.nqadmin.swingSet.formatting.SSCurrencyField.class, "getColumnName", "setColumnName" );
             properties[PROPERTY_columnName].setPreferred ( true );
             properties[PROPERTY_columnName].setDisplayName ( "Column Name" );
-            properties[PROPERTY_decimals] = new PropertyDescriptor ( "decimals", SSCurrencyField.class, "getDecimals", "setDecimals" );
+            properties[PROPERTY_decimals] = new PropertyDescriptor ( "decimals", com.nqadmin.swingSet.formatting.SSCurrencyField.class, "getDecimals", "setDecimals" );
             properties[PROPERTY_decimals].setPreferred ( true );
             properties[PROPERTY_decimals].setDisplayName ( "Decimals" );
-            properties[PROPERTY_editable] = new PropertyDescriptor ( "editable", SSCurrencyField.class, "isEditable", "setEditable" );
-            properties[PROPERTY_formatterFactory] = new PropertyDescriptor ( "formatterFactory", SSCurrencyField.class, "getFormatterFactory", "setFormatterFactory" );
-            properties[PROPERTY_helper] = new PropertyDescriptor ( "helper", SSCurrencyField.class, null, "setHelper" );
+            properties[PROPERTY_editable] = new PropertyDescriptor ( "editable", com.nqadmin.swingSet.formatting.SSCurrencyField.class, "isEditable", "setEditable" );
+            properties[PROPERTY_formatterFactory] = new PropertyDescriptor ( "formatterFactory", com.nqadmin.swingSet.formatting.SSCurrencyField.class, "getFormatterFactory", "setFormatterFactory" );
+            properties[PROPERTY_helper] = new PropertyDescriptor ( "helper", com.nqadmin.swingSet.formatting.SSCurrencyField.class, null, "setHelper" );
             properties[PROPERTY_helper].setPreferred ( true );
             properties[PROPERTY_helper].setDisplayName ( "HelperPopup" );
-            properties[PROPERTY_navigator] = new PropertyDescriptor ( "navigator", SSCurrencyField.class, "getNavigator", "setNavigator" );
+            properties[PROPERTY_navigator] = new PropertyDescriptor ( "navigator", com.nqadmin.swingSet.formatting.SSCurrencyField.class, "getNavigator", "setNavigator" );
             properties[PROPERTY_navigator].setPreferred ( true );
             properties[PROPERTY_navigator].setDisplayName ( "SSDataNavigator" );
-            properties[PROPERTY_SSRowSet] = new PropertyDescriptor ( "SSRowSet", SSCurrencyField.class, "getSSRowSet", "setSSRowSet" );
+            properties[PROPERTY_SSRowSet] = new PropertyDescriptor ( "SSRowSet", com.nqadmin.swingSet.formatting.SSCurrencyField.class, "getSSRowSet", "setSSRowSet" );
             properties[PROPERTY_SSRowSet].setPreferred ( true );
             properties[PROPERTY_SSRowSet].setDisplayName ( "SSRowSet" );
-            properties[PROPERTY_text] = new PropertyDescriptor ( "text", SSCurrencyField.class, "getText", "setText" );
-            properties[PROPERTY_toolTipText] = new PropertyDescriptor ( "toolTipText", SSCurrencyField.class, "getToolTipText", "setToolTipText" );
+            properties[PROPERTY_text] = new PropertyDescriptor ( "text", com.nqadmin.swingSet.formatting.SSCurrencyField.class, "getText", "setText" );
+            properties[PROPERTY_toolTipText] = new PropertyDescriptor ( "toolTipText", com.nqadmin.swingSet.formatting.SSCurrencyField.class, "getToolTipText", "setToolTipText" );
             properties[PROPERTY_toolTipText].setPreferred ( true );
-            properties[PROPERTY_value] = new PropertyDescriptor ( "value", SSCurrencyField.class, "getValue", "setValue" );
+            properties[PROPERTY_value] = new PropertyDescriptor ( "value", com.nqadmin.swingSet.formatting.SSCurrencyField.class, "getValue", "setValue" );
         }
         catch( IntrospectionException e) {}//GEN-HEADEREND:Properties
         
