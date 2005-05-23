@@ -530,7 +530,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                 setBackground(java.awt.Color.WHITE);
                 
                 aux = tf.getValue();
-                System.out.println("inputVerifier(): " + columnName + " aux = " + aux);
+                System.out.println("inputVerifier(): " + columnName + " aux = " + aux + " colType = " + colType);
                 
                 if (columnName == null) return true;
                 if (colType    == -99 ) return true;
@@ -589,10 +589,10 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                         case java.sql.Types.DOUBLE://8
                             //System.out.println("DOUBLE");
                             if (aux instanceof Double) {
-                                //System.out.println("Double = columnName => " + columnName);
+                                System.out.println("Double = columnName => " + columnName);
                                 rowset.updateDouble(columnName, ((Double)aux).doubleValue());
                             } else if (aux instanceof Float) {
-                                //System.out.println("Float    = columnName => " + columnName);
+                                System.out.println("Float    = columnName => " + columnName);
                                 rowset.updateFloat(columnName, ((Float)aux).floatValue());
                             } else {
                                 System.out.println("ELSE ???");
@@ -642,6 +642,28 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                             break;
                             
                         case java.sql.Types.NUMERIC://2
+                            System.out.println("NUMERIC");
+                            if (aux instanceof Double) {
+                                System.out.println("Double = columnName => " + columnName);
+                                rowset.updateDouble(columnName, ((Double)aux).doubleValue());
+                            } else if (aux instanceof Float) {
+                                System.out.println("Float    = columnName => " + columnName);
+                                rowset.updateFloat(columnName, ((Float)aux).floatValue());
+                            } else if (aux instanceof Integer) {
+                                System.out.println("Integer = columnName => " + columnName);
+                                rowset.updateInt(columnName, ((Integer)aux).intValue());
+                            } else if (aux instanceof Long) {
+                                System.out.println("Long    = columnName => " + columnName);
+                                rowset.updateLong(columnName, ((Long)aux).intValue());
+                            } else {
+                                System.out.println("ELSE ???");
+                            }
+                            
+                            if (aux instanceof Double && ((Double) aux).doubleValue() < 0.0) {
+                                tf.setForeground(Color.RED);
+                            } else {
+                                tf.setForeground(Color.BLACK);
+                            }
                             break;
                             
                         case java.sql.Types.OTHER://1111
@@ -757,6 +779,9 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
 
 /*
  * $Log$
+ * Revision 1.16  2005/05/11 17:25:56  dags
+ * several modifications to allow SSFormattedComboBox work as expected
+ *
  * Revision 1.15  2005/03/30 13:03:51  dags
  * Accept null dates values
  *
