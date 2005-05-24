@@ -80,7 +80,7 @@ import java.beans.IntrospectionException;
 	    	PropertyDescriptor connDescriptor = new PropertyDescriptor("sSConnection", SSJdbcRowSetImpl.class, "getSSConnection", "setSSConnection");
 	    	connDescriptor.setBound(true);
 	    	connDescriptor.setPropertyEditorClass(SSConnectionEditor.class);
-	    	PropertyDescriptor queryDescriptor = new PropertyDescriptor("query", SSJdbcRowSetImpl.class, "getCommand", "setCommand");
+	    	PropertyDescriptor queryDescriptor = new PropertyDescriptor("command", SSJdbcRowSetImpl.class, "getCommand", "setCommand");
 	    	queryDescriptor.setBound(true);    	
 	    	return new PropertyDescriptor[]{connDescriptor, queryDescriptor};
 	    }catch(IntrospectionException ie){
@@ -93,6 +93,9 @@ import java.beans.IntrospectionException;
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/09 06:41:22  prasanth
+ * added getPropertyDescriptors method.
+ *
  * Revision 1.4  2005/02/07 19:56:17  yoda2
  * Fixing JavaDoc errors with _iconKind parameter name.
  *
