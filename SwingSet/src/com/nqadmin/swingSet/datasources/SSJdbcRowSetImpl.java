@@ -937,10 +937,129 @@ import java.beans.PropertyVetoException;
     public void refreshRow() throws SQLException{
         rowset.refreshRow();
     }
+    
+    /**
+     * Retrieves whether a row has been deleted. A deleted row may leave a visible "hole" in a 
+     * result set. This method can be used to detect holes in a result set. The value returned 
+     * depends on whether or not this ResultSet object can detect deletions.
+     * @return true if a row was deleted and deletions are detected; false otherwise
+     * @throws SQLException - if a database access error occurs
+     */
+    public boolean rowDeleted() throws SQLException{
+        return rowset.rowDeleted();
+    }
+    
+    /**
+     * Retrieves whether the current row has had an insertion. The value returned depends on
+     * whether or not this ResultSet object can detect visible inserts.
+     * @return true if a row has had an insertion and insertions are detected; false otherwise
+     * @throws SQLException - if a database access error occurs
+     */ 
+    public boolean rowInserted() throws SQLException{
+        return rowset.rowInserted();
+    }
+    
+    /**
+     * Retrieves whether the current row has been updated. The value returned depends on whether
+     * or not the result set can detect updates.
+     * @return true if both (1) the row has been visibly updated by the owner or another and 
+     * (2) updates are detected
+     * @throws SQLException - if a database access error occurs
+     */
+    public boolean rowUpdated() throws SQLException{
+        return rowset.rowUpdated();
+    }
+    
+    /**
+     * Retrieves the number, types and properties of underlying ResultSet object's columns.
+     * @return the description of this ResultSet object's columns
+     * @throws SQLException - if a database access error occurs
+     */
+    public ResultSetMetaData getMetaData() throws SQLException{
+        return rowset.getMetaData();
+    }
+    
+    /**
+     * Gets the value of the designated column in the current row of this ResultSet object as
+     * an Object in the Java programming language.
+     *
+     * This method will return the value of the given column as a Java object. The type of the
+     * Java object will be the default Java object type corresponding to the column's SQL type
+     * , following the mapping for built-in types specified in the JDBC specification. If the
+     * value is an SQL NULL, the driver returns a Java null.
+     *
+     * This method may also be used to read database-specific abstract data types.
+     *
+     * In the JDBC 2.0 API, the behavior of the method getObject is extended to materialize
+     * data of SQL user-defined types. When a column contains a structured or distinct value,
+     * the behavior of this method is as if it were a call to: getObject(columnIndex, 
+     * this.getStatement().getConnection().getTypeMap()). 
+     *
+     * @param columnName - the SQL name of the column
+     * @return a java.lang.Object holding the column value
+     * @throws SQLException - if a database access error occurs
+     */
+    public Object getObject(String columnName) throws SQLException{
+        return rowset.getObject(columnName);
+    }
+    
+    /**
+     * Gets the value of the designated column in the current row of this ResultSet object as
+     * an Object in the Java programming language.
+     *
+     * This method will return the value of the given column as a Java object. The type of the
+     * Java object will be the default Java object type corresponding to the column's SQL type
+     * , following the mapping for built-in types specified in the JDBC specification. If the
+     * value is an SQL NULL, the driver returns a Java null.
+     *
+     * This method may also be used to read database-specific abstract data types.
+     *
+     * In the JDBC 2.0 API, the behavior of the method getObject is extended to materialize
+     * data of SQL user-defined types. When a column contains a structured or distinct value,
+     * the behavior of this method is as if it were a call to: getObject(columnIndex, 
+     * this.getStatement().getConnection().getTypeMap()). 
+     *
+     * @param columnIndex - the first column is 1, the second is 2, ...
+     * @return a java.lang.Object holding the column value
+     * @throws SQLException - if a database access error occurs
+     */ 
+    public Object getObject(int columnIndex) throws SQLException{
+        return rowset.getObject(columnIndex);
+    }
+    
+    /**
+     * Updates the designated column with an Object value. The updater methods are used to update
+     * column values in the current row or the insert row. The updater methods do not update the
+     * underlying database; instead the updateRow or insertRow methods are called to update the
+     * database.
+     * @param columnName - the name of the column
+     * @param value - the new column value
+     * @throws SQLException - if a database access error occurs
+     */
+    public void updateObject(String columnName, Object value) throws SQLException{
+        rowset.updateObject(columnName, value);
+    }
+    
+    /**
+     * Updates the designated column with an Object value. The updater methods are used to update
+     * column values in the current row or the insert row. The updater methods do not update the
+     * underlying database; instead the updateRow or insertRow methods are called to update the
+     * database.
+     * @param columnIndex - the first column is 1, the second is 2, ...
+     * @param value - the new column value
+     * @throws SQLException - if a database access error occurs
+     */
+    public void updateObject(int columnIndex, Object value) throws SQLException{
+        rowset.updateObject(columnIndex, value);
+    }
+    
 
 }
  /*
   * $Log$
+  * Revision 1.13  2005/02/12 03:27:09  yoda2
+  * Added bound properties (for beans).
+  *
   * Revision 1.12  2005/02/11 22:59:56  yoda2
   * Imported PropertyVetoException and added some bound properties.
   *
