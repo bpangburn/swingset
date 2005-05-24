@@ -621,6 +621,7 @@ public class SSDataNavigator extends JPanel {
             System.out.println("Unable to load images for navigator buttons");
         }
 
+    // SET TOOL TIPS FOR THE BUTTONS   
         firstButton.setToolTipText("First");
         previousButton.setToolTipText("Previous");
         nextButton.setToolTipText("Next");
@@ -630,6 +631,18 @@ public class SSDataNavigator extends JPanel {
         refreshButton.setToolTipText("Refresh");
         addButton.setToolTipText("Add Record");
         deleteButton.setToolTipText("Delete Record");
+        
+    // MAKE THE BUTTONS NON FOCUSABLE.
+        firstButton.setFocusable(false);
+        previousButton.setFocusable(false);
+        nextButton.setFocusable(false);
+        lastButton.setFocusable(false);
+        commitButton.setFocusable(false);
+        undoButton.setFocusable(false);
+        refreshButton.setFocusable(false);
+        addButton.setFocusable(false);
+        deleteButton.setFocusable(false);
+            
 
     } // end protected void addToolTips() {
 
@@ -1191,6 +1204,10 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.36  2005/05/03 15:23:43  prasanth
+ * Updated the listeners for commit button and delete button to call allowInsertion
+ * and allowDeletion functions.
+ *
  * Revision 1.35  2005/03/08 16:13:50  prasanth
  * In undoButton listener based on insertRow flag changing the function call.
  * cancelRowUpdates throws exception if current row is on insertRow.
