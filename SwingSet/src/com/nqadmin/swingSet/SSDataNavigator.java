@@ -642,7 +642,7 @@ public class SSDataNavigator extends JPanel {
         refreshButton.setFocusable(false);
         addButton.setFocusable(false);
         deleteButton.setFocusable(false);
-            
+        txtCurrentRow.setFocusable(false);    
 
     } // end protected void addToolTips() {
 
@@ -1204,6 +1204,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.37  2005/05/24 14:33:35  prasanth
+ * Made the buttons non focusable.
+ *
  * Revision 1.36  2005/05/03 15:23:43  prasanth
  * Updated the listeners for commit button and delete button to call allowInsertion
  * and allowDeletion functions.
