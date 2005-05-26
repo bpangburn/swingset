@@ -39,8 +39,12 @@ import java.sql.ResultSetMetaData;
 import java.io.ObjectInputStream;
 import java.io.IOException;
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.sql.Time;
+ 
 import javax.sql.RowSetListener;
 import com.sun.rowset.JdbcRowSetImpl;
+
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
@@ -1053,10 +1057,110 @@ import java.beans.PropertyVetoException;
         rowset.updateObject(columnIndex, value);
     }
     
+    /**
+     * Retrieves the value of the designated column in the current row of this ResultSet
+     * object as a java.sql.Time object in the Java programming language.
+     * @param columnIndex - the first column is 1, the second is 2, ...
+     * @return the column value; if the value is SQL NULL, the value returned is null
+     * @throws SQLException - if a database access error occurs 
+     */
+    public Time getTime(int columnIndex) throws SQLException {
+        return rowset.getTime(columnIndex);
+    }
+    
+    /**
+     * Retrieves the value of the designated column in the current row of this ResultSet
+     * object as a java.sql.Time object in the Java programming language.
+     * @param columnName - the SQL name of the column 
+     * @return the column value; if the value is SQL NULL, the value returned is null 
+     * @throws SQLException - if a database access error occurs
+     */
+    public Time getTime(String columnName) throws SQLException {
+        return rowset.getTime(columnName);
+    }
 
+    /**
+     * Retrieves the value of the designated column in the current row of this ResultSet
+     * object as a java.sql.Timestamp object in the Java programming language.
+     * @param columnIndex - the first column is 1, the second is 2, ... 
+     * @return the column value; if the value is SQL NULL, the value returned is null 
+     * @throws SQLException - if a database access error occurs
+     */
+    public Timestamp getTimestamp(int columnIndex) throws SQLException {
+        return rowset.getTimestamp(columnIndex);
+    }
+    
+    /**
+     * Retrieves the value of the designated column in the current row of this ResultSet
+     * object as a java.sql.Timestamp object.
+     * @param columnName - the SQL name of the column 
+     * @return the column value; if the value is SQL NULL, the value returned is null 
+     * @throws SQLException - if a database access error occurs
+     */
+    public Timestamp getTimestamp(String columnName) throws SQLException {
+        return rowset.getTimestamp(columnName);
+    }
+    
+    /**
+     * Updates the designated column with a java.sql.Time value. The updater methods are
+     * used to update column values in the current row or the insert row. The updater
+     * methods do not update the underlying database; instead the updateRow or insertRow
+     * methods are called to update the database.
+     * @param columnIndex - the first column is 1, the second is 2, ...
+     * @param value - the new column value 
+     * @throws SQLException - if a database access error occurs
+     */
+    public void updateTime(int columnIndex, Time value) throws SQLException {
+        rowset.updateTime(columnIndex, value);
+    }
+    
+    /**
+     * Updates the designated column with a java.sql.Time value. The updater methods are
+     * used to update column values in the current row or the insert row. The updater
+     * methods do not update the underlying database; instead the updateRow or insertRow
+     * methods are called to update the database.
+     * @param columnName - the SQL name of the column 
+     * @param value - the new column value 
+     * @throws SQLException - if a database access error occurs
+     */
+    public void updateTime(String columnName, Time value) throws SQLException {
+        rowset.updateTime(columnName, value);
+    } 
+    
+    /**
+     * Updates the designated column with a java.sql.Timestamp  value. The updater methods
+     * are used to update column values in the current row or the insert row. The updater
+     * methods do not update the underlying database; instead the updateRow or insertRow
+     * methods are called to update the database.
+     * @param columnIndex - the first column is 1, the second is 2, ...
+     * @param value - the new column value 
+     * @throws SQLException - if a database access error occurs
+     */
+    public void updateTimestamp(int columnIndex, Timestamp value) throws SQLException {
+        rowset.updateTimestamp(columnIndex, value);
+    } 
+    
+    /**
+     * Updates the designated column with a java.sql.Timestamp  value. The updater methods
+     * are used to update column values in the current row or the insert row. The updater
+     * methods do not update the underlying database; instead the updateRow or insertRow
+     * methods are called to update the database.
+     * @param columnName - the SQL name of the column 
+     * @param value - the new column value 
+     * @throws SQLException - if a database access error occurs
+     */
+    public void updateTimestamp(String columnName, Timestamp value) throws SQLException {
+        rowset.updateTimestamp(columnName, value);
+    }
+    
 }
  /*
   * $Log$
+  * Revision 1.14  2005/05/24 23:07:37  prasanth
+  * 1. Added get/set methods for object.
+  * 2. Added rowDeleted, rowInserted, rowUpdated methods
+  * 3. Added getMetaData method.
+  *
   * Revision 1.13  2005/02/12 03:27:09  yoda2
   * Added bound properties (for beans).
   *
