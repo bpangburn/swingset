@@ -44,8 +44,8 @@ import com.nqadmin.swingSet.formatting.SSCurrencyFormatterFactory;
 
 public class SSCurrencyField extends SSFormattedTextField {
     
-    private int precision = 1;
-    private int decimals  = 0;
+    private int precision = 3;
+    private int decimals  = 2;
 
     /**
      * Holds value of property minimumIntegerDigits.
@@ -100,6 +100,9 @@ public class SSCurrencyField extends SSFormattedTextField {
 
 /*
  * $Log$
+ * Revision 1.6  2005/03/28 14:46:42  dags
+ * syncro commit
+ *
  * Revision 1.5  2005/02/04 22:42:06  yoda2
  * Updated Copyright info.
  *

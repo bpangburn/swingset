@@ -117,6 +117,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
     private void DbToFm() {
         
         try {
+            if (rowset.getRow() == 0) return;
             
             switch(colType) {
                 
@@ -146,6 +147,18 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
         }
     }
     
+    /**
+     * Sets the SSRowSet and column name to which the component is to be bound.
+     *
+     * @param _sSRowSet    datasource to be used.
+     * @param _columnName  Name of the column to which this check box should be bound
+     */
+    public void bind(SSRowSet _sSRowSet, String _columnName) {
+        rowset = _sSRowSet;
+        columnName = _columnName;
+        bind();
+    }
+
     private void bind() {
         
         if (this.columnName == null) return;
@@ -243,7 +256,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
             boolean selected = tf.isSelected();
             
             setBackground(java.awt.Color.WHITE);
-
+            
             // if not linked to a db field, returns.
             if (columnName == null || rowset == null) return true;
             
@@ -287,6 +300,9 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 
 /*
  * $Log$
+ * Revision 1.10  2005/03/30 13:03:51  dags
+ * Accept null dates values
+ *
  * Revision 1.9  2005/03/28 14:46:42  dags
  * syncro commit
  *

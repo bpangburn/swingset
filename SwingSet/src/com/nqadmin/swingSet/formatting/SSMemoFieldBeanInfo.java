@@ -16,7 +16,7 @@ public class SSMemoFieldBeanInfo extends SimpleBeanInfo {
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( SSMemoField.class , null );//GEN-HEADEREND:BeanDescriptor
+        BeanDescriptor beanDescriptor = new BeanDescriptor  ( com.nqadmin.swingSet.formatting.SSMemoField.class , null );//GEN-HEADEREND:BeanDescriptor
         
         // Here you can add code for customizing the BeanDescriptor.
         
@@ -32,7 +32,7 @@ public class SSMemoFieldBeanInfo extends SimpleBeanInfo {
     private static final int PROPERTY_foreground = 5;
     private static final int PROPERTY_lineWrap = 6;
     private static final int PROPERTY_navigator = 7;
-    private static final int PROPERTY_rowSet = 8;
+    private static final int PROPERTY_SSRowSet = 8;
     private static final int PROPERTY_text = 9;
     private static final int PROPERTY_toolTipText = 10;
     private static final int PROPERTY_visible = 11;
@@ -44,26 +44,26 @@ public class SSMemoFieldBeanInfo extends SimpleBeanInfo {
         PropertyDescriptor[] properties = new PropertyDescriptor[13];
     
         try {
-            properties[PROPERTY_border] = new PropertyDescriptor ( "border", SSMemoField.class, "getBorder", "setBorder" );
-            properties[PROPERTY_caret] = new PropertyDescriptor ( "caret", SSMemoField.class, "getCaret", "setCaret" );
-            properties[PROPERTY_columnName] = new PropertyDescriptor ( "columnName", SSMemoField.class, "getColumnName", "setColumnName" );
+            properties[PROPERTY_border] = new PropertyDescriptor ( "border", com.nqadmin.swingSet.formatting.SSMemoField.class, "getBorder", "setBorder" );
+            properties[PROPERTY_caret] = new PropertyDescriptor ( "caret", com.nqadmin.swingSet.formatting.SSMemoField.class, "getCaret", "setCaret" );
+            properties[PROPERTY_columnName] = new PropertyDescriptor ( "columnName", com.nqadmin.swingSet.formatting.SSMemoField.class, "getColumnName", "setColumnName" );
             properties[PROPERTY_columnName].setPreferred ( true );
             properties[PROPERTY_columnName].setDisplayName ( "Column Name" );
-            properties[PROPERTY_editable] = new PropertyDescriptor ( "editable", SSMemoField.class, "isEditable", "setEditable" );
-            properties[PROPERTY_enabled] = new PropertyDescriptor ( "enabled", SSMemoField.class, "isEnabled", "setEnabled" );
-            properties[PROPERTY_foreground] = new PropertyDescriptor ( "foreground", SSMemoField.class, "getForeground", "setForeground" );
-            properties[PROPERTY_lineWrap] = new PropertyDescriptor ( "lineWrap", SSMemoField.class, "getLineWrap", "setLineWrap" );
-            properties[PROPERTY_navigator] = new PropertyDescriptor ( "navigator", SSMemoField.class, "getNavigator", "setNavigator" );
+            properties[PROPERTY_editable] = new PropertyDescriptor ( "editable", com.nqadmin.swingSet.formatting.SSMemoField.class, "isEditable", "setEditable" );
+            properties[PROPERTY_enabled] = new PropertyDescriptor ( "enabled", com.nqadmin.swingSet.formatting.SSMemoField.class, "isEnabled", "setEnabled" );
+            properties[PROPERTY_foreground] = new PropertyDescriptor ( "foreground", com.nqadmin.swingSet.formatting.SSMemoField.class, "getForeground", "setForeground" );
+            properties[PROPERTY_lineWrap] = new PropertyDescriptor ( "lineWrap", com.nqadmin.swingSet.formatting.SSMemoField.class, "getLineWrap", "setLineWrap" );
+            properties[PROPERTY_navigator] = new PropertyDescriptor ( "navigator", com.nqadmin.swingSet.formatting.SSMemoField.class, "getNavigator", "setNavigator" );
             properties[PROPERTY_navigator].setPreferred ( true );
             properties[PROPERTY_navigator].setDisplayName ( "SSDataNavigator" );
-            properties[PROPERTY_rowSet] = new PropertyDescriptor ( "rowSet", SSMemoField.class, "getRowSet", "setRowSet" );
-            properties[PROPERTY_rowSet].setPreferred ( true );
-            properties[PROPERTY_rowSet].setDisplayName ( "SSRowSet" );
-            properties[PROPERTY_text] = new PropertyDescriptor ( "text", SSMemoField.class, "getText", "setText" );
-            properties[PROPERTY_toolTipText] = new PropertyDescriptor ( "toolTipText", SSMemoField.class, "getToolTipText", "setToolTipText" );
+            properties[PROPERTY_SSRowSet] = new PropertyDescriptor ( "SSRowSet", com.nqadmin.swingSet.formatting.SSMemoField.class, "getSSRowSet", "setSSRowSet" );
+            properties[PROPERTY_SSRowSet].setPreferred ( true );
+            properties[PROPERTY_SSRowSet].setDisplayName ( "SSRowSet" );
+            properties[PROPERTY_text] = new PropertyDescriptor ( "text", com.nqadmin.swingSet.formatting.SSMemoField.class, "getText", "setText" );
+            properties[PROPERTY_toolTipText] = new PropertyDescriptor ( "toolTipText", com.nqadmin.swingSet.formatting.SSMemoField.class, "getToolTipText", "setToolTipText" );
             properties[PROPERTY_toolTipText].setPreferred ( true );
-            properties[PROPERTY_visible] = new PropertyDescriptor ( "visible", SSMemoField.class, "isVisible", "setVisible" );
-            properties[PROPERTY_wrapStyleWord] = new PropertyDescriptor ( "wrapStyleWord", SSMemoField.class, "getWrapStyleWord", "setWrapStyleWord" );
+            properties[PROPERTY_visible] = new PropertyDescriptor ( "visible", com.nqadmin.swingSet.formatting.SSMemoField.class, "isVisible", "setVisible" );
+            properties[PROPERTY_wrapStyleWord] = new PropertyDescriptor ( "wrapStyleWord", com.nqadmin.swingSet.formatting.SSMemoField.class, "getWrapStyleWord", "setWrapStyleWord" );
         }
         catch( IntrospectionException e) {}//GEN-HEADEREND:Properties
         

@@ -92,13 +92,27 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
         this.columnName = columnName;
         bind();
     }
-    
+
+    /*
+     * @deprecated
+     */
     public void setRowSet(SSRowSet rowset) {
+        setSSRowSet(rowset);
+    }
+    
+    /*
+     * @deprecated
+     */
+    public SSRowSet getRowSet() {
+        return getSSRowSet();
+    }
+    
+    public void setSSRowSet(SSRowSet rowset) {
         this.rowset = rowset;
         bind();
     }
     
-    public SSRowSet getRowSet() {
+    public SSRowSet getSSRowSet() {
         return this.rowset;
     }
     
@@ -116,6 +130,8 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
         
         try {
             
+            if (rowset.getRow() == 0) return;
+            
             switch(colType) {
                 
                 case java.sql.Types.VARCHAR://-7
@@ -132,6 +148,18 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
         }
     }
     
+    /**
+     * Sets the SSRowSet and column name to which the component is to be bound.
+     *
+     * @param _sSRowSet    datasource to be used.
+     * @param _columnName  Name of the column to which this check box should be bound
+     */
+    public void bind(SSRowSet _sSRowSet, String _columnName) {
+        rowset = _sSRowSet;
+        columnName = _columnName;
+        bind();
+    }
+
     private void bind() {
         
         if (this.columnName == null) return;

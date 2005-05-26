@@ -48,8 +48,8 @@ import com.nqadmin.swingSet.formatting.SSNumericFormatterFactory;
 
 public class SSNumericField extends SSFormattedTextField {
     
-    private int precision = 1;
-    private int decimals  = 0;
+    private int precision = 3;
+    private int decimals  = 2;
 
     /**
      * Holds value of property minimumIntegerDigits.
@@ -86,6 +86,7 @@ public class SSNumericField extends SSFormattedTextField {
     
     public void setDecimals(int decimals) {
         this.decimals = decimals;
+        this.setFormatterFactory(new SSNumericFormatterFactory(precision, decimals));
     }
 
     /**
@@ -109,6 +110,9 @@ public class SSNumericField extends SSFormattedTextField {
 
 /*
  * $Log$
+ * Revision 1.6  2005/03/28 14:46:43  dags
+ * syncro commit
+ *
  * Revision 1.5  2005/02/04 22:42:06  yoda2
  * Updated Copyright info.
  *
