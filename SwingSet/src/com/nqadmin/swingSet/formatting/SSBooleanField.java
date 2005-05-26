@@ -50,7 +50,7 @@ import javax.swing.KeyStroke;
  *
  * @author dags
  */
-public class SSBooleanField extends JCheckBox implements RowSetListener, KeyListener {
+public class SSBooleanField extends JCheckBox implements SSField, RowSetListener, KeyListener {
     
     private java.awt.Color std_color = null;
     private String columnName = null;
@@ -240,6 +240,14 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
         }
         
     }
+
+    public void cleanField() {
+        setDefaultValue();
+    }
+    
+    public void setDefaultValue() {
+        this.setSelected(false);
+    }
     
     
     /**
@@ -300,6 +308,9 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 
 /*
  * $Log$
+ * Revision 1.11  2005/05/26 12:12:36  dags
+ * added bind(SSRowSet, columnName) method and some java.sql.Types checking and support
+ *
  * Revision 1.10  2005/03/30 13:03:51  dags
  * Accept null dates values
  *

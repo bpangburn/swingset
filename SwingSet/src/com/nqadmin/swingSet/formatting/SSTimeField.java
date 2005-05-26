@@ -31,8 +31,7 @@
  *
  */
 package com.nqadmin.swingSet.formatting;
-
-import com.nqadmin.swingSet.formatting.SSDateFormatterFactory;
+import java.util.Calendar;
 
 /**
  *
@@ -48,12 +47,21 @@ public class SSTimeField extends SSFormattedTextField {
             
     public SSTimeField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
-        this.setValue(new java.util.Date());
+        this.setValue( Calendar.getInstance().getTime() );
     }
+
+    public void cleanField() {
+        this.setValue( Calendar.getInstance().getTime() );
+    }
+    
+
 }
 
 
 /*
  * $Log$
+ * Revision 1.1  2005/05/26 12:16:20  dags
+ * initial release
+ *
   *
  */

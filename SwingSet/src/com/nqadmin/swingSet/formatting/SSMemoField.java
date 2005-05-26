@@ -53,7 +53,7 @@ import javax.swing.SwingUtilities;
  *
  * @author dags
  */
-public class SSMemoField extends JTextArea implements RowSetListener, KeyListener, FocusListener {
+public class SSMemoField extends JTextArea implements SSField, RowSetListener, KeyListener, FocusListener {
     
     private java.awt.Color std_color = null;
     private String columnName = null;
@@ -289,6 +289,9 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
                 selectAll();
             }
         });
+    }
+
+    public void cleanField() {
     }
     
     /**

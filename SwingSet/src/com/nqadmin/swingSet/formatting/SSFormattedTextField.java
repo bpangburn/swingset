@@ -49,6 +49,7 @@ import com.nqadmin.swingSet.formatting.helpers.*;
 import java.beans.beancontext.BeanContextChild;
 import java.beans.beancontext.BeanContextChildSupport;
 import java.beans.beancontext.BeanContextProxy;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.ParseException;
 
@@ -63,7 +64,7 @@ import java.text.ParseException;
  * @author $Author$
  * @version $Revision$
  */
-public class SSFormattedTextField extends JFormattedTextField implements RowSetListener, KeyListener, MouseListener, BeanContextProxy, FocusListener {
+public class SSFormattedTextField extends JFormattedTextField implements SSField, RowSetListener, KeyListener, MouseListener, BeanContextProxy, FocusListener {
     
     private BeanContextChildSupport beanContextChildSupport = new BeanContextChildSupport();
     
@@ -498,13 +499,15 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                     
                 case java.sql.Types.TIME://92
                     //System.out.println("TIME implemented as java.util.Date --> " + columnName);
-                    nValue = new java.util.Date(rowset.getTime(columnName).getTime());
+                    //nValue = new java.util.Date(rowset.getTime(columnName).getTime());
+                    nValue = rowset.getTime(columnName);
                     this.setValue(nValue);
                     break;
                     
                 case java.sql.Types.TIMESTAMP://93
                     //System.out.println("TIMESTAMP implemented as java.util.Date --> " + columnName);
-                    nValue = new java.util.Date(rowset.getTimestamp(columnName).getTime());
+//                    nValue = new java.util.Date(rowset.getTimestamp(columnName).getTime());
+                    nValue = rowset.getTimestamp(columnName);
                     this.setValue(nValue);
                     break;
                     
@@ -671,159 +674,45 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                             break;
                             
                         case java.sql.Types.DECIMAL://3
+                        case java.sql.Types.NUMERIC:
+                        case java.sql.Types.BIGINT:
+                        case java.sql.Types.DOUBLE:
+                        case java.sql.Types.FLOAT:
+                        case java.sql.Types.INTEGER:
+                        case java.sql.Types.REAL:
+                        case java.sql.Types.SMALLINT:
+                        case java.sql.Types.TINYINT:
                             if (aux instanceof java.math.BigDecimal) {
-                                System.out.println("DECIMAL --> updateDouble() - BigDecimal");
+                                System.out.println("updateDouble() - BigDecimal");
                                 rowset.updateDouble(columnName, ((Double)aux).doubleValue());
                             } else if (aux instanceof Double) {
-                                System.out.println("DECIMAL --> updateDouble()");
+                                System.out.println("updateDouble()");
                                 rowset.updateDouble(columnName, ((Double)aux).doubleValue());
                             } else if (aux instanceof Float) {
-                                System.out.println("DECIMAL --> updateFloat()");
+                                System.out.println("updateFloat()");
                                 rowset.updateFloat(columnName, ((Float)aux).floatValue());
                             } else if (aux instanceof Integer) {
-                                System.out.println("DECIMAL --> updateInt()");
+                                System.out.println("updateInt()");
                                 rowset.updateInt(columnName, ((Integer)aux).intValue());
                             } else if (aux instanceof Long) {
-                                System.out.println("DECIMAL --> updateLong()");
+                                System.out.println("updateLong()");
                                 rowset.updateLong(columnName, ((Long)aux).longValue());
                             } else {
-                                System.out.println("DECIMAL -- ELSE ???");
+                                System.out.println("ELSE ???");
                             }
-                            break;
-                            
-                        case java.sql.Types.DISTINCT://2001
-                            break;
-                            
-                        case java.sql.Types.FLOAT  ://6
-                            if (aux instanceof Double) {
-                                System.out.println("FLOAT --> updateDouble()");
-                                rowset.updateDouble(columnName, ((Double)aux).doubleValue());
-                            } else if (aux instanceof Float) {
-                                System.out.println("FLOAT --> updateFloat()");
-                                rowset.updateFloat(columnName, ((Float)aux).floatValue());
-                            } else if (aux instanceof Integer) {
-                                System.out.println("FLOAT --> updateInt()");
-                                rowset.updateInt(columnName, ((Integer)aux).intValue());
-                            } else if (aux instanceof Long) {
-                                System.out.println("FLOAT --> updateLong()");
-                                rowset.updateLong(columnName, ((Long)aux).longValue());
-                            } else {
-                                System.out.println("FLOAT -- ELSE ???");
-                            }
-                            break;
-                            
-                        case java.sql.Types.REAL   ://7
-                            if (aux instanceof Double) {
-                                System.out.println("REAL --> updateDouble()");
-                                rowset.updateDouble(columnName, ((Double)aux).doubleValue());
-                            } else if (aux instanceof Float) {
-                                System.out.println("REAL --> updateFloat()");
-                                rowset.updateFloat(columnName, ((Float)aux).floatValue());
-                            } else if (aux instanceof Integer) {
-                                System.out.println("REAL --> updateInt()");
-                                rowset.updateInt(columnName, ((Integer)aux).intValue());
-                            } else if (aux instanceof Long) {
-                                System.out.println("REAL --> updateLong()");
-                                rowset.updateLong(columnName, ((Long)aux).longValue());
-                            } else {
-                                System.out.println("REAL -- ELSE ???");
-                            }
-                            break;
-                            
-                        case java.sql.Types.DOUBLE ://8
-                            if (aux instanceof Double) {
-                                System.out.println("DOUBLE --> updateDouble()");
-                                rowset.updateDouble(columnName, ((Double)aux).doubleValue());
-                            } else if (aux instanceof Float) {
-                                System.out.println("DOUBLE --> updateFloat()");
-                                rowset.updateFloat(columnName, ((Float)aux).floatValue());
-                            } else if (aux instanceof Integer) {
-                                System.out.println("DOUBLE --> updateInt()");
-                                rowset.updateInt(columnName, ((Integer)aux).intValue());
-                            } else if (aux instanceof Long) {
-                                System.out.println("DOUBLE --> updateLong()");
-                                rowset.updateLong(columnName, ((Long)aux).longValue());
-                            } else {
-                                System.out.println("DOUBLE -- ELSE ???");
-                            }
-                            
-                            if (aux instanceof Double && ((Double) aux).doubleValue() < 0.0) {
+                                                        
+                            if (    (aux instanceof BigDecimal  && ((Double)  aux).doubleValue() < 0.0) ||
+                                    (aux instanceof Double      && ((Double)  aux).doubleValue() < 0.0) ||
+                                    (aux instanceof Float       && ((Float)   aux).floatValue() < 0.0) ||
+                                    (aux instanceof Integer     && ((Integer) aux).intValue() < 0) ||
+                                    (aux instanceof Long        && ((Long)    aux).longValue() < 0)  ) {
                                 tf.setForeground(Color.RED);
                             } else {
                                 tf.setForeground(Color.BLACK);
                             }
                             break;
                             
-                        case java.sql.Types.INTEGER:    //4
-                            if (aux instanceof Double) {
-                                System.out.println("INTEGER --> updateDouble()");
-                                rowset.updateDouble(columnName, ((Double)aux).doubleValue());
-                            } else if (aux instanceof Float) {
-                                System.out.println("INTEGER --> updateFloat()");
-                                rowset.updateFloat(columnName, ((Float)aux).floatValue());
-                            } else if (aux instanceof Integer) {
-                                System.out.println("INTEGER --> updateInt()");
-                                rowset.updateInt(columnName, ((Integer)aux).intValue());
-                            } else if (aux instanceof Long) {
-                                System.out.println("INTEGER --> updateLong()");
-                                rowset.updateLong(columnName, ((Long)aux).longValue());
-                            } else {
-                                System.out.println("INTEGER -- ELSE ???");
-                            }
-                            break;
-                            
-                        case java.sql.Types.BIGINT:     //-5
-                            if (aux instanceof Double) {
-                                System.out.println("BIGINT --> updateDouble()");
-                                rowset.updateDouble(columnName, ((Double)aux).doubleValue());
-                            } else if (aux instanceof Float) {
-                                System.out.println("BIGINT --> updateFloat()");
-                                rowset.updateFloat(columnName, ((Float)aux).floatValue());
-                            } else if (aux instanceof Integer) {
-                                System.out.println("BIGINT --> updateInt()");
-                                rowset.updateInt(columnName, ((Integer)aux).intValue());
-                            } else if (aux instanceof Long) {
-                                System.out.println("BIGINT --> updateLong()");
-                                rowset.updateLong(columnName, ((Long)aux).longValue());
-                            } else {
-                                System.out.println("BIGINT -- ELSE ???");
-                            }
-                            break;
-                            
-                        case java.sql.Types.SMALLINT:   //5
-                            if (aux instanceof Double) {
-                                System.out.println("SMALLINT --> updateDouble()");
-                                rowset.updateDouble(columnName, ((Double)aux).doubleValue());
-                            } else if (aux instanceof Float) {
-                                System.out.println("SMALLINT --> updateFloat()");
-                                rowset.updateFloat(columnName, ((Float)aux).floatValue());
-                            } else if (aux instanceof Integer) {
-                                System.out.println("SMALLINT --> updateInt()");
-                                rowset.updateInt(columnName, ((Integer)aux).intValue());
-                            } else if (aux instanceof Long) {
-                                System.out.println("SMALLINT --> updateLong()");
-                                rowset.updateLong(columnName, ((Long)aux).longValue());
-                            } else {
-                                System.out.println("SMALLINT -- ELSE ???");
-                            }
-                            break;
-                            
-                        case java.sql.Types.TINYINT:    //-6
-                            if (aux instanceof Double) {
-                                System.out.println("TINYINT --> updateDouble()");
-                                rowset.updateDouble(columnName, ((Double)aux).doubleValue());
-                            } else if (aux instanceof Float) {
-                                System.out.println("TINYINT --> updateFloat()");
-                                rowset.updateFloat(columnName, ((Float)aux).floatValue());
-                            } else if (aux instanceof Integer) {
-                                System.out.println("TINYINT --> updateInt()");
-                                rowset.updateInt(columnName, ((Integer)aux).intValue());
-                            } else if (aux instanceof Long) {
-                                System.out.println("TINYINT --> updateLong()");
-                                rowset.updateLong(columnName, ((Long)aux).longValue());
-                            } else {
-                                System.out.println("TINYINT -- ELSE ???");
-                            }
+                        case java.sql.Types.DISTINCT://2001
                             break;
                             
                         case java.sql.Types.JAVA_OBJECT://2000
@@ -851,33 +740,6 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                         case java.sql.Types.NULL://0
                             break;
                             
-                        case java.sql.Types.NUMERIC://2
-                            if (aux instanceof java.math.BigDecimal) {
-                                System.out.println("NUMERIC --> updateDouble() - BigDecimal");
-                                rowset.updateDouble(columnName, ((Double)aux).doubleValue());
-                            } else if (aux instanceof Double) {
-                                System.out.println("NUMERIC --> updateDouble()");
-                                rowset.updateDouble(columnName, ((Double)aux).doubleValue());
-                            } else if (aux instanceof Float) {
-                                System.out.println("NUMERIC --> updateFloat()");
-                                rowset.updateFloat(columnName, ((Float)aux).floatValue());
-                            } else if (aux instanceof Integer) {
-                                System.out.println("NUMERIC --> updateInt()");
-                                rowset.updateInt(columnName, ((Integer)aux).intValue());
-                            } else if (aux instanceof Long) {
-                                System.out.println("NUMERIC --> updateLong()");
-                                rowset.updateLong(columnName, ((Long)aux).longValue());
-                            } else {
-                                System.out.println("NUMERIC -- ELSE ???");
-                            }
-                            
-                            if (aux instanceof Double && ((Double) aux).doubleValue() < 0.0) {
-                                tf.setForeground(Color.RED);
-                            } else {
-                                tf.setForeground(Color.BLACK);
-                            }
-                            break;
-                            
                         case java.sql.Types.OTHER://1111
                             break;
                             
@@ -888,12 +750,14 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                             break;
                             
                         case java.sql.Types.TIME://92
-                            System.out.println("DATE --> updateDate()");
+                            System.out.println("TIME --> updateTime()");
+                            System.out.println("TIME : " + aux.getClass().getName());
                             rowset.updateTime(columnName, new java.sql.Time(((java.util.Date) aux).getTime()));
                             break;
                             
                         case java.sql.Types.TIMESTAMP://93
-                            System.out.println("DATE --> updateDate()");
+                            System.out.println("TIMESTAMP --> updateTimestamp()");
+                            System.out.println("TIMESTAMP : " + aux.getClass().getName());
                             rowset.updateTimestamp(columnName, new java.sql.Timestamp(((java.util.Date) aux).getTime()));
                             break;
                             
@@ -988,10 +852,17 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         this.nullable = nullable;
         this.firePropertyChange("nullable", new Boolean(oldNullable), new Boolean(nullable));
     }
+
+    public void cleanField() {
+        setValue(null);
+    }
 }
 
 /*
  * $Log$
+ * Revision 1.18  2005/05/26 12:12:36  dags
+ * added bind(SSRowSet, columnName) method and some java.sql.Types checking and support
+ *
  * Revision 1.17  2005/05/23 22:10:23  dags
  * Fix for numeric fields
  *

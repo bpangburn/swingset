@@ -36,7 +36,7 @@ import javax.swing.KeyStroke;
  *
  * @author Diego Gil
  */
-public class SSImageField extends JPanel implements RowSetListener, KeyListener, ComponentListener {
+public class SSImageField extends JPanel implements SSField, RowSetListener, KeyListener, ComponentListener {
     
     private BufferedImage bufferedImage;
     private byte[] imageBytes;
@@ -357,5 +357,8 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
             imageButton.setIcon(scaledIcon);
             updateUI();
         }
+    }
+
+    public void cleanField() {
     }
 }

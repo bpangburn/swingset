@@ -50,11 +50,18 @@ public class SSDateField extends SSFormattedTextField {
         super(factory);
         this.setValue(new java.util.Date());
     }
+    
+    public void cleanField() {
+        this.setValue(new java.util.Date());
+    }
 }
 
 
 /*
  * $Log$
+ * Revision 1.6  2005/03/28 14:46:42  dags
+ * syncro commit
+ *
  * Revision 1.5  2005/02/04 22:42:06  yoda2
  * Updated Copyright info.
  *

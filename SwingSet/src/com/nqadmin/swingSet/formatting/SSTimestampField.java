@@ -32,7 +32,10 @@
  */
 package com.nqadmin.swingSet.formatting;
 
-import com.nqadmin.swingSet.formatting.SSDateFormatterFactory;
+import java.sql.Timestamp;
+import java.util.Calendar;
+
+
 
 /**
  *
@@ -40,6 +43,7 @@ import com.nqadmin.swingSet.formatting.SSDateFormatterFactory;
  */
 
 public class SSTimestampField extends SSFormattedTextField {
+    private Timestamp ts = null;
     
     /** Creates a new instance of SSTimeField */
     public SSTimestampField() {
@@ -48,12 +52,24 @@ public class SSTimestampField extends SSFormattedTextField {
             
     public SSTimestampField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
-        this.setValue(new java.util.Date());
+        ts = new java.sql.Timestamp( (new java.util.Date().getTime() ) );
+
+        this.setValue(new java.util.Date(  ));
     }
+    
+    public void cleanField() {
+        ts = new java.sql.Timestamp( (new java.util.Date().getTime() ) );
+
+        this.setValue(new java.util.Date( ) );
+    }
+    
 }
 
 
 /*
  * $Log$
+ * Revision 1.1  2005/05/26 12:16:20  dags
+ * initial release
+ *
   *
  */

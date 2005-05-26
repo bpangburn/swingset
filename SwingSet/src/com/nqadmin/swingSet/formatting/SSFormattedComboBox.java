@@ -23,7 +23,7 @@ import javax.swing.JComboBox;
  *
  * @author dags
  */
-public class SSFormattedComboBox extends JComboBox implements ActionListener {
+public class SSFormattedComboBox extends JComboBox implements SSField, ActionListener {
     
     protected SSFormattedComboBoxEditor editor = null;
     protected SSFormattedComboBoxRenderer renderer = null;
@@ -177,5 +177,9 @@ public class SSFormattedComboBox extends JComboBox implements ActionListener {
         System.out.println("SSFormattedComboBox.getInputVerifier()");
         retValue = editor.getEditorField().getInputVerifier();
         return retValue;
+    }
+
+    public void cleanField() {
+        
     }
 }

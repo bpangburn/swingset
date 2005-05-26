@@ -49,14 +49,17 @@ import java.text.ParseException;
 public class SSTimestampFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
 
     public SSTimestampFormatterFactory() {
-        this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("DD/mm/yyyy HH:mm:ss SSSZ")));
+        this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss SSS Z")));
         this.setNullFormatter(null);
-        this.setEditFormatter(new DateFormatter(new SimpleDateFormat("DDmmyyyyHHmmssSSSZ")));
-        this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("DD/mm/yyyy HH:mm:ss SSSZ")));
+        this.setEditFormatter(new DateFormatter(new SimpleDateFormat("ddMMyyyyHHmmssSSSZ")));
+        this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss SSS Z")));
     }
 }
 
 
 /*
  * $Log$
+ * Revision 1.1  2005/05/26 12:16:20  dags
+ * initial release
+ *
  */
