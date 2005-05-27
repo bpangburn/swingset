@@ -611,6 +611,9 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
                 tf.commitEdit();
             } catch (java.text.ParseException pe) {
                 System.out.println("inputVerifier --> ParseException");
+                tf.setValue(null);
+                setBackground(java.awt.Color.RED);
+                return false;
             }
             
             aux = tf.getValue();
@@ -770,8 +773,10 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
                     }
                 } catch (java.sql.SQLException se) {
                     System.out.println("---> SQLException -----------> " + se);
+                    tf.setValue(null);
                 } catch(java.lang.NullPointerException np) {
                     System.out.println("<---> NullPointerException <---> " + np + " columnName : " + columnName);
+                    tf.setValue(null);
                 }
                 
                 rowset.addRowSetListener(tf);
@@ -860,6 +865,9 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
 
 /*
  * $Log$
+ * Revision 1.19  2005/05/26 22:20:36  dags
+ * SSField interface implemented
+ *
  * Revision 1.18  2005/05/26 12:12:36  dags
  * added bind(SSRowSet, columnName) method and some java.sql.Types checking and support
  *
