@@ -198,16 +198,31 @@ public class SSImageField extends JPanel implements SSField, RowSetListener, Key
         return this.rowset;
     }
     
+     /**
+     *
+     * @deprecated
+     **/
     public void setNavigator(SSDataNavigator navigator) {
+        this.setSSDataNavigator(navigator);
+    }
+    
+    /**
+     *
+     * @deprecated
+     **/
+    public SSDataNavigator getNavigator() {
+        return this.getSSDataNavigator();
+    }
+    
+    public void setSSDataNavigator(SSDataNavigator navigator) {
         this.navigator = navigator;
-        setRowSet(navigator.getSSRowSet());
+        setSSRowSet(navigator.getSSRowSet());
         bind();
     }
     
-    public SSDataNavigator getNavigator() {
+    public SSDataNavigator getSSDataNavigator() {
         return this.navigator;
     }
-    
     private void DbToFm() {
         
         try {

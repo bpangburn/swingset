@@ -104,16 +104,31 @@ public class SSBooleanField extends JCheckBox implements SSField, RowSetListener
         return this.rowset;
     }
     
+     /**
+     *
+     * @deprecated
+     **/
     public void setNavigator(SSDataNavigator navigator) {
+        this.setSSDataNavigator(navigator);
+    }
+    
+    /**
+     *
+     * @deprecated
+     **/
+    public SSDataNavigator getNavigator() {
+        return this.getSSDataNavigator();
+    }
+    
+    public void setSSDataNavigator(SSDataNavigator navigator) {
         this.navigator = navigator;
-        setRowSet(navigator.getSSRowSet());
+        setSSRowSet(navigator.getSSRowSet());
         bind();
     }
     
-    public SSDataNavigator getNavigator() {
+    public SSDataNavigator getSSDataNavigator() {
         return this.navigator;
     }
-    
     private void DbToFm() {
         
         try {
@@ -308,6 +323,9 @@ public class SSBooleanField extends JCheckBox implements SSField, RowSetListener
 
 /*
  * $Log$
+ * Revision 1.12  2005/05/26 22:20:36  dags
+ * SSField interface implemented
+ *
  * Revision 1.11  2005/05/26 12:12:36  dags
  * added bind(SSRowSet, columnName) method and some java.sql.Types checking and support
  *

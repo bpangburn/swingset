@@ -16,7 +16,7 @@ public class SSFormattedTextFieldBeanInfo extends SimpleBeanInfo {
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( SSFormattedTextField.class , null );
+        BeanDescriptor beanDescriptor = new BeanDescriptor  ( com.nqadmin.swingSet.formatting.SSFormattedTextField.class , null );
         beanDescriptor.setPreferred ( true );
         beanDescriptor.setDisplayName ( "SSFormattedTextField" );
         beanDescriptor.setShortDescription ( "A FormattedTextField bound to a jdbc column" );//GEN-HEADEREND:BeanDescriptor
@@ -39,54 +39,56 @@ public class SSFormattedTextFieldBeanInfo extends SimpleBeanInfo {
     private static final int PROPERTY_helper = 9;
     private static final int PROPERTY_horizontalAlignment = 10;
     private static final int PROPERTY_locale = 11;
-    private static final int PROPERTY_navigator = 12;
-    private static final int PROPERTY_nextFocusableComponent = 13;
-    private static final int PROPERTY_nullable = 14;
-    private static final int PROPERTY_preferredSize = 15;
-    private static final int PROPERTY_SSRowSet = 16;
-    private static final int PROPERTY_text = 17;
-    private static final int PROPERTY_toolTipText = 18;
-    private static final int PROPERTY_value = 19;
-    private static final int PROPERTY_width = 20;
+    private static final int PROPERTY_nextFocusableComponent = 12;
+    private static final int PROPERTY_nullable = 13;
+    private static final int PROPERTY_preferredSize = 14;
+    private static final int PROPERTY_SSDataNavigator = 15;
+    private static final int PROPERTY_SSFormattedComboBox = 16;
+    private static final int PROPERTY_SSRowSet = 17;
+    private static final int PROPERTY_text = 18;
+    private static final int PROPERTY_toolTipText = 19;
+    private static final int PROPERTY_value = 20;
+    private static final int PROPERTY_width = 21;
 
     // Property array 
     /*lazy PropertyDescriptor*/
     private static PropertyDescriptor[] getPdescriptor(){
-        PropertyDescriptor[] properties = new PropertyDescriptor[21];
+        PropertyDescriptor[] properties = new PropertyDescriptor[22];
     
         try {
-            properties[PROPERTY_background] = new PropertyDescriptor ( "background", SSFormattedTextField.class, "getBackground", "setBackground" );
-            properties[PROPERTY_border] = new PropertyDescriptor ( "border", SSFormattedTextField.class, "getBorder", "setBorder" );
-            properties[PROPERTY_columnName] = new PropertyDescriptor ( "columnName", SSFormattedTextField.class, "getColumnName", "setColumnName" );
+            properties[PROPERTY_background] = new PropertyDescriptor ( "background", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getBackground", "setBackground" );
+            properties[PROPERTY_border] = new PropertyDescriptor ( "border", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getBorder", "setBorder" );
+            properties[PROPERTY_columnName] = new PropertyDescriptor ( "columnName", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getColumnName", "setColumnName" );
             properties[PROPERTY_columnName].setPreferred ( true );
             properties[PROPERTY_columnName].setDisplayName ( "Column Name" );
-            properties[PROPERTY_columns] = new PropertyDescriptor ( "columns", SSFormattedTextField.class, "getColumns", "setColumns" );
-            properties[PROPERTY_editable] = new PropertyDescriptor ( "editable", SSFormattedTextField.class, "isEditable", "setEditable" );
-            properties[PROPERTY_enabled] = new PropertyDescriptor ( "enabled", SSFormattedTextField.class, "isEnabled", "setEnabled" );
-            properties[PROPERTY_font] = new PropertyDescriptor ( "font", SSFormattedTextField.class, "getFont", "setFont" );
-            properties[PROPERTY_foreground] = new PropertyDescriptor ( "foreground", SSFormattedTextField.class, "getForeground", "setForeground" );
-            properties[PROPERTY_formatterFactory] = new PropertyDescriptor ( "formatterFactory", SSFormattedTextField.class, "getFormatterFactory", "setFormatterFactory" );
-            properties[PROPERTY_helper] = new PropertyDescriptor ( "helper", SSFormattedTextField.class, null, "setHelper" );
+            properties[PROPERTY_columns] = new PropertyDescriptor ( "columns", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getColumns", "setColumns" );
+            properties[PROPERTY_editable] = new PropertyDescriptor ( "editable", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "isEditable", "setEditable" );
+            properties[PROPERTY_enabled] = new PropertyDescriptor ( "enabled", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "isEnabled", "setEnabled" );
+            properties[PROPERTY_font] = new PropertyDescriptor ( "font", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getFont", "setFont" );
+            properties[PROPERTY_foreground] = new PropertyDescriptor ( "foreground", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getForeground", "setForeground" );
+            properties[PROPERTY_formatterFactory] = new PropertyDescriptor ( "formatterFactory", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getFormatterFactory", "setFormatterFactory" );
+            properties[PROPERTY_helper] = new PropertyDescriptor ( "helper", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, null, "setHelper" );
             properties[PROPERTY_helper].setPreferred ( true );
             properties[PROPERTY_helper].setDisplayName ( "HelperPopup" );
-            properties[PROPERTY_horizontalAlignment] = new PropertyDescriptor ( "horizontalAlignment", SSFormattedTextField.class, "getHorizontalAlignment", "setHorizontalAlignment" );
-            properties[PROPERTY_locale] = new PropertyDescriptor ( "locale", SSFormattedTextField.class, "getLocale", "setLocale" );
-            properties[PROPERTY_navigator] = new PropertyDescriptor ( "navigator", SSFormattedTextField.class, "getNavigator", "setNavigator" );
-            properties[PROPERTY_navigator].setPreferred ( true );
-            properties[PROPERTY_navigator].setDisplayName ( "SSDataNavigator" );
-            properties[PROPERTY_navigator].setShortDescription ( "Linked SSDataNavigator" );
-            properties[PROPERTY_nextFocusableComponent] = new PropertyDescriptor ( "nextFocusableComponent", SSFormattedTextField.class, "getNextFocusableComponent", "setNextFocusableComponent" );
-            properties[PROPERTY_nullable] = new PropertyDescriptor ( "nullable", SSFormattedTextField.class, "isNullable", "setNullable" );
+            properties[PROPERTY_horizontalAlignment] = new PropertyDescriptor ( "horizontalAlignment", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getHorizontalAlignment", "setHorizontalAlignment" );
+            properties[PROPERTY_locale] = new PropertyDescriptor ( "locale", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getLocale", "setLocale" );
+            properties[PROPERTY_nextFocusableComponent] = new PropertyDescriptor ( "nextFocusableComponent", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getNextFocusableComponent", "setNextFocusableComponent" );
+            properties[PROPERTY_nullable] = new PropertyDescriptor ( "nullable", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "isNullable", "setNullable" );
             properties[PROPERTY_nullable].setPreferred ( true );
-            properties[PROPERTY_preferredSize] = new PropertyDescriptor ( "preferredSize", SSFormattedTextField.class, "getPreferredSize", "setPreferredSize" );
-            properties[PROPERTY_SSRowSet] = new PropertyDescriptor ( "SSRowSet", SSFormattedTextField.class, "getSSRowSet", "setSSRowSet" );
+            properties[PROPERTY_preferredSize] = new PropertyDescriptor ( "preferredSize", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getPreferredSize", "setPreferredSize" );
+            properties[PROPERTY_SSDataNavigator] = new PropertyDescriptor ( "SSDataNavigator", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getSSDataNavigator", "setSSDataNavigator" );
+            properties[PROPERTY_SSDataNavigator].setPreferred ( true );
+            properties[PROPERTY_SSDataNavigator].setDisplayName ( "SSDataNavigator" );
+            properties[PROPERTY_SSFormattedComboBox] = new PropertyDescriptor ( "SSFormattedComboBox", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getSSFormattedComboBox", "setSSFormattedComboBox" );
+            properties[PROPERTY_SSFormattedComboBox].setPreferred ( true );
+            properties[PROPERTY_SSRowSet] = new PropertyDescriptor ( "SSRowSet", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getSSRowSet", "setSSRowSet" );
             properties[PROPERTY_SSRowSet].setPreferred ( true );
             properties[PROPERTY_SSRowSet].setDisplayName ( "SSRowSet" );
-            properties[PROPERTY_text] = new PropertyDescriptor ( "text", SSFormattedTextField.class, "getText", "setText" );
-            properties[PROPERTY_toolTipText] = new PropertyDescriptor ( "toolTipText", SSFormattedTextField.class, "getToolTipText", "setToolTipText" );
+            properties[PROPERTY_text] = new PropertyDescriptor ( "text", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getText", "setText" );
+            properties[PROPERTY_toolTipText] = new PropertyDescriptor ( "toolTipText", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getToolTipText", "setToolTipText" );
             properties[PROPERTY_toolTipText].setPreferred ( true );
-            properties[PROPERTY_value] = new PropertyDescriptor ( "value", SSFormattedTextField.class, "getValue", "setValue" );
-            properties[PROPERTY_width] = new PropertyDescriptor ( "width", SSFormattedTextField.class, "getWidth", null );
+            properties[PROPERTY_value] = new PropertyDescriptor ( "value", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getValue", "setValue" );
+            properties[PROPERTY_width] = new PropertyDescriptor ( "width", com.nqadmin.swingSet.formatting.SSFormattedTextField.class, "getWidth", null );
         }
         catch( IntrospectionException e) {}//GEN-HEADEREND:Properties
         

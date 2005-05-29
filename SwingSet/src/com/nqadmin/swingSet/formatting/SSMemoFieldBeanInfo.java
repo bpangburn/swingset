@@ -32,16 +32,17 @@ public class SSMemoFieldBeanInfo extends SimpleBeanInfo {
     private static final int PROPERTY_foreground = 5;
     private static final int PROPERTY_lineWrap = 6;
     private static final int PROPERTY_navigator = 7;
-    private static final int PROPERTY_SSRowSet = 8;
-    private static final int PROPERTY_text = 9;
-    private static final int PROPERTY_toolTipText = 10;
-    private static final int PROPERTY_visible = 11;
-    private static final int PROPERTY_wrapStyleWord = 12;
+    private static final int PROPERTY_SSDataNavigator = 8;
+    private static final int PROPERTY_SSRowSet = 9;
+    private static final int PROPERTY_text = 10;
+    private static final int PROPERTY_toolTipText = 11;
+    private static final int PROPERTY_visible = 12;
+    private static final int PROPERTY_wrapStyleWord = 13;
 
     // Property array 
     /*lazy PropertyDescriptor*/
     private static PropertyDescriptor[] getPdescriptor(){
-        PropertyDescriptor[] properties = new PropertyDescriptor[13];
+        PropertyDescriptor[] properties = new PropertyDescriptor[14];
     
         try {
             properties[PROPERTY_border] = new PropertyDescriptor ( "border", com.nqadmin.swingSet.formatting.SSMemoField.class, "getBorder", "setBorder" );
@@ -53,9 +54,12 @@ public class SSMemoFieldBeanInfo extends SimpleBeanInfo {
             properties[PROPERTY_enabled] = new PropertyDescriptor ( "enabled", com.nqadmin.swingSet.formatting.SSMemoField.class, "isEnabled", "setEnabled" );
             properties[PROPERTY_foreground] = new PropertyDescriptor ( "foreground", com.nqadmin.swingSet.formatting.SSMemoField.class, "getForeground", "setForeground" );
             properties[PROPERTY_lineWrap] = new PropertyDescriptor ( "lineWrap", com.nqadmin.swingSet.formatting.SSMemoField.class, "getLineWrap", "setLineWrap" );
+            properties[PROPERTY_lineWrap].setPreferred ( true );
             properties[PROPERTY_navigator] = new PropertyDescriptor ( "navigator", com.nqadmin.swingSet.formatting.SSMemoField.class, "getNavigator", "setNavigator" );
-            properties[PROPERTY_navigator].setPreferred ( true );
             properties[PROPERTY_navigator].setDisplayName ( "SSDataNavigator" );
+            properties[PROPERTY_SSDataNavigator] = new PropertyDescriptor ( "SSDataNavigator", com.nqadmin.swingSet.formatting.SSMemoField.class, "getSSDataNavigator", "setSSDataNavigator" );
+            properties[PROPERTY_SSDataNavigator].setPreferred ( true );
+            properties[PROPERTY_SSDataNavigator].setDisplayName ( "SSDataNavigator" );
             properties[PROPERTY_SSRowSet] = new PropertyDescriptor ( "SSRowSet", com.nqadmin.swingSet.formatting.SSMemoField.class, "getSSRowSet", "setSSRowSet" );
             properties[PROPERTY_SSRowSet].setPreferred ( true );
             properties[PROPERTY_SSRowSet].setDisplayName ( "SSRowSet" );
@@ -64,6 +68,7 @@ public class SSMemoFieldBeanInfo extends SimpleBeanInfo {
             properties[PROPERTY_toolTipText].setPreferred ( true );
             properties[PROPERTY_visible] = new PropertyDescriptor ( "visible", com.nqadmin.swingSet.formatting.SSMemoField.class, "isVisible", "setVisible" );
             properties[PROPERTY_wrapStyleWord] = new PropertyDescriptor ( "wrapStyleWord", com.nqadmin.swingSet.formatting.SSMemoField.class, "getWrapStyleWord", "setWrapStyleWord" );
+            properties[PROPERTY_wrapStyleWord].setPreferred ( true );
         }
         catch( IntrospectionException e) {}//GEN-HEADEREND:Properties
         

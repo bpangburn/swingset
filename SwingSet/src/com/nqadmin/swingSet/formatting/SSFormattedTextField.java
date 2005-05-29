@@ -191,13 +191,29 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         return rowset;
     }
     
+    /**
+     *
+     * @deprecated
+     **/
     public void setNavigator(SSDataNavigator navigator) {
+        this.setSSDataNavigator(navigator);
+    }
+    
+    /**
+     *
+     * @deprecated
+     **/
+    public SSDataNavigator getNavigator() {
+        return this.getSSDataNavigator();
+    }
+    
+    public void setSSDataNavigator(SSDataNavigator navigator) {
         this.navigator = navigator;
         setSSRowSet(navigator.getSSRowSet());
         bind();
     }
     
-    public SSDataNavigator getNavigator() {
+    public SSDataNavigator getSSDataNavigator() {
         return this.navigator;
     }
     /**
@@ -518,6 +534,7 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         } catch (java.sql.SQLException sqe) {
             System.out.println("Error in DbToFm() = " + sqe);
             sqe.printStackTrace();
+            this.setValue(null);
         }
         
         if ( (nValue instanceof Double  && ((Double)  nValue).doubleValue() < 0.0) ||
@@ -703,7 +720,7 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
                             } else {
                                 System.out.println("ELSE ???");
                             }
-                                                        
+                            
                             if (    (aux instanceof BigDecimal  && ((Double)  aux).doubleValue() < 0.0) ||
                                     (aux instanceof Double      && ((Double)  aux).doubleValue() < 0.0) ||
                                     (aux instanceof Float       && ((Float)   aux).floatValue() < 0.0) ||
@@ -857,7 +874,7 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         this.nullable = nullable;
         this.firePropertyChange("nullable", new Boolean(oldNullable), new Boolean(nullable));
     }
-
+    
     public void cleanField() {
         setValue(null);
     }
@@ -865,6 +882,9 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
 
 /*
  * $Log$
+ * Revision 1.20  2005/05/27 00:37:11  dags
+ * added setValue(null) on exceptions
+ *
  * Revision 1.19  2005/05/26 22:20:36  dags
  * SSField interface implemented
  *

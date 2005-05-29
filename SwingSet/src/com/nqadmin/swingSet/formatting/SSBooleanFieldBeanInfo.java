@@ -16,7 +16,7 @@ public class SSBooleanFieldBeanInfo extends SimpleBeanInfo {
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( SSBooleanField.class , null );
+        BeanDescriptor beanDescriptor = new BeanDescriptor  ( com.nqadmin.swingSet.formatting.SSBooleanField.class , null );
         beanDescriptor.setPreferred ( true );//GEN-HEADEREND:BeanDescriptor
         
         // Here you can add code for customizing the BeanDescriptor.
@@ -28,9 +28,9 @@ public class SSBooleanFieldBeanInfo extends SimpleBeanInfo {
     private static final int PROPERTY_border = 0;
     private static final int PROPERTY_columnName = 1;
     private static final int PROPERTY_locale = 2;
-    private static final int PROPERTY_navigator = 3;
-    private static final int PROPERTY_preferredSize = 4;
-    private static final int PROPERTY_selected = 5;
+    private static final int PROPERTY_preferredSize = 3;
+    private static final int PROPERTY_selected = 4;
+    private static final int PROPERTY_SSDataNavigator = 5;
     private static final int PROPERTY_SSRowSet = 6;
     private static final int PROPERTY_text = 7;
     private static final int PROPERTY_toolTipText = 8;
@@ -42,24 +42,25 @@ public class SSBooleanFieldBeanInfo extends SimpleBeanInfo {
         PropertyDescriptor[] properties = new PropertyDescriptor[10];
     
         try {
-            properties[PROPERTY_border] = new PropertyDescriptor ( "border", SSBooleanField.class, "getBorder", "setBorder" );
-            properties[PROPERTY_columnName] = new PropertyDescriptor ( "columnName", SSBooleanField.class, "getColumnName", "setColumnName" );
+            properties[PROPERTY_border] = new PropertyDescriptor ( "border", com.nqadmin.swingSet.formatting.SSBooleanField.class, "getBorder", "setBorder" );
+            properties[PROPERTY_columnName] = new PropertyDescriptor ( "columnName", com.nqadmin.swingSet.formatting.SSBooleanField.class, "getColumnName", "setColumnName" );
             properties[PROPERTY_columnName].setPreferred ( true );
             properties[PROPERTY_columnName].setDisplayName ( "Column Name" );
-            properties[PROPERTY_locale] = new PropertyDescriptor ( "locale", SSBooleanField.class, "getLocale", "setLocale" );
-            properties[PROPERTY_navigator] = new PropertyDescriptor ( "navigator", SSBooleanField.class, "getNavigator", "setNavigator" );
-            properties[PROPERTY_navigator].setPreferred ( true );
-            properties[PROPERTY_navigator].setDisplayName ( "SSDataNavigator" );
-            properties[PROPERTY_preferredSize] = new PropertyDescriptor ( "preferredSize", SSBooleanField.class, "getPreferredSize", "setPreferredSize" );
-            properties[PROPERTY_selected] = new PropertyDescriptor ( "selected", SSBooleanField.class, "isSelected", "setSelected" );
-            properties[PROPERTY_SSRowSet] = new PropertyDescriptor ( "SSRowSet", SSBooleanField.class, "getSSRowSet", "setSSRowSet" );
+            properties[PROPERTY_locale] = new PropertyDescriptor ( "locale", com.nqadmin.swingSet.formatting.SSBooleanField.class, "getLocale", "setLocale" );
+            properties[PROPERTY_preferredSize] = new PropertyDescriptor ( "preferredSize", com.nqadmin.swingSet.formatting.SSBooleanField.class, "getPreferredSize", "setPreferredSize" );
+            properties[PROPERTY_selected] = new PropertyDescriptor ( "selected", com.nqadmin.swingSet.formatting.SSBooleanField.class, "isSelected", "setSelected" );
+            properties[PROPERTY_selected].setPreferred ( true );
+            properties[PROPERTY_SSDataNavigator] = new PropertyDescriptor ( "SSDataNavigator", com.nqadmin.swingSet.formatting.SSBooleanField.class, "getSSDataNavigator", "setSSDataNavigator" );
+            properties[PROPERTY_SSDataNavigator].setPreferred ( true );
+            properties[PROPERTY_SSDataNavigator].setDisplayName ( "SSDataNavigator" );
+            properties[PROPERTY_SSRowSet] = new PropertyDescriptor ( "SSRowSet", com.nqadmin.swingSet.formatting.SSBooleanField.class, "getSSRowSet", "setSSRowSet" );
             properties[PROPERTY_SSRowSet].setPreferred ( true );
             properties[PROPERTY_SSRowSet].setDisplayName ( "SSRowSet" );
-            properties[PROPERTY_text] = new PropertyDescriptor ( "text", SSBooleanField.class, "getText", "setText" );
+            properties[PROPERTY_text] = new PropertyDescriptor ( "text", com.nqadmin.swingSet.formatting.SSBooleanField.class, "getText", "setText" );
             properties[PROPERTY_text].setPreferred ( true );
-            properties[PROPERTY_toolTipText] = new PropertyDescriptor ( "toolTipText", SSBooleanField.class, "getToolTipText", "setToolTipText" );
+            properties[PROPERTY_toolTipText] = new PropertyDescriptor ( "toolTipText", com.nqadmin.swingSet.formatting.SSBooleanField.class, "getToolTipText", "setToolTipText" );
             properties[PROPERTY_toolTipText].setPreferred ( true );
-            properties[PROPERTY_visible] = new PropertyDescriptor ( "visible", SSBooleanField.class, "isVisible", "setVisible" );
+            properties[PROPERTY_visible] = new PropertyDescriptor ( "visible", com.nqadmin.swingSet.formatting.SSBooleanField.class, "isVisible", "setVisible" );
         }
         catch( IntrospectionException e) {}//GEN-HEADEREND:Properties
         

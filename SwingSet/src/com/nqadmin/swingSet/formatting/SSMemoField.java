@@ -93,16 +93,16 @@ public class SSMemoField extends JTextArea implements SSField, RowSetListener, K
         bind();
     }
 
-    /*
+    /**
      * @deprecated
-     */
+     **/
     public void setRowSet(SSRowSet rowset) {
         setSSRowSet(rowset);
     }
     
-    /*
+    /**
      * @deprecated
-     */
+     **/
     public SSRowSet getRowSet() {
         return getSSRowSet();
     }
@@ -116,16 +116,31 @@ public class SSMemoField extends JTextArea implements SSField, RowSetListener, K
         return this.rowset;
     }
     
+     /**
+     *
+     * @deprecated
+     **/
     public void setNavigator(SSDataNavigator navigator) {
-        this.navigator = navigator;
-        setRowSet(navigator.getSSRowSet());
+        this.setSSDataNavigator(navigator);
     }
     
+    /**
+     *
+     * @deprecated
+     **/
     public SSDataNavigator getNavigator() {
+        return this.getSSDataNavigator();
+    }
+    
+    public void setSSDataNavigator(SSDataNavigator navigator) {
+        this.navigator = navigator;
+        setSSRowSet(navigator.getSSRowSet());
+        bind();
+    }
+    
+    public SSDataNavigator getSSDataNavigator() {
         return this.navigator;
     }
-    
-    
     private void DbToFm() {
         
         try {
@@ -145,6 +160,7 @@ public class SSMemoField extends JTextArea implements SSField, RowSetListener, K
             }
         } catch (java.sql.SQLException sqe) {
             System.out.println("Error in DbToFm() = " + sqe);
+            this.setText("");
         }
     }
     
@@ -334,8 +350,10 @@ public class SSMemoField extends JTextArea implements SSField, RowSetListener, K
                     rowset.addRowSetListener(tf);
                 } catch (java.sql.SQLException se) {
                     System.out.println("SSMemoField ---> SQLException -----------> " + se);
+                    tf.setText("");
                 } catch(java.lang.NullPointerException np) {
                     System.out.println("SSMemoField ---> NullPointerException ---> " + np);
+                    tf.setText("");
                 }
                 return true;
             } else {

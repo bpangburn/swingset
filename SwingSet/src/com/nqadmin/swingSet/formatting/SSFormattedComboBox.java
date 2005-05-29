@@ -120,13 +120,30 @@ public class SSFormattedComboBox extends JComboBox implements SSField, ActionLis
         return table;
     }
     
+    /**
+     *
+     * @deprecated
+     */
     public void setNavigator(SSDataNavigator navigator) {
         this.navigator = navigator;
         editor.setNavigator(navigator);
     }
     
+    /**
+     *
+     * @deprecated
+     */
     public SSDataNavigator getNavigator() {
         return navigator;
+    }
+    
+    public void setSSDataNavigator(SSDataNavigator navigator) {
+        this.navigator = navigator;
+        editor.setSSRowSet(navigator.getSSRowSet());
+    }
+    
+    public SSDataNavigator getSSDataNavigator() {
+        return this.navigator;
     }
     
     public void setSSRowSet(SSRowSet rowset) {
@@ -155,13 +172,29 @@ public class SSFormattedComboBox extends JComboBox implements SSField, ActionLis
         return colType;
     }
     
+    /**
+     *
+     * @deprecated
+     */
     public void setConnection(SSConnection connection) {
-        this.connection = connection;
-        model.setSsConnection(connection);
+        this.setSSConnection(connection);
     }
     
+    /**
+     *
+     * @deprecated
+     */
     public SSConnection getConnection() {
-        return connection;
+        return this.getSSConnection();
+    }
+    
+    public void setSSConnection(SSConnection connection) {
+        this.connection = connection;
+        model.setSSConnection(connection);
+    }
+    
+    public SSConnection getSSConnection() {
+        return this.connection;
     }
     
     public void configureEditor(javax.swing.ComboBoxEditor anEditor, Object anItem) {
@@ -178,7 +211,7 @@ public class SSFormattedComboBox extends JComboBox implements SSField, ActionLis
         retValue = editor.getEditorField().getInputVerifier();
         return retValue;
     }
-
+    
     public void cleanField() {
         
     }

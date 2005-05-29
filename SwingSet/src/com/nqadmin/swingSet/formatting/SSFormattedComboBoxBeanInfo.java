@@ -16,7 +16,7 @@ public class SSFormattedComboBoxBeanInfo extends SimpleBeanInfo {
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( SSFormattedComboBox.class , null );//GEN-HEADEREND:BeanDescriptor
+        BeanDescriptor beanDescriptor = new BeanDescriptor  ( com.nqadmin.swingSet.formatting.SSFormattedComboBox.class , null );//GEN-HEADEREND:BeanDescriptor
         
         // Here you can add code for customizing the BeanDescriptor.
         
@@ -25,23 +25,23 @@ public class SSFormattedComboBoxBeanInfo extends SimpleBeanInfo {
     
     // Property identifiers//GEN-FIRST:Properties
     private static final int PROPERTY_columnType = 0;
-    private static final int PROPERTY_connection = 1;
-    private static final int PROPERTY_dataColumn = 2;
-    private static final int PROPERTY_editable = 3;
-    private static final int PROPERTY_editor = 4;
-    private static final int PROPERTY_evenRowBackground = 5;
-    private static final int PROPERTY_evenRowForeground = 6;
+    private static final int PROPERTY_dataColumn = 1;
+    private static final int PROPERTY_editable = 2;
+    private static final int PROPERTY_editor = 3;
+    private static final int PROPERTY_evenRowBackground = 4;
+    private static final int PROPERTY_evenRowForeground = 5;
+    private static final int PROPERTY_insets = 6;
     private static final int PROPERTY_listColumn = 7;
     private static final int PROPERTY_locale = 8;
     private static final int PROPERTY_model = 9;
-    private static final int PROPERTY_navigator = 10;
-    private static final int PROPERTY_nextFocusableComponent = 11;
-    private static final int PROPERTY_oddRowBackground = 12;
-    private static final int PROPERTY_oddRowForeground = 13;
-    private static final int PROPERTY_orderBy = 14;
-    private static final int PROPERTY_preferredSize = 15;
-    private static final int PROPERTY_prototypeDisplayValue = 16;
-    private static final int PROPERTY_renderer = 17;
+    private static final int PROPERTY_oddRowBackground = 10;
+    private static final int PROPERTY_oddRowForeground = 11;
+    private static final int PROPERTY_orderBy = 12;
+    private static final int PROPERTY_preferredSize = 13;
+    private static final int PROPERTY_prototypeDisplayValue = 14;
+    private static final int PROPERTY_renderer = 15;
+    private static final int PROPERTY_SSConnection = 16;
+    private static final int PROPERTY_SSDataNavigator = 17;
     private static final int PROPERTY_SSRowSet = 18;
     private static final int PROPERTY_table = 19;
     private static final int PROPERTY_width = 20;
@@ -52,39 +52,40 @@ public class SSFormattedComboBoxBeanInfo extends SimpleBeanInfo {
         PropertyDescriptor[] properties = new PropertyDescriptor[21];
     
         try {
-            properties[PROPERTY_columnType] = new PropertyDescriptor ( "columnType", SSFormattedComboBox.class, "getColumnType", "setColumnType" );
+            properties[PROPERTY_columnType] = new PropertyDescriptor ( "columnType", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getColumnType", "setColumnType" );
             properties[PROPERTY_columnType].setPreferred ( true );
-            properties[PROPERTY_connection] = new PropertyDescriptor ( "connection", SSFormattedComboBox.class, "getConnection", "setConnection" );
-            properties[PROPERTY_connection].setPreferred ( true );
-            properties[PROPERTY_dataColumn] = new PropertyDescriptor ( "dataColumn", SSFormattedComboBox.class, "getDataColumn", "setDataColumn" );
+            properties[PROPERTY_dataColumn] = new PropertyDescriptor ( "dataColumn", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getDataColumn", "setDataColumn" );
             properties[PROPERTY_dataColumn].setPreferred ( true );
-            properties[PROPERTY_editable] = new PropertyDescriptor ( "editable", SSFormattedComboBox.class, "isEditable", "setEditable" );
-            properties[PROPERTY_editor] = new PropertyDescriptor ( "editor", SSFormattedComboBox.class, "getEditor", "setEditor" );
-            properties[PROPERTY_evenRowBackground] = new PropertyDescriptor ( "evenRowBackground", SSFormattedComboBox.class, "getEvenRowBackground", "setEvenRowBackground" );
+            properties[PROPERTY_editable] = new PropertyDescriptor ( "editable", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "isEditable", "setEditable" );
+            properties[PROPERTY_editor] = new PropertyDescriptor ( "editor", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getEditor", "setEditor" );
+            properties[PROPERTY_evenRowBackground] = new PropertyDescriptor ( "evenRowBackground", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getEvenRowBackground", "setEvenRowBackground" );
             properties[PROPERTY_evenRowBackground].setPreferred ( true );
-            properties[PROPERTY_evenRowForeground] = new PropertyDescriptor ( "evenRowForeground", SSFormattedComboBox.class, "getEvenRowForeground", "setEvenRowForeground" );
+            properties[PROPERTY_evenRowForeground] = new PropertyDescriptor ( "evenRowForeground", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getEvenRowForeground", "setEvenRowForeground" );
             properties[PROPERTY_evenRowForeground].setPreferred ( true );
-            properties[PROPERTY_listColumn] = new PropertyDescriptor ( "listColumn", SSFormattedComboBox.class, "getListColumn", "setListColumn" );
+            properties[PROPERTY_insets] = new PropertyDescriptor ( "insets", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getInsets", null );
+            properties[PROPERTY_listColumn] = new PropertyDescriptor ( "listColumn", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getListColumn", "setListColumn" );
             properties[PROPERTY_listColumn].setPreferred ( true );
-            properties[PROPERTY_locale] = new PropertyDescriptor ( "locale", SSFormattedComboBox.class, "getLocale", "setLocale" );
-            properties[PROPERTY_model] = new PropertyDescriptor ( "model", SSFormattedComboBox.class, "getModel", "setModel" );
-            properties[PROPERTY_navigator] = new PropertyDescriptor ( "navigator", SSFormattedComboBox.class, "getNavigator", "setNavigator" );
-            properties[PROPERTY_navigator].setPreferred ( true );
-            properties[PROPERTY_nextFocusableComponent] = new PropertyDescriptor ( "nextFocusableComponent", SSFormattedComboBox.class, "getNextFocusableComponent", "setNextFocusableComponent" );
-            properties[PROPERTY_oddRowBackground] = new PropertyDescriptor ( "oddRowBackground", SSFormattedComboBox.class, "getOddRowBackground", "setOddRowBackground" );
+            properties[PROPERTY_locale] = new PropertyDescriptor ( "locale", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getLocale", "setLocale" );
+            properties[PROPERTY_model] = new PropertyDescriptor ( "model", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getModel", "setModel" );
+            properties[PROPERTY_oddRowBackground] = new PropertyDescriptor ( "oddRowBackground", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getOddRowBackground", "setOddRowBackground" );
             properties[PROPERTY_oddRowBackground].setPreferred ( true );
-            properties[PROPERTY_oddRowForeground] = new PropertyDescriptor ( "oddRowForeground", SSFormattedComboBox.class, "getOddRowForeground", "setOddRowForeground" );
+            properties[PROPERTY_oddRowForeground] = new PropertyDescriptor ( "oddRowForeground", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getOddRowForeground", "setOddRowForeground" );
             properties[PROPERTY_oddRowForeground].setPreferred ( true );
-            properties[PROPERTY_orderBy] = new PropertyDescriptor ( "orderBy", SSFormattedComboBox.class, "getOrderBy", "setOrderBy" );
+            properties[PROPERTY_orderBy] = new PropertyDescriptor ( "orderBy", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getOrderBy", "setOrderBy" );
             properties[PROPERTY_orderBy].setPreferred ( true );
-            properties[PROPERTY_preferredSize] = new PropertyDescriptor ( "preferredSize", SSFormattedComboBox.class, "getPreferredSize", "setPreferredSize" );
-            properties[PROPERTY_prototypeDisplayValue] = new PropertyDescriptor ( "prototypeDisplayValue", SSFormattedComboBox.class, "getPrototypeDisplayValue", "setPrototypeDisplayValue" );
-            properties[PROPERTY_renderer] = new PropertyDescriptor ( "renderer", SSFormattedComboBox.class, "getRenderer", "setRenderer" );
-            properties[PROPERTY_SSRowSet] = new PropertyDescriptor ( "SSRowSet", SSFormattedComboBox.class, "getSSRowSet", "setSSRowSet" );
+            properties[PROPERTY_preferredSize] = new PropertyDescriptor ( "preferredSize", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getPreferredSize", "setPreferredSize" );
+            properties[PROPERTY_prototypeDisplayValue] = new PropertyDescriptor ( "prototypeDisplayValue", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getPrototypeDisplayValue", "setPrototypeDisplayValue" );
+            properties[PROPERTY_renderer] = new PropertyDescriptor ( "renderer", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getRenderer", "setRenderer" );
+            properties[PROPERTY_SSConnection] = new PropertyDescriptor ( "SSConnection", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getSSConnection", "setSSConnection" );
+            properties[PROPERTY_SSConnection].setPreferred ( true );
+            properties[PROPERTY_SSDataNavigator] = new PropertyDescriptor ( "SSDataNavigator", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getSSDataNavigator", "setSSDataNavigator" );
+            properties[PROPERTY_SSDataNavigator].setPreferred ( true );
+            properties[PROPERTY_SSDataNavigator].setDisplayName ( "SSDataNavigator" );
+            properties[PROPERTY_SSRowSet] = new PropertyDescriptor ( "SSRowSet", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getSSRowSet", "setSSRowSet" );
             properties[PROPERTY_SSRowSet].setPreferred ( true );
-            properties[PROPERTY_table] = new PropertyDescriptor ( "table", SSFormattedComboBox.class, "getTable", "setTable" );
+            properties[PROPERTY_table] = new PropertyDescriptor ( "table", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getTable", "setTable" );
             properties[PROPERTY_table].setPreferred ( true );
-            properties[PROPERTY_width] = new PropertyDescriptor ( "width", SSFormattedComboBox.class, "getWidth", null );
+            properties[PROPERTY_width] = new PropertyDescriptor ( "width", com.nqadmin.swingSet.formatting.SSFormattedComboBox.class, "getWidth", null );
         }
         catch( IntrospectionException e) {}//GEN-HEADEREND:Properties
         

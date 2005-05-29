@@ -401,6 +401,7 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
     /**
      * Getter for property ssConnection.
      * @return Value of property ssConnection.
+     * @deprecated
      */
     public com.nqadmin.swingSet.datasources.SSConnection getSsConnection() {
         return this.ssConnection;
@@ -409,12 +410,28 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
     /**
      * Setter for property ssConnection.
      * @param ssConnection New value of property ssConnection.
+     * @deprecated
      */
     public void setSsConnection(com.nqadmin.swingSet.datasources.SSConnection ssConnection) {
         this.ssConnection = ssConnection;
         this.refresh();
     }
+     /**
+     * Getter for property ssConnection.
+     * @return Value of property ssConnection.
+     */
+    public com.nqadmin.swingSet.datasources.SSConnection getSSConnection() {
+        return this.ssConnection;
+    }
     
+    /**
+     * Setter for property ssConnection.
+     * @param ssConnection New value of property ssConnection.
+     */
+    public void setSSConnection(com.nqadmin.swingSet.datasources.SSConnection ssConnection) {
+        this.ssConnection = ssConnection;
+        this.refresh();
+    }
     public Object getElementAt(int index) {
         return listList.get(index);
         
