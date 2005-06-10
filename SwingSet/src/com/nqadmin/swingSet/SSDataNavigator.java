@@ -631,20 +631,30 @@ public class SSDataNavigator extends JPanel {
         refreshButton.setToolTipText("Refresh");
         addButton.setToolTipText("Add Record");
         deleteButton.setToolTipText("Delete Record");
-        
-    // MAKE THE BUTTONS NON FOCUSABLE.
-        firstButton.setFocusable(false);
-        previousButton.setFocusable(false);
-        nextButton.setFocusable(false);
-        lastButton.setFocusable(false);
-        commitButton.setFocusable(false);
-        undoButton.setFocusable(false);
-        refreshButton.setFocusable(false);
-        addButton.setFocusable(false);
-        deleteButton.setFocusable(false);
-        txtCurrentRow.setFocusable(false);    
-
+       
+    
     } // end protected void addToolTips() {
+        
+    /**
+     *    This will make all the components in the navigator to either focusable
+     *components or non focusable components.
+     *Set to false if you don't want any of the buttons or text fields in the navigator to
+     *receive the focus else true. The default value is true.
+     *@param focusable - false if you don't want the navigator to receive focus else false.
+     */    
+    public void setFocusable(boolean focusable){
+    // MAKE THE BUTTONS NON FOCUSABLE IF REQUESTED
+        firstButton.setFocusable(focusable);
+        previousButton.setFocusable(focusable);
+        nextButton.setFocusable(focusable);
+        lastButton.setFocusable(focusable);
+        commitButton.setFocusable(focusable);
+        undoButton.setFocusable(focusable);
+        refreshButton.setFocusable(focusable);
+        addButton.setFocusable(focusable);
+        deleteButton.setFocusable(focusable);
+        txtCurrentRow.setFocusable(focusable); 
+    }    
 
     /**
      * Sets the dimensions for the navigator components.
@@ -1204,6 +1214,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.38  2005/05/24 16:35:45  prasanth
+ * Made the current row number text field non focusable.
+ *
  * Revision 1.37  2005/05/24 14:33:35  prasanth
  * Made the buttons non focusable.
  *
