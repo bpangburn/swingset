@@ -979,6 +979,7 @@ public class SSDataGrid extends JTable {
             tableModel.setJTable(this);
 
         // THIS CAUSES THE JTABLE TO DISPLAY THE HORIZONTAL SCROLL BAR AS NEEDED.
+        // CODE IN HIDECOLUMNS FUNCTION DEPENDS ON THIS VARIABLE.
             this.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         // ADD THE JTABLE TO A SCROLL BAR
@@ -1034,13 +1035,14 @@ public class SSDataGrid extends JTable {
      * Hides the columns specified in the hidden columns list.
      */
     protected void hideColumns(){
+
     // SET THE MINIMUM WIDTH OF COLUMNS
         TableColumnModel columnModel = this.getColumnModel();
         TableColumn column;
         for (int i=columnModel.getColumnCount()-1;i>=0;i--) {
             column = columnModel.getColumn(i);
             int j = -1;
-
+            
             if (hiddenColumns != null) {
             // SET THE WIDTH OF HIDDEN COLUMNS AS 0
                 for (j=0; j<hiddenColumns.length;j++) {
@@ -1051,12 +1053,21 @@ public class SSDataGrid extends JTable {
                         break;
                     }
                 }
+            // AUTO RESIZE IS SET TO OFF IN THE INIT FUNCTION.
+            // SO IF IT IS NOT IN AUTO RESIZE MODE THEN USER HAS REQUESTED 
+            // AUTO RESIZING. SO DON'T SET ANY SPECIFIC SIZE TO THE COLUMNS.    
                 if (j == hiddenColumns.length) {
-                    column.setMinWidth(columnWidth);
+                    if(getAutoResizeMode() == AUTO_RESIZE_OFF){
+                        column.setPreferredWidth(columnWidth);
+                    }
+                        
                 }
             } else {
             // SET OTHER COLUMNS MIN WIDTH TO 100
-                column.setMinWidth(columnWidth);
+                if(getAutoResizeMode() == AUTO_RESIZE_OFF){
+                    column.setPreferredWidth(columnWidth);
+                }
+                    
             }
         }
         updateUI();
@@ -1401,6 +1412,10 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.33  2005/03/09 21:59:41  prasanth
+ * 1. Using DefaultTableCellRenderer.UIResource as parent class for ComboRenderer.
+ * 2. Added custom editor for Numeric, String, & Object class types.
+ *
  * Revision 1.32  2005/03/03 15:04:44  yoda2
  * Added setSurrendersFocusOnKeystroke(true); to init() to force the JTable to surrender the focus to the editor following keystroke-based navigation.  This seems to fix the problem with editors not working in the DataGrid following tab-based cell navigation.
  *
