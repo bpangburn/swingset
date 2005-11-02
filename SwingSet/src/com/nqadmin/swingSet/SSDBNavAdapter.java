@@ -123,6 +123,21 @@ public class SSDBNavAdapter implements SSDBNav, Serializable {
      */    
     public void performRefreshOps(){
     }
+    
+    /**
+     * This functions is called just before calling the updateRow on the rowset.
+     * @return true is the row can be updated else false.
+     */
+    public boolean allowUpdate(){
+    	return true;
+    }
+    
+    /**
+     * Method to perform operations after the updateRow has been called.
+     */
+    public void performPostUpdateOps(){
+    	
+    }
 
 } // end public class SSDBNavAdapter implements SSDBNav, Serializable {
 
@@ -130,6 +145,9 @@ public class SSDBNavAdapter implements SSDBNav, Serializable {
 
 /*
  * $Log$
+ * Revision 1.10  2005/05/03 15:22:28  prasanth
+ * Added default implementations for new functions allowInsertion & allowDeletion.
+ *
  * Revision 1.9  2005/02/09 17:21:21  yoda2
  * JavaDoc cleanup.
  *
