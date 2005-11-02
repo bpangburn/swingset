@@ -726,7 +726,24 @@ public class SSDataNavigator extends JPanel {
                 public void actionPerformed(ActionEvent ae) {
                     try {
                         if ( modification ) {
-                            sSRowSet.updateRow();
+                        // CHECK IF THE DBNAV IS NULL IF SO UPDATE ROW	
+                        	if(dBNav == null ){
+                        		sSRowSet.updateRow();
+                        	}
+                        	else {
+                        	// IF DBNAV IS NOT NULL CALL ALLOW UPDATE	
+                        		if(dBNav.allowUpdate()){
+                        		// UPDATE ALLOWED GO AHEAD AND DO THE UPDATE	
+                        			sSRowSet.updateRow();
+                        			dBNav.performPostUpdateOps();
+                        		}
+                        		else{
+                        		// UPDATE NOT ALLOWED SO DO NOTHING.
+                        		// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
+                        	    // TO THE ROW THAT SHOULD BE UNDONE.
+                        			return;
+                        		}
+                        	}
                         }
                         sSRowSet.first();
 
@@ -761,7 +778,24 @@ public class SSDataNavigator extends JPanel {
                     try {
                         //if( sSRowSet.rowUpdated() )
                         if ( modification ) {
-                            sSRowSet.updateRow();
+                        // CHECK IF THE DBNAV IS NULL IF SO UPDATE ROW	
+                        	if(dBNav == null ){
+                        		sSRowSet.updateRow();
+                        	}
+                        	else {
+                        	// IF DBNAV IS NOT NULL CALL ALLOW UPDATE	
+                        		if(dBNav.allowUpdate()){
+                        		// UPDATE ALLOWED GO AHEAD AND DO THE UPDATE	
+                        			sSRowSet.updateRow();
+                        			dBNav.performPostUpdateOps();
+                        		}
+                        		else{
+                        		// UPDATE NOT ALLOWED SO DO NOTHING.
+                        		// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
+                        	    // TO THE ROW THAT SHOULD BE UNDONE.
+                        			return;
+                        		}
+                        	}
                         }
                         if ( sSRowSet.getRow() != 0 && !sSRowSet.previous() ) {
                             sSRowSet.first();
@@ -799,7 +833,24 @@ public class SSDataNavigator extends JPanel {
                     try {
                         //if( sSRowSet.rowUpdated() )
                         if ( modification ) {
-                            sSRowSet.updateRow();
+                        // CHECK IF THE DBNAV IS NULL IF SO UPDATE ROW	
+                        	if(dBNav == null ){
+                        		sSRowSet.updateRow();
+                        	}
+                        	else {
+                        	// IF DBNAV IS NOT NULL CALL ALLOW UPDATE	
+                        		if(dBNav.allowUpdate()){
+                        		// UPDATE ALLOWED GO AHEAD AND DO THE UPDATE	
+                        			sSRowSet.updateRow();
+                        			dBNav.performPostUpdateOps();
+                        		}
+                        		else{
+                        		// UPDATE NOT ALLOWED SO DO NOTHING.
+                        		// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
+                        	    // TO THE ROW THAT SHOULD BE UNDONE.
+                        			return;
+                        		}
+                        	}
                         }
                         if ( !sSRowSet.next() ) {
                             nextButton.setEnabled(false);
@@ -841,7 +892,24 @@ public class SSDataNavigator extends JPanel {
                     try {
                         //if( sSRowSet.rowUpdated() )
                         if ( modification ) {
-                            sSRowSet.updateRow();
+                        // CHECK IF THE DBNAV IS NULL IF SO UPDATE ROW	
+                        	if(dBNav == null ){
+                        		sSRowSet.updateRow();
+                        	}
+                        	else {
+                        	// IF DBNAV IS NOT NULL CALL ALLOW UPDATE	
+                        		if(dBNav.allowUpdate()){
+                        		// UPDATE ALLOWED GO AHEAD AND DO THE UPDATE	
+                        			sSRowSet.updateRow();
+                        			dBNav.performPostUpdateOps();
+                        		}
+                        		else{
+                        		// UPDATE NOT ALLOWED SO DO NOTHING.
+                        		// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
+                        	    // TO THE ROW THAT SHOULD BE UNDONE.
+                        			return;
+                        		}
+                        	}
                         }
                         sSRowSet.last();
 
@@ -904,7 +972,24 @@ public class SSDataNavigator extends JPanel {
                             
                         } else {
                         // ELSE UPDATE THE PRESENT ROW VALUES.
-                            sSRowSet.updateRow();
+                        // CHECK IF THE DBNAV IS NULL IF SO UPDATE ROW	
+                        	if(dBNav == null ){
+                        		sSRowSet.updateRow();
+                        	}
+                        	else {
+                        	// IF DBNAV IS NOT NULL CALL ALLOW UPDATE	
+                        		if(dBNav.allowUpdate()){
+                        		// UPDATE ALLOWED GO AHEAD AND DO THE UPDATE	
+                        			sSRowSet.updateRow();
+                        			dBNav.performPostUpdateOps();
+                        		}
+                        		else{
+                        		// UPDATE NOT ALLOWED SO DO NOTHING.
+                        		// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
+                        	    // TO THE ROW THAT SHOULD BE UNDONE.
+                        			return;
+                        		}
+                        	}
                         }
 
                         onInsertRow = false;
@@ -1214,6 +1299,10 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.39  2005/06/10 20:36:31  prasanth
+ * Added function setFocusable. This will call setFocusable on all buttons and the
+ * text field.
+ *
  * Revision 1.38  2005/05/24 16:35:45  prasanth
  * Made the current row number text field non focusable.
  *
