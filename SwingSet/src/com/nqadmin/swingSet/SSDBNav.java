@@ -115,15 +115,14 @@ public interface SSDBNav {
     /**
      *  This function will be called after performPreDeletionOps is  called but before
      *the row is deleted.
-     *@return true is the row can be deleted else false.
+     *@return true if the row can be deleted else false.
      */
     public boolean allowDeletion();
     
     /**
      * Method to perform pre-deletion operations.
      *
-     * SSRowSet does not provide any notifications before the deletion of a row. but a notification
-     * will be received after the deletion if you have listener for the SSRowSet.
+     * SSRowSet provides notification before the deletion of a row. 
      */
     public void performPreDeletionOps();
 
@@ -148,6 +147,17 @@ public interface SSDBNav {
      * Method to perform operations when the user hits the refresh button.
      */
     public void performRefreshOps();
+    
+    /**
+     * This functions is called just before calling the updateRow on the rowset.
+     * @return true is the row can be updated else false.
+     */
+    public boolean allowUpdate();
+    
+    /**
+     * Method to perform operations after the updateRow has been called.
+     */
+    public void performPostUpdateOps();
 
 } // end public interface SSDBNav {
 
@@ -155,6 +165,11 @@ public interface SSDBNav {
 
 /*
  * $Log$
+ * Revision 1.12  2005/05/03 15:17:38  prasanth
+ * Added two new functions to the interface.
+ * 1. allowInsertion
+ * 2. allowDeletion
+ *
  * Revision 1.11  2005/02/09 17:21:21  yoda2
  * JavaDoc cleanup.
  *
