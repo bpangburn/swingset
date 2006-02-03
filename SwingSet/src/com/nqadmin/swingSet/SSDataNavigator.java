@@ -520,7 +520,7 @@ public class SSDataNavigator extends JPanel {
      */
     public boolean updatePresentRow() {
         try {
-            if (!onInsertRow) {
+            if (!onInsertRow && modification) {
                 sSRowSet.updateRow();
             }
             return true;
@@ -1299,6 +1299,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.40  2005/11/02 17:18:23  prasanth
+ * Calling the allowUpdate & performPostUpdateOps functions on SSDBNav.
+ *
  * Revision 1.39  2005/06/10 20:36:31  prasanth
  * Added function setFocusable. This will call setFocusable on all buttons and the
  * text field.
