@@ -48,17 +48,42 @@ import java.text.ParseException;
  */
 public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
 
+	public static final int MMDDYYYY = 0;
+	public static final int DDMMYYYY = 1;
+	
+	private int format = 0;
+	
     public SSDateFormatterFactory() {
         this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("DD/mm/yyyy")));
         this.setNullFormatter(null);
         this.setEditFormatter(new DateFormatter(new SimpleDateFormat("ddMMyyyy")));
         this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("MMM dd, yyyy")));
     }
+    
+    public SSDateFormatterFactory(int format){
+    	switch(format){
+    	case 0:
+    		this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("MM/dd/yyyy")));
+            this.setNullFormatter(null);
+            this.setEditFormatter(new DateFormatter(new SimpleDateFormat("MMddyyyy")));
+            this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("MMM dd, yyyy")));
+    		break;
+    	case 1:
+    		this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("DD/mm/yyyy")));
+            this.setNullFormatter(null);
+            this.setEditFormatter(new DateFormatter(new SimpleDateFormat("ddMMyyyy")));
+            this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("MMM dd, yyyy")));
+    		break;
+    	}
+    }
 }
 
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/04 22:42:06  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.4  2005/01/18 23:37:59  dags
  * Diego's name fix
  *
