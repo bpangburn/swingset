@@ -5,23 +5,42 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 $Id$
 
 ==============================================================================
-SwingSet 1.0.0-PR3 - Released xx-xx-2005
+SwingSet 1.0.0-PR3 - Released xx-xx-2006
 ==============================================================================
 
 Changes:
 	SSDBNav:
-		1. Added two new functions to the interface.
+		1. Added four new functions to the interface.
 			a) allowInsertion
 			b) allowDeletion
+			c) allowUpdate
+			d) performPostUpdateOps			
 	
 	SSDBNavAdapter:
 		1. Added default implementations for allowInsertion & allowDeletion
 			Both functions return true by default.
-	
+		2. Added default inplementations for allowUpdate & performPostUpdateOps
+			
 	SSDataNavigator:
 		1. Calling the functions allowInsertion & allowDeletion prior to adding
 			row or deleting the row.
+		2. In the updatePresentRow function checking for modification variable 
+			before updating the row.	
+		3. Added calls to allowUpdate & performPostUpdateOps
 			
+	SSFormatterTextField:
+		1. Added the function updateValue to programmatically change the value
+			in the field. This was needed as setText will not work with 
+			formatting.
+		
+	SSDateField:
+		1. Added a constructor to date the date format.
+		2. Added two constants to represent the date formats
+
+	SSDateFormatterFactory:
+		1. Added a constructor to date the date format.
+		2. Added two constants to represent the date formats	
+				
 ==============================================================================
 SwingSet 1.0.0-PR2 - Released 03-09-2005
 ==============================================================================
