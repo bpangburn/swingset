@@ -41,11 +41,18 @@ import com.nqadmin.swingSet.formatting.SSDateFormatterFactory;
 
 public class SSDateField extends SSFormattedTextField {
     
+	public static final int MMDDYYYY = 0;
+	public static final int DDMMYYYY = 1;
+	
     /** Creates a new instance of SSDateField */
-    public SSDateField() {
-        this(new SSDateFormatterFactory());
+    public SSDateField(int format) {
+        this(new SSDateFormatterFactory(format));
     }
             
+    public SSDateField(){
+    	this(new SSDateFormatterFactory());
+    }
+    
     public SSDateField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         this.setValue(new java.util.Date());
@@ -59,6 +66,9 @@ public class SSDateField extends SSFormattedTextField {
 
 /*
  * $Log$
+ * Revision 1.7  2005/05/26 22:20:36  dags
+ * SSField interface implemented
+ *
  * Revision 1.6  2005/03/28 14:46:42  dags
  * syncro commit
  *
