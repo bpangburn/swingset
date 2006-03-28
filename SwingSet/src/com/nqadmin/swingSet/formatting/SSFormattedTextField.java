@@ -50,6 +50,7 @@ import java.beans.beancontext.BeanContextChild;
 import java.beans.beancontext.BeanContextChildSupport;
 import java.beans.beancontext.BeanContextProxy;
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
 
@@ -405,8 +406,14 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
                     
                 case java.sql.Types.DATE://91
                     //System.out.println("DATE implemented as java.util.Date --> " + columnName);
-                    nValue = new java.util.Date(rowset.getDate(columnName).getTime());
-                    this.setValue(nValue);
+                	Date date = rowset.getDate(columnName);
+                	if(date != null){
+                		nValue = new java.util.Date(rowset.getDate(columnName).getTime());
+                		this.setValue(nValue);
+                	}
+                	else{
+                		this.setValue(null);
+                	}
                     break;
                     
                 case java.sql.Types.DECIMAL://3
@@ -627,192 +634,225 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
             try {
                 tf.commitEdit();
             } catch (java.text.ParseException pe) {
-                System.out.println("inputVerifier --> ParseException");
+                System.out.println("inputVerifier --> ParseException  POSITION:" + pe.getErrorOffset());
                 tf.setValue(null);
                 setBackground(java.awt.Color.RED);
                 return false;
             }
-            
+           
             aux = tf.getValue();
-            
-            passed = validateField(aux);
-            
-            if (passed == true) {
-                
-                setBackground(java.awt.Color.WHITE);
-                
-                aux = tf.getValue();
-                //System.out.println("inputVerifier(): " + columnName + " aux = " + aux + " colType = " + colType);
-                //System.out.println("aux is a " + aux.getClass().getName());
-                
-                if (columnName == null) return true;
-                if (colType    == -99 ) return true;
-                if (rowset     == null) return true;
-                
-                try {
-                    
-                    rowset.removeRowSetListener(tf);
-                    
-                    if (aux == null) {
-                        System.out.println("aux IS null");
-                        rowset.updateNull(columnName);
-                        rowset.addRowSetListener(tf);
-                        tf.firePropertyChange("value", null, aux);
-                        return true;
-                    }
-                    
-                    switch(colType) {
-                        
-                        case java.sql.Types.ARRAY://2003
-                            break;
-                            
-                        case java.sql.Types.BINARY://-2
-                            break;
-                            
-                        case java.sql.Types.BIT://-7
-                            System.out.println("BIT --> updateBoolean()");
-                            rowset.updateBoolean(columnName, ((Boolean)tf.getValue()).booleanValue());
-                            break;
-                            
-                        case java.sql.Types.BLOB://2004
-                            break;
-                            
-                        case java.sql.Types.BOOLEAN://16
-                            System.out.println("BOOLEAN - Set");
-                            rowset.updateBoolean(columnName, ((Boolean)tf.getValue()).booleanValue());
-                            break;
-                            
-                        case java.sql.Types.CLOB://2005
-                            break;
-                            
-                        case java.sql.Types.DATALINK://70
-                            break;
-                            
-                        case java.sql.Types.DATE://91
-                            System.out.println("DATE --> updateDate()");
-                            rowset.updateDate(columnName, new java.sql.Date(((java.util.Date) aux).getTime()));
-                            break;
-                            
-                        case java.sql.Types.DECIMAL://3
-                        case java.sql.Types.NUMERIC:
-                        case java.sql.Types.BIGINT:
-                        case java.sql.Types.DOUBLE:
-                        case java.sql.Types.FLOAT:
-                        case java.sql.Types.INTEGER:
-                        case java.sql.Types.REAL:
-                        case java.sql.Types.SMALLINT:
-                        case java.sql.Types.TINYINT:
-                            if (aux instanceof java.math.BigDecimal) {
-                                System.out.println("updateDouble() - BigDecimal");
-                                rowset.updateDouble(columnName, ((Double)aux).doubleValue());
-                            } else if (aux instanceof Double) {
-                                System.out.println("updateDouble()");
-                                rowset.updateDouble(columnName, ((Double)aux).doubleValue());
-                            } else if (aux instanceof Float) {
-                                System.out.println("updateFloat()");
-                                rowset.updateFloat(columnName, ((Float)aux).floatValue());
-                            } else if (aux instanceof Integer) {
-                                System.out.println("updateInt()");
-                                rowset.updateInt(columnName, ((Integer)aux).intValue());
-                            } else if (aux instanceof Long) {
-                                System.out.println("updateLong()");
-                                rowset.updateLong(columnName, ((Long)aux).longValue());
-                            } else {
-                                System.out.println("ELSE ???");
-                            }
-                            
-                            if (    (aux instanceof BigDecimal  && ((Double)  aux).doubleValue() < 0.0) ||
-                                    (aux instanceof Double      && ((Double)  aux).doubleValue() < 0.0) ||
-                                    (aux instanceof Float       && ((Float)   aux).floatValue() < 0.0) ||
-                                    (aux instanceof Integer     && ((Integer) aux).intValue() < 0) ||
-                                    (aux instanceof Long        && ((Long)    aux).longValue() < 0)  ) {
-                                tf.setForeground(Color.RED);
-                            } else {
-                                tf.setForeground(Color.BLACK);
-                            }
-                            break;
-                            
-                        case java.sql.Types.DISTINCT://2001
-                            break;
-                            
-                        case java.sql.Types.JAVA_OBJECT://2000
-                            break;
-                            
-                        case java.sql.Types.LONGVARBINARY://-4
-                        case java.sql.Types.VARBINARY://-3
-                            break;
-                            
-                        case java.sql.Types.VARCHAR://
-                            System.out.println("VARCHAR --> updateString()");
-                            rowset.updateString(columnName, aux.toString());
-                            break;
-                            
-                        case java.sql.Types.LONGVARCHAR://-1
-                            System.out.println("LONGVARCHAR --> updateString()");
-                            rowset.updateString(columnName, aux.toString());
-                            break;
-                            
-                        case java.sql.Types.CHAR://1
-                            System.out.println("CHAR --> updateString()");
-                            rowset.updateString(columnName, aux.toString());
-                            break;
-                            
-                        case java.sql.Types.NULL://0
-                            break;
-                            
-                        case java.sql.Types.OTHER://1111
-                            break;
-                            
-                        case java.sql.Types.REF://2006
-                            break;
-                            
-                        case java.sql.Types.STRUCT://2002
-                            break;
-                            
-                        case java.sql.Types.TIME://92
-                            System.out.println("TIME --> updateTime()");
-                            System.out.println("TIME : " + aux.getClass().getName());
-                            rowset.updateTime(columnName, new java.sql.Time(((java.util.Date) aux).getTime()));
-                            break;
-                            
-                        case java.sql.Types.TIMESTAMP://93
-                            System.out.println("TIMESTAMP --> updateTimestamp()");
-                            System.out.println("TIMESTAMP : " + aux.getClass().getName());
-                            rowset.updateTimestamp(columnName, new java.sql.Timestamp(((java.util.Date) aux).getTime()));
-                            break;
-                            
-                        default:
-                            System.out.println("============================================================================");
-                            System.out.println("default = " + colType);
-                            System.out.println("columnName = " + columnName);
-                            System.out.println("============================================================================");
-                            break;
-                    }
-                } catch (java.sql.SQLException se) {
-                    System.out.println("---> SQLException -----------> " + se);
-                    tf.setValue(null);
-                } catch(java.lang.NullPointerException np) {
-                    System.out.println("<---> NullPointerException <---> " + np + " columnName : " + columnName);
-                    tf.setValue(null);
-                }
-                
-                rowset.addRowSetListener(tf);
-                System.out.println("inputVerifier : " + columnName + " nValue = " + aux);
-                tf.firePropertyChange("value", null, aux);
-                return true;
-                
-            } else {
-                /*
-                 * Validation fails.
-                 *
-                 */
-                
-                setBackground(java.awt.Color.RED);
-                return false;
+            System.out.println(aux);
+            if(aux instanceof Long || aux instanceof Integer || aux instanceof Double){
+            	System.out.println(aux);
             }
+            	
+            	
+            
+            return updateFieldValue(aux);
+
         }
     }
     
+    
+    public boolean updateValue(Object aux){
+    	if(updateFieldValue(aux)){
+    		setValue(aux);
+    		return true;
+    	}
+    	return false;
+    }
+    
+    private boolean updateFieldValue(Object aux){
+    	
+    	/**
+         * field to be validated and updated
+         */
+        
+    	SSFormattedTextField tf = this;
+        
+        boolean passed = validateField(aux);
+        
+        if (passed == true) {
+            
+            setBackground(java.awt.Color.WHITE);
+            
+            System.out.println("inputVerifier(): " + columnName + " aux = " + aux + " colType = " + colType);
+            System.out.println("aux is a " + aux.getClass().getName());
+            
+            if (columnName == null) return true;
+            if (colType    == -99 ) return true;
+            if (rowset     == null) return true;
+            
+            try {
+                
+                rowset.removeRowSetListener(tf);
+                if (aux == null) {
+                    System.out.println("aux IS null");
+                    rowset.updateNull(columnName);
+                    rowset.addRowSetListener(tf);
+                    tf.firePropertyChange("value", null, aux);
+                    return true;
+                }
+                
+                updateRowSet(aux);
+                
+           // SHOW NEGATIVE NUMBERS IN RED     
+                if (    (aux instanceof BigDecimal  && ((Double)  aux).doubleValue() < 0.0) ||
+                        (aux instanceof Double      && ((Double)  aux).doubleValue() < 0.0) ||
+                        (aux instanceof Float       && ((Float)   aux).floatValue() < 0.0) ||
+                        (aux instanceof Integer     && ((Integer) aux).intValue() < 0) ||
+                        (aux instanceof Long        && ((Long)    aux).longValue() < 0)  ) {
+                    tf.setForeground(Color.RED);
+                } else {
+                    tf.setForeground(Color.BLACK);
+                }
+                
+            } catch (java.sql.SQLException se) {
+                System.out.println("---> SQLException -----------> " + se);
+                tf.setValue(null);
+            } catch(java.lang.NullPointerException np) {
+                System.out.println("<---> NullPointerException <---> " + np + " columnName : " + columnName);
+                tf.setValue(null);
+            }
+            
+            rowset.addRowSetListener(tf);
+            System.out.println("inputVerifier : " + columnName + " nValue = " + aux);
+            tf.firePropertyChange("value", null, aux);
+            return true;
+            
+        } else {
+            /*
+             * Validation fails.
+             *
+             */
+            
+            setBackground(java.awt.Color.RED);
+            return false;
+        }
+    	
+    }
+    
+    private void updateRowSet(Object aux) throws SQLException{
+    	System.out.println("Updating rowset column " + columnName + " with " + aux);        
+        switch(colType) {
+            
+            case java.sql.Types.ARRAY://2003
+                break;
+                
+            case java.sql.Types.BINARY://-2
+                break;
+                
+            case java.sql.Types.BIT://-7
+                System.out.println("BIT --> updateBoolean()");
+                rowset.updateBoolean(columnName, ((Boolean)aux).booleanValue());
+                break;
+                
+            case java.sql.Types.BLOB://2004
+                break;
+                
+            case java.sql.Types.BOOLEAN://16
+                System.out.println("BOOLEAN - Set");
+                rowset.updateBoolean(columnName, ((Boolean)aux).booleanValue());
+                break;
+                
+            case java.sql.Types.CLOB://2005
+                break;
+                
+            case java.sql.Types.DATALINK://70
+                break;
+                
+            case java.sql.Types.DATE://91
+                System.out.println("DATE --> updateDate()");
+                rowset.updateDate(columnName, new java.sql.Date(((java.util.Date) aux).getTime()));
+                break;
+                
+            case java.sql.Types.DECIMAL://3
+            case java.sql.Types.NUMERIC:
+            case java.sql.Types.BIGINT:
+            case java.sql.Types.DOUBLE:
+            case java.sql.Types.FLOAT:
+            case java.sql.Types.INTEGER:
+            case java.sql.Types.REAL:
+            case java.sql.Types.SMALLINT:
+            case java.sql.Types.TINYINT:
+                if (aux instanceof java.math.BigDecimal) {
+                    System.out.println("updateDouble() - BigDecimal");
+                    rowset.updateDouble(columnName, ((Double)aux).doubleValue());
+                } else if (aux instanceof Double) {
+                    System.out.println("updateDouble()");
+                    rowset.updateDouble(columnName, ((Double)aux).doubleValue());
+                } else if (aux instanceof Float) {
+                    System.out.println("updateFloat()");
+                    rowset.updateFloat(columnName, ((Float)aux).floatValue());
+                } else if (aux instanceof Integer) {
+                    System.out.println("updateInt()");
+                    rowset.updateInt(columnName, ((Integer)aux).intValue());
+                } else if (aux instanceof Long) {
+                    System.out.println("updateLong()");
+                    rowset.updateLong(columnName, ((Long)aux).longValue());
+                } else {
+                    System.out.println("ELSE ???");
+                }
+                
+                break;
+                
+            case java.sql.Types.DISTINCT://2001
+                break;
+                
+            case java.sql.Types.JAVA_OBJECT://2000
+                break;
+                
+            case java.sql.Types.LONGVARBINARY://-4
+            case java.sql.Types.VARBINARY://-3
+                break;
+                
+            case java.sql.Types.VARCHAR://
+                System.out.println("VARCHAR --> updateString()");
+                rowset.updateString(columnName, aux.toString());
+                break;
+                
+            case java.sql.Types.LONGVARCHAR://-1
+                System.out.println("LONGVARCHAR --> updateString()");
+                rowset.updateString(columnName, aux.toString());
+                break;
+                
+            case java.sql.Types.CHAR://1
+                System.out.println("CHAR --> updateString()");
+                rowset.updateString(columnName, aux.toString());
+                break;
+                
+            case java.sql.Types.NULL://0
+                break;
+                
+            case java.sql.Types.OTHER://1111
+                break;
+                
+            case java.sql.Types.REF://2006
+                break;
+                
+            case java.sql.Types.STRUCT://2002
+                break;
+                
+            case java.sql.Types.TIME://92
+                System.out.println("TIME --> updateTime()");
+                System.out.println("TIME : " + aux.getClass().getName());
+                rowset.updateTime(columnName, new java.sql.Time(((java.util.Date) aux).getTime()));
+                break;
+                
+            case java.sql.Types.TIMESTAMP://93
+                System.out.println("TIMESTAMP --> updateTimestamp()");
+                System.out.println("TIMESTAMP : " + aux.getClass().getName());
+                rowset.updateTimestamp(columnName, new java.sql.Timestamp(((java.util.Date) aux).getTime()));
+                break;
+                
+            default:
+                System.out.println("============================================================================");
+                System.out.println("default = " + colType);
+                System.out.println("columnName = " + columnName);
+                System.out.println("============================================================================");
+                break;
+        }
+    }
     public BeanContextChild getBeanContextProxy(){
         System.err.println("getBeanContextProxy Called");
         return beanContextChildSupport;
@@ -843,7 +883,10 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         
         if (getText()==null || getText().length()==0){
             setValue(null);
-        } else super.commitEdit();
+        } 
+        else{
+        	super.commitEdit();
+        }        
     }
     
     // this method can be override to make custom validation.
@@ -882,6 +925,9 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
 
 /*
  * $Log$
+ * Revision 1.21  2005/05/29 02:24:37  dags
+ * SSConnection and SSRowSet getters and setter refactoring
+ *
  * Revision 1.20  2005/05/27 00:37:11  dags
  * added setValue(null) on exceptions
  *
