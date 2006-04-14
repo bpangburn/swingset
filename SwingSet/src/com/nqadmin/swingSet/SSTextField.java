@@ -318,16 +318,17 @@ public class SSTextField extends JTextField {
                         }
                             
                     }
+                // TRANSFER FOCUS TO NEXT COMPONENT WHEN ENTER KEY IS PRESSED
+                    if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
+                        ((Component)ke.getSource()).transferFocus();
+                    }
+
                 }
 
                 public void keyTyped(KeyEvent ke) {
                 }
 
                 public synchronized void keyPressed(KeyEvent ke) {
-                // TRANSFER FOCUS TO NEXT COMPONENT WHEN ENTER KEY IS PRESSED
-                    if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
-                        ((Component)ke.getSource()).transferFocus();
-                    }
 
                     if(mask == MMDDYYYY || mask == DDMMYYYY){
                         mask(ke);
@@ -514,6 +515,11 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.23  2005/04/06 15:27:21  prasanth
+ * Made the return type of mask a boolean.  This is to know if mask function
+ * has messed with the text or left it alone as a result of some non alphanumeric
+ * key being pressed. (This is done to fix the mask problem for SSN)
+ *
  * Revision 1.22  2005/02/21 16:31:33  prasanth
  * In bind checking for empty columnName before binding the component.
  *
