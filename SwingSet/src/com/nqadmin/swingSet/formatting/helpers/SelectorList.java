@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,11 +33,16 @@
 
 package com.nqadmin.swingSet.formatting.helpers;
 
-import ca.odell.glazedlists.event.ListEventListener;
-import ca.odell.glazedlists.event.ListEvent;
+import java.awt.BorderLayout;
 
-import javax.swing.*;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
+
+import ca.odell.glazedlists.event.ListEventListener;
 
 /**
  *
@@ -45,27 +50,47 @@ import javax.swing.event.ListDataListener;
  */
 public class SelectorList extends JList implements ListDataListener, ListEventListener {
     
+	private JTextField txtFilter = new JTextField();
+	
+	private JScrollPane scrollPane = new JScrollPane();
+	
+	private JPanel panel = new JPanel();
+	
     /**
      * Creates a new instance of SelectorList
      */
     
     public SelectorList() {
         super(new SelectorListModel());
-
-        //        this.getModel().addListDataListener(this);
-//        ((SelectorListModel)this.getModel()).addListEventListener(this);
-    }
-    
-    public SelectorList(SelectorListModel model) {
-        this.setModel(model);
-//        model.addListDataListener(this);
-//        model.addListEventListener(this);
-    }
-    
-    private void Init() {
+        init();
     }
     
     /**
+     * Contruts a SelectorList object with the sepecified list model.
+     * @param model - list model to be used
+     */
+    public SelectorList(SelectorListModel model) {
+        this.setModel(model);
+        init();
+    }
+    
+    private void init() {
+    	((SelectorListModel)getModel()).setFilterEdit(txtFilter);
+    	addComponents();
+	}
+
+	private void addComponents() {
+		scrollPane.setViewportView(this);
+		panel.setLayout(new BorderLayout());
+		panel.add(scrollPane, BorderLayout.CENTER);
+		panel.add(txtFilter, BorderLayout.SOUTH);
+	}
+	
+	public JPanel getComponent() {
+		return panel;
+	}
+
+	/**
      * Getter for property dataValue.
      * @return Value of property dataValue.
      */
@@ -73,36 +98,43 @@ public class SelectorList extends JList implements ListDataListener, ListEventLi
         return ((SelectorListModel)getModel()).getSelectedBoundData(this.getSelectedIndex());
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.event.ListDataListener#intervalRemoved(javax.swing.event.ListDataEvent)
+     */
     public void intervalRemoved(javax.swing.event.ListDataEvent e) {
-        System.out.println("SelectorList --> intervalRemoved");
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.event.ListDataListener#intervalAdded(javax.swing.event.ListDataEvent)
+     */
     public void intervalAdded(javax.swing.event.ListDataEvent e) {
-        System.out.println("SelectorList ---> intervalAdded");
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.event.ListDataListener#contentsChanged(javax.swing.event.ListDataEvent)
+     */
     public void contentsChanged(javax.swing.event.ListDataEvent e) {
-        System.out.println("SelectorList ---> contentsChanged");
     }
 
+    /* (non-Javadoc)
+     * @see ca.odell.glazedlists.event.ListEventListener#listChanged(ca.odell.glazedlists.event.ListEvent)
+     */
     public void listChanged(ca.odell.glazedlists.event.ListEvent listEvent) {
-        System.out.println("SelectorList --> listChanged");
         this.repaint();
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.JList#setModel(javax.swing.ListModel)
+     */
     public void setModel(ListModel model) {
 
         super.setModel(model);
         ((SelectorListModel)model).addListDataListener(this);
         ((SelectorListModel)model).addListEventListener(this);
-        
-    }
-
-    public int getSelectedIndex() {
-
-        int retValue;
-        
-        retValue = super.getSelectedIndex();
-        return retValue;
+        ((SelectorListModel)model).setFilterEdit(txtFilter);
     }
 }
+
+/*
+* $Log$
+*/
