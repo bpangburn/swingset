@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,8 +33,10 @@
 
 package com.nqadmin.swingSet.formatting.helpers;
 
-import java.sql.*;
-import com.nqadmin.swingSet.datasources.*;
+import java.sql.SQLException;
+
+import com.nqadmin.swingSet.datasources.SSConnection;
+import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
 
 /**
  *
@@ -73,6 +75,7 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
      * Holds value of property ssConnection.
      */
     private SSConnection     ssConnection;
+    
     private SSJdbcRowSetImpl ssRowset;
     
     /** Creates a new instance of AccountSelectorModel */
@@ -81,14 +84,32 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
         this(null, null, null, null);
     }
     
+    /**
+     * @param table
+     * @param bcolumn
+     * @param lcolumn
+     */
     public SelectorComboBoxModel(String table, String bcolumn, String lcolumn) {
         this(table, bcolumn, lcolumn, null);
     }
     
+    /**
+     * @param table
+     * @param bcolumn
+     * @param lcolumn
+     * @param orderBy
+     */
     public SelectorComboBoxModel(String table, String bcolumn, String lcolumn, String orderBy) {
         this(null, table, bcolumn, lcolumn, orderBy);
     }
     
+    /**
+     * @param ssConnection
+     * @param table
+     * @param bcolumn
+     * @param lcolumn
+     * @param orderBy
+     */
     public SelectorComboBoxModel(SSConnection ssConnection, String table, String bcolumn, String lcolumn, String orderBy) { 
         super();
         propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
@@ -102,7 +123,6 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
     }
     
     public void refresh() {
-        System.out.println("---------------------- refresh() ---------------------");
         this.populateModel();
     }
     
@@ -110,19 +130,13 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
         return ((SelectorElement)this.getElementAt(index)).getDataValue();
     }
     
+    /**
+     * 
+     */
     private void populateModel() {
         
         String sql = null;
-        
-        System.out.println("populateModel();");
-        
-        //  if (table == null) table = "publications";
-        
         if (dataColumn == null || listColumn == null || table == null) {
-            System.out.println("dataColumn = " + dataColumn);
-            System.out.println("listColumn = " + listColumn);
-            System.out.println("table      = " + table);
-            System.out.println("Sample Model");
             this.addElement(new SelectorElement(new String("0") , "Option 0"));
             this.addElement(new SelectorElement(new String("1") , "Option 1"));
             this.addElement(new SelectorElement(new String("2") , "Option 2"));
@@ -136,32 +150,25 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
             return;
         }
         
-        System.out.println(dataColumn + " " + listColumn + " " + table);
-        System.out.println("-----------------------------------------------------------");
-        
         if (orderBy != null) {
             sql = "select " + dataColumn + ", " + listColumn + " from " + table + " ORDER BY " + orderBy;
         }
         else 
             sql = "select " + dataColumn + ", " + listColumn + " from " + table;
 
-        System.out.println("sql1 = " + sql);
-               
+              
         ssRowset = new SSJdbcRowSetImpl();
         ssRowset.setSSConnection(ssConnection);
-        
-        
-       System.out.println("sql2 = " + sql);
         
         ssRowset.setCommand(sql);
         
         try {
             ssRowset.execute();
             ssRowset.last();
-            System.out.println("Hay " + ssRowset.getRow() + " registros");
         } catch (SQLException se) {
             System.out.println("sql = " + sql);
             System.out.println("ssRowset.execute() " + se);
+            se.printStackTrace();
         }
         
         //data.add(new SelectorElement(new String("-1"), selectText));
@@ -184,25 +191,21 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
         ssConnection = null;
     }
     
+    /**
+     * @param bdata
+     */
     public void setSelectedItem(String bdata) {
         SelectorElement cual;
         String tofind;
         
         tofind = bdata.toUpperCase().trim();
         
-        System.out.println("setSelectedItem = " + tofind);
-        
         for (int i=0; i < this.getSize(); i++) {
             cual = (SelectorElement)(this.getElementAt(i));
-            
-            System.out.println("BoundData = '" + cual.getDataValue() + "'");
-            
             if ((cual.getDataValue()).equals(bdata)) {
-                //                super.setSelectedItem(cual);
                 return;
             }
         }
-        System.out.println("parece que no encontro a '" + bdata +"'");
     }
     
     /**
@@ -241,7 +244,6 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
         } catch(java.lang.NullPointerException npe) {
             
         }
-        //this.refresh();
     }
     
     /**
@@ -265,8 +267,6 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
         } catch(java.lang.NullPointerException npe) {
             
         }
-        //this.refresh();
-        
     }
     
     /**
@@ -291,7 +291,6 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
         } catch(java.lang.NullPointerException npe) {
             
         }
-        //this.refresh();
     }
     
     /**
@@ -308,9 +307,11 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
         } catch(java.lang.NullPointerException npe) {
             
         }
-        //this.refresh();
     }
 
+    /**
+     * @return
+     */
     public String getOrderBy() {
         return orderBy;
     }
@@ -337,9 +338,11 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
         } catch (java.lang.NullPointerException npe) {
             
         }
-        //this.refresh();
     }
     
+    /**
+     * 
+     */
     public void execute() {
         refresh();
     }
@@ -369,3 +372,7 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
         }
     }
 }
+
+/*
+* $Log$
+*/

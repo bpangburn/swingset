@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,14 +33,13 @@
 
 package com.nqadmin.swingSet.formatting.helpers;
 
-import com.nqadmin.swingSet.datasources.SSConnection;
-import com.nqadmin.swingSet.formatting.SSFormattedTextField;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
+
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
@@ -48,13 +47,19 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuListener;
+
+import com.nqadmin.swingSet.datasources.SSConnection;
+import com.nqadmin.swingSet.formatting.SSFormattedTextField;
 
 /**
  *
  * @author dags
+ */
+/**
+ * @author ppasala
+ *
  */
 public class HelperPopup extends JPopupMenu implements MouseListener, KeyListener, ActionListener, ListSelectionListener, PopupMenuListener, FocusListener {
     
@@ -71,14 +76,12 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
     private String dataColumn = null;
     private String listColumn = null;
     private String orderBy = null;
-    private String query = null;
     
     private SSFormattedTextField target = null;
     private JScrollPane sc;
     private SSConnection connection = null;
     private SelectorListModel model = null;
     private SelectorList lista;
-    private int colType = 0;
     
     /** Creates a new instance of HelperPopup */
     public HelperPopup() {
@@ -140,12 +143,18 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
         this.pack();
     }
     
+    /**
+     * @param model
+     */
     public void setModel(SelectorListModel model) {
         this.model = model;
         lista.setModel(model);
         model.setFilterEdit(searchText);
     }
     
+    /**
+     * @param target
+     */
     public void setTarget(SSFormattedTextField target) {
         this.target = target;
         
@@ -153,26 +162,41 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
         
     }
     
+    /**
+     * @param table
+     */
     public void setTable(String table) {
         this.table = table;
         createHelper();
     }
     
+    /**
+     * @param dataColumn
+     */
     public void setDataColumn(String dataColumn) {
         this.dataColumn = dataColumn;
         createHelper();
     }
     
+    /**
+     * @param listColumn
+     */
     public void setListColumn(String listColumn) {
         this.listColumn = listColumn;
         createHelper();
     }
     
+    /**
+     * @param orderBy
+     */
     public void setOrderBy(String orderBy) {
         this.orderBy = orderBy;
         createHelper();
     }
     
+    /**
+     * @param connection
+     */
     public void setConnection(SSConnection connection) {
         this.connection = connection;
         
@@ -186,10 +210,10 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
         createHelper();
     }
     
-    public void setColumnType(int colType) {
-        this.colType = colType;
-    }
     
+    /**
+     * 
+     */
     private void createHelper() {
         
         if (connection == null || table == null || dataColumn == null || listColumn == null) return;
@@ -212,6 +236,9 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
         pack();
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
+     */
     public void keyPressed(java.awt.event.KeyEvent e) {
         System.out.println("keyPressed");
         System.out.println("KeyCode = " + KeyEvent.getKeyText(e.getKeyCode()));
@@ -221,26 +248,47 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
         }
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+     */
     public void keyTyped(java.awt.event.KeyEvent e) {
         System.out.println("keyTyped");
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+     */
     public void keyReleased(java.awt.event.KeyEvent e) {
         System.out.println("keyReleased");
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+     */
     public void mouseReleased(java.awt.event.MouseEvent e) {
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+     */
     public void mousePressed(java.awt.event.MouseEvent e) {
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+     */
     public void mouseExited(java.awt.event.MouseEvent e) {
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+     */
     public void mouseEntered(java.awt.event.MouseEvent e) {
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+     */
     public void mouseClicked(java.awt.event.MouseEvent e) {
         System.out.println("mouseClicked");
         
@@ -253,6 +301,9 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
         }
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
     public void actionPerformed(java.awt.event.ActionEvent e) {
         
         if (e.getSource().equals(searchButton)) {
@@ -287,6 +338,9 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
     }
     
     
+    /**
+     * @param evt
+     */
     private void search(java.awt.event.ActionEvent evt) {
         
         javax.swing.JTextField s;
@@ -319,89 +373,57 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
         }
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
+     */
     public void valueChanged(javax.swing.event.ListSelectionEvent e) {
         int desde;
         int hasta;
         int selected;
         
-//        System.out.println("ValueIsAdjusting = " + e.getValueIsAdjusting());
-        
         if (e.getValueIsAdjusting() == false) {
             desde = e.getFirstIndex();
             hasta = e.getLastIndex();
-//            System.out.println("Desde " + desde + " hasta " + hasta);
             
             DefaultListSelectionModel lm = ((DefaultListSelectionModel)e.getSource());
             
             selected = lm.getLeadSelectionIndex();
             
-            System.out.println("--------------------- desde --------------------------------------");
             SelectorElement se1 = (SelectorElement) (lista.getModel().getElementAt(desde));
-//            System.out.println("DataValue = " + se1.getDataValue().toString());
-//            System.out.println("ListValue = " + se1.getListValue().toString());
             
-            System.out.println("--------------------- hasta --------------------------------------");
             SelectorElement se2 = (SelectorElement) (lista.getModel().getElementAt(hasta));
-//            System.out.println("DataValue = " + se2.getDataValue().toString());
-//            System.out.println("ListValue = " + se2.getListValue().toString());
-            
-            System.out.println("--------------------- selected --------------------------------------");
+
             SelectorElement se3 = (SelectorElement) (lista.getModel().getElementAt(selected));
-//            System.out.println("DataValue = " + se3.getDataValue().toString());
-//            System.out.println("ListValue = " + se3.getListValue().toString());
             
         }
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.event.PopupMenuListener#popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent)
+     */
     public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent e) {
         Object current = target.getValue();
         Object dataval = null;
         
-        System.out.println("popupMenuWillBecomeVisible();");
-        
-        // trying to select current value
-        /*
-        if (current == null) return;
-        
-        for (int j= 0; j < lista.getModel().getSize(); j++) {
-            dataval = ( (SelectorElement)lista.getModel().getElementAt(j) ).getDataValue();
-            
-            if (dataval.toString().equals(current.toString()) ) {
-                lista.setSelectedIndex(j);
-                lista.ensureIndexIsVisible(j);
-                break;
-            }
-        }
-         */
-        //this.setSize(target.getWidth(), searchText.getHeight() * 15);
         searchText.requestFocusInWindow();
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.event.PopupMenuListener#popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent)
+     */
     public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent e) {
-        int index;
-        System.out.println("popupMenuWillBecomeInvisible();");
-        /*
-        index = lista.getSelectedIndex();
-        
-        if (index > -1 && target != null) {
-            SelectorElement se = (SelectorElement)(lista.getModel().getElementAt(index));
-            System.out.println("DataValue = " + se.getDataValue());
-            switch(colType) {
-                case 0:
-                    target.setValue(new Integer((String)se.getDataValue()));
-                    break;
-                case 1:
-                    target.setValue((String)se.getDataValue());
-                    break;
-            }
-        }
-         */
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.event.PopupMenuListener#popupMenuCanceled(javax.swing.event.PopupMenuEvent)
+     */
     public void popupMenuCanceled(javax.swing.event.PopupMenuEvent e) {
         System.out.println("popupMenuCanceled();");
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.JPopupMenu#show(java.awt.Component, int, int)
+     */
     public void show(java.awt.Component invoker, int x, int y) {
         System.out.println("show(" + x + "," + y + ")");
         this.setSize(target.getWidth(), searchText.getHeight() * 15);
@@ -409,11 +431,21 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
         super.show(invoker, x, y);
     }
 
+    /* (non-Javadoc)
+     * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
+     */
     public void focusLost(java.awt.event.FocusEvent e) {
         System.out.println("focusLost");
     }
 
+    /* (non-Javadoc)
+     * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
+     */
     public void focusGained(java.awt.event.FocusEvent e) {
         System.out.println("focusGained");
     }
 }
+
+/*
+* $Log$
+*/

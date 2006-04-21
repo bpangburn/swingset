@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -39,7 +39,7 @@ import ca.odell.glazedlists.TextFilterable;
  *
  * @author  dags
  */
-public class SelectorElement extends Object implements TextFilterable {
+public class SelectorElement implements TextFilterable {
     
     /**
      * Holds value of property listValue.
@@ -61,13 +61,19 @@ public class SelectorElement extends Object implements TextFilterable {
         dataValue = new String("dataValue");
     }
     
+    /**
+     * @param bD
+     * @param lD
+     */
     public SelectorElement(Object bD, Object lD) {
         this.setDataValue(bD);
         this.setListValue(lD);
     }
     
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     public String toString() {
-        //return listValue.toString().trim() + " (" + dataValue.toString().trim() + ")";
         return listValue.toString().trim();
     }
     
@@ -126,9 +132,15 @@ public class SelectorElement extends Object implements TextFilterable {
         propertyChangeSupport.firePropertyChange("dataValue", olddataValue, dataValue);
     }
     
+    /* (non-Javadoc)
+     * @see ca.odell.glazedlists.TextFilterable#getFilterStrings(java.util.List)
+     */
     public void getFilterStrings(java.util.List list) {
         list.add(listValue.toString());
         list.add(dataValue.toString());
     }
 }
 
+/*
+* $Log$
+*/

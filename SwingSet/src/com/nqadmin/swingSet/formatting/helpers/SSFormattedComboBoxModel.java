@@ -33,13 +33,14 @@
 
 package com.nqadmin.swingSet.formatting.helpers;
 
-import java.sql.*;
-import com.nqadmin.swingSet.datasources.*;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
-
 import javax.swing.MutableComboBoxModel;
+
+import com.nqadmin.swingSet.datasources.SSConnection;
+import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
 
 /**
  *
@@ -99,14 +100,32 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
         this(null, null, null, null);
     }
     
-    public SSFormattedComboBoxModel(String table, String bcolumn, String lcolumn) {
-        this(table, bcolumn, lcolumn, null);
+    /**
+     * @param table - database table name
+     * @param dataColumn - name of the column containing the values of the items displayed in the list
+     * @param listColumn - column names whose values should be displayed in the list
+     */
+    public SSFormattedComboBoxModel(String table, String dataColumn, String listColumn) {
+        this(table, dataColumn, listColumn, null);
     }
     
+    /**
+     * @param table - database table name
+     * @param dataColumn - name of the column containing the values of the items displayed in the list
+     * @param listColumn - column names whose values should be displayed in the list
+     * @param orderBy - column name based on which the list items should be ordered
+     */
     public SSFormattedComboBoxModel(String table, String bcolumn, String lcolumn, String orderBy) {
         this(null, table, bcolumn, lcolumn, orderBy);
     }
     
+    /**
+     * @param ssConnection - connection to be used for querying the database
+     * @param table - database table name
+     * @param dataColumn - name of the column containing the values of the items displayed in the list
+     * @param listColumn - column names whose values should be displayed in the list
+     * @param orderBy - column name based on which the list items should be ordered
+     */
     public SSFormattedComboBoxModel(SSConnection ssConnection, String table, String dataColumn, String listColumn, String orderBy) {
         this.ssConnection = ssConnection;
         this.table = table;
@@ -116,10 +135,17 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
         this.refresh();
     }
     
+    /**
+     * @param object
+     * @return
+     */
     public int indexOf(Object object) {
         return dataList.indexOf(object);
     }
     
+    /**
+     * 
+     */
     public void refresh() {
         dataList = new ArrayList();
         listList = new ArrayList();
@@ -127,16 +153,23 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
         this.populateModel();
     }
     
+    /**
+     * @param index
+     * @return
+     */
     public Object getSelectedBoundData(int index) {
         Object itm = listList.get(index);
         
         if (itm != null) {
             return ((SelectorElement)(itm)).getDataValue();
-        } else {
-            return "<null>";
-        }
+        } 
+        return "<null>";
     }
     
+    /**
+     * This function builds the query based on the specified information and populated the data model with the 
+     * data fetched from the database.
+     */
     private void populateModel() {
         
         Object dataValue = null;
@@ -306,9 +339,11 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
         this.fireContentsChanged(this, 0, listList.size()-1);
         
         ssRowset = null;
-        ssConnection = null;
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.MutableComboBoxModel#addElement(java.lang.Object)
+     */
     public void addElement(Object ob) {
         listList.add(ob);
     }
@@ -373,6 +408,9 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
         this.refresh();
     }
     
+    /**
+     * @return
+     */
     public String getOrderBy() {
         return orderBy;
     }
@@ -394,6 +432,9 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
         this.refresh();
     }
     
+    /**
+     * 
+     */
     public void execute() {
         refresh();
     }
@@ -432,11 +473,17 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
         this.ssConnection = ssConnection;
         this.refresh();
     }
+    /* (non-Javadoc)
+     * @see javax.swing.ListModel#getElementAt(int)
+     */
     public Object getElementAt(int index) {
         return listList.get(index);
         
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.ListModel#getSize()
+     */
     public int getSize() {
         if (listList == null)
             return 0;
@@ -444,23 +491,33 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
             return listList.size();
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.ComboBoxModel#setSelectedItem(java.lang.Object)
+     */
     public void setSelectedItem(Object anItem) {
-        //System.out.println("setSelectedItem("+ anItem + ")");
         if ((selectedOne != null && !selectedOne.equals(anItem)) || (selectedOne == null && anItem != null) ) {
             selectedOne = anItem;
-            //fireContentsChanged(anItem, -1, -1);
         }
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.ComboBoxModel#getSelectedItem()
+     */
     public Object getSelectedItem() {
         return selectedOne;
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.MutableComboBoxModel#removeElement(java.lang.Object)
+     */
     public void removeElement(Object obj) {
         dataList.remove( ((SelectorElement)obj).getDataValue() );
         listList.remove(obj);
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.MutableComboBoxModel#removeElementAt(int)
+     */
     public void removeElementAt(int index) {
         dataList.remove(index);
         listList.remove(index);
@@ -471,3 +528,7 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
         listList.add(index, obj);
     }
 }
+
+/*
+* $Log$
+*/

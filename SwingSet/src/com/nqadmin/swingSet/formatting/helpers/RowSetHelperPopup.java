@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,9 +33,6 @@
 
 package com.nqadmin.swingSet.formatting.helpers;
 
-import com.nqadmin.swingSet.datasources.SSConnection;
-import com.nqadmin.swingSet.datasources.SSRowSet;
-import com.nqadmin.swingSet.formatting.SSFormattedTextField;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
@@ -43,17 +40,19 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.sql.SQLException;
+
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListSelectionModel;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuListener;
+
+import com.nqadmin.swingSet.datasources.SSRowSet;
+import com.nqadmin.swingSet.formatting.SSFormattedTextField;
 
 /**
  *
@@ -70,15 +69,11 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
     private JButton helpButton;
     private JTextField searchText;
     
-    private String table = null;
     private String dataColumn = null;
     private String listColumn = null;
-    private String orderBy = null;
-    private String query = null;
-    
+   
     private SSFormattedTextField target = null;
     private JScrollPane sc;
-    private SSConnection connection;
     private SelectorListModel model = null;
     private SelectorList lista;
     
@@ -132,80 +127,61 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
         
     }
     
+    /**
+     * @param rowset
+     */
     public  void setRowSet(SSRowSet rowset) {
         this.rowset = rowset;
         createHelper();
     }
     
+    /**
+     * @param model
+     */
     public void setModel(SelectorListModel model) {
         this.model = model;
         lista.setModel(model);
     }
     
+    /**
+     * @param target
+     */
     public void setTarget(SSFormattedTextField target) {
         this.target = target;
         
         //if (target != null) this.setPreferredSize(new Dimension(target.getWidth(),300));
     }
     
-    public void setTable(String table) {
-        this.table = table;
-        createHelper();
-    }
-    
+    /**
+     * @param dataColumn
+     */
     public void setDataColumn(String dataColumn) {
         this.dataColumn = dataColumn;
         createHelper();
     }
     
+    /**
+     * @param listColumn
+     */
     public void setListColumn(String listColumn) {
         this.listColumn = listColumn;
         createHelper();
     }
     
-    public void setOrderBy(String orderBy) {
-        this.orderBy = orderBy;
-        createHelper();
-    }
     
-    public void setConnection(SSConnection connection) {
-        this.connection = connection;
-        
-        try {
-            connection.createConnection();
-        } catch(java.lang.ClassNotFoundException nfe) {
-            
-        } catch(java.lang.Exception ex) {
-            
-        }
-        createHelper();
-    }
-    
+ 
+    /**
+     * 
+     */
     public void createHelper() {
-        /*
-        try {
-            connection.createConnection();
-        } catch(java.lang.ClassNotFoundException nfe) {
-            
-        } catch(java.lang.Exception ex) {
-            
-        }
-        */
-        
-        if (dataColumn == null 
-                || listColumn == null
-                || rowset == null) return;
+        if (dataColumn == null || listColumn == null || rowset == null) 
+        	return;
 
-         model = new SelectorListModel();
+        model = new SelectorListModel();
         
-         try {
-//            System.out.println("beforeFirst();");
-//            System.out.println("dataColumn = " + dataColumn);
-//            System.out.println("listColumn = " + listColumn);
-            
+        try {
             rowset.beforeFirst();
             while (rowset.next()) {
-//                System.out.println("rowset.next() =" + rowset.getString(listColumn));
                 String s1 = rowset.getString(dataColumn);
                 String s2 = rowset.getString(listColumn);
                 model.addElement(new SelectorElement(s1,s2));
@@ -223,38 +199,55 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
         pack();
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
+     */
     public void keyPressed(java.awt.event.KeyEvent e) {
-        System.out.println("keyPressed");
-        System.out.println("KeyCode = " + KeyEvent.getKeyText(e.getKeyCode()));
-        
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
             this.setVisible(false);
         }
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+     */
     public void keyTyped(java.awt.event.KeyEvent e) {
-        System.out.println("keyTyped");
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+     */
     public void keyReleased(java.awt.event.KeyEvent e) {
-        System.out.println("keyReleased");
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+     */
     public void mouseReleased(java.awt.event.MouseEvent e) {
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+     */
     public void mousePressed(java.awt.event.MouseEvent e) {
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+     */
     public void mouseExited(java.awt.event.MouseEvent e) {
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+     */
     public void mouseEntered(java.awt.event.MouseEvent e) {
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+     */
     public void mouseClicked(java.awt.event.MouseEvent e) {
-        System.out.println("mouseClicked");
-        
         if (e.getClickCount() == 2) {
             this.setVisible(false);
         }
@@ -264,18 +257,18 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
         }
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
     public void actionPerformed(java.awt.event.ActionEvent e) {
         
         if (e.getSource().equals(searchButton)) {
-            System.out.println("searchButton");
             search();
         }
         if (e.getSource().equals(closeButton)) {
-            System.out.println("closeButton");
             this.setVisible(false);
         }
         if (e.getSource().equals(refreshButton)) {
-            System.out.println("refreshButton");
             createHelper();
         }
         
@@ -290,6 +283,9 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
     }
     
     
+    /**
+     * 
+     */
     private void search() {
         
         int j, n;
@@ -321,40 +317,33 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
         }
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
+     */
     public void valueChanged(javax.swing.event.ListSelectionEvent e) {
         int desde;
         int hasta;
         int selected;
         
-        //        System.out.println("ValueIsAdjusting = " + e.getValueIsAdjusting());
-        
         if (e.getValueIsAdjusting() == false) {
             desde = e.getFirstIndex();
             hasta = e.getLastIndex();
-            //            System.out.println("Desde " + desde + " hasta " + hasta);
             
             DefaultListSelectionModel lm = ((DefaultListSelectionModel)e.getSource());
             
             selected = lm.getLeadSelectionIndex();
             
-            System.out.println("--------------------- desde --------------------------------------");
             SelectorElement se1 = (SelectorElement) (lista.getModel().getElementAt(desde));
-            //            System.out.println("DataValue = " + se1.getDataValue().toString());
-            //            System.out.println("ListValue = " + se1.getListValue().toString());
             
-            System.out.println("--------------------- hasta --------------------------------------");
             SelectorElement se2 = (SelectorElement) (lista.getModel().getElementAt(hasta));
-            //            System.out.println("DataValue = " + se2.getDataValue().toString());
-            //            System.out.println("ListValue = " + se2.getListValue().toString());
             
-            System.out.println("--------------------- selected --------------------------------------");
             SelectorElement se3 = (SelectorElement) (lista.getModel().getElementAt(selected));
-                        System.out.println("DataValue = " + se3.getDataValue().toString());
-                        System.out.println("ListValue = " + se3.getListValue().toString());
-            
         }
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.event.PopupMenuListener#popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent)
+     */
     public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent e) {
         
         int index = -1;
@@ -372,6 +361,9 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
         searchText.selectAll();
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.event.PopupMenuListener#popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent)
+     */
     public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent e) {
 
         System.out.println("popupMenuWillBecomeInvisible();");
@@ -387,22 +379,34 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
         }
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.event.PopupMenuListener#popupMenuCanceled(javax.swing.event.PopupMenuEvent)
+     */
     public void popupMenuCanceled(javax.swing.event.PopupMenuEvent e) {
-        System.out.println("popupMenuCanceled();");
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.JPopupMenu#show(java.awt.Component, int, int)
+     */
     public void show(java.awt.Component invoker, int x, int y) {
-        System.out.println("show(" + x + "," + y + ")");
         this.setSize(target.getWidth(), searchText.getHeight() * 15);
         searchText.requestFocusInWindow();
         super.show(invoker, x, y);
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
+     */
     public void focusLost(java.awt.event.FocusEvent e) {
-        System.out.println("focusLost");
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
+     */
     public void focusGained(java.awt.event.FocusEvent e) {
-        System.out.println("focusGained");
     }
 }
+
+/*
+* $Log$
+*/

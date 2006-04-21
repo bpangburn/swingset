@@ -1,18 +1,61 @@
+/* $Id$
+ *
+ * Tab Spacing = 4
+ *
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
+ * Diego Gil
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.  Redistributions in binary
+ * form must reproduce the above copyright notice, this list of conditions and
+ * the following disclaimer in the documentation and/or other materials
+ * provided with the distribution.  The names of its contributors may not be
+ * used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
 package com.nqadmin.swingSet.formatting.helpers;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.beans.PropertyChangeListener;
+import java.text.ParseException;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ComboBoxEditor;
+import javax.swing.InputVerifier;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
 
 import com.nqadmin.swingSet.SSDataNavigator;
 import com.nqadmin.swingSet.datasources.SSRowSet;
 import com.nqadmin.swingSet.formatting.SSFormattedComboBox;
 import com.nqadmin.swingSet.formatting.SSFormattedTextField;
-import javax.swing.*;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.beans.PropertyChangeListener;
-
-
-import java.text.ParseException;
-import javax.swing.border.Border;
 
 
 
@@ -23,8 +66,6 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
     
     private SelectorElement editValue = null;
     
-    private int editColumns = 10;
-    private int displayColumns = 50;
     private String columnName = null;
     private SSDataNavigator navigator = null;
     private SSRowSet rowset = null;
@@ -32,6 +73,9 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
     private SSFormattedComboBoxModel model = null;
     private Border border = null;
     
+    /**
+     * 
+     */
     public SSFormattedComboBoxEditor() {
         
         border = UIManager.getBorder("ComboBox.border");
@@ -60,56 +104,92 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
         this.add(display);
     }
     
+    /**
+     * @param combo
+     */
     public void setComboBox(SSFormattedComboBox combo) {
         this.combo = combo;
         this.model = (SSFormattedComboBoxModel)this.combo.getModel();
         this.editor.setSSFormattedComboBox(combo);
     }
     
+    /**
+     * @param value
+     */
     public void setValue(Object value) {
         editValue = (SelectorElement) value;
         updateField(editValue);
     }
     
+    /**
+     * @param columnName
+     */
     public void setColumnName(String columnName) {
         this.columnName = columnName;
         editor.setColumnName(columnName);
     }
     
+    /**
+     * @return
+     */
     public String getColumnName() {
         return columnName;
     }
     
+    /**
+     * @param navigator
+     */
     public void setNavigator(SSDataNavigator navigator) {
         this.navigator = navigator;
         editor.setNavigator(navigator);
     }
     
+    /**
+     * @return
+     */
     public SSDataNavigator getNavigator() {
         return navigator;
     }
     
+    /**
+     * @param rowset
+     */
     public void setSSRowSet(SSRowSet rowset) {
         this.rowset = rowset;
         editor.setSSRowSet(rowset);
     }
     
+    /**
+     * @return
+     */
     public SSRowSet getSSRowSet() {
         return rowset;
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.ComboBoxEditor#getEditorComponent()
+     */
     public Component getEditorComponent() {
         return this;
     }
     
+    /**
+     * @return
+     */
     public SSFormattedTextField getEditorField() {
         return editor;
     }
     
+    /**
+     * @return
+     */
     public JLabel getDisplayField() {
         return display;
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.ComboBoxEditor#setItem(java.lang.Object)
+     */
     public void setItem(Object anObject) {
         
         if (anObject == null) {
@@ -122,14 +202,13 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
         updateField(anObject);
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.ComboBoxEditor#getItem()
+     */
     public Object getItem() {
-        
-        int index = -99;
         
         try {
             editor.commitEdit();
-            System.out.println("getItem() :" + editor.getValue());
-            
         } catch (ParseException pe) {
             System.out.println("getItem ParseException " + pe);
         }
@@ -138,30 +217,41 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
         return updateField(new SelectorElement(editor.getValue(),null));
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.ComboBoxEditor#selectAll()
+     */
     public void selectAll() {
         editor.selectAll();
         editor.requestFocus();
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.ComboBoxEditor#addActionListener(java.awt.event.ActionListener)
+     */
     public void addActionListener(ActionListener l) {
         editor.addActionListener(l);
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.ComboBoxEditor#removeActionListener(java.awt.event.ActionListener)
+     */
     public void removeActionListener(ActionListener l) {
         editor.removeActionListener(l);
     }
     
     
+    /**
+     * @param columns
+     */
     public void setEditColumns(int columns) {
-        this.editColumns = columns;
         if (editor != null)
             editor.setColumns(columns);
     }
     
-    public void setDisplayColumns(int columns) {
-        this.displayColumns = columns;
-    }
     
+    /* (non-Javadoc)
+     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+     */
     public void propertyChange(java.beans.PropertyChangeEvent evt) {
         Object oValue = null;
         Object nValue = null;
@@ -183,23 +273,42 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
         }
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+     */
     public void mouseReleased(MouseEvent e) {
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+     */
     public void mousePressed(MouseEvent e) {
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+     */
     public void mouseExited(MouseEvent e) {
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+     */
     public void mouseEntered(MouseEvent e) {
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+     */
     public void mouseClicked(MouseEvent e) {
         System.out.println("mouseClicked");
         this.combo.showPopup();
     }
     
+    /**
+     * @param nValue
+     * @return
+     */
     private Object updateField(Object nValue) {
         
         SelectorElement item = (SelectorElement)nValue;
@@ -220,7 +329,6 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
                 editValue = (SelectorElement)model.getElementAt(index);
                 model.setSelectedItem(editValue);
                 editor.setValue(editValue.getDataValue());
-                //editor.getInputVerifier().verify(editor);
                 display.setText(editValue.getListValue().toString());
                 display.setToolTipText(editValue.getListValue().toString());
             }
@@ -231,6 +339,9 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
         return editValue;
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.JComponent#getInputVerifier()
+     */
     public InputVerifier getInputVerifier() {
 
         InputVerifier retValue;
@@ -239,3 +350,7 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
         return retValue;
     }
 }
+
+/*
+* $Log$
+*/
