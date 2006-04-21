@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,18 +33,24 @@
 
 package com.nqadmin.swingSet.formatting.helpers;
 
+import java.sql.SQLException;
+
+import javax.swing.ComboBoxModel;
+import javax.swing.JTextField;
+
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.swing.TextFilterList;
-import java.sql.*;
-import com.nqadmin.swingSet.datasources.*;
-import javax.swing.ComboBoxModel;
-import javax.swing.JTextField;
+
+import com.nqadmin.swingSet.datasources.SSConnection;
+import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+
 
 /**
  *
  * @author  dags
  */
+
 public class SelectorListModel extends javax.swing.AbstractListModel implements ComboBoxModel {
     
     private Object selectedOne = null;
@@ -94,85 +100,112 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
         this(null, null, null, null);
     }
     
-    public SelectorListModel(String table, String bcolumn, String lcolumn) {
-        this(table, bcolumn, lcolumn, null);
+    /**
+     * @param table - database table name
+     * @param dataColumn - name of the column containing the values of the items displayed in the list
+     * @param listColumn - column names whose values should be displayed in the list
+     */
+    public SelectorListModel(String table, String dataColumn, String listColumn) {
+        this(table, dataColumn, listColumn, null);
     }
     
+    /**
+     * @param object
+     * @return
+     */
     public int indexOf(Object object) {
-        SelectorElement tmpEl = null;
-        
-        tmpEl = (SelectorElement)object;
-        
+               
         return data.indexOf(object);
     }
     
-    public SelectorListModel(String table, String bcolumn, String lcolumn, String orderBy) {
-        this(null, table, bcolumn, lcolumn, orderBy);
+    /**
+     * @param table - database table name
+     * @param dataColumn - name of the column containing the values of the items displayed in the list
+     * @param listColumn - column names whose values should be displayed in the list
+     * @param orderBy - column name based on which the list items should be ordered
+     */
+    public SelectorListModel(String table, String dataColumn, String listColumn, String orderBy) {
+        this(null, table, dataColumn, listColumn, orderBy);
     }
     
-    public SelectorListModel(SSConnection ssConnection, String table, String bcolumn, String lcolumn, String orderBy) {
+    /**
+     * @param ssConnection - connection to be used for querying the database
+     * @param table - database table name
+     * @param dataColumn - name of the column containing the values of the items displayed in the list
+     * @param listColumn - column names whose values should be displayed in the list
+     * @param orderBy - column name based on which the list items should be ordered
+     */
+    public SelectorListModel(SSConnection ssConnection, String table, String dataColumn, String listColumn, String orderBy) {
         super();
         propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
         setSsConnection(ssConnection);
         setTable(table);
-        setDataColumn(bcolumn);
-        setListColumn(lcolumn);
+        setDataColumn(dataColumn);
+        setListColumn(listColumn);
         setOrderBy(orderBy);
     }
     
+    /**
+     *	This function refetches the information from the database. 
+     */
     public void refresh() {
         data = new BasicEventList();
         this.populateModel();
     }
     
+    /**
+     * @param index
+     * @return
+     */
     public Object getSelectedBoundData(int index) {
         Object itm = filtered_data.get(index);
         
         if (itm != null) {
             return ((SelectorElement)(itm)).getDataValue();
-        } else {
-            return "<null>";
         }
+        return "<null>";
     }
     
     public void setFilterText(String[] newFilter) {
         filtered_data.setFilterText(newFilter);
     }
     
+    /*
+     * Populates the list model with the data by fetching it from the database.
+     */
     private void populateModel() {
         
         Object dataValue = null;
         Object listValue = null;
         String sql = null;
         
+    // IF ANY OF THE REQUIRED INFORMATION IS NOT PRESENT CLEAR THE DATA AND RETURN     
         if (ssConnection == null || dataColumn == null || listColumn == null || table == null) {
             data.clear();
             filtered_data = new TextFilterList(data);
             return;
         }
-        
+
+    //  SEEMS LIKE WE HAVE THE USER INPUT REQUIRED TO FETCH INFORMATION FROM DATABASE
+    //  SO CLEAR THE OLD DATA FIRST
         data.clear();
         
+    // BUILD THE SQL    
         if (orderBy != null) {
             sql = "select " + dataColumn + ", " + listColumn + " from " + table + " ORDER BY " + orderBy;
         } else
             sql = "select " + dataColumn + ", " + listColumn + " from " + table;
         
+    // CREATE A ROWSET BASED ON THE ABOVE QUERY    
         ssRowset = new SSJdbcRowSetImpl();
         ssRowset.setSSConnection(ssConnection);
         ssRowset.setCommand(sql);
         
         try {
+        // EXECUTE THE QUERY	
             ssRowset.execute();
-            ssRowset.last();
-            //            System.out.println("Hay " + ssRowset.getRow() + " registros");
-        } catch (SQLException se) {
-            System.out.println("sql = " + sql);
-            System.out.println("ssRowset.execute() " + se);
-        }
-        
-        try {
-            ssRowset.beforeFirst();
+            
+        // LOOP THROUGH THE ROWSET THE ADD ELEMENTS TO THE DATA MODEL    
             while (ssRowset.next()) {
                 
                 switch(ssRowset.getColumnType(1)) {
@@ -291,29 +324,39 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
                         break;
                 }
                 listValue = ssRowset.getString(2);
+            // ADD ELEMENT TO THE DATA MODEL    
                 data.add(new SelectorElement(dataValue,listValue));
             }
+
         } catch (SQLException se) {
             System.out.println("SelectorListModel :" + se);
         } catch (java.lang.NullPointerException np) {
             System.out.println("SelectorListModel :" + np);
         }
-        
+    // FILL THE FILTERED DATA WITH THE COMPLETE DATA GOT FROM DATABASE    
         filtered_data = new TextFilterList(data);
         
+        
         this.fireContentsChanged(this, 0, filtered_data.size()-1);
-        this.fireIntervalAdded(this, 0, 1);
         this.fireIntervalRemoved(this, 0, 1);
-        
+        this.fireIntervalAdded(this, 0, 1);
+
+    // WE DON'T NEED THIS ROWSET ANY MORE SO SET IT TO NULL    
         ssRowset = null;
-        ssConnection = null;
-        
     }
     
+    
+    /**
+     * Adds an element to the data
+     * @param ob - object to be added to the data
+     */
     public void addElement(Object ob) {
         data.add(ob);
     }
     
+    /**
+     * Creates filtered data based on the actual data
+     */
     public void createFilteredData() {
         filtered_data = new TextFilterList(data);
         this.fireContentsChanged(this, 0, filtered_data.size()-1);
@@ -321,25 +364,24 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
         this.fireIntervalRemoved(this, 0, 1);
     }
     
+    /**
+     * Sets the selected item to the specified item
+     * @param bdata
+     */
     public void setSelectedItem(String bdata) {
         SelectorElement cual;
         String tofind;
         
         tofind = bdata.toUpperCase().trim();
         
-        System.out.println("setSelectedItem = " + tofind);
-        
         for (int i=0; i < filtered_data.size(); i++) {
             cual = (SelectorElement)(filtered_data.get(i));
             
-            System.out.println("BoundData = '" + cual.getDataValue() + "'");
-            
             if ((cual.getDataValue()).equals(bdata)) {
-                //                super.setSelectedItem(cual);
+            //    super.setSelectedItem(cual);
                 return;
             }
         }
-        System.out.println("parece que no encontro a '" + bdata +"'");
     }
     
     /**
@@ -448,6 +490,10 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
         this.refresh();
     }
     
+    /**
+     * Returns the column names based on which items are ordered
+     * @return returns the column names based on which items are ordered
+     */
     public String getOrderBy() {
         return orderBy;
     }
@@ -477,6 +523,10 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
         //this.refresh();
     }
     
+    /**
+     * This will execute the query and fetch the information from database and 
+     * updates the model with the new data fetched from the database
+     */
     public void execute() {
         refresh();
     }
@@ -505,41 +555,66 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
         this.refresh();
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.ListModel#getElementAt(int)
+     */
     public Object getElementAt(int index) {
-        //return data.get(index);
+       //return data.get(index);
         return filtered_data.get(index);
         
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.ListModel#getSize()
+     */
     public int getSize() {
         //return data.size();
         return filtered_data.size();
     }
     
+    /**
+     * @return
+     */
     public JTextField getFilterEdit() {
         return filtered_data.getFilterEdit();
     }
     
+    /**
+     * @param filter
+     */
     public void setFilterEdit(JTextField filter) {
         filtered_data.setFilterEdit(filter);
     }
     
+    /**
+     * @param listChangeListener
+     */
     public void addListEventListener(ListEventListener listChangeListener) {
         filtered_data.addListEventListener(listChangeListener);
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.ListModel#addListDataListener(javax.swing.event.ListDataListener)
+     */
     public void addListDataListener(javax.swing.event.ListDataListener l) {
         super.addListDataListener(l);
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.ComboBoxModel#setSelectedItem(java.lang.Object)
+     */
     public void setSelectedItem(Object anItem) {
-        System.out.println("setSelectedItem = " + anItem);
         selectedOne = anItem;
     }
     
+    /* (non-Javadoc)
+     * @see javax.swing.ComboBoxModel#getSelectedItem()
+     */
     public Object getSelectedItem() {
-        System.out.println("getSelectedItem = " + selectedOne);
-        
         return selectedOne;
     }
 }
+
+/*
+* $Log$
+*/
