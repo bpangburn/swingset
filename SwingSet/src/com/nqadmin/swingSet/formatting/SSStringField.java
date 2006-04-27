@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -39,7 +39,9 @@ package com.nqadmin.swingSet.formatting;
  */
 public class SSStringField extends SSFormattedTextField{
     
-    /** Creates a new instance of SSStringField */
+    /** 
+     * Creates a new instance of SSStringField 
+     */
     public SSStringField() {
     }
     
@@ -48,6 +50,9 @@ public class SSStringField extends SSFormattedTextField{
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/04 22:42:06  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.4  2005/01/18 23:38:01  dags
  * Diego's name fix
  *

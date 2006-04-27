@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,11 +33,7 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import java.text.NumberFormat;
-import javax.swing.text.NumberFormatter;
-import java.util.Locale;
 import javax.swing.JTextField;
-import com.nqadmin.swingSet.formatting.SSIntegerFormatterFactory;
 
 
 /**
@@ -54,24 +50,42 @@ public class SSIntegerField extends SSFormattedTextField {
      */
     private int minimumIntegerDigits;
     
-    /** Creates a new instance of PgIntegerField */
+    /** 
+     * Creates a new instance of PgIntegerField 
+     */
     public SSIntegerField() {
         this(new SSIntegerFormatterFactory());
     }
     
+    /**
+     * Creates an object of SSIntegerField with the specified number of digits.
+     * @param precision - number of digits needed
+     */
     public SSIntegerField(int precision) {
         this(new SSIntegerFormatterFactory(precision));
     }
     
+    /**
+     * Creates an object of SSIntegerField with the specified formatter factory
+     * @param factory - formatter factory to be used
+     */
     public SSIntegerField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         this.setHorizontalAlignment(JTextField.RIGHT);
     }
     
+    /**
+     * Returns the number of digits used for displaying integer 
+     * @return returns the number of digits used for displaying integer
+     */
     public int getPrecision() {
         return precision;
     }
     
+    /**
+     * Sets the number of digits needed to display the number
+     * @param precision - number of digits to be used to display the number
+     */
     public void setPrecision(int precision) {
         this.precision = precision;
         this.setFormatterFactory(new SSIntegerFormatterFactory(precision));
@@ -99,6 +113,9 @@ public class SSIntegerField extends SSFormattedTextField {
 
 /*
  * $Log$
+ * Revision 1.6  2005/03/28 14:46:42  dags
+ * syncro commit
+ *
  * Revision 1.5  2005/02/04 22:42:06  yoda2
  * Updated Copyright info.
  *

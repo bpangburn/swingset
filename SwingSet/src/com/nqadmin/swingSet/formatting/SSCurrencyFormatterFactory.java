@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,12 +33,11 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import javax.swing.text.NumberFormatter;
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import java.io.Serializable;
-import java.text.ParseException;
+import javax.swing.text.NumberFormatter;
 
 /**
  *
@@ -48,7 +47,7 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
     
     /**
      *  SSCurrencyFormatterFactory constructor, without arguments.
-     *  Creates a SSCurrencyFormatter with default Locale for
+     *  Creates a SSCurrencyFormatter with default Locale 
      */
     
     public SSCurrencyFormatterFactory() {
@@ -58,6 +57,11 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
         this.setDisplayFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
     }
     
+    /**
+     * Creates SSCurrencyFormatterFactory object with the specified precision & decimals
+     * @param precision - number of digits needed in the integer portion of the number
+     * @param decimals - number of digits needed in the fraction portion of the number
+     */
     public SSCurrencyFormatterFactory(int precision, int decimals) {
         NumberFormat nfd = NumberFormat.getCurrencyInstance(Locale.US);
         nfd.setMaximumFractionDigits(decimals);
@@ -72,16 +76,23 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
         this.setDisplayFormatter(new NumberFormatter(nfd));
     }
     
-    public SSCurrencyFormatterFactory(int precision, int decimals, Locale editor_locale, Locale display_locale) {
+    /**
+     * Creates SSCurrencyFormatterFactory object with the specified precision, decimals, editor locale & display locale
+     * @param precision - number of digits needed in the integer portion of the number
+     * @param decimals - number of digits needed in the fraction portion of the number
+     * @param editorLocale  - locale to be used by the editor
+     * @param displayLocale - locale to be used while displaying number
+     */
+    public SSCurrencyFormatterFactory(int precision, int decimals, Locale editorLocale, Locale displayLocale) {
         
-        NumberFormat nfe = NumberFormat.getCurrencyInstance(editor_locale);
+        NumberFormat nfe = NumberFormat.getCurrencyInstance(editorLocale);
         nfe.setMaximumFractionDigits(decimals);
         nfe.setMinimumFractionDigits(decimals);
         nfe.setMaximumIntegerDigits(precision);
         nfe.setMinimumIntegerDigits(1);
         this.setEditFormatter(new NumberFormatter(nfe));
         
-        NumberFormat nfd = NumberFormat.getCurrencyInstance(display_locale);
+        NumberFormat nfd = NumberFormat.getCurrencyInstance(displayLocale);
         nfd.setMaximumFractionDigits(decimals);
         nfd.setMinimumFractionDigits(decimals);
         nfd.setMaximumIntegerDigits(precision);
@@ -97,6 +108,9 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/04 22:42:06  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.5  2005/01/18 23:37:59  dags
  * Diego's name fix
  *

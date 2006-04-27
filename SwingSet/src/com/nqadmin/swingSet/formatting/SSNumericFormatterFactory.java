@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,13 +33,11 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import javax.swing.text.NumberFormatter;
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import java.io.Serializable;
-import java.text.ParseException;
-import javax.swing.JFormattedTextField;
+import javax.swing.text.NumberFormatter;
 
 
 /**
@@ -52,6 +50,9 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
     NumberFormatter enf = null;
     NumberFormatter dnf = null;
     
+    /**
+     * Creates a default SSNumericFormatterFactory
+     */
     public SSNumericFormatterFactory() {
         snf = new NumberFormatter(NumberFormat.getInstance());
         snf.setCommitsOnValidEdit(true);
@@ -68,6 +69,11 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
         this.setDisplayFormatter(dnf);
     }
     
+    /**
+     * Creates an object of SSFormatterFactory with the specified precision & decimals
+     * @param precision - number of digits needed for integer part of the number
+     * @param decimals - number of digits needed for fraction part of the number
+     */
     public SSNumericFormatterFactory(int precision, int decimals) {
         NumberFormat nfd = NumberFormat.getInstance(Locale.US);
         nfd.setMaximumFractionDigits(decimals);
@@ -94,6 +100,9 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
 
 /*
  * $Log$
+ * Revision 1.6  2005/05/11 17:21:41  dags
+ * let enter NULL values
+ *
  * Revision 1.5  2005/02/04 22:42:06  yoda2
  * Updated Copyright info.
  *

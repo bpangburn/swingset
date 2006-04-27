@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,11 +33,9 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import javax.swing.text.MaskFormatter;
-import java.util.Locale;
-
 import java.io.Serializable;
-import java.text.ParseException;
+
+import javax.swing.text.MaskFormatter;
 
 /**
  * SSCuitFormatterFactory.java
@@ -57,6 +55,9 @@ public class SSCuitFormatterFactory extends javax.swing.text.DefaultFormatterFac
     private MaskFormatter editFormatter;
     private MaskFormatter nullFormatter;
     
+    /**
+     * Creates an default object of SSCuitFormatterFactory
+     */
     public SSCuitFormatterFactory() {
         
         try {
@@ -87,5 +88,8 @@ public class SSCuitFormatterFactory extends javax.swing.text.DefaultFormatterFac
 
 /*
  * $Log$
+ * Revision 1.1  2005/06/08 02:26:02  dags
+ * initial release
+ *
  *
  */

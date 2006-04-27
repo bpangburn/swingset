@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,19 +33,15 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import com.nqadmin.swingSet.datasources.SSRowSet;
-
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-
-import javax.sql.RowSetListener;
-import javax.swing.JFormattedTextField;
-import java.util.Set;
-import java.util.HashSet;
-
-import com.nqadmin.swingSet.SSDataNavigator;
-import com.nqadmin.swingSet.formatting.helpers.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.beancontext.BeanContextChild;
 import java.beans.beancontext.BeanContextChildSupport;
 import java.beans.beancontext.BeanContextProxy;
@@ -53,6 +49,23 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.sql.RowSetListener;
+import javax.swing.InputVerifier;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+
+import com.nqadmin.swingSet.SSDataNavigator;
+import com.nqadmin.swingSet.datasources.SSRowSet;
+import com.nqadmin.swingSet.formatting.helpers.HelperPopup;
+import com.nqadmin.swingSet.formatting.helpers.RowSetHelperPopup;
+import com.nqadmin.swingSet.formatting.helpers.SSFormattedComboBoxEditor;
+import com.nqadmin.swingSet.formatting.helpers.SSFormattedComboBoxModel;
 
 
 /**
@@ -92,7 +105,9 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
     //private java.beans.PropertyChangeSupport propertyChangeSupport =  new java.beans.PropertyChangeSupport(this);
     
     
-    /** Creates a new instance of SSFormattedTextField */
+    /** 
+     * Creates a new instance of SSFormattedTextField 
+     */
     public SSFormattedTextField() {
         super();
         this.setFont(new Font(this.getFont().getName(), Font.BOLD, 11));
@@ -115,8 +130,7 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,newBackwardKeys);
         
         /*
-         * add this as a self KeyListener
-         *
+         * add this as a self KeyListener      *
          */
         addKeyListener(this);
         
@@ -137,9 +151,9 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
          *
          */
         menu = new JPopupMenu();
-        menu.add("Opcion 1");
-        menu.add("Opcion 2");
-        menu.add("Opcion 3");
+        menu.add("Option 1");
+        menu.add("Option 2");
+        menu.add("Option 3");
         
         /*
          * set InputVerifier. Rowset's updates are handled by this class. Is the preferred method instead of focus change.
@@ -148,78 +162,121 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         setInputVerifier(new internalVerifier());
     }
     
+    /**
+     * @param factory
+     */
     public SSFormattedTextField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         this();
         this.setFormatterFactory(factory);
     }
     
+    /**
+     * Sets the column name to which the component should be bound to
+     * @param columnName - column name to which the component will be bound to
+     */
     public void setColumnName(String columnName) {
         this.columnName = columnName;
         bind();
     }
     
+    /**
+     * Returns the column name to which the component is bound to
+     * @return - returns the column name to which the component is bound to
+     */
     public String getColumnName() {
         return columnName;
     }
     
+    /**
+     * @param combo
+     */
     public void setSSFormattedComboBox(SSFormattedComboBox combo) {
         this.combo = combo;
         if (this.combo != null)
             combo.setSelectedIndex(((SSFormattedComboBoxModel)combo.getModel()).indexOf(this.getValue()));
     }
     
+    /**
+     * @return
+     */
     public SSFormattedComboBox getSSFormattedComboBox() {
         return combo;
     }
     
     /**
-     *
+     * Sets the SSRowSet object to be used to get/set the value of the bound column
+     * @param rowset - SSRowSet object to be used to get/set the value of the bound column
      * @deprecated
-     * @see #setSSRowSet
-     *
+     * @see #setSSRowSet(SSRowSet)
      */
     public void setRowSet(SSRowSet rowset) {
         this.rowset = rowset;
         bind();
     }
     
+    /**
+     * Sets the SSRowSet object to be used to get/set the value of the bound column
+     * @param rowset - SSRowSet object to be used to get/set the value of the bound column
+     */
     public void setSSRowSet(SSRowSet rowset) {
         this.rowset = rowset;
         bind();
     }
     
+    /**
+     * SSRowSet object being used to get/set the bound column value
+     * @return - returns the SSRowSet object being used to get/set the bound column value
+     */
     public SSRowSet getSSRowSet() {
         return rowset;
     }
     
     /**
-     *
+     * Sets the SSDataNavigator being used to navigate the SSRowSet
+     * This is needed only if you want to include the function keys as short cuts to perform operations on the DataNavigator
+     * like saving the current row/ undo changes/ delete current row.
+     * The functionality for this is not yet finalized so be sure befor you use this
+     * @param navigator - SSDataNavigator being used to navigate the SSRowSet   
      * @deprecated
-     **/
+     * @see #setSSDataNavigator(SSDataNavigator) 
+     */
     public void setNavigator(SSDataNavigator navigator) {
         this.setSSDataNavigator(navigator);
     }
     
     /**
-     *
+     * Returns the SSDataNavigator object being used.
+     * @return returns the SSDataNavigator object being used.
      * @deprecated
+     * @see #getSSDataNavigator()
      **/
     public SSDataNavigator getNavigator() {
         return this.getSSDataNavigator();
     }
     
+    /**
+     * Sets the SSDataNavigator being used to navigate the SSRowSet
+     * This is needed only if you want to include the function keys as short cuts to perform operations on the DataNavigator
+     * like saving the current row/ undo changes/ delete current row.
+     * The functionality for this is not yet finalized so be sure befor you use this
+     * @param navigator - SSDataNavigator being used to navigate the SSRowSet
+     */
     public void setSSDataNavigator(SSDataNavigator navigator) {
         this.navigator = navigator;
         setSSRowSet(navigator.getSSRowSet());
         bind();
     }
     
+    /**
+     * Returns the SSDataNavigator object being used.
+     * @return returns the SSDataNavigator object being used.
+     */
     public SSDataNavigator getSSDataNavigator() {
         return this.navigator;
     }
+
     /**
      * Sets the SSRowSet and column name to which the component is to be bound.
-     *
      * @param _sSRowSet    datasource to be used.
      * @param _columnName  Name of the column to which this check box should be bound
      */
@@ -229,6 +286,9 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         bind();
     }
     
+    /**
+     * Binds the components to the specified column in the given rowset.
+     */
     private void bind() {
         
         if (columnName == null || rowset  == null) return;
@@ -242,22 +302,37 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         DbToFm("bind");
     }
     
+    /* (non-Javadoc)
+     * @see javax.sql.RowSetListener#rowSetChanged(javax.sql.RowSetEvent)
+     */
     public void rowSetChanged(javax.sql.RowSetEvent event) {
         //System.out.println("rowSetChanged" + event.getSource());
     }
     
+    /* (non-Javadoc)
+     * @see javax.sql.RowSetListener#rowChanged(javax.sql.RowSetEvent)
+     */
     public void rowChanged(javax.sql.RowSetEvent event) {
         //System.out.println("rowChanged " + event.getSource());
     }
     
+    /* (non-Javadoc)
+     * @see javax.sql.RowSetListener#cursorMoved(javax.sql.RowSetEvent)
+     */
     public void cursorMoved(javax.sql.RowSetEvent event) {
         //System.out.println("cursorMoved " + event.getSource());
         DbToFm("cursorMoved");
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+     */
     public void keyTyped(KeyEvent e) {
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+     */
     public void keyReleased(KeyEvent e) {
     }
     
@@ -277,8 +352,6 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         }
         
         if (e.getKeyCode() == KeyEvent.VK_F3) {
-            
-            System.out.println("F3 ");
             calculator = new javax.swing.JPopupMenu();
             //calculator.add(new com.nqadmin.swingSet.formatting.utils.JCalculator());
             JFormattedTextField ob = (JFormattedTextField)(e.getSource());
@@ -291,7 +364,7 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         }
         
         if (e.getKeyCode() == KeyEvent.VK_F5) {
-            System.out.println("F5 = PROCESS");
+            System.out.println("F5 = COMMIT");
             navigator.doCommitButtonClick();
         }
         
@@ -301,7 +374,7 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         }
         
         if (e.getKeyCode() == KeyEvent.VK_F8) {
-            System.out.println("F8 ");
+            System.out.println("F8 = UNDO");
             navigator.doUndoButtonClick();
         }
         
@@ -318,6 +391,9 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         }
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
+     */
     public void focusLost(FocusEvent e) {
         /**
          * some code to highlight the component with the focus
@@ -326,6 +402,9 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         setBackground(std_color);
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
+     */
     public void focusGained(FocusEvent e) {
         
         /**
@@ -352,7 +431,6 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
     /**
      * This method perform the actual data transfer from rowset to this object Value field.
      * depending on the column Type.
-     *
      */
     
     private void DbToFm(String texto) {
@@ -561,30 +639,49 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         oValue = nValue;
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+     */
     public void mouseExited(MouseEvent e) {
         //System.out.println("mouseExited");
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+     */
     public void mouseEntered(MouseEvent e) {
         //System.out.println("mouseEntered");
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+     */
     public void mouseClicked(MouseEvent e) {
         //System.out.println("mouseClicked");
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+     */
     public void mousePressed(MouseEvent evt) {
         if (evt.isPopupTrigger()) {
             menu.show(evt.getComponent(), evt.getX(), evt.getY());
         }
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+     */
     public void mouseReleased(MouseEvent evt) {
         if (evt.isPopupTrigger()) {
             menu.show(evt.getComponent(), evt.getX(), evt.getY());
         }
     }
     
+    /**
+     * Sets the HelperPopup to be used.
+     * @param helper - HelperPopup to be used.
+     */
     public void setHelper(JPopupMenu helper) {
         this.helper = helper;
         
@@ -596,6 +693,10 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         
     }
     
+    /**
+     * Displays the HelperPopup screen.
+     * @param e - the key event which triggered the helper popup
+     */
     public void showHelper(KeyEvent e) {
         if (helper == null) return;
         
@@ -654,14 +755,24 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
     }
     
     
-    public boolean updateValue(Object aux){
-    	if(updateFieldValue(aux)){
-    		setValue(aux);
+    /**
+     * Sets the value of the field to the specified value
+     * @param value - The value to be set for this component (this will also update the underlying column value)
+     * @return returns true if update is successful else false
+     */
+    public boolean updateValue(Object value){
+    	if(updateFieldValue(value)){
+    		setValue(value);
     		return true;
     	}
     	return false;
     }
     
+    /**
+     * Updates the value of the componenet
+     * @param aux - value with whcih the component should be updated
+     * @return returns true upon successful update else false
+     */
     private boolean updateFieldValue(Object aux){
     	
     	/**
@@ -676,8 +787,6 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
             
             setBackground(java.awt.Color.WHITE);
             
-            System.out.println("inputVerifier(): " + columnName + " aux = " + aux + " colType = " + colType);
-            System.out.println("aux is a " + aux.getClass().getName());
             
             if (columnName == null) return true;
             if (colType    == -99 ) return true;
@@ -687,7 +796,6 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
                 
                 rowset.removeRowSetListener(tf);
                 if (aux == null) {
-                    System.out.println("aux IS null");
                     rowset.updateNull(columnName);
                     rowset.addRowSetListener(tf);
                     tf.firePropertyChange("value", null, aux);
@@ -732,8 +840,12 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
     	
     }
     
+    /**
+     * Updates the bound column in the rowset with the specified value
+     * @param aux - value with which the rowset column has to be updated
+     * @throws SQLException
+     */
     private void updateRowSet(Object aux) throws SQLException{
-    	System.out.println("Updating rowset column " + columnName + " with " + aux);        
         switch(colType) {
             
             case java.sql.Types.ARRAY://2003
@@ -743,7 +855,6 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
                 break;
                 
             case java.sql.Types.BIT://-7
-                System.out.println("BIT --> updateBoolean()");
                 rowset.updateBoolean(columnName, ((Boolean)aux).booleanValue());
                 break;
                 
@@ -751,7 +862,6 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
                 break;
                 
             case java.sql.Types.BOOLEAN://16
-                System.out.println("BOOLEAN - Set");
                 rowset.updateBoolean(columnName, ((Boolean)aux).booleanValue());
                 break;
                 
@@ -762,7 +872,6 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
                 break;
                 
             case java.sql.Types.DATE://91
-                System.out.println("DATE --> updateDate()");
                 rowset.updateDate(columnName, new java.sql.Date(((java.util.Date) aux).getTime()));
                 break;
                 
@@ -776,22 +885,17 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
             case java.sql.Types.SMALLINT:
             case java.sql.Types.TINYINT:
                 if (aux instanceof java.math.BigDecimal) {
-                    System.out.println("updateDouble() - BigDecimal");
                     rowset.updateDouble(columnName, ((Double)aux).doubleValue());
                 } else if (aux instanceof Double) {
-                    System.out.println("updateDouble()");
                     rowset.updateDouble(columnName, ((Double)aux).doubleValue());
                 } else if (aux instanceof Float) {
-                    System.out.println("updateFloat()");
                     rowset.updateFloat(columnName, ((Float)aux).floatValue());
                 } else if (aux instanceof Integer) {
-                    System.out.println("updateInt()");
                     rowset.updateInt(columnName, ((Integer)aux).intValue());
                 } else if (aux instanceof Long) {
-                    System.out.println("updateLong()");
                     rowset.updateLong(columnName, ((Long)aux).longValue());
                 } else {
-                    System.out.println("ELSE ???");
+                    System.out.println("Value aux is of unknown type......unable to update database");
                 }
                 
                 break;
@@ -847,18 +951,22 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
                 
             default:
                 System.out.println("============================================================================");
+            	System.out.println("Unknown column type");
                 System.out.println("default = " + colType);
                 System.out.println("columnName = " + columnName);
                 System.out.println("============================================================================");
                 break;
         }
     }
+  
+    /* (non-Javadoc)
+     * @see java.beans.beancontext.BeanContextProxy#getBeanContextProxy()
+     */
     public BeanContextChild getBeanContextProxy(){
-        System.err.println("getBeanContextProxy Called");
         return beanContextChildSupport;
     }
-   /*
     
+   /*    
     protected void processFocusEvent(FocusEvent e) {
         System.out.println("processFocusEvent()" + e);
     
@@ -876,8 +984,9 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
     }
     */
     
-    /**
-     * Overridden from superclass
+ 
+    /* (non-Javadoc)
+     * @see javax.swing.JFormattedTextField#commitEdit()
      */
     public void commitEdit() throws ParseException {
         
@@ -890,6 +999,11 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
     }
     
     // this method can be override to make custom validation.
+    /**
+     * Checks if the value is valid of the component
+     * @param value - value to be validated
+     * @return returns true if the value is valid else false
+     */
     public boolean validateField(Object value) {
         
         if (nullable == false && value == null)
@@ -918,6 +1032,9 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
         this.firePropertyChange("nullable", new Boolean(oldNullable), new Boolean(nullable));
     }
     
+    /* (non-Javadoc)
+     * @see com.nqadmin.swingSet.formatting.SSField#cleanField()
+     */
     public void cleanField() {
         setValue(null);
     }
@@ -925,6 +1042,9 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
 
 /*
  * $Log$
+ * Revision 1.22  2006/03/28 16:12:28  prasanth
+ * Added functions to provide the ability to set value programatically that works with the formatter.
+ *
  * Revision 1.21  2005/05/29 02:24:37  dags
  * SSConnection and SSRowSet getters and setter refactoring
  *

@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -30,19 +30,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 package com.nqadmin.swingSet.formatting;
 
-import javax.swing.JFormattedTextField.AbstractFormatterFactory;
-import com.nqadmin.swingSet.formatting.SSPercentFormatterFactory;
 import javax.swing.JTextField;
 
 public class SSPercentField extends SSFormattedTextField {
     
-    /** Creates a new instance of SSPercentField */
+    /** 
+     * Creates a default object of SSPercentField 
+     */
     public SSPercentField() {
         this(new SSPercentFormatterFactory());
     }
     
+    /**
+     * Creates an object of SSPercentField with the specified formatter factory
+     * @param factory - formatter factory to be used
+     */
     public SSPercentField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         this.setHorizontalAlignment(JTextField.RIGHT);        
@@ -50,3 +55,7 @@ public class SSPercentField extends SSFormattedTextField {
     }
     
 }
+
+/*
+ * $Log$
+ */

@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -32,7 +32,6 @@
  */
 package com.nqadmin.swingSet.formatting;
 
-import com.nqadmin.swingSet.formatting.SSDateFormatterFactory;
 
 /**
  *
@@ -44,20 +43,34 @@ public class SSDateField extends SSFormattedTextField {
 	public static final int MMDDYYYY = 0;
 	public static final int DDMMYYYY = 1;
 	
-    /** Creates a new instance of SSDateField */
+    /**
+     *  Creates a new instance of SSDateField with the specified format 
+     *  @param format - format to be used while the date field is in edit mode
+     *  allowed values are MMDDYYYY or DDMMYYYY
+     */
     public SSDateField(int format) {
         this(new SSDateFormatterFactory(format));
     }
             
+    /**
+     *  Creates a default SSDateField object
+     */
     public SSDateField(){
     	this(new SSDateFormatterFactory());
     }
     
+    /**
+     * Creates an object of SSDateField with the specified formatter factory
+     * @param factory - formatter factory to be used 
+     */
     public SSDateField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         this.setValue(new java.util.Date());
     }
     
+    /* 
+     * Sets the value of the field to the current system date
+     */
     public void cleanField() {
         this.setValue(new java.util.Date());
     }
@@ -66,6 +79,9 @@ public class SSDateField extends SSFormattedTextField {
 
 /*
  * $Log$
+ * Revision 1.8  2006/03/28 16:10:33  prasanth
+ * Added a constructor to take the date format needed.
+ *
  * Revision 1.7  2005/05/26 22:20:36  dags
  * SSField interface implemented
  *

@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -40,16 +40,25 @@ import java.util.Calendar;
 
 public class SSTimeField extends SSFormattedTextField {
     
-    /** Creates a new instance of SSTimeField */
+    /** 
+     * Creates a new instance of SSTimeField 
+     */
     public SSTimeField() {
         this(new SSTimeFormatterFactory());
     }
             
+    /**
+     * Creates an object of SSTimeField with the specified formatter factory
+     * @param factory - formatter factory to be used
+     */
     public SSTimeField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         this.setValue( Calendar.getInstance().getTime() );
     }
 
+    /* (non-Javadoc)
+     * @see com.nqadmin.swingSet.formatting.SSField#cleanField()
+     */
     public void cleanField() {
         this.setValue( Calendar.getInstance().getTime() );
     }
@@ -60,6 +69,9 @@ public class SSTimeField extends SSFormattedTextField {
 
 /*
  * $Log$
+ * Revision 1.2  2005/05/26 22:20:36  dags
+ * SSField interface implemented
+ *
  * Revision 1.1  2005/05/26 12:16:20  dags
  * initial release
  *

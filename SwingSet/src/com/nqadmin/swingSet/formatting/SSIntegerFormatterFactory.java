@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,12 +33,11 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import javax.swing.text.NumberFormatter;
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import java.io.Serializable;
-import java.text.ParseException;
+import javax.swing.text.NumberFormatter;
 
 /**
  *
@@ -46,6 +45,10 @@ import java.text.ParseException;
  */
 public class SSIntegerFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
 
+	
+    /**
+     * Constructs a default SSIntegerFormatterFactory 
+     */
     public SSIntegerFormatterFactory() {
         this.setDefaultFormatter(new NumberFormatter(NumberFormat.getIntegerInstance()));
         this.setNullFormatter(null);
@@ -53,6 +56,10 @@ public class SSIntegerFormatterFactory extends javax.swing.text.DefaultFormatter
         this.setDisplayFormatter(new NumberFormatter(NumberFormat.getIntegerInstance()));
     }
     
+    /**
+     * Creates an object of SSIntegerFormatterFactory with the specified precision
+     * @param precision - number of digits needed to display the number
+     */
     public SSIntegerFormatterFactory(int precision) {
         NumberFormat nfd = NumberFormat.getIntegerInstance();
         
@@ -69,6 +76,9 @@ public class SSIntegerFormatterFactory extends javax.swing.text.DefaultFormatter
 
 /*
  * $Log$
+ * Revision 1.5  2005/02/04 22:42:06  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.4  2005/01/18 23:38:01  dags
  * Diego's name fix
  *

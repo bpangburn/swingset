@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,13 +33,10 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import javax.swing.text.DateFormatter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-
 import java.io.Serializable;
-import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import javax.swing.text.DateFormatter;
 
 
 /**
@@ -48,11 +45,19 @@ import java.text.ParseException;
  */
 public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
 
+	/**
+	 * Constant for date format
+	 */
 	public static final int MMDDYYYY = 0;
+	
+	/**
+	 * Constant for date format
+	 */
 	public static final int DDMMYYYY = 1;
 	
-	private int format = 0;
-	
+    /**
+     * Constructs a default SSDateFormatterFactory. 
+     */
     public SSDateFormatterFactory() {
         this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("DD/mm/yyyy")));
         this.setNullFormatter(null);
@@ -60,6 +65,11 @@ public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFac
         this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("MMM dd, yyyy")));
     }
     
+    /**
+     * Creates an object of SSDateFormatterFactory with the specified format.
+     * @param format  - format to be used for date while in editing mode.
+     * The default format is DDMMYYYY
+     */
     public SSDateFormatterFactory(int format){
     	switch(format){
     	case 0:
@@ -81,6 +91,9 @@ public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFac
 
 /*
  * $Log$
+ * Revision 1.6  2006/03/28 16:09:40  prasanth
+ * Added a constructor to take the date format.
+ *
  * Revision 1.5  2005/02/04 22:42:06  yoda2
  * Updated Copyright info.
  *

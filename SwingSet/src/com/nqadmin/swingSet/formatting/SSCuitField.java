@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -52,12 +52,16 @@ public class SSCuitField extends SSFormattedTextField {
   
     private Caret cuitCaret;
   
-    /** Creates a new instance of SSCuitFieldField */
+    /** 
+     * Creates a new instance of SSCuitFieldField 
+     */
     public SSCuitField() {
         this(new SSCuitFormatterFactory());
     }
     
-    /** Creates a new instance of SSCuitFieldField */
+    /** Creates a new instance of SSCuitFieldField with the specified formatter factory 
+     * @param factory - formatter factory to be used
+     */
     public SSCuitField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         
@@ -73,6 +77,9 @@ public class SSCuitField extends SSFormattedTextField {
         
     }
 
+    /* (non-Javadoc)
+     * @see com.nqadmin.swingSet.formatting.SSFormattedTextField#validateField(java.lang.Object)
+     */
     public boolean validateField(Object value) {
 
         boolean retValue;
@@ -82,13 +89,12 @@ public class SSCuitField extends SSFormattedTextField {
         return retValue;
     }
 
-/**
- * Computes verifier digit and checks against supplied value.
- *
- * @param  cu    the CUIT value to be verified.
- * @return true if CUIT is valid, false elsewhere.
- */
-
+    /**
+	 * Computes verifier digit and checks against supplied value.
+	 *
+	 * @param  cu    the CUIT value to be verified.
+	 * @return true if CUIT is valid, else false
+	 */
     public boolean CheckCuit(String cu)
     {
         
@@ -129,14 +135,15 @@ public class SSCuitField extends SSFormattedTextField {
         {
             return false;
         }
-        else
-        {
-            return true;
-        }
+        return true;
+        
     }
 }
 
 /*
  * $Log$
+ * Revision 1.1  2005/06/08 02:26:02  dags
+ * initial release
+ *
  *
  */

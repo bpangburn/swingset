@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,13 +33,10 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import javax.swing.text.DateFormatter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-
 import java.io.Serializable;
-import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import javax.swing.text.DateFormatter;
 
 
 /**
@@ -48,6 +45,10 @@ import java.text.ParseException;
  */
 public class SSTimestampFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
 
+    /**
+     * Creates an instance of SSTimestampFormatterFactory 
+     * the display format used is dd/MM/yyyy hh:mm:ss SSS Z and the edit format is ddMMyyyyHHmmssSSSZ 
+     */
     public SSTimestampFormatterFactory() {
         this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss SSS Z")));
         this.setNullFormatter(null);
@@ -59,6 +60,9 @@ public class SSTimestampFormatterFactory extends javax.swing.text.DefaultFormatt
 
 /*
  * $Log$
+ * Revision 1.2  2005/05/26 22:20:36  dags
+ * SSField interface implemented
+ *
  * Revision 1.1  2005/05/26 12:16:20  dags
  * initial release
  *

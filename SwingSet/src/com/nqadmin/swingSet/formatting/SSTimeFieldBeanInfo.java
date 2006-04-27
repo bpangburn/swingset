@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,7 +33,12 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import java.beans.*;
+import java.beans.BeanDescriptor;
+import java.beans.EventSetDescriptor;
+import java.beans.IntrospectionException;
+import java.beans.MethodDescriptor;
+import java.beans.PropertyDescriptor;
+import java.beans.SimpleBeanInfo;
 
 /**
  * SSTimeFieldBeanInfo.java
@@ -210,5 +215,8 @@ public class SSTimeFieldBeanInfo extends SimpleBeanInfo {
 
 /*
  * $Log$
+ * Revision 1.1  2005/06/08 02:35:47  dags
+ * initial release
+ *
  *
  */

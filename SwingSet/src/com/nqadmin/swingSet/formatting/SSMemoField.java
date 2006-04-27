@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,8 +33,6 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import com.nqadmin.swingSet.SSDataNavigator;
-import com.nqadmin.swingSet.datasources.SSRowSet;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -42,12 +40,16 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.sql.RowSetListener;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+
+import com.nqadmin.swingSet.SSDataNavigator;
+import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
  *
@@ -61,7 +63,9 @@ public class SSMemoField extends JTextArea implements SSField, RowSetListener, K
     private SSRowSet rowset = null;
     private SSDataNavigator navigator = null;
     
-    /** Creates a new instance of SSBooleanField */
+    /** 
+     * Creates a new instance of SSBooleanField 
+     */
     public SSMemoField() {
         super();
         
@@ -84,63 +88,104 @@ public class SSMemoField extends JTextArea implements SSField, RowSetListener, K
         this.setInputVerifier(new internalVerifier());
     }
     
+    /**
+     * Returns the column name to which the component is bound to
+     * @return - returns the column name to which the component is bound to
+     */
     public String getColumnName() {
         return this.columnName;
     }
-    
+
+    /**
+     * Sets the column name to which the component should be bound to
+     * @param columnName - column name to which the component will be bound to
+     */
     public void setColumnName(String columnName) {
         this.columnName = columnName;
         bind();
     }
 
     /**
+     * Sets the SSRowSet object to be used to get/set the value of the bound column
+     * @param rowset - SSRowSet object to be used to get/set the value of the bound column
      * @deprecated
-     **/
+     * @see #setSSRowSet(SSRowSet)
+     */
     public void setRowSet(SSRowSet rowset) {
         setSSRowSet(rowset);
     }
     
     /**
+     * SSRowSet object being used to get/set the bound column value
+     * @return - returns the SSRowSet object being used to get/set the bound column value
      * @deprecated
+     * @see #getSSRowSet()
      **/
     public SSRowSet getRowSet() {
         return getSSRowSet();
     }
     
+    /**
+     * Sets the SSRowSet object to be used to get/set the value of the bound column
+     * @param rowset - SSRowSet object to be used to get/set the value of the bound column
+     */
     public void setSSRowSet(SSRowSet rowset) {
         this.rowset = rowset;
         bind();
     }
     
-    public SSRowSet getSSRowSet() {
+    /**
+     * SSRowSet object being used to get/set the bound column value
+     * @return - returns the SSRowSet object being used to get/set the bound column value
+     */
+      public SSRowSet getSSRowSet() {
         return this.rowset;
     }
     
-     /**
-     *
-     * @deprecated
-     **/
+	/**
+	 * Sets the SSDataNavigator being used to navigate the SSRowSet
+	 * This is needed only if you want to include the function keys as short cuts to perform operations on the DataNavigator
+	 * like saving the current row/ undo changes/ delete current row.
+	 * The functionality for this is not yet finalized so be sure befor you use this
+	 * @param navigator - SSDataNavigator being used to navigate the SSRowSet   
+	 * @deprecated
+	 * @see #setSSDataNavigator(SSDataNavigator) 
+	 */
     public void setNavigator(SSDataNavigator navigator) {
         this.setSSDataNavigator(navigator);
     }
     
     /**
-     *
+     * Returns the SSDataNavigator object being used.
+     * @return returns the SSDataNavigator object being used.
      * @deprecated
+     * @see #getSSDataNavigator()
      **/
     public SSDataNavigator getNavigator() {
         return this.getSSDataNavigator();
     }
     
-    public void setSSDataNavigator(SSDataNavigator navigator) {
+    /**
+     * Sets the SSDataNavigator being used to navigate the SSRowSet
+     * This is needed only if you want to include the function keys as short cuts to perform operations on the DataNavigator
+     * like saving the current row/ undo changes/ delete current row.
+     * The functionality for this is not yet finalized so be sure befor you use this
+     * @param navigator - SSDataNavigator being used to navigate the SSRowSet
+     */
+     public void setSSDataNavigator(SSDataNavigator navigator) {
         this.navigator = navigator;
         setSSRowSet(navigator.getSSRowSet());
         bind();
     }
     
-    public SSDataNavigator getSSDataNavigator() {
+     /**
+      * Returns the SSDataNavigator object being used.
+      * @return returns the SSDataNavigator object being used.
+      */
+     public SSDataNavigator getSSDataNavigator() {
         return this.navigator;
     }
+     
     private void DbToFm() {
         
         try {
@@ -190,30 +235,41 @@ public class SSMemoField extends JTextArea implements SSField, RowSetListener, K
         DbToFm();
     }
     
+    /* (non-Javadoc)
+     * @see javax.sql.RowSetListener#rowSetChanged(javax.sql.RowSetEvent)
+     */
     public void rowSetChanged(javax.sql.RowSetEvent event) {
         
     }
     
+    /* (non-Javadoc)
+     * @see javax.sql.RowSetListener#rowChanged(javax.sql.RowSetEvent)
+     */
     public void rowChanged(javax.sql.RowSetEvent event) {
         
     }
     
+    /* (non-Javadoc)
+     * @see javax.sql.RowSetListener#cursorMoved(javax.sql.RowSetEvent)
+     */
     public void cursorMoved(javax.sql.RowSetEvent event) {
         DbToFm();
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+     */
     public void keyTyped(KeyEvent e) {
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+     */
     public void keyReleased(KeyEvent e) {
     }
     
     /**
      *  Catch severals keys, to implement some forms functionality (To be done).
-     *
-     *
-     *
-     *
      */
     public void keyPressed(KeyEvent e) {
         
@@ -276,6 +332,9 @@ public class SSMemoField extends JTextArea implements SSField, RowSetListener, K
     }
     
     
+    /* (non-Javadoc)
+     * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
+     */
     public void focusLost(FocusEvent e) {
         /**
          * some code to highlight the component with the focus
@@ -284,6 +343,9 @@ public class SSMemoField extends JTextArea implements SSField, RowSetListener, K
         setBackground(std_color);
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
+     */
     public void focusGained(FocusEvent e) {
         
         /**
@@ -307,6 +369,9 @@ public class SSMemoField extends JTextArea implements SSField, RowSetListener, K
         });
     }
 
+    /* (non-Javadoc)
+     * @see com.nqadmin.swingSet.formatting.SSField#cleanField()
+     */
     public void cleanField() {
     }
     
@@ -356,15 +421,18 @@ public class SSMemoField extends JTextArea implements SSField, RowSetListener, K
                     tf.setText("");
                 }
                 return true;
-            } else {
-                /*
-                 * Validation fails.
-                 *
-                 */
-                
-                setBackground(java.awt.Color.RED);
-                return false;
-            }
+            } 
+            /*
+             * Validation fails.
+             *
+             */
+            
+            setBackground(java.awt.Color.RED);
+            return false;            
         }
     }
 }
+
+/*
+* $Log$
+*/

@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -30,10 +30,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 package com.nqadmin.swingSet.formatting;
 
-import javax.swing.JFormattedTextField.AbstractFormatterFactory;
-import com.nqadmin.swingSet.formatting.SSNFormatterFactory;
 
 /**
  *
@@ -43,11 +42,17 @@ import com.nqadmin.swingSet.formatting.SSNFormatterFactory;
 public class SSSSNField extends SSFormattedTextField {
   
   
-    /** Creates a new instance of SSSSNField */
+    /** 
+     * Creates a new instance of SSSSNField 
+     */
     public SSSSNField() {
         this(new SSNFormatterFactory());
     }
     
+    /**
+     * Creates an object of SSSSNField with the specified formatter factory
+     * @param factory - formatter factory to be used
+     */
     public SSSSNField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
     }
@@ -55,6 +60,9 @@ public class SSSSNField extends SSFormattedTextField {
 
 /*
  * $Log$
+ * Revision 1.6  2005/03/28 14:46:43  dags
+ * syncro commit
+ *
  * Revision 1.5  2005/02/04 22:42:06  yoda2
  * Updated Copyright info.
  *

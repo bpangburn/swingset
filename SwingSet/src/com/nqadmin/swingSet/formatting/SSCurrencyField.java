@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -34,8 +34,8 @@
 package com.nqadmin.swingSet.formatting;
 
 import java.util.Locale;
+
 import javax.swing.JTextField;
-import com.nqadmin.swingSet.formatting.SSCurrencyFormatterFactory;
 
 /**
  *
@@ -52,19 +52,38 @@ public class SSCurrencyField extends SSFormattedTextField {
      */
     private int minimumIntegerDigits;
 
-    /** Creates a new instance of PgCurrencyField */
+    /** 
+     * Creates a new instance of SSCurrencyField 
+     */
     public SSCurrencyField() {
         this(new SSCurrencyFormatterFactory());
     }
     
+    /**
+     * Creates an instance of SSCurrenyField with the specified number of integer & fraction digits
+     * @param precision - number of digits needed for integer part of the number
+     * @param decimals - number of digits needed for the fraction part of the number
+     */
     public SSCurrencyField(int precision, int decimals) {
         this(new SSCurrencyFormatterFactory(precision, decimals));
     }
     
-    public SSCurrencyField(int precision, int decimals, Locale editor, Locale display) {
-        this(new SSCurrencyFormatterFactory(precision, decimals, editor, display));
+    /**
+     * Creates an instance of SSCurrenyField with the specified number of integer & fraction digits using the 
+     * given locale
+     * @param precision - number of digits needed for integer part of the number
+     * @param decimals - number of digits needed for the fraction part of the number
+     * @param editorLocale -  locale to be used while in editing mode
+     * @param displayLocale - locate to be used for displaying the number
+     */
+    public SSCurrencyField(int precision, int decimals, Locale editorLocale, Locale displayLocale) {
+        this(new SSCurrencyFormatterFactory(precision, decimals, editorLocale, displayLocale));
     }
     
+    /**
+     * Creates an SSCurrencyField with the specified formatter factory
+     * @param factory - formatter factory to be used
+     */
     public SSCurrencyField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         this.setHorizontalAlignment(JTextField.RIGHT);
@@ -72,8 +91,8 @@ public class SSCurrencyField extends SSFormattedTextField {
     }
     
     /**
-     * Getter for property precision.
-     * @return Value of property precision.
+     * Returns the number digits used for integer part of the number
+     * @return returns the number digits used for integer part of the number
      */
     public int getPrecision() {
         return precision;
@@ -87,11 +106,19 @@ public class SSCurrencyField extends SSFormattedTextField {
         return decimals;
     }
     
+    /**
+     * Sets the number of digits needed for integer part of the number
+     * @param precision - number of digits needed for integer part of the number
+     */
     public void setPrecision(int precision) {
         this.precision = precision;
         this.setFormatterFactory(new SSCurrencyFormatterFactory(precision, decimals));
     }
     
+    /**
+     * Sets the number of digits needed for fraction part of the number
+     * @param decimals - number of digits needed for fraction part of the number
+     */
     public void setDecimals(int decimals) {
         this.decimals = decimals;
         this.setFormatterFactory(new SSCurrencyFormatterFactory(precision, decimals));
@@ -100,6 +127,9 @@ public class SSCurrencyField extends SSFormattedTextField {
 
 /*
  * $Log$
+ * Revision 1.7  2005/05/26 12:12:36  dags
+ * added bind(SSRowSet, columnName) method and some java.sql.Types checking and support
+ *
  * Revision 1.6  2005/03/28 14:46:42  dags
  * syncro commit
  *

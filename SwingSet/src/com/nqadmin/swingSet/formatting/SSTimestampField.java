@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,7 +33,6 @@
 package com.nqadmin.swingSet.formatting;
 
 import java.sql.Timestamp;
-import java.util.Calendar;
 
 
 
@@ -45,11 +44,17 @@ import java.util.Calendar;
 public class SSTimestampField extends SSFormattedTextField {
     private Timestamp ts = null;
     
-    /** Creates a new instance of SSTimeField */
+    /** 
+     * Creates a new instance of SSTimeField 
+     */
     public SSTimestampField() {
         this(new SSTimestampFormatterFactory());
     }
             
+    /**
+     * Creates an instance of SSTimestampField with the specified formatter factory
+     * @param factory - formatter factory to be used
+     */
     public SSTimestampField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         ts = new java.sql.Timestamp( (new java.util.Date().getTime() ) );
@@ -57,6 +62,9 @@ public class SSTimestampField extends SSFormattedTextField {
         this.setValue(new java.util.Date(  ));
     }
     
+    /* (non-Javadoc)
+     * @see com.nqadmin.swingSet.formatting.SSField#cleanField()
+     */
     public void cleanField() {
         ts = new java.sql.Timestamp( (new java.util.Date().getTime() ) );
 
@@ -68,6 +76,9 @@ public class SSTimestampField extends SSFormattedTextField {
 
 /*
  * $Log$
+ * Revision 1.2  2005/05/26 22:20:36  dags
+ * SSField interface implemented
+ *
  * Revision 1.1  2005/05/26 12:16:20  dags
  * initial release
  *

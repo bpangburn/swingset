@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -33,18 +33,20 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import com.nqadmin.swingSet.SSDataNavigator;
-import com.nqadmin.swingSet.datasources.SSRowSet;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.sql.RowSetListener;
 import javax.swing.InputVerifier;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
+
+import com.nqadmin.swingSet.SSDataNavigator;
+import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
  *
@@ -78,57 +80,99 @@ public class SSBooleanField extends JCheckBox implements SSField, RowSetListener
         this.setInputVerifier(new internalVerifier());
     }
     
+    /**
+     * Sets the SSRowSet column name to which the component is bound.
+     * @param columnName - column name to which the component is bound 
+     */
     public void setColumnName(String columnName) {
         this.columnName = columnName;
         bind();
     }
     
+    /**
+     * Returns the SSRowSet column name to which the component is bound.
+     * @return  returns column name to which the component is bound 
+     */
     public String getColumnName() {
         return this.columnName;
     }
     
+    /**
+     * Sets the SSRowSet to which the component is bound
+     * @param rowset SSRowSet to which the component is bound
+     * @deprecated 
+     * @see #setSSRowSet(SSRowSet)
+     */
     public void setRowSet(SSRowSet rowset) {
         this.setSSRowSet(rowset);
     }
     
+    /**
+     * Sets the SSRowSet to which the component is bound.
+     * @param rowset SSRowSet to which the component is bound.
+     */
     public void setSSRowSet(SSRowSet rowset) {
         this.rowset = rowset;
         bind();
     }
     
+    /**
+     * Returns the SSRowSet to which the component is bound
+     * @return returns the SSRowSet to which the component is bound
+     */
     public SSRowSet getRowSet() {
         return this.getSSRowSet();
     }
     
+    /**
+     * Returns the SSRowSet to which the component is bound
+     * @return returns the SSRowSet to which the component is bound
+     */
     public SSRowSet getSSRowSet() {
         return this.rowset;
     }
     
      /**
-     *
-     * @deprecated
+     * Sets the SSDataNavigator used for navigating the SSRowSet to which this component is bound to.
+     * @param navigator - SSDataNavigator used for navigating the SSRowSet to which this component is bound to
+     * @deprecated 
+     * @see #setSSDataNavigator(SSDataNavigator)
      **/
     public void setNavigator(SSDataNavigator navigator) {
         this.setSSDataNavigator(navigator);
     }
     
     /**
-     *
-     * @deprecated
+     * Returns the SSDataNavigator being used
+     * @return returns the SSDataNavigator being used
+     * @deprecated 
+     * @see #setSSDataNavigator(SSDataNavigator)
      **/
     public SSDataNavigator getNavigator() {
         return this.getSSDataNavigator();
     }
     
+    /**
+     * Sets the SSDataNavigator used for navigating the SSRowSet to which this component is bound to.
+     * @param navigator - SSDataNavigator used for navigating the SSRowSet to which this component is bound to
+     */
     public void setSSDataNavigator(SSDataNavigator navigator) {
         this.navigator = navigator;
         setSSRowSet(navigator.getSSRowSet());
         bind();
     }
     
+    /**
+     * Returns the SSDataNavigator being used
+     * @return returns the SSDataNavigator being used
+     */
     public SSDataNavigator getSSDataNavigator() {
         return this.navigator;
     }
+    
+    /**
+     * Fetches the value from rowset and updates the field accordingly
+     */
     private void DbToFm() {
         
         try {
@@ -174,6 +218,9 @@ public class SSBooleanField extends JCheckBox implements SSField, RowSetListener
         bind();
     }
 
+    /**
+     * Binds this component to the specified column in the given rowset. 
+     */
     private void bind() {
         
         if (this.columnName == null) return;
@@ -188,22 +235,37 @@ public class SSBooleanField extends JCheckBox implements SSField, RowSetListener
         DbToFm();
     }
     
+    /* (non-Javadoc)
+     * @see javax.sql.RowSetListener#rowSetChanged(javax.sql.RowSetEvent)
+     */
     public void rowSetChanged(javax.sql.RowSetEvent event) {
         
     }
     
+    /* (non-Javadoc)
+     * @see javax.sql.RowSetListener#rowChanged(javax.sql.RowSetEvent)
+     */
     public void rowChanged(javax.sql.RowSetEvent event) {
         
     }
     
+    /* (non-Javadoc)
+     * @see javax.sql.RowSetListener#cursorMoved(javax.sql.RowSetEvent)
+     */
     public void cursorMoved(javax.sql.RowSetEvent event) {
         DbToFm();
     }
     
     
+    /* (non-Javadoc)
+     * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+     */
     public void keyTyped(KeyEvent e) {
     }
     
+    /* (non-Javadoc)
+     * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+     */
     public void keyReleased(KeyEvent e) {
     }
     
@@ -224,7 +286,7 @@ public class SSBooleanField extends JCheckBox implements SSField, RowSetListener
         }
         
         if (e.getKeyCode() == KeyEvent.VK_F4) {
-            System.out.println("F4 ");
+
         }
         
         if (e.getKeyCode() == KeyEvent.VK_F5) {
@@ -256,10 +318,16 @@ public class SSBooleanField extends JCheckBox implements SSField, RowSetListener
         
     }
 
+    /* (non-Javadoc)
+     * @see com.nqadmin.swingSet.formatting.SSField#cleanField()
+     */
     public void cleanField() {
         setDefaultValue();
     }
     
+    /**
+     * 
+     */
     public void setDefaultValue() {
         this.setSelected(false);
     }
@@ -270,7 +338,6 @@ public class SSBooleanField extends JCheckBox implements SSField, RowSetListener
      * implements actual rowset fields updates.
      *
      */
-    
     class internalVerifier extends InputVerifier {
         
         public boolean verify(JComponent input) {
@@ -323,6 +390,9 @@ public class SSBooleanField extends JCheckBox implements SSField, RowSetListener
 
 /*
  * $Log$
+ * Revision 1.13  2005/05/29 02:24:37  dags
+ * SSConnection and SSRowSet getters and setter refactoring
+ *
  * Revision 1.12  2005/05/26 22:20:36  dags
  * SSField interface implemented
  *

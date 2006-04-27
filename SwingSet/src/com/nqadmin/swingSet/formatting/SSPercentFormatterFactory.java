@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company, Prasanth R. Pasala and
+ * Copyright (c) 2004-2006, The Pangburn Company, Prasanth R. Pasala and
  * Diego Gil
  * All rights reserved.
  *
@@ -30,15 +30,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 package com.nqadmin.swingSet.formatting;
 
-import javax.swing.text.NumberFormatter;
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import java.io.Serializable;
-import java.text.ParseException;
-import javax.swing.JFormattedTextField;
+import javax.swing.text.NumberFormatter;
 
 
 /**
@@ -47,6 +46,9 @@ import javax.swing.JFormattedTextField;
  */
 public class SSPercentFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
 
+    /**
+     * Creates a default object of SSPercentFormatterFactory
+     */
     public SSPercentFormatterFactory() {
         this.setDefaultFormatter(new NumberFormatter(NumberFormat.getPercentInstance()));
         this.setNullFormatter(null);
@@ -54,6 +56,11 @@ public class SSPercentFormatterFactory extends javax.swing.text.DefaultFormatter
         this.setDisplayFormatter(new NumberFormatter(NumberFormat.getPercentInstance()));
     }
     
+    /**
+     * Creates an object of SSPercentFormatterFactory with the specified precision & decimals
+     * @param precision - number of digits needed for integer part of the number
+     * @param decimals - number of digits needed for fraction part of the number
+     */
     public SSPercentFormatterFactory(int precision, int decimals) {
         NumberFormat nfd = NumberFormat.getPercentInstance(Locale.US);
         nfd.setMaximumFractionDigits(decimals);
