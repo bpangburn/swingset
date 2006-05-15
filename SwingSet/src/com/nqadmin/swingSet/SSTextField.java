@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,12 +32,16 @@
 
 package com.nqadmin.swingSet;
 
-import javax.swing.*;
-import java.awt.event.*;
-import java.awt.*;
-import java.io.ObjectInputStream;
-import java.io.IOException;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.StringTokenizer;
+
+import javax.swing.JTextField;
+
 import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
@@ -515,6 +519,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.24  2006/04/14 22:04:33  prasanth
+ * Doing the focus transfer on receiving key released event of VK_ENTER rather than on  key pressed.
+ *
  * Revision 1.23  2005/04/06 15:27:21  prasanth
  * Made the return type of mask a boolean.  This is to know if mask function
  * has messed with the text or left it alone as a result of some non alphanumeric

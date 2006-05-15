@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala.
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,17 @@
 
 package com.nqadmin.swingSet;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Component;
+import java.awt.Container;
+
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 /**
  * SSDBNavImp.java
@@ -136,6 +145,9 @@ public class SSDBNavImp extends SSDBNavAdapter {
 
 /*
  * $Log$
+ * Revision 1.14  2005/03/08 16:06:40  prasanth
+ * Added JScrollPane to the list of items to look for in setComponents function.
+ *
  * Revision 1.13  2005/02/09 17:12:53  yoda2
  * Consolidated logic, added text area, check box, slider, & SSLabel, and cleaned up JavaDoc.
  *

@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company and Prasanth R. Pasala
+ * Copyright (c) 2004-2006, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,19 +33,20 @@
 package com.nqadmin.swingSet;
 
 import java.awt.Toolkit;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.util.StringTokenizer;
-import javax.swing.JTable;
-import javax.swing.JOptionPane;
-import java.lang.reflect.Constructor;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.util.StringTokenizer;
+
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
 
 /**
  * SSTableKeyAdapter.java
@@ -196,7 +197,6 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
                     String strData = "";
                     try {
                         strData = (String)transferable.getTransferData(DataFlavor.stringFlavor);
-                        System.out.println(strData);
                     } catch(UnsupportedFlavorException ufe) {
                         ufe.printStackTrace();
                         return;
@@ -363,6 +363,9 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/09 21:22:35  yoda2
+ * JavaDoc cleanup.
+ *
  * Revision 1.5  2005/02/04 22:48:54  yoda2
  * API cleanup & updated Copyright info.
  *

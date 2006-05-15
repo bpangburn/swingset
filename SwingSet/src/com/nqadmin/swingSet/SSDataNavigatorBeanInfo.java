@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2005, The Pangburn Company and Prasanth R. Pasala.
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,8 @@
  
 package com.nqadmin.swingSet;
 
-import java.beans.*;
+import java.beans.BeanInfo;
+import java.beans.SimpleBeanInfo;
 
 /**
  * SSDataNavigatorBeanInfo.java
@@ -76,6 +77,9 @@ import java.beans.*;
 
 /*
  * $Log$
+ * Revision 1.4  2005/02/07 19:55:52  yoda2
+ * Fixing JavaDoc errors with _iconKind parameter name.
+ *
  * Revision 1.3  2005/02/04 22:41:06  yoda2
  * Updated Copyright info.
  *

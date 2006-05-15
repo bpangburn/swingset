@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2005, The Pangburn Company and Prasanth R. Pasala.
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,17 +32,18 @@
 
 package com.nqadmin.swingSet;
 
-import java.io.*;
-import java.sql.*;
-import com.nqadmin.swingSet.datasources.SSRowSet;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.text.*;
-import javax.swing.event.*;
-import java.beans.PropertyChangeListener;
+import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.Serializable;
+
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
  * SSLabel.java
@@ -301,6 +302,9 @@ public class SSLabel extends JLabel {
 
 /*
  * $Log$
+ * Revision 1.16  2005/02/21 16:31:33  prasanth
+ * In bind checking for empty columnName before binding the component.
+ *
  * Revision 1.15  2005/02/13 15:38:20  yoda2
  * Removed redundant PropertyChangeListener and VetoableChangeListener class variables and methods from components with JComponent as an ancestor.
  *

@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala.
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -145,6 +145,9 @@ public class SSDBNavAdapter implements SSDBNav, Serializable {
 
 /*
  * $Log$
+ * Revision 1.11  2005/11/02 17:17:26  prasanth
+ * Added empty implementations for allowUpdate & performPostUpdateOps.
+ *
  * Revision 1.10  2005/05/03 15:22:28  prasanth
  * Added default implementations for new functions allowInsertion & allowDeletion.
  *

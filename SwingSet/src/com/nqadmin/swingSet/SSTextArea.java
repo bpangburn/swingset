@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,9 +32,10 @@
 
 package com.nqadmin.swingSet;
 
-import javax.swing.*;
-import java.awt.event.*;
-import java.awt.*;
+import java.awt.Dimension;
+
+import javax.swing.JTextArea;
+
 import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
@@ -188,6 +189,9 @@ public class SSTextArea extends JTextArea {
 
 /*
  * $Log$
+ * Revision 1.14  2005/02/21 16:31:33  prasanth
+ * In bind checking for empty columnName before binding the component.
+ *
  * Revision 1.13  2005/02/13 15:38:20  yoda2
  * Removed redundant PropertyChangeListener and VetoableChangeListener class variables and methods from components with JComponent as an ancestor.
  *

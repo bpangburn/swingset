@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala.
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,14 +32,25 @@
 
 package com.nqadmin.swingSet;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.sql.*;
-import java.io.*;
-import com.nqadmin.swingSet.datasources.SSRowSet;
-import javax.sql.RowSetListener;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.sql.SQLException;
+
 import javax.sql.RowSetEvent;
+import javax.sql.RowSetListener;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+
+import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
  * SSDataNavigator.java
@@ -653,7 +664,7 @@ public class SSDataNavigator extends JPanel {
         refreshButton.setFocusable(focusable);
         addButton.setFocusable(focusable);
         deleteButton.setFocusable(focusable);
-        txtCurrentRow.setFocusable(focusable); 
+        txtCurrentRow.setFocusable(focusable);
     }    
 
     /**
@@ -711,7 +722,6 @@ public class SSDataNavigator extends JPanel {
         add(deleteButton);
         add(lblRowCount);
         //pack();
-
     }
 
     /**
@@ -1299,6 +1309,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.41  2006/02/03 23:23:54  prasanth
+ * In updatePresentRow function checking for modification variable before updating the current row.
+ *
  * Revision 1.40  2005/11/02 17:18:23  prasanth
  * Calling the allowUpdate & performPostUpdateOps functions on SSDBNav.
  *

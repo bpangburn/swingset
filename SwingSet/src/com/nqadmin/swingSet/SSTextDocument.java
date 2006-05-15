@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,15 +32,22 @@
 
 package com.nqadmin.swingSet;
 
-import java.sql.*;
-import java.io.*;
-import java.text.*;
-import javax.sql.*;
-import javax.swing.text.*;
-import javax.swing.event.*;
-import java.util.GregorianCalendar;
+import java.io.Serializable;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.StringTokenizer;
+
+import javax.sql.RowSetEvent;
+import javax.sql.RowSetListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
+
 import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
@@ -578,6 +585,10 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.24  2005/04/14 15:38:34  prasanth
+ * Setting the column value to null when the string value is empty and the column
+ * type is varchar. This was needed to support string columns with unique constraints.
+ *
  * Revision 1.23  2005/03/09 21:55:20  prasanth
  * Added TIMESTAMP column type in updateText & getText functions.
  *

@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,15 +32,19 @@
 
 package com.nqadmin.swingSet;
 
-import javax.swing.table.*;
+import java.awt.Component;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import java.awt.Component;
-import java.sql.*;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.Iterator;
-import java.util.StringTokenizer;
+import javax.swing.table.AbstractTableModel;
+
 import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
@@ -913,6 +917,12 @@ public class SSTableModel extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.20  2005/03/16 21:12:33  prasanth
+ * In setValueAt checking for the type of column and converting the value
+ * from String to Date if the column type is Date or TimeStamp, so that all the
+ * functions in different interfaces get the Date object rather than String as the
+ * new value.
+ *
  * Revision 1.19  2005/03/09 21:45:26  prasanth
  * Added TIMESTAMP column type in setValueAt & getValueAt functions.
  *

@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala.
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -165,6 +165,9 @@ public interface SSDBNav {
 
 /*
  * $Log$
+ * Revision 1.13  2005/11/02 17:10:23  yoda2
+ * Added two functions: allowUpdate() & performPostUpdateOps()
+ *
  * Revision 1.12  2005/05/03 15:17:38  prasanth
  * Added two new functions to the interface.
  * 1. allowInsertion

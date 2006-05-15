@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,19 +32,38 @@
 
 package com.nqadmin.swingSet;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import javax.swing.border.LineBorder;
-import java.sql.SQLException;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.sql.Date;
-import java.util.GregorianCalendar;
+import java.sql.SQLException;
 import java.util.Calendar;
-import java.util.StringTokenizer;
 import java.util.EventObject;
+import java.util.GregorianCalendar;
+import java.util.StringTokenizer;
 import java.util.Vector;
+
+import javax.swing.DefaultCellEditor;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+
 import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
@@ -1087,18 +1106,14 @@ public class SSDataGrid extends JTable {
                 public void keyPressed(KeyEvent ke){
                     if(ke.getKeyCode() != KeyEvent.VK_TAB)
                         keyPressed++;
-                    System.out.println("Key Pressed true");
                 }
                 public void keyReleased(KeyEvent ke){
-                    System.out.println("Key Released number editor");
                     JComponent editor = (JComponent)DateEditor.this.getComponent();
                     if(editor instanceof JTextField){
-                        System.out.println("Instance of JTextField");
                         if(keyPressed == 0){
                             ((JTextField)editor).setText(String.valueOf(ke.getKeyChar()));
                         }
                     }
-                    System.out.println("Key Pressed is false");
                     keyPressed--;
                     if(keyPressed < 0)
                         keyPressed = 0;
@@ -1412,6 +1427,10 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.34  2005/07/26 21:02:27  prasanth
+ * Setting the column width only if autoResizeMode = AUTO_RESIZE_OFF.
+ * This is set in init.
+ *
  * Revision 1.33  2005/03/09 21:59:41  prasanth
  * 1. Using DefaultTableCellRenderer.UIResource as parent class for ComboRenderer.
  * 2. Added custom editor for Numeric, String, & Object class types.

@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala.
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,15 +32,19 @@
 
 package com.nqadmin.swingSet;
 
-import java.io.*;
-import java.sql.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+import javax.swing.JCheckBox;
+import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import com.nqadmin.swingSet.datasources.SSRowSet;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.text.*;
-import javax.swing.event.*;
 
 /**
  * SSDBCheckBox.java
@@ -375,6 +379,9 @@ public class SSDBCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.12  2005/02/04 22:48:53  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.11  2005/01/10 15:08:05  yoda2
  * deprecated in favor of SSCheckBox to match naming conventions.
  *

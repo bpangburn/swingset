@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -61,6 +61,9 @@ public interface SSDataValue {
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/04 22:48:54  yoda2
+ * API cleanup & updated Copyright info.
+ *
  * Revision 1.6  2004/11/11 14:45:48  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *

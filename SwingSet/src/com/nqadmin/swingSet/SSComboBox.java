@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala.
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,16 +32,20 @@
 
 package com.nqadmin.swingSet;
 
-import java.io.*;
-import java.sql.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.text.*;
-import javax.swing.event.*;
-import java.beans.*;
-import javax.sql.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.beans.PropertyVetoException;
+import java.io.Serializable;
+
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
@@ -792,6 +796,9 @@ public class SSComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.34  2005/02/21 16:31:29  prasanth
+ * In bind checking for empty columnName before binding the component.
+ *
  * Revision 1.33  2005/02/13 15:38:20  yoda2
  * Removed redundant PropertyChangeListener and VetoableChangeListener class variables and methods from components with JComponent as an ancestor.
  *

@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala.
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,19 +32,29 @@
 
 package com.nqadmin.swingSet;
 
-import java.io.*;
-import java.util.Vector;
-import java.util.Stack;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.text.SimpleDateFormat;
-import java.sql.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import com.nqadmin.swingSet.datasources.SSRowSet;
+import java.util.Stack;
+import java.util.Vector;
+
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import com.nqadmin.swingSet.datasources.SSConnection;
-import javax.swing.border.*;
-import javax.swing.text.*;
-import javax.swing.event.*;
+import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
  * SSDBComboBox.java
@@ -1145,6 +1155,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.32  2005/05/19 16:14:35  prasanth
+ * Added setPrimaryKeyColumnName method. The set method was missing.
+ *
  * Revision 1.31  2005/02/22 16:07:10  prasanth
  * While checking if secondDisplayColumnName has  to be used for displaying
  * text, in addition to checking for null, checking for empty string.

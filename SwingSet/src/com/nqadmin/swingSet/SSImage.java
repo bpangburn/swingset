@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala
+ * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,24 +32,25 @@
 
 package com.nqadmin.swingSet;
 
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
 import java.awt.Dimension;
-import javax.sql.RowSet;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.SQLException;
+
 import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
-import java.sql.SQLException;
-import javax.swing.JPanel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.io.FileInputStream;
-import java.io.File;
 import javax.swing.JFileChooser;
-import java.io.IOException;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
 import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
@@ -395,6 +396,9 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /*
  *$Log$
+ *Revision 1.12  2005/02/21 16:31:33  prasanth
+ *In bind checking for empty columnName before binding the component.
+ *
  *Revision 1.11  2005/02/13 15:38:20  yoda2
  *Removed redundant PropertyChangeListener and VetoableChangeListener class variables and methods from components with JComponent as an ancestor.
  *
