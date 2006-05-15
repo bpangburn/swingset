@@ -14,7 +14,6 @@ public class SSConnectionEditor extends PropertyEditorSupport implements BeanCon
 	Vector vecSSConn = new Vector();
 	
 	public BeanContextChild getBeanContextProxy(){
-		System.out.println("getBeanContextProxy Called");
 		return beanContextChildSupport;
 	}
 	
