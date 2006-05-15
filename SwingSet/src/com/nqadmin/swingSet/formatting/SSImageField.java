@@ -65,7 +65,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  *
  * @author Diego Gil
  */
-public class SSImageField extends JPanel implements SSField, RowSetListener, KeyListener, ComponentListener {
+public class SSImageField extends JPanel implements RowSetListener, KeyListener, ComponentListener {
     
     private BufferedImage bufferedImage;
     private byte[] imageBytes;
@@ -260,7 +260,7 @@ public class SSImageField extends JPanel implements SSField, RowSetListener, Key
      * Sets the SSDataNavigator being used to navigate the SSRowSet
      * This is needed only if you want to include the function keys as short cuts to perform operations on the DataNavigator
      * like saving the current row/ undo changes/ delete current row.
-     * The functionality for this is not yet finalized so be sure befor you use this
+     * <font color=red>The functionality for this is not yet finalized so try to avoid using this </font>
      * @param navigator - SSDataNavigator being used to navigate the SSRowSet   
      * @deprecated
      * @see #setSSDataNavigator(SSDataNavigator) 
@@ -283,7 +283,7 @@ public class SSImageField extends JPanel implements SSField, RowSetListener, Key
      * Sets the SSDataNavigator being used to navigate the SSRowSet
      * This is needed only if you want to include the function keys as short cuts to perform operations on the DataNavigator
      * like saving the current row/ undo changes/ delete current row.
-     * The functionality for this is not yet finalized so be sure befor you use this
+     * <font color=red>The functionality for this is not yet finalized so try to avoid using this </font>
      * @param navigator - SSDataNavigator being used to navigate the SSRowSet   
      */
     public void setSSDataNavigator(SSDataNavigator navigator) {
@@ -493,10 +493,4 @@ public class SSImageField extends JPanel implements SSField, RowSetListener, Key
         }
     }
 
-    
-    /* (non-Javadoc)
-     * @see com.nqadmin.swingSet.formatting.SSField#cleanField()
-     */
-    public void cleanField() {
-    }
 }

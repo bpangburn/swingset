@@ -78,7 +78,7 @@ import com.nqadmin.swingSet.formatting.helpers.SSFormattedComboBoxModel;
  * @author $Author$
  * @version $Revision$
  */
-public class SSFormattedTextField extends JFormattedTextField implements SSField, RowSetListener, KeyListener, MouseListener, BeanContextProxy, FocusListener {
+public class SSFormattedTextField extends JFormattedTextField implements RowSetListener, KeyListener, MouseListener, BeanContextProxy, FocusListener {
     
     private BeanContextChildSupport beanContextChildSupport = new BeanContextChildSupport();
     
@@ -235,7 +235,7 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
      * Sets the SSDataNavigator being used to navigate the SSRowSet
      * This is needed only if you want to include the function keys as short cuts to perform operations on the DataNavigator
      * like saving the current row/ undo changes/ delete current row.
-     * The functionality for this is not yet finalized so be sure befor you use this
+     * <font color=red>The functionality for this is not yet finalized so try to avoid using this </font>
      * @param navigator - SSDataNavigator being used to navigate the SSRowSet   
      * @deprecated
      * @see #setSSDataNavigator(SSDataNavigator) 
@@ -258,7 +258,7 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
      * Sets the SSDataNavigator being used to navigate the SSRowSet
      * This is needed only if you want to include the function keys as short cuts to perform operations on the DataNavigator
      * like saving the current row/ undo changes/ delete current row.
-     * The functionality for this is not yet finalized so be sure befor you use this
+     * <font color=red>The functionality for this is not yet finalized so try to avoid using this </font>
      * @param navigator - SSDataNavigator being used to navigate the SSRowSet
      */
     public void setSSDataNavigator(SSDataNavigator navigator) {
@@ -1042,6 +1042,9 @@ public class SSFormattedTextField extends JFormattedTextField implements SSField
 
 /*
  * $Log$
+ * Revision 1.23  2006/04/27 22:02:45  prasanth
+ * Added/updated java doc
+ *
  * Revision 1.22  2006/03/28 16:12:28  prasanth
  * Added functions to provide the ability to set value programatically that works with the formatter.
  *

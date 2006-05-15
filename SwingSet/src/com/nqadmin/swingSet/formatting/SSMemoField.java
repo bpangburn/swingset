@@ -55,7 +55,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  *
  * @author dags
  */
-public class SSMemoField extends JTextArea implements SSField, RowSetListener, KeyListener, FocusListener {
+public class SSMemoField extends JTextArea implements RowSetListener, KeyListener, FocusListener {
     
     private java.awt.Color std_color = null;
     private String columnName = null;
@@ -146,7 +146,7 @@ public class SSMemoField extends JTextArea implements SSField, RowSetListener, K
 	 * Sets the SSDataNavigator being used to navigate the SSRowSet
 	 * This is needed only if you want to include the function keys as short cuts to perform operations on the DataNavigator
 	 * like saving the current row/ undo changes/ delete current row.
-	 * The functionality for this is not yet finalized so be sure befor you use this
+	 * <font color=red>The functionality for this is not yet finalized so try to avoid using this </font>
 	 * @param navigator - SSDataNavigator being used to navigate the SSRowSet   
 	 * @deprecated
 	 * @see #setSSDataNavigator(SSDataNavigator) 
@@ -169,7 +169,7 @@ public class SSMemoField extends JTextArea implements SSField, RowSetListener, K
      * Sets the SSDataNavigator being used to navigate the SSRowSet
      * This is needed only if you want to include the function keys as short cuts to perform operations on the DataNavigator
      * like saving the current row/ undo changes/ delete current row.
-     * The functionality for this is not yet finalized so be sure befor you use this
+     * <font color=red>The functionality for this is not yet finalized so try to avoid using this </font>
      * @param navigator - SSDataNavigator being used to navigate the SSRowSet
      */
      public void setSSDataNavigator(SSDataNavigator navigator) {
@@ -368,12 +368,6 @@ public class SSMemoField extends JTextArea implements SSField, RowSetListener, K
             }
         });
     }
-
-    /* (non-Javadoc)
-     * @see com.nqadmin.swingSet.formatting.SSField#cleanField()
-     */
-    public void cleanField() {
-    }
     
     /**
      * This method should implements validation AND, most important for our purposes
@@ -435,4 +429,7 @@ public class SSMemoField extends JTextArea implements SSField, RowSetListener, K
 
 /*
 * $Log$
+* Revision 1.11  2006/04/27 22:02:45  prasanth
+* Added/updated java doc
+*
 */
