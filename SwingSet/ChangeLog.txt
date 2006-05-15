@@ -5,10 +5,17 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 $Id$
 
 ==============================================================================
-SwingSet 1.0.0-PR3 - Released xx-xx-2006
+SwingSet 1.0.0-PR3 - Released 05-15-2006
 ==============================================================================
 
 Changes:
+	Classes Added:
+		1. SSCuitField
+		2. SSImageField
+		3. SSStringField
+		4. SSTimeField
+		5. SSTimestampField
+		
 	SSDBNav:
 		1. Added four new functions to the interface.
 			a) allowInsertion
@@ -34,12 +41,15 @@ Changes:
 			formatting.
 		
 	SSDateField:
-		1. Added a constructor to date the date format.
+		1. Added a constructor to take the date format as an argument.
 		2. Added two constants to represent the date formats
 
 	SSDateFormatterFactory:
-		1. Added a constructor to date the date format.
+		1. Added a constructor to take the date format as an argument.
 		2. Added two constants to represent the date formats	
+		
+	SSTextField:
+		1. Transfering the focus on key released event of VK_ENTER rather than key pressed.
 				
 ==============================================================================
 SwingSet 1.0.0-PR2 - Released 03-09-2005
