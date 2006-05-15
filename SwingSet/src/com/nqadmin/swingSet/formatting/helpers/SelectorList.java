@@ -58,8 +58,7 @@ public class SelectorList extends JList implements ListDataListener, ListEventLi
 	
     /**
      * Creates a new instance of SelectorList
-     */
-    
+     */    
     public SelectorList() {
         super(new SelectorListModel());
         init();
@@ -86,6 +85,10 @@ public class SelectorList extends JList implements ListDataListener, ListEventLi
 		panel.add(txtFilter, BorderLayout.SOUTH);
 	}
 	
+	/**
+	 * Returns a JPanel containing this list in a scroll pane
+	 * @return returns the list component in a JScrollPane
+	 */
 	public JPanel getComponent() {
 		return panel;
 	}
@@ -137,4 +140,8 @@ public class SelectorList extends JList implements ListDataListener, ListEventLi
 
 /*
 * $Log$
+* Revision 1.7  2006/04/21 19:12:20  prasanth
+* Added comments & CVS tags.
+* Made changes to that it has a panel with list & a filter text field.
+*
 */

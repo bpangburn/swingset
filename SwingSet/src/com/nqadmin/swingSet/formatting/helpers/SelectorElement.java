@@ -56,18 +56,22 @@ public class SelectorElement implements TextFilterable {
      */
     private Object dataValue = null;
     
+    /**
+     * Creates a default instance of SelectorElement
+     */
     public SelectorElement() {
         listValue = new String("listValue");
         dataValue = new String("dataValue");
     }
     
     /**
-     * @param bD
-     * @param lD
+     * Creates an instance of SelectorElement with the given listValue & dataValue
+     * @param dataValue - underlying value of the object displayed
+     * @param listValue - value to be used for display purpose
      */
-    public SelectorElement(Object bD, Object lD) {
-        this.setDataValue(bD);
-        this.setListValue(lD);
+    public SelectorElement(Object dataValue, Object listValue) {
+        this.setDataValue(dataValue);
+        this.setListValue(listValue);
     }
     
     /* (non-Javadoc)
@@ -143,4 +147,7 @@ public class SelectorElement implements TextFilterable {
 
 /*
 * $Log$
+* Revision 1.7  2006/04/21 19:09:17  prasanth
+* Added CVS tags & some comments
+*
 */

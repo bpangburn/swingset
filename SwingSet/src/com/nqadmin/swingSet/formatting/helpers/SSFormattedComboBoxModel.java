@@ -44,6 +44,8 @@ import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
 
 /**
  *
+ * <font color=red> <B> It is not recommended to use this class as there could be drastic changes to this classes API. </B> </font>
+ * 
  * @author  dags
  */
 public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel implements MutableComboBoxModel, Serializable {
@@ -95,7 +97,9 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
     
     private SSJdbcRowSetImpl ssRowset = null;
     
-    /** Creates a new instance of FormattedComboBoxModel */
+    /** 
+     * Creates a new instance of FormattedComboBoxModel 
+     */
     public SSFormattedComboBoxModel() {
         this(null, null, null, null);
     }
@@ -115,8 +119,8 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
      * @param listColumn - column names whose values should be displayed in the list
      * @param orderBy - column name based on which the list items should be ordered
      */
-    public SSFormattedComboBoxModel(String table, String bcolumn, String lcolumn, String orderBy) {
-        this(null, table, bcolumn, lcolumn, orderBy);
+    public SSFormattedComboBoxModel(String table, String dataColumn, String listColumn, String orderBy) {
+        this(null, table, dataColumn,listColumn, orderBy);
     }
     
     /**
@@ -531,4 +535,7 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
 
 /*
 * $Log$
+* Revision 1.3  2006/04/21 19:09:17  prasanth
+* Added CVS tags & some comments
+*
 */

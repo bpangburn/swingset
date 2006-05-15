@@ -94,13 +94,15 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
     
     private SSJdbcRowSetImpl ssRowset = null;
     
-    /** Creates a new instance of SelectorListModel */
-    
+    /** 
+     * Creates a new instance of SelectorListModel 
+     */    
     public SelectorListModel() {
         this(null, null, null, null);
     }
     
     /**
+     * Creates an object of SelectorListModel with the given data
      * @param table - database table name
      * @param dataColumn - name of the column containing the values of the items displayed in the list
      * @param listColumn - column names whose values should be displayed in the list
@@ -110,8 +112,9 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
     }
     
     /**
-     * @param object
-     * @return
+     * Returns the index of the specified object in the actual data (unfiltered list)
+     * @param object - object whose index should be returned
+     * @return - returns the index of the specified object (in unfiltered list)
      */
     public int indexOf(Object object) {
                
@@ -119,6 +122,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
     }
     
     /**
+     * Creates an object of SelectorListModel with the given data
      * @param table - database table name
      * @param dataColumn - name of the column containing the values of the items displayed in the list
      * @param listColumn - column names whose values should be displayed in the list
@@ -129,6 +133,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
     }
     
     /**
+     * Creates an object of SelectorListModel with the given data
      * @param ssConnection - connection to be used for querying the database
      * @param table - database table name
      * @param dataColumn - name of the column containing the values of the items displayed in the list
@@ -154,8 +159,9 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
     }
     
     /**
-     * @param index
-     * @return
+     * Returns the value corresponding to the item at the specified index. 
+     * @param index - index of the item whose value should be returned.
+     * @return returns the value of the item at the specified index
      */
     public Object getSelectedBoundData(int index) {
         Object itm = filtered_data.get(index);
@@ -166,6 +172,10 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
         return "<null>";
     }
     
+    /**
+     * Sets the text to be used to filter items in the list
+     * @param newFilter - text to be used to filter item in the list
+     */
     public void setFilterText(String[] newFilter) {
         filtered_data.setFilterText(newFilter);
     }
@@ -364,26 +374,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
         this.fireIntervalRemoved(this, 0, 1);
     }
     
-    /**
-     * Sets the selected item to the specified item
-     * @param bdata
-     */
-    public void setSelectedItem(String bdata) {
-        SelectorElement cual;
-        String tofind;
-        
-        tofind = bdata.toUpperCase().trim();
-        
-        for (int i=0; i < filtered_data.size(); i++) {
-            cual = (SelectorElement)(filtered_data.get(i));
-            
-            if ((cual.getDataValue()).equals(bdata)) {
-            //    super.setSelectedItem(cual);
-                return;
-            }
-        }
-    }
-    
+   
     /**
      * Adds a PropertyChangeListener to the listener list.
      * @param l The listener to add.
@@ -573,21 +564,24 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
     }
     
     /**
-     * @return
+     * Returns the text field used as the filter.
+     * @return - returns the text field used as the filter text field.
      */
     public JTextField getFilterEdit() {
         return filtered_data.getFilterEdit();
     }
     
     /**
-     * @param filter
+     * Sets the JTextField to be used as the filter field.
+     * @param filter - JTextField to be used to get the filter text.
      */
     public void setFilterEdit(JTextField filter) {
         filtered_data.setFilterEdit(filter);
     }
     
     /**
-     * @param listChangeListener
+     * Adds the event listener for the filtered list
+     * @param listChangeListener - list listener to be added to filtered list
      */
     public void addListEventListener(ListEventListener listChangeListener) {
         filtered_data.addListEventListener(listChangeListener);
@@ -617,4 +611,8 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
 
 /*
 * $Log$
+* Revision 1.9  2006/04/21 19:11:32  prasanth
+* Added comments & CVS tags.
+* ssConnection was set to null in populate model remoted this line of code.
+*
 */

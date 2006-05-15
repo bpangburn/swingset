@@ -45,6 +45,11 @@ import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 
+/**
+ * 
+ * <font color=red> <B> It is not recommended to use this class as there could be drastic changes to this classes API. </B> </font>
+ *
+ */
 public class SSFormattedComboBoxRenderer extends JPanel implements ListCellRenderer, Serializable {
     
     private JLabel listLabel = null;
@@ -191,4 +196,7 @@ public class SSFormattedComboBoxRenderer extends JPanel implements ListCellRende
 
 /* 
 * $Log$
+* Revision 1.2  2006/04/21 19:09:17  prasanth
+* Added CVS tags & some comments
+*
 */

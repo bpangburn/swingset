@@ -85,53 +85,63 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
     }
     
     /**
-     * @param table
-     * @param bcolumn
-     * @param lcolumn
+     * Creates an object of SelectorComboBoxModel with the specified values.
+     * @param table - name of the table to be queried
+     * @param dataColumn - column name whose values should be used as underlying values
+     * @param listColumn - column name whose values shoudl be used for displaying
      */
-    public SelectorComboBoxModel(String table, String bcolumn, String lcolumn) {
-        this(table, bcolumn, lcolumn, null);
+    public SelectorComboBoxModel(String table, String dataColumn, String listColumn) {
+        this(table, dataColumn, listColumn, null);
     }
     
     /**
-     * @param table
-     * @param bcolumn
-     * @param lcolumn
-     * @param orderBy
+     * Creates an object of SelectorComboBoxModel with the specified values.
+     * @param table - name of the table to be queried
+     * @param dataColumn - column name whose values should be used as underlying values
+     * @param listColumn - column name whose values shoudl be used for displaying
+     * @param orderBy - column name based on which data should be ordered
      */
-    public SelectorComboBoxModel(String table, String bcolumn, String lcolumn, String orderBy) {
-        this(null, table, bcolumn, lcolumn, orderBy);
+    public SelectorComboBoxModel(String table, String dataColumn, String listColumn, String orderBy) {
+        this(null, table, dataColumn, listColumn, orderBy);
     }
     
     /**
-     * @param ssConnection
-     * @param table
-     * @param bcolumn
-     * @param lcolumn
-     * @param orderBy
-     */
-    public SelectorComboBoxModel(SSConnection ssConnection, String table, String bcolumn, String lcolumn, String orderBy) { 
+     * Creates an object of SelectorComboBoxModel with the specified values.
+     * @param ssConnection -  connection object to be used for running the query
+     * @param table - name of the table to be queried
+     * @param dataColumn - column name whose values should be used as underlying values
+     * @param listColumn - column name whose values shoudl be used for displaying
+     * @param orderBy - column name based on which data should be ordered     */
+    public SelectorComboBoxModel(SSConnection ssConnection, String table, String dataColumn, String listColumn, String orderBy) { 
         super();
         propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
         setSsConnection(ssConnection);
         setTable(table);
-        setDataColumn(bcolumn);
-        setListColumn(lcolumn);
+        setDataColumn(dataColumn);
+        setListColumn(listColumn);
         setOrderBy(orderBy);
                 
         //populateModel();
     }
     
+    /**
+     * Updates the model. This would trigger reexecution of the query
+     */
     public void refresh() {
         this.populateModel();
     }
     
+    /**
+     * Returns the value of the dataColumn corresponding to the item at the specified index
+     * @param index - index position of the item whose underlying value is needed
+     * @return - returns the underlying value of the item at the specified index position
+     */
     public Object getSelectedBoundData(int index) {
         return ((SelectorElement)this.getElementAt(index)).getDataValue();
     }
     
     /**
-     * 
+     * Fetechs the information from the database and populates the model
      */
     private void populateModel() {
         
@@ -192,17 +202,16 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
     }
     
     /**
-     * @param bdata
+     * Sets the selected item to the item corresponding to the specfied value 
+     * If more than one item in the list has same underlying value (bound value) then the first one
+     * in the list is set as the selected item
+     * @param bdata - underlying value of the item that should be set a selected item
      */
-    public void setSelectedItem(String bdata) {
-        SelectorElement cual;
-        String tofind;
-        
-        tofind = bdata.toUpperCase().trim();
-        
+    public void setSelectedItem(String boundData) {
+        SelectorElement item;
         for (int i=0; i < this.getSize(); i++) {
-            cual = (SelectorElement)(this.getElementAt(i));
-            if ((cual.getDataValue()).equals(bdata)) {
+            item = (SelectorElement)(this.getElementAt(i));
+            if ((item.getDataValue()).equals(boundData)) {
                 return;
             }
         }
@@ -310,7 +319,8 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
     }
 
     /**
-     * @return
+     * Returns the orderBy field value.
+     * @return - returns the column name used for ordering 
      */
     public String getOrderBy() {
         return orderBy;
@@ -341,7 +351,7 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
     }
     
     /**
-     * 
+     * The query will be executed and model will be populated based on the resultset
      */
     public void execute() {
         refresh();
@@ -375,4 +385,7 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
 
 /*
 * $Log$
+* Revision 1.6  2006/04/21 19:09:17  prasanth
+* Added CVS tags & some comments
+*
 */

@@ -58,7 +58,11 @@ import com.nqadmin.swingSet.formatting.SSFormattedComboBox;
 import com.nqadmin.swingSet.formatting.SSFormattedTextField;
 
 
-
+/**
+ * 
+ * <font color=red> <B> It is not recommended to use this class as there could be drastic changes to this classes API. </B> </font>
+ *
+ */
 public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor, PropertyChangeListener, MouseListener {
     
     protected SSFormattedTextField editor;
@@ -353,4 +357,7 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
 
 /*
 * $Log$
+* Revision 1.2  2006/04/21 19:09:17  prasanth
+* Added CVS tags & some comments
+*
 */

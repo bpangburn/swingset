@@ -57,10 +57,6 @@ import com.nqadmin.swingSet.formatting.SSFormattedTextField;
  *
  * @author dags
  */
-/**
- * @author ppasala
- *
- */
 public class HelperPopup extends JPopupMenu implements MouseListener, KeyListener, ActionListener, ListSelectionListener, PopupMenuListener, FocusListener {
     
     private JPanel spane;
@@ -144,7 +140,8 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
     }
     
     /**
-     * @param model
+     * Sets the list model to be used 
+     * @param model - list model to be used
      */
     public void setModel(SelectorListModel model) {
         this.model = model;
@@ -153,7 +150,8 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
     }
     
     /**
-     * @param target
+     * Sets the text field for which this helper popup is being used.
+     * @param target - text field for which this helper popup is being used
      */
     public void setTarget(SSFormattedTextField target) {
         this.target = target;
@@ -163,7 +161,8 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
     }
     
     /**
-     * @param table
+     * Sets the table name from which data should be pulled
+     * @param table - table name to be used in the query to pull the data
      */
     public void setTable(String table) {
         this.table = table;
@@ -171,7 +170,8 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
     }
     
     /**
-     * @param dataColumn
+     * Sets the column name whose values should be used as underlying/bound values
+     * @param dataColumn - column name whose values should be used as underlying/bound values
      */
     public void setDataColumn(String dataColumn) {
         this.dataColumn = dataColumn;
@@ -179,7 +179,8 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
     }
     
     /**
-     * @param listColumn
+     * Sets the column name whose values should be used for displaying.
+     * @param listColumn - column name whose values should be used for displaying.
      */
     public void setListColumn(String listColumn) {
         this.listColumn = listColumn;
@@ -187,7 +188,8 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
     }
     
     /**
-     * @param orderBy
+     * Sets the column name to used for ordering the items
+     * @param orderBy - column name to used for ordering the items
      */
     public void setOrderBy(String orderBy) {
         this.orderBy = orderBy;
@@ -195,7 +197,8 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
     }
     
     /**
-     * @param connection
+     * Sets the SSConnection object to used for database access.
+     * @param connection - connection object to be used for accessing the database
      */
     public void setConnection(SSConnection connection) {
         this.connection = connection;
@@ -448,4 +451,7 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
 
 /*
 * $Log$
+* Revision 1.7  2006/04/21 19:09:17  prasanth
+* Added CVS tags & some comments
+*
 */

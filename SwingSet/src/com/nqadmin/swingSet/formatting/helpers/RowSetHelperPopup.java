@@ -79,7 +79,9 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
     
     private SSRowSet rowset = null;
     
-    /** Creates a new instance of HelperPopup */
+    /** 
+     * Creates a new instance of HelperPopup 
+     */
     public RowSetHelperPopup() {
         
         // main panel
@@ -128,15 +130,17 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
     }
     
     /**
-     * @param rowset
+     * Sets the SSRowSet object to be used to fetch the values for dataColumn & listColumn values
+     * @param rowset - SSRowSet object to be used to fetch the values
      */
-    public  void setRowSet(SSRowSet rowset) {
+    public  void setSSRowSet(SSRowSet rowset) {
         this.rowset = rowset;
         createHelper();
     }
     
     /**
-     * @param model
+     * Sets the list model to be used 
+     * @param model - list model to be used
      */
     public void setModel(SelectorListModel model) {
         this.model = model;
@@ -144,7 +148,8 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
     }
     
     /**
-     * @param target
+     * Sets the text field for which this helper popup is being used.
+     * @param target - text field for which this helper popup is being used
      */
     public void setTarget(SSFormattedTextField target) {
         this.target = target;
@@ -153,7 +158,8 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
     }
     
     /**
-     * @param dataColumn
+     * Sets the column name whose values should be used as underlying/bound values
+     * @param dataColumn - column name whose values should be used as underlying/bound values
      */
     public void setDataColumn(String dataColumn) {
         this.dataColumn = dataColumn;
@@ -161,7 +167,8 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
     }
     
     /**
-     * @param listColumn
+     * Sets the column name whose values should be used for displaying.
+     * @param listColumn - column name whose values should be used for displaying.
      */
     public void setListColumn(String listColumn) {
         this.listColumn = listColumn;
@@ -171,7 +178,7 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
     
  
     /**
-     * 
+     * Fetches the values from the rowset and populates the model
      */
     public void createHelper() {
         if (dataColumn == null || listColumn == null || rowset == null) 
@@ -409,4 +416,7 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
 
 /*
 * $Log$
+* Revision 1.6  2006/04/21 19:09:17  prasanth
+* Added CVS tags & some comments
+*
 */
