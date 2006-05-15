@@ -52,7 +52,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  *
  * @author dags
  */
-public class SSBooleanField extends JCheckBox implements SSField, RowSetListener, KeyListener {
+public class SSBooleanField extends JCheckBox implements RowSetListener, KeyListener {
     
     private java.awt.Color std_color = null;
     private String columnName = null;
@@ -134,6 +134,7 @@ public class SSBooleanField extends JCheckBox implements SSField, RowSetListener
     
      /**
      * Sets the SSDataNavigator used for navigating the SSRowSet to which this component is bound to.
+     * <font color=red>The functionality for this is not yet finalized so try to avoid using this </font>
      * @param navigator - SSDataNavigator used for navigating the SSRowSet to which this component is bound to
      * @deprecated 
      * @see #setSSDataNavigator(SSDataNavigator)
@@ -154,6 +155,7 @@ public class SSBooleanField extends JCheckBox implements SSField, RowSetListener
     
     /**
      * Sets the SSDataNavigator used for navigating the SSRowSet to which this component is bound to.
+     * <font color=red>The functionality for this is not yet finalized so try to avoid using this </font>
      * @param navigator - SSDataNavigator used for navigating the SSRowSet to which this component is bound to
      */
     public void setSSDataNavigator(SSDataNavigator navigator) {
@@ -318,20 +320,6 @@ public class SSBooleanField extends JCheckBox implements SSField, RowSetListener
         
     }
 
-    /* (non-Javadoc)
-     * @see com.nqadmin.swingSet.formatting.SSField#cleanField()
-     */
-    public void cleanField() {
-        setDefaultValue();
-    }
-    
-    /**
-     * 
-     */
-    public void setDefaultValue() {
-        this.setSelected(false);
-    }
-    
     
     /**
      * This method should implements validation AND, most important for our purposes
@@ -390,6 +378,9 @@ public class SSBooleanField extends JCheckBox implements SSField, RowSetListener
 
 /*
  * $Log$
+ * Revision 1.14  2006/04/27 22:02:45  prasanth
+ * Added/updated java doc
+ *
  * Revision 1.13  2005/05/29 02:24:37  dags
  * SSConnection and SSRowSet getters and setter refactoring
  *
