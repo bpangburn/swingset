@@ -51,7 +51,7 @@ import com.nqadmin.swingSet.formatting.helpers.SSFormattedComboBoxRenderer;
  *
  * @author dags
  */
-public class SSFormattedComboBox extends JComboBox implements SSField, ActionListener {
+public class SSFormattedComboBox extends JComboBox implements ActionListener {
     
     protected SSFormattedComboBoxEditor editor = null;
     protected SSFormattedComboBoxRenderer renderer = null;
@@ -153,7 +153,8 @@ public class SSFormattedComboBox extends JComboBox implements SSField, ActionLis
     }
     
     /**
-     * @param listColumn
+     * Sets the column name whose values should be displayed in the combo box
+     * @param listColumn - column name whose values should be displayed in the combo box
      */
     public void setListColumn(String listColumn) {
         this.listColumn = listColumn;
@@ -161,14 +162,16 @@ public class SSFormattedComboBox extends JComboBox implements SSField, ActionLis
     }
     
     /**
-     * @return
+     * Returns the name of the column whose values are displayed as combo box items
+     * @return - returns the name of the column whose values are displayed as combo box items
      */
     public String getListColumn() {
         return listColumn;
     }
     
     /**
-     * @param dataColumn
+     * Sets the column name whose values are used as the underlying values for the displayed items
+     * @param dataColumn - column name whose values are used as the underlying values for the displayed items
      */
     public void setDataColumn(String dataColumn) {
         this.dataColumn = dataColumn;
@@ -176,7 +179,8 @@ public class SSFormattedComboBox extends JComboBox implements SSField, ActionLis
     }
     
     /**
-     * @return
+     * Retuns the data column name
+     * @return - returns the data column name used in the query.
      */
     public String getDataColumn() {
         return dataColumn;
@@ -270,14 +274,16 @@ public class SSFormattedComboBox extends JComboBox implements SSField, ActionLis
     }
     
     /**
-     * @param colType
+     * Sets the type of columns to which this component is bound to.
+     * @param colType - column type of the bound column
      */
     public void setColumnType(int colType) {
         this.colType = colType;
     }
     
     /**
-     * @return
+     * Returns the column type of the bound column
+     * @return - returns the column type of the bound column
      */
     public int getColumnType() {
         return colType;
@@ -338,12 +344,6 @@ public class SSFormattedComboBox extends JComboBox implements SSField, ActionLis
         return retValue;
     }
     
-    /* (non-Javadoc)
-     * @see com.nqadmin.swingSet.formatting.SSField#cleanField()
-     */
-    public void cleanField() {
-        
-    }
 }
 
 /*
