@@ -9,7 +9,7 @@ $Id$
 LICENSE
 ==============================================================================
 
-Copyright (c) 2003-2005, The Pangburn Company and Prasanth R. Pasala.
+Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -69,24 +69,21 @@ The SwingSet feature-set currently includes:
     (h) allows data entry "masks" to be applied to text columns
 7. a serializable datasource abstraction layer
 8. JavaBean support for all major components
+9. Formatted fields for various types like currency, percent, SSN, date etc.
 
-For SwingSet 1.0.0-PR1 (Preview Release 1) the API & JavaDoc have undergone
-a major rewrite for consistency.  The image, label, slider, & formatting classes
-are new for this release.  A utility class called SSSyncManager was also added
-for this release to simplify creation of screens with both combo box-based and
-navigator-based navigation (see Example4.java for an example).
+For SwingSet 1.0.0-PR3 (Preview Release 3) added extra functions to SSDBNav interface
+to give more control to the programmer to create to different events on the 
+DataNavigator. New classes have been added in the formatting package for currency,
+percent, date, timestamp etc. A new package has been added but the work is in progress
+on this classes.
 
 The following tasks remain to be done prior to the release of SwingSet 1.0.0-RC1
 (Release Candidate 1):
 1. Bean property editors of some sort for connection/rowset/column properties.
 2. JavaDoc & examples for new formatting components.
-3. CVS tree/package reorganization of the formatting classes (if needed).
-4. Integration of the formatting classes into SSDataGrid.
-5. Deprecation of the formatting related methods in SSTextField.
-
-Hopefully these will be wrapped up in the next month, at which time we will
-release the first release candidate.  Any release candidates will be quickly
-followed by the first production release of SwingSet.
+3. Integration of the formatting classes into SSDataGrid.
+4. Deprecation of the formatting related methods in SSTextField.
+5. Finalizing the API for classes in the helpers package
 
 More information on SwingSet is available from:
 http://swingset.sourceforge.net 
@@ -153,10 +150,10 @@ the JAR file ssdemo.jar to launch the demo.  If that doesn't work then type:
   java -jar <demo jar file name here>
   
   e.g.
-       java -jar swingset-demo_1.0.0-PR1.jar
+       java -jar swingset-demo_1.0.0-PR3.jar
   
 Please note that the demo requires both the rowset.jar and latest SwingSet
-binary JAR files (e.g. swingset-bin_1.0.0-PR1.jar). See the "INSTALLATION"
+binary JAR files (e.g. swingset-bin_1.0.0-PR3.jar). See the "INSTALLATION"
 section above for more information.
 
 The demo will attempt to connect to a small, remote, read only database so an
