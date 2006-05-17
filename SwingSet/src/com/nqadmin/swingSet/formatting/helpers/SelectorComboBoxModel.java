@@ -205,7 +205,7 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
      * Sets the selected item to the item corresponding to the specfied value 
      * If more than one item in the list has same underlying value (bound value) then the first one
      * in the list is set as the selected item
-     * @param bdata - underlying value of the item that should be set a selected item
+     * @param boundData - underlying value of the item that should be set a selected item
      */
     public void setSelectedItem(String boundData) {
         SelectorElement item;
@@ -385,6 +385,9 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
 
 /*
 * $Log$
+* Revision 1.7  2006/05/15 15:50:09  prasanth
+* Updated javadoc
+*
 * Revision 1.6  2006/04/21 19:09:17  prasanth
 * Added CVS tags & some comments
 *
