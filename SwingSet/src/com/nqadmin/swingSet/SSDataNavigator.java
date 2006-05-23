@@ -1156,10 +1156,12 @@ public class SSDataNavigator extends JPanel {
             deleteButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     try {
-                        int answer = JOptionPane.showConfirmDialog(SSDataNavigator.this,"Are you sure you want to delete this record?","Delete Present Record", JOptionPane.YES_NO_OPTION);
-                        if ( answer != JOptionPane.YES_OPTION ) {
-                            return;
-                        }
+                    	if(confirmDeletes) {
+                    		int answer = JOptionPane.showConfirmDialog(SSDataNavigator.this,"Are you sure you want to delete this record?","Delete Present Record", JOptionPane.YES_NO_OPTION);
+                    		if ( answer != JOptionPane.YES_OPTION ) {
+                    			return;
+                    		}
+                    	}
 
                         if ( dBNav != null ) {
                             dBNav.performPreDeletionOps();
@@ -1309,6 +1311,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.42  2006/05/15 16:10:38  prasanth
+ * Updated copy right
+ *
  * Revision 1.41  2006/02/03 23:23:54  prasanth
  * In updatePresentRow function checking for modification variable before updating the current row.
  *
