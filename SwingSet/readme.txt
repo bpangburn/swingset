@@ -150,10 +150,10 @@ the JAR file ssdemo.jar to launch the demo.  If that doesn't work then type:
   java -jar <demo jar file name here>
   
   e.g.
-       java -jar swingset-demo_1.0.0-PR3.jar
+       java -jar swingset-demo_1.0.0-PR4.jar
   
 Please note that the demo requires both the rowset.jar and latest SwingSet
-binary JAR files (e.g. swingset-bin_1.0.0-PR3.jar). See the "INSTALLATION"
+binary JAR files (e.g. swingset-bin_1.0.0-PR4.jar). See the "INSTALLATION"
 section above for more information.
 
 The demo will attempt to connect to a small, remote, read only database so an
