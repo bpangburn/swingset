@@ -24,10 +24,10 @@ mkdir ./release_jars/images
 mkdir ./release_jars/images/icons
 
 # RECOMPILE SWINGSET
-javac -source 1.4 -target 1.4 -d ./release_jars/bin -classpath "./:./lib/glazedlists-0.9.5.jar" ./src/com/nqadmin/swingSet/*.java ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/formatting/*.java ./src/com/nqadmin/swingSet/formatting/helpers/*.java ./src/com/nqadmin/swingSet/utils/*.java
+javac -source 1.4 -target 1.4 -d ./release_jars/bin -classpath ./lib/glazedlists-0.9.5.jar ./src/com/nqadmin/swingSet/*.java ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/formatting/*.java ./src/com/nqadmin/swingSet/formatting/helpers/*.java ./src/com/nqadmin/swingSet/utils/*.java
 
 # REBUILD JAVADOCS
-javadoc -d ./release_jars/docs -classpath "./lib/glazedlists-0.9.5.jar" ./src/com/nqadmin/swingSet/*.java ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/formatting/*.java ./src/com/nqadmin/swingSet/formatting/helpers/*.java ./src/com/nqadmin/swingSet/utils/*.java
+javadoc -d ./release_jars/docs -classpath ./lib/glazedlists-0.9.5.jar ./src/com/nqadmin/swingSet/*.java ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/formatting/*.java ./src/com/nqadmin/swingSet/formatting/helpers/*.java ./src/com/nqadmin/swingSet/utils/*.java
 
 # COPY SOURCE CODE
 cp ./src/com/nqadmin/swingSet/*.java ./release_jars/src/com/nqadmin/swingSet/
@@ -55,7 +55,7 @@ jar -cvf ./release_jars/swingset-docs_current.jar -C ./release_jars/docs . readm
 jar -cvf ./release_jars/swingset-src_current.jar -C ./release_jars/src com -C ./release_jars images readme.txt ChangeLog.txt FAQ.txt
 
 # COMPILE DEMO
-javac -source 1.4 -target 1.4 -d ./release_jars/demo -classpath "./lib/glazedlists-0.9.5.jar:./release_jars/swingset-bin_current.jar"  ./src/samples/*.java
+javac -source 1.4 -target 1.4 -d ./release_jars/demo -classpath ./lib/glazedlists-0.9.5.jar:./release_jars/swingset-bin_current.jar ./src/samples/Example*.java ./src/samples/MainClass.java
 
 # COPY DEMO SOURCE CODE
 cp ./src/samples/* ./release_jars/demo/
