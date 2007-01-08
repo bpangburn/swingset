@@ -825,6 +825,8 @@ public class SSTableModel extends AbstractTableModel {
         if (_strDate.trim().equals("")) {
             return null;
         }
+       // REMOVE ANY SPACES IF ANY (This could happen if copying from another application) 
+        _strDate = _strDate.trim();
         String newStrDate = _strDate;
         if(_strDate.indexOf("/") != -1){
             StringTokenizer strtok = new StringTokenizer(_strDate,"/",false);
@@ -917,6 +919,9 @@ public class SSTableModel extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.21  2006/05/15 16:10:38  prasanth
+ * Updated copy right
+ *
  * Revision 1.20  2005/03/16 21:12:33  prasanth
  * In setValueAt checking for the type of column and converting the value
  * from String to Date if the column type is Date or TimeStamp, so that all the
