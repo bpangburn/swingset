@@ -209,8 +209,24 @@ public class SSDataGrid extends JTable {
      * inserting new rows.
      */
     protected boolean insertion = true;
+    
+    protected boolean allowDeletion = true;
 
     /**
+	 * @return the allowDeletion
+	 */
+	public boolean isAllowDeletion() {
+		return allowDeletion;
+	}
+
+	/**
+	 * @param allowDeletion the allowDeletion to set
+	 */
+	public void setAllowDeletion(boolean allowDeletion) {
+		this.allowDeletion = allowDeletion;
+	}
+
+	/**
      * Constructs a data grid with the data source set to the given SSRowSet.
      *
      * @param _sSRowSet    SSRowSet from which values have to be retrieved.
@@ -951,6 +967,10 @@ public class SSDataGrid extends JTable {
                 // IF X IS PRESSED WHILE THE CONTROL KEY IS STILL PRESSED
                 // DELETE THE SELECTED ROWS.
                     if (ke.getKeyCode() == KeyEvent.VK_X) {
+                    	if(!allowDeletion) {
+                    		return;
+                    	}
+                    	
                         if (! controlPressed) {
                             return;
                         }
@@ -1427,6 +1447,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.35  2006/05/15 16:10:38  prasanth
+ * Updated copy right
+ *
  * Revision 1.34  2005/07/26 21:02:27  prasanth
  * Setting the column width only if autoResizeMode = AUTO_RESIZE_OFF.
  * This is set in init.
