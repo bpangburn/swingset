@@ -389,6 +389,10 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
     protected String getText() {
         String value = null;
         try {
+        	// IF THE COLUMN HAS NULL RETURN NULL
+            if(sSRowSet.getObject(columnName) == null) {
+            	return null;
+            }
             // BASED ON THE COLUMN DATA TYPE THE CORRESPONDING FUNCTION
             // IS CALLED TO GET THE VALUE IN THE COLUMN
             switch(columnType) {
@@ -585,6 +589,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.25  2006/05/15 16:10:38  prasanth
+ * Updated copy right
+ *
  * Revision 1.24  2005/04/14 15:38:34  prasanth
  * Setting the column value to null when the string value is empty and the column
  * type is varchar. This was needed to support string columns with unique constraints.
