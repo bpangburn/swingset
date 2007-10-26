@@ -282,10 +282,15 @@ public class SSTableModel extends AbstractTableModel {
             value = getDefaultValue(_column);
             return value;
         }
-
+        
         try {
             // ROW NUMBERS IN SSROWSET START FROM 1 WHERE AS ROW NUMBERING FOR JTABLE START FROM 0
             rowset.absolute(_row + 1);
+            
+            // IF IT IS NULL RETURN NULL  
+            if(rowset.getObject(_column+1) == null)
+            	return null;
+            
             // COLUMN NUMBERS IN SSROWSET START FROM 1 WHERE AS COLUMN NUMBERING FOR JTABLE START FROM 0
             int type = rowset.getColumnType(_column + 1);
             switch(type) {
@@ -919,6 +924,9 @@ public class SSTableModel extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.22  2007/01/08 22:03:20  prasanth
+ * Trimming any spaces on either side to avoid NumberFormatException. This could happen when copying data to the spreadsheet.
+ *
  * Revision 1.21  2006/05/15 16:10:38  prasanth
  * Updated copy right
  *
