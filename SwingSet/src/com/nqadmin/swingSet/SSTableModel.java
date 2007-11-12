@@ -35,6 +35,7 @@ package com.nqadmin.swingSet;
 import java.awt.Component;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -360,9 +361,13 @@ public class SSTableModel extends AbstractTableModel {
             
             
         // IF COPYING VALUES THE DATE WILL COME AS STRING SO CONVERT IT TO DATE OBJECT.
-            if(type == Types.TIMESTAMP || type == Types.DATE){
+            if(type == Types.DATE){
                 if(_value instanceof String)
                     _value = getSQLDate((String)_value);
+            }
+            else if(type == Types.TIMESTAMP) {
+            	if(_value instanceof String)
+                    _value = new Timestamp(getSQLDate((String)_value).getTime());
             }
 
         // IF CELL EDITING INTERFACE IMPLEMENTATION IS PROVIDED INFO THE USER
@@ -426,21 +431,12 @@ public class SSTableModel extends AbstractTableModel {
                 case Types.BIT:
                     rowset.updateBoolean(_column+1, ((Boolean)_value).booleanValue());
                     break;
-                case Types.DATE:
-                case Types.TIMESTAMP:
-                //  IF A DATE RENDERER AND EDITOR IS USED THE DATE IS DISPLAYED AS STRING.
-                // SO A STRING WILL BE SENT FOR UPDATE
-                // IN SUCH A CASE CHECK IS THE STRING IS EMPTY IF SO UPDATE NULL FOR THE FEILD
-                    if (_value instanceof String) {
-                        if (getSQLDate((String)_value) == null) {
-                            rowset.updateNull(_column+1);
-                        } else {
-                            rowset.updateDate(_column+1,getSQLDate((String)_value));
-                        }
-                    } else {
-                        rowset.updateDate(_column+1,(Date)_value);
-                    }
+                case Types.DATE:                
+                    rowset.updateDate(_column+1,(Date)_value);
                     break;
+                case Types.TIMESTAMP:
+                	rowset.updateTimestamp(_column+1, (Timestamp) _value);
+                	break;
                 case Types.CHAR:
                 case Types.VARCHAR:
                 case Types.LONGVARCHAR:
@@ -924,6 +920,10 @@ public class SSTableModel extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.23  2007/10/26 20:35:26  prasanth
+ * getValueAt now returns null if a given column has null.
+ * It used to return 0 for numeric fields (getInt, getDouble return 0 for null columns)
+ *
  * Revision 1.22  2007/01/08 22:03:20  prasanth
  * Trimming any spaces on either side to avoid NumberFormatException. This could happen when copying data to the spreadsheet.
  *

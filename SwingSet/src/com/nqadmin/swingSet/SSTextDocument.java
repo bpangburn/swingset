@@ -35,6 +35,7 @@ package com.nqadmin.swingSet;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -341,19 +342,25 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
                     break;
 
                 case Types.DATE:
-                case Types.TIMESTAMP:
                     // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
                     if ( strValue.equals("") ) {
                         sSRowSet.updateNull(columnName);
                     } else if (strValue.length() == 10) {
-    //                  System.out.println(strValue);
-    //                  Date dateValue = Date.valueOf(strValue);
                         sSRowSet.updateDate(columnName, getSQLDate(strValue));
                     } else {
                         // do nothing
                     }
                     break;
-
+                case Types.TIMESTAMP:
+                    // IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
+                    if ( strValue.equals("") ) {
+                        sSRowSet.updateNull(columnName);
+                    } else if (strValue.length() == 10) {
+                        sSRowSet.updateTimestamp(columnName, new Timestamp(getSQLDate(strValue).getTime()));
+                    } else {
+                        // do nothing
+                    }
+                    break;
                 case Types.CHAR:
                 case Types.VARCHAR:
                 case Types.LONGVARCHAR:
@@ -589,6 +596,9 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
 /*
  * $Log$
+ * Revision 1.26  2007/10/26 20:36:14  prasanth
+ * getText now returns null if getObject returns null.
+ *
  * Revision 1.25  2006/05/15 16:10:38  prasanth
  * Updated copy right
  *
