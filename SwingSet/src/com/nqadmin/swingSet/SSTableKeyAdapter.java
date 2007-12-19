@@ -344,12 +344,14 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
         Class objectClass = _jTable.getColumnClass(_column);
         Object newValue = null;
         try {
-        // GET THE CONSTRUCTOR FOR THE CLASS WHICH TAKES A STRING
-            Constructor constructor = objectClass.getConstructor(new Class[]{String.class});
-
-        // CREATE AN INSTANCE OF THE OBJECT
-            newValue = constructor.newInstance(new Object[]{_value});
-
+        	// CONSTRUCT THE OBJECT ONLY IF THE STRING IS NOT NULL
+        	if(_value != null) {
+	        // GET THE CONSTRUCTOR FOR THE CLASS WHICH TAKES A STRING
+	            Constructor constructor = objectClass.getConstructor(new Class[]{String.class});
+	
+	        // CREATE AN INSTANCE OF THE OBJECT
+	            newValue = constructor.newInstance(new Object[]{_value});
+        	}
         } catch(NoSuchMethodException nsme) {
             newValue = _value;
         }
@@ -363,6 +365,9 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
 /*
  * $Log$
+ * Revision 1.7  2006/05/15 16:10:38  prasanth
+ * Updated copy right
+ *
  * Revision 1.6  2005/02/09 21:22:35  yoda2
  * JavaDoc cleanup.
  *
