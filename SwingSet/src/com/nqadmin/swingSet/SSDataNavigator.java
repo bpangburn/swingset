@@ -532,7 +532,18 @@ public class SSDataNavigator extends JPanel {
     public boolean updatePresentRow() {
         try {
             if (!onInsertRow && modification) {
-                sSRowSet.updateRow();
+            	// CHECK IF WE HAVE DB NAV
+            	if(dBNav != null) {
+            		// SINCE WE HAVE DB NAV CHECK IF UPDATE IS ALLOWED
+            		if(dBNav.allowUpdate()) {
+            			sSRowSet.updateRow();
+            			dBNav.performPostUpdateOps();
+            		}            		
+            	}
+            	else {
+            		// DB NAV IS NOT PRESENT GO AHEAD AND UDPATE THE ROW.
+            		sSRowSet.updateRow();
+            	}
             }
             return true;
         } catch(Exception e) {
@@ -1311,6 +1322,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.43  2006/05/23 05:48:47  prasanth
+ * While deleting the row checking for confirmDeletes variable to display the confirmation dialog.
+ *
  * Revision 1.42  2006/05/15 16:10:38  prasanth
  * Updated copy right
  *
