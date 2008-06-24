@@ -1413,6 +1413,9 @@ public class SSDataGrid extends JTable {
 
         protected int getIndexOf(Object _value) {
             if (underlyingValues == null) {
+            	// IF THE VALUE IS NULL THEN SET THE DISPLAY ON THE COMBO TO BLANK (INDEX -1)
+            	if(_value == null)
+            		return -1;
                 return ((Integer)_value).intValue();
             }
             for (int i=0;i<underlyingValues.length;i++) {
@@ -1447,6 +1450,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.36  2007/10/26 20:32:46  prasanth
+ * Added ability to specify if deletions should be allowed.
+ *
  * Revision 1.35  2006/05/15 16:10:38  prasanth
  * Updated copy right
  *
