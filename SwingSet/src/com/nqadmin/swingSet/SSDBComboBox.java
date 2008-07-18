@@ -839,8 +839,18 @@ public class SSDBComboBox extends JComboBox {
                 return;
 
             }
-
-            if (ke.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+            
+            if(ke.getKeyCode() == KeyEvent.VK_F1 || ke.getKeyCode() == KeyEvent.VK_F2 || 
+            		ke.getKeyCode() == KeyEvent.VK_F3 || ke.getKeyCode() == KeyEvent.VK_F4 || 
+            		ke.getKeyCode() == KeyEvent.VK_F5 || ke.getKeyCode() == KeyEvent.VK_F6 || 
+            		ke.getKeyCode() == KeyEvent.VK_F7 || ke.getKeyCode() == KeyEvent.VK_F8 || 
+            		ke.getKeyCode() == KeyEvent.VK_F9 || ke.getKeyCode() == KeyEvent.VK_F10 || 
+            		ke.getKeyCode() == KeyEvent.VK_F11 || ke.getKeyCode() == KeyEvent.VK_F12) {
+            	// DON'T DO ANY THING FOR FUNCTION KEYS
+            	return;
+            }            
+            else if (ke.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+            	// REMOVE THE LAST CHARACTER IN THE SEARCH STRING
                 if (searchString == null ) {
                     setSelectedIndex(0);
                     searchStack.removeAllElements();
@@ -856,7 +866,8 @@ public class SSDBComboBox extends JComboBox {
                     }
                 }
 
-            } else if(searchString == null) {
+            }            
+            else if(searchString == null) {
                 searchString = new String(new char[]{ke.getKeyChar()});
             } else {
                 searchString = searchString + new String(new char[]{ke.getKeyChar()});
@@ -1155,6 +1166,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.33  2006/05/15 16:10:38  prasanth
+ * Updated copy right
+ *
  * Revision 1.32  2005/05/19 16:14:35  prasanth
  * Added setPrimaryKeyColumnName method. The set method was missing.
  *
