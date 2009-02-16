@@ -530,11 +530,9 @@ public class SSDataNavigator extends JPanel {
      * @return returns true if update succeeds else false.
      */
     public boolean updatePresentRow() {
-    	try {
+    	if(onInsertRow || currentRow > 0)
     		doCommitButtonClick();
-    	}catch(Exception e) {
-    		return false;
-    	}
+    	
         return true;
     }
 
@@ -1310,6 +1308,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.46  2009/02/16 22:21:29  prasanth
+ * Added try/catch in updatePresentRow.
+ *
  * Revision 1.45  2009/02/16 18:27:35  prasanth
  * 1. In updatePresentRow calling doCommitButtonClick.
  * 2. When on insert row and allowInsertion returns false staying in insertion row rather than making a call to moveToCurrentRow().
