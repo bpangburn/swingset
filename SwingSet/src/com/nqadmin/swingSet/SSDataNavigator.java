@@ -530,25 +530,8 @@ public class SSDataNavigator extends JPanel {
      * @return returns true if update succeeds else false.
      */
     public boolean updatePresentRow() {
-        try {
-            if (!onInsertRow && modification) {
-            	// CHECK IF WE HAVE DB NAV
-            	if(dBNav != null) {
-            		// SINCE WE HAVE DB NAV CHECK IF UPDATE IS ALLOWED
-            		if(dBNav.allowUpdate()) {
-            			sSRowSet.updateRow();
-            			dBNav.performPostUpdateOps();
-            		}            		
-            	}
-            	else {
-            		// DB NAV IS NOT PRESENT GO AHEAD AND UDPATE THE ROW.
-            		sSRowSet.updateRow();
-            	}
-            }
-            return true;
-        } catch(Exception e) {
-            return false;
-        }
+        doCommitButtonClick();
+        return true;
     }
 
     /**
@@ -985,10 +968,29 @@ public class SSDataNavigator extends JPanel {
                                 currentRow = sSRowSet.getRow();
                             // UPDATE THE TEXT FEILD
                                 txtCurrentRow.setText(String.valueOf(currentRow));
+                            
+	                            onInsertRow = false;
+	
+	                            if (!sSRowSet.isFirst()) {
+	                                firstButton.setEnabled(true);
+	                                previousButton.setEnabled(true);
+	                            }
+	                            if (!sSRowSet.isLast()) {
+	                                nextButton.setEnabled(true);
+	                                lastButton.setEnabled(true);
+	                            }
+	                            refreshButton.setEnabled(true);
+	
+	                            if (insertion) {
+	                                addButton.setEnabled(true);
+	                            }
+	                            if (deletion) {
+	                                deleteButton.setEnabled(true);
+	                            }
                             }
-                            else{
-                            // INSERTION IS NOT ALLOWED SO MOVE BACK TO PREVIOUS RECORD.    
-                                sSRowSet.moveToCurrentRow();
+                            else {
+                            	// WE DO NOTHING. THE ROWSET STAYS IN INSERT ROW. EITHER USER HAS TO FIX THE DATA AND SAVE THE ROW
+                            	// OR CANCEL THE INSERTION. 
                             }
                             
                         } else {
@@ -1013,24 +1015,6 @@ public class SSDataNavigator extends JPanel {
                         	}
                         }
 
-                        onInsertRow = false;
-
-                        if (!sSRowSet.isFirst()) {
-                            firstButton.setEnabled(true);
-                            previousButton.setEnabled(true);
-                        }
-                        if (!sSRowSet.isLast()) {
-                            nextButton.setEnabled(true);
-                            lastButton.setEnabled(true);
-                        }
-                        refreshButton.setEnabled(true);
-
-                        if (insertion) {
-                            addButton.setEnabled(true);
-                        }
-                        if (deletion) {
-                            deleteButton.setEnabled(true);
-                        }
                     } catch(SQLException se) {
                         JOptionPane.showMessageDialog(SSDataNavigator.this,"Exception occured while inserting row.\n"+se.getMessage());
                         se.printStackTrace();
@@ -1322,6 +1306,10 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.44  2008/05/12 14:27:42  prasanth
+ * In updatePresentRow allowUpdate was not called before calling updateRow().
+ * Modified the code to call allowUpdate & performPostUpateOps in updatePresentRow.
+ *
  * Revision 1.43  2006/05/23 05:48:47  prasanth
  * While deleting the row checking for confirmDeletes variable to display the confirmation dialog.
  *
