@@ -43,6 +43,8 @@ import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JFormattedTextField;
+import com.nqadmin.swingSet.formatting.SSFormattedTextField;
 
 /**
  * SSDBNavImp.java
@@ -104,9 +106,16 @@ public class SSDBNavImp extends SSDBNavAdapter {
         Component[] comps = _container.getComponents();
 
         for (int i=0; i< comps.length; i++ ) {
-            if (comps[i] instanceof JTextField) {
-            // IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING
-                ((JTextField)comps[i]).setText("");
+            if (comps[i] instanceof JTextField) {	            
+                // IF IT IS A SSFormattedTextField SET ITS VALUE TO NULL (to avoid parse exception)
+                   if(comps[i] instanceof SSFormattedTextField){
+        	       		((SSFormattedTextField)comps[i]).setValue(null);
+                   }
+                   else{
+                   // IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING
+		                ((JTextField)comps[i]).setText("");
+                   }
+                   
             } else if(comps[i] instanceof JTextArea) {
             // IF IT IS A JTextArea, SET TO EMPTY STRING
                 ((JTextArea)comps[i]).setText("");                
@@ -134,7 +143,7 @@ public class SSDBNavImp extends SSDBNavAdapter {
             } else if(comps[i] instanceof JScrollPane) {
             // IF IT IS A JScrollPane GET THE VIEW PORT AND RECURSIVELY SET THE FIELDS IN VIEW PORT    
                 setComponents((Container) ((JScrollPane)comps[i]).getViewport());
-            }
+            }            
         }
 
     } // end protected void setComponents(Container _container) {
@@ -145,6 +154,9 @@ public class SSDBNavImp extends SSDBNavAdapter {
 
 /*
  * $Log$
+ * Revision 1.15  2006/05/15 16:10:38  prasanth
+ * Updated copy right
+ *
  * Revision 1.14  2005/03/08 16:06:40  prasanth
  * Added JScrollPane to the list of items to look for in setComponents function.
  *
