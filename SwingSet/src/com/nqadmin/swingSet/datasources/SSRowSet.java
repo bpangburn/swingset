@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company and Prasanth R. Pasala
+ * Copyright (c) 2004-2009, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,8 @@
 
  import java.io.Serializable;
  import javax.sql.RowSetListener;
+
+ import java.sql.Array;
  import java.sql.SQLException;
  import java.sql.Date;
  import java.sql.ResultSetMetaData;
@@ -52,16 +54,25 @@
   *</pre>
   */
  public interface SSRowSet extends Serializable{
-
-    /**
+	 
+	 /**
      * Retrieves the value of the designated column in the current row of this DataSet
      * object as a boolean in the Java programming language.
      * @param columnIndex - column number . first column is 1, second column is 2....
-     * @return returns the column value of the current row, if the value is null then a false
+     * @return returns the column value of the current row, if the value is null then 0
      * is returned.
      * @throws throws an SQL exception if an access error occurs.
      */
     public boolean getBoolean(int columnIndex) throws SQLException;
+
+	 /**
+	  * Retrieves the value of the designated column in the current row of this DataSet
+	  * object as an array in the Java programming language.
+	  * @param columnIndex - column number . first column is 1, second column is 2....
+	  * @return returns the column value of the current row.
+	  * @throws throws an SQL exception if an access error occurs.
+	  */	 
+	public Array getArray(int columnIndex) throws SQLException;
 
     /**
      * Retrieves the value of the designated column in the current row of this DataSet
@@ -143,6 +154,17 @@
      * @throws throws an SQL exception if an access error occurs.
      */
     public void updateBoolean(int columnIndex, boolean x) throws SQLException;
+    
+    /**
+     * Updates the designated column with an array value. The updater methods are used to
+     * update column values in the current row or the insert row. The updater methods do
+     * not update the underlying data source; instead the updateRow or insertRow methods are called
+     * to update the underlying data source.
+     * @param columnIndex - index of the column
+     * @param x - new column value
+     * @throws throws an SQL exception if an access error occurs.
+     */
+    public void updateArray(int columnIndex, Array x) throws SQLException;
 
     /**
      * Updates the designated column with a int value. The updater methods are used to
@@ -240,6 +262,15 @@
      * @throws throws an SQL exception if an access error occurs.
      */
     public boolean getBoolean(String columnName) throws SQLException;
+    
+    /**
+     * Retrieves the value of the designated column in the current row of this DataSet
+     * object as an array in the Java programming language.
+     * @param columnName - Name of the column.
+     * @return returns the column value of the current row.
+     * @throws throws an SQL exception if an access error occurs.
+     */
+    public Array getArray(String columnName) throws SQLException;
 
     /**
      * Retrieves the value of the designated column in the current row of this DataSet
@@ -321,6 +352,17 @@
      * @throws throws an SQL exception if an access error occurs.
      */
     public void updateBoolean(String columnName, boolean x) throws SQLException;
+
+    /**
+     * Updates the designated column with an array value. The updater methods are used to
+     * update column values in the current row or the insert row. The updater methods do
+     * not update the underlying data source; instead the updateRow or insertRow methods are called
+     * to update the underlying data source.
+     * @param columnName - name of the column
+     * @param x - new column value
+     * @throws throws an SQL exception if an access error occurs.
+     */
+    public void updateArray(String columnName, Array x) throws SQLException;
 
     /**
      * Updates the designated column with a int value. The updater methods are used to
@@ -827,6 +869,9 @@
 
 /*
  * $Log$
+ * Revision 1.8  2005/05/26 19:26:35  prasanth
+ * Added method get/update methods for Time & TimeStamp.
+ *
  * Revision 1.7  2005/05/24 23:07:39  prasanth
  * 1. Added get/set methods for object.
  * 2. Added rowDeleted, rowInserted, rowUpdated methods

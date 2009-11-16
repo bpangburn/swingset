@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company and Prasanth R. Pasala
+ * Copyright (c) 2004-2009, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,11 +34,13 @@
 
  import java.io.Serializable;
  import javax.sql.RowSetListener;
+
+import java.sql.Array;
  import java.sql.Date;
  import java.sql.SQLException;
  import java.sql.ResultSetMetaData;
  import java.sql.Timestamp;
- import java.sql.Time;
+import java.sql.Time;
 
 /**
  * SSRowSetAdapter.java
@@ -66,6 +68,17 @@
      * @throws throws an SQL exception if an access error occurs.
      */
     public boolean getBoolean(int columnIndex) throws SQLException{
+        throw new UnsupportedOperationException();
+    }
+    
+    /**
+     * Retrieves the value of the designated column in the current row of this DataSet
+     * object as an SQL array.
+     * @param columnIndex - column number
+     * @return returns SQL Array stored in the current row of the DataSet.
+     * @throws throws an SQL exception if an access error occurs.
+     */
+    public Array getArray(int columnIndex) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -163,6 +176,19 @@
      * @throws throws an SQL exception if an access error occurs.
      */
     public void updateBoolean(int columnIndex, boolean x) throws SQLException{
+        throw new UnsupportedOperationException();
+    }
+    
+    /**
+     * Updates the designated column with an array value. The updater methods are used to
+     * update column values in the current row or the insert row. The updater methods do
+     * not update the underlying data source; instead the updateRow or insertRow methods are called
+     * to update the underlying data source.
+     * @param columnIndex - index number of the column. first column is 1, second column is 2......
+     * @param x - new column value
+     * @throws throws an SQL exception if an access error occurs.
+     */
+    public void updateArray(int columnIndex, Array x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -283,6 +309,17 @@
 
     /**
      * Retrieves the value of the designated column in the current row of this DataSet
+     * object as an SQL array in the Java programming language.
+     * @param columnName - name of the column
+     * @return returns the column value of the current row
+     * @throws throws an SQL exception if an access error occurs.
+     */
+    public Array getArray(String columnName) throws SQLException{
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Retrieves the value of the designated column in the current row of this DataSet
      * object as a int in the Java programming language.
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then 0
@@ -375,6 +412,19 @@
      * @throws throws an SQL exception if an access error occurs.
      */
     public void updateBoolean(String columnName, boolean x) throws SQLException{
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Updates the designated column with an array value. The updater methods are used to
+     * update column values in the current row or the insert row. The updater methods do
+     * not update the underlying data source; instead the updateRow or insertRow methods are called
+     * to update the underlying data source.
+     * @param columnName - name of the column
+     * @param x - new column value
+     * @throws throws an SQL exception if an access error occurs.
+     */
+    public void updateArray(String columnName, Array x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -978,6 +1028,9 @@
 
 /*
  * $Log$
+ * Revision 1.9  2005/05/26 19:26:35  prasanth
+ * Added method get/update methods for Time & TimeStamp.
+ *
  * Revision 1.8  2005/05/24 23:07:40  prasanth
  * 1. Added get/set methods for object.
  * 2. Added rowDeleted, rowInserted, rowUpdated methods

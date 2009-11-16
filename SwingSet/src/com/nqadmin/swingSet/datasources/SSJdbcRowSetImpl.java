@@ -2,7 +2,7 @@
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2005, The Pangburn Company and Prasanth R. Pasala
+ * Copyright (c) 2004-2009, The Pangburn Company and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,7 @@
 
 package com.nqadmin.swingSet.datasources;
 
+import java.sql.Array;
 import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -251,6 +252,17 @@ import java.beans.PropertyVetoException;
 
     /**
      * Retrieves the value of the designated column in the current row of this DataSet
+     * object as an sql array in the Java programming language.
+     * @param columnIndex - column number . first column is 1, second column is 2....
+     * @return returns the column value of the current row.
+     * @throws throws an SQL exception if an access error occurs.
+     */
+    public Array getArray(int columnIndex) throws SQLException{
+        return rowset.getArray(columnIndex);
+    }
+    
+    /**
+     * Retrieves the value of the designated column in the current row of this DataSet
      * object as a boolean in the Java programming language.
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then a false
@@ -343,6 +355,19 @@ import java.beans.PropertyVetoException;
      */
     public byte[] getBytes(int columnIndex)  throws SQLException {
         return rowset.getBytes(columnIndex);
+    }
+    
+    /**
+     * Updates the designated column with an array value. The updater methods are used to
+     * update column values in the current row or the insert row. The updater methods do
+     * not update the underlying data source; instead the updateRow or insertRow methods are called
+     * to update the underlying data source.
+     * @param columnIndex - index number of the column. first column is 1, second column is 2......
+     * @param value - new column value
+     * @throws throws an SQL exception if an access error occurs.
+     */
+    public void updateArray(int columnIndex, Array x) throws SQLException{
+        rowset.updateArray(columnIndex, x);
     }
 
     /**
@@ -460,6 +485,17 @@ import java.beans.PropertyVetoException;
     public void updateNull(int columnIndex) throws SQLException{
         rowset.updateNull(columnIndex);
     }
+    
+    /**
+     * Retrieves the value of the designated column in the current row of this DataSet
+     * object as an sql array in the Java programming language.
+     * @param columnName - Name of the column.
+     * @return returns the column value of the current row.
+     * @throws throws an SQL exception if an access error occurs.
+     */
+    public Array getArray(String columnName) throws SQLException{
+        return rowset.getArray(columnName);
+    }
 
     /**
      * Retrieves the value of the designated column in the current row of this DataSet
@@ -555,6 +591,19 @@ import java.beans.PropertyVetoException;
      */
     public byte[] getBytes(String columnName)  throws SQLException {
         return rowset.getBytes(columnName);
+    }
+
+    /**
+     * Updates the designated column with an array value. The updater methods are used to
+     * update column values in the current row or the insert row. The updater methods do
+     * not update the underlying data source; instead the updateRow or insertRow methods are called
+     * to update the underlying data source.
+     * @param columnName - Name of the column.
+     * @param value - new column value
+     * @throws throws an SQL exception if an access error occurs.
+     */
+    public void updateArray(String columnName, Array x) throws SQLException{
+        rowset.updateArray(columnName, x);
     }
 
     /**
@@ -1156,6 +1205,9 @@ import java.beans.PropertyVetoException;
 }
  /*
   * $Log$
+  * Revision 1.15  2005/05/26 19:26:35  prasanth
+  * Added method get/update methods for Time & TimeStamp.
+  *
   * Revision 1.14  2005/05/24 23:07:37  prasanth
   * 1. Added get/set methods for object.
   * 2. Added rowDeleted, rowInserted, rowUpdated methods
