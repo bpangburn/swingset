@@ -449,7 +449,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         try {
         	// IF THE COLUMN VALUE IS NULL SET THE FIELD TO NULL AND RETURN
             if(rowset.getObject(columnName) == null){
-            	this.setValue(null);
+            	super.setValue(null);
             	return;
             }
             
@@ -466,13 +466,13 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                 case java.sql.Types.BIT    ://-7
                     //System.out.println("BIT implemented as Boolean --> " + columnName);
                     nValue = new Boolean(rowset.getBoolean(columnName));
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 case java.sql.Types.BOOLEAN://16
                     //System.out.println("BOOLEAN implemented as Boolean --> " + columnName);
                     nValue = new Boolean(rowset.getBoolean(columnName));
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 case java.sql.Types.BLOB://2004
@@ -492,17 +492,17 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                 	Date date = rowset.getDate(columnName);
                 	if(date != null){
                 		nValue = new java.util.Date(rowset.getDate(columnName).getTime());
-                		this.setValue(nValue);
+                		super.setValue(nValue);
                 	}
                 	else{
-                		this.setValue(null);
+                		super.setValue(null);
                 	}
                     break;
                     
                 case java.sql.Types.DECIMAL://3
                     //System.out.println("DECIMAL implemented as BigDecimal --> " + columnName);
                     nValue = new java.math.BigDecimal(rowset.getDouble(columnName));
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 case java.sql.Types.DISTINCT://2001
@@ -512,43 +512,43 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                 case java.sql.Types.DOUBLE://8
                     //System.out.println("DOUBLE implemented as Double --> " + columnName);
                     nValue = new Double(rowset.getDouble(columnName));
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 case java.sql.Types.REAL: //7
                     //System.out.println("REAL implemented as Float --> " + columnName);
                     nValue = new Float(rowset.getFloat(columnName));
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 case java.sql.Types.FLOAT://6
                     //System.out.println("FLOAT implemented as Float --> " + columnName);
                     nValue = new Float(rowset.getFloat(columnName));
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 case java.sql.Types.TINYINT ://-6
                     //System.out.println("TINYINT implemented as Integer --> " + columnName);
                     nValue = new Integer(rowset.getInt(columnName));
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 case java.sql.Types.SMALLINT://5
                     //System.out.println("SMALLINT implemented as Integer --> " + columnName);
                     nValue = new Integer(rowset.getInt(columnName));
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 case java.sql.Types.INTEGER ://4
                     //System.out.println("INTEGER implemented as Integer --> " + columnName);
                     nValue = new Integer(rowset.getInt(columnName));
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 case java.sql.Types.BIGINT  ://-5
                     //System.out.println("BIGINT implemented as Integer --> " + columnName);
                     nValue = new Integer(rowset.getInt(columnName));
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 case java.sql.Types.JAVA_OBJECT://2000
@@ -566,19 +566,19 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                 case java.sql.Types.VARCHAR://
                     //System.out.println("VARCHAR implemented as String --> " + columnName);
                     nValue = rowset.getString(columnName);
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 case java.sql.Types.LONGVARCHAR://-1
                     //System.out.println("LONGVARCHAR implemented as String --> " + columnName);
                     nValue = rowset.getString(columnName);
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 case java.sql.Types.CHAR://1
                     //System.out.println("CHAR implemented as String --> " + columnName);
                     nValue = rowset.getString(columnName);
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 case java.sql.Types.NULL://0
@@ -588,7 +588,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                 case java.sql.Types.NUMERIC://2
                     //System.out.println("NUMERIC implemented as BigDecimal --> " + columnName);
                     nValue = new java.math.BigDecimal(rowset.getDouble(columnName));
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 case java.sql.Types.OTHER://1111
@@ -607,14 +607,14 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                     //System.out.println("TIME implemented as java.util.Date --> " + columnName);
                     //nValue = new java.util.Date(rowset.getTime(columnName).getTime());
                     nValue = rowset.getTime(columnName);
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 case java.sql.Types.TIMESTAMP://93
                     //System.out.println("TIMESTAMP implemented as java.util.Date --> " + columnName);
 //                    nValue = new java.util.Date(rowset.getTimestamp(columnName).getTime());
                     nValue = rowset.getTimestamp(columnName);
-                    this.setValue(nValue);
+                    super.setValue(nValue);
                     break;
                     
                 default:
@@ -624,7 +624,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         } catch (java.sql.SQLException sqe) {
             System.out.println("Error in DbToFm() = " + sqe);
             sqe.printStackTrace();
-            this.setValue(null);
+            super.setValue(null);
         }
         
         if ( (nValue instanceof Double  && ((Double)  nValue).doubleValue() < 0.0) ||
@@ -763,7 +763,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
      * @param value - The value to be set for this component (this will also update the underlying column value)
      * @return returns true if update is successful else false
      */
-    @Deprecated( )
+    @Deprecated
     public boolean updateValue(Object value){
     	if(updateFieldValue(value)){
     		super.setValue(value);
@@ -834,10 +834,10 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
                 
             } catch (java.sql.SQLException se) {
                 System.out.println("---> SQLException -----------> " + se);
-                tf.setValue(null);
+                super.setValue(null);
             } catch(java.lang.NullPointerException np) {
                 System.out.println("<---> NullPointerException <---> " + np + " columnName : " + columnName);
-                tf.setValue(null);
+                super.setValue(null);
             }
             
             rowset.addRowSetListener(tf);
@@ -1008,7 +1008,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     public void commitEdit() throws ParseException {
         
         if (getText()==null || getText().length()==0){
-            setValue(null);
+            super.setValue(null);
         } 
         else{
         	super.commitEdit();
@@ -1053,12 +1053,16 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
      * @see com.nqadmin.swingSet.formatting.SSField#cleanField()
      */
     public void cleanField() {
-        setValue(null);
+        super.setValue(null);
     }
 }
 
 /*
  * $Log$
+ * Revision 1.25  2010/03/17 14:47:59  prasanth
+ * Deprecated updateValue and added setValue.
+ * When the underlying value is null setting value of null to the component.
+ *
  * Revision 1.24  2006/05/15 15:51:46  prasanth
  * Removed implementation of SSField
  *
