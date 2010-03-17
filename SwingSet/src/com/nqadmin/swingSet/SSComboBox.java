@@ -212,7 +212,11 @@ public class SSComboBox extends JComboBox {
         try {
         	removeListeners();
             textField.setText(String.valueOf(_value));
-			updateDisplay();
+            // SOME TIMES THE ROWSET IS NOT UPDATED WITH THE NEW VALUE SET IN TEXT FIELD
+            // BY THE TIME UPDATE DISPLAY FETCHES THE VALUE FROM ROWSET PROBABLY BECAUSE THE LISTENERS
+            // HAVEN'T COMPLETED THE WORK BY THE TIME UPDATE DISPLAY FETCHES THE VALUE
+            // SO FORCING THE USE OF VALUE IN TEXT FIELD.
+			updateDisplay(true);
 			addListeners();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -476,13 +480,28 @@ public class SSComboBox extends JComboBox {
 
     /**
      * Updates the value displayed in the component based on the SSRowSet column
-     * binding.
+     * binding. 
      */
     protected void updateDisplay() throws SQLException {
+    	updateDisplay(false);
+    }
+    
+    /**
+     * Updates the value displayed in the component based on the SSRowSet column
+     * binding.
+     * @useTextField if this is true the value from the text in the text field will be used to update the display even if the
+     * rowset is on a valid row. This is needed when setSelectedValue is used.
+     */
+    protected void updateDisplay(boolean useTextField) throws SQLException {
         try {
             String text = "";
             try{
-            	text =  sSRowSet.getRow() > 0 ? sSRowSet.getString(columnName) : textField.getText().trim();
+            	if(useTextField) {
+            		text = textField.getText().trim();
+            	}
+            	else {
+            		text =  sSRowSet.getRow() > 0 ? sSRowSet.getString(columnName) : textField.getText().trim();
+            	}
             	//System.out.println(columnName + "  " + text + " " + textField.getText());
             }catch(SQLException se) {
             	
@@ -754,6 +773,9 @@ public class SSComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.36  2008/07/18 15:01:34  prasanth
+ * Uses listener on rowset to update the value in the combo box. Doesn't use the listener on SSTextDocument any more. As a result removed the depricated constructor that takes SSTextDocument.
+ *
  * Revision 1.35  2006/05/15 16:10:38  prasanth
  * Updated copy right
  *
