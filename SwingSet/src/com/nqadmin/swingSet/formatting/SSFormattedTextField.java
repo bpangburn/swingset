@@ -447,6 +447,11 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         if (nrow == 0) return;
         
         try {
+        	// IF THE COLUMN VALUE IS NULL SET THE FIELD TO NULL AND RETURN
+            if(rowset.getObject(columnName) == null){
+            	this.setValue(null);
+            	return;
+            }
             
             switch(colType) {
                 
@@ -735,20 +740,14 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
             try {
                 tf.commitEdit();
             } catch (java.text.ParseException pe) {
-                System.out.println("inputVerifier --> ParseException  POSITION:" + pe.getErrorOffset());
+                pe.printStackTrace();
+            	System.out.println("inputVerifier --> ParseException  POSITION:" + pe.getErrorOffset());
                 tf.setValue(null);
                 setBackground(java.awt.Color.RED);
                 return false;
             }
            
             aux = tf.getValue();
-            System.out.println(aux);
-            if(aux instanceof Long || aux instanceof Integer || aux instanceof Double){
-            	System.out.println(aux);
-            }
-            	
-            	
-            
             return updateFieldValue(aux);
 
         }
@@ -756,17 +755,35 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     
     
     /**
+     * This function has been deprecated, use setValue to set the value in database. This is done to reduce the confusion of when to use setValue and when to use updateValue.
+     * Before this change setValue is a function in JFormattedText field and it would not set the value in database, so we have overridden this function in
+     * this class to update database and then update the display.
+     * 
      * Sets the value of the field to the specified value
      * @param value - The value to be set for this component (this will also update the underlying column value)
      * @return returns true if update is successful else false
      */
+    @Deprecated( )
     public boolean updateValue(Object value){
     	if(updateFieldValue(value)){
-    		setValue(value);
+    		super.setValue(value);
     		return true;
     	}
     	return false;
     }
+    
+    
+    /**
+     * Sets the value of the field to the specified value
+     * @param value - The value to be set for this component (this will also update the underlying column value)
+     */
+    public void setValue(Object value){
+    	if(updateFieldValue(value)){
+    		super.setValue(value);
+    	}
+    }
+    
+
     
     /**
      * Updates the value of the componenet
@@ -1042,6 +1059,9 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
 
 /*
  * $Log$
+ * Revision 1.24  2006/05/15 15:51:46  prasanth
+ * Removed implementation of SSField
+ *
  * Revision 1.23  2006/04/27 22:02:45  prasanth
  * Added/updated java doc
  *
