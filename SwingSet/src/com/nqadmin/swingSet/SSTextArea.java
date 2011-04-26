@@ -64,7 +64,7 @@ public class SSTextArea extends JTextArea {
      * Empty constructor needed for deserialization.
      */
     public SSTextArea() {
-		init();
+
     }
 
     /**
@@ -87,7 +87,6 @@ public class SSTextArea extends JTextArea {
     public SSTextArea(SSRowSet _sSRowSet, String _columnName) {
 		sSRowSet = _sSRowSet;
         columnName = _columnName;
-        init();
         bind();
     }
 
@@ -153,15 +152,6 @@ public class SSTextArea extends JTextArea {
     }
 
     /**
-     * Initialization code.
-     */
-    protected void init() {
-
-        // SET PREFERRED DIMENSIONS
-            setPreferredSize(new Dimension(200,80));
-    }
-
-    /**
      * Method for handling binding of component to a SSRowSet column.
      */
     protected void bind() {
@@ -189,6 +179,9 @@ public class SSTextArea extends JTextArea {
 
 /*
  * $Log$
+ * Revision 1.15  2006/05/15 16:10:38  prasanth
+ * Updated copy right
+ *
  * Revision 1.14  2005/02/21 16:31:33  prasanth
  * In bind checking for empty columnName before binding the component.
  *
