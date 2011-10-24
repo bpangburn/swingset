@@ -122,6 +122,13 @@ public class SSTableModel extends AbstractTableModel {
     protected SSCellEditing cellEditing = null;
 
     /**
+     * Implementation of DataGridHandler interface used to determine dynamically
+     * if a given row can be deleted, and what to do before and after a row 
+     * is added or removed.
+     */
+    protected SSDataGridHandler dataGridHandler = null;
+
+    /**
      * List of uneditable columns.
      */
     protected int[] uneditableColumns  = null;
@@ -178,6 +185,17 @@ public class SSTableModel extends AbstractTableModel {
      public void setSSCellEditing(SSCellEditing _cellEditing) {
         cellEditing = _cellEditing;
      }
+
+     /**
+      * Used to set an implementation of SSDataGridHandler interface which can be
+      * used to determine dynamically if a given row can be deleted, and what 
+      * should be done after row insertion, and deletion.
+      *
+      * @param _dataGridHandler implementation of SSDataGridHandler interface.
+      */
+      public void setSSDataGridHandler(SSDataGridHandler _dataGridHandler) {
+         dataGridHandler = _dataGridHandler;
+      }
 
      /**
       * Sets row insertion indicator.
@@ -469,6 +487,9 @@ public class SSTableModel extends AbstractTableModel {
         if (_value == null) {
             return;
         }
+        if(dataGridHandler!= null) {
+        	dataGridHandler.performPreInsertOps(rowCount);
+        }
 
         try {
             // IF NOT ON INSERT ROW MOVE TO INSERT ROW.
@@ -536,7 +557,11 @@ public class SSTableModel extends AbstractTableModel {
             }
             inInsertRow = false;
             rowCount++;
-
+            
+            if(dataGridHandler != null) {
+            	dataGridHandler.performPostInsertOps(rowCount-1);
+            }
+            
        } catch(SQLException se) {
             se.printStackTrace();
             inInsertRow = false;
@@ -664,12 +689,20 @@ public class SSTableModel extends AbstractTableModel {
      * @return returns true on succesful deletion else false.
      */
     public boolean deleteRow(int _row) {
-
+    	if(dataGridHandler != null) {
+    		dataGridHandler.performPreDeletionOps(_row);
+    	}
         if (_row < rowCount) {
             try {
+            	if(dataGridHandler!= null && !dataGridHandler.allowDeletion(_row)) {
+            		return false;
+            	}
                 rowset.absolute(_row +1);
                 rowset.deleteRow();
                 rowCount--;
+                if(dataGridHandler != null) {
+                	dataGridHandler.performPostDeletionOps(_row);
+                }
                 return true;
             } catch(SQLException se) {
                 se.printStackTrace();
@@ -920,6 +953,9 @@ public class SSTableModel extends AbstractTableModel {
 
 /*
  * $Log$
+ * Revision 1.24  2007/11/12 22:44:45  prasanth
+ * When the underlying column is timestamp using updateTimestamp rather than updateDate.
+ *
  * Revision 1.23  2007/10/26 20:35:26  prasanth
  * getValueAt now returns null if a given column has null.
  * It used to return 0 for numeric fields (getInt, getDouble return 0 for null columns)
