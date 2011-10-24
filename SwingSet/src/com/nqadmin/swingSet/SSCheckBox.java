@@ -32,14 +32,17 @@
 
 package com.nqadmin.swingSet;
 
-import java.awt.Component;
+import java.awt.AWTKeyStroke;
 import java.awt.Dimension;
-import java.awt.event.KeyAdapter;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -205,16 +208,13 @@ public class SSCheckBox extends JCheckBox {
      * Initialization code.
      */
     protected void init() {
-        // ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
-        // KEY IS PRESSED.
-            //cmbDisplayed.addKeyListener(new KeyAdapter() {
-            addKeyListener(new KeyAdapter() {
-                public void keyReleased(KeyEvent ke) {
-                    if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
-                        ((Component)ke.getSource()).transferFocus();
-                    }
-                }
-            });
+    	
+        // TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER KEY IS PRESSED
+        Set<AWTKeyStroke> forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+        Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(forwardKeys);
+        newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+        newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK ));
+        setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);
             
         // SET PREFERRED AND MAXIMUM DIMENSIONS
             setPreferredSize(new Dimension(20,20));
@@ -410,6 +410,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.16  2006/05/15 16:10:38  prasanth
+ * Updated copy right
+ *
  * Revision 1.15  2005/02/21 16:31:18  prasanth
  * In bind checking for empty columnName before binding the component.
  *

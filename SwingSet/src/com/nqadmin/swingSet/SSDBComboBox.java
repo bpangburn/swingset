@@ -32,8 +32,10 @@
 
 package com.nqadmin.swingSet;
 
+import java.awt.AWTKeyStroke;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -45,11 +47,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -672,9 +677,13 @@ public class SSDBComboBox extends JComboBox {
      * Initialization code.
      */
     protected void init() {
-        // ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
-        // THIS IS HANDLED IN MyKeyListener
-
+        // TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER KEY IS PRESSED
+        Set<AWTKeyStroke> forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+        Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(forwardKeys);
+        newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+        newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK ));
+        setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);
+        
         // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,20));
     }
@@ -833,9 +842,6 @@ public class SSDBComboBox extends JComboBox {
                     ke.getKeyCode() == KeyEvent.VK_ENTER       ) {
                 searchString = null;
                 searchStack.removeAllElements();
-                if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
-                    ((Component)ke.getSource()).transferFocus();
-                }
                 return;
 
             }
@@ -1166,6 +1172,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.34  2008/07/18 14:49:58  prasanth
+ * In key listener ignoring function keys.
+ *
  * Revision 1.33  2006/05/15 16:10:38  prasanth
  * Updated copy right
  *

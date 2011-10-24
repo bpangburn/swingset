@@ -32,15 +32,19 @@
 
 package com.nqadmin.swingSet;
 
-import java.awt.Component;
+import java.awt.AWTKeyStroke;
 import java.awt.Dimension;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 import com.nqadmin.swingSet.datasources.SSRowSet;
 
@@ -303,6 +307,13 @@ public class SSTextField extends JTextField {
                     SSTextField.this.selectAll();
                 }
             });
+            
+            // TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER KEY IS PRESSED
+            Set<AWTKeyStroke> forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+            Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(forwardKeys);
+            newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+            newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK ));
+            setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);
 
          // ADD KEY LISTENER FOR THE TEXT FIELD
             this.addKeyListener(new KeyListener() {
@@ -322,11 +333,6 @@ public class SSTextField extends JTextField {
                         }
                             
                     }
-                // TRANSFER FOCUS TO NEXT COMPONENT WHEN ENTER KEY IS PRESSED
-                    if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
-                        ((Component)ke.getSource()).transferFocus();
-                    }
-
                 }
 
                 public void keyTyped(KeyEvent ke) {
@@ -519,6 +525,9 @@ public class SSTextField extends JTextField {
 
 /*
  * $Log$
+ * Revision 1.25  2006/05/15 16:10:38  prasanth
+ * Updated copy right
+ *
  * Revision 1.24  2006/04/14 22:04:33  prasanth
  * Doing the focus transfer on receiving key released event of VK_ENTER rather than on  key pressed.
  *

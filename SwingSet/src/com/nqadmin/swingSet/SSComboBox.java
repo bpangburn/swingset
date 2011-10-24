@@ -32,19 +32,23 @@
 
 package com.nqadmin.swingSet;
 
+import java.awt.AWTKeyStroke;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyVetoException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
 import javax.swing.JComboBox;
+import javax.swing.KeyStroke;
 
 import com.nqadmin.swingSet.datasources.SSRowSet;
 
@@ -440,15 +444,12 @@ public class SSComboBox extends JComboBox {
      * Initialization code.
      */
     protected void init() {
-        // ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
-        // KEY IS PRESSED.
-            addKeyListener(new KeyAdapter() {
-                public void keyReleased(KeyEvent ke) {
-                    if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
-                        ((Component)ke.getSource()).transferFocus();
-                    }
-                }
-            });
+        // TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER KEY IS PRESSED.
+        Set<AWTKeyStroke> forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+        Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(forwardKeys);
+        newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+        newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK ));
+        setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);
             
         // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,20));
@@ -773,6 +774,9 @@ public class SSComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.37  2010/03/17 18:17:19  prasanth
+ * Added a function updateDisplay(boolean useTextField) which can be used in setSelectedValue.
+ *
  * Revision 1.36  2008/07/18 15:01:34  prasanth
  * Uses listener on rowset to update the value in the combo box. Doesn't use the listener on SSTextDocument any more. As a result removed the depricated constructor that takes SSTextDocument.
  *
