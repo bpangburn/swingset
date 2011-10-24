@@ -183,6 +183,11 @@ public class SSDataGrid extends JTable {
      * Table model to construct the JTable
      */
     protected SSTableModel tableModel = new SSTableModel();
+    
+    /**
+     * DagaGridHandler to help with row deletions, and insertions
+     */
+    protected SSDataGridHandler dataGridHandler;
 
     /**
      * Scrollpane used to scroll datagrid.
@@ -796,6 +801,16 @@ public class SSDataGrid extends JTable {
      */
     public void setSSCellEditing(SSCellEditing _cellEditing) {
         tableModel.setSSCellEditing( _cellEditing );
+    }
+
+    /**
+     * Set the implementation of DataGridHandler which can be use to handle 
+     * row deletions and insertions
+     *
+     * @param _dataGridHandler  implementation of SSDataGridHandler interface.
+     */
+    public void setSSDataGridHandler(SSDataGridHandler _dataGridHandler) {
+        tableModel.setSSDataGridHandler(_dataGridHandler);
     }
     
     /**
@@ -1452,6 +1467,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.38  2011/10/24 18:25:49  prasanth
+ * Disabling the use of focus traversal keys in default editor and date editor. This will allow the use of tab to move to next cell while editing.
+ *
  * Revision 1.37  2008/06/24 21:51:03  prasanth
  * When using a combo renderer and the underlying value is null returning index -1.
  *
