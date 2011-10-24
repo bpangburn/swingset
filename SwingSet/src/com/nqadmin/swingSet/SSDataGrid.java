@@ -818,6 +818,7 @@ public class SSDataGrid extends JTable {
          */
         public DefaultEditor() {
             super(new SSTextField());
+            getComponent().setFocusTraversalKeysEnabled(false);
             MyListener listener = new MyListener();
             getComponent().addFocusListener(listener);
             getComponent().addKeyListener(listener);
@@ -1121,6 +1122,7 @@ public class SSDataGrid extends JTable {
         // CONSTRUCTOR FOR THE EDITOR CLASS
         public DateEditor(){
             super(new SSTextField(SSTextField.MMDDYYYY));
+            getComponent().setFocusTraversalKeysEnabled(false);
             getComponent().addKeyListener(new KeyAdapter(){
                 int keyPressed = 0;
                 public void keyPressed(KeyEvent ke){
@@ -1450,6 +1452,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.37  2008/06/24 21:51:03  prasanth
+ * When using a combo renderer and the underlying value is null returning index -1.
+ *
  * Revision 1.36  2007/10/26 20:32:46  prasanth
  * Added ability to specify if deletions should be allowed.
  *
