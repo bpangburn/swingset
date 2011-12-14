@@ -127,6 +127,16 @@ public class SSCheckBox extends JCheckBox {
         init();
     }
 
+    
+    /**
+     * Creates an object of SSCheckBox.
+     */
+    public SSCheckBox(String text) {
+    	super(text);
+        init();
+    }
+
+    
     /**
      * Creates an object of SSCheckBox binding it so the specified column
      * in the given SSRowSet.
@@ -214,11 +224,8 @@ public class SSCheckBox extends JCheckBox {
         Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(forwardKeys);
         newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
         newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK ));
-        setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);
-            
-        // SET PREFERRED AND MAXIMUM DIMENSIONS
-            setPreferredSize(new Dimension(20,20));
-            setMaximumSize(new Dimension(20,20));            
+        setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);       
+     
     }
     
     /**
@@ -410,6 +417,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.17  2011/10/24 17:11:42  prasanth
+ * Changed the way focus is transfered for ENTER key.
+ *
  * Revision 1.16  2006/05/15 16:10:38  prasanth
  * Updated copy right
  *
