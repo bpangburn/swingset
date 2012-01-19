@@ -435,6 +435,10 @@ public class SSDataNavigator extends JPanel {
      * @param _sSRowSet    a SSRowSet object to which the navigator will be bound
      */
     public void setSSRowSet(SSRowSet _sSRowSet) {
+    	// RESET INSERT FLAG THIS IS NEED IF USERS LEFT THE LAST ROWSET IN INSERTION MODE
+    	// WITH OUT SAVING THE RECORD OR UNDOING THE INSERTION
+    	onInsertRow = false;
+    	
         if(sSRowSet != null){
             sSRowSet.removeRowSetListener(sSRowSetListener);
         }
@@ -1308,6 +1312,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.47  2009/02/16 22:31:48  prasanth
+ * Had to do conditional call to doCommitButtonClick in updatePresentRow to make sure we are on a valid row .
+ *
  * Revision 1.46  2009/02/16 22:21:29  prasanth
  * Added try/catch in updatePresentRow.
  *
