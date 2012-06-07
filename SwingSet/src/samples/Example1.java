@@ -160,9 +160,6 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
 /*
  * $Log$
- * Revision 1.8  2012/06/07 15:54:38  beevo
- * Modified example for compatibilty with H2 database.
- *
  * Revision 1.7  2005/02/04 22:40:12  yoda2
  * Updated Copyright info.
  *
