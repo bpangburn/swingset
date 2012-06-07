@@ -69,7 +69,6 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
         	ssConnection.setDriverName("org.h2.Driver");
             ssConnection.createConnection();
-            
             rowset = new SSJdbcRowSetImpl(ssConnection);
             rowset.setCommand("SELECT * FROM supplier_data");
             navigator = new SSDataNavigator(rowset);
@@ -161,6 +160,9 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
 /*
  * $Log$
+ * Revision 1.8  2012/06/07 15:54:38  beevo
+ * Modified example for compatibilty with H2 database.
+ *
  * Revision 1.7  2005/02/04 22:40:12  yoda2
  * Updated Copyright info.
  *

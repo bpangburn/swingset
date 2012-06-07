@@ -50,7 +50,6 @@ import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
 
 
 /**
- *
  * @author  dags
  */
 
@@ -164,7 +163,7 @@ public class SelectorListModel extends AbstractListModel implements ComboBoxMode
     }
     
     /**
-     *	This function refetches the information from the database. 
+     *	This function re-fetches the information from the database. 
      */
     public void refresh() {
         data = new BasicEventList();//
@@ -190,11 +189,6 @@ public class SelectorListModel extends AbstractListModel implements ComboBoxMode
      */
 	@SuppressWarnings("unchecked")
 	public void setFilterText(String[] newFilter) {
-        //filtered_data.setFilterText(newFilter);
-		
-		/*
-		 *  
-		 */
         text_match.setFilterText(newFilter);
         filtered_data = new FilterList(data, text_match);
         

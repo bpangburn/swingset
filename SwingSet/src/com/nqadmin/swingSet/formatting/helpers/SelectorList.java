@@ -51,7 +51,6 @@ import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 
 /**
- *
  * @author  dags
  */
 public class SelectorList extends JList implements ListDataListener, ListEventListener {
@@ -85,9 +84,6 @@ public class SelectorList extends JList implements ListDataListener, ListEventLi
 	}
     
 	private void addComponents() {
-		/*
-		 * added by bee
-		 */
 		txtFilter.addKeyListener(new KeyListener(){
 
 			public void keyTyped(KeyEvent e) {
