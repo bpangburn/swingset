@@ -34,14 +34,20 @@
 package com.nqadmin.swingSet.formatting.helpers;
 
 import java.awt.BorderLayout;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
+import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 
 /**
@@ -65,7 +71,7 @@ public class SelectorList extends JList implements ListDataListener, ListEventLi
     }
     
     /**
-     * Contruts a SelectorList object with the sepecified list model.
+     * Constructs a SelectorList object with the specified list model.
      * @param model - list model to be used
      */
     public SelectorList(SelectorListModel model) {
@@ -77,13 +83,37 @@ public class SelectorList extends JList implements ListDataListener, ListEventLi
     	((SelectorListModel)getModel()).setFilterEdit(txtFilter);
     	addComponents();
 	}
-
+    
 	private void addComponents() {
+		/*
+		 * added by bee
+		 */
+		txtFilter.addKeyListener(new KeyListener(){
+
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				scrollPane.updateUI();
+			}
+
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
 		scrollPane.setViewportView(this);
 		panel.setLayout(new BorderLayout());
 		panel.add(scrollPane, BorderLayout.CENTER);
 		panel.add(txtFilter, BorderLayout.SOUTH);
+		
 	}
+	
 	
 	/**
 	 * Returns a JPanel containing this list in a scroll pane
@@ -104,25 +134,25 @@ public class SelectorList extends JList implements ListDataListener, ListEventLi
     /* (non-Javadoc)
      * @see javax.swing.event.ListDataListener#intervalRemoved(javax.swing.event.ListDataEvent)
      */
-    public void intervalRemoved(javax.swing.event.ListDataEvent e) {
+    public void intervalRemoved(ListDataEvent e) {
     }
     
     /* (non-Javadoc)
      * @see javax.swing.event.ListDataListener#intervalAdded(javax.swing.event.ListDataEvent)
      */
-    public void intervalAdded(javax.swing.event.ListDataEvent e) {
+    public void intervalAdded(ListDataEvent e) {
     }
     
     /* (non-Javadoc)
      * @see javax.swing.event.ListDataListener#contentsChanged(javax.swing.event.ListDataEvent)
      */
-    public void contentsChanged(javax.swing.event.ListDataEvent e) {
+    public void contentsChanged(ListDataEvent e) {
     }
 
     /* (non-Javadoc)
      * @see ca.odell.glazedlists.event.ListEventListener#listChanged(ca.odell.glazedlists.event.ListEvent)
      */
-    public void listChanged(ca.odell.glazedlists.event.ListEvent listEvent) {
+    public void listChanged(ListEvent listEvent) {
         this.repaint();
     }
 
@@ -133,13 +163,16 @@ public class SelectorList extends JList implements ListDataListener, ListEventLi
 
         super.setModel(model);
         ((SelectorListModel)model).addListDataListener(this);
-        ((SelectorListModel)model).addListEventListener(this);
+        ((SelectorListModel)model).addListEventListener(this);//
         ((SelectorListModel)model).setFilterEdit(txtFilter);
     }
 }
 
 /*
 * $Log$
+* Revision 1.8  2006/05/15 15:50:09  prasanth
+* Updated javadoc
+*
 * Revision 1.7  2006/04/21 19:12:20  prasanth
 * Added comments & CVS tags.
 * Made changes to that it has a panel with list & a filter text field.

@@ -35,19 +35,45 @@ package com.nqadmin.swingSet.formatting.helpers;
 
 import java.sql.SQLException;
 
+import javax.swing.AbstractListModel;
+import javax.swing.ComboBoxModel;
+import javax.swing.JTextField;
+import javax.swing.event.ListDataListener;
+
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
+import ca.odell.glazedlists.*;
+
 import com.nqadmin.swingSet.datasources.SSConnection;
 import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+
 
 /**
  *
  * @author  dags
  */
-public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
+
+public class SelectorComboBoxModel extends AbstractListModel implements ComboBoxModel {
+	
+    private Object selectedOne = null;
+	private BasicEventList data = new BasicEventList();
+	/*
+	 * Changed TextFilterList to FilterList because of new glazedlist jar update.
+	 * FilterList takes in its parameters a TextComponentMatcherEditor to account for
+	 * the depreciated TextFilterList methods.
+	 */
+    private FilterList filtered_data = new FilterList(data);
+    private TextComponentMatcherEditor text_match; 
     
+    /*
+     *  Holds value of JTextField used to filter
+     */
+    private JTextField filter;
     /**
      * Holds value of property dataColumn.
      */
-    private String dataColumn;
+    private String dataColumn = null;
     
     /**
      * Utility field used by bound properties.
@@ -57,29 +83,33 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
     /**
      * Holds value of property listColumn.
      */
-    private String listColumn;
+    private String listColumn = null;
     
     /**
      * Holds value of property table.
      */
-    private String table;
+    private String table = null;
     
     /**
      * Holds value of property selectText.
      */
     private String selectText;
     
-    private String orderBy;
+    /**
+     * Holds value of property orderBy.
+     */
+    private String orderBy = null;
     
     /**
      * Holds value of property ssConnection.
      */
-    private SSConnection     ssConnection;
+    private SSConnection ssConnection = null;
     
-    private SSJdbcRowSetImpl ssRowset;
+    private SSJdbcRowSetImpl ssRowset = null;
     
-    /** Creates a new instance of AccountSelectorModel */
-    
+    /** 
+     * Creates a new instance of SelectorListModel 
+     */    
     public SelectorComboBoxModel() {
         this(null, null, null, null);
     }
@@ -125,98 +155,238 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
     }
     
     /**
-     * Updates the model. This would trigger reexecution of the query
+     *	This function refetches the information from the database. 
      */
     public void refresh() {
+        data = new BasicEventList();//
         this.populateModel();
     }
     
     /**
-     * Returns the value of the dataColumn corresponding to the item at the specified index
-     * @param index - index position of the item whose underlying value is needed
-     * @return - returns the underlying value of the item at the specified index position
+     * Returns the value corresponding to the item at the specified index. 
+     * @param index - index of the item whose value should be returned.
+     * @return returns the value of the item at the specified index
      */
     public Object getSelectedBoundData(int index) {
-        return ((SelectorElement)this.getElementAt(index)).getDataValue();
+        Object itm = filtered_data.get(index);//
+        if (itm != null) {
+            return ((SelectorElement)(itm)).getDataValue();
+        }
+        return "<null>";
     }
     
     /**
-     * Fetechs the information from the database and populates the model
+     * Sets the text to be used to filter items in the list
+     * @param newFilter - text to be used to filter item in the list
      */
-    private void populateModel() {
+	@SuppressWarnings("unchecked")
+	public void setFilterText(String[] newFilter) {
+        //filtered_data.setFilterText(newFilter);
+		
+		/*
+		 *  
+		 */
+        text_match.setFilterText(newFilter);
+        filtered_data = new FilterList(data, text_match);
         
+    }
+    
+    /*
+     * Populates the list model with the data by fetching it from the database.
+     */
+    @SuppressWarnings("unchecked")
+	private void populateModel() {
+        
+        Object dataValue = null;
+        Object listValue = null;
         String sql = null;
-        if (dataColumn == null || listColumn == null || table == null) {
-            this.addElement(new SelectorElement(new String("0") , "Option 0"));
-            this.addElement(new SelectorElement(new String("1") , "Option 1"));
-            this.addElement(new SelectorElement(new String("2") , "Option 2"));
-            this.addElement(new SelectorElement(new String("0") , "Option 3"));
-            this.addElement(new SelectorElement(new String("1") , "Option 4"));
-            this.addElement(new SelectorElement(new String("2") , "Option 5"));
-            this.addElement(new SelectorElement(new String("0") , "Option 6"));
-            this.addElement(new SelectorElement(new String("1") , "Option 7"));
-            this.addElement(new SelectorElement(new String("2") , "Option 8"));
-            this.addElement(new SelectorElement(new String("0") , "Option 9"));
+        
+    // IF ANY OF THE REQUIRED INFORMATION IS NOT PRESENT CLEAR THE DATA AND RETURN     
+        if (ssConnection == null || dataColumn == null || listColumn == null || table == null) {
+            data.clear();
+            filtered_data = new FilterList(data);//
             return;
         }
+
+    //  SEEMS LIKE WE HAVE THE USER INPUT REQUIRED TO FETCH INFORMATION FROM DATABASE
+    //  SO CLEAR THE OLD DATA FIRST
+        data.clear();
         
+    // BUILD THE SQL    
         if (orderBy != null) {
             sql = "select " + dataColumn + ", " + listColumn + " from " + table + " ORDER BY " + orderBy;
-        }
-        else 
+        } else
             sql = "select " + dataColumn + ", " + listColumn + " from " + table;
-
-              
+        
+    // CREATE A ROWSET BASED ON THE ABOVE QUERY    
         ssRowset = new SSJdbcRowSetImpl();
         ssRowset.setSSConnection(ssConnection);
-        
         ssRowset.setCommand(sql);
         
         try {
+        // EXECUTE THE QUERY	
             ssRowset.execute();
-            ssRowset.last();
-        } catch (SQLException se) {
-            System.out.println("sql = " + sql);
-            System.out.println("ssRowset.execute() " + se);
-            se.printStackTrace();
-        }
-        
-        //data.add(new SelectorElement(new String("-1"), selectText));
-        
-        try {
-            ssRowset.beforeFirst();
+            
+        // LOOP THROUGH THE ROWSET THE ADD ELEMENTS TO THE DATA MODEL    
             while (ssRowset.next()) {
-                String s1 = ssRowset.getString(1);
-                String s2 = ssRowset.getString(2);
-                System.out.println(s2);
-                this.addElement(new SelectorElement(s1,s2));
+                
+                switch(ssRowset.getColumnType(1)) {
+                    
+                    case java.sql.Types.ARRAY://2003
+                        dataValue = new String("<unsupported type: ARRAY>");
+                        break;
+                        
+                    case java.sql.Types.BINARY://-2
+                        dataValue = new String("<unsupported type: BINARY>");
+                        break;
+                        
+                    case java.sql.Types.BIT://-7
+                    case java.sql.Types.BOOLEAN://16
+                        dataValue = new Boolean(ssRowset.getBoolean(1));
+                        break;
+                        
+                    case java.sql.Types.BLOB://2004
+                        dataValue = new String("<unsupported type: BLOB>");
+                        break;
+                        
+                    case java.sql.Types.CLOB://2005
+                        dataValue = new String("<unsupported type: CLOB>");
+                        break;
+                        
+                    case java.sql.Types.DATALINK://70
+                        dataValue = new String("<unsupported type: DATALINK>");
+                        break;
+                        
+                    case java.sql.Types.DATE://91
+                        dataValue = new java.util.Date(ssRowset.getDate(1).getTime());
+                        break;
+                        
+                    case java.sql.Types.DECIMAL://3
+                        dataValue = new String("<unsupported type: DECIMAL>");
+                        break;
+                        
+                    case java.sql.Types.DISTINCT://2001
+                        dataValue = new String("<unsupported type: DISTINCT>");
+                        break;
+                        
+                    case java.sql.Types.DOUBLE://8
+                        dataValue = new Double(ssRowset.getDouble(1));
+                        break;
+                        
+                    case java.sql.Types.FLOAT://6
+                        dataValue = new Float(ssRowset.getFloat(1));
+                        break;
+                        
+                    case java.sql.Types.INTEGER://4
+                        dataValue = new Integer(ssRowset.getInt(1));
+                        break;
+                        
+                    case java.sql.Types.BIGINT://-5
+                        dataValue = new Long(ssRowset.getLong(1));
+                        break;
+                        
+                    case java.sql.Types.SMALLINT://5
+                    case java.sql.Types.TINYINT://-6
+                        dataValue  = new Integer(ssRowset.getInt(1));
+                        break;
+                        
+                    case java.sql.Types.JAVA_OBJECT://2000
+                        dataValue = new String("<unsupported type: JAVA_OBJECT>");
+                        break;
+                        
+                    case java.sql.Types.LONGVARBINARY://-4
+                        dataValue = new String("<unsupported type: LONGVARBINARY>");
+                        break;
+
+                    case java.sql.Types.VARBINARY://-3
+                        dataValue = new String("<unsupported type: VARBINARY>");
+                        break;
+                        
+                    case java.sql.Types.VARCHAR://
+                    case java.sql.Types.LONGVARCHAR://-1
+                    case java.sql.Types.CHAR://1
+                        dataValue = ssRowset.getString(1);
+                        break;
+                        
+                    case java.sql.Types.NULL://0
+                        dataValue = new String("<unsupported type: NULL>");
+                        break;
+                        
+                    case java.sql.Types.NUMERIC://2
+                        dataValue = new String("<unsupported type: NUMERIC>");
+                        break;
+                        
+                    case java.sql.Types.OTHER://1111
+                        dataValue = new String("<unsupported type: OTHER>");
+                        break;
+                        
+                    case java.sql.Types.REAL://7
+                        dataValue = new String("<unsupported type: REAL>");
+                        break;
+                        
+                    case java.sql.Types.REF://2006
+                        dataValue = new String("<unsupported type: REF>");
+                        break;
+                        
+                    case java.sql.Types.STRUCT://2002
+                        dataValue = new String("<unsupported type: STRUCT>");
+                        break;
+                        
+                    case java.sql.Types.TIME://92
+                        dataValue = new String("<unsupported type: TIME>");
+
+                        break;
+                        
+                    case java.sql.Types.TIMESTAMP://93
+                        dataValue = new String("<unsupported type: TIMESTAMP>");
+                        break;
+                        
+                    default:
+                        dataValue = new String("<unknown type>");
+                        break;
+                }
+                listValue = ssRowset.getString(2);
+            // ADD ELEMENT TO THE DATA MODEL    
+                data.add(new SelectorElement(dataValue,listValue));
             }
+
         } catch (SQLException se) {
-            System.out.println("ssRowset.next()" + se);
+            System.out.println("SelectorListModel :" + se);
         } catch (java.lang.NullPointerException np) {
-            System.out.println(np);
+            System.out.println("SelectorListModel :" + np);
         }
+    // FILL THE FILTERED DATA WITH THE COMPLETE DATA GOT FROM DATABASE    
+        filtered_data = new FilterList(data);//
         
+        
+        this.fireContentsChanged(this, 0, filtered_data.size()-1);//
+        this.fireIntervalRemoved(this, 0, 1);
+        this.fireIntervalAdded(this, 0, 1);
+
+    // WE DON'T NEED THIS ROWSET ANY MORE SO SET IT TO NULL    
         ssRowset = null;
-        ssConnection = null;
+    }
+    
+    
+    /**
+     * Adds an element to the data
+     * @param ob - object to be added to the data
+     */
+    public void addElement(Object ob) {
+        data.add(ob);
     }
     
     /**
-     * Sets the selected item to the item corresponding to the specfied value 
-     * If more than one item in the list has same underlying value (bound value) then the first one
-     * in the list is set as the selected item
-     * @param boundData - underlying value of the item that should be set a selected item
+     * Creates filtered data based on the actual data
      */
-    public void setSelectedItem(String boundData) {
-        SelectorElement item;
-        for (int i=0; i < this.getSize(); i++) {
-            item = (SelectorElement)(this.getElementAt(i));
-            if ((item.getDataValue()).equals(boundData)) {
-                return;
-            }
-        }
+    public void createFilteredData() {
+        filtered_data = new FilterList(data);//
+        this.fireContentsChanged(this, 0, filtered_data.size()-1);//
+        this.fireIntervalAdded(this, 0, 1);
+        this.fireIntervalRemoved(this, 0, 1);
     }
     
+   
     /**
      * Adds a PropertyChangeListener to the listener list.
      * @param l The listener to add.
@@ -253,6 +423,7 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
         } catch(java.lang.NullPointerException npe) {
             
         }
+        this.refresh();
     }
     
     /**
@@ -276,6 +447,8 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
         } catch(java.lang.NullPointerException npe) {
             
         }
+        this.refresh();
+        
     }
     
     /**
@@ -300,6 +473,7 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
         } catch(java.lang.NullPointerException npe) {
             
         }
+        this.refresh();
     }
     
     /**
@@ -316,16 +490,17 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
         } catch(java.lang.NullPointerException npe) {
             
         }
+        this.refresh();
     }
-
+    
     /**
-     * Returns the orderBy field value.
-     * @return - returns the column name used for ordering 
+     * Returns the column names based on which items are ordered
+     * @return returns the column names based on which items are ordered
      */
     public String getOrderBy() {
         return orderBy;
     }
-
+    
     /**
      * Getter for property selectText.
      * @return Value of property selectText.
@@ -348,10 +523,12 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
         } catch (java.lang.NullPointerException npe) {
             
         }
+        //this.refresh();
     }
     
     /**
-     * The query will be executed and model will be populated based on the resultset
+     * This will execute the query and fetch the information from database and 
+     * updates the model with the new data fetched from the database
      */
     public void execute() {
         refresh();
@@ -361,7 +538,7 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
      * Getter for property ssConnection.
      * @return Value of property ssConnection.
      */
-    public com.nqadmin.swingSet.datasources.SSConnection getSsConnection() {
+    public SSConnection getSsConnection() {
         
         return this.ssConnection;
     }
@@ -370,25 +547,96 @@ public class SelectorComboBoxModel extends javax.swing.DefaultComboBoxModel {
      * Setter for property ssConnection.
      * @param ssConnection New value of property ssConnection.
      */
-    public void setSsConnection(com.nqadmin.swingSet.datasources.SSConnection ssConnection)
-    
-    {
+    public void setSsConnection(SSConnection ssConnection) {
         try {
-            com.nqadmin.swingSet.datasources.SSConnection oldSsConnection = this.ssConnection;
+            SSConnection oldSsConnection = this.ssConnection;
             this.ssConnection = ssConnection;
             propertyChangeSupport.firePropertyChange("ssConnection", oldSsConnection, ssConnection);
         } catch(java.lang.NullPointerException nop) {
             
         }
+        this.refresh();
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.ListModel#getElementAt(int)
+     */
+    public Object getElementAt(int index) {
+       //return data.get(index);
+        return filtered_data.get(index);//
+        
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.ListModel#getSize()
+     */
+    public int getSize() {
+        //return data.size();
+        return filtered_data.size();//
+    }
+    
+    /**
+     * Returns the text field used as the filter.
+     * @return - returns the text field used as the filter text field.
+     */
+    public JTextField getFilterEdit() {
+    	
+        //return filtered_data.getFilterEdit();//
+       return filter;
+        
+    }
+    
+    /**
+     * Sets the JTextField to be used as the filter field.
+     * @param filter - JTextField to be used to get the filter text.
+     */
+	public void setFilterEdit(JTextField filter) {
+        //filtered_data.setFilterEdit(filter);
+    	this.filter = filter;
+    	text_match = new TextComponentMatcherEditor(filter, null);    
+        filtered_data = new FilterList(data, text_match);
+        
+
+    }
+    
+    /**
+     * Adds the event listener for the filtered list
+     * @param listChangeListener - list listener to be added to filtered list
+     */
+    public void addListEventListener(ListEventListener listChangeListener) {//
+        filtered_data.addListEventListener(listChangeListener);//
+       
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.ListModel#addListDataListener(javax.swing.event.ListDataListener)
+     */
+    public void addListDataListener(ListDataListener l) {
+        super.addListDataListener(l);
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.ComboBoxModel#setSelectedItem(java.lang.Object)
+     */
+    public void setSelectedItem(Object anItem) {
+        selectedOne = anItem;
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.ComboBoxModel#getSelectedItem()
+     */
+    public Object getSelectedItem() {
+        return selectedOne;
     }
 }
 
 /*
 * $Log$
-* Revision 1.7  2006/05/15 15:50:09  prasanth
+* Revision 1.10  2006/05/15 15:50:09  prasanth
 * Updated javadoc
 *
-* Revision 1.6  2006/04/21 19:09:17  prasanth
-* Added CVS tags & some comments
+* Revision 1.9  2006/04/21 19:11:32  prasanth
+* Added comments & CVS tags.
+* ssConnection was set to null in populate model remoted this line of code.
 *
 */

@@ -33,45 +33,49 @@
 import com.nqadmin.swingSet.*;
 import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
 import com.nqadmin.swingSet.datasources.SSConnection;
-import java.awt.*;
-import java.awt.event.*;
+
 import javax.swing.*;
-import javax.swing.event.*;
 import java.sql.*;
 
 public class Example5 extends JFrame {
 
     SSConnection ssConnection = null;
     SSJdbcRowSetImpl rowset   = null;
-    SSDataGrid dataGrid = null; //new SSDataGrid();
-
+    SSDataGrid dataGrid = null;
+    
     public Example5(){
         super("Example 5");
-        setSize(300,350);
+        setSize(430,145);
         init();
     }
 
     private void init(){
 
-
         try{
-            ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
-                "swingset", "test");
-            ssConnection.setDriverName("org.postgresql.Driver");
+        	String url = "http://192.168.0.234/populate.sql";
+        	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
+        	
+        	ssConnection.setDriverName("org.h2.Driver");
             ssConnection.createConnection();
             rowset = new SSJdbcRowSetImpl(ssConnection);
-            rowset.setCommand("SELECT part_name,color_code, weight, city,part_id FROM part_data ORDER BY part_name;");
+            rowset.setCommand("SELECT part_name, color_code, weight, city, part_id FROM part_data ORDER BY part_name;");
             //  SET THE HEADER BEFORE SETTING THE ROWSET
             dataGrid = new SSDataGrid();
             dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
             dataGrid.setSSRowSet(rowset);
             dataGrid.setMessageWindow(this);
+            
+            // DISABLES NEW INSERTIONS TO THE DATA BASE.
+            // DUE TO H2 DATABASE PROPERTIES, INSERTION OF NEW DATA CAUSES ERRORS.
+            // ANY CHANGES MADE TO THE PRESENT RECORD WILL BE SAVED BUT INSERTIONS ARE NOT ALLOWED
+            // IN H2.
+            dataGrid.setInsertion(false);
+            
             // HIDE THE PART ID COLUMN
             // THIS SETS THE WIDTH OF THE COLUMN TO 0
             dataGrid.setHiddenColumns(new String[]{"part_id"});
             dataGrid.setUneditableColumns(new String[]{"part_id"});
-
-
+          
         }catch(SQLException se){
             se.printStackTrace();
         }catch(ClassNotFoundException cnfe){
@@ -81,12 +85,17 @@ public class Example5 extends JFrame {
 
         setVisible(true);
 
-    } // END OF INIT FUNCTION
+    }
+ // END OF INIT FUNCTION
 
- }// END OF EXAMPLE 5
+ }
+// END OF EXAMPLE 5
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/22 15:17:31  yoda2
+ * Removed call to setPreferredSize().
+ *
  * Revision 1.6  2005/02/14 18:50:25  prasanth
  * Updated to remove calls to deprecated methods.
  *

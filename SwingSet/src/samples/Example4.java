@@ -32,9 +32,7 @@
 
 import com.nqadmin.swingSet.*;
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
-import javax.sql.*;
+
 import java.sql.*;
 import java.awt.*;
 import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
@@ -55,24 +53,27 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
   * This example also demonstrates the use of SSTextDocument to display
   * information in SSComboBox (Color) and JTextField (Weight and City).
   */
+
  public class Example4 extends JFrame{
 
-    JLabel lblSelectPart    = new JLabel("Part");
+	JLabel lblPartName    = new JLabel("Part Name");
+    JLabel lblSelectPart    = new JLabel("Parts");
     JLabel lblPartColor     = new JLabel("Color");
     JLabel lblPartWeight    = new JLabel("Weight");
     JLabel lblPartCity      = new JLabel("City");
 
+    SSTextField txtPartName      = new SSTextField();
     SSDBComboBox cmbSelectPart  = null;
     SSComboBox cmbPartColor     = null;
-    JTextField txtPartWeight    = new JTextField();
-    JTextField txtPartCity      = new JTextField();
+    SSTextField txtPartWeight    = new SSTextField();
+    SSTextField txtPartCity      = new SSTextField();
 
     SSConnection ssConnection = null;
     SSJdbcRowSetImpl rowset   = null;
     SSDataNavigator navigator = null;
     SSSyncManager syncManager;
 
-    JTextField txtPartID = new JTextField();
+    SSTextField txtPartID = new SSTextField();
 
    public Example4(){
 
@@ -80,34 +81,27 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
         setSize(600,200);
 
         try{
-            ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
-                "swingset", "test");
-            ssConnection.setDriverName("org.postgresql.Driver");
+        	String url = "http://192.168.0.234/populate.sql";
+        	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
+            ssConnection.setDriverName("org.h2.Driver");
             ssConnection.createConnection();
+            ssConnection.createConnection();
+            
             rowset = new SSJdbcRowSetImpl(ssConnection);
-
-            // POSTGRES RAISES AN EXCEPTION WHEN YOU TRY TO USE THE UPDATEROW() METHOD
-            // IF THERE IS A SEMICOLON AT THE END OF THE QUERY WITH OUT ANY CLAUSES
-            // OR WHERE CONDITIONS AT THE END.
-            // IF YOU REMOVE THE SEMICOLON IT WILL NOT RAISE THE EXCEPTION BUT
-            // NO UPDATES ARE MADE.
             rowset.setCommand("SELECT * FROM part_data");
             navigator = new SSDataNavigator(rowset);
-            // THIS DISABLES MODIFICATIONS TO THE DATA
-            // ADDITION AND DELETION BUTTONS ARE DISABLED
-            // ANY CHANGES MADE TO PRESENT RECORD WILL BE NEGLECTED.
-            navigator.setModification(false);
-            navigator.setDBNav( new SSDBNavImp(getContentPane()));
         }catch(SQLException se){
             se.printStackTrace();
         }catch(ClassNotFoundException cnfe){
             cnfe.printStackTrace();
         }
 
-        txtPartID.setDocument(new SSTextDocument(rowset,"part_id"));
-
+        txtPartID.bind(rowset,"part_id");
+        txtPartName.bind(rowset,"part_name");
+        
         String query = "SELECT * FROM part_data;";
         cmbSelectPart = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
+        
         try{
             cmbSelectPart.execute();
         }catch(SQLException se){
@@ -118,25 +112,80 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
 
        // SYNC MANAGER WILL TAKE CARE OF KEEPING THE COMBO BOX AND DATANAVIGATOR IN SYNC.
        // WHILE CHANGEING THE QUERY OR REEXECUTING THE QUERY FOR COMBO BOX
-       // YOU HAVE TO CALL ASYNC ON THE SYNC MANAGER AND AFTER CALLING EXECUTE ON COMBO BOX
+       // YOU HAVE TO CALL A SYNC ON THE SYNC MANAGER AND AFTER CALLING EXECUTE ON COMBO BOX
        // CALL SYNC ON SYNC MANAGER. 
-       // THESE THREE LINE OF CODE IS USED A REPLACEMENT FOR THE TWO LISTENER CLASS WE HAD.
+       // THESE THREE LINE OF CODE IS USED AS A REPLACEMENT FOR THE TWO LISTENER CLASS WE HAD.
         syncManager = new SSSyncManager(cmbSelectPart, navigator);
         syncManager.setColumnName("part_id");
         syncManager.sync();
         
+        // THE FOLLOWING CODE IS USED BECAUSE OF AN H2 LIMITATION. UPDATABLE ROWSET IS NOT
+        // FULLY IMPLEMENTED AND AN EXECUTE COMMAND IS REQUIRED WHEN INSERTING A NEW
+        // ROW AND KEEPING THE CURSOR AT THE NEWLY INSERTED ROW.
+        // IF USING ANOTHER DATABASE, THE FOLLOWING IS NOT REQURIED:   
+        navigator.setDBNav(new SSDBNavAdapter(){
+ 			@Override
+			public void performRefreshOps() {
+				// TODO Auto-generated method stub
+				super.performRefreshOps();
+				syncManager.async();
+				try{
+		            cmbSelectPart.execute();
+		        }catch(SQLException se){
+		            se.printStackTrace();
+		        }catch(Exception e){
+		            e.printStackTrace();
+		        }
+				syncManager.sync();
+			}
+
+			@Override
+ 			public void performCancelOps() {
+ 				// TODO Auto-generated method stub
+ 				super.performCancelOps();
+ 				cmbSelectPart.setEnabled(true);
+ 			}
+
+ 			@Override
+ 			public void performPreInsertOps() {
+ 				// TODO Auto-generated method stub
+ 				super.performPreInsertOps();
+ 				txtPartName.setText(null);
+ 				cmbSelectPart.setEnabled(false);
+ 				cmbPartColor.setSelectedItem(null);
+ 				txtPartWeight.setText(null);
+ 				txtPartCity.setText(null);
+ 			}
+
+ 			@Override
+ 			public void performPostInsertOps() {
+ 				// TODO Auto-generated method stub
+ 				super.performPostInsertOps();
+ 				cmbSelectPart.setEnabled(true);
+ 				try {
+					rowset.execute();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+ 			}
+ 			
+         });
+
         cmbPartColor = new SSComboBox();
-        cmbPartColor.setOption(new String[]{"Red","Green","Blue"});
+        cmbPartColor.setOptions(new String[]{"Red","Green","Blue"});
         cmbPartColor.bind(rowset,"color_code");
 
-        txtPartWeight.setDocument(new SSTextDocument(rowset,"weight"));
-        txtPartCity.setDocument(new SSTextDocument(rowset,"city"));
+        txtPartWeight.bind(rowset,"weight");
+        txtPartCity.bind(rowset,"city");
 
+        lblPartName.setPreferredSize(new Dimension(75,20));
         lblSelectPart.setPreferredSize(new Dimension(75,20));
         lblPartColor.setPreferredSize(new Dimension(75,20));
         lblPartWeight.setPreferredSize(new Dimension(75,20));
         lblPartCity.setPreferredSize(new Dimension(75,20));
 
+        txtPartName.setPreferredSize(new Dimension(150,20));
         cmbSelectPart.setPreferredSize(new Dimension(150,20));
         cmbPartColor.setPreferredSize(new Dimension(150,20));
         txtPartWeight.setPreferredSize(new Dimension(150,20));
@@ -150,24 +199,28 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
         constraints.gridy = 0;
         contentPane.add(lblSelectPart, constraints);
         constraints.gridy = 1;
-        contentPane.add(lblPartColor, constraints);
+        contentPane.add(lblPartName, constraints);
         constraints.gridy = 2;
-        contentPane.add(lblPartWeight, constraints);
+        contentPane.add(lblPartColor, constraints);
         constraints.gridy = 3;
+        contentPane.add(lblPartWeight, constraints);
+        constraints.gridy = 4;
         contentPane.add(lblPartCity, constraints);
 
-        constraints.gridx = 1;
+        constraints.gridx = 1;        
         constraints.gridy = 0;
         contentPane.add(cmbSelectPart, constraints);
         constraints.gridy = 1;
-        contentPane.add(cmbPartColor, constraints);
+        contentPane.add(txtPartName, constraints);
         constraints.gridy = 2;
-        contentPane.add(txtPartWeight, constraints);
+        contentPane.add(cmbPartColor, constraints);
         constraints.gridy = 3;
+        contentPane.add(txtPartWeight, constraints);
+        constraints.gridy = 4;
         contentPane.add(txtPartCity, constraints);
 
         constraints.gridx = 0;
-        constraints.gridy = 4;
+        constraints.gridy = 5;
         constraints.gridwidth = 2;
         contentPane.add(navigator,constraints);
 
@@ -183,6 +236,9 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
 
 /*
  * $Log$
+ * Revision 1.9  2005/02/14 18:50:25  prasanth
+ * Updated to remove calls to deprecated methods.
+ *
  * Revision 1.8  2005/02/04 22:40:12  yoda2
  * Updated Copyright info.
  *

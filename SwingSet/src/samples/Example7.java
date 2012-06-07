@@ -33,10 +33,9 @@
 import com.nqadmin.swingSet.*;
 import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
 import com.nqadmin.swingSet.datasources.SSConnection;
-import java.awt.*;
-import java.awt.event.*;
+
 import javax.swing.*;
-import javax.swing.event.*;
+
 import java.sql.*;
 
 public class Example7 extends JFrame {
@@ -44,21 +43,22 @@ public class Example7 extends JFrame {
     SSConnection ssConnection = null;
     SSJdbcRowSetImpl rowset   = null;
     SSDataGrid dataGrid = new SSDataGrid();
+    
 
     public Example7(){
         super("Example 7");
-        setSize(650,350);
+        setSize(730,290);
         init();
     }
 
     private void init(){
 
-
         try{
-            ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
-                "swingset", "test");
-            ssConnection.setDriverName("org.postgresql.Driver");
+        	String url = "http://192.168.0.234/populate.sql";
+        	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
+            ssConnection.setDriverName("org.h2.Driver");
             ssConnection.createConnection();
+            
             rowset = new SSJdbcRowSetImpl(ssConnection);
             rowset.setCommand("SELECT supplier_id, part_id,quantity, ship_date, supplier_part_id FROM supplier_part_data ORDER BY supplier_id, part_id;");
 
@@ -78,7 +78,18 @@ public class Example7 extends JFrame {
             }
             dataGrid.setMessageWindow(this);
             dataGrid.setUneditableColumns(new int[]{4});
-            ResultSet rs = ssConnection.getConnection().createStatement().executeQuery("SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;");
+            
+            // DISABLES NEW INSERTIONS TO THE DATA BASE.
+            // DUE TO H2 DATABASE PROPERTIES, INSERTION OF NEW DATA CAUSES ERRORS.
+            // ANY CHANGES MADE TO THE PRESENT RECORD WILL BE SAVED BUT INSERTIONS ARE NOT ALLOWED
+            // IN H2.
+            dataGrid.setInsertion(false);
+           
+             // ADDED STATEMENT "SCROLL INSENSITIVITY" FOR EXAMPLE TO BE
+             // COMPATIBLE WITH H2 DATABASE DEFAULT SETTINGS.
+            Statement stmt = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
+            ResultSet rs = stmt.executeQuery("SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;");
+       
             rs.last();
             String[] displayItems  = new String[rs.getRow()];
             Integer[] underlyingNumbers = new Integer[rs.getRow()];
@@ -93,8 +104,7 @@ public class Example7 extends JFrame {
             }
 
             dataGrid.setComboRenderer("supplier_id",displayItems,underlyingNumbers);
-
-            rs = ssConnection.getConnection().createStatement().executeQuery("SELECT part_name, part_id FROM part_data ORDER BY part_name;");
+            rs = stmt.executeQuery("SELECT part_name, part_id FROM part_data ORDER BY part_name;");
             rs.last();
             displayItems  = new String[rs.getRow()];
             underlyingNumbers = new Integer[rs.getRow()];
@@ -126,6 +136,9 @@ public class Example7 extends JFrame {
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/14 18:50:25  prasanth
+ * Updated to remove calls to deprecated methods.
+ *
  * Revision 1.5  2005/02/04 22:40:12  yoda2
  * Updated Copyright info.
  *

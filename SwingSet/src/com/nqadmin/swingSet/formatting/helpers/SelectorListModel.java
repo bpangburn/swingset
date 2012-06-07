@@ -35,12 +35,15 @@ package com.nqadmin.swingSet.formatting.helpers;
 
 import java.sql.SQLException;
 
+import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
 import javax.swing.JTextField;
+import javax.swing.event.ListDataListener;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.event.ListEventListener;
-import ca.odell.glazedlists.swing.TextFilterList;
+import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
+import ca.odell.glazedlists.*;
 
 import com.nqadmin.swingSet.datasources.SSConnection;
 import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
@@ -51,12 +54,22 @@ import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
  * @author  dags
  */
 
-public class SelectorListModel extends javax.swing.AbstractListModel implements ComboBoxModel {
-    
+public class SelectorListModel extends AbstractListModel implements ComboBoxModel {
+	
     private Object selectedOne = null;
-    private BasicEventList data = new BasicEventList();
-    private TextFilterList filtered_data = new TextFilterList(data);
+	private BasicEventList data = new BasicEventList();
+	/*
+	 * Changed TextFilterList to FilterList because of new glazedlist jar update.
+	 * FilterList takes in its parameters a TextComponentMatcherEditor to account for
+	 * the depreciated TextFilterList methods.
+	 */
+    private FilterList filtered_data = new FilterList(data);
+    private TextComponentMatcherEditor text_match; 
     
+    /*
+     *  Holds value of JTextField used to filter
+     */
+    private JTextField filter;
     /**
      * Holds value of property dataColumn.
      */
@@ -118,7 +131,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
      */
     public int indexOf(Object object) {
                
-        return data.indexOf(object);
+        return data.indexOf(object);//
     }
     
     /**
@@ -154,7 +167,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
      *	This function refetches the information from the database. 
      */
     public void refresh() {
-        data = new BasicEventList();
+        data = new BasicEventList();//
         this.populateModel();
     }
     
@@ -164,8 +177,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
      * @return returns the value of the item at the specified index
      */
     public Object getSelectedBoundData(int index) {
-        Object itm = filtered_data.get(index);
-        
+        Object itm = filtered_data.get(index);//
         if (itm != null) {
             return ((SelectorElement)(itm)).getDataValue();
         }
@@ -176,14 +188,23 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
      * Sets the text to be used to filter items in the list
      * @param newFilter - text to be used to filter item in the list
      */
-    public void setFilterText(String[] newFilter) {
-        filtered_data.setFilterText(newFilter);
+	@SuppressWarnings("unchecked")
+	public void setFilterText(String[] newFilter) {
+        //filtered_data.setFilterText(newFilter);
+		
+		/*
+		 *  
+		 */
+        text_match.setFilterText(newFilter);
+        filtered_data = new FilterList(data, text_match);
+        
     }
     
     /*
      * Populates the list model with the data by fetching it from the database.
      */
-    private void populateModel() {
+    @SuppressWarnings("unchecked")
+	private void populateModel() {
         
         Object dataValue = null;
         Object listValue = null;
@@ -192,7 +213,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
     // IF ANY OF THE REQUIRED INFORMATION IS NOT PRESENT CLEAR THE DATA AND RETURN     
         if (ssConnection == null || dataColumn == null || listColumn == null || table == null) {
             data.clear();
-            filtered_data = new TextFilterList(data);
+            filtered_data = new FilterList(data);//
             return;
         }
 
@@ -344,10 +365,10 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
             System.out.println("SelectorListModel :" + np);
         }
     // FILL THE FILTERED DATA WITH THE COMPLETE DATA GOT FROM DATABASE    
-        filtered_data = new TextFilterList(data);
+        filtered_data = new FilterList(data);//
         
         
-        this.fireContentsChanged(this, 0, filtered_data.size()-1);
+        this.fireContentsChanged(this, 0, filtered_data.size()-1);//
         this.fireIntervalRemoved(this, 0, 1);
         this.fireIntervalAdded(this, 0, 1);
 
@@ -368,8 +389,8 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
      * Creates filtered data based on the actual data
      */
     public void createFilteredData() {
-        filtered_data = new TextFilterList(data);
-        this.fireContentsChanged(this, 0, filtered_data.size()-1);
+        filtered_data = new FilterList(data);//
+        this.fireContentsChanged(this, 0, filtered_data.size()-1);//
         this.fireIntervalAdded(this, 0, 1);
         this.fireIntervalRemoved(this, 0, 1);
     }
@@ -526,7 +547,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
      * Getter for property ssConnection.
      * @return Value of property ssConnection.
      */
-    public com.nqadmin.swingSet.datasources.SSConnection getSsConnection() {
+    public SSConnection getSsConnection() {
         
         return this.ssConnection;
     }
@@ -535,9 +556,9 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
      * Setter for property ssConnection.
      * @param ssConnection New value of property ssConnection.
      */
-    public void setSsConnection(com.nqadmin.swingSet.datasources.SSConnection ssConnection) {
+    public void setSsConnection(SSConnection ssConnection) {
         try {
-            com.nqadmin.swingSet.datasources.SSConnection oldSsConnection = this.ssConnection;
+            SSConnection oldSsConnection = this.ssConnection;
             this.ssConnection = ssConnection;
             propertyChangeSupport.firePropertyChange("ssConnection", oldSsConnection, ssConnection);
         } catch(java.lang.NullPointerException nop) {
@@ -551,7 +572,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
      */
     public Object getElementAt(int index) {
        //return data.get(index);
-        return filtered_data.get(index);
+        return filtered_data.get(index);//
         
     }
     
@@ -560,7 +581,7 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
      */
     public int getSize() {
         //return data.size();
-        return filtered_data.size();
+        return filtered_data.size();//
     }
     
     /**
@@ -568,29 +589,37 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
      * @return - returns the text field used as the filter text field.
      */
     public JTextField getFilterEdit() {
-        return filtered_data.getFilterEdit();
+    	
+        //return filtered_data.getFilterEdit();//
+       return filter;
+        
     }
     
     /**
      * Sets the JTextField to be used as the filter field.
      * @param filter - JTextField to be used to get the filter text.
      */
-    public void setFilterEdit(JTextField filter) {
-        filtered_data.setFilterEdit(filter);
+	public void setFilterEdit(JTextField filter) {
+        //filtered_data.setFilterEdit(filter);
+    	this.filter = filter;
+    	text_match = new TextComponentMatcherEditor(filter, null);    
+        filtered_data = new FilterList(data, text_match);
+
     }
     
     /**
      * Adds the event listener for the filtered list
      * @param listChangeListener - list listener to be added to filtered list
      */
-    public void addListEventListener(ListEventListener listChangeListener) {
-        filtered_data.addListEventListener(listChangeListener);
+    public void addListEventListener(ListEventListener listChangeListener) {//
+        filtered_data.addListEventListener(listChangeListener);//
+       
     }
     
     /* (non-Javadoc)
      * @see javax.swing.ListModel#addListDataListener(javax.swing.event.ListDataListener)
      */
-    public void addListDataListener(javax.swing.event.ListDataListener l) {
+    public void addListDataListener(ListDataListener l) {
         super.addListDataListener(l);
     }
     
@@ -611,6 +640,9 @@ public class SelectorListModel extends javax.swing.AbstractListModel implements 
 
 /*
 * $Log$
+* Revision 1.10  2006/05/15 15:50:09  prasanth
+* Updated javadoc
+*
 * Revision 1.9  2006/04/21 19:11:32  prasanth
 * Added comments & CVS tags.
 * ssConnection was set to null in populate model remoted this line of code.

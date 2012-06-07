@@ -33,11 +33,14 @@
 import com.nqadmin.swingSet.*;
 import javax.swing.*;
 import javax.sql.*;
+
+import java.io.File;
 import java.sql.*;
 import java.awt.*;
 import java.awt.event.*;
 
 public class MainClass extends JFrame {
+	
 
     JButton btnExample1 = new JButton("Example1");
     JButton btnExample2 = new JButton("Example2");
@@ -46,7 +49,7 @@ public class MainClass extends JFrame {
     JButton btnExample5 = new JButton("Example5");
     JButton btnExample6 = new JButton("Example6");
     JButton btnExample7 = new JButton("Example7");
-
+    
     public MainClass(){
 
         super("SwingSet Demo");
@@ -69,7 +72,8 @@ public class MainClass extends JFrame {
         btnExample5.setPreferredSize(new Dimension(150,25));
         btnExample6.setPreferredSize(new Dimension(150,25));
         btnExample7.setPreferredSize(new Dimension(150,25));
-
+        
+        
         getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
         getContentPane().add(btnExample1);
         getContentPane().add(btnExample2);
@@ -81,8 +85,6 @@ public class MainClass extends JFrame {
 
         setVisible(true);
         pack();
-
-
     }
 
     private class MyButtonListener implements ActionListener{
@@ -121,6 +123,9 @@ public class MainClass extends JFrame {
 
 /*
  * $Log$
+ * Revision 1.7  2005/02/04 22:40:12  yoda2
+ * Updated Copyright info.
+ *
  * Revision 1.6  2004/11/11 15:04:38  yoda2
  * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
  *

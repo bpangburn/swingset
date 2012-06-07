@@ -31,8 +31,9 @@
  */
 
 import com.nqadmin.swingSet.*;
+
 import javax.swing.*;
-import javax.sql.*;
+
 import java.sql.*;
 import java.awt.*;
 import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
@@ -40,7 +41,7 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
  /**
   * This example demonstrates the use of SSTextDocument to display information in
-  * SSDBComboBox (Supplier and Part) and JTextField (Quantity). The navigation
+  * SSDBComboBox (Supplier and Part) and JTextField (ty). The navigation
   * is done with SSDataNavigator.
   */
  public class Example3 extends JFrame{
@@ -51,7 +52,7 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
     SSDBComboBox cmbSupplierName = null;
     SSDBComboBox cmbPartName = null;
-    JTextField txtQuantity   = new JTextField();
+    SSTextField txtQuantity   = new SSTextField();
 
     SSConnection ssConnection = null;
     SSJdbcRowSetImpl rowset   = null;
@@ -63,28 +64,46 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         setSize(600,200);
 
         try{
-            ssConnection = new SSConnection("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
-                "swingset", "test");
-            ssConnection.setDriverName("org.postgresql.Driver");
+        	String url = "http://192.168.0.234/populate.sql";
+        	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
+            ssConnection.setDriverName("org.h2.Driver");
             ssConnection.createConnection();
+            
             rowset = new SSJdbcRowSetImpl(ssConnection);
-            // POSTGRES RAISES AN EXCEPTION WHEN YOU TRY TO USE THE UPDATEROW() METHOD
-            // IF THERE IS A SEMICOLON AT THE END OF THE QUERY WITH OUT ANY CLAUSES
-            // OR WHERE CONDITIONS AT THE END.
-            // IF YOU REMOVE THE SEMICOLON IT WILL NOT RAISE THE EXCEPTION BUT
-            // NO UPDATES ARE MADE.
             rowset.setCommand("SELECT * FROM supplier_part_data");
             navigator = new SSDataNavigator(rowset);
-            // THIS DISABLES MODIFICATIONS TO THE DATA
-            // ADDITION AND DELETION BUTTONS ARE DISABLED
-            // ANY CHANGES MADE TO PRESENT RECORD WILL BE NEGLECTED.
-            navigator.setModification(false);
-            navigator.setDBNav( new SSDBNavImp(getContentPane()));
         }catch(SQLException se){
             se.printStackTrace();
         }catch(ClassNotFoundException cnfe){
             cnfe.printStackTrace();
-        }
+        } 
+        
+        // THE FOLLOWING CODE IS USED BECAUSE OF AN H2 LIMITATION. UPDATABLE ROWSET IS NOT
+        // FULLY IMPLEMENTED AND AN EXECUTE COMMAND IS REQUIRED WHEN INSERTING A NEW
+        // ROW AND KEEPING THE CURSOR AT THE NEWLY INSERTED ROW.
+        // IF USING ANOTHER DATABASE, THE FOLLOWING IS NOT REQURIED:   
+        navigator.setDBNav(new SSDBNavAdapter(){
+        	@Override
+        	public void performPreInsertOps() {
+ 				// TODO Auto-generated method stub
+ 				super.performPreInsertOps();
+ 				cmbSupplierName.setSelectedItem(null);
+ 				cmbPartName.setSelectedItem(null);
+ 				txtQuantity.setText(null);
+ 			}
+        	@Override
+ 			public void performPostInsertOps() {
+ 				// TODO Auto-generated method stub
+ 				super.performPostInsertOps();
+ 				try {
+					rowset.execute();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+ 			}  
+ 			
+         });
 
         String query = "SELECT * FROM supplier_data;";
         cmbSupplierName = new SSDBComboBox(ssConnection, query, "supplier_id", "supplier_name");
@@ -93,9 +112,9 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         query = "SELECT * FROM part_data;";
         cmbPartName = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
         cmbPartName.bind(rowset,"part_id");
-
-        txtQuantity.setDocument(new SSTextDocument(rowset,"quantity"));
-
+        
+        txtQuantity.bind(rowset,"quantity");
+        
         try{
             cmbPartName.execute();
             cmbSupplierName.execute();
@@ -104,7 +123,7 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         }catch(Exception e){
             e.printStackTrace();
         }
-
+        
         lblSupplierName.setPreferredSize(new Dimension(75,20));
         lblPartName.setPreferredSize(new Dimension(75,20));
         lblQuantity.setPreferredSize(new Dimension(75,20));
@@ -150,6 +169,9 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
 /*
  * $Log$
+ * Revision 1.9  2005/02/14 18:50:25  prasanth
+ * Updated to remove calls to deprecated methods.
+ *
  * Revision 1.8  2005/02/04 22:40:12  yoda2
  * Updated Copyright info.
  *
