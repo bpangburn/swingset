@@ -1133,7 +1133,6 @@ public class SSDataGrid extends JTable {
      * the format to mm/dd/yyy from yyyy-mm-dd.
      */
     protected class DateEditor extends DefaultCellEditor {
-
         // CONSTRUCTOR FOR THE EDITOR CLASS
         public DateEditor(){
             super(new SSTextField(SSTextField.MMDDYYYY));
@@ -1141,7 +1140,15 @@ public class SSDataGrid extends JTable {
             getComponent().addKeyListener(new KeyAdapter(){
                 int keyPressed = 0;
                 public void keyPressed(KeyEvent ke){
-                    if(ke.getKeyCode() != KeyEvent.VK_TAB)
+                	//changed date key listener to clear date field when a new key is pressed
+                	if( ke.getKeyCode() == KeyEvent.VK_UP    ||
+                		ke.getKeyCode() == KeyEvent.VK_DOWN  ||
+                		ke.getKeyCode() == KeyEvent.VK_LEFT  ||
+                		ke.getKeyCode() == KeyEvent.VK_RIGHT ||
+                		ke.getKeyCode() == KeyEvent.VK_ENTER ||
+                		ke.getKeyCode() == KeyEvent.VK_TAB     )
+                		return;
+          
                         keyPressed++;
                 }
                 public void keyReleased(KeyEvent ke){
@@ -1467,6 +1474,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.39  2011/10/24 18:28:34  prasanth
+ * Added SSDataGridHandler.
+ *
  * Revision 1.38  2011/10/24 18:25:49  prasanth
  * Disabling the use of focus traversal keys in default editor and date editor. This will allow the use of tab to move to next cell while editing.
  *
