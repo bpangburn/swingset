@@ -32,8 +32,6 @@
 
 package com.nqadmin.swingSet;
 
-import java.awt.AWTKeyStroke;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -47,19 +45,23 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.text.SimpleDateFormat;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
-import java.util.Vector;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+
 
 import com.nqadmin.swingSet.datasources.SSConnection;
 import com.nqadmin.swingSet.datasources.SSRowSet;
+import com.nqadmin.swingSet.formatting.helpers.SelectorComboBoxModel;
+import com.nqadmin.swingSet.formatting.helpers.SelectorElement;
 
 /**
  * SSDBComboBox.java
@@ -69,7 +71,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  * Similar to the SSComboBox, but used when both the 'bound' values and the
  * 'display' values are pulled from a database table.  Generally the bound
  * value represents a foreign key to another table, and the combobox needs to
- * diplay a list of one (or more) columns from the other table.
+ * display a list of one (or more) columns from the other table.
  *
  * Note, if changing both a sSRowSet and column name consider using the bind()
  * method rather than individual setSSRowSet() and setColumName() calls.
@@ -141,11 +143,18 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  */
 //public class SSDBComboBox extends JComponent {
 public class SSDBComboBox extends JComboBox {
-
+	private int initialItemCount;
+	/**
+	 * @author mvo
+	 * Model to be used for holding and filtering data in combo box.
+	 */
+	 private SelectorComboBoxModel selectorCBM;
+	  
     /**
      * Text field bound to the SSRowSet.
+     * Bee changed to public
      */
-    protected JTextField textField = new JTextField();
+    public JTextField textField = new JTextField();
 
     /**
      * Database connection used to execute queries for combo population.
@@ -177,12 +186,6 @@ public class SSDBComboBox extends JComboBox {
     protected String secondDisplayColumnName = "";
 
     /**
-     * Vector used to store all of the primaryKeyColumnName values for the
-     * combo box.
-     */
-    protected Vector columnVector = new Vector();
-
-    /**
      * Number of items in the combo box.
      */
     protected int numberOfItems = 0;
@@ -211,11 +214,23 @@ public class SSDBComboBox extends JComboBox {
      * Keystroke-based item selection listener.
      */
     private final MyKeyListener myKeyListener = new MyKeyListener();
+    
+    /**
+     * Listener for PopupMenu
+     */
+    private MyPopupMenuListener myPopupMenuListener = new MyPopupMenuListener();
 
     /**
      * Alphanumeric separator used to separate values in multi-column combo boxes.
      */
     protected String seperator = " - ";
+    
+    /**
+     * @author mvo
+     * boolean value for activating or disabling the filter
+     */
+   private boolean filterSwitch = true;
+   
 
     /**
      * Format for any date columns displayed in combo box.
@@ -244,6 +259,7 @@ public class SSDBComboBox extends JComboBox {
         displayColumnName = _displayColumnName;
         init();
     }
+ 
 
     /**
      * Sets the new SSRowSet for the combo box.
@@ -429,6 +445,10 @@ public class SSDBComboBox extends JComboBox {
     public int getNumberOfItems() {
         return numberOfItems;
     }
+    
+    public int getInitialNumberOfItems() {
+    	return initialItemCount;
+    }
 
     /**
      * Sets the currently selected value
@@ -450,15 +470,14 @@ public class SSDBComboBox extends JComboBox {
      *     return -1 if no item is selected.
      */
     public long getSelectedValue() {
-
         int index = getSelectedIndex();
 
         if (index == -1) {
             return -1;
         }
-
-        return Long.valueOf((String)columnVector.get(index)).longValue();
-
+        long returnVal =  Long.valueOf(selectorCBM.getSelectedBoundData(index).toString());
+        return returnVal;
+        
     }
 
     /**
@@ -487,17 +506,17 @@ public class SSDBComboBox extends JComboBox {
         if (index == -1) {
             return null;
         }
-
-        return (String)columnVector.get(index);
-
-    }
-
+ 
+        return ""+selectorCBM.getSelectedBoundData(index);
+    } 
+    
+    public Map<String, Long> itemMap;
+    
     /**
      * Executes the query and adds items to the combo box based on the values
      * retrieved from the database.
      */
     public void execute() throws SQLException, Exception {
-
         // TURN OFF LISTENERS
             removeListeners();
 
@@ -508,34 +527,26 @@ public class SSDBComboBox extends JComboBox {
                 throw new Exception("Query is empty");
             }
 
-            ResultSet rs = statement.executeQuery(query);
-
-        // CLEAR ALL ITEMS FROM COMBO AND VECTOR STORING ITS CORRESPONDING VALUES.
+            setModel(new DefaultComboBoxModel());
             removeAllItems();
-            columnVector.clear();
-
-        // LOOP THROUGH VALUES IN RESULTSET AND ADD TO COMBO BOX
-            int i = 0;
-            while (rs.next()) {
-                // IF TWO COLUMNS HAVE TO BE DISPLAYED IN THE COMBO THEY SEPERATED BY SEMI-COLON
-                if ( secondDisplayColumnName != null && !secondDisplayColumnName.trim().equals("")) {
-                    addItem(getStringValue(rs,displayColumnName) + seperator + rs.getString(secondDisplayColumnName));
-                } else {
-                    addItem(getStringValue(rs,displayColumnName));
-                }
-                // ADD THE PK TO A VECTOR.
-                columnVector.add(i,rs.getString(primaryKeyColumnName));
-                i++;
-            }
-
-        // STORE THE NUMBER OF ITEMS IN THE COMBO BOX.
-            numberOfItems = i;
-
-        // DISPLAYS THE ITEM CORRESPONDING TO THE PRESENT VALUE IN THE DATABASE BASE.
+            
+        	selectorCBM  = new SelectorComboBoxModel();
+        	removeAllItems();
+        	selectorCBM  = new SelectorComboBoxModel();
+        	selectorCBM.setQuery(query);
+        	selectorCBM.setPrimaryKeyColumn(primaryKeyColumnName);
+    		selectorCBM.setDisplayColumn(displayColumnName);
+    		selectorCBM.setSecondDisplayColumn(secondDisplayColumnName);
+    		selectorCBM.setSeparator(seperator);
+    		selectorCBM.setSSConnection(sSConnection);
+    		selectorCBM.refresh();
+    		this.setModel(selectorCBM);
+    		itemMap = selectorCBM.itemMap;
+    		numberOfItems = selectorCBM.getSize();
+    		
             updateDisplay();
             addListeners();
-
-    } // end public void execute() throws SQLException, Exception {
+    }
 
     /**
      * Sets the SSRowSet and column name to which the component is to be bound.
@@ -562,8 +573,8 @@ public class SSDBComboBox extends JComboBox {
      * @param _value   value corresponding the the name
      */
      public void addItem(String _name, long _value) {
-        columnVector.add(Long.toString(_value));
-        addItem(_name);
+    	selectorCBM.data.add(new SelectorElement(_value,_name));
+        itemMap.put(""+_value, (long) itemMap.size());
         numberOfItems++;
      }
 
@@ -574,9 +585,9 @@ public class SSDBComboBox extends JComboBox {
      * @param _value   value corresponding the the name
      */
      public void addStringItem(String _name, String _value) {
-        columnVector.add(_value);
-        addItem(_name);
-        numberOfItems++;
+         selectorCBM.data.add(new SelectorElement(_value,_name));
+         itemMap.put(_value, (long) itemMap.size());
+         numberOfItems++;
      }
 
      /**
@@ -588,14 +599,21 @@ public class SSDBComboBox extends JComboBox {
       * @return returns true on successful deletion else returns false.
       */
      public boolean deleteItem(long _value) {
-        int index = columnVector.indexOf(Long.toString(_value));
-        if (index == -1) {
-            return false;
-        }
-        columnVector.removeElementAt(index);
-        removeItemAt(index);
-        numberOfItems--;
-        return true;
+		 if (itemMap.get((""+_value)) == null) return false;
+		 
+	     long indexL = itemMap.get((""+_value));
+	     int index = (int) indexL;
+	     
+	     selectorCBM.data.remove(index);
+	     itemMap.remove(""+_value);
+	    
+	     Map<String, Long> tempItemMap = new HashMap<String, Long>();
+	 	 for (Map.Entry<String, Long> entry : itemMap.entrySet()){		
+	 		 if ( entry.getValue() > indexL ) tempItemMap.put(entry.getKey(), indexL++);  		
+	  	 }
+	  	 itemMap.putAll(tempItemMap);
+	     numberOfItems--;
+	     return true;
      }
 
      /**
@@ -606,15 +624,22 @@ public class SSDBComboBox extends JComboBox {
       *
       * @return returns true on successful deletion else returns false.
       */
-     public boolean deleteStringItem(String _value) {
-        int index = columnVector.indexOf(_value);
-        if (index == -1) {
-            return false;
-        }
-        columnVector.removeElementAt(index);
-        removeItemAt(index);
-        numberOfItems--;
-        return true;
+    public boolean deleteStringItem(String _value) {
+		if (itemMap.get(_value) == null) return false;
+	    
+		long indexL = itemMap.get(_value);
+	    int index = (int) indexL;
+	    selectorCBM.data.remove(index);
+	    itemMap.remove(_value);
+	    Map<String, Long> tempItemMap = new HashMap<String, Long>();
+	    
+	    for (Map.Entry<String, Long> entry : itemMap.entrySet()){
+	    	if ( entry.getValue() > indexL ) 
+	  			tempItemMap.put(entry.getKey(), (long)indexL++);
+	  	}
+	  	itemMap.putAll(tempItemMap);
+	  	numberOfItems--;
+	    return true;
      }
 
     /**
@@ -633,16 +658,19 @@ public class SSDBComboBox extends JComboBox {
      * @return returns true if successful else false.
      */
     public boolean updateItem(long _value, String _name) {
-        int index = columnVector.indexOf(Long.toString(_value));
-        if (index == -1) {
-            return false;
-        }
-        removeActionListener(cmbListener);
-        insertItemAt(_name,index+1);
-        removeItemAt(index);
-        setSelectedIndex(index);
-        addActionListener(cmbListener);
-        return true;
+    	if (itemMap.get(""+_value) == null) return false;
+			
+		long indexL = itemMap.get(""+_value);
+		int index = (int) indexL;
+		
+		removeActionListener(cmbListener);
+		
+		selectorCBM.data.add(index+1, new SelectorElement(_value,_name));
+		selectorCBM.data.remove(index);
+		
+		setSelectedIndex(index);
+		addActionListener(cmbListener);
+		return true;
     }
 
     /**
@@ -661,13 +689,16 @@ public class SSDBComboBox extends JComboBox {
      * @return returns true if successful else false.
      */
     public boolean updateStringItem(String _value, String _name) {
-        int index = columnVector.indexOf(_value);
-        if (index == -1) {
-            return false;
-        }
+    	if (itemMap.get(_value) == null) return false;
+        
+    	long indexL = itemMap.get(_value);
+        int index = (int) indexL;
+        
         removeActionListener(cmbListener);
-        insertItemAt(_name,index+1);
-        removeItemAt(index);
+        
+        selectorCBM.data.add(index+1, new SelectorElement(_value,_name));
+        selectorCBM.data.remove(index);
+        
         setSelectedIndex(index);
         addActionListener(cmbListener);
         return true;
@@ -677,12 +708,12 @@ public class SSDBComboBox extends JComboBox {
      * Initialization code.
      */
     protected void init() {
-        // TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER KEY IS PRESSED
-        Set<AWTKeyStroke> forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
-        Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(forwardKeys);
-        newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
-        newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK ));
-        setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);
+       // // TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER KEY IS PRESSED
+        //Set<AWTKeyStroke> forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+        //Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(forwardKeys);
+        //newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+        //newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK ));
+        //setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);
         
         // SET PREFERRED DIMENSIONS
             setPreferredSize(new Dimension(200,20));
@@ -709,7 +740,6 @@ public class SSDBComboBox extends JComboBox {
 
         // ADD BACK LISTENERS
             addListeners();
-
     }
 
     /**
@@ -717,31 +747,23 @@ public class SSDBComboBox extends JComboBox {
      * binding.
      */
     protected void updateDisplay() {
+    //try {
+        // GET THE VALUE FROM TEXT FIELD
+        String text = textField.getText().trim();
 
-        //try {
-            // GET THE VALUE FROM TEXT FIELD
-            String text = textField.getText().trim();
-            if (!text.equals("")) {
-                //long valueInText = Long.parseLong(text);
-                // GET THE INDEX WHERE THIS VALUE IS IN THE VECTOR.
-                //int indexCorrespondingToLong = columnVector.indexOf(new Long(valueInText));
-                int columnVectorIndex = columnVector.indexOf(text);
-                // SET THE SELECTED ITEM OF COMBO TO THE ITEM AT THE INDEX FOUND FROM
-                // ABOVE STATEMENT
-                //if (indexCorrespondingToLong != getSelectedIndex()) {
-                if (columnVectorIndex != getSelectedIndex()) {
-                    //setSelectedIndex(indexCorrespondingToLong);
-                    setSelectedIndex(columnVectorIndex);
-                }
+        if (!text.equals("") && itemMap != null && itemMap.get(text) != null ) {
+            //long valueInText = Long.parseLong(text);
+            // GET THE INDEX WHERE THIS VALUE IS IN THE VECTOR.
+        	long longIndex = itemMap.get(text);
+            int index = (int) longIndex;
+            if (index != getSelectedIndex()) {
+                setSelectedIndex(index);
+                updateUI();
             }
-            else{
-                setSelectedIndex(-1);
-            }
-        //} catch(NumberFormatException nfe) {
-        //    System.out.println("Possible reason underlying column is not a number field");
-        //    nfe.printStackTrace();
-        //}
-
+        }
+        else {
+            setSelectedIndex(-1);
+        }
     }
 
     /**
@@ -771,7 +793,7 @@ public class SSDBComboBox extends JComboBox {
         return strValue;
 
     }
-
+    
     /**
      * Adds listeners for component and bound text field (where applicable).
      */
@@ -779,7 +801,10 @@ public class SSDBComboBox extends JComboBox {
         addActionListener(cmbListener);
         addFocusListener(cmbListener);
         addKeyListener(myKeyListener);
+        addPopupMenuListener(myPopupMenuListener);
         textField.getDocument().addDocumentListener(textFieldDocumentListener);
+       
+        
     }
 
     /**
@@ -790,381 +815,271 @@ public class SSDBComboBox extends JComboBox {
         removeFocusListener(cmbListener);
         removeKeyListener(myKeyListener);
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
-
+        
     }
+    
+    /**
+     * @author mvo
+     * Listener for the combobox's popup menu which resets the combobox's list to the original data if it is invisible.
+     */
+    private class MyPopupMenuListener implements PopupMenuListener{	
+    	private ActionListener[] saveActionListeners = new ActionListener[getActionListeners().length];
+    	boolean saveSwitch = true;
+    	
+    	public void addAllActionListeners(){	
+    		for (ActionListener al: saveActionListeners) addActionListener(al);
+			fireActionEvent();
+		}
+		
+		public void removeAllActionListeners(){	
+			if (getActionListeners().length != 0){	
+				for (ActionListener al : getActionListeners()){
+					removeActionListener(al);
+				}
+			}
+		}
+    	
+		public void popupMenuCanceled(PopupMenuEvent e) {
+    		if (isEditable()){
+    			hidePopup();
+    		}
+    	}
+	
+		public void popupMenuWillBecomeInvisible(PopupMenuEvent e){
+			
+			//if the popup was open before filtering, return as to not add action listeners
+			if(myKeyListener.openPopupFilter){	
+				myKeyListener.openPopupFilter = false;
+				return;
+			}
+			//when menu closes, change out textfield to re-insert original items before filtering.
+			if (selectorCBM != null) selectorCBM.setFilterEdit(new JTextField());
+			//set editable to false if value is clicked while filtering and set text field to selected item.
+			if (isEditable()){	
+				setEditable(false);	
+				textField.setText(""+getSelectedFilteredValue());
+			}
+			addAllActionListeners();	
+			requestFocus();
+		}
 
+		@Override
+		public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+			if (saveSwitch){	
+				saveActionListeners = getActionListeners();
+    			saveSwitch = false;
+    			removeAllActionListeners();
+			}
+		}
+    }
+    
     /**
      * Listener(s) for the bound text field used to propigate values back to the
      * component's value.
      */
     private class MyTextFieldDocumentListener implements DocumentListener {
-
-        public void changedUpdate(DocumentEvent de) {
-            removeActionListener(cmbListener);
+    	public void changedUpdate(DocumentEvent de) {
+        	removeActionListener(cmbListener);
             updateDisplay();
             addActionListener(cmbListener);
         }
-
         public void insertUpdate(DocumentEvent de) {
-            removeActionListener(cmbListener);
+        	removeActionListener(cmbListener);
             updateDisplay();
             addActionListener(cmbListener);
+           
         }
-
-        public void removeUpdate(DocumentEvent de) {
-            removeActionListener(cmbListener);
-            updateDisplay();
-            addActionListener(cmbListener);
-        }
+        public void removeUpdate(DocumentEvent de) {}
 
     } // end private class MyTextFieldDocumentListener implements DocumentListener {
-
+ 
     /**
+     * @author mvo
+     * Listener for JTextField "filterText" which allows for navigation of filtered items in combo box.
+     */
+    private class FilterKeyListener extends KeyAdapter {	
+    	long savePrimary;
+    	
+    	public void keyPressed(KeyEvent ke){	
+    		
+    		if(ke.getKeyCode() == KeyEvent.VK_ESCAPE){	
+    			setEditable(false);
+    			hidePopup();
+				setSelectedIndex(myKeyListener.saveIndex);
+				textField.setText(""+getSelectedFilteredValue());
+    			return;
+    		}
+    	}
+    	public void keyReleased(KeyEvent ke){	
+    		//tab will traverse to next component
+    		if (ke.getKeyCode() == KeyEvent.VK_TAB){	
+    			setEditable(false);
+				hidePopup();
+				transferFocus();
+				return;
+    		}
+    		//turn off filter if arrows are pressed and keep focus on combo box
+    		if (ke.getKeyCode() == KeyEvent.VK_DOWN || ke.getKeyCode() == KeyEvent.VK_UP){	
+    			setEditable(false);
+    			showPopup();
+    			requestFocus();
+				return;
+			}
+    		
+    		
+    		if (0 == getItemCount()){
+    			repaint();
+    			showPopup();
+    			return;
+    		}
+    		
+    		//set selected index to the first item in the filtered list
+    		setSelectedIndex(0);
+    		
+    		if (0 != getItemCount()) setSelectedIndex(0);
+    		
+    		savePrimary = getSelectedFilteredValue();
+    		
+    		//if the combo box has less items than the popup's row length, refresh the popup box.
+    		if(getItemCount() < 9 || ke.getKeyCode() == KeyEvent.VK_BACK_SPACE)
+    		{	myKeyListener.openPopupFilter = true;
+    			hidePopup();
+    		}
+    		showPopup();
+    	}
+    }
+    
+    /**
+     * @author mvo
+     * Gets the selected value of the selected item in the filtered list.
+     */
+    public long getSelectedFilteredValue() {	
+    	if(getSelectedIndex() < 0) setSelectedIndex(0);
+    	//gets the primary value of the selected index of the filtered list.
+    	return Long.valueOf(selectorCBM.getSelectedBoundData(getSelectedIndex()).toString());
+    }
+   
+    /**
+     * Listener for focus in filter text field.
+     */
+    private class FilterFocus extends FocusAdapter{	
+		public void focusGained(FocusEvent fe){	
+			showPopup();
+		}
+	}
+    
+    private FilterFocus myFilterFocus = new FilterFocus();
+    
+     /**
+     * @author mvo
      * Listener for keystroke-based, string matching, combo box navigation.
      */
     private class MyKeyListener extends KeyAdapter {
-
-        String searchString = null;
-        Stack searchStack = new Stack();
-        int previousIndex = 0;
-
-        public void resetSearchString() {
-            searchString = null;
-        }
-
-        public void keyReleased(KeyEvent ke) {
-            int i;
-            if (ke.getKeyCode() == KeyEvent.VK_ESCAPE        ||
-                    ke.getKeyCode() == KeyEvent.VK_PAGE_UP   ||
-                    ke.getKeyCode() == KeyEvent.VK_PAGE_DOWN ||
-                    ke.getKeyCode() == KeyEvent.VK_UP        ||
-                    ke.getKeyCode() == KeyEvent.VK_DOWN      ||
-                    ke.getKeyCode() == KeyEvent.VK_ENTER       ) {
-                searchString = null;
-                searchStack.removeAllElements();
-                return;
-
-            }
-            
-            if(ke.getKeyCode() == KeyEvent.VK_F1 || ke.getKeyCode() == KeyEvent.VK_F2 || 
-            		ke.getKeyCode() == KeyEvent.VK_F3 || ke.getKeyCode() == KeyEvent.VK_F4 || 
-            		ke.getKeyCode() == KeyEvent.VK_F5 || ke.getKeyCode() == KeyEvent.VK_F6 || 
-            		ke.getKeyCode() == KeyEvent.VK_F7 || ke.getKeyCode() == KeyEvent.VK_F8 || 
-            		ke.getKeyCode() == KeyEvent.VK_F9 || ke.getKeyCode() == KeyEvent.VK_F10 || 
-            		ke.getKeyCode() == KeyEvent.VK_F11 || ke.getKeyCode() == KeyEvent.VK_F12) {
-            	// DON'T DO ANY THING FOR FUNCTION KEYS
-            	return;
-            }            
-            else if (ke.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-            	// REMOVE THE LAST CHARACTER IN THE SEARCH STRING
-                if (searchString == null ) {
-                    setSelectedIndex(0);
-                    searchStack.removeAllElements();
-                    previousIndex = 0;
-                    return;
-                }
-                if (searchString.length() > 0) {
-                    searchString = searchString.substring(0,searchString.length()-1);
-                    if (searchString.length() == 0) {
-                        searchString = null;
-                        searchStack.removeAllElements();
-                        previousIndex = 0;
-                    }
-                }
-
-            }            
-            else if(searchString == null) {
-                searchString = new String(new char[]{ke.getKeyChar()});
-            } else {
-                searchString = searchString + new String(new char[]{ke.getKeyChar()});
-            }
-
-            if (searchString == null) {
-                setSelectedIndex(0);
-                return;
-            }
-
-            if (ke.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-
-                if (searchStack.empty()) {
-                    setSelectedIndex(0);
-                    return;
-                } else {
-                    // PRESENT POSITION IN COMBO
-                    searchStack.pop();
-                    // PREVIOUS POSITION IN COMBO
-                    if(!searchStack.empty()) {
-                        previousIndex = ((Integer)searchStack.peek()).intValue();
-                        setSelectedIndex(previousIndex);
-                        return;
-                    } else {
-                        previousIndex = 0;
-                        setSelectedIndex(0);
-                        return;
-                    }
-                }
-
-            } else {
-
-                for (i=previousIndex;i<getItemCount();i++) {
-                    if (searchString.length() == 0) {
-                        setSelectedIndex(0);
-                    } else {
-                        if (((String)getItemAt(i)).length() >= searchString.length()) {
-                            if (searchString.equalsIgnoreCase( ((String)getItemAt(i)).substring(0,searchString.length())) ) {
-                                setSelectedIndex(i);
-                                searchStack.push(new Integer(i));
-                                return;
-                            }
-                        }
-                    }
-
-                }
-
-                if (i == getItemCount()) {
-                    for (i=0;i<previousIndex;i++) {
-                        if (searchString.length() == 0) {
-                            setSelectedIndex(0);
-                        } else {
-                            if (((String)getItemAt(i)).length() >= searchString.length()) {
-                                if (searchString.equalsIgnoreCase( ((String)getItemAt(i)).substring(0,searchString.length())) ){
-                                    setSelectedIndex(i);
-                                    searchStack.push(new Integer(i));
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (searchStack.empty()) {
-                setSelectedIndex(0);
-            } else {
-                setSelectedIndex(((Integer)searchStack.peek()).intValue());
-            }
-
-        }
-    } // end private class MyKeyListener extends KeyAdapter {
+    	private JTextField filterText;
+    	private FilterKeyListener filterKeyListener = new FilterKeyListener();
+    	boolean openPopupFilter = false;
+    	int saveIndex;
+    	public void keyPressed(KeyEvent ke){	
+    		saveIndex = getSelectedIndex();
+    		if (myPopupMenuListener.saveSwitch) {	
+    			myPopupMenuListener.saveActionListeners = getActionListeners();
+    			myPopupMenuListener.saveSwitch = false;
+    		}
+    		myPopupMenuListener.removeAllActionListeners();
+    	}
+    	public void keyReleased(KeyEvent ke){	
+    		//reset the list and set the text field to the selected item's primary key 
+    		if (ke.getKeyCode() == KeyEvent.VK_ENTER){
+    			
+    			//if enter is pressed inside of the filter textfield and no item is selected
+    			//pick the last item selected item and set it as the current selected item
+    			if (-1 == getSelectedIndex()){
+    				setSelectedItem(null);
+    				textField.setText(""+filterKeyListener.savePrimary);
+    			}
+    			return;
+    		}
+    		
+    		if (ke.getKeyCode() == KeyEvent.VK_DOWN ||  ke.getKeyCode() == KeyEvent.VK_UP || !filterSwitch) return;
+    	
+    		//take the first key pressed, set combo box to editable, turn on filter, and set the text field to that saved key
+    		if (ke.getKeyCode() >= KeyEvent.VK_A & ke.getKeyCode() <= KeyEvent.VK_BACK_SLASH 					||
+    			ke.getKeyCode() >= KeyEvent.VK_COMMA & ke.getKeyCode() <= KeyEvent.VK_9 	  					||
+    			ke.getKeyCode() >= KeyEvent.VK_OPEN_BRACKET & ke.getKeyCode() <= KeyEvent.VK_CLOSE_BRACKET		||
+    			ke.getKeyCode() == KeyEvent.VK_PLUS																||
+    			ke.getKeyCode() == KeyEvent.VK_QUOTE) {	
+    			// if the popup is open, close it and do not add listeners
+        		if (isPopupVisible()){
+        			openPopupFilter = true;
+        			hidePopup();
+        		}
+    			setEditable(true);
+    			filterText = (JTextField) getEditor().getEditorComponent();
+    			selectorCBM.setFilterEdit(filterText);
+    			filterText.setText(""+ke.getKeyChar());
+    			filterText.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
+    			
+    			// ONLY ADD LISTENERS IF THERE IS NONE ALERADY ADDED. 
+    			if (filterText.getKeyListeners().length > 0 && 
+    				filterText.getFocusListeners().length > 0){
+        			return;
+        		}
+        		else {	
+        			//add the key listener and focus listener to the filtered data text field only if it has not already been added
+        			filterText.addKeyListener(filterKeyListener);
+        			filterText.addFocusListener(myFilterFocus);
+        		}
+        	}
+    	}
+    }
 
     /**
-     * Listener(s) for the component's value used to propigate changes back to
+     * Method that sets the combo box to be filterable. 
+     * @author mvo
+     * @param filter boolean to turn filtering on or off
+     */
+    public void setFilterable(boolean filter) {	
+    	filterSwitch = filter;
+    	return;
+    }
+    
+    /**
+     * Listener(s) for the component's value used to propagate changes back to
      * bound text field.
      */
     private class MyComboListener extends FocusAdapter implements ActionListener {
-
-        public void actionPerformed(ActionEvent ae) {
-
-            textField.getDocument().removeDocumentListener(textFieldDocumentListener);
+    	public void actionPerformed(ActionEvent ae) {	
+        	//dont fire an action if the size of the filtered model is not the same as the initial item size
+        	if (selectorCBM != null){
+        		if (selectorCBM.getSize() != selectorCBM.data.size()) return;
+        	}
+        	textField.getDocument().removeDocumentListener(textFieldDocumentListener);
 
             // GET THE INDEX CORRESPONDING TO THE SELECTED TEXT IN COMBO
             int index = getSelectedIndex();
-
             // IF THE USER WANTS TO REMOVE COMPLETELY THE VALUE IN THE FIELD HE CHOOSES
             // THE EMPTY STRING IN COMBO THEN THE TEXT FIELD IS SET TO EMPTY STRING
             if (index != -1) {
                 try {
-                    // NOW LOOK UP THE VECTOR AND GET THE VALUE CORRESPONDING TO THE TEXT SELECTED IN THE COMBO
-                    //long valueCorresponingToIndex = ( (Long)columnVector.get(index) ).longValue() ;
-                    //GET THE TEXT IN THE TEXT FIELD
-                    //String strValueinTextField = textField.getText();
-                    //INITIALIZE THE  LONG VALUE IN TEXT TO -1
-                    //long valueInText = -1;
-                    // IF THE TEXT IS NOT NULL PARSE ITS LONG VALUE
-                    //if (!strValueinTextField.equals("")) {
-                    //    valueInText = Long.parseLong(strValueinTextField);
-                    //}
                     String textFieldText = textField.getText();
-                    String columnVectorText = (String)columnVector.get(index);
-
-                    if (!textFieldText.equals(columnVectorText)) {
-                        textField.setText(columnVectorText);
+                    String textPK= selectorCBM.getSelectedBoundData(index).toString();
+                    if (!textFieldText.equals(textPK)) {
+                        textField.setText(textPK);
                     }
-
-
                     // IF THE LONG VALUE CORRESPONDING TO THE SELECTED TEXT OF COMBO NOT EQUAL
                     // TO THAT IN THE TEXT FIELD THEN CHANGE THE TEXT IN THE TEXT FIELD TO THAT VALUE
                     // IF ITS THE SAME LEAVE IT AS IS
-                    //if (valueInText != valueCorresponingToIndex) {
-                    //    textField.setText( String.valueOf(valueCorresponingToIndex) );
-                    //}
-
                 } catch(NullPointerException npe) {
                 } catch(NumberFormatException nfe) {
                 }
             }
-            else{
+            else {
                 textField.setText("");
             }
-
-            textField.getDocument().addDocumentListener(textFieldDocumentListener);
-
-        }
-
-        public void focusLost(FocusEvent fe){
-            myKeyListener.resetSearchString();
+                textField.getDocument().addDocumentListener(textFieldDocumentListener);
         }
 
     } // private class MyComboListener implements ActionListener {
-
-
-// DEPRECATED STUFF....................
-
-    /**
-     * Constructs a SSDBComboBox  with the given parameters.
-     *
-     * @param _sSConnection    database connection to be used.
-     * @param _query   query to be used to retrieve the values from the database.
-     * @param _primaryKeyColumnName  column name whose value has to be stored.
-     * @param _displayColumnName   column name whose values are displayed in the combo box.
-     * @param _textField   a text field to which the combo box has to be synchronized
-     *
-     * @deprecated
-     */
-    public SSDBComboBox(SSConnection _sSConnection, String _query, String _primaryKeyColumnName, String _displayColumnName, JTextField _textField) {
-
-        sSConnection                = _sSConnection;
-        query               = _query;
-        primaryKeyColumnName   = _primaryKeyColumnName;
-        displayColumnName  = _displayColumnName;
-        textField           = _textField;
-
-    }
-
-    /**
-     * Sets the connection object to be used.
-     *
-     * @param _sSConnection    connection object used for database.
-     *
-     * @deprecated
-     * @see #setSSConnection
-     */
-    public void setConnection(SSConnection _sSConnection) {
-        sSConnection = _sSConnection;
-    }
-
-
-    /**
-     * Sets the new SSRowSet for the combo box.
-     *
-     * @param _sSRowSet  SSRowSet to which the combo has to update values.
-     *
-     * @deprecated
-     * @see #setSSRowSet
-     */
-    public void setRowSet(SSRowSet _sSRowSet) {
-        sSRowSet = _sSRowSet;
-        bind();
-    }
-
-    /**
-     * Sets the text field to which the underlying value is written to.
-     *
-     * @param _textField    text field to which the selected item value has to
-     *  be written.
-     *
-     * @deprecated
-     */
-    public void setTextField(JTextField _textField) {
-        textField = _textField;
-    }
-
-    /**
-     * Returns connection object used to get values from database.
-     *
-     * @return returns a SSConnection object.
-     *
-     * @deprecated
-     * @see #getSSConnection
-     */
-    public SSConnection getConnection() {
-        return sSConnection;
-    }
-
-    /**
-     * Returns the text field used to synchronize with the SSRowSet.
-     *
-     * @return returns the text field used to synchronize with the SSRowSet.
-     *
-     * @deprecated
-     */
-    public JTextField getTextField() {
-        return textField;
-    }
-
-    /**
-     * returns the combo box that has to be displayed on screen.
-     *
-     * @return returns the combo box that displays the items.
-     *
-     * @deprecated
-     */
-    public JComboBox getComboBox() {
-        return this;
-    }
-
-    /**
-     * Returns the combo box to be displayed on the screen.
-     *
-     * @return returns the combo box that displays the items.
-     *
-     * @deprecated
-     */
-    public Component getComponent() {
-        return this;
-    }
-
-
-     /**
-      * Deletes the item which has name equal to _name. If there are
-      * more than one item with the same name then the first occurance is deleted.
-      *
-      * @param _name  value of the item to be deleted.
-      *
-      * @return returns true on successful deletion else returns false.
-      *
-      * @deprecated
-      */
-     public boolean deleteItem(String _name) {
-
-        for (int i=0; i<getItemCount();i++) {
-            if ( ((String)getItemAt(i)).equals(_name) ) {
-                removeItemAt(i);
-                columnVector.removeElementAt(i);
-                numberOfItems--;
-                return true;
-            }
-        }
-        return false;
-     }
-
-
-     /**
-      * Deletes the item which has display name equal to _name and corresponding value
-      * as _value. If there is more than one item with same name and value then the first
-      * occurance is deleted.
-      *
-      * @param _name   name of item to be deleted
-      * @param _value  value of the item to be deleted.
-      *
-      * @return returns true on successful deletion else returns false.
-      *
-      * @deprecated
-      */
-     public boolean deleteItem(String _name, long _value) {
-        for (int i=0; i<getItemCount();i++) {
-            if ( ((String)getItemAt(i)).equals(_name) ) {
-                if (((String)columnVector.elementAt(i)).equals(Long.toString(_value))) {
-                    removeItemAt(i);
-                    columnVector.removeElementAt(i);
-                    numberOfItems--;
-                    return true;
-                }
-            }
-        }
-        return false;
-     }
-
 
 } // end public class SSDBComboBox extends JComponent {
 
@@ -1172,6 +1087,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.35  2011/10/24 17:13:30  prasanth
+ * Changed the way focus is transfered for ENTER key.
+ *
  * Revision 1.34  2008/07/18 14:49:58  prasanth
  * In key listener ignoring function keys.
  *
@@ -1197,7 +1115,7 @@ public class SSDBComboBox extends JComboBox {
  * Revision 1.27  2005/02/11 22:59:27  yoda2
  * Imported PropertyVetoException and added some bound properties.
  *
- * Revision 1.26  2005/02/11 20:16:01  yoda2
+ * Revision 1.26  2005/02/11 20:16:01  yoda2  private SelectorComboBoxModel selectorCBM;
  * Added infrastructure to support property & vetoable change listeners (for beans).
  *
  * Revision 1.25  2005/02/10 20:12:57  yoda2
