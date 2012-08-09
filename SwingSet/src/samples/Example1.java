@@ -58,17 +58,18 @@ import com.nqadmin.swingSet.datasources.SSConnection;
     SSJdbcRowSetImpl rowset   = null;
     SSDataNavigator navigator = null;
     
-    public Example1() {
+    public Example1(String url) {
    
         super("Example1");
 
         setSize(600,200);
 
         try{
-        	String url = "http://192.168.0.234/populate.sql";
         	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
+        	System.out.println("url from ex 1: "+url);
         	ssConnection.setDriverName("org.h2.Driver");
             ssConnection.createConnection();
+                
             rowset = new SSJdbcRowSetImpl(ssConnection);
             rowset.setCommand("SELECT * FROM supplier_data");
             navigator = new SSDataNavigator(rowset);
@@ -86,7 +87,6 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         navigator.setDBNav(new SSDBNavAdapter(){
         	@Override
         	public void performPreInsertOps() {
- 				// TODO Auto-generated method stub
  				super.performPreInsertOps();
  				txtSupplierName.setText(null);
  				txtSupplierCity.setText(null);
@@ -94,22 +94,20 @@ import com.nqadmin.swingSet.datasources.SSConnection;
  			}
         	@Override
  			public void performPostInsertOps() {
- 				// TODO Auto-generated method stub
  				super.performPostInsertOps();
  				try {
 					rowset.execute();
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
  			}  
  			
          });
         
-        
         // .BIND(SSRowSet _sSRowSet, String _columnName) REPLACES 
         // DEPRECIATED .SETDOCUMENT(Document document) AND BINDS THE ROWSET AND
         // THE DATABASE'S COLUMN NAME TO THE NAVIGATOR
+       
         txtSupplierID.bind(rowset,"supplier_id");
         txtSupplierName.bind(rowset,"supplier_name");
         txtSupplierCity.bind(rowset,"city");
@@ -152,14 +150,13 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         
     }
 
-    public static void main(String[] args) {
-        new Example1();
-    }
-
  }
 
 /*
  * $Log$
+ * Revision 1.10  2012/06/07 16:12:40  beevo
+ * Modified example for compatibilty with H2 database.
+ *
  * Revision 1.7  2005/02/04 22:40:12  yoda2
  * Updated Copyright info.
  *
