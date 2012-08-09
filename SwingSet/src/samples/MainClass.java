@@ -41,7 +41,6 @@ import java.awt.event.*;
 
 public class MainClass extends JFrame {
 	
-
     JButton btnExample1 = new JButton("Example1");
     JButton btnExample2 = new JButton("Example2");
     JButton btnExample3 = new JButton("Example3");
@@ -50,11 +49,13 @@ public class MainClass extends JFrame {
     JButton btnExample6 = new JButton("Example6");
     JButton btnExample7 = new JButton("Example7");
     
-    public MainClass(){
-
+    String url;
+    
+    public MainClass(String[] url){
+    
         super("SwingSet Demo");
         setSize(400,500);
-
+        this.url = url[0];
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         btnExample1.addActionListener( new MyButtonListener());
@@ -72,7 +73,6 @@ public class MainClass extends JFrame {
         btnExample5.setPreferredSize(new Dimension(150,25));
         btnExample6.setPreferredSize(new Dimension(150,25));
         btnExample7.setPreferredSize(new Dimension(150,25));
-        
         
         getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
         getContentPane().add(btnExample1);
@@ -92,37 +92,41 @@ public class MainClass extends JFrame {
         public void actionPerformed( ActionEvent ae){
             if(ae.getSource().equals(btnExample1)){
                 btnExample1.setText("Processing..");
-                new Example1();
+                new Example1(url);
                 btnExample1.setText("Example1");
             }
             else if(ae.getSource().equals(btnExample2)){
-                new Example2();
+                new Example2(url); 
             }
             else if(ae.getSource().equals(btnExample3)){
-                new Example3();
+                new Example3(url);
             }
             else if(ae.getSource().equals(btnExample4)){
-                new Example4();
+                new Example4(url);
             }
             else if(ae.getSource().equals(btnExample5)){
-                new Example5();
+                new Example5(url);
             }
             else if(ae.getSource().equals(btnExample6)){
-                new Example6();
+                new Example6(url);
             }
             else if(ae.getSource().equals(btnExample7)){
-                new Example7();
+                new Example7(url);
             }
         }
     }
 
-    public static void main (String[] args){
-        new MainClass();
+    public static void main(String[] url){
+    	//this.url = url;
+        new MainClass(url);
     }
 }
 
 /*
  * $Log$
+ * Revision 1.8  2012/06/07 15:54:38  beevo
+ * Modified example for compatibilty with H2 database.
+ *
  * Revision 1.7  2005/02/04 22:40:12  yoda2
  * Updated Copyright info.
  *
