@@ -863,7 +863,6 @@ public class SSDBComboBox extends JComboBox {
 			requestFocus();
 		}
 
-		@Override
 		public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 			if (saveSwitch){	
 				saveActionListeners = getActionListeners();
@@ -1087,6 +1086,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.36  2012/08/08 19:55:03  beevo
+ * Added a text filter for the items in the combo box. The setFilterable() method can turn the filter on or off.
+ *
  * Revision 1.35  2011/10/24 17:13:30  prasanth
  * Changed the way focus is transfered for ENTER key.
  *
