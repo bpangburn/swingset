@@ -60,13 +60,13 @@ import com.nqadmin.swingSet.datasources.SSConnection;
     SSJdbcRowSetImpl rowset   = null;
     SSDataNavigator navigator = null;
 
-    public Example2(){
+    public Example2(String url){
 
         super("Example2");
         setSize(600,200);
 
         try{
-        	String url = "http://192.168.0.234/populate.sql";
+        	System.out.println("url from ex 2: "+url);
         	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
             ssConnection.setDriverName("org.h2.Driver");
             ssConnection.createConnection();
@@ -87,7 +87,7 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         navigator.setDBNav(new SSDBNavAdapter(){
            	@Override
         	public void performPreInsertOps() {
- 				// TODO Auto-generated method stub
+ 		
  				super.performPreInsertOps();
  				txtSupplierName.setText(null);
  				txtSupplierCity.setText(null);
@@ -95,12 +95,11 @@ import com.nqadmin.swingSet.datasources.SSConnection;
  			}
         	@Override
  			public void performPostInsertOps() {
- 				// TODO Auto-generated method stub
+ 
  				super.performPostInsertOps();
  				try {
 					rowset.execute();
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
  			}  
@@ -124,7 +123,7 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         
         // BIND THE COMBO TO THE STATUS COLUMN OF THE ROWSET
         cmbSupplierStatus.bind(rowset,"status");
-
+        cmbSupplierStatus.setSelectedIndex(1);
         lblSupplierName.setPreferredSize(new Dimension(75,20));
         lblSupplierCity.setPreferredSize(new Dimension(75,20));
         lblSupplierStatus.setPreferredSize(new Dimension(75,20));
@@ -162,14 +161,13 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         
     }
 
-    public static void main(String[] args){
-        new Example2();
-    }
-
  }
 
 /*
  * $Log$
+ * Revision 1.9  2012/06/07 15:54:38  beevo
+ * Modified example for compatibilty with H2 database.
+ *
  * Revision 1.8  2005/02/14 18:50:25  prasanth
  * Updated to remove calls to deprecated methods.
  *

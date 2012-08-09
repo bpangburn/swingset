@@ -42,9 +42,10 @@ public class Example6 extends JFrame {
     SSConnection ssConnection = null;
     SSJdbcRowSetImpl rowset   = null;
     SSDataGrid dataGrid = new SSDataGrid();
-
-    public Example6(){
+    String url;
+    public Example6(String url){
         super("Example 6");
+        this.url = url;
         setSize(580,170);
         init();
     }
@@ -52,7 +53,7 @@ public class Example6 extends JFrame {
     private void init(){
 
         try{
-        	String url = "http://192.168.0.234/populate.sql";
+        	System.out.println("url from ex 6: "+url);
         	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
             ssConnection.setDriverName("org.h2.Driver");
             ssConnection.createConnection();
@@ -110,11 +111,14 @@ public class Example6 extends JFrame {
         setVisible(true);
 
     } // END OF INIT FUNCTION
-
+    
  }// END OF EXAMPLE 6
 
 /*
  * $Log$
+ * Revision 1.7  2012/06/07 15:54:38  beevo
+ * Modified example for compatibilty with H2 database.
+ *
  * Revision 1.6  2005/02/14 18:50:25  prasanth
  * Updated to remove calls to deprecated methods.
  *

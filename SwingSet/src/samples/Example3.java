@@ -58,15 +58,15 @@ import com.nqadmin.swingSet.datasources.SSConnection;
     SSJdbcRowSetImpl rowset   = null;
     SSDataNavigator navigator = null;
 
-    public Example3(){
+    public Example3(String url){
 
         super("Example3");
         setSize(600,200);
 
         try{
-        	String url = "http://192.168.0.234/populate.sql";
+        	System.out.println("url from ex 3: "+url);
         	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
-            ssConnection.setDriverName("org.h2.Driver");
+        	ssConnection.setDriverName("org.h2.Driver");
             ssConnection.createConnection();
             
             rowset = new SSJdbcRowSetImpl(ssConnection);
@@ -77,7 +77,7 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         }catch(ClassNotFoundException cnfe){
             cnfe.printStackTrace();
         } 
-        
+       
         // THE FOLLOWING CODE IS USED BECAUSE OF AN H2 LIMITATION. UPDATABLE ROWSET IS NOT
         // FULLY IMPLEMENTED AND AN EXECUTE COMMAND IS REQUIRED WHEN INSERTING A NEW
         // ROW AND KEEPING THE CURSOR AT THE NEWLY INSERTED ROW.
@@ -85,7 +85,7 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         navigator.setDBNav(new SSDBNavAdapter(){
         	@Override
         	public void performPreInsertOps() {
- 				// TODO Auto-generated method stub
+ 			
  				super.performPreInsertOps();
  				cmbSupplierName.setSelectedItem(null);
  				cmbPartName.setSelectedItem(null);
@@ -93,22 +93,20 @@ import com.nqadmin.swingSet.datasources.SSConnection;
  			}
         	@Override
  			public void performPostInsertOps() {
- 				// TODO Auto-generated method stub
  				super.performPostInsertOps();
  				try {
 					rowset.execute();
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
  			}  
  			
          });
-
+        
         String query = "SELECT * FROM supplier_data;";
-        cmbSupplierName = new SSDBComboBox(ssConnection, query, "supplier_id", "supplier_name");
+        cmbSupplierName = new SSDBComboBox(ssConnection, query, "supplier_id", "supplier_name");  
         cmbSupplierName.bind(rowset,"supplier_id");
-
+        
         query = "SELECT * FROM part_data;";
         cmbPartName = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
         cmbPartName.bind(rowset,"part_id");
@@ -118,11 +116,13 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         try{
             cmbPartName.execute();
             cmbSupplierName.execute();
+         
         }catch(SQLException se){
             se.printStackTrace();
         }catch(Exception e){
             e.printStackTrace();
         }
+       
         
         lblSupplierName.setPreferredSize(new Dimension(75,20));
         lblPartName.setPreferredSize(new Dimension(75,20));
@@ -131,7 +131,7 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         cmbSupplierName.setPreferredSize(new Dimension(150,20));
         cmbPartName.setPreferredSize(new Dimension(150,20));
         txtQuantity.setPreferredSize(new Dimension(150,20));
-
+        
         Container contentPane = getContentPane();
         contentPane.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -158,17 +158,15 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         contentPane.add(navigator,constraints);
 
         setVisible(true);
-
     }
-
-    public static void main(String[] args){
-        new Example3();
-    }
-
+  
  }
 
 /*
  * $Log$
+ * Revision 1.10  2012/06/07 15:54:38  beevo
+ * Modified example for compatibilty with H2 database.
+ *
  * Revision 1.9  2005/02/14 18:50:25  prasanth
  * Updated to remove calls to deprecated methods.
  *

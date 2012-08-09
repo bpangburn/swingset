@@ -56,15 +56,15 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
 
  public class Example4 extends JFrame{
 
-	JLabel lblPartName    = new JLabel("Part Name");
+	JLabel lblPartName      = new JLabel("Part Name");
     JLabel lblSelectPart    = new JLabel("Parts");
     JLabel lblPartColor     = new JLabel("Color");
     JLabel lblPartWeight    = new JLabel("Weight");
     JLabel lblPartCity      = new JLabel("City");
 
     SSTextField txtPartName      = new SSTextField();
-    SSDBComboBox cmbSelectPart  = null;
-    SSComboBox cmbPartColor     = null;
+    SSDBComboBox cmbSelectPart   = null;
+    SSComboBox cmbPartColor      = null;
     SSTextField txtPartWeight    = new SSTextField();
     SSTextField txtPartCity      = new SSTextField();
 
@@ -75,20 +75,18 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
 
     SSTextField txtPartID = new SSTextField();
 
-   public Example4(){
+   public Example4(String url){
 
         super("Example4");
         setSize(600,200);
-
+        
         try{
-        	String url = "http://192.168.0.234/populate.sql";
+        	System.out.println("url from ex 4: "+url);
         	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
-            ssConnection.setDriverName("org.h2.Driver");
+        	ssConnection.setDriverName("org.h2.Driver");
             ssConnection.createConnection();
-            ssConnection.createConnection();
-            
             rowset = new SSJdbcRowSetImpl(ssConnection);
-            rowset.setCommand("SELECT * FROM part_data");
+            rowset.setCommand("SELECT * FROM part_data;");
             navigator = new SSDataNavigator(rowset);
         }catch(SQLException se){
             se.printStackTrace();
@@ -101,7 +99,7 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
         
         String query = "SELECT * FROM part_data;";
         cmbSelectPart = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
-        
+
         try{
             cmbSelectPart.execute();
         }catch(SQLException se){
@@ -109,12 +107,13 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
         }catch(Exception e){
             e.printStackTrace();
         }
-
+      //  cmbSelectPart.updateItem(1, "new nut");
        // SYNC MANAGER WILL TAKE CARE OF KEEPING THE COMBO BOX AND DATANAVIGATOR IN SYNC.
        // WHILE CHANGEING THE QUERY OR REEXECUTING THE QUERY FOR COMBO BOX
        // YOU HAVE TO CALL A SYNC ON THE SYNC MANAGER AND AFTER CALLING EXECUTE ON COMBO BOX
        // CALL SYNC ON SYNC MANAGER. 
        // THESE THREE LINE OF CODE IS USED AS A REPLACEMENT FOR THE TWO LISTENER CLASS WE HAD.
+      
         syncManager = new SSSyncManager(cmbSelectPart, navigator);
         syncManager.setColumnName("part_id");
         syncManager.sync();
@@ -171,7 +170,6 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
  			}
  			
          });
-
         cmbPartColor = new SSComboBox();
         cmbPartColor.setOptions(new String[]{"Red","Green","Blue"});
         cmbPartColor.bind(rowset,"color_code");
@@ -225,17 +223,16 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
         contentPane.add(navigator,constraints);
 
         setVisible(true);
-
     }
 
-    public static void main(String[] args){
-        new Example4();
-    }
 
  }
 
 /*
  * $Log$
+ * Revision 1.10  2012/06/07 15:54:38  beevo
+ * Modified example for compatibilty with H2 database.
+ *
  * Revision 1.9  2005/02/14 18:50:25  prasanth
  * Updated to remove calls to deprecated methods.
  *

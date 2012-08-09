@@ -42,9 +42,10 @@ public class Example5 extends JFrame {
     SSConnection ssConnection = null;
     SSJdbcRowSetImpl rowset   = null;
     SSDataGrid dataGrid = null;
-    
-    public Example5(){
+    String url;
+    public Example5(String url){
         super("Example 5");
+        this.url = url;
         setSize(430,145);
         init();
     }
@@ -52,7 +53,7 @@ public class Example5 extends JFrame {
     private void init(){
 
         try{
-        	String url = "http://192.168.0.234/populate.sql";
+        	System.out.println("url from ex 5: "+url);
         	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
         	
         	ssConnection.setDriverName("org.h2.Driver");
@@ -87,12 +88,14 @@ public class Example5 extends JFrame {
 
     }
  // END OF INIT FUNCTION
-
  }
 // END OF EXAMPLE 5
 
 /*
  * $Log$
+ * Revision 1.8  2012/06/07 15:54:38  beevo
+ * Modified example for compatibilty with H2 database.
+ *
  * Revision 1.7  2005/02/22 15:17:31  yoda2
  * Removed call to setPreferredSize().
  *

@@ -43,10 +43,11 @@ public class Example7 extends JFrame {
     SSConnection ssConnection = null;
     SSJdbcRowSetImpl rowset   = null;
     SSDataGrid dataGrid = new SSDataGrid();
-    
+    String url;
 
-    public Example7(){
+    public Example7(String url){
         super("Example 7");
+        this.url = url;
         setSize(730,290);
         init();
     }
@@ -54,8 +55,9 @@ public class Example7 extends JFrame {
     private void init(){
 
         try{
-        	String url = "http://192.168.0.234/populate.sql";
+        	System.out.println("url from ex 7: "+url);
         	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
+        	
             ssConnection.setDriverName("org.h2.Driver");
             ssConnection.createConnection();
             
@@ -95,12 +97,10 @@ public class Example7 extends JFrame {
             Integer[] underlyingNumbers = new Integer[rs.getRow()];
             rs.beforeFirst();
 
-            for( int i=0; i<displayItems.length; i++)
-            {
-                rs.next();
+            for (int i=0; i<displayItems.length; i++) { 
+            	rs.next();
                 displayItems[i] = rs.getString("supplier_name");
                 underlyingNumbers[i] = new Integer(rs.getInt("supplier_id"));
-
             }
 
             dataGrid.setComboRenderer("supplier_id",displayItems,underlyingNumbers);
@@ -110,12 +110,10 @@ public class Example7 extends JFrame {
             underlyingNumbers = new Integer[rs.getRow()];
             rs.beforeFirst();
 
-            for( int i=0; i<displayItems.length; i++)
-            {
+            for (int i=0; i<displayItems.length; i++) {
                 rs.next();
                 displayItems[i] = rs.getString("part_name");
                 underlyingNumbers[i] = new Integer(rs.getInt("part_id"));
-
             }
 
             dataGrid.setComboRenderer("part_id",displayItems,underlyingNumbers);
@@ -129,13 +127,15 @@ public class Example7 extends JFrame {
         getContentPane().add(dataGrid.getComponent());
 
         setVisible(true);
-
     } // END OF INIT FUNCTION
-
+   
  }// END OF EXAMPLE 7
 
 /*
  * $Log$
+ * Revision 1.7  2012/06/07 15:54:38  beevo
+ * Modified example for compatibilty with H2 database.
+ *
  * Revision 1.6  2005/02/14 18:50:25  prasanth
  * Updated to remove calls to deprecated methods.
  *
