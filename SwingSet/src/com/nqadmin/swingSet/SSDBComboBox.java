@@ -731,7 +731,7 @@ public class SSDBComboBox extends JComboBox {
 
         // REMOVE LISTENERS TO PREVENT DUPLICATION
             removeListeners();
-
+            
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
             textField.setDocument(new SSTextDocument(sSRowSet, columnName));
 
@@ -804,7 +804,6 @@ public class SSDBComboBox extends JComboBox {
         addPopupMenuListener(myPopupMenuListener);
         textField.getDocument().addDocumentListener(textFieldDocumentListener);
        
-        
     }
 
     /**
@@ -814,6 +813,7 @@ public class SSDBComboBox extends JComboBox {
         removeActionListener(cmbListener);
         removeFocusListener(cmbListener);
         removeKeyListener(myKeyListener);
+        removePopupMenuListener(myPopupMenuListener);
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
         
     }
@@ -1086,6 +1086,9 @@ public class SSDBComboBox extends JComboBox {
 
 /*
  * $Log$
+ * Revision 1.37  2012/08/09 17:22:16  prasanth
+ * Removed a @override annotation  as jdk1.5 doesn't like it.
+ *
  * Revision 1.36  2012/08/08 19:55:03  beevo
  * Added a text filter for the items in the combo box. The setFilterable() method can turn the filter on or off.
  *
