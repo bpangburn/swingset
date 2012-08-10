@@ -212,23 +212,20 @@ public class SSSyncManager {
     // WHEN THERE IS A CHANGE IN THIS VALUE MOVE THE ROWSET SO THAT
     // ITS POSITIONED AT THE RIGHT RECORD.
         public void actionPerformed(ActionEvent ae) {
-            try {
-
-                if(rowset == null || rowset.getRow() < 1 || comboBox.getSelectedIndex() == -1){
-                    return;
+        	try {
+        		
+                if(rowset == null || rowset.getRow() < 1 || comboBox.getSelectedIndex() == -1 || comboBox.textField == null){
+                     return;
                 }
-
-                //id = comboBox.getSelectedValue();
-                id = comboBox.getSelectedStringValue();
+                id = ""+comboBox.getSelectedFilteredValue();
                 rowset.removeRowSetListener(rowsetListener);
-
-            // UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
-                dataNavigator.updatePresentRow();
-
+                
+            // UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW. *take out to make it faster
+               // dataNavigator.updatePresentRow();
                 //if(id != rowset.getLong(columnName)) {
                 if(!id.equals(rowset.getString(columnName))) {
-
-                    int index = comboBox.getSelectedIndex() + 1;
+                	long indexOfId = comboBox.itemMap.get(id) + 1;
+                  	int index = (int)indexOfId;
                     rowset.absolute(index);
                     int numRecords = comboBox.getItemCount();
                     int count = 0;
@@ -245,6 +242,7 @@ public class SSSyncManager {
                         //so if for some reason item is in combo but deleted in rowset
                         //To avoid infinite loop in such scenario
                         if (count > numRecords + 5) {
+                        	comboBox.repaint();
                             //JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin about this","Row not found",JOptionPane.OK_OPTION);
                             break;
                         }
@@ -262,6 +260,10 @@ public class SSSyncManager {
 
 /*
  * $Log$
+ * Revision 1.6  2005/02/22 16:09:46  prasanth
+ * In adjustValue while checking combo selection make sure the underlying value returned
+ * is not null. If the selected item is -1 the getSelectedStringValue will return null.
+ *
  * Revision 1.5  2005/02/10 16:51:23  prasanth
  * On rowset events checking if the combo box is displaying the right value
  * or not. Changing the selection only if it is not displaying the right one.
