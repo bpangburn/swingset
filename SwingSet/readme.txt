@@ -9,7 +9,7 @@ $Id$
 LICENSE
 ==============================================================================
 
-Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala.
+Copyright (c) 2003-2012, The Pangburn Group and Prasanth R. Pasala.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -71,20 +71,6 @@ The SwingSet feature-set currently includes:
 8. JavaBean support for all major components
 9. Formatted fields for various types like currency, percent, SSN, date etc.
 
-For SwingSet 1.0.0-PR3 (Preview Release 3) added extra functions to SSDBNav interface
-to give more control to the programmer to create to different events on the 
-DataNavigator. New classes have been added in the formatting package for currency,
-percent, date, timestamp etc. A new package has been added but the work is in progress
-on this classes.
-
-The following tasks remain to be done prior to the release of SwingSet 1.0.0-RC1
-(Release Candidate 1):
-1. Bean property editors of some sort for connection/rowset/column properties.
-2. JavaDoc & examples for new formatting components.
-3. Integration of the formatting classes into SSDataGrid.
-4. Deprecation of the formatting related methods in SSTextField.
-5. Finalizing the API for classes in the helpers package
-
 More information on SwingSet is available from:
 http://swingset.sourceforge.net 
 and
@@ -98,24 +84,17 @@ swingset@nqadmin.com
 INSTALLATION
 ==============================================================================
 
-If SwingSet is to be used with a J2SE prior to 1.5, Sun's Reference
-Implementation of the JDBC RowSet is required (free registration required).
-It is available in a Zip file from:
-http://java.sun.com/developer/earlyAccess/jdbc/jdbc-rowset.html
-
-If using J2SE 1.5.0 Beta 1 or later, a reference implementation is already
-included.
+SwingSet 2.0.0 requires jre 1.5 or later.
 
 Download the latest SwingSet binary JAR file from:
 http://sourceforge.net/projects/swingset
 
-If needed, unzip the file rowset.jar from the Sun file to the same location as
-swingset.jar and add both JAR files to your CLASSPATH. Alternatively, you can
-copy both files to the the /jre/lib/ext subdirectory of your JDK (for
-compiling) and the /lib/ext subdirectory of your JRE (for execution).
+Add swingset.jar to your CLASSPATH. Alternatively, you can copy the jar
+to the the /jre/lib/ext subdirectory of your JDK (for compiling) and the 
+/lib/ext subdirectory of your JRE (for execution).
 
-SwingSet has been tested with J2SE 1.4.2 and 1.5.0, but should work with
-all J2SE 1.4 or 1.5 releases.
+SwingSet has been tested with J2SE 1.5.0 and 1.6.0_22, but should work with
+all J2SE 1.5 or later releases.
 
 Note that you will also need a JDBC driver for your target database.  If the
 driver is available as a JAR file, it should be added to your CLASSPATH or
@@ -126,38 +105,26 @@ placed in the same /lib/ext subdirectories mentioned above.
 SAMPLE/DEMO PROGRAMS
 ==============================================================================
 
-The sample/demo programs provided with SwingSet utilize a read-only PostgreSQL
-database based on the suppliers-and-parts database referenced in the classic
-database textbook, "An Introduction to Database Systems,"  by C. J. Date.
+The sample/demo programs provided with SwingSet utilize h2 database which is 
+run in memory. The database is based on the suppliers-and-parts database 
+referenced in the classic database textbook, 
+"An Introduction to Database Systems,"  by C. J. Date.
 
 The demo is available as a Java Web Start application from:
-http://swingset.sourceforge.net/SwingSet.jnlp
+http://swingset.sourceforge.net/SwingSetDemo.jnlp
 
 Alternatively, the demo can be downloaded and run from the command line.  This
-method also requires downloading the PostgreSQL JDBC driver.  The JDBC JAR file
-is available from:
-http://jdbc.postgresql.org/download.html
+method also requires downloading the PostgreSQL JDBC driver, H2 database engine
+and sql for supplier and parts database.  The PostgreSQL JDBC JAR file is 
+available from: http://jdbc.postgresql.org/download.html, H2 jars are 
+available at http://www.h2database.com/html/download.html and sql for database
+can be downloaded at https://swingset.sourceforge.net/lib/populate.sql
 
-This file should be added to your CLASSPATH or placed in the same /lib/ext
-subdirectories mentioned under "INSTALLATION."
+All the jars downloaded should be added to your CLASSPATH.
 
 After installing the JDBC driver, download the latest SwingSet demo JAR file
 to the location of your choice.  The file is available from:
 http://sourceforge.net/projects/swingset
-
-This is an executable JAR so on many platforms, you only need to double-click
-the JAR file ssdemo.jar to launch the demo.  If that doesn't work then type:
-  java -jar <demo jar file name here>
-  
-  e.g.
-       java -jar swingset-demo_1.0.0-PR4.jar
-  
-Please note that the demo requires both the rowset.jar and latest SwingSet
-binary JAR files (e.g. swingset-bin_1.0.0-PR4.jar). See the "INSTALLATION"
-section above for more information.
-
-The demo will attempt to connect to a small, remote, read only database so an
-Internet connection is required.
 
 
 ***********************
@@ -597,3 +564,20 @@ implementation.
 SSCellEditingAdapter defines empty functions so that the programmer can define
 only the functions desired.  Both isCellEditable() and cellUpdateRequested()
 always return true.
+
+***********************
+SSDataGridHandler
+***********************
+The SSDataGridHandler interface specifies set of methods that can be used to
+determine whether or not a given row can be deleted, and operation to be 
+performed before and after deletion or insertion of a record.
+
+***********************
+SSDataGridAdapter
+***********************
+This abstract class is provided as a convenience for creating custom 
+SSDataGridHandler objects. Extend this class to create a SSDataGridHandler 
+implementation.
+
+SSDataGridHandlerImpl defines empty functions so that the programmer can define
+only the functions desired.
