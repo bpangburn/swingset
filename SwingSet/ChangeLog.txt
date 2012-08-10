@@ -5,6 +5,103 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 $Id$
 
 ==============================================================================
+SwingSet 2.0.0 - Released 08-10-2012
+==============================================================================
+
+Classes or Interfaces added: 
+	SSDataGridAdapter
+	SSDataGridHandler
+	SSList
+	SSArray	
+	
+Changes:
+	SSCheckBox:
+	    1. Adding constructor that takes text for check box. Removed the preferred size setting.
+	    2. Changed the way focus is transfered for ENTER key.
+	
+	SSComboBox:
+	    1. Changed the way focus is transfered for ENTER key.
+	    2. Added a function updateDisplay(boolean useTextField) which can be used in setSelectedValue.
+	    3. Uses listener on rowset to update the value in the combo box. Doesn't use the listener on SSTextDocument any more. As a result removed the depricated constructor that takes SSTextDocument.
+	
+	SSDataGrid:
+	    1. Added SSDataGridHandler.
+	    2. Disabling the use of focus traversal keys in default editor and date editor. This will allow the use of tab to move to next cell while editing.
+	    3. When using a combo renderer and the underlying value is null returning index -1.
+	    4. Added ability to specify if deletions should be allowed.
+	    
+	SSDataNavigator:
+	    1. Reseting the onInsertRow flag when a new rowset is set.
+	    2. Had to do conditional call to doCommitButtonClick in updatePresentRow to make sure we are on a valid row .
+	    3. Added try/catch in updatePresentRow i) In updatePresentRow calling doCommitButtonClick  ii) When on insert row and allowInsertion returns false staying in insertion row rather than making a call to moveToCurrentRow().
+	    4. In updatePresentRow allowUpdate was not called before calling updateRow().
+	    5. Modified the code to call allowUpdate & performPostUpateOps in updatePresentRow.
+	    6. While deleting the row checking for confirmDeletes variable to display the confirmation dialog.
+	
+	SSDBComboBox:
+	    1. Added a text filter for the items in the combo box. The setFilterable() method can turn the filter on or off.
+	    2. Changed the way focus is transfered for ENTER key.
+	    3. In key listener ignoring function keys.
+	
+	SSDBNavImp:
+	    1. Setting default value to null if it is an instance of SSFormattedTextField.
+	
+	SSTableKeyAdapter:
+	    1. When pasting creating object only when string value is not null.
+	
+	SSTableModel:
+	    1. Calling functions on the data grid handler.
+	    2. When the underlying column is timestamp using updateTimestamp rather than updateDate.
+	    3. getValueAt now returns null if a given column has null.
+	    4. It used to return 0 for numeric fields (getInt, getDouble return 0 for null columns)
+	    5. Trimming any spaces on either side to avoid NumberFormatException. This could happen when copying data to the spreadsheet.
+	    
+	SSTextArea:
+	    1. Removed the init method that is setting the preferred size. This causes problem with the scrollpane.
+	    
+	SSTextDocument:
+	    1. When the underlying column is timestamp using updateTimestamp rather than updateDate.
+	    2. getText now returns null if getObject returns null.
+	    
+	SSTextField:
+	    1. Changed the way focus is transfered for ENTER key.
+	    
+	
+	SSJdbcRowSetImpl:
+	    1. Added get/update methods for Array.
+	    2. Added method get/update methods for Time & TimeStamp.
+	    3. Added get/set methods for object.
+	    4. Added rowDeleted, rowInserted, rowUpdated methods
+	    5. Added getMetaData method.
+	     
+	SSJdbcRowSetImplBeanInfo:
+	    1. Name of property in property descriptor for command was set as query changed it to command.
+	
+	SSRowSet:
+	    1. Added get/update methods for Array.
+	    2. Added method get/update methods for Time & TimeStamp.
+	    3. Added get/set methods for object.
+	    4. Added rowDeleted, rowInserted, rowUpdated methods
+	    5. Added getMetaData method.
+	
+	SSRowSetAdapter:
+	    1. Added get/update methods for Array.
+	    2. Added method get/update methods for Time & TimeStamp.
+	    3. Added get/set methods for object.
+	    4. Added rowDeleted, rowInserted, rowUpdated methods
+	    5. Added getMetaData method.
+	    
+	SelectorComboBoxModel:
+	    1. Modified to support the navigation in the SSDBCOMBOBOX filter.
+	    2. Changed parameter name in javadoc
+	
+	SSFormattedTextField:
+	    1. In DbToFm function which is trying to set the display based on value from database changed the function calls from this.setValue to super.setValue as we have now overridden the setValue in this class. Also changed this in couple other functions.
+	    2. Deprecated updateValue and added setValue.
+	    3. When the underlying value is null setting value of null to the component.
+
+
+==============================================================================
 SwingSet 1.0.0-PR4 - Released 06-06-2006
 ==============================================================================
 
