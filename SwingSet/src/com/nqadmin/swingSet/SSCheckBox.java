@@ -33,8 +33,9 @@
 package com.nqadmin.swingSet;
 
 import java.awt.AWTKeyStroke;
-import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.Serializable;
 import java.util.HashSet;
@@ -43,8 +44,6 @@ import java.util.Set;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -261,7 +260,7 @@ public class SSCheckBox extends JCheckBox {
     private void addListeners() {
         textField.getDocument().addDocumentListener(textFieldDocumentListener);
         //cmbDisplayed.addActionListener(cmbListener);
-        addChangeListener(checkBoxListener);   
+        addItemListener(checkBoxListener);   
     }
 
     /**
@@ -270,7 +269,7 @@ public class SSCheckBox extends JCheckBox {
     private void removeListeners() {
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
         //cmbDisplayed.removeActionListener(cmbListener);
-        removeChangeListener(checkBoxListener);
+        removeItemListener(checkBoxListener);
     }    
 
 
@@ -316,31 +315,31 @@ public class SSCheckBox extends JCheckBox {
     private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
         public void changedUpdate(DocumentEvent de){
-            removeChangeListener(checkBoxListener);
+            removeItemListener(checkBoxListener);
             
             updateDisplay();
             
-            addChangeListener(checkBoxListener);
+            addItemListener(checkBoxListener);
         }
 
         // WHEN EVER THERE IS A CHANGE IN THE VALUE IN THE TEXT FIELD CHANGE THE CHECK BOX
         // ACCORDINGLY.
         public void insertUpdate(DocumentEvent de) {
-            removeChangeListener(checkBoxListener);
+            removeItemListener(checkBoxListener);
             
             updateDisplay();
             
-            addChangeListener( checkBoxListener );
+            addItemListener( checkBoxListener );
         }
 
         // IF A REMOVE UPDATE OCCURS ON THE TEXT FIELD CHECK THE CHANGE AND SET THE
         // CHECK BOX ACCORDINGLY.
         public void removeUpdate(DocumentEvent de) {
-            removeChangeListener(checkBoxListener);
+            removeItemListener(checkBoxListener);
             
             updateDisplay();
             
-            addChangeListener( checkBoxListener );
+            addItemListener( checkBoxListener );
         }
     } // end private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
@@ -348,12 +347,12 @@ public class SSCheckBox extends JCheckBox {
      * Listener(s) for the component's value used to propigate changes back to
      * bound text field.
      */
-    private class MyCheckBoxListener implements ChangeListener, Serializable {
+    private class MyCheckBoxListener implements ItemListener, Serializable {
 
-        public void stateChanged(ChangeEvent ce) {
+        public void itemStateChanged(ItemEvent ie) {
             textField.getDocument().removeDocumentListener(textFieldDocumentListener);
 
-            if ( ((JCheckBox)ce.getSource()).isSelected() ) {
+            if ( ((JCheckBox)ie.getSource()).isSelected() ) {
                 switch(columnType) {
                     case java.sql.Types.INTEGER:
                     case java.sql.Types.SMALLINT:
@@ -417,6 +416,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.18  2011/12/14 15:50:22  prasanth
+ * Adding constructor that takes text for check box. Removed the preferred size setting.
+ *
  * Revision 1.17  2011/10/24 17:11:42  prasanth
  * Changed the way focus is transfered for ENTER key.
  *
