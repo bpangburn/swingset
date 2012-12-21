@@ -6,13 +6,13 @@
 	<property name="lib" value="./lib" />
 	<property name="deploydir" value="./deploy" />
 	<property name="manifestdir" value="./META-INF" />
-	
+	<property name="version" value="2.0.0" />
+		
 	<path id="1">
-		<pathelement location="${lib}/rowset.jar" />
+		<pathelement location="${lib}/glazedlists-1.8.0.jar" />
 	</path>
 	
 	<path id="2">
-		<pathelement location="${lib}/rowset.jar" />
 		<pathelement location="${classesdir}" />
 	</path>
 	
@@ -34,11 +34,11 @@
 	</target>
 	
 	<target name="compile" depends="prepare">
-		<javac srcdir="${srcdir}/com" destdir="${classesdir}" >
+		<javac debug="true" debuglevel="lines,source,vars" srcdir="${srcdir}/com" destdir="${classesdir}" >
 			<classpath refid="1" />
 		</javac>
 		
-		<javac srcdir="${srcdir}/samples" destdir="${classesdir}/samples" >
+		<javac srcdir="${srcdir}/samples" destdir="${classesdir}" >
 			<classpath refid="2" />
 		</javac>
 		
@@ -46,9 +46,6 @@
 	
 	<target name="docs" depends="compile">
 		<javadoc source="${srcdir}" destdir="${javadocdir}">
-			<sourcepath>
-				<pathelement location="${srcdir}"/>
-			</sourcepath>
 			<classpath>
 				<path path="${classesdir}" />
 			</classpath>
@@ -60,20 +57,26 @@
 	</target>
 	
 	<target name="build" depends="docs">
-		<jar jarfile="${deploydir}/swingset-bin.jar" basedir="${classesdir}"  manifest="${manifestdir}/MANIFEST.MF">
-			<exclude name="samples/**/*" />
+		<jar jarfile="${deploydir}/swingset-bin_${version}.jar" basedir="${classesdir}"  manifest="${manifestdir}/MANIFEST.MF" >
+			<exclude name="samples/**" />
+			<fileset dir="${basedir}" >
+				<include name="FAQ.txt" />
+				<include name="readme.txt" />
+				<include name="ChangeLog.txt" />
+			</fileset>
 			<fileset dir="${srcdir}" >
-				<include name="images" />
+				<include name="images/**" />
 			</fileset>
 		</jar>
 
-		<jar jarfile="${deploydir}/swingset-demo.jar" basedir="${classesdir}/samples"  manifest="${manifestdir}/MANIFEST-DEMO.MF" />
-		
-		<jar jarfile="${deploydir}/swingset-docs.jar" basedir="${javadocdir}" />
-		
-		<jar jarfile="${deploydir}/swingset-src.jar" basedir="${srcdir}" >
-			<exclude name="samples/*" />
+		<jar jarfile="${deploydir}/swingset-demo_${version}.jar" basedir="${classesdir}"  manifest="${manifestdir}/MANIFEST-DEMO.MF" >
+				<exclude name="com/**"/>
 		</jar>
+		
+		<jar jarfile="${deploydir}/swingset-docs_${version}.jar" basedir="${javadocdir}" />
+		
+		<jar jarfile="${deploydir}/swingset-src_${version}.jar" basedir="${srcdir}" />
+
 	</target>
 	
 </project>
