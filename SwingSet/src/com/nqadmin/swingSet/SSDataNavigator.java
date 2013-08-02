@@ -956,6 +956,7 @@ public class SSDataNavigator extends JPanel {
                         // CHECK IF THE ROW CAN BE INSERTED.        
                             if(dBNav==null || (dBNav != null && dBNav.allowInsertion()) ){
                                 sSRowSet.insertRow();
+                                onInsertRow = false;
                                 dBNav.performPostInsertOps();
                             // INCREMENT THE ROW COUNT
                                 rowCount++;
@@ -975,8 +976,6 @@ public class SSDataNavigator extends JPanel {
                             // UPDATE THE TEXT FEILD
                                 txtCurrentRow.setText(String.valueOf(currentRow));
                             
-	                            onInsertRow = false;
-	
 	                            if (!sSRowSet.isFirst()) {
 	                                firstButton.setEnabled(true);
 	                                previousButton.setEnabled(true);
@@ -1312,6 +1311,9 @@ public class SSDataNavigator extends JPanel {
 
 /*
  * $Log$
+ * Revision 1.48  2012/01/19 18:46:03  prasanth
+ * Reseting the onInsertRow flag when a new rowset is set.
+ *
  * Revision 1.47  2009/02/16 22:31:48  prasanth
  * Had to do conditional call to doCommitButtonClick in updatePresentRow to make sure we are on a valid row .
  *
