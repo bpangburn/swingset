@@ -78,7 +78,9 @@ public class SelectorElement implements TextFilterable {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return listValue.toString().trim();
+    	if(listValue != null)
+    		return listValue.toString().trim();
+    	return null;
     }
     
     /**
@@ -147,6 +149,9 @@ public class SelectorElement implements TextFilterable {
 
 /*
 * $Log$
+* Revision 1.8  2006/05/15 15:50:09  prasanth
+* Updated javadoc
+*
 * Revision 1.7  2006/04/21 19:09:17  prasanth
 * Added CVS tags & some comments
 *
