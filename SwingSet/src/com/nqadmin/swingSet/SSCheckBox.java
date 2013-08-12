@@ -259,7 +259,6 @@ public class SSCheckBox extends JCheckBox {
      */
     private void addListeners() {
         textField.getDocument().addDocumentListener(textFieldDocumentListener);
-        //cmbDisplayed.addActionListener(cmbListener);
         addItemListener(checkBoxListener);   
     }
 
@@ -268,7 +267,6 @@ public class SSCheckBox extends JCheckBox {
      */
     private void removeListeners() {
         textField.getDocument().removeDocumentListener(textFieldDocumentListener);
-        //cmbDisplayed.removeActionListener(cmbListener);
         removeItemListener(checkBoxListener);
     }    
 
@@ -383,32 +381,6 @@ public class SSCheckBox extends JCheckBox {
 
     } // end private class MyCheckBoxListener implements ChangeListener, Serializable {
         
-        
-        
-// DEPRECATED STUFF....................
-
-    /**
-     * Creates a object of SSCheckBox which synchronizes with the value in the specified
-     * text field.
-     *
-     * @param _textField the text field with which the check box will be in sync.
-     *
-     * @deprecated
-     */
-    public SSCheckBox(JTextField _textField) {
-        textField = _textField;
-    }
-
-    /**
-     * Initializes the check box by getting the value corresponding to
-     * specified column from the SSRowSet.
-     *
-     * @deprecated
-     */
-    public void execute() {
-        //init();
-    }    
-        
 
 } // end public class SSCheckBox extends JCheckBox {
 
@@ -416,6 +388,9 @@ public class SSCheckBox extends JCheckBox {
 
 /*
  * $Log$
+ * Revision 1.19  2012/08/21 19:17:23  prasanth
+ * Using item listener rather than change listener as item listener is triggered only when check box is selected or unselected.
+ *
  * Revision 1.18  2011/12/14 15:50:22  prasanth
  * Adding constructor that takes text for check box. Removed the preferred size setting.
  *
