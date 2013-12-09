@@ -33,6 +33,7 @@
 
 package com.nqadmin.swingSet.formatting.helpers;
 
+import java.beans.PropertyChangeSupport;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -52,7 +53,6 @@ import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 import ca.odell.glazedlists.*;
 
 import com.nqadmin.swingSet.datasources.SSConnection;
-import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
 
 
 /**
@@ -60,19 +60,24 @@ import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
  * @author  dags
  */
 
-public class SelectorComboBoxModel extends AbstractListModel implements ComboBoxModel {
+public class SelectorComboBoxModel extends AbstractListModel<SelectorElement> implements ComboBoxModel<SelectorElement> {
 	
-    private Object selectedOne = null;
-	public BasicEventList data = new BasicEventList();
-	/*
+    private Object selectedItem = null;
+	
+    public BasicEventList<SelectorElement> data = new BasicEventList<SelectorElement>();
+    
+	public Map<String, Long> itemMap;
+	
+	/**
 	 * Changed TextFilterList to FilterList because of new glazedlist jar update.
 	 * FilterList takes in its parameters a TextComponentMatcherEditor to account for
 	 * the depreciated TextFilterList methods.
 	 */
-    public FilterList filtered_data = new FilterList(data);
-    public TextComponentMatcherEditor text_match; 
+    public FilterList<SelectorElement> filteredData = new FilterList<SelectorElement>(data);
     
-    /*
+    public TextComponentMatcherEditor<SelectorElement> textMatch; 
+    
+    /**
      *  Holds value of JTextField used to filter
      */
     private JTextField filter;
@@ -84,7 +89,7 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
     /**
      * Utility field used by bound properties.
      */
-    private java.beans.PropertyChangeSupport propertyChangeSupport;
+    private java.beans.PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     
     /**
      * Holds value of property displayColumn.
@@ -100,31 +105,23 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
      * Separateor for the second display column
      */
     protected String seperator;// = " - ";
-    /**
-     * Holds value of property table.
-     */
- //   private String table = null;
+    
+    private String dateFormat = "MM/dd/yyyy";
     
     /**
      * Holds value of property selectText.
      */
     private String selectText;
     
-    /*
+    /**
      * Holds value of property query.
      */
     private String query = "";
-    /**
-     * Holds value of property orderBy.
-     */
-   // private String orderBy = null;
     
     /**
      * Holds value of property ssConnection.
      */
     private SSConnection ssConnection = null;
-    
-    private SSJdbcRowSetImpl ssRowset = null;
     
     /** 
      * Creates a new instance of SelectorListModel 
@@ -146,15 +143,14 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
         setQuery(query);
         setPrimaryKeyColumn(primaryKeyColumn);
         setDisplayColumn(displayColumn);
-        
-        //populateModel();
+
     }
     
     /**
      *	This function refetches the information from the database. 
      */
     public void refresh() {
-        data = new BasicEventList();//
+        data = new BasicEventList<SelectorElement>();
         this.populateModel();
     }
     
@@ -164,56 +160,61 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
      * @return returns the value of the item at the specified index
      */
     public Object getSelectedBoundData(int index) {
-        Object itm = filtered_data.get(index);
+        Object itm = filteredData.get(index);
         if (itm != null) {
             return ((SelectorElement)(itm)).getDataValue();
-        }
-        
-        return "<null>";
+        }        
+        return null;
     }
     
     public void setSeparator(String separator) {
     	this.seperator = separator;
     }
+    
     /**
      * Sets the text to be used to filter items in the list
      * @param newFilter - text to be used to filter item in the list
      */
-	@SuppressWarnings("unchecked")
 	public void setFilterText(String[] newFilter) {
 		
-        text_match.setFilterText(newFilter);
-        filtered_data = new FilterList(data, text_match);
+        textMatch.setFilterText(newFilter);
+        filteredData = new FilterList<SelectorElement>(data, textMatch);
         
     }
 	
-	 protected String getStringValue(ResultSet _rs, String _columnName) {
+	/**
+	 * Converts the database column value into string. Only date columns are formated as specified by dateFormat variable
+	 * all other column types are retrieved as strings
+	 * @param _rs
+	 * @param _columnName
+	 * @return
+	 */
+	protected String getStringValue(ResultSet _rs, String _columnName) {
 	        String strValue = "";
-	        String dateFormat = "MM/dd/yyyy";
-	        try {
-	            int type = _rs.getMetaData().getColumnType(_rs.findColumn(_columnName));
-	            switch(type){
-	                case Types.DATE:
-	                    SimpleDateFormat myDateFormat = new SimpleDateFormat(dateFormat);
-	                    strValue = myDateFormat.format(_rs.getDate(_columnName));
-	                break;
-	                default:
-	                    strValue = _rs.getString(_columnName);
-	                break;
-	            }
-	        } catch(SQLException se) {
-	            se.printStackTrace();
+	    try {
+	        int type = _rs.getMetaData().getColumnType(_rs.findColumn(_columnName));
+	        switch(type){
+	            case Types.DATE:
+	                SimpleDateFormat myDateFormat = new SimpleDateFormat(getDateFormat());
+	                strValue = myDateFormat.format(_rs.getDate(_columnName));
+	            break;
+	            default:
+	                strValue = _rs.getString(_columnName);
+	            break;
 	        }
-	        return strValue;
-
+	        if(strValue == null) {
+	        	strValue = "";
+	        }
+	    } catch(SQLException se) {
+	        se.printStackTrace();
 	    }
-	 
-	public Map<String, Long> itemMap;
+	    return strValue;
 	
-    /*
+	}	 
+
+    /**
      * Populates the list model with the data by fetching it from the database.
      */
-    @SuppressWarnings("unchecked")
 	private void populateModel() {
     	itemMap  = new HashMap<String, Long>();
         Object primaryValue = null;
@@ -241,20 +242,17 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
              }
 
         } catch (SQLException se) {
-            Thread.dumpStack();
-        } catch (java.lang.NullPointerException np) {
-            Thread.dumpStack();
+            se.printStackTrace();
+        } catch (java.lang.NullPointerException npe) {
+            npe.printStackTrace();
         }
     // FILL THE FILTERED DATA WITH THE COMPLETE DATA GOT FROM DATABASE    
-        filtered_data = new FilterList(data);//
+        filteredData = new FilterList<SelectorElement>(data);        
         
-        
-        this.fireContentsChanged(this, 0, filtered_data.size()-1);//
+        this.fireContentsChanged(this, 0, filteredData.size()-1);
         this.fireIntervalRemoved(this, 0, 1);
         this.fireIntervalAdded(this, 0, 1);
 
-    // WE DON'T NEED THIS ROWSET ANY MORE SO SET IT TO NULL    
-        ssRowset = null;
     }
     
     
@@ -262,7 +260,7 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
      * Adds an element to the data
      * @param ob - object to be added to the data
      */
-    public void addElement(Object ob) {
+    public void addElement(SelectorElement ob) {
         data.add(ob);
     }
     
@@ -270,8 +268,8 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
      * Creates filtered data based on the actual data
      */
     public void createFilteredData() {
-        filtered_data = new FilterList(data);//
-        this.fireContentsChanged(this, 0, filtered_data.size()-1);//
+        filteredData = new FilterList<SelectorElement>(data);
+        this.fireContentsChanged(this, 0, filteredData.size()-1);
         this.fireIntervalAdded(this, 0, 1);
         this.fireIntervalRemoved(this, 0, 1);
     }
@@ -311,7 +309,7 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
         try {
             propertyChangeSupport.firePropertyChange("primaryKeyColumn", oldPrimaryKeyColumn, primaryKeyColumn);
         } catch(java.lang.NullPointerException npe) {
-            
+        	npe.printStackTrace();
         }
     }
     
@@ -319,8 +317,7 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
      * Getter for property displayColumn.
      * @return Value of property displayColumn.
      */
-    public String getDisplayColumn() {
-        
+    public String getDisplayColumn() {        
         return this.displayColumn;
     }
     
@@ -334,7 +331,7 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
         try {
             propertyChangeSupport.firePropertyChange("displayColumn", oldDisplayColumn, displayColumn);
         } catch(java.lang.NullPointerException npe) {
-            
+        	npe.printStackTrace();
         }
         
     }
@@ -349,7 +346,7 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
         try {
             propertyChangeSupport.firePropertyChange("secondDisplayColumn", oldDisplayColumn, secondDisplayColumnName);
         } catch(java.lang.NullPointerException npe) {
-            
+            npe.printStackTrace();
         }
     }
     
@@ -373,9 +370,9 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
         try {
             propertyChangeSupport.firePropertyChange("selectText", oldSelectText, selectText);
         } catch (java.lang.NullPointerException npe) {
-            
+            npe.printStackTrace();
         }
-        //this.refresh();
+
     }
     
     /**
@@ -404,25 +401,37 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
             SSConnection oldSsConnection = this.ssConnection;
             this.ssConnection = ssConnection;
             propertyChangeSupport.firePropertyChange("ssConnection", oldSsConnection, ssConnection);
-        } catch(java.lang.NullPointerException nop) {
-            
+        } catch(java.lang.NullPointerException npe) {
+            npe.printStackTrace();
         }
     }
+    
+    /**
+	 * @return the dateFormat
+	 */
+	public String getDateFormat() {
+		return dateFormat;
+	}
+
+	/**
+	 * @param dateFormat the dateFormat to set
+	 */
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
+	}
     
     /* (non-Javadoc)
      * @see javax.swing.ListModel#getElementAt(int)
      */
-    public Object getElementAt(int index) {
-       //return data.get(index);
-        return filtered_data.get(index);//
-        
+    public SelectorElement getElementAt(int index) {
+        return filteredData.get(index);        
     }
     
     /* (non-Javadoc)
      * @see javax.swing.ListModel#getSize()
      */
     public int getSize() {
-        return filtered_data.size();//
+        return filteredData.size();
     }
     
     /**
@@ -439,9 +448,7 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
      * @param _query   query to be used to get values from database (to display combo box items)
      */
     public void setQuery(String _query) {
-        String oldValue = query;
         query = _query;
-        //this.refresh();
     }
     
     /**
@@ -449,18 +456,17 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
      * @param filter - JTextField to be used to get the filter text.
      */
 	public void setFilterEdit(JTextField filter) {
-        //filtered_data.setFilterEdit(filter);
     	this.filter = filter;
-    	text_match = new TextComponentMatcherEditor(filter, null);    
-        filtered_data = new FilterList(data, text_match);
+    	textMatch = new TextComponentMatcherEditor<SelectorElement>(filter, null);    
+        filteredData = new FilterList<SelectorElement>(data, textMatch);
     }
     
     /**
      * Adds the event listener for the filtered list
      * @param listChangeListener - list listener to be added to filtered list
      */
-    public void addListEventListener(ListEventListener listChangeListener) {//
-        filtered_data.addListEventListener(listChangeListener);//
+    public void addListEventListener(ListEventListener listChangeListener) {
+        filteredData.addListEventListener(listChangeListener);
        
     }
     
@@ -472,24 +478,26 @@ public class SelectorComboBoxModel extends AbstractListModel implements ComboBox
     }
     
     /* (non-Javadoc)
-     * @see javax.swing.ComboBoxModel#setSelectedItem(java.lang.Object)
-     */
-    public void setSelectedItem(Object anItem) {
-        selectedOne = anItem;
-    }
-    
-    /* (non-Javadoc)
      * @see javax.swing.ComboBoxModel#getSelectedItem()
      */
     public Object getSelectedItem() {
-        return selectedOne;
+        return selectedItem;
     }
-
+    
+    /* (non-Javadoc)
+     * @see javax.swing.ComboBoxModel#setSelectedItem(java.lang.Object)
+     */
+    public void setSelectedItem(Object anItem) {
+   		selectedItem = anItem;
+    }
 
 }
 
 /*
 * $Log$
+* Revision 1.11  2012/08/08 20:14:49  beevo
+* Modified to support the navigation in the SSDBCOMBOBOX filter.
+*
 * Revision 1.10  2006/05/15 15:50:09  prasanth
 * Updated javadoc
 *
