@@ -60,8 +60,6 @@ public class SelectorElement implements TextFilterable {
      * Creates a default instance of SelectorElement
      */
     public SelectorElement() {
-        listValue = new String("listValue");
-        dataValue = new String("dataValue");
     }
     
     /**
@@ -142,13 +140,15 @@ public class SelectorElement implements TextFilterable {
      * @see ca.odell.glazedlists.TextFilterable#getFilterStrings(java.util.List)
      */
     public void getFilterStrings(java.util.List list) {
-        list.add(listValue.toString());
-        list.add(dataValue.toString());
+        list.add(listValue);
     }
 }
 
 /*
 * $Log$
+* Revision 1.9  2013/08/02 20:31:33  prasanth
+* Modified toString to return null when listValue is null.
+*
 * Revision 1.8  2006/05/15 15:50:09  prasanth
 * Updated javadoc
 *
