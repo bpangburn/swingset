@@ -424,7 +424,11 @@ public class SSList extends JList {
 	 * binding.
 	 */
 	protected void updateDisplay() throws SQLException {
-		Object[] array = toObjArray(sSRowSet.getArray(columnName));
+		
+		Object[] array = null;
+		if(sSRowSet.getRow() > 0 ) {
+			array = toObjArray(sSRowSet.getArray(columnName));
+		}
 		if(array == null) {
 			this.clearSelection();
 			return;
@@ -495,4 +499,7 @@ public class SSList extends JList {
 
 /*
 * $Log$
+* Revision 1.1  2009/11/16 17:24:55  prasanth
+* Initial Commit.
+*
 */
