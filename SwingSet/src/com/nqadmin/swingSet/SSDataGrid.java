@@ -1185,6 +1185,10 @@ public class SSDataGrid extends JTable {
         // RETURNS A DATE OBJECT REPRESENTING THE VALUE IN THE CELL.
         public Object getCellEditorValue(){
             String strDate = ((JTextField)(DateEditor.this.getComponent())).getText();
+            // IF THE FIELD IS EMPTY RETURN NULL
+            if(strDate == null || "".equals(strDate.trim())) {
+            	return null;
+            }
             StringTokenizer strtok = new StringTokenizer(strDate, "/", false);
             Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.MONTH, Integer.parseInt(strtok.nextToken())-1);
@@ -1474,6 +1478,9 @@ public class SSDataGrid extends JTable {
 
 /*
  * $Log$
+ * Revision 1.40  2012/06/28 20:33:45  beevo
+ * Changed key listener in DateEditor to clear date field when a new key is pressed.
+ *
  * Revision 1.39  2011/10/24 18:28:34  prasanth
  * Added SSDataGridHandler.
  *
