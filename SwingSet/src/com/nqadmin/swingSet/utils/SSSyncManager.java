@@ -213,8 +213,8 @@ public class SSSyncManager {
     // ITS POSITIONED AT THE RIGHT RECORD.
         public void actionPerformed(ActionEvent ae) {
         	try {
-        		
-                if(rowset == null || rowset.getRow() < 1 || comboBox.getSelectedIndex() == -1 || comboBox.textField == null){
+        		// IF THIS IS NOT CAUSED BY THE USER ACTION (IN WHICH THE FOCUS WILL BE ON THE COMBO) NOTHING TO DO
+                if(rowset == null || rowset.getRow() < 1 || comboBox.getSelectedIndex() == -1 || comboBox.textField == null || !comboBox.hasFocus()){
                      return;
                 }
                 id = ""+comboBox.getSelectedFilteredValue();
@@ -260,6 +260,9 @@ public class SSSyncManager {
 
 /*
  * $Log$
+ * Revision 1.7  2012/08/10 14:41:01  prasanth
+ * Modified for compatibility with filterable db combobox.
+ *
  * Revision 1.6  2005/02/22 16:09:46  prasanth
  * In adjustValue while checking combo selection make sure the underlying value returned
  * is not null. If the selected item is -1 the getSelectedStringValue will return null.
