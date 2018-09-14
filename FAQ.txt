@@ -2,24 +2,15 @@
 Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
-$Id$
-
-
-==============================================================================
-FAQ
-==============================================================================
-
 1.  I am trying to run the samples. I see "Processing...." and nothing
     happens.  What is wrong?
 
     You might be missing one or more required jar files.  Please make sure
     that you have the following jar files:
-        1. Latest SwingSet binary jar file (e.g. swingset-bin_0.8.0_beta.jar)
-        2. Latest PostgreSQL JDBC drive (e.g. pg74.214.jdbc3.jar) from:
-           http://jdbc.postgresql.org/download.html
-        3. For JDK/JRE prior to 1.5, early RowSet implementation (e.g.
-           rowset.jar) from:
-           http://java.sun.com/developer/earlyAccess/jdbc/jdbc-rowset.html
+        1. Latest SwingSet binary JAR file from:
+           https://sourceforge.net/projects/swingset/
+        2. Latest H2 JAR from:
+           https://h2database.com
 
     If you still have problems:
         1. Unzip the demo jar file and extract the files to a folder.

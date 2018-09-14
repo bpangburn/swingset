@@ -5,5 +5,9 @@ REM
 REM DELETE ANY EXISTING .class FILES AND RE-COMPILE ALL .java FILES FOR SWINGSET DEMO
 REM
 echo off
+
+REM CLEAN UP
 del .\*.class
-javac ./MainClass.java
+
+# COMPILE DEMO
+javac -source 1.5 -target 1.5 -classpath .\swingset-2.0.1.jar .\MainClass.java

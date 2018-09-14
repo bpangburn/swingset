@@ -5,6 +5,16 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 $Id$
 
 ==============================================================================
+SwingSet 2.0.1 - Released 2018-09-14
+==============================================================================
+
+Changes:
+	1. minor fixes to build scripts
+	2. updated email address in supporting docs
+	3. addition of populate.sql used for examples (http://swingset.sourceforge.net/lib/populate.sql)
+	4. corrected instructions for examples
+
+==============================================================================
 SwingSet 2.0.0 - Released 08-10-2012
 ==============================================================================
 
@@ -22,7 +32,7 @@ Changes:
 	SSComboBox:
 	    1. Changed the way focus is transfered for ENTER key.
 	    2. Added a function updateDisplay(boolean useTextField) which can be used in setSelectedValue.
-	    3. Uses listener on rowset to update the value in the combo box. Doesn't use the listener on SSTextDocument any more. As a result removed the depricated constructor that takes SSTextDocument.
+	    3. Uses listener on rowset to update the value in the combo box. Doesn't use the listener on SSTextDocument any more. As a result removed the deprecated constructor that takes SSTextDocument.
 	
 	SSDataGrid:
 	    1. Added SSDataGridHandler.

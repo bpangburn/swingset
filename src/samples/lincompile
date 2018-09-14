@@ -6,6 +6,8 @@
 #
 # DELETE ANY EXISTING .class FILES AND RE-COMPILE ALL .java FILES FOR SWINGSET DEMO
 #
-rm ../../release_jars/demo/*.class
+# CLEAN UP
+rm ./*.class
+
 # COMPILE DEMO
-javac -source 1.4 -target 1.4 -d ../../release_jars/demo -classpath ../../release_jars/swingset-bin_current.jar  ./*.java
+javac -source 1.5 -target 1.5 -classpath ./swingset-2.0.1.jar ./MainClass.java

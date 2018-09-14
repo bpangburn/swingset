@@ -7,4 +7,4 @@ REM
 echo off
 rmdir .\bin /s
 mkdir .\bin
-javac -source 1.4 -target 1.4 -Xlint:deprecation -Xlint:unchecked -d .\bin .\src\com\nqadmin\swingSet\*.java .\src\com\nqadmin\swingSet\datasources\*.java .\src\com\nqadmin\swingSet\formatting\*.java .\src\com\nqadmin\swingSet\formatting\helpers\*.java .\src\com\nqadmin\swingSet\utils\*.java 
+javac -source 1.5 -target 1.5 -Xlint:deprecation -Xlint:unchecked -d .\bin -classpath .\lib\glazedlists-1.8.0.jar .\src\com\nqadmin\swingSet\*.java .\src\com\nqadmin\swingSet\datasources\*.java .\src\com\nqadmin\swingSet\formatting\*.java .\src\com\nqadmin\swingSet\formatting\helpers\*.java .\src\com\nqadmin\swingSet\utils\*.java 

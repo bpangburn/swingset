@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Created-By: Prasanth Pasala, The Pangburn Company.
+Created-By: Prasanth Pasala, The Pangburn Group.
 
 Name: com/nqadmin/swingSet/SSLabel.class
 Java-Bean: True

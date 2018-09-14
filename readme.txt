@@ -2,14 +2,11 @@
 ReadMe file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
-$Id$
-
-
 ==============================================================================
 LICENSE
 ==============================================================================
 
-Copyright (c) 2003-2012, The Pangburn Group and Prasanth R. Pasala.
+Copyright (c) 2003-2018, The Pangburn Group and Prasanth R. Pasala.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -77,24 +74,23 @@ and
 http://sourceforge.net/projects/swingset
 
 For questions regarding SwingSet, send e-mail to:
-swingset@nqadmin.com
+swingset#NO-SPAM#@pangburngroup.com
 
 
 ==============================================================================
 INSTALLATION
 ==============================================================================
 
-SwingSet 2.0.0 requires jre 1.5 or later.
+SwingSet 2.0.1 requires jre 1.5 or later.
 
 Download the latest SwingSet binary JAR file from:
 http://sourceforge.net/projects/swingset
 
-Add swingset.jar to your CLASSPATH. Alternatively, you can copy the jar
+Add swingset JAR to your CLASSPATH. Alternatively, you can copy the JAR
 to the the /jre/lib/ext subdirectory of your JDK (for compiling) and the 
 /lib/ext subdirectory of your JRE (for execution).
 
-SwingSet has been tested with J2SE 1.5.0 and 1.6.0_22, but should work with
-all J2SE 1.5 or later releases.
+SwingSet should work with all J2SE 1.5 or later releases.
 
 Note that you will also need a JDBC driver for your target database.  If the
 driver is available as a JAR file, it should be added to your CLASSPATH or
@@ -109,9 +105,6 @@ The sample/demo programs provided with SwingSet utilize h2 database which is
 run in memory. The database is based on the suppliers-and-parts database 
 referenced in the classic database textbook, 
 "An Introduction to Database Systems,"  by C. J. Date.
-
-The demo is available as a Java Web Start application from:
-http://swingset.sourceforge.net/SwingSetDemo.jnlp
 
 Alternatively, the demo can be downloaded and run from the command line.  This
 method also requires downloading the PostgreSQL JDBC driver, H2 database engine
