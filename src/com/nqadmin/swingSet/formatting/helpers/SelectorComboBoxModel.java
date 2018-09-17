@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: SelectorComboBoxModel.java,v 1.12 2013/12/09 22:32:53 prasanth Exp $
  *
  * Tab Spacing = 4
  *
@@ -48,9 +48,9 @@ import javax.swing.JTextField;
 import javax.swing.event.ListDataListener;
 
 import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
-import ca.odell.glazedlists.*;
 
 import com.nqadmin.swingSet.datasources.SSConnection;
 
@@ -62,7 +62,9 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
 public class SelectorComboBoxModel extends AbstractListModel<SelectorElement> implements ComboBoxModel<SelectorElement> {
 	
-    private Object selectedItem = null;
+	private static final long serialVersionUID = -1266028305085372287L;
+
+	private Object selectedItem = null;
 	
     public BasicEventList<SelectorElement> data = new BasicEventList<SelectorElement>();
     
@@ -135,7 +137,7 @@ public class SelectorComboBoxModel extends AbstractListModel<SelectorElement> im
      * @param ssConnection -  connection object to be used for running the query
      * @param query - name of the query to be used
      * @param primaryKeyColumn - column name whose values should be used as underlying values
-     * @param displayColumn - column name whose values shoudl be used for displaying */
+     * @param displayColumn - column name whose values should be used for displaying */
     public SelectorComboBoxModel(SSConnection ssConnection, String query, String primaryKeyColumn, String displayColumn) { 
         super();
         propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
@@ -150,7 +152,6 @@ public class SelectorComboBoxModel extends AbstractListModel<SelectorElement> im
      *	This function refetches the information from the database. 
      */
     public void refresh() {
-        data = new BasicEventList<SelectorElement>();
         this.populateModel();
     }
     
@@ -220,6 +221,7 @@ public class SelectorComboBoxModel extends AbstractListModel<SelectorElement> im
         Object primaryValue = null;
         Object displayValue = null;
        
+        data.getReadWriteLock().writeLock().lock();
         try {
         	 Statement statement = ssConnection.getConnection().createStatement();
              ResultSet rs = statement.executeQuery(query);
@@ -245,9 +247,18 @@ public class SelectorComboBoxModel extends AbstractListModel<SelectorElement> im
             se.printStackTrace();
         } catch (java.lang.NullPointerException npe) {
             npe.printStackTrace();
+        } finally {
+        	data.getReadWriteLock().writeLock().unlock();
         }
-    // FILL THE FILTERED DATA WITH THE COMPLETE DATA GOT FROM DATABASE    
-        filteredData = new FilterList<SelectorElement>(data);        
+        
+    // FILL THE FILTERED DATA WITH THE COMPLETE DATA GOT FROM DATABASE
+        filteredData.getReadWriteLock().writeLock().lock();
+        try {
+        	filteredData.dispose();
+        	filteredData = new FilterList<SelectorElement>(data);
+        }finally {
+        	filteredData.getReadWriteLock().writeLock().unlock();
+        }
         
         this.fireContentsChanged(this, 0, filteredData.size()-1);
         this.fireIntervalRemoved(this, 0, 1);
@@ -261,20 +272,14 @@ public class SelectorComboBoxModel extends AbstractListModel<SelectorElement> im
      * @param ob - object to be added to the data
      */
     public void addElement(SelectorElement ob) {
-        data.add(ob);
+    	data.getReadWriteLock().writeLock().lock();
+    	try {
+    		data.add(ob);
+    	}finally {
+    		data.getReadWriteLock().writeLock().unlock();
+    	}
     }
     
-    /**
-     * Creates filtered data based on the actual data
-     */
-    public void createFilteredData() {
-        filteredData = new FilterList<SelectorElement>(data);
-        this.fireContentsChanged(this, 0, filteredData.size()-1);
-        this.fireIntervalAdded(this, 0, 1);
-        this.fireIntervalRemoved(this, 0, 1);
-    }
-    
-   
     /**
      * Adds a PropertyChangeListener to the listener list.
      * @param l The listener to add.
@@ -457,8 +462,10 @@ public class SelectorComboBoxModel extends AbstractListModel<SelectorElement> im
      */
 	public void setFilterEdit(JTextField filter) {
     	this.filter = filter;
-    	textMatch = new TextComponentMatcherEditor<SelectorElement>(filter, null);    
-        filteredData = new FilterList<SelectorElement>(data, textMatch);
+    	if(textMatch != null)
+    		textMatch.dispose();
+    	textMatch = new TextComponentMatcherEditor<SelectorElement>(filter, null);
+    	filteredData.setMatcherEditor(textMatch);
     }
     
     /**
@@ -494,7 +501,10 @@ public class SelectorComboBoxModel extends AbstractListModel<SelectorElement> im
 }
 
 /*
-* $Log$
+* $Log: SelectorComboBoxModel.java,v $
+* Revision 1.12  2013/12/09 22:32:53  prasanth
+* Updated the variable names, specifying the data types for lists and printing exceptions when there is an exception.
+*
 * Revision 1.11  2012/08/08 20:14:49  beevo
 * Modified to support the navigation in the SSDBCOMBOBOX filter.
 *

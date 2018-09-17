@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: SSDBComboBox.java,v 1.39 2013/12/09 22:43:01 prasanth Exp $
  *
  * Tab Spacing = 4
  *
@@ -133,8 +133,8 @@ import com.nqadmin.swingSet.formatting.helpers.SelectorElement;
  *      // ADD THE JTEXTFIELD TO THE JFRAME
  *           getContentPane().add(myText);
  *</pre><p>
- * @author  $Author$
- * @version $Revision$
+ * @author  $Author: prasanth $
+ * @version $Revision: 1.39 $
  */
 
 public class SSDBComboBox extends JComboBox {
@@ -144,7 +144,7 @@ public class SSDBComboBox extends JComboBox {
 	/**	
 	 * Model to be used for holding and filtering data in combo box.
 	 */
-	 private SelectorComboBoxModel selectorCBM;
+	 private SelectorComboBoxModel selectorCBM = new SelectorComboBoxModel();
 	  
     /**
      * Text field bound to the SSRowSet.
@@ -234,6 +234,8 @@ public class SSDBComboBox extends JComboBox {
      * Format for any date columns displayed in combo box.
      */
     protected String dateFormat = "MM/dd/yyyy";
+    
+    protected volatile boolean inUpdateDisplay = false;
 
     /**
      * Creates an object of the SSDBComboBox.
@@ -521,7 +523,6 @@ public class SSDBComboBox extends JComboBox {
             if (query.equals("")) {
                 throw new Exception("Query is empty");
             }
-        	selectorCBM  = new SelectorComboBoxModel();
         	selectorCBM.setQuery(query);
         	selectorCBM.setDateFormat(dateFormat);
         	selectorCBM.setPrimaryKeyColumn(primaryKeyColumnName);
@@ -530,12 +531,16 @@ public class SSDBComboBox extends JComboBox {
     		selectorCBM.setSeparator(seperator);
     		selectorCBM.setSSConnection(sSConnection);
     		selectorCBM.refresh();
-    		this.setModel(selectorCBM);
+    		setModel(selectorCBM);
     		itemMap = selectorCBM.itemMap;
     		numberOfItems = selectorCBM.getSize();
-    		
+
+    		// UPDATE DISPLAY WILL ADD THE LISTENERS AT THE END SO NO NEED TO ADD IT AGAIN.
             updateDisplay();
+            
+            //ADD THE LISTENERS BACK
             addListeners();
+
     }
 
     /**
@@ -563,14 +568,7 @@ public class SSDBComboBox extends JComboBox {
      * @param _value   value corresponding the the name
      */
      public void addItem(String _name, long _value) {
-    	 selectorCBM.data.getReadWriteLock().writeLock().lock();
-    	 try {
-	    	 selectorCBM.data.add(new SelectorElement(_value,_name));
-	    	 itemMap.put(""+_value, (long) itemMap.size());
-	    	 numberOfItems++;
-    	 }finally {
-    		 selectorCBM.data.getReadWriteLock().writeLock().unlock();
-    	 }
+    	 addStringItem(_name, String.valueOf(_value));
      }
 
     /**
@@ -600,26 +598,7 @@ public class SSDBComboBox extends JComboBox {
       * @return returns true on successful deletion else returns false.
       */
      public boolean deleteItem(long _value) {
-    	 selectorCBM.data.getReadWriteLock().writeLock().lock();
-    	 try {
-			 if (itemMap.get((""+_value)) == null) return false;
-			 
-		     long indexL = itemMap.get((""+_value));
-		     int index = (int) indexL;
-		     
-		     selectorCBM.data.remove(index);
-		     itemMap.remove(""+_value);
-		    
-		     Map<String, Long> tempItemMap = new HashMap<String, Long>();
-		 	 for (Map.Entry<String, Long> entry : itemMap.entrySet()){		
-		 		 if ( entry.getValue() > indexL ) tempItemMap.put(entry.getKey(), indexL++);  		
-		  	 }
-		  	 itemMap.putAll(tempItemMap);
-		     numberOfItems--;
-		     return true;
-    	 }finally {
-    		 selectorCBM.data.getReadWriteLock().writeLock().unlock();
-    	 }
+    	 return deleteStringItem(String.valueOf(_value));
      }
 
      /**
@@ -727,15 +706,18 @@ public class SSDBComboBox extends JComboBox {
 
         // REMOVE LISTENERS TO PREVENT DUPLICATION
             removeListeners();
-            
-        // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
-            textField.setDocument(new SSTextDocument(sSRowSet, columnName));
-
-        // SET THE COMBO BOX ITEM DISPLAYED
-            updateDisplay();
-
-        // ADD BACK LISTENERS
-            addListeners();
+            try {
+	            
+	        // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
+	            textField.setDocument(new SSTextDocument(sSRowSet, columnName));
+	
+	        // SET THE COMBO BOX ITEM DISPLAYED
+	            updateDisplay();
+	            
+            }finally { 
+            	// ADD BACK LISTENERS
+            	addListeners();
+            }
     }
 
     /**
@@ -743,24 +725,30 @@ public class SSDBComboBox extends JComboBox {
      * binding.
      */
     protected void updateDisplay() {
-    //try {
-        // GET THE VALUE FROM TEXT FIELD
-        String text = textField.getText().trim();
 
-        if (!text.equals("") && itemMap != null && itemMap.get(text) != null ) {
-            //long valueInText = Long.parseLong(text);
-            // GET THE INDEX WHERE THIS VALUE IS IN THE VECTOR.
-        	long longIndex = itemMap.get(text);
-            int index = (int) longIndex;
-            if (index != getSelectedIndex()) {
-                setSelectedIndex(index);
-                updateUI();
-            }
-        }
-        else {
-            setSelectedIndex(-1);
-            updateUI();
-        }
+    	// THIS WILL MAKE SURE COMBO BOX ACTION LISTENER DOESN'T DO ANY THING EVEN IF IT GETS CALLED
+    	inUpdateDisplay = true;
+    	try {
+	        // GET THE VALUE FROM TEXT FIELD
+	        String text = textField.getText().trim();
+	
+	        if (!text.equals("") && itemMap != null && itemMap.get(text) != null ) {
+	            //long valueInText = Long.parseLong(text);
+	            // GET THE INDEX WHERE THIS VALUE IS IN THE VECTOR.
+	        	long longIndex = itemMap.get(text);
+	            int index = (int) longIndex;
+	            if (index != getSelectedIndex()) {
+	                setSelectedIndex(index);
+	                updateUI();
+	            }
+	        }
+	        else {
+	            setSelectedIndex(-1);
+	            updateUI();
+	        }
+    	}finally {
+    		inUpdateDisplay = false;
+    	}
     }
 
     /**
@@ -844,24 +832,29 @@ public class SSDBComboBox extends JComboBox {
      */
     private class MyTextFieldDocumentListener implements DocumentListener {
     	public void changedUpdate(DocumentEvent de) {
-        	removeActionListener(cmbListener);
-            updateDisplay();
-            addActionListener(cmbListener);
+    		// DON'T MOVE THE REMOVE ADD LISTENER CALLS TO UPDATEDISPLAY
+    		// AS UPDATE DISPLAY IS CALLED IN OTHER PLACES WHICH REMOVE AND ADD LISTENERS
+    		// THIS WOULD MAKE THE ADDLISTENER CALL TWICE SO THERE WILL BE TWO LISTENERS
+    		// AND A CALL TO REMOVE LISTENER IS NOT GOOD ENOUGH
+    		removeListeners();
+       		updateDisplay();
+       		addListeners();
         }
     	
         public void insertUpdate(DocumentEvent de) {
-        	removeActionListener(cmbListener);
-            updateDisplay();
-            addActionListener(cmbListener);           
+        	removeListeners();
+       		updateDisplay();
+       		addListeners();
         }
         
         public void removeUpdate(DocumentEvent de) {
-        	removeActionListener(cmbListener);
-            updateDisplay();
-            addActionListener(cmbListener);
+        	removeListeners();
+       		updateDisplay();
+       		addListeners();
         }
 
     } // end private class MyTextFieldDocumentListener implements DocumentListener {
+    
  
     /**
      * @author mvo
@@ -1008,37 +1001,47 @@ public class SSDBComboBox extends JComboBox {
      * bound text field.
      */
     private class MyComboListener implements ActionListener {
-    	public void actionPerformed(ActionEvent ae) {	
+    	public void actionPerformed(ActionEvent ae) {
+    		// IF WE ARE UPDATING THE DISPLAY DON'T DO ANY THING.
+    		if(inUpdateDisplay) {
+    			return;
+    		}
+    		
         	//dont fire an action if the size of the filtered model is not the same as the initial item size
         	if (selectorCBM != null){
         		if (selectorCBM.getSize() != selectorCBM.data.size()) return;
         	}
+        	
         	textField.getDocument().removeDocumentListener(textFieldDocumentListener);
 
-            // GET THE INDEX CORRESPONDING TO THE SELECTED TEXT IN COMBO
-            int index = getSelectedIndex();
-            // IF THE USER WANTS TO REMOVE COMPLETELY THE VALUE IN THE FIELD HE CHOOSES
-            // THE EMPTY STRING IN COMBO THEN THE TEXT FIELD IS SET TO EMPTY STRING
-            if (index != -1) {
-                try {
-                    String textFieldText = textField.getText();
-                    String textPK= selectorCBM.getSelectedBoundData(index).toString();
-                    if (!textFieldText.equals(textPK)) {
-                        textField.setText(textPK);
-                    }
-                    // IF THE LONG VALUE CORRESPONDING TO THE SELECTED TEXT OF COMBO NOT EQUAL
-                    // TO THAT IN THE TEXT FIELD THEN CHANGE THE TEXT IN THE TEXT FIELD TO THAT VALUE
-                    // IF ITS THE SAME LEAVE IT AS IS
-                } catch(NullPointerException npe) {
-                	npe.printStackTrace();
-                } catch(NumberFormatException nfe) {
-                	nfe.printStackTrace();
-                }
-            }
-            else {
-                textField.setText("");
-            }
-            textField.getDocument().addDocumentListener(textFieldDocumentListener);
+        	try {
+	            // GET THE INDEX CORRESPONDING TO THE SELECTED TEXT IN COMBO
+	            int index = getSelectedIndex();
+	            // IF THE USER WANTS TO REMOVE COMPLETELY THE VALUE IN THE FIELD HE CHOOSES
+	            // THE EMPTY STRING IN COMBO THEN THE TEXT FIELD IS SET TO EMPTY STRING
+	            if (index != -1) {
+	                try {
+	                    String textFieldText = textField.getText();
+	                    String textPK= selectorCBM.getSelectedBoundData(index).toString();
+	                    if (!textFieldText.equals(textPK)) {
+	                        textField.setText(textPK);
+	                    }
+	                    // IF THE LONG VALUE CORRESPONDING TO THE SELECTED TEXT OF COMBO NOT EQUAL
+	                    // TO THAT IN THE TEXT FIELD THEN CHANGE THE TEXT IN THE TEXT FIELD TO THAT VALUE
+	                    // IF ITS THE SAME LEAVE IT AS IS
+	                } catch(NullPointerException npe) {
+	                	npe.printStackTrace();
+	                } catch(NumberFormatException nfe) {
+	                	nfe.printStackTrace();
+	                }
+	            }
+	            else {
+	                textField.setText("");
+	            }
+	            
+        	}finally {
+        		textField.getDocument().addDocumentListener(textFieldDocumentListener);
+        	}
             
             // WHEN SET SELECTED INDEX IS CALLED SET SELECTED ITEM WILL BE CALLED ON THE MODEL AND THIS FUNCTION 
             // IS SUPPOSED TO FIRE A EVENT TO CHANGE THE TEXT BUT IT WILL CAUSE ISSUES IN OUR IMPLEMENTATION
@@ -1053,7 +1056,10 @@ public class SSDBComboBox extends JComboBox {
 
 
 /*
- * $Log$
+ * $Log: SSDBComboBox.java,v $
+ * Revision 1.39  2013/12/09 22:43:01  prasanth
+ * Did some code cleanup and modified code to display the value when we set value programatically. The value was being set but the display was not updated.
+ *
  * Revision 1.38  2012/08/09 20:39:21  beevo
  * Added removePopupMenuListener() to removeListeners() method to fix bug that occured when bind() was called.
  *
