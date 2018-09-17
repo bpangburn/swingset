@@ -20,6 +20,9 @@ mkdir ./release_jars/src/com/nqadmin/swingSet/utils
 mkdir ./release_jars/src/com/nqadmin/swingSet/formatting
 mkdir ./release_jars/src/com/nqadmin/swingSet/formatting/helpers
 mkdir ./release_jars/demo
+mkdir ./release_jars/demo/src
+mkdir ./release_jars/demo/bin
+mkdir ./release_jars/demo/lib
 mkdir ./release_jars/images
 mkdir ./release_jars/images/icons
 
@@ -55,11 +58,16 @@ jar -cvf ./release_jars/swingset-docs_current.jar -C ./release_jars/docs . readm
 jar -cvf ./release_jars/swingset-src_current.jar -C ./release_jars/src com -C ./release_jars images readme.txt ChangeLog.txt FAQ.txt
 
 # COMPILE DEMO
-javac -source 1.5 -target 1.5 -d ./release_jars/demo -classpath ./lib/glazedlists-1.8.0.jar:./release_jars/swingset-bin_current.jar ./src/samples/Example*.java ./src/samples/MainClass.java
+javac -source 1.5 -target 1.5 -d ./release_jars/demo/bin -classpath ./lib/glazedlists-1.8.0.jar:./release_jars/swingset-bin_current.jar ./src/samples/Example*.java ./src/samples/MainClass.java
 
 # COPY DEMO SOURCE CODE
-cp ./src/samples/* ./release_jars/demo/
-rm ./release_jars/demo/*.java~
+cp ./src/samples/*.java ./release_jars/demo/src
+
+# COPY DEMO DEPENDENCIES
+cp ./release_jars/swingset-bin_current.jar ./release_jars/demo/lib
+cp ./lib/*.jar ./release_jars/demo/lib
+cp ./src/samples/suppliers_and_parts.sql ./release_jars/demo
+cp ./src/samples/readme.txt ./release_jars/demo
 
 # BUILD DEMO JAR
-jar -mcvf ./META-INF/MANIFEST-DEMO.MF ./release_jars/swingset-demo_current.jar -C ./release_jars/demo . readme.txt
+jar -cvf ./release_jars/swingset-demo_current.jar -C ./release_jars/demo .

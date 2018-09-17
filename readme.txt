@@ -86,13 +86,13 @@ SwingSet 2.0.1 requires jre 1.5 or later.
 Download the latest SwingSet binary JAR file from:
 http://sourceforge.net/projects/swingset
 
-Add swingset JAR to your CLASSPATH. Alternatively, you can copy the JAR
+Add the swingset JAR to your CLASSPATH. Alternatively, you can copy the JAR
 to the the /jre/lib/ext subdirectory of your JDK (for compiling) and the 
 /lib/ext subdirectory of your JRE (for execution).
 
 SwingSet should work with all J2SE 1.5 or later releases.
 
-Note that you will also need a JDBC driver for your target database.  If the
+Note that you may also need a JDBC driver for your target database.  If the
 driver is available as a JAR file, it should be added to your CLASSPATH or
 placed in the same /lib/ext subdirectories mentioned above.
 
@@ -101,87 +101,7 @@ placed in the same /lib/ext subdirectories mentioned above.
 SAMPLE/DEMO PROGRAMS
 ==============================================================================
 
-The sample/demo programs provided with SwingSet utilize h2 database which is 
-run in memory. The database is based on the suppliers-and-parts database 
-referenced in the classic database textbook, 
-"An Introduction to Database Systems,"  by C. J. Date.
-
-Alternatively, the demo can be downloaded and run from the command line.  This
-method also requires downloading the PostgreSQL JDBC driver, H2 database engine
-and sql for supplier and parts database.  The PostgreSQL JDBC JAR file is 
-available from: http://jdbc.postgresql.org/download.html, H2 jars are 
-available at http://www.h2database.com/html/download.html and sql for database
-can be downloaded at https://swingset.sourceforge.net/lib/populate.sql
-
-All the jars downloaded should be added to your CLASSPATH.
-
-After installing the JDBC driver, download the latest SwingSet demo JAR file
-to the location of your choice.  The file is available from:
-http://sourceforge.net/projects/swingset
-
-
-***********************
-Example1
-***********************
-This example demonstrates the use of SSTextDocument to display information in
-JTextField (Name, City, and Status). The navigation is done with
-SSDataNavigator.
-
-
-***********************
-Example2
-***********************
-This example demonstrates the use of SSTextDocument to display information in
-JTextField (Name and City) and SSComboBox (Status). The navigation is done with
-SSDataNavigator.
-
-
-***********************
-Example3
-***********************
-This example demonstrates the use of SSTextDocument to display information in
-SSDBComboBox (Supplier and Part) and JTextField (Quantity). The navigation
-is done with SSDataNavigator.
-
-
-***********************
-Example4
-***********************
-This example demonstrates the use of SSDBComboBox for record navigation.
-Navigation can be accomplished using either the Part combo box or the
-navigation bar. Since the part name is used for navigation it can't be
-updated (note that none of the fields in these examples can actually be
-updated since the demo database is read only).
-
-Because the navigation can take place by multiple methods, the navigation
-controls have to be synchronized.  This is done using a "helper" class
-called SSSyncManager.
-
-This example also demonstrates the use of SSTextDocument to display
-information in SSComboBox (Color) and JTextField (Weight and City).
-
-
-***********************
-Example5
-***********************
-This example demonstrates the use of SSDataGrid to display information
-in a table format. If the database were editable, users could also delete rows
-by selecting the row to be deleted and pressing Ctrl-X. By default, a
-confirmation message is displayed before deletion.
-
-
-***********************
-Example6
-***********************
-This example demonstrates the use of SSDataGrid with a combo box renderer.
-
-
-***********************
-Example7
-***********************
-This example demonstrates the use of SSDataGrid with two combo box renderers
-and a date renderer. The mappings for the combo boxes are retrieved from another
-table.
+See readme.txt contained in the swingset-demo jar file.
 
 
 ==============================================================================
