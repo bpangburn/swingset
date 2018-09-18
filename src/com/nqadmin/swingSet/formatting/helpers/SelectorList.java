@@ -55,6 +55,11 @@ import ca.odell.glazedlists.event.ListEventListener;
  */
 public class SelectorList extends JList implements ListDataListener, ListEventListener {
     
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6085433762502942928L;
+
 	private JTextField txtFilter = new JTextField();
 	
 	private JScrollPane scrollPane = new JScrollPane();

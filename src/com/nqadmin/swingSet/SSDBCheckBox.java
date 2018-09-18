@@ -68,7 +68,12 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  */
 public class SSDBCheckBox extends JCheckBox {
 
-    // TEXT FIELD BOUND TO THE DATABASE
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7708152057594247158L;
+
+	// TEXT FIELD BOUND TO THE DATABASE
     private JTextField textField = new JTextField();
 
     private String columnName;
@@ -220,7 +225,12 @@ public class SSDBCheckBox extends JCheckBox {
 
     // LISTENER FOR THE TEXT FIELD
     private class MyTextFieldListener implements DocumentListener, Serializable {
-        private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = -798705942676231862L;
+
+		private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
             objIn.defaultReadObject();
         }
 
@@ -331,7 +341,12 @@ public class SSDBCheckBox extends JCheckBox {
     // TEXT FIELD FOR FURTHER PROPOGATION TO THE UNDERLYING STORAGE STRUCTURE.
     private class MyCheckBoxListener implements ChangeListener, Serializable {
 
-        private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = -6245509211162728028L;
+
+		private void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
             objIn.defaultReadObject();
         }
 

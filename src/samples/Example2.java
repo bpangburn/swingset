@@ -48,7 +48,11 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
  public class Example2 extends JFrame{
 	
-    JLabel lblSupplierName   = new JLabel("Name");
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 9205688923559422257L;
+	JLabel lblSupplierName   = new JLabel("Name");
     JLabel lblSupplierCity   = new JLabel("City");
     JLabel lblSupplierStatus = new JLabel("Status");
 
@@ -85,7 +89,11 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         // ROW AND KEEPING THE CURSOR AT THE NEWLY INSERTED ROW.
         // IF USING ANOTHER DATABASE, THE FOLLOWING IS NOT REQURIED:   
         navigator.setDBNav(new SSDBNavAdapter(){
-           	@Override
+           	/**
+			 * 
+			 */
+			private static final long serialVersionUID = 6964661066285402119L;
+			@Override
         	public void performPreInsertOps() {
  		
  				super.performPreInsertOps();

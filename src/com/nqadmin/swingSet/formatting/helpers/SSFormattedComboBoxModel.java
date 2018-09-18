@@ -51,6 +51,11 @@ import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
 public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel implements MutableComboBoxModel, Serializable {
     
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8033305026029930428L;
+
+	/**
      * Holds selected Object.
      */
     private Object selectedOne = null;

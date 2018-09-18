@@ -80,7 +80,12 @@ import com.nqadmin.swingSet.formatting.helpers.SSFormattedComboBoxModel;
  */
 public class SSFormattedTextField extends JFormattedTextField implements RowSetListener, KeyListener, MouseListener, BeanContextProxy, FocusListener {
     
-    private BeanContextChildSupport beanContextChildSupport = new BeanContextChildSupport();
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5349618425984728006L;
+
+	private BeanContextChildSupport beanContextChildSupport = new BeanContextChildSupport();
     
     private JPopupMenu menu       = null;
     private JPopupMenu calculator = null;

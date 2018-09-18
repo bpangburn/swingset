@@ -65,7 +65,11 @@ import com.nqadmin.swingSet.formatting.SSFormattedTextField;
  */
 public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor, PropertyChangeListener, MouseListener {
     
-    protected SSFormattedTextField editor;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -820040230616079711L;
+	protected SSFormattedTextField editor;
     protected JLabel display;
     
     private SelectorElement editValue = null;

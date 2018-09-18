@@ -58,6 +58,11 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
 public class SSLabel extends JLabel {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5232780793538061537L;
+
+	/**
      * Text field bound to the SSRowSet.
      */
     protected JTextField textField = new JTextField();
@@ -252,7 +257,12 @@ public class SSLabel extends JLabel {
      * component's value.
      */
     private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
-        public void changedUpdate(DocumentEvent de) {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = -6911906045174819801L;
+
+		public void changedUpdate(DocumentEvent de) {
             removePropertyChangeListener("text", labelTextListener);
 
             updateDisplay();
@@ -286,7 +296,12 @@ public class SSLabel extends JLabel {
      * bound text field.
      */
     private class MyLabelTextListener implements PropertyChangeListener, Serializable {
-        public void propertyChange(PropertyChangeEvent pce) {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 6786673052979566820L;
+
+		public void propertyChange(PropertyChangeEvent pce) {
             textField.getDocument().removeDocumentListener(textFieldDocumentListener);
 
             textField.setText(getText());

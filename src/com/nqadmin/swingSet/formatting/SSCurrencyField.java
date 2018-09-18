@@ -44,7 +44,11 @@ import javax.swing.JTextField;
 
 public class SSCurrencyField extends SSFormattedTextField {
     
-    private int precision = 3;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1636264407572416306L;
+	private int precision = 3;
     private int decimals  = 2;
 
     /**

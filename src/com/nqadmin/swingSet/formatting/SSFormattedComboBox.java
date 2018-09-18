@@ -53,7 +53,11 @@ import com.nqadmin.swingSet.formatting.helpers.SSFormattedComboBoxRenderer;
  */
 public class SSFormattedComboBox extends JComboBox implements ActionListener {
     
-    protected SSFormattedComboBoxEditor editor = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8096912066245475037L;
+	protected SSFormattedComboBoxEditor editor = null;
     protected SSFormattedComboBoxRenderer renderer = null;
     
     private SSFormattedComboBoxModel model = null;

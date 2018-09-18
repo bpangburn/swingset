@@ -47,6 +47,11 @@ public class SSIntegerFormatterFactory extends javax.swing.text.DefaultFormatter
 
 	
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7431201446112333734L;
+
+	/**
      * Constructs a default SSIntegerFormatterFactory 
      */
     public SSIntegerFormatterFactory() {

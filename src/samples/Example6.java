@@ -39,7 +39,11 @@ import java.sql.*;
 
 public class Example6 extends JFrame {
 
-    SSConnection ssConnection = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1727893372201402700L;
+	SSConnection ssConnection = null;
     SSJdbcRowSetImpl rowset   = null;
     SSDataGrid dataGrid = new SSDataGrid();
     String url;

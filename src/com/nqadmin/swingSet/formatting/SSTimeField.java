@@ -40,7 +40,12 @@ import java.util.Calendar;
 
 public class SSTimeField extends SSFormattedTextField {
     
-    /** 
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -9007900169899885575L;
+
+	/** 
      * Creates a new instance of SSTimeField 
      */
     public SSTimeField() {

@@ -65,6 +65,11 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  */public class SSImage extends JPanel {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2726746843832259767L;
+
+	/**
      * ImageIcon to store the image.
      */
     protected ImageIcon img;

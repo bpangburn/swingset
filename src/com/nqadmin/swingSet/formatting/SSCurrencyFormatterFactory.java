@@ -46,6 +46,11 @@ import javax.swing.text.NumberFormatter;
 public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
     
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3893270430611620113L;
+
+	/**
      *  SSCurrencyFormatterFactory constructor, without arguments.
      *  Creates a SSCurrencyFormatter with default Locale 
      */

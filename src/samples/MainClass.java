@@ -41,7 +41,11 @@ import java.awt.event.*;
 
 public class MainClass extends JFrame {
 	
-    JButton btnExample1 = new JButton("Example1");
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6316984401822746124L;
+	JButton btnExample1 = new JButton("Example1");
     JButton btnExample2 = new JButton("Example2");
     JButton btnExample3 = new JButton("Example3");
     JButton btnExample4 = new JButton("Example4");

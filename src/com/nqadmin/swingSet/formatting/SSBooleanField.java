@@ -54,7 +54,11 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  */
 public class SSBooleanField extends JCheckBox implements RowSetListener, KeyListener {
     
-    private java.awt.Color std_color = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -856226927518717477L;
+	private java.awt.Color std_color = null;
     private String columnName = null;
     private int colType = -99;
     private SSRowSet rowset = null;

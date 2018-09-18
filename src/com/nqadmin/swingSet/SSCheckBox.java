@@ -70,6 +70,11 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
 public class SSCheckBox extends JCheckBox {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1204307502900668225L;
+
+	/**
      * Text field bound to the SSRowSet.
      */
     protected JTextField textField = new JTextField();
@@ -312,7 +317,12 @@ public class SSCheckBox extends JCheckBox {
      */
     private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
-        public void changedUpdate(DocumentEvent de){
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 662317066187756908L;
+
+		public void changedUpdate(DocumentEvent de){
             removeItemListener(checkBoxListener);
             
             updateDisplay();
@@ -347,7 +357,12 @@ public class SSCheckBox extends JCheckBox {
      */
     private class MyCheckBoxListener implements ItemListener, Serializable {
 
-        public void itemStateChanged(ItemEvent ie) {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = -8006881399306841024L;
+
+		public void itemStateChanged(ItemEvent ie) {
             textField.getDocument().removeDocumentListener(textFieldDocumentListener);
 
             if ( ((JCheckBox)ie.getSource()).isSelected() ) {

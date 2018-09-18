@@ -62,6 +62,11 @@ import javax.swing.JTable;
 public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2748762202415891694L;
+
+	/**
      * On state for copying or pasting.
      */
     protected int onMask = KeyEvent.CTRL_DOWN_MASK;

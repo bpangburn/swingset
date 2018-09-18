@@ -66,7 +66,12 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  */
 public class SSTableModel extends AbstractTableModel {
 
-    protected SSRowSet rowset = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7650858998003486418L;
+
+	protected SSRowSet rowset = null;
 
     /**
      * Number of rows in the SSRowSet.

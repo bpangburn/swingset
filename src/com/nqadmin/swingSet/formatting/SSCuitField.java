@@ -50,7 +50,11 @@ import javax.swing.text.DefaultCaret;
 
 public class SSCuitField extends SSFormattedTextField {
   
-    private Caret cuitCaret;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6012580680828883089L;
+	private Caret cuitCaret;
   
     /** 
      * Creates a new instance of SSCuitFieldField 

@@ -40,6 +40,10 @@ package com.nqadmin.swingSet.formatting;
 
 public class SSDateField extends SSFormattedTextField {
     
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9138021901389692436L;
 	public static final int MMDDYYYY = 0;
 	public static final int DDMMYYYY = 1;
 	

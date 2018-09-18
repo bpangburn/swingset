@@ -155,6 +155,11 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
 public class SSDataGrid extends JTable {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7924790696188174770L;
+
+	/**
      * Component where messages should be popped up.
      */
     protected Component messageWindow = null;
@@ -818,6 +823,11 @@ public class SSDataGrid extends JTable {
      */
     class DefaultEditor extends DefaultCellEditor{
         /**
+		 * 
+		 */
+		private static final long serialVersionUID = -5408829003545103686L;
+
+		/**
          *  Value of the editor.
          */
         Object value;
@@ -1133,7 +1143,12 @@ public class SSDataGrid extends JTable {
      * the format to mm/dd/yyy from yyyy-mm-dd.
      */
     protected class DateEditor extends DefaultCellEditor {
-        // CONSTRUCTOR FOR THE EDITOR CLASS
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 8741829961228359406L;
+
+		// CONSTRUCTOR FOR THE EDITOR CLASS
         public DateEditor(){
             super(new SSTextField(SSTextField.MMDDYYYY));
             getComponent().setFocusTraversalKeysEnabled(false);
@@ -1213,6 +1228,11 @@ public class SSDataGrid extends JTable {
      */
 	protected class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -8310278203475303010L;
+
 		public CheckBoxRenderer(){
 			super();
 		}
@@ -1250,7 +1270,11 @@ public class SSDataGrid extends JTable {
      * Editor for check box fields.
      */
     protected class CheckBoxEditor extends DefaultCellEditor {
-    // VARIABLE TO STORE THE COLUMN CLASS.
+    /**
+		 * 
+		 */
+		private static final long serialVersionUID = 966225988861238964L;
+		// VARIABLE TO STORE THE COLUMN CLASS.
 	   	protected int columnClass = 0;
 
     	public CheckBoxEditor(){
@@ -1328,7 +1352,12 @@ public class SSDataGrid extends JTable {
      */
     protected class DateRenderer extends DefaultTableCellRenderer {
 
-        public  void setValue(Object value) {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 2167118906692276587L;
+
+		public  void setValue(Object value) {
             if (value instanceof java.sql.Date) {
                 Date date = (Date)value;
                 GregorianCalendar calendar = new GregorianCalendar();
@@ -1348,7 +1377,11 @@ public class SSDataGrid extends JTable {
      */
 //    protected class ComboRenderer extends JComboBox implements TableCellRenderer {
     protected class ComboRenderer extends DefaultTableCellRenderer.UIResource {
-        Object[] underlyingValues = null;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 2010609036458432567L;
+		Object[] underlyingValues = null;
 //        JLabel label = new JLabel();
         Object[] displayValues = null;
 
@@ -1400,7 +1433,11 @@ public class SSDataGrid extends JTable {
      * Editor for combo box fields.
      */
     protected class ComboEditor extends DefaultCellEditor {
-        Object[] underlyingValues = null;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = -6439941232160386725L;
+		Object[] underlyingValues = null;
         // SET THE CLICK COUNT TO EDIT THE COMBO AS 2
         int clickCountToStart = 2;
 //      JComboBox comboBox = null;

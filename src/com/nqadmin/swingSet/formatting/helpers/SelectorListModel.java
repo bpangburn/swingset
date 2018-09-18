@@ -55,7 +55,11 @@ import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
 
 public class SelectorListModel extends AbstractListModel implements ComboBoxModel {
 	
-    private Object selectedOne = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2436267331238687202L;
+	private Object selectedOne = null;
 	private BasicEventList data = new BasicEventList();
 	/*
 	 * Changed TextFilterList to FilterList because of new glazedlist jar update.

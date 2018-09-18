@@ -76,6 +76,11 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
 public class SSDataNavigator extends JPanel {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3129669039062103212L;
+
+	/**
      * Button to navigate to the first record in the SSRowSet.
      */
     protected JButton firstButton = new JButton();

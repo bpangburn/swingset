@@ -42,7 +42,12 @@ package com.nqadmin.swingSet.formatting;
 public class SSSSNField extends SSFormattedTextField {
   
   
-    /** 
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8330641913621926923L;
+
+	/** 
      * Creates a new instance of SSSSNField 
      */
     public SSSSNField() {

@@ -75,6 +75,11 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
 public class SSTextDocument extends javax.swing.text.PlainDocument {
     
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8837650674496040218L;
+
+	/**
      * SSRowSet from which document will get/set values.
      */
     protected SSRowSet sSRowSet;
@@ -508,7 +513,12 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
      * Listener(s) for the bound document used to update the underlying SSRowSet.
      */    
     private class MyDocumentListener implements DocumentListener, Serializable {
-        // WHEN EVER THERE IS ANY CHANGE IN THE DOCUMENT CAN BE REMOVE UPDATE
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 2287696691641310793L;
+
+		// WHEN EVER THERE IS ANY CHANGE IN THE DOCUMENT CAN BE REMOVE UPDATE
         // CHANGED UPDATE OR INSERT UPDATE GET THE TEXT IN THE DOCUMENT
         // AND UPDATE THE COLUMN IN THE SSROWSET
         // TO AVOID THE TRIGGERING OF UPDATE ON THE SSROWSET AS A RESULT OF UPDATING THE COLUMN VALUE
@@ -552,7 +562,12 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
      * Listener(s) for the underlying SSRowSet used to update the bound document.
      */  
     private class MyRowSetListener implements RowSetListener, Serializable {
-        // WHEN EVER THERE IS A CHANGE IN SSROWSET CAN BE ROW-CHANGED OR SSROWSET-CHANGED
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = -5194433723970625351L;
+
+		// WHEN EVER THERE IS A CHANGE IN SSROWSET CAN BE ROW-CHANGED OR SSROWSET-CHANGED
         // OR CURSOR-MOVED GET THE NEW TEXT CORRESPONDING TO THE COLUMN AND UPDATE THE DOCUMENT
         // WHILE DOING SO YOU CAN CAUSE A EVENT TO FIRE WHEN DOCUMENT CHANGES SO REMOVE THE
         // LISTENER ON THE DOCUMENT THEN CHANGE THE DOCUMENT AND THEN ADD BACK THE LISTENER

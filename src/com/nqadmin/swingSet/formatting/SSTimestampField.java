@@ -42,7 +42,11 @@ import java.sql.Timestamp;
  */
 
 public class SSTimestampField extends SSFormattedTextField {
-    private Timestamp ts = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4689820569270582334L;
+	private Timestamp ts = null;
     
     /** 
      * Creates a new instance of SSTimeField 

@@ -59,7 +59,11 @@ import com.nqadmin.swingSet.formatting.SSFormattedTextField;
  */
 public class HelperPopup extends JPopupMenu implements MouseListener, KeyListener, ActionListener, ListSelectionListener, PopupMenuListener, FocusListener {
     
-    private JPanel spane;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2615782240022599464L;
+	private JPanel spane;
     private JPanel buttons;
     private JPanel tpane;
     private JButton searchButton;

@@ -51,6 +51,11 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
 public class SSTextArea extends JTextArea {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1256528482424744463L;
+
+	/**
      * SSRowSet from which component will get/set values.
      */
     protected SSRowSet sSRowSet;

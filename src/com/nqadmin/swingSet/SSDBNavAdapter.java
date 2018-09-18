@@ -52,6 +52,11 @@ import java.io.Serializable;
 public class SSDBNavAdapter implements SSDBNav, Serializable {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1598570407121698368L;
+
+	/**
      * Method to perform pre-insertion operations.
      */
     public void performPreInsertOps(){

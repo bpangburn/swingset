@@ -72,6 +72,10 @@ import com.nqadmin.swingSet.formatting.SSFormattedTextField;
 public class SSDBNavImp extends SSDBNavAdapter {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4632505399798312457L;
+	/**
      * Screen where componets to be cleared are located.
      */
     protected Container container = null;

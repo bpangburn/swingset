@@ -57,7 +57,11 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  */
 public class SSMemoField extends JTextArea implements RowSetListener, KeyListener, FocusListener {
     
-    private java.awt.Color std_color = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7984808092295218942L;
+	private java.awt.Color std_color = null;
     private String columnName = null;
     private int colType = -99;
     private SSRowSet rowset = null;

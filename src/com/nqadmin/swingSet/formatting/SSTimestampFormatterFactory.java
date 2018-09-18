@@ -46,6 +46,11 @@ import javax.swing.text.DateFormatter;
 public class SSTimestampFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1206910593127977868L;
+
+	/**
      * Creates an instance of SSTimestampFormatterFactory 
      * the display format used is dd/MM/yyyy hh:mm:ss SSS Z and the edit format is ddMMyyyyHHmmssSSSZ 
      */

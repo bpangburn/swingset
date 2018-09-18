@@ -37,7 +37,12 @@ import javax.swing.JTextField;
 
 public class SSPercentField extends SSFormattedTextField {
     
-    /** 
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3688135906130676106L;
+
+	/** 
      * Creates a default object of SSPercentField 
      */
     public SSPercentField() {

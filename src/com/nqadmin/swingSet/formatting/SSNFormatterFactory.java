@@ -43,7 +43,11 @@ import javax.swing.text.MaskFormatter;
  */
 public class SSNFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
 
-    private MaskFormatter defaultFormatter;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7141905652057051134L;
+	private MaskFormatter defaultFormatter;
     private MaskFormatter displayFormatter;
     private MaskFormatter editFormatter;
     private MaskFormatter nullFormatter;

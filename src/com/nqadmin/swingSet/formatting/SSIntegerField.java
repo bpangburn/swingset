@@ -43,7 +43,12 @@ import javax.swing.JTextField;
 
 public class SSIntegerField extends SSFormattedTextField {
     
-    private int precision = 1;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1820785941185499480L;
+
+	private int precision = 1;
     
     /**
      * Holds value of property minimumIntegerDigits.

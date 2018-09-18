@@ -46,6 +46,11 @@ import javax.swing.text.DateFormatter;
 public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8205600502325364394L;
+
+	/**
 	 * Constant for date format
 	 */
 	public static final int MMDDYYYY = 0;

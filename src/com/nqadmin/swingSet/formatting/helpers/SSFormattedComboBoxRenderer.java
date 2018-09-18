@@ -52,7 +52,11 @@ import javax.swing.UIManager;
  */
 public class SSFormattedComboBoxRenderer extends JPanel implements ListCellRenderer, Serializable {
     
-    private JLabel listLabel = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4893131319725819812L;
+	private JLabel listLabel = null;
     private SelectorElement el = null;
 
     private Color evenRowBackground = Color.WHITE;

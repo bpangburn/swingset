@@ -53,6 +53,11 @@ import java.io.Serializable;
 public abstract class SSCellEditingAdapter implements SSCellEditing, Serializable {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8081589658308592606L;
+
+	/**
      * This empty implementation always returns true.
      * For description about the function look in SSCellEditing class.
      */

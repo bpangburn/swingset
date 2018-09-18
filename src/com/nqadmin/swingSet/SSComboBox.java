@@ -99,6 +99,11 @@ public class SSComboBox extends JComboBox {
          as strings, similar to SSDBComboBox. */
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 521308332266885608L;
+
+	/**
      * Value to represent that no item has been selected in the combo box.
      */
     public static final int NON_SELECTED = (int)((Math.pow(2, 32) -1)/(-2));
@@ -585,6 +590,11 @@ public class SSComboBox extends JComboBox {
      */
     private class MyRowSetListener implements RowSetListener, Serializable {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 5996555547965507000L;
+
 		public void cursorMoved(RowSetEvent arg0) {
             removeActionListener(cmbListener);            
             try {
@@ -622,7 +632,12 @@ public class SSComboBox extends JComboBox {
      */
     private class MyComboListener implements ActionListener, Serializable {
 
-        public void actionPerformed(ActionEvent ae) {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = -3131533966245488092L;
+
+		public void actionPerformed(ActionEvent ae) {
             int index = getSelectedIndex();
             try {
                 if (index == -1) {

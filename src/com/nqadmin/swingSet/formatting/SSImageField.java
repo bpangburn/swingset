@@ -67,7 +67,11 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  */
 public class SSImageField extends JPanel implements RowSetListener, KeyListener, ComponentListener {
     
-    private BufferedImage bufferedImage;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 889303691158522232L;
+	private BufferedImage bufferedImage;
     private byte[] imageBytes;
     private ImageIcon fullIcon;
     private ImageIcon scaledIcon;

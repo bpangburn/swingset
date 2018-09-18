@@ -46,6 +46,11 @@ import javax.swing.text.DateFormatter;
 public class SSTimeFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 22375866433132782L;
+
+	/**
      * Creates an object of SSTimeFormatterFactory.
      * The display format is HH:mm:ss and edit format is HHmmss
      */

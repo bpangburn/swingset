@@ -62,6 +62,11 @@ import java.beans.PropertyVetoException;
  public class SSConnection implements Serializable {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 844522706318494234L;
+
+	/**
      * URL to the database.
      */
     protected String url = "";

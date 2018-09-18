@@ -42,7 +42,11 @@ import javax.swing.JTextField;
 
 public class SSNumericField extends SSFormattedTextField {
     
-    private int precision = 3;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5922010378310406148L;
+	private int precision = 3;
     private int decimals  = 2;
 
     /** 

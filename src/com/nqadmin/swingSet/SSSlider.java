@@ -57,6 +57,11 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
 public class SSSlider extends JSlider {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8477179080546081481L;
+
+	/**
      * Text field bound to the SSRowSet.
      */
     protected JTextField textField = new JTextField();
@@ -273,7 +278,12 @@ public class SSSlider extends JSlider {
      */
     private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
-        public void changedUpdate(DocumentEvent de) {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 2592351765135476620L;
+
+		public void changedUpdate(DocumentEvent de) {
             removeChangeListener(sliderListener);
 
         	updateDisplay();
@@ -309,7 +319,12 @@ public class SSSlider extends JSlider {
      */
     private class MySliderListener implements ChangeListener, Serializable {
 
-        public void stateChanged(ChangeEvent ce) {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = -5004328872032247853L;
+
+		public void stateChanged(ChangeEvent ce) {
             textField.getDocument().removeDocumentListener(textFieldDocumentListener);
 
             textField.setText(String.valueOf(getValue()));

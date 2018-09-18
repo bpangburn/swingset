@@ -139,6 +139,11 @@ import com.nqadmin.swingSet.formatting.helpers.SelectorElement;
 
 public class SSDBComboBox extends JComboBox {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4203338788107410027L;
+
 	private int initialItemCount;
 	
 	/**	

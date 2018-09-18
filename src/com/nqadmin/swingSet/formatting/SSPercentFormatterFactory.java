@@ -47,6 +47,11 @@ import javax.swing.text.NumberFormatter;
 public class SSPercentFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2567959171805065991L;
+
+	/**
      * Creates a default object of SSPercentFormatterFactory
      */
     public SSPercentFormatterFactory() {

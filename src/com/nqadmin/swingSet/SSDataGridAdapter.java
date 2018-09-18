@@ -54,6 +54,11 @@ import java.io.Serializable;
 public abstract class SSDataGridAdapter implements SSDataGridHandler, Serializable {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6957488891365154999L;
+
+	/**
      * This empty implementation always returns true.
      * For description about the function look in SSRowDeletion class.
      * 

@@ -56,6 +56,10 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
 
  public class Example4 extends JFrame{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6594890166578252237L;
 	JLabel lblPartName      = new JLabel("Part Name");
     JLabel lblSelectPart    = new JLabel("Parts");
     JLabel lblPartColor     = new JLabel("Color");
@@ -123,7 +127,12 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
         // ROW AND KEEPING THE CURSOR AT THE NEWLY INSERTED ROW.
         // IF USING ANOTHER DATABASE, THE FOLLOWING IS NOT REQURIED:   
         navigator.setDBNav(new SSDBNavAdapter(){
- 			@Override
+ 			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 9018468389405536891L;
+
+			@Override
 			public void performRefreshOps() {
 				// TODO Auto-generated method stub
 				super.performRefreshOps();

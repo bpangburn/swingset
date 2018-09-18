@@ -50,7 +50,11 @@ import javax.swing.text.MaskFormatter;
 
 public class SSCuitFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
 
-    private MaskFormatter defaultFormatter;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3206796666162203982L;
+	private MaskFormatter defaultFormatter;
     private MaskFormatter displayFormatter;
     private MaskFormatter editFormatter;
     private MaskFormatter nullFormatter;

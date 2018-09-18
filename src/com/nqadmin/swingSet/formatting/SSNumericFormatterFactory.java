@@ -46,7 +46,11 @@ import javax.swing.text.NumberFormatter;
  */
 public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
 
-    NumberFormatter snf = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3335183379540169892L;
+	NumberFormatter snf = null;
     NumberFormatter enf = null;
     NumberFormatter dnf = null;
     
