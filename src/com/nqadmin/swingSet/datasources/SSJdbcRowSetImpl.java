@@ -44,7 +44,10 @@ import java.sql.Timestamp;
 import java.sql.Time;
  
 import javax.sql.RowSetListener;
-import com.sun.rowset.JdbcRowSetImpl;
+//import com.sun.rowset.JdbcRowSetImpl;
+import javax.sql.rowset.RowSetProvider;
+import javax.sql.rowset.RowSetFactory;
+import javax.sql.rowset.JdbcRowSet;
 
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
@@ -66,6 +69,11 @@ import java.beans.PropertyVetoException;
  public class SSJdbcRowSetImpl extends SSRowSetAdapter {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3556990832719097405L;
+
+	/**
      * SSConnection used to populate SSRowSet.
      */
     protected SSConnection sSConnection = new SSConnection();
@@ -83,7 +91,7 @@ import java.beans.PropertyVetoException;
     /**
      * Instance of JdbcRowSetImpl wrapped by SSJdbcRowSetImpl.
      */
-    transient protected JdbcRowSetImpl rowset;
+    transient protected JdbcRowSet rowset;
 
     /**
      * Metadata for query.
@@ -214,13 +222,35 @@ import java.beans.PropertyVetoException;
      */
     public void execute() throws SQLException{
         if(rowset == null){
-            rowset = new JdbcRowSetImpl(sSConnection.getConnection());
+        	
+            //rowset = new JdbcRowSetImpl(sSConnection.getConnection());
+        	/*rowset = RowSetProvider.newFactory().createJdbcRowSet();
+        	rowset.setUrl(sSConnection.getUrl());
+        	rowset.setUsername(sSConnection.getUsername());
+        	rowset.setPassword(sSConnection.getPassword());
+        	
             rowset.setType(ResultSet.TYPE_SCROLL_INSENSITIVE);
             rowset.setConcurrency(ResultSet.CONCUR_UPDATABLE);
+            */
+        	setJdbcRowSetConnection();
             rowset.setCommand(command);
         }
         rowset.execute();
         metaData = rowset.getMetaData();
+    }
+    
+    protected void setJdbcRowSetConnection() throws SQLException{
+    	
+    	// based in part on https://www.javatpoint.com/java-7-jdbc-improvement
+    	
+    	rowset = RowSetProvider.newFactory().createJdbcRowSet();
+    	rowset.setUrl(sSConnection.getUrl());
+    	rowset.setUsername(sSConnection.getUsername());
+    	rowset.setPassword(sSConnection.getPassword());
+    	
+        rowset.setType(ResultSet.TYPE_SCROLL_INSENSITIVE);
+        rowset.setConcurrency(ResultSet.CONCUR_UPDATABLE);
+    	
     }
 
     /**
@@ -229,12 +259,16 @@ import java.beans.PropertyVetoException;
     protected void readObject(ObjectInputStream inStream) throws ClassNotFoundException, IOException{
         inStream.defaultReadObject();
     // GET THE CONNECTION OBJECT FROM THE SSCONNECTION.
-        connection = sSConnection.getConnection();
+    //    connection = sSConnection.getConnection();
         try{
         // CREATE NEW INSTANCE OF JDBC ROWSET.
+        /*
             rowset = new JdbcRowSetImpl(connection);
             rowset.setType(ResultSet.TYPE_SCROLL_INSENSITIVE);
             rowset.setConcurrency(ResultSet.CONCUR_UPDATABLE);
+         */            
+            
+            setJdbcRowSetConnection();
 
         // SET THE COMMAND FOR ROWSET
             rowset.setCommand(command);

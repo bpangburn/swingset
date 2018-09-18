@@ -60,6 +60,11 @@ import java.sql.Time;
  public class SSRowSetAdapter implements SSRowSet {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4481470811187002701L;
+
+	/**
      * Retrieves the value of the designated column in the current row of this DataSet
      * object as a boolean in the Java programming language.
      * @param columnIndex - column number . first column is 1, second column is 2....
