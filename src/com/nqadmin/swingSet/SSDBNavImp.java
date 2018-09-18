@@ -43,7 +43,6 @@ import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JFormattedTextField;
 import com.nqadmin.swingSet.formatting.SSFormattedTextField;
 
 /**

@@ -32,8 +32,6 @@
 
 package com.nqadmin.swingSet;
 
-import java.awt.Dimension;
-
 import javax.swing.JTextArea;
 
 import com.nqadmin.swingSet.datasources.SSRowSet;

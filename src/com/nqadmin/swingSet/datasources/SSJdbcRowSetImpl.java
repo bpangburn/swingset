@@ -46,14 +46,12 @@ import java.sql.Time;
 import javax.sql.RowSetListener;
 //import com.sun.rowset.JdbcRowSetImpl;
 import javax.sql.rowset.RowSetProvider;
-import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.JdbcRowSet;
 
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.beans.VetoableChangeListener;
-import java.beans.PropertyVetoException;
 
 /**
  * SSJdbcRowSetImpl.java

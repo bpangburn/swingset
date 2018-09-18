@@ -43,7 +43,6 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeSupport;
 import java.beans.VetoableChangeListener;
-import java.beans.PropertyVetoException;
  
 /**
  * SSConnection.java

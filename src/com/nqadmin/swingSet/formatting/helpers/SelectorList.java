@@ -36,9 +36,6 @@ package com.nqadmin.swingSet.formatting.helpers;
 import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;

@@ -32,7 +32,6 @@
 
  package com.nqadmin.swingSet.datasources;
 
- import java.io.Serializable;
  import javax.sql.RowSetListener;
 
 import java.sql.Array;
