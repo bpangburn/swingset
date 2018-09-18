@@ -276,6 +276,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
                                     else
                                         bytesRead += read;
                                 }
+                                inStream.close();
                                 sSRowSet.updateBytes(columnName, bytes);
                                 img = new ImageIcon(bytes);
                                 lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
