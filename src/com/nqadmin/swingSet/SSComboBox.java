@@ -93,7 +93,7 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  * @version $Revision$
  */
 //public class SSComboBox extends JComponent {
-public class SSComboBox extends JComboBox {
+public class SSComboBox extends JComboBox<Object> {
     
 /* NOTE: It would probably be best to retool mappings such that they are stored
          as strings, similar to SSDBComboBox. */
@@ -693,7 +693,7 @@ public class SSComboBox extends JComboBox {
      *
      * @deprecated
      */
-    public JComboBox getComboBox() {
+    public JComboBox<?> getComboBox() {
         return this;
     }
 

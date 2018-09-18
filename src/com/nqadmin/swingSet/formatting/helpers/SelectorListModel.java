@@ -363,7 +363,7 @@ public class SelectorListModel extends AbstractListModel implements ComboBoxMode
             System.out.println("SelectorListModel :" + np);
         }
     // FILL THE FILTERED DATA WITH THE COMPLETE DATA GOT FROM DATABASE    
-        filtered_data = new FilterList(data);//
+        filtered_data = new FilterList<Object>(data);//
         
         
         this.fireContentsChanged(this, 0, filtered_data.size()-1);//

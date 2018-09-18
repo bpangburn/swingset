@@ -51,7 +51,7 @@ import com.nqadmin.swingSet.formatting.helpers.SSFormattedComboBoxRenderer;
  *
  * @author dags
  */
-public class SSFormattedComboBox extends JComboBox implements ActionListener {
+public class SSFormattedComboBox extends JComboBox<Object> implements ActionListener {
     
     /**
 	 * 

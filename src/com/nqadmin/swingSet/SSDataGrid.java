@@ -1443,7 +1443,7 @@ public class SSDataGrid extends JTable {
 //      JComboBox comboBox = null;
 
         public ComboEditor(Object[] _items, Object[] _underlyingValues) {
-            super(new JComboBox(_items));
+            super(new JComboBox<Object>(_items));
             underlyingValues = _underlyingValues;
         }
 
@@ -1457,17 +1457,17 @@ public class SSDataGrid extends JTable {
         public Component getTableCellEditorComponent(JTable _table, Object _value,
             boolean _selected, int _row, int _column) {
 
-            JComboBox comboBox = (JComboBox)getComponent();
+            JComboBox<?> comboBox = (JComboBox<?>)getComponent();
             comboBox.setSelectedIndex(getIndexOf(_value));
             return comboBox;
         }
 
         public Object getCellEditorValue() {
             if (underlyingValues == null) {
-                return new Integer( ((JComboBox)getComponent()).getSelectedIndex());
+                return new Integer( ((JComboBox<?>)getComponent()).getSelectedIndex());
             }
 
-            int index = ((JComboBox)getComponent()).getSelectedIndex();
+            int index = ((JComboBox<?>)getComponent()).getSelectedIndex();
 //          System.out.println("Index is "+ index);
             if (index == -1) {
                 return underlyingValues[0];

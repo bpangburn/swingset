@@ -146,6 +146,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
                             else
                                 bytesRead += read;
                         }
+                        inStream.close();
                         //rowset.updateBytes(columnName, bytes);
                         imageBytes = bytes;
                         fullIcon = new ImageIcon(bytes);
