@@ -60,13 +60,14 @@ many of the standard Java Swing components.
 
 This file contains sample/demo SwingSet source code and Java class files.
 
-The sample/demo programs provided with SwingSet utilize h2 database which is 
-run in memory.
+The sample/demo programs provided with SwingSet utilize the h2 database,
+which is run in memory.
 
-The database is based on the suppliers-and-parts database referenced in the
-classic database textbook, "An Introduction to Database Systems,"  by C. J. Date.
+The sample database is based on the suppliers-and-parts database referenced
+in the classic database textbook, "An Introduction to Database Systems,"
+by C. J. Date.
 
-For questions regarding SwingSet, send e-mail to:
+For questions regarding SwingSet, send an email to:
 swingset#NO-SPAM#@pangburngroup.com
 
 

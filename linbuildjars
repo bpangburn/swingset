@@ -27,10 +27,10 @@ mkdir ./release_jars/images
 mkdir ./release_jars/images/icons
 
 # RECOMPILE SWINGSET
-javac -source 1.5 -target 1.5 -d ./release_jars/bin -classpath ./lib/glazedlists-1.8.0.jar ./src/com/nqadmin/swingSet/*.java ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/formatting/*.java ./src/com/nqadmin/swingSet/formatting/helpers/*.java ./src/com/nqadmin/swingSet/utils/*.java
+javac -source 1.5 -target 1.5 -d ./release_jars/bin -classpath ./lib/glazedlists-1.11.0.jar ./src/com/nqadmin/swingSet/*.java ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/formatting/*.java ./src/com/nqadmin/swingSet/formatting/helpers/*.java ./src/com/nqadmin/swingSet/utils/*.java
 
 # REBUILD JAVADOCS
-javadoc -d ./release_jars/docs -classpath ./lib/glazedlists-1.8.0.jar ./src/com/nqadmin/swingSet/*.java ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/formatting/*.java ./src/com/nqadmin/swingSet/formatting/helpers/*.java ./src/com/nqadmin/swingSet/utils/*.java
+javadoc -d ./release_jars/docs -classpath ./lib/glazedlists-1.11.0.jar ./src/com/nqadmin/swingSet/*.java ./src/com/nqadmin/swingSet/datasources/*.java ./src/com/nqadmin/swingSet/formatting/*.java ./src/com/nqadmin/swingSet/formatting/helpers/*.java ./src/com/nqadmin/swingSet/utils/*.java
 
 # COPY SOURCE CODE
 cp ./src/com/nqadmin/swingSet/*.java ./release_jars/src/com/nqadmin/swingSet/
@@ -49,25 +49,25 @@ cp ./src/images/* ./release_jars/images
 cp ./src/images/icons/* ./release_jars/images/icons
 
 # BUILD BIN JAR
-jar -mcvf ./META-INF/MANIFEST.MF ./release_jars/swingset-bin_current.jar -C ./release_jars/bin com -C ./release_jars images readme.txt ChangeLog.txt FAQ.txt
+jar -mcvf ./META-INF/MANIFEST.MF ./release_jars/swingset-current.jar -C ./release_jars/bin com -C ./release_jars images readme.txt ChangeLog.txt FAQ.txt
 
 # BUILD JAVADOC JAR
-jar -cvf ./release_jars/swingset-docs_current.jar -C ./release_jars/docs . readme.txt ChangeLog.txt FAQ.txt
+jar -cvf ./release_jars/swingset-docs-current.jar -C ./release_jars/docs . readme.txt ChangeLog.txt FAQ.txt
 
 # BUILD SOURCE JAR
-jar -cvf ./release_jars/swingset-src_current.jar -C ./release_jars/src com -C ./release_jars images readme.txt ChangeLog.txt FAQ.txt
+jar -cvf ./release_jars/swingset-src-current.jar -C ./release_jars/src com -C ./release_jars images readme.txt ChangeLog.txt FAQ.txt
 
 # COMPILE DEMO
-javac -source 1.5 -target 1.5 -d ./release_jars/demo/bin -classpath ./lib/glazedlists-1.8.0.jar:./release_jars/swingset-bin_current.jar ./src/samples/Example*.java ./src/samples/MainClass.java
+javac -source 1.5 -target 1.5 -d ./release_jars/demo/bin -classpath ./lib/glazedlists-1.11.0.jar:./release_jars/swingset-current.jar ./src/samples/Example*.java ./src/samples/MainClass.java
 
 # COPY DEMO SOURCE CODE
 cp ./src/samples/*.java ./release_jars/demo/src
 
 # COPY DEMO DEPENDENCIES
-cp ./release_jars/swingset-bin_current.jar ./release_jars/demo/lib
+cp ./release_jars/swingset-current.jar ./release_jars/demo/lib
 cp ./lib/*.jar ./release_jars/demo/lib
 cp ./src/samples/suppliers_and_parts.sql ./release_jars/demo
 cp ./src/samples/readme.txt ./release_jars/demo
 
 # BUILD DEMO JAR
-jar -cvf ./release_jars/swingset-demo_current.jar -C ./release_jars/demo .
+jar -cvf ./release_jars/swingset-demo-current.jar -C ./release_jars/demo .

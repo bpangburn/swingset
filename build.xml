@@ -1,85 +1,68 @@
 <project name="SwingSet" default="all" basedir=".">
-
-	<property name="srcdir" value="./src" />
-	<property name="classesdir" value="./classes" />
-	<property name="javadocdir" value="./javadoc" />
-	<property name="lib" value="./lib" />
-	<property name="deploydir" value="./deploy" />
-	<property name="manifestdir" value="./META-INF" />
-	<property name="version" value="2.0.1" />
-		
-	<path id="1">
-		<pathelement location="${lib}/glazedlists-1.8.0.jar" />
-	</path>
-	
-	<path id="2">
-		<pathelement location="${classesdir}" />
-	</path>
-	
-	<target name="all" depends="clean, prepare, compile, docs, build">
-		
-	</target>
-	
-	<target name="clean">
-		<delete dir="${classesdir}" />
-		<delete dir="${deploydir}" />
-		<delete dir="${javadocdir}" />
-	</target>
-	
-	<target name="prepare" depends="clean">
-		<mkdir dir="${classesdir}" />
-		<mkdir dir="${classesdir}/samples" />
-		<mkdir dir="${javadocdir}" />
-		<mkdir dir="${deploydir}" />
-	</target>
-	
-	<target name="compile" depends="prepare">
-		<javac source="1.5" target="1.5" includeantruntime="false" debug="true" debuglevel="lines,source,vars" srcdir="${srcdir}/com" destdir="${classesdir}" >
-			<classpath refid="1" />
-		</javac>
-		
-		<javac source="1.5" target="1.5" includeantruntime="false" debug="true" debuglevel="lines,source,vars" srcdir="${srcdir}/samples" destdir="${classesdir}" >
-			<classpath refid="2" />
-		</javac>
-		
-	</target>
-	
-	<target name="docs" depends="compile">
-		<javadoc source="${srcdir}" destdir="${javadocdir}">
-			<classpath refid="1" />
-			<fileset dir="${srcdir}" >
-				<exclude name="samples/**" />
-				<exclude name="images/**" />
-			</fileset>
-		</javadoc>
-	</target>
-	
-	<target name="build" depends="docs">
-		<jar jarfile="${deploydir}/swingset-bin_${version}.jar" basedir="${classesdir}"  manifest="${manifestdir}/MANIFEST.MF" >
-			<exclude name="samples/**" />
-			<fileset dir="${basedir}" >
-				<include name="FAQ.txt" />
-				<include name="readme.txt" />
-				<include name="ChangeLog.txt" />
-			</fileset>
-			<fileset dir="${srcdir}" >
-				<include name="images/**" />
-			</fileset>
-		</jar>
-
-		<jar jarfile="${deploydir}/swingset-demo_${version}.jar" basedir="${classesdir}"  manifest="${manifestdir}/MANIFEST-DEMO.MF" >
-				<exclude name="com/**"/>
-				<fileset dir="${srcdir}" >
-					<include name="samples/**" />
-				</fileset>
-		</jar>
-		
-		<jar jarfile="${deploydir}/swingset-docs_${version}.jar" basedir="${javadocdir}" />
-		
-		<jar jarfile="${deploydir}/swingset-src_${version}.jar" basedir="${srcdir}" />
-
-	</target>
-	
+    <property name="srcdir" value="./src" />
+    <property name="classesdir" value="./classes" />
+    <property name="javadocdir" value="./javadoc" />
+    <property name="lib" value="./lib" />
+    <property name="deploydir" value="./deploy" />
+    <property name="manifestdir" value="./META-INF" />
+    <property name="version" value="2.1.0" />
+    <path id="1">
+        <pathelement location="${lib}/glazedlists-1.11.0.jar" />
+    </path>
+    <path id="2">
+        <pathelement location="${classesdir}" />
+    </path>
+    <target name="all" depends="clean, prepare, compile, docs, build, demo-build"></target>
+    <target name="clean">
+        <delete dir="${classesdir}" />
+        <delete dir="${deploydir}" />
+        <delete dir="${javadocdir}" />
+    </target>
+    <target name="prepare" depends="clean">
+        <mkdir dir="${classesdir}" />
+        <mkdir dir="${classesdir}/samples" />
+        <mkdir dir="${javadocdir}" />
+        <mkdir dir="${deploydir}" />
+    </target>
+    <target name="compile" depends="prepare">
+        <javac source="1.5" target="1.5" includeantruntime="false" debug="true" debuglevel="lines,source,vars" srcdir="${srcdir}/com" destdir="${classesdir}">
+            <classpath refid="1" />
+        </javac>
+        <javac source="1.5" target="1.5" includeantruntime="false" debug="true" debuglevel="lines,source,vars" srcdir="${srcdir}/samples" destdir="${classesdir}/samples">
+            <classpath refid="2" />
+        </javac>
+    </target>
+    <target name="docs" depends="compile">
+        <javadoc source="${srcdir}" destdir="${javadocdir}">
+            <classpath refid="1" />
+            <fileset dir="${srcdir}">
+                <exclude name="samples/**" />
+                <exclude name="images/**" />
+            </fileset>
+        </javadoc>
+    </target>
+    <target name="build" depends="docs">
+        <jar jarfile="${deploydir}/swingset-${version}.jar" basedir="${classesdir}" manifest="${manifestdir}/MANIFEST.MF">
+            <exclude name="samples/**" />
+            <fileset dir="${basedir}">
+                <include name="FAQ.txt" />
+                <include name="readme.txt" />
+                <include name="ChangeLog.txt" />
+            </fileset>
+            <fileset dir="${srcdir}">
+                <include name="images/**" />
+            </fileset>
+        </jar>
+        <jar jarfile="${deploydir}/swingset-docs-${version}.jar" basedir="${javadocdir}" />
+        <jar jarfile="${deploydir}/swingset-src-${version}.jar" basedir="${srcdir}" />
+    </target>
+    <target name="demo-build" depends="compile, build">
+        <jar jarfile="${deploydir}/swingset-demo-${version}.jar">
+            <zipfileset dir="${srcdir}/samples" includes="*.java" prefix="src/" />
+            <zipfileset dir="${classesdir}/samples" includes="*.class" prefix="bin/" />
+            <zipfileset dir="${lib}" includes="*.jar" prefix="lib/" />
+            <zipfileset dir="${deploydir}" includes="swingset-${version}.jar" prefix="lib/" />
+            <zipfileset dir="${srcdir}/samples" excludes="*.java" prefix="/" />
+        </jar>
+    </target>
 </project>
-
-

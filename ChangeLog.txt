@@ -2,17 +2,23 @@
 ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
-$Id$
-
 ==============================================================================
-SwingSet 2.0.1 - Released 2018-09-14
+SwingSet 2.1.0 - Released 2018-09-18
 ==============================================================================
 
 Changes:
-	1. minor fixes to build scripts
-	2. updated email address in supporting docs
-	3. addition of populate.sql used for examples (http://swingset.sourceforge.net/lib/populate.sql)
-	4. corrected instructions for examples
+	1. Fixed the issue with the last/first buttons not being enabled/disabled correctly, when navigation happens directly on the rowset.
+	2. Fixed the issue of newly added item not being displayed in SSDBComboBox.
+	3. Fixed NullPointerException in SSDataGrid, when users enter empty string in a date column.
+	4. Fixed an exception in SSList while updating display, if the underlying rowset doesn't have any records.
+	5. In SSSyncManager, updating the navigator inside combo box listener only if combo box has focus (actionPerformed is due to user action).
+	6. Using locking mechanism while making any changes to the items in SSDBComboBox.
+	7. Made updates/fixes to various build scripts.
+	8. Updated project support email address in project docs.
+	9. Added populate.sql used for sample/demo to project (formerly available only online).
+	10. Corrected instructions for sample/demo.
+	11. Updated GlazedLists to 1.11.0.
+	12. Updated H2 used for sample/demo to 1.4.197.
 
 ==============================================================================
 SwingSet 2.0.0 - Released 08-10-2012

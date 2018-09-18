@@ -46,7 +46,7 @@ The SwingSet feature-set currently includes:
 1. data-aware replacements for JTextField, JTextArea, JComboBox, JCheckBox,
    JLabel, JSlider, & JFormattedTextField
 2. binding of a "hidden" numeric column for combo boxes with text choices
-   (e.g. 0, 1, & 2 are stored for "Yes," "No," & "Maybe," respectively)
+   (e.g., 0, 1, & 2 are stored for "Yes," "No," & "Maybe," respectively)
 3. population of combo boxes based on columns in a database query (can also
    be used for combo box-based record navigation)
 4. a data-aware image component with support for JPEG & GIF image formats
@@ -73,7 +73,7 @@ http://swingset.sourceforge.net
 and
 http://sourceforge.net/projects/swingset
 
-For questions regarding SwingSet, send e-mail to:
+For questions regarding SwingSet, send an email to:
 swingset#NO-SPAM#@pangburngroup.com
 
 
@@ -81,20 +81,22 @@ swingset#NO-SPAM#@pangburngroup.com
 INSTALLATION
 ==============================================================================
 
-SwingSet 2.0.1 requires jre 1.5 or later.
+SwingSet 2.1.0 should work with Java 5 (JRE/JDK 1.5) or later.
 
-Download the latest SwingSet binary JAR file from:
-http://sourceforge.net/projects/swingset
+Download the latest SwingSet binary jar file from:
+https://sourceforge.net/projects/swingset
 
-Add the swingset JAR to your CLASSPATH. Alternatively, you can copy the JAR
+Add the SwingSet jar to your CLASSPATH. Alternatively, you can copy the jar
 to the the /jre/lib/ext subdirectory of your JDK (for compiling) and the 
 /lib/ext subdirectory of your JRE (for execution).
 
-SwingSet should work with all J2SE 1.5 or later releases.
+Some SwingSet features depend on the GlazedList jar file available from
+http://glazedlists.com.
 
-Note that you may also need a JDBC driver for your target database.  If the
-driver is available as a JAR file, it should be added to your CLASSPATH or
-placed in the same /lib/ext subdirectories mentioned above.
+Note that you may also need a JDBC driver for your target database.
+
+Dependency jars should be added to your CLASSPATH, JRE, or JDK as indicated
+above.
 
 
 ==============================================================================
@@ -136,7 +138,7 @@ the database. By default the codes start from zero. If you want to provide a
 different mapping for the items in the combo box then a string of integers
 containing the corresponding numeric values for each choice must be provided.
 
-e.g.
+e.g.,
      SSComboBox combo = new SSComboBox();
      String[] options = {"111", "2222", "33333"};
      combo.setOptions(options);
@@ -170,7 +172,7 @@ Similar to the SSComboBox, but used when both the 'bound' values and the
 value represents a foreign key to another table, and the combo box needs to
 diplay a list of one (or more) columns from the other table.
   
-e.g.
+e.g.,
 
      Consider two tables:
        1. part_data (part_id, part_name, ...)
@@ -332,7 +334,7 @@ JdbcRowSetImpl.
 
 SSJdbcRowSetImpl can be extended with custom setXYZ() methods to handle
 database updates via INSERT/UPDATE queries.  SSJdbcRowSetImpl can also serve as
-a template for writing SSRowSet wrappers for other RowSets (e.g. CachedRowSet,
+a template for writing SSRowSet wrappers for other RowSets (e.g., CachedRowSet,
 WebRowSet, etc.).
 
 
@@ -367,7 +369,7 @@ SSDataNavigator to allow for both editing and navigation of the rows in a
 database table.
 
 The SSTextDocument takes a SSRowSet and either a column index or a column name
-as arguments.  Whenever the cursor is moved (e.g. navigation occurs on the 
+as arguments.  Whenever the cursor is moved (e.g., navigation occurs on the 
 SSDataNavigator), the document property of the bound Swing control changes to
 reflect the new value for the database column.
 
@@ -439,7 +441,7 @@ SSTableModel
 ***********************
 SSTableModel provides an implementation of the TableModel interface.
 The SSDataGrid uses this class for providing a grid view for a SSRowSet. 
-SSTableModel can be used without the SSDataGrid (e.g. in conjunction with a
+SSTableModel can be used without the SSDataGrid (e.g., in conjunction with a
 JTable), but the cell renderers and hidden columns features of the SSDataGrid
 will not be available.
 
