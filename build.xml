@@ -1,11 +1,12 @@
 <project name="SwingSet" default="all" basedir=".">
     <property name="srcdir" value="./src" />
-    <property name="classesdir" value="./classes" />
-    <property name="javadocdir" value="./javadoc" />
-    <property name="lib" value="./lib" />
-    <property name="deploydir" value="./deploy" />
+	<property name="lib" value="./lib" />
+	<property name="antdir" value="./ant-build" />
+    <property name="classesdir" value="${antdir}/classes" />
+    <property name="javadocdir" value="${antdir}/javadoc" />
+    <property name="deploydir" value="${antdir}/deploy" />
     <property name="manifestdir" value="./META-INF" />
-    <property name="version" value="2.1.0" />
+    <property name="version" value="2.2.0" />
     <path id="1">
         <pathelement location="${lib}/glazedlists-1.11.0.jar" />
     </path>
@@ -14,9 +15,7 @@
     </path>
     <target name="all" depends="clean, prepare, compile, docs, build, demo-build"></target>
     <target name="clean">
-        <delete dir="${classesdir}" />
-        <delete dir="${deploydir}" />
-        <delete dir="${javadocdir}" />
+        <delete dir="${antdir}" />
     </target>
     <target name="prepare" depends="clean">
         <mkdir dir="${classesdir}" />
