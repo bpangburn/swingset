@@ -1,8 +1,8 @@
-/* $Id$
+/* 
  *
  * Tab Spacing = 4
  *
- * Copyright (c) 2004-2009, The Pangburn Company and Prasanth R. Pasala
+ * Copyright (c) 2004-2018, The Pangburn Group and Prasanth R. Pasala
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,26 +32,29 @@
 
 package com.nqadmin.swingSet.datasources;
 
-import java.sql.Array;
-import java.sql.SQLException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.io.ObjectInputStream;
-import java.io.IOException;
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.sql.Time;
- 
-import javax.sql.RowSetListener;
-//import com.sun.rowset.JdbcRowSetImpl;
-import javax.sql.rowset.RowSetProvider;
-import javax.sql.rowset.JdbcRowSet;
+import java.beans.PropertyChangeListener;
+
+//import javax.sql.rowset.JdbcRowSet;
+//import javax.sql.rowset.RowSetFactory;
+//import javax.sql.rowset.RowSetProvider;
 
 import java.beans.PropertyChangeSupport;
-import java.beans.PropertyChangeListener;
-import java.beans.VetoableChangeSupport;
 import java.beans.VetoableChangeListener;
+import java.beans.VetoableChangeSupport;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.sql.Array;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
+
+import javax.sql.RowSetListener;
+
+import com.sun.rowset.JdbcRowSetImpl;
 
 /**
  * SSJdbcRowSetImpl.java
@@ -89,7 +92,8 @@ import java.beans.VetoableChangeListener;
     /**
      * Instance of JdbcRowSetImpl wrapped by SSJdbcRowSetImpl.
      */
-    transient protected JdbcRowSet rowset;
+    //transient protected JdbcRowSet rowset;
+    transient protected JdbcRowSetImpl rowset;
 
     /**
      * Metadata for query.
@@ -220,16 +224,6 @@ import java.beans.VetoableChangeListener;
      */
     public void execute() throws SQLException{
         if(rowset == null){
-        	
-            //rowset = new JdbcRowSetImpl(sSConnection.getConnection());
-        	/*rowset = RowSetProvider.newFactory().createJdbcRowSet();
-        	rowset.setUrl(sSConnection.getUrl());
-        	rowset.setUsername(sSConnection.getUsername());
-        	rowset.setPassword(sSConnection.getPassword());
-        	
-            rowset.setType(ResultSet.TYPE_SCROLL_INSENSITIVE);
-            rowset.setConcurrency(ResultSet.CONCUR_UPDATABLE);
-            */
         	setJdbcRowSetConnection();
             rowset.setCommand(command);
         }
@@ -240,11 +234,19 @@ import java.beans.VetoableChangeListener;
     protected void setJdbcRowSetConnection() throws SQLException{
     	
     	// based in part on https://www.javatpoint.com/java-7-jdbc-improvement
+    	//
+    	// problem is that using this code creates a new connection for
+    	// every rowset - no obvious workaround to reuse the connection
     	
+    	/*
     	rowset = RowSetProvider.newFactory().createJdbcRowSet();
+
     	rowset.setUrl(sSConnection.getUrl());
     	rowset.setUsername(sSConnection.getUsername());
     	rowset.setPassword(sSConnection.getPassword());
+    	*/
+    	
+    	rowset = new JdbcRowSetImpl(sSConnection.getConnection());
     	
         rowset.setType(ResultSet.TYPE_SCROLL_INSENSITIVE);
         rowset.setConcurrency(ResultSet.CONCUR_UPDATABLE);
@@ -260,12 +262,6 @@ import java.beans.VetoableChangeListener;
     //    connection = sSConnection.getConnection();
         try{
         // CREATE NEW INSTANCE OF JDBC ROWSET.
-        /*
-            rowset = new JdbcRowSetImpl(connection);
-            rowset.setType(ResultSet.TYPE_SCROLL_INSENSITIVE);
-            rowset.setConcurrency(ResultSet.CONCUR_UPDATABLE);
-         */            
-            
             setJdbcRowSetConnection();
 
         // SET THE COMMAND FOR ROWSET
