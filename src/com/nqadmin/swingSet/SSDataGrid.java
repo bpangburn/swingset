@@ -366,7 +366,7 @@ public class SSDataGrid extends JTable {
 
         // GET THE LIST OF SELECTED COLUMNS FROM SUPER CLASS.
             int[] selectedColumns = super.getSelectedColumns();
-            Vector filteredColumns = new Vector();
+            Vector<Object> filteredColumns = new Vector<Object>();
 
         // FILTER OUT THE HIDDEN COLUMNS FROM THIS LIST.
             for (int i=0; i<selectedColumns.length; i++) {

@@ -11,7 +11,7 @@ import java.util.Iterator;
 public class SSConnectionEditor extends PropertyEditorSupport implements BeanContextProxy {
 	
 	private BeanContextChildSupport beanContextChildSupport = new BeanContextChildSupport();
-	Vector vecSSConn = new Vector();
+	Vector<Object> vecSSConn = new Vector<Object>();
 	
 	public BeanContextChild getBeanContextProxy(){
 		return beanContextChildSupport;

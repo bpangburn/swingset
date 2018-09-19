@@ -63,12 +63,12 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
     /**
      * Holds value of property dataColumn.
      */
-    private ArrayList dataList = new ArrayList();
+    private ArrayList<Object> dataList = new ArrayList<Object>();
     
     /**
      * Holds value of property listColumn.
      */
-    private ArrayList listList = new ArrayList();
+    private ArrayList<Object> listList = new ArrayList<Object>();
     
     /**
      * Holds value of property dataColumn.
@@ -156,8 +156,8 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
      * 
      */
     public void refresh() {
-        dataList = new ArrayList();
-        listList = new ArrayList();
+        dataList = new ArrayList<Object>();
+        listList = new ArrayList<Object>();
         
         this.populateModel();
     }

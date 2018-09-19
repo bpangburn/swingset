@@ -329,7 +329,7 @@ public class SSList extends JList {
 		if(array == null) {
 			return null;
 		}
-		Vector data= new Vector();
+		Vector<Object> data= new Vector<Object>();
 		switch(array.getBaseType()){
 		case Types.INTEGER:
 		case Types.SMALLINT:
