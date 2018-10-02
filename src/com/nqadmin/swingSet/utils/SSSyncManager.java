@@ -183,7 +183,7 @@ public class SSSyncManager {
     protected void adjustValue() {
         comboBox.removeActionListener(comboListener);
         try{
-            if(rowset != null & rowset.getRow() > 0){
+            if(rowset != null && rowset.getRow() > 0){
             // GET THE CURRENT VALUE FROM THE ROWSET.    
                 String currentRowValue = rowset.getString(columnName);
             // CHECK IF THE COMBO BOX IS DISPLAYING THE SAME ONE.    
