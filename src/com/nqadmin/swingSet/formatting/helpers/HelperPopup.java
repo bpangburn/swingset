@@ -41,7 +41,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -384,6 +383,11 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
      * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
      */
     public void valueChanged(javax.swing.event.ListSelectionEvent e) {
+    	
+    	// 2019-02-23-BP: this method doesn't seem to do anything
+    	return;
+    	
+    	/*
         int desde;
         int hasta;
         int selected;
@@ -396,21 +400,22 @@ public class HelperPopup extends JPopupMenu implements MouseListener, KeyListene
             
             selected = lm.getLeadSelectionIndex();
             
-            SelectorElement se1 = (SelectorElement) (lista.getModel().getElementAt(desde));
+            //SelectorElement se1 = (SelectorElement) (lista.getModel().getElementAt(desde));
             
-            SelectorElement se2 = (SelectorElement) (lista.getModel().getElementAt(hasta));
+            //SelectorElement se2 = (SelectorElement) (lista.getModel().getElementAt(hasta));
 
-            SelectorElement se3 = (SelectorElement) (lista.getModel().getElementAt(selected));
+            //SelectorElement se3 = (SelectorElement) (lista.getModel().getElementAt(selected));
             
         }
+        */
     }
     
     /* (non-Javadoc)
      * @see javax.swing.event.PopupMenuListener#popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent)
      */
     public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent e) {
-        Object current = target.getValue();
-        Object dataval = null;
+        //Object current = target.getValue();
+        //Object dataval = null;
         
         searchText.requestFocusInWindow();
     }

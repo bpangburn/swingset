@@ -43,7 +43,7 @@ public class SSConnectionEditor extends PropertyEditorSupport implements BeanCon
 		if(beanContext == null){
 			return new String[]{"Bean Context Null"};
 		}
-		Iterator iterator = beanContext.iterator();
+		Iterator<?> iterator = beanContext.iterator();
 		while(iterator.hasNext()){
 			Object sibling = iterator.next();
 			if(sibling instanceof SSConnection){

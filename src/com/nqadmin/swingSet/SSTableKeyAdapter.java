@@ -346,13 +346,13 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
      */
     protected Object getObjectToSet(JTable _jTable, int _column, String _value) throws Exception {
     // GET THE COLUMN CLASS
-        Class objectClass = _jTable.getColumnClass(_column);
+        Class<?> objectClass = _jTable.getColumnClass(_column);
         Object newValue = null;
         try {
         	// CONSTRUCT THE OBJECT ONLY IF THE STRING IS NOT NULL
         	if(_value != null) {
 	        // GET THE CONSTRUCTOR FOR THE CLASS WHICH TAKES A STRING
-	            Constructor constructor = objectClass.getConstructor(new Class[]{String.class});
+	            Constructor<?> constructor = objectClass.getConstructor(new Class[]{String.class});
 	
 	        // CREATE AN INSTANCE OF THE OBJECT
 	            newValue = constructor.newInstance(new Object[]{_value});

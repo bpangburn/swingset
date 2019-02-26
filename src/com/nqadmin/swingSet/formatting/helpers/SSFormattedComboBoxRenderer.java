@@ -50,7 +50,7 @@ import javax.swing.UIManager;
  * <font color=red> <B> It is not recommended to use this class as there could be drastic changes to this classes API. </B> </font>
  *
  */
-public class SSFormattedComboBoxRenderer extends JPanel implements ListCellRenderer, Serializable {
+public class SSFormattedComboBoxRenderer extends JPanel implements ListCellRenderer<Object>, Serializable {
     
     /**
 	 * 
@@ -110,28 +110,28 @@ public class SSFormattedComboBoxRenderer extends JPanel implements ListCellRende
     }
 
     /**
-     * @return
+     * @return background color for odd rows
      */
     public Color getOddRowBackground() {
         return oddRowBackground;
     }
 
     /**
-     * @return
+     * @return background color for even rows
      */
     public Color getEvenRowBackground() {
         return evenRowBackground;
     }
 
     /**
-     * @return
+     * @return text/foreground color for odd rows
      */
     public Color getOddRowForeground() {
         return oddRowForeground;
     }
 
     /**
-     * @return
+     * @return text/foreground color for even rows
      */
     public Color getEvenRowForeground() {
         return evenRowForeground;
@@ -158,7 +158,7 @@ public class SSFormattedComboBoxRenderer extends JPanel implements ListCellRende
      * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
      */
     public Component getListCellRendererComponent(
-            JList list,
+            JList<?> list,
             Object value,
             int index,
             boolean isSelected,

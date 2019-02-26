@@ -42,17 +42,16 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.AbstractListModel;
-import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTextField;
 import javax.swing.event.ListDataListener;
+
+import com.nqadmin.swingSet.datasources.SSConnection;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
-
-import com.nqadmin.swingSet.datasources.SSConnection;
 
 
 /**
@@ -60,7 +59,8 @@ import com.nqadmin.swingSet.datasources.SSConnection;
  * @author  dags
  */
 
-public class SelectorComboBoxModel extends AbstractListModel<SelectorElement> implements ComboBoxModel<SelectorElement> {
+//public class SelectorComboBoxModel extends AbstractListModel<SelectorElement> implements ComboBoxModel<SelectorElement> {
+public class SelectorComboBoxModel extends DefaultComboBoxModel<Object> {
 	
 	private static final long serialVersionUID = -1266028305085372287L;
 
@@ -188,7 +188,7 @@ public class SelectorComboBoxModel extends AbstractListModel<SelectorElement> im
 	 * all other column types are retrieved as strings
 	 * @param _rs
 	 * @param _columnName
-	 * @return
+	 * @return string value of database column
 	 */
 	protected String getStringValue(ResultSet _rs, String _columnName) {
 	        String strValue = "";
@@ -343,7 +343,8 @@ public class SelectorComboBoxModel extends AbstractListModel<SelectorElement> im
 
     /**
      * Setter for property displayColumn.
-     * @param displayColumn New value of property displayColumn.
+     * 
+     * @param secondDisplayColumn New value of property displayColumn.
      */
     public void setSecondDisplayColumn(String secondDisplayColumn) {
         String oldDisplayColumn = this.secondDisplayColumnName;
@@ -472,7 +473,7 @@ public class SelectorComboBoxModel extends AbstractListModel<SelectorElement> im
      * Adds the event listener for the filtered list
      * @param listChangeListener - list listener to be added to filtered list
      */
-    public void addListEventListener(ListEventListener listChangeListener) {
+    public void addListEventListener(ListEventListener<SelectorElement> listChangeListener) {
         filteredData.addListEventListener(listChangeListener);
        
     }

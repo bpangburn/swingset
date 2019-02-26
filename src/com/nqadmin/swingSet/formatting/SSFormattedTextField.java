@@ -33,6 +33,7 @@
 
 package com.nqadmin.swingSet.formatting;
 
+import java.awt.AWTKeyStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.KeyboardFocusManager;
@@ -118,19 +119,14 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
         this.setFont(new Font(this.getFont().getName(), Font.BOLD, 11));
         this.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
         
-        /*
-         *
-         *
-         */
-        
-        Set forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
-        Set newForwardKeys = new HashSet(forwardKeys);
+        Set<AWTKeyStroke> forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+        Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(forwardKeys);
         newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
         newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK ));
         setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);
         
-        Set backwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
-        Set newBackwardKeys = new HashSet(backwardKeys);
+        Set<AWTKeyStroke> backwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
+        Set<AWTKeyStroke> newBackwardKeys = new HashSet<AWTKeyStroke>(backwardKeys);
         newBackwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_UP, java.awt.event.InputEvent.SHIFT_MASK ));
         setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,newBackwardKeys);
         
@@ -193,7 +189,8 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     }
     
     /**
-     * @param combo
+      * @deprecated
+      * @param combo
      */
     public void setSSFormattedComboBox(SSFormattedComboBox combo) {
         this.combo = combo;
@@ -202,7 +199,8 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
     }
     
     /**
-     * @return
+     * @deprecated
+     * @return SSFormattedComboBox associated with SSFormattedTextField
      */
     public SSFormattedComboBox getSSFormattedComboBox() {
         return combo;
@@ -728,7 +726,7 @@ public class SSFormattedTextField extends JFormattedTextField implements RowSetL
             
             SSFormattedTextField tf = null;
             Object aux = null;
-            boolean passed = true;
+            //boolean passed = true;
             
             /**
              * field to be validated and updated

@@ -50,7 +50,7 @@ import ca.odell.glazedlists.event.ListEventListener;
 /**
  * @author  dags
  */
-public class SelectorList extends JList implements ListDataListener, ListEventListener {
+public class SelectorList extends JList<Object> implements ListDataListener, ListEventListener<Object> {
     
 	/**
 	 * 
@@ -150,14 +150,14 @@ public class SelectorList extends JList implements ListDataListener, ListEventLi
     /* (non-Javadoc)
      * @see ca.odell.glazedlists.event.ListEventListener#listChanged(ca.odell.glazedlists.event.ListEvent)
      */
-    public void listChanged(ListEvent listEvent) {
+    public void listChanged(ListEvent<Object> listEvent) {
         this.repaint();
     }
 
     /* (non-Javadoc)
      * @see javax.swing.JList#setModel(javax.swing.ListModel)
      */
-    public void setModel(ListModel model) {
+    public void setModel(ListModel<Object> model) {
 
         super.setModel(model);
         ((SelectorListModel)model).addListDataListener(this);

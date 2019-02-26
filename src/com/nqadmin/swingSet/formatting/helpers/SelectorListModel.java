@@ -35,39 +35,39 @@ package com.nqadmin.swingSet.formatting.helpers;
 
 import java.sql.SQLException;
 
-import javax.swing.AbstractListModel;
-import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTextField;
 import javax.swing.event.ListDataListener;
 
-import ca.odell.glazedlists.BasicEventList;
-import ca.odell.glazedlists.event.ListEventListener;
-import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
-import ca.odell.glazedlists.*;
-
 import com.nqadmin.swingSet.datasources.SSConnection;
 import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.FilterList;
+import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.swing.TextComponentMatcherEditor;
 
 
 /**
  * @author  dags
  */
 
-public class SelectorListModel extends AbstractListModel implements ComboBoxModel {
+//public class SelectorListModel extends AbstractListModel implements ComboBoxModel {
+public class SelectorListModel extends DefaultComboBoxModel<Object> {
 	
     /**
 	 * 
 	 */
 	private static final long serialVersionUID = 2436267331238687202L;
 	private Object selectedOne = null;
-	private BasicEventList data = new BasicEventList();
+	private BasicEventList<Object> data = new BasicEventList<>();
 	/*
 	 * Changed TextFilterList to FilterList because of new glazedlist jar update.
 	 * FilterList takes in its parameters a TextComponentMatcherEditor to account for
 	 * the depreciated TextFilterList methods.
 	 */
-    private FilterList filtered_data = new FilterList(data);
-    private TextComponentMatcherEditor text_match; 
+    private FilterList<Object> filtered_data = new FilterList<>(data);
+    private TextComponentMatcherEditor<Object> text_match; 
     
     /*
      *  Holds value of JTextField used to filter
@@ -170,7 +170,7 @@ public class SelectorListModel extends AbstractListModel implements ComboBoxMode
      *	This function re-fetches the information from the database. 
      */
     public void refresh() {
-        data = new BasicEventList();//
+        data = new BasicEventList<>();//
         this.populateModel();
     }
     
@@ -191,17 +191,14 @@ public class SelectorListModel extends AbstractListModel implements ComboBoxMode
      * Sets the text to be used to filter items in the list
      * @param newFilter - text to be used to filter item in the list
      */
-	@SuppressWarnings("unchecked")
 	public void setFilterText(String[] newFilter) {
         text_match.setFilterText(newFilter);
-        filtered_data = new FilterList(data, text_match);
-        
+        filtered_data = new FilterList<Object>(data, text_match);
     }
     
     /*
      * Populates the list model with the data by fetching it from the database.
      */
-    @SuppressWarnings("unchecked")
 	private void populateModel() {
         
         Object dataValue = null;
@@ -211,7 +208,7 @@ public class SelectorListModel extends AbstractListModel implements ComboBoxMode
     // IF ANY OF THE REQUIRED INFORMATION IS NOT PRESENT CLEAR THE DATA AND RETURN     
         if (ssConnection == null || dataColumn == null || listColumn == null || table == null) {
             data.clear();
-            filtered_data = new FilterList(data);//
+            filtered_data = new FilterList<Object>(data);//
             return;
         }
 
@@ -387,7 +384,7 @@ public class SelectorListModel extends AbstractListModel implements ComboBoxMode
      * Creates filtered data based on the actual data
      */
     public void createFilteredData() {
-        filtered_data = new FilterList(data);//
+        filtered_data = new FilterList<>(data);//
         this.fireContentsChanged(this, 0, filtered_data.size()-1);//
         this.fireIntervalAdded(this, 0, 1);
         this.fireIntervalRemoved(this, 0, 1);
@@ -600,8 +597,8 @@ public class SelectorListModel extends AbstractListModel implements ComboBoxMode
 	public void setFilterEdit(JTextField filter) {
         //filtered_data.setFilterEdit(filter);
     	this.filter = filter;
-    	text_match = new TextComponentMatcherEditor(filter, null);    
-        filtered_data = new FilterList(data, text_match);
+    	text_match = new TextComponentMatcherEditor<Object>(filter, null);    
+        filtered_data = new FilterList<Object>(data, text_match);
 
     }
     
@@ -609,7 +606,7 @@ public class SelectorListModel extends AbstractListModel implements ComboBoxMode
      * Adds the event listener for the filtered list
      * @param listChangeListener - list listener to be added to filtered list
      */
-    public void addListEventListener(ListEventListener listChangeListener) {//
+    public void addListEventListener(ListEventListener<Object> listChangeListener) {//
         filtered_data.addListEventListener(listChangeListener);//
        
     }

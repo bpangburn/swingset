@@ -32,6 +32,7 @@
 
 package com.nqadmin.swingSet;
 
+import java.lang.reflect.Constructor;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.FocusEvent;
@@ -833,9 +834,9 @@ public class SSDataGrid extends JTable {
         Object value;
         
         /**
-         *  Constructor to instanciate an object of column type from a string.
+         *  Constructor to instantiate an object of column type from a string.
          */
-        java.lang.reflect.Constructor constructor;
+        Constructor<?> constructor;
         
               
         /**
@@ -855,7 +856,8 @@ public class SSDataGrid extends JTable {
         private class MyListener implements KeyListener, FocusListener{
             
             int keyPressed = 0;
-            boolean hasFocus = false;
+            // 2019-02-23-BP: hasFocus is not read/used
+            //boolean hasFocus = false;
             
         // ASSUMPTION HERE IS THAT THE EDITOR WILL NOT GET THE KEY PRESSED EVENT
         // FOR THE FIRST KEY (WHICH TRIGGERS THE EDITOR, EVENT IS CONSUMED BY JTABLE)
@@ -892,7 +894,7 @@ public class SSDataGrid extends JTable {
              */
             public void focusGained(FocusEvent fe){
                 ((SSTextField)getComponent()).selectAll();
-                hasFocus = true;
+                //hasFocus = true;
             }
             
             /**
@@ -900,7 +902,7 @@ public class SSDataGrid extends JTable {
              */
             public void focusLost(FocusEvent fe){
             // SET THE KEYPRESSED TO ZERO AS THE EDITOR HAS LOST THE FOCUS.    
-                hasFocus = false;
+                //hasFocus = false;
                 keyPressed = 0;
             }
         }
@@ -937,7 +939,7 @@ public class SSDataGrid extends JTable {
         // GET A CONSTRUCTOR FOR AN OBJECT OF THE CURRENT COLUMN TYPE.
         // THIS IS NEEDED FOR RETURNING THE VALUE IN COLUMN CLASS OBJECT 
             try {
-                Class type = table.getColumnClass(column);
+                Class<?> type = table.getColumnClass(column);
                 if (type == Object.class) {
                     type = String.class;
                 }

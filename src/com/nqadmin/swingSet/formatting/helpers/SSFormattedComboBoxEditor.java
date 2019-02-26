@@ -138,7 +138,7 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
     }
     
     /**
-     * @return
+     * @return database column name
      */
     public String getColumnName() {
         return columnName;
@@ -147,13 +147,14 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
     /**
      * @param navigator
      */
+    @Deprecated
     public void setNavigator(SSDataNavigator navigator) {
         this.navigator = navigator;
         editor.setNavigator(navigator);
     }
     
     /**
-     * @return
+     * @return SSDataNavigator
      */
     public SSDataNavigator getNavigator() {
         return navigator;
@@ -168,7 +169,7 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
     }
     
     /**
-     * @return
+     * @return SSRowSet
      */
     public SSRowSet getSSRowSet() {
         return rowset;
@@ -182,14 +183,14 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
     }
     
     /**
-     * @return
+     * @return associated SSFormattedTextField
      */
     public SSFormattedTextField getEditorField() {
         return editor;
     }
     
     /**
-     * @return
+     * @return JLabel column label
      */
     public JLabel getDisplayField() {
         return display;
@@ -261,14 +262,14 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
      * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
      */
     public void propertyChange(java.beans.PropertyChangeEvent evt) {
-        Object oValue = null;
+        //Object oValue = null;
         Object nValue = null;
         
         if (evt.getSource().equals(editor)) {
             
             if (evt.getPropertyName() == "value") {
                 
-                oValue = evt.getOldValue();
+                //oValue = evt.getOldValue();
                 nValue = evt.getNewValue();
                 
                 if (nValue == null) {
@@ -314,8 +315,8 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
     }
     
     /**
-     * @param nValue
-     * @return
+     * @param nValue new value for List
+     * @return Object with edited value
      */
     private Object updateField(Object nValue) {
         

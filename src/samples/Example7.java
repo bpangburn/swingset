@@ -79,9 +79,7 @@ public class Example7 extends JFrame {
             dataGrid.setHiddenColumns(new String[]{"supplier_part_id"});
 
             dataGrid.setDateRenderer("ship_date");
-            if (this == null) {
-                System.out.println("This frame is null");
-            }
+
             dataGrid.setMessageWindow(this);
             dataGrid.setUneditableColumns(new int[]{4});
             

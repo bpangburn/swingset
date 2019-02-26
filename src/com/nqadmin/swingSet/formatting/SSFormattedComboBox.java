@@ -79,7 +79,7 @@ public class SSFormattedComboBox extends JComboBox<Object> implements ActionList
     /**
      * @param model
      */
-    public SSFormattedComboBox(ComboBoxModel model) {
+    public SSFormattedComboBox(ComboBoxModel<Object> model) {
         super(model);
         this.model = (SSFormattedComboBoxModel)this.getModel();
         

@@ -73,8 +73,12 @@ import com.nqadmin.swingSet.utils.SSArray;
  *
  *</pre><p>
  */
-@SuppressWarnings("serial")
-public class SSList extends JList {
+public class SSList extends JList<Object> {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5698401719124062031L;
 
 	/**
 	 * SSRowSet from which component will get/set values.
@@ -324,7 +328,6 @@ public class SSList extends JList {
 	 * @return	Object array
 	 * @throws SQLException
 	 */
-	@SuppressWarnings("unchecked")
 	private Object[] toObjArray(Array array) throws SQLException{
 		if(array == null) {
 			return null;
@@ -452,6 +455,8 @@ public class SSList extends JList {
 	 */
 	private class MyRowSetListener implements RowSetListener, Serializable {
 
+		private static final long serialVersionUID = 8375973600687061491L;
+
 		public void cursorMoved(RowSetEvent arg0) {
 			removeListSelectionListener(listListener);
 			try {
@@ -488,6 +493,8 @@ public class SSList extends JList {
 	 * bound text field.
 	 */
 	private class MyListListener implements ListSelectionListener, Serializable {
+
+		private static final long serialVersionUID = 4337396603209239909L;
 
 		public void valueChanged(ListSelectionEvent e) {
 			removeListeners();

@@ -33,6 +33,7 @@
 
 package com.nqadmin.swingSet.formatting;
 
+import java.awt.AWTKeyStroke;
 import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.Insets;
@@ -42,7 +43,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -55,7 +55,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
 import com.nqadmin.swingSet.SSDataNavigator;
@@ -67,20 +66,13 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  */
 public class SSImageField extends JPanel implements RowSetListener, KeyListener, ComponentListener {
     
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 889303691158522232L;
-	private BufferedImage bufferedImage;
-    private byte[] imageBytes;
+	private byte[] imageBytes;
     private ImageIcon fullIcon;
     private ImageIcon scaledIcon;
     private ImageIcon nullIcon;
     private JButton imageButton;
     private JButton getButton;
-    private JScrollPane scrollPane;
-    
-    private java.awt.Color std_color = null;
     private String columnName = null;
     private int colType = -99;
     private SSRowSet rowset = null;
@@ -90,14 +82,14 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
     public SSImageField() {
         super();
         
-        Set forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
-        Set newForwardKeys = new HashSet(forwardKeys);
+        Set<AWTKeyStroke> forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+        Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(forwardKeys);
         newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
         newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK ));
         setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);
         
-        Set backwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
-        Set newBackwardKeys = new HashSet(backwardKeys);
+        Set<AWTKeyStroke> backwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
+        Set<AWTKeyStroke> newBackwardKeys = new HashSet<AWTKeyStroke>(backwardKeys);
         newBackwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_UP, java.awt.event.InputEvent.SHIFT_MASK ));
         setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,newBackwardKeys);
         
@@ -203,7 +195,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
         if (wi == 0 && hi ==0 ) {
             ws = wo; hs = ho;
         }
-        scaled = image.getScaledInstance(ws, hs, image.SCALE_SMOOTH);
+        scaled = image.getScaledInstance(ws, hs, Image.SCALE_SMOOTH);
         return new ImageIcon(scaled);
     }
     

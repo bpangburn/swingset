@@ -33,6 +33,7 @@
 
 package com.nqadmin.swingSet.formatting.helpers;
 
+import java.util.List;
 import ca.odell.glazedlists.TextFilterable;
 
 /**
@@ -139,9 +140,10 @@ public class SelectorElement implements TextFilterable {
     /* (non-Javadoc)
      * @see ca.odell.glazedlists.TextFilterable#getFilterStrings(java.util.List)
      */
-    public void getFilterStrings(java.util.List list) {
-        list.add(listValue);
+    public void getFilterStrings(List<String> list) {
+        list.add((String) listValue);
     }
+
 }
 
 /*

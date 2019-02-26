@@ -54,7 +54,7 @@ public class SSCurrencyField extends SSFormattedTextField {
     /**
      * Holds value of property minimumIntegerDigits.
      */
-    private int minimumIntegerDigits;
+    //private int minimumIntegerDigits;
 
     /** 
      * Creates a new instance of SSCurrencyField 

@@ -33,11 +33,10 @@
 
 package com.nqadmin.swingSet.formatting.helpers;
 
-import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import javax.swing.MutableComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 
 import com.nqadmin.swingSet.datasources.SSConnection;
 import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
@@ -48,7 +47,8 @@ import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
  * 
  * @author  dags
  */
-public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel implements MutableComboBoxModel, Serializable {
+//public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel implements MutableComboBoxModel, Serializable {
+public class SSFormattedComboBoxModel extends DefaultComboBoxModel<Object> {
     
     /**
 	 * 
@@ -145,8 +145,8 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
     }
     
     /**
-     * @param object
-     * @return
+     * @param object for which to lookup index
+     * @return list index corresponding to value provided
      */
     public int indexOf(Object object) {
         return dataList.indexOf(object);
@@ -164,7 +164,7 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
     
     /**
      * @param index
-     * @return
+     * @return Object with value corresponding to index provided
      */
     public Object getSelectedBoundData(int index) {
         Object itm = listList.get(index);
@@ -418,7 +418,7 @@ public class SSFormattedComboBoxModel extends javax.swing.AbstractListModel impl
     }
     
     /**
-     * @return
+     * @return ordery by SQL
      */
     public String getOrderBy() {
         return orderBy;

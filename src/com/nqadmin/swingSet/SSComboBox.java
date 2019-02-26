@@ -493,9 +493,9 @@ public class SSComboBox extends JComboBox<Object> {
     }
     
     /**
-     * Updates the value displayed in the component based on the SSRowSet column
-     * binding.
-     * @useTextField if this is true the value from the text in the text field will be used to update the display even if the
+     * Updates the value displayed in the component based on the SSRowSet column binding.
+     * 
+     * @param useTextField If this is true the value from the text in the text field will be used to update the display even if the
      * rowset is on a valid row. This is needed when setSelectedValue is used.
      */
     protected void updateDisplay(boolean useTextField) throws SQLException {

@@ -86,7 +86,7 @@ public class SSTableModel extends AbstractTableModel {
     /**
      * Map to store the default values of different columns.
      */
-    protected HashMap defaultValuesMap = null;
+    protected HashMap<Integer, Object> defaultValuesMap = null;
 
     /**
      * Indicator to determine if the SSRowSet is on the insertion row.
@@ -586,8 +586,8 @@ public class SSTableModel extends AbstractTableModel {
             return;
         }
 
-        Set keySet = defaultValuesMap.keySet();
-        Iterator iterator = keySet.iterator();
+        Set<Integer> keySet = defaultValuesMap.keySet();
+        Iterator<?> iterator = keySet.iterator();
         try {
             while (iterator.hasNext()) {
                 Integer column = (Integer)iterator.next();
@@ -643,7 +643,7 @@ public class SSTableModel extends AbstractTableModel {
      *
      * @return  type for the specified column (first column is 0)
      */
-    public Class getColumnClass(int _column) {
+    public Class<?> getColumnClass(int _column) {
         int type;
         try {
             type = rowset.getColumnType(_column+1);
@@ -735,7 +735,7 @@ public class SSTableModel extends AbstractTableModel {
         }
 
         if (defaultValuesMap == null) {
-            defaultValuesMap = new HashMap();
+            defaultValuesMap = new HashMap<>();
         } else {
             defaultValuesMap.clear();
         }

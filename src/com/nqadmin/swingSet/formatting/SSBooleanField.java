@@ -33,6 +33,7 @@
 
 package com.nqadmin.swingSet.formatting;
 
+import java.awt.AWTKeyStroke;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -58,8 +59,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	 * 
 	 */
 	private static final long serialVersionUID = -856226927518717477L;
-	private java.awt.Color std_color = null;
-    private String columnName = null;
+	private String columnName = null;
     private int colType = -99;
     private SSRowSet rowset = null;
     private SSDataNavigator navigator = null;
@@ -68,14 +68,14 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
     public SSBooleanField() {
         super();
         
-        Set forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
-        Set newForwardKeys = new HashSet(forwardKeys);
+        Set<AWTKeyStroke> forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+        Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(forwardKeys);
         newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
         newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK ));
         setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);
         
-        Set backwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
-        Set newBackwardKeys = new HashSet(backwardKeys);
+        Set<AWTKeyStroke> backwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
+        Set<AWTKeyStroke> newBackwardKeys = new HashSet<AWTKeyStroke>(backwardKeys);
         newBackwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_UP, java.awt.event.InputEvent.SHIFT_MASK ));
         setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,newBackwardKeys);
         

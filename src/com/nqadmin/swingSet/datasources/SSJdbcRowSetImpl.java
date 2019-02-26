@@ -391,7 +391,7 @@ import com.sun.rowset.JdbcRowSetImpl;
      * not update the underlying data source; instead the updateRow or insertRow methods are called
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
-     * @param value - new column value
+     * @param x - new column value
      * @throws throws an SQL exception if an access error occurs.
      */
     public void updateArray(int columnIndex, Array x) throws SQLException{
@@ -627,7 +627,7 @@ import com.sun.rowset.JdbcRowSetImpl;
      * not update the underlying data source; instead the updateRow or insertRow methods are called
      * to update the underlying data source.
      * @param columnName - Name of the column.
-     * @param value - new column value
+     * @param x - new column value
      * @throws throws an SQL exception if an access error occurs.
      */
     public void updateArray(String columnName, Array x) throws SQLException{

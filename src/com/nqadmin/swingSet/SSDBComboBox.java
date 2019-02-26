@@ -137,7 +137,7 @@ import com.nqadmin.swingSet.formatting.helpers.SelectorElement;
  * @version $Revision: 1.39 $
  */
 
-public class SSDBComboBox extends JComboBox {
+public class SSDBComboBox extends JComboBox<Object> {
 	
 	/**
 	 * 
@@ -229,7 +229,6 @@ public class SSDBComboBox extends JComboBox {
     protected String seperator = " - ";
     
     /**
-     * @author mvo
      * boolean value for activating or disabling the filter
      */
    private boolean filterSwitch = true;
@@ -909,7 +908,6 @@ public class SSDBComboBox extends JComboBox {
     }
     
     /**
-     * @author mvo
      * Gets the selected value of the selected item in the filtered list.
      */
     public String getSelectedFilteredValue() {	
@@ -930,8 +928,7 @@ public class SSDBComboBox extends JComboBox {
 		}
 	}
    
-     /**
-     * @author mvo
+    /**
      * Listener for keystroke-based, string matching, combo box navigation.
      */
     private class MyKeyListener extends KeyAdapter {
@@ -977,7 +974,7 @@ public class SSDBComboBox extends JComboBox {
     			filterText = (JTextField) getEditor().getEditorComponent();
     			selectorCBM.setFilterEdit(filterText);
     			filterText.setText(""+ke.getKeyChar());
-    			filterText.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
+    			filterText.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, Collections.emptySet());
     			
     			// SINCE WE HAVE TO ADD THE LISTENER IN COMBO KEY LISTENER
     			// MAKE SURE WE ARE NOT ADDING IT MULTIPLE TIMES.
@@ -993,7 +990,7 @@ public class SSDBComboBox extends JComboBox {
 
     /**
      * Method that sets the combo box to be filterable. 
-     * @author mvo
+     * 
      * @param filter boolean to turn filtering on or off
      */
     public void setFilterable(boolean filter) {	

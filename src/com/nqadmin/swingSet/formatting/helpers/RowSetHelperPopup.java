@@ -42,7 +42,6 @@ import java.awt.event.MouseListener;
 import java.sql.SQLException;
 
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -332,6 +331,11 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
      * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
      */
     public void valueChanged(javax.swing.event.ListSelectionEvent e) {
+    	
+    	// 2019-02-23-BP: this method doesn't seem to do anything
+    	return;
+    	
+    	/*
         int desde;
         int hasta;
         int selected;
@@ -350,6 +354,7 @@ public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyL
             
             SelectorElement se3 = (SelectorElement) (lista.getModel().getElementAt(selected));
         }
+        */
     }
     
     /* (non-Javadoc)
