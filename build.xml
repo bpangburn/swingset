@@ -24,10 +24,10 @@
         <mkdir dir="${deploydir}" />
     </target>
     <target name="compile" depends="prepare">
-        <javac source="1.7" target="1.7" includeantruntime="false" debug="true" debuglevel="lines,source,vars" srcdir="${srcdir}/com" destdir="${classesdir}">
+        <javac source="1.8" target="1.8" includeantruntime="false" debug="true" debuglevel="lines,source,vars" srcdir="${srcdir}/com" destdir="${classesdir}">
             <classpath refid="1" />
         </javac>
-        <javac source="1.7" target="1.7" includeantruntime="false" debug="true" debuglevel="lines,source,vars" srcdir="${srcdir}/samples" destdir="${classesdir}/samples">
+        <javac source="1.8" target="1.8" includeantruntime="false" debug="true" debuglevel="lines,source,vars" srcdir="${srcdir}/samples" destdir="${classesdir}/samples">
             <classpath refid="2" />
         </javac>
     </target>
