@@ -3,6 +3,17 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
 ==============================================================================
+SwingSet 2.2.0 - Released 2019-02-27
+==============================================================================
+
+Changes:
+	1. Updated code to support Java Generics
+	2. Addressed various Eclipse compilation and JavaDoc warnings
+	3. Set build source & target to Java 8 (1.8)
+	4. Cleaned up licensing & file header consistency using the Eclipse
+	   Copyright Generator
+
+==============================================================================
 SwingSet 2.1.0 - Released 2018-09-18
 ==============================================================================
 
