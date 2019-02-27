@@ -1,25 +1,25 @@
-/* $Id: SSDBComboBox.java,v 1.39 2013/12/09 22:43:01 prasanth Exp $
- *
- * Tab Spacing = 4
- *
- * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala.
+/*******************************************************************************
+ * Copyright (C) 2003-2019, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this
- * list of conditions and the following disclaimer.  Redistributions in binary
- * form must reproduce the above copyright notice, this list of conditions and
- * the following disclaimer in the documentation and/or other materials
- * provided with the distribution.  The names of its contributors may not be
- * used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
  * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
  * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -27,8 +27,13 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- */
+ * 
+ * Contributors:
+ *   Prasanth R. Pasala
+ *   Brian E. Pangburn
+ *   Diego Gil
+ *   Man "Bee" Vo
+ ******************************************************************************/
 
 package com.nqadmin.swingSet;
 
@@ -60,9 +65,9 @@ import com.nqadmin.swingSet.formatting.helpers.SelectorElement;
 
 /**
  * SSDBComboBox.java
- *<p>
+ * 
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- *<p><pre>
+ * 
  * Similar to the SSComboBox, but used when both the 'bound' values and the
  * 'display' values are pulled from a database table.  Generally the bound
  * value represents a foreign key to another table, and the combobox needs to
@@ -132,15 +137,12 @@ import com.nqadmin.swingSet.formatting.helpers.SelectorElement;
  *
  *      // ADD THE JTEXTFIELD TO THE JFRAME
  *           getContentPane().add(myText);
- *</pre><p>
- * @author  $Author: prasanth $
- * @version $Revision: 1.39 $
  */
 
 public class SSDBComboBox extends JComboBox<Object> {
 	
 	/**
-	 * 
+	 * unique serial id
 	 */
 	private static final long serialVersionUID = -4203338788107410027L;
 
@@ -1054,8 +1056,6 @@ public class SSDBComboBox extends JComboBox<Object> {
     } // private class MyComboListener implements ActionListener {
 
 } // end public class SSDBComboBox extends JComponent {
-
-
 
 /*
  * $Log: SSDBComboBox.java,v $

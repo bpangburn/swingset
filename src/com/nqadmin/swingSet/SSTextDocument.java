@@ -1,25 +1,25 @@
-/* $Id$
- *
- * Tab Spacing = 4
- *
- * Copyright (c) 2003-2006, The Pangburn Company and Prasanth R. Pasala
+/*******************************************************************************
+ * Copyright (C) 2003-2019, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this
- * list of conditions and the following disclaimer.  Redistributions in binary
- * form must reproduce the above copyright notice, this list of conditions and
- * the following disclaimer in the documentation and/or other materials
- * provided with the distribution.  The names of its contributors may not be
- * used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
  * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
  * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -27,8 +27,13 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- */
+ * 
+ * Contributors:
+ *   Prasanth R. Pasala
+ *   Brian E. Pangburn
+ *   Diego Gil
+ *   Man "Bee" Vo
+ ******************************************************************************/
 
 package com.nqadmin.swingSet;
 
@@ -53,9 +58,9 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
 
 /**
  * SSTextDocument.java
- *<p>
+ * 
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- *<p><pre>
+ * 
  * Java PlainDocument that is 'database-aware'.  When developing a database
  * application the SSTextDocument can be used in conjunction with the
  * SSDataNavigator to allow for both editing and navigation of the rows in a
@@ -68,14 +73,11 @@ import com.nqadmin.swingSet.datasources.SSRowSet;
  *
  * Note that a SSRowSet insert doesn't implicitly modify the cursor which is why
  * the SSDBNavImp is provided for clearing controls following an insert.
- *</pre><p>
- * @author  $Author$
- * @version $Revision$
  */
 public class SSTextDocument extends javax.swing.text.PlainDocument {
     
     /**
-	 * 
+	 * unique serial id
 	 */
 	private static final long serialVersionUID = -8837650674496040218L;
 
@@ -606,8 +608,6 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
     } // end private class MyRowSetListener implements RowSetListener, Serializable {
 
 } // end public class SSTextDocument extends javax.swing.text.PlainDocument {
-
-
 
 /*
  * $Log$
