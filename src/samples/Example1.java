@@ -44,7 +44,7 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
  /**
   * This example demonstrates the use of SSTextDocument to display information in
-  * JTextField (Name, City, and Status). The navigation is done with
+  * SSTextField (name, city, status, & supplier id). The navigation is done with
   * SSDataNavigator.
   */
 
@@ -64,6 +64,11 @@ import com.nqadmin.swingSet.datasources.SSConnection;
     SSJdbcRowSetImpl rowset   = null;
     SSDataNavigator navigator = null;
     
+    /**
+     * Constructor for Example1
+     * 
+     * @param url - path to SQL to create suppliers & parts database
+     */
     public Example1(String url) {
    
         super("Example1");
@@ -71,15 +76,15 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         setSize(600,200);
 
         try{
-        	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
+        	this.ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
         	System.out.println("url from ex 1: "+url);
-        	ssConnection.setDriverName("org.h2.Driver");
-            ssConnection.createConnection();
+        	this.ssConnection.setDriverName("org.h2.Driver");
+            this.ssConnection.createConnection();
                 
-            rowset = new SSJdbcRowSetImpl(ssConnection);
-            rowset.setCommand("SELECT * FROM supplier_data");
-            navigator = new SSDataNavigator(rowset);
-            navigator.setDBNav( new SSDBNavImp(getContentPane()));
+            this.rowset = new SSJdbcRowSetImpl(this.ssConnection);
+            this.rowset.setCommand("SELECT * FROM supplier_data");
+            this.navigator = new SSDataNavigator(this.rowset);
+            this.navigator.setDBNav( new SSDBNavImp(getContentPane()));
         }catch(SQLException se){
             se.printStackTrace();
         }catch(ClassNotFoundException cnfe){
@@ -90,23 +95,23 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         // FULLY IMPLEMENTED AND AN EXECUTE COMMAND IS REQUIRED WHEN INSERTING A NEW
         // ROW FOR KEEPING THE CURSOR AT THE NEWLY INSERTED ROW.
         // IF USING ANOTHER DATABASE, THE FOLLOWING IS NOT REQURIED:         
-        navigator.setDBNav(new SSDBNavAdapter(){
+        this.navigator.setDBNav(new SSDBNavAdapter(){
         	/**
-			 * 
+			 * unique serial id
 			 */
 			private static final long serialVersionUID = -7698780157683623074L;
 			@Override
         	public void performPreInsertOps() {
  				super.performPreInsertOps();
- 				txtSupplierName.setText(null);
- 				txtSupplierCity.setText(null);
- 				txtSupplierStatus.setText(null);
+ 				Example1.this.txtSupplierName.setText(null);
+ 				Example1.this.txtSupplierCity.setText(null);
+ 				Example1.this.txtSupplierStatus.setText(null);
  			}
         	@Override
  			public void performPostInsertOps() {
  				super.performPostInsertOps();
  				try {
-					rowset.execute();
+					Example1.this.rowset.execute();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -118,18 +123,18 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         // DEPRECIATED .SETDOCUMENT(Document document) AND BINDS THE ROWSET AND
         // THE DATABASE'S COLUMN NAME TO THE NAVIGATOR
        
-        txtSupplierID.bind(rowset,"supplier_id");
-        txtSupplierName.bind(rowset,"supplier_name");
-        txtSupplierCity.bind(rowset,"city");
-        txtSupplierStatus.bind(rowset,"status");
+        this.txtSupplierID.bind(this.rowset,"supplier_id");
+        this.txtSupplierName.bind(this.rowset,"supplier_name");
+        this.txtSupplierCity.bind(this.rowset,"city");
+        this.txtSupplierStatus.bind(this.rowset,"status");
         
-        lblSupplierName.setPreferredSize(new Dimension(75,20));
-        lblSupplierCity.setPreferredSize(new Dimension(75,20));
-        lblSupplierStatus.setPreferredSize(new Dimension(75,20));
+        this.lblSupplierName.setPreferredSize(new Dimension(75,20));
+        this.lblSupplierCity.setPreferredSize(new Dimension(75,20));
+        this.lblSupplierStatus.setPreferredSize(new Dimension(75,20));
 
-        txtSupplierName.setPreferredSize(new Dimension(150,20));
-        txtSupplierCity.setPreferredSize(new Dimension(150,20));
-        txtSupplierStatus.setPreferredSize(new Dimension(150,20));
+        this.txtSupplierName.setPreferredSize(new Dimension(150,20));
+        this.txtSupplierCity.setPreferredSize(new Dimension(150,20));
+        this.txtSupplierStatus.setPreferredSize(new Dimension(150,20));
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new GridBagLayout());
@@ -137,24 +142,24 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
         constraints.gridx = 0;
         constraints.gridy = 0;
-        contentPane.add(lblSupplierName, constraints);
+        contentPane.add(this.lblSupplierName, constraints);
         constraints.gridy = 1;
-        contentPane.add(lblSupplierCity, constraints);
+        contentPane.add(this.lblSupplierCity, constraints);
         constraints.gridy = 2;
-        contentPane.add(lblSupplierStatus, constraints);
+        contentPane.add(this.lblSupplierStatus, constraints);
 
         constraints.gridx = 1;
         constraints.gridy = 0;
-        contentPane.add(txtSupplierName, constraints);
+        contentPane.add(this.txtSupplierName, constraints);
         constraints.gridy = 1;
-        contentPane.add(txtSupplierCity, constraints);
+        contentPane.add(this.txtSupplierCity, constraints);
         constraints.gridy = 2;
-        contentPane.add(txtSupplierStatus, constraints);
+        contentPane.add(this.txtSupplierStatus, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 3;
         constraints.gridwidth = 2;
-        contentPane.add(navigator,constraints);
+        contentPane.add(this.navigator,constraints);
 
         setVisible(true);
         

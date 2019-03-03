@@ -45,15 +45,25 @@ import java.beans.beancontext.BeanContextChildSupport;
 import java.util.Vector;
 import java.util.Iterator;
 
+/**
+ * SSConnectionEditor.java
+ * 
+ * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+ * 
+ * SSConnectionEditor is used to facilitate Java Bean editing of data source
+ * connection information.
+ */
 public class SSConnectionEditor extends PropertyEditorSupport implements BeanContextProxy {
 	
 	private BeanContextChildSupport beanContextChildSupport = new BeanContextChildSupport();
-	Vector<Object> vecSSConn = new Vector<Object>();
+	Vector<Object> vecSSConn = new Vector<>();
 	
+	@Override
 	public BeanContextChild getBeanContextProxy(){
-		return beanContextChildSupport;
+		return this.beanContextChildSupport;
 	}
 	
+	@Override
 	public String getAsText(){
 		Object curValue = getValue();
 		if(curValue == null)
@@ -61,22 +71,24 @@ public class SSConnectionEditor extends PropertyEditorSupport implements BeanCon
 		return curValue.toString();	
 	}
 
+	@Override
 	public void setAsText(String value){
 		if(value.trim().equals("<none>"))
 			setValue(null);
 		else{
-			for(int i=0; i<vecSSConn.size(); i++){
-				if(vecSSConn.elementAt(i).toString().equals(value)){
-					setValue(vecSSConn.elementAt(i));
+			for(int i=0; i<this.vecSSConn.size(); i++){
+				if(this.vecSSConn.elementAt(i).toString().equals(value)){
+					setValue(this.vecSSConn.elementAt(i));
 					break;
 				}
 			}
 		}	
 	}
 	
+	@Override
 	public String[] getTags(){
-		vecSSConn.removeAllElements();
-		BeanContext beanContext = beanContextChildSupport.getBeanContext();
+		this.vecSSConn.removeAllElements();
+		BeanContext beanContext = this.beanContextChildSupport.getBeanContext();
 		if(beanContext == null){
 			return new String[]{"Bean Context Null"};
 		}
@@ -84,18 +96,18 @@ public class SSConnectionEditor extends PropertyEditorSupport implements BeanCon
 		while(iterator.hasNext()){
 			Object sibling = iterator.next();
 			if(sibling instanceof SSConnection){
-				vecSSConn.add(sibling);
+				this.vecSSConn.add(sibling);
 			}
 		}
-		String[] names = new String[vecSSConn.size() + 1];
-		if(vecSSConn.size() > 0){
+		String[] names = new String[this.vecSSConn.size() + 1];
+		if(this.vecSSConn.size() > 0){
 			
-			for(int i=0; i<vecSSConn.size(); i++){
-				names[i] = vecSSConn.elementAt(i).toString();
+			for(int i=0; i<this.vecSSConn.size(); i++){
+				names[i] = this.vecSSConn.elementAt(i).toString();
 			}
 			return names;
 		}
-		names[vecSSConn.size()] = String.valueOf(vecSSConn.size());
+		names[this.vecSSConn.size()] = String.valueOf(this.vecSSConn.size());
 		return names;
 
 	}

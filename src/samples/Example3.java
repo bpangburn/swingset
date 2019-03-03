@@ -46,7 +46,7 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
  /**
   * This example demonstrates the use of SSTextDocument to display information in
-  * SSDBComboBox (Supplier and Part) and JTextField (ty). The navigation
+  * SSDBComboBox (supplier and part) and SSTextField (quantity). The navigation
   * is done with SSDataNavigator.
   */
  public class Example3 extends JFrame{
@@ -64,6 +64,11 @@ import com.nqadmin.swingSet.datasources.SSConnection;
     SSJdbcRowSetImpl rowset   = null;
     SSDataNavigator navigator = null;
 
+    /**
+     * Constructor for Example3
+     * 
+     * @param url - path to SQL to create suppliers & parts database
+     */
     public Example3(String url){
 
         super("Example3");
@@ -71,13 +76,13 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
         try{
         	System.out.println("url from ex 3: "+url);
-        	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
-        	ssConnection.setDriverName("org.h2.Driver");
-            ssConnection.createConnection();
+        	this.ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
+        	this.ssConnection.setDriverName("org.h2.Driver");
+            this.ssConnection.createConnection();
             
-            rowset = new SSJdbcRowSetImpl(ssConnection);
-            rowset.setCommand("SELECT * FROM supplier_part_data");
-            navigator = new SSDataNavigator(rowset);
+            this.rowset = new SSJdbcRowSetImpl(this.ssConnection);
+            this.rowset.setCommand("SELECT * FROM supplier_part_data");
+            this.navigator = new SSDataNavigator(this.rowset);
         }catch(SQLException se){
             se.printStackTrace();
         }catch(ClassNotFoundException cnfe){
@@ -88,24 +93,24 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         // FULLY IMPLEMENTED AND AN EXECUTE COMMAND IS REQUIRED WHEN INSERTING A NEW
         // ROW AND KEEPING THE CURSOR AT THE NEWLY INSERTED ROW.
         // IF USING ANOTHER DATABASE, THE FOLLOWING IS NOT REQURIED:   
-        navigator.setDBNav(new SSDBNavAdapter(){
+        this.navigator.setDBNav(new SSDBNavAdapter(){
         	/**
-			 * 
+			 * unique serial id
 			 */
 			private static final long serialVersionUID = 4343059684161003109L;
 			@Override
         	public void performPreInsertOps() {
  			
  				super.performPreInsertOps();
- 				cmbSupplierName.setSelectedItem(null);
- 				cmbPartName.setSelectedItem(null);
- 				txtQuantity.setText(null);
+ 				Example3.this.cmbSupplierName.setSelectedItem(null);
+ 				Example3.this.cmbPartName.setSelectedItem(null);
+ 				Example3.this.txtQuantity.setText(null);
  			}
         	@Override
  			public void performPostInsertOps() {
  				super.performPostInsertOps();
  				try {
-					rowset.execute();
+					Example3.this.rowset.execute();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -114,18 +119,18 @@ import com.nqadmin.swingSet.datasources.SSConnection;
          });
         
         String query = "SELECT * FROM supplier_data;";
-        cmbSupplierName = new SSDBComboBox(ssConnection, query, "supplier_id", "supplier_name");  
-        cmbSupplierName.bind(rowset,"supplier_id");
+        this.cmbSupplierName = new SSDBComboBox(this.ssConnection, query, "supplier_id", "supplier_name");  
+        this.cmbSupplierName.bind(this.rowset,"supplier_id");
         
         query = "SELECT * FROM part_data;";
-        cmbPartName = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
-        cmbPartName.bind(rowset,"part_id");
+        this.cmbPartName = new SSDBComboBox(this.ssConnection, query, "part_id", "part_name");
+        this.cmbPartName.bind(this.rowset,"part_id");
         
-        txtQuantity.bind(rowset,"quantity");
+        this.txtQuantity.bind(this.rowset,"quantity");
         
         try{
-            cmbPartName.execute();
-            cmbSupplierName.execute();
+            this.cmbPartName.execute();
+            this.cmbSupplierName.execute();
          
         }catch(SQLException se){
             se.printStackTrace();
@@ -134,13 +139,13 @@ import com.nqadmin.swingSet.datasources.SSConnection;
         }
        
         
-        lblSupplierName.setPreferredSize(new Dimension(75,20));
-        lblPartName.setPreferredSize(new Dimension(75,20));
-        lblQuantity.setPreferredSize(new Dimension(75,20));
+        this.lblSupplierName.setPreferredSize(new Dimension(75,20));
+        this.lblPartName.setPreferredSize(new Dimension(75,20));
+        this.lblQuantity.setPreferredSize(new Dimension(75,20));
 
-        cmbSupplierName.setPreferredSize(new Dimension(150,20));
-        cmbPartName.setPreferredSize(new Dimension(150,20));
-        txtQuantity.setPreferredSize(new Dimension(150,20));
+        this.cmbSupplierName.setPreferredSize(new Dimension(150,20));
+        this.cmbPartName.setPreferredSize(new Dimension(150,20));
+        this.txtQuantity.setPreferredSize(new Dimension(150,20));
         
         Container contentPane = getContentPane();
         contentPane.setLayout(new GridBagLayout());
@@ -148,24 +153,24 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 
         constraints.gridx = 0;
         constraints.gridy = 0;
-        contentPane.add(lblSupplierName, constraints);
+        contentPane.add(this.lblSupplierName, constraints);
         constraints.gridy = 1;
-        contentPane.add(lblPartName, constraints);
+        contentPane.add(this.lblPartName, constraints);
         constraints.gridy = 2;
-        contentPane.add(lblQuantity, constraints);
+        contentPane.add(this.lblQuantity, constraints);
 
         constraints.gridx = 1;
         constraints.gridy = 0;
-        contentPane.add(cmbSupplierName, constraints);
+        contentPane.add(this.cmbSupplierName, constraints);
         constraints.gridy = 1;
-        contentPane.add(cmbPartName, constraints);
+        contentPane.add(this.cmbPartName, constraints);
         constraints.gridy = 2;
-        contentPane.add(txtQuantity, constraints);
+        contentPane.add(this.txtQuantity, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 3;
         constraints.gridwidth = 2;
-        contentPane.add(navigator,constraints);
+        contentPane.add(this.navigator,constraints);
 
         setVisible(true);
     }

@@ -6,7 +6,7 @@
     <property name="javadocdir" value="${antdir}/javadoc" />
     <property name="deploydir" value="${antdir}/deploy" />
     <property name="manifestdir" value="./META-INF" />
-    <property name="version" value="2.2.0-SNAPSHOT" />
+    <property name="version" value="2.3.0-SNAPSHOT" />
     <path id="1">
         <pathelement location="${lib}/glazedlists-1.11.0.jar" />
     </path>
@@ -26,9 +26,11 @@
     <target name="compile" depends="prepare">
         <javac source="1.8" target="1.8" includeantruntime="false" debug="true" debuglevel="lines,source,vars" srcdir="${srcdir}/com" destdir="${classesdir}">
             <classpath refid="1" />
+            <compilerarg value="-Xlint"/>
         </javac>
         <javac source="1.8" target="1.8" includeantruntime="false" debug="true" debuglevel="lines,source,vars" srcdir="${srcdir}/samples" destdir="${classesdir}/samples">
             <classpath refid="2" />
+            <compilerarg value="-Xlint"/>
         </javac>
     </target>
     <target name="docs" depends="compile">

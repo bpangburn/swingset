@@ -37,7 +37,6 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 
 import javax.swing.text.DateFormatter;
@@ -49,7 +48,7 @@ import javax.swing.text.DateFormatter;
  * 
  * SSTimeFormatterFactory extends DefaultFormatterFactory for time fields.
  */
-public class SSTimeFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
+public class SSTimeFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
     /**
 	 * unique serial id

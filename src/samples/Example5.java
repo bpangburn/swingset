@@ -42,6 +42,10 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 import javax.swing.*;
 import java.sql.*;
 
+/**
+ * This example demonstrates the use of an SSDataGrid to display a tabular
+ * view of the suppliers & parts data.
+ */
 public class Example5 extends JFrame {
 
 	private static final long serialVersionUID = -5126011569315467420L;
@@ -49,9 +53,15 @@ public class Example5 extends JFrame {
     SSJdbcRowSetImpl rowset   = null;
     SSDataGrid dataGrid = null;
     String url;
-    public Example5(String url){
+    
+    /**
+     * Constructor for Example5
+     * 
+     * @param _url - path to SQL to create suppliers & parts database
+     */
+    public Example5(String _url){
         super("Example 5");
-        this.url = url;
+        this.url = _url;
         setSize(430,145);
         init();
     }
@@ -59,36 +69,36 @@ public class Example5 extends JFrame {
     private void init(){
 
         try{
-        	System.out.println("url from ex 5: "+url);
-        	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
+        	System.out.println("url from ex 5: "+this.url);
+        	this.ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+this.url+"'", "sa", "");
         	
-        	ssConnection.setDriverName("org.h2.Driver");
-            ssConnection.createConnection();
-            rowset = new SSJdbcRowSetImpl(ssConnection);
-            rowset.setCommand("SELECT part_name, color_code, weight, city, part_id FROM part_data ORDER BY part_name;");
+        	this.ssConnection.setDriverName("org.h2.Driver");
+            this.ssConnection.createConnection();
+            this.rowset = new SSJdbcRowSetImpl(this.ssConnection);
+            this.rowset.setCommand("SELECT part_name, color_code, weight, city, part_id FROM part_data ORDER BY part_name;");
             //  SET THE HEADER BEFORE SETTING THE ROWSET
-            dataGrid = new SSDataGrid();
-            dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
-            dataGrid.setSSRowSet(rowset);
-            dataGrid.setMessageWindow(this);
+            this.dataGrid = new SSDataGrid();
+            this.dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
+            this.dataGrid.setSSRowSet(this.rowset);
+            this.dataGrid.setMessageWindow(this);
             
             // DISABLES NEW INSERTIONS TO THE DATA BASE.
             // DUE TO H2 DATABASE PROPERTIES, INSERTION OF NEW DATA CAUSES ERRORS.
             // ANY CHANGES MADE TO THE PRESENT RECORD WILL BE SAVED BUT INSERTIONS ARE NOT ALLOWED
             // IN H2.
-            dataGrid.setInsertion(false);
+            this.dataGrid.setInsertion(false);
             
             // HIDE THE PART ID COLUMN
             // THIS SETS THE WIDTH OF THE COLUMN TO 0
-            dataGrid.setHiddenColumns(new String[]{"part_id"});
-            dataGrid.setUneditableColumns(new String[]{"part_id"});
+            this.dataGrid.setHiddenColumns(new String[]{"part_id"});
+            this.dataGrid.setUneditableColumns(new String[]{"part_id"});
           
         }catch(SQLException se){
             se.printStackTrace();
         }catch(ClassNotFoundException cnfe){
             cnfe.printStackTrace();
         }
-        getContentPane().add(dataGrid.getComponent());
+        getContentPane().add(this.dataGrid.getComponent());
 
         setVisible(true);
 

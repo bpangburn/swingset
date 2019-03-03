@@ -64,17 +64,17 @@
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public boolean getBoolean(int columnIndex) throws SQLException;
 
-	 /**
-	  * Retrieves the value of the designated column in the current row of this DataSet
-	  * object as an array in the Java programming language.
-	  * @param columnIndex - column number . first column is 1, second column is 2....
-	  * @return returns the column value of the current row.
-	  * @throws throws an SQL exception if an access error occurs.
-	  */	 
+	/**
+	 * Retrieves the value of the designated column in the current row of this DataSet
+	 * object as an array in the Java programming language.
+	 * @param columnIndex - column number . first column is 1, second column is 2....
+	 * @return returns the column value of the current row.
+     * @throws SQLException - if a database access error occurs
+	 */	 
 	public Array getArray(int columnIndex) throws SQLException;
 
     /**
@@ -83,7 +83,7 @@
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public int getInt(int columnIndex) throws SQLException;
 
@@ -93,7 +93,7 @@
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public long getLong(int columnIndex) throws SQLException;
 
@@ -103,7 +103,7 @@
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public float getFloat(int columnIndex) throws SQLException;
 
@@ -113,7 +113,7 @@
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public double getDouble(int columnIndex) throws SQLException;
 
@@ -123,7 +123,7 @@
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then a null
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public String getString(int columnIndex) throws SQLException;
 
@@ -133,7 +133,7 @@
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then null
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public Date getDate(int columnIndex) throws SQLException;
 
@@ -143,7 +143,7 @@
      * raw values returned by the driver.
      * @param columnIndex - index number of the column
      * @return  returns the column value; if the value is SQL NULL, the value returned is null 
-     * @throws throws an SQLException - if a database access error occurs
+     * @throws SQLException - if a database access error occurs
      */    
     public byte[] getBytes(int columnIndex) throws SQLException;
 
@@ -154,7 +154,7 @@
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateBoolean(int columnIndex, boolean x) throws SQLException;
     
@@ -165,7 +165,7 @@
      * to update the underlying data source.
      * @param columnIndex - index of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateArray(int columnIndex, Array x) throws SQLException;
 
@@ -176,7 +176,7 @@
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateInt(int columnIndex, int x) throws SQLException;
 
@@ -187,7 +187,7 @@
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateLong(int columnIndex, long x) throws SQLException;
 
@@ -198,7 +198,7 @@
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateFloat(int columnIndex, float x) throws SQLException;
 
@@ -209,7 +209,7 @@
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateDouble(int columnIndex, double x) throws SQLException;
 
@@ -220,7 +220,7 @@
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateString(int columnIndex, String x) throws SQLException;
 
@@ -231,7 +231,7 @@
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateDate(int columnIndex, Date x) throws SQLException;
 
@@ -241,7 +241,7 @@
      * not update the underlying data source; instead the updateRow or insertRow methods are called
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateNull(int columnIndex) throws SQLException;
 
@@ -252,7 +252,7 @@
      * methods are called to update the database.
      * @param columnIndex - the index number of the column
      * @param x - the new column value 
-     * @throws throws an SQLException - if a database access error occurs
+     * @throws SQLException - if a database access error occurs
      */
     public void updateBytes(int columnIndex, byte[] x) throws SQLException;
     
@@ -262,7 +262,7 @@
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then a false
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public boolean getBoolean(String columnName) throws SQLException;
     
@@ -271,7 +271,7 @@
      * object as an array in the Java programming language.
      * @param columnName - Name of the column.
      * @return returns the column value of the current row.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public Array getArray(String columnName) throws SQLException;
 
@@ -281,7 +281,7 @@
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public int getInt(String columnName) throws SQLException;
 
@@ -291,7 +291,7 @@
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public long getLong(String columnName) throws SQLException;
 
@@ -301,7 +301,7 @@
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public float getFloat(String columnName) throws SQLException;
 
@@ -311,7 +311,7 @@
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public double getDouble(String columnName) throws SQLException;
 
@@ -321,7 +321,7 @@
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then a null
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public String getString(String columnName) throws SQLException;
 
@@ -331,7 +331,7 @@
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then a null
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public Date getDate(String columnName) throws SQLException;
     
@@ -341,7 +341,7 @@
      * raw values returned by the driver.
      * @param columnName - the SQL name of the column
      * @return  returns the column value; if the value is SQL NULL, the value returned is null 
-     * @throws throws an SQLException - if a database access error occurs
+     * @throws SQLException - if a database access error occurs
      */    
     public byte[] getBytes(String columnName) throws SQLException;
 
@@ -352,7 +352,7 @@
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateBoolean(String columnName, boolean x) throws SQLException;
 
@@ -363,7 +363,7 @@
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateArray(String columnName, Array x) throws SQLException;
 
@@ -374,7 +374,7 @@
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateInt(String columnName, int x) throws SQLException;
 
@@ -385,7 +385,7 @@
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateLong(String columnName, long x) throws SQLException;
 
@@ -396,7 +396,7 @@
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateFloat(String columnName, float x) throws SQLException;
 
@@ -407,7 +407,7 @@
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateDouble(String columnName, double x) throws SQLException;
 
@@ -418,7 +418,7 @@
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateString(String columnName, String x) throws SQLException;
 
@@ -429,7 +429,7 @@
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateDate(String columnName, Date x) throws SQLException;
     
@@ -440,7 +440,7 @@
      * methods are called to update the database.
      * @param columnName - the name of the column
      * @param x - the new column value 
-     * @throws throws an SQLException - if a database access error occurs
+     * @throws SQLException - if a database access error occurs
      */
     public void updateBytes(String columnName, byte[] x) throws SQLException;
 
@@ -450,7 +450,7 @@
      * not update the underlying data source; instead the updateRow or insertRow methods are called
      * to update the underlying data source.
      * @param columnName - name of the column
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
     public void updateNull(String columnName) throws SQLException;
 

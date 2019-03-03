@@ -52,7 +52,15 @@ public class SSDateField extends SSFormattedTextField {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 9138021901389692436L;
+	
+	/**
+	 * constant representing the mm/dd/yyyy date format
+	 */
 	public static final int MMDDYYYY = 0;
+	
+	/**
+	 * constant representing the dd/mm/yyyy date format
+	 */
 	public static final int DDMMYYYY = 1;
 	
     /**
@@ -83,7 +91,8 @@ public class SSDateField extends SSFormattedTextField {
     /* 
      * Sets the value of the field to the current system date
      */
-    public void cleanField() {
+    @Override
+	public void cleanField() {
         this.setValue(new java.util.Date());
     }
 }

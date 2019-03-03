@@ -103,7 +103,9 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
             properties[PROPERTY_toolTipText].setPreferred ( true );
             properties[PROPERTY_visible] = new PropertyDescriptor ( "visible", com.nqadmin.swingSet.formatting.SSImageField.class, "isVisible", "setVisible" );
         }
-        catch( IntrospectionException e) {}//GEN-HEADEREND:Properties
+        catch( IntrospectionException e) {
+        	// do nothing
+        }//GEN-HEADEREND:Properties
         
         // Here you can add code for customizing the properties array.
         
@@ -146,7 +148,8 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
      * properties of this bean.  May return null if the
      * information should be obtained by automatic analysis.
      */
-    public BeanDescriptor getBeanDescriptor() {
+    @Override
+	public BeanDescriptor getBeanDescriptor() {
         return getBdescriptor();
     }
     
@@ -162,7 +165,8 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
      * A client of getPropertyDescriptors can use "instanceof" to check
      * if a given PropertyDescriptor is an IndexedPropertyDescriptor.
      */
-    public PropertyDescriptor[] getPropertyDescriptors() {
+    @Override
+	public PropertyDescriptor[] getPropertyDescriptors() {
         return getPdescriptor();
     }
     
@@ -173,7 +177,8 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
      * events fired by this bean.  May return null if the information
      * should be obtained by automatic analysis.
      */
-    public EventSetDescriptor[] getEventSetDescriptors() {
+    @Override
+	public EventSetDescriptor[] getEventSetDescriptors() {
         return getEdescriptor();
     }
     
@@ -184,7 +189,8 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
      * implemented by this bean.  May return null if the information
      * should be obtained by automatic analysis.
      */
-    public MethodDescriptor[] getMethodDescriptors() {
+    @Override
+	public MethodDescriptor[] getMethodDescriptors() {
         return getMdescriptor();
     }
     
@@ -196,7 +202,8 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
      * 		returned by getPropertyDescriptors.
      * <P>	Returns -1 if there is no default property.
      */
-    public int getDefaultPropertyIndex() {
+    @Override
+	public int getDefaultPropertyIndex() {
         return defaultPropertyIndex;
     }
     
@@ -207,7 +214,8 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
      *		returned by getEventSetDescriptors.
      * <P>	Returns -1 if there is no default event.
      */
-    public int getDefaultEventIndex() {
+    @Override
+	public int getDefaultEventIndex() {
         return defaultEventIndex;
     }
 }

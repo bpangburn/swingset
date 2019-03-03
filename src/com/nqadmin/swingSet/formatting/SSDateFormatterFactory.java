@@ -37,7 +37,6 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 
 import javax.swing.text.DateFormatter;
@@ -50,7 +49,7 @@ import javax.swing.text.DateFormatter;
  * 
  * SSDateFormatterFactory extends DefaultFormatterFactory for Date fields.
  */
-public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
+public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
 	/**
 	 * 
@@ -75,14 +74,14 @@ public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFac
         this.setNullFormatter(null);
         this.setEditFormatter(new DateFormatter(new SimpleDateFormat("ddMMyyyy")));
         this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("MMM dd, yyyy")));
-    }
+    } 
     
     /**
      * Creates an object of SSDateFormatterFactory with the specified format.
      * @param format  - format to be used for date while in editing mode.
      * The default format is DDMMYYYY
      */
-    public SSDateFormatterFactory(int format){
+    public SSDateFormatterFactory(int format) {
     	switch(format){
     	case 0:
     		this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("MM/dd/yyyy")));
@@ -96,6 +95,9 @@ public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFac
             this.setEditFormatter(new DateFormatter(new SimpleDateFormat("ddMMyyyy")));
             this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("MMM dd, yyyy")));
     		break;
+    	default:
+        	System.out.println("Unknown date format type of " + format);
+        	break;
     	}
     }
 }

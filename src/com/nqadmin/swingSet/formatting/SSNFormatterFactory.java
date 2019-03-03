@@ -37,8 +37,6 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import java.io.Serializable;
-
 import javax.swing.text.MaskFormatter;
 
 // 2019-02-27-BP: this should be named SSSSNFormatterFactory for consistency.
@@ -49,7 +47,7 @@ import javax.swing.text.MaskFormatter;
  * 
  * SSNFormatterFactory extends DefaultFormatterFactory for US Social Security Number fields.
  */
-public class SSNFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
+public class SSNFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
     /**
 	 * unique serial id
@@ -66,20 +64,20 @@ public class SSNFormatterFactory extends javax.swing.text.DefaultFormatterFactor
     public SSNFormatterFactory() {
         
         try {
-            defaultFormatter = new MaskFormatter("###-##-####");
-            nullFormatter    = null;
-            editFormatter    = new MaskFormatter("###-##-####");
-            displayFormatter = new MaskFormatter("###-##-####");
+            this.defaultFormatter = new MaskFormatter("###-##-####");
+            this.nullFormatter    = null;
+            this.editFormatter    = new MaskFormatter("###-##-####");
+            this.displayFormatter = new MaskFormatter("###-##-####");
             
-            editFormatter.setPlaceholderCharacter('0');
+            this.editFormatter.setPlaceholderCharacter('0');
                     
-            this.setDefaultFormatter(defaultFormatter);
-            this.setNullFormatter(nullFormatter);
-            this.setEditFormatter(editFormatter);
-            this.setDisplayFormatter(displayFormatter);
+            this.setDefaultFormatter(this.defaultFormatter);
+            this.setNullFormatter(this.nullFormatter);
+            this.setEditFormatter(this.editFormatter);
+            this.setDisplayFormatter(this.displayFormatter);
         }
         catch (java.text.ParseException pe) {
-            
+        	// do nothing
         }
     }
 }

@@ -115,7 +115,7 @@ import java.beans.VetoableChangeListener;
      * the url should be of the form jdbc:subprotocol:subname
      */
     public SSConnection(String _url) {
-        url = _url;
+        this.url = _url;
     }
 
     /**
@@ -127,9 +127,9 @@ import java.beans.VetoableChangeListener;
      * @param _password - the user's password
      */
     public SSConnection(String _url, String _username, String _password) {
-        url = _url;
-        username = _username;
-        password = _password;
+        this.url = _url;
+        this.username = _username;
+        this.password = _password;
     }
 
     /**
@@ -142,10 +142,10 @@ import java.beans.VetoableChangeListener;
      * @param _driverName - name of the database driver to be used.
      */
     public SSConnection(String _url, String _username, String _password, String _driverName) {
-        url = _url;
-        username = _username;
-        password = _password;
-        driverName = _driverName;
+        this.url = _url;
+        this.username = _username;
+        this.password = _password;
+        this.driverName = _driverName;
     }
     
     /**
@@ -154,7 +154,7 @@ import java.beans.VetoableChangeListener;
      * @param _listener bean property change listener
      */
     public void addPropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.addPropertyChangeListener(_listener);
+    	this.pChangeSupport.addPropertyChangeListener(_listener);
     }
     
     /**
@@ -163,7 +163,7 @@ import java.beans.VetoableChangeListener;
      * @param _listener bean property change listener
      */    
     public void removePropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.removePropertyChangeListener(_listener);
+    	this.pChangeSupport.removePropertyChangeListener(_listener);
     }
     
     /**
@@ -172,7 +172,7 @@ import java.beans.VetoableChangeListener;
      * @param _listener bean vetoable change listener
      */
     public void addVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.addVetoableChangeListener(_listener);
+    	this.vChangeSupport.addVetoableChangeListener(_listener);
     }
     
     /**
@@ -181,7 +181,7 @@ import java.beans.VetoableChangeListener;
      * @param _listener bean veto change listener
      */    
     public void removeVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.removeVetoableChangeListener(_listener);
+    	this.vChangeSupport.removeVetoableChangeListener(_listener);
     }     
 
     /**
@@ -191,9 +191,9 @@ import java.beans.VetoableChangeListener;
      * the url should be of the form jdbc:subprotocol:subname
      */
     public void setUrl(String _url) {
-        String oldValue = url;
-        url = _url;
-        pChangeSupport.firePropertyChange("url", oldValue, url);
+        String oldValue = this.url;
+        this.url = _url;
+        this.pChangeSupport.firePropertyChange("url", oldValue, this.url);
         
     }
     
@@ -203,7 +203,7 @@ import java.beans.VetoableChangeListener;
      * @return returns the database url.
      */
     public String getUrl() {
-        return url;
+        return this.url;
     }    
 
     /**
@@ -212,9 +212,9 @@ import java.beans.VetoableChangeListener;
      * @param _username - the database username on whose behalf the connection is being made
      */
     public void setUsername(String _username) {
-    	String oldValue = username;
-        username = _username;
-        pChangeSupport.firePropertyChange("username", oldValue, username);
+    	String oldValue = this.username;
+        this.username = _username;
+        this.pChangeSupport.firePropertyChange("username", oldValue, this.username);
     }
     
     /**
@@ -223,7 +223,7 @@ import java.beans.VetoableChangeListener;
      * @return returns the database username.
      */
     public String getUsername() {
-        return username;
+        return this.username;
     }    
 
     /**
@@ -232,9 +232,9 @@ import java.beans.VetoableChangeListener;
      * @param _password - the user's password to be used.
      */
     public void setPassword(String _password) {
-    	String oldValue = password;
-        password = _password;
-        pChangeSupport.firePropertyChange("password", oldValue, password);
+    	String oldValue = this.password;
+        this.password = _password;
+        this.pChangeSupport.firePropertyChange("password", oldValue, this.password);
     }
     
     /**
@@ -243,7 +243,7 @@ import java.beans.VetoableChangeListener;
      * @return returns the user's password.
      */
     public String getPassword() {
-        return password;
+        return this.password;
     }    
 
     /**
@@ -252,9 +252,9 @@ import java.beans.VetoableChangeListener;
      * @param _driverName - name of the database driver to be used.
      */
     public void setDriverName(String _driverName) {
-    	String oldValue = driverName;
-        driverName = _driverName;
-        pChangeSupport.firePropertyChange("driverName", oldValue, password);
+    	String oldValue = this.driverName;
+        this.driverName = _driverName;
+        this.pChangeSupport.firePropertyChange("driverName", oldValue, this.password);
     }
     
     /**
@@ -263,7 +263,7 @@ import java.beans.VetoableChangeListener;
      * @return returns the database driver being used.
      */
     public String getDriverName() {
-        return driverName;
+        return this.driverName;
     }
     
     /**
@@ -274,8 +274,8 @@ import java.beans.VetoableChangeListener;
     public Connection getConnection() {
     // IF THE CONNECTION IS NOT YET CREATED BUT WE HAVE ALL THE INFORMATION TO CREATE ONE
     // THEN GO AHEAD AND TRY CREATING THE CONNECTION	
-    	if(connection == null && url != null && driverName != null && username != null && password != null &&
-    		!url.trim().equals("") && !driverName.trim().equals("")){
+    	if(this.connection == null && this.url != null && this.driverName != null && this.username != null && this.password != null &&
+    		!this.url.trim().equals("") && !this.driverName.trim().equals("")){
     		try{
     			createConnection();	
     		}catch(SQLException se){
@@ -284,16 +284,18 @@ import java.beans.VetoableChangeListener;
     			cnfe.printStackTrace();
     		}
     	}
-        return connection;
+        return this.connection;
     }    
 
     /**
      * Creates a connection to the database based on the information provided
      * by the user.
+     * @throws SQLException 
+     * @throws ClassNotFoundException 
      */
     public void createConnection() throws SQLException, ClassNotFoundException{
-        Class.forName(driverName);
-        connection = DriverManager.getConnection(url, username, password);
+        Class.forName(this.driverName);
+        this.connection = DriverManager.getConnection(this.url, this.username, this.password);
     }
 
     /**

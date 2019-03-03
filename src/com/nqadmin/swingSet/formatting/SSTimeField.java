@@ -72,7 +72,8 @@ public class SSTimeField extends SSFormattedTextField {
     /* (non-Javadoc)
      * @see com.nqadmin.swingSet.formatting.SSField#cleanField()
      */
-    public void cleanField() {
+    @Override
+	public void cleanField() {
         this.setValue( Calendar.getInstance().getTime() );
     }
     

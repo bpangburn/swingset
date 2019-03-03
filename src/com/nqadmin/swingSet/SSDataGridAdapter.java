@@ -66,7 +66,8 @@ public abstract class SSDataGridAdapter implements SSDataGridHandler, Serializab
      * 
      * @param _row    the row number in data grid.
      */
-    public boolean allowDeletion(int _row) {
+    @Override
+	public boolean allowDeletion(int _row) {
         return true;
     }
 
@@ -75,8 +76,9 @@ public abstract class SSDataGridAdapter implements SSDataGridHandler, Serializab
      * 
      * @param _row position of data grid row being deleted.
      */    
-    public void performPreDeletionOps(int _row) {
-    	
+    @Override
+	public void performPreDeletionOps(int _row) {
+    	// do nothing
     }
 
     /**
@@ -84,8 +86,9 @@ public abstract class SSDataGridAdapter implements SSDataGridHandler, Serializab
      * 
 	 * @param _row the position of deleted row in the data grid.
      */    
-    public void performPostDeletionOps(int _row){
-    	
+    @Override
+	public void performPostDeletionOps(int _row){
+    	// do nothing
     }
     
     /**
@@ -93,8 +96,9 @@ public abstract class SSDataGridAdapter implements SSDataGridHandler, Serializab
      * 
      * @param _row position of new row in the data grid.
      */
-    public void performPreInsertOps(int _row){
-    	
+    @Override
+	public void performPreInsertOps(int _row){
+    	// do nothing
     }
 
     /**
@@ -102,7 +106,8 @@ public abstract class SSDataGridAdapter implements SSDataGridHandler, Serializab
      * 
      * @param _row position of added row in the data grid.
      */
-    public void performPostInsertOps(int _row) {
-    	
+    @Override
+	public void performPostInsertOps(int _row) {
+    	// do nothing
     }
 }

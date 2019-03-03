@@ -37,7 +37,6 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -50,7 +49,7 @@ import javax.swing.text.NumberFormatter;
  * 
  * SSPercentFormatterFactory extends DefaultFormatterFactory for percentage fields.
  */
-public class SSPercentFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
+public class SSPercentFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
     /**
 	 * unique serial id

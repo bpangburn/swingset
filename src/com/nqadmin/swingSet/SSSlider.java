@@ -86,12 +86,12 @@ public class SSSlider extends JSlider {
     /**
      * Component listener.
      */
-    private final MySliderListener sliderListener = new MySliderListener();
+    protected final MySliderListener sliderListener = new MySliderListener();
 
     /**
      * Bound text field document listener.
      */
-    private final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
+    protected final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
     /**
      * Empty constructor needed for deserialization. Creates a horizontal
@@ -128,10 +128,11 @@ public class SSSlider extends JSlider {
      *
      * @param _sSRowSet    datasource to be used.
      * @param _columnName    name of the column to which this slider should be bound
+     * @throws java.sql.SQLException 
      */
     public SSSlider(SSRowSet _sSRowSet, String _columnName) throws java.sql.SQLException {
-		sSRowSet = _sSRowSet;
-        columnName = _columnName;
+		this.sSRowSet = _sSRowSet;
+        this.columnName = _columnName;
         init();
         bind();
     }
@@ -141,11 +142,12 @@ public class SSSlider extends JSlider {
      *
      * @param _columnName    column name in the SSRowSet to which the component
      *    is bound
+     * @throws java.sql.SQLException 
      */
     public void setColumnName(String _columnName) throws java.sql.SQLException {
-        String oldValue = columnName;
-        columnName = _columnName;
-        firePropertyChange("columnName", oldValue, columnName);
+        String oldValue = this.columnName;
+        this.columnName = _columnName;
+        firePropertyChange("columnName", oldValue, this.columnName);
         bind();
     }
 
@@ -155,18 +157,19 @@ public class SSSlider extends JSlider {
      * @return column name to which the component is bound
      */
     public String getColumnName() {
-        return columnName;
+        return this.columnName;
     }
 
     /**
      * Sets the SSRowSet to which the component is bound.
      *
      * @param _sSRowSet    SSRowSet to which the component is bound
+     * @throws java.sql.SQLException 
      */
     public void setSSRowSet(SSRowSet _sSRowSet) throws java.sql.SQLException {
-        SSRowSet oldValue = sSRowSet;
-        sSRowSet = _sSRowSet;
-        firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        SSRowSet oldValue = this.sSRowSet;
+        this.sSRowSet = _sSRowSet;
+        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
         bind();
     }
 
@@ -176,7 +179,7 @@ public class SSSlider extends JSlider {
      * @return SSRowSet to which the component is bound
      */
     public SSRowSet getSSRowSet() {
-        return sSRowSet;
+        return this.sSRowSet;
     }
 
     /**
@@ -184,15 +187,16 @@ public class SSSlider extends JSlider {
      *
      * @param _sSRowSet    datasource to be used.
      * @param _columnName    Name of the column to which this check box should be bound
+     * @throws java.sql.SQLException 
      */
     public void bind(SSRowSet _sSRowSet, String _columnName) throws java.sql.SQLException {
-        SSRowSet oldValue = sSRowSet;
-        sSRowSet = _sSRowSet;
-        firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        SSRowSet oldValue = this.sSRowSet;
+        this.sSRowSet = _sSRowSet;
+        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
 
-        String oldValue2 = columnName;
-        columnName = _columnName;
-        firePropertyChange("columnName", oldValue2, columnName);
+        String oldValue2 = this.columnName;
+        this.columnName = _columnName;
+        firePropertyChange("columnName", oldValue2, this.columnName);
 
         bind();
     }
@@ -212,7 +216,7 @@ public class SSSlider extends JSlider {
     protected void bind() throws java.sql.SQLException {
 
         // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || columnName.trim().equals("") || sSRowSet==null) {
+            if (this.columnName==null || this.columnName.trim().equals("") || this.sSRowSet==null) {
                 return;
             }
 
@@ -220,10 +224,10 @@ public class SSSlider extends JSlider {
             removeListeners();
 
         // DETERMINE COLUMN TYPE
-			columnType = sSRowSet.getColumnType(columnName);
+			this.columnType = this.sSRowSet.getColumnType(this.columnName);
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
-            textField.setDocument(new SSTextDocument(sSRowSet, columnName));
+            this.textField.setDocument(new SSTextDocument(this.sSRowSet, this.columnName));
 
         // SET THE LABEL DISPLAY
             updateDisplay();
@@ -240,7 +244,7 @@ public class SSSlider extends JSlider {
 	protected void updateDisplay() {
 
 		// SET THE SLIDER BASED ON THE VALUE IN THE TEXT FIELD
-            switch(columnType) {
+            switch(this.columnType) {
                 case java.sql.Types.INTEGER:
                 case java.sql.Types.SMALLINT:
                 case java.sql.Types.TINYINT:
@@ -249,7 +253,7 @@ public class SSSlider extends JSlider {
                 case java.sql.Types.DOUBLE:
                 case java.sql.Types.NUMERIC:
             	// SET THE SLIDER BASED ON THE VALUE IN TEXT FIELD
-            		setValue(Integer.parseInt(textField.getText()));
+            		setValue(Integer.parseInt(this.textField.getText()));
                     break;
 
                 default:
@@ -262,79 +266,83 @@ public class SSSlider extends JSlider {
      * Adds listeners for component and bound text field (where applicable).
      */
     private void addListeners() {
-        textField.getDocument().addDocumentListener(textFieldDocumentListener);
-        addChangeListener(sliderListener);
+        this.textField.getDocument().addDocumentListener(this.textFieldDocumentListener);
+        addChangeListener(this.sliderListener);
     }
 
     /**
      * Removes listeners for component and bound text field (where applicable).
      */
     private void removeListeners() {
-        textField.getDocument().removeDocumentListener(textFieldDocumentListener);
-        removeChangeListener(sliderListener);
+        this.textField.getDocument().removeDocumentListener(this.textFieldDocumentListener);
+        removeChangeListener(this.sliderListener);
     }
 
     /**
      * Listener(s) for the bound text field used to propigate values back to the
      * component's value.
      */
-    private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
+    protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
         /**
 		 * 
 		 */
 		private static final long serialVersionUID = 2592351765135476620L;
 
+		@Override
 		public void changedUpdate(DocumentEvent de) {
-            removeChangeListener(sliderListener);
+            removeChangeListener(SSSlider.this.sliderListener);
 
         	updateDisplay();
 
-            addChangeListener(sliderListener);
+            addChangeListener(SSSlider.this.sliderListener);
         }
 
         // WHEN EVER THERE IS A CHANGE IN THE VALUE IN THE TEXT FIELD CHANGE THE SLIDER
         // ACCORDINGLY.
-        public void insertUpdate(DocumentEvent de) {
-            removeChangeListener(sliderListener);
+        @Override
+		public void insertUpdate(DocumentEvent de) {
+            removeChangeListener(SSSlider.this.sliderListener);
 
             updateDisplay();
 
-            addChangeListener(sliderListener);
+            addChangeListener(SSSlider.this.sliderListener);
         }
 
         // IF A REMOVE UPDATE OCCURS ON THE TEXT FIELD CHECK THE CHANGE AND SET THE
         // SLIDER ACCORDINGLY.
-        public void removeUpdate(DocumentEvent de) {
-            removeChangeListener(sliderListener);
+        @Override
+		public void removeUpdate(DocumentEvent de) {
+            removeChangeListener(SSSlider.this.sliderListener);
 
             updateDisplay();
 
-            addChangeListener(sliderListener);
+            addChangeListener(SSSlider.this.sliderListener);
         }
 
-    } // end private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
+    } // end protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
     /**
      * Listener(s) for the component's value used to propigate changes back to
      * bound text field.
      */
-    private class MySliderListener implements ChangeListener, Serializable {
+    protected class MySliderListener implements ChangeListener, Serializable {
 
         /**
 		 * 
 		 */
 		private static final long serialVersionUID = -5004328872032247853L;
 
+		@Override
 		public void stateChanged(ChangeEvent ce) {
-            textField.getDocument().removeDocumentListener(textFieldDocumentListener);
+            SSSlider.this.textField.getDocument().removeDocumentListener(SSSlider.this.textFieldDocumentListener);
 
-            textField.setText(String.valueOf(getValue()));
+            SSSlider.this.textField.setText(String.valueOf(getValue()));
 
-            textField.getDocument().addDocumentListener(textFieldDocumentListener);
+            SSSlider.this.textField.getDocument().addDocumentListener(SSSlider.this.textFieldDocumentListener);
         }
 
-    } // end private class MySliderListener implements ChangeListener, Serializable {
+    } // end protected class MySliderListener implements ChangeListener, Serializable {
 
 } // end public class SSSlider extends JSlider {
 

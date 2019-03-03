@@ -71,9 +71,10 @@ import java.sql.Time;
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then a false
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public boolean getBoolean(int columnIndex) throws SQLException{
+    @Override
+	public boolean getBoolean(int columnIndex) throws SQLException{
         throw new UnsupportedOperationException();
     }
     
@@ -82,9 +83,10 @@ import java.sql.Time;
      * object as an SQL array.
      * @param columnIndex - column number
      * @return returns SQL Array stored in the current row of the DataSet.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public Array getArray(int columnIndex) throws SQLException{
+    @Override
+	public Array getArray(int columnIndex) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -94,9 +96,10 @@ import java.sql.Time;
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public int getInt(int columnIndex) throws SQLException{
+    @Override
+	public int getInt(int columnIndex) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -106,9 +109,10 @@ import java.sql.Time;
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public long getLong(int columnIndex) throws SQLException{
+    @Override
+	public long getLong(int columnIndex) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -118,9 +122,10 @@ import java.sql.Time;
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public float getFloat(int columnIndex) throws SQLException{
+    @Override
+	public float getFloat(int columnIndex) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -130,9 +135,10 @@ import java.sql.Time;
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public double getDouble(int columnIndex) throws SQLException{
+    @Override
+	public double getDouble(int columnIndex) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -142,9 +148,10 @@ import java.sql.Time;
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then a null
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public String getString(int columnIndex) throws SQLException{
+    @Override
+	public String getString(int columnIndex) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -154,9 +161,10 @@ import java.sql.Time;
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then null
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public Date getDate(int columnIndex) throws SQLException{
+    @Override
+	public Date getDate(int columnIndex) throws SQLException{
         throw new UnsupportedOperationException();
     }
     
@@ -166,9 +174,10 @@ import java.sql.Time;
      * raw values returned by the driver.
      * @param columnIndex - index number of the column
      * @return  returns the column value; if the value is SQL NULL, the value returned is null 
-     * @throws throws an SQLException - if a database access error occurs
+     * @throws SQLException - if a database access error occurs
      */ 
-    public byte[] getBytes(int columnIndex) throws SQLException {
+    @Override
+	public byte[] getBytes(int columnIndex) throws SQLException {
         throw new UnsupportedOperationException();
     }
 
@@ -179,9 +188,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateBoolean(int columnIndex, boolean x) throws SQLException{
+    @Override
+	public void updateBoolean(int columnIndex, boolean x) throws SQLException{
         throw new UnsupportedOperationException();
     }
     
@@ -192,9 +202,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateArray(int columnIndex, Array x) throws SQLException{
+    @Override
+	public void updateArray(int columnIndex, Array x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -205,9 +216,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateInt(int columnIndex, int x) throws SQLException{
+    @Override
+	public void updateInt(int columnIndex, int x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -218,9 +230,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateLong(int columnIndex, long x) throws SQLException{
+    @Override
+	public void updateLong(int columnIndex, long x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -231,9 +244,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateFloat(int columnIndex, float x) throws SQLException{
+    @Override
+	public void updateFloat(int columnIndex, float x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -244,9 +258,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateDouble(int columnIndex, double x) throws SQLException{
+    @Override
+	public void updateDouble(int columnIndex, double x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -257,9 +272,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateString(int columnIndex, String x) throws SQLException{
+    @Override
+	public void updateString(int columnIndex, String x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -270,9 +286,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateDate(int columnIndex, Date x) throws SQLException{
+    @Override
+	public void updateDate(int columnIndex, Date x) throws SQLException{
         throw new UnsupportedOperationException();
     }
     
@@ -283,9 +300,10 @@ import java.sql.Time;
      * methods are called to update the database.
      * @param columnIndex - the index number of the column
      * @param x - the new column value 
-     * @throws throws an SQLException - if a database access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateBytes(int columnIndex, byte[] x) throws SQLException {
+    @Override
+	public void updateBytes(int columnIndex, byte[] x) throws SQLException {
         throw new UnsupportedOperationException();
     }
 
@@ -295,9 +313,10 @@ import java.sql.Time;
      * not update the underlying data source; instead the updateRow or insertRow methods are called
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateNull(int columnIndex) throws SQLException{
+    @Override
+	public void updateNull(int columnIndex) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -307,9 +326,10 @@ import java.sql.Time;
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then a false
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public boolean getBoolean(String columnName) throws SQLException{
+    @Override
+	public boolean getBoolean(String columnName) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -318,9 +338,10 @@ import java.sql.Time;
      * object as an SQL array in the Java programming language.
      * @param columnName - name of the column
      * @return returns the column value of the current row
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public Array getArray(String columnName) throws SQLException{
+    @Override
+	public Array getArray(String columnName) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -330,9 +351,10 @@ import java.sql.Time;
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public int getInt(String columnName) throws SQLException{
+    @Override
+	public int getInt(String columnName) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -342,9 +364,10 @@ import java.sql.Time;
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public long getLong(String columnName) throws SQLException{
+    @Override
+	public long getLong(String columnName) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -354,9 +377,10 @@ import java.sql.Time;
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public float getFloat(String columnName) throws SQLException{
+    @Override
+	public float getFloat(String columnName) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -366,9 +390,10 @@ import java.sql.Time;
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public double getDouble(String columnName) throws SQLException{
+    @Override
+	public double getDouble(String columnName) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -378,9 +403,10 @@ import java.sql.Time;
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then a null
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public String getString(String columnName) throws SQLException{
+    @Override
+	public String getString(String columnName) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -390,9 +416,10 @@ import java.sql.Time;
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then a null
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public Date getDate(String columnName) throws SQLException{
+    @Override
+	public Date getDate(String columnName) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -402,9 +429,10 @@ import java.sql.Time;
      * raw values returned by the driver.
      * @param columnName - the SQL name of the column
      * @return  returns the column value; if the value is SQL NULL, the value returned is null 
-     * @throws throws an SQLException - if a database access error occurs
+     * @throws SQLException - if a database access error occurs
      */    
-    public byte[] getBytes(String columnName) throws SQLException {
+    @Override
+	public byte[] getBytes(String columnName) throws SQLException {
         throw new UnsupportedOperationException();
     }
     
@@ -415,9 +443,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateBoolean(String columnName, boolean x) throws SQLException{
+    @Override
+	public void updateBoolean(String columnName, boolean x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -428,9 +457,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateArray(String columnName, Array x) throws SQLException{
+    @Override
+	public void updateArray(String columnName, Array x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -441,9 +471,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateInt(String columnName, int x) throws SQLException{
+    @Override
+	public void updateInt(String columnName, int x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -454,9 +485,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateLong(String columnName, long x) throws SQLException{
+    @Override
+	public void updateLong(String columnName, long x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -467,9 +499,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateFloat(String columnName, float x) throws SQLException{
+    @Override
+	public void updateFloat(String columnName, float x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -480,9 +513,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateDouble(String columnName, double x) throws SQLException{
+    @Override
+	public void updateDouble(String columnName, double x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -493,9 +527,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateString(String columnName, String x) throws SQLException{
+    @Override
+	public void updateString(String columnName, String x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -506,9 +541,10 @@ import java.sql.Time;
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateDate(String columnName, Date x) throws SQLException{
+    @Override
+	public void updateDate(String columnName, Date x) throws SQLException{
         throw new UnsupportedOperationException();
     }
     
@@ -519,9 +555,10 @@ import java.sql.Time;
      * methods are called to update the database.
      * @param columnName - the name of the column
      * @param x - the new column value 
-     * @throws throws an SQLException - if a database access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateBytes(String columnName, byte[] x) throws SQLException {
+    @Override
+	public void updateBytes(String columnName, byte[] x) throws SQLException {
         throw new UnsupportedOperationException();
     }
 
@@ -531,9 +568,10 @@ import java.sql.Time;
      * not update the underlying data source; instead the updateRow or insertRow methods are called
      * to update the underlying data source.
      * @param columnName - name of the column
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateNull(String columnName) throws SQLException{
+    @Override
+	public void updateNull(String columnName) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -550,7 +588,8 @@ import java.sql.Time;
      * @param listener - an object that has implemented the javax.sql.RowSetListener interface
      * and wants to be notified of any events that occur on this RowSet object; May be null
      */
-    public void addRowSetListener(RowSetListener listener){
+    @Override
+	public void addRowSetListener(RowSetListener listener){
         throw new UnsupportedOperationException();
     }
 
@@ -560,7 +599,8 @@ import java.sql.Time;
      * Note: if the RowSetListener object is null, this method silently discards the null value
      * @param listener - a RowSetListener object that is on the list of listeners for this RowSet object
      */
-    public void removeRowSetListener(RowSetListener listener){
+    @Override
+	public void removeRowSetListener(RowSetListener listener){
         throw new UnsupportedOperationException();
     }
 
@@ -571,7 +611,8 @@ import java.sql.Time;
      * @throws SQLException - if the object does not contain columnIndex or a access
      * error occurs
      */
-    public String getColumnName(int columnIndex) throws SQLException{
+    @Override
+	public String getColumnName(int columnIndex) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -581,7 +622,8 @@ import java.sql.Time;
      * @return returns the corresponding column index.
      * @throws SQLException - if a data access error
      */
-    public int getColumnIndex(String columnName) throws SQLException{
+    @Override
+	public int getColumnIndex(String columnName) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -591,7 +633,8 @@ import java.sql.Time;
      * @return SQL type from java.sql.Types
      * @throws SQLException - if a data access error occurs
      */
-    public int getColumnType(String columnName) throws SQLException{
+    @Override
+	public int getColumnType(String columnName) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -601,7 +644,8 @@ import java.sql.Time;
      * @return SQL type from java.sql.Types
      * @throws SQLException - if a data access error occurs
      */
-    public int getColumnType(int columnIndex) throws SQLException{
+    @Override
+	public int getColumnType(int columnIndex) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -611,7 +655,8 @@ import java.sql.Time;
      * @return the current row number; 0 if there is no current row
      * @throws SQLException - if a data access error occurs
      */
-    public int getRow() throws SQLException{
+    @Override
+	public int getRow() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -620,7 +665,8 @@ import java.sql.Time;
      * @return the number of columns
      * @throws SQLException - if a data access error occurs
      */
-    public int getColumnCount() throws SQLException{
+    @Override
+	public int getColumnCount() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -635,7 +681,8 @@ import java.sql.Time;
      * @return true if the new current row is valid; false if there are no more rows
      * @throws SQLException - if a data access error occurs
      */
-    public boolean next() throws SQLException{
+    @Override
+	public boolean next() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -644,7 +691,8 @@ import java.sql.Time;
      * @return true if the cursor is on a valid row; false if it is off the result set
      * @throws SQLException - if a data access error occurs
      */
-    public boolean previous() throws SQLException{
+    @Override
+	public boolean previous() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -654,7 +702,8 @@ import java.sql.Time;
      * result set
      * @throws SQLException - if a data access error occurs
      */
-    public boolean last() throws SQLException{
+    @Override
+	public boolean last() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -664,7 +713,8 @@ import java.sql.Time;
      * result set
      * @throws SQLException - if a data access error occurs
      */
-    public boolean first() throws SQLException{
+    @Override
+	public boolean first() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -673,7 +723,8 @@ import java.sql.Time;
      * @return true if the cursor is on the first row; false otherwise
      * @throws SQLException - if a data access error occurs
      */
-    public boolean isFirst() throws SQLException{
+    @Override
+	public boolean isFirst() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -685,7 +736,8 @@ import java.sql.Time;
      * @return true if the cursor is on the last row; false otherwise
      * @throws SQLException - if a data access error occurs
      */
-    public boolean isLast() throws SQLException{
+    @Override
+	public boolean isLast() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -694,7 +746,8 @@ import java.sql.Time;
      * This method has no effect if the result set contains no rows.
      * @throws SQLException - if a data access error occurs
      */
-    public void beforeFirst() throws SQLException{
+    @Override
+	public void beforeFirst() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -715,7 +768,8 @@ import java.sql.Time;
      * @return true if the cursor is on the result set; false otherwise
      * @throws SQLException - if a database access error occurs
      */
-    public boolean absolute(int row) throws SQLException{
+    @Override
+	public boolean absolute(int row) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -725,7 +779,8 @@ import java.sql.Time;
      * @throws SQLException - if a data access error occurs or if this method is called when
      * the cursor is on the insert row
      */
-    public void updateRow() throws SQLException{
+    @Override
+	public void updateRow() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -734,7 +789,8 @@ import java.sql.Time;
      * This method has no effect if the cursor is not on the insert row.
      * @throws SQLException - if a data access error occurs
      */
-    public void moveToCurrentRow() throws SQLException{
+    @Override
+	public void moveToCurrentRow() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -750,7 +806,8 @@ import java.sql.Time;
      * value.
      * @throws SQLException - if a data access error occurs
      */
-    public void moveToInsertRow() throws SQLException{
+    @Override
+	public void moveToInsertRow() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -761,7 +818,8 @@ import java.sql.Time;
      * the cursor is not on the insert row, or if not all of non-nullable columns in the
      * insert row have been given a value
      */
-    public void insertRow() throws SQLException{
+    @Override
+	public void insertRow() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -771,7 +829,8 @@ import java.sql.Time;
      * @throws SQLException - if a data access error occurs or if this method is called
      * when the cursor is on the insert row
      */
-    public void deleteRow() throws SQLException{
+    @Override
+	public void deleteRow() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -783,7 +842,8 @@ import java.sql.Time;
      * @throws SQLException - if a data access error occurs or if this method is called when
      * the cursor is on the insert row
      */
-    public void cancelRowUpdates() throws SQLException{
+    @Override
+	public void cancelRowUpdates() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -802,7 +862,8 @@ import java.sql.Time;
      * @throws SQLException - if a data access error occurs or if this method is called
      * when the cursor is on the insert row
      */
-    public void refreshRow() throws SQLException{
+    @Override
+	public void refreshRow() throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -814,7 +875,8 @@ import java.sql.Time;
      * @throws SQLException - if a data access error occurs or any of the properties necessary
      * for making a connection have not been set
      */
-    public void execute() throws SQLException{
+    @Override
+	public void execute() throws SQLException{
         throw new UnsupportedOperationException();
     }
     
@@ -825,7 +887,8 @@ import java.sql.Time;
      * @return true if a row was deleted and deletions are detected; false otherwise
      * @throws SQLException - if a database access error occurs
      */
-    public boolean rowDeleted() throws SQLException{
+    @Override
+	public boolean rowDeleted() throws SQLException{
         throw new UnsupportedOperationException();
     }
     
@@ -835,7 +898,8 @@ import java.sql.Time;
      * @return true if a row has had an insertion and insertions are detected; false otherwise
      * @throws SQLException - if a database access error occurs
      */ 
-    public boolean rowInserted() throws SQLException{
+    @Override
+	public boolean rowInserted() throws SQLException{
         throw new UnsupportedOperationException();
     }
     
@@ -846,7 +910,8 @@ import java.sql.Time;
      * (2) updates are detected
      * @throws SQLException - if a database access error occurs
      */
-    public boolean rowUpdated() throws SQLException{
+    @Override
+	public boolean rowUpdated() throws SQLException{
         throw new UnsupportedOperationException();
     }
     
@@ -855,7 +920,8 @@ import java.sql.Time;
      * @return the description of this ResultSet object's columns
      * @throws SQLException - if a database access error occurs
      */
-    public ResultSetMetaData getMetaData() throws SQLException{
+    @Override
+	public ResultSetMetaData getMetaData() throws SQLException{
         throw new UnsupportedOperationException();
     }
     
@@ -880,7 +946,8 @@ import java.sql.Time;
      * @return a java.lang.Object holding the column value
      * @throws SQLException - if a database access error occurs
      */
-    public Object getObject(String columnName) throws SQLException{
+    @Override
+	public Object getObject(String columnName) throws SQLException{
         throw new UnsupportedOperationException();
     }
     
@@ -904,7 +971,8 @@ import java.sql.Time;
      * @return a java.lang.Object holding the column value
      * @throws SQLException - if a database access error occurs
      */ 
-    public Object getObject(int columnIndex) throws SQLException{
+    @Override
+	public Object getObject(int columnIndex) throws SQLException{
         throw new UnsupportedOperationException();
     }
     
@@ -917,7 +985,8 @@ import java.sql.Time;
      * @param x - the new column value
      * @throws SQLException - if a database access error occurs
      */
-    public void updateObject(String columnName, Object x) throws SQLException{
+    @Override
+	public void updateObject(String columnName, Object x) throws SQLException{
         throw new UnsupportedOperationException();
     }
 
@@ -930,7 +999,8 @@ import java.sql.Time;
      * @param x - the new column value
      * @throws SQLException - if a database access error occurs
      */
-    public void updateObject(int columnIndex, Object x) throws SQLException{
+    @Override
+	public void updateObject(int columnIndex, Object x) throws SQLException{
         throw new UnsupportedOperationException();
     }
     
@@ -941,7 +1011,8 @@ import java.sql.Time;
      * @return the column value; if the value is SQL NULL, the value returned is null
      * @throws SQLException - if a database access error occurs 
      */
-    public Time getTime(int columnIndex) throws SQLException {
+    @Override
+	public Time getTime(int columnIndex) throws SQLException {
         throw new UnsupportedOperationException();
     }
     
@@ -952,7 +1023,8 @@ import java.sql.Time;
      * @return the column value; if the value is SQL NULL, the value returned is null 
      * @throws SQLException - if a database access error occurs
      */
-    public Time getTime(String columnName) throws SQLException {
+    @Override
+	public Time getTime(String columnName) throws SQLException {
         throw new UnsupportedOperationException();
     }
 
@@ -963,7 +1035,8 @@ import java.sql.Time;
      * @return the column value; if the value is SQL NULL, the value returned is null 
      * @throws SQLException - if a database access error occurs
      */
-    public Timestamp getTimestamp(int columnIndex) throws SQLException {
+    @Override
+	public Timestamp getTimestamp(int columnIndex) throws SQLException {
         throw new UnsupportedOperationException();
     }
     
@@ -974,7 +1047,8 @@ import java.sql.Time;
      * @return the column value; if the value is SQL NULL, the value returned is null 
      * @throws SQLException - if a database access error occurs
      */
-    public Timestamp getTimestamp(String columnName) throws SQLException {
+    @Override
+	public Timestamp getTimestamp(String columnName) throws SQLException {
         throw new UnsupportedOperationException();
     }
     
@@ -987,7 +1061,8 @@ import java.sql.Time;
      * @param x - the new column value 
      * @throws SQLException - if a database access error occurs
      */
-    public void updateTime(int columnIndex, Time x) throws SQLException {
+    @Override
+	public void updateTime(int columnIndex, Time x) throws SQLException {
         throw new UnsupportedOperationException();
     }
     
@@ -1000,7 +1075,8 @@ import java.sql.Time;
      * @param x - the new column value 
      * @throws SQLException - if a database access error occurs
      */
-    public void updateTime(String columnName, Time x) throws SQLException {
+    @Override
+	public void updateTime(String columnName, Time x) throws SQLException {
         throw new UnsupportedOperationException();
     } 
     
@@ -1013,7 +1089,8 @@ import java.sql.Time;
      * @param x - the new column value 
      * @throws SQLException - if a database access error occurs
      */
-    public void updateTimestamp(int columnIndex, Timestamp x) throws SQLException {
+    @Override
+	public void updateTimestamp(int columnIndex, Timestamp x) throws SQLException {
         throw new UnsupportedOperationException();
     } 
     
@@ -1026,7 +1103,8 @@ import java.sql.Time;
      * @param x - the new column value 
      * @throws SQLException - if a database access error occurs
      */
-    public void updateTimestamp(String columnName, Timestamp x) throws SQLException {
+    @Override
+	public void updateTimestamp(String columnName, Timestamp x) throws SQLException {
         throw new UnsupportedOperationException();
     }
 

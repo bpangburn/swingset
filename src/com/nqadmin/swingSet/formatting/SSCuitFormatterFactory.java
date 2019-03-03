@@ -37,8 +37,6 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import java.io.Serializable;
-
 import javax.swing.text.MaskFormatter;
 
 /**
@@ -49,7 +47,7 @@ import javax.swing.text.MaskFormatter;
  * SSCuitFormatterFactory extends DefaultFormatterFactory for Argentina's Tax ID fields.
  */
 
-public class SSCuitFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
+public class SSCuitFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
     /**
 	 * unique serial id
@@ -66,27 +64,27 @@ public class SSCuitFormatterFactory extends javax.swing.text.DefaultFormatterFac
     public SSCuitFormatterFactory() {
         
         try {
-            defaultFormatter = new MaskFormatter("##-########-#");
-            nullFormatter    = null;
-            editFormatter    = new MaskFormatter("##-########-#");
-            displayFormatter = new MaskFormatter("##-########-#");
+            this.defaultFormatter = new MaskFormatter("##-########-#");
+            this.nullFormatter    = null;
+            this.editFormatter    = new MaskFormatter("##-########-#");
+            this.displayFormatter = new MaskFormatter("##-########-#");
 
-            defaultFormatter.setPlaceholderCharacter('0');
-            defaultFormatter.setAllowsInvalid(false);
+            this.defaultFormatter.setPlaceholderCharacter('0');
+            this.defaultFormatter.setAllowsInvalid(false);
             
-            editFormatter.setPlaceholderCharacter('0');
-            editFormatter.setAllowsInvalid(false);
+            this.editFormatter.setPlaceholderCharacter('0');
+            this.editFormatter.setAllowsInvalid(false);
 
-            displayFormatter.setPlaceholderCharacter('0');
-            displayFormatter.setAllowsInvalid(false);
+            this.displayFormatter.setPlaceholderCharacter('0');
+            this.displayFormatter.setAllowsInvalid(false);
             
-            this.setDefaultFormatter(defaultFormatter);
-            this.setNullFormatter(nullFormatter);
-            this.setEditFormatter(editFormatter);
-            this.setDisplayFormatter(displayFormatter);
+            this.setDefaultFormatter(this.defaultFormatter);
+            this.setNullFormatter(this.nullFormatter);
+            this.setEditFormatter(this.editFormatter);
+            this.setDisplayFormatter(this.displayFormatter);
         }
         catch (java.text.ParseException pe) {
-            
+        	// do nothing
         }
     }
 }

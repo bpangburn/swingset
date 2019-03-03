@@ -37,7 +37,7 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 /**
  * SSNumericField.java
@@ -48,94 +48,95 @@ import javax.swing.JTextField;
  */
 
 public class SSNumericField extends SSFormattedTextField {
-    
-    /**
+
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -5922010378310406148L;
 	private int precision = 3;
-    private int decimals  = 2;
+	private int decimals = 2;
 
-    /** 
-     * Creates a new instance of SSNumericField 
-     */
-    public SSNumericField() {
-        this(new SSNumericFormatterFactory());
-    }
-    
-    /**
-     * Creates an instance of SSNumericField with the specified number of integer & fraction digits
-     * @param precision - number of digits needed for integer part of the number
-     * @param decimals - number of digits needed for the fraction part of the number
-     */
-    public SSNumericField(int precision, int decimals) {
-        this(new SSNumericFormatterFactory(precision, decimals));
-    }
-            
-    
-    /**
-     * Creates an SSCurrencyField with the specified formatter factory
-     * @param factory - formatter factory to be used
-     */
-    public SSNumericField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
-        super(factory);
-        this.setHorizontalAlignment(JTextField.RIGHT);
-    }
-    
-    /**
-     * Returns the number digits used for integer part of the number
-     * @return returns the number digits used for integer part of the number
-     */
-    public int getPrecision() {
-        return precision;
-    }
-    
-    /**
-     * Returns the number of digits used for fraction part of the number
-     * @return returns the number of digits used for fraction part of the number
-     */
-    public int getDecimals() {
-        return decimals;
-    }
-    
-    /**
-     * Sets the number of digits needed for integer part of the number
-     * @param precision - number of digits needed for integer part of the number
-     */
-    public void setPrecision(int precision) {
-        this.precision = precision;
-        this.setFormatterFactory(new SSNumericFormatterFactory(precision, decimals));
-    }
-    
-    /**
-     * Sets the number of digits needed for fraction part of the number
-     * @param decimals - number of digits needed for fraction part of the number
-     */
-    public void setDecimals(int decimals) {
-        this.decimals = decimals;
-        this.setFormatterFactory(new SSNumericFormatterFactory(precision, decimals));
-    }
+	/**
+	 * Creates a new instance of SSNumericField
+	 */
+	public SSNumericField() {
+		this(new SSNumericFormatterFactory());
+	}
+
+	/**
+	 * Creates an instance of SSNumericField with the specified number of integer &
+	 * fraction digits
+	 * 
+	 * @param _precision - number of digits needed for integer part of the number
+	 * @param _decimals  - number of digits needed for the fraction part of the
+	 *                   number
+	 */
+	public SSNumericField(final int _precision, final int _decimals) {
+		this(new SSNumericFormatterFactory(_precision, _decimals));
+	}
+
+	/**
+	 * Creates an SSCurrencyField with the specified formatter factory
+	 * 
+	 * @param factory - formatter factory to be used
+	 */
+	public SSNumericField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+		super(factory);
+		this.setHorizontalAlignment(SwingConstants.RIGHT);
+	}
+
+	/**
+	 * Returns the number digits used for integer part of the number
+	 * 
+	 * @return returns the number digits used for integer part of the number
+	 */
+	public int getPrecision() {
+		return this.precision;
+	}
+
+	/**
+	 * Returns the number of digits used for fraction part of the number
+	 * 
+	 * @return returns the number of digits used for fraction part of the number
+	 */
+	public int getDecimals() {
+		return this.decimals;
+	}
+
+	/**
+	 * Sets the number of digits needed for integer part of the number
+	 * 
+	 * @param _precision - number of digits needed for integer part of the number
+	 */
+	public void setPrecision(final int _precision) {
+		this.precision = _precision;
+		this.setFormatterFactory(new SSNumericFormatterFactory(_precision, this.decimals));
+	}
+
+	/**
+	 * Sets the number of digits needed for fraction part of the number
+	 * 
+	 * @param _decimals - number of digits needed for fraction part of the number
+	 */
+	public void setDecimals(final int _decimals) {
+		this.decimals = _decimals;
+		this.setFormatterFactory(new SSNumericFormatterFactory(this.precision, _decimals));
+	}
 
 }
 
 /*
- * $Log$
- * Revision 1.7  2005/05/26 12:12:36  dags
- * added bind(SSRowSet, columnName) method and some java.sql.Types checking and support
+ * $Log$ Revision 1.7 2005/05/26 12:12:36 dags added bind(SSRowSet, columnName)
+ * method and some java.sql.Types checking and support
  *
- * Revision 1.6  2005/03/28 14:46:43  dags
- * syncro commit
+ * Revision 1.6 2005/03/28 14:46:43 dags syncro commit
  *
- * Revision 1.5  2005/02/04 22:42:06  yoda2
- * Updated Copyright info.
+ * Revision 1.5 2005/02/04 22:42:06 yoda2 Updated Copyright info.
  *
- * Revision 1.4  2005/01/18 23:38:01  dags
- * Diego's name fix
+ * Revision 1.4 2005/01/18 23:38:01 dags Diego's name fix
  *
- * Revision 1.3  2004/12/13 20:50:16  dags
- * Fix package name
+ * Revision 1.3 2004/12/13 20:50:16 dags Fix package name
  *
- * Revision 1.2  2004/12/13 18:46:13  prasanth
- * Added License.
+ * Revision 1.2 2004/12/13 18:46:13 prasanth Added License.
  *
  */

@@ -67,7 +67,7 @@ public class SelectorList extends JList<Object> implements ListDataListener, Lis
 
 	private JTextField txtFilter = new JTextField();
 	
-	private JScrollPane scrollPane = new JScrollPane();
+	protected JScrollPane scrollPane = new JScrollPane();
 	
 	private JPanel panel = new JPanel();
 	
@@ -89,23 +89,25 @@ public class SelectorList extends JList<Object> implements ListDataListener, Lis
     }
     
     private void init() {
-    	((SelectorListModel)getModel()).setFilterEdit(txtFilter);
+    	((SelectorListModel)getModel()).setFilterEdit(this.txtFilter);
     	addComponents();
 	}
     
 	private void addComponents() {
-		txtFilter.addKeyListener(new KeyListener(){
+		this.txtFilter.addKeyListener(new KeyListener(){
 
+			@Override
 			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
-				scrollPane.updateUI();
+				SelectorList.this.scrollPane.updateUI();
 			}
 
+			@Override
 			public void keyPressed(KeyEvent e) {
 				// TODO Auto-generated method stub
 				
 			}
 
+			@Override
 			public void keyReleased(KeyEvent e) {
 				// TODO Auto-generated method stub
 				
@@ -113,10 +115,10 @@ public class SelectorList extends JList<Object> implements ListDataListener, Lis
 			
 		});
 		
-		scrollPane.setViewportView(this);
-		panel.setLayout(new BorderLayout());
-		panel.add(scrollPane, BorderLayout.CENTER);
-		panel.add(txtFilter, BorderLayout.SOUTH);
+		this.scrollPane.setViewportView(this);
+		this.panel.setLayout(new BorderLayout());
+		this.panel.add(this.scrollPane, BorderLayout.CENTER);
+		this.panel.add(this.txtFilter, BorderLayout.SOUTH);
 		
 	}
 	
@@ -126,7 +128,7 @@ public class SelectorList extends JList<Object> implements ListDataListener, Lis
 	 * @return returns the list component in a JScrollPane
 	 */
 	public JPanel getComponent() {
-		return panel;
+		return this.panel;
 	}
 
 	/**
@@ -140,37 +142,45 @@ public class SelectorList extends JList<Object> implements ListDataListener, Lis
     /* (non-Javadoc)
      * @see javax.swing.event.ListDataListener#intervalRemoved(javax.swing.event.ListDataEvent)
      */
-    public void intervalRemoved(ListDataEvent e) {
+    @Override
+	public void intervalRemoved(ListDataEvent e) {
+    	// do nothing
     }
     
     /* (non-Javadoc)
      * @see javax.swing.event.ListDataListener#intervalAdded(javax.swing.event.ListDataEvent)
      */
-    public void intervalAdded(ListDataEvent e) {
+    @Override
+	public void intervalAdded(ListDataEvent e) {
+    	// do nothing
     }
     
     /* (non-Javadoc)
      * @see javax.swing.event.ListDataListener#contentsChanged(javax.swing.event.ListDataEvent)
      */
-    public void contentsChanged(ListDataEvent e) {
+    @Override
+	public void contentsChanged(ListDataEvent e) {
+    	// do nothing
     }
 
     /* (non-Javadoc)
      * @see ca.odell.glazedlists.event.ListEventListener#listChanged(ca.odell.glazedlists.event.ListEvent)
      */
-    public void listChanged(ListEvent<Object> listEvent) {
+    @Override
+	public void listChanged(ListEvent<Object> listEvent) {
         this.repaint();
     }
 
     /* (non-Javadoc)
      * @see javax.swing.JList#setModel(javax.swing.ListModel)
      */
-    public void setModel(ListModel<Object> model) {
+    @Override
+	public void setModel(ListModel<Object> model) {
 
         super.setModel(model);
         ((SelectorListModel)model).addListDataListener(this);
         ((SelectorListModel)model).addListEventListener(this);//
-        ((SelectorListModel)model).setFilterEdit(txtFilter);
+        ((SelectorListModel)model).setFilterEdit(this.txtFilter);
     }
 }
 

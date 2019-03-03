@@ -43,6 +43,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -99,12 +100,12 @@ public class SSCheckBox extends JCheckBox {
     /**
      * Component listener.
      */
-    private final MyCheckBoxListener checkBoxListener = new MyCheckBoxListener();
+    protected final MyCheckBoxListener checkBoxListener = new MyCheckBoxListener();
     
     /**
      * Bound text field document listener.
      */
-    private final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
+    protected final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
     /**
      * Checked value for numeric columns.
@@ -136,6 +137,7 @@ public class SSCheckBox extends JCheckBox {
     
     /**
      * Creates an object of SSCheckBox.
+     * @param text 
      */
     public SSCheckBox(String text) {
     	super(text);
@@ -149,10 +151,11 @@ public class SSCheckBox extends JCheckBox {
      *
      * @param _sSRowSet    datasource to be used.
      * @param _columnName    name of the column to which this check box should be bound
+     * @throws SQLException - if a database access error occurs
      */
     public SSCheckBox(SSRowSet _sSRowSet, String _columnName) throws java.sql.SQLException {
-        sSRowSet = _sSRowSet;
-        columnName = _columnName;
+        this.sSRowSet = _sSRowSet;
+        this.columnName = _columnName;
         init();
         bind();
     }
@@ -160,13 +163,13 @@ public class SSCheckBox extends JCheckBox {
     /**
      * Sets the SSRowSet column name to which the component is bound.
      *
-     * @param _columnName    column name in the SSRowSet to which the component
-     *    is bound
+     * @param _columnName    column name in the SSRowSet to which the component is bound
+     * @throws SQLException - if a database access error occurs
      */
     public void setColumnName(String _columnName) throws java.sql.SQLException {
-        String oldValue = columnName;
-        columnName = _columnName;
-        firePropertyChange("columnName", oldValue, columnName);
+        String oldValue = this.columnName;
+        this.columnName = _columnName;
+        firePropertyChange("columnName", oldValue, this.columnName);
         bind();
     }    
     
@@ -176,18 +179,19 @@ public class SSCheckBox extends JCheckBox {
      * @return column name to which the component is bound
      */
     public String getColumnName() {
-        return columnName;
+        return this.columnName;
     }
 
     /**
      * Sets the SSRowSet to which the component is bound.
      *
      * @param _sSRowSet    SSRowSet to which the component is bound
+     * @throws SQLException - if a database access error occurs
      */
     public void setSSRowSet(SSRowSet _sSRowSet) throws java.sql.SQLException {
-        SSRowSet oldValue = sSRowSet;
-        sSRowSet = _sSRowSet;
-        firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        SSRowSet oldValue = this.sSRowSet;
+        this.sSRowSet = _sSRowSet;
+        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
         bind();
     }     
     
@@ -197,7 +201,7 @@ public class SSCheckBox extends JCheckBox {
      * @return SSRowSet to which the component is bound
      */
     public SSRowSet getSSRowSet() {
-        return sSRowSet;
+        return this.sSRowSet;
     }
 
     /**
@@ -205,17 +209,18 @@ public class SSCheckBox extends JCheckBox {
      *
      * @param _sSRowSet    datasource to be used.
      * @param _columnName    Name of the column to which this check box should be bound
+     * @throws SQLException - if a database access error occurs
      */
     public void bind(SSRowSet _sSRowSet, String _columnName) throws java.sql.SQLException {
-        SSRowSet oldValue = sSRowSet;
-        sSRowSet = _sSRowSet;
+        SSRowSet oldValue = this.sSRowSet;
+        this.sSRowSet = _sSRowSet;
         //pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
-        firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
         
-        String oldValue2 = columnName;
-        columnName = _columnName;
+        String oldValue2 = this.columnName;
+        this.columnName = _columnName;
         //pChangeSupport.firePropertyChange("columnName", oldValue2, columnName);
-        firePropertyChange("columnName", oldValue2, columnName);
+        firePropertyChange("columnName", oldValue2, this.columnName);
         
         bind();
     }
@@ -227,7 +232,7 @@ public class SSCheckBox extends JCheckBox {
     	
         // TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER KEY IS PRESSED
         Set<AWTKeyStroke> forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
-        Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(forwardKeys);
+        Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
         newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
         newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK ));
         setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);       
@@ -236,11 +241,13 @@ public class SSCheckBox extends JCheckBox {
     
     /**
      * Method for handling binding of component to a SSRowSet column.
+     * 
+     * @throws SQLException - if a database access error occurs
      */
     protected void bind() throws java.sql.SQLException {
         
         // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || columnName.trim().equals("") || sSRowSet==null) {
+            if (this.columnName==null || this.columnName.trim().equals("") || this.sSRowSet==null) {
                 return;
             }
             
@@ -248,10 +255,10 @@ public class SSCheckBox extends JCheckBox {
             removeListeners();
 
         // DETERMINE COLUMN TYPE
-			columnType = sSRowSet.getColumnType(columnName);            
+			this.columnType = this.sSRowSet.getColumnType(this.columnName);            
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
-            textField.setDocument(new SSTextDocument(sSRowSet, columnName));
+            this.textField.setDocument(new SSTextDocument(this.sSRowSet, this.columnName));
 
         // SET THE COMBO BOX ITEM DISPLAYED
             updateDisplay();
@@ -265,16 +272,16 @@ public class SSCheckBox extends JCheckBox {
      * Adds listeners for component and bound text field (where applicable).
      */
     private void addListeners() {
-        textField.getDocument().addDocumentListener(textFieldDocumentListener);
-        addItemListener(checkBoxListener);   
+        this.textField.getDocument().addDocumentListener(this.textFieldDocumentListener);
+        addItemListener(this.checkBoxListener);   
     }
 
     /**
      * Removes listeners for component and bound text field (where applicable).
      */
     private void removeListeners() {
-        textField.getDocument().removeDocumentListener(textFieldDocumentListener);
-        removeItemListener(checkBoxListener);
+        this.textField.getDocument().removeDocumentListener(this.textFieldDocumentListener);
+        removeItemListener(this.checkBoxListener);
     }    
 
 
@@ -285,12 +292,12 @@ public class SSCheckBox extends JCheckBox {
     protected void updateDisplay() {
             
         // SELECT/DESELECT BASED ON UNDERLYING SQL TYPE
-            switch(columnType) {
+            switch(this.columnType) {
                 case java.sql.Types.INTEGER:
                 case java.sql.Types.SMALLINT:
                 case java.sql.Types.TINYINT:
             // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                    if (textField.getText().equals(String.valueOf(CHECKED))) {
+                    if (this.textField.getText().equals(String.valueOf(this.CHECKED))) {
                         setSelected(true);
                     } else {
                         setSelected(false);
@@ -300,7 +307,7 @@ public class SSCheckBox extends JCheckBox {
                 case java.sql.Types.BIT:
                 case java.sql.Types.BOOLEAN:
             // SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-                    if (textField.getText().equals(BOOLEAN_CHECKED)) {
+                    if (this.textField.getText().equals(BOOLEAN_CHECKED)) {
                         setSelected(true);
                     } else {
                         setSelected(false);
@@ -317,83 +324,93 @@ public class SSCheckBox extends JCheckBox {
      * Listener(s) for the bound text field used to propigate values back to the
      * component's value.
      */
-    private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
+    protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
         /**
 		 * 
 		 */
 		private static final long serialVersionUID = 662317066187756908L;
 
+		@Override
 		public void changedUpdate(DocumentEvent de){
-            removeItemListener(checkBoxListener);
+            removeItemListener(SSCheckBox.this.checkBoxListener);
             
             updateDisplay();
             
-            addItemListener(checkBoxListener);
+            addItemListener(SSCheckBox.this.checkBoxListener);
         }
 
         // WHEN EVER THERE IS A CHANGE IN THE VALUE IN THE TEXT FIELD CHANGE THE CHECK BOX
         // ACCORDINGLY.
-        public void insertUpdate(DocumentEvent de) {
-            removeItemListener(checkBoxListener);
+        @Override
+		public void insertUpdate(DocumentEvent de) {
+            removeItemListener(SSCheckBox.this.checkBoxListener);
             
             updateDisplay();
             
-            addItemListener( checkBoxListener );
+            addItemListener( SSCheckBox.this.checkBoxListener );
         }
 
         // IF A REMOVE UPDATE OCCURS ON THE TEXT FIELD CHECK THE CHANGE AND SET THE
         // CHECK BOX ACCORDINGLY.
-        public void removeUpdate(DocumentEvent de) {
-            removeItemListener(checkBoxListener);
+        @Override
+		public void removeUpdate(DocumentEvent de) {
+            removeItemListener(SSCheckBox.this.checkBoxListener);
             
             updateDisplay();
             
-            addItemListener( checkBoxListener );
+            addItemListener( SSCheckBox.this.checkBoxListener );
         }
     } // end private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
     /**
-     * Listener(s) for the component's value used to propigate changes back to
+     * Listener(s) for the component's value used to propagate changes back to
      * bound text field.
      */
-    private class MyCheckBoxListener implements ItemListener, Serializable {
+    protected class MyCheckBoxListener implements ItemListener, Serializable {
 
         /**
-		 * 
+		 * uniquie serial id
 		 */
 		private static final long serialVersionUID = -8006881399306841024L;
 
+		@Override
 		public void itemStateChanged(ItemEvent ie) {
-            textField.getDocument().removeDocumentListener(textFieldDocumentListener);
+            SSCheckBox.this.textField.getDocument().removeDocumentListener(SSCheckBox.this.textFieldDocumentListener);
 
             if ( ((JCheckBox)ie.getSource()).isSelected() ) {
-                switch(columnType) {
+                switch(SSCheckBox.this.columnType) {
                     case java.sql.Types.INTEGER:
                     case java.sql.Types.SMALLINT:
                     case java.sql.Types.TINYINT:
-                        textField.setText(String.valueOf(CHECKED));
+                        SSCheckBox.this.textField.setText(String.valueOf(SSCheckBox.this.CHECKED));
                         break;
                     case java.sql.Types.BIT:
                     case java.sql.Types.BOOLEAN:
-                        textField.setText(BOOLEAN_CHECKED);
+                        SSCheckBox.this.textField.setText(BOOLEAN_CHECKED);
                         break;
+                    default:
+                    	System.out.println("Unknown column type of " + SSCheckBox.this.columnType);
+                    	break;
                 }
             } else {
-                switch(columnType) {
+                switch(SSCheckBox.this.columnType) {
                     case java.sql.Types.INTEGER:
                     case java.sql.Types.SMALLINT:
                     case java.sql.Types.TINYINT:
-                        textField.setText(String.valueOf(UNCHECKED));
+                        SSCheckBox.this.textField.setText(String.valueOf(SSCheckBox.this.UNCHECKED));
                         break;
                     case java.sql.Types.BIT:
                     case java.sql.Types.BOOLEAN:
-                        textField.setText(BOOLEAN_UNCHECKED);
+                        SSCheckBox.this.textField.setText(BOOLEAN_UNCHECKED);
                         break;
+                    default:
+                    	System.out.println("Unknown column type of " + SSCheckBox.this.columnType);
+                    	break;
                 }
             }
 
-            textField.getDocument().addDocumentListener(textFieldDocumentListener);
+            SSCheckBox.this.textField.getDocument().addDocumentListener(SSCheckBox.this.textFieldDocumentListener);
         }
 
     } // end private class MyCheckBoxListener implements ChangeListener, Serializable {

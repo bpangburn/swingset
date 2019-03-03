@@ -55,6 +55,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 import com.nqadmin.swingSet.datasources.SSRowSet;
 
@@ -105,7 +106,7 @@ public class SSImage extends JPanel {
     /**
      * RowSet listener
      */
-    private final MyRowSetListener sSRowSetListener = new MyRowSetListener();
+    protected final MyRowSetListener sSRowSetListener = new MyRowSetListener();
 
     /**
      *
@@ -122,8 +123,8 @@ public class SSImage extends JPanel {
      * @param _columnName - column in the sSRowSet to which the component should be bound.
      */
     public SSImage(SSRowSet _sSRowSet, String _columnName) {
-        sSRowSet = _sSRowSet;
-        columnName = _columnName;
+        this.sSRowSet = _sSRowSet;
+        this.columnName = _columnName;
         init();
         bind();
     }
@@ -134,9 +135,9 @@ public class SSImage extends JPanel {
      * @param _sSRowSet    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _sSRowSet) {
-        SSRowSet oldValue = sSRowSet;
-        sSRowSet = _sSRowSet;
-        firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        SSRowSet oldValue = this.sSRowSet;
+        this.sSRowSet = _sSRowSet;
+        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
         bind();
     }
 
@@ -146,7 +147,7 @@ public class SSImage extends JPanel {
      * @return SSRowSet to which the component is bound
      */
     public SSRowSet getSSRowSet() {
-        return sSRowSet;
+        return this.sSRowSet;
     }
 
     /**
@@ -156,9 +157,9 @@ public class SSImage extends JPanel {
      *    is bound
      */
     public void setColumnName(String _columnName) {
-        String oldValue = columnName;
-        columnName = _columnName;
-        firePropertyChange("columnName", oldValue, columnName);
+        String oldValue = this.columnName;
+        this.columnName = _columnName;
+        firePropertyChange("columnName", oldValue, this.columnName);
         bind();
     }
 
@@ -168,7 +169,7 @@ public class SSImage extends JPanel {
      * @return column name to which the component is bound
      */
     public String getColumnName() {
-        return columnName;
+        return this.columnName;
     }
 
     /**
@@ -205,13 +206,14 @@ public class SSImage extends JPanel {
      *
      * @param _preferredSize - preferred size of the image component
      */
-    public void setPreferredSize(Dimension _preferredSize) {
-        Dimension oldValue = preferredSize;
-        preferredSize = _preferredSize;
-        firePropertyChange("preferredSize", oldValue, preferredSize);
+    @Override
+	public void setPreferredSize(Dimension _preferredSize) {
+        Dimension oldValue = this.preferredSize;
+        this.preferredSize = _preferredSize;
+        firePropertyChange("preferredSize", oldValue, this.preferredSize);
 
-        lblImage.setPreferredSize(new Dimension((int)_preferredSize.getWidth(), (int)_preferredSize.getHeight() - 20));
-        btnUpdateImage.setPreferredSize(new Dimension((int)_preferredSize.getWidth(), 20));
+        this.lblImage.setPreferredSize(new Dimension((int)_preferredSize.getWidth(), (int)_preferredSize.getHeight() - 20));
+        this.btnUpdateImage.setPreferredSize(new Dimension((int)_preferredSize.getWidth(), 20));
         super.setPreferredSize(_preferredSize);
     }
 
@@ -220,18 +222,19 @@ public class SSImage extends JPanel {
      *
      * @return returns preferred size of the image component
      */
-    public Dimension getPreferredSize() {
-        return preferredSize;
+    @Override
+	public Dimension getPreferredSize() {
+        return this.preferredSize;
     }
 
     /**
      * Removes the current image. The image is not removed from the underlying sSRowSet.
      */
     public void clearImage(){
-        lblImage.setIcon(null);
-        lblImage.setText("No Picture");
+        this.lblImage.setIcon(null);
+        this.lblImage.setText("No Picture");
         Dimension dimension = getPreferredSize();
-        lblImage.setPreferredSize(new Dimension((int)dimension.getWidth(), (int)dimension.getHeight()-20));
+        this.lblImage.setPreferredSize(new Dimension((int)dimension.getWidth(), (int)dimension.getHeight()-20));
         updateUI();
     }
 
@@ -242,13 +245,13 @@ public class SSImage extends JPanel {
      * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _sSRowSet, String _columnName) {
-        SSRowSet oldValue = sSRowSet;
-        sSRowSet = _sSRowSet;
-        firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        SSRowSet oldValue = this.sSRowSet;
+        this.sSRowSet = _sSRowSet;
+        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
 
-        String oldValue2 = columnName;
-        columnName = _columnName;
-        firePropertyChange("columnName", oldValue2, columnName);
+        String oldValue2 = this.columnName;
+        this.columnName = _columnName;
+        firePropertyChange("columnName", oldValue2, this.columnName);
 
         bind();
     }
@@ -259,33 +262,34 @@ public class SSImage extends JPanel {
     protected void init() {
 
         // ADD UPDATE BUTTON LISTENER
-            btnUpdateImage.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
+            this.btnUpdateImage.addActionListener(new ActionListener() {
+                @Override
+				public void actionPerformed(ActionEvent ae) {
                     try{
-                        if (sSRowSet != null) {
-                            FileInputStream inStream = null;
+                        if (SSImage.this.sSRowSet != null) {
+                            //FileInputStream inStream = null;
                             File inFile = null;
                             JFileChooser fileChooser = new JFileChooser();
-                            if(fileChooser.showOpenDialog(btnUpdateImage) == JFileChooser.APPROVE_OPTION){
+                            if(fileChooser.showOpenDialog(SSImage.this.btnUpdateImage) == JFileChooser.APPROVE_OPTION){
                                 inFile = fileChooser.getSelectedFile();
-                                inStream = new FileInputStream(inFile);
-                                int totalLength = (int)inFile.length();
-                                byte[] bytes = new byte[totalLength];
-                                int bytesRead = inStream.read(bytes);
-                                while (bytesRead < totalLength){
-                                    int read = inStream.read(bytes, bytesRead, totalLength - bytesRead);
-                                    if(read == -1)
-                                        break;
-                                    else
-                                        bytesRead += read;
+                                try (FileInputStream inStream = new FileInputStream(inFile)) {
+	                                int totalLength = (int)inFile.length();
+	                                byte[] bytes = new byte[totalLength];
+	                                int bytesRead = inStream.read(bytes);
+	                                while (bytesRead < totalLength){
+	                                    int read = inStream.read(bytes, bytesRead, totalLength - bytesRead);
+	                                    if(read == -1)
+	                                        break;
+										bytesRead += read;
+	                                }
+	                                //inStream.close();
+	                                SSImage.this.sSRowSet.updateBytes(SSImage.this.columnName, bytes);
+	                                SSImage.this.img = new ImageIcon(bytes);
+	                                SSImage.this.lblImage.setPreferredSize(new Dimension(SSImage.this.img.getIconWidth(), SSImage.this.img.getIconHeight()));
+	                                SSImage.this.lblImage.setIcon(SSImage.this.img);
+	                                SSImage.this.lblImage.setText("");
+	                                updateUI();
                                 }
-                                inStream.close();
-                                sSRowSet.updateBytes(columnName, bytes);
-                                img = new ImageIcon(bytes);
-                                lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
-                                lblImage.setIcon(img);
-                                lblImage.setText("");
-                                updateUI();
                             } else {
                                 return;
                             }
@@ -299,7 +303,7 @@ public class SSImage extends JPanel {
             });
 
         // SET PREFERRED DIMENSIONS
-            setPreferredSize(preferredSize);
+            setPreferredSize(this.preferredSize);
 
         // ADD LABEL & BUTTON TO PANEL
             addComponents();
@@ -313,12 +317,12 @@ public class SSImage extends JPanel {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy= 0;
-        JScrollPane scrollPane = new JScrollPane(lblImage, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        JScrollPane scrollPane = new JScrollPane(this.lblImage, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         scrollPane.setPreferredSize(new Dimension(200, 180));
-        btnUpdateImage.setPreferredSize(new Dimension(200,20));
+        this.btnUpdateImage.setPreferredSize(new Dimension(200,20));
         add(scrollPane, constraints);
         constraints.gridy = 1;
-        add(btnUpdateImage, constraints);
+        add(this.btnUpdateImage, constraints);
     }
 
     /**
@@ -327,7 +331,7 @@ public class SSImage extends JPanel {
     protected void bind() {
 
         // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || columnName.trim().equals("") || sSRowSet==null) {
+            if (this.columnName==null || this.columnName.trim().equals("") || this.sSRowSet==null) {
                 return;
             }
 
@@ -348,21 +352,21 @@ public class SSImage extends JPanel {
     protected void updateDisplay() {
 
         try {
-            byte[] imageData = sSRowSet.getRow() >0 ? sSRowSet.getBytes(columnName) : null;
+            byte[] imageData = this.sSRowSet.getRow() >0 ? this.sSRowSet.getBytes(this.columnName) : null;
             if(imageData != null){
-                img = new ImageIcon(imageData);
-                lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
-                lblImage.setText("");
+                this.img = new ImageIcon(imageData);
+                this.lblImage.setPreferredSize(new Dimension(this.img.getIconWidth(), this.img.getIconHeight()));
+                this.lblImage.setText("");
             } else {
-                img = null;
-                lblImage.setText("No Picture");
+                this.img = null;
+                this.lblImage.setText("No Picture");
             }
         } catch(SQLException se) {
             se.printStackTrace();
-            img = null;
+            this.img = null;
         }
 
-        lblImage.setIcon(img);
+        this.lblImage.setIcon(this.img);
         updateUI();
 
     }
@@ -371,31 +375,34 @@ public class SSImage extends JPanel {
      * Adds listeners for component and bound text field (where applicable).
      */
     private void addListeners() {
-        sSRowSet.addRowSetListener(sSRowSetListener);
+        this.sSRowSet.addRowSetListener(this.sSRowSetListener);
     }
 
     /**
      * Removes listeners for component and bound text field (where applicable).
      */
     private void removeListeners() {
-        sSRowSet.removeRowSetListener(sSRowSetListener);
+        this.sSRowSet.removeRowSetListener(this.sSRowSetListener);
     }
 
     /**
      *  Listener for the RowSet.
      */
-    private class MyRowSetListener  implements RowSetListener {
-        public void cursorMoved(RowSetEvent rse){
+    protected class MyRowSetListener implements RowSetListener {
+        @Override
+		public void cursorMoved(RowSetEvent rse){
             //System.out.println("Cursor Moved");
             updateDisplay();
         }
 
-        public void rowChanged(RowSetEvent rse){
+        @Override
+		public void rowChanged(RowSetEvent rse){
             //System.out.println("Row Changed");
             updateDisplay();
         }
 
-        public void rowSetChanged(RowSetEvent rse){
+        @Override
+		public void rowSetChanged(RowSetEvent rse){
             //System.out.println("RowSet Changed");
             updateDisplay();
         }

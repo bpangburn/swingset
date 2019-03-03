@@ -83,7 +83,7 @@ public class SSSyncManager {
     /**
      * Listener on SSRowSet to detect data navigator-based navigations.
      */
-    private final MyRowSetListener rowsetListener = new MyRowSetListener();
+    protected final MyRowSetListener rowsetListener = new MyRowSetListener();
 
     /**
 
@@ -94,9 +94,9 @@ public class SSSyncManager {
      * with navigation combo box
      */
     public SSSyncManager(SSDBComboBox _comboBox, SSDataNavigator _dataNavigator) {
-        comboBox = _comboBox;
-        dataNavigator = _dataNavigator;
-        rowset = dataNavigator.getSSRowSet();
+        this.comboBox = _comboBox;
+        this.dataNavigator = _dataNavigator;
+        this.rowset = this.dataNavigator.getSSRowSet();
     }
 
     /**
@@ -105,7 +105,7 @@ public class SSSyncManager {
      * @param _columnName   SSRowSet column used as basis for synchronization.
      */
     public void setColumnName(String _columnName) {
-        columnName = _columnName;
+        this.columnName = _columnName;
     }
 
     /**
@@ -114,8 +114,8 @@ public class SSSyncManager {
      * @param _dataNavigator    data navigator to be synchronized
      */
     public void setDataNavigator(SSDataNavigator _dataNavigator) {
-        dataNavigator = _dataNavigator;
-        rowset = dataNavigator.getSSRowSet();
+        this.dataNavigator = _dataNavigator;
+        this.rowset = this.dataNavigator.getSSRowSet();
     }
 
     /**
@@ -125,7 +125,7 @@ public class SSSyncManager {
      */
 
     public void setComboBox(SSDBComboBox _comboBox) {
-        comboBox = _comboBox;
+        this.comboBox = _comboBox;
     }
 
     /**
@@ -147,32 +147,35 @@ public class SSSyncManager {
      * Adds listeners to combo box & rowset.
      */
     private void addListeners() {
-        comboBox.addActionListener(comboListener);
-        dataNavigator.getSSRowSet().addRowSetListener(rowsetListener);
+        this.comboBox.addActionListener(this.comboListener);
+        this.dataNavigator.getSSRowSet().addRowSetListener(this.rowsetListener);
     }
 
     /**
      * Removes listeners from combo box & rowset.
      */
     private void removeListeners() {
-        comboBox.removeActionListener(comboListener);
-        dataNavigator.getSSRowSet().removeRowSetListener(rowsetListener);
+        this.comboBox.removeActionListener(this.comboListener);
+        this.dataNavigator.getSSRowSet().removeRowSetListener(this.rowsetListener);
     }
 
     /**
      *  Listener for rowset.
      */
-    private class MyRowSetListener implements RowSetListener {
+    protected class MyRowSetListener implements RowSetListener {
 
-        public void cursorMoved(RowSetEvent rse) {
+        @Override
+		public void cursorMoved(RowSetEvent rse) {
             adjustValue();
         }
 
-        public void rowChanged(RowSetEvent rse) {
+        @Override
+		public void rowChanged(RowSetEvent rse) {
             adjustValue();
         }
 
-        public void rowSetChanged(RowSetEvent rse) {
+        @Override
+		public void rowSetChanged(RowSetEvent rse) {
             adjustValue();
         }
 
@@ -183,23 +186,23 @@ public class SSSyncManager {
      * Method to update combo box based on rowset.
      */
     protected void adjustValue() {
-        comboBox.removeActionListener(comboListener);
+        this.comboBox.removeActionListener(this.comboListener);
         try{
-            if(rowset != null && rowset.getRow() > 0){
+            if(this.rowset != null && this.rowset.getRow() > 0){
             // GET THE CURRENT VALUE FROM THE ROWSET.    
-                String currentRowValue = rowset.getString(columnName);
+                String currentRowValue = this.rowset.getString(this.columnName);
             // CHECK IF THE COMBO BOX IS DISPLAYING THE SAME ONE.    
-                if(comboBox.getSelectedStringValue() == null || !comboBox.getSelectedStringValue().equals(currentRowValue)){
+                if(this.comboBox.getSelectedStringValue() == null || !this.comboBox.getSelectedStringValue().equals(currentRowValue)){
                 // IF NOT CHANGE THE SELECTION OF THE COMBO BOX.    
-                    comboBox.setSelectedStringValue(rowset.getString(columnName));
+                    this.comboBox.setSelectedStringValue(this.rowset.getString(this.columnName));
                 }
             } else {
-                comboBox.setSelectedIndex(-1);
+                this.comboBox.setSelectedIndex(-1);
             }
         } catch(SQLException se) {
             se.printStackTrace();
         }
-        comboBox.addActionListener(comboListener);
+        this.comboBox.addActionListener(this.comboListener);
     }
 
 
@@ -207,35 +210,37 @@ public class SSSyncManager {
      *Listener for combo box to update data navigator when
      * combo box-based navigation occurs.
      */
-    private class MyComboListener implements ActionListener {
+    protected class MyComboListener implements ActionListener {
         //protected long id = -1;
         protected String id = "";
 
     // WHEN THERE IS A CHANGE IN THIS VALUE MOVE THE ROWSET SO THAT
     // ITS POSITIONED AT THE RIGHT RECORD.
-        public void actionPerformed(ActionEvent ae) {
+        @Override
+		public void actionPerformed(ActionEvent ae) {
         	try {
         		// IF THIS IS NOT CAUSED BY THE USER ACTION (IN WHICH THE FOCUS WILL BE ON THE COMBO) NOTHING TO DO
-                if(rowset == null || rowset.getRow() < 1 || comboBox.getSelectedIndex() == -1 || comboBox.textField == null || !comboBox.hasFocus()){
+                if(SSSyncManager.this.rowset == null || SSSyncManager.this.rowset.getRow() < 1 || SSSyncManager.this.comboBox.getSelectedIndex() == -1 || SSSyncManager.this.comboBox.textField == null || !SSSyncManager.this.comboBox.hasFocus()){
                      return;
                 }
-                id = ""+comboBox.getSelectedFilteredValue();
-                rowset.removeRowSetListener(rowsetListener);
+                this.id = ""+SSSyncManager.this.comboBox.getSelectedFilteredValue();
+                SSSyncManager.this.rowset.removeRowSetListener(SSSyncManager.this.rowsetListener);
                 
             // UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW. *take out to make it faster
                // dataNavigator.updatePresentRow();
                 //if(id != rowset.getLong(columnName)) {
-                if(!id.equals(rowset.getString(columnName))) {
-                	long indexOfId = comboBox.itemMap.get(id) + 1;
+                if(!this.id.equals(SSSyncManager.this.rowset.getString(SSSyncManager.this.columnName))) {
+                	@SuppressWarnings("boxing")
+					long indexOfId = SSSyncManager.this.comboBox.itemMap.get(this.id) + 1;
                   	int index = (int)indexOfId;
-                    rowset.absolute(index);
-                    int numRecords = comboBox.getItemCount();
+                    SSSyncManager.this.rowset.absolute(index);
+                    int numRecords = SSSyncManager.this.comboBox.getItemCount();
                     int count = 0;
                     //while (id != rowset.getLong(columnName)) {
-                    while (!id.equals(rowset.getString(columnName))) {
-                        if (!rowset.next()) {
-                            rowset.beforeFirst();
-                            rowset.next();
+                    while (!this.id.equals(SSSyncManager.this.rowset.getString(SSSyncManager.this.columnName))) {
+                        if (!SSSyncManager.this.rowset.next()) {
+                            SSSyncManager.this.rowset.beforeFirst();
+                            SSSyncManager.this.rowset.next();
                         }
 
                         count++;
@@ -244,19 +249,19 @@ public class SSSyncManager {
                         //so if for some reason item is in combo but deleted in rowset
                         //To avoid infinite loop in such scenario
                         if (count > numRecords + 5) {
-                        	comboBox.repaint();
+                        	SSSyncManager.this.comboBox.repaint();
                             //JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin about this","Row not found",JOptionPane.OK_OPTION);
                             break;
                         }
                     }
                 }
-                rowset.addRowSetListener(rowsetListener);
+                SSSyncManager.this.rowset.addRowSetListener(SSSyncManager.this.rowsetListener);
 
             } catch(SQLException se) {
                 se.printStackTrace();
             }
         }
-    } // private class MyComboListener implements ActionListener {
+    } // protected class MyComboListener implements ActionListener {
 
 } // end public class SSSyncManager {
 

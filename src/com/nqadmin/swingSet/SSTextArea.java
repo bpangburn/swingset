@@ -90,8 +90,8 @@ public class SSTextArea extends JTextArea {
      * @param _columnName    name of the column to which this text area should be bound
      */
     public SSTextArea(SSRowSet _sSRowSet, String _columnName) {
-		sSRowSet = _sSRowSet;
-        columnName = _columnName;
+		this.sSRowSet = _sSRowSet;
+        this.columnName = _columnName;
         bind();
     }
 
@@ -102,9 +102,9 @@ public class SSTextArea extends JTextArea {
      *    is bound
      */
     public void setColumnName(String _columnName) {
-        String oldValue = columnName;
-        columnName = _columnName;
-        firePropertyChange("columnName", oldValue, columnName);
+        String oldValue = this.columnName;
+        this.columnName = _columnName;
+        firePropertyChange("columnName", oldValue, this.columnName);
         bind();
     }
 
@@ -114,7 +114,7 @@ public class SSTextArea extends JTextArea {
      * @return column name to which the component is bound
      */
     public String getColumnName() {
-        return columnName;
+        return this.columnName;
     }
 
     /**
@@ -123,9 +123,9 @@ public class SSTextArea extends JTextArea {
      * @param _sSRowSet    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _sSRowSet) {
-        SSRowSet oldValue = sSRowSet;
-        sSRowSet = _sSRowSet;
-        firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        SSRowSet oldValue = this.sSRowSet;
+        this.sSRowSet = _sSRowSet;
+        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
         bind();
     }
 
@@ -135,7 +135,7 @@ public class SSTextArea extends JTextArea {
      * @return SSRowSet to which the component is bound
      */
     public SSRowSet getSSRowSet() {
-        return sSRowSet;
+        return this.sSRowSet;
     }
 
     /**
@@ -145,13 +145,13 @@ public class SSTextArea extends JTextArea {
      * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _sSRowSet, String _columnName) {
-        SSRowSet oldValue = sSRowSet;
-        sSRowSet = _sSRowSet;
-        firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        SSRowSet oldValue = this.sSRowSet;
+        this.sSRowSet = _sSRowSet;
+        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
 
-        String oldValue2 = columnName;
-        columnName = _columnName;
-        firePropertyChange("columnName", oldValue2, columnName);
+        String oldValue2 = this.columnName;
+        this.columnName = _columnName;
+        firePropertyChange("columnName", oldValue2, this.columnName);
 
         bind();
     }
@@ -162,7 +162,7 @@ public class SSTextArea extends JTextArea {
     protected void bind() {
 
         // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || columnName.trim().equals("") || sSRowSet==null) {
+            if (this.columnName==null || this.columnName.trim().equals("") || this.sSRowSet==null) {
                 return;
             }
 
@@ -170,7 +170,7 @@ public class SSTextArea extends JTextArea {
         //    removeListeners();
 
         // BIND THE TEXT AREA TO THE SPECIFIED COLUMN
-            setDocument(new SSTextDocument(sSRowSet, columnName));
+            setDocument(new SSTextDocument(this.sSRowSet, this.columnName));
 
         // ADD BACK LISTENERS
         //    addListeners();;

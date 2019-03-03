@@ -83,12 +83,12 @@ public class SSLabel extends JLabel {
     /**
      * Component listener.
      */
-    private final MyLabelTextListener labelTextListener = new MyLabelTextListener();
+    protected final MyLabelTextListener labelTextListener = new MyLabelTextListener();
 
     /**
      * Bound text field document listener.
      */
-    private final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
+    protected final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
     /**
      * Empty constructor needed for deserialization. Creates a SSLabel instance
@@ -128,8 +128,8 @@ public class SSLabel extends JLabel {
      * @param _columnName    name of the column to which this label should be bound
      */
     public SSLabel(SSRowSet _sSRowSet, String _columnName) {
-        sSRowSet = _sSRowSet;
-        columnName = _columnName;
+        this.sSRowSet = _sSRowSet;
+        this.columnName = _columnName;
         init();
         bind();
     }
@@ -141,9 +141,9 @@ public class SSLabel extends JLabel {
      *    is bound
      */
     public void setColumnName(String _columnName) {
-        String oldValue = columnName;
-        columnName = _columnName;
-        firePropertyChange("columnName", oldValue, columnName);
+        String oldValue = this.columnName;
+        this.columnName = _columnName;
+        firePropertyChange("columnName", oldValue, this.columnName);
         bind();
     }
 
@@ -153,7 +153,7 @@ public class SSLabel extends JLabel {
      * @return column name to which the component is bound
      */
     public String getColumnName() {
-        return columnName;
+        return this.columnName;
     }
 
     /**
@@ -162,9 +162,9 @@ public class SSLabel extends JLabel {
      * @param _sSRowSet    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _sSRowSet) {
-        SSRowSet oldValue = sSRowSet;
-        sSRowSet = _sSRowSet;
-        firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        SSRowSet oldValue = this.sSRowSet;
+        this.sSRowSet = _sSRowSet;
+        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
         bind();
     }
 
@@ -174,7 +174,7 @@ public class SSLabel extends JLabel {
      * @return SSRowSet to which the component is bound
      */
     public SSRowSet getSSRowSet() {
-        return sSRowSet;
+        return this.sSRowSet;
     }
 
     /**
@@ -184,13 +184,13 @@ public class SSLabel extends JLabel {
      * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _sSRowSet, String _columnName) {
-        SSRowSet oldValue = sSRowSet;
-        sSRowSet = _sSRowSet;
-        firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        SSRowSet oldValue = this.sSRowSet;
+        this.sSRowSet = _sSRowSet;
+        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
 
-        String oldValue2 = columnName;
-        columnName = _columnName;
-        firePropertyChange("columnName", oldValue2, columnName);
+        String oldValue2 = this.columnName;
+        this.columnName = _columnName;
+        firePropertyChange("columnName", oldValue2, this.columnName);
 
         bind();
     }
@@ -210,7 +210,7 @@ public class SSLabel extends JLabel {
     protected void bind() {
 
         // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || columnName.trim().equals("") || sSRowSet==null) {
+            if (this.columnName==null || this.columnName.trim().equals("") || this.sSRowSet==null) {
                 return;
             }
 
@@ -218,13 +218,13 @@ public class SSLabel extends JLabel {
             removeListeners();
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
-            textField.setDocument(new SSTextDocument(sSRowSet, columnName));
+            this.textField.setDocument(new SSTextDocument(this.sSRowSet, this.columnName));
 
         // SET THE LABEL DISPLAY
             updateDisplay();
 
         // ADD BACK LISTENERS
-            addListeners();;
+            addListeners();
 
     }
 
@@ -235,7 +235,7 @@ public class SSLabel extends JLabel {
     protected void updateDisplay() {
 
         // SET THE LABEL BASED ON THE VALUE IN THE TEXT FIELD
-            setText(textField.getText());
+            setText(this.textField.getText());
 
     } // end protected void updateDisplay() {
 
@@ -243,76 +243,80 @@ public class SSLabel extends JLabel {
      * Adds listeners for component and bound text field (where applicable).
      */
     private void addListeners() {
-        textField.getDocument().addDocumentListener(textFieldDocumentListener);
-        addPropertyChangeListener("text", labelTextListener);
+        this.textField.getDocument().addDocumentListener(this.textFieldDocumentListener);
+        addPropertyChangeListener("text", this.labelTextListener);
     }
 
     /**
      * Removes listeners for component and bound text field (where applicable).
      */
     private void removeListeners() {
-        textField.getDocument().removeDocumentListener(textFieldDocumentListener);
-        removePropertyChangeListener("text", labelTextListener);
+        this.textField.getDocument().removeDocumentListener(this.textFieldDocumentListener);
+        removePropertyChangeListener("text", this.labelTextListener);
     }
 
     /**
      * Listener(s) for the bound text field used to propigate values back to the
      * component's value.
      */
-    private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
+    protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
         /**
 		 * 
 		 */
 		private static final long serialVersionUID = -6911906045174819801L;
 
+		@Override
 		public void changedUpdate(DocumentEvent de) {
-            removePropertyChangeListener("text", labelTextListener);
+            removePropertyChangeListener("text", SSLabel.this.labelTextListener);
 
             updateDisplay();
 
-            addPropertyChangeListener("text", labelTextListener);
+            addPropertyChangeListener("text", SSLabel.this.labelTextListener);
         }
 
         // WHEN EVER THERE IS A CHANGE IN THE VALUE IN THE TEXT FIELD CHANGE THE LABEL
         // ACCORDINGLY.
-        public void insertUpdate(DocumentEvent de) {
-            removePropertyChangeListener("text", labelTextListener);
+        @Override
+		public void insertUpdate(DocumentEvent de) {
+            removePropertyChangeListener("text", SSLabel.this.labelTextListener);
 
             updateDisplay();
 
-            addPropertyChangeListener("text", labelTextListener);
+            addPropertyChangeListener("text", SSLabel.this.labelTextListener);
         }
 
         // IF A REMOVE UPDATE OCCURS ON THE TEXT FIELD CHECK THE CHANGE AND SET THE
         // CHECK BOX ACCORDINGLY.
-        public void removeUpdate(DocumentEvent de) {
-            removePropertyChangeListener("text", labelTextListener);
+        @Override
+		public void removeUpdate(DocumentEvent de) {
+            removePropertyChangeListener("text", SSLabel.this.labelTextListener);
 
             updateDisplay();
 
-            addPropertyChangeListener("text", labelTextListener);
+            addPropertyChangeListener("text", SSLabel.this.labelTextListener);
         }
-    } // end private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
+    } // end protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
     /**
      * Listener(s) for the component's value used to propigate changes back to
      * bound text field.
      */
-    private class MyLabelTextListener implements PropertyChangeListener, Serializable {
+    protected class MyLabelTextListener implements PropertyChangeListener, Serializable {
         /**
 		 * 
 		 */
 		private static final long serialVersionUID = 6786673052979566820L;
 
+		@Override
 		public void propertyChange(PropertyChangeEvent pce) {
-            textField.getDocument().removeDocumentListener(textFieldDocumentListener);
+            SSLabel.this.textField.getDocument().removeDocumentListener(SSLabel.this.textFieldDocumentListener);
 
-            textField.setText(getText());
+            SSLabel.this.textField.setText(getText());
 
-            textField.getDocument().addDocumentListener(textFieldDocumentListener);
+            SSLabel.this.textField.getDocument().addDocumentListener(SSLabel.this.textFieldDocumentListener);
         }
 
-    } // end private class MyLabelTextListener implements ChangeListener, Serializable {
+    } // end protected class MyLabelTextListener implements ChangeListener, Serializable {
 
 } // end public class SSLabel extends JLabel {
 

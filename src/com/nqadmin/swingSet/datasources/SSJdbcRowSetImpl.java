@@ -124,7 +124,7 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param _ssConnection  SSConnection object to be used to connect to the database.
      */
     public SSJdbcRowSetImpl(SSConnection _ssConnection) {
-    	sSConnection = _ssConnection;
+    	this.sSConnection = _ssConnection;
     }
 
     /**
@@ -133,8 +133,8 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param _command   SQL query to be executed.
      */
     public SSJdbcRowSetImpl(SSConnection _ssConnection, String _command) {
-        sSConnection = _ssConnection;
-        command = _command;
+        this.sSConnection = _ssConnection;
+        this.command = _command;
     }
 
     /**
@@ -143,7 +143,7 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param _listener bean property change listener
      */
     public void addPropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.addPropertyChangeListener(_listener);
+    	this.pChangeSupport.addPropertyChangeListener(_listener);
     }
 
     /**
@@ -152,7 +152,7 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param _listener bean property change listener
      */
     public void removePropertyChangeListener(PropertyChangeListener _listener) {
-    	pChangeSupport.removePropertyChangeListener(_listener);
+    	this.pChangeSupport.removePropertyChangeListener(_listener);
     }
 
     /**
@@ -161,7 +161,7 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param _listener bean vetoable change listener
      */
     public void addVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.addVetoableChangeListener(_listener);
+    	this.vChangeSupport.addVetoableChangeListener(_listener);
     }
 
     /**
@@ -170,7 +170,7 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param _listener bean veto change listener
      */
     public void removeVetoableChangeListener(VetoableChangeListener _listener) {
-    	vChangeSupport.removeVetoableChangeListener(_listener);
+    	this.vChangeSupport.removeVetoableChangeListener(_listener);
     }
 
     /**
@@ -178,9 +178,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param _ssConnection  connection object to be used to connect to the database.
      */
     public void setSSConnection(SSConnection _ssConnection) {
-        SSConnection oldValue = sSConnection;
-        sSConnection = _ssConnection;
-        pChangeSupport.firePropertyChange("ssConnection", oldValue, sSConnection);
+        SSConnection oldValue = this.sSConnection;
+        this.sSConnection = _ssConnection;
+        this.pChangeSupport.firePropertyChange("ssConnection", oldValue, this.sSConnection);
     }
 
     /**
@@ -188,13 +188,13 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param _command    query to be executed.
      */
     public void setCommand(String _command) {
-    	String oldValue = command;
-        command = _command;
-        pChangeSupport.firePropertyChange("command", oldValue, command);
+    	String oldValue = this.command;
+        this.command = _command;
+        this.pChangeSupport.firePropertyChange("command", oldValue, this.command);
 
         try {
-            if (rowset != null) {
-                rowset.setCommand(command);
+            if (this.rowset != null) {
+                this.rowset.setCommand(this.command);
             }
         }catch(SQLException se){
             se.printStackTrace();
@@ -206,7 +206,7 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @return returns the SSConnection object being used.
      */
     public SSConnection getSSConnection(){
-        return sSConnection;
+        return this.sSConnection;
     }
 
     /**
@@ -214,7 +214,7 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @return returns the query being used.
      */
     public String getCommand(){
-        return command;
+        return this.command;
     }
 
     /**
@@ -225,13 +225,14 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @throws SQLException - if a data access error occurs or any of the properties necessary
      * for making a connection have not been set
      */
-    public void execute() throws SQLException{
-        if(rowset == null){
+    @Override
+	public void execute() throws SQLException{
+        if(this.rowset == null){
         	setJdbcRowSetConnection();
-            rowset.setCommand(command);
+            this.rowset.setCommand(this.command);
         }
-        rowset.execute();
-        metaData = rowset.getMetaData();
+        this.rowset.execute();
+        this.metaData = this.rowset.getMetaData();
     }
     
     protected void setJdbcRowSetConnection() throws SQLException{
@@ -249,10 +250,10 @@ import com.sun.rowset.JdbcRowSetImpl;
     	rowset.setPassword(sSConnection.getPassword());
     	*/
     	
-    	rowset = new JdbcRowSetImpl(sSConnection.getConnection());
+    	this.rowset = new JdbcRowSetImpl(this.sSConnection.getConnection());
     	
-        rowset.setType(ResultSet.TYPE_SCROLL_INSENSITIVE);
-        rowset.setConcurrency(ResultSet.CONCUR_UPDATABLE);
+        this.rowset.setType(ResultSet.TYPE_SCROLL_INSENSITIVE);
+        this.rowset.setConcurrency(ResultSet.CONCUR_UPDATABLE);
     	
     }
 
@@ -268,12 +269,12 @@ import com.sun.rowset.JdbcRowSetImpl;
             setJdbcRowSetConnection();
 
         // SET THE COMMAND FOR ROWSET
-            rowset.setCommand(command);
+            this.rowset.setCommand(this.command);
 
         // CALL EXECUTE ONLY IF THE QUERY IS NOT EMPTY.
-            if(!command.equals("")){
-                rowset.execute();
-                metaData = rowset.getMetaData();
+            if(!this.command.equals("")){
+                this.rowset.execute();
+                this.metaData = this.rowset.getMetaData();
             }
         }catch(SQLException se){
             se.printStackTrace();
@@ -286,10 +287,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * object as an sql array in the Java programming language.
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public Array getArray(int columnIndex) throws SQLException{
-        return rowset.getArray(columnIndex);
+    @Override
+	public Array getArray(int columnIndex) throws SQLException{
+        return this.rowset.getArray(columnIndex);
     }
     
     /**
@@ -298,10 +300,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then a false
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public boolean getBoolean(int columnIndex) throws SQLException{
-        return rowset.getBoolean(columnIndex);
+    @Override
+	public boolean getBoolean(int columnIndex) throws SQLException{
+        return this.rowset.getBoolean(columnIndex);
     }
 
     /**
@@ -310,10 +313,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public int getInt(int columnIndex) throws SQLException{
-        return rowset.getInt(columnIndex);
+    @Override
+	public int getInt(int columnIndex) throws SQLException{
+        return this.rowset.getInt(columnIndex);
     }
 
     /**
@@ -322,10 +326,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public long getLong(int columnIndex) throws SQLException{
-        return rowset.getLong(columnIndex);
+    @Override
+	public long getLong(int columnIndex) throws SQLException{
+        return this.rowset.getLong(columnIndex);
     }
 
     /**
@@ -334,10 +339,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public float getFloat(int columnIndex) throws SQLException{
-        return rowset.getFloat(columnIndex);
+    @Override
+	public float getFloat(int columnIndex) throws SQLException{
+        return this.rowset.getFloat(columnIndex);
     }
 
     /**
@@ -346,10 +352,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public double getDouble(int columnIndex) throws SQLException{
-        return rowset.getDouble(columnIndex);
+    @Override
+	public double getDouble(int columnIndex) throws SQLException{
+        return this.rowset.getDouble(columnIndex);
     }
 
     /**
@@ -358,10 +365,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then a null
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public String getString(int columnIndex) throws SQLException{
-        return rowset.getString(columnIndex);
+    @Override
+	public String getString(int columnIndex) throws SQLException{
+        return this.rowset.getString(columnIndex);
     }
 
     /**
@@ -370,10 +378,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param columnIndex - column number . first column is 1, second column is 2....
      * @return returns the column value of the current row, if the value is null then null
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public Date getDate(int columnIndex) throws SQLException{
-        return rowset.getDate(columnIndex);
+    @Override
+	public Date getDate(int columnIndex) throws SQLException{
+        return this.rowset.getDate(columnIndex);
     }
 
     /**
@@ -382,10 +391,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * raw values returned by the driver.
      * @param columnIndex - index number of the column
      * @return  returns the column value; if the value is SQL NULL, the value returned is null
-     * @throws throws an SQLException - if a database access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public byte[] getBytes(int columnIndex)  throws SQLException {
-        return rowset.getBytes(columnIndex);
+    @Override
+	public byte[] getBytes(int columnIndex)  throws SQLException {
+        return this.rowset.getBytes(columnIndex);
     }
     
     /**
@@ -395,10 +405,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateArray(int columnIndex, Array x) throws SQLException{
-        rowset.updateArray(columnIndex, x);
+    @Override
+	public void updateArray(int columnIndex, Array x) throws SQLException{
+        this.rowset.updateArray(columnIndex, x);
     }
 
     /**
@@ -408,10 +419,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param value - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateBoolean(int columnIndex, boolean value) throws SQLException{
-        rowset.updateBoolean(columnIndex, value);
+    @Override
+	public void updateBoolean(int columnIndex, boolean value) throws SQLException{
+        this.rowset.updateBoolean(columnIndex, value);
     }
 
     /**
@@ -421,10 +433,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param value - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateInt(int columnIndex, int value) throws SQLException{
-        rowset.updateInt(columnIndex, value);
+    @Override
+	public void updateInt(int columnIndex, int value) throws SQLException{
+        this.rowset.updateInt(columnIndex, value);
     }
 
     /**
@@ -434,10 +447,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param value - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateLong(int columnIndex, long value) throws SQLException{
-        rowset.updateLong(columnIndex, value);
+    @Override
+	public void updateLong(int columnIndex, long value) throws SQLException{
+        this.rowset.updateLong(columnIndex, value);
     }
 
     /**
@@ -447,10 +461,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param value - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateFloat(int columnIndex, float value) throws SQLException{
-        rowset.updateFloat(columnIndex, value);
+    @Override
+	public void updateFloat(int columnIndex, float value) throws SQLException{
+        this.rowset.updateFloat(columnIndex, value);
     }
 
     /**
@@ -460,10 +475,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param value - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateDouble(int columnIndex, double value) throws SQLException{
-        rowset.updateDouble(columnIndex, value);
+    @Override
+	public void updateDouble(int columnIndex, double value) throws SQLException{
+        this.rowset.updateDouble(columnIndex, value);
     }
 
     /**
@@ -473,10 +489,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param value - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateString(int columnIndex, String value) throws SQLException{
-        rowset.updateString(columnIndex, value);
+    @Override
+	public void updateString(int columnIndex, String value) throws SQLException{
+        this.rowset.updateString(columnIndex, value);
     }
 
     /**
@@ -486,10 +503,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
      * @param value - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateDate(int columnIndex, Date value) throws SQLException{
-        rowset.updateDate(columnIndex, value);
+    @Override
+	public void updateDate(int columnIndex, Date value) throws SQLException{
+        this.rowset.updateDate(columnIndex, value);
     }
 
     /**
@@ -499,10 +517,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * methods are called to update the database.
      * @param columnIndex - the index number of the column
      * @param value - the new column value
-     * @throws throws an SQLException - if a database access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateBytes(int columnIndex, byte[] value) throws SQLException {
-        rowset.updateBytes(columnIndex, value);
+    @Override
+	public void updateBytes(int columnIndex, byte[] value) throws SQLException {
+        this.rowset.updateBytes(columnIndex, value);
     }
 
     /**
@@ -511,10 +530,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * not update the underlying data source; instead the updateRow or insertRow methods are called
      * to update the underlying data source.
      * @param columnIndex - index number of the column. first column is 1, second column is 2......
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateNull(int columnIndex) throws SQLException{
-        rowset.updateNull(columnIndex);
+    @Override
+	public void updateNull(int columnIndex) throws SQLException{
+        this.rowset.updateNull(columnIndex);
     }
     
     /**
@@ -522,10 +542,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * object as an sql array in the Java programming language.
      * @param columnName - Name of the column.
      * @return returns the column value of the current row.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public Array getArray(String columnName) throws SQLException{
-        return rowset.getArray(columnName);
+    @Override
+	public Array getArray(String columnName) throws SQLException{
+        return this.rowset.getArray(columnName);
     }
 
     /**
@@ -534,10 +555,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then a false
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public boolean getBoolean(String columnName) throws SQLException{
-        return rowset.getBoolean(columnName);
+    @Override
+	public boolean getBoolean(String columnName) throws SQLException{
+        return this.rowset.getBoolean(columnName);
     }
 
     /**
@@ -546,10 +568,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public int getInt(String columnName) throws SQLException{
-        return rowset.getInt(columnName);
+    @Override
+	public int getInt(String columnName) throws SQLException{
+        return this.rowset.getInt(columnName);
     }
 
     /**
@@ -558,10 +581,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public long getLong(String columnName) throws SQLException{
-        return rowset.getLong(columnName);
+    @Override
+	public long getLong(String columnName) throws SQLException{
+        return this.rowset.getLong(columnName);
     }
 
     /**
@@ -570,10 +594,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public float getFloat(String columnName) throws SQLException{
-        return rowset.getFloat(columnName);
+    @Override
+	public float getFloat(String columnName) throws SQLException{
+        return this.rowset.getFloat(columnName);
     }
 
     /**
@@ -582,10 +607,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then 0
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public double getDouble(String columnName) throws SQLException{
-        return rowset.getDouble(columnName);
+    @Override
+	public double getDouble(String columnName) throws SQLException{
+        return this.rowset.getDouble(columnName);
     }
 
     /**
@@ -594,10 +620,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then a null
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public String getString(String columnName) throws SQLException{
-        return rowset.getString(columnName);
+    @Override
+	public String getString(String columnName) throws SQLException{
+        return this.rowset.getString(columnName);
     }
 
     /**
@@ -606,10 +633,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param columnName - name of the column
      * @return returns the column value of the current row, if the value is null then a null
      * is returned.
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public Date getDate(String columnName) throws SQLException{
-        return rowset.getDate(columnName);
+    @Override
+	public Date getDate(String columnName) throws SQLException{
+        return this.rowset.getDate(columnName);
     }
 
     /**
@@ -618,10 +646,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * raw values returned by the driver.
      * @param columnName - the SQL name of the column
      * @return  returns the column value; if the value is SQL NULL, the value returned is null
-     * @throws throws an SQLException - if a database access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public byte[] getBytes(String columnName)  throws SQLException {
-        return rowset.getBytes(columnName);
+    @Override
+	public byte[] getBytes(String columnName)  throws SQLException {
+        return this.rowset.getBytes(columnName);
     }
 
     /**
@@ -631,10 +660,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnName - Name of the column.
      * @param x - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateArray(String columnName, Array x) throws SQLException{
-        rowset.updateArray(columnName, x);
+    @Override
+	public void updateArray(String columnName, Array x) throws SQLException{
+        this.rowset.updateArray(columnName, x);
     }
 
     /**
@@ -644,10 +674,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param value - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateBoolean(String columnName, boolean value) throws SQLException{
-        rowset.updateBoolean(columnName, value);
+    @Override
+	public void updateBoolean(String columnName, boolean value) throws SQLException{
+        this.rowset.updateBoolean(columnName, value);
     }
 
     /**
@@ -657,10 +688,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param value - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateInt(String columnName, int value) throws SQLException{
-        rowset.updateInt(columnName, value);
+    @Override
+	public void updateInt(String columnName, int value) throws SQLException{
+        this.rowset.updateInt(columnName, value);
     }
 
     /**
@@ -670,10 +702,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param value - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateLong(String columnName, long value) throws SQLException{
-        rowset.updateLong(columnName, value);
+    @Override
+	public void updateLong(String columnName, long value) throws SQLException{
+        this.rowset.updateLong(columnName, value);
     }
 
     /**
@@ -683,10 +716,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param value - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateFloat(String columnName, float value) throws SQLException{
-        rowset.updateFloat(columnName, value);
+    @Override
+	public void updateFloat(String columnName, float value) throws SQLException{
+        this.rowset.updateFloat(columnName, value);
     }
 
     /**
@@ -696,10 +730,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param value - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateDouble(String columnName, double value) throws SQLException{
-        rowset.updateDouble(columnName, value);
+    @Override
+	public void updateDouble(String columnName, double value) throws SQLException{
+        this.rowset.updateDouble(columnName, value);
     }
 
     /**
@@ -709,10 +744,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param value - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateString(String columnName, String value) throws SQLException{
-        rowset.updateString(columnName, value);
+    @Override
+	public void updateString(String columnName, String value) throws SQLException{
+        this.rowset.updateString(columnName, value);
     }
 
     /**
@@ -722,10 +758,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * to update the underlying data source.
      * @param columnName - name of the column
      * @param value - new column value
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateDate(String columnName, Date value) throws SQLException{
-        rowset.updateDate(columnName, value);
+    @Override
+	public void updateDate(String columnName, Date value) throws SQLException{
+        this.rowset.updateDate(columnName, value);
     }
 
     /**
@@ -735,10 +772,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * methods are called to update the database.
      * @param columnName - the name of the column
      * @param value - the new column value
-     * @throws throws an SQLException - if a database access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateBytes(String columnName, byte[] value) throws SQLException {
-        rowset.updateBytes(columnName, value);
+    @Override
+	public void updateBytes(String columnName, byte[] value) throws SQLException {
+        this.rowset.updateBytes(columnName, value);
     }
 
     /**
@@ -747,10 +785,11 @@ import com.sun.rowset.JdbcRowSetImpl;
      * not update the underlying data source; instead the updateRow or insertRow methods are called
      * to update the underlying data source.
      * @param columnName - name of the column
-     * @throws throws an SQL exception if an access error occurs.
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateNull(String columnName) throws SQLException{
-        rowset.updateNull(columnName);
+    @Override
+	public void updateNull(String columnName) throws SQLException{
+        this.rowset.updateNull(columnName);
     }
 
     /**
@@ -766,8 +805,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param listener - an object that has implemented the javax.sql.RowSetListener interface
      * and wants to be notified of any events that occur on this RowSet object; May be null
      */
-    public void addRowSetListener(RowSetListener listener){
-        rowset.addRowSetListener(listener);
+    @Override
+	public void addRowSetListener(RowSetListener listener) {
+        this.rowset.addRowSetListener(listener);
     }
 
     /**
@@ -776,68 +816,74 @@ import com.sun.rowset.JdbcRowSetImpl;
      * Note: if the RowSetListener object is null, this method silently discards the null value
      * @param listener - a RowSetListener object that is on the list of listeners for this RowSet object
      */
-    public void removeRowSetListener(RowSetListener listener){
-        rowset.removeRowSetListener(listener);
+    @Override
+	public void removeRowSetListener(RowSetListener listener){
+        this.rowset.removeRowSetListener(listener);
     }
 
     /**
      * Maps the given column name to its column index
      * @param columnIndex - column number first column is 1, second column is 2 .....
      * @return the column name of the given column index
-     * @throws SQLException - if the object does not contain columnIndex or a access
-     * error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public String getColumnName(int columnIndex) throws SQLException{
-        return metaData.getColumnName(columnIndex);
+    @Override
+	public String getColumnName(int columnIndex) throws SQLException{
+        return this.metaData.getColumnName(columnIndex);
     }
 
     /**
      * Get the designated column's index
      * @param columnName - name of the column
      * @return returns the corresponding column index.
-     * @throws SQLException - if a data access error
+     * @throws SQLException - if a database access error occurs
      */
-    public int getColumnIndex(String columnName) throws SQLException{
-        return rowset.findColumn(columnName);
+    @Override
+	public int getColumnIndex(String columnName) throws SQLException{
+        return this.rowset.findColumn(columnName);
     }
 
     /**
      * Retrieves the designated column's type
      * @param columnName - name of the column
      * @return SQL type from java.sql.Types
-     * @throws SQLException - if a data access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public int getColumnType(String columnName) throws SQLException{
-        return metaData.getColumnType(getColumnIndex(columnName));
+    @Override
+	public int getColumnType(String columnName) throws SQLException{
+        return this.metaData.getColumnType(getColumnIndex(columnName));
     }
 
     /**
      * Retrieves the designated column's type
      * @param columnIndex - column number first column is 1, second column is 2 .....
      * @return SQL type from java.sql.Types
-     * @throws SQLException - if a data access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public int getColumnType(int columnIndex) throws SQLException{
-        return metaData.getColumnType(columnIndex);
+    @Override
+	public int getColumnType(int columnIndex) throws SQLException{
+        return this.metaData.getColumnType(columnIndex);
     }
 
     /**
      * Retrieves the current row number. The first row is number 1, the second number 2,
      * and so on.
      * @return the current row number; 0 if there is no current row
-     * @throws SQLException - if a data access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public int getRow() throws SQLException{
-        return rowset.getRow();
+    @Override
+	public int getRow() throws SQLException{
+        return this.rowset.getRow();
     }
 
     /**
      * Returns the number of columns in this ResultSet object
      * @return the number of columns
-     * @throws SQLException - if a data access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public int getColumnCount() throws SQLException{
-        return metaData.getColumnCount();
+    @Override
+	public int getColumnCount() throws SQLException{
+        return this.metaData.getColumnCount();
     }
 
     /**
@@ -849,48 +895,53 @@ import com.sun.rowset.JdbcRowSetImpl;
      * implicitly close it. A ResultSet object's warning chain is cleared when a new row
      * is read.
      * @return true if the new current row is valid; false if there are no more rows
-     * @throws SQLException - if a data access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public boolean next() throws SQLException{
-        return rowset.next();
+    @Override
+	public boolean next() throws SQLException{
+        return this.rowset.next();
     }
 
     /**
      * Moves the cursor to the previous row in this ResultSet object.
      * @return true if the cursor is on a valid row; false if it is off the result set
-     * @throws SQLException - if a data access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public boolean previous() throws SQLException{
-        return rowset.previous();
+    @Override
+	public boolean previous() throws SQLException{
+        return this.rowset.previous();
     }
 
     /**
      * Moves the cursor to the last row in this ResultSet object.
      * @return true if the cursor is on a valid row; false if there are no rows in the
      * result set
-     * @throws SQLException - if a data access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public boolean last() throws SQLException{
-        return rowset.last();
+    @Override
+	public boolean last() throws SQLException{
+        return this.rowset.last();
     }
 
     /**
      * Moves the cursor to the first row in this ResultSet object.
      * @return true if the cursor is on a valid row; false if there are no rows in the
      * result set
-     * @throws SQLException - if a data access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public boolean first() throws SQLException{
-        return rowset.first();
+    @Override
+	public boolean first() throws SQLException{
+        return this.rowset.first();
     }
 
     /**
      * Retrieves whether the cursor is on the first row of this ResultSet object.
      * @return true if the cursor is on the first row; false otherwise
-     * @throws SQLException - if a data access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public boolean isFirst() throws SQLException{
-        return rowset.isFirst();
+    @Override
+	public boolean isFirst() throws SQLException{
+        return this.rowset.isFirst();
     }
 
     /**
@@ -899,19 +950,21 @@ import com.sun.rowset.JdbcRowSetImpl;
      * need to fetch ahead one row in order to determine whether the current row is the
      * last row in the result set.
      * @return true if the cursor is on the last row; false otherwise
-     * @throws SQLException - if a data access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public boolean isLast() throws SQLException{
-        return rowset.isLast();
+    @Override
+	public boolean isLast() throws SQLException{
+        return this.rowset.isLast();
     }
 
     /**
      * Moves the cursor to the front of this ResultSet object, just before the first row.
      * This method has no effect if the result set contains no rows.
-     * @throws SQLException - if a data access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public void beforeFirst() throws SQLException{
-        rowset.beforeFirst();
+    @Override
+	public void beforeFirst() throws SQLException{
+        this.rowset.beforeFirst();
     }
 
     /**
@@ -931,27 +984,29 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @return true if the cursor is on the result set; false otherwise
      * @throws SQLException - if a database access error occurs
      */
-    public boolean absolute(int row) throws SQLException{
-        return rowset.absolute(row);
+    @Override
+	public boolean absolute(int row) throws SQLException{
+        return this.rowset.absolute(row);
     }
 
     /**
      * Updates the underlying database with the new contents of the current row of this
      * ResultSet object. This method cannot be called when the cursor is on the insert row.
-     * @throws SQLException - if a data access error occurs or if this method is called when
-     * the cursor is on the insert row
+     * @throws SQLException - if a database access error occurs
      */
-    public void updateRow() throws SQLException{
-        rowset.updateRow();
+    @Override
+	public void updateRow() throws SQLException{
+        this.rowset.updateRow();
     }
 
     /**
      * Moves the cursor to the remembered cursor position, usually the current row.
      * This method has no effect if the cursor is not on the insert row.
-     * @throws SQLException - if a data access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public void moveToCurrentRow() throws SQLException{
-        rowset.moveToCurrentRow();
+    @Override
+	public void moveToCurrentRow() throws SQLException{
+        this.rowset.moveToCurrentRow();
     }
 
     /**
@@ -964,21 +1019,23 @@ import com.sun.rowset.JdbcRowSetImpl;
      * set must be given a value each time this method is called before calling insertRow.
      * An updater method must be called before a getter method can be called on a column
      * value.
-     * @throws SQLException - if a data access error occurs
+     * @throws SQLException - if a database access error occurs
      */
-    public void moveToInsertRow() throws SQLException{
-        rowset.moveToInsertRow();
+    @Override
+	public void moveToInsertRow() throws SQLException{
+        this.rowset.moveToInsertRow();
     }
 
     /**
      * Inserts the contents of the insert row into this ResultSet object and into the
      * database. The cursor must be on the insert row when this method is called.
-     * @throws SQLException - if a data access error occurs,if this method is called when
+     * @throws SQLException - if a data access error occurs or if this method is called when
      * the cursor is not on the insert row, or if not all of non-nullable columns in the
      * insert row have been given a value
      */
-    public void insertRow() throws SQLException{
-        rowset.insertRow();
+    @Override
+	public void insertRow() throws SQLException{
+        this.rowset.insertRow();
     }
 
     /**
@@ -987,8 +1044,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @throws SQLException - if a data access error occurs or if this method is called
      * when the cursor is on the insert row
      */
-    public void deleteRow() throws SQLException{
-        rowset.deleteRow();
+    @Override
+	public void deleteRow() throws SQLException{
+        this.rowset.deleteRow();
     }
 
     /**
@@ -999,8 +1057,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @throws SQLException - if a data access error occurs or if this method is called when
      * the cursor is on the insert row
      */
-    public void cancelRowUpdates() throws SQLException{
-        rowset.cancelRowUpdates();
+    @Override
+	public void cancelRowUpdates() throws SQLException{
+        this.rowset.cancelRowUpdates();
     }
 
     /**
@@ -1018,8 +1077,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @throws SQLException - if a data access error occurs or if this method is called
      * when the cursor is on the insert row
      */
-    public void refreshRow() throws SQLException{
-        rowset.refreshRow();
+    @Override
+	public void refreshRow() throws SQLException{
+        this.rowset.refreshRow();
     }
     
     /**
@@ -1029,8 +1089,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @return true if a row was deleted and deletions are detected; false otherwise
      * @throws SQLException - if a database access error occurs
      */
-    public boolean rowDeleted() throws SQLException{
-        return rowset.rowDeleted();
+    @Override
+	public boolean rowDeleted() throws SQLException{
+        return this.rowset.rowDeleted();
     }
     
     /**
@@ -1039,8 +1100,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @return true if a row has had an insertion and insertions are detected; false otherwise
      * @throws SQLException - if a database access error occurs
      */ 
-    public boolean rowInserted() throws SQLException{
-        return rowset.rowInserted();
+    @Override
+	public boolean rowInserted() throws SQLException{
+        return this.rowset.rowInserted();
     }
     
     /**
@@ -1050,8 +1112,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * (2) updates are detected
      * @throws SQLException - if a database access error occurs
      */
-    public boolean rowUpdated() throws SQLException{
-        return rowset.rowUpdated();
+    @Override
+	public boolean rowUpdated() throws SQLException{
+        return this.rowset.rowUpdated();
     }
     
     /**
@@ -1059,8 +1122,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @return the description of this ResultSet object's columns
      * @throws SQLException - if a database access error occurs
      */
-    public ResultSetMetaData getMetaData() throws SQLException{
-        return rowset.getMetaData();
+    @Override
+	public ResultSetMetaData getMetaData() throws SQLException{
+        return this.rowset.getMetaData();
     }
     
     /**
@@ -1083,8 +1147,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @return a java.lang.Object holding the column value
      * @throws SQLException - if a database access error occurs
      */
-    public Object getObject(String columnName) throws SQLException{
-        return rowset.getObject(columnName);
+    @Override
+	public Object getObject(String columnName) throws SQLException{
+        return this.rowset.getObject(columnName);
     }
     
     /**
@@ -1107,8 +1172,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @return a java.lang.Object holding the column value
      * @throws SQLException - if a database access error occurs
      */ 
-    public Object getObject(int columnIndex) throws SQLException{
-        return rowset.getObject(columnIndex);
+    @Override
+	public Object getObject(int columnIndex) throws SQLException{
+        return this.rowset.getObject(columnIndex);
     }
     
     /**
@@ -1120,8 +1186,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param value - the new column value
      * @throws SQLException - if a database access error occurs
      */
-    public void updateObject(String columnName, Object value) throws SQLException{
-        rowset.updateObject(columnName, value);
+    @Override
+	public void updateObject(String columnName, Object value) throws SQLException{
+        this.rowset.updateObject(columnName, value);
     }
     
     /**
@@ -1133,8 +1200,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param value - the new column value
      * @throws SQLException - if a database access error occurs
      */
-    public void updateObject(int columnIndex, Object value) throws SQLException{
-        rowset.updateObject(columnIndex, value);
+    @Override
+	public void updateObject(int columnIndex, Object value) throws SQLException{
+        this.rowset.updateObject(columnIndex, value);
     }
     
     /**
@@ -1144,8 +1212,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @return the column value; if the value is SQL NULL, the value returned is null
      * @throws SQLException - if a database access error occurs 
      */
-    public Time getTime(int columnIndex) throws SQLException {
-        return rowset.getTime(columnIndex);
+    @Override
+	public Time getTime(int columnIndex) throws SQLException {
+        return this.rowset.getTime(columnIndex);
     }
     
     /**
@@ -1155,8 +1224,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @return the column value; if the value is SQL NULL, the value returned is null 
      * @throws SQLException - if a database access error occurs
      */
-    public Time getTime(String columnName) throws SQLException {
-        return rowset.getTime(columnName);
+    @Override
+	public Time getTime(String columnName) throws SQLException {
+        return this.rowset.getTime(columnName);
     }
 
     /**
@@ -1166,8 +1236,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @return the column value; if the value is SQL NULL, the value returned is null 
      * @throws SQLException - if a database access error occurs
      */
-    public Timestamp getTimestamp(int columnIndex) throws SQLException {
-        return rowset.getTimestamp(columnIndex);
+    @Override
+	public Timestamp getTimestamp(int columnIndex) throws SQLException {
+        return this.rowset.getTimestamp(columnIndex);
     }
     
     /**
@@ -1177,8 +1248,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @return the column value; if the value is SQL NULL, the value returned is null 
      * @throws SQLException - if a database access error occurs
      */
-    public Timestamp getTimestamp(String columnName) throws SQLException {
-        return rowset.getTimestamp(columnName);
+    @Override
+	public Timestamp getTimestamp(String columnName) throws SQLException {
+        return this.rowset.getTimestamp(columnName);
     }
     
     /**
@@ -1190,8 +1262,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param value - the new column value 
      * @throws SQLException - if a database access error occurs
      */
-    public void updateTime(int columnIndex, Time value) throws SQLException {
-        rowset.updateTime(columnIndex, value);
+    @Override
+	public void updateTime(int columnIndex, Time value) throws SQLException {
+        this.rowset.updateTime(columnIndex, value);
     }
     
     /**
@@ -1203,8 +1276,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param value - the new column value 
      * @throws SQLException - if a database access error occurs
      */
-    public void updateTime(String columnName, Time value) throws SQLException {
-        rowset.updateTime(columnName, value);
+    @Override
+	public void updateTime(String columnName, Time value) throws SQLException {
+        this.rowset.updateTime(columnName, value);
     } 
     
     /**
@@ -1216,8 +1290,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param value - the new column value 
      * @throws SQLException - if a database access error occurs
      */
-    public void updateTimestamp(int columnIndex, Timestamp value) throws SQLException {
-        rowset.updateTimestamp(columnIndex, value);
+    @Override
+	public void updateTimestamp(int columnIndex, Timestamp value) throws SQLException {
+        this.rowset.updateTimestamp(columnIndex, value);
     } 
     
     /**
@@ -1229,8 +1304,9 @@ import com.sun.rowset.JdbcRowSetImpl;
      * @param value - the new column value 
      * @throws SQLException - if a database access error occurs
      */
-    public void updateTimestamp(String columnName, Timestamp value) throws SQLException {
-        rowset.updateTimestamp(columnName, value);
+    @Override
+	public void updateTimestamp(String columnName, Timestamp value) throws SQLException {
+        this.rowset.updateTimestamp(columnName, value);
     }
     
 }

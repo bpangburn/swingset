@@ -61,14 +61,17 @@ public class SSDBNavAdapter implements SSDBNav, Serializable {
 	/**
      * Method to perform pre-insertion operations.
      */
-    public void performPreInsertOps(){
+    @Override
+	public void performPreInsertOps(){
+    	// do nothing
     }
 
     /**
      *  This function always return true. This would allow the insertions
      *if an implementation is not provided.
      */ 
-    public boolean allowInsertion(){
+    @Override
+	public boolean allowInsertion(){
         return true;
     }
     
@@ -78,14 +81,18 @@ public class SSDBNavAdapter implements SSDBNav, Serializable {
      * In addition to this you can have a listener on the SSRowSet attached
      * to a SSDataNavigator to get notified when a row is inserted.
      */
-    public void performPostInsertOps(){
+    @Override
+	public void performPostInsertOps(){
+    	// do nothing
     }
 
     /**
      * Method to perform operations when the user is on the insert row and
      * cancels the insert by clicking on the undo button.
      */    
-    public void performCancelOps(){
+    @Override
+	public void performCancelOps(){
+    	// do nothing
     }
     
     /**
@@ -94,7 +101,9 @@ public class SSDBNavAdapter implements SSDBNav, Serializable {
      * SSRowSet does not provide any notifications before the deletion of a row. but a notification
      * will be received after the deletion if you have listener for the SSRowSet.
      */
-    public void performPreDeletionOps(){
+    @Override
+	public void performPreDeletionOps(){
+    	// do nothing
     }
 
     /**
@@ -102,7 +111,8 @@ public class SSDBNavAdapter implements SSDBNav, Serializable {
      *if an implementation is not provided.
      *@return returns true.
      */
-    public boolean allowDeletion(){
+    @Override
+	public boolean allowDeletion(){
         return true;
     }
     
@@ -111,7 +121,9 @@ public class SSDBNavAdapter implements SSDBNav, Serializable {
      *
      * The SSRowSet listener also provides the notification after the deletion of the row.
      */    
-    public void performPostDeletionOps(){
+    @Override
+	public void performPostDeletionOps(){
+    	// do nothing
     }
 
     /**
@@ -122,28 +134,34 @@ public class SSDBNavAdapter implements SSDBNav, Serializable {
      *
      * @param _navigationType    this indicates the type of navigation.
      */    
-    public void performNavigationOps(int _navigationType){
+    @Override
+	public void performNavigationOps(int _navigationType){
+    	// do nothing
     }
 
     /**
      * Method to perform operations when the user hits the refresh button.
      */    
-    public void performRefreshOps(){
+    @Override
+	public void performRefreshOps(){
+    	// do nothing
     }
     
     /**
      * This functions is called just before calling the updateRow on the rowset.
      * @return true is the row can be updated else false.
      */
-    public boolean allowUpdate(){
+    @Override
+	public boolean allowUpdate(){
     	return true;
     }
     
     /**
      * Method to perform operations after the updateRow has been called.
      */
-    public void performPostUpdateOps(){
-    	
+    @Override
+	public void performPostUpdateOps(){
+    	// do nothing
     }
 
 } // end public class SSDBNavAdapter implements SSDBNav, Serializable {

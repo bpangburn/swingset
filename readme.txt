@@ -74,7 +74,7 @@ The SwingSet feature-set currently includes:
     (g) allows deletion of multiple, non-consecutive records
     (h) allows data entry "masks" to be applied to text columns
 7. a serializable datasource abstraction layer
-8. JavaBean support for all major components
+8. JavaBean support for all major components (removed in version 2.3+)
 9. Formatted fields for various types like currency, percent, SSN, date etc.
 
 More information on SwingSet is available from:
@@ -90,7 +90,7 @@ swingset#NO-SPAM#@pangburngroup.com
 INSTALLATION
 ==============================================================================
 
-SwingSet 2.2.0 should work with Java 8 (JRE/JDK 1.8) or later.
+SwingSet 2.3.0 should work with Java 8 (JRE/JDK 1.8) or later.
 
 Download the latest SwingSet binary jar file from:
 https://sourceforge.net/projects/swingset

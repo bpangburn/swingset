@@ -113,7 +113,7 @@ public class SSList extends JList<Object> {
 	/**
 	 * Component listener for list selection changes.
 	 */
-	private final MyListListener listListener = new MyListListener();
+	protected final MyListListener listListener = new MyListListener();
 
 	/**
 	 * Database bound rowset listener.
@@ -132,9 +132,9 @@ public class SSList extends JList<Object> {
 	 * @param _columnName	Column name to which the component is bound.
 	 */
 	public void setColumnName(String _columnName) {
-		String oldValue = columnName;
-		columnName = _columnName;
-		firePropertyChange("columnName", oldValue, columnName);
+		String oldValue = this.columnName;
+		this.columnName = _columnName;
+		firePropertyChange("columnName", oldValue, this.columnName);
 		try {
 			bind();
 		} catch (SQLException e) {
@@ -147,7 +147,7 @@ public class SSList extends JList<Object> {
 	 * @return returns the column name to which to component is bound.
 	 */
 	public String getColumnName() {
-		return columnName;
+		return this.columnName;
 	}
 
 	/**
@@ -155,9 +155,9 @@ public class SSList extends JList<Object> {
 	 * @param _sSRowSet    SSRowSet to which the component is bound
 	 */
 	public void setSSRowSet(SSRowSet _sSRowSet) {
-		SSRowSet oldValue = sSRowSet;
-		sSRowSet = _sSRowSet;
-		firePropertyChange("sSRowSet", oldValue, sSRowSet);
+		SSRowSet oldValue = this.sSRowSet;
+		this.sSRowSet = _sSRowSet;
+		firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
 		try {
 			bind();
 		} catch (SQLException e) {
@@ -170,7 +170,7 @@ public class SSList extends JList<Object> {
 	 * @return returns the SSRowSet being used.
 	 */
 	public SSRowSet getSSRowSet() {
-		return sSRowSet;
+		return this.sSRowSet;
 	}
 
 	/**
@@ -179,9 +179,9 @@ public class SSList extends JList<Object> {
 	 * @param _mappings		An array of values that correspond to those in the list box.
 	 */
 	protected void setMappings(Object[] _mappings) {
-		Object[] oldValue = (Object[])_mappings.clone();
-		mappings = (Object[])_mappings.clone();
-		firePropertyChange("mappings", oldValue, mappings);
+		Object[] oldValue = _mappings.clone();
+		this.mappings = _mappings.clone();
+		firePropertyChange("mappings", oldValue, this.mappings);
 	}
 
 	/**
@@ -190,7 +190,7 @@ public class SSList extends JList<Object> {
 	 * @return returns the underlying values for each of the items in the list box
 	 */
 	public Object[] getMappings() {
-		return mappings;
+		return this.mappings;
 	}
 
 	/**
@@ -198,11 +198,11 @@ public class SSList extends JList<Object> {
 	 * @param _options    the list of options that you want to appear in the list box.
 	 */
 	protected void setOptions(String[] _options) {
-		String[] oldValue = (String[])_options.clone();
-		options = (String[])_options.clone();
-		firePropertyChange("options", oldValue, options);
+		String[] oldValue = _options.clone();
+		this.options = _options.clone();
+		firePropertyChange("options", oldValue, this.options);
 		// ADD SPECIFIED ITEMS TO THE LIST BOX
-		setListData(options);
+		setListData(this.options);
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class SSList extends JList<Object> {
 	 * @return returns the items displayed in the list box
 	 */
 	public String[] getOptions() {
-		return options;
+		return this.options;
 	}    
 
 	/**
@@ -237,8 +237,8 @@ public class SSList extends JList<Object> {
 	public void setSelectedValues(Object[] values) {
 		int[] selectedIndices = new int[values.length];
 		for(int i = 0; i < values.length; i++) {
-			for(int j = 0; j < mappings.length; j++) {
-				if(values[i] == mappings[j])
+			for(int j = 0; j < this.mappings.length; j++) {
+				if(values[i] == this.mappings[j])
 					selectedIndices[i] = j;
 			}
 		}
@@ -248,14 +248,19 @@ public class SSList extends JList<Object> {
 	/**
 	 * Returns the list value associated with the currently selected item.
 	 * @return returns the value associated with the selected item OR -1 if nothing is selected.
+	 * @deprecated
+	 * @deprecated
 	 */
+	@SuppressWarnings("deprecation")
+	@Deprecated
+	@Override
 	public Object[] getSelectedValues() {
 		if (getSelectedIndex() == -1) {
-			return new Object[]{-1};
+			return new Object[]{Integer.valueOf(-1)};
 		}
 		Object[] selectedValues = new Object[getSelectedIndices().length];
 		for(int i = 0; i < selectedValues.length; i++) {
-			selectedValues[i] = mappings != null? mappings[getSelectedIndices()[i]] : Integer.valueOf(getSelectedIndices()[i]);
+			selectedValues[i] = this.mappings != null? this.mappings[getSelectedIndices()[i]] : Integer.valueOf(getSelectedIndices()[i]);
 		}
 		return selectedValues;
 	}
@@ -267,6 +272,7 @@ public class SSList extends JList<Object> {
 		// ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
 		// KEY IS PRESSED.
 		addKeyListener(new KeyAdapter() {
+			@Override
 			public void keyReleased(KeyEvent ke) {
 				if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
 					((Component) ke.getSource()).transferFocus();
@@ -286,15 +292,15 @@ public class SSList extends JList<Object> {
 	 * 							of the array elements in the specified column
 	 */
 	public void bind(SSRowSet _sSRowSet, String _columnName, String _baseTypeName) {
-		baseTypeName = _baseTypeName;
+		this.baseTypeName = _baseTypeName;
 		
-		SSRowSet oldValue = sSRowSet;
-		sSRowSet = _sSRowSet;
-		firePropertyChange("sSRowSet", oldValue, sSRowSet);
+		SSRowSet oldValue = this.sSRowSet;
+		this.sSRowSet = _sSRowSet;
+		firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
 
-		String oldValue2 = columnName;
-		columnName = _columnName;
-		firePropertyChange("columnName", oldValue2, columnName);
+		String oldValue2 = this.columnName;
+		this.columnName = _columnName;
+		firePropertyChange("columnName", oldValue2, this.columnName);
 
 		try {
 			bind();
@@ -309,16 +315,16 @@ public class SSList extends JList<Object> {
 	protected void bind() throws SQLException {
 
 		// CHECK FOR NULL COLUMN/ROWSET
-		if (columnName==null || columnName.trim().equals("") || sSRowSet==null) {
+		if (this.columnName==null || this.columnName.trim().equals("") || this.sSRowSet==null) {
 			return;
 		}
 
 		// REMOVE LISTENERS TO PREVENT DUPLICATION
 		removeListeners();
 
-		if(mappings == null || options == null)
+		if(this.mappings == null || this.options == null)
 			return;
-		this.setListData(options);
+		this.setListData(this.options);
 		updateDisplay();
 
 		// ADD BACK LISTENERS
@@ -332,11 +338,11 @@ public class SSList extends JList<Object> {
 	 * @return	Object array
 	 * @throws SQLException
 	 */
-	private Object[] toObjArray(Array array) throws SQLException{
+	private static Object[] toObjArray(Array array) throws SQLException{
 		if(array == null) {
 			return null;
 		}
-		Vector<Object> data= new Vector<Object>();
+		Vector<Object> data= new Vector<>();
 		switch(array.getBaseType()){
 		case Types.INTEGER:
 		case Types.SMALLINT:
@@ -397,30 +403,30 @@ public class SSList extends JList<Object> {
 	/**
 	 * Adds listeners for component and rowset
 	 */
-	private void addListeners() {
-		sSRowSet.addRowSetListener(rowsetListener);
-		addListSelectionListener(listListener);
+	protected void addListeners() {
+		this.sSRowSet.addRowSetListener(this.rowsetListener);
+		addListSelectionListener(this.listListener);
 	}
 
 	/**
 	 * Removes listeners for component and rowset.
 	 */
-	private void removeListeners() {
-		sSRowSet.removeRowSetListener(rowsetListener);
-		removeListSelectionListener(listListener);
+	protected void removeListeners() {
+		this.sSRowSet.removeRowSetListener(this.rowsetListener);
+		removeListSelectionListener(this.listListener);
 	}
 	
 	/**
 	 * updates the corresponding column of the rowset with the values selected in the list
 	 */
-	private void updateRowSet(){
+	protected void updateRowSet(){
 		Array array;
 		if(this.getSelectedIndices().length == 0)
-			array = new SSArray(new Object[]{}, baseTypeName);
+			array = new SSArray(new Object[]{}, this.baseTypeName);
 		else
-			array = new SSArray(this.getSelectedValues(), baseTypeName);
+			array = new SSArray(this.getSelectedValues(), this.baseTypeName);
 		try {
-			sSRowSet.updateArray(columnName, array);
+			this.sSRowSet.updateArray(this.columnName, array);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -433,8 +439,8 @@ public class SSList extends JList<Object> {
 	protected void updateDisplay() throws SQLException {
 		
 		Object[] array = null;
-		if(sSRowSet.getRow() > 0 ) {
-			array = toObjArray(sSRowSet.getArray(columnName));
+		if(this.sSRowSet.getRow() > 0 ) {
+			array = toObjArray(this.sSRowSet.getArray(this.columnName));
 		}
 		if(array == null) {
 			this.clearSelection();
@@ -442,13 +448,12 @@ public class SSList extends JList<Object> {
 		}
 		int[] indices = new int[array.length];
 		for(int i = 0; i < array.length; i++) {
-			for(int j = 0; j < mappings.length; j++) {
-				if(array[i].equals(mappings[j])){
+			for(int j = 0; j < this.mappings.length; j++) {
+				if(array[i].equals(this.mappings[j])){
 					indices[i] = j;
 					break;
 				}
-				else
-					indices[i] = -1;
+				indices[i] = -1;
 			}
 		}
 		this.setSelectedIndices(indices);
@@ -457,38 +462,41 @@ public class SSList extends JList<Object> {
 	/**
 	 * Rowset Listener for updating the value displayed.
 	 */
-	private class MyRowSetListener implements RowSetListener, Serializable {
+	protected class MyRowSetListener implements RowSetListener, Serializable {
 
 		private static final long serialVersionUID = 8375973600687061491L;
 
+		@Override
 		public void cursorMoved(RowSetEvent arg0) {
-			removeListSelectionListener(listListener);
+			removeListSelectionListener(SSList.this.listListener);
 			try {
 				updateDisplay();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}            
-			addListSelectionListener(listListener);
+			addListSelectionListener(SSList.this.listListener);
 		}
 
+		@Override
 		public void rowChanged(RowSetEvent event) {
-			removeListSelectionListener(listListener);
+			removeListSelectionListener(SSList.this.listListener);
 			try {
 				updateDisplay();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}            
-			addListSelectionListener(listListener);
+			addListSelectionListener(SSList.this.listListener);
 		}
 
+		@Override
 		public void rowSetChanged(RowSetEvent event) {
-			removeListSelectionListener(listListener);
+			removeListSelectionListener(SSList.this.listListener);
 			try {
 				updateDisplay();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}            
-			addListSelectionListener(listListener);
+			addListSelectionListener(SSList.this.listListener);
 		}
 
 	}
@@ -496,10 +504,11 @@ public class SSList extends JList<Object> {
 	 * Listener(s) for the component's value used to propagate changes back to
 	 * bound text field.
 	 */
-	private class MyListListener implements ListSelectionListener, Serializable {
+	protected class MyListListener implements ListSelectionListener, Serializable {
 
 		private static final long serialVersionUID = 4337396603209239909L;
 
+		@Override
 		public void valueChanged(ListSelectionEvent e) {
 			removeListeners();
 			updateRowSet();

@@ -44,7 +44,6 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyVetoException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -118,7 +117,7 @@ public class SSComboBox extends JComboBox<Object> {
     /**
      * Component listener.
      */
-    private final MyComboListener cmbListener = new MyComboListener();
+    protected final MyComboListener cmbListener = new MyComboListener();
 
     /**
      * Bound text field document listener.
@@ -220,18 +219,18 @@ public class SSComboBox extends JComboBox<Object> {
      * @param _value    value to assign to combo box
      */
     public void setSelectedValue(int _value) {
-        try {
+        //try {
         	removeListeners();
-            textField.setText(String.valueOf(_value));
+            this.textField.setText(String.valueOf(_value));
             // SOME TIMES THE ROWSET IS NOT UPDATED WITH THE NEW VALUE SET IN TEXT FIELD
             // BY THE TIME UPDATE DISPLAY FETCHES THE VALUE FROM ROWSET PROBABLY BECAUSE THE LISTENERS
             // HAVEN'T COMPLETED THE WORK BY THE TIME UPDATE DISPLAY FETCHES THE VALUE
             // SO FORCING THE USE OF VALUE IN TEXT FIELD.
 			updateDisplay(true);
 			addListeners();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		//} catch (SQLException e) {
+		//	e.printStackTrace();
+		//}
     }
 
     /**
@@ -248,9 +247,9 @@ public class SSComboBox extends JComboBox<Object> {
             return NON_SELECTED;
         }
 
-        if (mappings != null) {
+        if (this.mappings != null) {
             //return mappings[cmbDisplayed.getSelectedIndex()];
-            return mappings[getSelectedIndex()];
+            return this.mappings[getSelectedIndex()];
         }
         //return cmbDisplayed.getSelectedIndex();
         return getSelectedIndex();
@@ -264,14 +263,14 @@ public class SSComboBox extends JComboBox<Object> {
      *    is bound
      */
     public void setColumnName(String _columnName) {
-        String oldValue = columnName;
-        columnName = _columnName;
-        firePropertyChange("columnName", oldValue, columnName);
-        try {
+        String oldValue = this.columnName;
+        this.columnName = _columnName;
+        firePropertyChange("columnName", oldValue, this.columnName);
+        //try {
 			bind();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		//} catch (SQLException e) {
+		//	e.printStackTrace();
+		//}
     }    
 
     /**
@@ -280,7 +279,7 @@ public class SSComboBox extends JComboBox<Object> {
      * @return returns the column name to which to combo box is bound.
      */
     public String getColumnName() {
-        return columnName;
+        return this.columnName;
     }
     
     /**
@@ -289,14 +288,14 @@ public class SSComboBox extends JComboBox<Object> {
      * @param _sSRowSet    SSRowSet to which the component is bound
      */
     public void setSSRowSet(SSRowSet _sSRowSet) {
-        SSRowSet oldValue = sSRowSet;
-        sSRowSet = _sSRowSet;
-        firePropertyChange("sSRowSet", oldValue, sSRowSet);
-        try {
+        SSRowSet oldValue = this.sSRowSet;
+        this.sSRowSet = _sSRowSet;
+        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
+        //try {
 			bind();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		//} catch (SQLException e) {
+		//	e.printStackTrace();
+		//}
     }     
 
     /**
@@ -305,7 +304,7 @@ public class SSComboBox extends JComboBox<Object> {
      * @return returns the SSRowSet being used.
      */
     public SSRowSet getSSRowSet() {
-        return sSRowSet;
+        return this.sSRowSet;
     }
     
     /**
@@ -315,9 +314,9 @@ public class SSComboBox extends JComboBox<Object> {
      * @param _mappings    an array of values that correspond to those in the combo box.
      */
     public void setMappings(int[] _mappings) {
-        int[] oldValue = (int[])_mappings.clone();
-        mappings = (int[])_mappings.clone();
-        firePropertyChange("mappings", oldValue, mappings);
+        int[] oldValue = _mappings.clone();
+        this.mappings = _mappings.clone();
+        firePropertyChange("mappings", oldValue, this.mappings);
         // INITIALIZE THE ARRAY AND COPY THE MAPPING VALUES
         //mappings = new int[_mappings.length];
         //for (int i=0;i<_mappings.length;i++) {
@@ -332,7 +331,7 @@ public class SSComboBox extends JComboBox<Object> {
      * @return returns the underlying values for each of the items in the combo box
      */
     public int[] getMappings() {
-        return mappings;
+        return this.mappings;
     }
     
     /**
@@ -341,9 +340,9 @@ public class SSComboBox extends JComboBox<Object> {
      * @param _options    the list of options that you want to appear in the combo box.
      */
     public void setOptions(String[] _options) {
-        String[] oldValue = (String[])_options.clone();
-        options = (String[])_options.clone();
-        firePropertyChange("options", oldValue, options);
+        String[] oldValue = _options.clone();
+        this.options = _options.clone();
+        firePropertyChange("options", oldValue, this.options);
             
         // ADD THE SPECIFIED ITEMS TO THE COMBO BOX
         // REMOVE ANY OLD ITEMS SO THAT MULTIPLE CALLS TO THIS FUNCTION DOES NOT AFFECT
@@ -362,7 +361,7 @@ public class SSComboBox extends JComboBox<Object> {
      * @return returns the items displayed in the combo box
      */
     public String[] getOptions() {
-        return options;
+        return this.options;
 // if developer is adding items with addItem() then options won't have the data
 // may be better to loop through all items and return that way...
     }    
@@ -395,9 +394,10 @@ public class SSComboBox extends JComboBox<Object> {
      * predefined options.
      *
      * @param _predefinedOptions predefined options to be displayed in the combo box.
+     * @return true or false indicating if the predefined options were set successfully
      */
     public boolean setPredefinedOptions(int _predefinedOptions) {
-        int oldValue = predefinedOptions;
+        int oldValue = this.predefinedOptions;
         
         if (_predefinedOptions == YES_NO_OPTION) {
             setOptions(new String[]{"No", "Yes"});
@@ -409,8 +409,8 @@ public class SSComboBox extends JComboBox<Object> {
             return false;
         }
         
-        predefinedOptions = _predefinedOptions;
-        firePropertyChange("predefinedOptions", oldValue, predefinedOptions);
+        this.predefinedOptions = _predefinedOptions;
+        firePropertyChange("predefinedOptions", oldValue, this.predefinedOptions);
         
         return true;
     }
@@ -422,7 +422,7 @@ public class SSComboBox extends JComboBox<Object> {
      * @return returns the predefined option code
      */
     public int getPredefinedOptions() {
-        return predefinedOptions;
+        return this.predefinedOptions;
     }
 
     /**
@@ -432,19 +432,19 @@ public class SSComboBox extends JComboBox<Object> {
      * @param _columnName    Name of the column to which this check box should be bound
      */
     public void bind(SSRowSet _sSRowSet, String _columnName) {
-        SSRowSet oldValue = sSRowSet;
-        sSRowSet = _sSRowSet;
-        firePropertyChange("sSRowSet", oldValue, sSRowSet);
+        SSRowSet oldValue = this.sSRowSet;
+        this.sSRowSet = _sSRowSet;
+        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
         
-        String oldValue2 = columnName;
-        columnName = _columnName;
-        firePropertyChange("columnName", oldValue2, columnName);
+        String oldValue2 = this.columnName;
+        this.columnName = _columnName;
+        firePropertyChange("columnName", oldValue2, this.columnName);
         
-        try {
+        //try {
 			bind();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		//} catch (SQLException e) {
+		//	e.printStackTrace();
+		//}
     }
     
     /**
@@ -453,7 +453,7 @@ public class SSComboBox extends JComboBox<Object> {
     protected void init() {
         // TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER KEY IS PRESSED.
         Set<AWTKeyStroke> forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
-        Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(forwardKeys);
+        Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
         newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
         newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK ));
         setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);
@@ -465,10 +465,10 @@ public class SSComboBox extends JComboBox<Object> {
     /**
      * Method for handling binding of component to a SSRowSet column.
      */
-    protected void bind() throws SQLException {
+    protected void bind() {
         
         // CHECK FOR NULL COLUMN/ROWSET
-            if (columnName==null || columnName.trim().equals("") || sSRowSet==null) {
+            if (this.columnName==null || this.columnName.trim().equals("") || this.sSRowSet==null) {
                 return;
             }
             
@@ -476,7 +476,7 @@ public class SSComboBox extends JComboBox<Object> {
             removeListeners();
 
         // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
-            textField.bind(sSRowSet, columnName);
+            this.textField.bind(this.sSRowSet, this.columnName);
 
         // SET THE COMBO BOX ITEM DISPLAYED
             updateDisplay();
@@ -490,7 +490,7 @@ public class SSComboBox extends JComboBox<Object> {
      * Updates the value displayed in the component based on the SSRowSet column
      * binding. 
      */
-    protected void updateDisplay() throws SQLException {
+    protected void updateDisplay() {
     	updateDisplay(false);
     }
     
@@ -500,19 +500,19 @@ public class SSComboBox extends JComboBox<Object> {
      * @param useTextField If this is true the value from the text in the text field will be used to update the display even if the
      * rowset is on a valid row. This is needed when setSelectedValue is used.
      */
-    protected void updateDisplay(boolean useTextField) throws SQLException {
+    protected void updateDisplay(boolean useTextField) {
         try {
             String text = "";
             try{
             	if(useTextField) {
-            		text = textField.getText().trim();
+            		text = this.textField.getText().trim();
             	}
             	else {
-            		text =  sSRowSet.getRow() > 0 ? sSRowSet.getString(columnName) : textField.getText().trim();
+            		text =  this.sSRowSet.getRow() > 0 ? this.sSRowSet.getString(this.columnName) : this.textField.getText().trim();
             	}
             	//System.out.println(columnName + "  " + text + " " + textField.getText());
             }catch(SQLException se) {
-            	
+            	// do nothing
             }
 
             // GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD            
@@ -527,11 +527,11 @@ public class SSComboBox extends JComboBox<Object> {
 	            // IN CASE TWO: YOU HAVE TO CHECK IF THE VALUE IN THE MAPPINGVALUES ARRAY AT INDEX EQUAL
 	            // TO THE SELECTED INDEX OF THE COMBO BOX EQUALS THE VALUE IN TEXT FIELD
 	            // IF THESE CONDITIONS ARE MET YOU NEED NOT CHANGE COMBO BOX SELECTED ITEM
-	            if ( (mappings==null && intValue != getSelectedIndex()) ||
-	                 (mappings!=null && getSelectedIndex() == -1)       ||
-	                 (mappings!=null && mappings[getSelectedIndex()] != intValue) ) {
+	            if ( (this.mappings==null && intValue != getSelectedIndex()) ||
+	                 (this.mappings!=null && getSelectedIndex() == -1)       ||
+	                 (this.mappings!=null && this.mappings[getSelectedIndex()] != intValue) ) {
 	
-	                if (mappings==null && (intValue <0 || intValue >= getItemCount() )) {
+	                if (this.mappings==null && (intValue <0 || intValue >= getItemCount() )) {
 	                // IF EXPLICIT VALUES FOR THE ITEMS IN COMBO ARE NOT SPECIFIED THEN CODES START
 	                // FROM ZERO. IN SUCH A CASE CHECK IF THE NUMBER EXCEEDS THE NUMBER OF ITEMS
 	                // IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)
@@ -540,16 +540,16 @@ public class SSComboBox extends JComboBox<Object> {
 	                } else {
 	                // IF MAPPINGS  ARE SPECIFIED THEN GET THE INDEX AT WHICH THE VALUE IN TEXT FIELD
 	                // APPEARS IN THE MAPPINGVALUES ARRAY. SET THE SELECTED ITEM OF COMBO SO THAT INDEX
-	                    if (mappings!=null) {
+	                    if (this.mappings!=null) {
 	                        int i=0;
-	                        for (;i<mappings.length;i++) {
-	                            if (mappings[i] == intValue) {
+	                        for (;i<this.mappings.length;i++) {
+	                            if (this.mappings[i] == intValue) {
 	                                setSelectedIndex(i);
 	                                break;
 	                            }
 	                        }
 	                        // IF THAT VALUE IS NOT FOUND IN THE GIVEN MAPPING VALUES PRINT AN ERROR MESSAGE
-	                        if (i==mappings.length) {
+	                        if (i==this.mappings.length) {
 	                            System.out.println("change ERROR: could not find a corresponding item in combo for value " + intValue);
 	                            setSelectedIndex(-1);
 	                        }
@@ -574,57 +574,60 @@ public class SSComboBox extends JComboBox<Object> {
      * Adds listeners for component and rowset
      */
     private void addListeners() {
-    	sSRowSet.addRowSetListener(rowsetListener);
-        addActionListener(cmbListener);
+    	this.sSRowSet.addRowSetListener(this.rowsetListener);
+        addActionListener(this.cmbListener);
     }
 
     /**
      * Removes listeners for component and rowset.
      */
     private void removeListeners() {
-    	sSRowSet.removeRowSetListener(rowsetListener);
-        removeActionListener(cmbListener);
+    	this.sSRowSet.removeRowSetListener(this.rowsetListener);
+        removeActionListener(this.cmbListener);
     }
 
 
     /**
      * Rowset Listener for updating the value displayed.
      */
-    private class MyRowSetListener implements RowSetListener, Serializable {
+    protected class MyRowSetListener implements RowSetListener, Serializable {
 
 		/**
-		 * 
+		 * unique serial id
 		 */
 		private static final long serialVersionUID = 5996555547965507000L;
 
+		@Override
 		public void cursorMoved(RowSetEvent arg0) {
-            removeActionListener(cmbListener);            
-            try {
+            removeActionListener(SSComboBox.this.cmbListener);            
+            //try {
 				updateDisplay();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}            
-			addActionListener(cmbListener);
+			//} catch (SQLException e) {
+			//	e.printStackTrace();
+			//}            
+			addActionListener(SSComboBox.this.cmbListener);
 		}
 
+		@Override
 		public void rowChanged(RowSetEvent event) {
-			removeActionListener(cmbListener);            
-            try {
+			removeActionListener(SSComboBox.this.cmbListener);            
+            //try {
 				updateDisplay();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}            
-			addActionListener(cmbListener);
+			//} catch (SQLException e) {
+			//	e.printStackTrace();
+			//}            
+			addActionListener(SSComboBox.this.cmbListener);
 		}
 
+		@Override
 		public void rowSetChanged(RowSetEvent event) {
-			removeActionListener(cmbListener);            
-            try {
+			removeActionListener(SSComboBox.this.cmbListener);            
+            //try {
 				updateDisplay();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}            
-			addActionListener(cmbListener);
+			//} catch (SQLException e) {
+			//	e.printStackTrace();
+			//}            
+			addActionListener(SSComboBox.this.cmbListener);
 		}
     	
     }
@@ -632,31 +635,32 @@ public class SSComboBox extends JComboBox<Object> {
      * Listener(s) for the component's value used to propigate changes back to
      * bound text field.
      */
-    private class MyComboListener implements ActionListener, Serializable {
+    protected class MyComboListener implements ActionListener, Serializable {
 
         /**
 		 * 
 		 */
 		private static final long serialVersionUID = -3131533966245488092L;
 
+		@Override
 		public void actionPerformed(ActionEvent ae) {
             int index = getSelectedIndex();
             try {
                 if (index == -1) {
-                    textField.setText("");
+                    SSComboBox.this.textField.setText("");
                 } else {
-                    String strValueInText = textField.getText();
+                    String strValueInText = SSComboBox.this.textField.getText();
                     Integer valueOfText = null;
                     if(strValueInText != null && !"".equals(strValueInText.trim())) {
                     	strValueInText = strValueInText.trim();
                    		valueOfText = Integer.valueOf(strValueInText);
                     }
 
-                    if( mappings == null && ( valueOfText == null || valueOfText.intValue() != index )) {
-                        textField.setText( String.valueOf(index) );
+                    if( SSComboBox.this.mappings == null && ( valueOfText == null || valueOfText.intValue() != index )) {
+                        SSComboBox.this.textField.setText( String.valueOf(index) );
                     }
-                    else if(mappings != null && mappings.length > index && (valueOfText ==null || valueOfText.intValue() != mappings[index])){
-                        textField.setText(String.valueOf(mappings[index]));
+                    else if(SSComboBox.this.mappings != null && SSComboBox.this.mappings.length > index && (valueOfText ==null || valueOfText.intValue() != SSComboBox.this.mappings[index])){
+                        SSComboBox.this.textField.setText(String.valueOf(SSComboBox.this.mappings[index]));
                     }
                 }
             } catch(NullPointerException npe) {
@@ -677,7 +681,8 @@ public class SSComboBox extends JComboBox<Object> {
      * @deprecated
      * @see #GENDER_OPTION     
      */
-    public static final int SEX_OPTION = 1;
+    @Deprecated
+	public static final int SEX_OPTION = 1;
     
     /**
      * Predefined "unisex" option.
@@ -685,7 +690,8 @@ public class SSComboBox extends JComboBox<Object> {
      * @deprecated
      * @see #UNISEX     
      */    
-    public static final int UNI_SEX = 2;
+    @Deprecated
+	public static final int UNI_SEX = 2;
 
 
     /**
@@ -695,7 +701,8 @@ public class SSComboBox extends JComboBox<Object> {
      *
      * @deprecated
      */
-    public JComboBox<?> getComboBox() {
+    @Deprecated
+	public JComboBox<?> getComboBox() {
         return this;
     }
 
@@ -706,7 +713,8 @@ public class SSComboBox extends JComboBox<Object> {
      *
      * @deprecated
      */
-    public Component getComponent() {
+    @Deprecated
+	public Component getComponent() {
         return this;
     }
     
@@ -722,7 +730,8 @@ public class SSComboBox extends JComboBox<Object> {
      * @deprecated
      * @see #setOptions     
      */
-    public boolean setOption(String[] _options) {
+    @Deprecated
+	public boolean setOption(String[] _options) {
         setOptions(_options);
         return true;
     }
@@ -740,7 +749,8 @@ public class SSComboBox extends JComboBox<Object> {
      * @deprecated
      * @see #setOptions
      */
-    public boolean setOption(String[] _options, int[]_mappings) {
+    @Deprecated
+	public boolean setOption(String[] _options, int[]_mappings) {
         return setOptions(_options, _mappings);
     }
 
@@ -754,7 +764,8 @@ public class SSComboBox extends JComboBox<Object> {
      * @see #setPredefinedOptions
      * @see #setMappings    
      */
-    public void setOption(int _options, int[]_mappings) throws PropertyVetoException {
+    @Deprecated
+	public void setOption(int _options, int[]_mappings) {
         setPredefinedOptions(_options);
         setMappings(_mappings);
     }
@@ -764,11 +775,13 @@ public class SSComboBox extends JComboBox<Object> {
      * predefined options.
      *
      * @param _option predefined options to be displayed in the combo box.
+     * @return a boolean indicating success/failure setting predefined options.
      *
      * @deprecated
      * @see #setPredefinedOptions     
      */
-    public boolean setOption(int _option) {
+    @Deprecated
+	public boolean setOption(int _option) {
         return setPredefinedOptions(_option);
     }
     
@@ -781,7 +794,8 @@ public class SSComboBox extends JComboBox<Object> {
      * @deprecated
      * @see #setMappings       
      */
-    public void setMappingValues(int[] _mappings) {
+    @Deprecated
+	public void setMappingValues(int[] _mappings) {
         setMappings(_mappings);
     }    
 

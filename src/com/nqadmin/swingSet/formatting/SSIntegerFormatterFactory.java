@@ -37,7 +37,6 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -50,7 +49,7 @@ import javax.swing.text.NumberFormatter;
  * 
  * SSIntegerFormatterFactory extends DefaultFormatterFactory for Integer fields.
  */
-public class SSIntegerFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
+public class SSIntegerFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 	
     /**
 	 * unique serial id

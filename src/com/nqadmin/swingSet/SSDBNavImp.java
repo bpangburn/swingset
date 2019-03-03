@@ -84,17 +84,19 @@ public class SSDBNavImp extends SSDBNavAdapter {
 
     /**
      * Constructs a SSDBNavImp with the specified container.
+     * @param _container 
      */
     public SSDBNavImp(Container _container) {
-        container = _container;
+        this.container = _container;
     }
 
     /**
      * Performs pre-insertion operations.
      */
-    public void performPreInsertOps() {
+    @Override
+	public void performPreInsertOps() {
         
-        setComponents(container);
+        setComponents(this.container);
 
     } // end public void performPreInsertOps() {
 
@@ -148,7 +150,7 @@ public class SSDBNavImp extends SSDBNavAdapter {
                 setComponents((Container)comps[i]);
             } else if(comps[i] instanceof JScrollPane) {
             // IF IT IS A JScrollPane GET THE VIEW PORT AND RECURSIVELY SET THE FIELDS IN VIEW PORT    
-                setComponents((Container) ((JScrollPane)comps[i]).getViewport());
+                setComponents(((JScrollPane)comps[i]).getViewport());
             }            
         }
 

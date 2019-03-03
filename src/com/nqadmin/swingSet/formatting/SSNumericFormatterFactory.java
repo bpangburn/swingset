@@ -37,7 +37,6 @@
 
 package com.nqadmin.swingSet.formatting;
 
-import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -51,7 +50,7 @@ import javax.swing.text.NumberFormatter;
  * 
  * SSNumericFormatterFactory extends DefaultFormatterFactory for numeric fields.
  */
-public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatterFactory implements Serializable {
+public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
     /**
 	 * unique serial id
@@ -65,19 +64,19 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
      * Creates a default SSNumericFormatterFactory
      */
     public SSNumericFormatterFactory() {
-        snf = new NumberFormatter(NumberFormat.getInstance());
-        snf.setCommitsOnValidEdit(true);
-        this.setDefaultFormatter(snf);
+        this.snf = new NumberFormatter(NumberFormat.getInstance());
+        this.snf.setCommitsOnValidEdit(true);
+        this.setDefaultFormatter(this.snf);
         
         this.setNullFormatter(null);
 
-        enf = new NumberFormatter(NumberFormat.getInstance(Locale.US));
-        enf.setCommitsOnValidEdit(true);
-        this.setEditFormatter(enf);
+        this.enf = new NumberFormatter(NumberFormat.getInstance(Locale.US));
+        this.enf.setCommitsOnValidEdit(true);
+        this.setEditFormatter(this.enf);
 
-        dnf = new NumberFormatter(NumberFormat.getInstance());
-        dnf.setCommitsOnValidEdit(true);
-        this.setDisplayFormatter(dnf);
+        this.dnf = new NumberFormatter(NumberFormat.getInstance());
+        this.dnf.setCommitsOnValidEdit(true);
+        this.setDisplayFormatter(this.dnf);
     }
     
     /**
@@ -93,19 +92,19 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
         nfd.setMaximumIntegerDigits(precision);
         nfd.setMinimumIntegerDigits(1);
     
-        snf = new NumberFormatter(NumberFormat.getInstance());
-        snf.setCommitsOnValidEdit(true);
-        this.setDefaultFormatter(snf);
+        this.snf = new NumberFormatter(NumberFormat.getInstance());
+        this.snf.setCommitsOnValidEdit(true);
+        this.setDefaultFormatter(this.snf);
         
         this.setNullFormatter(null);
 
-        enf = new NumberFormatter(NumberFormat.getInstance(Locale.US));
-        enf.setCommitsOnValidEdit(true);
-        this.setEditFormatter(enf);
+        this.enf = new NumberFormatter(NumberFormat.getInstance(Locale.US));
+        this.enf.setCommitsOnValidEdit(true);
+        this.setEditFormatter(this.enf);
 
-        dnf = new NumberFormatter(nfd);
-        dnf.setCommitsOnValidEdit(true);
-        this.setDisplayFormatter(dnf);
+        this.dnf = new NumberFormatter(nfd);
+        this.dnf.setCommitsOnValidEdit(true);
+        this.setDisplayFormatter(this.dnf);
     }
 }
 

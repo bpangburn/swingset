@@ -46,17 +46,17 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
 
  /**
   * This example demonstrates the use of SSDBComboBox for record navigation.
-  * Navigation can be accomplished using either the Part combobox or the
+  * Navigation can be accomplished using either the part combobox or the
   * navigation bar. Since the part name is used for navigation it can't be
   * updated (note that none of the fields in these examples can actually be
   * updated since the database is read only).
   *
   * Since the navigation can take place by multiple methods, the navigation
-  * controls have to be synchronized.  This is done using a hidden JTextField
-  * containing the part_id and an event listener.
+  * controls have to be synchronized.  This is done using a hidden SSTextField
+  * containing the part id and a SSSyncManager.
   *
-  * This example also demonstrates the use of SSTextDocument to display
-  * information in SSComboBox (Color) and JTextField (Weight and City).
+  * This example also demonstrates the use of other components to display
+  * information in SSComboBox (Color) and SSTextField (Weight and City).
   */
 
  public class Example4 extends JFrame{
@@ -81,33 +81,38 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
 
     SSTextField txtPartID = new SSTextField();
 
-   public Example4(String url){
+    /**
+     * Constructor for Example4
+     * 
+     * @param url - path to SQL to create suppliers & parts database
+     */
+    public Example4(String url){
 
         super("Example4");
         setSize(600,200);
         
         try{
         	System.out.println("url from ex 4: "+url);
-        	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
-        	ssConnection.setDriverName("org.h2.Driver");
-            ssConnection.createConnection();
-            rowset = new SSJdbcRowSetImpl(ssConnection);
-            rowset.setCommand("SELECT * FROM part_data;");
-            navigator = new SSDataNavigator(rowset);
+        	this.ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
+        	this.ssConnection.setDriverName("org.h2.Driver");
+            this.ssConnection.createConnection();
+            this.rowset = new SSJdbcRowSetImpl(this.ssConnection);
+            this.rowset.setCommand("SELECT * FROM part_data;");
+            this.navigator = new SSDataNavigator(this.rowset);
         }catch(SQLException se){
             se.printStackTrace();
         }catch(ClassNotFoundException cnfe){
             cnfe.printStackTrace();
         }
 
-        txtPartID.bind(rowset,"part_id");
-        txtPartName.bind(rowset,"part_name");
+        this.txtPartID.bind(this.rowset,"part_id");
+        this.txtPartName.bind(this.rowset,"part_name");
         
         String query = "SELECT * FROM part_data;";
-        cmbSelectPart = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
+        this.cmbSelectPart = new SSDBComboBox(this.ssConnection, query, "part_id", "part_name");
 
         try{
-            cmbSelectPart.execute();
+            this.cmbSelectPart.execute();
         }catch(SQLException se){
             se.printStackTrace();
         }catch(Exception e){
@@ -120,85 +125,80 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
        // CALL SYNC ON SYNC MANAGER. 
        // THESE THREE LINE OF CODE IS USED AS A REPLACEMENT FOR THE TWO LISTENER CLASS WE HAD.
       
-        syncManager = new SSSyncManager(cmbSelectPart, navigator);
-        syncManager.setColumnName("part_id");
-        syncManager.sync();
+        this.syncManager = new SSSyncManager(this.cmbSelectPart, this.navigator);
+        this.syncManager.setColumnName("part_id");
+        this.syncManager.sync();
         
         // THE FOLLOWING CODE IS USED BECAUSE OF AN H2 LIMITATION. UPDATABLE ROWSET IS NOT
         // FULLY IMPLEMENTED AND AN EXECUTE COMMAND IS REQUIRED WHEN INSERTING A NEW
         // ROW AND KEEPING THE CURSOR AT THE NEWLY INSERTED ROW.
         // IF USING ANOTHER DATABASE, THE FOLLOWING IS NOT REQURIED:   
-        navigator.setDBNav(new SSDBNavAdapter(){
+        this.navigator.setDBNav(new SSDBNavAdapter(){
  			/**
-			 * 
+			 * unique serial id
 			 */
 			private static final long serialVersionUID = 9018468389405536891L;
 
 			@Override
 			public void performRefreshOps() {
-				// TODO Auto-generated method stub
 				super.performRefreshOps();
-				syncManager.async();
+				Example4.this.syncManager.async();
 				try{
-		            cmbSelectPart.execute();
+		            Example4.this.cmbSelectPart.execute();
 		        }catch(SQLException se){
 		            se.printStackTrace();
 		        }catch(Exception e){
 		            e.printStackTrace();
 		        }
-				syncManager.sync();
+				Example4.this.syncManager.sync();
 			}
 
 			@Override
  			public void performCancelOps() {
- 				// TODO Auto-generated method stub
  				super.performCancelOps();
- 				cmbSelectPart.setEnabled(true);
+ 				Example4.this.cmbSelectPart.setEnabled(true);
  			}
 
  			@Override
  			public void performPreInsertOps() {
- 				// TODO Auto-generated method stub
  				super.performPreInsertOps();
- 				txtPartName.setText(null);
- 				cmbSelectPart.setEnabled(false);
- 				cmbPartColor.setSelectedItem(null);
- 				txtPartWeight.setText(null);
- 				txtPartCity.setText(null);
+ 				Example4.this.txtPartName.setText(null);
+ 				Example4.this.cmbSelectPart.setEnabled(false);
+ 				Example4.this.cmbPartColor.setSelectedItem(null);
+ 				Example4.this.txtPartWeight.setText(null);
+ 				Example4.this.txtPartCity.setText(null);
  			}
 
  			@Override
  			public void performPostInsertOps() {
- 				// TODO Auto-generated method stub
  				super.performPostInsertOps();
- 				cmbSelectPart.setEnabled(true);
+ 				Example4.this.cmbSelectPart.setEnabled(true);
  				try {
-					rowset.execute();
+					Example4.this.rowset.execute();
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
  			}
  			
          });
-        cmbPartColor = new SSComboBox();
-        cmbPartColor.setOptions(new String[]{"Red","Green","Blue"});
-        cmbPartColor.bind(rowset,"color_code");
+        this.cmbPartColor = new SSComboBox();
+        this.cmbPartColor.setOptions(new String[]{"Red","Green","Blue"});
+        this.cmbPartColor.bind(this.rowset,"color_code");
 
-        txtPartWeight.bind(rowset,"weight");
-        txtPartCity.bind(rowset,"city");
+        this.txtPartWeight.bind(this.rowset,"weight");
+        this.txtPartCity.bind(this.rowset,"city");
 
-        lblPartName.setPreferredSize(new Dimension(75,20));
-        lblSelectPart.setPreferredSize(new Dimension(75,20));
-        lblPartColor.setPreferredSize(new Dimension(75,20));
-        lblPartWeight.setPreferredSize(new Dimension(75,20));
-        lblPartCity.setPreferredSize(new Dimension(75,20));
+        this.lblPartName.setPreferredSize(new Dimension(75,20));
+        this.lblSelectPart.setPreferredSize(new Dimension(75,20));
+        this.lblPartColor.setPreferredSize(new Dimension(75,20));
+        this.lblPartWeight.setPreferredSize(new Dimension(75,20));
+        this.lblPartCity.setPreferredSize(new Dimension(75,20));
 
-        txtPartName.setPreferredSize(new Dimension(150,20));
-        cmbSelectPart.setPreferredSize(new Dimension(150,20));
-        cmbPartColor.setPreferredSize(new Dimension(150,20));
-        txtPartWeight.setPreferredSize(new Dimension(150,20));
-        txtPartCity.setPreferredSize(new Dimension(150,20));
+        this.txtPartName.setPreferredSize(new Dimension(150,20));
+        this.cmbSelectPart.setPreferredSize(new Dimension(150,20));
+        this.cmbPartColor.setPreferredSize(new Dimension(150,20));
+        this.txtPartWeight.setPreferredSize(new Dimension(150,20));
+        this.txtPartCity.setPreferredSize(new Dimension(150,20));
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new GridBagLayout());
@@ -206,32 +206,32 @@ import com.nqadmin.swingSet.utils.SSSyncManager;
 
         constraints.gridx = 0;
         constraints.gridy = 0;
-        contentPane.add(lblSelectPart, constraints);
+        contentPane.add(this.lblSelectPart, constraints);
         constraints.gridy = 1;
-        contentPane.add(lblPartName, constraints);
+        contentPane.add(this.lblPartName, constraints);
         constraints.gridy = 2;
-        contentPane.add(lblPartColor, constraints);
+        contentPane.add(this.lblPartColor, constraints);
         constraints.gridy = 3;
-        contentPane.add(lblPartWeight, constraints);
+        contentPane.add(this.lblPartWeight, constraints);
         constraints.gridy = 4;
-        contentPane.add(lblPartCity, constraints);
+        contentPane.add(this.lblPartCity, constraints);
 
         constraints.gridx = 1;        
         constraints.gridy = 0;
-        contentPane.add(cmbSelectPart, constraints);
+        contentPane.add(this.cmbSelectPart, constraints);
         constraints.gridy = 1;
-        contentPane.add(txtPartName, constraints);
+        contentPane.add(this.txtPartName, constraints);
         constraints.gridy = 2;
-        contentPane.add(cmbPartColor, constraints);
+        contentPane.add(this.cmbPartColor, constraints);
         constraints.gridy = 3;
-        contentPane.add(txtPartWeight, constraints);
+        contentPane.add(this.txtPartWeight, constraints);
         constraints.gridy = 4;
-        contentPane.add(txtPartCity, constraints);
+        contentPane.add(this.txtPartCity, constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 5;
         constraints.gridwidth = 2;
-        contentPane.add(navigator,constraints);
+        contentPane.add(this.navigator,constraints);
 
         setVisible(true);
     }

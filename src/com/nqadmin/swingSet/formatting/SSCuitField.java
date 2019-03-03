@@ -71,22 +71,25 @@ public class SSCuitField extends SSFormattedTextField {
     public SSCuitField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         
-        cuitCaret = new DefaultCaret();
-        cuitCaret.setBlinkRate(600);
+        this.cuitCaret = new DefaultCaret();
+        this.cuitCaret.setBlinkRate(600);
         
         try {
-            cuitCaret.setSelectionVisible(true);
-        } catch(java.lang.NullPointerException np) {}
+            this.cuitCaret.setSelectionVisible(true);
+        } catch(java.lang.NullPointerException np) {
+        	// do nothing
+        }
         
 
-        this.setCaret(cuitCaret);
+        this.setCaret(this.cuitCaret);
         
     }
 
     /* (non-Javadoc)
      * @see com.nqadmin.swingSet.formatting.SSFormattedTextField#validateField(java.lang.Object)
      */
-    public boolean validateField(Object value) {
+    @Override
+	public boolean validateField(Object value) {
 
         boolean retValue;
 
@@ -101,7 +104,7 @@ public class SSCuitField extends SSFormattedTextField {
 	 * @param  cu    the CUIT value to be verified.
 	 * @return true if CUIT is valid, else false
 	 */
-    public boolean CheckCuit(String cu)
+    public static boolean CheckCuit(final String cu)
     {
         
         String base = new String("54 32765432  ");
@@ -117,7 +120,7 @@ public class SSCuitField extends SSFormattedTextField {
         for (mo=0, i=0; i < 12; i++)
         {
             if (i==2 || i==11) continue;
-            mo += ((int)base.charAt(i) - (int)'0') * ((int)cuit.charAt(i) - (int)'0');
+            mo += (base.charAt(i) - '0') * (cuit.charAt(i) - '0');
         }
         
         mr = mo%11;
@@ -132,7 +135,7 @@ public class SSCuitField extends SSFormattedTextField {
             else
                 ba = 11 - mr;
         
-        ctrl.setCharAt(12, (char)((int)ba + (int)'0'));
+        ctrl.setCharAt(12, (char)(ba + '0'));
         
         c1 = new String(cuit);
         c2 = new String(ctrl);

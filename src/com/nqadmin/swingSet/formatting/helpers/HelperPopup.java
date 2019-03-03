@@ -63,411 +63,479 @@ import com.nqadmin.swingSet.formatting.SSFormattedTextField;
  * 
  * Used to set a helper popup for a SSFormattedTextField.
  */
-public class HelperPopup extends JPopupMenu implements MouseListener, KeyListener, ActionListener, ListSelectionListener, PopupMenuListener, FocusListener {
-    
-    /**
+public class HelperPopup extends JPopupMenu
+		implements MouseListener, KeyListener, ActionListener, ListSelectionListener, PopupMenuListener, FocusListener {
+
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 2615782240022599464L;
 	private JPanel spane;
-    private JPanel buttons;
-    private JPanel tpane;
-    private JButton searchButton;
-    private JButton closeButton;
-    private JButton refreshButton;
-    private JButton helpButton;
-    private JTextField searchText;
-    
-    private String table = null;
-    private String dataColumn = null;
-    private String listColumn = null;
-    private String orderBy = null;
-    
-    private SSFormattedTextField target = null;
-    private JScrollPane sc;
-    private SSConnection connection = null;
-    private SelectorListModel model = null;
-    private SelectorList lista;
-    
-    /** Creates a new instance of HelperPopup */
-    public HelperPopup() {
-        
-        // main panel
-        spane = new JPanel();
-        spane.setLayout(new BorderLayout());
-        spane.setBorder(new javax.swing.border.TitledBorder(" Helper "));
-        
-        // search text panel
-        tpane = new JPanel();
-        tpane.setLayout(new BorderLayout());
-        
-        // button bar panel
-        buttons = new JPanel();
-        buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
-        
-        //searchButton = new JButton("Search");
-        //searchButton.addActionListener(this);
-        
-        //closeButton = new JButton("Close");
-        //closeButton.addActionListener(this);
-        
-        refreshButton = new JButton("Refresh");
-        refreshButton.addActionListener(this);
-        
-        //helpButton = new JButton("Help");
-        //helpButton.addActionListener(this);
-        
-        searchText = new JTextField();
-        searchText.setColumns(20);
-        searchText.addActionListener(this);
-        searchText.addFocusListener(this);
-        //tpane.add(searchText, BorderLayout.NORTH);
-        
-        //buttons.add(searchButton);
-        //buttons.add(closeButton);
-        buttons.add(searchText);
-        buttons.add(refreshButton);
-        //buttons.add(helpButton);
-        
-        tpane.add(buttons, BorderLayout.SOUTH);
-        
-        lista = new SelectorList();
-        lista.addKeyListener(this);
-        lista.addMouseListener(this);
-        lista.setVisibleRowCount(10);
-        
-        sc = new JScrollPane(lista);
-        
-        spane.add(tpane, BorderLayout.NORTH);
-        spane.add(sc   , BorderLayout.CENTER);
-        
-        this.add(spane);
-        this.addPopupMenuListener(this);
-        this.setEnabled(true);
-        this.setFocusable(true);
-        this.addFocusListener(this);
-        this.pack();
-    }
-    
-    /**
-     * Sets the list model to be used 
-     * @param model - list model to be used
-     */
-    public void setModel(SelectorListModel model) {
-        this.model = model;
-        lista.setModel(model);
-        model.setFilterEdit(searchText);
-    }
-    
-    /**
-     * Sets the text field for which this helper popup is being used.
-     * @param target - text field for which this helper popup is being used
-     */
-    public void setTarget(SSFormattedTextField target) {
-        this.target = target;
-        
-        //if (target != null) this.setPreferredSize(new Dimension(target.getWidth(),300));
-        
-    }
-    
-    /**
-     * Sets the table name from which data should be pulled
-     * @param table - table name to be used in the query to pull the data
-     */
-    public void setTable(String table) {
-        this.table = table;
-        createHelper();
-    }
-    
-    /**
-     * Sets the column name whose values should be used as underlying/bound values
-     * @param dataColumn - column name whose values should be used as underlying/bound values
-     */
-    public void setDataColumn(String dataColumn) {
-        this.dataColumn = dataColumn;
-        createHelper();
-    }
-    
-    /**
-     * Sets the column name whose values should be used for displaying.
-     * @param listColumn - column name whose values should be used for displaying.
-     */
-    public void setListColumn(String listColumn) {
-        this.listColumn = listColumn;
-        createHelper();
-    }
-    
-    /**
-     * Sets the column name to used for ordering the items
-     * @param orderBy - column name to used for ordering the items
-     */
-    public void setOrderBy(String orderBy) {
-        this.orderBy = orderBy;
-        createHelper();
-    }
-    
-    /**
-     * Sets the SSConnection object to used for database access.
-     * @param connection - connection object to be used for accessing the database
-     */
-    public void setConnection(SSConnection connection) {
-        this.connection = connection;
-        
-        try {
-            connection.createConnection();
-        } catch(java.lang.ClassNotFoundException nfe) {
-            
-        } catch(java.lang.Exception ex) {
-            
-        }
-        createHelper();
-    }
-    
-    
-    /**
-     * 
-     */
-    private void createHelper() {
-        
-        if (connection == null || table == null || dataColumn == null || listColumn == null) return;
-        
-        try {
-            connection.createConnection();
-        } catch(java.lang.ClassNotFoundException nfe) {
-            
-        } catch(java.lang.Exception ex) {
-            
-        }
-        
-        model = new SelectorListModel(connection, table, dataColumn, listColumn, orderBy);
-        model.refresh();
-        model.setFilterEdit(searchText);
-        
-        lista.setModel(model);
-        lista.getSelectionModel().addListSelectionListener(this);
-        lista.setVisibleRowCount(10);
-        pack();
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
-     */
-    public void keyPressed(java.awt.event.KeyEvent e) {
-        System.out.println("keyPressed");
-        System.out.println("KeyCode = " + KeyEvent.getKeyText(e.getKeyCode()));
-        
-        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.setVisible(false);
-        }
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
-     */
-    public void keyTyped(java.awt.event.KeyEvent e) {
-        System.out.println("keyTyped");
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
-     */
-    public void keyReleased(java.awt.event.KeyEvent e) {
-        System.out.println("keyReleased");
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-     */
-    public void mouseReleased(java.awt.event.MouseEvent e) {
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-     */
-    public void mousePressed(java.awt.event.MouseEvent e) {
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-     */
-    public void mouseExited(java.awt.event.MouseEvent e) {
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-     */
-    public void mouseEntered(java.awt.event.MouseEvent e) {
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-     */
-    public void mouseClicked(java.awt.event.MouseEvent e) {
-        System.out.println("mouseClicked");
-        
-        if (e.getClickCount() == 2) {
-            this.setVisible(false);
-        }
-        
-        if (e.getClickCount() == 1) {
-            this.setVisible(false);
-        }
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-     */
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-        
-        if (e.getSource().equals(searchButton)) {
-            System.out.println("searchButton");
-            search(e);
-        }
-        if (e.getSource().equals(closeButton)) {
-            System.out.println("closeButton");
-            this.setVisible(false);
-        }
-        if (e.getSource().equals(refreshButton)) {
-            System.out.println("refreshButton");
-            
-            model = new SelectorListModel(connection, table, dataColumn, listColumn, orderBy);
-            model.refresh();
-            model.setFilterEdit(searchText);
-            
-            lista.setModel(model);
-            lista.updateUI();
-            lista.getSelectionModel().addListSelectionListener(this);
-            lista.setVisibleRowCount(10);
-        }
-        
-        if (e.getSource().equals(helpButton)) {
-            int index = lista.getSelectedIndex();
-            lista.ensureIndexIsVisible(index);
-        }
-        
-        if (e.getSource().equals(searchText)) {
-            search(e);
-        }
-    }
-    
-    
-    /**
-     * @param evt
-     */
-    private void search(java.awt.event.ActionEvent evt) {
-        
-        javax.swing.JTextField s;
-        int j, n;
-        
-        // text to find
-        String toFind = null;
-        
-        s= ((javax.swing.JTextField)evt.getSource());
-        toFind = s.getText().toUpperCase().trim();
-        s.setText(toFind);
-        System.out.println("Texto a buscar : " + toFind);
-        n = lista.getModel().getSize();
-        
-        /**
-         * Here implements list search logic.
-         *
-         *
-         */
-        
-        for (j= 0; j < n; j++) {
-            String texto = lista.getModel().getElementAt(j).toString().toUpperCase();
-            System.out.println("Comparando con " + texto);
-            if (texto.startsWith(toFind)) {
-                lista.setSelectedIndex(j);
-                lista.ensureIndexIsVisible(j);
-                lista.requestFocus();
-                break;
-            }
-        }
-    }
-    
-    /* (non-Javadoc)
-     * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
-     */
-    public void valueChanged(javax.swing.event.ListSelectionEvent e) {
-    	
-    	// 2019-02-23-BP: this method doesn't seem to do anything
-    	return;
-    	
-    	/*
-        int desde;
-        int hasta;
-        int selected;
-        
-        if (e.getValueIsAdjusting() == false) {
-            desde = e.getFirstIndex();
-            hasta = e.getLastIndex();
-            
-            DefaultListSelectionModel lm = ((DefaultListSelectionModel)e.getSource());
-            
-            selected = lm.getLeadSelectionIndex();
-            
-            //SelectorElement se1 = (SelectorElement) (lista.getModel().getElementAt(desde));
-            
-            //SelectorElement se2 = (SelectorElement) (lista.getModel().getElementAt(hasta));
+	private JPanel buttons;
+	private JPanel tpane;
+	private JButton searchButton;
+	private JButton closeButton;
+	private JButton refreshButton;
+	private JButton helpButton;
+	private JTextField searchText;
 
-            //SelectorElement se3 = (SelectorElement) (lista.getModel().getElementAt(selected));
-            
-        }
-        */
-    }
-    
-    /* (non-Javadoc)
-     * @see javax.swing.event.PopupMenuListener#popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent)
-     */
-    public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent e) {
-        //Object current = target.getValue();
-        //Object dataval = null;
-        
-        searchText.requestFocusInWindow();
-    }
-    
-    /* (non-Javadoc)
-     * @see javax.swing.event.PopupMenuListener#popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent)
-     */
-    public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent e) {
-    }
-    
-    /* (non-Javadoc)
-     * @see javax.swing.event.PopupMenuListener#popupMenuCanceled(javax.swing.event.PopupMenuEvent)
-     */
-    public void popupMenuCanceled(javax.swing.event.PopupMenuEvent e) {
-        System.out.println("popupMenuCanceled();");
-    }
+	private String table = null;
+	private String dataColumn = null;
+	private String listColumn = null;
+	private String orderBy = null;
 
-    /* (non-Javadoc)
-     * @see javax.swing.JPopupMenu#show(java.awt.Component, int, int)
-     */
-    public void show(java.awt.Component invoker, int x, int y) {
-        System.out.println("show(" + x + "," + y + ")");
-        this.setSize(target.getWidth(), searchText.getHeight() * 15);
-        searchText.requestFocusInWindow();
-        super.show(invoker, x, y);
-    }
+	private SSFormattedTextField target = null;
+	private JScrollPane sc;
+	private SSConnection connection = null;
+	private SelectorListModel model = null;
+	private SelectorList lista;
 
-    /* (non-Javadoc)
-     * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
-     */
-    public void focusLost(java.awt.event.FocusEvent e) {
-        System.out.println("focusLost");
-    }
+	/** Creates a new instance of HelperPopup */
+	public HelperPopup() {
 
-    /* (non-Javadoc)
-     * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
-     */
-    public void focusGained(java.awt.event.FocusEvent e) {
-        System.out.println("focusGained");
-    }
+		// main panel
+		this.spane = new JPanel();
+		this.spane.setLayout(new BorderLayout());
+		this.spane.setBorder(new javax.swing.border.TitledBorder(" Helper "));
+
+		// search text panel
+		this.tpane = new JPanel();
+		this.tpane.setLayout(new BorderLayout());
+
+		// button bar panel
+		this.buttons = new JPanel();
+		this.buttons.setLayout(new BoxLayout(this.buttons, BoxLayout.X_AXIS));
+
+		// searchButton = new JButton("Search");
+		// searchButton.addActionListener(this);
+
+		// closeButton = new JButton("Close");
+		// closeButton.addActionListener(this);
+
+		this.refreshButton = new JButton("Refresh");
+		this.refreshButton.addActionListener(this);
+
+		// helpButton = new JButton("Help");
+		// helpButton.addActionListener(this);
+
+		this.searchText = new JTextField();
+		this.searchText.setColumns(20);
+		this.searchText.addActionListener(this);
+		this.searchText.addFocusListener(this);
+		// tpane.add(searchText, BorderLayout.NORTH);
+
+		// buttons.add(searchButton);
+		// buttons.add(closeButton);
+		this.buttons.add(this.searchText);
+		this.buttons.add(this.refreshButton);
+		// buttons.add(helpButton);
+
+		this.tpane.add(this.buttons, BorderLayout.SOUTH);
+
+		this.lista = new SelectorList();
+		this.lista.addKeyListener(this);
+		this.lista.addMouseListener(this);
+		this.lista.setVisibleRowCount(10);
+
+		this.sc = new JScrollPane(this.lista);
+
+		this.spane.add(this.tpane, BorderLayout.NORTH);
+		this.spane.add(this.sc, BorderLayout.CENTER);
+
+		this.add(this.spane);
+		this.addPopupMenuListener(this);
+		this.setEnabled(true);
+		this.setFocusable(true);
+		this.addFocusListener(this);
+		this.pack();
+	}
+
+	/**
+	 * Sets the list model to be used
+	 * 
+	 * @param _model - list model to be used
+	 */
+	// TODO confirm that .setFilteredEdit should be called for _model parameter
+	public void setModel(SelectorListModel _model) {
+		this.model = _model;
+		this.lista.setModel(_model);
+		_model.setFilterEdit(this.searchText);
+	}
+
+	/**
+	 * Sets the text field for which this helper popup is being used.
+	 * 
+	 * @param _target - text field for which this helper popup is being used
+	 */
+	public void setTarget(final SSFormattedTextField _target) {
+		this.target = _target;
+
+		// if (target != null) this.setPreferredSize(new
+		// Dimension(target.getWidth(),300));
+
+	}
+
+	/**
+	 * Sets the table name from which data should be pulled
+	 * 
+	 * @param _table - table name to be used in the query to pull the data
+	 */
+	public void setTable(final String _table) {
+		this.table = _table;
+		createHelper();
+	}
+
+	/**
+	 * Sets the column name whose values should be used as underlying/bound values
+	 * 
+	 * @param _dataColumn - column name whose values should be used as
+	 *                    underlying/bound values
+	 */
+	public void setDataColumn(final String _dataColumn) {
+		this.dataColumn = _dataColumn;
+		createHelper();
+	}
+
+	/**
+	 * Sets the column name whose values should be used for displaying.
+	 * 
+	 * @param _listColumn - column name whose values should be used for displaying.
+	 */
+	public void setListColumn(final String _listColumn) {
+		this.listColumn = _listColumn;
+		createHelper();
+	}
+
+	/**
+	 * Sets the column name to used for ordering the items
+	 * 
+	 * @param _orderBy - column name to used for ordering the items
+	 */
+	public void setOrderBy(final String _orderBy) {
+		this.orderBy = _orderBy;
+		createHelper();
+	}
+
+	/**
+	 * Sets the SSConnection object to used for database access.
+	 * 
+	 * @param _connection - connection object to be used for accessing the database
+	 */
+	public void setConnection(final SSConnection _connection) {
+		this.connection = _connection;
+
+		try {
+			_connection.createConnection();
+		} catch (java.lang.ClassNotFoundException nfe) {
+			// do nothing
+		} catch (java.lang.Exception ex) {
+			// do nothing
+		}
+		createHelper();
+	}
+
+	/**
+	 * 
+	 */
+	private void createHelper() {
+
+		if (this.connection == null || this.table == null || this.dataColumn == null || this.listColumn == null)
+			return;
+
+		try {
+			this.connection.createConnection();
+		} catch (java.lang.ClassNotFoundException nfe) {
+			// do nothing
+		} catch (java.lang.Exception ex) {
+			// do nothing
+		}
+
+		this.model = new SelectorListModel(this.connection, this.table, this.dataColumn, this.listColumn, this.orderBy);
+		this.model.refresh();
+		this.model.setFilterEdit(this.searchText);
+
+		this.lista.setModel(this.model);
+		this.lista.getSelectionModel().addListSelectionListener(this);
+		this.lista.setVisibleRowCount(10);
+		pack();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
+	 */
+	@Override
+	public void keyPressed(final java.awt.event.KeyEvent _event) {
+		System.out.println("keyPressed");
+		System.out.println("KeyCode = " + KeyEvent.getKeyText(_event.getKeyCode()));
+
+		if (_event.getKeyCode() == KeyEvent.VK_ENTER) {
+			this.setVisible(false);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+	 */
+	@Override
+	public void keyTyped(final java.awt.event.KeyEvent _event) {
+		System.out.println("keyTyped");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+	 */
+	@Override
+	public void keyReleased(final java.awt.event.KeyEvent _event) {
+		System.out.println("keyReleased");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mouseReleased(final java.awt.event.MouseEvent _event) {
+		// do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mousePressed(final java.awt.event.MouseEvent _event) {
+		// do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mouseExited(final java.awt.event.MouseEvent _event) {
+		// do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mouseEntered(final java.awt.event.MouseEvent _event) {
+		// do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mouseClicked(final java.awt.event.MouseEvent _event) {
+		System.out.println("mouseClicked");
+
+		if (_event.getClickCount() == 2) {
+			this.setVisible(false);
+		}
+
+		if (_event.getClickCount() == 1) {
+			this.setVisible(false);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
+	@Override
+	public void actionPerformed(final java.awt.event.ActionEvent _event) {
+
+		if (_event.getSource().equals(this.searchButton)) {
+			System.out.println("searchButton");
+			search(_event);
+		}
+		if (_event.getSource().equals(this.closeButton)) {
+			System.out.println("closeButton");
+			this.setVisible(false);
+		}
+		if (_event.getSource().equals(this.refreshButton)) {
+			System.out.println("refreshButton");
+
+			this.model = new SelectorListModel(this.connection, this.table, this.dataColumn, this.listColumn,
+					this.orderBy);
+			this.model.refresh();
+			this.model.setFilterEdit(this.searchText);
+
+			this.lista.setModel(this.model);
+			this.lista.updateUI();
+			this.lista.getSelectionModel().addListSelectionListener(this);
+			this.lista.setVisibleRowCount(10);
+		}
+
+		if (_event.getSource().equals(this.helpButton)) {
+			int index = this.lista.getSelectedIndex();
+			this.lista.ensureIndexIsVisible(index);
+		}
+
+		if (_event.getSource().equals(this.searchText)) {
+			search(_event);
+		}
+	}
+
+	/**
+	 * @param _event
+	 */
+	private void search(final java.awt.event.ActionEvent _event) {
+
+		javax.swing.JTextField s;
+		int j, n;
+
+		// text to find
+		String toFind = null;
+
+		s = ((javax.swing.JTextField) _event.getSource());
+		toFind = s.getText().toUpperCase().trim();
+		s.setText(toFind);
+		System.out.println("Texto a buscar : " + toFind);
+		n = this.lista.getModel().getSize();
+
+		/**
+		 * Here implements list search logic.
+		 */
+
+		for (j = 0; j < n; j++) {
+			String texto = this.lista.getModel().getElementAt(j).toString().toUpperCase();
+			System.out.println("Comparando con " + texto);
+			if (texto.startsWith(toFind)) {
+				this.lista.setSelectedIndex(j);
+				this.lista.ensureIndexIsVisible(j);
+				this.lista.requestFocus();
+				break;
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.
+	 * ListSelectionEvent)
+	 */
+	@Override
+	public void valueChanged(final javax.swing.event.ListSelectionEvent _event) {
+
+		// 2019-02-23-BP: this method doesn't seem to do anything
+		return;
+
+		/*
+		 * int desde; int hasta; int selected;
+		 * 
+		 * if (_event.getValueIsAdjusting() == false) { desde = e.getFirstIndex(); hasta
+		 * = e.getLastIndex();
+		 * 
+		 * DefaultListSelectionModel lm = ((DefaultListSelectionModel)e.getSource());
+		 * 
+		 * selected = lm.getLeadSelectionIndex();
+		 * 
+		 * //SelectorElement se1 = (SelectorElement)
+		 * (lista.getModel().getElementAt(desde));
+		 * 
+		 * //SelectorElement se2 = (SelectorElement)
+		 * (lista.getModel().getElementAt(hasta));
+		 * 
+		 * //SelectorElement se3 = (SelectorElement)
+		 * (lista.getModel().getElementAt(selected));
+		 * 
+		 * }
+		 */
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * javax.swing.event.PopupMenuListener#popupMenuWillBecomeVisible(javax.swing.
+	 * event.PopupMenuEvent)
+	 */
+	@Override
+	public void popupMenuWillBecomeVisible(final javax.swing.event.PopupMenuEvent _event) {
+		// Object current = target.getValue();
+		// Object dataval = null;
+
+		this.searchText.requestFocusInWindow();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * javax.swing.event.PopupMenuListener#popupMenuWillBecomeInvisible(javax.swing.
+	 * event.PopupMenuEvent)
+	 */
+	@Override
+	public void popupMenuWillBecomeInvisible(final javax.swing.event.PopupMenuEvent _event) {
+		// do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.swing.event.PopupMenuListener#popupMenuCanceled(javax.swing.event.
+	 * PopupMenuEvent)
+	 */
+	@Override
+	public void popupMenuCanceled(final javax.swing.event.PopupMenuEvent _event) {
+		System.out.println("popupMenuCanceled();");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.swing.JPopupMenu#show(java.awt.Component, int, int)
+	 */
+	@Override
+	public void show(final java.awt.Component invoker, final int x, final int y) {
+		System.out.println("show(" + x + "," + y + ")");
+		this.setSize(this.target.getWidth(), this.searchText.getHeight() * 15);
+		this.searchText.requestFocusInWindow();
+		super.show(invoker, x, y);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
+	 */
+	@Override
+	public void focusLost(final java.awt.event.FocusEvent _event) {
+		System.out.println("focusLost");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
+	 */
+	@Override
+	public void focusGained(final java.awt.event.FocusEvent _event) {
+		System.out.println("focusGained");
+	}
 }
 
 /*
-* $Log$
-* Revision 1.7  2006/04/21 19:09:17  prasanth
-* Added CVS tags & some comments
-*
-*/
+ * $Log$ Revision 1.7 2006/04/21 19:09:17 prasanth Added CVS tags & some
+ * comments
+ *
+ */

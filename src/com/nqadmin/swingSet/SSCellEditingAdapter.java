@@ -63,7 +63,8 @@ public abstract class SSCellEditingAdapter implements SSCellEditing, Serializabl
      * This empty implementation always returns true.
      * For description about the function look in SSCellEditing class.
      */
-    public boolean isCellEditable(int _row, int _column) {
+    @Override
+	public boolean isCellEditable(int _row, int _column) {
         return true;
     }
 
@@ -71,7 +72,8 @@ public abstract class SSCellEditingAdapter implements SSCellEditing, Serializabl
      * This empty implementation always returns true.
      * For description about the function look in SSCellEditing class.
      */
-    public boolean cellUpdateRequested(int _row, int _column, Object _oldValue, Object _newValue){
+    @Override
+	public boolean cellUpdateRequested(int _row, int _column, Object _oldValue, Object _newValue){
         return true;
     }
 

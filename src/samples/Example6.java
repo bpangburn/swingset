@@ -42,6 +42,10 @@ import com.nqadmin.swingSet.datasources.SSConnection;
 import javax.swing.*;
 import java.sql.*;
 
+/**
+ * This example is similar to Example5, demonstrating the use of an SSDataGrid to display a tabular
+ * view of the suppliers & parts data. It adds a ComboRenderer for the color.
+ */
 public class Example6 extends JFrame {
 
 	private static final long serialVersionUID = 1727893372201402700L;
@@ -49,9 +53,15 @@ public class Example6 extends JFrame {
     SSJdbcRowSetImpl rowset   = null;
     SSDataGrid dataGrid = new SSDataGrid();
     String url;
-    public Example6(String url){
+    
+    /**
+     * Constructor for Example6
+     * 
+     * @param _url - path to SQL to create suppliers & parts database
+     */
+    public Example6(String _url){
         super("Example 6");
-        this.url = url;
+        this.url = _url;
         setSize(580,170);
         init();
     }
@@ -59,36 +69,37 @@ public class Example6 extends JFrame {
     private void init(){
 
         try{
-        	System.out.println("url from ex 6: "+url);
-        	ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
-            ssConnection.setDriverName("org.h2.Driver");
-            ssConnection.createConnection();
+        	System.out.println("url from ex 6: "+this.url);
+        	this.ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+this.url+"'", "sa", "");
+            this.ssConnection.setDriverName("org.h2.Driver");
+            this.ssConnection.createConnection();
             
-            rowset = new SSJdbcRowSetImpl(ssConnection);
-            rowset.setCommand("SELECT part_name,color_code, weight, city,part_id FROM part_data ORDER BY part_name;");
+            this.rowset = new SSJdbcRowSetImpl(this.ssConnection);
+            this.rowset.setCommand("SELECT part_name,color_code, weight, city,part_id FROM part_data ORDER BY part_name;");
             
             //  SET THE HEADER BEFORE SETTING THE ROWSET
-            dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
-            dataGrid.setSSRowSet(rowset);
+            this.dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
+            this.dataGrid.setSSRowSet(this.rowset);
             // HIDE THE PART ID COLUMN
             // THIS SETS THE WIDTH OF THE COLUMN TO 0
-            dataGrid.setHiddenColumns(new String[]{"part_id"});
-            dataGrid.setMessageWindow(this);
-            dataGrid.setUneditableColumns(new String[]{"part_id"});
+            this.dataGrid.setHiddenColumns(new String[]{"part_id"});
+            this.dataGrid.setMessageWindow(this);
+            this.dataGrid.setUneditableColumns(new String[]{"part_id"});
             
             // THIS DISABLES NEW INSERTIONS TO THE DATA BASE.
             // DUE TO H2 DATABASE PROPERTIES, INSERTION OF NEW DATA CAUSES PROBLEMS.
             // ANY CHANGES MADE TO PRESENT RECORD WILL BE SAVED.
-            dataGrid.setInsertion(false);
+            this.dataGrid.setInsertion(false);
 
-            dataGrid.setComboRenderer("color_code",new String[]{"Red","Green","Blue"},
+            this.dataGrid.setComboRenderer("color_code",new String[]{"Red","Green","Blue"},
                     new Integer[]{new Integer(0),new Integer(1),new Integer(2)});
-            dataGrid.setDefaultValues(new int[]{1,2,3},new Object[]{new Integer(0),
+            this.dataGrid.setDefaultValues(new int[]{1,2,3},new Object[]{new Integer(0),
                     new Integer(20),new String("New Orleans")});
 
-            dataGrid.setPrimaryColumn("part_id");
-            dataGrid.setSSDataValue(new SSDataValue(){
-                public Object getPrimaryColumnValue(){
+            this.dataGrid.setPrimaryColumn("part_id");
+            this.dataGrid.setSSDataValue(new SSDataValue(){
+                @Override
+				public Object getPrimaryColumnValue(){
                     // YOUR PRIMARY KEY VALUE GENERATION GOES HERE
                     // IF ITS SOME THING USER ENTERS THEN NO PROBLEM
                     // IF ITS AN AUTO INCREMENT FIELD THEN IT DEPENDS ON
@@ -112,7 +123,7 @@ public class Example6 extends JFrame {
             cnfe.printStackTrace();
         }
 
-        getContentPane().add(dataGrid.getComponent());
+        getContentPane().add(this.dataGrid.getComponent());
 
         setVisible(true);
 

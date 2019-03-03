@@ -62,377 +62,443 @@ import com.nqadmin.swingSet.formatting.SSFormattedTextField;
  * 
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * 
- * Used to set a helper popup for a SSFormattedTextField. Very similar to HelperPopup.java
+ * Used to set a helper popup for a SSFormattedTextField. Very similar to
+ * HelperPopup.java
  */
-public class RowSetHelperPopup extends JPopupMenu implements MouseListener, KeyListener, ActionListener, ListSelectionListener, PopupMenuListener, FocusListener {
+public class RowSetHelperPopup extends JPopupMenu
+		implements MouseListener, KeyListener, ActionListener, ListSelectionListener, PopupMenuListener, FocusListener {
 
-    /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -469422538841985553L;
 	private JPanel spane;
-    private JPanel buttons;
-    private JPanel tpane;
-    private JButton searchButton;
-    private JButton closeButton;
-    private JButton refreshButton;
-    private JButton helpButton;
-    private JTextField searchText;
-    
-    private String dataColumn = null;
-    private String listColumn = null;
-   
-    private SSFormattedTextField target = null;
-    private JScrollPane sc;
-    private SelectorListModel model = null;
-    private SelectorList lista;
-    
-    private SSRowSet rowset = null;
-    
-    /** 
-     * Creates a new instance of HelperPopup 
-     */
-    public RowSetHelperPopup() {
-        
-        // main panel
-        spane = new JPanel();
-        spane.setLayout(new BorderLayout());
-        spane.setBorder(new javax.swing.border.TitledBorder(" RowSet Helper "));
-        
-        // search text panel
-        tpane = new JPanel();
-        tpane.setLayout(new BorderLayout());
-        
-        // button bar panel
-        buttons = new JPanel();
-        buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
-        
-        refreshButton = new JButton("Refresh");
-        refreshButton.addActionListener(this);
-        
-        searchText = new JTextField();
-        searchText.setColumns(20);
-        searchText.addActionListener(this);
-        searchText.addFocusListener(this);
-        buttons.add(searchText);
-        buttons.add(refreshButton);
-        
-        tpane.add(buttons, BorderLayout.SOUTH);
-        
-        lista = new SelectorList();
-        lista.addKeyListener(this);
-        lista.addMouseListener(this);
-        lista.setVisibleRowCount(10);
-        
-        sc = new JScrollPane(lista);
-        
-        spane.add(tpane, BorderLayout.NORTH);
-        spane.add(sc   , BorderLayout.CENTER);
-        
-        this.add(spane);
-        this.addPopupMenuListener(this);
-        this.setEnabled(true);
-        this.setFocusable(true);
-        this.addFocusListener(this);
-        this.pack();
+	private JPanel buttons;
+	private JPanel tpane;
+	private JButton searchButton;
+	private JButton closeButton;
+	private JButton refreshButton;
+	private JButton helpButton;
+	private JTextField searchText;
 
-        
-    }
-    
-    /**
-     * Sets the SSRowSet object to be used to fetch the values for dataColumn & listColumn values
-     * @param rowset - SSRowSet object to be used to fetch the values
-     */
-    public  void setSSRowSet(SSRowSet rowset) {
-        this.rowset = rowset;
-        createHelper();
-    }
-    
-    /**
-     * Sets the list model to be used 
-     * @param model - list model to be used
-     */
-    public void setModel(SelectorListModel model) {
-        this.model = model;
-        lista.setModel(model);
-    }
-    
-    /**
-     * Sets the text field for which this helper popup is being used.
-     * @param target - text field for which this helper popup is being used
-     */
-    public void setTarget(SSFormattedTextField target) {
-        this.target = target;
-        
-        //if (target != null) this.setPreferredSize(new Dimension(target.getWidth(),300));
-    }
-    
-    /**
-     * Sets the column name whose values should be used as underlying/bound values
-     * @param dataColumn - column name whose values should be used as underlying/bound values
-     */
-    public void setDataColumn(String dataColumn) {
-        this.dataColumn = dataColumn;
-        createHelper();
-    }
-    
-    /**
-     * Sets the column name whose values should be used for displaying.
-     * @param listColumn - column name whose values should be used for displaying.
-     */
-    public void setListColumn(String listColumn) {
-        this.listColumn = listColumn;
-        createHelper();
-    }
-    
-    
- 
-    /**
-     * Fetches the values from the rowset and populates the model
-     */
-    public void createHelper() {
-        if (dataColumn == null || listColumn == null || rowset == null) 
-        	return;
+	private String dataColumn = null;
+	private String listColumn = null;
 
-        model = new SelectorListModel();
-        
-        try {
-            rowset.beforeFirst();
-            while (rowset.next()) {
-                String s1 = rowset.getString(dataColumn);
-                String s2 = rowset.getString(listColumn);
-                model.addElement(new SelectorElement(s1,s2));
-            }
-        } catch (SQLException se) {
-            System.out.println("rowset.next()" + se);
-        } catch (java.lang.NullPointerException np) {
-            System.out.println(np);
-        }
-        
-        model.setFilterEdit(searchText);
-        lista.setModel(model);
-        lista.getSelectionModel().addListSelectionListener(this);
-        lista.setVisibleRowCount(10);
-        pack();
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
-     */
-    public void keyPressed(java.awt.event.KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            this.setVisible(false);
-        }
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
-     */
-    public void keyTyped(java.awt.event.KeyEvent e) {
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
-     */
-    public void keyReleased(java.awt.event.KeyEvent e) {
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-     */
-    public void mouseReleased(java.awt.event.MouseEvent e) {
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-     */
-    public void mousePressed(java.awt.event.MouseEvent e) {
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-     */
-    public void mouseExited(java.awt.event.MouseEvent e) {
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-     */
-    public void mouseEntered(java.awt.event.MouseEvent e) {
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-     */
-    public void mouseClicked(java.awt.event.MouseEvent e) {
-        if (e.getClickCount() == 2) {
-            this.setVisible(false);
-        }
-        
-        if (e.getClickCount() == 321) {
-            this.setVisible(false);
-        }
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-     */
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-        
-        if (e.getSource().equals(searchButton)) {
-            search();
-        }
-        if (e.getSource().equals(closeButton)) {
-            this.setVisible(false);
-        }
-        if (e.getSource().equals(refreshButton)) {
-            createHelper();
-        }
-        
-        if (e.getSource().equals(helpButton)) {
-            int index = lista.getSelectedIndex();
-            lista.ensureIndexIsVisible(index);
-        }
-        
-        if (e.getSource().equals(searchText)) {
-            search();
-        }
-    }
-    
-    
-    /**
-     * 
-     */
-    private void search() {
-        
-        int j, n;
-        
-        // text to find
-        String toFind = searchText.getText().toUpperCase().trim();
-        searchText.setText(toFind);
-        System.out.println("Texto a buscar : " + toFind);
-        n = lista.getModel().getSize();
-        
-        /**
-         * Here implements list search logic.
-         *
-         *
-         */
-        j = lista.getSelectedIndex() + 1;
-        
-        System.out.println("j = " + j + " n = " + n);
-        for (; j < n; j++) {
-            String texto = lista.getModel().getElementAt(j).toString().toUpperCase();
-            System.out.println("Comparando con " + texto);
-            
-            if (texto.indexOf(toFind) != -1) {  // texto.contains(toFind) in jdk5
-                lista.setSelectedIndex(j);
-                lista.ensureIndexIsVisible(j);
-                lista.requestFocus();
-                break;
-            }
-        }
-    }
-    
-    /* (non-Javadoc)
-     * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
-     */
-    public void valueChanged(javax.swing.event.ListSelectionEvent e) {
-    	
-    	// 2019-02-23-BP: this method doesn't seem to do anything
-    	return;
-    	
-    	/*
-        int desde;
-        int hasta;
-        int selected;
-        
-        if (e.getValueIsAdjusting() == false) {
-            desde = e.getFirstIndex();
-            hasta = e.getLastIndex();
-            
-            DefaultListSelectionModel lm = ((DefaultListSelectionModel)e.getSource());
-            
-            selected = lm.getLeadSelectionIndex();
-            
-            SelectorElement se1 = (SelectorElement) (lista.getModel().getElementAt(desde));
-            
-            SelectorElement se2 = (SelectorElement) (lista.getModel().getElementAt(hasta));
-            
-            SelectorElement se3 = (SelectorElement) (lista.getModel().getElementAt(selected));
-        }
-        */
-    }
-    
-    /* (non-Javadoc)
-     * @see javax.swing.event.PopupMenuListener#popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent)
-     */
-    public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent e) {
-        
-        int index = -1;
-        
-        try {
-            index = rowset.getRow() -1;
-        }
-        catch(java.sql.SQLException se) {
-            
-        }
+	private SSFormattedTextField target = null;
+	private JScrollPane sc;
+	private SelectorListModel model = null;
+	private SelectorList lista;
 
-        lista.setSelectedIndex(index);
-        lista.ensureIndexIsVisible(index);
-        searchText.requestFocusInWindow();
-        searchText.selectAll();
-    }
-    
-    /* (non-Javadoc)
-     * @see javax.swing.event.PopupMenuListener#popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent)
-     */
-    public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent e) {
+	private SSRowSet rowset = null;
 
-        System.out.println("popupMenuWillBecomeInvisible();");
-        int index = lista.getSelectedIndex() + 1;
-        
-        if (index > -1 && target != null) {
-            try {
-                rowset.absolute(index);
-            }
-            catch(java.sql.SQLException se) {
-                
-            }
-        }
-    }
-    
-    /* (non-Javadoc)
-     * @see javax.swing.event.PopupMenuListener#popupMenuCanceled(javax.swing.event.PopupMenuEvent)
-     */
-    public void popupMenuCanceled(javax.swing.event.PopupMenuEvent e) {
-    }
-    
-    /* (non-Javadoc)
-     * @see javax.swing.JPopupMenu#show(java.awt.Component, int, int)
-     */
-    public void show(java.awt.Component invoker, int x, int y) {
-        this.setSize(target.getWidth(), searchText.getHeight() * 15);
-        searchText.requestFocusInWindow();
-        super.show(invoker, x, y);
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
-     */
-    public void focusLost(java.awt.event.FocusEvent e) {
-    }
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
-     */
-    public void focusGained(java.awt.event.FocusEvent e) {
-    }
+	/**
+	 * Creates a new instance of HelperPopup
+	 */
+	public RowSetHelperPopup() {
+
+		// main panel
+		this.spane = new JPanel();
+		this.spane.setLayout(new BorderLayout());
+		this.spane.setBorder(new javax.swing.border.TitledBorder(" RowSet Helper "));
+
+		// search text panel
+		this.tpane = new JPanel();
+		this.tpane.setLayout(new BorderLayout());
+
+		// button bar panel
+		this.buttons = new JPanel();
+		this.buttons.setLayout(new BoxLayout(this.buttons, BoxLayout.X_AXIS));
+
+		this.refreshButton = new JButton("Refresh");
+		this.refreshButton.addActionListener(this);
+
+		this.searchText = new JTextField();
+		this.searchText.setColumns(20);
+		this.searchText.addActionListener(this);
+		this.searchText.addFocusListener(this);
+		this.buttons.add(this.searchText);
+		this.buttons.add(this.refreshButton);
+
+		this.tpane.add(this.buttons, BorderLayout.SOUTH);
+
+		this.lista = new SelectorList();
+		this.lista.addKeyListener(this);
+		this.lista.addMouseListener(this);
+		this.lista.setVisibleRowCount(10);
+
+		this.sc = new JScrollPane(this.lista);
+
+		this.spane.add(this.tpane, BorderLayout.NORTH);
+		this.spane.add(this.sc, BorderLayout.CENTER);
+
+		this.add(this.spane);
+		this.addPopupMenuListener(this);
+		this.setEnabled(true);
+		this.setFocusable(true);
+		this.addFocusListener(this);
+		this.pack();
+
+	}
+
+	/**
+	 * Sets the SSRowSet object to be used to fetch the values for dataColumn &
+	 * listColumn values
+	 * 
+	 * @param _rowset - SSRowSet object to be used to fetch the values
+	 */
+	public void setSSRowSet(final SSRowSet _rowset) {
+		this.rowset = _rowset;
+		createHelper();
+	}
+
+	/**
+	 * Sets the list model to be used
+	 * 
+	 * @param _model - list model to be used
+	 */
+	public void setModel(final SelectorListModel _model) {
+		this.model = _model;
+		this.lista.setModel(_model);
+	}
+
+	/**
+	 * Sets the text field for which this helper popup is being used.
+	 * 
+	 * @param _target - text field for which this helper popup is being used
+	 */
+	public void setTarget(final SSFormattedTextField _target) {
+		this.target = _target;
+
+		// if (target != null) this.setPreferredSize(new
+		// Dimension(target.getWidth(),300));
+	}
+
+	/**
+	 * Sets the column name whose values should be used as underlying/bound values
+	 * 
+	 * @param _dataColumn - column name whose values should be used as
+	 *                    underlying/bound values
+	 */
+	public void setDataColumn(final String _dataColumn) {
+		this.dataColumn = _dataColumn;
+		createHelper();
+	}
+
+	/**
+	 * Sets the column name whose values should be used for displaying.
+	 * 
+	 * @param _listColumn - column name whose values should be used for displaying.
+	 */
+	public void setListColumn(final String _listColumn) {
+		this.listColumn = _listColumn;
+		createHelper();
+	}
+
+	/**
+	 * Fetches the values from the rowset and populates the model
+	 */
+	public void createHelper() {
+		if (this.dataColumn == null || this.listColumn == null || this.rowset == null)
+			return;
+
+		this.model = new SelectorListModel();
+
+		try {
+			this.rowset.beforeFirst();
+			while (this.rowset.next()) {
+				String s1 = this.rowset.getString(this.dataColumn);
+				String s2 = this.rowset.getString(this.listColumn);
+				this.model.addElement(new SelectorElement(s1, s2));
+			}
+		} catch (SQLException se) {
+			System.out.println("rowset.next()" + se);
+		} catch (java.lang.NullPointerException np) {
+			System.out.println(np);
+		}
+
+		this.model.setFilterEdit(this.searchText);
+		this.lista.setModel(this.model);
+		this.lista.getSelectionModel().addListSelectionListener(this);
+		this.lista.setVisibleRowCount(10);
+		pack();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
+	 */
+	@Override
+	public void keyPressed(final java.awt.event.KeyEvent _event) {
+		if (_event.getKeyCode() == KeyEvent.VK_ENTER) {
+			this.setVisible(false);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+	 */
+	@Override
+	public void keyTyped(final java.awt.event.KeyEvent _event) {
+		// do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+	 */
+	@Override
+	public void keyReleased(final java.awt.event.KeyEvent _event) {
+		// do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mouseReleased(final java.awt.event.MouseEvent _event) {
+		// do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mousePressed(final java.awt.event.MouseEvent _event) {
+		// do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mouseExited(final java.awt.event.MouseEvent _event) {
+		// do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mouseEntered(final java.awt.event.MouseEvent _event) {
+		// do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+	 */
+	@Override
+	public void mouseClicked(final java.awt.event.MouseEvent _event) {
+		if (_event.getClickCount() == 2) {
+			this.setVisible(false);
+		}
+
+		if (_event.getClickCount() == 321) {
+			this.setVisible(false);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
+	@Override
+	public void actionPerformed(final java.awt.event.ActionEvent _event) {
+
+		if (_event.getSource().equals(this.searchButton)) {
+			search();
+		}
+		if (_event.getSource().equals(this.closeButton)) {
+			this.setVisible(false);
+		}
+		if (_event.getSource().equals(this.refreshButton)) {
+			createHelper();
+		}
+
+		if (_event.getSource().equals(this.helpButton)) {
+			int index = this.lista.getSelectedIndex();
+			this.lista.ensureIndexIsVisible(index);
+		}
+
+		if (_event.getSource().equals(this.searchText)) {
+			search();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void search() {
+
+		int j, n;
+
+		// text to find
+		String toFind = this.searchText.getText().toUpperCase().trim();
+		this.searchText.setText(toFind);
+		System.out.println("Texto a buscar : " + toFind);
+		n = this.lista.getModel().getSize();
+
+		/**
+		 * Here implements list search logic.
+		 *
+		 *
+		 */
+		j = this.lista.getSelectedIndex() + 1;
+
+		System.out.println("j = " + j + " n = " + n);
+		for (; j < n; j++) {
+			String texto = this.lista.getModel().getElementAt(j).toString().toUpperCase();
+			System.out.println("Comparando con " + texto);
+
+			if (texto.indexOf(toFind) != -1) { // texto.contains(toFind) in jdk5
+				this.lista.setSelectedIndex(j);
+				this.lista.ensureIndexIsVisible(j);
+				this.lista.requestFocus();
+				break;
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.
+	 * ListSelectionEvent)
+	 */
+	@Override
+	public void valueChanged(final javax.swing.event.ListSelectionEvent _event) {
+
+		// 2019-02-23-BP: this method doesn't seem to do anything
+		return;
+
+		/*
+		 * int desde; int hasta; int selected;
+		 * 
+		 * if (_event.getValueIsAdjusting() == false) { desde = e.getFirstIndex(); hasta
+		 * = e.getLastIndex();
+		 * 
+		 * DefaultListSelectionModel lm = ((DefaultListSelectionModel)e.getSource());
+		 * 
+		 * selected = lm.getLeadSelectionIndex();
+		 * 
+		 * SelectorElement se1 = (SelectorElement)
+		 * (lista.getModel().getElementAt(desde));
+		 * 
+		 * SelectorElement se2 = (SelectorElement)
+		 * (lista.getModel().getElementAt(hasta));
+		 * 
+		 * SelectorElement se3 = (SelectorElement)
+		 * (lista.getModel().getElementAt(selected)); }
+		 */
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * javax.swing.event.PopupMenuListener#popupMenuWillBecomeVisible(javax.swing.
+	 * event.PopupMenuEvent)
+	 */
+	@Override
+	public void popupMenuWillBecomeVisible(final javax.swing.event.PopupMenuEvent _event) {
+
+		int index = -1;
+
+		try {
+			index = this.rowset.getRow() - 1;
+		} catch (java.sql.SQLException se) {
+			// do nothing
+		}
+
+		this.lista.setSelectedIndex(index);
+		this.lista.ensureIndexIsVisible(index);
+		this.searchText.requestFocusInWindow();
+		this.searchText.selectAll();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * javax.swing.event.PopupMenuListener#popupMenuWillBecomeInvisible(javax.swing.
+	 * event.PopupMenuEvent)
+	 */
+	@Override
+	public void popupMenuWillBecomeInvisible(final javax.swing.event.PopupMenuEvent _event) {
+
+		System.out.println("popupMenuWillBecomeInvisible();");
+		int index = this.lista.getSelectedIndex() + 1;
+
+		if (index > -1 && this.target != null) {
+			try {
+				this.rowset.absolute(index);
+			} catch (java.sql.SQLException se) {
+				// do nothing
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.swing.event.PopupMenuListener#popupMenuCanceled(javax.swing.event.
+	 * PopupMenuEvent)
+	 */
+	@Override
+	public void popupMenuCanceled(final javax.swing.event.PopupMenuEvent _event) {
+		// do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.swing.JPopupMenu#show(java.awt.Component, int, int)
+	 */
+	@Override
+	public void show(final java.awt.Component invoker, final int x, final int y) {
+		this.setSize(this.target.getWidth(), this.searchText.getHeight() * 15);
+		this.searchText.requestFocusInWindow();
+		super.show(invoker, x, y);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
+	 */
+	@Override
+	public void focusLost(final java.awt.event.FocusEvent _event) {
+		// do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
+	 */
+	@Override
+	public void focusGained(final java.awt.event.FocusEvent _event) {
+		// do nothing
+	}
 }
 
 /*
-* $Log$
-* Revision 1.6  2006/04/21 19:09:17  prasanth
-* Added CVS tags & some comments
-*
-*/
+ * $Log$ Revision 1.6 2006/04/21 19:09:17 prasanth Added CVS tags & some
+ * comments
+ *
+ */

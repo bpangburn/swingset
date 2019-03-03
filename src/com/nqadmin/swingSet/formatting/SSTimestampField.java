@@ -73,7 +73,8 @@ public class SSTimestampField extends SSFormattedTextField {
     /* (non-Javadoc)
      * @see com.nqadmin.swingSet.formatting.SSField#cleanField()
      */
-    public void cleanField() {
+    @Override
+	public void cleanField() {
         //ts = new java.sql.Timestamp( (new java.util.Date().getTime() ) );
 
         this.setValue(new java.util.Date( ) );
