@@ -39,61 +39,56 @@ package com.nqadmin.swingSet.formatting;
 
 import javax.swing.text.MaskFormatter;
 
-// 2019-02-27-BP: this should be named SSSSNFormatterFactory for consistency.
+// 2019-02-27-BP: this should be named SSSSSSNFormatterFactory for consistency.
 /**
- * SSNFormatterFactory.java
+ * SSSSNFormatterFactory.java
  * 
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * 
- * SSNFormatterFactory extends DefaultFormatterFactory for US Social Security Number fields.
+ * SSSSNFormatterFactory extends DefaultFormatterFactory for US Social Security
+ * Number fields.
  */
-public class SSNFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
+public class SSSSNFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
-    /**
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 7141905652057051134L;
 	private MaskFormatter defaultFormatter;
-    private MaskFormatter displayFormatter;
-    private MaskFormatter editFormatter;
-    private MaskFormatter nullFormatter;
+	private MaskFormatter displayFormatter;
+	private MaskFormatter editFormatter;
+	private MaskFormatter nullFormatter;
 
-    /**
-     * Creates a default  SSNFormatterFactory
-     */
-    public SSNFormatterFactory() {
-        
-        try {
-            this.defaultFormatter = new MaskFormatter("###-##-####");
-            this.nullFormatter    = null;
-            this.editFormatter    = new MaskFormatter("###-##-####");
-            this.displayFormatter = new MaskFormatter("###-##-####");
-            
-            this.editFormatter.setPlaceholderCharacter('0');
-                    
-            this.setDefaultFormatter(this.defaultFormatter);
-            this.setNullFormatter(this.nullFormatter);
-            this.setEditFormatter(this.editFormatter);
-            this.setDisplayFormatter(this.displayFormatter);
-        }
-        catch (java.text.ParseException pe) {
-        	// do nothing
-        }
-    }
+	/**
+	 * Creates a default SSSSNFormatterFactory
+	 */
+	public SSSSNFormatterFactory() {
+
+		try {
+			this.defaultFormatter = new MaskFormatter("###-##-####");
+			this.nullFormatter = null;
+			this.editFormatter = new MaskFormatter("###-##-####");
+			this.displayFormatter = new MaskFormatter("###-##-####");
+
+			this.editFormatter.setPlaceholderCharacter('0');
+
+			this.setDefaultFormatter(this.defaultFormatter);
+			this.setNullFormatter(this.nullFormatter);
+			this.setEditFormatter(this.editFormatter);
+			this.setDisplayFormatter(this.displayFormatter);
+		} catch (java.text.ParseException pe) {
+			// do nothing
+		}
+	}
 }
 
 /*
- * $Log$
- * Revision 1.5  2005/02/04 22:42:06  yoda2
- * Updated Copyright info.
+ * $Log$ Revision 1.5 2005/02/04 22:42:06 yoda2 Updated Copyright info.
  *
- * Revision 1.4  2005/01/18 23:38:01  dags
- * Diego's name fix
+ * Revision 1.4 2005/01/18 23:38:01 dags Diego's name fix
  *
- * Revision 1.3  2004/12/13 20:50:16  dags
- * Fix package name
+ * Revision 1.3 2004/12/13 20:50:16 dags Fix package name
  *
- * Revision 1.2  2004/12/13 18:46:13  prasanth
- * Added License.
+ * Revision 1.2 2004/12/13 18:46:13 prasanth Added License.
  *
  */

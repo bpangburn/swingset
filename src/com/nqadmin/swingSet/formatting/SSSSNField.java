@@ -42,46 +42,42 @@ package com.nqadmin.swingSet.formatting;
  *
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * 
- * Used to link a SSFormattedTextField to a US Social Security Number column in a database.
+ * Used to link a SSFormattedTextField to a US Social Security Number column in
+ * a database.
  */
 public class SSSSNField extends SSFormattedTextField {
-  
-    /**
+
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -8330641913621926923L;
 
-	/** 
-     * Creates a new instance of SSSSNField 
-     */
-    public SSSSNField() {
-        this(new SSNFormatterFactory());
-    }
-    
-    /**
-     * Creates an object of SSSSNField with the specified formatter factory
-     * @param factory - formatter factory to be used
-     */
-    public SSSSNField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
-        super(factory);
-    }
+	/**
+	 * Creates a new instance of SSSSNField
+	 */
+	public SSSSNField() {
+		this(new SSSSNFormatterFactory());
+	}
+
+	/**
+	 * Creates an object of SSSSNField with the specified formatter factory
+	 * 
+	 * @param factory - formatter factory to be used
+	 */
+	public SSSSNField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+		super(factory);
+	}
 }
 
 /*
- * $Log$
- * Revision 1.6  2005/03/28 14:46:43  dags
- * syncro commit
+ * $Log$ Revision 1.6 2005/03/28 14:46:43 dags syncro commit
  *
- * Revision 1.5  2005/02/04 22:42:06  yoda2
- * Updated Copyright info.
+ * Revision 1.5 2005/02/04 22:42:06 yoda2 Updated Copyright info.
  *
- * Revision 1.4  2005/01/18 23:38:01  dags
- * Diego's name fix
+ * Revision 1.4 2005/01/18 23:38:01 dags Diego's name fix
  *
- * Revision 1.3  2004/12/13 20:50:16  dags
- * Fix package name
+ * Revision 1.3 2004/12/13 20:50:16 dags Fix package name
  *
- * Revision 1.2  2004/12/13 18:46:13  prasanth
- * Added License.
+ * Revision 1.2 2004/12/13 18:46:13 prasanth Added License.
  *
  */
