@@ -229,6 +229,7 @@ public class SelectorListModel extends DefaultComboBoxModel<Object> {
 	/*
 	 * Populates the list model with the data by fetching it from the database.
 	 */
+	@SuppressWarnings("deprecation")
 	private void populateModel() {
 
 		Object dataValue = null;
@@ -253,12 +254,13 @@ public class SelectorListModel extends DefaultComboBoxModel<Object> {
 		} else
 			sql = "select " + this.dataColumn + ", " + this.listColumn + " from " + this.table;
 
-		// CREATE A ROWSET BASED ON THE ABOVE QUERY
-		this.ssRowset = new SSJdbcRowSetImpl();
-		this.ssRowset.setSSConnection(this.ssConnection);
-		this.ssRowset.setCommand(sql);
-
 		try {
+			// CREATE A ROWSET BASED ON THE ABOVE QUERY
+			this.ssRowset = new SSJdbcRowSetImpl();
+			// TODO review this code
+			this.ssRowset.setSSConnection(this.ssConnection);
+			this.ssRowset.setCommand(sql);
+
 			// EXECUTE THE QUERY
 			this.ssRowset.execute();
 

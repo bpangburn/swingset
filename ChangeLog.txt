@@ -8,12 +8,17 @@ SwingSet 2.3.0 - Released TBD
 
 Changes:
 	1. Removed BeanInfo and SSFormattedCombobBox classes (moved to archive)
-	2. 
-	3. 
-	4. 
-	5. 
-	6. 
-	7. 
+	2. Addressed additional Eclipse compiler warnings
+	3. Addressed additional Eclipse JavaDoc warnings
+	4. Made many method parameters final
+	5. Allowing Eclipse to format code when saving a class
+	6. Removed any unqualified datamember access (e.g., use "this.x")
+	7. Made inner classes protected vs. private
+	8. Eliminated SSRowSetAdapter and SSConnectionEditor
+	9. Removed Bean property code from com.nqadmin.swingSet.datasources classes
+	10. Rewrote SSRowSet to extend RowSet and added default methods
+	11. Rewrote SSJdbcRowSetImpl to extend JdbcRowSetImpl and implement SSRowSet
+	12. 
 	   
 ==============================================================================
 SwingSet 2.2.0 - Released 2019-02-27
