@@ -46,7 +46,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import com.nqadmin.swingSet.SSDBComboBox;
-import com.nqadmin.swingSet.SSDBNavImp;
+import com.nqadmin.swingSet.SSDBNavImpl;
 import com.nqadmin.swingSet.SSDataNavigator;
 import com.nqadmin.swingSet.SSTextField;
 import com.nqadmin.swingSet.datasources.SSConnection;
@@ -103,7 +103,7 @@ public class Example3 extends JFrame {
 		// FULLY IMPLEMENTED AND AN EXECUTE COMMAND IS REQUIRED WHEN INSERTING A NEW
 		// ROW AND KEEPING THE CURSOR AT THE NEWLY INSERTED ROW.
 		// IF USING ANOTHER DATABASE, THE FOLLOWING IS NOT REQURIED:
-		this.navigator.setDBNav(new SSDBNavImp(this) {
+		this.navigator.setDBNav(new SSDBNavImpl(this) {
 			/**
 			 * unique serial id
 			 */

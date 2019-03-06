@@ -45,7 +45,7 @@ import java.sql.SQLException;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import com.nqadmin.swingSet.SSDBNavImp;
+import com.nqadmin.swingSet.SSDBNavImpl;
 import com.nqadmin.swingSet.SSDataNavigator;
 import com.nqadmin.swingSet.SSTextField;
 import com.nqadmin.swingSet.datasources.SSConnection;
@@ -94,7 +94,7 @@ public class Example1 extends JFrame {
 			this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
 			this.rowset.setCommand("SELECT * FROM supplier_data");
 			this.navigator = new SSDataNavigator(this.rowset);
-			this.navigator.setDBNav(new SSDBNavImp(getContentPane()));
+			this.navigator.setDBNav(new SSDBNavImpl(getContentPane()));
 		} catch (SQLException se) {
 			se.printStackTrace();
 		} catch (ClassNotFoundException cnfe) {
@@ -106,7 +106,7 @@ public class Example1 extends JFrame {
 		// FULLY IMPLEMENTED AND AN EXECUTE COMMAND IS REQUIRED WHEN INSERTING A NEW
 		// ROW FOR KEEPING THE CURSOR AT THE NEWLY INSERTED ROW.
 		// IF USING ANOTHER DATABASE, THE FOLLOWING IS NOT REQURIED:
-		this.navigator.setDBNav(new SSDBNavImp(this) {
+		this.navigator.setDBNav(new SSDBNavImpl(this) {
 			/**
 			 * unique serial id
 			 */

@@ -20,6 +20,7 @@ Changes:
 	11. Rewrote SSJdbcRowSetImpl to extend JdbcRowSetImpl and implement SSRowSet
 	12. Rewrote SSDBNav to add default methods from SSDBNavAdapter
 	13. Deprecated SSDBNavAdapter
+	14. Deprecated SSDBNavImp and replaced with SSDBNavImpl
 	   
 ==============================================================================
 SwingSet 2.2.0 - Released 2019-02-27
