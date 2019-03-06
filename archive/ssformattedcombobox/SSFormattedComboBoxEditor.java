@@ -157,6 +157,7 @@ public class SSFormattedComboBoxEditor extends JPanel implements ComboBoxEditor,
     
     /**
      * @param navigator
+     * @deprecated Use {@link #setSSDataNavigator()} instead. 
      */
     @Deprecated
     public void setNavigator(SSDataNavigator navigator) {

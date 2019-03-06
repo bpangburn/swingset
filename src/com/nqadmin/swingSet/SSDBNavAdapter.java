@@ -49,8 +49,8 @@ package com.nqadmin.swingSet;
  * own SSDBNav implementations can just extend the abstract class and override
  * the desired methods.
  * 
- * This class has been deprecated. Default methods have been added to the
- * SSDBNav interface so it can be implemented instead of this adapter.
+ * @deprecated Starting in 2.3.0+ use {@link SSDBNav} instead.
+ * 
  */
 @Deprecated
 public class SSDBNavAdapter implements SSDBNav {

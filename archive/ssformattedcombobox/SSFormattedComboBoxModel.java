@@ -462,8 +462,9 @@ public class SSFormattedComboBoxModel extends DefaultComboBoxModel<Object> {
     /**
      * Getter for property ssConnection.
      * @return Value of property ssConnection.
-     * @deprecated
+     * @deprecated Use {@link #getSSConnection()} instead. 
      */
+    @Deprecated
     public com.nqadmin.swingSet.datasources.SSConnection getSsConnection() {
         return this.ssConnection;
     }
@@ -471,8 +472,9 @@ public class SSFormattedComboBoxModel extends DefaultComboBoxModel<Object> {
     /**
      * Setter for property ssConnection.
      * @param ssConnection New value of property ssConnection.
-     * @deprecated
+     * @deprecated Use {@link #setSSConnection()} instead. 
      */
+    @Deprecated
     public void setSsConnection(com.nqadmin.swingSet.datasources.SSConnection ssConnection) {
         this.ssConnection = ssConnection;
         this.refresh();

@@ -59,7 +59,7 @@ import java.awt.Container;
  * This recursive behavior performed on all the components inside the JPanel or
  * JTabbedPane inside the specified container.
  * 
- * This class has been deprecated and replaced by SSDBNavImpl
+ * @deprecated Starting in 2.3.0+ use {@link SSDBNavImpl} instead.
  */
 @Deprecated
 public class SSDBNavImp extends SSDBNavImpl {

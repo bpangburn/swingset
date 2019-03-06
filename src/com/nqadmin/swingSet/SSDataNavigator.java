@@ -1258,7 +1258,7 @@ public class SSDataNavigator extends JPanel {
 	 * @param _sSRowSet SSRowSet to which the combo has to update values.
 	 *
 	 * @deprecated
-	 * @see #setSSRowSet
+	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
 	 */
 	@Deprecated
 	public void setRowSet(SSRowSet _sSRowSet) {
@@ -1271,7 +1271,7 @@ public class SSDataNavigator extends JPanel {
 	 * @return returns the SSRowSet being used.
 	 *
 	 * @deprecated
-	 * @see #getSSRowSet
+	 * @deprecated Use {@link #getSSRowSet()} instead.
 	 */
 	@Deprecated
 	public SSRowSet getRowSet() {

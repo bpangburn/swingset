@@ -237,8 +237,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 * 
 	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
 	 *                column
-	 * @deprecated
-	 * @see #setSSRowSet(SSRowSet)
+	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
 	 */
 	@Deprecated
 	public void setRowSet(final SSRowSet _rowset) {
@@ -262,7 +261,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 * @return - returns the SSRowSet object being used to get/set the bound column
 	 *         value
 	 * @deprecated
-	 * @see #getSSRowSet()
+	 * @Use {@link #getSSRowSet()} instead.
 	 */
 	@Deprecated
 	public SSRowSet getRowSet() {
@@ -288,7 +287,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 * 
 	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
 	 * @deprecated
-	 * @see #setSSDataNavigator(SSDataNavigator)
+	 * @Use {@link #setSSDataNavigator(SSDataNavigator _navigator)} instead.
 	 **/
 	@Deprecated
 	public void setNavigator(final SSDataNavigator _navigator) {
@@ -299,8 +298,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 * Returns the SSDataNavigator object being used.
 	 * 
 	 * @return returns the SSDataNavigator object being used.
-	 * @deprecated
-	 * @see #getSSDataNavigator()
+	 * @deprecated Use {@link #getSSDataNavigator()} instead.
 	 **/
 	@Deprecated
 	public SSDataNavigator getNavigator() {

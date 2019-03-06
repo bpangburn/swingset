@@ -67,13 +67,11 @@ import com.nqadmin.swingSet.utils.SSArray;
  * database codes. The selected values can be stored in a DB array element.
  * These mappings can be provided by setOptions method.
  * 
- * e.g.
- *      SSList list = new SSList();
- *      String[] options = {"VLarge""large", "medium", "small", "VSmall};
- *      Double[] mappings = {100.0, 10.0, 5.0, 1.0, 0.1};
- *      list.setOptions(options, mappings);
- *      list.bind(myRowset, "my_column", "myDataType");
- *      
+ * e.g. SSList list = new SSList(); String[] options = {"VLarge""large",
+ * "medium", "small", "VSmall}; Double[] mappings = {100.0, 10.0, 5.0, 1.0,
+ * 0.1}; list.setOptions(options, mappings); list.bind(myRowset, "my_column",
+ * "myDataType");
+ * 
  * If three values VLarge, medium, small are selected the array element in the
  * database will store {100.0,5.0,1.0}
  */
@@ -95,8 +93,7 @@ public class SSList extends JList<Object> {
 	protected String columnName = "";
 
 	/**
-	 * Underlying values for each list item choice
-	 * of 0, 1, 2, 3, etc.
+	 * Underlying values for each list item choice of 0, 1, 2, 3, etc.
 	 */
 	protected Object[] mappings = null;
 
@@ -121,7 +118,7 @@ public class SSList extends JList<Object> {
 	private final MyRowSetListener rowsetListener = new MyRowSetListener();
 
 	/**
-	 *  Creates an object of SSComboBox.
+	 * Creates an object of SSComboBox.
 	 */
 	public SSList() {
 		init();
@@ -129,7 +126,8 @@ public class SSList extends JList<Object> {
 
 	/**
 	 * Sets the SSRowSet column name to which the component is bound.
-	 * @param _columnName	Column name to which the component is bound.
+	 * 
+	 * @param _columnName Column name to which the component is bound.
 	 */
 	public void setColumnName(String _columnName) {
 		String oldValue = this.columnName;
@@ -140,10 +138,11 @@ public class SSList extends JList<Object> {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}    
+	}
 
 	/**
 	 * Returns the column name to which the component is bound.
+	 * 
 	 * @return returns the column name to which to component is bound.
 	 */
 	public String getColumnName() {
@@ -152,7 +151,8 @@ public class SSList extends JList<Object> {
 
 	/**
 	 * Sets the SSRowSet to which the component is bound.
-	 * @param _sSRowSet    SSRowSet to which the component is bound
+	 * 
+	 * @param _sSRowSet SSRowSet to which the component is bound
 	 */
 	public void setSSRowSet(SSRowSet _sSRowSet) {
 		SSRowSet oldValue = this.sSRowSet;
@@ -163,10 +163,11 @@ public class SSList extends JList<Object> {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}     
+	}
 
 	/**
 	 * Returns the SSRowSet being used to get the values.
+	 * 
 	 * @return returns the SSRowSet being used.
 	 */
 	public SSRowSet getSSRowSet() {
@@ -174,9 +175,10 @@ public class SSList extends JList<Object> {
 	}
 
 	/**
-	 * Sets the underlying values for each of the items in the list box
-	 * (e.g. the values that map to the items displayed in the list box)
-	 * @param _mappings		An array of values that correspond to those in the list box.
+	 * Sets the underlying values for each of the items in the list box (e.g. the
+	 * values that map to the items displayed in the list box)
+	 * 
+	 * @param _mappings An array of values that correspond to those in the list box.
 	 */
 	protected void setMappings(Object[] _mappings) {
 		Object[] oldValue = _mappings.clone();
@@ -185,8 +187,9 @@ public class SSList extends JList<Object> {
 	}
 
 	/**
-	 * Returns the underlying values for each of the items in the list box
-	 * (e.g. the values that map to the items displayed in the list box)
+	 * Returns the underlying values for each of the items in the list box (e.g. the
+	 * values that map to the items displayed in the list box)
+	 * 
 	 * @return returns the underlying values for each of the items in the list box
 	 */
 	public Object[] getMappings() {
@@ -195,7 +198,8 @@ public class SSList extends JList<Object> {
 
 	/**
 	 * Adds an array of strings as combo box items.
-	 * @param _options    the list of options that you want to appear in the list box.
+	 * 
+	 * @param _options the list of options that you want to appear in the list box.
 	 */
 	protected void setOptions(String[] _options) {
 		String[] oldValue = _options.clone();
@@ -207,21 +211,25 @@ public class SSList extends JList<Object> {
 
 	/**
 	 * Returns the items displayed in the list box.
+	 * 
 	 * @return returns the items displayed in the list box
 	 */
 	public String[] getOptions() {
 		return this.options;
-	}    
+	}
 
 	/**
-	 * Sets the options to be displayed in the list box and their corresponding values.
-	 * @param _options    options to be displayed in the list box.
-	 * @param _mappings    integer values that correspond to the options in the list box.
+	 * Sets the options to be displayed in the list box and their corresponding
+	 * values.
+	 * 
+	 * @param _options  options to be displayed in the list box.
+	 * @param _mappings integer values that correspond to the options in the list
+	 *                  box.
 	 * @return returns true if the options and mappings are set successfully -
-	 *    returns false if the size of arrays do not match or if the values could
-	 *    not be set
+	 *         returns false if the size of arrays do not match or if the values
+	 *         could not be set
 	 */
-	public boolean setOptions(String[] _options, Object[]_mappings) {
+	public boolean setOptions(String[] _options, Object[] _mappings) {
 		if (_options.length != _mappings.length) {
 			return false;
 		}
@@ -232,13 +240,14 @@ public class SSList extends JList<Object> {
 
 	/**
 	 * Selects appropriate elements in the list box
+	 * 
 	 * @param values Values to be selected in list
 	 */
 	public void setSelectedValues(Object[] values) {
 		int[] selectedIndices = new int[values.length];
-		for(int i = 0; i < values.length; i++) {
-			for(int j = 0; j < this.mappings.length; j++) {
-				if(values[i] == this.mappings[j])
+		for (int i = 0; i < values.length; i++) {
+			for (int j = 0; j < this.mappings.length; j++) {
+				if (values[i] == this.mappings[j])
 					selectedIndices[i] = j;
 			}
 		}
@@ -247,20 +256,24 @@ public class SSList extends JList<Object> {
 
 	/**
 	 * Returns the list value associated with the currently selected item.
-	 * @return returns the value associated with the selected item OR -1 if nothing is selected.
-	 * @deprecated
-	 * @deprecated
+	 * 
+	 * @return returns the value associated with the selected item OR -1 if nothing
+	 *         is selected.
+	 * 
+	 * @deprecated Use {@link #getSelectedValuesList()} instead.
+	 * 
 	 */
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings("deprecation") // needed because it overrides a deprecated method in the parent class
 	@Deprecated
 	@Override
 	public Object[] getSelectedValues() {
 		if (getSelectedIndex() == -1) {
-			return new Object[]{Integer.valueOf(-1)};
+			return new Object[] { Integer.valueOf(-1) };
 		}
 		Object[] selectedValues = new Object[getSelectedIndices().length];
-		for(int i = 0; i < selectedValues.length; i++) {
-			selectedValues[i] = this.mappings != null? this.mappings[getSelectedIndices()[i]] : Integer.valueOf(getSelectedIndices()[i]);
+		for (int i = 0; i < selectedValues.length; i++) {
+			selectedValues[i] = this.mappings != null ? this.mappings[getSelectedIndices()[i]]
+					: Integer.valueOf(getSelectedIndices()[i]);
 		}
 		return selectedValues;
 	}
@@ -282,18 +295,20 @@ public class SSList extends JList<Object> {
 
 		// SET PREFERRED DIMENSIONS
 		setPreferredSize(new Dimension(200, 40));
-	}    
+	}
 
 	/**
 	 * Sets the SSRowSet and column name to which the component is to be bound.
-	 * @param _sSRowSet    datasource to be used.
-	 * @param _columnName    Name of the column to which this check box should be bound
-	 * @param _baseTypeName		Underlying DataType Name(specific to database provider)
-	 * 							of the array elements in the specified column
+	 * 
+	 * @param _sSRowSet     datasource to be used.
+	 * @param _columnName   Name of the column to which this check box should be
+	 *                      bound
+	 * @param _baseTypeName Underlying DataType Name(specific to database provider)
+	 *                      of the array elements in the specified column
 	 */
 	public void bind(SSRowSet _sSRowSet, String _columnName, String _baseTypeName) {
 		this.baseTypeName = _baseTypeName;
-		
+
 		SSRowSet oldValue = this.sSRowSet;
 		this.sSRowSet = _sSRowSet;
 		firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
@@ -315,14 +330,14 @@ public class SSList extends JList<Object> {
 	protected void bind() throws SQLException {
 
 		// CHECK FOR NULL COLUMN/ROWSET
-		if (this.columnName==null || this.columnName.trim().equals("") || this.sSRowSet==null) {
+		if (this.columnName == null || this.columnName.trim().equals("") || this.sSRowSet == null) {
 			return;
 		}
 
 		// REMOVE LISTENERS TO PREVENT DUPLICATION
 		removeListeners();
 
-		if(this.mappings == null || this.options == null)
+		if (this.mappings == null || this.options == null)
 			return;
 		this.setListData(this.options);
 		updateDisplay();
@@ -334,72 +349,73 @@ public class SSList extends JList<Object> {
 
 	/**
 	 * Converts SQL array to object array
+	 * 
 	 * @param array SQL array
-	 * @return	Object array
+	 * @return Object array
 	 * @throws SQLException
 	 */
-	private static Object[] toObjArray(Array array) throws SQLException{
-		if(array == null) {
+	private static Object[] toObjArray(Array array) throws SQLException {
+		if (array == null) {
 			return null;
 		}
-		Vector<Object> data= new Vector<>();
-		switch(array.getBaseType()){
+		Vector<Object> data = new Vector<>();
+		switch (array.getBaseType()) {
 		case Types.INTEGER:
 		case Types.SMALLINT:
 		case Types.TINYINT:
-			try{
-				for(Integer num: (Integer[])array.getArray())
+			try {
+				for (Integer num : (Integer[]) array.getArray())
 					data.add(num);
-			} catch(ClassCastException ex) {
-				for(int num: (int[])array.getArray())
+			} catch (ClassCastException ex) {
+				for (int num : (int[]) array.getArray())
 					data.add(Integer.valueOf(num));
 			}
 			break;
 		case Types.BIGINT:
-			try{
-				for(Long num: (Long[])array.getArray())
+			try {
+				for (Long num : (Long[]) array.getArray())
 					data.add(num);
-			} catch(ClassCastException ex) {
-				for(long num: (long[])array.getArray())
+			} catch (ClassCastException ex) {
+				for (long num : (long[]) array.getArray())
 					data.add(Long.valueOf(num));
 			}
 			break;
 		case Types.FLOAT:
 		case Types.DOUBLE:
 		case Types.REAL:
-			try{
-				for(Double num: (Double[])array.getArray())
+			try {
+				for (Double num : (Double[]) array.getArray())
 					data.add(num);
-			} catch(ClassCastException ex) {
-				for(double num: (double[])array.getArray())
+			} catch (ClassCastException ex) {
+				for (double num : (double[]) array.getArray())
 					data.add(Double.valueOf(num));
 			}
 			break;
 		case Types.DECIMAL:
 		case Types.NUMERIC:
-			try{
-				for(BigDecimal num: (BigDecimal[])array.getArray())
+			try {
+				for (BigDecimal num : (BigDecimal[]) array.getArray())
 					data.add(num);
-			} catch(ClassCastException ex) {
+			} catch (ClassCastException ex) {
 				ex.printStackTrace();
 			}
 			break;
 		case Types.DATE:
-			for(Date dt: (Date[])array.getArray())
+			for (Date dt : (Date[]) array.getArray())
 				data.add(dt);
 			break;
 		case Types.CHAR:
 		case Types.VARCHAR:
 		case Types.LONGVARCHAR:
-			for(String txt: (String[])array.getArray())
+			for (String txt : (String[]) array.getArray())
 				data.add(txt);
 			break;
-		default: 
-			throw new SQLException("DataType: "+ array.getBaseTypeName() +" not supported");
+		default:
+			throw new SQLException("DataType: " + array.getBaseTypeName() + " not supported");
 		}
 		return data.toArray();
 	}
-	
+
 	/**
 	 * Adds listeners for component and rowset
 	 */
@@ -415,14 +431,15 @@ public class SSList extends JList<Object> {
 		this.sSRowSet.removeRowSetListener(this.rowsetListener);
 		removeListSelectionListener(this.listListener);
 	}
-	
+
 	/**
-	 * updates the corresponding column of the rowset with the values selected in the list
+	 * updates the corresponding column of the rowset with the values selected in
+	 * the list
 	 */
-	protected void updateRowSet(){
+	protected void updateRowSet() {
 		Array array;
-		if(this.getSelectedIndices().length == 0)
-			array = new SSArray(new Object[]{}, this.baseTypeName);
+		if (this.getSelectedIndices().length == 0)
+			array = new SSArray(new Object[] {}, this.baseTypeName);
 		else
 			array = new SSArray(this.getSelectedValues(), this.baseTypeName);
 		try {
@@ -437,19 +454,19 @@ public class SSList extends JList<Object> {
 	 * binding.
 	 */
 	protected void updateDisplay() throws SQLException {
-		
+
 		Object[] array = null;
-		if(this.sSRowSet.getRow() > 0 ) {
+		if (this.sSRowSet.getRow() > 0) {
 			array = toObjArray(this.sSRowSet.getArray(this.columnName));
 		}
-		if(array == null) {
+		if (array == null) {
 			this.clearSelection();
 			return;
 		}
 		int[] indices = new int[array.length];
-		for(int i = 0; i < array.length; i++) {
-			for(int j = 0; j < this.mappings.length; j++) {
-				if(array[i].equals(this.mappings[j])){
+		for (int i = 0; i < array.length; i++) {
+			for (int j = 0; j < this.mappings.length; j++) {
+				if (array[i].equals(this.mappings[j])) {
 					indices[i] = j;
 					break;
 				}
@@ -473,7 +490,7 @@ public class SSList extends JList<Object> {
 				updateDisplay();
 			} catch (SQLException e) {
 				e.printStackTrace();
-			}            
+			}
 			addListSelectionListener(SSList.this.listListener);
 		}
 
@@ -484,7 +501,7 @@ public class SSList extends JList<Object> {
 				updateDisplay();
 			} catch (SQLException e) {
 				e.printStackTrace();
-			}            
+			}
 			addListSelectionListener(SSList.this.listListener);
 		}
 
@@ -495,14 +512,15 @@ public class SSList extends JList<Object> {
 				updateDisplay();
 			} catch (SQLException e) {
 				e.printStackTrace();
-			}            
+			}
 			addListSelectionListener(SSList.this.listListener);
 		}
 
 	}
+
 	/**
-	 * Listener(s) for the component's value used to propagate changes back to
-	 * bound text field.
+	 * Listener(s) for the component's value used to propagate changes back to bound
+	 * text field.
 	 */
 	protected class MyListListener implements ListSelectionListener, Serializable {
 
@@ -518,8 +536,6 @@ public class SSList extends JList<Object> {
 }
 
 /*
-* $Log$
-* Revision 1.1  2009/11/16 17:24:55  prasanth
-* Initial Commit.
-*
-*/
+ * $Log$ Revision 1.1 2009/11/16 17:24:55 prasanth Initial Commit.
+ *
+ */

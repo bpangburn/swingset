@@ -217,8 +217,9 @@ public class SSFormattedComboBox extends JComboBox<Object> implements ActionList
     /**
      * Sets the SSDataNavigator used for navigating the SSRowSet
      * @param navigator - SSDataNavigator instance used for navigating the SSRowSet
-     * @deprecated
+     * @deprecated Use {@link #setSSDataNavigator()} instead.  
      */
+    @Deprecated
     public void setNavigator(SSDataNavigator navigator) {
         this.navigator = navigator;
         editor.setNavigator(navigator);
@@ -227,8 +228,9 @@ public class SSFormattedComboBox extends JComboBox<Object> implements ActionList
     /**
      * Returns the SSDataNavigator object being used
      * @return returns the SSDataNavigator object being used
-     * @deprecated
+     * @deprecated Use {@link #getSSDataNavigator()} instead. 
      */
+    @Deprecated
     public SSDataNavigator getNavigator() {
         return navigator;
     }
@@ -303,8 +305,9 @@ public class SSFormattedComboBox extends JComboBox<Object> implements ActionList
     /**
      * Database connection to be used for executing the query
      * @param connection - SSConnection object to be used for querying the database
-     * @deprecated
+     * @deprecated Use {@link #setSSConnection()} instead. 
      */
+    @Deprecated
     public void setConnection(SSConnection connection) {
         this.setSSConnection(connection);
     }
@@ -312,8 +315,9 @@ public class SSFormattedComboBox extends JComboBox<Object> implements ActionList
     /**
      * Database connection used for executing the query
      * @return connection - SSConnection object used for querying the database
-     * @deprecated
+     * @deprecated Use {@link #getSSConnection()} instead. 
      */
+    @Deprecated
     public SSConnection getConnection() {
         return this.getSSConnection();
     }

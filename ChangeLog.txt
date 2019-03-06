@@ -21,6 +21,7 @@ Changes:
 	12. Rewrote SSDBNav to add default methods from SSDBNavAdapter
 	13. Deprecated SSDBNavAdapter
 	14. Deprecated SSDBNavImp and replaced with SSDBNavImpl
+	15. Updated @deprecated JavaDoc annotation, providing link to suggested replacement
 	   
 ==============================================================================
 SwingSet 2.2.0 - Released 2019-02-27

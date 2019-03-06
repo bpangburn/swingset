@@ -112,7 +112,7 @@ public interface SSDBNav extends Serializable {
 	/**
 	 * Constant indicating the navigation button next.
 	 * 
-	 * Please use Navigation.NEXT
+	 * @deprecated Starting in 2.3.0+ use {@link Navigation#NEXT} instead.
 	 */
 	@Deprecated
 	public static final int NAVIGATION_NEXT = 1;
@@ -120,7 +120,7 @@ public interface SSDBNav extends Serializable {
 	/**
 	 * Constant indicating the navigation button previous.
 	 * 
-	 * Please use Navigation.PREVIOUS
+	 * @deprecated Starting in 2.3.0+ use {@link Navigation#PREVIOUS} instead.
 	 */
 	@Deprecated
 	public static final int NAVIGATION_PREVIOUS = 2;
@@ -128,7 +128,7 @@ public interface SSDBNav extends Serializable {
 	/**
 	 * Constant indicating the navigation button first.
 	 * 
-	 * Please use Navigation.FIRST
+	 * @deprecated Starting in 2.3.0+ use {@link Navigation#FIRST} instead.
 	 */
 	@Deprecated
 	public static final int NAVIGATION_FIRST = 3;
@@ -136,7 +136,7 @@ public interface SSDBNav extends Serializable {
 	/**
 	 * Constant indicating the navigation button last.
 	 * 
-	 * Please use Navigation.LAST
+	 * @deprecated Starting in 2.3.0+ use {@link Navigation#LAST} instead.
 	 */
 	@Deprecated
 	public static final int NAVIGATION_LAST = 4;
@@ -189,10 +189,9 @@ public interface SSDBNav extends Serializable {
 	 * Possible values are NAVIGATION_NEXT, NAVIGATION_PREVIOUS, NAVIGATION_FIRST,
 	 * NAVIGATION_LAST.
 	 * 
-	 * This method has been deprecated. Please use performNavigationOps(Navigation
-	 * _navType)
-	 * 
 	 * @param _navigationType this indicates the type of navigation.
+	 * 
+	 * @deprecated Use {@link #performNavigationOps(Navigation _navType)} instead.
 	 */
 	@Deprecated
 	default void performNavigationOps(int _navigationType) {

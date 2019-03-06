@@ -90,12 +90,12 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 
 	/**
 	 * Constructs a SSJdbcRowSetImpl object with the specified SSConnection.
-	 * 
-	 * This is deprecated as of SwingSet 2.3.0. Please use
-	 * SSJdbcRowSetImpl(Connection _connection).
 	 *
 	 * @param _ssConnection SSConnection object to be used to connect to the
 	 *                      database.
+	 * 
+	 * @deprecated Starting in 2.3.0+ use
+	 *             {@link #SSJdbcRowSetImpl(Connection _connection)} instead.
 	 */
 	@Deprecated
 	public SSJdbcRowSetImpl(SSConnection _ssConnection) {
@@ -106,12 +106,14 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * Constructs a SSJdbcRowSetImpl object with the specified SSConnection & SQL
 	 * command.
 	 * 
-	 * This is deprecated as of SwingSet 2.3.0. Please use
-	 * SSJdbcRowSetImpl(Connection _connection, String _command).
-	 * 
 	 * @param _ssConnection SSConnection object to be used to connect to the
 	 *                      database.
 	 * @param _command      SQL query to be executed.
+	 * 
+	 * @deprecated Starting in 2.3.0+ use
+	 *             {@link #SSJdbcRowSetImpl(Connection _connection, String _command)}
+	 *             instead.
+	 * 
 	 */
 	@Deprecated
 	public SSJdbcRowSetImpl(SSConnection _ssConnection, String _command) {
@@ -123,6 +125,27 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 		// se.printStackTrace();
 		// }
 
+	}
+
+	/**
+	 * Returns the Connection object being used.
+	 * 
+	 * @return returns the Connection object being used.
+	 */
+	@Override
+	public Connection getConnection() {
+		return super.getConnection();
+	}
+
+	/**
+	 * Returns the SSConnection object being used.
+	 * 
+	 * @return returns the SSConnection object being used.
+	 * @deprecated Starting in 2.3.0+ use {@link #getConnection()} instead.
+	 */
+	@Deprecated
+	public SSConnection getSSConnection() {
+		return new SSConnection(getConnection());
 	}
 
 	/**
@@ -145,23 +168,22 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	}
 
 	/**
-	 * Returns the SSConnection object being used.
+	 * Sets the Connection object to be used.
 	 * 
-	 * This is deprecated as of SwingSet 2.3.0. Please use getConnection().
-	 *
-	 * @return returns the SSConnection object being used.
+	 * @param _connection connection object to be used to connect to the database.
 	 */
-	@Deprecated
-	public SSConnection getSSConnection() {
-		return new SSConnection(getConnection());
+	@Override
+	public void setConnection(Connection _connection) {
+		super.setConnection(_connection);
 	}
 
 	/**
-	 * Sets the connection object to be used.
-	 * 
-	 * This is deprecated as of SwingSet 2.3.0. Please use setConnection().
+	 * Sets the Connection object to be used.
 	 * 
 	 * @param _ssConnection connection object to be used to connect to the database.
+	 * 
+	 * @deprecated Starting in 2.3.0+ use
+	 *             {@link #setConnection(Connection _connection)} instead.
 	 */
 	@Deprecated
 	public void setSSConnection(SSConnection _ssConnection) {

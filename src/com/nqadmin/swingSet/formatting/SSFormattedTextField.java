@@ -196,8 +196,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * 
 	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
 	 *                column
-	 * @deprecated
-	 * @see #setSSRowSet(SSRowSet)
+	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
 	 */
 	@Deprecated
 	public void setRowSet(final SSRowSet _rowset) {
@@ -234,8 +233,8 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * finalized so try to avoid using this </font>
 	 * 
 	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
-	 * @deprecated
-	 * @see #setSSDataNavigator(SSDataNavigator)
+	 * @deprecated Use {@link #setSSDataNavigator(SSDataNavigator _navigator)}
+	 *             instead.
 	 */
 	@Deprecated
 	public void setNavigator(final SSDataNavigator _navigator) {
@@ -246,8 +245,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * Returns the SSDataNavigator object being used.
 	 * 
 	 * @return returns the SSDataNavigator object being used.
-	 * @deprecated
-	 * @see #getSSDataNavigator()
+	 * @deprecated Use {@link #getSSDataNavigator()} instead.
 	 **/
 	@Deprecated
 	public SSDataNavigator getNavigator() {
@@ -815,6 +813,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * @param _value - The value to be set for this component (this will also update
 	 *               the underlying column value)
 	 * @return returns true if update is successful else false
+	 * @deprecated Use {@link #setValue(Object _value)} instead.
 	 */
 	@Deprecated
 	public boolean updateValue(final Object _value) {
