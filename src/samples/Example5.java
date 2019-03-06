@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  * Copyright (C) 2003-2019, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
@@ -35,102 +36,102 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-import com.nqadmin.swingSet.*;
-import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
-import com.nqadmin.swingSet.datasources.SSConnection;
+import java.sql.SQLException;
 
-import javax.swing.*;
-import java.sql.*;
+import javax.swing.JFrame;
+
+import com.nqadmin.swingSet.SSDataGrid;
+import com.nqadmin.swingSet.datasources.SSConnection;
+import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
 
 /**
- * This example demonstrates the use of an SSDataGrid to display a tabular
- * view of the suppliers & parts data.
+ * This example demonstrates the use of an SSDataGrid to display a tabular view
+ * of the suppliers & parts data.
  */
 public class Example5 extends JFrame {
 
 	private static final long serialVersionUID = -5126011569315467420L;
 	SSConnection ssConnection = null;
-    SSJdbcRowSetImpl rowset   = null;
-    SSDataGrid dataGrid = null;
-    String url;
-    
-    /**
-     * Constructor for Example5
-     * 
-     * @param _url - path to SQL to create suppliers & parts database
-     */
-    public Example5(String _url){
-        super("Example 5");
-        this.url = _url;
-        setSize(430,145);
-        init();
-    }
+	SSJdbcRowSetImpl rowset = null;
+	SSDataGrid dataGrid = null;
+	String url;
 
-    private void init(){
+	/**
+	 * Constructor for Example5
+	 * 
+	 * @param _url - path to SQL to create suppliers & parts database
+	 */
+	public Example5(String _url) {
+		super("Example 5");
+		this.url = _url;
+		setSize(430, 145);
+		init();
+	}
 
-        try{
-        	System.out.println("url from ex 5: "+this.url);
-        	this.ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+this.url+"'", "sa", "");
-        	
-        	this.ssConnection.setDriverName("org.h2.Driver");
-            this.ssConnection.createConnection();
-            this.rowset = new SSJdbcRowSetImpl(this.ssConnection);
-            this.rowset.setCommand("SELECT part_name, color_code, weight, city, part_id FROM part_data ORDER BY part_name;");
-            //  SET THE HEADER BEFORE SETTING THE ROWSET
-            this.dataGrid = new SSDataGrid();
-            this.dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
-            this.dataGrid.setSSRowSet(this.rowset);
-            this.dataGrid.setMessageWindow(this);
-            
-            // DISABLES NEW INSERTIONS TO THE DATA BASE.
-            // DUE TO H2 DATABASE PROPERTIES, INSERTION OF NEW DATA CAUSES ERRORS.
-            // ANY CHANGES MADE TO THE PRESENT RECORD WILL BE SAVED BUT INSERTIONS ARE NOT ALLOWED
-            // IN H2.
-            this.dataGrid.setInsertion(false);
-            
-            // HIDE THE PART ID COLUMN
-            // THIS SETS THE WIDTH OF THE COLUMN TO 0
-            this.dataGrid.setHiddenColumns(new String[]{"part_id"});
-            this.dataGrid.setUneditableColumns(new String[]{"part_id"});
-          
-        }catch(SQLException se){
-            se.printStackTrace();
-        }catch(ClassNotFoundException cnfe){
-            cnfe.printStackTrace();
-        }
-        getContentPane().add(this.dataGrid.getComponent());
+	private void init() {
 
-        setVisible(true);
+		try {
+			System.out.println("url from ex 5: " + this.url);
+			this.ssConnection = new SSConnection(
+					"jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + this.url + "'", "sa", "");
 
-    }
- // END OF INIT FUNCTION
- }
+			this.ssConnection.setDriverName("org.h2.Driver");
+			this.ssConnection.createConnection();
+			this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
+			this.rowset.setCommand(
+					"SELECT part_name, color_code, weight, city, part_id FROM part_data ORDER BY part_name;");
+			// SET THE HEADER BEFORE SETTING THE ROWSET
+			this.dataGrid = new SSDataGrid();
+			this.dataGrid.setHeaders(new String[] { "Part Name", "Color Code", " Weight", "City" });
+			this.dataGrid.setSSRowSet(this.rowset);
+			this.dataGrid.setMessageWindow(this);
+
+			// DISABLES NEW INSERTIONS TO THE DATA BASE.
+			// DUE TO H2 DATABASE PROPERTIES, INSERTION OF NEW DATA CAUSES ERRORS.
+			// ANY CHANGES MADE TO THE PRESENT RECORD WILL BE SAVED BUT INSERTIONS ARE NOT
+			// ALLOWED
+			// IN H2.
+			this.dataGrid.setInsertion(false);
+
+			// HIDE THE PART ID COLUMN
+			// THIS SETS THE WIDTH OF THE COLUMN TO 0
+			this.dataGrid.setHiddenColumns(new String[] { "part_id" });
+			this.dataGrid.setUneditableColumns(new String[] { "part_id" });
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (ClassNotFoundException cnfe) {
+			cnfe.printStackTrace();
+		}
+		getContentPane().add(this.dataGrid.getComponent());
+
+		setVisible(true);
+
+	}
+	// END OF INIT FUNCTION
+}
 // END OF EXAMPLE 5
 
 /*
- * $Log$
- * Revision 1.8  2012/06/07 15:54:38  beevo
- * Modified example for compatibilty with H2 database.
+ * $Log$ Revision 1.8 2012/06/07 15:54:38 beevo Modified example for
+ * compatibilty with H2 database.
  *
- * Revision 1.7  2005/02/22 15:17:31  yoda2
- * Removed call to setPreferredSize().
+ * Revision 1.7 2005/02/22 15:17:31 yoda2 Removed call to setPreferredSize().
  *
- * Revision 1.6  2005/02/14 18:50:25  prasanth
- * Updated to remove calls to deprecated methods.
+ * Revision 1.6 2005/02/14 18:50:25 prasanth Updated to remove calls to
+ * deprecated methods.
  *
- * Revision 1.5  2005/02/04 22:40:12  yoda2
- * Updated Copyright info.
+ * Revision 1.5 2005/02/04 22:40:12 yoda2 Updated Copyright info.
  *
- * Revision 1.4  2004/11/11 15:04:38  yoda2
- * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
+ * Revision 1.4 2004/11/11 15:04:38 yoda2 Using TextPad, converted all tabs to
+ * "soft" tabs comprised of four actual spaces.
  *
- * Revision 1.3  2004/10/25 22:01:16  yoda2
- * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ * Revision 1.3 2004/10/25 22:01:16 yoda2 Updated JavaDoc for new datasource
+ * abstraction layer in 0.9.0 release.
  *
- * Revision 1.2  2004/10/25 19:52:12  prasanth
- * Modified to work with new SwingSet (SSConnection & SSRowSet)
+ * Revision 1.2 2004/10/25 19:52:12 prasanth Modified to work with new SwingSet
+ * (SSConnection & SSRowSet)
  *
- * Revision 1.1  2003/12/18 20:14:43  prasanth
- * Initial commit.
+ * Revision 1.1 2003/12/18 20:14:43 prasanth Initial commit.
  *
  */

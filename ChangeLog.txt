@@ -18,7 +18,8 @@ Changes:
 	9. Removed Bean property code from com.nqadmin.swingSet.datasources classes
 	10. Rewrote SSRowSet to extend RowSet and added default methods
 	11. Rewrote SSJdbcRowSetImpl to extend JdbcRowSetImpl and implement SSRowSet
-	12. 
+	12. Rewrote SSDBNav to add default methods from SSDBNavAdapter
+	13. Deprecated SSDBNavAdapter
 	   
 ==============================================================================
 SwingSet 2.2.0 - Released 2019-02-27

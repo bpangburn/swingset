@@ -37,173 +37,271 @@
 
 package com.nqadmin.swingSet;
 
+import java.io.Serializable;
+
 /**
  * SSDBNav.java
  * 
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * 
- * Interface that provides a set of functions to perform some custom operation
- * before a record is added, after a record is added, before a record is deleted
- * and after a record is deleted.
+ * Interface that provides a set of methods to perform custom operations before
+ * a record is added, after a record is added, before a record is deleted and
+ * after a record is deleted.
  *
- * These functions are called by the SSDataNavigator if the SSDBNav datamember of
- * the SSDataNavigator is set using the setDBNav() function of the
+ * These functions are called by the SSDataNavigator if the SSDBNav datamember
+ * of the SSDataNavigator is set using the setDBNav() function of the
  * SSDataNavigator.
  *
- *      performPreInsertOps() is called when the user presses the insert button.
+ * performPreInsertOps() is called when the user presses the insert button.
  *
- *      performPostInsertOps() is called when the user presses the commit button
- *           after updating the values for the newly inserted row. If the user
- *           presses the Undo button after the insert button is pressed the
- *           insertion is cancelled and this function will not be called.
+ * performPostInsertOps() is called when the user presses the commit button
+ * after updating the values for the newly inserted row. If the user presses the
+ * Undo button after the insert button is pressed the insertion is cancelled and
+ * this function will not be called.
  *
- *      performPreDeletionOps() is called when the user presses the delete
- *           button, but just before the deleteRow() method is called on the
- *           SSRowSet.
+ * performPreDeletionOps() is called when the user presses the delete button,
+ * but just before the deleteRow() method is called on the SSRowSet.
  *
- *      performPostDeletionOps() is called when the user presses the delete
- *           button and after the deleteRow() method is called on the SSRowSet.
+ * performPostDeletionOps() is called when the user presses the delete button
+ * and after the deleteRow() method is called on the SSRowSet.
  *
- *      Note that both the performPreDeletionOps() and performPostDeletionOps()
- *      will be executed when the user presses the delete button.
+ * Note that both the performPreDeletionOps() and performPostDeletionOps() will
+ * be executed when the user presses the delete button.
+ * 
+ * Generally the user will want to use/extend SSDBNavImp as it has an
+ * implementation of performPreInsertOps() that will clear/reset component
+ * values when a new record is added.
  */
-public interface SSDBNav {
+public interface SSDBNav extends Serializable {
 
-    /**
-     *  Constant indicating the navigation button next.
-     */
-    public static final int NAVIGATION_NEXT      = 1;
+	/**
+	 * unique serial id
+	 */
+	static final long serialVersionUID = -4632504656498312457L;
 
-    /**
-     *  Constant indicating the navigation button previous.
-     */
-    public static final int NAVIGATION_PREVIOUS  = 2;
+	/**
+	 * Enumeration for navigation buttons.
+	 */
+	public enum Navigation {
+		/** Next record button */
+		NEXT(1),
 
-    /**
-     *  Constant indicating the navigation button first.
-     */
-    public static final int NAVIGATION_FIRST     = 3;
+		/** Previous record button */
+		PREVIOUS(1),
 
-    /**
-     *  Constant indicating the navigation button last.
-     */
-    public static final int NAVIGATION_LAST      = 4;
+		/** First record button */
+		FIRST(2),
 
-    /**
-     * Method to perform pre-insertion operations.
-     */
-    public void performPreInsertOps();
+		/** Last record button */
+		LAST(3);
 
-    /**
-     *    This function is called just before inserting the row into the database
-     *@return true is row can be inserted else false.
-     */
-    public boolean allowInsertion();
-    
-    /**
-     * Method to perform post-insertion operations.
-     *
-     * In addition to this you can have a listener on the SSRowSet attached
-     * to a SSDataNavigator to get notified when a row is inserted.
-     */
-    public void performPostInsertOps();
+		private final int value;
 
-    /**
-     * Method to perform operations when the user is on the insert row and
-     * cancels the insert by clicking on the undo button.
-     */
-    public void performCancelOps();
+		Navigation(final int newValue) {
+			this.value = newValue;
+		}
 
-    /**
-     *  This function will be called after performPreDeletionOps is  called but before
-     *the row is deleted.
-     *@return true if the row can be deleted else false.
-     */
-    public boolean allowDeletion();
-    
-    /**
-     * Method to perform pre-deletion operations.
-     *
-     * SSRowSet provides notification before the deletion of a row. 
-     */
-    public void performPreDeletionOps();
+		/**
+		 * @return integer corresponding to enumerated value
+		 */
+		public int getValue() {
+			return this.value;
+		}
+	}
 
-    /**
-     * Method to perform post-deletion operations.
-     *
-     * The SSRowSet listener also provides the notification after the deletion of the row.
-     */
-    public void performPostDeletionOps();
+	/**
+	 * Constant indicating the navigation button next.
+	 * 
+	 * Please use Navigation.NEXT
+	 */
+	@Deprecated
+	public static final int NAVIGATION_NEXT = 1;
 
-    /**
-     * Method to perform navigation-related operations.
-     *
-     * Possible values are NAVIGATION_NEXT, NAVIGATION_PREVIOUS, NAVIGATION_FIRST,
-     * NAVIGATION_LAST.
-     *
-     * @param _navigationType    this indicates the type of navigation.
-     */
-    public void performNavigationOps(int _navigationType);
+	/**
+	 * Constant indicating the navigation button previous.
+	 * 
+	 * Please use Navigation.PREVIOUS
+	 */
+	@Deprecated
+	public static final int NAVIGATION_PREVIOUS = 2;
 
-    /**
-     * Method to perform operations when the user hits the refresh button.
-     */
-    public void performRefreshOps();
-    
-    /**
-     * This functions is called just before calling the updateRow on the rowset.
-     * @return true is the row can be updated else false.
-     */
-    public boolean allowUpdate();
-    
-    /**
-     * Method to perform operations after the updateRow has been called.
-     */
-    public void performPostUpdateOps();
+	/**
+	 * Constant indicating the navigation button first.
+	 * 
+	 * Please use Navigation.FIRST
+	 */
+	@Deprecated
+	public static final int NAVIGATION_FIRST = 3;
+
+	/**
+	 * Constant indicating the navigation button last.
+	 * 
+	 * Please use Navigation.LAST
+	 */
+	@Deprecated
+	public static final int NAVIGATION_LAST = 4;
+
+	/**
+	 * This function will be called after performPreDeletionOps is called but before
+	 * the row is deleted.
+	 * 
+	 * @return true if the row can be deleted else false.
+	 */
+	default boolean allowDeletion() {
+
+		return true;
+
+	}
+
+	/**
+	 * This function is called just before inserting the row into the database
+	 * 
+	 * @return true is row can be inserted else false.
+	 */
+	default boolean allowInsertion() {
+		return true;
+
+	}
+
+	/**
+	 * This functions is called just before calling the updateRow on the rowset.
+	 * 
+	 * @return true is the row can be updated else false.
+	 */
+	default boolean allowUpdate() {
+
+		return true;
+
+	}
+
+	/**
+	 * Method to perform operations when the user is on the insert row and cancels
+	 * the insert by clicking on the undo button.
+	 */
+	default void performCancelOps() {
+		// no action by default
+
+	}
+
+	/**
+	 * Method to perform navigation-related operations.
+	 *
+	 * Possible values are NAVIGATION_NEXT, NAVIGATION_PREVIOUS, NAVIGATION_FIRST,
+	 * NAVIGATION_LAST.
+	 * 
+	 * This method has been deprecated. Please use performNavigationOps(Navigation
+	 * _navType)
+	 * 
+	 * @param _navigationType this indicates the type of navigation.
+	 */
+	@Deprecated
+	default void performNavigationOps(int _navigationType) {
+		// no action by default
+
+	}
+
+	/**
+	 * Method to perform navigation-related operations.
+	 * 
+	 * @param _navType - indicates type of navigation that is occurring
+	 *
+	 */
+	default void performNavigationOps(Navigation _navType) {
+		// no action by default
+
+	}
+
+	/**
+	 * Method to perform post-deletion operations.
+	 *
+	 * The SSRowSet listener also provides the notification after the deletion of
+	 * the row.
+	 */
+	default void performPostDeletionOps() {
+		// no action by default
+
+	}
+
+	/**
+	 * Method to perform post-insertion operations.
+	 *
+	 * In addition to this you can have a listener on the SSRowSet attached to a
+	 * SSDataNavigator to get notified when a row is inserted.
+	 */
+	default void performPostInsertOps() {
+		// no action by default
+
+	}
+
+	/**
+	 * Method to perform operations after the updateRow has been called.
+	 */
+	default void performPostUpdateOps() {
+		// no action by default
+
+	}
+
+	/**
+	 * Method to perform pre-deletion operations.
+	 *
+	 * SSRowSet provides notification before the deletion of a row.
+	 */
+	default void performPreDeletionOps() {
+		// no action by default
+
+	}
+
+	/**
+	 * Method to perform pre-insertion operations.
+	 */
+	default void performPreInsertOps() {
+		// no action by default
+
+	}
+
+	/**
+	 * Method to perform operations when the user hits the refresh button.
+	 */
+	default void performRefreshOps() {
+		// no action by default
+
+	}
 
 } // end public interface SSDBNav {
 
 /*
- * $Log$
- * Revision 1.13  2005/11/02 17:10:23  yoda2
- * Added two functions: allowUpdate() & performPostUpdateOps()
+ * $Log$ Revision 1.13 2005/11/02 17:10:23 yoda2 Added two functions:
+ * allowUpdate() & performPostUpdateOps()
  *
- * Revision 1.12  2005/05/03 15:17:38  prasanth
- * Added two new functions to the interface.
- * 1. allowInsertion
- * 2. allowDeletion
+ * Revision 1.12 2005/05/03 15:17:38 prasanth Added two new functions to the
+ * interface. 1. allowInsertion 2. allowDeletion
  *
- * Revision 1.11  2005/02/09 17:21:21  yoda2
- * JavaDoc cleanup.
+ * Revision 1.11 2005/02/09 17:21:21 yoda2 JavaDoc cleanup.
  *
- * Revision 1.10  2005/02/04 22:48:53  yoda2
- * API cleanup & updated Copyright info.
+ * Revision 1.10 2005/02/04 22:48:53 yoda2 API cleanup & updated Copyright info.
  *
- * Revision 1.9  2004/11/11 14:45:48  yoda2
- * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
+ * Revision 1.9 2004/11/11 14:45:48 yoda2 Using TextPad, converted all tabs to
+ * "soft" tabs comprised of four actual spaces.
  *
- * Revision 1.8  2004/11/01 15:53:30  yoda2
- * Fixed various JavaDoc errors.
+ * Revision 1.8 2004/11/01 15:53:30 yoda2 Fixed various JavaDoc errors.
  *
- * Revision 1.7  2004/10/25 22:13:44  yoda2
- * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ * Revision 1.7 2004/10/25 22:13:44 yoda2 Updated JavaDoc for new datasource
+ * abstraction layer in 0.9.0 release.
  *
- * Revision 1.6  2004/08/10 22:06:59  yoda2
- * Added/edited JavaDoc, made code layout more uniform across classes, made various small coding improvements suggested by PMD.
+ * Revision 1.6 2004/08/10 22:06:59 yoda2 Added/edited JavaDoc, made code layout
+ * more uniform across classes, made various small coding improvements suggested
+ * by PMD.
  *
- * Revision 1.5  2004/03/08 16:43:37  prasanth
- * Updated copy right year.
+ * Revision 1.5 2004/03/08 16:43:37 prasanth Updated copy right year.
  *
- * Revision 1.4  2003/12/16 18:01:40  prasanth
- * Documented versions for release 0.6.0
+ * Revision 1.4 2003/12/16 18:01:40 prasanth Documented versions for release
+ * 0.6.0
  *
- * Revision 1.3  2003/11/26 21:21:50  prasanth
- * Added function performCancelOps().
+ * Revision 1.3 2003/11/26 21:21:50 prasanth Added function performCancelOps().
  *
- * Revision 1.2  2003/09/25 14:27:45  yoda2
- * Removed unused Import statements and added preformatting tags to JavaDoc descriptions.
+ * Revision 1.2 2003/09/25 14:27:45 yoda2 Removed unused Import statements and
+ * added preformatting tags to JavaDoc descriptions.
  *
- * Revision 1.1.1.1  2003/09/25 13:56:43  yoda2
- * Initial CVS import for SwingSet.
+ * Revision 1.1.1.1 2003/09/25 13:56:43 yoda2 Initial CVS import for SwingSet.
  *
  */

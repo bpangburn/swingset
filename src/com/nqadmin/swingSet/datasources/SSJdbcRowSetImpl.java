@@ -112,7 +112,6 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * @param _ssConnection SSConnection object to be used to connect to the
 	 *                      database.
 	 * @param _command      SQL query to be executed.
-	 * @throws SQLException
 	 */
 	@Deprecated
 	public SSJdbcRowSetImpl(SSConnection _ssConnection, String _command) {

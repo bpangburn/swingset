@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  * Copyright (C) 2003-2019, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
@@ -35,150 +36,159 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-import com.nqadmin.swingSet.*;
-import javax.swing.*;
-import java.sql.*;
-import java.awt.*;
-import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.sql.SQLException;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+import com.nqadmin.swingSet.SSDBNavImp;
+import com.nqadmin.swingSet.SSDataNavigator;
+import com.nqadmin.swingSet.SSTextField;
 import com.nqadmin.swingSet.datasources.SSConnection;
+import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
 
- /**
-  * This example demonstrates the use of SSTextDocument to display information in
-  * SSTextField (name, city, status, & supplier id). The navigation is done with
-  * SSDataNavigator.
-  */
+/**
+ * This example demonstrates the use of SSTextDocument to display information in
+ * SSTextField (name, city, status, & supplier id). The navigation is done with
+ * SSDataNavigator.
+ */
 
- public class Example1 extends JFrame{
+public class Example1 extends JFrame {
 
 	private static final long serialVersionUID = 1613223721461838426L;
-	JLabel lblSupplierName   = new JLabel("Name");
-    JLabel lblSupplierCity   = new JLabel("City");
-    JLabel lblSupplierStatus = new JLabel("Status");
+	JLabel lblSupplierName = new JLabel("Name");
+	JLabel lblSupplierCity = new JLabel("City");
+	JLabel lblSupplierStatus = new JLabel("Status");
 
-    SSTextField txtSupplierName   = new SSTextField();
-    SSTextField txtSupplierCity   = new SSTextField();
-    SSTextField txtSupplierStatus = new SSTextField();
-    SSTextField txtSupplierID   = new SSTextField();
+	SSTextField txtSupplierName = new SSTextField();
+	SSTextField txtSupplierCity = new SSTextField();
+	SSTextField txtSupplierStatus = new SSTextField();
+	SSTextField txtSupplierID = new SSTextField();
 
-    SSConnection ssConnection = null;
-    SSJdbcRowSetImpl rowset   = null;
-    SSDataNavigator navigator = null;
-    
-    /**
-     * Constructor for Example1
-     * 
-     * @param url - path to SQL to create suppliers & parts database
-     */
-    public Example1(String url) {
-   
-        super("Example1");
+	SSConnection ssConnection = null;
+	SSJdbcRowSetImpl rowset = null;
+	SSDataNavigator navigator = null;
 
-        setSize(600,200);
+	/**
+	 * Constructor for Example1
+	 * 
+	 * @param url - path to SQL to create suppliers & parts database
+	 */
+	public Example1(String url) {
 
-        try{
-        	this.ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+url+"'", "sa", "");
-        	System.out.println("url from ex 1: "+url);
-        	this.ssConnection.setDriverName("org.h2.Driver");
-            this.ssConnection.createConnection();
-                
-            this.rowset = new SSJdbcRowSetImpl(this.ssConnection);
-            this.rowset.setCommand("SELECT * FROM supplier_data");
-            this.navigator = new SSDataNavigator(this.rowset);
-            this.navigator.setDBNav( new SSDBNavImp(getContentPane()));
-        }catch(SQLException se){
-            se.printStackTrace();
-        }catch(ClassNotFoundException cnfe){
-            cnfe.printStackTrace();
-        }
-        
-        // THE FOLLOWING CODE IS USED BECAUSE OF AN H2 LIMITATION. UPDATABLE ROWSET IS NOT
-        // FULLY IMPLEMENTED AND AN EXECUTE COMMAND IS REQUIRED WHEN INSERTING A NEW
-        // ROW FOR KEEPING THE CURSOR AT THE NEWLY INSERTED ROW.
-        // IF USING ANOTHER DATABASE, THE FOLLOWING IS NOT REQURIED:         
-        this.navigator.setDBNav(new SSDBNavAdapter(){
-        	/**
+		super("Example1");
+
+		setSize(600, 200);
+
+		try {
+			this.ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + url + "'",
+					"sa", "");
+			System.out.println("url from ex 1: " + url);
+			this.ssConnection.setDriverName("org.h2.Driver");
+			this.ssConnection.createConnection();
+
+			this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
+			this.rowset.setCommand("SELECT * FROM supplier_data");
+			this.navigator = new SSDataNavigator(this.rowset);
+			this.navigator.setDBNav(new SSDBNavImp(getContentPane()));
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (ClassNotFoundException cnfe) {
+			cnfe.printStackTrace();
+		}
+
+		// THE FOLLOWING CODE IS USED BECAUSE OF AN H2 LIMITATION. UPDATABLE ROWSET IS
+		// NOT
+		// FULLY IMPLEMENTED AND AN EXECUTE COMMAND IS REQUIRED WHEN INSERTING A NEW
+		// ROW FOR KEEPING THE CURSOR AT THE NEWLY INSERTED ROW.
+		// IF USING ANOTHER DATABASE, THE FOLLOWING IS NOT REQURIED:
+		this.navigator.setDBNav(new SSDBNavImp(this) {
+			/**
 			 * unique serial id
 			 */
 			private static final long serialVersionUID = -7698780157683623074L;
+
+			/*
+			 * @Override public void performPreInsertOps() { super.performPreInsertOps();
+			 * Example1.this.txtSupplierName.setText(null);
+			 * Example1.this.txtSupplierCity.setText(null);
+			 * Example1.this.txtSupplierStatus.setText(null); }
+			 */
+
 			@Override
-        	public void performPreInsertOps() {
- 				super.performPreInsertOps();
- 				Example1.this.txtSupplierName.setText(null);
- 				Example1.this.txtSupplierCity.setText(null);
- 				Example1.this.txtSupplierStatus.setText(null);
- 			}
-        	@Override
- 			public void performPostInsertOps() {
- 				super.performPostInsertOps();
- 				try {
+			public void performPostInsertOps() {
+				// super.performPostInsertOps();
+				try {
 					Example1.this.rowset.execute();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
- 			}  
- 			
-         });
-        
-        // .BIND(SSRowSet _sSRowSet, String _columnName) REPLACES 
-        // DEPRECIATED .SETDOCUMENT(Document document) AND BINDS THE ROWSET AND
-        // THE DATABASE'S COLUMN NAME TO THE NAVIGATOR
-       
-        this.txtSupplierID.bind(this.rowset,"supplier_id");
-        this.txtSupplierName.bind(this.rowset,"supplier_name");
-        this.txtSupplierCity.bind(this.rowset,"city");
-        this.txtSupplierStatus.bind(this.rowset,"status");
-        
-        this.lblSupplierName.setPreferredSize(new Dimension(75,20));
-        this.lblSupplierCity.setPreferredSize(new Dimension(75,20));
-        this.lblSupplierStatus.setPreferredSize(new Dimension(75,20));
+			}
 
-        this.txtSupplierName.setPreferredSize(new Dimension(150,20));
-        this.txtSupplierCity.setPreferredSize(new Dimension(150,20));
-        this.txtSupplierStatus.setPreferredSize(new Dimension(150,20));
+		});
 
-        Container contentPane = getContentPane();
-        contentPane.setLayout(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
+		// .BIND(SSRowSet _sSRowSet, String _columnName) REPLACES
+		// DEPRECIATED .SETDOCUMENT(Document document) AND BINDS THE ROWSET AND
+		// THE DATABASE'S COLUMN NAME TO THE NAVIGATOR
 
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        contentPane.add(this.lblSupplierName, constraints);
-        constraints.gridy = 1;
-        contentPane.add(this.lblSupplierCity, constraints);
-        constraints.gridy = 2;
-        contentPane.add(this.lblSupplierStatus, constraints);
+		this.txtSupplierID.bind(this.rowset, "supplier_id");
+		this.txtSupplierName.bind(this.rowset, "supplier_name");
+		this.txtSupplierCity.bind(this.rowset, "city");
+		this.txtSupplierStatus.bind(this.rowset, "status");
 
-        constraints.gridx = 1;
-        constraints.gridy = 0;
-        contentPane.add(this.txtSupplierName, constraints);
-        constraints.gridy = 1;
-        contentPane.add(this.txtSupplierCity, constraints);
-        constraints.gridy = 2;
-        contentPane.add(this.txtSupplierStatus, constraints);
+		this.lblSupplierName.setPreferredSize(new Dimension(75, 20));
+		this.lblSupplierCity.setPreferredSize(new Dimension(75, 20));
+		this.lblSupplierStatus.setPreferredSize(new Dimension(75, 20));
 
-        constraints.gridx = 0;
-        constraints.gridy = 3;
-        constraints.gridwidth = 2;
-        contentPane.add(this.navigator,constraints);
+		this.txtSupplierName.setPreferredSize(new Dimension(150, 20));
+		this.txtSupplierCity.setPreferredSize(new Dimension(150, 20));
+		this.txtSupplierStatus.setPreferredSize(new Dimension(150, 20));
 
-        setVisible(true);
-        
-    }
+		Container contentPane = getContentPane();
+		contentPane.setLayout(new GridBagLayout());
+		GridBagConstraints constraints = new GridBagConstraints();
 
- }
+		constraints.gridx = 0;
+		constraints.gridy = 0;
+		contentPane.add(this.lblSupplierName, constraints);
+		constraints.gridy = 1;
+		contentPane.add(this.lblSupplierCity, constraints);
+		constraints.gridy = 2;
+		contentPane.add(this.lblSupplierStatus, constraints);
+
+		constraints.gridx = 1;
+		constraints.gridy = 0;
+		contentPane.add(this.txtSupplierName, constraints);
+		constraints.gridy = 1;
+		contentPane.add(this.txtSupplierCity, constraints);
+		constraints.gridy = 2;
+		contentPane.add(this.txtSupplierStatus, constraints);
+
+		constraints.gridx = 0;
+		constraints.gridy = 3;
+		constraints.gridwidth = 2;
+		contentPane.add(this.navigator, constraints);
+
+		setVisible(true);
+
+	}
+
+}
 
 /*
- * $Log$
- * Revision 1.10  2012/06/07 16:12:40  beevo
- * Modified example for compatibilty with H2 database.
+ * $Log$ Revision 1.10 2012/06/07 16:12:40 beevo Modified example for
+ * compatibilty with H2 database.
  *
- * Revision 1.7  2005/02/04 22:40:12  yoda2
- * Updated Copyright info.
+ * Revision 1.7 2005/02/04 22:40:12 yoda2 Updated Copyright info.
  *
- * Revision 1.6  2004/11/11 15:04:38  yoda2
- * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
+ * Revision 1.6 2004/11/11 15:04:38 yoda2 Using TextPad, converted all tabs to
+ * "soft" tabs comprised of four actual spaces.
  *
- * Revision 1.5  2004/10/25 22:01:16  yoda2
- * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ * Revision 1.5 2004/10/25 22:01:16 yoda2 Updated JavaDoc for new datasource
+ * abstraction layer in 0.9.0 release.
  *
  */

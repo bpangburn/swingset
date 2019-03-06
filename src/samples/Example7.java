@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  * Copyright (C) 2003-2019, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
@@ -35,145 +36,150 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-import com.nqadmin.swingSet.*;
-import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.JFrame;
+
+import com.nqadmin.swingSet.SSDataGrid;
 import com.nqadmin.swingSet.datasources.SSConnection;
-
-import javax.swing.*;
-
-import java.sql.*;
+import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
 
 /**
- * This example is similar to Example6, demonstrating the use of an SSDataGrid to display a tabular
- * view of the suppliers & parts data. It adds a ComboRenderer with a lookup to another table for the
- * supplier name and adds a DateRenderer for the ship date.
+ * This example is similar to Example6, demonstrating the use of an SSDataGrid
+ * to display a tabular view of the suppliers & parts data. It adds a
+ * ComboRenderer with a lookup to another table for the supplier name and adds a
+ * DateRenderer for the ship date.
  */
 public class Example7 extends JFrame {
 
 	private static final long serialVersionUID = 5925004336834854311L;
 	SSConnection ssConnection = null;
-    SSJdbcRowSetImpl rowset   = null;
-    SSDataGrid dataGrid = new SSDataGrid();
-    String url;
+	SSJdbcRowSetImpl rowset = null;
+	SSDataGrid dataGrid = new SSDataGrid();
+	String url;
 
-    /**
-     * Constructor for Example7
-     * 
-     * @param _url - path to SQL to create suppliers & parts database
-     */
-    public Example7(String _url){
-        super("Example 7");
-        this.url = _url;
-        setSize(730,290);
-        init();
-    }
+	/**
+	 * Constructor for Example7
+	 * 
+	 * @param _url - path to SQL to create suppliers & parts database
+	 */
+	public Example7(String _url) {
+		super("Example 7");
+		this.url = _url;
+		setSize(730, 290);
+		init();
+	}
 
-    private void init(){
+	private void init() {
 
-        try{
-        	System.out.println("url from ex 7: "+this.url);
-        	this.ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '"+this.url+"'", "sa", "");
-        	
-            this.ssConnection.setDriverName("org.h2.Driver");
-            this.ssConnection.createConnection();
-            
-            this.rowset = new SSJdbcRowSetImpl(this.ssConnection);
-            this.rowset.setCommand("SELECT supplier_id, part_id,quantity, ship_date, supplier_part_id FROM supplier_part_data ORDER BY supplier_id, part_id;");
+		try {
+			System.out.println("url from ex 7: " + this.url);
+			this.ssConnection = new SSConnection(
+					"jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + this.url + "'", "sa", "");
 
-            //  SET THE HEADER BEFORE SETTING THE ROWSET
-            this.dataGrid.setHeaders(new String[]{"Supplier Name", "Part Name", "Quantity", " Ship Date"});
-            this.dataGrid.setSSRowSet(this.rowset);
+			this.ssConnection.setDriverName("org.h2.Driver");
+			this.ssConnection.createConnection();
 
-            this.dataGrid.updateUI();
+			this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
+			this.rowset.setCommand(
+					"SELECT supplier_id, part_id,quantity, ship_date, supplier_part_id FROM supplier_part_data ORDER BY supplier_id, part_id;");
 
-            // HIDE THE PART ID COLUMN
-            // THIS SETS THE WIDTH OF THE COLUMN TO 0
-            this.dataGrid.setHiddenColumns(new String[]{"supplier_part_id"});
+			// SET THE HEADER BEFORE SETTING THE ROWSET
+			this.dataGrid.setHeaders(new String[] { "Supplier Name", "Part Name", "Quantity", " Ship Date" });
+			this.dataGrid.setSSRowSet(this.rowset);
 
-            this.dataGrid.setDateRenderer("ship_date");
+			this.dataGrid.updateUI();
 
-            this.dataGrid.setMessageWindow(this);
-            this.dataGrid.setUneditableColumns(new int[]{4});
-            
-            // DISABLES NEW INSERTIONS TO THE DATA BASE.
-            // DUE TO H2 DATABASE PROPERTIES, INSERTION OF NEW DATA CAUSES ERRORS.
-            // ANY CHANGES MADE TO THE PRESENT RECORD WILL BE SAVED BUT INSERTIONS ARE NOT ALLOWED
-            // IN H2.
-            this.dataGrid.setInsertion(false);
-           
-             // ADDED STATEMENT "SCROLL INSENSITIVITY" FOR EXAMPLE TO BE
-             // COMPATIBLE WITH H2 DATABASE DEFAULT SETTINGS.
-            try (Statement stmt = this.ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE)) {
-            	
-            	String[] displayItems = null;
-	            Integer[] underlyingNumbers = null;
+			// HIDE THE PART ID COLUMN
+			// THIS SETS THE WIDTH OF THE COLUMN TO 0
+			this.dataGrid.setHiddenColumns(new String[] { "supplier_part_id" });
 
-        		try (ResultSet rs = stmt.executeQuery("SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;")) {
-       
-		            rs.last();
-		            displayItems  = new String[rs.getRow()];
-		            underlyingNumbers = new Integer[rs.getRow()];
-		            rs.beforeFirst();
-		
-		            for (int i=0; i<displayItems.length; i++) { 
-		            	rs.next();
-		                displayItems[i] = rs.getString("supplier_name");
-		                underlyingNumbers[i] = new Integer(rs.getInt("supplier_id"));
-		            }
-		
-		            this.dataGrid.setComboRenderer("supplier_id",displayItems,underlyingNumbers);
-        		}
-        		
-        		try (ResultSet rs = stmt.executeQuery("SELECT part_name, part_id FROM part_data ORDER BY part_name;")) {
-		            rs.last();
-		            displayItems  = new String[rs.getRow()];
-		            underlyingNumbers = new Integer[rs.getRow()];
-		            rs.beforeFirst();
-		
-		            for (int i=0; i<displayItems.length; i++) {
-		                rs.next();
-		                displayItems[i] = rs.getString("part_name");
-		                underlyingNumbers[i] = new Integer(rs.getInt("part_id"));
-		            }
-		
-		            this.dataGrid.setComboRenderer("part_id",displayItems,underlyingNumbers);
-        		}
-            }
+			this.dataGrid.setDateRenderer("ship_date");
 
-        }catch(SQLException se){
-            se.printStackTrace();
-        }catch(ClassNotFoundException cnfe){
-            cnfe.printStackTrace();
-        }
+			this.dataGrid.setMessageWindow(this);
+			this.dataGrid.setUneditableColumns(new int[] { 4 });
 
-        getContentPane().add(this.dataGrid.getComponent());
+			// DISABLES NEW INSERTIONS TO THE DATA BASE.
+			// DUE TO H2 DATABASE PROPERTIES, INSERTION OF NEW DATA CAUSES ERRORS.
+			// ANY CHANGES MADE TO THE PRESENT RECORD WILL BE SAVED BUT INSERTIONS ARE NOT
+			// ALLOWED
+			// IN H2.
+			this.dataGrid.setInsertion(false);
 
-        setVisible(true);
-    } // END OF INIT FUNCTION
-   
- }// END OF EXAMPLE 7
+			// ADDED STATEMENT "SCROLL INSENSITIVITY" FOR EXAMPLE TO BE
+			// COMPATIBLE WITH H2 DATABASE DEFAULT SETTINGS.
+			try (Statement stmt = this.ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_UPDATABLE)) {
+
+				String[] displayItems = null;
+				Integer[] underlyingNumbers = null;
+
+				try (ResultSet rs = stmt
+						.executeQuery("SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;")) {
+
+					rs.last();
+					displayItems = new String[rs.getRow()];
+					underlyingNumbers = new Integer[rs.getRow()];
+					rs.beforeFirst();
+
+					for (int i = 0; i < displayItems.length; i++) {
+						rs.next();
+						displayItems[i] = rs.getString("supplier_name");
+						underlyingNumbers[i] = new Integer(rs.getInt("supplier_id"));
+					}
+
+					this.dataGrid.setComboRenderer("supplier_id", displayItems, underlyingNumbers);
+				}
+
+				try (ResultSet rs = stmt.executeQuery("SELECT part_name, part_id FROM part_data ORDER BY part_name;")) {
+					rs.last();
+					displayItems = new String[rs.getRow()];
+					underlyingNumbers = new Integer[rs.getRow()];
+					rs.beforeFirst();
+
+					for (int i = 0; i < displayItems.length; i++) {
+						rs.next();
+						displayItems[i] = rs.getString("part_name");
+						underlyingNumbers[i] = new Integer(rs.getInt("part_id"));
+					}
+
+					this.dataGrid.setComboRenderer("part_id", displayItems, underlyingNumbers);
+				}
+			}
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (ClassNotFoundException cnfe) {
+			cnfe.printStackTrace();
+		}
+
+		getContentPane().add(this.dataGrid.getComponent());
+
+		setVisible(true);
+	} // END OF INIT FUNCTION
+
+}// END OF EXAMPLE 7
 
 /*
- * $Log$
- * Revision 1.7  2012/06/07 15:54:38  beevo
- * Modified example for compatibilty with H2 database.
+ * $Log$ Revision 1.7 2012/06/07 15:54:38 beevo Modified example for
+ * compatibilty with H2 database.
  *
- * Revision 1.6  2005/02/14 18:50:25  prasanth
- * Updated to remove calls to deprecated methods.
+ * Revision 1.6 2005/02/14 18:50:25 prasanth Updated to remove calls to
+ * deprecated methods.
  *
- * Revision 1.5  2005/02/04 22:40:12  yoda2
- * Updated Copyright info.
+ * Revision 1.5 2005/02/04 22:40:12 yoda2 Updated Copyright info.
  *
- * Revision 1.4  2004/11/11 15:04:38  yoda2
- * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
+ * Revision 1.4 2004/11/11 15:04:38 yoda2 Using TextPad, converted all tabs to
+ * "soft" tabs comprised of four actual spaces.
  *
- * Revision 1.3  2004/10/25 22:01:15  yoda2
- * Updated JavaDoc for new datasource abstraction layer in 0.9.0 release.
+ * Revision 1.3 2004/10/25 22:01:15 yoda2 Updated JavaDoc for new datasource
+ * abstraction layer in 0.9.0 release.
  *
- * Revision 1.2  2004/10/25 19:52:12  prasanth
- * Modified to work with new SwingSet (SSConnection & SSRowSet)
+ * Revision 1.2 2004/10/25 19:52:12 prasanth Modified to work with new SwingSet
+ * (SSConnection & SSRowSet)
  *
- * Revision 1.1  2003/12/18 20:14:43  prasanth
- * Initial commit.
+ * Revision 1.1 2003/12/18 20:14:43 prasanth Initial commit.
  *
  */
