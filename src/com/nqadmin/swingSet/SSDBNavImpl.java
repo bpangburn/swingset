@@ -40,16 +40,10 @@ package com.nqadmin.swingSet;
 import java.awt.Component;
 import java.awt.Container;
 
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 import com.nqadmin.swingSet.formatting.SSFormattedTextField;
+import com.nqadmin.swingSet.utils.SSComponent;
 
 /**
  * SSDBNavImpl.java
@@ -114,53 +108,91 @@ public class SSDBNavImpl implements SSDBNav {
 	 */
 	protected void setComponents(Container _container) {
 
-		// TODO system.out.println or throw exception for unknown component
-		// see enum example here:
-		// https://stackoverflow.com/questions/5579309/switch-instanceof
-
 		Component[] comps = _container.getComponents();
 
 		for (int i = 0; i < comps.length; i++) {
-			if (comps[i] instanceof JTextField) {
-				// IF IT IS A SSFormattedTextField SET ITS VALUE TO NULL (to avoid parse
-				// exception)
-				if (comps[i] instanceof SSFormattedTextField) {
-					((SSFormattedTextField) comps[i]).setValue(null);
-				} else {
-					// IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING
-					((JTextField) comps[i]).setText("");
-				}
 
-			} else if (comps[i] instanceof JTextArea) {
-				// IF IT IS A JTextArea, SET TO EMPTY STRING
-				((JTextArea) comps[i]).setText("");
-			} else if (comps[i] instanceof JComboBox) {
-				// IF IT IS A JComboBox THEN SET IT TO 'EMPTY' ITEM BEFORE FIRST ITEM
-				((JComboBox<?>) comps[i]).setSelectedIndex(-1);
-			} else if (comps[i] instanceof SSImage) {
-				// IF IT IS A SSImage CLEAR THE IMAGE.
-				((SSImage) comps[i]).clearImage();
-			} else if (comps[i] instanceof JCheckBox) {
-				// IF IT IS A JCheckBox UNCHECK
-				((JCheckBox) comps[i]).setSelected(false);
-			} else if (comps[i] instanceof SSLabel) {
-				// IF IT IS A SSLabel, SET TO EMPTY STRING
-				((SSLabel) comps[i]).setText("");
-			} else if (comps[i] instanceof JSlider) {
-				// IF IT IS A JSlider, SET TO AVERAGE OF MIN/MAX VALUES
-				((JSlider) comps[i])
-						.setValue((((JSlider) comps[i]).getMinimum() + ((JSlider) comps[i]).getMaximum()) / 2);
-			} else if (comps[i] instanceof JPanel) {
-				// IF IT IS A JPanel RECURSIVELY SET THE FIELDS
+			/*
+			 * JPanel, JScrollPane, JTabbedPane,
+			 * 
+			 * SSCheckBox, SSComboBox, SSFormattedTextField, SSImage, SSLabel, SSSlider,
+			 * SSTextArea, SSTextField
+			 */
+
+			SSComponent ssComponent = SSComponent.valueOf(comps[i].getClass().getSimpleName());
+			switch (ssComponent) {
+			case JPanel:
+				// RECURSIVELY SET COMPONENTS ON JPANEL
 				setComponents((Container) comps[i]);
-			} else if (comps[i] instanceof JTabbedPane) {
-				// IF IT IS A JTabbedPane RECURSIVELY SET THE FIELDS
-				setComponents((Container) comps[i]);
-			} else if (comps[i] instanceof JScrollPane) {
-				// IF IT IS A JScrollPane GET THE VIEW PORT AND RECURSIVELY SET THE FIELDS IN
-				// VIEW PORT
+				break;
+			case JScrollPane:
+				// RECURSIVELY SET COMPONENTS ON JSCROLLPANE VIEWPORT
 				setComponents(((JScrollPane) comps[i]).getViewport());
+				break;
+			case JTabbedPane:
+				// RECURSIVELY SET COMPONENTS ON JTABBEDPANE
+				setComponents((Container) comps[i]);
+				break;
+			case SSCheckBox:
+				((SSCheckBox) comps[i]).setSelected(false);
+				break;
+			case SSComboBox:
+				((SSComboBox) comps[i]).setSelectedIndex(-1);
+				break;
+			case SSFormattedTextField:
+				((SSFormattedTextField) comps[i]).setValue(null);
+				break;
+			case SSImage:
+				((SSImage) comps[i]).clearImage();
+				break;
+			case SSLabel:
+				((SSLabel) comps[i]).setText("");
+				break;
+			case SSSlider:
+				((SSSlider) comps[i])
+						.setValue((((SSSlider) comps[i]).getMinimum() + ((SSSlider) comps[i]).getMaximum()) / 2);
+				break;
+			case SSTextArea:
+				((SSTextArea) comps[i]).setText("");
+				break;
+			case SSTextField:
+				((SSTextField) comps[i]).setText("");
+				break;
+
+			default:
+				System.out.println("While resetting fields, encountered unknown " + ssComponent + " component.");
+				break;
+
 			}
+
+			/*
+			 * 
+			 * if (comps[i] instanceof JTextField) { // IF IT IS A SSFormattedTextField SET
+			 * ITS VALUE TO NULL (to avoid parse // exception) if (comps[i] instanceof
+			 * SSFormattedTextField) { ((SSFormattedTextField) comps[i]).setValue(null); }
+			 * else { // IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING ((JTextField)
+			 * comps[i]).setText(""); }
+			 * 
+			 * } else if (comps[i] instanceof JTextArea) { // IF IT IS A JTextArea, SET TO
+			 * EMPTY STRING ((JTextArea) comps[i]).setText(""); } else if (comps[i]
+			 * instanceof JComboBox) { // IF IT IS A JComboBox THEN SET IT TO 'EMPTY' ITEM
+			 * BEFORE FIRST ITEM ((JComboBox<?>) comps[i]).setSelectedIndex(-1); } else if
+			 * (comps[i] instanceof SSImage) { // IF IT IS A SSImage CLEAR THE IMAGE.
+			 * ((SSImage) comps[i]).clearImage(); } else if (comps[i] instanceof JCheckBox)
+			 * { // IF IT IS A JCheckBox UNCHECK ((JCheckBox) comps[i]).setSelected(false);
+			 * } else if (comps[i] instanceof SSLabel) { // IF IT IS A SSLabel, SET TO EMPTY
+			 * STRING ((SSLabel) comps[i]).setText(""); } else if (comps[i] instanceof
+			 * JSlider) { // IF IT IS A JSlider, SET TO AVERAGE OF MIN/MAX VALUES ((JSlider)
+			 * comps[i]) .setValue((((JSlider) comps[i]).getMinimum() + ((JSlider)
+			 * comps[i]).getMaximum()) / 2); } else if (comps[i] instanceof JPanel) { // IF
+			 * IT IS A JPanel RECURSIVELY SET THE FIELDS setComponents((Container)
+			 * comps[i]); } else if (comps[i] instanceof JTabbedPane) { // IF IT IS A
+			 * JTabbedPane RECURSIVELY SET THE FIELDS setComponents((Container) comps[i]); }
+			 * else if (comps[i] instanceof JScrollPane) { // IF IT IS A JScrollPane GET THE
+			 * VIEW PORT AND RECURSIVELY SET THE FIELDS IN // VIEW PORT
+			 * setComponents(((JScrollPane) comps[i]).getViewport()); }
+			 * 
+			 */
 
 		}
 
