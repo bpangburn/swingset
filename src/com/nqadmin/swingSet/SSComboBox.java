@@ -749,7 +749,7 @@ public class SSComboBox extends JComboBox<Object> {
 	 *         returns false if the size of arrays do not match or if the values
 	 *         could not be set
 	 *
-	 * @deprecated Use {@link #setOptions(String[] _options, int[]_mappings)}
+	 * @deprecated Use {@link #setOptions(String[] _options, int[] _mappings)}
 	 *             instead.
 	 */
 	@Deprecated

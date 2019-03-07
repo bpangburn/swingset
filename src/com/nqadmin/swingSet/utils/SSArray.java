@@ -49,6 +49,8 @@ import java.util.Map;
  * 
  * Implementation of SQL array for SSList.
  */
+
+// TODO only reference is in com.nqadmin.swingSet.SSList
 public class SSArray implements Array {
 
 	/**
@@ -63,7 +65,8 @@ public class SSArray implements Array {
 
 	/**
 	 * Creates SSArray with the object array and data base type
-	 * @param _data object array of SSArray
+	 * 
+	 * @param _data         object array of SSArray
 	 * @param _baseTypeName Array elements database type name
 	 */
 	public SSArray(Object[] _data, String _baseTypeName) {
@@ -72,14 +75,14 @@ public class SSArray implements Array {
 		this.data = _data.clone();
 		this.baseTypeName = _baseTypeName;
 	}
-	
+
 	@Override
 	public void free() throws SQLException {
 		// do nothing
 	}
 
 	/**
-	 * returns Object Array contained in SSArray 
+	 * returns Object Array contained in SSArray
 	 */
 	@Override
 	public Object getArray() throws SQLException {
@@ -108,6 +111,7 @@ public class SSArray implements Array {
 
 	/**
 	 * returns the base type name of db array elements
+	 * 
 	 * @return _baseTypeName data base type name
 	 */
 	@Override
@@ -136,8 +140,7 @@ public class SSArray implements Array {
 	}
 
 	/**
-	 * Returns a string value with comma separated values.
-	 * e.g. "{100,200,300}"
+	 * Returns a string value with comma separated values. e.g. "{100,200,300}"
 	 */
 	@Override
 	public String toString() {

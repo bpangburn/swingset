@@ -45,6 +45,7 @@ package com.nqadmin.swingSet.utils;
  * Enum for the Swing and SwingSet component types
  */
 
+@SuppressWarnings("javadoc")
 public enum SSComponent {
 
 	JPanel, JScrollPane, JTabbedPane,
