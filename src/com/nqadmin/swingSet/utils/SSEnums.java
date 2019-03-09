@@ -42,14 +42,17 @@ package com.nqadmin.swingSet.utils;
  * 
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * 
- * Enum for the Swing and SwingSet component types
+ * Various Enumerations for SwingSet
  */
+public class SSEnums {
 
-@SuppressWarnings("javadoc")
-public enum SSComponent {
+	@SuppressWarnings("javadoc")
+	public enum SSComponent {
 
-	JPanel, JScrollPane, JTabbedPane,
+		JPanel, JScrollPane, JTabbedPane,
 
-	SSCheckBox, SSComboBox, SSFormattedTextField, SSImage, SSLabel, SSSlider, SSTextArea, SSTextField
+		SSCheckBox, SSComboBox, SSFormattedTextField, SSImage, SSLabel, SSSlider, SSTextArea, SSTextField
+
+	}
 
 }

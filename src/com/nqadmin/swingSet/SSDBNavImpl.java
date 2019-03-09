@@ -43,7 +43,7 @@ import java.awt.Container;
 import javax.swing.JScrollPane;
 
 import com.nqadmin.swingSet.formatting.SSFormattedTextField;
-import com.nqadmin.swingSet.utils.SSComponent;
+import com.nqadmin.swingSet.utils.SSEnums.SSComponent;
 
 /**
  * SSDBNavImpl.java
