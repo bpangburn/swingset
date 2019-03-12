@@ -39,6 +39,8 @@ package com.nqadmin.swingSet;
 
 import java.io.Serializable;
 
+import com.nqadmin.swingSet.utils.SSEnums.Navigation;
+
 /**
  * SSDBNav.java
  * 
@@ -80,39 +82,9 @@ public interface SSDBNav extends Serializable {
 	static final long serialVersionUID = -4632504656498312457L;
 
 	/**
-	 * Enumeration for navigation buttons.
-	 */
-	public enum Navigation {
-		/** Next record button */
-		NEXT(1),
-
-		/** Previous record button */
-		PREVIOUS(1),
-
-		/** First record button */
-		FIRST(2),
-
-		/** Last record button */
-		LAST(3);
-
-		private final int value;
-
-		Navigation(final int newValue) {
-			this.value = newValue;
-		}
-
-		/**
-		 * @return integer corresponding to enumerated value
-		 */
-		public int getValue() {
-			return this.value;
-		}
-	}
-
-	/**
 	 * Constant indicating the navigation button next.
 	 * 
-	 * @deprecated Starting in 2.3.0+ use {@link Navigation#NEXT} instead.
+	 * @deprecated Starting in 2.3.0+ use {@link Navigation#Next} instead.
 	 */
 	@Deprecated
 	public static final int NAVIGATION_NEXT = 1;
@@ -120,7 +92,7 @@ public interface SSDBNav extends Serializable {
 	/**
 	 * Constant indicating the navigation button previous.
 	 * 
-	 * @deprecated Starting in 2.3.0+ use {@link Navigation#PREVIOUS} instead.
+	 * @deprecated Starting in 2.3.0+ use {@link Navigation#Previous} instead.
 	 */
 	@Deprecated
 	public static final int NAVIGATION_PREVIOUS = 2;
@@ -128,7 +100,7 @@ public interface SSDBNav extends Serializable {
 	/**
 	 * Constant indicating the navigation button first.
 	 * 
-	 * @deprecated Starting in 2.3.0+ use {@link Navigation#FIRST} instead.
+	 * @deprecated Starting in 2.3.0+ use {@link Navigation#First} instead.
 	 */
 	@Deprecated
 	public static final int NAVIGATION_FIRST = 3;
@@ -136,7 +108,7 @@ public interface SSDBNav extends Serializable {
 	/**
 	 * Constant indicating the navigation button last.
 	 * 
-	 * @deprecated Starting in 2.3.0+ use {@link Navigation#LAST} instead.
+	 * @deprecated Starting in 2.3.0+ use {@link Navigation#Last} instead.
 	 */
 	@Deprecated
 	public static final int NAVIGATION_LAST = 4;
@@ -191,7 +163,9 @@ public interface SSDBNav extends Serializable {
 	 * 
 	 * @param _navigationType this indicates the type of navigation.
 	 * 
-	 * @deprecated Use {@link #performNavigationOps(Navigation _navType)} instead.
+	 * @deprecated Use
+	 *             {@link #performNavigationOps(com.nqadmin.swingSet.utils.SSEnums.Navigation _navType)}
+	 *             instead.
 	 */
 	@Deprecated
 	default void performNavigationOps(int _navigationType) {

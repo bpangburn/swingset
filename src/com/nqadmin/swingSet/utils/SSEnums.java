@@ -38,7 +38,7 @@
 package com.nqadmin.swingSet.utils;
 
 /**
- * Components.java
+ * SSEnums.java
  * 
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * 
@@ -46,6 +46,9 @@ package com.nqadmin.swingSet.utils;
  */
 public class SSEnums {
 
+	/*
+	 * Enumeration for SwingSet component types.
+	 */
 	@SuppressWarnings("javadoc")
 	public enum SSComponent {
 
@@ -53,6 +56,61 @@ public class SSEnums {
 
 		SSCheckBox, SSComboBox, SSFormattedTextField, SSImage, SSLabel, SSSlider, SSTextArea, SSTextField
 
+	}
+
+	/**
+	 * Enumeration for navigation buttons.
+	 */
+	@SuppressWarnings("javadoc")
+	public enum Navigation {
+		Next(1), Previous(1), First(2), Last(3);
+
+		private final int value;
+
+		Navigation(final int newValue) {
+			this.value = newValue;
+		}
+
+		/**
+		 * @return integer corresponding to enumerated value
+		 */
+		public int getValue() {
+			return this.value;
+		}
+	}
+
+	/**
+	 * Enumeration for navigation buttons.
+	 */
+	@SuppressWarnings("javadoc")
+	public enum CheckBoxValues {
+
+		// protected static String BOOLEAN_CHECKED = "true";
+
+		// protected static String BOOLEAN_UNCHECKED = "false";
+		Checked(1, "true"), Unchecked(0, "false");
+
+		private final int intValue;
+		private final String stringValue;
+
+		CheckBoxValues(final int newIntValue, final String newStringValue) {
+			this.intValue = newIntValue;
+			this.stringValue = newStringValue;
+		}
+
+		/**
+		 * @return integer corresponding to enumerated value
+		 */
+		public int getIntValue() {
+			return this.intValue;
+		}
+
+		/**
+		 * @return String corresponding to enumerated value
+		 */
+		public String getStringValue() {
+			return this.stringValue;
+		}
 	}
 
 }

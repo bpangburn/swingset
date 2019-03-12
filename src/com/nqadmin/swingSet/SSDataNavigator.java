@@ -56,6 +56,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import com.nqadmin.swingSet.datasources.SSRowSet;
+import com.nqadmin.swingSet.utils.SSEnums.Navigation;
 
 /**
  * SSDataNavigator.java
@@ -772,7 +773,7 @@ public class SSDataNavigator extends JPanel {
 					updateNavigator();
 
 					if (SSDataNavigator.this.dBNav != null) {
-						SSDataNavigator.this.dBNav.performNavigationOps(SSDBNav.Navigation.FIRST);
+						SSDataNavigator.this.dBNav.performNavigationOps(Navigation.First);
 						// ALSO CALL DEPRECATED performNavigationOps TO ALLOW FOR LEGACY CODE
 						SSDataNavigator.this.dBNav.performNavigationOps(SSDBNav.NAVIGATION_FIRST);
 					}
@@ -822,7 +823,7 @@ public class SSDataNavigator extends JPanel {
 					updateNavigator();
 
 					if (SSDataNavigator.this.dBNav != null) {
-						SSDataNavigator.this.dBNav.performNavigationOps(SSDBNav.Navigation.PREVIOUS);
+						SSDataNavigator.this.dBNav.performNavigationOps(Navigation.Previous);
 						// ALSO CALL DEPRECATED performNavigationOps TO ALLOW FOR LEGACY CODE
 						SSDataNavigator.this.dBNav.performNavigationOps(SSDBNav.NAVIGATION_PREVIOUS);
 					}
@@ -870,7 +871,7 @@ public class SSDataNavigator extends JPanel {
 					updateNavigator();
 
 					if (SSDataNavigator.this.dBNav != null) {
-						SSDataNavigator.this.dBNav.performNavigationOps(SSDBNav.Navigation.NEXT);
+						SSDataNavigator.this.dBNav.performNavigationOps(Navigation.Next);
 						// ALSO CALL DEPRECATED performNavigationOps TO ALLOW FOR LEGACY CODE
 						SSDataNavigator.this.dBNav.performNavigationOps(SSDBNav.NAVIGATION_NEXT);
 					}
@@ -918,7 +919,7 @@ public class SSDataNavigator extends JPanel {
 					updateNavigator();
 
 					if (SSDataNavigator.this.dBNav != null) {
-						SSDataNavigator.this.dBNav.performNavigationOps(SSDBNav.Navigation.LAST);
+						SSDataNavigator.this.dBNav.performNavigationOps(Navigation.Last);
 						// ALSO CALL DEPRECATED performNavigationOps TO ALLOW FOR LEGACY CODE
 						SSDataNavigator.this.dBNav.performNavigationOps(SSDBNav.NAVIGATION_LAST);
 					}
