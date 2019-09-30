@@ -23,6 +23,7 @@ Changes:
 	14. Deprecated SSDBNavImp and replaced with SSDBNavImpl
 	15. Updated @deprecated JavaDoc annotation, providing link to suggested replacement
 	16. Removed SSDBCheckBox (deprecated long ago)
+	17. Fixed error in SSDBNavImpl when trying to clear fields for a new record
 	   
 ==============================================================================
 SwingSet 2.2.0 - Released 2019-02-27
