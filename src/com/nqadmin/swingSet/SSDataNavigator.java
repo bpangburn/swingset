@@ -778,8 +778,9 @@ public class SSDataNavigator extends JPanel {
 						SSDataNavigator.this.dBNav.performNavigationOps(SSDBNav.NAVIGATION_FIRST);
 					}
 					// GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD
-					SSDataNavigator.this.currentRow = 1;
-					SSDataNavigator.this.txtCurrentRow.setText(String.valueOf(SSDataNavigator.this.currentRow));
+					// 2019-10-14: updateNavigator should take care of this
+					//SSDataNavigator.this.currentRow = 1;
+					//SSDataNavigator.this.txtCurrentRow.setText(String.valueOf(SSDataNavigator.this.currentRow));
 				} catch (SQLException se) {
 					se.printStackTrace();
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
@@ -828,8 +829,9 @@ public class SSDataNavigator extends JPanel {
 						SSDataNavigator.this.dBNav.performNavigationOps(SSDBNav.NAVIGATION_PREVIOUS);
 					}
 					// GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD
-					SSDataNavigator.this.currentRow = SSDataNavigator.this.sSRowSet.getRow();
-					SSDataNavigator.this.txtCurrentRow.setText(String.valueOf(SSDataNavigator.this.currentRow));
+					// 2019-10-14: updateNavigator should take care of this
+					//SSDataNavigator.this.currentRow = SSDataNavigator.this.sSRowSet.getRow();
+					//SSDataNavigator.this.txtCurrentRow.setText(String.valueOf(SSDataNavigator.this.currentRow));
 				} catch (SQLException se) {
 					se.printStackTrace();
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
@@ -876,8 +878,9 @@ public class SSDataNavigator extends JPanel {
 						SSDataNavigator.this.dBNav.performNavigationOps(SSDBNav.NAVIGATION_NEXT);
 					}
 					// GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD
-					SSDataNavigator.this.currentRow = SSDataNavigator.this.sSRowSet.getRow();
-					SSDataNavigator.this.txtCurrentRow.setText(String.valueOf(SSDataNavigator.this.currentRow));
+					// 2019-10-14: updateNavigator should take care of this
+					//SSDataNavigator.this.currentRow = SSDataNavigator.this.sSRowSet.getRow();
+					//SSDataNavigator.this.txtCurrentRow.setText(String.valueOf(SSDataNavigator.this.currentRow));
 				} catch (SQLException se) {
 					se.printStackTrace();
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
@@ -947,6 +950,11 @@ public class SSDataNavigator extends JPanel {
 							SSDataNavigator.this.sSRowSet.insertRow();
 							SSDataNavigator.this.onInsertRow = false;
 							SSDataNavigator.this.dBNav.performPostInsertOps();
+							
+							// 2019-10-14: next bit of code seems odd. not sure why we're calling moveToCurrentRow() and last().
+							//  In H2, this is leading to an incorrect total # of rows (e.g., have 5, insert a row, and it shows 6 of 7 until refreshed)
+							
+							/*
 							// INCREMENT THE ROW COUNT
 							SSDataNavigator.this.rowCount++;
 
@@ -956,7 +964,10 @@ public class SSDataNavigator extends JPanel {
 							// ALSO MOVE TO CURRENT ROW MOVES THE SSROWSET POSITION BUT DOES NOT TRIGGER
 							// ANY EVENT FOR THE LISTENERS AS A RESULT VALUES ON THE SCREEN WILL NOT
 							// DISPLAY THE CURRENT RECORD VALUES.
+							 */
 							SSDataNavigator.this.sSRowSet.last();
+							// 2019-10-14: adding this to replace SSDataNavigator.this.rowCount++;
+							SSDataNavigator.this.rowCount = SSDataNavigator.this.sSRowSet.getRow();
 
 							updateNavigator();
 
@@ -1137,14 +1148,41 @@ public class SSDataNavigator extends JPanel {
 
 					if (SSDataNavigator.this.dBNav == null
 							|| (SSDataNavigator.this.dBNav != null && SSDataNavigator.this.dBNav.allowDeletion())) {
-						// DELETE ROW IS ALLOW DELETION RETURN TRUE.
+						
+						// CAPTURE CURRENT ROW PRE-DELETION
+						int tmpPosition = SSDataNavigator.this.currentRow;
+						
+						// SET ANTICIPATED ROW COUNT POST-DELETION
+						int tmpSize = SSDataNavigator.this.rowCount-1;
+						
+						// DELETE ROW FROM ROWSET
 						SSDataNavigator.this.sSRowSet.deleteRow();
+						
+						// PERFORM ANY POST DELETION OPS (WHICH MAY INVOLVE REQUERYING WHICH IS NEEDED FOR H2)
 						SSDataNavigator.this.dBNav.performPostDeletionOps();
+						
+						// UPDATE TOTAL ROW COUNT
+						SSDataNavigator.this.rowCount=tmpSize;
+						
+						// TRY TO NAVIGATE TO THE RECORD AFTER THE DELETED RECORD, OTHERWISE GO TO
+						// WHATEVER IS THE LAST RECORD
+						if (tmpPosition <= SSDataNavigator.this.rowCount && tmpPosition > 0) {
+							SSDataNavigator.this.sSRowSet.absolute(tmpPosition);
+						} else {
+							SSDataNavigator.this.sSRowSet.last();
+						}
+						
+						
 						// SEEMS DELETION WAS SUCCESSFULL DECREMENT ROWCOUNT
+						/*
 						SSDataNavigator.this.rowCount--;
+						SSDataNavigator.this.sSRowSet.
 						if (!SSDataNavigator.this.sSRowSet.next()) {
 							SSDataNavigator.this.sSRowSet.last();
 						}
+						*/
+						
+						// UPDATE THE STATUS OF THE NAVIGATOR
 						updateNavigator();
 					}
 
@@ -1157,7 +1195,7 @@ public class SSDataNavigator extends JPanel {
 		});
 
 		// LISTENER FOR THE TEXT FIELD. USER CAN ENTER A ROW NUMBER IN THE TEXT
-		// FIELD TO MOVE THE THE SPEICIFIED ROW.
+		// FIELD TO MOVE THE THE SPECIFIED ROW.
 		// IF ITS NOT A NUMBER OR IF ITS NOT VALID FOR THE CURRENT SSROWSET
 		// NOTHING HAPPENS.
 		this.txtCurrentRow.addKeyListener(new KeyAdapter() {
@@ -1215,10 +1253,11 @@ public class SSDataNavigator extends JPanel {
 	}
 
 	/**
-	 * Enables/disables buttons as need and updates the current row and row count
+	 * Enables/disables navigation buttons as needed and updates the current row and row count
 	 * numbers
 	 */
 	protected void updateNavigator() throws SQLException {
+		
 		this.currentRow = this.sSRowSet.getRow();
 		// SET THE ROW COUNT AS LABEL
 		this.lblRowCount.setText("of " + this.rowCount);
