@@ -66,6 +66,9 @@ public class MainClass extends JFrame {
         setSize(400,500);
         this.url = _url[0];
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        
+        System.out.println("Working Directory = " +
+                System.getProperty("user.dir"));
 
         this.btnExample1.addActionListener( new MyButtonListener());
         this.btnExample2.addActionListener( new MyButtonListener());

@@ -40,6 +40,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.JFrame;
@@ -92,6 +93,7 @@ public class Example1 extends JFrame {
 			this.ssConnection.createConnection();
 
 			this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
+
 			this.rowset.setCommand("SELECT * FROM supplier_data");
 			this.navigator = new SSDataNavigator(this.rowset);
 			this.navigator.setDBNav(new SSDBNavImpl(getContentPane()));
@@ -101,27 +103,69 @@ public class Example1 extends JFrame {
 			cnfe.printStackTrace();
 		}
 
-		// THE FOLLOWING CODE IS USED BECAUSE OF AN H2 LIMITATION. UPDATABLE ROWSET IS
-		// NOT
-		// FULLY IMPLEMENTED AND AN EXECUTE COMMAND IS REQUIRED WHEN INSERTING A NEW
-		// ROW FOR KEEPING THE CURSOR AT THE NEWLY INSERTED ROW.
-		// IF USING ANOTHER DATABASE, THE FOLLOWING IS NOT REQURIED:
+		/**
+		 * Various navigator overrides needed to support H2
+		 */
 		this.navigator.setDBNav(new SSDBNavImpl(this) {
+			
 			/**
 			 * unique serial id
 			 */
 			private static final long serialVersionUID = -7698780157683623074L;
 
-			/*
-			 * @Override public void performPreInsertOps() { super.performPreInsertOps();
-			 * Example1.this.txtSupplierName.setText(null);
-			 * Example1.this.txtSupplierCity.setText(null);
-			 * Example1.this.txtSupplierStatus.setText(null); }
+			/**
+			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
 			 */
+			@Override
+			public void performPreInsertOps() {
+				
+				super.performPreInsertOps();
+				
+				try {
 
+				// GET THE NEW OPTION ID.	
+					ResultSet rs = ssConnection.getConnection()
+							.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+							.executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");
+					rs.next();
+					int supplierID = rs.getInt("nextVal");
+					txtSupplierID.setText(String.valueOf(supplierID));
+					rs.close();
+				
+				// SET OTHER DEFAULTS
+					 Example1.this.txtSupplierName.setText(null);
+					 Example1.this.txtSupplierCity.setText(null);
+					 Example1.this.txtSupplierStatus.setText(null);			
+					
+				} catch(SQLException se) {
+					se.printStackTrace();
+					System.out.println("Error occured during pre insert operation.\n" + se.getMessage());								
+				} catch(Exception e) {
+					e.printStackTrace();
+					System.out.println("Error occured during pre insert operation.\n" + e.getMessage());
+				}		
+				
+			}
+
+			/**
+			 * Requery the rowset following an insertion. This is needed for H2.
+			 */
 			@Override
 			public void performPostInsertOps() {
-				// super.performPostInsertOps();
+				super.performPostInsertOps();
+				try {
+					Example1.this.rowset.execute();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			/**
+			 * Requery the rowset following a deletion. This is needed for H2.
+			 */
+			@Override
+			public void performPostDeletionOps() {
+				super.performPostDeletionOps();
 				try {
 					Example1.this.rowset.execute();
 				} catch (SQLException e) {
@@ -131,10 +175,7 @@ public class Example1 extends JFrame {
 
 		});
 
-		// .BIND(SSRowSet _sSRowSet, String _columnName) REPLACES
-		// DEPRECIATED .SETDOCUMENT(Document document) AND BINDS THE ROWSET AND
-		// THE DATABASE'S COLUMN NAME TO THE NAVIGATOR
-
+		// BIND THE COMPONENTS TO THEIR RESPECTIVE DATABASE COLUMNS
 		this.txtSupplierID.bind(this.rowset, "supplier_id");
 		this.txtSupplierName.bind(this.rowset, "supplier_name");
 		this.txtSupplierCity.bind(this.rowset, "city");
