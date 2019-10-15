@@ -157,7 +157,7 @@ public class SSDBNavImpl implements SSDBNav {
                 setComponents((Container) ((JScrollPane)comps[i]).getViewport());
             } else {
             // DIPLAY WARNING FOR UNKNOWN COMPONENT
-            	System.out.println("Encounted unknown component type of: " + comps[i].getClass().getSimpleName() + ". Unable to clear component.");
+            //	System.out.println("Encountered unknown component type of: " + comps[i].getClass().getSimpleName() + ". Unable to clear component.");
             } 
 
 			/*
