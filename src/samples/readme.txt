@@ -84,7 +84,7 @@ swingset#NO-SPAM#@pangburngroup.com
 INSTALLATION
 ==============================================================================
 
-The SwingSet samples/demo requires Java 1.5 or later.
+The SwingSet samples/demo requires Java 1.8 or later.
 
   1. make a swingset folder containing the demo jar file
   2. open a terminal / command line window and cd to the swingset folder
@@ -110,6 +110,11 @@ using the following commands:
 		javac -d ./bin -classpath ./src:./lib/* ./src/MainClass.java
 	Windows:
 		javac -d .\bin -classpath .\src;.\lib\* .\src\MainClass.java
+		
+Note that if running the examples from Eclipse, right-click on MainClass.java
+and select Run As->Run Configurations... and then under Arguments enter:
+	./src/samples/suppliers_and_parts.sql
+Then right-click on MainClass.java and select Run As->Java Application.	
 
 
 ***********************
