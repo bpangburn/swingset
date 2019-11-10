@@ -24,6 +24,8 @@ Changes:
 	15. Updated @deprecated JavaDoc annotation, providing link to suggested replacement
 	16. Removed SSDBCheckBox (deprecated long ago)
 	17. Fixed error in SSDBNavImpl when trying to clear fields for a new record
+	18. Fixes to SSDataNavigator to eliminate some redundant code and better support H2
+	19. Example code cleanup and documentation.
 	   
 ==============================================================================
 SwingSet 2.2.0 - Released 2019-02-27
