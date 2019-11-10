@@ -6,7 +6,7 @@
     <property name="javadocdir" value="${antdir}/javadoc" />
     <property name="deploydir" value="${antdir}/deploy" />
     <property name="manifestdir" value="./META-INF" />
-    <property name="version" value="2.3.0-SNAPSHOT" />
+    <property name="version" value="2.3.0" />
     <path id="1">
         <pathelement location="${lib}/glazedlists-1.11.0.jar" />
     </path>
