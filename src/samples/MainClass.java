@@ -44,7 +44,34 @@ import java.awt.event.*;
  */
 public class MainClass extends JFrame {
 	
+	/**
+	 * unique serial id
+	 */
 	private static final long serialVersionUID = -6316984401822746124L;
+	
+	/**
+	 * shared component dimensions
+	 */
+	private static final int buttonWidth = 150;
+	private static final int buttonHeight = 25;
+	public static final Dimension buttonDim = new Dimension(buttonWidth, buttonHeight);
+	
+	private static final int labelWidth = 200;
+	private static final int labelHeight = 20;
+	public static final Dimension labelDim = new Dimension(labelWidth, labelHeight);
+	
+	private static final int ssWidth = 200;
+	private static final int ssHeight = 20;
+	public static final Dimension ssDim = new Dimension(ssWidth, ssHeight);
+	
+	public static final int childScreenWidth = 600;
+	public static final int childScreenHeight = 300;
+	
+	public static final int gridColumnWidth = 60;
+	
+	/**
+	 * buttons to launch code examples
+	 */
 	JButton btnExample1 = new JButton("Example1");
     JButton btnExample2 = new JButton("Example2");
     JButton btnExample3 = new JButton("Example3");
@@ -53,6 +80,9 @@ public class MainClass extends JFrame {
     JButton btnExample6 = new JButton("Example6");
     JButton btnExample7 = new JButton("Example7");
     
+    /**
+     * path to database SQL file
+     */
     String url;
     
     /**
@@ -62,50 +92,57 @@ public class MainClass extends JFrame {
      */
     public MainClass(String[] _url){
     
-        super("SwingSet Demo");
-        setSize(400,500);
-        this.url = _url[0];
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        // SETUP WINDOW
+	    	super("SwingSet Demo");
+	        setSize(300,300);
+	        this.url = _url[0];
+	        setDefaultCloseOperation(EXIT_ON_CLOSE);
+	        
+	        System.out.println("Working Directory = " +
+	                System.getProperty("user.dir"));
+
+	    // ADD ACTION LISTENERS FOR BUTTONS
+	        this.btnExample1.addActionListener( new MyButtonListener());
+	        this.btnExample2.addActionListener( new MyButtonListener());
+	        this.btnExample3.addActionListener( new MyButtonListener());
+	        this.btnExample4.addActionListener( new MyButtonListener());
+	        this.btnExample5.addActionListener( new MyButtonListener());
+	        this.btnExample6.addActionListener( new MyButtonListener());
+	        this.btnExample7.addActionListener( new MyButtonListener());
+
+        // SET BUTTON DIMENSIONS
+	        this.btnExample1.setPreferredSize(buttonDim);
+	        this.btnExample2.setPreferredSize(buttonDim);
+	        this.btnExample3.setPreferredSize(buttonDim);
+	        this.btnExample4.setPreferredSize(buttonDim);
+	        this.btnExample5.setPreferredSize(buttonDim);
+	        this.btnExample6.setPreferredSize(buttonDim);
+	        this.btnExample7.setPreferredSize(buttonDim);
         
-        System.out.println("Working Directory = " +
-                System.getProperty("user.dir"));
+	    // LAYOUT BUTTONS
+	        getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
+	        getContentPane().add(this.btnExample1);
+	        getContentPane().add(this.btnExample2);
+	        getContentPane().add(this.btnExample3);
+	        getContentPane().add(this.btnExample4);
+	        getContentPane().add(this.btnExample5);
+	        getContentPane().add(this.btnExample6);
+	        getContentPane().add(this.btnExample7);
 
-        this.btnExample1.addActionListener( new MyButtonListener());
-        this.btnExample2.addActionListener( new MyButtonListener());
-        this.btnExample3.addActionListener( new MyButtonListener());
-        this.btnExample4.addActionListener( new MyButtonListener());
-        this.btnExample5.addActionListener( new MyButtonListener());
-        this.btnExample6.addActionListener( new MyButtonListener());
-        this.btnExample7.addActionListener( new MyButtonListener());
-
-        this.btnExample1.setPreferredSize(new Dimension(150,25));
-        this.btnExample2.setPreferredSize(new Dimension(150,25));
-        this.btnExample3.setPreferredSize(new Dimension(150,25));
-        this.btnExample4.setPreferredSize(new Dimension(150,25));
-        this.btnExample5.setPreferredSize(new Dimension(150,25));
-        this.btnExample6.setPreferredSize(new Dimension(150,25));
-        this.btnExample7.setPreferredSize(new Dimension(150,25));
-        
-        getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
-        getContentPane().add(this.btnExample1);
-        getContentPane().add(this.btnExample2);
-        getContentPane().add(this.btnExample3);
-        getContentPane().add(this.btnExample4);
-        getContentPane().add(this.btnExample5);
-        getContentPane().add(this.btnExample6);
-        getContentPane().add(this.btnExample7);
-
-        setVisible(true);
-        pack();
+        // DISPLAY SCREEN
+	        setVisible(true);
+	        //pack();
     }
 
+    /**
+     * ActionListener implementation to call code for each button.
+     */
     private class MyButtonListener implements ActionListener{
 
 		public MyButtonListener() {
 			super();
 		}
 
-		@SuppressWarnings("unused")
 		@Override
 		public void actionPerformed( ActionEvent ae){
             if(ae.getSource().equals(MainClass.this.btnExample1)){
@@ -138,7 +175,6 @@ public class MainClass extends JFrame {
      * main method for SwingSet samples/demo
      * @param url 
      */
-    @SuppressWarnings("unused")
 	public static void main(String[] url){
         new MainClass(url);
     }

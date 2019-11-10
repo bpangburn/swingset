@@ -40,6 +40,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.JFrame;
@@ -59,15 +60,30 @@ import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
  */
 public class Example3 extends JFrame {
 
+	/**
+	 * unique serial id
+	 */
 	private static final long serialVersionUID = 4859550616628544511L;
+	
+	/**
+	 * screen label declarations
+	 */
+	JLabel lblSupplierPartID = new JLabel("Supplier-Part ID");
 	JLabel lblSupplierName = new JLabel("Supplier");
 	JLabel lblPartName = new JLabel("Part");
 	JLabel lblQuantity = new JLabel("Quantity");
 
+	/**
+	 * bound component declarations
+	 */
+	SSTextField txtSupplierPartID = new SSTextField();
 	SSDBComboBox cmbSupplierName = null;
 	SSDBComboBox cmbPartName = null;
 	SSTextField txtQuantity = new SSTextField();
 
+	/**
+	 * database component declarations
+	 */
 	SSConnection ssConnection = null;
 	SSJdbcRowSetImpl rowset = null;
 	SSDataNavigator navigator = null;
@@ -79,43 +95,77 @@ public class Example3 extends JFrame {
 	 */
 	public Example3(String url) {
 
-		super("Example3");
-		setSize(600, 200);
+		// SET SCREEN TITLE
+			super("Example3");
+			
+		// SET SCREEN DIMENSIONS
+			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 
-		try {
-			System.out.println("url from ex 3: " + url);
-			this.ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + url + "'",
-					"sa", "");
-			this.ssConnection.setDriverName("org.h2.Driver");
-			this.ssConnection.createConnection();
+		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
+			try {
+				System.out.println("url from ex 3: " + url);
+				this.ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + url + "'",
+						"sa", "");
+				this.ssConnection.setDriverName("org.h2.Driver");
+				this.ssConnection.createConnection();
+	
+				this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
+				this.rowset.setCommand("SELECT * FROM supplier_part_data");
+				this.navigator = new SSDataNavigator(this.rowset);
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} catch (ClassNotFoundException cnfe) {
+				cnfe.printStackTrace();
+			}
 
-			this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
-			this.rowset.setCommand("SELECT * FROM supplier_part_data");
-			this.navigator = new SSDataNavigator(this.rowset);
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (ClassNotFoundException cnfe) {
-			cnfe.printStackTrace();
-		}
-
-		// THE FOLLOWING CODE IS USED BECAUSE OF AN H2 LIMITATION. UPDATABLE ROWSET IS
-		// NOT
-		// FULLY IMPLEMENTED AND AN EXECUTE COMMAND IS REQUIRED WHEN INSERTING A NEW
-		// ROW AND KEEPING THE CURSOR AT THE NEWLY INSERTED ROW.
-		// IF USING ANOTHER DATABASE, THE FOLLOWING IS NOT REQURIED:
+		/**
+		 * Various navigator overrides needed to support H2
+		 * H2 does not fully support updatable rowset so it must be
+		 * re-queried following insert and delete with rowset.execute()
+		 */
 		this.navigator.setDBNav(new SSDBNavImpl(this) {
 			/**
 			 * unique serial id
 			 */
 			private static final long serialVersionUID = 4343059684161003109L;
 
-			/*
-			 * @Override public void performPreInsertOps() { super.performPreInsertOps();
-			 * Example3.this.cmbSupplierName.setSelectedItem(null);
-			 * Example3.this.cmbPartName.setSelectedItem(null);
-			 * Example3.this.txtQuantity.setText(null); }
+			/**
+			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
 			 */
+			@Override
+			public void performPreInsertOps() {
+				
+				super.performPreInsertOps();
+				
+				try {
 
+				// GET THE NEW RECORD ID.	
+					ResultSet rs = ssConnection.getConnection()
+							.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+							.executeQuery("SELECT nextval('supplier_part_data_seq') as nextVal;");
+					rs.next();
+					int supplierPartID = rs.getInt("nextVal");
+					txtSupplierPartID.setText(String.valueOf(supplierPartID));
+					rs.close();
+				
+				// SET OTHER DEFAULTS
+					 Example3.this.cmbSupplierName.setSelectedValue(0);
+					 Example3.this.cmbPartName.setSelectedValue(0);
+					 Example3.this.txtQuantity.setText("0");
+					
+				} catch(SQLException se) {
+					se.printStackTrace();
+					System.out.println("Error occured during pre insert operation.\n" + se.getMessage());								
+				} catch(Exception e) {
+					e.printStackTrace();
+					System.out.println("Error occured during pre insert operation.\n" + e.getMessage());
+				}		
+				
+			}
+
+			/**
+			 * Requery the rowset following an insertion. This is needed for H2.
+			 */
 			@Override
 			public void performPostInsertOps() {
 				super.performPostInsertOps();
@@ -125,70 +175,100 @@ public class Example3 extends JFrame {
 					e.printStackTrace();
 				}
 			}
+			
+			/**
+			 * Requery the rowset following a deletion. This is needed for H2.
+			 */
+			@Override
+			public void performPostDeletionOps() {
+				super.performPostDeletionOps();
+				try {
+					Example3.this.rowset.execute();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
 
 		});
 
-		String query = "SELECT * FROM supplier_data;";
-		this.cmbSupplierName = new SSDBComboBox(this.ssConnection, query, "supplier_id", "supplier_name");
-		this.cmbSupplierName.bind(this.rowset, "supplier_id");
+		// SETUP DB COMBO QUERIES
+			String query = "SELECT * FROM supplier_data;";
+			this.cmbSupplierName = new SSDBComboBox(this.ssConnection, query, "supplier_id", "supplier_name");
+			
+			query = "SELECT * FROM part_data;";
+			this.cmbPartName = new SSDBComboBox(this.ssConnection, query, "part_id", "part_name");
+		
+		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
+			this.txtSupplierPartID.bind(this.rowset, "supplier_part_id");
+			this.cmbSupplierName.bind(this.rowset, "supplier_id");
+			this.cmbPartName.bind(this.rowset, "part_id");
+			this.txtQuantity.bind(this.rowset, "quantity");
+			
+		// RUN DB COMBO QUERIES
+			try {
+				this.cmbPartName.execute();
+				this.cmbSupplierName.execute();
+	
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		// SET LABEL DIMENSIONS	
+			this.lblSupplierPartID.setPreferredSize(MainClass.labelDim);
+			this.lblSupplierName.setPreferredSize(MainClass.labelDim);
+			this.lblPartName.setPreferredSize(MainClass.labelDim);
+			this.lblQuantity.setPreferredSize(MainClass.labelDim);
 
-		query = "SELECT * FROM part_data;";
-		this.cmbPartName = new SSDBComboBox(this.ssConnection, query, "part_id", "part_name");
-		this.cmbPartName.bind(this.rowset, "part_id");
+		// SET BOUND COMPONENT DIMENSIONS
+			this.txtSupplierPartID.setPreferredSize(MainClass.ssDim);
+			this.cmbSupplierName.setPreferredSize(MainClass.ssDim);
+			this.cmbPartName.setPreferredSize(MainClass.ssDim);
+			this.txtQuantity.setPreferredSize(MainClass.ssDim);
 
-		this.txtQuantity.bind(this.rowset, "quantity");
+		// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
+			Container contentPane = getContentPane();
+			contentPane.setLayout(new GridBagLayout());
+			GridBagConstraints constraints = new GridBagConstraints();
+	
+			constraints.gridx = 0;
+			constraints.gridy = 0;
+			contentPane.add(this.lblSupplierPartID, constraints);
+			constraints.gridy = 1;
+			contentPane.add(this.lblSupplierName, constraints);
+			constraints.gridy = 2;
+			contentPane.add(this.lblPartName, constraints);
+			constraints.gridy = 3;
+			contentPane.add(this.lblQuantity, constraints);
+	
+			constraints.gridx = 1;
+			constraints.gridy = 0;
+			contentPane.add(this.txtSupplierPartID, constraints);
+			constraints.gridy = 1;
+			contentPane.add(this.cmbSupplierName, constraints);
+			constraints.gridy = 2;
+			contentPane.add(this.cmbPartName, constraints);
+			constraints.gridy = 3;
+			contentPane.add(this.txtQuantity, constraints);
+	
+			constraints.gridx = 0;
+			constraints.gridy = 4;
+			constraints.gridwidth = 2;
+			contentPane.add(this.navigator, constraints);
 
-		try {
-			this.cmbPartName.execute();
-			this.cmbSupplierName.execute();
+		// DISABLE THE PRIMARY KEY
+			txtSupplierPartID.setEnabled(false);
 
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		this.lblSupplierName.setPreferredSize(new Dimension(75, 20));
-		this.lblPartName.setPreferredSize(new Dimension(75, 20));
-		this.lblQuantity.setPreferredSize(new Dimension(75, 20));
-
-		this.cmbSupplierName.setPreferredSize(new Dimension(150, 20));
-		this.cmbPartName.setPreferredSize(new Dimension(150, 20));
-		this.txtQuantity.setPreferredSize(new Dimension(150, 20));
-
-		Container contentPane = getContentPane();
-		contentPane.setLayout(new GridBagLayout());
-		GridBagConstraints constraints = new GridBagConstraints();
-
-		constraints.gridx = 0;
-		constraints.gridy = 0;
-		contentPane.add(this.lblSupplierName, constraints);
-		constraints.gridy = 1;
-		contentPane.add(this.lblPartName, constraints);
-		constraints.gridy = 2;
-		contentPane.add(this.lblQuantity, constraints);
-
-		constraints.gridx = 1;
-		constraints.gridy = 0;
-		contentPane.add(this.cmbSupplierName, constraints);
-		constraints.gridy = 1;
-		contentPane.add(this.cmbPartName, constraints);
-		constraints.gridy = 2;
-		contentPane.add(this.txtQuantity, constraints);
-
-		constraints.gridx = 0;
-		constraints.gridy = 3;
-		constraints.gridwidth = 2;
-		contentPane.add(this.navigator, constraints);
-
-		setVisible(true);
+		// MAKE THE JFRAME VISIBLE
+			setVisible(true);
 	}
 
 }
 
 /*
  * $Log$ Revision 1.10 2012/06/07 15:54:38 beevo Modified example for
- * compatibilty with H2 database.
+ * compatibility with H2 database.
  *
  * Revision 1.9 2005/02/14 18:50:25 prasanth Updated to remove calls to
  * deprecated methods.

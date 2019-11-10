@@ -37,7 +37,6 @@
  ******************************************************************************/
 
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.sql.ResultSet;
@@ -60,16 +59,30 @@ import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
 
 public class Example1 extends JFrame {
 
+	/**
+	 * unique serial id
+	 */
 	private static final long serialVersionUID = 1613223721461838426L;
+	
+	/**
+	 * screen label declarations
+	 */
+	JLabel lblSupplierID = new JLabel("Supplier ID");
 	JLabel lblSupplierName = new JLabel("Name");
 	JLabel lblSupplierCity = new JLabel("City");
 	JLabel lblSupplierStatus = new JLabel("Status");
 
+	/**
+	 * bound component declarations
+	 */
+	SSTextField txtSupplierID = new SSTextField();
 	SSTextField txtSupplierName = new SSTextField();
 	SSTextField txtSupplierCity = new SSTextField();
 	SSTextField txtSupplierStatus = new SSTextField();
-	SSTextField txtSupplierID = new SSTextField();
 
+	/**
+	 * database component declarations
+	 */
 	SSConnection ssConnection = null;
 	SSJdbcRowSetImpl rowset = null;
 	SSDataNavigator navigator = null;
@@ -80,31 +93,36 @@ public class Example1 extends JFrame {
 	 * @param url - path to SQL to create suppliers & parts database
 	 */
 	public Example1(String url) {
-
-		super("Example1");
-
-		setSize(600, 200);
-
-		try {
-			this.ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + url + "'",
-					"sa", "");
-			System.out.println("url from ex 1: " + url);
-			this.ssConnection.setDriverName("org.h2.Driver");
-			this.ssConnection.createConnection();
-
-			this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
-
-			this.rowset.setCommand("SELECT * FROM supplier_data");
-			this.navigator = new SSDataNavigator(this.rowset);
-			this.navigator.setDBNav(new SSDBNavImpl(getContentPane()));
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (ClassNotFoundException cnfe) {
-			cnfe.printStackTrace();
-		}
+		
+		// SET SCREEN TITLE
+			super("Example1");
+		
+		// SET SCREEN DIMENSIONS
+			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
+			
+		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
+			try {
+				this.ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + url + "'",
+						"sa", "");
+				System.out.println("url from ex 1: " + url);
+				this.ssConnection.setDriverName("org.h2.Driver");
+				this.ssConnection.createConnection();
+	
+				this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
+	
+				this.rowset.setCommand("SELECT * FROM supplier_data");
+				this.navigator = new SSDataNavigator(this.rowset);
+				this.navigator.setDBNav(new SSDBNavImpl(getContentPane()));
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} catch (ClassNotFoundException cnfe) {
+				cnfe.printStackTrace();
+			}
 
 		/**
 		 * Various navigator overrides needed to support H2
+		 * H2 does not fully support updatable rowset so it must be
+		 * re-queried following insert and delete with rowset.execute()
 		 */
 		this.navigator.setDBNav(new SSDBNavImpl(this) {
 			
@@ -123,7 +141,7 @@ public class Example1 extends JFrame {
 				
 				try {
 
-				// GET THE NEW OPTION ID.	
+				// GET THE NEW RECORD ID.	
 					ResultSet rs = ssConnection.getConnection()
 							.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 							.executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");
@@ -135,7 +153,7 @@ public class Example1 extends JFrame {
 				// SET OTHER DEFAULTS
 					 Example1.this.txtSupplierName.setText(null);
 					 Example1.this.txtSupplierCity.setText(null);
-					 Example1.this.txtSupplierStatus.setText(null);			
+					 Example1.this.txtSupplierStatus.setText("0");			
 					
 				} catch(SQLException se) {
 					se.printStackTrace();
@@ -175,46 +193,59 @@ public class Example1 extends JFrame {
 
 		});
 
-		// BIND THE COMPONENTS TO THEIR RESPECTIVE DATABASE COLUMNS
-		this.txtSupplierID.bind(this.rowset, "supplier_id");
-		this.txtSupplierName.bind(this.rowset, "supplier_name");
-		this.txtSupplierCity.bind(this.rowset, "city");
-		this.txtSupplierStatus.bind(this.rowset, "status");
+		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
+			this.txtSupplierID.bind(this.rowset, "supplier_id");
+			this.txtSupplierName.bind(this.rowset, "supplier_name");
+			this.txtSupplierCity.bind(this.rowset, "city");
+			this.txtSupplierStatus.bind(this.rowset, "status");
 
-		this.lblSupplierName.setPreferredSize(new Dimension(75, 20));
-		this.lblSupplierCity.setPreferredSize(new Dimension(75, 20));
-		this.lblSupplierStatus.setPreferredSize(new Dimension(75, 20));
+		// SET LABEL DIMENSIONS
+			this.lblSupplierID.setPreferredSize(MainClass.labelDim);
+			this.lblSupplierName.setPreferredSize(MainClass.labelDim);
+			this.lblSupplierCity.setPreferredSize(MainClass.labelDim);
+			this.lblSupplierStatus.setPreferredSize(MainClass.labelDim);
 
-		this.txtSupplierName.setPreferredSize(new Dimension(150, 20));
-		this.txtSupplierCity.setPreferredSize(new Dimension(150, 20));
-		this.txtSupplierStatus.setPreferredSize(new Dimension(150, 20));
+		// SET BOUND COMPONENT DIMENSIONS
+			this.txtSupplierID.setPreferredSize(MainClass.ssDim);
+			this.txtSupplierName.setPreferredSize(MainClass.ssDim);
+			this.txtSupplierCity.setPreferredSize(MainClass.ssDim);
+			this.txtSupplierStatus.setPreferredSize(MainClass.ssDim);
 
-		Container contentPane = getContentPane();
-		contentPane.setLayout(new GridBagLayout());
-		GridBagConstraints constraints = new GridBagConstraints();
+		// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
+			Container contentPane = getContentPane();
+			contentPane.setLayout(new GridBagLayout());
+			GridBagConstraints constraints = new GridBagConstraints();
+	
+			constraints.gridx = 0;
+			constraints.gridy = 0;
+			contentPane.add(this.lblSupplierID, constraints);
+			constraints.gridy = 1;
+			contentPane.add(this.lblSupplierName, constraints);
+			constraints.gridy = 2;
+			contentPane.add(this.lblSupplierCity, constraints);
+			constraints.gridy = 3;
+			contentPane.add(this.lblSupplierStatus, constraints);
+	
+			constraints.gridx = 1;
+			constraints.gridy = 0;
+			contentPane.add(this.txtSupplierID, constraints);
+			constraints.gridy = 1;
+			contentPane.add(this.txtSupplierName, constraints);
+			constraints.gridy = 2;
+			contentPane.add(this.txtSupplierCity, constraints);
+			constraints.gridy = 3;
+			contentPane.add(this.txtSupplierStatus, constraints);
+	
+			constraints.gridx = 0;
+			constraints.gridy = 4;
+			constraints.gridwidth = 2;
+			contentPane.add(this.navigator, constraints);
+		
+		// DISABLE THE PRIMARY KEY
+			txtSupplierID.setEnabled(false);
 
-		constraints.gridx = 0;
-		constraints.gridy = 0;
-		contentPane.add(this.lblSupplierName, constraints);
-		constraints.gridy = 1;
-		contentPane.add(this.lblSupplierCity, constraints);
-		constraints.gridy = 2;
-		contentPane.add(this.lblSupplierStatus, constraints);
-
-		constraints.gridx = 1;
-		constraints.gridy = 0;
-		contentPane.add(this.txtSupplierName, constraints);
-		constraints.gridy = 1;
-		contentPane.add(this.txtSupplierCity, constraints);
-		constraints.gridy = 2;
-		contentPane.add(this.txtSupplierStatus, constraints);
-
-		constraints.gridx = 0;
-		constraints.gridy = 3;
-		constraints.gridwidth = 2;
-		contentPane.add(this.navigator, constraints);
-
-		setVisible(true);
+		// MAKE THE JFRAME VISIBLE
+			setVisible(true);
 
 	}
 
@@ -222,7 +253,7 @@ public class Example1 extends JFrame {
 
 /*
  * $Log$ Revision 1.10 2012/06/07 16:12:40 beevo Modified example for
- * compatibilty with H2 database.
+ * compatibility with H2 database.
  *
  * Revision 1.7 2005/02/04 22:40:12 yoda2 Updated Copyright info.
  *

@@ -50,7 +50,14 @@ import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
  */
 public class Example5 extends JFrame {
 
+	/**
+	 * unique serial id
+	 */
 	private static final long serialVersionUID = -5126011569315467420L;
+	
+	/**
+	 * declarations
+	 */
 	SSConnection ssConnection = null;
 	SSJdbcRowSetImpl rowset = null;
 	SSDataGrid dataGrid = null;
@@ -64,53 +71,53 @@ public class Example5 extends JFrame {
 	public Example5(String _url) {
 		super("Example 5");
 		this.url = _url;
-		setSize(430, 145);
+		setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 		init();
 	}
 
+	/**
+	 * Initialize the screen & datagrid
+	 */
 	private void init() {
 
-		try {
-			System.out.println("url from ex 5: " + this.url);
-			this.ssConnection = new SSConnection(
-					"jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + this.url + "'", "sa", "");
+		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
+			try {
+			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
+				System.out.println("url from ex 5: " + this.url);
+				this.ssConnection = new SSConnection(
+						"jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + this.url + "'", "sa", "");
+				this.ssConnection.setDriverName("org.h2.Driver");
+				this.ssConnection.createConnection();
+				
+				this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
+				this.rowset.setCommand("SELECT * FROM part_data ORDER BY part_name;");
+			
+			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
+				this.dataGrid = new SSDataGrid();
+				this.dataGrid.setHeaders(new String[] { "Part ID", "Part Name", "Color Code", "Weight", "City" });
+				this.dataGrid.setSSRowSet(this.rowset);
+				this.dataGrid.setMessageWindow(this);
+	
+			// DISABLES NEW INSERTIONS TO THE DATABASE. - NOT CURRENTLY WORKING FOR H2
+				this.dataGrid.setInsertion(false);
+	
+			// MAKE THE PART ID UNEDITABLE
+				this.dataGrid.setUneditableColumns(new String[] { "part_id" });
+	
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} catch (ClassNotFoundException cnfe) {
+				cnfe.printStackTrace();
+			}
+			
+		// SETUP THE CONTAINER AND ADD THE DATAGRID
+			getContentPane().add(this.dataGrid.getComponent());
 
-			this.ssConnection.setDriverName("org.h2.Driver");
-			this.ssConnection.createConnection();
-			this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
-			this.rowset.setCommand(
-					"SELECT part_name, color_code, weight, city, part_id FROM part_data ORDER BY part_name;");
-			// SET THE HEADER BEFORE SETTING THE ROWSET
-			this.dataGrid = new SSDataGrid();
-			this.dataGrid.setHeaders(new String[] { "Part Name", "Color Code", " Weight", "City" });
-			this.dataGrid.setSSRowSet(this.rowset);
-			this.dataGrid.setMessageWindow(this);
-
-			// DISABLES NEW INSERTIONS TO THE DATA BASE.
-			// DUE TO H2 DATABASE PROPERTIES, INSERTION OF NEW DATA CAUSES ERRORS.
-			// ANY CHANGES MADE TO THE PRESENT RECORD WILL BE SAVED BUT INSERTIONS ARE NOT
-			// ALLOWED
-			// IN H2.
-			this.dataGrid.setInsertion(false);
-
-			// HIDE THE PART ID COLUMN
-			// THIS SETS THE WIDTH OF THE COLUMN TO 0
-			this.dataGrid.setHiddenColumns(new String[] { "part_id" });
-			this.dataGrid.setUneditableColumns(new String[] { "part_id" });
-
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (ClassNotFoundException cnfe) {
-			cnfe.printStackTrace();
-		}
-		getContentPane().add(this.dataGrid.getComponent());
-
-		setVisible(true);
-
+		// MAKE THE JFRAME VISIBLE
+			setVisible(true);
 	}
-	// END OF INIT FUNCTION
+
 }
-// END OF EXAMPLE 5
 
 /*
  * $Log$ Revision 1.8 2012/06/07 15:54:38 beevo Modified example for

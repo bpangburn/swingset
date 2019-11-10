@@ -36,6 +36,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.JFrame;
@@ -52,10 +53,17 @@ import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
  */
 public class Example6 extends JFrame {
 
+	/**
+	 * unique serial id
+	 */
 	private static final long serialVersionUID = 1727893372201402700L;
+	
+	/**
+	 * declarations
+	 */
 	SSConnection ssConnection = null;
 	SSJdbcRowSetImpl rowset = null;
-	SSDataGrid dataGrid = new SSDataGrid();
+	SSDataGrid dataGrid = null;
 	String url;
 
 	/**
@@ -66,75 +74,93 @@ public class Example6 extends JFrame {
 	public Example6(String _url) {
 		super("Example 6");
 		this.url = _url;
-		setSize(580, 170);
+		setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 		init();
 	}
 
+	/**
+	 * Initialize the screen & datagrid
+	 */
 	private void init() {
 
-		try {
-			System.out.println("url from ex 6: " + this.url);
-			this.ssConnection = new SSConnection(
-					"jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + this.url + "'", "sa", "");
-			this.ssConnection.setDriverName("org.h2.Driver");
-			this.ssConnection.createConnection();
+		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
+			try {
+			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
+				System.out.println("url from ex 6: " + this.url);
+				this.ssConnection = new SSConnection(
+						"jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + this.url + "'", "sa", "");
+				this.ssConnection.setDriverName("org.h2.Driver");
+				this.ssConnection.createConnection();
+	
+				this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
+				this.rowset.setCommand("SELECT * FROM part_data ORDER BY part_name;");
+			
+			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
+				this.dataGrid = new SSDataGrid();
+				this.dataGrid.setHeaders(new String[] { "Part ID", "Part Name", "Color Code", "Weight", "City" });
+				this.dataGrid.setSSRowSet(this.rowset);
+				this.dataGrid.setMessageWindow(this);
+	
+			// DISABLES NEW INSERTIONS TO THE DATABASE. - NOT CURRENTLY WORKING FOR H2
+				this.dataGrid.setInsertion(false);
+	
+			// MAKE THE PART ID UNEDITABLE
+				this.dataGrid.setUneditableColumns(new String[] { "part_id" });
+	
+			// SETUP COMBO RENDER FOR COLOR COLUMN
+				this.dataGrid.setComboRenderer("color_code", new String[] { "Red", "Green", "Blue" },
+						new Integer[] { 0,1,2 }, MainClass.gridColumnWidth);
+				
+			// SET DEFAULTS FOR NEW RECORDS
+			// THIS CODE IS NOT CURRENTLY USED AS THERE IS AN ISSUE ADDING RECORDS IN H2
+				this.dataGrid.setDefaultValues(new String[] { "part_name", "color_code", "weight", "city" },
+						new Object[] { "", 1, 20, "Default City" });
+	
+				this.dataGrid.setPrimaryColumn("part_id");
+				this.dataGrid.setSSDataValue(new SSDataValue() {
+					@Override
+					public Object getPrimaryColumnValue() {
+						
+						int partID = 0;
+						
+						try {
+						// GET THE NEW RECORD ID.	
+							ResultSet rs = ssConnection.getConnection()
+									.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+									.executeQuery("SELECT nextval('part_data_seq') as nextVal;");
+							rs.next();
+							partID = rs.getInt("nextVal");
+							rs.close();
+	
+						} catch(SQLException se) {
+							se.printStackTrace();
+							System.out.println("Error occured obtaining new Primary Key.\n" + se.getMessage());								
+						} catch(Exception e) {
+							e.printStackTrace();
+							System.out.println("Error occured obtaining new Primary Key.\n" + e.getMessage());
+						}	
+						
+						//System.out.println(partID);
+						
+						return partID;
+					}
+				});
+	
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} catch (ClassNotFoundException cnfe) {
+				cnfe.printStackTrace();
+			}
+		
+		// SETUP THE CONTAINER AND ADD THE DATAGRID
+			getContentPane().add(this.dataGrid.getComponent());
 
-			this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
-			this.rowset
-					.setCommand("SELECT part_name,color_code, weight, city,part_id FROM part_data ORDER BY part_name;");
+		// MAKE THE JFRAME VISIBLE
+			setVisible(true);
 
-			// SET THE HEADER BEFORE SETTING THE ROWSET
-			this.dataGrid.setHeaders(new String[] { "Part Name", "Color Code", " Weight", "City" });
-			this.dataGrid.setSSRowSet(this.rowset);
-			// HIDE THE PART ID COLUMN
-			// THIS SETS THE WIDTH OF THE COLUMN TO 0
-			this.dataGrid.setHiddenColumns(new String[] { "part_id" });
-			this.dataGrid.setMessageWindow(this);
-			this.dataGrid.setUneditableColumns(new String[] { "part_id" });
+	}
 
-			// THIS DISABLES NEW INSERTIONS TO THE DATA BASE.
-			// DUE TO H2 DATABASE PROPERTIES, INSERTION OF NEW DATA CAUSES PROBLEMS.
-			// ANY CHANGES MADE TO PRESENT RECORD WILL BE SAVED.
-			this.dataGrid.setInsertion(false);
-
-			this.dataGrid.setComboRenderer("color_code", new String[] { "Red", "Green", "Blue" },
-					new Integer[] { new Integer(0), new Integer(1), new Integer(2) });
-			this.dataGrid.setDefaultValues(new int[] { 1, 2, 3 },
-					new Object[] { new Integer(0), new Integer(20), new String("New Orleans") });
-
-			this.dataGrid.setPrimaryColumn("part_id");
-			this.dataGrid.setSSDataValue(new SSDataValue() {
-				@Override
-				public Object getPrimaryColumnValue() {
-					// YOUR PRIMARY KEY VALUE GENERATION GOES HERE
-					// IF ITS SOME THING USER ENTERS THEN NO PROBLEM
-					// IF ITS AN AUTO INCREMENT FIELD THEN IT DEPENDS ON
-					// THE DATABASE DRIVER YOU ARE USING.
-					// IF THE UPDATEROW CAN RETRIEVE THE VALUES FOR THE ROW
-					// WITH OUT KNOWING THE PRIMARY KEY VALUE ITS FINE
-					// BUT POSTGRES CAN'T UPDATE ROW WITH OUT THE PRIMARY
-					// COLUMN.
-
-					// YOUR PRIMARY KEY VALUE GENERATION GOES HERE.
-					// the database does not allow updates so just returning
-					// a fixed value. in your code you have to generate unique value.
-					return new Integer(4);
-				}
-			});
-
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (ClassNotFoundException cnfe) {
-			cnfe.printStackTrace();
-		}
-
-		getContentPane().add(this.dataGrid.getComponent());
-
-		setVisible(true);
-
-	} // END OF INIT FUNCTION
-
-}// END OF EXAMPLE 6
+}
 
 /*
  * $Log$ Revision 1.7 2012/06/07 15:54:38 beevo Modified example for

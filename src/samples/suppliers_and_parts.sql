@@ -40,11 +40,8 @@
    for the SwingSet sample programs */
 
 /* supplier_data */
-DROP TABLE IF EXISTS supplier_data;
-DROP SEQUENCE IF EXISTS supplier_data_seq;
-
-CREATE SEQUENCE IF NOT EXISTS supplier_data_seq;
-CREATE TABLE supplier_data 
+CREATE SEQUENCE IF NOT EXISTS supplier_data_seq START WITH 1000;
+CREATE TABLE IF NOT EXISTS supplier_data 
 ( 
     supplier_id INTEGER DEFAULT nextval('supplier_data_seq') NOT NULL PRIMARY KEY,
     supplier_name VARCHAR(50), 
@@ -52,23 +49,18 @@ CREATE TABLE supplier_data
     city VARCHAR(50)
 );
 
-INSERT INTO supplier_data VALUES (2,'Jones',  10, 'Paris');
-INSERT INTO supplier_data VALUES (5,'Adams', 30, 'Athens');
-INSERT INTO supplier_data VALUES (4,'Clark', 20, 'London');
-INSERT INTO supplier_data VALUES (3,'Blake', 30, 'Paris');
-INSERT INTO supplier_data VALUES (1,'Smith',20,'London');
-
-ALTER SEQUENCE supplier_data_seq RESTART WITH 1000;
+MERGE INTO supplier_data VALUES (2,'Jones',  10, 'Paris') ;
+MERGE INTO supplier_data VALUES (5,'Adams', 30, 'Athens');
+MERGE INTO supplier_data VALUES (4,'Clark', 20, 'London');
+MERGE INTO supplier_data VALUES (3,'Blake', 30, 'Paris');
+MERGE INTO supplier_data VALUES (1,'Smith',20,'London');
 
 SELECT * from supplier_data;
 
 
 /* part_data */
-DROP TABLE IF EXISTS part_data;
-DROP SEQUENCE IF EXISTS part_data_seq;
-
-CREATE SEQUENCE IF NOT EXISTS part_data_seq;
-CREATE TABLE part_data 
+CREATE SEQUENCE IF NOT EXISTS part_data_seq START WITH 1000;
+CREATE TABLE IF NOT EXISTS part_data 
 ( 
     part_id INTEGER DEFAULT nextval('part_data_seq') NOT NULL PRIMARY KEY,
     part_name VARCHAR(50), 
@@ -77,23 +69,18 @@ CREATE TABLE part_data
     city VARCHAR(50)
 );
 
-INSERT INTO part_data VALUES (6, 'Cog', 0, 19, 'London');
-INSERT INTO part_data VALUES (5, 'Cam', 2, 12, 'Paris');
-INSERT INTO part_data VALUES (4, 'Screw', 0, 14, 'London');
-INSERT INTO part_data VALUES (3, 'Screw', 2, 17, 'Rome');
-INSERT INTO part_data VALUES (2, 'Bolt', 1, 17, 'Paris');
-INSERT INTO part_data VALUES (1, 'Nut', 0, 12, 'London');
-
-ALTER SEQUENCE part_data_seq RESTART WITH 1000;
+MERGE INTO part_data VALUES (6, 'Cog', 0, 19, 'London');
+MERGE INTO part_data VALUES (5, 'Cam', 2, 12, 'Paris');
+MERGE INTO part_data VALUES (4, 'Screw', 0, 14, 'London');
+MERGE INTO part_data VALUES (3, 'Screw', 2, 17, 'Rome');
+MERGE INTO part_data VALUES (2, 'Bolt', 1, 17, 'Paris');
+MERGE INTO part_data VALUES (1, 'Nut', 0, 12, 'London');
 
 SELECT * FROM part_data;
 
 /* supplier_part_data */
-DROP TABLE IF EXISTS supplier_part_data;
-DROP SEQUENCE IF EXISTS supplier_part_data_seq;
-
-CREATE SEQUENCE IF NOT EXISTS supplier_part_data_seq;
-CREATE TABLE supplier_part_data 
+CREATE SEQUENCE IF NOT EXISTS supplier_part_data_seq START WITH 1000;
+CREATE TABLE IF NOT EXISTS supplier_part_data 
 ( 
     supplier_part_id INTEGER DEFAULT nextval('supplier_part_data_seq') NOT NULL PRIMARY KEY,
     supplier_id INT, 
@@ -104,19 +91,17 @@ CREATE TABLE supplier_part_data
     FOREIGN KEY (part_id) REFERENCES part_data(part_id)
 );
 
-INSERT INTO supplier_part_data VALUES (8, 3, 2, 700, '2003-10-15');
-INSERT INTO supplier_part_data VALUES (7, 2, 1, 400, '2004-09-15');
-INSERT INTO supplier_part_data VALUES (4, 4, 6, 700, '2004-03-15');
-INSERT INTO supplier_part_data VALUES (5, 5, 5, 100, '2004-03-25');
-INSERT INTO supplier_part_data VALUES (1, 1, 4, 100, '2003-10-20');
-INSERT INTO supplier_part_data VALUES (3, 3, 3, 400, '2003-01-05');
-INSERT INTO supplier_part_data VALUES (2, 2, 2, 200, '2003-01-01');
-INSERT INTO supplier_part_data VALUES (6, 1, 1, 700, '2003-12-12');
-INSERT INTO supplier_part_data VALUES (9, 4, 3, 700, '2003-12-12');
-INSERT INTO supplier_part_data VALUES (12, 2, 5, 400, '2003-12-12');
-INSERT INTO supplier_part_data VALUES (11, 1, 4, 300, '2003-12-12');
-INSERT INTO supplier_part_data VALUES (10, 5, 2, 200, '2003-12-12');
-
-ALTER SEQUENCE supplier_part_data_seq RESTART WITH 1000;
+MERGE INTO supplier_part_data VALUES (8, 3, 2, 700, '2003-10-15');
+MERGE INTO supplier_part_data VALUES (7, 2, 1, 400, '2004-09-15');
+MERGE INTO supplier_part_data VALUES (4, 4, 6, 700, '2004-03-15');
+MERGE INTO supplier_part_data VALUES (5, 5, 5, 100, '2004-03-25');
+MERGE INTO supplier_part_data VALUES (1, 1, 4, 100, '2003-10-20');
+MERGE INTO supplier_part_data VALUES (3, 3, 3, 400, '2003-01-05');
+MERGE INTO supplier_part_data VALUES (2, 2, 2, 200, '2003-01-01');
+MERGE INTO supplier_part_data VALUES (6, 1, 1, 700, '2003-12-12');
+MERGE INTO supplier_part_data VALUES (9, 4, 3, 700, '2003-12-12');
+MERGE INTO supplier_part_data VALUES (12, 2, 5, 400, '2003-12-12');
+MERGE INTO supplier_part_data VALUES (11, 1, 4, 300, '2003-12-12');
+MERGE INTO supplier_part_data VALUES (10, 5, 2, 200, '2003-12-12');
 
 SELECT * FROM supplier_part_data;

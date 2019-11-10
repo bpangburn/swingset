@@ -54,10 +54,17 @@ import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
  */
 public class Example7 extends JFrame {
 
+	/**
+	 * unique serial id
+	 */
 	private static final long serialVersionUID = 5925004336834854311L;
+	
+	/**
+	 * declarations
+	 */
 	SSConnection ssConnection = null;
 	SSJdbcRowSetImpl rowset = null;
-	SSDataGrid dataGrid = new SSDataGrid();
+	SSDataGrid dataGrid = null;
 	String url;
 
 	/**
@@ -68,99 +75,99 @@ public class Example7 extends JFrame {
 	public Example7(String _url) {
 		super("Example 7");
 		this.url = _url;
-		setSize(730, 290);
+		setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 		init();
 	}
 
+	/**
+	 * Initialize the screen & datagrid
+	 */
 	private void init() {
 
-		try {
-			System.out.println("url from ex 7: " + this.url);
-			this.ssConnection = new SSConnection(
-					"jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + this.url + "'", "sa", "");
+		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
+			try {
+			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
+				System.out.println("url from ex 7: " + this.url);
+				this.ssConnection = new SSConnection(
+						"jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + this.url + "'", "sa", "");
+				this.ssConnection.setDriverName("org.h2.Driver");
+				this.ssConnection.createConnection();
+	
+				this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
+				this.rowset.setCommand("SELECT supplier_part_id, supplier_id, part_id, quantity, ship_date FROM supplier_part_data ORDER BY supplier_id, part_id;");
+	
+			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
+				this.dataGrid = new SSDataGrid();
+				this.dataGrid.setHeaders(new String[] { "Supplier-Part ID", "Supplier Name", "Part Name", "Quantity", "Ship Date" });
+				this.dataGrid.setSSRowSet(this.rowset);
+				this.dataGrid.setMessageWindow(this);
+				
+			// DISABLES NEW INSERTIONS TO THE DATABASE. - NOT CURRENTLY WORKING FOR H2
+				this.dataGrid.setInsertion(false);
+	
+			//	this.dataGrid.updateUI();
+	
+			// MAKE THE SUPPLIER-PART ID UNEDITABLE
+				this.dataGrid.setUneditableColumns(new String[] { "supplier_part_id" });
+				
+			// SET A DATE RENDERER FOR ship_date
+				this.dataGrid.setDateRenderer("ship_date");
 
-			this.ssConnection.setDriverName("org.h2.Driver");
-			this.ssConnection.createConnection();
-
-			this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
-			this.rowset.setCommand(
-					"SELECT supplier_id, part_id,quantity, ship_date, supplier_part_id FROM supplier_part_data ORDER BY supplier_id, part_id;");
-
-			// SET THE HEADER BEFORE SETTING THE ROWSET
-			this.dataGrid.setHeaders(new String[] { "Supplier Name", "Part Name", "Quantity", " Ship Date" });
-			this.dataGrid.setSSRowSet(this.rowset);
-
-			this.dataGrid.updateUI();
-
-			// HIDE THE PART ID COLUMN
-			// THIS SETS THE WIDTH OF THE COLUMN TO 0
-			this.dataGrid.setHiddenColumns(new String[] { "supplier_part_id" });
-
-			this.dataGrid.setDateRenderer("ship_date");
-
-			this.dataGrid.setMessageWindow(this);
-			this.dataGrid.setUneditableColumns(new int[] { 4 });
-
-			// DISABLES NEW INSERTIONS TO THE DATA BASE.
-			// DUE TO H2 DATABASE PROPERTIES, INSERTION OF NEW DATA CAUSES ERRORS.
-			// ANY CHANGES MADE TO THE PRESENT RECORD WILL BE SAVED BUT INSERTIONS ARE NOT
-			// ALLOWED
-			// IN H2.
-			this.dataGrid.setInsertion(false);
-
-			// ADDED STATEMENT "SCROLL INSENSITIVITY" FOR EXAMPLE TO BE
-			// COMPATIBLE WITH H2 DATABASE DEFAULT SETTINGS.
-			try (Statement stmt = this.ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
-					ResultSet.CONCUR_UPDATABLE)) {
-
-				String[] displayItems = null;
-				Integer[] underlyingNumbers = null;
-
-				try (ResultSet rs = stmt
-						.executeQuery("SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;")) {
-
-					rs.last();
-					displayItems = new String[rs.getRow()];
-					underlyingNumbers = new Integer[rs.getRow()];
-					rs.beforeFirst();
-
-					for (int i = 0; i < displayItems.length; i++) {
-						rs.next();
-						displayItems[i] = rs.getString("supplier_name");
-						underlyingNumbers[i] = new Integer(rs.getInt("supplier_id"));
+			// BUILD COMBO RENDERERS FOR SUPPLIER AND PART
+			// ADDED STATEMENT "SCROLL INSENSITIVITY" FOR EXAMPLE TO BE COMPATIBLE WITH H2 DATABASE DEFAULT SETTINGS.
+				try (Statement stmt = this.ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.CONCUR_UPDATABLE)) {
+	
+					String[] displayItems = null;
+					Integer[] underlyingNumbers = null;
+	
+					try (ResultSet rs = stmt
+							.executeQuery("SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;")) {
+	
+						rs.last();
+						displayItems = new String[rs.getRow()];
+						underlyingNumbers = new Integer[rs.getRow()];
+						rs.beforeFirst();
+	
+						for (int i = 0; i < displayItems.length; i++) {
+							rs.next();
+							displayItems[i] = rs.getString("supplier_name");
+							underlyingNumbers[i] = new Integer(rs.getInt("supplier_id"));
+						}
+	
+						this.dataGrid.setComboRenderer("supplier_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);
 					}
-
-					this.dataGrid.setComboRenderer("supplier_id", displayItems, underlyingNumbers);
-				}
-
-				try (ResultSet rs = stmt.executeQuery("SELECT part_name, part_id FROM part_data ORDER BY part_name;")) {
-					rs.last();
-					displayItems = new String[rs.getRow()];
-					underlyingNumbers = new Integer[rs.getRow()];
-					rs.beforeFirst();
-
-					for (int i = 0; i < displayItems.length; i++) {
-						rs.next();
-						displayItems[i] = rs.getString("part_name");
-						underlyingNumbers[i] = new Integer(rs.getInt("part_id"));
+	
+					try (ResultSet rs = stmt.executeQuery("SELECT part_name, part_id FROM part_data ORDER BY part_name;")) {
+						rs.last();
+						displayItems = new String[rs.getRow()];
+						underlyingNumbers = new Integer[rs.getRow()];
+						rs.beforeFirst();
+	
+						for (int i = 0; i < displayItems.length; i++) {
+							rs.next();
+							displayItems[i] = rs.getString("part_name");
+							underlyingNumbers[i] = new Integer(rs.getInt("part_id"));
+						}
+	
+						this.dataGrid.setComboRenderer("part_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);
 					}
-
-					this.dataGrid.setComboRenderer("part_id", displayItems, underlyingNumbers);
 				}
+	
+			} catch (SQLException se) {
+				se.printStackTrace();
+			} catch (ClassNotFoundException cnfe) {
+				cnfe.printStackTrace();
 			}
+			
+		// SETUP THE CONTAINER AND ADD THE DATAGRID
+			getContentPane().add(this.dataGrid.getComponent());
 
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (ClassNotFoundException cnfe) {
-			cnfe.printStackTrace();
-		}
+		// MAKE THE JFRAME VISIBLE
+			setVisible(true);
+	}
 
-		getContentPane().add(this.dataGrid.getComponent());
-
-		setVisible(true);
-	} // END OF INIT FUNCTION
-
-}// END OF EXAMPLE 7
+}
 
 /*
  * $Log$ Revision 1.7 2012/06/07 15:54:38 beevo Modified example for
