@@ -133,7 +133,7 @@ public class SSDBNavImpl implements SSDBNav {
                 ((JTextArea)comps[i]).setText("");                
             } else if (comps[i] instanceof JComboBox) {
             // IF IT IS A JComboBox THEN SET IT TO 'EMPTY' ITEM BEFORE FIRST ITEM
-                ((JComboBox)comps[i]).setSelectedIndex(-1);
+                ((JComboBox<?>)comps[i]).setSelectedIndex(-1);
             } else if(comps[i] instanceof SSImage) {
             // IF IT IS A SSImage CLEAR THE IMAGE.
                 ((SSImage)comps[i]).clearImage();
