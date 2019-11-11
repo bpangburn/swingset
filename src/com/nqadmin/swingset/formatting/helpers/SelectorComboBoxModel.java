@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet.formatting.helpers;
+package com.nqadmin.swingset.formatting.helpers;
 
 import java.beans.PropertyChangeSupport;
 import java.sql.ResultSet;
@@ -50,7 +50,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTextField;
 import javax.swing.event.ListDataListener;
 
-import com.nqadmin.swingSet.datasources.SSConnection;
+import com.nqadmin.swingset.datasources.SSConnection;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.FilterList;

@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet.formatting;
+package com.nqadmin.swingset.formatting;
 
 /**
  * SSTimestampField.java
@@ -71,7 +71,7 @@ public class SSTimestampField extends SSFormattedTextField {
     }
     
     /* (non-Javadoc)
-     * @see com.nqadmin.swingSet.formatting.SSField#cleanField()
+     * @see com.nqadmin.swingset.formatting.SSField#cleanField()
      */
     @Override
 	public void cleanField() {

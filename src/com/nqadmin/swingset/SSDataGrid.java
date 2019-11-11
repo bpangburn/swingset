@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet;
+package com.nqadmin.swingset;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -71,7 +71,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import com.nqadmin.swingSet.datasources.SSRowSet;
+import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
  * SSDataGrid.java

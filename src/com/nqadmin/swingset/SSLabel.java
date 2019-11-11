@@ -36,7 +36,7 @@
  ******************************************************************************/
 
 
-package com.nqadmin.swingSet;
+package com.nqadmin.swingset;
 
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
@@ -49,7 +49,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import com.nqadmin.swingSet.datasources.SSRowSet;
+import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
  * SSLabel.java

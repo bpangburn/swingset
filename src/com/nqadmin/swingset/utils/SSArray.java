@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet.utils;
+package com.nqadmin.swingset.utils;
 
 import java.sql.Array;
 import java.sql.ResultSet;
@@ -50,7 +50,7 @@ import java.util.Map;
  * Implementation of SQL array for SSList.
  */
 
-// TODO only reference is in com.nqadmin.swingSet.SSList
+// TODO only reference is in com.nqadmin.swingset.SSList
 public class SSArray implements Array {
 
 	/**

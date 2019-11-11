@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet;
+package com.nqadmin.swingset;
 
 import java.io.Serializable;
 import java.sql.Date;
@@ -54,7 +54,7 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 
-import com.nqadmin.swingSet.datasources.SSRowSet;
+import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
  * SSTextDocument.java

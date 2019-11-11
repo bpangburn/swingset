@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet.formatting;
+package com.nqadmin.swingset.formatting;
 
 import java.beans.BeanDescriptor;
 import java.beans.EventSetDescriptor;
@@ -55,7 +55,7 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( com.nqadmin.swingSet.formatting.SSImageField.class , null );
+        BeanDescriptor beanDescriptor = new BeanDescriptor  ( com.nqadmin.swingset.formatting.SSImageField.class , null );
         beanDescriptor.setDisplayName ( "SSImageField" );
         beanDescriptor.setShortDescription ( "Field used to handle bytea image fields" );//GEN-HEADEREND:BeanDescriptor
         
@@ -84,24 +84,24 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
         PropertyDescriptor[] properties = new PropertyDescriptor[11];
     
         try {
-            properties[PROPERTY_background] = new PropertyDescriptor ( "background", com.nqadmin.swingSet.formatting.SSImageField.class, "getBackground", "setBackground" );
-            properties[PROPERTY_border] = new PropertyDescriptor ( "border", com.nqadmin.swingSet.formatting.SSImageField.class, "getBorder", "setBorder" );
-            properties[PROPERTY_columnName] = new PropertyDescriptor ( "columnName", com.nqadmin.swingSet.formatting.SSImageField.class, "getColumnName", "setColumnName" );
+            properties[PROPERTY_background] = new PropertyDescriptor ( "background", com.nqadmin.swingset.formatting.SSImageField.class, "getBackground", "setBackground" );
+            properties[PROPERTY_border] = new PropertyDescriptor ( "border", com.nqadmin.swingset.formatting.SSImageField.class, "getBorder", "setBorder" );
+            properties[PROPERTY_columnName] = new PropertyDescriptor ( "columnName", com.nqadmin.swingset.formatting.SSImageField.class, "getColumnName", "setColumnName" );
             properties[PROPERTY_columnName].setPreferred ( true );
             properties[PROPERTY_columnName].setDisplayName ( "Column Name" );
-            properties[PROPERTY_enabled] = new PropertyDescriptor ( "enabled", com.nqadmin.swingSet.formatting.SSImageField.class, "isEnabled", "setEnabled" );
-            properties[PROPERTY_focusable] = new PropertyDescriptor ( "focusable", com.nqadmin.swingSet.formatting.SSImageField.class, "isFocusable", "setFocusable" );
-            properties[PROPERTY_insets] = new PropertyDescriptor ( "insets", com.nqadmin.swingSet.formatting.SSImageField.class, "getInsets", null );
-            properties[PROPERTY_preferredSize] = new PropertyDescriptor ( "preferredSize", com.nqadmin.swingSet.formatting.SSImageField.class, "getPreferredSize", "setPreferredSize" );
-            properties[PROPERTY_SSDataNavigator] = new PropertyDescriptor ( "SSDataNavigator", com.nqadmin.swingSet.formatting.SSImageField.class, "getSSDataNavigator", "setSSDataNavigator" );
+            properties[PROPERTY_enabled] = new PropertyDescriptor ( "enabled", com.nqadmin.swingset.formatting.SSImageField.class, "isEnabled", "setEnabled" );
+            properties[PROPERTY_focusable] = new PropertyDescriptor ( "focusable", com.nqadmin.swingset.formatting.SSImageField.class, "isFocusable", "setFocusable" );
+            properties[PROPERTY_insets] = new PropertyDescriptor ( "insets", com.nqadmin.swingset.formatting.SSImageField.class, "getInsets", null );
+            properties[PROPERTY_preferredSize] = new PropertyDescriptor ( "preferredSize", com.nqadmin.swingset.formatting.SSImageField.class, "getPreferredSize", "setPreferredSize" );
+            properties[PROPERTY_SSDataNavigator] = new PropertyDescriptor ( "SSDataNavigator", com.nqadmin.swingset.formatting.SSImageField.class, "getSSDataNavigator", "setSSDataNavigator" );
             properties[PROPERTY_SSDataNavigator].setPreferred ( true );
             properties[PROPERTY_SSDataNavigator].setDisplayName ( "SSDataNavigator" );
-            properties[PROPERTY_SSRowSet] = new PropertyDescriptor ( "SSRowSet", com.nqadmin.swingSet.formatting.SSImageField.class, "getSSRowSet", "setSSRowSet" );
+            properties[PROPERTY_SSRowSet] = new PropertyDescriptor ( "SSRowSet", com.nqadmin.swingset.formatting.SSImageField.class, "getSSRowSet", "setSSRowSet" );
             properties[PROPERTY_SSRowSet].setPreferred ( true );
             properties[PROPERTY_SSRowSet].setDisplayName ( "SSRowSet" );
-            properties[PROPERTY_toolTipText] = new PropertyDescriptor ( "toolTipText", com.nqadmin.swingSet.formatting.SSImageField.class, "getToolTipText", "setToolTipText" );
+            properties[PROPERTY_toolTipText] = new PropertyDescriptor ( "toolTipText", com.nqadmin.swingset.formatting.SSImageField.class, "getToolTipText", "setToolTipText" );
             properties[PROPERTY_toolTipText].setPreferred ( true );
-            properties[PROPERTY_visible] = new PropertyDescriptor ( "visible", com.nqadmin.swingSet.formatting.SSImageField.class, "isVisible", "setVisible" );
+            properties[PROPERTY_visible] = new PropertyDescriptor ( "visible", com.nqadmin.swingset.formatting.SSImageField.class, "isVisible", "setVisible" );
         }
         catch( IntrospectionException e) {
         	// do nothing

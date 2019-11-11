@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet.formatting;
+package com.nqadmin.swingset.formatting;
 
 /**
  * SSCurrencyField.java

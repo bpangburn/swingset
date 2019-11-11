@@ -40,9 +40,9 @@ import java.sql.SQLException;
 
 import javax.swing.JFrame;
 
-import com.nqadmin.swingSet.SSDataGrid;
-import com.nqadmin.swingSet.datasources.SSConnection;
-import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+import com.nqadmin.swingset.SSDataGrid;
+import com.nqadmin.swingset.datasources.SSConnection;
+import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view

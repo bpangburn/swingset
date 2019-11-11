@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet.formatting.helpers;
+package com.nqadmin.swingset.formatting.helpers;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
@@ -53,8 +53,8 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuListener;
 
-import com.nqadmin.swingSet.datasources.SSConnection;
-import com.nqadmin.swingSet.formatting.SSFormattedTextField;
+import com.nqadmin.swingset.datasources.SSConnection;
+import com.nqadmin.swingset.formatting.SSFormattedTextField;
 
 /**
  * HelperPopup.java

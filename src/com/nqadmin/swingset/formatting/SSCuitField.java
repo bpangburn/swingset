@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet.formatting;
+package com.nqadmin.swingset.formatting;
 
 import javax.swing.text.Caret;
 import javax.swing.text.DefaultCaret;
@@ -86,7 +86,7 @@ public class SSCuitField extends SSFormattedTextField {
     }
 
     /* (non-Javadoc)
-     * @see com.nqadmin.swingSet.formatting.SSFormattedTextField#validateField(java.lang.Object)
+     * @see com.nqadmin.swingset.formatting.SSFormattedTextField#validateField(java.lang.Object)
      */
     @Override
 	public boolean validateField(Object value) {

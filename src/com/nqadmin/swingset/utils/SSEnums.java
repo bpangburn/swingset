@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet.utils;
+package com.nqadmin.swingset.utils;
 
 /**
  * SSEnums.java

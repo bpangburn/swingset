@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet;
+package com.nqadmin.swingset;
 
 import java.awt.Component;
 import java.sql.Date;
@@ -51,7 +51,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
-import com.nqadmin.swingSet.datasources.SSRowSet;
+import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
  * SSTableModel.java

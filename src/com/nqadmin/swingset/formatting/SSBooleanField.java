@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet.formatting;
+package com.nqadmin.swingset.formatting;
 
 import java.awt.AWTKeyStroke;
 import java.awt.KeyboardFocusManager;
@@ -50,8 +50,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
-import com.nqadmin.swingSet.SSDataNavigator;
-import com.nqadmin.swingSet.datasources.SSRowSet;
+import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
  * SSBooleanField.java

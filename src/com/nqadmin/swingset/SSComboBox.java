@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet;
+package com.nqadmin.swingset;
 
 import java.awt.AWTKeyStroke;
 import java.awt.Component;
@@ -54,7 +54,7 @@ import javax.sql.RowSetListener;
 import javax.swing.JComboBox;
 import javax.swing.KeyStroke;
 
-import com.nqadmin.swingSet.datasources.SSRowSet;
+import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
  * SSComboBox.java

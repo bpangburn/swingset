@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet;
+package com.nqadmin.swingset;
 
 /**
  * SSDBNavAdapter.java

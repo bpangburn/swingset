@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet;
+package com.nqadmin.swingset;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -49,7 +49,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import com.nqadmin.swingSet.formatting.SSFormattedTextField;
+import com.nqadmin.swingset.formatting.SSFormattedTextField;
 
 /**
  * SSDBNavImpl.java

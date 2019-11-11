@@ -41,10 +41,10 @@ import java.sql.SQLException;
 
 import javax.swing.JFrame;
 
-import com.nqadmin.swingSet.SSDataGrid;
-import com.nqadmin.swingSet.SSDataValue;
-import com.nqadmin.swingSet.datasources.SSConnection;
-import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+import com.nqadmin.swingset.SSDataGrid;
+import com.nqadmin.swingset.SSDataValue;
+import com.nqadmin.swingset.datasources.SSConnection;
+import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 
 /**
  * This example is similar to Example5, demonstrating the use of an SSDataGrid

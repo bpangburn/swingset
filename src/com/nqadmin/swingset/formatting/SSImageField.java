@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet.formatting;
+package com.nqadmin.swingset.formatting;
 
 import java.awt.AWTKeyStroke;
 import java.awt.BorderLayout;
@@ -61,8 +61,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
-import com.nqadmin.swingSet.SSDataNavigator;
-import com.nqadmin.swingSet.datasources.SSRowSet;
+import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
  * SSImageField.java

@@ -45,12 +45,12 @@ import java.sql.SQLException;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import com.nqadmin.swingSet.SSComboBox;
-import com.nqadmin.swingSet.SSDBNavImpl;
-import com.nqadmin.swingSet.SSDataNavigator;
-import com.nqadmin.swingSet.SSTextField;
-import com.nqadmin.swingSet.datasources.SSConnection;
-import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
+import com.nqadmin.swingset.SSComboBox;
+import com.nqadmin.swingset.SSDBNavImpl;
+import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.datasources.SSConnection;
+import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 
 /**
  * This example demonstrates the use of SSTextDocument to display information in

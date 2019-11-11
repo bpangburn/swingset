@@ -35,11 +35,11 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet;
+package com.nqadmin.swingset;
 
 import java.io.Serializable;
 
-import com.nqadmin.swingSet.utils.SSEnums.Navigation;
+import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 /**
  * SSDBNav.java
@@ -164,7 +164,7 @@ public interface SSDBNav extends Serializable {
 	 * @param _navigationType this indicates the type of navigation.
 	 * 
 	 * @deprecated Use
-	 *             {@link #performNavigationOps(com.nqadmin.swingSet.utils.SSEnums.Navigation _navType)}
+	 *             {@link #performNavigationOps(com.nqadmin.swingset.utils.SSEnums.Navigation _navType)}
 	 *             instead.
 	 */
 	@Deprecated

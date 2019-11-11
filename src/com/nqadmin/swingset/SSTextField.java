@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet;
+package com.nqadmin.swingset;
 
 import java.awt.AWTKeyStroke;
 import java.awt.Dimension;
@@ -52,7 +52,7 @@ import java.util.StringTokenizer;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-import com.nqadmin.swingSet.datasources.SSRowSet;
+import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
  * SSTextField.java

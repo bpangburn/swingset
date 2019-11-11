@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet;
+package com.nqadmin.swingset;
 
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
@@ -58,10 +58,10 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 
-import com.nqadmin.swingSet.datasources.SSConnection;
-import com.nqadmin.swingSet.datasources.SSRowSet;
-import com.nqadmin.swingSet.formatting.helpers.SelectorComboBoxModel;
-import com.nqadmin.swingSet.formatting.helpers.SelectorElement;
+import com.nqadmin.swingset.datasources.SSConnection;
+import com.nqadmin.swingset.datasources.SSRowSet;
+import com.nqadmin.swingset.formatting.helpers.SelectorComboBoxModel;
+import com.nqadmin.swingset.formatting.helpers.SelectorElement;
 
 /**
  * SSDBComboBox.java

@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet.formatting;
+package com.nqadmin.swingset.formatting;
 
 import java.awt.AWTKeyStroke;
 import java.awt.Color;
@@ -65,12 +65,12 @@ import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-import com.nqadmin.swingSet.SSDataNavigator;
-import com.nqadmin.swingSet.datasources.SSRowSet;
-import com.nqadmin.swingSet.formatting.helpers.HelperPopup;
-import com.nqadmin.swingSet.formatting.helpers.RowSetHelperPopup;
-//import com.nqadmin.swingSet.formatting.helpers.SSFormattedComboBoxEditor;
-//import com.nqadmin.swingSet.formatting.helpers.SSFormattedComboBoxModel;
+import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.datasources.SSRowSet;
+import com.nqadmin.swingset.formatting.helpers.HelperPopup;
+import com.nqadmin.swingset.formatting.helpers.RowSetHelperPopup;
+//import com.nqadmin.swingset.formatting.helpers.SSFormattedComboBoxEditor;
+//import com.nqadmin.swingset.formatting.helpers.SSFormattedComboBoxModel;
 
 /**
  * SSFormattedTextField.java
@@ -374,7 +374,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 		if (_event.getKeyCode() == KeyEvent.VK_F3) {
 			this.calculator = new javax.swing.JPopupMenu();
-			// calculator.add(new com.nqadmin.swingSet.formatting.utils.JCalculator());
+			// calculator.add(new com.nqadmin.swingset.formatting.utils.JCalculator());
 			JFormattedTextField ob = (JFormattedTextField) (_event.getSource());
 			java.awt.Dimension d = ob.getSize();
 			this.calculator.show(ob, 0, d.height);

@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet;
+package com.nqadmin.swingset;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -55,8 +55,8 @@ import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import com.nqadmin.swingSet.datasources.SSRowSet;
-import com.nqadmin.swingSet.utils.SSArray;
+import com.nqadmin.swingset.datasources.SSRowSet;
+import com.nqadmin.swingset.utils.SSArray;
 
 /**
  * SSList.java

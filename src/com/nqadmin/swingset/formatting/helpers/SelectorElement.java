@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet.formatting.helpers;
+package com.nqadmin.swingset.formatting.helpers;
 
 import java.util.List;
 

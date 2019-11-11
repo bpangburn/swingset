@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet.datasources;
+package com.nqadmin.swingset.datasources;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet.formatting;
+package com.nqadmin.swingset.formatting;
 
 import java.awt.AWTKeyStroke;
 import java.awt.KeyboardFocusManager;
@@ -53,8 +53,8 @@ import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-import com.nqadmin.swingSet.SSDataNavigator;
-import com.nqadmin.swingSet.datasources.SSRowSet;
+import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
  * SSMemoField.java
@@ -338,7 +338,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		if (_event.getKeyCode() == KeyEvent.VK_F3) {
 			System.out.println("F3 ");
 			// calculator = new javax.swing.JPopupMenu();
-			// calculator.add(new com.nqadmin.swingSet.formatting.utils.JCalculator());
+			// calculator.add(new com.nqadmin.swingset.formatting.utils.JCalculator());
 			// JFormattedTextField ob = (JFormattedTextField)(_event.getSource());
 			// java.awt.Dimension d = ob.getSize();
 			// calculator.show(ob, 0, d.height);

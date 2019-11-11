@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet;
+package com.nqadmin.swingset;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -55,8 +55,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-import com.nqadmin.swingSet.datasources.SSRowSet;
-import com.nqadmin.swingSet.utils.SSEnums.Navigation;
+import com.nqadmin.swingset.datasources.SSRowSet;
+import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 /**
  * SSDataNavigator.java

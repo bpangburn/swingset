@@ -35,12 +35,12 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
- package com.nqadmin.swingSet.utils;
+ package com.nqadmin.swingset.utils;
 
- import com.nqadmin.swingSet.datasources.*;
+ import com.nqadmin.swingset.datasources.*;
  import java.sql.SQLException;
- import com.nqadmin.swingSet.SSDBComboBox;
- import com.nqadmin.swingSet.SSDataNavigator;
+ import com.nqadmin.swingset.SSDBComboBox;
+ import com.nqadmin.swingset.SSDataNavigator;
  import javax.sql.RowSetListener;
  import java.awt.event.ActionListener;
  import java.awt.event.ActionEvent;

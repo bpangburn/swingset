@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingSet.formatting;
+package com.nqadmin.swingset.formatting;
 
 import java.util.Calendar;
 
@@ -70,7 +70,7 @@ public class SSTimeField extends SSFormattedTextField {
     }
 
     /* (non-Javadoc)
-     * @see com.nqadmin.swingSet.formatting.SSField#cleanField()
+     * @see com.nqadmin.swingset.formatting.SSField#cleanField()
      */
     @Override
 	public void cleanField() {
