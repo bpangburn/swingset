@@ -520,11 +520,12 @@ public class SSDataNavigator extends JPanel {
 		// EXCEPT COMMIT & UNDO. WITH OUT COMMITING OR UNDOING THE ADD USER
 		// CLOSES THE SCREEN. NOW IF THE SCREEN IS OPENED WITH A NEW SSROWSET.
 		// THE REFRESH, ADD & DELETE WILL BE DISABLED.
+		// 2019-11-11: only enabling add/delete if this.modification==true
 		this.refreshButton.setEnabled(true);
-		if (this.insertion) {
+		if (this.insertion && this.modification) {
 			this.addButton.setEnabled(true);
 		}
-		if (this.deletion) {
+		if (this.deletion && this.modification) {
 			this.deleteButton.setEnabled(true);
 		}
 	}
