@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!--  specify parent project to inherit common properties & dependencies -->
+  <parent>
+	<groupId>com.nqadmin.swingset</groupId>
+	<artifactId>swingset-parent</artifactId>
+	<version>${revision}</version>
+  </parent>
+  
+  <groupId>com.nqadmin.swingset</groupId>
+  <artifactId>swingset-demo</artifactId>
+  <version>${revision}</version>
+  <packaging>jar</packaging>
+
+  <name>swingset-demo</name>
+  <description>Demo for SwingSet</description>
+  <url>https://sourceforge.net/projects/swingset</url>
+
+  <!-- added by Eclipse -->
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <!-- local dependency on swingset -->
+	<dependency>
+		<groupId>com.nqadmin.swingset</groupId>
+		<artifactId>swingset</artifactId>
+		<version>${revision}</version>
+	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+	<dependency>
+		<groupId>com.h2database</groupId>
+		<artifactId>h2</artifactId>
+		<version>${h2.version}</version>
+		</dependency>
+  </dependencies>
+  
+</project>

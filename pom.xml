@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.nqadmin.swingset</groupId>
+  <artifactId>swingset-parent</artifactId>
+  <version>${revision}</version>
+  <packaging>pom</packaging>
+
+  <name>swingset-parent</name>
+  <url>https://sourceforge.net/projects/swingset</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <revision>3.0.0-SNAPSHOT</revision>
+    <h2.version>1.4.200</h2.version>
+    <glazedlist.version>1.11.0</glazedlist.version>
+  </properties>
+
+  <!-- any shared dependencies such as junit - none for swingset -->
+  <dependencies>
+      <!-- 
+        <dependency>
+
+    	</dependency>
+       -->
+  </dependencies>
+  
+  <modules>
+  	<module>swingset</module>
+  	<module>swingset-demo</module>
+  </modules>
+
+  
+</project>
