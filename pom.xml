@@ -4,34 +4,17 @@
 
   <groupId>com.nqadmin.swingset</groupId>
   <artifactId>swingset-parent</artifactId>
-  <version>${revision}</version>
+  <version>3.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>swingset-parent</name>
   <url>https://sourceforge.net/projects/swingset</url>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <revision>3.0.0-SNAPSHOT</revision>
-    <h2.version>1.4.200</h2.version>
-    <glazedlist.version>1.11.0</glazedlist.version>
-  </properties>
-
-  <!-- any shared dependencies such as junit - none for swingset -->
-  <dependencies>
-      <!-- 
-        <dependency>
-
-    	</dependency>
-       -->
-  </dependencies>
   
+  <!-- NOT INCLUDING ANY CHILD DEPENDENCIES/PROPERTIES SO THAT EACH MODULE STANDS ALONE -->
+ 
   <modules>
   	<module>swingset</module>
   	<module>swingset-demo</module>
   </modules>
-
   
 </project>

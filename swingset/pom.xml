@@ -1,29 +1,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
-  <!--  specify parent project to inherit common properties & dependencies -->
-  <parent>
-	<groupId>com.nqadmin.swingset</groupId>
-	<artifactId>swingset-parent</artifactId>
-	<version>${revision}</version>
-  </parent>
+    
+  <!-- NOT SPECIFYING PARENT SO EACH MODULE STANDS ALONE -->
 
   <groupId>com.nqadmin.swingset</groupId>
   <artifactId>swingset</artifactId>
-  <version>${revision}</version>
+  <version>3.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>swingset</name>
   <description>Data-aware replacements for manyof the standard Java Swing components</description>
   <url>https://sourceforge.net/projects/swingset</url>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
 
   <dependencies>
     <!-- https://mvnrepository.com/artifact/com.glazedlists/glazedlists -->
 	<dependency>
 		<groupId>com.glazedlists</groupId>
 		<artifactId>glazedlists</artifactId>
-		<version>${glazedlist.version}</version>
+		<version>1.11.0</version>
 	</dependency>
   </dependencies>
   
