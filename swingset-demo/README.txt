@@ -113,7 +113,7 @@ using the following commands:
 		
 Note that if running the examples from Eclipse, right-click on MainClass.java
 and select Run As->Run Configurations... and then under Arguments enter:
-	./src/samples/suppliers_and_parts.sql
+	./src/main/resources/suppliers_and_parts.sql
 Then right-click on MainClass.java and select Run As->Java Application.	
 
 
