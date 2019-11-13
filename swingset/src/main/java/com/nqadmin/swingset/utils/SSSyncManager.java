@@ -230,7 +230,6 @@ public class SSSyncManager {
                // dataNavigator.updatePresentRow();
                 //if(id != rowset.getLong(columnName)) {
                 if(!this.id.equals(SSSyncManager.this.rowset.getString(SSSyncManager.this.columnName))) {
-                	@SuppressWarnings("boxing")
 					long indexOfId = SSSyncManager.this.comboBox.itemMap.get(this.id) + 1;
                   	int index = (int)indexOfId;
                     SSSyncManager.this.rowset.absolute(index);

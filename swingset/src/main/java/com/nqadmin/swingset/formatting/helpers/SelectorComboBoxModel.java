@@ -253,7 +253,6 @@ public class SelectorComboBoxModel extends DefaultComboBoxModel<Object> {
 	/**
 	 * Populates the list model with the data by fetching it from the database.
 	 */
-	@SuppressWarnings("boxing")
 	private void populateModel() {
 		this.itemMap = new HashMap<>();
 		Object primaryValue = null;

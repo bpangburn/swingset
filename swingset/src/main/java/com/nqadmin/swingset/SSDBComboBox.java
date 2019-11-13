@@ -491,7 +491,6 @@ public class SSDBComboBox extends JComboBox<Object> {
         if (index == -1) {
             return -1;
         }
-        @SuppressWarnings("boxing")
 		long returnVal =  Long.valueOf(this.selectorCBM.getSelectedBoundData(index).toString());
         return returnVal;
         
@@ -631,7 +630,6 @@ public class SSDBComboBox extends JComboBox<Object> {
       *
       * @return returns true on successful deletion else returns false.
       */
-    @SuppressWarnings("boxing")
 	public boolean deleteStringItem(String _value) {
     	this.selectorCBM.data.getReadWriteLock().writeLock().lock();
     	try {
@@ -692,7 +690,6 @@ public class SSDBComboBox extends JComboBox<Object> {
     public boolean updateStringItem(String _value, String _name) {
     	if (this.itemMap.get(_value) == null) return false;
 		
-		@SuppressWarnings("boxing")
 		long indexL = this.itemMap.get(_value);
 		int index = (int) indexL;
 		
@@ -748,7 +745,6 @@ public class SSDBComboBox extends JComboBox<Object> {
      * Updates the value displayed in the component based on the SSRowSet column
      * binding.
      */
-    @SuppressWarnings("boxing")
 	protected void updateDisplay() {
 
     	// THIS WILL MAKE SURE COMBO BOX ACTION LISTENER DOESN'T DO ANY THING EVEN IF IT GETS CALLED
@@ -806,7 +802,6 @@ public class SSDBComboBox extends JComboBox<Object> {
     	ActionListener[] saveActionListeners = new ActionListener[getActionListeners().length];
     	boolean saveSwitch = true;
     	
-    	@SuppressWarnings("synthetic-access")
 		public void addAllActionListeners(){	
     		for (ActionListener al: this.saveActionListeners) addActionListener(al);
 			fireActionEvent();

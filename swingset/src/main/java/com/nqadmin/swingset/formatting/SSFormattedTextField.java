@@ -461,7 +461,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * field. depending on the column Type.
 	 */
 
-	private void DbToFm(@SuppressWarnings("unused") final String texto) {
+	private void DbToFm(final String texto) {
 		Object oValue = null;
 		Object nValue = null;
 		int nrow = 0;

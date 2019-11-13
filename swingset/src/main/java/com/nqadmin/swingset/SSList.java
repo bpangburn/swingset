@@ -263,7 +263,6 @@ public class SSList extends JList<Object> {
 	 * @deprecated Use {@link #getSelectedValuesList()} instead.
 	 * 
 	 */
-	@SuppressWarnings("deprecation") // needed because it overrides a deprecated method in the parent class
 	@Deprecated
 	@Override
 	public Object[] getSelectedValues() {
