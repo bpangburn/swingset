@@ -35,6 +35,8 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
+package com.nqadmin.swingset.demo;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;

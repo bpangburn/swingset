@@ -36,6 +36,8 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
+package com.nqadmin.swingset.demo;
+
 import java.sql.SQLException;
 
 import javax.swing.JFrame;

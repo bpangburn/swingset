@@ -36,6 +36,8 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
+package com.nqadmin.swingset.demo;
+
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
