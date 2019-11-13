@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry excluding="samples/" kind="src" path="src"/>
-	<classpathentry kind="src" path="src/samples"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/glazedlists-1.11.0.jar"/>
-	<classpathentry kind="lib" path="lib/h2-1.4.200.jar"/>
-	<classpathentry kind="output" path="bin"/>
-</classpath>

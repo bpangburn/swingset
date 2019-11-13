@@ -4,7 +4,7 @@
     
   <!-- NOT SPECIFYING PARENT SO EACH MODULE STANDS ALONE -->
   
-  <groupId>com.nqadmin.swingset</groupId>
+  <groupId>com.nqadmin.swingset.demo</groupId>
   <artifactId>swingset-demo</artifactId>
   <version>3.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
