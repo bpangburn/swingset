@@ -37,9 +37,21 @@
 
 package com.nqadmin.swingset.demo;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+
+import org.h2.tools.RunScript;
 
 /**
  * A JFrame with buttons for each of the SwingSet example screens.
@@ -50,6 +62,16 @@ public class MainClass extends JFrame {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -6316984401822746124L;
+	
+	/**
+	 * database script
+	 */
+	private static final String DATABASE_SCRIPT = "suppliers_and_parts.sql";
+	
+	/**
+	 * database connection
+	 */
+	private Connection dbConnection = null;
 	
 	/**
 	 * shared component dimensions
@@ -92,17 +114,24 @@ public class MainClass extends JFrame {
      * 
      * @param _url - path to SQL to create suppliers & parts database
      */
-    public MainClass(String[] _url){
-    
+    public MainClass(){
+    	
+
         // SETUP WINDOW
 	    	super("SwingSet Demo");
 	        setSize(300,300);
-	        this.url = _url[0];
 	        setDefaultCloseOperation(EXIT_ON_CLOSE);
 	        
 	        System.out.println("Working Directory = " +
 	                System.getProperty("user.dir"));
-
+	        
+	    // INITIALIZE DATABASE
+    		dbConnection = getDatabase();
+    		if (dbConnection == null) {
+				System.out.println("Error initializing database. Exiting.");
+				System.exit(0);
+    		}
+    	        
 	    // ADD ACTION LISTENERS FOR BUTTONS
 	        this.btnExample1.addActionListener( new MyButtonListener());
 	        this.btnExample2.addActionListener( new MyButtonListener());
@@ -135,6 +164,37 @@ public class MainClass extends JFrame {
 	        setVisible(true);
 	        //pack();
     }
+    
+    /**
+     * Class to initialize the database connection and load the database content from a script
+     */
+    protected Connection getDatabase() {
+    	
+    	Connection result = null;
+    	
+		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
+		try {
+			
+			Class.forName("org.h2.Driver");
+	        InputStream inStream = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT);
+	        if (inStream == null) {
+	            System.out.println("Please add the file suppliers_and_parts.sql to the classpath, package "
+	                    + getClass().getPackage().getName());
+	        } else {
+	            result = DriverManager.getConnection("jdbc:h2:mem:suppliers_and_parts");
+	            RunScript.execute(result, new InputStreamReader(inStream));
+	            inStream.close();
+	        }
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (ClassNotFoundException cnfe) {
+			cnfe.printStackTrace();
+		}
+		
+		return result;
+    }
 
     /**
      * ActionListener implementation to call code for each button.
@@ -148,27 +208,25 @@ public class MainClass extends JFrame {
 		@Override
 		public void actionPerformed( ActionEvent ae){
             if(ae.getSource().equals(MainClass.this.btnExample1)){
-                MainClass.this.btnExample1.setText("Processing..");
-                new Example1(MainClass.this.url);
-                MainClass.this.btnExample1.setText("Example1");
+                new Example1(dbConnection);
             }
             else if(ae.getSource().equals(MainClass.this.btnExample2)){
-                new Example2(MainClass.this.url); 
+            	new Example2(dbConnection);
             }
             else if(ae.getSource().equals(MainClass.this.btnExample3)){
-                new Example3(MainClass.this.url);
+            	new Example3(dbConnection);
             }
             else if(ae.getSource().equals(MainClass.this.btnExample4)){
-                new Example4(MainClass.this.url);
+            	new Example4(dbConnection);
             }
             else if(ae.getSource().equals(MainClass.this.btnExample5)){
-                new Example5(MainClass.this.url);
+            	new Example5(dbConnection);
             }
             else if(ae.getSource().equals(MainClass.this.btnExample6)){
-                new Example6(MainClass.this.url);
+            	new Example6(dbConnection);
             }
             else if(ae.getSource().equals(MainClass.this.btnExample7)){
-                new Example7(MainClass.this.url);
+            	new Example7(dbConnection);
             }
         }
     }
@@ -177,8 +235,8 @@ public class MainClass extends JFrame {
      * main method for SwingSet samples/demo
      * @param url 
      */
-	public static void main(String[] url){
-        new MainClass(url);
+	public static void main(String[] _url){
+        new MainClass();
     }
 }
 

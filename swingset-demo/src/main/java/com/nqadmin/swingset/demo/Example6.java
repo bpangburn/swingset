@@ -38,6 +38,7 @@
 
 package com.nqadmin.swingset.demo;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -73,11 +74,19 @@ public class Example6 extends JFrame {
 	 * 
 	 * @param _url - path to SQL to create suppliers & parts database
 	 */
-	public Example6(String _url) {
-		super("Example 6");
-		this.url = _url;
-		setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
-		init();
+	public Example6(Connection _dbConn) {
+		
+		// SET SCREEN TITLE
+			super("Example6");
+			
+		// SET CONNECTION
+			ssConnection = new SSConnection(_dbConn);
+		
+		// SET SCREEN DIMENSIONS
+			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
+			
+		// INITIALIZE SCREEN & DATAGRID
+			init();
 	}
 
 	/**
@@ -88,13 +97,7 @@ public class Example6 extends JFrame {
 		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
 			try {
 			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-				System.out.println("url from ex 6: " + this.url);
-				this.ssConnection = new SSConnection(
-						"jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + this.url + "'", "sa", "");
-				this.ssConnection.setDriverName("org.h2.Driver");
-				this.ssConnection.createConnection();
-	
-				this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
+				this.rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
 				this.rowset.setCommand("SELECT * FROM part_data ORDER BY part_name;");
 			
 			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
@@ -127,8 +130,7 @@ public class Example6 extends JFrame {
 						
 						try {
 						// GET THE NEW RECORD ID.	
-							ResultSet rs = ssConnection.getConnection()
-									.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+							ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 									.executeQuery("SELECT nextval('part_data_seq') as nextVal;");
 							rs.next();
 							partID = rs.getInt("nextVal");
@@ -150,8 +152,6 @@ public class Example6 extends JFrame {
 	
 			} catch (SQLException se) {
 				se.printStackTrace();
-			} catch (ClassNotFoundException cnfe) {
-				cnfe.printStackTrace();
 			}
 		
 		// SETUP THE CONTAINER AND ADD THE DATAGRID

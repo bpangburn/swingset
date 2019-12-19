@@ -38,6 +38,7 @@
 
 package com.nqadmin.swingset.demo;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -74,11 +75,19 @@ public class Example7 extends JFrame {
 	 * 
 	 * @param _url - path to SQL to create suppliers & parts database
 	 */
-	public Example7(String _url) {
-		super("Example 7");
-		this.url = _url;
-		setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
-		init();
+	public Example7(Connection _dbConn) {
+		
+		// SET SCREEN TITLE
+			super("Example7");
+			
+		// SET CONNECTION
+			ssConnection = new SSConnection(_dbConn);
+		
+		// SET SCREEN DIMENSIONS
+			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
+			
+		// INITIALIZE SCREEN & DATAGRID
+			init();
 	}
 
 	/**
@@ -89,13 +98,7 @@ public class Example7 extends JFrame {
 		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
 			try {
 			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-				System.out.println("url from ex 7: " + this.url);
-				this.ssConnection = new SSConnection(
-						"jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + this.url + "'", "sa", "");
-				this.ssConnection.setDriverName("org.h2.Driver");
-				this.ssConnection.createConnection();
-	
-				this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
+				this.rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
 				this.rowset.setCommand("SELECT supplier_part_id, supplier_id, part_id, quantity, ship_date FROM supplier_part_data ORDER BY supplier_id, part_id;");
 	
 			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
@@ -158,8 +161,6 @@ public class Example7 extends JFrame {
 	
 			} catch (SQLException se) {
 				se.printStackTrace();
-			} catch (ClassNotFoundException cnfe) {
-				cnfe.printStackTrace();
 			}
 			
 		// SETUP THE CONTAINER AND ADD THE DATAGRID

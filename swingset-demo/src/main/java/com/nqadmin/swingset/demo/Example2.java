@@ -41,6 +41,7 @@ package com.nqadmin.swingset.demo;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -95,29 +96,24 @@ public class Example2 extends JFrame {
 	 * 
 	 * @param url - path to SQL to create suppliers & parts database
 	 */
-	public Example2(String url) {
-
+	public Example2(Connection _dbConn) {
+		
 		// SET SCREEN TITLE
 			super("Example2");
 			
+		// SET CONNECTION
+			ssConnection = new SSConnection(_dbConn);
+		
 		// SET SCREEN DIMENSIONS
 			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 			
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				System.out.println("url from ex 2: " + url);
-				this.ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + url + "'",
-						"sa", "");
-				this.ssConnection.setDriverName("org.h2.Driver");
-				this.ssConnection.createConnection();
-	
-				this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
+				this.rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
 				this.rowset.setCommand("SELECT * FROM supplier_data");
 				this.navigator = new SSDataNavigator(this.rowset);
 			} catch (SQLException se) {
 				se.printStackTrace();
-			} catch (ClassNotFoundException cnfe) {
-				cnfe.printStackTrace();
 			}
 
 		/**

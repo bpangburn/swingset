@@ -41,6 +41,7 @@ package com.nqadmin.swingset.demo;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -114,28 +115,24 @@ public class Example4 extends JFrame {
 	 * 
 	 * @param url - path to SQL to create suppliers & parts database
 	 */
-	public Example4(String url) {
-
+	public Example4(Connection _dbConn) {
+		
 		// SET SCREEN TITLE
 			super("Example4");
 			
+		// SET CONNECTION
+			ssConnection = new SSConnection(_dbConn);
+		
 		// SET SCREEN DIMENSIONS
 			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				System.out.println("url from ex 4: " + url);
-				this.ssConnection = new SSConnection("jdbc:h2:mem:suppliers_and_parts;INIT=runscript from '" + url + "'",
-						"sa", "");
-				this.ssConnection.setDriverName("org.h2.Driver");
-				this.ssConnection.createConnection();
-				this.rowset = new SSJdbcRowSetImpl(this.ssConnection.getConnection());
+				this.rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
 				this.rowset.setCommand("SELECT * FROM part_data;");
 				this.navigator = new SSDataNavigator(this.rowset);
 			} catch (SQLException se) {
 				se.printStackTrace();
-			} catch (ClassNotFoundException cnfe) {
-				cnfe.printStackTrace();
 			}
 			
 			
@@ -161,8 +158,7 @@ public class Example4 extends JFrame {
 					try {
 
 					// GET THE NEW RECORD ID.	
-						ResultSet rs = ssConnection.getConnection()
-								.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+						ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 								.executeQuery("SELECT nextval('part_data_seq') as nextVal;");
 						rs.next();
 						int partID = rs.getInt("nextVal");
@@ -247,7 +243,7 @@ public class Example4 extends JFrame {
 			
 			// SETUP NAVIGATOR QUERY
 				String query = "SELECT * FROM part_data;";
-				this.cmbSelectPart = new SSDBComboBox(this.ssConnection, query, "part_id", "part_name");
+				this.cmbSelectPart = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
 	
 				try {
 					this.cmbSelectPart.execute();
