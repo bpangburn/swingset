@@ -128,7 +128,7 @@ public class SSSlider extends JSlider {
      *
      * @param _sSRowSet    datasource to be used.
      * @param _columnName    name of the column to which this slider should be bound
-     * @throws java.sql.SQLException 
+     * @throws java.sql.SQLException SQLException
      */
     public SSSlider(SSRowSet _sSRowSet, String _columnName) throws java.sql.SQLException {
 		this.sSRowSet = _sSRowSet;
@@ -142,7 +142,7 @@ public class SSSlider extends JSlider {
      *
      * @param _columnName    column name in the SSRowSet to which the component
      *    is bound
-     * @throws java.sql.SQLException 
+     * @throws java.sql.SQLException SQLException
      */
     public void setColumnName(String _columnName) throws java.sql.SQLException {
         String oldValue = this.columnName;
@@ -164,7 +164,7 @@ public class SSSlider extends JSlider {
      * Sets the SSRowSet to which the component is bound.
      *
      * @param _sSRowSet    SSRowSet to which the component is bound
-     * @throws java.sql.SQLException 
+     * @throws java.sql.SQLException SQLException
      */
     public void setSSRowSet(SSRowSet _sSRowSet) throws java.sql.SQLException {
         SSRowSet oldValue = this.sSRowSet;
@@ -187,7 +187,7 @@ public class SSSlider extends JSlider {
      *
      * @param _sSRowSet    datasource to be used.
      * @param _columnName    Name of the column to which this check box should be bound
-     * @throws java.sql.SQLException 
+     * @throws java.sql.SQLException 	SQL Exception
      */
     public void bind(SSRowSet _sSRowSet, String _columnName) throws java.sql.SQLException {
         SSRowSet oldValue = this.sSRowSet;
@@ -212,6 +212,7 @@ public class SSSlider extends JSlider {
 
     /**
      * Method for handling binding of component to a SSRowSet column.
+     * @throws java.sql.SQLException SQLException
      */
     protected void bind() throws java.sql.SQLException {
 

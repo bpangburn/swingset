@@ -64,7 +64,7 @@ public class SSNumericField extends SSFormattedTextField {
 	}
 
 	/**
-	 * Creates an instance of SSNumericField with the specified number of integer &
+	 * Creates an instance of SSNumericField with the specified number of integer and
 	 * fraction digits
 	 * 
 	 * @param _precision - number of digits needed for integer part of the number

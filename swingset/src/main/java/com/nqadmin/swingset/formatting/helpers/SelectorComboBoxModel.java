@@ -197,10 +197,10 @@ public class SelectorComboBoxModel extends DefaultComboBoxModel<Object> {
 	}
 
 	/**
-	 * Sets the character(s) used to separate the first and second display columsn
+	 * Sets the character(s) used to separate the first and second display columns
 	 * (where applicable)
 	 * 
-	 * @param _separator
+	 * @param _separator characeters used to separate columns for display purposes
 	 */
 	public void setSeparator(final String _separator) {
 		this.seperator = _separator;
@@ -223,8 +223,8 @@ public class SelectorComboBoxModel extends DefaultComboBoxModel<Object> {
 	 * formated as specified by dateFormat variable all other column types are
 	 * retrieved as strings
 	 * 
-	 * @param _rs
-	 * @param _columnName
+	 * @param _rs ResultSet containing database column to convert to string
+	 * @param _columnName database column to convert to string
 	 * @return string value of database column
 	 */
 	protected String getStringValue(final ResultSet _rs, final String _columnName) {

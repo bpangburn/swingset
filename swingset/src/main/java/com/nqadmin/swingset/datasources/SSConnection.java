@@ -50,7 +50,7 @@ import java.sql.SQLException;
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * 
  * The SSConnection class is a wrapper for Connection. It provides methods to
- * specify the url, username, password & driver class name. The createConnection
+ * specify the url, username, password and driver class name. The createConnection
  * should be called before calling the getConnection method. Whenever any
  * connection parameters are changed, createConnection has to be called to
  * change the connection object.
@@ -150,8 +150,8 @@ public class SSConnection implements Serializable {
 	 * Creates a connection to the database based on the information provided by the
 	 * user.
 	 * 
-	 * @throws SQLException
-	 * @throws ClassNotFoundException
+	 * @throws SQLException	SQLException
+	 * @throws ClassNotFoundException	ClassNotFoundException
 	 */
 	public void createConnection() throws SQLException, ClassNotFoundException {
 		Class.forName(this.driverName);
@@ -217,6 +217,9 @@ public class SSConnection implements Serializable {
 
 	/**
 	 * Recreates the connection when the object is deserialized.
+	 * @param objIn deserialized object
+	 * @throws IOException 	IOException
+	 * @throws ClassNotFoundException 	ClassNotFoundException
 	 */
 	// TODO it would be better to have this throw an SQLException rather than
 	// printing a stack trace
@@ -232,7 +235,7 @@ public class SSConnection implements Serializable {
 	/**
 	 * Sets the database connection
 	 * 
-	 * @param _connection
+	 * @param _connection 	database connection
 	 */
 	public void setConnection(Connection _connection) {
 		this.connection = _connection;

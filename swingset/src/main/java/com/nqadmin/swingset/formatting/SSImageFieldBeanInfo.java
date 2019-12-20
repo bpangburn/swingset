@@ -49,7 +49,8 @@ import java.beans.SimpleBeanInfo;
  * 
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * 
- * Contains & controls various bean properties for SSImageField */
+ * Contains and controls various bean properties for SSImageField
+ */
 public class SSImageFieldBeanInfo extends SimpleBeanInfo {
     
     // Bean descriptor//GEN-FIRST:BeanDescriptor

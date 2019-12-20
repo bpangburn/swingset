@@ -111,7 +111,7 @@ public class SSTextField extends JTextField {
     protected int numberOfDecimalPlaces = 2;
 
     /**
-     * Constructs a new text field with the specified text & mask.
+     * Constructs a new text field with the specified text and mask.
      *
      * @param _text    the text to be displayed.
      * @param _mask    the mask required for this textfield.
@@ -141,7 +141,7 @@ public class SSTextField extends JTextField {
     }
 
     /**
-     * Constructs a new, empty text field with the specified mask & number of
+     * Constructs a new, empty text field with the specified mask and number of
      * decimal places. Use this constructor only if you are using a decimal mask.
      *
      * @param _mask    the mask required for this textfield.
@@ -155,7 +155,7 @@ public class SSTextField extends JTextField {
 
     /**
      * Constructs a new, empty text field with the specified mask, number of
-     * decimal places, & alignment. Use this constructor only if you are using
+     * decimal places, and alignment. Use this constructor only if you are using
      * a decimal mask.
      *<pre>
      * (Horizontal alignment).

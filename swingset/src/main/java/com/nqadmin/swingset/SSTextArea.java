@@ -75,8 +75,8 @@ public class SSTextArea extends JTextArea {
     /**
      * Constructs a new empty SSTextArea with the specified number of rows and columns.
      *
-     * @param _rows     the number of rows >= 0
-     * @param _columns     the number of columns >= 0
+     * @param _rows     {@literal the number of rows >= 0}
+     * @param _columns     {@literal the number of columns >= 0}
      */
     public SSTextArea(int _rows, int _columns) {
         super(_rows, _columns);

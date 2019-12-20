@@ -59,7 +59,7 @@ import javax.swing.JTable;
  * 
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * 
- * Key adapter for JTable & SSDataGrid that manages cut & paste functionality
+ * Key adapter for JTable and SSDataGrid that manages cut and paste functionality
  * between a table and either another table or a spreadsheet.
  */
 public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
@@ -80,7 +80,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	protected int offMask = InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK;
 
 	/**
-	 * Indicates whether or not row insertions are allowed via cut/copy & paste.
+	 * Indicates whether or not row insertions are allowed via cut/copy and paste.
 	 */
 	protected boolean allowInsertion = false;
 
@@ -100,7 +100,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
 	/**
 	 * Sets allowInsertion indicator. Set true if new rows can be added to JTable
-	 * via cut/copy & paste - otherwise false. False by default.
+	 * via cut/copy and paste - otherwise false. False by default.
 	 *
 	 * @param _allowInsertion true if new rows can be added when pasting data from
 	 *                        clipboard, else false.
@@ -122,6 +122,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
 	/**
 	 * Adds the key listener for the specified JTable.
+	 * @param _jTable table for which listener is to be added
 	 */
 	protected void init(JTable _jTable) {
 		_jTable.addKeyListener(this);
@@ -354,6 +355,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	 * @param _value  string representation of the new value.
 	 *
 	 * @return returns the value as a column class object.
+	 * @throws Exception catch all exception
 	 */
 	protected static Object getObjectToSet(JTable _jTable, int _column, String _value) throws Exception {
 		// GET THE COLUMN CLASS

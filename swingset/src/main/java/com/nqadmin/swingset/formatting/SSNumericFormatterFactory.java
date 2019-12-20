@@ -80,7 +80,7 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
     }
     
     /**
-     * Creates an object of SSFormatterFactory with the specified precision & decimals
+     * Creates an object of SSFormatterFactory with the specified precision and decimals
      * @param precision - number of digits needed for integer part of the number
      * @param decimals - number of digits needed for fraction part of the number
      */

@@ -86,7 +86,7 @@ public class SSDBNavImpl implements SSDBNav {
 	/**
 	 * Constructs a SSDBNavImpl with the specified container.
 	 * 
-	 * @param _container
+	 * @param _container	GUI Container to scan for Swing components to clear/reset
 	 */
 	public SSDBNavImpl(Container _container) {
 		this.container = _container;
@@ -106,7 +106,7 @@ public class SSDBNavImpl implements SSDBNav {
 	 * Clears all the JTextFields and resets the combo boxes to empty item before
 	 * first item.
 	 *
-	 * This is done for all SwingSet components, text fields, & text areas,
+	 * This is done for all SwingSet components, text fields, and text areas,
 	 * recursively looking in to the JTabbedPanes and JPanels inside the given
 	 * container as needed.
 	 *

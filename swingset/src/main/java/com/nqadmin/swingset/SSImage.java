@@ -64,7 +64,7 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * 
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * 
- * Used to load, store, & display images stored in a database.
+ * Used to load, store, and display images stored in a database.
  */
 public class SSImage extends JPanel {
 

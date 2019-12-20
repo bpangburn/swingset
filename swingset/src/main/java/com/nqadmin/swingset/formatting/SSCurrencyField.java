@@ -70,7 +70,7 @@ public class SSCurrencyField extends SSFormattedTextField {
 	}
 
 	/**
-	 * Creates an instance of SSCurrenyField with the specified number of integer &
+	 * Creates an instance of SSCurrenyField with the specified number of integer and
 	 * fraction digits
 	 * 
 	 * @param _precision - number of digits needed for integer part of the number
@@ -82,7 +82,7 @@ public class SSCurrencyField extends SSFormattedTextField {
 	}
 
 	/**
-	 * Creates an instance of SSCurrenyField with the specified number of integer &
+	 * Creates an instance of SSCurrenyField with the specified number of integer and
 	 * fraction digits using the given locale
 	 * 
 	 * @param _precision     - number of digits needed for integer part of the

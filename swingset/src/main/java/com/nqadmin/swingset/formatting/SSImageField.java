@@ -281,8 +281,8 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
 	 * only if you want to include the function keys as short cuts to perform
 	 * operations on the DataNavigator like saving the current row/ undo changes/
-	 * delete current row. <font color=red>The functionality for this is not yet
-	 * finalized so try to avoid using this </font>
+	 * delete current row. <b><i>The functionality for this is not yet
+	 * finalized so try to avoid using this </i></b>
 	 * 
 	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
 	 * @deprecated Use {@link #setSSDataNavigator(SSDataNavigator _navigator)}
@@ -308,8 +308,8 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
 	 * only if you want to include the function keys as short cuts to perform
 	 * operations on the DataNavigator like saving the current row/ undo changes/
-	 * delete current row. <font color=red>The functionality for this is not yet
-	 * finalized so try to avoid using this </font>
+	 * delete current row. <b><i>The functionality for this is not yet
+	 * finalized so try to avoid using this </i></b>
 	 * 
 	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
 	 */

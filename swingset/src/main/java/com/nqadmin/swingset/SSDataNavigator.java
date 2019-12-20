@@ -1256,6 +1256,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Enables/disables navigation buttons as needed and updates the current row and row count
 	 * numbers
+	 * @throws SQLException 	SQLException
 	 */
 	protected void updateNavigator() throws SQLException {
 		
@@ -1298,7 +1299,6 @@ public class SSDataNavigator extends JPanel {
 	 *
 	 * @param _sSRowSet SSRowSet to which the combo has to update values.
 	 *
-	 * @deprecated
 	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
 	 */
 	@Deprecated
@@ -1311,7 +1311,6 @@ public class SSDataNavigator extends JPanel {
 	 *
 	 * @return returns the SSRowSet being used.
 	 *
-	 * @deprecated
 	 * @deprecated Use {@link #getSSRowSet()} instead.
 	 */
 	@Deprecated

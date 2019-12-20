@@ -376,8 +376,8 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 
 	/**
 	 * Sets the SSDataNavigator used for navigating the SSRowSet to which this
-	 * component is bound to. <font color=red>The functionality for this is not yet
-	 * finalized so try to avoid using this </font>
+	 * component is bound. <b><i>The functionality for this is not yet
+	 * finalized so try to avoid using this </i></b>
 	 * 
 	 * @param _navigator - SSDataNavigator used for navigating the SSRowSet to which
 	 *                   this component is bound to
@@ -402,8 +402,8 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 
 	/**
 	 * Sets the SSDataNavigator used for navigating the SSRowSet to which this
-	 * component is bound to. <font color=red>The functionality for this is not yet
-	 * finalized so try to avoid using this </font>
+	 * component is bound to. <b>The functionality for this is not yet
+	 * finalized so try to avoid using this </b>
 	 * 
 	 * @param _navigator - SSDataNavigator used for navigating the SSRowSet to which
 	 *                   this component is bound to

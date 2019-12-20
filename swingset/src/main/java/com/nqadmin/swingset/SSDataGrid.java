@@ -555,7 +555,7 @@ public class SSDataGrid extends JTable {
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _columnName the column which is the primary column.
-	 * @throws SQLException
+	 * @throws SQLException	SQLException
 	 */
 	public void setPrimaryColumn(String _columnName) throws SQLException {
 		int columnNumber = this.sSRowSet.getColumnIndex(_columnName) - 1;
@@ -598,7 +598,7 @@ public class SSDataGrid extends JTable {
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _column column name for which a date renderer is needed.
-	 * @throws SQLException
+	 * @throws SQLException	SQLException
 	 */
 	public void setDateRenderer(String _column) throws SQLException {
 		int tmpColumn = this.sSRowSet.getColumnIndex(_column) - 1;
@@ -628,7 +628,7 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Sets a combo box renderer for the specified column. This is use full to limit
 	 * the values that go with a column or if an underlying code is do be displayed
-	 * in a more meaningfull manner.
+	 * in a more meaningful manner.
 	 *
 	 * Currently not a bean property since there is no associated variable.
 	 *
@@ -637,7 +637,7 @@ public class SSDataGrid extends JTable {
 	 * @param _displayItems     the actual Objects to be displayed in the combo box.
 	 * @param _underlyingValues the values that have to be written to the database
 	 *                          when an item in the combo box is selected.
-	 * @param _columnWidth
+	 * @param _columnWidth		minimium width for table column
 	 */
 	public void setComboRenderer(int _column, Object[] _displayItems, Object[] _underlyingValues, int _columnWidth) {
 		setRowHeight(20);
@@ -660,7 +660,7 @@ public class SSDataGrid extends JTable {
 	 * @param _displayItems     the actual Objects to be displayed in the combo box.
 	 * @param _underlyingValues the values that have to be written to the database
 	 *                          when an item in the combo box is selected.
-	 * @throws SQLException
+	 * @throws SQLException	SQLException
 	 */
 	public void setComboRenderer(String _column, Object[] _displayItems, Object[] _underlyingValues)
 			throws SQLException {
@@ -680,7 +680,7 @@ public class SSDataGrid extends JTable {
 	 * @param _underlyingValues the values that have to be written to the database
 	 *                          when an item in the combo box is selected.
 	 * @param _columnWidth      required minimum width for this column
-	 * @throws SQLException
+	 * @throws SQLException	SQLException
 	 */
 	public void setComboRenderer(String _column, Object[] _displayItems, Object[] _underlyingValues, int _columnWidth)
 			throws SQLException {
@@ -693,8 +693,8 @@ public class SSDataGrid extends JTable {
 	 *
 	 * Currently not a bean property since there is no associated variable.
 	 *
-	 * @param _column - name ofthe column for which check box rendering is needed.
-	 * @throws SQLException
+	 * @param _column - name of the column for which check box rendering is needed.
+	 * @throws SQLException	SQLException
 	 */
 	public void setCheckBoxRenderer(String _column) throws SQLException {
 		int column = this.sSRowSet.getColumnIndex(_column) - 1;
@@ -751,7 +751,7 @@ public class SSDataGrid extends JTable {
 	 *
 	 * @param _columnNames array specifying the column names which should be
 	 *                     uneditable.
-	 * @throws SQLException
+	 * @throws SQLException	SQLException
 	 */
 	public void setUneditableColumns(String[] _columnNames) throws SQLException {
 		int[] columnNumbers = null;
@@ -798,7 +798,7 @@ public class SSDataGrid extends JTable {
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _columnNames array specifying the column names which should be hidden
-	 * @throws SQLException
+	 * @throws SQLException	SQLException
 	 */
 	public void setHiddenColumns(String[] _columnNames) throws SQLException {
 		this.hiddenColumns = null;
@@ -836,7 +836,7 @@ public class SSDataGrid extends JTable {
 	}
 
 	/**
-	 * This is the default editor for Numeric, String & Object column types.
+	 * This is the default editor for Numeric, String and Object column types.
 	 */
 	class DefaultEditor extends DefaultCellEditor {
 		/**
@@ -866,7 +866,7 @@ public class SSDataGrid extends JTable {
 		}
 
 		/**
-		 * Implementation of KeyListener & FocusListener for the editor component.
+		 * Implementation of KeyListener and FocusListener for the editor component.
 		 */
 		protected class MyListener implements KeyListener, FocusListener {
 
@@ -1361,7 +1361,7 @@ public class SSDataGrid extends JTable {
 			// GET THE COMPONENT AND CHECK IF IT IS CHECKED OR NOT.
 			if (((JCheckBox) getComponent()).isSelected()) {
 				// CHECK THE COLUMN TYPE AND RETURN CORRESPONDING OBJECT.
-				// IF IT IS INTEGER THEN 1 IS CONSIDERED TRUE & 0 FALSE.
+				// IF IT IS INTEGER THEN 1 IS CONSIDERED TRUE AND 0 FALSE.
 				if (this.columnClass == java.sql.Types.BOOLEAN) {
 					return new Boolean(true);
 				}
@@ -1533,7 +1533,6 @@ public class SSDataGrid extends JTable {
 	 *
 	 * @param _sSRowSet SSRowSet to which the combo has to update values.
 	 *
-	 * @deprecated
 	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
 	 */
 	@Deprecated

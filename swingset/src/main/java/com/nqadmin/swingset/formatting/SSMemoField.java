@@ -125,7 +125,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 * 
 	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
 	 *                column
-	 * @deprecated
+	 * @deprecated renamed setSSRowSet()
 	 * @see #setSSRowSet(SSRowSet)
 	 */
 	@Deprecated
@@ -138,7 +138,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 * 
 	 * @return - returns the SSRowSet object being used to get/set the bound column
 	 *         value
-	 * @deprecated
+	 * @deprecated renamed getSSRowSet()
 	 * @see #getSSRowSet()
 	 **/
 	@Deprecated
@@ -171,11 +171,11 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
 	 * only if you want to include the function keys as short cuts to perform
 	 * operations on the DataNavigator like saving the current row/ undo changes/
-	 * delete current row. <font color=red>The functionality for this is not yet
-	 * finalized so try to avoid using this </font>
+	 * delete current row. <b><i>The functionality for this is not yet
+	 * finalized so try to avoid using this </i></b>
 	 * 
 	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
-	 * @deprecated
+	 * @deprecated renamed setSSDataNavigator()
 	 * @see #setSSDataNavigator(SSDataNavigator)
 	 */
 	@Deprecated
@@ -187,7 +187,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 * Returns the SSDataNavigator object being used.
 	 * 
 	 * @return returns the SSDataNavigator object being used.
-	 * @deprecated
+	 * @deprecated renamed getSSDataNavigator()
 	 * @see #getSSDataNavigator()
 	 **/
 	@Deprecated
@@ -199,8 +199,8 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
 	 * only if you want to include the function keys as short cuts to perform
 	 * operations on the DataNavigator like saving the current row/ undo changes/
-	 * delete current row. <font color=red>The functionality for this is not yet
-	 * finalized so try to avoid using this </font>
+	 * delete current row. <b><i>The functionality for this is not yet
+	 * finalized so try to avoid using this </i></b>
 	 * 
 	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
 	 */

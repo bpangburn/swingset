@@ -68,7 +68,7 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
     }
     
     /**
-     * Creates SSCurrencyFormatterFactory object with the specified precision & decimals
+     * Creates SSCurrencyFormatterFactory object with the specified precision and decimals
      * @param precision - number of digits needed in the integer portion of the number
      * @param decimals - number of digits needed in the fraction portion of the number
      */
@@ -87,7 +87,7 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
     }
     
     /**
-     * Creates SSCurrencyFormatterFactory object with the specified precision, decimals, editor locale & display locale
+     * Creates SSCurrencyFormatterFactory object with the specified precision, decimals, editor locale and display locale
      * @param precision - number of digits needed in the integer portion of the number
      * @param decimals - number of digits needed in the fraction portion of the number
      * @param editorLocale  - locale to be used by the editor

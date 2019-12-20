@@ -296,7 +296,7 @@ public class SSTableModel extends AbstractTableModel {
 	} // end public boolean isCellEditable(int _row, int _column) {
 
 	/**
-	 * Returns the value for the cell at the specified row & column.
+	 * Returns the value for the cell at the specified row and column.
 	 *
 	 * @param _row    the row whose value to be queried.
 	 * @param _column the column whose value to be queried.

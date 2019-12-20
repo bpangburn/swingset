@@ -373,7 +373,7 @@ public class SSDBComboBox extends JComboBox<Object> {
     /**
      * Sets the database table primary column name.
      * 
-     * @param _primaryKeyColumnName
+     * @param _primaryKeyColumnName name of primary key column
      */
     public void setPrimaryKeyColumnName(String _primaryKeyColumnName){
         String oldValue = this.primaryKeyColumnName;
@@ -534,8 +534,8 @@ public class SSDBComboBox extends JComboBox<Object> {
     /**
      * Executes the query and adds items to the combo box based on the values
      * retrieved from the database.
-     * @throws SQLException 
-     * @throws Exception 
+     * @throws SQLException 	SQLException
+     * @throws Exception 	Exception
      */
     public void execute() throws SQLException, Exception {
         // TURN OFF LISTENERS

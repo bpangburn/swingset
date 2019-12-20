@@ -69,19 +69,19 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * Constructs a SSJdbcRowSetImpl object with the specified Connection.
 	 * 
 	 * @param _connection Connection object to be used to connect to the database.
-	 * @throws SQLException
+	 * @throws SQLException	SQLException
 	 */
 	public SSJdbcRowSetImpl(Connection _connection) throws SQLException {
 		super(_connection);
 	}
 
 	/**
-	 * Constructs a SSJdbcRowSetImpl object with the specified Connection & SQL
+	 * Constructs a SSJdbcRowSetImpl object with the specified Connection and SQL
 	 * command.
 	 * 
 	 * @param _connection Connection object to be used to connect to the database.
 	 * @param _command    SQL query to be executed.
-	 * @throws SQLException
+	 * @throws SQLException	SQLException
 	 */
 	public SSJdbcRowSetImpl(Connection _connection, String _command) throws SQLException {
 		super(_connection);
@@ -103,7 +103,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	}
 
 	/**
-	 * Constructs a SSJdbcRowSetImpl object with the specified SSConnection & SQL
+	 * Constructs a SSJdbcRowSetImpl object with the specified SSConnection and SQL
 	 * command.
 	 * 
 	 * @param _ssConnection SSConnection object to be used to connect to the
@@ -149,7 +149,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	}
 
 	/**
-	 * Sets & executes the query for a RowSet.
+	 * Sets and executes the query for a RowSet.
 	 * 
 	 * Overriding to catch any SQLException, but probably better to force calling
 	 * class to handle in which case, there is no need to override this method.

@@ -73,20 +73,29 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * Also, if changing both a sSRowSet and column name consider using the bind()
  * method rather than individual setSSRowSet() and setColumName() calls.
  *
- * e.g. SSComboBox combo = new SSComboBox(); String[] options = {"111", "2222",
+ * e.g.
+ * {@code
+ * SSComboBox combo = new SSComboBox();
+ * String[] options = {"111", "2222",
  * "33333"}; combo.setOptions(options);
+ * }
  *
  * For the above items the combobox assumes that the values start from zero:
- * "111" -> 0, "2222" -> 1, "33333" -> 2
+ * {@literal "111" -> 0, "2222" -> 1, "33333" -> 2}
  *
  * To give your own mappings you can set the mappings separately or pass them
  * along with the options:
  *
- * SSComboBox combo = new SSComboBox(); String[] options = {"111", "2222",
- * "33333"}; int[] mappings = { 1,5,7 }; combo.setOptions(options, mappings);
- *
+ * {@code
+ * SSComboBox combo = new SSComboBox();
+ * String[] options = {"111", "2222", "33333"};
+ * int[] mappings = { 1,5,7 }; combo.setOptions(options, mappings);
+ * 
  * // next line is assuming mysSRowSet has been initialized and my_column is a
- * // column in mysSRowSet combo.bind(mysSRowSet,"my_column");
+ * // column in mysSRowSet
+ * combo.bind(mysSRowSet,"my_column");
+ * }
+ *
  */
 //public class SSComboBox extends JComponent {
 public class SSComboBox extends JComboBox<Object> {
@@ -701,7 +710,7 @@ public class SSComboBox extends JComboBox<Object> {
 	 *
 	 * @return returns the combo box that displays the items.
 	 *
-	 * @deprecated
+	 * @deprecated unnecessary - can reference object directly
 	 */
 	@Deprecated
 	public JComboBox<?> getComboBox() {
@@ -713,7 +722,7 @@ public class SSComboBox extends JComboBox<Object> {
 	 *
 	 * @return returns the combo box that displays the items.
 	 *
-	 * @deprecated
+	 * @deprecated unnecessary - can reference object directly
 	 */
 	@Deprecated
 	public Component getComponent() {
@@ -796,7 +805,6 @@ public class SSComboBox extends JComboBox<Object> {
 	 * @param _mappings an array of values that correspond to those in the combo
 	 *                  box.
 	 *
-	 * @deprecated
 	 * @deprecated Use {@link #setMappings(int[] _mappings)} instead.
 	 */
 	@Deprecated

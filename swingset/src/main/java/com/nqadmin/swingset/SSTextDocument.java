@@ -204,7 +204,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
     }
 
     /**
-     * Retrieves meta data for column & initializes document text if applicable.
+     * Retrieves meta data for column and initializes document text if applicable.
      */
     protected void bind() {
 
@@ -275,6 +275,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
 
     /**
      * Method used by document listeners to update the underlying sSRowSet.
+     * @param strValue string to be type-converted as needed and updated in underlying rowset column
      */
     protected void updateText(String strValue) {
     // THIS METHOD IS USED BY THE DOCUMENT LISTENERS WHEN EVER THE USER CHANGES THE TEXT IN
@@ -399,6 +400,7 @@ public class SSTextDocument extends javax.swing.text.PlainDocument {
     /**
      * Method used by sSRowSet listeners to get the new text when the SSRowSet
      * events are triggered.
+     * @return text representation of data in column
      */
     protected String getText() {
         String value = null;

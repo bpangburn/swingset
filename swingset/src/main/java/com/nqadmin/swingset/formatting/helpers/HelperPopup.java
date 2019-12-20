@@ -395,7 +395,7 @@ public class HelperPopup extends JPopupMenu
 	}
 
 	/**
-	 * @param _event
+	 * @param _event	ActionEvent
 	 */
 	private void search(final java.awt.event.ActionEvent _event) {
 

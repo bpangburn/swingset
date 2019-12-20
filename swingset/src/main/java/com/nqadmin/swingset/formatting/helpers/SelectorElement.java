@@ -76,7 +76,7 @@ public class SelectorElement implements TextFilterable {
 	}
 
 	/**
-	 * Creates an instance of SelectorElement with the given listValue & dataValue
+	 * Creates an instance of SelectorElement with the given listValue and dataValue
 	 * 
 	 * @param _dataValue - underlying value of the object displayed
 	 * @param _listValue - value to be used for display purpose

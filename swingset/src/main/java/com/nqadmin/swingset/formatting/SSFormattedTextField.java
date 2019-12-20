@@ -165,7 +165,9 @@ public class SSFormattedTextField extends JFormattedTextField
 	}
 
 	/**
-	 * @param _factory
+	 * Creates a new instance of SSFormattedTextField
+	 * 
+	 * @param _factory formatter to use for text field
 	 */
 	public SSFormattedTextField(final javax.swing.JFormattedTextField.AbstractFormatterFactory _factory) {
 		this();
@@ -229,8 +231,8 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
 	 * only if you want to include the function keys as short cuts to perform
 	 * operations on the DataNavigator like saving the current row/ undo changes/
-	 * delete current row. <font color=red>The functionality for this is not yet
-	 * finalized so try to avoid using this </font>
+	 * delete current row. <b><i>The functionality for this is not yet
+	 * finalized so try to avoid using this </i></b>
 	 * 
 	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
 	 * @deprecated Use {@link #setSSDataNavigator(SSDataNavigator _navigator)}
@@ -256,8 +258,8 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
 	 * only if you want to include the function keys as short cuts to perform
 	 * operations on the DataNavigator like saving the current row/ undo changes/
-	 * delete current row. <font color=red>The functionality for this is not yet
-	 * finalized so try to avoid using this </font>
+	 * delete current row. <b><i>The functionality for this is not yet
+	 * finalized so try to avoid using this </i></b>
 	 * 
 	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
 	 */
@@ -459,8 +461,9 @@ public class SSFormattedTextField extends JFormattedTextField
 	/**
 	 * This method perform the actual data transfer from rowset to this object Value
 	 * field. depending on the column Type.
+	 * @param texto this parameter is never used and method should probably be re-written
 	 */
-
+//TODO: remove "texto" as parameter and depreciate this method
 	private void DbToFm(final String texto) {
 		Object oValue = null;
 		Object nValue = null;
@@ -910,7 +913,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * Updates the bound column in the rowset with the specified value
 	 * 
 	 * @param _aux - value with which the rowset column has to be updated
-	 * @throws SQLException
+	 * @throws SQLException SQLException
 	 */
 	private void updateRowSet(final Object _aux) throws SQLException {
 		switch (this.colType) {

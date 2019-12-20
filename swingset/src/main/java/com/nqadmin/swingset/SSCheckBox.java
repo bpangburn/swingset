@@ -137,10 +137,10 @@ public class SSCheckBox extends JCheckBox {
     
     /**
      * Creates an object of SSCheckBox.
-     * @param text 
+     * @param _text Checkbox label
      */
-    public SSCheckBox(String text) {
-    	super(text);
+    public SSCheckBox(String _text) {
+    	super(_text);
         init();
     }
 

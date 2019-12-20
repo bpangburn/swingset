@@ -46,8 +46,9 @@ package com.nqadmin.swingset.utils;
  */
 public class SSEnums {
 
-	/*
+	/**
 	 * Enumeration for SwingSet component types.
+	 *
 	 */
 	public enum SSComponent {
 

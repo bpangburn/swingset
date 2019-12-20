@@ -325,6 +325,7 @@ public class SSList extends JList<Object> {
 
 	/**
 	 * Method for handling binding of component to a SSRowSet column.
+	 * @throws SQLException 	SQLException
 	 */
 	protected void bind() throws SQLException {
 
@@ -351,7 +352,7 @@ public class SSList extends JList<Object> {
 	 * 
 	 * @param array SQL array
 	 * @return Object array
-	 * @throws SQLException
+	 * @throws SQLException	SQLException
 	 */
 	private static Object[] toObjArray(Array array) throws SQLException {
 		if (array == null) {
@@ -451,6 +452,7 @@ public class SSList extends JList<Object> {
 	/**
 	 * Updates the value displayed in the component based on the SSRowSet column
 	 * binding.
+	 * @throws SQLException 	SQLException
 	 */
 	protected void updateDisplay() throws SQLException {
 

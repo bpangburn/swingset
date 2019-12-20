@@ -141,7 +141,7 @@ public class RowSetHelperPopup extends JPopupMenu
 	}
 
 	/**
-	 * Sets the SSRowSet object to be used to fetch the values for dataColumn &
+	 * Sets the SSRowSet object to be used to fetch the values for dataColumn and
 	 * listColumn values
 	 * 
 	 * @param _rowset - SSRowSet object to be used to fetch the values
