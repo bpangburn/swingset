@@ -6,7 +6,7 @@ ReadMe file for the SwingSet DEMO
 LICENSE
 ==============================================================================
 
-Copyright (C) 2003-2019, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
