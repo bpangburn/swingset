@@ -3,11 +3,14 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
 ==============================================================================
-SwingSet 3.0.0 - Released TBD
+SwingSet 3.0.0 - Released 2020-01-08
 ==============================================================================
 
 Changes:
 	1. Changed package from com.nqadmin.swingSet to com.nqadmin.swingset
+	2. Migrated to Maven project. Separated demo. Created POM files.
+	3. JavaDoc updates.
+	4. Update POM for deployment to Maven Central via Nexus OSSRH
 	
 ==============================================================================
 SwingSet 2.3.1 - Released 2019-11-11
