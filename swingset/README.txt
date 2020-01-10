@@ -90,22 +90,23 @@ swingset#NO-SPAM#@pangburngroup.com
 INSTALLATION
 ==============================================================================
 
-SwingSet 2.3.0 should work with Java 8 (JRE/JDK 1.8) or later.
+SwingSet should work with Java 8 (JRE/JDK 1.8) or later.
 
-Download the latest SwingSet binary jar file from:
-https://sourceforge.net/projects/swingset
-
-Add the SwingSet jar to your CLASSPATH. Alternatively, you can copy the jar
-to the the /jre/lib/ext subdirectory of your JDK (for compiling) and the 
-/lib/ext subdirectory of your JRE (for execution).
-
-Some SwingSet features depend on the GlazedList jar file available from
-http://glazedlists.com.
-
-Note that you may also need a JDBC driver for your target database.
-
-Dependency jars should be added to your CLASSPATH, JRE, or JDK as indicated
-above.
+Traditional CLASSPATH:
+  Download the latest SwingSet jar (swingset-x.y.z.jar) from:
+    https://sf.net/p/swingset
+  Download the latest GlazedLists jar (glazedlists-x.y.z.jar) from:
+    https://repo1.maven.org/maven2/com/glazedlists/glazedlists/
+  Add the swingset and glazedlists jars to your CLASSPATH
+  Add any JDBC drivers needed for your database to your CLASSPATH
+  
+Maven:
+  Add SwingSet to the Maven dependencies in your POM file:
+  		<dependency>
+			<groupId>com.nqadmin.swingset</groupId>
+			<artifactId>swingset</artifactId>
+			<version>x.y.z</version>
+		</dependency> 
 
 
 ==============================================================================

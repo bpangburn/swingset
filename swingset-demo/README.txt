@@ -81,41 +81,59 @@ swingset#NO-SPAM#@pangburngroup.com
 
 
 ==============================================================================
-INSTALLATION
+EXECUTION
 ==============================================================================
 
 The SwingSet samples/demo requires Java 1.8 or later.
 
-  1. make a swingset folder containing the demo jar file
-  2. open a terminal / command line window and cd to the swingset folder
-	(e.g. "cd /tmp/swingset" or "cd c:\downloads\swingset")
-  3. unpackage the demo jar:
-	jar -xf swingset-demo-{version}.jar
-  4. this creates the following folders:
-	./src - sample/demo source code files
-	./bin - sample/demo Java classes
-	./lib - dependency jars
-	./META-INF - jar manifest
-	./readme.txt - this file
-	./suppliers_and_parts.sql - sql for sample database
-  5. run the demo:
-  	Linux:
-		java -classpath ./bin:./lib/* MainClass suppliers_and_parts.sql
-	Windows:
-		java -classpath .\bin;.\lib\* MainClass suppliers_and_parts.sql
-	
-If you would like to experiment with the source code in /src, you can recompile
-using the following commands:
-	Linux:
-		javac -d ./bin -classpath ./src:./lib/* ./src/MainClass.java
-	Windows:
-		javac -d .\bin -classpath .\src;.\lib\* .\src\MainClass.java
-		
-Note that if running the examples from Eclipse, right-click on MainClass.java
-and select Run As->Run Configurations... and then under Arguments enter:
-	./src/main/resources/suppliers_and_parts.sql
-Then right-click on MainClass.java and select Run As->Java Application.	
+  1. Beginning with SwingSet 3.0.0. we're providing an executable jar
+     with all dependencies.
+  2. Download/save swingset-demo-x.y.z-jar-with-dependencies.jar to a local folder
+  3. Type:
+  		java -jar swingset-demo-x.y.z-jar-with-dependencies.jar
+  		
+  		
+==============================================================================
+COMPILATION
+==============================================================================
 
+The SwingSet samples/demo requires Java 1.8 or later.
+
+Git/Maven/Eclipse:
+  git clone https://git.code.sf.net/p/swingset/code swingset-code 
+  
+Command line:
+
+  1. Download/save swingset-demo-x.y.z-sources.jar to a local
+     swingset folder
+  2. Open a terminal / command line window and cd to the swingset folder
+	 (e.g. "cd /tmp/swingset" or "cd c:\downloads\swingset")
+  3. unpackage the demo jar:
+	 jar -xf swingset-demo-x.y.z-sources.jar
+  4. Make a "lib" subdirectory
+     mkdir lib
+  5. Save the following jar files to the "lib" subdirectory
+     a. Download the latest SwingSet jar (swingset-x.y.z.jar) from:
+        https://sf.net/p/swingset
+     b. Download the latest GlazedLists jar (glazedlists-x.y.z.jar) from:
+        https://repo1.maven.org/maven2/com/glazedlists/glazedlists/
+     c. Download the latest H2 Database jar (h2-x.y.z.jar)
+        https://repo1.maven.org/maven2/com/h2database/h2/
+  6. Compile the demo:
+  	 Linux:
+		javac -classpath ./lib/h2-x.y.z.jar:./lib/swingset-x.y.z.jar:./lib/glazedlists-x.y.x.jar ./com/nqadmin/swingset/demo/*.java
+	 Windows:
+		javac -classpath .\lib\h2-x.y.z.jar;.\lib\swingset-x.y.z.jar;.\lib\glazedlists-x.y.x.jar .\com\nqadmin\swingset\demo\*.java
+  7. Run the demo:
+  	 Linux:
+		java -classpath .:./lib/h2-x.y.z.jar:./lib/swingset-x.y.x.jar:./lib/glazedlists-x.y.z.jar com.nqadmin.swingset.demo.MainClass
+	 Windows:
+		java -classpath .;.\lib\h2-x.y.z.jar;.\lib\swingset-x.y.x.jar;.\lib\glazedlists-x.y.z.jar com.nqadmin.swingset.demo.MainClass
+
+
+==============================================================================
+CLASS DESCRIPTIONS
+==============================================================================
 
 ***********************
 Example1
