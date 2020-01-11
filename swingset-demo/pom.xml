@@ -8,7 +8,7 @@
 
 	<groupId>com.nqadmin.swingset.demo</groupId>
 	<artifactId>swingset-demo</artifactId>
-	<version>3.0.0</version>
+	<version>3.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>swingset-demo</name>
