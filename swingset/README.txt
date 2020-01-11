@@ -113,7 +113,7 @@ Maven:
 SAMPLE/DEMO PROGRAMS
 ==============================================================================
 
-See readme.txt contained in the swingset-demo jar file.
+See https://sourceforge.net/p/swingset/code/ci/master/tree/swingset-demo/README.txt
 
 
 ==============================================================================
