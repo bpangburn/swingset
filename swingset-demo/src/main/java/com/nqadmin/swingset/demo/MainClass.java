@@ -50,6 +50,7 @@ import java.sql.SQLException;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import org.h2.tools.RunScript;
 
@@ -236,7 +237,12 @@ public class MainClass extends JFrame {
      * @param url 
      */
 	public static void main(String[] _url){
-        new MainClass();
+        //new MainClass();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				MainClass mc = new MainClass();
+			}
+		});
     }
 }
 
