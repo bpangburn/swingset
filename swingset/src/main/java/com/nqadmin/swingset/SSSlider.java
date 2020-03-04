@@ -286,7 +286,7 @@ public class SSSlider extends JSlider {
     protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
         /**
-		 * 
+		 * unique serial id
 		 */
 		private static final long serialVersionUID = 2592351765135476620L;
 

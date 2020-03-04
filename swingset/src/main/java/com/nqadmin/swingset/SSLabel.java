@@ -260,8 +260,9 @@ public class SSLabel extends JLabel {
      * component's value.
      */
     protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
+    	
         /**
-		 * 
+		 * unique serial id
 		 */
 		private static final long serialVersionUID = -6911906045174819801L;
 

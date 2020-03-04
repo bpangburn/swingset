@@ -327,7 +327,7 @@ public class SSCheckBox extends JCheckBox {
     protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
         /**
-		 * 
+		 * unique serial id
 		 */
 		private static final long serialVersionUID = 662317066187756908L;
 
