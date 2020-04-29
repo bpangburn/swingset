@@ -40,7 +40,6 @@ package com.nqadmin.swingset.utils;
 import java.awt.AWTKeyStroke;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
@@ -62,6 +61,8 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * member that is instantiated in the Component's constructor.
  */
 public interface SSComponentInterface {
+	
+	// TODO fire property changes where applicable
 
 	/**
 	 * Convenience method to add both RowSet and SwingSet Component listeners.
@@ -80,8 +81,21 @@ public interface SSComponentInterface {
 	 * involved (e.g., ItemListener for a class extending JCheckBox, ChangeListener
 	 * for a class extending JSlider, DocumentListener for a class extending
 	 * JTextField, etc.).
+	 * 
+	 * If the component is JTextComponent then the implementation can simply
+	 * call addSSDocumentListener()
 	 */
 	void addSSComponentListener();
+
+	/**
+	 * Adds listener for Document if SwingSet component is a JTextComponent.
+	 * 
+	 * Implementation of addSSComponentListener() can just call this method when the
+	 * component is a JTextComponent.
+	 */
+	default void addSSDocumentListener() {
+		getSSCommon().addSSDocumentListener();
+	}
 
 	/**
 	 * Adds listener for RowSet.
@@ -131,7 +145,7 @@ public interface SSComponentInterface {
 	}
 
 	/**
-	 * Method to allow Programmer to add functionality when SwingSet component is
+	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
 	 * 
 	 * It will actually be called from SSCommon.init() once the SSCommon data member
@@ -140,6 +154,15 @@ public interface SSComponentInterface {
 	 * This method can be empty.
 	 */
 	void customInit();
+
+	/**
+	 * Retrieves the allowNull flag for the bound database column.
+	 * 
+	 * @return true if bound database column can contain null values, otherwise returns false
+	 */
+	default boolean getAllowNull() {
+		return getSSCommon().getAllowNull();
+	}
 
 	/**
 	 * Returns the index of the database column to which the SwingSet component is
@@ -254,8 +277,8 @@ public interface SSComponentInterface {
 	default void removeListeners() {
 		removeSSRowSetListener();
 		removeSSComponentListener();
-	}
-
+	};
+	
 	/**
 	 * Remove the listener detecting changes in value for the current component.
 	 * SSCommon will manage any bound RowSet listeners.
@@ -265,22 +288,44 @@ public interface SSComponentInterface {
 	 * involved (e.g., ItemListener for a class extending JCheckBox, ChangeListener
 	 * for a class extending JSlider, DocumentListener for a class extending
 	 * JTextField, etc.).
+	 * 
+	 * If the component is JTextComponent then the implementation can simply
+	 * call removeSSDocumentListener()
 	 */
-	void removeSSComponentListener();
+	void removeSSComponentListener();;
+	
+	/**
+	 * Removes listener for Document if SwingSet component is a JTextComponent.
+	 * 
+	 * Implementation of removeSSComponentListener() can just call this method when the
+	 * component is a JTextComponent.
+	 */
+	default void removeSSDocumentListener() {
+		getSSCommon().removeSSDocumentListener();
+	};
 
 	/**
 	 * Removes listener for RowSet.
 	 */
 	default void removeSSRowSetListener() {
 		getSSCommon().removeSSRowSetListener();
-	};
+	}
+
+	/**
+	 * Sets the allowNull flag for the bound database column.
+	 * 
+	 * @param _allowNull flag to indicate if the bound database column can be null
+	 */
+	default void setAllowNull(boolean _allowNull) {
+		getSSCommon().setAllowNull(_allowNull);
+	}
 
 	/**
 	 * Sets the column index to which the Component is to be bound.
 	 *
 	 * @param _boundColumnIndex column index to which the Component is to be bound
 	 */
-	default void setBoundColumnIndex(int _boundColumnIndex) throws SQLException {
+	default void setBoundColumnIndex(int _boundColumnIndex) { // throws SQLException {
 		getSSCommon().setBoundColumnIndex(_boundColumnIndex);
 	}
 
@@ -349,7 +394,7 @@ public interface SSComponentInterface {
 	default void setSSConnection(SSConnection _ssConnection) {
 		getSSCommon().setSSConnection(_ssConnection);
 	}
-
+	
 	/**
 	 * Sets the RowSet to hold queried data from the database.
 	 * 

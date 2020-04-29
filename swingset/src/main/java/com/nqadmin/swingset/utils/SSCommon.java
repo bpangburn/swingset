@@ -44,6 +44,9 @@ import java.util.StringTokenizer;
 
 import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSRowSet;
@@ -76,6 +79,71 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * navigation.
  */
 public class SSCommon implements Serializable {
+
+	/**
+     * Document listener provided for convenience for SwingSet Components based on JTextComponents
+     * 
+     * Updates the underlying RowSet there is a change to the Document object. E.g., a call to setText() on a JTextField.
+     * 
+     * DocumentListener events generally, but not always get fired twice any time there is an update to the JTextField:
+     * a removeUpdate() followed by insertUpdate().
+     * See:
+     * https://stackoverflow.com/questions/15209766/why-jtextfield-settext-will-fire-documentlisteners-removeupdate-before-change#15213813
+     * 
+     * Using partial solution here from here:
+     * https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
+     * 
+     * Having removeUpdate() and insertUpdate() both call changedUpdate(). changedUpdate() uses counters
+     * and SwingUtilities.invokeLater() to only update the display on the last method called.
+     */
+
+    protected class SSDocumentListener implements DocumentListener, Serializable {
+    	
+    	/**
+		 * unique serial id
+		 */
+		private static final long serialVersionUID = 2287696691641310793L;
+		
+		/**
+		 * variables needed to consolidate calls to removeUpdate() and insertUpdate() from DocumentListener
+		 */
+		private int lastChange=0;
+    	private int lastNotifiedChange = 0;
+    	
+    	@Override    	
+		public void changedUpdate(DocumentEvent de) {
+			lastChange++;
+			//System.out.println("SSTextDocument (" + boundColumnName + ") - changedUpdate(): lastChange=" + lastChange + ", lastNotifiedChange=" + lastNotifiedChange);
+			// Delay execution of logic until all listener methods are called for current event
+			// See: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
+			SwingUtilities.invokeLater(() -> {
+				if (lastNotifiedChange != lastChange) {
+					lastNotifiedChange = lastChange;
+					
+					removeSSRowSetListener();
+					
+		            try {
+		                setBoundColumnText(((javax.swing.text.JTextComponent)getSSComponent()).getText());
+		            } finally {
+		            	addSSRowSetListener();
+		            }
+				}
+			});
+    	}
+    	
+        @Override
+		public void insertUpdate(DocumentEvent de) {
+        	//System.out.println("SSTextDocument (" + this.boundColumnName + ") - insertUpdate()");
+        	changedUpdate(de);
+        }
+        
+        @Override
+		public void removeUpdate(DocumentEvent de) {
+        	//System.out.println("SSTextDocument (" + this.boundColumnName + ") - removeUpdate()"); 
+        	changedUpdate(de);
+        }
+
+    } // end protected class SSDocumentListener
 
 	/**
 	 * Listener(s) for the underlying SSRowSet used to update the bound SwingSet component.
@@ -149,97 +217,30 @@ public class SSCommon implements Serializable {
 	}
 
 	/**
+	 * flag to indicate if the bound database column can be null
+	 */
+	private boolean allowNull = false;
+
+	/**
 	 * Index of SSRowSet column to which the SwingSet component will be bound.
 	 */
 	private int boundColumnIndex = NO_COLUMN_INDEX;
-
-	/**
+    
+    /**
 	 * Name of SSRowSet column to which the SwingSet component will be bound.
 	 */
 	private String boundColumnName = null;
-
-//	/**
-//     * Updates the underlying RowSet AND the component display when there is a change to the Document object.
-//     * 
-//     * These types of changes can result from a change in the RowSet pushed to the Document or a call to setText() on the
-//     * JTextField.
-//     * 
-//     * DocumentListener events generally, but not always get fired twice any time there is an update to the JTextField:
-//     * a removeUpdate() followed by insertUpdate().
-//     * See:
-//     * https://stackoverflow.com/questions/15209766/why-jtextfield-settext-will-fire-documentlisteners-removeupdate-before-change#15213813
-//     * 
-//     * Using partial solution here from here:
-//     * https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
-//     * 
-//     * Having removeUpdate() and insertUpdate() both call changedUpdate(). changedUpdate() uses counters
-//     * and SwingUtilities.invokeLater() to only update the display on the last method called.
-//     */
-//
-//    protected class TextDocumentListener implements DocumentListener, Serializable {
-//    	
-//    	/**
-//		 * unique serial id
-//		 */
-//		private static final long serialVersionUID = 2287696691641310793L;
-//		
-//		/**
-//		 * variables needed to consolidate calls to removeUpdate() and insertUpdate() from DocumentListener
-//		 */
-//		private int lastChange=0;
-//    	private int lastNotifiedChange = 0;
-//    	
-//    	@Override    	
-//		public void changedUpdate(DocumentEvent de) {
-//			lastChange++;
-//			System.out.println("SSTextDocument (" + boundColumnName + ") - changedUpdate(): lastChange=" + lastChange + ", lastNotifiedChange=" + lastNotifiedChange);
-//			// Delay execution of logic until all listener methods are called for current event
-//			// See: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
-//			SwingUtilities.invokeLater(() -> {
-//				if (lastNotifiedChange != lastChange) {
-//					lastNotifiedChange = lastChange;
-//					
-//		            ssRowSet.removeSSRowSetListener(ssRowSetListener);
-//		            ((SSComponentInterface)ssComponent).removeComponentListener();
-//					
-//		            try {
-//		                ssRowSet.updateColumnText(textDocument.getText(0,textDocument.getLength()), boundColumnName);
-//		                ((SSComponentInterface)ssComponent).updateDisplay();
-//		                
-//		            } catch(BadLocationException ble) {
-//		                ble.printStackTrace();
-//		            } finally {
-//		            	ssRowSet.addSSRowSetListener(ssRowSetListener);
-//		            	((SSComponentInterface)ssComponent).addComponentListener();
-//		            }
-//				}
-//			});
-//    	}
-//    	
-//        @Override
-//		public void insertUpdate(DocumentEvent de) {
-//        	//System.out.println("SSTextDocument (" + this.boundColumnName + ") - insertUpdate()");
-//        	changedUpdate(de);
-//        }
-//        
-//        @Override
-//		public void removeUpdate(DocumentEvent de) {
-//        	//System.out.println("SSTextDocument (" + this.boundColumnName + ") - removeUpdate()"); 
-//        	changedUpdate(de);
-//        }
-//
-//    } // end protected class SSTextDocumentListener implements DocumentListener {
-
+    
 	/**
 	 * Column SQL data type.
 	 */
 	private int boundColumnType = NO_COLUMN_TYPE;
-
+	
 	/**
 	 * flag to indicate if we're inside of a bind() method
 	 */
 	private volatile boolean inBinding = false;
-
+    
 	/**
 	 * SSRowSet column containing the primary key.
 	 */
@@ -254,6 +255,11 @@ public class SSCommon implements Serializable {
 	 * database connection
 	 */
 	private SSConnection ssConnection = null;
+
+	/**
+	 * Underlying Document listener (where SwingSet component is a JTextComponent)
+	 */
+	private SSDocumentListener ssDocumentListener = new SSDocumentListener();
 
 	/**
 	 * SSRowSet from which component will get/set values.
@@ -279,16 +285,6 @@ public class SSCommon implements Serializable {
 
 	}
 
-//	public SSCommon(Object _ssComponent, SSConnection _ssConnection, SSRowSet _ssRowSet, String _primaryKeyColumn,
-//			String _boundColumn) {
-//		setSSComponent(_ssComponent);
-//		setSSConnection(_ssConnection);
-//		setSSRowSet(_ssRowSet);
-//		setPrimaryKeyColumn(_primaryKeyColumn);
-//		setBoundColumnName(_boundColumn);
-//
-//	}
-
 	/**
 	 * Convenience method to add both RowSet and SwingSet Component listeners.
 	 */
@@ -303,6 +299,15 @@ public class SSCommon implements Serializable {
 	public void addSSComponentListener() {
 		((SSComponentInterface) ssComponent).addSSComponentListener();
 	}
+	
+	/**
+     * Class to add a Document listener when the SwingSet component is a JTextComponent
+     */
+    public void addSSDocumentListener() {
+    	//ssRowSet.addSSRowSetListener(ssRowSetListener);
+    	((javax.swing.text.JTextComponent)getSSComponent()).getDocument().addDocumentListener(ssDocumentListener);
+    	
+    }
 
 	/**
 	 * Method to add the RowSet listener.
@@ -384,6 +389,15 @@ public class SSCommon implements Serializable {
 	}
 
 	/**
+	 * Retrieves the allowNull flag for the bound database column.
+	 * 
+	 * @return true if bound database column can contain null values, otherwise returns false
+	 */
+	public boolean getAllowNull() {
+		return allowNull;
+	}
+
+	/**
 	 * Returns the index of the database column to which the SwingSet component is bound.
 	 *
 	 * @return returns the index of the column to which the SwingSet component is bound
@@ -404,7 +418,8 @@ public class SSCommon implements Serializable {
 	/**
 	 * Returns a String representing the value in the bound database column.
 	 * 
-	 * If null, it will return an empty string.
+	 * New functionality added (2020) to allow this method to return a null String
+	 * if allowNull==true. allowNull is false by default so nulls will be converted to empty strings.
 	 * 
 	 * @return String containing the value in the bound database column
 	 */
@@ -415,7 +430,7 @@ public class SSCommon implements Serializable {
 		try {
 			if (getSSRowSet().getRow() != 0) {
 				value = getSSRowSet().getColumnText(getBoundColumnName());
-				if (value == null) {
+				if (!getAllowNull() && value == null) {
 					value = "";
 				}
 			}
@@ -510,10 +525,30 @@ public class SSCommon implements Serializable {
 	}
 
 	/**
+     * Class to remove a Document listener when the SwingSet component is a JTextComponent
+     */
+    public void removeSSDocumentListener() {
+    	//ssRowSet.addSSRowSetListener(ssRowSetListener);
+    	((javax.swing.text.JTextComponent)getSSComponent()).getDocument().removeDocumentListener(ssDocumentListener);
+    	
+    }
+
+	/**
 	 * Method to remove the RowSet listener.
 	 */
 	public void removeSSRowSetListener() {
-		ssRowSet.removeSSRowSetListener(ssRowSetListener);
+		if (ssRowSet!=null) {
+			ssRowSet.removeSSRowSetListener(ssRowSetListener);
+		}
+	}
+
+	/**
+	 * Sets the allowNull flag for the bound database column.
+	 * 
+	 * @param _allowNull flag to indicate if the bound database column can be null
+	 */
+	public void setAllowNull(boolean _allowNull) {
+		this.allowNull = _allowNull;
 	}
 
 	/**
@@ -594,7 +629,7 @@ public class SSCommon implements Serializable {
 	 * @param _boundColumnText value to write to bound database column
 	 */
 	public void setBoundColumnText(String _boundColumnText) {
-		getSSRowSet().updateColumnText(getBoundColumnName(), _boundColumnText);
+		getSSRowSet().updateColumnText( _boundColumnText, getBoundColumnName());
 	}
 
 	/**
