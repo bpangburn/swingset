@@ -846,8 +846,10 @@ public class SSDBComboBox extends JComboBox<Object> {
 			if (this.saveSwitch){	
 				this.saveActionListeners = getActionListeners();
     			this.saveSwitch = false;
-    			removeAllActionListeners();
+    			// moving this line out of if block
+    			//removeAllActionListeners();
 			}
+			removeAllActionListeners();
 		}
     }
     
