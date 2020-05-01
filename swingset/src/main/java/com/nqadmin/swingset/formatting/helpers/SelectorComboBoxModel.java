@@ -77,6 +77,8 @@ public class SelectorComboBoxModel extends DefaultComboBoxModel<Object> {
 	private static final long serialVersionUID = -1266028305085372287L;
 
 	private Object selectedItem = null;
+	
+	private int getSizeCounter = 0;
 
 	/**
 	 * GlazedList data for ComboBox
@@ -498,6 +500,10 @@ public class SelectorComboBoxModel extends DefaultComboBoxModel<Object> {
 	 */
 	@Override
 	public int getSize() {
+		//System.out.println("\nSelectorComboBoxModel.getSize(): " + getSizeCounter++);
+		//if (getSizeCounter<14) {
+		//	Thread.dumpStack();
+		//}
 		return this.filteredData.size();
 	}
 
