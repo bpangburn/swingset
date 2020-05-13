@@ -146,9 +146,12 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  */
 
 public class SSDataGrid extends JTable {
+	
+	// TODO Add support for JFormattedTextField.
+	// TODO Add support for GlazedList table features.
 
 	/**
-	 * 
+	 * Unique serial ID
 	 */
 	private static final long serialVersionUID = -7924790696188174770L;
 
