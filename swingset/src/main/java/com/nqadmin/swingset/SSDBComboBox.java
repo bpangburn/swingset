@@ -626,38 +626,23 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //		DefaultEventComboBoxModel<SSListItem> model = new DefaultEventComboBoxModel<SSListItem>(eventList);
 //		this.setModel(model);
 
-		//SSDBComboBox currentCombo = this;
-
 //TODO do we need to install once or after every query???	
 
-		
 // NOTE: install method makes the ComboBox editable
 //		// should already in the event dispatch thread so don't use invokeAndWait()
-if (!autoCompleteInstalled) {
-	AutoCompleteSupport<SSListItem> autoComplete = AutoCompleteSupport.install(this, eventList);
-	autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
-	autoCompleteInstalled = true;
-}
-		
-		//autoComplete.setStrict(true);
+		if (!autoCompleteInstalled) {
+			AutoCompleteSupport<SSListItem> autoComplete = AutoCompleteSupport.install(this, eventList);
+			autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
+			autoCompleteInstalled = true;
+		}
 
-//		// install auto-complete support
-//        SwingUtilities.invokeAndWait(new Runnable() {
-//            public void run() {
-//        		AutoCompleteSupport<SSListItem> autoComplete = AutoCompleteSupport.install(currentCombo, eventList);
-//        		//autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
-//        		autoComplete.setStrict(true);
-//            }
-//        });
-
-		// set selected index
-
-		// update ui
-		//System.out.println("Selected value after query: " + getSelectedValue());
-		//refresh();
+		// autoComplete.setStrict(true);
 
 // since the list was likely blank when the component was bound we need to update the component again so it can get the text from the list
-updateSSComponent();
+// we don't want to do this if the component is unbound as with an SSDBComboBox used for navigation.
+		if (getSSRowSet() != null) {
+			updateSSComponent();
+		}
 	}
 
 	/**
@@ -968,7 +953,7 @@ System.out.println("Clearing eventList.");
 			Statement statement = ssCommon.getSSConnection().getConnection().createStatement();
 			rs = statement.executeQuery(getQuery());
 			
-System.out.println("SSDBComboBox Query: " + getQuery());	
+//System.out.println("SSDBComboBox Query: " + getQuery());	
 			// eventList.clear();
 			// int i = 0;
 			while (rs.next()) {
@@ -1538,7 +1523,7 @@ System.out.println("SSDBComboBox Query: " + getQuery());
 							+ ". Setting index to -1 (blank).");
 				}
 
-				System.out.println(eventList.toString());
+				//System.out.println(eventList.toString());
 				setSelectedIndex(index);
 				//updateUI();
 			} else {

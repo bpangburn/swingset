@@ -37,10 +37,7 @@
 
 package com.nqadmin.swingset;
 
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Array;
@@ -49,13 +46,10 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Vector;
 
-import javax.sql.RowSetEvent;
-import javax.sql.RowSetListener;
 import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSArray;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;

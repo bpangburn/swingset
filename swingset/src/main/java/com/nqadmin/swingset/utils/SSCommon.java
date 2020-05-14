@@ -427,6 +427,8 @@ public class SSCommon implements Serializable {
 	 * @return String containing the value in the bound database column
 	 */
 	public String getBoundColumnText() {
+		
+// TODO Consider checking for a null RowSet. This would be the case for an unbound SSDBComboBox used for navigation.		
 
 		String value = "";
 

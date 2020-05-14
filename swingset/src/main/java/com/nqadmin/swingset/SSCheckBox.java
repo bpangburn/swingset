@@ -124,7 +124,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 			addSSRowSetListener();
 		}
 
-	} // end private class MyCheckBoxListener implements ChangeListener, Serializable
+	} // end private class SSCheckBoxListener
 		// {
 
 	/**
