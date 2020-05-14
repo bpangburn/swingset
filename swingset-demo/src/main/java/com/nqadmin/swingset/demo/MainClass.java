@@ -237,24 +237,11 @@ public class MainClass extends JFrame {
      * @param url 
      */
 	public static void main(String[] _url){
-        //new MainClass();
+//        new MainClass();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				MainClass mc = new MainClass();
 			}
 		});
     }
-}
-
-/*
- * $Log$
- * Revision 1.8  2012/06/07 15:54:38  beevo
- * Modified example for compatibilty with H2 database.
- *
- * Revision 1.7  2005/02/04 22:40:12  yoda2
- * Updated Copyright info.
- *
- * Revision 1.6  2004/11/11 15:04:38  yoda2
- * Using TextPad, converted all tabs to "soft" tabs comprised of four actual spaces.
- *
- */
+} // end public class MainClass extends JFrame {
