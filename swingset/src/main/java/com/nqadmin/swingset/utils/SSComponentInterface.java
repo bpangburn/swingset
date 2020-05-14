@@ -130,7 +130,7 @@ public interface SSComponentInterface {
 		getSSCommon().bind(_ssRowSet, _boundColumnName);
 
 	}
-
+	
 	/**
 	 * Transfers focus to next Swing Component on the screen when Down Arrow or
 	 * Enter are pressed.
@@ -143,7 +143,7 @@ public interface SSComponentInterface {
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK));
 		((JComponent) this).setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
 	}
-
+	
 	/**
 	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
@@ -158,7 +158,8 @@ public interface SSComponentInterface {
 	/**
 	 * Retrieves the allowNull flag for the bound database column.
 	 * 
-	 * @return true if bound database column can contain null values, otherwise returns false
+	 * @return true if bound database column can contain null values, otherwise
+	 *         returns false
 	 */
 	default boolean getAllowNull() {
 		return getSSCommon().getAllowNull();
@@ -246,6 +247,18 @@ public interface SSComponentInterface {
 		return getBoundColumnType();
 	}
 
+//	/**
+//	 * Returns the primary key column name for the RowSet query
+//	 * 
+//	 * Used primarily for associating a primary key value with another column in a SwingSet list component.
+//	 * 
+//	 * @return the primaryKeyColumn
+//	 */
+//// TODO if this is just used for lists then we may want to put into a separate SSListCommon class
+//	default String getPrimaryKeyColumn() {
+//		return getSSCommon().getPrimaryKeyColumn();
+//	}
+
 	/**
 	 * Returns the ssCommon data member of the Swingset component.
 	 * 
@@ -277,8 +290,8 @@ public interface SSComponentInterface {
 	default void removeListeners() {
 		removeSSRowSetListener();
 		removeSSComponentListener();
-	};
-	
+	}
+
 	/**
 	 * Remove the listener detecting changes in value for the current component.
 	 * SSCommon will manage any bound RowSet listeners.
@@ -303,13 +316,13 @@ public interface SSComponentInterface {
 	default void removeSSDocumentListener() {
 		getSSCommon().removeSSDocumentListener();
 	};
-
+	
 	/**
 	 * Removes listener for RowSet.
 	 */
 	default void removeSSRowSetListener() {
 		getSSCommon().removeSSRowSetListener();
-	}
+	};
 
 	/**
 	 * Sets the allowNull flag for the bound database column.
@@ -318,6 +331,19 @@ public interface SSComponentInterface {
 	 */
 	default void setAllowNull(boolean _allowNull) {
 		getSSCommon().setAllowNull(_allowNull);
+	}
+
+	/**
+	 * Updates the bound database column with the specified Array.
+	 * 
+	 * Used for SSList or other component where multiple items can be selected.
+	 * 
+	 * @param _boundColumnArray Array to write to bound database column
+	 * @throws SQLException thrown if there is a problem writing the array to the RowSet
+	 */
+	default void setBoundColumnArray(SSArray _boundColumnArray) throws SQLException {
+		
+		getSSCommon().setBoundColumnArray(_boundColumnArray);
 	}
 
 	/**
@@ -339,13 +365,15 @@ public interface SSComponentInterface {
 		getSSCommon().setBoundColumnName(_boundColumnName);
 
 	}
-
+	
 	/**
 	 * Sets the value of the bound database column
 	 * 
 	 * @param _boundColumnText the value to set in the bound database column
 	 */
 	default void setBoundColumnText(String _boundColumnText) {
+
+		System.out.println("SSComponentInterface.setBoundColumnText() " + _boundColumnText);
 
 		getSSCommon().setBoundColumnText(_boundColumnText);
 
@@ -378,6 +406,13 @@ public interface SSComponentInterface {
 	default void setColumnName(String _columnName) throws SQLException {
 		setBoundColumnName(_columnName);
 	}
+
+//	/**
+//	 * @param _primaryKeyColumn the primaryKeyColumn to set
+//	 */
+//	default void setPrimaryKeyColumn(String _primaryKeyColumn) {
+//		getSSCommon().setPrimaryKeyColumn(_primaryKeyColumn);
+//	}
 
 	/**
 	 * Sets the SSCommon data member of the Swingset Component.

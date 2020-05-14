@@ -3,14 +3,22 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
 ==============================================================================
-SwingSet 3.0.1 - Released TBD
+SwingSet 4.0.0 - Released TBD
 ==============================================================================
 
 Changes:
-	1. 
-	2. 
-	3. 
-	4. 
+	1. Demo: moved instantiation of MainClass to SwingUtilities.invokeLater()
+	2. Moved recurring data members and logic to SSCommon
+	3. Wrote SSComponentInterface interface to be implemented by all 
+	   SwingSet components and eliminate redundant code.
+	4. Elimination of bound JTextFields/Document Listeners for components
+	   NOT based on JTextComponent
+	   Elimination of SSTextDocument
+	5. Generic SSDocumentListener in SSCommon deals with multiple calls
+	   better moving logic to changedUpdate() and SwingUtilities.invokeLater()
+	6. Added allowNull flag to SSCommon to allow user to leave certain
+	   components unselected (e.g., combobox) and write null back to RowSet
+	   bound column.
 
 ==============================================================================
 SwingSet 3.0.0 - Released 2020-01-10

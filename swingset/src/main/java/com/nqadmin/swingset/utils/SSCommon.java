@@ -241,10 +241,10 @@ public class SSCommon implements Serializable {
 	 */
 	private volatile boolean inBinding = false;
     
-	/**
-	 * SSRowSet column containing the primary key.
-	 */
-	private String primaryKeyColumn = null;
+//	/**
+//	 * SSRowSet column containing the primary key.
+//	 */
+//	private String primaryKeyColumn = null;
 
 	/**
 	 * parent SwingSet component
@@ -328,7 +328,10 @@ public class SSCommon implements Serializable {
 		}
 
 		// UPDATE COMPONENT
+		// For an SSDBComboBox, we have likely not yet called execute to populate the combo lists so the text for the first record will be blank.
 		updateSSComponent();
+		
+		//Thread.dumpStack();
 
 	}
 
@@ -452,17 +455,17 @@ public class SSCommon implements Serializable {
 		return boundColumnType;
 	}
 
-	/**
-	 * Returns the primary key column name for the RowSet query
-	 * 
-	 * Used primarily for associating a primary key value with another column in a SwingSet list component.
-	 * 
-	 * @return the primaryKeyColumn
-	 */
-// TODO if this is just used for lists then we may want to put into a separate SSListCommon class
-	public String getPrimaryKeyColumn() {
-		return primaryKeyColumn;
-	}
+//	/**
+//	 * Returns the primary key column name for the RowSet query
+//	 * 
+//	 * Used primarily for associating a primary key value with another column in a SwingSet list component.
+//	 * 
+//	 * @return the primaryKeyColumn
+//	 */
+//// TODO if this is just used for lists then we may want to put into a separate SSListCommon class
+//	public String getPrimaryKeyColumn() {
+//		return primaryKeyColumn;
+//	}
 
 	/**
 	 * @return the parent/calling SwingSet JComponent implementing
@@ -552,6 +555,20 @@ public class SSCommon implements Serializable {
 	}
 
 	/**
+	 * Updates the bound database column with the specified Array.
+	 * 
+	 * Used for SSList or other component where multiple items can be selected.
+	 * 
+	 * @param _boundColumnArray Array to write to bound database column
+	 * @throws SQLException thrown if there is a problem writing the array to the RowSet
+	 */
+	public void setBoundColumnArray(SSArray _boundColumnArray) throws SQLException {
+		//getSSRowSet().updateColumnText( _boundColumnText, getBoundColumnName(), getAllowNull());
+		
+		getSSRowSet().updateArray(getBoundColumnName(), _boundColumnArray);
+	}
+
+	/**
 	 * Sets the column index to which the Component is to be bound.
 	 *
 	 * @param _boundColumnIndex column index to which the Component is to be bound
@@ -622,22 +639,22 @@ public class SSCommon implements Serializable {
 		if (!inBinding)
 			bind();
 	}
-
+	
 	/**
 	 * Updates the bound database column with the specified String.
 	 * 
 	 * @param _boundColumnText value to write to bound database column
 	 */
 	public void setBoundColumnText(String _boundColumnText) {
-		getSSRowSet().updateColumnText( _boundColumnText, getBoundColumnName());
+		getSSRowSet().updateColumnText(_boundColumnText, getBoundColumnName(), getAllowNull());
 	}
 
-	/**
-	 * @param primaryKeyColumn the primaryKeyColumn to set
-	 */
-	public void setPrimaryKeyColumn(String primaryKeyColumn) {
-		this.primaryKeyColumn = primaryKeyColumn;
-	}
+//	/**
+//	 * @param primaryKeyColumn the primaryKeyColumn to set
+//	 */
+//	public void setPrimaryKeyColumn(String primaryKeyColumn) {
+//		this.primaryKeyColumn = primaryKeyColumn;
+//	}
 
 	/**
 	 * Sets the SwingSet component of which this SSCommon instance is a datamember.

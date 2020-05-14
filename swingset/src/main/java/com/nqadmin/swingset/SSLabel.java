@@ -45,11 +45,10 @@ import java.io.Serializable;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import com.nqadmin.swingset.datasources.SSRowSet;
+import com.nqadmin.swingset.utils.SSCommon;
+import com.nqadmin.swingset.utils.SSComponentInterface;
 
 /**
  * SSLabel.java
@@ -58,37 +57,73 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * 
  * Used to display database values in a read-only JLabel.
  */
-public class SSLabel extends JLabel {
+public class SSLabel extends JLabel implements SSComponentInterface {
 
+    /**
+     * Listener(s) for the component's value used to propagate changes back to
+     * bound database column.
+     * 
+     * There is not an obvious use-case where a label would change, but could be 
+     * tied to a menu, screen logic, or some other Developer driven change that could
+     * conceivably need to be synchronized back to the RowSet.
+     */
+    protected class SSLabelListener implements PropertyChangeListener, Serializable {
+        /**
+		 * unique serial ID
+		 */
+		private static final long serialVersionUID = 6786673052979566820L;
+		
+		@Override
+		public void propertyChange(PropertyChangeEvent pce) {
+			
+			// CONFIRM THE PROPERTY NAME IN CASE SOMEONE ADDS A DIFFERENT PROPERTY LISTENER TO ssLabelListener
+			if (pce.getPropertyName()=="text") {
+			
+				removeSSRowSetListener();
+				
+				setBoundColumnText(getText());
+				
+				addSSRowSetListener();
+			}
+			
+		}
+
+    } // end protected class SSLabelListener
+	
     /**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -5232780793538061537L;
 
-	/**
-     * Text field bound to the SSRowSet.
-     */
-    protected JTextField textField = new JTextField();
+//	/**
+//     * Text field bound to the SSRowSet.
+//     */
+//    protected JTextField textField = new JTextField();
+//
+//    /**
+//     * SSRowSet from which component will get/set values.
+//     */
+//    protected SSRowSet sSRowSet;
+//
+//    /**
+//     * SSRowSet column to which the component will be bound.
+//     */
+//    protected String columnName = "";
 
     /**
-     * SSRowSet from which component will get/set values.
+     * Common fields shared across SwingSet components
      */
-    protected SSRowSet sSRowSet;
+    protected SSCommon ssCommon;
 
-    /**
-     * SSRowSet column to which the component will be bound.
-     */
-    protected String columnName = "";
+//    /**
+//     * Bound text field document listener.
+//     */
+//    protected final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
     /**
      * Component listener.
      */
-    protected final MyLabelTextListener labelTextListener = new MyLabelTextListener();
-
-    /**
-     * Bound text field document listener.
-     */
-    protected final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
+    protected final SSLabelListener ssLabelListener = new SSLabelListener();
 
     /**
      * Empty constructor needed for deserialization. Creates a SSLabel instance
@@ -96,7 +131,9 @@ public class SSLabel extends JLabel {
      */
     public SSLabel() {
         super("<label text here>");
-        init();
+        setSSCommon(new SSCommon(this));
+		// SSCommon constructor calls init()
+        //init();
     }
 
     /**
@@ -106,7 +143,9 @@ public class SSLabel extends JLabel {
      */
     public SSLabel(Icon _image) {
 		super(_image);
-        init();
+		setSSCommon(new SSCommon(this));
+		// SSCommon constructor calls init()
+        //init();
     }
 
     /**
@@ -117,258 +156,326 @@ public class SSLabel extends JLabel {
      */
     public SSLabel(Icon _image, int _horizontalAlignment) {
 		super(_image, _horizontalAlignment);
-        init();
+		setSSCommon(new SSCommon(this));
+        //init();
     }
 
-    /**
+//    /**
+//     * Sets the SSRowSet column name to which the component is bound.
+//     *
+//     * @param _columnName    column name in the SSRowSet to which the component
+//     *    is bound
+//     */
+//    public void setColumnName(String _columnName) {
+//        String oldValue = this.columnName;
+//        this.columnName = _columnName;
+//        firePropertyChange("columnName", oldValue, this.columnName);
+//        bind();
+//    }
+
+//    /**
+//     * Returns the SSRowSet column name to which the component is bound.
+//     *
+//     * @return column name to which the component is bound
+//     */
+//    public String getColumnName() {
+//        return this.columnName;
+//    }
+
+//    /**
+//     * Sets the SSRowSet to which the component is bound.
+//     *
+//     * @param _sSRowSet    SSRowSet to which the component is bound
+//     */
+//    public void setSSRowSet(SSRowSet _sSRowSet) {
+//        SSRowSet oldValue = this.sSRowSet;
+//        this.sSRowSet = _sSRowSet;
+//        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
+//        bind();
+//    }
+
+//    /**
+//     * Returns the SSRowSet to which the component is bound.
+//     *
+//     * @return SSRowSet to which the component is bound
+//     */
+//    public SSRowSet getSSRowSet() {
+//        return this.sSRowSet;
+//    }
+
+//    /**
+//     * Sets the SSRowSet and column name to which the component is to be bound.
+//     *
+//     * @param _sSRowSet    datasource to be used.
+//     * @param _columnName    Name of the column to which this check box should be bound
+//     */
+//    public void bind(SSRowSet _sSRowSet, String _columnName) {
+//        SSRowSet oldValue = this.sSRowSet;
+//        this.sSRowSet = _sSRowSet;
+//        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
+//
+//        String oldValue2 = this.columnName;
+//        this.columnName = _columnName;
+//        firePropertyChange("columnName", oldValue2, this.columnName);
+//
+//        bind();
+//    }
+
+
+	/**
      * Creates a SSLabel instance with no image and binds it to the specified
      * SSRowSet column.
      *
-     * @param _sSRowSet    datasource to be used.
-     * @param _columnName    name of the column to which this label should be bound
+     * @param _ssRowSet    datasource to be used.
+     * @param _boundColumnName    name of the column to which this label should be bound
      */
-    public SSLabel(SSRowSet _sSRowSet, String _columnName) {
-        this.sSRowSet = _sSRowSet;
-        this.columnName = _columnName;
-        init();
-        bind();
+    public SSLabel(SSRowSet _ssRowSet, String _boundColumnName) {
+		super();
+		setSSCommon(new SSCommon(this));
+		// SSCommon constructor calls init()
+		bind(_ssRowSet, _boundColumnName);
+        //this.sSRowSet = _sSRowSet;
+        //this.columnName = _columnName;
+        //bind();
     }
 
-    /**
-     * Sets the SSRowSet column name to which the component is bound.
-     *
-     * @param _columnName    column name in the SSRowSet to which the component
-     *    is bound
-     */
-    public void setColumnName(String _columnName) {
-        String oldValue = this.columnName;
-        this.columnName = _columnName;
-        firePropertyChange("columnName", oldValue, this.columnName);
-        bind();
-    }
+//    /**
+//     * Method for handling binding of component to a SSRowSet column.
+//     */
+//    protected void bind() {
+//
+//        // CHECK FOR NULL COLUMN/ROWSET
+//            if (this.columnName==null || this.columnName.trim().equals("") || this.sSRowSet==null) {
+//                return;
+//            }
+//
+//        // REMOVE LISTENERS TO PREVENT DUPLICATION
+//            removeListeners();
+//            
+//        // BIND AND UPDATE DISPLAY
+//            try {
+//
+//	        // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
+//	            this.textField.setDocument(new SSTextDocument(this.sSRowSet, this.columnName));
+//	
+//	        // SET THE LABEL DISPLAY
+//	            updateDisplay();
+//	            
+//            } finally {
+//	        // ADD BACK LISTENERS
+//	            addListeners();
+//            }
+//
+//    }
 
-    /**
-     * Returns the SSRowSet column name to which the component is bound.
-     *
-     * @return column name to which the component is bound
-     */
-    public String getColumnName() {
-        return this.columnName;
-    }
 
-    /**
-     * Sets the SSRowSet to which the component is bound.
-     *
-     * @param _sSRowSet    SSRowSet to which the component is bound
-     */
-    public void setSSRowSet(SSRowSet _sSRowSet) {
-        SSRowSet oldValue = this.sSRowSet;
-        this.sSRowSet = _sSRowSet;
-        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
-        bind();
-    }
+//    /**
+//     * Updates the value displayed in the component based on the SSRowSet column
+//     * binding.
+//     */
+//    
+//    public void updateDisplay() {
+//
+//        // SET THE LABEL BASED ON THE VALUE IN THE TEXT FIELD
+//            //setText(this.textField.getText());
+//    	
+//    } // end protected void updateDisplay() {
 
-    /**
-     * Returns the SSRowSet to which the component is bound.
-     *
-     * @return SSRowSet to which the component is bound
-     */
-    public SSRowSet getSSRowSet() {
-        return this.sSRowSet;
-    }
+//    /**
+//     * Adds listeners for component and bound text field (where applicable).
+//     */
+//    private void addListeners() {
+//        this.textField.getDocument().addDocumentListener(this.textFieldDocumentListener);
+//        addPropertyChangeListener("text", this.labelTextListener);
+//    }
+//
+//    /**
+//     * Removes listeners for component and bound text field (where applicable).
+//     */
+//    private void removeListeners() {
+//        this.textField.getDocument().removeDocumentListener(this.textFieldDocumentListener);
+//        removePropertyChangeListener("text", this.labelTextListener);
+//    }
 
-    /**
-     * Sets the SSRowSet and column name to which the component is to be bound.
-     *
-     * @param _sSRowSet    datasource to be used.
-     * @param _columnName    Name of the column to which this check box should be bound
-     */
-    public void bind(SSRowSet _sSRowSet, String _columnName) {
-        SSRowSet oldValue = this.sSRowSet;
-        this.sSRowSet = _sSRowSet;
-        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
+//    /**
+//     * Listener(s) for the bound text field used to propigate values back to the
+//     * component's value.
+//     */
+//    protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
+//    	
+//        /**
+//		 * unique serial id
+//		 */
+//		private static final long serialVersionUID = -6911906045174819801L;
+//
+//		@Override
+//		public void changedUpdate(DocumentEvent de) {
+//            removePropertyChangeListener("text", SSLabel.this.labelTextListener);
+//
+//            updateDisplay();
+//
+//            addPropertyChangeListener("text", SSLabel.this.labelTextListener);
+//        }
+//
+//        // WHEN EVER THERE IS A CHANGE IN THE VALUE IN THE TEXT FIELD CHANGE THE LABEL
+//        // ACCORDINGLY.
+//        @Override
+//		public void insertUpdate(DocumentEvent de) {
+//            removePropertyChangeListener("text", SSLabel.this.labelTextListener);
+//
+//            updateDisplay();
+//
+//            addPropertyChangeListener("text", SSLabel.this.labelTextListener);
+//        }
+//
+//        // IF A REMOVE UPDATE OCCURS ON THE TEXT FIELD CHECK THE CHANGE AND SET THE
+//        // CHECK BOX ACCORDINGLY.
+//        @Override
+//		public void removeUpdate(DocumentEvent de) {
+//            removePropertyChangeListener("text", SSLabel.this.labelTextListener);
+//
+//            updateDisplay();
+//
+//            addPropertyChangeListener("text", SSLabel.this.labelTextListener);
+//        }
+//    } // end protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
+    
+//    /**
+//     * Updates the underlying RowSet when there is a change to the Document object.
+//     * 
+//     * These types of changes can result from a change in the RowSet pushed to the Document or a call to setText() on the
+//     * JTextField.
+//     * 
+//     * DocumentListener events generally, but not always get fired twice any time there is an update to the JTextField:
+//     * a removeUpdate() followed by insertUpdate().
+//     * See:
+//     * https://stackoverflow.com/questions/15209766/why-jtextfield-settext-will-fire-documentlisteners-removeupdate-before-change#15213813
+//     * 
+//     * Using partial solution here from here:
+//     * https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
+//     * 
+//     * Having removeUpdate() and insertUpdate() both call changedUpdate(). changedUpdate() uses counters
+//     * and SwingUtilities.invokeLater() to only update the display on the last method called.
+//     * 
+//     * Note that we do not want to handle removal/addition of listeners in updateText() because other
+//     * code could call it directly.
+//     */
+//    // TODO audit which listeners need to be removed in changedUpdate()
+//
+//    protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
+//    	
+//    	/**
+//		 * unique serial id
+//		 */
+//		private static final long serialVersionUID = -6911906045174819801L;
+//		
+//		/**
+//		 * variables needed to consolidate calls to removeUpdate() and insertUpdate() from DocumentListener
+//		 */
+//		private int lastChange=0;
+//    	private int lastNotifiedChange = 0;
+//    	
+//    	@Override    	
+//		public void changedUpdate(DocumentEvent de) {
+//			lastChange++;
+//			//System.out.println("SSLabel (" + SSLabel.this.getColumnName() + ") - changedUpdate(): lastChange=" + lastChange + ", lastNotifiedChange=" + lastNotifiedChange);
+//			// Delay execution of logic until all listener methods are called for current event
+//			// See: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
+//			SwingUtilities.invokeLater(() -> {
+//				if (lastNotifiedChange != lastChange) {
+//					lastNotifiedChange = lastChange;
+//					
+//					removePropertyChangeListener("text", SSLabel.this.labelTextListener);
+//					updateDisplay();
+//					addPropertyChangeListener("text", SSLabel.this.labelTextListener);
+//				}
+//			});
+//    	}
+//    	
+//        @Override
+//		public void insertUpdate(DocumentEvent de) {
+//        	//System.out.println("SSLabel (" + this.columnName + ") - insertUpdate()");
+//        	changedUpdate(de);
+//        }
+//        
+//        @Override
+//		public void removeUpdate(DocumentEvent de) {
+//        	//System.out.println("SSLabel (" + this.columnName + ") - removeUpdate()"); 
+//        	changedUpdate(de);
+//        }
+//
+//    } // end protected class MyTextFieldDocumentListener implements DocumentListener {
 
-        String oldValue2 = this.columnName;
-        this.columnName = _columnName;
-        firePropertyChange("columnName", oldValue2, this.columnName);
+	/**
+	 * Adds any necessary listeners for the current SwingSet component. These will
+	 * trigger changes in the underlying RowSet column.
+	 * 
+	 * Generally an SSLabel will be read-only, but Developer could change the text
+	 * so we'll support a property listener.
+	 */
+	@Override
+	public void addSSComponentListener() {
+		addPropertyChangeListener("text", ssLabelListener);
+	}
 
-        bind();
-    }
-
-    /**
-     * Initialization code.
-     */
-    protected void init() {
-
+	/**
+	 * Method to allow Developer to add functionality when SwingSet component is
+	 * instantiated.
+	 * 
+	 * It will actually be called from SSCommon.init() once the SSCommon data member
+	 * is instantiated.
+	 */
+	@Override
+	public void customInit() {
         // SET PREFERRED DIMENSIONS
+// TODO not sure SwingSet should be setting component dimensions    	
             setPreferredSize(new Dimension(200,20));
     }
 
-    /**
-     * Method for handling binding of component to a SSRowSet column.
-     */
-    protected void bind() {
+	/**
+	 * Returns the ssCommon data member for the current Swingset component.
+	 * 
+	 * @return shared/common SwingSet component data & methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		return ssCommon;
+	}
 
-        // CHECK FOR NULL COLUMN/ROWSET
-            if (this.columnName==null || this.columnName.trim().equals("") || this.sSRowSet==null) {
-                return;
-            }
+	/**
+	 * Removes any necessary listeners for the current SwingSet component. These will
+	 * trigger changes in the underlying RowSet column.
+	 * 
+	 * Generally an SSLabel will be read-only, but Developer could change the text so
+	 * we'll support a property listener.
+	 */
+	@Override
+	public void removeSSComponentListener() {
+		removePropertyChangeListener("text", ssLabelListener);
+	}
 
-        // REMOVE LISTENERS TO PREVENT DUPLICATION
-            removeListeners();
 
-        // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
-            this.textField.setDocument(new SSTextDocument(this.sSRowSet, this.columnName));
 
-        // SET THE LABEL DISPLAY
-            updateDisplay();
+	/**
+	 * Sets the SSCommon data member for the current Swingset Component.
+	 * 
+	 * @param _ssCommon shared/common SwingSet component data & methods
+	 */
+	@Override
+	public void setSSCommon(SSCommon _ssCommon) {
+		ssCommon = _ssCommon;
+	}
 
-        // ADD BACK LISTENERS
-            addListeners();
-
-    }
-
-    /**
-     * Updates the value displayed in the component based on the SSRowSet column
-     * binding.
-     */
-    protected void updateDisplay() {
-
-        // SET THE LABEL BASED ON THE VALUE IN THE TEXT FIELD
-            setText(this.textField.getText());
-
-    } // end protected void updateDisplay() {
-
-    /**
-     * Adds listeners for component and bound text field (where applicable).
-     */
-    private void addListeners() {
-        this.textField.getDocument().addDocumentListener(this.textFieldDocumentListener);
-        addPropertyChangeListener("text", this.labelTextListener);
-    }
-
-    /**
-     * Removes listeners for component and bound text field (where applicable).
-     */
-    private void removeListeners() {
-        this.textField.getDocument().removeDocumentListener(this.textFieldDocumentListener);
-        removePropertyChangeListener("text", this.labelTextListener);
-    }
-
-    /**
-     * Listener(s) for the bound text field used to propigate values back to the
-     * component's value.
-     */
-    protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
-    	
-        /**
-		 * unique serial id
-		 */
-		private static final long serialVersionUID = -6911906045174819801L;
-
-		@Override
-		public void changedUpdate(DocumentEvent de) {
-            removePropertyChangeListener("text", SSLabel.this.labelTextListener);
-
-            updateDisplay();
-
-            addPropertyChangeListener("text", SSLabel.this.labelTextListener);
-        }
-
-        // WHEN EVER THERE IS A CHANGE IN THE VALUE IN THE TEXT FIELD CHANGE THE LABEL
-        // ACCORDINGLY.
-        @Override
-		public void insertUpdate(DocumentEvent de) {
-            removePropertyChangeListener("text", SSLabel.this.labelTextListener);
-
-            updateDisplay();
-
-            addPropertyChangeListener("text", SSLabel.this.labelTextListener);
-        }
-
-        // IF A REMOVE UPDATE OCCURS ON THE TEXT FIELD CHECK THE CHANGE AND SET THE
-        // CHECK BOX ACCORDINGLY.
-        @Override
-		public void removeUpdate(DocumentEvent de) {
-            removePropertyChangeListener("text", SSLabel.this.labelTextListener);
-
-            updateDisplay();
-
-            addPropertyChangeListener("text", SSLabel.this.labelTextListener);
-        }
-    } // end protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
-
-    /**
-     * Listener(s) for the component's value used to propigate changes back to
-     * bound text field.
-     */
-    protected class MyLabelTextListener implements PropertyChangeListener, Serializable {
-        /**
-		 * 
-		 */
-		private static final long serialVersionUID = 6786673052979566820L;
-
-		@Override
-		public void propertyChange(PropertyChangeEvent pce) {
-            SSLabel.this.textField.getDocument().removeDocumentListener(SSLabel.this.textFieldDocumentListener);
-
-            SSLabel.this.textField.setText(getText());
-
-            SSLabel.this.textField.getDocument().addDocumentListener(SSLabel.this.textFieldDocumentListener);
-        }
-
-    } // end protected class MyLabelTextListener implements ChangeListener, Serializable {
+	/**
+	 * Updates the value stored and displayed in the SwingSet component based on
+	 * getBoundColumnText()
+	 * 
+	 * Call to this method should be coming from SSCommon and should already have
+	 * the Component listener removed
+	 */
+	@Override
+	public void updateSSComponent() {
+		this.setText(getBoundColumnText());
+	}
 
 } // end public class SSLabel extends JLabel {
-
-/*
- * $Log$
- * Revision 1.16  2005/02/21 16:31:33  prasanth
- * In bind checking for empty columnName before binding the component.
- *
- * Revision 1.15  2005/02/13 15:38:20  yoda2
- * Removed redundant PropertyChangeListener and VetoableChangeListener class variables and methods from components with JComponent as an ancestor.
- *
- * Revision 1.14  2005/02/12 03:29:26  yoda2
- * Added bound properties (for beans).
- *
- * Revision 1.13  2005/02/11 22:59:46  yoda2
- * Imported PropertyVetoException and added some bound properties.
- *
- * Revision 1.12  2005/02/11 20:16:05  yoda2
- * Added infrastructure to support property & vetoable change listeners (for beans).
- *
- * Revision 1.11  2005/02/10 21:10:23  yoda2
- * Added default label text to empty constructor so that label will be visible in BDK.
- *
- * Revision 1.10  2005/02/10 20:13:03  yoda2
- * Setter/getter cleanup & method reordering for consistency.
- *
- * Revision 1.9  2005/02/10 03:46:47  yoda2
- * Replaced all setDisplay() methods & calls with updateDisplay() methods & calls to prevent any setter/getter confusion.
- *
- * Revision 1.8  2005/02/09 17:29:55  yoda2
- * JavaDoc cleanup.
- *
- * Revision 1.7  2005/02/07 20:36:38  yoda2
- * Made private listener data members final.
- *
- * Revision 1.6  2005/02/05 05:16:33  yoda2
- * API cleanup.
- *
- * Revision 1.5  2005/02/04 22:48:54  yoda2
- * API cleanup & updated Copyright info.
- *
- * Revision 1.4  2005/02/01 17:32:38  yoda2
- * API cleanup.
- *
- * Revision 1.3  2005/01/03 02:58:03  yoda2
- * Added appropriate super() calls to non-empty constructors.
- *
- * Revision 1.2  2005/01/02 18:33:48  yoda2
- * Added back empty constructor needed for deserialization along with other potentially useful constructors from parent classes.
- *
- * Revision 1.1  2005/01/01 05:05:47  yoda2
- * Adding preliminary SwingSet implementations for JLabel & JSlider.
- *
- */
