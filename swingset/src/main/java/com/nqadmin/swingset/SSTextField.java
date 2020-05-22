@@ -557,7 +557,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
     /**
 	 * Returns the ssCommon data member for the current Swingset component.
 	 * 
-	 * @return shared/common SwingSet component data & methods
+	 * @return shared/common SwingSet component data and methods
 	 */
     @Override
 	public SSCommon getSSCommon() {
@@ -659,7 +659,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	/**
 	 * Sets the SSCommon data member for the current Swingset Component.
 	 * 
-	 * @param _ssCommon shared/common SwingSet component data & methods
+	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
 	public void setSSCommon(SSCommon _ssCommon) {

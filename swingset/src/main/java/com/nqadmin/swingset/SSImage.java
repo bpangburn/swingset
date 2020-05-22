@@ -42,26 +42,20 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-import javax.sql.RowSetEvent;
-import javax.sql.RowSetListener;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
-import com.nqadmin.swingset.SSCheckBox.SSCheckBoxListener;
 import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -474,7 +468,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	/**
 	 * Returns the ssCommon data member for the current Swingset component.
 	 * 
-	 * @return shared/common SwingSet component data & methods
+	 * @return shared/common SwingSet component data and methods
 	 */
 	@Override
 	public SSCommon getSSCommon() {
@@ -511,7 +505,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	/**
 	 * Sets the SSCommon data member for the current Swingset Component.
 	 * 
-	 * @param _ssCommon shared/common SwingSet component data & methods
+	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
 	public void setSSCommon(SSCommon _ssCommon) {

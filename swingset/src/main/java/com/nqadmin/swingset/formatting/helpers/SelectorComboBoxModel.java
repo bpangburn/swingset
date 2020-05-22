@@ -78,7 +78,7 @@ public class SelectorComboBoxModel extends DefaultComboBoxModel<Object> {
 
 	private Object selectedItem = null;
 	
-	private int getSizeCounter = 0;
+	//private int getSizeCounter = 0;
 
 	/**
 	 * GlazedList data for ComboBox

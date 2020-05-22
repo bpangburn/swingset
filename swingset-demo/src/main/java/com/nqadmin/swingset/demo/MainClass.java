@@ -240,7 +240,7 @@ public class MainClass extends JFrame {
 //        new MainClass();
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				MainClass mc = new MainClass();
+				new MainClass();
 			}
 		});
     }

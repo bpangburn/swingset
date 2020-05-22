@@ -64,7 +64,7 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * 
  * SwingSet components will implement addComponentListener() and
  * removeComponentListener() to maintain data flow from the
- * JComponent->ssCommon.ssRowSet and from ssCommon.ssRowSet->JComponent
+ * JComponent to ssCommon.ssRowSet and from ssCommon.ssRowSet to JComponent
  * 
  * Generally the developer will need to add an inner class and corresponding
  * data member that implements the appropriate listener for the JComponent

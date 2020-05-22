@@ -262,7 +262,7 @@ public interface SSComponentInterface {
 	/**
 	 * Returns the ssCommon data member of the Swingset component.
 	 * 
-	 * @return shared/common SwingSet component data & methods
+	 * @return shared/common SwingSet component data and methods
 	 */
 	SSCommon getSSCommon();
 
@@ -417,7 +417,7 @@ public interface SSComponentInterface {
 	/**
 	 * Sets the SSCommon data member of the Swingset Component.
 	 * 
-	 * @param _ssCommon shared/common SwingSet component data & methods
+	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	void setSSCommon(SSCommon _ssCommon);
 

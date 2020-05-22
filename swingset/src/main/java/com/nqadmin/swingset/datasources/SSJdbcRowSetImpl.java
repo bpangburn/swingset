@@ -51,6 +51,7 @@ import com.sun.rowset.JdbcRowSetImpl;
  * rowset-related functionality for linking SwingSet components to an
  * SSConnection.
  */
+@SuppressWarnings("restriction")
 public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 
 	/**

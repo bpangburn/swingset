@@ -47,7 +47,6 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Map;
 
 import javax.swing.JComboBox;
 
@@ -60,7 +59,6 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.matchers.TextMatcherEditor;
 import ca.odell.glazedlists.swing.AutoCompleteSupport;
-import ca.odell.glazedlists.swing.DefaultEventComboBoxModel;
 
 /**
  * SSDBComboBox.java
@@ -876,7 +874,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Returns the ssCommon data member for the current Swingset component.
 	 * 
-	 * @return shared/common SwingSet component data & methods
+	 * @return shared/common SwingSet component data and methods
 	 */
 	@Override
 	public SSCommon getSSCommon() {
@@ -1618,7 +1616,7 @@ System.out.println("Clearing eventList.");
 	/**
 	 * Sets the SSCommon data member for the current Swingset Component.
 	 * 
-	 * @param _ssCommon shared/common SwingSet component data & methods
+	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
 	public void setSSCommon(SSCommon _ssCommon) {

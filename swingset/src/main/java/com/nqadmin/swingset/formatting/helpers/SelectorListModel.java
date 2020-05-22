@@ -229,7 +229,7 @@ public class SelectorListModel extends DefaultComboBoxModel<Object> {
 	/*
 	 * Populates the list model with the data by fetching it from the database.
 	 */
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({ "deprecation", "restriction" })
 	private void populateModel() {
 
 		Object dataValue = null;
