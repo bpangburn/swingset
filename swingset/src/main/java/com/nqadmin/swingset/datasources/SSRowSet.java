@@ -38,6 +38,7 @@
 package com.nqadmin.swingset.datasources;
 
 import java.sql.Date;
+import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -257,11 +258,15 @@ public interface SSRowSet extends RowSet {
 //				_updatedValue = "";
 //			}
 			
+			// TODO Convert this code to use Java 8 JDBCType enum
+			
 			_updatedValue.trim();
 			
 //          System.out.println("Update Text:" + columnName);
+			
+			int columnType = getColumnType(_columnName);
 
-			switch (getColumnType(_columnName)) {
+			switch (columnType) {
 			// FOR NON-TEXT-BASED DATABASE COLUMNS, WRITE NULL INSTEAD OF AN EMPTY STRING
 
 			case Types.INTEGER:
@@ -356,13 +361,14 @@ public interface SSRowSet extends RowSet {
 				break;
 
 			default:
-				System.out.println("Unknown data type");
+				System.out.println("Unsupported data type: " + JDBCType.valueOf(columnType).getName());
 			} // end switch
 
 		} catch (SQLException se) {
 			se.printStackTrace();
 //          System.out.println(se.getMessage());
 		} catch (NumberFormatException nfe) {
+			nfe.printStackTrace();
 //          System.out.println(nfe.getMessage());
 		}
 
