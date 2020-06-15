@@ -71,6 +71,7 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * 
  * Used to link a JPanel to an image column in a database.
  */
+// TODO Compare this with SSImage in parent package. Not based on SSFormattedTextField().
 public class SSImageField extends JPanel implements RowSetListener, KeyListener, ComponentListener {
 
 	private static final long serialVersionUID = 889303691158522232L;
