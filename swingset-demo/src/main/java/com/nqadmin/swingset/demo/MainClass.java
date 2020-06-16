@@ -65,9 +65,10 @@ public class MainClass extends JFrame {
 	private static final long serialVersionUID = -6316984401822746124L;
 	
 	/**
-	 * database script
+	 * database scripts
 	 */
-	private static final String DATABASE_SCRIPT = "suppliers_and_parts.sql";
+	private static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
+	private static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
 	
 	/**
 	 * database connection
@@ -104,6 +105,9 @@ public class MainClass extends JFrame {
     JButton btnExample5 = new JButton("Example5");
     JButton btnExample6 = new JButton("Example6");
     JButton btnExample7 = new JButton("Example7");
+    JButton btnTestBase = new JButton("Test Base Components");
+    JButton btnTestGrid = new JButton("Test Grid Components");
+    JButton btnTestFormatted = new JButton("Test Formatted Components");
     
     /**
      * path to database SQL file
@@ -141,6 +145,9 @@ public class MainClass extends JFrame {
 	        this.btnExample5.addActionListener( new MyButtonListener());
 	        this.btnExample6.addActionListener( new MyButtonListener());
 	        this.btnExample7.addActionListener( new MyButtonListener());
+	        this.btnTestBase.addActionListener( new MyButtonListener());
+	        this.btnTestGrid.addActionListener( new MyButtonListener());
+	        this.btnTestFormatted.addActionListener( new MyButtonListener());
 
         // SET BUTTON DIMENSIONS
 	        this.btnExample1.setPreferredSize(buttonDim);
@@ -150,6 +157,9 @@ public class MainClass extends JFrame {
 	        this.btnExample5.setPreferredSize(buttonDim);
 	        this.btnExample6.setPreferredSize(buttonDim);
 	        this.btnExample7.setPreferredSize(buttonDim);
+	        this.btnTestBase.setPreferredSize(buttonDim);
+	        this.btnTestGrid.setPreferredSize(buttonDim);
+	        this.btnTestFormatted.setPreferredSize(buttonDim);
         
 	    // LAYOUT BUTTONS
 	        getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
@@ -160,6 +170,9 @@ public class MainClass extends JFrame {
 	        getContentPane().add(this.btnExample5);
 	        getContentPane().add(this.btnExample6);
 	        getContentPane().add(this.btnExample7);
+	        getContentPane().add(this.btnTestBase);
+	        getContentPane().add(this.btnTestGrid);
+	        getContentPane().add(this.btnTestFormatted);
 
         // DISPLAY SCREEN
 	        setVisible(true);
@@ -177,15 +190,24 @@ public class MainClass extends JFrame {
 		try {
 			
 			Class.forName("org.h2.Driver");
-	        InputStream inStream = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT);
-	        if (inStream == null) {
-	            System.out.println("Please add the file suppliers_and_parts.sql to the classpath, package "
+	        InputStream inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
+	        InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
+	        if (inStreamDemo == null || inStreamTest == null) {
+	            System.out.println("Please add the file "
+	            		+ DATABASE_SCRIPT_DEMO
+	            		+ " and "
+	            		+ DATABASE_SCRIPT_TEST
+	            		+ " to the classpath, package "
 	                    + getClass().getPackage().getName());
 	        } else {
 	            result = DriverManager.getConnection("jdbc:h2:mem:suppliers_and_parts");
-	            RunScript.execute(result, new InputStreamReader(inStream));
-	            inStream.close();
+	            RunScript.execute(result, new InputStreamReader(inStreamDemo));
+	            RunScript.execute(result, new InputStreamReader(inStreamTest));
+	            inStreamDemo.close();
+	            inStreamTest.close();
 	        }
+	        
+	        
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		} catch (SQLException se) {
@@ -228,6 +250,17 @@ public class MainClass extends JFrame {
             }
             else if(ae.getSource().equals(MainClass.this.btnExample7)){
             	new Example7(dbConnection);
+            }
+            else if(ae.getSource().equals(MainClass.this.btnTestBase)){
+            	new TestBaseComponents(dbConnection);
+            }
+            else if(ae.getSource().equals(MainClass.this.btnTestGrid)){
+            	// TODO
+            	//new TestGridComponents(dbConnection);
+            }
+            else if(ae.getSource().equals(MainClass.this.btnTestFormatted)){
+            	// TODO
+            	//new TestFormattedComponents(dbConnection);
             }
         }
     }
