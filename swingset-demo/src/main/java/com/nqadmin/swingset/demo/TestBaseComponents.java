@@ -111,7 +111,7 @@ public class TestBaseComponents extends JFrame {
 	SSDBComboBox cmbSSDBComboBox = new SSDBComboBox();
 	SSImage imgSSImage = new SSImage();
 	SSLabel lblSSLabel2 = new SSLabel();	
-	SSList lisSSList = new SSList();
+	SSList lstSSList = new SSList();
 	SSSlider sliSSSlider = new SSSlider();
 	SSTextArea txtSSTextArea = new SSTextArea();
 	SSTextField txtSSTextField = new SSTextField();
@@ -127,6 +127,15 @@ public class TestBaseComponents extends JFrame {
 	 * sync manger
 	 */
 	SSSyncManager syncManager;
+	
+	/**
+	 * combo and list items
+	 */
+	private static final String[] comboItems = {"Combo Item 0","Combo Item 1", "Combo Item 2", "Combo Item 3"};
+	private static final int[] comboCodes = {0,1,2,3};
+	private static final String[] listItems = {"List Item 2","List Item 3", "List Item 4", "List Item 5", "List Item 6", "List Item 7", "List Item 8"};
+	private static final Object[] listCodes = {2,3,4,5,6,7,8};
+	
 
 	/**
 	 * Constructor for Example4
@@ -146,9 +155,9 @@ public class TestBaseComponents extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				this.rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
-				this.rowset.setCommand("SELECT * FROM swingset_base_test_data;");
-				this.navigator = new SSDataNavigator(this.rowset);
+				rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
+				rowset.setCommand("SELECT * FROM swingset_base_test_data;");
+				navigator = new SSDataNavigator(rowset);
 			} catch (SQLException se) {
 				se.printStackTrace();
 			}
@@ -156,10 +165,11 @@ public class TestBaseComponents extends JFrame {
 			
 			/**
 			 * Various navigator overrides needed to support H2
+			 * 
 			 * H2 does not fully support updatable rowset so it must be
 			 * re-queried following insert and delete with rowset.execute()
 			 */
-			this.navigator.setDBNav(new SSDBNavImpl(this) {
+			navigator.setDBNav(new SSDBNavImpl(this) {
 				/**
 				 * unique serial id
 				 */
@@ -185,10 +195,10 @@ public class TestBaseComponents extends JFrame {
 
 // TODO See if pre-insert reset of components is needed.					
 					// SET OTHER DEFAULTS
-//						TestBaseComponents.this.txtBaseName.setText(null);
-//						TestBaseComponents.this.cmbBaseColor.setSelectedValue(0);
-//						TestBaseComponents.this.txtBaseWeight.setText("0");
-//						TestBaseComponents.this.txtBaseCity.setText(null);
+//						TestBaseComponents.txtBaseName.setText(null);
+//						TestBaseComponents.cmbBaseColor.setSelectedValue(0);
+//						TestBaseComponents.txtBaseWeight.setText("0");
+//						TestBaseComponents.txtBaseCity.setText(null);
 						
 					} catch(SQLException se) {
 						se.printStackTrace();
@@ -260,29 +270,17 @@ public class TestBaseComponents extends JFrame {
 			});
 			
 			// SETUP NAVIGATOR QUERY
-				String query = "SELECT * FROM part_data;";
-				this.cmbSSDBComboNav = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
+				String query = "SELECT * FROM swingset_base_test_data;";
+				cmbSSDBComboNav = new SSDBComboBox(ssConnection, query, "swingset_base_test_pk", "swingset_base_test_pk");
 	
 				try {
-					this.cmbSSDBComboNav.execute();
+					cmbSSDBComboNav.execute();
 				} catch (SQLException se) {
 					se.printStackTrace();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
-			// SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES
-//				this.cmbBaseColor.setOptions(new String[] { "Red", "Green", "Blue" });
-				
-				
-//				
-//			// BIND THE COMPONENTS TO THE DATABASE COLUMNS
-//				this.lblSwingSetBaseTestPK.bind(this.rowset, "part_id");
-//				this.txtBaseName.bind(this.rowset, "part_name");
-//				this.cmbBaseColor.bind(this.rowset, "color_code");
-//				this.txtBaseWeight.bind(this.rowset, "weight");
-//				this.txtBaseCity.bind(this.rowset, "city");
-				
+			
 			// SETUP SYNCMANAGER, WHICH WILL TAKE CARE OF KEEPING THE COMBO NAVIGATOR AND
 			// DATA NAVIGATOR IN SYNC.
 			//
@@ -290,32 +288,56 @@ public class TestBaseComponents extends JFrame {
 			// YOU HAVE TO CALL THE .async() METHOD
 			// 
 			// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
-				this.syncManager = new SSSyncManager(this.cmbSSDBComboNav, this.navigator);
-				this.syncManager.setColumnName("part_id");
-				this.syncManager.sync();
+				syncManager = new SSSyncManager(cmbSSDBComboNav, navigator);
+				syncManager.setColumnName("swingset_base_test_pk");
+				syncManager.sync();				
+				
+			// SETUP COMBO AND LIST OPTIONS
+				cmbSSComboBox.setOptions(comboItems, comboCodes);
+// TODO setup DBCombo queries				
+				lstSSList.setOptions(listItems, listCodes);
+				
+			// SETUP BOUND COMPONENTS
+				txtSwingSetBaseTestPK.bind(rowset, "swingset_base_test_pk");
+				
+				chkSSCheckBox.bind(rowset, "ss_check_box");
+				chkSSCheckBox.bind(rowset, "ss_check_box");
+				cmbSSComboBox.bind(rowset, "ss_combo_box");
+				cmbSSDBComboBox.bind(rowset, "ss_db_combo_box");
+				imgSSImage.bind(rowset, "ss_image");
+				lblSSLabel2.bind(rowset, "ss_label");
+				lstSSList.bind(rowset, "ss_list");
+				sliSSSlider.bind(rowset, "ss_slider");
+				txtSSTextArea.bind(rowset, "ss_text_area");
+				txtSSTextField.bind(rowset, "ss_text_field");
 
 			// SET LABEL DIMENSIONS
-				this.lblSwingSetBaseTestPK.setPreferredSize(MainClass.labelDim);
+				lblSSDBComboNav.setPreferredSize(MainClass.labelDim);
 				
-				this.lblSSDBComboNav.setPreferredSize(MainClass.labelDim);
+				lblSwingSetBaseTestPK.setPreferredSize(MainClass.labelDim);
 				
-				this.lblSSCheckBox.setPreferredSize(MainClass.labelDim);
-				this.lblSSComboBox.setPreferredSize(MainClass.labelDim);
-				this.lblSSDBComboBox.setPreferredSize(MainClass.labelDim);
-				this.lblSSImage.setPreferredSize(MainClass.labelDim);
-				this.lblSSLabel.setPreferredSize(MainClass.labelDim);
-				this.lblSSList.setPreferredSize(MainClass.labelDim);
-				this.lblSSSlider.setPreferredSize(MainClass.labelDim);
-				this.lblSSTextArea.setPreferredSize(MainClass.labelDim);
-				this.lblSSTextField.setPreferredSize(MainClass.labelDim);
+				lblSSCheckBox.setPreferredSize(MainClass.labelDim);
+				lblSSComboBox.setPreferredSize(MainClass.labelDim);
+				lblSSDBComboBox.setPreferredSize(MainClass.labelDim);
+				lblSSImage.setPreferredSize(MainClass.labelDim);
+				lblSSLabel.setPreferredSize(MainClass.labelDim);
+				lblSSList.setPreferredSize(MainClass.labelDim);
+				lblSSSlider.setPreferredSize(MainClass.labelDim);
+				lblSSTextArea.setPreferredSize(MainClass.labelDim);
+				lblSSTextField.setPreferredSize(MainClass.labelDim);
 				
 			// SET BOUND COMPONENT DIMENSIONS
-//				this.cmbSSDBComboNav.setPreferredSize(MainClass.ssDim);
-//				this.lblSwingSetBaseTestPK.setPreferredSize(MainClass.ssDim);
-//				this.txtBaseName.setPreferredSize(MainClass.ssDim);
-//				this.cmbBaseColor.setPreferredSize(MainClass.ssDim);
-//				this.txtBaseWeight.setPreferredSize(MainClass.ssDim);
-//				this.txtBaseCity.setPreferredSize(MainClass.ssDim);
+				txtSwingSetBaseTestPK.setPreferredSize(MainClass.ssDim);
+				
+				chkSSCheckBox.setPreferredSize(MainClass.ssDim);
+				cmbSSComboBox.setPreferredSize(MainClass.ssDim);
+				cmbSSDBComboBox.setPreferredSize(MainClass.ssDim);
+				imgSSImage.setPreferredSize(MainClass.ssDim);
+				lblSSLabel2.setPreferredSize(MainClass.ssDim);
+				lstSSList.setPreferredSize(MainClass.ssDim);
+				sliSSSlider.setPreferredSize(MainClass.ssDim);
+				txtSSTextArea.setPreferredSize(MainClass.ssDim);
+				txtSSTextField.setPreferredSize(MainClass.ssDim);
 				
 			// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
 				Container contentPane = getContentPane();
@@ -324,39 +346,57 @@ public class TestBaseComponents extends JFrame {
 
 				constraints.gridx = 0;
 				constraints.gridy = 0;
-//				contentPane.add(this.lblSelectBase, constraints);
-//				constraints.gridy = 1;
-//				contentPane.add(this.lblBaseID, constraints);
-//				constraints.gridy = 2;
-//				contentPane.add(this.lblBaseName, constraints);
-//				constraints.gridy = 3;
-//				contentPane.add(this.lblBaseColor, constraints);
-//				constraints.gridy = 4;
-//				contentPane.add(this.lblBaseWeight, constraints);
-//				constraints.gridy = 5;
-//				contentPane.add(this.lblBaseCity, constraints);
-		
+
+				contentPane.add(lblSSDBComboNav, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSwingSetBaseTestPK, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSSCheckBox, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSSComboBox, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSSDBComboBox, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSSImage, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSSLabel, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSSList, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSSSlider, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSSTextArea, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSSTextField, constraints);
+
 				constraints.gridx = 1;
 				constraints.gridy = 0;
-				contentPane.add(this.cmbSSDBComboNav, constraints);
-//				constraints.gridy = 1;
-//				contentPane.add(this.lblSwingSetBaseTestPK, constraints);
-//				constraints.gridy = 2;
-//				contentPane.add(this.txtBaseName, constraints);
-//				constraints.gridy = 3;
-//				contentPane.add(this.cmbBaseColor, constraints);
-//				constraints.gridy = 4;
-//				contentPane.add(this.txtBaseWeight, constraints);
-//				constraints.gridy = 5;
-//				contentPane.add(this.txtBaseCity, constraints);
-		
-				constraints.gridx = 0;
-				constraints.gridy = 6;
 				constraints.gridwidth = 2;
-				contentPane.add(this.navigator, constraints);
+
+				contentPane.add(cmbSSDBComboNav, constraints);
+				constraints.gridy++;
+				contentPane.add(txtSwingSetBaseTestPK, constraints);
+				constraints.gridy++;
+				contentPane.add(chkSSCheckBox, constraints);
+				constraints.gridy++;
+				contentPane.add(cmbSSComboBox, constraints);
+				constraints.gridy++;
+				contentPane.add(cmbSSDBComboBox, constraints);
+				constraints.gridy++;
+				contentPane.add(imgSSImage, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSSLabel2, constraints);
+				constraints.gridy++;
+				contentPane.add(lstSSList, constraints);
+				constraints.gridy++;
+				contentPane.add(sliSSSlider, constraints);
+				constraints.gridy++;
+				contentPane.add(txtSSTextArea, constraints);
+				constraints.gridy++;
+				contentPane.add(txtSSTextField, constraints);
 
 		// DISABLE THE PRIMARY KEY
-			lblSwingSetBaseTestPK.setEnabled(false);
+			txtSwingSetBaseTestPK.setEnabled(false);
 	
 		// MAKE THE JFRAME VISIBLE
 			setVisible(true);	}
