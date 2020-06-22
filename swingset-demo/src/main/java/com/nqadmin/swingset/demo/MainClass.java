@@ -84,14 +84,22 @@ public class MainClass extends JFrame {
 	
 	private static final int labelWidth = 200;
 	private static final int labelHeight = 20;
+	private static final int labelHeightTall = 80;
 	public static final Dimension labelDim = new Dimension(labelWidth, labelHeight);
+	public static final Dimension labelDimTall = new Dimension(labelWidth, labelHeightTall);
+	
 	
 	private static final int ssWidth = 200;
 	private static final int ssHeight = 20;
+	private static final int ssHeightTall = 100;
+
 	public static final Dimension ssDim = new Dimension(ssWidth, ssHeight);
+	public static final Dimension ssDimTall = new Dimension(ssWidth, ssHeightTall);
+	
 	
 	public static final int childScreenWidth = 600;
 	public static final int childScreenHeight = 300;
+	public static final int childScreenHeightTall = 600;
 	
 	public static final int gridColumnWidth = 60;
 	

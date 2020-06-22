@@ -23,7 +23,7 @@
 		<version.h2>1.4.200</version.h2>
 		<version.dependency-check-maven>5.2.4</version.dependency-check-maven>
 		<version.maven-source-plugin>3.2.0</version.maven-source-plugin>
-		<version.maven-assembly-plugin>3.2.0</version.maven-assembly-plugin>
+		<version.maven-assembly-plugin>3.3.0</version.maven-assembly-plugin>
 		<version.maven-gpg-plugin>1.6</version.maven-gpg-plugin>
 	</properties>
 	
@@ -100,7 +100,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>${version.maven-assembly-plugin}</version>
+				<version>${version.maven-assembly-plugin}</version><!--$NO-MVN-MAN-VER$-->
 				<executions>
 					<execution>
 						<phase>package</phase>

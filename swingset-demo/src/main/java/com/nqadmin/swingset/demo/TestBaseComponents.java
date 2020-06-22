@@ -151,7 +151,7 @@ public class TestBaseComponents extends JFrame {
 			ssConnection = new SSConnection(_dbConn);
 		
 		// SET SCREEN DIMENSIONS
-			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
+			setSize(MainClass.childScreenWidth, MainClass.childScreenHeightTall);
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
@@ -319,11 +319,11 @@ public class TestBaseComponents extends JFrame {
 				lblSSCheckBox.setPreferredSize(MainClass.labelDim);
 				lblSSComboBox.setPreferredSize(MainClass.labelDim);
 				lblSSDBComboBox.setPreferredSize(MainClass.labelDim);
-				lblSSImage.setPreferredSize(MainClass.labelDim);
+				lblSSImage.setPreferredSize(MainClass.labelDimTall);
 				lblSSLabel.setPreferredSize(MainClass.labelDim);
-				lblSSList.setPreferredSize(MainClass.labelDim);
+				lblSSList.setPreferredSize(MainClass.labelDimTall);
 				lblSSSlider.setPreferredSize(MainClass.labelDim);
-				lblSSTextArea.setPreferredSize(MainClass.labelDim);
+				lblSSTextArea.setPreferredSize(MainClass.labelDimTall);
 				lblSSTextField.setPreferredSize(MainClass.labelDim);
 				
 			// SET BOUND COMPONENT DIMENSIONS
@@ -332,11 +332,11 @@ public class TestBaseComponents extends JFrame {
 				chkSSCheckBox.setPreferredSize(MainClass.ssDim);
 				cmbSSComboBox.setPreferredSize(MainClass.ssDim);
 				cmbSSDBComboBox.setPreferredSize(MainClass.ssDim);
-				imgSSImage.setPreferredSize(MainClass.ssDim);
+				imgSSImage.setPreferredSize(MainClass.ssDimTall);
 				lblSSLabel2.setPreferredSize(MainClass.ssDim);
-				lstSSList.setPreferredSize(MainClass.ssDim);
+				lstSSList.setPreferredSize(MainClass.ssDimTall);
 				sliSSSlider.setPreferredSize(MainClass.ssDim);
-				txtSSTextArea.setPreferredSize(MainClass.ssDim);
+				txtSSTextArea.setPreferredSize(MainClass.ssDimTall);
 				txtSSTextField.setPreferredSize(MainClass.ssDim);
 				
 			// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
@@ -357,21 +357,27 @@ public class TestBaseComponents extends JFrame {
 				constraints.gridy++;
 				contentPane.add(lblSSDBComboBox, constraints);
 				constraints.gridy++;
+				//constraints.gridheight=4;
 				contentPane.add(lblSSImage, constraints);
 				constraints.gridy++;
+				//constraints.gridheight=1;
 				contentPane.add(lblSSLabel, constraints);
 				constraints.gridy++;
+				//constraints.gridheight=4;
 				contentPane.add(lblSSList, constraints);
 				constraints.gridy++;
+				//constraints.gridheight=1;
 				contentPane.add(lblSSSlider, constraints);
 				constraints.gridy++;
+				//constraints.gridheight=4;
 				contentPane.add(lblSSTextArea, constraints);
 				constraints.gridy++;
+				//constraints.gridheight=1;
 				contentPane.add(lblSSTextField, constraints);
 
 				constraints.gridx = 1;
 				constraints.gridy = 0;
-				constraints.gridwidth = 2;
+				//constraints.gridwidth = 2;
 
 				contentPane.add(cmbSSDBComboNav, constraints);
 				constraints.gridy++;
@@ -383,18 +389,29 @@ public class TestBaseComponents extends JFrame {
 				constraints.gridy++;
 				contentPane.add(cmbSSDBComboBox, constraints);
 				constraints.gridy++;
+				//constraints.gridheight=4;
 				contentPane.add(imgSSImage, constraints);
 				constraints.gridy++;
+				//constraints.gridheight=1;
 				contentPane.add(lblSSLabel2, constraints);
 				constraints.gridy++;
+				//constraints.gridheight=4;
 				contentPane.add(lstSSList, constraints);
 				constraints.gridy++;
+				//constraints.gridheight=1;
 				contentPane.add(sliSSSlider, constraints);
 				constraints.gridy++;
+				//constraints.gridheight=4;
 				contentPane.add(txtSSTextArea, constraints);
 				constraints.gridy++;
+				//constraints.gridheight=1;
 				contentPane.add(txtSSTextField, constraints);
-
+				
+				constraints.gridx = 0;
+				constraints.gridy++;
+				constraints.gridwidth = 2;
+				contentPane.add(this.navigator, constraints);
+				
 		// DISABLE THE PRIMARY KEY
 			txtSwingSetBaseTestPK.setEnabled(false);
 	
