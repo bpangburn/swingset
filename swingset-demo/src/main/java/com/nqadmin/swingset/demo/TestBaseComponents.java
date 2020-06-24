@@ -294,8 +294,10 @@ public class TestBaseComponents extends JFrame {
 				
 			// SETUP COMBO AND LIST OPTIONS
 				cmbSSComboBox.setOptions(comboItems, comboCodes);
-// TODO setup DBCombo queries				
 				lstSSList.setOptions(listItems, listCodes);
+				
+				String dbComboQuery = "SELECT * FROM part_data;";
+				this.cmbSSDBComboBox = new SSDBComboBox(this.ssConnection, dbComboQuery, "part_id", "part_name");
 				
 			// SETUP BOUND COMPONENTS
 				txtSwingSetBaseTestPK.bind(rowset, "swingset_base_test_pk");
@@ -310,6 +312,15 @@ public class TestBaseComponents extends JFrame {
 				sliSSSlider.bind(rowset, "ss_slider");
 				txtSSTextArea.bind(rowset, "ss_text_area");
 				txtSSTextField.bind(rowset, "ss_text_field");
+				
+			// RUN DB COMBO QUERIES
+				try {
+					this.cmbSSDBComboBox.execute();
+				} catch (SQLException se) {
+					se.printStackTrace();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 
 			// SET LABEL DIMENSIONS
 				lblSSDBComboNav.setPreferredSize(MainClass.labelDim);

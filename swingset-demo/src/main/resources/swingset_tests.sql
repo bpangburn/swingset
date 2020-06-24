@@ -50,9 +50,9 @@ CREATE TABLE IF NOT EXISTS swingset_base_test_data
 	ss_db_combo_box INTEGER, /* mapping to part_data, which has valid PK values of 1-6 by default */
 	ss_image BLOB,
 	ss_label VARCHAR(50),
-	ss_list TEXT, /* arbitrary range 2-8 */
+	ss_list VARCHAR(255), /* arbitrary range 2-8 */
 	ss_slider INTEGER, /* arbitrary range 0-20 */
-	ss_text_area TEXT,
+	ss_text_area VARCHAR(255),
 	ss_text_field VARCHAR(100)
 );
 
