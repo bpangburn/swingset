@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS swingset_base_test_data
 	ss_label VARCHAR(50),
 	ss_list ARRAY, /* arbitrary range 2-8 */
 	ss_slider INTEGER, /* arbitrary range 0-20 */
-	ss_text_area TEXT,
+	ss_text_area VARCHAR(255),
 	ss_text_field VARCHAR(100)
 );
 
