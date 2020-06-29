@@ -39,6 +39,14 @@
 /* This SQL script is used to generate the sample suppliers_and_parts database
    for the SwingSet sample programs */
 
+/* housekeeping */
+DROP TABLE IF EXISTS supplier_part_data;
+DROP SEQUENCE IF EXISTS supplier_part_data_seq;
+DROP TABLE IF EXISTS supplier_data;
+DROP SEQUENCE IF EXISTS supplier_data_seq;
+DROP TABLE IF EXISTS part_data;
+DROP SEQUENCE IF EXISTS part_data_seq;
+
 /* supplier_data */
 CREATE SEQUENCE IF NOT EXISTS supplier_data_seq START WITH 1000;
 CREATE TABLE IF NOT EXISTS supplier_data 

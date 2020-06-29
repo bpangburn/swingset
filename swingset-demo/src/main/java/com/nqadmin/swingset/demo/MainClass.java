@@ -73,6 +73,8 @@ public class MainClass extends JFrame {
 	/**
 	 * database connection
 	 */
+	private static final boolean USE_IN_MEMORY_DATABASE = true;
+	private static final boolean RUN_SQL_SCRIPTS = true;
 	private Connection dbConnection = null;
 	
 	/**
@@ -208,9 +210,18 @@ public class MainClass extends JFrame {
 	            		+ " to the classpath, package "
 	                    + getClass().getPackage().getName());
 	        } else {
-	            result = DriverManager.getConnection("jdbc:h2:mem:suppliers_and_parts");
-	            RunScript.execute(result, new InputStreamReader(inStreamDemo));
-	            RunScript.execute(result, new InputStreamReader(inStreamTest));
+	        	if (USE_IN_MEMORY_DATABASE) {
+	        		result = DriverManager.getConnection("jdbc:h2:mem:suppliers_and_parts");
+	        	} else {
+	        	// ASSUMING DATABASE IS IN LOCAL ./downloads/h2/database/ FOLDER WITH DEFAULT USERNAME OF sa AND BLANK PASSWORD
+	        	// USEFUL FOR WORKING WITH DATASET FOR SWINGSET TESTS
+	        		result = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/downloads/h2/databases/suppliers_and_parts","sa","");
+	        	}
+	        	
+	        	if (RUN_SQL_SCRIPTS) {
+		            RunScript.execute(result, new InputStreamReader(inStreamDemo));
+		            RunScript.execute(result, new InputStreamReader(inStreamTest));
+	        	}
 	            inStreamDemo.close();
 	            inStreamTest.close();
 	        }
