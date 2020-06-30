@@ -39,6 +39,7 @@
 package com.nqadmin.swingset.demo;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.sql.Connection;
@@ -330,7 +331,7 @@ public class TestBaseComponents extends JFrame {
 				lblSSCheckBox.setPreferredSize(MainClass.labelDim);
 				lblSSComboBox.setPreferredSize(MainClass.labelDim);
 				lblSSDBComboBox.setPreferredSize(MainClass.labelDim);
-				lblSSImage.setPreferredSize(MainClass.labelDimTall);
+				lblSSImage.setPreferredSize(MainClass.labelDimVeryTall);
 				lblSSLabel.setPreferredSize(MainClass.labelDim);
 				lblSSList.setPreferredSize(MainClass.labelDimTall);
 				lblSSSlider.setPreferredSize(MainClass.labelDim);
@@ -343,7 +344,7 @@ public class TestBaseComponents extends JFrame {
 				chkSSCheckBox.setPreferredSize(MainClass.ssDim);
 				cmbSSComboBox.setPreferredSize(MainClass.ssDim);
 				cmbSSDBComboBox.setPreferredSize(MainClass.ssDim);
-				imgSSImage.setPreferredSize(MainClass.ssDimTall);
+				imgSSImage.setPreferredSize(MainClass.ssDimVeryTall);
 				lblSSLabel2.setPreferredSize(MainClass.ssDim);
 				lstSSList.setPreferredSize(MainClass.ssDimTall);
 				sliSSSlider.setPreferredSize(MainClass.ssDim);

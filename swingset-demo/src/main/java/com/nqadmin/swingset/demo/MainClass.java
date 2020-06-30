@@ -86,22 +86,26 @@ public class MainClass extends JFrame {
 	
 	private static final int labelWidth = 200;
 	private static final int labelHeight = 20;
-	private static final int labelHeightTall = 80;
+	private static final int labelHeightTall = 100; // used for lists, textareas
+	private static final int labelHeightVeryTall = 100;  // used for images
 	public static final Dimension labelDim = new Dimension(labelWidth, labelHeight);
-	public static final Dimension labelDimTall = new Dimension(labelWidth, labelHeightTall);
+	public static final Dimension labelDimTall = new Dimension(labelWidth, labelHeightTall); // used for lists, textareas
+	public static final Dimension labelDimVeryTall = new Dimension(labelWidth, labelHeightVeryTall); // used for images
 	
 	
 	private static final int ssWidth = 200;
 	private static final int ssHeight = 20;
-	private static final int ssHeightTall = 100;
+	private static final int ssHeightTall = 100; // used for lists, textareas
+	private static final int ssHeightVeryTall = 200; // used for images
 
 	public static final Dimension ssDim = new Dimension(ssWidth, ssHeight);
-	public static final Dimension ssDimTall = new Dimension(ssWidth, ssHeightTall);
+	public static final Dimension ssDimTall = new Dimension(ssWidth, ssHeightTall); // used for lists, textareas
+	public static final Dimension ssDimVeryTall = new Dimension(ssWidth, ssHeightVeryTall); // used for images
 	
 	
 	public static final int childScreenWidth = 600;
-	public static final int childScreenHeight = 300;
-	public static final int childScreenHeightTall = 600;
+	public static final int childScreenHeight = 400;
+	public static final int childScreenHeightTall = 800;
 	
 	public static final int gridColumnWidth = 60;
 	
