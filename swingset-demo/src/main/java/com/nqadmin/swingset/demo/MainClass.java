@@ -75,6 +75,8 @@ public class MainClass extends JFrame {
 	 */
 	private static final boolean USE_IN_MEMORY_DATABASE = true;
 	private static final boolean RUN_SQL_SCRIPTS = true;
+	private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
+	private static final String DATABASE_NAME = "suppliers_and_parts";
 	private Connection dbConnection = null;
 	
 	/**
@@ -215,11 +217,13 @@ public class MainClass extends JFrame {
 	                    + getClass().getPackage().getName());
 	        } else {
 	        	if (USE_IN_MEMORY_DATABASE) {
-	        		result = DriverManager.getConnection("jdbc:h2:mem:suppliers_and_parts");
+	        		result = DriverManager.getConnection("jdbc:h2:mem:" + DATABASE_NAME);
+	        		System.out.println("Established connection to in-memory database.");
 	        	} else {
-	        	// ASSUMING DATABASE IS IN LOCAL ./downloads/h2/database/ FOLDER WITH DEFAULT USERNAME OF sa AND BLANK PASSWORD
+	        	// ASSUMING DATABASE IS IN LOCAL ./downloads/h2/databases/ FOLDER WITH DEFAULT USERNAME OF sa AND BLANK PASSWORD
 	        	// USEFUL FOR WORKING WITH DATASET FOR SWINGSET TESTS
-	        		result = DriverManager.getConnection("jdbc:h2:tcp://localhost/~/downloads/h2/databases/suppliers_and_parts","sa","");
+	        		result = DriverManager.getConnection("jdbc:h2:tcp:" + DATABASE_PATH + DATABASE_NAME,"sa","");
+	        		System.out.println("Established connection to database server.");
 	        	}
 	        	
 	        	if (RUN_SQL_SCRIPTS) {
