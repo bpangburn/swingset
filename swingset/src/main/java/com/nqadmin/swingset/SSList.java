@@ -115,6 +115,9 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		if (array == null) {
 			return null;
 		}
+//		
+//		System.out.println("SSList.toObjArray() contents: " + array);
+//		
 		Vector<Object> data = new Vector<>();
 		switch (array.getBaseType()) {
 		case Types.INTEGER:
@@ -168,7 +171,15 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 				data.add(txt);
 			break;
 		default:
-			throw new SQLException("DataType: " + array.getBaseTypeName() + " not supported");
+		// H2 ARRAY RETURNS NULL FOR getBaseType()
+		// FOR THIS AND OTHER FAILURES, TRY A LIST OF OBJECTS
+			try {
+				for (Object val : (Object[]) array.getArray())
+					data.add(val);
+			} catch (SQLException se) {
+				throw new SQLException("DataType: " + array.getBaseTypeName() + " not supported and unable to convert to generic object.", se);
+			}
+			break;
 		}
 		return data.toArray();
 	}
@@ -623,7 +634,16 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		try {
 
 			if (getSSRowSet().getRow() > 0) {
-				array = toObjArray(getSSRowSet().getArray(getBoundColumnName()));
+				
+//			    Array sqlArray = getSSRowSet().getArray(getBoundColumnName());
+//			    System.out.println("SQL array retrieved for SSList: " + sqlArray);
+//			    Object[] objArray = (Object[])sqlArray.getArray();
+//			    for (int i = 0; i < objArray.length; i++) {
+//			    	System.out.println("Array element [" + i + "] contains: " + objArray[i]);
+//			    }
+			    
+			    array = toObjArray(getSSRowSet().getArray(getBoundColumnName()));
+
 			}
 
 		} catch (SQLException e) {
