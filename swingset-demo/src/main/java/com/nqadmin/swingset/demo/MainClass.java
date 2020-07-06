@@ -220,7 +220,7 @@ public class MainClass extends JFrame {
 	        		result = DriverManager.getConnection("jdbc:h2:mem:" + DATABASE_NAME);
 	        		System.out.println("Established connection to in-memory database.");
 	        	} else {
-	        	// ASSUMING DATABASE IS IN LOCAL ./downloads/h2/databases/ FOLDER WITH DEFAULT USERNAME OF sa AND BLANK PASSWORD
+	        	// ASSUMING DATABASE IS IN LOCAL ./h2/databases/ FOLDER WITH DEFAULT USERNAME OF sa AND BLANK PASSWORD
 	        	// USEFUL FOR WORKING WITH DATASET FOR SWINGSET TESTS
 	        		result = DriverManager.getConnection("jdbc:h2:tcp:" + DATABASE_PATH + DATABASE_NAME,"sa","");
 	        		System.out.println("Established connection to database server.");
