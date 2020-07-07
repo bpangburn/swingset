@@ -48,6 +48,7 @@ import java.sql.SQLException;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 
 import com.nqadmin.swingset.SSCheckBox;
 import com.nqadmin.swingset.SSComboBox;
@@ -134,8 +135,8 @@ public class TestBaseComponents extends JFrame {
 	 */
 	private static final String[] comboItems = {"Combo Item 0","Combo Item 1", "Combo Item 2", "Combo Item 3"};
 	private static final int[] comboCodes = {0,1,2,3};
-	private static final String[] listItems = {"List Item 2","List Item 3", "List Item 4", "List Item 5", "List Item 6", "List Item 7", "List Item 8"};
-	private static final Object[] listCodes = {2,3,4,5,6,7,8};
+	private static final String[] listItems = {"List Item 1","List Item 2", "List Item 3", "List Item 4", "List Item 5", "List Item 6", "List Item 7"};
+	private static final Object[] listCodes = {1,2,3,4,5,6,7};
 	
 
 	/**
@@ -346,7 +347,12 @@ public class TestBaseComponents extends JFrame {
 				cmbSSDBComboBox.setPreferredSize(MainClass.ssDim);
 				imgSSImage.setPreferredSize(MainClass.ssDimVeryTall);
 				lblSSLabel2.setPreferredSize(MainClass.ssDim);
-				lstSSList.setPreferredSize(MainClass.ssDimTall);
+				
+				// NEED TO MAKE SURE LIST IS TALLER THAN THE SCROLLPANE TO SEE THE SCROLLBAR
+				lstSSList.setPreferredSize(new Dimension(MainClass.ssDimTall.width-20, MainClass.ssDimVeryTall.height));
+				JScrollPane lstScrollPane = new JScrollPane(lstSSList);
+				lstScrollPane.setPreferredSize(MainClass.ssDimTall);
+				
 				sliSSSlider.setPreferredSize(MainClass.ssDim);
 				txtSSTextArea.setPreferredSize(MainClass.ssDimTall);
 				txtSSTextField.setPreferredSize(MainClass.ssDim);
@@ -408,7 +414,8 @@ public class TestBaseComponents extends JFrame {
 				contentPane.add(lblSSLabel2, constraints);
 				constraints.gridy++;
 				//constraints.gridheight=4;
-				contentPane.add(lstSSList, constraints);
+				//contentPane.add(lstSSList, constraints);
+				contentPane.add(lstScrollPane, constraints);
 				constraints.gridy++;
 				//constraints.gridheight=1;
 				contentPane.add(sliSSSlider, constraints);
@@ -428,6 +435,9 @@ public class TestBaseComponents extends JFrame {
 			txtSwingSetBaseTestPK.setEnabled(false);
 	
 		// MAKE THE JFRAME VISIBLE
-			setVisible(true);	}
+			setVisible(true);
+			lstScrollPane.setPreferredSize(MainClass.ssDimTall);
+			
+	}
 
 }
