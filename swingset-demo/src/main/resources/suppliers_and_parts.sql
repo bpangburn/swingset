@@ -63,7 +63,7 @@ MERGE INTO supplier_data VALUES (4,'Clark', 20, 'London');
 MERGE INTO supplier_data VALUES (3,'Blake', 30, 'Paris');
 MERGE INTO supplier_data VALUES (1,'Smith',20,'London');
 
-SELECT * from supplier_data;
+/* SELECT * from supplier_data; */
 
 
 /* part_data */
@@ -84,7 +84,7 @@ MERGE INTO part_data VALUES (3, 'Screw', 2, 17, 'Rome');
 MERGE INTO part_data VALUES (2, 'Bolt', 1, 17, 'Paris');
 MERGE INTO part_data VALUES (1, 'Nut', 0, 12, 'London');
 
-SELECT * FROM part_data;
+/* SELECT * FROM part_data; */
 
 /* supplier_part_data */
 CREATE SEQUENCE IF NOT EXISTS supplier_part_data_seq START WITH 1000;
@@ -112,4 +112,4 @@ MERGE INTO supplier_part_data VALUES (12, 2, 5, 400, '2003-12-12');
 MERGE INTO supplier_part_data VALUES (11, 1, 4, 300, '2003-12-12');
 MERGE INTO supplier_part_data VALUES (10, 5, 2, 200, '2003-12-12');
 
-SELECT * FROM supplier_part_data;
+/* SELECT * FROM supplier_part_data; */

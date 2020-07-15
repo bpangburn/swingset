@@ -69,11 +69,12 @@ public class MainClass extends JFrame {
 	 */
 	private static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
 	private static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
+	private static final String DATABASE_SCRIPT_TEST_IMAGES = "swingset_tests_load_blobs.sql";
 	
 	/**
 	 * database connection
 	 */
-	private static final boolean USE_IN_MEMORY_DATABASE = true;
+	private static final boolean USE_IN_MEMORY_DATABASE = false;
 	private static final boolean RUN_SQL_SCRIPTS = true;
 	private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
 	private static final String DATABASE_NAME = "suppliers_and_parts";
@@ -206,13 +207,24 @@ public class MainClass extends JFrame {
 		try {
 			
 			Class.forName("org.h2.Driver");
+			//System.out.println("Resource path: " + getClass().getPackage().getName());
+			//System.out.println("Resource path: " + getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
 	        InputStream inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
-	        InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
+        	InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
+        	InputStream inStreamTestImages = null;
+
+	        if (USE_IN_MEMORY_DATABASE) {
+	        	inStreamTestImages = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST_IMAGES);
+	        } else {
+	        	System.out.println("Running H2 as a database server (versus an in-memory database) so binary files (e.g., images) cannot be pre-populated to any BLOB column(s).");
+	        }
 	        if (inStreamDemo == null || inStreamTest == null) {
 	            System.out.println("Please add the file "
 	            		+ DATABASE_SCRIPT_DEMO
 	            		+ " and "
 	            		+ DATABASE_SCRIPT_TEST
+	            		+ " and "
+	            		+ DATABASE_SCRIPT_TEST_IMAGES
 	            		+ " to the classpath, package "
 	                    + getClass().getPackage().getName());
 	        } else {
@@ -226,14 +238,20 @@ public class MainClass extends JFrame {
 	        		System.out.println("Established connection to database server.");
 	        	}
 	        	
+	        	// RUN SCRIPTS AND CLOSE STREAMS
 	        	if (RUN_SQL_SCRIPTS) {
 		            RunScript.execute(result, new InputStreamReader(inStreamDemo));
+		            inStreamDemo.close();
+		            
 		            RunScript.execute(result, new InputStreamReader(inStreamTest));
+		            inStreamTest.close();
+		            
+		            if (USE_IN_MEMORY_DATABASE) {
+		            	RunScript.execute(result, new InputStreamReader(inStreamTestImages));
+		            	inStreamTestImages.close();
+		            }
 	        	}
-	            inStreamDemo.close();
-	            inStreamTest.close();
 	        }
-	        
 	        
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
