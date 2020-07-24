@@ -138,6 +138,45 @@ public class TestBaseComponents extends JFrame {
 	private static final String[] listItems = {"List Item 1","List Item 2", "List Item 3", "List Item 4", "List Item 5", "List Item 6", "List Item 7"};
 	private static final Object[] listCodes = {1,2,3,4,5,6,7};
 	
+	
+	/**
+	 * Method to set default values following an insert
+	 */
+	public void setDefaultValues() {
+		
+		try {
+
+		// GET THE NEW RECORD ID.	
+			ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+					.executeQuery("SELECT nextval('swingset_base_test_seq') as nextVal;");
+			rs.next();
+			int recordPK = rs.getInt("nextVal");
+			txtSwingSetBaseTestPK.setText(String.valueOf(recordPK));
+			rs.close();
+
+		// SET OTHER DEFAULTS
+			chkSSCheckBox.setSelected(false);
+			cmbSSComboBox.setSelectedIndex(-1);
+			cmbSSDBComboBox.setSelectedIndex(-1);
+			imgSSImage.clearImage();
+			lblSSLabel2.setText(null);	
+			lstSSList.clearSelection();
+// TODO determine range for slider, 0 was not accepted			
+			sliSSSlider.setValue(1);
+			txtSSTextArea.setText(null);
+			txtSSTextField.setText(null);
+			
+		} catch(SQLException se) {
+			se.printStackTrace();
+			System.out.println("Error occured during pre insert operation.\n" + se.getMessage());								
+		} catch(Exception e) {
+			e.printStackTrace();
+			System.out.println("Error occured during pre insert operation.\n" + e.getMessage());
+		}	
+		
+
+	}
+	
 
 	/**
 	 * Constructor for Example4
@@ -164,6 +203,7 @@ public class TestBaseComponents extends JFrame {
 				se.printStackTrace();
 			}
 			
+
 			
 			/**
 			 * Various navigator overrides needed to support H2
@@ -185,30 +225,7 @@ public class TestBaseComponents extends JFrame {
 					
 					super.performPreInsertOps();
 					
-					try {
-
-					// GET THE NEW RECORD ID.	
-						ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-								.executeQuery("SELECT nextval('swingset_base_test_seq') as nextVal;");
-						rs.next();
-						int recordPK = rs.getInt("nextVal");
-						lblSwingSetBaseTestPK.setText(String.valueOf(recordPK));
-						rs.close();
-
-// TODO See if pre-insert reset of components is needed.					
-					// SET OTHER DEFAULTS
-//						TestBaseComponents.txtBaseName.setText(null);
-//						TestBaseComponents.cmbBaseColor.setSelectedValue(0);
-//						TestBaseComponents.txtBaseWeight.setText("0");
-//						TestBaseComponents.txtBaseCity.setText(null);
-						
-					} catch(SQLException se) {
-						se.printStackTrace();
-						System.out.println("Error occured during pre insert operation.\n" + se.getMessage());								
-					} catch(Exception e) {
-						e.printStackTrace();
-						System.out.println("Error occured during pre insert operation.\n" + e.getMessage());
-					}		
+					setDefaultValues();
 					
 				}
 
@@ -219,7 +236,7 @@ public class TestBaseComponents extends JFrame {
 				@Override
 				public void performPostInsertOps() {
 					super.performPostInsertOps();
-					TestBaseComponents.this.cmbSSDBComboNav.setEnabled(true);
+					//TestBaseComponents.this.cmbSSDBComboNav.setEnabled(true);
 					try {
 						TestBaseComponents.this.rowset.execute();
 					} catch (SQLException e) {
@@ -295,11 +312,18 @@ public class TestBaseComponents extends JFrame {
 				syncManager.sync();				
 				
 			// SETUP COMBO AND LIST OPTIONS
+				// TODO if getAllowNull() is true then add blank item to SSComboBox
+				cmbSSComboBox.setAllowNull(true);
 				cmbSSComboBox.setOptions(comboItems, comboCodes);
 				lstSSList.setOptions(listItems, listCodes);
 				
 				String dbComboQuery = "SELECT * FROM part_data;";
-				this.cmbSSDBComboBox = new SSDBComboBox(this.ssConnection, dbComboQuery, "part_id", "part_name");
+				cmbSSDBComboBox = new SSDBComboBox(this.ssConnection, dbComboQuery, "part_id", "part_name");
+				cmbSSDBComboBox.setAllowNull(false);
+				// TODO if getAllowNull() is false, user can still blank out the combo - we may want to prevent this
+				
+			// SET SLIDER RANGE
+			// TODO Set slider range
 				
 			// SETUP BOUND COMPONENTS
 				txtSwingSetBaseTestPK.bind(rowset, "swingset_base_test_pk");

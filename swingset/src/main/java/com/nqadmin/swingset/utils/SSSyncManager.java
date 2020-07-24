@@ -71,7 +71,7 @@ public class SSSyncManager {
 		public void actionPerformed(ActionEvent ae) {
 	
 			SSSyncManager.this.rowset.removeRowSetListener(SSSyncManager.this.rowsetListener);
-			
+
 			try {
 				// IF THIS IS NOT CAUSED BY THE USER ACTION (IN WHICH THE FOCUS WILL BE ON THE
 				// COMBO) NOTHING TO DO
@@ -139,7 +139,6 @@ public class SSSyncManager {
 			} finally {
 				System.out.println("SSSyncManager.MyComboListener.actionPerformed(): " + actionPerformedCount++);
 				SSSyncManager.this.rowset.addRowSetListener(SSSyncManager.this.rowsetListener);
-
 			}
 		}
 	} // protected class MyComboListener implements ActionListener {
@@ -208,6 +207,7 @@ public class SSSyncManager {
 		this.comboBox = _comboBox;
 		this.dataNavigator = _dataNavigator;
 		this.rowset = this.dataNavigator.getSSRowSet();
+		dataNavigator.setNavCombo(comboBox);
 	}
 
 	/**
@@ -223,13 +223,17 @@ public class SSSyncManager {
 	 * Method to update combo box based on rowset.
 	 */
 	protected void adjustValue() {
+		
+//System.out.println("SSSyncManager.adjustValue() called.");
+
 		comboBox.removeActionListener(comboListener);
+		
 		try {
 			if (rowset != null && rowset.getRow() > 0) {
 				// GET THE PRIMARY KEY FOR THE CURRENT RECORD IN THE ROWSET
 				long currentRowPK = this.rowset.getLong(this.columnName);
 				
-System.out.println("RowSet value: " + currentRowPK);				
+//System.out.println("RowSet value: " + currentRowPK);				
 
 				// CHECK IF THE COMBO BOX IS DISPLAYING THE SAME ONE.
 				if (comboBox.getSelectedStringValue() == null
@@ -244,6 +248,7 @@ System.out.println("RowSet value: " + currentRowPK);
 		} catch (SQLException se) {
 			se.printStackTrace();
 		}
+		comboBox.setEnabled(true);
 		this.comboBox.addActionListener(this.comboListener);
 
 // THIS CODE IS FROM SSCommon.getBoundColumnText()

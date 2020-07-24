@@ -74,7 +74,7 @@ public class MainClass extends JFrame {
 	/**
 	 * database connection
 	 */
-	private static final boolean USE_IN_MEMORY_DATABASE = false;
+	private static final boolean USE_IN_MEMORY_DATABASE = true;
 	private static final boolean RUN_SQL_SCRIPTS = true;
 	private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
 	private static final String DATABASE_NAME = "suppliers_and_parts";

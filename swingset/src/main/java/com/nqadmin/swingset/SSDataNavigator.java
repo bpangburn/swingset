@@ -188,6 +188,30 @@ public class SSDataNavigator extends JPanel {
 	 * Indicator used to determine if a row is being inserted into the SSRowSet.
 	 */
 	protected boolean onInsertRow = false;
+	
+	/**
+	 * SSDBComboBox used for navigation if applicable.
+	 * 
+	 * Allows Navigator to disable it when a row is inserted and enable it when that row is saved.
+	 * 
+	 * TODO Consider writing a PropertyChangeListener for onInsertRow instead. 
+	 */
+	protected SSDBComboBox navCombo= null;
+
+
+	/**
+	 * @return the navCombo
+	 */
+	public SSDBComboBox getNavCombo() {
+		return navCombo;
+	}
+
+	/**
+	 * @param navCombo the navCombo to set
+	 */
+	public void setNavCombo(SSDBComboBox _navCombo) {
+		navCombo = _navCombo;
+	}
 
 	/**
 	 * Navigator button dimensions.
@@ -485,8 +509,7 @@ public class SSDataNavigator extends JPanel {
 		// IF NO ROWS ARE PRESENT DISABLE NAVIGATION
 		// ELSE ENABLE THEN ELSE IS USEFUL WHEN THE SSROWSET IS CHNAGED
 		// IF THE INITIAL SSROWSET HAS ZERO ROWS NEXT IF THE USER SETS A NEW SSROWSET
-		// THEN THE
-		// BUTTONS HAVE TO BE ENABLED
+		// THEN THE BUTTONS HAVE TO BE ENABLED
 		if (this.rowCount == 0) {
 			this.firstButton.setEnabled(false);
 			this.previousButton.setEnabled(false);
@@ -1102,8 +1125,14 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
 				try {
+					
+					//System.out.println("Add button pressed...");					
+					
 					SSDataNavigator.this.sSRowSet.moveToInsertRow();
 					SSDataNavigator.this.onInsertRow = true;
+					if (navCombo!=null) {
+						navCombo.setEnabled(false);
+					}
 
 					if (SSDataNavigator.this.dBNav != null) {
 						SSDataNavigator.this.dBNav.performPreInsertOps();

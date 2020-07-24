@@ -624,7 +624,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //		DefaultEventComboBoxModel<SSListItem> model = new DefaultEventComboBoxModel<SSListItem>(eventList);
 //		this.setModel(model);
 
-//TODO do we need to install once or after every query???	
+//TODO do we need to install once or after every query???
+// Per: https://stackoverflow.com/questions/15210771/autocomplete-with-glazedlists
+// use eventList.addAll() to modify list contents and the 
 
 // NOTE: install method makes the ComboBox editable
 //		// should already in the event dispatch thread so don't use invokeAndWait()
@@ -798,12 +800,15 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	public long getSelectedValue() {
 
-		long result;
+		Long result;
 
 		if (getSelectedIndex() == -1) {
-			result = NON_SELECTED;
+			result = (long) NON_SELECTED;
 		} else {
 			result = mappings.get(getSelectedIndex());
+			if (result==null) {
+				result = (long) NON_SELECTED;
+			}
 		}
 
 		return result;
@@ -923,18 +928,24 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			
 System.out.println("Clearing eventList.");			
 			
-			eventList.dispose();
+			//eventList.dispose();
 			eventList.clear();
+		} else {
+			eventList = new BasicEventList<>();
 		}
 		if (mappings != null) {
 			mappings.clear();
+		} else {
+			mappings = new ArrayList<Long>();
 		}
 		if (options != null) {
 			options.clear();
+		} else {
+			options = new ArrayList<String>();
 		}
-		eventList = new BasicEventList<>();
-		mappings = new ArrayList<Long>();
-		options = new ArrayList<String>();
+		
+		
+		
 		
 		eventList.getReadWriteLock().writeLock().lock();
 
@@ -947,6 +958,15 @@ System.out.println("Clearing eventList.");
 
 		// this.data.getReadWriteLock().writeLock().lock();
 		try {
+System.out.println("allow null? " + getAllowNull());			
+			// 2020-07-24: adding support for a nullable first item if nulls are supported
+			if (getAllowNull()) {
+				listItem = new SSListItem(null, "");
+				System.out.println("SSDBComboBox - adding blank listItem: " + listItem);
+				eventList.add(listItem);
+				mappings.add(listItem.getPrimaryKey());
+				options.add(listItem.getListItem());
+			}
 
 			Statement statement = ssCommon.getSSConnection().getConnection().createStatement();
 			rs = statement.executeQuery(getQuery());
@@ -961,6 +981,7 @@ System.out.println("Clearing eventList.");
 				// extract first column string
 				// getStringValue() takes care of formatting dates
 				firstColumnString = getStringValue(rs, this.displayColumnName).trim();
+				//System.out.println("firstColumnString: " + firstColumnString);
 
 				// extract second column string, if applicable
 				// getStringValue() takes care of formatting dates
@@ -1224,6 +1245,48 @@ System.out.println("Clearing eventList.");
 //        this.textField.setText(_value);
 	}
 	
+//	/**
+//	 * Sets the currently selected value
+//	 *
+//	 * Currently not a bean property since there is no associated variable.
+//	 *
+//	 * @param _value value to set as currently selected.
+//	 */
+//	@Override
+//	public void setSelectedItem(Object _value) {
+//// INTERCEPTING GLAZEDLISTS CALLS TO setSelectedItem() SO THAT WE CAN PREVENT IT FROM TRYING TO SET VALUES NOT IN THE LIST
+//		
+//// NOTE THAT CALLING setSelectedIndex(-1); CAUSES A CYCLE HERE BECAUSE setSelectedIndex() CALLS setSelectedItem()
+//
+//		System.out.println("SSDBComboBox.setSelectedItem()._value: " + _value);
+//		System.out.println("SSDBComboBox.setSelectedItem()-textbox: " + getEditor().getItem().toString());
+//		
+//		SSListItem selectedItem = (SSListItem)_value;
+//		
+//		// two reasons why selectedItem could be null: null following Cast because there is no mapping OR _value is actually passed as null		
+//		
+//		if (_value==null) {
+//		// someone is trying to set this field to null so blank out the text
+//			getEditor().setItem("");
+//			updateUI();
+//			super.setSelectedItem(null);
+//
+//		} else if (selectedItem == null) {
+//			// capture what user actually typed
+//				String typedText = getEditor().getItem().toString();
+//				
+//			// reset typed text to remove a character
+//				typedText = typedText.substring(0, typedText.length() - 1);
+//				System.out.println("Modified text: " + typedText);
+//				getEditor().setItem(typedText);
+//				updateUI(); // this refreshes the typed text. Confirmed it does not update without call to
+//							// updateUI();
+//				// no call to setSelectedItem() because we're not letting the user change anything
+//		} else {
+//			super.setSelectedItem(_value);
+//		}
+//	}
+
 	/**
 	 * Sets the currently selected value
 	 *
@@ -1263,8 +1326,7 @@ System.out.println("Clearing eventList.");
 		
 		
 
-	}
-	
+	}	
 	
 
 //    /**
@@ -1521,7 +1583,10 @@ System.out.println("Clearing eventList.");
 							+ ". Setting index to -1 (blank).");
 				}
 
-				//System.out.println(eventList.toString());
+				//System.out.println("eventList: " + eventList.toString());
+				//System.out.println("options: " + options.toString());
+				//System.out.println("mappings: " + mappings.toString());
+				
 				setSelectedIndex(index);
 				//updateUI();
 			} else {

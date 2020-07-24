@@ -260,7 +260,7 @@ public interface SSRowSet extends RowSet {
 			
 			// TODO Convert this code to use Java 8 JDBCType enum
 			
-			_updatedValue.trim();
+			if (_updatedValue!=null) _updatedValue.trim();
 			
 //          System.out.println("Update Text:" + columnName);
 			
@@ -273,7 +273,7 @@ public interface SSRowSet extends RowSet {
 			case Types.SMALLINT:
 			case Types.TINYINT:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if (_updatedValue.equals("")) {
+				if (_updatedValue==null || _updatedValue.equals("")) {
 					this.updateNull(_columnName);
 				} else {
 					int intValue = Integer.parseInt(_updatedValue);
@@ -283,7 +283,7 @@ public interface SSRowSet extends RowSet {
 
 			case Types.BIGINT:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if (_updatedValue.equals("")) {
+				if (_updatedValue==null || _updatedValue.equals("")) {
 					this.updateNull(_columnName);
 				} else {
 					long longValue = Long.parseLong(_updatedValue);
@@ -293,7 +293,7 @@ public interface SSRowSet extends RowSet {
 
 			case Types.FLOAT:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if (_updatedValue.equals("")) {
+				if (_updatedValue==null || _updatedValue.equals("")) {
 					this.updateNull(_columnName);
 				} else {
 					float floatValue = Float.parseFloat(_updatedValue);
@@ -304,8 +304,7 @@ public interface SSRowSet extends RowSet {
 			case Types.DOUBLE:
 			case Types.NUMERIC:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				// System.out.println("ppr" + _updatedValue + "ppr");
-				if (_updatedValue.equals("")) {
+				if (_updatedValue==null || _updatedValue.equals("")) {
 					this.updateNull(_columnName);
 				} else {
 					double doubleValue = Double.parseDouble(_updatedValue);
@@ -315,7 +314,7 @@ public interface SSRowSet extends RowSet {
 
 			case Types.BOOLEAN:
 			case Types.BIT:
-				if (_updatedValue.equals("")) {
+				if (_updatedValue==null || _updatedValue.equals("")) {
 					this.updateNull(_columnName);
 				} else {
 					// CONVERT THE GIVEN STRING TO BOOLEAN TYPE
@@ -326,7 +325,7 @@ public interface SSRowSet extends RowSet {
 
 			case Types.DATE:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if (_updatedValue.equals("")) {
+				if (_updatedValue==null || _updatedValue.equals("")) {
 					this.updateNull(_columnName);
 				} else if (_updatedValue.length() == 10) {
 					this.updateDate(_columnName, SSCommon.getSQLDate(_updatedValue));
@@ -336,7 +335,7 @@ public interface SSRowSet extends RowSet {
 				break;
 			case Types.TIMESTAMP:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if (_updatedValue.equals("")) {
+				if (_updatedValue==null || _updatedValue.equals("")) {
 					this.updateNull(_columnName);
 				} else if (_updatedValue.length() == 10) {
 					this.updateTimestamp(_columnName, new Timestamp(SSCommon.getSQLDate(_updatedValue).getTime()));
@@ -352,7 +351,7 @@ public interface SSRowSet extends RowSet {
 				// THIS CAUSES A PROBLEM SO WE WRITE NULL
 				// TODO investigate if we can let the programmer indicate how this should be
 				// handled for a given column OR see if we can identify constraints
-				if (_updatedValue.equals("")) {
+				if (_updatedValue==null || _updatedValue.equals("")) {
 					this.updateNull(_columnName);
 				} else {
 					this.updateString(_columnName, _updatedValue);
