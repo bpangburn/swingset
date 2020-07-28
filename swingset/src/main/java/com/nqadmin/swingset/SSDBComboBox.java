@@ -198,6 +198,11 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * box.
 	 */
 	protected String displayColumnName = "";
+	
+	/**
+	 * String typed by user into combobox
+	 */
+	protected String priorTypedText = "";
 
 	/**
 	 * Map of string/value pairings for the ComboBox (generally the text to be
@@ -1245,48 +1250,6 @@ System.out.println("allow null? " + getAllowNull());
 //        this.textField.setText(_value);
 	}
 	
-//	/**
-//	 * Sets the currently selected value
-//	 *
-//	 * Currently not a bean property since there is no associated variable.
-//	 *
-//	 * @param _value value to set as currently selected.
-//	 */
-//	@Override
-//	public void setSelectedItem(Object _value) {
-//// INTERCEPTING GLAZEDLISTS CALLS TO setSelectedItem() SO THAT WE CAN PREVENT IT FROM TRYING TO SET VALUES NOT IN THE LIST
-//		
-//// NOTE THAT CALLING setSelectedIndex(-1); CAUSES A CYCLE HERE BECAUSE setSelectedIndex() CALLS setSelectedItem()
-//
-//		System.out.println("SSDBComboBox.setSelectedItem()._value: " + _value);
-//		System.out.println("SSDBComboBox.setSelectedItem()-textbox: " + getEditor().getItem().toString());
-//		
-//		SSListItem selectedItem = (SSListItem)_value;
-//		
-//		// two reasons why selectedItem could be null: null following Cast because there is no mapping OR _value is actually passed as null		
-//		
-//		if (_value==null) {
-//		// someone is trying to set this field to null so blank out the text
-//			getEditor().setItem("");
-//			updateUI();
-//			super.setSelectedItem(null);
-//
-//		} else if (selectedItem == null) {
-//			// capture what user actually typed
-//				String typedText = getEditor().getItem().toString();
-//				
-//			// reset typed text to remove a character
-//				typedText = typedText.substring(0, typedText.length() - 1);
-//				System.out.println("Modified text: " + typedText);
-//				getEditor().setItem(typedText);
-//				updateUI(); // this refreshes the typed text. Confirmed it does not update without call to
-//							// updateUI();
-//				// no call to setSelectedItem() because we're not letting the user change anything
-//		} else {
-//			super.setSelectedItem(_value);
-//		}
-//	}
-
 	/**
 	 * Sets the currently selected value
 	 *
@@ -1327,7 +1290,77 @@ System.out.println("allow null? " + getAllowNull());
 		
 
 	}	
+
 	
+// TODO TEST NAV TOOLBAR REFRESH	
+	/**
+	 * Sets the currently selected value.
+	 * This is called when the user clicks on an item or when they type in the combo's textfield.
+	 *
+	 * Currently not a bean property since there is no associated variable.
+	 *
+	 * @param _value value to set as currently selected.
+	 */
+/*	
+	@Override
+	public void setSelectedItem(Object _value) {
+// INTERCEPTING GLAZEDLISTS CALLS TO setSelectedItem() SO THAT WE CAN PREVENT IT FROM TRYING TO SET VALUES NOT IN THE LIST
+		
+// NOTE THAT CALLING setSelectedIndex(-1) IN THIS METHOD CAUSES A CYCLE HERE BECAUSE setSelectedIndex() CALLS setSelectedItem()
+		
+		// WE COULD BE HERE DUE TO:
+		// 1. MOUSE CLICK ON AN ITEM
+		// 2. KEYBASED NAVIGATION
+		// 3. USER TYPING SEQUENTIALLY:
+		//		THIS MAY TRIGGER MATCHING ITEMS, OR MAY NOT MATCH ANY SUBSTRINGS SO WE DELETE THE LAST CHARACTER
+		// 4. USER DOING SOMETHING UNEXPECTED LIKE INSERTING CHARACTERS, DELETING ALL TEXT, ETC.
+		//		THIS MAY TRIGGER MATCHING ITEMS, OR MAY NOT MATCH ANY SUBSTRINGS SO WE REVERT TO THE LAST STRING AVAILABLE
+		//		IF NOT MATCH, COULD ALSO REVERT TO EMPTY STRING
+		
+		// GET LATEST TEXT TYPED BY USER
+		String latestTypedText = "";
+		if (getEditor().getItem()!=null) {
+			latestTypedText = getEditor().getItem().toString();
+		}
+		
+		SSListItem selectedItem = (SSListItem)_value;
+		
+		// FOUR OUTCOMES:
+		//	1. _value is null, but selectedItem is not null, indicating a match (so null is a valid choice)
+		//  2. _value is null and selectedItem is null, indicating no match
+		//  3. neither _value nor selectedItem are null, indicating a match
+		//  4. _value is not null, but selectedItem is null, indicating no match (have to revert text)
+		
+		if (selectedItem!=null) {
+		// OUTCOME 1 & 3 ABOVE, MAKE CALL TO SUPER AND MOVE ALONG
+			// call to parent method
+			// note: don't call setSelectedIndex(-1) as this causes a cycle setSelectedIndex()->setSelectedItem()
+			super.setSelectedItem(_value);
+			
+			// update priorTypedText
+			priorTypedText = latestTypedText;
+			
+System.out.println(getBoundColumnName() + " - SSDBComboBox.setSelectedItem() - found a match for " + priorTypedText);		
+// TODO if _value==null then priorTypedText should probably be reset to ""
+			
+		} else if (_value==null) {
+		// OUTCOME 2 ABOVE
+			// someone passed null, but there is no match
+			// revert to empty string and don't select anything
+System.out.println(getBoundColumnName() + " - SSDBComboBox.setSelectedItem() called with null, but this field is not nullable. Prior text was " + priorTypedText + ". Resetting to empty string.");	
+			priorTypedText = "";
+			getEditor().setItem(priorTypedText);
+			updateUI(); // This refreshes the characters displayed. Confirmed the display does not update without call to updateUI();
+		} else {
+		// OUTCOME 4 ABOVE
+			// revert to prior string and don't select anything
+System.out.println(getBoundColumnName() + " - SSDBComboBox.setSelectedItem() called with " + _value + ", but there is not match. Reverting to prior text of " + priorTypedText + ".");	
+			getEditor().setItem(priorTypedText);
+			updateUI(); // This refreshes the characters displayed. Confirmed the display does not update without call to updateUI();
+		}
+
+	}	
+*/	
 
 //    /**
 //     * @author mvo
