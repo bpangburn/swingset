@@ -332,6 +332,7 @@ public class TestBaseComponents extends JFrame {
 				chkSSCheckBox.bind(rowset, "ss_check_box");
 				cmbSSComboBox.bind(rowset, "ss_combo_box");
 				cmbSSDBComboBox.bind(rowset, "ss_db_combo_box");
+				//cmbSSDBComboBox.setEditable(false);
 				imgSSImage.bind(rowset, "ss_image");
 				lblSSLabel2.bind(rowset, "ss_label");
 				lstSSList.bind(rowset, "ss_list");

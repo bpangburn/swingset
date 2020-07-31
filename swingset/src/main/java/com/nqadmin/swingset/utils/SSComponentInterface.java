@@ -373,7 +373,7 @@ public interface SSComponentInterface {
 	 */
 	default void setBoundColumnText(String _boundColumnText) {
 
-		System.out.println("SSComponentInterface.setBoundColumnText() " + _boundColumnText);
+		System.out.println(getBoundColumnName() + " - " + "SSComponentInterface.setBoundColumnText(): " + _boundColumnText);
 
 		getSSCommon().setBoundColumnText(_boundColumnText);
 
