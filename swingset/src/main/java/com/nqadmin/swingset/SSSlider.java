@@ -504,7 +504,17 @@ public class SSSlider extends JSlider implements SSComponentInterface {
             case java.sql.Types.DOUBLE:
             case java.sql.Types.NUMERIC:
         	// SET THE SLIDER BASED ON THE VALUE IN TEXT FIELD
-        		setValue(Integer.parseInt(getBoundColumnText()));
+            	String columnValue = getBoundColumnText();
+            	try {
+            		if (columnValue==null || columnValue.isEmpty()) {
+            			setValue(0);
+	            	} else {
+	            		setValue(Integer.parseInt(columnValue));
+	            	}
+            	} catch (NumberFormatException _nfe) {
+            		System.out.println(getBoundColumnName() + " - " + "SSSlider.updateSSComponent() - cannot update slider to " + columnValue + ".\n");
+            		_nfe.printStackTrace();
+            	}
                 break;
 
             default:
