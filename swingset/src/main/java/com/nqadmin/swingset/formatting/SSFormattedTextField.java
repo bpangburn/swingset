@@ -37,38 +37,14 @@
 
 package com.nqadmin.swingset.formatting;
 
-import java.awt.AWTKeyStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.KeyboardFocusManager;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.beans.beancontext.BeanContextChild;
-import java.beans.beancontext.BeanContextChildSupport;
-import java.beans.beancontext.BeanContextProxy;
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.sql.RowSetListener;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
-import javax.swing.JPopupMenu;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-import com.nqadmin.swingset.SSDataNavigator;
-import com.nqadmin.swingset.datasources.SSRowSet;
-import com.nqadmin.swingset.formatting.helpers.HelperPopup;
-import com.nqadmin.swingset.formatting.helpers.RowSetHelperPopup;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 //import com.nqadmin.swingset.formatting.helpers.SSFormattedComboBoxEditor;

@@ -207,7 +207,7 @@ public class SSDataNavigator extends JPanel {
 	}
 
 	/**
-	 * @param navCombo the navCombo to set
+	 * @param _navCombo the navCombo to set
 	 */
 	public void setNavCombo(SSDBComboBox _navCombo) {
 		navCombo = _navCombo;
