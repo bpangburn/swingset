@@ -12,8 +12,51 @@
 	<name>swingset-parent</name>
 	<url>https://sourceforge.net/projects/swingset</url>
 
-	<!-- NOT INCLUDING ANY CHILD DEPENDENCIES/PROPERTIES SO THAT EACH MODULE 
-		STANDS ALONE -->
+	<!--ONLY INCLUDING PROPERTIES/BUILD TO ENFORCE MAVEN AND JAVA VERSION -->
+
+	<properties>
+		<version.maven>3.6.3</version.maven>
+		<version.java>1.8</version.java>
+
+		<version.maven-enforcer-plugin>3.0.0-M3</version.maven-enforcer-plugin>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>${version.maven-enforcer-plugin}</version>
+				<executions>
+					<execution>
+						<id>enforce-versions</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<bannedPlugins>
+									<!-- will only display a warning but does not fail the build. -->
+									<level>WARN</level>
+									<excludes>
+										<exclude>org.apache.maven.plugins:maven-verifier-plugin</exclude>
+									</excludes>
+									<message>Please consider using the maven-invoker-plugin
+										(http://maven.apache.org/plugins/maven-invoker-plugin/)!</message>
+								</bannedPlugins>
+								<requireMavenVersion>
+									<version>${version.maven}</version>
+								</requireMavenVersion>
+								<requireJavaVersion>
+									<version>${version.java}</version>
+								</requireJavaVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 	<modules>
 		<module>swingset</module>
