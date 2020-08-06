@@ -34,7 +34,7 @@ import java.util.*;
  *
  * @author Amit Handa
  */
-
+@SuppressWarnings("all")
 public class JdbcRowSetResourceBundle implements Serializable {
 
     /**

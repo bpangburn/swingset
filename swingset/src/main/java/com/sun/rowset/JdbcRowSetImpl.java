@@ -40,7 +40,7 @@ import javax.sql.rowset.*;
  *
  * @author Jonathan Bruce, Amit Handa
  */
-
+@SuppressWarnings("all")
 public class JdbcRowSetImpl extends BaseRowSet implements JdbcRowSet, Joinable {
 
     /**
