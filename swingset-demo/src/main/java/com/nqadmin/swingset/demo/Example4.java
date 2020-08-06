@@ -187,7 +187,6 @@ public class Example4 extends JFrame {
 				/**
 				 * Requery the rowset following an insertion. This is needed for H2.
 				 */
-				@SuppressWarnings("restriction")
 				@Override
 				public void performPostInsertOps() {
 					super.performPostInsertOps();
@@ -203,7 +202,6 @@ public class Example4 extends JFrame {
 				/**
 				 * Requery the rowset following a deletion. This is needed for H2.
 				 */
-				@SuppressWarnings("restriction")
 				@Override
 				public void performPostDeletionOps() {
 					super.performPostDeletionOps();
