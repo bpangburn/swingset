@@ -933,25 +933,26 @@ public class SSDataGrid extends JTable {
 
 		@Override
 		public boolean stopCellEditing() {
+
 			String s = (String) super.getCellEditorValue();
 
 			if (s.trim().equals("")) {
 				if (this.constructor.getDeclaringClass() == String.class) {
 					this.value = s;
 				}
-				super.stopCellEditing();
-			}
-
-			try {
-				this.value = this.constructor.newInstance(new Object[] { s });
-			} catch (Exception e) {
-				// DRAW A RED BORDER IF THE VALUE OBJECT CAN'T BE CREATED.
-				// PROBABLY THE DATA ENTERED IS NOT RIGHT (STRING IN NUMBER FIELD OR VICE-VERSA)
-				((JComponent) getComponent()).setBorder(new LineBorder(Color.red));
-				return false;
+			} else {
+				try {
+					this.value = this.constructor.newInstance(new Object[] { s });
+				} catch (Exception e) {
+					// DRAW A RED BORDER IF THE VALUE OBJECT CAN'T BE CREATED.
+					// PROBABLY THE DATA ENTERED IS NOT RIGHT (STRING IN NUMBER FIELD OR VICE-VERSA)
+					((JComponent) getComponent()).setBorder(new LineBorder(Color.red));
+					return false;
+				}
 			}
 
 			return super.stopCellEditing();
+
 		}
 
 		@Override
