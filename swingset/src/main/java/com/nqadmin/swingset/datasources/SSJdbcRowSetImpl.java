@@ -51,7 +51,6 @@ import com.sun.rowset.JdbcRowSetImpl;
  * rowset-related functionality for linking SwingSet components to an
  * SSConnection.
  */
-@SuppressWarnings("restriction")
 public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 
 	/**
@@ -96,7 +95,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 *                      database.
 	 * 
 	 * @deprecated Starting in 2.3.0+ use
-	 *             {@link #SSJdbcRowSetImpl(Connection _connection)} instead.
+	 *             {@link #setConnection(Connection _connection)} instead.
 	 */
 	@Deprecated
 	public SSJdbcRowSetImpl(SSConnection _ssConnection) {
@@ -112,7 +111,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * @param _command      SQL query to be executed.
 	 * 
 	 * @deprecated Starting in 2.3.0+ use
-	 *             {@link #SSJdbcRowSetImpl(Connection _connection, String _command)}
+	 *             {@link #setConnection(Connection _connection) and @link #setCommand(String _command)}
 	 *             instead.
 	 * 
 	 */
