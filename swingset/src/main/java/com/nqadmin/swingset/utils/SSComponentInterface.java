@@ -47,6 +47,8 @@ import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSRowSet;
 
@@ -61,7 +63,7 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * member that is instantiated in the Component's constructor.
  */
 public interface SSComponentInterface {
-	
+
 	// TODO fire property changes where applicable
 
 	/**
@@ -82,8 +84,8 @@ public interface SSComponentInterface {
 	 * for a class extending JSlider, DocumentListener for a class extending
 	 * JTextField, etc.).
 	 * 
-	 * If the component is JTextComponent then the implementation can simply
-	 * call addSSDocumentListener()
+	 * If the component is JTextComponent then the implementation can simply call
+	 * addSSDocumentListener()
 	 */
 	void addSSComponentListener();
 
@@ -130,7 +132,7 @@ public interface SSComponentInterface {
 		getSSCommon().bind(_ssRowSet, _boundColumnName);
 
 	}
-	
+
 	/**
 	 * Transfers focus to next Swing Component on the screen when Down Arrow or
 	 * Enter are pressed.
@@ -143,7 +145,7 @@ public interface SSComponentInterface {
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK));
 		((JComponent) this).setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
 	}
-	
+
 	/**
 	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
@@ -208,6 +210,15 @@ public interface SSComponentInterface {
 	}
 
 	/**
+	 * Returns the bound column name in square brackets
+	 * 
+	 * @return the bound column name in square brackets
+	 */
+	default String getColumnForLog() {
+		return getSSCommon().getColumnForLog();
+	}
+
+	/**
 	 * Returns the index of the database column to which the SwingSet component is
 	 * bound.
 	 *
@@ -245,6 +256,10 @@ public interface SSComponentInterface {
 	@Deprecated
 	default int getColumnType() {
 		return getBoundColumnType();
+	}
+
+	default Logger getLogger() {
+		return getSSCommon().getLogger();
 	}
 
 //	/**
@@ -302,21 +317,21 @@ public interface SSComponentInterface {
 	 * for a class extending JSlider, DocumentListener for a class extending
 	 * JTextField, etc.).
 	 * 
-	 * If the component is JTextComponent then the implementation can simply
-	 * call removeSSDocumentListener()
+	 * If the component is JTextComponent then the implementation can simply call
+	 * removeSSDocumentListener()
 	 */
 	void removeSSComponentListener();;
-	
+
 	/**
 	 * Removes listener for Document if SwingSet component is a JTextComponent.
 	 * 
-	 * Implementation of removeSSComponentListener() can just call this method when the
-	 * component is a JTextComponent.
+	 * Implementation of removeSSComponentListener() can just call this method when
+	 * the component is a JTextComponent.
 	 */
 	default void removeSSDocumentListener() {
 		getSSCommon().removeSSDocumentListener();
 	};
-	
+
 	/**
 	 * Removes listener for RowSet.
 	 */
@@ -339,10 +354,11 @@ public interface SSComponentInterface {
 	 * Used for SSList or other component where multiple items can be selected.
 	 * 
 	 * @param _boundColumnArray Array to write to bound database column
-	 * @throws SQLException thrown if there is a problem writing the array to the RowSet
+	 * @throws SQLException thrown if there is a problem writing the array to the
+	 *                      RowSet
 	 */
 	default void setBoundColumnArray(SSArray _boundColumnArray) throws SQLException {
-		
+
 		getSSCommon().setBoundColumnArray(_boundColumnArray);
 	}
 
@@ -365,7 +381,7 @@ public interface SSComponentInterface {
 		getSSCommon().setBoundColumnName(_boundColumnName);
 
 	}
-	
+
 	/**
 	 * Sets the value of the bound database column
 	 * 
@@ -373,9 +389,9 @@ public interface SSComponentInterface {
 	 */
 	default void setBoundColumnText(String _boundColumnText) {
 
-		System.out.println(getBoundColumnName() + " - " + "SSComponentInterface.setBoundColumnText(): " + _boundColumnText);
-
 		getSSCommon().setBoundColumnText(_boundColumnText);
+
+		getLogger().info(getColumnForLog());
 
 	}
 
@@ -429,7 +445,7 @@ public interface SSComponentInterface {
 	default void setSSConnection(SSConnection _ssConnection) {
 		getSSCommon().setSSConnection(_ssConnection);
 	}
-	
+
 	/**
 	 * Sets the RowSet to hold queried data from the database.
 	 * 

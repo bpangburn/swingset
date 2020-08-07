@@ -52,6 +52,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.h2.tools.RunScript;
 
 /**
@@ -131,6 +133,11 @@ public class MainClass extends JFrame {
      */
     String url;
     
+	/**
+	 * Log4j Logger for component
+	 */
+    private static final Logger demoLogger = LogManager.getLogger(MainClass.class);
+    
     /**
      * Constructor for MainClass
      * 
@@ -138,19 +145,19 @@ public class MainClass extends JFrame {
      */
     public MainClass(){
     	
-
         // SETUP WINDOW
 	    	super("SwingSet Demo");
 	        setSize(300,300);
 	        setDefaultCloseOperation(EXIT_ON_CLOSE);
 	        
-	        System.out.println("Working Directory = " +
+	    // ECHO WORKING DIRECTORY	        
+	        demoLogger.info("Working Directory = " +
 	                System.getProperty("user.dir"));
 	        
 	    // INITIALIZE DATABASE
     		dbConnection = getDatabase();
     		if (dbConnection == null) {
-				System.out.println("Error initializing database. Exiting.");
+				demoLogger.fatal("Error initializing database. Exiting.");
 				System.exit(0);
     		}
     	        
@@ -207,8 +214,10 @@ public class MainClass extends JFrame {
 		try {
 			
 			Class.forName("org.h2.Driver");
-			//System.out.println("Resource path: " + getClass().getPackage().getName());
-			//System.out.println("Resource path: " + getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
+			
+			demoLogger.debug("Resource path: " + getClass().getPackage().getName());
+			demoLogger.debug("Resource path: " + getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
+			
 	        InputStream inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
         	InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
         	InputStream inStreamTestImages = null;
@@ -216,10 +225,10 @@ public class MainClass extends JFrame {
 	        if (USE_IN_MEMORY_DATABASE) {
 	        	inStreamTestImages = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST_IMAGES);
 	        } else {
-	        	System.out.println("Running H2 as a database server (versus an in-memory database) so binary files (e.g., images) cannot be pre-populated to any BLOB column(s).");
+	        	demoLogger.info("Running H2 as a database server (versus an in-memory database) so binary files (e.g., images) cannot be pre-populated to any BLOB column(s).");
 	        }
 	        if (inStreamDemo == null || inStreamTest == null) {
-	            System.out.println("Please add the file "
+	            demoLogger.fatal("Please add the file "
 	            		+ DATABASE_SCRIPT_DEMO
 	            		+ " and "
 	            		+ DATABASE_SCRIPT_TEST
@@ -230,12 +239,12 @@ public class MainClass extends JFrame {
 	        } else {
 	        	if (USE_IN_MEMORY_DATABASE) {
 	        		result = DriverManager.getConnection("jdbc:h2:mem:" + DATABASE_NAME);
-	        		System.out.println("Established connection to in-memory database.");
+	        		demoLogger.info("Established connection to in-memory database.");
 	        	} else {
 	        	// ASSUMING DATABASE IS IN LOCAL ./h2/databases/ FOLDER WITH DEFAULT USERNAME OF sa AND BLANK PASSWORD
 	        	// USEFUL FOR WORKING WITH DATASET FOR SWINGSET TESTS
 	        		result = DriverManager.getConnection("jdbc:h2:tcp:" + DATABASE_PATH + DATABASE_NAME,"sa","");
-	        		System.out.println("Established connection to database server.");
+	        		demoLogger.info("Established connection to database server.");
 	        	}
 	        	
 	        	// RUN SCRIPTS AND CLOSE STREAMS
@@ -316,10 +325,13 @@ public class MainClass extends JFrame {
      */
 	public static void main(String[] _url){
 //        new MainClass();
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				new MainClass();
-			}
-		});
+
+
+		// create application screen
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					new MainClass();
+				}
+			});
     }
 } // end public class MainClass extends JFrame {
