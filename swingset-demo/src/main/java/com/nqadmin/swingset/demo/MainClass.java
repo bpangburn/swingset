@@ -134,9 +134,9 @@ public class MainClass extends JFrame {
     String url;
     
 	/**
-	 * Log4j Logger for component
+	 * Log4j2 Logger
 	 */
-    private static final Logger demoLogger = LogManager.getLogger(MainClass.class);
+    private static final Logger logger = LogManager.getLogger(MainClass.class);
     
     /**
      * Constructor for MainClass
@@ -151,13 +151,13 @@ public class MainClass extends JFrame {
 	        setDefaultCloseOperation(EXIT_ON_CLOSE);
 	        
 	    // ECHO WORKING DIRECTORY	        
-	        demoLogger.info("Working Directory = " +
+	        logger.info("Working Directory = " +
 	                System.getProperty("user.dir"));
 	        
 	    // INITIALIZE DATABASE
     		dbConnection = getDatabase();
     		if (dbConnection == null) {
-				demoLogger.fatal("Error initializing database. Exiting.");
+				logger.fatal("Error initializing database. Exiting.");
 				System.exit(0);
     		}
     	        
@@ -215,8 +215,8 @@ public class MainClass extends JFrame {
 			
 			Class.forName("org.h2.Driver");
 			
-			demoLogger.debug("Resource path: " + getClass().getPackage().getName());
-			demoLogger.debug("Resource path: " + getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
+			logger.debug("Resource path: " + getClass().getPackage().getName());
+			logger.debug("Resource path: " + getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
 			
 	        InputStream inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
         	InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
@@ -225,10 +225,10 @@ public class MainClass extends JFrame {
 	        if (USE_IN_MEMORY_DATABASE) {
 	        	inStreamTestImages = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST_IMAGES);
 	        } else {
-	        	demoLogger.info("Running H2 as a database server (versus an in-memory database) so binary files (e.g., images) cannot be pre-populated to any BLOB column(s).");
+	        	logger.info("Running H2 as a database server (versus an in-memory database) so binary files (e.g., images) cannot be pre-populated to any BLOB column(s).");
 	        }
 	        if (inStreamDemo == null || inStreamTest == null) {
-	            demoLogger.fatal("Please add the file "
+	            logger.fatal("Please add the file "
 	            		+ DATABASE_SCRIPT_DEMO
 	            		+ " and "
 	            		+ DATABASE_SCRIPT_TEST
@@ -239,12 +239,12 @@ public class MainClass extends JFrame {
 	        } else {
 	        	if (USE_IN_MEMORY_DATABASE) {
 	        		result = DriverManager.getConnection("jdbc:h2:mem:" + DATABASE_NAME);
-	        		demoLogger.info("Established connection to in-memory database.");
+	        		logger.info("Established connection to in-memory database.");
 	        	} else {
 	        	// ASSUMING DATABASE IS IN LOCAL ./h2/databases/ FOLDER WITH DEFAULT USERNAME OF sa AND BLANK PASSWORD
 	        	// USEFUL FOR WORKING WITH DATASET FOR SWINGSET TESTS
 	        		result = DriverManager.getConnection("jdbc:h2:tcp:" + DATABASE_PATH + DATABASE_NAME,"sa","");
-	        		demoLogger.info("Established connection to database server.");
+	        		logger.info("Established connection to database server.");
 	        	}
 	        	
 	        	// RUN SCRIPTS AND CLOSE STREAMS
@@ -263,11 +263,11 @@ public class MainClass extends JFrame {
 	        }
 	        
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			logger.error("IO Exception.", ioe);
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL Exception.", se);
 		} catch (ClassNotFoundException cnfe) {
-			cnfe.printStackTrace();
+			logger.error("Class Not Found Exception.", cnfe);
 		}
 		
 		return result;

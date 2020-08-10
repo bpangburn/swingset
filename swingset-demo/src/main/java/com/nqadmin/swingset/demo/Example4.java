@@ -114,9 +114,9 @@ public class Example4 extends JFrame {
 	SSSyncManager syncManager;
 	
 	/**
-	 * Log4j Logger for component
+	 * Log4j2 Logger
 	 */
-    private static final Logger demoLogger = LogManager.getLogger(Example4.class);
+    private static final Logger logger = LogManager.getLogger(Example4.class);
 
 	/**
 	 * Constructor for Example4
@@ -140,7 +140,7 @@ public class Example4 extends JFrame {
 				this.rowset.setCommand("SELECT * FROM part_data;");
 				this.navigator = new SSDataNavigator(this.rowset);
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error("SQL Exception.", se);
 			}
 			
 			
@@ -183,11 +183,9 @@ public class Example4 extends JFrame {
 						Example4.this.txtPartCity.setText(null);
 						
 					} catch(SQLException se) {
-						se.printStackTrace();
-						demoLogger.error("Error occured initializing new record.\n" + se.getMessage());						
+						logger.error("SQL Exception occured initializing new record.",se);						
 					} catch(Exception e) {
-						e.printStackTrace();
-						demoLogger.error("Error occured initializing new record.\n" + e.getMessage());
+						logger.error("Exception occured initializing new record.",e);
 					}		
 					
 				}
@@ -201,8 +199,8 @@ public class Example4 extends JFrame {
 					Example4.this.cmbSelectPart.setEnabled(true);
 					try {
 						Example4.this.rowset.execute();
-					} catch (SQLException e) {
-						e.printStackTrace();
+					} catch (SQLException se) {
+						logger.error("SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -215,8 +213,8 @@ public class Example4 extends JFrame {
 					super.performPostDeletionOps();
 					try {
 						Example4.this.rowset.execute();
-					} catch (SQLException e) {
-						e.printStackTrace();
+					} catch (SQLException se) {
+						logger.error("SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -231,9 +229,9 @@ public class Example4 extends JFrame {
 					try {
 						Example4.this.cmbSelectPart.execute();
 					} catch (SQLException se) {
-						se.printStackTrace();
+						logger.error("SQL Exception.", se);
 					} catch (Exception e) {
-						e.printStackTrace();
+						logger.error("Exception.", e);
 					}
 					Example4.this.syncManager.sync();
 				}
@@ -256,9 +254,9 @@ public class Example4 extends JFrame {
 				try {
 					this.cmbSelectPart.execute();
 				} catch (SQLException se) {
-					se.printStackTrace();
+					logger.error("SQL Exception.", se);
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error("Exception.", e);
 				}
 				
 			// SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES

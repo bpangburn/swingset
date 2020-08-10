@@ -363,9 +363,9 @@ public interface SSComponentInterface {
 	}
 
 	/**
-	 * Sets the column index to which the Component is to be bound.
+	 * Sets the rowset column index to which the Component is to be bound.
 	 *
-	 * @param _boundColumnIndex column index to which the Component is to be bound
+	 * @param _boundColumnIndex rowset column index to which the Component is to be bound
 	 */
 	default void setBoundColumnIndex(int _boundColumnIndex) { // throws SQLException {
 		getSSCommon().setBoundColumnIndex(_boundColumnIndex);
@@ -391,14 +391,14 @@ public interface SSComponentInterface {
 
 		getSSCommon().setBoundColumnText(_boundColumnText);
 
-		getLogger().info(getColumnForLog());
+		getLogger().debug(getColumnForLog() + ": " + _boundColumnText);
 
 	}
 
 	/**
-	 * Sets the column index to which the Component is to be bound.
+	 * Sets the rowset column index to which the Component is to be bound.
 	 *
-	 * @param _columnIndex column index to which the Component is to be bound
+	 * @param _columnIndex rowset column index to which the Component is to be bound
 	 * 
 	 * @throws java.sql.SQLException - if a database access error occurs
 	 * 

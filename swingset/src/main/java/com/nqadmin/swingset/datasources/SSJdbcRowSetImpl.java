@@ -40,6 +40,9 @@ package com.nqadmin.swingset.datasources;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.sun.rowset.JdbcRowSetImpl;
 
 /**
@@ -57,6 +60,11 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -3556990832719097405L;
+	
+	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger(SSJdbcRowSetImpl.class);
 
 	/**
 	 * Empty constructor
@@ -119,11 +127,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	public SSJdbcRowSetImpl(SSConnection _ssConnection, String _command) {
 		setSSConnection(_ssConnection);
 
-		// try {
 		setCommand(_command);
-		// } catch (SQLException se) {
-		// se.printStackTrace();
-		// }
 
 	}
 
@@ -160,10 +164,10 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	public void setCommand(String _command) {
 		try {
 			super.setCommand(_command);
-		} catch (SQLException e) {
+		} catch (SQLException se) {
 			// TODO consider letting the calling class handle any SQLException and do away
 			// with this overridden method.
-			e.printStackTrace();
+			logger.error("SQL Exception for command " + _command + ".", se);
 		}
 	}
 

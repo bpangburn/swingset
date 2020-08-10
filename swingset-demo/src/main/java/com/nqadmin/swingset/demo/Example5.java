@@ -70,9 +70,9 @@ public class Example5 extends JFrame {
 	String url;
 	
 	/**
-	 * Log4j Logger for component
+	 * Log4j2 Logger
 	 */
-    private static final Logger demoLogger = LogManager.getLogger(Example5.class);
+    private static final Logger logger = LogManager.getLogger(Example5.class);
 
 	/**
 	 * Constructor for Example5
@@ -118,7 +118,7 @@ public class Example5 extends JFrame {
 				this.dataGrid.setUneditableColumns(new String[] { "part_id" });
 	
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error("SQL Exception.", se);
 			}
 			
 		// SETUP THE CONTAINER AND ADD THE DATAGRID

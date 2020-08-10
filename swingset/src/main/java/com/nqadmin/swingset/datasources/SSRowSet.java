@@ -48,6 +48,9 @@ import java.util.GregorianCalendar;
 import javax.sql.RowSet;
 import javax.sql.RowSetListener;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.utils.SSCommon;
 
 /**
@@ -60,6 +63,11 @@ import com.nqadmin.swingset.utils.SSCommon;
  * code where SSRowSet was referenced as a type.
  */
 public interface SSRowSet extends RowSet {
+	
+	/**
+	 * Log4j2 Logger - can't be private in an interface
+	 */
+    static final Logger logger = LogManager.getLogger(SSRowSet.class);
 
 	/**
 	 * Wrapper/convenience method for SwingSet method naming consistency.
@@ -117,14 +125,16 @@ public interface SSRowSet extends RowSet {
 	public default String getColumnText(final String _columnName) {
 		String value = null;
 		try {
-			// IF THE COLUMN HAS NULL RETURN NULL
+			// IF THE COLUMN IS NULL SO RETURN NULL
 			if (this.getObject(_columnName) == null) {
 				return null;
 			}
+			
+			int columnType = getColumnType(_columnName);
 
 			// BASED ON THE COLUMN DATA TYPE THE CORRESPONDING FUNCTION
 			// IS CALLED TO GET THE VALUE IN THE COLUMN
-			switch (getColumnType(_columnName)) {
+			switch (columnType) {
 			case Types.INTEGER:
 			case Types.SMALLINT:
 			case Types.TINYINT:
@@ -184,11 +194,11 @@ public interface SSRowSet extends RowSet {
 				break;
 
 			default:
-				System.out.println(_columnName + " : UNKNOWN DATA TYPE ");
+				logger.error("Unsupported data type of " + JDBCType.valueOf(columnType).getName() + " for column " + _columnName + ".");
 			} // end switch
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL Exception for column " + _columnName + ".", se);
 		}
 
 		return value;
@@ -262,8 +272,8 @@ public interface SSRowSet extends RowSet {
 			
 			if (_updatedValue!=null) _updatedValue.trim();
 			
-//          System.out.println("Update Text:" + columnName);
-			
+			logger.debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? " + _allowNull);
+					
 			int columnType = getColumnType(_columnName);
 
 			switch (columnType) {
@@ -360,15 +370,13 @@ public interface SSRowSet extends RowSet {
 				break;
 
 			default:
-				System.out.println("Unsupported data type: " + JDBCType.valueOf(columnType).getName());
+				logger.error("Unsupported data type of " + JDBCType.valueOf(columnType).getName() + " for column " + _columnName + ".");
 			} // end switch
 
 		} catch (SQLException se) {
-			se.printStackTrace();
-//          System.out.println(se.getMessage());
+			logger.error("SQL Exception for column " + _columnName + ".", se);
 		} catch (NumberFormatException nfe) {
-			nfe.printStackTrace();
-//          System.out.println(nfe.getMessage());
+			logger.error("Number Format Exception for column " + _columnName + ".", nfe);
 		}
 
 	} // end protected void updateColumnText(String _updatedValue, String _columnName)

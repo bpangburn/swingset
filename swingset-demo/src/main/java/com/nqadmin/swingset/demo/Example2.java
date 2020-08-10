@@ -95,9 +95,9 @@ public class Example2 extends JFrame {
 	SSDataNavigator navigator = null;
 	
 	/**
-	 * Log4j Logger for component
+	 * Log4j2 Logger
 	 */
-    private static final Logger demoLogger = LogManager.getLogger(Example2.class);
+    private static final Logger logger = LogManager.getLogger(Example2.class);
 
 	/**
 	 * Constructor for Example2
@@ -121,7 +121,7 @@ public class Example2 extends JFrame {
 				this.rowset.setCommand("SELECT * FROM supplier_data");
 				this.navigator = new SSDataNavigator(this.rowset);
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error("SQL Exception.", se);
 			}
 
 		/**
@@ -161,11 +161,9 @@ public class Example2 extends JFrame {
 					 Example2.this.cmbSupplierStatus.setSelectedValue(0);
 					
 				} catch(SQLException se) {
-					se.printStackTrace();
-					demoLogger.error("Error occured initializing new record.\n" + se.getMessage());								
+					logger.error("SQL Exception occured initializing new record.",se);								
 				} catch(Exception e) {
-					e.printStackTrace();
-					demoLogger.error("Error occured initializing new record.\n" + e.getMessage());
+					logger.error("Exception occured initializing new record.",e);
 				}		
 				
 			}
@@ -178,8 +176,8 @@ public class Example2 extends JFrame {
 				super.performPostInsertOps();
 				try {
 					Example2.this.rowset.execute();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				} catch (SQLException se) {
+					logger.error("SQL Exception.", se);
 				}
 			}
 			
@@ -191,8 +189,8 @@ public class Example2 extends JFrame {
 				super.performPostDeletionOps();
 				try {
 					Example2.this.rowset.execute();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				} catch (SQLException se) {
+					logger.error("SQL Exception.", se);
 				}
 			}
 

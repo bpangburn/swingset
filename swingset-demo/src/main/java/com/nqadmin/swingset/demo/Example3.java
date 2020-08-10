@@ -94,9 +94,9 @@ public class Example3 extends JFrame {
 	SSDataNavigator navigator = null;
 	
 	/**
-	 * Log4j Logger for component
+	 * Log4j2 Logger
 	 */
-    private static final Logger demoLogger = LogManager.getLogger(Example3.class);
+    private static final Logger logger = LogManager.getLogger(Example3.class);
 
 	/**
 	 * Constructor for Example3
@@ -120,7 +120,7 @@ public class Example3 extends JFrame {
 				this.rowset.setCommand("SELECT * FROM supplier_part_data");
 				this.navigator = new SSDataNavigator(this.rowset);
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error("SQL Exception.", se);
 			}
 
 		/**
@@ -159,11 +159,9 @@ public class Example3 extends JFrame {
 					 Example3.this.txtQuantity.setText("0");
 					
 				} catch(SQLException se) {
-					se.printStackTrace();
-					demoLogger.error("Error occured initializing new record.\n" + se.getMessage());								
+					logger.error("SQL Exception occured initializing new record.",se);								
 				} catch(Exception e) {
-					e.printStackTrace();
-					demoLogger.error("Error occured initializing new record.\n" + e.getMessage());
+					logger.error("Exception occured initializing new record.",e);
 				}		
 				
 			}
@@ -176,8 +174,8 @@ public class Example3 extends JFrame {
 				super.performPostInsertOps();
 				try {
 					Example3.this.rowset.execute();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				} catch (SQLException se) {
+					logger.error("SQL Exception.", se);
 				}
 			}
 			
@@ -189,8 +187,8 @@ public class Example3 extends JFrame {
 				super.performPostDeletionOps();
 				try {
 					Example3.this.rowset.execute();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				} catch (SQLException se) {
+					logger.error("SQL Exception.", se);
 				}
 			}
 
@@ -215,9 +213,9 @@ public class Example3 extends JFrame {
 				this.cmbSupplierName.execute();
 	
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error("SQL Exception.", se);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("Exception.", e);
 			}
 			
 		// SET LABEL DIMENSIONS	

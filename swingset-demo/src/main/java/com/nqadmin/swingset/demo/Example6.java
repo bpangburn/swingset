@@ -73,9 +73,9 @@ public class Example6 extends JFrame {
 	String url;
 	
 	/**
-	 * Log4j Logger for component
+	 * Log4j2 Logger
 	 */
-    private static final Logger demoLogger = LogManager.getLogger(Example6.class);
+    private static final Logger logger = LogManager.getLogger(Example6.class);
 
 	/**
 	 * Constructor for Example6
@@ -145,21 +145,17 @@ public class Example6 extends JFrame {
 							rs.close();
 	
 						} catch(SQLException se) {
-							se.printStackTrace();
-							demoLogger.error("Error occured obtaining primary key value for new record.\n" + se.getMessage());						
+							logger.error("SQL Exception occured obtaining primary key value for new record.",se);						
 						} catch(Exception e) {
-							e.printStackTrace();
-							demoLogger.error("Error occured obtaining primary key value for new record.\n" + e.getMessage());
+							logger.error("Exception occured obtaining primary key value for new record.",e);
 						}			
-						
-						//System.out.println(partID);
 						
 						return partID;
 					}
 				});
 	
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error("SQL Exception.", se);
 			}
 		
 		// SETUP THE CONTAINER AND ADD THE DATAGRID

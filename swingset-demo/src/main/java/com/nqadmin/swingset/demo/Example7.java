@@ -74,9 +74,9 @@ public class Example7 extends JFrame {
 	String url;
 	
 	/**
-	 * Log4j Logger for component
+	 * Log4j2 Logger
 	 */
-    private static final Logger demoLogger = LogManager.getLogger(Example7.class);
+    private static final Logger logger = LogManager.getLogger(Example7.class);
 
 	/**
 	 * Constructor for Example7
@@ -168,7 +168,7 @@ public class Example7 extends JFrame {
 				}
 	
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error("SQL Exception.", se);
 			}
 			
 		// SETUP THE CONTAINER AND ADD THE DATAGRID

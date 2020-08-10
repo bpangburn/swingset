@@ -44,6 +44,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * SSConnection.java
  * 
@@ -86,6 +89,11 @@ public class SSConnection implements Serializable {
 	 * Database connection object.
 	 */
 	protected Connection connection;
+	
+	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger(SSConnection.class);
 
 	/**
 	 * Constructs a default SSConnection object.
@@ -171,9 +179,9 @@ public class SSConnection implements Serializable {
 			try {
 				createConnection();
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error("SQL Exception.", se);
 			} catch (ClassNotFoundException cnfe) {
-				cnfe.printStackTrace();
+				logger.error("Class Not Found Exception.", cnfe);
 			}
 		}
 		return this.connection;
@@ -221,14 +229,13 @@ public class SSConnection implements Serializable {
 	 * @throws IOException 	IOException
 	 * @throws ClassNotFoundException 	ClassNotFoundException
 	 */
-	// TODO it would be better to have this throw an SQLException rather than
-	// printing a stack trace
+	// TODO It would probably be best to add SQLException to the exceptions thrown here.
 	protected void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
 		objIn.defaultReadObject();
 		try {
 			createConnection();
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL Exception.", se);
 		}
 	}
 

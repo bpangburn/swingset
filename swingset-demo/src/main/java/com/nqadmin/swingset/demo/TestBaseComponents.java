@@ -142,9 +142,9 @@ public class TestBaseComponents extends JFrame {
 	private static final Object[] listCodes = {1,2,3,4,5,6,7};
 	
 	/**
-	 * Log4j Logger for component
+	 * Log4j2 Logger
 	 */
-    private static final Logger demoLogger = LogManager.getLogger(TestBaseComponents.class);
+    private static final Logger logger = LogManager.getLogger(TestBaseComponents.class);
 	
 	
 	/**
@@ -175,11 +175,9 @@ public class TestBaseComponents extends JFrame {
 			txtSSTextField.setText(null);
 			
 		} catch(SQLException se) {
-			se.printStackTrace();
-			demoLogger.error("Error occured during setting default values.\n" + se.getMessage());								
+			logger.error("SQL Exception occured during setting default values.",se);								
 		} catch(Exception e) {
-			e.printStackTrace();
-			demoLogger.error("Error occured during setting default values.\n" + e.getMessage());
+			logger.error("Exception occured during setting default values.",e);
 		}	
 		
 
@@ -208,7 +206,7 @@ public class TestBaseComponents extends JFrame {
 				rowset.setCommand("SELECT * FROM swingset_base_test_data;");
 				navigator = new SSDataNavigator(rowset);
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error("SQL Exception.", se);
 			}
 			
 
@@ -246,8 +244,8 @@ public class TestBaseComponents extends JFrame {
 					//TestBaseComponents.this.cmbSSDBComboNav.setEnabled(true);
 					try {
 						TestBaseComponents.this.rowset.execute();
-					} catch (SQLException e) {
-						e.printStackTrace();
+					} catch (SQLException se) {
+						logger.error("SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -260,8 +258,8 @@ public class TestBaseComponents extends JFrame {
 					super.performPostDeletionOps();
 					try {
 						TestBaseComponents.this.rowset.execute();
-					} catch (SQLException e) {
-						e.printStackTrace();
+					} catch (SQLException se) {
+						logger.error("SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -276,9 +274,9 @@ public class TestBaseComponents extends JFrame {
 					try {
 						TestBaseComponents.this.cmbSSDBComboNav.execute();
 					} catch (SQLException se) {
-						se.printStackTrace();
+						logger.error("SQL Exception.", se);
 					} catch (Exception e) {
-						e.printStackTrace();
+						logger.error("Exception.", e);
 					}
 					TestBaseComponents.this.syncManager.sync();
 				}
@@ -301,9 +299,9 @@ public class TestBaseComponents extends JFrame {
 				try {
 					cmbSSDBComboNav.execute();
 				} catch (SQLException se) {
-					se.printStackTrace();
+					logger.error("SQL Exception.", se);
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error("Exception.", e);
 				}
 			
 			// SETUP SYNCMANAGER, WHICH WILL TAKE CARE OF KEEPING THE COMBO NAVIGATOR AND
@@ -350,9 +348,9 @@ public class TestBaseComponents extends JFrame {
 				try {
 					this.cmbSSDBComboBox.execute();
 				} catch (SQLException se) {
-					se.printStackTrace();
+					logger.error("SQL Exception.", se);
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error("Exception.", e);
 				}
 
 			// SET LABEL DIMENSIONS
