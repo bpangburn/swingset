@@ -38,10 +38,15 @@
 package com.nqadmin.swingset.utils;
 
 import com.nqadmin.swingset.datasources.*;
+
 import java.sql.SQLException;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDataNavigator;
 import javax.sql.RowSetListener;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.sql.RowSetEvent;
@@ -116,7 +121,7 @@ public class SSSyncManager {
 
 						count++;
 
-						System.out.println(
+						logger.info(
 								"SSSyncManager SSRowSet and SSDBComboBox values do not match for the same index. Looping through each record for a match. Pass # "
 										+ count + ".");
 
@@ -125,7 +130,7 @@ public class SSSyncManager {
 						// To avoid infinite loop in such scenario
 						if (count > numRecords + 5) {
 							comboBox.repaint();
-							System.out.println("SSSyncManager unable to find a record matching the selection in the dropdown list: " + comboBox.getSelectedStringValue() + ".");
+							logger.warn("SSSyncManager unable to find a record matching the selection in the dropdown list: " + comboBox.getSelectedStringValue() + ".");
 							// JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin
 							// about this","Row not found",JOptionPane.OK_OPTION);
 							break;
@@ -135,9 +140,9 @@ public class SSSyncManager {
 				
 
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error("SQL Exception.", se);
 			} finally {
-				System.out.println("SSSyncManager.MyComboListener.actionPerformed(): " + actionPerformedCount++);
+				logger.debug(actionPerformedCount++);
 				SSSyncManager.this.rowset.addRowSetListener(SSSyncManager.this.rowsetListener);
 			}
 		}
@@ -194,6 +199,11 @@ public class SSSyncManager {
 	 * Listener on SSRowSet to detect data navigator-based navigations.
 	 */
 	protected final SyncRowSetListener rowsetListener = new SyncRowSetListener();
+	
+	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger(SSSyncManager.class);
 
 	/**
 	 * 
@@ -223,8 +233,6 @@ public class SSSyncManager {
 	 * Method to update combo box based on rowset.
 	 */
 	protected void adjustValue() {
-		
-//System.out.println("SSSyncManager.adjustValue() called.");
 
 		comboBox.removeActionListener(comboListener);
 		
@@ -233,7 +241,7 @@ public class SSSyncManager {
 				// GET THE PRIMARY KEY FOR THE CURRENT RECORD IN THE ROWSET
 				long currentRowPK = this.rowset.getLong(this.columnName);
 				
-//System.out.println("RowSet value: " + currentRowPK);				
+				logger.trace("RowSet value: " + currentRowPK);		
 
 				// CHECK IF THE COMBO BOX IS DISPLAYING THE SAME ONE.
 				if (comboBox.getSelectedStringValue() == null
@@ -246,7 +254,7 @@ public class SSSyncManager {
 				this.comboBox.setSelectedIndex(-1);
 			}
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL Exception.", se);
 		}
 		comboBox.setEnabled(true);
 		this.comboBox.addActionListener(this.comboListener);

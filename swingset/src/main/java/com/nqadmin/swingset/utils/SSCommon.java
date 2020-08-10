@@ -465,7 +465,7 @@ public class SSCommon implements Serializable {
 				}
 			}
 		} catch (SQLException se) {
-			se.printStackTrace();
+			getLogger().error(getColumnForLog() + " - SQL Exception.", se);
 		}
 
 		return value;
@@ -641,7 +641,7 @@ public class SSCommon implements Serializable {
 			}
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			getLogger().error(getColumnForLog() + " - SQL Exception.", se);
 		}
 
 		// BIND UPDATED COLUMN IF APPLICABLE
@@ -678,7 +678,7 @@ public class SSCommon implements Serializable {
 			}
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			getLogger().error(getColumnForLog() + " - SQL Exception.", se);
 		}
 
 		// BIND UPDATED COLUMN IF APPLICABLE
