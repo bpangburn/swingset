@@ -50,6 +50,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.SSCheckBox;
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
@@ -138,6 +141,11 @@ public class TestBaseComponents extends JFrame {
 	private static final String[] listItems = {"List Item 1","List Item 2", "List Item 3", "List Item 4", "List Item 5", "List Item 6", "List Item 7"};
 	private static final Object[] listCodes = {1,2,3,4,5,6,7};
 	
+	/**
+	 * Log4j Logger for component
+	 */
+    private static final Logger demoLogger = LogManager.getLogger(TestBaseComponents.class);
+	
 	
 	/**
 	 * Method to set default values following an insert
@@ -168,10 +176,10 @@ public class TestBaseComponents extends JFrame {
 			
 		} catch(SQLException se) {
 			se.printStackTrace();
-			System.out.println("Error occured during pre insert operation.\n" + se.getMessage());								
+			demoLogger.error("Error occured during setting default values.\n" + se.getMessage());								
 		} catch(Exception e) {
 			e.printStackTrace();
-			System.out.println("Error occured during pre insert operation.\n" + e.getMessage());
+			demoLogger.error("Error occured during setting default values.\n" + e.getMessage());
 		}	
 		
 

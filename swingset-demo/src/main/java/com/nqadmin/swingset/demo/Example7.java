@@ -45,6 +45,9 @@ import java.sql.Statement;
 
 import javax.swing.JFrame;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.SSDataGrid;
 import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
@@ -69,6 +72,11 @@ public class Example7 extends JFrame {
 	SSJdbcRowSetImpl rowset = null;
 	SSDataGrid dataGrid = null;
 	String url;
+	
+	/**
+	 * Log4j Logger for component
+	 */
+    private static final Logger demoLogger = LogManager.getLogger(Example7.class);
 
 	/**
 	 * Constructor for Example7

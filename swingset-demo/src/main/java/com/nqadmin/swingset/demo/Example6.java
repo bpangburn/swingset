@@ -44,6 +44,9 @@ import java.sql.SQLException;
 
 import javax.swing.JFrame;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.SSDataGrid;
 import com.nqadmin.swingset.SSDataValue;
 import com.nqadmin.swingset.datasources.SSConnection;
@@ -68,6 +71,11 @@ public class Example6 extends JFrame {
 	SSJdbcRowSetImpl rowset = null;
 	SSDataGrid dataGrid = null;
 	String url;
+	
+	/**
+	 * Log4j Logger for component
+	 */
+    private static final Logger demoLogger = LogManager.getLogger(Example6.class);
 
 	/**
 	 * Constructor for Example6
@@ -138,11 +146,11 @@ public class Example6 extends JFrame {
 	
 						} catch(SQLException se) {
 							se.printStackTrace();
-							System.out.println("Error occured obtaining new Primary Key.\n" + se.getMessage());								
+							demoLogger.error("Error occured obtaining primary key value for new record.\n" + se.getMessage());						
 						} catch(Exception e) {
 							e.printStackTrace();
-							System.out.println("Error occured obtaining new Primary Key.\n" + e.getMessage());
-						}	
+							demoLogger.error("Error occured obtaining primary key value for new record.\n" + e.getMessage());
+						}			
 						
 						//System.out.println(partID);
 						

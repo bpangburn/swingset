@@ -48,6 +48,9 @@ import java.sql.SQLException;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
@@ -90,6 +93,11 @@ public class Example2 extends JFrame {
 	SSConnection ssConnection = null;
 	SSJdbcRowSetImpl rowset = null;
 	SSDataNavigator navigator = null;
+	
+	/**
+	 * Log4j Logger for component
+	 */
+    private static final Logger demoLogger = LogManager.getLogger(Example2.class);
 
 	/**
 	 * Constructor for Example2
@@ -154,10 +162,10 @@ public class Example2 extends JFrame {
 					
 				} catch(SQLException se) {
 					se.printStackTrace();
-					System.out.println("Error occured during pre insert operation.\n" + se.getMessage());								
+					demoLogger.error("Error occured initializing new record.\n" + se.getMessage());								
 				} catch(Exception e) {
 					e.printStackTrace();
-					System.out.println("Error occured during pre insert operation.\n" + e.getMessage());
+					demoLogger.error("Error occured initializing new record.\n" + e.getMessage());
 				}		
 				
 			}
