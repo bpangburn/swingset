@@ -112,10 +112,10 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 
 			if (index == -1) {
 				setBoundColumnText(null);
-				System.out.println("Setting " + getBoundColumnName() + " to null.");
+				getLogger().debug(getColumnForLog() + ": Setting " + getBoundColumnName() + " to null.");
 			} else {
 				setBoundColumnText(String.valueOf(getSelectedValue()));
-				System.out.println("Setting " + getBoundColumnName() + " to " + getSelectedValue() + ".");
+				getLogger().debug(getColumnForLog() + ": Setting " + getBoundColumnName() + " to " + getSelectedValue() + ".");
 			}
 
 			addSSRowSetListener();
@@ -862,7 +862,8 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 				// IF EXPLICIT VALUES FOR THE ITEMS IN COMBO ARE NOT SPECIFIED THEN CODES START
 				// FROM ZERO. IN SUCH A CASE CHECK IF THE NUMBER EXCEEDS THE NUMBER OF ITEMS
 				// IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)
-				System.out.println("Error: Value from database:" + _value + "  items in combobox: " + getItemCount());
+				getLogger().warn(getColumnForLog() + ": Value from database:" + _value + ". Items in combobox: " + getItemCount());
+				
 				setSelectedIndex(-1);
 			} else {
 				// IF MAPPINGS ARE SPECIFIED THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
@@ -871,8 +872,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 					int index = mappings.indexOf(_value);
 
 					if (index == -1) {
-						System.out.println("Warning: could not find a corresponding item in combobox for code of "
-								+ _value + ". Setting index to -1 (blank).");
+						getLogger().warn(getColumnForLog() + ": Warning: could not find a corresponding item in combobox for code of " + _value + ". Setting index to -1 (blank).");
 					}
 
 					setSelectedIndex(index);
@@ -921,7 +921,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 			}
 
 		} catch (NumberFormatException nfe) {
-			nfe.printStackTrace();
+			getLogger().warn(getColumnForLog() + ": Number Format Exception.", nfe);
 		}
 	}
 

@@ -71,6 +71,10 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
@@ -217,7 +221,15 @@ public class SSDataGrid extends JTable {
 	 */
 	protected boolean insertion = true;
 
+	/**
+	 * Variable to indicate if rows can be deleted.
+	 */
 	protected boolean allowDeletion = true;
+	
+	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger(SSConnection.class);
 
 	/**
 	 * @return the allowDeletion
@@ -1116,7 +1128,7 @@ public class SSDataGrid extends JTable {
 			this.columnCount = this.tableModel.getColumnCount();
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL Exception.", se);
 		}
 
 		// THIS IS NEEDED IF THE NUMBER OF COLUMNS IN THE NEW SSROWSET
@@ -1294,8 +1306,7 @@ public class SSDataGrid extends JTable {
 					this.setSelected(false);
 				}
 			} else {
-				System.out.println("Can't set check box value. Unknown data type.");
-				System.out.println("Column type should be Boolean or Integer for check box columns.");
+				logger.error("Can't set check box value. Unknown data type. Column type should be Boolean or Integer for check box columns.");
 			}
 
 			return this;
@@ -1351,10 +1362,9 @@ public class SSDataGrid extends JTable {
 				}
 			}
 			// IF THE COLUMN CLASS IS NOT BOOLEAN OR INTEGER
-			// PRINT OUT ERROR MESSAGE.
+			// LOG ERROR MESSAGE.
 			else {
-				System.out.println("Can't set check box value. Unknown data type.");
-				System.out.println("Column type should be Boolean or Integer for check box columns.");
+				logger.error("Can't set check box value. Unknown data type. Column type should be Boolean or Integer for check box columns.");
 			}
 			// RETURN THE EDITOR COMPONENT
 			return checkBox;
@@ -1435,7 +1445,7 @@ public class SSDataGrid extends JTable {
 //              setSelectedIndex(getIndexOf(_value));
 				index = getIndexOf(_value);
 			} else {
-				System.out.println("Combo Renderer: No item in combo that corresponds to " + _value);
+				logger.error("No item in combo that corresponds to " + _value);
 			}
 //          return this;
 
@@ -1505,7 +1515,9 @@ public class SSDataGrid extends JTable {
 			}
 
 			int index = ((JComboBox<?>) getComponent()).getSelectedIndex();
-//          System.out.println("Index is "+ index);
+			
+			logger.trace("Index is "+ index);
+
 			if (index == -1) {
 				return this.underlyingValues[0];
 			}

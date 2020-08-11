@@ -55,6 +55,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
@@ -197,6 +201,11 @@ public class SSDataNavigator extends JPanel {
 	 * TODO Consider writing a PropertyChangeListener for onInsertRow instead. 
 	 */
 	protected SSDBComboBox navCombo= null;
+	
+	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger(SSConnection.class);
 
 
 	/**
@@ -503,7 +512,7 @@ public class SSDataNavigator extends JPanel {
 
 			this.sSRowSet.addRowSetListener(this.sSRowSetListener);
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL Exception.", se);
 		}
 
 		// IF NO ROWS ARE PRESENT DISABLE NAVIGATION
@@ -533,7 +542,7 @@ public class SSDataNavigator extends JPanel {
 			}
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL Exception.", se);
 		}
 
 		// ENABLE OTHER BUTTONS IF NEED BE.
@@ -664,7 +673,7 @@ public class SSDataNavigator extends JPanel {
 			this.refreshButton.setText("Refresh");
 			this.addButton.setText("Add");
 			this.deleteButton.setText("Delete");
-			System.out.println("Unable to load images for navigator buttons");
+			logger.warn("Unable to load images for navigator buttons.", e);
 		}
 
 		// SET TOOL TIPS FOR THE BUTTONS
@@ -806,7 +815,7 @@ public class SSDataNavigator extends JPanel {
 					//SSDataNavigator.this.currentRow = 1;
 					//SSDataNavigator.this.txtCurrentRow.setText(String.valueOf(SSDataNavigator.this.currentRow));
 				} catch (SQLException se) {
-					se.printStackTrace();
+					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 				}
@@ -857,7 +866,7 @@ public class SSDataNavigator extends JPanel {
 					//SSDataNavigator.this.currentRow = SSDataNavigator.this.sSRowSet.getRow();
 					//SSDataNavigator.this.txtCurrentRow.setText(String.valueOf(SSDataNavigator.this.currentRow));
 				} catch (SQLException se) {
-					se.printStackTrace();
+					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 				}
@@ -906,7 +915,7 @@ public class SSDataNavigator extends JPanel {
 					//SSDataNavigator.this.currentRow = SSDataNavigator.this.sSRowSet.getRow();
 					//SSDataNavigator.this.txtCurrentRow.setText(String.valueOf(SSDataNavigator.this.currentRow));
 				} catch (SQLException se) {
-					se.printStackTrace();
+					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 				}
@@ -952,7 +961,7 @@ public class SSDataNavigator extends JPanel {
 					}
 
 				} catch (SQLException se) {
-					se.printStackTrace();
+					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 				}
@@ -1030,9 +1039,9 @@ public class SSDataNavigator extends JPanel {
 					}
 
 				} catch (SQLException se) {
+					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while saving row.\n" + se.getMessage());
-					se.printStackTrace();
 				}
 			}
 		});
@@ -1071,9 +1080,9 @@ public class SSDataNavigator extends JPanel {
 					}
 
 				} catch (SQLException se) {
+					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while undoing changes.\n" + se.getMessage());
-					se.printStackTrace();
 				}
 			}
 		});
@@ -1110,7 +1119,7 @@ public class SSDataNavigator extends JPanel {
 					}
 
 				} catch (SQLException se) {
-					se.printStackTrace();
+					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured refreshing the data.\n" + se.getMessage());
 				}
@@ -1125,9 +1134,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
 				try {
-					
-					//System.out.println("Add button pressed...");					
-					
+
 					SSDataNavigator.this.sSRowSet.moveToInsertRow();
 					SSDataNavigator.this.onInsertRow = true;
 					if (navCombo!=null) {
@@ -1149,9 +1156,9 @@ public class SSDataNavigator extends JPanel {
 					SSDataNavigator.this.deleteButton.setEnabled(false);
 
 				} catch (SQLException se) {
+					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while moving to insert row.\n" + se.getMessage());
-					se.printStackTrace();
 				}
 			}
 		});
@@ -1217,9 +1224,9 @@ public class SSDataNavigator extends JPanel {
 					}
 
 				} catch (SQLException se) {
+					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while deleting row.\n" + se.getMessage());
-					se.printStackTrace();
 				}
 			}
 		});
@@ -1257,7 +1264,7 @@ public class SSDataNavigator extends JPanel {
 			try {
 				updateNavigator();
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error("SQL Exception.", se);
 			}
 		}
 
@@ -1275,7 +1282,7 @@ public class SSDataNavigator extends JPanel {
 				SSDataNavigator.this.sSRowSet.first();
 				updateNavigator();
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error("SQL Exception.", se);
 			}
 
 		}
@@ -1317,7 +1324,7 @@ public class SSDataNavigator extends JPanel {
 			}
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL Exception.", se);
 		}
 	}
 

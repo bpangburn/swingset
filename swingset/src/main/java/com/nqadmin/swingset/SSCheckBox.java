@@ -98,7 +98,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 					setBoundColumnText(BOOLEAN_CHECKED);
 					break;
 				default:
-					System.out.println("Unknown column type of " + getBoundColumnType());
+					getLogger().warn(getColumnForLog() + ": Unknown column type of " + getBoundColumnType());
 					break;
 				}
 			} else {
@@ -114,7 +114,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 					setBoundColumnText(BOOLEAN_UNCHECKED);
 					break;
 				default:
-					System.out.println("Unknown column type of " + getBoundColumnType());
+					getLogger().warn(getColumnForLog() + ": Unknown column type of " + getBoundColumnType());
 					break;
 				}
 			}
