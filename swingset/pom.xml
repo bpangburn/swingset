@@ -23,6 +23,7 @@
 
 		<version.glazedlists>1.11.0</version.glazedlists>
 		<version.log4j>2.13.3</version.log4j>
+		<version.jdbcrowsetimpl>1.0.0</version.jdbcrowsetimpl>
 
 		<version.maven-enforcer-plugin>3.0.0-M3</version.maven-enforcer-plugin>
 		<version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
@@ -85,6 +86,13 @@
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
 			<version>${version.log4j}</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/ *** NEED LINK *** -->
+		<dependency>
+			<groupId>com.nqadmin.rowset</groupId>
+			<artifactId>jdbcrowsetimpl</artifactId>
+			<version>${version.jdbcrowsetimpl}</version>
 		</dependency>
 	</dependencies>
 

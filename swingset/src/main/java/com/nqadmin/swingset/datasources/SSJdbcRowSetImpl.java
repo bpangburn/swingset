@@ -43,7 +43,8 @@ import java.sql.SQLException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.sun.rowset.JdbcRowSetImpl;
+//import com.sun.rowset.JdbcRowSetImpl;
+import com.nqadmin.rowset.JdbcRowSetImpl;
 
 /**
  * SSJdbcRowSetImpl.java
