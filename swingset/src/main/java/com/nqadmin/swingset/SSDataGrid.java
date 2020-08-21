@@ -79,14 +79,15 @@ import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
  * SSDataGrid.java
- * 
+ * <p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
+ * <p>
+ * <pre>
  * SSDataGrid provides a way to display information from a database in a table
  * format (aka "spreadsheet" or "datasheet" view). The SSDataGrid takes a
  * SSRowSet as a source of data. It also provides different cell renderers
  * including a comboboxes renderer and a date renderer.
- *
+ * 
  * SSDataGrid internally uses the SSTableModel to display the information in a
  * table format. SSDataGrid also provides an easy means for displaying headers.
  * Columns can be hidden or made uneditable. In addition, it provides much finer
@@ -121,32 +122,37 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  *
  * Simple Example:
  *
- * // SET THE HEADER BEFORE SETTING THE SSROWSET dataGrid.setHeaders(new
- * String[]{"Part Name", "Color Code", " Weight", "City"});
- * dataGrid.setSSRowSet(ssRowSet); // HIDE THE PART ID COLUMN // THIS SETS THE
- * WIDTH OF THE COLUMN TO 0 //dataGrid.setHiddenColumns(new
- * String[]{"part_id"}); dataGrid.setHiddenColumns(new String[]{"part_id"});
+ *{@code
+ * // SET THE HEADER BEFORE SETTING THE SSROWSET
+ * dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
+ * dataGrid.setSSRowSet(ssRowSet);
+ * 
+ * // HIDE THE PART ID COLUMN
+ * // THIS SETS THE WIDTH OF THE COLUMN TO 0
+ * dataGrid.setHiddenColumns(new String[]{"part_id"}); dataGrid.setHiddenColumns(new String[]{"part_id"});
  *
- * dataGrid.setMessageWindow(this); dataGrid.setUneditableColumns(new
- * String[]{"part_id"});
+ * dataGrid.setMessageWindow(this);
+ * dataGrid.setUneditableColumns(new String[]{"part_id"});
  *
- * dataGrid.setComboRenderer("color_code",new String[]{"Red","Green","Blue"},
- * new Integer[]{new Integer(0),new Integer(1),new Integer(2)});
- * dataGrid.setDefaultValues(new int[]{1,2,3},new Object[]{new Integer(0), new
- * Integer(20),new String("New Orleans")});
+ * dataGrid.setComboRenderer("color_code",new String[]{"Red","Green","Blue"}, new Integer[]{new Integer(0),new Integer(1),new Integer(2)});
+ * dataGrid.setDefaultValues(new int[]{1,2,3},new Object[]{new Integer(0), new Integer(20),new String("New Orleans")});
  *
- * dataGrid.setPrimaryColumn("part_id"); dataGrid.setSSDataValue(new
- * SSDataValue(){ public Object getPrimaryColumnValue(){ // YOUR PRIMARY KEY
- * VALUE GENERATION GOES HERE // IF ITS SOME THING USER ENTERS THEN NO PROBLEM
- * // IF ITS AN AUTO INCREMENT FIELD THEN IT DEPENDS ON // THE DATABASE DRIVER
- * YOU ARE USING. // IF THE UPDATEROW CAN RETRIEVE THE VALUES FOR THE ROW //
- * WITH OUT KNOWING THE PRIMARY KEY VALUE ITS FINE // BUT POSTGRES CAN'T UPDATE
- * ROW WITH OUT THE PRIMARY // COLUMN.
+ * dataGrid.setPrimaryColumn("part_id");
+ * dataGrid.setSSDataValue(new SSDataValue(){ public Object getPrimaryColumnValue() {
+ * // YOUR PRIMARY KEY VALUE GENERATION GOES HERE
+ * // IF IT'S SOME THING USER ENTERS THEN NO PROBLEM
+ * // IF IT'S AN AUTO INCREMENT FIELD THEN IT DEPENDS ON
+ * // THE DATABASE DRIVER YOU ARE USING.
+ * // IF THE UPDATEROW CAN RETRIEVE THE VALUES FOR THE ROW WITHOUT KNOWING THE PRIMARY KEY VALUE ITS FINE
+ * // BUT POSTGRES CAN'T UPDATE ROW WITHOUT THE PRIMARY / COLUMN.
  *
- * // YOUR PRIMARY KEY VALUE GENERATION GOES HERE. ........ ........ ........ }
+ * // YOUR PRIMARY KEY VALUE GENERATION GOES HERE. ........ ........ ........ 
+ * }
  * });
- *
+ * }
+ * <p>
  * Also See Examples 5, 6, 7 in the samples.
+ *  </pre>
  */
 
 public class SSDataGrid extends JTable {
@@ -229,7 +235,7 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(SSConnection.class);
+    private static final Logger logger = LogManager.getLogger(SSDataGrid.class);
 
 	/**
 	 * @return the allowDeletion
