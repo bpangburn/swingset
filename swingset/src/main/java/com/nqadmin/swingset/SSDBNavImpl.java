@@ -49,6 +49,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
 
 /**
@@ -82,6 +85,11 @@ public class SSDBNavImpl implements SSDBNav {
 	 * Screen where components to be cleared are located.
 	 */
 	protected Container container = null;
+	
+	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger();
 
 	/**
 	 * Constructs a SSDBNavImpl with the specified container.
@@ -157,7 +165,7 @@ public class SSDBNavImpl implements SSDBNav {
                 setComponents((Container) ((JScrollPane)comps[i]).getViewport());
             } else {
             // DIPLAY WARNING FOR UNKNOWN COMPONENT
-            //	System.out.println("Encountered unknown component type of: " + comps[i].getClass().getSimpleName() + ". Unable to clear component.");
+            	logger.warn("Encountered unknown component type of: " + comps[i].getClass().getSimpleName() + ". Unable to clear component.");
             } 
 
 			/*
@@ -166,7 +174,6 @@ public class SSDBNavImpl implements SSDBNav {
 			 * SSCheckBox, SSComboBox, SSFormattedTextField, SSImage, SSLabel, SSSlider,
 			 * SSTextArea, SSTextField
 			 */
-// System.out.println(comps[i].getClass().getSimpleName());
 // 2019-09-29: PROBLEM WITH NEW SWITCH/ENUM IS THAT getSimpleName() RETURNS THE CLASS NAME OF THE CONTAINER SCREEEN
 //   WHICH COULD BE A CHILD ONE ONE OF THE JComponents E.G., XJPanelChildClass
 // 
@@ -214,7 +221,7 @@ public class SSDBNavImpl implements SSDBNav {
 				break;
 
 			default:
-				System.out.println("While resetting fields, encountered unknown " + ssComponent + " component.");
+            	logger.warn("Encountered unknown component type of: " + comps[i].getClass().getSimpleName() + ". Unable to clear component.");
 				break;
 
 			}

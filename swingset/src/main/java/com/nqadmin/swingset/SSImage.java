@@ -118,9 +118,9 @@ public class SSImage extends JPanel implements SSComponentInterface {
                         }
                     }
                 }catch(SQLException se){
-                    se.printStackTrace();
+                	getLogger().error(getColumnForLog() + ": SQL Exception.", se);
                 }catch(IOException ioe){
-                    ioe.printStackTrace();
+                	getLogger().error(getColumnForLog() + ": IO Exception.", ioe);;
                 }
                 
                 addSSRowSetListener();
@@ -535,7 +535,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
                 this.lblImage.setText("No Picture");
             }
         } catch(SQLException se) {
-            se.printStackTrace();
+        	getLogger().error(getColumnForLog() + ": SQL Exception.", se);
             this.img = null;
         }
 
@@ -545,4 +545,5 @@ public class SSImage extends JPanel implements SSComponentInterface {
         updateUI();
 		
 	}
+
 }

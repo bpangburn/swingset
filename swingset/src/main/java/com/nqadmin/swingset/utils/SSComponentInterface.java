@@ -47,6 +47,7 @@ import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.SSConnection;
@@ -258,9 +259,17 @@ public interface SSComponentInterface {
 		return getBoundColumnType();
 	}
 
+	/**
+	 * Returns a Log4J2 logger object for logging
+	 * 
+	 * @return Log4J2 logger object for implementing class
+	 */
 	default Logger getLogger() {
-		return getSSCommon().getLogger();
-	}
+		return LogManager.getLogger();
+	};
+//	{
+//		//return getSSCommon().getLogger();
+//	}
 
 //	/**
 //	 * Returns the primary key column name for the RowSet query

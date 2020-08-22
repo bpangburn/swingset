@@ -93,7 +93,7 @@ public class SSConnection implements Serializable {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(SSConnection.class);
+    private static final Logger logger = LogManager.getLogger();
 
 	/**
 	 * Constructs a default SSConnection object.

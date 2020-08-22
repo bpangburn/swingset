@@ -143,16 +143,13 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			removeSSRowSetListener();
 
 			int index = getSelectedIndex();
-			
-			//System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.SSDBComboListener.actionPerformed() - Selected index: -1. Current item: " + getSelectedItem());
-			//System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.SSDBComboListener.actionPerformed() - Selected index: -1. Current value: " + getSelectedValue());
 
 			if (index == -1) {
 				setBoundColumnText(null);
-				System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.SSDBComboListener.actionPerformed() - setting " + getBoundColumnName() + " to null.");
+				getLogger().debug(getColumnForLog() + ": Setting to null.");
 			} else {
 				setBoundColumnText(String.valueOf(getSelectedValue()));
-				System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.SSDBComboListener.actionPerformed() - setting " + getBoundColumnName() + " to " + getSelectedValue() + ".");
+				getLogger().debug(getColumnForLog() + ": Setting to " + getSelectedValue() + ".");
 			}
 
 			addSSRowSetListener();
@@ -474,7 +471,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			options.add(listItem.getListItem());
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			getLogger().error(getColumnForLog() + ": Exception.", e);
 		} finally {
 			eventList.getReadWriteLock().writeLock().unlock();
 		}
@@ -587,7 +584,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				}
 
 			} catch (Exception e) {
-				e.printStackTrace();
+				getLogger().error(getColumnForLog() + ": Exception.", e);
 			} finally {
 				eventList.getReadWriteLock().writeLock().unlock();
 			}
@@ -624,6 +621,11 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	}
 
+	/**
+	 * Executes the query specified with setQuery(), populates combobox, and turns on AutoCompleteSupport 
+	 * 
+	 * @throws Exception exception that occurs querying data or turning on AutoComplete
+	 */
 	public void execute() throws Exception {
 
 		//System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.execute() - setting execute count: " + executeCount++);
@@ -681,8 +683,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// it appears code was never written to set this value so Depreciated and
 		// returning 0
 		// TODO Remove completely from future release.
-		System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.getInitialNumberOfItems() - this method was never properly implemented so it has been Deprecated and just returns 0.");
-		Thread.dumpStack();
+		
+		getLogger().warn(getColumnForLog() + ": This method was never properly implemented so it has been Deprecated and just returns 0. \n" + Thread.currentThread().getStackTrace());
 		return 0;
 	}
 
@@ -915,7 +917,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				strValue = "";
 			}
 		} catch (SQLException se) {
-			se.printStackTrace();
+			getLogger().error(getColumnForLog() + ": SQL Exception.", se);
 		}
 		return strValue;
 
@@ -928,10 +930,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		if (eventList != null) {
 // TODO look at .dispose() vs .clear()
-			
-System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - clearing eventList.");			
-			
-			//eventList.dispose();
+			getLogger().trace(getColumnForLog() + ": Clearing eventList.");
 			eventList.clear();
 		} else {
 			eventList = new BasicEventList<>();
@@ -957,11 +956,11 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - cl
 
 		// this.data.getReadWriteLock().writeLock().lock();
 		try {
-System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - nulls allowed? " + getAllowNull());			
+			getLogger().debug(getColumnForLog() + ": Nulls allowed? " + getAllowNull());
 			// 2020-07-24: adding support for a nullable first item if nulls are supported
 			if (getAllowNull()) {
 				listItem = new SSListItem(null, "");
-System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - adding blank listItem: " + listItem);
+				getLogger().debug(getColumnForLog() + ": Adding blank list item - " + listItem);
 				eventList.add(listItem);
 				mappings.add(listItem.getPrimaryKey());
 				options.add(listItem.getListItem());
@@ -970,7 +969,7 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 			Statement statement = ssCommon.getSSConnection().getConnection().createStatement();
 			rs = statement.executeQuery(getQuery());
 			
-//System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - query: " + getQuery());	
+			getLogger().debug(getColumnForLog() + ": Query - " + getQuery());
 
 			while (rs.next()) {
 				// extract primary key
@@ -979,7 +978,7 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 				// extract first column string
 				// getStringValue() takes care of formatting dates
 				firstColumnString = getStringValue(rs, this.displayColumnName).trim();
-				//System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - firstColumnString: " + firstColumnString);
+				getLogger().debug(getColumnForLog() + ": First column to display - " + firstColumnString);
 
 				// extract second column string, if applicable
 				// getStringValue() takes care of formatting dates
@@ -989,6 +988,7 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 					if (secondColumnString.equals("")) {
 						secondColumnString = null;
 					}
+					getLogger().debug(getColumnForLog() + ": Second column to display - " + secondColumnString);
 				}
 
 				// build eventList item
@@ -1007,9 +1007,9 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 			rs.close();
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			getLogger().error(getColumnForLog() + ": SQL Exception.", se);
 		} catch (java.lang.NullPointerException npe) {
-			npe.printStackTrace();
+			getLogger().error(getColumnForLog() + ": Null Pointer Exception.", npe);
 		} finally {
 			eventList.getReadWriteLock().writeLock().unlock();
 		}
@@ -1088,8 +1088,7 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 	public void setFilterable(boolean _filter) {
 		// TODO remove this method in future release
 		this.filterSwitch = _filter;
-		System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setFilterable() - this method has been Deprecated because GlazedList filtering is now fully integrated.");
-		Thread.dumpStack();
+		getLogger().warn(getColumnForLog() + ": This method has been Deprecated because GlazedList filtering is now fully integrated.\n" + Thread.currentThread().getStackTrace());
 	}
 
 	/**
@@ -1222,8 +1221,7 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 				int index = options.indexOf(_value);
 
 				if (index == -1) {
-					System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setSelectedStringValue() - warning: could not find a corresponding item in combobox for display text of "
-							+ _value + ". Setting index to -1 (blank).");
+					getLogger().warn(getColumnForLog() + ": Could not find a corresponding item in combobox for display text of " + _value + ". Setting index to -1 (blank).");
 				}
 
 				setSelectedIndex(index);
@@ -1284,8 +1282,7 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 		if (selectedItem != null) {
 			// OUTCOME 1 & 3 ABOVE, MAKE CALL TO SUPER AND MOVE ALONG
 			// Display contents of selectedItem for debugging
-			System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setSelectedItem() - PK="
-					+ selectedItem.getPrimaryKey() + ", Item=" + selectedItem.getListItem());
+			getLogger().debug(getColumnForLog() + ": PK=" + selectedItem.getPrimaryKey() + ", Item=" + selectedItem.getListItem());
 
 			// We have to be VERY careful with calls to setSelectedItem() because it will
 			// set the value based on the index of any SUBSET list returned by GlazedList,
@@ -1295,20 +1292,17 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 			// call to setSelectedItem works as intended.
 			
 			possibleMatches = getItemCount();
-			System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setSelectedItem() - possible matches BEFORE hidePopup(): "
-					+ possibleMatches);
+			getLogger().trace(getColumnForLog() + ": Possible matches BEFORE hidePopup() - " + possibleMatches);
 			
 			hidePopup();
 			
 			possibleMatches = getItemCount();
-			System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setSelectedItem() - possible matches AFTER hidePopup(): "
-					+ possibleMatches);
+			getLogger().trace(getColumnForLog() + ": Possible matches AFTER hidePopup() - " + possibleMatches);
 
 			// Call to parent method.
 			// Don't call setSelectedIndex() as this causes a cycle
 			// setSelectedIndex()->setSelectedItem().
-			System.out.println(getBoundColumnName() + " - "
-					+ "SSDBComboBox.setSelectedItem() - calling super.setSelectedItem(" + selectedItem + ")");
+			getLogger().trace(getColumnForLog() + ": Calling super.setSelectedItem(" + selectedItem + ")");
 			super.setSelectedItem(selectedItem);
 
 			// Update editor text
@@ -1316,8 +1310,7 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 			getEditor().setItem(currentEditorText);
 			updateUI();
 
-			System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setSelectedItem() - Prior text was '"
-					+ priorEditorText + "'. Current text is '" + currentEditorText + "'.");
+			getLogger().debug(getColumnForLog() + ": Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.");
 
 			// update priorEditorText
 			priorEditorText = currentEditorText;
@@ -1326,14 +1319,12 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 			// OUTCOME 2 ABOVE
 			// setSelectedItem() was called with null, but there is no match (so null is not a valid selection in the list)
 			// There may be partial matches from GlazedList.
-			System.out.println(
-					getBoundColumnName() + " - " + "SSDBComboBox.setSelectedItem() called with null. Prior text was '"
-							+ priorEditorText + "'. Current text is '" + currentEditorText + "'.");
+			getLogger().debug(getColumnForLog() + ": Method called with null. Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.");
 	
 			// Determine if there are partial matches on the popup list due to user typing.
 			possibleMatches = getItemCount();
-			System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setSelectedItem() - possible matches: "
-					+ possibleMatches);
+			getLogger().trace(getColumnForLog() + ": Possible matches - " + possibleMatches);
+			
 			if (possibleMatches > 0) {
 				// update the latestTypedText, but don't make a call to super.setSelectedItem(). No change to bound value.
 				priorEditorText = currentEditorText;
@@ -1342,7 +1333,7 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 // on call to updateUI(), focus is lost and list items revert to 6 for "ss_db_combo_box" column in swingset_tests.sql
 // if "x" is typed a 2nd time, the popup does not become visible again and there are zero items in the list before and after the call
 // to setItem() and/or to updateUI()				
-				System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setSelectedItem() reverting to prior typed text.");
+				getLogger().trace(getColumnForLog() + ": Reverting to prior typed text.");
 				getEditor().setItem(priorEditorText);
 				// IMPORTANT: The particular order here of showPopup() and then updateUI() seems to restore the
 				// underlying GlazedList to all of the items. Reversing this order breaks things. Calling hidePopup() does not work.
@@ -1350,18 +1341,16 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 				updateUI(); // This refreshes the characters displayed. Display does not update without call to updateUI();
 							// updateUI() triggers focus lost
 				possibleMatches = getItemCount();
-				System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setSelectedItem() - possible matches AFTER reverting text: "
-						+ possibleMatches);
+				
+				getLogger().trace(getColumnForLog() + ": Possible matches AFTER reverting text - " + possibleMatches);
 			}
-			
-//System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setSelectedItem() - current value: "
-//					+ getSelectedItem());
 
 		} else {
 			// OUTCOME 4 ABOVE
+			// generally not expecting this outcome
 			// revert to prior string and don't select anything
-			System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setSelectedItem() called with " + _value
-					+ ", but there is no match. Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.");
+			getLogger().warn(getColumnForLog() + ": Method called with " + _value + ", but there is no match. Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.");
+			
 			// TODO Throw an exception here? May be the result of a coding error.
 			getEditor().setItem(priorEditorText);
 			currentEditorText = priorEditorText;
@@ -1623,19 +1612,17 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 				int index = mappings.indexOf(_value);
 
 				if (index == -1) {
-					System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setSelectedValue() - warning: could not find a corresponding item in combobox for value of " + _value
-							+ ". Setting index to -1 (blank).");
+					getLogger().warn(getColumnForLog() + ": Could not find a corresponding item in combobox for value of " + _value + ". Setting index to -1 (blank).");
 				}
 
-				//System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setSelectedValue() - eventList: " + eventList.toString());
-				//System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setSelectedValue() - options: " + options.toString());
-				//System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setSelectedValue() - mappings: " + mappings.toString());
+				getLogger().trace(getColumnForLog() + ": eventList - " + eventList.toString());
+				getLogger().trace(getColumnForLog() + ": options - " + options.toString());
+				getLogger().trace(getColumnForLog() + ": mappings - " + mappings.toString());
 				
 				setSelectedIndex(index);
 			} else {
-				System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.setSelectedValue() - no mappings available for current component. No value set in setSelectedValue().");
+				getLogger().warn(getColumnForLog() + ": No mappings available for current component. No value set by setSelectedValue().");
 			}
-
 
 	}
 	
@@ -1777,7 +1764,7 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 // TODO may need to call repaint()				
 
 			} catch (Exception e) {
-				e.printStackTrace();
+				getLogger().error(getColumnForLog() + ": Exception.", e);
 			} finally {
 				eventList.getReadWriteLock().writeLock().unlock();
 			}
@@ -1803,15 +1790,13 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 			// the GlazedList subset and generate:
 			// Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: setSelectedIndex: X out of bounds
 			//int possibleMatches = getItemCount();
-			//System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.updateSSComponent() - possible matches before setPopupVisible(false);: "
-			//		+ possibleMatches);
-			
+			//getLogger().debug(getColumnForLog() + ": Possible matches BEFORE setPopupVisible(false);: "+ possibleMatches);
+
 			//this.setPopupVisible(false);
 			//updateUI();
 			
 			//possibleMatches = getItemCount();
-			//System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.updateSSComponent() - possible matches AFTER setPopupVisible(false);: "
-			//		+ possibleMatches);
+			//getLogger().debug(getColumnForLog() + ": Possible matches AFTER setPopupVisible(false);: "+ possibleMatches);
 			
 			// THIS SHOULD BE CALLED AS A RESULT OF SOME ACTION ON THE ROWSET SO RESET THE EDITOR STRINGS BEFORE DOING ANYTHING ELSE
 			priorEditorText = "";
@@ -1823,7 +1808,7 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.queryData() - ad
 			// TODO Consider starting with a Long and passing directly to setSelectedValue(primaryKey). Modify setSelectedValue to accept a Long vs long.
 			String text = getBoundColumnText().trim();
 			
-System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.updateSSComponent() - getBoundColumnText(): " + text);
+			getLogger().debug(getColumnForLog() + ": getBoundColumnText() - " + text);
 
 			// GET THE BOUND VALUE STORED IN THE ROWSET
 			//if (text != null && !(text.equals(""))) {
@@ -1831,14 +1816,13 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.updateSSComponen
 				
 				long primaryKey = Long.parseLong(text);
 				
-System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.updateSSComponent() - calling setSelectedValue(" + primaryKey + ").");				
+				getLogger().debug(getColumnForLog() + ": Calling setSelectedValue(" + primaryKey + ").");
 
 				setSelectedValue(primaryKey);
 
 			} else {
-				
-System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.updateSSComponent() - calling setSelectedIndex(-1).");				
-				
+				getLogger().debug(getColumnForLog() + ": Calling setSelectedIndex(-1).");
+			
 				setSelectedIndex(-1);
 				//updateUI();
 			}
@@ -1847,11 +1831,10 @@ System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.updateSSComponen
 			if (getEditor().getItem() != null) {
 				editorString = getEditor().getItem().toString();
 			}
-			System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.updateSSComponent() - editor string: " + editorString);				
-			
+			getLogger().debug(getColumnForLog() + ": Combo editor string: " + editorString);
 
 		} catch (NumberFormatException nfe) {
-			nfe.printStackTrace();
+			getLogger().error(getColumnForLog() + ": Number Format Exception.", nfe);
 		}
 	}
 

@@ -203,7 +203,7 @@ public class SSSyncManager {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(SSSyncManager.class);
+    private static final Logger logger = LogManager.getLogger();
 
 	/**
 	 * 

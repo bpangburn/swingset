@@ -51,6 +51,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
@@ -113,7 +116,7 @@ public class SSTableModel extends AbstractTableModel {
 	/**
 	 * Column containing primary key.
 	 */
-	int primaryColumn = -1;
+	private int primaryColumn = -1;
 
 	/**
 	 * Implementation of SSDataValue interface used to determine PK value for new
@@ -148,6 +151,11 @@ public class SSTableModel extends AbstractTableModel {
 	 * Indicator to determine if insertions are allowed.
 	 */
 	protected boolean allowInsertion = true;
+	
+	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger();
 
 	/**
 	 * Constructs a SSTableModel object. If this contructor is used the
@@ -232,7 +240,7 @@ public class SSTableModel extends AbstractTableModel {
 // end additions
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL Exception.",  se);
 		}
 	}
 
@@ -275,11 +283,6 @@ public class SSTableModel extends AbstractTableModel {
 	@Override
 	public boolean isCellEditable(int _row, int _column) {
 
-//      if(rowset.isReadOnly()){
-//          System.out.println("Is Cell Editable : false");
-//          return false;
-//      }
-//      System.out.println("Is Cell Editable : true");
 		if (this.uneditableColumns != null) {
 			for (int i = 0; i < this.uneditableColumns.length; i++) {
 				if (_column == this.uneditableColumns[i]) {
@@ -287,6 +290,7 @@ public class SSTableModel extends AbstractTableModel {
 				}
 			}
 		}
+		
 		if (this.cellEditing != null) {
 			return this.cellEditing.isCellEditable(_row, _column);
 		}
@@ -354,10 +358,10 @@ public class SSTableModel extends AbstractTableModel {
 				value = this.rowset.getString(_column + 1);
 				break;
 			default:
-				System.out.println("SSTableModel.getValueAt(): Unknown data type");
+				logger.warn("Unknown data type of " + type);
 			}
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL Exception while retrieving value.",  se);
 			if (this.component != null) {
 				JOptionPane.showMessageDialog(this.component, "Error while retrieving value.\n" + se.getMessage());
 			}
@@ -386,9 +390,9 @@ public class SSTableModel extends AbstractTableModel {
 		try {
 			type = this.rowset.getColumnType(_column + 1);
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL Exception while updating value.",  se);
 			if (this.component != null) {
-				JOptionPane.showMessageDialog(this.component, "Error while updating the value.\n" + se.getMessage());
+				JOptionPane.showMessageDialog(this.component, "Error while updating value.\n" + se.getMessage());
 			}
 			return;
 		}
@@ -429,8 +433,9 @@ public class SSTableModel extends AbstractTableModel {
 			insertRow(valueCopy, _column);
 			return;
 		}
-
-//      System.out.println("Set value at "+ _row + "  " + _column + " with "+ valueCopy);
+		
+		logger.debug("Set value at "+ _row + "  " + _column + " with "+ valueCopy);
+		
 		try {
 			// YOU SHOULD BE ON THE RIGHT ROW IN THE SSROWSET
 			if (this.rowset.getRow() != _row + 1) {
@@ -474,14 +479,15 @@ public class SSTableModel extends AbstractTableModel {
 				this.rowset.updateString(_column + 1, (String) valueCopy);
 				break;
 			default:
-				System.out.println("SSTableModel.setValueAt(): Unknown data type");
+				logger.warn("Unknown data type of " + type);
 			}
 			this.rowset.updateRow();
-//          System.out.println("Updated value: " + getValueAt(_row,_column));
+			
+			logger.debug("Updated value: " + getValueAt(_row,_column));
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL Exception while updating value.",  se);
 			if (this.component != null) {
-				JOptionPane.showMessageDialog(this.component, "Error while updating the value.\n" + se.getMessage());
+				JOptionPane.showMessageDialog(this.component, "Error while updating value.\n" + se.getMessage());
 			}
 		}
 
@@ -553,7 +559,7 @@ public class SSTableModel extends AbstractTableModel {
 				this.rowset.updateString(_column + 1, (String) _value);
 				break;
 			default:
-				System.out.println("SSTableModel.setValueAt(): Unknown data type");
+				logger.warn("SSTableModel.setValueAt(): Unknown data type.");
 			}
 
 			this.rowset.insertRow();
@@ -563,7 +569,9 @@ public class SSTableModel extends AbstractTableModel {
 				this.rowset.first();
 			}
 			this.rowset.refreshRow();
-//          System.out.println("Row number of inserted row : "+ rowset.getRow());
+			
+			logger.debug("Row number of inserted row : "+ rowset.getRow());
+
 			if (this.table != null) {
 				this.table.updateUI();
 			}
@@ -575,13 +583,14 @@ public class SSTableModel extends AbstractTableModel {
 			}
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL Exception while inserting row.",  se);
 			this.inInsertRow = false;
 			if (this.component != null) {
-				JOptionPane.showMessageDialog(this.component, "Error while trying to insert row.\n" + se.getMessage());
+				JOptionPane.showMessageDialog(this.component, "Error while inserting row.\n" + se.getMessage());
 			}
 		}
-//     System.out.println("Successfully added row");
+		
+		logger.debug("Successfully added row.");
 
 	} // end protected void insertRow(Object _value, int _column) {
 
@@ -598,7 +607,9 @@ public class SSTableModel extends AbstractTableModel {
 		try {
 			while (iterator.hasNext()) {
 				Integer column = (Integer) iterator.next();
-//              System.out.println("Column number is:" + column);
+				
+				logger.debug("Column number is:" + column);
+				
 				// COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
 				int type = this.rowset.getColumnType(column.intValue() + 1);
 				switch (type) {
@@ -635,15 +646,15 @@ public class SSTableModel extends AbstractTableModel {
 					this.rowset.updateString(column.intValue() + 1, (String) this.defaultValuesMap.get(column));
 					break;
 				default:
-					System.out.println("SSTableModel.setValueAt(): Unknown data type");
+					logger.warn("Unknown data type of " + type);
 				} // END OF SWITCH
 
 			} // END OF WHILE
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL Exception while setting defaults for row.",  se);
 			if (this.component != null) {
-				JOptionPane.showMessageDialog(this.component, "Error while inserting row.\n" + se.getMessage());
+				JOptionPane.showMessageDialog(this.component, "Error while setting defaults for row.\n" + se.getMessage());
 			}
 		}
 	} // end protected void setDefaults() {
@@ -660,7 +671,8 @@ public class SSTableModel extends AbstractTableModel {
 		int type;
 		try {
 			type = this.rowset.getColumnType(_column + 1);
-		} catch (SQLException e) {
+		} catch (SQLException se) {
+			logger.debug("SQL Exception.",  se);
 			return super.getColumnClass(_column);
 		}
 
@@ -723,7 +735,7 @@ public class SSTableModel extends AbstractTableModel {
 				}
 				return true;
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error("SQL Exception while deleting row.",  se);
 				if (this.component != null) {
 					JOptionPane.showMessageDialog(this.component, "Error while deleting row.\n" + se.getMessage());
 				}
@@ -862,10 +874,10 @@ public class SSTableModel extends AbstractTableModel {
 				this.rowset.updateString(this.primaryColumn + 1, (String) this.dataValue.getPrimaryColumnValue());
 				break;
 			default:
-				System.out.println("SSTableModel.setPrimaryColumn(): Unknown data type");
+				logger.warn("Unknown data type of " + type);
 			}
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL Exception while insering Primary Key value.",  se);
 			if (this.component != null) {
 				JOptionPane.showMessageDialog(this.component,
 						"Error while inserting Primary Key value.\n" + se.getMessage());
@@ -928,11 +940,11 @@ public class SSTableModel extends AbstractTableModel {
 	public String getColumnName(int _columnNumber) {
 		if (this.headers != null) {
 			if (_columnNumber < this.headers.length) {
-//              System.out.println("sending header " + headers[_columnNumber]);
+				logger.debug("Sending header " + headers[_columnNumber]);
 				return this.headers[_columnNumber];
 			}
 		}
-//      System.out.println(" Not able to supply header name");
+		logger.warn("Not able to supply header name.");
 		return "";
 	}
 

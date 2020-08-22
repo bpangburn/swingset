@@ -65,7 +65,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(SSJdbcRowSetImpl.class);
+    private static final Logger logger = LogManager.getLogger();
 
 	/**
 	 * Empty constructor

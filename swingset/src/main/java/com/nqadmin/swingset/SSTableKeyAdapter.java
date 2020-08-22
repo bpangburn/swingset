@@ -54,6 +54,9 @@ import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * SSTableKeyAdapter.java
  * 
@@ -88,6 +91,11 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	 * Indicates row used for insertion in SSDataGrid.
 	 */
 	protected boolean forSSDataGrid = false;
+	
+	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger();
 
 	/**
 	 * Constructs a KeyAdapter for the JTable.
@@ -136,16 +144,15 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 		StringBuffer strBuf = new StringBuffer();
 
 		JTable jTable = (JTable) ke.getSource();
-//      System.out.println("Key Released on GRID");
-		// System.out.println("Key Released: " + ke.getKeyCode() + " " +
-		// ((ke.getModifiersEx() & (onMask | offMask)) == onMask));
+		
+		logger.debug("Key Released on SSDataGrid. Key Released: " + ke.getKeyCode() + " " +  ((ke.getModifiersEx() & (onMask | offMask)) == onMask));
 
 		if (((ke.getModifiersEx() & (this.onMask | this.offMask)) == this.onMask) && ke.getKeyCode() == KeyEvent.VK_C) {
 			// CHECK IF CONTROL-C IS PRESSED
 			// SHIFT OR ALT SHOULD NOT BE DOWN
 
 			// ALERT USER
-			// System.out.println("Going to handle copy");
+			logger.debug("Going to handle copy");
 
 			// GET COLUMNS INVOLVED
 			int numRows = jTable.getSelectedRowCount();
@@ -210,10 +217,10 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 				try {
 					strData = (String) transferable.getTransferData(DataFlavor.stringFlavor);
 				} catch (UnsupportedFlavorException ufe) {
-					ufe.printStackTrace();
+					logger.error("Unsupported Flavor Exception.",  ufe);
 					return;
 				} catch (IOException ioe) {
-					ioe.printStackTrace();
+					logger.error("IO Exception.",  ioe);
 					return;
 				}
 
@@ -322,19 +329,16 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 					jTable.updateUI();
 
 				} catch (NoSuchMethodException nsme) {
-					nsme.printStackTrace();
-					JOptionPane.showMessageDialog(jTable, "One of the column class does not provide a constructor"
-							+ "that takes a single String Argument");
+					logger.error("No Such Method Exception. One of the column classes does not provide a constructor that takes a single String argument.",  nsme);
+					JOptionPane.showMessageDialog(jTable, "One of the column classes does not provide a constructor that takes a single String argument.");
 				} catch (SecurityException se) {
-					se.printStackTrace();
-					JOptionPane.showMessageDialog(jTable, "One of the column class does not provide a constructor"
-							+ "that takes a single String Argument");
+					logger.error("Security Exception. One of the column class does not provide a constructor that takes a single String argument.",  se);
+					JOptionPane.showMessageDialog(jTable, "One of the column class does not provide a constructor that takes a single String argument.");
 				} catch (InstantiationException ie) {
-					ie.printStackTrace();
-					JOptionPane.showMessageDialog(jTable, "Failed to copy data. Error occured while instantiating"
-							+ "a single String argument constructor for a column ");
+					logger.error("(Instantiation Exception. Failed to copy data. Error occured while instantiating a single String argument constructor for a column.",  ie);
+					JOptionPane.showMessageDialog(jTable, "Failed to copy data. Error occured while instantiating a single String argument constructor for a column.");
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error("Exception. Failed to copy data.",  e);
 					JOptionPane.showMessageDialog(jTable, "Failed to copy data.");
 				}
 
@@ -371,6 +375,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 				newValue = constructor.newInstance(new Object[] { _value });
 			}
 		} catch (NoSuchMethodException nsme) {
+			logger.warn("No Such Method Exception. Failed to copy data.",  nsme);
 			newValue = _value;
 		}
 

@@ -58,7 +58,6 @@ import javax.swing.SwingConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
@@ -205,7 +204,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(SSConnection.class);
+    private static final Logger logger = LogManager.getLogger();
 
 
 	/**

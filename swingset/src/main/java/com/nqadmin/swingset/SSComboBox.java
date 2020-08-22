@@ -112,10 +112,10 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 
 			if (index == -1) {
 				setBoundColumnText(null);
-				getLogger().debug(getColumnForLog() + ": Setting " + getBoundColumnName() + " to null.");
+				getLogger().debug(getColumnForLog() + ": Setting to null.");
 			} else {
 				setBoundColumnText(String.valueOf(getSelectedValue()));
-				getLogger().debug(getColumnForLog() + ": Setting " + getBoundColumnName() + " to " + getSelectedValue() + ".");
+				getLogger().debug(getColumnForLog() + ": Setting to " + getSelectedValue() + ".");
 			}
 
 			addSSRowSetListener();

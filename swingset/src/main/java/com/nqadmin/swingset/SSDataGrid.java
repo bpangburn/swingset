@@ -74,7 +74,6 @@ import javax.swing.table.TableColumnModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
@@ -235,17 +234,17 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(SSDataGrid.class);
+    private static final Logger logger = LogManager.getLogger();
 
 	/**
-	 * @return the allowDeletion
+	 * @return the allowDeletion flag
 	 */
 	public boolean isAllowDeletion() {
 		return this.allowDeletion;
 	}
 
 	/**
-	 * @param _allowDeletion the allowDeletion to set
+	 * @param _allowDeletion boolean indicating if deletions are allowed
 	 */
 	public void setAllowDeletion(final boolean _allowDeletion) {
 		this.allowDeletion = _allowDeletion;

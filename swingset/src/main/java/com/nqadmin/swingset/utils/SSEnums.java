@@ -50,6 +50,7 @@ public class SSEnums {
 	 * Enumeration for SwingSet component types.
 	 *
 	 */
+	@SuppressWarnings("javadoc")
 	public enum SSComponent {
 
 		JPanel, JScrollPane, JTabbedPane,
@@ -61,6 +62,7 @@ public class SSEnums {
 	/**
 	 * Enumeration for navigation buttons.
 	 */
+	@SuppressWarnings("javadoc")
 	public enum Navigation {
 		Next(1), Previous(1), First(2), Last(3);
 
@@ -81,6 +83,7 @@ public class SSEnums {
 	/**
 	 * Enumeration for navigation buttons.
 	 */
+	@SuppressWarnings("javadoc")
 	public enum CheckBoxValues {
 
 		// protected static String BOOLEAN_CHECKED = "true";

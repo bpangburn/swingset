@@ -67,7 +67,7 @@ public interface SSRowSet extends RowSet {
 	/**
 	 * Log4j2 Logger - can't be private in an interface
 	 */
-    static final Logger logger = LogManager.getLogger(SSRowSet.class);
+    static final Logger logger = LogManager.getLogger();
 
 	/**
 	 * Wrapper/convenience method for SwingSet method naming consistency.

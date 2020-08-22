@@ -512,13 +512,12 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	            		setValue(Integer.parseInt(columnValue));
 	            	}
             	} catch (NumberFormatException _nfe) {
-            		System.out.println(getBoundColumnName() + " - " + "SSSlider.updateSSComponent() - cannot update slider to " + columnValue + ".\n");
-            		_nfe.printStackTrace();
+            		getLogger().error(getColumnForLog() + ": Number Format Exception. Cannot update slider to " + columnValue, _nfe);
             	}
                 break;
 
             default:
-            	System.out.println("Unable to update Slider bound to " + getBoundColumnName() + " because the data type is not supported (" + getBoundColumnType() + ".");
+            	getLogger().warn(getColumnForLog() + ": Unable to update Slider bound to " + getBoundColumnName() + " because the data type is not supported (" + getBoundColumnType() + ".");
                 break;
         }
 		

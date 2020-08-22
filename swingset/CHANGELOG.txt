@@ -20,8 +20,9 @@ Changes:
 	   components unselected (e.g., combobox) and write null back to RowSet
 	   bound column.
 	7. Added Log4J support.
-	8. Added OpenJDK JdbcRowSet classes (com.sun.rowset) to maintain support
-	   for connection pooling in Java 9+. 
+	8. Replaced dependencey on com.sun.rowset with com.nqadmin.rowset using
+	   new jdbcrowsetimpl Maven artifact. See:
+	   https://github.com/bpangburn/jdbcrowsetimpl
 
 ==============================================================================
 SwingSet 3.0.0 - Released 2020-01-10

@@ -200,7 +200,7 @@ public class SSCommon implements Serializable {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger;
+	//private static Logger logger;
 
 	/**
 	 * Constant to indicate that no RowSet column index has been specified.
@@ -296,9 +296,6 @@ public class SSCommon implements Serializable {
 	 */
 	public SSCommon(Object _ssComponent) {
 		setSSComponent(_ssComponent);
-
-		logger = LogManager.getLogger(_ssComponent.getClass());
-
 		init();
 
 	}
@@ -492,11 +489,13 @@ public class SSCommon implements Serializable {
 	}
 
 	/**
-	 * @return the componentLogger
+	 * Returns a Log4J2 logger object for logging
+	 * 
+	 * @return Log4J2 logger object
 	 */
-	public Logger getLogger() {
-		return logger;
-	}
+	private static Logger getLogger() {
+		return LogManager.getLogger();
+	};
 
 //	/**
 //	 * Returns the primary key column name for the RowSet query
