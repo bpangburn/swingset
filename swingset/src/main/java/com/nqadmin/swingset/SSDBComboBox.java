@@ -978,7 +978,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				// extract first column string
 				// getStringValue() takes care of formatting dates
 				firstColumnString = getStringValue(rs, this.displayColumnName).trim();
-				getLogger().debug(getColumnForLog() + ": First column to display - " + firstColumnString);
+				getLogger().trace(getColumnForLog() + ": First column to display - " + firstColumnString);
 
 				// extract second column string, if applicable
 				// getStringValue() takes care of formatting dates
@@ -988,7 +988,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 					if (secondColumnString.equals("")) {
 						secondColumnString = null;
 					}
-					getLogger().debug(getColumnForLog() + ": Second column to display - " + secondColumnString);
+					getLogger().trace(getColumnForLog() + ": Second column to display - " + secondColumnString);
 				}
 
 				// build eventList item
@@ -1332,17 +1332,27 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 // 2020-08-03: if user types "x" and it is not a choice we land here
 // on call to updateUI(), focus is lost and list items revert to 6 for "ss_db_combo_box" column in swingset_tests.sql
 // if "x" is typed a 2nd time, the popup does not become visible again and there are zero items in the list before and after the call
-// to setItem() and/or to updateUI()				
-				getLogger().trace(getColumnForLog() + ": Reverting to prior typed text.");
-				getEditor().setItem(priorEditorText);
-				// IMPORTANT: The particular order here of showPopup() and then updateUI() seems to restore the
-				// underlying GlazedList to all of the items. Reversing this order breaks things. Calling hidePopup() does not work.
-				showPopup();
-				updateUI(); // This refreshes the characters displayed. Display does not update without call to updateUI();
-							// updateUI() triggers focus lost
-				possibleMatches = getItemCount();
+// to setItem() and/or to updateUI()
 				
-				getLogger().trace(getColumnForLog() + ": Possible matches AFTER reverting text - " + possibleMatches);
+				
+// This could also be the result of the first call to execute() where nothing has been typed and the popup is not visible.
+// This will throw a 'java.awt.IllegalComponentStateException' exception when showPopup() is called.
+				//if (!this.isVisible()) {
+				if (currentEditorText.isEmpty()) {
+					getLogger().debug(getColumnForLog() + ": Method called with null, but nothing has been typed. This occurs during screen initialization.");
+					super.setSelectedItem(selectedItem);
+				} else {		
+					getLogger().trace(getColumnForLog() + ": Reverting to prior typed text.");
+					getEditor().setItem(priorEditorText);
+					// IMPORTANT: The particular order here of showPopup() and then updateUI() seems to restore the
+					// underlying GlazedList to all of the items. Reversing this order breaks things. Calling hidePopup() does not work.
+					showPopup();
+					updateUI(); // This refreshes the characters displayed. Display does not update without call to updateUI();
+								// updateUI() triggers focus lost
+					possibleMatches = getItemCount();
+					
+					getLogger().trace(getColumnForLog() + ": Possible matches AFTER reverting text - " + possibleMatches);
+				}
 			}
 
 		} else {
