@@ -51,9 +51,9 @@ import java.util.ArrayList;
 import javax.swing.JComboBox;
 
 import com.nqadmin.swingset.datasources.SSConnection;
-import com.nqadmin.swingset.formatting.helpers.SSListItem;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSListItem;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;

@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  ******************************************************************************/
 
-package com.nqadmin.swingset.formatting.helpers;
+package com.nqadmin.swingset.utils;
 
 /**
  * SSListItem.java
