@@ -614,7 +614,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
                     setText(decimalMask(str, this.numberOfDecimalPlaces));
                     break;
                 default:
-                	System.out.println("Unknown textbox mask type of " + this.mask);
+                	getLogger().warn(getColumnForLog() + ": Unknown textbox mask type of " + this.mask);
                 	break;
             } // end switch
             return true;

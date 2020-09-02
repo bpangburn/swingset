@@ -50,6 +50,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.datasources.SSRowSet;
 
@@ -59,7 +63,16 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * 
  * Used to link a JCheckBox to a boolean column in a database.
+ * 
+ * Other than some function key handling, which is likely outside the scope of
+ * SwingSet and should be customized at the application level, this class appears to 
+ * mostly duplicate SSCheckBox.
+ * 
+ * It does not extend SSFormattedText field like the other classes in this package.
+ * 
+ * @deprecated Starting in 4.0.0+ use {@link com.nqadmin.swingset.SSCheckBox} instead.
  */
+@Deprecated
 public class SSBooleanField extends JCheckBox implements RowSetListener, KeyListener {
 
 	/**
@@ -110,9 +123,9 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 				}
 				SSBooleanField.this.rowset.addRowSetListener(tf);
 			} catch (java.sql.SQLException se) {
-				System.out.println("SSBooleanField ---> SQLException -----------> " + se);
+				logger.error(getColumnForLog() + ": SQL Exception.", se);
 			} catch (java.lang.NullPointerException np) {
-				System.out.println("SSBooleanField ---> NullPointerException ---> " + np);
+				logger.error(getColumnForLog() + ": Null Pointer Exception.", np);
 			}
 			return true;
 		}
@@ -127,6 +140,11 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	protected SSRowSet rowset = null;
 
 	private SSDataNavigator navigator = null;
+	
+	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger();
 
 	/** Creates a new instance of SSBooleanField */
 	public SSBooleanField() {
@@ -147,6 +165,15 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 
 		this.setInputVerifier(new internalVerifier());
 	}
+	
+	/**
+	 * Returns the bound column name in square brackets.
+	 * 
+	 * @return the boundColumnName in square brackets
+	 */
+	public String getColumnForLog() {
+		return "[" + columnName + "]";
+	}
 
 	/**
 	 * Binds this component to the specified column in the given rowset.
@@ -160,8 +187,8 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 
 		try {
 			this.colType = this.rowset.getColumnType(this.columnName);
-		} catch (java.sql.SQLException sqe) {
-			System.out.println("bind error = " + sqe);
+		} catch (java.sql.SQLException se) {
+			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
 		this.rowset.addRowSetListener(this);
 		DbToFm();
@@ -221,8 +248,8 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 			default:
 				break;
 			}
-		} catch (java.sql.SQLException sqe) {
-			System.out.println("Error in DbToFm() = " + sqe);
+		} catch (java.sql.SQLException se) {
+			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
 	}
 
@@ -296,30 +323,30 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F5) {
-			System.out.println("F5 = PROCESS");
+			logger.debug(getColumnForLog() + ": F5 = PROCESS");
 			this.navigator.doCommitButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F6) {
-			System.out.println("F6 = DELETE");
+			logger.debug(getColumnForLog() + ": F6 = DELETE");
 			this.navigator.doDeleteButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F8) {
-			System.out.println("F8 ");
+			logger.debug(getColumnForLog() + ": F8");
 			this.navigator.doUndoButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_END) {
-			System.out.println("END ");
+			logger.debug(getColumnForLog() + ": END");
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_DELETE) {
-			System.out.println("DELETE ");
+			logger.debug(getColumnForLog() + ": DELETE");
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_HOME) {
-			System.out.println("HOME ");
+			logger.debug(getColumnForLog() + ": HOME");
 		}
 
 	}
