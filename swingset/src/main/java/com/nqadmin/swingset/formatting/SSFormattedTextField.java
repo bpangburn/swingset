@@ -804,8 +804,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				try {
 					tf.commitEdit();
 				} catch (java.text.ParseException pe) {
-					pe.printStackTrace();
-					System.out.println("inputVerifier --> ParseException  POSITION:" + pe.getErrorOffset());
+					getLogger().error(getColumnForLog() + ": Parse Exception at " + pe.getErrorOffset() + ".", pe);
 					tf.setValue(null);
 					setBackground(java.awt.Color.RED);
 					return false;

@@ -39,6 +39,9 @@ package com.nqadmin.swingset.formatting;
 
 import javax.swing.text.MaskFormatter;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * SSCuitFormatterFactory.java
  * 
@@ -57,6 +60,11 @@ public class SSCuitFormatterFactory extends javax.swing.text.DefaultFormatterFac
     private MaskFormatter displayFormatter;
     private MaskFormatter editFormatter;
     private MaskFormatter nullFormatter;
+    
+	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger();
     
     /**
      * Creates an default object of SSCuitFormatterFactory
@@ -84,6 +92,7 @@ public class SSCuitFormatterFactory extends javax.swing.text.DefaultFormatterFac
             this.setDisplayFormatter(this.displayFormatter);
         }
         catch (java.text.ParseException pe) {
+        	logger.warn("Parse Exception.", pe);
         	// do nothing
         }
     }

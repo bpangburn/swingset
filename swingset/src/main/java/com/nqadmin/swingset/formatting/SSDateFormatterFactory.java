@@ -41,6 +41,9 @@ import java.text.SimpleDateFormat;
 
 import javax.swing.text.DateFormatter;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * SSDateFormatterFactory.java
@@ -65,6 +68,11 @@ public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFac
 	 * Constant for date format
 	 */
 	public static final int DDMMYYYY = 1;
+	
+	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger();
 	
     /**
      * Constructs a default SSDateFormatterFactory. 
@@ -96,7 +104,7 @@ public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFac
             this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("MMM dd, yyyy")));
     		break;
     	default:
-        	System.out.println("Unknown date format type of " + format);
+    		logger.warn("Unknown date format type of " + format);
         	break;
     	}
     }

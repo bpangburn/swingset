@@ -61,17 +61,32 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
  * SSImageField.java
- *
+ * <p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
+ * <p>
+ * <pre>
  * Used to link a JPanel to an image column in a database.
+ * 
+ * Other than some function key handling, which is likely outside the scope of
+ * SwingSet and should be customized at the application level, this class appears to 
+ * mostly duplicate SSImage.
+ * 
+ * There were methods to resize an image to make a thumbnail (Rescale, Thumbnail), but 
+ * the data members that they manipulated did not appear to be exposed anywhere.
+ * 
+ * SSImageField does not extend SSFormattedText field like the other classes in this package.
+ * 
+ * @deprecated Starting in 4.0.0+ use {@link com.nqadmin.swingset.SSImage} instead.
  */
-// TODO Compare this with SSImage in parent package. Not based on SSFormattedTextField().
+@Deprecated
 public class SSImageField extends JPanel implements RowSetListener, KeyListener, ComponentListener {
 
 	private static final long serialVersionUID = 889303691158522232L;
@@ -85,6 +100,11 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	private int colType = -99;
 	protected SSRowSet rowset = null;
 	private SSDataNavigator navigator = null;
+	
+	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger();
 
 	/** Creates a new instance of SSImageField */
 	public SSImageField() {
@@ -165,12 +185,22 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 					// }catch(SQLException se){
 					// se.printStackTrace();
 				} catch (IOException ioe) {
-					ioe.printStackTrace();
+					logger.error(getColumnForLog() + ": IO Exception.", ioe);
 				}
 			}
 		});
 		add(this.getButton, BorderLayout.SOUTH);
 	}
+	
+	/**
+	 * Returns the bound column name in square brackets.
+	 * 
+	 * @return the boundColumnName in square brackets
+	 */
+	public String getColumnForLog() {
+		return "[" + columnName + "]";
+	}
+
 
 	/**
 	 * Creates a image icon from the specified image
@@ -361,7 +391,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 				break;
 			}
 		} catch (java.sql.SQLException sqe) {
-			System.out.println("SSImageField --> Error in DbToFm() = " + sqe);
+			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
 		}
 	}
 
@@ -390,7 +420,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 		try {
 			this.colType = this.rowset.getColumnType(this.columnName);
 		} catch (java.sql.SQLException sqe) {
-			System.out.println("bind error = " + sqe);
+			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
 		}
 		this.rowset.addRowSetListener(this);
 		DbToFm();
@@ -470,34 +500,34 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F4) {
-			System.out.println("F4 ");
+			logger.debug(getColumnForLog() + ": F4");
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F5) {
-			System.out.println("F5 = PROCESS");
+			logger.debug(getColumnForLog() + ": F5 = PROCESS");
 			this.navigator.doCommitButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F6) {
-			System.out.println("F6 = DELETE");
+			logger.debug(getColumnForLog() + ": F6 = DELETE");
 			this.navigator.doDeleteButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F8) {
-			System.out.println("F8 ");
+			logger.debug(getColumnForLog() + ": F8");
 			this.navigator.doUndoButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_END) {
-			System.out.println("END ");
+			logger.debug(getColumnForLog() + ": END");
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_DELETE) {
-			System.out.println("DELETE ");
+			logger.debug(getColumnForLog() + ": DELETE");
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_HOME) {
-			System.out.println("HOME ");
+			logger.debug(getColumnForLog() + ": HOME");
 		}
 
 	}

@@ -228,9 +228,9 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 			switch (this.colType) {
 
-			case java.sql.Types.VARCHAR:// -7
-			case java.sql.Types.LONGVARCHAR:// -7
-			case java.sql.Types.CHAR:// -7
+			case java.sql.Types.VARCHAR:
+			case java.sql.Types.LONGVARCHAR:
+			case java.sql.Types.CHAR:
 				this.setText(this.rowset.getString(this.columnName));
 				break;
 

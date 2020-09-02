@@ -53,17 +53,17 @@ import javax.swing.KeyStroke;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
  * SSBooleanField.java
- * 
+ * <p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
+ * <p>
+ * <pre>
  * Used to link a JCheckBox to a boolean column in a database.
- * 
+ *
  * Other than some function key handling, which is likely outside the scope of
  * SwingSet and should be customized at the application level, this class appears to 
  * mostly duplicate SSCheckBox.

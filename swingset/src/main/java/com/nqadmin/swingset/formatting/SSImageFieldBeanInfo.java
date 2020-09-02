@@ -46,11 +46,16 @@ import java.beans.SimpleBeanInfo;
 
 /**
  * SSImageFieldBeanInfo.java
- * 
+ * <p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+ * <p>
+ * <pre>
+ * Contains and controls various bean properties for SSImageField.
  * 
- * Contains and controls various bean properties for SSImageField
+ * SSImageField is deprecated starting in SwingSet 4.0.0 so this class
+ * is being deprecated as well.
  */
+@Deprecated
 public class SSImageFieldBeanInfo extends SimpleBeanInfo {
     
     // Bean descriptor//GEN-FIRST:BeanDescriptor
