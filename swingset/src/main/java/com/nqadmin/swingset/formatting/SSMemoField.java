@@ -53,17 +53,32 @@ import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
  * SSMemoField.java
- *
+ * <p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
+ * <p>
+ * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+ * <p>
  * Used to link a JTextArea to a text (generally multi-line) column in a
  * database.
+ * <p>
+ * Other than some function key handling, which is likely outside the scope of
+ * SwingSet and should be customized at the application level, this class appears to 
+ * mostly duplicate SSTextArea. It may be desirable to add an InputVerifier to 
+ * SSTextArea.
+ * <p>
+ * It does not extend SSFormattedText field like the other classes in this package.
+ * <p>
+ * @deprecated Starting in 4.0.0+ use {@link com.nqadmin.swingset.SSTextArea} instead.
  */
+@Deprecated
 public class SSMemoField extends JTextArea implements RowSetListener, KeyListener, FocusListener {
 
 	/**
@@ -75,6 +90,11 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	protected int colType = -99;
 	protected SSRowSet rowset = null;
 	private SSDataNavigator navigator = null;
+	
+	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger();
 
 	/**
 	 * Creates a new instance of SSBooleanField
@@ -99,6 +119,15 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		addKeyListener(this);
 		addFocusListener(this);
 		this.setInputVerifier(new internalVerifier());
+	}
+	
+	/**
+	 * Returns the bound column name in square brackets.
+	 * 
+	 * @return the boundColumnName in square brackets
+	 */
+	public String getColumnForLog() {
+		return "[" + columnName + "]";
 	}
 
 	/**
@@ -238,7 +267,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 				break;
 			}
 		} catch (java.sql.SQLException sqe) {
-			System.out.println("Error in DbToFm() = " + sqe);
+			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
 			this.setText("");
 		}
 	}
@@ -265,7 +294,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		try {
 			this.colType = this.rowset.getColumnType(this.columnName);
 		} catch (java.sql.SQLException sqe) {
-			System.out.println("bind error = " + sqe);
+			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
 		}
 		this.rowset.addRowSetListener(this);
 		DbToFm();
@@ -336,7 +365,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F3) {
-			System.out.println("F3 ");
+			logger.debug(getColumnForLog() + ": F3");
 			// calculator = new javax.swing.JPopupMenu();
 			// calculator.add(new com.nqadmin.swingset.formatting.utils.JCalculator());
 			// JFormattedTextField ob = (JFormattedTextField)(_event.getSource());
@@ -347,40 +376,40 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F4) {
-			System.out.println("F4 ");
+			logger.debug(getColumnForLog() + ": F4");
 			// ((Component)e.getSource()).transferFocus();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F5) {
-			System.out.println("F5 = PROCESS");
+			logger.debug(getColumnForLog() + ": F5 = PROCESS");
 			if (this.navigator.updatePresentRow() == true) {
-				System.out.println("Update Sucessfully");
+				logger.info(getColumnForLog() + ": Update successful.");
 			}
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F6) {
-			System.out.println("F6 = DELETE");
+			logger.debug(getColumnForLog() + ": F6 = DELETE");
 			this.navigator.doDeleteButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F8) {
-			System.out.println("F8 ");
+			logger.debug(getColumnForLog() + ": F8");
 			// ((Component)e.getSource()).transferFocus();
 			this.navigator.doUndoButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_END) {
-			System.out.println("END ");
+			logger.debug(getColumnForLog() + ": END");
 			// ((Component)e.getSource()).transferFocus();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_DELETE) {
-			System.out.println("DELETE ");
+			logger.debug(getColumnForLog() + ": DELETE");
 			// ((Component)e.getSource()).transferFocus();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_HOME) {
-			System.out.println("HOME ");
+			logger.debug(getColumnForLog() + ": HOME");
 			// ((Component)e.getSource()).transferFocus();
 		}
 
@@ -470,10 +499,10 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 					}
 					SSMemoField.this.rowset.addRowSetListener(tf);
 				} catch (java.sql.SQLException se) {
-					System.out.println("SSMemoField ---> SQLException -----------> " + se);
+					logger.error(getColumnForLog() + ": SQL Exception.", se);
 					tf.setText("");
 				} catch (java.lang.NullPointerException np) {
-					System.out.println("SSMemoField ---> NullPointerException ---> " + np);
+					logger.error(getColumnForLog() + ": Null Pointer Exception.", np);
 					tf.setText("");
 				}
 				return true;

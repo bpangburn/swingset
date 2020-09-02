@@ -81,12 +81,11 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * <p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * <p>
- * <pre>
  * SSDataGrid provides a way to display information from a database in a table
  * format (aka "spreadsheet" or "datasheet" view). The SSDataGrid takes a
  * SSRowSet as a source of data. It also provides different cell renderers
  * including a comboboxes renderer and a date renderer.
- * 
+ * <p>
  * SSDataGrid internally uses the SSTableModel to display the information in a
  * table format. SSDataGrid also provides an easy means for displaying headers.
  * Columns can be hidden or made uneditable. In addition, it provides much finer
@@ -94,64 +93,65 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * uses the SSCellEditing interface for achieving this. The implementation of
  * this interface also provides a way to specify what kind of information is
  * valid for each cell.
- *
+ * <p>
  * SSDataGrid uses the isCellEditable() method in SSCellEditing to determine if
  * a cell is editable or not. The cellUpdateRequested() method of SSCellEditing
  * is used to notify a user program when an update is requested. While doing so
  * it provides the present value in the cell and also the new value. Based on
  * this information the new value can be rejected or accepted by the program.
- *
+ * <p>
  * SSDataGrid also provides an "extra" row to facilitate the addition of rows to
  * the table. Default values for various columns can be set programmatically. A
  * programmer can also specify which column is the primary key column for the
  * underlying SSRowSet and supply a primary key for that column when a new row
  * is being added.
- *
+ * <p>
  * While using the headers always set them before you set the SSRowSet.
  * Otherwise the headers will not appear.
- *
+ * <p>
  * Also if you are using column names rather than column numbers for different
  * function you have to call them only after setting the SSRowSet. Because
  * SSDataGrid uses the SSRowSet to convert the column names to column numbers.
  * If you specify the column numbers you can do before or after setting the
  * SSRowSet, it does not matter.
- *
+ * <p>
  * You can simply remember this order 1.Set the headers 2.Set the SSRowSet 3.Any
  * other function calls.
- *
+ * <pre>
  * Simple Example:
  *
  *{@code
  * // SET THE HEADER BEFORE SETTING THE SSROWSET
- * dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
- * dataGrid.setSSRowSet(ssRowSet);
+ * 	dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
+ * 	dataGrid.setSSRowSet(ssRowSet);
  * 
  * // HIDE THE PART ID COLUMN
  * // THIS SETS THE WIDTH OF THE COLUMN TO 0
- * dataGrid.setHiddenColumns(new String[]{"part_id"}); dataGrid.setHiddenColumns(new String[]{"part_id"});
+ * 	dataGrid.setHiddenColumns(new String[]{"part_id"});
  *
- * dataGrid.setMessageWindow(this);
- * dataGrid.setUneditableColumns(new String[]{"part_id"});
+ * 	dataGrid.setMessageWindow(this);
+ * 	dataGrid.setUneditableColumns(new String[]{"part_id"});
  *
- * dataGrid.setComboRenderer("color_code",new String[]{"Red","Green","Blue"}, new Integer[]{new Integer(0),new Integer(1),new Integer(2)});
- * dataGrid.setDefaultValues(new int[]{1,2,3},new Object[]{new Integer(0), new Integer(20),new String("New Orleans")});
+ * 	dataGrid.setComboRenderer("color_code",new String[]{"Red","Green","Blue"}, new Integer[]{new Integer(0),new Integer(1),new Integer(2)});
+ * 	dataGrid.setDefaultValues(new int[]{1,2,3},new Object[]{new Integer(0), new Integer(20),new String("New Orleans")});
  *
- * dataGrid.setPrimaryColumn("part_id");
- * dataGrid.setSSDataValue(new SSDataValue(){ public Object getPrimaryColumnValue() {
- * // YOUR PRIMARY KEY VALUE GENERATION GOES HERE
- * // IF IT'S SOME THING USER ENTERS THEN NO PROBLEM
- * // IF IT'S AN AUTO INCREMENT FIELD THEN IT DEPENDS ON
- * // THE DATABASE DRIVER YOU ARE USING.
- * // IF THE UPDATEROW CAN RETRIEVE THE VALUES FOR THE ROW WITHOUT KNOWING THE PRIMARY KEY VALUE ITS FINE
- * // BUT POSTGRES CAN'T UPDATE ROW WITHOUT THE PRIMARY / COLUMN.
+ * 	dataGrid.setPrimaryColumn("part_id");
+ * 	dataGrid.setSSDataValue(new SSDataValue(){ public Object getPrimaryColumnValue() {
+ * 		// YOUR PRIMARY KEY VALUE GENERATION GOES HERE
+ * 		// IF IT'S SOME THING USER ENTERS THEN NO PROBLEM
+ * 		// IF IT'S AN AUTO INCREMENT FIELD THEN IT DEPENDS ON
+ * 		// THE DATABASE DRIVER YOU ARE USING.
+ * 		// IF THE UPDATEROW CAN RETRIEVE THE VALUES FOR THE ROW WITHOUT KNOWING THE PRIMARY KEY VALUE ITS FINE
+ * 		// BUT POSTGRES CAN'T UPDATE ROW WITHOUT THE PRIMARY / COLUMN.
  *
- * // YOUR PRIMARY KEY VALUE GENERATION GOES HERE. ........ ........ ........ 
+ * 		// YOUR PRIMARY KEY VALUE GENERATION GOES HERE. ........ ........ ........ 
+ * 
+ * 		}
+ * 	});
  * }
- * });
- * }
- * <p>
+ * 
  * Also See Examples 5, 6, 7 in the samples.
- *  </pre>
+ * </pre>
  */
 
 public class SSDataGrid extends JTable {

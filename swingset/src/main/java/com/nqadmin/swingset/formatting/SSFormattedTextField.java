@@ -779,6 +779,8 @@ public class SSFormattedTextField extends JFormattedTextField
 	 */
 
 	class internalVerifier extends InputVerifier {
+		
+// TODO Rewrite this based on sample code from https://docs.oracle.com/javase/8/docs/api/javax/swing/JFormattedTextField.html		
 
 		@Override
 		public boolean verify(JComponent input) {

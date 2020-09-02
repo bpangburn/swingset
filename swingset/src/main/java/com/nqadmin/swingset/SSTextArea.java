@@ -51,6 +51,8 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * SSTextArea extends the JTextArea to add SSRowSet binding.
  */
 public class SSTextArea extends JTextArea implements SSComponentInterface {
+	
+	// TODO Consider adding an InputVerifier to prevent component from losing focus. See SSFormattedTextField. May be able to add to SSDocumentListener in SSCommon.
 
     /**
 	 * unique serial id
@@ -124,7 +126,9 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	
     @Override
 	public void customInit() {
-		// NOTHING TO DO
+    	// Adding some logic from SSMemoField (deprecated), which seems generally helpful.
+		setLineWrap(true);
+		setWrapStyleWord(true);
 	}
     
 	/**

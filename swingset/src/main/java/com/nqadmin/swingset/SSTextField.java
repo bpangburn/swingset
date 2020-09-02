@@ -60,6 +60,9 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * like date mask, SSN mask etc.
  */
 public class SSTextField extends JTextField implements SSComponentInterface {
+	
+	// TODO Consider adding an InputVerifier to prevent component from losing focus. See SSFormattedTextField. May be able to add to SSDocumentListener in SSCommon.
+	// TODO Convert masks to SSFormattedTextFields
 
     /**
      * Use this mask if mm/dd/yyyy format is required.

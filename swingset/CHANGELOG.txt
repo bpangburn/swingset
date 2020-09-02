@@ -26,8 +26,9 @@ Changes:
 	9. Moved SSListItem to com.nqadmin.swingset.utils.
 	10.Deleted com.nqadmin.swingset.formatting.helpers package which just
 	   contained classes no longer used for SSDBComboBox filtering.
-	11.Deprecated SSBooleanField, SSImageField, & SSStringField in formatting
-	   package.
+	11.Deprecated SSBooleanField, SSImageField, SSMemoField, & SSStringField
+	   in formatting package.
+	12.Added line wrapping to SSTextArea.
 
 ==============================================================================
 SwingSet 3.0.0 - Released 2020-01-10

@@ -61,15 +61,14 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * <p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * <p>
- * <pre>
  * Used to link a JCheckBox to a boolean column in a database.
- *
+ * <p>
  * Other than some function key handling, which is likely outside the scope of
  * SwingSet and should be customized at the application level, this class appears to 
  * mostly duplicate SSCheckBox.
- * 
+ * <p>
  * It does not extend SSFormattedText field like the other classes in this package.
- * 
+ * <p>
  * @deprecated Starting in 4.0.0+ use {@link com.nqadmin.swingset.SSCheckBox} instead.
  */
 @Deprecated

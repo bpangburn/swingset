@@ -42,14 +42,12 @@ package com.nqadmin.swingset.formatting;
  * <p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * <p>
- * <pre>
  * Used to link a SSStringField to a string column in a database.
- * 
+ * <p>
  * This class doesn't really do anything other than extend 
  * SSFormattedTextField so deprecating.
- * 
+ * <p>
  * @deprecated Starting in 4.0.0+ use {@link SSFormattedTextField} instead.
- * 
  */
 @Deprecated
 public class SSStringField extends SSFormattedTextField {

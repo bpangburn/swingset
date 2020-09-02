@@ -72,18 +72,17 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * <p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * <p>
- * <pre>
  * Used to link a JPanel to an image column in a database.
- * 
+ * <p>
  * Other than some function key handling, which is likely outside the scope of
  * SwingSet and should be customized at the application level, this class appears to 
  * mostly duplicate SSImage.
- * 
+ * <p>
  * There were methods to resize an image to make a thumbnail (Rescale, Thumbnail), but 
  * the data members that they manipulated did not appear to be exposed anywhere.
- * 
+ * <p>
  * SSImageField does not extend SSFormattedText field like the other classes in this package.
- * 
+ * <p>
  * @deprecated Starting in 4.0.0+ use {@link com.nqadmin.swingset.SSImage} instead.
  */
 @Deprecated

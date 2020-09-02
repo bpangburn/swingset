@@ -49,9 +49,8 @@ import java.beans.SimpleBeanInfo;
  * <p>
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * <p>
- * <pre>
  * Contains and controls various bean properties for SSImageField.
- * 
+ * <p>
  * SSImageField is deprecated starting in SwingSet 4.0.0 so this class
  * is being deprecated as well.
  */
