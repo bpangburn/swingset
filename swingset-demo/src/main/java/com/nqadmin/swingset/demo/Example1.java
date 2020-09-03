@@ -58,9 +58,11 @@ import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 
 /**
- * This example demonstrates the use of SSTextDocument to display information in
- * SSTextField (name, city, status, & supplier id). The navigation is done with
- * SSDataNavigator.
+ * This example displays data from the supplier_data table. 
+ * SSTextFields are used to display supplier id, name, city,
+ * and status.
+ * <p>
+ * Record navigation is handled with a SSDataNavigator.
  */
 
 public class Example1 extends JFrame {
@@ -100,8 +102,8 @@ public class Example1 extends JFrame {
 
 	/**
 	 * Constructor for Example1
-	 * 
-	 * @param url - path to SQL to create suppliers & parts database
+	 * <p>
+	 * @param _dbConn - database connection
 	 */
 	public Example1(Connection _dbConn) {
 		
@@ -251,17 +253,3 @@ public class Example1 extends JFrame {
 	}
 
 }
-
-/*
- * $Log$ Revision 1.10 2012/06/07 16:12:40 beevo Modified example for
- * compatibility with H2 database.
- *
- * Revision 1.7 2005/02/04 22:40:12 yoda2 Updated Copyright info.
- *
- * Revision 1.6 2004/11/11 15:04:38 yoda2 Using TextPad, converted all tabs to
- * "soft" tabs comprised of four actual spaces.
- *
- * Revision 1.5 2004/10/25 22:01:16 yoda2 Updated JavaDoc for new datasource
- * abstraction layer in 0.9.0 release.
- *
- */

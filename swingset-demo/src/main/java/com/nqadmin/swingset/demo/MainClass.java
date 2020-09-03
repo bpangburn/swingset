@@ -57,7 +57,7 @@ import org.apache.logging.log4j.Logger;
 import org.h2.tools.RunScript;
 
 /**
- * A JFrame with buttons for each of the SwingSet example screens.
+ * A JFrame with buttons to launch each of the SwingSet example/demo screens.
  */
 public class MainClass extends JFrame {
 	
@@ -140,8 +140,6 @@ public class MainClass extends JFrame {
     
     /**
      * Constructor for MainClass
-     * 
-     * @param _url - path to SQL to create suppliers & parts database
      */
     public MainClass(){
     	
@@ -195,7 +193,7 @@ public class MainClass extends JFrame {
 	        getContentPane().add(this.btnExample6);
 	        getContentPane().add(this.btnExample7);
 	        getContentPane().add(this.btnTestBase);
-	        getContentPane().add(this.btnTestGrid);
+	        //getContentPane().add(this.btnTestGrid);
 	        getContentPane().add(this.btnTestFormatted);
 
         // DISPLAY SCREEN
@@ -314,18 +312,17 @@ public class MainClass extends JFrame {
             }
             else if(ae.getSource().equals(MainClass.this.btnTestFormatted)){
             	// TODO
-            	//new TestFormattedComponents(dbConnection);
+            	new TestFormattedComponents(dbConnection);
             }
         }
     }
 
     /**
-     * main method for SwingSet samples/demo
-     * @param url 
+     * Main method for SwingSet samples/demo
+     * <p>
+     * @param _args - optional command line arguments, which are ignored by this program
      */
-	public static void main(String[] _url){
-//        new MainClass();
-
+	public static void main(String[] _args){
 
 		// create application screen
 			SwingUtilities.invokeLater(new Runnable() {

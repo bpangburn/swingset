@@ -136,64 +136,98 @@ CLASS DESCRIPTIONS
 ==============================================================================
 
 ***********************
+MainClass
+***********************
+A JFrame with buttons to launch each of the SwingSet example/demo screens.
+
+
+***********************
 Example1
 ***********************
-This example demonstrates the use of SSTextDocument to display information in
-JTextField (Name, City, and Status). The navigation is done with
-SSDataNavigator.
+This example displays data from the supplier_data table. SSTextFields are
+used to display supplier id, name, city, and status.
+
+Record navigation is handled with a SSDataNavigator.
 
 
 ***********************
 Example2
 ***********************
-This example demonstrates the use of SSTextDocument to display information in
-JTextField (Name and City) and SSComboBox (Status). The navigation is done with
-SSDataNavigator.
+This example displays data from the supplier_data table. SSTextFields are
+used to display supplier id, name, and city. SSComboBox is used to display
+status.
+
+Record navigation is handled with a SSDataNavigator.
 
 
 ***********************
 Example3
 ***********************
-This example demonstrates the use of SSTextDocument to display information in
-SSDBComboBox (Supplier and Part) and JTextField (Quantity). The navigation
-is done with SSDataNavigator.
+This example displays data from the supplier_part_data table. SSTextFields
+are used to display supplier-part id and quantity. SSDBComboBoxes are used
+to display supplier name and part name based on queries against the
+supplier_data and part_data tables.
+
+Record navigation is handled with a SSDataNavigator.
 
 
 ***********************
 Example4
 ***********************
-This example demonstrates the use of SSDBComboBox for record navigation.
-Navigation can be accomplished using either the Part combo box or the
-navigation bar. Since the part name is used for navigation it can't be
-updated (note that none of the fields in these examples can actually be
-updated since the demo database is read only).
+This example displays data from the part_data table. SSTextFields are used
+to display part id, name, weight, and city. SSComboBox is used to display
+color.
 
-Because the navigation can take place by multiple methods, the navigation
-controls have to be synchronized.  This is done using a "helper" class
-called SSSyncManager.
+Record navigation can be handled with a SSDataNavigator or with a
+SSDBComboBox.
 
-This example also demonstrates the use of SSTextDocument to display
-information in SSComboBox (Color) and JTextField (Weight and City).
+Since the navigation can take place by multiple methods, the navigation
+controls have to be synchronized. This is accomplished with the
+SSSyncManager.
 
 
 ***********************
 Example5
 ***********************
-This example demonstrates the use of SSDataGrid to display information
-in a table format. If the database were editable, users could also delete rows
-by selecting the row to be deleted and pressing Ctrl-X. By default, a
-confirmation message is displayed before deletion.
+This example demonstrates the use of an SSDataGrid to display a tabular view
+of the part_data table.
+
+For an editable table, users can delete rows by selecting the row to be deleted
+and pressing Ctrl-X. By default, a confirmation message is displayed before
+deletion.
 
 
 ***********************
 Example6
 ***********************
-This example demonstrates the use of SSDataGrid with a combo box renderer.
+This example is similar to Example5, demonstrating the use of an SSDataGrid
+to display a tabular view of the part_data table. It adds a
+ComboRenderer for the color column.
 
 
 ***********************
 Example7
 ***********************
-This example demonstrates the use of SSDataGrid with two combo box renderers
-and a date renderer. The mappings for the combo boxes are retrieved from another
-table.
+This example demonstrates the use of an SSDataGrid to display a tabular view
+of the supplier_part_data table.
+
+It adds a ComboRenderer with a lookup to the supplier_data table for the
+supplier name, and adds a DateRenderer for the ship date column.
+
+
+***********************
+TestBaseComponents
+***********************
+This example demonstrates all of the Base SwingSet Components except for
+the SSDataGrid.
+
+There is a separate example screen to demonstrate the Formatted SwingSet
+Components.
+
+***********************
+TestFormattedComponents
+***********************
+This example demonstrates all of the Formatted SwingSet Components.
+
+There is a separate example screen to demonstrate the Base SwingSet
+Components.

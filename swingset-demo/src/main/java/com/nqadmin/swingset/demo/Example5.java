@@ -52,7 +52,10 @@ import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view
- * of the suppliers & parts data.
+ * of the part_data table.
+ * <p>
+ * For an editable table, users can delete rows by selecting the row to be deleted
+ * and pressing Ctrl-X. By default, a confirmation message is displayed before deletion.
  */
 public class Example5 extends JFrame {
 
@@ -76,8 +79,8 @@ public class Example5 extends JFrame {
 
 	/**
 	 * Constructor for Example5
-	 * 
-	 * @param _url - path to SQL to create suppliers & parts database
+	 * <p>
+	 * @param _dbConn - database connection
 	 */
 	public Example5(Connection _dbConn) {
 		
@@ -129,27 +132,3 @@ public class Example5 extends JFrame {
 	}
 
 }
-
-/*
- * $Log$ Revision 1.8 2012/06/07 15:54:38 beevo Modified example for
- * compatibilty with H2 database.
- *
- * Revision 1.7 2005/02/22 15:17:31 yoda2 Removed call to setPreferredSize().
- *
- * Revision 1.6 2005/02/14 18:50:25 prasanth Updated to remove calls to
- * deprecated methods.
- *
- * Revision 1.5 2005/02/04 22:40:12 yoda2 Updated Copyright info.
- *
- * Revision 1.4 2004/11/11 15:04:38 yoda2 Using TextPad, converted all tabs to
- * "soft" tabs comprised of four actual spaces.
- *
- * Revision 1.3 2004/10/25 22:01:16 yoda2 Updated JavaDoc for new datasource
- * abstraction layer in 0.9.0 release.
- *
- * Revision 1.2 2004/10/25 19:52:12 prasanth Modified to work with new SwingSet
- * (SSConnection & SSRowSet)
- *
- * Revision 1.1 2003/12/18 20:14:43 prasanth Initial commit.
- *
- */

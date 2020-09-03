@@ -59,9 +59,12 @@ import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 
 /**
- * This example demonstrates the use of SSTextDocument to display information in
- * SSDBComboBox (supplier and part) and SSTextField (quantity). The navigation
- * is done with SSDataNavigator.
+ * This example displays data from the supplier_part_data table. 
+ * SSTextFields are used to display supplier-part id and quantity.  
+ * SSDBComboBoxes are used to display supplier name and part name
+ * based on queries against the supplier_data and part_data tables.
+ * <p>
+ * Record navigation is handled with a SSDataNavigator.
  */
 public class Example3 extends JFrame {
 
@@ -100,8 +103,8 @@ public class Example3 extends JFrame {
 
 	/**
 	 * Constructor for Example3
-	 * 
-	 * @param url - path to SQL to create suppliers & parts database
+	 * <p>
+	 * @param _dbConn - database connection
 	 */
 	public Example3(Connection _dbConn) {
 		
@@ -268,22 +271,3 @@ public class Example3 extends JFrame {
 	}
 
 }
-
-/*
- * $Log$ Revision 1.10 2012/06/07 15:54:38 beevo Modified example for
- * compatibility with H2 database.
- *
- * Revision 1.9 2005/02/14 18:50:25 prasanth Updated to remove calls to
- * deprecated methods.
- *
- * Revision 1.8 2005/02/04 22:40:12 yoda2 Updated Copyright info.
- *
- * Revision 1.7 2004/11/11 15:04:38 yoda2 Using TextPad, converted all tabs to
- * "soft" tabs comprised of four actual spaces.
- *
- * Revision 1.6 2004/11/01 19:18:51 yoda2 Fixed 0.9.X compatibility issues.
- *
- * Revision 1.5 2004/10/25 22:01:16 yoda2 Updated JavaDoc for new datasource
- * abstraction layer in 0.9.0 release.
- *
- */
