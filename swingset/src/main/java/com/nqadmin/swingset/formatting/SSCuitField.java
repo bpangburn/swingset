@@ -71,6 +71,8 @@ public class SSCuitField extends SSFormattedTextField {
     public SSCuitField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         
+        // 2020-09-04: Cursor and caret manipulation not present in other formatters so disabling.
+        /*
         this.cuitCaret = new DefaultCaret();
         this.cuitCaret.setBlinkRate(600);
         
@@ -83,6 +85,7 @@ public class SSCuitField extends SSFormattedTextField {
         
 
         this.setCaret(this.cuitCaret);
+        */
         
     }
 
