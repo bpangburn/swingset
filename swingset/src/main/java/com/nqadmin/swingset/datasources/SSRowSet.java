@@ -40,6 +40,7 @@ package com.nqadmin.swingset.datasources;
 import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Calendar;
@@ -63,6 +64,8 @@ import com.nqadmin.swingset.utils.SSCommon;
  * code where SSRowSet was referenced as a type.
  */
 public interface SSRowSet extends RowSet {
+	
+	// TODO Audit type handling based on http://www.java2s.com/Code/Java/Database-SQL-JDBC/StandardSQLDataTypeswithTheirJavaEquivalents.htm
 	
 	/**
 	 * Log4j2 Logger - can't be private in an interface
@@ -151,9 +154,10 @@ public interface SSRowSet extends RowSet {
 
 			case Types.DOUBLE:
 			case Types.NUMERIC:
+			case Types.DECIMAL:
 				value = String.valueOf(this.getDouble(_columnName));
 				break;
-
+				
 			case Types.BOOLEAN:
 			case Types.BIT:
 				value = String.valueOf(this.getBoolean(_columnName));
@@ -179,6 +183,15 @@ public interface SSRowSet extends RowSet {
 					value = value + calendar.get(Calendar.DAY_OF_MONTH) + "/";
 					value = value + calendar.get(Calendar.YEAR);
 					// value = String.valueOf(sSRowSet.getDate(columnName));
+				}
+				break;
+				
+			case Types.TIME:
+				Time time = this.getTime(_columnName);
+				if (time == null) {
+					value = "";
+				} else {
+					value=time.toString();
 				}
 				break;
 
@@ -313,6 +326,7 @@ public interface SSRowSet extends RowSet {
 
 			case Types.DOUBLE:
 			case Types.NUMERIC:
+			case Types.DECIMAL:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
 				if (_updatedValue==null || _updatedValue.equals("")) {
 					this.updateNull(_columnName);
@@ -320,7 +334,7 @@ public interface SSRowSet extends RowSet {
 					double doubleValue = Double.parseDouble(_updatedValue);
 					this.updateDouble(_columnName, doubleValue);
 				}
-				break;
+				break;		
 
 			case Types.BOOLEAN:
 			case Types.BIT:
@@ -337,22 +351,35 @@ public interface SSRowSet extends RowSet {
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
 				if (_updatedValue==null || _updatedValue.equals("")) {
 					this.updateNull(_columnName);
+// TODO Good to get rid of getSQLDate if possible.						
 				} else if (_updatedValue.length() == 10) {
 					this.updateDate(_columnName, SSCommon.getSQLDate(_updatedValue));
 				} else {
 					// do nothing
 				}
 				break;
+				
+			case Types.TIME:
+				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
+				if (_updatedValue==null || _updatedValue.equals("")) {
+					this.updateNull(_columnName);
+				} else {
+					this.updateTime(_columnName, java.sql.Time.valueOf(_updatedValue));
+				}
+				break;
+				
 			case Types.TIMESTAMP:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
 				if (_updatedValue==null || _updatedValue.equals("")) {
 					this.updateNull(_columnName);
+// TODO Probably do not want a length of 10 characters here. Good to get rid of getSQLDate if possible.					
 				} else if (_updatedValue.length() == 10) {
 					this.updateTimestamp(_columnName, new Timestamp(SSCommon.getSQLDate(_updatedValue).getTime()));
 				} else {
 					// do nothing
 				}
 				break;
+				
 			case Types.CHAR:
 			case Types.VARCHAR:
 			case Types.LONGVARCHAR:
