@@ -87,7 +87,7 @@ public class TestFormattedComponents extends JFrame {
 	/**
 	 * screen label declarations
 	 */
-	JLabel lblSwingSetFormattedTestPK = new JLabel("SwingSet Formatted Test PK");
+	JLabel lblSwingSetFormattedTestPK = new JLabel("Record ID");
 	
 	JLabel lblSSDBComboNav = new JLabel("SSDBComboNav"); // SSDBComboBox used just for navigation
 
@@ -408,6 +408,7 @@ public class TestFormattedComponents extends JFrame {
 				constraints.gridy++;
 				contentPane.add(fmtSSTimeField, constraints);
 				constraints.gridy++;
+				contentPane.add(fmtSSTimestampField, constraints);
 				
 				constraints.gridx = 0;
 				constraints.gridy++;

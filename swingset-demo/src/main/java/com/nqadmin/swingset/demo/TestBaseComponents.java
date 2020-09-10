@@ -86,7 +86,7 @@ public class TestBaseComponents extends JFrame {
 	/**
 	 * screen label declarations
 	 */
-	JLabel lblSwingSetBaseTestPK = new JLabel("SwingSet Base Test PK");
+	JLabel lblSwingSetBaseTestPK = new JLabel("Record ID");
 	
 	JLabel lblSSDBComboNav = new JLabel("SSDBComboNav"); // SSDBComboBox used just for navigation
 
