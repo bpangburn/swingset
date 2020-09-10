@@ -145,6 +145,13 @@ public interface SSComponentInterface {
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK));
 		((JComponent) this).setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
+		
+		// ADDING BACKWARD TRAVERSAL KEYS FROM SSFORMATTEDTEXTFIELD
+		Set<AWTKeyStroke> backwardKeys = ((JComponent) this)
+				.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
+		Set<AWTKeyStroke> newBackwardKeys = new HashSet<>(backwardKeys);
+		newBackwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_UP, java.awt.event.InputEvent.SHIFT_MASK));
+		((JComponent) this).setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, newBackwardKeys);
 	}
 
 	/**
@@ -329,7 +336,7 @@ public interface SSComponentInterface {
 	 * If the component is JTextComponent then the implementation can simply call
 	 * removeSSDocumentListener()
 	 */
-	void removeSSComponentListener();;
+	void removeSSComponentListener();
 
 	/**
 	 * Removes listener for Document if SwingSet component is a JTextComponent.
