@@ -40,6 +40,7 @@ package com.nqadmin.swingset.utils;
 import java.awt.AWTKeyStroke;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
+import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
@@ -215,6 +216,17 @@ public interface SSComponentInterface {
 	 */
 	default int getBoundColumnType() {
 		return getSSCommon().getBoundColumnType();
+	}
+	
+	/**
+	 * Returns the JDBCType enum representing the bound database column data type.
+	 * 
+	 * Based on java.sql.JDBCType
+	 * 
+	 * @return the enum value corresponding to the data type of the bound column
+	 */
+	default JDBCType getBoundColumnJDBCType() {
+		return getSSCommon().getBoundColumnJDBCType();
 	}
 
 	/**

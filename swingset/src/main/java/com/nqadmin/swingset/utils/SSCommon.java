@@ -39,6 +39,7 @@ package com.nqadmin.swingset.utils;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.StringTokenizer;
 
@@ -209,7 +210,15 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Constant to indicate that no RowSet column type has been specified.
+	 * 
+	 * 
+	 * Per https://www.tutorialspoint.com/java-resultsetmetadata-getcolumntype-method-with-example
+	 * value can be positive or negative so it's dangerous to presume -1 can represent that
+	 * no column type has been specified.
+	 * 
+	 * There is a java.sql.Type of of NULL
 	 */
+	@Deprecated
 	public static final int NO_COLUMN_TYPE = -1;
 
 	/**
@@ -250,7 +259,12 @@ public class SSCommon implements Serializable {
 	/**
 	 * Column SQL data type.
 	 */
-	private int boundColumnType = NO_COLUMN_TYPE;
+	private int boundColumnType = java.sql.Types.NULL;
+	
+	/**
+	 * Column JDBCType enum.
+	 */
+	private JDBCType boundColumnJDBCType = java.sql.JDBCType.NULL;
 
 //	/**
 //	 * SSRowSet column containing the primary key.
@@ -478,6 +492,17 @@ public class SSCommon implements Serializable {
 	public int getBoundColumnType() {
 		return boundColumnType;
 	}
+	
+	/**
+	 * Returns the JDBCType enum representing the bound database column data type.
+	 * 
+	 * Based on java.sql.JDBCType
+	 * 
+	 * @return the enum value corresponding to the data type of the bound column
+	 */
+	public JDBCType getBoundColumnJDBCType() {
+		return boundColumnJDBCType;
+	}
 
 	/**
 	 * Returns the bound column name in square brackets.
@@ -631,13 +656,14 @@ public class SSCommon implements Serializable {
 		try {
 			// IF COLUMN INDEX IS VALID, GET COLUMN NAME, OTHERWISE SET TO NULL
 // TODO update SSRowSet to return constant or throw Exception if invalid/out of bounds	        	
-			if (this.boundColumnIndex != NO_COLUMN_INDEX) {
-				this.boundColumnName = getSSRowSet().getColumnName(this.getBoundColumnIndex());
-				this.boundColumnType = getSSRowSet().getColumnType(this.boundColumnIndex);
+			if (boundColumnIndex != NO_COLUMN_INDEX) {
+				boundColumnName = getSSRowSet().getColumnName(boundColumnIndex);
+				boundColumnType = getSSRowSet().getColumnType(boundColumnIndex);
 			} else {
-				this.boundColumnName = null;
-				this.boundColumnType = NO_COLUMN_TYPE;
+				boundColumnName = null;
+				boundColumnType = java.sql.Types.NULL;
 			}
+			boundColumnJDBCType = JDBCType.valueOf(boundColumnType);
 
 		} catch (SQLException se) {
 			getLogger().error(getColumnForLog() + " - SQL Exception.", se);
@@ -658,9 +684,9 @@ public class SSCommon implements Serializable {
 
 		// SET COLUMN NAME
 		if (!_boundColumnName.isEmpty()) {
-			this.boundColumnName = _boundColumnName;
+			boundColumnName = _boundColumnName;
 		} else {
-			this.boundColumnName = null;
+			boundColumnName = null;
 		}
 
 		// DETERMINE COLUMN INDEX AND TYPE
@@ -668,13 +694,14 @@ public class SSCommon implements Serializable {
 			// IF COLUMN NAME ISN'T NULL, SET COLUMN INDEX - OTHERWISE, SET INDEX TO
 			// NO_INDEX
 // TODO update SSRowSet to return constant or throw Exception if invalid/out of bounds	        	
-			if (this.boundColumnName != null) {
-				this.boundColumnIndex = getSSRowSet().getColumnIndex(this.boundColumnName);
-				this.boundColumnType = getSSRowSet().getColumnType(this.boundColumnIndex);
+			if (boundColumnName != null) {
+				boundColumnIndex = getSSRowSet().getColumnIndex(boundColumnName);
+				boundColumnType = getSSRowSet().getColumnType(boundColumnIndex);
 			} else {
-				this.boundColumnIndex = NO_COLUMN_INDEX;
-				this.boundColumnType = NO_COLUMN_TYPE;
+				boundColumnIndex = NO_COLUMN_INDEX;
+				boundColumnType = java.sql.Types.NULL;
 			}
+			boundColumnJDBCType = JDBCType.valueOf(boundColumnType);
 
 		} catch (SQLException se) {
 			getLogger().error(getColumnForLog() + " - SQL Exception.", se);
