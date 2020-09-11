@@ -272,7 +272,7 @@ public interface SSRowSet extends RowSet {
 	 * @param _columnName   name of the database column
 	 * @param _allowNull 	indicates if Component and underlying column can contain null values
 	 */
-	public default void updateColumnText(String _updatedValue, String _columnName, boolean _allowNull) {
+	public default void updateColumnText(final String _updatedValue, final String _columnName, final boolean _allowNull) {
 
 		try {
 			
@@ -283,7 +283,13 @@ public interface SSRowSet extends RowSet {
 			
 			// TODO Convert this code to use Java 8 JDBCType enum
 			
-			if (_updatedValue!=null) _updatedValue.trim();
+			// 2020-09-11_BP: Probably not a good idea to trim here as it may be desirable to have padding for some strings
+			// Also, it's coded wrong.
+			// Should be:
+			//	if (_updatedValue!=null) _updatedValue = _updatedValue.trim();
+			// not:
+			// 	if (_updatedValue!=null) _updatedValue.trim();
+			
 			
 			logger.debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? " + _allowNull);
 					

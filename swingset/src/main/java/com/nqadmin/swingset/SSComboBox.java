@@ -908,6 +908,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	@Override
 	public void updateSSComponent() {
 		try {
+			// Expecting an integer so trim in case the database column is a String AND has padding
 			String text = getBoundColumnText().trim();
 
 			// GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD
