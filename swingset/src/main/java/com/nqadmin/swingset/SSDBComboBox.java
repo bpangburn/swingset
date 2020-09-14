@@ -89,42 +89,56 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
  * so that it is easier for the user to choose. At the same time you want to
  * store the id of the part chosen by the user in the shipment table.
  *
- * SSConnection connection = null; SSJdbcRowSetImpl sSRowSet = null;
- * SSDataNavigator navigator = null; SSDBComboBox combo = null;
+ * <pre>
+ * {@code
+ * SSConnection connection = null;
+ * SSJdbcRowSetImpl sSRowSet = null;
+ * SSDataNavigator navigator = null;
+ * SSDBComboBox combo = null;
  *
  * try {
  *
- * // CREATE A DATABASE CONNECTION OBJECT SSConnection connection = new
- * SSConnection(........);
+ * // CREATE A DATABASE CONNECTION OBJECT
+ * SSConnection connection = new SSConnection(........);
  *
- * // CREATE AN INSTANCE OF SSJDBCROWSETIMPL SSJdbcRowsetImpl sSRowSet = new
- * SSJdbcRowsetImpl(connection); sSRowSet.setCommand("SELECT * FROM
- * shipment_data;");
+ * // CREATE AN INSTANCE OF SSJDBCROWSETIMPL
+ * SSJdbcRowsetImpl sSRowSet = new SSJdbcRowsetImpl(connection);
+ * sSRowSet.setCommand("SELECT * FROM shipment_data;");
  *
- * // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE SSROWSET. // IF
- * YOU ARE NOT USING THE DATA NAVIGATOR YOU HAVE TO INCLUDE THOSE. //
- * sSRowSet.execute(); // sSRowSet.next(); SSDataNavigator navigator = new
- * SSDataNavigator(sSRowSet);
+ * // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE SSROWSET.
+ * // IF YOU ARE NOT USING THE DATA NAVIGATOR YOU HAVE TO INCLUDE THOSE.
+ * // sSRowSet.execute();
+ * // sSRowSet.next();
+ * SSDataNavigator navigator = new SSDataNavigator(sSRowSet);
  *
- * // QUERY FOR THE COMBOBOX. String query = "SELECT * FROM part_data;";
+ * // QUERY FOR THE COMBOBOX.
+ * String query = "SELECT * FROM part_data;";
  *
- * // CREATE AN INSTANCE OF THE SSDBCOMBOBOX WITH THE CONNECTION OBJECT // QUERY
- * AND COLUMN NAMES combo = new
- * SSDBComboBox(connection,query,"part_id","part_name");
+ * // CREATE AN INSTANCE OF THE SSDBCOMBOBOX WITH THE CONNECTION OBJECT
+ * // QUERY AND COLUMN NAMES
+ * combo = new SSDBComboBox(connection,query,"part_id","part_name");
  *
- * // THIS BASICALLY SPECIFIES THE COLUMN AND THE SSROWSET WHERE UPDATES HAVE //
- * TO BE MADE. combo.bind(sSRowSet,"part_id"); combo.execute();
+ * // THIS BASICALLY SPECIFIES THE COLUMN AND THE SSROWSET WHERE UPDATES HAVE
+ * // TO BE MADE.
+ * combo.bind(sSRowSet,"part_id");
+ * combo.execute();
  *
- * // CREATE A TEXTFIELD JTextField myText = new JTextField();
+ * // CREATE A TEXTFIELD
+ * JTextField myText = new JTextField();
  * myText.setDocument(new SSTextDocument(sSRowSet, "quantity");
  *
- * } catch(Exception e) { // EXCEPTION HANDLER HERE... }
+ * } catch(Exception e) {
+ *	// EXCEPTION HANDLER HERE...
+ * }
  *
  *
  * // ADD THE SSDBCOMBOBOX TO THE JFRAME
  * getContentPane().add(combo.getComboBox());
  *
- * // ADD THE JTEXTFIELD TO THE JFRAME getContentPane().add(myText);
+ * // ADD THE JTEXTFIELD TO THE JFRAME
+ * getContentPane().add(myText);
+ * }
+ * </pre>
  */
 
 public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentInterface {

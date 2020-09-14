@@ -72,11 +72,15 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * SSComboBox assumes that it will be bound to an integer column
  *
  * Also, if changing both a sSRowSet and column name consider using the bind()
- * method rather than individual setSSRowSet() and setColumName() calls.
- *
- * e.g. {@code
- * SSComboBox combo = new SSComboBox(); String[] options = {"111", "2222",
- * "33333"}; combo.setOptions(options); }
+ * method rather than individual setSSRowSet() and setColumName() calls. <br>
+ * For example,
+ * <pre>
+ * {@code
+ * SSComboBox combo = new SSComboBox();
+ * String[] options = {"111", "2222", "33333"};
+ * combo.setOptions(options);
+ * }
+ * </pre>
  *
  * For the above items the combobox assumes that the values start from zero:
  * {@literal "111" -> 0, "2222" -> 1, "33333" -> 2}
@@ -84,12 +88,17 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * To give your own mappings you can set the mappings separately or pass them
  * along with the options:
  *
+ * <pre>
  * {@code
- * SSComboBox combo = new SSComboBox(); String[] options = {"111", "2222",
- * "33333"}; int[] mappings = { 1,5,7 }; combo.setOptions(options, mappings);
+ * SSComboBox combo = new SSComboBox();
+ * String[] options = {"111", "2222", "33333"};
+ * int[] mappings = { 1,5,7 };
+ * combo.setOptions(options, mappings);
  * 
  * // next line is assuming mysSRowSet has been initialized and my_column is a
- * // column in mysSRowSet combo.bind(mysSRowSet,"my_column"); }
+ * // column in mysSRowSet
+ * combo.bind(mysSRowSet,"my_column"); }
+ * </pre>
  *
  */
 // TODO Consider processing the delete key to allow de-selection (e.g., setSelectedIndex(-1);)

@@ -78,9 +78,9 @@ import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
  * SSDataGrid.java
- * <p>
+ * 
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * <p>
+ * 
  * SSDataGrid provides a way to display information from a database in a table
  * format (aka "spreadsheet" or "datasheet" view). The SSDataGrid takes a
  * SSRowSet as a source of data. It also provides different cell renderers
