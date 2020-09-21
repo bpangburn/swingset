@@ -127,9 +127,10 @@ public interface SSRowSet extends RowSet {
 	 */
 	public default String getColumnText(final String _columnName) {
 		String value = null;
+
 		try {
 			// IF THE COLUMN IS NULL SO RETURN NULL
-			if (this.getObject(_columnName) == null) {
+			if (getColumnCount()==0 || getObject(_columnName) == null) {
 				return null;
 			}
 			
