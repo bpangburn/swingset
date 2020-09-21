@@ -38,8 +38,11 @@
 package com.nqadmin.swingset.formatting;
 
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 
+import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.text.DateFormatter;
+import javax.swing.text.MaskFormatter;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,19 +58,24 @@ import org.apache.logging.log4j.Logger;
 public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
 	/**
-	 * 
+	 * Unique serial ID
 	 */
 	private static final long serialVersionUID = -8205600502325364394L;
 
-	/**
-	 * Constant for date format
+	/**		
+	 * Constant for MM/dd/yyyy date format
 	 */
 	public static final int MMDDYYYY = 0;
 	
 	/**
-	 * Constant for date format
+	 * Constant for dd/MM/yyyy date format
 	 */
 	public static final int DDMMYYYY = 1;
+	
+	/**
+	 * Constant for yyyy-MM-dd date format
+	 */
+	public static final int YYYYMMDD = 2;
 	
 	/**
 	 * Log4j2 Logger
@@ -78,30 +86,34 @@ public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFac
      * Constructs a default SSDateFormatterFactory. 
      */
     public SSDateFormatterFactory() {
-        this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("DD/mm/yyyy")));
-        this.setNullFormatter(null);
-        this.setEditFormatter(new DateFormatter(new SimpleDateFormat("ddMMyyyy")));
-        this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("MMM dd, yyyy")));
+    	this(DDMMYYYY);
     } 
     
     /**
      * Creates an object of SSDateFormatterFactory with the specified format.
-     * @param format  - format to be used for date while in editing mode.
-     * The default format is DDMMYYYY
+     * See https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html
+     * 
+     * @param format - Format to be used for date while in editing mode. The default format is DDMMYYYY
      */
     public SSDateFormatterFactory(int format) {
     	switch(format){
-    	case 0:
+    	case MMDDYYYY:
     		this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("MM/dd/yyyy")));
             this.setNullFormatter(null);
             this.setEditFormatter(new DateFormatter(new SimpleDateFormat("MMddyyyy")));
-            this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("MMM dd, yyyy")));
+            this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("MM/dd/yyyy")));
     		break;
-    	case 1:
-    		this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("DD/mm/yyyy")));
-            this.setNullFormatter(null);
-            this.setEditFormatter(new DateFormatter(new SimpleDateFormat("ddMMyyyy")));
-            this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("MMM dd, yyyy")));
+    	case DDMMYYYY:
+			this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy")));
+			this.setNullFormatter(null);
+			this.setEditFormatter(new DateFormatter(new SimpleDateFormat("ddMMyyyy")));
+			this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy")));
+    		break;
+    	case YYYYMMDD:
+			this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("yyyy-MM-dd")));
+			this.setNullFormatter(null);
+			this.setEditFormatter(new DateFormatter(new SimpleDateFormat("yyyyMMdd")));
+			this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("yyyy-MM-dd")));
     		break;
     	default:
     		logger.warn("Unknown date format type of " + format);
@@ -109,22 +121,3 @@ public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFac
     	}
     }
 }
-
-/*
- * $Log$
- * Revision 1.6  2006/03/28 16:09:40  prasanth
- * Added a constructor to take the date format.
- *
- * Revision 1.5  2005/02/04 22:42:06  yoda2
- * Updated Copyright info.
- *
- * Revision 1.4  2005/01/18 23:37:59  dags
- * Diego's name fix
- *
- * Revision 1.3  2004/12/13 20:50:16  dags
- * Fix package name
- *
- * Revision 1.2  2004/12/13 18:46:13  prasanth
- * Added License.
- *
- */

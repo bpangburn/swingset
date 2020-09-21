@@ -48,6 +48,8 @@ import javax.swing.text.DefaultCaret;
  * SSCuitField extends the SSFormattedTextField. This class provides an implementation 
  * of Argentina's Tax ID. Every taxpayer in Argentina must have this Government supplied 
  * ID. It is an 10 digits code plus one verifier digit. Display format is ##-########-#.
+ * 
+ * See https://meta.cdq.ch/CUIT_number_(Argentina)
  */
 
 public class SSCuitField extends SSFormattedTextField {
@@ -71,21 +73,18 @@ public class SSCuitField extends SSFormattedTextField {
     public SSCuitField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         
-        // 2020-09-04: Cursor and caret manipulation not present in other formatters so disabling.
-        /*
         this.cuitCaret = new DefaultCaret();
         this.cuitCaret.setBlinkRate(600);
         
         try {
             this.cuitCaret.setSelectionVisible(true);
         } catch(java.lang.NullPointerException np) {
-        	// do nothing
-        	getLogger().warn(getColumnForLog() + ": Null Pointer Exception.", np);
+        	// do nothing - there may not be anything to select during initialization
+        	//getLogger().warn(getColumnForLog() + ": Null Pointer Exception.", np);
         }
         
 
         this.setCaret(this.cuitCaret);
-        */
         
     }
 

@@ -48,6 +48,8 @@ import org.apache.logging.log4j.Logger;
  * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
  * 
  * SSCuitFormatterFactory extends DefaultFormatterFactory for Argentina's Tax ID fields.
+ * 
+ * See https://meta.cdq.ch/CUIT_number_(Argentina)
  */
 
 public class SSCuitFormatterFactory extends javax.swing.text.DefaultFormatterFactory {

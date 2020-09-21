@@ -85,6 +85,7 @@ public class SSDateField extends SSFormattedTextField {
      */
     public SSDateField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
+        // TODO Consider setting to null vs system date.
         this.setValue(new java.util.Date());
     }
     
@@ -93,31 +94,7 @@ public class SSDateField extends SSFormattedTextField {
      */
     @Override
 	public void cleanField() {
+    	// TODO Consider setting to null vs system date.
         this.setValue(new java.util.Date());
     }
 }
-
-/*
- * $Log$
- * Revision 1.8  2006/03/28 16:10:33  prasanth
- * Added a constructor to take the date format needed.
- *
- * Revision 1.7  2005/05/26 22:20:36  dags
- * SSField interface implemented
- *
- * Revision 1.6  2005/03/28 14:46:42  dags
- * syncro commit
- *
- * Revision 1.5  2005/02/04 22:42:06  yoda2
- * Updated Copyright info.
- *
- * Revision 1.4  2005/01/18 22:34:30  dags
- * sincronization update
- *
- * Revision 1.3  2004/12/13 20:50:16  dags
- * Fix package name
- *
- * Revision 1.2  2004/12/13 18:46:13  prasanth
- * Added License.
- *
- */
