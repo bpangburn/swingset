@@ -121,7 +121,7 @@ public class SSCommon implements Serializable {
 		@Override
 		public void changedUpdate(DocumentEvent de) {
 			lastChange++;
-			getLogger().trace(getColumnForLog() + " - changedUpdate(): lastChange=" + lastChange
+			logger.trace(getColumnForLog() + " - changedUpdate(): lastChange=" + lastChange
 					+ ", lastNotifiedChange=" + lastNotifiedChange);
 			// Delay execution of logic until all listener methods are called for current
 			// event
@@ -144,13 +144,13 @@ public class SSCommon implements Serializable {
 
 		@Override
 		public void insertUpdate(DocumentEvent de) {
-			getLogger().trace(getColumnForLog());
+			logger.trace(getColumnForLog());
 			changedUpdate(de);
 		}
 
 		@Override
 		public void removeUpdate(DocumentEvent de) {
-			getLogger().trace(getColumnForLog());
+			logger.trace(getColumnForLog());
 			changedUpdate(de);
 		}
 
@@ -172,7 +172,7 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void cursorMoved(RowSetEvent event) {
-			getLogger().trace(getColumnForLog());
+			logger.trace(getColumnForLog());
 			updateSSComponent();
 		}
 
@@ -182,7 +182,7 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void rowChanged(RowSetEvent event) {
-			getLogger().trace(getColumnForLog());
+			logger.trace(getColumnForLog());
 			updateSSComponent();
 		}
 
@@ -192,7 +192,7 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void rowSetChanged(RowSetEvent event) {
-			getLogger().trace(getColumnForLog());
+			logger.trace(getColumnForLog());
 			updateSSComponent();
 		}
 
@@ -300,6 +300,11 @@ public class SSCommon implements Serializable {
 	 * Underlying SSRowSet listener.
 	 */
 	private SSRowSetListener ssRowSetListener = new SSRowSetListener();
+	
+	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
 
 	/**
 	 * Constructor expecting a SwingSet component as an argument (usually called as
@@ -476,7 +481,7 @@ public class SSCommon implements Serializable {
 				}
 			}
 		} catch (SQLException se) {
-			getLogger().error(getColumnForLog() + " - SQL Exception.", se);
+			logger.error(getColumnForLog() + " - SQL Exception.", se);
 		}
 
 		return value;
@@ -513,14 +518,6 @@ public class SSCommon implements Serializable {
 		return "[" + boundColumnName + "]";
 	}
 
-	/**
-	 * Returns a Log4J2 logger object for logging
-	 * 
-	 * @return Log4J2 logger object
-	 */
-	private static Logger getLogger() {
-		return LogManager.getLogger();
-	};
 
 //	/**
 //	 * Returns the primary key column name for the RowSet query
@@ -666,7 +663,7 @@ public class SSCommon implements Serializable {
 			boundColumnJDBCType = JDBCType.valueOf(boundColumnType);
 
 		} catch (SQLException se) {
-			getLogger().error(getColumnForLog() + " - SQL Exception.", se);
+			logger.error(getColumnForLog() + " - SQL Exception.", se);
 		}
 
 		// BIND UPDATED COLUMN IF APPLICABLE
@@ -704,7 +701,7 @@ public class SSCommon implements Serializable {
 			boundColumnJDBCType = JDBCType.valueOf(boundColumnType);
 
 		} catch (SQLException se) {
-			getLogger().error(getColumnForLog() + " - SQL Exception.", se);
+			logger.error(getColumnForLog() + " - SQL Exception.", se);
 		}
 
 		// BIND UPDATED COLUMN IF APPLICABLE

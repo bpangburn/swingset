@@ -201,9 +201,9 @@ public class SSSyncManager {
 	protected final SyncRowSetListener rowsetListener = new SyncRowSetListener();
 	
 	/**
-	 * Log4j2 Logger
+	 * Log4j Logger for component
 	 */
-    private static final Logger logger = LogManager.getLogger();
+	private static Logger logger = LogManager.getLogger();
 
 	/**
 	 * 

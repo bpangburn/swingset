@@ -46,12 +46,14 @@ import java.io.Serializable;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.text.Format;
-import java.util.Date;
 
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.SwingUtilities;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -105,6 +107,11 @@ public class SSFormattedTextField extends JFormattedTextField
 	protected final SSFormattedValueListener ssFormattedValueListener = new SSFormattedValueListener();
 	
 	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+	
+	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
 	 * database column
 	 */
@@ -125,12 +132,12 @@ public class SSFormattedTextField extends JFormattedTextField
 			    SSFormattedTextField ftf = (SSFormattedTextField)_pce.getSource();
 			    
 			    Object currentValue = ftf.getValue();
-			    getLogger().info(getColumnForLog() + ": Object to be passed to database is " + currentValue + ".");
+			    logger.info(getColumnForLog() + ": Object to be passed to database is " + currentValue + ".");
 			    
 			    try {
 					getSSRowSet().updateObject(getBoundColumnName(), currentValue);
 				} catch (SQLException _se) {
-					getLogger().error(getColumnForLog() + ": RowSet update triggered SQL Exception.", _se);
+					logger.error(getColumnForLog() + ": RowSet update triggered SQL Exception.", _se);
 				}
 			    
 				addSSRowSetListener();
@@ -461,10 +468,10 @@ public class SSFormattedTextField extends JFormattedTextField
 			boolean result = false;
 
 			if (input instanceof SSFormattedTextField) {
-				getLogger().debug(getColumnForLog() + ": Instance of SSFormattedTextField.");
+				logger.debug(getColumnForLog() + ": Instance of SSFormattedTextField.");
 				SSFormattedTextField ssftf = (SSFormattedTextField) input;
 				try {
-					getLogger().debug(getColumnForLog() + ": Text in Formatted Text Field is " + ssftf.getText() + ".");
+					logger.debug(getColumnForLog() + ": Text in Formatted Text Field is " + ssftf.getText() + ".");
 					// this will throw a parse exception if something goes wrong
 					ssftf.commitEdit();
 
@@ -472,7 +479,7 @@ public class SSFormattedTextField extends JFormattedTextField
 					result = validateField(ssftf.getValue());
 
 				} catch (java.text.ParseException pe) {
-					getLogger().warn(getColumnForLog() + ": Parse Exception at " + pe.getErrorOffset() + ".", pe);
+					logger.warn(getColumnForLog() + ": Parse Exception at " + pe.getErrorOffset() + ".", pe);
 				}
 			}
 
@@ -803,11 +810,11 @@ public class SSFormattedTextField extends JFormattedTextField
 					
 					setValue(newValue);
 				} else {
-					getLogger().error(getColumnForLog() + ": JDBCType of " + jdbcType.toString() + " was cast to unsupported type of " + newValue.getClass().getName() + " based on JDBC connection getTypeMap().");
+					logger.error(getColumnForLog() + ": JDBCType of " + jdbcType.toString() + " was cast to unsupported type of " + newValue.getClass().getName() + " based on JDBC connection getTypeMap().");
 				}
 
 			} catch (java.sql.SQLException sqe) {
-				getLogger().error(getColumnForLog() + ": SQL Exception while updating rowset from formatted component.", sqe);
+				logger.error(getColumnForLog() + ": SQL Exception while updating rowset from formatted component.", sqe);
 				setValue(null);
 			}
 	

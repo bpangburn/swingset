@@ -93,9 +93,9 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	protected boolean forSSDataGrid = false;
 	
 	/**
-	 * Log4j2 Logger
+	 * Log4j Logger for component
 	 */
-    private static final Logger logger = LogManager.getLogger();
+	private static Logger logger = LogManager.getLogger();
 
 	/**
 	 * Constructs a KeyAdapter for the JTable.

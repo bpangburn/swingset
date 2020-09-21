@@ -80,7 +80,7 @@ public class SSCuitField extends SSFormattedTextField {
             this.cuitCaret.setSelectionVisible(true);
         } catch(java.lang.NullPointerException np) {
         	// do nothing - there may not be anything to select during initialization
-        	//getLogger().warn(getColumnForLog() + ": Null Pointer Exception.", np);
+        	//logger.warn(getColumnForLog() + ": Null Pointer Exception.", np);
         }
         
 

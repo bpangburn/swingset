@@ -50,6 +50,9 @@ import java.util.ArrayList;
 
 import javax.swing.JComboBox;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -146,10 +149,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 			if (index == -1) {
 				setBoundColumnText(null);
-				getLogger().debug(getColumnForLog() + ": Setting to null.");
+				logger.debug(getColumnForLog() + ": Setting to null.");
 			} else {
 				setBoundColumnText(String.valueOf(getSelectedValue()));
-				getLogger().debug(getColumnForLog() + ": Setting to " + getSelectedValue() + ".");
+				logger.debug(getColumnForLog() + ": Setting to " + getSelectedValue() + ".");
 			}
 
 			addSSRowSetListener();
@@ -238,6 +241,11 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * keystroke listener/filter.
 	 */
 	protected boolean filterSwitch = true;
+	
+	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
 
 	/**
 	 * True if inside a call to updateDisplay()
@@ -471,7 +479,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			options.add(listItem.getListItem());
 
 		} catch (Exception e) {
-			getLogger().error(getColumnForLog() + ": Exception.", e);
+			logger.error(getColumnForLog() + ": Exception.", e);
 		} finally {
 			eventList.getReadWriteLock().writeLock().unlock();
 		}
@@ -584,7 +592,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				}
 
 			} catch (Exception e) {
-				getLogger().error(getColumnForLog() + ": Exception.", e);
+				logger.error(getColumnForLog() + ": Exception.", e);
 			} finally {
 				eventList.getReadWriteLock().writeLock().unlock();
 			}
@@ -684,7 +692,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// returning 0
 		// TODO Remove completely from future release.
 		
-		getLogger().warn(getColumnForLog() + ": This method was never properly implemented so it has been Deprecated and just returns 0. \n" + Thread.currentThread().getStackTrace());
+		logger.warn(getColumnForLog() + ": This method was never properly implemented so it has been Deprecated and just returns 0. \n" + Thread.currentThread().getStackTrace());
 		return 0;
 	}
 
@@ -917,7 +925,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				strValue = "";
 			}
 		} catch (SQLException se) {
-			getLogger().error(getColumnForLog() + ": SQL Exception.", se);
+			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
 		return strValue;
 
@@ -930,7 +938,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		if (eventList != null) {
 // TODO look at .dispose() vs .clear()
-			getLogger().trace(getColumnForLog() + ": Clearing eventList.");
+			logger.trace(getColumnForLog() + ": Clearing eventList.");
 			eventList.clear();
 		} else {
 			eventList = new BasicEventList<>();
@@ -956,11 +964,11 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		// this.data.getReadWriteLock().writeLock().lock();
 		try {
-			getLogger().debug(getColumnForLog() + ": Nulls allowed? " + getAllowNull());
+			logger.debug(getColumnForLog() + ": Nulls allowed? " + getAllowNull());
 			// 2020-07-24: adding support for a nullable first item if nulls are supported
 			if (getAllowNull()) {
 				listItem = new SSListItem(null, "");
-				getLogger().debug(getColumnForLog() + ": Adding blank list item - " + listItem);
+				logger.debug(getColumnForLog() + ": Adding blank list item - " + listItem);
 				eventList.add(listItem);
 				mappings.add(listItem.getPrimaryKey());
 				options.add(listItem.getListItem());
@@ -969,7 +977,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			Statement statement = ssCommon.getSSConnection().getConnection().createStatement();
 			rs = statement.executeQuery(getQuery());
 			
-			getLogger().debug(getColumnForLog() + ": Query - " + getQuery());
+			logger.debug(getColumnForLog() + ": Query - " + getQuery());
 
 			while (rs.next()) {
 				// extract primary key
@@ -978,7 +986,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				// extract first column string
 				// getStringValue() takes care of formatting dates
 				firstColumnString = getStringValue(rs, this.displayColumnName).trim();
-				getLogger().trace(getColumnForLog() + ": First column to display - " + firstColumnString);
+				logger.trace(getColumnForLog() + ": First column to display - " + firstColumnString);
 
 				// extract second column string, if applicable
 				// getStringValue() takes care of formatting dates
@@ -988,7 +996,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 					if (secondColumnString.equals("")) {
 						secondColumnString = null;
 					}
-					getLogger().trace(getColumnForLog() + ": Second column to display - " + secondColumnString);
+					logger.trace(getColumnForLog() + ": Second column to display - " + secondColumnString);
 				}
 
 				// build eventList item
@@ -1007,9 +1015,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			rs.close();
 
 		} catch (SQLException se) {
-			getLogger().error(getColumnForLog() + ": SQL Exception.", se);
+			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		} catch (java.lang.NullPointerException npe) {
-			getLogger().error(getColumnForLog() + ": Null Pointer Exception.", npe);
+			logger.error(getColumnForLog() + ": Null Pointer Exception.", npe);
 		} finally {
 			eventList.getReadWriteLock().writeLock().unlock();
 		}
@@ -1088,7 +1096,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	public void setFilterable(boolean _filter) {
 		// TODO remove this method in future release
 		this.filterSwitch = _filter;
-		getLogger().warn(getColumnForLog() + ": This method has been Deprecated because GlazedList filtering is now fully integrated.\n" + Thread.currentThread().getStackTrace());
+		logger.warn(getColumnForLog() + ": This method has been Deprecated because GlazedList filtering is now fully integrated.\n" + Thread.currentThread().getStackTrace());
 	}
 
 	/**
@@ -1221,7 +1229,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				int index = options.indexOf(_value);
 
 				if (index == -1) {
-					getLogger().warn(getColumnForLog() + ": Could not find a corresponding item in combobox for display text of " + _value + ". Setting index to -1 (blank).");
+					logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for display text of " + _value + ". Setting index to -1 (blank).");
 				}
 
 				setSelectedIndex(index);
@@ -1282,7 +1290,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		if (selectedItem != null) {
 			// OUTCOME 1 & 3 ABOVE, MAKE CALL TO SUPER AND MOVE ALONG
 			// Display contents of selectedItem for debugging
-			getLogger().debug(getColumnForLog() + ": PK=" + selectedItem.getPrimaryKey() + ", Item=" + selectedItem.getListItem());
+			logger.debug(getColumnForLog() + ": PK=" + selectedItem.getPrimaryKey() + ", Item=" + selectedItem.getListItem());
 
 			// We have to be VERY careful with calls to setSelectedItem() because it will
 			// set the value based on the index of any SUBSET list returned by GlazedList,
@@ -1292,17 +1300,17 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			// call to setSelectedItem works as intended.
 			
 			possibleMatches = getItemCount();
-			getLogger().trace(getColumnForLog() + ": Possible matches BEFORE hidePopup() - " + possibleMatches);
+			logger.trace(getColumnForLog() + ": Possible matches BEFORE hidePopup() - " + possibleMatches);
 			
 			hidePopup();
 			
 			possibleMatches = getItemCount();
-			getLogger().trace(getColumnForLog() + ": Possible matches AFTER hidePopup() - " + possibleMatches);
+			logger.trace(getColumnForLog() + ": Possible matches AFTER hidePopup() - " + possibleMatches);
 
 			// Call to parent method.
 			// Don't call setSelectedIndex() as this causes a cycle
 			// setSelectedIndex()->setSelectedItem().
-			getLogger().trace(getColumnForLog() + ": Calling super.setSelectedItem(" + selectedItem + ")");
+			logger.trace(getColumnForLog() + ": Calling super.setSelectedItem(" + selectedItem + ")");
 			super.setSelectedItem(selectedItem);
 
 			// Update editor text
@@ -1310,7 +1318,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			getEditor().setItem(currentEditorText);
 			updateUI();
 
-			getLogger().debug(getColumnForLog() + ": Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.");
+			logger.debug(getColumnForLog() + ": Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.");
 
 			// update priorEditorText
 			priorEditorText = currentEditorText;
@@ -1319,11 +1327,11 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			// OUTCOME 2 ABOVE
 			// setSelectedItem() was called with null, but there is no match (so null is not a valid selection in the list)
 			// There may be partial matches from GlazedList.
-			getLogger().debug(getColumnForLog() + ": Method called with null. Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.");
+			logger.debug(getColumnForLog() + ": Method called with null. Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.");
 	
 			// Determine if there are partial matches on the popup list due to user typing.
 			possibleMatches = getItemCount();
-			getLogger().trace(getColumnForLog() + ": Possible matches - " + possibleMatches);
+			logger.trace(getColumnForLog() + ": Possible matches - " + possibleMatches);
 			
 			if (possibleMatches > 0) {
 				// update the latestTypedText, but don't make a call to super.setSelectedItem(). No change to bound value.
@@ -1339,10 +1347,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 // This will throw a 'java.awt.IllegalComponentStateException' exception when showPopup() is called.
 				//if (!this.isVisible()) {
 				if (currentEditorText.isEmpty()) {
-					getLogger().debug(getColumnForLog() + ": Method called with null, but nothing has been typed. This occurs during screen initialization.");
+					logger.debug(getColumnForLog() + ": Method called with null, but nothing has been typed. This occurs during screen initialization.");
 					super.setSelectedItem(selectedItem);
 				} else {		
-					getLogger().trace(getColumnForLog() + ": Reverting to prior typed text.");
+					logger.trace(getColumnForLog() + ": Reverting to prior typed text.");
 					getEditor().setItem(priorEditorText);
 					// IMPORTANT: The particular order here of showPopup() and then updateUI() seems to restore the
 					// underlying GlazedList to all of the items. Reversing this order breaks things. Calling hidePopup() does not work.
@@ -1351,7 +1359,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 								// updateUI() triggers focus lost
 					possibleMatches = getItemCount();
 					
-					getLogger().trace(getColumnForLog() + ": Possible matches AFTER reverting text - " + possibleMatches);
+					logger.trace(getColumnForLog() + ": Possible matches AFTER reverting text - " + possibleMatches);
 				}
 			}
 
@@ -1359,7 +1367,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			// OUTCOME 4 ABOVE
 			// generally not expecting this outcome
 			// revert to prior string and don't select anything
-			getLogger().warn(getColumnForLog() + ": Method called with " + _value + ", but there is no match. Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.");
+			logger.warn(getColumnForLog() + ": Method called with " + _value + ", but there is no match. Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.");
 			
 			// TODO Throw an exception here? May be the result of a coding error.
 			getEditor().setItem(priorEditorText);
@@ -1622,16 +1630,16 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				int index = mappings.indexOf(_value);
 
 				if (index == -1) {
-					getLogger().warn(getColumnForLog() + ": Could not find a corresponding item in combobox for value of " + _value + ". Setting index to -1 (blank).");
+					logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for value of " + _value + ". Setting index to -1 (blank).");
 				}
 
-				getLogger().trace(getColumnForLog() + ": eventList - " + eventList.toString());
-				getLogger().trace(getColumnForLog() + ": options - " + options.toString());
-				getLogger().trace(getColumnForLog() + ": mappings - " + mappings.toString());
+				logger.trace(getColumnForLog() + ": eventList - " + eventList.toString());
+				logger.trace(getColumnForLog() + ": options - " + options.toString());
+				logger.trace(getColumnForLog() + ": mappings - " + mappings.toString());
 				
 				setSelectedIndex(index);
 			} else {
-				getLogger().warn(getColumnForLog() + ": No mappings available for current component. No value set by setSelectedValue().");
+				logger.warn(getColumnForLog() + ": No mappings available for current component. No value set by setSelectedValue().");
 			}
 
 	}
@@ -1774,7 +1782,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 // TODO may need to call repaint()				
 
 			} catch (Exception e) {
-				getLogger().error(getColumnForLog() + ": Exception.", e);
+				logger.error(getColumnForLog() + ": Exception.", e);
 			} finally {
 				eventList.getReadWriteLock().writeLock().unlock();
 			}
@@ -1800,13 +1808,13 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			// the GlazedList subset and generate:
 			// Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: setSelectedIndex: X out of bounds
 			//int possibleMatches = getItemCount();
-			//getLogger().debug(getColumnForLog() + ": Possible matches BEFORE setPopupVisible(false);: "+ possibleMatches);
+			//logger.debug(getColumnForLog() + ": Possible matches BEFORE setPopupVisible(false);: "+ possibleMatches);
 
 			//this.setPopupVisible(false);
 			//updateUI();
 			
 			//possibleMatches = getItemCount();
-			//getLogger().debug(getColumnForLog() + ": Possible matches AFTER setPopupVisible(false);: "+ possibleMatches);
+			//logger.debug(getColumnForLog() + ": Possible matches AFTER setPopupVisible(false);: "+ possibleMatches);
 			
 			// THIS SHOULD BE CALLED AS A RESULT OF SOME ACTION ON THE ROWSET SO RESET THE EDITOR STRINGS BEFORE DOING ANYTHING ELSE
 			priorEditorText = "";
@@ -1818,7 +1826,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			// TODO Consider starting with a Long and passing directly to setSelectedValue(primaryKey). Modify setSelectedValue to accept a Long vs long.
 			String text = getBoundColumnText().trim();
 			
-			getLogger().debug(getColumnForLog() + ": getBoundColumnText() - " + text);
+			logger.debug(getColumnForLog() + ": getBoundColumnText() - " + text);
 
 			// GET THE BOUND VALUE STORED IN THE ROWSET
 			//if (text != null && !(text.equals(""))) {
@@ -1826,12 +1834,12 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				
 				long primaryKey = Long.parseLong(text);
 				
-				getLogger().debug(getColumnForLog() + ": Calling setSelectedValue(" + primaryKey + ").");
+				logger.debug(getColumnForLog() + ": Calling setSelectedValue(" + primaryKey + ").");
 
 				setSelectedValue(primaryKey);
 
 			} else {
-				getLogger().debug(getColumnForLog() + ": Calling setSelectedIndex(-1).");
+				logger.debug(getColumnForLog() + ": Calling setSelectedIndex(-1).");
 			
 				setSelectedIndex(-1);
 				//updateUI();
@@ -1841,10 +1849,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			if (getEditor().getItem() != null) {
 				editorString = getEditor().getItem().toString();
 			}
-			getLogger().debug(getColumnForLog() + ": Combo editor string: " + editorString);
+			logger.debug(getColumnForLog() + ": Combo editor string: " + editorString);
 
 		} catch (NumberFormatException nfe) {
-			getLogger().error(getColumnForLog() + ": Number Format Exception.", nfe);
+			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
 		}
 	}
 

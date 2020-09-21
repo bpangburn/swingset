@@ -51,6 +51,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.utils.SSArray;
 import com.nqadmin.swingset.utils.SSCommon;
@@ -105,6 +106,11 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 //	 * SSRowSet column to which the component will be bound.
 //	 */
 //	protected String columnName = "";
+	
+	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
 
 	/**
 	 * Converts SQL array to object array
@@ -118,7 +124,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 			return null;
 		}
 		
-		LogManager.getLogger().debug("SSList.toObjArray() contents: " + array);
+		logger.debug("SSList.toObjArray() contents: " + array);
 	
 		Vector<Object> data = new Vector<>();
 		switch (array.getBaseType()) {
@@ -159,7 +165,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 				for (BigDecimal num : (BigDecimal[]) array.getArray())
 					data.add(num);
 			} catch (ClassCastException cce) {
-				LogManager.getLogger().error("Class Cast Exception.", cce);
+				logger.error("Class Cast Exception.", cce);
 			}
 			break;
 		case Types.DATE:
@@ -179,7 +185,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 				for (Object val : (Object[]) array.getArray())
 					data.add(val);
 			} catch (SQLException se) {
-				LogManager.getLogger().error("DataType: " + array.getBaseTypeName() + " not supported and unable to convert to generic object.", se);
+				logger.error("DataType: " + array.getBaseTypeName() + " not supported and unable to convert to generic object.", se);
 			}
 			break;
 		}
@@ -600,7 +606,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		try {
 			getSSRowSet().updateArray(getBoundColumnName(), array);
 		} catch (SQLException se) {
-			getLogger().error(getColumnForLog() + ": SQL Exception.", se);
+			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
 	}
 
@@ -649,7 +655,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 			}
 
 		} catch (SQLException se) {
-			getLogger().error(getColumnForLog() + ": SQL Exception.", se);
+			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
 
 		if (array == null) {

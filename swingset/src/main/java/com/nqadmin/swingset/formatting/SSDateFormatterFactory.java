@@ -38,11 +38,8 @@
 package com.nqadmin.swingset.formatting;
 
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 
-import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.text.DateFormatter;
-import javax.swing.text.MaskFormatter;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -78,9 +75,9 @@ public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFac
 	public static final int YYYYMMDD = 2;
 	
 	/**
-	 * Log4j2 Logger
+	 * Log4j Logger for component
 	 */
-    private static final Logger logger = LogManager.getLogger();
+	private static Logger logger = LogManager.getLogger();
 	
     /**
      * Constructs a default SSDateFormatterFactory. 

@@ -63,9 +63,9 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	private static final long serialVersionUID = -3556990832719097405L;
 	
 	/**
-	 * Log4j2 Logger
+	 * Log4j Logger for component
 	 */
-    private static final Logger logger = LogManager.getLogger();
+	private static Logger logger = LogManager.getLogger();
 
 	/**
 	 * Empty constructor

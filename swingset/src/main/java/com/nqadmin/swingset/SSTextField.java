@@ -47,6 +47,9 @@ import java.util.StringTokenizer;
 
 import javax.swing.JTextField;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -89,6 +92,11 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * Use this if the text field contains SSN
      */
     public static final int SSN = 3;
+    
+	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
 
     /**
      * Function to manage formatting date _strings with slashes as the user types
@@ -617,7 +625,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
                     setText(decimalMask(str, this.numberOfDecimalPlaces));
                     break;
                 default:
-                	getLogger().warn(getColumnForLog() + ": Unknown textbox mask type of " + this.mask);
+                	logger.warn(getColumnForLog() + ": Unknown textbox mask type of " + this.mask);
                 	break;
             } // end switch
             return true;

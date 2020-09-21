@@ -49,6 +49,9 @@ import java.util.stream.IntStream;
 
 import javax.swing.JComboBox;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
@@ -112,10 +115,10 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 
 			if (index == -1) {
 				setBoundColumnText(null);
-				getLogger().debug(getColumnForLog() + ": Setting to null.");
+				logger.debug(getColumnForLog() + ": Setting to null.");
 			} else {
 				setBoundColumnText(String.valueOf(getSelectedValue()));
-				getLogger().debug(getColumnForLog() + ": Setting to " + getSelectedValue() + ".");
+				logger.debug(getColumnForLog() + ": Setting to " + getSelectedValue() + ".");
 			}
 
 			addSSRowSetListener();
@@ -247,6 +250,11 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * Common fields shared across SwingSet components
 	 */
 	protected SSCommon ssCommon;
+	
+	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
 
 //	/**
 //	 * Sets the SSRowSet column name to which the component is bound.
@@ -862,7 +870,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 				// IF EXPLICIT VALUES FOR THE ITEMS IN COMBO ARE NOT SPECIFIED THEN CODES START
 				// FROM ZERO. IN SUCH A CASE CHECK IF THE NUMBER EXCEEDS THE NUMBER OF ITEMS
 				// IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)
-				getLogger().warn(getColumnForLog() + ": Value from database:" + _value + ". Items in combobox: " + getItemCount());
+				logger.warn(getColumnForLog() + ": Value from database:" + _value + ". Items in combobox: " + getItemCount());
 				
 				setSelectedIndex(-1);
 			} else {
@@ -872,7 +880,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 					int index = mappings.indexOf(_value);
 
 					if (index == -1) {
-						getLogger().warn(getColumnForLog() + ": Warning: could not find a corresponding item in combobox for code of " + _value + ". Setting index to -1 (blank).");
+						logger.warn(getColumnForLog() + ": Warning: could not find a corresponding item in combobox for code of " + _value + ". Setting index to -1 (blank).");
 					}
 
 					setSelectedIndex(index);
@@ -922,7 +930,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 			}
 
 		} catch (NumberFormatException nfe) {
-			getLogger().warn(getColumnForLog() + ": Number Format Exception.", nfe);
+			logger.warn(getColumnForLog() + ": Number Format Exception.", nfe);
 		}
 	}
 

@@ -56,6 +56,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -118,9 +121,9 @@ public class SSImage extends JPanel implements SSComponentInterface {
                         }
                     }
                 }catch(SQLException se){
-                	getLogger().error(getColumnForLog() + ": SQL Exception.", se);
+                	logger.error(getColumnForLog() + ": SQL Exception.", se);
                 }catch(IOException ioe){
-                	getLogger().error(getColumnForLog() + ": IO Exception.", ioe);;
+                	logger.error(getColumnForLog() + ": IO Exception.", ioe);;
                 }
                 
                 addSSRowSetListener();
@@ -178,6 +181,11 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 * Component listener.
 	 */
 	protected final SSImageListener ssImageListener = new SSImageListener();
+	
+	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
 
     /**
      *
@@ -535,7 +543,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
                 this.lblImage.setText("No Picture");
             }
         } catch(SQLException se) {
-        	getLogger().error(getColumnForLog() + ": SQL Exception.", se);
+        	logger.error(getColumnForLog() + ": SQL Exception.", se);
             this.img = null;
         }
 

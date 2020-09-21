@@ -141,9 +141,9 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	private SSDataNavigator navigator = null;
 	
 	/**
-	 * Log4j2 Logger
+	 * Log4j Logger for component
 	 */
-    private static final Logger logger = LogManager.getLogger();
+	private static Logger logger = LogManager.getLogger();
 
 	/** Creates a new instance of SSBooleanField */
 	public SSBooleanField() {

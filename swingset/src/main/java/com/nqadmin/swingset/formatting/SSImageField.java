@@ -101,9 +101,9 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	private SSDataNavigator navigator = null;
 	
 	/**
-	 * Log4j2 Logger
+	 * Log4j Logger for component
 	 */
-    private static final Logger logger = LogManager.getLogger();
+	private static Logger logger = LogManager.getLogger();
 
 	/** Creates a new instance of SSImageField */
 	public SSImageField() {

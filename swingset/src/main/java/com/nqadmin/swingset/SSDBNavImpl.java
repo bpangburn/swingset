@@ -87,9 +87,9 @@ public class SSDBNavImpl implements SSDBNav {
 	protected Container container = null;
 	
 	/**
-	 * Log4j2 Logger
+	 * Log4j Logger for component
 	 */
-    private static final Logger logger = LogManager.getLogger();
+	private static Logger logger = LogManager.getLogger();
 
 	/**
 	 * Constructs a SSDBNavImpl with the specified container.

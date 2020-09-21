@@ -202,10 +202,9 @@ public class SSDataNavigator extends JPanel {
 	protected SSDBComboBox navCombo= null;
 	
 	/**
-	 * Log4j2 Logger
+	 * Log4j Logger for component
 	 */
-    private static final Logger logger = LogManager.getLogger();
-
+	private static Logger logger = LogManager.getLogger();
 
 	/**
 	 * @return the navCombo

@@ -232,9 +232,9 @@ public class SSDataGrid extends JTable {
 	protected boolean allowDeletion = true;
 	
 	/**
-	 * Log4j2 Logger
+	 * Log4j Logger for component
 	 */
-    private static final Logger logger = LogManager.getLogger();
+	private static Logger logger = LogManager.getLogger();
 
 	/**
 	 * @return the allowDeletion flag

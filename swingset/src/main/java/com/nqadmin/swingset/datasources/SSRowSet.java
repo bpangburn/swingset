@@ -50,7 +50,6 @@ import javax.sql.RowSet;
 import javax.sql.RowSetListener;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.utils.SSCommon;
 
@@ -66,11 +65,6 @@ import com.nqadmin.swingset.utils.SSCommon;
 public interface SSRowSet extends RowSet {
 	
 	// TODO Audit type handling based on http://www.java2s.com/Code/Java/Database-SQL-JDBC/StandardSQLDataTypeswithTheirJavaEquivalents.htm
-	
-	/**
-	 * Log4j2 Logger - can't be private in an interface
-	 */
-    static final Logger logger = LogManager.getLogger();
 
 	/**
 	 * Wrapper/convenience method for SwingSet method naming consistency.
@@ -208,11 +202,11 @@ public interface SSRowSet extends RowSet {
 				break;
 
 			default:
-				logger.error("Unsupported data type of " + JDBCType.valueOf(columnType).getName() + " for column " + _columnName + ".");
+				LogManager.getLogger().error("Unsupported data type of " + JDBCType.valueOf(columnType).getName() + " for column " + _columnName + ".");
 			} // end switch
 
 		} catch (SQLException se) {
-			logger.error("SQL Exception for column " + _columnName + ".", se);
+			LogManager.getLogger().error("SQL Exception for column " + _columnName + ".", se);
 		}
 
 		return value;
@@ -292,7 +286,7 @@ public interface SSRowSet extends RowSet {
 			// 	if (_updatedValue!=null) _updatedValue.trim();
 			
 			
-			logger.debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? " + _allowNull);
+			LogManager.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? " + _allowNull);
 					
 			int columnType = getColumnType(_columnName);
 
@@ -404,13 +398,13 @@ public interface SSRowSet extends RowSet {
 				break;
 
 			default:
-				logger.error("Unsupported data type of " + JDBCType.valueOf(columnType).getName() + " for column " + _columnName + ".");
+				LogManager.getLogger().error("Unsupported data type of " + JDBCType.valueOf(columnType).getName() + " for column " + _columnName + ".");
 			} // end switch
 
 		} catch (SQLException se) {
-			logger.error("SQL Exception for column " + _columnName + ".", se);
+			LogManager.getLogger().error("SQL Exception for column " + _columnName + ".", se);
 		} catch (NumberFormatException nfe) {
-			logger.error("Number Format Exception for column " + _columnName + ".", nfe);
+			LogManager.getLogger().error("Number Format Exception for column " + _columnName + ".", nfe);
 		}
 
 	} // end protected void updateColumnText(String _updatedValue, String _columnName)

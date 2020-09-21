@@ -49,7 +49,6 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSRowSet;
@@ -278,16 +277,8 @@ public interface SSComponentInterface {
 		return getBoundColumnType();
 	}
 
-	/**
-	 * Returns a Log4J2 logger object for logging
-	 * 
-	 * @return Log4J2 logger object for implementing class
-	 */
-	default Logger getLogger() {
-		return LogManager.getLogger();
-	};
 //	{
-//		//return getSSCommon().getLogger();
+//		//return getSSCommon().logger;
 //	}
 
 //	/**
@@ -419,7 +410,7 @@ public interface SSComponentInterface {
 
 		getSSCommon().setBoundColumnText(_boundColumnText);
 
-		getLogger().debug(getColumnForLog() + ": " + _boundColumnText);
+		LogManager.getLogger().debug(getColumnForLog() + ": " + _boundColumnText);
 
 	}
 

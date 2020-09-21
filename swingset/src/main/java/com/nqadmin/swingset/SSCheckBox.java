@@ -44,6 +44,9 @@ import java.sql.SQLException;
 
 import javax.swing.JCheckBox;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -98,7 +101,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 					setBoundColumnText(BOOLEAN_CHECKED);
 					break;
 				default:
-					getLogger().warn(getColumnForLog() + ": Unknown column type of " + getBoundColumnType());
+					logger.warn(getColumnForLog() + ": Unknown column type of " + getBoundColumnType());
 					break;
 				}
 			} else {
@@ -114,7 +117,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 					setBoundColumnText(BOOLEAN_UNCHECKED);
 					break;
 				default:
-					getLogger().warn(getColumnForLog() + ": Unknown column type of " + getBoundColumnType());
+					logger.warn(getColumnForLog() + ": Unknown column type of " + getBoundColumnType());
 					break;
 				}
 			}
@@ -186,6 +189,11 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	 * Unchecked value for numeric columns.
 	 */
 	protected int UNCHECKED = 0;
+	
+	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
 
 	/**
 	 * Creates an object of SSCheckBox.
