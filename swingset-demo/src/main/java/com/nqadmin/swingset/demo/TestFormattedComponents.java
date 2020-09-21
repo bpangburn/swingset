@@ -112,7 +112,7 @@ public class TestFormattedComponents extends JFrame {
 
 	SSCuitField fmtSSCuitField = new SSCuitField();
 	SSCurrencyField fmtSSCurrencyField = new SSCurrencyField();
-	SSDateField fmtSSDateField = new SSDateField();
+	SSDateField fmtSSDateField = new SSDateField(SSDateField.MMDDYYYY);
 	SSFormattedTextField fmtSSFormattedTextField = new SSFormattedTextField();
 	SSIntegerField fmtSSIntegerField = new SSIntegerField();	
 	SSNumericField fmtSSNumericField = new SSNumericField();
