@@ -78,7 +78,7 @@ CREATE SEQUENCE IF NOT EXISTS swingset_formatted_test_seq START WITH 1000;
 CREATE TABLE IF NOT EXISTS swingset_formatted_test_data 
 ( 
     swingset_formatted_test_pk INTEGER DEFAULT nextval('swingset_formatted_test_seq') NOT NULL PRIMARY KEY,
-    ss_cuit_field VARCHAR(11), /* Tax ID for the country of Argentina. See https://meta.cdq.ch/CUIT_number_(Argentina). */
+    ss_cuit_field VARCHAR(13), /* Tax ID for the country of Argentina. See https://meta.cdq.ch/CUIT_number_(Argentina) */
     ss_currency_field DECIMAL(20,2),
     ss_date_field DATE,
     ss_formatted_text_field VARCHAR(50), /* parent class for formatted components */
@@ -91,6 +91,6 @@ CREATE TABLE IF NOT EXISTS swingset_formatted_test_data
 );
 
 
-MERGE INTO swingset_formatted_test_data VALUES (1,'54327654321',1234567.89,'2020-01-01','This is some random text 1.',23456678,12345678.4321,99.375,'111223333','12:34:56',NULL);
+MERGE INTO swingset_formatted_test_data VALUES (1,'20-10563145-8',1234567.89,'2020-01-01','This is some random text 1.',23456678,12345678.4321,0.99375,'111223333','12:34:56',NULL);
 
 
