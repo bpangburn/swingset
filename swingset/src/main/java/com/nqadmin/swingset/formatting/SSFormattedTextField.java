@@ -474,17 +474,29 @@ public class SSFormattedTextField extends JFormattedTextField
 					logger.debug(getColumnForLog() + ": Text in Formatted Text Field is " + ssftf.getText() + ".");
 					// this will throw a parse exception if something goes wrong
 					ssftf.commitEdit();
+					
+					// get current value
+					Object value = (ssftf.getValue());
 
 					// now perform custom checks
-					result = validateField(ssftf.getValue());
+					result = validateField(value);
+					
+					// update text color for negatives
+					if (result) {
+						updateTextColor(value);
+					}
 
 				} catch (java.text.ParseException pe) {
 					logger.warn(getColumnForLog() + ": Parse Exception at " + pe.getErrorOffset() + ".", pe);
 				}
 			}
 
-			if (result == false) {
-				setBackground(java.awt.Color.RED);
+			// Update background color to RED for invalid value.
+			// Also force foreground color to BLACK in case it was previous RED (negative number)
+			// If value is valid, the background color will change when focus is lost.
+			if (result==false) {
+				setBackground(Color.RED);
+				setForeground(Color.BLACK);
 			}
 
 			return result;
@@ -628,9 +640,6 @@ public class SSFormattedTextField extends JFormattedTextField
 		// TODO May want to add null check here or let SSRowSet handle. Hard to enforce if method overridden.
 		//if (this.getAllowNull() == false && _value == null)
 		//	return false;
-		
-		// UPDATE TEXT COLOR FOR NEGATIVE NUMBERS
-			updateTextColor(_value);
 			
 		// RETURN
 			return true;
