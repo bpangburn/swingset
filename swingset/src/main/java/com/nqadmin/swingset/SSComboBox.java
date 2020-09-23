@@ -779,6 +779,14 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 
 		if (options != null)
 			options.clear();
+		
+		// TODO Add empty string first item if getAllowNull()==true. Will also impact mappings, getSelectedValue(), getSelectedIndex(), etc.
+//		if (getAllowNull()) {
+//			options = new ArrayList<String>(Arrays.asList(""));
+//			options.addAll(Arrays.asList(_options));
+//		} else {
+//			options = new ArrayList<String>(Arrays.asList(_options));
+//		}
 		options = new ArrayList<String>(Arrays.asList(_options));
 		// TODO in Java 9, we can use List.of(_options)
 
@@ -915,6 +923,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 */
 	@Override
 	public void updateSSComponent() {
+		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long or Integer
 		try {
 			// Expecting an integer so trim in case the database column is a String AND has padding
 			String text = getBoundColumnText().trim();
