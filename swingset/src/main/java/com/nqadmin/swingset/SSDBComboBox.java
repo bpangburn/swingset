@@ -985,14 +985,14 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 				// extract first column string
 				// getStringValue() takes care of formatting dates
-				firstColumnString = getStringValue(rs, this.displayColumnName).trim();
+				firstColumnString = getStringValue(rs, this.displayColumnName);
 				logger.trace(getColumnForLog() + ": First column to display - " + firstColumnString);
 
 				// extract second column string, if applicable
 				// getStringValue() takes care of formatting dates
 				secondColumnString = null;
 				if (secondDisplayColumnName != null && !secondDisplayColumnName.equals("")) {
-					secondColumnString = rs.getString(this.secondDisplayColumnName).trim();
+					secondColumnString = rs.getString(this.secondDisplayColumnName);
 					if (secondColumnString.equals("")) {
 						secondColumnString = null;
 					}
@@ -1023,14 +1023,14 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		}
 	}
 
-	/**
-	 * Adds listeners for Component, RowSet, Keyboard, and PopupMenu
-	 */
-	public void removeListeners() {
-		SSComponentInterface.super.removeListeners();
-		// removeKeyListener(this.myKeyListener);
-		// removePopupMenuListener(this.myPopupMenuListener);
-	}
+//	/**
+//	 * Adds listeners for Component, RowSet, Keyboard, and PopupMenu
+//	 */
+//	public void removeListeners() {
+//		SSComponentInterface.super.removeListeners();
+//		// removeKeyListener(this.myKeyListener);
+//		// removePopupMenuListener(this.myPopupMenuListener);
+//	}
 
 //    /**
 //     * Sets the SSRowSet and column name to which the component is to be bound.
@@ -1801,6 +1801,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	@Override
 	public void updateSSComponent() {
+		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long or Integer
 		try {
 			
 			// If the user was on this component and the GlazedList had a subset of items, then
@@ -1824,7 +1825,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			// Combobox primary key column data queried from the database will generally be of data type long.
 			// The bound column text should generally be a long integer as well, but trimming to be safe.
 			// TODO Consider starting with a Long and passing directly to setSelectedValue(primaryKey). Modify setSelectedValue to accept a Long vs long.
-			String text = getBoundColumnText().trim();
+			String text = getBoundColumnText();
 			
 			logger.debug(getColumnForLog() + ": getBoundColumnText() - " + text);
 
