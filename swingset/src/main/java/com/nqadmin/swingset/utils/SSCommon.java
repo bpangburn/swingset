@@ -45,6 +45,8 @@ import java.util.StringTokenizer;
 
 import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -242,9 +244,13 @@ public class SSCommon implements Serializable {
 	}
 
 	/**
-	 * flag to indicate if the bound database column can be null
+	 * Flag to indicate if the bound database column can be null.
+	 * 
+	 * Adds in a blank item being added to SSCombobox and SSDBComboBox.
+	 * 
+	 * Setting to true by default and will let database throw exceptions if not overwritten.
 	 */
-	private boolean allowNull = false;
+	private boolean allowNull = true;
 
 	/**
 	 * Index of SSRowSet column to which the SwingSet component will be bound.
@@ -715,7 +721,26 @@ public class SSCommon implements Serializable {
 	 * @param _boundColumnText value to write to bound database column
 	 */
 	public void setBoundColumnText(String _boundColumnText) {
-		getSSRowSet().updateColumnText(_boundColumnText, getBoundColumnName(), getAllowNull());
+		try {
+			getSSRowSet().updateColumnText(_boundColumnText, getBoundColumnName(), getAllowNull());
+		} catch(NullPointerException _npe) {
+			logger.warn("Null Pointer Exception.", _npe);
+			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
+					"Null values are not allowed for " + getBoundColumnName(), "Null Exception", JOptionPane.ERROR_MESSAGE);
+			
+		} catch(SQLException _se) {
+			logger.warn("SQL Exception.", _se);
+			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
+					"SQL Exception encountered for " + getBoundColumnName(), "SQL Exception", JOptionPane.ERROR_MESSAGE);
+			
+		} catch(NumberFormatException _pe) {
+			logger.warn("Number Format Exception.", _pe);
+			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
+					"Number Format Exception encountered for " + getBoundColumnName() + " converting " + _boundColumnText + " to a number.",
+					"Number Format Exception", JOptionPane.ERROR_MESSAGE);
+			
+		}
+		
 	}
 
 //	/**
