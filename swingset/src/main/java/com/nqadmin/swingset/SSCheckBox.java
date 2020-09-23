@@ -535,6 +535,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	 */
 	@Override
 	public void updateSSComponent() {
+		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long, Integer, Boolean
 
 		// SELECT/DESELECT BASED ON UNDERLYING SQL TYPE
 		// switch(this.columnType) {

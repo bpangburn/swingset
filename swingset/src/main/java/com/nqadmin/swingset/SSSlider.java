@@ -500,7 +500,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	@Override
 	public void updateSSComponent() {
 		
-		// TODO consider trying to support string columns containing numeric values
+		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to numeric types
 		
 		// SET THE SLIDER BASED ON THE VALUE IN THE TEXT FIELD
 		switch (getBoundColumnType()) {
