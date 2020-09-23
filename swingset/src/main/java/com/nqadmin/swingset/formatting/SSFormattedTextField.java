@@ -50,6 +50,7 @@ import java.text.Format;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.apache.logging.log4j.LogManager;
@@ -134,11 +135,21 @@ public class SSFormattedTextField extends JFormattedTextField
 			    Object currentValue = ftf.getValue();
 			    logger.info(getColumnForLog() + ": Object to be passed to database is " + currentValue + ".");
 			    
-			    try {
-					getSSRowSet().updateObject(getBoundColumnName(), currentValue);
-				} catch (SQLException _se) {
-					logger.error(getColumnForLog() + ": RowSet update triggered SQL Exception.", _se);
-				}
+			    // TODO May want to see if we can veto invalid updates
+//			    if (!getAllowNull() && currentValue==null) {
+//			    	logger.warn("Null value encounted, but not allowed.");
+//					JOptionPane.showMessageDialog((JComponent)ftf,
+//							"Null values are not allowed for " + getBoundColumnName(), "Null Exception", JOptionPane.ERROR_MESSAGE);
+//			    } else {
+			    
+				    try {
+						getSSRowSet().updateObject(getBoundColumnName(), currentValue);
+					} catch (SQLException _se) {
+						logger.error(getColumnForLog() + ": RowSet update triggered SQL Exception.", _se);
+						JOptionPane.showMessageDialog((JComponent)ftf,
+								"SQL Exception encountered for " + getBoundColumnName(), "SQL Exception", JOptionPane.ERROR_MESSAGE);
+					}
+//			    }
 			    
 				addSSRowSetListener();
 			}
