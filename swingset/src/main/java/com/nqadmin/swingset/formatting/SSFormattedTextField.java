@@ -136,11 +136,11 @@ public class SSFormattedTextField extends JFormattedTextField
 			    logger.info(getColumnForLog() + ": Object to be passed to database is " + currentValue + ".");
 			    
 			    // TODO May want to see if we can veto invalid updates
-//			    if (!getAllowNull() && currentValue==null) {
-//			    	logger.warn("Null value encounted, but not allowed.");
-//					JOptionPane.showMessageDialog((JComponent)ftf,
-//							"Null values are not allowed for " + getBoundColumnName(), "Null Exception", JOptionPane.ERROR_MESSAGE);
-//			    } else {
+			    if (!getAllowNull() && currentValue==null) {
+			    	logger.warn("Null value encounted, but not allowed.");
+					JOptionPane.showMessageDialog((JComponent)ftf,
+							"Null values are not allowed for " + getBoundColumnName(), "Null Exception", JOptionPane.ERROR_MESSAGE);
+			    } else {
 			    
 				    try {
 						getSSRowSet().updateObject(getBoundColumnName(), currentValue);
@@ -149,7 +149,7 @@ public class SSFormattedTextField extends JFormattedTextField
 						JOptionPane.showMessageDialog((JComponent)ftf,
 								"SQL Exception encountered for " + getBoundColumnName(), "SQL Exception", JOptionPane.ERROR_MESSAGE);
 					}
-//			    }
+			    }
 			    
 				addSSRowSetListener();
 			}
