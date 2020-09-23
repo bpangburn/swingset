@@ -266,10 +266,13 @@ public interface SSRowSet extends RowSet {
 	 *                      underlying RowSet column
 	 * @param _columnName   name of the database column
 	 * @param _allowNull 	indicates if Component and underlying column can contain null values
+	 * @throws NullPointerException thrown if null is not allowed
+	 * @throws SQLException  thrown if a database error is encountered
+	 * @throws NumberFormatException thrown if unable to parse a string to number format
 	 */
-	public default void updateColumnText(final String _updatedValue, final String _columnName, final boolean _allowNull) {
+	public default void updateColumnText(final String _updatedValue, final String _columnName, final boolean _allowNull) throws NullPointerException, SQLException, NumberFormatException {
 
-		try {
+//		try {
 			
 			// TODO Add proper support for null vs "" based on _allowNull. For Char types all "" are currently forced to null, 
 //			if (!_allowNull && _updatedValue==null) {
@@ -298,7 +301,11 @@ public interface SSRowSet extends RowSet {
 			case Types.TINYINT:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
 				if (_updatedValue==null || _updatedValue.equals("")) {
-					this.updateNull(_columnName);
+					if (_allowNull) {
+						this.updateNull(_columnName);
+					} else {
+						throw new NullPointerException("Null values are not allowed for this field.");
+					}
 				} else {
 					int intValue = Integer.parseInt(_updatedValue);
 					this.updateInt(_columnName, intValue);
@@ -308,7 +315,11 @@ public interface SSRowSet extends RowSet {
 			case Types.BIGINT:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
 				if (_updatedValue==null || _updatedValue.equals("")) {
-					this.updateNull(_columnName);
+					if (_allowNull) {
+						this.updateNull(_columnName);
+					} else {
+						throw new NullPointerException("Null values are not allowed for this field.");
+					}
 				} else {
 					long longValue = Long.parseLong(_updatedValue);
 					this.updateLong(_columnName, longValue);
@@ -318,7 +329,11 @@ public interface SSRowSet extends RowSet {
 			case Types.FLOAT:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
 				if (_updatedValue==null || _updatedValue.equals("")) {
-					this.updateNull(_columnName);
+					if (_allowNull) {
+						this.updateNull(_columnName);
+					} else {
+						throw new NullPointerException("Null values are not allowed for this field.");
+					}
 				} else {
 					float floatValue = Float.parseFloat(_updatedValue);
 					this.updateFloat(_columnName, floatValue);
@@ -330,7 +345,11 @@ public interface SSRowSet extends RowSet {
 			case Types.DECIMAL:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
 				if (_updatedValue==null || _updatedValue.equals("")) {
-					this.updateNull(_columnName);
+					if (_allowNull) {
+						this.updateNull(_columnName);
+					} else {
+						throw new NullPointerException("Null values are not allowed for this field.");
+					}
 				} else {
 					double doubleValue = Double.parseDouble(_updatedValue);
 					this.updateDouble(_columnName, doubleValue);
@@ -340,7 +359,11 @@ public interface SSRowSet extends RowSet {
 			case Types.BOOLEAN:
 			case Types.BIT:
 				if (_updatedValue==null || _updatedValue.equals("")) {
-					this.updateNull(_columnName);
+					if (_allowNull) {
+						this.updateNull(_columnName);
+					} else {
+						throw new NullPointerException("Null values are not allowed for this field.");
+					}
 				} else {
 					// CONVERT THE GIVEN STRING TO BOOLEAN TYPE
 					boolean boolValue = Boolean.valueOf(_updatedValue).booleanValue();
@@ -351,7 +374,11 @@ public interface SSRowSet extends RowSet {
 			case Types.DATE:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
 				if (_updatedValue==null || _updatedValue.equals("")) {
-					this.updateNull(_columnName);
+					if (_allowNull) {
+						this.updateNull(_columnName);
+					} else {
+						throw new NullPointerException("Null values are not allowed for this field.");
+					}
 // TODO Good to get rid of getSQLDate if possible.						
 				} else if (_updatedValue.length() == 10) {
 					this.updateDate(_columnName, SSCommon.getSQLDate(_updatedValue));
@@ -363,7 +390,11 @@ public interface SSRowSet extends RowSet {
 			case Types.TIME:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
 				if (_updatedValue==null || _updatedValue.equals("")) {
-					this.updateNull(_columnName);
+					if (_allowNull) {
+						this.updateNull(_columnName);
+					} else {
+						throw new NullPointerException("Null values are not allowed for this field.");
+					}
 				} else {
 					this.updateTime(_columnName, java.sql.Time.valueOf(_updatedValue));
 				}
@@ -372,7 +403,11 @@ public interface SSRowSet extends RowSet {
 			case Types.TIMESTAMP:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
 				if (_updatedValue==null || _updatedValue.equals("")) {
-					this.updateNull(_columnName);
+					if (_allowNull) {
+						this.updateNull(_columnName);
+					} else {
+						throw new NullPointerException("Null values are not allowed for this field.");
+					}
 // TODO Probably do not want a length of 10 characters here. Good to get rid of getSQLDate if possible.					
 				} else if (_updatedValue.length() == 10) {
 					this.updateTimestamp(_columnName, new Timestamp(SSCommon.getSQLDate(_updatedValue).getTime()));
@@ -389,23 +424,32 @@ public interface SSRowSet extends RowSet {
 				// THIS CAUSES A PROBLEM SO WE WRITE NULL
 				// TODO investigate if we can let the programmer indicate how this should be
 				// handled for a given column OR see if we can identify constraints
-				if (_updatedValue==null || _updatedValue.equals("")) {
-					this.updateNull(_columnName);
+//				if (_updatedValue==null || _updatedValue.equals("")) {
+//					this.updateNull(_columnName);
+//				} else {
+//					this.updateString(_columnName, _updatedValue);
+//				}
+				
+				if (_updatedValue==null) {
+					if (_allowNull) {
+						this.updateNull(_columnName);
+					} else {
+						throw new NullPointerException("Null values are not allowed for this field.");
+					}
 				} else {
 					this.updateString(_columnName, _updatedValue);
 				}
-
 				break;
 
 			default:
 				LogManager.getLogger().error("Unsupported data type of " + JDBCType.valueOf(columnType).getName() + " for column " + _columnName + ".");
 			} // end switch
 
-		} catch (SQLException se) {
-			LogManager.getLogger().error("SQL Exception for column " + _columnName + ".", se);
-		} catch (NumberFormatException nfe) {
-			LogManager.getLogger().error("Number Format Exception for column " + _columnName + ".", nfe);
-		}
+//		} catch (SQLException se) {
+//			LogManager.getLogger().error("SQL Exception for column " + _columnName + ".", se);
+//		} catch (NumberFormatException nfe) {
+//			LogManager.getLogger().error("Number Format Exception for column " + _columnName + ".", nfe);
+//		}
 
 	} // end protected void updateColumnText(String _updatedValue, String _columnName)
 		// {
