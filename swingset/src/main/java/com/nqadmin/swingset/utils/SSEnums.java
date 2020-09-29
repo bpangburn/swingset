@@ -48,7 +48,6 @@ public class SSEnums {
 
 	/**
 	 * Enumeration for SwingSet component types.
-	 * <p>
 	 */
 	@SuppressWarnings("javadoc")
 	public enum SSComponent {

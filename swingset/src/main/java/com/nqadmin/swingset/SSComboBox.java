@@ -87,7 +87,6 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * <p>
  * To give your own mappings you can set the mappings separately or pass them
  * along with the options:
- * <p>
  * <pre>
  * {@code
  * SSComboBox combo = new SSComboBox();
@@ -99,7 +98,6 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * // column in mysSRowSet
  * combo.bind(mysSRowSet,"my_column"); }
  * </pre>
- * <p>
  */
 // TODO Consider processing the delete key to allow de-selection (e.g., setSelectedIndex(-1);)
 public class SSComboBox extends JComboBox<String> implements SSComponentInterface {

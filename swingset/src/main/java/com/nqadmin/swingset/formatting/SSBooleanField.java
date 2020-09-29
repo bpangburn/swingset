@@ -77,7 +77,6 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	/**
 	 * This method should implements validation AND, most important for our purposes
 	 * implements actual rowset fields updates.
-	 * <p>
 	 */
 	protected class internalVerifier extends InputVerifier {
 

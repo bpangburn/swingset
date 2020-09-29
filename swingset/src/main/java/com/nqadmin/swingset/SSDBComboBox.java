@@ -88,7 +88,6 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
  * In the combobox you would want to display the part name rather than part_id
  * so that it is easier for the user to choose. At the same time you want to
  * store the id of the part chosen by the user in the shipment table.
- * <p>
  * <pre>
  * {@code
  * SSConnection connection = null;

@@ -76,7 +76,6 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * by the user. For a MaskFormatter, this triggers a ParseException, which would need to be caught in the code and surplanted by
  * a call to setValue(null); Using a MaskFormatter still requires additional validation of some sort. E.g. preventing a MM/dd/yyyy date of
  * 99/99/9999 from being entered.
- * <p>
  */
 // TODO Consider adding back context help and calculators via popups. See 2020-01-07 revisions or earlier.
 // TODO Add JDatePicker support or something similar: https://www.codejava.net/java-se/swing/how-to-use-jdatepicker-to-display-calendar-component and https://github.com/JDatePicker/JDatePicker

@@ -576,7 +576,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	}
 
 	/**
-	 * <p>
+	 * 
 	 */
 	protected void Rescale() {
 		if (this.fullIcon != null) {

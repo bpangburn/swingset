@@ -213,7 +213,6 @@ public class SSCommon implements Serializable {
 	/**
 	 * Constant to indicate that no RowSet column type has been specified.
 	 * <p>
-	 * <p>
 	 * Per https://www.tutorialspoint.com/java-resultsetmetadata-getcolumntype-method-with-example
 	 * value can be positive or negative so it's dangerous to presume -1 can represent that
 	 * no column type has been specified.
