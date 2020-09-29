@@ -55,22 +55,22 @@ import org.apache.logging.log4j.Logger;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
+// SSComboBox.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSComboBox.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Provides a way of displaying text corresponding to codes that are stored in
  * the database. By default the codes start from zero. If you want to provide a
  * different mapping for the items in the combobox then a string of integers
  * containing the corresponding numeric values for each choice must be provided.
- *
+ * <p>
  * Note that if you DO NOT want to use the default mappings, the custom mappings
  * must be set before calling the bind() method to bind the combobox to a
  * database column.
- * 
+ * <p>
  * SSComboBox assumes that it will be bound to an integer column
- *
+ * <p>
  * Also, if changing both a sSRowSet and column name consider using the bind()
  * method rather than individual setSSRowSet() and setColumName() calls. <br>
  * For example,
@@ -81,13 +81,13 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * combo.setOptions(options);
  * }
  * </pre>
- *
+ * <p>
  * For the above items the combobox assumes that the values start from zero:
  * {@literal "111" -> 0, "2222" -> 1, "33333" -> 2}
- *
+ * <p>
  * To give your own mappings you can set the mappings separately or pass them
  * along with the options:
- *
+ * <p>
  * <pre>
  * {@code
  * SSComboBox combo = new SSComboBox();
@@ -99,7 +99,7 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * // column in mysSRowSet
  * combo.bind(mysSRowSet,"my_column"); }
  * </pre>
- *
+ * <p>
  */
 // TODO Consider processing the delete key to allow de-selection (e.g., setSelectedIndex(-1);)
 public class SSComboBox extends JComboBox<String> implements SSComponentInterface {
@@ -338,7 +338,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	/**
 	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
-	 * 
+	 * <p>
 	 * It will actually be called from SSCommon.init() once the SSCommon data member
 	 * is instantiated.
 	 */
@@ -625,7 +625,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	/**
 	 * Returns the mapping code corresponding to the currently selected item in the
 	 * combobox.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @return returns the value associated with the selected item OR -1 if nothing
@@ -867,11 +867,11 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 
 	/**
 	 * Sets the value stored in the component.
-	 * 
+	 * <p>
 	 * If called from updateSSComponent() from a RowSet change then the Component
 	 * listener should already be turned off. Otherwise we want it on so the
 	 * ultimate call to setSelectedIndex() will trigger an update the to RowSet.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _value value to assign to combobox, which may or may not correlate to
@@ -926,7 +926,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText()
-	 * 
+	 * <p>
 	 * Call to this method should be coming from SSCommon and should already have
 	 * the Component listener removed
 	 */

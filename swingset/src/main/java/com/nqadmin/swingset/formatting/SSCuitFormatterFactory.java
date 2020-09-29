@@ -42,13 +42,13 @@ import javax.swing.text.MaskFormatter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+// SSCuitFormatterFactory.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSCuitFormatterFactory.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * SSCuitFormatterFactory extends DefaultFormatterFactory for Argentina's Tax ID fields.
- * 
+ * <p>
  * See https://meta.cdq.ch/CUIT_number_(Argentina)
  */
 
@@ -100,9 +100,3 @@ public class SSCuitFormatterFactory extends javax.swing.text.DefaultFormatterFac
     }
 }
 
-/*
- * $Log$
- * Revision 1.1  2005/06/08 02:26:02  dags
- * initial release
- *
- */

@@ -39,11 +39,11 @@ package com.nqadmin.swingset;
 
 import java.io.Serializable;
 
+// SSCellEditing.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSCellEditing.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * The SSCellEditing interface specifies the methods the SSTableModel will use
  * to determine whether or not a given cell can be edited or if a user-specified
  * value for a cell is valid or invalid.
@@ -58,7 +58,7 @@ public interface SSCellEditing extends Serializable {
 	/**
 	 * Returns true if the cell at row _row and at column _column is editable else
 	 * false.
-	 *
+	 * <p>
 	 * SSTableModel first looks in to uneditable columns, if the column is not in
 	 * the uneditable columns list then this function is called (If SSCellEditing is
 	 * implemented).
@@ -91,21 +91,3 @@ public interface SSCellEditing extends Serializable {
 
 } // end public interface SSCellEditing {
 
-/*
- * $Log$ Revision 1.6 2005/02/04 22:48:52 yoda2 API cleanup & updated Copyright
- * info.
- *
- * Revision 1.5 2004/11/11 14:45:33 yoda2 Using TextPad, converted all tabs to
- * "soft" tabs comprised of four actual spaces.
- *
- * Revision 1.4 2004/08/10 22:06:59 yoda2 Added/edited JavaDoc, made code layout
- * more uniform across classes, made various small coding improvements suggested
- * by PMD.
- *
- * Revision 1.3 2004/03/08 16:43:37 prasanth Updated copyright year.
- *
- * Revision 1.2 2003/12/18 20:12:40 prasanth Update class description.
- *
- * Revision 1.1 2003/12/16 18:02:47 prasanth Initial version.
- *
- */

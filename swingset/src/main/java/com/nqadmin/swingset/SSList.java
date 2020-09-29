@@ -57,20 +57,20 @@ import com.nqadmin.swingset.utils.SSArray;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
+// SSList.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSList.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Provides a way to display a list of elements and map them to corresponding
  * database codes. The selected values can be stored in a DB array element.
  * These mappings can be provided by setOptions method.
- * 
+ * <p>
  * e.g. SSList list = new SSList(); String[] options = {"VLarge""large",
  * "medium", "small", "VSmall}; Double[] mappings = {100.0, 10.0, 5.0, 1.0,
  * 0.1}; list.setOptions(options, mappings); list.bind(myRowset, "my_column",
  * "myDataType");
- * 
+ * <p>
  * If three values VLarge, medium, small are selected the array element in the
  * database will store {100.0,5.0,1.0}
  */
@@ -293,7 +293,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	/**
 	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
-	 * 
+	 * <p>
 	 * It will actually be called from SSCommon.init() once the SSCommon data member
 	 * is instantiated.
 	 */
@@ -613,7 +613,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText()
-	 * 
+	 * <p>
 	 * Call to this method should be coming from SSCommon and should already have
 	 * the Component listener removed
 	 */

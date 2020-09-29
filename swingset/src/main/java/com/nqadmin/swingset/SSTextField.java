@@ -54,11 +54,11 @@ import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
+// SSTextField.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSTextField.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * SSTextField extends the JTextField. This class provides different masks
  * like date mask, SSN mask etc.
  */
@@ -482,7 +482,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
     /**
 	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
-	 * 
+	 * <p>
 	 * It will actually be called from SSCommon.init() once the SSCommon data member
 	 * is instantiated.
 	 */
@@ -680,7 +680,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText()
-	 * 
+	 * <p>
 	 * Call to this method should be coming from SSCommon and should already have
 	 * the Component listener removed
 	 */

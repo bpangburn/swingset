@@ -45,11 +45,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
+// SSDateFormatterFactory.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSDateFormatterFactory.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * SSDateFormatterFactory extends DefaultFormatterFactory for Date fields.
  */
 public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFactory {

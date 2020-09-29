@@ -51,11 +51,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.sql.RowSetEvent;
 
+// SSSyncManager.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSSyncManager.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Used to synchronize a data navigator and a navigation combo box.
  */
 public class SSSyncManager {
@@ -206,7 +206,7 @@ public class SSSyncManager {
 	private static Logger logger = LogManager.getLogger();
 
 	/**
-	 * 
+	 * <p>
 	 * Creates a SSSyncManager with the specified combo box and data navigator.
 	 *
 	 * @param _comboBox      SSDBComboBox used for record navigation
@@ -229,7 +229,7 @@ public class SSSyncManager {
 	}
 
 	/**
-	 * 
+	 * <p>
 	 * Method to update combo box based on rowset.
 	 */
 	protected void adjustValue() {
@@ -331,26 +331,3 @@ public class SSSyncManager {
 
 } // end public class SSSyncManager {
 
-/*
- * $Log$ Revision 1.7 2012/08/10 14:41:01 prasanth Modified for compatibility
- * with filterable db combobox.
- *
- * Revision 1.6 2005/02/22 16:09:46 prasanth In adjustValue while checking combo
- * selection make sure the underlying value returned is not null. If the
- * selected item is -1 the getSelectedStringValue will return null.
- *
- * Revision 1.5 2005/02/10 16:51:23 prasanth On rowset events checking if the
- * combo box is displaying the right value or not. Changing the selection only
- * if it is not displaying the right one.
- *
- * Revision 1.4 2005/02/10 03:36:08 yoda2 JavaDoc cleanup and updated to support
- * string columns used for synchronization (to match recent changes in
- * SSDBComboBox).
- *
- * Revision 1.3 2005/02/05 15:06:56 yoda2 Got rid of depreciated calls.
- *
- * Revision 1.2 2005/02/04 22:49:15 yoda2 API cleanup & updated Copyright info.
- *
- * Revision 1.1 2005/01/03 19:53:43 prasanth Initial Commit.
- *
- */

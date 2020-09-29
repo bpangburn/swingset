@@ -57,11 +57,11 @@ import javax.swing.JTable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+// SSTableKeyAdapter.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSTableKeyAdapter.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Key adapter for JTable and SSDataGrid that manages cut and paste functionality
  * between a table and either another table or a spreadsheet.
  */
@@ -387,23 +387,3 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 } // end public class SSTableKeyAdapter extends KeyAdapter implements Serializable
 	// {
 
-/*
- * $Log$ Revision 1.7 2006/05/15 16:10:38 prasanth Updated copy right
- *
- * Revision 1.6 2005/02/09 21:22:35 yoda2 JavaDoc cleanup.
- *
- * Revision 1.5 2005/02/04 22:48:54 yoda2 API cleanup & updated Copyright info.
- *
- * Revision 1.4 2004/11/11 14:45:48 yoda2 Using TextPad, converted all tabs to
- * "soft" tabs comprised of four actual spaces.
- *
- * Revision 1.3 2004/08/11 14:44:31 prasanth Added java doc.
- *
- * Revision 1.2 2004/08/10 22:06:59 yoda2 Added/edited JavaDoc, made code layout
- * more uniform across classes, made various small coding improvements suggested
- * by PMD.
- *
- * Revision 1.1 2004/07/30 22:38:54 prasanth Table listener for copy and paste
- * support.
- *
- */

@@ -63,11 +63,11 @@ import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
+// SSImage.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSImage.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Used to load, store, and display images stored in a database.
  */
 public class SSImage extends JPanel implements SSComponentInterface {
@@ -188,7 +188,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	private static Logger logger = LogManager.getLogger();
 
     /**
-     *
+     * <p>
      *  Construct a default SSImage Object.
      */
     public SSImage() {
@@ -366,7 +366,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
     /**
 	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
-	 * 
+	 * <p>
 	 * It will actually be called from SSCommon.init() once the SSCommon data member
 	 * is instantiated.
 	 */
@@ -524,7 +524,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText()
-	 * 
+	 * <p>
 	 * Call to this method should be coming from SSCommon and should already have
 	 * the Component listener removed
 	 */

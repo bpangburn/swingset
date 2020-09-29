@@ -37,11 +37,11 @@
 
 package com.nqadmin.swingset;
 
+// SSDataGridHandler.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSDataGridHandler.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * The SSDataGridHandler interface specifies set of methods that can be used to
  * determine whether or not a given row can be deleted, and operation to be 
  * performed before and after deletion or insertion of a record.
@@ -50,7 +50,7 @@ public interface SSDataGridHandler {
 
     /**
      * Returns true if the row _row can be deleted
-     *
+     * <p>
      * SSTableModel calls this function if the row deletion is requested 
 	 * (If SSDataGridHandler is implemented).
      *

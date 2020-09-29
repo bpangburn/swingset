@@ -67,18 +67,3 @@ public class SSStringField extends SSFormattedTextField {
     
 }
 
-/*
- * $Log$
- * Revision 1.5  2005/02/04 22:42:06  yoda2
- * Updated Copyright info.
- *
- * Revision 1.4  2005/01/18 23:38:01  dags
- * Diego's name fix
- *
- * Revision 1.3  2004/12/13 20:50:16  dags
- * Fix package name
- *
- * Revision 1.2  2004/12/13 18:46:13  prasanth
- * Added License.
- *
- */

@@ -41,15 +41,15 @@ import java.io.Serializable;
 
 
 
+// SSDataGridAdapter.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSDataGridAdapter.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * This abstract class is provided as a convenience for creating
  * custom SSDataGridHandler objects. Extend this class to create a 
  * SSDataGridHandler implementation.
- *
+ * <p>
  * SSDataGridHandlerImpl defines empty functions so that the programmer can define
  * only the functions desired.
  */

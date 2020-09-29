@@ -42,11 +42,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+// SSArray.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSArray.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Implementation of SQL array for SSList.
  */
 

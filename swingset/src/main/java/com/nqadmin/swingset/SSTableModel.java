@@ -56,17 +56,17 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.SSRowSet;
 
+// SSTableModel.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSTableModel.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * SSTableModel provides an implementation of the TableModel interface. The
  * SSDataGrid uses this class for providing a grid view for a SSRowSet.
  * SSTableModel can be used without the SSDataGrid (e.g. in conjunction with a
  * JTable), but the cell renderers and hidden columns features of the SSDataGrid
  * will not be available.
- *
+ * <p>
  * SSTableModel can be used with a JTable to get a Grid view of the data.
  */
 public class SSTableModel extends AbstractTableModel {
@@ -774,7 +774,7 @@ public class SSTableModel extends AbstractTableModel {
 
 	/**
 	 * Returns the default value inforce for the requested column.
-	 *
+	 * <p>
 	 * The type of object is same as returned by getColumnClass in JTable.
 	 *
 	 * @param _columnNumber the column number for which default value is needed.
@@ -994,71 +994,3 @@ public class SSTableModel extends AbstractTableModel {
 
 } // end public class SSTableModel extends AbstractTableModel {
 
-/*
- * $Log$ Revision 1.24 2007/11/12 22:44:45 prasanth When the underlying column
- * is timestamp using updateTimestamp rather than updateDate.
- *
- * Revision 1.23 2007/10/26 20:35:26 prasanth getValueAt now returns null if a
- * given column has null. It used to return 0 for numeric fields (getInt,
- * getDouble return 0 for null columns)
- *
- * Revision 1.22 2007/01/08 22:03:20 prasanth Trimming any spaces on either side
- * to avoid NumberFormatException. This could happen when copying data to the
- * spreadsheet.
- *
- * Revision 1.21 2006/05/15 16:10:38 prasanth Updated copy right
- *
- * Revision 1.20 2005/03/16 21:12:33 prasanth In setValueAt checking for the
- * type of column and converting the value from String to Date if the column
- * type is Date or TimeStamp, so that all the functions in different interfaces
- * get the Date object rather than String as the new value.
- *
- * Revision 1.19 2005/03/09 21:45:26 prasanth Added TIMESTAMP column type in
- * setValueAt & getValueAt functions.
- *
- * Revision 1.18 2005/02/09 22:20:05 yoda2 JavaDoc cleanup.
- *
- * Revision 1.17 2005/02/07 22:55:34 yoda2 Fixed accidental renaming in
- * deprecated method.
- *
- * Revision 1.16 2005/02/07 22:46:29 yoda2 Deprecated setRowSet().
- *
- * Revision 1.15 2005/02/04 23:05:10 yoda2 no message
- *
- * Revision 1.14 2005/02/04 22:48:54 yoda2 API cleanup & updated Copyright info.
- *
- * Revision 1.13 2004/11/11 14:45:48 yoda2 Using TextPad, converted all tabs to
- * "soft" tabs comprised of four actual spaces.
- *
- * Revision 1.12 2004/11/01 15:48:39 yoda2 Added support for NUMERIC. Made type
- * support consistent across SwingSet: INTEGER, SMALLINT, TINYINT (Integer);
- * BIGINT (Long); FLOAT (Float); DOUBLE, NUMERIC (Double); BOOLEAN, BIT
- * (Boolean); DATE (Date); CHAR, VARCHAR, LONGVARCHAR (String).
- *
- * Revision 1.11 2004/10/25 22:13:43 yoda2 Updated JavaDoc for new datasource
- * abstraction layer in 0.9.0 release.
- *
- * Revision 1.10 2004/10/25 19:51:03 prasanth Modified to use the new SSRowSet
- * instead of RowSet.
- *
- * Revision 1.9 2004/10/19 21:13:07 prasanth In getSQLDate function. checking if
- * a / occurs in the string. If not assuming that its in standard format
- * yyyy-mm-dd and trying to convert in to a date.
- *
- * Revision 1.8 2004/09/27 15:48:17 prasanth Added function to disable
- * insertions.
- *
- * Revision 1.7 2004/08/10 22:06:58 yoda2 Added/edited JavaDoc, made code layout
- * more uniform across classes, made various small coding improvements suggested
- * by PMD.
- *
- * Revision 1.6 2004/08/02 15:27:15 prasanth Made all variabled protected.
- *
- * Revision 1.5 2004/03/08 16:43:37 prasanth Updated copy right year.
- *
- * Revision 1.4 2003/12/18 20:12:20 prasanth Update class description.
- *
- * Revision 1.3 2003/12/16 18:01:40 prasanth Documented versions for release
- * 0.6.0
- *
- */

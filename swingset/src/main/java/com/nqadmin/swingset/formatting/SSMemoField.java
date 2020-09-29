@@ -424,7 +424,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	public void focusLost(final FocusEvent _event) {
 		/**
 		 * some code to highlight the component with the focus
-		 *
+		 * <p>
 		 */
 		setBackground(this.std_color);
 	}
@@ -439,7 +439,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 		/**
 		 * some code to highlight the component with the focus
-		 *
+		 * <p>
 		 */
 		java.awt.Color col = new java.awt.Color(204, 255, 255);
 		this.std_color = getBackground();
@@ -448,7 +448,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		/**
 		 * This is a bug workaround see :
 		 * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4740914
-		 *
+		 * <p>
 		 */
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -461,7 +461,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	/**
 	 * This method should implements validation AND, most important for our purposes
 	 * implements actual rowset fields updates.
-	 *
+	 * <p>
 	 */
 
 	class internalVerifier extends InputVerifier {
@@ -518,7 +518,3 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	}
 }
 
-/*
- * $Log$ Revision 1.11 2006/04/27 22:02:45 prasanth Added/updated java doc
- *
- */

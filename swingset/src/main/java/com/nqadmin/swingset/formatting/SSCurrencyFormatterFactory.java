@@ -42,11 +42,11 @@ import java.util.Locale;
 
 import javax.swing.text.NumberFormatter;
 
+// SSCurrencyFormatterFactory.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSCurrencyFormatterFactory.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * SSCurrencyFormatterFactory extends DefaultFormatterFactory for US Currency fields.
  */
 public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
@@ -116,21 +116,3 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
     
 }
 
-/*
- * $Log$
- * Revision 1.6  2005/02/04 22:42:06  yoda2
- * Updated Copyright info.
- *
- * Revision 1.5  2005/01/18 23:37:59  dags
- * Diego's name fix
- *
- * Revision 1.4  2005/01/18 22:34:29  dags
- * sincronization update
- *
- * Revision 1.3  2004/12/13 20:50:16  dags
- * Fix package name
- *
- * Revision 1.2  2004/12/13 18:46:13  prasanth
- * Added License.
- *
- */

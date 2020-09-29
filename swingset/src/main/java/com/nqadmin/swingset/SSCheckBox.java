@@ -51,11 +51,11 @@ import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
+// SSCheckBox.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSCheckBox.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Used to display the boolean values stored in the database. The SSCheckBox can
  * be bound to a numeric or boolean database column. Currently, binding to a
  * boolean column has been tested only with PostgreSQL. If bound to a numeric
@@ -63,7 +63,7 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * unchecked SSCheckBox will returns a '0'. In the future an option may be added
  * to allow the user to specify the values returned for the checked and
  * unchecked SSCheckBox states.
- *
+ * <p>
  * Note that for naming consistency, SSCheckBox replaced SSDBCheckBox
  * 01-10-2005.
  */
@@ -485,7 +485,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	/**
 	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
-	 * 
+	 * <p>
 	 * It will actually be called from SSCommon.init() once the SSCommon data member
 	 * is instantiated.
 	 */
@@ -529,7 +529,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText()
-	 * 
+	 * <p>
 	 * Call to this method should be coming from SSCommon and should already have
 	 * the Component listener removed
 	 */

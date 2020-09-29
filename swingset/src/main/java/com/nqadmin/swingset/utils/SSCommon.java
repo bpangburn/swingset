@@ -57,30 +57,30 @@ import org.apache.logging.log4j.Logger;
 import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSRowSet;
 
+// SSCommon.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSCommon.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Datasource binding data members and methods common to all SwingSet
  * components.
- * 
+ * <p>
  * All SwingSet components should have a ssCommon datamember of type SSCommon
  * and should implement SSComponentInterface
- * 
+ * <p>
  * SwingSet components will implement addComponentListener() and
  * removeComponentListener() to maintain data flow from the JComponent to
  * ssCommon.ssRowSet and from ssCommon.ssRowSet to JComponent
- * 
+ * <p>
  * Generally the developer will need to add an inner class and corresponding
  * data member that implements the appropriate listener for the JComponent
  * involved (e.g., ItemListener for a class extending JCheckBox, ChangeListener
  * for a class extending JSlider, DocumentListener for a class extending
  * JTextField, etc.).
- * 
+ * <p>
  * It is possible some SwingSet will be unbound where a change to the component
  * should not trigger a database change.
- * 
+ * <p>
  * A good example of this is SSDBComboBox, which may be used solely for
  * navigation.
  */
@@ -89,18 +89,18 @@ public class SSCommon implements Serializable {
 	/**
 	 * Document listener provided for convenience for SwingSet Components based on
 	 * JTextComponents
-	 * 
+	 * <p>
 	 * Updates the underlying RowSet there is a change to the Document object. E.g.,
 	 * a call to setText() on a JTextField.
-	 * 
+	 * <p>
 	 * DocumentListener events generally, but not always get fired twice any time
 	 * there is an update to the JTextField: a removeUpdate() followed by
 	 * insertUpdate(). See:
 	 * https://stackoverflow.com/questions/15209766/why-jtextfield-settext-will-fire-documentlisteners-removeupdate-before-change#15213813
-	 * 
+	 * <p>
 	 * Using partial solution here from here:
 	 * https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
-	 * 
+	 * <p>
 	 * Having removeUpdate() and insertUpdate() both call changedUpdate().
 	 * changedUpdate() uses counters and SwingUtilities.invokeLater() to only update
 	 * the display on the last method called.
@@ -212,12 +212,12 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Constant to indicate that no RowSet column type has been specified.
-	 * 
-	 * 
+	 * <p>
+	 * <p>
 	 * Per https://www.tutorialspoint.com/java-resultsetmetadata-getcolumntype-method-with-example
 	 * value can be positive or negative so it's dangerous to presume -1 can represent that
 	 * no column type has been specified.
-	 * 
+	 * <p>
 	 * There is a java.sql.Type of of NULL
 	 */
 	@Deprecated
@@ -245,9 +245,9 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Flag to indicate if the bound database column can be null.
-	 * 
+	 * <p>
 	 * Adds in a blank item being added to SSCombobox and SSDBComboBox.
-	 * 
+	 * <p>
 	 * Setting to true by default and will let database throw exceptions if not overwritten.
 	 */
 	private boolean allowNull = true;
@@ -466,7 +466,7 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Returns a String representing the value in the bound database column.
-	 * 
+	 * <p>
 	 * New functionality added (2020) to allow this method to return a null String
 	 * if allowNull==true. allowNull is false by default so nulls will be converted
 	 * to empty strings.
@@ -495,7 +495,7 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Returns the integer code representing the bound database column data type.
-	 * 
+	 * <p>
 	 * Based on java.sql.Types
 	 * 
 	 * @return the data type of the bound column
@@ -506,7 +506,7 @@ public class SSCommon implements Serializable {
 	
 	/**
 	 * Returns the JDBCType enum representing the bound database column data type.
-	 * 
+	 * <p>
 	 * Based on java.sql.JDBCType
 	 * 
 	 * @return the enum value corresponding to the data type of the bound column
@@ -627,7 +627,7 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Updates the bound database column with the specified Array.
-	 * 
+	 * <p>
 	 * Used for SSList or other component where multiple items can be selected.
 	 * 
 	 * @param _boundColumnArray Array to write to bound database column
@@ -784,7 +784,7 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Method used by SSRowSet listeners to update the bound SwingSet component.
-	 * 
+	 * <p>
 	 * Handles removal of Component listener before update and addition of listener
 	 * after update.
 	 */

@@ -37,11 +37,11 @@
 
 package com.nqadmin.swingset;
 
+// SSDataValue.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSDataValue.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * The SSDataValue interface specifies methods for SSTableModel to retrieve the
  * value for primary column in JTable.
  */
@@ -59,23 +59,3 @@ public interface SSDataValue {
 
 } // end public interface SSDataValue {
 
-/*
- * $Log$ Revision 1.7 2005/02/04 22:48:54 yoda2 API cleanup & updated Copyright
- * info.
- *
- * Revision 1.6 2004/11/11 14:45:48 yoda2 Using TextPad, converted all tabs to
- * "soft" tabs comprised of four actual spaces.
- *
- * Revision 1.5 2004/10/25 22:03:17 yoda2 Updated JavaDoc for new datasource
- * abstraction layer in 0.9.0 release.
- *
- * Revision 1.4 2004/08/10 22:06:59 yoda2 Added/edited JavaDoc, made code layout
- * more uniform across classes, made various small coding improvements suggested
- * by PMD.
- *
- * Revision 1.3 2004/03/08 16:43:37 prasanth Updated copy right year.
- *
- * Revision 1.2 2003/12/16 18:01:40 prasanth Documented versions for release
- * 0.6.0
- *
- */

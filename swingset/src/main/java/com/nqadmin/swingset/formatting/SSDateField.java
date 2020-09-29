@@ -38,11 +38,11 @@
 package com.nqadmin.swingset.formatting;
 
 
+// SSDateField.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSDateField.java
- *
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Used to link a SSFormattedTextField to a date column in a database.
  */
 

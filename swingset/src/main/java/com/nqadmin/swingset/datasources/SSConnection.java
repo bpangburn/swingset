@@ -47,11 +47,11 @@ import java.sql.SQLException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+// SSConnection.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSConnection.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * The SSConnection class is a wrapper for Connection. It provides methods to
  * specify the url, username, password and driver class name. The createConnection
  * should be called before calling the getConnection method. Whenever any
@@ -157,7 +157,7 @@ public class SSConnection implements Serializable {
 	/**
 	 * Creates a connection to the database based on the information provided by the
 	 * user.
-	 * 
+	 * <p>
 	 * @throws SQLException	SQLException
 	 * @throws ClassNotFoundException	ClassNotFoundException
 	 */
@@ -297,25 +297,3 @@ public class SSConnection implements Serializable {
 	}
 }
 
-/*
- * $Log$ Revision 1.8 2005/02/11 22:59:55 yoda2 Imported PropertyVetoException
- * and added some bound properties.
- *
- * Revision 1.7 2005/02/11 20:16:27 yoda2 Added infrastructure to support
- * property & vetoable change listeners (for beans).
- *
- * Revision 1.6 2005/02/10 20:13:20 yoda2 Setter/getter cleanup & method
- * reordering for consistency.
- *
- * Revision 1.5 2005/02/09 23:04:01 yoda2 JavaDoc cleanup.
- *
- * Revision 1.4 2005/02/09 06:39:06 prasanth Added PropertyChangeSupport
- *
- * Revision 1.3 2005/02/04 22:49:09 yoda2 API cleanup & updated Copyright info.
- *
- * Revision 1.2 2004/11/11 14:45:57 yoda2 Using TextPad, converted all tabs to
- * "soft" tabs comprised of four actual spaces.
- *
- * Revision 1.1 2004/10/25 21:47:50 prasanth Initial Commit
- *
- */

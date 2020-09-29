@@ -39,11 +39,11 @@ package com.nqadmin.swingset.formatting;
 
 import javax.swing.SwingConstants;
 
+// SSPercentField.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSPercentField.java
- *
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Used to link a SSFormattedTextField to a percentage column in a database.
  */
 public class SSPercentField extends SSFormattedTextField {

@@ -39,11 +39,11 @@ package com.nqadmin.swingset.formatting;
 
 import javax.swing.SwingConstants;
 
+// SSIntegerField.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSIntegerField.java
- *
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Used to link a SSFormattedTextField to an integer column in a database.
  */
 
@@ -127,15 +127,3 @@ public class SSIntegerField extends SSFormattedTextField {
 	}
 }
 
-/*
- * $Log$ Revision 1.6 2005/03/28 14:46:42 dags syncro commit
- *
- * Revision 1.5 2005/02/04 22:42:06 yoda2 Updated Copyright info.
- *
- * Revision 1.4 2005/01/18 23:38:01 dags Diego's name fix
- *
- * Revision 1.3 2004/12/13 20:50:16 dags Fix package name
- *
- * Revision 1.2 2004/12/13 18:46:13 prasanth Added License.
- *
- */

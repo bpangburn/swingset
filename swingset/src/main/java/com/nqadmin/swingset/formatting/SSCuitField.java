@@ -40,15 +40,15 @@ package com.nqadmin.swingset.formatting;
 import javax.swing.text.Caret;
 import javax.swing.text.DefaultCaret;
 
+// SSCuitField.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSCuitField.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * SSCuitField extends the SSFormattedTextField. This class provides an implementation 
  * of Argentina's Tax ID. Every taxpayer in Argentina must have this Government supplied 
  * ID. It is an 10 digits code plus one verifier digit. Display format is ##-########-#.
- * 
+ * <p>
  * See https://meta.cdq.ch/CUIT_number_(Argentina)
  */
 
@@ -152,9 +152,3 @@ public class SSCuitField extends SSFormattedTextField {
     }
 }
 
-/*
- * $Log$
- * Revision 1.1  2005/06/08 02:26:02  dags
- * initial release
- * 
- */

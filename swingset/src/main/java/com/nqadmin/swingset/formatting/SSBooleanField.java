@@ -77,7 +77,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	/**
 	 * This method should implements validation AND, most important for our purposes
 	 * implements actual rowset fields updates.
-	 *
+	 * <p>
 	 */
 	protected class internalVerifier extends InputVerifier {
 
@@ -451,35 +451,3 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	}
 }
 
-/*
- * $Log$ Revision 1.14 2006/04/27 22:02:45 prasanth Added/updated java doc
- *
- * Revision 1.13 2005/05/29 02:24:37 dags SSConnection and SSRowSet getters and
- * setter refactoring
- *
- * Revision 1.12 2005/05/26 22:20:36 dags SSField interface implemented
- *
- * Revision 1.11 2005/05/26 12:12:36 dags added bind(SSRowSet, columnName)
- * method and some java.sql.Types checking and support
- *
- * Revision 1.10 2005/03/30 13:03:51 dags Accept null dates values
- *
- * Revision 1.9 2005/03/28 14:46:42 dags syncro commit
- *
- * Revision 1.8 2005/02/22 15:14:34 yoda2 Fixed some JavaDoc & deprecation
- * errors/warnings.
- *
- * Revision 1.7 2005/02/04 22:42:06 yoda2 Updated Copyright info.
- *
- * Revision 1.6 2005/01/19 19:12:26 dags bind refactoring
- *
- * Revision 1.5 2005/01/14 00:06:42 dags Deep Refactoring
- *
- * Revision 1.4 2004/12/21 05:07:02 dags Remove SSFormattedTextField dependency.
- * Simplified, I hope.
- *
- * Revision 1.3 2004/12/13 20:50:16 dags Fix package name
- *
- * Revision 1.2 2004/12/13 18:46:13 prasanth Added License.
- *
- */

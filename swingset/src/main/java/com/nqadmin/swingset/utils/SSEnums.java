@@ -37,18 +37,18 @@
 
 package com.nqadmin.swingset.utils;
 
+// SSEnums.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSEnums.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Various Enumerations for SwingSet
  */
 public class SSEnums {
 
 	/**
 	 * Enumeration for SwingSet component types.
-	 *
+	 * <p>
 	 */
 	@SuppressWarnings("javadoc")
 	public enum SSComponent {

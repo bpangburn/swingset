@@ -43,11 +43,11 @@ import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
+// SSTextArea.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSTextArea.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * SSTextArea extends the JTextArea to add SSRowSet binding.
  */
 public class SSTextArea extends JTextArea implements SSComponentInterface {
@@ -163,7 +163,7 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText()
-	 * 
+	 * <p>
 	 * Call to this method should be coming from SSCommon and should already have
 	 * the Component listener removed
 	 */

@@ -53,13 +53,13 @@ import org.apache.logging.log4j.LogManager;
 import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSRowSet;
 
+// SSComponentInterface.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSComponentInterface.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Interface with default methods shared by most SwingSet components.
- * 
+ * <p>
  * Developer needs to insure that each implementation has an SSCommon data
  * member that is instantiated in the Component's constructor.
  */
@@ -78,13 +78,13 @@ public interface SSComponentInterface {
 	/**
 	 * Add a listener to detect a change in value for the current component.
 	 * SSCommon will manage any bound RowSet listeners.
-	 * 
+	 * <p>
 	 * Generally the developer will need to add an inner class and corresponding
 	 * data member that implements the appropriate listener for the JComponent
 	 * involved (e.g., ItemListener for a class extending JCheckBox, ChangeListener
 	 * for a class extending JSlider, DocumentListener for a class extending
 	 * JTextField, etc.).
-	 * 
+	 * <p>
 	 * If the component is JTextComponent then the implementation can simply call
 	 * addSSDocumentListener()
 	 */
@@ -92,7 +92,7 @@ public interface SSComponentInterface {
 
 	/**
 	 * Adds listener for Document if SwingSet component is a JTextComponent.
-	 * 
+	 * <p>
 	 * Implementation of addSSComponentListener() can just call this method when the
 	 * component is a JTextComponent.
 	 */
@@ -109,7 +109,7 @@ public interface SSComponentInterface {
 
 	/**
 	 * Sets (or resets) the binding from the component to a database column
-	 * 
+	 * <p>
 	 * Assumes that RowSet and Column Name are already set properly
 	 */
 	default void bind() {// throws java.sql.SQLException {
@@ -120,7 +120,7 @@ public interface SSComponentInterface {
 
 	/**
 	 * Sets the SSRowSet and column name to which the component is to be bound.
-	 * 
+	 * <p>
 	 * Takes care of setting RowSet and Column Name for ssCommon and then calls
 	 * bind(this.ssCommon);
 	 *
@@ -157,10 +157,10 @@ public interface SSComponentInterface {
 	/**
 	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
-	 * 
+	 * <p>
 	 * It will actually be called from SSCommon.init() once the SSCommon data member
 	 * is instantiated.
-	 * 
+	 * <p>
 	 * This method can be empty.
 	 */
 	void customInit();
@@ -197,7 +197,7 @@ public interface SSComponentInterface {
 
 	/**
 	 * Returns a String representing the value in the bound database column.
-	 * 
+	 * <p>
 	 * If null, it will return an empty string.
 	 * 
 	 * @return String containing the value in the bound database column
@@ -208,7 +208,7 @@ public interface SSComponentInterface {
 
 	/**
 	 * Returns the integer code representing the bound database column data type.
-	 * 
+	 * <p>
 	 * Based on java.sql.Types
 	 * 
 	 * @return the data type of the bound column
@@ -219,7 +219,7 @@ public interface SSComponentInterface {
 	
 	/**
 	 * Returns the JDBCType enum representing the bound database column data type.
-	 * 
+	 * <p>
 	 * Based on java.sql.JDBCType
 	 * 
 	 * @return the enum value corresponding to the data type of the bound column
@@ -265,7 +265,7 @@ public interface SSComponentInterface {
 
 	/**
 	 * Returns the integer code representing the bound database column data type.
-	 * 
+	 * <p>
 	 * Based on java.sql.Types
 	 * 
 	 * @return the data type of the bound column
@@ -329,13 +329,13 @@ public interface SSComponentInterface {
 	/**
 	 * Remove the listener detecting changes in value for the current component.
 	 * SSCommon will manage any bound RowSet listeners.
-	 * 
+	 * <p>
 	 * Generally the developer will need to add an inner class and corresponding
 	 * data member that implements the appropriate listener for the JComponent
 	 * involved (e.g., ItemListener for a class extending JCheckBox, ChangeListener
 	 * for a class extending JSlider, DocumentListener for a class extending
 	 * JTextField, etc.).
-	 * 
+	 * <p>
 	 * If the component is JTextComponent then the implementation can simply call
 	 * removeSSDocumentListener()
 	 */
@@ -343,7 +343,7 @@ public interface SSComponentInterface {
 
 	/**
 	 * Removes listener for Document if SwingSet component is a JTextComponent.
-	 * 
+	 * <p>
 	 * Implementation of removeSSComponentListener() can just call this method when
 	 * the component is a JTextComponent.
 	 */
@@ -369,7 +369,7 @@ public interface SSComponentInterface {
 
 	/**
 	 * Updates the bound database column with the specified Array.
-	 * 
+	 * <p>
 	 * Used for SSList or other component where multiple items can be selected.
 	 * 
 	 * @param _boundColumnArray Array to write to bound database column
@@ -479,7 +479,7 @@ public interface SSComponentInterface {
 	/**
 	 * Updates the value of the SwingSet component based on the bound database
 	 * column.
-	 * 
+	 * <p>
 	 * updateSSComponent() will likely eliminate the need for updateDisplay()
 	 * 
 	 * @deprecated {@link #updateSSComponent()} should generally handle display
@@ -494,7 +494,7 @@ public interface SSComponentInterface {
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText()
-	 * 
+	 * <p>
 	 * Call to this method should be coming from SSCommon and should already have
 	 * the Component listener removed
 	 */

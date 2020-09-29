@@ -50,11 +50,11 @@ import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
+// SSLabel.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSLabel.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Used to display database values in a read-only JLabel.
  */
 public class SSLabel extends JLabel implements SSComponentInterface {
@@ -62,7 +62,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
     /**
      * Listener(s) for the component's value used to propagate changes back to
      * bound database column.
-     * 
+     * <p>
      * There is not an obvious use-case where a label would change, but could be 
      * tied to a menu, screen logic, or some other Developer driven change that could
      * conceivably need to be synchronized back to the RowSet.
@@ -409,7 +409,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	/**
 	 * Adds any necessary listeners for the current SwingSet component. These will
 	 * trigger changes in the underlying RowSet column.
-	 * 
+	 * <p>
 	 * Generally an SSLabel will be read-only, but Developer could change the text
 	 * so we'll support a property listener.
 	 */
@@ -421,7 +421,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	/**
 	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
-	 * 
+	 * <p>
 	 * It will actually be called from SSCommon.init() once the SSCommon data member
 	 * is instantiated.
 	 */
@@ -445,7 +445,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	/**
 	 * Removes any necessary listeners for the current SwingSet component. These will
 	 * trigger changes in the underlying RowSet column.
-	 * 
+	 * <p>
 	 * Generally an SSLabel will be read-only, but Developer could change the text so
 	 * we'll support a property listener.
 	 */
@@ -469,7 +469,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText()
-	 * 
+	 * <p>
 	 * Call to this method should be coming from SSCommon and should already have
 	 * the Component listener removed
 	 */

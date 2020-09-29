@@ -41,11 +41,11 @@ import java.text.SimpleDateFormat;
 
 import javax.swing.text.DateFormatter;
 
+// SSTimeFormatterFactory.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSTimeFormatterFactory.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * SSTimeFormatterFactory extends DefaultFormatterFactory for time fields.
  */
 public class SSTimeFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
@@ -67,9 +67,3 @@ public class SSTimeFormatterFactory extends javax.swing.text.DefaultFormatterFac
     }
 }
 
-/*
- * $Log$
- * Revision 1.1  2005/05/26 12:16:20  dags
- * initial release
- *
- */

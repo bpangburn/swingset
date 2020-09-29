@@ -63,32 +63,32 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.matchers.TextMatcherEditor;
 import ca.odell.glazedlists.swing.AutoCompleteSupport;
 
+// SSDBComboBox.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSDBComboBox.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Similar to the SSComboBox, but used when both the 'bound' values and the
  * 'display' values are pulled from a database table. Generally the bound value
  * represents a foreign key to another table, and the combobox needs to display
  * a list of one (or more) columns from the other table.
- *
+ * <p>
  * Note, if changing both a sSRowSet and column name consider using the bind()
  * method rather than individual setSSRowSet() and setColumName() calls.
- *
+ * <p>
  * e.g.
- *
+ * <p>
  * Consider two tables: 1. part_data (part_id, part_name, ...) 2. shipment_data
  * (shipment_id, part_id, quantity, ...)
- *
+ * <p>
  * Assume you would like to develop a screen for the shipment table and you want
  * to have a screen with a combobox where the user can choose a part and a
  * textbox where the user can specify a quantity.
- *
+ * <p>
  * In the combobox you would want to display the part name rather than part_id
  * so that it is easier for the user to choose. At the same time you want to
  * store the id of the part chosen by the user in the shipment table.
- *
+ * <p>
  * <pre>
  * {@code
  * SSConnection connection = null;
@@ -250,7 +250,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * boolean value for activating or disabling the filter
-	 * 
+	 * <p>
 	 * Appears to determine if GlazedList is used for filtering or original
 	 * keystroke listener/filter.
 	 */
@@ -308,7 +308,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * Underlying database table primary key values corresponding to text displayed.
-	 * 
+	 * <p>
 	 * Note that mappings for the SSDBComboBox are Longs whereas in SSComboBox they
 	 * are Integers.
 	 */
@@ -374,7 +374,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * Alphanumeric separator used to separate values in multi-column comboboxes.
-	 * 
+	 * <p>
 	 * Changing from " - " to " | " for 2020 rewrite.
 	 */
 	protected String separator = " - ";
@@ -557,7 +557,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
-	 * 
+	 * <p>
 	 * It will actually be called from SSCommon.init() once the SSCommon data member
 	 * is instantiated.
 	 */
@@ -573,7 +573,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Removes an item from the combobox and underlying lists based on the record
 	 * primary key provided.
-	 * 
+	 * <p>
 	 * If more than one item is present in the combo for that value the first one is
 	 * changed.
 	 * 
@@ -622,7 +622,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Removes the display text provided from the combobox and removes any
 	 * corresponding list items.
-	 * 
+	 * <p>
 	 * If more than one item is present in the combo for the specified value, only
 	 * the first one is removed.
 	 *
@@ -645,7 +645,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * Executes the query specified with setQuery(), populates combobox, and turns on AutoCompleteSupport 
-	 * 
+	 * <p>
 	 * @throws Exception exception that occurs querying data or turning on AutoComplete
 	 */
 	public void execute() throws Exception {
@@ -694,7 +694,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * Provides the initial number of items in the list underlying the CombobBox
-	 * 
+	 * <p>
 	 * NOTE: There does not appear to be any code that sets this value so marking as
 	 * Deprecated.
 	 * 
@@ -712,7 +712,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * Returns the number of items present in the combo box.
-	 *
+	 * <p>
 	 * This is a read-only bean property.
 	 *
 	 * @return returns the number of items present in the combo box.
@@ -750,7 +750,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * Returns the text displayed in the combobox.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @return value corresponding to the selected item in the combo. return null if
@@ -819,7 +819,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Returns the underlying database record primary key value corresponding to the
 	 * currently selected item in the combobox.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @return returns the value associated with the selected item OR -1 if nothing
@@ -893,7 +893,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * Returns the separator used when multiple columns are displayed
-	 * 
+	 * <p>
 	 * Deprecated for misspelling.
 	 *
 	 * @return separator used.
@@ -1100,7 +1100,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * Method that sets the combo box to be filterable.
-	 * 
+	 * <p>
 	 * GlazedList filtering is now fully integrated so this no longer serves a
 	 * purpose.
 	 * 
@@ -1226,7 +1226,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * Sets the currently selected value
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _value value to set as currently selected.
@@ -1257,7 +1257,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Sets the currently selected value. This is called when the user clicks on an
 	 * item or when they type in the combo's textfield.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _value value to set as currently selected.
@@ -1618,13 +1618,13 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * Sets the value stored in the component.
-	 * 
+	 * <p>
 	 * If called from updateSSComponent() from a RowSet change then the Component
 	 * listener should already be turned off. Otherwise we want it on so the
 	 * ultimate call to setSelectedIndex() will trigger an update the to RowSet.
-	 * 
+	 * <p>
 	 * The mappings ArrayList will be null until execute is called so
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _value database record primary key value to assign to combobox
@@ -1729,7 +1729,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * Set the separator to be used when multiple columns are displayed
-	 * 
+	 * <p>
 	 * Deprecated for misspelling.
 	 *
 	 * @param _separator separator to be used.
@@ -1752,10 +1752,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * Updates an item available in the combobox and associated lists.
-	 * 
+	 * <p>
 	 * If more than one item is present in the combo for that value, only the first
 	 * one is changed.
-	 *
+	 * <p>
 	 * NOTE: To retain changes made to current SSRowSet call updateRow before
 	 * calling the updateItem on SSDBComboBox. (Only if you are using the
 	 * SSDBComboBox and SSDataNavigator for navigation in the screen. If you are not
@@ -1809,7 +1809,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText()
-	 * 
+	 * <p>
 	 * Call to this method should be coming from SSCommon and should already have
 	 * the Component listener removed
 	 */
@@ -1873,7 +1873,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * Updates the string thats being displayed.
-	 * 
+	 * <p>
 	 * If more than one item is present in the combo for that value the first one is
 	 * changed.
 	 *

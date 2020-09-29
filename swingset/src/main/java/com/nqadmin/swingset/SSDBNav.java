@@ -41,35 +41,35 @@ import java.io.Serializable;
 
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
+// SSDBNav.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSDBNav.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Interface that provides a set of methods to perform custom operations before
  * a record is added, after a record is added, before a record is deleted and
  * after a record is deleted.
- *
+ * <p>
  * These functions are called by the SSDataNavigator if the SSDBNav datamember
  * of the SSDataNavigator is set using the setDBNav() function of the
  * SSDataNavigator.
- *
+ * <p>
  * performPreInsertOps() is called when the user presses the insert button.
- *
+ * <p>
  * performPostInsertOps() is called when the user presses the commit button
  * after updating the values for the newly inserted row. If the user presses the
  * Undo button after the insert button is pressed the insertion is cancelled and
  * this function will not be called.
- *
+ * <p>
  * performPreDeletionOps() is called when the user presses the delete button,
  * but just before the deleteRow() method is called on the SSRowSet.
- *
+ * <p>
  * performPostDeletionOps() is called when the user presses the delete button
  * and after the deleteRow() method is called on the SSRowSet.
- *
+ * <p>
  * Note that both the performPreDeletionOps() and performPostDeletionOps() will
  * be executed when the user presses the delete button.
- * 
+ * <p>
  * Generally the user will want to use/extend SSDBNavImp as it has an
  * implementation of performPreInsertOps() that will clear/reset component
  * values when a new record is added.
@@ -157,7 +157,7 @@ public interface SSDBNav extends Serializable {
 
 	/**
 	 * Method to perform navigation-related operations.
-	 *
+	 * <p>
 	 * Possible values are NAVIGATION_NEXT, NAVIGATION_PREVIOUS, NAVIGATION_FIRST,
 	 * NAVIGATION_LAST.
 	 * 
@@ -186,7 +186,7 @@ public interface SSDBNav extends Serializable {
 
 	/**
 	 * Method to perform post-deletion operations.
-	 *
+	 * <p>
 	 * The SSRowSet listener also provides the notification after the deletion of
 	 * the row.
 	 */
@@ -197,7 +197,7 @@ public interface SSDBNav extends Serializable {
 
 	/**
 	 * Method to perform post-insertion operations.
-	 *
+	 * <p>
 	 * In addition to this you can have a listener on the SSRowSet attached to a
 	 * SSDataNavigator to get notified when a row is inserted.
 	 */
@@ -216,7 +216,7 @@ public interface SSDBNav extends Serializable {
 
 	/**
 	 * Method to perform pre-deletion operations.
-	 *
+	 * <p>
 	 * SSRowSet provides notification before the deletion of a row.
 	 */
 	default void performPreDeletionOps() {
@@ -242,39 +242,3 @@ public interface SSDBNav extends Serializable {
 
 } // end public interface SSDBNav {
 
-/*
- * $Log$ Revision 1.13 2005/11/02 17:10:23 yoda2 Added two functions:
- * allowUpdate() & performPostUpdateOps()
- *
- * Revision 1.12 2005/05/03 15:17:38 prasanth Added two new functions to the
- * interface. 1. allowInsertion 2. allowDeletion
- *
- * Revision 1.11 2005/02/09 17:21:21 yoda2 JavaDoc cleanup.
- *
- * Revision 1.10 2005/02/04 22:48:53 yoda2 API cleanup & updated Copyright info.
- *
- * Revision 1.9 2004/11/11 14:45:48 yoda2 Using TextPad, converted all tabs to
- * "soft" tabs comprised of four actual spaces.
- *
- * Revision 1.8 2004/11/01 15:53:30 yoda2 Fixed various JavaDoc errors.
- *
- * Revision 1.7 2004/10/25 22:13:44 yoda2 Updated JavaDoc for new datasource
- * abstraction layer in 0.9.0 release.
- *
- * Revision 1.6 2004/08/10 22:06:59 yoda2 Added/edited JavaDoc, made code layout
- * more uniform across classes, made various small coding improvements suggested
- * by PMD.
- *
- * Revision 1.5 2004/03/08 16:43:37 prasanth Updated copy right year.
- *
- * Revision 1.4 2003/12/16 18:01:40 prasanth Documented versions for release
- * 0.6.0
- *
- * Revision 1.3 2003/11/26 21:21:50 prasanth Added function performCancelOps().
- *
- * Revision 1.2 2003/09/25 14:27:45 yoda2 Removed unused Import statements and
- * added preformatting tags to JavaDoc descriptions.
- *
- * Revision 1.1.1.1 2003/09/25 13:56:43 yoda2 Initial CVS import for SwingSet.
- *
- */

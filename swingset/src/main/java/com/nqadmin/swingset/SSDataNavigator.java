@@ -61,17 +61,17 @@ import org.apache.logging.log4j.Logger;
 import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
+// SSDataNavigator.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSDataNavigator.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Component that can be used for data navigation. It provides buttons for
  * navigation, insertion, and deletion of records in a SSRowSet. The
  * modification of a SSRowSet can be prevented using the setModificaton()
  * method. Any changes made to the columns of a record will be updated whenever
  * there is a navigation.
- *
+ * <p>
  * For example if you are displaying three columns using the JTextField and the
  * user changes the text in the text fields then the columns will be updated to
  * the new values when the user navigates the SSRowSet. If the user wants to
@@ -194,9 +194,9 @@ public class SSDataNavigator extends JPanel {
 	
 	/**
 	 * SSDBComboBox used for navigation if applicable.
-	 * 
+	 * <p>
 	 * Allows Navigator to disable it when a row is inserted and enable it when that row is saved.
-	 * 
+	 * <p>
 	 * TODO Consider writing a PropertyChangeListener for onInsertRow instead. 
 	 */
 	protected SSDBComboBox navCombo= null;
@@ -1354,158 +1354,3 @@ public class SSDataNavigator extends JPanel {
 
 } // end public class SSDataNavigator extends JPanel {
 
-/*
- * $Log$ Revision 1.49 2013/08/02 20:25:35 prasanth Setting onInsertRow to false
- * as soon as row in added. There was an issue with updateRow being called
- * before commit function has exited.
- *
- * Revision 1.48 2012/01/19 18:46:03 prasanth Reseting the onInsertRow flag when
- * a new rowset is set.
- *
- * Revision 1.47 2009/02/16 22:31:48 prasanth Had to do conditional call to
- * doCommitButtonClick in updatePresentRow to make sure we are on a valid row .
- *
- * Revision 1.46 2009/02/16 22:21:29 prasanth Added try/catch in
- * updatePresentRow.
- *
- * Revision 1.45 2009/02/16 18:27:35 prasanth 1. In updatePresentRow calling
- * doCommitButtonClick. 2. When on insert row and allowInsertion returns false
- * staying in insertion row rather than making a call to moveToCurrentRow().
- *
- * Revision 1.44 2008/05/12 14:27:42 prasanth In updatePresentRow allowUpdate
- * was not called before calling updateRow(). Modified the code to call
- * allowUpdate & performPostUpateOps in updatePresentRow.
- *
- * Revision 1.43 2006/05/23 05:48:47 prasanth While deleting the row checking
- * for confirmDeletes variable to display the confirmation dialog.
- *
- * Revision 1.42 2006/05/15 16:10:38 prasanth Updated copy right
- *
- * Revision 1.41 2006/02/03 23:23:54 prasanth In updatePresentRow function
- * checking for modification variable before updating the current row.
- *
- * Revision 1.40 2005/11/02 17:18:23 prasanth Calling the allowUpdate &
- * performPostUpdateOps functions on SSDBNav.
- *
- * Revision 1.39 2005/06/10 20:36:31 prasanth Added function setFocusable. This
- * will call setFocusable on all buttons and the text field.
- *
- * Revision 1.38 2005/05/24 16:35:45 prasanth Made the current row number text
- * field non focusable.
- *
- * Revision 1.37 2005/05/24 14:33:35 prasanth Made the buttons non focusable.
- *
- * Revision 1.36 2005/05/03 15:23:43 prasanth Updated the listeners for commit
- * button and delete button to call allowInsertion and allowDeletion functions.
- *
- * Revision 1.35 2005/03/08 16:13:50 prasanth In undoButton listener based on
- * insertRow flag changing the function call. cancelRowUpdates throws exception
- * if current row is on insertRow. Used to work in 1.4.2 (though java docs say
- * it would not). Also updating the current row number when undo is pressed.
- *
- * Revision 1.34 2005/02/13 15:38:20 yoda2 Removed redundant
- * PropertyChangeListener and VetoableChangeListener class variables and methods
- * from components with JComponent as an ancestor.
- *
- * Revision 1.33 2005/02/12 03:29:26 yoda2 Added bound properties (for beans).
- *
- * Revision 1.32 2005/02/11 22:59:28 yoda2 Imported PropertyVetoException and
- * added some bound properties.
- *
- * Revision 1.31 2005/02/11 20:16:04 yoda2 Added infrastructure to support
- * property & vetoable change listeners (for beans).
- *
- * Revision 1.30 2005/02/10 20:13:00 yoda2 Setter/getter cleanup & method
- * reordering for consistency.
- *
- * Revision 1.29 2005/02/07 22:47:15 yoda2 Replaced internal calls to
- * setRowSet() with calls to setSSRowSet().
- *
- * Revision 1.28 2005/02/07 22:19:33 yoda2 Fixed infinite loop in deprecated
- * setRowSet() which was calling setRowSet() rather than setSSRowSet()
- *
- * Revision 1.27 2005/02/07 20:27:26 yoda2 JavaDoc cleanup & made private
- * listener data members final.
- *
- * Revision 1.26 2005/02/04 22:48:54 yoda2 API cleanup & updated Copyright info.
- *
- * Revision 1.25 2005/01/09 03:56:14 prasanth Added public methods to
- * programmatically perform different button clicks.
- *
- * Revision 1.24 2004/11/11 14:45:48 yoda2 Using TextPad, converted all tabs to
- * "soft" tabs comprised of four actual spaces.
- *
- * Revision 1.23 2004/11/01 15:53:30 yoda2 Fixed various JavaDoc errors.
- *
- * Revision 1.22 2004/10/25 22:03:17 yoda2 Updated JavaDoc for new datasource
- * abstraction layer in 0.9.0 release.
- *
- * Revision 1.21 2004/10/25 19:51:02 prasanth Modified to use the new SSRowSet
- * instead of RowSet.
- *
- * Revision 1.20 2004/09/21 18:58:28 prasanth removing the sSRowSet listener
- * while doing the refresh ops.
- *
- * Revision 1.19 2004/09/21 14:15:33 prasanth Displaying error messages when an
- * exception occurs, when the user presses any button.
- *
- * Revision 1.18 2004/09/08 18:41:54 prasanth Added a sSRowSet listener.
- *
- * Revision 1.17 2004/09/02 16:37:05 prasanth Moving to the last record if your
- * has added a record & pressed commit button. This would keep the user in the
- * added record.
- *
- * Revision 1.16 2004/09/01 18:42:08 prasanth Was calling next in the refresh
- * listener. This would move to second record if refresh is pressed. If there is
- * only one record then user will not be able to see as the navigation buttons
- * are also disabled.
- *
- * Revision 1.15 2004/08/26 22:00:00 prasanth Setting all the buttons when a new
- * sSRowSet is set.
- *
- * Revision 1.14 2004/08/24 22:21:03 prasanth Changed the way images are loaded.
- *
- * Revision 1.13 2004/08/16 20:51:16 yoda2 Gave button names in code more
- * meaningful names (e.g. button1 -> firstButton).
- *
- * Revision 1.12 2004/08/13 14:55:28 prasanth Changed the default size of
- * buttons (decreased). Also that of text field & label (increased). Displaying
- * "of" before rowcount.
- *
- * Revision 1.11 2004/08/12 23:50:24 prasanth Changing the row count when a new
- * row is added or a row is deleted.
- *
- * Revision 1.10 2004/08/11 20:29:01 prasanth When sSRowSet has no rows the
- * values in text field and row count label were not updated so corrected this.
- *
- * Revision 1.9 2004/08/10 22:06:59 yoda2 Added/edited JavaDoc, made code layout
- * more uniform across classes, made various small coding improvements suggested
- * by PMD.
- *
- * Revision 1.8 2004/08/02 15:04:06 prasanth 1. Added a text field to display
- * current row number. 2. Added a label to display the total number of rows in
- * the sSRowSet. 3. Added listener to text field so that user can enter a row
- * number to navigate to that row.
- *
- * Revision 1.7 2004/03/08 16:40:00 prasanth Added the if condition to check for
- * callExecute in the listener for refresh button.
- *
- * Revision 1.6 2004/02/23 16:36:00 prasanth Added setMySQLDB function. Skipping
- * execute call on the sSRowSet if mySQL is true.
- *
- * Revision 1.5 2004/01/27 17:13:03 prasanth Changed the behaviour of commit
- * button. When not on insert row will update present row.
- *
- * Also modified enabling and disabling of navigation buttons.
- *
- * Revision 1.4 2003/11/26 21:24:49 prasanth Calling performCancelOps().
- *
- * Revision 1.3 2003/10/31 16:02:52 prasanth Added login to disable the
- * navigation buttons when only one record is present in the sSRowSet.
- *
- * Revision 1.2 2003/09/25 14:27:45 yoda2 Removed unused Import statements and
- * added preformatting tags to JavaDoc descriptions.
- *
- * Revision 1.1.1.1 2003/09/25 13:56:43 yoda2 Initial CVS import for SwingSet.
- *
- */

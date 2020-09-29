@@ -39,11 +39,11 @@ package com.nqadmin.swingset.formatting;
 
 import java.util.Calendar;
 
+// SSTimeField.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSTimeField.java
- *
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Used to link a SSTimeField to a time column in a database.
  */
 public class SSTimeField extends SSFormattedTextField {
@@ -79,12 +79,3 @@ public class SSTimeField extends SSFormattedTextField {
     
 }
 
-/*
- * $Log$
- * Revision 1.2  2005/05/26 22:20:36  dags
- * SSField interface implemented
- *
- * Revision 1.1  2005/05/26 12:16:20  dags
- * initial release
- *
- */

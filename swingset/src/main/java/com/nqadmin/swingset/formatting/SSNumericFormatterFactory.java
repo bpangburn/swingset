@@ -43,11 +43,11 @@ import java.util.Locale;
 import javax.swing.text.NumberFormatter;
 
 
+// SSNumericFormatterFactory.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSNumericFormatterFactory.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * SSNumericFormatterFactory extends DefaultFormatterFactory for numeric fields.
  */
 public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
@@ -108,21 +108,3 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
     }
 }
 
-/*
- * $Log$
- * Revision 1.6  2005/05/11 17:21:41  dags
- * let enter NULL values
- *
- * Revision 1.5  2005/02/04 22:42:06  yoda2
- * Updated Copyright info.
- *
- * Revision 1.4  2005/01/18 23:38:01  dags
- * Diego's name fix
- *
- * Revision 1.3  2004/12/13 20:50:16  dags
- * Fix package name
- *
- * Revision 1.2  2004/12/13 18:46:13  prasanth
- * Added License.
- *
- */

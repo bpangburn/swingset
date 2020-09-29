@@ -37,14 +37,14 @@
 
 package com.nqadmin.swingset.utils;
 
+// SSListItem.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSListItem.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Class for items to be displayed in list and combobox components.
  * Compatible with GlazedLists AutoComplete feature.
- * 
+ * <p>
  * See https://publicobject.com/glazedlistsdeveloper/screencasts/autocompletesupport/
  */
 public class SSListItem {

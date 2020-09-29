@@ -54,23 +54,23 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
 
+// SSDBNavImpl.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSDBNavImpl.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Custom implementation of SSDBNav that clears/resets the various
  * database-aware fields on a screen when the user adds a new record. To achieve
  * this, special implementation of the performPreInsertOps() method is provided.
  * An instance of this class can be created for the container where the fields
  * are to be cleared and passed to the data navigator.
- *
+ * <p>
  * The data navigator will call the performPreInsertOps() method whenever the
  * user presses the insert button on the navigator. This functions recursively
  * clears any JTextFields, JTextAreas, and SSCheckBoxes, and if their are any
  * SSComboBoxes or SSDBComboBoxes they will be reset to the first item in the
  * list.
- *
+ * <p>
  * This recursive behavior performed on all the components inside the JPanel or
  * JTabbedPane inside the specified container.
  */
@@ -113,7 +113,7 @@ public class SSDBNavImpl implements SSDBNav {
 	/**
 	 * Clears all the JTextFields and resets the combo boxes to empty item before
 	 * first item.
-	 *
+	 * <p>
 	 * This is done for all SwingSet components, text fields, and text areas,
 	 * recursively looking in to the JTabbedPanes and JPanels inside the given
 	 * container as needed.

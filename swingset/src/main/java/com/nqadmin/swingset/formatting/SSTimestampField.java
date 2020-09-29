@@ -37,11 +37,11 @@
 
 package com.nqadmin.swingset.formatting;
 
+// SSTimestampField.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSTimestampField.java
- *
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Used to link a SSTimestampField to a timestamp column in a database.
  */
 
@@ -82,12 +82,3 @@ public class SSTimestampField extends SSFormattedTextField {
     
 }
 
-/*
- * $Log$
- * Revision 1.2  2005/05/26 22:20:36  dags
- * SSField interface implemented
- *
- * Revision 1.1  2005/05/26 12:16:20  dags
- * initial release
- *
- */

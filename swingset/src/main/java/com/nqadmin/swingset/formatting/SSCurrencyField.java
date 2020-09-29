@@ -41,11 +41,11 @@ import java.util.Locale;
 
 import javax.swing.SwingConstants;
 
+// SSCurrencyField.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSCurrencyField.java
- *
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Used to link a SSFormattedTextField to a currency column in a database.
  */
 public class SSCurrencyField extends SSFormattedTextField {
@@ -147,18 +147,3 @@ public class SSCurrencyField extends SSFormattedTextField {
 	}
 }
 
-/*
- * $Log$ Revision 1.7 2005/05/26 12:12:36 dags added bind(SSRowSet, columnName)
- * method and some java.sql.Types checking and support
- *
- * Revision 1.6 2005/03/28 14:46:42 dags syncro commit
- *
- * Revision 1.5 2005/02/04 22:42:06 yoda2 Updated Copyright info.
- *
- * Revision 1.4 2005/01/18 22:34:29 dags sincronization update
- *
- * Revision 1.3 2004/12/13 20:50:16 dags Fix package name
- *
- * Revision 1.2 2004/12/13 18:46:13 prasanth Added License.
- *
- */

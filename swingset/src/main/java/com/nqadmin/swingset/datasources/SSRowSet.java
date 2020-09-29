@@ -53,11 +53,11 @@ import org.apache.logging.log4j.LogManager;
 
 import com.nqadmin.swingset.utils.SSCommon;
 
+// SSRowSet.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSRowSet.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * Previously this was a custom Interface that was a subset of RowSet. Now we
  * will try to support the full RowSet interface, but still need to accommodate
  * code where SSRowSet was referenced as a type.
@@ -257,7 +257,7 @@ public interface SSRowSet extends RowSet {
 	/**
 	 * Method used by SwingSet component listeners to update the underlying
 	 * SSRowSet.
-	 * 
+	 * <p>
 	 * When the user changes/edits the SwingSet column this method propagates the
 	 * change to the RowSet. A separate call is required to flush/commit the change
 	 * to the database.

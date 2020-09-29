@@ -42,11 +42,11 @@ import java.util.Locale;
 
 import javax.swing.text.NumberFormatter;
 
+// SSPercentFormatterFactory.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSPercentFormatterFactory.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * SSPercentFormatterFactory extends DefaultFormatterFactory for percentage fields.
  */
 public class SSPercentFormatterFactory extends javax.swing.text.DefaultFormatterFactory {

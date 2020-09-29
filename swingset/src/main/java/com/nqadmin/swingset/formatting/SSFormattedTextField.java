@@ -60,23 +60,23 @@ import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
 
+// SSFormattedTextField.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSFormattedTextField.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * SSFormattedTextField extends the JFormattedTextField.
  * <p>
  * Generally bound components are implemented by extending SSFormattedTextField and
  * instantiating with a custom FormatterFactory parameter. E.g. SSDateField ssdf = new SSDateField(SSDateFormatterFactory); 
  * <p>
  * Each FormatterFactory will have calls to setDefaultFormatter(), setNullFormatter(), setEditFormatter(), and setDisplayFormatter()
- * 
+ * <p>
  * It would be possible to instead use a MaskFormatter, but custom code has to be written if the field needs to be nullable/blanked 
  * by the user. For a MaskFormatter, this triggers a ParseException, which would need to be caught in the code and surplanted by
  * a call to setValue(null); Using a MaskFormatter still requires additional validation of some sort. E.g. preventing a MM/dd/yyyy date of
  * 99/99/9999 from being entered.
- * 
+ * <p>
  */
 // TODO Consider adding back context help and calculators via popups. See 2020-01-07 revisions or earlier.
 // TODO Add JDatePicker support or something similar: https://www.codejava.net/java-se/swing/how-to-use-jdatepicker-to-display-calendar-component and https://github.com/JDatePicker/JDatePicker
@@ -464,9 +464,9 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	/**
 	 * This class should implements validation AND calls setValue() which triggers RowSet updates.
-	 * 
+	 * <p>
 	 * See https://docs.oracle.com/javase/8/docs/api/javax/swing/JFormattedTextField.html
-	 * 
+	 * <p>
 	 * More on input verifiers here: https://www.drdobbs.com/jvm/java-better-interfaces-via-jformattedtex/224700979?pgno=1
 	 * Some discussion on dates and validation here: https://docs.oracle.com/javase/tutorial/uiswing/misc/focus.html#inputVerification
 	 */
@@ -716,7 +716,7 @@ public class SSFormattedTextField extends JFormattedTextField
     /**
 	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
-	 * 
+	 * <p>
 	 * It will actually be called from SSCommon.init() once the SSCommon data member
 	 * is instantiated.
 	 */
@@ -768,7 +768,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * the object obtained from getValue()
-	 *
+	 * <p>
 	 * Calls to this method should be coming from SSCommon and should already have
 	 * the Component listener removed
 	 */

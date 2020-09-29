@@ -76,11 +76,11 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.SSRowSet;
 
+// SSDataGrid.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSDataGrid.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * SSDataGrid provides a way to display information from a database in a table
  * format (aka "spreadsheet" or "datasheet" view). The SSDataGrid takes a
  * SSRowSet as a source of data. It also provides different cell renderers
@@ -365,7 +365,7 @@ public class SSDataGrid extends JTable {
 	 * Returns the list of selected columns. This function gets the list of selected
 	 * columns from parent class and removes any columns which are present in hidden
 	 * columns.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable
 	 *
 	 * @return array of selected columns
@@ -413,7 +413,7 @@ public class SSDataGrid extends JTable {
 
 	/**
 	 * Returns number of selected columns.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @return number of selected columns
@@ -451,7 +451,7 @@ public class SSDataGrid extends JTable {
 
 	/**
 	 * Returns scroll pane with the JTable embedded in it.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @return scroll pane with embedded JTable
@@ -466,7 +466,7 @@ public class SSDataGrid extends JTable {
 	 * specified for each column is of the same type as that of the column in the
 	 * database. Use the getColumnClass function in JTable to determine the exact
 	 * data type.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _columnNumbers array containing the column numbers for which the
@@ -487,7 +487,7 @@ public class SSDataGrid extends JTable {
 	 * specified for each column is of the same type as that of the column in the
 	 * database. Use the getColumnClass function in JTable to determine the exact
 	 * data type.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _columnNames array containing the column names for which the defaults
@@ -520,7 +520,7 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Returns the default value being used for the specified column. Returns null
 	 * if a default is not in use.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _columnNumber the column number for which default value is to be
@@ -536,7 +536,7 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Returns the default value being used for the specified column. Returns null
 	 * if a default is not in use.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _columnName the column name for which default value is to be returned.
@@ -557,7 +557,7 @@ public class SSDataGrid extends JTable {
 	 * required if new rows have to be added to the JTable. For this to properly
 	 * work the SSDataValue object should also be provided SSDataValue is used to
 	 * get the value for the primary column.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _columnNumber the column which is the primary column.
@@ -571,7 +571,7 @@ public class SSDataGrid extends JTable {
 	 * required if new rows have to be added to the JTable. For this to properly
 	 * work the SSDataValue object should also be provided SSDataValue is used to
 	 * get the value for the primary column.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _columnName the column which is the primary column.
@@ -585,7 +585,7 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Sets the SSDataValue interface implemention. This interface specifies
 	 * function to retrieve primary column values for a new row to be added.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _dataValue implementation of SSDataValue
@@ -598,7 +598,7 @@ public class SSDataGrid extends JTable {
 	 * Sets a date renderer for the specified column. The date will be displayed in
 	 * mm/dd/yyyy format. If a date renderer is not requested then the date will be
 	 * displayed in a standard format(yyyy-mm-dd).
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _column column number for which a date renderer is needed.
@@ -614,7 +614,7 @@ public class SSDataGrid extends JTable {
 	 * Sets a date renderer for the specified column. The date will be displayed in
 	 * mm/dd/yyyy format. If a date renderer is not requested then the date will be
 	 * displayed in a standard format(yyyy-mm-dd).
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _column column name for which a date renderer is needed.
@@ -632,7 +632,7 @@ public class SSDataGrid extends JTable {
 	 * Sets a combo box renderer for the specified column. This is use full to limit
 	 * the values that go with a column or if an underlying code is do be displayed
 	 * in a more meaningfull manner.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _column           column number for which combo renderer is to be
@@ -649,7 +649,7 @@ public class SSDataGrid extends JTable {
 	 * Sets a combo box renderer for the specified column. This is use full to limit
 	 * the values that go with a column or if an underlying code is do be displayed
 	 * in a more meaningful manner.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _column           column number for which combo renderer is to be
@@ -672,7 +672,7 @@ public class SSDataGrid extends JTable {
 	 * Sets a combo box renderer for the specified column. This is use full to limit
 	 * the values that go with a column or if an underlying code is do be displayed
 	 * in a more meaningfull manner.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _column           column name for which combo renderer is to be
@@ -691,7 +691,7 @@ public class SSDataGrid extends JTable {
 	 * Sets a combo box renderer for the specified column. This is use full to limit
 	 * the values that go with a column or if an underlying code is do be displayed
 	 * in a more meaningfull manner.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _column           column name for which combo renderer is to be
@@ -710,7 +710,7 @@ public class SSDataGrid extends JTable {
 
 	/**
 	 * Sets a check box renderer for the specified column.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _column - name of the column for which check box rendering is needed.
@@ -723,7 +723,7 @@ public class SSDataGrid extends JTable {
 
 	/**
 	 * Sets a check box renderer for the specified column.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _column - column number for which check box rendering is needed.
@@ -738,7 +738,7 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Sets the header for the JTable. This function has to be called before setting
 	 * the SSRowSet for SSDataGrid.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _headers array of string objects representing the header of each
@@ -752,7 +752,7 @@ public class SSDataGrid extends JTable {
 	 * Sets the uneditable columns. The columns specified as uneditable will not be
 	 * available for user to edit. This overrides the isCellEditable function in
 	 * SSCellEditing.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _columnNumbers array specifying the column numbers which should be
@@ -766,7 +766,7 @@ public class SSDataGrid extends JTable {
 	 * Sets the uneditable columns. The columns specified as uneditable will not be
 	 * available for user to edit. This overrides the isCellEditable function in
 	 * SSCellEditing.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _columnNames array specifying the column names which should be
@@ -794,7 +794,7 @@ public class SSDataGrid extends JTable {
 	 * column will change. Even if the column is specified as hidden user will be
 	 * seeing a tiny strip. Make sure that you specify the hidden column numbers in
 	 * the uneditable column list.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _columnNumbers array specifying the column numbers which should be
@@ -814,7 +814,7 @@ public class SSDataGrid extends JTable {
 	 * column will change. Even if the column is specified as hidden user will be
 	 * seeing a tiny strip. Make sure that you specify the hidden column numbers in
 	 * the uneditable column list.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _columnNames array specifying the column names which should be hidden
@@ -836,7 +836,7 @@ public class SSDataGrid extends JTable {
 	 * If the user has to decide on which cell has to be editable and which is not
 	 * then SSCellEditable interface has to be implemented and set it for the
 	 * SSTableModel.
-	 *
+	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
 	 * @param _cellEditing implementation of SSCellEditable interface.
@@ -860,7 +860,7 @@ public class SSDataGrid extends JTable {
 	 */
 	class DefaultEditor extends DefaultCellEditor {
 		/**
-		 * 
+		 * <p>
 		 */
 		private static final long serialVersionUID = -5408829003545103686L;
 
@@ -929,7 +929,7 @@ public class SSDataGrid extends JTable {
 			}
 
 			/**
-			 * 
+			 * <p>
 			 */
 			@Override
 			public void focusGained(FocusEvent fe) {
@@ -1196,7 +1196,7 @@ public class SSDataGrid extends JTable {
 	 */
 	protected class DateEditor extends DefaultCellEditor {
 		/**
-		 * 
+		 * <p>
 		 */
 		private static final long serialVersionUID = 8741829961228359406L;
 
@@ -1286,7 +1286,7 @@ public class SSDataGrid extends JTable {
 	protected class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
 
 		/**
-		 * 
+		 * <p>
 		 */
 		private static final long serialVersionUID = -8310278203475303010L;
 
@@ -1324,7 +1324,7 @@ public class SSDataGrid extends JTable {
 	 */
 	protected class CheckBoxEditor extends DefaultCellEditor {
 		/**
-			 * 
+			 * <p>
 			 */
 		private static final long serialVersionUID = 966225988861238964L;
 		// VARIABLE TO STORE THE COLUMN CLASS.
@@ -1399,7 +1399,7 @@ public class SSDataGrid extends JTable {
 	protected class DateRenderer extends DefaultTableCellRenderer {
 
 		/**
-		 * 
+		 * <p>
 		 */
 		private static final long serialVersionUID = 2167118906692276587L;
 
@@ -1425,7 +1425,7 @@ public class SSDataGrid extends JTable {
 //    protected class ComboRenderer extends JComboBox implements TableCellRenderer {
 	protected class ComboRenderer extends DefaultTableCellRenderer.UIResource {
 		/**
-		 * 
+		 * <p>
 		 */
 		private static final long serialVersionUID = 2010609036458432567L;
 		Object[] underlyingValues = null;
@@ -1563,119 +1563,3 @@ public class SSDataGrid extends JTable {
 
 } // end public class SSDataGrid extends JTable {
 
-/*
- * $Log$ Revision 1.40 2012/06/28 20:33:45 beevo Changed key listener in
- * DateEditor to clear date field when a new key is pressed.
- *
- * Revision 1.39 2011/10/24 18:28:34 prasanth Added SSDataGridHandler.
- *
- * Revision 1.38 2011/10/24 18:25:49 prasanth Disabling the use of focus
- * traversal keys in default editor and date editor. This will allow the use of
- * tab to move to next cell while editing.
- *
- * Revision 1.37 2008/06/24 21:51:03 prasanth When using a combo renderer and
- * the underlying value is null returning index -1.
- *
- * Revision 1.36 2007/10/26 20:32:46 prasanth Added ability to specify if
- * deletions should be allowed.
- *
- * Revision 1.35 2006/05/15 16:10:38 prasanth Updated copy right
- *
- * Revision 1.34 2005/07/26 21:02:27 prasanth Setting the column width only if
- * autoResizeMode = AUTO_RESIZE_OFF. This is set in init.
- *
- * Revision 1.33 2005/03/09 21:59:41 prasanth 1. Using
- * DefaultTableCellRenderer.UIResource as parent class for ComboRenderer. 2.
- * Added custom editor for Numeric, String, & Object class types.
- *
- * Revision 1.32 2005/03/03 15:04:44 yoda2 Added
- * setSurrendersFocusOnKeystroke(true); to init() to force the JTable to
- * surrender the focus to the editor following keystroke-based navigation. This
- * seems to fix the problem with editors not working in the DataGrid following
- * tab-based cell navigation.
- *
- * Revision 1.31 2005/02/22 15:16:09 yoda2 Removed preferredSize datamember
- * along with setter & getter. These all exist in the parent class.
- *
- * Revision 1.30 2005/02/13 15:38:20 yoda2 Removed redundant
- * PropertyChangeListener and VetoableChangeListener class variables and methods
- * from components with JComponent as an ancestor.
- *
- * Revision 1.29 2005/02/12 03:29:26 yoda2 Added bound properties (for beans).
- *
- * Revision 1.28 2005/02/11 22:59:28 yoda2 Imported PropertyVetoException and
- * added some bound properties.
- *
- * Revision 1.27 2005/02/11 20:16:02 yoda2 Added infrastructure to support
- * property & vetoable change listeners (for beans).
- *
- * Revision 1.26 2005/02/10 20:13:00 yoda2 Setter/getter cleanup & method
- * reordering for consistency.
- *
- * Revision 1.25 2005/02/07 22:47:14 yoda2 Replaced internal calls to
- * setRowSet() with calls to setSSRowSet().
- *
- * Revision 1.24 2005/02/07 22:34:10 yoda2 Fixed infinite loop in deprecated
- * setRowSet() which was calling setRowSet() rather than setSSRowSet()
- *
- * Revision 1.23 2005/02/07 22:20:32 yoda2 JavaDoc cleanup.
- *
- * Revision 1.22 2005/02/04 22:48:53 yoda2 API cleanup & updated Copyright info.
- *
- * Revision 1.21 2005/02/01 17:32:37 yoda2 API cleanup.
- *
- * Revision 1.20 2004/12/10 18:59:47 prasanth Modified the getCellEditorValue
- * function of CheckBoxEditor inner class.
- *
- * Revision 1.19 2004/12/09 18:36:04 prasanth Added CheckBox rendering support.
- *
- * Revision 1.18 2004/11/11 14:45:33 yoda2 Using TextPad, converted all tabs to
- * "soft" tabs comprised of four actual spaces.
- *
- * Revision 1.17 2004/11/01 15:53:30 yoda2 Fixed various JavaDoc errors.
- *
- * Revision 1.16 2004/10/25 22:03:17 yoda2 Updated JavaDoc for new datasource
- * abstraction layer in 0.9.0 release.
- *
- * Revision 1.15 2004/10/25 19:51:02 prasanth Modified to use the new SSRowSet
- * instead of RowSet.
- *
- * Revision 1.14 2004/10/22 17:38:56 prasanth Using SSTextField for date mask.
- *
- * Revision 1.13 2004/10/19 21:14:36 prasanth Added getCellEditorValue function
- * for date cell editor class. This way the editor will return a Date object
- * rather than a string as value of the cell.
- *
- * Revision 1.12 2004/10/06 23:14:12 prasanth Added function to set minimum
- * column widths. Added function to set combo box column widths.
- *
- * Revision 1.11 2004/09/27 15:47:19 prasanth Added hideColumns function.
- * Calling createDefaultColumnModel function in setRowSet if the sSRowSet is not
- * null.
- *
- * Revision 1.10 2004/08/10 22:06:59 yoda2 Added/edited JavaDoc, made code
- * layout more uniform across classes, made various small coding improvements
- * suggested by PMD.
- *
- * Revision 1.9 2004/08/09 21:29:44 prasanth The default selection of first item
- * in combo box renderer is removed. If a default value is specified it will be
- * selected else no selected item.
- *
- * Revision 1.8 2004/08/02 14:48:39 prasanth 1. Added getSelectedColumnCount and
- * getSelectedColumns functions. 2. Added the SSTableKeyAdapter instance for
- * copy and paste support.
- *
- * Revision 1.7 2004/03/08 16:59:32 prasanth Added callExecute function to let
- * users decide whether execute should be called or not.
- *
- * Revision 1.6 2004/03/08 16:43:37 prasanth Updated copy right year.
- *
- * Revision 1.5 2004/02/23 16:47:41 prasanth Println statements are commented
- * out.
- *
- * Revision 1.4 2003/12/18 20:12:01 prasanth Update class description.
- *
- * Revision 1.3 2003/12/16 18:01:40 prasanth Documented versions for release
- * 0.6.0
- *
- */

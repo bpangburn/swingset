@@ -41,11 +41,11 @@ import java.text.SimpleDateFormat;
 
 import javax.swing.text.DateFormatter;
 
+// SSTimestampFormatterFactory.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
- * SSTimestampFormatterFactory.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
  * SSTimestampFormatterFactory extends DefaultFormatterFactory for timestamp fields.
  */
 public class SSTimestampFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
@@ -67,12 +67,3 @@ public class SSTimestampFormatterFactory extends javax.swing.text.DefaultFormatt
     }
 }
 
-/*
- * $Log$
- * Revision 1.2  2005/05/26 22:20:36  dags
- * SSField interface implemented
- *
- * Revision 1.1  2005/05/26 12:16:20  dags
- * initial release
- *
- */
