@@ -142,7 +142,14 @@ public class SSFormattedTextField extends JFormattedTextField
 			    } else {
 			    
 				    try {
-						getSSRowSet().updateObject(getBoundColumnName(), currentValue);
+				    	// 2020-10-02_BP: Date fields are returned as java.util.Date and Postgres JDBC doesn't know how to handle them
+//TODO Add support for time and timestamp or modify in formatter factories				    	
+				    	if (currentValue instanceof java.util.Date) {
+				    		getSSRowSet().updateObject(getBoundColumnName(), new java.sql.Date(((java.util.Date)currentValue).getTime()));
+				    	} else {
+				    		getSSRowSet().updateObject(getBoundColumnName(), currentValue);
+				    	}
+
 					} catch (SQLException _se) {
 						logger.error(getColumnForLog() + ": RowSet update triggered SQL Exception.", _se);
 						JOptionPane.showMessageDialog((JComponent)ftf,
