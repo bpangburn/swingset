@@ -241,7 +241,7 @@ public class SSSyncManager {
 				// GET THE PRIMARY KEY FOR THE CURRENT RECORD IN THE ROWSET
 				long currentRowPK = this.rowset.getLong(this.columnName);
 				
-				logger.trace("RowSet value: " + currentRowPK);		
+				logger.debug("SSSyncManager().adjustValue() - RowSet value: " + currentRowPK);		
 
 				// CHECK IF THE COMBO BOX IS DISPLAYING THE SAME ONE.
 				if (comboBox.getSelectedStringValue() == null
