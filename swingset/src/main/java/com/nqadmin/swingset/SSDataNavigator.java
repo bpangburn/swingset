@@ -780,6 +780,7 @@ public class SSDataNavigator extends JPanel {
 			@SuppressWarnings("deprecation")
 			@Override
 			public void actionPerformed(ActionEvent ae) {
+				logger.debug("FIRST button clicked.");
 				try {
 					if (SSDataNavigator.this.modification) {
 						// CHECK IF THE DBNAV IS NULL IF SO UPDATE ROW
@@ -828,6 +829,7 @@ public class SSDataNavigator extends JPanel {
 			@SuppressWarnings("deprecation")
 			@Override
 			public void actionPerformed(ActionEvent ae) {
+				logger.debug("PREVIOUS button clicked.");
 				try {
 					// if( sSRowSet.rowUpdated() )
 					if (SSDataNavigator.this.modification) {
@@ -878,6 +880,7 @@ public class SSDataNavigator extends JPanel {
 			@SuppressWarnings("deprecation")
 			@Override
 			public void actionPerformed(ActionEvent ae) {
+				logger.debug("NEXT button clicked.");
 				try {
 					// if( sSRowSet.rowUpdated() )
 					if (SSDataNavigator.this.modification) {
@@ -928,6 +931,7 @@ public class SSDataNavigator extends JPanel {
 			@SuppressWarnings("deprecation")
 			@Override
 			public void actionPerformed(ActionEvent ae) {
+				logger.debug("LAST button clicked.");
 				try {
 					// if( sSRowSet.rowUpdated() )
 					if (SSDataNavigator.this.modification) {
@@ -972,6 +976,7 @@ public class SSDataNavigator extends JPanel {
 		this.commitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
+				logger.debug("COMMIT button clicked.");
 				try {
 					if (SSDataNavigator.this.onInsertRow) {
 						// IF ON INSERT ROW ADD THE ROW.
@@ -1050,6 +1055,7 @@ public class SSDataNavigator extends JPanel {
 		this.undoButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
+				logger.debug("UNDO button clicked.");
 				try {
 					// CALL MOVE TO CURRENT ROW IF ON INSERT ROW.
 					if (SSDataNavigator.this.onInsertRow) {
@@ -1094,6 +1100,7 @@ public class SSDataNavigator extends JPanel {
 		this.refreshButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
+				logger.debug("REFRESH button clicked.");
 				SSDataNavigator.this.sSRowSet.removeRowSetListener(SSDataNavigator.this.sSRowSetListener);
 				try {
 					if (SSDataNavigator.this.callExecute) {
@@ -1131,6 +1138,7 @@ public class SSDataNavigator extends JPanel {
 		this.addButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
+				logger.debug("ADD button clicked.");
 				try {
 
 					SSDataNavigator.this.sSRowSet.moveToInsertRow();
@@ -1167,6 +1175,7 @@ public class SSDataNavigator extends JPanel {
 		this.deleteButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent ae) {
+				logger.debug("DELETE button clicked.");
 				try {
 					if (SSDataNavigator.this.confirmDeletes) {
 						int answer = JOptionPane.showConfirmDialog(SSDataNavigator.this,
@@ -1236,6 +1245,7 @@ public class SSDataNavigator extends JPanel {
 		this.txtCurrentRow.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent ke) {
+				logger.debug("Record number manually updated.");
 				if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
 					try {
 						int row = Integer.parseInt(SSDataNavigator.this.txtCurrentRow.getText().trim());
@@ -1298,6 +1308,9 @@ public class SSDataNavigator extends JPanel {
 		// SET THE ROW COUNT AS LABEL
 		this.lblRowCount.setText("of " + this.rowCount);
 		this.txtCurrentRow.setText(String.valueOf(this.currentRow));
+		
+		logger.debug("Current Row: " + currentRow + ". Row Count: " + rowCount);
+		
 		// ENABLE OR DISABLE BUTTONS
 		if (this.rowCount == 0) {
 			this.firstButton.setEnabled(false);
