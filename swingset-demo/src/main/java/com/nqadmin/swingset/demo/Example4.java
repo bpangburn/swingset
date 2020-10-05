@@ -71,6 +71,10 @@ import com.nqadmin.swingset.utils.SSSyncManager;
  * Since the navigation can take place by multiple methods, the navigation
  * controls have to be synchronized. This is accomplished with the
  * SSSyncManager.
+ * <p>
+ * IMPORTANT: The SSDBComboBox and the SSRowSet queries should select the same
+ * records and in the same order. Otherwise the SSSyncManager will spend a lot of
+ * time looping through records to match.
  */
 public class Example4 extends JFrame {
 

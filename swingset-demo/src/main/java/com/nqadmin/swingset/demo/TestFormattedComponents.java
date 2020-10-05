@@ -74,6 +74,10 @@ import com.nqadmin.swingset.utils.SSSyncManager;
  * <p>
  * There is a separate example screen to demonstrate the
  * Base SwingSet Components.
+ * <p>
+ * IMPORTANT: The SSDBComboBox and the SSRowSet queries should select the same
+ * records and in the same order. Otherwise the SSSyncManager will spend a lot of
+ * time looping through records to match.
  */
 
 public class TestFormattedComponents extends JFrame {
