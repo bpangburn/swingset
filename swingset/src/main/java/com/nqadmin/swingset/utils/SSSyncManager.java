@@ -56,7 +56,11 @@ import javax.sql.RowSetEvent;
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * Used to synchronize a data navigator and a navigation combo box.
+ * Used to synchronize a data navigator and a navigation combobox.
+ * <p>
+ * IMPORTANT: The SSDBComboBox and the SSRowSet queries should select the same
+ * records and in the same order. Otherwise the SSSyncManager will spend a lot of
+ * time looping through records to match.
  */
 public class SSSyncManager {
 
@@ -75,7 +79,7 @@ public class SSSyncManager {
 		@Override
 		public void actionPerformed(ActionEvent ae) {
 	
-			SSSyncManager.this.rowset.removeRowSetListener(SSSyncManager.this.rowsetListener);
+			rowset.removeRowSetListener(rowsetListener);
 
 			try {
 				// IF THIS IS NOT CAUSED BY THE USER ACTION (IN WHICH THE FOCUS WILL BE ON THE
@@ -90,45 +94,67 @@ public class SSSyncManager {
 				}
 
 				// this.id = ""+SSSyncManager.this.comboBox.getSelectedFilteredValue();
-				comboPK = SSSyncManager.this.comboBox.getSelectedValue();
+				comboPK = comboBox.getSelectedValue();
 				
 
-				// UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW. *take out to make it
-				// faster
+				// UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
+				// Code removed to to make it faster.
 				// dataNavigator.updatePresentRow();
-				// if(id != rowset.getLong(columnName)) {
-				// TODO Consider getColumnText() over rowset.getString()
 
-				if (comboPK != SSSyncManager.this.rowset.getLong(SSSyncManager.this.columnName)) {
+				
+				// Note rowset count starts at 1 whereas combobox index starts at 0.
+				
+				long rowsetPK = rowset.getLong(columnName);
+
+				if (comboPK != rowsetPK) {
 					// long indexOfId = SSSyncManager.this.comboBox.itemMap.get(this.id) + 1;
-					int indexOfPK = comboBox.getMappings().indexOf((Long) comboPK) + 1;
+					int indexOfPK = comboBox.getMappings().indexOf(comboPK) + 1;
 					//int index = (int) indexOfPK;
-					SSSyncManager.this.rowset.absolute(indexOfPK);
-					int numRecords = SSSyncManager.this.comboBox.getItemCount();
+					logger.debug("Rowset PK=" + rowsetPK + ", Combo PK=" + comboPK + ", Target rowset record # should be " + indexOfPK + ".");
+					rowset.absolute(indexOfPK);
+					int numRecords = comboBox.getItemCount();
 					int count = 0;
-					// while (id != rowset.getLong(columnName)) {
-					// IF AFTER POSITIONING THE ROWSET INDEX AT THE COMBO INDEX, THE VALUES DON'T
-					// MATCH
+					
+					// IF AFTER POSITIONING THE ROWSET INDEX AT THE COMBO INDEX, THE VALUES DON'T MATCH,
 					// PERFORM A MANUAL LOOP TO TRY TO FIND A MATCH
 					// PRESUMING RECORDS COULD BE ADDED/DELETED BY OTHER CONNECTIONS, DON'T LOOP
-					// THROUGH ALL OF THE RECORDS
-					// MORE THAN ONCE PLUS A CUSHION OF 5
+					// THROUGH ALL OF THE RECORDS MORE THAN ONCE PLUS A CUSHION OF overlapToCheck
 					while (comboPK != rowset.getLong(columnName)) {
-						if (!SSSyncManager.this.rowset.next()) {
-							SSSyncManager.this.rowset.beforeFirst();
-							SSSyncManager.this.rowset.next();
+						if (!rowset.next()) {
+							rowset.beforeFirst();
+							rowset.next();
 						}
 
 						count++;
 
-						logger.info(
-								"SSSyncManager SSRowSet and SSDBComboBox values do not match for the same index. Looping through each record for a match. Pass # "
+						logger.warn(
+								"SSSyncManager SSRowSet and SSDBComboBox values do not match for the same index. This can be caused by SSDBComboBox and SSRowSet "
+								+ " queries not selecting the same records in the same order. Looping through each record for a match. Pass # "
 										+ count + ".");
+						
+						// Often records are just slightly out of order so a better strategy would be to move backwards by some small offset
+						// and then search forward rather than potentially searching through all records to make a full loop.
+						if (count==1) {
+							// If there are only a few records, just start at first record
+							int rowsetSearchFrom = 1;
+														
+							if (numRecords>offsetToCheck) {
+								rowsetSearchFrom = indexOfPK - offsetToCheck;
+							}
+							if (rowsetSearchFrom<1) {
+								rowsetSearchFrom += numRecords;
+							}
+							if (rowsetSearchFrom>numRecords) {
+								rowsetSearchFrom -= numRecords;
+							}
+							rowset.absolute(rowsetSearchFrom);
+						}
+						
 
 						// number of items in combo is the number of records in resultset.
 						// so if for some reason item is in combo but deleted in rowset
 						// To avoid infinite loop in such scenario
-						if (count > numRecords + 5) {
+						if (count > numRecords + overlapToCheck) {
 							comboBox.repaint();
 							logger.warn("SSSyncManager unable to find a record matching the selection in the dropdown list: " + comboBox.getSelectedStringValue() + ".");
 							// JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin
@@ -143,7 +169,7 @@ public class SSSyncManager {
 				logger.error("SQL Exception.", se);
 			} finally {
 				logger.debug(actionPerformedCount++);
-				SSSyncManager.this.rowset.addRowSetListener(SSSyncManager.this.rowsetListener);
+				rowset.addRowSetListener(rowsetListener);
 			}
 		}
 	} // protected class MyComboListener implements ActionListener {
@@ -204,6 +230,16 @@ public class SSSyncManager {
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = LogManager.getLogger();
+	
+	/**
+	 * # of records to step back if doing a sequential search because SSDBComboBox and SSRowSet results don't match.
+	 */
+	protected static final int offsetToCheck = 7;
+	
+	/**
+	 * # of records of overlap to check if SSDBComboBox and SSRowSet results don't match due to record additions/deletions.
+	 */
+	protected static final int overlapToCheck = 7;
 
 	/**
 	 * <p>
