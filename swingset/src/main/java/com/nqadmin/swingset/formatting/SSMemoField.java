@@ -252,8 +252,9 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 		try {
 
-			if (this.rowset.getRow() == 0)
+			if (this.rowset.getRow() == 0) {
 				return;
+			}
 
 			switch (this.colType) {
 
@@ -286,10 +287,12 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	private void bind() {
 
-		if (this.columnName == null)
+		if (this.columnName == null) {
 			return;
-		if (this.rowset == null)
+		}
+		if (this.rowset == null) {
 			return;
+		}
 
 		try {
 			this.colType = this.rowset.getColumnType(this.columnName);
@@ -480,8 +483,9 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 				setBackground(java.awt.Color.WHITE);
 
 				// if not linked to a db field, returns.
-				if (SSMemoField.this.columnName == null || SSMemoField.this.rowset == null)
+				if ((SSMemoField.this.columnName == null) || (SSMemoField.this.rowset == null)) {
 					return true;
+				}
 
 				try {
 					SSMemoField.this.rowset.removeRowSetListener(tf);

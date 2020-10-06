@@ -514,7 +514,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
         	// SET THE SLIDER BASED ON THE VALUE IN TEXT FIELD
             	String columnValue = getBoundColumnText();
             	try {
-            		if (columnValue==null || columnValue.isEmpty()) {
+            		if ((columnValue==null) || columnValue.isEmpty()) {
             			setValue(0);
 	            	} else {
 	            		setValue(Integer.parseInt(columnValue));

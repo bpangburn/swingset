@@ -70,8 +70,9 @@ public class SSArray implements Array {
 	 * @param _baseTypeName Array elements database type name
 	 */
 	public SSArray(Object[] _data, String _baseTypeName) {
-		if (_data == null)
+		if (_data == null) {
 			throw new IllegalArgumentException("Parameter should not be null");
+		}
 		this.data = _data.clone();
 		this.baseTypeName = _baseTypeName;
 	}

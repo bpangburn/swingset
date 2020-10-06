@@ -265,8 +265,9 @@ public class SSTableModel extends AbstractTableModel {
 	public int getRowCount() {
 		// RETURN THE NUMBER OF ROWS AS ONE GREATER THAN THOSE IN DATABASE
 		// ITS USED FOR INSERTING NEW ROWS
-		if (this.allowInsertion)
+		if (this.allowInsertion) {
 			return this.rowCount + 1;
+		}
 		// IF INSERTION IS NOT ALLOWED THEN RETURN THE ACTUAL ROW COUNT
 		return this.rowCount;
 	}
@@ -322,8 +323,9 @@ public class SSTableModel extends AbstractTableModel {
 			this.rowset.absolute(_row + 1);
 
 			// IF IT IS NULL RETURN NULL
-			if (this.rowset.getObject(_column + 1) == null)
+			if (this.rowset.getObject(_column + 1) == null) {
 				return null;
+			}
 
 			// COLUMN NUMBERS IN SSROWSET START FROM 1 WHERE AS COLUMN NUMBERING FOR JTABLE
 			// START FROM 0
@@ -399,11 +401,13 @@ public class SSTableModel extends AbstractTableModel {
 
 		// IF COPYING VALUES THE DATE WILL COME AS STRING SO CONVERT IT TO DATE OBJECT.
 		if (type == Types.DATE) {
-			if (valueCopy instanceof String)
+			if (valueCopy instanceof String) {
 				valueCopy = getSQLDate((String) valueCopy);
+			}
 		} else if (type == Types.TIMESTAMP) {
-			if (valueCopy instanceof String)
+			if (valueCopy instanceof String) {
 				valueCopy = new Timestamp(getSQLDate((String) valueCopy).getTime());
+			}
 		}
 
 		// IF CELL EDITING INTERFACE IMPLEMENTATION IS PROVIDED INFO THE USER
@@ -438,7 +442,7 @@ public class SSTableModel extends AbstractTableModel {
 		
 		try {
 			// YOU SHOULD BE ON THE RIGHT ROW IN THE SSROWSET
-			if (this.rowset.getRow() != _row + 1) {
+			if (this.rowset.getRow() != (_row + 1)) {
 				this.rowset.absolute(_row + 1);
 			}
 			if (valueCopy == null) {
@@ -724,7 +728,7 @@ public class SSTableModel extends AbstractTableModel {
 		}
 		if (_row < this.rowCount) {
 			try {
-				if (this.dataGridHandler != null && !this.dataGridHandler.allowDeletion(_row)) {
+				if ((this.dataGridHandler != null) && !this.dataGridHandler.allowDeletion(_row)) {
 					return false;
 				}
 				this.rowset.absolute(_row + 1);
@@ -756,7 +760,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *                       argument
 	 */
 	public void setDefaultValues(int[] _columnNumbers, Object[] _values) {
-		if (_columnNumbers == null || _values == null) {
+		if ((_columnNumbers == null) || (_values == null)) {
 			this.defaultValuesMap = null;
 		}
 
@@ -765,7 +769,7 @@ public class SSTableModel extends AbstractTableModel {
 		} else {
 			this.defaultValuesMap.clear();
 		}
-		if (_columnNumbers != null && _values != null) {
+		if ((_columnNumbers != null) && (_values != null)) {
 			for (int i = 0; i < _columnNumbers.length; i++) {
 				this.defaultValuesMap.put(new Integer(_columnNumbers[i]), _values[i]);
 			}

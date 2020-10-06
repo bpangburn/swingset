@@ -161,8 +161,9 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 							int bytesRead = inStream.read(bytes);
 							while (bytesRead < totalLength) {
 								int read = inStream.read(bytes, bytesRead, totalLength - bytesRead);
-								if (read == -1)
+								if (read == -1) {
 									break;
+								}
 								bytesRead += read;
 							}
 							// inStream.close();
@@ -226,15 +227,16 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 		fw = (double) wi / (double) wo;
 		fh = (double) hi / (double) ho;
 
-		if (fw > fh)
+		if (fw > fh) {
 			scale = fh;
-		else
+		} else {
 			scale = fw;
+		}
 
 		ws = (int) (scale * wo);
 		hs = (int) (scale * ho);
 
-		if (wi == 0 && hi == 0) {
+		if ((wi == 0) && (hi == 0)) {
 			ws = wo;
 			hs = ho;
 		}
@@ -364,8 +366,9 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	private void DbToFm() {
 
 		try {
-			if (this.rowset.getRow() == 0)
+			if (this.rowset.getRow() == 0) {
 				return;
+			}
 
 			switch (this.colType) {
 
@@ -378,11 +381,11 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 					break;
 				}
 
-				if (this.imageBytes.length > 0)
-
+				if (this.imageBytes.length > 0) {
 					this.fullIcon = new ImageIcon(this.imageBytes);
-				else
+				} else {
 					this.fullIcon = this.nullIcon;
+				}
 				Rescale();
 				break;
 
@@ -411,10 +414,12 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 */
 	private void bind() {
 
-		if (this.columnName == null)
+		if (this.columnName == null) {
 			return;
-		if (this.rowset == null)
+		}
+		if (this.rowset == null) {
 			return;
+		}
 
 		try {
 			this.colType = this.rowset.getColumnType(this.columnName);
@@ -580,10 +585,11 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 */
 	protected void Rescale() {
 		if (this.fullIcon != null) {
-			if (!this.fullIcon.equals(this.nullIcon))
+			if (!this.fullIcon.equals(this.nullIcon)) {
 				this.scaledIcon = Thumbnail(this.fullIcon.getImage());
-			else
+			} else {
 				this.scaledIcon = this.fullIcon;
+			}
 			this.imageButton.setIcon(this.scaledIcon);
 			updateUI();
 		}

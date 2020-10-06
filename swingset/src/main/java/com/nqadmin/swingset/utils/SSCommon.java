@@ -363,7 +363,7 @@ public class SSCommon implements Serializable {
 
 // TODO consider updating Component to null/zero/empty string if not valid column name, column index, or rowset    	
 		// CHECK FOR NULL COLUMN/ROWSET
-		if ((this.boundColumnName == null && this.boundColumnIndex == NO_COLUMN_INDEX) || this.ssRowSet == null) {
+		if (((this.boundColumnName == null) && (this.boundColumnIndex == NO_COLUMN_INDEX)) || (this.ssRowSet == null)) {
 			return;
 		}
 
@@ -481,7 +481,7 @@ public class SSCommon implements Serializable {
 		try {
 			if (getSSRowSet().getRow() != 0) {
 				value = getSSRowSet().getColumnText(getBoundColumnName());
-				if (!getAllowNull() && value == null) {
+				if (!getAllowNull() && (value == null)) {
 					value = "";
 				}
 			}
@@ -672,8 +672,9 @@ public class SSCommon implements Serializable {
 		}
 
 		// BIND UPDATED COLUMN IF APPLICABLE
-		if (!inBinding)
+		if (!inBinding) {
 			bind();
+		}
 
 	}
 
@@ -710,8 +711,9 @@ public class SSCommon implements Serializable {
 		}
 
 		// BIND UPDATED COLUMN IF APPLICABLE
-		if (!inBinding)
+		if (!inBinding) {
 			bind();
+		}
 	}
 
 	/**
@@ -776,8 +778,9 @@ public class SSCommon implements Serializable {
 	// public void setSSRowSet(SSRowSet _ssRowSet) throws SQLException {
 	public void setSSRowSet(SSRowSet _ssRowSet) {
 		this.ssRowSet = _ssRowSet;
-		if (!inBinding)
+		if (!inBinding) {
 			bind();
+		}
 
 	}
 

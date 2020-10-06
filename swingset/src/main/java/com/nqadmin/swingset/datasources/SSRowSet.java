@@ -124,7 +124,7 @@ public interface SSRowSet extends RowSet {
 
 		try {
 			// IF THE COLUMN IS NULL SO RETURN NULL
-			if (getColumnCount()==0 || getObject(_columnName) == null) {
+			if ((getColumnCount()==0) || (getObject(_columnName) == null)) {
 				return null;
 			}
 			
@@ -167,7 +167,7 @@ public interface SSRowSet extends RowSet {
 					GregorianCalendar calendar = new GregorianCalendar();
 					calendar.setTime(date);
 					value = "";
-					if (calendar.get(Calendar.MONTH) + 1 < 10) {
+					if ((calendar.get(Calendar.MONTH) + 1) < 10) {
 						value = "0";
 					}
 					value = value + (calendar.get(Calendar.MONTH) + 1) + "/";
@@ -300,7 +300,7 @@ public interface SSRowSet extends RowSet {
 			case Types.SMALLINT:
 			case Types.TINYINT:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if (_updatedValue==null || _updatedValue.equals("")) {
+				if ((_updatedValue==null) || _updatedValue.equals("")) {
 					if (_allowNull) {
 						this.updateNull(_columnName);
 					} else {
@@ -314,7 +314,7 @@ public interface SSRowSet extends RowSet {
 
 			case Types.BIGINT:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if (_updatedValue==null || _updatedValue.equals("")) {
+				if ((_updatedValue==null) || _updatedValue.equals("")) {
 					if (_allowNull) {
 						this.updateNull(_columnName);
 					} else {
@@ -328,7 +328,7 @@ public interface SSRowSet extends RowSet {
 
 			case Types.FLOAT:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if (_updatedValue==null || _updatedValue.equals("")) {
+				if ((_updatedValue==null) || _updatedValue.equals("")) {
 					if (_allowNull) {
 						this.updateNull(_columnName);
 					} else {
@@ -344,7 +344,7 @@ public interface SSRowSet extends RowSet {
 			case Types.NUMERIC:
 			case Types.DECIMAL:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if (_updatedValue==null || _updatedValue.equals("")) {
+				if ((_updatedValue==null) || _updatedValue.equals("")) {
 					if (_allowNull) {
 						this.updateNull(_columnName);
 					} else {
@@ -358,7 +358,7 @@ public interface SSRowSet extends RowSet {
 
 			case Types.BOOLEAN:
 			case Types.BIT:
-				if (_updatedValue==null || _updatedValue.equals("")) {
+				if ((_updatedValue==null) || _updatedValue.equals("")) {
 					if (_allowNull) {
 						this.updateNull(_columnName);
 					} else {
@@ -373,7 +373,7 @@ public interface SSRowSet extends RowSet {
 
 			case Types.DATE:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if (_updatedValue==null || _updatedValue.equals("")) {
+				if ((_updatedValue==null) || _updatedValue.equals("")) {
 					if (_allowNull) {
 						this.updateNull(_columnName);
 					} else {
@@ -389,7 +389,7 @@ public interface SSRowSet extends RowSet {
 				
 			case Types.TIME:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if (_updatedValue==null || _updatedValue.equals("")) {
+				if ((_updatedValue==null) || _updatedValue.equals("")) {
 					if (_allowNull) {
 						this.updateNull(_columnName);
 					} else {
@@ -402,7 +402,7 @@ public interface SSRowSet extends RowSet {
 				
 			case Types.TIMESTAMP:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if (_updatedValue==null || _updatedValue.equals("")) {
+				if ((_updatedValue==null) || _updatedValue.equals("")) {
 					if (_allowNull) {
 						this.updateNull(_columnName);
 					} else {

@@ -486,12 +486,15 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		eventList.getReadWriteLock().writeLock().lock();
 
 		// INITIALIZE LISTS IF NULL
-		if (eventList == null)
+		if (eventList == null) {
 			eventList = new BasicEventList<>();
-		if (mappings == null)
+		}
+		if (mappings == null) {
 			mappings = new ArrayList<Long>();
-		if (options == null)
+		}
+		if (options == null) {
 			options = new ArrayList<String>();
+		}
 
 		try {
 
@@ -735,8 +738,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 // TODO Determine where/how this is/was used.   
 		int result = 0;
 
-		if (eventList != null)
+		if (eventList != null) {
 			result = eventList.size();
+		}
 
 		return result;
 	}
@@ -1013,7 +1017,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			logger.debug(getColumnForLog() + ": Nulls allowed? " + getAllowNull());
 			// 2020-07-24: adding support for a nullable first item if nulls are supported
 			// 2020-10-02: For a SSDBComboBox used as a navigator, we don't want a null first item. Look at getBoundColumnName().
-			if (getAllowNull() && getBoundColumnName()!=null) {
+			if (getAllowNull() && (getBoundColumnName()!=null)) {
 				listItem = new SSListItem(null, "");
 				logger.debug(getColumnForLog() + ": Adding blank list item - " + listItem);
 				eventList.add(listItem);
@@ -1038,7 +1042,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				// extract second column string, if applicable
 				// getStringValue() takes care of formatting dates
 				secondColumnString = null;
-				if (secondDisplayColumnName != null && !secondDisplayColumnName.equals("")) {
+				if ((secondDisplayColumnName != null) && !secondDisplayColumnName.equals("")) {
 					secondColumnString = rs.getString(this.secondDisplayColumnName);
 					if (secondColumnString.equals("")) {
 						secondColumnString = null;
@@ -1930,7 +1934,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 			// GET THE BOUND VALUE STORED IN THE ROWSET
 			//if (text != null && !(text.equals(""))) {
-			if (text != null && !text.isEmpty()) {
+			if ((text != null) && !text.isEmpty()) {
 				
 				long primaryKey = Long.parseLong(text);
 				

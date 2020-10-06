@@ -89,8 +89,9 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 			setBackground(java.awt.Color.WHITE);
 
 			// if not linked to a db field, returns.
-			if (SSBooleanField.this.getColumnName() == null || SSBooleanField.this.rowset == null)
+			if ((SSBooleanField.this.getColumnName() == null) || (SSBooleanField.this.rowset == null)) {
 				return true;
+			}
 
 			try {
 				SSBooleanField.this.rowset.removeRowSetListener(tf);
@@ -178,10 +179,12 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	 */
 	private void bind() {
 
-		if (this.columnName == null)
+		if (this.columnName == null) {
 			return;
-		if (this.rowset == null)
+		}
+		if (this.rowset == null) {
 			return;
+		}
 
 		try {
 			this.colType = this.rowset.getColumnType(this.columnName);
@@ -220,8 +223,9 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	private void DbToFm() {
 
 		try {
-			if (this.rowset.getRow() == 0)
+			if (this.rowset.getRow() == 0) {
 				return;
+			}
 
 			switch (this.colType) {
 
@@ -237,10 +241,11 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 			case java.sql.Types.BIGINT:// -5
 			case java.sql.Types.SMALLINT:// 5
 			case java.sql.Types.TINYINT:// -6
-				if (this.rowset.getInt(this.columnName) == 1)
+				if (this.rowset.getInt(this.columnName) == 1) {
 					this.setSelected(true);
-				else
+				} else {
 					this.setSelected(false);
+				}
 				break;
 
 			default:

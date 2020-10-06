@@ -514,14 +514,14 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	            @Override
 				public synchronized void keyPressed(KeyEvent ke) {
 	
-	                if(SSTextField.this.mask == MMDDYYYY || SSTextField.this.mask == DDMMYYYY){
+	                if((SSTextField.this.mask == MMDDYYYY) || (SSTextField.this.mask == DDMMYYYY)){
 	                    mask(ke);
 	                }
 	            }
 	
 	            @Override
 				public void keyReleased(KeyEvent ke) {
-	                if(SSTextField.this.mask == DECIMAL || SSTextField.this.mask == SSN){
+	                if((SSTextField.this.mask == DECIMAL) || (SSTextField.this.mask == SSN)){
 	                    int position = SSTextField.this.getCaretPosition();
 	                    int length = SSTextField.this.getText().length();
 	                    if(mask(ke)){
@@ -588,15 +588,15 @@ public class SSTextField extends JTextField implements SSComponentInterface {
             char ch = _ke.getKeyChar();
 
          // IF THE KEY PRESSED IS ANY OF THE FOLLOWING DO NOTHING
-            if (_ke.getKeyCode() == KeyEvent.VK_BACK_SPACE  ||
-                    _ke.getKeyCode() == KeyEvent.VK_DELETE  ||
-                    _ke.getKeyCode() == KeyEvent.VK_END     ||
-                    _ke.getKeyCode() == KeyEvent.VK_ENTER   ||
-                    _ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            if ((_ke.getKeyCode() == KeyEvent.VK_BACK_SPACE)  ||
+                    (_ke.getKeyCode() == KeyEvent.VK_DELETE)  ||
+                    (_ke.getKeyCode() == KeyEvent.VK_END)     ||
+                    (_ke.getKeyCode() == KeyEvent.VK_ENTER)   ||
+                    (_ke.getKeyCode() == KeyEvent.VK_ESCAPE)) {
 
                 return false;
-            } else if ( (_ke.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) == InputEvent.CTRL_DOWN_MASK ||
-                     (_ke.getModifiersEx() & InputEvent.ALT_DOWN_MASK)  == InputEvent.ALT_DOWN_MASK    ) {
+            } else if ( ((_ke.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) == InputEvent.CTRL_DOWN_MASK) ||
+                     ((_ke.getModifiersEx() & InputEvent.ALT_DOWN_MASK)  == InputEvent.ALT_DOWN_MASK)    ) {
 
                 return false;
             } else if(!Character.isDefined(ch)) {

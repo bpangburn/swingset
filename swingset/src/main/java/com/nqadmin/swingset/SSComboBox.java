@@ -675,8 +675,9 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	public void setMappings(int[] _mappings) {
 		// int[] oldValue = mappings.clone();
 		// this.mappings = _mappings.clone();
-		if (mappings != null)
+		if (mappings != null) {
 			mappings.clear();
+		}
 		// https://examples.javacodegeeks.com/core-java/java8-convert-array-list-example/
 		mappings = new ArrayList<Integer>(IntStream.of(_mappings).boxed().collect(Collectors.toList()));
 		// TODO in Java 9, we can use List.of(_mappings) - can be immutable or mutable -
@@ -784,8 +785,9 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 		// this.options = _options.clone();
 		// firePropertyChange("options", oldValue, this.options);
 
-		if (options != null)
+		if (options != null) {
 			options.clear();
+		}
 		
 		// TODO Add empty string first item if getAllowNull()==true. Will also impact mappings, getSelectedValue(), getSelectedIndex(), etc.
 //		if (getAllowNull()) {
@@ -849,7 +851,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 
 		if (_predefinedOptions == YES_NO_OPTION) {
 			setOptions(new String[] { "No", "Yes" });
-		} else if (_predefinedOptions == SEX_OPTION || _predefinedOptions == GENDER_OPTION) {
+		} else if ((_predefinedOptions == SEX_OPTION) || (_predefinedOptions == GENDER_OPTION)) {
 			setOptions(new String[] { "Male", "Female", "Unisex" });
 		} else if (_predefinedOptions == INCLUDE_EXCLUDE_OPTION) {
 			setOptions(new String[] { "Include", "Exclude" });
@@ -881,7 +883,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 		// TODO consider firing a property change
 		if (_value != getSelectedValue()) {
 
-			if (this.mappings == null && (_value < 0 || _value >= getItemCount())) {
+			if ((this.mappings == null) && ((_value < 0) || (_value >= getItemCount()))) {
 				// IF EXPLICIT VALUES FOR THE ITEMS IN COMBO ARE NOT SPECIFIED THEN CODES START
 				// FROM ZERO. IN SUCH A CASE CHECK IF THE NUMBER EXCEEDS THE NUMBER OF ITEMS
 				// IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)
@@ -936,7 +938,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 			String text = getBoundColumnText().trim();
 
 			// GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD
-			if (text != null && !(text.equals(""))) {
+			if ((text != null) && !(text.equals(""))) {
 				int comboCode = Integer.parseInt(text);
 
 				setSelectedValue(comboCode);

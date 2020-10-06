@@ -132,58 +132,68 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		case Types.SMALLINT:
 		case Types.TINYINT:
 			try {
-				for (Integer num : (Integer[]) array.getArray())
+				for (Integer num : (Integer[]) array.getArray()) {
 					data.add(num);
+				}
 			} catch (ClassCastException ex) {
-				for (int num : (int[]) array.getArray())
+				for (int num : (int[]) array.getArray()) {
 					data.add(Integer.valueOf(num));
+				}
 			}
 			break;
 		case Types.BIGINT:
 			try {
-				for (Long num : (Long[]) array.getArray())
+				for (Long num : (Long[]) array.getArray()) {
 					data.add(num);
+				}
 			} catch (ClassCastException ex) {
-				for (long num : (long[]) array.getArray())
+				for (long num : (long[]) array.getArray()) {
 					data.add(Long.valueOf(num));
+				}
 			}
 			break;
 		case Types.FLOAT:
 		case Types.DOUBLE:
 		case Types.REAL:
 			try {
-				for (Double num : (Double[]) array.getArray())
+				for (Double num : (Double[]) array.getArray()) {
 					data.add(num);
+				}
 			} catch (ClassCastException ex) {
-				for (double num : (double[]) array.getArray())
+				for (double num : (double[]) array.getArray()) {
 					data.add(Double.valueOf(num));
+				}
 			}
 			break;
 		case Types.DECIMAL:
 		case Types.NUMERIC:
 			try {
-				for (BigDecimal num : (BigDecimal[]) array.getArray())
+				for (BigDecimal num : (BigDecimal[]) array.getArray()) {
 					data.add(num);
+				}
 			} catch (ClassCastException cce) {
 				logger.error("Class Cast Exception.", cce);
 			}
 			break;
 		case Types.DATE:
-			for (Date dt : (Date[]) array.getArray())
+			for (Date dt : (Date[]) array.getArray()) {
 				data.add(dt);
+			}
 			break;
 		case Types.CHAR:
 		case Types.VARCHAR:
 		case Types.LONGVARCHAR:
-			for (String txt : (String[]) array.getArray())
+			for (String txt : (String[]) array.getArray()) {
 				data.add(txt);
+			}
 			break;
 		default:
 		// H2 ARRAY RETURNS NULL FOR getBaseType()
 		// FOR THIS AND OTHER FAILURES, TRY A LIST OF OBJECTS
 			try {
-				for (Object val : (Object[]) array.getArray())
+				for (Object val : (Object[]) array.getArray()) {
 					data.add(val);
+				}
 			} catch (SQLException se) {
 				logger.error("DataType: " + array.getBaseTypeName() + " not supported and unable to convert to generic object.", se);
 			}
@@ -575,8 +585,9 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		int[] selectedIndices = new int[values.length];
 		for (int i = 0; i < values.length; i++) {
 			for (int j = 0; j < this.mappings.length; j++) {
-				if (values[i] == this.mappings[j])
+				if (values[i] == this.mappings[j]) {
 					selectedIndices[i] = j;
+				}
 			}
 		}
 		this.setSelectedIndices(selectedIndices);
@@ -599,10 +610,11 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 */
 	protected void updateRowSet() {
 		Array array;
-		if (this.getSelectedIndices().length == 0)
+		if (this.getSelectedIndices().length == 0) {
 			array = new SSArray(new Object[] {}, this.baseTypeName);
-		else
+		} else {
 			array = new SSArray(this.getSelectedValues(), this.baseTypeName);
+		}
 		try {
 			getSSRowSet().updateArray(getBoundColumnName(), array);
 		} catch (SQLException se) {
@@ -629,8 +641,9 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 //		// REMOVE LISTENERS TO PREVENT DUPLICATION
 //		removeListeners();
 //
-		if (this.mappings == null || this.options == null)
+		if ((this.mappings == null) || (this.options == null)) {
 			return;
+		}
 		this.setListData(this.options);
 //		updateDisplay();
 //

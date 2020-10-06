@@ -122,21 +122,23 @@ public class SSCuitField extends SSFormattedTextField {
         
         for (mo=0, i=0; i < 12; i++)
         {
-            if (i==2 || i==11) continue;
+            if ((i==2) || (i==11)) {
+				continue;
+			}
             mo += (base.charAt(i) - '0') * (cuit.charAt(i) - '0');
         }
         
         mr = mo%11;
         
-        if (mr==0)
-            ba = 0;
-        else
+        if (mr==0) {
+			ba = 0;
+		} else
             if (mr==1)
             {
             return false;
-            }
-            else
-                ba = 11 - mr;
+            } else {
+				ba = 11 - mr;
+			}
         
         ctrl.setCharAt(12, (char)(ba + '0'));
         

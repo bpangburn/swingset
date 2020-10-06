@@ -902,8 +902,9 @@ public class SSDataGrid extends JTable {
 			 */
 			@Override
 			public void keyPressed(KeyEvent ke) {
-				if (ke.getKeyCode() != KeyEvent.VK_TAB)
+				if (ke.getKeyCode() != KeyEvent.VK_TAB) {
 					this.keyPressed++;
+				}
 			}
 
 			/**
@@ -913,13 +914,14 @@ public class SSDataGrid extends JTable {
 			public void keyReleased(KeyEvent ke) {
 				JComponent editor = (JComponent) DefaultEditor.this.getComponent();
 				if (editor instanceof JTextField) {
-					if (this.keyPressed == 0 && Character.isLetterOrDigit(ke.getKeyChar())) {
+					if ((this.keyPressed == 0) && Character.isLetterOrDigit(ke.getKeyChar())) {
 						((JTextField) editor).setText(String.valueOf(ke.getKeyChar()));
 					}
 				}
 				this.keyPressed--;
-				if (this.keyPressed < 0)
+				if (this.keyPressed < 0) {
 					this.keyPressed = 0;
+				}
 
 			}
 
@@ -1210,10 +1212,11 @@ public class SSDataGrid extends JTable {
 				@Override
 				public void keyPressed(KeyEvent ke) {
 					// changed date key listener to clear date field when a new key is pressed
-					if (ke.getKeyCode() == KeyEvent.VK_UP || ke.getKeyCode() == KeyEvent.VK_DOWN
-							|| ke.getKeyCode() == KeyEvent.VK_LEFT || ke.getKeyCode() == KeyEvent.VK_RIGHT
-							|| ke.getKeyCode() == KeyEvent.VK_ENTER || ke.getKeyCode() == KeyEvent.VK_TAB)
+					if ((ke.getKeyCode() == KeyEvent.VK_UP) || (ke.getKeyCode() == KeyEvent.VK_DOWN)
+							|| (ke.getKeyCode() == KeyEvent.VK_LEFT) || (ke.getKeyCode() == KeyEvent.VK_RIGHT)
+							|| (ke.getKeyCode() == KeyEvent.VK_ENTER) || (ke.getKeyCode() == KeyEvent.VK_TAB)) {
 						return;
+					}
 
 					this.keyPressed++;
 				}
@@ -1227,8 +1230,9 @@ public class SSDataGrid extends JTable {
 						}
 					}
 					this.keyPressed--;
-					if (this.keyPressed < 0)
+					if (this.keyPressed < 0) {
 						this.keyPressed = 0;
+					}
 				}
 			});
 		}
@@ -1257,7 +1261,7 @@ public class SSDataGrid extends JTable {
 		public Object getCellEditorValue() {
 			String strDate = ((JTextField) (DateEditor.this.getComponent())).getText();
 			// IF THE FIELD IS EMPTY RETURN NULL
-			if (strDate == null || "".equals(strDate.trim())) {
+			if ((strDate == null) || "".equals(strDate.trim())) {
 				return null;
 			}
 			StringTokenizer strtok = new StringTokenizer(strDate, "/", false);
@@ -1533,8 +1537,9 @@ public class SSDataGrid extends JTable {
 		protected int getIndexOf(Object _value) {
 			if (this.underlyingValues == null) {
 				// IF THE VALUE IS NULL THEN SET THE DISPLAY ON THE COMBO TO BLANK (INDEX -1)
-				if (_value == null)
+				if (_value == null) {
 					return -1;
+				}
 				return ((Integer) _value).intValue();
 			}
 			for (int i = 0; i < this.underlyingValues.length; i++) {

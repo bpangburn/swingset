@@ -135,7 +135,7 @@ public class SSFormattedTextField extends JFormattedTextField
 			    logger.info(getColumnForLog() + ": Object to be passed to database is " + currentValue + ".");
 			    
 			    // TODO May want to see if we can veto invalid updates
-			    if (!getAllowNull() && currentValue==null) {
+			    if (!getAllowNull() && (currentValue==null)) {
 			    	logger.warn("Null value encounted, but not allowed.");
 					JOptionPane.showMessageDialog((JComponent)ftf,
 							"Null values are not allowed for " + getBoundColumnName(), "Null Exception", JOptionPane.ERROR_MESSAGE);
@@ -669,10 +669,10 @@ public class SSFormattedTextField extends JFormattedTextField
 	 */
 	public void updateTextColor(final Object _value) {
 	
-		if ((_value instanceof Double && (Double) _value < 0.0)
-				|| (_value instanceof Float && (Float) _value < 0.0)
-				|| (_value instanceof Long && (Long) _value < 0)
-				|| (_value instanceof Integer && (Integer) _value < 0)) {
+		if (((_value instanceof Double) && ((Double) _value < 0.0))
+				|| ((_value instanceof Float) && ((Float) _value < 0.0))
+				|| ((_value instanceof Long) && ((Long) _value < 0))
+				|| ((_value instanceof Integer) && ((Integer) _value < 0))) {
 			this.setForeground(Color.RED);
 		} else {
 			this.setForeground(Color.BLACK);
@@ -795,7 +795,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 			try {
 				// IF THERE ARE NO RECORDS OR THE COLUMN VALUE IS NULL SET THE FIELD TO NULL AND RETURN
-				if (getSSRowSet().getColumnCount()==0 || getSSRowSet().getObject(getBoundColumnName()) == null) {
+				if ((getSSRowSet().getColumnCount()==0) || (getSSRowSet().getObject(getBoundColumnName()) == null)) {
 					setValue(null);
 					return;
 				}
@@ -823,16 +823,16 @@ public class SSFormattedTextField extends JFormattedTextField
 				 *  java.sql.Time
 				 *  java.sql.Timestamp
 				 */
-				if (newValue instanceof String ||
-						newValue instanceof Boolean ||
-						newValue instanceof Float ||
-						newValue instanceof Double ||
-						newValue instanceof Integer ||
-						newValue instanceof Long ||
-						newValue instanceof java.math.BigDecimal ||
-						newValue instanceof java.sql.Date ||
-						newValue instanceof java.sql.Time ||
-						newValue instanceof java.sql.Timestamp) {
+				if ((newValue instanceof String) ||
+						(newValue instanceof Boolean) ||
+						(newValue instanceof Float) ||
+						(newValue instanceof Double) ||
+						(newValue instanceof Integer) ||
+						(newValue instanceof Long) ||
+						(newValue instanceof java.math.BigDecimal) ||
+						(newValue instanceof java.sql.Date) ||
+						(newValue instanceof java.sql.Time) ||
+						(newValue instanceof java.sql.Timestamp)) {
 					
 					setValue(newValue);
 				} else {

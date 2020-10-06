@@ -576,8 +576,9 @@ public class SSDataNavigator extends JPanel {
 	 * @return returns true if update succeeds else false.
 	 */
 	public boolean updatePresentRow() {
-		if (this.onInsertRow || this.currentRow > 0)
+		if (this.onInsertRow || (this.currentRow > 0)) {
 			doCommitButtonClick();
+		}
 
 		return true;
 	}
@@ -850,7 +851,7 @@ public class SSDataNavigator extends JPanel {
 							}
 						}
 					}
-					if (SSDataNavigator.this.sSRowSet.getRow() != 0 && !SSDataNavigator.this.sSRowSet.previous()) {
+					if ((SSDataNavigator.this.sSRowSet.getRow() != 0) && !SSDataNavigator.this.sSRowSet.previous()) {
 						SSDataNavigator.this.sSRowSet.first();
 					}
 
@@ -981,7 +982,7 @@ public class SSDataNavigator extends JPanel {
 					if (SSDataNavigator.this.onInsertRow) {
 						// IF ON INSERT ROW ADD THE ROW.
 						// CHECK IF THE ROW CAN BE INSERTED.
-						if (SSDataNavigator.this.dBNav == null || (SSDataNavigator.this.dBNav != null
+						if ((SSDataNavigator.this.dBNav == null) || ((SSDataNavigator.this.dBNav != null)
 								&& SSDataNavigator.this.dBNav.allowInsertion())) {
 							SSDataNavigator.this.sSRowSet.insertRow();
 							SSDataNavigator.this.onInsertRow = false;
@@ -1190,8 +1191,8 @@ public class SSDataNavigator extends JPanel {
 						SSDataNavigator.this.dBNav.performPreDeletionOps();
 					}
 
-					if (SSDataNavigator.this.dBNav == null
-							|| (SSDataNavigator.this.dBNav != null && SSDataNavigator.this.dBNav.allowDeletion())) {
+					if ((SSDataNavigator.this.dBNav == null)
+							|| ((SSDataNavigator.this.dBNav != null) && SSDataNavigator.this.dBNav.allowDeletion())) {
 						
 						// CAPTURE CURRENT ROW PRE-DELETION
 						int tmpPosition = SSDataNavigator.this.currentRow;
@@ -1210,7 +1211,7 @@ public class SSDataNavigator extends JPanel {
 						
 						// TRY TO NAVIGATE TO THE RECORD AFTER THE DELETED RECORD, OTHERWISE GO TO
 						// WHATEVER IS THE LAST RECORD
-						if (tmpPosition <= SSDataNavigator.this.rowCount && tmpPosition > 0) {
+						if ((tmpPosition <= SSDataNavigator.this.rowCount) && (tmpPosition > 0)) {
 							SSDataNavigator.this.sSRowSet.absolute(tmpPosition);
 						} else {
 							SSDataNavigator.this.sSRowSet.last();
@@ -1249,7 +1250,7 @@ public class SSDataNavigator extends JPanel {
 				if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
 					try {
 						int row = Integer.parseInt(SSDataNavigator.this.txtCurrentRow.getText().trim());
-						if (row <= SSDataNavigator.this.rowCount && row > 0) {
+						if ((row <= SSDataNavigator.this.rowCount) && (row > 0)) {
 							SSDataNavigator.this.sSRowSet.absolute(row);
 						}
 					} catch (Exception e) {

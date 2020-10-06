@@ -174,8 +174,8 @@ public class SSConnection implements Serializable {
 	public Connection getConnection() {
 		// IF THE CONNECTION IS NOT YET CREATED, BUT WE HAVE ALL THE INFORMATION TO
 		// CREATE ONE, THEN GO AHEAD AND TRY CREATING THE CONNECTION
-		if (this.connection == null && this.url != null && this.driverName != null && this.username != null
-				&& this.password != null && !this.url.trim().equals("") && !this.driverName.trim().equals("")) {
+		if ((this.connection == null) && (this.url != null) && (this.driverName != null) && (this.username != null)
+				&& (this.password != null) && !this.url.trim().equals("") && !this.driverName.trim().equals("")) {
 			try {
 				createConnection();
 			} catch (SQLException se) {

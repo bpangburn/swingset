@@ -104,8 +104,9 @@ public class SSImage extends JPanel implements SSComponentInterface {
                                 int bytesRead = inStream.read(bytes);
                                 while (bytesRead < totalLength){
                                     int read = inStream.read(bytes, bytesRead, totalLength - bytesRead);
-                                    if(read == -1)
-                                        break;
+                                    if(read == -1) {
+										break;
+									}
 									bytesRead += read;
                                 }
                                 //inStream.close();

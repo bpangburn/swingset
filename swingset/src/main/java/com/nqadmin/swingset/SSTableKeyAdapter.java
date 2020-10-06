@@ -147,7 +147,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 		
 		logger.debug("Key Released on SSDataGrid. Key Released: " + ke.getKeyCode() + " " +  ((ke.getModifiersEx() & (onMask | offMask)) == onMask));
 
-		if (((ke.getModifiersEx() & (this.onMask | this.offMask)) == this.onMask) && ke.getKeyCode() == KeyEvent.VK_C) {
+		if (((ke.getModifiersEx() & (this.onMask | this.offMask)) == this.onMask) && (ke.getKeyCode() == KeyEvent.VK_C)) {
 			// CHECK IF CONTROL-C IS PRESSED
 			// SHIFT OR ALT SHOULD NOT BE DOWN
 
@@ -165,7 +165,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
 			// CHECK IF THERE IS ATLEAST ONE SELECTED CELL.
 			// IF NOT NOTHING TO COPY JUST RETURN.
-			if (numRows < 1 || numColumns < 1) {
+			if ((numRows < 1) || (numColumns < 1)) {
 				return;
 			}
 
@@ -200,7 +200,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 			clipboard.setContents(stringSelection, stringSelection);
 
 		} else if (((ke.getModifiersEx() & (this.onMask | this.offMask)) == this.onMask)
-				&& ke.getKeyCode() == KeyEvent.VK_V) {
+				&& (ke.getKeyCode() == KeyEvent.VK_V)) {
 			// CHECK IF CONTROL-V IS PRESSED
 			// SHIFT OR ALT SHOULD NOT BE DOWN
 
@@ -225,7 +225,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 				}
 
 				// IF USER HAS NOT SELECTED ANY CELL THEN DO NOT COPY.
-				if (jTable.getSelectedRowCount() < 1 || jTable.getSelectedColumnCount() < 1) {
+				if ((jTable.getSelectedRowCount() < 1) || (jTable.getSelectedColumnCount() < 1)) {
 					return;
 				}
 
@@ -262,7 +262,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 				int rowCount = jTable.getRowCount();
 				int columnCount = jTable.getColumnCount();
 
-				if (this.forSSDataGrid || jTable instanceof SSDataGrid) {
+				if (this.forSSDataGrid || (jTable instanceof SSDataGrid)) {
 					rowCount--;
 				}
 
@@ -312,7 +312,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
 					// WHILE THERE ARE ROWS IN THE CLIP BOARD DATA AND NUMBER OF ROWS
 					// COPIED IS LESS THEN WE SHOULD COPY DATA TO JTABLE.
-					for (int i = 0; rowTokens.hasMoreTokens() && i < numRowsToCopy; i++) {
+					for (int i = 0; rowTokens.hasMoreTokens() && (i < numRowsToCopy); i++) {
 						// TOKENIZE THE ROW INFORMATION IN TO COLUMNS
 						columnTokens = new StringTokenizer(rowTokens.nextToken(), "\t", false);
 						// PASTE THE DATA IN TO JTABLE ROW.

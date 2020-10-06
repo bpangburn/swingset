@@ -84,7 +84,7 @@ public class SSSyncManager {
 			try {
 				// IF THIS IS NOT CAUSED BY THE USER ACTION (IN WHICH THE FOCUS WILL BE ON THE
 				// COMBO) NOTHING TO DO
-				if (rowset == null || rowset.getRow() < 1 || comboBox.getSelectedIndex() == -1
+				if ((rowset == null) || (rowset.getRow() < 1) || (comboBox.getSelectedIndex() == -1)
 						/* || comboBox.textField == null */
 						/* || comboBox.isBoundTextFieldNull() */
 						/* || !comboBox.hasFocus() */ // with rewrite, the editor and not the combo likely has the focus
@@ -154,7 +154,7 @@ public class SSSyncManager {
 						// number of items in combo is the number of records in resultset.
 						// so if for some reason item is in combo but deleted in rowset
 						// To avoid infinite loop in such scenario
-						if (count > numRecords + overlapToCheck) {
+						if (count > (numRecords + overlapToCheck)) {
 							comboBox.repaint();
 							logger.warn("SSSyncManager unable to find a record matching the selection in the dropdown list: " + comboBox.getSelectedStringValue() + ".");
 							// JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin
@@ -273,15 +273,15 @@ public class SSSyncManager {
 		comboBox.removeActionListener(comboListener);
 		
 		try {
-			if (rowset != null && rowset.getRow() > 0) {
+			if ((rowset != null) && (rowset.getRow() > 0)) {
 				// GET THE PRIMARY KEY FOR THE CURRENT RECORD IN THE ROWSET
 				long currentRowPK = this.rowset.getLong(this.columnName);
 				
 				logger.debug("SSSyncManager().adjustValue() - RowSet value: " + currentRowPK);		
 
 				// CHECK IF THE COMBO BOX IS DISPLAYING THE SAME ONE.
-				if (comboBox.getSelectedStringValue() == null
-						|| comboBox.getSelectedValue()!=currentRowPK) {
+				if ((comboBox.getSelectedStringValue() == null)
+						|| (comboBox.getSelectedValue()!=currentRowPK)) {
 					// IF NOT CHANGE THE SELECTION OF THE COMBO BOX.
 					// this.comboBox.setSelectedStringValue(this.rowset.getString(this.columnName));
 					this.comboBox.setSelectedValue(currentRowPK);
