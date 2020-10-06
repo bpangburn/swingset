@@ -73,8 +73,8 @@ public class SSArray implements Array {
 		if (_data == null) {
 			throw new IllegalArgumentException("Parameter should not be null");
 		}
-		this.data = _data.clone();
-		this.baseTypeName = _baseTypeName;
+		data = _data.clone();
+		baseTypeName = _baseTypeName;
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class SSArray implements Array {
 	 */
 	@Override
 	public Object getArray() throws SQLException {
-		return this.data;
+		return data;
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public class SSArray implements Array {
 	 */
 	@Override
 	public String getBaseTypeName() throws SQLException {
-		return this.baseTypeName;
+		return baseTypeName;
 	}
 
 	@Override
@@ -146,11 +146,11 @@ public class SSArray implements Array {
 	@Override
 	public String toString() {
 		String text = "{";
-		for (int i = 0; i < this.data.length; ++i) {
+		for (int i = 0; i < data.length; ++i) {
 			if (i > 0) {
 				text += ",";
 			}
-			text += this.data[i];
+			text += data[i];
 		}
 
 		text += "}";

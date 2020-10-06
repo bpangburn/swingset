@@ -247,7 +247,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      */
     public SSTextField(final int _mask) {
         super();
-        this.mask = _mask;
+        mask = _mask;
         setSSCommon(new SSCommon(this));
     	// SSCommon constructor calls init()
         }
@@ -261,8 +261,8 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      */
      public SSTextField(final int _mask, final int _numberOfDecimalPlaces) {
     	 super();
-        this.mask = _mask;
-        this.numberOfDecimalPlaces = _numberOfDecimalPlaces;
+        mask = _mask;
+        numberOfDecimalPlaces = _numberOfDecimalPlaces;
         setSSCommon(new SSCommon(this));
     	// SSCommon constructor calls init()
         }
@@ -331,8 +331,8 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      */
      public SSTextField(final int _mask, final int _numberOfDecimalPlaces, final int _align) {
     	 super();
-        this.mask = _mask;
-        this.numberOfDecimalPlaces = _numberOfDecimalPlaces;
+        mask = _mask;
+        numberOfDecimalPlaces = _numberOfDecimalPlaces;
         setHorizontalAlignment(_align);
         setSSCommon(new SSCommon(this));
     	// SSCommon constructor calls init()
@@ -364,7 +364,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      */
     public SSTextField(final String _text, final int _mask) {
         super(_text);
-        this.mask = _mask;
+        mask = _mask;
         setSSCommon(new SSCommon(this));
     	// SSCommon constructor calls init()
     }
@@ -493,7 +493,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	
 	     // ADD FOCUS LISTENER TO THE TEXT FIELD SO THAT WHEN THE FOCUS IS GAINED
 	     // COMPLETE TEXT SHOULD BE SELECTED
-	        this.addFocusListener(new FocusAdapter(){
+	        addFocusListener(new FocusAdapter(){
 	            @Override
 				public void focusGained(final FocusEvent fe){
 	                SSTextField.this.selectAll();
@@ -509,19 +509,19 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 //	        setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);
 //	
 	     // ADD KEY LISTENER FOR THE TEXT FIELD
-	        this.addKeyListener(new KeyListener() {
+	        addKeyListener(new KeyListener() {
 	
 	            @Override
 				public synchronized void keyPressed(final KeyEvent ke) {
 	
-	                if((SSTextField.this.mask == MMDDYYYY) || (SSTextField.this.mask == DDMMYYYY)){
+	                if((mask == MMDDYYYY) || (mask == DDMMYYYY)){
 	                    mask(ke);
 	                }
 	            }
 	
 	            @Override
 				public void keyReleased(final KeyEvent ke) {
-	                if((SSTextField.this.mask == DECIMAL) || (SSTextField.this.mask == SSN)){
+	                if((mask == DECIMAL) || (mask == SSN)){
 	                    final int position = SSTextField.this.getCaretPosition();
 	                    final int length = SSTextField.this.getText().length();
 	                    if(mask(ke)){
@@ -551,7 +551,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * @return editing mask for text field
      */
     public int getMask() {
-        return this.mask;
+        return mask;
     }
 
     /**
@@ -562,7 +562,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * @return desired # of decimal places
      */
     public int getNumberOfDecimalPlaces() {
-        return this.numberOfDecimalPlaces;
+        return numberOfDecimalPlaces;
     }
 
     /**
@@ -610,7 +610,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 
          // BASED ON TYPE OF MASK REQUESTED MODIFY THE TEXT
          // ACCORDINGLY
-            switch(this.mask) {
+            switch(mask) {
                 case MMDDYYYY:
                 case DDMMYYYY:
                     if (getCaretPosition() < str.length()) {
@@ -622,10 +622,10 @@ public class SSTextField extends JTextField implements SSComponentInterface {
                     setText(ssnMask(str, _ke));
                     break;
                 case DECIMAL:
-                    setText(decimalMask(str, this.numberOfDecimalPlaces));
+                    setText(decimalMask(str, numberOfDecimalPlaces));
                     break;
                 default:
-                	logger.warn(getColumnForLog() + ": Unknown textbox mask type of " + this.mask);
+                	logger.warn(getColumnForLog() + ": Unknown textbox mask type of " + mask);
                 	break;
             } // end switch
             return true;
@@ -647,9 +647,9 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	 * @param _mask the mask required for this text field.
 	 */
 	public void setMask(final int _mask) {
-		final int oldValue = this.mask;
-		this.mask = _mask;
-		firePropertyChange("mask", oldValue, this.mask);
+		final int oldValue = mask;
+		mask = _mask;
+		firePropertyChange("mask", oldValue, mask);
 
 		// init();
 	}
@@ -662,9 +662,9 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * @param _numberOfDecimalPlaces desired # of decimal places
      */
     public void setNumberOfDecimalPlaces(final int _numberOfDecimalPlaces) {
-        final int oldValue = this.numberOfDecimalPlaces;
-        this.numberOfDecimalPlaces = _numberOfDecimalPlaces;
-        firePropertyChange("numberOfDecimalPlaces", oldValue, this.numberOfDecimalPlaces);
+        final int oldValue = numberOfDecimalPlaces;
+        numberOfDecimalPlaces = _numberOfDecimalPlaces;
+        firePropertyChange("numberOfDecimalPlaces", oldValue, numberOfDecimalPlaces);
     }
 
 	/**
@@ -686,7 +686,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	 */
 	@Override
 	public void updateSSComponent() {
-		this.setText(getBoundColumnText());
+		setText(getBoundColumnText());
 	}
 
 } // end public class SSTextField extends JTextField {

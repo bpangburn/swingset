@@ -60,10 +60,10 @@ public class SSTimeFormatterFactory extends javax.swing.text.DefaultFormatterFac
      * The display format is HH:mm:ss and edit format is HHmmss
      */
     public SSTimeFormatterFactory() {
-        this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("HH:mm:ss")));
-        this.setNullFormatter(null);
-        this.setEditFormatter(new DateFormatter(new SimpleDateFormat("HHmmss")));
-        this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("HH:mm:ss")));
+        setDefaultFormatter(new DateFormatter(new SimpleDateFormat("HH:mm:ss")));
+        setNullFormatter(null);
+        setEditFormatter(new DateFormatter(new SimpleDateFormat("HHmmss")));
+        setDisplayFormatter(new DateFormatter(new SimpleDateFormat("HH:mm:ss")));
     }
 }
 

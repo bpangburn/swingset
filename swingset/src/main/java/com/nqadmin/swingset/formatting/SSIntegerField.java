@@ -84,7 +84,7 @@ public class SSIntegerField extends SSFormattedTextField {
 	 */
 	public SSIntegerField(final javax.swing.JFormattedTextField.AbstractFormatterFactory _factory) {
 		super(_factory);
-		this.setHorizontalAlignment(SwingConstants.RIGHT);
+		setHorizontalAlignment(SwingConstants.RIGHT);
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class SSIntegerField extends SSFormattedTextField {
 	 * @return returns the number of digits used for displaying integer
 	 */
 	public int getPrecision() {
-		return this.precision;
+		return precision;
 	}
 
 	/**
@@ -102,8 +102,8 @@ public class SSIntegerField extends SSFormattedTextField {
 	 * @param _precision - number of digits to be used to display the number
 	 */
 	public void setPrecision(final int _precision) {
-		this.precision = _precision;
-		this.setFormatterFactory(new SSIntegerFormatterFactory(_precision));
+		precision = _precision;
+		setFormatterFactory(new SSIntegerFormatterFactory(_precision));
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class SSIntegerField extends SSFormattedTextField {
 	 */
 	public int getMinimumIntegerDigits() {
 
-		return this.minimumIntegerDigits;
+		return minimumIntegerDigits;
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class SSIntegerField extends SSFormattedTextField {
 	 */
 	public void setMinimumIntegerDigits(final int _minimumIntegerDigits) {
 
-		this.minimumIntegerDigits = _minimumIntegerDigits;
+		minimumIntegerDigits = _minimumIntegerDigits;
 	}
 }
 

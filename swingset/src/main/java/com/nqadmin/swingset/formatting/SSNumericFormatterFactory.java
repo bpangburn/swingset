@@ -64,19 +64,19 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
      * Creates a default SSNumericFormatterFactory
      */
     public SSNumericFormatterFactory() {
-        this.snf = new NumberFormatter(NumberFormat.getInstance());
-        this.snf.setCommitsOnValidEdit(true);
-        this.setDefaultFormatter(this.snf);
+        snf = new NumberFormatter(NumberFormat.getInstance());
+        snf.setCommitsOnValidEdit(true);
+        setDefaultFormatter(snf);
         
-        this.setNullFormatter(null);
+        setNullFormatter(null);
 
-        this.enf = new NumberFormatter(NumberFormat.getInstance(Locale.US));
-        this.enf.setCommitsOnValidEdit(true);
-        this.setEditFormatter(this.enf);
+        enf = new NumberFormatter(NumberFormat.getInstance(Locale.US));
+        enf.setCommitsOnValidEdit(true);
+        setEditFormatter(enf);
 
-        this.dnf = new NumberFormatter(NumberFormat.getInstance());
-        this.dnf.setCommitsOnValidEdit(true);
-        this.setDisplayFormatter(this.dnf);
+        dnf = new NumberFormatter(NumberFormat.getInstance());
+        dnf.setCommitsOnValidEdit(true);
+        setDisplayFormatter(dnf);
     }
     
     /**
@@ -92,19 +92,19 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
         nfd.setMaximumIntegerDigits(precision);
         nfd.setMinimumIntegerDigits(1);
     
-        this.snf = new NumberFormatter(NumberFormat.getInstance());
-        this.snf.setCommitsOnValidEdit(true);
-        this.setDefaultFormatter(this.snf);
+        snf = new NumberFormatter(NumberFormat.getInstance());
+        snf.setCommitsOnValidEdit(true);
+        setDefaultFormatter(snf);
         
-        this.setNullFormatter(null);
+        setNullFormatter(null);
 
-        this.enf = new NumberFormatter(NumberFormat.getInstance(Locale.US));
-        this.enf.setCommitsOnValidEdit(true);
-        this.setEditFormatter(this.enf);
+        enf = new NumberFormatter(NumberFormat.getInstance(Locale.US));
+        enf.setCommitsOnValidEdit(true);
+        setEditFormatter(enf);
 
-        this.dnf = new NumberFormatter(nfd);
-        this.dnf.setCommitsOnValidEdit(true);
-        this.setDisplayFormatter(this.dnf);
+        dnf = new NumberFormatter(nfd);
+        dnf.setCommitsOnValidEdit(true);
+        setDisplayFormatter(dnf);
     }
 }
 

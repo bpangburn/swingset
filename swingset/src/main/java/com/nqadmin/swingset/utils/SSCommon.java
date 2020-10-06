@@ -363,7 +363,7 @@ public class SSCommon implements Serializable {
 
 // TODO consider updating Component to null/zero/empty string if not valid column name, column index, or rowset    	
 		// CHECK FOR NULL COLUMN/ROWSET
-		if (((this.boundColumnName == null) && (this.boundColumnIndex == NO_COLUMN_INDEX)) || (this.ssRowSet == null)) {
+		if (((boundColumnName == null) && (boundColumnIndex == NO_COLUMN_INDEX)) || (ssRowSet == null)) {
 			return;
 		}
 
@@ -450,7 +450,7 @@ public class SSCommon implements Serializable {
 	 *         bound
 	 */
 	public int getBoundColumnIndex() {
-		return this.boundColumnIndex;
+		return boundColumnIndex;
 	}
 
 	/**
@@ -541,7 +541,7 @@ public class SSCommon implements Serializable {
 	 *         SSComponentInterface
 	 */
 	public Object getSSComponent() {
-		return this.ssComponent;
+		return ssComponent;
 	}
 
 	/**
@@ -559,7 +559,7 @@ public class SSCommon implements Serializable {
 	 * @return SSRowSet to which the SwingSet component is bound
 	 */
 	public SSRowSet getSSRowSet() {
-		return this.ssRowSet;
+		return ssRowSet;
 	}
 
 	/**
@@ -568,7 +568,7 @@ public class SSCommon implements Serializable {
 	 * @return listener for the bound RowSet
 	 */
 	public SSRowSetListener getSSRowSetListener() {
-		return this.ssRowSetListener;
+		return ssRowSetListener;
 	}
 
 	/**
@@ -621,7 +621,7 @@ public class SSCommon implements Serializable {
 	 * @param _allowNull flag to indicate if the bound database column can be null
 	 */
 	public void setAllowNull(final boolean _allowNull) {
-		this.allowNull = _allowNull;
+		allowNull = _allowNull;
 	}
 
 	/**
@@ -649,9 +649,9 @@ public class SSCommon implements Serializable {
 
 		// SET COLUMN INDEX
 		if (_boundColumnIndex > NO_COLUMN_INDEX) {
-			this.boundColumnIndex = _boundColumnIndex;
+			boundColumnIndex = _boundColumnIndex;
 		} else {
-			this.boundColumnIndex = NO_COLUMN_INDEX;
+			boundColumnIndex = NO_COLUMN_INDEX;
 		}
 
 		// DETERMINE COLUMN NAME AND TYPE
@@ -758,7 +758,7 @@ public class SSCommon implements Serializable {
 	 *                     SSComponentInterface
 	 */
 	public void setSSComponent(final Object _ssComponent) {
-		this.ssComponent = _ssComponent;
+		ssComponent = _ssComponent;
 	}
 
 	/**
@@ -767,7 +767,7 @@ public class SSCommon implements Serializable {
 	 * @param _ssConnection the ssConnection to set
 	 */
 	public void setSSConnection(final SSConnection _ssConnection) {
-		this.ssConnection = _ssConnection;
+		ssConnection = _ssConnection;
 	}
 
 	/**
@@ -777,7 +777,7 @@ public class SSCommon implements Serializable {
 	 */
 	// public void setSSRowSet(SSRowSet _ssRowSet) throws SQLException {
 	public void setSSRowSet(final SSRowSet _ssRowSet) {
-		this.ssRowSet = _ssRowSet;
+		ssRowSet = _ssRowSet;
 		if (!inBinding) {
 			bind();
 		}

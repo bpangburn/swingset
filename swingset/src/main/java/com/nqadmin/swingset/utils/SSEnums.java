@@ -68,14 +68,14 @@ public class SSEnums {
 		private final int value;
 
 		Navigation(final int newValue) {
-			this.value = newValue;
+			value = newValue;
 		}
 
 		/**
 		 * @return integer corresponding to enumerated value
 		 */
 		public int getValue() {
-			return this.value;
+			return value;
 		}
 	}
 
@@ -94,22 +94,22 @@ public class SSEnums {
 		private final String stringValue;
 
 		CheckBoxValues(final int newIntValue, final String newStringValue) {
-			this.intValue = newIntValue;
-			this.stringValue = newStringValue;
+			intValue = newIntValue;
+			stringValue = newStringValue;
 		}
 
 		/**
 		 * @return integer corresponding to enumerated value
 		 */
 		public int getIntValue() {
-			return this.intValue;
+			return intValue;
 		}
 
 		/**
 		 * @return String corresponding to enumerated value
 		 */
 		public String getStringValue() {
-			return this.stringValue;
+			return stringValue;
 		}
 	}
 

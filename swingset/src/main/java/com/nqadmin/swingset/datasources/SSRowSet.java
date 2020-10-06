@@ -82,7 +82,7 @@ public interface SSRowSet extends RowSet {
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public default int getColumnCount() throws SQLException {
-		return this.getMetaData().getColumnCount();
+		return getMetaData().getColumnCount();
 	}
 
 	/**
@@ -95,7 +95,7 @@ public interface SSRowSet extends RowSet {
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public default int getColumnIndex(final String _columnName) throws SQLException {
-		return this.findColumn(_columnName);
+		return findColumn(_columnName);
 	}
 
 	/**
@@ -108,7 +108,7 @@ public interface SSRowSet extends RowSet {
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public default String getColumnName(final int _columnIndex) throws SQLException {
-		return this.getMetaData().getColumnName(_columnIndex);
+		return getMetaData().getColumnName(_columnIndex);
 	}
 
 	/**
@@ -226,7 +226,7 @@ public interface SSRowSet extends RowSet {
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public default int getColumnType(final int _columnIndex) throws SQLException {
-		return this.getMetaData().getColumnType(_columnIndex);
+		return getMetaData().getColumnType(_columnIndex);
 	}
 
 	/**
@@ -242,7 +242,7 @@ public interface SSRowSet extends RowSet {
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public default int getColumnType(final String _columnName) throws SQLException {
-		return this.getMetaData().getColumnType(getColumnIndex(_columnName));
+		return getMetaData().getColumnType(getColumnIndex(_columnName));
 	}
 
 	/**

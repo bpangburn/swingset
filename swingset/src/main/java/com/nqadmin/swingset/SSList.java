@@ -297,7 +297,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 */
 	@Override
 	public void addSSComponentListener() {
-		addListSelectionListener(this.ssListListener);
+		addListSelectionListener(ssListListener);
 	}
 
 	/**
@@ -320,7 +320,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 * @return returns the underlying values for each of the items in the list box
 	 */
 	public Object[] getMappings() {
-		return this.mappings;
+		return mappings;
 	}
 
 	/**
@@ -329,7 +329,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 * @return returns the items displayed in the list box
 	 */
 	public String[] getOptions() {
-		return this.options;
+		return options;
 	}
 
 	/**
@@ -349,7 +349,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		}
 		final Object[] selectedValues = new Object[getSelectedIndices().length];
 		for (int i = 0; i < selectedValues.length; i++) {
-			selectedValues[i] = this.mappings != null ? this.mappings[getSelectedIndices()[i]]
+			selectedValues[i] = mappings != null ? mappings[getSelectedIndices()[i]]
 					: Integer.valueOf(getSelectedIndices()[i]);
 		}
 		return selectedValues;
@@ -457,7 +457,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 */
 	@Override
 	public void removeSSComponentListener() {
-		removeListSelectionListener(this.ssListListener);
+		removeListSelectionListener(ssListListener);
 	}
 
 //	/**
@@ -539,8 +539,8 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 */
 	protected void setMappings(final Object[] _mappings) {
 		final Object[] oldValue = _mappings.clone();
-		this.mappings = _mappings.clone();
-		firePropertyChange("mappings", oldValue, this.mappings);
+		mappings = _mappings.clone();
+		firePropertyChange("mappings", oldValue, mappings);
 	}
 
 	/**
@@ -550,10 +550,10 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 */
 	protected void setOptions(final String[] _options) {
 		final String[] oldValue = _options.clone();
-		this.options = _options.clone();
-		firePropertyChange("options", oldValue, this.options);
+		options = _options.clone();
+		firePropertyChange("options", oldValue, options);
 		// ADD SPECIFIED ITEMS TO THE LIST BOX
-		setListData(this.options);
+		setListData(options);
 	}
 
 	/**
@@ -584,13 +584,13 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	public void setSelectedValues(final Object[] values) {
 		final int[] selectedIndices = new int[values.length];
 		for (int i = 0; i < values.length; i++) {
-			for (int j = 0; j < this.mappings.length; j++) {
-				if (values[i] == this.mappings[j]) {
+			for (int j = 0; j < mappings.length; j++) {
+				if (values[i] == mappings[j]) {
 					selectedIndices[i] = j;
 				}
 			}
 		}
-		this.setSelectedIndices(selectedIndices);
+		setSelectedIndices(selectedIndices);
 	}
 
 	/**
@@ -610,10 +610,10 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 */
 	protected void updateRowSet() {
 		Array array;
-		if (this.getSelectedIndices().length == 0) {
-			array = new SSArray(new Object[] {}, this.baseTypeName);
+		if (getSelectedIndices().length == 0) {
+			array = new SSArray(new Object[] {}, baseTypeName);
 		} else {
-			array = new SSArray(this.getSelectedValues(), this.baseTypeName);
+			array = new SSArray(getSelectedValues(), baseTypeName);
 		}
 		try {
 			getSSRowSet().updateArray(getBoundColumnName(), array);
@@ -641,10 +641,10 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 //		// REMOVE LISTENERS TO PREVENT DUPLICATION
 //		removeListeners();
 //
-		if ((this.mappings == null) || (this.options == null)) {
+		if ((mappings == null) || (options == null)) {
 			return;
 		}
-		this.setListData(this.options);
+		this.setListData(options);
 //		updateDisplay();
 //
 //		// ADD BACK LISTENERS
@@ -672,20 +672,20 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		}
 
 		if (array == null) {
-			this.clearSelection();
+			clearSelection();
 			return;
 		}
 		final int[] indices = new int[array.length];
 		for (int i = 0; i < array.length; i++) {
-			for (int j = 0; j < this.mappings.length; j++) {
-				if (array[i].equals(this.mappings[j])) {
+			for (int j = 0; j < mappings.length; j++) {
+				if (array[i].equals(mappings[j])) {
 					indices[i] = j;
 					break;
 				}
 				indices[i] = -1;
 			}
 		}
-		this.setSelectedIndices(indices);
+		setSelectedIndices(indices);
 
 	}
 }

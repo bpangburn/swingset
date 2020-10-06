@@ -695,7 +695,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @return returns the pattern in which dates have to be displayed
 	 */
 	public String getDateFormat() {
-		return this.dateFormat;
+		return dateFormat;
 	}
 
 	/**
@@ -705,7 +705,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *         items.
 	 */
 	public String getDisplayColumnName() {
-		return this.displayColumnName;
+		return displayColumnName;
 	}
 
 	/**
@@ -751,7 +751,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @return returns the query used.
 	 */
 	public String getQuery() {
-		return this.query;
+		return query;
 	}
 
 	/**
@@ -762,7 +762,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *         items. returns NULL if the second display column is not provided.
 	 */
 	public String getSecondDisplayColumnName() {
-		return this.secondDisplayColumnName;
+		return secondDisplayColumnName;
 	}
 
 	/**
@@ -894,7 +894,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @return separator used.
 	 */
 	public String getSeparator() {
-		return this.separator;
+		return separator;
 	}
 
 //    /**
@@ -936,7 +936,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	@Deprecated
 	public String getSeperator() {
-		return this.separator;
+		return separator;
 	}
 
 	/**
@@ -1036,14 +1036,14 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 				// extract first column string
 				// getStringValue() takes care of formatting dates
-				firstColumnString = getStringValue(rs, this.displayColumnName);
+				firstColumnString = getStringValue(rs, displayColumnName);
 				logger.trace(getColumnForLog() + ": First column to display - " + firstColumnString);
 
 				// extract second column string, if applicable
 				// getStringValue() takes care of formatting dates
 				secondColumnString = null;
 				if ((secondDisplayColumnName != null) && !secondDisplayColumnName.equals("")) {
-					secondColumnString = rs.getString(this.secondDisplayColumnName);
+					secondColumnString = rs.getString(secondDisplayColumnName);
 					if (secondColumnString.equals("")) {
 						secondColumnString = null;
 					}
@@ -1119,9 +1119,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _dateFormat pattern in which dates have to be displayed
 	 */
 	public void setDateFormat(final String _dateFormat) {
-		final String oldValue = this.dateFormat;
-		this.dateFormat = _dateFormat;
-		firePropertyChange("dateFormat", oldValue, this.dateFormat);
+		final String oldValue = dateFormat;
+		dateFormat = _dateFormat;
+		firePropertyChange("dateFormat", oldValue, dateFormat);
 	}
 
 	/**
@@ -1130,9 +1130,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _displayColumnName column name whose values have to be displayed.
 	 */
 	public void setDisplayColumnName(final String _displayColumnName) {
-		final String oldValue = this.displayColumnName;
-		this.displayColumnName = _displayColumnName;
-		firePropertyChange("displayColumnName", oldValue, this.displayColumnName);
+		final String oldValue = displayColumnName;
+		displayColumnName = _displayColumnName;
+		firePropertyChange("displayColumnName", oldValue, displayColumnName);
 	}
 
 	/**
@@ -1146,7 +1146,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	@Deprecated
 	public void setFilterable(final boolean _filter) {
 		// TODO remove this method in future release
-		this.filterSwitch = _filter;
+		filterSwitch = _filter;
 		logger.warn(getColumnForLog() + ": This method has been Deprecated because GlazedList filtering is now fully integrated.\n" + Thread.currentThread().getStackTrace());
 	}
 
@@ -1156,9 +1156,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _primaryKeyColumnName name of primary key column
 	 */
 	public void setPrimaryKeyColumnName(final String _primaryKeyColumnName) {
-		final String oldValue = this.primaryKeyColumnName;
-		this.primaryKeyColumnName = _primaryKeyColumnName;
-		firePropertyChange("primaryKeyColumnName", oldValue, this.primaryKeyColumnName);
+		final String oldValue = primaryKeyColumnName;
+		primaryKeyColumnName = _primaryKeyColumnName;
+		firePropertyChange("primaryKeyColumnName", oldValue, primaryKeyColumnName);
 	}
 
 	/**
@@ -1168,9 +1168,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *               box items)
 	 */
 	public void setQuery(final String _query) {
-		final String oldValue = this.query;
-		this.query = _query;
-		firePropertyChange("query", oldValue, this.query);
+		final String oldValue = query;
+		query = _query;
+		firePropertyChange("query", oldValue, query);
 	}
 
 //    /**
@@ -1256,9 +1256,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *                                 name.
 	 */
 	public void setSecondDisplayColumnName(final String _secondDisplayColumnName) {
-		final String oldValue = this.secondDisplayColumnName;
-		this.secondDisplayColumnName = _secondDisplayColumnName;
-		firePropertyChange("secondDisplayColumnName", oldValue, this.secondDisplayColumnName);
+		final String oldValue = secondDisplayColumnName;
+		secondDisplayColumnName = _secondDisplayColumnName;
+		firePropertyChange("secondDisplayColumnName", oldValue, secondDisplayColumnName);
 	}
 
 	/**
@@ -1276,7 +1276,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 			// IF OPTIONS ARE NON-NULL THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
 			// SPECIFIED TEXT IS STORED
-			if (this.options != null) {
+			if (options != null) {
 				final int index = options.indexOf(_value);
 
 				if (index == -1) {
@@ -1725,7 +1725,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 			// IF MAPPINGS ARE SPECIFIED THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
 			// SPECIFIED CODE IS STORED
-			if (this.mappings != null) {
+			if (mappings != null) {
 				final int index = mappings.indexOf(_value);
 
 				if (index == -1) {
@@ -1807,9 +1807,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _separator separator to be used.
 	 */
 	public void setSeparator(final String _separator) {
-		final String oldValue = this.separator;
-		this.separator = _separator;
-		firePropertyChange("separator", oldValue, this.separator);
+		final String oldValue = separator;
+		separator = _separator;
+		firePropertyChange("separator", oldValue, separator);
 	}
 
 	/**

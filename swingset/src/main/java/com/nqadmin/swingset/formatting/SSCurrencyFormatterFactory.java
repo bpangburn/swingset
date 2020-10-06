@@ -61,10 +61,10 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
      *  Creates a SSCurrencyFormatter with default Locale 
      */
     public SSCurrencyFormatterFactory() {
-        this.setDefaultFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
-        this.setNullFormatter(null);
-        this.setEditFormatter(new NumberFormatter(NumberFormat.getInstance(Locale.US)));
-        this.setDisplayFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
+        setDefaultFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
+        setNullFormatter(null);
+        setEditFormatter(new NumberFormatter(NumberFormat.getInstance(Locale.US)));
+        setDisplayFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
     }
     
     /**
@@ -80,10 +80,10 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
         nfd.setMaximumIntegerDigits(precision);
         nfd.setMinimumIntegerDigits(1);
         
-        this.setDefaultFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
-        this.setNullFormatter(null);
-        this.setEditFormatter(new NumberFormatter(NumberFormat.getInstance(Locale.US)));
-        this.setDisplayFormatter(new NumberFormatter(nfd));
+        setDefaultFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
+        setNullFormatter(null);
+        setEditFormatter(new NumberFormatter(NumberFormat.getInstance(Locale.US)));
+        setDisplayFormatter(new NumberFormatter(nfd));
     }
     
     /**
@@ -100,17 +100,17 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
         nfe.setMinimumFractionDigits(decimals);
         nfe.setMaximumIntegerDigits(precision);
         nfe.setMinimumIntegerDigits(1);
-        this.setEditFormatter(new NumberFormatter(nfe));
+        setEditFormatter(new NumberFormatter(nfe));
         
         final NumberFormat nfd = NumberFormat.getCurrencyInstance(displayLocale);
         nfd.setMaximumFractionDigits(decimals);
         nfd.setMinimumFractionDigits(decimals);
         nfd.setMaximumIntegerDigits(precision);
         nfd.setMinimumIntegerDigits(1);
-        this.setDisplayFormatter(new NumberFormatter(nfd));        
+        setDisplayFormatter(new NumberFormatter(nfd));        
         
-        this.setDefaultFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
-        this.setNullFormatter(null);
+        setDefaultFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
+        setNullFormatter(null);
 
     }
     

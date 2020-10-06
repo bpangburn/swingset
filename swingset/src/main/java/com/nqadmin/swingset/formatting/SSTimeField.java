@@ -66,7 +66,7 @@ public class SSTimeField extends SSFormattedTextField {
      */
     public SSTimeField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
-        this.setValue( Calendar.getInstance().getTime() );
+        setValue( Calendar.getInstance().getTime() );
     }
 
     /* (non-Javadoc)
@@ -74,7 +74,7 @@ public class SSTimeField extends SSFormattedTextField {
      */
     @Override
 	public void cleanField() {
-        this.setValue( Calendar.getInstance().getTime() );
+        setValue( Calendar.getInstance().getTime() );
     }
     
 }

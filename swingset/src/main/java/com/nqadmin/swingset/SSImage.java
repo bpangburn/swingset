@@ -96,7 +96,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
                         //FileInputStream inStream = null;
                         File inFile = null;
                         final JFileChooser fileChooser = new JFileChooser();
-                        if(fileChooser.showOpenDialog(SSImage.this.btnUpdateImage) == JFileChooser.APPROVE_OPTION){
+                        if(fileChooser.showOpenDialog(btnUpdateImage) == JFileChooser.APPROVE_OPTION){
                             inFile = fileChooser.getSelectedFile();
                             try (FileInputStream inStream = new FileInputStream(inFile)) {
                                 final int totalLength = (int)inFile.length();
@@ -111,10 +111,10 @@ public class SSImage extends JPanel implements SSComponentInterface {
                                 }
                                 //inStream.close();
                                 getSSRowSet().updateBytes(getBoundColumnName(), bytes);
-                                SSImage.this.img = new ImageIcon(bytes);
-                                SSImage.this.lblImage.setPreferredSize(new Dimension(SSImage.this.img.getIconWidth(), SSImage.this.img.getIconHeight()));
-                                SSImage.this.lblImage.setIcon(SSImage.this.img);
-                                SSImage.this.lblImage.setText("");
+                                img = new ImageIcon(bytes);
+                                lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
+                                lblImage.setIcon(img);
+                                lblImage.setText("");
                                 updateUI();
                             }
                         } else {
@@ -268,12 +268,12 @@ public class SSImage extends JPanel implements SSComponentInterface {
         final GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy= 0;
-        final JScrollPane scrollPane = new JScrollPane(this.lblImage, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        final JScrollPane scrollPane = new JScrollPane(lblImage, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         scrollPane.setPreferredSize(new Dimension(200, 180));
-        this.btnUpdateImage.setPreferredSize(new Dimension(200,20));
+        btnUpdateImage.setPreferredSize(new Dimension(200,20));
         add(scrollPane, constraints);
         constraints.gridy = 1;
-        add(this.btnUpdateImage, constraints);
+        add(btnUpdateImage, constraints);
     }
 
     /**
@@ -290,10 +290,10 @@ public class SSImage extends JPanel implements SSComponentInterface {
      * Removes the current image. The image is not removed from the underlying sSRowSet.
      */
     public void clearImage(){
-        this.lblImage.setIcon(null);
-        this.lblImage.setText("No Picture");
+        lblImage.setIcon(null);
+        lblImage.setText("No Picture");
         final Dimension dimension = getPreferredSize();
-        this.lblImage.setPreferredSize(new Dimension((int)dimension.getWidth(), (int)dimension.getHeight()-20));
+        lblImage.setPreferredSize(new Dimension((int)dimension.getWidth(), (int)dimension.getHeight()-20));
         updateUI();
     }
 
@@ -374,7 +374,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	@Override
 	public void customInit() {
         // SET PREFERRED DIMENSIONS
-        setPreferredSize(this.preferredSize);
+        setPreferredSize(preferredSize);
 
     // ADD LABEL & BUTTON TO PANEL
         addComponents();		
@@ -471,7 +471,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
      */
     @Override
 	public Dimension getPreferredSize() {
-        return this.preferredSize;
+        return preferredSize;
     }
 
 	/**
@@ -501,13 +501,13 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 */
 	@Override
 	public void setPreferredSize(final Dimension _preferredSize) {
-		final Dimension oldValue = this.preferredSize;
-		this.preferredSize = _preferredSize;
-		firePropertyChange("preferredSize", oldValue, this.preferredSize);
+		final Dimension oldValue = preferredSize;
+		preferredSize = _preferredSize;
+		firePropertyChange("preferredSize", oldValue, preferredSize);
 
-		this.lblImage.setPreferredSize(
+		lblImage.setPreferredSize(
 				new Dimension((int) _preferredSize.getWidth(), (int) _preferredSize.getHeight() - 20));
-		this.btnUpdateImage.setPreferredSize(new Dimension((int) _preferredSize.getWidth(), 20));
+		btnUpdateImage.setPreferredSize(new Dimension((int) _preferredSize.getWidth(), 20));
 		super.setPreferredSize(_preferredSize);
 	}
 
@@ -536,19 +536,19 @@ public class SSImage extends JPanel implements SSComponentInterface {
         try {
             final byte[] imageData = getSSRowSet().getRow() >0 ? getSSRowSet().getBytes(getBoundColumnName()) : null;
             if(imageData != null){
-                this.img = new ImageIcon(imageData);
-                this.lblImage.setPreferredSize(new Dimension(this.img.getIconWidth(), this.img.getIconHeight()));
-                this.lblImage.setText("");
+                img = new ImageIcon(imageData);
+                lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
+                lblImage.setText("");
             } else {
-                this.img = null;
-                this.lblImage.setText("No Picture");
+                img = null;
+                lblImage.setText("No Picture");
             }
         } catch(final SQLException se) {
         	logger.error(getColumnForLog() + ": SQL Exception.", se);
-            this.img = null;
+            img = null;
         }
 
-        this.lblImage.setIcon(this.img);
+        lblImage.setIcon(img);
         
         // TODO Confirm this is needed.
         updateUI();

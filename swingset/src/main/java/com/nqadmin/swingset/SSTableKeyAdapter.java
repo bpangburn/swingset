@@ -114,7 +114,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	 *                        clipboard, else false.
 	 */
 	public void setAllowInsertion(final boolean _allowInsertion) {
-		this.allowInsertion = _allowInsertion;
+		allowInsertion = _allowInsertion;
 	}
 
 	/**
@@ -125,7 +125,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	 *                       false.
 	 */
 	public void setForSSDataGrid(final boolean _forSSDataGrid) {
-		this.forSSDataGrid = _forSSDataGrid;
+		forSSDataGrid = _forSSDataGrid;
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 		
 		logger.debug("Key Released on SSDataGrid. Key Released: " + ke.getKeyCode() + " " +  ((ke.getModifiersEx() & (onMask | offMask)) == onMask));
 
-		if (((ke.getModifiersEx() & (this.onMask | this.offMask)) == this.onMask) && (ke.getKeyCode() == KeyEvent.VK_C)) {
+		if (((ke.getModifiersEx() & (onMask | offMask)) == onMask) && (ke.getKeyCode() == KeyEvent.VK_C)) {
 			// CHECK IF CONTROL-C IS PRESSED
 			// SHIFT OR ALT SHOULD NOT BE DOWN
 
@@ -199,7 +199,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 			// COPY THE DATA TO CLIP BOARD
 			clipboard.setContents(stringSelection, stringSelection);
 
-		} else if (((ke.getModifiersEx() & (this.onMask | this.offMask)) == this.onMask)
+		} else if (((ke.getModifiersEx() & (onMask | offMask)) == onMask)
 				&& (ke.getKeyCode() == KeyEvent.VK_V)) {
 			// CHECK IF CONTROL-V IS PRESSED
 			// SHIFT OR ALT SHOULD NOT BE DOWN
@@ -262,7 +262,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 				int rowCount = jTable.getRowCount();
 				final int columnCount = jTable.getColumnCount();
 
-				if (this.forSSDataGrid || (jTable instanceof SSDataGrid)) {
+				if (forSSDataGrid || (jTable instanceof SSDataGrid)) {
 					rowCount--;
 				}
 
@@ -281,7 +281,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 				// SEE IF SUFFICENT ROWS ARE PRESENT.
 				if (rowCount < (numRows + selectedRows[0])) {
 					JOptionPane.showMessageDialog(jTable, "There are not enough rows in the table to copy into.\n");
-					if (this.allowInsertion) {
+					if (allowInsertion) {
 						final int option = JOptionPane.showConfirmDialog(jTable, "Do you want to insert new rows?",
 								"Add Rows", JOptionPane.YES_NO_OPTION);
 						if (option == JOptionPane.YES_OPTION) {

@@ -107,7 +107,7 @@ public class SSConnection implements Serializable {
 	 * @param _connection - database connection
 	 */
 	public SSConnection(final Connection _connection) {
-		this.connection = _connection;
+		connection = _connection;
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class SSConnection implements Serializable {
 	 *             the url should be of the form jdbc:subprotocol:subname
 	 */
 	public SSConnection(final String _url) {
-		this.url = _url;
+		url = _url;
 	}
 
 	/**
@@ -131,9 +131,9 @@ public class SSConnection implements Serializable {
 	 * @param _password - the user's password
 	 */
 	public SSConnection(final String _url, final String _username, final String _password) {
-		this.url = _url;
-		this.username = _username;
-		this.password = _password;
+		url = _url;
+		username = _username;
+		password = _password;
 	}
 
 	/**
@@ -148,10 +148,10 @@ public class SSConnection implements Serializable {
 	 * @param _driverName - name of the database driver to be used.
 	 */
 	public SSConnection(final String _url, final String _username, final String _password, final String _driverName) {
-		this.url = _url;
-		this.username = _username;
-		this.password = _password;
-		this.driverName = _driverName;
+		url = _url;
+		username = _username;
+		password = _password;
+		driverName = _driverName;
 	}
 
 	/**
@@ -162,8 +162,8 @@ public class SSConnection implements Serializable {
 	 * @throws ClassNotFoundException	ClassNotFoundException
 	 */
 	public void createConnection() throws SQLException, ClassNotFoundException {
-		Class.forName(this.driverName);
-		this.connection = DriverManager.getConnection(this.url, this.username, this.password);
+		Class.forName(driverName);
+		connection = DriverManager.getConnection(url, username, password);
 	}
 
 	/**
@@ -174,8 +174,8 @@ public class SSConnection implements Serializable {
 	public Connection getConnection() {
 		// IF THE CONNECTION IS NOT YET CREATED, BUT WE HAVE ALL THE INFORMATION TO
 		// CREATE ONE, THEN GO AHEAD AND TRY CREATING THE CONNECTION
-		if ((this.connection == null) && (this.url != null) && (this.driverName != null) && (this.username != null)
-				&& (this.password != null) && !this.url.trim().equals("") && !this.driverName.trim().equals("")) {
+		if ((connection == null) && (url != null) && (driverName != null) && (username != null)
+				&& (password != null) && !url.trim().equals("") && !driverName.trim().equals("")) {
 			try {
 				createConnection();
 			} catch (final SQLException se) {
@@ -184,7 +184,7 @@ public class SSConnection implements Serializable {
 				logger.error("Class Not Found Exception.", cnfe);
 			}
 		}
-		return this.connection;
+		return connection;
 	}
 
 	/**
@@ -193,7 +193,7 @@ public class SSConnection implements Serializable {
 	 * @return returns the database driver being used.
 	 */
 	public String getDriverName() {
-		return this.driverName;
+		return driverName;
 	}
 
 	/**
@@ -202,7 +202,7 @@ public class SSConnection implements Serializable {
 	 * @return returns the user's password.
 	 */
 	public String getPassword() {
-		return this.password;
+		return password;
 	}
 
 	/**
@@ -211,7 +211,7 @@ public class SSConnection implements Serializable {
 	 * @return returns the database url.
 	 */
 	public String getUrl() {
-		return this.url;
+		return url;
 	}
 
 	/**
@@ -220,7 +220,7 @@ public class SSConnection implements Serializable {
 	 * @return returns the database username.
 	 */
 	public String getUsername() {
-		return this.username;
+		return username;
 	}
 
 	/**
@@ -245,7 +245,7 @@ public class SSConnection implements Serializable {
 	 * @param _connection 	database connection
 	 */
 	public void setConnection(final Connection _connection) {
-		this.connection = _connection;
+		connection = _connection;
 	}
 
 	/**
@@ -255,7 +255,7 @@ public class SSConnection implements Serializable {
 	 */
 	public void setDriverName(final String _driverName) {
 		// String oldValue = this.driverName;
-		this.driverName = _driverName;
+		driverName = _driverName;
 		// this.pChangeSupport.firePropertyChange("driverName", oldValue,
 		// this.password);
 	}
@@ -267,7 +267,7 @@ public class SSConnection implements Serializable {
 	 */
 	public void setPassword(final String _password) {
 		// String oldValue = this.password;
-		this.password = _password;
+		password = _password;
 		// this.pChangeSupport.firePropertyChange("password", oldValue, this.password);
 	}
 
@@ -279,7 +279,7 @@ public class SSConnection implements Serializable {
 	 */
 	public void setUrl(final String _url) {
 		// String oldValue = this.url;
-		this.url = _url;
+		url = _url;
 		// this.pChangeSupport.firePropertyChange("url", oldValue, this.url);
 
 	}
@@ -292,7 +292,7 @@ public class SSConnection implements Serializable {
 	 */
 	public void setUsername(final String _username) {
 		/// String oldValue = this.username;
-		this.username = _username;
+		username = _username;
 		// this.pChangeSupport.firePropertyChange("username", oldValue, this.username);
 	}
 }

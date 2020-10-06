@@ -97,7 +97,7 @@ public class SSDBNavImpl implements SSDBNav {
 	 * @param _container	GUI Container to scan for Swing components to clear/reset
 	 */
 	public SSDBNavImpl(final Container _container) {
-		this.container = _container;
+		container = _container;
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class SSDBNavImpl implements SSDBNav {
 	@Override
 	public void performPreInsertOps() {
 
-		setComponents(this.container);
+		setComponents(container);
 
 	} // end public void performPreInsertOps() {
 

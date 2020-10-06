@@ -89,21 +89,21 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 			setBackground(java.awt.Color.WHITE);
 
 			// if not linked to a db field, returns.
-			if ((SSBooleanField.this.getColumnName() == null) || (SSBooleanField.this.rowset == null)) {
+			if ((getColumnName() == null) || (rowset == null)) {
 				return true;
 			}
 
 			try {
-				SSBooleanField.this.rowset.removeRowSetListener(tf);
+				rowset.removeRowSetListener(tf);
 
-				switch (SSBooleanField.this.colType) {
+				switch (colType) {
 
 				case java.sql.Types.BIT:// -7
-					SSBooleanField.this.rowset.updateBoolean(SSBooleanField.this.columnName, selected);
+					rowset.updateBoolean(columnName, selected);
 					break;
 
 				case java.sql.Types.BOOLEAN:// 16
-					SSBooleanField.this.rowset.updateBoolean(SSBooleanField.this.columnName, selected);
+					rowset.updateBoolean(columnName, selected);
 					break;
 
 				case java.sql.Types.INTEGER: // 4
@@ -111,16 +111,16 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 				case java.sql.Types.SMALLINT: // 5
 				case java.sql.Types.TINYINT: // -6
 					if (selected == true) {
-						SSBooleanField.this.rowset.updateInt(SSBooleanField.this.columnName, 1);
+						rowset.updateInt(columnName, 1);
 					} else {
-						SSBooleanField.this.rowset.updateInt(SSBooleanField.this.columnName, 0);
+						rowset.updateInt(columnName, 0);
 					}
 					break;
 
 				default:
 					break;
 				}
-				SSBooleanField.this.rowset.addRowSetListener(tf);
+				rowset.addRowSetListener(tf);
 			} catch (final java.sql.SQLException se) {
 				logger.error(getColumnForLog() + ": SQL Exception.", se);
 			} catch (final java.lang.NullPointerException np) {
@@ -160,9 +160,9 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 		newBackwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_UP, java.awt.event.InputEvent.SHIFT_MASK));
 		setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, newBackwardKeys);
 
-		this.addKeyListener(this);
+		addKeyListener(this);
 
-		this.setInputVerifier(new internalVerifier());
+		setInputVerifier(new internalVerifier());
 	}
 	
 	/**
@@ -179,19 +179,19 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	 */
 	private void bind() {
 
-		if (this.columnName == null) {
+		if (columnName == null) {
 			return;
 		}
-		if (this.rowset == null) {
+		if (rowset == null) {
 			return;
 		}
 
 		try {
-			this.colType = this.rowset.getColumnType(this.columnName);
+			colType = rowset.getColumnType(columnName);
 		} catch (final java.sql.SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
-		this.rowset.addRowSetListener(this);
+		rowset.addRowSetListener(this);
 		DbToFm();
 	}
 
@@ -202,8 +202,8 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	 * @param _columnName Name of the column to which this check box should be bound
 	 */
 	public void bind(final SSRowSet _sSRowSet, final String _columnName) {
-		this.rowset = _sSRowSet;
-		this.columnName = _columnName;
+		rowset = _sSRowSet;
+		columnName = _columnName;
 		bind();
 	}
 
@@ -223,28 +223,28 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	private void DbToFm() {
 
 		try {
-			if (this.rowset.getRow() == 0) {
+			if (rowset.getRow() == 0) {
 				return;
 			}
 
-			switch (this.colType) {
+			switch (colType) {
 
 			case java.sql.Types.BIT:// -7
-				this.setSelected(this.rowset.getBoolean(this.columnName));
+				setSelected(rowset.getBoolean(columnName));
 				break;
 
 			case java.sql.Types.BOOLEAN:// 16
-				this.setSelected(this.rowset.getBoolean(this.columnName));
+				setSelected(rowset.getBoolean(columnName));
 				break;
 
 			case java.sql.Types.INTEGER:// 4
 			case java.sql.Types.BIGINT:// -5
 			case java.sql.Types.SMALLINT:// 5
 			case java.sql.Types.TINYINT:// -6
-				if (this.rowset.getInt(this.columnName) == 1) {
-					this.setSelected(true);
+				if (rowset.getInt(columnName) == 1) {
+					setSelected(true);
 				} else {
-					this.setSelected(false);
+					setSelected(false);
 				}
 				break;
 
@@ -262,7 +262,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	 * @return returns column name to which the component is bound
 	 */
 	public String getColumnName() {
-		return this.columnName;
+		return columnName;
 	}
 
 	/**
@@ -273,7 +273,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	 **/
 	@Deprecated
 	public SSDataNavigator getNavigator() {
-		return this.getSSDataNavigator();
+		return getSSDataNavigator();
 	}
 
 	/**
@@ -282,7 +282,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	 * @return returns the SSRowSet to which the component is bound
 	 */
 	public SSRowSet getRowSet() {
-		return this.getSSRowSet();
+		return getSSRowSet();
 	}
 
 	/**
@@ -291,7 +291,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	 * @return returns the SSDataNavigator being used
 	 */
 	public SSDataNavigator getSSDataNavigator() {
-		return this.navigator;
+		return navigator;
 	}
 
 	/**
@@ -300,7 +300,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	 * @return returns the SSRowSet to which the component is bound
 	 */
 	public SSRowSet getSSRowSet() {
-		return this.rowset;
+		return rowset;
 	}
 
 	/**
@@ -327,17 +327,17 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 
 		if (_event.getKeyCode() == KeyEvent.VK_F5) {
 			logger.debug(getColumnForLog() + ": F5 = PROCESS");
-			this.navigator.doCommitButtonClick();
+			navigator.doCommitButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F6) {
 			logger.debug(getColumnForLog() + ": F6 = DELETE");
-			this.navigator.doDeleteButtonClick();
+			navigator.doDeleteButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F8) {
 			logger.debug(getColumnForLog() + ": F8");
-			this.navigator.doUndoButtonClick();
+			navigator.doUndoButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_END) {
@@ -400,7 +400,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	 * @param _columnName - column name to which the component is bound
 	 */
 	public void setColumnName(final String _columnName) {
-		this.columnName = _columnName;
+		columnName = _columnName;
 		bind();
 	}
 
@@ -416,7 +416,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	 **/
 	@Deprecated
 	public void setNavigator(final SSDataNavigator _navigator) {
-		this.setSSDataNavigator(_navigator);
+		setSSDataNavigator(_navigator);
 	}
 
 	/**
@@ -427,7 +427,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	 */
 	@Deprecated
 	public void setRowSet(final SSRowSet _rowset) {
-		this.setSSRowSet(_rowset);
+		setSSRowSet(_rowset);
 	}
 
 	/**
@@ -439,7 +439,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	 *                   this component is bound to
 	 */
 	public void setSSDataNavigator(final SSDataNavigator _navigator) {
-		this.navigator = _navigator;
+		navigator = _navigator;
 		setSSRowSet(_navigator.getSSRowSet());
 		bind();
 	}
@@ -450,7 +450,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	 * @param _rowset SSRowSet to which the component is bound.
 	 */
 	public void setSSRowSet(final SSRowSet _rowset) {
-		this.rowset = _rowset;
+		rowset = _rowset;
 		bind();
 	}
 }

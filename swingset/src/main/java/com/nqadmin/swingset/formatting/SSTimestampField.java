@@ -67,7 +67,7 @@ public class SSTimestampField extends SSFormattedTextField {
         super(factory);
         //ts = new java.sql.Timestamp( (new java.util.Date().getTime() ) );
 
-        this.setValue(new java.util.Date(  ));
+        setValue(new java.util.Date(  ));
     }
     
     /* (non-Javadoc)
@@ -77,7 +77,7 @@ public class SSTimestampField extends SSFormattedTextField {
 	public void cleanField() {
         //ts = new java.sql.Timestamp( (new java.util.Date().getTime() ) );
 
-        this.setValue(new java.util.Date( ) );
+        setValue(new java.util.Date( ) );
     }
     
 }

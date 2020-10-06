@@ -250,9 +250,9 @@ public class SSSyncManager {
 	 *                       combo box
 	 */
 	public SSSyncManager(final SSDBComboBox _comboBox, final SSDataNavigator _dataNavigator) {
-		this.comboBox = _comboBox;
-		this.dataNavigator = _dataNavigator;
-		this.rowset = this.dataNavigator.getSSRowSet();
+		comboBox = _comboBox;
+		dataNavigator = _dataNavigator;
+		rowset = dataNavigator.getSSRowSet();
 		dataNavigator.setNavCombo(comboBox);
 	}
 
@@ -260,8 +260,8 @@ public class SSSyncManager {
 	 * Adds listeners to combobox & rowset.
 	 */
 	private void addListeners() {
-		this.comboBox.addActionListener(this.comboListener);
-		this.dataNavigator.getSSRowSet().addRowSetListener(this.rowsetListener);
+		comboBox.addActionListener(comboListener);
+		dataNavigator.getSSRowSet().addRowSetListener(rowsetListener);
 	}
 
 	/**
@@ -275,7 +275,7 @@ public class SSSyncManager {
 		try {
 			if ((rowset != null) && (rowset.getRow() > 0)) {
 				// GET THE PRIMARY KEY FOR THE CURRENT RECORD IN THE ROWSET
-				final long currentRowPK = this.rowset.getLong(this.columnName);
+				final long currentRowPK = rowset.getLong(columnName);
 				
 				logger.debug("SSSyncManager().adjustValue() - RowSet value: " + currentRowPK);		
 
@@ -284,16 +284,16 @@ public class SSSyncManager {
 						|| (comboBox.getSelectedValue()!=currentRowPK)) {
 					// IF NOT CHANGE THE SELECTION OF THE COMBO BOX.
 					// this.comboBox.setSelectedStringValue(this.rowset.getString(this.columnName));
-					this.comboBox.setSelectedValue(currentRowPK);
+					comboBox.setSelectedValue(currentRowPK);
 				}
 			} else {
-				this.comboBox.setSelectedIndex(-1);
+				comboBox.setSelectedIndex(-1);
 			}
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
 		}
 		comboBox.setEnabled(true);
-		this.comboBox.addActionListener(this.comboListener);
+		comboBox.addActionListener(comboListener);
 
 // THIS CODE IS FROM SSCommon.getBoundColumnText()
 //		String value = "";
@@ -324,8 +324,8 @@ public class SSSyncManager {
 	 * Removes listeners from combo box & rowset.
 	 */
 	private void removeListeners() {
-		this.comboBox.removeActionListener(this.comboListener);
-		this.dataNavigator.getSSRowSet().removeRowSetListener(this.rowsetListener);
+		comboBox.removeActionListener(comboListener);
+		dataNavigator.getSSRowSet().removeRowSetListener(rowsetListener);
 	}
 
 	/**
@@ -334,7 +334,7 @@ public class SSSyncManager {
 	 * @param _columnName SSRowSet column used as basis for synchronization.
 	 */
 	public void setColumnName(final String _columnName) {
-		this.columnName = _columnName;
+		columnName = _columnName;
 	}
 
 	/**
@@ -344,7 +344,7 @@ public class SSSyncManager {
 	 */
 
 	public void setComboBox(final SSDBComboBox _comboBox) {
-		this.comboBox = _comboBox;
+		comboBox = _comboBox;
 	}
 
 	/**
@@ -353,8 +353,8 @@ public class SSSyncManager {
 	 * @param _dataNavigator data navigator to be synchronized
 	 */
 	public void setDataNavigator(final SSDataNavigator _dataNavigator) {
-		this.dataNavigator = _dataNavigator;
-		this.rowset = this.dataNavigator.getSSRowSet();
+		dataNavigator = _dataNavigator;
+		rowset = dataNavigator.getSSRowSet();
 	}
 
 	/**

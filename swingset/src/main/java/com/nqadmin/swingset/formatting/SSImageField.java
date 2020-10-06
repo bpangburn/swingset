@@ -120,32 +120,32 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 		newBackwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_UP, java.awt.event.InputEvent.SHIFT_MASK));
 		setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, newBackwardKeys);
 
-		this.addKeyListener(this);
+		addKeyListener(this);
 
-		this.addComponentListener(this);
+		addComponentListener(this);
 
 		setLayout(new BorderLayout());
 
-		this.imageButton = new JButton();
-		this.imageButton.setFocusable(false);
+		imageButton = new JButton();
+		imageButton.setFocusable(false);
 
-		this.imageButton.setIconTextGap(0);
-		this.imageButton.setBorder(null);
-		this.imageButton.setMargin(new Insets(0, 0, 0, 0));
-		this.imageButton.setText("");
-		this.nullIcon = new ImageIcon(getClass().getResource("/com/nqadmin/swingSet/formatting/image.png"));
-		this.fullIcon = this.nullIcon;
-		this.imageButton.setIcon(this.fullIcon);
-		add(this.imageButton, BorderLayout.CENTER);
+		imageButton.setIconTextGap(0);
+		imageButton.setBorder(null);
+		imageButton.setMargin(new Insets(0, 0, 0, 0));
+		imageButton.setText("");
+		nullIcon = new ImageIcon(getClass().getResource("/com/nqadmin/swingSet/formatting/image.png"));
+		fullIcon = nullIcon;
+		imageButton.setIcon(fullIcon);
+		add(imageButton, BorderLayout.CENTER);
 		validate();
 
 //        scrollPane = new JScrollPane(imageButton);
 //        add(scrollPane, BorderLayout.CENTER);
 
-		this.getButton = new JButton("from file ...");
-		this.getButton.setFocusable(false);
+		getButton = new JButton("from file ...");
+		getButton.setFocusable(false);
 
-		this.getButton.addActionListener(new ActionListener() {
+		getButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				try {
@@ -153,7 +153,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 					// FileInputStream inStream = null;
 					File inFile = null;
 					final JFileChooser fileChooser = new JFileChooser();
-					if (fileChooser.showOpenDialog(SSImageField.this.getButton) == JFileChooser.APPROVE_OPTION) {
+					if (fileChooser.showOpenDialog(getButton) == JFileChooser.APPROVE_OPTION) {
 						inFile = fileChooser.getSelectedFile();
 						try (FileInputStream inStream = new FileInputStream(inFile)) {
 							final int totalLength = (int) inFile.length();
@@ -168,12 +168,12 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 							}
 							// inStream.close();
 							// rowset.updateBytes(columnName, bytes);
-							SSImageField.this.imageBytes = bytes;
-							SSImageField.this.fullIcon = new ImageIcon(bytes);
+							imageBytes = bytes;
+							fullIcon = new ImageIcon(bytes);
 						}
 						try {
-							SSImageField.this.rowset.updateBytes(SSImageField.this.columnName,
-									SSImageField.this.imageBytes);
+							rowset.updateBytes(columnName,
+									imageBytes);
 						} catch (final SQLException se) {
 							// do nothing
 						}
@@ -189,7 +189,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 				}
 			}
 		});
-		add(this.getButton, BorderLayout.SOUTH);
+		add(getButton, BorderLayout.SOUTH);
 	}
 	
 	/**
@@ -215,11 +215,11 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 		int ws, hs;
 		Image scaled;
 
-		this.imageButton.setIcon(null);
-		this.validate();
+		imageButton.setIcon(null);
+		validate();
 
-		wi = this.imageButton.getWidth();
-		hi = this.imageButton.getHeight();
+		wi = imageButton.getWidth();
+		hi = imageButton.getHeight();
 
 		wo = _image.getWidth(this);
 		ho = _image.getHeight(this);
@@ -251,7 +251,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 *                    be bound to
 	 */
 	public void setColumnName(final String _columnName) {
-		this.columnName = _columnName;
+		columnName = _columnName;
 		bind();
 	}
 
@@ -261,7 +261,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 * @return - returns the column name to which the component is bound to
 	 */
 	public String getColumnName() {
-		return this.columnName;
+		return columnName;
 	}
 
 	/**
@@ -273,7 +273,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 */
 	@Deprecated
 	public void setRowSet(final SSRowSet _rowset) {
-		this.setSSRowSet(_rowset);
+		setSSRowSet(_rowset);
 	}
 
 	/**
@@ -283,7 +283,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 *                column
 	 */
 	public void setSSRowSet(final SSRowSet _rowset) {
-		this.rowset = _rowset;
+		rowset = _rowset;
 		bind();
 	}
 
@@ -296,7 +296,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 */
 	@Deprecated
 	public SSRowSet getRowSet() {
-		return this.getSSRowSet();
+		return getSSRowSet();
 	}
 
 	/**
@@ -306,7 +306,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 *         value
 	 */
 	public SSRowSet getSSRowSet() {
-		return this.rowset;
+		return rowset;
 	}
 
 	/**
@@ -322,7 +322,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 **/
 	@Deprecated
 	public void setNavigator(final SSDataNavigator _navigator) {
-		this.setSSDataNavigator(_navigator);
+		setSSDataNavigator(_navigator);
 	}
 
 	/**
@@ -333,7 +333,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 **/
 	@Deprecated
 	public SSDataNavigator getNavigator() {
-		return this.getSSDataNavigator();
+		return getSSDataNavigator();
 	}
 
 	/**
@@ -346,7 +346,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
 	 */
 	public void setSSDataNavigator(final SSDataNavigator _navigator) {
-		this.navigator = _navigator;
+		navigator = _navigator;
 		setSSRowSet(_navigator.getSSRowSet());
 		bind();
 	}
@@ -357,7 +357,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 * @return returns the SSDataNavigator object being used.
 	 */
 	public SSDataNavigator getSSDataNavigator() {
-		return this.navigator;
+		return navigator;
 	}
 
 	/**
@@ -366,25 +366,25 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	private void DbToFm() {
 
 		try {
-			if (this.rowset.getRow() == 0) {
+			if (rowset.getRow() == 0) {
 				return;
 			}
 
-			switch (this.colType) {
+			switch (colType) {
 
 			case java.sql.Types.BINARY:
-				this.imageBytes = this.rowset.getBytes(this.columnName);
+				imageBytes = rowset.getBytes(columnName);
 
-				if (this.imageBytes == null) {
-					this.fullIcon = this.nullIcon;
+				if (imageBytes == null) {
+					fullIcon = nullIcon;
 					Rescale();
 					break;
 				}
 
-				if (this.imageBytes.length > 0) {
-					this.fullIcon = new ImageIcon(this.imageBytes);
+				if (imageBytes.length > 0) {
+					fullIcon = new ImageIcon(imageBytes);
 				} else {
-					this.fullIcon = this.nullIcon;
+					fullIcon = nullIcon;
 				}
 				Rescale();
 				break;
@@ -404,8 +404,8 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 * @param _columnName Name of the column to which this check box should be bound
 	 */
 	public void bind(final SSRowSet _sSRowSet, final String _columnName) {
-		this.rowset = _sSRowSet;
-		this.columnName = _columnName;
+		rowset = _sSRowSet;
+		columnName = _columnName;
 		bind();
 	}
 
@@ -414,19 +414,19 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 */
 	private void bind() {
 
-		if (this.columnName == null) {
+		if (columnName == null) {
 			return;
 		}
-		if (this.rowset == null) {
+		if (rowset == null) {
 			return;
 		}
 
 		try {
-			this.colType = this.rowset.getColumnType(this.columnName);
+			colType = rowset.getColumnType(columnName);
 		} catch (final java.sql.SQLException sqe) {
 			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
 		}
-		this.rowset.addRowSetListener(this);
+		rowset.addRowSetListener(this);
 		DbToFm();
 	}
 
@@ -509,17 +509,17 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 		if (_event.getKeyCode() == KeyEvent.VK_F5) {
 			logger.debug(getColumnForLog() + ": F5 = PROCESS");
-			this.navigator.doCommitButtonClick();
+			navigator.doCommitButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F6) {
 			logger.debug(getColumnForLog() + ": F6 = DELETE");
-			this.navigator.doDeleteButtonClick();
+			navigator.doDeleteButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F8) {
 			logger.debug(getColumnForLog() + ": F8");
-			this.navigator.doUndoButtonClick();
+			navigator.doUndoButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_END) {
@@ -584,13 +584,13 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 * 
 	 */
 	protected void Rescale() {
-		if (this.fullIcon != null) {
-			if (!this.fullIcon.equals(this.nullIcon)) {
-				this.scaledIcon = Thumbnail(this.fullIcon.getImage());
+		if (fullIcon != null) {
+			if (!fullIcon.equals(nullIcon)) {
+				scaledIcon = Thumbnail(fullIcon.getImage());
 			} else {
-				this.scaledIcon = this.fullIcon;
+				scaledIcon = fullIcon;
 			}
-			this.imageButton.setIcon(this.scaledIcon);
+			imageButton.setIcon(scaledIcon);
 			updateUI();
 		}
 	}

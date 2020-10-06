@@ -224,7 +224,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	@Override
 	public void focusLost(final FocusEvent _event) {
 		// Remove highlighting
-		setBackground(this.standardColor);
+		setBackground(standardColor);
 	}
 
 	/**
@@ -673,9 +673,9 @@ public class SSFormattedTextField extends JFormattedTextField
 				|| ((_value instanceof Float) && ((Float) _value < 0.0))
 				|| ((_value instanceof Long) && ((Long) _value < 0))
 				|| ((_value instanceof Integer) && ((Integer) _value < 0))) {
-			this.setForeground(Color.RED);
+			setForeground(Color.RED);
 		} else {
-			this.setForeground(Color.BLACK);
+			setForeground(Color.BLACK);
 		}
 		
 	}

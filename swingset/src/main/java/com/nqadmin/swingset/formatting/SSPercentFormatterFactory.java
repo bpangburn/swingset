@@ -60,10 +60,10 @@ public class SSPercentFormatterFactory extends javax.swing.text.DefaultFormatter
      * Creates a default object of SSPercentFormatterFactory
      */
     public SSPercentFormatterFactory() {
-        this.setDefaultFormatter(new NumberFormatter(NumberFormat.getPercentInstance()));
-        this.setNullFormatter(null);
-        this.setEditFormatter(new NumberFormatter(NumberFormat.getPercentInstance(Locale.US)));
-        this.setDisplayFormatter(new NumberFormatter(NumberFormat.getPercentInstance()));
+        setDefaultFormatter(new NumberFormatter(NumberFormat.getPercentInstance()));
+        setNullFormatter(null);
+        setEditFormatter(new NumberFormatter(NumberFormat.getPercentInstance(Locale.US)));
+        setDisplayFormatter(new NumberFormatter(NumberFormat.getPercentInstance()));
     }
     
     /**
@@ -79,10 +79,10 @@ public class SSPercentFormatterFactory extends javax.swing.text.DefaultFormatter
         nfd.setMaximumIntegerDigits(precision);
         nfd.setMinimumIntegerDigits(1);
         
-        this.setDefaultFormatter(new NumberFormatter(NumberFormat.getPercentInstance()));
-        this.setNullFormatter(null);
-        this.setEditFormatter(new NumberFormatter(NumberFormat.getPercentInstance(Locale.US)));
-        this.setDisplayFormatter(new NumberFormatter(nfd));
+        setDefaultFormatter(new NumberFormatter(NumberFormat.getPercentInstance()));
+        setNullFormatter(null);
+        setEditFormatter(new NumberFormatter(NumberFormat.getPercentInstance(Locale.US)));
+        setDisplayFormatter(new NumberFormatter(nfd));
 
     }
 }

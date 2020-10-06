@@ -60,10 +60,10 @@ public class SSIntegerFormatterFactory extends javax.swing.text.DefaultFormatter
      * Constructs a default SSIntegerFormatterFactory 
      */
     public SSIntegerFormatterFactory() {
-        this.setDefaultFormatter(new NumberFormatter(NumberFormat.getIntegerInstance()));
-        this.setNullFormatter(null);
-        this.setEditFormatter(new NumberFormatter(NumberFormat.getIntegerInstance(Locale.US)));
-        this.setDisplayFormatter(new NumberFormatter(NumberFormat.getIntegerInstance()));
+        setDefaultFormatter(new NumberFormatter(NumberFormat.getIntegerInstance()));
+        setNullFormatter(null);
+        setEditFormatter(new NumberFormatter(NumberFormat.getIntegerInstance(Locale.US)));
+        setDisplayFormatter(new NumberFormatter(NumberFormat.getIntegerInstance()));
     }
     
     /**
@@ -76,10 +76,10 @@ public class SSIntegerFormatterFactory extends javax.swing.text.DefaultFormatter
         nfd.setMaximumIntegerDigits(precision);
         nfd.setMinimumIntegerDigits(1);
         
-        this.setDefaultFormatter(new NumberFormatter(NumberFormat.getIntegerInstance()));
-        this.setNullFormatter(null);
-        this.setEditFormatter(new NumberFormatter(NumberFormat.getIntegerInstance(Locale.US)));
-        this.setDisplayFormatter(new NumberFormatter(nfd));
+        setDefaultFormatter(new NumberFormatter(NumberFormat.getIntegerInstance()));
+        setNullFormatter(null);
+        setEditFormatter(new NumberFormatter(NumberFormat.getIntegerInstance(Locale.US)));
+        setDisplayFormatter(new NumberFormatter(nfd));
 
     }
 }

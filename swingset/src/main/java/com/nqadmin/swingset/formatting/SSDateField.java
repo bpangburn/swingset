@@ -86,7 +86,7 @@ public class SSDateField extends SSFormattedTextField {
     public SSDateField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         // TODO Consider setting to null vs system date.
-        this.setValue(new java.util.Date());
+        setValue(new java.util.Date());
     }
     
     /* 
@@ -95,6 +95,6 @@ public class SSDateField extends SSFormattedTextField {
     @Override
 	public void cleanField() {
     	// TODO Consider setting to null vs system date.
-        this.setValue(new java.util.Date());
+        setValue(new java.util.Date());
     }
 }

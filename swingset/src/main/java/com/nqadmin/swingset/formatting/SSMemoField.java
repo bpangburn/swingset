@@ -102,8 +102,8 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	public SSMemoField() {
 		super();
 
-		this.setLineWrap(true);
-		this.setWrapStyleWord(true);
+		setLineWrap(true);
+		setWrapStyleWord(true);
 
 		final Set<AWTKeyStroke> forwardKeys = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
 		final Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
@@ -118,7 +118,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 		addKeyListener(this);
 		addFocusListener(this);
-		this.setInputVerifier(new internalVerifier());
+		setInputVerifier(new internalVerifier());
 	}
 	
 	/**
@@ -136,7 +136,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 * @return - returns the column name to which the component is bound to
 	 */
 	public String getColumnName() {
-		return this.columnName;
+		return columnName;
 	}
 
 	/**
@@ -145,7 +145,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 * @param _columnName - column name to which the component will be bound to
 	 */
 	public void setColumnName(final String _columnName) {
-		this.columnName = _columnName;
+		columnName = _columnName;
 		bind();
 	}
 
@@ -182,7 +182,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 *                column
 	 */
 	public void setSSRowSet(final SSRowSet _rowset) {
-		this.rowset = _rowset;
+		rowset = _rowset;
 		bind();
 	}
 
@@ -193,7 +193,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 *         value
 	 */
 	public SSRowSet getSSRowSet() {
-		return this.rowset;
+		return rowset;
 	}
 
 	/**
@@ -209,7 +209,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 */
 	@Deprecated
 	public void setNavigator(final SSDataNavigator _navigator) {
-		this.setSSDataNavigator(_navigator);
+		setSSDataNavigator(_navigator);
 	}
 
 	/**
@@ -221,7 +221,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 **/
 	@Deprecated
 	public SSDataNavigator getNavigator() {
-		return this.getSSDataNavigator();
+		return getSSDataNavigator();
 	}
 
 	/**
@@ -234,7 +234,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
 	 */
 	public void setSSDataNavigator(final SSDataNavigator _navigator) {
-		this.navigator = _navigator;
+		navigator = _navigator;
 		setSSRowSet(_navigator.getSSRowSet());
 		bind();
 	}
@@ -245,23 +245,23 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 * @return returns the SSDataNavigator object being used.
 	 */
 	public SSDataNavigator getSSDataNavigator() {
-		return this.navigator;
+		return navigator;
 	}
 
 	private void DbToFm() {
 
 		try {
 
-			if (this.rowset.getRow() == 0) {
+			if (rowset.getRow() == 0) {
 				return;
 			}
 
-			switch (this.colType) {
+			switch (colType) {
 
 			case java.sql.Types.VARCHAR:
 			case java.sql.Types.LONGVARCHAR:
 			case java.sql.Types.CHAR:
-				this.setText(this.rowset.getString(this.columnName));
+				setText(rowset.getString(columnName));
 				break;
 
 			default:
@@ -269,7 +269,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 			}
 		} catch (final java.sql.SQLException sqe) {
 			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
-			this.setText("");
+			setText("");
 		}
 	}
 
@@ -280,26 +280,26 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 * @param _columnName Name of the column to which this check box should be bound
 	 */
 	public void bind(final SSRowSet _sSRowSet, final String _columnName) {
-		this.rowset = _sSRowSet;
-		this.columnName = _columnName;
+		rowset = _sSRowSet;
+		columnName = _columnName;
 		bind();
 	}
 
 	private void bind() {
 
-		if (this.columnName == null) {
+		if (columnName == null) {
 			return;
 		}
-		if (this.rowset == null) {
+		if (rowset == null) {
 			return;
 		}
 
 		try {
-			this.colType = this.rowset.getColumnType(this.columnName);
+			colType = rowset.getColumnType(columnName);
 		} catch (final java.sql.SQLException sqe) {
 			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
 		}
-		this.rowset.addRowSetListener(this);
+		rowset.addRowSetListener(this);
 		DbToFm();
 	}
 
@@ -385,20 +385,20 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 		if (_event.getKeyCode() == KeyEvent.VK_F5) {
 			logger.debug(getColumnForLog() + ": F5 = PROCESS");
-			if (this.navigator.updatePresentRow() == true) {
+			if (navigator.updatePresentRow() == true) {
 				logger.info(getColumnForLog() + ": Update successful.");
 			}
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F6) {
 			logger.debug(getColumnForLog() + ": F6 = DELETE");
-			this.navigator.doDeleteButtonClick();
+			navigator.doDeleteButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F8) {
 			logger.debug(getColumnForLog() + ": F8");
 			// ((Component)e.getSource()).transferFocus();
-			this.navigator.doUndoButtonClick();
+			navigator.doUndoButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_END) {
@@ -429,7 +429,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		 * some code to highlight the component with the focus
 		 * <p>
 		 */
-		setBackground(this.std_color);
+		setBackground(std_color);
 	}
 
 	/*
@@ -445,7 +445,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		 * <p>
 		 */
 		final java.awt.Color col = new java.awt.Color(204, 255, 255);
-		this.std_color = getBackground();
+		std_color = getBackground();
 		setBackground(col);
 
 		/**
@@ -483,25 +483,25 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 				setBackground(java.awt.Color.WHITE);
 
 				// if not linked to a db field, returns.
-				if ((SSMemoField.this.columnName == null) || (SSMemoField.this.rowset == null)) {
+				if ((columnName == null) || (rowset == null)) {
 					return true;
 				}
 
 				try {
-					SSMemoField.this.rowset.removeRowSetListener(tf);
+					rowset.removeRowSetListener(tf);
 
-					switch (SSMemoField.this.colType) {
+					switch (colType) {
 
 					case java.sql.Types.VARCHAR:// -7
 					case java.sql.Types.LONGVARCHAR:// -7
 					case java.sql.Types.CHAR:// -7
-						SSMemoField.this.rowset.updateString(SSMemoField.this.columnName, aux);
+						rowset.updateString(columnName, aux);
 						break;
 
 					default:
 						break;
 					}
-					SSMemoField.this.rowset.addRowSetListener(tf);
+					rowset.addRowSetListener(tf);
 				} catch (final java.sql.SQLException se) {
 					logger.error(getColumnForLog() + ": SQL Exception.", se);
 					tf.setText("");

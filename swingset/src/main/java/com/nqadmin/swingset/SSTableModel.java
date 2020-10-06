@@ -174,7 +174,7 @@ public class SSTableModel extends AbstractTableModel {
 	 */
 	public SSTableModel(final SSRowSet _rowset) {
 		super();
-		this.rowset = _rowset;
+		rowset = _rowset;
 		init();
 	}
 
@@ -185,7 +185,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _rowset SSRowSet object whose records has to be displayed in JTable.
 	 */
 	public void setSSRowSet(final SSRowSet _rowset) {
-		this.rowset = _rowset;
+		rowset = _rowset;
 		init();
 	}
 
@@ -197,7 +197,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _cellEditing implementation of SSCellEditing interface.
 	 */
 	public void setSSCellEditing(final SSCellEditing _cellEditing) {
-		this.cellEditing = _cellEditing;
+		cellEditing = _cellEditing;
 	}
 
 	/**
@@ -208,7 +208,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _dataGridHandler implementation of SSDataGridHandler interface.
 	 */
 	public void setSSDataGridHandler(final SSDataGridHandler _dataGridHandler) {
-		this.dataGridHandler = _dataGridHandler;
+		dataGridHandler = _dataGridHandler;
 	}
 
 	/**
@@ -217,7 +217,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _insert true if user can insert new rows, else false.
 	 */
 	public void setInsertion(final boolean _insert) {
-		this.allowInsertion = _insert;
+		allowInsertion = _insert;
 	}
 
 	/**
@@ -227,16 +227,16 @@ public class SSTableModel extends AbstractTableModel {
 	protected void init() {
 		try {
 
-			this.columnCount = this.rowset.getColumnCount();
-			this.rowset.last();
+			columnCount = rowset.getColumnCount();
+			rowset.last();
 			// ROWS IN THE SSROWSET ARE NUMBERED FROM 1, SO LAST ROW NUMBER GIVES THE
 			// ROW COUNT
-			this.rowCount = this.rowset.getRow();
-			this.rowset.first();
+			rowCount = rowset.getRow();
+			rowset.first();
 
 // following code added 11-01-2004 per forum suggestion from Diego Gil (dags)
 			// IF DATA CHANGES, ALERT LISTENERS
-			this.fireTableDataChanged();
+			fireTableDataChanged();
 // end additions
 
 		} catch (final SQLException se) {
@@ -252,7 +252,7 @@ public class SSTableModel extends AbstractTableModel {
 	 */
 	@Override
 	public int getColumnCount() {
-		return this.columnCount;
+		return columnCount;
 	}
 
 	/**
@@ -265,11 +265,11 @@ public class SSTableModel extends AbstractTableModel {
 	public int getRowCount() {
 		// RETURN THE NUMBER OF ROWS AS ONE GREATER THAN THOSE IN DATABASE
 		// ITS USED FOR INSERTING NEW ROWS
-		if (this.allowInsertion) {
-			return this.rowCount + 1;
+		if (allowInsertion) {
+			return rowCount + 1;
 		}
 		// IF INSERTION IS NOT ALLOWED THEN RETURN THE ACTUAL ROW COUNT
-		return this.rowCount;
+		return rowCount;
 	}
 
 	/**
@@ -284,16 +284,16 @@ public class SSTableModel extends AbstractTableModel {
 	@Override
 	public boolean isCellEditable(final int _row, final int _column) {
 
-		if (this.uneditableColumns != null) {
-			for (int i = 0; i < this.uneditableColumns.length; i++) {
-				if (_column == this.uneditableColumns[i]) {
+		if (uneditableColumns != null) {
+			for (int i = 0; i < uneditableColumns.length; i++) {
+				if (_column == uneditableColumns[i]) {
 					return false;
 				}
 			}
 		}
 		
-		if (this.cellEditing != null) {
-			return this.cellEditing.isCellEditable(_row, _column);
+		if (cellEditing != null) {
+			return cellEditing.isCellEditable(_row, _column);
 		}
 
 		return true;
@@ -312,7 +312,7 @@ public class SSTableModel extends AbstractTableModel {
 	public Object getValueAt(final int _row, final int _column) {
 
 		Object value = null;
-		if (_row == this.rowCount) {
+		if (_row == rowCount) {
 			value = getDefaultValue(_column);
 			return value;
 		}
@@ -320,52 +320,52 @@ public class SSTableModel extends AbstractTableModel {
 		try {
 			// ROW NUMBERS IN SSROWSET START FROM 1 WHERE AS ROW NUMBERING FOR JTABLE START
 			// FROM 0
-			this.rowset.absolute(_row + 1);
+			rowset.absolute(_row + 1);
 
 			// IF IT IS NULL RETURN NULL
-			if (this.rowset.getObject(_column + 1) == null) {
+			if (rowset.getObject(_column + 1) == null) {
 				return null;
 			}
 
 			// COLUMN NUMBERS IN SSROWSET START FROM 1 WHERE AS COLUMN NUMBERING FOR JTABLE
 			// START FROM 0
-			final int type = this.rowset.getColumnType(_column + 1);
+			final int type = rowset.getColumnType(_column + 1);
 			switch (type) {
 			case Types.INTEGER:
 			case Types.SMALLINT:
 			case Types.TINYINT:
-				value = new Integer(this.rowset.getInt(_column + 1));
+				value = new Integer(rowset.getInt(_column + 1));
 				break;
 			case Types.BIGINT:
-				value = new Long(this.rowset.getLong(_column + 1));
+				value = new Long(rowset.getLong(_column + 1));
 				break;
 			case Types.FLOAT:
-				value = new Float(this.rowset.getFloat(_column + 1));
+				value = new Float(rowset.getFloat(_column + 1));
 				break;
 			case Types.DOUBLE:
 			case Types.NUMERIC:
-				value = new Double(this.rowset.getDouble(_column + 1));
+				value = new Double(rowset.getDouble(_column + 1));
 				break;
 			case Types.BOOLEAN:
 			case Types.BIT:
-				value = new Boolean(this.rowset.getBoolean(_column + 1));
+				value = new Boolean(rowset.getBoolean(_column + 1));
 				break;
 			case Types.DATE:
 			case Types.TIMESTAMP:
-				value = this.rowset.getDate(_column + 1);
+				value = rowset.getDate(_column + 1);
 				break;
 			case Types.CHAR:
 			case Types.VARCHAR:
 			case Types.LONGVARCHAR:
-				value = this.rowset.getString(_column + 1);
+				value = rowset.getString(_column + 1);
 				break;
 			default:
 				logger.warn("Unknown data type of " + type);
 			}
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while retrieving value.",  se);
-			if (this.component != null) {
-				JOptionPane.showMessageDialog(this.component, "Error while retrieving value.\n" + se.getMessage());
+			if (component != null) {
+				JOptionPane.showMessageDialog(component, "Error while retrieving value.\n" + se.getMessage());
 			}
 
 		}
@@ -390,11 +390,11 @@ public class SSTableModel extends AbstractTableModel {
 		// GET THE TYPE OF THE COLUMN
 		int type = -1;
 		try {
-			type = this.rowset.getColumnType(_column + 1);
+			type = rowset.getColumnType(_column + 1);
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while updating value.",  se);
-			if (this.component != null) {
-				JOptionPane.showMessageDialog(this.component, "Error while updating value.\n" + se.getMessage());
+			if (component != null) {
+				JOptionPane.showMessageDialog(component, "Error while updating value.\n" + se.getMessage());
 			}
 			return;
 		}
@@ -412,16 +412,16 @@ public class SSTableModel extends AbstractTableModel {
 
 		// IF CELL EDITING INTERFACE IMPLEMENTATION IS PROVIDED INFO THE USER
 		// THAT AN UPDATE FOR CELL HAS BEEN REQUESTED.
-		if (this.cellEditing != null) {
+		if (cellEditing != null) {
 			// THE ROW AND COLUMN NUMBERING STARTS FROM 0 FOR JTABLE BUT THE COLUMNS AND
 			// ROWS ARE NUMBERED FROM 1 FOR SSROWSET.
 			boolean allowEdit;
 
 			// IF ITS NEW ROW SEND A NULL FOR THE OLD VALUE
-			if (_row == this.rowCount) {
-				allowEdit = this.cellEditing.cellUpdateRequested(_row, _column, null, valueCopy);
+			if (_row == rowCount) {
+				allowEdit = cellEditing.cellUpdateRequested(_row, _column, null, valueCopy);
 			} else {
-				allowEdit = this.cellEditing.cellUpdateRequested(_row, _column, getValueAt(_row, _column), valueCopy);
+				allowEdit = cellEditing.cellUpdateRequested(_row, _column, getValueAt(_row, _column), valueCopy);
 			}
 
 			// IF THE USER DOES NOT PERMIT THE UPDATE RETURN ELSE GO AHEAD AND UPDATE THE
@@ -433,7 +433,7 @@ public class SSTableModel extends AbstractTableModel {
 
 		// IF CHANGE IS MADE IN INSERT ROW ADD ROW TO THE DATABASE
 		// INSERTROW FUNCTION ALSO INCREMENTS THE ROW COUNT
-		if (_row == this.rowCount) {
+		if (_row == rowCount) {
 			insertRow(valueCopy, _column);
 			return;
 		}
@@ -442,11 +442,11 @@ public class SSTableModel extends AbstractTableModel {
 		
 		try {
 			// YOU SHOULD BE ON THE RIGHT ROW IN THE SSROWSET
-			if (this.rowset.getRow() != (_row + 1)) {
-				this.rowset.absolute(_row + 1);
+			if (rowset.getRow() != (_row + 1)) {
+				rowset.absolute(_row + 1);
 			}
 			if (valueCopy == null) {
-				this.rowset.updateNull(_column + 1);
+				rowset.updateNull(_column + 1);
 				return;
 			}
 
@@ -454,44 +454,44 @@ public class SSTableModel extends AbstractTableModel {
 			case Types.INTEGER:
 			case Types.SMALLINT:
 			case Types.TINYINT:
-				this.rowset.updateInt(_column + 1, ((Integer) valueCopy).intValue());
+				rowset.updateInt(_column + 1, ((Integer) valueCopy).intValue());
 				break;
 			case Types.BIGINT:
 // adding update long support 11-01-2004
-				this.rowset.updateLong(_column + 1, ((Long) valueCopy).longValue());
+				rowset.updateLong(_column + 1, ((Long) valueCopy).longValue());
 				break;
 			case Types.FLOAT:
-				this.rowset.updateFloat(_column + 1, ((Float) valueCopy).floatValue());
+				rowset.updateFloat(_column + 1, ((Float) valueCopy).floatValue());
 				break;
 			case Types.DOUBLE:
 			case Types.NUMERIC:
-				this.rowset.updateDouble(_column + 1, ((Double) valueCopy).doubleValue());
+				rowset.updateDouble(_column + 1, ((Double) valueCopy).doubleValue());
 				break;
 			case Types.BOOLEAN:
 			case Types.BIT:
-				this.rowset.updateBoolean(_column + 1, ((Boolean) valueCopy).booleanValue());
+				rowset.updateBoolean(_column + 1, ((Boolean) valueCopy).booleanValue());
 				break;
 			case Types.DATE:
-				this.rowset.updateDate(_column + 1, (Date) valueCopy);
+				rowset.updateDate(_column + 1, (Date) valueCopy);
 				break;
 			case Types.TIMESTAMP:
-				this.rowset.updateTimestamp(_column + 1, (Timestamp) valueCopy);
+				rowset.updateTimestamp(_column + 1, (Timestamp) valueCopy);
 				break;
 			case Types.CHAR:
 			case Types.VARCHAR:
 			case Types.LONGVARCHAR:
-				this.rowset.updateString(_column + 1, (String) valueCopy);
+				rowset.updateString(_column + 1, (String) valueCopy);
 				break;
 			default:
 				logger.warn("Unknown data type of " + type);
 			}
-			this.rowset.updateRow();
+			rowset.updateRow();
 			
 			logger.debug("Updated value: " + getValueAt(_row,_column));
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while updating value.",  se);
-			if (this.component != null) {
-				JOptionPane.showMessageDialog(this.component, "Error while updating value.\n" + se.getMessage());
+			if (component != null) {
+				JOptionPane.showMessageDialog(component, "Error while updating value.\n" + se.getMessage());
 			}
 		}
 
@@ -509,88 +509,88 @@ public class SSTableModel extends AbstractTableModel {
 		if (_value == null) {
 			return;
 		}
-		if (this.dataGridHandler != null) {
-			this.dataGridHandler.performPreInsertOps(this.rowCount);
+		if (dataGridHandler != null) {
+			dataGridHandler.performPreInsertOps(rowCount);
 		}
 
 		try {
 			// IF NOT ON INSERT ROW MOVE TO INSERT ROW.
-			if (!this.inInsertRow) {
-				this.rowset.moveToInsertRow();
+			if (!inInsertRow) {
+				rowset.moveToInsertRow();
 				// SET THE DEFAULTS
 				setDefaults();
-				this.inInsertRow = true;
+				inInsertRow = true;
 				// IS SSDATAVALUE IS PROVIDED SET PRIMARY KEY VALUE
-				if (this.dataValue != null) {
+				if (dataValue != null) {
 					setPrimaryColumn();
 				}
 
 			}
 
-			final int type = this.rowset.getColumnType(_column + 1);
+			final int type = rowset.getColumnType(_column + 1);
 
 			switch (type) {
 			case Types.INTEGER:
 			case Types.SMALLINT:
 			case Types.TINYINT:
-				this.rowset.updateInt(_column + 1, ((Integer) _value).intValue());
+				rowset.updateInt(_column + 1, ((Integer) _value).intValue());
 				break;
 			case Types.BIGINT:
 // adding update long support 11-01-2004
-				this.rowset.updateLong(_column + 1, ((Long) _value).longValue());
+				rowset.updateLong(_column + 1, ((Long) _value).longValue());
 				break;
 			case Types.FLOAT:
-				this.rowset.updateFloat(_column + 1, ((Float) _value).floatValue());
+				rowset.updateFloat(_column + 1, ((Float) _value).floatValue());
 				break;
 			case Types.DOUBLE:
 			case Types.NUMERIC:
-				this.rowset.updateDouble(_column + 1, ((Double) _value).doubleValue());
+				rowset.updateDouble(_column + 1, ((Double) _value).doubleValue());
 				break;
 			case Types.BOOLEAN:
 			case Types.BIT:
-				this.rowset.updateBoolean(_column + 1, ((Boolean) _value).booleanValue());
+				rowset.updateBoolean(_column + 1, ((Boolean) _value).booleanValue());
 				break;
 			case Types.DATE:
 				if (_value instanceof String) {
-					this.rowset.updateDate(_column + 1, getSQLDate((String) _value));
+					rowset.updateDate(_column + 1, getSQLDate((String) _value));
 				} else {
-					this.rowset.updateDate(_column + 1, (Date) _value);
+					rowset.updateDate(_column + 1, (Date) _value);
 				}
 				break;
 			case Types.CHAR:
 			case Types.VARCHAR:
 			case Types.LONGVARCHAR:
-				this.rowset.updateString(_column + 1, (String) _value);
+				rowset.updateString(_column + 1, (String) _value);
 				break;
 			default:
 				logger.warn("SSTableModel.setValueAt(): Unknown data type.");
 			}
 
-			this.rowset.insertRow();
-			if (this.rowCount != 0) {
-				this.rowset.moveToCurrentRow();
+			rowset.insertRow();
+			if (rowCount != 0) {
+				rowset.moveToCurrentRow();
 			} else {
-				this.rowset.first();
+				rowset.first();
 			}
-			this.rowset.refreshRow();
+			rowset.refreshRow();
 			
 			logger.debug("Row number of inserted row : "+ rowset.getRow());
 
-			if (this.table != null) {
-				this.table.updateUI();
+			if (table != null) {
+				table.updateUI();
 			}
-			this.inInsertRow = false;
-			this.rowCount++;
+			inInsertRow = false;
+			rowCount++;
 
-			if (this.dataGridHandler != null) {
-				this.dataGridHandler.performPostInsertOps(this.rowCount - 1);
+			if (dataGridHandler != null) {
+				dataGridHandler.performPostInsertOps(rowCount - 1);
 			}
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while inserting row.",  se);
-			this.inInsertRow = false;
-			if (this.component != null) {
-				JOptionPane.showMessageDialog(this.component, "Error while inserting row.\n" + se.getMessage());
+			inInsertRow = false;
+			if (component != null) {
+				JOptionPane.showMessageDialog(component, "Error while inserting row.\n" + se.getMessage());
 			}
 		}
 		
@@ -602,11 +602,11 @@ public class SSTableModel extends AbstractTableModel {
 	 * This function sets the default values for the present row.
 	 */
 	protected void setDefaults() {
-		if (this.defaultValuesMap == null) {
+		if (defaultValuesMap == null) {
 			return;
 		}
 
-		final Set<Integer> keySet = this.defaultValuesMap.keySet();
+		final Set<Integer> keySet = defaultValuesMap.keySet();
 		final Iterator<?> iterator = keySet.iterator();
 		try {
 			while (iterator.hasNext()) {
@@ -615,39 +615,39 @@ public class SSTableModel extends AbstractTableModel {
 				logger.debug("Column number is:" + column);
 				
 				// COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
-				final int type = this.rowset.getColumnType(column.intValue() + 1);
+				final int type = rowset.getColumnType(column.intValue() + 1);
 				switch (type) {
 				case Types.INTEGER:
 				case Types.SMALLINT:
 				case Types.TINYINT:
-					this.rowset.updateInt(column.intValue() + 1,
-							((Integer) this.defaultValuesMap.get(column)).intValue());
+					rowset.updateInt(column.intValue() + 1,
+							((Integer) defaultValuesMap.get(column)).intValue());
 					break;
 				case Types.BIGINT:
-					this.rowset.updateLong(column.intValue() + 1,
-							((Long) this.defaultValuesMap.get(column)).longValue());
+					rowset.updateLong(column.intValue() + 1,
+							((Long) defaultValuesMap.get(column)).longValue());
 					break;
 				case Types.FLOAT:
-					this.rowset.updateFloat(column.intValue() + 1,
-							((Float) this.defaultValuesMap.get(column)).floatValue());
+					rowset.updateFloat(column.intValue() + 1,
+							((Float) defaultValuesMap.get(column)).floatValue());
 					break;
 				case Types.DOUBLE:
 				case Types.NUMERIC:
-					this.rowset.updateDouble(column.intValue() + 1,
-							((Double) this.defaultValuesMap.get(column)).doubleValue());
+					rowset.updateDouble(column.intValue() + 1,
+							((Double) defaultValuesMap.get(column)).doubleValue());
 					break;
 				case Types.BOOLEAN:
 				case Types.BIT:
-					this.rowset.updateBoolean(column.intValue() + 1,
-							((Boolean) this.defaultValuesMap.get(column)).booleanValue());
+					rowset.updateBoolean(column.intValue() + 1,
+							((Boolean) defaultValuesMap.get(column)).booleanValue());
 					break;
 				case Types.DATE:
-					this.rowset.updateDate(column.intValue() + 1, (Date) this.defaultValuesMap.get(column));
+					rowset.updateDate(column.intValue() + 1, (Date) defaultValuesMap.get(column));
 					break;
 				case Types.CHAR:
 				case Types.VARCHAR:
 				case Types.LONGVARCHAR:
-					this.rowset.updateString(column.intValue() + 1, (String) this.defaultValuesMap.get(column));
+					rowset.updateString(column.intValue() + 1, (String) defaultValuesMap.get(column));
 					break;
 				default:
 					logger.warn("Unknown data type of " + type);
@@ -657,8 +657,8 @@ public class SSTableModel extends AbstractTableModel {
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while setting defaults for row.",  se);
-			if (this.component != null) {
-				JOptionPane.showMessageDialog(this.component, "Error while setting defaults for row.\n" + se.getMessage());
+			if (component != null) {
+				JOptionPane.showMessageDialog(component, "Error while setting defaults for row.\n" + se.getMessage());
 			}
 		}
 	} // end protected void setDefaults() {
@@ -674,7 +674,7 @@ public class SSTableModel extends AbstractTableModel {
 	public Class<?> getColumnClass(final int _column) {
 		int type;
 		try {
-			type = this.rowset.getColumnType(_column + 1);
+			type = rowset.getColumnType(_column + 1);
 		} catch (final SQLException se) {
 			logger.debug("SQL Exception.",  se);
 			return super.getColumnClass(_column);
@@ -723,25 +723,25 @@ public class SSTableModel extends AbstractTableModel {
 	 * @return returns true on succesful deletion else false.
 	 */
 	public boolean deleteRow(final int _row) {
-		if (this.dataGridHandler != null) {
-			this.dataGridHandler.performPreDeletionOps(_row);
+		if (dataGridHandler != null) {
+			dataGridHandler.performPreDeletionOps(_row);
 		}
-		if (_row < this.rowCount) {
+		if (_row < rowCount) {
 			try {
-				if ((this.dataGridHandler != null) && !this.dataGridHandler.allowDeletion(_row)) {
+				if ((dataGridHandler != null) && !dataGridHandler.allowDeletion(_row)) {
 					return false;
 				}
-				this.rowset.absolute(_row + 1);
-				this.rowset.deleteRow();
-				this.rowCount--;
-				if (this.dataGridHandler != null) {
-					this.dataGridHandler.performPostDeletionOps(_row);
+				rowset.absolute(_row + 1);
+				rowset.deleteRow();
+				rowCount--;
+				if (dataGridHandler != null) {
+					dataGridHandler.performPostDeletionOps(_row);
 				}
 				return true;
 			} catch (final SQLException se) {
 				logger.error("SQL Exception while deleting row.",  se);
-				if (this.component != null) {
-					JOptionPane.showMessageDialog(this.component, "Error while deleting row.\n" + se.getMessage());
+				if (component != null) {
+					JOptionPane.showMessageDialog(component, "Error while deleting row.\n" + se.getMessage());
 				}
 
 			}
@@ -761,17 +761,17 @@ public class SSTableModel extends AbstractTableModel {
 	 */
 	public void setDefaultValues(final int[] _columnNumbers, final Object[] _values) {
 		if ((_columnNumbers == null) || (_values == null)) {
-			this.defaultValuesMap = null;
+			defaultValuesMap = null;
 		}
 
-		if (this.defaultValuesMap == null) {
-			this.defaultValuesMap = new HashMap<>();
+		if (defaultValuesMap == null) {
+			defaultValuesMap = new HashMap<>();
 		} else {
-			this.defaultValuesMap.clear();
+			defaultValuesMap.clear();
 		}
 		if ((_columnNumbers != null) && (_values != null)) {
 			for (int i = 0; i < _columnNumbers.length; i++) {
-				this.defaultValuesMap.put(new Integer(_columnNumbers[i]), _values[i]);
+				defaultValuesMap.put(new Integer(_columnNumbers[i]), _values[i]);
 			}
 		}
 	}
@@ -787,8 +787,8 @@ public class SSTableModel extends AbstractTableModel {
 	 */
 	public Object getDefaultValue(final int _columnNumber) {
 		Object value = null;
-		if (this.defaultValuesMap != null) {
-			value = this.defaultValuesMap.get(new Integer(_columnNumber));
+		if (defaultValuesMap != null) {
+			value = defaultValuesMap.get(new Integer(_columnNumber));
 		}
 		return value;
 	}
@@ -800,7 +800,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _component the component that should be used for message dialogs.
 	 */
 	public void setMessageWindow(final Component _component) {
-		this.component = _component;
+		component = _component;
 	}
 
 	/**
@@ -810,7 +810,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _table JTable to which SSTableModel is bound to.
 	 */
 	public void setJTable(final JTable _table) {
-		this.table = _table;
+		table = _table;
 	}
 
 	/**
@@ -822,7 +822,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _columnNumber the column which is the primary column.
 	 */
 	public void setPrimaryColumn(final int _columnNumber) {
-		this.primaryColumn = _columnNumber;
+		primaryColumn = _columnNumber;
 	}
 
 	/**
@@ -832,7 +832,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _dataValue implementation of SSDataValue for determining PK
 	 */
 	public void setSSDataValue(final SSDataValue _dataValue) {
-		this.dataValue = _dataValue;
+		dataValue = _dataValue;
 	}
 
 	/**
@@ -842,48 +842,48 @@ public class SSTableModel extends AbstractTableModel {
 	protected void setPrimaryColumn() {
 		try {
 
-			final int type = this.rowset.getColumnType(this.primaryColumn + 1);
+			final int type = rowset.getColumnType(primaryColumn + 1);
 
 			switch (type) {
 			case Types.INTEGER:
 			case Types.SMALLINT:
 			case Types.TINYINT:
-				this.rowset.updateInt(this.primaryColumn + 1,
-						((Integer) this.dataValue.getPrimaryColumnValue()).intValue());
+				rowset.updateInt(primaryColumn + 1,
+						((Integer) dataValue.getPrimaryColumnValue()).intValue());
 				break;
 			case Types.BIGINT:
-				this.rowset.updateLong(this.primaryColumn + 1,
-						((Long) this.dataValue.getPrimaryColumnValue()).longValue());
+				rowset.updateLong(primaryColumn + 1,
+						((Long) dataValue.getPrimaryColumnValue()).longValue());
 				break;
 			case Types.FLOAT:
-				this.rowset.updateFloat(this.primaryColumn + 1,
-						((Float) this.dataValue.getPrimaryColumnValue()).floatValue());
+				rowset.updateFloat(primaryColumn + 1,
+						((Float) dataValue.getPrimaryColumnValue()).floatValue());
 				break;
 			case Types.DOUBLE:
 			case Types.NUMERIC:
-				this.rowset.updateDouble(this.primaryColumn + 1,
-						((Double) this.dataValue.getPrimaryColumnValue()).doubleValue());
+				rowset.updateDouble(primaryColumn + 1,
+						((Double) dataValue.getPrimaryColumnValue()).doubleValue());
 				break;
 			case Types.BOOLEAN:
 			case Types.BIT:
-				this.rowset.updateBoolean(this.primaryColumn + 1,
-						((Boolean) this.dataValue.getPrimaryColumnValue()).booleanValue());
+				rowset.updateBoolean(primaryColumn + 1,
+						((Boolean) dataValue.getPrimaryColumnValue()).booleanValue());
 				break;
 			case Types.DATE:
-				this.rowset.updateDate(this.primaryColumn + 1, (Date) this.dataValue.getPrimaryColumnValue());
+				rowset.updateDate(primaryColumn + 1, (Date) dataValue.getPrimaryColumnValue());
 				break;
 			case Types.CHAR:
 			case Types.VARCHAR:
 			case Types.LONGVARCHAR:
-				this.rowset.updateString(this.primaryColumn + 1, (String) this.dataValue.getPrimaryColumnValue());
+				rowset.updateString(primaryColumn + 1, (String) dataValue.getPrimaryColumnValue());
 				break;
 			default:
 				logger.warn("Unknown data type of " + type);
 			}
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while insering Primary Key value.",  se);
-			if (this.component != null) {
-				JOptionPane.showMessageDialog(this.component,
+			if (component != null) {
+				JOptionPane.showMessageDialog(component,
 						"Error while inserting Primary Key value.\n" + se.getMessage());
 			}
 		}
@@ -928,7 +928,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *                 column.
 	 */
 	public void setHeaders(final String[] _headers) {
-		this.headers = _headers;
+		headers = _headers;
 	}
 
 	/**
@@ -942,10 +942,10 @@ public class SSTableModel extends AbstractTableModel {
 	 */
 	@Override
 	public String getColumnName(final int _columnNumber) {
-		if (this.headers != null) {
-			if (_columnNumber < this.headers.length) {
+		if (headers != null) {
+			if (_columnNumber < headers.length) {
 				logger.debug("Sending header " + headers[_columnNumber]);
-				return this.headers[_columnNumber];
+				return headers[_columnNumber];
 			}
 		}
 		logger.warn("Not able to supply header name.");
@@ -961,7 +961,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *                       uneditable.
 	 */
 	public void setUneditableColumns(final int[] _columnNumbers) {
-		this.uneditableColumns = _columnNumbers;
+		uneditableColumns = _columnNumbers;
 	}
 
 	/**
@@ -977,7 +977,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *                       hidden.
 	 */
 	public void setHiddenColumns(final int[] _columnNumbers) {
-		this.hiddenColumns = _columnNumbers;
+		hiddenColumns = _columnNumbers;
 	}
 
 // DEPRECATED STUFF....................
@@ -992,7 +992,7 @@ public class SSTableModel extends AbstractTableModel {
 	 */
 	@Deprecated
 	public void setRowSet(final SSRowSet _rowset) {
-		this.rowset = _rowset;
+		rowset = _rowset;
 		init();
 	}
 

@@ -73,18 +73,18 @@ public class SSCuitField extends SSFormattedTextField {
     public SSCuitField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         
-        this.cuitCaret = new DefaultCaret();
-        this.cuitCaret.setBlinkRate(600);
+        cuitCaret = new DefaultCaret();
+        cuitCaret.setBlinkRate(600);
         
         try {
-            this.cuitCaret.setSelectionVisible(true);
+            cuitCaret.setSelectionVisible(true);
         } catch(final java.lang.NullPointerException np) {
         	// do nothing - there may not be anything to select during initialization
         	//logger.warn(getColumnForLog() + ": Null Pointer Exception.", np);
         }
         
 
-        this.setCaret(this.cuitCaret);
+        setCaret(cuitCaret);
         
     }
 

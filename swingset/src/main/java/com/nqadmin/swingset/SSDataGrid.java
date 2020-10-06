@@ -240,14 +240,14 @@ public class SSDataGrid extends JTable {
 	 * @return the allowDeletion flag
 	 */
 	public boolean isAllowDeletion() {
-		return this.allowDeletion;
+		return allowDeletion;
 	}
 
 	/**
 	 * @param _allowDeletion boolean indicating if deletions are allowed
 	 */
 	public void setAllowDeletion(final boolean _allowDeletion) {
-		this.allowDeletion = _allowDeletion;
+		allowDeletion = _allowDeletion;
 	}
 
 	/**
@@ -256,7 +256,7 @@ public class SSDataGrid extends JTable {
 	 * @param _sSRowSet SSRowSet from which values have to be retrieved.
 	 */
 	public SSDataGrid(final SSRowSet _sSRowSet) {
-		this.sSRowSet = _sSRowSet;
+		sSRowSet = _sSRowSet;
 		init();
 		bind();
 	}
@@ -274,9 +274,9 @@ public class SSDataGrid extends JTable {
 	 * @param _columnWidth minimum column width of the each column
 	 */
 	public void setColumnWidth(final int _columnWidth) {
-		final int oldValue = this.columnWidth;
-		this.columnWidth = _columnWidth;
-		firePropertyChange("columnWidth", oldValue, this.columnWidth);
+		final int oldValue = columnWidth;
+		columnWidth = _columnWidth;
+		firePropertyChange("columnWidth", oldValue, columnWidth);
 	}
 
 	/**
@@ -285,7 +285,7 @@ public class SSDataGrid extends JTable {
 	 * @return minimum column width of the each column
 	 */
 	public int getColumnWidth() {
-		return this.columnWidth;
+		return columnWidth;
 	}
 
 	/**
@@ -296,10 +296,10 @@ public class SSDataGrid extends JTable {
 	 *                       messages
 	 */
 	public void setMessageWindow(final Component _messageWindow) {
-		final Component oldValue = this.messageWindow;
-		this.messageWindow = _messageWindow;
-		firePropertyChange("messageWindow", oldValue, this.messageWindow);
-		this.tableModel.setMessageWindow(this.messageWindow);
+		final Component oldValue = messageWindow;
+		messageWindow = _messageWindow;
+		firePropertyChange("messageWindow", oldValue, messageWindow);
+		tableModel.setMessageWindow(messageWindow);
 	}
 
 	/**
@@ -309,7 +309,7 @@ public class SSDataGrid extends JTable {
 	 * @return the component that should be used when displaying error messages
 	 */
 	public Component getMessageWindow() {
-		return this.messageWindow;
+		return messageWindow;
 	}
 
 	/**
@@ -321,9 +321,9 @@ public class SSDataGrid extends JTable {
 	 *                     false
 	 */
 	public void setCallExecute(final boolean _callExecute) {
-		final boolean oldValue = this.callExecute;
-		this.callExecute = _callExecute;
-		firePropertyChange("callExecute", oldValue, this.callExecute);
+		final boolean oldValue = callExecute;
+		callExecute = _callExecute;
+		firePropertyChange("callExecute", oldValue, callExecute);
 	}
 
 	/**
@@ -334,7 +334,7 @@ public class SSDataGrid extends JTable {
 	 * @return true if execute function call has to be skipped else false
 	 */
 	public boolean getCallExecute() {
-		return this.callExecute;
+		return callExecute;
 	}
 
 	/**
@@ -344,10 +344,10 @@ public class SSDataGrid extends JTable {
 	 * @param _insertion true if new rows can be added else false.
 	 */
 	public void setInsertion(final boolean _insertion) {
-		final boolean oldValue = this.insertion;
-		this.insertion = _insertion;
-		firePropertyChange("insertion", oldValue, this.insertion);
-		this.tableModel.setInsertion(_insertion);
+		final boolean oldValue = insertion;
+		insertion = _insertion;
+		firePropertyChange("insertion", oldValue, insertion);
+		tableModel.setInsertion(_insertion);
 		updateUI();
 	}
 
@@ -358,7 +358,7 @@ public class SSDataGrid extends JTable {
 	 * @return true if new rows can be added else false.
 	 */
 	public boolean getInsertion() {
-		return this.insertion;
+		return insertion;
 	}
 
 	/**
@@ -377,7 +377,7 @@ public class SSDataGrid extends JTable {
 	@Override
 	public int[] getSelectedColumns() {
 		// IF THERE ARE NO HIDDEN COLUMNS THEN RETURN THE SAME LIST
-		if (this.hiddenColumns == null) {
+		if (hiddenColumns == null) {
 			return super.getSelectedColumns();
 		}
 
@@ -389,9 +389,9 @@ public class SSDataGrid extends JTable {
 		for (int i = 0; i < selectedColumns.length; i++) {
 			boolean found = false;
 			// CHECK THIS COLUMN NUMBER WITH HIDDEN COLUMNS
-			for (int j = 0; j < this.hiddenColumns.length; j++) {
+			for (int j = 0; j < hiddenColumns.length; j++) {
 				// IF ITS THERES INDICATE THE SAME AND BREAK OUT.
-				if (selectedColumns[i] == this.hiddenColumns[j]) {
+				if (selectedColumns[i] == hiddenColumns[j]) {
 					found = true;
 					break;
 				}
@@ -420,7 +420,7 @@ public class SSDataGrid extends JTable {
 	 */
 	@Override
 	public int getSelectedColumnCount() {
-		final int[] selectedColumns = this.getSelectedColumns();
+		final int[] selectedColumns = getSelectedColumns();
 		if (selectedColumns == null) {
 			return 0;
 		}
@@ -434,9 +434,9 @@ public class SSDataGrid extends JTable {
 	 * @param _sSRowSet the SSRowSet which acts as the data source.
 	 */
 	public void setSSRowSet(final SSRowSet _sSRowSet) {
-		final SSRowSet oldValue = this.sSRowSet;
-		this.sSRowSet = _sSRowSet;
-		firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
+		final SSRowSet oldValue = sSRowSet;
+		sSRowSet = _sSRowSet;
+		firePropertyChange("sSRowSet", oldValue, sSRowSet);
 		bind();
 	} // end public void setSSRowSet(SSRowSet _sSRowSet) {
 
@@ -446,7 +446,7 @@ public class SSDataGrid extends JTable {
 	 * @return returns the SSRowSet being used.
 	 */
 	public SSRowSet getSSRowSet() {
-		return this.sSRowSet;
+		return sSRowSet;
 	}
 
 	/**
@@ -457,7 +457,7 @@ public class SSDataGrid extends JTable {
 	 * @return scroll pane with embedded JTable
 	 */
 	public Component getComponent() {
-		return this.scrollPane;
+		return scrollPane;
 	}
 
 	/**
@@ -478,7 +478,7 @@ public class SSDataGrid extends JTable {
 		// if (tableModel == null) {
 		// tableModel = new SSTableModel();
 		// }
-		this.tableModel.setDefaultValues(_columnNumbers, _values);
+		tableModel.setDefaultValues(_columnNumbers, _values);
 	}
 
 	/**
@@ -510,11 +510,11 @@ public class SSDataGrid extends JTable {
 			columnNumbers = new int[_columnNames.length];
 
 			for (int i = 0; i < _columnNames.length; i++) {
-				columnNumbers[i] = this.sSRowSet.getColumnIndex(_columnNames[i]) - 1;
+				columnNumbers[i] = sSRowSet.getColumnIndex(_columnNames[i]) - 1;
 			}
 		}
 
-		this.tableModel.setDefaultValues(columnNumbers, _values);
+		tableModel.setDefaultValues(columnNumbers, _values);
 	}
 
 	/**
@@ -530,7 +530,7 @@ public class SSDataGrid extends JTable {
 	 *         column.
 	 */
 	public Object getDefaultValue(final int _columnNumber) {
-		return this.tableModel.getDefaultValue(_columnNumber);
+		return tableModel.getDefaultValue(_columnNumber);
 	}
 
 	/**
@@ -548,8 +548,8 @@ public class SSDataGrid extends JTable {
 	 *                      SSRowSet
 	 */
 	public Object getDefaultValue(final String _columnName) throws SQLException {
-		final int columnNumber = this.sSRowSet.getColumnIndex(_columnName);
-		return this.tableModel.getDefaultValue(columnNumber - 1);
+		final int columnNumber = sSRowSet.getColumnIndex(_columnName);
+		return tableModel.getDefaultValue(columnNumber - 1);
 	}
 
 	/**
@@ -563,7 +563,7 @@ public class SSDataGrid extends JTable {
 	 * @param _columnNumber the column which is the primary column.
 	 */
 	public void setPrimaryColumn(final int _columnNumber) {
-		this.tableModel.setPrimaryColumn(_columnNumber);
+		tableModel.setPrimaryColumn(_columnNumber);
 	}
 
 	/**
@@ -578,8 +578,8 @@ public class SSDataGrid extends JTable {
 	 * @throws SQLException	SQLException
 	 */
 	public void setPrimaryColumn(final String _columnName) throws SQLException {
-		final int columnNumber = this.sSRowSet.getColumnIndex(_columnName) - 1;
-		this.tableModel.setPrimaryColumn(columnNumber);
+		final int columnNumber = sSRowSet.getColumnIndex(_columnName) - 1;
+		tableModel.setPrimaryColumn(columnNumber);
 	}
 
 	/**
@@ -591,7 +591,7 @@ public class SSDataGrid extends JTable {
 	 * @param _dataValue implementation of SSDataValue
 	 */
 	public void setSSDataValue(final SSDataValue _dataValue) {
-		this.tableModel.setSSDataValue(_dataValue);
+		tableModel.setSSDataValue(_dataValue);
 	}
 
 	/**
@@ -621,7 +621,7 @@ public class SSDataGrid extends JTable {
 	 * @throws SQLException	SQLException
 	 */
 	public void setDateRenderer(final String _column) throws SQLException {
-		final int tmpColumn = this.sSRowSet.getColumnIndex(_column) - 1;
+		final int tmpColumn = sSRowSet.getColumnIndex(_column) - 1;
 		final TableColumnModel tmpColumnModel = getColumnModel();
 		final TableColumn tmpTableColumn = tmpColumnModel.getColumn(tmpColumn);
 		tmpTableColumn.setCellRenderer(new DateRenderer());
@@ -704,7 +704,7 @@ public class SSDataGrid extends JTable {
 	 */
 	public void setComboRenderer(final String _column, final Object[] _displayItems, final Object[] _underlyingValues, final int _columnWidth)
 			throws SQLException {
-		final int column = this.sSRowSet.getColumnIndex(_column) - 1;
+		final int column = sSRowSet.getColumnIndex(_column) - 1;
 		setComboRenderer(column, _displayItems, _underlyingValues, _columnWidth);
 	}
 
@@ -717,7 +717,7 @@ public class SSDataGrid extends JTable {
 	 * @throws SQLException	SQLException
 	 */
 	public void setCheckBoxRenderer(final String _column) throws SQLException {
-		final int column = this.sSRowSet.getColumnIndex(_column) - 1;
+		final int column = sSRowSet.getColumnIndex(_column) - 1;
 		setCheckBoxRenderer(column);
 	}
 
@@ -745,7 +745,7 @@ public class SSDataGrid extends JTable {
 	 *                 column.
 	 */
 	public void setHeaders(final String[] _headers) {
-		this.tableModel.setHeaders(_headers);
+		tableModel.setHeaders(_headers);
 	}
 
 	/**
@@ -759,7 +759,7 @@ public class SSDataGrid extends JTable {
 	 *                       uneditable.
 	 */
 	public void setUneditableColumns(final int[] _columnNumbers) {
-		this.tableModel.setUneditableColumns(_columnNumbers);
+		tableModel.setUneditableColumns(_columnNumbers);
 	}
 
 	/**
@@ -779,11 +779,11 @@ public class SSDataGrid extends JTable {
 			columnNumbers = new int[_columnNames.length];
 
 			for (int i = 0; i < _columnNames.length; i++) {
-				columnNumbers[i] = this.sSRowSet.getColumnIndex(_columnNames[i]) - 1;
+				columnNumbers[i] = sSRowSet.getColumnIndex(_columnNames[i]) - 1;
 			}
 		}
 
-		this.tableModel.setUneditableColumns(columnNumbers);
+		tableModel.setUneditableColumns(columnNumbers);
 	}
 
 	/**
@@ -801,8 +801,8 @@ public class SSDataGrid extends JTable {
 	 *                       hidden
 	 */
 	public void setHiddenColumns(final int[] _columnNumbers) {
-		this.hiddenColumns = _columnNumbers;
-		this.tableModel.setHiddenColumns(_columnNumbers);
+		hiddenColumns = _columnNumbers;
+		tableModel.setHiddenColumns(_columnNumbers);
 		hideColumns();
 	}
 
@@ -821,12 +821,12 @@ public class SSDataGrid extends JTable {
 	 * @throws SQLException	SQLException
 	 */
 	public void setHiddenColumns(final String[] _columnNames) throws SQLException {
-		this.hiddenColumns = null;
-		this.tableModel.setHiddenColumns(this.hiddenColumns);
+		hiddenColumns = null;
+		tableModel.setHiddenColumns(hiddenColumns);
 		if (_columnNames != null) {
-			this.hiddenColumns = new int[_columnNames.length];
+			hiddenColumns = new int[_columnNames.length];
 			for (int i = 0; i < _columnNames.length; i++) {
-				this.hiddenColumns[i] = this.sSRowSet.getColumnIndex(_columnNames[i]) - 1;
+				hiddenColumns[i] = sSRowSet.getColumnIndex(_columnNames[i]) - 1;
 			}
 		}
 		hideColumns();
@@ -842,7 +842,7 @@ public class SSDataGrid extends JTable {
 	 * @param _cellEditing implementation of SSCellEditable interface.
 	 */
 	public void setSSCellEditing(final SSCellEditing _cellEditing) {
-		this.tableModel.setSSCellEditing(_cellEditing);
+		tableModel.setSSCellEditing(_cellEditing);
 	}
 
 	/**
@@ -852,7 +852,7 @@ public class SSDataGrid extends JTable {
 	 * @param _dataGridHandler implementation of SSDataGridHandler interface.
 	 */
 	public void setSSDataGridHandler(final SSDataGridHandler _dataGridHandler) {
-		this.tableModel.setSSDataGridHandler(_dataGridHandler);
+		tableModel.setSSDataGridHandler(_dataGridHandler);
 	}
 
 	/**
@@ -903,7 +903,7 @@ public class SSDataGrid extends JTable {
 			@Override
 			public void keyPressed(final KeyEvent ke) {
 				if (ke.getKeyCode() != KeyEvent.VK_TAB) {
-					this.keyPressed++;
+					keyPressed++;
 				}
 			}
 
@@ -914,13 +914,13 @@ public class SSDataGrid extends JTable {
 			public void keyReleased(final KeyEvent ke) {
 				final JComponent editor = (JComponent) DefaultEditor.this.getComponent();
 				if (editor instanceof JTextField) {
-					if ((this.keyPressed == 0) && Character.isLetterOrDigit(ke.getKeyChar())) {
+					if ((keyPressed == 0) && Character.isLetterOrDigit(ke.getKeyChar())) {
 						((JTextField) editor).setText(String.valueOf(ke.getKeyChar()));
 					}
 				}
-				this.keyPressed--;
-				if (this.keyPressed < 0) {
-					this.keyPressed = 0;
+				keyPressed--;
+				if (keyPressed < 0) {
+					keyPressed = 0;
 				}
 
 			}
@@ -946,7 +946,7 @@ public class SSDataGrid extends JTable {
 			public void focusLost(final FocusEvent fe) {
 				// SET THE KEYPRESSED TO ZERO AS THE EDITOR HAS LOST THE FOCUS.
 				// hasFocus = false;
-				this.keyPressed = 0;
+				keyPressed = 0;
 			}
 		}
 
@@ -956,12 +956,12 @@ public class SSDataGrid extends JTable {
 			final String s = (String) super.getCellEditorValue();
 
 			if (s.trim().equals("")) {
-				if (this.constructor.getDeclaringClass() == String.class) {
-					this.value = s;
+				if (constructor.getDeclaringClass() == String.class) {
+					value = s;
 				}
 			} else {
 				try {
-					this.value = this.constructor.newInstance(new Object[] { s });
+					value = constructor.newInstance(new Object[] { s });
 				} catch (final Exception e) {
 					// DRAW A RED BORDER IF THE VALUE OBJECT CAN'T BE CREATED.
 					// PROBABLY THE DATA ENTERED IS NOT RIGHT (STRING IN NUMBER FIELD OR VICE-VERSA)
@@ -979,7 +979,7 @@ public class SSDataGrid extends JTable {
 				final boolean _isSelected, final int _row, final int _column) {
 
 			// SET INITIAL VALUE TO NULL.
-			this.value = null;
+			value = null;
 
 			((JComponent) getComponent()).setBorder(new LineBorder(Color.black));
 
@@ -990,7 +990,7 @@ public class SSDataGrid extends JTable {
 				if (type == Object.class) {
 					type = String.class;
 				}
-				this.constructor = type.getConstructor(new Class<?>[] { String.class });
+				constructor = type.getConstructor(new Class<?>[] { String.class });
 			} catch (final Exception e) {
 				return null;
 			}
@@ -1003,7 +1003,7 @@ public class SSDataGrid extends JTable {
 		 */
 		@Override
 		public Object getCellEditorValue() {
-			return this.value;
+			return value;
 		}
 
 	}
@@ -1024,14 +1024,14 @@ public class SSDataGrid extends JTable {
 		// THIS IS USED FOR DELETING THE ROWS
 		// ALLOWS MULTIPLE ROW DELETION.
 		// KEY SEQUENCE FOR DELETING ROWS IS CTRL-X.
-		this.addKeyListener(new KeyAdapter() {
+		addKeyListener(new KeyAdapter() {
 			private boolean controlPressed = false;
 
 			// IF THE KEY PRESSED IS CONTROL STORE THAT INFO.
 			@Override
 			public void keyPressed(final KeyEvent ke) {
 				if (ke.getKeyCode() == KeyEvent.VK_CONTROL) {
-					this.controlPressed = true;
+					controlPressed = true;
 				}
 			}
 
@@ -1040,16 +1040,16 @@ public class SSDataGrid extends JTable {
 			public void keyReleased(final KeyEvent ke) {
 				// IF CONTROL KEY IS RELEASED SET THAT CONTROL IS NOT PRESSED.
 				if (ke.getKeyCode() == KeyEvent.VK_CONTROL) {
-					this.controlPressed = false;
+					controlPressed = false;
 				}
 				// IF X IS PRESSED WHILE THE CONTROL KEY IS STILL PRESSED
 				// DELETE THE SELECTED ROWS.
 				if (ke.getKeyCode() == KeyEvent.VK_X) {
-					if (!SSDataGrid.this.allowDeletion) {
+					if (!allowDeletion) {
 						return;
 					}
 
-					if (!this.controlPressed) {
+					if (!controlPressed) {
 						return;
 					}
 					// GET THE NUMBER OF ROWS SELECTED
@@ -1061,8 +1061,8 @@ public class SSDataGrid extends JTable {
 					final int[] rows = getSelectedRows();
 					// IF USER HAS PROVIDED A PARENT COMPONENT FOR ERROR MESSAGES
 					// CONFIRM THE DELETION
-					if (SSDataGrid.this.messageWindow != null) {
-						final int returnValue = JOptionPane.showConfirmDialog(SSDataGrid.this.messageWindow,
+					if (messageWindow != null) {
+						final int returnValue = JOptionPane.showConfirmDialog(messageWindow,
 								"You are about to delete " + rows.length + " rows. "
 										+ "\nAre you sure you want to delete the rows?");
 						if (returnValue != JOptionPane.YES_OPTION) {
@@ -1076,7 +1076,7 @@ public class SSDataGrid extends JTable {
 					// TO IDENTIFY THE NEW ROW NUMBERS AND THEN DELETE THE ROWS
 					// INSTEAD OF THAT ITS MUCH EASIER IF YOU DO IT BOTTOM UP.
 					for (int i = rows.length - 1; i >= 0; i--) {
-						SSDataGrid.this.tableModel.deleteRow(rows[i]);
+						tableModel.deleteRow(rows[i]);
 					}
 					updateUI();
 				}
@@ -1093,15 +1093,15 @@ public class SSDataGrid extends JTable {
 
 		// SPECIFY THE MESSAGE WINDOW TO WHICH THE TABLE MODEL HAS TO POP UP
 		// ERROR MESSAGES.
-		this.tableModel.setMessageWindow(this.messageWindow);
-		this.tableModel.setJTable(this);
+		tableModel.setMessageWindow(messageWindow);
+		tableModel.setJTable(this);
 
 		// THIS CAUSES THE JTABLE TO DISPLAY THE HORIZONTAL SCROLL BAR AS NEEDED.
 		// CODE IN HIDECOLUMNS FUNCTION DEPENDS ON THIS VARIABLE.
-		this.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
 		// ADD THE JTABLE TO A SCROLL BAR
-		this.scrollPane = new JScrollPane(this, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+		scrollPane = new JScrollPane(this, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 	} // end protected void init() {
@@ -1114,25 +1114,25 @@ public class SSDataGrid extends JTable {
 
 		try {
 			// EXECUTE THE QUERY
-			if (this.callExecute) {
-				this.sSRowSet.execute();
+			if (callExecute) {
+				sSRowSet.execute();
 			}
 
 			// SPECIFY THE SSROWSET TO THE TABLE MODEL.
 			// if (tableModel == null) {
 			// tableModel = new SSTableModel(sSRowSet);
 			// } else {
-			this.tableModel.setSSRowSet(this.sSRowSet);
+			tableModel.setSSRowSet(sSRowSet);
 			// }
 
 			// SET THE TABLE MODEL FOR JTABLE
-			this.setModel(this.tableModel);
+			setModel(tableModel);
 
 			// GET THE ROW COUNT
-			this.rowCount = this.tableModel.getRowCount();
+			rowCount = tableModel.getRowCount();
 
 			// GET THE COLUMN COUNT
-			this.columnCount = this.tableModel.getColumnCount();
+			columnCount = tableModel.getColumnCount();
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
@@ -1156,16 +1156,16 @@ public class SSDataGrid extends JTable {
 	protected void hideColumns() {
 
 		// SET THE MINIMUM WIDTH OF COLUMNS
-		final TableColumnModel tmpColumnModel = this.getColumnModel();
+		final TableColumnModel tmpColumnModel = getColumnModel();
 		TableColumn tmpColumn;
 		for (int i = tmpColumnModel.getColumnCount() - 1; i >= 0; i--) {
 			tmpColumn = tmpColumnModel.getColumn(i);
 			int j = -1;
 
-			if (this.hiddenColumns != null) {
+			if (hiddenColumns != null) {
 				// SET THE WIDTH OF HIDDEN COLUMNS AS 0
-				for (j = 0; j < this.hiddenColumns.length; j++) {
-					if (this.hiddenColumns[j] == i) {
+				for (j = 0; j < hiddenColumns.length; j++) {
+					if (hiddenColumns[j] == i) {
 						tmpColumn.setMaxWidth(0);
 						tmpColumn.setMinWidth(0);
 						tmpColumn.setPreferredWidth(0);
@@ -1175,16 +1175,16 @@ public class SSDataGrid extends JTable {
 				// AUTO RESIZE IS SET TO OFF IN THE INIT FUNCTION.
 				// SO IF IT IS NOT IN AUTO RESIZE MODE THEN USER HAS REQUESTED
 				// AUTO RESIZING. SO DON'T SET ANY SPECIFIC SIZE TO THE COLUMNS.
-				if (j == this.hiddenColumns.length) {
+				if (j == hiddenColumns.length) {
 					if (getAutoResizeMode() == AUTO_RESIZE_OFF) {
-						tmpColumn.setPreferredWidth(this.columnWidth);
+						tmpColumn.setPreferredWidth(columnWidth);
 					}
 
 				}
 			} else {
 				// SET OTHER COLUMNS MIN WIDTH TO 100
 				if (getAutoResizeMode() == AUTO_RESIZE_OFF) {
-					tmpColumn.setPreferredWidth(this.columnWidth);
+					tmpColumn.setPreferredWidth(columnWidth);
 				}
 
 			}
@@ -1218,20 +1218,20 @@ public class SSDataGrid extends JTable {
 						return;
 					}
 
-					this.keyPressed++;
+					keyPressed++;
 				}
 
 				@Override
 				public void keyReleased(final KeyEvent ke) {
 					final JComponent editor = (JComponent) DateEditor.this.getComponent();
 					if (editor instanceof JTextField) {
-						if (this.keyPressed == 0) {
+						if (keyPressed == 0) {
 							((JTextField) editor).setText(String.valueOf(ke.getKeyChar()));
 						}
 					}
-					this.keyPressed--;
-					if (this.keyPressed < 0) {
-						this.keyPressed = 0;
+					keyPressed--;
+					if (keyPressed < 0) {
+						keyPressed = 0;
 					}
 				}
 			});
@@ -1304,15 +1304,15 @@ public class SSDataGrid extends JTable {
 
 			if (_value instanceof Boolean) {
 				if (((Boolean) _value).booleanValue()) {
-					this.setSelected(true);
+					setSelected(true);
 				} else {
-					this.setSelected(false);
+					setSelected(false);
 				}
 			} else if (_value instanceof Integer) {
 				if (((Integer) _value).intValue() != 0) {
-					this.setSelected(true);
+					setSelected(true);
 				} else {
-					this.setSelected(false);
+					setSelected(false);
 				}
 			} else {
 				logger.error("Can't set check box value. Unknown data type. Column type should be Boolean or Integer for check box columns.");
@@ -1349,7 +1349,7 @@ public class SSDataGrid extends JTable {
 			if (_value instanceof Boolean) {
 				// STORE THE TYPE OF COLUMN WE NEED THIS WHEN EDITOR HAS TO RETURN
 				// VALUE BACK.
-				this.columnClass = java.sql.Types.BOOLEAN;
+				columnClass = java.sql.Types.BOOLEAN;
 				// BASED ON THE VALUE CHECK THE BOX OR UNCHECK IT.
 				if (((Boolean) _value).booleanValue()) {
 					checkBox.setSelected(true);
@@ -1360,7 +1360,7 @@ public class SSDataGrid extends JTable {
 			// IF THE COLUMN CLASS IS INTEGER
 			else if (_value instanceof Integer) {
 				// STORE THE COLUMN CLASS.
-				this.columnClass = java.sql.Types.INTEGER;
+				columnClass = java.sql.Types.INTEGER;
 				// BASED ON THE INTEGER VALUE CHECK OR UNCHECK THE CHECK BOX.
 				// A VALUE OF 0 IS CONSIDERED TRUE - CHECK BOX IS CHECKED.
 				// ANY OTHER VALUE IS CONSIDERED FALSE - UNCHECK THE CHECK BOX.
@@ -1385,12 +1385,12 @@ public class SSDataGrid extends JTable {
 			if (((JCheckBox) getComponent()).isSelected()) {
 				// CHECK THE COLUMN TYPE AND RETURN CORRESPONDING OBJECT.
 				// IF IT IS INTEGER THEN 1 IS CONSIDERED TRUE AND 0 FALSE.
-				if (this.columnClass == java.sql.Types.BOOLEAN) {
+				if (columnClass == java.sql.Types.BOOLEAN) {
 					return new Boolean(true);
 				}
 				return new Integer(1);
 			}
-			if (this.columnClass == java.sql.Types.BOOLEAN) {
+			if (columnClass == java.sql.Types.BOOLEAN) {
 				return new Boolean(false);
 			}
 			return new Integer(0);
@@ -1438,8 +1438,8 @@ public class SSDataGrid extends JTable {
 
 		public ComboRenderer(final Object[] _items, final Object[] _underlyingValues) {
 //            super(_items);
-			this.underlyingValues = _underlyingValues;
-			this.displayValues = _items;
+			underlyingValues = _underlyingValues;
+			displayValues = _items;
 		}
 
 		@Override
@@ -1450,7 +1450,7 @@ public class SSDataGrid extends JTable {
 					_column);
 
 			int index = -1;
-			if (this.displayValues.length > 0) {
+			if (displayValues.length > 0) {
 //              setSelectedIndex(getIndexOf(_value));
 				index = getIndexOf(_value);
 			} else {
@@ -1461,7 +1461,7 @@ public class SSDataGrid extends JTable {
 			if (index == -1) {
 				label.setText("");
 			} else {
-				label.setText(this.displayValues[index].toString());
+				label.setText(displayValues[index].toString());
 			}
 			return label;
 		}
@@ -1470,11 +1470,11 @@ public class SSDataGrid extends JTable {
 			if (_value == null) {
 				return -1;
 			}
-			if (this.underlyingValues == null) {
+			if (underlyingValues == null) {
 				return ((Integer) _value).intValue();
 			}
-			for (int i = 0; i < this.underlyingValues.length; i++) {
-				if (this.underlyingValues[i].equals(_value)) {
+			for (int i = 0; i < underlyingValues.length; i++) {
+				if (underlyingValues[i].equals(_value)) {
 					return i;
 				}
 			}
@@ -1497,13 +1497,13 @@ public class SSDataGrid extends JTable {
 
 		public ComboEditor(final Object[] _items, final Object[] _underlyingValues) {
 			super(new JComboBox<>(_items));
-			this.underlyingValues = _underlyingValues;
+			underlyingValues = _underlyingValues;
 		}
 
 		@Override
 		public boolean isCellEditable(final EventObject event) {
 			if (event instanceof MouseEvent) {
-				return ((MouseEvent) event).getClickCount() >= this.tmpClickCountToStart;
+				return ((MouseEvent) event).getClickCount() >= tmpClickCountToStart;
 			}
 			return true;
 		}
@@ -1519,7 +1519,7 @@ public class SSDataGrid extends JTable {
 
 		@Override
 		public Object getCellEditorValue() {
-			if (this.underlyingValues == null) {
+			if (underlyingValues == null) {
 				return new Integer(((JComboBox<?>) getComponent()).getSelectedIndex());
 			}
 
@@ -1528,22 +1528,22 @@ public class SSDataGrid extends JTable {
 			logger.trace("Index is "+ index);
 
 			if (index == -1) {
-				return this.underlyingValues[0];
+				return underlyingValues[0];
 			}
 
-			return this.underlyingValues[index];
+			return underlyingValues[index];
 		}
 
 		protected int getIndexOf(final Object _value) {
-			if (this.underlyingValues == null) {
+			if (underlyingValues == null) {
 				// IF THE VALUE IS NULL THEN SET THE DISPLAY ON THE COMBO TO BLANK (INDEX -1)
 				if (_value == null) {
 					return -1;
 				}
 				return ((Integer) _value).intValue();
 			}
-			for (int i = 0; i < this.underlyingValues.length; i++) {
-				if (this.underlyingValues[i].equals(_value)) {
+			for (int i = 0; i < underlyingValues.length; i++) {
+				if (underlyingValues[i].equals(_value)) {
 					return i;
 				}
 			}

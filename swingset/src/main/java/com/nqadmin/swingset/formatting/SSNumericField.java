@@ -82,7 +82,7 @@ public class SSNumericField extends SSFormattedTextField {
 	 */
 	public SSNumericField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
 		super(factory);
-		this.setHorizontalAlignment(SwingConstants.RIGHT);
+		setHorizontalAlignment(SwingConstants.RIGHT);
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class SSNumericField extends SSFormattedTextField {
 	 * @return returns the number digits used for integer part of the number
 	 */
 	public int getPrecision() {
-		return this.precision;
+		return precision;
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class SSNumericField extends SSFormattedTextField {
 	 * @return returns the number of digits used for fraction part of the number
 	 */
 	public int getDecimals() {
-		return this.decimals;
+		return decimals;
 	}
 
 	/**
@@ -109,8 +109,8 @@ public class SSNumericField extends SSFormattedTextField {
 	 * @param _precision - number of digits needed for integer part of the number
 	 */
 	public void setPrecision(final int _precision) {
-		this.precision = _precision;
-		this.setFormatterFactory(new SSNumericFormatterFactory(_precision, this.decimals));
+		precision = _precision;
+		setFormatterFactory(new SSNumericFormatterFactory(_precision, decimals));
 	}
 
 	/**
@@ -119,8 +119,8 @@ public class SSNumericField extends SSFormattedTextField {
 	 * @param _decimals - number of digits needed for fraction part of the number
 	 */
 	public void setDecimals(final int _decimals) {
-		this.decimals = _decimals;
-		this.setFormatterFactory(new SSNumericFormatterFactory(this.precision, _decimals));
+		decimals = _decimals;
+		setFormatterFactory(new SSNumericFormatterFactory(precision, _decimals));
 	}
 
 }

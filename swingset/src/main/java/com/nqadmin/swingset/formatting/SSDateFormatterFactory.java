@@ -95,22 +95,22 @@ public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFac
     public SSDateFormatterFactory(final int format) {
     	switch(format){
     	case MMDDYYYY:
-    		this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("MM/dd/yyyy")));
-            this.setNullFormatter(null);
-            this.setEditFormatter(new DateFormatter(new SimpleDateFormat("MMddyyyy")));
-            this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("MM/dd/yyyy")));
+    		setDefaultFormatter(new DateFormatter(new SimpleDateFormat("MM/dd/yyyy")));
+            setNullFormatter(null);
+            setEditFormatter(new DateFormatter(new SimpleDateFormat("MMddyyyy")));
+            setDisplayFormatter(new DateFormatter(new SimpleDateFormat("MM/dd/yyyy")));
     		break;
     	case DDMMYYYY:
-			this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy")));
-			this.setNullFormatter(null);
-			this.setEditFormatter(new DateFormatter(new SimpleDateFormat("ddMMyyyy")));
-			this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy")));
+			setDefaultFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy")));
+			setNullFormatter(null);
+			setEditFormatter(new DateFormatter(new SimpleDateFormat("ddMMyyyy")));
+			setDisplayFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy")));
     		break;
     	case YYYYMMDD:
-			this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("yyyy-MM-dd")));
-			this.setNullFormatter(null);
-			this.setEditFormatter(new DateFormatter(new SimpleDateFormat("yyyyMMdd")));
-			this.setDisplayFormatter(new DateFormatter(new SimpleDateFormat("yyyy-MM-dd")));
+			setDefaultFormatter(new DateFormatter(new SimpleDateFormat("yyyy-MM-dd")));
+			setNullFormatter(null);
+			setEditFormatter(new DateFormatter(new SimpleDateFormat("yyyyMMdd")));
+			setDisplayFormatter(new DateFormatter(new SimpleDateFormat("yyyy-MM-dd")));
     		break;
     	default:
     		logger.warn("Unknown date format type of " + format);

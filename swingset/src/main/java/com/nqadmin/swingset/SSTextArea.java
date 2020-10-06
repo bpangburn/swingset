@@ -169,7 +169,7 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	 */
 	@Override
 	public void updateSSComponent() {
-		this.setText(getBoundColumnText());
+		setText(getBoundColumnText());
 	}
 
 //    /**

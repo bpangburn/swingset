@@ -73,17 +73,17 @@ public class SSSSNFormatterFactory extends javax.swing.text.DefaultFormatterFact
 	public SSSSNFormatterFactory() {
 
 		try {
-			this.defaultFormatter = new MaskFormatter("###-##-####");
-			this.nullFormatter = null;
-			this.editFormatter = new MaskFormatter("###-##-####");
-			this.displayFormatter = new MaskFormatter("###-##-####");
+			defaultFormatter = new MaskFormatter("###-##-####");
+			nullFormatter = null;
+			editFormatter = new MaskFormatter("###-##-####");
+			displayFormatter = new MaskFormatter("###-##-####");
 
-			this.editFormatter.setPlaceholderCharacter('0');
+			editFormatter.setPlaceholderCharacter('0');
 
-			this.setDefaultFormatter(this.defaultFormatter);
-			this.setNullFormatter(this.nullFormatter);
-			this.setEditFormatter(this.editFormatter);
-			this.setDisplayFormatter(this.displayFormatter);
+			setDefaultFormatter(defaultFormatter);
+			setNullFormatter(nullFormatter);
+			setEditFormatter(editFormatter);
+			setDisplayFormatter(displayFormatter);
 		} catch (final java.text.ParseException pe) {
 			logger.warn("Parse Exception.", pe);
 			// do nothing

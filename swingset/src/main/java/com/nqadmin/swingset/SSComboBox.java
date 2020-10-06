@@ -439,7 +439,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * @return returns the predefined option code
 	 */
 	public int getPredefinedOptions() {
-		return this.predefinedOptions;
+		return predefinedOptions;
 	}
 
 //	/**
@@ -635,7 +635,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 
 		if (getSelectedIndex() == -1) {
 			result = NON_SELECTED;
-		} else if (this.mappings != null) {
+		} else if (mappings != null) {
 			// result = this.mappings[getSelectedIndex()];
 			result = (int) mappings.get(getSelectedIndex());
 		} else {
@@ -847,7 +847,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 *         successfully
 	 */
 	public boolean setPredefinedOptions(final int _predefinedOptions) {
-		final int oldValue = this.predefinedOptions;
+		final int oldValue = predefinedOptions;
 
 		if (_predefinedOptions == YES_NO_OPTION) {
 			setOptions(new String[] { "No", "Yes" });
@@ -859,8 +859,8 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 			return false;
 		}
 
-		this.predefinedOptions = _predefinedOptions;
-		firePropertyChange("predefinedOptions", oldValue, this.predefinedOptions);
+		predefinedOptions = _predefinedOptions;
+		firePropertyChange("predefinedOptions", oldValue, predefinedOptions);
 
 		return true;
 	}
@@ -883,7 +883,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 		// TODO consider firing a property change
 		if (_value != getSelectedValue()) {
 
-			if ((this.mappings == null) && ((_value < 0) || (_value >= getItemCount()))) {
+			if ((mappings == null) && ((_value < 0) || (_value >= getItemCount()))) {
 				// IF EXPLICIT VALUES FOR THE ITEMS IN COMBO ARE NOT SPECIFIED THEN CODES START
 				// FROM ZERO. IN SUCH A CASE CHECK IF THE NUMBER EXCEEDS THE NUMBER OF ITEMS
 				// IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)
@@ -893,7 +893,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 			} else {
 				// IF MAPPINGS ARE SPECIFIED THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
 				// SPECIFIED CODE IS STORED
-				if (this.mappings != null) {
+				if (mappings != null) {
 					final int index = mappings.indexOf(_value);
 
 					if (index == -1) {

@@ -475,7 +475,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	 */
 	@Override
 	public void updateSSComponent() {
-		this.setText(getBoundColumnText());
+		setText(getBoundColumnText());
 	}
 
 } // end public class SSLabel extends JLabel {
