@@ -79,46 +79,46 @@ import com.nqadmin.swingset.utils.SSSyncManager;
 public class Example4 extends JFrame {
 
 	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger(Example4.class);
+
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -6594890166578252237L;
-
+	SSComboBox cmbPartColor = new SSComboBox();
+	SSDBComboBox cmbSelectPart = null;
+	JLabel lblPartCity = new JLabel("City");
+	JLabel lblPartColor = new JLabel("Color");
 	/**
 	 * screen label declarations
 	 */
 	JLabel lblPartID = new JLabel("Part ID");
+
 	JLabel lblPartName = new JLabel("Part Name");
-	JLabel lblSelectPart = new JLabel("Parts");
-	JLabel lblPartColor = new JLabel("Color");
 	JLabel lblPartWeight = new JLabel("Weight");
-	JLabel lblPartCity = new JLabel("City");
-
-	/**
-	 * bound component declarations
-	 */
-	SSTextField txtPartID = new SSTextField();
-	SSTextField txtPartName = new SSTextField();
-	SSDBComboBox cmbSelectPart = null;
-	SSComboBox cmbPartColor = new SSComboBox();
-	SSTextField txtPartWeight = new SSTextField();
-	SSTextField txtPartCity = new SSTextField();
-
+	JLabel lblSelectPart = new JLabel("Parts");
+	SSDataNavigator navigator = null;
+	SSJdbcRowSetImpl rowset = null;
 	/**
 	 * database component declarations
 	 */
 	SSConnection ssConnection = null;
-	SSJdbcRowSetImpl rowset = null;
-	SSDataNavigator navigator = null;
 
 	/**
 	 * sync manger
 	 */
 	SSSyncManager syncManager;
-
+	SSTextField txtPartCity = new SSTextField();
 	/**
-	 * Log4j2 Logger
+	 * bound component declarations
 	 */
-    private static final Logger logger = LogManager.getLogger(Example4.class);
+	SSTextField txtPartID = new SSTextField();
+
+	SSTextField txtPartName = new SSTextField();
+
+	SSTextField txtPartWeight = new SSTextField();
 
 	/**
 	 * Constructor for Example4
@@ -158,6 +158,44 @@ public class Example4 extends JFrame {
 				private static final long serialVersionUID = 9018468389405536891L;
 
 				/**
+				 * Re-enable DB Navigator following insertion Cancel
+				 */
+				@Override
+				public void performCancelOps() {
+					super.performCancelOps();
+					cmbSelectPart.setEnabled(true);
+				}
+
+				/**
+				 * Requery the rowset following a deletion. This is needed for H2.
+				 */
+				@Override
+				public void performPostDeletionOps() {
+					super.performPostDeletionOps();
+					try {
+						rowset.execute();
+					} catch (final SQLException se) {
+						logger.error("SQL Exception.", se);
+					}
+					performRefreshOps();
+				}
+
+				/**
+				 * Requery the rowset following an insertion. This is needed for H2.
+				 */
+				@Override
+				public void performPostInsertOps() {
+					super.performPostInsertOps();
+					cmbSelectPart.setEnabled(true);
+					try {
+						rowset.execute();
+					} catch (final SQLException se) {
+						logger.error("SQL Exception.", se);
+					}
+					performRefreshOps();
+				}
+
+				/**
 				 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
 				 */
 				@Override
@@ -193,35 +231,6 @@ public class Example4 extends JFrame {
 				}
 
 				/**
-				 * Requery the rowset following an insertion. This is needed for H2.
-				 */
-				@Override
-				public void performPostInsertOps() {
-					super.performPostInsertOps();
-					cmbSelectPart.setEnabled(true);
-					try {
-						rowset.execute();
-					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
-					}
-					performRefreshOps();
-				}
-
-				/**
-				 * Requery the rowset following a deletion. This is needed for H2.
-				 */
-				@Override
-				public void performPostDeletionOps() {
-					super.performPostDeletionOps();
-					try {
-						rowset.execute();
-					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
-					}
-					performRefreshOps();
-				}
-
-				/**
 				 * Manage sync manager during a Refresh
 				 */
 				@Override
@@ -236,15 +245,6 @@ public class Example4 extends JFrame {
 						logger.error("Exception.", e);
 					}
 					syncManager.sync();
-				}
-
-				/**
-				 * Re-enable DB Navigator following insertion Cancel
-				 */
-				@Override
-				public void performCancelOps() {
-					super.performCancelOps();
-					cmbSelectPart.setEnabled(true);
 				}
 
 			});

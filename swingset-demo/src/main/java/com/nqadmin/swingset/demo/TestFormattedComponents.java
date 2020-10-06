@@ -84,33 +84,14 @@ public class TestFormattedComponents extends JFrame {
 
 
 	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger(TestFormattedComponents.class);
+
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -1831202547517957436L;
-
-	/**
-	 * screen label declarations
-	 */
-	JLabel lblSwingSetFormattedTestPK = new JLabel("Record ID");
-
-	JLabel lblSSDBComboNav = new JLabel("SSDBComboNav"); // SSDBComboBox used just for navigation
-
-	JLabel lblSSCuitField = new JLabel("SSCuitField");
-	JLabel lblSSCurrencyField = new JLabel("SSCurrencyField");
-	JLabel lblSSDateField = new JLabel("SSDateField");
-	JLabel lblSSFormattedTextField = new JLabel("SSFormattedTextField");
-	JLabel lblSSIntegerField = new JLabel("SSIntegerField");
-	JLabel lblSSNumericField = new JLabel("SSNumericField");
-	JLabel lblSSPercentField = new JLabel("SSPercentField");
-	JLabel lblSSSSNField = new JLabel("SSSSNField");
-	JLabel lblSSTimeField = new JLabel("SSTimeField");
-	JLabel lblSSTimestampField = new JLabel("SSTimestampField");
-
-
-	/**
-	 * bound component declarations
-	 */
-	SSTextField txtSwingSetFormattedTestPK = new SSTextField();
 
 	SSDBComboBox cmbSSDBComboNav = new SSDBComboBox(); // SSDBComboBox used just for navigation
 
@@ -125,12 +106,31 @@ public class TestFormattedComponents extends JFrame {
 	SSTimeField fmtSSTimeField = new SSTimeField();
 	SSTimestampField fmtSSTimestampField = new SSTimestampField();
 
+
+	JLabel lblSSCuitField = new JLabel("SSCuitField");
+
+	JLabel lblSSCurrencyField = new JLabel("SSCurrencyField");
+
+	JLabel lblSSDateField = new JLabel("SSDateField");
+	JLabel lblSSDBComboNav = new JLabel("SSDBComboNav"); // SSDBComboBox used just for navigation
+	JLabel lblSSFormattedTextField = new JLabel("SSFormattedTextField");
+	JLabel lblSSIntegerField = new JLabel("SSIntegerField");
+	JLabel lblSSNumericField = new JLabel("SSNumericField");
+	JLabel lblSSPercentField = new JLabel("SSPercentField");
+	JLabel lblSSSSNField = new JLabel("SSSSNField");
+	JLabel lblSSTimeField = new JLabel("SSTimeField");
+	JLabel lblSSTimestampField = new JLabel("SSTimestampField");
+	/**
+	 * screen label declarations
+	 */
+	JLabel lblSwingSetFormattedTestPK = new JLabel("Record ID");
+
+	SSDataNavigator navigator = null;
+	SSJdbcRowSetImpl rowset = null;
 	/**
 	 * database component declarations
 	 */
 	SSConnection ssConnection = null;
-	SSJdbcRowSetImpl rowset = null;
-	SSDataNavigator navigator = null;
 
 	/**
 	 * sync manger
@@ -138,46 +138,9 @@ public class TestFormattedComponents extends JFrame {
 	SSSyncManager syncManager;
 
 	/**
-	 * Log4j2 Logger
+	 * bound component declarations
 	 */
-    private static final Logger logger = LogManager.getLogger(TestFormattedComponents.class);
-
-	/**
-	 * Method to set default values following an insert
-	 */
-	public void setDefaultValues() {
-
-		try {
-
-		// GET THE NEW RECORD ID.
-			final ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-					.executeQuery("SELECT nextval('swingset_formatted_test_seq') as nextVal;");
-			rs.next();
-			final int recordPK = rs.getInt("nextVal");
-			txtSwingSetFormattedTestPK.setText(String.valueOf(recordPK));
-			rs.close();
-
-		// SET OTHER DEFAULTS
-			fmtSSCuitField.setText(null);
-			fmtSSCurrencyField.setText(null);
-			fmtSSDateField.setText(null);
-			fmtSSFormattedTextField.setText(null);
-			fmtSSIntegerField.setText(null);
-			fmtSSNumericField.setText(null);
-			fmtSSPercentField.setText(null);
-			fmtSSSSNField.setText(null);
-			fmtSSTimeField.setText(null);
-			fmtSSTimestampField.setText(null);
-
-		} catch(final SQLException se) {
-			logger.error("SQL Exception occured during setting default values.",se);
-		} catch(final Exception e) {
-			logger.error("Exception occured during setting default values.",e);
-		}
-
-
-	}
-
+	SSTextField txtSwingSetFormattedTestPK = new SSTextField();
 
 	/**
 	 * Constructor for Formatted Component Test
@@ -219,14 +182,26 @@ public class TestFormattedComponents extends JFrame {
 				private static final long serialVersionUID = 4264119495814589191L;
 
 				/**
-				 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
+				 * Re-enable DB Navigator following insertion Cancel
 				 */
 				@Override
-				public void performPreInsertOps() {
+				public void performCancelOps() {
+					super.performCancelOps();
+					cmbSSDBComboNav.setEnabled(true);
+				}
 
-					super.performPreInsertOps();
-
-					setDefaultValues();
+				/**
+				 * Requery the rowset following a deletion. This is needed for H2.
+				 */
+				@Override
+				public void performPostDeletionOps() {
+					super.performPostDeletionOps();
+					try {
+						rowset.execute();
+					} catch (final SQLException se) {
+						logger.error("SQL Exception.", se);
+					}
+					performRefreshOps();
 				}
 
 				/**
@@ -245,17 +220,14 @@ public class TestFormattedComponents extends JFrame {
 				}
 
 				/**
-				 * Requery the rowset following a deletion. This is needed for H2.
+				 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
 				 */
 				@Override
-				public void performPostDeletionOps() {
-					super.performPostDeletionOps();
-					try {
-						rowset.execute();
-					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
-					}
-					performRefreshOps();
+				public void performPreInsertOps() {
+
+					super.performPreInsertOps();
+
+					setDefaultValues();
 				}
 
 				/**
@@ -273,15 +245,6 @@ public class TestFormattedComponents extends JFrame {
 						logger.error("Exception.", e);
 					}
 					syncManager.sync();
-				}
-
-				/**
-				 * Re-enable DB Navigator following insertion Cancel
-				 */
-				@Override
-				public void performCancelOps() {
-					super.performCancelOps();
-					cmbSSDBComboNav.setEnabled(true);
 				}
 
 			});
@@ -424,6 +387,43 @@ public class TestFormattedComponents extends JFrame {
 
 		// MAKE THE JFRAME VISIBLE
 			setVisible(true);
+
+	}
+
+
+	/**
+	 * Method to set default values following an insert
+	 */
+	public void setDefaultValues() {
+
+		try {
+
+		// GET THE NEW RECORD ID.
+			final ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+					.executeQuery("SELECT nextval('swingset_formatted_test_seq') as nextVal;");
+			rs.next();
+			final int recordPK = rs.getInt("nextVal");
+			txtSwingSetFormattedTestPK.setText(String.valueOf(recordPK));
+			rs.close();
+
+		// SET OTHER DEFAULTS
+			fmtSSCuitField.setText(null);
+			fmtSSCurrencyField.setText(null);
+			fmtSSDateField.setText(null);
+			fmtSSFormattedTextField.setText(null);
+			fmtSSIntegerField.setText(null);
+			fmtSSNumericField.setText(null);
+			fmtSSPercentField.setText(null);
+			fmtSSSSNField.setText(null);
+			fmtSSTimeField.setText(null);
+			fmtSSTimestampField.setText(null);
+
+		} catch(final SQLException se) {
+			logger.error("SQL Exception occured during setting default values.",se);
+		} catch(final Exception e) {
+			logger.error("Exception occured during setting default values.",e);
+		}
+
 
 	}
 

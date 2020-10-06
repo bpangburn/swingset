@@ -68,37 +68,37 @@ import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 public class Example1 extends JFrame {
 
 	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger(Example1.class);
+
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 1613223721461838426L;
-
+	JLabel lblSupplierCity = new JLabel("City");
 	/**
 	 * screen label declarations
 	 */
 	JLabel lblSupplierID = new JLabel("Supplier ID");
 	JLabel lblSupplierName = new JLabel("Name");
-	JLabel lblSupplierCity = new JLabel("City");
-	JLabel lblSupplierStatus = new JLabel("Status");
 
+	JLabel lblSupplierStatus = new JLabel("Status");
+	SSDataNavigator navigator = null;
+	SSJdbcRowSetImpl rowset = null;
+	/**
+	 * database component declarations
+	 */
+	SSConnection ssConnection = null;
+
+	SSTextField txtSupplierCity = new SSTextField();
 	/**
 	 * bound component declarations
 	 */
 	SSTextField txtSupplierID = new SSTextField();
 	SSTextField txtSupplierName = new SSTextField();
-	SSTextField txtSupplierCity = new SSTextField();
+
 	SSTextField txtSupplierStatus = new SSTextField();
-
-	/**
-	 * database component declarations
-	 */
-	SSConnection ssConnection = null;
-	SSJdbcRowSetImpl rowset = null;
-	SSDataNavigator navigator = null;
-
-	/**
-	 * Log4j2 Logger
-	 */
-    private static final Logger logger = LogManager.getLogger(Example1.class);
 
 	/**
 	 * Constructor for Example1
@@ -138,6 +138,32 @@ public class Example1 extends JFrame {
 			private static final long serialVersionUID = -7698780157683623074L;
 
 			/**
+			 * Requery the rowset following a deletion. This is needed for H2.
+			 */
+			@Override
+			public void performPostDeletionOps() {
+				super.performPostDeletionOps();
+				try {
+					rowset.execute();
+				} catch (final SQLException se) {
+					logger.error("SQL Exception.", se);
+				}
+			}
+
+			/**
+			 * Requery the rowset following an insertion. This is needed for H2.
+			 */
+			@Override
+			public void performPostInsertOps() {
+				super.performPostInsertOps();
+				try {
+					rowset.execute();
+				} catch (final SQLException se) {
+					logger.error("SQL Exception.", se);
+				}
+			}
+
+			/**
 			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
 			 */
 			@Override
@@ -166,32 +192,6 @@ public class Example1 extends JFrame {
 					logger.error("Exception occured initializing new record.", e);
 				}
 
-			}
-
-			/**
-			 * Requery the rowset following an insertion. This is needed for H2.
-			 */
-			@Override
-			public void performPostInsertOps() {
-				super.performPostInsertOps();
-				try {
-					rowset.execute();
-				} catch (final SQLException se) {
-					logger.error("SQL Exception.", se);
-				}
-			}
-
-			/**
-			 * Requery the rowset following a deletion. This is needed for H2.
-			 */
-			@Override
-			public void performPostDeletionOps() {
-				super.performPostDeletionOps();
-				try {
-					rowset.execute();
-				} catch (final SQLException se) {
-					logger.error("SQL Exception.", se);
-				}
 			}
 
 		});

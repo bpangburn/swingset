@@ -69,37 +69,37 @@ import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 public class Example3 extends JFrame {
 
 	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger(Example3.class);
+
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 4859550616628544511L;
+	SSDBComboBox cmbPartName = null;
+	SSDBComboBox cmbSupplierName = null;
+	JLabel lblPartName = new JLabel("Part");
 
+	JLabel lblQuantity = new JLabel("Quantity");
+	JLabel lblSupplierName = new JLabel("Supplier");
 	/**
 	 * screen label declarations
 	 */
 	JLabel lblSupplierPartID = new JLabel("Supplier-Part ID");
-	JLabel lblSupplierName = new JLabel("Supplier");
-	JLabel lblPartName = new JLabel("Part");
-	JLabel lblQuantity = new JLabel("Quantity");
+	SSDataNavigator navigator = null;
+
+	SSJdbcRowSetImpl rowset = null;
+	/**
+	 * database component declarations
+	 */
+	SSConnection ssConnection = null;
+	SSTextField txtQuantity = new SSTextField();
 
 	/**
 	 * bound component declarations
 	 */
 	SSTextField txtSupplierPartID = new SSTextField();
-	SSDBComboBox cmbSupplierName = null;
-	SSDBComboBox cmbPartName = null;
-	SSTextField txtQuantity = new SSTextField();
-
-	/**
-	 * database component declarations
-	 */
-	SSConnection ssConnection = null;
-	SSJdbcRowSetImpl rowset = null;
-	SSDataNavigator navigator = null;
-
-	/**
-	 * Log4j2 Logger
-	 */
-    private static final Logger logger = LogManager.getLogger(Example3.class);
 
 	/**
 	 * Constructor for Example3
@@ -138,6 +138,32 @@ public class Example3 extends JFrame {
 			private static final long serialVersionUID = 4343059684161003109L;
 
 			/**
+			 * Requery the rowset following a deletion. This is needed for H2.
+			 */
+			@Override
+			public void performPostDeletionOps() {
+				super.performPostDeletionOps();
+				try {
+					rowset.execute();
+				} catch (final SQLException se) {
+					logger.error("SQL Exception.", se);
+				}
+			}
+
+			/**
+			 * Requery the rowset following an insertion. This is needed for H2.
+			 */
+			@Override
+			public void performPostInsertOps() {
+				super.performPostInsertOps();
+				try {
+					rowset.execute();
+				} catch (final SQLException se) {
+					logger.error("SQL Exception.", se);
+				}
+			}
+
+			/**
 			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
 			 */
 			@Override
@@ -167,32 +193,6 @@ public class Example3 extends JFrame {
 					logger.error("Exception occured initializing new record.",e);
 				}
 
-			}
-
-			/**
-			 * Requery the rowset following an insertion. This is needed for H2.
-			 */
-			@Override
-			public void performPostInsertOps() {
-				super.performPostInsertOps();
-				try {
-					rowset.execute();
-				} catch (final SQLException se) {
-					logger.error("SQL Exception.", se);
-				}
-			}
-
-			/**
-			 * Requery the rowset following a deletion. This is needed for H2.
-			 */
-			@Override
-			public void performPostDeletionOps() {
-				super.performPostDeletionOps();
-				try {
-					rowset.execute();
-				} catch (final SQLException se) {
-					logger.error("SQL Exception.", se);
-				}
 			}
 
 		});

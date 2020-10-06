@@ -62,81 +62,120 @@ import org.h2.tools.RunScript;
 public class MainClass extends JFrame {
 
 	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -6316984401822746124L;
+     * ActionListener implementation to call code for each button.
+     */
+    private class MyButtonListener implements ActionListener{
+
+		public MyButtonListener() {
+			super();
+		}
+
+		@Override
+		public void actionPerformed( final ActionEvent ae){
+            if(ae.getSource().equals(btnExample1)){
+                new Example1(dbConnection);
+            }
+            else if(ae.getSource().equals(btnExample2)){
+            	new Example2(dbConnection);
+            }
+            else if(ae.getSource().equals(btnExample3)){
+            	new Example3(dbConnection);
+            }
+            else if(ae.getSource().equals(btnExample4)){
+            	new Example4(dbConnection);
+            }
+            else if(ae.getSource().equals(btnExample5)){
+            	new Example5(dbConnection);
+            }
+            else if(ae.getSource().equals(btnExample6)){
+            	new Example6(dbConnection);
+            }
+            else if(ae.getSource().equals(btnExample7)){
+            	new Example7(dbConnection);
+            }
+            else if(ae.getSource().equals(btnTestBase)){
+            	new TestBaseComponents(dbConnection);
+            }
+            else if(ae.getSource().equals(btnTestGrid)){
+            	// TODO
+            	//new TestGridComponents(dbConnection);
+            }
+            else if(ae.getSource().equals(btnTestFormatted)){
+            	new TestFormattedComponents(dbConnection);
+            }
+        }
+    }
+
 
 	/**
-	 * database scripts
+	 * component dimensions
 	 */
-	private static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
-	private static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
-	private static final String DATABASE_SCRIPT_TEST_IMAGES = "swingset_tests_load_blobs.sql";
-
-	/**
-	 * database connection
-	 */
-	private static final boolean USE_IN_MEMORY_DATABASE = true;
-	private static final boolean RUN_SQL_SCRIPTS = true;
-	private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
-	private static final String DATABASE_NAME = "suppliers_and_parts";
-	private Connection dbConnection = null;
-
-	/**
-	 * shared component dimensions
-	 */
-	private static final int buttonWidth = 150;
 	private static final int buttonHeight = 25;
+	private static final int buttonWidth = 150;
 	public static final Dimension buttonDim = new Dimension(buttonWidth, buttonHeight);
-
-	private static final int labelWidth = 200;
+	
+	public static final int gridColumnWidth = 60;
+	
 	private static final int labelHeight = 20;
 	private static final int labelHeightTall = 100; // used for lists, textareas
 	private static final int labelHeightVeryTall = 100;  // used for images
+	private static final int labelWidth = 200;
+	
 	public static final Dimension labelDim = new Dimension(labelWidth, labelHeight);
 	public static final Dimension labelDimTall = new Dimension(labelWidth, labelHeightTall); // used for lists, textareas
 	public static final Dimension labelDimVeryTall = new Dimension(labelWidth, labelHeightVeryTall); // used for images
-
-
-	private static final int ssWidth = 200;
+	
 	private static final int ssHeight = 20;
 	private static final int ssHeightTall = 100; // used for lists, textareas
 	private static final int ssHeightVeryTall = 200; // used for images
-
+	private static final int ssWidth = 200;
+	
 	public static final Dimension ssDim = new Dimension(ssWidth, ssHeight);
 	public static final Dimension ssDimTall = new Dimension(ssWidth, ssHeightTall); // used for lists, textareas
 	public static final Dimension ssDimVeryTall = new Dimension(ssWidth, ssHeightVeryTall); // used for images
 
-
-	public static final int childScreenWidth = 600;
 	public static final int childScreenHeight = 400;
 	public static final int childScreenHeightTall = 800;
-
-	public static final int gridColumnWidth = 60;
+	public static final int childScreenWidth = 600;
 
 	/**
+	 * database
+	 */
+	private static final String DATABASE_NAME = "suppliers_and_parts";
+	private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
+
+	private static final boolean USE_IN_MEMORY_DATABASE = true;
+	 
+	private static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
+	private static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
+	private static final String DATABASE_SCRIPT_TEST_IMAGES = "swingset_tests_load_blobs.sql";
+	
+    private Connection dbConnection = null;
+    
+    /**
 	 * buttons to launch code examples
 	 */
-	JButton btnExample1 = new JButton("Example1");
-    JButton btnExample2 = new JButton("Example2");
-    JButton btnExample3 = new JButton("Example3");
-    JButton btnExample4 = new JButton("Example4");
-    JButton btnExample5 = new JButton("Example5");
-    JButton btnExample6 = new JButton("Example6");
-    JButton btnExample7 = new JButton("Example7");
-    JButton btnTestBase = new JButton("Test Base Components");
-    JButton btnTestGrid = new JButton("Test Grid Components");
-    JButton btnTestFormatted = new JButton("Test Formatted Components");
-
-    /**
-     * path to database SQL file
-     */
-    String url;
+	private JButton btnExample1 = new JButton("Example1");
+	private JButton btnExample2 = new JButton("Example2");
+	private JButton btnExample3 = new JButton("Example3");
+	private JButton btnExample4 = new JButton("Example4");
+	private JButton btnExample5 = new JButton("Example5");
+	private JButton btnExample6 = new JButton("Example6");
+	private JButton btnExample7 = new JButton("Example7");
+	private JButton btnTestBase = new JButton("Test Base Components");
+	private JButton btnTestFormatted = new JButton("Test Formatted Components");
+	private JButton btnTestGrid = new JButton("Test Grid Components");
 
 	/**
 	 * Log4j2 Logger
 	 */
     private static final Logger logger = LogManager.getLogger(MainClass.class);
+	private static final boolean RUN_SQL_SCRIPTS = true;
+	
+	/**
+	 * unique serial id
+	 */
+	private static final long serialVersionUID = -6316984401822746124L;
 
     /**
      * Constructor for MainClass
@@ -270,53 +309,7 @@ public class MainClass extends JFrame {
 
 		return result;
     }
-
-    /**
-     * ActionListener implementation to call code for each button.
-     */
-    private class MyButtonListener implements ActionListener{
-
-		public MyButtonListener() {
-			super();
-		}
-
-		@Override
-		public void actionPerformed( final ActionEvent ae){
-            if(ae.getSource().equals(btnExample1)){
-                new Example1(dbConnection);
-            }
-            else if(ae.getSource().equals(btnExample2)){
-            	new Example2(dbConnection);
-            }
-            else if(ae.getSource().equals(btnExample3)){
-            	new Example3(dbConnection);
-            }
-            else if(ae.getSource().equals(btnExample4)){
-            	new Example4(dbConnection);
-            }
-            else if(ae.getSource().equals(btnExample5)){
-            	new Example5(dbConnection);
-            }
-            else if(ae.getSource().equals(btnExample6)){
-            	new Example6(dbConnection);
-            }
-            else if(ae.getSource().equals(btnExample7)){
-            	new Example7(dbConnection);
-            }
-            else if(ae.getSource().equals(btnTestBase)){
-            	new TestBaseComponents(dbConnection);
-            }
-            else if(ae.getSource().equals(btnTestGrid)){
-            	// TODO
-            	//new TestGridComponents(dbConnection);
-            }
-            else if(ae.getSource().equals(btnTestFormatted)){
-            	// TODO
-            	new TestFormattedComponents(dbConnection);
-            }
-        }
-    }
-
+    
     /**
      * Main method for SwingSet samples/demo
      * <p>

@@ -82,107 +82,70 @@ import com.nqadmin.swingset.utils.SSSyncManager;
 
 public class TestBaseComponents extends JFrame {
 
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 7155378273131680653L;
-
-	/**
-	 * screen label declarations
-	 */
-	JLabel lblSwingSetBaseTestPK = new JLabel("Record ID");
-
-	JLabel lblSSDBComboNav = new JLabel("SSDBComboNav"); // SSDBComboBox used just for navigation
-
-	JLabel lblSSCheckBox = new JLabel("SSCheckBox");
-	JLabel lblSSComboBox = new JLabel("SSComboBox");
-	JLabel lblSSDBComboBox = new JLabel("SSDBComboBox");
-	JLabel lblSSImage = new JLabel("SSImage");
-	JLabel lblSSLabel = new JLabel("SSLabel");
-	JLabel lblSSList = new JLabel("SSList");
-	JLabel lblSSSlider = new JLabel("SSSlider");
-	JLabel lblSSTextArea = new JLabel("SSTextArea");
-	JLabel lblSSTextField = new JLabel("SSTextField");
-
-
-	/**
-	 * bound component declarations
-	 */
-	SSTextField txtSwingSetBaseTestPK = new SSTextField();
-
-	SSDBComboBox cmbSSDBComboNav = new SSDBComboBox(); // SSDBComboBox used just for navigation
-
-	SSCheckBox chkSSCheckBox = new SSCheckBox();
-	SSComboBox cmbSSComboBox = new SSComboBox();
-	SSDBComboBox cmbSSDBComboBox = new SSDBComboBox();
-	SSImage imgSSImage = new SSImage();
-	SSLabel lblSSLabel2 = new SSLabel();
-	SSList lstSSList = new SSList();
-	SSSlider sliSSSlider = new SSSlider();
-	SSTextArea txtSSTextArea = new SSTextArea();
-	SSTextField txtSSTextField = new SSTextField();
-
-	/**
-	 * database component declarations
-	 */
-	SSConnection ssConnection = null;
-	SSJdbcRowSetImpl rowset = null;
-	SSDataNavigator navigator = null;
-
-	/**
-	 * sync manger
-	 */
-	SSSyncManager syncManager;
+	private static final int[] comboCodes = {0,1,2,3};
 
 	/**
 	 * combo and list items
 	 */
 	private static final String[] comboItems = {"Combo Item 0","Combo Item 1", "Combo Item 2", "Combo Item 3"};
-	private static final int[] comboCodes = {0,1,2,3};
-	private static final String[] listItems = {"List Item 1","List Item 2", "List Item 3", "List Item 4", "List Item 5", "List Item 6", "List Item 7"};
+
 	private static final Object[] listCodes = {1,2,3,4,5,6,7};
 
+	private static final String[] listItems = {"List Item 1","List Item 2", "List Item 3", "List Item 4", "List Item 5", "List Item 6", "List Item 7"};
 	/**
 	 * Log4j2 Logger
 	 */
     private static final Logger logger = LogManager.getLogger(TestBaseComponents.class);
+	/**
+	 * unique serial id
+	 */
+	private static final long serialVersionUID = 7155378273131680653L;
+	SSCheckBox chkSSCheckBox = new SSCheckBox();
+	SSComboBox cmbSSComboBox = new SSComboBox();
+	SSDBComboBox cmbSSDBComboBox = new SSDBComboBox();
+	SSDBComboBox cmbSSDBComboNav = new SSDBComboBox(); // SSDBComboBox used just for navigation
+	SSImage imgSSImage = new SSImage();
+	JLabel lblSSCheckBox = new JLabel("SSCheckBox");
 
+
+	JLabel lblSSComboBox = new JLabel("SSComboBox");
+
+	JLabel lblSSDBComboBox = new JLabel("SSDBComboBox");
+
+	JLabel lblSSDBComboNav = new JLabel("SSDBComboNav"); // SSDBComboBox used just for navigation
+	JLabel lblSSImage = new JLabel("SSImage");
+	JLabel lblSSLabel = new JLabel("SSLabel");
+	SSLabel lblSSLabel2 = new SSLabel();
+	JLabel lblSSList = new JLabel("SSList");
+	JLabel lblSSSlider = new JLabel("SSSlider");
+	JLabel lblSSTextArea = new JLabel("SSTextArea");
+	JLabel lblSSTextField = new JLabel("SSTextField");
+	/**
+	 * screen label declarations
+	 */
+	JLabel lblSwingSetBaseTestPK = new JLabel("Record ID");
+
+	SSList lstSSList = new SSList();
+	SSDataNavigator navigator = null;
+	SSJdbcRowSetImpl rowset = null;
+
+	SSSlider sliSSSlider = new SSSlider();
 
 	/**
-	 * Method to set default values following an insert
+	 * database component declarations
 	 */
-	public void setDefaultValues() {
+	SSConnection ssConnection = null;
+	/**
+	 * sync manger
+	 */
+	SSSyncManager syncManager;
+	SSTextArea txtSSTextArea = new SSTextArea();
+	SSTextField txtSSTextField = new SSTextField();
 
-		try {
-
-		// GET THE NEW RECORD ID.
-			final ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-					.executeQuery("SELECT nextval('swingset_base_test_seq') as nextVal;");
-			rs.next();
-			final int recordPK = rs.getInt("nextVal");
-			txtSwingSetBaseTestPK.setText(String.valueOf(recordPK));
-			rs.close();
-
-		// SET OTHER DEFAULTS
-			chkSSCheckBox.setSelected(false);
-			cmbSSComboBox.setSelectedIndex(-1);
-			cmbSSDBComboBox.setSelectedIndex(-1);
-			imgSSImage.clearImage();
-			lblSSLabel2.setText(null);
-			lstSSList.clearSelection();
-// TODO determine range for slider, 0 was not accepted
-			sliSSSlider.setValue(1);
-			txtSSTextArea.setText(null);
-			txtSSTextField.setText(null);
-
-		} catch(final SQLException se) {
-			logger.error("SQL Exception occured during setting default values.",se);
-		} catch(final Exception e) {
-			logger.error("Exception occured during setting default values.",e);
-		}
-
-
-	}
+	/**
+	 * bound component declarations
+	 */
+	SSTextField txtSwingSetBaseTestPK = new SSTextField();
 
 
 	/**
@@ -225,15 +188,26 @@ public class TestBaseComponents extends JFrame {
 				private static final long serialVersionUID = 4264119495814589191L;
 
 				/**
-				 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
+				 * Re-enable DB Navigator following insertion Cancel
 				 */
 				@Override
-				public void performPreInsertOps() {
+				public void performCancelOps() {
+					super.performCancelOps();
+					cmbSSDBComboNav.setEnabled(true);
+				}
 
-					super.performPreInsertOps();
-
-					setDefaultValues();
-
+				/**
+				 * Requery the rowset following a deletion. This is needed for H2.
+				 */
+				@Override
+				public void performPostDeletionOps() {
+					super.performPostDeletionOps();
+					try {
+						rowset.execute();
+					} catch (final SQLException se) {
+						logger.error("SQL Exception.", se);
+					}
+					performRefreshOps();
 				}
 
 				/**
@@ -252,17 +226,15 @@ public class TestBaseComponents extends JFrame {
 				}
 
 				/**
-				 * Requery the rowset following a deletion. This is needed for H2.
+				 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
 				 */
 				@Override
-				public void performPostDeletionOps() {
-					super.performPostDeletionOps();
-					try {
-						rowset.execute();
-					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
-					}
-					performRefreshOps();
+				public void performPreInsertOps() {
+
+					super.performPreInsertOps();
+
+					setDefaultValues();
+
 				}
 
 				/**
@@ -280,15 +252,6 @@ public class TestBaseComponents extends JFrame {
 						logger.error("Exception.", e);
 					}
 					syncManager.sync();
-				}
-
-				/**
-				 * Re-enable DB Navigator following insertion Cancel
-				 */
-				@Override
-				public void performCancelOps() {
-					super.performCancelOps();
-					cmbSSDBComboNav.setEnabled(true);
 				}
 
 			});
@@ -455,6 +418,43 @@ public class TestBaseComponents extends JFrame {
 		// MAKE THE JFRAME VISIBLE
 			setVisible(true);
 			lstScrollPane.setPreferredSize(MainClass.ssDimTall);
+
+	}
+
+
+	/**
+	 * Method to set default values following an insert
+	 */
+	public void setDefaultValues() {
+
+		try {
+
+		// GET THE NEW RECORD ID.
+			final ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+					.executeQuery("SELECT nextval('swingset_base_test_seq') as nextVal;");
+			rs.next();
+			final int recordPK = rs.getInt("nextVal");
+			txtSwingSetBaseTestPK.setText(String.valueOf(recordPK));
+			rs.close();
+
+		// SET OTHER DEFAULTS
+			chkSSCheckBox.setSelected(false);
+			cmbSSComboBox.setSelectedIndex(-1);
+			cmbSSDBComboBox.setSelectedIndex(-1);
+			imgSSImage.clearImage();
+			lblSSLabel2.setText(null);
+			lstSSList.clearSelection();
+// TODO determine range for slider, 0 was not accepted
+			sliSSSlider.setValue(1);
+			txtSSTextArea.setText(null);
+			txtSSTextField.setText(null);
+
+		} catch(final SQLException se) {
+			logger.error("SQL Exception occured during setting default values.",se);
+		} catch(final Exception e) {
+			logger.error("Exception occured during setting default values.",e);
+		}
+
 
 	}
 

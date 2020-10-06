@@ -60,22 +60,22 @@ import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 public class Example5 extends JFrame {
 
 	/**
+	 * Log4j2 Logger
+	 */
+    private static final Logger logger = LogManager.getLogger(Example5.class);
+
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -5126011569315467420L;
-
+	SSDataGrid dataGrid = null;
+	SSJdbcRowSetImpl rowset = null;
 	/**
 	 * declarations
 	 */
 	SSConnection ssConnection = null;
-	SSJdbcRowSetImpl rowset = null;
-	SSDataGrid dataGrid = null;
-	String url;
 
-	/**
-	 * Log4j2 Logger
-	 */
-    private static final Logger logger = LogManager.getLogger(Example5.class);
+	String url;
 
 	/**
 	 * Constructor for Example5
