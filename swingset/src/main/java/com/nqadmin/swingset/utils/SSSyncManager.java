@@ -37,19 +37,19 @@
 
 package com.nqadmin.swingset.utils;
 
-import com.nqadmin.swingset.datasources.*;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import com.nqadmin.swingset.SSDBComboBox;
-import com.nqadmin.swingset.SSDataNavigator;
+
+import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.sql.RowSetEvent;
+import com.nqadmin.swingset.SSDBComboBox;
+import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.datasources.SSRowSet;
 
 // SSSyncManager.java
 //
