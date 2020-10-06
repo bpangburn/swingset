@@ -92,7 +92,7 @@ public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFac
      * 
      * @param format - Format to be used for date while in editing mode. The default format is DDMMYYYY
      */
-    public SSDateFormatterFactory(int format) {
+    public SSDateFormatterFactory(final int format) {
     	switch(format){
     	case MMDDYYYY:
     		this.setDefaultFormatter(new DateFormatter(new SimpleDateFormat("MM/dd/yyyy")));

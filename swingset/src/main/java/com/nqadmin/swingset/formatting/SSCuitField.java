@@ -58,7 +58,7 @@ public class SSCuitField extends SSFormattedTextField {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 6012580680828883089L;
-	private Caret cuitCaret;
+	private final Caret cuitCaret;
   
     /** 
      * Creates a new instance of SSCuitFieldField 
@@ -70,7 +70,7 @@ public class SSCuitField extends SSFormattedTextField {
     /** Creates a new instance of SSCuitFieldField with the specified formatter factory 
      * @param factory - formatter factory to be used
      */
-    public SSCuitField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+    public SSCuitField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         
         this.cuitCaret = new DefaultCaret();
@@ -78,7 +78,7 @@ public class SSCuitField extends SSFormattedTextField {
         
         try {
             this.cuitCaret.setSelectionVisible(true);
-        } catch(java.lang.NullPointerException np) {
+        } catch(final java.lang.NullPointerException np) {
         	// do nothing - there may not be anything to select during initialization
         	//logger.warn(getColumnForLog() + ": Null Pointer Exception.", np);
         }
@@ -92,7 +92,7 @@ public class SSCuitField extends SSFormattedTextField {
      * @see com.nqadmin.swingset.formatting.SSFormattedTextField#validateField(java.lang.Object)
      */
     @Override
-	public boolean validateField(Object value) {
+	public boolean validateField(final Object value) {
 
         boolean retValue;
 
@@ -110,7 +110,7 @@ public class SSCuitField extends SSFormattedTextField {
     public static boolean CheckCuit(final String cu)
     {
         
-        String base = new String("54 32765432  ");
+        final String base = new String("54 32765432  ");
         String c1, c2;
         StringBuffer cuit;
         StringBuffer ctrl;

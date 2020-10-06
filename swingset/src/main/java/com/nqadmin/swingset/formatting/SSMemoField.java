@@ -105,14 +105,14 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		this.setLineWrap(true);
 		this.setWrapStyleWord(true);
 
-		Set<AWTKeyStroke> forwardKeys = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
-		Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
+		final Set<AWTKeyStroke> forwardKeys = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+		final Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK));
 		setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
 
-		Set<AWTKeyStroke> backwardKeys = getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
-		Set<AWTKeyStroke> newBackwardKeys = new HashSet<>(backwardKeys);
+		final Set<AWTKeyStroke> backwardKeys = getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
+		final Set<AWTKeyStroke> newBackwardKeys = new HashSet<>(backwardKeys);
 		newBackwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_UP, java.awt.event.InputEvent.SHIFT_MASK));
 		setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, newBackwardKeys);
 
@@ -267,7 +267,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 			default:
 				break;
 			}
-		} catch (java.sql.SQLException sqe) {
+		} catch (final java.sql.SQLException sqe) {
 			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
 			this.setText("");
 		}
@@ -296,7 +296,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 		try {
 			this.colType = this.rowset.getColumnType(this.columnName);
-		} catch (java.sql.SQLException sqe) {
+		} catch (final java.sql.SQLException sqe) {
 			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
 		}
 		this.rowset.addRowSetListener(this);
@@ -444,7 +444,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		 * some code to highlight the component with the focus
 		 * <p>
 		 */
-		java.awt.Color col = new java.awt.Color(204, 255, 255);
+		final java.awt.Color col = new java.awt.Color(204, 255, 255);
 		this.std_color = getBackground();
 		setBackground(col);
 
@@ -470,12 +470,12 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	class internalVerifier extends InputVerifier {
 
 		@Override
-		public boolean verify(JComponent input) {
+		public boolean verify(final JComponent input) {
 
 			String aux = null;
-			boolean passed = true;
+			final boolean passed = true;
 
-			SSMemoField tf = (SSMemoField) input;
+			final SSMemoField tf = (SSMemoField) input;
 			aux = tf.getText();
 
 			if (passed == true) {
@@ -502,10 +502,10 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 						break;
 					}
 					SSMemoField.this.rowset.addRowSetListener(tf);
-				} catch (java.sql.SQLException se) {
+				} catch (final java.sql.SQLException se) {
 					logger.error(getColumnForLog() + ": SQL Exception.", se);
 					tf.setText("");
-				} catch (java.lang.NullPointerException np) {
+				} catch (final java.lang.NullPointerException np) {
 					logger.error(getColumnForLog() + ": Null Pointer Exception.", np);
 					tf.setText("");
 				}

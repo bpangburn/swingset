@@ -74,7 +74,7 @@ public class SSDBNavImp extends SSDBNavImpl {
 	 * 
 	 * @param _container	GUI Container to scan for Swing components to clear/reset
 	 */
-	public SSDBNavImp(Container _container) {
+	public SSDBNavImp(final Container _container) {
 		super(_container);
 	}
 

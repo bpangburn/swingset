@@ -63,7 +63,7 @@ public class SSTimestampField extends SSFormattedTextField {
      * Creates an instance of SSTimestampField with the specified formatter factory
      * @param factory - formatter factory to be used
      */
-    public SSTimestampField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+    public SSTimestampField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         //ts = new java.sql.Timestamp( (new java.util.Date().getTime() ) );
 

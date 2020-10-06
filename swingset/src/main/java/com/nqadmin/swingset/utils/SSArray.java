@@ -56,7 +56,7 @@ public class SSArray implements Array {
 	/**
 	 * object array containing elements of sql array
 	 */
-	private Object[] data;
+	private final Object[] data;
 
 	/**
 	 * Underlying database type name for array elements
@@ -69,7 +69,7 @@ public class SSArray implements Array {
 	 * @param _data         object array of SSArray
 	 * @param _baseTypeName Array elements database type name
 	 */
-	public SSArray(Object[] _data, String _baseTypeName) {
+	public SSArray(final Object[] _data, final String _baseTypeName) {
 		if (_data == null) {
 			throw new IllegalArgumentException("Parameter should not be null");
 		}
@@ -91,17 +91,17 @@ public class SSArray implements Array {
 	}
 
 	@Override
-	public Object getArray(Map<String, Class<?>> map) throws SQLException {
+	public Object getArray(final Map<String, Class<?>> map) throws SQLException {
 		return null;
 	}
 
 	@Override
-	public Object getArray(long index, int count) throws SQLException {
+	public Object getArray(final long index, final int count) throws SQLException {
 		return null;
 	}
 
 	@Override
-	public Object getArray(long index, int count, Map<String, Class<?>> map) throws SQLException {
+	public Object getArray(final long index, final int count, final Map<String, Class<?>> map) throws SQLException {
 		return null;
 	}
 
@@ -126,17 +126,17 @@ public class SSArray implements Array {
 	}
 
 	@Override
-	public ResultSet getResultSet(Map<String, Class<?>> map) throws SQLException {
+	public ResultSet getResultSet(final Map<String, Class<?>> map) throws SQLException {
 		return null;
 	}
 
 	@Override
-	public ResultSet getResultSet(long index, int count) throws SQLException {
+	public ResultSet getResultSet(final long index, final int count) throws SQLException {
 		return null;
 	}
 
 	@Override
-	public ResultSet getResultSet(long index, int count, Map<String, Class<?>> map) throws SQLException {
+	public ResultSet getResultSet(final long index, final int count, final Map<String, Class<?>> map) throws SQLException {
 		return null;
 	}
 

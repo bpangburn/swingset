@@ -121,7 +121,7 @@ public class SSCommon implements Serializable {
 		private int lastNotifiedChange = 0;
 
 		@Override
-		public void changedUpdate(DocumentEvent de) {
+		public void changedUpdate(final DocumentEvent de) {
 			lastChange++;
 			logger.trace(getColumnForLog() + " - changedUpdate(): lastChange=" + lastChange
 					+ ", lastNotifiedChange=" + lastNotifiedChange);
@@ -145,13 +145,13 @@ public class SSCommon implements Serializable {
 		}
 
 		@Override
-		public void insertUpdate(DocumentEvent de) {
+		public void insertUpdate(final DocumentEvent de) {
 			logger.trace(getColumnForLog());
 			changedUpdate(de);
 		}
 
 		@Override
-		public void removeUpdate(DocumentEvent de) {
+		public void removeUpdate(final DocumentEvent de) {
 			logger.trace(getColumnForLog());
 			changedUpdate(de);
 		}
@@ -173,7 +173,7 @@ public class SSCommon implements Serializable {
 		 * display/value.
 		 */
 		@Override
-		public void cursorMoved(RowSetEvent event) {
+		public void cursorMoved(final RowSetEvent event) {
 			logger.trace(getColumnForLog());
 			updateSSComponent();
 		}
@@ -183,7 +183,7 @@ public class SSCommon implements Serializable {
 		 * Component display/value.
 		 */
 		@Override
-		public void rowChanged(RowSetEvent event) {
+		public void rowChanged(final RowSetEvent event) {
 			logger.trace(getColumnForLog());
 			updateSSComponent();
 		}
@@ -193,7 +193,7 @@ public class SSCommon implements Serializable {
 		 * Component display/value.
 		 */
 		@Override
-		public void rowSetChanged(RowSetEvent event) {
+		public void rowSetChanged(final RowSetEvent event) {
 			logger.trace(getColumnForLog());
 			updateSSComponent();
 		}
@@ -234,11 +234,11 @@ public class SSCommon implements Serializable {
 	 *
 	 * @return return SQL date for the string specified
 	 */
-	public static Date getSQLDate(String _strDate) {
-		StringTokenizer strtok = new StringTokenizer(_strDate, "/", false);
-		String month = strtok.nextToken();
-		String day = strtok.nextToken();
-		String newStrDate = strtok.nextToken() + "-" + month + "-" + day;
+	public static Date getSQLDate(final String _strDate) {
+		final StringTokenizer strtok = new StringTokenizer(_strDate, "/", false);
+		final String month = strtok.nextToken();
+		final String day = strtok.nextToken();
+		final String newStrDate = strtok.nextToken() + "-" + month + "-" + day;
 		return Date.valueOf(newStrDate);
 	}
 
@@ -294,7 +294,7 @@ public class SSCommon implements Serializable {
 	/**
 	 * Underlying Document listener (where SwingSet component is a JTextComponent)
 	 */
-	private SSDocumentListener ssDocumentListener = new SSDocumentListener();
+	private final SSDocumentListener ssDocumentListener = new SSDocumentListener();
 
 	/**
 	 * SSRowSet from which component will get/set values.
@@ -304,7 +304,7 @@ public class SSCommon implements Serializable {
 	/**
 	 * Underlying SSRowSet listener.
 	 */
-	private SSRowSetListener ssRowSetListener = new SSRowSetListener();
+	private final SSRowSetListener ssRowSetListener = new SSRowSetListener();
 	
 	/**
 	 * Log4j Logger for component
@@ -318,7 +318,7 @@ public class SSCommon implements Serializable {
 	 * @param _ssComponent SwingSet component having this SSCommon instance as a
 	 *                     datamember
 	 */
-	public SSCommon(Object _ssComponent) {
+	public SSCommon(final Object _ssComponent) {
 		setSSComponent(_ssComponent);
 		init();
 
@@ -384,7 +384,7 @@ public class SSCommon implements Serializable {
 	 * @param _boundColumnIndex index of the column to which this check box should
 	 *                          be bound
 	 */
-	public void bind(SSRowSet _ssRowSet, int _boundColumnIndex) {// throws java.sql.SQLException {
+	public void bind(final SSRowSet _ssRowSet, final int _boundColumnIndex) {// throws java.sql.SQLException {
 		// INDICATE THAT WE'RE UPDATING THE BINDINGS
 		inBinding = true;
 
@@ -412,7 +412,7 @@ public class SSCommon implements Serializable {
 	 * @param _boundColumnName name of the column to which this check box should be
 	 *                         bound
 	 */
-	public void bind(SSRowSet _ssRowSet, String _boundColumnName) {// throws java.sql.SQLException {
+	public void bind(final SSRowSet _ssRowSet, final String _boundColumnName) {// throws java.sql.SQLException {
 		// INDICATE THAT WE'RE UPDATING THE BINDINGS
 		inBinding = true;
 
@@ -485,7 +485,7 @@ public class SSCommon implements Serializable {
 					value = "";
 				}
 			}
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error(getColumnForLog() + " - SQL Exception.", se);
 		}
 
@@ -620,7 +620,7 @@ public class SSCommon implements Serializable {
 	 * 
 	 * @param _allowNull flag to indicate if the bound database column can be null
 	 */
-	public void setAllowNull(boolean _allowNull) {
+	public void setAllowNull(final boolean _allowNull) {
 		this.allowNull = _allowNull;
 	}
 
@@ -633,7 +633,7 @@ public class SSCommon implements Serializable {
 	 * @throws SQLException thrown if there is a problem writing the array to the
 	 *                      RowSet
 	 */
-	public void setBoundColumnArray(SSArray _boundColumnArray) throws SQLException {
+	public void setBoundColumnArray(final SSArray _boundColumnArray) throws SQLException {
 		// getSSRowSet().updateColumnText( _boundColumnText, getBoundColumnName(),
 		// getAllowNull());
 
@@ -645,7 +645,7 @@ public class SSCommon implements Serializable {
 	 *
 	 * @param _boundColumnIndex column index to which the Component is to be bound
 	 */
-	public void setBoundColumnIndex(int _boundColumnIndex) {
+	public void setBoundColumnIndex(final int _boundColumnIndex) {
 
 		// SET COLUMN INDEX
 		if (_boundColumnIndex > NO_COLUMN_INDEX) {
@@ -667,7 +667,7 @@ public class SSCommon implements Serializable {
 			}
 			boundColumnJDBCType = JDBCType.valueOf(boundColumnType);
 
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error(getColumnForLog() + " - SQL Exception.", se);
 		}
 
@@ -683,7 +683,7 @@ public class SSCommon implements Serializable {
 	 * 
 	 * @param _boundColumnName column name to which the Component is to be bound.
 	 */
-	public void setBoundColumnName(String _boundColumnName) {
+	public void setBoundColumnName(final String _boundColumnName) {
 
 		// SET COLUMN NAME
 		if (!_boundColumnName.isEmpty()) {
@@ -706,7 +706,7 @@ public class SSCommon implements Serializable {
 			}
 			boundColumnJDBCType = JDBCType.valueOf(boundColumnType);
 
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error(getColumnForLog() + " - SQL Exception.", se);
 		}
 
@@ -721,20 +721,20 @@ public class SSCommon implements Serializable {
 	 * 
 	 * @param _boundColumnText value to write to bound database column
 	 */
-	public void setBoundColumnText(String _boundColumnText) {
+	public void setBoundColumnText(final String _boundColumnText) {
 		try {
 			getSSRowSet().updateColumnText(_boundColumnText, getBoundColumnName(), getAllowNull());
-		} catch(NullPointerException _npe) {
+		} catch(final NullPointerException _npe) {
 			logger.warn("Null Pointer Exception.", _npe);
 			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
 					"Null values are not allowed for " + getBoundColumnName(), "Null Exception", JOptionPane.ERROR_MESSAGE);
 			
-		} catch(SQLException _se) {
+		} catch(final SQLException _se) {
 			logger.warn("SQL Exception.", _se);
 			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
 					"SQL Exception encountered for " + getBoundColumnName(), "SQL Exception", JOptionPane.ERROR_MESSAGE);
 			
-		} catch(NumberFormatException _pe) {
+		} catch(final NumberFormatException _pe) {
 			logger.warn("Number Format Exception.", _pe);
 			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
 					"Number Format Exception encountered for " + getBoundColumnName() + " converting " + _boundColumnText + " to a number.",
@@ -757,7 +757,7 @@ public class SSCommon implements Serializable {
 	 * @param _ssComponent the parent/calling SwingSet JComponent implementing
 	 *                     SSComponentInterface
 	 */
-	public void setSSComponent(Object _ssComponent) {
+	public void setSSComponent(final Object _ssComponent) {
 		this.ssComponent = _ssComponent;
 	}
 
@@ -766,7 +766,7 @@ public class SSCommon implements Serializable {
 	 * 
 	 * @param _ssConnection the ssConnection to set
 	 */
-	public void setSSConnection(SSConnection _ssConnection) {
+	public void setSSConnection(final SSConnection _ssConnection) {
 		this.ssConnection = _ssConnection;
 	}
 
@@ -776,7 +776,7 @@ public class SSCommon implements Serializable {
 	 * @param _ssRowSet SSRowSet to which the component is bound
 	 */
 	// public void setSSRowSet(SSRowSet _ssRowSet) throws SQLException {
-	public void setSSRowSet(SSRowSet _ssRowSet) {
+	public void setSSRowSet(final SSRowSet _ssRowSet) {
 		this.ssRowSet = _ssRowSet;
 		if (!inBinding) {
 			bind();

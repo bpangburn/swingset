@@ -94,7 +94,7 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
      * @param _rows     {@literal the number of rows >= 0}
      * @param _columns     {@literal the number of columns >= 0}
      */
-    public SSTextArea(int _rows, int _columns) {
+    public SSTextArea(final int _rows, final int _columns) {
         super(_rows, _columns);
     	setSSCommon(new SSCommon(this));
     	// SSCommon constructor calls init()
@@ -106,7 +106,7 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
      * @param _ssRowSet    datasource to be used.
      * @param _boundColumnName    name of the column to which this text area should be bound
      */
-    public SSTextArea(SSRowSet _ssRowSet, String _boundColumnName) {
+    public SSTextArea(final SSRowSet _ssRowSet, final String _boundColumnName) {
     	super();
 		//this.sSRowSet = _sSRowSet;
         //this.columnName = _columnName;
@@ -156,7 +156,7 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
-	public void setSSCommon(SSCommon _ssCommon) {
+	public void setSSCommon(final SSCommon _ssCommon) {
 		ssCommon = _ssCommon;
 	}
 

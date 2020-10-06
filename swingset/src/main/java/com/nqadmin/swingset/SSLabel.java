@@ -74,7 +74,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 		private static final long serialVersionUID = 6786673052979566820L;
 		
 		@Override
-		public void propertyChange(PropertyChangeEvent pce) {
+		public void propertyChange(final PropertyChangeEvent pce) {
 			
 			// CONFIRM THE PROPERTY NAME IN CASE SOMEONE ADDS A DIFFERENT PROPERTY LISTENER TO ssLabelListener
 			if (pce.getPropertyName()=="text") {
@@ -141,7 +141,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
      *
      * @param _image    specified image for label
      */
-    public SSLabel(Icon _image) {
+    public SSLabel(final Icon _image) {
 		super(_image);
 		setSSCommon(new SSCommon(this));
 		// SSCommon constructor calls init()
@@ -154,7 +154,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
      * @param _image    specified image for label
      * @param _horizontalAlignment	horizontal alignment
      */
-    public SSLabel(Icon _image, int _horizontalAlignment) {
+    public SSLabel(final Icon _image, final int _horizontalAlignment) {
 		super(_image, _horizontalAlignment);
 		setSSCommon(new SSCommon(this));
         //init();
@@ -229,7 +229,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
      * @param _ssRowSet    datasource to be used.
      * @param _boundColumnName    name of the column to which this label should be bound
      */
-    public SSLabel(SSRowSet _ssRowSet, String _boundColumnName) {
+    public SSLabel(final SSRowSet _ssRowSet, final String _boundColumnName) {
 		super();
 		setSSCommon(new SSCommon(this));
 		// SSCommon constructor calls init()
@@ -462,7 +462,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
-	public void setSSCommon(SSCommon _ssCommon) {
+	public void setSSCommon(final SSCommon _ssCommon) {
 		ssCommon = _ssCommon;
 	}
 

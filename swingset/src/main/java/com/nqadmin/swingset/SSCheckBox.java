@@ -81,7 +81,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 		private static final long serialVersionUID = -8006881399306841024L;
 
 		@Override
-		public void itemStateChanged(ItemEvent ie) {
+		public void itemStateChanged(final ItemEvent ie) {
 			// SSCheckBox.this.textField.getDocument().removeDocumentListener(SSCheckBox.this.textFieldDocumentListener);
 			// removeTextDocumentListener();
 			removeSSRowSetListener();
@@ -214,7 +214,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	 * 
 	 * @throws SQLException - if a database access error occurs
 	 */
-	public SSCheckBox(SSRowSet _ssRowSet, String _boundColumnName) throws java.sql.SQLException {
+	public SSCheckBox(final SSRowSet _ssRowSet, final String _boundColumnName) throws java.sql.SQLException {
 		super();
 		setSSCommon(new SSCommon(this));
 		// SSCommon constructor calls init()
@@ -358,7 +358,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	 * 
 	 * @param _text Checkbox label
 	 */
-	public SSCheckBox(String _text) {
+	public SSCheckBox(final String _text) {
 		super(_text);
 		setSSCommon(new SSCommon(this));
 		// SSCommon constructor calls init()
@@ -521,7 +521,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
-	public void setSSCommon(SSCommon _ssCommon) {
+	public void setSSCommon(final SSCommon _ssCommon) {
 		ssCommon = _ssCommon;
 
 	}

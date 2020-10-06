@@ -71,7 +71,7 @@ public interface SSRowSet extends RowSet {
 	 * 
 	 * @param _rowSetListener RowSetListener to add to current SSRowSet
 	 */
-	public default void addSSRowSetListener(RowSetListener _rowSetListener) {
+	public default void addSSRowSetListener(final RowSetListener _rowSetListener) {
 		addRowSetListener(_rowSetListener);
 	}
 
@@ -128,7 +128,7 @@ public interface SSRowSet extends RowSet {
 				return null;
 			}
 			
-			int columnType = getColumnType(_columnName);
+			final int columnType = getColumnType(_columnName);
 
 			// BASED ON THE COLUMN DATA TYPE THE CORRESPONDING FUNCTION
 			// IS CALLED TO GET THE VALUE IN THE COLUMN
@@ -160,11 +160,11 @@ public interface SSRowSet extends RowSet {
 
 			case Types.DATE:
 			case Types.TIMESTAMP:
-				Date date = this.getDate(_columnName);
+				final Date date = this.getDate(_columnName);
 				if (date == null) {
 					value = "";
 				} else {
-					GregorianCalendar calendar = new GregorianCalendar();
+					final GregorianCalendar calendar = new GregorianCalendar();
 					calendar.setTime(date);
 					value = "";
 					if ((calendar.get(Calendar.MONTH) + 1) < 10) {
@@ -182,7 +182,7 @@ public interface SSRowSet extends RowSet {
 				break;
 				
 			case Types.TIME:
-				Time time = this.getTime(_columnName);
+				final Time time = this.getTime(_columnName);
 				if (time == null) {
 					value = "";
 				} else {
@@ -193,7 +193,7 @@ public interface SSRowSet extends RowSet {
 			case Types.CHAR:
 			case Types.VARCHAR:
 			case Types.LONGVARCHAR:
-				String str = this.getString(_columnName);
+				final String str = this.getString(_columnName);
 				if (str == null) {
 					value = "";
 				} else {
@@ -205,7 +205,7 @@ public interface SSRowSet extends RowSet {
 				LogManager.getLogger().error("Unsupported data type of " + JDBCType.valueOf(columnType).getName() + " for column " + _columnName + ".");
 			} // end switch
 
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			LogManager.getLogger().error("SQL Exception for column " + _columnName + ".", se);
 		}
 
@@ -250,7 +250,7 @@ public interface SSRowSet extends RowSet {
 	 * 
 	 * @param _rowSetListener RowSetListener to remove from current SSRowSet
 	 */
-	public default void removeSSRowSetListener(RowSetListener _rowSetListener) {
+	public default void removeSSRowSetListener(final RowSetListener _rowSetListener) {
 		removeRowSetListener(_rowSetListener);
 	}
 
@@ -291,7 +291,7 @@ public interface SSRowSet extends RowSet {
 			
 			LogManager.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? " + _allowNull);
 					
-			int columnType = getColumnType(_columnName);
+			final int columnType = getColumnType(_columnName);
 
 			switch (columnType) {
 			// FOR NON-TEXT-BASED DATABASE COLUMNS, WRITE NULL INSTEAD OF AN EMPTY STRING
@@ -307,7 +307,7 @@ public interface SSRowSet extends RowSet {
 						throw new NullPointerException("Null values are not allowed for this field.");
 					}
 				} else {
-					int intValue = Integer.parseInt(_updatedValue);
+					final int intValue = Integer.parseInt(_updatedValue);
 					this.updateInt(_columnName, intValue);
 				}
 				break;
@@ -321,7 +321,7 @@ public interface SSRowSet extends RowSet {
 						throw new NullPointerException("Null values are not allowed for this field.");
 					}
 				} else {
-					long longValue = Long.parseLong(_updatedValue);
+					final long longValue = Long.parseLong(_updatedValue);
 					this.updateLong(_columnName, longValue);
 				}
 				break;
@@ -335,7 +335,7 @@ public interface SSRowSet extends RowSet {
 						throw new NullPointerException("Null values are not allowed for this field.");
 					}
 				} else {
-					float floatValue = Float.parseFloat(_updatedValue);
+					final float floatValue = Float.parseFloat(_updatedValue);
 					this.updateFloat(_columnName, floatValue);
 				}
 				break;
@@ -351,7 +351,7 @@ public interface SSRowSet extends RowSet {
 						throw new NullPointerException("Null values are not allowed for this field.");
 					}
 				} else {
-					double doubleValue = Double.parseDouble(_updatedValue);
+					final double doubleValue = Double.parseDouble(_updatedValue);
 					this.updateDouble(_columnName, doubleValue);
 				}
 				break;		
@@ -366,7 +366,7 @@ public interface SSRowSet extends RowSet {
 					}
 				} else {
 					// CONVERT THE GIVEN STRING TO BOOLEAN TYPE
-					boolean boolValue = Boolean.valueOf(_updatedValue).booleanValue();
+					final boolean boolValue = Boolean.valueOf(_updatedValue).booleanValue();
 					this.updateBoolean(_columnName, boolValue);
 				}
 				break;

@@ -68,7 +68,7 @@ public class SSDateField extends SSFormattedTextField {
      *  @param format - format to be used while the date field is in edit mode
      *  allowed values are MMDDYYYY or DDMMYYYY
      */
-    public SSDateField(int format) {
+    public SSDateField(final int format) {
         this(new SSDateFormatterFactory(format));
     }
             
@@ -83,7 +83,7 @@ public class SSDateField extends SSFormattedTextField {
      * Creates an object of SSDateField with the specified formatter factory
      * @param factory - formatter factory to be used 
      */
-    public SSDateField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+    public SSDateField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         // TODO Consider setting to null vs system date.
         this.setValue(new java.util.Date());

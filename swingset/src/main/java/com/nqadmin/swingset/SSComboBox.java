@@ -114,11 +114,11 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 		private static final long serialVersionUID = -3131533966245488092L;
 
 		@Override
-		public void actionPerformed(ActionEvent ae) {
+		public void actionPerformed(final ActionEvent ae) {
 
 			removeSSRowSetListener();
 
-			int index = getSelectedIndex();
+			final int index = getSelectedIndex();
 
 			if (index == -1) {
 				setBoundColumnText(null);
@@ -672,7 +672,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * @param _mappings an array of values that correspond to those in the combo
 	 *                  box.
 	 */
-	public void setMappings(int[] _mappings) {
+	public void setMappings(final int[] _mappings) {
 		// int[] oldValue = mappings.clone();
 		// this.mappings = _mappings.clone();
 		if (mappings != null) {
@@ -702,7 +702,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * @deprecated Use {@link #setMappings(int[] _mappings)} instead.
 	 */
 	@Deprecated
-	public void setMappingValues(int[] _mappings) {
+	public void setMappingValues(final int[] _mappings) {
 		setMappings(_mappings);
 	}
 
@@ -716,7 +716,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * @deprecated Use {@link #setPredefinedOptions(int _option)} instead.
 	 */
 	@Deprecated
-	public boolean setOption(int _option) {
+	public boolean setOption(final int _option) {
 		return setPredefinedOptions(_option);
 	}
 
@@ -733,7 +733,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * 
 	 */
 	@Deprecated
-	public void setOption(int _options, int[] _mappings) {
+	public void setOption(final int _options, final int[] _mappings) {
 		setPredefinedOptions(_options);
 		setMappings(_mappings);
 	}
@@ -750,7 +750,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * @deprecated Use {@link #setOptions(String[] _options)} instead.
 	 */
 	@Deprecated
-	public boolean setOption(String[] _options) {
+	public boolean setOption(final String[] _options) {
 		setOptions(_options);
 		return true;
 	}
@@ -771,7 +771,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 *             instead.
 	 */
 	@Deprecated
-	public boolean setOption(String[] _options, int[] _mappings) {
+	public boolean setOption(final String[] _options, final int[] _mappings) {
 		return setOptions(_options, _mappings);
 	}
 
@@ -780,7 +780,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 *
 	 * @param _options the list of options that you want to appear in the combo box.
 	 */
-	public void setOptions(String[] _options) {
+	public void setOptions(final String[] _options) {
 		// String[] oldValue = options.clone();
 		// this.options = _options.clone();
 		// firePropertyChange("options", oldValue, this.options);
@@ -824,7 +824,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 *         returns false if the size of arrays do not match or if the values
 	 *         could not be set
 	 */
-	public boolean setOptions(String[] _options, int[] _mappings) {
+	public boolean setOptions(final String[] _options, final int[] _mappings) {
 		if (_options.length != _mappings.length) {
 			return false;
 		}
@@ -846,8 +846,8 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * @return true or false indicating if the predefined options were set
 	 *         successfully
 	 */
-	public boolean setPredefinedOptions(int _predefinedOptions) {
-		int oldValue = this.predefinedOptions;
+	public boolean setPredefinedOptions(final int _predefinedOptions) {
+		final int oldValue = this.predefinedOptions;
 
 		if (_predefinedOptions == YES_NO_OPTION) {
 			setOptions(new String[] { "No", "Yes" });
@@ -877,7 +877,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * @param _value value to assign to combobox, which may or may not correlate to
 	 *               the combobox index
 	 */
-	public void setSelectedValue(int _value) {
+	public void setSelectedValue(final int _value) {
 
 		// ONLY NEED TO PROCEED IF THERE IS A CHANGE
 		// TODO consider firing a property change
@@ -894,7 +894,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 				// IF MAPPINGS ARE SPECIFIED THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
 				// SPECIFIED CODE IS STORED
 				if (this.mappings != null) {
-					int index = mappings.indexOf(_value);
+					final int index = mappings.indexOf(_value);
 
 					if (index == -1) {
 						logger.warn(getColumnForLog() + ": Warning: could not find a corresponding item in combobox for code of " + _value + ". Setting index to -1 (blank).");
@@ -918,7 +918,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
-	public void setSSCommon(SSCommon _ssCommon) {
+	public void setSSCommon(final SSCommon _ssCommon) {
 		ssCommon = _ssCommon;
 
 	}
@@ -935,11 +935,11 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long or Integer
 		try {
 			// Expecting an integer so trim in case the database column is a String AND has padding
-			String text = getBoundColumnText().trim();
+			final String text = getBoundColumnText().trim();
 
 			// GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD
 			if ((text != null) && !(text.equals(""))) {
-				int comboCode = Integer.parseInt(text);
+				final int comboCode = Integer.parseInt(text);
 
 				setSelectedValue(comboCode);
 
@@ -947,7 +947,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 				setSelectedIndex(-1);
 			}
 
-		} catch (NumberFormatException nfe) {
+		} catch (final NumberFormatException nfe) {
 			logger.warn(getColumnForLog() + ": Number Format Exception.", nfe);
 		}
 	}

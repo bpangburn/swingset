@@ -93,7 +93,7 @@ public class SSCuitFormatterFactory extends javax.swing.text.DefaultFormatterFac
             this.setEditFormatter(this.editFormatter);
             this.setDisplayFormatter(this.displayFormatter);
         }
-        catch (java.text.ParseException pe) {
+        catch (final java.text.ParseException pe) {
         	logger.warn("Parse Exception.", pe);
         	// do nothing
         }

@@ -102,7 +102,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	 *
 	 * @param _jTable JTable for which copy and paste support should be added.
 	 */
-	public SSTableKeyAdapter(JTable _jTable) {
+	public SSTableKeyAdapter(final JTable _jTable) {
 		init(_jTable);
 	}
 
@@ -113,7 +113,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	 * @param _allowInsertion true if new rows can be added when pasting data from
 	 *                        clipboard, else false.
 	 */
-	public void setAllowInsertion(boolean _allowInsertion) {
+	public void setAllowInsertion(final boolean _allowInsertion) {
 		this.allowInsertion = _allowInsertion;
 	}
 
@@ -124,7 +124,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	 * @param _forSSDataGrid - true if this key adapter is used for SSDataGrid, else
 	 *                       false.
 	 */
-	public void setForSSDataGrid(boolean _forSSDataGrid) {
+	public void setForSSDataGrid(final boolean _forSSDataGrid) {
 		this.forSSDataGrid = _forSSDataGrid;
 	}
 
@@ -132,7 +132,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	 * Adds the key listener for the specified JTable.
 	 * @param _jTable table for which listener is to be added
 	 */
-	protected void init(JTable _jTable) {
+	protected void init(final JTable _jTable) {
 		_jTable.addKeyListener(this);
 	}
 
@@ -140,10 +140,10 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	 * Invoked when a key is released.
 	 */
 	@Override
-	public void keyReleased(KeyEvent ke) {
-		StringBuffer strBuf = new StringBuffer();
+	public void keyReleased(final KeyEvent ke) {
+		final StringBuffer strBuf = new StringBuffer();
 
-		JTable jTable = (JTable) ke.getSource();
+		final JTable jTable = (JTable) ke.getSource();
 		
 		logger.debug("Key Released on SSDataGrid. Key Released: " + ke.getKeyCode() + " " +  ((ke.getModifiersEx() & (onMask | offMask)) == onMask));
 
@@ -155,7 +155,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 			logger.debug("Going to handle copy");
 
 			// GET COLUMNS INVOLVED
-			int numRows = jTable.getSelectedRowCount();
+			final int numRows = jTable.getSelectedRowCount();
 			int numColumns = 0;
 			if (jTable instanceof SSDataGrid) {
 				numColumns = ((SSDataGrid) jTable).getSelectedColumnCount();
@@ -170,7 +170,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 			}
 
 			// GET THE ROWS AND COLUMNS SELECTED.
-			int[] selectedRows = jTable.getSelectedRows();
+			final int[] selectedRows = jTable.getSelectedRows();
 			int[] selectedColumns = null;
 			if (jTable instanceof SSDataGrid) {
 				selectedColumns = ((SSDataGrid) jTable).getSelectedColumns();
@@ -191,10 +191,10 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 			}
 
 			// GET THE SYSTEM CLIPBOARD
-			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
 			// CREATE A TRANSFERABLE OBJECT
-			StringSelection stringSelection = new StringSelection(strBuf.toString());
+			final StringSelection stringSelection = new StringSelection(strBuf.toString());
 
 			// COPY THE DATA TO CLIP BOARD
 			clipboard.setContents(stringSelection, stringSelection);
@@ -205,10 +205,10 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 			// SHIFT OR ALT SHOULD NOT BE DOWN
 
 			// GET CLIPBOARD
-			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
 			// GET THE CONTENTS OF THE CLIPBOARD
-			Transferable transferable = clipboard.getContents(this);
+			final Transferable transferable = clipboard.getContents(this);
 
 			// IF THE CONTENT TYPE SUPPORTS STRING TYPE GET THE DATA.
 			if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
@@ -216,10 +216,10 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 				String strData = "";
 				try {
 					strData = (String) transferable.getTransferData(DataFlavor.stringFlavor);
-				} catch (UnsupportedFlavorException ufe) {
+				} catch (final UnsupportedFlavorException ufe) {
 					logger.error("Unsupported Flavor Exception.",  ufe);
 					return;
-				} catch (IOException ioe) {
+				} catch (final IOException ioe) {
 					logger.error("IO Exception.",  ioe);
 					return;
 				}
@@ -230,8 +230,8 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 				}
 
 				// GET THE SELECTED ROWS AND COLUMNS
-				int[] selectedRows = jTable.getSelectedRows();
-				int[] selectedColumns = jTable.getSelectedColumns();
+				final int[] selectedRows = jTable.getSelectedRows();
+				final int[] selectedColumns = jTable.getSelectedColumns();
 
 				// CREATE A STRING TOKENIZER TO BREAK THE DATA INTO ROWS.
 				StringTokenizer rowTokens = new StringTokenizer(strData, "\n", false);
@@ -260,7 +260,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
 				// GET THE NUMBER OF COLUMNS AND ROWS IN THE JTABLE.
 				int rowCount = jTable.getRowCount();
-				int columnCount = jTable.getColumnCount();
+				final int columnCount = jTable.getColumnCount();
 
 				if (this.forSSDataGrid || (jTable instanceof SSDataGrid)) {
 					rowCount--;
@@ -282,7 +282,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 				if (rowCount < (numRows + selectedRows[0])) {
 					JOptionPane.showMessageDialog(jTable, "There are not enough rows in the table to copy into.\n");
 					if (this.allowInsertion) {
-						int option = JOptionPane.showConfirmDialog(jTable, "Do you want to insert new rows?",
+						final int option = JOptionPane.showConfirmDialog(jTable, "Do you want to insert new rows?",
 								"Add Rows", JOptionPane.YES_NO_OPTION);
 						if (option == JOptionPane.YES_OPTION) {
 							// SET THE NUMBER OF ROWS TO COPY EQUAL TO
@@ -318,7 +318,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 						// PASTE THE DATA IN TO JTABLE ROW.
 						for (int j = 0; columnTokens.hasMoreTokens(); j++) {
 							// GET THE VALUE FOR THIS CELL IN THE FORM OF THIS COLUMN CLASS OBJECT
-							Object newValue = getObjectToSet(jTable, selectedColumns[0] + j, columnTokens.nextToken());
+							final Object newValue = getObjectToSet(jTable, selectedColumns[0] + j, columnTokens.nextToken());
 							// SET THE VALUE FOR THE COLUMN
 							jTable.setValueAt(newValue, selectedRows[0] + i, selectedColumns[0] + j);
 						}
@@ -328,16 +328,16 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 					// THIS HAS TO PROPOGATE TO THE SCREEN.
 					jTable.updateUI();
 
-				} catch (NoSuchMethodException nsme) {
+				} catch (final NoSuchMethodException nsme) {
 					logger.error("No Such Method Exception. One of the column classes does not provide a constructor that takes a single String argument.",  nsme);
 					JOptionPane.showMessageDialog(jTable, "One of the column classes does not provide a constructor that takes a single String argument.");
-				} catch (SecurityException se) {
+				} catch (final SecurityException se) {
 					logger.error("Security Exception. One of the column class does not provide a constructor that takes a single String argument.",  se);
 					JOptionPane.showMessageDialog(jTable, "One of the column class does not provide a constructor that takes a single String argument.");
-				} catch (InstantiationException ie) {
+				} catch (final InstantiationException ie) {
 					logger.error("(Instantiation Exception. Failed to copy data. Error occured while instantiating a single String argument constructor for a column.",  ie);
 					JOptionPane.showMessageDialog(jTable, "Failed to copy data. Error occured while instantiating a single String argument constructor for a column.");
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					logger.error("Exception. Failed to copy data.",  e);
 					JOptionPane.showMessageDialog(jTable, "Failed to copy data.");
 				}
@@ -361,20 +361,20 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	 * @return returns the value as a column class object.
 	 * @throws Exception catch all exception
 	 */
-	protected static Object getObjectToSet(JTable _jTable, int _column, String _value) throws Exception {
+	protected static Object getObjectToSet(final JTable _jTable, final int _column, final String _value) throws Exception {
 		// GET THE COLUMN CLASS
-		Class<?> objectClass = _jTable.getColumnClass(_column);
+		final Class<?> objectClass = _jTable.getColumnClass(_column);
 		Object newValue = null;
 		try {
 			// CONSTRUCT THE OBJECT ONLY IF THE STRING IS NOT NULL
 			if (_value != null) {
 				// GET THE CONSTRUCTOR FOR THE CLASS WHICH TAKES A STRING
-				Constructor<?> constructor = objectClass.getConstructor(new Class<?>[] { String.class });
+				final Constructor<?> constructor = objectClass.getConstructor(new Class<?>[] { String.class });
 
 				// CREATE AN INSTANCE OF THE OBJECT
 				newValue = constructor.newInstance(new Object[] { _value });
 			}
-		} catch (NoSuchMethodException nsme) {
+		} catch (final NoSuchMethodException nsme) {
 			logger.warn("No Such Method Exception. Failed to copy data.",  nsme);
 			newValue = _value;
 		}

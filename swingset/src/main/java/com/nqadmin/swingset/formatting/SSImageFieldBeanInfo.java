@@ -60,7 +60,7 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( com.nqadmin.swingset.formatting.SSImageField.class , null );
+        final BeanDescriptor beanDescriptor = new BeanDescriptor  ( com.nqadmin.swingset.formatting.SSImageField.class , null );
         beanDescriptor.setDisplayName ( "SSImageField" );
         beanDescriptor.setShortDescription ( "Field used to handle bytea image fields" );//GEN-HEADEREND:BeanDescriptor
         
@@ -86,7 +86,7 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
     // Property array 
     /*lazy PropertyDescriptor*/
     private static PropertyDescriptor[] getPdescriptor(){
-        PropertyDescriptor[] properties = new PropertyDescriptor[11];
+        final PropertyDescriptor[] properties = new PropertyDescriptor[11];
     
         try {
             properties[PROPERTY_background] = new PropertyDescriptor ( "background", com.nqadmin.swingset.formatting.SSImageField.class, "getBackground", "setBackground" );
@@ -108,7 +108,7 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
             properties[PROPERTY_toolTipText].setPreferred ( true );
             properties[PROPERTY_visible] = new PropertyDescriptor ( "visible", com.nqadmin.swingset.formatting.SSImageField.class, "isVisible", "setVisible" );
         }
-        catch( IntrospectionException e) {
+        catch( final IntrospectionException e) {
         	// do nothing
         }//GEN-HEADEREND:Properties
         

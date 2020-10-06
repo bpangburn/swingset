@@ -85,7 +85,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		private static final long serialVersionUID = 4337396603209239909L;
 
 		@Override
-		public void valueChanged(ListSelectionEvent e) {
+		public void valueChanged(final ListSelectionEvent e) {
 			removeListeners();
 			updateRowSet();
 			addListeners();
@@ -119,35 +119,35 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 * @return Object array
 	 * @throws SQLException SQLException
 	 */
-	private static Object[] toObjArray(Array array) throws SQLException {
+	private static Object[] toObjArray(final Array array) throws SQLException {
 		if (array == null) {
 			return null;
 		}
 		
 		logger.debug("SSList.toObjArray() contents: " + array);
 	
-		Vector<Object> data = new Vector<>();
+		final Vector<Object> data = new Vector<>();
 		switch (array.getBaseType()) {
 		case Types.INTEGER:
 		case Types.SMALLINT:
 		case Types.TINYINT:
 			try {
-				for (Integer num : (Integer[]) array.getArray()) {
+				for (final Integer num : (Integer[]) array.getArray()) {
 					data.add(num);
 				}
-			} catch (ClassCastException ex) {
-				for (int num : (int[]) array.getArray()) {
+			} catch (final ClassCastException ex) {
+				for (final int num : (int[]) array.getArray()) {
 					data.add(Integer.valueOf(num));
 				}
 			}
 			break;
 		case Types.BIGINT:
 			try {
-				for (Long num : (Long[]) array.getArray()) {
+				for (final Long num : (Long[]) array.getArray()) {
 					data.add(num);
 				}
-			} catch (ClassCastException ex) {
-				for (long num : (long[]) array.getArray()) {
+			} catch (final ClassCastException ex) {
+				for (final long num : (long[]) array.getArray()) {
 					data.add(Long.valueOf(num));
 				}
 			}
@@ -156,11 +156,11 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		case Types.DOUBLE:
 		case Types.REAL:
 			try {
-				for (Double num : (Double[]) array.getArray()) {
+				for (final Double num : (Double[]) array.getArray()) {
 					data.add(num);
 				}
-			} catch (ClassCastException ex) {
-				for (double num : (double[]) array.getArray()) {
+			} catch (final ClassCastException ex) {
+				for (final double num : (double[]) array.getArray()) {
 					data.add(Double.valueOf(num));
 				}
 			}
@@ -168,22 +168,22 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		case Types.DECIMAL:
 		case Types.NUMERIC:
 			try {
-				for (BigDecimal num : (BigDecimal[]) array.getArray()) {
+				for (final BigDecimal num : (BigDecimal[]) array.getArray()) {
 					data.add(num);
 				}
-			} catch (ClassCastException cce) {
+			} catch (final ClassCastException cce) {
 				logger.error("Class Cast Exception.", cce);
 			}
 			break;
 		case Types.DATE:
-			for (Date dt : (Date[]) array.getArray()) {
+			for (final Date dt : (Date[]) array.getArray()) {
 				data.add(dt);
 			}
 			break;
 		case Types.CHAR:
 		case Types.VARCHAR:
 		case Types.LONGVARCHAR:
-			for (String txt : (String[]) array.getArray()) {
+			for (final String txt : (String[]) array.getArray()) {
 				data.add(txt);
 			}
 			break;
@@ -191,10 +191,10 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		// H2 ARRAY RETURNS NULL FOR getBaseType()
 		// FOR THIS AND OTHER FAILURES, TRY A LIST OF OBJECTS
 			try {
-				for (Object val : (Object[]) array.getArray()) {
+				for (final Object val : (Object[]) array.getArray()) {
 					data.add(val);
 				}
-			} catch (SQLException se) {
+			} catch (final SQLException se) {
 				logger.error("DataType: " + array.getBaseTypeName() + " not supported and unable to convert to generic object.", se);
 			}
 			break;
@@ -347,7 +347,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		if (getSelectedIndex() == -1) {
 			return new Object[] { Integer.valueOf(-1) };
 		}
-		Object[] selectedValues = new Object[getSelectedIndices().length];
+		final Object[] selectedValues = new Object[getSelectedIndices().length];
 		for (int i = 0; i < selectedValues.length; i++) {
 			selectedValues[i] = this.mappings != null ? this.mappings[getSelectedIndices()[i]]
 					: Integer.valueOf(getSelectedIndices()[i]);
@@ -537,8 +537,8 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 * 
 	 * @param _mappings An array of values that correspond to those in the list box.
 	 */
-	protected void setMappings(Object[] _mappings) {
-		Object[] oldValue = _mappings.clone();
+	protected void setMappings(final Object[] _mappings) {
+		final Object[] oldValue = _mappings.clone();
 		this.mappings = _mappings.clone();
 		firePropertyChange("mappings", oldValue, this.mappings);
 	}
@@ -548,8 +548,8 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 * 
 	 * @param _options the list of options that you want to appear in the list box.
 	 */
-	protected void setOptions(String[] _options) {
-		String[] oldValue = _options.clone();
+	protected void setOptions(final String[] _options) {
+		final String[] oldValue = _options.clone();
 		this.options = _options.clone();
 		firePropertyChange("options", oldValue, this.options);
 		// ADD SPECIFIED ITEMS TO THE LIST BOX
@@ -567,7 +567,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 *         returns false if the size of arrays do not match or if the values
 	 *         could not be set
 	 */
-	public boolean setOptions(String[] _options, Object[] _mappings) {
+	public boolean setOptions(final String[] _options, final Object[] _mappings) {
 		if (_options.length != _mappings.length) {
 			return false;
 		}
@@ -581,8 +581,8 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 * 
 	 * @param values Values to be selected in list
 	 */
-	public void setSelectedValues(Object[] values) {
-		int[] selectedIndices = new int[values.length];
+	public void setSelectedValues(final Object[] values) {
+		final int[] selectedIndices = new int[values.length];
 		for (int i = 0; i < values.length; i++) {
 			for (int j = 0; j < this.mappings.length; j++) {
 				if (values[i] == this.mappings[j]) {
@@ -599,7 +599,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
-	public void setSSCommon(SSCommon _ssCommon) {
+	public void setSSCommon(final SSCommon _ssCommon) {
 		ssCommon = _ssCommon;
 
 	}
@@ -617,7 +617,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		}
 		try {
 			getSSRowSet().updateArray(getBoundColumnName(), array);
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
 	}
@@ -667,7 +667,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 
 			}
 
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
 
@@ -675,7 +675,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 			this.clearSelection();
 			return;
 		}
-		int[] indices = new int[array.length];
+		final int[] indices = new int[array.length];
 		for (int i = 0; i < array.length; i++) {
 			for (int j = 0; j < this.mappings.length; j++) {
 				if (array[i].equals(this.mappings[j])) {

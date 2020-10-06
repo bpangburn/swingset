@@ -72,7 +72,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 		private static final long serialVersionUID = -5004328872032247853L;
 
 		@Override
-		public void stateChanged(ChangeEvent ce) {
+		public void stateChanged(final ChangeEvent ce) {
 			
 			removeSSRowSetListener();
 			
@@ -148,7 +148,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
      *
      * @param _orientation	slider spatial orientation
      */
-    public SSSlider(int _orientation) {
+    public SSSlider(final int _orientation) {
 		super(_orientation);
 		setSSCommon(new SSCommon(this));
 		// SSCommon constructor calls init()
@@ -160,7 +160,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
      * @param _min	minimum slider value
      * @param _max	maximum slider value
      */
-    public SSSlider(int _min, int _max) {
+    public SSSlider(final int _min, final int _max) {
 		super(_min, _max);
 		setSSCommon(new SSCommon(this));
 		// SSCommon constructor calls init()
@@ -431,7 +431,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
      * @param _boundColumnName    name of the column to which this slider should be bound
      * @throws java.sql.SQLException SQLException
      */
-    public SSSlider(SSRowSet _ssRowSet, String _boundColumnName) throws java.sql.SQLException {
+    public SSSlider(final SSRowSet _ssRowSet, final String _boundColumnName) throws java.sql.SQLException {
     	super();
 		setSSCommon(new SSCommon(this));
 		// SSCommon constructor calls init()
@@ -492,7 +492,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
-	public void setSSCommon(SSCommon _ssCommon) {
+	public void setSSCommon(final SSCommon _ssCommon) {
 		ssCommon = _ssCommon;
 
 	}
@@ -512,14 +512,14 @@ public class SSSlider extends JSlider implements SSComponentInterface {
             case java.sql.Types.DOUBLE:
             case java.sql.Types.NUMERIC:
         	// SET THE SLIDER BASED ON THE VALUE IN TEXT FIELD
-            	String columnValue = getBoundColumnText();
+            	final String columnValue = getBoundColumnText();
             	try {
             		if ((columnValue==null) || columnValue.isEmpty()) {
             			setValue(0);
 	            	} else {
 	            		setValue(Integer.parseInt(columnValue));
 	            	}
-            	} catch (NumberFormatException _nfe) {
+            	} catch (final NumberFormatException _nfe) {
             		logger.error(getColumnForLog() + ": Number Format Exception. Cannot update slider to " + columnValue, _nfe);
             	}
                 break;

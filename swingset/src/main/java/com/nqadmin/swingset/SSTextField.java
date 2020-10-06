@@ -163,8 +163,8 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      *
      * @return returns the formatted string.
      */
-    protected static String decimalMask(String _str, int numberOfDecimalPlaces) {
-        StringTokenizer strtok = new StringTokenizer(_str,".",false);
+    protected static String decimalMask(final String _str, final int numberOfDecimalPlaces) {
+        final StringTokenizer strtok = new StringTokenizer(_str,".",false);
         String intPart = "";
         String decimalPart = "";
         String returnStr = _str;
@@ -245,7 +245,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      *
      * @param _mask the mask required for this textfield.
      */
-    public SSTextField(int _mask) {
+    public SSTextField(final int _mask) {
         super();
         this.mask = _mask;
         setSSCommon(new SSCommon(this));
@@ -259,7 +259,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * @param _mask    the mask required for this textfield.
      * @param _numberOfDecimalPlaces    number of decimal places required
      */
-     public SSTextField(int _mask, int _numberOfDecimalPlaces) {
+     public SSTextField(final int _mask, final int _numberOfDecimalPlaces) {
     	 super();
         this.mask = _mask;
         this.numberOfDecimalPlaces = _numberOfDecimalPlaces;
@@ -329,7 +329,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * @param _numberOfDecimalPlaces    number of decimal places required
      * @param _align    alignment required
      */
-     public SSTextField(int _mask, int _numberOfDecimalPlaces, int _align) {
+     public SSTextField(final int _mask, final int _numberOfDecimalPlaces, final int _align) {
     	 super();
         this.mask = _mask;
         this.numberOfDecimalPlaces = _numberOfDecimalPlaces;
@@ -345,7 +345,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * @param _ssRowSet    datasource to be used.
      * @param _boundColumnName    name of the column to which this label should be bound
      */
-    public SSTextField(SSRowSet _ssRowSet, String _boundColumnName) {
+    public SSTextField(final SSRowSet _ssRowSet, final String _boundColumnName) {
     	super();
 		//this.sSRowSet = _sSRowSet;
         //this.columnName = _columnName;
@@ -362,7 +362,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * @param _text    the text to be displayed.
      * @param _mask    the mask required for this textfield.
      */
-    public SSTextField(String _text, int _mask) {
+    public SSTextField(final String _text, final int _mask) {
         super(_text);
         this.mask = _mask;
         setSSCommon(new SSCommon(this));
@@ -495,7 +495,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	     // COMPLETE TEXT SHOULD BE SELECTED
 	        this.addFocusListener(new FocusAdapter(){
 	            @Override
-				public void focusGained(FocusEvent fe){
+				public void focusGained(final FocusEvent fe){
 	                SSTextField.this.selectAll();
 	            }
 	        });
@@ -512,7 +512,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	        this.addKeyListener(new KeyListener() {
 	
 	            @Override
-				public synchronized void keyPressed(KeyEvent ke) {
+				public synchronized void keyPressed(final KeyEvent ke) {
 	
 	                if((SSTextField.this.mask == MMDDYYYY) || (SSTextField.this.mask == DDMMYYYY)){
 	                    mask(ke);
@@ -520,12 +520,12 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	            }
 	
 	            @Override
-				public void keyReleased(KeyEvent ke) {
+				public void keyReleased(final KeyEvent ke) {
 	                if((SSTextField.this.mask == DECIMAL) || (SSTextField.this.mask == SSN)){
-	                    int position = SSTextField.this.getCaretPosition();
-	                    int length = SSTextField.this.getText().length();
+	                    final int position = SSTextField.this.getCaretPosition();
+	                    final int length = SSTextField.this.getText().length();
 	                    if(mask(ke)){
-	                       int newLength = SSTextField.this.getText().length();
+	                       final int newLength = SSTextField.this.getText().length();
 	                       if(newLength > length){
 	                            SSTextField.this.setCaretPosition(position+1);
 	                        }
@@ -538,7 +538,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	            }
 	
 	            @Override
-				public void keyTyped(KeyEvent ke) {
+				public void keyTyped(final KeyEvent ke) {
 	            	// do nothing
 	            }
 	
@@ -582,10 +582,10 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      *@return returns true if function has detected a key it does not want to respond to
      *like function keys etc else true.
      */
-    protected boolean mask(KeyEvent _ke) {
+    protected boolean mask(final KeyEvent _ke) {
          // DECLARATIONS
             String str = getText();
-            char ch = _ke.getKeyChar();
+            final char ch = _ke.getKeyChar();
 
          // IF THE KEY PRESSED IS ANY OF THE FOLLOWING DO NOTHING
             if ((_ke.getKeyCode() == KeyEvent.VK_BACK_SPACE)  ||
@@ -646,8 +646,8 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	 *
 	 * @param _mask the mask required for this text field.
 	 */
-	public void setMask(int _mask) {
-		int oldValue = this.mask;
+	public void setMask(final int _mask) {
+		final int oldValue = this.mask;
 		this.mask = _mask;
 		firePropertyChange("mask", oldValue, this.mask);
 
@@ -661,8 +661,8 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      *
      * @param _numberOfDecimalPlaces desired # of decimal places
      */
-    public void setNumberOfDecimalPlaces(int _numberOfDecimalPlaces) {
-        int oldValue = this.numberOfDecimalPlaces;
+    public void setNumberOfDecimalPlaces(final int _numberOfDecimalPlaces) {
+        final int oldValue = this.numberOfDecimalPlaces;
         this.numberOfDecimalPlaces = _numberOfDecimalPlaces;
         firePropertyChange("numberOfDecimalPlaces", oldValue, this.numberOfDecimalPlaces);
     }
@@ -673,7 +673,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
-	public void setSSCommon(SSCommon _ssCommon) {
+	public void setSSCommon(final SSCommon _ssCommon) {
 		ssCommon = _ssCommon;
 	}
 

@@ -72,8 +72,8 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
      * @param precision - number of digits needed in the integer portion of the number
      * @param decimals - number of digits needed in the fraction portion of the number
      */
-    public SSCurrencyFormatterFactory(int precision, int decimals) {
-        NumberFormat nfd = NumberFormat.getCurrencyInstance(Locale.US);
+    public SSCurrencyFormatterFactory(final int precision, final int decimals) {
+        final NumberFormat nfd = NumberFormat.getCurrencyInstance(Locale.US);
         nfd.setMaximumFractionDigits(decimals);
         nfd.setMinimumFractionDigits(decimals);
         
@@ -93,16 +93,16 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
      * @param editorLocale  - locale to be used by the editor
      * @param displayLocale - locale to be used while displaying number
      */
-    public SSCurrencyFormatterFactory(int precision, int decimals, Locale editorLocale, Locale displayLocale) {
+    public SSCurrencyFormatterFactory(final int precision, final int decimals, final Locale editorLocale, final Locale displayLocale) {
         
-        NumberFormat nfe = NumberFormat.getCurrencyInstance(editorLocale);
+        final NumberFormat nfe = NumberFormat.getCurrencyInstance(editorLocale);
         nfe.setMaximumFractionDigits(decimals);
         nfe.setMinimumFractionDigits(decimals);
         nfe.setMaximumIntegerDigits(precision);
         nfe.setMinimumIntegerDigits(1);
         this.setEditFormatter(new NumberFormatter(nfe));
         
-        NumberFormat nfd = NumberFormat.getCurrencyInstance(displayLocale);
+        final NumberFormat nfd = NumberFormat.getCurrencyInstance(displayLocale);
         nfd.setMaximumFractionDigits(decimals);
         nfd.setMinimumFractionDigits(decimals);
         nfd.setMaximumIntegerDigits(precision);

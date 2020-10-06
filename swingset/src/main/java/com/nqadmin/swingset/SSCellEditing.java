@@ -68,7 +68,7 @@ public interface SSCellEditing extends Serializable {
 	 *
 	 * @return returns true is the cell is editable else false.
 	 */
-	default boolean isCellEditable(int _row, int _column) {
+	default boolean isCellEditable(final int _row, final int _column) {
 		return true;
 	}
 
@@ -85,7 +85,7 @@ public interface SSCellEditing extends Serializable {
 	 *
 	 * @return returns true if update should be made else false.
 	 */
-	default boolean cellUpdateRequested(int _row, int _column, Object _oldValue, Object _newValue) {
+	default boolean cellUpdateRequested(final int _row, final int _column, final Object _oldValue, final Object _newValue) {
 		return true;
 	}
 

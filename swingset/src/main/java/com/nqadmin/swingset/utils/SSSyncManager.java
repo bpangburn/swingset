@@ -77,7 +77,7 @@ public class SSSyncManager {
 		// WHEN THERE IS A CHANGE IN THIS VALUE MOVE THE ROWSET SO THAT
 		// ITS POSITIONED AT THE RIGHT RECORD.
 		@Override
-		public void actionPerformed(ActionEvent ae) {
+		public void actionPerformed(final ActionEvent ae) {
 	
 			rowset.removeRowSetListener(rowsetListener);
 
@@ -104,15 +104,15 @@ public class SSSyncManager {
 				
 				// Note rowset count starts at 1 whereas combobox index starts at 0.
 				
-				long rowsetPK = rowset.getLong(columnName);
+				final long rowsetPK = rowset.getLong(columnName);
 
 				if (comboPK != rowsetPK) {
 					// long indexOfId = SSSyncManager.this.comboBox.itemMap.get(this.id) + 1;
-					int indexOfPK = comboBox.getMappings().indexOf(comboPK) + 1;
+					final int indexOfPK = comboBox.getMappings().indexOf(comboPK) + 1;
 					//int index = (int) indexOfPK;
 					logger.debug("Rowset PK=" + rowsetPK + ", Combo PK=" + comboPK + ", Target rowset record # should be " + indexOfPK + ".");
 					rowset.absolute(indexOfPK);
-					int numRecords = comboBox.getItemCount();
+					final int numRecords = comboBox.getItemCount();
 					int count = 0;
 					
 					// IF AFTER POSITIONING THE ROWSET INDEX AT THE COMBO INDEX, THE VALUES DON'T MATCH,
@@ -165,7 +165,7 @@ public class SSSyncManager {
 				}
 				
 
-			} catch (SQLException se) {
+			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			} finally {
 				logger.debug(actionPerformedCount++);
@@ -180,17 +180,17 @@ public class SSSyncManager {
 	protected class SyncRowSetListener implements RowSetListener {
 
 		@Override
-		public void cursorMoved(RowSetEvent rse) {
+		public void cursorMoved(final RowSetEvent rse) {
 			adjustValue();
 		}
 
 		@Override
-		public void rowChanged(RowSetEvent rse) {
+		public void rowChanged(final RowSetEvent rse) {
 			adjustValue();
 		}
 
 		@Override
-		public void rowSetChanged(RowSetEvent rse) {
+		public void rowSetChanged(final RowSetEvent rse) {
 			adjustValue();
 		}
 
@@ -249,7 +249,7 @@ public class SSSyncManager {
 	 * @param _dataNavigator SSDataNavigator to be synchronized with navigation
 	 *                       combo box
 	 */
-	public SSSyncManager(SSDBComboBox _comboBox, SSDataNavigator _dataNavigator) {
+	public SSSyncManager(final SSDBComboBox _comboBox, final SSDataNavigator _dataNavigator) {
 		this.comboBox = _comboBox;
 		this.dataNavigator = _dataNavigator;
 		this.rowset = this.dataNavigator.getSSRowSet();
@@ -275,7 +275,7 @@ public class SSSyncManager {
 		try {
 			if ((rowset != null) && (rowset.getRow() > 0)) {
 				// GET THE PRIMARY KEY FOR THE CURRENT RECORD IN THE ROWSET
-				long currentRowPK = this.rowset.getLong(this.columnName);
+				final long currentRowPK = this.rowset.getLong(this.columnName);
 				
 				logger.debug("SSSyncManager().adjustValue() - RowSet value: " + currentRowPK);		
 
@@ -289,7 +289,7 @@ public class SSSyncManager {
 			} else {
 				this.comboBox.setSelectedIndex(-1);
 			}
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
 		}
 		comboBox.setEnabled(true);
@@ -333,7 +333,7 @@ public class SSSyncManager {
 	 *
 	 * @param _columnName SSRowSet column used as basis for synchronization.
 	 */
-	public void setColumnName(String _columnName) {
+	public void setColumnName(final String _columnName) {
 		this.columnName = _columnName;
 	}
 
@@ -343,7 +343,7 @@ public class SSSyncManager {
 	 * @param _comboBox combo box to be synchronized
 	 */
 
-	public void setComboBox(SSDBComboBox _comboBox) {
+	public void setComboBox(final SSDBComboBox _comboBox) {
 		this.comboBox = _comboBox;
 	}
 
@@ -352,7 +352,7 @@ public class SSSyncManager {
 	 *
 	 * @param _dataNavigator data navigator to be synchronized
 	 */
-	public void setDataNavigator(SSDataNavigator _dataNavigator) {
+	public void setDataNavigator(final SSDataNavigator _dataNavigator) {
 		this.dataNavigator = _dataNavigator;
 		this.rowset = this.dataNavigator.getSSRowSet();
 	}

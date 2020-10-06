@@ -70,8 +70,8 @@ public class SSIntegerFormatterFactory extends javax.swing.text.DefaultFormatter
      * Creates an object of SSIntegerFormatterFactory with the specified precision
      * @param precision - number of digits needed to display the number
      */
-    public SSIntegerFormatterFactory(int precision) {
-        NumberFormat nfd = NumberFormat.getIntegerInstance();
+    public SSIntegerFormatterFactory(final int precision) {
+        final NumberFormat nfd = NumberFormat.getIntegerInstance();
         
         nfd.setMaximumIntegerDigits(precision);
         nfd.setMinimumIntegerDigits(1);

@@ -106,7 +106,7 @@ public class SSConnection implements Serializable {
 	 *
 	 * @param _connection - database connection
 	 */
-	public SSConnection(Connection _connection) {
+	public SSConnection(final Connection _connection) {
 		this.connection = _connection;
 	}
 
@@ -116,7 +116,7 @@ public class SSConnection implements Serializable {
 	 * @param _url - url to the database to which connection has to be established.
 	 *             the url should be of the form jdbc:subprotocol:subname
 	 */
-	public SSConnection(String _url) {
+	public SSConnection(final String _url) {
 		this.url = _url;
 	}
 
@@ -130,7 +130,7 @@ public class SSConnection implements Serializable {
 	 *                  being made
 	 * @param _password - the user's password
 	 */
-	public SSConnection(String _url, String _username, String _password) {
+	public SSConnection(final String _url, final String _username, final String _password) {
 		this.url = _url;
 		this.username = _username;
 		this.password = _password;
@@ -147,7 +147,7 @@ public class SSConnection implements Serializable {
 	 * @param _password   - the user's password
 	 * @param _driverName - name of the database driver to be used.
 	 */
-	public SSConnection(String _url, String _username, String _password, String _driverName) {
+	public SSConnection(final String _url, final String _username, final String _password, final String _driverName) {
 		this.url = _url;
 		this.username = _username;
 		this.password = _password;
@@ -178,9 +178,9 @@ public class SSConnection implements Serializable {
 				&& (this.password != null) && !this.url.trim().equals("") && !this.driverName.trim().equals("")) {
 			try {
 				createConnection();
-			} catch (SQLException se) {
+			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
-			} catch (ClassNotFoundException cnfe) {
+			} catch (final ClassNotFoundException cnfe) {
 				logger.error("Class Not Found Exception.", cnfe);
 			}
 		}
@@ -230,11 +230,11 @@ public class SSConnection implements Serializable {
 	 * @throws ClassNotFoundException 	ClassNotFoundException
 	 */
 	// TODO It would probably be best to add SQLException to the exceptions thrown here.
-	protected void readObject(ObjectInputStream objIn) throws IOException, ClassNotFoundException {
+	protected void readObject(final ObjectInputStream objIn) throws IOException, ClassNotFoundException {
 		objIn.defaultReadObject();
 		try {
 			createConnection();
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
 		}
 	}
@@ -244,7 +244,7 @@ public class SSConnection implements Serializable {
 	 * 
 	 * @param _connection 	database connection
 	 */
-	public void setConnection(Connection _connection) {
+	public void setConnection(final Connection _connection) {
 		this.connection = _connection;
 	}
 
@@ -253,7 +253,7 @@ public class SSConnection implements Serializable {
 	 *
 	 * @param _driverName - name of the database driver to be used.
 	 */
-	public void setDriverName(String _driverName) {
+	public void setDriverName(final String _driverName) {
 		// String oldValue = this.driverName;
 		this.driverName = _driverName;
 		// this.pChangeSupport.firePropertyChange("driverName", oldValue,
@@ -265,7 +265,7 @@ public class SSConnection implements Serializable {
 	 *
 	 * @param _password - the user's password to be used.
 	 */
-	public void setPassword(String _password) {
+	public void setPassword(final String _password) {
 		// String oldValue = this.password;
 		this.password = _password;
 		// this.pChangeSupport.firePropertyChange("password", oldValue, this.password);
@@ -277,7 +277,7 @@ public class SSConnection implements Serializable {
 	 * @param _url - url to the database to which connection has to be established.
 	 *             the url should be of the form jdbc:subprotocol:subname
 	 */
-	public void setUrl(String _url) {
+	public void setUrl(final String _url) {
 		// String oldValue = this.url;
 		this.url = _url;
 		// this.pChangeSupport.firePropertyChange("url", oldValue, this.url);
@@ -290,7 +290,7 @@ public class SSConnection implements Serializable {
 	 * @param _username - the database username on whose behalf the connection is
 	 *                  being made
 	 */
-	public void setUsername(String _username) {
+	public void setUsername(final String _username) {
 		/// String oldValue = this.username;
 		this.username = _username;
 		// this.pChangeSupport.firePropertyChange("username", oldValue, this.username);

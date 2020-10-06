@@ -64,7 +64,7 @@ public class SSTimeField extends SSFormattedTextField {
      * Creates an object of SSTimeField with the specified formatter factory
      * @param factory - formatter factory to be used
      */
-    public SSTimeField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+    public SSTimeField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         this.setValue( Calendar.getInstance().getTime() );
     }

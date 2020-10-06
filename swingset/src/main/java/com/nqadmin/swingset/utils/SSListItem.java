@@ -59,7 +59,7 @@ public class SSListItem {
 	 * @param _primaryKey Primary Key/index for the new list item
 	 * @param _listItem String description for the new list item
 	 */
-	public SSListItem(Long _primaryKey, String _listItem) {
+	public SSListItem(final Long _primaryKey, final String _listItem) {
 		super();
 		this.primaryKey = _primaryKey;
 		this.listItem =_listItem;
@@ -74,7 +74,7 @@ public class SSListItem {
 	/**
 	 * @param _listItem String description for the list item
 	 */
-	public void setListItem(String _listItem) {
+	public void setListItem(final String _listItem) {
 		this.listItem = _listItem;
 	}
 	
@@ -88,7 +88,7 @@ public class SSListItem {
 	/**
 	 * @param _primaryKey Primary Key/index for the current list item
 	 */
-	public void setPrimaryKey(Long _primaryKey) {
+	public void setPrimaryKey(final Long _primaryKey) {
 		this.primaryKey = _primaryKey;
 	}
 

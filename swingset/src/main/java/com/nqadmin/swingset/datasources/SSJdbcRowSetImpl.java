@@ -80,7 +80,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * @param _connection Connection object to be used to connect to the database.
 	 * @throws SQLException	SQLException
 	 */
-	public SSJdbcRowSetImpl(Connection _connection) throws SQLException {
+	public SSJdbcRowSetImpl(final Connection _connection) throws SQLException {
 		super(_connection);
 	}
 
@@ -92,7 +92,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * @param _command    SQL query to be executed.
 	 * @throws SQLException	SQLException
 	 */
-	public SSJdbcRowSetImpl(Connection _connection, String _command) throws SQLException {
+	public SSJdbcRowSetImpl(final Connection _connection, final String _command) throws SQLException {
 		super(_connection);
 		setCommand(_command);
 	}
@@ -107,7 +107,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 *             {@link #setConnection(Connection _connection)} instead.
 	 */
 	@Deprecated
-	public SSJdbcRowSetImpl(SSConnection _ssConnection) {
+	public SSJdbcRowSetImpl(final SSConnection _ssConnection) {
 		setSSConnection(_ssConnection);
 	}
 
@@ -125,7 +125,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * 
 	 */
 	@Deprecated
-	public SSJdbcRowSetImpl(SSConnection _ssConnection, String _command) {
+	public SSJdbcRowSetImpl(final SSConnection _ssConnection, final String _command) {
 		setSSConnection(_ssConnection);
 
 		setCommand(_command);
@@ -162,10 +162,10 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * @param _command SQL query to be executed.
 	 */
 	@Override
-	public void setCommand(String _command) {
+	public void setCommand(final String _command) {
 		try {
 			super.setCommand(_command);
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			// TODO consider letting the calling class handle any SQLException and do away
 			// with this overridden method.
 			logger.error("SQL Exception for command " + _command + ".", se);
@@ -178,7 +178,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * @param _connection connection object to be used to connect to the database.
 	 */
 	@Override
-	public void setConnection(Connection _connection) {
+	public void setConnection(final Connection _connection) {
 		super.setConnection(_connection);
 	}
 
@@ -191,7 +191,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 *             {@link #setConnection(Connection _connection)} instead.
 	 */
 	@Deprecated
-	public void setSSConnection(SSConnection _ssConnection) {
+	public void setSSConnection(final SSConnection _ssConnection) {
 		setConnection(_ssConnection.getConnection());
 	}
 

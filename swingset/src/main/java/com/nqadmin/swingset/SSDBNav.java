@@ -168,7 +168,7 @@ public interface SSDBNav extends Serializable {
 	 *             instead.
 	 */
 	@Deprecated
-	default void performNavigationOps(int _navigationType) {
+	default void performNavigationOps(final int _navigationType) {
 		// no action by default
 
 	}
@@ -179,7 +179,7 @@ public interface SSDBNav extends Serializable {
 	 * @param _navType - indicates type of navigation that is occurring
 	 *
 	 */
-	default void performNavigationOps(Navigation _navType) {
+	default void performNavigationOps(final Navigation _navType) {
 		// no action by default
 
 	}

@@ -64,7 +64,7 @@ public class SSSSNField extends SSFormattedTextField {
 	 * 
 	 * @param factory - formatter factory to be used
 	 */
-	public SSSSNField(javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+	public SSSSNField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
 		super(factory);
 	}
 }

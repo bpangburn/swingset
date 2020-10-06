@@ -128,7 +128,7 @@ public interface SSComponentInterface {
 	 * @param _boundColumnName Name of the column to which this check box should be
 	 *                         bound
 	 */
-	default void bind(SSRowSet _ssRowSet, String _boundColumnName) {// throws java.sql.SQLException {
+	default void bind(final SSRowSet _ssRowSet, final String _boundColumnName) {// throws java.sql.SQLException {
 
 		getSSCommon().bind(_ssRowSet, _boundColumnName);
 
@@ -139,17 +139,17 @@ public interface SSComponentInterface {
 	 * Enter are pressed.
 	 */
 	default void configureTraversalKeys() {
-		Set<AWTKeyStroke> forwardKeys = ((JComponent) this)
+		final Set<AWTKeyStroke> forwardKeys = ((JComponent) this)
 				.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
-		Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
+		final Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK));
 		((JComponent) this).setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
 		
 		// ADDING BACKWARD TRAVERSAL KEYS FROM SSFORMATTEDTEXTFIELD
-		Set<AWTKeyStroke> backwardKeys = ((JComponent) this)
+		final Set<AWTKeyStroke> backwardKeys = ((JComponent) this)
 				.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
-		Set<AWTKeyStroke> newBackwardKeys = new HashSet<>(backwardKeys);
+		final Set<AWTKeyStroke> newBackwardKeys = new HashSet<>(backwardKeys);
 		newBackwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_UP, java.awt.event.InputEvent.SHIFT_MASK));
 		((JComponent) this).setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, newBackwardKeys);
 	}
@@ -363,7 +363,7 @@ public interface SSComponentInterface {
 	 * 
 	 * @param _allowNull flag to indicate if the bound database column can be null
 	 */
-	default void setAllowNull(boolean _allowNull) {
+	default void setAllowNull(final boolean _allowNull) {
 		getSSCommon().setAllowNull(_allowNull);
 	}
 
@@ -376,7 +376,7 @@ public interface SSComponentInterface {
 	 * @throws SQLException thrown if there is a problem writing the array to the
 	 *                      RowSet
 	 */
-	default void setBoundColumnArray(SSArray _boundColumnArray) throws SQLException {
+	default void setBoundColumnArray(final SSArray _boundColumnArray) throws SQLException {
 
 		getSSCommon().setBoundColumnArray(_boundColumnArray);
 	}
@@ -386,7 +386,7 @@ public interface SSComponentInterface {
 	 *
 	 * @param _boundColumnIndex rowset column index to which the Component is to be bound
 	 */
-	default void setBoundColumnIndex(int _boundColumnIndex) { // throws SQLException {
+	default void setBoundColumnIndex(final int _boundColumnIndex) { // throws SQLException {
 		getSSCommon().setBoundColumnIndex(_boundColumnIndex);
 	}
 
@@ -395,7 +395,7 @@ public interface SSComponentInterface {
 	 * 
 	 * @param _boundColumnName the columnName to set
 	 */
-	default void setBoundColumnName(String _boundColumnName) {// throws java.sql.SQLException {
+	default void setBoundColumnName(final String _boundColumnName) {// throws java.sql.SQLException {
 
 		getSSCommon().setBoundColumnName(_boundColumnName);
 
@@ -406,7 +406,7 @@ public interface SSComponentInterface {
 	 * 
 	 * @param _boundColumnText the value to set in the bound database column
 	 */
-	default void setBoundColumnText(String _boundColumnText) {
+	default void setBoundColumnText(final String _boundColumnText) {
 
 		getSSCommon().setBoundColumnText(_boundColumnText);
 
@@ -424,7 +424,7 @@ public interface SSComponentInterface {
 	 * @deprecated use {@link #setBoundColumnIndex(int _boundColumnIndex)} instead.
 	 */
 	@Deprecated
-	default void setColumnIndex(int _columnIndex) throws SQLException {
+	default void setColumnIndex(final int _columnIndex) throws SQLException {
 		setBoundColumnIndex(_columnIndex);
 	}
 
@@ -438,7 +438,7 @@ public interface SSComponentInterface {
 	 * @deprecated use {@link #setBoundColumnName(String _boundColumnName)} instead.
 	 */
 	@Deprecated
-	default void setColumnName(String _columnName) throws SQLException {
+	default void setColumnName(final String _columnName) throws SQLException {
 		setBoundColumnName(_columnName);
 	}
 
@@ -461,7 +461,7 @@ public interface SSComponentInterface {
 	 * 
 	 * @param _ssConnection the ssConnection to set
 	 */
-	default void setSSConnection(SSConnection _ssConnection) {
+	default void setSSConnection(final SSConnection _ssConnection) {
 		getSSCommon().setSSConnection(_ssConnection);
 	}
 
@@ -472,7 +472,7 @@ public interface SSComponentInterface {
 	 * 
 	 * @throws java.sql.SQLException - if a database access error occurs
 	 */
-	default void setSSRowSet(SSRowSet _ssRowSet) throws java.sql.SQLException {
+	default void setSSRowSet(final SSRowSet _ssRowSet) throws java.sql.SQLException {
 		getSSCommon().setSSRowSet(_ssRowSet);
 	}
 

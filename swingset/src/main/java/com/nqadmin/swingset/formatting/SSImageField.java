@@ -109,14 +109,14 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	public SSImageField() {
 		super();
 
-		Set<AWTKeyStroke> forwardKeys = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
-		Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
+		final Set<AWTKeyStroke> forwardKeys = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+		final Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK));
 		setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
 
-		Set<AWTKeyStroke> backwardKeys = getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
-		Set<AWTKeyStroke> newBackwardKeys = new HashSet<>(backwardKeys);
+		final Set<AWTKeyStroke> backwardKeys = getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
+		final Set<AWTKeyStroke> newBackwardKeys = new HashSet<>(backwardKeys);
 		newBackwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_UP, java.awt.event.InputEvent.SHIFT_MASK));
 		setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, newBackwardKeys);
 
@@ -147,20 +147,20 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 		this.getButton.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent ae) {
+			public void actionPerformed(final ActionEvent ae) {
 				try {
 					// if (rowset != null) {
 					// FileInputStream inStream = null;
 					File inFile = null;
-					JFileChooser fileChooser = new JFileChooser();
+					final JFileChooser fileChooser = new JFileChooser();
 					if (fileChooser.showOpenDialog(SSImageField.this.getButton) == JFileChooser.APPROVE_OPTION) {
 						inFile = fileChooser.getSelectedFile();
 						try (FileInputStream inStream = new FileInputStream(inFile)) {
-							int totalLength = (int) inFile.length();
-							byte[] bytes = new byte[totalLength];
+							final int totalLength = (int) inFile.length();
+							final byte[] bytes = new byte[totalLength];
 							int bytesRead = inStream.read(bytes);
 							while (bytesRead < totalLength) {
-								int read = inStream.read(bytes, bytesRead, totalLength - bytesRead);
+								final int read = inStream.read(bytes, bytesRead, totalLength - bytesRead);
 								if (read == -1) {
 									break;
 								}
@@ -174,7 +174,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 						try {
 							SSImageField.this.rowset.updateBytes(SSImageField.this.columnName,
 									SSImageField.this.imageBytes);
-						} catch (SQLException se) {
+						} catch (final SQLException se) {
 							// do nothing
 						}
 						Rescale();
@@ -184,7 +184,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 					// }
 					// }catch(SQLException se){
 					// se.printStackTrace();
-				} catch (IOException ioe) {
+				} catch (final IOException ioe) {
 					logger.error(getColumnForLog() + ": IO Exception.", ioe);
 				}
 			}
@@ -392,7 +392,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 			default:
 				break;
 			}
-		} catch (java.sql.SQLException sqe) {
+		} catch (final java.sql.SQLException sqe) {
 			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
 		}
 	}
@@ -423,7 +423,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 		try {
 			this.colType = this.rowset.getColumnType(this.columnName);
-		} catch (java.sql.SQLException sqe) {
+		} catch (final java.sql.SQLException sqe) {
 			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
 		}
 		this.rowset.addRowSetListener(this);

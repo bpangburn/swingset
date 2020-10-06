@@ -96,7 +96,7 @@ public class SSDBNavImpl implements SSDBNav {
 	 * 
 	 * @param _container	GUI Container to scan for Swing components to clear/reset
 	 */
-	public SSDBNavImpl(Container _container) {
+	public SSDBNavImpl(final Container _container) {
 		this.container = _container;
 	}
 
@@ -120,9 +120,9 @@ public class SSDBNavImpl implements SSDBNav {
 	 *
 	 * @param _container container in which to recursively initialize components
 	 */
-	protected void setComponents(Container _container) {
+	protected void setComponents(final Container _container) {
 
-		Component[] comps = _container.getComponents();	
+		final Component[] comps = _container.getComponents();	
 
 		for (int i = 0; i < comps.length; i++) {
 			

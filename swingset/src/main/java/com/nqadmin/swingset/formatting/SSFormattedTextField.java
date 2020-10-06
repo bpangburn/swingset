@@ -123,15 +123,15 @@ public class SSFormattedTextField extends JFormattedTextField
 		private static final long serialVersionUID = -8060207437911787572L;
 
 		@Override
-		public void propertyChange(PropertyChangeEvent _pce) {
+		public void propertyChange(final PropertyChangeEvent _pce) {
 			
 			if (_pce.getPropertyName().equals("value")) {
 			
 				removeSSRowSetListener();
 	
-			    SSFormattedTextField ftf = (SSFormattedTextField)_pce.getSource();
+			    final SSFormattedTextField ftf = (SSFormattedTextField)_pce.getSource();
 			    
-			    Object currentValue = ftf.getValue();
+			    final Object currentValue = ftf.getValue();
 			    logger.info(getColumnForLog() + ": Object to be passed to database is " + currentValue + ".");
 			    
 			    // TODO May want to see if we can veto invalid updates
@@ -150,7 +150,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				    		getSSRowSet().updateObject(getBoundColumnName(), currentValue);
 				    	}
 
-					} catch (SQLException _se) {
+					} catch (final SQLException _se) {
 						logger.error(getColumnForLog() + ": RowSet update triggered SQL Exception.", _se);
 						JOptionPane.showMessageDialog((JComponent)ftf,
 								"SQL Exception encountered for " + getBoundColumnName(), "SQL Exception", JOptionPane.ERROR_MESSAGE);
@@ -480,20 +480,20 @@ public class SSFormattedTextField extends JFormattedTextField
 	public class FormattedTextFieldVerifier extends InputVerifier {
 
 		@Override
-		public boolean verify(JComponent input) {
+		public boolean verify(final JComponent input) {
 
 			boolean result = false;
 
 			if (input instanceof SSFormattedTextField) {
 				logger.debug(getColumnForLog() + ": Instance of SSFormattedTextField.");
-				SSFormattedTextField ssftf = (SSFormattedTextField) input;
+				final SSFormattedTextField ssftf = (SSFormattedTextField) input;
 				try {
 					logger.debug(getColumnForLog() + ": Text in Formatted Text Field is " + ssftf.getText() + ".");
 					// this will throw a parse exception if something goes wrong
 					ssftf.commitEdit();
 					
 					// get current value
-					Object value = (ssftf.getValue());
+					final Object value = (ssftf.getValue());
 
 					// now perform custom checks
 					result = validateField(value);
@@ -503,7 +503,7 @@ public class SSFormattedTextField extends JFormattedTextField
 						updateTextColor(value);
 					}
 
-				} catch (java.text.ParseException pe) {
+				} catch (final java.text.ParseException pe) {
 					logger.warn(getColumnForLog() + ": Parse Exception at " + pe.getErrorOffset() + ".", pe);
 				}
 			}
@@ -766,7 +766,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
-	public void setSSCommon(SSCommon _ssCommon) {
+	public void setSSCommon(final SSCommon _ssCommon) {
 		ssCommon = _ssCommon;
 	}
 
@@ -801,7 +801,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				}
 				
 				final JDBCType jdbcType = getBoundColumnJDBCType();
-				String columnName = getBoundColumnName();
+				final String columnName = getBoundColumnName();
 	
  				// SQL TO JAVA CONVERSIONS: https://stackoverflow.com/questions/5251140/map-database-type-to-concrete-java-class
 				//
@@ -839,7 +839,7 @@ public class SSFormattedTextField extends JFormattedTextField
 					logger.error(getColumnForLog() + ": JDBCType of " + jdbcType.toString() + " was cast to unsupported type of " + newValue.getClass().getName() + " based on JDBC connection getTypeMap().");
 				}
 
-			} catch (java.sql.SQLException sqe) {
+			} catch (final java.sql.SQLException sqe) {
 				logger.error(getColumnForLog() + ": SQL Exception while updating rowset from formatted component.", sqe);
 				setValue(null);
 			}

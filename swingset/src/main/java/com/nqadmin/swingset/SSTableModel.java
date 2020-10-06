@@ -172,7 +172,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @param _rowset SSRowSet object whose records has to be displayed in JTable.
 	 */
-	public SSTableModel(SSRowSet _rowset) {
+	public SSTableModel(final SSRowSet _rowset) {
 		super();
 		this.rowset = _rowset;
 		init();
@@ -184,7 +184,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @param _rowset SSRowSet object whose records has to be displayed in JTable.
 	 */
-	public void setSSRowSet(SSRowSet _rowset) {
+	public void setSSRowSet(final SSRowSet _rowset) {
 		this.rowset = _rowset;
 		init();
 	}
@@ -196,7 +196,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @param _cellEditing implementation of SSCellEditing interface.
 	 */
-	public void setSSCellEditing(SSCellEditing _cellEditing) {
+	public void setSSCellEditing(final SSCellEditing _cellEditing) {
 		this.cellEditing = _cellEditing;
 	}
 
@@ -207,7 +207,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @param _dataGridHandler implementation of SSDataGridHandler interface.
 	 */
-	public void setSSDataGridHandler(SSDataGridHandler _dataGridHandler) {
+	public void setSSDataGridHandler(final SSDataGridHandler _dataGridHandler) {
 		this.dataGridHandler = _dataGridHandler;
 	}
 
@@ -216,7 +216,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @param _insert true if user can insert new rows, else false.
 	 */
-	public void setInsertion(boolean _insert) {
+	public void setInsertion(final boolean _insert) {
 		this.allowInsertion = _insert;
 	}
 
@@ -239,7 +239,7 @@ public class SSTableModel extends AbstractTableModel {
 			this.fireTableDataChanged();
 // end additions
 
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error("SQL Exception.",  se);
 		}
 	}
@@ -282,7 +282,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @return editable indicator for cell at row and column specified
 	 */
 	@Override
-	public boolean isCellEditable(int _row, int _column) {
+	public boolean isCellEditable(final int _row, final int _column) {
 
 		if (this.uneditableColumns != null) {
 			for (int i = 0; i < this.uneditableColumns.length; i++) {
@@ -309,7 +309,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @return value at the requested cell.
 	 */
 	@Override
-	public Object getValueAt(int _row, int _column) {
+	public Object getValueAt(final int _row, final int _column) {
 
 		Object value = null;
 		if (_row == this.rowCount) {
@@ -329,7 +329,7 @@ public class SSTableModel extends AbstractTableModel {
 
 			// COLUMN NUMBERS IN SSROWSET START FROM 1 WHERE AS COLUMN NUMBERING FOR JTABLE
 			// START FROM 0
-			int type = this.rowset.getColumnType(_column + 1);
+			final int type = this.rowset.getColumnType(_column + 1);
 			switch (type) {
 			case Types.INTEGER:
 			case Types.SMALLINT:
@@ -362,7 +362,7 @@ public class SSTableModel extends AbstractTableModel {
 			default:
 				logger.warn("Unknown data type of " + type);
 			}
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error("SQL Exception while retrieving value.",  se);
 			if (this.component != null) {
 				JOptionPane.showMessageDialog(this.component, "Error while retrieving value.\n" + se.getMessage());
@@ -391,7 +391,7 @@ public class SSTableModel extends AbstractTableModel {
 		int type = -1;
 		try {
 			type = this.rowset.getColumnType(_column + 1);
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error("SQL Exception while updating value.",  se);
 			if (this.component != null) {
 				JOptionPane.showMessageDialog(this.component, "Error while updating value.\n" + se.getMessage());
@@ -488,7 +488,7 @@ public class SSTableModel extends AbstractTableModel {
 			this.rowset.updateRow();
 			
 			logger.debug("Updated value: " + getValueAt(_row,_column));
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error("SQL Exception while updating value.",  se);
 			if (this.component != null) {
 				JOptionPane.showMessageDialog(this.component, "Error while updating value.\n" + se.getMessage());
@@ -505,7 +505,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _value  value entererd of a column
 	 * @param _column the column number for which the value is entered.
 	 */
-	protected void insertRow(Object _value, int _column) {
+	protected void insertRow(final Object _value, final int _column) {
 		if (_value == null) {
 			return;
 		}
@@ -527,7 +527,7 @@ public class SSTableModel extends AbstractTableModel {
 
 			}
 
-			int type = this.rowset.getColumnType(_column + 1);
+			final int type = this.rowset.getColumnType(_column + 1);
 
 			switch (type) {
 			case Types.INTEGER:
@@ -586,7 +586,7 @@ public class SSTableModel extends AbstractTableModel {
 				this.dataGridHandler.performPostInsertOps(this.rowCount - 1);
 			}
 
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error("SQL Exception while inserting row.",  se);
 			this.inInsertRow = false;
 			if (this.component != null) {
@@ -606,16 +606,16 @@ public class SSTableModel extends AbstractTableModel {
 			return;
 		}
 
-		Set<Integer> keySet = this.defaultValuesMap.keySet();
-		Iterator<?> iterator = keySet.iterator();
+		final Set<Integer> keySet = this.defaultValuesMap.keySet();
+		final Iterator<?> iterator = keySet.iterator();
 		try {
 			while (iterator.hasNext()) {
-				Integer column = (Integer) iterator.next();
+				final Integer column = (Integer) iterator.next();
 				
 				logger.debug("Column number is:" + column);
 				
 				// COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
-				int type = this.rowset.getColumnType(column.intValue() + 1);
+				final int type = this.rowset.getColumnType(column.intValue() + 1);
 				switch (type) {
 				case Types.INTEGER:
 				case Types.SMALLINT:
@@ -655,7 +655,7 @@ public class SSTableModel extends AbstractTableModel {
 
 			} // END OF WHILE
 
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error("SQL Exception while setting defaults for row.",  se);
 			if (this.component != null) {
 				JOptionPane.showMessageDialog(this.component, "Error while setting defaults for row.\n" + se.getMessage());
@@ -671,11 +671,11 @@ public class SSTableModel extends AbstractTableModel {
 	 * @return type for the specified column (first column is 0)
 	 */
 	@Override
-	public Class<?> getColumnClass(int _column) {
+	public Class<?> getColumnClass(final int _column) {
 		int type;
 		try {
 			type = this.rowset.getColumnType(_column + 1);
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.debug("SQL Exception.",  se);
 			return super.getColumnClass(_column);
 		}
@@ -722,7 +722,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @return returns true on succesful deletion else false.
 	 */
-	public boolean deleteRow(int _row) {
+	public boolean deleteRow(final int _row) {
 		if (this.dataGridHandler != null) {
 			this.dataGridHandler.performPreDeletionOps(_row);
 		}
@@ -738,7 +738,7 @@ public class SSTableModel extends AbstractTableModel {
 					this.dataGridHandler.performPostDeletionOps(_row);
 				}
 				return true;
-			} catch (SQLException se) {
+			} catch (final SQLException se) {
 				logger.error("SQL Exception while deleting row.",  se);
 				if (this.component != null) {
 					JOptionPane.showMessageDialog(this.component, "Error while deleting row.\n" + se.getMessage());
@@ -759,7 +759,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _values        the values for all the columns specified in first
 	 *                       argument
 	 */
-	public void setDefaultValues(int[] _columnNumbers, Object[] _values) {
+	public void setDefaultValues(final int[] _columnNumbers, final Object[] _values) {
 		if ((_columnNumbers == null) || (_values == null)) {
 			this.defaultValuesMap = null;
 		}
@@ -785,7 +785,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @return returns a object representing the default value.
 	 */
-	public Object getDefaultValue(int _columnNumber) {
+	public Object getDefaultValue(final int _columnNumber) {
 		Object value = null;
 		if (this.defaultValuesMap != null) {
 			value = this.defaultValuesMap.get(new Integer(_columnNumber));
@@ -799,7 +799,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @param _component the component that should be used for message dialogs.
 	 */
-	public void setMessageWindow(Component _component) {
+	public void setMessageWindow(final Component _component) {
 		this.component = _component;
 	}
 
@@ -809,7 +809,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @param _table JTable to which SSTableModel is bound to.
 	 */
-	public void setJTable(JTable _table) {
+	public void setJTable(final JTable _table) {
 		this.table = _table;
 	}
 
@@ -821,7 +821,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @param _columnNumber the column which is the primary column.
 	 */
-	public void setPrimaryColumn(int _columnNumber) {
+	public void setPrimaryColumn(final int _columnNumber) {
 		this.primaryColumn = _columnNumber;
 	}
 
@@ -831,7 +831,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @param _dataValue implementation of SSDataValue for determining PK
 	 */
-	public void setSSDataValue(SSDataValue _dataValue) {
+	public void setSSDataValue(final SSDataValue _dataValue) {
 		this.dataValue = _dataValue;
 	}
 
@@ -842,7 +842,7 @@ public class SSTableModel extends AbstractTableModel {
 	protected void setPrimaryColumn() {
 		try {
 
-			int type = this.rowset.getColumnType(this.primaryColumn + 1);
+			final int type = this.rowset.getColumnType(this.primaryColumn + 1);
 
 			switch (type) {
 			case Types.INTEGER:
@@ -880,7 +880,7 @@ public class SSTableModel extends AbstractTableModel {
 			default:
 				logger.warn("Unknown data type of " + type);
 			}
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error("SQL Exception while insering Primary Key value.",  se);
 			if (this.component != null) {
 				JOptionPane.showMessageDialog(this.component,
@@ -912,9 +912,9 @@ public class SSTableModel extends AbstractTableModel {
 		// _strDate = _strDate.trim();
 		// String newStrDate = _strDate;
 		if (newStrDate.indexOf("/") != -1) {
-			StringTokenizer strtok = new StringTokenizer(newStrDate, "/", false);
-			String month = strtok.nextToken();
-			String day = strtok.nextToken();
+			final StringTokenizer strtok = new StringTokenizer(newStrDate, "/", false);
+			final String month = strtok.nextToken();
+			final String day = strtok.nextToken();
 			newStrDate = strtok.nextToken() + "-" + month + "-" + day;
 		}
 		return Date.valueOf(newStrDate);
@@ -927,7 +927,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _headers array of string objects representing the header for each
 	 *                 column.
 	 */
-	public void setHeaders(String[] _headers) {
+	public void setHeaders(final String[] _headers) {
 		this.headers = _headers;
 	}
 
@@ -941,7 +941,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *         where column numbering begins at 0
 	 */
 	@Override
-	public String getColumnName(int _columnNumber) {
+	public String getColumnName(final int _columnNumber) {
 		if (this.headers != null) {
 			if (_columnNumber < this.headers.length) {
 				logger.debug("Sending header " + headers[_columnNumber]);
@@ -960,7 +960,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _columnNumbers array specifying the column numbers which should be
 	 *                       uneditable.
 	 */
-	public void setUneditableColumns(int[] _columnNumbers) {
+	public void setUneditableColumns(final int[] _columnNumbers) {
 		this.uneditableColumns = _columnNumbers;
 	}
 
@@ -976,7 +976,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _columnNumbers array specifying the column numbers which should be
 	 *                       hidden.
 	 */
-	public void setHiddenColumns(int[] _columnNumbers) {
+	public void setHiddenColumns(final int[] _columnNumbers) {
 		this.hiddenColumns = _columnNumbers;
 	}
 
@@ -991,7 +991,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
 	 */
 	@Deprecated
-	public void setRowSet(SSRowSet _rowset) {
+	public void setRowSet(final SSRowSet _rowset) {
 		this.rowset = _rowset;
 		init();
 	}

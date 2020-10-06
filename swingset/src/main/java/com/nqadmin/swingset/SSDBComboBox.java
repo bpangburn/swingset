@@ -154,11 +154,11 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		private static final long serialVersionUID = 5078725576768393489L;
 
 		@Override
-		public void actionPerformed(ActionEvent ae) {
+		public void actionPerformed(final ActionEvent ae) {
 
 			removeSSRowSetListener();
 
-			int index = getSelectedIndex();
+			final int index = getSelectedIndex();
 
 			if (index == -1) {
 				logger.debug(getColumnForLog() + ": SSDBComboListener.actionPerformed setting bound column to  null.");
@@ -238,7 +238,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * @param eventList the eventList to set
 	 */
-	public void setEventList(EventList<SSListItem> eventList) {
+	public void setEventList(final EventList<SSListItem> eventList) {
 		this.eventList = eventList;
 	}
 
@@ -329,7 +329,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * @param mappings the mappings to set
 	 */
-	public void setMappings(ArrayList<Long> mappings) {
+	public void setMappings(final ArrayList<Long> mappings) {
 		this.mappings = mappings;
 	}
 
@@ -343,7 +343,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * @param options the options to set
 	 */
-	public void setOptions(ArrayList<String> options) {
+	public void setOptions(final ArrayList<String> options) {
 		this.options = options;
 	}
 
@@ -419,8 +419,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _displayColumnName    column name whose values are displayed in the
 	 *                              combo box.
 	 */
-	public SSDBComboBox(SSConnection _ssConnection, String _query, String _primaryKeyColumnName,
-			String _displayColumnName) {
+	public SSDBComboBox(final SSConnection _ssConnection, final String _query, final String _primaryKeyColumnName,
+			final String _displayColumnName) {
 		super();
 		setSSCommon(new SSCommon(this));
 		// SSCommon constructor calls init()
@@ -480,7 +480,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _displayText text that should be displayed in the combobox
 	 * @param _primaryKey  primary key value corresponding the the display text
 	 */
-	public void addItem(String _displayText, long _primaryKey) {
+	public void addItem(final String _displayText, final long _primaryKey) {
 
 		// LOCK EVENT LIST
 		eventList.getReadWriteLock().writeLock().lock();
@@ -499,14 +499,14 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		try {
 
 			// create new list item
-			SSListItem listItem = new SSListItem(_primaryKey, _displayText);
+			final SSListItem listItem = new SSListItem(_primaryKey, _displayText);
 
 			// add to lists
 			eventList.add(listItem);
 			mappings.add(listItem.getPrimaryKey());
 			options.add(listItem.getListItem());
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			logger.error(getColumnForLog() + ": Exception.", e);
 		} finally {
 			eventList.getReadWriteLock().writeLock().unlock();
@@ -563,7 +563,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _value value corresponding the the name
 	 */
 	@Deprecated
-	public void addStringItem(String _name, String _value) {
+	public void addStringItem(final String _name, final String _value) {
 		addItem(_name, Long.valueOf(_value));
 
 	}
@@ -595,7 +595,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * 
 	 * @return returns true on successful deletion otherwise returns false.
 	 */
-	public boolean deleteItem(long _primaryKey) {
+	public boolean deleteItem(final long _primaryKey) {
 
 		boolean result = false;
 
@@ -607,7 +607,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			try {
 
 				// GET INDEX FOR mappings and options
-				int index = mappings.indexOf(_primaryKey);
+				final int index = mappings.indexOf(_primaryKey);
 
 				// PROCEED IF INDEX WAS FOUND
 				if (index != -1) {
@@ -619,7 +619,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 				}
 
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				logger.error(getColumnForLog() + ": Exception.", e);
 			} finally {
 				eventList.getReadWriteLock().writeLock().unlock();
@@ -644,12 +644,12 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *
 	 * @return returns true on successful deletion otherwise returns false.
 	 */
-	public boolean deleteStringItem(String _displayText) {
+	public boolean deleteStringItem(final String _displayText) {
 
 		boolean result = false;
 
 		if (options != null) {
-			int index = options.indexOf(_displayText);
+			final int index = options.indexOf(_displayText);
 			result = deleteItem(mappings.get(index));
 		}
 
@@ -675,7 +675,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 // Note that installing AutoComplete support makes the ComboBox editable.
 // Should already in the event dispatch thread so don't use invokeAndWait()
 		if (!autoCompleteInstalled) {
-			AutoCompleteSupport<SSListItem> autoComplete = AutoCompleteSupport.install(this, eventList);
+			final AutoCompleteSupport<SSListItem> autoComplete = AutoCompleteSupport.install(this, eventList);
 			autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
 			autoCompleteInstalled = true;
 		}
@@ -777,7 +777,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		
 		String result = null;
 		
-		SSListItem currentItem = (SSListItem)getSelectedItem();
+		final SSListItem currentItem = (SSListItem)getSelectedItem();
 		
 		if (currentItem!=null) {
 			result = currentItem.getListItem();
@@ -961,10 +961,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	protected String getStringValue(final ResultSet _rs, final String _columnName) {
 		String strValue = "";
 		try {
-			int type = _rs.getMetaData().getColumnType(_rs.findColumn(_columnName));
+			final int type = _rs.getMetaData().getColumnType(_rs.findColumn(_columnName));
 			switch (type) {
 			case Types.DATE:
-				SimpleDateFormat myDateFormat = new SimpleDateFormat(dateFormat);
+				final SimpleDateFormat myDateFormat = new SimpleDateFormat(dateFormat);
 				strValue = myDateFormat.format(_rs.getDate(_columnName));
 				break;
 			default:
@@ -974,7 +974,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			if (strValue == null) {
 				strValue = "";
 			}
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
 		return strValue;
@@ -1025,7 +1025,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				options.add(listItem.getListItem());
 			}
 
-			Statement statement = ssCommon.getSSConnection().getConnection().createStatement();
+			final Statement statement = ssCommon.getSSConnection().getConnection().createStatement();
 			rs = statement.executeQuery(getQuery());
 			
 			logger.debug(getColumnForLog() + ": Query - " + getQuery());
@@ -1065,9 +1065,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			}
 			rs.close();
 
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
-		} catch (java.lang.NullPointerException npe) {
+		} catch (final java.lang.NullPointerException npe) {
 			logger.error(getColumnForLog() + ": Null Pointer Exception.", npe);
 		} finally {
 			eventList.getReadWriteLock().writeLock().unlock();
@@ -1118,8 +1118,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *
 	 * @param _dateFormat pattern in which dates have to be displayed
 	 */
-	public void setDateFormat(String _dateFormat) {
-		String oldValue = this.dateFormat;
+	public void setDateFormat(final String _dateFormat) {
+		final String oldValue = this.dateFormat;
 		this.dateFormat = _dateFormat;
 		firePropertyChange("dateFormat", oldValue, this.dateFormat);
 	}
@@ -1129,8 +1129,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *
 	 * @param _displayColumnName column name whose values have to be displayed.
 	 */
-	public void setDisplayColumnName(String _displayColumnName) {
-		String oldValue = this.displayColumnName;
+	public void setDisplayColumnName(final String _displayColumnName) {
+		final String oldValue = this.displayColumnName;
 		this.displayColumnName = _displayColumnName;
 		firePropertyChange("displayColumnName", oldValue, this.displayColumnName);
 	}
@@ -1144,7 +1144,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _filter boolean to turn filtering on or off
 	 */
 	@Deprecated
-	public void setFilterable(boolean _filter) {
+	public void setFilterable(final boolean _filter) {
 		// TODO remove this method in future release
 		this.filterSwitch = _filter;
 		logger.warn(getColumnForLog() + ": This method has been Deprecated because GlazedList filtering is now fully integrated.\n" + Thread.currentThread().getStackTrace());
@@ -1155,8 +1155,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * 
 	 * @param _primaryKeyColumnName name of primary key column
 	 */
-	public void setPrimaryKeyColumnName(String _primaryKeyColumnName) {
-		String oldValue = this.primaryKeyColumnName;
+	public void setPrimaryKeyColumnName(final String _primaryKeyColumnName) {
+		final String oldValue = this.primaryKeyColumnName;
 		this.primaryKeyColumnName = _primaryKeyColumnName;
 		firePropertyChange("primaryKeyColumnName", oldValue, this.primaryKeyColumnName);
 	}
@@ -1167,8 +1167,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _query query to be used to get values from database (to display combo
 	 *               box items)
 	 */
-	public void setQuery(String _query) {
-		String oldValue = this.query;
+	public void setQuery(final String _query) {
+		final String oldValue = this.query;
 		this.query = _query;
 		firePropertyChange("query", oldValue, this.query);
 	}
@@ -1255,8 +1255,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *                                 in the combo in addition to the first column
 	 *                                 name.
 	 */
-	public void setSecondDisplayColumnName(String _secondDisplayColumnName) {
-		String oldValue = this.secondDisplayColumnName;
+	public void setSecondDisplayColumnName(final String _secondDisplayColumnName) {
+		final String oldValue = this.secondDisplayColumnName;
 		this.secondDisplayColumnName = _secondDisplayColumnName;
 		firePropertyChange("secondDisplayColumnName", oldValue, this.secondDisplayColumnName);
 	}
@@ -1268,7 +1268,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *
 	 * @param _value value to set as currently selected.
 	 */
-	public void setSelectedStringValue(String _value) {
+	public void setSelectedStringValue(final String _value) {
 
 		// ONLY NEED TO PROCEED IF THERE IS A CHANGE
 		// TODO consider firing a property change
@@ -1277,7 +1277,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			// IF OPTIONS ARE NON-NULL THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
 			// SPECIFIED TEXT IS STORED
 			if (this.options != null) {
-				int index = options.indexOf(_value);
+				final int index = options.indexOf(_value);
 
 				if (index == -1) {
 					logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for display text of " + _value + ". Setting index to -1 (blank).");
@@ -1300,7 +1300,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _value value to set as currently selected.
 	 */
 	@Override
-	public void setSelectedItem(Object _value) {
+	public void setSelectedItem(final Object _value) {
 		
 // TODO Need to deal with null on focus lost event. SSDBComboListener.actionPerformed setting bound column to  null when focus lost.
 // TODO Could add back logic to revert typed text to restore matches.		
@@ -1714,7 +1714,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *
 	 * @param _value database record primary key value to assign to combobox
 	 */
-	public void setSelectedValue(long _value) {
+	public void setSelectedValue(final long _value) {
 
 		// ONLY NEED TO PROCEED IF THERE IS A CHANGE
 		// TODO consider firing a property change
@@ -1726,7 +1726,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			// IF MAPPINGS ARE SPECIFIED THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
 			// SPECIFIED CODE IS STORED
 			if (this.mappings != null) {
-				int index = mappings.indexOf(_value);
+				final int index = mappings.indexOf(_value);
 
 				if (index == -1) {
 					logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for value of " + _value + ". Setting index to -1 (blank).");
@@ -1806,8 +1806,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *
 	 * @param _separator separator to be used.
 	 */
-	public void setSeparator(String _separator) {
-		String oldValue = this.separator;
+	public void setSeparator(final String _separator) {
+		final String oldValue = this.separator;
 		this.separator = _separator;
 		firePropertyChange("separator", oldValue, this.separator);
 	}
@@ -1820,7 +1820,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _separator separator to be used.
 	 */
 	@Deprecated
-	public void setSeperator(String _separator) {
+	public void setSeperator(final String _separator) {
 		setSeparator(_separator);
 	}
 
@@ -1830,7 +1830,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
-	public void setSSCommon(SSCommon _ssCommon) {
+	public void setSSCommon(final SSCommon _ssCommon) {
 		ssCommon = _ssCommon;
 
 	}
@@ -1854,7 +1854,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *
 	 * @return returns true if update is successful otherwise returns false.
 	 */
-	public boolean updateItem(long _primaryKey, String _updatedDisplayText) {
+	public boolean updateItem(final long _primaryKey, final String _updatedDisplayText) {
 
 		boolean result = false;
 
@@ -1866,7 +1866,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			try {
 
 				// GET INDEX FOR mappings and options
-				int index = mappings.indexOf(_primaryKey);
+				final int index = mappings.indexOf(_primaryKey);
 
 				// PROCEED IF INDEX WAS FOUND
 				if (index != -1) {
@@ -1880,7 +1880,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 // TODO may need to call repaint()				
 
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				logger.error(getColumnForLog() + ": Exception.", e);
 			} finally {
 				eventList.getReadWriteLock().writeLock().unlock();
@@ -1928,7 +1928,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			// Combobox primary key column data queried from the database will generally be of data type long.
 			// The bound column text should generally be a long integer as well, but trimming to be safe.
 			// TODO Consider starting with a Long and passing directly to setSelectedValue(primaryKey). Modify setSelectedValue to accept a Long vs long.
-			String text = getBoundColumnText();
+			final String text = getBoundColumnText();
 			
 			logger.debug(getColumnForLog() + ": getBoundColumnText() - " + text);
 
@@ -1936,7 +1936,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			//if (text != null && !(text.equals(""))) {
 			if ((text != null) && !text.isEmpty()) {
 				
-				long primaryKey = Long.parseLong(text);
+				final long primaryKey = Long.parseLong(text);
 				
 				logger.debug(getColumnForLog() + ": Calling setSelectedValue(" + primaryKey + ").");
 
@@ -1956,7 +1956,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			}
 			logger.debug(getColumnForLog() + ": Combo editor string: " + editorString);
 
-		} catch (NumberFormatException nfe) {
+		} catch (final NumberFormatException nfe) {
 			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
 		}
 	}
@@ -1972,12 +1972,12 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *
 	 * @return returns true if successful otherwise returns false.
 	 */
-	public boolean updateStringItem(String _existingDisplayText, String _updatedDisplayText) {
+	public boolean updateStringItem(final String _existingDisplayText, final String _updatedDisplayText) {
 
 		boolean result = false;
 
 		if (options != null) {
-			int index = options.indexOf(_existingDisplayText);
+			final int index = options.indexOf(_existingDisplayText);
 			result = updateItem(mappings.get(index), _updatedDisplayText);
 		}
 

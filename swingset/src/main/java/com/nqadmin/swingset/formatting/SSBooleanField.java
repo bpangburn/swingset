@@ -81,10 +81,10 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	protected class internalVerifier extends InputVerifier {
 
 		@Override
-		public boolean verify(JComponent input) {
+		public boolean verify(final JComponent input) {
 
-			SSBooleanField tf = (SSBooleanField) input;
-			boolean selected = tf.isSelected();
+			final SSBooleanField tf = (SSBooleanField) input;
+			final boolean selected = tf.isSelected();
 
 			setBackground(java.awt.Color.WHITE);
 
@@ -121,9 +121,9 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 					break;
 				}
 				SSBooleanField.this.rowset.addRowSetListener(tf);
-			} catch (java.sql.SQLException se) {
+			} catch (final java.sql.SQLException se) {
 				logger.error(getColumnForLog() + ": SQL Exception.", se);
-			} catch (java.lang.NullPointerException np) {
+			} catch (final java.lang.NullPointerException np) {
 				logger.error(getColumnForLog() + ": Null Pointer Exception.", np);
 			}
 			return true;
@@ -149,14 +149,14 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	public SSBooleanField() {
 		super();
 
-		Set<AWTKeyStroke> forwardKeys = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
-		Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
+		final Set<AWTKeyStroke> forwardKeys = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+		final Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK));
 		setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
 
-		Set<AWTKeyStroke> backwardKeys = getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
-		Set<AWTKeyStroke> newBackwardKeys = new HashSet<>(backwardKeys);
+		final Set<AWTKeyStroke> backwardKeys = getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
+		final Set<AWTKeyStroke> newBackwardKeys = new HashSet<>(backwardKeys);
 		newBackwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_UP, java.awt.event.InputEvent.SHIFT_MASK));
 		setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, newBackwardKeys);
 
@@ -188,7 +188,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 
 		try {
 			this.colType = this.rowset.getColumnType(this.columnName);
-		} catch (java.sql.SQLException se) {
+		} catch (final java.sql.SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
 		this.rowset.addRowSetListener(this);
@@ -251,7 +251,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 			default:
 				break;
 			}
-		} catch (java.sql.SQLException se) {
+		} catch (final java.sql.SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
 	}

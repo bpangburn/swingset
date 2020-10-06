@@ -87,7 +87,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 		private static final long serialVersionUID = -997068820028544504L;
 
 			@Override
-			public void actionPerformed(ActionEvent ae) {
+			public void actionPerformed(final ActionEvent ae) {
 				
 				removeSSRowSetListener();
 				
@@ -95,15 +95,15 @@ public class SSImage extends JPanel implements SSComponentInterface {
                     if (getSSRowSet() != null) {
                         //FileInputStream inStream = null;
                         File inFile = null;
-                        JFileChooser fileChooser = new JFileChooser();
+                        final JFileChooser fileChooser = new JFileChooser();
                         if(fileChooser.showOpenDialog(SSImage.this.btnUpdateImage) == JFileChooser.APPROVE_OPTION){
                             inFile = fileChooser.getSelectedFile();
                             try (FileInputStream inStream = new FileInputStream(inFile)) {
-                                int totalLength = (int)inFile.length();
-                                byte[] bytes = new byte[totalLength];
+                                final int totalLength = (int)inFile.length();
+                                final byte[] bytes = new byte[totalLength];
                                 int bytesRead = inStream.read(bytes);
                                 while (bytesRead < totalLength){
-                                    int read = inStream.read(bytes, bytesRead, totalLength - bytesRead);
+                                    final int read = inStream.read(bytes, bytesRead, totalLength - bytesRead);
                                     if(read == -1) {
 										break;
 									}
@@ -121,9 +121,9 @@ public class SSImage extends JPanel implements SSComponentInterface {
                             return;
                         }
                     }
-                }catch(SQLException se){
+                }catch(final SQLException se){
                 	logger.error(getColumnForLog() + ": SQL Exception.", se);
-                }catch(IOException ioe){
+                }catch(final IOException ioe){
                 	logger.error(getColumnForLog() + ": IO Exception.", ioe);;
                 }
                 
@@ -204,7 +204,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
      * @param _ssRowSet - SSRowSet from/to which data has to be read/written
      * @param _boundColumnName - column in the sSRowSet to which the component should be bound.
      */
-    public SSImage(SSRowSet _ssRowSet, String _boundColumnName) {
+    public SSImage(final SSRowSet _ssRowSet, final String _boundColumnName) {
 		super();
 		setSSCommon(new SSCommon(this));
 		// SSCommon constructor calls init()
@@ -265,10 +265,10 @@ public class SSImage extends JPanel implements SSComponentInterface {
      */
     protected void addComponents() {
         setLayout(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
+        final GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy= 0;
-        JScrollPane scrollPane = new JScrollPane(this.lblImage, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        final JScrollPane scrollPane = new JScrollPane(this.lblImage, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         scrollPane.setPreferredSize(new Dimension(200, 180));
         this.btnUpdateImage.setPreferredSize(new Dimension(200,20));
         add(scrollPane, constraints);
@@ -292,7 +292,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
     public void clearImage(){
         this.lblImage.setIcon(null);
         this.lblImage.setText("No Picture");
-        Dimension dimension = getPreferredSize();
+        final Dimension dimension = getPreferredSize();
         this.lblImage.setPreferredSize(new Dimension((int)dimension.getWidth(), (int)dimension.getHeight()-20));
         updateUI();
     }
@@ -500,8 +500,8 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 * @param _preferredSize - preferred size of the image component
 	 */
 	@Override
-	public void setPreferredSize(Dimension _preferredSize) {
-		Dimension oldValue = this.preferredSize;
+	public void setPreferredSize(final Dimension _preferredSize) {
+		final Dimension oldValue = this.preferredSize;
 		this.preferredSize = _preferredSize;
 		firePropertyChange("preferredSize", oldValue, this.preferredSize);
 
@@ -517,7 +517,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
-	public void setSSCommon(SSCommon _ssCommon) {
+	public void setSSCommon(final SSCommon _ssCommon) {
 		ssCommon = _ssCommon;
 
 	}
@@ -534,7 +534,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 
 // from updateDisplay()
         try {
-            byte[] imageData = getSSRowSet().getRow() >0 ? getSSRowSet().getBytes(getBoundColumnName()) : null;
+            final byte[] imageData = getSSRowSet().getRow() >0 ? getSSRowSet().getBytes(getBoundColumnName()) : null;
             if(imageData != null){
                 this.img = new ImageIcon(imageData);
                 this.lblImage.setPreferredSize(new Dimension(this.img.getIconWidth(), this.img.getIconHeight()));
@@ -543,7 +543,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
                 this.img = null;
                 this.lblImage.setText("No Picture");
             }
-        } catch(SQLException se) {
+        } catch(final SQLException se) {
         	logger.error(getColumnForLog() + ": SQL Exception.", se);
             this.img = null;
         }
