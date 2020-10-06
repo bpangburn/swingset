@@ -162,7 +162,7 @@ public class SSDBNavImpl implements SSDBNav {
                 setComponents((Container)comps[i]);
             } else if(comps[i] instanceof JScrollPane) {
             // IF IT IS A JScrollPane GET THE VIEW PORT AND RECURSIVELY SET THE FIELDS IN VIEW PORT    
-                setComponents((Container) ((JScrollPane)comps[i]).getViewport());
+                setComponents(((JScrollPane)comps[i]).getViewport());
             } else {
             // DIPLAY WARNING FOR UNKNOWN COMPONENT
             	logger.warn("Encountered unknown component type of: " + comps[i].getClass().getSimpleName() + ". Unable to clear component.");

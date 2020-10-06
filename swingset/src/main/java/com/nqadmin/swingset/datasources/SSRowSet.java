@@ -366,7 +366,7 @@ public interface SSRowSet extends RowSet {
 					}
 				} else {
 					// CONVERT THE GIVEN STRING TO BOOLEAN TYPE
-					final boolean boolValue = Boolean.valueOf(_updatedValue).booleanValue();
+					final boolean boolValue = Boolean.valueOf(_updatedValue);
 					this.updateBoolean(_columnName, boolValue);
 				}
 				break;

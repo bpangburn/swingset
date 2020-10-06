@@ -637,7 +637,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 			result = NON_SELECTED;
 		} else if (mappings != null) {
 			// result = this.mappings[getSelectedIndex()];
-			result = (int) mappings.get(getSelectedIndex());
+			result = mappings.get(getSelectedIndex());
 		} else {
 			result = getSelectedIndex();
 		}

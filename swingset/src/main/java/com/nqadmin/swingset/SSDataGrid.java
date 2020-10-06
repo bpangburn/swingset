@@ -405,7 +405,7 @@ public class SSDataGrid extends JTable {
 		// CREATE AN INT ARRAY CONTAINING THE FILETED LIST OF COLUMNS
 		final int[] result = new int[filteredColumns.size()];
 		for (int i = 0; i < filteredColumns.size(); i++) {
-			result[i] = ((Integer) filteredColumns.elementAt(i)).intValue();
+			result[i] = ((Integer) filteredColumns.elementAt(i));
 		}
 
 		return result;
@@ -1303,7 +1303,7 @@ public class SSDataGrid extends JTable {
 				final boolean _hasFocus, final int _row, final int _column) {
 
 			if (_value instanceof Boolean) {
-				if (((Boolean) _value).booleanValue()) {
+				if (((Boolean) _value)) {
 					setSelected(true);
 				} else {
 					setSelected(false);
@@ -1351,7 +1351,7 @@ public class SSDataGrid extends JTable {
 				// VALUE BACK.
 				columnClass = java.sql.Types.BOOLEAN;
 				// BASED ON THE VALUE CHECK THE BOX OR UNCHECK IT.
-				if (((Boolean) _value).booleanValue()) {
+				if (((Boolean) _value)) {
 					checkBox.setSelected(true);
 				} else {
 					checkBox.setSelected(false);
@@ -1471,7 +1471,7 @@ public class SSDataGrid extends JTable {
 				return -1;
 			}
 			if (underlyingValues == null) {
-				return ((Integer) _value).intValue();
+				return ((Integer) _value);
 			}
 			for (int i = 0; i < underlyingValues.length; i++) {
 				if (underlyingValues[i].equals(_value)) {
@@ -1540,7 +1540,7 @@ public class SSDataGrid extends JTable {
 				if (_value == null) {
 					return -1;
 				}
-				return ((Integer) _value).intValue();
+				return ((Integer) _value);
 			}
 			for (int i = 0; i < underlyingValues.length; i++) {
 				if (underlyingValues[i].equals(_value)) {

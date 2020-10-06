@@ -454,22 +454,22 @@ public class SSTableModel extends AbstractTableModel {
 			case Types.INTEGER:
 			case Types.SMALLINT:
 			case Types.TINYINT:
-				rowset.updateInt(_column + 1, ((Integer) valueCopy).intValue());
+				rowset.updateInt(_column + 1, ((Integer) valueCopy));
 				break;
 			case Types.BIGINT:
 // adding update long support 11-01-2004
-				rowset.updateLong(_column + 1, ((Long) valueCopy).longValue());
+				rowset.updateLong(_column + 1, ((Long) valueCopy));
 				break;
 			case Types.FLOAT:
-				rowset.updateFloat(_column + 1, ((Float) valueCopy).floatValue());
+				rowset.updateFloat(_column + 1, ((Float) valueCopy));
 				break;
 			case Types.DOUBLE:
 			case Types.NUMERIC:
-				rowset.updateDouble(_column + 1, ((Double) valueCopy).doubleValue());
+				rowset.updateDouble(_column + 1, ((Double) valueCopy));
 				break;
 			case Types.BOOLEAN:
 			case Types.BIT:
-				rowset.updateBoolean(_column + 1, ((Boolean) valueCopy).booleanValue());
+				rowset.updateBoolean(_column + 1, ((Boolean) valueCopy));
 				break;
 			case Types.DATE:
 				rowset.updateDate(_column + 1, (Date) valueCopy);
@@ -533,22 +533,22 @@ public class SSTableModel extends AbstractTableModel {
 			case Types.INTEGER:
 			case Types.SMALLINT:
 			case Types.TINYINT:
-				rowset.updateInt(_column + 1, ((Integer) _value).intValue());
+				rowset.updateInt(_column + 1, ((Integer) _value));
 				break;
 			case Types.BIGINT:
 // adding update long support 11-01-2004
-				rowset.updateLong(_column + 1, ((Long) _value).longValue());
+				rowset.updateLong(_column + 1, ((Long) _value));
 				break;
 			case Types.FLOAT:
-				rowset.updateFloat(_column + 1, ((Float) _value).floatValue());
+				rowset.updateFloat(_column + 1, ((Float) _value));
 				break;
 			case Types.DOUBLE:
 			case Types.NUMERIC:
-				rowset.updateDouble(_column + 1, ((Double) _value).doubleValue());
+				rowset.updateDouble(_column + 1, ((Double) _value));
 				break;
 			case Types.BOOLEAN:
 			case Types.BIT:
-				rowset.updateBoolean(_column + 1, ((Boolean) _value).booleanValue());
+				rowset.updateBoolean(_column + 1, ((Boolean) _value));
 				break;
 			case Types.DATE:
 				if (_value instanceof String) {
@@ -621,25 +621,25 @@ public class SSTableModel extends AbstractTableModel {
 				case Types.SMALLINT:
 				case Types.TINYINT:
 					rowset.updateInt(column.intValue() + 1,
-							((Integer) defaultValuesMap.get(column)).intValue());
+							((Integer) defaultValuesMap.get(column)));
 					break;
 				case Types.BIGINT:
 					rowset.updateLong(column.intValue() + 1,
-							((Long) defaultValuesMap.get(column)).longValue());
+							((Long) defaultValuesMap.get(column)));
 					break;
 				case Types.FLOAT:
 					rowset.updateFloat(column.intValue() + 1,
-							((Float) defaultValuesMap.get(column)).floatValue());
+							((Float) defaultValuesMap.get(column)));
 					break;
 				case Types.DOUBLE:
 				case Types.NUMERIC:
 					rowset.updateDouble(column.intValue() + 1,
-							((Double) defaultValuesMap.get(column)).doubleValue());
+							((Double) defaultValuesMap.get(column)));
 					break;
 				case Types.BOOLEAN:
 				case Types.BIT:
 					rowset.updateBoolean(column.intValue() + 1,
-							((Boolean) defaultValuesMap.get(column)).booleanValue());
+							((Boolean) defaultValuesMap.get(column)));
 					break;
 				case Types.DATE:
 					rowset.updateDate(column.intValue() + 1, (Date) defaultValuesMap.get(column));
@@ -849,25 +849,25 @@ public class SSTableModel extends AbstractTableModel {
 			case Types.SMALLINT:
 			case Types.TINYINT:
 				rowset.updateInt(primaryColumn + 1,
-						((Integer) dataValue.getPrimaryColumnValue()).intValue());
+						((Integer) dataValue.getPrimaryColumnValue()));
 				break;
 			case Types.BIGINT:
 				rowset.updateLong(primaryColumn + 1,
-						((Long) dataValue.getPrimaryColumnValue()).longValue());
+						((Long) dataValue.getPrimaryColumnValue()));
 				break;
 			case Types.FLOAT:
 				rowset.updateFloat(primaryColumn + 1,
-						((Float) dataValue.getPrimaryColumnValue()).floatValue());
+						((Float) dataValue.getPrimaryColumnValue()));
 				break;
 			case Types.DOUBLE:
 			case Types.NUMERIC:
 				rowset.updateDouble(primaryColumn + 1,
-						((Double) dataValue.getPrimaryColumnValue()).doubleValue());
+						((Double) dataValue.getPrimaryColumnValue()));
 				break;
 			case Types.BOOLEAN:
 			case Types.BIT:
 				rowset.updateBoolean(primaryColumn + 1,
-						((Boolean) dataValue.getPrimaryColumnValue()).booleanValue());
+						((Boolean) dataValue.getPrimaryColumnValue()));
 				break;
 			case Types.DATE:
 				rowset.updateDate(primaryColumn + 1, (Date) dataValue.getPrimaryColumnValue());

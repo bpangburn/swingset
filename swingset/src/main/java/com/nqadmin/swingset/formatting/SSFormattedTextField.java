@@ -137,7 +137,7 @@ public class SSFormattedTextField extends JFormattedTextField
 			    // TODO May want to see if we can veto invalid updates
 			    if (!getAllowNull() && (currentValue==null)) {
 			    	logger.warn("Null value encounted, but not allowed.");
-					JOptionPane.showMessageDialog((JComponent)ftf,
+					JOptionPane.showMessageDialog(ftf,
 							"Null values are not allowed for " + getBoundColumnName(), "Null Exception", JOptionPane.ERROR_MESSAGE);
 			    } else {
 			    
@@ -152,7 +152,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 					} catch (final SQLException _se) {
 						logger.error(getColumnForLog() + ": RowSet update triggered SQL Exception.", _se);
-						JOptionPane.showMessageDialog((JComponent)ftf,
+						JOptionPane.showMessageDialog(ftf,
 								"SQL Exception encountered for " + getBoundColumnName(), "SQL Exception", JOptionPane.ERROR_MESSAGE);
 					}
 			    }
