@@ -156,10 +156,10 @@ public class TestBaseComponents extends JFrame {
 		try {
 
 		// GET THE NEW RECORD ID.	
-			ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+			final ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 					.executeQuery("SELECT nextval('swingset_base_test_seq') as nextVal;");
 			rs.next();
-			int recordPK = rs.getInt("nextVal");
+			final int recordPK = rs.getInt("nextVal");
 			txtSwingSetBaseTestPK.setText(String.valueOf(recordPK));
 			rs.close();
 
@@ -175,9 +175,9 @@ public class TestBaseComponents extends JFrame {
 			txtSSTextArea.setText(null);
 			txtSSTextField.setText(null);
 			
-		} catch(SQLException se) {
+		} catch(final SQLException se) {
 			logger.error("SQL Exception occured during setting default values.",se);								
-		} catch(Exception e) {
+		} catch(final Exception e) {
 			logger.error("Exception occured during setting default values.",e);
 		}	
 		
@@ -190,7 +190,7 @@ public class TestBaseComponents extends JFrame {
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
-	public TestBaseComponents(Connection _dbConn) {
+	public TestBaseComponents(final Connection _dbConn) {
 		
 		// SET SCREEN TITLE
 			super("SwingSet Base Component Test");
@@ -206,7 +206,7 @@ public class TestBaseComponents extends JFrame {
 				rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
 				rowset.setCommand("SELECT * FROM swingset_base_test_data;");
 				navigator = new SSDataNavigator(rowset);
-			} catch (SQLException se) {
+			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			}
 			
@@ -244,8 +244,8 @@ public class TestBaseComponents extends JFrame {
 					super.performPostInsertOps();
 					//TestBaseComponents.this.cmbSSDBComboNav.setEnabled(true);
 					try {
-						TestBaseComponents.this.rowset.execute();
-					} catch (SQLException se) {
+						rowset.execute();
+					} catch (final SQLException se) {
 						logger.error("SQL Exception.", se);
 					}
 					performRefreshOps();
@@ -258,8 +258,8 @@ public class TestBaseComponents extends JFrame {
 				public void performPostDeletionOps() {
 					super.performPostDeletionOps();
 					try {
-						TestBaseComponents.this.rowset.execute();
-					} catch (SQLException se) {
+						rowset.execute();
+					} catch (final SQLException se) {
 						logger.error("SQL Exception.", se);
 					}
 					performRefreshOps();
@@ -271,15 +271,15 @@ public class TestBaseComponents extends JFrame {
 				@Override
 				public void performRefreshOps() {
 					super.performRefreshOps();
-					TestBaseComponents.this.syncManager.async();
+					syncManager.async();
 					try {
-						TestBaseComponents.this.cmbSSDBComboNav.execute();
-					} catch (SQLException se) {
+						cmbSSDBComboNav.execute();
+					} catch (final SQLException se) {
 						logger.error("SQL Exception.", se);
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						logger.error("Exception.", e);
 					}
-					TestBaseComponents.this.syncManager.sync();
+					syncManager.sync();
 				}
 
 				/**
@@ -288,20 +288,20 @@ public class TestBaseComponents extends JFrame {
 				@Override
 				public void performCancelOps() {
 					super.performCancelOps();
-					TestBaseComponents.this.cmbSSDBComboNav.setEnabled(true);
+					cmbSSDBComboNav.setEnabled(true);
 				}
 
 			});
 			
 			// SETUP NAVIGATOR QUERY
-				String query = "SELECT * FROM swingset_base_test_data;";
+				final String query = "SELECT * FROM swingset_base_test_data;";
 				cmbSSDBComboNav = new SSDBComboBox(ssConnection, query, "swingset_base_test_pk", "swingset_base_test_pk");
 	
 				try {
 					cmbSSDBComboNav.execute();
-				} catch (SQLException se) {
+				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					logger.error("Exception.", e);
 				}
 			
@@ -322,8 +322,8 @@ public class TestBaseComponents extends JFrame {
 				cmbSSComboBox.setOptions(comboItems, comboCodes);
 				lstSSList.setOptions(listItems, listCodes);
 				
-				String dbComboQuery = "SELECT * FROM part_data;";
-				cmbSSDBComboBox = new SSDBComboBox(this.ssConnection, dbComboQuery, "part_id", "part_name");
+				final String dbComboQuery = "SELECT * FROM part_data;";
+				cmbSSDBComboBox = new SSDBComboBox(ssConnection, dbComboQuery, "part_id", "part_name");
 				cmbSSDBComboBox.setAllowNull(false);
 				// TODO if getAllowNull() is false, user can still blank out the combo - we may want to prevent this
 				
@@ -346,10 +346,10 @@ public class TestBaseComponents extends JFrame {
 				
 			// RUN DB COMBO QUERIES
 				try {
-					this.cmbSSDBComboBox.execute();
-				} catch (SQLException se) {
+					cmbSSDBComboBox.execute();
+				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					logger.error("Exception.", e);
 				}
 
@@ -381,7 +381,7 @@ public class TestBaseComponents extends JFrame {
 				
 				// NEED TO MAKE SURE LIST IS TALLER THAN THE SCROLLPANE TO SEE THE SCROLLBAR
 				lstSSList.setPreferredSize(new Dimension(MainClass.ssDimTall.width-20, MainClass.ssDimVeryTall.height));
-				JScrollPane lstScrollPane = new JScrollPane(lstSSList);
+				final JScrollPane lstScrollPane = new JScrollPane(lstSSList);
 				lstScrollPane.setPreferredSize(MainClass.ssDimTall);
 				
 				sliSSSlider.setPreferredSize(MainClass.ssDim);
@@ -389,9 +389,9 @@ public class TestBaseComponents extends JFrame {
 				txtSSTextField.setPreferredSize(MainClass.ssDim);
 				
 			// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-				Container contentPane = getContentPane();
+				final Container contentPane = getContentPane();
 				contentPane.setLayout(new GridBagLayout());
-				GridBagConstraints constraints = new GridBagConstraints();
+				final GridBagConstraints constraints = new GridBagConstraints();
 
 				constraints.gridx = 0;
 				constraints.gridy = 0;
@@ -447,7 +447,7 @@ public class TestBaseComponents extends JFrame {
 				constraints.gridx = 0;
 				constraints.gridy++;
 				constraints.gridwidth = 2;
-				contentPane.add(this.navigator, constraints);
+				contentPane.add(navigator, constraints);
 				
 		// DISABLE THE PRIMARY KEY
 			txtSwingSetBaseTestPK.setEnabled(false);

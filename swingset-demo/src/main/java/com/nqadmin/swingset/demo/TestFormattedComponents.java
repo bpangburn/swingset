@@ -150,10 +150,10 @@ public class TestFormattedComponents extends JFrame {
 		try {
 
 		// GET THE NEW RECORD ID.	
-			ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+			final ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 					.executeQuery("SELECT nextval('swingset_formatted_test_seq') as nextVal;");
 			rs.next();
-			int recordPK = rs.getInt("nextVal");
+			final int recordPK = rs.getInt("nextVal");
 			txtSwingSetFormattedTestPK.setText(String.valueOf(recordPK));
 			rs.close();
 
@@ -169,9 +169,9 @@ public class TestFormattedComponents extends JFrame {
 			fmtSSTimeField.setText(null);
 			fmtSSTimestampField.setText(null);
 			
-		} catch(SQLException se) {
+		} catch(final SQLException se) {
 			logger.error("SQL Exception occured during setting default values.",se);								
-		} catch(Exception e) {
+		} catch(final Exception e) {
 			logger.error("Exception occured during setting default values.",e);
 		}	
 		
@@ -184,7 +184,7 @@ public class TestFormattedComponents extends JFrame {
 	 * 
 	 * @param _dbConn - database connection
 	 */
-	public TestFormattedComponents(Connection _dbConn) {
+	public TestFormattedComponents(final Connection _dbConn) {
 		
 		// SET SCREEN TITLE
 			super("SwingSet Formatted Component Test");
@@ -200,7 +200,7 @@ public class TestFormattedComponents extends JFrame {
 				rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
 				rowset.setCommand("SELECT * FROM swingset_formatted_test_data;");
 				navigator = new SSDataNavigator(rowset);
-			} catch (SQLException se) {
+			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			}
 			
@@ -237,8 +237,8 @@ public class TestFormattedComponents extends JFrame {
 					super.performPostInsertOps();
 					//TestFormattedComponents.this.cmbSSDBComboNav.setEnabled(true);
 					try {
-						TestFormattedComponents.this.rowset.execute();
-					} catch (SQLException se) {
+						rowset.execute();
+					} catch (final SQLException se) {
 						logger.error("SQL Exception.", se);
 					}
 					performRefreshOps();
@@ -251,8 +251,8 @@ public class TestFormattedComponents extends JFrame {
 				public void performPostDeletionOps() {
 					super.performPostDeletionOps();
 					try {
-						TestFormattedComponents.this.rowset.execute();
-					} catch (SQLException se) {
+						rowset.execute();
+					} catch (final SQLException se) {
 						logger.error("SQL Exception.", se);
 					}
 					performRefreshOps();
@@ -264,15 +264,15 @@ public class TestFormattedComponents extends JFrame {
 				@Override
 				public void performRefreshOps() {
 					super.performRefreshOps();
-					TestFormattedComponents.this.syncManager.async();
+					syncManager.async();
 					try {
-						TestFormattedComponents.this.cmbSSDBComboNav.execute();
-					} catch (SQLException se) {
+						cmbSSDBComboNav.execute();
+					} catch (final SQLException se) {
 						logger.error("SQL Exception.", se);
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						logger.error("Exception.", e);
 					}
-					TestFormattedComponents.this.syncManager.sync();
+					syncManager.sync();
 				}
 
 				/**
@@ -281,20 +281,20 @@ public class TestFormattedComponents extends JFrame {
 				@Override
 				public void performCancelOps() {
 					super.performCancelOps();
-					TestFormattedComponents.this.cmbSSDBComboNav.setEnabled(true);
+					cmbSSDBComboNav.setEnabled(true);
 				}
 
 			});
 			
 			// SETUP NAVIGATOR QUERY
-				String query = "SELECT * FROM swingset_formatted_test_data;";
+				final String query = "SELECT * FROM swingset_formatted_test_data;";
 				cmbSSDBComboNav = new SSDBComboBox(ssConnection, query, "swingset_formatted_test_pk", "swingset_formatted_test_pk");
 	
 				try {
 					cmbSSDBComboNav.execute();
-				} catch (SQLException se) {
+				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					logger.error("Exception.", e);
 				}
 			
@@ -356,9 +356,9 @@ public class TestFormattedComponents extends JFrame {
 				fmtSSTimestampField.setPreferredSize(MainClass.ssDim);
 				
 			// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-				Container contentPane = getContentPane();
+				final Container contentPane = getContentPane();
 				contentPane.setLayout(new GridBagLayout());
-				GridBagConstraints constraints = new GridBagConstraints();
+				final GridBagConstraints constraints = new GridBagConstraints();
 
 				constraints.gridx = 0;
 				constraints.gridy = 0;
@@ -417,7 +417,7 @@ public class TestFormattedComponents extends JFrame {
 				constraints.gridx = 0;
 				constraints.gridy++;
 				constraints.gridwidth = 2;
-				contentPane.add(this.navigator, constraints);
+				contentPane.add(navigator, constraints);
 				
 		// DISABLE THE PRIMARY KEY
 			txtSwingSetFormattedTestPK.setEnabled(false);

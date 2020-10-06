@@ -84,7 +84,7 @@ public class Example7 extends JFrame {
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
-	public Example7(Connection _dbConn) {
+	public Example7(final Connection _dbConn) {
 		
 		// SET SCREEN TITLE
 			super("Example7");
@@ -107,29 +107,29 @@ public class Example7 extends JFrame {
 		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
 			try {
 			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-				this.rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
-				this.rowset.setCommand("SELECT supplier_part_id, supplier_id, part_id, quantity, ship_date FROM supplier_part_data ORDER BY supplier_id, part_id;");
+				rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
+				rowset.setCommand("SELECT supplier_part_id, supplier_id, part_id, quantity, ship_date FROM supplier_part_data ORDER BY supplier_id, part_id;");
 	
 			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
-				this.dataGrid = new SSDataGrid();
-				this.dataGrid.setHeaders(new String[] { "Supplier-Part ID", "Supplier Name", "Part Name", "Quantity", "Ship Date" });
-				this.dataGrid.setSSRowSet(this.rowset);
-				this.dataGrid.setMessageWindow(this);
+				dataGrid = new SSDataGrid();
+				dataGrid.setHeaders(new String[] { "Supplier-Part ID", "Supplier Name", "Part Name", "Quantity", "Ship Date" });
+				dataGrid.setSSRowSet(rowset);
+				dataGrid.setMessageWindow(this);
 				
 			// DISABLES NEW INSERTIONS TO THE DATABASE. - NOT CURRENTLY WORKING FOR H2
-				this.dataGrid.setInsertion(false);
+				dataGrid.setInsertion(false);
 	
 			//	this.dataGrid.updateUI();
 	
 			// MAKE THE SUPPLIER-PART ID UNEDITABLE
-				this.dataGrid.setUneditableColumns(new String[] { "supplier_part_id" });
+				dataGrid.setUneditableColumns(new String[] { "supplier_part_id" });
 				
 			// SET A DATE RENDERER FOR ship_date
-				this.dataGrid.setDateRenderer("ship_date");
+				dataGrid.setDateRenderer("ship_date");
 
 			// BUILD COMBO RENDERERS FOR SUPPLIER AND PART
 			// ADDED STATEMENT "SCROLL INSENSITIVITY" FOR EXAMPLE TO BE COMPATIBLE WITH H2 DATABASE DEFAULT SETTINGS.
-				try (Statement stmt = this.ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+				try (Statement stmt = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
 						ResultSet.CONCUR_UPDATABLE)) {
 	
 					String[] displayItems = null;
@@ -149,7 +149,7 @@ public class Example7 extends JFrame {
 							underlyingNumbers[i] = new Integer(rs.getInt("supplier_id"));
 						}
 	
-						this.dataGrid.setComboRenderer("supplier_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);
+						dataGrid.setComboRenderer("supplier_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);
 					}
 	
 					try (ResultSet rs = stmt.executeQuery("SELECT part_name, part_id FROM part_data ORDER BY part_name;")) {
@@ -164,16 +164,16 @@ public class Example7 extends JFrame {
 							underlyingNumbers[i] = new Integer(rs.getInt("part_id"));
 						}
 	
-						this.dataGrid.setComboRenderer("part_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);
+						dataGrid.setComboRenderer("part_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);
 					}
 				}
 	
-			} catch (SQLException se) {
+			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			}
 			
 		// SETUP THE CONTAINER AND ADD THE DATAGRID
-			getContentPane().add(this.dataGrid.getComponent());
+			getContentPane().add(dataGrid.getComponent());
 
 		// MAKE THE JFRAME VISIBLE
 			setVisible(true);

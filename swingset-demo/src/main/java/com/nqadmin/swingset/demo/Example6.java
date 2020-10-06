@@ -82,7 +82,7 @@ public class Example6 extends JFrame {
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
-	public Example6(Connection _dbConn) {
+	public Example6(final Connection _dbConn) {
 		
 		// SET SCREEN TITLE
 			super("Example6");
@@ -105,32 +105,32 @@ public class Example6 extends JFrame {
 		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
 			try {
 			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-				this.rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
-				this.rowset.setCommand("SELECT * FROM part_data ORDER BY part_name;");
+				rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
+				rowset.setCommand("SELECT * FROM part_data ORDER BY part_name;");
 			
 			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
-				this.dataGrid = new SSDataGrid();
-				this.dataGrid.setHeaders(new String[] { "Part ID", "Part Name", "Color Code", "Weight", "City" });
-				this.dataGrid.setSSRowSet(this.rowset);
-				this.dataGrid.setMessageWindow(this);
+				dataGrid = new SSDataGrid();
+				dataGrid.setHeaders(new String[] { "Part ID", "Part Name", "Color Code", "Weight", "City" });
+				dataGrid.setSSRowSet(rowset);
+				dataGrid.setMessageWindow(this);
 	
 			// DISABLES NEW INSERTIONS TO THE DATABASE. - NOT CURRENTLY WORKING FOR H2
-				this.dataGrid.setInsertion(false);
+				dataGrid.setInsertion(false);
 	
 			// MAKE THE PART ID UNEDITABLE
-				this.dataGrid.setUneditableColumns(new String[] { "part_id" });
+				dataGrid.setUneditableColumns(new String[] { "part_id" });
 	
 			// SETUP COMBO RENDER FOR COLOR COLUMN
-				this.dataGrid.setComboRenderer("color_code", new String[] { "Red", "Green", "Blue" },
+				dataGrid.setComboRenderer("color_code", new String[] { "Red", "Green", "Blue" },
 						new Integer[] { 0,1,2 }, MainClass.gridColumnWidth);
 				
 			// SET DEFAULTS FOR NEW RECORDS
 			// THIS CODE IS NOT CURRENTLY USED AS THERE IS AN ISSUE ADDING RECORDS IN H2
-				this.dataGrid.setDefaultValues(new String[] { "part_name", "color_code", "weight", "city" },
+				dataGrid.setDefaultValues(new String[] { "part_name", "color_code", "weight", "city" },
 						new Object[] { "", 1, 20, "Default City" });
 	
-				this.dataGrid.setPrimaryColumn("part_id");
-				this.dataGrid.setSSDataValue(new SSDataValue() {
+				dataGrid.setPrimaryColumn("part_id");
+				dataGrid.setSSDataValue(new SSDataValue() {
 					@Override
 					public Object getPrimaryColumnValue() {
 						
@@ -138,15 +138,15 @@ public class Example6 extends JFrame {
 						
 						try {
 						// GET THE NEW RECORD ID.	
-							ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+							final ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 									.executeQuery("SELECT nextval('part_data_seq') as nextVal;");
 							rs.next();
 							partID = rs.getInt("nextVal");
 							rs.close();
 	
-						} catch(SQLException se) {
+						} catch(final SQLException se) {
 							logger.error("SQL Exception occured obtaining primary key value for new record.",se);						
-						} catch(Exception e) {
+						} catch(final Exception e) {
 							logger.error("Exception occured obtaining primary key value for new record.",e);
 						}			
 						
@@ -154,12 +154,12 @@ public class Example6 extends JFrame {
 					}
 				});
 	
-			} catch (SQLException se) {
+			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			}
 		
 		// SETUP THE CONTAINER AND ADD THE DATAGRID
-			getContentPane().add(this.dataGrid.getComponent());
+			getContentPane().add(dataGrid.getComponent());
 
 		// MAKE THE JFRAME VISIBLE
 			setVisible(true);

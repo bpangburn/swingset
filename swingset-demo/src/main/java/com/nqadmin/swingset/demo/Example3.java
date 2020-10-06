@@ -106,7 +106,7 @@ public class Example3 extends JFrame {
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
-	public Example3(Connection _dbConn) {
+	public Example3(final Connection _dbConn) {
 		
 		// SET SCREEN TITLE
 			super("Example3");
@@ -119,10 +119,10 @@ public class Example3 extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				this.rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
-				this.rowset.setCommand("SELECT * FROM supplier_part_data");
-				this.navigator = new SSDataNavigator(this.rowset);
-			} catch (SQLException se) {
+				rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
+				rowset.setCommand("SELECT * FROM supplier_part_data");
+				navigator = new SSDataNavigator(rowset);
+			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			}
 
@@ -131,7 +131,7 @@ public class Example3 extends JFrame {
 		 * H2 does not fully support updatable rowset so it must be
 		 * re-queried following insert and delete with rowset.execute()
 		 */
-		this.navigator.setDBNav(new SSDBNavImpl(this) {
+		navigator.setDBNav(new SSDBNavImpl(this) {
 			/**
 			 * unique serial id
 			 */
@@ -148,22 +148,22 @@ public class Example3 extends JFrame {
 				try {
 
 				// GET THE NEW RECORD ID.	
-					ResultSet rs = ssConnection.getConnection()
+					final ResultSet rs = ssConnection.getConnection()
 							.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 							.executeQuery("SELECT nextval('supplier_part_data_seq') as nextVal;");
 					rs.next();
-					int supplierPartID = rs.getInt("nextVal");
+					final int supplierPartID = rs.getInt("nextVal");
 					txtSupplierPartID.setText(String.valueOf(supplierPartID));
 					rs.close();
 				
 				// SET OTHER DEFAULTS
-					 Example3.this.cmbSupplierName.setSelectedValue(0);
-					 Example3.this.cmbPartName.setSelectedValue(0);
-					 Example3.this.txtQuantity.setText("0");
+					 cmbSupplierName.setSelectedValue(0);
+					 cmbPartName.setSelectedValue(0);
+					 txtQuantity.setText("0");
 					
-				} catch(SQLException se) {
+				} catch(final SQLException se) {
 					logger.error("SQL Exception occured initializing new record.",se);								
-				} catch(Exception e) {
+				} catch(final Exception e) {
 					logger.error("Exception occured initializing new record.",e);
 				}		
 				
@@ -176,8 +176,8 @@ public class Example3 extends JFrame {
 			public void performPostInsertOps() {
 				super.performPostInsertOps();
 				try {
-					Example3.this.rowset.execute();
-				} catch (SQLException se) {
+					rowset.execute();
+				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
 				}
 			}
@@ -189,8 +189,8 @@ public class Example3 extends JFrame {
 			public void performPostDeletionOps() {
 				super.performPostDeletionOps();
 				try {
-					Example3.this.rowset.execute();
-				} catch (SQLException se) {
+					rowset.execute();
+				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
 				}
 			}
@@ -199,69 +199,69 @@ public class Example3 extends JFrame {
 
 		// SETUP DB COMBO QUERIES
 			String query = "SELECT * FROM supplier_data;";
-			this.cmbSupplierName = new SSDBComboBox(this.ssConnection, query, "supplier_id", "supplier_name");
+			cmbSupplierName = new SSDBComboBox(ssConnection, query, "supplier_id", "supplier_name");
 			
 			query = "SELECT * FROM part_data;";
-			this.cmbPartName = new SSDBComboBox(this.ssConnection, query, "part_id", "part_name");
+			cmbPartName = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
 		
 		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
-			this.txtSupplierPartID.bind(this.rowset, "supplier_part_id");
-			this.cmbSupplierName.bind(this.rowset, "supplier_id");
-			this.cmbPartName.bind(this.rowset, "part_id");
-			this.txtQuantity.bind(this.rowset, "quantity");
+			txtSupplierPartID.bind(rowset, "supplier_part_id");
+			cmbSupplierName.bind(rowset, "supplier_id");
+			cmbPartName.bind(rowset, "part_id");
+			txtQuantity.bind(rowset, "quantity");
 			
 		// RUN DB COMBO QUERIES
 			try {
-				this.cmbPartName.execute();
-				this.cmbSupplierName.execute();
+				cmbPartName.execute();
+				cmbSupplierName.execute();
 	
-			} catch (SQLException se) {
+			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				logger.error("Exception.", e);
 			}
 			
 		// SET LABEL DIMENSIONS	
-			this.lblSupplierPartID.setPreferredSize(MainClass.labelDim);
-			this.lblSupplierName.setPreferredSize(MainClass.labelDim);
-			this.lblPartName.setPreferredSize(MainClass.labelDim);
-			this.lblQuantity.setPreferredSize(MainClass.labelDim);
+			lblSupplierPartID.setPreferredSize(MainClass.labelDim);
+			lblSupplierName.setPreferredSize(MainClass.labelDim);
+			lblPartName.setPreferredSize(MainClass.labelDim);
+			lblQuantity.setPreferredSize(MainClass.labelDim);
 
 		// SET BOUND COMPONENT DIMENSIONS
-			this.txtSupplierPartID.setPreferredSize(MainClass.ssDim);
-			this.cmbSupplierName.setPreferredSize(MainClass.ssDim);
-			this.cmbPartName.setPreferredSize(MainClass.ssDim);
-			this.txtQuantity.setPreferredSize(MainClass.ssDim);
+			txtSupplierPartID.setPreferredSize(MainClass.ssDim);
+			cmbSupplierName.setPreferredSize(MainClass.ssDim);
+			cmbPartName.setPreferredSize(MainClass.ssDim);
+			txtQuantity.setPreferredSize(MainClass.ssDim);
 
 		// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-			Container contentPane = getContentPane();
+			final Container contentPane = getContentPane();
 			contentPane.setLayout(new GridBagLayout());
-			GridBagConstraints constraints = new GridBagConstraints();
+			final GridBagConstraints constraints = new GridBagConstraints();
 	
 			constraints.gridx = 0;
 			constraints.gridy = 0;
-			contentPane.add(this.lblSupplierPartID, constraints);
+			contentPane.add(lblSupplierPartID, constraints);
 			constraints.gridy = 1;
-			contentPane.add(this.lblSupplierName, constraints);
+			contentPane.add(lblSupplierName, constraints);
 			constraints.gridy = 2;
-			contentPane.add(this.lblPartName, constraints);
+			contentPane.add(lblPartName, constraints);
 			constraints.gridy = 3;
-			contentPane.add(this.lblQuantity, constraints);
+			contentPane.add(lblQuantity, constraints);
 	
 			constraints.gridx = 1;
 			constraints.gridy = 0;
-			contentPane.add(this.txtSupplierPartID, constraints);
+			contentPane.add(txtSupplierPartID, constraints);
 			constraints.gridy = 1;
-			contentPane.add(this.cmbSupplierName, constraints);
+			contentPane.add(cmbSupplierName, constraints);
 			constraints.gridy = 2;
-			contentPane.add(this.cmbPartName, constraints);
+			contentPane.add(cmbPartName, constraints);
 			constraints.gridy = 3;
-			contentPane.add(this.txtQuantity, constraints);
+			contentPane.add(txtQuantity, constraints);
 	
 			constraints.gridx = 0;
 			constraints.gridy = 4;
 			constraints.gridwidth = 2;
-			contentPane.add(this.navigator, constraints);
+			contentPane.add(navigator, constraints);
 
 		// DISABLE THE PRIMARY KEY
 			txtSupplierPartID.setEnabled(false);

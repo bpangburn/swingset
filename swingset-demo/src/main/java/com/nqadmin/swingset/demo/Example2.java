@@ -105,7 +105,7 @@ public class Example2 extends JFrame {
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
-	public Example2(Connection _dbConn) {
+	public Example2(final Connection _dbConn) {
 		
 		// SET SCREEN TITLE
 			super("Example2");
@@ -118,10 +118,10 @@ public class Example2 extends JFrame {
 			
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				this.rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
-				this.rowset.setCommand("SELECT * FROM supplier_data");
-				this.navigator = new SSDataNavigator(this.rowset);
-			} catch (SQLException se) {
+				rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
+				rowset.setCommand("SELECT * FROM supplier_data");
+				navigator = new SSDataNavigator(rowset);
+			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			}
 
@@ -130,7 +130,7 @@ public class Example2 extends JFrame {
 		 * H2 does not fully support updatable rowset so it must be
 		 * re-queried following insert and delete with rowset.execute()
 		 */
-		this.navigator.setDBNav(new SSDBNavImpl(this) {
+		navigator.setDBNav(new SSDBNavImpl(this) {
 			
 			/**
 			 * unique serial id
@@ -148,22 +148,22 @@ public class Example2 extends JFrame {
 				try {
 
 				// GET THE NEW RECORD ID.	
-					ResultSet rs = ssConnection.getConnection()
+					final ResultSet rs = ssConnection.getConnection()
 							.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 							.executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");
 					rs.next();
-					int supplierID = rs.getInt("nextVal");
+					final int supplierID = rs.getInt("nextVal");
 					txtSupplierID.setText(String.valueOf(supplierID));
 					rs.close();
 				
 				// SET OTHER DEFAULTS
-					 Example2.this.txtSupplierName.setText(null);
-					 Example2.this.txtSupplierCity.setText(null);
-					 Example2.this.cmbSupplierStatus.setSelectedValue(0);
+					 txtSupplierName.setText(null);
+					 txtSupplierCity.setText(null);
+					 cmbSupplierStatus.setSelectedValue(0);
 					
-				} catch(SQLException se) {
+				} catch(final SQLException se) {
 					logger.error("SQL Exception occured initializing new record.",se);								
-				} catch(Exception e) {
+				} catch(final Exception e) {
 					logger.error("Exception occured initializing new record.",e);
 				}		
 				
@@ -176,8 +176,8 @@ public class Example2 extends JFrame {
 			public void performPostInsertOps() {
 				super.performPostInsertOps();
 				try {
-					Example2.this.rowset.execute();
-				} catch (SQLException se) {
+					rowset.execute();
+				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
 				}
 			}
@@ -189,8 +189,8 @@ public class Example2 extends JFrame {
 			public void performPostDeletionOps() {
 				super.performPostDeletionOps();
 				try {
-					Example2.this.rowset.execute();
-				} catch (SQLException se) {
+					rowset.execute();
+				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
 				}
 			}
@@ -202,58 +202,58 @@ public class Example2 extends JFrame {
 		// 		10 -> BAD
 		// 		20 -> BETTER
 		// 		30 -> GOOD
-			int[] codes = { 10, 20, 30 };
-			String[] options = { "Bad", "Better", "Good" };
-			this.cmbSupplierStatus.setOptions(options, codes);
+			final int[] codes = { 10, 20, 30 };
+			final String[] options = { "Bad", "Better", "Good" };
+			cmbSupplierStatus.setOptions(options, codes);
 
 		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
-			this.txtSupplierID.bind(this.rowset, "supplier_id");
-			this.txtSupplierName.bind(this.rowset, "supplier_name");
-			this.txtSupplierCity.bind(this.rowset, "city");
-			this.cmbSupplierStatus.bind(this.rowset, "status");
+			txtSupplierID.bind(rowset, "supplier_id");
+			txtSupplierName.bind(rowset, "supplier_name");
+			txtSupplierCity.bind(rowset, "city");
+			cmbSupplierStatus.bind(rowset, "status");
 			//this.cmbSupplierStatus.setSelectedIndex(1);
 		
 		// SET LABEL DIMENSIONS
-			this.lblSupplierID.setPreferredSize(MainClass.labelDim);
-			this.lblSupplierName.setPreferredSize(MainClass.labelDim);
-			this.lblSupplierCity.setPreferredSize(MainClass.labelDim);
-			this.lblSupplierStatus.setPreferredSize(MainClass.labelDim);
+			lblSupplierID.setPreferredSize(MainClass.labelDim);
+			lblSupplierName.setPreferredSize(MainClass.labelDim);
+			lblSupplierCity.setPreferredSize(MainClass.labelDim);
+			lblSupplierStatus.setPreferredSize(MainClass.labelDim);
 
 		// SET BOUND COMPONENT DIMENSIONS
-			this.txtSupplierID.setPreferredSize(MainClass.ssDim);
-			this.txtSupplierName.setPreferredSize(MainClass.ssDim);
-			this.txtSupplierCity.setPreferredSize(MainClass.ssDim);
-			this.cmbSupplierStatus.setPreferredSize(MainClass.ssDim);
+			txtSupplierID.setPreferredSize(MainClass.ssDim);
+			txtSupplierName.setPreferredSize(MainClass.ssDim);
+			txtSupplierCity.setPreferredSize(MainClass.ssDim);
+			cmbSupplierStatus.setPreferredSize(MainClass.ssDim);
 
 		// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-			Container contentPane = getContentPane();
+			final Container contentPane = getContentPane();
 			contentPane.setLayout(new GridBagLayout());
-			GridBagConstraints constraints = new GridBagConstraints();
+			final GridBagConstraints constraints = new GridBagConstraints();
 	
 			constraints.gridx = 0;
 			constraints.gridy = 0;
-			contentPane.add(this.lblSupplierID, constraints);
+			contentPane.add(lblSupplierID, constraints);
 			constraints.gridy = 1;
-			contentPane.add(this.lblSupplierName, constraints);
+			contentPane.add(lblSupplierName, constraints);
 			constraints.gridy = 2;
-			contentPane.add(this.lblSupplierCity, constraints);
+			contentPane.add(lblSupplierCity, constraints);
 			constraints.gridy = 3;
-			contentPane.add(this.lblSupplierStatus, constraints);
+			contentPane.add(lblSupplierStatus, constraints);
 	
 			constraints.gridx = 1;
 			constraints.gridy = 0;
-			contentPane.add(this.txtSupplierID, constraints);
+			contentPane.add(txtSupplierID, constraints);
 			constraints.gridy = 1;
-			contentPane.add(this.txtSupplierName, constraints);
+			contentPane.add(txtSupplierName, constraints);
 			constraints.gridy = 2;
-			contentPane.add(this.txtSupplierCity, constraints);
+			contentPane.add(txtSupplierCity, constraints);
 			constraints.gridy = 3;
-			contentPane.add(this.cmbSupplierStatus, constraints);
+			contentPane.add(cmbSupplierStatus, constraints);
 	
 			constraints.gridx = 0;
 			constraints.gridy = 4;
 			constraints.gridwidth = 2;
-			contentPane.add(this.navigator, constraints);
+			contentPane.add(navigator, constraints);
 		
 		// DISABLE THE PRIMARY KEY
 			txtSupplierID.setEnabled(false);

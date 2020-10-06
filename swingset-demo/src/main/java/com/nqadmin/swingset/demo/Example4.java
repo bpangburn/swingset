@@ -125,7 +125,7 @@ public class Example4 extends JFrame {
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
-	public Example4(Connection _dbConn) {
+	public Example4(final Connection _dbConn) {
 		
 		// SET SCREEN TITLE
 			super("Example4");
@@ -138,10 +138,10 @@ public class Example4 extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				this.rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
-				this.rowset.setCommand("SELECT * FROM part_data;");
-				this.navigator = new SSDataNavigator(this.rowset);
-			} catch (SQLException se) {
+				rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
+				rowset.setCommand("SELECT * FROM part_data;");
+				navigator = new SSDataNavigator(rowset);
+			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			}
 			
@@ -151,7 +151,7 @@ public class Example4 extends JFrame {
 			 * H2 does not fully support updatable rowset so it must be
 			 * re-queried following insert and delete with rowset.execute()
 			 */
-			this.navigator.setDBNav(new SSDBNavImpl(this) {
+			navigator.setDBNav(new SSDBNavImpl(this) {
 				/**
 				 * unique serial id
 				 */
@@ -168,25 +168,25 @@ public class Example4 extends JFrame {
 					try {
 
 					// GET THE NEW RECORD ID.	
-						ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+						final ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 								.executeQuery("SELECT nextval('part_data_seq') as nextVal;");
 						rs.next();
-						int partID = rs.getInt("nextVal");
+						final int partID = rs.getInt("nextVal");
 						txtPartID.setText(String.valueOf(partID));
 						rs.close();
 						
 					// DISABLE PART SELECTOR
-						Example4.this.cmbSelectPart.setEnabled(false);
+						cmbSelectPart.setEnabled(false);
 					
 					// SET OTHER DEFAULTS
-						Example4.this.txtPartName.setText(null);
-						Example4.this.cmbPartColor.setSelectedValue(0);
-						Example4.this.txtPartWeight.setText("0");
-						Example4.this.txtPartCity.setText(null);
+						txtPartName.setText(null);
+						cmbPartColor.setSelectedValue(0);
+						txtPartWeight.setText("0");
+						txtPartCity.setText(null);
 						
-					} catch(SQLException se) {
+					} catch(final SQLException se) {
 						logger.error("SQL Exception occured initializing new record.",se);						
-					} catch(Exception e) {
+					} catch(final Exception e) {
 						logger.error("Exception occured initializing new record.",e);
 					}		
 					
@@ -198,10 +198,10 @@ public class Example4 extends JFrame {
 				@Override
 				public void performPostInsertOps() {
 					super.performPostInsertOps();
-					Example4.this.cmbSelectPart.setEnabled(true);
+					cmbSelectPart.setEnabled(true);
 					try {
-						Example4.this.rowset.execute();
-					} catch (SQLException se) {
+						rowset.execute();
+					} catch (final SQLException se) {
 						logger.error("SQL Exception.", se);
 					}
 					performRefreshOps();
@@ -214,8 +214,8 @@ public class Example4 extends JFrame {
 				public void performPostDeletionOps() {
 					super.performPostDeletionOps();
 					try {
-						Example4.this.rowset.execute();
-					} catch (SQLException se) {
+						rowset.execute();
+					} catch (final SQLException se) {
 						logger.error("SQL Exception.", se);
 					}
 					performRefreshOps();
@@ -227,15 +227,15 @@ public class Example4 extends JFrame {
 				@Override
 				public void performRefreshOps() {
 					super.performRefreshOps();
-					Example4.this.syncManager.async();
+					syncManager.async();
 					try {
-						Example4.this.cmbSelectPart.execute();
-					} catch (SQLException se) {
+						cmbSelectPart.execute();
+					} catch (final SQLException se) {
 						logger.error("SQL Exception.", se);
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						logger.error("Exception.", e);
 					}
-					Example4.this.syncManager.sync();
+					syncManager.sync();
 				}
 
 				/**
@@ -244,32 +244,32 @@ public class Example4 extends JFrame {
 				@Override
 				public void performCancelOps() {
 					super.performCancelOps();
-					Example4.this.cmbSelectPart.setEnabled(true);
+					cmbSelectPart.setEnabled(true);
 				}
 
 			});
 			
 			// SETUP NAVIGATOR QUERY
-				String query = "SELECT * FROM part_data;";
-				this.cmbSelectPart = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
+				final String query = "SELECT * FROM part_data;";
+				cmbSelectPart = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
 	
 				try {
-					this.cmbSelectPart.execute();
-				} catch (SQLException se) {
+					cmbSelectPart.execute();
+				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					logger.error("Exception.", e);
 				}
 				
 			// SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES
-				this.cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
+				cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
 				
 			// BIND THE COMPONENTS TO THE DATABASE COLUMNS
-				this.txtPartID.bind(this.rowset, "part_id");
-				this.txtPartName.bind(this.rowset, "part_name");
-				this.cmbPartColor.bind(this.rowset, "color_code");
-				this.txtPartWeight.bind(this.rowset, "weight");
-				this.txtPartCity.bind(this.rowset, "city");
+				txtPartID.bind(rowset, "part_id");
+				txtPartName.bind(rowset, "part_name");
+				cmbPartColor.bind(rowset, "color_code");
+				txtPartWeight.bind(rowset, "weight");
+				txtPartCity.bind(rowset, "city");
 				
 			// SETUP SYNCMANAGER, WHICH WILL TAKE CARE OF KEEPING THE COMBO NAVIGATOR AND
 			// DATA NAVIGATOR IN SYNC.
@@ -278,63 +278,63 @@ public class Example4 extends JFrame {
 			// YOU HAVE TO CALL THE .async() METHOD
 			// 
 			// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
-				this.syncManager = new SSSyncManager(this.cmbSelectPart, this.navigator);
-				this.syncManager.setColumnName("part_id");
-				this.syncManager.sync();
+				syncManager = new SSSyncManager(cmbSelectPart, navigator);
+				syncManager.setColumnName("part_id");
+				syncManager.sync();
 
 			// SET LABEL DIMENSIONS
-				this.lblSelectPart.setPreferredSize(MainClass.labelDim);
-				this.lblPartID.setPreferredSize(MainClass.labelDim);
-				this.lblPartName.setPreferredSize(MainClass.labelDim);
-				this.lblPartColor.setPreferredSize(MainClass.labelDim);
-				this.lblPartWeight.setPreferredSize(MainClass.labelDim);
-				this.lblPartCity.setPreferredSize(MainClass.labelDim);
+				lblSelectPart.setPreferredSize(MainClass.labelDim);
+				lblPartID.setPreferredSize(MainClass.labelDim);
+				lblPartName.setPreferredSize(MainClass.labelDim);
+				lblPartColor.setPreferredSize(MainClass.labelDim);
+				lblPartWeight.setPreferredSize(MainClass.labelDim);
+				lblPartCity.setPreferredSize(MainClass.labelDim);
 				
 			// SET BOUND COMPONENT DIMENSIONS
-				this.cmbSelectPart.setPreferredSize(MainClass.ssDim);
-				this.txtPartID.setPreferredSize(MainClass.ssDim);
-				this.txtPartName.setPreferredSize(MainClass.ssDim);
-				this.cmbPartColor.setPreferredSize(MainClass.ssDim);
-				this.txtPartWeight.setPreferredSize(MainClass.ssDim);
-				this.txtPartCity.setPreferredSize(MainClass.ssDim);
+				cmbSelectPart.setPreferredSize(MainClass.ssDim);
+				txtPartID.setPreferredSize(MainClass.ssDim);
+				txtPartName.setPreferredSize(MainClass.ssDim);
+				cmbPartColor.setPreferredSize(MainClass.ssDim);
+				txtPartWeight.setPreferredSize(MainClass.ssDim);
+				txtPartCity.setPreferredSize(MainClass.ssDim);
 				
 			// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-				Container contentPane = getContentPane();
+				final Container contentPane = getContentPane();
 				contentPane.setLayout(new GridBagLayout());
-				GridBagConstraints constraints = new GridBagConstraints();
+				final GridBagConstraints constraints = new GridBagConstraints();
 
 				constraints.gridx = 0;
 				constraints.gridy = 0;
-				contentPane.add(this.lblSelectPart, constraints);
+				contentPane.add(lblSelectPart, constraints);
 				constraints.gridy = 1;
-				contentPane.add(this.lblPartID, constraints);
+				contentPane.add(lblPartID, constraints);
 				constraints.gridy = 2;
-				contentPane.add(this.lblPartName, constraints);
+				contentPane.add(lblPartName, constraints);
 				constraints.gridy = 3;
-				contentPane.add(this.lblPartColor, constraints);
+				contentPane.add(lblPartColor, constraints);
 				constraints.gridy = 4;
-				contentPane.add(this.lblPartWeight, constraints);
+				contentPane.add(lblPartWeight, constraints);
 				constraints.gridy = 5;
-				contentPane.add(this.lblPartCity, constraints);
+				contentPane.add(lblPartCity, constraints);
 		
 				constraints.gridx = 1;
 				constraints.gridy = 0;
-				contentPane.add(this.cmbSelectPart, constraints);
+				contentPane.add(cmbSelectPart, constraints);
 				constraints.gridy = 1;
-				contentPane.add(this.txtPartID, constraints);
+				contentPane.add(txtPartID, constraints);
 				constraints.gridy = 2;
-				contentPane.add(this.txtPartName, constraints);
+				contentPane.add(txtPartName, constraints);
 				constraints.gridy = 3;
-				contentPane.add(this.cmbPartColor, constraints);
+				contentPane.add(cmbPartColor, constraints);
 				constraints.gridy = 4;
-				contentPane.add(this.txtPartWeight, constraints);
+				contentPane.add(txtPartWeight, constraints);
 				constraints.gridy = 5;
-				contentPane.add(this.txtPartCity, constraints);
+				contentPane.add(txtPartCity, constraints);
 		
 				constraints.gridx = 0;
 				constraints.gridy = 6;
 				constraints.gridwidth = 2;
-				contentPane.add(this.navigator, constraints);
+				contentPane.add(navigator, constraints);
 
 		// DISABLE THE PRIMARY KEY
 			txtPartID.setEnabled(false);

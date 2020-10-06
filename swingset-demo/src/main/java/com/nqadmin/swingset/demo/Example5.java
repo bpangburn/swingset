@@ -82,7 +82,7 @@ public class Example5 extends JFrame {
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
-	public Example5(Connection _dbConn) {
+	public Example5(final Connection _dbConn) {
 		
 		// SET SCREEN TITLE
 			super("Example5");
@@ -105,27 +105,27 @@ public class Example5 extends JFrame {
 		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
 			try {
 			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-				this.rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
-				this.rowset.setCommand("SELECT * FROM part_data ORDER BY part_name;");
+				rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
+				rowset.setCommand("SELECT * FROM part_data ORDER BY part_name;");
 			
 			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
-				this.dataGrid = new SSDataGrid();
-				this.dataGrid.setHeaders(new String[] { "Part ID", "Part Name", "Color Code", "Weight", "City" });
-				this.dataGrid.setSSRowSet(this.rowset);
-				this.dataGrid.setMessageWindow(this);
+				dataGrid = new SSDataGrid();
+				dataGrid.setHeaders(new String[] { "Part ID", "Part Name", "Color Code", "Weight", "City" });
+				dataGrid.setSSRowSet(rowset);
+				dataGrid.setMessageWindow(this);
 	
 			// DISABLES NEW INSERTIONS TO THE DATABASE. - NOT CURRENTLY WORKING FOR H2
-				this.dataGrid.setInsertion(false);
+				dataGrid.setInsertion(false);
 	
 			// MAKE THE PART ID UNEDITABLE
-				this.dataGrid.setUneditableColumns(new String[] { "part_id" });
+				dataGrid.setUneditableColumns(new String[] { "part_id" });
 	
-			} catch (SQLException se) {
+			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			}
 			
 		// SETUP THE CONTAINER AND ADD THE DATAGRID
-			getContentPane().add(this.dataGrid.getComponent());
+			getContentPane().add(dataGrid.getComponent());
 
 		// MAKE THE JFRAME VISIBLE
 			setVisible(true);

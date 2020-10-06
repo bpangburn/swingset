@@ -160,41 +160,41 @@ public class MainClass extends JFrame {
     		}
     	        
 	    // ADD ACTION LISTENERS FOR BUTTONS
-	        this.btnExample1.addActionListener( new MyButtonListener());
-	        this.btnExample2.addActionListener( new MyButtonListener());
-	        this.btnExample3.addActionListener( new MyButtonListener());
-	        this.btnExample4.addActionListener( new MyButtonListener());
-	        this.btnExample5.addActionListener( new MyButtonListener());
-	        this.btnExample6.addActionListener( new MyButtonListener());
-	        this.btnExample7.addActionListener( new MyButtonListener());
-	        this.btnTestBase.addActionListener( new MyButtonListener());
-	        this.btnTestGrid.addActionListener( new MyButtonListener());
-	        this.btnTestFormatted.addActionListener( new MyButtonListener());
+	        btnExample1.addActionListener( new MyButtonListener());
+	        btnExample2.addActionListener( new MyButtonListener());
+	        btnExample3.addActionListener( new MyButtonListener());
+	        btnExample4.addActionListener( new MyButtonListener());
+	        btnExample5.addActionListener( new MyButtonListener());
+	        btnExample6.addActionListener( new MyButtonListener());
+	        btnExample7.addActionListener( new MyButtonListener());
+	        btnTestBase.addActionListener( new MyButtonListener());
+	        btnTestGrid.addActionListener( new MyButtonListener());
+	        btnTestFormatted.addActionListener( new MyButtonListener());
 
         // SET BUTTON DIMENSIONS
-	        this.btnExample1.setPreferredSize(buttonDim);
-	        this.btnExample2.setPreferredSize(buttonDim);
-	        this.btnExample3.setPreferredSize(buttonDim);
-	        this.btnExample4.setPreferredSize(buttonDim);
-	        this.btnExample5.setPreferredSize(buttonDim);
-	        this.btnExample6.setPreferredSize(buttonDim);
-	        this.btnExample7.setPreferredSize(buttonDim);
-	        this.btnTestBase.setPreferredSize(buttonDim);
-	        this.btnTestGrid.setPreferredSize(buttonDim);
-	        this.btnTestFormatted.setPreferredSize(buttonDim);
+	        btnExample1.setPreferredSize(buttonDim);
+	        btnExample2.setPreferredSize(buttonDim);
+	        btnExample3.setPreferredSize(buttonDim);
+	        btnExample4.setPreferredSize(buttonDim);
+	        btnExample5.setPreferredSize(buttonDim);
+	        btnExample6.setPreferredSize(buttonDim);
+	        btnExample7.setPreferredSize(buttonDim);
+	        btnTestBase.setPreferredSize(buttonDim);
+	        btnTestGrid.setPreferredSize(buttonDim);
+	        btnTestFormatted.setPreferredSize(buttonDim);
         
 	    // LAYOUT BUTTONS
 	        getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
-	        getContentPane().add(this.btnExample1);
-	        getContentPane().add(this.btnExample2);
-	        getContentPane().add(this.btnExample3);
-	        getContentPane().add(this.btnExample4);
-	        getContentPane().add(this.btnExample5);
-	        getContentPane().add(this.btnExample6);
-	        getContentPane().add(this.btnExample7);
-	        getContentPane().add(this.btnTestBase);
+	        getContentPane().add(btnExample1);
+	        getContentPane().add(btnExample2);
+	        getContentPane().add(btnExample3);
+	        getContentPane().add(btnExample4);
+	        getContentPane().add(btnExample5);
+	        getContentPane().add(btnExample6);
+	        getContentPane().add(btnExample7);
+	        getContentPane().add(btnTestBase);
 	        //getContentPane().add(this.btnTestGrid);
-	        getContentPane().add(this.btnTestFormatted);
+	        getContentPane().add(btnTestFormatted);
 
         // DISPLAY SCREEN
 	        setVisible(true);
@@ -216,8 +216,8 @@ public class MainClass extends JFrame {
 			logger.debug("Resource path: " + getClass().getPackage().getName());
 			logger.debug("Resource path: " + getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
 			
-	        InputStream inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
-        	InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
+	        final InputStream inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
+        	final InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
         	InputStream inStreamTestImages = null;
 
 	        if (USE_IN_MEMORY_DATABASE) {
@@ -225,7 +225,7 @@ public class MainClass extends JFrame {
 	        } else {
 	        	logger.info("Running H2 as a database server (versus an in-memory database) so binary files (e.g., images) cannot be pre-populated to any BLOB column(s).");
 	        }
-	        if (inStreamDemo == null || inStreamTest == null) {
+	        if ((inStreamDemo == null) || (inStreamTest == null)) {
 	            logger.fatal("Please add the file "
 	            		+ DATABASE_SCRIPT_DEMO
 	            		+ " and "
@@ -260,11 +260,11 @@ public class MainClass extends JFrame {
 	        	}
 	        }
 	        
-		} catch (IOException ioe) {
+		} catch (final IOException ioe) {
 			logger.error("IO Exception.", ioe);
-		} catch (SQLException se) {
+		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
-		} catch (ClassNotFoundException cnfe) {
+		} catch (final ClassNotFoundException cnfe) {
 			logger.error("Class Not Found Exception.", cnfe);
 		}
 		
@@ -281,36 +281,36 @@ public class MainClass extends JFrame {
 		}
 
 		@Override
-		public void actionPerformed( ActionEvent ae){
-            if(ae.getSource().equals(MainClass.this.btnExample1)){
+		public void actionPerformed( final ActionEvent ae){
+            if(ae.getSource().equals(btnExample1)){
                 new Example1(dbConnection);
             }
-            else if(ae.getSource().equals(MainClass.this.btnExample2)){
+            else if(ae.getSource().equals(btnExample2)){
             	new Example2(dbConnection);
             }
-            else if(ae.getSource().equals(MainClass.this.btnExample3)){
+            else if(ae.getSource().equals(btnExample3)){
             	new Example3(dbConnection);
             }
-            else if(ae.getSource().equals(MainClass.this.btnExample4)){
+            else if(ae.getSource().equals(btnExample4)){
             	new Example4(dbConnection);
             }
-            else if(ae.getSource().equals(MainClass.this.btnExample5)){
+            else if(ae.getSource().equals(btnExample5)){
             	new Example5(dbConnection);
             }
-            else if(ae.getSource().equals(MainClass.this.btnExample6)){
+            else if(ae.getSource().equals(btnExample6)){
             	new Example6(dbConnection);
             }
-            else if(ae.getSource().equals(MainClass.this.btnExample7)){
+            else if(ae.getSource().equals(btnExample7)){
             	new Example7(dbConnection);
             }
-            else if(ae.getSource().equals(MainClass.this.btnTestBase)){
+            else if(ae.getSource().equals(btnTestBase)){
             	new TestBaseComponents(dbConnection);
             }
-            else if(ae.getSource().equals(MainClass.this.btnTestGrid)){
+            else if(ae.getSource().equals(btnTestGrid)){
             	// TODO
             	//new TestGridComponents(dbConnection);
             }
-            else if(ae.getSource().equals(MainClass.this.btnTestFormatted)){
+            else if(ae.getSource().equals(btnTestFormatted)){
             	// TODO
             	new TestFormattedComponents(dbConnection);
             }
@@ -322,10 +322,11 @@ public class MainClass extends JFrame {
      * <p>
      * @param _args - optional command line arguments, which are ignored by this program
      */
-	public static void main(String[] _args){
+	public static void main(final String[] _args){
 
 		// create application screen
 			SwingUtilities.invokeLater(new Runnable() {
+				@Override
 				public void run() {
 					new MainClass();
 				}
