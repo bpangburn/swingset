@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -59,7 +59,7 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
 	NumberFormatter snf = null;
     NumberFormatter enf = null;
     NumberFormatter dnf = null;
-    
+
     /**
      * Creates a default SSNumericFormatterFactory
      */
@@ -67,7 +67,7 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
         snf = new NumberFormatter(NumberFormat.getInstance());
         snf.setCommitsOnValidEdit(true);
         setDefaultFormatter(snf);
-        
+
         setNullFormatter(null);
 
         enf = new NumberFormatter(NumberFormat.getInstance(Locale.US));
@@ -78,7 +78,7 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
         dnf.setCommitsOnValidEdit(true);
         setDisplayFormatter(dnf);
     }
-    
+
     /**
      * Creates an object of SSFormatterFactory with the specified precision and decimals
      * @param precision - number of digits needed for integer part of the number
@@ -88,14 +88,14 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
         final NumberFormat nfd = NumberFormat.getInstance(Locale.US);
         nfd.setMaximumFractionDigits(decimals);
         nfd.setMinimumFractionDigits(decimals);
-        
+
         nfd.setMaximumIntegerDigits(precision);
         nfd.setMinimumIntegerDigits(1);
-    
+
         snf = new NumberFormatter(NumberFormat.getInstance());
         snf.setCommitsOnValidEdit(true);
         setDefaultFormatter(snf);
-        
+
         setNullFormatter(null);
 
         enf = new NumberFormatter(NumberFormat.getInstance(Locale.US));

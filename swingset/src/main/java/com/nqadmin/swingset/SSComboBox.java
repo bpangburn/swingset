@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -93,7 +93,7 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * String[] options = {"111", "2222", "33333"};
  * int[] mappings = { 1,5,7 };
  * combo.setOptions(options, mappings);
- * 
+ *
  * // next line is assuming mysSRowSet has been initialized and my_column is a
  * // column in mysSRowSet
  * combo.bind(mysSRowSet,"my_column"); }
@@ -257,7 +257,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * Common fields shared across SwingSet components
 	 */
 	protected SSCommon ssCommon;
-	
+
 	/**
 	 * Log4j Logger for component
 	 */
@@ -343,9 +343,9 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	@Override
 	public void customInit() {
 		// SET PREFERRED DIMENSIONS
-// TODO not sure SwingSet should be setting component dimensions    	
+// TODO not sure SwingSet should be setting component dimensions
 		setPreferredSize(new Dimension(200, 20));
-// TODO This was added during SwingSet rewrite 4/2020. Need to confirm it doesn't break anything.             
+// TODO This was added during SwingSet rewrite 4/2020. Need to confirm it doesn't break anything.
 		setEditable(false);
 	}
 
@@ -477,7 +477,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 //	/**
 //	 * Updates the value displayed in the component based on the SSRowSet column
 //	 * binding.
-//	 * 
+//	 *
 //	 * @param useTextField If this is true the value from the text in the text field
 //	 *                     will be used to update the display even if the rowset is
 //	 *                     on a valid row. This is needed when setSelectedValue is
@@ -487,7 +487,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 //		try {
 //			String text = "";
 //			try {
-//				
+//
 //				if (useTextField) {
 //					text = this.textField.getText().trim();
 //				} else {
@@ -647,7 +647,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 
 	/**
 	 * Returns the ssCommon data member for the current Swingset component.
-	 * 
+	 *
 	 * @return shared/common SwingSet component data and methods
 	 */
 	@Override
@@ -730,7 +730,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 *
 	 * @deprecated Use {@link #setOptions(String[] _options, int[] _mappings)}
 	 *             instead.
-	 * 
+	 *
 	 */
 	@Deprecated
 	public void setOption(final int _options, final int[] _mappings) {
@@ -788,7 +788,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 		if (options != null) {
 			options.clear();
 		}
-		
+
 		// TODO Add empty string first item if getAllowNull()==true. Will also impact mappings, getSelectedValue(), getSelectedIndex(), etc.
 //		if (getAllowNull()) {
 //			options = new ArrayList<String>(Arrays.asList(""));
@@ -888,7 +888,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 				// FROM ZERO. IN SUCH A CASE CHECK IF THE NUMBER EXCEEDS THE NUMBER OF ITEMS
 				// IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)
 				logger.warn(getColumnForLog() + ": Value from database:" + _value + ". Items in combobox: " + getItemCount());
-				
+
 				setSelectedIndex(-1);
 			} else {
 				// IF MAPPINGS ARE SPECIFIED THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
@@ -914,7 +914,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 
 	/**
 	 * Sets the SSCommon data member for the current Swingset Component.
-	 * 
+	 *
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override

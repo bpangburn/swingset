@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -189,7 +189,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	 * Unchecked value for numeric columns.
 	 */
 	protected int UNCHECKED = 0;
-	
+
 	/**
 	 * Log4j Logger for component
 	 */
@@ -211,7 +211,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	 * @param _ssRowSet        datasource to be used.
 	 * @param _boundColumnName name of the column to which this check box should be
 	 *                         bound
-	 * 
+	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public SSCheckBox(final SSRowSet _ssRowSet, final String _boundColumnName) throws java.sql.SQLException {
@@ -236,8 +236,8 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 //        this.columnName = _columnName;
 //        firePropertyChange("columnName", oldValue, this.columnName);
 //        bind();
-//    }    
-//    
+//    }
+//
 //    /**
 //     * Returns the SSRowSet column name to which the component is bound.
 //     *
@@ -258,8 +258,8 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 //        this.sSRowSet = _sSRowSet;
 //        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
 //        bind();
-//    }     
-//    
+//    }
+//
 //    /**
 //     * Returns the SSRowSet to which the component is bound.
 //     *
@@ -281,12 +281,12 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 //        this.sSRowSet = _sSRowSet;
 //        //pChangeSupport.firePropertyChange("sSRowSet", oldValue, sSRowSet);
 //        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
-//        
+//
 //        String oldValue2 = this.columnName;
 //        this.columnName = _columnName;
 //        //pChangeSupport.firePropertyChange("columnName", oldValue2, columnName);
 //        firePropertyChange("columnName", oldValue2, this.columnName);
-//        
+//
 //        bind();
 //    }
 
@@ -294,47 +294,47 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 //     * Initialization code.
 //     */
 //    protected void init() {
-//    	
+//
 //        // TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER KEY IS PRESSED
 //        Set<AWTKeyStroke> forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
 //        Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
 //        newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
 //        newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK ));
-//        setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);       
-//     
+//        setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);
+//
 //    }
 
 //    /**
 //     * Method for handling binding of component to a SSRowSet column.
-//     * 
+//     *
 //     * @throws SQLException - if a database access error occurs
 //     */
 //    protected void bind() throws java.sql.SQLException {
-//        
+//
 //        // CHECK FOR NULL COLUMN/ROWSET
 //            if (this.columnName==null || this.columnName.trim().equals("") || this.sSRowSet==null) {
 //                return;
 //            }
-//            
+//
 //        // REMOVE LISTENERS TO PREVENT DUPLICATION
 //            removeListeners();
-//            
-//         // BIND AND UPDATE DISPLAY            
+//
+//         // BIND AND UPDATE DISPLAY
 //            try {
 //
 //	        // DETERMINE COLUMN TYPE
-//				this.columnType = this.sSRowSet.getColumnType(this.columnName);            
-//	
+//				this.columnType = this.sSRowSet.getColumnType(this.columnName);
+//
 //	        // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
 //	            this.textField.setDocument(new SSTextDocument(this.sSRowSet, this.columnName));
-//	
+//
 //	        // SET THE COMBO BOX ITEM DISPLAYED
 //	            updateDisplay();
 //            } finally {
 //	        // ADD BACK LISTENERS
 //	            addListeners();
 //            }
-//               
+//
 //    }
 
 //    /**
@@ -342,7 +342,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 //     */
 //    private void addListeners() {
 //        this.textField.getDocument().addDocumentListener(this.textFieldDocumentListener);
-//        addItemListener(this.checkBoxListener);   
+//        addItemListener(this.checkBoxListener);
 //    }
 
 //    /**
@@ -351,11 +351,11 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 //    private void removeListeners() {
 //        this.textField.getDocument().removeDocumentListener(this.textFieldDocumentListener);
 //        removeItemListener(this.checkBoxListener);
-//    }    
+//    }
 
 	/**
 	 * Creates an object of SSCheckBox.
-	 * 
+	 *
 	 * @param _text Checkbox label
 	 */
 	public SSCheckBox(final String _text) {
@@ -378,9 +378,9 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 //		@Override
 //		public void changedUpdate(DocumentEvent de){
 //            removeItemListener(SSCheckBox.this.checkBoxListener);
-//            
+//
 //            updateDisplay();
-//            
+//
 //            addItemListener(SSCheckBox.this.checkBoxListener);
 //        }
 //
@@ -389,9 +389,9 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 //        @Override
 //		public void insertUpdate(DocumentEvent de) {
 //            removeItemListener(SSCheckBox.this.checkBoxListener);
-//            
+//
 //            updateDisplay();
-//            
+//
 //            addItemListener( SSCheckBox.this.checkBoxListener );
 //        }
 //
@@ -400,48 +400,48 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 //        @Override
 //		public void removeUpdate(DocumentEvent de) {
 //            removeItemListener(SSCheckBox.this.checkBoxListener);
-//            
+//
 //            updateDisplay();
-//            
+//
 //            addItemListener( SSCheckBox.this.checkBoxListener );
 //        }
 //    } // end private class MyTextFieldDocumentListener implements DocumentListener, Serializable {
 
 //    /**
 //     * Updates the underlying RowSet when there is a change to the Document object.
-//     * 
+//     *
 //     * These types of changes can result from a change in the RowSet pushed to the Document or a call to setText() on the
 //     * JTextField.
-//     * 
+//     *
 //     * DocumentListener events generally, but not always get fired twice any time there is an update to the JTextField:
 //     * a removeUpdate() followed by insertUpdate().
 //     * See:
 //     * https://stackoverflow.com/questions/15209766/why-jtextfield-settext-will-fire-documentlisteners-removeupdate-before-change#15213813
-//     * 
+//     *
 //     * Using partial solution here from here:
 //     * https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
-//     * 
+//     *
 //     * Having removeUpdate() and insertUpdate() both call changedUpdate(). changedUpdate() uses counters
 //     * and SwingUtilities.invokeLater() to only update the display on the last method called.
-//     * 
+//     *
 //     * Note that we do not want to handle removal/addition of listeners in updateText() because other
 //     * code could call it directly.
 //     */
 //
 //    protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
-//    	
+//
 //    	/**
 //		 * unique serial id
 //		 */
 //		private static final long serialVersionUID = 662317066187756908L;
-//		
+//
 //		/**
 //		 * variables needed to consolidate calls to removeUpdate() and insertUpdate() from DocumentListener
 //		 */
 //		private int lastChange=0;
 //    	private int lastNotifiedChange = 0;
-//    	
-//    	@Override    	
+//
+//    	@Override
 //		public void changedUpdate(DocumentEvent de) {
 //			lastChange++;
 //			//System.out.println("SSCheckBox (" + SSCheckBox.this.getColumnName() + ") - changedUpdate(): lastChange + ", lastNotifiedChange=" + lastNotifiedChange);
@@ -450,23 +450,23 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 //			SwingUtilities.invokeLater(() -> {
 //				if (lastNotifiedChange != lastChange) {
 //					lastNotifiedChange = lastChange;
-//					
+//
 //					removeItemListener(SSCheckBox.this.checkBoxListener);
 //					updateDisplay();
 //					addItemListener( SSCheckBox.this.checkBoxListener );
 //				}
 //			});
 //    	}
-//    	
+//
 //        @Override
 //		public void insertUpdate(DocumentEvent de) {
 //        	//System.out.println("SSCheckBox (" + this.columnName + ") - insertUpdate()");
 //        	changedUpdate(de);
 //        }
-//        
+//
 //        @Override
 //		public void removeUpdate(DocumentEvent de) {
-//        	//System.out.println("SSCheckBox (" + this.columnName + ") - removeUpdate()"); 
+//        	//System.out.println("SSCheckBox (" + this.columnName + ") - removeUpdate()");
 //        	changedUpdate(de);
 //        }
 //
@@ -497,7 +497,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 
 	/**
 	 * Returns the ssCommon data member for the current Swingset component.
-	 * 
+	 *
 	 * @return shared/common SwingSet component data and methods
 	 */
 	@Override
@@ -517,7 +517,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 
 	/**
 	 * Sets the SSCommon data member for the current Swingset Component.
-	 * 
+	 *
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override

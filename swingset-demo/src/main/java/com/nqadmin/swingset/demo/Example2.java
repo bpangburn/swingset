@@ -2,21 +2,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -59,7 +59,7 @@ import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 
 /**
- * This example displays data from the supplier_data table. 
+ * This example displays data from the supplier_data table.
  * SSTextFields are used to display supplier id, name,
  * and city. SSComboBox is used to display status.
  * <p>
@@ -71,7 +71,7 @@ public class Example2 extends JFrame {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 9205688923559422257L;
-	
+
 	/**
 	 * screen label declarations
 	 */
@@ -79,7 +79,7 @@ public class Example2 extends JFrame {
 	JLabel lblSupplierName = new JLabel("Name");
 	JLabel lblSupplierCity = new JLabel("City");
 	JLabel lblSupplierStatus = new JLabel("Status");
-	
+
 	/**
 	 * bound component declarations
 	 */
@@ -94,7 +94,7 @@ public class Example2 extends JFrame {
 	SSConnection ssConnection = null;
 	SSJdbcRowSetImpl rowset = null;
 	SSDataNavigator navigator = null;
-	
+
 	/**
 	 * Log4j2 Logger
 	 */
@@ -106,16 +106,16 @@ public class Example2 extends JFrame {
 	 * @param _dbConn - database connection
 	 */
 	public Example2(final Connection _dbConn) {
-		
+
 		// SET SCREEN TITLE
 			super("Example2");
-			
+
 		// SET CONNECTION
 			ssConnection = new SSConnection(_dbConn);
-		
+
 		// SET SCREEN DIMENSIONS
 			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
-			
+
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
 				rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
@@ -131,23 +131,23 @@ public class Example2 extends JFrame {
 		 * re-queried following insert and delete with rowset.execute()
 		 */
 		navigator.setDBNav(new SSDBNavImpl(this) {
-			
+
 			/**
 			 * unique serial id
 			 */
 			private static final long serialVersionUID = 6964661066285402119L;
-			
+
 			/**
 			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
 			 */
 			@Override
 			public void performPreInsertOps() {
-				
+
 				super.performPreInsertOps();
-				
+
 				try {
 
-				// GET THE NEW RECORD ID.	
+				// GET THE NEW RECORD ID.
 					final ResultSet rs = ssConnection.getConnection()
 							.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 							.executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");
@@ -155,18 +155,18 @@ public class Example2 extends JFrame {
 					final int supplierID = rs.getInt("nextVal");
 					txtSupplierID.setText(String.valueOf(supplierID));
 					rs.close();
-				
+
 				// SET OTHER DEFAULTS
 					 txtSupplierName.setText(null);
 					 txtSupplierCity.setText(null);
 					 cmbSupplierStatus.setSelectedValue(0);
-					
+
 				} catch(final SQLException se) {
-					logger.error("SQL Exception occured initializing new record.",se);								
+					logger.error("SQL Exception occured initializing new record.",se);
 				} catch(final Exception e) {
 					logger.error("Exception occured initializing new record.",e);
-				}		
-				
+				}
+
 			}
 
 			/**
@@ -181,7 +181,7 @@ public class Example2 extends JFrame {
 					logger.error("SQL Exception.", se);
 				}
 			}
-			
+
 			/**
 			 * Requery the rowset following a deletion. This is needed for H2.
 			 */
@@ -212,7 +212,7 @@ public class Example2 extends JFrame {
 			txtSupplierCity.bind(rowset, "city");
 			cmbSupplierStatus.bind(rowset, "status");
 			//this.cmbSupplierStatus.setSelectedIndex(1);
-		
+
 		// SET LABEL DIMENSIONS
 			lblSupplierID.setPreferredSize(MainClass.labelDim);
 			lblSupplierName.setPreferredSize(MainClass.labelDim);
@@ -229,7 +229,7 @@ public class Example2 extends JFrame {
 			final Container contentPane = getContentPane();
 			contentPane.setLayout(new GridBagLayout());
 			final GridBagConstraints constraints = new GridBagConstraints();
-	
+
 			constraints.gridx = 0;
 			constraints.gridy = 0;
 			contentPane.add(lblSupplierID, constraints);
@@ -239,7 +239,7 @@ public class Example2 extends JFrame {
 			contentPane.add(lblSupplierCity, constraints);
 			constraints.gridy = 3;
 			contentPane.add(lblSupplierStatus, constraints);
-	
+
 			constraints.gridx = 1;
 			constraints.gridy = 0;
 			contentPane.add(txtSupplierID, constraints);
@@ -249,12 +249,12 @@ public class Example2 extends JFrame {
 			contentPane.add(txtSupplierCity, constraints);
 			constraints.gridy = 3;
 			contentPane.add(cmbSupplierStatus, constraints);
-	
+
 			constraints.gridx = 0;
 			constraints.gridy = 4;
 			constraints.gridwidth = 2;
 			contentPane.add(navigator, constraints);
-		
+
 		// DISABLE THE PRIMARY KEY
 			txtSupplierID.setEnabled(false);
 

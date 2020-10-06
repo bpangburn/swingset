@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -68,11 +68,11 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * SSFormattedTextField extends the JFormattedTextField.
  * <p>
  * Generally bound components are implemented by extending SSFormattedTextField and
- * instantiating with a custom FormatterFactory parameter. E.g. SSDateField ssdf = new SSDateField(SSDateFormatterFactory); 
+ * instantiating with a custom FormatterFactory parameter. E.g. SSDateField ssdf = new SSDateField(SSDateFormatterFactory);
  * <p>
  * Each FormatterFactory will have calls to setDefaultFormatter(), setNullFormatter(), setEditFormatter(), and setDisplayFormatter()
  * <p>
- * It would be possible to instead use a MaskFormatter, but custom code has to be written if the field needs to be nullable/blanked 
+ * It would be possible to instead use a MaskFormatter, but custom code has to be written if the field needs to be nullable/blanked
  * by the user. For a MaskFormatter, this triggers a ParseException, which would need to be caught in the code and surplanted by
  * a call to setValue(null); Using a MaskFormatter still requires additional validation of some sort. E.g. preventing a MM/dd/yyyy date of
  * 99/99/9999 from being entered.
@@ -89,28 +89,28 @@ public class SSFormattedTextField extends JFormattedTextField
 	private static final long serialVersionUID = 5349618425984728006L;
 
 	private java.awt.Color standardColor = null;
-	
+
 	/**
 	 * color for the field that has the focus
 	 */
 	// TODO Add setters/getters and allow developer to customize
 	private final java.awt.Color focusColor = new java.awt.Color(204, 255, 255);
-	
+
     /**
      * Common fields shared across SwingSet components
      */
     protected SSCommon ssCommon;
-    
+
 	/**
 	 * Component listener.
 	 */
 	protected final SSFormattedValueListener ssFormattedValueListener = new SSFormattedValueListener();
-	
+
 	/**
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = LogManager.getLogger();
-	
+
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
 	 * database column
@@ -124,26 +124,26 @@ public class SSFormattedTextField extends JFormattedTextField
 
 		@Override
 		public void propertyChange(final PropertyChangeEvent _pce) {
-			
+
 			if (_pce.getPropertyName().equals("value")) {
-			
+
 				removeSSRowSetListener();
-	
+
 			    final SSFormattedTextField ftf = (SSFormattedTextField)_pce.getSource();
-			    
+
 			    final Object currentValue = ftf.getValue();
 			    logger.info(getColumnForLog() + ": Object to be passed to database is " + currentValue + ".");
-			    
+
 			    // TODO May want to see if we can veto invalid updates
 			    if (!getAllowNull() && (currentValue==null)) {
 			    	logger.warn("Null value encounted, but not allowed.");
 					JOptionPane.showMessageDialog(ftf,
 							"Null values are not allowed for " + getBoundColumnName(), "Null Exception", JOptionPane.ERROR_MESSAGE);
 			    } else {
-			    
+
 				    try {
 				    	// 2020-10-02_BP: Date fields are returned as java.util.Date and Postgres JDBC doesn't know how to handle them
-//TODO Add support for time and timestamp or modify in formatter factories				    	
+//TODO Add support for time and timestamp or modify in formatter factories
 				    	if (currentValue instanceof java.util.Date) {
 				    		getSSRowSet().updateObject(getBoundColumnName(), new java.sql.Date(((java.util.Date)currentValue).getTime()));
 				    	} else {
@@ -156,10 +156,10 @@ public class SSFormattedTextField extends JFormattedTextField
 								"SQL Exception encountered for " + getBoundColumnName(), "SQL Exception", JOptionPane.ERROR_MESSAGE);
 					}
 			    }
-			    
+
 				addSSRowSetListener();
 			}
-			
+
 		}
 
 	}
@@ -168,34 +168,34 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * Creates a new instance of SSFormattedTextField
 	 */
 	public SSFormattedTextField() {
-		
+
     	super();
     	setSSCommon(new SSCommon(this));
     	// SSCommon constructor calls init()
 
 	}
-	
-	
+
+
 	/**
 	 * Creates a new instance of SSFormattedTextField
-	 * 
+	 *
 	 * @param _format Format used to look up an AbstractFormatter
 	 */
 	public SSFormattedTextField(final Format _format) {
-		
+
     	super(_format);
     	setSSCommon(new SSCommon(this));
     	// SSCommon constructor calls init()
 
 	}
-	
+
 	/**
 	 * Creates a new instance of SSFormattedTextField
-	 * 
+	 *
 	 * @param _formatter AbstractFormatter to use for formatting.
 	 */
 	public SSFormattedTextField(final AbstractFormatter _formatter) {
-		
+
     	super(_formatter);
     	setSSCommon(new SSCommon(this));
     	// SSCommon constructor calls init()
@@ -204,7 +204,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	/**
 	 * Creates a new instance of SSFormattedTextField
-	 * 
+	 *
 	 * @param _factory AbstractFormatterFactory used for formatting.
 	 */
 	public SSFormattedTextField(final AbstractFormatterFactory _factory) {
@@ -212,13 +212,13 @@ public class SSFormattedTextField extends JFormattedTextField
     	setSSCommon(new SSCommon(this));
     	// SSCommon constructor calls init()
 	}
-	
+
 	// WE DON'T WANT TO REPLICATE THE JFormattedTextField CONSTRUCTOR THAT ACCEPTS AN OBJECT.
 	// FOR SWINGSET THAT SHOULD BE HANDLED SEPARATELY WITH BINDING.
 
 	/**
 	 * Remove highlighting when the focus is lost.
-	 * 
+	 *
 	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
 	 */
 	@Override
@@ -228,9 +228,9 @@ public class SSFormattedTextField extends JFormattedTextField
 	}
 
 	/**
-	 * Add highlighting when the focus is gained and select all of the text so 
+	 * Add highlighting when the focus is gained and select all of the text so
 	 * overwriting is easier.
-	 * 
+	 *
 	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
 	 */
 	@Override
@@ -240,7 +240,7 @@ public class SSFormattedTextField extends JFormattedTextField
 		standardColor = getBackground();
 		setBackground(focusColor);
 
-		
+
 		// HIGHLIGHT THE TEXT IN THE FIELD WHEN FOCUS IS GAINED SO USE CAN JUST TYPE OVER WHAT IS THERE
 		//
 		// This is a workaround based on the following thread:
@@ -254,7 +254,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	}
 
 //	KEEPING DbToFm in comments for reference.
-//	
+//
 //	/**
 //	 * This method perform the actual data transfer from rowset to this object Value
 //	 * field. depending on the column Type.
@@ -491,13 +491,13 @@ public class SSFormattedTextField extends JFormattedTextField
 					logger.debug(getColumnForLog() + ": Text in Formatted Text Field is " + ssftf.getText() + ".");
 					// this will throw a parse exception if something goes wrong
 					ssftf.commitEdit();
-					
+
 					// get current value
 					final Object value = (ssftf.getValue());
 
 					// now perform custom checks
 					result = validateField(value);
-					
+
 					// update text color for negatives
 					if (result) {
 						updateTextColor(value);
@@ -521,15 +521,15 @@ public class SSFormattedTextField extends JFormattedTextField
 	}
 
 //	KEEPING updateRowSet in comments for reference.
-//	
+//
 //	/**
 //	 * Updates the bound column in the rowset with the specified value
-//	 * 
+//	 *
 //	 * @param _aux - value with which the rowset column has to be updated
 //	 * @throws SQLException SQLException
 //	 */
 //	private void updateRowSet(final Object _aux) throws SQLException {
-//		
+//
 //		// THIS SHOULD ALL BE HANDLED BY SSRowSet.updateColumnText()
 //		switch (this.colType) {
 //
@@ -647,28 +647,28 @@ public class SSFormattedTextField extends JFormattedTextField
 	/**
 	 * Checks if the value is valid of the component. Override for custom validations
 	 * not handled by formatter / formatter factory.
-	 * 
+	 *
 	 * @param _value - value to be validated
 	 * @return returns true if the value is valid else false
 	 */
 	public boolean validateField(final Object _value) {
 
-		
+
 		// TODO May want to add null check here or let SSRowSet handle. Hard to enforce if method overridden.
 		//if (this.getAllowNull() == false && _value == null)
 		//	return false;
-			
+
 		// RETURN
 			return true;
 	}
-	
+
 	/**
 	 * Sets text color to red for negative numbers, otherwise black.
-	 * 
+	 *
 	 * @param _value - value to be validated
 	 */
 	public void updateTextColor(final Object _value) {
-	
+
 		if (((_value instanceof Double) && ((Double) _value < 0.0))
 				|| ((_value instanceof Float) && ((Float) _value < 0.0))
 				|| ((_value instanceof Long) && ((Long) _value < 0))
@@ -677,12 +677,12 @@ public class SSFormattedTextField extends JFormattedTextField
 		} else {
 			setForeground(Color.BLACK);
 		}
-		
+
 	}
 
 	/**
 	 * Getter for property nullable.
-	 * 
+	 *
 	 * @return Value of property nullable.
 	 */
 	@Deprecated
@@ -693,12 +693,12 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	/**
 	 * Setter for property nullable.
-	 * 
+	 *
 	 * @param _nullable New value of property nullable.
 	 */
 	@Deprecated
 	public void setNullable(final boolean _nullable) {
-		
+
 		setAllowNull(_nullable);
 
 	}
@@ -738,12 +738,12 @@ public class SSFormattedTextField extends JFormattedTextField
 		// Setting inputVerifier to validate field before focus is lost
 		// See https://docs.oracle.com/javase/8/docs/api/javax/swing/JFormattedTextField.html
 		setInputVerifier(new FormattedTextFieldVerifier());
-		
+
 	}
 
     /**
 	 * Returns the ssCommon data member for the current Swingset component.
-	 * 
+	 *
 	 * @return shared/common SwingSet component data and methods
 	 */
     @Override
@@ -762,7 +762,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	/**
 	 * Sets the SSCommon data member for the current Swingset Component.
-	 * 
+	 *
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
@@ -782,15 +782,15 @@ public class SSFormattedTextField extends JFormattedTextField
 	public void updateSSComponent() {
 
 		// DbToFm() was doing this work previously and had some special handling for dates, etc.
-		
+
 		// It is OK to pass a String to SSFormattedTextField or a child class expecting a string (e.g., SSCuitField), but for
 		// child classes expecting a number format (e.g., SSCurrencyField) then it will not accept a string an an exception will be thrown.
 		//
 		// Previously, data type conversions for the component and rowset were handled with DbToFm() and updateRowSet().
-		
+
 			//Object oValue = null;
 			Object newValue = null;
-			
+
 			// TODO Review date/time handling: https://stackoverflow.com/questions/21162753/jdbc-resultset-i-need-a-getdatetime-but-there-is-only-getdate-and-gettimestamp
 
 			try {
@@ -799,18 +799,18 @@ public class SSFormattedTextField extends JFormattedTextField
 					setValue(null);
 					return;
 				}
-				
+
 				final JDBCType jdbcType = getBoundColumnJDBCType();
 				final String columnName = getBoundColumnName();
-	
+
  				// SQL TO JAVA CONVERSIONS: https://stackoverflow.com/questions/5251140/map-database-type-to-concrete-java-class
 				//
 				// 2020-09-14: Will use java <-> SQL mapping in JDBC to get appropriate Java object and then exclude ones that would cause a problem for JFormattedTextField
 				// Based on: https://docs.oracle.com/javase/8/docs/api/java/sql/ResultSet.html#getObject-java.lang.String-
 				//
-				// getObject() will return the given column as a Java object. JDBC specification should contain the mappings for built in types. 
+				// getObject() will return the given column as a Java object. JDBC specification should contain the mappings for built in types.
 				newValue = getSSRowSet().getObject(columnName);
-				
+
 				/* Java types we want to support for JFormattedTextFields:
 				 * 	String
 				 *  Boolean
@@ -833,7 +833,7 @@ public class SSFormattedTextField extends JFormattedTextField
 						(newValue instanceof java.sql.Date) ||
 						(newValue instanceof java.sql.Time) ||
 						(newValue instanceof java.sql.Timestamp)) {
-					
+
 					setValue(newValue);
 				} else {
 					logger.error(getColumnForLog() + ": JDBCType of " + jdbcType.toString() + " was cast to unsupported type of " + newValue.getClass().getName() + " based on JDBC connection getTypeMap().");
@@ -843,7 +843,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				logger.error(getColumnForLog() + ": SQL Exception while updating rowset from formatted component.", sqe);
 				setValue(null);
 			}
-	
+
 			// SET TEXT COLOR TO RED FOR ANY NEGATIVE NUMBERS
 				updateTextColor(newValue);
 

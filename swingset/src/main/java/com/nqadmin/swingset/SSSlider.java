@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -73,11 +73,11 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 
 		@Override
 		public void stateChanged(final ChangeEvent ce) {
-			
+
 			removeSSRowSetListener();
-			
+
 			setBoundColumnText(String.valueOf(getValue()));
-			
+
 			addSSRowSetListener();
 //            SSSlider.this.textField.getDocument().removeDocumentListener(SSSlider.this.textFieldDocumentListener);
 //
@@ -87,7 +87,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
         }
 
     } // end protected class SSSliderListener implements ChangeListener, Serializable {
-	
+
     /**
 	 * unique serial id
 	 */
@@ -127,7 +127,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
      * Component listener.
      */
     protected final SSSliderListener ssSliderListener = new SSSliderListener();
-    
+
 	/**
 	 * Log4j Logger for component
 	 */
@@ -252,19 +252,19 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 //
 //        // REMOVE LISTENERS TO PREVENT DUPLICATION
 //            removeListeners();
-//            
+//
 //        // BIND AND UPDATE DISPLAY
 //            try {
 //
 //	        // DETERMINE COLUMN TYPE
 //				this.columnType = this.sSRowSet.getColumnType(this.columnName);
-//	
+//
 //	        // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
 //	            this.textField.setDocument(new SSTextDocument(this.sSRowSet, this.columnName));
-//	
+//
 //	        // SET THE LABEL DISPLAY
 //	            updateDisplay();
-//	            
+//
 //            } finally {
 //	        // ADD BACK LISTENERS
 //	            addListeners();
@@ -356,43 +356,43 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 //        }
 //
 //    } // end protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
-    
+
 //    /**
 //     * Updates the underlying RowSet when there is a change to the Document object.
-//     * 
+//     *
 //     * These types of changes can result from a change in the RowSet pushed to the Document or a call to setText() on the
 //     * JTextField.
-//     * 
+//     *
 //     * DocumentListener events generally, but not always get fired twice any time there is an update to the JTextField:
 //     * a removeUpdate() followed by insertUpdate().
 //     * See:
 //     * https://stackoverflow.com/questions/15209766/why-jtextfield-settext-will-fire-documentlisteners-removeupdate-before-change#15213813
-//     * 
+//     *
 //     * Using partial solution here from here:
 //     * https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
-//     * 
+//     *
 //     * Having removeUpdate() and insertUpdate() both call changedUpdate(). changedUpdate() uses counters
 //     * and SwingUtilities.invokeLater() to only update the display on the last method called.
-//     * 
+//     *
 //     * Note that we do not want to handle removal/addition of listeners in updateText() because other
 //     * code could call it directly.
 //     */
 //    // TODO audit which listeners need to be removed in changedUpdate()
 //
 //    protected class MyTextFieldDocumentListener implements DocumentListener, Serializable {
-//    	
+//
 //    	/**
 //		 * unique serial id
 //		 */
 //		private static final long serialVersionUID = 2592351765135476620L;
-//		
+//
 //		/**
 //		 * variables needed to consolidate calls to removeUpdate() and insertUpdate() from DocumentListener
 //		 */
 //		private int lastChange=0;
 //    	private int lastNotifiedChange = 0;
-//    	
-//    	@Override    	
+//
+//    	@Override
 //		public void changedUpdate(DocumentEvent de) {
 //			lastChange++;
 //			//System.out.println("SSSlider (" + SSSlider.this.getColumnName() + ") - changedUpdate(): lastChange + ", lastNotifiedChange=" + lastNotifiedChange);
@@ -401,27 +401,27 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 //			SwingUtilities.invokeLater(() -> {
 //				if (lastNotifiedChange != lastChange) {
 //					lastNotifiedChange = lastChange;
-//					
+//
 //					removeChangeListener(SSSlider.this.sliderListener);
 //					updateDisplay();
 //					addChangeListener(SSSlider.this.sliderListener);
 //				}
 //			});
 //    	}
-//    	
+//
 //        @Override
 //		public void insertUpdate(DocumentEvent de) {
 //        	//System.out.println("SSSlider (" + this.columnName + ") - insertUpdate()");
 //        	changedUpdate(de);
 //        }
-//        
+//
 //        @Override
 //		public void removeUpdate(DocumentEvent de) {
-//        	//System.out.println("SSSlider (" + this.columnName + ") - removeUpdate()"); 
+//        	//System.out.println("SSSlider (" + this.columnName + ") - removeUpdate()");
 //        	changedUpdate(de);
 //        }
 //
-//    } // end protected class MyTextFieldDocumentListener implements DocumentListener {    
+//    } // end protected class MyTextFieldDocumentListener implements DocumentListener {
 
     /**
      * Creates a horizontal slider with the range 0 to 100 and binds it
@@ -463,12 +463,12 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	public void customInit() {
 		// TODO Consider removing default dimensions.
         // SET PREFERRED DIMENSIONS
-        	setPreferredSize(new Dimension(200,20));		
+        	setPreferredSize(new Dimension(200,20));
 	}
 
 	/**
 	 * Returns the ssCommon data member for the current Swingset component.
-	 * 
+	 *
 	 * @return shared/common SwingSet component data and methods
 	 */
 	@Override
@@ -488,7 +488,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 
 	/**
 	 * Sets the SSCommon data member for the current Swingset Component.
-	 * 
+	 *
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
@@ -499,9 +499,9 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 
 	@Override
 	public void updateSSComponent() {
-		
+
 		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to numeric types
-		
+
 		// SET THE SLIDER BASED ON THE VALUE IN THE TEXT FIELD
 		switch (getBoundColumnType()) {
             case java.sql.Types.INTEGER:
@@ -528,7 +528,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
             	logger.warn(getColumnForLog() + ": Unable to update Slider bound to " + getBoundColumnName() + " because the data type is not supported (" + getBoundColumnType() + ".");
                 break;
         }
-		
+
 	}
 
 } // end public class SSSlider extends JSlider

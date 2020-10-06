@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -106,7 +106,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 //	 * SSRowSet column to which the component will be bound.
 //	 */
 //	protected String columnName = "";
-	
+
 	/**
 	 * Log4j Logger for component
 	 */
@@ -114,7 +114,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 
 	/**
 	 * Converts SQL array to object array
-	 * 
+	 *
 	 * @param array SQL array
 	 * @return Object array
 	 * @throws SQLException SQLException
@@ -123,9 +123,9 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		if (array == null) {
 			return null;
 		}
-		
+
 		logger.debug("SSList.toObjArray() contents: " + array);
-	
+
 		final Vector<Object> data = new Vector<>();
 		switch (array.getBaseType()) {
 		case Types.INTEGER:
@@ -229,7 +229,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 
 //	/**
 //	 * Sets the SSRowSet column name to which the component is bound.
-//	 * 
+//	 *
 //	 * @param _columnName Column name to which the component is bound.
 //	 */
 //	public void setColumnName(String _columnName) {
@@ -245,7 +245,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 //
 //	/**
 //	 * Returns the column name to which the component is bound.
-//	 * 
+//	 *
 //	 * @return returns the column name to which to component is bound.
 //	 */
 //	public String getBoundColumnName() {
@@ -254,7 +254,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 
 //	/**
 //	 * Sets the SSRowSet to which the component is bound.
-//	 * 
+//	 *
 //	 * @param _sSRowSet SSRowSet to which the component is bound
 //	 */
 //	public void setSSRowSet(SSRowSet _sSRowSet) {
@@ -270,7 +270,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 
 //	/**
 //	 * Returns the SSRowSet being used to get the values.
-//	 * 
+//	 *
 //	 * @return returns the SSRowSet being used.
 //	 */
 //	public SSRowSet getSSRowSet() {
@@ -316,7 +316,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	/**
 	 * Returns the underlying values for each of the items in the list box (e.g. the
 	 * values that map to the items displayed in the list box)
-	 * 
+	 *
 	 * @return returns the underlying values for each of the items in the list box
 	 */
 	public Object[] getMappings() {
@@ -325,7 +325,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 
 	/**
 	 * Returns the items displayed in the list box.
-	 * 
+	 *
 	 * @return returns the items displayed in the list box
 	 */
 	public String[] getOptions() {
@@ -334,12 +334,12 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 
 	/**
 	 * Returns the list value associated with the currently selected item.
-	 * 
+	 *
 	 * @return returns the value associated with the selected item OR -1 if nothing
 	 *         is selected.
-	 * 
+	 *
 	 * @deprecated Use {@link #getSelectedValuesList()} instead.
-	 * 
+	 *
 	 */
 	@Deprecated
 	@Override
@@ -376,7 +376,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 
 //	/**
 //	 * Sets the SSRowSet and column name to which the component is to be bound.
-//	 * 
+//	 *
 //	 * @param _sSRowSet     datasource to be used.
 //	 * @param _columnName   Name of the column to which this check box should be
 //	 *                      bound
@@ -427,7 +427,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 
 	/**
 	 * Returns the ssCommon data member for the current Swingset component.
-	 * 
+	 *
 	 * @return shared/common SwingSet component data and methods
 	 */
 	@Override
@@ -463,7 +463,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 //	/**
 //	 * Updates the value displayed in the component based on the SSRowSet column
 //	 * binding.
-//	 * 
+//	 *
 //	 * @throws SQLException SQLException
 //	 */
 //	protected void updateDisplay() throws SQLException {
@@ -534,7 +534,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	/**
 	 * Sets the underlying values for each of the items in the list box (e.g. the
 	 * values that map to the items displayed in the list box)
-	 * 
+	 *
 	 * @param _mappings An array of values that correspond to those in the list box.
 	 */
 	protected void setMappings(final Object[] _mappings) {
@@ -545,7 +545,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 
 	/**
 	 * Adds an array of strings as combo box items.
-	 * 
+	 *
 	 * @param _options the list of options that you want to appear in the list box.
 	 */
 	protected void setOptions(final String[] _options) {
@@ -559,7 +559,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	/**
 	 * Sets the options to be displayed in the list box and their corresponding
 	 * values.
-	 * 
+	 *
 	 * @param _options  options to be displayed in the list box.
 	 * @param _mappings integer values that correspond to the options in the list
 	 *                  box.
@@ -578,7 +578,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 
 	/**
 	 * Selects appropriate elements in the list box
-	 * 
+	 *
 	 * @param values Values to be selected in list
 	 */
 	public void setSelectedValues(final Object[] values) {
@@ -595,7 +595,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 
 	/**
 	 * Sets the SSCommon data member for the current Swingset Component.
-	 * 
+	 *
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
@@ -655,14 +655,14 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		try {
 
 			if (getSSRowSet().getRow() > 0) {
-				
+
 //			    Array sqlArray = getSSRowSet().getArray(getBoundColumnName());
 //			    System.out.println("SQL array retrieved for SSList: " + sqlArray);
 //			    Object[] objArray = (Object[])sqlArray.getArray();
 //			    for (int i = 0; i < objArray.length; i++) {
 //			    	System.out.println("Array element [" + i + "] contains: " + objArray[i]);
 //			    }
-			    
+
 			    array = toObjArray(getSSRowSet().getArray(getBoundColumnName()));
 
 			}

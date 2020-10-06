@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -63,12 +63,12 @@ import com.nqadmin.swingset.utils.SSCommon;
  * code where SSRowSet was referenced as a type.
  */
 public interface SSRowSet extends RowSet {
-	
+
 	// TODO Audit type handling based on http://www.java2s.com/Code/Java/Database-SQL-JDBC/StandardSQLDataTypeswithTheirJavaEquivalents.htm
 
 	/**
 	 * Wrapper/convenience method for SwingSet method naming consistency.
-	 * 
+	 *
 	 * @param _rowSetListener RowSetListener to add to current SSRowSet
 	 */
 	public default void addSSRowSetListener(final RowSetListener _rowSetListener) {
@@ -77,7 +77,7 @@ public interface SSRowSet extends RowSet {
 
 	/**
 	 * Returns the number of columns in the underlying ResultSet object
-	 * 
+	 *
 	 * @return the number of columns
 	 * @throws SQLException - if a database access error occurs
 	 */
@@ -87,11 +87,11 @@ public interface SSRowSet extends RowSet {
 
 	/**
 	 * Get the designated column's index
-	 * 
+	 *
 	 * @param _columnName - name of the column
-	 * 
+	 *
 	 * @return returns the corresponding column index (starting from 1)
-	 * 
+	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public default int getColumnIndex(final String _columnName) throws SQLException {
@@ -100,11 +100,11 @@ public interface SSRowSet extends RowSet {
 
 	/**
 	 * Returns the column name for the column index provided
-	 * 
+	 *
 	 * @param _columnIndex - the column index where the first column is 1, second
 	 *                     column is 2, etc.
 	 * @return the column name of the given column index
-	 * 
+	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public default String getColumnName(final int _columnIndex) throws SQLException {
@@ -114,9 +114,9 @@ public interface SSRowSet extends RowSet {
 	/**
 	 * Method used by ssRowSet listeners to get the new text when the SSRowSet
 	 * events are triggered.
-	 * 
+	 *
 	 * @param _columnName - name of database column to retrieve
-	 * 
+	 *
 	 * @return text representation of data in specified column
 	 */
 	public default String getColumnText(final String _columnName) {
@@ -127,7 +127,7 @@ public interface SSRowSet extends RowSet {
 			if ((getColumnCount()==0) || (getObject(_columnName) == null)) {
 				return null;
 			}
-			
+
 			final int columnType = getColumnType(_columnName);
 
 			// BASED ON THE COLUMN DATA TYPE THE CORRESPONDING FUNCTION
@@ -152,7 +152,7 @@ public interface SSRowSet extends RowSet {
 			case Types.DECIMAL:
 				value = String.valueOf(this.getDouble(_columnName));
 				break;
-				
+
 			case Types.BOOLEAN:
 			case Types.BIT:
 				value = String.valueOf(this.getBoolean(_columnName));
@@ -180,7 +180,7 @@ public interface SSRowSet extends RowSet {
 					// value = String.valueOf(sSRowSet.getDate(columnName));
 				}
 				break;
-				
+
 			case Types.TIME:
 				final Time time = this.getTime(_columnName);
 				if (time == null) {
@@ -216,13 +216,13 @@ public interface SSRowSet extends RowSet {
 	/**
 	 * Retrieves an integer corresponding to the designated column's type based on
 	 * the column index (starting from 1)
-	 * 
+	 *
 	 * @see "https://docs.oracle.com/javase/7/docs/api/java/sql/Types.html"
 	 *
 	 * @param _columnIndex - the column index where the first column is 1, second
 	 *                     column is 2, etc.
 	 * @return SQL type from java.sql.Types
-	 * 
+	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public default int getColumnType(final int _columnIndex) throws SQLException {
@@ -232,13 +232,13 @@ public interface SSRowSet extends RowSet {
 	/**
 	 * Retrieves an int corresponding to the designated column's type based on the
 	 * column name
-	 * 
+	 *
 	 * @see "https://docs.oracle.com/javase/7/docs/api/java/sql/Types.html"
-	 * 
+	 *
 	 * @param _columnName - name of the column
-	 * 
+	 *
 	 * @return SQL type from java.sql.Types
-	 * 
+	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public default int getColumnType(final String _columnName) throws SQLException {
@@ -247,7 +247,7 @@ public interface SSRowSet extends RowSet {
 
 	/**
 	 * Wrapper/convenience method for SwingSet method naming consistency.
-	 * 
+	 *
 	 * @param _rowSetListener RowSetListener to remove from current SSRowSet
 	 */
 	public default void removeSSRowSetListener(final RowSetListener _rowSetListener) {
@@ -261,7 +261,7 @@ public interface SSRowSet extends RowSet {
 	 * When the user changes/edits the SwingSet column this method propagates the
 	 * change to the RowSet. A separate call is required to flush/commit the change
 	 * to the database.
-	 * 
+	 *
 	 * @param _updatedValue string to be type-converted as needed and updated in
 	 *                      underlying RowSet column
 	 * @param _columnName   name of the database column
@@ -273,24 +273,24 @@ public interface SSRowSet extends RowSet {
 	public default void updateColumnText(final String _updatedValue, final String _columnName, final boolean _allowNull) throws NullPointerException, SQLException, NumberFormatException {
 
 //		try {
-			
-			// TODO Add proper support for null vs "" based on _allowNull. For Char types all "" are currently forced to null, 
+
+			// TODO Add proper support for null vs "" based on _allowNull. For Char types all "" are currently forced to null,
 //			if (!_allowNull && _updatedValue==null) {
 //				_updatedValue = "";
 //			}
-			
+
 			// TODO Convert this code to use Java 8 JDBCType enum
-			
+
 			// 2020-09-11_BP: Probably not a good idea to trim here as it may be desirable to have padding for some strings
 			// Also, it's coded wrong.
 			// Should be:
 			//	if (_updatedValue!=null) _updatedValue = _updatedValue.trim();
 			// not:
 			// 	if (_updatedValue!=null) _updatedValue.trim();
-			
-			
+
+
 			LogManager.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? " + _allowNull);
-					
+
 			final int columnType = getColumnType(_columnName);
 
 			switch (columnType) {
@@ -354,7 +354,7 @@ public interface SSRowSet extends RowSet {
 					final double doubleValue = Double.parseDouble(_updatedValue);
 					this.updateDouble(_columnName, doubleValue);
 				}
-				break;		
+				break;
 
 			case Types.BOOLEAN:
 			case Types.BIT:
@@ -379,14 +379,14 @@ public interface SSRowSet extends RowSet {
 					} else {
 						throw new NullPointerException("Null values are not allowed for this field.");
 					}
-// TODO Good to get rid of getSQLDate if possible.						
+// TODO Good to get rid of getSQLDate if possible.
 				} else if (_updatedValue.length() == 10) {
 					this.updateDate(_columnName, SSCommon.getSQLDate(_updatedValue));
 				} else {
 					// do nothing
 				}
 				break;
-				
+
 			case Types.TIME:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
 				if ((_updatedValue==null) || _updatedValue.equals("")) {
@@ -399,7 +399,7 @@ public interface SSRowSet extends RowSet {
 					this.updateTime(_columnName, java.sql.Time.valueOf(_updatedValue));
 				}
 				break;
-				
+
 			case Types.TIMESTAMP:
 				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
 				if ((_updatedValue==null) || _updatedValue.equals("")) {
@@ -408,14 +408,14 @@ public interface SSRowSet extends RowSet {
 					} else {
 						throw new NullPointerException("Null values are not allowed for this field.");
 					}
-// TODO Probably do not want a length of 10 characters here. Good to get rid of getSQLDate if possible.					
+// TODO Probably do not want a length of 10 characters here. Good to get rid of getSQLDate if possible.
 				} else if (_updatedValue.length() == 10) {
 					this.updateTimestamp(_columnName, new Timestamp(SSCommon.getSQLDate(_updatedValue).getTime()));
 				} else {
 					// do nothing
 				}
 				break;
-				
+
 			case Types.CHAR:
 			case Types.VARCHAR:
 			case Types.LONGVARCHAR:
@@ -429,7 +429,7 @@ public interface SSRowSet extends RowSet {
 //				} else {
 //					this.updateString(_columnName, _updatedValue);
 //				}
-				
+
 				if (_updatedValue==null) {
 					if (_allowNull) {
 						this.updateNull(_columnName);

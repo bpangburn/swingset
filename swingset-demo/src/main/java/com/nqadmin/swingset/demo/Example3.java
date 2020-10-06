@@ -2,21 +2,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -59,8 +59,8 @@ import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 
 /**
- * This example displays data from the supplier_part_data table. 
- * SSTextFields are used to display supplier-part id and quantity.  
+ * This example displays data from the supplier_part_data table.
+ * SSTextFields are used to display supplier-part id and quantity.
  * SSDBComboBoxes are used to display supplier name and part name
  * based on queries against the supplier_data and part_data tables.
  * <p>
@@ -72,7 +72,7 @@ public class Example3 extends JFrame {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 4859550616628544511L;
-	
+
 	/**
 	 * screen label declarations
 	 */
@@ -95,7 +95,7 @@ public class Example3 extends JFrame {
 	SSConnection ssConnection = null;
 	SSJdbcRowSetImpl rowset = null;
 	SSDataNavigator navigator = null;
-	
+
 	/**
 	 * Log4j2 Logger
 	 */
@@ -107,13 +107,13 @@ public class Example3 extends JFrame {
 	 * @param _dbConn - database connection
 	 */
 	public Example3(final Connection _dbConn) {
-		
+
 		// SET SCREEN TITLE
 			super("Example3");
-			
+
 		// SET CONNECTION
 			ssConnection = new SSConnection(_dbConn);
-		
+
 		// SET SCREEN DIMENSIONS
 			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 
@@ -142,12 +142,12 @@ public class Example3 extends JFrame {
 			 */
 			@Override
 			public void performPreInsertOps() {
-				
+
 				super.performPreInsertOps();
-				
+
 				try {
 
-				// GET THE NEW RECORD ID.	
+				// GET THE NEW RECORD ID.
 					final ResultSet rs = ssConnection.getConnection()
 							.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 							.executeQuery("SELECT nextval('supplier_part_data_seq') as nextVal;");
@@ -155,18 +155,18 @@ public class Example3 extends JFrame {
 					final int supplierPartID = rs.getInt("nextVal");
 					txtSupplierPartID.setText(String.valueOf(supplierPartID));
 					rs.close();
-				
+
 				// SET OTHER DEFAULTS
 					 cmbSupplierName.setSelectedValue(0);
 					 cmbPartName.setSelectedValue(0);
 					 txtQuantity.setText("0");
-					
+
 				} catch(final SQLException se) {
-					logger.error("SQL Exception occured initializing new record.",se);								
+					logger.error("SQL Exception occured initializing new record.",se);
 				} catch(final Exception e) {
 					logger.error("Exception occured initializing new record.",e);
-				}		
-				
+				}
+
 			}
 
 			/**
@@ -181,7 +181,7 @@ public class Example3 extends JFrame {
 					logger.error("SQL Exception.", se);
 				}
 			}
-			
+
 			/**
 			 * Requery the rowset following a deletion. This is needed for H2.
 			 */
@@ -200,28 +200,28 @@ public class Example3 extends JFrame {
 		// SETUP DB COMBO QUERIES
 			String query = "SELECT * FROM supplier_data;";
 			cmbSupplierName = new SSDBComboBox(ssConnection, query, "supplier_id", "supplier_name");
-			
+
 			query = "SELECT * FROM part_data;";
 			cmbPartName = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
-		
+
 		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
 			txtSupplierPartID.bind(rowset, "supplier_part_id");
 			cmbSupplierName.bind(rowset, "supplier_id");
 			cmbPartName.bind(rowset, "part_id");
 			txtQuantity.bind(rowset, "quantity");
-			
+
 		// RUN DB COMBO QUERIES
 			try {
 				cmbPartName.execute();
 				cmbSupplierName.execute();
-	
+
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			} catch (final Exception e) {
 				logger.error("Exception.", e);
 			}
-			
-		// SET LABEL DIMENSIONS	
+
+		// SET LABEL DIMENSIONS
 			lblSupplierPartID.setPreferredSize(MainClass.labelDim);
 			lblSupplierName.setPreferredSize(MainClass.labelDim);
 			lblPartName.setPreferredSize(MainClass.labelDim);
@@ -237,7 +237,7 @@ public class Example3 extends JFrame {
 			final Container contentPane = getContentPane();
 			contentPane.setLayout(new GridBagLayout());
 			final GridBagConstraints constraints = new GridBagConstraints();
-	
+
 			constraints.gridx = 0;
 			constraints.gridy = 0;
 			contentPane.add(lblSupplierPartID, constraints);
@@ -247,7 +247,7 @@ public class Example3 extends JFrame {
 			contentPane.add(lblPartName, constraints);
 			constraints.gridy = 3;
 			contentPane.add(lblQuantity, constraints);
-	
+
 			constraints.gridx = 1;
 			constraints.gridy = 0;
 			contentPane.add(txtSupplierPartID, constraints);
@@ -257,7 +257,7 @@ public class Example3 extends JFrame {
 			contentPane.add(cmbPartName, constraints);
 			constraints.gridy = 3;
 			contentPane.add(txtQuantity, constraints);
-	
+
 			constraints.gridx = 0;
 			constraints.gridy = 4;
 			constraints.gridwidth = 2;

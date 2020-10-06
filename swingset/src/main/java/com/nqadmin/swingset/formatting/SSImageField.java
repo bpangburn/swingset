@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -75,10 +75,10 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * Used to link a JPanel to an image column in a database.
  * <p>
  * Other than some function key handling, which is likely outside the scope of
- * SwingSet and should be customized at the application level, this class appears to 
+ * SwingSet and should be customized at the application level, this class appears to
  * mostly duplicate SSImage.
  * <p>
- * There were methods to resize an image to make a thumbnail (Rescale, Thumbnail), but 
+ * There were methods to resize an image to make a thumbnail (Rescale, Thumbnail), but
  * the data members that they manipulated did not appear to be exposed anywhere.
  * <p>
  * SSImageField does not extend SSFormattedText field like the other classes in this package.
@@ -99,7 +99,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	private int colType = -99;
 	protected SSRowSet rowset = null;
 	private SSDataNavigator navigator = null;
-	
+
 	/**
 	 * Log4j Logger for component
 	 */
@@ -191,10 +191,10 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 		});
 		add(getButton, BorderLayout.SOUTH);
 	}
-	
+
 	/**
 	 * Returns the bound column name in square brackets.
-	 * 
+	 *
 	 * @return the boundColumnName in square brackets
 	 */
 	public String getColumnForLog() {
@@ -204,7 +204,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/**
 	 * Creates a image icon from the specified image
-	 * 
+	 *
 	 * @param _image - image to be used to create image icon
 	 * @return return the image icon created
 	 */
@@ -246,7 +246,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/**
 	 * Column name in the SSRowSet to which this component will be bound to
-	 * 
+	 *
 	 * @param _columnName - column name in the SSRowSet to which this component will
 	 *                    be bound to
 	 */
@@ -257,7 +257,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/**
 	 * Returns the column name to which the component is bound to
-	 * 
+	 *
 	 * @return - returns the column name to which the component is bound to
 	 */
 	public String getColumnName() {
@@ -266,7 +266,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/**
 	 * Sets the SSRowSet object to be used to get/set the value of the bound column
-	 * 
+	 *
 	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
 	 *                column
 	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
@@ -278,7 +278,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/**
 	 * Sets the SSRowSet object to be used to get/set the value of the bound column
-	 * 
+	 *
 	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
 	 *                column
 	 */
@@ -289,7 +289,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/**
 	 * SSRowSet object being used to get/set the bound column value
-	 * 
+	 *
 	 * @return - returns the SSRowSet object being used to get/set the bound column
 	 *         value
 	 * @deprecated Use {@link #getSSRowSet()} instead.
@@ -301,7 +301,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/**
 	 * SSRowSet object being used to get/set the bound column value
-	 * 
+	 *
 	 * @return - returns the SSRowSet object being used to get/set the bound column
 	 *         value
 	 */
@@ -315,7 +315,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 * operations on the DataNavigator like saving the current row/ undo changes/
 	 * delete current row. <b><i>The functionality for this is not yet
 	 * finalized so try to avoid using this </i></b>
-	 * 
+	 *
 	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
 	 * @deprecated Use {@link #setSSDataNavigator(SSDataNavigator _navigator)}
 	 *             instead.
@@ -327,7 +327,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/**
 	 * Returns the SSDataNavigator object being used.
-	 * 
+	 *
 	 * @return returns the SSDataNavigator object being used.
 	 * @deprecated Use {@link #getSSDataNavigator()} instead.
 	 **/
@@ -342,7 +342,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 * operations on the DataNavigator like saving the current row/ undo changes/
 	 * delete current row. <b><i>The functionality for this is not yet
 	 * finalized so try to avoid using this </i></b>
-	 * 
+	 *
 	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
 	 */
 	public void setSSDataNavigator(final SSDataNavigator _navigator) {
@@ -353,7 +353,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/**
 	 * Returns the SSDataNavigator object being used.
-	 * 
+	 *
 	 * @return returns the SSDataNavigator object being used.
 	 */
 	public SSDataNavigator getSSDataNavigator() {
@@ -432,7 +432,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.sql.RowSetListener#rowSetChanged(javax.sql.RowSetEvent)
 	 */
 	@Override
@@ -442,7 +442,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.sql.RowSetListener#rowChanged(javax.sql.RowSetEvent)
 	 */
 	@Override
@@ -452,7 +452,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.sql.RowSetListener#cursorMoved(javax.sql.RowSetEvent)
 	 */
 	@Override
@@ -462,7 +462,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
 	 */
 	@Override
@@ -472,7 +472,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
 	@Override
@@ -485,7 +485,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 */
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
 	 */
 	@Override
@@ -538,7 +538,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.awt.event.ComponentListener#componentShown(java.awt.event.
 	 * ComponentEvent)
 	 */
@@ -549,7 +549,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.awt.event.ComponentListener#componentResized(java.awt.event.
 	 * ComponentEvent)
 	 */
@@ -560,7 +560,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.awt.event.ComponentListener#componentMoved(java.awt.event.
 	 * ComponentEvent)
 	 */
@@ -571,7 +571,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.awt.event.ComponentListener#componentHidden(java.awt.event.
 	 * ComponentEvent)
 	 */
@@ -581,7 +581,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	protected void Rescale() {
 		if (fullIcon != null) {

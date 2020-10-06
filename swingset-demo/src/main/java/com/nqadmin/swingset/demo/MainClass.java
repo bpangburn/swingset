@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -60,19 +60,19 @@ import org.h2.tools.RunScript;
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
  */
 public class MainClass extends JFrame {
-	
+
 	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -6316984401822746124L;
-	
+
 	/**
 	 * database scripts
 	 */
 	private static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
 	private static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
 	private static final String DATABASE_SCRIPT_TEST_IMAGES = "swingset_tests_load_blobs.sql";
-	
+
 	/**
 	 * database connection
 	 */
@@ -81,14 +81,14 @@ public class MainClass extends JFrame {
 	private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
 	private static final String DATABASE_NAME = "suppliers_and_parts";
 	private Connection dbConnection = null;
-	
+
 	/**
 	 * shared component dimensions
 	 */
 	private static final int buttonWidth = 150;
 	private static final int buttonHeight = 25;
 	public static final Dimension buttonDim = new Dimension(buttonWidth, buttonHeight);
-	
+
 	private static final int labelWidth = 200;
 	private static final int labelHeight = 20;
 	private static final int labelHeightTall = 100; // used for lists, textareas
@@ -96,8 +96,8 @@ public class MainClass extends JFrame {
 	public static final Dimension labelDim = new Dimension(labelWidth, labelHeight);
 	public static final Dimension labelDimTall = new Dimension(labelWidth, labelHeightTall); // used for lists, textareas
 	public static final Dimension labelDimVeryTall = new Dimension(labelWidth, labelHeightVeryTall); // used for images
-	
-	
+
+
 	private static final int ssWidth = 200;
 	private static final int ssHeight = 20;
 	private static final int ssHeightTall = 100; // used for lists, textareas
@@ -106,14 +106,14 @@ public class MainClass extends JFrame {
 	public static final Dimension ssDim = new Dimension(ssWidth, ssHeight);
 	public static final Dimension ssDimTall = new Dimension(ssWidth, ssHeightTall); // used for lists, textareas
 	public static final Dimension ssDimVeryTall = new Dimension(ssWidth, ssHeightVeryTall); // used for images
-	
-	
+
+
 	public static final int childScreenWidth = 600;
 	public static final int childScreenHeight = 400;
 	public static final int childScreenHeightTall = 800;
-	
+
 	public static final int gridColumnWidth = 60;
-	
+
 	/**
 	 * buttons to launch code examples
 	 */
@@ -127,38 +127,38 @@ public class MainClass extends JFrame {
     JButton btnTestBase = new JButton("Test Base Components");
     JButton btnTestGrid = new JButton("Test Grid Components");
     JButton btnTestFormatted = new JButton("Test Formatted Components");
-    
+
     /**
      * path to database SQL file
      */
     String url;
-    
+
 	/**
 	 * Log4j2 Logger
 	 */
     private static final Logger logger = LogManager.getLogger(MainClass.class);
-    
+
     /**
      * Constructor for MainClass
      */
     public MainClass(){
-    	
+
         // SETUP WINDOW
 	    	super("SwingSet Demo");
 	        setSize(300,300);
 	        setDefaultCloseOperation(EXIT_ON_CLOSE);
-	        
-	    // ECHO WORKING DIRECTORY	        
+
+	    // ECHO WORKING DIRECTORY
 	        logger.info("Working Directory = " +
 	                System.getProperty("user.dir"));
-	        
+
 	    // INITIALIZE DATABASE
     		dbConnection = getDatabase();
     		if (dbConnection == null) {
 				logger.fatal("Error initializing database. Exiting.");
 				System.exit(0);
     		}
-    	        
+
 	    // ADD ACTION LISTENERS FOR BUTTONS
 	        btnExample1.addActionListener( new MyButtonListener());
 	        btnExample2.addActionListener( new MyButtonListener());
@@ -182,7 +182,7 @@ public class MainClass extends JFrame {
 	        btnTestBase.setPreferredSize(buttonDim);
 	        btnTestGrid.setPreferredSize(buttonDim);
 	        btnTestFormatted.setPreferredSize(buttonDim);
-        
+
 	    // LAYOUT BUTTONS
 	        getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
 	        getContentPane().add(btnExample1);
@@ -200,22 +200,22 @@ public class MainClass extends JFrame {
 	        setVisible(true);
 	        //pack();
     }
-    
+
     /**
      * Class to initialize the database connection and load the database content from a script
      */
     protected Connection getDatabase() {
-    	
+
     	Connection result = null;
-    	
+
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 		try {
-			
+
 			Class.forName("org.h2.Driver");
-			
+
 			logger.debug("Resource path: " + getClass().getPackage().getName());
 			logger.debug("Resource path: " + getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
-			
+
 	        final InputStream inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
         	final InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
         	InputStream inStreamTestImages = null;
@@ -244,22 +244,22 @@ public class MainClass extends JFrame {
 	        		result = DriverManager.getConnection("jdbc:h2:tcp:" + DATABASE_PATH + DATABASE_NAME,"sa","");
 	        		logger.info("Established connection to database server.");
 	        	}
-	        	
+
 	        	// RUN SCRIPTS AND CLOSE STREAMS
 	        	if (RUN_SQL_SCRIPTS) {
 		            RunScript.execute(result, new InputStreamReader(inStreamDemo));
 		            inStreamDemo.close();
-		            
+
 		            RunScript.execute(result, new InputStreamReader(inStreamTest));
 		            inStreamTest.close();
-		            
+
 		            if (USE_IN_MEMORY_DATABASE) {
 		            	RunScript.execute(result, new InputStreamReader(inStreamTestImages));
 		            	inStreamTestImages.close();
 		            }
 	        	}
 	        }
-	        
+
 		} catch (final IOException ioe) {
 			logger.error("IO Exception.", ioe);
 		} catch (final SQLException se) {
@@ -267,7 +267,7 @@ public class MainClass extends JFrame {
 		} catch (final ClassNotFoundException cnfe) {
 			logger.error("Class Not Found Exception.", cnfe);
 		}
-		
+
 		return result;
     }
 

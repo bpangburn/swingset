@@ -2,21 +2,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -61,11 +61,11 @@ import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 import com.nqadmin.swingset.utils.SSSyncManager;
 
 /**
- * This example displays data from the part_data table. 
+ * This example displays data from the part_data table.
  * SSTextFields are used to display part id, name, weight,
  * and city. SSComboBox is used to display color.
  * <p>
- * Record navigation can be handled with a SSDataNavigator or 
+ * Record navigation can be handled with a SSDataNavigator or
  * with a SSDBComboBox.
  * <p>
  * Since the navigation can take place by multiple methods, the navigation
@@ -82,7 +82,7 @@ public class Example4 extends JFrame {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -6594890166578252237L;
-	
+
 	/**
 	 * screen label declarations
 	 */
@@ -109,12 +109,12 @@ public class Example4 extends JFrame {
 	SSConnection ssConnection = null;
 	SSJdbcRowSetImpl rowset = null;
 	SSDataNavigator navigator = null;
-	
+
 	/**
 	 * sync manger
 	 */
 	SSSyncManager syncManager;
-	
+
 	/**
 	 * Log4j2 Logger
 	 */
@@ -126,13 +126,13 @@ public class Example4 extends JFrame {
 	 * @param _dbConn - database connection
 	 */
 	public Example4(final Connection _dbConn) {
-		
+
 		// SET SCREEN TITLE
 			super("Example4");
-			
+
 		// SET CONNECTION
 			ssConnection = new SSConnection(_dbConn);
-		
+
 		// SET SCREEN DIMENSIONS
 			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 
@@ -144,8 +144,8 @@ public class Example4 extends JFrame {
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			}
-			
-			
+
+
 			/**
 			 * Various navigator overrides needed to support H2
 			 * H2 does not fully support updatable rowset so it must be
@@ -162,34 +162,34 @@ public class Example4 extends JFrame {
 				 */
 				@Override
 				public void performPreInsertOps() {
-					
+
 					super.performPreInsertOps();
-					
+
 					try {
 
-					// GET THE NEW RECORD ID.	
+					// GET THE NEW RECORD ID.
 						final ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 								.executeQuery("SELECT nextval('part_data_seq') as nextVal;");
 						rs.next();
 						final int partID = rs.getInt("nextVal");
 						txtPartID.setText(String.valueOf(partID));
 						rs.close();
-						
+
 					// DISABLE PART SELECTOR
 						cmbSelectPart.setEnabled(false);
-					
+
 					// SET OTHER DEFAULTS
 						txtPartName.setText(null);
 						cmbPartColor.setSelectedValue(0);
 						txtPartWeight.setText("0");
 						txtPartCity.setText(null);
-						
+
 					} catch(final SQLException se) {
-						logger.error("SQL Exception occured initializing new record.",se);						
+						logger.error("SQL Exception occured initializing new record.",se);
 					} catch(final Exception e) {
 						logger.error("Exception occured initializing new record.",e);
-					}		
-					
+					}
+
 				}
 
 				/**
@@ -206,7 +206,7 @@ public class Example4 extends JFrame {
 					}
 					performRefreshOps();
 				}
-				
+
 				/**
 				 * Requery the rowset following a deletion. This is needed for H2.
 				 */
@@ -220,7 +220,7 @@ public class Example4 extends JFrame {
 					}
 					performRefreshOps();
 				}
-				
+
 				/**
 				 * Manage sync manager during a Refresh
 				 */
@@ -248,11 +248,11 @@ public class Example4 extends JFrame {
 				}
 
 			});
-			
+
 			// SETUP NAVIGATOR QUERY
 				final String query = "SELECT * FROM part_data;";
 				cmbSelectPart = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
-	
+
 				try {
 					cmbSelectPart.execute();
 				} catch (final SQLException se) {
@@ -260,23 +260,23 @@ public class Example4 extends JFrame {
 				} catch (final Exception e) {
 					logger.error("Exception.", e);
 				}
-				
+
 			// SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES
 				cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
-				
+
 			// BIND THE COMPONENTS TO THE DATABASE COLUMNS
 				txtPartID.bind(rowset, "part_id");
 				txtPartName.bind(rowset, "part_name");
 				cmbPartColor.bind(rowset, "color_code");
 				txtPartWeight.bind(rowset, "weight");
 				txtPartCity.bind(rowset, "city");
-				
+
 			// SETUP SYNCMANAGER, WHICH WILL TAKE CARE OF KEEPING THE COMBO NAVIGATOR AND
 			// DATA NAVIGATOR IN SYNC.
 			//
 			// BEFORE CHANGING THE QUERY OR RE-EXECUTING THE QUERY FOR THE COMBO BOX,
 			// YOU HAVE TO CALL THE .async() METHOD
-			// 
+			//
 			// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
 				syncManager = new SSSyncManager(cmbSelectPart, navigator);
 				syncManager.setColumnName("part_id");
@@ -289,7 +289,7 @@ public class Example4 extends JFrame {
 				lblPartColor.setPreferredSize(MainClass.labelDim);
 				lblPartWeight.setPreferredSize(MainClass.labelDim);
 				lblPartCity.setPreferredSize(MainClass.labelDim);
-				
+
 			// SET BOUND COMPONENT DIMENSIONS
 				cmbSelectPart.setPreferredSize(MainClass.ssDim);
 				txtPartID.setPreferredSize(MainClass.ssDim);
@@ -297,7 +297,7 @@ public class Example4 extends JFrame {
 				cmbPartColor.setPreferredSize(MainClass.ssDim);
 				txtPartWeight.setPreferredSize(MainClass.ssDim);
 				txtPartCity.setPreferredSize(MainClass.ssDim);
-				
+
 			// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
 				final Container contentPane = getContentPane();
 				contentPane.setLayout(new GridBagLayout());
@@ -316,7 +316,7 @@ public class Example4 extends JFrame {
 				contentPane.add(lblPartWeight, constraints);
 				constraints.gridy = 5;
 				contentPane.add(lblPartCity, constraints);
-		
+
 				constraints.gridx = 1;
 				constraints.gridy = 0;
 				contentPane.add(cmbSelectPart, constraints);
@@ -330,7 +330,7 @@ public class Example4 extends JFrame {
 				contentPane.add(txtPartWeight, constraints);
 				constraints.gridy = 5;
 				contentPane.add(txtPartCity, constraints);
-		
+
 				constraints.gridx = 0;
 				constraints.gridy = 6;
 				constraints.gridwidth = 2;
@@ -338,7 +338,7 @@ public class Example4 extends JFrame {
 
 		// DISABLE THE PRIMARY KEY
 			txtPartID.setEnabled(false);
-	
+
 		// MAKE THE JFRAME VISIBLE
 			setVisible(true);	}
 

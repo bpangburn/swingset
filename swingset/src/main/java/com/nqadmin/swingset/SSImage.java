@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -77,8 +77,8 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 * database column
 	 */
 	protected class SSImageListener implements ActionListener, Serializable {
-		
-		
+
+
 //		  // ADD UPDATE BUTTON LISTENER
 //        this.btnUpdateImage.addActionListener(new ActionListener() {
             /**
@@ -88,9 +88,9 @@ public class SSImage extends JPanel implements SSComponentInterface {
 
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
-				
+
 				removeSSRowSetListener();
-				
+
                 try {
                     if (getSSRowSet() != null) {
                         //FileInputStream inStream = null;
@@ -126,7 +126,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
                 }catch(final IOException ioe){
                 	logger.error(getColumnForLog() + ": IO Exception.", ioe);;
                 }
-                
+
                 addSSRowSetListener();
             }
 
@@ -136,7 +136,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -2726746843832259767L;
-    
+
 	/**
      * Button to update the image.
      */
@@ -176,13 +176,13 @@ public class SSImage extends JPanel implements SSComponentInterface {
 //     * RowSet listener
 //     */
 //    protected final MyRowSetListener sSRowSetListener = new MyRowSetListener();
-    
-    
+
+
 	/**
 	 * Component listener.
 	 */
 	protected final SSImageListener ssImageListener = new SSImageListener();
-	
+
 	/**
 	 * Log4j Logger for component
 	 */
@@ -377,7 +377,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
         setPreferredSize(preferredSize);
 
     // ADD LABEL & BUTTON TO PANEL
-        addComponents();		
+        addComponents();
 	}
 
 //    /**
@@ -476,7 +476,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 
 	/**
 	 * Returns the ssCommon data member for the current Swingset component.
-	 * 
+	 *
 	 * @return shared/common SwingSet component data and methods
 	 */
 	@Override
@@ -513,7 +513,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 
 	/**
 	 * Sets the SSCommon data member for the current Swingset Component.
-	 * 
+	 *
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override
@@ -549,10 +549,10 @@ public class SSImage extends JPanel implements SSComponentInterface {
         }
 
         lblImage.setIcon(img);
-        
+
         // TODO Confirm this is needed.
         updateUI();
-		
+
 	}
 
 }

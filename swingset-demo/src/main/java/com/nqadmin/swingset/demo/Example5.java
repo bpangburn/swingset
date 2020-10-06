@@ -2,21 +2,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -63,7 +63,7 @@ public class Example5 extends JFrame {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -5126011569315467420L;
-	
+
 	/**
 	 * declarations
 	 */
@@ -71,7 +71,7 @@ public class Example5 extends JFrame {
 	SSJdbcRowSetImpl rowset = null;
 	SSDataGrid dataGrid = null;
 	String url;
-	
+
 	/**
 	 * Log4j2 Logger
 	 */
@@ -83,16 +83,16 @@ public class Example5 extends JFrame {
 	 * @param _dbConn - database connection
 	 */
 	public Example5(final Connection _dbConn) {
-		
+
 		// SET SCREEN TITLE
 			super("Example5");
-			
+
 		// SET CONNECTION
 			ssConnection = new SSConnection(_dbConn);
-		
+
 		// SET SCREEN DIMENSIONS
 			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
-			
+
 		// INITIALIZE SCREEN & DATAGRID
 			init();
 	}
@@ -107,23 +107,23 @@ public class Example5 extends JFrame {
 			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 				rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
 				rowset.setCommand("SELECT * FROM part_data ORDER BY part_name;");
-			
+
 			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
 				dataGrid = new SSDataGrid();
 				dataGrid.setHeaders(new String[] { "Part ID", "Part Name", "Color Code", "Weight", "City" });
 				dataGrid.setSSRowSet(rowset);
 				dataGrid.setMessageWindow(this);
-	
+
 			// DISABLES NEW INSERTIONS TO THE DATABASE. - NOT CURRENTLY WORKING FOR H2
 				dataGrid.setInsertion(false);
-	
+
 			// MAKE THE PART ID UNEDITABLE
 				dataGrid.setUneditableColumns(new String[] { "part_id" });
-	
+
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			}
-			
+
 		// SETUP THE CONTAINER AND ADD THE DATAGRID
 			getContentPane().add(dataGrid.getComponent());
 

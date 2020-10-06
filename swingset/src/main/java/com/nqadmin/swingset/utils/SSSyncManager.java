@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -78,7 +78,7 @@ public class SSSyncManager {
 		// ITS POSITIONED AT THE RIGHT RECORD.
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
-	
+
 			rowset.removeRowSetListener(rowsetListener);
 
 			try {
@@ -89,21 +89,21 @@ public class SSSyncManager {
 						/* || comboBox.isBoundTextFieldNull() */
 						/* || !comboBox.hasFocus() */ // with rewrite, the editor and not the combo likely has the focus
 						) {
-				
+
 					return;
 				}
 
 				// this.id = ""+SSSyncManager.this.comboBox.getSelectedFilteredValue();
 				comboPK = comboBox.getSelectedValue();
-				
+
 
 				// UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
 				// Code removed to to make it faster.
 				// dataNavigator.updatePresentRow();
 
-				
+
 				// Note rowset count starts at 1 whereas combobox index starts at 0.
-				
+
 				final long rowsetPK = rowset.getLong(columnName);
 
 				if (comboPK != rowsetPK) {
@@ -114,7 +114,7 @@ public class SSSyncManager {
 					rowset.absolute(indexOfPK);
 					final int numRecords = comboBox.getItemCount();
 					int count = 0;
-					
+
 					// IF AFTER POSITIONING THE ROWSET INDEX AT THE COMBO INDEX, THE VALUES DON'T MATCH,
 					// PERFORM A MANUAL LOOP TO TRY TO FIND A MATCH
 					// PRESUMING RECORDS COULD BE ADDED/DELETED BY OTHER CONNECTIONS, DON'T LOOP
@@ -131,13 +131,13 @@ public class SSSyncManager {
 								"SSSyncManager SSRowSet and SSDBComboBox values do not match for the same index. This can be caused by SSDBComboBox and SSRowSet "
 								+ " queries not selecting the same records in the same order. Looping through each record for a match. Pass # "
 										+ count + ".");
-						
+
 						// Often records are just slightly out of order so a better strategy would be to move backwards by some small offset
 						// and then search forward rather than potentially searching through all records to make a full loop.
 						if (count==1) {
 							// If there are only a few records, just start at first record
 							int rowsetSearchFrom = 1;
-														
+
 							if (numRecords>offsetToCheck) {
 								rowsetSearchFrom = indexOfPK - offsetToCheck;
 							}
@@ -149,7 +149,7 @@ public class SSSyncManager {
 							}
 							rowset.absolute(rowsetSearchFrom);
 						}
-						
+
 
 						// number of items in combo is the number of records in resultset.
 						// so if for some reason item is in combo but deleted in rowset
@@ -163,7 +163,7 @@ public class SSSyncManager {
 						}
 					}
 				}
-				
+
 
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
@@ -225,17 +225,17 @@ public class SSSyncManager {
 	 * Listener on SSRowSet to detect data navigator-based navigations.
 	 */
 	protected final SyncRowSetListener rowsetListener = new SyncRowSetListener();
-	
+
 	/**
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = LogManager.getLogger();
-	
+
 	/**
 	 * # of records to step back if doing a sequential search because SSDBComboBox and SSRowSet results don't match.
 	 */
 	protected static final int offsetToCheck = 7;
-	
+
 	/**
 	 * # of records of overlap to check if SSDBComboBox and SSRowSet results don't match due to record additions/deletions.
 	 */
@@ -271,13 +271,13 @@ public class SSSyncManager {
 	protected void adjustValue() {
 
 		comboBox.removeActionListener(comboListener);
-		
+
 		try {
 			if ((rowset != null) && (rowset.getRow() > 0)) {
 				// GET THE PRIMARY KEY FOR THE CURRENT RECORD IN THE ROWSET
 				final long currentRowPK = rowset.getLong(columnName);
-				
-				logger.debug("SSSyncManager().adjustValue() - RowSet value: " + currentRowPK);		
+
+				logger.debug("SSSyncManager().adjustValue() - RowSet value: " + currentRowPK);
 
 				// CHECK IF THE COMBO BOX IS DISPLAYING THE SAME ONE.
 				if ((comboBox.getSelectedStringValue() == null)

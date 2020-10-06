@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -56,20 +56,20 @@ import java.beans.SimpleBeanInfo;
  */
 @Deprecated
 public class SSImageFieldBeanInfo extends SimpleBeanInfo {
-    
+
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
         final BeanDescriptor beanDescriptor = new BeanDescriptor  ( com.nqadmin.swingset.formatting.SSImageField.class , null );
         beanDescriptor.setDisplayName ( "SSImageField" );
         beanDescriptor.setShortDescription ( "Field used to handle bytea image fields" );//GEN-HEADEREND:BeanDescriptor
-        
+
         // Here you can add code for customizing the BeanDescriptor.
-        
+
         return beanDescriptor;
     }//GEN-LAST:BeanDescriptor
-    
-    
+
+
     // Property identifiers//GEN-FIRST:Properties
     private static final int PROPERTY_background = 0;
     private static final int PROPERTY_border = 1;
@@ -83,11 +83,11 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
     private static final int PROPERTY_toolTipText = 9;
     private static final int PROPERTY_visible = 10;
 
-    // Property array 
+    // Property array
     /*lazy PropertyDescriptor*/
     private static PropertyDescriptor[] getPdescriptor(){
         final PropertyDescriptor[] properties = new PropertyDescriptor[11];
-    
+
         try {
             properties[PROPERTY_background] = new PropertyDescriptor ( "background", com.nqadmin.swingset.formatting.SSImageField.class, "getBackground", "setBackground" );
             properties[PROPERTY_border] = new PropertyDescriptor ( "border", com.nqadmin.swingset.formatting.SSImageField.class, "getBorder", "setBorder" );
@@ -111,41 +111,41 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
         catch( final IntrospectionException e) {
         	// do nothing
         }//GEN-HEADEREND:Properties
-        
+
         // Here you can add code for customizing the properties array.
-        
+
         return properties;
     }//GEN-LAST:Properties
-    
+
     // Event set information will be obtained from introspection.//GEN-FIRST:Events
     private static EventSetDescriptor[] eventSets = null;
     private static EventSetDescriptor[] getEdescriptor(){//GEN-HEADEREND:Events
-        
+
         // Here you can add code for customizing the event sets array.
-        
+
         return eventSets;
     }//GEN-LAST:Events
-    
+
     // Method information will be obtained from introspection.//GEN-FIRST:Methods
     private static MethodDescriptor[] methods = null;
     private static MethodDescriptor[] getMdescriptor(){//GEN-HEADEREND:Methods
-        
+
         // Here you can add code for customizing the methods array.
-        
+
         return methods;
     }//GEN-LAST:Methods
-    
-    
+
+
     private static final int defaultPropertyIndex = -1;//GEN-BEGIN:Idx
     private static final int defaultEventIndex = -1;//GEN-END:Idx
-    
-    
+
+
 //GEN-FIRST:Superclass
-    
+
     // Here you can add code for customizing the Superclass BeanInfo.
-    
+
 //GEN-LAST:Superclass
-    
+
     /**
      * Gets the bean's <code>BeanDescriptor</code>s.
      *
@@ -157,7 +157,7 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
 	public BeanDescriptor getBeanDescriptor() {
         return getBdescriptor();
     }
-    
+
     /**
      * Gets the bean's <code>PropertyDescriptor</code>s.
      *
@@ -174,7 +174,7 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
 	public PropertyDescriptor[] getPropertyDescriptors() {
         return getPdescriptor();
     }
-    
+
     /**
      * Gets the bean's <code>EventSetDescriptor</code>s.
      *
@@ -186,7 +186,7 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
 	public EventSetDescriptor[] getEventSetDescriptors() {
         return getEdescriptor();
     }
-    
+
     /**
      * Gets the bean's <code>MethodDescriptor</code>s.
      *
@@ -198,7 +198,7 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
 	public MethodDescriptor[] getMethodDescriptors() {
         return getMdescriptor();
     }
-    
+
     /**
      * A bean may have a "default" property that is the property that will
      * mostly commonly be initially chosen for update by human's who are
@@ -211,7 +211,7 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
 	public int getDefaultPropertyIndex() {
         return defaultPropertyIndex;
     }
-    
+
     /**
      * A bean may have a "default" event that is the event that will
      * mostly commonly be used by human's when using the bean.

@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -70,8 +70,8 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * database.
  * <p>
  * Other than some function key handling, which is likely outside the scope of
- * SwingSet and should be customized at the application level, this class appears to 
- * mostly duplicate SSTextArea. It may be desirable to add an InputVerifier to 
+ * SwingSet and should be customized at the application level, this class appears to
+ * mostly duplicate SSTextArea. It may be desirable to add an InputVerifier to
  * SSTextArea.
  * <p>
  * It does not extend SSFormattedText field like the other classes in this package.
@@ -90,7 +90,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	protected int colType = -99;
 	protected SSRowSet rowset = null;
 	private SSDataNavigator navigator = null;
-	
+
 	/**
 	 * Log4j Logger for component
 	 */
@@ -120,10 +120,10 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		addFocusListener(this);
 		setInputVerifier(new internalVerifier());
 	}
-	
+
 	/**
 	 * Returns the bound column name in square brackets.
-	 * 
+	 *
 	 * @return the boundColumnName in square brackets
 	 */
 	public String getColumnForLog() {
@@ -132,7 +132,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	/**
 	 * Returns the column name to which the component is bound to
-	 * 
+	 *
 	 * @return - returns the column name to which the component is bound to
 	 */
 	public String getColumnName() {
@@ -141,7 +141,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	/**
 	 * Sets the column name to which the component should be bound to
-	 * 
+	 *
 	 * @param _columnName - column name to which the component will be bound to
 	 */
 	public void setColumnName(final String _columnName) {
@@ -151,7 +151,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	/**
 	 * Sets the SSRowSet object to be used to get/set the value of the bound column
-	 * 
+	 *
 	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
 	 *                column
 	 * @deprecated renamed setSSRowSet()
@@ -164,7 +164,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	/**
 	 * SSRowSet object being used to get/set the bound column value
-	 * 
+	 *
 	 * @return - returns the SSRowSet object being used to get/set the bound column
 	 *         value
 	 * @deprecated renamed getSSRowSet()
@@ -177,7 +177,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	/**
 	 * Sets the SSRowSet object to be used to get/set the value of the bound column
-	 * 
+	 *
 	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
 	 *                column
 	 */
@@ -188,7 +188,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	/**
 	 * SSRowSet object being used to get/set the bound column value
-	 * 
+	 *
 	 * @return - returns the SSRowSet object being used to get/set the bound column
 	 *         value
 	 */
@@ -202,7 +202,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 * operations on the DataNavigator like saving the current row/ undo changes/
 	 * delete current row. <b><i>The functionality for this is not yet
 	 * finalized so try to avoid using this </i></b>
-	 * 
+	 *
 	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
 	 * @deprecated renamed setSSDataNavigator()
 	 * @see #setSSDataNavigator(SSDataNavigator)
@@ -214,7 +214,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	/**
 	 * Returns the SSDataNavigator object being used.
-	 * 
+	 *
 	 * @return returns the SSDataNavigator object being used.
 	 * @deprecated renamed getSSDataNavigator()
 	 * @see #getSSDataNavigator()
@@ -230,7 +230,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	 * operations on the DataNavigator like saving the current row/ undo changes/
 	 * delete current row. <b><i>The functionality for this is not yet
 	 * finalized so try to avoid using this </i></b>
-	 * 
+	 *
 	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
 	 */
 	public void setSSDataNavigator(final SSDataNavigator _navigator) {
@@ -241,7 +241,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	/**
 	 * Returns the SSDataNavigator object being used.
-	 * 
+	 *
 	 * @return returns the SSDataNavigator object being used.
 	 */
 	public SSDataNavigator getSSDataNavigator() {
@@ -305,7 +305,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.sql.RowSetListener#rowSetChanged(javax.sql.RowSetEvent)
 	 */
 	@Override
@@ -315,7 +315,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.sql.RowSetListener#rowChanged(javax.sql.RowSetEvent)
 	 */
 	@Override
@@ -325,7 +325,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.sql.RowSetListener#cursorMoved(javax.sql.RowSetEvent)
 	 */
 	@Override
@@ -335,7 +335,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
 	 */
 	@Override
@@ -345,7 +345,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
 	@Override
@@ -420,7 +420,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
 	 */
 	@Override
@@ -434,7 +434,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
 	 */
 	@Override

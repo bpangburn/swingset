@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -83,7 +83,7 @@ public interface SSDBNav extends Serializable {
 
 	/**
 	 * Constant indicating the navigation button next.
-	 * 
+	 *
 	 * @deprecated Starting in 2.3.0+ use {@link Navigation#Next} instead.
 	 */
 	@Deprecated
@@ -91,7 +91,7 @@ public interface SSDBNav extends Serializable {
 
 	/**
 	 * Constant indicating the navigation button previous.
-	 * 
+	 *
 	 * @deprecated Starting in 2.3.0+ use {@link Navigation#Previous} instead.
 	 */
 	@Deprecated
@@ -99,7 +99,7 @@ public interface SSDBNav extends Serializable {
 
 	/**
 	 * Constant indicating the navigation button first.
-	 * 
+	 *
 	 * @deprecated Starting in 2.3.0+ use {@link Navigation#First} instead.
 	 */
 	@Deprecated
@@ -107,7 +107,7 @@ public interface SSDBNav extends Serializable {
 
 	/**
 	 * Constant indicating the navigation button last.
-	 * 
+	 *
 	 * @deprecated Starting in 2.3.0+ use {@link Navigation#Last} instead.
 	 */
 	@Deprecated
@@ -116,7 +116,7 @@ public interface SSDBNav extends Serializable {
 	/**
 	 * This function will be called after performPreDeletionOps is called but before
 	 * the row is deleted.
-	 * 
+	 *
 	 * @return true if the row can be deleted else false.
 	 */
 	default boolean allowDeletion() {
@@ -127,7 +127,7 @@ public interface SSDBNav extends Serializable {
 
 	/**
 	 * This function is called just before inserting the row into the database
-	 * 
+	 *
 	 * @return true is row can be inserted else false.
 	 */
 	default boolean allowInsertion() {
@@ -137,7 +137,7 @@ public interface SSDBNav extends Serializable {
 
 	/**
 	 * This functions is called just before calling the updateRow on the rowset.
-	 * 
+	 *
 	 * @return true is the row can be updated else false.
 	 */
 	default boolean allowUpdate() {
@@ -160,9 +160,9 @@ public interface SSDBNav extends Serializable {
 	 * <p>
 	 * Possible values are NAVIGATION_NEXT, NAVIGATION_PREVIOUS, NAVIGATION_FIRST,
 	 * NAVIGATION_LAST.
-	 * 
+	 *
 	 * @param _navigationType this indicates the type of navigation.
-	 * 
+	 *
 	 * @deprecated Use
 	 *             {@link #performNavigationOps(com.nqadmin.swingset.utils.SSEnums.Navigation _navType)}
 	 *             instead.
@@ -175,7 +175,7 @@ public interface SSDBNav extends Serializable {
 
 	/**
 	 * Method to perform navigation-related operations.
-	 * 
+	 *
 	 * @param _navType - indicates type of navigation that is occurring
 	 *
 	 */

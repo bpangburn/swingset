@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2019, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -265,7 +265,7 @@ public class SSCommon implements Serializable {
 	 * Column SQL data type.
 	 */
 	private int boundColumnType = java.sql.Types.NULL;
-	
+
 	/**
 	 * Column JDBCType enum.
 	 */
@@ -305,7 +305,7 @@ public class SSCommon implements Serializable {
 	 * Underlying SSRowSet listener.
 	 */
 	private final SSRowSetListener ssRowSetListener = new SSRowSetListener();
-	
+
 	/**
 	 * Log4j Logger for component
 	 */
@@ -314,7 +314,7 @@ public class SSCommon implements Serializable {
 	/**
 	 * Constructor expecting a SwingSet component as an argument (usually called as
 	 * = new SSCommon(this);)
-	 * 
+	 *
 	 * @param _ssComponent SwingSet component having this SSCommon instance as a
 	 *                     datamember
 	 */
@@ -361,7 +361,7 @@ public class SSCommon implements Serializable {
 	 */
 	protected void bind() {
 
-// TODO consider updating Component to null/zero/empty string if not valid column name, column index, or rowset    	
+// TODO consider updating Component to null/zero/empty string if not valid column name, column index, or rowset
 		// CHECK FOR NULL COLUMN/ROWSET
 		if (((boundColumnName == null) && (boundColumnIndex == NO_COLUMN_INDEX)) || (ssRowSet == null)) {
 			return;
@@ -434,7 +434,7 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Retrieves the allowNull flag for the bound database column.
-	 * 
+	 *
 	 * @return true if bound database column can contain null values, otherwise
 	 *         returns false
 	 */
@@ -456,7 +456,7 @@ public class SSCommon implements Serializable {
 	/**
 	 * Returns the name of the database column to which the SwingSet component is
 	 * bound.
-	 * 
+	 *
 	 * @return the boundColumnName
 	 */
 	public String getBoundColumnName() {
@@ -469,12 +469,12 @@ public class SSCommon implements Serializable {
 	 * New functionality added (2020) to allow this method to return a null String
 	 * if allowNull==true. allowNull is false by default so nulls will be converted
 	 * to empty strings.
-	 * 
+	 *
 	 * @return String containing the value in the bound database column
 	 */
 	public String getBoundColumnText() {
 
-// TODO Consider checking for a null RowSet. This would be the case for an unbound SSDBComboBox used for navigation.		
+// TODO Consider checking for a null RowSet. This would be the case for an unbound SSDBComboBox used for navigation.
 
 		String value = "";
 
@@ -496,18 +496,18 @@ public class SSCommon implements Serializable {
 	 * Returns the integer code representing the bound database column data type.
 	 * <p>
 	 * Based on java.sql.Types
-	 * 
+	 *
 	 * @return the data type of the bound column
 	 */
 	public int getBoundColumnType() {
 		return boundColumnType;
 	}
-	
+
 	/**
 	 * Returns the JDBCType enum representing the bound database column data type.
 	 * <p>
 	 * Based on java.sql.JDBCType
-	 * 
+	 *
 	 * @return the enum value corresponding to the data type of the bound column
 	 */
 	public JDBCType getBoundColumnJDBCType() {
@@ -516,7 +516,7 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Returns the bound column name in square brackets.
-	 * 
+	 *
 	 * @return the boundColumnName in square brackets
 	 */
 	public String getColumnForLog() {
@@ -526,9 +526,9 @@ public class SSCommon implements Serializable {
 
 //	/**
 //	 * Returns the primary key column name for the RowSet query
-//	 * 
+//	 *
 //	 * Used primarily for associating a primary key value with another column in a SwingSet list component.
-//	 * 
+//	 *
 //	 * @return the primaryKeyColumn
 //	 */
 //// TODO if this is just used for lists then we may want to put into a separate SSListCommon class
@@ -546,7 +546,7 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Returns the SSConnection to the database
-	 * 
+	 *
 	 * @return the ssConnection
 	 */
 	public SSConnection getSSConnection() {
@@ -564,7 +564,7 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Returns Listener for the RowSet bound to the database
-	 * 
+	 *
 	 * @return listener for the bound RowSet
 	 */
 	public SSRowSetListener getSSRowSetListener() {
@@ -617,7 +617,7 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Sets the allowNull flag for the bound database column.
-	 * 
+	 *
 	 * @param _allowNull flag to indicate if the bound database column can be null
 	 */
 	public void setAllowNull(final boolean _allowNull) {
@@ -628,7 +628,7 @@ public class SSCommon implements Serializable {
 	 * Updates the bound database column with the specified Array.
 	 * <p>
 	 * Used for SSList or other component where multiple items can be selected.
-	 * 
+	 *
 	 * @param _boundColumnArray Array to write to bound database column
 	 * @throws SQLException thrown if there is a problem writing the array to the
 	 *                      RowSet
@@ -657,7 +657,7 @@ public class SSCommon implements Serializable {
 		// DETERMINE COLUMN NAME AND TYPE
 		try {
 			// IF COLUMN INDEX IS VALID, GET COLUMN NAME, OTHERWISE SET TO NULL
-// TODO update SSRowSet to return constant or throw Exception if invalid/out of bounds	        	
+// TODO update SSRowSet to return constant or throw Exception if invalid/out of bounds
 			if (boundColumnIndex != NO_COLUMN_INDEX) {
 				boundColumnName = getSSRowSet().getColumnName(boundColumnIndex);
 				boundColumnType = getSSRowSet().getColumnType(boundColumnIndex);
@@ -680,7 +680,7 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Sets the name of the bound database column.
-	 * 
+	 *
 	 * @param _boundColumnName column name to which the Component is to be bound.
 	 */
 	public void setBoundColumnName(final String _boundColumnName) {
@@ -696,7 +696,7 @@ public class SSCommon implements Serializable {
 		try {
 			// IF COLUMN NAME ISN'T NULL, SET COLUMN INDEX - OTHERWISE, SET INDEX TO
 			// NO_INDEX
-// TODO update SSRowSet to return constant or throw Exception if invalid/out of bounds	        	
+// TODO update SSRowSet to return constant or throw Exception if invalid/out of bounds
 			if (boundColumnName != null) {
 				boundColumnIndex = getSSRowSet().getColumnIndex(boundColumnName);
 				boundColumnType = getSSRowSet().getColumnType(boundColumnIndex);
@@ -718,7 +718,7 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Updates the bound database column with the specified String.
-	 * 
+	 *
 	 * @param _boundColumnText value to write to bound database column
 	 */
 	public void setBoundColumnText(final String _boundColumnText) {
@@ -728,20 +728,20 @@ public class SSCommon implements Serializable {
 			logger.warn("Null Pointer Exception.", _npe);
 			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
 					"Null values are not allowed for " + getBoundColumnName(), "Null Exception", JOptionPane.ERROR_MESSAGE);
-			
+
 		} catch(final SQLException _se) {
 			logger.warn("SQL Exception.", _se);
 			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
 					"SQL Exception encountered for " + getBoundColumnName(), "SQL Exception", JOptionPane.ERROR_MESSAGE);
-			
+
 		} catch(final NumberFormatException _pe) {
 			logger.warn("Number Format Exception.", _pe);
 			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
 					"Number Format Exception encountered for " + getBoundColumnName() + " converting " + _boundColumnText + " to a number.",
 					"Number Format Exception", JOptionPane.ERROR_MESSAGE);
-			
+
 		}
-		
+
 	}
 
 //	/**
@@ -753,7 +753,7 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Sets the SwingSet component of which this SSCommon instance is a datamember.
-	 * 
+	 *
 	 * @param _ssComponent the parent/calling SwingSet JComponent implementing
 	 *                     SSComponentInterface
 	 */
@@ -763,7 +763,7 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Sets the SSConnection to the database
-	 * 
+	 *
 	 * @param _ssConnection the ssConnection to set
 	 */
 	public void setSSConnection(final SSConnection _ssConnection) {

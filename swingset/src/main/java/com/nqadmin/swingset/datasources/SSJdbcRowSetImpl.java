@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -61,7 +61,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -3556990832719097405L;
-	
+
 	/**
 	 * Log4j Logger for component
 	 */
@@ -76,7 +76,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 
 	/**
 	 * Constructs a SSJdbcRowSetImpl object with the specified Connection.
-	 * 
+	 *
 	 * @param _connection Connection object to be used to connect to the database.
 	 * @throws SQLException	SQLException
 	 */
@@ -87,7 +87,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	/**
 	 * Constructs a SSJdbcRowSetImpl object with the specified Connection and SQL
 	 * command.
-	 * 
+	 *
 	 * @param _connection Connection object to be used to connect to the database.
 	 * @param _command    SQL query to be executed.
 	 * @throws SQLException	SQLException
@@ -102,7 +102,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 *
 	 * @param _ssConnection SSConnection object to be used to connect to the
 	 *                      database.
-	 * 
+	 *
 	 * @deprecated Starting in 2.3.0+ use
 	 *             {@link #setConnection(Connection _connection)} instead.
 	 */
@@ -114,15 +114,15 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	/**
 	 * Constructs a SSJdbcRowSetImpl object with the specified SSConnection and SQL
 	 * command.
-	 * 
+	 *
 	 * @param _ssConnection SSConnection object to be used to connect to the
 	 *                      database.
 	 * @param _command      SQL query to be executed.
-	 * 
+	 *
 	 * @deprecated Starting in 2.3.0+ use
 	 *             {@link #setConnection(Connection _connection) and @link #setCommand(String _command)}
 	 *             instead.
-	 * 
+	 *
 	 */
 	@Deprecated
 	public SSJdbcRowSetImpl(final SSConnection _ssConnection, final String _command) {
@@ -134,7 +134,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 
 	/**
 	 * Returns the Connection object being used.
-	 * 
+	 *
 	 * @return returns the Connection object being used.
 	 */
 	@Override
@@ -144,7 +144,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 
 	/**
 	 * Returns the SSConnection object being used.
-	 * 
+	 *
 	 * @return returns the SSConnection object being used.
 	 * @deprecated Starting in 2.3.0+ use {@link #getConnection()} instead.
 	 */
@@ -158,7 +158,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * <p>
 	 * Overriding to catch any SQLException, but probably better to force calling
 	 * class to handle in which case, there is no need to override this method.
-	 * 
+	 *
 	 * @param _command SQL query to be executed.
 	 */
 	@Override
@@ -174,7 +174,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 
 	/**
 	 * Sets the Connection object to be used.
-	 * 
+	 *
 	 * @param _connection connection object to be used to connect to the database.
 	 */
 	@Override
@@ -184,9 +184,9 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 
 	/**
 	 * Sets the Connection object to be used.
-	 * 
+	 *
 	 * @param _ssConnection connection object to be used to connect to the database.
-	 * 
+	 *
 	 * @deprecated Starting in 2.3.0+ use
 	 *             {@link #setConnection(Connection _connection)} instead.
 	 */

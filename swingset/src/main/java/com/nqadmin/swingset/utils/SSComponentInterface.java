@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2019, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -145,7 +145,7 @@ public interface SSComponentInterface {
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK));
 		((JComponent) this).setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
-		
+
 		// ADDING BACKWARD TRAVERSAL KEYS FROM SSFORMATTEDTEXTFIELD
 		final Set<AWTKeyStroke> backwardKeys = ((JComponent) this)
 				.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
@@ -167,7 +167,7 @@ public interface SSComponentInterface {
 
 	/**
 	 * Retrieves the allowNull flag for the bound database column.
-	 * 
+	 *
 	 * @return true if bound database column can contain null values, otherwise
 	 *         returns false
 	 */
@@ -188,7 +188,7 @@ public interface SSComponentInterface {
 
 	/**
 	 * Returns the database column name bound to the Swingset component
-	 * 
+	 *
 	 * @return the bound column name
 	 */
 	default String getBoundColumnName() {
@@ -199,7 +199,7 @@ public interface SSComponentInterface {
 	 * Returns a String representing the value in the bound database column.
 	 * <p>
 	 * If null, it will return an empty string.
-	 * 
+	 *
 	 * @return String containing the value in the bound database column
 	 */
 	default String getBoundColumnText() {
@@ -210,18 +210,18 @@ public interface SSComponentInterface {
 	 * Returns the integer code representing the bound database column data type.
 	 * <p>
 	 * Based on java.sql.Types
-	 * 
+	 *
 	 * @return the data type of the bound column
 	 */
 	default int getBoundColumnType() {
 		return getSSCommon().getBoundColumnType();
 	}
-	
+
 	/**
 	 * Returns the JDBCType enum representing the bound database column data type.
 	 * <p>
 	 * Based on java.sql.JDBCType
-	 * 
+	 *
 	 * @return the enum value corresponding to the data type of the bound column
 	 */
 	default JDBCType getBoundColumnJDBCType() {
@@ -230,7 +230,7 @@ public interface SSComponentInterface {
 
 	/**
 	 * Returns the bound column name in square brackets
-	 * 
+	 *
 	 * @return the bound column name in square brackets
 	 */
 	default String getColumnForLog() {
@@ -243,7 +243,7 @@ public interface SSComponentInterface {
 	 *
 	 * @return returns the index of the column to which the SwingSet component is
 	 *         bound
-	 * 
+	 *
 	 * @deprecated use {@link #getBoundColumnIndex()} instead.
 	 */
 	@Deprecated
@@ -253,9 +253,9 @@ public interface SSComponentInterface {
 
 	/**
 	 * Returns the database column name bound to the Swingset component
-	 * 
+	 *
 	 * @return the bound column name
-	 * 
+	 *
 	 * @deprecated use {@link #getBoundColumnName()} instead.
 	 */
 	@Deprecated
@@ -267,9 +267,9 @@ public interface SSComponentInterface {
 	 * Returns the integer code representing the bound database column data type.
 	 * <p>
 	 * Based on java.sql.Types
-	 * 
+	 *
 	 * @return the data type of the bound column
-	 * 
+	 *
 	 * @deprecated use {@link #getBoundColumnType()} instead.
 	 */
 	@Deprecated
@@ -283,9 +283,9 @@ public interface SSComponentInterface {
 
 //	/**
 //	 * Returns the primary key column name for the RowSet query
-//	 * 
+//	 *
 //	 * Used primarily for associating a primary key value with another column in a SwingSet list component.
-//	 * 
+//	 *
 //	 * @return the primaryKeyColumn
 //	 */
 //// TODO if this is just used for lists then we may want to put into a separate SSListCommon class
@@ -295,14 +295,14 @@ public interface SSComponentInterface {
 
 	/**
 	 * Returns the ssCommon data member of the Swingset component.
-	 * 
+	 *
 	 * @return shared/common SwingSet component data and methods
 	 */
 	SSCommon getSSCommon();
 
 	/**
 	 * Returns the SSConnection to the database
-	 * 
+	 *
 	 * @return the ssConnection
 	 */
 	default SSConnection getSSConnection() {
@@ -311,7 +311,7 @@ public interface SSComponentInterface {
 
 	/**
 	 * Returns the RowSet containing queried data from the database.
-	 * 
+	 *
 	 * @return the ssRowSet
 	 */
 	default SSRowSet getSSRowSet() {
@@ -360,7 +360,7 @@ public interface SSComponentInterface {
 
 	/**
 	 * Sets the allowNull flag for the bound database column.
-	 * 
+	 *
 	 * @param _allowNull flag to indicate if the bound database column can be null
 	 */
 	default void setAllowNull(final boolean _allowNull) {
@@ -371,7 +371,7 @@ public interface SSComponentInterface {
 	 * Updates the bound database column with the specified Array.
 	 * <p>
 	 * Used for SSList or other component where multiple items can be selected.
-	 * 
+	 *
 	 * @param _boundColumnArray Array to write to bound database column
 	 * @throws SQLException thrown if there is a problem writing the array to the
 	 *                      RowSet
@@ -392,7 +392,7 @@ public interface SSComponentInterface {
 
 	/**
 	 * Sets the database column name bound to the Swingset component
-	 * 
+	 *
 	 * @param _boundColumnName the columnName to set
 	 */
 	default void setBoundColumnName(final String _boundColumnName) {// throws java.sql.SQLException {
@@ -403,7 +403,7 @@ public interface SSComponentInterface {
 
 	/**
 	 * Sets the value of the bound database column
-	 * 
+	 *
 	 * @param _boundColumnText the value to set in the bound database column
 	 */
 	default void setBoundColumnText(final String _boundColumnText) {
@@ -418,9 +418,9 @@ public interface SSComponentInterface {
 	 * Sets the rowset column index to which the Component is to be bound.
 	 *
 	 * @param _columnIndex rowset column index to which the Component is to be bound
-	 * 
+	 *
 	 * @throws java.sql.SQLException - if a database access error occurs
-	 * 
+	 *
 	 * @deprecated use {@link #setBoundColumnIndex(int _boundColumnIndex)} instead.
 	 */
 	@Deprecated
@@ -430,11 +430,11 @@ public interface SSComponentInterface {
 
 	/**
 	 * Sets the database column name bound to the Swingset component
-	 * 
+	 *
 	 * @param _columnName the columnName to set
-	 * 
+	 *
 	 * @throws java.sql.SQLException - if a database access error occurs
-	 * 
+	 *
 	 * @deprecated use {@link #setBoundColumnName(String _boundColumnName)} instead.
 	 */
 	@Deprecated
@@ -451,14 +451,14 @@ public interface SSComponentInterface {
 
 	/**
 	 * Sets the SSCommon data member of the Swingset Component.
-	 * 
+	 *
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	void setSSCommon(SSCommon _ssCommon);
 
 	/**
 	 * Sets the SSConnection to the database
-	 * 
+	 *
 	 * @param _ssConnection the ssConnection to set
 	 */
 	default void setSSConnection(final SSConnection _ssConnection) {
@@ -467,9 +467,9 @@ public interface SSComponentInterface {
 
 	/**
 	 * Sets the RowSet to hold queried data from the database.
-	 * 
+	 *
 	 * @param _ssRowSet the ssRowSet to set
-	 * 
+	 *
 	 * @throws java.sql.SQLException - if a database access error occurs
 	 */
 	default void setSSRowSet(final SSRowSet _ssRowSet) throws java.sql.SQLException {
@@ -481,7 +481,7 @@ public interface SSComponentInterface {
 	 * column.
 	 * <p>
 	 * updateSSComponent() will likely eliminate the need for updateDisplay()
-	 * 
+	 *
 	 * @deprecated {@link #updateSSComponent()} should generally handle display
 	 *             update.
 	 */

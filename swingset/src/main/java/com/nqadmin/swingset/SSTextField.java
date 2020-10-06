@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -63,7 +63,7 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * like date mask, SSN mask etc.
  */
 public class SSTextField extends JTextField implements SSComponentInterface {
-	
+
 	// TODO Consider adding an InputVerifier to prevent component from losing focus. See SSFormattedTextField. May be able to add to SSDocumentListener in SSCommon.
 	// TODO Convert masks to SSFormattedTextFields
 
@@ -71,7 +71,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * Use this mask if mm/dd/yyyy format is required.
      */
     public static final int DDMMYYYY = 2;
-	
+
     /**
      * Use this if the text field contains decimal number and want to limit
      * number of decimal places.
@@ -92,7 +92,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * Use this if the text field contains SSN
      */
     public static final int SSN = 3;
-    
+
 	/**
 	 * Log4j Logger for component
 	 */
@@ -108,9 +108,9 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * @return returns the formated string.
      */
     protected static String dateMask(final String _str, final KeyEvent _ke) {
-    	
+
     	String result = _str;
-    	
+
         switch(_str.length()) {
             case 1:
                 if (_ke.getKeyChar() == '/') {
@@ -193,9 +193,9 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * @return returns the formated string.
      */
     protected static String ssnMask(final String _str, final KeyEvent _ke) {
-    	
+
     	String result = _str;
-    	
+
         switch(_str.length()) {
             case 3:
             case 6:
@@ -412,7 +412,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 //                    SSTextField.this.selectAll();
 //                }
 //            });
-//            
+//
 //            // TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER KEY IS PRESSED
 //            Set<AWTKeyStroke> forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
 //            Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
@@ -435,9 +435,9 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 //                            }
 //                            else{
 //                                SSTextField.this.setCaretPosition(position);
-//                            }    
+//                            }
 //                        }
-//                            
+//
 //                    }
 //                }
 //
@@ -490,7 +490,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	public void customInit() {
         // SET PREFERRED DIMENSIONS
 	        setPreferredSize(new Dimension(200,20));
-	
+
 	     // ADD FOCUS LISTENER TO THE TEXT FIELD SO THAT WHEN THE FOCUS IS GAINED
 	     // COMPLETE TEXT SHOULD BE SELECTED
 	        addFocusListener(new FocusAdapter(){
@@ -499,7 +499,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	                SSTextField.this.selectAll();
 	            }
 	        });
-	        
+
 //	        // HANDLED IN init()
 //	        // TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER KEY IS PRESSED
 //	        Set<AWTKeyStroke> forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
@@ -507,18 +507,18 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 //	        newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
 //	        newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK ));
 //	        setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);
-//	
+//
 	     // ADD KEY LISTENER FOR THE TEXT FIELD
 	        addKeyListener(new KeyListener() {
-	
+
 	            @Override
 				public synchronized void keyPressed(final KeyEvent ke) {
-	
+
 	                if((mask == MMDDYYYY) || (mask == DDMMYYYY)){
 	                    mask(ke);
 	                }
 	            }
-	
+
 	            @Override
 				public void keyReleased(final KeyEvent ke) {
 	                if((mask == DECIMAL) || (mask == SSN)){
@@ -531,18 +531,18 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	                        }
 	                        else{
 	                            SSTextField.this.setCaretPosition(position);
-	                        }    
+	                        }
 	                    }
-	                        
+
 	                }
 	            }
-	
+
 	            @Override
 				public void keyTyped(final KeyEvent ke) {
 	            	// do nothing
 	            }
-	
-	        });		
+
+	        });
 	}
 
     /**
@@ -567,7 +567,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 
     /**
 	 * Returns the ssCommon data member for the current Swingset component.
-	 * 
+	 *
 	 * @return shared/common SwingSet component data and methods
 	 */
     @Override
@@ -669,7 +669,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 
 	/**
 	 * Sets the SSCommon data member for the current Swingset Component.
-	 * 
+	 *
 	 * @param _ssCommon shared/common SwingSet component data and methods
 	 */
 	@Override

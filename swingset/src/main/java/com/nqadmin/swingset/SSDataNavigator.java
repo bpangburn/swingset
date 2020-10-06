@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -191,16 +191,16 @@ public class SSDataNavigator extends JPanel {
 	 * Indicator used to determine if a row is being inserted into the SSRowSet.
 	 */
 	protected boolean onInsertRow = false;
-	
+
 	/**
 	 * SSDBComboBox used for navigation if applicable.
 	 * <p>
 	 * Allows Navigator to disable it when a row is inserted and enable it when that row is saved.
 	 * <p>
-	 * TODO Consider writing a PropertyChangeListener for onInsertRow instead. 
+	 * TODO Consider writing a PropertyChangeListener for onInsertRow instead.
 	 */
 	protected SSDBComboBox navCombo= null;
-	
+
 	/**
 	 * Log4j Logger for component
 	 */
@@ -693,7 +693,7 @@ public class SSDataNavigator extends JPanel {
 	 * components or non focusable components. Set to false if you don't want any of
 	 * the buttons or text fields in the navigator to receive the focus else true.
 	 * The default value is true.
-	 * 
+	 *
 	 * @param focusable - false if you don't want the navigator to receive focus
 	 *                  else false.
 	 */
@@ -987,10 +987,10 @@ public class SSDataNavigator extends JPanel {
 							sSRowSet.insertRow();
 							onInsertRow = false;
 							dBNav.performPostInsertOps();
-							
+
 							// 2019-10-14: next bit of code seems odd. not sure why we're calling moveToCurrentRow() and last().
 							//  In H2, this is leading to an incorrect total # of rows (e.g., have 5, insert a row, and it shows 6 of 7 until refreshed)
-							
+
 							/*
 							// INCREMENT THE ROW COUNT
 							SSDataNavigator.this.rowCount++;
@@ -1193,22 +1193,22 @@ public class SSDataNavigator extends JPanel {
 
 					if ((dBNav == null)
 							|| ((dBNav != null) && dBNav.allowDeletion())) {
-						
+
 						// CAPTURE CURRENT ROW PRE-DELETION
 						final int tmpPosition = currentRow;
-						
+
 						// SET ANTICIPATED ROW COUNT POST-DELETION
 						final int tmpSize = rowCount-1;
-						
+
 						// DELETE ROW FROM ROWSET
 						sSRowSet.deleteRow();
-						
+
 						// PERFORM ANY POST DELETION OPS (WHICH MAY INVOLVE REQUERYING WHICH IS NEEDED FOR H2)
 						dBNav.performPostDeletionOps();
-						
+
 						// UPDATE TOTAL ROW COUNT
 						rowCount=tmpSize;
-						
+
 						// TRY TO NAVIGATE TO THE RECORD AFTER THE DELETED RECORD, OTHERWISE GO TO
 						// WHATEVER IS THE LAST RECORD
 						if ((tmpPosition <= rowCount) && (tmpPosition > 0)) {
@@ -1216,8 +1216,8 @@ public class SSDataNavigator extends JPanel {
 						} else {
 							sSRowSet.last();
 						}
-						
-						
+
+
 						// SEEMS DELETION WAS SUCCESSFULL DECREMENT ROWCOUNT
 						/*
 						SSDataNavigator.this.rowCount--;
@@ -1226,7 +1226,7 @@ public class SSDataNavigator extends JPanel {
 							SSDataNavigator.this.sSRowSet.last();
 						}
 						*/
-						
+
 						// UPDATE THE STATUS OF THE NAVIGATOR
 						updateNavigator();
 					}
@@ -1304,14 +1304,14 @@ public class SSDataNavigator extends JPanel {
 	 * @throws SQLException 	SQLException
 	 */
 	protected void updateNavigator() throws SQLException {
-		
+
 		currentRow = sSRowSet.getRow();
 		// SET THE ROW COUNT AS LABEL
 		lblRowCount.setText("of " + rowCount);
 		txtCurrentRow.setText(String.valueOf(currentRow));
-		
+
 		logger.debug("Current Row: " + currentRow + ". Row Count: " + rowCount);
-		
+
 		// ENABLE OR DISABLE BUTTONS
 		if (rowCount == 0) {
 			firstButton.setEnabled(false);

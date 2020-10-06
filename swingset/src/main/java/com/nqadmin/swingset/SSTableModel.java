@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -151,7 +151,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * Indicator to determine if insertions are allowed.
 	 */
 	protected boolean allowInsertion = true;
-	
+
 	/**
 	 * Log4j Logger for component
 	 */
@@ -291,7 +291,7 @@ public class SSTableModel extends AbstractTableModel {
 				}
 			}
 		}
-		
+
 		if (cellEditing != null) {
 			return cellEditing.isCellEditable(_row, _column);
 		}
@@ -437,9 +437,9 @@ public class SSTableModel extends AbstractTableModel {
 			insertRow(valueCopy, _column);
 			return;
 		}
-		
+
 		logger.debug("Set value at "+ _row + "  " + _column + " with "+ valueCopy);
-		
+
 		try {
 			// YOU SHOULD BE ON THE RIGHT ROW IN THE SSROWSET
 			if (rowset.getRow() != (_row + 1)) {
@@ -486,7 +486,7 @@ public class SSTableModel extends AbstractTableModel {
 				logger.warn("Unknown data type of " + type);
 			}
 			rowset.updateRow();
-			
+
 			logger.debug("Updated value: " + getValueAt(_row,_column));
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while updating value.",  se);
@@ -573,7 +573,7 @@ public class SSTableModel extends AbstractTableModel {
 				rowset.first();
 			}
 			rowset.refreshRow();
-			
+
 			logger.debug("Row number of inserted row : "+ rowset.getRow());
 
 			if (table != null) {
@@ -593,7 +593,7 @@ public class SSTableModel extends AbstractTableModel {
 				JOptionPane.showMessageDialog(component, "Error while inserting row.\n" + se.getMessage());
 			}
 		}
-		
+
 		logger.debug("Successfully added row.");
 
 	} // end protected void insertRow(Object _value, int _column) {
@@ -611,9 +611,9 @@ public class SSTableModel extends AbstractTableModel {
 		try {
 			while (iterator.hasNext()) {
 				final Integer column = (Integer) iterator.next();
-				
+
 				logger.debug("Column number is:" + column);
-				
+
 				// COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
 				final int type = rowset.getColumnType(column.intValue() + 1);
 				switch (type) {

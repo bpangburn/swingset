@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -43,7 +43,7 @@ package com.nqadmin.swingset;
 
 /**
  * The SSDataGridHandler interface specifies set of methods that can be used to
- * determine whether or not a given row can be deleted, and operation to be 
+ * determine whether or not a given row can be deleted, and operation to be
  * performed before and after deletion or insertion of a record.
  */
 public interface SSDataGridHandler {
@@ -51,17 +51,17 @@ public interface SSDataGridHandler {
     /**
      * Returns true if the row _row can be deleted
      * <p>
-     * SSTableModel calls this function if the row deletion is requested 
+     * SSTableModel calls this function if the row deletion is requested
 	 * (If SSDataGridHandler is implemented).
      *
      * @param _row    the row number in data grid.
      * @return returns true is the row can be deleted else false.
      */
     public boolean allowDeletion(int _row);
-    
+
     /**
      * Method to specify any pre-deletion operations.
-     * 
+     *
      *  @param _row position of data grid row being deleted.
      */
     public void performPreDeletionOps(int _row);
@@ -72,10 +72,10 @@ public interface SSDataGridHandler {
 	 * @param _row  position of deleted row in the data grid.
      */
     public void performPostDeletionOps(int _row);
-    
+
     /**
      * Method to perform pre-insertion operations.
-     * 
+     *
      * @param _row position of new row in the data grid.
      */
     public void performPreInsertOps(int _row);

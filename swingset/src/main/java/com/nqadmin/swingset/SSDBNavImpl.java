@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
@@ -85,7 +85,7 @@ public class SSDBNavImpl implements SSDBNav {
 	 * Screen where components to be cleared are located.
 	 */
 	protected Container container = null;
-	
+
 	/**
 	 * Log4j Logger for component
 	 */
@@ -93,7 +93,7 @@ public class SSDBNavImpl implements SSDBNav {
 
 	/**
 	 * Constructs a SSDBNavImpl with the specified container.
-	 * 
+	 *
 	 * @param _container	GUI Container to scan for Swing components to clear/reset
 	 */
 	public SSDBNavImpl(final Container _container) {
@@ -122,11 +122,11 @@ public class SSDBNavImpl implements SSDBNav {
 	 */
 	protected void setComponents(final Container _container) {
 
-		final Component[] comps = _container.getComponents();	
+		final Component[] comps = _container.getComponents();
 
 		for (int i = 0; i < comps.length; i++) {
-			
-            if (comps[i] instanceof JTextField) {	            
+
+            if (comps[i] instanceof JTextField) {
                 // IF IT IS A SSFormattedTextField SET ITS VALUE TO NULL (to avoid parse exception)
                    if(comps[i] instanceof SSFormattedTextField){
         	       		((SSFormattedTextField)comps[i]).setValue(null);
@@ -135,10 +135,10 @@ public class SSDBNavImpl implements SSDBNav {
                    // IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING
 		                ((JTextField)comps[i]).setText("");
                    }
-                   
+
             } else if(comps[i] instanceof JTextArea) {
             // IF IT IS A JTextArea, SET TO EMPTY STRING
-                ((JTextArea)comps[i]).setText("");                
+                ((JTextArea)comps[i]).setText("");
             } else if (comps[i] instanceof JComboBox) {
             // IF IT IS A JComboBox THEN SET IT TO 'EMPTY' ITEM BEFORE FIRST ITEM
                 ((JComboBox<?>)comps[i]).setSelectedIndex(-1);
@@ -161,22 +161,22 @@ public class SSDBNavImpl implements SSDBNav {
             // IF IT IS A JTabbedPane RECURSIVELY SET THE FIELDS
                 setComponents((Container)comps[i]);
             } else if(comps[i] instanceof JScrollPane) {
-            // IF IT IS A JScrollPane GET THE VIEW PORT AND RECURSIVELY SET THE FIELDS IN VIEW PORT    
+            // IF IT IS A JScrollPane GET THE VIEW PORT AND RECURSIVELY SET THE FIELDS IN VIEW PORT
                 setComponents(((JScrollPane)comps[i]).getViewport());
             } else {
             // DIPLAY WARNING FOR UNKNOWN COMPONENT
             	logger.warn("Encountered unknown component type of: " + comps[i].getClass().getSimpleName() + ". Unable to clear component.");
-            } 
+            }
 
 			/*
 			 * JPanel, JScrollPane, JTabbedPane,
-			 * 
+			 *
 			 * SSCheckBox, SSComboBox, SSFormattedTextField, SSImage, SSLabel, SSSlider,
 			 * SSTextArea, SSTextField
 			 */
 // 2019-09-29: PROBLEM WITH NEW SWITCH/ENUM IS THAT getSimpleName() RETURNS THE CLASS NAME OF THE CONTAINER SCREEEN
 //   WHICH COULD BE A CHILD ONE ONE OF THE JComponents E.G., XJPanelChildClass
-// 
+//
 // HAVE TO SEE IF WE CAN GET THE NAME OF THE SUPER CLASS
 
 /*
@@ -225,7 +225,7 @@ public class SSDBNavImpl implements SSDBNav {
 				break;
 
 			}
-*/			
+*/
 
 		}
 
