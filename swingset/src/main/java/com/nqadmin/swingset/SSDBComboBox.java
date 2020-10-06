@@ -860,11 +860,14 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				result = (long) NON_SELECTED;
 			} else {
 				result = mappings.get(getSelectedIndex());
-				if (result==null) {
-					result = (long) NON_SELECTED;
-				}
+
 			}
 			
+		}
+		
+		// If anything above returned null, change to NON_SELECTED.
+		if (result==null) {
+			result = (long) NON_SELECTED;
 		}
 
 		return result;
@@ -1895,6 +1898,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	public void updateSSComponent() {
 		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long or Integer
 		try {
+			// 2020-10-05_BP: If initialization is taking place then there won't be any mappings so don't try to update anything yet.
+			if (eventList==null) {
+				return;
+			}
 			
 			// If the user was on this component and the GlazedList had a subset of items, then
 			// navigating resulting in a call to updateSSComponent()->setSelectedValue() may try to do a lookup based on 
@@ -1938,6 +1945,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				//updateUI();
 			}
 
+			// TODO Consider commenting this out for performance.
 			String editorString = null;
 			if (getEditor().getItem() != null) {
 				editorString = getEditor().getItem().toString();
