@@ -473,12 +473,12 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		public boolean verify(final JComponent input) {
 
 			String aux = null;
-			final boolean passed = true;
+			//final boolean passed = true;
 
 			final SSMemoField tf = (SSMemoField) input;
 			aux = tf.getText();
 
-			if (passed == true) {
+			//if (passed) {
 
 				setBackground(java.awt.Color.WHITE);
 
@@ -502,6 +502,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 						break;
 					}
 					rowset.addRowSetListener(tf);
+					return true;
 				} catch (final java.sql.SQLException se) {
 					logger.error(getColumnForLog() + ": SQL Exception.", se);
 					tf.setText("");
@@ -509,13 +510,12 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 					logger.error(getColumnForLog() + ": Null Pointer Exception.", np);
 					tf.setText("");
 				}
-				return true;
-			}
+				//return true;
+			//}
 			/*
 			 * Validation fails.
 			 *
 			 */
-
 			setBackground(java.awt.Color.RED);
 			return false;
 		}
