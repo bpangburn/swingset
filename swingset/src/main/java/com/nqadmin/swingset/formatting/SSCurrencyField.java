@@ -54,8 +54,8 @@ public class SSCurrencyField extends SSFormattedTextField {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 1636264407572416306L;
-	private int precision = 3;
 	private int decimals = 2;
+	private int precision = 3;
 
 	/**
 	 * Holds value of property minimumIntegerDigits.
@@ -109,15 +109,6 @@ public class SSCurrencyField extends SSFormattedTextField {
 	}
 
 	/**
-	 * Returns the number digits used for integer part of the number
-	 *
-	 * @return returns the number digits used for integer part of the number
-	 */
-	public int getPrecision() {
-		return precision;
-	}
-
-	/**
 	 * Getter for property decimals.
 	 *
 	 * @return Value of property decimals.
@@ -127,13 +118,12 @@ public class SSCurrencyField extends SSFormattedTextField {
 	}
 
 	/**
-	 * Sets the number of digits needed for integer part of the number
+	 * Returns the number digits used for integer part of the number
 	 *
-	 * @param _precision - number of digits needed for integer part of the number
+	 * @return returns the number digits used for integer part of the number
 	 */
-	public void setPrecision(final int _precision) {
-		precision = _precision;
-		setFormatterFactory(new SSCurrencyFormatterFactory(_precision, decimals));
+	public int getPrecision() {
+		return precision;
 	}
 
 	/**
@@ -144,6 +134,16 @@ public class SSCurrencyField extends SSFormattedTextField {
 	public void setDecimals(final int _decimals) {
 		decimals = _decimals;
 		setFormatterFactory(new SSCurrencyFormatterFactory(precision, _decimals));
+	}
+
+	/**
+	 * Sets the number of digits needed for integer part of the number
+	 *
+	 * @param _precision - number of digits needed for integer part of the number
+	 */
+	public void setPrecision(final int _precision) {
+		precision = _precision;
+		setFormatterFactory(new SSCurrencyFormatterFactory(_precision, decimals));
 	}
 }
 

@@ -166,6 +166,11 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 //    protected final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
 	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -1204307502900668225L;
@@ -189,11 +194,6 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	 * Unchecked value for numeric columns.
 	 */
 	protected int UNCHECKED = 0;
-
-	/**
-	 * Log4j Logger for component
-	 */
-	private static Logger logger = LogManager.getLogger();
 
 	/**
 	 * Creates an object of SSCheckBox.

@@ -133,6 +133,11 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	} // end private class SSImageListener
 
 	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -2726746843832259767L;
@@ -142,7 +147,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
      */
     protected JButton btnUpdateImage = new JButton("Update");
 
-	/**
+    /**
      * ImageIcon to store the image.
      */
     protected ImageIcon img;
@@ -151,11 +156,6 @@ public class SSImage extends JPanel implements SSComponentInterface {
      * Label to display the image
      */
     protected JLabel lblImage = new JLabel("No Picture");
-
-    /**
-     * The preferred size of the image component.
-     */
-    protected Dimension preferredSize = new Dimension(200,200);
 
 //    /**
 //     * SSRowSet from which component will get/set values.
@@ -168,9 +168,9 @@ public class SSImage extends JPanel implements SSComponentInterface {
 //    protected String columnName = "";
 
     /**
-	 * Common fields shared across SwingSet components
-	 */
-	protected SSCommon ssCommon;
+     * The preferred size of the image component.
+     */
+    protected Dimension preferredSize = new Dimension(200,200);
 
 //    /**
 //     * RowSet listener
@@ -179,14 +179,14 @@ public class SSImage extends JPanel implements SSComponentInterface {
 
 
 	/**
+	 * Common fields shared across SwingSet components
+	 */
+	protected SSCommon ssCommon;
+
+	/**
 	 * Component listener.
 	 */
 	protected final SSImageListener ssImageListener = new SSImageListener();
-
-	/**
-	 * Log4j Logger for component
-	 */
-	private static Logger logger = LogManager.getLogger();
 
     /**
      * <p>

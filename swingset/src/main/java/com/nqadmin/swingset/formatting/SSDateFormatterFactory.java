@@ -55,9 +55,14 @@ import org.apache.logging.log4j.Logger;
 public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
 	/**
-	 * Unique serial ID
+	 * Constant for dd/MM/yyyy date format
 	 */
-	private static final long serialVersionUID = -8205600502325364394L;
+	public static final int DDMMYYYY = 1;
+
+	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
 
 	/**
 	 * Constant for MM/dd/yyyy date format
@@ -65,19 +70,14 @@ public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFac
 	public static final int MMDDYYYY = 0;
 
 	/**
-	 * Constant for dd/MM/yyyy date format
+	 * Unique serial ID
 	 */
-	public static final int DDMMYYYY = 1;
+	private static final long serialVersionUID = -8205600502325364394L;
 
 	/**
 	 * Constant for yyyy-MM-dd date format
 	 */
 	public static final int YYYYMMDD = 2;
-
-	/**
-	 * Log4j Logger for component
-	 */
-	private static Logger logger = LogManager.getLogger();
 
     /**
      * Constructs a default SSDateFormatterFactory.

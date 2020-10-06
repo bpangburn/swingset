@@ -93,9 +93,9 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	}
 
 	/**
-	 * unique serial id
+	 * Log4j Logger for component
 	 */
-	private static final long serialVersionUID = -5698401719124062031L;
+	private static Logger logger = LogManager.getLogger();
 
 //	/**
 //	 * SSRowSet from which component will get/set values.
@@ -108,9 +108,9 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 //	protected String columnName = "";
 
 	/**
-	 * Log4j Logger for component
+	 * unique serial id
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static final long serialVersionUID = -5698401719124062031L;
 
 	/**
 	 * Converts SQL array to object array

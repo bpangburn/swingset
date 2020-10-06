@@ -57,6 +57,29 @@ import java.beans.SimpleBeanInfo;
 @Deprecated
 public class SSImageFieldBeanInfo extends SimpleBeanInfo {
 
+    private static final int defaultEventIndex = -1;//GEN-END:Idx
+
+
+    private static final int defaultPropertyIndex = -1;//GEN-BEGIN:Idx
+    // Event set information will be obtained from introspection.//GEN-FIRST:Events
+    private static EventSetDescriptor[] eventSets = null;
+    // Method information will be obtained from introspection.//GEN-FIRST:Methods
+    private static MethodDescriptor[] methods = null;
+    // Property identifiers//GEN-FIRST:Properties
+    private static final int PROPERTY_background = 0;
+    private static final int PROPERTY_border = 1;
+    private static final int PROPERTY_columnName = 2;
+    private static final int PROPERTY_enabled = 3;
+    private static final int PROPERTY_focusable = 4;
+    private static final int PROPERTY_insets = 5;
+    private static final int PROPERTY_preferredSize = 6;
+    private static final int PROPERTY_SSDataNavigator = 7;
+
+    private static final int PROPERTY_SSRowSet = 8;
+
+    private static final int PROPERTY_toolTipText = 9;
+    private static final int PROPERTY_visible = 10;
+
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
@@ -68,21 +91,20 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
 
         return beanDescriptor;
     }//GEN-LAST:BeanDescriptor
+    private static EventSetDescriptor[] getEdescriptor(){//GEN-HEADEREND:Events
+
+        // Here you can add code for customizing the event sets array.
+
+        return eventSets;
+    }//GEN-LAST:Events
 
 
-    // Property identifiers//GEN-FIRST:Properties
-    private static final int PROPERTY_background = 0;
-    private static final int PROPERTY_border = 1;
-    private static final int PROPERTY_columnName = 2;
-    private static final int PROPERTY_enabled = 3;
-    private static final int PROPERTY_focusable = 4;
-    private static final int PROPERTY_insets = 5;
-    private static final int PROPERTY_preferredSize = 6;
-    private static final int PROPERTY_SSDataNavigator = 7;
-    private static final int PROPERTY_SSRowSet = 8;
-    private static final int PROPERTY_toolTipText = 9;
-    private static final int PROPERTY_visible = 10;
+    private static MethodDescriptor[] getMdescriptor(){//GEN-HEADEREND:Methods
 
+        // Here you can add code for customizing the methods array.
+
+        return methods;
+    }//GEN-LAST:Methods
     // Property array
     /*lazy PropertyDescriptor*/
     private static PropertyDescriptor[] getPdescriptor(){
@@ -117,28 +139,6 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
         return properties;
     }//GEN-LAST:Properties
 
-    // Event set information will be obtained from introspection.//GEN-FIRST:Events
-    private static EventSetDescriptor[] eventSets = null;
-    private static EventSetDescriptor[] getEdescriptor(){//GEN-HEADEREND:Events
-
-        // Here you can add code for customizing the event sets array.
-
-        return eventSets;
-    }//GEN-LAST:Events
-
-    // Method information will be obtained from introspection.//GEN-FIRST:Methods
-    private static MethodDescriptor[] methods = null;
-    private static MethodDescriptor[] getMdescriptor(){//GEN-HEADEREND:Methods
-
-        // Here you can add code for customizing the methods array.
-
-        return methods;
-    }//GEN-LAST:Methods
-
-
-    private static final int defaultPropertyIndex = -1;//GEN-BEGIN:Idx
-    private static final int defaultEventIndex = -1;//GEN-END:Idx
-
 
 //GEN-FIRST:Superclass
 
@@ -159,20 +159,28 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
     }
 
     /**
-     * Gets the bean's <code>PropertyDescriptor</code>s.
-     *
-     * @return An array of PropertyDescriptors describing the editable
-     * properties supported by this bean.  May return null if the
-     * information should be obtained by automatic analysis.
-     * <p>
-     * If a property is indexed, then its entry in the result array will
-     * belong to the IndexedPropertyDescriptor subclass of PropertyDescriptor.
-     * A client of getPropertyDescriptors can use "instanceof" to check
-     * if a given PropertyDescriptor is an IndexedPropertyDescriptor.
+     * A bean may have a "default" event that is the event that will
+     * mostly commonly be used by human's when using the bean.
+     * @return Index of default event in the EventSetDescriptor array
+     *		returned by getEventSetDescriptors.
+     * <P>	Returns -1 if there is no default event.
      */
     @Override
-	public PropertyDescriptor[] getPropertyDescriptors() {
-        return getPdescriptor();
+	public int getDefaultEventIndex() {
+        return defaultEventIndex;
+    }
+
+    /**
+     * A bean may have a "default" property that is the property that will
+     * mostly commonly be initially chosen for update by human's who are
+     * customizing the bean.
+     * @return  Index of default property in the PropertyDescriptor array
+     * 		returned by getPropertyDescriptors.
+     * <P>	Returns -1 if there is no default property.
+     */
+    @Override
+	public int getDefaultPropertyIndex() {
+        return defaultPropertyIndex;
     }
 
     /**
@@ -200,27 +208,19 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
     }
 
     /**
-     * A bean may have a "default" property that is the property that will
-     * mostly commonly be initially chosen for update by human's who are
-     * customizing the bean.
-     * @return  Index of default property in the PropertyDescriptor array
-     * 		returned by getPropertyDescriptors.
-     * <P>	Returns -1 if there is no default property.
+     * Gets the bean's <code>PropertyDescriptor</code>s.
+     *
+     * @return An array of PropertyDescriptors describing the editable
+     * properties supported by this bean.  May return null if the
+     * information should be obtained by automatic analysis.
+     * <p>
+     * If a property is indexed, then its entry in the result array will
+     * belong to the IndexedPropertyDescriptor subclass of PropertyDescriptor.
+     * A client of getPropertyDescriptors can use "instanceof" to check
+     * if a given PropertyDescriptor is an IndexedPropertyDescriptor.
      */
     @Override
-	public int getDefaultPropertyIndex() {
-        return defaultPropertyIndex;
-    }
-
-    /**
-     * A bean may have a "default" event that is the event that will
-     * mostly commonly be used by human's when using the bean.
-     * @return Index of default event in the EventSetDescriptor array
-     *		returned by getEventSetDescriptors.
-     * <P>	Returns -1 if there is no default event.
-     */
-    @Override
-	public int getDefaultEventIndex() {
-        return defaultEventIndex;
+	public PropertyDescriptor[] getPropertyDescriptors() {
+        return getPdescriptor();
     }
 }

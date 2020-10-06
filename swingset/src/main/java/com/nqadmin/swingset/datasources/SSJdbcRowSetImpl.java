@@ -58,14 +58,14 @@ import com.nqadmin.rowset.JdbcRowSetImpl;
 public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 
 	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -3556990832719097405L;
-
-	/**
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = LogManager.getLogger();
+
+	/**
+	 * unique serial id
+	 */
+	private static final long serialVersionUID = -3556990832719097405L;
 
 	/**
 	 * Empty constructor

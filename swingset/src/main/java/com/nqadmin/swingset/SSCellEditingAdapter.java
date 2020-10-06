@@ -66,7 +66,7 @@ public abstract class SSCellEditingAdapter implements SSCellEditing {
 	 * function look in SSCellEditing class.
 	 */
 	@Override
-	public boolean isCellEditable(final int _row, final int _column) {
+	public boolean cellUpdateRequested(final int _row, final int _column, final Object _oldValue, final Object _newValue) {
 		return true;
 	}
 
@@ -75,7 +75,7 @@ public abstract class SSCellEditingAdapter implements SSCellEditing {
 	 * function look in SSCellEditing class.
 	 */
 	@Override
-	public boolean cellUpdateRequested(final int _row, final int _column, final Object _oldValue, final Object _newValue) {
+	public boolean isCellEditable(final int _row, final int _column) {
 		return true;
 	}
 

@@ -53,8 +53,8 @@ public class SSNumericField extends SSFormattedTextField {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -5922010378310406148L;
-	private int precision = 3;
 	private int decimals = 2;
+	private int precision = 3;
 
 	/**
 	 * Creates a new instance of SSNumericField
@@ -86,15 +86,6 @@ public class SSNumericField extends SSFormattedTextField {
 	}
 
 	/**
-	 * Returns the number digits used for integer part of the number
-	 *
-	 * @return returns the number digits used for integer part of the number
-	 */
-	public int getPrecision() {
-		return precision;
-	}
-
-	/**
 	 * Returns the number of digits used for fraction part of the number
 	 *
 	 * @return returns the number of digits used for fraction part of the number
@@ -104,13 +95,12 @@ public class SSNumericField extends SSFormattedTextField {
 	}
 
 	/**
-	 * Sets the number of digits needed for integer part of the number
+	 * Returns the number digits used for integer part of the number
 	 *
-	 * @param _precision - number of digits needed for integer part of the number
+	 * @return returns the number digits used for integer part of the number
 	 */
-	public void setPrecision(final int _precision) {
-		precision = _precision;
-		setFormatterFactory(new SSNumericFormatterFactory(_precision, decimals));
+	public int getPrecision() {
+		return precision;
 	}
 
 	/**
@@ -121,6 +111,16 @@ public class SSNumericField extends SSFormattedTextField {
 	public void setDecimals(final int _decimals) {
 		decimals = _decimals;
 		setFormatterFactory(new SSNumericFormatterFactory(precision, _decimals));
+	}
+
+	/**
+	 * Sets the number of digits needed for integer part of the number
+	 *
+	 * @param _precision - number of digits needed for integer part of the number
+	 */
+	public void setPrecision(final int _precision) {
+		precision = _precision;
+		setFormatterFactory(new SSNumericFormatterFactory(_precision, decimals));
 	}
 
 }

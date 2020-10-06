@@ -55,18 +55,18 @@ import org.apache.logging.log4j.Logger;
 public class SSCuitFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
     /**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 3206796666162203982L;
-	private MaskFormatter defaultFormatter;
-    private MaskFormatter displayFormatter;
-    private MaskFormatter editFormatter;
-    private MaskFormatter nullFormatter;
-
-	/**
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = LogManager.getLogger();
+	/**
+	 * unique serial id
+	 */
+	private static final long serialVersionUID = 3206796666162203982L;
+    private MaskFormatter defaultFormatter;
+    private MaskFormatter displayFormatter;
+    private MaskFormatter editFormatter;
+
+	private MaskFormatter nullFormatter;
 
     /**
      * Creates an default object of SSCuitFormatterFactory

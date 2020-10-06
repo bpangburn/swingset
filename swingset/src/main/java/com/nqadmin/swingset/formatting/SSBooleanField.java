@@ -131,19 +131,19 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	}
 
 	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -856226927518717477L;
-	protected String columnName = null;
-	protected int colType = -99;
-	protected SSRowSet rowset = null;
-
-	private SSDataNavigator navigator = null;
-
-	/**
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = LogManager.getLogger();
+	/**
+	 * unique serial id
+	 */
+	private static final long serialVersionUID = -856226927518717477L;
+	protected int colType = -99;
+	protected String columnName = null;
+
+	private SSDataNavigator navigator = null;
+
+	protected SSRowSet rowset = null;
 
 	/** Creates a new instance of SSBooleanField */
 	public SSBooleanField() {
@@ -163,15 +163,6 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 		addKeyListener(this);
 
 		setInputVerifier(new internalVerifier());
-	}
-
-	/**
-	 * Returns the bound column name in square brackets.
-	 *
-	 * @return the boundColumnName in square brackets
-	 */
-	public String getColumnForLog() {
-		return "[" + columnName + "]";
 	}
 
 	/**
@@ -254,6 +245,15 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 		} catch (final java.sql.SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
+	}
+
+	/**
+	 * Returns the bound column name in square brackets.
+	 *
+	 * @return the boundColumnName in square brackets
+	 */
+	public String getColumnForLog() {
+		return "[" + columnName + "]";
 	}
 
 	/**

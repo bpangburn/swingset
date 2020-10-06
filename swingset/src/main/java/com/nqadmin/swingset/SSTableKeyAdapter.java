@@ -68,19 +68,49 @@ import org.apache.logging.log4j.Logger;
 public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
 	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -2748762202415891694L;
 
 	/**
-	 * On state for copying or pasting.
+	 * Takes the column number and string value to be set for that column and
+	 * converts the string in to appropriate class. The class is found by calling
+	 * the getColumnClass() method of the JTable.
+	 *
+	 * @param _jTable JTable containing target object
+	 * @param _column the column number for which new value has to be set.
+	 * @param _value  string representation of the new value.
+	 *
+	 * @return returns the value as a column class object.
+	 * @throws Exception catch all exception
 	 */
-	protected int onMask = InputEvent.CTRL_DOWN_MASK;
+	protected static Object getObjectToSet(final JTable _jTable, final int _column, final String _value) throws Exception {
+		// GET THE COLUMN CLASS
+		final Class<?> objectClass = _jTable.getColumnClass(_column);
+		Object newValue = null;
+		try {
+			// CONSTRUCT THE OBJECT ONLY IF THE STRING IS NOT NULL
+			if (_value != null) {
+				// GET THE CONSTRUCTOR FOR THE CLASS WHICH TAKES A STRING
+				final Constructor<?> constructor = objectClass.getConstructor(new Class<?>[] { String.class });
 
-	/**
-	 * Off state for copying or pasting.
-	 */
-	protected int offMask = InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK;
+				// CREATE AN INSTANCE OF THE OBJECT
+				newValue = constructor.newInstance(new Object[] { _value });
+			}
+		} catch (final NoSuchMethodException nsme) {
+			logger.warn("No Such Method Exception. Failed to copy data.",  nsme);
+			newValue = _value;
+		}
+
+		// RETURN THE NEWLY CREATED OBJECT.
+		return newValue;
+
+	}
 
 	/**
 	 * Indicates whether or not row insertions are allowed via cut/copy and paste.
@@ -93,9 +123,14 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	protected boolean forSSDataGrid = false;
 
 	/**
-	 * Log4j Logger for component
+	 * Off state for copying or pasting.
 	 */
-	private static Logger logger = LogManager.getLogger();
+	protected int offMask = InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK;
+
+	/**
+	 * On state for copying or pasting.
+	 */
+	protected int onMask = InputEvent.CTRL_DOWN_MASK;
 
 	/**
 	 * Constructs a KeyAdapter for the JTable.
@@ -104,28 +139,6 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	 */
 	public SSTableKeyAdapter(final JTable _jTable) {
 		init(_jTable);
-	}
-
-	/**
-	 * Sets allowInsertion indicator. Set true if new rows can be added to JTable
-	 * via cut/copy and paste - otherwise false. False by default.
-	 *
-	 * @param _allowInsertion true if new rows can be added when pasting data from
-	 *                        clipboard, else false.
-	 */
-	public void setAllowInsertion(final boolean _allowInsertion) {
-		allowInsertion = _allowInsertion;
-	}
-
-	/**
-	 * Sets forSSDataGrid indicator. True if the key adapter is used for SSDataGrid
-	 * -- otherwise false. False by default.
-	 *
-	 * @param _forSSDataGrid - true if this key adapter is used for SSDataGrid, else
-	 *                       false.
-	 */
-	public void setForSSDataGrid(final boolean _forSSDataGrid) {
-		forSSDataGrid = _forSSDataGrid;
 	}
 
 	/**
@@ -350,38 +363,25 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	} // end public void keyReleased(KeyEvent ke) {
 
 	/**
-	 * Takes the column number and string value to be set for that column and
-	 * converts the string in to appropriate class. The class is found by calling
-	 * the getColumnClass() method of the JTable.
+	 * Sets allowInsertion indicator. Set true if new rows can be added to JTable
+	 * via cut/copy and paste - otherwise false. False by default.
 	 *
-	 * @param _jTable JTable containing target object
-	 * @param _column the column number for which new value has to be set.
-	 * @param _value  string representation of the new value.
-	 *
-	 * @return returns the value as a column class object.
-	 * @throws Exception catch all exception
+	 * @param _allowInsertion true if new rows can be added when pasting data from
+	 *                        clipboard, else false.
 	 */
-	protected static Object getObjectToSet(final JTable _jTable, final int _column, final String _value) throws Exception {
-		// GET THE COLUMN CLASS
-		final Class<?> objectClass = _jTable.getColumnClass(_column);
-		Object newValue = null;
-		try {
-			// CONSTRUCT THE OBJECT ONLY IF THE STRING IS NOT NULL
-			if (_value != null) {
-				// GET THE CONSTRUCTOR FOR THE CLASS WHICH TAKES A STRING
-				final Constructor<?> constructor = objectClass.getConstructor(new Class<?>[] { String.class });
+	public void setAllowInsertion(final boolean _allowInsertion) {
+		allowInsertion = _allowInsertion;
+	}
 
-				// CREATE AN INSTANCE OF THE OBJECT
-				newValue = constructor.newInstance(new Object[] { _value });
-			}
-		} catch (final NoSuchMethodException nsme) {
-			logger.warn("No Such Method Exception. Failed to copy data.",  nsme);
-			newValue = _value;
-		}
-
-		// RETURN THE NEWLY CREATED OBJECT.
-		return newValue;
-
+	/**
+	 * Sets forSSDataGrid indicator. True if the key adapter is used for SSDataGrid
+	 * -- otherwise false. False by default.
+	 *
+	 * @param _forSSDataGrid - true if this key adapter is used for SSDataGrid, else
+	 *                       false.
+	 */
+	public void setForSSDataGrid(final boolean _forSSDataGrid) {
+		forSSDataGrid = _forSSDataGrid;
 	}
 
 } // end public class SSTableKeyAdapter extends KeyAdapter implements Serializable

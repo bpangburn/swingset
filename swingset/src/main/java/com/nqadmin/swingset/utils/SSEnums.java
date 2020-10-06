@@ -47,39 +47,6 @@ package com.nqadmin.swingset.utils;
 public class SSEnums {
 
 	/**
-	 * Enumeration for SwingSet component types.
-	 */
-	@SuppressWarnings("javadoc")
-	public enum SSComponent {
-
-		JPanel, JScrollPane, JTabbedPane,
-
-		SSCheckBox, SSComboBox, SSFormattedTextField, SSImage, SSLabel, SSSlider, SSTextArea, SSTextField
-
-	}
-
-	/**
-	 * Enumeration for navigation buttons.
-	 */
-	@SuppressWarnings("javadoc")
-	public enum Navigation {
-		Next(1), Previous(1), First(2), Last(3);
-
-		private final int value;
-
-		Navigation(final int newValue) {
-			value = newValue;
-		}
-
-		/**
-		 * @return integer corresponding to enumerated value
-		 */
-		public int getValue() {
-			return value;
-		}
-	}
-
-	/**
 	 * Enumeration for navigation buttons.
 	 */
 	@SuppressWarnings("javadoc")
@@ -111,6 +78,39 @@ public class SSEnums {
 		public String getStringValue() {
 			return stringValue;
 		}
+	}
+
+	/**
+	 * Enumeration for navigation buttons.
+	 */
+	@SuppressWarnings("javadoc")
+	public enum Navigation {
+		First(2), Last(3), Next(1), Previous(1);
+
+		private final int value;
+
+		Navigation(final int newValue) {
+			value = newValue;
+		}
+
+		/**
+		 * @return integer corresponding to enumerated value
+		 */
+		public int getValue() {
+			return value;
+		}
+	}
+
+	/**
+	 * Enumeration for SwingSet component types.
+	 */
+	@SuppressWarnings("javadoc")
+	public enum SSComponent {
+
+		JPanel, JScrollPane, JTabbedPane,
+
+		SSCheckBox, SSComboBox, SSFormattedTextField, SSImage, SSLabel, SSSlider, SSTextArea, SSTextField
+
 	}
 
 }

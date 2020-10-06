@@ -58,50 +58,7 @@ public class SSCuitField extends SSFormattedTextField {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 6012580680828883089L;
-	private final Caret cuitCaret;
-
-    /**
-     * Creates a new instance of SSCuitFieldField
-     */
-    public SSCuitField() {
-        this(new SSCuitFormatterFactory());
-    }
-
-    /** Creates a new instance of SSCuitFieldField with the specified formatter factory
-     * @param factory - formatter factory to be used
-     */
-    public SSCuitField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
-        super(factory);
-
-        cuitCaret = new DefaultCaret();
-        cuitCaret.setBlinkRate(600);
-
-        try {
-            cuitCaret.setSelectionVisible(true);
-        } catch(final java.lang.NullPointerException np) {
-        	// do nothing - there may not be anything to select during initialization
-        	//logger.warn(getColumnForLog() + ": Null Pointer Exception.", np);
-        }
-
-
-        setCaret(cuitCaret);
-
-    }
-
-    /* (non-Javadoc)
-     * @see com.nqadmin.swingset.formatting.SSFormattedTextField#validateField(java.lang.Object)
-     */
-    @Override
-	public boolean validateField(final Object value) {
-
-        boolean retValue;
-
-        retValue = CheckCuit((String)value);
-
-        return retValue;
-    }
-
-    /**
+	/**
 	 * Computes verifier digit and checks against supplied value.
 	 *
 	 * @param  cu    the CUIT value to be verified.
@@ -151,6 +108,49 @@ public class SSCuitField extends SSFormattedTextField {
         }
         return true;
 
+    }
+
+    private final Caret cuitCaret;
+
+    /**
+     * Creates a new instance of SSCuitFieldField
+     */
+    public SSCuitField() {
+        this(new SSCuitFormatterFactory());
+    }
+
+    /** Creates a new instance of SSCuitFieldField with the specified formatter factory
+     * @param factory - formatter factory to be used
+     */
+    public SSCuitField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+        super(factory);
+
+        cuitCaret = new DefaultCaret();
+        cuitCaret.setBlinkRate(600);
+
+        try {
+            cuitCaret.setSelectionVisible(true);
+        } catch(final java.lang.NullPointerException np) {
+        	// do nothing - there may not be anything to select during initialization
+        	//logger.warn(getColumnForLog() + ": Null Pointer Exception.", np);
+        }
+
+
+        setCaret(cuitCaret);
+
+    }
+
+    /* (non-Javadoc)
+     * @see com.nqadmin.swingset.formatting.SSFormattedTextField#validateField(java.lang.Object)
+     */
+    @Override
+	public boolean validateField(final Object value) {
+
+        boolean retValue;
+
+        retValue = CheckCuit((String)value);
+
+        return retValue;
     }
 }
 

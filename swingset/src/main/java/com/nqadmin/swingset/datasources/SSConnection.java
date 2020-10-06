@@ -61,9 +61,29 @@ import org.apache.logging.log4j.Logger;
 public class SSConnection implements Serializable {
 
 	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 844522706318494234L;
+
+	/**
+	 * Database connection object.
+	 */
+	protected Connection connection;
+
+	/**
+	 * Database driver class name.
+	 */
+	protected String driverName = "";
+
+	/**
+	 * Password to be used for the username specified.
+	 */
+	protected String password = "";
 
 	/**
 	 * URL to the database.
@@ -74,26 +94,6 @@ public class SSConnection implements Serializable {
 	 * Username to be used while connecting to the database.
 	 */
 	protected String username = "";
-
-	/**
-	 * Password to be used for the username specified.
-	 */
-	protected String password = "";
-
-	/**
-	 * Database driver class name.
-	 */
-	protected String driverName = "";
-
-	/**
-	 * Database connection object.
-	 */
-	protected Connection connection;
-
-	/**
-	 * Log4j Logger for component
-	 */
-	private static Logger logger = LogManager.getLogger();
 
 	/**
 	 * Constructs a default SSConnection object.

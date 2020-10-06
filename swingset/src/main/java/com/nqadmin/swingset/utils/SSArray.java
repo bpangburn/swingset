@@ -54,14 +54,14 @@ import java.util.Map;
 public class SSArray implements Array {
 
 	/**
-	 * object array containing elements of sql array
-	 */
-	private final Object[] data;
-
-	/**
 	 * Underlying database type name for array elements
 	 */
 	private String baseTypeName = "";
+
+	/**
+	 * object array containing elements of sql array
+	 */
+	private final Object[] data;
 
 	/**
 	 * Creates SSArray with the object array and data base type
@@ -91,17 +91,17 @@ public class SSArray implements Array {
 	}
 
 	@Override
-	public Object getArray(final Map<String, Class<?>> map) throws SQLException {
-		return null;
-	}
-
-	@Override
 	public Object getArray(final long index, final int count) throws SQLException {
 		return null;
 	}
 
 	@Override
 	public Object getArray(final long index, final int count, final Map<String, Class<?>> map) throws SQLException {
+		return null;
+	}
+
+	@Override
+	public Object getArray(final Map<String, Class<?>> map) throws SQLException {
 		return null;
 	}
 
@@ -126,17 +126,17 @@ public class SSArray implements Array {
 	}
 
 	@Override
-	public ResultSet getResultSet(final Map<String, Class<?>> map) throws SQLException {
-		return null;
-	}
-
-	@Override
 	public ResultSet getResultSet(final long index, final int count) throws SQLException {
 		return null;
 	}
 
 	@Override
 	public ResultSet getResultSet(final long index, final int count, final Map<String, Class<?>> map) throws SQLException {
+		return null;
+	}
+
+	@Override
+	public ResultSet getResultSet(final Map<String, Class<?>> map) throws SQLException {
 		return null;
 	}
 

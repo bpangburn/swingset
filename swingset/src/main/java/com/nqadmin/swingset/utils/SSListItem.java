@@ -49,8 +49,8 @@ package com.nqadmin.swingset.utils;
  */
 public class SSListItem {
 
-	private Long primaryKey;
 	private String listItem;
+	private Long primaryKey;
 
 
 	/**
@@ -72,17 +72,17 @@ public class SSListItem {
 		return listItem;
 	}
 	/**
-	 * @param _listItem String description for the list item
-	 */
-	public void setListItem(final String _listItem) {
-		listItem = _listItem;
-	}
-
-    /**
      * @return the Primary Key/index for the current list item
      */
     public Long getPrimaryKey() {
 		return primaryKey;
+	}
+
+    /**
+	 * @param _listItem String description for the list item
+	 */
+	public void setListItem(final String _listItem) {
+		listItem = _listItem;
 	}
 
 	/**

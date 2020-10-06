@@ -56,23 +56,6 @@ public interface SSCellEditing extends Serializable {
 	static final long serialVersionUID = -8081589343308592606L;
 
 	/**
-	 * Returns true if the cell at row _row and at column _column is editable else
-	 * false.
-	 * <p>
-	 * SSTableModel first looks in to uneditable columns, if the column is not in
-	 * the uneditable columns list then this function is called (If SSCellEditing is
-	 * implemented).
-	 *
-	 * @param _row    the row to which the cell belongs.
-	 * @param _column the column to which the cell belongs.
-	 *
-	 * @return returns true is the cell is editable else false.
-	 */
-	default boolean isCellEditable(final int _row, final int _column) {
-		return true;
-	}
-
-	/**
 	 * This function is called when ever a update to a cell is done but before the
 	 * value is updated in the database.<BR>
 	 * If the function returns false the update is cancelled, if it returns true the
@@ -86,6 +69,23 @@ public interface SSCellEditing extends Serializable {
 	 * @return returns true if update should be made else false.
 	 */
 	default boolean cellUpdateRequested(final int _row, final int _column, final Object _oldValue, final Object _newValue) {
+		return true;
+	}
+
+	/**
+	 * Returns true if the cell at row _row and at column _column is editable else
+	 * false.
+	 * <p>
+	 * SSTableModel first looks in to uneditable columns, if the column is not in
+	 * the uneditable columns list then this function is called (If SSCellEditing is
+	 * implemented).
+	 *
+	 * @param _row    the row to which the cell belongs.
+	 * @param _column the column to which the cell belongs.
+	 *
+	 * @return returns true is the cell is editable else false.
+	 */
+	default boolean isCellEditable(final int _row, final int _column) {
 		return true;
 	}
 

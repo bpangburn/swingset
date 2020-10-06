@@ -49,9 +49,9 @@ package com.nqadmin.swingset.formatting;
 public class SSDateField extends SSFormattedTextField {
 
 	/**
-	 * unique serial id
+	 * constant representing the dd/mm/yyyy date format
 	 */
-	private static final long serialVersionUID = 9138021901389692436L;
+	public static final int DDMMYYYY = 1;
 
 	/**
 	 * constant representing the mm/dd/yyyy date format
@@ -59,9 +59,16 @@ public class SSDateField extends SSFormattedTextField {
 	public static final int MMDDYYYY = 0;
 
 	/**
-	 * constant representing the dd/mm/yyyy date format
+	 * unique serial id
 	 */
-	public static final int DDMMYYYY = 1;
+	private static final long serialVersionUID = 9138021901389692436L;
+
+    /**
+     *  Creates a default SSDateField object
+     */
+    public SSDateField(){
+    	this(new SSDateFormatterFactory());
+    }
 
     /**
      *  Creates a new instance of SSDateField with the specified format
@@ -70,13 +77,6 @@ public class SSDateField extends SSFormattedTextField {
      */
     public SSDateField(final int format) {
         this(new SSDateFormatterFactory(format));
-    }
-
-    /**
-     *  Creates a default SSDateField object
-     */
-    public SSDateField(){
-    	this(new SSDateFormatterFactory());
     }
 
     /**

@@ -89,9 +89,9 @@ public class SSSlider extends JSlider implements SSComponentInterface {
     } // end protected class SSSliderListener implements ChangeListener, Serializable {
 
     /**
-	 * unique serial id
+	 * Log4j Logger for component
 	 */
-	private static final long serialVersionUID = 8477179080546081481L;
+	private static Logger logger = LogManager.getLogger();
 
 //	/**
 //     * Text field bound to the SSRowSet.
@@ -114,9 +114,9 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 //    protected int columnType;
 
     /**
-     * Common fields shared across SwingSet components
-     */
-    protected SSCommon ssCommon;
+	 * unique serial id
+	 */
+	private static final long serialVersionUID = 8477179080546081481L;
 
 //    /**
 //     * Bound text field document listener.
@@ -124,14 +124,14 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 //    protected final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
 
     /**
+     * Common fields shared across SwingSet components
+     */
+    protected SSCommon ssCommon;
+
+	/**
      * Component listener.
      */
     protected final SSSliderListener ssSliderListener = new SSSliderListener();
-
-	/**
-	 * Log4j Logger for component
-	 */
-	private static Logger logger = LogManager.getLogger();
 
     /**
      * Empty constructor needed for deserialization. Creates a horizontal

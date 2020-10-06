@@ -175,20 +175,20 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 
 	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+
+	/**
 	 * Value to represent that no item has been selected in the combo box.
 	 */
 	public static final int NON_SELECTED = (int) ((Math.pow(2, 32) - 1) / (-2));
+
 
 	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -4203338788107410027L;
-
-
-	/**
-	 * Indicates if GlazedList autocompletion has already been installed
-	 */
-	private boolean autoCompleteInstalled = false;
 
 //	/**
 //	 * Model to be used for holding and filtering data in combo box.
@@ -207,6 +207,11 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //    protected SSConnection sSConnection = null;
 
 	/**
+	 * Indicates if GlazedList autocompletion has already been installed
+	 */
+	private boolean autoCompleteInstalled = false;
+
+	/**
 	 * Format for any date columns displayed in combo box.
 	 */
 	protected String dateFormat = "MM/dd/yyyy";
@@ -218,29 +223,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	protected String displayColumnName = "";
 
 	/**
-	 * String typed by user into combobox
-	 */
-	protected String priorEditorText = "";
-
-	/**
 	 * Map of string/value pairings for the ComboBox (generally the text to be
 	 * display (SSListItem) and its corresponding primary key)
 	 */
 	protected EventList<SSListItem> eventList;
-
-	/**
-	 * @return the eventList
-	 */
-	public EventList<SSListItem> getEventList() {
-		return eventList;
-	}
-
-	/**
-	 * @param eventList the eventList to set
-	 */
-	public void setEventList(final EventList<SSListItem> eventList) {
-		this.eventList = eventList;
-	}
 
 	/**
 	 * counter for # times that execute() method is called - for testing
@@ -257,9 +243,24 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	protected boolean filterSwitch = true;
 
 	/**
-	 * Log4j Logger for component
+	 * Underlying database table primary key values corresponding to text displayed.
+	 * <p>
+	 * Note that mappings for the SSDBComboBox are Longs whereas in SSComboBox they
+	 * are Integers.
 	 */
-	private static Logger logger = LogManager.getLogger();
+	protected ArrayList<Long> mappings = null;
+
+	/**
+	 * Options to be displayed in the combobox (based on a query).
+	 */
+	protected ArrayList<String> options = null;
+
+	/**
+	 * The column name whose value is written back to the database when the user
+	 * chooses an item in the combo box. This is generally the PK of the table to
+	 * which a foreign key is mapped.
+	 */
+	protected String primaryKeyColumnName = "";
 
 	/**
 	 * True if inside a call to updateDisplay()
@@ -307,59 +308,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //    protected FilterFocusListener filterFocusListener = new FilterFocusListener();
 
 	/**
-	 * Underlying database table primary key values corresponding to text displayed.
-	 * <p>
-	 * Note that mappings for the SSDBComboBox are Longs whereas in SSComboBox they
-	 * are Integers.
+	 * String typed by user into combobox
 	 */
-	protected ArrayList<Long> mappings = null;
-
-	/**
-	 * Options to be displayed in the combobox (based on a query).
-	 */
-	protected ArrayList<String> options = null;
-
-	/**
-	 * @return the mappings
-	 */
-	public ArrayList<Long> getMappings() {
-		return mappings;
-	}
-
-	/**
-	 * @param mappings the mappings to set
-	 */
-	public void setMappings(final ArrayList<Long> mappings) {
-		this.mappings = mappings;
-	}
-
-	/**
-	 * @return the options
-	 */
-	public ArrayList<String> getOptions() {
-		return options;
-	}
-
-	/**
-	 * @param options the options to set
-	 */
-	public void setOptions(final ArrayList<String> options) {
-		this.options = options;
-	}
-
-	/**
-	 * The column name whose value is written back to the database when the user
-	 * chooses an item in the combo box. This is generally the PK of the table to
-	 * which a foreign key is mapped.
-	 */
-	protected String primaryKeyColumnName = "";
-
-	/**
-	 * @return the primaryKeyColumnName
-	 */
-	public String getPrimaryKeyColumnName() {
-		return primaryKeyColumnName;
-	}
+	protected String priorEditorText = "";
 
 	/**
 	 * Query used to populate combo box.
@@ -373,11 +324,22 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	protected String secondDisplayColumnName = null;
 
 	/**
+	 * SSListItem currently selected in combobox. Needed because GlazedList can cause getSelectedIndex()
+	 * to return -1 (while editing) or 0 (after selection is made from list subset)
+	 */
+	private SSListItem selectedItem = null;
+
+	/**
 	 * Alphanumeric separator used to separate values in multi-column comboboxes.
 	 * <p>
 	 * Changing from " - " to " | " for 2020 rewrite.
 	 */
 	protected String separator = " - ";
+
+	/**
+	 * Boolean to indicated that a call to setSelectedItem() is in progress.
+	 */
+	private boolean settingSelectedItem = false;
 
 	/**
 	 * Common fields shared across SwingSet components
@@ -388,17 +350,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * Component listener.
 	 */
 	protected final SSDBComboBoxListener ssDBComboBoxListener = new SSDBComboBoxListener();
-
-	/**
-	 * SSListItem currently selected in combobox. Needed because GlazedList can cause getSelectedIndex()
-	 * to return -1 (while editing) or 0 (after selection is made from list subset)
-	 */
-	private SSListItem selectedItem = null;
-
-	/**
-	 * Boolean to indicated that a call to setSelectedItem() is in progress.
-	 */
-	private boolean settingSelectedItem = false;
 
 	/**
 	 * Creates an object of the SSDBComboBox.
@@ -431,48 +382,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		setDisplayColumnName(_displayColumnName);
 		// init();
 	}
-
-//    /**
-//     * Sets the new SSRowSet for the combo box.
-//     *
-//     * @param _sSRowSet  SSRowSet to which the combo has to update values.
-//     */
-//    public void setSSRowSet(SSRowSet _sSRowSet) {
-//        SSRowSet oldValue = this.sSRowSet;
-//        this.sSRowSet = _sSRowSet;
-//        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
-//        bind();
-//    }
-
-//    /**
-//     * Returns the SSRowSet being used to get the values.
-//     *
-//     * @return returns the SSRowSet being used.
-//     */
-//    public SSRowSet getSSRowSet() {
-//        return this.sSRowSet;
-//    }
-
-//    /**
-//     * Sets the connection object to be used.
-//     *
-//     * @param _sSConnection    connection object used for database.
-//     */
-//    public void setSSConnection(SSConnection _sSConnection) {
-//        SSConnection oldValue = this.sSConnection;
-//        this.sSConnection = _sSConnection;
-//        firePropertyChange("sSConnection", oldValue, this.sSConnection);
-//        bind();
-//    }
-
-//    /**
-//     * Returns connection object used to get values from database.
-//     *
-//     * @return returns a SSConnection object.
-//     */
-//    public SSConnection getSSConnection() {
-//        return this.sSConnection;
-//    }
 
 	/**
 	 * Adds an item to the existing list of items in the combo box.
@@ -515,36 +424,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 // TODO Determine if any change is needed to actually add item to combobox.
 
 	}
-
-//	/**
-//	 * Adds listeners for Component, RowSet, Keyboard, and PopupMenu
-//	 */
-//	public void addListeners() {
-//		SSComponentInterface.super.addListeners();
-//		// addKeyListener(this.myKeyListener);
-//		// addPopupMenuListener(this.myPopupMenuListener);
-//	}
-
-//    /**
-//     * Sets the column name for the combo box
-//     *
-//     * @param _columnName   name of column
-//     */
-//    public void setColumnName(String _columnName) {
-//        String oldValue = this.columnName;
-//        this.columnName = _columnName;
-//        firePropertyChange("columnName", oldValue, this.columnName);
-//        bind();
-//    }
-
-//    /**
-//     * Returns the column name to which the combo is bound.
-//     *
-//     * @return returns the column name to which to combo box is bound.
-//     */
-//    public String getColumnName() {
-//        return this.columnName;
-//    }
 
 	/**
 	 * Adds any necessary listeners for the current SwingSet component. These will
@@ -689,6 +568,48 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		}
 	}
 
+//    /**
+//     * Sets the new SSRowSet for the combo box.
+//     *
+//     * @param _sSRowSet  SSRowSet to which the combo has to update values.
+//     */
+//    public void setSSRowSet(SSRowSet _sSRowSet) {
+//        SSRowSet oldValue = this.sSRowSet;
+//        this.sSRowSet = _sSRowSet;
+//        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
+//        bind();
+//    }
+
+//    /**
+//     * Returns the SSRowSet being used to get the values.
+//     *
+//     * @return returns the SSRowSet being used.
+//     */
+//    public SSRowSet getSSRowSet() {
+//        return this.sSRowSet;
+//    }
+
+//    /**
+//     * Sets the connection object to be used.
+//     *
+//     * @param _sSConnection    connection object used for database.
+//     */
+//    public void setSSConnection(SSConnection _sSConnection) {
+//        SSConnection oldValue = this.sSConnection;
+//        this.sSConnection = _sSConnection;
+//        firePropertyChange("sSConnection", oldValue, this.sSConnection);
+//        bind();
+//    }
+
+//    /**
+//     * Returns connection object used to get values from database.
+//     *
+//     * @return returns a SSConnection object.
+//     */
+//    public SSConnection getSSConnection() {
+//        return this.sSConnection;
+//    }
+
 	/**
 	 * Returns the pattern in which dates have to be displayed
 	 *
@@ -698,6 +619,36 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		return dateFormat;
 	}
 
+//	/**
+//	 * Adds listeners for Component, RowSet, Keyboard, and PopupMenu
+//	 */
+//	public void addListeners() {
+//		SSComponentInterface.super.addListeners();
+//		// addKeyListener(this.myKeyListener);
+//		// addPopupMenuListener(this.myPopupMenuListener);
+//	}
+
+//    /**
+//     * Sets the column name for the combo box
+//     *
+//     * @param _columnName   name of column
+//     */
+//    public void setColumnName(String _columnName) {
+//        String oldValue = this.columnName;
+//        this.columnName = _columnName;
+//        firePropertyChange("columnName", oldValue, this.columnName);
+//        bind();
+//    }
+
+//    /**
+//     * Returns the column name to which the combo is bound.
+//     *
+//     * @return returns the column name to which to combo box is bound.
+//     */
+//    public String getColumnName() {
+//        return this.columnName;
+//    }
+
 	/**
 	 * Returns the column name whose values are displayed in the combo box.
 	 *
@@ -706,6 +657,13 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	public String getDisplayColumnName() {
 		return displayColumnName;
+	}
+
+	/**
+	 * @return the eventList
+	 */
+	public EventList<SSListItem> getEventList() {
+		return eventList;
 	}
 
 	/**
@@ -727,6 +685,13 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	}
 
 	/**
+	 * @return the mappings
+	 */
+	public ArrayList<Long> getMappings() {
+		return mappings;
+	}
+
+	/**
 	 * Returns the number of items present in the combo box.
 	 * <p>
 	 * This is a read-only bean property.
@@ -743,6 +708,20 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		}
 
 		return result;
+	}
+
+	/**
+	 * @return the options
+	 */
+	public ArrayList<String> getOptions() {
+		return options;
+	}
+
+	/**
+	 * @return the primaryKeyColumnName
+	 */
+	public String getPrimaryKeyColumnName() {
+		return primaryKeyColumnName;
 	}
 
 	/**
@@ -877,17 +856,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		return result;
 	}
 
-//    /**
-//     * Sets the currently selected value
-//     *
-//     * Currently not a bean property since there is no associated variable.
-//     *
-//     * @param _value    value to set as currently selected.
-//     */
-//    public void setSelectedValue(long _value) {
-//        this.textField.setText(String.valueOf(_value));
-//    }
-
 	/**
 	 * Returns the separator used when multiple columns are displayed
 	 *
@@ -896,36 +864,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	public String getSeparator() {
 		return separator;
 	}
-
-//    /**
-//     * Returns the bound key value of the currently selected item.
-//     *
-//     * Currently not a bean property since there is no associated variable.
-//     *
-//     * @return value corresponding to the selected item in the combo.
-//     *     return -1 if no item is selected.
-//     */
-//    public long getSelectedValue() {
-//
-//// TODO revisit returning -1 if nothing is selected as that could be a legitimate bound pk value (unlikely)
-//
-//    	long returnValue = -1;
-//
-//        int index = getSelectedIndex();
-//
-//        if (index == -1) {
-//            // NOTHING TO DO return -1;
-//        } else {
-//        	returnValue = comboMap.
-//        }
-//
-//        returnValue
-//		long returnVal =  Long.valueOf(this.selectorCBM.getSelectedBoundData(index).toString());
-//
-//
-//        return returnVal;
-//
-//    }
 
 	/**
 	 * Returns the separator used when multiple columns are displayed
@@ -948,6 +886,17 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	public SSCommon getSSCommon() {
 		return ssCommon;
 	}
+
+//    /**
+//     * Sets the currently selected value
+//     *
+//     * Currently not a bean property since there is no associated variable.
+//     *
+//     * @param _value    value to set as currently selected.
+//     */
+//    public void setSelectedValue(long _value) {
+//        this.textField.setText(String.valueOf(_value));
+//    }
 
 	/**
 	 * Converts the database column value into string. Only date columns are
@@ -980,6 +929,36 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		return strValue;
 
 	}
+
+//    /**
+//     * Returns the bound key value of the currently selected item.
+//     *
+//     * Currently not a bean property since there is no associated variable.
+//     *
+//     * @return value corresponding to the selected item in the combo.
+//     *     return -1 if no item is selected.
+//     */
+//    public long getSelectedValue() {
+//
+//// TODO revisit returning -1 if nothing is selected as that could be a legitimate bound pk value (unlikely)
+//
+//    	long returnValue = -1;
+//
+//        int index = getSelectedIndex();
+//
+//        if (index == -1) {
+//            // NOTHING TO DO return -1;
+//        } else {
+//        	returnValue = comboMap.
+//        }
+//
+//        returnValue
+//		long returnVal =  Long.valueOf(this.selectorCBM.getSelectedBoundData(index).toString());
+//
+//
+//        return returnVal;
+//
+//    }
 
 	/**
 	 * Populates the list model with the data by fetching it from the database.
@@ -1074,33 +1053,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		}
 	}
 
-//	/**
-//	 * Adds listeners for Component, RowSet, Keyboard, and PopupMenu
-//	 */
-//	public void removeListeners() {
-//		SSComponentInterface.super.removeListeners();
-//		// removeKeyListener(this.myKeyListener);
-//		// removePopupMenuListener(this.myPopupMenuListener);
-//	}
-
-//    /**
-//     * Sets the SSRowSet and column name to which the component is to be bound.
-//     *
-//     * @param _sSRowSet    datasource to be used.
-//     * @param _columnName    Name of the column to which this check box should be bound
-//     */
-//    public void bind(SSRowSet _sSRowSet, String _columnName) {
-//        SSRowSet oldValue = this.sSRowSet;
-//        this.sSRowSet = _sSRowSet;
-//        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
-//
-//        String oldValue2 = this.columnName;
-//        this.columnName = _columnName;
-//        firePropertyChange("columnName", oldValue2, this.columnName);
-//
-//        bind();
-//    }
-
 	/**
 	 * Removes any necessary listeners for the current SwingSet component. These
 	 * will trigger changes in the underlying RowSet column.
@@ -1135,6 +1087,40 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		firePropertyChange("displayColumnName", oldValue, displayColumnName);
 	}
 
+//	/**
+//	 * Adds listeners for Component, RowSet, Keyboard, and PopupMenu
+//	 */
+//	public void removeListeners() {
+//		SSComponentInterface.super.removeListeners();
+//		// removeKeyListener(this.myKeyListener);
+//		// removePopupMenuListener(this.myPopupMenuListener);
+//	}
+
+//    /**
+//     * Sets the SSRowSet and column name to which the component is to be bound.
+//     *
+//     * @param _sSRowSet    datasource to be used.
+//     * @param _columnName    Name of the column to which this check box should be bound
+//     */
+//    public void bind(SSRowSet _sSRowSet, String _columnName) {
+//        SSRowSet oldValue = this.sSRowSet;
+//        this.sSRowSet = _sSRowSet;
+//        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
+//
+//        String oldValue2 = this.columnName;
+//        this.columnName = _columnName;
+//        firePropertyChange("columnName", oldValue2, this.columnName);
+//
+//        bind();
+//    }
+
+	/**
+	 * @param eventList the eventList to set
+	 */
+	public void setEventList(final EventList<SSListItem> eventList) {
+		this.eventList = eventList;
+	}
+
 	/**
 	 * Method that sets the combo box to be filterable.
 	 * <p>
@@ -1148,6 +1134,20 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// TODO remove this method in future release
 		filterSwitch = _filter;
 		logger.warn(getColumnForLog() + ": This method has been Deprecated because GlazedList filtering is now fully integrated.\n" + Thread.currentThread().getStackTrace());
+	}
+
+	/**
+	 * @param mappings the mappings to set
+	 */
+	public void setMappings(final ArrayList<Long> mappings) {
+		this.mappings = mappings;
+	}
+
+	/**
+	 * @param options the options to set
+	 */
+	public void setOptions(final ArrayList<String> options) {
+		this.options = options;
 	}
 
 	/**
@@ -1259,36 +1259,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		final String oldValue = secondDisplayColumnName;
 		secondDisplayColumnName = _secondDisplayColumnName;
 		firePropertyChange("secondDisplayColumnName", oldValue, secondDisplayColumnName);
-	}
-
-	/**
-	 * Sets the currently selected value
-	 * <p>
-	 * Currently not a bean property since there is no associated variable.
-	 *
-	 * @param _value value to set as currently selected.
-	 */
-	public void setSelectedStringValue(final String _value) {
-
-		// ONLY NEED TO PROCEED IF THERE IS A CHANGE
-		// TODO consider firing a property change
-		if (_value != getSelectedItem()) {
-
-			// IF OPTIONS ARE NON-NULL THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
-			// SPECIFIED TEXT IS STORED
-			if (options != null) {
-				final int index = options.indexOf(_value);
-
-				if (index == -1) {
-					logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for display text of " + _value + ". Setting index to -1 (blank).");
-				}
-
-				setSelectedIndex(index);
-				//updateUI();
-			}
-
-		}
-
 	}
 
 	/**
@@ -1473,6 +1443,36 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //			currentEditorText = priorEditorText;
 //			updateUI(); // This refreshes the characters displayed.
 //		}
+
+	}
+
+	/**
+	 * Sets the currently selected value
+	 * <p>
+	 * Currently not a bean property since there is no associated variable.
+	 *
+	 * @param _value value to set as currently selected.
+	 */
+	public void setSelectedStringValue(final String _value) {
+
+		// ONLY NEED TO PROCEED IF THERE IS A CHANGE
+		// TODO consider firing a property change
+		if (_value != getSelectedItem()) {
+
+			// IF OPTIONS ARE NON-NULL THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
+			// SPECIFIED TEXT IS STORED
+			if (options != null) {
+				final int index = options.indexOf(_value);
+
+				if (index == -1) {
+					logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for display text of " + _value + ". Setting index to -1 (blank).");
+				}
+
+				setSelectedIndex(index);
+				//updateUI();
+			}
+
+		}
 
 	}
 

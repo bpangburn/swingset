@@ -187,6 +187,17 @@ public interface SSComponentInterface {
 	}
 
 	/**
+	 * Returns the JDBCType enum representing the bound database column data type.
+	 * <p>
+	 * Based on java.sql.JDBCType
+	 *
+	 * @return the enum value corresponding to the data type of the bound column
+	 */
+	default JDBCType getBoundColumnJDBCType() {
+		return getSSCommon().getBoundColumnJDBCType();
+	}
+
+	/**
 	 * Returns the database column name bound to the Swingset component
 	 *
 	 * @return the bound column name
@@ -215,17 +226,6 @@ public interface SSComponentInterface {
 	 */
 	default int getBoundColumnType() {
 		return getSSCommon().getBoundColumnType();
-	}
-
-	/**
-	 * Returns the JDBCType enum representing the bound database column data type.
-	 * <p>
-	 * Based on java.sql.JDBCType
-	 *
-	 * @return the enum value corresponding to the data type of the bound column
-	 */
-	default JDBCType getBoundColumnJDBCType() {
-		return getSSCommon().getBoundColumnJDBCType();
 	}
 
 	/**

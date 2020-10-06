@@ -179,6 +179,11 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	public static final int INCLUDE_EXCLUDE_OPTION = 2;
 
 	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+
+	/**
 	 * Predefined "male" option.
 	 */
 	public static final int MALE = 0;
@@ -257,11 +262,6 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * Common fields shared across SwingSet components
 	 */
 	protected SSCommon ssCommon;
-
-	/**
-	 * Log4j Logger for component
-	 */
-	private static Logger logger = LogManager.getLogger();
 
 //	/**
 //	 * Sets the SSRowSet column name to which the component is bound.

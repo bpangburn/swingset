@@ -197,6 +197,21 @@ public class SSSyncManager {
 	}
 
 	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+
+	/**
+	 * # of records to step back if doing a sequential search because SSDBComboBox and SSRowSet results don't match.
+	 */
+	protected static final int offsetToCheck = 7;
+
+	/**
+	 * # of records of overlap to check if SSDBComboBox and SSRowSet results don't match due to record additions/deletions.
+	 */
+	protected static final int overlapToCheck = 7;
+
+	/**
 	 * SSRowSet column used as basis for synchronization.
 	 */
 	protected String columnName;
@@ -225,21 +240,6 @@ public class SSSyncManager {
 	 * Listener on SSRowSet to detect data navigator-based navigations.
 	 */
 	protected final SyncRowSetListener rowsetListener = new SyncRowSetListener();
-
-	/**
-	 * Log4j Logger for component
-	 */
-	private static Logger logger = LogManager.getLogger();
-
-	/**
-	 * # of records to step back if doing a sequential search because SSDBComboBox and SSRowSet results don't match.
-	 */
-	protected static final int offsetToCheck = 7;
-
-	/**
-	 * # of records of overlap to check if SSDBComboBox and SSRowSet results don't match due to record additions/deletions.
-	 */
-	protected static final int overlapToCheck = 7;
 
 	/**
 	 * <p>

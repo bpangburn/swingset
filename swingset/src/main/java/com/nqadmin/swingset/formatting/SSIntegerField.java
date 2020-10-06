@@ -54,12 +54,12 @@ public class SSIntegerField extends SSFormattedTextField {
 	 */
 	private static final long serialVersionUID = -1820785941185499480L;
 
-	private int precision = 1;
-
 	/**
 	 * Holds value of property minimumIntegerDigits.
 	 */
 	private int minimumIntegerDigits;
+
+	private int precision = 1;
 
 	/**
 	 * Creates a new instance of PgIntegerField
@@ -88,25 +88,6 @@ public class SSIntegerField extends SSFormattedTextField {
 	}
 
 	/**
-	 * Returns the number of digits used for displaying integer
-	 *
-	 * @return returns the number of digits used for displaying integer
-	 */
-	public int getPrecision() {
-		return precision;
-	}
-
-	/**
-	 * Sets the number of digits needed to display the number
-	 *
-	 * @param _precision - number of digits to be used to display the number
-	 */
-	public void setPrecision(final int _precision) {
-		precision = _precision;
-		setFormatterFactory(new SSIntegerFormatterFactory(_precision));
-	}
-
-	/**
 	 * Getter for property minimumIntegerDigits.
 	 *
 	 * @return Value of property minimumIntegerDigits.
@@ -117,6 +98,15 @@ public class SSIntegerField extends SSFormattedTextField {
 	}
 
 	/**
+	 * Returns the number of digits used for displaying integer
+	 *
+	 * @return returns the number of digits used for displaying integer
+	 */
+	public int getPrecision() {
+		return precision;
+	}
+
+	/**
 	 * Setter for property minimumIntegerDigits.
 	 *
 	 * @param _minimumIntegerDigits New value of property minimumIntegerDigits.
@@ -124,6 +114,16 @@ public class SSIntegerField extends SSFormattedTextField {
 	public void setMinimumIntegerDigits(final int _minimumIntegerDigits) {
 
 		minimumIntegerDigits = _minimumIntegerDigits;
+	}
+
+	/**
+	 * Sets the number of digits needed to display the number
+	 *
+	 * @param _precision - number of digits to be used to display the number
+	 */
+	public void setPrecision(final int _precision) {
+		precision = _precision;
+		setFormatterFactory(new SSIntegerFormatterFactory(_precision));
 	}
 }
 

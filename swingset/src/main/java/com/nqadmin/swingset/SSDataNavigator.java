@@ -82,49 +82,50 @@ import com.nqadmin.swingset.utils.SSEnums.Navigation;
 public class SSDataNavigator extends JPanel {
 
 	/**
+	 * Adds the listeners on the SSRowSet used by data navigator.
+	 */
+	protected class SSDBNavRowSetListener implements RowSetListener {
+
+		@Override
+		public void cursorMoved(final RowSetEvent rse) {
+			// IF THERE ARE ROWS GET THE ROW COUNT
+			try {
+				updateNavigator();
+			} catch (final SQLException se) {
+				logger.error("SQL Exception.", se);
+			}
+		}
+
+		@Override
+		public void rowChanged(final RowSetEvent rse) {
+			// DO NOTHING
+		}
+
+		@Override
+		public void rowSetChanged(final RowSetEvent rse) {
+			// IF THERE ARE ROWS GET THE ROW COUNT
+			try {
+				sSRowSet.last();
+				rowCount = sSRowSet.getRow();
+				sSRowSet.first();
+				updateNavigator();
+			} catch (final SQLException se) {
+				logger.error("SQL Exception.", se);
+			}
+
+		}
+
+	}
+
+	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 3129669039062103212L;
-
-	/**
-	 * Button to navigate to the first record in the SSRowSet.
-	 */
-	protected JButton firstButton = new JButton();
-
-	/**
-	 * Button to navigate to the previous record in the SSRowSet.
-	 */
-	protected JButton previousButton = new JButton();
-
-	/**
-	 * Text field for viewing/changing the current record number.
-	 */
-	protected JTextField txtCurrentRow = new JTextField();
-
-	/**
-	 * Button to navigate to the next record in the SSRowSet.
-	 */
-	protected JButton nextButton = new JButton();
-
-	/**
-	 * Button to navigate to the last record in the SSRowSet.
-	 */
-	protected JButton lastButton = new JButton();
-
-	/**
-	 * Button to commit screen changes to the SSRowSet.
-	 */
-	protected JButton commitButton = new JButton(); // Commit button
-
-	/**
-	 * Button to revert screen changes based on the SSRowSet.
-	 */
-	protected JButton undoButton = new JButton();
-
-	/**
-	 * Button to refresh the screen based on any changes to the SSRowSet.
-	 */
-	protected JButton refreshButton = new JButton(); // REFRESH BUTTON
 
 	/**
 	 * Button to add a record to the SSRowSet.
@@ -132,9 +133,60 @@ public class SSDataNavigator extends JPanel {
 	protected JButton addButton = new JButton();
 
 	/**
+	 * Navigator button dimensions.
+	 */
+	protected Dimension buttonSize = new Dimension(40, 20);
+
+	/**
+	 * Indicator to cause the navigator to skip the execute() function call on the
+	 * specified SSRowSet. Must be false for MySQL (see FAQ).
+	 */
+	protected boolean callExecute = true;
+
+	/**
+	 * Button to commit screen changes to the SSRowSet.
+	 */
+	protected JButton commitButton = new JButton(); // Commit button
+
+	/**
+	 * Indicator to force confirmation of SSRowSet deletions.
+	 */
+	protected boolean confirmDeletes = true;
+
+	/**
+	 * Row number for current record in SSRowSet.
+	 */
+	protected int currentRow = 0;
+
+	/**
+	 * Container (frame or internal frame) which contains the navigator.
+	 */
+	protected SSDBNav dBNav = null;
+
+	/**
 	 * Button to delete the current record in the SSRowSet.
 	 */
 	protected JButton deleteButton = new JButton();
+
+	/**
+	 * Indicator to allow/disallow deletions from the SSRowSet.
+	 */
+	protected boolean deletion = true;
+
+	/**
+	 * Button to navigate to the first record in the SSRowSet.
+	 */
+	protected JButton firstButton = new JButton();
+
+	/**
+	 * Indicator to allow/disallow insertions to the SSRowSet.
+	 */
+	protected boolean insertion = true;
+
+	/**
+	 * Button to navigate to the last record in the SSRowSet.
+	 */
+	protected JButton lastButton = new JButton();
 
 	/**
 	 * Label to display the total number of records in the SSRowSet.
@@ -147,52 +199,6 @@ public class SSDataNavigator extends JPanel {
 	protected boolean modification = true;
 
 	/**
-	 * Indicator to allow/disallow deletions from the SSRowSet.
-	 */
-	protected boolean deletion = true;
-
-	/**
-	 * Indicator to allow/disallow insertions to the SSRowSet.
-	 */
-	protected boolean insertion = true;
-
-	/**
-	 * Indicator to force confirmation of SSRowSet deletions.
-	 */
-	protected boolean confirmDeletes = true;
-
-	/**
-	 * Indicator to cause the navigator to skip the execute() function call on the
-	 * specified SSRowSet. Must be false for MySQL (see FAQ).
-	 */
-	protected boolean callExecute = true;
-
-	/**
-	 * SSRowSet from which component will get/set values.
-	 */
-	protected SSRowSet sSRowSet = null;
-
-	/**
-	 * Container (frame or internal frame) which contains the navigator.
-	 */
-	protected SSDBNav dBNav = null;
-
-	/**
-	 * Number of rows in SSRowSet. Set to zero if next() method returns false.
-	 */
-	protected int rowCount = 0;
-
-	/**
-	 * Row number for current record in SSRowSet.
-	 */
-	protected int currentRow = 0;
-
-	/**
-	 * Indicator used to determine if a row is being inserted into the SSRowSet.
-	 */
-	protected boolean onInsertRow = false;
-
-	/**
 	 * SSDBComboBox used for navigation if applicable.
 	 * <p>
 	 * Allows Navigator to disable it when a row is inserted and enable it when that row is saved.
@@ -202,28 +208,44 @@ public class SSDataNavigator extends JPanel {
 	protected SSDBComboBox navCombo= null;
 
 	/**
-	 * Log4j Logger for component
+	 * Button to navigate to the next record in the SSRowSet.
 	 */
-	private static Logger logger = LogManager.getLogger();
+	protected JButton nextButton = new JButton();
 
 	/**
-	 * @return the navCombo
+	 * Indicator used to determine if a row is being inserted into the SSRowSet.
 	 */
-	public SSDBComboBox getNavCombo() {
-		return navCombo;
-	}
+	protected boolean onInsertRow = false;
 
 	/**
-	 * @param _navCombo the navCombo to set
+	 * Button to navigate to the previous record in the SSRowSet.
 	 */
-	public void setNavCombo(final SSDBComboBox _navCombo) {
-		navCombo = _navCombo;
-	}
+	protected JButton previousButton = new JButton();
 
 	/**
-	 * Navigator button dimensions.
+	 * Button to refresh the screen based on any changes to the SSRowSet.
 	 */
-	protected Dimension buttonSize = new Dimension(40, 20);
+	protected JButton refreshButton = new JButton(); // REFRESH BUTTON
+
+	/**
+	 * Number of rows in SSRowSet. Set to zero if next() method returns false.
+	 */
+	protected int rowCount = 0;
+
+	/**
+	 * SSRowSet from which component will get/set values.
+	 */
+	protected SSRowSet sSRowSet = null;
+
+	/**
+	 * Listener on the SSRowSet used by data navigator.
+	 */
+	protected final SSDBNavRowSetListener sSRowSetListener = new SSDBNavRowSetListener();
+
+	/**
+	 * Text field for viewing/changing the current record number.
+	 */
+	protected JTextField txtCurrentRow = new JTextField();
 
 	/**
 	 * Current record text field dimensions.
@@ -231,9 +253,9 @@ public class SSDataNavigator extends JPanel {
 	protected Dimension txtFieldSize = new Dimension(65, 20);
 
 	/**
-	 * Listener on the SSRowSet used by data navigator.
+	 * Button to revert screen changes based on the SSRowSet.
 	 */
-	protected final SSDBNavRowSetListener sSRowSetListener = new SSDBNavRowSetListener();
+	protected JButton undoButton = new JButton();
 
 	/**
 	 * Creates a object of SSDataNavigator. Note: you have to set the SSRowSet
@@ -270,503 +292,6 @@ public class SSDataNavigator extends JPanel {
 		addToolTips();
 		createPanel();
 		addListeners();
-	}
-
-	/**
-	 * Returns true if the SSRowSet contains one or more rows, else false.
-	 *
-	 * @return return true if SSRowSet contains data else false.
-	 */
-	public boolean containsRows() {
-
-		if (rowCount == 0) {
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Method to cause the navigator to skip the execute() function call on the
-	 * underlying SSRowSet. This is necessary for MySQL (see FAQ).
-	 *
-	 * @param _callExecute false if using MySQL database - otherwise true
-	 */
-	public void setCallExecute(final boolean _callExecute) {
-		final boolean oldValue = callExecute;
-		callExecute = _callExecute;
-		firePropertyChange("callExecute", oldValue, callExecute);
-	}
-
-	/**
-	 * Indicates if the navigator will skip the execute function call on the
-	 * underlying SSRowSet (needed for MySQL - see FAQ).
-	 *
-	 * @return value of execute() indicator
-	 */
-	public boolean getCallExecute() {
-		return callExecute;
-	}
-
-	/**
-	 * Sets the preferredSize and the MinimumSize of the buttons to the specified
-	 * size
-	 *
-	 * @param _buttonSize the required dimension of the buttons
-	 */
-	public void setButtonSize(final Dimension _buttonSize) {
-		final Dimension oldValue = buttonSize;
-		buttonSize = _buttonSize;
-		firePropertyChange("buttonSize", oldValue, buttonSize);
-		setButtonSizes();
-	}
-
-	/**
-	 * Returns the size of buttons on the data navigator.
-	 *
-	 * @return returns a Dimension object representing the size of each button on
-	 *         the data navigator.
-	 */
-	public Dimension getButtonSize() {
-		return buttonSize;
-	}
-
-	/**
-	 * Function that passes the implementation of the SSDBNav interface. This
-	 * interface can be implemented by the developer to perform custom actions when
-	 * the insert button is pressed
-	 *
-	 * @param _dBNav implementation of the SSDBNav interface
-	 */
-	public void setDBNav(final SSDBNav _dBNav) {
-		final SSDBNav oldValue = dBNav;
-		dBNav = _dBNav;
-		firePropertyChange("dBNav", oldValue, dBNav);
-	}
-
-	/**
-	 * Returns any custom implementation of the SSDBNav interface, which is used
-	 * when the insert button is pressed to perform custom actions.
-	 *
-	 * @return any custom implementation of the SSDBNav interface
-	 */
-	public SSDBNav getDBNav() {
-		return dBNav;
-	}
-
-	/**
-	 * Enables or disables the modification-related buttons on the SSDataNavigator.
-	 * If the user can only navigate through the records with out making any changes
-	 * set this to false. By default, the modification-related buttons are enabled.
-	 *
-	 * @param _modification indicates whether or not the modification-related
-	 *                      buttons are enabled.
-	 */
-	public void setModification(final boolean _modification) {
-		final boolean oldValue = modification;
-		modification = _modification;
-		firePropertyChange("modification", oldValue, modification);
-
-		if (!modification) {
-			commitButton.setEnabled(false);
-			undoButton.setEnabled(false);
-			addButton.setEnabled(false);
-			deleteButton.setEnabled(false);
-		} else {
-			commitButton.setEnabled(true);
-			undoButton.setEnabled(true);
-			addButton.setEnabled(true);
-			deleteButton.setEnabled(true);
-		}
-	}
-
-	/**
-	 * Returns true if the user can modify the data in the SSRowSet, else false.
-	 *
-	 * @return returns true if the user modifications are written back to the
-	 *         database, else false.
-	 */
-	public boolean getModification() {
-		return modification;
-	}
-
-	/**
-	 * Enables or disables the row deletion button. This method should be used if
-	 * row deletions are not allowed. True by default.
-	 *
-	 * @param _deletion indicates whether or not to allow deletions
-	 */
-	public void setDeletion(final boolean _deletion) {
-		final boolean oldValue = deletion;
-		deletion = _deletion;
-		firePropertyChange("deletion", oldValue, deletion);
-
-		if (!deletion) {
-			deleteButton.setEnabled(false);
-		} else {
-			deleteButton.setEnabled(true);
-		}
-	}
-
-	/**
-	 * Returns true if deletions are allowed, else false.
-	 *
-	 * @return returns true if deletions are allowed, else false.
-	 */
-	public boolean getDeletion() {
-		return deletion;
-	}
-
-	/**
-	 * Enables or disables the row insertion button. This method should be used if
-	 * row insertions are not allowed. True by default.
-	 *
-	 * @param _insertion indicates whether or not to allow insertions
-	 */
-	public void setInsertion(final boolean _insertion) {
-		final boolean oldValue = insertion;
-		insertion = _insertion;
-		firePropertyChange("insertion", oldValue, insertion);
-
-		if (!insertion) {
-			addButton.setEnabled(false);
-		} else {
-			addButton.setEnabled(true);
-		}
-	}
-
-	/**
-	 * Returns true if insertions are allowed, else false.
-	 *
-	 * @return returns true if insertions are allowed, else false.
-	 */
-	public boolean getInsertion() {
-		return insertion;
-	}
-
-	/**
-	 * Sets the confirm deletion indicator. If set to true, every time delete button
-	 * is pressed, the navigator pops up a confirmation dialog to the user. Default
-	 * value is true.
-	 *
-	 * @param _confirmDeletes indicates whether or not to confirm deletions
-	 */
-	public void setConfirmDeletes(final boolean _confirmDeletes) {
-		final boolean oldValue = confirmDeletes;
-		confirmDeletes = _confirmDeletes;
-		firePropertyChange("confirmDeletes", oldValue, confirmDeletes);
-	}
-
-	/**
-	 * Returns true if deletions must be confirmed by user, else false.
-	 *
-	 * @return returns true if a confirmation dialog is displayed when the user
-	 *         deletes a record, else false.
-	 */
-	public boolean getConfirmDeletes() {
-		return confirmDeletes;
-	}
-
-	/**
-	 * This method changes the SSRowSet to which the navigator is bound. The
-	 * execute() and next() methods MUST be called on the SSRowSet before you set
-	 * the SSRowSet for the SSDataNavigator.
-	 *
-	 * @param _sSRowSet a SSRowSet object to which the navigator will be bound
-	 */
-	public void setSSRowSet(final SSRowSet _sSRowSet) {
-		// RESET INSERT FLAG THIS IS NEED IF USERS LEFT THE LAST ROWSET IN INSERTION
-		// MODE
-		// WITH OUT SAVING THE RECORD OR UNDOING THE INSERTION
-		onInsertRow = false;
-
-		if (sSRowSet != null) {
-			sSRowSet.removeRowSetListener(sSRowSetListener);
-		}
-
-		final SSRowSet oldValue = sSRowSet;
-		sSRowSet = _sSRowSet;
-		firePropertyChange("sSRowSet", oldValue, sSRowSet);
-
-		// SEE IF THERE ARE ANY ROWS IN THE GIVEN SSROWSET
-		try {
-			if (callExecute) {
-				sSRowSet.execute();
-			}
-
-			if (!sSRowSet.next()) {
-				rowCount = 0;
-				currentRow = 0;
-			} else {
-				// IF THERE ARE ROWS GET THE ROW COUNT
-				sSRowSet.last();
-				rowCount = sSRowSet.getRow();
-				sSRowSet.first();
-				currentRow = sSRowSet.getRow();
-			}
-			// SET THE ROW COUNT AS LABEL
-			lblRowCount.setText("of " + rowCount);
-			txtCurrentRow.setText(String.valueOf(currentRow));
-
-			sSRowSet.addRowSetListener(sSRowSetListener);
-		} catch (final SQLException se) {
-			logger.error("SQL Exception.", se);
-		}
-
-		// IF NO ROWS ARE PRESENT DISABLE NAVIGATION
-		// ELSE ENABLE THEN ELSE IS USEFUL WHEN THE SSROWSET IS CHNAGED
-		// IF THE INITIAL SSROWSET HAS ZERO ROWS NEXT IF THE USER SETS A NEW SSROWSET
-		// THEN THE BUTTONS HAVE TO BE ENABLED
-		if (rowCount == 0) {
-			firstButton.setEnabled(false);
-			previousButton.setEnabled(false);
-			nextButton.setEnabled(false);
-			lastButton.setEnabled(false);
-		} else {
-			firstButton.setEnabled(true);
-			previousButton.setEnabled(true);
-			nextButton.setEnabled(true);
-			lastButton.setEnabled(true);
-		}
-
-		try {
-			if (sSRowSet.isLast()) {
-				nextButton.setEnabled(false);
-				lastButton.setEnabled(false);
-			}
-			if (sSRowSet.isFirst()) {
-				firstButton.setEnabled(false);
-				previousButton.setEnabled(false);
-			}
-
-		} catch (final SQLException se) {
-			logger.error("SQL Exception.", se);
-		}
-
-		// ENABLE OTHER BUTTONS IF NEED BE.
-
-		// THIS IS NEEDED TO HANDLE USER LEAVING THE SCREEN IN AN INCONSISTENT
-		// STATE EXAMPLE: USER CLICKS ADD BUTTON, THIS DISABLES ALL THE BUTTONS
-		// EXCEPT COMMIT & UNDO. WITH OUT COMMITING OR UNDOING THE ADD USER
-		// CLOSES THE SCREEN. NOW IF THE SCREEN IS OPENED WITH A NEW SSROWSET.
-		// THE REFRESH, ADD & DELETE WILL BE DISABLED.
-		// 2019-11-11: only enabling add/delete if this.modification==true
-		refreshButton.setEnabled(true);
-		if (insertion && modification) {
-			addButton.setEnabled(true);
-		}
-		if (deletion && modification) {
-			deleteButton.setEnabled(true);
-		}
-	}
-
-	/**
-	 * Returns the SSRowSet being used.
-	 *
-	 * @return returns the SSRowSet being used.
-	 */
-	public SSRowSet getSSRowSet() {
-		return sSRowSet;
-	}
-
-	/**
-	 * Writes the present row back to the SSRowSet. This is done automatically when
-	 * any navigation takes place, but can also be called manually.
-	 *
-	 * @return returns true if update succeeds else false.
-	 */
-	public boolean updatePresentRow() {
-		if (onInsertRow || (currentRow > 0)) {
-			doCommitButtonClick();
-		}
-
-		return true;
-	}
-
-	/**
-	 * Calls the doClick on First Button.
-	 */
-	public void doFirstButtonClick() {
-		firstButton.doClick();
-	}
-
-	/**
-	 * Calls the doClick on Previous Button.
-	 */
-	public void doPreviousButtonClick() {
-		previousButton.doClick();
-	}
-
-	/**
-	 * Calls the doClick on Next Button.
-	 */
-	public void doNextButtonClick() {
-		nextButton.doClick();
-	}
-
-	/**
-	 * Calls the doClick on Last Button.
-	 */
-	public void doLastButtonClick() {
-		lastButton.doClick();
-	}
-
-	/**
-	 * Calls the doClick on Refresh Button.
-	 */
-	public void doRefreshButtonClick() {
-		refreshButton.doClick();
-	}
-
-	/**
-	 * Calls the doClick on Commit Button.
-	 */
-	public void doCommitButtonClick() {
-		commitButton.doClick();
-	}
-
-	/**
-	 * Calls the doClick on Undo Button.
-	 */
-	public void doUndoButtonClick() {
-		undoButton.doClick();
-	}
-
-	/**
-	 * Calls the doClick on Add Button.
-	 */
-	public void doAddButtonClick() {
-		addButton.doClick();
-	}
-
-	/**
-	 * Calls the doClick on Delete Button.
-	 */
-	public void doDeleteButtonClick() {
-		deleteButton.doClick();
-	}
-
-	/**
-	 * Method to add tooltips and button graphics (or text) to navigator components.
-	 */
-	protected void addToolTips() {
-
-		try {
-			final ClassLoader cl = this.getClass().getClassLoader();
-			firstButton.setIcon(new ImageIcon(cl.getResource("images/first.gif")));
-			previousButton.setIcon(new ImageIcon(cl.getResource("images/prev.gif")));
-			nextButton.setIcon(new ImageIcon(cl.getResource("images/next.gif")));
-			lastButton.setIcon(new ImageIcon(cl.getResource("images/last.gif")));
-			commitButton.setIcon(new ImageIcon(cl.getResource("images/commit.gif")));
-			undoButton.setIcon(new ImageIcon(cl.getResource("images/undo.gif")));
-			refreshButton.setIcon(new ImageIcon(cl.getResource("images/refresh.gif")));
-			addButton.setIcon(new ImageIcon(cl.getResource("images/add.gif")));
-			deleteButton.setIcon(new ImageIcon(cl.getResource("images/delete.gif")));
-		} catch (final Exception e) {
-			firstButton.setText("<<");
-			previousButton.setText("<");
-			nextButton.setText(">");
-			lastButton.setText(">>");
-			commitButton.setText("Commit");
-			undoButton.setText("Undo");
-			refreshButton.setText("Refresh");
-			addButton.setText("Add");
-			deleteButton.setText("Delete");
-			logger.warn("Unable to load images for navigator buttons.", e);
-		}
-
-		// SET TOOL TIPS FOR THE BUTTONS
-		firstButton.setToolTipText("First");
-		previousButton.setToolTipText("Previous");
-		nextButton.setToolTipText("Next");
-		lastButton.setToolTipText("Last");
-		commitButton.setToolTipText("Commit");
-		undoButton.setToolTipText("Undo");
-		refreshButton.setToolTipText("Refresh");
-		addButton.setToolTipText("Add Record");
-		deleteButton.setToolTipText("Delete Record");
-
-	} // end protected void addToolTips() {
-
-	/**
-	 * This will make all the components in the navigator to either focusable
-	 * components or non focusable components. Set to false if you don't want any of
-	 * the buttons or text fields in the navigator to receive the focus else true.
-	 * The default value is true.
-	 *
-	 * @param focusable - false if you don't want the navigator to receive focus
-	 *                  else false.
-	 */
-	@Override
-	public void setFocusable(final boolean focusable) {
-		// MAKE THE BUTTONS NON FOCUSABLE IF REQUESTED
-		firstButton.setFocusable(focusable);
-		previousButton.setFocusable(focusable);
-		nextButton.setFocusable(focusable);
-		lastButton.setFocusable(focusable);
-		commitButton.setFocusable(focusable);
-		undoButton.setFocusable(focusable);
-		refreshButton.setFocusable(focusable);
-		addButton.setFocusable(focusable);
-		deleteButton.setFocusable(focusable);
-		txtCurrentRow.setFocusable(focusable);
-	}
-
-	/**
-	 * Sets the dimensions for the navigator components.
-	 */
-	protected void setButtonSizes() {
-
-		// SET THE PREFERRED SIZES
-		firstButton.setPreferredSize(buttonSize);
-		previousButton.setPreferredSize(buttonSize);
-		nextButton.setPreferredSize(buttonSize);
-		lastButton.setPreferredSize(buttonSize);
-		commitButton.setPreferredSize(buttonSize);
-		undoButton.setPreferredSize(buttonSize);
-		refreshButton.setPreferredSize(buttonSize);
-		addButton.setPreferredSize(buttonSize);
-		deleteButton.setPreferredSize(buttonSize);
-		txtCurrentRow.setPreferredSize(txtFieldSize);
-		lblRowCount.setPreferredSize(txtFieldSize);
-		lblRowCount.setHorizontalAlignment(SwingConstants.CENTER);
-
-		// SET MINIMUM BUTTON SIZES
-		firstButton.setMinimumSize(buttonSize);
-		previousButton.setMinimumSize(buttonSize);
-		nextButton.setMinimumSize(buttonSize);
-		lastButton.setMinimumSize(buttonSize);
-		commitButton.setMinimumSize(buttonSize);
-		undoButton.setMinimumSize(buttonSize);
-		refreshButton.setMinimumSize(buttonSize);
-		addButton.setMinimumSize(buttonSize);
-		deleteButton.setMinimumSize(buttonSize);
-		txtCurrentRow.setMinimumSize(txtFieldSize);
-		lblRowCount.setMinimumSize(txtFieldSize);
-	}
-
-	/**
-	 * Adds the navigator components to the navigator panel.
-	 */
-	protected void createPanel() {
-
-		setButtonSizes();
-		// SET THE BOX LAYOUT
-		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-
-		// ADD BUTTONS TO THE PANEL
-		add(firstButton);
-		add(previousButton);
-		add(txtCurrentRow);
-		add(nextButton);
-		add(lastButton);
-		add(commitButton);
-		add(undoButton);
-		add(refreshButton);
-		add(addButton);
-		add(deleteButton);
-		add(lblRowCount);
-		// pack();
 	}
 
 	/**
@@ -1263,40 +788,527 @@ public class SSDataNavigator extends JPanel {
 	}
 
 	/**
-	 * Adds the listeners on the SSRowSet used by data navigator.
+	 * Method to add tooltips and button graphics (or text) to navigator components.
 	 */
-	protected class SSDBNavRowSetListener implements RowSetListener {
+	protected void addToolTips() {
 
-		@Override
-		public void cursorMoved(final RowSetEvent rse) {
-			// IF THERE ARE ROWS GET THE ROW COUNT
-			try {
-				updateNavigator();
-			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+		try {
+			final ClassLoader cl = this.getClass().getClassLoader();
+			firstButton.setIcon(new ImageIcon(cl.getResource("images/first.gif")));
+			previousButton.setIcon(new ImageIcon(cl.getResource("images/prev.gif")));
+			nextButton.setIcon(new ImageIcon(cl.getResource("images/next.gif")));
+			lastButton.setIcon(new ImageIcon(cl.getResource("images/last.gif")));
+			commitButton.setIcon(new ImageIcon(cl.getResource("images/commit.gif")));
+			undoButton.setIcon(new ImageIcon(cl.getResource("images/undo.gif")));
+			refreshButton.setIcon(new ImageIcon(cl.getResource("images/refresh.gif")));
+			addButton.setIcon(new ImageIcon(cl.getResource("images/add.gif")));
+			deleteButton.setIcon(new ImageIcon(cl.getResource("images/delete.gif")));
+		} catch (final Exception e) {
+			firstButton.setText("<<");
+			previousButton.setText("<");
+			nextButton.setText(">");
+			lastButton.setText(">>");
+			commitButton.setText("Commit");
+			undoButton.setText("Undo");
+			refreshButton.setText("Refresh");
+			addButton.setText("Add");
+			deleteButton.setText("Delete");
+			logger.warn("Unable to load images for navigator buttons.", e);
+		}
+
+		// SET TOOL TIPS FOR THE BUTTONS
+		firstButton.setToolTipText("First");
+		previousButton.setToolTipText("Previous");
+		nextButton.setToolTipText("Next");
+		lastButton.setToolTipText("Last");
+		commitButton.setToolTipText("Commit");
+		undoButton.setToolTipText("Undo");
+		refreshButton.setToolTipText("Refresh");
+		addButton.setToolTipText("Add Record");
+		deleteButton.setToolTipText("Delete Record");
+
+	} // end protected void addToolTips() {
+
+	/**
+	 * Returns true if the SSRowSet contains one or more rows, else false.
+	 *
+	 * @return return true if SSRowSet contains data else false.
+	 */
+	public boolean containsRows() {
+
+		if (rowCount == 0) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Adds the navigator components to the navigator panel.
+	 */
+	protected void createPanel() {
+
+		setButtonSizes();
+		// SET THE BOX LAYOUT
+		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+
+		// ADD BUTTONS TO THE PANEL
+		add(firstButton);
+		add(previousButton);
+		add(txtCurrentRow);
+		add(nextButton);
+		add(lastButton);
+		add(commitButton);
+		add(undoButton);
+		add(refreshButton);
+		add(addButton);
+		add(deleteButton);
+		add(lblRowCount);
+		// pack();
+	}
+
+	/**
+	 * Calls the doClick on Add Button.
+	 */
+	public void doAddButtonClick() {
+		addButton.doClick();
+	}
+
+	/**
+	 * Calls the doClick on Commit Button.
+	 */
+	public void doCommitButtonClick() {
+		commitButton.doClick();
+	}
+
+	/**
+	 * Calls the doClick on Delete Button.
+	 */
+	public void doDeleteButtonClick() {
+		deleteButton.doClick();
+	}
+
+	/**
+	 * Calls the doClick on First Button.
+	 */
+	public void doFirstButtonClick() {
+		firstButton.doClick();
+	}
+
+	/**
+	 * Calls the doClick on Last Button.
+	 */
+	public void doLastButtonClick() {
+		lastButton.doClick();
+	}
+
+	/**
+	 * Calls the doClick on Next Button.
+	 */
+	public void doNextButtonClick() {
+		nextButton.doClick();
+	}
+
+	/**
+	 * Calls the doClick on Previous Button.
+	 */
+	public void doPreviousButtonClick() {
+		previousButton.doClick();
+	}
+
+	/**
+	 * Calls the doClick on Refresh Button.
+	 */
+	public void doRefreshButtonClick() {
+		refreshButton.doClick();
+	}
+
+	/**
+	 * Calls the doClick on Undo Button.
+	 */
+	public void doUndoButtonClick() {
+		undoButton.doClick();
+	}
+
+	/**
+	 * Returns the size of buttons on the data navigator.
+	 *
+	 * @return returns a Dimension object representing the size of each button on
+	 *         the data navigator.
+	 */
+	public Dimension getButtonSize() {
+		return buttonSize;
+	}
+
+	/**
+	 * Indicates if the navigator will skip the execute function call on the
+	 * underlying SSRowSet (needed for MySQL - see FAQ).
+	 *
+	 * @return value of execute() indicator
+	 */
+	public boolean getCallExecute() {
+		return callExecute;
+	}
+
+	/**
+	 * Returns true if deletions must be confirmed by user, else false.
+	 *
+	 * @return returns true if a confirmation dialog is displayed when the user
+	 *         deletes a record, else false.
+	 */
+	public boolean getConfirmDeletes() {
+		return confirmDeletes;
+	}
+
+	/**
+	 * Returns any custom implementation of the SSDBNav interface, which is used
+	 * when the insert button is pressed to perform custom actions.
+	 *
+	 * @return any custom implementation of the SSDBNav interface
+	 */
+	public SSDBNav getDBNav() {
+		return dBNav;
+	}
+
+	/**
+	 * Returns true if deletions are allowed, else false.
+	 *
+	 * @return returns true if deletions are allowed, else false.
+	 */
+	public boolean getDeletion() {
+		return deletion;
+	}
+
+	/**
+	 * Returns true if insertions are allowed, else false.
+	 *
+	 * @return returns true if insertions are allowed, else false.
+	 */
+	public boolean getInsertion() {
+		return insertion;
+	}
+
+	/**
+	 * Returns true if the user can modify the data in the SSRowSet, else false.
+	 *
+	 * @return returns true if the user modifications are written back to the
+	 *         database, else false.
+	 */
+	public boolean getModification() {
+		return modification;
+	}
+
+	/**
+	 * @return the navCombo
+	 */
+	public SSDBComboBox getNavCombo() {
+		return navCombo;
+	}
+
+	/**
+	 * Returns the SSRowSet being used.
+	 *
+	 * @return returns the SSRowSet being used.
+	 *
+	 * @deprecated Use {@link #getSSRowSet()} instead.
+	 */
+	@Deprecated
+	public SSRowSet getRowSet() {
+		return sSRowSet;
+	}
+
+	/**
+	 * Returns the SSRowSet being used.
+	 *
+	 * @return returns the SSRowSet being used.
+	 */
+	public SSRowSet getSSRowSet() {
+		return sSRowSet;
+	}
+
+	/**
+	 * Sets the preferredSize and the MinimumSize of the buttons to the specified
+	 * size
+	 *
+	 * @param _buttonSize the required dimension of the buttons
+	 */
+	public void setButtonSize(final Dimension _buttonSize) {
+		final Dimension oldValue = buttonSize;
+		buttonSize = _buttonSize;
+		firePropertyChange("buttonSize", oldValue, buttonSize);
+		setButtonSizes();
+	}
+
+	/**
+	 * Sets the dimensions for the navigator components.
+	 */
+	protected void setButtonSizes() {
+
+		// SET THE PREFERRED SIZES
+		firstButton.setPreferredSize(buttonSize);
+		previousButton.setPreferredSize(buttonSize);
+		nextButton.setPreferredSize(buttonSize);
+		lastButton.setPreferredSize(buttonSize);
+		commitButton.setPreferredSize(buttonSize);
+		undoButton.setPreferredSize(buttonSize);
+		refreshButton.setPreferredSize(buttonSize);
+		addButton.setPreferredSize(buttonSize);
+		deleteButton.setPreferredSize(buttonSize);
+		txtCurrentRow.setPreferredSize(txtFieldSize);
+		lblRowCount.setPreferredSize(txtFieldSize);
+		lblRowCount.setHorizontalAlignment(SwingConstants.CENTER);
+
+		// SET MINIMUM BUTTON SIZES
+		firstButton.setMinimumSize(buttonSize);
+		previousButton.setMinimumSize(buttonSize);
+		nextButton.setMinimumSize(buttonSize);
+		lastButton.setMinimumSize(buttonSize);
+		commitButton.setMinimumSize(buttonSize);
+		undoButton.setMinimumSize(buttonSize);
+		refreshButton.setMinimumSize(buttonSize);
+		addButton.setMinimumSize(buttonSize);
+		deleteButton.setMinimumSize(buttonSize);
+		txtCurrentRow.setMinimumSize(txtFieldSize);
+		lblRowCount.setMinimumSize(txtFieldSize);
+	}
+
+	/**
+	 * Method to cause the navigator to skip the execute() function call on the
+	 * underlying SSRowSet. This is necessary for MySQL (see FAQ).
+	 *
+	 * @param _callExecute false if using MySQL database - otherwise true
+	 */
+	public void setCallExecute(final boolean _callExecute) {
+		final boolean oldValue = callExecute;
+		callExecute = _callExecute;
+		firePropertyChange("callExecute", oldValue, callExecute);
+	}
+
+	/**
+	 * Sets the confirm deletion indicator. If set to true, every time delete button
+	 * is pressed, the navigator pops up a confirmation dialog to the user. Default
+	 * value is true.
+	 *
+	 * @param _confirmDeletes indicates whether or not to confirm deletions
+	 */
+	public void setConfirmDeletes(final boolean _confirmDeletes) {
+		final boolean oldValue = confirmDeletes;
+		confirmDeletes = _confirmDeletes;
+		firePropertyChange("confirmDeletes", oldValue, confirmDeletes);
+	}
+
+	/**
+	 * Function that passes the implementation of the SSDBNav interface. This
+	 * interface can be implemented by the developer to perform custom actions when
+	 * the insert button is pressed
+	 *
+	 * @param _dBNav implementation of the SSDBNav interface
+	 */
+	public void setDBNav(final SSDBNav _dBNav) {
+		final SSDBNav oldValue = dBNav;
+		dBNav = _dBNav;
+		firePropertyChange("dBNav", oldValue, dBNav);
+	}
+
+	/**
+	 * Enables or disables the row deletion button. This method should be used if
+	 * row deletions are not allowed. True by default.
+	 *
+	 * @param _deletion indicates whether or not to allow deletions
+	 */
+	public void setDeletion(final boolean _deletion) {
+		final boolean oldValue = deletion;
+		deletion = _deletion;
+		firePropertyChange("deletion", oldValue, deletion);
+
+		if (!deletion) {
+			deleteButton.setEnabled(false);
+		} else {
+			deleteButton.setEnabled(true);
+		}
+	}
+
+	/**
+	 * This will make all the components in the navigator to either focusable
+	 * components or non focusable components. Set to false if you don't want any of
+	 * the buttons or text fields in the navigator to receive the focus else true.
+	 * The default value is true.
+	 *
+	 * @param focusable - false if you don't want the navigator to receive focus
+	 *                  else false.
+	 */
+	@Override
+	public void setFocusable(final boolean focusable) {
+		// MAKE THE BUTTONS NON FOCUSABLE IF REQUESTED
+		firstButton.setFocusable(focusable);
+		previousButton.setFocusable(focusable);
+		nextButton.setFocusable(focusable);
+		lastButton.setFocusable(focusable);
+		commitButton.setFocusable(focusable);
+		undoButton.setFocusable(focusable);
+		refreshButton.setFocusable(focusable);
+		addButton.setFocusable(focusable);
+		deleteButton.setFocusable(focusable);
+		txtCurrentRow.setFocusable(focusable);
+	}
+
+	/**
+	 * Enables or disables the row insertion button. This method should be used if
+	 * row insertions are not allowed. True by default.
+	 *
+	 * @param _insertion indicates whether or not to allow insertions
+	 */
+	public void setInsertion(final boolean _insertion) {
+		final boolean oldValue = insertion;
+		insertion = _insertion;
+		firePropertyChange("insertion", oldValue, insertion);
+
+		if (!insertion) {
+			addButton.setEnabled(false);
+		} else {
+			addButton.setEnabled(true);
+		}
+	}
+
+	/**
+	 * Enables or disables the modification-related buttons on the SSDataNavigator.
+	 * If the user can only navigate through the records with out making any changes
+	 * set this to false. By default, the modification-related buttons are enabled.
+	 *
+	 * @param _modification indicates whether or not the modification-related
+	 *                      buttons are enabled.
+	 */
+	public void setModification(final boolean _modification) {
+		final boolean oldValue = modification;
+		modification = _modification;
+		firePropertyChange("modification", oldValue, modification);
+
+		if (!modification) {
+			commitButton.setEnabled(false);
+			undoButton.setEnabled(false);
+			addButton.setEnabled(false);
+			deleteButton.setEnabled(false);
+		} else {
+			commitButton.setEnabled(true);
+			undoButton.setEnabled(true);
+			addButton.setEnabled(true);
+			deleteButton.setEnabled(true);
+		}
+	}
+
+	/**
+	 * @param _navCombo the navCombo to set
+	 */
+	public void setNavCombo(final SSDBComboBox _navCombo) {
+		navCombo = _navCombo;
+	}
+
+	/**
+	 * Sets the new SSRowSet for the combo box.
+	 *
+	 * @param _sSRowSet SSRowSet to which the combo has to update values.
+	 *
+	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
+	 */
+	@Deprecated
+	public void setRowSet(final SSRowSet _sSRowSet) {
+		setSSRowSet(_sSRowSet);
+	}
+
+	/**
+	 * This method changes the SSRowSet to which the navigator is bound. The
+	 * execute() and next() methods MUST be called on the SSRowSet before you set
+	 * the SSRowSet for the SSDataNavigator.
+	 *
+	 * @param _sSRowSet a SSRowSet object to which the navigator will be bound
+	 */
+	public void setSSRowSet(final SSRowSet _sSRowSet) {
+		// RESET INSERT FLAG THIS IS NEED IF USERS LEFT THE LAST ROWSET IN INSERTION
+		// MODE
+		// WITH OUT SAVING THE RECORD OR UNDOING THE INSERTION
+		onInsertRow = false;
+
+		if (sSRowSet != null) {
+			sSRowSet.removeRowSetListener(sSRowSetListener);
+		}
+
+		final SSRowSet oldValue = sSRowSet;
+		sSRowSet = _sSRowSet;
+		firePropertyChange("sSRowSet", oldValue, sSRowSet);
+
+		// SEE IF THERE ARE ANY ROWS IN THE GIVEN SSROWSET
+		try {
+			if (callExecute) {
+				sSRowSet.execute();
 			}
-		}
 
-		@Override
-		public void rowChanged(final RowSetEvent rse) {
-			// DO NOTHING
-		}
-
-		@Override
-		public void rowSetChanged(final RowSetEvent rse) {
-			// IF THERE ARE ROWS GET THE ROW COUNT
-			try {
+			if (!sSRowSet.next()) {
+				rowCount = 0;
+				currentRow = 0;
+			} else {
+				// IF THERE ARE ROWS GET THE ROW COUNT
 				sSRowSet.last();
 				rowCount = sSRowSet.getRow();
 				sSRowSet.first();
-				updateNavigator();
-			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				currentRow = sSRowSet.getRow();
 			}
+			// SET THE ROW COUNT AS LABEL
+			lblRowCount.setText("of " + rowCount);
+			txtCurrentRow.setText(String.valueOf(currentRow));
 
+			sSRowSet.addRowSetListener(sSRowSetListener);
+		} catch (final SQLException se) {
+			logger.error("SQL Exception.", se);
 		}
 
+		// IF NO ROWS ARE PRESENT DISABLE NAVIGATION
+		// ELSE ENABLE THEN ELSE IS USEFUL WHEN THE SSROWSET IS CHNAGED
+		// IF THE INITIAL SSROWSET HAS ZERO ROWS NEXT IF THE USER SETS A NEW SSROWSET
+		// THEN THE BUTTONS HAVE TO BE ENABLED
+		if (rowCount == 0) {
+			firstButton.setEnabled(false);
+			previousButton.setEnabled(false);
+			nextButton.setEnabled(false);
+			lastButton.setEnabled(false);
+		} else {
+			firstButton.setEnabled(true);
+			previousButton.setEnabled(true);
+			nextButton.setEnabled(true);
+			lastButton.setEnabled(true);
+		}
+
+		try {
+			if (sSRowSet.isLast()) {
+				nextButton.setEnabled(false);
+				lastButton.setEnabled(false);
+			}
+			if (sSRowSet.isFirst()) {
+				firstButton.setEnabled(false);
+				previousButton.setEnabled(false);
+			}
+
+		} catch (final SQLException se) {
+			logger.error("SQL Exception.", se);
+		}
+
+		// ENABLE OTHER BUTTONS IF NEED BE.
+
+		// THIS IS NEEDED TO HANDLE USER LEAVING THE SCREEN IN AN INCONSISTENT
+		// STATE EXAMPLE: USER CLICKS ADD BUTTON, THIS DISABLES ALL THE BUTTONS
+		// EXCEPT COMMIT & UNDO. WITH OUT COMMITING OR UNDOING THE ADD USER
+		// CLOSES THE SCREEN. NOW IF THE SCREEN IS OPENED WITH A NEW SSROWSET.
+		// THE REFRESH, ADD & DELETE WILL BE DISABLED.
+		// 2019-11-11: only enabling add/delete if this.modification==true
+		refreshButton.setEnabled(true);
+		if (insertion && modification) {
+			addButton.setEnabled(true);
+		}
+		if (deletion && modification) {
+			deleteButton.setEnabled(true);
+		}
 	}
+
+// DEPRECATED STUFF....................
 
 	/**
 	 * Enables/disables navigation buttons as needed and updates the current row and row count
@@ -1340,30 +1352,18 @@ public class SSDataNavigator extends JPanel {
 		}
 	}
 
-// DEPRECATED STUFF....................
-
 	/**
-	 * Sets the new SSRowSet for the combo box.
+	 * Writes the present row back to the SSRowSet. This is done automatically when
+	 * any navigation takes place, but can also be called manually.
 	 *
-	 * @param _sSRowSet SSRowSet to which the combo has to update values.
-	 *
-	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
+	 * @return returns true if update succeeds else false.
 	 */
-	@Deprecated
-	public void setRowSet(final SSRowSet _sSRowSet) {
-		setSSRowSet(_sSRowSet);
-	}
+	public boolean updatePresentRow() {
+		if (onInsertRow || (currentRow > 0)) {
+			doCommitButtonClick();
+		}
 
-	/**
-	 * Returns the SSRowSet being used.
-	 *
-	 * @return returns the SSRowSet being used.
-	 *
-	 * @deprecated Use {@link #getSSRowSet()} instead.
-	 */
-	@Deprecated
-	public SSRowSet getRowSet() {
-		return sSRowSet;
+		return true;
 	}
 
 } // end public class SSDataNavigator extends JPanel {

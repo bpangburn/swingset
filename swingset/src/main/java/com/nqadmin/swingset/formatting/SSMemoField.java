@@ -82,19 +82,79 @@ import com.nqadmin.swingset.datasources.SSRowSet;
 public class SSMemoField extends JTextArea implements RowSetListener, KeyListener, FocusListener {
 
 	/**
-	 * unique serial id
+	 * This method should implements validation AND, most important for our purposes
+	 * implements actual rowset fields updates.
+	 * <p>
 	 */
-	private static final long serialVersionUID = -7984808092295218942L;
-	private java.awt.Color std_color = null;
-	protected String columnName = null;
-	protected int colType = -99;
-	protected SSRowSet rowset = null;
-	private SSDataNavigator navigator = null;
 
+	class internalVerifier extends InputVerifier {
+
+		@Override
+		public boolean verify(final JComponent input) {
+
+			String aux = null;
+			//final boolean passed = true;
+
+			final SSMemoField tf = (SSMemoField) input;
+			aux = tf.getText();
+
+			//if (passed) {
+
+				setBackground(java.awt.Color.WHITE);
+
+				// if not linked to a db field, returns.
+				if ((columnName == null) || (rowset == null)) {
+					return true;
+				}
+
+				try {
+					rowset.removeRowSetListener(tf);
+
+					switch (colType) {
+
+					case java.sql.Types.VARCHAR:// -7
+					case java.sql.Types.LONGVARCHAR:// -7
+					case java.sql.Types.CHAR:// -7
+						rowset.updateString(columnName, aux);
+						break;
+
+					default:
+						break;
+					}
+					rowset.addRowSetListener(tf);
+					return true;
+				} catch (final java.sql.SQLException se) {
+					logger.error(getColumnForLog() + ": SQL Exception.", se);
+					tf.setText("");
+				} catch (final java.lang.NullPointerException np) {
+					logger.error(getColumnForLog() + ": Null Pointer Exception.", np);
+					tf.setText("");
+				}
+				//return true;
+			//}
+			/*
+			 * Validation fails.
+			 *
+			 */
+			setBackground(java.awt.Color.RED);
+			return false;
+		}
+	}
 	/**
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = LogManager.getLogger();
+	/**
+	 * unique serial id
+	 */
+	private static final long serialVersionUID = -7984808092295218942L;
+	protected int colType = -99;
+	protected String columnName = null;
+	private SSDataNavigator navigator = null;
+
+	protected SSRowSet rowset = null;
+
+	private java.awt.Color std_color = null;
 
 	/**
 	 * Creates a new instance of SSBooleanField
@@ -121,131 +181,44 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		setInputVerifier(new internalVerifier());
 	}
 
-	/**
-	 * Returns the bound column name in square brackets.
-	 *
-	 * @return the boundColumnName in square brackets
-	 */
-	public String getColumnForLog() {
-		return "[" + columnName + "]";
+	private void bind() {
+
+		if (columnName == null) {
+			return;
+		}
+		if (rowset == null) {
+			return;
+		}
+
+		try {
+			colType = rowset.getColumnType(columnName);
+		} catch (final java.sql.SQLException sqe) {
+			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
+		}
+		rowset.addRowSetListener(this);
+		DbToFm();
 	}
 
 	/**
-	 * Returns the column name to which the component is bound to
+	 * Sets the SSRowSet and column name to which the component is to be bound.
 	 *
-	 * @return - returns the column name to which the component is bound to
+	 * @param _sSRowSet   datasource to be used.
+	 * @param _columnName Name of the column to which this check box should be bound
 	 */
-	public String getColumnName() {
-		return columnName;
-	}
-
-	/**
-	 * Sets the column name to which the component should be bound to
-	 *
-	 * @param _columnName - column name to which the component will be bound to
-	 */
-	public void setColumnName(final String _columnName) {
+	public void bind(final SSRowSet _sSRowSet, final String _columnName) {
+		rowset = _sSRowSet;
 		columnName = _columnName;
 		bind();
 	}
 
-	/**
-	 * Sets the SSRowSet object to be used to get/set the value of the bound column
+	/*
+	 * (non-Javadoc)
 	 *
-	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
-	 *                column
-	 * @deprecated renamed setSSRowSet()
-	 * @see #setSSRowSet(SSRowSet)
+	 * @see javax.sql.RowSetListener#cursorMoved(javax.sql.RowSetEvent)
 	 */
-	@Deprecated
-	public void setRowSet(final SSRowSet _rowset) {
-		setSSRowSet(_rowset);
-	}
-
-	/**
-	 * SSRowSet object being used to get/set the bound column value
-	 *
-	 * @return - returns the SSRowSet object being used to get/set the bound column
-	 *         value
-	 * @deprecated renamed getSSRowSet()
-	 * @see #getSSRowSet()
-	 **/
-	@Deprecated
-	public SSRowSet getRowSet() {
-		return getSSRowSet();
-	}
-
-	/**
-	 * Sets the SSRowSet object to be used to get/set the value of the bound column
-	 *
-	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
-	 *                column
-	 */
-	public void setSSRowSet(final SSRowSet _rowset) {
-		rowset = _rowset;
-		bind();
-	}
-
-	/**
-	 * SSRowSet object being used to get/set the bound column value
-	 *
-	 * @return - returns the SSRowSet object being used to get/set the bound column
-	 *         value
-	 */
-	public SSRowSet getSSRowSet() {
-		return rowset;
-	}
-
-	/**
-	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
-	 * only if you want to include the function keys as short cuts to perform
-	 * operations on the DataNavigator like saving the current row/ undo changes/
-	 * delete current row. <b><i>The functionality for this is not yet
-	 * finalized so try to avoid using this </i></b>
-	 *
-	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
-	 * @deprecated renamed setSSDataNavigator()
-	 * @see #setSSDataNavigator(SSDataNavigator)
-	 */
-	@Deprecated
-	public void setNavigator(final SSDataNavigator _navigator) {
-		setSSDataNavigator(_navigator);
-	}
-
-	/**
-	 * Returns the SSDataNavigator object being used.
-	 *
-	 * @return returns the SSDataNavigator object being used.
-	 * @deprecated renamed getSSDataNavigator()
-	 * @see #getSSDataNavigator()
-	 **/
-	@Deprecated
-	public SSDataNavigator getNavigator() {
-		return getSSDataNavigator();
-	}
-
-	/**
-	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
-	 * only if you want to include the function keys as short cuts to perform
-	 * operations on the DataNavigator like saving the current row/ undo changes/
-	 * delete current row. <b><i>The functionality for this is not yet
-	 * finalized so try to avoid using this </i></b>
-	 *
-	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
-	 */
-	public void setSSDataNavigator(final SSDataNavigator _navigator) {
-		navigator = _navigator;
-		setSSRowSet(_navigator.getSSRowSet());
-		bind();
-	}
-
-	/**
-	 * Returns the SSDataNavigator object being used.
-	 *
-	 * @return returns the SSDataNavigator object being used.
-	 */
-	public SSDataNavigator getSSDataNavigator() {
-		return navigator;
+	@Override
+	public void cursorMoved(final javax.sql.RowSetEvent _event) {
+		DbToFm();
 	}
 
 	private void DbToFm() {
@@ -273,84 +246,109 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
+	 */
+	@Override
+	public void focusGained(final FocusEvent _event) {
+
+		/**
+		 * some code to highlight the component with the focus
+		 * <p>
+		 */
+		final java.awt.Color col = new java.awt.Color(204, 255, 255);
+		std_color = getBackground();
+		setBackground(col);
+
+		/**
+		 * This is a bug workaround see :
+		 * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4740914
+		 * <p>
+		 */
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				selectAll();
+			}
+		});
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
+	 */
+	@Override
+	public void focusLost(final FocusEvent _event) {
+		/**
+		 * some code to highlight the component with the focus
+		 * <p>
+		 */
+		setBackground(std_color);
+	}
+
 	/**
-	 * Sets the SSRowSet and column name to which the component is to be bound.
+	 * Returns the bound column name in square brackets.
 	 *
-	 * @param _sSRowSet   datasource to be used.
-	 * @param _columnName Name of the column to which this check box should be bound
+	 * @return the boundColumnName in square brackets
 	 */
-	public void bind(final SSRowSet _sSRowSet, final String _columnName) {
-		rowset = _sSRowSet;
-		columnName = _columnName;
-		bind();
+	public String getColumnForLog() {
+		return "[" + columnName + "]";
 	}
 
-	private void bind() {
-
-		if (columnName == null) {
-			return;
-		}
-		if (rowset == null) {
-			return;
-		}
-
-		try {
-			colType = rowset.getColumnType(columnName);
-		} catch (final java.sql.SQLException sqe) {
-			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
-		}
-		rowset.addRowSetListener(this);
-		DbToFm();
+	/**
+	 * Returns the column name to which the component is bound to
+	 *
+	 * @return - returns the column name to which the component is bound to
+	 */
+	public String getColumnName() {
+		return columnName;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Returns the SSDataNavigator object being used.
 	 *
-	 * @see javax.sql.RowSetListener#rowSetChanged(javax.sql.RowSetEvent)
-	 */
-	@Override
-	public void rowSetChanged(final javax.sql.RowSetEvent _event) {
-		// do nothing
+	 * @return returns the SSDataNavigator object being used.
+	 * @deprecated renamed getSSDataNavigator()
+	 * @see #getSSDataNavigator()
+	 **/
+	@Deprecated
+	public SSDataNavigator getNavigator() {
+		return getSSDataNavigator();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * SSRowSet object being used to get/set the bound column value
 	 *
-	 * @see javax.sql.RowSetListener#rowChanged(javax.sql.RowSetEvent)
-	 */
-	@Override
-	public void rowChanged(final javax.sql.RowSetEvent _event) {
-		// do nothing
+	 * @return - returns the SSRowSet object being used to get/set the bound column
+	 *         value
+	 * @deprecated renamed getSSRowSet()
+	 * @see #getSSRowSet()
+	 **/
+	@Deprecated
+	public SSRowSet getRowSet() {
+		return getSSRowSet();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Returns the SSDataNavigator object being used.
 	 *
-	 * @see javax.sql.RowSetListener#cursorMoved(javax.sql.RowSetEvent)
+	 * @return returns the SSDataNavigator object being used.
 	 */
-	@Override
-	public void cursorMoved(final javax.sql.RowSetEvent _event) {
-		DbToFm();
+	public SSDataNavigator getSSDataNavigator() {
+		return navigator;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * SSRowSet object being used to get/set the bound column value
 	 *
-	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+	 * @return - returns the SSRowSet object being used to get/set the bound column
+	 *         value
 	 */
-	@Override
-	public void keyTyped(final KeyEvent _event) {
-		// do nothing
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
-	 */
-	@Override
-	public void keyReleased(final KeyEvent _event) {
-		// do nothing
+	public SSRowSet getSSRowSet() {
+		return rowset;
 	}
 
 	/**
@@ -421,104 +419,106 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
+	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
 	@Override
-	public void focusLost(final FocusEvent _event) {
-		/**
-		 * some code to highlight the component with the focus
-		 * <p>
-		 */
-		setBackground(std_color);
+	public void keyReleased(final KeyEvent _event) {
+		// do nothing
 	}
 
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
+	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
 	 */
 	@Override
-	public void focusGained(final FocusEvent _event) {
+	public void keyTyped(final KeyEvent _event) {
+		// do nothing
+	}
 
-		/**
-		 * some code to highlight the component with the focus
-		 * <p>
-		 */
-		final java.awt.Color col = new java.awt.Color(204, 255, 255);
-		std_color = getBackground();
-		setBackground(col);
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see javax.sql.RowSetListener#rowChanged(javax.sql.RowSetEvent)
+	 */
+	@Override
+	public void rowChanged(final javax.sql.RowSetEvent _event) {
+		// do nothing
+	}
 
-		/**
-		 * This is a bug workaround see :
-		 * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4740914
-		 * <p>
-		 */
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				selectAll();
-			}
-		});
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see javax.sql.RowSetListener#rowSetChanged(javax.sql.RowSetEvent)
+	 */
+	@Override
+	public void rowSetChanged(final javax.sql.RowSetEvent _event) {
+		// do nothing
 	}
 
 	/**
-	 * This method should implements validation AND, most important for our purposes
-	 * implements actual rowset fields updates.
-	 * <p>
+	 * Sets the column name to which the component should be bound to
+	 *
+	 * @param _columnName - column name to which the component will be bound to
 	 */
+	public void setColumnName(final String _columnName) {
+		columnName = _columnName;
+		bind();
+	}
 
-	class internalVerifier extends InputVerifier {
+	/**
+	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
+	 * only if you want to include the function keys as short cuts to perform
+	 * operations on the DataNavigator like saving the current row/ undo changes/
+	 * delete current row. <b><i>The functionality for this is not yet
+	 * finalized so try to avoid using this </i></b>
+	 *
+	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
+	 * @deprecated renamed setSSDataNavigator()
+	 * @see #setSSDataNavigator(SSDataNavigator)
+	 */
+	@Deprecated
+	public void setNavigator(final SSDataNavigator _navigator) {
+		setSSDataNavigator(_navigator);
+	}
 
-		@Override
-		public boolean verify(final JComponent input) {
+	/**
+	 * Sets the SSRowSet object to be used to get/set the value of the bound column
+	 *
+	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
+	 *                column
+	 * @deprecated renamed setSSRowSet()
+	 * @see #setSSRowSet(SSRowSet)
+	 */
+	@Deprecated
+	public void setRowSet(final SSRowSet _rowset) {
+		setSSRowSet(_rowset);
+	}
 
-			String aux = null;
-			//final boolean passed = true;
+	/**
+	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
+	 * only if you want to include the function keys as short cuts to perform
+	 * operations on the DataNavigator like saving the current row/ undo changes/
+	 * delete current row. <b><i>The functionality for this is not yet
+	 * finalized so try to avoid using this </i></b>
+	 *
+	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
+	 */
+	public void setSSDataNavigator(final SSDataNavigator _navigator) {
+		navigator = _navigator;
+		setSSRowSet(_navigator.getSSRowSet());
+		bind();
+	}
 
-			final SSMemoField tf = (SSMemoField) input;
-			aux = tf.getText();
-
-			//if (passed) {
-
-				setBackground(java.awt.Color.WHITE);
-
-				// if not linked to a db field, returns.
-				if ((columnName == null) || (rowset == null)) {
-					return true;
-				}
-
-				try {
-					rowset.removeRowSetListener(tf);
-
-					switch (colType) {
-
-					case java.sql.Types.VARCHAR:// -7
-					case java.sql.Types.LONGVARCHAR:// -7
-					case java.sql.Types.CHAR:// -7
-						rowset.updateString(columnName, aux);
-						break;
-
-					default:
-						break;
-					}
-					rowset.addRowSetListener(tf);
-					return true;
-				} catch (final java.sql.SQLException se) {
-					logger.error(getColumnForLog() + ": SQL Exception.", se);
-					tf.setText("");
-				} catch (final java.lang.NullPointerException np) {
-					logger.error(getColumnForLog() + ": Null Pointer Exception.", np);
-					tf.setText("");
-				}
-				//return true;
-			//}
-			/*
-			 * Validation fails.
-			 *
-			 */
-			setBackground(java.awt.Color.RED);
-			return false;
-		}
+	/**
+	 * Sets the SSRowSet object to be used to get/set the value of the bound column
+	 *
+	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
+	 *                column
+	 */
+	public void setSSRowSet(final SSRowSet _rowset) {
+		rowset = _rowset;
+		bind();
 	}
 }
 

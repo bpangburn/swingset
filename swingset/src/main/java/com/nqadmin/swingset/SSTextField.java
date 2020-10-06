@@ -79,6 +79,11 @@ public class SSTextField extends JTextField implements SSComponentInterface {
     public static final int DECIMAL = 4;
 
 	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+
+    /**
      * Use this mask if mm/dd/yyyy format is required.
      */
     public static final int MMDDYYYY = 1;
@@ -88,15 +93,10 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	 */
 	private static final long serialVersionUID = -8162614390803158456L;
 
-    /**
+	/**
      * Use this if the text field contains SSN
      */
     public static final int SSN = 3;
-
-	/**
-	 * Log4j Logger for component
-	 */
-	private static Logger logger = LogManager.getLogger();
 
     /**
      * Function to manage formatting date _strings with slashes as the user types

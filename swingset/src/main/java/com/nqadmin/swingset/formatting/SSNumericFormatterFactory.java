@@ -56,9 +56,9 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 3335183379540169892L;
-	NumberFormatter snf = null;
+	NumberFormatter dnf = null;
     NumberFormatter enf = null;
-    NumberFormatter dnf = null;
+    NumberFormatter snf = null;
 
     /**
      * Creates a default SSNumericFormatterFactory

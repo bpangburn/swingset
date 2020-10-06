@@ -77,6 +77,11 @@ import com.nqadmin.swingset.formatting.SSFormattedTextField;
 public class SSDBNavImpl implements SSDBNav {
 
 	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -4632505399798312457L;
@@ -85,11 +90,6 @@ public class SSDBNavImpl implements SSDBNav {
 	 * Screen where components to be cleared are located.
 	 */
 	protected Container container = null;
-
-	/**
-	 * Log4j Logger for component
-	 */
-	private static Logger logger = LogManager.getLogger();
 
 	/**
 	 * Constructs a SSDBNavImpl with the specified container.

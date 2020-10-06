@@ -77,9 +77,20 @@ import com.nqadmin.swingset.utils.SSEnums.Navigation;
 public interface SSDBNav extends Serializable {
 
 	/**
-	 * unique serial id
+	 * Constant indicating the navigation button first.
+	 *
+	 * @deprecated Starting in 2.3.0+ use {@link Navigation#First} instead.
 	 */
-	static final long serialVersionUID = -4632504656498312457L;
+	@Deprecated
+	public static final int NAVIGATION_FIRST = 3;
+
+	/**
+	 * Constant indicating the navigation button last.
+	 *
+	 * @deprecated Starting in 2.3.0+ use {@link Navigation#Last} instead.
+	 */
+	@Deprecated
+	public static final int NAVIGATION_LAST = 4;
 
 	/**
 	 * Constant indicating the navigation button next.
@@ -98,20 +109,9 @@ public interface SSDBNav extends Serializable {
 	public static final int NAVIGATION_PREVIOUS = 2;
 
 	/**
-	 * Constant indicating the navigation button first.
-	 *
-	 * @deprecated Starting in 2.3.0+ use {@link Navigation#First} instead.
+	 * unique serial id
 	 */
-	@Deprecated
-	public static final int NAVIGATION_FIRST = 3;
-
-	/**
-	 * Constant indicating the navigation button last.
-	 *
-	 * @deprecated Starting in 2.3.0+ use {@link Navigation#Last} instead.
-	 */
-	@Deprecated
-	public static final int NAVIGATION_LAST = 4;
+	static final long serialVersionUID = -4632504656498312457L;
 
 	/**
 	 * This function will be called after performPreDeletionOps is called but before

@@ -88,22 +88,22 @@ import com.nqadmin.swingset.datasources.SSRowSet;
 @Deprecated
 public class SSImageField extends JPanel implements RowSetListener, KeyListener, ComponentListener {
 
-	private static final long serialVersionUID = 889303691158522232L;
-	protected byte[] imageBytes;
-	protected ImageIcon fullIcon;
-	private ImageIcon scaledIcon;
-	private ImageIcon nullIcon;
-	private JButton imageButton;
-	protected JButton getButton;
-	protected String columnName = null;
-	private int colType = -99;
-	protected SSRowSet rowset = null;
-	private SSDataNavigator navigator = null;
-
 	/**
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = LogManager.getLogger();
+	private static final long serialVersionUID = 889303691158522232L;
+	private int colType = -99;
+	protected String columnName = null;
+	protected ImageIcon fullIcon;
+	protected JButton getButton;
+	private JButton imageButton;
+	protected byte[] imageBytes;
+	private SSDataNavigator navigator = null;
+	private ImageIcon nullIcon;
+	protected SSRowSet rowset = null;
+
+	private ImageIcon scaledIcon;
 
 	/** Creates a new instance of SSImageField */
 	public SSImageField() {
@@ -193,171 +193,91 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	}
 
 	/**
-	 * Returns the bound column name in square brackets.
-	 *
-	 * @return the boundColumnName in square brackets
+	 * Binds the component to the specified column in the given SSRowSet
 	 */
-	public String getColumnForLog() {
-		return "[" + columnName + "]";
+	private void bind() {
+
+		if (columnName == null) {
+			return;
+		}
+		if (rowset == null) {
+			return;
+		}
+
+		try {
+			colType = rowset.getColumnType(columnName);
+		} catch (final java.sql.SQLException sqe) {
+			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
+		}
+		rowset.addRowSetListener(this);
+		DbToFm();
 	}
 
 
 	/**
-	 * Creates a image icon from the specified image
+	 * Sets the SSRowSet and column name to which the component is to be bound.
 	 *
-	 * @param _image - image to be used to create image icon
-	 * @return return the image icon created
+	 * @param _sSRowSet   datasource to be used.
+	 * @param _columnName Name of the column to which this check box should be bound
 	 */
-	private ImageIcon Thumbnail(final Image _image) {
-		double scale, fw, fh;
-		int wi, hi;
-		int wo, ho;
-		int ws, hs;
-		Image scaled;
-
-		imageButton.setIcon(null);
-		validate();
-
-		wi = imageButton.getWidth();
-		hi = imageButton.getHeight();
-
-		wo = _image.getWidth(this);
-		ho = _image.getHeight(this);
-
-		fw = (double) wi / (double) wo;
-		fh = (double) hi / (double) ho;
-
-		if (fw > fh) {
-			scale = fh;
-		} else {
-			scale = fw;
-		}
-
-		ws = (int) (scale * wo);
-		hs = (int) (scale * ho);
-
-		if ((wi == 0) && (hi == 0)) {
-			ws = wo;
-			hs = ho;
-		}
-		scaled = _image.getScaledInstance(ws, hs, Image.SCALE_SMOOTH);
-		return new ImageIcon(scaled);
-	}
-
-	/**
-	 * Column name in the SSRowSet to which this component will be bound to
-	 *
-	 * @param _columnName - column name in the SSRowSet to which this component will
-	 *                    be bound to
-	 */
-	public void setColumnName(final String _columnName) {
+	public void bind(final SSRowSet _sSRowSet, final String _columnName) {
+		rowset = _sSRowSet;
 		columnName = _columnName;
 		bind();
 	}
 
-	/**
-	 * Returns the column name to which the component is bound to
+	/*
+	 * (non-Javadoc)
 	 *
-	 * @return - returns the column name to which the component is bound to
+	 * @see java.awt.event.ComponentListener#componentHidden(java.awt.event.
+	 * ComponentEvent)
 	 */
-	public String getColumnName() {
-		return columnName;
+	@Override
+	public void componentHidden(final java.awt.event.ComponentEvent _event) {
+		// do nothing
 	}
 
-	/**
-	 * Sets the SSRowSet object to be used to get/set the value of the bound column
+	/*
+	 * (non-Javadoc)
 	 *
-	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
-	 *                column
-	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
+	 * @see java.awt.event.ComponentListener#componentMoved(java.awt.event.
+	 * ComponentEvent)
 	 */
-	@Deprecated
-	public void setRowSet(final SSRowSet _rowset) {
-		setSSRowSet(_rowset);
+	@Override
+	public void componentMoved(final java.awt.event.ComponentEvent _event) {
+		// do nothing
 	}
 
-	/**
-	 * Sets the SSRowSet object to be used to get/set the value of the bound column
+	/*
+	 * (non-Javadoc)
 	 *
-	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
-	 *                column
+	 * @see java.awt.event.ComponentListener#componentResized(java.awt.event.
+	 * ComponentEvent)
 	 */
-	public void setSSRowSet(final SSRowSet _rowset) {
-		rowset = _rowset;
-		bind();
+	@Override
+	public void componentResized(final java.awt.event.ComponentEvent _event) {
+		Rescale();
 	}
 
-	/**
-	 * SSRowSet object being used to get/set the bound column value
+	/*
+	 * (non-Javadoc)
 	 *
-	 * @return - returns the SSRowSet object being used to get/set the bound column
-	 *         value
-	 * @deprecated Use {@link #getSSRowSet()} instead.
+	 * @see java.awt.event.ComponentListener#componentShown(java.awt.event.
+	 * ComponentEvent)
 	 */
-	@Deprecated
-	public SSRowSet getRowSet() {
-		return getSSRowSet();
+	@Override
+	public void componentShown(final java.awt.event.ComponentEvent _event) {
+		// do nothing
 	}
 
-	/**
-	 * SSRowSet object being used to get/set the bound column value
+	/*
+	 * (non-Javadoc)
 	 *
-	 * @return - returns the SSRowSet object being used to get/set the bound column
-	 *         value
+	 * @see javax.sql.RowSetListener#cursorMoved(javax.sql.RowSetEvent)
 	 */
-	public SSRowSet getSSRowSet() {
-		return rowset;
-	}
-
-	/**
-	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
-	 * only if you want to include the function keys as short cuts to perform
-	 * operations on the DataNavigator like saving the current row/ undo changes/
-	 * delete current row. <b><i>The functionality for this is not yet
-	 * finalized so try to avoid using this </i></b>
-	 *
-	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
-	 * @deprecated Use {@link #setSSDataNavigator(SSDataNavigator _navigator)}
-	 *             instead.
-	 **/
-	@Deprecated
-	public void setNavigator(final SSDataNavigator _navigator) {
-		setSSDataNavigator(_navigator);
-	}
-
-	/**
-	 * Returns the SSDataNavigator object being used.
-	 *
-	 * @return returns the SSDataNavigator object being used.
-	 * @deprecated Use {@link #getSSDataNavigator()} instead.
-	 **/
-	@Deprecated
-	public SSDataNavigator getNavigator() {
-		return getSSDataNavigator();
-	}
-
-	/**
-	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
-	 * only if you want to include the function keys as short cuts to perform
-	 * operations on the DataNavigator like saving the current row/ undo changes/
-	 * delete current row. <b><i>The functionality for this is not yet
-	 * finalized so try to avoid using this </i></b>
-	 *
-	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
-	 */
-	public void setSSDataNavigator(final SSDataNavigator _navigator) {
-		navigator = _navigator;
-		setSSRowSet(_navigator.getSSRowSet());
-		bind();
-	}
-
-	/**
-	 * Returns the SSDataNavigator object being used.
-	 *
-	 * @return returns the SSDataNavigator object being used.
-	 */
-	public SSDataNavigator getSSDataNavigator() {
-		return navigator;
+	@Override
+	public void cursorMoved(final javax.sql.RowSetEvent _event) {
+		DbToFm();
 	}
 
 	/**
@@ -398,86 +318,63 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	}
 
 	/**
-	 * Sets the SSRowSet and column name to which the component is to be bound.
+	 * Returns the bound column name in square brackets.
 	 *
-	 * @param _sSRowSet   datasource to be used.
-	 * @param _columnName Name of the column to which this check box should be bound
+	 * @return the boundColumnName in square brackets
 	 */
-	public void bind(final SSRowSet _sSRowSet, final String _columnName) {
-		rowset = _sSRowSet;
-		columnName = _columnName;
-		bind();
+	public String getColumnForLog() {
+		return "[" + columnName + "]";
 	}
 
 	/**
-	 * Binds the component to the specified column in the given SSRowSet
+	 * Returns the column name to which the component is bound to
+	 *
+	 * @return - returns the column name to which the component is bound to
 	 */
-	private void bind() {
-
-		if (columnName == null) {
-			return;
-		}
-		if (rowset == null) {
-			return;
-		}
-
-		try {
-			colType = rowset.getColumnType(columnName);
-		} catch (final java.sql.SQLException sqe) {
-			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
-		}
-		rowset.addRowSetListener(this);
-		DbToFm();
+	public String getColumnName() {
+		return columnName;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Returns the SSDataNavigator object being used.
 	 *
-	 * @see javax.sql.RowSetListener#rowSetChanged(javax.sql.RowSetEvent)
-	 */
-	@Override
-	public void rowSetChanged(final javax.sql.RowSetEvent _event) {
-		// do nothing
+	 * @return returns the SSDataNavigator object being used.
+	 * @deprecated Use {@link #getSSDataNavigator()} instead.
+	 **/
+	@Deprecated
+	public SSDataNavigator getNavigator() {
+		return getSSDataNavigator();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * SSRowSet object being used to get/set the bound column value
 	 *
-	 * @see javax.sql.RowSetListener#rowChanged(javax.sql.RowSetEvent)
+	 * @return - returns the SSRowSet object being used to get/set the bound column
+	 *         value
+	 * @deprecated Use {@link #getSSRowSet()} instead.
 	 */
-	@Override
-	public void rowChanged(final javax.sql.RowSetEvent _event) {
-		// do nothing
+	@Deprecated
+	public SSRowSet getRowSet() {
+		return getSSRowSet();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Returns the SSDataNavigator object being used.
 	 *
-	 * @see javax.sql.RowSetListener#cursorMoved(javax.sql.RowSetEvent)
+	 * @return returns the SSDataNavigator object being used.
 	 */
-	@Override
-	public void cursorMoved(final javax.sql.RowSetEvent _event) {
-		DbToFm();
+	public SSDataNavigator getSSDataNavigator() {
+		return navigator;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * SSRowSet object being used to get/set the bound column value
 	 *
-	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+	 * @return - returns the SSRowSet object being used to get/set the bound column
+	 *         value
 	 */
-	@Override
-	public void keyTyped(final KeyEvent _event) {
-		// do nothing
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
-	 */
-	@Override
-	public void keyReleased(final KeyEvent _event) {
-		// do nothing
+	public SSRowSet getSSRowSet() {
+		return rowset;
 	}
 
 	/**
@@ -539,44 +436,20 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see java.awt.event.ComponentListener#componentShown(java.awt.event.
-	 * ComponentEvent)
+	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
 	@Override
-	public void componentShown(final java.awt.event.ComponentEvent _event) {
+	public void keyReleased(final KeyEvent _event) {
 		// do nothing
 	}
 
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see java.awt.event.ComponentListener#componentResized(java.awt.event.
-	 * ComponentEvent)
+	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
 	 */
 	@Override
-	public void componentResized(final java.awt.event.ComponentEvent _event) {
-		Rescale();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.awt.event.ComponentListener#componentMoved(java.awt.event.
-	 * ComponentEvent)
-	 */
-	@Override
-	public void componentMoved(final java.awt.event.ComponentEvent _event) {
-		// do nothing
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.awt.event.ComponentListener#componentHidden(java.awt.event.
-	 * ComponentEvent)
-	 */
-	@Override
-	public void componentHidden(final java.awt.event.ComponentEvent _event) {
+	public void keyTyped(final KeyEvent _event) {
 		// do nothing
 	}
 
@@ -593,6 +466,133 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 			imageButton.setIcon(scaledIcon);
 			updateUI();
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see javax.sql.RowSetListener#rowChanged(javax.sql.RowSetEvent)
+	 */
+	@Override
+	public void rowChanged(final javax.sql.RowSetEvent _event) {
+		// do nothing
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see javax.sql.RowSetListener#rowSetChanged(javax.sql.RowSetEvent)
+	 */
+	@Override
+	public void rowSetChanged(final javax.sql.RowSetEvent _event) {
+		// do nothing
+	}
+
+	/**
+	 * Column name in the SSRowSet to which this component will be bound to
+	 *
+	 * @param _columnName - column name in the SSRowSet to which this component will
+	 *                    be bound to
+	 */
+	public void setColumnName(final String _columnName) {
+		columnName = _columnName;
+		bind();
+	}
+
+	/**
+	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
+	 * only if you want to include the function keys as short cuts to perform
+	 * operations on the DataNavigator like saving the current row/ undo changes/
+	 * delete current row. <b><i>The functionality for this is not yet
+	 * finalized so try to avoid using this </i></b>
+	 *
+	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
+	 * @deprecated Use {@link #setSSDataNavigator(SSDataNavigator _navigator)}
+	 *             instead.
+	 **/
+	@Deprecated
+	public void setNavigator(final SSDataNavigator _navigator) {
+		setSSDataNavigator(_navigator);
+	}
+
+	/**
+	 * Sets the SSRowSet object to be used to get/set the value of the bound column
+	 *
+	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
+	 *                column
+	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
+	 */
+	@Deprecated
+	public void setRowSet(final SSRowSet _rowset) {
+		setSSRowSet(_rowset);
+	}
+
+	/**
+	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
+	 * only if you want to include the function keys as short cuts to perform
+	 * operations on the DataNavigator like saving the current row/ undo changes/
+	 * delete current row. <b><i>The functionality for this is not yet
+	 * finalized so try to avoid using this </i></b>
+	 *
+	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
+	 */
+	public void setSSDataNavigator(final SSDataNavigator _navigator) {
+		navigator = _navigator;
+		setSSRowSet(_navigator.getSSRowSet());
+		bind();
+	}
+
+	/**
+	 * Sets the SSRowSet object to be used to get/set the value of the bound column
+	 *
+	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
+	 *                column
+	 */
+	public void setSSRowSet(final SSRowSet _rowset) {
+		rowset = _rowset;
+		bind();
+	}
+
+	/**
+	 * Creates a image icon from the specified image
+	 *
+	 * @param _image - image to be used to create image icon
+	 * @return return the image icon created
+	 */
+	private ImageIcon Thumbnail(final Image _image) {
+		double scale, fw, fh;
+		int wi, hi;
+		int wo, ho;
+		int ws, hs;
+		Image scaled;
+
+		imageButton.setIcon(null);
+		validate();
+
+		wi = imageButton.getWidth();
+		hi = imageButton.getHeight();
+
+		wo = _image.getWidth(this);
+		ho = _image.getHeight(this);
+
+		fw = (double) wi / (double) wo;
+		fh = (double) hi / (double) ho;
+
+		if (fw > fh) {
+			scale = fh;
+		} else {
+			scale = fw;
+		}
+
+		ws = (int) (scale * wo);
+		hs = (int) (scale * ho);
+
+		if ((wi == 0) && (hi == 0)) {
+			ws = wo;
+			hs = ho;
+		}
+		scaled = _image.getScaledInstance(ws, hs, Image.SCALE_SMOOTH);
+		return new ImageIcon(scaled);
 	}
 
 }

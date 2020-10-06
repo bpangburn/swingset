@@ -84,32 +84,56 @@ public class SSFormattedTextField extends JFormattedTextField
 		implements FocusListener, SSComponentInterface {
 
 	/**
-	 * unique serial id
+	 * This class should implements validation AND calls setValue() which triggers RowSet updates.
+	 * <p>
+	 * See https://docs.oracle.com/javase/8/docs/api/javax/swing/JFormattedTextField.html
+	 * <p>
+	 * More on input verifiers here: https://www.drdobbs.com/jvm/java-better-interfaces-via-jformattedtex/224700979?pgno=1
+	 * Some discussion on dates and validation here: https://docs.oracle.com/javase/tutorial/uiswing/misc/focus.html#inputVerification
 	 */
-	private static final long serialVersionUID = 5349618425984728006L;
 
-	private java.awt.Color standardColor = null;
+	public class FormattedTextFieldVerifier extends InputVerifier {
 
-	/**
-	 * color for the field that has the focus
-	 */
-	// TODO Add setters/getters and allow developer to customize
-	private final java.awt.Color focusColor = new java.awt.Color(204, 255, 255);
+		@Override
+		public boolean verify(final JComponent input) {
 
-    /**
-     * Common fields shared across SwingSet components
-     */
-    protected SSCommon ssCommon;
+			boolean result = false;
 
-	/**
-	 * Component listener.
-	 */
-	protected final SSFormattedValueListener ssFormattedValueListener = new SSFormattedValueListener();
+			if (input instanceof SSFormattedTextField) {
+				logger.debug(getColumnForLog() + ": Instance of SSFormattedTextField.");
+				final SSFormattedTextField ssftf = (SSFormattedTextField) input;
+				try {
+					logger.debug(getColumnForLog() + ": Text in Formatted Text Field is " + ssftf.getText() + ".");
+					// this will throw a parse exception if something goes wrong
+					ssftf.commitEdit();
 
-	/**
-	 * Log4j Logger for component
-	 */
-	private static Logger logger = LogManager.getLogger();
+					// get current value
+					final Object value = (ssftf.getValue());
+
+					// now perform custom checks
+					result = validateField(value);
+
+					// update text color for negatives
+					if (result) {
+						updateTextColor(value);
+					}
+
+				} catch (final java.text.ParseException pe) {
+					logger.warn(getColumnForLog() + ": Parse Exception at " + pe.getErrorOffset() + ".", pe);
+				}
+			}
+
+			// Update background color to RED for invalid value.
+			// Also force foreground color to BLACK in case it was previous RED (negative number)
+			// If value is valid, the background color will change when focus is lost.
+			if (result==false) {
+				setBackground(Color.RED);
+				setForeground(Color.BLACK);
+			}
+
+			return result;
+		}
+	}
 
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
@@ -165,25 +189,40 @@ public class SSFormattedTextField extends JFormattedTextField
 	}
 
 	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+
+    /**
+	 * unique serial id
+	 */
+	private static final long serialVersionUID = 5349618425984728006L;
+
+	/**
+	 * color for the field that has the focus
+	 */
+	// TODO Add setters/getters and allow developer to customize
+	private final java.awt.Color focusColor = new java.awt.Color(204, 255, 255);
+
+	/**
+     * Common fields shared across SwingSet components
+     */
+    protected SSCommon ssCommon;
+
+	/**
+	 * Component listener.
+	 */
+	protected final SSFormattedValueListener ssFormattedValueListener = new SSFormattedValueListener();
+
+	private java.awt.Color standardColor = null;
+
+
+	/**
 	 * Creates a new instance of SSFormattedTextField
 	 */
 	public SSFormattedTextField() {
 
     	super();
-    	setSSCommon(new SSCommon(this));
-    	// SSCommon constructor calls init()
-
-	}
-
-
-	/**
-	 * Creates a new instance of SSFormattedTextField
-	 *
-	 * @param _format Format used to look up an AbstractFormatter
-	 */
-	public SSFormattedTextField(final Format _format) {
-
-    	super(_format);
     	setSSCommon(new SSCommon(this));
     	// SSCommon constructor calls init()
 
@@ -217,40 +256,25 @@ public class SSFormattedTextField extends JFormattedTextField
 	// FOR SWINGSET THAT SHOULD BE HANDLED SEPARATELY WITH BINDING.
 
 	/**
-	 * Remove highlighting when the focus is lost.
+	 * Creates a new instance of SSFormattedTextField
 	 *
-	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
+	 * @param _format Format used to look up an AbstractFormatter
 	 */
-	@Override
-	public void focusLost(final FocusEvent _event) {
-		// Remove highlighting
-		setBackground(standardColor);
+	public SSFormattedTextField(final Format _format) {
+
+    	super(_format);
+    	setSSCommon(new SSCommon(this));
+    	// SSCommon constructor calls init()
+
 	}
 
 	/**
-	 * Add highlighting when the focus is gained and select all of the text so
-	 * overwriting is easier.
-	 *
-	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
+	 * Adds any necessary listeners for the current SwingSet component. These will trigger changes
+	 * in the underlying RowSet column.
 	 */
 	@Override
-	public void focusGained(final FocusEvent _event) {
-
-		// USE A DIFFERENT COLOR TO HIGHLIGHT THE FIELD WITH THE FOCUS
-		standardColor = getBackground();
-		setBackground(focusColor);
-
-
-		// HIGHLIGHT THE TEXT IN THE FIELD WHEN FOCUS IS GAINED SO USE CAN JUST TYPE OVER WHAT IS THERE
-		//
-		// This is a workaround based on the following thread:
-		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4740914
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				selectAll();
-			}
-		});
+	public void addSSComponentListener() {
+		addPropertyChangeListener(ssFormattedValueListener);
 	}
 
 //	KEEPING DbToFm in comments for reference.
@@ -469,55 +493,10 @@ public class SSFormattedTextField extends JFormattedTextField
 //	}
 
 	/**
-	 * This class should implements validation AND calls setValue() which triggers RowSet updates.
-	 * <p>
-	 * See https://docs.oracle.com/javase/8/docs/api/javax/swing/JFormattedTextField.html
-	 * <p>
-	 * More on input verifiers here: https://www.drdobbs.com/jvm/java-better-interfaces-via-jformattedtex/224700979?pgno=1
-	 * Some discussion on dates and validation here: https://docs.oracle.com/javase/tutorial/uiswing/misc/focus.html#inputVerification
+	 * Sets the value that will be formatted to null
 	 */
-
-	public class FormattedTextFieldVerifier extends InputVerifier {
-
-		@Override
-		public boolean verify(final JComponent input) {
-
-			boolean result = false;
-
-			if (input instanceof SSFormattedTextField) {
-				logger.debug(getColumnForLog() + ": Instance of SSFormattedTextField.");
-				final SSFormattedTextField ssftf = (SSFormattedTextField) input;
-				try {
-					logger.debug(getColumnForLog() + ": Text in Formatted Text Field is " + ssftf.getText() + ".");
-					// this will throw a parse exception if something goes wrong
-					ssftf.commitEdit();
-
-					// get current value
-					final Object value = (ssftf.getValue());
-
-					// now perform custom checks
-					result = validateField(value);
-
-					// update text color for negatives
-					if (result) {
-						updateTextColor(value);
-					}
-
-				} catch (final java.text.ParseException pe) {
-					logger.warn(getColumnForLog() + ": Parse Exception at " + pe.getErrorOffset() + ".", pe);
-				}
-			}
-
-			// Update background color to RED for invalid value.
-			// Also force foreground color to BLACK in case it was previous RED (negative number)
-			// If value is valid, the background color will change when focus is lost.
-			if (result==false) {
-				setBackground(Color.RED);
-				setForeground(Color.BLACK);
-			}
-
-			return result;
-		}
+	public void cleanField() {
+		setValue(null);
 	}
 
 //	KEEPING updateRowSet in comments for reference.
@@ -645,81 +624,6 @@ public class SSFormattedTextField extends JFormattedTextField
 //	}
 
 	/**
-	 * Checks if the value is valid of the component. Override for custom validations
-	 * not handled by formatter / formatter factory.
-	 *
-	 * @param _value - value to be validated
-	 * @return returns true if the value is valid else false
-	 */
-	public boolean validateField(final Object _value) {
-
-
-		// TODO May want to add null check here or let SSRowSet handle. Hard to enforce if method overridden.
-		//if (this.getAllowNull() == false && _value == null)
-		//	return false;
-
-		// RETURN
-			return true;
-	}
-
-	/**
-	 * Sets text color to red for negative numbers, otherwise black.
-	 *
-	 * @param _value - value to be validated
-	 */
-	public void updateTextColor(final Object _value) {
-
-		if (((_value instanceof Double) && ((Double) _value < 0.0))
-				|| ((_value instanceof Float) && ((Float) _value < 0.0))
-				|| ((_value instanceof Long) && ((Long) _value < 0))
-				|| ((_value instanceof Integer) && ((Integer) _value < 0))) {
-			setForeground(Color.RED);
-		} else {
-			setForeground(Color.BLACK);
-		}
-
-	}
-
-	/**
-	 * Getter for property nullable.
-	 *
-	 * @return Value of property nullable.
-	 */
-	@Deprecated
-	public boolean isNullable() {
-
-		return getAllowNull();
-	}
-
-	/**
-	 * Setter for property nullable.
-	 *
-	 * @param _nullable New value of property nullable.
-	 */
-	@Deprecated
-	public void setNullable(final boolean _nullable) {
-
-		setAllowNull(_nullable);
-
-	}
-
-	/**
-	 * Sets the value that will be formatted to null
-	 */
-	public void cleanField() {
-		setValue(null);
-	}
-
-    /**
-	 * Adds any necessary listeners for the current SwingSet component. These will trigger changes
-	 * in the underlying RowSet column.
-	 */
-	@Override
-	public void addSSComponentListener() {
-		addPropertyChangeListener(ssFormattedValueListener);
-	}
-
-    /**
 	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
 	 * <p>
@@ -741,7 +645,44 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	}
 
-    /**
+	/**
+	 * Add highlighting when the focus is gained and select all of the text so
+	 * overwriting is easier.
+	 *
+	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
+	 */
+	@Override
+	public void focusGained(final FocusEvent _event) {
+
+		// USE A DIFFERENT COLOR TO HIGHLIGHT THE FIELD WITH THE FOCUS
+		standardColor = getBackground();
+		setBackground(focusColor);
+
+
+		// HIGHLIGHT THE TEXT IN THE FIELD WHEN FOCUS IS GAINED SO USE CAN JUST TYPE OVER WHAT IS THERE
+		//
+		// This is a workaround based on the following thread:
+		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4740914
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				selectAll();
+			}
+		});
+	}
+
+	/**
+	 * Remove highlighting when the focus is lost.
+	 *
+	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
+	 */
+	@Override
+	public void focusLost(final FocusEvent _event) {
+		// Remove highlighting
+		setBackground(standardColor);
+	}
+
+	/**
 	 * Returns the ssCommon data member for the current Swingset component.
 	 *
 	 * @return shared/common SwingSet component data and methods
@@ -752,6 +693,17 @@ public class SSFormattedTextField extends JFormattedTextField
 	}
 
 	/**
+	 * Getter for property nullable.
+	 *
+	 * @return Value of property nullable.
+	 */
+	@Deprecated
+	public boolean isNullable() {
+
+		return getAllowNull();
+	}
+
+    /**
 	 * Removes any necessary listeners for the current SwingSet component. These will trigger changes
 	 * in the underlying RowSet column.
 	 */
@@ -760,7 +712,19 @@ public class SSFormattedTextField extends JFormattedTextField
 		removePropertyChangeListener(ssFormattedValueListener);
 	}
 
-	/**
+    /**
+	 * Setter for property nullable.
+	 *
+	 * @param _nullable New value of property nullable.
+	 */
+	@Deprecated
+	public void setNullable(final boolean _nullable) {
+
+		setAllowNull(_nullable);
+
+	}
+
+    /**
 	 * Sets the SSCommon data member for the current Swingset Component.
 	 *
 	 * @param _ssCommon shared/common SwingSet component data and methods
@@ -769,7 +733,6 @@ public class SSFormattedTextField extends JFormattedTextField
 	public void setSSCommon(final SSCommon _ssCommon) {
 		ssCommon = _ssCommon;
 	}
-
 
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
@@ -848,5 +811,42 @@ public class SSFormattedTextField extends JFormattedTextField
 				updateTextColor(newValue);
 
 
+	}
+
+	/**
+	 * Sets text color to red for negative numbers, otherwise black.
+	 *
+	 * @param _value - value to be validated
+	 */
+	public void updateTextColor(final Object _value) {
+
+		if (((_value instanceof Double) && ((Double) _value < 0.0))
+				|| ((_value instanceof Float) && ((Float) _value < 0.0))
+				|| ((_value instanceof Long) && ((Long) _value < 0))
+				|| ((_value instanceof Integer) && ((Integer) _value < 0))) {
+			setForeground(Color.RED);
+		} else {
+			setForeground(Color.BLACK);
+		}
+
+	}
+
+
+	/**
+	 * Checks if the value is valid of the component. Override for custom validations
+	 * not handled by formatter / formatter factory.
+	 *
+	 * @param _value - value to be validated
+	 * @return returns true if the value is valid else false
+	 */
+	public boolean validateField(final Object _value) {
+
+
+		// TODO May want to add null check here or let SSRowSet handle. Hard to enforce if method overridden.
+		//if (this.getAllowNull() == false && _value == null)
+		//	return false;
+
+		// RETURN
+			return true;
 	}
 }

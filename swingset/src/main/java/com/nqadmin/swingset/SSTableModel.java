@@ -72,16 +72,56 @@ import com.nqadmin.swingset.datasources.SSRowSet;
 public class SSTableModel extends AbstractTableModel {
 
 	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -7650858998003486418L;
 
-	protected SSRowSet rowset = null;
+	/**
+	 * Returns an SQL date for a string date formatted as "MM/dd/yyyy".
+	 *
+	 * @param _strDate String containing a date in "MM/dd/yyyy" format.
+	 *
+	 * @return String date reformatted as an SQL date
+	 */
+	protected static Date getSQLDate(final String _strDate) {
+
+		// remove any leading/trailing spaces (e.g., could be introduced from
+		// copy/paste)
+		String newStrDate = _strDate.trim();
+
+		// check for empty string
+		if (newStrDate.equals("")) {
+			return null;
+		}
+
+		// REMOVE ANY SPACES IF ANY (This could happen if copying from another
+		// application)
+		// _strDate = _strDate.trim();
+		// String newStrDate = _strDate;
+		if (newStrDate.indexOf("/") != -1) {
+			final StringTokenizer strtok = new StringTokenizer(newStrDate, "/", false);
+			final String month = strtok.nextToken();
+			final String day = strtok.nextToken();
+			newStrDate = strtok.nextToken() + "-" + month + "-" + day;
+		}
+		return Date.valueOf(newStrDate);
+	}
 
 	/**
-	 * Number of rows in the SSRowSet.
+	 * Indicator to determine if insertions are allowed.
 	 */
-	protected transient int rowCount = 0;
+	protected boolean allowInsertion = true;
+
+	/**
+	 * Implementation of SSCellEditing interface used to determine dynamically if a
+	 * given cell can be edited and to determine if a given value is valid.
+	 */
+	protected SSCellEditing cellEditing = null;
 
 	/**
 	 * Number of columns in the SSRowSet.
@@ -89,46 +129,9 @@ public class SSTableModel extends AbstractTableModel {
 	protected transient int columnCount = 0;
 
 	/**
-	 * Map to store the default values of different columns.
-	 */
-	protected HashMap<Integer, Object> defaultValuesMap = null;
-
-	/**
-	 * Indicator to determine if the SSRowSet is on the insertion row.
-	 */
-	protected boolean inInsertRow = false;
-
-	/**
 	 * Window where messages should be displayed.
 	 */
 	protected transient Component component = null;
-
-	/**
-	 * JTable being modeled.
-	 */
-	protected transient JTable table = null;
-
-	/**
-	 * JTable headers.
-	 */
-	protected transient String[] headers = null;
-
-	/**
-	 * Column containing primary key.
-	 */
-	private int primaryColumn = -1;
-
-	/**
-	 * Implementation of SSDataValue interface used to determine PK value for new
-	 * rows.
-	 */
-	protected SSDataValue dataValue = null;
-
-	/**
-	 * Implementation of SSCellEditing interface used to determine dynamically if a
-	 * given cell can be edited and to determine if a given value is valid.
-	 */
-	protected SSCellEditing cellEditing = null;
 
 	/**
 	 * Implementation of DataGridHandler interface used to determine dynamically if
@@ -138,9 +141,20 @@ public class SSTableModel extends AbstractTableModel {
 	protected SSDataGridHandler dataGridHandler = null;
 
 	/**
-	 * List of uneditable columns.
+	 * Implementation of SSDataValue interface used to determine PK value for new
+	 * rows.
 	 */
-	protected int[] uneditableColumns = null;
+	protected SSDataValue dataValue = null;
+
+	/**
+	 * Map to store the default values of different columns.
+	 */
+	protected HashMap<Integer, Object> defaultValuesMap = null;
+
+	/**
+	 * JTable headers.
+	 */
+	protected transient String[] headers = null;
 
 	/**
 	 * List of hidden columns.
@@ -148,14 +162,31 @@ public class SSTableModel extends AbstractTableModel {
 	protected int[] hiddenColumns = null;
 
 	/**
-	 * Indicator to determine if insertions are allowed.
+	 * Indicator to determine if the SSRowSet is on the insertion row.
 	 */
-	protected boolean allowInsertion = true;
+	protected boolean inInsertRow = false;
 
 	/**
-	 * Log4j Logger for component
+	 * Column containing primary key.
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private int primaryColumn = -1;
+
+	/**
+	 * Number of rows in the SSRowSet.
+	 */
+	protected transient int rowCount = 0;
+
+	protected SSRowSet rowset = null;
+
+	/**
+	 * JTable being modeled.
+	 */
+	protected transient JTable table = null;
+
+	/**
+	 * List of uneditable columns.
+	 */
+	protected int[] uneditableColumns = null;
 
 	/**
 	 * Constructs a SSTableModel object. If this contructor is used the
@@ -179,70 +210,92 @@ public class SSTableModel extends AbstractTableModel {
 	}
 
 	/**
-	 * Sets the SSRowSet for SSTableModel to the given SSRowSet. This SSRowSet will
-	 * be used to get the data for JTable.
+	 * Deletes the specified row from the database. The rows are numbered as: 0, 1,
+	 * ..., n-1
 	 *
-	 * @param _rowset SSRowSet object whose records has to be displayed in JTable.
-	 */
-	public void setSSRowSet(final SSRowSet _rowset) {
-		rowset = _rowset;
-		init();
-	}
-
-	/**
-	 * Used to set an implementation of SSCellEditing interface which can be used to
-	 * determine dynamically if a given cell can be edited and to determine if a
-	 * given value is valid.
+	 * @param _row the row number that has to be deleted.
 	 *
-	 * @param _cellEditing implementation of SSCellEditing interface.
+	 * @return returns true on succesful deletion else false.
 	 */
-	public void setSSCellEditing(final SSCellEditing _cellEditing) {
-		cellEditing = _cellEditing;
-	}
-
-	/**
-	 * Used to set an implementation of SSDataGridHandler interface which can be
-	 * used to determine dynamically if a given row can be deleted, and what should
-	 * be done after row insertion, and deletion.
-	 *
-	 * @param _dataGridHandler implementation of SSDataGridHandler interface.
-	 */
-	public void setSSDataGridHandler(final SSDataGridHandler _dataGridHandler) {
-		dataGridHandler = _dataGridHandler;
-	}
-
-	/**
-	 * Sets row insertion indicator.
-	 *
-	 * @param _insert true if user can insert new rows, else false.
-	 */
-	public void setInsertion(final boolean _insert) {
-		allowInsertion = _insert;
-	}
-
-	/**
-	 * Initializes the SSTableModel. (Gets the column count and row count for the
-	 * given SSRowSet.)
-	 */
-	protected void init() {
-		try {
-
-			columnCount = rowset.getColumnCount();
-			rowset.last();
-			// ROWS IN THE SSROWSET ARE NUMBERED FROM 1, SO LAST ROW NUMBER GIVES THE
-			// ROW COUNT
-			rowCount = rowset.getRow();
-			rowset.first();
-
-// following code added 11-01-2004 per forum suggestion from Diego Gil (dags)
-			// IF DATA CHANGES, ALERT LISTENERS
-			fireTableDataChanged();
-// end additions
-
-		} catch (final SQLException se) {
-			logger.error("SQL Exception.",  se);
+	public boolean deleteRow(final int _row) {
+		if (dataGridHandler != null) {
+			dataGridHandler.performPreDeletionOps(_row);
 		}
-	}
+		if (_row < rowCount) {
+			try {
+				if ((dataGridHandler != null) && !dataGridHandler.allowDeletion(_row)) {
+					return false;
+				}
+				rowset.absolute(_row + 1);
+				rowset.deleteRow();
+				rowCount--;
+				if (dataGridHandler != null) {
+					dataGridHandler.performPostDeletionOps(_row);
+				}
+				return true;
+			} catch (final SQLException se) {
+				logger.error("SQL Exception while deleting row.",  se);
+				if (component != null) {
+					JOptionPane.showMessageDialog(component, "Error while deleting row.\n" + se.getMessage());
+				}
+
+			}
+		}
+
+		return false;
+
+	} // end public boolean deleteRow(int _row) {
+
+	/**
+	 * Returns the type for the column specified for the current view.
+	 *
+	 * @param _column the column in the view being queried
+	 *
+	 * @return type for the specified column (first column is 0)
+	 */
+	@Override
+	public Class<?> getColumnClass(final int _column) {
+		int type;
+		try {
+			type = rowset.getColumnType(_column + 1);
+		} catch (final SQLException se) {
+			logger.debug("SQL Exception.",  se);
+			return super.getColumnClass(_column);
+		}
+
+		switch (type) {
+		case Types.INTEGER:
+		case Types.SMALLINT:
+		case Types.TINYINT:
+			return Integer.class;
+
+		case Types.BIGINT:
+			return Long.class;
+
+		case Types.FLOAT:
+			return Float.class;
+
+		case Types.DOUBLE:
+		case Types.NUMERIC:
+			return Double.class;
+
+		case Types.BOOLEAN:
+		case Types.BIT:
+			return Boolean.class;
+
+		case Types.DATE:
+			return java.sql.Date.class;
+
+		case Types.CHAR:
+		case Types.VARCHAR:
+		case Types.LONGVARCHAR:
+			return String.class;
+
+		default:
+			return Object.class;
+		}
+
+	} // end public Class getColumnClass(int _column) {
 
 	/**
 	 * Returns the number of columns in the model. A JTable uses this method to
@@ -253,6 +306,44 @@ public class SSTableModel extends AbstractTableModel {
 	@Override
 	public int getColumnCount() {
 		return columnCount;
+	}
+
+	/**
+	 * Returns the name of the column appearing in the view at column position
+	 * column.
+	 *
+	 * @param _columnNumber the column in the view being queried
+	 *
+	 * @return the name of the column at the position specified for the current vew
+	 *         where column numbering begins at 0
+	 */
+	@Override
+	public String getColumnName(final int _columnNumber) {
+		if (headers != null) {
+			if (_columnNumber < headers.length) {
+				logger.debug("Sending header " + headers[_columnNumber]);
+				return headers[_columnNumber];
+			}
+		}
+		logger.warn("Not able to supply header name.");
+		return "";
+	}
+
+	/**
+	 * Returns the default value inforce for the requested column.
+	 * <p>
+	 * The type of object is same as returned by getColumnClass in JTable.
+	 *
+	 * @param _columnNumber the column number for which default value is needed.
+	 *
+	 * @return returns a object representing the default value.
+	 */
+	public Object getDefaultValue(final int _columnNumber) {
+		Object value = null;
+		if (defaultValuesMap != null) {
+			value = defaultValuesMap.get(new Integer(_columnNumber));
+		}
+		return value;
 	}
 
 	/**
@@ -271,34 +362,6 @@ public class SSTableModel extends AbstractTableModel {
 		// IF INSERTION IS NOT ALLOWED THEN RETURN THE ACTUAL ROW COUNT
 		return rowCount;
 	}
-
-	/**
-	 * Returns true if the cell at rowIndex and columnIndex is editable. Otherwise,
-	 * a call to setValueAt() on the cell will not change the value of that cell.
-	 *
-	 * @param _row    the row whose value to be queried
-	 * @param _column the column whose value to be queried
-	 *
-	 * @return editable indicator for cell at row and column specified
-	 */
-	@Override
-	public boolean isCellEditable(final int _row, final int _column) {
-
-		if (uneditableColumns != null) {
-			for (int i = 0; i < uneditableColumns.length; i++) {
-				if (_column == uneditableColumns[i]) {
-					return false;
-				}
-			}
-		}
-
-		if (cellEditing != null) {
-			return cellEditing.isCellEditable(_row, _column);
-		}
-
-		return true;
-
-	} // end public boolean isCellEditable(int _row, int _column) {
 
 	/**
 	 * Returns the value for the cell at the specified row and column.
@@ -373,6 +436,442 @@ public class SSTableModel extends AbstractTableModel {
 		return value;
 
 	} // end public Object getValueAt(int _row, int _column) {
+
+	/**
+	 * Initializes the SSTableModel. (Gets the column count and row count for the
+	 * given SSRowSet.)
+	 */
+	protected void init() {
+		try {
+
+			columnCount = rowset.getColumnCount();
+			rowset.last();
+			// ROWS IN THE SSROWSET ARE NUMBERED FROM 1, SO LAST ROW NUMBER GIVES THE
+			// ROW COUNT
+			rowCount = rowset.getRow();
+			rowset.first();
+
+// following code added 11-01-2004 per forum suggestion from Diego Gil (dags)
+			// IF DATA CHANGES, ALERT LISTENERS
+			fireTableDataChanged();
+// end additions
+
+		} catch (final SQLException se) {
+			logger.error("SQL Exception.",  se);
+		}
+	}
+
+	/**
+	 * Inserts a new row into the database. While doing so it inserts all the
+	 * defaults provided by user and if the primary column is specified along with
+	 * an SSDataValue implementation then the primary column value will be inserted.
+	 *
+	 * @param _value  value entererd of a column
+	 * @param _column the column number for which the value is entered.
+	 */
+	protected void insertRow(final Object _value, final int _column) {
+		if (_value == null) {
+			return;
+		}
+		if (dataGridHandler != null) {
+			dataGridHandler.performPreInsertOps(rowCount);
+		}
+
+		try {
+			// IF NOT ON INSERT ROW MOVE TO INSERT ROW.
+			if (!inInsertRow) {
+				rowset.moveToInsertRow();
+				// SET THE DEFAULTS
+				setDefaults();
+				inInsertRow = true;
+				// IS SSDATAVALUE IS PROVIDED SET PRIMARY KEY VALUE
+				if (dataValue != null) {
+					setPrimaryColumn();
+				}
+
+			}
+
+			final int type = rowset.getColumnType(_column + 1);
+
+			switch (type) {
+			case Types.INTEGER:
+			case Types.SMALLINT:
+			case Types.TINYINT:
+				rowset.updateInt(_column + 1, ((Integer) _value));
+				break;
+			case Types.BIGINT:
+// adding update long support 11-01-2004
+				rowset.updateLong(_column + 1, ((Long) _value));
+				break;
+			case Types.FLOAT:
+				rowset.updateFloat(_column + 1, ((Float) _value));
+				break;
+			case Types.DOUBLE:
+			case Types.NUMERIC:
+				rowset.updateDouble(_column + 1, ((Double) _value));
+				break;
+			case Types.BOOLEAN:
+			case Types.BIT:
+				rowset.updateBoolean(_column + 1, ((Boolean) _value));
+				break;
+			case Types.DATE:
+				if (_value instanceof String) {
+					rowset.updateDate(_column + 1, getSQLDate((String) _value));
+				} else {
+					rowset.updateDate(_column + 1, (Date) _value);
+				}
+				break;
+			case Types.CHAR:
+			case Types.VARCHAR:
+			case Types.LONGVARCHAR:
+				rowset.updateString(_column + 1, (String) _value);
+				break;
+			default:
+				logger.warn("SSTableModel.setValueAt(): Unknown data type.");
+			}
+
+			rowset.insertRow();
+			if (rowCount != 0) {
+				rowset.moveToCurrentRow();
+			} else {
+				rowset.first();
+			}
+			rowset.refreshRow();
+
+			logger.debug("Row number of inserted row : "+ rowset.getRow());
+
+			if (table != null) {
+				table.updateUI();
+			}
+			inInsertRow = false;
+			rowCount++;
+
+			if (dataGridHandler != null) {
+				dataGridHandler.performPostInsertOps(rowCount - 1);
+			}
+
+		} catch (final SQLException se) {
+			logger.error("SQL Exception while inserting row.",  se);
+			inInsertRow = false;
+			if (component != null) {
+				JOptionPane.showMessageDialog(component, "Error while inserting row.\n" + se.getMessage());
+			}
+		}
+
+		logger.debug("Successfully added row.");
+
+	} // end protected void insertRow(Object _value, int _column) {
+
+	/**
+	 * Returns true if the cell at rowIndex and columnIndex is editable. Otherwise,
+	 * a call to setValueAt() on the cell will not change the value of that cell.
+	 *
+	 * @param _row    the row whose value to be queried
+	 * @param _column the column whose value to be queried
+	 *
+	 * @return editable indicator for cell at row and column specified
+	 */
+	@Override
+	public boolean isCellEditable(final int _row, final int _column) {
+
+		if (uneditableColumns != null) {
+			for (int i = 0; i < uneditableColumns.length; i++) {
+				if (_column == uneditableColumns[i]) {
+					return false;
+				}
+			}
+		}
+
+		if (cellEditing != null) {
+			return cellEditing.isCellEditable(_row, _column);
+		}
+
+		return true;
+
+	} // end public boolean isCellEditable(int _row, int _column) {
+
+	/**
+	 * This function sets the default values for the present row.
+	 */
+	protected void setDefaults() {
+		if (defaultValuesMap == null) {
+			return;
+		}
+
+		final Set<Integer> keySet = defaultValuesMap.keySet();
+		final Iterator<?> iterator = keySet.iterator();
+		try {
+			while (iterator.hasNext()) {
+				final Integer column = (Integer) iterator.next();
+
+				logger.debug("Column number is:" + column);
+
+				// COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
+				final int type = rowset.getColumnType(column.intValue() + 1);
+				switch (type) {
+				case Types.INTEGER:
+				case Types.SMALLINT:
+				case Types.TINYINT:
+					rowset.updateInt(column.intValue() + 1,
+							((Integer) defaultValuesMap.get(column)));
+					break;
+				case Types.BIGINT:
+					rowset.updateLong(column.intValue() + 1,
+							((Long) defaultValuesMap.get(column)));
+					break;
+				case Types.FLOAT:
+					rowset.updateFloat(column.intValue() + 1,
+							((Float) defaultValuesMap.get(column)));
+					break;
+				case Types.DOUBLE:
+				case Types.NUMERIC:
+					rowset.updateDouble(column.intValue() + 1,
+							((Double) defaultValuesMap.get(column)));
+					break;
+				case Types.BOOLEAN:
+				case Types.BIT:
+					rowset.updateBoolean(column.intValue() + 1,
+							((Boolean) defaultValuesMap.get(column)));
+					break;
+				case Types.DATE:
+					rowset.updateDate(column.intValue() + 1, (Date) defaultValuesMap.get(column));
+					break;
+				case Types.CHAR:
+				case Types.VARCHAR:
+				case Types.LONGVARCHAR:
+					rowset.updateString(column.intValue() + 1, (String) defaultValuesMap.get(column));
+					break;
+				default:
+					logger.warn("Unknown data type of " + type);
+				} // END OF SWITCH
+
+			} // END OF WHILE
+
+		} catch (final SQLException se) {
+			logger.error("SQL Exception while setting defaults for row.",  se);
+			if (component != null) {
+				JOptionPane.showMessageDialog(component, "Error while setting defaults for row.\n" + se.getMessage());
+			}
+		}
+	} // end protected void setDefaults() {
+
+	/**
+	 * Sets the default values for different columns. These values will be used
+	 * while inserting a new row.
+	 *
+	 * @param _columnNumbers the column numbers for which defaults are required
+	 * @param _values        the values for all the columns specified in first
+	 *                       argument
+	 */
+	public void setDefaultValues(final int[] _columnNumbers, final Object[] _values) {
+		if ((_columnNumbers == null) || (_values == null)) {
+			defaultValuesMap = null;
+		}
+
+		if (defaultValuesMap == null) {
+			defaultValuesMap = new HashMap<>();
+		} else {
+			defaultValuesMap.clear();
+		}
+		if ((_columnNumbers != null) && (_values != null)) {
+			for (int i = 0; i < _columnNumbers.length; i++) {
+				defaultValuesMap.put(new Integer(_columnNumbers[i]), _values[i]);
+			}
+		}
+	}
+
+	/**
+	 * Sets the headers for the JTable. This function has to be called before
+	 * setting the SSRowSet for SSDataGrid.
+	 *
+	 * @param _headers array of string objects representing the header for each
+	 *                 column.
+	 */
+	public void setHeaders(final String[] _headers) {
+		headers = _headers;
+	}
+
+	/**
+	 * Sets the column numbers that should be hidden. The SSDataGrid sets the column
+	 * width of these columns to 0. The columns are set to zero width rather than
+	 * removing the column from the table. Thus preserving the column numbering. If
+	 * a column is removed then the column numbers for columns after the removed
+	 * column will change. Even if the column is specified as hidden user will be
+	 * seeing a tiny strip. Make sure that you specify the hidden column numbers in
+	 * the uneditable column list.
+	 *
+	 * @param _columnNumbers array specifying the column numbers which should be
+	 *                       hidden.
+	 */
+	public void setHiddenColumns(final int[] _columnNumbers) {
+		hiddenColumns = _columnNumbers;
+	}
+
+	/**
+	 * Sets row insertion indicator.
+	 *
+	 * @param _insert true if user can insert new rows, else false.
+	 */
+	public void setInsertion(final boolean _insert) {
+		allowInsertion = _insert;
+	}
+
+	/**
+	 * This sets the JTable to which the table model is bound to. When an insert row
+	 * has taken place TableModel tries to update the UI.
+	 *
+	 * @param _table JTable to which SSTableModel is bound to.
+	 */
+	public void setJTable(final JTable _table) {
+		table = _table;
+	}
+
+	/**
+	 * Sets the message window. This is used as parent component for pop up message
+	 * dialogs.
+	 *
+	 * @param _component the component that should be used for message dialogs.
+	 */
+	public void setMessageWindow(final Component _component) {
+		component = _component;
+	}
+
+	/**
+	 * Updates the primary key column based on the SSDataValue implementation
+	 * specified for the SSTableModel and the underlying SQL data type.
+	 */
+	protected void setPrimaryColumn() {
+		try {
+
+			final int type = rowset.getColumnType(primaryColumn + 1);
+
+			switch (type) {
+			case Types.INTEGER:
+			case Types.SMALLINT:
+			case Types.TINYINT:
+				rowset.updateInt(primaryColumn + 1,
+						((Integer) dataValue.getPrimaryColumnValue()));
+				break;
+			case Types.BIGINT:
+				rowset.updateLong(primaryColumn + 1,
+						((Long) dataValue.getPrimaryColumnValue()));
+				break;
+			case Types.FLOAT:
+				rowset.updateFloat(primaryColumn + 1,
+						((Float) dataValue.getPrimaryColumnValue()));
+				break;
+			case Types.DOUBLE:
+			case Types.NUMERIC:
+				rowset.updateDouble(primaryColumn + 1,
+						((Double) dataValue.getPrimaryColumnValue()));
+				break;
+			case Types.BOOLEAN:
+			case Types.BIT:
+				rowset.updateBoolean(primaryColumn + 1,
+						((Boolean) dataValue.getPrimaryColumnValue()));
+				break;
+			case Types.DATE:
+				rowset.updateDate(primaryColumn + 1, (Date) dataValue.getPrimaryColumnValue());
+				break;
+			case Types.CHAR:
+			case Types.VARCHAR:
+			case Types.LONGVARCHAR:
+				rowset.updateString(primaryColumn + 1, (String) dataValue.getPrimaryColumnValue());
+				break;
+			default:
+				logger.warn("Unknown data type of " + type);
+			}
+		} catch (final SQLException se) {
+			logger.error("SQL Exception while insering Primary Key value.",  se);
+			if (component != null) {
+				JOptionPane.showMessageDialog(component,
+						"Error while inserting Primary Key value.\n" + se.getMessage());
+			}
+		}
+	} // end protected void setPrimaryColumn() {
+
+	/**
+	 * Sets the column number which is the primary column for the table. This is
+	 * required if new rows have to be added to the JTable. For this to properly
+	 * work the SSDataValue object should also be provided SSDataValue is used to
+	 * get the value for the primary column.
+	 *
+	 * @param _columnNumber the column which is the primary column.
+	 */
+	public void setPrimaryColumn(final int _columnNumber) {
+		primaryColumn = _columnNumber;
+	}
+
+	/**
+	 * Sets the SSRowSet for SSTableModel to the given SSRowSet. This SSRowSet will
+	 * be used to get the data for JTable.
+	 *
+	 * @param _rowset SSRowSet object whose records has to be displayed in JTable.
+	 *
+	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
+	 */
+	@Deprecated
+	public void setRowSet(final SSRowSet _rowset) {
+		rowset = _rowset;
+		init();
+	}
+
+	/**
+	 * Used to set an implementation of SSCellEditing interface which can be used to
+	 * determine dynamically if a given cell can be edited and to determine if a
+	 * given value is valid.
+	 *
+	 * @param _cellEditing implementation of SSCellEditing interface.
+	 */
+	public void setSSCellEditing(final SSCellEditing _cellEditing) {
+		cellEditing = _cellEditing;
+	}
+
+	/**
+	 * Used to set an implementation of SSDataGridHandler interface which can be
+	 * used to determine dynamically if a given row can be deleted, and what should
+	 * be done after row insertion, and deletion.
+	 *
+	 * @param _dataGridHandler implementation of SSDataGridHandler interface.
+	 */
+	public void setSSDataGridHandler(final SSDataGridHandler _dataGridHandler) {
+		dataGridHandler = _dataGridHandler;
+	}
+
+	/**
+	 * Sets the SSDataValue interface implemention. This interface specifies
+	 * function to retrieve primary column values for a new row to be added.
+	 *
+	 * @param _dataValue implementation of SSDataValue for determining PK
+	 */
+	public void setSSDataValue(final SSDataValue _dataValue) {
+		dataValue = _dataValue;
+	}
+
+	/**
+	 * Sets the SSRowSet for SSTableModel to the given SSRowSet. This SSRowSet will
+	 * be used to get the data for JTable.
+	 *
+	 * @param _rowset SSRowSet object whose records has to be displayed in JTable.
+	 */
+	public void setSSRowSet(final SSRowSet _rowset) {
+		rowset = _rowset;
+		init();
+	}
+
+	/**
+	 * Sets the uneditable columns. The columns specified as uneditable will not be
+	 * available for user to edit. This overrides the isCellEditable function in
+	 * SSCellEditing.
+	 *
+	 * @param _columnNumbers array specifying the column numbers which should be
+	 *                       uneditable.
+	 */
+	public void setUneditableColumns(final int[] _columnNumbers) {
+		uneditableColumns = _columnNumbers;
+	}
+
+// DEPRECATED STUFF....................
 
 	/**
 	 * Sets the value in the cell at _row and _column to _value.
@@ -496,505 +995,6 @@ public class SSTableModel extends AbstractTableModel {
 		}
 
 	} // end public void setValueAt(Object _value, int _row, int _column) {
-
-	/**
-	 * Inserts a new row into the database. While doing so it inserts all the
-	 * defaults provided by user and if the primary column is specified along with
-	 * an SSDataValue implementation then the primary column value will be inserted.
-	 *
-	 * @param _value  value entererd of a column
-	 * @param _column the column number for which the value is entered.
-	 */
-	protected void insertRow(final Object _value, final int _column) {
-		if (_value == null) {
-			return;
-		}
-		if (dataGridHandler != null) {
-			dataGridHandler.performPreInsertOps(rowCount);
-		}
-
-		try {
-			// IF NOT ON INSERT ROW MOVE TO INSERT ROW.
-			if (!inInsertRow) {
-				rowset.moveToInsertRow();
-				// SET THE DEFAULTS
-				setDefaults();
-				inInsertRow = true;
-				// IS SSDATAVALUE IS PROVIDED SET PRIMARY KEY VALUE
-				if (dataValue != null) {
-					setPrimaryColumn();
-				}
-
-			}
-
-			final int type = rowset.getColumnType(_column + 1);
-
-			switch (type) {
-			case Types.INTEGER:
-			case Types.SMALLINT:
-			case Types.TINYINT:
-				rowset.updateInt(_column + 1, ((Integer) _value));
-				break;
-			case Types.BIGINT:
-// adding update long support 11-01-2004
-				rowset.updateLong(_column + 1, ((Long) _value));
-				break;
-			case Types.FLOAT:
-				rowset.updateFloat(_column + 1, ((Float) _value));
-				break;
-			case Types.DOUBLE:
-			case Types.NUMERIC:
-				rowset.updateDouble(_column + 1, ((Double) _value));
-				break;
-			case Types.BOOLEAN:
-			case Types.BIT:
-				rowset.updateBoolean(_column + 1, ((Boolean) _value));
-				break;
-			case Types.DATE:
-				if (_value instanceof String) {
-					rowset.updateDate(_column + 1, getSQLDate((String) _value));
-				} else {
-					rowset.updateDate(_column + 1, (Date) _value);
-				}
-				break;
-			case Types.CHAR:
-			case Types.VARCHAR:
-			case Types.LONGVARCHAR:
-				rowset.updateString(_column + 1, (String) _value);
-				break;
-			default:
-				logger.warn("SSTableModel.setValueAt(): Unknown data type.");
-			}
-
-			rowset.insertRow();
-			if (rowCount != 0) {
-				rowset.moveToCurrentRow();
-			} else {
-				rowset.first();
-			}
-			rowset.refreshRow();
-
-			logger.debug("Row number of inserted row : "+ rowset.getRow());
-
-			if (table != null) {
-				table.updateUI();
-			}
-			inInsertRow = false;
-			rowCount++;
-
-			if (dataGridHandler != null) {
-				dataGridHandler.performPostInsertOps(rowCount - 1);
-			}
-
-		} catch (final SQLException se) {
-			logger.error("SQL Exception while inserting row.",  se);
-			inInsertRow = false;
-			if (component != null) {
-				JOptionPane.showMessageDialog(component, "Error while inserting row.\n" + se.getMessage());
-			}
-		}
-
-		logger.debug("Successfully added row.");
-
-	} // end protected void insertRow(Object _value, int _column) {
-
-	/**
-	 * This function sets the default values for the present row.
-	 */
-	protected void setDefaults() {
-		if (defaultValuesMap == null) {
-			return;
-		}
-
-		final Set<Integer> keySet = defaultValuesMap.keySet();
-		final Iterator<?> iterator = keySet.iterator();
-		try {
-			while (iterator.hasNext()) {
-				final Integer column = (Integer) iterator.next();
-
-				logger.debug("Column number is:" + column);
-
-				// COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
-				final int type = rowset.getColumnType(column.intValue() + 1);
-				switch (type) {
-				case Types.INTEGER:
-				case Types.SMALLINT:
-				case Types.TINYINT:
-					rowset.updateInt(column.intValue() + 1,
-							((Integer) defaultValuesMap.get(column)));
-					break;
-				case Types.BIGINT:
-					rowset.updateLong(column.intValue() + 1,
-							((Long) defaultValuesMap.get(column)));
-					break;
-				case Types.FLOAT:
-					rowset.updateFloat(column.intValue() + 1,
-							((Float) defaultValuesMap.get(column)));
-					break;
-				case Types.DOUBLE:
-				case Types.NUMERIC:
-					rowset.updateDouble(column.intValue() + 1,
-							((Double) defaultValuesMap.get(column)));
-					break;
-				case Types.BOOLEAN:
-				case Types.BIT:
-					rowset.updateBoolean(column.intValue() + 1,
-							((Boolean) defaultValuesMap.get(column)));
-					break;
-				case Types.DATE:
-					rowset.updateDate(column.intValue() + 1, (Date) defaultValuesMap.get(column));
-					break;
-				case Types.CHAR:
-				case Types.VARCHAR:
-				case Types.LONGVARCHAR:
-					rowset.updateString(column.intValue() + 1, (String) defaultValuesMap.get(column));
-					break;
-				default:
-					logger.warn("Unknown data type of " + type);
-				} // END OF SWITCH
-
-			} // END OF WHILE
-
-		} catch (final SQLException se) {
-			logger.error("SQL Exception while setting defaults for row.",  se);
-			if (component != null) {
-				JOptionPane.showMessageDialog(component, "Error while setting defaults for row.\n" + se.getMessage());
-			}
-		}
-	} // end protected void setDefaults() {
-
-	/**
-	 * Returns the type for the column specified for the current view.
-	 *
-	 * @param _column the column in the view being queried
-	 *
-	 * @return type for the specified column (first column is 0)
-	 */
-	@Override
-	public Class<?> getColumnClass(final int _column) {
-		int type;
-		try {
-			type = rowset.getColumnType(_column + 1);
-		} catch (final SQLException se) {
-			logger.debug("SQL Exception.",  se);
-			return super.getColumnClass(_column);
-		}
-
-		switch (type) {
-		case Types.INTEGER:
-		case Types.SMALLINT:
-		case Types.TINYINT:
-			return Integer.class;
-
-		case Types.BIGINT:
-			return Long.class;
-
-		case Types.FLOAT:
-			return Float.class;
-
-		case Types.DOUBLE:
-		case Types.NUMERIC:
-			return Double.class;
-
-		case Types.BOOLEAN:
-		case Types.BIT:
-			return Boolean.class;
-
-		case Types.DATE:
-			return java.sql.Date.class;
-
-		case Types.CHAR:
-		case Types.VARCHAR:
-		case Types.LONGVARCHAR:
-			return String.class;
-
-		default:
-			return Object.class;
-		}
-
-	} // end public Class getColumnClass(int _column) {
-
-	/**
-	 * Deletes the specified row from the database. The rows are numbered as: 0, 1,
-	 * ..., n-1
-	 *
-	 * @param _row the row number that has to be deleted.
-	 *
-	 * @return returns true on succesful deletion else false.
-	 */
-	public boolean deleteRow(final int _row) {
-		if (dataGridHandler != null) {
-			dataGridHandler.performPreDeletionOps(_row);
-		}
-		if (_row < rowCount) {
-			try {
-				if ((dataGridHandler != null) && !dataGridHandler.allowDeletion(_row)) {
-					return false;
-				}
-				rowset.absolute(_row + 1);
-				rowset.deleteRow();
-				rowCount--;
-				if (dataGridHandler != null) {
-					dataGridHandler.performPostDeletionOps(_row);
-				}
-				return true;
-			} catch (final SQLException se) {
-				logger.error("SQL Exception while deleting row.",  se);
-				if (component != null) {
-					JOptionPane.showMessageDialog(component, "Error while deleting row.\n" + se.getMessage());
-				}
-
-			}
-		}
-
-		return false;
-
-	} // end public boolean deleteRow(int _row) {
-
-	/**
-	 * Sets the default values for different columns. These values will be used
-	 * while inserting a new row.
-	 *
-	 * @param _columnNumbers the column numbers for which defaults are required
-	 * @param _values        the values for all the columns specified in first
-	 *                       argument
-	 */
-	public void setDefaultValues(final int[] _columnNumbers, final Object[] _values) {
-		if ((_columnNumbers == null) || (_values == null)) {
-			defaultValuesMap = null;
-		}
-
-		if (defaultValuesMap == null) {
-			defaultValuesMap = new HashMap<>();
-		} else {
-			defaultValuesMap.clear();
-		}
-		if ((_columnNumbers != null) && (_values != null)) {
-			for (int i = 0; i < _columnNumbers.length; i++) {
-				defaultValuesMap.put(new Integer(_columnNumbers[i]), _values[i]);
-			}
-		}
-	}
-
-	/**
-	 * Returns the default value inforce for the requested column.
-	 * <p>
-	 * The type of object is same as returned by getColumnClass in JTable.
-	 *
-	 * @param _columnNumber the column number for which default value is needed.
-	 *
-	 * @return returns a object representing the default value.
-	 */
-	public Object getDefaultValue(final int _columnNumber) {
-		Object value = null;
-		if (defaultValuesMap != null) {
-			value = defaultValuesMap.get(new Integer(_columnNumber));
-		}
-		return value;
-	}
-
-	/**
-	 * Sets the message window. This is used as parent component for pop up message
-	 * dialogs.
-	 *
-	 * @param _component the component that should be used for message dialogs.
-	 */
-	public void setMessageWindow(final Component _component) {
-		component = _component;
-	}
-
-	/**
-	 * This sets the JTable to which the table model is bound to. When an insert row
-	 * has taken place TableModel tries to update the UI.
-	 *
-	 * @param _table JTable to which SSTableModel is bound to.
-	 */
-	public void setJTable(final JTable _table) {
-		table = _table;
-	}
-
-	/**
-	 * Sets the column number which is the primary column for the table. This is
-	 * required if new rows have to be added to the JTable. For this to properly
-	 * work the SSDataValue object should also be provided SSDataValue is used to
-	 * get the value for the primary column.
-	 *
-	 * @param _columnNumber the column which is the primary column.
-	 */
-	public void setPrimaryColumn(final int _columnNumber) {
-		primaryColumn = _columnNumber;
-	}
-
-	/**
-	 * Sets the SSDataValue interface implemention. This interface specifies
-	 * function to retrieve primary column values for a new row to be added.
-	 *
-	 * @param _dataValue implementation of SSDataValue for determining PK
-	 */
-	public void setSSDataValue(final SSDataValue _dataValue) {
-		dataValue = _dataValue;
-	}
-
-	/**
-	 * Updates the primary key column based on the SSDataValue implementation
-	 * specified for the SSTableModel and the underlying SQL data type.
-	 */
-	protected void setPrimaryColumn() {
-		try {
-
-			final int type = rowset.getColumnType(primaryColumn + 1);
-
-			switch (type) {
-			case Types.INTEGER:
-			case Types.SMALLINT:
-			case Types.TINYINT:
-				rowset.updateInt(primaryColumn + 1,
-						((Integer) dataValue.getPrimaryColumnValue()));
-				break;
-			case Types.BIGINT:
-				rowset.updateLong(primaryColumn + 1,
-						((Long) dataValue.getPrimaryColumnValue()));
-				break;
-			case Types.FLOAT:
-				rowset.updateFloat(primaryColumn + 1,
-						((Float) dataValue.getPrimaryColumnValue()));
-				break;
-			case Types.DOUBLE:
-			case Types.NUMERIC:
-				rowset.updateDouble(primaryColumn + 1,
-						((Double) dataValue.getPrimaryColumnValue()));
-				break;
-			case Types.BOOLEAN:
-			case Types.BIT:
-				rowset.updateBoolean(primaryColumn + 1,
-						((Boolean) dataValue.getPrimaryColumnValue()));
-				break;
-			case Types.DATE:
-				rowset.updateDate(primaryColumn + 1, (Date) dataValue.getPrimaryColumnValue());
-				break;
-			case Types.CHAR:
-			case Types.VARCHAR:
-			case Types.LONGVARCHAR:
-				rowset.updateString(primaryColumn + 1, (String) dataValue.getPrimaryColumnValue());
-				break;
-			default:
-				logger.warn("Unknown data type of " + type);
-			}
-		} catch (final SQLException se) {
-			logger.error("SQL Exception while insering Primary Key value.",  se);
-			if (component != null) {
-				JOptionPane.showMessageDialog(component,
-						"Error while inserting Primary Key value.\n" + se.getMessage());
-			}
-		}
-	} // end protected void setPrimaryColumn() {
-
-	/**
-	 * Returns an SQL date for a string date formatted as "MM/dd/yyyy".
-	 *
-	 * @param _strDate String containing a date in "MM/dd/yyyy" format.
-	 *
-	 * @return String date reformatted as an SQL date
-	 */
-	protected static Date getSQLDate(final String _strDate) {
-
-		// remove any leading/trailing spaces (e.g., could be introduced from
-		// copy/paste)
-		String newStrDate = _strDate.trim();
-
-		// check for empty string
-		if (newStrDate.equals("")) {
-			return null;
-		}
-
-		// REMOVE ANY SPACES IF ANY (This could happen if copying from another
-		// application)
-		// _strDate = _strDate.trim();
-		// String newStrDate = _strDate;
-		if (newStrDate.indexOf("/") != -1) {
-			final StringTokenizer strtok = new StringTokenizer(newStrDate, "/", false);
-			final String month = strtok.nextToken();
-			final String day = strtok.nextToken();
-			newStrDate = strtok.nextToken() + "-" + month + "-" + day;
-		}
-		return Date.valueOf(newStrDate);
-	}
-
-	/**
-	 * Sets the headers for the JTable. This function has to be called before
-	 * setting the SSRowSet for SSDataGrid.
-	 *
-	 * @param _headers array of string objects representing the header for each
-	 *                 column.
-	 */
-	public void setHeaders(final String[] _headers) {
-		headers = _headers;
-	}
-
-	/**
-	 * Returns the name of the column appearing in the view at column position
-	 * column.
-	 *
-	 * @param _columnNumber the column in the view being queried
-	 *
-	 * @return the name of the column at the position specified for the current vew
-	 *         where column numbering begins at 0
-	 */
-	@Override
-	public String getColumnName(final int _columnNumber) {
-		if (headers != null) {
-			if (_columnNumber < headers.length) {
-				logger.debug("Sending header " + headers[_columnNumber]);
-				return headers[_columnNumber];
-			}
-		}
-		logger.warn("Not able to supply header name.");
-		return "";
-	}
-
-	/**
-	 * Sets the uneditable columns. The columns specified as uneditable will not be
-	 * available for user to edit. This overrides the isCellEditable function in
-	 * SSCellEditing.
-	 *
-	 * @param _columnNumbers array specifying the column numbers which should be
-	 *                       uneditable.
-	 */
-	public void setUneditableColumns(final int[] _columnNumbers) {
-		uneditableColumns = _columnNumbers;
-	}
-
-	/**
-	 * Sets the column numbers that should be hidden. The SSDataGrid sets the column
-	 * width of these columns to 0. The columns are set to zero width rather than
-	 * removing the column from the table. Thus preserving the column numbering. If
-	 * a column is removed then the column numbers for columns after the removed
-	 * column will change. Even if the column is specified as hidden user will be
-	 * seeing a tiny strip. Make sure that you specify the hidden column numbers in
-	 * the uneditable column list.
-	 *
-	 * @param _columnNumbers array specifying the column numbers which should be
-	 *                       hidden.
-	 */
-	public void setHiddenColumns(final int[] _columnNumbers) {
-		hiddenColumns = _columnNumbers;
-	}
-
-// DEPRECATED STUFF....................
-
-	/**
-	 * Sets the SSRowSet for SSTableModel to the given SSRowSet. This SSRowSet will
-	 * be used to get the data for JTable.
-	 *
-	 * @param _rowset SSRowSet object whose records has to be displayed in JTable.
-	 *
-	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
-	 */
-	@Deprecated
-	public void setRowSet(final SSRowSet _rowset) {
-		rowset = _rowset;
-		init();
-	}
 
 } // end public class SSTableModel extends AbstractTableModel {
 

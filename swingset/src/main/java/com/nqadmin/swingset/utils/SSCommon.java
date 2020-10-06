@@ -206,6 +206,11 @@ public class SSCommon implements Serializable {
 	//private static Logger logger;
 
 	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+
+	/**
 	 * Constant to indicate that no RowSet column index has been specified.
 	 */
 	public static final int NO_COLUMN_INDEX = -1;
@@ -257,24 +262,24 @@ public class SSCommon implements Serializable {
 	private int boundColumnIndex = NO_COLUMN_INDEX;
 
 	/**
-	 * Name of SSRowSet column to which the SwingSet component will be bound.
-	 */
-	private String boundColumnName = null;
-
-	/**
-	 * Column SQL data type.
-	 */
-	private int boundColumnType = java.sql.Types.NULL;
-
-	/**
 	 * Column JDBCType enum.
 	 */
 	private JDBCType boundColumnJDBCType = java.sql.JDBCType.NULL;
+
+	/**
+	 * Name of SSRowSet column to which the SwingSet component will be bound.
+	 */
+	private String boundColumnName = null;
 
 //	/**
 //	 * SSRowSet column containing the primary key.
 //	 */
 //	private String primaryKeyColumn = null;
+
+	/**
+	 * Column SQL data type.
+	 */
+	private int boundColumnType = java.sql.Types.NULL;
 
 	/**
 	 * flag to indicate if we're inside of a bind() method
@@ -305,11 +310,6 @@ public class SSCommon implements Serializable {
 	 * Underlying SSRowSet listener.
 	 */
 	private final SSRowSetListener ssRowSetListener = new SSRowSetListener();
-
-	/**
-	 * Log4j Logger for component
-	 */
-	private static Logger logger = LogManager.getLogger();
 
 	/**
 	 * Constructor expecting a SwingSet component as an argument (usually called as
@@ -454,6 +454,17 @@ public class SSCommon implements Serializable {
 	}
 
 	/**
+	 * Returns the JDBCType enum representing the bound database column data type.
+	 * <p>
+	 * Based on java.sql.JDBCType
+	 *
+	 * @return the enum value corresponding to the data type of the bound column
+	 */
+	public JDBCType getBoundColumnJDBCType() {
+		return boundColumnJDBCType;
+	}
+
+	/**
 	 * Returns the name of the database column to which the SwingSet component is
 	 * bound.
 	 *
@@ -501,17 +512,6 @@ public class SSCommon implements Serializable {
 	 */
 	public int getBoundColumnType() {
 		return boundColumnType;
-	}
-
-	/**
-	 * Returns the JDBCType enum representing the bound database column data type.
-	 * <p>
-	 * Based on java.sql.JDBCType
-	 *
-	 * @return the enum value corresponding to the data type of the bound column
-	 */
-	public JDBCType getBoundColumnJDBCType() {
-		return boundColumnJDBCType;
 	}
 
 	/**

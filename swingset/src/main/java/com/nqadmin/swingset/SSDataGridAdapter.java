@@ -72,16 +72,6 @@ public abstract class SSDataGridAdapter implements SSDataGridHandler, Serializab
     }
 
     /**
-     * Method to perform pre-deletion operations.
-     *
-     * @param _row position of data grid row being deleted.
-     */
-    @Override
-	public void performPreDeletionOps(final int _row) {
-    	// do nothing
-    }
-
-    /**
      * Method to perform post-deletion operations.
      *
 	 * @param _row the position of deleted row in the data grid.
@@ -92,22 +82,32 @@ public abstract class SSDataGridAdapter implements SSDataGridHandler, Serializab
     }
 
     /**
-     * Method to perform pre-insertion operations.
-     *
-     * @param _row position of new row in the data grid.
-     */
-    @Override
-	public void performPreInsertOps(final int _row){
-    	// do nothing
-    }
-
-    /**
      * Method to perform post-insertion operations.
      *
      * @param _row position of added row in the data grid.
      */
     @Override
 	public void performPostInsertOps(final int _row) {
+    	// do nothing
+    }
+
+    /**
+     * Method to perform pre-deletion operations.
+     *
+     * @param _row position of data grid row being deleted.
+     */
+    @Override
+	public void performPreDeletionOps(final int _row) {
+    	// do nothing
+    }
+
+    /**
+     * Method to perform pre-insertion operations.
+     *
+     * @param _row position of new row in the data grid.
+     */
+    @Override
+	public void performPreInsertOps(final int _row){
     	// do nothing
     }
 }
