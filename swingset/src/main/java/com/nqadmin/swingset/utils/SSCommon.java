@@ -289,7 +289,7 @@ public class SSCommon implements Serializable {
 	/**
 	 * parent SwingSet component
 	 */
-	private Object ssComponent = null;
+	private SSComponentInterface ssComponent = null;
 
 	/**
 	 * database connection
@@ -318,7 +318,7 @@ public class SSCommon implements Serializable {
 	 * @param _ssComponent SwingSet component having this SSCommon instance as a
 	 *                     datamember
 	 */
-	public SSCommon(final Object _ssComponent) {
+	public SSCommon(final SSComponentInterface _ssComponent) {
 		setSSComponent(_ssComponent);
 		init();
 
@@ -540,7 +540,7 @@ public class SSCommon implements Serializable {
 	 * @return the parent/calling SwingSet JComponent implementing
 	 *         SSComponentInterface
 	 */
-	public Object getSSComponent() {
+	public SSComponentInterface getSSComponent() {
 		return ssComponent;
 	}
 
@@ -757,7 +757,7 @@ public class SSCommon implements Serializable {
 	 * @param _ssComponent the parent/calling SwingSet JComponent implementing
 	 *                     SSComponentInterface
 	 */
-	public void setSSComponent(final Object _ssComponent) {
+	public void setSSComponent(final SSComponentInterface _ssComponent) {
 		ssComponent = _ssComponent;
 	}
 
