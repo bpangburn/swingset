@@ -168,12 +168,8 @@ public class SSDBNavImpl implements SSDBNav {
             	logger.warn("Encountered unknown component type of: " + comps[i].getClass().getSimpleName() + ". Unable to clear component.");
             }
 
-			/*
-			 * JPanel, JScrollPane, JTabbedPane,
-			 *
-			 * SSCheckBox, SSComboBox, SSFormattedTextField, SSImage, SSLabel, SSSlider,
-			 * SSTextArea, SSTextField
-			 */
+// TODO See if there is a way to use a case statement and/or the SwingSet component Enum here.
+            
 // 2019-09-29: PROBLEM WITH NEW SWITCH/ENUM IS THAT getSimpleName() RETURNS THE CLASS NAME OF THE CONTAINER SCREEEN
 //   WHICH COULD BE A CHILD ONE ONE OF THE JComponents E.G., XJPanelChildClass
 //

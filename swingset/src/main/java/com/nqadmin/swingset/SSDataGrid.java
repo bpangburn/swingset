@@ -164,10 +164,11 @@ public class SSDataGrid extends JTable {
 	 */
 	protected class CheckBoxEditor extends DefaultCellEditor {
 		/**
-			 * <p>
-			 */
+		 * Unique serial ID
+		 */
 		private static final long serialVersionUID = 966225988861238964L;
-		// VARIABLE TO STORE THE COLUMN CLASS.
+		
+		// Variable to store the java.sql.Type
 		protected int columnClass = 0;
 
 		public CheckBoxEditor() {
@@ -282,9 +283,8 @@ public class SSDataGrid extends JTable {
 		 */
 		private static final long serialVersionUID = -6439941232160386725L;
 		
-		// SET THE CLICK COUNT TO EDIT THE COMBO AS 2
+		// Set the # of clicks required to edit the combo to 2.
 		int tmpClickCountToStart = 2;
-//      JComboBox comboBox = null;
 		Object[] underlyingValues = null;
 
 		public ComboEditor(final Object[] _items, final Object[] _underlyingValues) {
@@ -347,7 +347,6 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Renderer for combo box fields.
 	 */
-//    protected class ComboRenderer extends JComboBox implements TableCellRenderer {
 	protected class ComboRenderer extends DefaultTableCellRenderer.UIResource {
 		
 		/**
@@ -355,12 +354,10 @@ public class SSDataGrid extends JTable {
 		 */
 		private static final long serialVersionUID = 2010609036458432567L;
 		
-		//        JLabel label = new JLabel();
 		Object[] displayValues = null;
 		Object[] underlyingValues = null;
 
 		public ComboRenderer(final Object[] _items, final Object[] _underlyingValues) {
-//            super(_items);
 			underlyingValues = _underlyingValues;
 			displayValues = _items;
 		}
@@ -389,12 +386,10 @@ public class SSDataGrid extends JTable {
 
 			int index = -1;
 			if (displayValues.length > 0) {
-//              setSelectedIndex(getIndexOf(_value));
 				index = getIndexOf(_value);
 			} else {
 				logger.error("No item in combo that corresponds to " + _value);
 			}
-//          return this;
 
 			if (index == -1) {
 				label.setText("");
@@ -411,7 +406,7 @@ public class SSDataGrid extends JTable {
 	 */
 	protected class DateEditor extends DefaultCellEditor {
 		/**
-		 * <p>
+		 * Unique serial ID.
 		 */
 		private static final long serialVersionUID = 8741829961228359406L;
 
@@ -503,7 +498,7 @@ public class SSDataGrid extends JTable {
 	protected class DateRenderer extends DefaultTableCellRenderer {
 
 		/**
-		 * <p>
+		 * Unique serial ID.
 		 */
 		private static final long serialVersionUID = 2167118906692276587L;
 
@@ -527,22 +522,20 @@ public class SSDataGrid extends JTable {
 	 * This is the default editor for Numeric, String and Object column types.
 	 */
 	class DefaultEditor extends DefaultCellEditor {
+		
 		/**
 		 * Implementation of KeyListener and FocusListener for the editor component.
 		 */
 		protected class MyListener implements KeyListener, FocusListener {
 
 			int keyPressed = 0;
-			// 2019-02-23-BP: hasFocus is not read/used
-			// boolean hasFocus = false;
-
+			
 			/**
-			 * <p>
+			 * Select all text when focus is gained
 			 */
 			@Override
 			public void focusGained(final FocusEvent fe) {
 				((SSTextField) getComponent()).selectAll();
-				// hasFocus = true;
 			}
 
 			/**
@@ -550,16 +543,15 @@ public class SSDataGrid extends JTable {
 			 */
 			@Override
 			public void focusLost(final FocusEvent fe) {
-				// SET THE KEYPRESSED TO ZERO AS THE EDITOR HAS LOST THE FOCUS.
-				// hasFocus = false;
+				// Set the key press tracker to 0 when the field loses focus.
 				keyPressed = 0;
 			}
 
-			// ASSUMPTION HERE IS THAT THE EDITOR WILL NOT GET THE KEY PRESSED EVENT
-			// FOR THE FIRST KEY (WHICH TRIGGERS THE EDITOR, EVENT IS CONSUMED BY JTABLE)
 			/**
-			 * Increment the key pressed variable when ever there is a key pressed event.
-			 * only exception is tab key.
+			 * Increment the key pressed variable when ever there is a key pressed event, other than the Tab key.
+			 * <p>
+			 * It is assumed that the editor will not get the keyPressed event for the first key,
+			 * which triggers the editor. That event is consumed by the JTable.
 			 */
 			@Override
 			public void keyPressed(final KeyEvent ke) {
@@ -740,8 +732,7 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Scrollpane used to scroll datagrid.
 	 */
-	protected JScrollPane scrollPane = null; // new
-												// JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	protected JScrollPane scrollPane = null; // new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 	/**
 	 * SSRowSet from which component will get/set values.
@@ -784,11 +775,7 @@ public class SSDataGrid extends JTable {
 			}
 
 			// SPECIFY THE SSROWSET TO THE TABLE MODEL.
-			// if (tableModel == null) {
-			// tableModel = new SSTableModel(sSRowSet);
-			// } else {
 			tableModel.setSSRowSet(sSRowSet);
-			// }
 
 			// SET THE TABLE MODEL FOR JTABLE
 			setModel(tableModel);
@@ -919,18 +906,15 @@ public class SSDataGrid extends JTable {
 	}
 
 	/**
-	 * Returns the list of selected columns. This function gets the list of selected
+	 * Returns the list of selected, visible columns. This function gets the list of selected
 	 * columns from parent class and removes any columns which are present in hidden
 	 * columns.
 	 * <p>
-	 * Currently not a bean property since there is no associated variable
+	 * This was needed because when doing a copy/paste operation, hidden columns were included
+	 * with the initial selection.
 	 *
 	 * @return array of selected columns
 	 */
-	// THIS IS A STRANGE BEHAVIOUR. FOR SOME REASON SOMETIMES THE
-	// LIST OF SELECTED COLUMNS INCLUDED HIDDEN COLUMNS THIS CAUSES
-	// A PROBLEM WITH COPY AND PASTE OPERATIONS. SO MAKE SURE THAT THIS
-	// LIST DOES NOT CONTAIN HIDDEN COLUMNS
 	@Override
 	public int[] getSelectedColumns() {
 		// IF THERE ARE NO HIDDEN COLUMNS THEN RETURN THE SAME LIST
@@ -1312,9 +1296,7 @@ public class SSDataGrid extends JTable {
 	 *                       _columnNumbers.
 	 */
 	public void setDefaultValues(final int[] _columnNumbers, final Object[] _values) {
-		// if (tableModel == null) {
-		// tableModel = new SSTableModel();
-		// }
+
 		tableModel.setDefaultValues(_columnNumbers, _values);
 	}
 
@@ -1338,10 +1320,6 @@ public class SSDataGrid extends JTable {
 	public void setDefaultValues(final String[] _columnNames, final Object[] _values) throws SQLException {
 
 		int[] columnNumbers = null;
-
-		// if (tableModel == null) {
-		// tableModel = new SSTableModel();
-		// }
 
 		if (_columnNames != null) {
 			columnNumbers = new int[_columnNames.length];
@@ -1569,4 +1547,3 @@ public class SSDataGrid extends JTable {
 	}
 
 } // end public class SSDataGrid extends JTable {
-

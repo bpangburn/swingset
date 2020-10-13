@@ -146,7 +146,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Button to commit screen changes to the SSRowSet.
 	 */
-	protected JButton commitButton = new JButton(); // Commit button
+	protected JButton commitButton = new JButton();
 
 	/**
 	 * Indicator to force confirmation of SSRowSet deletions.
@@ -225,7 +225,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Button to refresh the screen based on any changes to the SSRowSet.
 	 */
-	protected JButton refreshButton = new JButton(); // REFRESH BUTTON
+	protected JButton refreshButton = new JButton();
 
 	/**
 	 * Number of rows in SSRowSet. Set to zero if next() method returns false.
@@ -335,10 +335,7 @@ public class SSDataNavigator extends JPanel {
 						// ALSO CALL DEPRECATED performNavigationOps TO ALLOW FOR LEGACY CODE
 						dBNav.performNavigationOps(SSDBNav.NAVIGATION_FIRST);
 					}
-					// GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD
-					// 2019-10-14: updateNavigator should take care of this
-					//SSDataNavigator.this.currentRow = 1;
-					//SSDataNavigator.this.txtCurrentRow.setText(String.valueOf(SSDataNavigator.this.currentRow));
+
 				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
@@ -347,10 +344,8 @@ public class SSDataNavigator extends JPanel {
 			}
 		});
 
-		// WHEN BUTTON 2 IS PRESSED THE CURRENT RECORD IS SAVED AND SSROWSET IS
-		// MOVED TO PREVIOUS RECORD
-		// CALLING PREVIOUS ON ENPTY SSROWSET IS ILLEGAL SO A CHECK IS MADE FOR THAT
-		// IF NUMBER OF ROWS == 0 THEN SSROWSET IS EMPTY
+		// WHEN BUTTON 2 IS PRESSED THE CURRENT RECORD IS SAVED AND SSROWSET IS MOVED TO PREVIOUS RECORD
+		// CALLING PREVIOUS ON EMPTY SSROWSET IS ILLEGAL SO A CHECK IS PERFORMED
 		previousButton.addActionListener(new ActionListener() {
 			@SuppressWarnings("deprecation")
 			@Override
@@ -387,10 +382,6 @@ public class SSDataNavigator extends JPanel {
 						// ALSO CALL DEPRECATED performNavigationOps TO ALLOW FOR LEGACY CODE
 						dBNav.performNavigationOps(SSDBNav.NAVIGATION_PREVIOUS);
 					}
-					// GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD
-					// 2019-10-14: updateNavigator should take care of this
-					//SSDataNavigator.this.currentRow = SSDataNavigator.this.sSRowSet.getRow();
-					//SSDataNavigator.this.txtCurrentRow.setText(String.valueOf(SSDataNavigator.this.currentRow));
 				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
@@ -437,10 +428,7 @@ public class SSDataNavigator extends JPanel {
 						// ALSO CALL DEPRECATED performNavigationOps TO ALLOW FOR LEGACY CODE
 						dBNav.performNavigationOps(SSDBNav.NAVIGATION_NEXT);
 					}
-					// GET THE ROW NUMBER AND SET IT TO ROW NUMBER TEXT FIELD
-					// 2019-10-14: updateNavigator should take care of this
-					//SSDataNavigator.this.currentRow = SSDataNavigator.this.sSRowSet.getRow();
-					//SSDataNavigator.this.txtCurrentRow.setText(String.valueOf(SSDataNavigator.this.currentRow));
+
 				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
@@ -514,21 +502,21 @@ public class SSDataNavigator extends JPanel {
 							dBNav.performPostInsertOps();
 
 							// 2019-10-14: next bit of code seems odd. not sure why we're calling moveToCurrentRow() and last().
-							//  In H2, this is leading to an incorrect total # of rows (e.g., have 5, insert a row, and it shows 6 of 7 until refreshed)
+							//  In H2, this is leading to an incorrect total # of rows (e.g., have 5, insert a row, and it shows 6 of 7 until refreshed).
+							//  Modified to just call last();
 
-							/*
-							// INCREMENT THE ROW COUNT
-							SSDataNavigator.this.rowCount++;
+//							// INCREMENT THE ROW COUNT
+//							SSDataNavigator.this.rowCount++;
+//
+//							// MOVE TO CURRENT ROW MOVES SSROWSET TO RECORD AT WHICH ADD WAS PRESSED.
+//							// BUT IT NICE TO BE ON THE ADDED ROW WHICH IS THE LAST ONE IN THE SSROWSET.
+//							// ALSO MOVE TO CURRENT ROW MOVES THE SSROWSET POSITION BUT DOES NOT TRIGGER
+//							// ANY EVENT FOR THE LISTENERS AS A RESULT VALUES ON THE SCREEN WILL NOT
+//							// DISPLAY THE CURRENT RECORD VALUES.
+//							SSDataNavigator.this.sSRowSet.moveToCurrentRow();
 
-							SSDataNavigator.this.sSRowSet.moveToCurrentRow();
-							// MOVE TO CURRENT ROW MOVES SSROWSET TO RECORD AT WHICH ADD WAS PRESSED.
-							// BUT IT NICE TO BE ON THE ADDED ROW WHICH IS THE LAST ONE IN THE SSROWSET.
-							// ALSO MOVE TO CURRENT ROW MOVES THE SSROWSET POSITION BUT DOES NOT TRIGGER
-							// ANY EVENT FOR THE LISTENERS AS A RESULT VALUES ON THE SCREEN WILL NOT
-							// DISPLAY THE CURRENT RECORD VALUES.
-							 */
 							sSRowSet.last();
-							// 2019-10-14: adding this to replace SSDataNavigator.this.rowCount++;
+							
 							rowCount = sSRowSet.getRow();
 
 							updateNavigator();
@@ -543,8 +531,7 @@ public class SSDataNavigator extends JPanel {
 							}
 						} else {
 							// WE DO NOTHING. THE ROWSET STAYS IN INSERT ROW. EITHER USER HAS TO FIX THE
-							// DATA AND SAVE THE ROW
-							// OR CANCEL THE INSERTION.
+							// DATA AND SAVE THE ROW OR CANCEL THE INSERTION.
 						}
 
 					} else {
@@ -741,16 +728,6 @@ public class SSDataNavigator extends JPanel {
 						} else {
 							sSRowSet.last();
 						}
-
-
-						// SEEMS DELETION WAS SUCCESSFULL DECREMENT ROWCOUNT
-						/*
-						SSDataNavigator.this.rowCount--;
-						SSDataNavigator.this.sSRowSet.
-						if (!SSDataNavigator.this.sSRowSet.next()) {
-							SSDataNavigator.this.sSRowSet.last();
-						}
-						*/
 
 						// UPDATE THE STATUS OF THE NAVIGATOR
 						updateNavigator();
@@ -1307,8 +1284,6 @@ public class SSDataNavigator extends JPanel {
 			deleteButton.setEnabled(true);
 		}
 	}
-
-// DEPRECATED STUFF....................
 
 	/**
 	 * Enables/disables navigation buttons as needed and updates the current row and row count

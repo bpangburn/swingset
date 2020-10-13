@@ -384,6 +384,4 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 		forSSDataGrid = _forSSDataGrid;
 	}
 
-} // end public class SSTableKeyAdapter extends KeyAdapter implements Serializable
-	// {
-
+}

@@ -167,7 +167,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 				    try {
 				    	// 2020-10-02_BP: Date fields are returned as java.util.Date and Postgres JDBC doesn't know how to handle them
-//TODO Add support for time and timestamp or modify in formatter factories
+// TODO Add support for time and timestamp or modify in formatter factories
 				    	if (currentValue instanceof java.util.Date) {
 				    		getSSRowSet().updateObject(getBoundColumnName(), new java.sql.Date(((java.util.Date)currentValue).getTime()));
 				    	} else {

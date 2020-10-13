@@ -39,8 +39,6 @@ package com.nqadmin.swingset;
 
 import java.io.Serializable;
 
-
-
 // SSDataGridAdapter.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware

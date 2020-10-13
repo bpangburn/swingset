@@ -97,16 +97,6 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 */
 	private static Logger logger = LogManager.getLogger();
 
-//	/**
-//	 * SSRowSet from which component will get/set values.
-//	 */
-//	protected SSRowSet sSRowSet;
-//
-//	/**
-//	 * SSRowSet column to which the component will be bound.
-//	 */
-//	protected String columnName = "";
-
 	/**
 	 * unique serial id
 	 */
@@ -125,6 +115,9 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		}
 
 		logger.debug("SSList.toObjArray() contents: " + array);
+		
+		// TODO May be able to utilize JDBCType Enum here.
+		// TODO This may be better as a static method in SSJdbcRowSetImpl
 
 		final Vector<Object> data = new Vector<>();
 		switch (array.getBaseType()) {
@@ -217,65 +210,10 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 */
 	protected String[] options;
 
-//	/**
-//	 * Database bound rowset listener.
-//	 */
-//	private final MyRowSetListener rowsetListener = new MyRowSetListener();
-
 	/**
 	 * Common fields shared across SwingSet components
 	 */
 	protected SSCommon ssCommon;
-
-//	/**
-//	 * Sets the SSRowSet column name to which the component is bound.
-//	 *
-//	 * @param _columnName Column name to which the component is bound.
-//	 */
-//	public void setColumnName(String _columnName) {
-//		String oldValue = getBoundColumnName();
-//		getBoundColumnName() = _columnName;
-//		firePropertyChange("columnName", oldValue, getBoundColumnName());
-//		try {
-//			bind();
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//	}
-//
-//	/**
-//	 * Returns the column name to which the component is bound.
-//	 *
-//	 * @return returns the column name to which to component is bound.
-//	 */
-//	public String getBoundColumnName() {
-//		return getBoundColumnName();
-//	}
-
-//	/**
-//	 * Sets the SSRowSet to which the component is bound.
-//	 *
-//	 * @param _sSRowSet SSRowSet to which the component is bound
-//	 */
-//	public void setSSRowSet(SSRowSet _sSRowSet) {
-//		SSRowSet oldValue = getSSRowSet();
-//		getSSRowSet() = _sSRowSet;
-//		firePropertyChange("sSRowSet", oldValue, getSSRowSet());
-//		try {
-//			bind();
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//	}
-
-//	/**
-//	 * Returns the SSRowSet being used to get the values.
-//	 *
-//	 * @return returns the SSRowSet being used.
-//	 */
-//	public SSRowSet getSSRowSet() {
-//		return getSSRowSet();
-//	}
 
 	/**
 	 * Component listener for list selection changes.
@@ -355,76 +293,6 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		return selectedValues;
 	}
 
-//	/**
-//	 * Initialization code.
-//	 */
-//	protected void init() {
-//		// ADD KEY LISTENER TO TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER
-//		// KEY IS PRESSED.
-//		addKeyListener(new KeyAdapter() {
-//			@Override
-//			public void keyReleased(KeyEvent ke) {
-//				if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
-//					((Component) ke.getSource()).transferFocus();
-//				}
-//			}
-//		});
-//
-//		// SET PREFERRED DIMENSIONS
-//		setPreferredSize(new Dimension(200, 40));
-//	}
-
-//	/**
-//	 * Sets the SSRowSet and column name to which the component is to be bound.
-//	 *
-//	 * @param _sSRowSet     datasource to be used.
-//	 * @param _columnName   Name of the column to which this check box should be
-//	 *                      bound
-//	 * @param _baseTypeName Underlying DataType Name(specific to database provider)
-//	 *                      of the array elements in the specified column
-//	 */
-//	public void bind(SSRowSet _sSRowSet, String _columnName, String _baseTypeName) {
-//		this.baseTypeName = _baseTypeName;
-//
-//		SSRowSet oldValue = getSSRowSet();
-//		getSSRowSet() = _sSRowSet;
-//		firePropertyChange("sSRowSet", oldValue, getSSRowSet());
-//
-//		String oldValue2 = getBoundColumnName();
-//		getBoundColumnName() = _columnName;
-//		firePropertyChange("columnName", oldValue2, getBoundColumnName());
-//
-//		try {
-//			bind();
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//	}
-//
-//	/**
-//	 * Method for handling binding of component to a SSRowSet column.
-//	 * @throws SQLException 	SQLException
-//	 */
-//	protected void bind() throws SQLException {
-//
-//		// CHECK FOR NULL COLUMN/ROWSET
-//		if (getBoundColumnName() == null || getBoundColumnName().trim().equals("") || getSSRowSet() == null) {
-//			return;
-//		}
-//
-//		// REMOVE LISTENERS TO PREVENT DUPLICATION
-//		removeListeners();
-//
-//		if (this.mappings == null || this.options == null)
-//			return;
-//		this.setListData(this.options);
-//		updateDisplay();
-//
-//		// ADD BACK LISTENERS
-//		addListeners();
-//
-//	}
-
 	/**
 	 * Returns the ssCommon data member for the current Swingset component.
 	 *
@@ -435,22 +303,6 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 		return ssCommon;
 	}
 
-//	/**
-//	 * Adds listeners for component and rowset
-//	 */
-//	protected void addListeners() {
-//		getSSRowSet().addRowSetListener(this.rowsetListener);
-//		addListSelectionListener(this.ssListListener);
-//	}
-//
-//	/**
-//	 * Removes listeners for component and rowset.
-//	 */
-//	protected void removeListeners() {
-//		getSSRowSet().removeRowSetListener(this.rowsetListener);
-//		removeListSelectionListener(this.ssListListener);
-//	}
-
 	/**
 	 * Removes any necessary listeners for the current SwingSet component. These
 	 * will trigger changes in the underlying RowSet column.
@@ -459,77 +311,6 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	public void removeSSComponentListener() {
 		removeListSelectionListener(ssListListener);
 	}
-
-//	/**
-//	 * Updates the value displayed in the component based on the SSRowSet column
-//	 * binding.
-//	 *
-//	 * @throws SQLException SQLException
-//	 */
-//	protected void updateDisplay() throws SQLException {
-//
-//		Object[] array = null;
-//		if (getSSRowSet().getRow() > 0) {
-//			array = toObjArray(getSSRowSet().getArray(getBoundColumnName()));
-//		}
-//		if (array == null) {
-//			this.clearSelection();
-//			return;
-//		}
-//		int[] indices = new int[array.length];
-//		for (int i = 0; i < array.length; i++) {
-//			for (int j = 0; j < this.mappings.length; j++) {
-//				if (array[i].equals(this.mappings[j])) {
-//					indices[i] = j;
-//					break;
-//				}
-//				indices[i] = -1;
-//			}
-//		}
-//		this.setSelectedIndices(indices);
-//	}
-
-//	/**
-//	 * Rowset Listener for updating the value displayed.
-//	 */
-//	protected class MyRowSetListener implements RowSetListener, Serializable {
-//
-//		private static final long serialVersionUID = 8375973600687061491L;
-//
-//		@Override
-//		public void cursorMoved(RowSetEvent arg0) {
-//			removeListSelectionListener(SSList.this.ssListListener);
-//			try {
-//				updateDisplay();
-//			} catch (SQLException e) {
-//				e.printStackTrace();
-//			}
-//			addListSelectionListener(SSList.this.ssListListener);
-//		}
-//
-//		@Override
-//		public void rowChanged(RowSetEvent event) {
-//			removeListSelectionListener(SSList.this.ssListListener);
-//			try {
-//				updateDisplay();
-//			} catch (SQLException e) {
-//				e.printStackTrace();
-//			}
-//			addListSelectionListener(SSList.this.ssListListener);
-//		}
-//
-//		@Override
-//		public void rowSetChanged(RowSetEvent event) {
-//			removeListSelectionListener(SSList.this.ssListListener);
-//			try {
-//				updateDisplay();
-//			} catch (SQLException e) {
-//				e.printStackTrace();
-//			}
-//			addListSelectionListener(SSList.this.ssListListener);
-//		}
-//
-//	}
 
 	/**
 	 * Sets the underlying values for each of the items in the list box (e.g. the
@@ -632,39 +413,16 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	@Override
 	public void updateSSComponent() {
 
-		// taken from original bind()
-//		// CHECK FOR NULL COLUMN/ROWSET
-//		if (getBoundColumnName() == null || getBoundColumnName().trim().equals("") || getSSRowSet() == null) {
-//			return;
-//		}
-//
-//		// REMOVE LISTENERS TO PREVENT DUPLICATION
-//		removeListeners();
-//
 		if ((mappings == null) || (options == null)) {
 			return;
 		}
 		this.setListData(options);
-//		updateDisplay();
-//
-//		// ADD BACK LISTENERS
-//		addListeners();
 
-		// taken from updateDisplay()
 		Object[] array = null;
 		try {
 
 			if (getSSRowSet().getRow() > 0) {
-
-//			    Array sqlArray = getSSRowSet().getArray(getBoundColumnName());
-//			    System.out.println("SQL array retrieved for SSList: " + sqlArray);
-//			    Object[] objArray = (Object[])sqlArray.getArray();
-//			    for (int i = 0; i < objArray.length; i++) {
-//			    	System.out.println("Array element [" + i + "] contains: " + objArray[i]);
-//			    }
-
 			    array = toObjArray(getSSRowSet().getArray(getBoundColumnName()));
-
 			}
 
 		} catch (final SQLException se) {

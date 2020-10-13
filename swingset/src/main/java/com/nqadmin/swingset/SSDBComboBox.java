@@ -184,27 +184,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	public static final int NON_SELECTED = (int) ((Math.pow(2, 32) - 1) / (-2));
 
-
 	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -4203338788107410027L;
-
-//	/**
-//	 * Model to be used for holding and filtering data in combo box.
-//	 */
-//	 protected SelectorComboBoxModel selectorCBM = new SelectorComboBoxModel();
-
-//    /**
-//     * Text field bound to the SSRowSet.
-//     * Bee changed to public
-//     */
-//    public JTextField textField = new JTextField();
-
-//    /**
-//     * Database connection used to execute queries for combo population.
-//     */
-//    protected SSConnection sSConnection = null;
 
 	/**
 	 * Indicates if GlazedList autocompletion has already been installed
@@ -261,51 +244,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * which a foreign key is mapped.
 	 */
 	protected String primaryKeyColumnName = "";
-
-	/**
-	 * True if inside a call to updateDisplay()
-	 */
-	//protected volatile boolean inUpdateDisplay = false;
-
-//    /**
-//     * Number of items in the combo box.
-//     */
-//    protected int numberOfItems = 0;
-
-//    /**
-//     * SSRowSet from which component will get/set values.
-//     */
-//    protected SSRowSet sSRowSet;
-
-//    /**
-//     * SSRowSet column to which the component will be bound.
-//     */
-//    protected String columnName = "";
-
-//    /**
-//     * Component listener.
-//     */
-//    private final MyComboListener cmbListener = new MyComboListener();
-
-//    /**
-//     * Bound text field document listener.
-//     */
-//    protected final MyTextFieldDocumentListener textFieldDocumentListener = new MyTextFieldDocumentListener();
-
-//    /**
-//     * Keystroke-based item selection listener.
-//     */
-//    protected final MyKeyListener myKeyListener = new MyKeyListener();
-//
-//    /**
-//     * Listener for PopupMenu
-//     */
-//    protected MyPopupMenuListener myPopupMenuListener = new MyPopupMenuListener();
-//
-//    /**
-//     * Listener for Filter
-//     */
-//    protected FilterFocusListener filterFocusListener = new FilterFocusListener();
 
 	/**
 	 * String typed by user into combobox
@@ -376,11 +314,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		setSSCommon(new SSCommon(this));
 		// SSCommon constructor calls init()
 		setSSConnection(_ssConnection);
-		// this.sSConnection = _sSConnection;
 		setQuery(_query);
 		setPrimaryKeyColumnName(_primaryKeyColumnName);
 		setDisplayColumnName(_displayColumnName);
-		// init();
 	}
 
 	/**
@@ -390,6 +326,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _primaryKey  primary key value corresponding the the display text
 	 */
 	public void addItem(final String _displayText, final long _primaryKey) {
+
+		// TODO Determine if any change is needed to actually add item to combobox.
 
 		// LOCK EVENT LIST
 		eventList.getReadWriteLock().writeLock().lock();
@@ -420,8 +358,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		} finally {
 			eventList.getReadWriteLock().writeLock().unlock();
 		}
-
-// TODO Determine if any change is needed to actually add item to combobox.
 
 	}
 
@@ -476,6 +412,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	public boolean deleteItem(final long _primaryKey) {
 
+		// TODO Determine if any change is needed to actually remove item from combobox.
+
 		boolean result = false;
 
 		if (eventList != null) {
@@ -492,7 +430,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				if (index != -1) {
 					options.remove(index);
 					mappings.remove(index);
-// TODO Confirm that eventList is not reordered by GlazedLists code.
 					eventList.remove(index);
 					result = true;
 
@@ -507,8 +444,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		}
 
 		return result;
-
-// TODO Determine if any change is needed to actually remove item from combobox.
 
 	}
 
@@ -547,12 +482,12 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// (re)query data
 		queryData();
 
-// Only install AutoCompleteSupport once.
-// See https://stackoverflow.com/questions/15210771/autocomplete-with-glazedlists for info on modifying lists.
-// See https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html
-// We would like to call autoComplete.setStrict(true), but it is not currently compatible with TextMatcherEditor.CONTAINS, which is the more important feature.
-// Note that installing AutoComplete support makes the ComboBox editable.
-// Should already in the event dispatch thread so don't use invokeAndWait()
+		// Only install AutoCompleteSupport once.
+		// See https://stackoverflow.com/questions/15210771/autocomplete-with-glazedlists for info on modifying lists.
+		// See https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html
+		// We would like to call autoComplete.setStrict(true), but it is not currently compatible with TextMatcherEditor.CONTAINS, which is the more important feature.
+		// Note that installing AutoComplete support makes the ComboBox editable.
+		// Should already in the event dispatch thread so don't use invokeAndWait()
 		if (!autoCompleteInstalled) {
 			final AutoCompleteSupport<SSListItem> autoComplete = AutoCompleteSupport.install(this, eventList);
 			autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
@@ -561,54 +496,12 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		// autoComplete.setStrict(true);
 
-// since the list was likely blank when the component was bound we need to update the component again so it can get the text from the list
-// we don't want to do this if the component is unbound as with an SSDBComboBox used for navigation.
+		// since the list was likely blank when the component was bound we need to update the component again so it can get the text from the list
+		// we don't want to do this if the component is unbound as with an SSDBComboBox used for navigation.
 		if (getSSRowSet() != null) {
 			updateSSComponent();
 		}
 	}
-
-//    /**
-//     * Sets the new SSRowSet for the combo box.
-//     *
-//     * @param _sSRowSet  SSRowSet to which the combo has to update values.
-//     */
-//    public void setSSRowSet(SSRowSet _sSRowSet) {
-//        SSRowSet oldValue = this.sSRowSet;
-//        this.sSRowSet = _sSRowSet;
-//        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
-//        bind();
-//    }
-
-//    /**
-//     * Returns the SSRowSet being used to get the values.
-//     *
-//     * @return returns the SSRowSet being used.
-//     */
-//    public SSRowSet getSSRowSet() {
-//        return this.sSRowSet;
-//    }
-
-//    /**
-//     * Sets the connection object to be used.
-//     *
-//     * @param _sSConnection    connection object used for database.
-//     */
-//    public void setSSConnection(SSConnection _sSConnection) {
-//        SSConnection oldValue = this.sSConnection;
-//        this.sSConnection = _sSConnection;
-//        firePropertyChange("sSConnection", oldValue, this.sSConnection);
-//        bind();
-//    }
-
-//    /**
-//     * Returns connection object used to get values from database.
-//     *
-//     * @return returns a SSConnection object.
-//     */
-//    public SSConnection getSSConnection() {
-//        return this.sSConnection;
-//    }
 
 	/**
 	 * Returns the pattern in which dates have to be displayed
@@ -618,36 +511,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	public String getDateFormat() {
 		return dateFormat;
 	}
-
-//	/**
-//	 * Adds listeners for Component, RowSet, Keyboard, and PopupMenu
-//	 */
-//	public void addListeners() {
-//		SSComponentInterface.super.addListeners();
-//		// addKeyListener(this.myKeyListener);
-//		// addPopupMenuListener(this.myPopupMenuListener);
-//	}
-
-//    /**
-//     * Sets the column name for the combo box
-//     *
-//     * @param _columnName   name of column
-//     */
-//    public void setColumnName(String _columnName) {
-//        String oldValue = this.columnName;
-//        this.columnName = _columnName;
-//        firePropertyChange("columnName", oldValue, this.columnName);
-//        bind();
-//    }
-
-//    /**
-//     * Returns the column name to which the combo is bound.
-//     *
-//     * @return returns the column name to which to combo box is bound.
-//     */
-//    public String getColumnName() {
-//        return this.columnName;
-//    }
 
 	/**
 	 * Returns the column name whose values are displayed in the combo box.
@@ -700,7 +563,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	@Deprecated
 	public int getNumberOfItems() {
-// TODO Determine where/how this is/was used.
+	
+		// TODO Determine where/how this is/was used.
+		
 		int result = 0;
 
 		if (eventList != null) {
@@ -765,52 +630,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		return result;
 
-//        int index = getSelectedIndex();
-//
-//        if (index == -1) {
-//            return null;
-//        }
-//
-//        return ""+this.selectorCBM.getSelectedBoundData(index);
 	} // public String getSelectedStringValue() {
-//
-//    /**
-//     * Map of string/value pairings for the ComboBox.
-//     */
-//    public Map<String, Long> itemMap;
-//
-//    /**
-//     * Executes the query and adds items to the combo box based on the values
-//     * retrieved from the database.
-//     * @throws SQLException 	SQLException
-//     * @throws Exception 	Exception
-//     */
-//    public void execute() throws SQLException, Exception {
-//        // TURN OFF LISTENERS
-//            removeListeners();
-//
-//            if (this.query.equals("")) {
-//                throw new Exception("Query is empty");
-//            }
-//        	this.selectorCBM.setQuery(this.query);
-//        	this.selectorCBM.setDateFormat(this.dateFormat);
-//        	this.selectorCBM.setPrimaryKeyColumn(this.primaryKeyColumnName);
-//    		this.selectorCBM.setDisplayColumn(this.displayColumnName);
-//    		this.selectorCBM.setSecondDisplayColumn(this.secondDisplayColumnName);
-//    		this.selectorCBM.setSeparator(this.seperator);
-//    		this.selectorCBM.setSSConnection(this.sSConnection);
-//    		this.selectorCBM.refresh();
-//    		setModel(this.selectorCBM);
-//    		this.itemMap = this.selectorCBM.itemMap;
-//    		this.numberOfItems = this.selectorCBM.getSize();
-//
-//    		// UPDATE DISPLAY WILL ADD THE LISTENERS AT THE END SO NO NEED TO ADD IT AGAIN.
-//            updateDisplay();
-//
-//            //ADD THE LISTENERS BACK
-//            addListeners();
-//
-//    }
 
 	/**
 	 * Returns the underlying database record primary key value corresponding to the
@@ -822,7 +642,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *         is selected.
 	 */
 	public long getSelectedValue() {
-// TODO Consider overriding getSelectedIndex() to account for GlazedList impact
+		
+		// TODO Consider overriding getSelectedIndex() to account for GlazedList impact
+		
 		logger.debug(getColumnForLog() + ": Call to getSelectedValue().");
 
 		Long result;
@@ -887,17 +709,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		return ssCommon;
 	}
 
-//    /**
-//     * Sets the currently selected value
-//     *
-//     * Currently not a bean property since there is no associated variable.
-//     *
-//     * @param _value    value to set as currently selected.
-//     */
-//    public void setSelectedValue(long _value) {
-//        this.textField.setText(String.valueOf(_value));
-//    }
-
 	/**
 	 * Converts the database column value into string. Only date columns are
 	 * formated as specified by dateFormat variable all other column types are
@@ -929,36 +740,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		return strValue;
 
 	}
-
-//    /**
-//     * Returns the bound key value of the currently selected item.
-//     *
-//     * Currently not a bean property since there is no associated variable.
-//     *
-//     * @return value corresponding to the selected item in the combo.
-//     *     return -1 if no item is selected.
-//     */
-//    public long getSelectedValue() {
-//
-//// TODO revisit returning -1 if nothing is selected as that could be a legitimate bound pk value (unlikely)
-//
-//    	long returnValue = -1;
-//
-//        int index = getSelectedIndex();
-//
-//        if (index == -1) {
-//            // NOTHING TO DO return -1;
-//        } else {
-//        	returnValue = comboMap.
-//        }
-//
-//        returnValue
-//		long returnVal =  Long.valueOf(this.selectorCBM.getSelectedBoundData(index).toString());
-//
-//
-//        return returnVal;
-//
-//    }
 
 	/**
 	 * Populates the list model with the data by fetching it from the database.
@@ -1087,33 +868,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		firePropertyChange("displayColumnName", oldValue, displayColumnName);
 	}
 
-//	/**
-//	 * Adds listeners for Component, RowSet, Keyboard, and PopupMenu
-//	 */
-//	public void removeListeners() {
-//		SSComponentInterface.super.removeListeners();
-//		// removeKeyListener(this.myKeyListener);
-//		// removePopupMenuListener(this.myPopupMenuListener);
-//	}
-
-//    /**
-//     * Sets the SSRowSet and column name to which the component is to be bound.
-//     *
-//     * @param _sSRowSet    datasource to be used.
-//     * @param _columnName    Name of the column to which this check box should be bound
-//     */
-//    public void bind(SSRowSet _sSRowSet, String _columnName) {
-//        SSRowSet oldValue = this.sSRowSet;
-//        this.sSRowSet = _sSRowSet;
-//        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
-//
-//        String oldValue2 = this.columnName;
-//        this.columnName = _columnName;
-//        firePropertyChange("columnName", oldValue2, this.columnName);
-//
-//        bind();
-//    }
-
 	/**
 	 * @param eventList the eventList to set
 	 */
@@ -1172,79 +926,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		query = _query;
 		firePropertyChange("query", oldValue, query);
 	}
-
-//    /**
-//     * Initialization code.
-//     */
-//    protected void init() {
-//       // // TRANSFER FOCUS TO NEXT ELEMENT WHEN ENTER KEY IS PRESSED
-//        //Set<AWTKeyStroke> forwardKeys    = getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
-//        //Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(forwardKeys);
-//        //newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
-//        //newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK ));
-//        //setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,newForwardKeys);
-//
-//        // SET PREFERRED DIMENSIONS
-//            setPreferredSize(new Dimension(200,20));
-//    }
-
-//    /**
-//     * Method for handling binding of component to a SSRowSet column.
-//     */
-//    protected void bind() {
-//
-//        // CHECK FOR NULL COLUMN/ROWSET
-//            if (this.columnName==null || this.columnName.trim().equals("") || this.sSRowSet==null) {
-//                return;
-//            }
-//
-//        // REMOVE LISTENERS TO PREVENT DUPLICATION
-//            removeListeners();
-//            try {
-//
-//	        // BIND THE TEXT FIELD TO THE SPECIFIED COLUMN
-//	            this.textField.setDocument(new SSTextDocument(this.sSRowSet, this.columnName));
-//
-//	        // SET THE COMBO BOX ITEM DISPLAYED
-//	            updateDisplay();
-//
-//            }finally {
-//            	// ADD BACK LISTENERS
-//            	addListeners();
-//            }
-//    }
-
-//    /**
-//     * Updates the value displayed in the component based on the SSRowSet column
-//     * binding.
-//     */
-//	protected void updateDisplay() {
-//
-//    	// THIS WILL MAKE SURE COMBO BOX ACTION LISTENER DOESN'T DO ANY THING EVEN IF IT GETS CALLED
-//    	this.inUpdateDisplay = true;
-//    	try {
-//	        // GET THE VALUE FROM TEXT FIELD
-//	        String text = this.textField.getText().trim();
-//
-//	        if (!text.equals("") && this.itemMap != null && this.itemMap.get(text) != null ) {
-//	            //long valueInText = Long.parseLong(text);
-//	            // GET THE INDEX WHERE THIS VALUE IS IN THE VECTOR.
-//	        	//long longIndex = this.itemMap.get(text);
-//	        	Long index = this.itemMap.get(text);
-//	            //int index = (int) longIndex;
-//	            if (index != getSelectedIndex()) {
-//	                setSelectedIndex(index.intValue());
-//	                updateUI();
-//	            }
-//	        }
-//	        else {
-//	            setSelectedIndex(-1);
-//	            updateUI();
-//	        }
-//    	}finally {
-//    		this.inUpdateDisplay = false;
-//    	}
-//    }
 
 	/**
 	 * Sets the second display name. If more than one column have to displayed then
@@ -1476,231 +1157,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	}
 
-//    /**
-//     * @author mvo
-//     * Listener for the combobox's popup menu which resets the combobox's list to the original data if it is invisible.
-//     */
-//    protected class MyPopupMenuListener implements PopupMenuListener{
-//    	ActionListener[] saveActionListeners = new ActionListener[getActionListeners().length];
-//    	boolean saveSwitch = true;
-//
-//		public void addAllActionListeners(){
-//    		for (ActionListener al: this.saveActionListeners) addActionListener(al);
-//			fireActionEvent();
-//		}
-//
-//		public void removeAllActionListeners(){
-//			if (getActionListeners().length != 0){
-//				for (ActionListener al : getActionListeners()){
-//					removeActionListener(al);
-//				}
-//			}
-//		}
-//
-//		@Override
-//		public void popupMenuCanceled(PopupMenuEvent e) {
-//    		if (isEditable()){
-//    			hidePopup();
-//    		}
-//    	}
-//
-//		@Override
-//		public void popupMenuWillBecomeInvisible(PopupMenuEvent e){
-//
-//			//if the popup was open before filtering, return as to not add action listeners
-//			if(SSDBComboBox.this.myKeyListener.openPopupFilter){
-//				SSDBComboBox.this.myKeyListener.openPopupFilter = false;
-//				return;
-//			}
-//			//when menu closes, change out textfield to re-insert original items before filtering.
-//			if (SSDBComboBox.this.selectorCBM != null) SSDBComboBox.this.selectorCBM.setFilterEdit(new JTextField());
-//			//set editable to false if value is clicked while filtering and set text field to selected item.
-//			if (isEditable()){
-//				setEditable(false);
-//				SSDBComboBox.this.textField.setText(""+getSelectedFilteredValue());
-//			}
-//			addAllActionListeners();
-//			requestFocus();
-//		}
-//
-//		@Override
-//		public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-//			if (this.saveSwitch){
-//				this.saveActionListeners = getActionListeners();
-//    			this.saveSwitch = false;
-//    			// moving this line out of if block
-//    			//removeAllActionListeners();
-//			}
-//			removeAllActionListeners();
-//		}
-//    }
-
-//    /**
-//     * Listener(s) for the bound text field used to propigate values back to the
-//     * component's value.
-//     */
-//    protected class MyTextFieldDocumentListener implements DocumentListener {
-//    	@Override
-//		public void changedUpdate(DocumentEvent de) {
-//    		// DON'T MOVE THE REMOVE ADD LISTENER CALLS TO UPDATEDISPLAY
-//    		// AS UPDATE DISPLAY IS CALLED IN OTHER PLACES WHICH REMOVE AND ADD LISTENERS
-//    		// THIS WOULD MAKE THE ADDLISTENER CALL TWICE SO THERE WILL BE TWO LISTENERS
-//    		// AND A CALL TO REMOVE LISTENER IS NOT GOOD ENOUGH
-//    		removeListeners();
-//       		updateDisplay();
-//       		addListeners();
-//        }
-//
-//        @Override
-//		public void insertUpdate(DocumentEvent de) {
-//        	removeListeners();
-//       		updateDisplay();
-//       		addListeners();
-//        }
-//
-//        @Override
-//		public void removeUpdate(DocumentEvent de) {
-//        	removeListeners();
-//       		updateDisplay();
-//       		addListeners();
-//        }
-//
-//    } // end protected class MyTextFieldDocumentListener implements DocumentListener {
-
-//    /**
-//     * @author mvo
-//     * Listener for JTextField "filterText" which allows for navigation of filtered items in combo box.
-//     */
-//    protected class FilterKeyListener extends KeyAdapter {
-//    	String savePrimary;
-//
-//    	@Override
-//		public void keyPressed(KeyEvent ke){
-//
-//    		if(ke.getKeyCode() == KeyEvent.VK_ESCAPE){
-//    			setEditable(false);
-//    			hidePopup();
-//				setSelectedIndex(SSDBComboBox.this.myKeyListener.saveIndex);
-//				SSDBComboBox.this.textField.setText(""+getSelectedFilteredValue());
-//    			return;
-//    		}
-//    	}
-//    	@Override
-//		public void keyReleased(KeyEvent ke){
-//    		//tab will traverse to next component
-//    		if (ke.getKeyCode() == KeyEvent.VK_TAB){
-//    			setEditable(false);
-//				hidePopup();
-//				transferFocus();
-//    		}
-//    		//turn off filter if arrows are pressed and keep focus on combo box
-//    		else if (ke.getKeyCode() == KeyEvent.VK_DOWN || ke.getKeyCode() == KeyEvent.VK_UP){
-//    			setEditable(false);
-//    			showPopup();
-//    			requestFocus();
-//			}
-//    		else if (0 == getItemCount()){
-//    			repaint();
-//    			showPopup();
-//    		}
-//    		else {
-//	    		this.savePrimary = getSelectedFilteredValue();
-//
-//	    		//if the combo box has less items than the popup's row length, refresh the popup box.
-//	    		if(getItemCount() < 9 || ke.getKeyCode() == KeyEvent.VK_BACK_SPACE)
-//	    		{	SSDBComboBox.this.myKeyListener.openPopupFilter = true;
-//	    			hidePopup();
-//	    		}
-//	    		showPopup();
-//    		}
-//    	}
-//    }
-
-//    /**
-//     * Gets the selected value of the selected item in the filtered list.
-//     * @return a String corresponding to the currently selected value in the SSDBCombobBox
-//     */
-//    public String getSelectedFilteredValue() {
-//    	if(getSelectedIndex() < 0) setSelectedIndex(0);
-//    	//gets the primary value of the selected index of the filtered list.
-//    	Object selectedValue = this.selectorCBM.getSelectedBoundData(getSelectedIndex());
-//    	if(selectedValue == null)
-//    		return null;
-//    	return selectedValue.toString();
-//    }
-
-//    /**
-//     * Listener for focus in filter text field.
-//     */
-//    protected class FilterFocusListener extends FocusAdapter{
-//		@Override
-//		public void focusGained(FocusEvent fe){
-//			showPopup();
-//		}
-//	}
-
-//    /**
-//     * Listener for keystroke-based, string matching, combo box navigation.
-//     */
-//    protected class MyKeyListener extends KeyAdapter {
-//    	private JTextField filterText;
-//    	private FilterKeyListener filterKeyListener = new FilterKeyListener();
-//    	boolean openPopupFilter = false;
-//    	int saveIndex;
-//    	@Override
-//		public void keyPressed(KeyEvent ke){
-//    		this.saveIndex = getSelectedIndex();
-//    		if (SSDBComboBox.this.myPopupMenuListener.saveSwitch) {
-//    			SSDBComboBox.this.myPopupMenuListener.saveActionListeners = getActionListeners();
-//    			SSDBComboBox.this.myPopupMenuListener.saveSwitch = false;
-//    		}
-//    		SSDBComboBox.this.myPopupMenuListener.removeAllActionListeners();
-//    	}
-//    	@Override
-//		public void keyReleased(KeyEvent ke){
-//    		//reset the list and set the text field to the selected item's primary key
-//    		if (ke.getKeyCode() == KeyEvent.VK_ENTER){
-//
-//    			//if enter is pressed inside of the filter textfield and no item is selected
-//    			//pick the last item selected item and set it as the current selected item
-//    			if (-1 == getSelectedIndex()){
-//    				setSelectedItem(null);
-//    				SSDBComboBox.this.textField.setText(this.filterKeyListener.savePrimary);
-//    			}
-//    			return;
-//    		}
-//
-//    		if (ke.getKeyCode() == KeyEvent.VK_DOWN ||  ke.getKeyCode() == KeyEvent.VK_UP || !SSDBComboBox.this.filterSwitch) return;
-//
-//    		//take the first key pressed, set combo box to editable, turn on filter, and set the text field to that saved key
-//    		if (ke.getKeyCode() >= KeyEvent.VK_A & ke.getKeyCode() <= KeyEvent.VK_BACK_SLASH 					||
-//    			ke.getKeyCode() >= KeyEvent.VK_COMMA & ke.getKeyCode() <= KeyEvent.VK_9 	  					||
-//    			ke.getKeyCode() >= KeyEvent.VK_OPEN_BRACKET & ke.getKeyCode() <= KeyEvent.VK_CLOSE_BRACKET		||
-//    			ke.getKeyCode() == KeyEvent.VK_PLUS																||
-//    			ke.getKeyCode() == KeyEvent.VK_QUOTE) {
-//    			// if the popup is open, close it and do not add listeners
-//        		if (isPopupVisible()){
-//        			this.openPopupFilter = true;
-//        			hidePopup();
-//        		}
-//    			setEditable(true);
-//    			this.filterText = (JTextField) getEditor().getEditorComponent();
-//    			SSDBComboBox.this.selectorCBM.setFilterEdit(this.filterText);
-//    			this.filterText.setText(""+ke.getKeyChar());
-//    			this.filterText.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, Collections.emptySet());
-//
-//    			// SINCE WE HAVE TO ADD THE LISTENER IN COMBO KEY LISTENER
-//    			// MAKE SURE WE ARE NOT ADDING IT MULTIPLE TIMES.
-//    			// EASY WAY TO DO IT IS TO REMOVE IT AND THEN ADD IT.
-//       			this.filterText.removeKeyListener(this.filterKeyListener);
-//       			this.filterText.removeFocusListener(SSDBComboBox.this.filterFocusListener);
-//       			this.filterText.addKeyListener(this.filterKeyListener);
-//       			this.filterText.addFocusListener(SSDBComboBox.this.filterFocusListener);
-//
-//        	}
-//    	}
-//    }
-
 	/**
 	 * Sets the value stored in the component.
 	 * <p>
@@ -1716,90 +1172,31 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	public void setSelectedValue(final long _value) {
 
-		// ONLY NEED TO PROCEED IF THERE IS A CHANGE
 		// TODO consider firing a property change
 		// TODO what happens if user tries to pass null or if getSelectedValue() is null?
 
 		// 2020-08-03: Removing conditional as this could be called when consecutive records
 		// have the same value and we want to make sure to update the editor Strings
 
-			// IF MAPPINGS ARE SPECIFIED THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
-			// SPECIFIED CODE IS STORED
-			if (mappings != null) {
-				final int index = mappings.indexOf(_value);
+		// IF MAPPINGS ARE SPECIFIED THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
+		// SPECIFIED CODE IS STORED
+		if (mappings != null) {
+			final int index = mappings.indexOf(_value);
 
-				if (index == -1) {
-					logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for value of " + _value + ". Setting index to -1 (blank).");
-				}
-
-				logger.trace(getColumnForLog() + ": eventList - " + eventList.toString());
-				logger.trace(getColumnForLog() + ": options - " + options.toString());
-				logger.trace(getColumnForLog() + ": mappings - " + mappings.toString());
-
-				setSelectedIndex(index);
-			} else {
-				logger.warn(getColumnForLog() + ": No mappings available for current component. No value set by setSelectedValue().");
+			if (index == -1) {
+				logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for value of " + _value + ". Setting index to -1 (blank).");
 			}
 
+			logger.trace(getColumnForLog() + ": eventList - " + eventList.toString());
+			logger.trace(getColumnForLog() + ": options - " + options.toString());
+			logger.trace(getColumnForLog() + ": mappings - " + mappings.toString());
+
+			setSelectedIndex(index);
+		} else {
+			logger.warn(getColumnForLog() + ": No mappings available for current component. No value set by setSelectedValue().");
+		}
+
 	}
-
-
-
-//    /**
-//     * Listener(s) for the component's value used to propagate changes back to
-//     * bound text field.
-//     */
-//    protected class MyComboListener implements ActionListener {
-//    	@Override
-//		public void actionPerformed(ActionEvent ae) {
-//    		// IF WE ARE UPDATING THE DISPLAY DON'T DO ANY THING.
-//    		if(SSDBComboBox.this.inUpdateDisplay) {
-//    			return;
-//    		}
-//
-//        	//dont fire an action if the size of the filtered model is not the same as the initial item size
-//        	if (SSDBComboBox.this.selectorCBM != null){
-//        		if (SSDBComboBox.this.selectorCBM.getSize() != SSDBComboBox.this.selectorCBM.data.size()) return;
-//        	}
-//
-//        	SSDBComboBox.this.textField.getDocument().removeDocumentListener(SSDBComboBox.this.textFieldDocumentListener);
-//
-//        	try {
-//	            // GET THE INDEX CORRESPONDING TO THE SELECTED TEXT IN COMBO
-//	            int index = getSelectedIndex();
-//	            // IF THE USER WANTS TO REMOVE COMPLETELY THE VALUE IN THE FIELD HE CHOOSES
-//	            // THE EMPTY STRING IN COMBO THEN THE TEXT FIELD IS SET TO EMPTY STRING
-//	            if (index != -1) {
-//	                try {
-//	                    String textFieldText = SSDBComboBox.this.textField.getText();
-//	                    String textPK= SSDBComboBox.this.selectorCBM.getSelectedBoundData(index).toString();
-//	                    if (!textFieldText.equals(textPK)) {
-//	                        SSDBComboBox.this.textField.setText(textPK);
-//	                    }
-//	                    // IF THE LONG VALUE CORRESPONDING TO THE SELECTED TEXT OF COMBO NOT EQUAL
-//	                    // TO THAT IN THE TEXT FIELD THEN CHANGE THE TEXT IN THE TEXT FIELD TO THAT VALUE
-//	                    // IF ITS THE SAME LEAVE IT AS IS
-//	                } catch(NullPointerException npe) {
-//	                	npe.printStackTrace();
-//	                } catch(NumberFormatException nfe) {
-//	                	nfe.printStackTrace();
-//	                }
-//	            }
-//	            else {
-//	                SSDBComboBox.this.textField.setText("");
-//	            }
-//
-//        	}finally {
-//        		SSDBComboBox.this.textField.getDocument().addDocumentListener(SSDBComboBox.this.textFieldDocumentListener);
-//        	}
-//
-//            // WHEN SET SELECTED INDEX IS CALLED SET SELECTED ITEM WILL BE CALLED ON THE MODEL AND THIS FUNCTION
-//            // IS SUPPOSED TO FIRE A EVENT TO CHANGE THE TEXT BUT IT WILL CAUSE ISSUES IN OUR IMPLEMENTATION
-//            // BUT WE WILL GET ACTION EVENT SO REPAIT TO REFLECT THE CHANGE IN COMBO SELECTION
-//            repaint();
-//        }
-//
-//    } // protected class MyComboListener implements ActionListener {
 
 	/**
 	 * Set the separator to be used when multiple columns are displayed

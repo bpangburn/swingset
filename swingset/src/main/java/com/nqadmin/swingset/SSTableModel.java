@@ -255,6 +255,10 @@ public class SSTableModel extends AbstractTableModel {
 	 */
 	@Override
 	public Class<?> getColumnClass(final int _column) {
+		
+		// TODO May be able to utilize JDBCType Enum here.
+		// TODO This may be better as a static method in SSJdbcRowSetImpl
+		
 		int type;
 		try {
 			type = rowset.getColumnType(_column + 1);
@@ -389,6 +393,9 @@ public class SSTableModel extends AbstractTableModel {
 			if (rowset.getObject(_column + 1) == null) {
 				return null;
 			}
+			
+			// TODO May be able to utilize JDBCType Enum here.
+			// TODO This may be better as a static method in SSJdbcRowSetImpl. Could use getObject() and instanceof.
 
 			// COLUMN NUMBERS IN SSROWSET START FROM 1 WHERE AS COLUMN NUMBERING FOR JTABLE
 			// START FROM 0
@@ -451,10 +458,10 @@ public class SSTableModel extends AbstractTableModel {
 			rowCount = rowset.getRow();
 			rowset.first();
 
-// following code added 11-01-2004 per forum suggestion from Diego Gil (dags)
+			// *** Following code added 11-01-2004 per forum suggestion from Diego Gil (dags).
 			// IF DATA CHANGES, ALERT LISTENERS
 			fireTableDataChanged();
-// end additions
+			// *** End addition
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.",  se);
@@ -490,6 +497,9 @@ public class SSTableModel extends AbstractTableModel {
 				}
 
 			}
+			
+			// TODO May be able to utilize JDBCType Enum here.
+			// TODO This may be better as a static method in SSJdbcRowSetImpl
 
 			final int type = rowset.getColumnType(_column + 1);
 
@@ -605,6 +615,9 @@ public class SSTableModel extends AbstractTableModel {
 				final Integer column = (Integer) iterator.next();
 
 				logger.debug("Column number is:" + column);
+				
+				// TODO May be able to utilize JDBCType Enum here.
+				// TODO This may be better as a static method in SSJdbcRowSetImpl
 
 				// COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
 				final int type = rowset.getColumnType(column.intValue() + 1);
@@ -742,6 +755,9 @@ public class SSTableModel extends AbstractTableModel {
 	 */
 	protected void setPrimaryColumn() {
 		try {
+			
+			// TODO May be able to utilize JDBCType Enum here.
+			// TODO This may be better as a static method in SSJdbcRowSetImpl
 
 			final int type = rowset.getColumnType(primaryColumn + 1);
 
@@ -897,6 +913,8 @@ public class SSTableModel extends AbstractTableModel {
 			}
 			return;
 		}
+		
+		// TODO Clean this up. Utilize java.util.Time.
 
 		// IF COPYING VALUES THE DATE WILL COME AS STRING SO CONVERT IT TO DATE OBJECT.
 		if (type == Types.DATE) {
@@ -948,6 +966,9 @@ public class SSTableModel extends AbstractTableModel {
 				rowset.updateNull(_column + 1);
 				return;
 			}
+			
+			// TODO May be able to utilize JDBCType Enum here.
+			// TODO This may be better as a static method in SSJdbcRowSetImpl
 
 			switch (type) {
 			case Types.INTEGER:
@@ -996,5 +1017,4 @@ public class SSTableModel extends AbstractTableModel {
 
 	} // end public void setValueAt(Object _value, int _row, int _column) {
 
-} // end public class SSTableModel extends AbstractTableModel {
-
+}

@@ -64,21 +64,6 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
      */
     protected SSCommon ssCommon;
 
-//    /**
-//     * Common fields shared across SwingSet components
-//     */
-//    protected SSCommon ssCommon;
-//
-//	/**
-//     * SSRowSet from which component will get/set values.
-//     */
-//    protected SSRowSet sSRowSet;
-//
-//    /**
-//     * SSRowSet column to which the component will be bound.
-//     */
-//    protected String columnName = "";
-
     /**
      * Empty constructor needed for deserialization.
      */
@@ -108,8 +93,6 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
      */
     public SSTextArea(final SSRowSet _ssRowSet, final String _boundColumnName) {
     	super();
-		//this.sSRowSet = _sSRowSet;
-        //this.columnName = _columnName;
         setSSCommon(new SSCommon(this));
     	// SSCommon constructor calls init()
         bind(_ssRowSet, _boundColumnName);
@@ -171,88 +154,5 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	public void updateSSComponent() {
 		setText(getBoundColumnText());
 	}
-
-//    /**
-//     * Sets the SSRowSet column name to which the component is bound.
-//     *
-//     * @param _columnName    column name in the SSRowSet to which the component
-//     *    is bound
-//     */
-//    public void setColumnName(String _columnName) {
-//        String oldValue = this.columnName;
-//        this.columnName = _columnName;
-//        firePropertyChange("columnName", oldValue, this.columnName);
-//        bind();
-//    }
-//
-//    /**
-//     * Returns the SSRowSet column name to which the component is bound.
-//     *
-//     * @return column name to which the component is bound
-//     */
-//    public String getColumnName() {
-//        return this.columnName;
-//    }
-//
-//    /**
-//     * Sets the SSRowSet to which the component is bound.
-//     *
-//     * @param _sSRowSet    SSRowSet to which the component is bound
-//     */
-//    public void setSSRowSet(SSRowSet _sSRowSet) {
-//        SSRowSet oldValue = this.sSRowSet;
-//        this.sSRowSet = _sSRowSet;
-//        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
-//        bind();
-//    }
-//
-//    /**
-//     * Returns the SSRowSet to which the component is bound.
-//     *
-//     * @return SSRowSet to which the component is bound
-//     */
-//    public SSRowSet getSSRowSet() {
-//        return this.sSRowSet;
-//    }
-
-//    /**
-//     * Sets the SSRowSet and column name to which the component is to be bound.
-//     *
-//     * @param _sSRowSet    datasource to be used.
-//     * @param _columnName    Name of the column to which this check box should be bound
-//     */
-//    public void bind(SSRowSet _sSRowSet, String _columnName) {
-//        SSRowSet oldValue = this.sSRowSet;
-//        this.sSRowSet = _sSRowSet;
-//        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
-//
-//        String oldValue2 = this.columnName;
-//        this.columnName = _columnName;
-//        firePropertyChange("columnName", oldValue2, this.columnName);
-//
-//        bind();
-//    }
-
-//    /**
-//     * Method for handling binding of component to a SSRowSet column.
-//     */
-//    protected void bind() {
-//
-//        // CHECK FOR NULL COLUMN/ROWSET
-//            if (this.columnName==null || this.columnName.trim().equals("") || this.sSRowSet==null) {
-//                return;
-//            }
-//
-//        // REMOVE LISTENERS TO PREVENT DUPLICATION
-//        //    removeListeners();
-//
-//        // BIND THE TEXT AREA TO THE SPECIFIED COLUMN
-//            setDocument(new SSTextDocument(this.sSRowSet, this.columnName));
-//
-//        // ADD BACK LISTENERS
-//        //    addListeners();;
-//
-//    }
-
 
 } // end public class SSTextArea extends JTextArea {

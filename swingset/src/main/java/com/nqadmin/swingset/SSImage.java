@@ -78,10 +78,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 */
 	protected class SSImageListener implements ActionListener, Serializable {
 
-
-//		  // ADD UPDATE BUTTON LISTENER
-//        this.btnUpdateImage.addActionListener(new ActionListener() {
-            /**
+        /**
 		 * Unique serial ID
 		 */
 		private static final long serialVersionUID = -997068820028544504L;
@@ -157,28 +154,12 @@ public class SSImage extends JPanel implements SSComponentInterface {
      */
     protected JLabel lblImage = new JLabel("No Picture");
 
-//    /**
-//     * SSRowSet from which component will get/set values.
-//     */
-//    protected SSRowSet sSRowSet;
-//
-//    /**
-//     * SSRowSet column to which the component will be bound.
-//     */
-//    protected String columnName = "";
-
     /**
      * The preferred size of the image component.
      */
     protected Dimension preferredSize = new Dimension(200,200);
 
-//    /**
-//     * RowSet listener
-//     */
-//    protected final MyRowSetListener sSRowSetListener = new MyRowSetListener();
-
-
-	/**
+    /**
 	 * Common fields shared across SwingSet components
 	 */
 	protected SSCommon ssCommon;
@@ -209,56 +190,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 		setSSCommon(new SSCommon(this));
 		// SSCommon constructor calls init()
 		bind(_ssRowSet, _boundColumnName);
-//        this.sSRowSet = _sSRowSet;
-//        this.columnName = _columnName;
-//        init();
-//        bind();
     }
-
-//    /**
-//     * Sets the SSRowSet to which the component is bound.
-//     *
-//     * @param _sSRowSet    SSRowSet to which the component is bound
-//     */
-//    public void setSSRowSet(SSRowSet _sSRowSet) {
-//        SSRowSet oldValue = this.sSRowSet;
-//        this.sSRowSet = _sSRowSet;
-//        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
-//        bind();
-//    }
-//
-//    /**
-//     * Returns the SSRowSet to which the component is bound.
-//     *
-//     * @return SSRowSet to which the component is bound
-//     */
-//    public SSRowSet getSSRowSet() {
-//        return this.sSRowSet;
-//    }
-//
-//    /**
-//     * Sets the SSRowSet column name to which the component is bound.
-//     *
-//     * @param _columnName    column name in the SSRowSet to which the component
-//     *    is bound
-//     */
-//    public void setColumnName(String _columnName) {
-//        String oldValue = this.columnName;
-//        this.columnName = _columnName;
-//        firePropertyChange("columnName", oldValue, this.columnName);
-//        bind();
-//    }
-//
-//    /**
-//     * Returns the SSRowSet column name to which the component is bound.
-//     *
-//     * @return column name to which the component is bound
-//     */
-//    public String getColumnName() {
-//        return this.columnName;
-//    }
-
-
 
     /**
      *  Adds the label and button to the panel
@@ -297,73 +229,6 @@ public class SSImage extends JPanel implements SSComponentInterface {
         updateUI();
     }
 
-//    /**
-//     * Sets the SSRowSet and column name to which the component is to be bound.
-//     *
-//     * @param _sSRowSet    datasource to be used.
-//     * @param _columnName    Name of the column to which this check box should be bound
-//     */
-//    public void bind(SSRowSet _sSRowSet, String _columnName) {
-//        SSRowSet oldValue = this.sSRowSet;
-//        this.sSRowSet = _sSRowSet;
-//        firePropertyChange("sSRowSet", oldValue, this.sSRowSet);
-//
-//        String oldValue2 = this.columnName;
-//        this.columnName = _columnName;
-//        firePropertyChange("columnName", oldValue2, this.columnName);
-//
-//        bind();
-//    }
-
-//    /**
-//     * Initialization code.
-//     */
-//    protected void init() {
-//
-//        // ADD UPDATE BUTTON LISTENER
-//            this.btnUpdateImage.addActionListener(new ActionListener() {
-//                @Override
-//				public void actionPerformed(ActionEvent ae) {
-//                    try{
-//                        if (SSImage.this.sSRowSet != null) {
-//                            //FileInputStream inStream = null;
-//                            File inFile = null;
-//                            JFileChooser fileChooser = new JFileChooser();
-//                            if(fileChooser.showOpenDialog(SSImage.this.btnUpdateImage) == JFileChooser.APPROVE_OPTION){
-//                                inFile = fileChooser.getSelectedFile();
-//                                try (FileInputStream inStream = new FileInputStream(inFile)) {
-//	                                int totalLength = (int)inFile.length();
-//	                                byte[] bytes = new byte[totalLength];
-//	                                int bytesRead = inStream.read(bytes);
-//	                                while (bytesRead < totalLength){
-//	                                    int read = inStream.read(bytes, bytesRead, totalLength - bytesRead);
-//	                                    if(read == -1)
-//	                                        break;
-//										bytesRead += read;
-//	                                }
-//	                                //inStream.close();
-//	                                SSImage.this.sSRowSet.updateBytes(SSImage.this.columnName, bytes);
-//	                                SSImage.this.img = new ImageIcon(bytes);
-//	                                SSImage.this.lblImage.setPreferredSize(new Dimension(SSImage.this.img.getIconWidth(), SSImage.this.img.getIconHeight()));
-//	                                SSImage.this.lblImage.setIcon(SSImage.this.img);
-//	                                SSImage.this.lblImage.setText("");
-//	                                updateUI();
-//                                }
-//                            } else {
-//                                return;
-//                            }
-//                        }
-//                    }catch(SQLException se){
-//                        se.printStackTrace();
-//                    }catch(IOException ioe){
-//                        ioe.printStackTrace();
-//                    }
-//                }
-//            });
-//
-//
-//    }
-
     /**
 	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
@@ -379,90 +244,6 @@ public class SSImage extends JPanel implements SSComponentInterface {
     // ADD LABEL & BUTTON TO PANEL
         addComponents();
 	}
-
-//    /**
-//     * Method for handling binding of component to a SSRowSet column.
-//     */
-//    protected void bind() {
-//
-//        // CHECK FOR NULL COLUMN/ROWSET
-//            if (this.columnName==null || this.columnName.trim().equals("") || this.sSRowSet==null) {
-//                return;
-//            }
-//
-//        // REMOVE LISTENERS TO PREVENT DUPLICATION
-//            removeListeners();
-//
-//        // UPDATE DISPLAY
-//            updateDisplay();
-//
-//        // ADD BACK LISTENERS
-//            addListeners();
-//    }
-
-//    /**
-//     * UPDATES THE VALUE DISPLAYED IN THE COMPONENT BASED ON THE SSROWSET COLUMN
-//     * BINDING.
-//     */
-//    PROTECTED VOID UPDATEDISPLAY() {
-//
-//        TRY {
-//            BYTE[] IMAGEDATA = THIS.SSROWSET.GETROW() >0 ? THIS.SSROWSET.GETBYTES(THIS.COLUMNNAME) : NULL;
-//            IF(IMAGEDATA != NULL){
-//                THIS.IMG = NEW IMAGEICON(IMAGEDATA);
-//                THIS.LBLIMAGE.SETPREFERREDSIZE(NEW DIMENSION(THIS.IMG.GETICONWIDTH(), THIS.IMG.GETICONHEIGHT()));
-//                THIS.LBLIMAGE.SETTEXT("");
-//            } ELSE {
-//                THIS.IMG = NULL;
-//                THIS.LBLIMAGE.SETTEXT("NO PICTURE");
-//            }
-//        } CATCH(SQLEXCEPTION SE) {
-//            SE.PRINTSTACKTRACE();
-//            THIS.IMG = NULL;
-//        }
-//
-//        THIS.LBLIMAGE.SETICON(THIS.IMG);
-//        UPDATEUI();
-//
-//    }
-
-//    /**
-//     * Adds listeners for component and bound text field (where applicable).
-//     */
-//    private void addListeners() {
-//        this.sSRowSet.addRowSetListener(this.sSRowSetListener);
-//    }
-//
-//    /**
-//     * Removes listeners for component and bound text field (where applicable).
-//     */
-//    private void removeListeners() {
-//        this.sSRowSet.removeRowSetListener(this.sSRowSetListener);
-//    }
-//
-//    /**
-//     *  Listener for the RowSet.
-//     */
-//    protected class MyRowSetListener implements RowSetListener {
-//        @Override
-//		public void cursorMoved(RowSetEvent rse){
-//            //System.out.println("Cursor Moved");
-//            updateDisplay();
-//        }
-//
-//        @Override
-//		public void rowChanged(RowSetEvent rse){
-//            //System.out.println("Row Changed");
-//            updateDisplay();
-//        }
-//
-//        @Override
-//		public void rowSetChanged(RowSetEvent rse){
-//            //System.out.println("RowSet Changed");
-//            updateDisplay();
-//        }
-//
-//    }
 
 	/**
      * Returns the preferred size of the image component.
@@ -524,15 +305,14 @@ public class SSImage extends JPanel implements SSComponentInterface {
 
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
-	 * getBoundColumnText()
+	 * getBoundColumnText().
 	 * <p>
 	 * Call to this method should be coming from SSCommon and should already have
-	 * the Component listener removed
+	 * the Component listener removed.
 	 */
 	@Override
 	public void updateSSComponent() {
 
-// from updateDisplay()
         try {
             final byte[] imageData = getSSRowSet().getRow() >0 ? getSSRowSet().getBytes(getBoundColumnName()) : null;
             if(imageData != null){
@@ -550,7 +330,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 
         lblImage.setIcon(img);
 
-        // TODO Confirm this is needed.
+        // TODO Confirm updateUI is needed here.
         updateUI();
 
 	}

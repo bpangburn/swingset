@@ -52,7 +52,7 @@ public interface SSDataGridHandler {
      * Returns true if the row _row can be deleted
      * <p>
      * SSTableModel calls this function if the row deletion is requested
-	 * (If SSDataGridHandler is implemented).
+	 * (if SSDataGridHandler is implemented).
      *
      * @param _row    the row number in data grid.
      * @return returns true is the row can be deleted else false.

@@ -50,7 +50,6 @@ package com.nqadmin.swingset;
  * the desired methods.
  *
  * @deprecated Starting in 2.3.0+ use {@link SSDBNav} instead.
- *
  */
 @Deprecated
 public class SSDBNavAdapter implements SSDBNav {
