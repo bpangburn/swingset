@@ -69,10 +69,10 @@ public class SSSyncManager {
 	 * navigation occurs.
 	 */
 	protected class SyncComboListener implements ActionListener {
+		
 		int actionPerformedCount = 0;
 
 		protected long comboPK = -1;
-		// protected String id = "";
 
 		// WHEN THERE IS A CHANGE IN THIS VALUE MOVE THE ROWSET SO THAT
 		// ITS POSITIONED AT THE RIGHT RECORD.
@@ -82,8 +82,7 @@ public class SSSyncManager {
 			rowset.removeRowSetListener(rowsetListener);
 
 			try {
-				// IF THIS IS NOT CAUSED BY THE USER ACTION (IN WHICH THE FOCUS WILL BE ON THE
-				// COMBO) NOTHING TO DO
+				// IF THIS IS NOT CAUSED BY THE USER ACTION (IN WHICH THE FOCUS WILL BE ON THE COMBO) THERE IS NOTHING TO DO
 				if ((rowset == null) || (rowset.getRow() < 1) || (comboBox.getSelectedIndex() == -1)
 						/* || comboBox.textField == null */
 						/* || comboBox.isBoundTextFieldNull() */
@@ -93,16 +92,15 @@ public class SSSyncManager {
 					return;
 				}
 
-				// this.id = ""+SSSyncManager.this.comboBox.getSelectedFilteredValue();
 				comboPK = comboBox.getSelectedValue();
 
 
 				// UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
-				// Code removed to to make it faster.
+				// This code was removed to improve performance.
 				// dataNavigator.updatePresentRow();
 
 
-				// Note rowset count starts at 1 whereas combobox index starts at 0.
+				// Note that the rowset count starts at 1 whereas combobox index starts at 0.
 
 				final long rowsetPK = rowset.getLong(columnName);
 
@@ -294,23 +292,6 @@ public class SSSyncManager {
 		}
 		comboBox.setEnabled(true);
 		comboBox.addActionListener(comboListener);
-
-// THIS CODE IS FROM SSCommon.getBoundColumnText()
-//		String value = "";
-//
-//		try {
-//			if (getSSRowSet().getRow() != 0) {
-//				value = getSSRowSet().getColumnText(getBoundColumnName());
-//				if (!getAllowNull() && value == null) {
-//					value = "";
-//				}
-//			}
-//		} catch (SQLException se) {
-//			se.printStackTrace();
-//		}
-//
-//		return value;
-
 	}
 
 	/**

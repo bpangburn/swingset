@@ -44,7 +44,6 @@ import javax.swing.text.DateFormatter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
 // SSDateFormatterFactory.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware

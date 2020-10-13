@@ -83,4 +83,3 @@ public class SSIntegerFormatterFactory extends javax.swing.text.DefaultFormatter
 
     }
 }
-

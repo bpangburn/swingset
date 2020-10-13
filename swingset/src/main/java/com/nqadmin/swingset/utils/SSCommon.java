@@ -105,7 +105,6 @@ public class SSCommon implements Serializable {
 	 * changedUpdate() uses counters and SwingUtilities.invokeLater() to only update
 	 * the display on the last method called.
 	 */
-
 	protected class SSDocumentListener implements DocumentListener, Serializable {
 
 		/**
@@ -125,10 +124,9 @@ public class SSCommon implements Serializable {
 			lastChange++;
 			logger.trace(getColumnForLog() + " - changedUpdate(): lastChange=" + lastChange
 					+ ", lastNotifiedChange=" + lastNotifiedChange);
-			// Delay execution of logic until all listener methods are called for current
-			// event
-			// See:
-			// https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
+			
+			// Delay execution of logic until all listener methods are called for current event
+			// See: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
 			SwingUtilities.invokeLater(() -> {
 				if (lastNotifiedChange != lastChange) {
 					lastNotifiedChange = lastChange;
@@ -203,11 +201,6 @@ public class SSCommon implements Serializable {
 	/**
 	 * Log4j Logger for component
 	 */
-	//private static Logger logger;
-
-	/**
-	 * Log4j Logger for component
-	 */
 	private static Logger logger = LogManager.getLogger();
 
 	/**
@@ -270,11 +263,6 @@ public class SSCommon implements Serializable {
 	 * Name of SSRowSet column to which the SwingSet component will be bound.
 	 */
 	private String boundColumnName = null;
-
-//	/**
-//	 * SSRowSet column containing the primary key.
-//	 */
-//	private String primaryKeyColumn = null;
 
 	/**
 	 * Column SQL data type.
@@ -344,7 +332,6 @@ public class SSCommon implements Serializable {
 	 * JTextComponent
 	 */
 	public void addSSDocumentListener() {
-		// ssRowSet.addSSRowSetListener(ssRowSetListener);
 		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().addDocumentListener(ssDocumentListener);
 
 	}
@@ -361,7 +348,8 @@ public class SSCommon implements Serializable {
 	 */
 	protected void bind() {
 
-// TODO consider updating Component to null/zero/empty string if not valid column name, column index, or rowset
+		// TODO consider updating Component to null/zero/empty string if not valid column name, column index, or rowset
+		
 		// CHECK FOR NULL COLUMN/ROWSET
 		if (((boundColumnName == null) && (boundColumnIndex == NO_COLUMN_INDEX)) || (ssRowSet == null)) {
 			return;
@@ -371,8 +359,6 @@ public class SSCommon implements Serializable {
 		// For an SSDBComboBox, we have likely not yet called execute to populate the
 		// combo lists so the text for the first record will be blank.
 		updateSSComponent();
-
-		// Thread.dumpStack();
 
 	}
 
@@ -523,19 +509,6 @@ public class SSCommon implements Serializable {
 		return "[" + boundColumnName + "]";
 	}
 
-
-//	/**
-//	 * Returns the primary key column name for the RowSet query
-//	 *
-//	 * Used primarily for associating a primary key value with another column in a SwingSet list component.
-//	 *
-//	 * @return the primaryKeyColumn
-//	 */
-//// TODO if this is just used for lists then we may want to put into a separate SSListCommon class
-//	public String getPrimaryKeyColumn() {
-//		return primaryKeyColumn;
-//	}
-
 	/**
 	 * @return the parent/calling SwingSet JComponent implementing
 	 *         SSComponentInterface
@@ -601,7 +574,6 @@ public class SSCommon implements Serializable {
 	 * JTextComponent
 	 */
 	public void removeSSDocumentListener() {
-		// ssRowSet.addSSRowSetListener(ssRowSetListener);
 		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().removeDocumentListener(ssDocumentListener);
 
 	}
@@ -634,9 +606,6 @@ public class SSCommon implements Serializable {
 	 *                      RowSet
 	 */
 	public void setBoundColumnArray(final SSArray _boundColumnArray) throws SQLException {
-		// getSSRowSet().updateColumnText( _boundColumnText, getBoundColumnName(),
-		// getAllowNull());
-
 		getSSRowSet().updateArray(getBoundColumnName(), _boundColumnArray);
 	}
 
@@ -657,7 +626,7 @@ public class SSCommon implements Serializable {
 		// DETERMINE COLUMN NAME AND TYPE
 		try {
 			// IF COLUMN INDEX IS VALID, GET COLUMN NAME, OTHERWISE SET TO NULL
-// TODO update SSRowSet to return constant or throw Exception if invalid/out of bounds
+// TODO Update SSRowSet to return constant or throw Exception if invalid/out of bounds.
 			if (boundColumnIndex != NO_COLUMN_INDEX) {
 				boundColumnName = getSSRowSet().getColumnName(boundColumnIndex);
 				boundColumnType = getSSRowSet().getColumnType(boundColumnIndex);
@@ -696,7 +665,7 @@ public class SSCommon implements Serializable {
 		try {
 			// IF COLUMN NAME ISN'T NULL, SET COLUMN INDEX - OTHERWISE, SET INDEX TO
 			// NO_INDEX
-// TODO update SSRowSet to return constant or throw Exception if invalid/out of bounds
+// TODO Update SSRowSet to return constant or throw Exception if invalid/out of bounds.
 			if (boundColumnName != null) {
 				boundColumnIndex = getSSRowSet().getColumnIndex(boundColumnName);
 				boundColumnType = getSSRowSet().getColumnType(boundColumnIndex);
@@ -744,13 +713,6 @@ public class SSCommon implements Serializable {
 
 	}
 
-//	/**
-//	 * @param primaryKeyColumn the primaryKeyColumn to set
-//	 */
-//	public void setPrimaryKeyColumn(String primaryKeyColumn) {
-//		this.primaryKeyColumn = primaryKeyColumn;
-//	}
-
 	/**
 	 * Sets the SwingSet component of which this SSCommon instance is a datamember.
 	 *
@@ -775,13 +737,11 @@ public class SSCommon implements Serializable {
 	 *
 	 * @param _ssRowSet SSRowSet to which the component is bound
 	 */
-	// public void setSSRowSet(SSRowSet _ssRowSet) throws SQLException {
 	public void setSSRowSet(final SSRowSet _ssRowSet) {
 		ssRowSet = _ssRowSet;
 		if (!inBinding) {
 			bind();
 		}
-
 	}
 
 	/**

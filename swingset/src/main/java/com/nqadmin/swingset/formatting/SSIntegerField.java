@@ -126,4 +126,3 @@ public class SSIntegerField extends SSFormattedTextField {
 		setFormatterFactory(new SSIntegerFormatterFactory(_precision));
 	}
 }
-

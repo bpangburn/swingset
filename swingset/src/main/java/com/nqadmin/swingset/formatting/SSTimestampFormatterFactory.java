@@ -66,4 +66,3 @@ public class SSTimestampFormatterFactory extends javax.swing.text.DefaultFormatt
         setDisplayFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss SSS Z")));
     }
 }
-

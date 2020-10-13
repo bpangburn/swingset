@@ -65,7 +65,7 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  */
 public interface SSComponentInterface {
 
-	// TODO fire property changes where applicable
+	// TODO Fire property changes where applicable.
 
 	/**
 	 * Convenience method to add both RowSet and SwingSet Component listeners.
@@ -139,6 +139,8 @@ public interface SSComponentInterface {
 	 * Enter are pressed.
 	 */
 	default void configureTraversalKeys() {
+		
+		// Forward traversal keys.
 		final Set<AWTKeyStroke> forwardKeys = ((JComponent) this)
 				.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
 		final Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
@@ -146,7 +148,7 @@ public interface SSComponentInterface {
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK));
 		((JComponent) this).setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
 
-		// ADDING BACKWARD TRAVERSAL KEYS FROM SSFORMATTEDTEXTFIELD
+		// Backwards traversal keys.
 		final Set<AWTKeyStroke> backwardKeys = ((JComponent) this)
 				.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
 		final Set<AWTKeyStroke> newBackwardKeys = new HashSet<>(backwardKeys);
@@ -276,22 +278,6 @@ public interface SSComponentInterface {
 	default int getColumnType() {
 		return getBoundColumnType();
 	}
-
-//	{
-//		//return getSSCommon().logger;
-//	}
-
-//	/**
-//	 * Returns the primary key column name for the RowSet query
-//	 *
-//	 * Used primarily for associating a primary key value with another column in a SwingSet list component.
-//	 *
-//	 * @return the primaryKeyColumn
-//	 */
-//// TODO if this is just used for lists then we may want to put into a separate SSListCommon class
-//	default String getPrimaryKeyColumn() {
-//		return getSSCommon().getPrimaryKeyColumn();
-//	}
 
 	/**
 	 * Returns the ssCommon data member of the Swingset component.
@@ -442,13 +428,6 @@ public interface SSComponentInterface {
 		setBoundColumnName(_columnName);
 	}
 
-//	/**
-//	 * @param _primaryKeyColumn the primaryKeyColumn to set
-//	 */
-//	default void setPrimaryKeyColumn(String _primaryKeyColumn) {
-//		getSSCommon().setPrimaryKeyColumn(_primaryKeyColumn);
-//	}
-
 	/**
 	 * Sets the SSCommon data member of the Swingset Component.
 	 *
@@ -480,15 +459,14 @@ public interface SSComponentInterface {
 	 * Updates the value of the SwingSet component based on the bound database
 	 * column.
 	 * <p>
-	 * updateSSComponent() will likely eliminate the need for updateDisplay()
+	 * updateSSComponent() should eliminate the need for updateDisplay()
 	 *
 	 * @deprecated {@link #updateSSComponent()} should generally handle display
 	 *             update.
 	 */
-	// TODO have to see when existing updateDisplay() methods call updateUI()
 	@Deprecated
 	default void updateDisplay() {
-
+		updateSSComponent();
 	}
 
 	/**

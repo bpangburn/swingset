@@ -50,8 +50,9 @@ import java.util.Map;
  * Implementation of SQL array for SSList.
  */
 
-// TODO only reference is in com.nqadmin.swingset.SSList
 public class SSArray implements Array {
+	
+	// TODO May be able to eliminate. Only reference is in com.nqadmin.swingset.SSList.
 
 	/**
 	 * Underlying database type name for array elements

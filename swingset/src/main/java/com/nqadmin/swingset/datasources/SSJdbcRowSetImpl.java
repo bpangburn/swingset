@@ -196,4 +196,3 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	}
 
 }
-

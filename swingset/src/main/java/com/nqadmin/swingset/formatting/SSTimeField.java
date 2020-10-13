@@ -66,14 +66,16 @@ public class SSTimeField extends SSFormattedTextField {
      */
     public SSTimeField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
+        // TODO Consider setting to null vs system time.
         setValue( Calendar.getInstance().getTime() );
     }
 
-    /* (non-Javadoc)
-     * @see com.nqadmin.swingset.formatting.SSField#cleanField()
+    /**
+     * Sets the value of the field to the current system time
      */
     @Override
 	public void cleanField() {
+    	// TODO Consider setting to null vs system time.
         setValue( Calendar.getInstance().getTime() );
     }
 

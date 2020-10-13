@@ -115,4 +115,3 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
     }
 
 }
-

@@ -54,13 +54,9 @@ public class SSCurrencyField extends SSFormattedTextField {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 1636264407572416306L;
+	
 	private int decimals = 2;
 	private int precision = 3;
-
-	/**
-	 * Holds value of property minimumIntegerDigits.
-	 */
-	// private int minimumIntegerDigits;
 
 	/**
 	 * Creates a new instance of SSCurrencyField
@@ -146,4 +142,3 @@ public class SSCurrencyField extends SSFormattedTextField {
 		setFormatterFactory(new SSCurrencyFormatterFactory(_precision, decimals));
 	}
 }
-

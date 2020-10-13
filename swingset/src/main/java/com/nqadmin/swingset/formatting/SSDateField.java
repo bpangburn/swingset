@@ -89,7 +89,7 @@ public class SSDateField extends SSFormattedTextField {
         setValue(new java.util.Date());
     }
 
-    /*
+    /**
      * Sets the value of the field to the current system date
      */
     @Override

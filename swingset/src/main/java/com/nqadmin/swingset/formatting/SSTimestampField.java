@@ -50,7 +50,6 @@ public class SSTimestampField extends SSFormattedTextField {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 4689820569270582334L;
-	//private Timestamp ts = null;
 
     /**
      * Creates a new instance of SSTimeField
@@ -65,17 +64,19 @@ public class SSTimestampField extends SSFormattedTextField {
      */
     public SSTimestampField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
-        //ts = new java.sql.Timestamp( (new java.util.Date().getTime() ) );
 
+        // TODO Consider setting to null vs system date/time.
+        
         setValue(new java.util.Date(  ));
     }
 
-    /* (non-Javadoc)
-     * @see com.nqadmin.swingset.formatting.SSField#cleanField()
+    /**
+     * Sets the value of the field to the current system date/time
      */
     @Override
 	public void cleanField() {
-        //ts = new java.sql.Timestamp( (new java.util.Date().getTime() ) );
+    	
+    	// TODO Consider setting to null vs system date/time.
 
         setValue(new java.util.Date( ) );
     }

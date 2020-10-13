@@ -49,9 +49,16 @@ package com.nqadmin.swingset.utils;
  */
 public class SSListItem {
 
+	/**
+	 * String item to display (generally in a combobox or other list).
+	 */
 	private String listItem;
+	
+	/**
+	 * Record primary key value corresponding to list item displayed.
+	 * Generally used to store a foreign key in a related table.
+	 */
 	private Long primaryKey;
-
 
 	/**
 	 * Constructs an object to be stored in a list or combobox component
@@ -66,12 +73,16 @@ public class SSListItem {
 	}
 
 	/**
-	 * @return the String description for the current list item
+	 * Returns the string to display for the current list item.
+	 * 
+	 * @return the String to display for the current list item
 	 */
 	public String getListItem() {
 		return listItem;
 	}
 	/**
+	 * Returns the primary key value associated with the current list item.
+	 * 
      * @return the Primary Key/index for the current list item
      */
     public Long getPrimaryKey() {
@@ -79,6 +90,8 @@ public class SSListItem {
 	}
 
     /**
+	 * Sets the string to display for the current list item.
+	 * 
 	 * @param _listItem String description for the list item
 	 */
 	public void setListItem(final String _listItem) {
@@ -86,6 +99,8 @@ public class SSListItem {
 	}
 
 	/**
+	 * Sets the primary key value associated with the current list item.
+	 * 
 	 * @param _primaryKey Primary Key/index for the current list item
 	 */
 	public void setPrimaryKey(final Long _primaryKey) {
@@ -93,6 +108,9 @@ public class SSListItem {
 	}
 
 
+	/**
+	 * String representation of list item.
+	 */
 	@Override
 	public String toString() {
 		return listItem;
