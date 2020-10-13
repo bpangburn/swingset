@@ -270,9 +270,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Alphanumeric separator used to separate values in multi-column comboboxes.
 	 * <p>
-	 * Changing from " - " to " | " for 2020 rewrite.
+	 * Changing default from " - " to " | " for 2020 rewrite.
 	 */
-	protected String separator = " - ";
+	//protected String separator = " - ";
+	protected String separator = " | ";
 
 	/**
 	 * Boolean to indicated that a call to setSelectedItem() is in progress.
@@ -747,7 +748,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	private void queryData() {
 
 		if (eventList != null) {
-// TODO look at .dispose() vs .clear()
+		// .clear() appears to be the correct method vs. .dispose() for working with GlazedLists
 			logger.trace(getColumnForLog() + ": Clearing eventList.");
 			eventList.clear();
 		} else {
