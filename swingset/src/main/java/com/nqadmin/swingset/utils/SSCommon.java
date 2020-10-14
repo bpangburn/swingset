@@ -324,7 +324,7 @@ public class SSCommon implements Serializable {
 	 * Method to add any SwingSet Component listener(s).
 	 */
 	public void addSSComponentListener() {
-		((SSComponentInterface) ssComponent).addSSComponentListener();
+		ssComponent.addSSComponentListener();
 	}
 
 	/**
@@ -550,8 +550,8 @@ public class SSCommon implements Serializable {
 	 * component.
 	 */
 	protected void init() {
-		((SSComponentInterface) getSSComponent()).configureTraversalKeys();
-		((SSComponentInterface) getSSComponent()).customInit();
+		getSSComponent().configureTraversalKeys();
+		getSSComponent().customInit();
 	}
 
 	/**
@@ -566,7 +566,7 @@ public class SSCommon implements Serializable {
 	 * Method to remove any SwingSet Component listener(s).
 	 */
 	public void removeSSComponentListener() {
-		((SSComponentInterface) ssComponent).removeSSComponentListener();
+		ssComponent.removeSSComponentListener();
 	}
 
 	/**
@@ -751,11 +751,11 @@ public class SSCommon implements Serializable {
 	 * after update.
 	 */
 	public void updateSSComponent() {
-		((SSComponentInterface) ssComponent).removeSSComponentListener();
+		ssComponent.removeSSComponentListener();
 
-		((SSComponentInterface) ssComponent).updateSSComponent();
+		ssComponent.updateSSComponent();
 
-		((SSComponentInterface) ssComponent).addSSComponentListener();
+		ssComponent.addSSComponentListener();
 
 	}
 
