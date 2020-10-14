@@ -757,8 +757,8 @@ public class SSDataGrid extends JTable {
 	 * @param _sSRowSet SSRowSet from which values have to be retrieved.
 	 */
 	public SSDataGrid(final SSRowSet _sSRowSet) {
+		this();
 		sSRowSet = _sSRowSet;
-		init();
 		bind();
 	}
 

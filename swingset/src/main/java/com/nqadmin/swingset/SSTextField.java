@@ -219,16 +219,15 @@ public class SSTextField extends JTextField implements SSComponentInterface {
     /**
      * Common fields shared across SwingSet components
      */
-    protected SSCommon ssCommon;
+    protected SSCommon ssCommon = new SSCommon(this);
 
     /**
      * Constructs a new, empty text field.
      */
     public SSTextField() {
-    	super();
-    	setSSCommon(new SSCommon(this));
-    	// SSCommon constructor calls init()
-    	}
+		// Note that call to parent default constructor is implicit.
+		//super();
+    }
 
     /**
      * Constructs a new, empty text field with the specified mask.
@@ -236,11 +235,8 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * @param _mask the mask required for this textfield.
      */
     public SSTextField(final int _mask) {
-        super();
-        mask = _mask;
-        setSSCommon(new SSCommon(this));
-    	// SSCommon constructor calls init()
-        }
+        this("", _mask);
+    }
 
     /**
      * Constructs a new, empty text field with the specified mask and number of
@@ -249,13 +245,10 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * @param _mask    the mask required for this textfield.
      * @param _numberOfDecimalPlaces    number of decimal places required
      */
-     public SSTextField(final int _mask, final int _numberOfDecimalPlaces) {
-    	 super();
-        mask = _mask;
-        numberOfDecimalPlaces = _numberOfDecimalPlaces;
-        setSSCommon(new SSCommon(this));
-    	// SSCommon constructor calls init()
-        }
+    public SSTextField(final int _mask, final int _numberOfDecimalPlaces) {
+    	this(_mask);
+    	numberOfDecimalPlaces = _numberOfDecimalPlaces;
+    }
 
     /**
      * Constructs a new, empty text field with the specified mask, number of
@@ -276,14 +269,10 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * @param _numberOfDecimalPlaces    number of decimal places required
      * @param _align    alignment required
      */
-     public SSTextField(final int _mask, final int _numberOfDecimalPlaces, final int _align) {
-    	 super();
-        mask = _mask;
-        numberOfDecimalPlaces = _numberOfDecimalPlaces;
-        setHorizontalAlignment(_align);
-        setSSCommon(new SSCommon(this));
-    	// SSCommon constructor calls init()
-        }
+	 public SSTextField(final int _mask, final int _numberOfDecimalPlaces, final int _align) {
+		 this(_mask, _numberOfDecimalPlaces);
+		 setHorizontalAlignment(_align);
+	}
 
     /**
      * Creates a SSTextField instance and binds it to the specified
@@ -293,9 +282,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
      * @param _boundColumnName    name of the column to which this label should be bound
      */
     public SSTextField(final SSRowSet _ssRowSet, final String _boundColumnName) {
-    	super();
-        setSSCommon(new SSCommon(this));
-    	// SSCommon constructor calls init()
+    	this();
         bind(_ssRowSet, _boundColumnName);
     }
 
@@ -308,8 +295,6 @@ public class SSTextField extends JTextField implements SSComponentInterface {
     public SSTextField(final String _text, final int _mask) {
         super(_text);
         mask = _mask;
-        setSSCommon(new SSCommon(this));
-    	// SSCommon constructor calls init()
     }
 
     /**

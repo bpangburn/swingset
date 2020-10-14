@@ -309,7 +309,6 @@ public class SSCommon implements Serializable {
 	public SSCommon(final SSComponentInterface _ssComponent) {
 		setSSComponent(_ssComponent);
 		init();
-
 	}
 
 	/**
@@ -342,6 +341,8 @@ public class SSCommon implements Serializable {
 	public void addSSRowSetListener() {
 		ssRowSet.addSSRowSetListener(ssRowSetListener);
 	}
+	
+	// TODO Merge common code across bind() methods.
 
 	/**
 	 * Updates the SSComponent with a valid RowSet and Column (Name or Index)

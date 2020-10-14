@@ -283,7 +283,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon;
+	protected SSCommon ssCommon = new SSCommon(this);
 
 	/**
 	 * Component listener.
@@ -294,9 +294,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * Creates an object of the SSDBComboBox.
 	 */
 	public SSDBComboBox() {
-		super();
-		setSSCommon(new SSCommon(this));
-		// SSCommon constructor calls init()
+		// Note that call to parent default constructor is implicit.
+		//super();
 	}
 
 	/**
@@ -311,9 +310,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	public SSDBComboBox(final SSConnection _ssConnection, final String _query, final String _primaryKeyColumnName,
 			final String _displayColumnName) {
-		super();
-		setSSCommon(new SSCommon(this));
-		// SSCommon constructor calls init()
+		this();
 		setSSConnection(_ssConnection);
 		setQuery(_query);
 		setPrimaryKeyColumnName(_primaryKeyColumnName);

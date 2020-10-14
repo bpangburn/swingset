@@ -99,7 +99,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
     /**
      * Common fields shared across SwingSet components
      */
-    protected SSCommon ssCommon;
+    protected SSCommon ssCommon = new SSCommon(this);
 
     /**
      * Component listener.
@@ -108,12 +108,11 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 
     /**
      * Empty constructor needed for deserialization. Creates a SSLabel instance
-     * with no image and with an empty string for the title.
+     * with no image and no text.
      */
     public SSLabel() {
-        super("<label text here>");
-        setSSCommon(new SSCommon(this));
-		// SSCommon constructor calls init()
+		// Note that call to parent default constructor is implicit.
+		//super();
     }
 
     /**
@@ -123,8 +122,6 @@ public class SSLabel extends JLabel implements SSComponentInterface {
      */
     public SSLabel(final Icon _image) {
 		super(_image);
-		setSSCommon(new SSCommon(this));
-		// SSCommon constructor calls init()
     }
 
     /**
@@ -135,7 +132,6 @@ public class SSLabel extends JLabel implements SSComponentInterface {
      */
     public SSLabel(final Icon _image, final int _horizontalAlignment) {
 		super(_image, _horizontalAlignment);
-		setSSCommon(new SSCommon(this));
     }
 
 	/**
@@ -146,9 +142,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
      * @param _boundColumnName    name of the column to which this label should be bound
      */
     public SSLabel(final SSRowSet _ssRowSet, final String _boundColumnName) {
-		super();
-		setSSCommon(new SSCommon(this));
-		// SSCommon constructor calls init()
+		this();
 		bind(_ssRowSet, _boundColumnName);
     }
 

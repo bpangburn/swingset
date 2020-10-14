@@ -194,7 +194,8 @@ public class SSTableModel extends AbstractTableModel {
 	 * the JTable.
 	 */
 	public SSTableModel() {
-		super();
+		// Note that call to parent default constructor is implicit.
+		//super();
 	}
 
 	/**
@@ -204,7 +205,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _rowset SSRowSet object whose records has to be displayed in JTable.
 	 */
 	public SSTableModel(final SSRowSet _rowset) {
-		super();
+		this();
 		rowset = _rowset;
 		init();
 	}

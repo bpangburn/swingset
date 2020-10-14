@@ -162,7 +162,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
     /**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon;
+	protected SSCommon ssCommon = new SSCommon(this);
 
 	/**
 	 * Component listener.
@@ -174,9 +174,8 @@ public class SSImage extends JPanel implements SSComponentInterface {
      *  Construct a default SSImage Object.
      */
     public SSImage() {
-		super();
-		setSSCommon(new SSCommon(this));
-		// SSCommon constructor calls init()
+		// Note that call to parent default constructor is implicit.
+		//super();
     }
 
     /**
@@ -186,9 +185,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
      * @param _boundColumnName - column in the sSRowSet to which the component should be bound.
      */
     public SSImage(final SSRowSet _ssRowSet, final String _boundColumnName) {
-		super();
-		setSSCommon(new SSCommon(this));
-		// SSCommon constructor calls init()
+		this();
 		bind(_ssRowSet, _boundColumnName);
     }
 

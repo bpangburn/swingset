@@ -238,15 +238,14 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon;
+	protected SSCommon ssCommon = new SSCommon(this);
 
 	/**
 	 * Creates an object of SSComboBox.
 	 */
 	public SSComboBox() {
-		super();
-		setSSCommon(new SSCommon(this));
-		// SSCommon constructor calls init()
+		// Note that call to parent default constructor is implicit.
+		//super();
 	}
 
 	/**

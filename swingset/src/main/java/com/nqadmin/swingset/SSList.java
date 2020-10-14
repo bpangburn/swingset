@@ -213,7 +213,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon;
+	protected SSCommon ssCommon = new SSCommon(this);
 
 	/**
 	 * Component listener for list selection changes.
@@ -224,9 +224,8 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 * Creates an object of SSComboBox.
 	 */
 	public SSList() {
-		super();
-		setSSCommon(new SSCommon(this));
-		// SSCommon constructor calls init()
+		// Note that call to parent default constructor is implicit.
+		//super();
 	}
 
 	/**

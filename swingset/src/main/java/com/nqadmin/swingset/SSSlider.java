@@ -97,7 +97,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
     /**
      * Common fields shared across SwingSet components
      */
-    protected SSCommon ssCommon;
+	protected SSCommon ssCommon = new SSCommon(this);
 
 	/**
      * Component listener.
@@ -109,9 +109,8 @@ public class SSSlider extends JSlider implements SSComponentInterface {
      * slider with the range 0 to 100.
      */
     public SSSlider() {
-    	super();
-		setSSCommon(new SSCommon(this));
-		// SSCommon constructor calls init()
+		// Note that call to parent default constructor is implicit.
+		//super();
     }
 
     /**
@@ -121,8 +120,6 @@ public class SSSlider extends JSlider implements SSComponentInterface {
      */
     public SSSlider(final int _orientation) {
 		super(_orientation);
-		setSSCommon(new SSCommon(this));
-		// SSCommon constructor calls init()
     }
 
     /**
@@ -133,8 +130,6 @@ public class SSSlider extends JSlider implements SSComponentInterface {
      */
     public SSSlider(final int _min, final int _max) {
 		super(_min, _max);
-		setSSCommon(new SSCommon(this));
-		// SSCommon constructor calls init()
     }
 
     /**
@@ -146,14 +141,8 @@ public class SSSlider extends JSlider implements SSComponentInterface {
      * @throws java.sql.SQLException SQLException
      */
     public SSSlider(final SSRowSet _ssRowSet, final String _boundColumnName) throws java.sql.SQLException {
-    	super();
-		setSSCommon(new SSCommon(this));
-		// SSCommon constructor calls init()
+    	this();
 		bind(_ssRowSet, _boundColumnName);
-//		this.sSRowSet = _sSRowSet;
-//        this.columnName = _columnName;
-//        init();
-//        bind();
     }
 
 	/**

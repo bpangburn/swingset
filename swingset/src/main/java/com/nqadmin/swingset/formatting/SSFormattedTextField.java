@@ -219,7 +219,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	/**
      * Common fields shared across SwingSet components
      */
-    protected SSCommon ssCommon;
+    protected SSCommon ssCommon = new SSCommon(this);
 
 	/**
 	 * Component listener.
@@ -233,11 +233,8 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * Creates a new instance of SSFormattedTextField
 	 */
 	public SSFormattedTextField() {
-
-    	super();
-    	setSSCommon(new SSCommon(this));
-    	// SSCommon constructor calls init()
-
+		// Note that call to parent default constructor is implicit.
+		//super();
 	}
 
 	/**
@@ -247,9 +244,6 @@ public class SSFormattedTextField extends JFormattedTextField
 	 */
 	public SSFormattedTextField(final AbstractFormatter _formatter) {
     	super(_formatter);
-    	setSSCommon(new SSCommon(this));
-    	// SSCommon constructor calls init()
-
 	}
 
 	/**
@@ -259,8 +253,6 @@ public class SSFormattedTextField extends JFormattedTextField
 	 */
 	public SSFormattedTextField(final AbstractFormatterFactory _factory) {
     	super(_factory);
-    	setSSCommon(new SSCommon(this));
-    	// SSCommon constructor calls init()
 	}
 
 	// WE DON'T WANT TO REPLICATE THE JFormattedTextField CONSTRUCTOR THAT ACCEPTS AN OBJECT.
@@ -272,11 +264,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * @param _format Format used to look up an AbstractFormatter
 	 */
 	public SSFormattedTextField(final Format _format) {
-
     	super(_format);
-    	setSSCommon(new SSCommon(this));
-    	// SSCommon constructor calls init()
-
 	}
 
 	/**

@@ -62,15 +62,14 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
     /**
      * Common fields shared across SwingSet components
      */
-    protected SSCommon ssCommon;
+    protected SSCommon ssCommon = new SSCommon(this);
 
     /**
      * Empty constructor needed for deserialization.
      */
     public SSTextArea() {
-    	super();
-    	setSSCommon(new SSCommon(this));
-    	// SSCommon constructor calls init()
+		// Note that call to parent default constructor is implicit.
+		//super();
     }
 
     /**
@@ -81,8 +80,6 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
      */
     public SSTextArea(final int _rows, final int _columns) {
         super(_rows, _columns);
-    	setSSCommon(new SSCommon(this));
-    	// SSCommon constructor calls init()
     }
 
     /**
@@ -92,9 +89,7 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
      * @param _boundColumnName    name of the column to which this text area should be bound
      */
     public SSTextArea(final SSRowSet _ssRowSet, final String _boundColumnName) {
-    	super();
-        setSSCommon(new SSCommon(this));
-    	// SSCommon constructor calls init()
+    	this();
         bind(_ssRowSet, _boundColumnName);
     }
 
