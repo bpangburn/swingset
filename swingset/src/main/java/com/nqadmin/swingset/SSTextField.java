@@ -66,9 +66,10 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 
 	// TODO Consider adding an InputVerifier to prevent component from losing focus. See SSFormattedTextField. May be able to add to SSDocumentListener in SSCommon.
 	// TODO Convert masks to SSFormattedTextFields
+	// TODO Add YYYYMMDD mask.
 
     /**
-     * Use this mask if mm/dd/yyyy format is required.
+     * Use this mask if dd/mm/yyyy format is required.
      */
     public static final int DDMMYYYY = 2;
 
