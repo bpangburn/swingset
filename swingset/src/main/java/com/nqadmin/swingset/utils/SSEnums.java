@@ -38,6 +38,9 @@
 package com.nqadmin.swingset.utils;
 
 // SSEnums.java
+
+import com.nqadmin.swingset.SSDBNav;
+
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
@@ -85,12 +88,17 @@ public class SSEnums {
 	 */
 	@SuppressWarnings("javadoc")
 	public enum Navigation {
-		First(2), Last(3), Next(1), Previous(1);
+		First(2, SSDBNav.NAVIGATION_FIRST),
+		Last(3, SSDBNav.NAVIGATION_LAST),
+		Next(1, SSDBNav.NAVIGATION_NEXT),
+		Previous(1, SSDBNav.NAVIGATION_PREVIOUS);
 
 		private final int value;
+		private final int deprecatedConstant;
 
-		Navigation(final int newValue) {
+		Navigation(final int newValue, int deprecatedConstant) {
 			value = newValue;
+			this.deprecatedConstant = deprecatedConstant;
 		}
 
 		/**
@@ -98,6 +106,14 @@ public class SSEnums {
 		 */
 		public int getValue() {
 			return value;
+		}
+
+		/**
+		 * @return integer for use with the deprecated method
+		 */
+		@Deprecated
+		public int getDeprecatedConstant() {
+			return deprecatedConstant;
 		}
 	}
 

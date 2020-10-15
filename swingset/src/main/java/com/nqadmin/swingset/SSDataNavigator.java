@@ -161,7 +161,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Container (frame or internal frame) which contains the navigator.
 	 */
-	protected SSDBNav dBNav = null;
+	protected SSDBNav dBNav = new SSDBNav(){};
 
 	/**
 	 * Button to delete the current record in the SSRowSet.
@@ -309,33 +309,21 @@ public class SSDataNavigator extends JPanel {
 				logger.debug("FIRST button clicked.");
 				try {
 					if (modification) {
-						// CHECK IF THE DBNAV IS NULL IF SO UPDATE ROW
-						if (dBNav == null) {
-							sSRowSet.updateRow();
-						} else {
-							// IF DBNAV IS NOT NULL CALL ALLOW UPDATE
-							if (dBNav.allowUpdate()) {
-								// UPDATE ALLOWED GO AHEAD AND DO THE UPDATE
-								sSRowSet.updateRow();
-								dBNav.performPostUpdateOps();
-							} else {
-								// UPDATE NOT ALLOWED SO DO NOTHING.
-								// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
-								// TO THE ROW THAT SHOULD BE UNDONE.
-								return;
-							}
+						if (!dBNav.allowUpdate()) {
+							// UPDATE NOT ALLOWED SO DO NOTHING.
+							// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
+							// TO THE ROW THAT SHOULD BE UNDONE.
+							return;
 						}
+						sSRowSet.updateRow();
+						dBNav.performPostUpdateOps();
 					}
 					sSRowSet.first();
 
 					updateNavigator();
-
-					if (dBNav != null) {
-						dBNav.performNavigationOps(Navigation.First);
-						// ALSO CALL DEPRECATED performNavigationOps TO ALLOW FOR LEGACY CODE
-						dBNav.performNavigationOps(SSDBNav.NAVIGATION_FIRST);
-					}
-
+					
+					dBNav.performNavigationOps(Navigation.First);
+					
 				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
@@ -354,22 +342,14 @@ public class SSDataNavigator extends JPanel {
 				try {
 					// if( sSRowSet.rowUpdated() )
 					if (modification) {
-						// CHECK IF THE DBNAV IS NULL IF SO UPDATE ROW
-						if (dBNav == null) {
-							sSRowSet.updateRow();
-						} else {
-							// IF DBNAV IS NOT NULL CALL ALLOW UPDATE
-							if (dBNav.allowUpdate()) {
-								// UPDATE ALLOWED GO AHEAD AND DO THE UPDATE
-								sSRowSet.updateRow();
-								dBNav.performPostUpdateOps();
-							} else {
-								// UPDATE NOT ALLOWED SO DO NOTHING.
-								// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
-								// TO THE ROW THAT SHOULD BE UNDONE.
-								return;
-							}
+						if (!dBNav.allowUpdate()) {
+							// UPDATE NOT ALLOWED SO DO NOTHING.
+							// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
+							// TO THE ROW THAT SHOULD BE UNDONE.
+							return;
 						}
+						sSRowSet.updateRow();
+						dBNav.performPostUpdateOps();
 					}
 					if ((sSRowSet.getRow() != 0) && !sSRowSet.previous()) {
 						sSRowSet.first();
@@ -377,11 +357,7 @@ public class SSDataNavigator extends JPanel {
 
 					updateNavigator();
 
-					if (dBNav != null) {
-						dBNav.performNavigationOps(Navigation.Previous);
-						// ALSO CALL DEPRECATED performNavigationOps TO ALLOW FOR LEGACY CODE
-						dBNav.performNavigationOps(SSDBNav.NAVIGATION_PREVIOUS);
-					}
+					dBNav.performNavigationOps(Navigation.Previous);
 				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
@@ -401,33 +377,21 @@ public class SSDataNavigator extends JPanel {
 				try {
 					// if( sSRowSet.rowUpdated() )
 					if (modification) {
-						// CHECK IF THE DBNAV IS NULL IF SO UPDATE ROW
-						if (dBNav == null) {
-							sSRowSet.updateRow();
-						} else {
-							// IF DBNAV IS NOT NULL CALL ALLOW UPDATE
-							if (dBNav.allowUpdate()) {
-								// UPDATE ALLOWED GO AHEAD AND DO THE UPDATE
-								sSRowSet.updateRow();
-								dBNav.performPostUpdateOps();
-							} else {
-								// UPDATE NOT ALLOWED SO DO NOTHING.
-								// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
-								// TO THE ROW THAT SHOULD BE UNDONE.
-								return;
-							}
+						if (!dBNav.allowUpdate()) {
+							// UPDATE NOT ALLOWED SO DO NOTHING.
+							// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
+							// TO THE ROW THAT SHOULD BE UNDONE.
+							return;
 						}
+						sSRowSet.updateRow();
+						dBNav.performPostUpdateOps();
 					}
 
 					sSRowSet.next();
 
 					updateNavigator();
 
-					if (dBNav != null) {
-						dBNav.performNavigationOps(Navigation.Next);
-						// ALSO CALL DEPRECATED performNavigationOps TO ALLOW FOR LEGACY CODE
-						dBNav.performNavigationOps(SSDBNav.NAVIGATION_NEXT);
-					}
+					dBNav.performNavigationOps(Navigation.Next);
 
 				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
@@ -449,32 +413,20 @@ public class SSDataNavigator extends JPanel {
 				try {
 					// if( sSRowSet.rowUpdated() )
 					if (modification) {
-						// CHECK IF THE DBNAV IS NULL IF SO UPDATE ROW
-						if (dBNav == null) {
-							sSRowSet.updateRow();
-						} else {
-							// IF DBNAV IS NOT NULL CALL ALLOW UPDATE
-							if (dBNav.allowUpdate()) {
-								// UPDATE ALLOWED GO AHEAD AND DO THE UPDATE
-								sSRowSet.updateRow();
-								dBNav.performPostUpdateOps();
-							} else {
-								// UPDATE NOT ALLOWED SO DO NOTHING.
-								// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
-								// TO THE ROW THAT SHOULD BE UNDONE.
-								return;
-							}
+						if (!dBNav.allowUpdate()) {
+							// UPDATE NOT ALLOWED SO DO NOTHING.
+							// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
+							// TO THE ROW THAT SHOULD BE UNDONE.
+							return;
 						}
+						sSRowSet.updateRow();
+						dBNav.performPostUpdateOps();
 					}
 					sSRowSet.last();
 
 					updateNavigator();
 
-					if (dBNav != null) {
-						dBNav.performNavigationOps(Navigation.Last);
-						// ALSO CALL DEPRECATED performNavigationOps TO ALLOW FOR LEGACY CODE
-						dBNav.performNavigationOps(SSDBNav.NAVIGATION_LAST);
-					}
+					dBNav.performNavigationOps(Navigation.Last);
 
 				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
@@ -495,63 +447,54 @@ public class SSDataNavigator extends JPanel {
 					if (onInsertRow) {
 						// IF ON INSERT ROW ADD THE ROW.
 						// CHECK IF THE ROW CAN BE INSERTED.
-						if ((dBNav == null) || ((dBNav != null)
-								&& dBNav.allowInsertion())) {
-							sSRowSet.insertRow();
-							onInsertRow = false;
-							dBNav.performPostInsertOps();
-
-							// 2019-10-14: next bit of code seems odd. not sure why we're calling moveToCurrentRow() and last().
-							//  In H2, this is leading to an incorrect total # of rows (e.g., have 5, insert a row, and it shows 6 of 7 until refreshed).
-							//  Modified to just call last();
-
-//							// INCREMENT THE ROW COUNT
-//							SSDataNavigator.this.rowCount++;
-//
-//							// MOVE TO CURRENT ROW MOVES SSROWSET TO RECORD AT WHICH ADD WAS PRESSED.
-//							// BUT IT NICE TO BE ON THE ADDED ROW WHICH IS THE LAST ONE IN THE SSROWSET.
-//							// ALSO MOVE TO CURRENT ROW MOVES THE SSROWSET POSITION BUT DOES NOT TRIGGER
-//							// ANY EVENT FOR THE LISTENERS AS A RESULT VALUES ON THE SCREEN WILL NOT
-//							// DISPLAY THE CURRENT RECORD VALUES.
-//							SSDataNavigator.this.sSRowSet.moveToCurrentRow();
-
-							sSRowSet.last();
-							
-							rowCount = sSRowSet.getRow();
-
-							updateNavigator();
-
-							refreshButton.setEnabled(true);
-
-							if (insertion) {
-								addButton.setEnabled(true);
-							}
-							if (deletion) {
-								deleteButton.setEnabled(true);
-							}
-						} else {
-							// WE DO NOTHING. THE ROWSET STAYS IN INSERT ROW. EITHER USER HAS TO FIX THE
-							// DATA AND SAVE THE ROW OR CANCEL THE INSERTION.
+						if (!dBNav.allowInsertion()) {
+							// WE DO NOTHING. THE ROWSET STAYS IN INSERT ROW. EITHER USER
+							// HAS TO FIX THE DATA AND SAVE THE ROW OR CANCEL THE INSERTION.
+							return;
 						}
+						sSRowSet.insertRow();
+						onInsertRow = false;
+						dBNav.performPostInsertOps();
+						
+						// 2019-10-14: next bit of code seems odd. not sure why we're calling moveToCurrentRow() and last().
+						//  In H2, this is leading to an incorrect total # of rows (e.g., have 5, insert a row, and it shows 6 of 7 until refreshed).
+						//  Modified to just call last();
+						
+//						// INCREMENT THE ROW COUNT
+//						SSDataNavigator.this.rowCount++;
+//
+//						// MOVE TO CURRENT ROW MOVES SSROWSET TO RECORD AT WHICH ADD WAS PRESSED.
+//						// BUT IT NICE TO BE ON THE ADDED ROW WHICH IS THE LAST ONE IN THE SSROWSET.
+//						// ALSO MOVE TO CURRENT ROW MOVES THE SSROWSET POSITION BUT DOES NOT TRIGGER
+//						// ANY EVENT FOR THE LISTENERS AS A RESULT VALUES ON THE SCREEN WILL NOT
+//						// DISPLAY THE CURRENT RECORD VALUES.
+//						SSDataNavigator.this.sSRowSet.moveToCurrentRow();
 
+						sSRowSet.last();
+
+						rowCount = sSRowSet.getRow();
+
+						updateNavigator();
+
+						refreshButton.setEnabled(true);
+
+						if (insertion) {
+							addButton.setEnabled(true);
+						}
+						if (deletion) {
+							deleteButton.setEnabled(true);
+						}
+					
 					} else {
 						// ELSE UPDATE THE PRESENT ROW VALUES.
-						// CHECK IF THE DBNAV IS NULL IF SO UPDATE ROW
-						if (dBNav == null) {
-							sSRowSet.updateRow();
-						} else {
-							// IF DBNAV IS NOT NULL CALL ALLOW UPDATE
-							if (dBNav.allowUpdate()) {
-								// UPDATE ALLOWED GO AHEAD AND DO THE UPDATE
-								sSRowSet.updateRow();
-								dBNav.performPostUpdateOps();
-							} else {
-								// UPDATE NOT ALLOWED SO DO NOTHING.
-								// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
-								// TO THE ROW THAT SHOULD BE UNDONE.
-								return;
-							}
+						if (!dBNav.allowUpdate()) {
+							// UPDATE NOT ALLOWED SO DO NOTHING.
+							// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
+							// TO THE ROW THAT SHOULD BE UNDONE.
+							return;
 						}
+						sSRowSet.updateRow();
+						dBNav.performPostUpdateOps();
 					}
 
 				} catch (final SQLException se) {
@@ -581,9 +524,7 @@ public class SSDataNavigator extends JPanel {
 					// CALL CANCELROWUPDATE TO GET A TRIGGER
 					sSRowSet.cancelRowUpdates();
 					onInsertRow = false;
-					if (dBNav != null) {
-						dBNav.performCancelOps();
-					}
+					dBNav.performCancelOps();
 					sSRowSet.refreshRow();
 
 					updateNavigator();
@@ -632,9 +573,7 @@ public class SSDataNavigator extends JPanel {
 						updateNavigator();
 					}
 
-					if (dBNav != null) {
-						dBNav.performRefreshOps();
-					}
+					dBNav.performRefreshOps();
 
 				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
@@ -660,9 +599,7 @@ public class SSDataNavigator extends JPanel {
 						navCombo.setEnabled(false);
 					}
 
-					if (dBNav != null) {
-						dBNav.performPreInsertOps();
-					}
+					dBNav.performPreInsertOps();
 
 					firstButton.setEnabled(false);
 					previousButton.setEnabled(false);
@@ -698,41 +635,39 @@ public class SSDataNavigator extends JPanel {
 							return;
 						}
 					}
-
-					if (dBNav != null) {
-						dBNav.performPreDeletionOps();
+					
+					dBNav.performPreDeletionOps();
+					
+					if (!dBNav.allowDeletion()) {
+						return;
 					}
-
-					if ((dBNav == null)
-							|| ((dBNav != null) && dBNav.allowDeletion())) {
-
-						// CAPTURE CURRENT ROW PRE-DELETION
-						final int tmpPosition = currentRow;
-
-						// SET ANTICIPATED ROW COUNT POST-DELETION
-						final int tmpSize = rowCount-1;
-
-						// DELETE ROW FROM ROWSET
-						sSRowSet.deleteRow();
-
-						// PERFORM ANY POST DELETION OPS (WHICH MAY INVOLVE REQUERYING WHICH IS NEEDED FOR H2)
-						dBNav.performPostDeletionOps();
-
-						// UPDATE TOTAL ROW COUNT
-						rowCount=tmpSize;
-
-						// TRY TO NAVIGATE TO THE RECORD AFTER THE DELETED RECORD, OTHERWISE GO TO
-						// WHATEVER IS THE LAST RECORD
-						if ((tmpPosition <= rowCount) && (tmpPosition > 0)) {
-							sSRowSet.absolute(tmpPosition);
-						} else {
-							sSRowSet.last();
-						}
-
-						// UPDATE THE STATUS OF THE NAVIGATOR
-						updateNavigator();
+					
+					// CAPTURE CURRENT ROW PRE-DELETION
+					final int tmpPosition = currentRow;
+					
+					// SET ANTICIPATED ROW COUNT POST-DELETION
+					final int tmpSize = rowCount-1;
+					
+					// DELETE ROW FROM ROWSET
+					sSRowSet.deleteRow();
+					
+					// PERFORM ANY POST DELETION OPS (WHICH MAY INVOLVE REQUERYING WHICH IS NEEDED FOR H2)
+					dBNav.performPostDeletionOps();
+					
+					// UPDATE TOTAL ROW COUNT
+					rowCount=tmpSize;
+					
+					// TRY TO NAVIGATE TO THE RECORD AFTER THE DELETED RECORD, OTHERWISE GO TO
+					// WHATEVER IS THE LAST RECORD
+					if ((tmpPosition <= rowCount) && (tmpPosition > 0)) {
+						sSRowSet.absolute(tmpPosition);
+					} else {
+						sSRowSet.last();
 					}
-
+					
+					// UPDATE THE STATUS OF THE NAVIGATOR
+					updateNavigator();
+					
 				} catch (final SQLException se) {
 					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
@@ -1083,7 +1018,7 @@ public class SSDataNavigator extends JPanel {
 	 */
 	public void setDBNav(final SSDBNav _dBNav) {
 		final SSDBNav oldValue = dBNav;
-		dBNav = _dBNav;
+		dBNav = _dBNav != null ? _dBNav : new SSDBNav(){};
 		firePropertyChange("dBNav", oldValue, dBNav);
 	}
 
