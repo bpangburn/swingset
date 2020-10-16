@@ -636,8 +636,6 @@ public class SSDataNavigator extends JPanel {
 						}
 					}
 					
-					dBNav.performPreDeletionOps();
-					
 					if (!dBNav.allowDeletion()) {
 						return;
 					}
@@ -647,6 +645,9 @@ public class SSDataNavigator extends JPanel {
 					
 					// SET ANTICIPATED ROW COUNT POST-DELETION
 					final int tmpSize = rowCount-1;
+					
+					// PERFORM ANY PRE DELETION OPS
+					dBNav.performPreDeletionOps();
 					
 					// DELETE ROW FROM ROWSET
 					sSRowSet.deleteRow();

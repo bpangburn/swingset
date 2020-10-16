@@ -180,7 +180,7 @@ public interface SSDBNav extends Serializable {
 	 *
 	 */
 	default void performNavigationOps(final Navigation _navType) {
-		performNavigationOps(_navType.getDeprecatedConstant());
+		performNavigationOps(_navType.getValue());
 
 	}
 
