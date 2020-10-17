@@ -71,7 +71,8 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * Empty constructor
 	 */
 	public SSJdbcRowSetImpl() {
-		super();
+		// Note that call to parent default constructor is implicit.
+		//super();
 	}
 
 	/**
@@ -81,7 +82,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * @throws SQLException	SQLException
 	 */
 	public SSJdbcRowSetImpl(final Connection _connection) throws SQLException {
-		super(_connection);
+		this(_connection,"");
 	}
 
 	/**
@@ -94,7 +95,9 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 */
 	public SSJdbcRowSetImpl(final Connection _connection, final String _command) throws SQLException {
 		super(_connection);
-		setCommand(_command);
+		if (!_command.isEmpty()) {
+			setCommand(_command);
+		}
 	}
 
 	/**
@@ -108,7 +111,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 */
 	@Deprecated
 	public SSJdbcRowSetImpl(final SSConnection _ssConnection) {
-		setSSConnection(_ssConnection);
+		this(_ssConnection,"");
 	}
 
 	/**
@@ -122,25 +125,25 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * @deprecated Starting in 2.3.0+ use
 	 *             {@link #setConnection(Connection _connection) and @link #setCommand(String _command)}
 	 *             instead.
-	 *
 	 */
 	@Deprecated
 	public SSJdbcRowSetImpl(final SSConnection _ssConnection, final String _command) {
+		this();
 		setSSConnection(_ssConnection);
-
-		setCommand(_command);
-
+		if (!_command.isEmpty()) {
+			setCommand(_command);
+		}
 	}
 
-	/**
-	 * Returns the Connection object being used.
-	 *
-	 * @return returns the Connection object being used.
-	 */
-	@Override
-	public Connection getConnection() {
-		return super.getConnection();
-	}
+//	/**
+//	 * Returns the Connection object being used.
+//	 *
+//	 * @return returns the Connection object being used.
+//	 */
+//	@Override
+//	public Connection getConnection() {
+//		return super.getConnection();
+//	}
 
 	/**
 	 * Returns the SSConnection object being used.
@@ -172,15 +175,15 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 		}
 	}
 
-	/**
-	 * Sets the Connection object to be used.
-	 *
-	 * @param _connection connection object to be used to connect to the database.
-	 */
-	@Override
-	public void setConnection(final Connection _connection) {
-		super.setConnection(_connection);
-	}
+//	/**
+//	 * Sets the Connection object to be used.
+//	 *
+//	 * @param _connection connection object to be used to connect to the database.
+//	 */
+//	@Override
+//	public void setConnection(final Connection _connection) {
+//		super.setConnection(_connection);
+//	}
 
 	/**
 	 * Sets the Connection object to be used.

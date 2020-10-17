@@ -60,24 +60,26 @@ public class SSPercentFormatterFactory extends javax.swing.text.DefaultFormatter
      * Creates a default object of SSPercentFormatterFactory
      */
     public SSPercentFormatterFactory() {
-        setDefaultFormatter(new NumberFormatter(NumberFormat.getPercentInstance()));
-        setNullFormatter(null);
-        setEditFormatter(new NumberFormatter(NumberFormat.getPercentInstance(Locale.US)));
-        setDisplayFormatter(new NumberFormatter(NumberFormat.getPercentInstance()));
+    	this(null,null);
     }
 
     /**
      * Creates an object of SSPercentFormatterFactory with the specified precision and decimals
-     * @param precision - number of digits needed for integer part of the number
-     * @param decimals - number of digits needed for fraction part of the number
+     * @param _precision - number of digits needed for integer part of the number
+     * @param _decimals - number of digits needed for fraction part of the number
      */
-    public SSPercentFormatterFactory(final int precision, final int decimals) {
+    public SSPercentFormatterFactory(final Integer _precision, final Integer _decimals) {
         final NumberFormat nfd = NumberFormat.getPercentInstance(Locale.US);
-        nfd.setMaximumFractionDigits(decimals);
-        nfd.setMinimumFractionDigits(decimals);
-
-        nfd.setMaximumIntegerDigits(precision);
-        nfd.setMinimumIntegerDigits(1);
+        
+        if (_precision!=null) {
+        	nfd.setMaximumIntegerDigits(_precision);
+        	nfd.setMinimumIntegerDigits(1);
+        }
+       
+        if (_decimals!=null) {
+            nfd.setMaximumFractionDigits(_decimals);
+            nfd.setMinimumFractionDigits(_decimals);
+        }
 
         setDefaultFormatter(new NumberFormatter(NumberFormat.getPercentInstance()));
         setNullFormatter(null);

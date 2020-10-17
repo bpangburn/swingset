@@ -64,33 +64,28 @@ public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatter
      * Creates a default SSNumericFormatterFactory
      */
     public SSNumericFormatterFactory() {
-        snf = new NumberFormatter(NumberFormat.getInstance());
-        snf.setCommitsOnValidEdit(true);
-        setDefaultFormatter(snf);
-
-        setNullFormatter(null);
-
-        enf = new NumberFormatter(NumberFormat.getInstance(Locale.US));
-        enf.setCommitsOnValidEdit(true);
-        setEditFormatter(enf);
-
-        dnf = new NumberFormatter(NumberFormat.getInstance());
-        dnf.setCommitsOnValidEdit(true);
-        setDisplayFormatter(dnf);
+    	this(null,null);
     }
 
     /**
      * Creates an object of SSFormatterFactory with the specified precision and decimals
-     * @param precision - number of digits needed for integer part of the number
-     * @param decimals - number of digits needed for fraction part of the number
+     * @param _precision - number of digits needed for integer part of the number
+     * @param _decimals - number of digits needed for fraction part of the number
      */
-    public SSNumericFormatterFactory(final int precision, final int decimals) {
+    public SSNumericFormatterFactory(final Integer _precision, final Integer _decimals) {
+    	super();
+    	
         final NumberFormat nfd = NumberFormat.getInstance(Locale.US);
-        nfd.setMaximumFractionDigits(decimals);
-        nfd.setMinimumFractionDigits(decimals);
-
-        nfd.setMaximumIntegerDigits(precision);
-        nfd.setMinimumIntegerDigits(1);
+        
+        if (_precision!=null) {
+        	nfd.setMaximumIntegerDigits(_precision);
+        	nfd.setMinimumIntegerDigits(1);
+        }
+       
+        if (_decimals!=null) {
+            nfd.setMaximumFractionDigits(_decimals);
+            nfd.setMinimumFractionDigits(_decimals);
+        }
 
         snf = new NumberFormatter(NumberFormat.getInstance());
         snf.setCommitsOnValidEdit(true);

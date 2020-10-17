@@ -38,7 +38,6 @@
 package com.nqadmin.swingset.formatting;
 
 import java.text.NumberFormat;
-import java.util.Locale;
 
 import javax.swing.text.NumberFormatter;
 
@@ -60,26 +59,30 @@ public class SSIntegerFormatterFactory extends javax.swing.text.DefaultFormatter
      * Constructs a default SSIntegerFormatterFactory
      */
     public SSIntegerFormatterFactory() {
-        setDefaultFormatter(new NumberFormatter(NumberFormat.getIntegerInstance()));
-        setNullFormatter(null);
-        setEditFormatter(new NumberFormatter(NumberFormat.getIntegerInstance(Locale.US)));
-        setDisplayFormatter(new NumberFormatter(NumberFormat.getIntegerInstance()));
+    	this(null);
     }
 
     /**
      * Creates an object of SSIntegerFormatterFactory with the specified precision
-     * @param precision - number of digits needed to display the number
+     * @param _precision - number of digits needed to display the number
      */
-    public SSIntegerFormatterFactory(final int precision) {
-        final NumberFormat nfd = NumberFormat.getIntegerInstance();
+    public SSIntegerFormatterFactory(final Integer _precision) {
+    	super();
+    	
+    	final NumberFormat format = NumberFormat.getIntegerInstance();
+    	
+    	if (_precision!=null) {
+            format.setMaximumIntegerDigits(_precision);
+            format.setMinimumIntegerDigits(1);
+    	}
 
-        nfd.setMaximumIntegerDigits(precision);
-        nfd.setMinimumIntegerDigits(1);
-
-        setDefaultFormatter(new NumberFormatter(NumberFormat.getIntegerInstance()));
+//        setDefaultFormatter(new NumberFormatter(NumberFormat.getIntegerInstance()));
+//        setNullFormatter(null);
+//        setEditFormatter(new NumberFormatter(NumberFormat.getIntegerInstance(Locale.US)));
+        setDefaultFormatter(new NumberFormatter(format));
         setNullFormatter(null);
-        setEditFormatter(new NumberFormatter(NumberFormat.getIntegerInstance(Locale.US)));
-        setDisplayFormatter(new NumberFormatter(nfd));
+        setEditFormatter(new NumberFormatter(format));
+        setDisplayFormatter(new NumberFormatter(format));
 
     }
 }

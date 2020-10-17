@@ -135,9 +135,7 @@ public class SSCuitField extends SSFormattedTextField {
         	//logger.warn(getColumnForLog() + ": Null Pointer Exception.", np);
         }
 
-
         setCaret(cuitCaret);
-
     }
 
     /* (non-Javadoc)

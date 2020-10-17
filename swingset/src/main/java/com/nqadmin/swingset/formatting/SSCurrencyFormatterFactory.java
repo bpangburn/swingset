@@ -61,56 +61,66 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
      *  Creates a SSCurrencyFormatter with default Locale
      */
     public SSCurrencyFormatterFactory() {
-        setDefaultFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
-        setNullFormatter(null);
-        setEditFormatter(new NumberFormatter(NumberFormat.getInstance(Locale.US)));
-        setDisplayFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
+    	this(null,null,null,null);
     }
 
     /**
      * Creates SSCurrencyFormatterFactory object with the specified precision and decimals
-     * @param precision - number of digits needed in the integer portion of the number
-     * @param decimals - number of digits needed in the fraction portion of the number
+     * @param _precision - number of digits needed in the integer portion of the number
+     * @param _decimals - number of digits needed in the fraction portion of the number
      */
-    public SSCurrencyFormatterFactory(final int precision, final int decimals) {
-        final NumberFormat nfd = NumberFormat.getCurrencyInstance(Locale.US);
-        nfd.setMaximumFractionDigits(decimals);
-        nfd.setMinimumFractionDigits(decimals);
-
-        nfd.setMaximumIntegerDigits(precision);
-        nfd.setMinimumIntegerDigits(1);
-
-        setDefaultFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
-        setNullFormatter(null);
-        setEditFormatter(new NumberFormatter(NumberFormat.getInstance(Locale.US)));
-        setDisplayFormatter(new NumberFormatter(nfd));
+    public SSCurrencyFormatterFactory(final Integer _precision, final Integer _decimals) {
+    	this(_precision,_decimals,null,null);
     }
 
     /**
      * Creates SSCurrencyFormatterFactory object with the specified precision, decimals, editor locale and display locale
-     * @param precision - number of digits needed in the integer portion of the number
-     * @param decimals - number of digits needed in the fraction portion of the number
-     * @param editorLocale  - locale to be used by the editor
-     * @param displayLocale - locale to be used while displaying number
+     * @param _precision - number of digits needed in the integer portion of the number
+     * @param _decimals - number of digits needed in the fraction portion of the number
+     * @param _editorLocale  - locale to be used by the editor
+     * @param _displayLocale - locale to be used while displaying number
      */
-    public SSCurrencyFormatterFactory(final int precision, final int decimals, final Locale editorLocale, final Locale displayLocale) {
-
-        final NumberFormat nfe = NumberFormat.getCurrencyInstance(editorLocale);
-        nfe.setMaximumFractionDigits(decimals);
-        nfe.setMinimumFractionDigits(decimals);
-        nfe.setMaximumIntegerDigits(precision);
-        nfe.setMinimumIntegerDigits(1);
-        setEditFormatter(new NumberFormatter(nfe));
-
-        final NumberFormat nfd = NumberFormat.getCurrencyInstance(displayLocale);
-        nfd.setMaximumFractionDigits(decimals);
-        nfd.setMinimumFractionDigits(decimals);
-        nfd.setMaximumIntegerDigits(precision);
-        nfd.setMinimumIntegerDigits(1);
-        setDisplayFormatter(new NumberFormatter(nfd));
-
-        setDefaultFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
+    public SSCurrencyFormatterFactory(final Integer _precision, final Integer _decimals, final Locale _editorLocale, final Locale _displayLocale) {
+    	super();
+    	
+    	NumberFormat editorFormat;
+    	if (_editorLocale==null) {
+    		// May want to use US for default: NumberFormat.getCurrencyInstance(Locale.US);
+    		editorFormat = NumberFormat.getInstance();
+    	} else {
+    		editorFormat = NumberFormat.getInstance(_editorLocale);
+    	}
+    	
+    	NumberFormat displayFormat;
+    	if (_displayLocale==null) {
+    		// May want to use US for default: NumberFormat.getCurrencyInstance(Locale.US);
+    		displayFormat = NumberFormat.getCurrencyInstance();
+    	} else {
+    		displayFormat = NumberFormat.getCurrencyInstance(_displayLocale);
+    	}
+    	
+    	if (_precision!=null) {
+    		editorFormat.setMaximumIntegerDigits(_precision);
+    		editorFormat.setMinimumIntegerDigits(1);
+    		
+    		displayFormat.setMaximumIntegerDigits(_precision);
+    		displayFormat.setMinimumIntegerDigits(1);
+    	}
+    	
+    	if (_decimals!=null) {
+    		editorFormat.setMaximumFractionDigits(_decimals);
+    		editorFormat.setMinimumFractionDigits(_decimals);
+    		
+    		displayFormat.setMaximumFractionDigits(_decimals);
+    		displayFormat.setMinimumFractionDigits(_decimals);
+    	}
+    	
+    	// TODO Consider using displayFormat for setDefaultFormatter()
+    	setDefaultFormatter(new NumberFormatter(NumberFormat.getCurrencyInstance()));
         setNullFormatter(null);
+    	
+    	setEditFormatter(new NumberFormatter(editorFormat));
+    	setDisplayFormatter(new NumberFormatter(displayFormat));
 
     }
 

@@ -99,6 +99,8 @@ public class SSConnection implements Serializable {
 	 * Constructs a default SSConnection object.
 	 */
 	public SSConnection() {
+		// Note that call to parent default constructor is implicit.
+		//super();
 	}
 
 	/**
@@ -117,7 +119,7 @@ public class SSConnection implements Serializable {
 	 *             the url should be of the form jdbc:subprotocol:subname
 	 */
 	public SSConnection(final String _url) {
-		url = _url;
+		this(_url,"","","");
 	}
 
 	/**
@@ -131,9 +133,7 @@ public class SSConnection implements Serializable {
 	 * @param _password - the user's password
 	 */
 	public SSConnection(final String _url, final String _username, final String _password) {
-		url = _url;
-		username = _username;
-		password = _password;
+		this(_url, _username, _password, "");
 	}
 
 	/**
@@ -148,6 +148,7 @@ public class SSConnection implements Serializable {
 	 * @param _driverName - name of the database driver to be used.
 	 */
 	public SSConnection(final String _url, final String _username, final String _password, final String _driverName) {
+		this();
 		url = _url;
 		username = _username;
 		password = _password;

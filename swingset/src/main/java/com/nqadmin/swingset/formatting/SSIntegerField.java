@@ -50,15 +50,18 @@ import javax.swing.SwingConstants;
 public class SSIntegerField extends SSFormattedTextField {
 
 	/**
-	 * unique serial id
+	 * Unique serial id
 	 */
 	private static final long serialVersionUID = -1820785941185499480L;
 
-	/**
-	 * Holds value of property minimumIntegerDigits.
-	 */
-	private int minimumIntegerDigits;
+//	/**
+//	 * Minimum number of digits for integer.
+//	 */
+//	private int minimumIntegerDigits;
 
+	/**
+	 * Precision for integer.
+	 */
 	private int precision = 1;
 
 	/**
@@ -87,15 +90,15 @@ public class SSIntegerField extends SSFormattedTextField {
 		setHorizontalAlignment(SwingConstants.RIGHT);
 	}
 
-	/**
-	 * Getter for property minimumIntegerDigits.
-	 *
-	 * @return Value of property minimumIntegerDigits.
-	 */
-	public int getMinimumIntegerDigits() {
-
-		return minimumIntegerDigits;
-	}
+//	/**
+//	 * Getter for property minimumIntegerDigits.
+//	 *
+//	 * @return Value of property minimumIntegerDigits.
+//	 */
+//	public int getMinimumIntegerDigits() {
+//
+//		return minimumIntegerDigits;
+//	}
 
 	/**
 	 * Returns the number of digits used for displaying integer
@@ -106,15 +109,15 @@ public class SSIntegerField extends SSFormattedTextField {
 		return precision;
 	}
 
-	/**
-	 * Setter for property minimumIntegerDigits.
-	 *
-	 * @param _minimumIntegerDigits New value of property minimumIntegerDigits.
-	 */
-	public void setMinimumIntegerDigits(final int _minimumIntegerDigits) {
-
-		minimumIntegerDigits = _minimumIntegerDigits;
-	}
+//	/**
+//	 * Setter for property minimumIntegerDigits.
+//	 *
+//	 * @param _minimumIntegerDigits New value of property minimumIntegerDigits.
+//	 */
+//	public void setMinimumIntegerDigits(final int _minimumIntegerDigits) {
+//
+//		minimumIntegerDigits = _minimumIntegerDigits;
+//	}
 
 	/**
 	 * Sets the number of digits needed to display the number
