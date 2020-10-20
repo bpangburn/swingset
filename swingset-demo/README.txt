@@ -93,6 +93,8 @@ The SwingSet samples/demo requires Java 1.8 or later.
   3. Type:
   		java -jar swingset-demo-x.y.z-jar-with-dependencies.jar
   		
+The swingset-demo can be run against any database.
+See "USING ALTERNATE DATABASE SERVERS" at the end of this document.
   		
 ==============================================================================
 COMPILATION
@@ -232,3 +234,66 @@ This example demonstrates all of the Formatted SwingSet Components.
 
 There is a separate example screen to demonstrate the Base SwingSet
 Components.
+
+==============================================================================
+USING ALTERNATE DATABASE SERVERS
+==============================================================================
+
+swingset-demo can work with user supplied connection properties and sql scripts
+to initialize a database that is then used for the demo. Look at the help with
+
+    java -jar swingset-demo-x.y.z-jar-with-dependencies.jar -h
+
+The connection properties is standard java format for a properties file.
+Here is an example of a database connection property file used with mysql
+
+        # This is a standard java properties file
+
+        DB_DRIVER_CLASS = com.mysql.cj.jdbc.Driver
+        DB_URL = jdbc:mysql://localhost/swingset_demo_suppliers_and_parts
+        user = some_user
+        password = some_password
+        serverTimezone = UTC
+
+The properties "DB_DRIVER_CLASS" and "DB_URL" are used internally with
+    Class.forName(driver_class)
+    DriverManager.getConnection(url, props)
+
+You can run the demo, without re-compiling, if you provide java the dbms
+server class jar on the command line. Before running the demo, create
+the database swingset_demo_suppliers_and_parts.  The sql scripts to
+initialize the MySQL database tables are included in swingset-demo
+
+    java -cp mysql-connector-java-8.0.21.jar:swingset-demo-x.y.z-jar-with-dependencies.jar \
+        com.nqadmin.swingset.demo.MainClass -v -p property_file mysql
+
+Note that if you use the '-cp' option, you can not use the '-jar' option and
+so you tell java the main class to run.
+
+You can extract the MySQL script. The following command
+
+    java -jar swingset-demo-x.y.z-jar-with-dependencies.jar -d mysql
+
+puts the following files into the current directory.
+
+    dump.mysql.swingset-demo-app.sql
+    dump.mysql.swingset-demo-components.sql
+
+These files can be edited as needed for a different database. If the files
+are edited and saved under the names
+
+    swingset-demo-app.sql
+    swingset-demo-components.sql
+
+You can use them as in this example
+
+    java -cp some_db_driver.jar:swingset-demo-x.y.z-jar-with-dependencies.jar \
+        com.nqadmin.swingset.demo.MainClass -v \
+        -p property_file \
+        -s swingset-demo-app.sql -s swingset-demo-components.sql
+
+The user supplied connection properties and sql scripts initialize the
+database and then the demo is started.
+
+There are other options...
+

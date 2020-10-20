@@ -37,15 +37,26 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import gnu.getopt.Getopt;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+import java.util.logging.Level;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -192,10 +203,15 @@ public class MainClass extends JFrame {
 	                System.getProperty("user.dir"));
 
 	    // INITIALIZE DATABASE
-    		dbConnection = getDatabase();
+			if ("h2".equals(dbname)) {
+				dbConnection = getDatabase();
+			} else {
+				databaseSetup.run();
+				dbConnection = databaseSetup.getConnection();
+			}
     		if (dbConnection == null) {
 				logger.fatal("Error initializing database. Exiting.");
-				System.exit(0);
+				System.exit(1);
     		}
 
 	    // ADD ACTION LISTENERS FOR BUTTONS
@@ -309,20 +325,375 @@ public class MainClass extends JFrame {
 
 		return result;
     }
-    
-    /**
-     * Main method for SwingSet samples/demo
-     * <p>
-     * @param _args - optional command line arguments, which are ignored by this program
-     */
-	public static void main(final String[] _args){
 
-		// create application screen
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					new MainClass();
+	static abstract class DatabaseSetup implements Runnable {
+		private Connection conn;
+
+		abstract Properties getDatabaseProperties();
+		abstract List<String> getScripts();
+
+		Connection getConnection() {
+			return conn;
+		}
+
+		/**
+		 * Find resource;
+		 * an alternate implementation could take the resource as a file.
+		 * @param resourceName name of resource
+		 * @return 
+		 */
+		BufferedReader getBufferedReader(String resourceName) {
+			InputStream stream = MainClass.class.getResourceAsStream(resourceName);
+			if (stream == null) {
+				System.err.println("Script '" + resourceName +"' not found. Exiting.");
+				return null;
+			}
+			BufferedReader br = new BufferedReader(new InputStreamReader(stream));  
+			return br;
+		}
+
+		public void run() {
+			Properties info = getDatabaseProperties();
+			if(info == null) {
+				return;
+			}
+			String clazz = info.getProperty("DB_DRIVER_CLASS", "");
+
+			if (clazz.isEmpty()) {
+				System.err.println("'DB_DRIVER_CLASS' not found in property file");
+				conn = null;
+				return;
+			}
+			
+			try {
+				Class.forName(clazz);
+			} catch (ClassNotFoundException ex) {
+				System.err.println("Class '" + clazz + "' not found");
+				conn = null;
+				return;
+			}
+			
+			conn = DemoUtil.getConnection(info.getProperty("DB_URL"), info);
+			if (conn == null) {
+				return;
+			}
+
+			if (no_initialize_db) {
+				return;
+			}
+			
+			boolean ok = false;
+			for (String script : getScripts()) {
+				ok = false;
+				BufferedReader br = getBufferedReader(script);
+				if (br != null) {
+					ok = DemoUtil.runSqlStatements(conn, br, verbose);
 				}
+				if (!ok) {
+					break;
+				}
+			}
+			
+			if (ok && !no_load_images) {
+				// Load up the images
+				String sql = "UPDATE swingset_base_test_data"
+						+ " SET ss_image = ? WHERE swingset_base_test_pk = ?";
+				ok = DemoUtil.loadBinaries(conn, "/swingset-demo-images.txt", sql, verbose);
+			}
+			
+			if (!ok) {
+				conn = null;
+			}
+		}
+
+		Properties getFileProperties(String fname) {
+			try {
+				Properties props = new Properties();
+				FileReader reader = new FileReader(fname);
+				props.load(reader);
+				return props;
+			} catch (FileNotFoundException ex) {
+				System.err.println("Property file '" + fname + "' not found");
+			} catch (IOException ex) {
+				logger.error("IO exception.", ex);
+			}
+			return null;
+		}
+
+		void dump() {
+			for (String script : getScripts()) {
+				boolean ok = false;
+				try (BufferedReader br = getBufferedReader(script)){
+					if (br != null) {
+							String name = "dump." + new File(script).getName();
+							try (FileWriter fout = new FileWriter(name)) {
+								char buf[] = new char[4 * 1024];
+								int n;
+								while((n = br.read(buf)) > 0) {
+									fout.write(buf, 0, n);
+								}
+							}
+					}
+					ok = true;
+				} catch (IOException ex) {
+					logger.error("IO exception.", ex);
+				}
+				if (!ok) {
+					break;
+				}
+			}
+		}
+	}
+
+	static class ExternalSetup extends DatabaseSetup {
+		List<String> sqlFiles;
+
+		public ExternalSetup(List<String> sqlFiles) {
+			this.sqlFiles = sqlFiles;
+		}
+
+		@Override
+		BufferedReader getBufferedReader(String fileName) {
+			try {
+				return new BufferedReader(new FileReader(fileName));
+			} catch (FileNotFoundException ex) {
+				System.err.println("Script '" + fileName +"' not found. Exiting.");
+				return null;
+			}
+		}
+
+		@Override
+		Properties getDatabaseProperties() {
+			Properties info = null;
+			info = getFileProperties(propertyFile);
+			return info;
+		}
+
+		@Override
+		List<String> getScripts() {
+			return sqlFiles;
+		}
+	}
+
+	/**
+	 * This is only used to dump H2 sql files
+	 */
+	static class H2Setup extends DatabaseSetup {
+
+		@Override
+		Properties getDatabaseProperties() {
+			return null;
+		}
+
+		public void run() {
+			return;
+		}
+
+		@Override
+		List<String> getScripts() {
+			return Arrays.asList(new String[] {
+				"/" + DATABASE_SCRIPT_DEMO ,
+				"/" + DATABASE_SCRIPT_TEST ,
+				"/" + DATABASE_SCRIPT_TEST_IMAGES
 			});
-    }
+		}
+	}
+
+	static class MysqlSetup extends DatabaseSetup {
+
+		@Override
+		Properties getDatabaseProperties() {
+			//      <dependency>
+			//          <groupId>mysql</groupId>
+			//          <artifactId>mysql-connector-java</artifactId>
+			//          <version>8.0.21</version>
+			//      </dependency>
+			Properties info;
+			if (propertyFile != null) {
+				info = getFileProperties(propertyFile);
+			} else {
+				info = new Properties();
+				info.put("DB_DRIVER_CLASS", "com.mysql.cj.jdbc.Driver");
+				info.put("DB_URL", "jdbc:mysql://localhost/swingset_demo_suppliers_and_parts");
+				// DB_NAME NOT USED
+				info.put("DB_NAME", "swingset_demo_suppliers_and_parts");
+				info.put("user", "root");
+				info.put("serverTimezone", "UTC");
+			}
+			return info;
+		}
+
+		@Override
+		List<String> getScripts() {
+			return Arrays.asList(new String[] {
+				"/mysql.swingset-demo-app.sql",
+				"/mysql.swingset-demo-components.sql"
+			});
+		}
+	}
+
+	private static final String DBMS_MYSQL = "mysql";
+	private static final String DBMS_H2 = "h2";
+	private static final String DBMS_EXTERNAL = "external";
+
+	/*
+	 * defaults for optional command line arguments
+	 */
+	private static boolean verbose = false;
+	private static boolean dump = false;
+	private static boolean no_load_images = false;
+	private static boolean no_initialize_db = false;
+	private static boolean readme = false;
+	private static String dbname = DBMS_H2;
+	private static String propertyFile = null;
+	private static List<String> userSqlFiles = new ArrayList<>();
+	private static DatabaseSetup databaseSetup = null;
+
+	private static String cmdName = "SwingSetDemo";
+
+	private static void usage() {
+		// TODO: specify don't load images
+		String usage =
+				"\n"
+				+ "Run the SwingSet demo. With no options/args use the self contained\n"
+				+ "in memory database.\n"
+				+ "\n"
+				+ cmdName + " [-h] [-v] [-d] [-n] [-i] [-r] [-p fname] [-s sql]* [dbms-server]\n"
+				+ "\n"
+				+ "    -h             help\n"
+				+ "    -v             verbose; output initialization sql as executed\n"
+				+ "    -d             dump/create sql scripts in local directory, exit\n"
+				+ "    -n             do NOT initialize database, just run demo\n"
+				+ "    -i             do NOT load images\n"
+			//	+ "    -r             print a readme to stdout\n"
+				+ "    -p fname       properties file for jdbc database connection\n"
+				+ "                   'DB_URL', 'DB_DRIVER_CLASS' keys required\n"
+				+ "    -s sqlScript   sql file to initialize database, multiple OK\n"
+				+ "\n"
+				+ "If specified, dbms-server in {mysql}\n"
+				+ "Internal mysql properties use database swingset_demo_suppliers_and_parts.\n"
+				+ "After the sql files are run, the images are loaded, unless '-i'.\n"
+				+ "Use '-n -p props' to run demo with a previously initialized database.\n"
+				+ "Use '-d' or '-d mysql' to create local files with sql initialization.\n"
+				+ "See swingset-demo/README.txt for more information.\n"
+				+ "\n"
+				+ "Examples: (ss.jar like swingset-demo-vers-jar-with-dependencies.jar)\n"
+				+ "    java -jar ss.jar -d   # dump sql that creates in memory database\n"
+				+ "    java -jar ss.jar -d mysql   # dump sql to create mysql database\n"
+				+ "    java -cp jdbc_driver:ss.jar com.nqadmin.swingset.demo.MainClass \\\n"
+				+ "        -p db_props -s initializer.sql\n"
+				+ "\n"
+				;
+		System.err.println(usage);
+		System.exit(1);
+	}
+	
+	/**
+	 * Main method for SwingSet samples/demo
+	 * <p>
+	 * @param _args - optional command line arguments, which are ignored by this program
+	 */
+	public static void main(final String[] _args) {
+		boolean some_error = false;
+
+		Getopt g = new Getopt(cmdName, _args, "hvdinrp:s:");
+
+		int c;
+		while ((c = g.getopt()) != -1)
+		{
+			switch(c)
+			{
+				case 'v': verbose = true;                   break;
+				case 'd': dump = true;                      break;
+				case 'n': no_initialize_db = true;          break;
+				case 'i': no_load_images = true;            break;
+				case 'r': readme = true;                    break;
+				case 'p': propertyFile = g.getOptarg();     break;
+				case 's': userSqlFiles.add(g.getOptarg());  break;
+				case '?':
+				case 'h':
+					some_error = true;
+					break; // getopt() already printed an error
+			}
+		}
+
+		if (verbose) {
+			StringBuffer sb = new StringBuffer();
+			sb.append('\n').append(cmdName);
+			for (int i = 0; i < _args.length; i++) {
+				String arg = _args[i];
+				sb.append(' ').append(arg);
+			}
+			System.err.println(sb.toString());
+		}
+
+		if (some_error) {
+			usage();
+		}
+
+		// if (readme) {
+		// 	return;
+		// }
+
+		boolean databaseServerSpecified = false;
+
+		int i = g.getOptind();
+		if (i != _args.length) {
+			// There are positional arguemnts. Can only be one.
+			if (i + 1 != _args.length) {
+				usage();
+			}
+			dbname = _args[i];
+			databaseServerSpecified = true;
+		}
+
+		boolean useInternalSql = userSqlFiles.isEmpty();
+
+		if (!useInternalSql) {
+			if (propertyFile == null) {
+				System.err.println("-p required if -s is used. Exiting.");
+				some_error = true;
+			} else {
+				// there's both a property file and sql files
+				if (databaseServerSpecified) {
+					System.err.println("-s not allowed if database specified. Exiting.");
+					some_error = true;
+				} else {
+					dbname = DBMS_EXTERNAL;
+				}
+			}
+			if (dump) {
+				System.err.println("-d not allowed when -s is used. Exiting.");
+				some_error = true;
+			}
+		}
+
+		switch(dbname) {
+			case DBMS_MYSQL:
+				databaseSetup = new MysqlSetup();
+				break;
+			case DBMS_EXTERNAL:
+				databaseSetup = new ExternalSetup(userSqlFiles);
+				break;
+			case DBMS_H2:
+				databaseSetup = new H2Setup();
+				break;
+			default:
+				System.err.println("Unknown database server '" + dbname + "' . Exiting.");
+				some_error = true;
+				break;
+		}
+
+		if (some_error) {
+			System.exit(1);
+		}
+
+		if (dump) {
+			databaseSetup.dump();
+			return;
+		}
+		
+		// create application screen
+		SwingUtilities.invokeLater(() -> new MainClass());
+	}
 } // end public class MainClass extends JFrame {
