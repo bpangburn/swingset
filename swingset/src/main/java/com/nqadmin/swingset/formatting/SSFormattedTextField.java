@@ -164,27 +164,25 @@ public class SSFormattedTextField extends JFormattedTextField
 			    } else {
 
 				    try {
-				    	// 2020-10-02_BP: Date fields are returned as java.util.Date and Postgres JDBC doesn't know how to handle them
-// TODO Add support for time and timestamp or modify in formatter factories
+				    	// 2020-10-02_BP: Date (and presumably Time & Timestamp) fields are returned as java.util.Date and Postgres JDBC doesn't know how to handle them
+				    	// java.sql.Date, java.sql.Time, and java.sql.Timestamp are all subclasses of java.util.Date
 				    	if (currentValue instanceof java.util.Date) {
-				    		getSSRowSet().updateObject(getBoundColumnName(), new java.sql.Date(((java.util.Date)currentValue).getTime()));
-				    	} else {
+				    		switch (getBoundColumnJDBCType()) {
+				    		case DATE:
+				    			getSSRowSet().updateObject(getBoundColumnName(), new java.sql.Date(((java.util.Date)currentValue).getTime()));
+				    			break;
+				    		case TIME:
+				    			getSSRowSet().updateObject(getBoundColumnName(), new java.sql.Time(((java.util.Date)currentValue).getTime()));
+				    			break;
+				    		case TIMESTAMP:
+				    			getSSRowSet().updateObject(getBoundColumnName(), new java.sql.Timestamp(((java.util.Date)currentValue).getTime()));
+				    			break;
+				    		default:
+				    			logger.warn(getColumnForLog() + ": getValue() returned a java.sql.Date, but JDBCType is " + getBoundColumnJDBCType() + ". Unable to update column.");
+				    		}
+				    	} else{
 				    		getSSRowSet().updateObject(getBoundColumnName(), currentValue);
-				    	}
-				    	
-//						case java.sql.Types.TIME:// 92
-//						// System.out.println("TIME implemented as java.util.Date --> " + columnName);
-//						// nValue = new java.util.Date(rowset.getTime(columnName).getTime());
-//						nValue = this.rowset.getTime(this.columnName);
-//						super.setValue(nValue);
-//						break;
-//
-//					case java.sql.Types.TIMESTAMP:// 93
-//						// System.out.println("TIMESTAMP implemented as java.util.Date --> " + columnName);
-//						// nValue = new java.util.Date(rowset.getTimestamp(columnName).getTime());
-//						nValue = this.rowset.getTimestamp(this.columnName);
-//						super.setValue(nValue);
-//						break;				    	
+				    	}		    	
 
 					} catch (final SQLException _se) {
 						logger.error(getColumnForLog() + ": RowSet update triggered SQL Exception.", _se);
