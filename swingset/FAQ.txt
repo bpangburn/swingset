@@ -69,32 +69,11 @@ Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
 6. I'm having trouble getting SwingSet to work with MySQL.  Are there any
    special instructions?
 
-    Yes.  The mysql-connector-java MySQL driver has a unique ResultSet
-    implementation. The default ResultSet is not updatable so an
-    UpdatableResultSet is needed for creating updatable GUI's with SwingSet.
-    Rather than creating a RowSet using a connection string and query,
-    the developer should instantiate their RowSet with an UpdatableResultSet.  
-    
-    In addition, since there is no connection  string or query, the
-    SSDataNavigator needs to be explicitly told not to call the execute()
-    method of RowSet and to assume that the RowSet already contains the query
-    results.  This is done with the setCallExecute() method.
-    
-    Example:
-        Let rs be your UpdatableResultSet object.
-        JdbcRowSetImpl rowset = new JdbcRowSetImpl(rs);
-        SSDataNavigator dataNavigator = new SSDataNavigator();
-        dataNavigator.setCallExecute(false);
-        dataNavigator.setRowSet(rowset);
-        
-        If you want to change the query, change the rs object as needed,
-        re-instantiate your RowSet, and re-call the setRowSet method of your
-        SSDataNavigator.
+   SwingSet has been tested with mysql's "connector/j 8.0" driver; which is
+   compatible with mysql servers 5.6, 5.7, 8.0.
 
-    (P.S.: This is a work around provided for MySQL DB users based on the
-     feedback from lopes. See
-     http://sourceforge.net/forum/forum.php?thread_id=1005899&forum_id=313186)
-     
+   There are report of problems with old version of the mysql jdbc driver.
+   See http://sourceforge.net/forum/forum.php?thread_id=1005899&forum_id=313186)
      
 7. I'm currently using a SwingSet release prior to 0.9.0.  What is this new
    SSConnection and SSRowSet?  How do I fix my programs?

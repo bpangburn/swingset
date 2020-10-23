@@ -37,7 +37,6 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
-import gnu.getopt.Getopt;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -66,6 +65,8 @@ import javax.swing.SwingUtilities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.h2.tools.RunScript;
+
+import gnu.getopt.Getopt;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
@@ -308,10 +309,11 @@ public class MainClass extends JFrame {
 		            RunScript.execute(result, new InputStreamReader(inStreamTest));
 		            inStreamTest.close();
 
-		            if (USE_IN_MEMORY_DATABASE) {
-		            	RunScript.execute(result, new InputStreamReader(inStreamTestImages));
-		            	inStreamTestImages.close();
-		            }
+					if (!no_load_images) {
+						String sql = "UPDATE swingset_base_test_data"
+								+ " SET ss_image = ? WHERE swingset_base_test_pk = ?";
+						DemoUtil.loadBinaries(result, "/swingset-demo-images.txt", sql, verbose);
+					}
 	        	}
 	        }
 
