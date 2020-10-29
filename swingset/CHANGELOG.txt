@@ -30,6 +30,7 @@ Changes:
 	   in formatting package.
 	12.Added line wrapping to SSTextArea.
 	13.Preliminary support for JDBCType enum.
+	14.mysql support for swingset-demo
 
 ==============================================================================
 SwingSet 3.0.0 - Released 2020-01-10

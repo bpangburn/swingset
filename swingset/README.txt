@@ -95,10 +95,19 @@ SwingSet should work with Java 8 (JRE/JDK 1.8) or later.
 
 Traditional CLASSPATH:
   Download the latest SwingSet jar (swingset-x.y.z.jar) from:
-    https://sf.net/p/swingset
+    https://repo1.maven.org/maven2/com/nqadmin/swingset/swingset/
+  
   Download the latest GlazedLists jar (glazedlists-x.y.z.jar) from:
     https://repo1.maven.org/maven2/com/glazedlists/glazedlists/
-  Add the swingset and glazedlists jars to your CLASSPATH
+    
+  Download the latest jdbcrowsetimpl from:
+    https://repo1.maven.org/maven2/com/nqadmin/rowset/jdbcrowsetimpl/
+    
+  Download the latest log4j-core and log4j-api from:
+    https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/
+    https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/
+    
+  Add the above jars to your CLASSPATH
   Add any JDBC drivers needed for your database to your CLASSPATH
   
 Maven:

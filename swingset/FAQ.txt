@@ -2,21 +2,13 @@
 Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
-1.  I am trying to run the samples. I see "Processing...." and nothing
-    happens.  What is wrong?
+1.  I am trying to compile and run the demo/samples. I see "Processing....",
+    and nothing happens. What is wrong?
 
-    You might be missing one or more required jar files.  Please make sure
-    that you have the following jar files:
-        1. Latest SwingSet binary JAR file from:
-           https://sourceforge.net/projects/swingset/
-        2. Latest H2 JAR from:
-           https://h2database.com
-
-    If you still have problems:
-        1. Unzip the demo jar file and extract the files to a folder.
-        2. From a command prompt go to that folder and type:
-            java  MainClass
-        3. You will now see any remaining errors on the command prompt screen.
+    You may be missing a required dependency jar. See the README.txt file in
+    the swingset-demo-x.y.z.jar file for detailed instructions on running
+    the demo. The demo README.txt should also be available from:
+    https://sourceforge.net/p/swingset/code/ci/master/tree/swingset-demo/README.txt
         
 
 2.  I have set the headers for a SSDataGrid, so why I don't see them on the
@@ -29,7 +21,7 @@ Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
 
 3.  Why am I getting an exception, while setting the renderers.
 
-    You have to set the renderer only after you have set the rowset.  Until
+    You have to set the renderers only after you have set the rowset.  Until
     you set the rowset the JTable does not have any columns, so when you try
     to set a renderer SSDataGrid tries to access the specified column from
     JTable, which causes an exception.
@@ -53,11 +45,11 @@ Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
         
 5.  I setup a SSDataGrid based on a rowset querying columns "X," "Y," and "Z."
     I made a small change to the underlying query but return the same set of 
-    columns.  Why are my renderers and/or hidden columns not working as
+    columns. Why are my renderers and/or hidden columns not working as
     expected?
     
     When modifying a query for a SSDataGrid's rowset, you must insure that the 
-    columns are returned in the same order!  When you set a renderer, or
+    columns are returned in the same order! When you set a renderer, or
     specify a column as hidden you specify either a column number or column
     name (in which case SwingSet internally converts the name to a column 
     number).  If you change the column ordering for the underlying query and 
@@ -72,8 +64,8 @@ Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
    SwingSet has been tested with mysql's "connector/j 8.0" driver; which is
    compatible with mysql servers 5.6, 5.7, 8.0.
 
-   There are report of problems with old version of the mysql jdbc driver.
-   See http://sourceforge.net/forum/forum.php?thread_id=1005899&forum_id=313186)
+   There are report of problems with very old versions of the mysql jdbc driver.
+   See http://sourceforge.net/forum/forum.php?thread_id=1005899&forum_id=313186
      
 7. I'm currently using a SwingSet release prior to 0.9.0.  What is this new
    SSConnection and SSRowSet?  How do I fix my programs?
@@ -90,12 +82,12 @@ Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
         HashMap) much easier
      
    A SSJdbcRowSetImpl implementation of SSRowSet is provided to replace the
-   JdbcRowSetImpl used in most existing SwingSet applications.  It is basically
-   a serialized wrapper of JdbcRowSetImpl.  It can be used in conjunction with
+   JdbcRowSetImpl used in most existing SwingSet applications. It is basically
+   a serialized wrapper of JdbcRowSetImpl. It can be used in conjunction with
    the new SSConnection, a serialized wrapper of the Connection interface, which
    handles serialization/deserialization of database connection info (path,
-   username, password, etc.).  Finally, an SSRowSetAdapter is provided with
-   empty method implementations of everything in SSRowSet.  This adapter can be
+   username, password, etc.). Finally, an SSRowSetAdapter is provided with
+   empty method implementations of everything in SSRowSet. This adapter can be
    easily extended with non-empty method implementations for non-database
    datasources.
 
@@ -120,7 +112,7 @@ Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
     
     Class.forName("org.postgresql.Driver");
     conn = DriverManager.getConnection
-        ("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
+        ("jdbc:postgresql://pgserver.mycompany.com/suppliers_and_parts",
         "swingset","test");
     rowset = new JdbcRowSetImpl(conn);  
 
@@ -135,7 +127,7 @@ Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
     SSJdbcRowSetImpl rowset = null;
 
     ssConnection = new SSConnection
-        ("jdbc:postgresql://pgserver.greatmindsworking.com/suppliers_and_parts",
+        ("jdbc:postgresql://pgserver.mycompany.com/suppliers_and_parts",
         "swingset", "test");
     ssConnection.setDriverName("org.postgresql.Driver");
     ssConnection.createConnection();
