@@ -102,8 +102,14 @@ COMPILATION
 
 The SwingSet samples/demo requires Java 1.8 or later.
 
-Git/Maven/Eclipse:
+Git/Maven:
   git clone https://git.code.sf.net/p/swingset/code swingset-code 
+
+  After cloning, you can use an IDE, e.g. Eclipse or NetBeans, to compile/run.
+  Or you can use mvn directly and then run as shown here:
+    cd swingset-code/swingset-demo
+    mvn -Prelease clean package
+    java -jar target/swingset-demo-*-jar-with-dependencies.jar
   
 Command line:
 
