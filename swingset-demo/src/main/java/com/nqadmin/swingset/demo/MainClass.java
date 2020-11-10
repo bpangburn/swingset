@@ -37,6 +37,9 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import com.nqadmin.swingset.models.SSCollectionModel;
+import com.nqadmin.swingset.models.SSMysqlSetModel;
+import com.nqadmin.swingset.models.SSStringArrayModel;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -67,11 +70,16 @@ import org.apache.logging.log4j.Logger;
 import org.h2.tools.RunScript;
 
 import gnu.getopt.Getopt;
+import java.sql.JDBCType;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
  */
 public class MainClass extends JFrame {
+	private static final Map<String, Object> globalHints = new HashMap<>();
 
 	/**
      * ActionListener implementation to call code for each button.
@@ -84,6 +92,8 @@ public class MainClass extends JFrame {
 
 		@Override
 		public void actionPerformed( final ActionEvent ae){
+			final Map<String, Object> hints = new HashMap<>(globalHints);
+
             if(ae.getSource().equals(btnExample1)){
                 new Example1(dbConnection);
             }
@@ -106,7 +116,7 @@ public class MainClass extends JFrame {
             	new Example7(dbConnection);
             }
             else if(ae.getSource().equals(btnTestBase)){
-            	new TestBaseComponents(dbConnection);
+            	new TestBaseComponents(dbConnection, hints);
             }
             else if(ae.getSource().equals(btnTestGrid)){
             	// TODO
@@ -198,7 +208,7 @@ public class MainClass extends JFrame {
 	    	super("SwingSet Demo");
 	        setSize(300,300);
 	        setDefaultCloseOperation(EXIT_ON_CLOSE);
-
+		
 	    // ECHO WORKING DIRECTORY
 	        logger.info("Working Directory = " +
 	                System.getProperty("user.dir"));
@@ -502,6 +512,14 @@ public class MainClass extends JFrame {
 	}
 
 	static class MysqlSetup extends DatabaseSetup {
+
+		@Override
+		public void run() {
+			super.run();
+			globalHints.put("collectionModel", (Supplier<SSCollectionModel>)
+					() -> new SSMysqlSetModel(JDBCType.INTEGER));
+			// 		() -> new SSStringArrayModel(JDBCType.INTEGER));
+		}
 
 		@Override
 		Properties getDatabaseProperties() {

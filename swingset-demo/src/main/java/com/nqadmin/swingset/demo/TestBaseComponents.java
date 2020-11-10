@@ -65,7 +65,12 @@ import com.nqadmin.swingset.SSTextArea;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
+import com.nqadmin.swingset.models.SSCollectionModel;
+import com.nqadmin.swingset.models.SSDbArrayModel;
 import com.nqadmin.swingset.utils.SSSyncManager;
+import java.sql.JDBCType;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * This example demonstrates all of the Base SwingSet Components
@@ -81,6 +86,7 @@ import com.nqadmin.swingset.utils.SSSyncManager;
 
 public class TestBaseComponents extends JFrame {
 
+	private final Map<String,Object> hints;
 	private static final int[] comboCodes = {0,1,2,3};
 
 	/**
@@ -124,7 +130,7 @@ public class TestBaseComponents extends JFrame {
 	 */
 	JLabel lblSwingSetBaseTestPK = new JLabel("Record ID");
 
-	SSList lstSSList = new SSList();
+	final SSList lstSSList;
 	SSDataNavigator navigator = null;
 	SSJdbcRowSetImpl rowset = null;
 
@@ -146,16 +152,26 @@ public class TestBaseComponents extends JFrame {
 	 */
 	SSTextField txtSwingSetBaseTestPK = new SSTextField();
 
+	private SSCollectionModel getCollectionModel() {
+		@SuppressWarnings("unchecked")
+		Supplier<SSCollectionModel> supl
+				= (Supplier<SSCollectionModel>) hints.get("collectionModel");
+		return supl == null ? new SSDbArrayModel(JDBCType.INTEGER) : supl.get();
+	}
 
 	/**
 	 * Constructor for Base Component Test
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
-	public TestBaseComponents(final Connection _dbConn) {
+	public TestBaseComponents(final Connection _dbConn, Map<String,Object> _hints) {
 
 		// SET SCREEN TITLE
 			super("SwingSet Base Component Test");
+
+		// INITIALIZE SOME DYNAMIC INFORMATION
+			hints =  _hints;
+			lstSSList = new SSList(getCollectionModel());
 
 		// SET CONNECTION
 			ssConnection = new SSConnection(_dbConn);
