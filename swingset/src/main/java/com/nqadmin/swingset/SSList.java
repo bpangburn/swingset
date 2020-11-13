@@ -39,23 +39,26 @@ package com.nqadmin.swingset;
 
 import java.awt.Dimension;
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Array;
-import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.JDBCType;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Vector;
 
 import javax.swing.JList;
+import javax.swing.ListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.swingset.utils.SSArray;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.models.OptionMappingSwingListModel;
+import com.nqadmin.swingset.models.SSCollectionModel;
+import com.nqadmin.swingset.models.SSDbArrayModel;
 
 // SSList.java
 //
@@ -63,21 +66,27 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
 
 /**
  * Provides a way to display a list of elements and map them to corresponding
- * database codes. The selected values can be stored in a DB array element.
- * These mappings can be provided by setOptions method.
+ * database codes.
+ * These mappings are typically provided by {@code setOptions} method;
+ * if provided mappings are null they default to zero to N.
+ * The mappings for the selected {@code JList} values are stored in a DB as
+ * controlled by a {@link com.nqadmin.swingset.models.SSCollectionModel};
+ * if not specified {@link com.nqadmin.swingset.models.SSDbArrayModel} is
+ * used by default and this model saves the selected mappings in a column of
+ * type {@code JDBCType.ARRAY}.
  * <pre>
  * {@code 
- * SSList list = new SSList();
+ * SSList list = new SSList(JDBCType.DOUBLE);
  * String[] options = {"VLarge", "large", "medium", "small", "VSmall};
  * Double[] mappings = {100.0, 10.0, 5.0, 1.0, 0.1};
  * list.setOptions(options, mappings);
- * list.bind(myRowset, "my_column", "myDataType");}
- * // If three values VLarge, medium, small are selected the
- * // array element in the database will store {100.0,5.0,1.0}
- * }
+ * list.bind(myRowset, "my_column");}
  * </pre>
+ * From the example above, if three values VLarge, medium, small are selected the
+ * array element in the database will store {100.0,5.0,1.0}
  */
-public class SSList extends JList<Object> implements SSComponentInterface {
+public class SSList extends JList<String> implements SSComponentInterface {
+	// TODO: this should be class SSList<M> where M is the java type of mappings
 
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
@@ -86,7 +95,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	protected class SSListListener implements ListSelectionListener, Serializable {
 
 		private static final long serialVersionUID = 4337396603209239909L;
-
+		
 		@Override
 		public void valueChanged(final ListSelectionEvent e) {
 			removeListeners();
@@ -105,112 +114,23 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 */
 	private static final long serialVersionUID = -5698401719124062031L;
 
-	/**
-	 * Converts SQL array to object array
-	 *
-	 * @param array SQL array
-	 * @return Object array
-	 * @throws SQLException SQLException
-	 */
-	private static Object[] toObjArray(final Array array) throws SQLException {
-		if (array == null) {
-			return null;
-		}
 
-		logger.debug("SSList.toObjArray() contents: " + array);
-		
-		// TODO May be able to utilize JDBCType Enum here.
-		// TODO This may be better as a static method in SSJdbcRowSetImpl
-
-		final Vector<Object> data = new Vector<>();
-		switch (array.getBaseType()) {
-		case Types.INTEGER:
-		case Types.SMALLINT:
-		case Types.TINYINT:
-			try {
-				for (final Integer num : (Integer[]) array.getArray()) {
-					data.add(num);
-				}
-			} catch (final ClassCastException ex) {
-				for (final int num : (int[]) array.getArray()) {
-					data.add(Integer.valueOf(num));
-				}
-			}
-			break;
-		case Types.BIGINT:
-			try {
-				for (final Long num : (Long[]) array.getArray()) {
-					data.add(num);
-				}
-			} catch (final ClassCastException ex) {
-				for (final long num : (long[]) array.getArray()) {
-					data.add(Long.valueOf(num));
-				}
-			}
-			break;
-		case Types.FLOAT:
-		case Types.DOUBLE:
-		case Types.REAL:
-			try {
-				for (final Double num : (Double[]) array.getArray()) {
-					data.add(num);
-				}
-			} catch (final ClassCastException ex) {
-				for (final double num : (double[]) array.getArray()) {
-					data.add(Double.valueOf(num));
-				}
-			}
-			break;
-		case Types.DECIMAL:
-		case Types.NUMERIC:
-			try {
-				for (final BigDecimal num : (BigDecimal[]) array.getArray()) {
-					data.add(num);
-				}
-			} catch (final ClassCastException cce) {
-				logger.error("Class Cast Exception.", cce);
-			}
-			break;
-		case Types.DATE:
-			for (final Date dt : (Date[]) array.getArray()) {
-				data.add(dt);
-			}
-			break;
-		case Types.CHAR:
-		case Types.VARCHAR:
-		case Types.LONGVARCHAR:
-			for (final String txt : (String[]) array.getArray()) {
-				data.add(txt);
-			}
-			break;
-		default:
-		// H2 ARRAY RETURNS NULL FOR getBaseType()
-		// FOR THIS AND OTHER FAILURES, TRY A LIST OF OBJECTS
-			try {
-				for (final Object val : (Object[]) array.getArray()) {
-					data.add(val);
-				}
-			} catch (final SQLException se) {
-				logger.error("DataType: " + array.getBaseTypeName() + " not supported and unable to convert to generic object.", se);
-			}
-			break;
-		}
-		return data.toArray();
-	}
-
-	/**
-	 * Data Type name of the underlying elements of database array
-	 */
-	private String baseTypeName;
+	private SSCollectionModel collectionModel;
 
 	/**
 	 * Underlying values for each list item choice of 0, 1, 2, 3, etc.
+	 * 
+	 * @deprecated Use {@link #getMappings()} instead.
 	 */
+	// TODO: make this private, remove this not used anymore
 	protected Object[] mappings = null;
 
 	/**
 	 * Options to be displayed in list box.
+	 * 
+	 * @deprecated Use {@link #getOptions()} instead.
 	 */
+	// TODO: make this private, remove this not used anymore
 	protected String[] options;
 
 	/**
@@ -224,11 +144,30 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	protected final SSListListener ssListListener = new SSListListener();
 
 	/**
-	 * Creates an object of SSComboBox.
+	 * Creates an object of SSList with mapping type of {@code JDBCType.NULL}.
 	 */
 	public SSList() {
+		this(JDBCType.NULL);
+	}
+
+	/**
+	 * Creates an object of SSList with default
+	 * of {@link com.nqadmin.swingset.models.SSDbArrayModel}.
+	 *
+	 * @param _jdbcType type of mapping of database elements
+	 */
+	public SSList(JDBCType _jdbcType) {
+		// TODO: select proper model through the **DbPlugin**.
+		this(new SSDbArrayModel(_jdbcType));
+	}
+
+	/**
+	 * @param _collectionModel model to read/write the database
+	 */
+	public SSList(SSCollectionModel _collectionModel) {
 		// Note that call to parent default constructor is implicit.
 		//super();
+		this.collectionModel = _collectionModel;
 	}
 
 	/**
@@ -255,21 +194,23 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 
 	/**
 	 * Returns the underlying values for each of the items in the list box (e.g. the
-	 * values that map to the items displayed in the list box)
+	 * database values that map to the items displayed in the list box)
 	 *
-	 * @return returns the underlying values for each of the items in the list box
+	 * @return the mapping values for the items displayed in the list box
 	 */
+	// TODO: post 4.0 either change return type to List or deprecate and add List variant
 	public Object[] getMappings() {
-		return mappings;
+		return  myModel().getMappings().toArray();
 	}
 
 	/**
 	 * Returns the items displayed in the list box.
 	 *
-	 * @return returns the items displayed in the list box
+	 * @return the items displayed in the list box
 	 */
+	// TODO: post 4.0 either change return type to List or deprecate and add List variant
 	public String[] getOptions() {
-		return options;
+		return myModel().getOptions().toArray(new String[0]);
 	}
 
 	/**
@@ -278,21 +219,30 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 * @return returns the value associated with the selected item OR -1 if nothing
 	 *         is selected.
 	 *
-	 * @deprecated Use {@link #getSelectedValuesList()} instead.
-	 *
+	 * @deprecated Use {@link #getSelectedMappings()} instead.
 	 */
 	@Deprecated
 	@Override
 	public Object[] getSelectedValues() {
 		if (getSelectedIndex() == -1) {
+			// TODO: what's this about?
 			return new Object[] { Integer.valueOf(-1) };
 		}
-		final Object[] selectedValues = new Object[getSelectedIndices().length];
-		for (int i = 0; i < selectedValues.length; i++) {
-			selectedValues[i] = mappings != null ? mappings[getSelectedIndices()[i]]
-					: Integer.valueOf(getSelectedIndices()[i]);
+		return getSelectedMappings().toArray();
+	}
+
+	public List<Object> getSelectedMappings() {
+		int[] selectedIndices = getSelectedIndices();
+		List<Object> selectedMappings = new ArrayList<>(selectedIndices.length);
+		for(int index : selectedIndices) {
+			selectedMappings.add(myModel().getMappingAtIndex(index));
 		}
-		return selectedValues;
+		return selectedMappings;
+	}
+
+	@Override
+	public void setListData(Vector<? extends String> listData) {
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -317,61 +267,110 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	/**
 	 * Sets the underlying values for each of the items in the list box (e.g. the
 	 * values that map to the items displayed in the list box)
-	 *
+	 * 
 	 * @param _mappings An array of values that correspond to those in the list box.
+	 * @deprecated use {@link #setOptions(String[], Object[])}
 	 */
 	protected void setMappings(final Object[] _mappings) {
-		final Object[] oldValue = _mappings.clone();
-		mappings = _mappings.clone();
-		firePropertyChange("mappings", oldValue, mappings);
+		Objects.requireNonNull(_mappings);
+		// final Object[] oldValue = _mappings.clone(); TODO: BUG
+		// TODO: Seems no need to clone, mappings is being dropped
+		setModelInternal(options, _mappings);
+		final Object[] oldValue = mappings;
+		setMappingsInternal(oldValue);
 	}
 
 	/**
 	 * Adds an array of strings as combo box items.
 	 *
+	 * TODO: exception if doesn't match other size?
+	 * TODO: private?
+	 * 
 	 * @param _options the list of options that you want to appear in the list box.
+	 * @deprecated use {@link #setOptions(String[], Object[])}
 	 */
 	protected void setOptions(final String[] _options) {
-		final String[] oldValue = _options.clone();
-		options = _options.clone();
-		firePropertyChange("options", oldValue, options);
-		// ADD SPECIFIED ITEMS TO THE LIST BOX
-		setListData(options);
+		Objects.requireNonNull(_options);
+		// final String[] oldValue = _options.clone(); TODO: BUG
+		setModelInternal(_options, mappings);
+		final String[] oldValue = options;
+		setOptionsInternal(oldValue);
+	}
+
+	// TODO: cleanup when remove mappings field
+	private void setMappingsInternal(Object[] _oldValue) {
+		mappings = getMappings(); // XXX TODO: REMOVE
+		firePropertyChange("mappings", _oldValue, myModel().getMappings().toArray());
+	}
+
+	// TODO: cleanup when remove options field
+	private void setOptionsInternal(String[] _oldValue) {
+		options = getOptions(); // XXX TODO: REMOVE
+		firePropertyChange("options", _oldValue, myModel().getMappings().toArray());
+	}
+
+	private void setModelInternal(final String[] _options, final Object[] _mappings) {
+		OptionMappingSwingListModel<Object> model
+				= new OptionMappingSwingListModel<Object>(_options, _mappings);
+		setModel(model);
 	}
 
 	/**
-	 * Sets the options to be displayed in the list box and their corresponding
-	 * values.
-	 *
+	 * Sets the options to be displayed in the list box along with
+	 * their corresponding mappings to database values. If {@code _mappings}
+	 * is null, then a zero to N-1 mapping is automatically established.
+	 * 
 	 * @param _options  options to be displayed in the list box.
-	 * @param _mappings integer values that correspond to the options in the list
-	 *                  box.
-	 * @return returns true if the options and mappings are set successfully -
-	 *         returns false if the size of arrays do not match or if the values
-	 *         could not be set
+	 * @param _mappings database values that correspond to the options in
+	 *					the list box. The type is set by JList constructor.
+	 * @return returns true if the options and mappings are set successfully.
+	 * @throws IllegalArgumentException if arrays are not the same size.
 	 */
 	public boolean setOptions(final String[] _options, final Object[] _mappings) {
-		if (_options.length != _mappings.length) {
-			return false;
+		Objects.requireNonNull(_options);
+		if (_mappings != null && _options.length != _mappings.length) {
+			throw new IllegalArgumentException("Options and Mappings must be the same length");
 		}
-		setOptions(_options);
-		setMappings(_mappings);
+
+		String[] oldOptions = null;
+		Object[] oldMappings = null;
+		OptionMappingSwingListModel<Object> oldModel = myModel();
+		if (oldModel != null) {
+			oldOptions = oldModel.getOptions().toArray(new String[0]);
+			oldMappings = oldModel.getMappings().toArray();
+		}
+
+		// ADD SPECIFIED ITEMS TO THE LIST BOX
+		setModelInternal(_options, _mappings);
+
+		// for the events
+		setOptionsInternal(oldOptions);
+		if (_mappings != null) {
+			setMappingsInternal(oldMappings);
+		}
 		return true;
+	}
+
+	/** convenience method for accessing the model with proper casting */
+	private OptionMappingSwingListModel<Object> myModel() {
+		ListModel<String> curModel = getModel();
+		if(!(curModel instanceof OptionMappingSwingListModel)) {
+			return null;
+		}
+		@SuppressWarnings("unchecked")
+		OptionMappingSwingListModel<Object> model = (OptionMappingSwingListModel<Object>) curModel;
+		return model;
 	}
 
 	/**
 	 * Selects appropriate elements in the list box
 	 *
-	 * @param values Values to be selected in list
+	 * @param _selectedMappings Values to be selected in list
 	 */
-	public void setSelectedValues(final Object[] values) {
-		final int[] selectedIndices = new int[values.length];
-		for (int i = 0; i < values.length; i++) {
-			for (int j = 0; j < mappings.length; j++) {
-				if (values[i] == mappings[j]) {
-					selectedIndices[i] = j;
-				}
-			}
+	public void setSelectedValues(final Object[] _selectedMappings) {
+		final int[] selectedIndices = new int[_selectedMappings.length];
+		for (int i = 0; i < _selectedMappings.length; i++) {
+			selectedIndices[i] = myModel().getMappingToIndex(_selectedMappings[i]);
 		}
 		setSelectedIndices(selectedIndices);
 	}
@@ -392,14 +391,9 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	 * the list
 	 */
 	protected void updateRowSet() {
-		Array array;
-		if (getSelectedIndices().length == 0) {
-			array = new SSArray(new Object[] {}, baseTypeName);
-		} else {
-			array = new SSArray(getSelectedValues(), baseTypeName);
-		}
 		try {
-			getSSRowSet().updateArray(getBoundColumnName(), array);
+			collectionModel.writeData(getSSRowSet(), getBoundColumnName(),
+							getSelectedMappings().toArray());
 		} catch (final SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
@@ -415,18 +409,17 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 	@Override
 	public void updateSSComponent() {
 
-		if ((mappings == null) || (options == null)) {
+		if (myModel() == null) {
 			return;
 		}
-		this.setListData(options);
+		// TODO: WHY IS THIS HERE
+		//this.setListData(options);
 
 		Object[] array = null;
 		try {
-
 			if (getSSRowSet().getRow() > 0) {
-			    array = toObjArray(getSSRowSet().getArray(getBoundColumnName()));
+			    array = collectionModel.readData(getSSRowSet(), getBoundColumnName());
 			}
-
 		} catch (final SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
@@ -435,17 +428,7 @@ public class SSList extends JList<Object> implements SSComponentInterface {
 			clearSelection();
 			return;
 		}
-		final int[] indices = new int[array.length];
-		for (int i = 0; i < array.length; i++) {
-			for (int j = 0; j < mappings.length; j++) {
-				if (array[i].equals(mappings[j])) {
-					indices[i] = j;
-					break;
-				}
-				indices[i] = -1;
-			}
-		}
-		setSelectedIndices(indices);
 
+		setSelectedValues(array);
 	}
 }

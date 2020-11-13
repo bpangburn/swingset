@@ -38,9 +38,11 @@
 package com.nqadmin.swingset.utils;
 
 import java.sql.Array;
+import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Objects;
 
 // SSArray.java
 //
@@ -57,7 +59,7 @@ public class SSArray implements Array {
 	/**
 	 * Underlying database type name for array elements
 	 */
-	private String baseTypeName = "";
+	final private JDBCType baseType;
 
 	/**
 	 * object array containing elements of sql array
@@ -69,13 +71,16 @@ public class SSArray implements Array {
 	 *
 	 * @param _data         object array of SSArray
 	 * @param _baseTypeName Array elements database type name
+	 * @deprecated Use constructor that takes JDBCType
 	 */
 	public SSArray(final Object[] _data, final String _baseTypeName) {
-		if (_data == null) {
-			throw new IllegalArgumentException("Parameter should not be null");
-		}
+		this(_data, JDBCType.valueOf(_baseTypeName));
+	}
+
+	public SSArray(final Object[] _data, final JDBCType _baseType) {
+		Objects.requireNonNull(_data);
 		data = _data.clone();
-		baseTypeName = _baseTypeName;
+		baseType = _baseType;
 	}
 
 	@Override
@@ -93,22 +98,22 @@ public class SSArray implements Array {
 
 	@Override
 	public Object getArray(final long index, final int count) throws SQLException {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Object getArray(final long index, final int count, final Map<String, Class<?>> map) throws SQLException {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Object getArray(final Map<String, Class<?>> map) throws SQLException {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public int getBaseType() throws SQLException {
-		return 0;
+		return baseType.getVendorTypeNumber();
 	}
 
 	/**
@@ -118,27 +123,27 @@ public class SSArray implements Array {
 	 */
 	@Override
 	public String getBaseTypeName() throws SQLException {
-		return baseTypeName;
+		return baseType.getName();
 	}
 
 	@Override
 	public ResultSet getResultSet() throws SQLException {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public ResultSet getResultSet(final long index, final int count) throws SQLException {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public ResultSet getResultSet(final long index, final int count, final Map<String, Class<?>> map) throws SQLException {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public ResultSet getResultSet(final Map<String, Class<?>> map) throws SQLException {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	/**
