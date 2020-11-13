@@ -65,14 +65,17 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * Provides a way to display a list of elements and map them to corresponding
  * database codes. The selected values can be stored in a DB array element.
  * These mappings can be provided by setOptions method.
- * <p>
- * e.g. SSList list = new SSList(); String[] options = {"VLarge""large",
- * "medium", "small", "VSmall}; Double[] mappings = {100.0, 10.0, 5.0, 1.0,
- * 0.1}; list.setOptions(options, mappings); list.bind(myRowset, "my_column",
- * "myDataType");
- * <p>
- * If three values VLarge, medium, small are selected the array element in the
- * database will store {100.0,5.0,1.0}
+ * <pre>
+ * {@code 
+ * SSList list = new SSList();
+ * String[] options = {"VLarge", "large", "medium", "small", "VSmall};
+ * Double[] mappings = {100.0, 10.0, 5.0, 1.0, 0.1};
+ * list.setOptions(options, mappings);
+ * list.bind(myRowset, "my_column", "myDataType");}
+ * // If three values VLarge, medium, small are selected the
+ * // array element in the database will store {100.0,5.0,1.0}
+ * }
+ * </pre>
  */
 public class SSList extends JList<Object> implements SSComponentInterface {
 
