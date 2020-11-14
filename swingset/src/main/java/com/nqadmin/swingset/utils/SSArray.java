@@ -77,6 +77,11 @@ public class SSArray implements Array {
 		this(_data, JDBCType.valueOf(_baseTypeName));
 	}
 
+	/**
+	 * Creates SSArray with the object array and data base type
+	 * @param _data     object array of SSArray
+	 * @param _baseType Array elements database type
+	 */
 	public SSArray(final Object[] _data, final JDBCType _baseType) {
 		Objects.requireNonNull(_data);
 		data = _data.clone();

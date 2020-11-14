@@ -44,16 +44,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.sql.RowSet;
+
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * A Collection can be represented in a database as a string containing
  * the collection elements separated by a special character. This base
  * class handles such a collection.
  * 
- * @author err
+ * @since 4.0.0
  */
 public abstract class SSAbstractStringCollectionModel extends SSAbstractCollectionModel {
 	private final String separator;
@@ -91,7 +92,7 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	//private static Logger logger = LogManager.getLogger();
 
 	/** {@inheritDoc} */
 	@Override

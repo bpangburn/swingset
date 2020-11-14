@@ -47,7 +47,7 @@ import java.sql.JDBCType;
  * {@link #readData(javax.sql.RowSet, java.lang.String) readData} and
  * {@link #writeData(javax.sql.RowSet, java.lang.String, java.lang.Object[]) writeData}
  * 
- * @author err
+ * @since 4.0.0
  */
 public class SSStringArrayModel extends SSAbstractStringCollectionModel {
 	/**

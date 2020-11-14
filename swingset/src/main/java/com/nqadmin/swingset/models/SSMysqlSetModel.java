@@ -52,7 +52,7 @@ import java.sql.JDBCType;
  * it behaves like the {@code SSStringArrayModel}, except that commas
  * can not appear in elements.
  * 
- * @author err
+ * @since 4.0.0
  */
 public class SSMysqlSetModel extends SSAbstractStringCollectionModel {
 	/**

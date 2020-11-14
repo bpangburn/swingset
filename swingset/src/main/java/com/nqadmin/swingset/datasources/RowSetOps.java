@@ -56,16 +56,21 @@ import org.apache.logging.log4j.LogManager;
 
 import com.nqadmin.swingset.utils.SSCommon;
 
-// SSRowSet.java
+// RowSetOps.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * Previously this was a custom Interface that was a subset of RowSet. Now we
- * will try to support the full RowSet interface, but still need to accommodate
- * code where SSRowSet was referenced as a type.
+ * Utility class for working with {@link RowSet}s.
+ * Some methods for converting to/from text from/to objects according
+ * to database type. Several convenience methods for accessing metadata.
+ * 
+ * 
+ * @since 4.0.0
  */
 public class RowSetOps {
+
+	private RowSetOps(){}
 
 	// TODO Audit type handling based on http://www.java2s.com/Code/Java/Database-SQL-JDBC/StandardSQLDataTypeswithTheirJavaEquivalents.htm
 
@@ -75,6 +80,7 @@ public class RowSetOps {
 	 * @param _rowSet RowSet on which to operate
 	 * @param _rowSetListener RowSetListener to add to current SSRowSet
 	 */
+	//TODO: should this type be SSRowSetListener?
 	public static void addSSRowSetListener(final RowSet _rowSet, final RowSetListener _rowSetListener) {
 		_rowSet.addRowSetListener(_rowSetListener);
 	}
@@ -466,6 +472,15 @@ public class RowSetOps {
 	} // end protected void updateColumnText(String _updatedValue, String _columnName)
 		// {
 
+	/**
+	 * Convenience method for getting {@link JDBCType} enum from
+	 * {@link java.sql.Types}.
+	 * <p>
+	 * May perform better than using
+	 * {@link JDBCType#valueOf(java.lang.String) }
+	 * @param sqlType the type to translate
+	 * @return the corresponding JDBCType
+	 */
 	public static JDBCType getJDBCType(int sqlType) {
 		// TODO: can create a map of sqlType to JDBCType if performance issue
 		return JDBCType.valueOf(sqlType);
@@ -481,6 +496,7 @@ public class RowSetOps {
 	 * @throws SQLException This exception wraps a {@code ClassCastException}
 	 */
 	public static List<Object> castJDBCToJava(final JDBCType _jdbcType, final Object[] _objects) throws SQLException {
+		// TODO: get an array object of the correct type.
 		final List<Object> data = new ArrayList<>();
 		for (final Object val : _objects) {
 			data.add(castJDBCToJava(_jdbcType, val));
@@ -525,6 +541,7 @@ public class RowSetOps {
 			case DATE:
 			case TIME:
 			case TIMESTAMP:
+				// TODO: _WITH_TIMEZONE handling
 				// case TIME_WITH_TIMEZONE:
 				// case TIMESTAMP_WITH_TIMEZONE:
 				outputObject = (java.util.Date)_object;

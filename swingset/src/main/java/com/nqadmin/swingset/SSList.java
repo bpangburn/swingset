@@ -69,7 +69,7 @@ import com.nqadmin.swingset.models.SSDbArrayModel;
  * Provides a way to display a list of elements and map them to corresponding
  * database codes.
  * These mappings are typically provided by {@code setOptions} method;
- * if provided mappings are null they default to zero to N.
+ * if provided mappings are null they default to zero to N-1.
  * The mappings for the selected {@code JList} values are stored in a DB as
  * controlled by a {@link com.nqadmin.swingset.models.SSCollectionModel};
  * if not specified {@link com.nqadmin.swingset.models.SSDbArrayModel} is
@@ -85,6 +85,8 @@ import com.nqadmin.swingset.models.SSDbArrayModel;
  * </pre>
  * From the example above, if three values VLarge, medium, small are selected the
  * array element in the database will store {100.0,5.0,1.0}
+ * 
+ * @see OptionMappingSwingListModel
  */
 public class SSList extends JList<String> implements SSComponentInterface {
 	// TODO: this should be class SSList<M> where M is the java type of mappings
@@ -369,7 +371,7 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	 * is null, then a zero to N-1 mapping is automatically established.
 	 * 
 	 * @param _options  options to be displayed in the list box.
-	 * @param _mappings database values that correspond to the options in
+	 * @param _mappings null or database values that correspond to the options in
 	 *					the list box. The type is set by JList constructor.
 	 * @return returns true if the options and mappings are set successfully.
 	 * @throws IllegalArgumentException if arrays are not the same size.

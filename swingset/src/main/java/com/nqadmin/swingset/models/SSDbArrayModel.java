@@ -56,10 +56,14 @@ import static com.nqadmin.swingset.datasources.RowSetOps.*;
  * {@link #writeData(javax.sql.RowSet, java.lang.String, java.lang.Object[])
  * writeData}.
  * 
- * @author err
+ * @since 4.0.0
  */
 public class SSDbArrayModel extends SSAbstractCollectionModel {
 
+	/**
+	 * Create SSDbArrayModel
+	 * @param _jdbcType type of elements in database array
+	 */
 	public SSDbArrayModel(final JDBCType _jdbcType) {
 		super(_jdbcType);
 	}
@@ -85,6 +89,7 @@ public class SSDbArrayModel extends SSAbstractCollectionModel {
 	/**
 	 * Converts SQL array to object array
 	 *
+	 * @param _jdbcType type of objects in array
 	 * @param _array SQL array
 	 * @return Object array
 	 * @throws SQLException SQLException

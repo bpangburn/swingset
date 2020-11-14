@@ -107,7 +107,7 @@ public class DemoUtil
 		if (verbose) {
 			System.err.println("===== Executing sql statement:\n" + sql);
 		}
-		boolean rval = statement.execute(sql);
+		statement.execute(sql);
 	}
 
 	/**

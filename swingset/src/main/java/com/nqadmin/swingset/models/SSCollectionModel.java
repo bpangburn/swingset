@@ -46,7 +46,7 @@ import javax.sql.RowSet;
  * All items are the same jdbctype. How the items are stored is
  * independent of this interface.
  * 
- * @author err
+ * @since 4.0.0
  */
 public interface SSCollectionModel {
 

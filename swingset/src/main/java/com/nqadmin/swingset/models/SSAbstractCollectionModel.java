@@ -43,11 +43,15 @@ import java.sql.JDBCType;
  * This is the superclass for all collection models.
  * Handle the jdbcType info for the collection elements.
  * 
- * @author err
+ * @since 4.0.0
  */
 public abstract class SSAbstractCollectionModel implements SSCollectionModel {
 	private final JDBCType jdbcType;
 
+	/**
+	 * Indicate and save the type of the collection.
+	 * @param _jdbcType the collection type
+	 */
 	public SSAbstractCollectionModel(JDBCType _jdbcType) {
 		jdbcType = _jdbcType != null ? _jdbcType : JDBCType.NULL;
 	}

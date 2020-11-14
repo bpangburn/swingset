@@ -49,6 +49,8 @@
  * as an array or set independent of how it might be stored in a data.
  * A model
  * could represent data from a single field or data resulting from a join.
+ * 
+ * @since 4.0.0
  */
 
 package com.nqadmin.swingset.models;

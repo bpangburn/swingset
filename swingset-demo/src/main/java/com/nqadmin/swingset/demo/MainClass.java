@@ -39,7 +39,6 @@ package com.nqadmin.swingset.demo;
 
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSMysqlSetModel;
-import com.nqadmin.swingset.models.SSStringArrayModel;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -58,7 +57,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -284,13 +282,6 @@ public class MainClass extends JFrame {
 
 	        final InputStream inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
         	final InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
-        	InputStream inStreamTestImages = null;
-
-	        if (USE_IN_MEMORY_DATABASE) {
-	        	inStreamTestImages = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST_IMAGES);
-	        } else {
-	        	logger.info("Running H2 as a database server (versus an in-memory database) so binary files (e.g., images) cannot be pre-populated to any BLOB column(s).");
-	        }
 	        if ((inStreamDemo == null) || (inStreamTest == null)) {
 	            logger.fatal("Please add the file "
 	            		+ DATABASE_SCRIPT_DEMO
@@ -563,7 +554,7 @@ public class MainClass extends JFrame {
 	private static boolean dump = false;
 	private static boolean no_load_images = false;
 	private static boolean no_initialize_db = false;
-	private static boolean readme = false;
+	//private static boolean readme = false;
 	private static String dbname = DBMS_H2;
 	private static String propertyFile = null;
 	private static List<String> userSqlFiles = new ArrayList<>();
@@ -627,7 +618,7 @@ public class MainClass extends JFrame {
 				case 'd': dump = true;                      break;
 				case 'n': no_initialize_db = true;          break;
 				case 'i': no_load_images = true;            break;
-				case 'r': readme = true;                    break;
+				//case 'r': readme = true;                    break;
 				case 'p': propertyFile = g.getOptarg();     break;
 				case 's': userSqlFiles.add(g.getOptarg());  break;
 				case '?':
