@@ -38,6 +38,8 @@ import javax.swing.AbstractListModel;
  * <p>
  * The mappings is not required, in which case the mapping is the index;
  * note that in this case the generic mapping type, M, must be Object or Integer.
+ * 
+ * @param <M> The type of the mapping elements, Integer if mapping not provided
  */
 // TODO: get the mapping type at runtime for verifiction if null _mappings.
 // http://download.oracle.com/javase/6/docs/api/java/lang/reflect/ParameterizedType.html#getActualTypeArguments%28%29
@@ -108,12 +110,20 @@ public class OptionMappingSwingListModel<M> extends AbstractListModel<String>
 		return Collections.unmodifiableList(options);
 	}
 
+	public String getOption(int i) {
+		return options.get(i);
+	}
+
 	/**
 	 *
 	 * @return list of mappings
 	 */
 	public List<M> getMappings() {
 		return Collections.unmodifiableList(mappings);
+	}
+
+	public M getMapping(int i) {
+		return mappings.get(i);
 	}
 
 	/**

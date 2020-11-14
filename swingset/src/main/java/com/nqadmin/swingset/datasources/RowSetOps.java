@@ -480,10 +480,10 @@ public class RowSetOps {
 	 * @return List of cast objects
 	 * @throws SQLException This exception wraps a {@code ClassCastException}
 	 */
-	public static List<Object> castJDBCToJava(final Object[] _objects, final JDBCType _jdbcType) throws SQLException {
+	public static List<Object> castJDBCToJava(final JDBCType _jdbcType, final Object[] _objects) throws SQLException {
 		final List<Object> data = new ArrayList<>();
 		for (final Object val : _objects) {
-			data.add(castJDBCToJava(val, _jdbcType));
+			data.add(castJDBCToJava(_jdbcType, val));
 		}
 		return data;
 		
@@ -497,7 +497,7 @@ public class RowSetOps {
 	 * @return Essentially the same Object that was input
 	 * @throws SQLException This exception wraps a {@code ClassCastException}
 	 */
-	public static Object castJDBCToJava(final Object _object, final JDBCType _jdbcType) throws SQLException {
+	public static Object castJDBCToJava(final JDBCType _jdbcType, final Object _object) throws SQLException {
 		Object outputObject = null;
 		
 		try {
