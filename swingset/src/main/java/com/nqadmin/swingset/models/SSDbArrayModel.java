@@ -102,7 +102,7 @@ public class SSDbArrayModel extends SSAbstractCollectionModel {
 		
 		try {
 			if (dbArray instanceof Object[]) {
-				data = castJDBCToJava((Object[])dbArray, _jdbcType);
+				data = castJDBCToJava(_jdbcType, (Object[])dbArray);
 			} else {
 				data = new ArrayList<>();
 				// Handle array of primitives

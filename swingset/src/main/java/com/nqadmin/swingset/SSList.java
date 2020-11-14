@@ -41,6 +41,7 @@ import java.awt.Dimension;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.sql.JDBCType;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -197,8 +198,8 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	 * database values that map to the items displayed in the list box)
 	 *
 	 * @return the mapping values for the items displayed in the list box
+	 * @deprecated use getMappingsList()
 	 */
-	// TODO: post 4.0 either change return type to List or deprecate and add List variant
 	public Object[] getMappings() {
 		return  myModel().getMappings().toArray();
 	}
@@ -207,10 +208,57 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	 * Returns the items displayed in the list box.
 	 *
 	 * @return the items displayed in the list box
+	 * @deprecated use getOptionsList()
 	 */
-	// TODO: post 4.0 either change return type to List or deprecate and add List variant
 	public String[] getOptions() {
 		return myModel().getOptions().toArray(new String[0]);
+	}
+
+	/**
+	 * Returns the items displayed in the list box.
+	 * This is read only.
+	 * <p>
+	 * The returned list is live, tracking the active options in the JList.
+	 * Use copy or toArray for a static copy.
+	 * 
+	 * @return the items displayed in the list box. Read Only.
+	 */
+	public List<String> getOptionsList() {
+		return new AbstractList<String>() {
+			@Override
+			public String get(int index) {
+				return myModel().getOption(index);
+			}
+
+			@Override
+			public int size() {
+				return myModel().getSize();
+			}
+		};
+	}
+
+	/**
+	 * Returns the underlying values for each of the items in the list box (e.g. the
+	 * database values that map to the items displayed in the list box).
+	 * This is read only.
+	 * <p>
+	 * The returned list is live, tracking the active mappings in the JList.
+	 * Use copy or toArray for a static copy.
+	 *
+	 * @return the mapping values for the items displayed in the list box. Read Only.
+	 */
+	public List<Object> getMappingsList() {
+		return new AbstractList<Object>() {
+			@Override
+			public Object get(int index) {
+				return myModel().getMapping(index);
+			}
+
+			@Override
+			public int size() {
+				return myModel().getSize();
+			}
+		};
 	}
 
 	/**
@@ -306,7 +354,7 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	// TODO: cleanup when remove options field
 	private void setOptionsInternal(String[] _oldValue) {
 		options = getOptions(); // XXX TODO: REMOVE
-		firePropertyChange("options", _oldValue, myModel().getMappings().toArray());
+		firePropertyChange("options", _oldValue, myModel().getOptions().toArray());
 	}
 
 	private void setModelInternal(final String[] _options, final Object[] _mappings) {
@@ -412,8 +460,6 @@ public class SSList extends JList<String> implements SSComponentInterface {
 		if (myModel() == null) {
 			return;
 		}
-		// TODO: WHY IS THIS HERE
-		//this.setListData(options);
 
 		Object[] array = null;
 		try {
