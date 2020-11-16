@@ -161,7 +161,9 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Container (frame or internal frame) which contains the navigator.
 	 */
-	protected SSDBNav dBNav = new SSDBNav(){};
+	protected SSDBNav dBNav = new SSDBNav(){
+		private static final long serialVersionUID = 4690448389199879038L; // unique serial ID
+	};
 
 	/**
 	 * Button to delete the current record in the SSRowSet.
@@ -303,7 +305,6 @@ public class SSDataNavigator extends JPanel {
 		// AND MOVES THE SSROWSET TO THE FIRST ROW
 		// SINCE ROW SET IS IN FIRST ROW DISABLE PREVIOUS BUTTON AND ENABLE NEXT BUTTON
 		firstButton.addActionListener(new ActionListener() {
-			@SuppressWarnings("deprecation")
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("FIRST button clicked.");
@@ -335,7 +336,6 @@ public class SSDataNavigator extends JPanel {
 		// WHEN BUTTON 2 IS PRESSED THE CURRENT RECORD IS SAVED AND SSROWSET IS MOVED TO PREVIOUS RECORD
 		// CALLING PREVIOUS ON EMPTY SSROWSET IS ILLEGAL SO A CHECK IS PERFORMED
 		previousButton.addActionListener(new ActionListener() {
-			@SuppressWarnings("deprecation")
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("PREVIOUS button clicked.");
@@ -370,7 +370,6 @@ public class SSDataNavigator extends JPanel {
 		// MOVED TO NEXT RECORD. IF THIS IS THE LAST RECORD THEN BUTTON 3 IS DISABLED
 		// ALSO IF THE PREVIOUS BUTTON IS NOT ENABLED THEN IT IS ENABLED
 		nextButton.addActionListener(new ActionListener() {
-			@SuppressWarnings("deprecation")
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("NEXT button clicked.");
@@ -406,7 +405,6 @@ public class SSDataNavigator extends JPanel {
 		// AFTER MOVING TO LAST RECORD THE NEXT BUTTON IS DIAABLED AND PREVIOUS BUTTON
 		// ENABLED
 		lastButton.addActionListener(new ActionListener() {
-			@SuppressWarnings("deprecation")
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("LAST button clicked.");
@@ -1019,7 +1017,9 @@ public class SSDataNavigator extends JPanel {
 	 */
 	public void setDBNav(final SSDBNav _dBNav) {
 		final SSDBNav oldValue = dBNav;
-		dBNav = _dBNav != null ? _dBNav : new SSDBNav(){};
+		dBNav = _dBNav != null ? _dBNav : new SSDBNav(){
+			private static final long serialVersionUID = -1655686725609007995L; // unique serial ID
+		};
 		firePropertyChange("dBNav", oldValue, dBNav);
 	}
 

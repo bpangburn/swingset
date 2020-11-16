@@ -281,6 +281,9 @@ public class SSList extends JList<String> implements SSComponentInterface {
 		return getSelectedMappings().toArray();
 	}
 
+	/**
+	 * @return a list with the values of the mapped values corresponding to the selected indices
+	 */
 	public List<Object> getSelectedMappings() {
 		int[] selectedIndices = getSelectedIndices();
 		List<Object> selectedMappings = new ArrayList<>(selectedIndices.length);
@@ -401,7 +404,11 @@ public class SSList extends JList<String> implements SSComponentInterface {
 		return true;
 	}
 
-	/** convenience method for accessing the model with proper casting */
+	/**
+	 * Convenience method for accessing the model with proper casting.
+	 * 
+	 * @return mapping list model with proper casting
+	 */
 	private OptionMappingSwingListModel<Object> myModel() {
 		ListModel<String> curModel = getModel();
 		if(!(curModel instanceof OptionMappingSwingListModel)) {
