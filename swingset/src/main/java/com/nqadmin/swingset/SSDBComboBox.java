@@ -484,6 +484,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// See https://stackoverflow.com/questions/15210771/autocomplete-with-glazedlists for info on modifying lists.
 		// See https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html
 		// We would like to call autoComplete.setStrict(true), but it is not currently compatible with TextMatcherEditor.CONTAINS, which is the more important feature.
+		// There is a support request to support STRICT and CONTAINS: https://github.com/glazedlists/glazedlists/issues/676
 		// Note that installing AutoComplete support makes the ComboBox editable.
 		// Should already in the event dispatch thread so don't use invokeAndWait()
 		if (!autoCompleteInstalled) {
