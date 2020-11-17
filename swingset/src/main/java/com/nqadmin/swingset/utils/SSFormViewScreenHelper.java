@@ -398,7 +398,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * @deprecated Starting in 4.0.0+ use {@link #addCustomListeners()} instead.
 	 */
 	@Deprecated
-	protected abstract void addImplListeners() throws Exception;
+	protected void addImplListeners() throws Exception {
+		// Do nothing by default...
+	}
 
 	/**
 	 * Initialize and bind screen components.
@@ -607,6 +609,10 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 
 			// ADD SCREEN LISTENERS
 			addCoreListeners();
+			
+			// MAKE SCREEN VISIBLE
+			//setVisible(true);
+			// Parent to call screenClass.showUp(this);
 				
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);

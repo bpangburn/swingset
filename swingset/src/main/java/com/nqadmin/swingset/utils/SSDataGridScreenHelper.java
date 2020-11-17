@@ -425,6 +425,10 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			// SET DEFAULT VALUES
 			setDefaultValues();
 			
+			// MAKE SCREEN VISIBLE
+			//setVisible(true);
+			// Parent to call screenClass.showUp(this);
+			
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
 			JOptionPane.showMessageDialog(this,
