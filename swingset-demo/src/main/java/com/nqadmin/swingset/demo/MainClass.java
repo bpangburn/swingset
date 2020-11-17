@@ -104,6 +104,9 @@ public class MainClass extends JFrame {
             else if(ae.getSource().equals(btnExample4)){
             	new Example4(dbConnection);
             }
+            else if(ae.getSource().equals(btnExample4UsingHelper)){
+            	new Example4UsingHelper(dbConnection, MainClass.this);
+            }
             else if(ae.getSource().equals(btnExample5)){
             	new Example5(dbConnection);
             }
@@ -125,7 +128,6 @@ public class MainClass extends JFrame {
             }
         }
     }
-
 
 	/**
 	 * component dimensions
@@ -179,6 +181,7 @@ public class MainClass extends JFrame {
 	private JButton btnExample2 = new JButton("Example2");
 	private JButton btnExample3 = new JButton("Example3");
 	private JButton btnExample4 = new JButton("Example4");
+	private JButton btnExample4UsingHelper = new JButton("Example4 Using Helper");
 	private JButton btnExample5 = new JButton("Example5");
 	private JButton btnExample6 = new JButton("Example6");
 	private JButton btnExample7 = new JButton("Example7");
@@ -228,6 +231,7 @@ public class MainClass extends JFrame {
 	        btnExample2.addActionListener( new MyButtonListener());
 	        btnExample3.addActionListener( new MyButtonListener());
 	        btnExample4.addActionListener( new MyButtonListener());
+	        btnExample4UsingHelper.addActionListener( new MyButtonListener());
 	        btnExample5.addActionListener( new MyButtonListener());
 	        btnExample6.addActionListener( new MyButtonListener());
 	        btnExample7.addActionListener( new MyButtonListener());
@@ -240,6 +244,7 @@ public class MainClass extends JFrame {
 	        btnExample2.setPreferredSize(buttonDim);
 	        btnExample3.setPreferredSize(buttonDim);
 	        btnExample4.setPreferredSize(buttonDim);
+	        btnExample4UsingHelper.setPreferredSize(buttonDim);
 	        btnExample5.setPreferredSize(buttonDim);
 	        btnExample6.setPreferredSize(buttonDim);
 	        btnExample7.setPreferredSize(buttonDim);
@@ -253,6 +258,7 @@ public class MainClass extends JFrame {
 	        getContentPane().add(btnExample2);
 	        getContentPane().add(btnExample3);
 	        getContentPane().add(btnExample4);
+	        getContentPane().add(btnExample4UsingHelper);
 	        getContentPane().add(btnExample5);
 	        getContentPane().add(btnExample6);
 	        getContentPane().add(btnExample7);
