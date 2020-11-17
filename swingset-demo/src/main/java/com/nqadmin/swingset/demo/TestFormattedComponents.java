@@ -78,9 +78,7 @@ import com.nqadmin.swingset.utils.SSSyncManager;
  * records and in the same order. Otherwise the SSSyncManager will spend a lot of
  * time looping through records to match.
  */
-
 public class TestFormattedComponents extends JFrame {
-
 
 	/**
 	 * Log4j2 Logger
@@ -91,9 +89,27 @@ public class TestFormattedComponents extends JFrame {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -1831202547517957436L;
+	
+	/**
+	 * screen label declarations
+	 */
+	JLabel lblSSDBComboNav = new JLabel("SSDBComboNav"); // SSDBComboBox used just for navigation
+	JLabel lblSwingSetFormattedTestPK = new JLabel("Record ID");
+	JLabel lblSSCuitField = new JLabel("SSCuitField");
+	JLabel lblSSCurrencyField = new JLabel("SSCurrencyField");
+	JLabel lblSSDateField = new JLabel("SSDateField");
+	JLabel lblSSFormattedTextField = new JLabel("SSFormattedTextField");
+	JLabel lblSSIntegerField = new JLabel("SSIntegerField");
+	JLabel lblSSNumericField = new JLabel("SSNumericField");
+	JLabel lblSSPercentField = new JLabel("SSPercentField");
+	JLabel lblSSSSNField = new JLabel("SSSSNField");
+	JLabel lblSSTimeField = new JLabel("SSTimeField");
+	JLabel lblSSTimestampField = new JLabel("SSTimestampField");
 
-	SSDBComboBox cmbSSDBComboNav = new SSDBComboBox(); // SSDBComboBox used just for navigation
-
+	/**
+	 * bound component declarations
+	 */
+	SSTextField txtSwingSetFormattedTestPK = new SSTextField();
 	SSCuitField fmtSSCuitField = new SSCuitField();
 	SSCurrencyField fmtSSCurrencyField = new SSCurrencyField();
 	SSDateField fmtSSDateField = new SSDateField(SSDateField.MMDDYYYY);
@@ -105,41 +121,18 @@ public class TestFormattedComponents extends JFrame {
 	SSTimeField fmtSSTimeField = new SSTimeField();
 	SSTimestampField fmtSSTimestampField = new SSTimestampField();
 
-
-	JLabel lblSSCuitField = new JLabel("SSCuitField");
-
-	JLabel lblSSCurrencyField = new JLabel("SSCurrencyField");
-
-	JLabel lblSSDateField = new JLabel("SSDateField");
-	JLabel lblSSDBComboNav = new JLabel("SSDBComboNav"); // SSDBComboBox used just for navigation
-	JLabel lblSSFormattedTextField = new JLabel("SSFormattedTextField");
-	JLabel lblSSIntegerField = new JLabel("SSIntegerField");
-	JLabel lblSSNumericField = new JLabel("SSNumericField");
-	JLabel lblSSPercentField = new JLabel("SSPercentField");
-	JLabel lblSSSSNField = new JLabel("SSSSNField");
-	JLabel lblSSTimeField = new JLabel("SSTimeField");
-	JLabel lblSSTimestampField = new JLabel("SSTimestampField");
-	/**
-	 * screen label declarations
-	 */
-	JLabel lblSwingSetFormattedTestPK = new JLabel("Record ID");
-
-	SSDataNavigator navigator = null;
-	SSJdbcRowSetImpl rowset = null;
 	/**
 	 * database component declarations
 	 */
 	SSConnection ssConnection = null;
+	SSJdbcRowSetImpl rowset = null;
+	SSDataNavigator navigator = null;
 
 	/**
-	 * sync manger
+	 * combo navigator and sync manger
 	 */
+	SSDBComboBox cmbSSDBComboNav = new SSDBComboBox(); // SSDBComboBox used just for navigation
 	SSSyncManager syncManager;
-
-	/**
-	 * bound component declarations
-	 */
-	SSTextField txtSwingSetFormattedTestPK = new SSTextField();
 
 	/**
 	 * Constructor for Formatted Component Test
@@ -388,7 +381,6 @@ public class TestFormattedComponents extends JFrame {
 			setVisible(true);
 
 	}
-
 
 	/**
 	 * Method to set default values following an insert

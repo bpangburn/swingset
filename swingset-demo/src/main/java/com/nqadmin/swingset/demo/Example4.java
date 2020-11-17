@@ -86,38 +86,38 @@ public class Example4 extends JFrame {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -6594890166578252237L;
-	SSComboBox cmbPartColor = new SSComboBox();
-	SSDBComboBox cmbSelectPart = null;
-	JLabel lblPartCity = new JLabel("City");
-	JLabel lblPartColor = new JLabel("Color");
+	
 	/**
 	 * screen label declarations
 	 */
+	JLabel lblSelectPart = new JLabel("Part");
 	JLabel lblPartID = new JLabel("Part ID");
-
 	JLabel lblPartName = new JLabel("Part Name");
+	JLabel lblPartColor = new JLabel("Color");
 	JLabel lblPartWeight = new JLabel("Weight");
-	JLabel lblSelectPart = new JLabel("Parts");
-	SSDataNavigator navigator = null;
-	SSJdbcRowSetImpl rowset = null;
-	/**
-	 * database component declarations
-	 */
-	SSConnection ssConnection = null;
+	JLabel lblPartCity = new JLabel("City");
 
-	/**
-	 * sync manger
-	 */
-	SSSyncManager syncManager;
-	SSTextField txtPartCity = new SSTextField();
 	/**
 	 * bound component declarations
 	 */
 	SSTextField txtPartID = new SSTextField();
-
 	SSTextField txtPartName = new SSTextField();
-
+	SSComboBox cmbPartColor = new SSComboBox();
 	SSTextField txtPartWeight = new SSTextField();
+	SSTextField txtPartCity = new SSTextField();
+
+	/**
+	 * database component declarations
+	 */
+	SSConnection ssConnection = null;
+	SSJdbcRowSetImpl rowset = null;
+	SSDataNavigator navigator = null;
+
+	/**
+	 * combo navigator and sync manger
+	 */
+	SSDBComboBox cmbSelectPart = null;
+	SSSyncManager syncManager;
 
 	/**
 	 * Constructor for Example4
@@ -335,10 +335,11 @@ public class Example4 extends JFrame {
 				constraints.gridwidth = 2;
 				contentPane.add(navigator, constraints);
 
-		// DISABLE THE PRIMARY KEY
-			txtPartID.setEnabled(false);
-
-		// MAKE THE JFRAME VISIBLE
-			setVisible(true);	}
+			// DISABLE THE PRIMARY KEY
+				txtPartID.setEnabled(false);
+	
+			// MAKE THE JFRAME VISIBLE
+				setVisible(true);
+			}
 
 }

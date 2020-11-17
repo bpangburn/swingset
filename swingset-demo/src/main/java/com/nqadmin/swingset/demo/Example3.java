@@ -76,29 +76,29 @@ public class Example3 extends JFrame {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 4859550616628544511L;
-	SSDBComboBox cmbPartName = null;
-	SSDBComboBox cmbSupplierName = null;
-	JLabel lblPartName = new JLabel("Part");
-
-	JLabel lblQuantity = new JLabel("Quantity");
-	JLabel lblSupplierName = new JLabel("Supplier");
+	
 	/**
 	 * screen label declarations
 	 */
 	JLabel lblSupplierPartID = new JLabel("Supplier-Part ID");
-	SSDataNavigator navigator = null;
-
-	SSJdbcRowSetImpl rowset = null;
-	/**
-	 * database component declarations
-	 */
-	SSConnection ssConnection = null;
-	SSTextField txtQuantity = new SSTextField();
-
+	JLabel lblSupplierName = new JLabel("Supplier");
+	JLabel lblPartName = new JLabel("Part");
+	JLabel lblQuantity = new JLabel("Quantity");
+	
 	/**
 	 * bound component declarations
 	 */
 	SSTextField txtSupplierPartID = new SSTextField();
+	SSDBComboBox cmbSupplierName = null;
+	SSDBComboBox cmbPartName = null;
+	SSTextField txtQuantity = new SSTextField();
+	
+	/**
+	 * database component declarations
+	 */
+	SSConnection ssConnection = null;
+	SSJdbcRowSetImpl rowset = null;
+	SSDataNavigator navigator = null;
 
 	/**
 	 * Constructor for Example3

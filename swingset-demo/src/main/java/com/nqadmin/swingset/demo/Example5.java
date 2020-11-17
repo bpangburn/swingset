@@ -46,6 +46,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSDataGrid;
+import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 
@@ -67,14 +68,17 @@ public class Example5 extends JFrame {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -5126011569315467420L;
-	SSDataGrid dataGrid = null;
-	SSJdbcRowSetImpl rowset = null;
+	
 	/**
-	 * declarations
+	 * data grid
+	 */
+	SSDataGrid dataGrid = null;
+	
+	/**
+	 * database component declarations
 	 */
 	SSConnection ssConnection = null;
-
-	String url;
+	SSJdbcRowSetImpl rowset = null;
 
 	/**
 	 * Constructor for Example5

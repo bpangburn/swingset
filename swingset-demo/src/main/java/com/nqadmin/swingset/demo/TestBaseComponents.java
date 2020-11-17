@@ -86,17 +86,6 @@ import java.util.function.Supplier;
 
 public class TestBaseComponents extends JFrame {
 
-	private final Map<String,Object> hints;
-	private static final int[] comboCodes = {0,1,2,3};
-
-	/**
-	 * combo and list items
-	 */
-	private static final String[] comboItems = {"Combo Item 0","Combo Item 1", "Combo Item 2", "Combo Item 3"};
-
-	private static final Object[] listCodes = {1,2,3,4,5,6,7};
-
-	private static final String[] listItems = {"List Item 1","List Item 2", "List Item 3", "List Item 4", "List Item 5", "List Item 6", "List Item 7"};
 	/**
 	 * Log4j2 Logger
 	 */
@@ -105,53 +94,65 @@ public class TestBaseComponents extends JFrame {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 7155378273131680653L;
-	SSCheckBox chkSSCheckBox = new SSCheckBox();
-	SSComboBox cmbSSComboBox = new SSComboBox();
-	SSDBComboBox cmbSSDBComboBox = new SSDBComboBox();
-	SSDBComboBox cmbSSDBComboNav = new SSDBComboBox(); // SSDBComboBox used just for navigation
-	SSImage imgSSImage = new SSImage();
-	JLabel lblSSCheckBox = new JLabel("SSCheckBox");
+	
+	/**
+	 * map of 'hints' contianing info on which collection model to use
+	 */
+	private final Map<String,Object> hints;
 
-
-	JLabel lblSSComboBox = new JLabel("SSComboBox");
-
-	JLabel lblSSDBComboBox = new JLabel("SSDBComboBox");
-
+	/**
+	 * combo and list items
+	 */
+	private static final String[] comboItems = {"Combo Item 0","Combo Item 1", "Combo Item 2", "Combo Item 3"};
+	private static final int[] comboCodes = {0,1,2,3};
+	private static final Object[] listCodes = {1,2,3,4,5,6,7};
+	private static final String[] listItems = {"List Item 1","List Item 2", "List Item 3", "List Item 4", "List Item 5", "List Item 6", "List Item 7"};
+	
+	/**
+	 * screen label declarations
+	 */
 	JLabel lblSSDBComboNav = new JLabel("SSDBComboNav"); // SSDBComboBox used just for navigation
+	JLabel lblSwingSetBaseTestPK = new JLabel("Record ID");
+	JLabel lblSSCheckBox = new JLabel("SSCheckBox");
+	JLabel lblSSComboBox = new JLabel("SSComboBox");
+	JLabel lblSSDBComboBox = new JLabel("SSDBComboBox");
 	JLabel lblSSImage = new JLabel("SSImage");
 	JLabel lblSSLabel = new JLabel("SSLabel");
-	SSLabel lblSSLabel2 = new SSLabel();
 	JLabel lblSSList = new JLabel("SSList");
 	JLabel lblSSSlider = new JLabel("SSSlider");
 	JLabel lblSSTextArea = new JLabel("SSTextArea");
 	JLabel lblSSTextField = new JLabel("SSTextField");
+	
 	/**
-	 * screen label declarations
+	 * bound component declarations
 	 */
-	JLabel lblSwingSetBaseTestPK = new JLabel("Record ID");
-
+	SSTextField txtSwingSetBaseTestPK = new SSTextField();
+	SSCheckBox chkSSCheckBox = new SSCheckBox();
+	SSComboBox cmbSSComboBox = new SSComboBox();
+	SSDBComboBox cmbSSDBComboBox = new SSDBComboBox();
+	SSImage imgSSImage = new SSImage();
+	SSLabel lblSSLabel2 = new SSLabel();
 	final SSList lstSSList;
-	SSDataNavigator navigator = null;
-	SSJdbcRowSetImpl rowset = null;
-
 	SSSlider sliSSSlider = new SSSlider();
+	SSTextArea txtSSTextArea = new SSTextArea();
+	SSTextField txtSSTextField = new SSTextField();
 
 	/**
 	 * database component declarations
 	 */
 	SSConnection ssConnection = null;
+	SSJdbcRowSetImpl rowset = null;
+	SSDataNavigator navigator = null;
+
 	/**
-	 * sync manger
+	 * combo navigator and sync manger
 	 */
+	SSDBComboBox cmbSSDBComboNav = new SSDBComboBox(); // SSDBComboBox used just for navigation
 	SSSyncManager syncManager;
-	SSTextArea txtSSTextArea = new SSTextArea();
-	SSTextField txtSSTextField = new SSTextField();
 
 	/**
-	 * bound component declarations
+	 * Method to obtain proper data structure/model for SSList based on database used
 	 */
-	SSTextField txtSwingSetBaseTestPK = new SSTextField();
-
 	private SSCollectionModel getCollectionModel() {
 		@SuppressWarnings("unchecked")
 		Supplier<SSCollectionModel> supl
@@ -187,8 +188,6 @@ public class TestBaseComponents extends JFrame {
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			}
-
-
 
 			/**
 			 * Various navigator overrides needed to support H2
@@ -435,7 +434,6 @@ public class TestBaseComponents extends JFrame {
 			lstScrollPane.setPreferredSize(MainClass.ssDimTall);
 
 	}
-
 
 	/**
 	 * Method to set default values following an insert

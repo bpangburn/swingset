@@ -67,14 +67,17 @@ public class Example6 extends JFrame {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 1727893372201402700L;
-	SSDataGrid dataGrid = null;
-	SSJdbcRowSetImpl rowset = null;
+	
 	/**
-	 * declarations
+	 * data grid
+	 */
+	SSDataGrid dataGrid = null;
+	
+	/**
+	 * database component declarations
 	 */
 	SSConnection ssConnection = null;
-
-	String url;
+	SSJdbcRowSetImpl rowset = null;
 
 	/**
 	 * Constructor for Example6
