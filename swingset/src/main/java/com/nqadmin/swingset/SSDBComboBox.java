@@ -44,9 +44,8 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JComboBox;
 
@@ -54,14 +53,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.SSConnection;
+import com.nqadmin.swingset.models.DefaultGlazedListComboInfo;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
-import com.nqadmin.swingset.utils.SSListItem;
+import com.nqadmin.swingset.models.SSListItem;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.matchers.TextMatcherEditor;
 import ca.odell.glazedlists.swing.AutoCompleteSupport;
+
+import static com.nqadmin.swingset.datasources.RowSetOps.*;
+import com.nqadmin.swingset.models.SSListItemFormat;
 
 // SSDBComboBox.java
 //
@@ -182,6 +185,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Value to represent that no item has been selected in the combo box.
 	 */
+	// TODO: why not Integer.MIN_VALUE?
 	public static final int NON_SELECTED = (int) ((Math.pow(2, 32) - 1) / (-2));
 
 	/**
@@ -193,6 +197,27 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * Indicates if GlazedList autocompletion has already been installed
 	 */
 	private boolean autoCompleteInstalled = false;
+
+
+	/**
+	 * Define this class here because {@literal DefaultGla....<.....>}
+	 * messes up the code. In particular:
+	 * {@code try (DefaultGlazedListComboInfo<Long,String,String>.Remodel remodel = xxx) }
+	 */
+	private static class ComboInfo extends DefaultGlazedListComboInfo<Long,Object,Object> {
+		public ComboInfo(EventList<SSListItem> _eventList, boolean _hasOption2) {
+			super(_eventList, _hasOption2);
+		}
+	}
+	/**
+	 * comboInfo handles eventList, mappings, options access.
+	 */
+	private final ComboInfo comboInfo;
+
+	/**
+	 * Format an SSListItem. Used to AutoCompleteSupport.install.
+	 */
+	private final SSListItemFormat listItemFormat;
 
 	/**
 	 * Format for any date columns displayed in combo box.
@@ -222,6 +247,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * <p>
 	 * Appears to determine if GlazedList is used for filtering or original
 	 * keystroke listener/filter.
+	 * @deprecated 
 	 */
 	protected boolean filterSwitch = true;
 
@@ -230,11 +256,13 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * <p>
 	 * Note that mappings for the SSDBComboBox are Longs whereas in SSComboBox they
 	 * are Integers.
+	 * @deprecated
 	 */
 	protected ArrayList<Long> mappings = null;
 
 	/**
 	 * Options to be displayed in the combobox (based on a query).
+	 * @deprecated
 	 */
 	protected ArrayList<String> options = null;
 
@@ -296,6 +324,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	public SSDBComboBox() {
 		// Note that call to parent default constructor is implicit.
 		//super();
+		eventList = new BasicEventList<SSListItem>();
+		comboInfo = new ComboInfo(eventList, false);
+		listItemFormat = new SSListItemFormat();
+		listItemFormat.setDatePattern(dateFormat);
 	}
 
 	/**
@@ -308,8 +340,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _displayColumnName    column name whose values are displayed in the
 	 *                              combo box.
 	 */
-	public SSDBComboBox(final SSConnection _ssConnection, final String _query, final String _primaryKeyColumnName,
-			final String _displayColumnName) {
+	public SSDBComboBox(final SSConnection _ssConnection, final String _query,
+			final String _primaryKeyColumnName, final String _displayColumnName) {
 		this();
 		setSSConnection(_ssConnection);
 		setQuery(_query);
@@ -327,35 +359,41 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		// TODO Determine if any change is needed to actually add item to combobox.
 
-		// LOCK EVENT LIST
-		eventList.getReadWriteLock().writeLock().lock();
-
-		// INITIALIZE LISTS IF NULL
-		if (eventList == null) {
-			eventList = new BasicEventList<>();
-		}
-		if (mappings == null) {
-			mappings = new ArrayList<Long>();
-		}
-		if (options == null) {
-			options = new ArrayList<String>();
-		}
-
-		try {
-
-			// create new list item
-			final SSListItem listItem = new SSListItem(_primaryKey, _displayText);
-
-			// add to lists
-			eventList.add(listItem);
-			mappings.add(listItem.getPrimaryKey());
-			options.add(listItem.getListItem());
-
+		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+			remodel.add(_primaryKey, _displayText);
 		} catch (final Exception e) {
 			logger.error(getColumnForLog() + ": Exception.", e);
-		} finally {
-			eventList.getReadWriteLock().writeLock().unlock();
 		}
+
+		// // LOCK EVENT LIST
+		// eventList.getReadWriteLock().writeLock().lock();
+
+		// // INITIALIZE LISTS IF NULL
+		// if (eventList == null) {
+		// 	eventList = new BasicEventList<>();
+		// }
+		// if (mappings == null) {
+		// 	mappings = new ArrayList<Long>();
+		// }
+		// if (options == null) {
+		// 	options = new ArrayList<String>();
+		// }
+
+		// try {
+
+		// 	// create new list item
+		// 	final SSListItem listItem = new SSListItem(_primaryKey, _displayText);
+
+		// 	// add to lists
+		// 	eventList.add(listItem);
+		// 	mappings.add(listItem.getPrimaryKey());
+		// 	options.add(listItem.getListItem());
+
+		// } catch (final Exception e) {
+		// 	logger.error(getColumnForLog() + ": Exception.", e);
+		// } finally {
+		// 	eventList.getReadWriteLock().writeLock().unlock();
+		// }
 
 	}
 
@@ -414,34 +452,48 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		boolean result = false;
 
-		if (eventList != null) {
-
-			// LOCK EVENT LIST
-			eventList.getReadWriteLock().writeLock().lock();
-
-			try {
-
-				// GET INDEX FOR mappings and options
-				final int index = mappings.indexOf(_primaryKey);
-
-				// PROCEED IF INDEX WAS FOUND
-				if (index != -1) {
-					options.remove(index);
-					mappings.remove(index);
-					eventList.remove(index);
-					result = true;
-
-				}
-
-			} catch (final Exception e) {
-				logger.error(getColumnForLog() + ": Exception.", e);
-			} finally {
-				eventList.getReadWriteLock().writeLock().unlock();
+		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+			// GET INDEX FOR mappings and options
+			int index = remodel.getMappings().indexOf(_primaryKey);
+			// PROCEED IF INDEX WAS FOUND
+			if (index != -1) {
+				remodel.remove(index);
+				result = true;
 			}
-
+		} catch (final Exception e) {
+			logger.error(getColumnForLog() + ": Exception.", e);
 		}
 
 		return result;
+
+//		if (eventList != null) {
+//
+//			// LOCK EVENT LIST
+//			eventList.getReadWriteLock().writeLock().lock();
+//
+//			try {
+//
+//				// GET INDEX FOR mappings and options
+//				final int index = mappings.indexOf(_primaryKey);
+//
+//				// PROCEED IF INDEX WAS FOUND
+//				if (index != -1) {
+//					options.remove(index);
+//					mappings.remove(index);
+//					eventList.remove(index);
+//					result = true;
+//
+//				}
+//
+//			} catch (final Exception e) {
+//				logger.error(getColumnForLog() + ": Exception.", e);
+//			} finally {
+//				eventList.getReadWriteLock().writeLock().unlock();
+//			}
+//
+//		}
+//
+//		return result;
 
 	}
 
@@ -460,10 +512,16 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		boolean result = false;
 
-		if (options != null) {
-			final int index = options.indexOf(_displayText);
-			result = deleteItem(mappings.get(index));
+		// TODO: javadoc says "list items" plural. Is that what's wanted.
+		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+			final int index = remodel.getOptions().indexOf(_displayText);
+			result = deleteItem(index);
 		}
+
+		// if (options != null) {
+		// 	final int index = options.indexOf(_displayText);
+		// 	result = deleteItem(mappings.get(index));
+		// }
 
 		return result;
 
@@ -488,7 +546,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// Note that installing AutoComplete support makes the ComboBox editable.
 		// Should already in the event dispatch thread so don't use invokeAndWait()
 		if (!autoCompleteInstalled) {
-			final AutoCompleteSupport<SSListItem> autoComplete = AutoCompleteSupport.install(this, eventList);
+			// TODO: ComboItemFormat - not ready for prime time
+			final AutoCompleteSupport<SSListItem> autoComplete = AutoCompleteSupport.install(this, eventList, null, listItemFormat);
 			autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
 			autoCompleteInstalled = true;
 		}
@@ -524,7 +583,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * @return the eventList
 	 */
-	public EventList<SSListItem> getEventList() {
+	// TODO: public method? Why? How/where used.
+	//		Make private, see what happens
+	private EventList<SSListItem> getEventList() {
 		return eventList;
 	}
 
@@ -549,8 +610,12 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * @return the mappings
 	 */
-	public ArrayList<Long> getMappings() {
-		return mappings;
+	public List<Long> getMappings() {
+		// TODO: the signature should be List<>, not ArrayList.
+		//		 Changed signature to avoid strange casting exception
+		//		 having to do with unmodifiable lists...
+		//return mappings;
+		return comboInfo.getMappings();
 	}
 
 	/**
@@ -565,20 +630,39 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	
 		// TODO Determine where/how this is/was used.
 		
-		int result = 0;
+		// int result = 0;
 
-		if (eventList != null) {
-			result = eventList.size();
-		}
+		return eventList.size();
 
-		return result;
+		// if (eventList != null) {
+		// 	result = eventList.size();
+		// }
+
+		// return result;
 	}
 
 	/**
 	 * @return the options
 	 */
-	public ArrayList<String> getOptions() {
-		return options;
+	public List<Object> getOptions() {
+		// NOTE: this was List<String>, now List<Object>
+		// NOTE: changed signature to List<> from ArrayList<>.
+		// TODO: is this used?
+		//return options;
+
+		return comboInfo.getOptions();
+
+		// NOTE: IF A LIST OF THE STRINGS IN COMBOBOX IS WANTED,
+		//		 THEN THE FOLLOWING CAN BE USED.
+
+		// List<String> options = new ArrayList<>();
+		// try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+		// 	List<SSListItem> items = remodel.getEventList();
+		// 	for(SSListItem item : items) {
+		// 		options.add(listItemFormat.format(item));
+		// 	}
+		// }
+		// return options;
 	}
 
 	/**
@@ -589,7 +673,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	}
 
 	/**
-	 * Returns the query used to retrieve values from database for the combo box.
+//	 * Returns the query used to retrieve values from database for the combo box.
 	 *
 	 * @return returns the query used.
 	 */
@@ -617,19 +701,13 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *         no item is selected.
 	 */
 	public String getSelectedStringValue() {
-
-		String result = null;
-
-		final SSListItem currentItem = (SSListItem)getSelectedItem();
-
-		if (currentItem!=null) {
-			result = currentItem.getListItem();
-		}
-
-
-		return result;
-
-	} // public String getSelectedStringValue() {
+		// try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+		// 	SSListItem currentItem = (SSListItem)getSelectedItem();
+		// 	return currentItem != null ? remodel.getOption(currentItem) : null;
+		// }
+		Object currentItem = getSelectedItem();
+		return currentItem != null ? listItemFormat.format(currentItem) : null;
+	}
 
 	/**
 	 * Returns the underlying database record primary key value corresponding to the
@@ -646,27 +724,29 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		
 		logger.debug(getColumnForLog() + ": Call to getSelectedValue().");
 
-		Long result;
+		Long result = null;
 
 		// 2020-10-03_BP: getSelectedValue() seems to be the root of problems with filtered/glazed lists.
 		// When filtering is taking place, getSelectedIndex() returns -1
 
 		// Determine if the call to getSelectedValue() is happening during a call to setSelectedItem()
-		if (settingSelectedItem) {
-			if (selectedItem == null) {
-				result = (long) NON_SELECTED;
+		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+			if (settingSelectedItem) {
+				if (selectedItem == null) {
+					result = (long) NON_SELECTED;
+				} else {
+					//result = selectedItem.getPrimaryKey();
+					result = remodel.getMapping(selectedItem);
+				}
 			} else {
-				result = selectedItem.getPrimaryKey();
+				// Existing code not impacted by GlazedList dynamically impacting the list.
+				if (getSelectedIndex() == -1) {
+					result = (long) NON_SELECTED;
+				} else {
+					result = remodel.getMapping(getSelectedIndex());
+					
+				}
 			}
-		} else {
-		// Existing code not impacted by GlazedList dynamically impacting the list.
-			if (getSelectedIndex() == -1) {
-				result = (long) NON_SELECTED;
-			} else {
-				result = mappings.get(getSelectedIndex());
-
-			}
-
 		}
 
 		// If anything above returned null, change to NON_SELECTED.
@@ -708,36 +788,73 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		return ssCommon;
 	}
 
-	/**
-	 * Converts the database column value into string. Only date columns are
-	 * formated as specified by dateFormat variable all other column types are
-	 * retrieved as strings
-	 *
-	 * @param _rs         ResultSet containing database column to convert to string
-	 * @param _columnName database column to convert to string
-	 * @return string value of database column
-	 */
-	protected String getStringValue(final ResultSet _rs, final String _columnName) {
-		String strValue = "";
-		try {
-			final int type = _rs.getMetaData().getColumnType(_rs.findColumn(_columnName));
-			switch (type) {
-			case Types.DATE:
-				final SimpleDateFormat myDateFormat = new SimpleDateFormat(dateFormat);
-				strValue = myDateFormat.format(_rs.getDate(_columnName));
-				break;
-			default:
-				strValue = _rs.getString(_columnName);
-				break;
-			}
-			if (strValue == null) {
-				strValue = "";
-			}
-		} catch (final SQLException se) {
-			logger.error(getColumnForLog() + ": SQL Exception.", se);
-		}
-		return strValue;
+//	/** type of column being formatted, date types special */
+//	private JDBCType optionColumnType = null;
+//	/** type of secondary column being formatted, date types special */
+//	private JDBCType option2ColumnType = null;
+//
+//	private class ComboItemFormat extends Format {
+//		private static final long serialVersionUID = 1L;
+//		@Override
+//		public Object parseObject(String source, ParsePosition pos) {
+//			// Do not create objects from here
+//			return source;
+//		}
+//		@Override
+//		public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
+//			// GlazedLists guarentees only format(Object), so ignore pos.
+//			SSListItem listItem = (SSListItem)obj;
+//			toAppendTo.append(comboInfo.getOption(listItem).toString());
+//			if (hasOption2()) {
+//				Object option2 = comboInfo.getOption2(listItem);
+//				if (option2 != null) {
+//					toAppendTo.append(separator).append(option2.toString());
+//				}
+//			}
+//			return toAppendTo;
+//		}
+//	};
 
+	// This is the old method, now handled in format
+	protected String getStringValue(final ResultSet _rs, final String _columnName) {
+		throw new UnsupportedOperationException();
+	}
+
+//	/**
+//	 * Converts the database column value into string.Only date columns are
+//	 * formatted as specified by dateFormat variable all other column types are
+//	 * retrieved as strings
+//	 *
+//	 * @param _jdbcType	  the type of data to get as a String
+//	 * @param _rs         ResultSet containing database column to convert to string
+//	 * @param _columnName database column to convert to string
+//	 * @return string value of database column
+//	 */
+//	// TODO: this goes into format; like getStringValue(type, object)
+//	protected String getStringValue(final JDBCType _jdbcType, final ResultSet _rs, final String _columnName) {
+//		String strValue = "";
+//		try {
+//			switch (_jdbcType) {
+//			case DATE:
+//				final SimpleDateFormat myDateFormat = new SimpleDateFormat(dateFormat);
+//				strValue = myDateFormat.format(_rs.getDate(_columnName));
+//				break;
+//			default:
+//				strValue = _rs.getString(_columnName);
+//				break;
+//			}
+//			if (strValue == null) {
+//				strValue = "";
+//			}
+//		} catch (final SQLException se) {
+//			logger.error(getColumnForLog() + ": SQL Exception.", se);
+//		}
+//		return strValue;
+//
+//	}
+
+	private boolean hasOption2() {
+		return secondDisplayColumnName != null && !secondDisplayColumnName.equals("");
 	}
 
 	/**
@@ -745,93 +862,169 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	private void queryData() {
 
-		if (eventList != null) {
-		// .clear() appears to be the correct method vs. .dispose() for working with GlazedLists
-			logger.trace(getColumnForLog() + ": Clearing eventList.");
-			eventList.clear();
-		} else {
-			eventList = new BasicEventList<>();
-		}
-		if (mappings != null) {
-			mappings.clear();
-		} else {
-			mappings = new ArrayList<Long>();
-		}
-		if (options != null) {
-			options.clear();
-		} else {
-			options = new ArrayList<String>();
-		}
-
-		eventList.getReadWriteLock().writeLock().lock();
-
-		Long primaryKey = null;
-		String firstColumnString = null;
-		String secondColumnString = null;
-		SSListItem listItem = null;
-		ResultSet rs = null;
+		//Long primaryKey = null;
+		ResultSet rs;
 
 		// this.data.getReadWriteLock().writeLock().lock();
-		try {
+		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+			logger.trace(getColumnForLog() + ": Clearing eventList.");
+			remodel.clear();
 			logger.debug(getColumnForLog() + ": Nulls allowed? " + getAllowNull());
 			// 2020-07-24: adding support for a nullable first item if nulls are supported
 			// 2020-10-02: For a SSDBComboBox used as a navigator, we don't want a null first item. Look at getBoundColumnName().
 			if (getAllowNull() && (getBoundColumnName()!=null)) {
-				listItem = new SSListItem(null, "");
-				logger.debug(getColumnForLog() + ": Adding blank list item - " + listItem);
-				eventList.add(listItem);
-				mappings.add(listItem.getPrimaryKey());
-				options.add(listItem.getListItem());
+				logger.debug(getColumnForLog() + ": Adding blank list item");
+				remodel.add(null, "");
 			}
 
-			final Statement statement = ssCommon.getSSConnection().getConnection().createStatement();
+			Statement statement = ssCommon.getSSConnection().getConnection().createStatement();
 			rs = statement.executeQuery(getQuery());
+
+			//optionColumnType = getJDBCColumnType(rs, rs.findColumn(displayColumnName));
+
+			// Configure the listItemFormat with this queries column types
+			listItemFormat.clear();
+			listItemFormat.addElemType(comboInfo.getOptionListItemElemIndex(),
+					getJDBCColumnType(rs, rs.findColumn(displayColumnName)));
+			if (hasOption2()) {
+				//option2ColumnType = getJDBCColumnType(rs, rs.findColumn(secondDisplayColumnName));
+				listItemFormat.addElemType(comboInfo.getOption2ListItemElemIndex(),
+						getJDBCColumnType(rs, rs.findColumn(secondDisplayColumnName)));
+			}
 
 			logger.debug(getColumnForLog() + ": Query - " + getQuery());
 
 			while (rs.next()) {
-				// extract primary key
-				primaryKey = rs.getLong(getPrimaryKeyColumnName());
-
-				// extract first column string
-				// getStringValue() takes care of formatting dates
-				firstColumnString = getStringValue(rs, displayColumnName);
-				logger.trace(getColumnForLog() + ": First column to display - " + firstColumnString);
-
-				// extract second column string, if applicable
-				// getStringValue() takes care of formatting dates
-				secondColumnString = null;
-				if ((secondDisplayColumnName != null) && !secondDisplayColumnName.equals("")) {
-					secondColumnString = rs.getString(secondDisplayColumnName);
-					if (secondColumnString.equals("")) {
-						secondColumnString = null;
-					}
-					logger.trace(getColumnForLog() + ": Second column to display - " + secondColumnString);
+				Long pk = rs.getLong(getPrimaryKeyColumnName());
+				Object opt = rs.getObject(displayColumnName);
+				Object opt2 = hasOption2() ? rs.getObject(secondDisplayColumnName) : null;
+				logger.trace(getColumnForLog() + ": First column to display - " + opt);
+				if (hasOption2()) {
+					logger.trace(getColumnForLog() + ": Second column to display - " + opt2);
 				}
-
-				// build eventList item
-				if (secondColumnString != null) {
-					listItem = new SSListItem(primaryKey, firstColumnString + separator + secondColumnString);
-				} else {
-					listItem = new SSListItem(primaryKey, firstColumnString);
-				}
-
-				// add to lists
-				eventList.add(listItem);
-				mappings.add(listItem.getPrimaryKey());
-				options.add(listItem.getListItem());
-
+				remodel.add(pk, opt, opt2);
 			}
 			rs.close();
+
+//				// extract primary key
+//				primaryKey = rs.getLong(getPrimaryKeyColumnName());
+//
+//				// extract first column string
+//				// getStringValue() takes care of formatting dates
+//				// TODO: just get an object and use toString
+//				String displayString = getStringValue(optionColumnType, rs, displayColumnName);
+//				logger.trace(getColumnForLog() + ": First column to display - " + displayString);
+//
+//				// extract second column string, if applicable
+//				// getStringValue() takes care of formatting dates
+//				if (hasOption2()) {
+//					String secondColumnString = getStringValue(option2ColumnType, rs, secondDisplayColumnName);
+//					if (!secondColumnString.isEmpty()) {
+//						displayString += separator + secondColumnString;
+//					}
+//					logger.trace(getColumnForLog() + ": Second column to display - " + secondColumnString);
+//				}
+//
+//				// add to lists
+//				remodel.add(primaryKey, displayString);
+//			}
+//			rs.close();
 
 		} catch (final SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		} catch (final java.lang.NullPointerException npe) {
 			logger.error(getColumnForLog() + ": Null Pointer Exception.", npe);
-		} finally {
-			eventList.getReadWriteLock().writeLock().unlock();
 		}
 	}
+//	private void queryDataXXX() {
+//
+//		if (eventList != null) {
+//		// .clear() appears to be the correct method vs. .dispose() for working with GlazedLists
+//			logger.trace(getColumnForLog() + ": Clearing eventList.");
+//			eventList.clear();
+//		} else {
+//			eventList = new BasicEventList<>();
+//		}
+//		if (mappings != null) {
+//			mappings.clear();
+//		} else {
+//			mappings = new ArrayList<Long>();
+//		}
+//		if (options != null) {
+//			options.clear();
+//		} else {
+//			options = new ArrayList<String>();
+//		}
+//
+//		eventList.getReadWriteLock().writeLock().lock();
+//
+//		Long primaryKey = null;
+//		String firstColumnString = null;
+//		String secondColumnString = null;
+//		SSListItem listItem = null;
+//		ResultSet rs = null;
+//
+//		// this.data.getReadWriteLock().writeLock().lock();
+//		try {
+//			logger.debug(getColumnForLog() + ": Nulls allowed? " + getAllowNull());
+//			// 2020-07-24: adding support for a nullable first item if nulls are supported
+//			// 2020-10-02: For a SSDBComboBox used as a navigator, we don't want a null first item. Look at getBoundColumnName().
+//			if (getAllowNull() && (getBoundColumnName()!=null)) {
+//				listItem = new SSListItem(null, "");
+//				logger.debug(getColumnForLog() + ": Adding blank list item - " + listItem);
+//				eventList.add(listItem);
+//				mappings.add(listItem.getPrimaryKey());
+//				options.add(listItem.getListItem());
+//			}
+//
+//			final Statement statement = ssCommon.getSSConnection().getConnection().createStatement();
+//			rs = statement.executeQuery(getQuery());
+//
+//			logger.debug(getColumnForLog() + ": Query - " + getQuery());
+//
+//			while (rs.next()) {
+//				// extract primary key
+//				primaryKey = rs.getLong(getPrimaryKeyColumnName());
+//
+//				// extract first column string
+//				// getStringValue() takes care of formatting dates
+//				firstColumnString = getStringValue(rs, displayColumnName, 0);
+//				logger.trace(getColumnForLog() + ": First column to display - " + firstColumnString);
+//
+//				// extract second column string, if applicable
+//				// getStringValue() takes care of formatting dates
+//				secondColumnString = null;
+//				if ((secondDisplayColumnName != null) && !secondDisplayColumnName.equals("")) {
+//					secondColumnString = rs.getString(secondDisplayColumnName);
+//					if (secondColumnString.equals("")) {
+//						secondColumnString = null;
+//					}
+//					logger.trace(getColumnForLog() + ": Second column to display - " + secondColumnString);
+//				}
+//
+//				// build eventList item
+//				if (secondColumnString != null) {
+//					listItem = new SSListItem(primaryKey, firstColumnString + separator + secondColumnString);
+//				} else {
+//					listItem = new SSListItem(primaryKey, firstColumnString);
+//				}
+//
+//				// add to lists
+//				eventList.add(listItem);
+//				mappings.add(listItem.getPrimaryKey());
+//				options.add(listItem.getListItem());
+//
+//			}
+//			rs.close();
+//
+//		} catch (final SQLException se) {
+//			logger.error(getColumnForLog() + ": SQL Exception.", se);
+//		} catch (final java.lang.NullPointerException npe) {
+//			logger.error(getColumnForLog() + ": Null Pointer Exception.", npe);
+//		} finally {
+//			eventList.getReadWriteLock().writeLock().unlock();
+//		}
+//	}
 
 	/**
 	 * Removes any necessary listeners for the current SwingSet component. These
@@ -854,6 +1047,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		final String oldValue = dateFormat;
 		dateFormat = _dateFormat;
 		firePropertyChange("dateFormat", oldValue, dateFormat);
+		listItemFormat.setDatePattern(_dateFormat);
 	}
 
 	/**
@@ -871,7 +1065,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param eventList the eventList to set
 	 */
 	public void setEventList(final EventList<SSListItem> eventList) {
-		this.eventList = eventList;
+		// TODO: what/how is this used?
+		throw new UnsupportedOperationException();
+		//this.eventList = eventList;
 	}
 
 	/**
@@ -891,16 +1087,20 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * @param mappings the mappings to set
+	 * @deprecated
 	 */
 	public void setMappings(final ArrayList<Long> mappings) {
-		this.mappings = mappings;
+		throw new UnsupportedOperationException();
+		//this.mappings = mappings;
 	}
 
 	/**
 	 * @param options the options to set
+	 * @deprecated
 	 */
 	public void setOptions(final ArrayList<String> options) {
-		this.options = options;
+		throw new UnsupportedOperationException();
+		//this.options = options;
 	}
 
 	/**
@@ -938,6 +1138,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	public void setSecondDisplayColumnName(final String _secondDisplayColumnName) {
 		final String oldValue = secondDisplayColumnName;
 		secondDisplayColumnName = _secondDisplayColumnName;
+		comboInfo.setOption2Enabled(hasOption2());
 		firePropertyChange("secondDisplayColumnName", oldValue, secondDisplayColumnName);
 	}
 
@@ -976,6 +1177,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //		logger.debug(getColumnForLog() + ": Selected Index AFTER hidePopup()=" + getSelectedIndex());
 
 		// Extract selected item
+			//selectedItem = (SSListItem) _value;
 			selectedItem = (SSListItem) _value;
 
 		// Call to super.setSelectedItem() triggers SSDBComboListener.actionPerformed, which calls getSelectedValue(), which calls getSelectedIndex(), which returns -1 while still in the editor
@@ -1137,21 +1339,24 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		// ONLY NEED TO PROCEED IF THERE IS A CHANGE
 		// TODO consider firing a property change
-		if (_value != getSelectedItem()) {
-
-			// IF OPTIONS ARE NON-NULL THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
-			// SPECIFIED TEXT IS STORED
-			if (options != null) {
-				final int index = options.indexOf(_value);
-
-				if (index == -1) {
-					logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for display text of " + _value + ". Setting index to -1 (blank).");
+		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+			if(!remodel.isEmpty()) {
+				if (_value != getSelectedItem()) {
+					
+					// IF OPTIONS ARE NON-NULL THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
+					// SPECIFIED TEXT IS STORED
+					//final int index = options.indexOf(_value);
+					final int index = remodel.getOptions().indexOf(_value);
+					
+					if (index == -1) {
+						logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for display text of " + _value + ". Setting index to -1 (blank).");
+					}
+					
+					setSelectedIndex(index);
+					//updateUI();
+					
 				}
-
-				setSelectedIndex(index);
-				//updateUI();
 			}
-
 		}
 
 	}
@@ -1179,20 +1384,26 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		// IF MAPPINGS ARE SPECIFIED THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
 		// SPECIFIED CODE IS STORED
-		if (mappings != null) {
-			final int index = mappings.indexOf(_value);
 
-			if (index == -1) {
-				logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for value of " + _value + ". Setting index to -1 (blank).");
+		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+			if (!remodel.isEmpty()) {
+				//final int index = mappings.indexOf(_value);
+				final int index = remodel.getMappings().indexOf(_value);
+				
+				if (index == -1) {
+					logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for value of " + _value + ". Setting index to -1 (blank).");
+				}
+				
+				if (logger.isTraceEnabled()) {
+					logger.trace(getColumnForLog() + ": eventList - " + remodel.getEventList().toString());
+					logger.trace(getColumnForLog() + ": options - " + remodel.getOptions().toString());
+					logger.trace(getColumnForLog() + ": mappings - " + remodel.getMappings().toString());
+				}
+				
+				setSelectedIndex(index);
+			} else {
+				logger.warn(getColumnForLog() + ": No mappings available for current component. No value set by setSelectedValue().");
 			}
-
-			logger.trace(getColumnForLog() + ": eventList - " + eventList.toString());
-			logger.trace(getColumnForLog() + ": options - " + options.toString());
-			logger.trace(getColumnForLog() + ": mappings - " + mappings.toString());
-
-			setSelectedIndex(index);
-		} else {
-			logger.warn(getColumnForLog() + ": No mappings available for current component. No value set by setSelectedValue().");
 		}
 
 	}
@@ -1206,6 +1417,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		final String oldValue = separator;
 		separator = _separator;
 		firePropertyChange("separator", oldValue, separator);
+		listItemFormat.setSeparator(separator);
 	}
 
 	/**
@@ -1254,37 +1466,51 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		boolean result = false;
 
-		if (eventList != null) {
-
-			// LOCK EVENT LIST
-			eventList.getReadWriteLock().writeLock().lock();
-
-			try {
-
-				// GET INDEX FOR mappings and options
-				final int index = mappings.indexOf(_primaryKey);
-
-				// PROCEED IF INDEX WAS FOUND
-				if (index != -1) {
-					options.set(index, _updatedDisplayText);
-					// mappings.remove(index);
+		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+			final int index = remodel.getMappings().indexOf(_primaryKey);
+			if (index < 0) {
+				remodel.setOption(index, _updatedDisplayText);
+				result = true;
 // TODO Confirm that eventList is not reordered by GlazedLists code.
-					eventList.get(index).setListItem(_updatedDisplayText);
-					result = true;
-
-				}
-
-// TODO may need to call repaint()
-
-			} catch (final Exception e) {
-				logger.error(getColumnForLog() + ": Exception.", e);
-			} finally {
-				eventList.getReadWriteLock().writeLock().unlock();
 			}
-
+// TODO may need to call repaint()
+		} catch (final Exception e) {
+			logger.error(getColumnForLog() + ": Exception.", e);
 		}
 
 		return result;
+
+// 		if (eventList != null) {
+// 
+// 			// LOCK EVENT LIST
+// 			eventList.getReadWriteLock().writeLock().lock();
+// 
+// 			try {
+// 
+// 				// GET INDEX FOR mappings and options
+// 				final int index = mappings.indexOf(_primaryKey);
+// 
+// 				// PROCEED IF INDEX WAS FOUND
+// 				if (index != -1) {
+// 					options.set(index, _updatedDisplayText);
+// 					// mappings.remove(index);
+// // TODO Confirm that eventList is not reordered by GlazedLists code.
+// 					eventList.get(index).setListItem(_updatedDisplayText);
+// 					result = true;
+// 
+// 				}
+// 
+// // TODO may need to call repaint()
+// 
+// 			} catch (final Exception e) {
+// 				logger.error(getColumnForLog() + ": Exception.", e);
+// 			} finally {
+// 				eventList.getReadWriteLock().writeLock().unlock();
+// 			}
+// 
+// 		}
+//
+//		return result;
 	}
 
 	/**
@@ -1299,7 +1525,12 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long or Integer
 		try {
 			// 2020-10-05_BP: If initialization is taking place then there won't be any mappings so don't try to update anything yet.
-			if (eventList==null) {
+
+			// TODO: how does this happen?
+			//if (eventList==null) {
+			//	return;
+			//}
+			if (comboInfo.isEmpty()) {
 				return;
 			}
 
@@ -1346,11 +1577,19 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			}
 
 			// TODO Consider commenting this out for performance.
-			String editorString = null;
-			if (getEditor().getItem() != null) {
-				editorString = getEditor().getItem().toString();
-			}
-			logger.debug(getColumnForLog() + ": Combo editor string: " + editorString);
+			//String editorString = null;
+			//if (getEditor().getItem() != null) {
+			//	editorString = getEditor().getItem().toString();
+			//}
+			//logger.debug(getColumnForLog() + ": Combo editor string: " + editorString);
+			logger.debug(() -> {
+				// TODO Consider commenting this out for performance.
+				String editorString = null;
+				if (getEditor().getItem() != null) {
+					editorString = getEditor().getItem().toString();
+				}
+				return getColumnForLog() + ": Combo editor string: " + editorString;
+			});
 
 		} catch (final NumberFormatException nfe) {
 			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
@@ -1372,10 +1611,15 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		boolean result = false;
 
-		if (options != null) {
-			final int index = options.indexOf(_existingDisplayText);
-			result = updateItem(mappings.get(index), _updatedDisplayText);
+		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+			final int index = remodel.getOptions().indexOf(_existingDisplayText);
+			result = updateItem(remodel.getMapping(index), _updatedDisplayText);
 		}
+
+		//if (options != null) {
+		//	final int index = options.indexOf(_existingDisplayText);
+		//	result = updateItem(mappings.get(index), _updatedDisplayText);
+		//}
 
 		return result;
 	}

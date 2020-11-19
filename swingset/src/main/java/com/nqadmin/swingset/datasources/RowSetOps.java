@@ -40,6 +40,7 @@ package com.nqadmin.swingset.datasources;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.JDBCType;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -61,7 +62,7 @@ import com.nqadmin.swingset.utils.SSCommon;
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * Utility class for working with {@link RowSet}s.
+ * Utility class for working with {@link RowSet}s and {@link ResultSet}s.
  * Some methods for converting to/from text from/to objects according
  * to database type. Several convenience methods for accessing metadata.
  * 
@@ -88,40 +89,40 @@ public class RowSetOps {
 	/**
 	 * Returns the number of columns in the underlying ResultSet object
 	 *
-	 * @param _rowSet RowSet on which to operate
+	 * @param _resultSet ResultSet on which to operate
 	 * @return the number of columns
 	 * @throws SQLException - if a database access error occurs
 	 */
-	public static int getColumnCount(final RowSet _rowSet) throws SQLException {
-		return _rowSet.getMetaData().getColumnCount();
+	public static int getColumnCount(final ResultSet _resultSet) throws SQLException {
+		return _resultSet.getMetaData().getColumnCount();
 	}
 
 	/**
 	 * Get the designated column's index
 	 *
-	 * @param _rowSet RowSet on which to operate
+	 * @param _resultSet ResultSet on which to operate
 	 * @param _columnName - name of the column
 	 *
 	 * @return returns the corresponding column index (starting from 1)
 	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
-	public static int getColumnIndex(final RowSet _rowSet, final String _columnName) throws SQLException {
-		return _rowSet.findColumn(_columnName);
+	public static int getColumnIndex(final ResultSet _resultSet, final String _columnName) throws SQLException {
+		return _resultSet.findColumn(_columnName);
 	}
 
 	/**
 	 * Returns the column name for the column index provided
 	 *
-	 * @param _rowSet RowSet on which to operate
+	 * @param _resultSet ResultSet on which to operate
 	 * @param _columnIndex - the column index where the first column is 1, second
 	 *                     column is 2, etc.
 	 * @return the column name of the given column index
 	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
-	public static String getColumnName(final RowSet _rowSet, final int _columnIndex) throws SQLException {
-		return _rowSet.getMetaData().getColumnName(_columnIndex);
+	public static String getColumnName(final ResultSet _resultSet, final int _columnIndex) throws SQLException {
+		return _resultSet.getMetaData().getColumnName(_columnIndex);
 	}
 
 	/**
@@ -233,15 +234,32 @@ public class RowSetOps {
 	 *
 	 * @see "https://docs.oracle.com/javase/7/docs/api/java/sql/Types.html"
 	 *
-	 * @param _rowSet RowSet on which to operate
+	 * @param _resultSet ResultSet on which to operate
 	 * @param _columnIndex - the column index where the first column is 1, second
 	 *                     column is 2, etc.
 	 * @return SQL type from java.sql.Types
 	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
-	public static int getColumnType(final RowSet _rowSet, final int _columnIndex) throws SQLException {
-		return _rowSet.getMetaData().getColumnType(_columnIndex);
+	public static int getColumnType(final ResultSet _resultSet, final int _columnIndex) throws SQLException {
+		return _resultSet.getMetaData().getColumnType(_columnIndex);
+	}
+
+	/**
+	 * Retrieves JDBCType corresponding to the designated column's type based on
+	 * the column index (starting from 1)
+	 *
+	 * @see java.sql.JDBCType
+	 *
+	 * @param _resultSet ResultSet on which to operate
+	 * @param _columnIndex - the column index where the first column is 1, second
+	 *                     column is 2, etc.
+	 * @return JDBCType of the column
+	 *
+	 * @throws SQLException - if a database access error occurs
+	 */
+	public static JDBCType getJDBCColumnType(final ResultSet _resultSet, final int _columnIndex) throws SQLException {
+		return getJDBCType(getColumnType(_resultSet, _columnIndex));
 	}
 
 	/**
@@ -252,13 +270,30 @@ public class RowSetOps {
 	 *
 	 * @param _columnName - name of the column
 	 *
-	 * @param _rowSet RowSet on which to operate
-	 * @return SQL type from java.sql.Types
+	 * @param _resultSet ResultSet on which to operate
+	 * @return JDBCType of the column
 	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
-	public static int getColumnType(final RowSet _rowSet, final String _columnName) throws SQLException {
-		return _rowSet.getMetaData().getColumnType(getColumnIndex(_rowSet, _columnName));
+	public static int getColumnType(final ResultSet _resultSet, final String _columnName) throws SQLException {
+		return _resultSet.getMetaData().getColumnType(getColumnIndex(_resultSet, _columnName));
+	}
+
+	/**
+	 * Retrieves an int corresponding to the designated column's type based on the
+	 * column name
+	 *
+	 * @see java.sql.JDBCType
+	 *
+	 * @param _columnName - name of the column
+	 *
+	 * @param _resultSet ResultSet on which to operate
+	 * @return JDBCType of the column
+	 *
+	 * @throws SQLException - if a database access error occurs
+	 */
+	public static JDBCType getJDBCColumnType(final ResultSet _resultSet, final String _columnName) throws SQLException {
+		return getJDBCType(getColumnType(_resultSet, _columnName));
 	}
 
 	/**

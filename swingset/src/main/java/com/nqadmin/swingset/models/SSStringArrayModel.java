@@ -39,6 +39,10 @@ package com.nqadmin.swingset.models;
 
 import java.sql.JDBCType;
 
+// SSStringArrayModel.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
  * Implementation of SSCollectionModel as an array that uses a database String.
  * The elements in the string are separated by the ascii Unit Separator

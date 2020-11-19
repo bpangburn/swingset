@@ -49,6 +49,10 @@ import javax.sql.RowSet;
 
 import org.apache.logging.log4j.LogManager;
 
+// SSAbstractStringCollectionModel.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
  * A Collection can be represented in a database as a string containing
  * the collection elements separated by a special character. This base

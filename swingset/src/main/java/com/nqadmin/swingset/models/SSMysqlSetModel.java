@@ -39,6 +39,10 @@ package com.nqadmin.swingset.models;
 
 import java.sql.JDBCType;
 
+// SSMysqlSetModel.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
  * Implementation of SSCollectionModel as a set that uses a MySQL
  * SET datatype. In a MySQL database,

@@ -37,31 +37,46 @@
  ******************************************************************************/
 package com.nqadmin.swingset.models;
 
-import java.sql.JDBCType;
+import ca.odell.glazedlists.EventList;
 
-// SSAbstractCollectionModel.java
+// DefaultGlazedListComboInfo.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * This is the superclass for all collection models.
- * Handle the jdbcType info for the collection elements.
- * 
+ * This class adds support for GlazedLists locking.
+ * @see <a target="_top" href="https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html">GlazedLists AutoCompletion javadoc</a>
+ * @see <a href="https://publicobject.com/glazedlistsdeveloper/screencasts/autocompletesupport/">GlazedLists AutoCompletion Video</a>
  * @since 4.0.0
  */
-public abstract class SSAbstractCollectionModel implements SSCollectionModel {
-	private final JDBCType jdbcType;
+public abstract class SSAbstractGlazedListComboInfo extends SSAbstractListInfo {
+
+	protected SSAbstractGlazedListComboInfo(int itemNumElems, EventList<SSListItem> itemList) {
+		super(itemNumElems, itemList);
+	}
 
 	/**
-	 * Indicate and save the type of the collection.
-	 * @param _jdbcType the collection type
+	 * Remodel that locks the GlazedLists EventList.
 	 */
-	public SSAbstractCollectionModel(JDBCType _jdbcType) {
-		jdbcType = _jdbcType != null ? _jdbcType : JDBCType.NULL;
-	}
+	protected abstract class Remodel extends SSAbstractListInfo.Remodel implements AutoCloseable {
 
-	public JDBCType getJDBCType() {
-		return jdbcType;
-	}
+		/**
+		 * This is called during construction,
+		 * take the EventList's write lock.
+		 */
+		@Override
+		protected void takeWriteLock() {
+			((EventList<SSListItem>) itemList).getReadWriteLock().writeLock().lock();
+		}
 
+		/**
+		 * This is called during close,
+		 * release the EventList's write lock.
+		 */
+		@Override
+		protected void releaseWriteLock() {
+			((EventList<SSListItem>) itemList).getReadWriteLock().writeLock().unlock();
+		}
+	}
+	
 }

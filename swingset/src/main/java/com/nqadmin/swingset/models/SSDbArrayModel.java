@@ -49,6 +49,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import static com.nqadmin.swingset.datasources.RowSetOps.*;
 
+// SSDbArrayModel.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
  * Implementation of SSCollectionModel as an array that uses a database
  * {@code JDBCType.ARRAY} for storage. The order of items is preserved by

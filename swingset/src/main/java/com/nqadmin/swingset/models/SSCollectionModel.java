@@ -41,6 +41,10 @@ import java.sql.JDBCType;
 import java.sql.SQLException;
 import javax.sql.RowSet;
 
+// SSCollectionModel.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
  * Read and write a collection of data items from/to database.
  * All items are the same jdbctype. How the items are stored is

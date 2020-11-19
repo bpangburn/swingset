@@ -37,31 +37,23 @@
  ******************************************************************************/
 package com.nqadmin.swingset.models;
 
-import java.sql.JDBCType;
-
-// SSAbstractCollectionModel.java
+// SSListItem.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * This is the superclass for all collection models.
- * Handle the jdbcType info for the collection elements.
+ * Marker interface for items displayed in
+ * SwingSet list and combobox components.
+ * An {@code SSListem} is converted to a String for display
+ * with {@link SSListItemFormat}.
+ * An {@code SSListem} contains an ordered list of elements;
+ * each elem has an associated elemIndex which is typically opaque.
+ * Access to these elements is typically handled through sub-classes
+ * of {@link SSAbstractListInfo}. 
+ * <p>
+ * Compatible with GlazedLists AutoComplete feature.
  * 
- * @since 4.0.0
+ * @see SSAbstractListInfo
  */
-public abstract class SSAbstractCollectionModel implements SSCollectionModel {
-	private final JDBCType jdbcType;
-
-	/**
-	 * Indicate and save the type of the collection.
-	 * @param _jdbcType the collection type
-	 */
-	public SSAbstractCollectionModel(JDBCType _jdbcType) {
-		jdbcType = _jdbcType != null ? _jdbcType : JDBCType.NULL;
-	}
-
-	public JDBCType getJDBCType() {
-		return jdbcType;
-	}
-
+public interface SSListItem {
 }

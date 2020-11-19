@@ -36,19 +36,33 @@
  *   Ernie R. Rael
  ******************************************************************************/
 
+// package-info.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+
 /**
  * This package contains some very different kinds of model.
  * <ul>
- *	<li>models derived from java.swing for use with UI components</li>
- *	<li>models which access a collection of objects taken from a database</li>
+ *	<li>models which manage a collection of objects to/from a database</li>
+ *	<li>models, some derived from java.swing, for use with UI components</li>
  * </ul>
  * <h3>Database Collection Models</h3>
  * These models abstract away the storage specifics; they all 
  * implement {@link com.nqadmin.swingset.models.SSCollectionModel}.
+ * they generally read and write to database.
  * There are subclasses that present data
  * as an array or set independent of how it might be stored in a data.
  * A model
  * could represent data from a single field or data resulting from a join.
+ * <h3>UI support Models</h3>
+ * These models, sub-classes of
+ * {@link com.nqadmin.swingset.models.SSAbstractListInfo},
+ * generally revolve around managing
+ * {@link com.nqadmin.swingset.models.SSListItem}s. An {@code SSListItem}
+ * is generally the item which is visible in a {@code JComboBox}
+ * or {@code JList}.
+ * {@link com.nqadmin.swingset.models.SSAbstractGlazedListComboInfo}
+ * works with {@code GlazedLists} auto completion.
  * 
  * @since 4.0.0
  */
