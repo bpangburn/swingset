@@ -176,11 +176,10 @@ public interface SSDBNav extends Serializable {
 	/**
 	 * Method to perform navigation-related operations.
 	 *
-	 * @param _navType - indicates type of navigation that is occurring
-	 *
+	 * @param _navigationType type of navigation that is occurring
 	 */
-	default void performNavigationOps(final Navigation _navType) {
-		performNavigationOps(_navType.getValue());
+	default void performNavigationOps(final Navigation _navigationType) {
+		// no action by default
 
 	}
 
