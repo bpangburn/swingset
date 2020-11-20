@@ -123,12 +123,20 @@ public interface SSRowSet extends RowSet {
 		String value = null;
 
 		try {
-			// IF THE COLUMN IS NULL SO RETURN NULL
-			if ((getColumnCount()==0) || (getObject(_columnName) == null)) {
+			// IF THERE ARE NO COLUMNS IN THE ROWSET, RETURN NULL
+			if (getColumnCount()==0) {
+				LogManager.getLogger().debug("Call to getColumnText() for column=" + _columnName + ", but the RowSet has no columns.");
 				return null;
 			}
 
 			final int columnType = getColumnType(_columnName);
+		
+			LogManager.getLogger().debug("getObject() for " + _columnName + " of type " + JDBCType.valueOf(columnType).getName() + " returns " + getObject(_columnName));
+			
+			// RETURN NULL IF THE OBJECT REQUESTED IS NULL
+			if (getObject(_columnName) == null) {
+				return null;
+			}
 
 			// BASED ON THE COLUMN DATA TYPE THE CORRESPONDING FUNCTION
 			// IS CALLED TO GET THE VALUE IN THE COLUMN
