@@ -568,6 +568,8 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 
 		// TODO consider firing a property change
 		
+		logger.debug(getColumnForLog() + ": Currently selected value: " + getSelectedValue() + ", New value: " + _value + ".");
+
 		// ONLY NEED TO PROCEED IF THERE IS A CHANGE
 		if (_value != getSelectedValue()) {
 
@@ -625,6 +627,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 		
 		try {
 			// Expecting an integer so trim in case the database column is a String AND has padding
+			logger.debug(getColumnForLog() + ": getBoundColumnText() returns " + getBoundColumnText());
 			final String text = getBoundColumnText().trim();
 
 			// GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD
