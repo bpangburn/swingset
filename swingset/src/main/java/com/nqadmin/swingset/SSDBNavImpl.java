@@ -42,7 +42,9 @@ import java.awt.Container;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
@@ -125,13 +127,14 @@ public class SSDBNavImpl implements SSDBNav {
 		final Component[] comps = _container.getComponents();
 
 		for (int i = 0; i < comps.length; i++) {
+			
+			//logger.debug("Clearing component type of: " + comps[i].getClass().getSimpleName() + ". Loop index=" + i);
 
             if (comps[i] instanceof JTextField) {
                 // IF IT IS A SSFormattedTextField SET ITS VALUE TO NULL (to avoid parse exception)
-                   if(comps[i] instanceof SSFormattedTextField){
+                   if (comps[i] instanceof SSFormattedTextField) {
         	       		((SSFormattedTextField)comps[i]).setValue(null);
-                   }
-                   else{
+                   } else {
                    // IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING
 		                ((JTextField)comps[i]).setText("");
                    }
@@ -154,8 +157,14 @@ public class SSDBNavImpl implements SSDBNav {
             } else if(comps[i] instanceof JSlider) {
             // IF IT IS A JSlider, SET TO AVERAGE OF MIN/MAX VALUES
                 ((JSlider)comps[i]).setValue((((JSlider)comps[i]).getMinimum() + ((JSlider)comps[i]).getMaximum()) / 2);
+            } else if(comps[i] instanceof JRootPane) {
+            // IF IT IS A JRootPane RECURSIVELY SET THE FIELDS
+                setComponents((Container)comps[i]);
             } else if(comps[i] instanceof JPanel) {
             // IF IT IS A JPanel RECURSIVELY SET THE FIELDS
+                setComponents((Container)comps[i]);
+            } else if(comps[i] instanceof JLayeredPane) {
+            // IF IT IS A JLayeredPane RECURSIVELY SET THE FIELDS
                 setComponents((Container)comps[i]);
             } else if(comps[i] instanceof JTabbedPane) {
             // IF IT IS A JTabbedPane RECURSIVELY SET THE FIELDS
