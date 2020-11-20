@@ -41,6 +41,8 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -51,6 +53,7 @@ import org.apache.logging.log4j.Logger;
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.datasources.SSConnection;
+import com.nqadmin.swingset.utils.SSEnums.Navigation;
 import com.nqadmin.swingset.utils.SSFormViewScreenHelper;
 
 /**
@@ -85,7 +88,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	JLabel lblPartCity = new JLabel("City");
 	
 	// SwingSet Components
-	SSTextField txtPartID = new SSTextField();
+	//SSTextField txtPartID = new SSTextField();
 	SSTextField txtPartName = new SSTextField();
 	SSComboBox cmbPartColor = new SSComboBox();
 	SSTextField txtPartWeight = new SSTextField();
@@ -101,6 +104,9 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		// Instantiate Screen
 		super("Example 4 Using Helper", new SSConnection(_dbConn), pkColumn, null, screenQuery, cmbNavDisplayColumn, null, null, cmbNavQuery);
 		
+		// For H2, the rowset has to be requeried following a record insertion or deletion
+		setRequeryAfterInsertOrDelete(true);
+		
 		// Finish Initialization
 		initScreen();
 		
@@ -109,17 +115,14 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 
 	}
 
-
-
 	@Override
 	protected void activateDeactivateComponents() throws Exception {
-		// DISABLE THE PRIMARY KEY
-		txtPartID.setEnabled(false);
+		// nothing to do...
 	}
 
 	@Override
 	protected void addComponents() throws Exception {
-		// SET LABEL DIMENSIONS
+	// SET LABEL DIMENSIONS
 		lblSelectPart.setPreferredSize(MainClass.labelDim);
 		lblPartID.setPreferredSize(MainClass.labelDim);
 		lblPartName.setPreferredSize(MainClass.labelDim);
@@ -129,11 +132,14 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 
 	// SET BOUND COMPONENT DIMENSIONS
 		getCmbNavigator().setPreferredSize(MainClass.ssDim);
-		txtPartID.setPreferredSize(MainClass.ssDim);
+		getTxtPrimaryKey().setPreferredSize(MainClass.ssDim);
 		txtPartName.setPreferredSize(MainClass.ssDim);
 		cmbPartColor.setPreferredSize(MainClass.ssDim);
 		txtPartWeight.setPreferredSize(MainClass.ssDim);
 		txtPartCity.setPreferredSize(MainClass.ssDim);
+		
+	// SET COMBO OPTIONS
+		cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
 
 	// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
 		final Container contentPane = getContentPane();
@@ -158,7 +164,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		constraints.gridy = 0;
 		contentPane.add(getCmbNavigator(), constraints);
 		constraints.gridy = 1;
-		contentPane.add(txtPartID, constraints);
+		contentPane.add(getTxtPrimaryKey(), constraints);
 		constraints.gridy = 2;
 		contentPane.add(txtPartName, constraints);
 		constraints.gridy = 3;
@@ -175,65 +181,24 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	}
 
 	@Override
+	protected void addCustomListeners() throws Exception {
+		// nothing to do...
+	}
+	
+	@Override
+	protected void addNewRecordToCmbNavigator() {
+		// nothing to do because H2 requires that the rowset be 
+		// requeried following a record insertion or deletion
+		
+	}
+
+	@Override
 	protected void bindComponents() throws Exception {
-		txtPartID.bind(getRowset(), "part_id");
+		//txtPartID.bind(getRowset(), "part_id");
 		txtPartName.bind(getRowset(), "part_name");
 		cmbPartColor.bind(getRowset(), "color_code");
 		txtPartWeight.bind(getRowset(), "weight");
 		txtPartCity.bind(getRowset(), "city");
-	}
-
-	@Override
-	protected void ssDBNavPerformCancelOps() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void ssDBNavPerformNavigationOps(int _navigationType) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void ssDBNavPerformPostDeletionOps() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void ssDBNavPerformPostInsertOps() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void ssDBNavPerformPreDeletionOps() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void ssDBNavPerformPreInsertOps() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void ssDBNavPerformRefreshOps() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void updateSSDBComboBoxes() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void addCustomListeners() throws Exception {
-		// nothing to do...
 	}
 
 	@Override
@@ -254,12 +219,85 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		return null;
 	}
 
+	/**
+	 * Obtain and set the PK value for the new record.
+	 */
+	@Override
+	protected void retrieveAndSetNewPrimaryKey() {
+
+		try {
+
+		// GET THE NEW RECORD ID.
+			final ResultSet rs = getSSConnection().getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+					.executeQuery("SELECT nextval('part_data_seq') as nextVal;");
+			rs.next();
+			final int partID = rs.getInt("nextVal");
+			//txtPartID.setText(String.valueOf(partID));
+			getTxtPrimaryKey().setText(String.valueOf(partID));
+			rs.close();
+			
+		} catch(final SQLException se) {
+			logger.error("SQL Exception occured initializing new record.",se);
+		} catch(final Exception e) {
+			logger.error("Exception occured initializing new record.",e);
+		}
+
+	}
+
 	@Override
 	protected void setDefaultValues() throws Exception {
-		txtPartName.setText(null);
-		cmbPartColor.setSelectedValue(0);
+		//txtPartName.setText(null);
+		//cmbPartColor.setSelectedValue(0);
 		txtPartWeight.setText("0");
-		txtPartCity.setText(null);
+		//txtPartCity.setText(null);
+	}
+
+	@Override
+	protected void ssDBNavPerformCancelOps() {
+		// nothing to do...
+
+	}
+
+	@Override
+	protected void ssDBNavPerformNavigationOps(Navigation _navigationType) {
+		// nothing to do...
+
+	}
+
+	@Override
+	protected void ssDBNavPerformPostDeletionOps() {
+		// nothing to do...
+		
+	}
+
+	@Override
+	protected void ssDBNavPerformPostInsertOps() {
+		// nothing to do...
+		
+	}
+
+	@Override
+	protected void ssDBNavPerformPreDeletionOps() {
+		// nothing to do...
+
+	}
+
+	@Override
+	protected void ssDBNavPerformPreInsertOps() {
+		// nothing to do...
+
+	}
+
+	@Override
+	protected void ssDBNavPerformRefreshOps() {
+		// nothing to do...
+
+	}
+
+	@Override
+	protected void updateSSDBComboBoxes() {
+		// nothing to do...
+
 	}
 
 }

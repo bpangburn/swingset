@@ -327,6 +327,10 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	
 	/**
 	 * Sets any default values for the screen's components.
+	 * <p>
+	 * If there is a call to SSDBNavImpl.performPreInsertOps(), it should
+	 * take care of clearing all of the component values before defaults are
+	 * set.
 	 * 
 	 * @throws Exception exception thrown while setting default values for screen components
 	 */

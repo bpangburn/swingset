@@ -53,6 +53,7 @@ import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
+import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 //SSFormViewScreenHelper.java
 //
@@ -130,51 +131,67 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 */
 		@Override
 		public void performCancelOps() {
-			super.performCancelOps();
+			// super.performCancelOps();
 			getCmbNavigator().setEnabled(true);
 			ssDBNavPerformCancelOps();
 		}
 
 		/**
-		 * Close any child screens and perform any other actions specified.
+		 * Close any child screens and performs any other developer
+		 * specified actions following the specified record
+		 * navigation.
 		 *
-		 * @param _navigationType code indicating type of navigation
+		 * @param _navigationType Enum indicating type of navigation
 		 */
 		@Override
-		public void performNavigationOps(final int _navigationType) {
+		//public void performNavigationOps(final int _navigationType) {
+		public void performNavigationOps(final Navigation _navigationType) {
+			//super.performNavigationOps(_navigationType);
 			closeChildScreens();
 			ssDBNavPerformNavigationOps(_navigationType);
 		}
 
 		/**
-		 * Delete the account and perform any other actions specified.
+		 * Deletes the appropriate entry from the combo navigator and performs
+		 * any other developer specified actions following a record deletion.
 		 */
 		@Override
 		public void performPostDeletionOps() {
-			super.performPostDeletionOps();
-			getCmbNavigator().deleteItem(pkOfDeletedRecord);
+			//super.performPostDeletionOps();
+			if (requeryAfterInsertOrDelete) {
+			// FOR SOME DATABASES LIKE H2, WE HAVE TO REQUERY THE ROWSET
+				updateScreen(getParentID());
+			} else {
+				getCmbNavigator().deleteItem(pkOfDeletedRecord);
+			}
 			ssDBNavPerformPostDeletionOps();
 			pkOfDeletedRecord=null; 
 		}
 
 		/**
-		 * Enables the record selector, adds the new record, and performs any other
-		 * actions specified.
+		 * Adds the new record to the combo navigator, enables the combo navigator,
+		 * and performs any other developer specified actions following a record insertion.
 		 */
 		@Override
 		public void performPostInsertOps() {
-			super.performPostInsertOps();
+			//super.performPostInsertOps();
+			if (requeryAfterInsertOrDelete) {
+			// FOR SOME DATABASES LIKE H2, WE HAVE TO REQUERY THE ROWSET
+				updateScreen(getParentID());
+			} else {
+				addNewRecordToCmbNavigator();
+			}
 			getCmbNavigator().setEnabled(true);
 			ssDBNavPerformPostInsertOps();
 		}
 
 		/**
-		 * Get the ID of the record to be deleted and performs any other actions
-		 * specified.
+		 * Gets the primary key value for the record to be deleted
+		 * and performs any other developer specified actions prior to a record deletion.
 		 */
 		@Override
 		public void performPreDeletionOps() {
-			super.performPreDeletionOps();
+			//super.performPreDeletionOps();
 			try {
 				pkOfDeletedRecord = getRowset().getLong(getPkColumn());
 			} catch (final SQLException se) {
@@ -185,25 +202,40 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		}
 
 		/**
-		 * Disables the record selector, sets the PK value for the new record, and
-		 * performs any other actions specified.
+		 * Disables the combo navigator, queries and sets the primary key value
+		 * for the new record, and performs any other developer specified actions
+		 * prior to a record insertion.
 		 */
 		@Override
 		public void performPreInsertOps() {
-			super.performPreInsertOps();
+			super.performPreInsertOps(); // THIS CALL RECURSIVELY CLEARS ALL OF THE COMPONENT VALUES
 			getCmbNavigator().setEnabled(false);
+			retrieveAndSetNewPrimaryKey();
+			try {
+				setDefaultValues();
+			} catch (final Exception e) {
+				logger.error("Exception.", e);
+				JOptionPane.showMessageDialog(container, "Database error while setting default values for new record.");
+			}
 			ssDBNavPerformPreInsertOps();
 		}
 
 		/**
-		 * Turn off sync manager, update any SSDBComboBoxes, and perform any other actions
-		 * specified.initRowset
+		 * Turns off the sync manager, updates any SSDBComboBoxes, and perform any other
+		 * developer specified actions during a record refresh.
 		 */
 		@Override
 		public void performRefreshOps() {
-			super.performRefreshOps();
+			//super.performRefreshOps();
 			getSyncManager().async();
+			try {
+				updateCmbNavigatorData();
+			} catch (final Exception e) {
+				logger.error("Exception.", e);
+				JOptionPane.showMessageDialog(container, "Database error while refreshing record display.");
+			}
 			updateSSDBComboBoxes();
+			// TODO: call activateDeactivateComponents() ??
 			ssDBNavPerformRefreshOps();
 			getSyncManager().sync();
 		}
@@ -224,8 +256,11 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	private String cmbDisplayColumn1 = null; // name of the 1st database column to display in the combo navigator
 	private String cmbDisplayColumn2 = null; // name of the 2nd database column to display in the combo navigator
 	private String cmbSeparator = null; // character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator
+	
+	private boolean requeryAfterInsertOrDelete = false; // for some databases like H2, you have to call .execute() on the rowset following insertion or deletion
 
-	private SSTextField txtParentID = new SSTextField(); // Always keep a SSTextField with the parent ID.
+	//private SSTextField txtParentID = new SSTextField(); // Always keep a SSTextField with the parent ID.
+	private SSTextField txtPrimaryKey = new SSTextField(); // Always keep a SSTextField with the primary key.
 
 	/**
 	 * Constructs a Form View screen with the specified title and attaches it to the
@@ -403,6 +438,14 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	}
 
 	/**
+	 * Adds a newly inserted record to the combo navigator.
+	 * <p>
+	 * This can be empty if a call is made to {@code #setRequeryAfterInsertOrDelete(true);}
+	 * because in that case the combo navigator will be requeried.
+	 */
+	protected abstract void addNewRecordToCmbNavigator();
+
+	/**
 	 * Initialize and bind screen components.
 	 * 
 	 * @throws Exception exception thrown while binding components
@@ -494,6 +537,13 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	protected SSDataNavigator getDataNavigator() {
 		return dataNavigator;
 	}
+	
+	/**
+	 * @return boolean indicating if .execute() has to be called on rowset following insertion or deletion
+	 */
+	protected boolean getRequeryAfterInsertOrDelete() {
+		return requeryAfterInsertOrDelete;
+	}
 
 	/**
 	 * @return the sync manager keeping the combo navigator and data navigator in sync
@@ -502,12 +552,19 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		return syncManager;
 	}
 
+//	/**
+//	 * @return the txtParentID
+//	 */
+//	@Deprecated
+//	protected SSTextField getTxtParentID() {
+//		return txtParentID;
+//	}
+	
 	/**
-	 * @return the txtParentID
+	 * @return the text field bound to the primary key column
 	 */
-	@Deprecated
-	protected SSTextField getTxtParentID() {
-		return txtParentID;
+	protected SSTextField getTxtPrimaryKey() {
+		return txtPrimaryKey;
 	}
 
 	/**
@@ -586,6 +643,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			// INITIALIZE COMBO NAVIGATOR
 			initCmbNavigator();
 			
+			// BIND PRIMARY KEY
+			txtPrimaryKey.bind(getRowset(), getPkColumn());
+			
 			// INITIALIZE and BIND SCREEN COMPONENTS
 			bindComponents();
 
@@ -606,6 +666,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 
 			// ACTIVATE/DEACTIVATE SCREEN COMPONENTS
 			activateDeactivateComponents();
+			
+			// DISABLE PRIMARY KEY
+			txtPrimaryKey.setEnabled(false);
 
 			// ADD SCREEN LISTENERS
 			addCoreListeners();
@@ -642,6 +705,11 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		logger.error("initScreen() Method no longer supported. These parameters should be passed to the appropriate constructor.");
 		
 	}
+	
+	/**
+	 * Retrieve and set the primary key value for a new record.
+	 */
+	protected abstract void retrieveAndSetNewPrimaryKey();
 	
 	/**
 	 * @param _cmbDisplayColumn1 name of the 1st database column to display in the combo navigator
@@ -691,6 +759,13 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	private void setDataNavigator(final SSDataNavigator _dataNavigator) {
 		dataNavigator = _dataNavigator;
 	}
+	
+	/**
+	 * @param _requeryAfterInsertOrDelete sets boolean indicating if .execute() has to be called on rowset following insertion or deletion
+	 */
+	protected void setRequeryAfterInsertOrDelete(boolean _requeryAfterInsertOrDelete) {
+		requeryAfterInsertOrDelete = _requeryAfterInsertOrDelete;
+	}
 
 	/**
 	 * @param _syncManager the sync manager used to keep the selection combo and data navigator in sync 
@@ -699,14 +774,14 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		syncManager = _syncManager;
 	}
 
-	/**
-	 * @param _txtParentID the ID of the parent record's primary key (screen rowset foreign key)
-	 */
-	@Deprecated
-	// TODO Determine if this is needed.
-	public void setTxtParentID(final SSTextField _txtParentID) {
-		txtParentID = _txtParentID;
-	}
+//	/**
+//	 * @param _txtParentID the ID of the parent record's primary key (screen rowset foreign key)
+//	 */
+//	@Deprecated
+//	// TODO Determine if this is needed.
+//	public void setTxtParentID(final SSTextField _txtParentID) {
+//		txtParentID = _txtParentID;
+//	}
 
 	/**
 	 * Perform any checks to determine if data can be deleted. If return value is
@@ -752,13 +827,14 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	protected abstract void ssDBNavPerformCancelOps();
 
 	/**
-	 * Perform any actions needed after a navigation takes place.
+	 * Perform any actions needed after the specified Navigation
+	 * takes place.
+	 * <p>
+	 * The helper manages closing of any child screens.
 	 *
-	 * Helper manages closing of any child screens. NO ACTION REQUIRED.
-	 *
-	 * @param _navigationType code indicating type of navigation
+	 * @param _navigationType Enum indicating type of navigation
 	 */
-	protected abstract void ssDBNavPerformNavigationOps(int _navigationType);
+	protected abstract void ssDBNavPerformNavigationOps(Navigation _navigationType);
 
 	/**
 	 * Perform any actions needed after a deletion.
@@ -783,10 +859,10 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	protected abstract void ssDBNavPerformPreDeletionOps();
 
 	/**
-	 * Set the PK value for the new record and perform any other actions needed before
-	 * an insert.
-	 *
-	 * Helper manages disabling of record selector, but setting of PK is required.
+	 * Any actions required prior to an insert.
+	 * <p>
+	 * Helper takes care of disabling combo navigator, retrieving the primary key for
+	 * the new records, and setting default values.
 	 */
 	protected abstract void ssDBNavPerformPreInsertOps();
 
