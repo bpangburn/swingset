@@ -1,0 +1,6 @@
+[patterns]
+**.png = BIN
+**.gif = BIN
+**.nbm = BIN
+**.jar = BIN
+** = native
