@@ -867,7 +867,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		// this.data.getReadWriteLock().writeLock().lock();
 		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
-			logger.trace(getColumnForLog() + ": Clearing eventList.");
+			logger.trace("{}: Clearing eventList.", () -> getColumnForLog());
 			remodel.clear();
 			logger.debug(getColumnForLog() + ": Nulls allowed? " + getAllowNull());
 			// 2020-07-24: adding support for a nullable first item if nulls are supported
@@ -898,9 +898,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				Long pk = rs.getLong(getPrimaryKeyColumnName());
 				Object opt = rs.getObject(displayColumnName);
 				Object opt2 = hasOption2() ? rs.getObject(secondDisplayColumnName) : null;
-				logger.trace(getColumnForLog() + ": First column to display - " + opt);
+				logger.trace("{}: First column to display - " + opt, () -> getColumnForLog());
 				if (hasOption2()) {
-					logger.trace(getColumnForLog() + ": Second column to display - " + opt2);
+					logger.trace("{}: Second column to display - " + opt2, () -> getColumnForLog());
 				}
 				remodel.add(pk, opt, opt2);
 			}
@@ -913,7 +913,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //				// getStringValue() takes care of formatting dates
 //				// TODO: just get an object and use toString
 //				String displayString = getStringValue(optionColumnType, rs, displayColumnName);
-//				logger.trace(getColumnForLog() + ": First column to display - " + displayString);
+//				logger.trace("{}: First column to display - " + displayString, () -> getColumnForLog());
 //
 //				// extract second column string, if applicable
 //				// getStringValue() takes care of formatting dates
@@ -922,7 +922,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //					if (!secondColumnString.isEmpty()) {
 //						displayString += separator + secondColumnString;
 //					}
-//					logger.trace(getColumnForLog() + ": Second column to display - " + secondColumnString);
+//					logger.trace("{}: Second column to display - " + secondColumnString, () -> getColumnForLog());
 //				}
 //
 //				// add to lists
@@ -940,7 +940,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //
 //		if (eventList != null) {
 //		// .clear() appears to be the correct method vs. .dispose() for working with GlazedLists
-//			logger.trace(getColumnForLog() + ": Clearing eventList.");
+//			logger.trace("{}: Clearing eventList.", () -> getColumnForLog());
 //			eventList.clear();
 //		} else {
 //			eventList = new BasicEventList<>();
@@ -989,7 +989,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //				// extract first column string
 //				// getStringValue() takes care of formatting dates
 //				firstColumnString = getStringValue(rs, displayColumnName, 0);
-//				logger.trace(getColumnForLog() + ": First column to display - " + firstColumnString);
+//				logger.trace("{}: First column to display - " + firstColumnString, () -> getColumnForLog());
 //
 //				// extract second column string, if applicable
 //				// getStringValue() takes care of formatting dates
@@ -999,7 +999,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //					if (secondColumnString.equals("")) {
 //						secondColumnString = null;
 //					}
-//					logger.trace(getColumnForLog() + ": Second column to display - " + secondColumnString);
+//					logger.trace("{}: Second column to display - " + secondColumnString, () -> getColumnForLog());
 //				}
 //
 //				// build eventList item

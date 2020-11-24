@@ -122,8 +122,8 @@ public class SSCommon implements Serializable {
 		@Override
 		public void changedUpdate(final DocumentEvent de) {
 			lastChange++;
-			logger.trace(getColumnForLog() + " - changedUpdate(): lastChange=" + lastChange
-					+ ", lastNotifiedChange=" + lastNotifiedChange);
+			logger.trace("{} - changedUpdate(): lastChange=" + lastChange
+					+ ", lastNotifiedChange=" + lastNotifiedChange, () -> getColumnForLog());
 			
 			// Delay execution of logic until all listener methods are called for current event
 			// See: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
@@ -144,13 +144,13 @@ public class SSCommon implements Serializable {
 
 		@Override
 		public void insertUpdate(final DocumentEvent de) {
-			logger.trace(getColumnForLog());
+			logger.trace("{}", () -> getColumnForLog());
 			changedUpdate(de);
 		}
 
 		@Override
 		public void removeUpdate(final DocumentEvent de) {
-			logger.trace(getColumnForLog());
+			logger.trace("{}", () -> getColumnForLog());
 			changedUpdate(de);
 		}
 
