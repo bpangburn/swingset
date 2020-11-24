@@ -32,6 +32,9 @@
 		<version.maven-javadoc-plugin>3.2.0</version.maven-javadoc-plugin>
 		<version.maven-gpg-plugin>1.6</version.maven-gpg-plugin>
 		<version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
+		<version.maven-surefire-plugin>3.0.0-M5</version.maven-surefire-plugin>
+		<version.maven-failsafe-plugin>3.0.0-M5</version.maven-failsafe-plugin>
+		<version.junit-jupiter-any>5.7.0</version.junit-jupiter-any>
 	</properties>
 
 	<licenses>
@@ -87,12 +90,45 @@
 			<artifactId>log4j-api</artifactId>
 			<version>${version.log4j}</version>
 		</dependency>
-
 		<!-- https://mvnrepository.com/ *** NEED LINK *** -->
 		<dependency>
 			<groupId>com.nqadmin.rowset</groupId>
 			<artifactId>jdbcrowsetimpl</artifactId>
 			<version>${version.jdbcrowsetimpl}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-surefire-plugin</artifactId>
+			<version>${version.maven-surefire-plugin}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-failsafe-plugin -->
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-failsafe-plugin</artifactId>
+			<version>${version.maven-failsafe-plugin}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${version.junit-jupiter-any}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-params</artifactId>
+			<version>${version.junit-jupiter-any}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${version.junit-jupiter-any}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -141,6 +177,16 @@
 					<source>${version.java}</source>
 					<target>${version.java}</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${version.maven-surefire-plugin}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>${version.maven-failsafe-plugin}</version>
 			</plugin>
 
 		</plugins>
