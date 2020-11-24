@@ -121,7 +121,7 @@ public abstract class SSAbstractListInfo {
 	 * and slices that are now active are marked valid.
 	 * Keep a weakreference so they can go away gracefully.
 	 */
-	private List<WeakReference<ItemListElementSlice>> createdLists = new ArrayList<>();
+	private List<WeakReference<ItemElementSlice>> createdLists = new ArrayList<>();
 
 	/**
 	 * The constructor to create SSListItem
@@ -154,12 +154,13 @@ public abstract class SSAbstractListInfo {
 			throw new IllegalArgumentException(
 					"Only change number of items in a ListItem, when SSItemList is empty");
 		}
-		if (nElems < 2 || nElems > 3) {
+		if (nElems < 2 || nElems > 30) {
 			throw new IllegalArgumentException(
-					"Only 2 or 3 items in a ListItem is accepted, not " + nElems);
+					"Only [2:30] items in a ListItem handled, not " + nElems);
 		}
 		validElemsMask = 0;
-		Class<?> clazz = nElems == 2 ? ListItem2.class : ListItem3.class;
+		Class<?> clazz = nElems == 2 ? ListItem2.class
+				: nElems == 3 ? ListItem3.class : ListItemAsArray.class;
 		try {
 			listItemConstructor = clazz.getConstructor((new Object[0]).getClass());
 		} catch (NoSuchMethodException|SecurityException ex) {
@@ -169,15 +170,54 @@ public abstract class SSAbstractListInfo {
 
 		// Validate or invalidate any existing slices.
 		// Also toss cleared references.
-		for (Iterator<WeakReference<ItemListElementSlice>> iterator = createdLists.iterator(); iterator.hasNext();) {
-			WeakReference<ItemListElementSlice> elRef = iterator.next();
-			ItemListElementSlice el = elRef.get();
+		for (Iterator<WeakReference<ItemElementSlice>> iterator = createdLists.iterator(); iterator.hasNext();) {
+			WeakReference<ItemElementSlice> elRef = iterator.next();
+			ItemElementSlice el = elRef.get();
 			if (el == null) {
 				iterator.remove();
 				continue;
 			}
 			el.isValid = el.elemIndex < nElems;
 		}
+	}
+
+	/** package access for testing */
+	int checkCreatedLists() {
+		// toss cleared references.
+		for (Iterator<WeakReference<ItemElementSlice>> iterator = createdLists.iterator(); iterator.hasNext();) {
+			WeakReference<ItemElementSlice> elRef = iterator.next();
+			ItemElementSlice el = elRef.get();
+			if (el == null) {
+				iterator.remove();
+				continue;
+			}
+		}
+		return createdLists.size();
+	}
+
+	/** not used. package access for testing */
+	static class SliceInfo {
+		final int elemIndex;
+		final boolean isValid;
+
+		public SliceInfo(int elemIndex, boolean isValid) {
+			this.elemIndex = elemIndex;
+			this.isValid = isValid;
+		}
+
+		@Override
+		public String toString() {
+			return "SliceInfo{" + "elemIndex=" + elemIndex + ", isValid=" + isValid + '}';
+		}
+	}
+	/** not used. package access for testing */
+	SliceInfo sliceInfo(List<Object> l) {
+		ItemElementSlice slice = null;
+		if(l instanceof ItemElementSlice) {
+			slice = (ItemElementSlice) l;
+			return new SliceInfo(slice.elemIndex, slice.isValid);
+		}
+		return null;
 	}
 
 	/**
@@ -263,11 +303,11 @@ public abstract class SSAbstractListInfo {
 		return oldElem;
 	}
 
-	private class ItemListElementSlice extends AbstractList<Object> {
+	private class ItemElementSlice extends AbstractList<Object> {
 		private final int elemIndex;
 		private boolean isValid;
 
-		public ItemListElementSlice(int objectIndex) {
+		public ItemElementSlice(int objectIndex) {
 			this.elemIndex = objectIndex;
 			isValid = (validElemsMask & (1<<elemIndex)) != 0;
 		}
@@ -310,7 +350,7 @@ public abstract class SSAbstractListInfo {
 		if (elemIndex < 0) {
 			throw new IllegalArgumentException("elemIndex must be positive");
 		}
-		ItemListElementSlice el = new ItemListElementSlice(elemIndex);
+		ItemElementSlice el = new ItemElementSlice(elemIndex);
 		createdLists.add(new WeakReference<>(el));
 		return el;
 	}
@@ -543,8 +583,8 @@ public abstract class SSAbstractListInfo {
 		}
 
 		private void checkIndex(int index) {
-			if (index < 0 || index > 1) {
-				throw new IndexOutOfBoundsException(
+			if ((0b011 & (1 << index)) == 0) {
+				throw new ArrayIndexOutOfBoundsException(
 						"Only 0 or 1 index available for this ListItem, not " + index);
 			}
 		}
@@ -567,6 +607,35 @@ public abstract class SSAbstractListInfo {
 			return "{" + arg0 + "," + arg1 + '}';
 		}
 
+		@Override
+		public int hashCode() {
+			int hash = 3;
+			hash = 19 * hash + Objects.hashCode(this.arg0);
+			hash = 19 * hash + Objects.hashCode(this.arg1);
+			return hash;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			final ListItem2 other = (ListItem2) obj;
+			if (!Objects.equals(this.arg0, other.arg0)) {
+				return false;
+			}
+			if (!Objects.equals(this.arg1, other.arg1)) {
+				return false;
+			}
+			return true;
+		}
+
 	}
 
 	/**
@@ -585,7 +654,7 @@ public abstract class SSAbstractListInfo {
 
 		private void checkIndex(int index) {
 			if ((0b0111 & (1 << index)) == 0) {
-				throw new IndexOutOfBoundsException(
+				throw new ArrayIndexOutOfBoundsException(
 						"Only 0, 1 or 2 index available for this ListItem, not " + index);
 			}
 		}
@@ -608,13 +677,43 @@ public abstract class SSAbstractListInfo {
 		public String toString() {
 			return "{" + arg0 + "," + arg1 + "," + arg2 + '}';
 		}
+
+		@Override
+		public int hashCode() {
+			int hash = 3;
+			hash = 47 * hash + Objects.hashCode(this.arg0);
+			hash = 47 * hash + Objects.hashCode(this.arg1);
+			hash = 47 * hash + Objects.hashCode(this.arg2);
+			return hash;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			final ListItem3 other = (ListItem3) obj;
+			if (!Objects.equals(this.arg0, other.arg0)) {
+				return false;
+			}
+			if (!Objects.equals(this.arg1, other.arg1)) {
+				return false;
+			}
+			if (!Objects.equals(this.arg2, other.arg2)) {
+				return false;
+			}
+			return true;
+		}
 	}
 
 	// This can be used for an arbitrary, but fixed, number of items
 	// in an SSListItem. Typically 4 or more items.
-	//
-	// NOT TESTED.
-	// 
 	private static class ListItemAsArray implements ListItem0 {
 		Object[] elems;
 
@@ -634,7 +733,34 @@ public abstract class SSAbstractListInfo {
 
 		@Override
 		public String toString() {
-			return "{" + elems.toString() + '}';
+			return "{" + Arrays.toString(elems) + '}';
 		}
+
+		@Override
+		public int hashCode() {
+			int hash = 7;
+			hash = 83 * hash + Arrays.deepHashCode(this.elems);
+			return hash;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			final ListItemAsArray other = (ListItemAsArray) obj;
+			if (!Arrays.deepEquals(this.elems, other.elems)) {
+				return false;
+			}
+			return true;
+		}
+
+
 	}
 }

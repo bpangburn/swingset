@@ -52,13 +52,31 @@ import com.nqadmin.swingset.models.SSAbstractListInfo.ListItem0;
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
+ * Use this to produce a string representation of an SSListItem.
+ * Configure information about the list item elements,
+ * such as an element's JDBCType.
+ * <p>
+ * Use {@link #format(java.lang.Object)}, where the argument
+ * is an SSListItem, to get the String representation. Note
+ * that if format's argument is not an SSListItem, then an
+ * empty String is produced.
+ * <p>
+ * This is compatible with GlazedLists AutoCompleteSupport.
+ * 
  * @since 4.0.0
  */
 // TODO: Handle considerably more config for specific elem formatting
-//		map: {elemIndex:jdbcType}
-//		map: {jdbcType:format}
+//		map: {elemIndex:jdbcType} DONE
+//		map: {jdbcType:format} NO, there's a format for DATE
 //		map: {elemIndex:format} to override the defaults
 //		possibly option to specify function associated with elemIndex
+//
+// TODO: How about an object which describes an SSListItem properties,
+//		 this would include elements database type, format, ...
+//		 Then use this in preference to individually configuring elems.
+//		 But there's typically only one elem of SSListItem that
+//		 contributes to string description, so...
+//
 public class SSListItemFormat extends Format {
 	private static final long serialVersionUID = 1L;
 	/** default date format pattern */
@@ -73,11 +91,6 @@ public class SSListItemFormat extends Format {
 	protected List<JDBCType> elemTypes = new ArrayList<>(4);
 	/** format these item elem in order */
 	protected List<Integer> itemElemIndexes = new ArrayList<>(4);
-
-	private class ElemType {
-		int elemIndex;
-		JDBCType jdbcType;
-	}
 	
 	/**
 	 * Create a Format. Use {@code setElemType} to specify
@@ -86,8 +99,14 @@ public class SSListItemFormat extends Format {
 	public SSListItemFormat() {
 	}
 
-	/** reset information to prepare to add elements to format */
+	/**
+	 * Clear list item element information in preparation
+	 * to add elements to format.
+	 * Note that formatting defaults are not restored.
+	 */
 	public void clear() {
+		elemTypes.clear();
+		itemElemIndexes.clear();
 	}
 
 	/**
@@ -110,7 +129,8 @@ public class SSListItemFormat extends Format {
 	}
 
 	/**
-	 * Set the default pattern to format dates.
+	 * Set the pattern to format dates.
+	 * Default pattern in "yyyy/dd/MM".
 	 * @param _datePattern pattern used with SimpleDateFormat
 	 */
 	public void setDatePattern(String _datePattern) {
