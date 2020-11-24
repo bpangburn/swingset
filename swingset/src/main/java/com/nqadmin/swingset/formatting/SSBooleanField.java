@@ -326,30 +326,30 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F5) {
-			logger.debug(getColumnForLog() + ": F5 = PROCESS");
+			logger.debug("{}: F5 = PROCESS", () -> getColumnForLog());
 			navigator.doCommitButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F6) {
-			logger.debug(getColumnForLog() + ": F6 = DELETE");
+			logger.debug("{}: F6 = DELETE", () -> getColumnForLog());
 			navigator.doDeleteButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F8) {
-			logger.debug(getColumnForLog() + ": F8");
+			logger.debug("{}: F8", () -> getColumnForLog());
 			navigator.doUndoButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_END) {
-			logger.debug(getColumnForLog() + ": END");
+			logger.debug("{}: END", () -> getColumnForLog());
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_DELETE) {
-			logger.debug(getColumnForLog() + ": DELETE");
+			logger.debug("{}: DELETE", () -> getColumnForLog());
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_HOME) {
-			logger.debug(getColumnForLog() + ": HOME");
+			logger.debug("{}: HOME", () -> getColumnForLog());
 		}
 
 	}

@@ -472,7 +472,15 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * @throws Exception exception thrown while updating the rowset
 	 */
 	protected void updateRowset() throws SQLException, Exception {
-		logger.debug("Rowset query: " + getSelectionQuery());
+		logger.debug("Rowset query: [{}].", () -> {
+			try {
+				return getSelectionQuery();
+			} catch (SQLException se) {
+				return "*** getSelectionQuery() threw an SQL Exception ***";
+			} catch (Exception e) {
+				return "*** getSelectionQuery() threw an Exception ***";
+			}
+		});
 		getRowset().setCommand(getSelectionQuery());
 		getRowset().execute();
 	}

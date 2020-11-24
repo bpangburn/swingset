@@ -396,7 +396,7 @@ public interface SSComponentInterface {
 
 		getSSCommon().setBoundColumnText(_boundColumnText);
 
-		LogManager.getLogger().debug(getColumnForLog() + ": " + _boundColumnText);
+		LogManager.getLogger().debug("{}: " + _boundColumnText, () -> getColumnForLog());
 
 	}
 

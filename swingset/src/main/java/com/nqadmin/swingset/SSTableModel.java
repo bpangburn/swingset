@@ -549,7 +549,13 @@ public class SSTableModel extends AbstractTableModel {
 			}
 			rowset.refreshRow();
 
-			logger.debug("Row number of inserted row : "+ rowset.getRow());
+			logger.debug("Row number of inserted row : {}", () -> {
+				try {
+					return rowset.getRow();
+				} catch (SQLException e) {
+					return "*** getRow() threw an SQLException ***";
+				}
+			});
 
 			if (table != null) {
 				table.updateUI();
@@ -1008,7 +1014,7 @@ public class SSTableModel extends AbstractTableModel {
 			}
 			rowset.updateRow();
 
-			logger.debug("Updated value: " + getValueAt(_row,_column));
+			logger.debug("Updated value: {}.", () -> getValueAt(_row,_column));
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while updating value.",  se);
 			if (component != null) {

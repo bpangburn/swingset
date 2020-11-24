@@ -283,8 +283,8 @@ public class MainClass extends JFrame {
 
 			Class.forName("org.h2.Driver");
 
-			logger.debug("Resource path: " + getClass().getPackage().getName());
-			logger.debug("Resource path: " + getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
+			logger.debug("Resource path: {}.", () -> getClass().getPackage().getName());
+			logger.debug("Resource path: {}.", () -> getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
 
 	        final InputStream inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
         	final InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);

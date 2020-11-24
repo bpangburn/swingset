@@ -98,10 +98,10 @@ public class SSFormattedTextField extends JFormattedTextField
 			boolean result = false;
 
 			if (input instanceof SSFormattedTextField) {
-				logger.debug(getColumnForLog() + ": Instance of SSFormattedTextField.");
+				logger.debug("{}: Instance of SSFormattedTextField.", () -> getColumnForLog());
 				final SSFormattedTextField ssftf = (SSFormattedTextField) input;
 				try {
-					logger.debug(getColumnForLog() + ": Text in Formatted Text Field is " + ssftf.getText() + ".");
+					logger.debug("{}: Text in Formatted Text Field is {}.", () -> getColumnForLog(), () -> ssftf.getText());
 					// this will throw a parse exception if something goes wrong
 					ssftf.commitEdit();
 

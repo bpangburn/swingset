@@ -128,7 +128,7 @@ public class SSDBNavImpl implements SSDBNav {
 
 		for (int i = 0; i < comps.length; i++) {
 			
-			//logger.debug("Clearing component type of: " + comps[i].getClass().getSimpleName() + ". Loop index=" + i);
+			//logger.debug("Clearing component type of: {}. Loop index=" + i, () -> comps[i].getClass().getSimpleName());
 
             if (comps[i] instanceof JTextField) {
                 // IF IT IS A SSFormattedTextField SET ITS VALUE TO NULL (to avoid parse exception)

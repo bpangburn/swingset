@@ -158,7 +158,8 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
 		final JTable jTable = (JTable) ke.getSource();
 
-		logger.debug("Key Released on SSDataGrid. Key Released: " + ke.getKeyCode() + " " +  ((ke.getModifiersEx() & (onMask | offMask)) == onMask));
+		logger.debug("Key Released on SSDataGrid. Key Released: {} {}.", () -> ke.getKeyCode(),
+				() -> ((ke.getModifiersEx() & (onMask | offMask)) == onMask));
 
 		if (((ke.getModifiersEx() & (onMask | offMask)) == onMask) && (ke.getKeyCode() == KeyEvent.VK_C)) {
 			// CHECK IF CONTROL-C IS PRESSED

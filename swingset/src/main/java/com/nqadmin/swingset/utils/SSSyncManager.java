@@ -166,7 +166,7 @@ public class SSSyncManager {
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			} finally {
-				logger.debug(actionPerformedCount++);
+				logger.debug("SyncComboListener actionPerformedCount=" + actionPerformedCount++);
 				rowset.addRowSetListener(rowsetListener);
 			}
 		}

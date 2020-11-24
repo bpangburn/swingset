@@ -131,7 +131,13 @@ public interface SSRowSet extends RowSet {
 
 			final int columnType = getColumnType(_columnName);
 		
-			LogManager.getLogger().debug("getObject() for " + _columnName + " of type " + JDBCType.valueOf(columnType).getName() + " returns " + getObject(_columnName));
+			LogManager.getLogger().debug("getObject() for " + _columnName + " of type {} returns {}.", () ->  JDBCType.valueOf(columnType).getName(), () ->  {
+				try {
+					return getObject(_columnName);
+				} catch (SQLException e) {
+					return "*** getObject() threw an SQL Exception ***";
+				}
+			});
 			
 			// RETURN NULL IF THE OBJECT REQUESTED IS NULL
 			if (getObject(_columnName) == null) {
@@ -305,7 +311,7 @@ public interface SSRowSet extends RowSet {
 			// 	if (_updatedValue!=null) _updatedValue.trim();
 
 
-			LogManager.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? " + _allowNull);
+			LogManager.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "].");
 
 			final int columnType = getColumnType(_columnName);
 

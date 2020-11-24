@@ -105,6 +105,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		super("Example 4 Using Helper", new SSConnection(_dbConn), pkColumn, null, screenQuery, cmbNavDisplayColumn, null, null, cmbNavQuery);
 		
 		// For H2, the rowset has to be requeried following a record insertion or deletion
+		// TODO: Investigate how MySQL handles insert/delete and implement addNewRecordToCmbNavigator if needed.
 		setRequeryAfterInsertOrDelete(true);
 		
 		// Finish Initialization

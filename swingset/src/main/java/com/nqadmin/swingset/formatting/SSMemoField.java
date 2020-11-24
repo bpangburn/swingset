@@ -366,7 +366,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F3) {
-			logger.debug(getColumnForLog() + ": F3");
+			logger.debug("{}: F3", () -> getColumnForLog());
 			// calculator = new javax.swing.JPopupMenu();
 			// calculator.add(new com.nqadmin.swingset.formatting.utils.JCalculator());
 			// JFormattedTextField ob = (JFormattedTextField)(_event.getSource());
@@ -377,40 +377,40 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F4) {
-			logger.debug(getColumnForLog() + ": F4");
+			logger.debug("{}: F4", () -> getColumnForLog());
 			// ((Component)e.getSource()).transferFocus();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F5) {
-			logger.debug(getColumnForLog() + ": F5 = PROCESS");
+			logger.debug("{}: F5 = PROCESS", () -> getColumnForLog());
 			if (navigator.updatePresentRow() == true) {
 				logger.info(getColumnForLog() + ": Update successful.");
 			}
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F6) {
-			logger.debug(getColumnForLog() + ": F6 = DELETE");
+			logger.debug("{}: F6 = DELETE", () -> getColumnForLog());
 			navigator.doDeleteButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_F8) {
-			logger.debug(getColumnForLog() + ": F8");
+			logger.debug("{}: F8", () -> getColumnForLog());
 			// ((Component)e.getSource()).transferFocus();
 			navigator.doUndoButtonClick();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_END) {
-			logger.debug(getColumnForLog() + ": END");
+			logger.debug("{}: END", () -> getColumnForLog());
 			// ((Component)e.getSource()).transferFocus();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_DELETE) {
-			logger.debug(getColumnForLog() + ": DELETE");
+			logger.debug("{}: DELETE", () -> getColumnForLog());
 			// ((Component)e.getSource()).transferFocus();
 		}
 
 		if (_event.getKeyCode() == KeyEvent.VK_HOME) {
-			logger.debug(getColumnForLog() + ": HOME");
+			logger.debug("{}: HOME", () -> getColumnForLog());
 			// ((Component)e.getSource()).transferFocus();
 		}
 

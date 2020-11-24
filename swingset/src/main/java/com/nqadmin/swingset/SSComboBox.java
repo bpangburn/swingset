@@ -121,10 +121,10 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 
 			if (index == -1) {
 				setBoundColumnText(null);
-				logger.debug(getColumnForLog() + ": Setting to null.");
+				logger.debug("{}: Setting to null.", () -> getColumnForLog());
 			} else {
 				setBoundColumnText(String.valueOf(getSelectedValue()));
-				logger.debug(getColumnForLog() + ": Setting to " + getSelectedValue() + ".");
+				logger.debug("{}: Setting to {}.", () -> getColumnForLog(), () -> getSelectedValue());
 			}
 
 			addSSRowSetListener();
@@ -568,7 +568,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 
 		// TODO consider firing a property change
 		
-		logger.debug(getColumnForLog() + ": Currently selected value: " + getSelectedValue() + ", New value: " + _value + ".");
+		logger.debug("{}: Currently selected value: {}, New value: " + _value + ".", () -> getColumnForLog(), () -> getSelectedValue());
 
 		// ONLY NEED TO PROCEED IF THERE IS A CHANGE
 		if (_value != getSelectedValue()) {
@@ -627,7 +627,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 		
 		try {
 			// Expecting an integer so trim in case the database column is a String AND has padding
-			logger.debug(getColumnForLog() + ": getBoundColumnText() returns " + getBoundColumnText());
+			logger.debug("{}: getBoundColumnText() returns {}.", () -> getColumnForLog(), () -> getBoundColumnText());
 			final String text = getBoundColumnText().trim();
 
 			// GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD
