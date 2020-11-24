@@ -172,18 +172,33 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void cursorMoved(final RowSetEvent event) {
-			logger.trace(getColumnForLog());
+			logger.trace("Rowset cursor moved. {}", () -> getColumnForLog());
 			updateSSComponent();
 		}
 
 		/**
 		 * When the database row changes we want to trigger a change to the bound
 		 * Component display/value.
+		 * <p>
+		 * In SSDataNavigator, when a navigation is performed (first, previous,
+		 * next, last) a call is made to updateRow() to flush the rowset to the 
+		 * underlying database prior to a call to first(), previous(), next(),
+		 * or last(). updateRow() triggers rowChanged, but we don't want to update
+		 * the components for the database flush.
+		 * <p>
+		 * Calls to first(), previous(), next(), and last() trigger cursorMoved.
+		 * For a navigation we will updated the components following cursorMoved.
+		 * <p>
+		 * In JdbcRowSetImpl, notifyRowChanged() is called for insertRow(),
+		 * updateRow(), deleteRow(), & cancelRowUpdates(). We only want to block
+		 * component updates for calls resulting from updateRow().
 		 */
 		@Override
 		public void rowChanged(final RowSetEvent event) {
-			logger.trace(getColumnForLog());
-			updateSSComponent();
+			logger.trace("Rowset row changed. {}", () -> getColumnForLog());
+			if (!getSSRowSet().isUpdatingRow()) {
+				updateSSComponent();
+			}
 		}
 
 		/**
@@ -192,7 +207,7 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void rowSetChanged(final RowSetEvent event) {
-			logger.trace(getColumnForLog());
+			logger.trace("Rowset changed. {}", () -> getColumnForLog());
 			updateSSComponent();
 		}
 

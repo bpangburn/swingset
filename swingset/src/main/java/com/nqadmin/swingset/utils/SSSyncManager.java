@@ -182,9 +182,28 @@ public class SSSyncManager {
 			adjustValue();
 		}
 
+		/**
+		 * When the database row changes we want to trigger a change to the bound
+		 * combo navigator.
+		 * <p>
+		 * In SSDataNavigator, when a navigation is performed (first, previous,
+		 * next, last) a call is made to updateRow() to flush the rowset to the 
+		 * underlying database prior to a call to first(), previous(), next(),
+		 * or last(). updateRow() triggers rowChanged, but we don't want to update
+		 * the combo navigator for the database flush.
+		 * <p>
+		 * Calls to first(), previous(), next(), and last() trigger cursorMoved.
+		 * For a navigation we will updated the combo navigator following cursorMoved.
+		 * <p>
+		 * In JdbcRowSetImpl, notifyRowChanged() is called for insertRow(),
+		 * updateRow(), deleteRow(), & cancelRowUpdates(). We only want to block
+		 * combo navigator updates for calls resulting from updateRow().
+		 */
 		@Override
 		public void rowChanged(final RowSetEvent rse) {
-			adjustValue();
+			if (!rowset.isUpdatingRow()) {
+				adjustValue();
+			}
 		}
 
 		@Override

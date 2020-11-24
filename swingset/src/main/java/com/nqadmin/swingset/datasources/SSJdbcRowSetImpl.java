@@ -66,6 +66,14 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -3556990832719097405L;
+	
+	/**
+	 * Keep track of when we're calling @code{sSRowSet.updateRow();} so
+	 * that we don't make unnecessary calls in SSCommon or
+	 * SSSyncManager.
+	 */
+	// TODO should this be declared volitile??
+	private boolean updatingRow = false;
 
 	/**
 	 * Empty constructor
@@ -155,6 +163,16 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	public SSConnection getSSConnection() {
 		return new SSConnection(getConnection());
 	}
+	
+	/**
+	 * Indicates if a call to updateRow() is in progress flushing/committing
+	 * rowset changes to the underlying database.
+	 * 
+	 * @return indicates if a call to updateRow() is in progress
+	 */
+	public boolean isUpdatingRow() {
+		return updatingRow;
+	}
 
 	/**
 	 * Sets and executes the query for a RowSet.
@@ -196,6 +214,31 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	@Deprecated
 	public void setSSConnection(final SSConnection _ssConnection) {
 		setConnection(_ssConnection.getConnection());
+	}
+	
+	/**
+	 * Adds setting a boolean flag while committing rowset changes to the database.
+	 * <p>
+	 * In SSDataNavigator, when a navigation is performed (first, previous,
+	 * next, last) a call is made to updateRow() to flush the rowset to the 
+	 * underlying database prior to a call to first(), previous(), next(),
+	 * or last(). updateRow() triggers rowChanged, but we don't want to update
+	 * components for the database flush.
+	 * <p>
+	 * Calls to first(), previous(), next(), and last() trigger cursorMoved.
+	 * For a navigation we will updated the components following cursorMoved.
+	 * <p>
+	 * In JdbcRowSetImpl, notifyRowChanged() is called for insertRow(),
+	 * updateRow(), deleteRow(), & cancelRowUpdates(). We only want to block
+	 * component updates for calls resulting from updateRow().
+	 * 
+	 * @throws SQLException	SQLException
+	 */
+	@Override
+	public void updateRow() throws SQLException {
+		updatingRow=true;
+		super.updateRow();
+		updatingRow=false;
 	}
 
 }
