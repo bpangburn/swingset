@@ -612,6 +612,11 @@ public class MainClass extends JFrame {
 	 */
 	public static void main(final String[] _args) {
 		boolean some_error = false;
+		System.err.println(String.format("java:%s vm:%s date:%s os:%s",
+				System.getProperty("java.version"),
+				System.getProperty("java.vm.version"),
+				System.getProperty("java.version.date"),
+				System.getProperty("os.name")));
 
 		Getopt g = new Getopt(cmdName, _args, "hvdinrp:s:");
 
