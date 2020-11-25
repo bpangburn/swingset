@@ -41,6 +41,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
+import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -327,7 +328,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		eventList = new BasicEventList<SSListItem>();
 		comboInfo = new ComboInfo(eventList, false);
 		listItemFormat = new SSListItemFormat();
-		listItemFormat.setDatePattern(dateFormat);
+		listItemFormat.setPattern(JDBCType.DATE, dateFormat);
 	}
 
 	/**
@@ -1047,7 +1048,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		final String oldValue = dateFormat;
 		dateFormat = _dateFormat;
 		firePropertyChange("dateFormat", oldValue, dateFormat);
-		listItemFormat.setDatePattern(_dateFormat);
+		listItemFormat.setPattern(JDBCType.DATE, _dateFormat);
 	}
 
 	/**

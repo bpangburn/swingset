@@ -43,6 +43,7 @@ import java.text.Format;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 
 import com.nqadmin.swingset.models.SSAbstractListInfo.ListItem0;
@@ -53,8 +54,19 @@ import com.nqadmin.swingset.models.SSAbstractListInfo.ListItem0;
 
 /**
  * Use this to produce a string representation of an SSListItem.
- * Configure information about the list item elements,
- * such as an element's JDBCType.
+ * Configure information about the list item elements type and the order
+ * the elements are formatted with {@link #addElemType}.
+ * Time related elements can have a format pattern specified;
+ * The time patterns use {@link java.text.SimpleDateFormat}.
+ * If the pattern is null, then toString() is used to format the pattern.
+ * <pre>
+ * {@code
+ * The default patterns are:
+ *    JDBCType.DATE       "yyyy/MM/dd"
+ *    JDBCType.TIME,      "HH:mm:ss"
+ *    JDBCType.TIMESTAMP, "yyyy/MM/dd'T'HH:mm:ss"
+ * }
+ * </pre>
  * <p>
  * Use {@link #format(java.lang.Object)}, where the argument
  * is an SSListItem, to get the String representation. Note
@@ -78,25 +90,32 @@ import com.nqadmin.swingset.models.SSAbstractListInfo.ListItem0;
 //		 contributes to string description, so...
 //
 public class SSListItemFormat extends Format {
+	public static final String dateDefault = "yyyy/MM/dd";
+	public static final String timeDefault = "HH:mm:ss";
+	public static final String timestampDefault = "yyyy/MM/dd'T'HH:mm:ss";
 	private static final long serialVersionUID = 1L;
-	/** default date format pattern */
-	public static final String defaultDatePattern = "yyyy/dd/MM";
 	/** default elem separator */
 	public static final String defaultSeparator = " | ";
 	private static final FieldPosition FP0 = new FieldPosition(0);
 
-	private String datePattern = defaultDatePattern;
 	private String separator = defaultSeparator;
 	/** elemTypes.get(elemIndex) == jdbcType. Cheap map. Null is unspecified type */
 	protected List<JDBCType> elemTypes = new ArrayList<>(4);
 	/** format these item elem in order */
 	protected List<Integer> itemElemIndexes = new ArrayList<>(4);
+
+	// allow customization of date/time formats
+	private EnumMap<JDBCType, String> patterns = new EnumMap<>(JDBCType.class);
+
 	
 	/**
-	 * Create a Format. Use {@code setElemType} to specify
+	 * Create a Format. Use {@code addElemType} to specify
 	 * elements, in order, that are formatted.
 	 */
 	public SSListItemFormat() {
+		patterns.put(JDBCType.DATE, dateDefault);
+		patterns.put(JDBCType.TIME, timeDefault);
+		patterns.put(JDBCType.TIMESTAMP, timestampDefault);
 	}
 
 	/**
@@ -129,26 +148,31 @@ public class SSListItemFormat extends Format {
 	}
 
 	/**
-	 * Set the pattern to format dates.
-	 * Default pattern in "yyyy/dd/MM".
-	 * @param _datePattern pattern used with SimpleDateFormat
+	 * Set SimpleDateFormat's format pattern to use for the specified jdbc type.
+	 * Only DATE, TIME, TIMESTAMP jdbctype are allowed. If the pattern
+	 * is null, then toString is used for the specified type.
+	 * 
+	 * @param _jdbcType all elements of this type use the specified pattern
+	 * @param _pattern format pattern
+	 * @return the previous format string
 	 */
-	public void setDatePattern(String _datePattern) {
-		datePattern = _datePattern;
+	public String setPattern(JDBCType _jdbcType, String _pattern) {
+		if (!patterns.containsKey(_jdbcType)) {
+			throw new IllegalArgumentException("JDBCType " + _jdbcType + " not handled");
+		}
+		return patterns.put(_jdbcType, _pattern);
 	}
 
 	/**
-	 * @return the current date pattern
+	 * Get the pattern used for the specified JDBCType.
+	 * @param _jdbcType the JDBCTyep
+	 * @return the pattern or null
 	 */
-	public String getDatePattern() {
-		return datePattern;
-	}
-
-	/**
-	 * @return the separator
-	 */
-	public String getSeparator() {
-		return separator;
+	public String getPattern(JDBCType _jdbcType) {
+		if (!patterns.containsKey(_jdbcType)) {
+			throw new IllegalArgumentException("JDBCType " + _jdbcType + " not handled");
+		}
+		return patterns.get(_jdbcType);
 	}
 
 	/**
@@ -157,6 +181,13 @@ public class SSListItemFormat extends Format {
 	 */
 	public void setSeparator(String separator) {
 		this.separator = separator;
+	}
+
+	/**
+	 * @return the separator
+	 */
+	public String getSeparator() {
+		return separator;
 	}
 	
 	@Override
@@ -193,8 +224,15 @@ public class SSListItemFormat extends Format {
 		JDBCType jdbcType = elemTypes.get(_elemIndex);
 		switch(jdbcType) {
 		case DATE:
-			SimpleDateFormat dateFormat = new SimpleDateFormat(datePattern);
-			dateFormat.format(elem, _sb, FP0);
+		case TIME:
+		case TIMESTAMP:
+			String pattern = patterns.get(jdbcType);
+			if (pattern != null) {
+				SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+				dateFormat.format(elem, _sb, FP0);
+			} else {
+				_sb.append(elem.toString());
+			}
 			break;
 		default:
 			if(elem != null) {
