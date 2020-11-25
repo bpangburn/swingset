@@ -48,6 +48,7 @@ import javax.sql.RowSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import static com.nqadmin.swingset.datasources.RowSetOps.*;
+import java.util.Arrays;
 
 // SSDbArrayModel.java
 //
@@ -111,7 +112,7 @@ public class SSDbArrayModel extends SSAbstractCollectionModel {
 		
 		try {
 			if (dbArray instanceof Object[]) {
-				data = castJDBCToJava(_jdbcType, (Object[])dbArray);
+				data = Arrays.asList(castJDBCToJava(_jdbcType, (Object[])dbArray));
 			} else {
 				data = new ArrayList<>();
 				// Handle array of primitives

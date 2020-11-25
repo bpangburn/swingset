@@ -45,10 +45,8 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import javax.sql.RowSet;
 import javax.sql.RowSetListener;
@@ -56,6 +54,10 @@ import javax.sql.RowSetListener;
 import org.apache.logging.log4j.LogManager;
 
 import com.nqadmin.swingset.utils.SSCommon;
+
+import java.time.Instant;
+import java.util.EnumMap;
+import java.util.EnumSet;
 
 // RowSetOps.java
 //
@@ -306,6 +308,31 @@ public class RowSetOps {
 		_rowSet.removeRowSetListener(_rowSetListener);
 	}
 
+	private static EnumSet<JDBCType> textUpdateEmptyOK = EnumSet.of(
+			JDBCType.CHAR,
+			JDBCType.VARCHAR,
+			JDBCType.LONGVARCHAR
+	);
+	
+	private static EnumSet<JDBCType> textUpdateOK = EnumSet.of(
+			JDBCType.INTEGER,
+			JDBCType.SMALLINT,
+			JDBCType.TINYINT,
+			JDBCType.BIGINT,
+			JDBCType.FLOAT,
+			JDBCType.DOUBLE,
+			JDBCType.NUMERIC,
+			JDBCType.DECIMAL,
+			JDBCType.BOOLEAN,
+			JDBCType.BIT,
+			JDBCType.DATE,
+			JDBCType.TIME,
+			JDBCType.TIMESTAMP,
+			JDBCType.CHAR,
+			JDBCType.VARCHAR,
+			JDBCType.LONGVARCHAR
+	);
+
 	/**
 	 * Method used by SwingSet component listeners to update the underlying
 	 * SSRowSet.
@@ -325,7 +352,6 @@ public class RowSetOps {
 	 */
 	public static void updateColumnText(final RowSet _rowSet, final String _updatedValue, final String _columnName, final boolean _allowNull) throws NullPointerException, SQLException, NumberFormatException {
 
-//		try {
 
 			// TODO Add proper support for null vs "" based on _allowNull. For Char types all "" are currently forced to null,
 //			if (!_allowNull && _updatedValue==null) {
@@ -342,136 +368,15 @@ public class RowSetOps {
 			// 	if (_updatedValue!=null) _updatedValue.trim();
 
 
-			LogManager.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? " + _allowNull);
+		LogManager.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? " + _allowNull);
 
-			final int columnType = getColumnType(_rowSet, _columnName);
+		JDBCType jdbcType = getJDBCType(getColumnType(_rowSet, _columnName));
+		
+		if (!textUpdateOK.contains(jdbcType)) {
+			LogManager.getLogger().error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
+			return;
+		}
 
-			switch (columnType) {
-			// FOR NON-TEXT-BASED DATABASE COLUMNS, WRITE NULL INSTEAD OF AN EMPTY STRING
-
-			case Types.INTEGER:
-			case Types.SMALLINT:
-			case Types.TINYINT:
-				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						_rowSet.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-				} else {
-					final int intValue = Integer.parseInt(_updatedValue);
-					_rowSet.updateInt(_columnName, intValue);
-				}
-				break;
-
-			case Types.BIGINT:
-				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						_rowSet.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-				} else {
-					final long longValue = Long.parseLong(_updatedValue);
-					_rowSet.updateLong(_columnName, longValue);
-				}
-				break;
-
-			case Types.FLOAT:
-				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						_rowSet.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-				} else {
-					final float floatValue = Float.parseFloat(_updatedValue);
-					_rowSet.updateFloat(_columnName, floatValue);
-				}
-				break;
-
-			case Types.DOUBLE:
-			case Types.NUMERIC:
-			case Types.DECIMAL:
-				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						_rowSet.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-				} else {
-					final double doubleValue = Double.parseDouble(_updatedValue);
-					_rowSet.updateDouble(_columnName, doubleValue);
-				}
-				break;
-
-			case Types.BOOLEAN:
-			case Types.BIT:
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						_rowSet.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-				} else {
-					// CONVERT THE GIVEN STRING TO BOOLEAN TYPE
-					final boolean boolValue = Boolean.valueOf(_updatedValue);
-					_rowSet.updateBoolean(_columnName, boolValue);
-				}
-				break;
-
-			case Types.DATE:
-				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						_rowSet.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-// TODO Good to get rid of getSQLDate if possible.
-				} else if (_updatedValue.length() == 10) {
-					_rowSet.updateDate(_columnName, SSCommon.getSQLDate(_updatedValue));
-				} else {
-					// do nothing
-				}
-				break;
-
-			case Types.TIME:
-				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						_rowSet.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-				} else {
-					_rowSet.updateTime(_columnName, java.sql.Time.valueOf(_updatedValue));
-				}
-				break;
-
-			case Types.TIMESTAMP:
-				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						_rowSet.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-// TODO Probably do not want a length of 10 characters here. Good to get rid of getSQLDate if possible.
-				} else if (_updatedValue.length() == 10) {
-					_rowSet.updateTimestamp(_columnName, new Timestamp(SSCommon.getSQLDate(_updatedValue).getTime()));
-				} else {
-					// do nothing
-				}
-				break;
-
-			case Types.CHAR:
-			case Types.VARCHAR:
-			case Types.LONGVARCHAR:
 				// FOR TEXT-BASED DATABASE COLUMNS WE CAN WRITE AN EMPTY STRING, BUT IF THERE IS
 				// A UNIQUE CONSTRAINT ON THE COLUMN
 				// THIS CAUSES A PROBLEM SO WE WRITE NULL
@@ -483,29 +388,91 @@ public class RowSetOps {
 //					this.updateString(_columnName, _updatedValue);
 //				}
 
-				if (_updatedValue==null) {
-					if (_allowNull) {
-						_rowSet.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-				} else {
-					_rowSet.updateString(_columnName, _updatedValue);
-				}
-				break;
+			// First do null handling
+			// FOR NON-TEXT-BASED DATABASE COLUMNS, WRITE NULL INSTEAD OF AN EMPTY STRING
 
-			default:
-				LogManager.getLogger().error("Unsupported data type of " + JDBCType.valueOf(columnType).getName() + " for column " + _columnName + ".");
-			} // end switch
+			// TODO: would isBlank be better?
 
-//		} catch (SQLException se) {
-//			LogManager.getLogger().error("SQL Exception for column " + _columnName + ".", se);
-//		} catch (NumberFormatException nfe) {
-//			LogManager.getLogger().error("Number Format Exception for column " + _columnName + ".", nfe);
-//		}
+		if (_updatedValue == null
+				|| _updatedValue.isEmpty() && !textUpdateEmptyOK.contains(jdbcType)) {
+			if (_allowNull) {
+				_rowSet.updateNull(_columnName);
+			} else {
+				throw new NullPointerException("Null values are not allowed for this field.");
+			}
+		}
+		
+		switch (jdbcType) {
+		// FOR NON-TEXT-BASED DATABASE COLUMNS, WRITE NULL INSTEAD OF AN EMPTY STRING
+		
+		case INTEGER:
+		case SMALLINT:
+		case TINYINT:
+			final int intValue = Integer.parseInt(_updatedValue);
+			_rowSet.updateInt(_columnName, intValue);
+			break;
+			
+		case BIGINT:
+			final long longValue = Long.parseLong(_updatedValue);
+			_rowSet.updateLong(_columnName, longValue);
+			break;
+			
+		case FLOAT:
+			final float floatValue = Float.parseFloat(_updatedValue);
+			_rowSet.updateFloat(_columnName, floatValue);
+			break;
+			
+		case DOUBLE:
+		case NUMERIC:
+		case DECIMAL:
+			final double doubleValue = Double.parseDouble(_updatedValue);
+			_rowSet.updateDouble(_columnName, doubleValue);
+			break;
+			
+		case BOOLEAN:
+		case BIT:
+			// CONVERT THE GIVEN STRING TO BOOLEAN TYPE
+			final boolean boolValue = Boolean.valueOf(_updatedValue);
+			_rowSet.updateBoolean(_columnName, boolValue);
+			break;
+			
+		case DATE:
+// TODO Good to get rid of getSQLDate if possible.
+			if (_updatedValue.length() == 10) {
+				Date dateValue = SSCommon.getSQLDate(_updatedValue);
+				_rowSet.updateDate(_columnName, dateValue);
+			} else {
+				// do nothing
+			}
+			break;
+			
+		case TIME:
+			Time timeValue = java.sql.Time.valueOf(_updatedValue);
+			_rowSet.updateTime(_columnName, timeValue);
+			break;
+			
+			
+		case TIMESTAMP:
+// TODO Probably do not want a length of 10 characters here. Good to get rid of getSQLDate if possible.
+			if (_updatedValue.length() == 10) {
+				Timestamp timestampValue = new Timestamp(SSCommon.getSQLDate(_updatedValue).getTime());
+				_rowSet.updateTimestamp(_columnName, timestampValue);
+			} else {
+				// do nothing
+			}
+			break;
+			
+		case CHAR:
+		case VARCHAR:
+		case LONGVARCHAR:
+			_rowSet.updateString(_columnName, _updatedValue);
+			break;
+
+		default:
+			throw new IllegalStateException("switch cases out of sync");
+		} // end switch
 
 	} // end protected void updateColumnText(String _updatedValue, String _columnName)
-		// {
 
 	/**
 	 * Convenience method for getting {@link JDBCType} enum from
@@ -522,22 +489,33 @@ public class RowSetOps {
 	}
 
 	/**
-	 * Cast each element of the object array to {@code JDBCType}.
-	 * Convenience method that invokes {@code castJDBCToJava}.
-	 * This is a convenience method.
+	 * Copy the elements of the _objects array into into
+	 * an array of the correct type for the {@code JDBCType}d objects.
+	 * <p>
+	 * If an array or even a collection of the accurate type is desired,
+	 * you can do the follow which is type safe, no compiler warnings.
+	 * There will be an exception if something is afoul.
+	 * <pre>
+	 * {@code
+	 * Object[] arr = f(); // But I "know" the elements are Integer
+	 * Integer[] newarr = (Integer[]) castJDBCToJava(JDBCType.INTEGER, arr);
+	 * List<Integer> properList = Arrays.asList(newarr);
+	 * }
+	 * </pre>
 	 * @param _objects array of objects to cast
 	 * @param _jdbcType cast objects to this JDBCType
-	 * @return List of cast objects
+	 * @return array of corresponding type to the cast input objects
 	 * @throws SQLException This exception wraps a {@code ClassCastException}
 	 */
-	public static List<Object> castJDBCToJava(final JDBCType _jdbcType, final Object[] _objects) throws SQLException {
-		// TODO: get an array object of the correct type.
-		final List<Object> data = new ArrayList<>();
-		for (final Object val : _objects) {
-			data.add(castJDBCToJava(_jdbcType, val));
+	public static Object[] castJDBCToJava(final JDBCType _jdbcType, final Object[] _objects) throws SQLException {
+		Class<?> clazz = findJavaTypeClass(_jdbcType);
+		Object[] newArray = (Object[]) java.lang.reflect.Array.newInstance(clazz, _objects.length);
+		try {
+			System.arraycopy(_objects, 0, newArray, 0, _objects.length);
+		} catch(ArrayStoreException ex) {
+			throw new SQLException(ex);
 		}
-		return data;
-		
+		return newArray;
 	}
 
 	/**
@@ -549,37 +527,59 @@ public class RowSetOps {
 	 * @throws SQLException This exception wraps a {@code ClassCastException}
 	 */
 	public static Object castJDBCToJava(final JDBCType _jdbcType, final Object _object) throws SQLException {
-		Object outputObject = null;
-		
 		try {
-			switch (_jdbcType) {
+			return findJavaTypeClass(_jdbcType).cast(_object);
+		} catch (ClassCastException ex) {
+			throw new SQLException(ex);
+		}
+	}
+
+
+	// TODO: for override of type mapping for local/dbms requirements
+	// with_timezone might be the perfect candidates
+	private static EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType = new EnumMap<JDBCType, Class<?>>(JDBCType.class);
+	/**
+	 * Determine the Java type class for the given database type.
+	 * @param _jdbcType JDBCType of interest
+	 * @return the class object used for the given type
+	 * @throws SQLException if the JDBCType is not handled
+	 */
+	public static Class<?> findJavaTypeClass(final JDBCType _jdbcType)
+	throws SQLException {
+		Class<?> clazz = overrideJdbcToJavaType.getOrDefault(_jdbcType, null);
+		if (clazz != null) {
+			return clazz;
+		}
+
+		switch (_jdbcType) {
 			case INTEGER:
 			case SMALLINT:
 			case TINYINT:
-				outputObject = (Integer)_object;
+				clazz = Integer.class;
 				break;
 			case BIT:
-				outputObject = (Boolean)_object;
+				clazz = Boolean.class;
 				break;
 			case BIGINT:
-				outputObject = (Long)_object;
+				clazz = Long.class;
 				break;
 			case FLOAT:
 			case DOUBLE:
 			case REAL:
-				outputObject = (Double)_object;
+				clazz = Double.class;
 				break;
 			case DECIMAL:
 			case NUMERIC:
-				outputObject = (BigDecimal)_object;
+				clazz = BigDecimal.class;
 				break;
 			case DATE:
 			case TIME:
 			case TIMESTAMP:
-				// TODO: _WITH_TIMEZONE handling
-				// case TIME_WITH_TIMEZONE:
-				// case TIMESTAMP_WITH_TIMEZONE:
-				outputObject = (java.util.Date)_object;
+				clazz = java.util.Date.class;
+				break;
+			case TIME_WITH_TIMEZONE:
+			case TIMESTAMP_WITH_TIMEZONE:
+				clazz = Instant.class;
 				break;
 			case CHAR:
 			case VARCHAR:
@@ -587,16 +587,11 @@ public class RowSetOps {
 			case NCHAR:
 			case NVARCHAR:
 			case LONGNVARCHAR:
-				outputObject = (String)_object;
+				clazz = String.class;
 				break;
 			default:
-				outputObject = _object;
-				break;
-			}
-		} catch (ClassCastException ex) {
-			throw new SQLException(ex);
+				throw new SQLException("Unhandled type: " + _jdbcType);
 		}
-		return outputObject;
+		return clazz;
 	}
-
 }
