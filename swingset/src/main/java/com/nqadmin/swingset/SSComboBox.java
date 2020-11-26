@@ -627,12 +627,13 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 		
 		try {
 			// Expecting an integer so trim in case the database column is a String AND has padding
-			logger.debug("{}: getBoundColumnText() returns {}.", () -> getColumnForLog(), () -> getBoundColumnText());
-			final String text = getBoundColumnText().trim();
+			final String rawText = getBoundColumnText();
+			logger.debug("{}: getBoundColumnText() returns {}.", () -> getColumnForLog(), () -> rawText);
+			final String trimmedText = rawText.trim();
 
 			// GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD
-			if ((text != null) && !(text.equals(""))) {
-				final int comboCode = Integer.parseInt(text);
+			if ((trimmedText != null) && !(trimmedText.equals(""))) {
+				final int comboCode = Integer.parseInt(trimmedText);
 
 				setSelectedValue(comboCode);
 
