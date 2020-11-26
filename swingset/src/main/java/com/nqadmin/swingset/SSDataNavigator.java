@@ -308,6 +308,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("FIRST button clicked.");
+				sSRowSet.removeRowSetListener(sSRowSetListener);
 				try {
 					if (modification) {
 						if (!dBNav.allowUpdate()) {
@@ -330,6 +331,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 				}
+				sSRowSet.addRowSetListener(sSRowSetListener);
 			}
 		});
 
@@ -339,6 +341,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("PREVIOUS button clicked.");
+				sSRowSet.removeRowSetListener(sSRowSetListener);
 				try {
 					// if( sSRowSet.rowUpdated() )
 					if (modification) {
@@ -363,6 +366,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 				}
+				sSRowSet.addRowSetListener(sSRowSetListener);
 			}
 		});
 
@@ -373,6 +377,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("NEXT button clicked.");
+				sSRowSet.removeRowSetListener(sSRowSetListener);
 				try {
 					// if( sSRowSet.rowUpdated() )
 					if (modification) {
@@ -397,6 +402,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 				}
+				sSRowSet.addRowSetListener(sSRowSetListener);
 			}
 		});
 
@@ -408,6 +414,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("LAST button clicked.");
+				sSRowSet.removeRowSetListener(sSRowSetListener);
 				try {
 					// if( sSRowSet.rowUpdated() )
 					if (modification) {
@@ -431,16 +438,20 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 				}
+				sSRowSet.addRowSetListener(sSRowSetListener);
 			}
 		});
 
-		// THIS BUTTON INSERTS THE ROW AND MOVES TO THE NEWLY INSERTED ROW.
+		// THIS BUTTON COMMITS ANY CHANGES TO THE DATABASE
+		// IF YOU ARE ON THE INSERT ROW FOR
+		// A NEW RECORD, IT INSERTS THE ROW AND MOVES TO THE NEWLY INSERTED ROW.
 		// WHEN INSERT BUTTON IS PRESSED NAVIGATION WILL BE DISABLED SO THOSE HAVE TO BE
-		// ENABLED HERE
+		// RE-ENABLED HERE
 		commitButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("COMMIT button clicked.");
+				sSRowSet.removeRowSetListener(sSRowSetListener);
 				try {
 					if (onInsertRow) {
 						// IF ON INSERT ROW ADD THE ROW.
@@ -492,6 +503,16 @@ public class SSDataNavigator extends JPanel {
 							return;
 						}
 						sSRowSet.updateRow();
+						
+						// 2020-11-24: Generally redundant, but force a refresh the screen with the 
+						// values from the rowset. This will be most noticeable if you have
+						// two fields bound to the same column.
+						// 
+						// sSRowSet.refreshRow() did not accomplish the intended result, but
+						// navigating to the same row using absolute and the current record
+						// number did.
+						sSRowSet.absolute(sSRowSet.getRow());
+						
 						dBNav.performPostUpdateOps();
 					}
 
@@ -500,6 +521,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while saving row.\n" + se.getMessage());
 				}
+				sSRowSet.addRowSetListener(sSRowSetListener);
 			}
 		});
 
@@ -510,6 +532,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("UNDO button clicked.");
+				sSRowSet.removeRowSetListener(sSRowSetListener);
 				try {
 					// CALL MOVE TO CURRENT ROW IF ON INSERT ROW.
 					if (onInsertRow) {
@@ -540,6 +563,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while undoing changes.\n" + se.getMessage());
 				}
+				sSRowSet.addRowSetListener(sSRowSetListener);
 			}
 		});
 
@@ -589,6 +613,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("ADD button clicked.");
+				sSRowSet.removeRowSetListener(sSRowSetListener);
 				try {
 
 					sSRowSet.moveToInsertRow();
@@ -614,6 +639,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while moving to insert row.\n" + se.getMessage());
 				}
+				sSRowSet.addRowSetListener(sSRowSetListener);
 			}
 		});
 
@@ -624,6 +650,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("DELETE button clicked.");
+				sSRowSet.removeRowSetListener(sSRowSetListener);
 				try {
 					if (confirmDeletes) {
 						final int answer = JOptionPane.showConfirmDialog(SSDataNavigator.this,
@@ -672,6 +699,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while deleting row.\n" + se.getMessage());
 				}
+				sSRowSet.addRowSetListener(sSRowSetListener);
 			}
 		});
 
@@ -683,6 +711,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void keyReleased(final KeyEvent ke) {
 				logger.debug("Record number manually updated.");
+				sSRowSet.removeRowSetListener(sSRowSetListener);
 				if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
 					try {
 						final int row = Integer.parseInt(txtCurrentRow.getText().trim());
@@ -693,6 +722,7 @@ public class SSDataNavigator extends JPanel {
 						// do nothing
 					}
 				}
+				sSRowSet.addRowSetListener(sSRowSetListener);
 			}
 		});
 
@@ -935,6 +965,13 @@ public class SSDataNavigator extends JPanel {
 	 */
 	public SSRowSet getSSRowSet() {
 		return sSRowSet;
+	}
+
+	/**
+	 * @return boolean indicating if the navigator is on an insert row
+	 */
+	public boolean isOnInsertRow() {
+		return onInsertRow;
 	}
 
 	/**
@@ -1232,8 +1269,15 @@ public class SSDataNavigator extends JPanel {
 		// SET THE ROW COUNT AS LABEL
 		lblRowCount.setText("of " + rowCount);
 		txtCurrentRow.setText(String.valueOf(currentRow));
+		
+//	    StringBuilder sb = new StringBuilder();
+//	    for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+//	        sb.append(element.toString());
+//	        sb.append("\n");
+//	    }
 
 		logger.debug("Current Row: " + currentRow + ". Row Count: " + rowCount);
+		//logger.debug("Stack trace:\n" + sb);
 
 		// ENABLE OR DISABLE BUTTONS
 		if (rowCount == 0) {
@@ -1271,6 +1315,7 @@ public class SSDataNavigator extends JPanel {
 	 */
 	public boolean updatePresentRow() {
 		if (onInsertRow || (currentRow > 0)) {
+			logger.debug("Calling doCommitButtonClick().");
 			doCommitButtonClick();
 		}
 
