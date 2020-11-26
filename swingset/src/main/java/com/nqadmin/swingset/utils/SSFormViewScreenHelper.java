@@ -131,9 +131,11 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 */
 		@Override
 		public void performCancelOps() {
+			logger.debug("");
 			// super.performCancelOps();
 			getCmbNavigator().setEnabled(true);
 			ssDBNavPerformCancelOps();
+			//getSyncManager().sync();
 		}
 
 		/**
@@ -146,6 +148,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		@Override
 		//public void performNavigationOps(final int _navigationType) {
 		public void performNavigationOps(final Navigation _navigationType) {
+			logger.debug("");
 			//super.performNavigationOps(_navigationType);
 			closeChildScreens();
 			ssDBNavPerformNavigationOps(_navigationType);
@@ -157,15 +160,18 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 */
 		@Override
 		public void performPostDeletionOps() {
+			logger.debug("");
 			//super.performPostDeletionOps();
 			if (requeryAfterInsertOrDelete) {
 			// FOR SOME DATABASES LIKE H2, WE HAVE TO REQUERY THE ROWSET
+// TODO Check this....				
 				updateScreen(getParentID());
 			} else {
 				getCmbNavigator().deleteItem(pkOfDeletedRecord);
 			}
 			ssDBNavPerformPostDeletionOps();
 			pkOfDeletedRecord=null; 
+			//getSyncManager().sync();
 		}
 
 		/**
@@ -174,15 +180,19 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 */
 		@Override
 		public void performPostInsertOps() {
+			logger.debug("");
 			//super.performPostInsertOps();
 			if (requeryAfterInsertOrDelete) {
 			// FOR SOME DATABASES LIKE H2, WE HAVE TO REQUERY THE ROWSET
+// TODO Check this....				
 				updateScreen(getParentID());
 			} else {
 				addNewRecordToCmbNavigator();
 			}
-			getCmbNavigator().setEnabled(true);
+			// 2020-11-25: DATA NAVIGATOR SHOULD TAKE CARE OF ENABLING COMBO NAVIGATOR
+			//getCmbNavigator().setEnabled(true);
 			ssDBNavPerformPostInsertOps();
+			//getSyncManager().sync();
 		}
 
 		/**
@@ -191,6 +201,8 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 */
 		@Override
 		public void performPreDeletionOps() {
+			logger.debug("");
+			//getSyncManager().async();
 			//super.performPreDeletionOps();
 			try {
 				pkOfDeletedRecord = getRowset().getLong(getPkColumn());
@@ -208,8 +220,11 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 */
 		@Override
 		public void performPreInsertOps() {
+			logger.debug("");
+			//getSyncManager().async();
 			super.performPreInsertOps(); // THIS CALL RECURSIVELY CLEARS ALL OF THE COMPONENT VALUES
-			getCmbNavigator().setEnabled(false);
+			// DATA NAVIGATOR SHOULD DISABLE COMBO NAVIGATOR
+			//getCmbNavigator().setEnabled(false);
 			retrieveAndSetNewPrimaryKey();
 			try {
 				setDefaultValues();
@@ -226,6 +241,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 */
 		@Override
 		public void performRefreshOps() {
+			logger.debug("");
 			//super.performRefreshOps();
 			getSyncManager().async();
 			try {
