@@ -40,8 +40,10 @@ package com.nqadmin.swingset;
 import java.awt.Component;
 import java.awt.Container;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
@@ -154,6 +156,12 @@ public class SSDBNavImpl implements SSDBNav {
             } else if(comps[i] instanceof SSLabel) {
             // IF IT IS A SSLabel, SET TO EMPTY STRING
                 ((SSLabel)comps[i]).setText("");
+            } else if(comps[i] instanceof JLabel) {
+            // IF IT IS A JLabel - DO NOTHING
+            	// nothing to do...
+            } else if(comps[i] instanceof JButton) {
+            // IF IT IS A JButton - DO NOTHING
+            	// nothing to do...
             } else if(comps[i] instanceof JSlider) {
             // IF IT IS A JSlider, SET TO AVERAGE OF MIN/MAX VALUES
                 ((JSlider)comps[i]).setValue((((JSlider)comps[i]).getMinimum() + ((JSlider)comps[i]).getMaximum()) / 2);
