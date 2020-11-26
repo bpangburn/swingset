@@ -179,6 +179,7 @@ public class SSSyncManager {
 
 		@Override
 		public void cursorMoved(final RowSetEvent rse) {
+			logger.debug("");
 			adjustValue();
 		}
 
@@ -201,13 +202,16 @@ public class SSSyncManager {
 		 */
 		@Override
 		public void rowChanged(final RowSetEvent rse) {
-			if (!rowset.isUpdatingRow()) {
-				adjustValue();
-			}
+			logger.debug("");
+			// 2020-11-25: Moved check to head of adjustValue()
+			//if (!rowset.isUpdatingRow()) {
+			adjustValue();
+			//}
 		}
 
 		@Override
 		public void rowSetChanged(final RowSetEvent rse) {
+			logger.debug("");
 			adjustValue();
 		}
 
@@ -282,10 +286,14 @@ public class SSSyncManager {
 	}
 
 	/**
-	 * <p>
 	 * Method to update combo box based on rowset.
 	 */
 	protected void adjustValue() {
+		
+		// Ignore rowset listener calls triggered during row insertion or while navigator is calling updateRow() on rowset.
+		if (rowset.isUpdatingRow() || dataNavigator.isOnInsertRow()) {
+			return;
+		}
 
 		comboBox.removeActionListener(comboListener);
 
