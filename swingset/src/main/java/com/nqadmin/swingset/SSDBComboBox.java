@@ -65,7 +65,9 @@ import ca.odell.glazedlists.matchers.TextMatcherEditor;
 import ca.odell.glazedlists.swing.AutoCompleteSupport;
 
 import static com.nqadmin.swingset.datasources.RowSetOps.*;
+import com.nqadmin.swingset.models.SSAbstractGlazedListComboInfo;
 import com.nqadmin.swingset.models.SSListItemFormat;
+
 
 // SSDBComboBox.java
 //
@@ -205,11 +207,19 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * messes up the code. In particular:
 	 * {@code try (DefaultGlazedListComboInfo<Long,String,String>.Remodel remodel = xxx) }
 	 */
-	private static class ComboInfo extends DefaultGlazedListComboInfo<Long,Object,Object> {
-		public ComboInfo(EventList<SSListItem> _eventList, boolean _hasOption2) {
-			super(_eventList, _hasOption2);
+	private static class ComboInfo extends SSAbstractGlazedListComboInfo<Long,Object,Object> {
+		private static final long serialVersionUID = 1L;
+
+		public ComboInfo(boolean _hasOption2) {
+			super(_hasOption2, new BasicEventList<SSListItem>());
+		}
+
+		/** this only works once, use it for install */
+		public EventList<SSListItem> getEventList() {
+			return super.getEventList();
 		}
 	}
+
 	/**
 	 * comboInfo handles eventList, mappings, options access.
 	 */
@@ -326,7 +336,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// Note that call to parent default constructor is implicit.
 		//super();
 		eventList = new BasicEventList<SSListItem>();
-		comboInfo = new ComboInfo(eventList, false);
+		comboInfo = new ComboInfo(false);
 		listItemFormat = new SSListItemFormat();
 		listItemFormat.setPattern(JDBCType.DATE, dateFormat);
 	}
@@ -547,8 +557,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// Note that installing AutoComplete support makes the ComboBox editable.
 		// Should already in the event dispatch thread so don't use invokeAndWait()
 		if (!autoCompleteInstalled) {
-			// TODO: ComboItemFormat - not ready for prime time
-			final AutoCompleteSupport<SSListItem> autoComplete = AutoCompleteSupport.install(this, eventList, null, listItemFormat);
+			final AutoCompleteSupport<SSListItem> autoComplete = AutoCompleteSupport.install(this, comboInfo.getEventList(), null, listItemFormat);
 			autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
 			autoCompleteInstalled = true;
 		}
@@ -633,7 +642,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		
 		// int result = 0;
 
-		return eventList.size();
+		return comboInfo.getSize();
 
 		// if (eventList != null) {
 		// 	result = eventList.size();
@@ -664,6 +673,13 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// 	}
 		// }
 		// return options;
+
+		// or something like should work. Know that comboInfo has strings.
+		// depends on what the caller is looking for.
+
+		// @SuppressWarnings("unchecked")
+		// List<String> foo = (List)comboInfo.getOptions();
+		// return foo;
 	}
 
 	/**
@@ -895,6 +911,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 			logger.debug("{}: Query [{}].", () -> getColumnForLog(), () -> getQuery());
 
+			List<SSListItem> newItems = new ArrayList<>();
 			while (rs.next()) {
 				Long pk = rs.getLong(getPrimaryKeyColumnName());
 				Object opt = rs.getObject(displayColumnName);
@@ -903,8 +920,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				if (hasOption2()) {
 					logger.trace("{}: Second column to display - " + opt2, () -> getColumnForLog());
 				}
-				remodel.add(pk, opt, opt2);
+				newItems.add(remodel.createComboItem(pk, opt, opt2));
 			}
+			remodel.addAll(newItems);
 			rs.close();
 
 //				// extract primary key
@@ -1395,11 +1413,12 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 					logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for value of " + _value + ". Setting index to -1 (blank).");
 				}
 				
-				logger.trace("{}: eventList - [{}].", () -> getColumnForLog(), () ->  remodel.getEventList().toString());
+				logger.trace("{}: eventList - [{}].", () -> getColumnForLog(), () ->  remodel.getItemList().toString());
 				logger.trace("{}: options - [{}].", () -> getColumnForLog(), () ->  remodel.getOptions().toString());
 				logger.trace("{}: mappings - [{}].", () -> getColumnForLog(), () ->  remodel.getMappings().toString());
 				
-				setSelectedIndex(index);
+				setSelectedItem(index == -1 ? null : remodel.get(index));
+				//setSelectedIndex(index);
 			} else {
 				logger.warn(getColumnForLog() + ": No mappings available for current component. No value set by setSelectedValue().");
 			}
@@ -1529,7 +1548,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			//if (eventList==null) {
 			//	return;
 			//}
-			if (comboInfo.isEmpty()) {
+			if (comboInfo.getItemList().isEmpty()) {
 				return;
 			}
 

@@ -71,7 +71,8 @@ import ca.odell.glazedlists.EventList;
  * 
  * @since 4.0.0
  */
-public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComboInfo {
+public abstract class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractListInfo {
+	private static final long serialVersionUID = 1L;
 
 	/** index of primary key in SSListItem */
 	protected static int KEY_IDX = 0;
@@ -88,33 +89,19 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 	private final List<O2> options2; // may be null, depend option2Enabled
 	/** when true, there can be options2 */
 	private boolean option2Enabled = false;
-	
+
 	/**
 	 * Create an empty ComboInfo.
 	 * @param _eventList which is installed into AutoCompleteSupport
 	 * @param _option2Enabled true says to provide an options2 field in SSListItem
 	 */
 	@SuppressWarnings("unchecked")
-	public DefaultGlazedListComboInfo(EventList<SSListItem> _eventList, boolean _option2Enabled) {
-		super(_option2Enabled ? 3 : 2, _eventList);
+	public DefaultGlazedListComboInfo(boolean _option2Enabled, EventList<SSListItem> _itemList) {
+		super(_option2Enabled ? 3 : 2, _itemList);
 		option2Enabled = _option2Enabled;
-		mappings = (List<M>) createElementSlice(0);
-		options = (List<O>) createElementSlice(1);
-		options2 = (List<O2>) createElementSlice(2);
-	}
-
-	/**
-	 * Create a ComboInfo with the specified contents.
-	 * @param _eventList which is installed into AutoCompleteSupport
-	 * @param _option2Enabled true says to provide an options2 field in SSListItem
-	 * @param _mappings initial mappings
-	 * @param _options initial options
-	 * @param _options2  initial options2
-	 */
-	public DefaultGlazedListComboInfo(EventList<SSListItem> _eventList, boolean _option2Enabled,
-			List<M>_mappings, List<O>_options, List<O2>_options2) {
-		this(_eventList, _option2Enabled);
-		addAll(_mappings, _options, _options2);
+		mappings = (List<M>) createElementSlice(KEY_IDX);
+		options = (List<O>) createElementSlice(OPT_IDX);
+		options2 = (List<O2>) createElementSlice(OPT2_IDX);
 	}
 	
 	/**
@@ -188,23 +175,14 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 	}
 
 	/**
-	 * Create a list of list items with the specified contents.
+	 * Create a list of list items with the specified contents;
+	 * the lists must be the same size.
 	 * @param _mappings list of mapping values (primary key)
 	 * @param _options display info derived from this
 	 * @param _options2 additional display info
 	 * @return the new list item
 	 */
-	protected List<SSListItem> createComboItems(List<M> _mappings, List<O> _options, List<O2> _options2) {
-		List<SSListItem> comboItems = new ArrayList<>();
-		for (int i = 0; i < _mappings.size(); i++) {
-			comboItems.add(createComboItem(_mappings.get(i), _options.get(i),
-					option2Enabled ? _options2.get(i) : null));
-		}
-		return comboItems;
-	}
-
-	/** make sure sizes match up */
-	private void addAll(List<M> _mappings, List<O> _options, List<O2>_options2) {
+	protected List<SSListItem> createComboItems(List<M> _mappings, List<O> _options, List<O2>_options2) {
 		Objects.requireNonNull(_mappings);
 		Objects.requireNonNull(_options);
 		if (option2Enabled) {
@@ -218,8 +196,12 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 		if (_options.size() != n || _options2 != null && _options2.size() != n) {
 			throw new IllegalArgumentException("Lists must be the same size");
 		}
-		List<SSListItem> newItems = createComboItems(_mappings, _options, _options2);
-		itemList.addAll(newItems);
+		List<SSListItem> comboItems = new ArrayList<>();
+		for (int i = 0; i < _mappings.size(); i++) {
+			comboItems.add(createComboItem(_mappings.get(i), _options.get(i),
+					option2Enabled ? _options2.get(i) : null));
+		}
+		return comboItems;
 	}
 
 	/**
@@ -229,36 +211,6 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 		return option2Enabled;
 	}
 
-	/**
-	 * Extract the mapping from the list item.
-	 * @param _eventListItem list item from which mapping is extracted
-	 * @return the mapping
-	 */
-	@SuppressWarnings("unchecked")
-	public M getMapping(SSListItem _eventListItem) {
-		return (M) getElem(_eventListItem, KEY_IDX);
-	}
-	
-	/**
-	 * Extract the option from the list item.
-	 * @param _eventListItem list item from which option is extracted
-	 * @return the option
-	 */
-	@SuppressWarnings("unchecked")
-	public O getOption(SSListItem _eventListItem) {
-		return (O) getElem(_eventListItem, OPT_IDX);
-	}
-	
-	/**
-	 * Extract the option from the list item.
-	 * @param _eventListItem list item from which option is extracted
-	 * @return the option
-	 */
-	@SuppressWarnings("unchecked")
-	public O2 getOption2(SSListItem _eventListItem) {
-		usingOption2();
-		return (O2) getElem(_eventListItem, OPT2_IDX);
-	}
 
 	/**
 	 * Get the opaque index for the option element in a SSListeItem.
@@ -283,16 +235,11 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 	}
 
 	/** Methods for inspecting and modifying list info */
-	public class Remodel extends SSAbstractGlazedListComboInfo.Remodel {
+	protected class Remodel extends SSAbstractListInfo.Remodel {
 
-		/**
-		 * Convenience method.
-		 * @return the EventList being worked on
-		 */
-		public EventList<SSListItem> getEventList() {
-			verifyOpened();
-			return (EventList<SSListItem>) itemList;
-		}
+		// no locking by default
+		@Override protected void takeWriteLock() { }
+		@Override protected void releaseWriteLock() { }
 		
 		/**
 		 * Return an unmodifiable list of mappings.
@@ -300,7 +247,7 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 		 */
 		public List<M> getMappings() {
 			verifyOpened();
-			return DefaultGlazedListComboInfo.this.getMappings();
+			return mappings;
 		}
 		
 		/**
@@ -309,7 +256,7 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 		 */
 		public List<O> getOptions() {
 			verifyOpened();
-			return DefaultGlazedListComboInfo.this.getOptions();
+			return options;
 		}
 		
 		/**
@@ -318,7 +265,7 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 		 */
 		public List<O2> getOptions2() {
 			verifyOpened();
-			return DefaultGlazedListComboInfo.this.getOptions2();
+			return options2;
 		}
 		
 		/**
@@ -326,9 +273,9 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 		 * @param _eventListItem list item from which mapping is extracted
 		 * @return the mapping
 		 */
+		@SuppressWarnings("unchecked")
 		public M getMapping(SSListItem _eventListItem) {
-			verifyOpened();
-			return DefaultGlazedListComboInfo.this.getMapping(_eventListItem);
+			return (M)super.getElem(_eventListItem, KEY_IDX);
 		}
 		
 		/**
@@ -336,9 +283,9 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 		 * @param _eventListItem list item from which option is extracted
 		 * @return the option
 		 */
+		@SuppressWarnings("unchecked")
 		public O getOption(SSListItem _eventListItem) {
-			verifyOpened();
-			return DefaultGlazedListComboInfo.this.getOption(_eventListItem);
+			return (O)super.getElem(_eventListItem, OPT_IDX);
 		}
 		
 		/**
@@ -346,10 +293,10 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 		 * @param _eventListItem list item from which option is extracted
 		 * @return the option
 		 */
+		@SuppressWarnings("unchecked")
 		public O2 getOption2(SSListItem _eventListItem) {
-			verifyOpened();
 			usingOption2();
-			return DefaultGlazedListComboInfo.this.getOption2(_eventListItem);
+			return (O2)super.getElem(_eventListItem, OPT2_IDX);
 		}
 
 		/**
@@ -359,9 +306,9 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 		 * @param _index an item list index
 		 * @return the option
 		 */
+		@SuppressWarnings("unchecked")
 		public M getMapping(int _index) {
-			verifyOpened();
-			return getMapping(itemList.get(_index));
+			return (M)super.getElem(_index, KEY_IDX);
 		}
 		
 		/**
@@ -373,9 +320,7 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 		 */
 		@SuppressWarnings("unchecked")
 		public O setOption(int _index, O _option) {
-			verifyOpened();
-			SSListItem listItem = itemList.get(_index);
-			return (O) setElem(listItem, OPT2_IDX, _option);
+			return (O) super.setElem(_index, OPT_IDX, _option);
 		}
 
 		/**
@@ -387,10 +332,8 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 		 */
 		@SuppressWarnings("unchecked")
 		public O2 setOption2(int _index, O2 _option2) {
-			verifyOpened();
 			usingOption2();
-			SSListItem listItem = itemList.get(_index);
-			return (O2) setElem(listItem, OPT2_IDX, _option2);
+			return (O2) super.setElem(_index, OPT2_IDX, _option2);
 		}
 		
 		/**
@@ -410,14 +353,15 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 		 * @param _mappings list of mapping values (primary key)
 		 * @param _options display info derived from this
 		 * @param _options2 additional display info
-		 * @return the new list item
+		 * @return true if the list changed
 		 */
 		public boolean addAll(List<M> _mappings, List<O> _options, List<O2> _options2) {
-			verifyOpened();
-			usingOption2();
-			DefaultGlazedListComboInfo.this.addAll(_mappings, _options, _options2);
+			if (_options2 != null) {
+				usingOption2();
+			}
+			List<SSListItem> list = DefaultGlazedListComboInfo.this.createComboItems(_mappings, _options, _options2);
+			return super.addAll(list);
 			//isModifiedLength = true;
-			return !_mappings.isEmpty();
 		}
 
 		/**
@@ -442,13 +386,25 @@ public class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractGlazedListComb
 		 * @return the new list item
 		 */
 		public boolean add(M _mapping, O _option, O2 _option2) {
-			verifyOpened();
 			if (_option2 != null) {
 				usingOption2();
 			}
-			itemList.add(createComboItem(_mapping, _option, _option2));
+			return super.add(createComboItem(_mapping, _option, _option2));
+			//itemList.add(createComboItem(_mapping, _option, _option2));
 			//isModifiedLength = true;
-			return true;
+			//return true;
+		}
+		
+		/**
+		 * Create a list item with the specified contents.
+		 * @param _mapping mapping value (primary key)
+		 * @param _option display info derived from this
+		 * @param _option2 additional display info
+		 * @return the new list item
+		 */
+		public SSListItem createComboItem(M _mapping, O _option, O2 _option2) {
+			return option2Enabled ? createListItem(_mapping, _option, _option2)
+					: createListItem(_mapping, _option);
 		}
 	}
 }

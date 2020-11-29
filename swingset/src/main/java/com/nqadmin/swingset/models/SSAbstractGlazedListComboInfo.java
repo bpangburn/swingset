@@ -37,6 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset.models;
 
+import java.util.List;
+
 import ca.odell.glazedlists.EventList;
 
 // DefaultGlazedListComboInfo.java
@@ -49,16 +51,50 @@ import ca.odell.glazedlists.EventList;
  * @see <a href="https://publicobject.com/glazedlistsdeveloper/screencasts/autocompletesupport/">GlazedLists AutoCompletion Video</a>
  * @since 4.0.0
  */
-public abstract class SSAbstractGlazedListComboInfo extends SSAbstractListInfo {
+public class SSAbstractGlazedListComboInfo<M,O,O2> extends DefaultGlazedListComboInfo<M,O,O2> {
+	private static final long serialVersionUID = 1L;
+	private EventList<SSListItem> eventList;
+	private boolean hasReturnedEventList;
 
-	protected SSAbstractGlazedListComboInfo(int itemNumElems, EventList<SSListItem> itemList) {
-		super(itemNumElems, itemList);
+	/**
+	 * Create an empty ComboInfo.
+	 * @param _eventList which is installed into AutoCompleteSupport
+	 * @param _option2Enabled true says to provide an options2 field in SSListItem
+	 */
+	@SuppressWarnings("unchecked")
+	public SSAbstractGlazedListComboInfo(boolean _option2Enabled, EventList<SSListItem> _itemList) {
+		super(_option2Enabled, _itemList);
+		eventList = _itemList;
+	}
+
+	/**
+	 * This dance only returns the event list once; it helps make it
+	 * clear that no reference should be held to the list. All access
+	 * to the list should be done through this object and remodel.
+	 * There is {@link SSAbstractListInfo#getItemList}
+	 * for a read only reference.
+	 * @return GlazedLists event list.
+	 */
+	protected EventList<SSListItem> getEventList() {
+		EventList<SSListItem> temp = hasReturnedEventList ? null : eventList;
+		hasReturnedEventList = true;
+		return temp;
+	}
+
+	// protected SSAbstractGlazedListComboInfo(int itemNumElems, List<SSListItem> itemList) {
+	// 	super(itemNumElems, itemList);
+	// 	eventList = (EventList<SSListItem>) itemList;
+	// }
+
+	@Override
+	public Remodel getRemodel() {
+		return new Remodel();
 	}
 
 	/**
 	 * Remodel that locks the GlazedLists EventList.
 	 */
-	protected abstract class Remodel extends SSAbstractListInfo.Remodel implements AutoCloseable {
+	public class Remodel extends DefaultGlazedListComboInfo<M, O, O2>.Remodel implements AutoCloseable {
 
 		/**
 		 * This is called during construction,
@@ -66,7 +102,7 @@ public abstract class SSAbstractGlazedListComboInfo extends SSAbstractListInfo {
 		 */
 		@Override
 		protected void takeWriteLock() {
-			((EventList<SSListItem>) itemList).getReadWriteLock().writeLock().lock();
+			eventList.getReadWriteLock().writeLock().lock();
 		}
 
 		/**
@@ -75,7 +111,7 @@ public abstract class SSAbstractGlazedListComboInfo extends SSAbstractListInfo {
 		 */
 		@Override
 		protected void releaseWriteLock() {
-			((EventList<SSListItem>) itemList).getReadWriteLock().writeLock().unlock();
+			eventList.getReadWriteLock().writeLock().unlock();
 		}
 	}
 	

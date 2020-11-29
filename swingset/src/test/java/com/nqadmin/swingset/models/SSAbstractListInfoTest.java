@@ -25,6 +25,8 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
@@ -32,6 +34,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  *
@@ -51,6 +55,7 @@ public class SSAbstractListInfoTest {
 	}
 
 	static class LI extends SSAbstractListInfo {
+		private static final long serialVersionUID = 1L;
 
 		public LI(int itemNumElems, List<SSListItem> itemList) {
 			super(itemNumElems, itemList);
@@ -154,11 +159,11 @@ public class SSAbstractListInfoTest {
 	public void testIsEmpty() {
 		System.out.println("isEmpty");
 		//boolean expResult = true;
-		boolean result = listInfo.isEmpty();
+		boolean result = listInfo.getItemList().isEmpty();
 		assertEquals(true, result);
 		SSListItem li = listInfo.createListItem(liCreateArray(3,0));
 		itemList.add(li);
-		result = listInfo.isEmpty();
+		result = listInfo.getItemList().isEmpty();
 		assertEquals(false, result);
 	}
 
@@ -172,7 +177,7 @@ public class SSAbstractListInfoTest {
 		int expResult = 2; 
 		// check that equals works (not just ==)
 		SSListItem li = listInfo.createListItem(liCreateArray(3, expResult));
-		int result = listInfo.indexOfItem(li);
+		int result = listInfo.getItemList().indexOf(li);
 		assertEquals(expResult, result);
 	}
 
@@ -255,101 +260,107 @@ public class SSAbstractListInfoTest {
 		assertFalse(result.equals(result2));
 	}
 
-	private boolean getElemEquals(Object[] elems, SSListItem listItem) {
+	private boolean getElemEquals(Object[] elems, int listItemIndex, LI.Remodel remodel) {
 		for (int i = 0; i < elems.length; i++) {
-			if(!elems[i].equals(listInfo.getElem(listItem, i))) {
+			if(!elems[i].equals(remodel.getElem(listItemIndex, i))) {
 				return false;
 			}
 		}
 		return true;
 	}
+
+	// number of listItems for GetSet test
+	private static int nGetSetItems = 6;
 	/**
+	 * For each type of SSListItem
 	 * Test of getElem method, of class SSAbstractListInfo.
+	 * AND
+	 * Test equals for each list item type
 	 * AND
 	 * Test of setElem method, of class SSAbstractListInfo.
 	 */
-	@Test
-	public void testGetElem() {
-		System.out.println("getElem");
+	@ParameterizedTest
+	@MethodSource
+	public void testGetSetElem(LI linfo) {
+		System.err.println("" + linfo);
+		// calculate expected item element value, slice is 0 - n-1
+		BiFunction<Integer, Integer, Integer> f = (slice, listIndex) -> slice*10 + listIndex;
+		// test equals/get/set for item index 3
+		int testItemIndex = 3;
 
-		// test each of the 3 types of SSListItem
+		// elements for list item length 7
+		Integer[] elems = new Integer[] { 03, 13, 23, 33, 43, 53, 63 };
+		// truncate elements for the list item we're dealing with
+		int nElem = linfo.getItemNumElems();
+		elems = Arrays.copyOf(elems, nElem);
 
-		listInfo.setItemNumElems(2);
-		Object [] elems2 = new Object[] {"a", "b"};
-		SSListItem result2 = listInfo.createListItem(elems2);
-		assertTrue(getElemEquals(elems2, result2));
+		try (LI.Remodel remodel = linfo.getRemodel()) {
+			// verify the test item has the expected elements
+			assertTrue(getElemEquals(elems, testItemIndex, remodel));
 
-		listInfo.setItemNumElems(3);
-		Object [] elems3 = new Object[] {"a", "b", "c"};
-		SSListItem result3 = listInfo.createListItem(elems3);
-		assertTrue(getElemEquals(elems3, result3));
+			SSListItem testItem = linfo.createListItem((Object[])elems);
+			SSListItem getItem = remodel.get(testItemIndex);
+			assertTrue(testItem.equals(getItem));
 
-		listInfo.setItemNumElems(5);
-		Object [] elems5 = new Object[] {"a", "b", "c", "d", "e"};
-		SSListItem result5 = listInfo.createListItem(elems5);
-		assertTrue(getElemEquals(elems5, result5));
+			int modElemIndex = 2 % nElem;
+			// create a testItem that won't match what's in the item list
+			elems[modElemIndex] = 99;
+			testItem = linfo.createListItem((Object[])elems);
+			assertFalse(testItem.equals(getItem));
 
-		// do some setElem, verify the previous value is returned
+			// modify the element in the list item, should match now
+			// note, using the same reference for item in the list
+			remodel.setElem(testItemIndex, modElemIndex, 99);
+			assertTrue(testItem.equals(getItem));
 
-		Object o = listInfo.setElem(result2, 1, "b2");
-		assertEquals("b", o);
-		o = listInfo.setElem(result3, 1, "b2");
-		assertEquals("b", o);
-		o = listInfo.setElem(result5, 3, "d2");
-		assertEquals("d", o);
+			// change the item to 70,71,72,73
+			for (int i = 0; i < nElem; i++) {
+				elems[i] = 70 + i;
+				remodel.setElem(testItemIndex, i, 70 + i);
+			}
 
-		// the list items have been modified, equals should fail
+			// Read back the same items
+			for (int i = 0; i < nElem; i++) {
+				assertEquals(elems[i], remodel.getElem(testItemIndex, i));
+			}
 
-		assertFalse(getElemEquals(elems2, result2));
-		assertFalse(getElemEquals(elems3, result3));
-		assertFalse(getElemEquals(elems5, result5));
-
-		// now sync the arrays up to what's in the list items, then they're equal
-		elems2[1] = "b2";
-		elems3[1] = "b2";
-		elems5[3] = "d2";
-
-		assertTrue(getElemEquals(elems2, result2));
-		assertTrue(getElemEquals(elems3, result3));
-		assertTrue(getElemEquals(elems5, result5));
-
-		// test get/set exceptions
-		assertThrows(ArrayIndexOutOfBoundsException.class,
-				() -> listInfo.setElem(result2, 2, null));
-		assertThrows(ArrayIndexOutOfBoundsException.class,
-				() -> listInfo.setElem(result3, 3, null));
-		assertThrows(ArrayIndexOutOfBoundsException.class,
-				() -> listInfo.setElem(result5, 5, null));
-
-		assertThrows(IllegalArgumentException.class, () -> listInfo.setItemNumElems(31));
-
-		// check the endpoint for array items
-
-		listInfo.setItemNumElems(30);
-		SSListItem result30 = listInfo.createListItem(new Object[30]);
-		listInfo.setElem(result30, 29, "xxx");
-		assertThrows(ArrayIndexOutOfBoundsException.class,
-				() -> listInfo.setElem(result30, 30, "xxx"));
+			// test some get/set exceptions
+			assertThrows(ArrayIndexOutOfBoundsException.class,
+					() -> remodel.setElem(testItemIndex, nElem, null));
+			assertThrows(ArrayIndexOutOfBoundsException.class,
+					() -> remodel.getElem(testItemIndex, nElem));
+		}
+	}
+	static Stream<LI> testGetSetElem() {
+		List<LI> listInfos = new ArrayList<>();
+		// Gererate 4 LI, num elements 1,2,3,4, All elements are Integer
+		// This tests the four ListItem implementations
+		// Each slice is x0, x1, x2, x3, x4, x5; where x is 0,1,2,3
+		for (int nElem = 1; nElem <= 7; nElem++) {
+			LI listInfo = new LI(nElem, new ArrayList<>());
+			try (LI.Remodel remodel = listInfo.getRemodel()) {
+				for (int listItemIndex = 0; listItemIndex < nGetSetItems; listItemIndex++) {
+					Integer[] elems = new Integer[nElem];
+					for(int slice = 0; slice < nElem; slice++) {
+						elems[slice] = slice * 10 + listItemIndex;
+					}
+					remodel.add(listInfo.createListItem((Object[])elems));
+				}
+			}
+			listInfos.add(listInfo);
+		}
+		return listInfos.stream();
 	}
 
-	/**
-	 * Test of setElem method, of class SSAbstractListInfo.
-	 * 
-	 * TESTED IN testGetElem
-	 */
-	//@Test
-	//public void testSetElem() {
-	//	System.out.println("setElem");
-	//	SSListItem _eventListItem = null;
-	//	int _elemIndex = 0;
-	//	Object _newElem = null;
-	//	SSAbstractListInfo instance = null;
-	//	Object expResult = null;
-	//	Object result = instance.setElem(_eventListItem, _elemIndex, _newElem);
-	//	assertEquals(expResult, result);
-	//	// TODO review the generated test code and remove the default call to fail.
-	//	fail("The test case is a prototype.");
-	//}
+	@Test
+	public void testBoundaries() {
+		assertThrows(IllegalArgumentException.class,
+				() -> listInfo.setItemNumElems(0));
+		listInfo.setItemNumElems(1);
+		listInfo.setItemNumElems(30);
+		assertThrows(IllegalArgumentException.class,
+				() -> listInfo.setItemNumElems(31));
+	}
 
 	/**
 	 * Test of createElementSlice method, of class SSAbstractListInfo.
@@ -368,7 +379,7 @@ public class SSAbstractListInfoTest {
 		assertTrue(l2.equals(l2Shadow));
 		assertTrue(l3.equals(l3Shadow));
 
-		List<List> lists = new ArrayList<>();
+		List<List<?>> lists = new ArrayList<>();
 		// create and reference 8 more slices
 		for (int i = 0; i < 8; i++) {
 			lists.add(listInfo.createElementSlice(i % 4));
@@ -381,34 +392,4 @@ public class SSAbstractListInfoTest {
 		System.gc();
 		assertEquals(4, listInfo.checkCreatedLists());
 	}
-
-	/**
-	 * Test of checkState method, of class SSAbstractListInfo.
-	 */
-	//@Test
-	//public void testCheckState() {
-	//	System.out.println("checkState");
-	//	SSAbstractListInfo instance = null;
-	//	instance.checkState();
-	//	// TODO review the generated test code and remove the default call to fail.
-	//	fail("The test case is a prototype.");
-	//}
-
-	/**
-	 * Test of getRemodel method, of class SSAbstractListInfo.
-	 * 
-	 * The remodel doesn't have much in the way of logic.
-	 * It's primarily a trampoline.
-	 */
-	//@Test
-	//public void testGetRemodel() {
-	//	System.out.println("getRemodel");
-	//	SSAbstractListInfo instance = null;
-	//	SSAbstractListInfo.Remodel expResult = null;
-	//	SSAbstractListInfo.Remodel result = instance.getRemodel();
-	//	assertEquals(expResult, result);
-	//	// TODO review the generated test code and remove the default call to fail.
-	//	fail("The test case is a prototype.");
-	//}
-	
 }
