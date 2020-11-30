@@ -56,12 +56,13 @@
  * could represent data from a single field or data resulting from a join.
  * <h3>UI support Models</h3>
  * These models, sub-classes of
- * {@link com.nqadmin.swingset.models.SSAbstractListInfo},
+ * {@link com.nqadmin.swingset.models.AbstractComboBoxListSwingModel},
  * generally revolve around managing
  * {@link com.nqadmin.swingset.models.SSListItem}s. An {@code SSListItem}
  * is generally the item which is visible in a {@code JComboBox}
- * or {@code JList}.
- * {@link com.nqadmin.swingset.models.SSAbstractGlazedListComboInfo}
+ * or {@code JList}. Additionally these classes implement ListModel
+ * and MutableComboBoxModel; they can be installed into either.
+ * {@link com.nqadmin.swingset.models.GlazedListsOptionMappingInfo}
  * works with {@code GlazedLists} auto completion.
  * 
  * @since 4.0.0

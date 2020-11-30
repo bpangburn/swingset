@@ -37,7 +37,6 @@
  ******************************************************************************/
 package com.nqadmin.swingset.models;
 
-import java.util.List;
 
 import ca.odell.glazedlists.EventList;
 
@@ -58,20 +57,20 @@ public class GlazedListsOptionMappingInfo<M,O,O2> extends OptionMappingSwingMode
 
 	/**
 	 * Create an empty ComboInfo.
-	 * @param _eventList which is installed into AutoCompleteSupport
 	 * @param _option2Enabled true says to provide an options2 field in SSListItem
+	 * @param _eventList which is installed into AutoCompleteSupport
 	 */
 	@SuppressWarnings("unchecked")
-	public GlazedListsOptionMappingInfo(boolean _option2Enabled, EventList<SSListItem> _itemList) {
-		super(_option2Enabled, _itemList);
-		eventList = _itemList;
+	public GlazedListsOptionMappingInfo(boolean _option2Enabled, EventList<SSListItem> _eventList) {
+		super(_option2Enabled, _eventList);
+		eventList = _eventList;
 	}
 
 	/**
 	 * This dance only returns the event list once; it helps make it
 	 * clear that no reference should be held to the list. All access
 	 * to the list should be done through this object and remodel.
-	 * There is {@link SSAbstractListInfo#getItemList}
+	 * There is {@link AbstractComboBoxListSwingModel#getItemList}
 	 * for a read only reference.
 	 * @return GlazedLists event list.
 	 */
@@ -86,6 +85,16 @@ public class GlazedListsOptionMappingInfo<M,O,O2> extends OptionMappingSwingMode
 	// 	eventList = (EventList<SSListItem>) itemList;
 	// }
 
+	/**
+	 * The Remodel is the core object to support locked access to this object.
+	 * It has methods for inspecting and changing the EventList and
+	 * the contents of the SSListItems that it contains.
+	 * <p>
+	 * This getRemodel object can be used with try with resources.
+	 * It returns with the EventList write locked, and its close method
+	 * releases the lock.
+	 * @return a Remodel with read/write access
+	 */
 	@Override
 	public Remodel getRemodel() {
 		return new Remodel();

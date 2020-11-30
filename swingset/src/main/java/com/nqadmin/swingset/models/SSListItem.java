@@ -49,11 +49,9 @@ package com.nqadmin.swingset.models;
  * An {@code SSListem} contains an ordered list of elements;
  * each elem has an associated elemIndex which is typically opaque.
  * Access to these elements is typically handled through sub-classes
- * of {@link SSAbstractListInfo}. 
+ * of {@link AbstractComboBoxListSwingModel}. 
  * <p>
  * Compatible with GlazedLists AutoComplete feature.
- * 
- * @see SSAbstractListInfo
  */
 public interface SSListItem {
 }

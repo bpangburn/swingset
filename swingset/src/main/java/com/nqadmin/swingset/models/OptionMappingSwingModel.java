@@ -92,11 +92,11 @@ public abstract class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxLi
 
 	/**
 	 * Create an empty ComboInfo.
-	 * @param _eventList which is installed into AutoCompleteSupport
 	 * @param _option2Enabled true says to provide an options2 field in SSListItem
+	 * @param _itemList model backing store
 	 */
 	@SuppressWarnings("unchecked")
-	public OptionMappingSwingModel(boolean _option2Enabled, EventList<SSListItem> _itemList) {
+	public OptionMappingSwingModel(boolean _option2Enabled, List<SSListItem> _itemList) {
 		super(_option2Enabled ? 3 : 2, _itemList);
 		option2Enabled = _option2Enabled;
 		mappings = (List<M>) createElementSlice(KEY_IDX);

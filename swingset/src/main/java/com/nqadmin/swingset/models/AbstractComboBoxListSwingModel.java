@@ -65,7 +65,9 @@ import org.apache.logging.log4j.Logger;
  * The class holds a reference to a {@code List<SSListItem>} and
  * it's method {@link #createListItem(java.lang.Object...) }
  * is a factory that creates SSListItem objects. It does not have
- * methods to modify the list; sub-classes provide that.
+ * methods to modify the list; getRemodel and sub-classes provide that.
+ * This class implements MutableComboBoxModel; it installs into either
+ * JList or JComboBox, adjusting as needed.
  * <p>
  * Where possible, this class and subclasses name methods
  * similarly to the List interface, such as "add*", "remove*".
@@ -93,13 +95,13 @@ import org.apache.logging.log4j.Logger;
  * are done through a Remodel Object see {@link #getRemodel() }. The
  * remodel object is "try with resource" compatible and subclasses
  * may implement locking in their implementations of takeWriteLock()
- * and releaseWriteLock(). See {@link SSAbstractGlazedListComboInfo}
+ * and releaseWriteLock(). See {@link GlazedListsOptionMappingInfo}
  * for an example.
  * <p>
  * Compatible with GlazedLists AutoComplete feature;
  * in which case an EventList is set in the constructor.
  * 
- * @see SSAbstractGlazedListComboInfo SSAbstractGlazedListComboInfo
+ * @see GlazedListsOptionMappingInfo SSDBComboBox
  *		for use with GlazedLists AutoComplete feature
  * @since 4.0.0
  */
@@ -129,22 +131,19 @@ implements MutableComboBoxModel<SSListItem> {
 
 	/**
 	 * For fast check of valid element index.
-	 * <p>
-	 * {@code validElemsMask = (1 << nElem) - 1;} <br/>
-	 * {@code if (!(validElemsMask & (1 << index))) error;}
 	 */
+	// validElemsMask = (1 << nElem) - 1
+	// if (!(validElemsMask & (1 << index))) error
 	private int validElemsMask;
 
 
 	/**
 	 * The list of SSListItem elements.
-	 * <p>
 	 */
 	private final List<SSListItem> itemList;
 
 	/**
 	 * A read only list of SSListItem elements.
-	 * <p>
 	 */
 	private final List<SSListItem> readOnlyItemList = new AbstractList<SSListItem>() {
 		@Override
@@ -440,6 +439,7 @@ implements MutableComboBoxModel<SSListItem> {
 	 * Retire any list slice that was garbage collected.
 	 * Usually used for testing.
 	 * A subclass may use this if it wants the affect.
+	 * @return number of active/referenced list slices
 	 */
 	protected int checkCreatedLists() {
 		// toss cleared references.
@@ -755,16 +755,16 @@ implements MutableComboBoxModel<SSListItem> {
 	 * There is a class Inspect, similar to Remodel,
 	 * that has methods that only read data.
 	 * <p>
- It is anticipated that subclass may want to use Remodel
- as part of a locking scheme for multi-threaded
- access to AbstractComboBoxListSwingModel.
- The {@link #verifyOpened()}
+	 * It is anticipated that subclass may want to use Remodel
+	 * as part of a locking scheme for multi-threaded
+	 * access to AbstractComboBoxListSwingModel.
+	 * The {@link #verifyOpened()}
 	 * method is useful for that.
 	 * Methods in subclasses should call verifyOpened
 	 * as their first statement; this avoids modifications
 	 * after the lock is released.
 	 * 
-	 * @see SSAbstractGlazedListComboInfo for example of Remodel locking
+	 * @see GlazedListsOptionMappingInfo for example of Remodel locking
 	 */
 	protected abstract class Remodel implements AutoCloseable {
 
@@ -877,7 +877,7 @@ implements MutableComboBoxModel<SSListItem> {
 		 * with the specified item.
 		 * @param _index index of the item to replace
 		 * @param _newItem item to store at the index
-		 * @return 
+		 * @return the list item that was at that position
 		 */
 		public SSListItem set(int _index, SSListItem _newItem) {
 			verifyOpened();

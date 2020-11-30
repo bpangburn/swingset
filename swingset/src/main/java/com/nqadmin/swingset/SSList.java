@@ -229,12 +229,12 @@ public class SSList extends JList<String> implements SSComponentInterface {
 		return new AbstractList<String>() {
 			@Override
 			public String get(int index) {
-				return myModel().getOption(index);
+				return myModel().getOptions().get(index);
 			}
 
 			@Override
 			public int size() {
-				return myModel().getSize();
+				return myModel().getOptions().size();
 			}
 		};
 	}
@@ -253,12 +253,12 @@ public class SSList extends JList<String> implements SSComponentInterface {
 		return new AbstractList<Object>() {
 			@Override
 			public Object get(int index) {
-				return myModel().getMapping(index);
+				return myModel().getMappings().get(index);
 			}
 
 			@Override
 			public int size() {
-				return myModel().getSize();
+				return myModel().getMappings().size();
 			}
 		};
 	}
@@ -288,7 +288,7 @@ public class SSList extends JList<String> implements SSComponentInterface {
 		int[] selectedIndices = getSelectedIndices();
 		List<Object> selectedMappings = new ArrayList<>(selectedIndices.length);
 		for(int index : selectedIndices) {
-			selectedMappings.add(myModel().getMappingAtIndex(index));
+			selectedMappings.add(myModel().getMappings().get(index));
 		}
 		return selectedMappings;
 	}
@@ -427,7 +427,7 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	public void setSelectedValues(final Object[] _selectedMappings) {
 		final int[] selectedIndices = new int[_selectedMappings.length];
 		for (int i = 0; i < _selectedMappings.length; i++) {
-			selectedIndices[i] = myModel().getMappingToIndex(_selectedMappings[i]);
+			selectedIndices[i] = myModel().getMappings().indexOf(_selectedMappings[i]);
 		}
 		setSelectedIndices(selectedIndices);
 	}
