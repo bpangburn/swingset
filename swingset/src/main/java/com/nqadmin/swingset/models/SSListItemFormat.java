@@ -45,6 +45,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Objects;
 
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.ListItem0;
 
@@ -54,8 +55,12 @@ import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.ListItem0;
 
 /**
  * Use this to produce a string representation of an SSListItem.
- * Configure information about the list item elements type and the order
- * the elements are formatted with {@link #addElemType}.
+ * Configure the order in which the list item elements are formatted,
+ * and each element type, with {@link #addElemType}.
+ * After this object is created, by default
+ * element 0 is formatted with toString(). Start with {@link #clear()}
+ * to set up a different formatting specification.
+ * <p>
  * Time related elements can have a format pattern specified;
  * The time patterns use {@link java.text.SimpleDateFormat}.
  * If the pattern is null, then toString() is used to format the pattern.
@@ -111,8 +116,13 @@ public class SSListItemFormat extends Format {
 	/**
 	 * Create a Format. Use {@code addElemType} to specify
 	 * elements, in order, that are formatted.
+	 * By default, element 0 is formatted with toString()
 	 */
 	public SSListItemFormat() {
+		// format elment 0 with toString()
+		addElemType(0, JDBCType.NULL);
+
+		// initialize default format patterns
 		patterns.put(JDBCType.DATE, dateDefault);
 		patterns.put(JDBCType.TIME, timeDefault);
 		patterns.put(JDBCType.TIMESTAMP, timestampDefault);
@@ -120,8 +130,8 @@ public class SSListItemFormat extends Format {
 
 	/**
 	 * Clear list item element information in preparation
-	 * to add elements to format.
-	 * Note that formatting defaults are not restored.
+	 * to establish elements to format.
+	 * Note that default formatting patterns are not restored.
 	 */
 	public void clear() {
 		elemTypes.clear();
@@ -137,6 +147,7 @@ public class SSListItemFormat extends Format {
 	 * @param _jdbcType type of element
 	 */
 	public void addElemType(int _elemIndex, JDBCType _jdbcType) {
+		Objects.requireNonNull(_jdbcType);
 		// first make sure there's room
 		while (_elemIndex >= elemTypes.size()) {
 			elemTypes.add(null);

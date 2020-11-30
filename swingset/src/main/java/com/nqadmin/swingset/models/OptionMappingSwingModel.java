@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import ca.odell.glazedlists.EventList;
 
 // OptionMappingSwingModel.java
 //
@@ -71,24 +70,33 @@ import ca.odell.glazedlists.EventList;
  * 
  * @since 4.0.0
  */
-public abstract class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingModel {
+public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingModel {
 	private static final long serialVersionUID = 1L;
 
-	/** index of primary key in SSListItem */
-	protected static int KEY_IDX = 0;
 	/** index of option in SSListItem */
-	protected static int OPT_IDX = 1;
+	// Option IS FIST. THIS IS THE DEFAULT FOR SSListItemFormat
+	// In addition, only Option is required.
+	// LOOK AT createComboItem BEFORE THINKING ABOUT CHANGING THESE DEFINES
+	protected final static int OPT_IDX = 0; // 
+	/** index of primary key in SSListItem */
+	protected final static int KEY_IDX = 1;
 	/** index of option2 in SSListItem */
-	protected static int OPT2_IDX = 2;
+	protected final static int OPT2_IDX = 2;
 
-	/** read only */
-	private final List<M> mappings; // typically a primary key
-	/** read only */
-	private final List<O> options;
-	/** read only */
-	private final List<O2> options2; // may be null, depend option2Enabled
+	/** up to 3 slices created, OPT, KEY, OPT2 */
+	private final List<?>[] slices = new List<?>[3];
 	/** when true, there can be options2 */
 	private boolean option2Enabled = false;
+
+	/**
+	 * Create an empty ComboInfo.
+	 * 
+	 * @param _option2Enabled true says to provide an options2 field in SSListItem
+	 */
+	public OptionMappingSwingModel(boolean _option2Enabled) {
+		this(_option2Enabled, null);
+	}
+
 
 	/**
 	 * Create an empty ComboInfo.
@@ -99,30 +107,41 @@ public abstract class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxLi
 	public OptionMappingSwingModel(boolean _option2Enabled, List<SSListItem> _itemList) {
 		super(_option2Enabled ? 3 : 2, _itemList);
 		option2Enabled = _option2Enabled;
-		mappings = (List<M>) createElementSlice(KEY_IDX);
-		options = (List<O>) createElementSlice(OPT_IDX);
-		options2 = (List<O2>) createElementSlice(OPT2_IDX);
+	}
+
+	/** create List slices lazily */
+	private List<?> getSlice(int sliceIndex) {
+		List<?> slice = slices[sliceIndex];
+		if (slice == null) {
+			slice = createElementSlice(sliceIndex);
+			slices[sliceIndex] = slice;
+		}
+
+		return slice;
 	}
 	
 	/**
 	 * @return unmodifiable list of mappings
 	 */
+	@SuppressWarnings("unchecked")
 	public List<M> getMappings() {
-		return mappings;
+		return (List)getSlice(KEY_IDX);
 	}
 	
 	/**
 	 * @return unmodifiable list of options
 	 */
+	@SuppressWarnings("unchecked")
 	public List<O> getOptions() {
-		return options;
+		return (List)getSlice(OPT_IDX);
 	}
 	
 	/**
 	 * @return unmodifiable list of options2
 	 */
+	@SuppressWarnings("unchecked")
 	public List<O2> getOptions2() {
-		return options2;
+		return (List)getSlice(OPT2_IDX);
 	}
 	
 	/**
@@ -136,7 +155,7 @@ public abstract class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxLi
 		if(option2Enabled == _option2Enabled) {
 			return;
 		}
-		if (!mappings.isEmpty()) {
+		if (!getItemList().isEmpty()) {
 			throw new IllegalStateException("Only change option2enabled when empty");
 		}
 		option2Enabled = _option2Enabled;
@@ -169,9 +188,14 @@ public abstract class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxLi
 	 * @param _option2 additional display info
 	 * @return the new list item
 	 */
-	protected SSListItem createComboItem(M _mapping, O _option, O2 _option2) {
-		return option2Enabled ? createListItem(_mapping, _option, _option2)
-				: createListItem(_mapping, _option);
+	protected SSListItem createComboItem(M _mapping, O _option, O2 _option2) { 
+		// ALL ListItem CREATION GOES THROUGH HERE
+		// THE DEFINES FOR KEY_INDEX, OPT_INDEX ARE RELEVANT TO THE ORDER.
+		// _option MUST GO FIRST
+		return option2Enabled ? createListItem(_option, _mapping, _option2)
+				: createListItem(_option, _mapping);
+		//return option2Enabled ? createListItem(_mapping, _option, _option2)
+		//		: createListItem(_mapping, _option);
 	}
 
 	/**
@@ -235,7 +259,7 @@ public abstract class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxLi
 	}
 
 	/** Methods for inspecting and modifying list info */
-	protected class Remodel extends AbstractComboBoxListSwingModel.Remodel {
+	public class Remodel extends AbstractComboBoxListSwingModel.Remodel {
 
 		// no locking by default
 		@Override protected void takeWriteLock() { }
@@ -247,7 +271,7 @@ public abstract class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxLi
 		 */
 		public List<M> getMappings() {
 			verifyOpened();
-			return mappings;
+			return OptionMappingSwingModel.this.getMappings();
 		}
 		
 		/**
@@ -256,7 +280,7 @@ public abstract class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxLi
 		 */
 		public List<O> getOptions() {
 			verifyOpened();
-			return options;
+			return OptionMappingSwingModel.this.getOptions();
 		}
 		
 		/**
@@ -265,7 +289,7 @@ public abstract class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxLi
 		 */
 		public List<O2> getOptions2() {
 			verifyOpened();
-			return options2;
+			return OptionMappingSwingModel.this.getOptions2();
 		}
 		
 		/**
@@ -403,8 +427,7 @@ public abstract class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxLi
 		 * @return the new list item
 		 */
 		public SSListItem createComboItem(M _mapping, O _option, O2 _option2) {
-			return option2Enabled ? createListItem(_mapping, _option, _option2)
-					: createListItem(_mapping, _option);
+			return OptionMappingSwingModel.this.createComboItem(_mapping, _option, _option2);
 		}
 	}
 }

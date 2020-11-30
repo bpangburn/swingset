@@ -41,11 +41,11 @@ import java.awt.Dimension;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.sql.JDBCType;
-import java.util.AbstractList;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.swing.JList;
 import javax.swing.ListModel;
@@ -55,11 +55,13 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
-import com.nqadmin.swingset.models.OptionMappingSwingListModel;
+import com.nqadmin.swingset.models.OptionMappingSwingModel;
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSDbArrayModel;
+import com.nqadmin.swingset.models.SSListItem;
 
 // SSList.java
 //
@@ -86,9 +88,9 @@ import com.nqadmin.swingset.models.SSDbArrayModel;
  * From the example above, if three values VLarge, medium, small are selected the
  * array element in the database will store {100.0,5.0,1.0}
  * 
- * @see OptionMappingSwingListModel
+ * @see OptionMappingSwingModel
  */
-public class SSList extends JList<String> implements SSComponentInterface {
+public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	// TODO: this should be class SSList<M> where M is the java type of mappings
 
 	/**
@@ -107,6 +109,22 @@ public class SSList extends JList<String> implements SSComponentInterface {
 		}
 	}
 
+	private static class Model extends OptionMappingSwingModel<Object, String, Object> {
+		private static final long serialVersionUID = 1L;
+		static Model install(JList<SSListItem> _jl) {
+			Model model = new Model();
+			AbstractComboBoxListSwingModel.install(_jl, model);
+			return model;
+		}
+
+		private Model() {
+			// false means no Options2
+			super(false);
+		}
+	}
+
+	private Model optionSwingModel;
+
 	/**
 	 * Log4j Logger for component
 	 */
@@ -118,7 +136,7 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	private static final long serialVersionUID = -5698401719124062031L;
 
 
-	private SSCollectionModel collectionModel;
+	private SSCollectionModel selectedDBModel;
 
 	/**
 	 * Underlying values for each list item choice of 0, 1, 2, 3, etc.
@@ -134,7 +152,7 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	 * @deprecated Use {@link #getOptions()} instead.
 	 */
 	// TODO: make this private, remove this not used anymore
-	protected String[] options;
+	protected String[] options = null;
 
 	/**
 	 * Common fields shared across SwingSet components
@@ -170,7 +188,9 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	public SSList(SSCollectionModel _collectionModel) {
 		// Note that call to parent default constructor is implicit.
 		//super();
-		this.collectionModel = _collectionModel;
+		this.selectedDBModel = _collectionModel;
+		// last line of constructor safe to access this
+		Model.install(this);
 	}
 
 	/**
@@ -200,10 +220,10 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	 * database values that map to the items displayed in the list box)
 	 *
 	 * @return the mapping values for the items displayed in the list box
-	 * @deprecated use getMappingsList()
+	 * @deprecated use getMappingsList() or getMapingsArray
 	 */
 	public Object[] getMappings() {
-		return  myModel().getMappings().toArray();
+		return  optionSwingModel.getMappings().toArray();
 	}
 
 	/**
@@ -213,7 +233,7 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	 * @deprecated use getOptionsList()
 	 */
 	public String[] getOptions() {
-		return myModel().getOptions().toArray(new String[0]);
+		return optionSwingModel.getOptions().toArray(new String[0]);
 	}
 
 	/**
@@ -226,17 +246,7 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	 * @return the items displayed in the list box. Read Only.
 	 */
 	public List<String> getOptionsList() {
-		return new AbstractList<String>() {
-			@Override
-			public String get(int index) {
-				return myModel().getOptions().get(index);
-			}
-
-			@Override
-			public int size() {
-				return myModel().getOptions().size();
-			}
-		};
+		return optionSwingModel.getOptions();
 	}
 
 	/**
@@ -250,17 +260,7 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	 * @return the mapping values for the items displayed in the list box. Read Only.
 	 */
 	public List<Object> getMappingsList() {
-		return new AbstractList<Object>() {
-			@Override
-			public Object get(int index) {
-				return myModel().getMappings().get(index);
-			}
-
-			@Override
-			public int size() {
-				return myModel().getMappings().size();
-			}
-		};
+		return optionSwingModel.getMappings();
 	}
 
 	/**
@@ -285,16 +285,13 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	 * @return a list with the values of the mapped values corresponding to the selected indices
 	 */
 	public List<Object> getSelectedMappings() {
-		int[] selectedIndices = getSelectedIndices();
-		List<Object> selectedMappings = new ArrayList<>(selectedIndices.length);
-		for(int index : selectedIndices) {
-			selectedMappings.add(myModel().getMappings().get(index));
-		}
-		return selectedMappings;
+		return Arrays.stream(getSelectedIndices())
+				.mapToObj((index) -> optionSwingModel.getMappings().get(index))
+				.collect(Collectors.toList());
 	}
 
 	@Override
-	public void setListData(Vector<? extends String> listData) {
+	public void setListData(Vector<? extends SSListItem> listData) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -333,15 +330,24 @@ public class SSList extends JList<String> implements SSComponentInterface {
 		setMappingsInternal(oldValue);
 	}
 
+	@Override
+	public void setModel(ListModel<SSListItem> model) {
+		optionSwingModel = model instanceof Model ? (Model)model : null;
+
+		super.setModel(model);
+	}
+
+	
+
 	/**
 	 * Adds an array of strings as combo box items.
-	 *
-	 * TODO: exception if doesn't match other size?
-	 * TODO: private?
 	 * 
 	 * @param _options the list of options that you want to appear in the list box.
 	 * @deprecated use {@link #setOptions(String[], Object[])}
 	 */
+	// TODO: exception if doesn't match other size?
+	// TODO: private?
+	// TODO: should this discard current mappings and establish zero to N-1?
 	protected void setOptions(final String[] _options) {
 		Objects.requireNonNull(_options);
 		// final String[] oldValue = _options.clone(); TODO: BUG
@@ -353,19 +359,20 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	// TODO: cleanup when remove mappings field
 	private void setMappingsInternal(Object[] _oldValue) {
 		mappings = getMappings(); // XXX TODO: REMOVE
-		firePropertyChange("mappings", _oldValue, myModel().getMappings().toArray());
+		firePropertyChange("mappings", _oldValue, optionSwingModel.getMappings().toArray());
 	}
 
 	// TODO: cleanup when remove options field
 	private void setOptionsInternal(String[] _oldValue) {
 		options = getOptions(); // XXX TODO: REMOVE
-		firePropertyChange("options", _oldValue, myModel().getOptions().toArray());
+		firePropertyChange("options", _oldValue, optionSwingModel.getOptions().toArray());
 	}
 
 	private void setModelInternal(final String[] _options, final Object[] _mappings) {
-		OptionMappingSwingListModel<Object> model
-				= new OptionMappingSwingListModel<Object>(_options, _mappings);
-		setModel(model);
+		
+		try (Model.Remodel remodel = optionSwingModel.getRemodel()) {
+			remodel.addAll(Arrays.asList(_mappings), Arrays.asList(_options));
+		}
 	}
 
 	/**
@@ -387,10 +394,9 @@ public class SSList extends JList<String> implements SSComponentInterface {
 
 		String[] oldOptions = null;
 		Object[] oldMappings = null;
-		OptionMappingSwingListModel<Object> oldModel = myModel();
-		if (oldModel != null) {
-			oldOptions = oldModel.getOptions().toArray(new String[0]);
-			oldMappings = oldModel.getMappings().toArray();
+		if (optionSwingModel != null) {
+			oldOptions = optionSwingModel.getOptions().toArray(new String[0]);
+			oldMappings = optionSwingModel.getMappings().toArray();
 		}
 
 		// ADD SPECIFIED ITEMS TO THE LIST BOX
@@ -409,14 +415,8 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	 * 
 	 * @return mapping list model with proper casting
 	 */
-	private OptionMappingSwingListModel<Object> myModel() {
-		ListModel<String> curModel = getModel();
-		if(!(curModel instanceof OptionMappingSwingListModel)) {
-			return null;
-		}
-		@SuppressWarnings("unchecked")
-		OptionMappingSwingListModel<Object> model = (OptionMappingSwingListModel<Object>) curModel;
-		return model;
+	public OptionMappingSwingModel<Object, String, Object> getOptionModel() {
+		return optionSwingModel;
 	}
 
 	/**
@@ -425,11 +425,9 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	 * @param _selectedMappings Values to be selected in list
 	 */
 	public void setSelectedValues(final Object[] _selectedMappings) {
-		final int[] selectedIndices = new int[_selectedMappings.length];
-		for (int i = 0; i < _selectedMappings.length; i++) {
-			selectedIndices[i] = myModel().getMappings().indexOf(_selectedMappings[i]);
-		}
-		setSelectedIndices(selectedIndices);
+		setSelectedIndices(Arrays.stream(_selectedMappings)
+				.mapToInt(o -> optionSwingModel.getMappings().indexOf(o))
+				.toArray());
 	}
 
 	/**
@@ -449,7 +447,7 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	 */
 	protected void updateRowSet() {
 		try {
-			collectionModel.writeData(getSSRowSet(), getBoundColumnName(),
+			selectedDBModel.writeData(getSSRowSet(), getBoundColumnName(),
 							getSelectedMappings().toArray());
 		} catch (final SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
@@ -466,14 +464,14 @@ public class SSList extends JList<String> implements SSComponentInterface {
 	@Override
 	public void updateSSComponent() {
 
-		if (myModel() == null) {
+		if (optionSwingModel == null) {
 			return;
 		}
 
 		Object[] array = null;
 		try {
 			if (getSSRowSet().getRow() > 0) {
-			    array = collectionModel.readData(getSSRowSet(), getBoundColumnName());
+			    array = selectedDBModel.readData(getSSRowSet(), getBoundColumnName());
 			}
 		} catch (final SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);

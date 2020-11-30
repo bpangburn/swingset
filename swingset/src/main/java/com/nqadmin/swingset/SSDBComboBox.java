@@ -54,7 +54,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.SSConnection;
-import com.nqadmin.swingset.models.OptionMappingSwingModel;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.models.SSListItem;
@@ -205,7 +204,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Define this class here because {@literal DefaultGla....<.....>}
 	 * messes up the code. In particular:
-	 * {@code try (OptionMappingSwingModel<Long,String,String>.Remodel remodel = xxx) }
+	 * {@code try (GlazedListsOptionMappingInfo<Long,String,String>.Remodel remodel = xxx) }
 	 */
 	private static class ComboInfo extends GlazedListsOptionMappingInfo<Long,Object,Object> {
 		private static final long serialVersionUID = 1L;

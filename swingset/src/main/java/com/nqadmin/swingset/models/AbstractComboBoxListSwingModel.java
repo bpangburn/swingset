@@ -37,6 +37,7 @@
  ******************************************************************************/
 package com.nqadmin.swingset.models;
 
+import java.awt.Component;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -48,9 +49,15 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.swing.AbstractListModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 import javax.swing.MutableComboBoxModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -205,10 +212,9 @@ implements MutableComboBoxModel<SSListItem> {
 	}
 
 	/**
-	 * Used for testing to set combo handling flags.
+	 * Used for testing to set combo handling flag.
 	 * @param _itemNumElems
 	 * @param _isCombo in a combo box
-	 * @param _comboOld default combo box semantics
 	 */
 	/*package-test*/ AbstractComboBoxListSwingModel(int _itemNumElems, boolean _isCombo) {
 		this(_itemNumElems);
@@ -216,7 +222,7 @@ implements MutableComboBoxModel<SSListItem> {
 		comboBoxModel = _isCombo;
 	}
 
-	boolean isComboBoxModel() {
+	/*package-test*/ boolean isComboBoxModel() {
 		return comboBoxModel;
 	}
 
@@ -237,6 +243,115 @@ implements MutableComboBoxModel<SSListItem> {
 				eventLogger.trace(() -> e.toString());
 			}
 		});
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	//
+	// Installation
+	// Make sure there's a SSListItemFormat,
+	// and install CellRenderer that uses it.
+	//
+
+	/**
+	 * Installs a default {@link SSListItemFormat}
+	 * into the model and installs
+	 * a default ListCellRenderer that uses it into the JComponent. 
+	 * The model is installed into the JComponent as a convenience.
+	 * 
+	 * @param _jc Jcomponent to set up with model; must be JList or JComboBox
+	 * @param _model associated model
+	 */
+	public static void install(JComponent _jc, AbstractComboBoxListSwingModel _model) {
+		install(_jc, _model, null);
+	}
+
+	/**
+	 * Installs the specified {@link SSListItemFormat}
+	 * into the model and installs
+	 * a default ListCellRenderer that uses it into the JComponent. 
+	 * The model is installed into the JComponent as a convenience.
+	 * 
+	 * @param _jc Jcomponent to set up with model; must be JList or JComboBox
+	 * @param _model associated model
+	 * @param _lif list item format
+	 */
+	public static void install(JComponent _jc, AbstractComboBoxListSwingModel _model,
+			SSListItemFormat _lif) {
+		install(_jc, _model, null, null);
+	}
+
+	/**
+	 * Installs the specified {@link SSListItemFormat}
+	 * into the model and installs
+	 * the specified ListCellRenderer into the JComponent. 
+	 * The model is installed into the JComponent as a convenience.
+	 * 
+	 * @param _jc Jcomponent to set up with model; must be JList or JComboBox
+	 * @param _model associated model
+	 * @param _lif list item format
+	 * @param _render list cell renderer
+	 */
+	@SuppressWarnings("unchecked")
+	public static void install(JComponent _jc, AbstractComboBoxListSwingModel _model,
+			SSListItemFormat _lif, ListCellRenderer<?> _render) {
+		Objects.requireNonNull(_jc);
+		Objects.requireNonNull(_model);
+		if(_model.installed) {
+			throw new IllegalStateException("model already installed");
+		}
+
+		_model.listItemFormat = _lif == null ? new SSListItemFormat() : _lif;
+		_model.installed = true;
+
+		if (_jc instanceof JList) {
+			ListCellRenderer<?> render = _render == null
+					? _model.new LocalListCellRenderer() : _render;
+			((JList) _jc).setCellRenderer(render);
+			((JList) _jc).setModel(_model);
+		} else if (_jc instanceof JComboBox) {
+			ListCellRenderer<?> render = _render == null
+					? _model.new LocalComboBoxCellRenderer() : _render;
+			((JComboBox) _jc).setRenderer(render);
+			((JComboBox) _jc).setModel(_model);
+			_model.comboBoxModel = true;
+		} else {
+			throw new IllegalArgumentException("must be JList or JComboBox");
+		}
+	}
+
+	private SSListItemFormat listItemFormat;
+	/**
+	 * Return the listItemFormat associated with this model;
+	 * it was installed into the JComponent as part of the cell renderer.
+	 * @return the associated listItemFormat
+	 */
+	public SSListItemFormat getListItemFormat() {
+		return listItemFormat;
+	}
+
+	protected class LocalListCellRenderer extends DefaultListCellRenderer {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Component getListCellRendererComponent( JList<?> list,
+				Object value, int index, boolean isSelected, boolean cellHasFocus) {
+			String stringValue = getListItemFormat().format(value);
+			return super.getListCellRendererComponent(list, stringValue, index, isSelected, cellHasFocus);
+		}
+	}
+
+	protected class LocalComboBoxCellRenderer extends BasicComboBoxRenderer {
+		private static final long serialVersionUID = 1L;
+
+		// In following, "JList<?> list" gets an error with 1.8 compiler,
+		// and is OK with j-14 compiler. I remember the old one
+		// has some inference issues with nested classes
+		@Override
+		public Component getListCellRendererComponent( JList list,
+				Object value, int index, boolean isSelected, boolean cellHasFocus) {
+			String stringValue = getListItemFormat().format(value);
+			return super.getListCellRendererComponent(list, stringValue, index, isSelected, cellHasFocus);
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
