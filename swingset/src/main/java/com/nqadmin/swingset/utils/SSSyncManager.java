@@ -197,7 +197,7 @@ public class SSSyncManager {
 		 * For a navigation we will updated the combo navigator following cursorMoved.
 		 * <p>
 		 * In JdbcRowSetImpl, notifyRowChanged() is called for insertRow(),
-		 * updateRow(), deleteRow(), & cancelRowUpdates(). We only want to block
+		 * updateRow(), deleteRow(), &amp; cancelRowUpdates(). We only want to block
 		 * combo navigator updates for calls resulting from updateRow().
 		 */
 		@Override

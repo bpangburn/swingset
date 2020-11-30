@@ -229,7 +229,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	 * For a navigation we will updated the components following cursorMoved.
 	 * <p>
 	 * In JdbcRowSetImpl, notifyRowChanged() is called for insertRow(),
-	 * updateRow(), deleteRow(), & cancelRowUpdates(). We only want to block
+	 * updateRow(), deleteRow(), &amp; cancelRowUpdates(). We only want to block
 	 * component updates for calls resulting from updateRow().
 	 * 
 	 * @throws SQLException	SQLException
