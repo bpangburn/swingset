@@ -46,7 +46,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSDataGrid;
-import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 
@@ -95,6 +94,9 @@ public class Example5 extends JFrame {
 
 		// SET SCREEN DIMENSIONS
 			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
+			
+		// SET SCREEN POSITION
+			setLocation(DemoUtil.getChildScreenLocation(this.getName()));
 
 		// INITIALIZE SCREEN & DATAGRID
 			init();

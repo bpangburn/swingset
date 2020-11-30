@@ -115,6 +115,9 @@ public class Example3 extends JFrame {
 
 		// SET SCREEN DIMENSIONS
 			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
+			
+		// SET SCREEN POSITION
+			setLocation(DemoUtil.getChildScreenLocation(this.getName()));
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
@@ -267,6 +270,7 @@ public class Example3 extends JFrame {
 
 		// MAKE THE JFRAME VISIBLE
 			setVisible(true);
+			pack();
 	}
 
 }

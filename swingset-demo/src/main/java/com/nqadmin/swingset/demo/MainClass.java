@@ -105,7 +105,11 @@ public class MainClass extends JFrame {
             	new Example4(dbConnection);
             }
             else if(ae.getSource().equals(btnExample4UsingHelper)){
-            	new Example4UsingHelper(dbConnection, MainClass.this);
+            	JFrame e4JFrame = new JFrame("Example4UsingHelper");
+            	e4JFrame.add(new Example4UsingHelper(dbConnection, e4JFrame));
+            	e4JFrame.setLocation(DemoUtil.getChildScreenLocation("Example4UsingHelper"));
+            	e4JFrame.setVisible(true);
+            	e4JFrame.pack();
             }
             else if(ae.getSource().equals(btnExample5)){
             	new Example5(dbConnection);
@@ -132,8 +136,8 @@ public class MainClass extends JFrame {
 	/**
 	 * component dimensions
 	 */
-	private static final int buttonHeight = 25;
-	private static final int buttonWidth = 150;
+	public static final int buttonHeight = 25;
+	public static final int buttonWidth = 250;
 	public static final Dimension buttonDim = new Dimension(buttonWidth, buttonHeight);
 	
 	public static final int gridColumnWidth = 60;
@@ -159,6 +163,7 @@ public class MainClass extends JFrame {
 	public static final int childScreenHeight = 400;
 	public static final int childScreenHeightTall = 800;
 	public static final int childScreenWidth = 600;
+	public static final int childScreenCount = 10;
 
 	/**
 	 * database
@@ -268,7 +273,7 @@ public class MainClass extends JFrame {
 
         // DISPLAY SCREEN
 	        setVisible(true);
-	        //pack();
+	        pack();
     }
 
     /**

@@ -96,6 +96,9 @@ public class Example7 extends JFrame {
 
 		// SET SCREEN DIMENSIONS
 			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
+			
+		// SET SCREEN POSITION
+			setLocation(DemoUtil.getChildScreenLocation(this.getName()));
 
 		// INITIALIZE SCREEN & DATAGRID
 			init();

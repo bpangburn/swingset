@@ -46,6 +46,8 @@ import java.sql.SQLException;
 
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
+import javax.swing.plaf.InternalFrameUI;
+import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -110,6 +112,9 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		
 		// Finish Initialization
 		initScreen();
+		
+		// Hide the frame since we're putting the JInternalFrame in its own JFrame for the demo
+		setBorder(null);
 		
 		// Display Screen
 		showUp(_container);
@@ -294,6 +299,15 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		// nothing to do...
 
 	}
+	
+	// THIS IS A HACK TO HIDE THE TITLE BAR SINCE WE'RE PUTTING THE JINTERNALFRAME IN ITS OWN JFRAME FOR THE SWINGSET DEMO
+	// https://stackoverflow.com/a/51254020
+    @Override
+    public void setUI(InternalFrameUI ui) {
+        super.setUI(ui); // this gets called internally when updating the ui and makes the northPane reappear
+        BasicInternalFrameUI frameUI = (BasicInternalFrameUI) getUI(); // so...
+        if (frameUI != null) frameUI.setNorthPane(null); // lets get rid of it
+    }
 
 	@Override
 	protected void updateSSDBComboBoxes() {

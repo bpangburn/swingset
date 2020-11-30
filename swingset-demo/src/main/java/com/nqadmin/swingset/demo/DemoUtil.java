@@ -5,6 +5,7 @@
  */
 package com.nqadmin.swingset.demo;
  
+import java.awt.Point;
 import java.io.BufferedReader;  
 import java.io.IOException;
  
@@ -46,6 +47,27 @@ public class DemoUtil
 			logger.error("SQL Exception. " + ex.getMessage());
 		}
 		return conn;
+	}
+	
+	/**
+	 * Provide a point with the child screen location based on the class name.
+	 * 
+	 * @param _className name of screen to position
+	 */
+	public static Point getChildScreenLocation(String _className) {
+		// TODO Consider cascading based on name.
+		
+		Point result = new Point(MainClass.buttonWidth + 50, (MainClass.buttonHeight * MainClass.childScreenCount) + 50);
+//		switch (_className) {
+//		case "x":
+//			result.setLocation(0,0);
+//			break;		
+//		default:
+//			result.setLocation(0,0);
+//			break;
+//		}
+		
+		return result;
 	}
 
 	/**
