@@ -54,7 +54,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.SSConnection;
-import com.nqadmin.swingset.models.DefaultGlazedListComboInfo;
+import com.nqadmin.swingset.models.OptionMappingSwingModel;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.models.SSListItem;
@@ -65,7 +65,7 @@ import ca.odell.glazedlists.matchers.TextMatcherEditor;
 import ca.odell.glazedlists.swing.AutoCompleteSupport;
 
 import static com.nqadmin.swingset.datasources.RowSetOps.*;
-import com.nqadmin.swingset.models.SSAbstractGlazedListComboInfo;
+import com.nqadmin.swingset.models.GlazedListsOptionMappingInfo;
 import com.nqadmin.swingset.models.SSListItemFormat;
 
 
@@ -205,9 +205,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Define this class here because {@literal DefaultGla....<.....>}
 	 * messes up the code. In particular:
-	 * {@code try (DefaultGlazedListComboInfo<Long,String,String>.Remodel remodel = xxx) }
+	 * {@code try (OptionMappingSwingModel<Long,String,String>.Remodel remodel = xxx) }
 	 */
-	private static class ComboInfo extends SSAbstractGlazedListComboInfo<Long,Object,Object> {
+	private static class ComboInfo extends GlazedListsOptionMappingInfo<Long,Object,Object> {
 		private static final long serialVersionUID = 1L;
 
 		public ComboInfo(boolean _hasOption2) {

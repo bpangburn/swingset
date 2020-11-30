@@ -55,7 +55,7 @@ import javax.swing.event.ListDataListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-// SSAbstractListInfo.java
+// AbstractComboBoxListSwingModel.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
@@ -103,7 +103,7 @@ import org.apache.logging.log4j.Logger;
  *		for use with GlazedLists AutoComplete feature
  * @since 4.0.0
  */
-public abstract class SSAbstractListInfo extends AbstractListModel<SSListItem>
+public abstract class AbstractComboBoxListSwingModel extends AbstractListModel<SSListItem>
 implements MutableComboBoxModel<SSListItem> {
 	private static final long serialVersionUID = 1L;
 
@@ -120,7 +120,7 @@ implements MutableComboBoxModel<SSListItem> {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger eventLogger = LogManager.getLogger(SSAbstractListInfo.class.getName() + ".events");
+	private static Logger eventLogger = LogManager.getLogger(AbstractComboBoxListSwingModel.class.getName() + ".events");
 
 	/**
 	 * number of objects in the SSListItem
@@ -176,7 +176,7 @@ implements MutableComboBoxModel<SSListItem> {
 	 * Construct an empty list info container.
 	 * @param _itemNumElems number of elements in an SSListItem
 	 */
-	protected SSAbstractListInfo(int _itemNumElems) {
+	protected AbstractComboBoxListSwingModel(int _itemNumElems) {
 		this(_itemNumElems, null);
 	}
 
@@ -193,7 +193,7 @@ implements MutableComboBoxModel<SSListItem> {
 	 */
 	
 	
-	protected SSAbstractListInfo(int _itemNumElems, List<SSListItem> _itemList) {
+	protected AbstractComboBoxListSwingModel(int _itemNumElems, List<SSListItem> _itemList) {
 		if(_itemList != null && !_itemList.isEmpty()) {
 			throw new IllegalArgumentException("item list must be empty");
 		}
@@ -211,7 +211,7 @@ implements MutableComboBoxModel<SSListItem> {
 	 * @param _isCombo in a combo box
 	 * @param _comboOld default combo box semantics
 	 */
-	/*package-test*/ SSAbstractListInfo(int _itemNumElems, boolean _isCombo) {
+	/*package-test*/ AbstractComboBoxListSwingModel(int _itemNumElems, boolean _isCombo) {
 		this(_itemNumElems);
 		
 		comboBoxModel = _isCombo;
@@ -755,10 +755,10 @@ implements MutableComboBoxModel<SSListItem> {
 	 * There is a class Inspect, similar to Remodel,
 	 * that has methods that only read data.
 	 * <p>
-	 * It is anticipated that subclass may want to use Remodel
-	 * as part of a locking scheme for multi-threaded
-	 * access to SSAbstractListInfo.
-	 * The {@link #verifyOpened()}
+ It is anticipated that subclass may want to use Remodel
+ as part of a locking scheme for multi-threaded
+ access to AbstractComboBoxListSwingModel.
+ The {@link #verifyOpened()}
 	 * method is useful for that.
 	 * Methods in subclasses should call verifyOpened
 	 * as their first statement; this avoids modifications
@@ -847,7 +847,7 @@ implements MutableComboBoxModel<SSListItem> {
 		 */
 		public boolean add(SSListItem _newItem) {
 			verifyOpened();
-			return SSAbstractListInfo.this.add(_newItem);
+			return AbstractComboBoxListSwingModel.this.add(_newItem);
 			// isModifiedLength = true;
 		}
 
@@ -858,7 +858,7 @@ implements MutableComboBoxModel<SSListItem> {
 		 */
 		public void add(int _index, SSListItem _newItem) {
 			verifyOpened();
-			SSAbstractListInfo.this.add(_index, _newItem);
+			AbstractComboBoxListSwingModel.this.add(_index, _newItem);
 			// isModifiedLength = true;
 		}
 		/**
@@ -869,7 +869,7 @@ implements MutableComboBoxModel<SSListItem> {
 		 */
 		public boolean addAll(List<SSListItem> _newItems) {
 			verifyOpened();
-			return SSAbstractListInfo.this.addAll(_newItems);
+			return AbstractComboBoxListSwingModel.this.addAll(_newItems);
 			// isModifiedLength = true;
 		}
 		/**
@@ -881,13 +881,13 @@ implements MutableComboBoxModel<SSListItem> {
 		 */
 		public SSListItem set(int _index, SSListItem _newItem) {
 			verifyOpened();
-			return SSAbstractListInfo.this.set(_index, _newItem);
+			return AbstractComboBoxListSwingModel.this.set(_index, _newItem);
 		}
 
 		/** remove all list items from the itemList */
 		public void clear() {
 			verifyOpened();
-			SSAbstractListInfo.this.clear();
+			AbstractComboBoxListSwingModel.this.clear();
 			// isModifiedLength = true;
 		}
 		
@@ -898,7 +898,7 @@ implements MutableComboBoxModel<SSListItem> {
 		 */
 		public SSListItem remove(int _index) {
 			verifyOpened();
-			SSListItem item = SSAbstractListInfo.this.remove(_index);
+			SSListItem item = AbstractComboBoxListSwingModel.this.remove(_index);
 			// isModifiedLength = true;
 			return item;
 		}
@@ -909,7 +909,7 @@ implements MutableComboBoxModel<SSListItem> {
 		 */
 		public boolean remove(Object _listItem) {
 			verifyOpened();
-			return SSAbstractListInfo.this.remove(_listItem);
+			return AbstractComboBoxListSwingModel.this.remove(_listItem);
 			// isModifiedLength = true;
 		}
 		
@@ -922,7 +922,7 @@ implements MutableComboBoxModel<SSListItem> {
 		 */
 		public Object getElem(int _listItemIndex, int _elemIndex) {
 			verifyOpened();
-			return SSAbstractListInfo.this.getElem(_listItemIndex, _elemIndex);
+			return AbstractComboBoxListSwingModel.this.getElem(_listItemIndex, _elemIndex);
 		}
 		
 		/**
@@ -934,7 +934,7 @@ implements MutableComboBoxModel<SSListItem> {
 		 */
 		public Object getElem(SSListItem _listItem, int _elemIndex) {
 			verifyOpened();
-			return SSAbstractListInfo.this.getElem(_listItem, _elemIndex);
+			return AbstractComboBoxListSwingModel.this.getElem(_listItem, _elemIndex);
 		}
 		
 		/**
@@ -947,7 +947,7 @@ implements MutableComboBoxModel<SSListItem> {
 		 */
 		public Object setElem(int _listItemIndex, int _elemIndex, Object _newElem) {
 			verifyOpened();
-			return SSAbstractListInfo.this.setElem(_listItemIndex, _elemIndex, _newElem);
+			return AbstractComboBoxListSwingModel.this.setElem(_listItemIndex, _elemIndex, _newElem);
 		}
 
 		/**

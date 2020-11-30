@@ -41,7 +41,7 @@ import java.util.List;
 
 import ca.odell.glazedlists.EventList;
 
-// DefaultGlazedListComboInfo.java
+// OptionMappingSwingModel.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
@@ -51,7 +51,7 @@ import ca.odell.glazedlists.EventList;
  * @see <a href="https://publicobject.com/glazedlistsdeveloper/screencasts/autocompletesupport/">GlazedLists AutoCompletion Video</a>
  * @since 4.0.0
  */
-public class SSAbstractGlazedListComboInfo<M,O,O2> extends DefaultGlazedListComboInfo<M,O,O2> {
+public class GlazedListsOptionMappingInfo<M,O,O2> extends OptionMappingSwingModel<M,O,O2> {
 	private static final long serialVersionUID = 1L;
 	private EventList<SSListItem> eventList;
 	private boolean hasReturnedEventList;
@@ -62,7 +62,7 @@ public class SSAbstractGlazedListComboInfo<M,O,O2> extends DefaultGlazedListComb
 	 * @param _option2Enabled true says to provide an options2 field in SSListItem
 	 */
 	@SuppressWarnings("unchecked")
-	public SSAbstractGlazedListComboInfo(boolean _option2Enabled, EventList<SSListItem> _itemList) {
+	public GlazedListsOptionMappingInfo(boolean _option2Enabled, EventList<SSListItem> _itemList) {
 		super(_option2Enabled, _itemList);
 		eventList = _itemList;
 	}
@@ -81,7 +81,7 @@ public class SSAbstractGlazedListComboInfo<M,O,O2> extends DefaultGlazedListComb
 		return temp;
 	}
 
-	// protected SSAbstractGlazedListComboInfo(int itemNumElems, List<SSListItem> itemList) {
+	// protected GlazedListsOptionMappingInfo(int itemNumElems, List<SSListItem> itemList) {
 	// 	super(itemNumElems, itemList);
 	// 	eventList = (EventList<SSListItem>) itemList;
 	// }
@@ -94,7 +94,7 @@ public class SSAbstractGlazedListComboInfo<M,O,O2> extends DefaultGlazedListComb
 	/**
 	 * Remodel that locks the GlazedLists EventList.
 	 */
-	public class Remodel extends DefaultGlazedListComboInfo<M, O, O2>.Remodel implements AutoCloseable {
+	public class Remodel extends OptionMappingSwingModel<M, O, O2>.Remodel implements AutoCloseable {
 
 		/**
 		 * This is called during construction,

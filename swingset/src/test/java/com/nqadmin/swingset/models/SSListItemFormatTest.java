@@ -76,7 +76,7 @@ public class SSListItemFormatTest {
 	public void tearDown() {
 	}
 
-	static class LI extends SSAbstractListInfo {
+	static class LI extends AbstractComboBoxListSwingModel {
 
 		public LI(int itemNumElems, List<SSListItem> itemList) {
 			super(itemNumElems, itemList);
@@ -84,7 +84,7 @@ public class SSListItemFormatTest {
 		@Override protected void checkState() { }
 		@Override protected Remodel getRemodel() { return new RM(); }
 
-		class RM extends SSAbstractListInfo.Remodel {
+		class RM extends AbstractComboBoxListSwingModel.Remodel {
 			@Override protected void takeWriteLock() { }
 			@Override protected void releaseWriteLock() { }
 		}
@@ -297,7 +297,7 @@ public class SSListItemFormatTest {
 	// 	System.out.println("appendValue");
 	// 	StringBuffer _sb = null;
 	// 	int _elemIndex = 0;
-	// 	SSAbstractListInfo.ListItem0 _listItem = null;
+	// 	AbstractComboBoxListSwingModel.ListItem0 _listItem = null;
 	// 	SSListItemFormat instance = new SSListItemFormat();
 	// 	instance.appendValue(_sb, _elemIndex, _listItem);
 	// 	// TODO review the generated test code and remove the default call to fail.

@@ -39,7 +39,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * This is a copy of SSAbstractListInfo just for events.
+ * This is a copy of AbstractComboBoxListSwingModel just for events.
  * @author err
  */
 public class SSAbstractListInfoEventTest {
@@ -55,7 +55,7 @@ public class SSAbstractListInfoEventTest {
 	public static void tearDownClass() {
 	}
 
-	static class LI extends SSAbstractListInfo {
+	static class LI extends AbstractComboBoxListSwingModel {
 		private static final long serialVersionUID = 1L;
 
 		public LI(int itemNumElems, boolean isCombo) {
@@ -71,7 +71,7 @@ public class SSAbstractListInfoEventTest {
 		@Override protected void checkState() { }
 		@Override protected Remodel getRemodel() { return new RM(); }
 
-		class RM extends SSAbstractListInfo.Remodel {
+		class RM extends AbstractComboBoxListSwingModel.Remodel {
 			@Override protected void takeWriteLock() { }
 			@Override protected void releaseWriteLock() { }
 		}

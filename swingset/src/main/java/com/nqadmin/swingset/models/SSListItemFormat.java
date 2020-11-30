@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
-import com.nqadmin.swingset.models.SSAbstractListInfo.ListItem0;
+import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.ListItem0;
 
 // SSListItemFormat.java
 //

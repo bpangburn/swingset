@@ -44,7 +44,7 @@ import java.util.Objects;
 
 import ca.odell.glazedlists.EventList;
 
-// DefaultGlazedListComboInfo.java
+// OptionMappingSwingModel.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
@@ -66,12 +66,12 @@ import ca.odell.glazedlists.EventList;
  * @param <O> option type; option provides display string
  * @param <O2>  option2 type; if present, suplementary display string
  * 
- * @see SSAbstractListInfo for general description of using this class
+ * @see AbstractComboBoxListSwingModel for general description of using this class
  * @see <a target="_top" href="https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html">GlazedLists AutoCompletion javadoc</a>
  * 
  * @since 4.0.0
  */
-public abstract class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractListInfo {
+public abstract class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingModel {
 	private static final long serialVersionUID = 1L;
 
 	/** index of primary key in SSListItem */
@@ -96,7 +96,7 @@ public abstract class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractListI
 	 * @param _option2Enabled true says to provide an options2 field in SSListItem
 	 */
 	@SuppressWarnings("unchecked")
-	public DefaultGlazedListComboInfo(boolean _option2Enabled, EventList<SSListItem> _itemList) {
+	public OptionMappingSwingModel(boolean _option2Enabled, EventList<SSListItem> _itemList) {
 		super(_option2Enabled ? 3 : 2, _itemList);
 		option2Enabled = _option2Enabled;
 		mappings = (List<M>) createElementSlice(KEY_IDX);
@@ -235,7 +235,7 @@ public abstract class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractListI
 	}
 
 	/** Methods for inspecting and modifying list info */
-	protected class Remodel extends SSAbstractListInfo.Remodel {
+	protected class Remodel extends AbstractComboBoxListSwingModel.Remodel {
 
 		// no locking by default
 		@Override protected void takeWriteLock() { }
@@ -359,7 +359,7 @@ public abstract class DefaultGlazedListComboInfo<M,O,O2> extends SSAbstractListI
 			if (_options2 != null) {
 				usingOption2();
 			}
-			List<SSListItem> list = DefaultGlazedListComboInfo.this.createComboItems(_mappings, _options, _options2);
+			List<SSListItem> list = OptionMappingSwingModel.this.createComboItems(_mappings, _options, _options2);
 			return super.addAll(list);
 			//isModifiedLength = true;
 		}

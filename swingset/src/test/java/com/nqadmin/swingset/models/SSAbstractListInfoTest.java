@@ -54,7 +54,7 @@ public class SSAbstractListInfoTest {
 	public static void tearDownClass() {
 	}
 
-	static class LI extends SSAbstractListInfo {
+	static class LI extends AbstractComboBoxListSwingModel {
 		private static final long serialVersionUID = 1L;
 
 		public LI(int itemNumElems, List<SSListItem> itemList) {
@@ -63,7 +63,7 @@ public class SSAbstractListInfoTest {
 		@Override protected void checkState() { }
 		@Override protected Remodel getRemodel() { return new RM(); }
 
-		class RM extends SSAbstractListInfo.Remodel {
+		class RM extends AbstractComboBoxListSwingModel.Remodel {
 			@Override protected void takeWriteLock() { }
 			@Override protected void releaseWriteLock() { }
 		}
@@ -153,7 +153,7 @@ public class SSAbstractListInfoTest {
 	}
 
 	/**
-	 * Test of isEmpty method, of class SSAbstractListInfo.
+	 * Test of isEmpty method, of class AbstractComboBoxListSwingModel.
 	 */
 	@Test
 	public void testIsEmpty() {
@@ -168,7 +168,7 @@ public class SSAbstractListInfoTest {
 	}
 
 	/**
-	 * Test of indexOfItem method, of class SSAbstractListInfo.
+	 * Test of indexOfItem method, of class AbstractComboBoxListSwingModel.
 	 */
 	@Test
 	public void testIndexOfItem() {
@@ -182,7 +182,7 @@ public class SSAbstractListInfoTest {
 	}
 
 	/**
-	 * Test of getItemNumElems method, of class SSAbstractListInfo.
+	 * Test of getItemNumElems method, of class AbstractComboBoxListSwingModel.
 	 */
 	@Test
 	public void testGetItemNumElems() {
@@ -193,7 +193,7 @@ public class SSAbstractListInfoTest {
 	}
 
 	/**
-	 * Test of setItemNumElems method, of class SSAbstractListInfo.
+	 * Test of setItemNumElems method, of class AbstractComboBoxListSwingModel.
 	 */
 	@Test
 	public void testSetItemNumElems() {
@@ -236,7 +236,7 @@ public class SSAbstractListInfoTest {
 	}
 
 	/**
-	 * Test of createListItem method, of class SSAbstractListInfo.
+	 * Test of createListItem method, of class AbstractComboBoxListSwingModel.
 	 */
 	@Test
 	public void testCreateListItem() {
@@ -363,7 +363,7 @@ public class SSAbstractListInfoTest {
 	}
 
 	/**
-	 * Test of createElementSlice method, of class SSAbstractListInfo.
+	 * Test of createElementSlice method, of class AbstractComboBoxListSwingModel.
 	 */
 	@Test
 	public void testCreateElementSlice() {
