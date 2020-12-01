@@ -354,7 +354,7 @@ public class SSCommon implements Serializable {
 	 * Method to add the RowSet listener.
 	 */
 	public void addSSRowSetListener() {
-		ssRowSet.addSSRowSetListener(ssRowSetListener);
+		ssRowSet.addRowSetListener(ssRowSetListener);
 	}
 	
 	// TODO Merge common code across bind() methods.
@@ -599,7 +599,7 @@ public class SSCommon implements Serializable {
 	 */
 	public void removeSSRowSetListener() {
 		if (ssRowSet != null) {
-			ssRowSet.removeSSRowSetListener(ssRowSetListener);
+			ssRowSet.removeRowSetListener(ssRowSetListener);
 		}
 	}
 
