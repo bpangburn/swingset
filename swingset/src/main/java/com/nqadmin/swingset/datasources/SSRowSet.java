@@ -37,21 +37,9 @@
  ******************************************************************************/
 package com.nqadmin.swingset.datasources;
 
-import java.sql.Date;
-import java.sql.JDBCType;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import javax.sql.RowSet;
-import javax.sql.RowSetListener;
-
-import org.apache.logging.log4j.LogManager;
-
-import com.nqadmin.swingset.utils.SSCommon;
 
 // SSRowSet.java
 //
@@ -64,17 +52,6 @@ import com.nqadmin.swingset.utils.SSCommon;
  */
 public interface SSRowSet extends RowSet {
 
-	// TODO Audit type handling based on http://www.java2s.com/Code/Java/Database-SQL-JDBC/StandardSQLDataTypeswithTheirJavaEquivalents.htm
-
-	/**
-	 * Wrapper/convenience method for SwingSet method naming consistency.
-	 *
-	 * @param _rowSetListener RowSetListener to add to current SSRowSet
-	 */
-	public default void addSSRowSetListener(final RowSetListener _rowSetListener) {
-		addRowSetListener(_rowSetListener);
-	}
-
 	/**
 	 * Returns the number of columns in the underlying ResultSet object
 	 *
@@ -82,7 +59,8 @@ public interface SSRowSet extends RowSet {
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public default int getColumnCount() throws SQLException {
-		return getMetaData().getColumnCount();
+		return RowSetOps.getColumnCount(this);
+		//return getMetaData().getColumnCount();
 	}
 
 	/**
@@ -95,7 +73,8 @@ public interface SSRowSet extends RowSet {
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public default int getColumnIndex(final String _columnName) throws SQLException {
-		return findColumn(_columnName);
+		return RowSetOps.getColumnIndex(this, _columnName);
+		//return findColumn(_columnName);
 	}
 
 	/**
@@ -108,7 +87,8 @@ public interface SSRowSet extends RowSet {
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public default String getColumnName(final int _columnIndex) throws SQLException {
-		return getMetaData().getColumnName(_columnIndex);
+		return RowSetOps.getColumnName(this, _columnIndex);
+		//return getMetaData().getColumnName(_columnIndex);
 	}
 
 	/**
@@ -120,110 +100,111 @@ public interface SSRowSet extends RowSet {
 	 * @return text representation of data in specified column
 	 */
 	public default String getColumnText(final String _columnName) {
-		String value = null;
-
-		try {
-			// IF THERE ARE NO COLUMNS IN THE ROWSET, RETURN NULL
-			if (getColumnCount()==0) {
-				LogManager.getLogger().debug("Call to getColumnText() for column=" + _columnName + ", but the RowSet has no columns.");
-				return null;
-			}
-
-			final int columnType = getColumnType(_columnName);
-		
-			LogManager.getLogger().debug("getObject() for " + _columnName + " of type {} returns {}.", () ->  JDBCType.valueOf(columnType).getName(), () ->  {
-				try {
-					return getObject(_columnName);
-				} catch (SQLException e) {
-					return "*** getObject() threw an SQL Exception ***";
-				}
-			});
-			
-			// RETURN NULL IF THE OBJECT REQUESTED IS NULL
-			if (getObject(_columnName) == null) {
-				return null;
-			}
-
-			// BASED ON THE COLUMN DATA TYPE THE CORRESPONDING FUNCTION
-			// IS CALLED TO GET THE VALUE IN THE COLUMN
-			switch (columnType) {
-			case Types.INTEGER:
-			case Types.SMALLINT:
-			case Types.TINYINT:
-				value = String.valueOf(this.getInt(_columnName));
-				break;
-
-			case Types.BIGINT:
-				value = String.valueOf(this.getLong(_columnName));
-				break;
-
-			case Types.FLOAT:
-				value = String.valueOf(this.getFloat(_columnName));
-				break;
-
-			case Types.DOUBLE:
-			case Types.NUMERIC:
-			case Types.DECIMAL:
-				value = String.valueOf(this.getDouble(_columnName));
-				break;
-
-			case Types.BOOLEAN:
-			case Types.BIT:
-				value = String.valueOf(this.getBoolean(_columnName));
-				break;
-
-			case Types.DATE:
-			case Types.TIMESTAMP:
-				final Date date = this.getDate(_columnName);
-				if (date == null) {
-					value = "";
-				} else {
-					final GregorianCalendar calendar = new GregorianCalendar();
-					calendar.setTime(date);
-					value = "";
-					if ((calendar.get(Calendar.MONTH) + 1) < 10) {
-						value = "0";
-					}
-					value = value + (calendar.get(Calendar.MONTH) + 1) + "/";
-
-					if (calendar.get(Calendar.DAY_OF_MONTH) < 10) {
-						value = value + "0";
-					}
-					value = value + calendar.get(Calendar.DAY_OF_MONTH) + "/";
-					value = value + calendar.get(Calendar.YEAR);
-					// value = String.valueOf(sSRowSet.getDate(columnName));
-				}
-				break;
-
-			case Types.TIME:
-				final Time time = this.getTime(_columnName);
-				if (time == null) {
-					value = "";
-				} else {
-					value=time.toString();
-				}
-				break;
-
-			case Types.CHAR:
-			case Types.VARCHAR:
-			case Types.LONGVARCHAR:
-				final String str = this.getString(_columnName);
-				if (str == null) {
-					value = "";
-				} else {
-					value = String.valueOf(str);
-				}
-				break;
-
-			default:
-				LogManager.getLogger().error("Unsupported data type of " + JDBCType.valueOf(columnType).getName() + " for column " + _columnName + ".");
-			} // end switch
-
-		} catch (final SQLException se) {
-			LogManager.getLogger().error("SQL Exception for column " + _columnName + ".", se);
-		}
-
-		return value;
+		return RowSetOps.getColumnText(this, _columnName);
+//		String value = null;
+//
+//		try {
+//			// IF THERE ARE NO COLUMNS IN THE ROWSET, RETURN NULL
+//			if (getColumnCount()==0) {
+//				LogManager.getLogger().debug("Call to getColumnText() for column=" + _columnName + ", but the RowSet has no columns.");
+//				return null;
+//			}
+//
+//			final int columnType = getColumnType(_columnName);
+//		
+//			LogManager.getLogger().debug("getObject() for " + _columnName + " of type {} returns {}.", () ->  JDBCType.valueOf(columnType).getName(), () ->  {
+//				try {
+//					return getObject(_columnName);
+//				} catch (SQLException e) {
+//					return "*** getObject() threw an SQL Exception ***";
+//				}
+//			});
+//			
+//			// RETURN NULL IF THE OBJECT REQUESTED IS NULL
+//			if (getObject(_columnName) == null) {
+//				return null;
+//			}
+//
+//			// BASED ON THE COLUMN DATA TYPE THE CORRESPONDING FUNCTION
+//			// IS CALLED TO GET THE VALUE IN THE COLUMN
+//			switch (columnType) {
+//			case Types.INTEGER:
+//			case Types.SMALLINT:
+//			case Types.TINYINT:
+//				value = String.valueOf(this.getInt(_columnName));
+//				break;
+//
+//			case Types.BIGINT:
+//				value = String.valueOf(this.getLong(_columnName));
+//				break;
+//
+//			case Types.FLOAT:
+//				value = String.valueOf(this.getFloat(_columnName));
+//				break;
+//
+//			case Types.DOUBLE:
+//			case Types.NUMERIC:
+//			case Types.DECIMAL:
+//				value = String.valueOf(this.getDouble(_columnName));
+//				break;
+//
+//			case Types.BOOLEAN:
+//			case Types.BIT:
+//				value = String.valueOf(this.getBoolean(_columnName));
+//				break;
+//
+//			case Types.DATE:
+//			case Types.TIMESTAMP:
+//				final Date date = this.getDate(_columnName);
+//				if (date == null) {
+//					value = "";
+//				} else {
+//					final GregorianCalendar calendar = new GregorianCalendar();
+//					calendar.setTime(date);
+//					value = "";
+//					if ((calendar.get(Calendar.MONTH) + 1) < 10) {
+//						value = "0";
+//					}
+//					value = value + (calendar.get(Calendar.MONTH) + 1) + "/";
+//
+//					if (calendar.get(Calendar.DAY_OF_MONTH) < 10) {
+//						value = value + "0";
+//					}
+//					value = value + calendar.get(Calendar.DAY_OF_MONTH) + "/";
+//					value = value + calendar.get(Calendar.YEAR);
+//					// value = String.valueOf(sSRowSet.getDate(columnName));
+//				}
+//				break;
+//
+//			case Types.TIME:
+//				final Time time = this.getTime(_columnName);
+//				if (time == null) {
+//					value = "";
+//				} else {
+//					value=time.toString();
+//				}
+//				break;
+//
+//			case Types.CHAR:
+//			case Types.VARCHAR:
+//			case Types.LONGVARCHAR:
+//				final String str = this.getString(_columnName);
+//				if (str == null) {
+//					value = "";
+//				} else {
+//					value = String.valueOf(str);
+//				}
+//				break;
+//
+//			default:
+//				LogManager.getLogger().error("Unsupported data type of " + JDBCType.valueOf(columnType).getName() + " for column " + _columnName + ".");
+//			} // end switch
+//
+//		} catch (final SQLException se) {
+//			LogManager.getLogger().error("SQL Exception for column " + _columnName + ".", se);
+//		}
+//
+//		return value;
 
 	} // end protected String getColumnText(String _columnName) {
 
@@ -240,7 +221,8 @@ public interface SSRowSet extends RowSet {
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public default int getColumnType(final int _columnIndex) throws SQLException {
-		return getMetaData().getColumnType(_columnIndex);
+		return RowSetOps.getColumnType(this, _columnIndex);
+		//return getMetaData().getColumnType(_columnIndex);
 	}
 
 	/**
@@ -256,7 +238,8 @@ public interface SSRowSet extends RowSet {
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public default int getColumnType(final String _columnName) throws SQLException {
-		return getMetaData().getColumnType(getColumnIndex(_columnName));
+		return RowSetOps.getColumnType(this, _columnName);
+		//return getMetaData().getColumnType(getColumnIndex(_columnName));
 	}
 	
 	/**
@@ -266,15 +249,6 @@ public interface SSRowSet extends RowSet {
 	 * @return indicates if a call to updateRow() is in progress
 	 */
 	public boolean isUpdatingRow();
-
-	/**
-	 * Wrapper/convenience method for SwingSet method naming consistency.
-	 *
-	 * @param _rowSetListener RowSetListener to remove from current SSRowSet
-	 */
-	public default void removeSSRowSetListener(final RowSetListener _rowSetListener) {
-		removeRowSetListener(_rowSetListener);
-	}
 
 	/**
 	 * Method used by SwingSet component listeners to update the underlying
@@ -293,187 +267,169 @@ public interface SSRowSet extends RowSet {
 	 * @throws NumberFormatException thrown if unable to parse a string to number format
 	 */
 	public default void updateColumnText(final String _updatedValue, final String _columnName, final boolean _allowNull) throws NullPointerException, SQLException, NumberFormatException {
-
-//		try {
-
-			// TODO Add proper support for null vs "" based on _allowNull. For Char types all "" are currently forced to null,
-//			if (!_allowNull && _updatedValue==null) {
-//				_updatedValue = "";
-//			}
-
-			// TODO Convert this code to use Java 8 JDBCType enum
-
-			// 2020-09-11_BP: Probably not a good idea to trim here as it may be desirable to have padding for some strings
-			// Also, it's coded wrong.
-			// Should be:
-			//	if (_updatedValue!=null) _updatedValue = _updatedValue.trim();
-			// not:
-			// 	if (_updatedValue!=null) _updatedValue.trim();
-
-
-			LogManager.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "].");
-
-			final int columnType = getColumnType(_columnName);
-
-			switch (columnType) {
-			// FOR NON-TEXT-BASED DATABASE COLUMNS, WRITE NULL INSTEAD OF AN EMPTY STRING
-
-			case Types.INTEGER:
-			case Types.SMALLINT:
-			case Types.TINYINT:
-				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						this.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-				} else {
-					final int intValue = Integer.parseInt(_updatedValue);
-					this.updateInt(_columnName, intValue);
-				}
-				break;
-
-			case Types.BIGINT:
-				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						this.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-				} else {
-					final long longValue = Long.parseLong(_updatedValue);
-					this.updateLong(_columnName, longValue);
-				}
-				break;
-
-			case Types.FLOAT:
-				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						this.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-				} else {
-					final float floatValue = Float.parseFloat(_updatedValue);
-					this.updateFloat(_columnName, floatValue);
-				}
-				break;
-
-			case Types.DOUBLE:
-			case Types.NUMERIC:
-			case Types.DECIMAL:
-				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						this.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-				} else {
-					final double doubleValue = Double.parseDouble(_updatedValue);
-					this.updateDouble(_columnName, doubleValue);
-				}
-				break;
-
-			case Types.BOOLEAN:
-			case Types.BIT:
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						this.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-				} else {
-					// CONVERT THE GIVEN STRING TO BOOLEAN TYPE
-					final boolean boolValue = Boolean.valueOf(_updatedValue);
-					this.updateBoolean(_columnName, boolValue);
-				}
-				break;
-
-			case Types.DATE:
-				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						this.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-// TODO Good to get rid of getSQLDate if possible.
-				} else if (_updatedValue.length() == 10) {
-					this.updateDate(_columnName, SSCommon.getSQLDate(_updatedValue));
-				} else {
-					// do nothing
-				}
-				break;
-
-			case Types.TIME:
-				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						this.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-				} else {
-					this.updateTime(_columnName, java.sql.Time.valueOf(_updatedValue));
-				}
-				break;
-
-			case Types.TIMESTAMP:
-				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
-				if ((_updatedValue==null) || _updatedValue.equals("")) {
-					if (_allowNull) {
-						this.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-// TODO Probably do not want a length of 10 characters here. Good to get rid of getSQLDate if possible.
-				} else if (_updatedValue.length() == 10) {
-					this.updateTimestamp(_columnName, new Timestamp(SSCommon.getSQLDate(_updatedValue).getTime()));
-				} else {
-					// do nothing
-				}
-				break;
-
-			case Types.CHAR:
-			case Types.VARCHAR:
-			case Types.LONGVARCHAR:
-				// FOR TEXT-BASED DATABASE COLUMNS WE CAN WRITE AN EMPTY STRING, BUT IF THERE IS
-				// A UNIQUE CONSTRAINT ON THE COLUMN
-				// THIS CAUSES A PROBLEM SO WE WRITE NULL
-				// TODO investigate if we can let the programmer indicate how this should be
-				// handled for a given column OR see if we can identify constraints
-//				if (_updatedValue==null || _updatedValue.equals("")) {
-//					this.updateNull(_columnName);
+		RowSetOps.updateColumnText(this, _updatedValue, _columnName, _allowNull);
+//			// 2020-09-11_BP: Probably not a good idea to trim here as it may be desirable to have padding for some strings
+//			// Also, it's coded wrong.
+//			// Should be:
+//			//	if (_updatedValue!=null) _updatedValue = _updatedValue.trim();
+//			// not:
+//			// 	if (_updatedValue!=null) _updatedValue.trim();
+//
+//
+//			LogManager.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "].");
+//
+//			final int columnType = getColumnType(_columnName);
+//
+//			switch (columnType) {
+//			// FOR NON-TEXT-BASED DATABASE COLUMNS, WRITE NULL INSTEAD OF AN EMPTY STRING
+//
+//			case Types.INTEGER:
+//			case Types.SMALLINT:
+//			case Types.TINYINT:
+//				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
+//				if ((_updatedValue==null) || _updatedValue.equals("")) {
+//					if (_allowNull) {
+//						this.updateNull(_columnName);
+//					} else {
+//						throw new NullPointerException("Null values are not allowed for this field.");
+//					}
+//				} else {
+//					final int intValue = Integer.parseInt(_updatedValue);
+//					this.updateInt(_columnName, intValue);
+//				}
+//				break;
+//
+//			case Types.BIGINT:
+//				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
+//				if ((_updatedValue==null) || _updatedValue.equals("")) {
+//					if (_allowNull) {
+//						this.updateNull(_columnName);
+//					} else {
+//						throw new NullPointerException("Null values are not allowed for this field.");
+//					}
+//				} else {
+//					final long longValue = Long.parseLong(_updatedValue);
+//					this.updateLong(_columnName, longValue);
+//				}
+//				break;
+//
+//			case Types.FLOAT:
+//				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
+//				if ((_updatedValue==null) || _updatedValue.equals("")) {
+//					if (_allowNull) {
+//						this.updateNull(_columnName);
+//					} else {
+//						throw new NullPointerException("Null values are not allowed for this field.");
+//					}
+//				} else {
+//					final float floatValue = Float.parseFloat(_updatedValue);
+//					this.updateFloat(_columnName, floatValue);
+//				}
+//				break;
+//
+//			case Types.DOUBLE:
+//			case Types.NUMERIC:
+//			case Types.DECIMAL:
+//				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
+//				if ((_updatedValue==null) || _updatedValue.equals("")) {
+//					if (_allowNull) {
+//						this.updateNull(_columnName);
+//					} else {
+//						throw new NullPointerException("Null values are not allowed for this field.");
+//					}
+//				} else {
+//					final double doubleValue = Double.parseDouble(_updatedValue);
+//					this.updateDouble(_columnName, doubleValue);
+//				}
+//				break;
+//
+//			case Types.BOOLEAN:
+//			case Types.BIT:
+//				if ((_updatedValue==null) || _updatedValue.equals("")) {
+//					if (_allowNull) {
+//						this.updateNull(_columnName);
+//					} else {
+//						throw new NullPointerException("Null values are not allowed for this field.");
+//					}
+//				} else {
+//					// CONVERT THE GIVEN STRING TO BOOLEAN TYPE
+//					final boolean boolValue = Boolean.valueOf(_updatedValue);
+//					this.updateBoolean(_columnName, boolValue);
+//				}
+//				break;
+//
+//			case Types.DATE:
+//				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
+//				if ((_updatedValue==null) || _updatedValue.equals("")) {
+//					if (_allowNull) {
+//						this.updateNull(_columnName);
+//					} else {
+//						throw new NullPointerException("Null values are not allowed for this field.");
+//					}
+//				} else if (_updatedValue.length() == 10) {
+//					this.updateDate(_columnName, SSCommon.getSQLDate(_updatedValue));
+//				} else {
+//					// do nothing
+//				}
+//				break;
+//
+//			case Types.TIME:
+//				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
+//				if ((_updatedValue==null) || _updatedValue.equals("")) {
+//					if (_allowNull) {
+//						this.updateNull(_columnName);
+//					} else {
+//						throw new NullPointerException("Null values are not allowed for this field.");
+//					}
+//				} else {
+//					this.updateTime(_columnName, java.sql.Time.valueOf(_updatedValue));
+//				}
+//				break;
+//
+//			case Types.TIMESTAMP:
+//				// IF TEXT IS EMPTY THEN UPDATE COLUMN TO NULL
+//				if ((_updatedValue==null) || _updatedValue.equals("")) {
+//					if (_allowNull) {
+//						this.updateNull(_columnName);
+//					} else {
+//						throw new NullPointerException("Null values are not allowed for this field.");
+//					}
+//				} else if (_updatedValue.length() == 10) {
+//					this.updateTimestamp(_columnName, new Timestamp(SSCommon.getSQLDate(_updatedValue).getTime()));
+//				} else {
+//					// do nothing
+//				}
+//				break;
+//
+//			case Types.CHAR:
+//			case Types.VARCHAR:
+//			case Types.LONGVARCHAR:
+//				// FOR TEXT-BASED DATABASE COLUMNS WE CAN WRITE AN EMPTY STRING, BUT IF THERE IS
+//				// A UNIQUE CONSTRAINT ON THE COLUMN
+//				// THIS CAUSES A PROBLEM SO WE WRITE NULL
+//				// TODO investigate if we can let the programmer indicate how this should be
+//				// handled for a given column OR see if we can identify constraints
+////				if (_updatedValue==null || _updatedValue.equals("")) {
+////					this.updateNull(_columnName);
+////				} else {
+////					this.updateString(_columnName, _updatedValue);
+////				}
+//
+//				if (_updatedValue==null) {
+//					if (_allowNull) {
+//						this.updateNull(_columnName);
+//					} else {
+//						throw new NullPointerException("Null values are not allowed for this field.");
+//					}
 //				} else {
 //					this.updateString(_columnName, _updatedValue);
 //				}
-
-				if (_updatedValue==null) {
-					if (_allowNull) {
-						this.updateNull(_columnName);
-					} else {
-						throw new NullPointerException("Null values are not allowed for this field.");
-					}
-				} else {
-					this.updateString(_columnName, _updatedValue);
-				}
-				break;
-
-			default:
-				LogManager.getLogger().error("Unsupported data type of " + JDBCType.valueOf(columnType).getName() + " for column " + _columnName + ".");
-			} // end switch
-
-//		} catch (SQLException se) {
-//			LogManager.getLogger().error("SQL Exception for column " + _columnName + ".", se);
-//		} catch (NumberFormatException nfe) {
-//			LogManager.getLogger().error("Number Format Exception for column " + _columnName + ".", nfe);
-//		}
+//				break;
+//
+//			default:
+//				LogManager.getLogger().error("Unsupported data type of " + JDBCType.valueOf(columnType).getName() + " for column " + _columnName + ".");
+//			} // end switch
 
 	} // end protected void updateColumnText(String _updatedValue, String _columnName)
-		// {
 
 }
