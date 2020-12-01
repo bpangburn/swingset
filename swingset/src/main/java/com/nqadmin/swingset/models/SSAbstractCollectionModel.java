@@ -60,6 +60,7 @@ public abstract class SSAbstractCollectionModel implements SSCollectionModel {
 		jdbcType = _jdbcType != null ? _jdbcType : JDBCType.NULL;
 	}
 
+	@Override
 	public JDBCType getJDBCType() {
 		return jdbcType;
 	}

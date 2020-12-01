@@ -210,7 +210,7 @@ public class SSListItemFormat extends Format {
 	@Override
 	public StringBuffer format(Object _listItem, StringBuffer toAppendTo, FieldPosition pos) {
 		if (_listItem != null && _listItem instanceof ListItem0) {
-			// GlazedLists guarentees only format(Object), so ignore pos.
+			// GlazedLists guarantees only format(Object), so ignore pos.
 			ListItem0 listItem = (ListItem0)_listItem;
 			for (int i = 0; i < itemElemIndexes.size(); i++) {
 				// if this isn't the first element, add the separator

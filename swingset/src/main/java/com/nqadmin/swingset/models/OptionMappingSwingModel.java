@@ -63,7 +63,7 @@ import java.util.Objects;
  * 
  * @param <M> mapping type; mapping is typically primary key
  * @param <O> option type; option provides display string
- * @param <O2>  option2 type; if present, suplementary display string
+ * @param <O2>  option2 type; if present, supplementary display string
  * 
  * @see AbstractComboBoxListSwingModel for general description of using this class
  * @see <a target="_top" href="https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html">GlazedLists AutoCompletion javadoc</a>
@@ -74,7 +74,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	private static final long serialVersionUID = 1L;
 
 	/** index of option in SSListItem */
-	// Option IS FIST. THIS IS THE DEFAULT FOR SSListItemFormat
+	// Option IS FIRST. THIS IS THE DEFAULT FOR SSListItemFormat
 	// In addition, only Option is required.
 	// LOOK AT createComboItem BEFORE THINKING ABOUT CHANGING THESE DEFINES
 	protected final static int OPT_IDX = 0; // 
