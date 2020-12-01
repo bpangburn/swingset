@@ -69,8 +69,13 @@ import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSDbArrayModel;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import java.sql.JDBCType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * This example demonstrates all of the Base SwingSet Components
@@ -103,8 +108,43 @@ public class TestBaseComponents extends JFrame {
 	/**
 	 * combo and list items
 	 */
+	enum ComboEnum {
+		A("Combo Enum 0"),
+		B("Combo Enum 1"),
+		C("Combo Enum 2"),
+		D("Combo Enum 3");
+		private final String displayVal;
+		private ComboEnum(String _displayVal) {
+			displayVal = _displayVal;
+		}
+
+		@Override
+		public String toString() {
+			return displayVal;
+		}
+	}
+	/** only used manually for testing */
+	enum ListEnum {
+		A("List Enum 1"),
+		B("List Enum 2"),
+		C("List Enum 3"),
+		D("List Enum 4"),
+		E("List Enum 5"),
+		F("List Enum 6"),
+		G("List Enum 7");
+		private final String displayVal;
+		private ListEnum(String _displayVal) {
+			displayVal = _displayVal;
+		}
+		
+		@Override
+		public String toString() {
+			return displayVal;
+		}
+	}
 	private static final String[] comboItems = {"Combo Item 0","Combo Item 1", "Combo Item 2", "Combo Item 3"};
 	private static final int[] comboCodes = {0,1,2,3};
+	private static final Integer[] comboCodesIntegers = new Integer[] {0,1,2,3};
 	private static final Object[] listCodes = {1,2,3,4,5,6,7};
 	private static final String[] listItems = {"List Item 1","List Item 2", "List Item 3", "List Item 4", "List Item 5", "List Item 6", "List Item 7"};
 	
@@ -115,6 +155,7 @@ public class TestBaseComponents extends JFrame {
 	JLabel lblSwingSetBaseTestPK = new JLabel("Record ID");
 	JLabel lblSSCheckBox = new JLabel("SSCheckBox");
 	JLabel lblSSComboBox = new JLabel("SSComboBox");
+	JLabel lblEnumSSComboBox = new JLabel("enumSSComboBox");
 	JLabel lblSSDBComboBox = new JLabel("SSDBComboBox");
 	JLabel lblSSImage = new JLabel("SSImage");
 	JLabel lblSSLabel = new JLabel("SSLabel");
@@ -129,6 +170,7 @@ public class TestBaseComponents extends JFrame {
 	SSTextField txtSwingSetBaseTestPK = new SSTextField();
 	SSCheckBox chkSSCheckBox = new SSCheckBox();
 	SSComboBox cmbSSComboBox = new SSComboBox();
+	SSComboBox cmbEnumSSComboBox = new SSComboBox();
 	SSDBComboBox cmbSSDBComboBox = new SSDBComboBox();
 	SSImage imgSSImage = new SSImage();
 	SSLabel lblSSLabel2 = new SSLabel();
@@ -299,8 +341,14 @@ public class TestBaseComponents extends JFrame {
 			// SETUP COMBO AND LIST OPTIONS
 				// TODO if getAllowNull() is true then add blank item to SSComboBox
 				cmbSSComboBox.setAllowNull(true);
-				cmbSSComboBox.setOptions(comboItems, comboCodes);
-				lstSSList.setOptions(listItems, listCodes);
+				cmbSSComboBox.setOptions(Arrays.asList(comboItems), Arrays.asList(comboCodesIntegers));
+				cmbEnumSSComboBox.setAllowNull(true);
+				cmbEnumSSComboBox.setOptions(ComboEnum.class);
+
+				// NOTE following enum has [0,N) mapping, but DB is [1,N]
+				//      Fortunately test DB doesn't have a "7" in ss_list array
+				//lstSSList.setOptions(ListEnum.class);
+				lstSSList.setOptions(Arrays.asList(listItems), Arrays.asList(listCodes));
 
 				final String dbComboQuery = "SELECT * FROM part_data;";
 				cmbSSDBComboBox = new SSDBComboBox(ssConnection, dbComboQuery, "part_id", "part_name");
@@ -315,6 +363,7 @@ public class TestBaseComponents extends JFrame {
 
 				chkSSCheckBox.bind(rowset, "ss_check_box");
 				cmbSSComboBox.bind(rowset, "ss_combo_box");
+				cmbEnumSSComboBox.bind(rowset, "ss_combo_box");
 				cmbSSDBComboBox.bind(rowset, "ss_db_combo_box");
 				//cmbSSDBComboBox.setEditable(false);
 				imgSSImage.bind(rowset, "ss_image");
@@ -340,6 +389,7 @@ public class TestBaseComponents extends JFrame {
 
 				lblSSCheckBox.setPreferredSize(MainClass.labelDim);
 				lblSSComboBox.setPreferredSize(MainClass.labelDim);
+				lblEnumSSComboBox.setPreferredSize(MainClass.labelDim);
 				lblSSDBComboBox.setPreferredSize(MainClass.labelDim);
 				lblSSImage.setPreferredSize(MainClass.labelDimVeryTall);
 				lblSSLabel.setPreferredSize(MainClass.labelDim);
@@ -355,6 +405,7 @@ public class TestBaseComponents extends JFrame {
 
 				chkSSCheckBox.setPreferredSize(MainClass.ssDim);
 				cmbSSComboBox.setPreferredSize(MainClass.ssDim);
+				cmbEnumSSComboBox.setPreferredSize(MainClass.ssDim);
 				cmbSSDBComboBox.setPreferredSize(MainClass.ssDim);
 				imgSSImage.setPreferredSize(MainClass.ssDimVeryTall);
 				lblSSLabel2.setPreferredSize(MainClass.ssDim);
@@ -384,6 +435,8 @@ public class TestBaseComponents extends JFrame {
 				constraints.gridy++;
 				contentPane.add(lblSSComboBox, constraints);
 				constraints.gridy++;
+				contentPane.add(lblEnumSSComboBox, constraints);
+				constraints.gridy++;
 				contentPane.add(lblSSDBComboBox, constraints);
 				constraints.gridy++;
 				contentPane.add(lblSSImage, constraints);
@@ -408,6 +461,8 @@ public class TestBaseComponents extends JFrame {
 				contentPane.add(chkSSCheckBox, constraints);
 				constraints.gridy++;
 				contentPane.add(cmbSSComboBox, constraints);
+				constraints.gridy++;
+				contentPane.add(cmbEnumSSComboBox, constraints);
 				constraints.gridy++;
 				contentPane.add(cmbSSDBComboBox, constraints);
 				constraints.gridy++;
@@ -457,6 +512,7 @@ public class TestBaseComponents extends JFrame {
 		// SET OTHER DEFAULTS
 			chkSSCheckBox.setSelected(false);
 			cmbSSComboBox.setSelectedIndex(-1);
+			cmbEnumSSComboBox.setSelectedIndex(-1);
 			cmbSSDBComboBox.setSelectedIndex(-1);
 			imgSSImage.clearImage();
 			lblSSLabel2.setText(null);

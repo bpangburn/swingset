@@ -48,6 +48,7 @@ import java.util.Objects;
 import java.util.Vector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.swing.JList;
 import javax.swing.ListModel;
@@ -360,7 +361,7 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	 * values that map to the items displayed in the list box)
 	 * 
 	 * @param _mappings An array of values that correspond to those in the list box.
-	 * @deprecated use {@link #setOptions(List<String> options, List<Object>mappings)}
+	 * @deprecated use {@link #setOptions(java.util.List, java.util.List) }
 	 */
 	protected void setMappings(final Object[] _mappings) {
 		Objects.requireNonNull(_mappings);
@@ -431,6 +432,23 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	 */
 	public void setOptions(List<String> _options) {
 		setOptions(_options, null);
+	}
+
+	/**
+	 * Sets the options to be displayed in the combo box based on
+	 * the enum class' value's toString(). Generate a {@literal [0-N)}
+	 * mapping.
+	 *
+	 * @param <T> inferred enum type
+	 * @param _enumOptions enum class with values to display
+	 */
+	public <T extends Enum<T>> void setOptions(Class<T> _enumOptions) {
+		// Could mark known enums for special handling,
+		// Could have a special method for getting the display string.
+		// But what's wrong with toString()
+
+		setOptions(Stream.of(_enumOptions.getEnumConstants())
+				.map((t) -> t.toString()).collect(Collectors.toList()));
 	}
 
 	/**
