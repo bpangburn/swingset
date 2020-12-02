@@ -152,7 +152,7 @@ public class DemoUtil
 		LineReader lr = null;
         String line;
         int indexOfCommentSign;
-        StringBuffer sBuffer =  new StringBuffer();
+        StringBuilder sBuffer =  new StringBuilder();
          
         try {  
 			lr = new LineReader(br);
@@ -234,7 +234,7 @@ public class DemoUtil
 	throws IOException {
         boolean[] endComment = new boolean[1];
         String line = firstLine;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         boolean inCom = false;
         while(true) {
             String t = removeSlashStarCommentsOnLine(line, inCom, endComment);
@@ -259,7 +259,7 @@ public class DemoUtil
         // Handle weird stuff like: xxx */f/* sdf */o/*dfdf*/o bar
         // which returns: foo bar
         boolean inComment = _inComment;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         endComment[0] = true;
         int idx;
         while(true) {

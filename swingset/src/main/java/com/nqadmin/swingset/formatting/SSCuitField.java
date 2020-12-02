@@ -69,13 +69,13 @@ public class SSCuitField extends SSFormattedTextField {
 
         final String base = new String("54 32765432  ");
         String c1, c2;
-        StringBuffer cuit;
-        StringBuffer ctrl;
+        StringBuilder cuit;
+        StringBuilder ctrl;
 
         int mo, ba, mr, i;
 
-        ctrl = new StringBuffer(cu);
-        cuit = new StringBuffer(cu);
+        ctrl = new StringBuilder(cu);
+        cuit = new StringBuilder(cu);
 
         for (mo=0, i=0; i < 12; i++)
         {

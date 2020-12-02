@@ -154,7 +154,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	 */
 	@Override
 	public void keyReleased(final KeyEvent ke) {
-		final StringBuffer strBuf = new StringBuffer();
+		final StringBuilder strBuf = new StringBuilder();
 
 		final JTable jTable = (JTable) ke.getSource();
 
