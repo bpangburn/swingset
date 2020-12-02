@@ -823,6 +823,11 @@ implements MutableComboBoxModel<SSListItem> {
 		return el;
 	}
 
+	public String dump() {
+		return itemList.stream().collect(StringBuilder::new,
+				StringBuilder::append, StringBuilder::append).toString();
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	//
 	// Remodel

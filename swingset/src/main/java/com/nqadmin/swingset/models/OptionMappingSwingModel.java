@@ -235,6 +235,14 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 		return option2Enabled;
 	}
 
+	/**
+	 * Get the opaque index for the mapping element in a SSListeItem.
+	 * Useful for use with {@link SSListItemFormat} or setElem.
+	 * @return the index of mapping
+	 */
+	public int getMappingListItemElemIndex() {
+		return KEY_IDX;
+	}
 
 	/**
 	 * Get the opaque index for the option element in a SSListeItem.
@@ -333,6 +341,18 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 		@SuppressWarnings("unchecked")
 		public M getMapping(int _index) {
 			return (M)super.getElem(_index, KEY_IDX);
+		}
+		
+		/**
+		 * Set the mapping element of the list item
+		 * at the specified item list index.
+		 * @param _index of list item
+		 * @param _mapping put this into list item
+		 * @return previous contents; the replaced element.
+		 */
+		@SuppressWarnings("unchecked")
+		public O setMapping(int _index, O _mapping) {
+			return (O) super.setElem(_index, OPT_IDX, _mapping);
 		}
 		
 		/**
