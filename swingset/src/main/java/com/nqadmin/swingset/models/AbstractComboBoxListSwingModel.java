@@ -769,6 +769,10 @@ implements MutableComboBoxModel<SSListItem> {
 			isValid = (validElemsMask & (1<<elemIndex)) != 0;
 		}
 
+		private boolean isShadow(AbstractComboBoxListSwingModel model) {
+			return AbstractComboBoxListSwingModel.this == model;
+		}
+
 		@Override
 		public Object get(int index) {
 			checkValid();
@@ -821,6 +825,17 @@ implements MutableComboBoxModel<SSListItem> {
 		ItemElementSlice el = new ItemElementSlice(elemIndex);
 		createdLists.add(new WeakReference<>(el));
 		return el;
+	}
+
+	public boolean hasShadow(List<?> list) {
+		if (list instanceof ItemElementSlice) {
+			return ((ItemElementSlice)list).isShadow(this);
+		}
+		return false;
+	}
+
+	public <T> List<T> getDisconnectedList(List<T> list) {
+		return hasShadow(list) ? new ArrayList<T>(list) : list;
 	}
 
 	public String dump() {
