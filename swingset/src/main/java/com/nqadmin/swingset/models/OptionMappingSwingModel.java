@@ -236,7 +236,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	}
 
 	/**
-	 * Get the opaque index for the mapping element in a SSListeItem.
+	 * Get the opaque index for the mapping element in a SSListItem.
 	 * Useful for use with {@link SSListItemFormat} or setElem.
 	 * @return the index of mapping
 	 */
@@ -245,7 +245,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	}
 
 	/**
-	 * Get the opaque index for the option element in a SSListeItem.
+	 * Get the opaque index for the option element in a SSListItem.
 	 * Useful for use with {@link SSListItemFormat}.
 	 * @return the index of option
 	 */
@@ -254,7 +254,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	}
 
 	/**
-	 * Get the opaque index for the option2 element in a SSListeItem.
+	 * Get the opaque index for the option2 element in a SSListItem.
 	 * Useful for use with {@link SSListItemFormat}.
 	 * @return the index of option2
 	 */
@@ -409,7 +409,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 		}
 
 		/**
-		 * Create an SSListeItem with the specified contents
+		 * Create an SSListItem with the specified contents
 		 * and add it to the item list.
 		 * The input lists shall be the same size.
 		 * @param _mapping list of mapping values mapping value (primary key)
@@ -421,7 +421,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 		}
 
 		/**
-		 * Create an SSListeItem with the specified contents
+		 * Create an SSListItem with the specified contents
 		 * and add it to the item list.
 		 * The input lists shall be the same size.
 		 * @param _mapping list of mapping values mapping value (primary key)
