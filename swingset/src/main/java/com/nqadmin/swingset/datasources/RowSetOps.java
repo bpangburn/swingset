@@ -44,20 +44,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.sql.Types;
+import java.time.Instant;
 import java.util.Calendar;
+import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.GregorianCalendar;
 
 import javax.sql.RowSet;
-import javax.sql.RowSetListener;
 
 import org.apache.logging.log4j.LogManager;
 
 import com.nqadmin.swingset.utils.SSCommon;
-
-import java.time.Instant;
-import java.util.EnumMap;
-import java.util.EnumSet;
 
 // RowSetOps.java
 //
@@ -76,17 +73,6 @@ public class RowSetOps {
 	private RowSetOps(){}
 
 	// TODO Audit type handling based on http://www.java2s.com/Code/Java/Database-SQL-JDBC/StandardSQLDataTypeswithTheirJavaEquivalents.htm
-
-	/**
-	 * Wrapper/convenience method for SwingSet method naming consistency.
-	 *
-	 * @param _rowSet RowSet on which to operate
-	 * @param _rowSetListener RowSetListener to add to current SSRowSet
-	 */
-	//TODO: should this type be SSRowSetListener?
-	public static void addSSRowSetListener(final RowSet _rowSet, final RowSetListener _rowSetListener) {
-		_rowSet.addRowSetListener(_rowSetListener);
-	}
 
 	/**
 	 * Returns the number of columns in the underlying ResultSet object
@@ -145,38 +131,44 @@ public class RowSetOps {
 				return null;
 			}
 
-			final int columnType = getColumnType(_rowSet, _columnName);
+			//final int columnType = getColumnType(_rowSet, _columnName);
+			
+			final JDBCType jdbcType = getJDBCType(getColumnType(_rowSet, _columnName));
 
 			// BASED ON THE COLUMN DATA TYPE THE CORRESPONDING FUNCTION
 			// IS CALLED TO GET THE VALUE IN THE COLUMN
-			switch (columnType) {
-			case Types.INTEGER:
-			case Types.SMALLINT:
-			case Types.TINYINT:
+			switch (jdbcType) {
+			case INTEGER:
+			case SMALLINT:
+			case TINYINT:
 				value = String.valueOf(_rowSet.getInt(_columnName));
 				break;
 
-			case Types.BIGINT:
+			case BIGINT:
 				value = String.valueOf(_rowSet.getLong(_columnName));
 				break;
 
-			case Types.FLOAT:
+			case FLOAT:
 				value = String.valueOf(_rowSet.getFloat(_columnName));
 				break;
 
-			case Types.DOUBLE:
-			case Types.NUMERIC:
-			case Types.DECIMAL:
+			case DOUBLE:
+			case REAL:
 				value = String.valueOf(_rowSet.getDouble(_columnName));
 				break;
+				
+			case NUMERIC:
+			case DECIMAL:
+				value = String.valueOf(_rowSet.getBigDecimal(_columnName));
+				break;
 
-			case Types.BOOLEAN:
-			case Types.BIT:
+			case BOOLEAN:
+			case BIT:
 				value = String.valueOf(_rowSet.getBoolean(_columnName));
 				break;
 
-			case Types.DATE:
-			case Types.TIMESTAMP:
+			case DATE:
+			case TIMESTAMP:
 				final Date date = _rowSet.getDate(_columnName);
 				if (date == null) {
 					value = "";
@@ -198,7 +190,7 @@ public class RowSetOps {
 				}
 				break;
 
-			case Types.TIME:
+			case TIME:
 				final Time time = _rowSet.getTime(_columnName);
 				if (time == null) {
 					value = "";
@@ -207,9 +199,9 @@ public class RowSetOps {
 				}
 				break;
 
-			case Types.CHAR:
-			case Types.VARCHAR:
-			case Types.LONGVARCHAR:
+			case CHAR:
+			case VARCHAR:
+			case LONGVARCHAR:
 				final String str = _rowSet.getString(_columnName);
 				if (str == null) {
 					value = "";
@@ -219,7 +211,7 @@ public class RowSetOps {
 				break;
 
 			default:
-				LogManager.getLogger().error("Unsupported data type of " + JDBCType.valueOf(columnType).getName() + " for column " + _columnName + ".");
+				LogManager.getLogger().error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
 			} // end switch
 
 		} catch (final SQLException se) {
@@ -298,16 +290,6 @@ public class RowSetOps {
 		return getJDBCType(getColumnType(_resultSet, _columnName));
 	}
 
-	/**
-	 * Wrapper/convenience method for SwingSet method naming consistency.
-	 *
-	 * @param _rowSet RowSet on which to operate
-	 * @param _rowSetListener RowSetListener to remove from current SSRowSet
-	 */
-	public static void removeSSRowSetListener(final RowSet _rowSet, final RowSetListener _rowSetListener) {
-		_rowSet.removeRowSetListener(_rowSetListener);
-	}
-
 	private static EnumSet<JDBCType> textUpdateEmptyOK = EnumSet.of(
 			JDBCType.CHAR,
 			JDBCType.VARCHAR,
@@ -321,6 +303,7 @@ public class RowSetOps {
 			JDBCType.BIGINT,
 			JDBCType.FLOAT,
 			JDBCType.DOUBLE,
+			JDBCType.REAL,
 			JDBCType.NUMERIC,
 			JDBCType.DECIMAL,
 			JDBCType.BOOLEAN,
@@ -352,23 +335,7 @@ public class RowSetOps {
 	 */
 	public static void updateColumnText(final RowSet _rowSet, final String _updatedValue, final String _columnName, final boolean _allowNull) throws NullPointerException, SQLException, NumberFormatException {
 
-
-			// TODO Add proper support for null vs "" based on _allowNull. For Char types all "" are currently forced to null,
-//			if (!_allowNull && _updatedValue==null) {
-//				_updatedValue = "";
-//			}
-
-			// TODO Convert this code to use Java 8 JDBCType enum
-
-			// 2020-09-11_BP: Probably not a good idea to trim here as it may be desirable to have padding for some strings
-			// Also, it's coded wrong.
-			// Should be:
-			//	if (_updatedValue!=null) _updatedValue = _updatedValue.trim();
-			// not:
-			// 	if (_updatedValue!=null) _updatedValue.trim();
-
-
-		LogManager.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? " + _allowNull);
+		LogManager.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
 		JDBCType jdbcType = getJDBCType(getColumnType(_rowSet, _columnName));
 		
@@ -377,34 +344,47 @@ public class RowSetOps {
 			return;
 		}
 
-				// FOR TEXT-BASED DATABASE COLUMNS WE CAN WRITE AN EMPTY STRING, BUT IF THERE IS
-				// A UNIQUE CONSTRAINT ON THE COLUMN
-				// THIS CAUSES A PROBLEM SO WE WRITE NULL
-				// TODO investigate if we can let the programmer indicate how this should be
-				// handled for a given column OR see if we can identify constraints
-//				if (_updatedValue==null || _updatedValue.equals("")) {
-//					this.updateNull(_columnName);
-//				} else {
-//					this.updateString(_columnName, _updatedValue);
-//				}
+		/*
+		 * FIRST - NULL HANDLING:
+		 * 
+		 * For character-based columns where _allowNull==true, we write null rather than an empty string
+		 * We do this because a column could allow null, but have a UNIQUE constraint and each null
+		 * should be unique.
+		 * 
+		 * We want to enter this code under 3 conditions:
+		 *  1. updateColumnText() is passed a null string
+		 *  2. updateColumnText() is passed an empty string (any column type)
+		 *  3. updateColumnText() is passed a 'blank' (whitespace) string for a non-character-based field
+		 *     (e.g., "" or "   " for a double)
+		 *     
+		 * If !_allowNull then a character based field with 0 or more blank spaced will be allowed
+		 * and code will continue to the switch/case statement below.
+		 */
+       if (_updatedValue == null
+    		   || _updatedValue.isEmpty()
+               || (_updatedValue.trim().isEmpty() && !textUpdateEmptyOK.contains(jdbcType))) {
+    	    // TODO: Switch to isBlank) for Java 11+
+    	   	// Java 11: || (_updatedValue.isBlank() && !textUpdateEmptyOK.contains(jdbcType))) {
 
-			// First do null handling
-			// FOR NON-TEXT-BASED DATABASE COLUMNS, WRITE NULL INSTEAD OF AN EMPTY STRING
+            if (_allowNull) {
+                _rowSet.updateNull(_columnName);
+                return;
+            } else if (!textUpdateEmptyOK.contains(jdbcType)) {
+                // This will throw an exception for a non-char type, but allow a char-based type with
+            	// an empty string to continue to the switch/case below and write the empty string via
+            	// _rowSet.updateString(_columnName, _updatedValue)
+            	//
+            	// Note that if there is a UNIQUE constraint on such a text column then repeatedly writing the same 
+            	// number (0 to N) spaces should throw an SQL exception (as should any other duplicate string)
+                throw new NullPointerException("Null values are not allowed for this field.");
+            }
+        }
 
-			// TODO: would isBlank be better?
-
-		if (_updatedValue == null
-				|| _updatedValue.isEmpty() && !textUpdateEmptyOK.contains(jdbcType)) {
-			if (_allowNull) {
-				_rowSet.updateNull(_columnName);
-			} else {
-				throw new NullPointerException("Null values are not allowed for this field.");
-			}
-		}
-		
+		/*
+		 * SECOND - WRITING NON-NULL VALUES TO DATABASE BASED ON APPROPRIATE STRING CONVERSIONS
+		 */
 		switch (jdbcType) {
-		// FOR NON-TEXT-BASED DATABASE COLUMNS, WRITE NULL INSTEAD OF AN EMPTY STRING
-		
+	
 		case INTEGER:
 		case SMALLINT:
 		case TINYINT:
@@ -423,10 +403,16 @@ public class RowSetOps {
 			break;
 			
 		case DOUBLE:
-		case NUMERIC:
-		case DECIMAL:
+		//case NUMERIC: 
+		//case DECIMAL:
+		case REAL:
 			final double doubleValue = Double.parseDouble(_updatedValue);
 			_rowSet.updateDouble(_columnName, doubleValue);
+			break;
+			
+		case DECIMAL:
+		case NUMERIC:
+			_rowSet.updateBigDecimal(_columnName, new BigDecimal(_updatedValue));
 			break;
 			
 		case BOOLEAN:
@@ -442,7 +428,9 @@ public class RowSetOps {
 				Date dateValue = SSCommon.getSQLDate(_updatedValue);
 				_rowSet.updateDate(_columnName, dateValue);
 			} else {
-				// do nothing
+			// 2020-12-01_BP: Might as well at least try to process a date that is other than 10 characters
+				Date dateValue = java.sql.Date.valueOf(_updatedValue);
+				_rowSet.updateDate(_columnName, dateValue);
 			}
 			break;
 			
@@ -451,14 +439,17 @@ public class RowSetOps {
 			_rowSet.updateTime(_columnName, timeValue);
 			break;
 			
-			
 		case TIMESTAMP:
-// TODO Probably do not want a length of 10 characters here. Good to get rid of getSQLDate if possible.
+		// TODO: We're not doing anything here
+		// TODO: Probably a better way to handle date to timestamp conversion. Formatter? Get rid of getSQLDate() if possible.
+			// CONVERT ANY 10 CHARACTER DATE (e.g., yyyy-mm-dd, mm/dd/yyyy to a date/time)
 			if (_updatedValue.length() == 10) {
 				Timestamp timestampValue = new Timestamp(SSCommon.getSQLDate(_updatedValue).getTime());
 				_rowSet.updateTimestamp(_columnName, timestampValue);
 			} else {
-				// do nothing
+			// Per ER email 2020-11-25, we weren't even trying to handle a legitimate timestamp
+				Timestamp timeStampValue = java.sql.Timestamp.valueOf(_updatedValue);
+				_rowSet.updateTimestamp(_columnName, timeStampValue);
 			}
 			break;
 			
