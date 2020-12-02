@@ -79,7 +79,7 @@ public class SSSyncManager {
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 
-			rowset.removeRowSetListener(rowsetListener);
+			removeRowsetListener();
 
 			try {
 				// IF THIS IS NOT CAUSED BY THE USER ACTION (IN WHICH THE FOCUS WILL BE ON THE COMBO) THERE IS NOTHING TO DO
@@ -97,7 +97,9 @@ public class SSSyncManager {
 
 				// UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
 				// This code was removed to improve performance.
-				// dataNavigator.updatePresentRow();
+				//
+				// 2020-12-02_BP: adding back
+				dataNavigator.updatePresentRow();
 
 
 				// Note that the rowset count starts at 1 whereas combobox index starts at 0.
@@ -167,7 +169,7 @@ public class SSSyncManager {
 				logger.error("SQL Exception.", se);
 			} finally {
 				logger.debug("SyncComboListener actionPerformedCount=" + actionPerformedCount++);
-				rowset.addRowSetListener(rowsetListener);
+				addRowsetListener();
 			}
 		}
 	} // protected class MyComboListener implements ActionListener {
@@ -177,6 +179,9 @@ public class SSSyncManager {
 	 */
 	protected class SyncRowSetListener implements RowSetListener {
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public void cursorMoved(final RowSetEvent rse) {
 			logger.debug("");
@@ -184,31 +189,17 @@ public class SSSyncManager {
 		}
 
 		/**
-		 * When the database row changes we want to trigger a change to the bound
-		 * combo navigator.
-		 * <p>
-		 * In SSDataNavigator, when a navigation is performed (first, previous,
-		 * next, last) a call is made to updateRow() to flush the rowset to the 
-		 * underlying database prior to a call to first(), previous(), next(),
-		 * or last(). updateRow() triggers rowChanged, but we don't want to update
-		 * the combo navigator for the database flush.
-		 * <p>
-		 * Calls to first(), previous(), next(), and last() trigger cursorMoved.
-		 * For a navigation we will updated the combo navigator following cursorMoved.
-		 * <p>
-		 * In JdbcRowSetImpl, notifyRowChanged() is called for insertRow(),
-		 * updateRow(), deleteRow(), &amp; cancelRowUpdates(). We only want to block
-		 * combo navigator updates for calls resulting from updateRow().
+		 * {@inheritDoc}
 		 */
 		@Override
 		public void rowChanged(final RowSetEvent rse) {
 			logger.debug("");
-			// 2020-11-25: Moved check to head of adjustValue()
-			//if (!rowset.isUpdatingRow()) {
-			adjustValue();
-			//}
+			// We only care about navigation (cursorMoved) or a full refresh (rowSetChanged)
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public void rowSetChanged(final RowSetEvent rse) {
 			logger.debug("");
@@ -225,42 +216,52 @@ public class SSSyncManager {
 	/**
 	 * # of records to step back if doing a sequential search because SSDBComboBox and SSRowSet results don't match.
 	 */
-	protected static final int offsetToCheck = 7;
+	private static final int offsetToCheck = 7;
 
 	/**
 	 * # of records of overlap to check if SSDBComboBox and SSRowSet results don't match due to record additions/deletions.
 	 */
-	protected static final int overlapToCheck = 7;
+	private static final int overlapToCheck = 7;
 
 	/**
 	 * SSRowSet column used as basis for synchronization.
 	 */
-	protected String columnName;
+	private String columnName;
 
 	/**
 	 * SSDBComboBox used for record navigation.
 	 */
-	protected SSDBComboBox comboBox;
+	private SSDBComboBox comboBox;
 
 	/**
 	 * Listener on combo box to detect combo-based navigations.
 	 */
 	private final SyncComboListener comboListener = new SyncComboListener();
+	
+	/**
+	 * Indicates if combo navigator listener is added (or removed)
+	 */
+	private boolean comboListenerAdded = false;
 
 	/**
 	 * SSDataNavigator to be synchronized with navigation combo box.
 	 */
-	protected SSDataNavigator dataNavigator;
+	private SSDataNavigator dataNavigator;
 
 	/**
 	 * SSRowSet navigated with data navigator and combo box.
 	 */
-	protected SSRowSet rowset;
+	private SSRowSet rowset;
 
 	/**
 	 * Listener on SSRowSet to detect data navigator-based navigations.
 	 */
-	protected final SyncRowSetListener rowsetListener = new SyncRowSetListener();
+	private final SyncRowSetListener rowsetListener = new SyncRowSetListener();
+	
+	/**
+	 * Indicates if rowset listener is added (or removed)
+	 */
+	private boolean rowsetListenerAdded = false;
 
 	/**
 	 * <p>
@@ -276,13 +277,33 @@ public class SSSyncManager {
 		rowset = dataNavigator.getSSRowSet();
 		dataNavigator.setNavCombo(comboBox);
 	}
+	
+	/**
+	 * Adds listener to the combo navigator
+	 */
+	private void addComboListener() {
+		if (!comboListenerAdded) {
+			comboBox.addActionListener(comboListener);
+			comboListenerAdded = true;
+		}
+	}
 
 	/**
 	 * Adds listeners to combobox & rowset.
 	 */
 	private void addListeners() {
-		comboBox.addActionListener(comboListener);
-		dataNavigator.getSSRowSet().addRowSetListener(rowsetListener);
+		addComboListener();
+		addRowsetListener();
+	}
+	
+	/**
+	 * Adds listener to the rowset
+	 */
+	private void addRowsetListener() {
+		if (!rowsetListenerAdded) {
+			dataNavigator.getSSRowSet().addRowSetListener(rowsetListener);
+			rowsetListenerAdded = true;
+		}
 	}
 
 	/**
@@ -295,7 +316,7 @@ public class SSSyncManager {
 			return;
 		}
 
-		comboBox.removeActionListener(comboListener);
+		removeComboListener();
 
 		try {
 			if ((rowset != null) && (rowset.getRow() > 0)) {
@@ -317,23 +338,45 @@ public class SSSyncManager {
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
 		}
+		
 		comboBox.setEnabled(true);
-		comboBox.addActionListener(comboListener);
+		addComboListener();
 	}
 
 	/**
 	 * Stop synchronization between navigation components.
 	 */
 	public void async() {
+		logger.debug("");
 		removeListeners();
 	}
 
 	/**
-	 * Removes listeners from combo box & rowset.
+	 * Removes listener from the combo navigator
+	 */
+	private void removeComboListener() {
+		if (comboListenerAdded) {
+			comboBox.removeActionListener(comboListener);
+			comboListenerAdded = false;
+		}
+	}
+
+	/**
+	 * Removes listeners from combobox & rowset.
 	 */
 	private void removeListeners() {
-		comboBox.removeActionListener(comboListener);
-		dataNavigator.getSSRowSet().removeRowSetListener(rowsetListener);
+		removeComboListener();
+		removeRowsetListener();
+	}
+	
+	/**
+	 * Removes listener from the rowset
+	 */
+	private void removeRowsetListener() {
+		if (rowsetListenerAdded) {
+			dataNavigator.getSSRowSet().removeRowSetListener(rowsetListener);
+			rowsetListenerAdded = false;
+		}
 	}
 
 	/**
@@ -367,10 +410,17 @@ public class SSSyncManager {
 
 	/**
 	 * Start synchronization between navigation components.
+	 * 
+	 * This aligns the combo navigator with the data navigator and turns on the listeners.
 	 */
 	public void sync() {
-		addListeners();
+		// 2020-12-02_BP:
+		//   Seems we should adjustValue() and then call addListeners() because adjustValue() starts by removing the combo listener.
+		//   However since adjustValue() was removing/adding the combo listener, it was getting called twice.
+		//   Added methods for adding/removing combo and rowset listeners along with booleans to indicate state.
+		logger.debug("");
 		adjustValue();
+		addListeners();
 	}
 
 } // end public class SSSyncManager {

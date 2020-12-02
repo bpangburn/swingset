@@ -82,32 +82,46 @@ import com.nqadmin.swingset.utils.SSEnums.Navigation;
 public class SSDataNavigator extends JPanel {
 
 	/**
-	 * Adds the listeners on the SSRowSet used by data navigator.
+	 * Rowset Listener on the SSRowSet used by data navigator.
 	 */
 	protected class SSDBNavRowSetListener implements RowSetListener {
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public void cursorMoved(final RowSetEvent rse) {
-			// IF THERE ARE ROWS GET THE ROW COUNT
+			// Update the navigator display following a navigation.
 			try {
+				logger.debug("Calling updateNavigator().");
 				updateNavigator();
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			}
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public void rowChanged(final RowSetEvent rse) {
-			// DO NOTHING
+			logger.debug("");
+			// We only care about navigation (cursorMoved) or a full refresh (rowSetChanged)
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public void rowSetChanged(final RowSetEvent rse) {
-			// IF THERE ARE ROWS GET THE ROW COUNT
+			// Update the record counts and navigator display following a navigation.
 			try {
+				logger.debug("Updating row count with last(), getRow(), and first().");
 				sSRowSet.last();
 				rowCount = sSRowSet.getRow();
 				sSRowSet.first();
+				
+				logger.debug("Calling updateNavigator().");
 				updateNavigator();
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
@@ -242,7 +256,12 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Listener on the SSRowSet used by data navigator.
 	 */
-	protected final SSDBNavRowSetListener sSRowSetListener = new SSDBNavRowSetListener();
+	private final SSDBNavRowSetListener rowsetListener = new SSDBNavRowSetListener();
+	
+	/**
+	 * Indicates if rowset listener is added (or removed)
+	 */
+	private boolean rowsetListenerAdded = false;
 
 	/**
 	 * Text field for viewing/changing the current record number.
@@ -264,9 +283,7 @@ public class SSDataNavigator extends JPanel {
 	 * before you can start using it.
 	 */
 	public SSDataNavigator() {
-		addToolTips();
-		createPanel();
-		addListeners();
+		this(null, null);
 	}
 
 	/**
@@ -275,10 +292,7 @@ public class SSDataNavigator extends JPanel {
 	 * @param _sSRowSet The SSRowSet to which the SSDataNavigator has to be bound
 	 */
 	public SSDataNavigator(final SSRowSet _sSRowSet) {
-		setSSRowSet(_sSRowSet);
-		addToolTips();
-		createPanel();
-		addListeners();
+		this(_sSRowSet, null);
 	}
 
 	/**
@@ -289,17 +303,21 @@ public class SSDataNavigator extends JPanel {
 	 * @param _buttonSize the size to which the button on navigator have to be set
 	 */
 	public SSDataNavigator(final SSRowSet _sSRowSet, final Dimension _buttonSize) {
-		buttonSize = _buttonSize;
-		setSSRowSet(_sSRowSet);
+		if (_sSRowSet!=null) {
+			setSSRowSet(_sSRowSet);
+		}
+		if (_buttonSize!=null) {
+			buttonSize = _buttonSize;
+		}
 		addToolTips();
 		createPanel();
-		addListeners();
+		addNavListeners();
 	}
 
 	/**
 	 * Adds the listeners for the navigator components.
 	 */
-	protected void addListeners() {
+	private void addNavListeners() {
 
 		// WHEN THIS BUTTON IS PRESSED THE RECORD ON WHICH USER WAS WORKING IS SAVED
 		// AND MOVES THE SSROWSET TO THE FIRST ROW
@@ -308,7 +326,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("FIRST button clicked.");
-				sSRowSet.removeRowSetListener(sSRowSetListener);
+				removeRowsetListener();
 				try {
 					if (modification) {
 						if (!dBNav.allowUpdate()) {
@@ -331,7 +349,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 				}
-				sSRowSet.addRowSetListener(sSRowSetListener);
+				addRowsetListener();
 			}
 		});
 
@@ -341,7 +359,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("PREVIOUS button clicked.");
-				sSRowSet.removeRowSetListener(sSRowSetListener);
+				removeRowsetListener();
 				try {
 					// if( sSRowSet.rowUpdated() )
 					if (modification) {
@@ -366,7 +384,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 				}
-				sSRowSet.addRowSetListener(sSRowSetListener);
+				addRowsetListener();
 			}
 		});
 
@@ -377,7 +395,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("NEXT button clicked.");
-				sSRowSet.removeRowSetListener(sSRowSetListener);
+				removeRowsetListener();
 				try {
 					// if( sSRowSet.rowUpdated() )
 					if (modification) {
@@ -402,7 +420,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 				}
-				sSRowSet.addRowSetListener(sSRowSetListener);
+				addRowsetListener();
 			}
 		});
 
@@ -414,7 +432,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("LAST button clicked.");
-				sSRowSet.removeRowSetListener(sSRowSetListener);
+				removeRowsetListener();
 				try {
 					// if( sSRowSet.rowUpdated() )
 					if (modification) {
@@ -438,7 +456,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 				}
-				sSRowSet.addRowSetListener(sSRowSetListener);
+				addRowsetListener();
 			}
 		});
 
@@ -451,7 +469,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("COMMIT button clicked.");
-				sSRowSet.removeRowSetListener(sSRowSetListener);
+				removeRowsetListener();
 				try {
 					if (onInsertRow) {
 						// IF ON INSERT ROW ADD THE ROW.
@@ -521,7 +539,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while saving row.\n" + se.getMessage());
 				}
-				sSRowSet.addRowSetListener(sSRowSetListener);
+				addRowsetListener();
 			}
 		});
 
@@ -532,7 +550,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("UNDO button clicked.");
-				sSRowSet.removeRowSetListener(sSRowSetListener);
+				removeRowsetListener();
 				try {
 					// CALL MOVE TO CURRENT ROW IF ON INSERT ROW.
 					if (onInsertRow) {
@@ -563,7 +581,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while undoing changes.\n" + se.getMessage());
 				}
-				sSRowSet.addRowSetListener(sSRowSetListener);
+				addRowsetListener();
 			}
 		});
 
@@ -577,7 +595,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("REFRESH button clicked.");
-				sSRowSet.removeRowSetListener(sSRowSetListener);
+				removeRowsetListener();
 				try {
 					if (callExecute) {
 						sSRowSet.execute();
@@ -602,7 +620,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured refreshing the data.\n" + se.getMessage());
 				}
-				sSRowSet.addRowSetListener(sSRowSetListener);
+				addRowsetListener();
 			}
 		});
 
@@ -613,7 +631,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("ADD button clicked.");
-				sSRowSet.removeRowSetListener(sSRowSetListener);
+				removeRowsetListener();
 				try {
 
 					sSRowSet.moveToInsertRow();
@@ -639,7 +657,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while moving to insert row.\n" + se.getMessage());
 				}
-				sSRowSet.addRowSetListener(sSRowSetListener);
+				addRowsetListener();
 			}
 		});
 
@@ -650,7 +668,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("DELETE button clicked.");
-				sSRowSet.removeRowSetListener(sSRowSetListener);
+				removeRowsetListener();
 				try {
 					if (confirmDeletes) {
 						final int answer = JOptionPane.showConfirmDialog(SSDataNavigator.this,
@@ -699,7 +717,7 @@ public class SSDataNavigator extends JPanel {
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while deleting row.\n" + se.getMessage());
 				}
-				sSRowSet.addRowSetListener(sSRowSetListener);
+				addRowsetListener();
 			}
 		});
 
@@ -711,7 +729,7 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void keyReleased(final KeyEvent ke) {
 				logger.debug("Record number manually updated.");
-				sSRowSet.removeRowSetListener(sSRowSetListener);
+				removeRowsetListener();
 				if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
 					try {
 						final int row = Integer.parseInt(txtCurrentRow.getText().trim());
@@ -722,10 +740,20 @@ public class SSDataNavigator extends JPanel {
 						// do nothing
 					}
 				}
-				sSRowSet.addRowSetListener(sSRowSetListener);
+				addRowsetListener();
 			}
 		});
 
+	}
+	
+	/**
+	 * Adds listener to the rowset
+	 */
+	private void addRowsetListener() {
+		if (!rowsetListenerAdded) {
+			sSRowSet.addRowSetListener(rowsetListener);
+			rowsetListenerAdded = true;
+		}
 	}
 
 	/**
@@ -973,6 +1001,16 @@ public class SSDataNavigator extends JPanel {
 	public boolean isOnInsertRow() {
 		return onInsertRow;
 	}
+	
+	/**
+	 * Removes listener from the rowset
+	 */
+	private void removeRowsetListener() {
+		if (rowsetListenerAdded) {
+			sSRowSet.removeRowSetListener(rowsetListener);
+			rowsetListenerAdded = false;
+		}
+	}
 
 	/**
 	 * Sets the preferredSize and the MinimumSize of the buttons to the specified
@@ -1178,8 +1216,9 @@ public class SSDataNavigator extends JPanel {
 		// WITH OUT SAVING THE RECORD OR UNDOING THE INSERTION
 		onInsertRow = false;
 
+		// REMOVE ROWSET LISTENER
 		if (sSRowSet != null) {
-			sSRowSet.removeRowSetListener(sSRowSetListener);
+			removeRowsetListener();
 		}
 
 		final SSRowSet oldValue = sSRowSet;
@@ -1206,10 +1245,13 @@ public class SSDataNavigator extends JPanel {
 			lblRowCount.setText("of " + rowCount);
 			txtCurrentRow.setText(String.valueOf(currentRow));
 
-			sSRowSet.addRowSetListener(sSRowSetListener);
+			
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
 		}
+		
+		// ADD ROWSET LISTENER
+		addRowsetListener();
 
 		// IF NO ROWS ARE PRESENT DISABLE NAVIGATION
 		// ELSE ENABLE THEN ELSE IS USEFUL WHEN THE SSROWSET IS CHNAGED
