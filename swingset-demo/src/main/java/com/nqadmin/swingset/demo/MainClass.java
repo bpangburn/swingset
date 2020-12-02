@@ -645,7 +645,7 @@ public class MainClass extends JFrame {
 		}
 
 		if (verbose) {
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			sb.append('\n').append(cmdName);
 			for (int i = 0; i < _args.length; i++) {
 				String arg = _args[i];
