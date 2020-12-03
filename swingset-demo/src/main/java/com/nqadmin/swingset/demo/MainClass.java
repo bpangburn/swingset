@@ -93,18 +93,23 @@ public class MainClass extends JFrame {
 			final Map<String, Object> hints = new HashMap<>(globalHints);
 
             if(ae.getSource().equals(btnExample1)){
+            	logger.debug("**** Opening Example1 ****");
                 new Example1(dbConnection);
             }
             else if(ae.getSource().equals(btnExample2)){
+            	logger.debug("**** Opening Example2 ****");
             	new Example2(dbConnection);
             }
             else if(ae.getSource().equals(btnExample3)){
+            	logger.debug("**** Opening Example3 ****");
             	new Example3(dbConnection);
             }
             else if(ae.getSource().equals(btnExample4)){
+            	logger.debug("**** Opening Example4 ****");
             	new Example4(dbConnection);
             }
             else if(ae.getSource().equals(btnExample4UsingHelper)){
+            	logger.debug("**** Opening Example4UsingHelper ****");
             	JFrame e4JFrame = new JFrame("Example4UsingHelper");
             	e4JFrame.add(new Example4UsingHelper(dbConnection, e4JFrame));
             	e4JFrame.setLocation(DemoUtil.getChildScreenLocation("Example4UsingHelper"));
@@ -112,22 +117,28 @@ public class MainClass extends JFrame {
             	e4JFrame.pack();
             }
             else if(ae.getSource().equals(btnExample5)){
+            	logger.debug("**** Opening Example5 ****");
             	new Example5(dbConnection);
             }
             else if(ae.getSource().equals(btnExample6)){
+            	logger.debug("**** Opening Example6 ****");
             	new Example6(dbConnection);
             }
             else if(ae.getSource().equals(btnExample7)){
+            	logger.debug("**** Opening Example7 ****");
             	new Example7(dbConnection);
             }
             else if(ae.getSource().equals(btnTestBase)){
+            	logger.debug("**** Opening TestBaseComponents ****");
             	new TestBaseComponents(dbConnection, hints);
             }
             else if(ae.getSource().equals(btnTestGrid)){
+            	logger.debug("**** TestGridComponents not implemented ****");
             	// TODO
             	//new TestGridComponents(dbConnection);
             }
             else if(ae.getSource().equals(btnTestFormatted)){
+            	logger.debug("**** Opening TestFormattedComponents ****");
             	new TestFormattedComponents(dbConnection);
             }
         }
