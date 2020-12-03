@@ -566,7 +566,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// since the list was likely blank when the component was bound we need to update the component again so it can get the text from the list
 		// we don't want to do this if the component is unbound as with an SSDBComboBox used for navigation.
 		if (getSSRowSet() != null) {
+			// 2020-12-03_BP: if we call updateSSComponent() directly from a component, we MUST turn the component listeners off first
+			removeSSComponentListener();
 			updateSSComponent();
+			addSSComponentListener();
 		}
 	}
 
