@@ -209,6 +209,7 @@ public class Example3 extends JFrame {
 		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
 			txtSupplierPartID.bind(rowset, "supplier_part_id");
 			cmbSupplierName.bind(rowset, "supplier_id");
+			cmbPartName.setAllowNull(false);
 			cmbPartName.bind(rowset, "part_id");
 			txtQuantity.bind(rowset, "quantity");
 
