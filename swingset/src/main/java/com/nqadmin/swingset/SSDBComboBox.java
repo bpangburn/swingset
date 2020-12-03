@@ -1210,6 +1210,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// Only try to update item for a valid list item.
 			if (selectedItem!=null) {
 				super.setSelectedItem(_value);
+				getEditor().selectAll(); // after we find a match, do a select all on the editor so if the user starts typing again it won't be appended
 				logger.debug("{}: Selected Index AFTER setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedIndex());
 			} else {
 				logger.debug("{}: No matching list item found so not updating. Current editor text is '{}'", () -> getColumnForLog(), () -> getEditor().getItem().toString());
