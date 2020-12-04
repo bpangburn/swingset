@@ -241,14 +241,6 @@ public interface SSRowSet extends RowSet {
 		return RowSetOps.getColumnType(this, _columnName);
 		//return getMetaData().getColumnType(getColumnIndex(_columnName));
 	}
-	
-	/**
-	 * Indicates if a call to updateRow() is in progress flushing/committing
-	 * rowset changes to the underlying database.
-	 * 
-	 * @return indicates if a call to updateRow() is in progress
-	 */
-	public boolean isUpdatingRow();
 
 	/**
 	 * Method used by SwingSet component listeners to update the underlying
