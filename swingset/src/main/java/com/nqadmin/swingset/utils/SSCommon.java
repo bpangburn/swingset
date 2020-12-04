@@ -54,6 +54,7 @@ import javax.swing.event.DocumentListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.datasources.SSRowSet;
 
@@ -382,8 +383,6 @@ public class SSCommon implements Serializable {
 	public void addSSRowSetListener() {
 		ssRowSet.addRowSetListener(ssRowSetListener);
 	}
-	
-	// TODO Merge common code across bind() methods.
 
 	/**
 	 * Updates the SSComponent with a valid RowSet and Column (Name or Index)
@@ -394,12 +393,14 @@ public class SSCommon implements Serializable {
 		
 		// CHECK FOR NULL COLUMN/ROWSET
 		if (((boundColumnName == null) && (boundColumnIndex == NO_COLUMN_INDEX)) || (ssRowSet == null)) {
+			logger.warn("Binding failed: column name={}, column index={}{}.", ()->boundColumnName, ()->boundColumnIndex, ()->ssRowSet==null ? ", rowset=null" : "");
 			return;
 		}
 
 		// UPDATE COMPONENT
 		// For an SSDBComboBox, we have likely not yet called execute to populate the
-		// combo lists so the text for the first record will be blank.
+		// combo lists so the text for the first record will be blank, but updateSSComponent() for
+		// SSDBComboBox checks for a null list and returns.
 		updateSSComponent();
 
 	}
@@ -421,7 +422,7 @@ public class SSCommon implements Serializable {
 		setSSRowSet(_ssRowSet);
 		addSSRowSetListener();
 
-		// UPDATE COLUMN NAME
+		// STORE COLUMN INDEX & NAME
 		setBoundColumnIndex(_boundColumnIndex);
 
 		// INDICATE THAT WE'RE DONE SETTING THE BINDINGS
@@ -440,23 +441,28 @@ public class SSCommon implements Serializable {
 	 * @param _boundColumnName name of the column to which this check box should be
 	 *                         bound
 	 */
-	public void bind(final SSRowSet _ssRowSet, final String _boundColumnName) {// throws java.sql.SQLException {
-		// INDICATE THAT WE'RE UPDATING THE BINDINGS
-		inBinding = true;
-
-		// UPDATE ROWSET
-		removeSSRowSetListener();
-		setSSRowSet(_ssRowSet);
-		addSSRowSetListener();
-
-		// UPDATE COLUMN NAME
-		setBoundColumnName(_boundColumnName);
-
-		// INDICATE THAT WE'RE DONE SETTING THE BINDINGS
-		inBinding = false;
-
-		// UPDATE THE COMPONENT
-		bind();
+	public void bind(final SSRowSet _ssRowSet, final String _boundColumnName) { // throws java.sql.SQLException {
+		try {
+			bind(_ssRowSet, RowSetOps.getColumnIndex(_ssRowSet, _boundColumnName));
+		} catch (final SQLException se) {
+			logger.error(_boundColumnName + " - Failed to retrieve column index while binding.", se);
+		}
+//		// INDICATE THAT WE'RE UPDATING THE BINDINGS
+//		inBinding = true;
+//
+//		// UPDATE ROWSET
+//		removeSSRowSetListener();
+//		setSSRowSet(_ssRowSet);
+//		addSSRowSetListener();
+//
+//		// UPDATE COLUMN NAME
+//		setBoundColumnName(_boundColumnName);
+//
+//		// INDICATE THAT WE'RE DONE SETTING THE BINDINGS
+//		inBinding = false;
+//
+//		// UPDATE THE COMPONENT
+//		bind();
 
 	}
 
