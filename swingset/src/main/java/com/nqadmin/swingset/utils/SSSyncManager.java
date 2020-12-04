@@ -39,10 +39,12 @@ package com.nqadmin.swingset.utils;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
 import java.sql.SQLException;
 
 import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
+import javax.swing.SwingUtilities;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -177,15 +179,26 @@ public class SSSyncManager {
 	/**
 	 * Listener for rowset.
 	 */
-	protected class SyncRowSetListener implements RowSetListener {
+	protected class SyncRowSetListener implements RowSetListener, Serializable {
+
+		/**
+		 * unique serial ID 
+		 */
+		private static final long serialVersionUID = -7584919356924575482L;
+		
+		/**
+		 * variables needed to consolidate multiple calls
+		 */
+		private int lastChange = 0;
+		private int lastNotifiedChange = 0;
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void cursorMoved(final RowSetEvent rse) {
-			logger.debug("");
-			adjustValue();
+		public void cursorMoved(final RowSetEvent event) {
+			logger.trace("Rowset cursor moved.");
+			performUpdates();
 		}
 
 		/**
@@ -193,8 +206,9 @@ public class SSSyncManager {
 		 */
 		@Override
 		public void rowChanged(final RowSetEvent rse) {
-			logger.debug("");
-			// We only care about navigation (cursorMoved) or a full refresh (rowSetChanged)
+			logger.trace("Rowset row changed.");
+			// Do nothing as there is no navigation involved
+			//performUpdates();
 		}
 
 		/**
@@ -202,8 +216,24 @@ public class SSSyncManager {
 		 */
 		@Override
 		public void rowSetChanged(final RowSetEvent rse) {
-			logger.debug("");
-			adjustValue();
+			logger.trace("Rowset changed.");
+			performUpdates();
+		}
+		
+		private void performUpdates() {
+			lastChange++;
+			logger.trace("performUpdates(): lastChange=" + lastChange
+					+ ", lastNotifiedChange=" + lastNotifiedChange);
+			
+			// Delay execution of logic until all listener methods are called for current event
+			// Based on: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
+			SwingUtilities.invokeLater(() -> {
+				if (lastNotifiedChange != lastChange) {
+					lastNotifiedChange = lastChange;
+
+					adjustValue();
+				}
+			});
 		}
 
 	}
@@ -311,10 +341,10 @@ public class SSSyncManager {
 	 */
 	protected void adjustValue() {
 		
-		// Ignore rowset listener calls triggered during row insertion or while navigator is calling updateRow() on rowset.
-		if (rowset.isUpdatingRow() || dataNavigator.isOnInsertRow()) {
-			return;
-		}
+//		// Ignore rowset listener calls triggered during row insertion or while navigator is calling updateRow() on rowset.
+//		if (dataNavigator.isOnInsertRow()) {
+//			return;
+//		}
 
 		removeComboListener();
 

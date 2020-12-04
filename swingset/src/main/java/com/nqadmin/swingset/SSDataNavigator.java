@@ -42,6 +42,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.Serializable;
 import java.sql.SQLException;
 
 import javax.sql.RowSetEvent;
@@ -54,6 +55,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -84,20 +86,26 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Rowset Listener on the SSRowSet used by data navigator.
 	 */
-	protected class SSDBNavRowSetListener implements RowSetListener {
+	protected class SSDBNavRowSetListener implements RowSetListener, Serializable {
+		
+		/**
+		 * unique serial ID
+		 */
+		private static final long serialVersionUID = -6731728079603068264L;
+		
+		/**
+		 * variables needed to consolidate multiple calls
+		 */
+		private int lastChange = 0;
+		private int lastNotifiedChange = 0;
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public void cursorMoved(final RowSetEvent rse) {
-			// Update the navigator display following a navigation.
-			try {
-				logger.debug("Calling updateNavigator().");
-				updateNavigator();
-			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
-			}
+			logger.trace("Rowset cursor moved.");
+			performUpdates();
 		}
 
 		/**
@@ -105,8 +113,8 @@ public class SSDataNavigator extends JPanel {
 		 */
 		@Override
 		public void rowChanged(final RowSetEvent rse) {
-			logger.debug("");
-			// We only care about navigation (cursorMoved) or a full refresh (rowSetChanged)
+			logger.trace("Row changed.");
+			performUpdates();
 		}
 
 		/**
@@ -114,19 +122,39 @@ public class SSDataNavigator extends JPanel {
 		 */
 		@Override
 		public void rowSetChanged(final RowSetEvent rse) {
+			logger.trace("Rowset changed.");
 			// Update the record counts and navigator display following a navigation.
 			try {
 				logger.debug("Updating row count with last(), getRow(), and first().");
 				sSRowSet.last();
 				rowCount = sSRowSet.getRow();
 				sSRowSet.first();
-				
-				logger.debug("Calling updateNavigator().");
-				updateNavigator();
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			}
+			performUpdates();
 
+		}
+		
+		private void performUpdates() {
+			lastChange++;
+			logger.trace("performUpdates(): lastChange=" + lastChange
+					+ ", lastNotifiedChange=" + lastNotifiedChange);
+			
+			// Delay execution of logic until all listener methods are called for current event
+			// Based on: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
+			SwingUtilities.invokeLater(() -> {
+				if (lastNotifiedChange != lastChange) {
+					lastNotifiedChange = lastChange;
+
+					try {
+						logger.debug("Calling updateNavigator().");
+						updateNavigator();
+					} catch (final SQLException se) {
+						logger.error("SQL Exception.", se);
+					}				
+				}
+			});
 		}
 
 	}
