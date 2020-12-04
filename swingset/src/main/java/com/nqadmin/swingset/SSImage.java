@@ -309,14 +309,18 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 */
 	@Override
 	public void updateSSComponent() {
+		
+		
 
         try {
             final byte[] imageData = getSSRowSet().getRow() >0 ? getSSRowSet().getBytes(getBoundColumnName()) : null;
             if(imageData != null){
+            	logger.debug("{}: Setting non-null image.", () -> getColumnForLog());
                 img = new ImageIcon(imageData);
                 lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
                 lblImage.setText("");
             } else {
+            	logger.debug("{}: Setting null image.", () -> getColumnForLog());
                 img = null;
                 lblImage.setText("No Picture");
             }

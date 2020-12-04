@@ -224,7 +224,7 @@ public class SSCommon implements Serializable {
 
 		private void performUpdates() {
 			lastChange++;
-			logger.debug("{} - performUpdates(): lastChange=" + lastChange
+			logger.trace("{} - performUpdates(): lastChange=" + lastChange
 					+ ", lastNotifiedChange=" + lastNotifiedChange, () -> getColumnForLog());
 			
 			// Delay execution of logic until all listener methods are called for current event
@@ -802,7 +802,7 @@ public class SSCommon implements Serializable {
 		
 		// If you see this in the logs back to back for the same component a listener is likely
 		// not handled properly. Maybe incorporate SwingUtilities.invokeLater()? 
-		logger.debug("Updating component {}.", () -> getColumnForLog());
+		logger.trace("Updating component {}.", () -> getColumnForLog());
 		
 		ssComponent.removeSSComponentListener();
 

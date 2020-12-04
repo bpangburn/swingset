@@ -283,10 +283,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	protected String primaryKeyColumnName = "";
 
-	/**
-	 * String typed by user into combobox
-	 */
-	protected String priorEditorText = "";
+//	/**
+//	 * String typed by user into combobox
+//	 */
+//	protected String priorEditorText = "";
 
 	/**
 	 * Query used to populate combo box.
@@ -740,7 +740,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		
 		// TODO Consider overriding getSelectedIndex() to account for GlazedList impact
 		
-		logger.debug("{}: Call to getSelectedValue().", () -> getColumnForLog());
+		logger.trace("{}: Call to getSelectedValue().", () -> getColumnForLog());
 
 		Long result = null;
 
@@ -891,7 +891,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			// 2020-07-24: adding support for a nullable first item if nulls are supported
 			// 2020-10-02: For a SSDBComboBox used as a navigator, we don't want a null first item. Look at getBoundColumnName().
 			if (getAllowNull() && (getBoundColumnName()!=null)) {
-				logger.debug("{}: Adding blank list item", () -> getColumnForLog());
+				logger.trace("{}: Adding blank list item", () -> getColumnForLog());
 				remodel.add(null, "");
 			}
 
@@ -1174,7 +1174,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	public void setSelectedItem(final Object _value) {
 
 // TODO Need to deal with null on focus lost event. SSDBComboListener.actionPerformed setting bound column to  null when focus lost.
-// TODO Could add back logic to revert typed text to restore matches.
 
 // INTERCEPTING GLAZEDLISTS CALLS TO setSelectedItem() SO THAT WE CAN PREVENT IT FROM TRYING TO SET VALUES NOT IN THE LIST
 
@@ -1568,8 +1567,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			//logger.debug("{}: Possible matches AFTER setPopupVisible(false): " + possibleMatches, () -> getColumnForLog());
 
 			// THIS SHOULD BE CALLED AS A RESULT OF SOME ACTION ON THE ROWSET SO RESET THE EDITOR STRINGS BEFORE DOING ANYTHING ELSE
-			priorEditorText = "";
-			getEditor().setItem(priorEditorText);
+			// This is going to make a little noise in the debug logs since it results in an "extra" call to setSelectedItem()
+			getEditor().setItem("");
 
 
 			// Combobox primary key column data queried from the database will generally be of data type long.
@@ -1577,7 +1576,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			// TODO Consider starting with a Long and passing directly to setSelectedValue(primaryKey). Modify setSelectedValue to accept a Long vs long.
 			final String text = getBoundColumnText();
 
-			logger.debug("{}: getBoundColumnText() - " + text, () -> getColumnForLog());
+			logger.trace("{}: getBoundColumnText() - " + text, () -> getColumnForLog());
 
 			// GET THE BOUND VALUE STORED IN THE ROWSET
 			//if (text != null && !(text.equals(""))) {
@@ -1602,7 +1601,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			//	editorString = getEditor().getItem().toString();
 			//}
 			//logger.debug("{}: Combo editor string: " + editorString, () -> getColumnForLog());
-			logger.debug(() -> {
+			logger.trace(() -> {
 				String editorString = null;
 				if (getEditor().getItem() != null) {
 					editorString = getEditor().getItem().toString();

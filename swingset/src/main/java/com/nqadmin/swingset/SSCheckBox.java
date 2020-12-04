@@ -263,6 +263,9 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	@Override
 	public void updateSSComponent() {
 		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long, Integer, Boolean
+		
+		final String text = getBoundColumnText();
+		logger.debug("{}: getBoundColumnText() - " + text, () -> getColumnForLog());
 
 		// SELECT/DESELECT BASED ON UNDERLYING SQL TYPE
 		switch (getBoundColumnType()) {
@@ -270,7 +273,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 		case java.sql.Types.SMALLINT:
 		case java.sql.Types.TINYINT:
 			// SET THE CHECK BOX BASED ON THE VALUE IN ROWSET
-			if (getBoundColumnText().equals(String.valueOf(CHECKED))) {
+			if (text.equals(String.valueOf(CHECKED))) {
 				setSelected(true);
 			} else {
 				setSelected(false);
@@ -280,7 +283,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 		case java.sql.Types.BIT:
 		case java.sql.Types.BOOLEAN:
 			// SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-			if (getBoundColumnText().equals(BOOLEAN_CHECKED)) {
+			if (text.equals(BOOLEAN_CHECKED)) {
 				setSelected(true);
 			} else {
 				setSelected(false);

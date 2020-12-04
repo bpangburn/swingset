@@ -166,6 +166,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				    try {
 				    	// 2020-10-02_BP: Date (and presumably Time & Timestamp) fields are returned as java.util.Date and Postgres JDBC doesn't know how to handle them
 				    	// java.sql.Date, java.sql.Time, and java.sql.Timestamp are all subclasses of java.util.Date
+// TODO This may be where we want to check and deal with NULL				    	
 				    	if (currentValue instanceof java.util.Date) {
 				    		switch (getBoundColumnJDBCType()) {
 				    		case DATE:
@@ -451,7 +452,8 @@ public class SSFormattedTextField extends JFormattedTextField
 					(newValue instanceof java.sql.Date) ||
 					(newValue instanceof java.sql.Time) ||
 					(newValue instanceof java.sql.Timestamp)) {
-
+				
+				logger.debug("{}: getObject() - " + newValue, () -> getColumnForLog());
 				setValue(newValue);
 			} else {
 				logger.error(getColumnForLog() + ": JDBCType of " + jdbcType.toString() + " was cast to unsupported type of " + newValue.getClass().getName() + " based on JDBC connection getTypeMap().");

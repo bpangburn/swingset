@@ -218,8 +218,10 @@ public class SSSlider extends JSlider implements SSComponentInterface {
             	final String columnValue = getBoundColumnText();
             	try {
             		if ((columnValue==null) || columnValue.isEmpty()) {
+            			logger.debug("{}: Setting slider to 0.", () -> getColumnForLog());
             			setValue(0);
 	            	} else {
+	            		logger.debug("{}: Setting slider to " + columnValue + ".", () -> getColumnForLog());
 	            		setValue(Integer.parseInt(columnValue));
 	            	}
             	} catch (final NumberFormatException _nfe) {

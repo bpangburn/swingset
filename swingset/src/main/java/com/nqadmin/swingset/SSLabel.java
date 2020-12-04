@@ -45,6 +45,9 @@ import java.io.Serializable;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -89,6 +92,11 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 		}
 
     } // end protected class SSLabelListener
+    
+	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
 
     /**
 	 * unique serial id
@@ -214,7 +222,9 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	 */
 	@Override
 	public void updateSSComponent() {
-		setText(getBoundColumnText());
+		final String text = getBoundColumnText();
+		logger.debug("{}: Setting label to " + text + ".", () -> getColumnForLog());
+		setText(text);
 	}
 
 } // end public class SSLabel extends JLabel {

@@ -506,7 +506,10 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	 */
 	@Override
 	public void updateSSComponent() {
-		setText(getBoundColumnText());
+		
+		final String text = getBoundColumnText();
+		logger.debug("{}: Setting text field to " + text + ".", () -> getColumnForLog());
+		setText(text);
 	}
 
 } // end public class SSTextField extends JTextField {

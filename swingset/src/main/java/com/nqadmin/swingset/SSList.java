@@ -543,12 +543,14 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 		} catch (final SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
-
+		
 		if (array == null) {
+			logger.debug("{}: Array is null. Clearing selection.", () -> getColumnForLog());
 			clearSelection();
 			return;
 		}
 
+		logger.debug("{}: Updating component with array of [" + array.toString() + "].", () -> getColumnForLog());
 		setSelectedValues(array);
 	}
 

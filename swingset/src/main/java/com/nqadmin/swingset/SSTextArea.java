@@ -39,6 +39,9 @@ package com.nqadmin.swingset;
 
 import javax.swing.JTextArea;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -53,6 +56,11 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
 public class SSTextArea extends JTextArea implements SSComponentInterface {
 
 	// TODO Consider adding an InputVerifier to prevent component from losing focus. See SSFormattedTextField. May be able to add to SSDocumentListener in SSCommon.
+	
+	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
 
     /**
 	 * unique serial id
@@ -147,7 +155,10 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	 */
 	@Override
 	public void updateSSComponent() {
-		setText(getBoundColumnText());
+		
+		final String text = getBoundColumnText();
+		logger.debug("{}: Setting text area to " + text + ".", () -> getColumnForLog());
+		setText(text);
 	}
 
 } // end public class SSTextArea extends JTextArea {
