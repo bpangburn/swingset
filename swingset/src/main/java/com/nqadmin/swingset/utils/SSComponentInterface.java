@@ -465,7 +465,7 @@ public interface SSComponentInterface {
 	 * <p>
 	 * IMPORTANT: Do not call {@link #updateSSComponent()} directly from 
 	 * SwingSet components unless you disable/enable the component listener.
-	 * Best practice is to call {@link #getSSCommon().updateSSComponent()}
+	 * Best practice is to call {@code #getSSCommon().updateSSComponent()}
 	 * <p>
 	 * updateSSComponent() should eliminate the need for updateDisplay()
 	 *
