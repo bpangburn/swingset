@@ -44,11 +44,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
 import javax.swing.AbstractListModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -112,8 +114,7 @@ import org.apache.logging.log4j.Logger;
  *		for use with GlazedLists AutoComplete feature
  * @since 4.0.0
  */
-public abstract class AbstractComboBoxListSwingModel extends AbstractListModel<SSListItem>
-implements MutableComboBoxModel<SSListItem> {
+public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxModel<SSListItem> {
 	private static final long serialVersionUID = 1L;
 
 	/** when true, handle combo box selected item (about the events) */
@@ -251,6 +252,8 @@ implements MutableComboBoxModel<SSListItem> {
 	// Make sure there's a SSListItemFormat,
 	// and install CellRenderer that uses it.
 	//
+	// TODO: uninstall
+	//
 
 	/**
 	 * Installs a default {@link SSListItemFormat}
@@ -363,21 +366,25 @@ implements MutableComboBoxModel<SSListItem> {
 
 	@Override
 	public int getSize() {
-		return itemList.size();
+		try (Remodel remodel = getRemodel()) {
+			return itemList.size();
+		}
 	}
 
 	@Override
 	public SSListItem getElementAt(int index) {
-		if (comboBoxModel) {
-			// The DefaultComboBoxModel never throws an exception
-			// Curiously, the DefaultListModel for this same method
-			// does throw an exception.
-			if ( index >= 0 && index < itemList.size() )
-				return itemList.get(index);
-			else
-				return null;
+		try (Remodel remodel = getRemodel()) {
+			if (comboBoxModel) {
+				// The DefaultComboBoxModel never throws an exception
+				// Curiously, the DefaultListModel for this same method
+				// does throw an exception.
+				if ( index >= 0 && index < itemList.size() )
+					return itemList.get(index);
+				else
+					return null;
+			}
+			return itemList.get(index);
 		}
-		return itemList.get(index);
 	}
 
 	// ComboBoxModel
@@ -387,13 +394,15 @@ implements MutableComboBoxModel<SSListItem> {
 	@Override
 	public void setSelectedItem(Object anItem) {
 		// TODO: exception if not combo?
-		if (comboBoxModel) {
-			if (!Objects.equals(selectedObject, anItem)) {
-				if (anItem == null || anItem instanceof SSListItem) {
-					selectedObject = (SSListItem)anItem;
-					fireContentsChanged(this, -1, -1);
-				} else {
-					logger.warn(() -> "ComboBox#setSelectedItem(" + anItem + ") not SSListItem");
+		try (Remodel remodel = getRemodel()) {
+			if (comboBoxModel) {
+				if (!Objects.equals(selectedObject, anItem)) {
+					if (anItem == null || anItem instanceof SSListItem) {
+						selectedObject = (SSListItem)anItem;
+						fireContentsChanged(this, -1, -1);
+					} else {
+						logger.warn(() -> "ComboBox#setSelectedItem(" + anItem + ") not SSListItem");
+					}
 				}
 			}
 		}
@@ -440,6 +449,38 @@ implements MutableComboBoxModel<SSListItem> {
 		}
 	}
 
+	// Methods from DefaultComboBoxModel (make sure Vector never gets referenced)
+
+	@Override
+	public void addAll(int index, Collection<? extends SSListItem> c) {
+		try (Remodel remodel = getRemodel()) {
+			remodel.addAll(index, c);
+		}
+	}
+
+	@Override
+	public void addAll(Collection<? extends SSListItem> c) {
+		try (Remodel remodel = getRemodel()) {
+			remodel.addAll(c);
+		}
+	}
+
+	@Override
+	public void removeAllElements() {
+		try (Remodel remodel = getRemodel()) {
+			remodel.clear();
+		}
+	}
+
+	@Override
+	public int getIndexOf(Object anObject) {
+		try (Remodel remodel = getRemodel()) {
+			return remodel.indexOf(anObject);
+		}
+	}
+
+
+
 	// Helper methods for adjusting selected
 
 	/**
@@ -462,7 +503,7 @@ implements MutableComboBoxModel<SSListItem> {
 	 * 
 	 * @param oldSize the size before additions
 	 */
-	private void adjustSelectedAfterAdd(int oldSize) {
+	private void comboAdjustSelectedAfterAdd(int oldSize) {
 		if (comboBoxModel) {
 			if (oldSize == 0) {
 				if ( itemList.size() >= 1 && selectedObject == null ) {
@@ -689,13 +730,23 @@ implements MutableComboBoxModel<SSListItem> {
 		comboAdjustSelectedAfterAdd(_listItem);
 	}
 
-	private boolean addAll(List<SSListItem> newItems) {
+	private boolean internalAddAll(Collection<? extends SSListItem> newItems) {
 		// first new item goes here
-		int firstAddAt = itemList.size();
+		int oldSize = itemList.size();
 		boolean isChanged = itemList.addAll(newItems);
 		if (isChanged) {
-            fireIntervalAdded(this, firstAddAt, itemList.size()-1);
-			adjustSelectedAfterAdd(firstAddAt);
+			fireIntervalAdded(this, oldSize, itemList.size()-1);
+			comboAdjustSelectedAfterAdd(oldSize);
+		}
+		return isChanged;
+	}
+
+	private boolean internalAddAll(int index, Collection<? extends SSListItem> newItems) {
+		boolean isChanged = itemList.addAll(index, newItems);
+		int oldSize = itemList.size();
+		if (isChanged) {
+			fireIntervalAdded(this, index, index + newItems.size() - 1);
+			comboAdjustSelectedAfterAdd(oldSize);
 		}
 		return isChanged;
 	}
@@ -996,17 +1047,31 @@ implements MutableComboBoxModel<SSListItem> {
 			AbstractComboBoxListSwingModel.this.add(_index, _newItem);
 			// isModifiedLength = true;
 		}
+
 		/**
 		 * Appends all of the list items in the specified list
 		 * to the end of this list.
 		 * @param _newItems items to add to this list.
 		 * @return true if the list changed
 		 */
-		public boolean addAll(List<SSListItem> _newItems) {
+		public boolean addAll(Collection<? extends SSListItem> _newItems) {
 			verifyOpened();
-			return AbstractComboBoxListSwingModel.this.addAll(_newItems);
+			return AbstractComboBoxListSwingModel.this.internalAddAll(_newItems);
 			// isModifiedLength = true;
 		}
+
+		/**
+		 * Appends all of the list items in the specified list
+		 * to the end of this list.
+		 * @param _newItems items to add to this list.
+		 * @return true if the list changed
+		 */
+		public boolean addAll(int _index, Collection<? extends SSListItem> _newItems) {
+			verifyOpened();
+			return AbstractComboBoxListSwingModel.this.internalAddAll(_index, _newItems);
+			// isModifiedLength = true;
+		}
+
 		/**
 		 * Replaces the item at the specified position in the list
 		 * with the specified item.
