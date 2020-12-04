@@ -44,8 +44,11 @@ import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.swing.JComboBox;
 
@@ -100,6 +103,10 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * </pre>
  */
 public class SSComboBox extends JComboBox<String> implements SSComponentInterface {
+	/**
+	 * unique serial ID
+	 */
+	private static final long serialVersionUID = 521308332266885608L;
 
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
@@ -132,30 +139,81 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	}
 
 	/**
-	 * Predefined "exclude" option.
+	 * Constant indicating that combo box should display predefined yes/no options.
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.YesNo}
 	 */
-	public static final int EXCLUDE = 0;
+	public static final int YES_NO_OPTION = 0;
 
 	/**
-	 * Predefined "female" option.
+	 * Predefined "no" option.
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.YesNo}
 	 */
-	public static final int FEMALE = 1;
+	public static final int NO = 0;
+
+	/**
+	 * Predefined "yes" option.
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.YesNo}
+	 */
+	public static final int YES = 1;
 
 	/**
 	 * Constant indicating that combo box should display predefined gender options.
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
 	 */
 	public static final int GENDER_OPTION = 1;
 
 	/**
-	 * Predefined "include" option.
+	 * Constant indicating that combo box should display predefined gender options.
+	 *
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
 	 */
-	public static final int INCLUDE = 1;
+	@Deprecated
+	public static final int SEX_OPTION = 1;
+
+	/**
+	 * Predefined "male" option.
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
+	 */
+	public static final int MALE = 0;
+
+	/**
+	 * Predefined "female" option.
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
+	 */
+	public static final int FEMALE = 1;
+
+	/**
+	 * Predefined "unisex" option.
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
+	 */
+	public static final int UNISEX = 2;
+
+	/**
+	 * Predefined "unisex" option.
+	 *
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
+	 */
+	@Deprecated
+	public static final int UNI_SEX = 2;
 
 	/**
 	 * Constant indicating that combo box should display predefined include/exclude
 	 * options.
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.IncludeExclude}
 	 */
 	public static final int INCLUDE_EXCLUDE_OPTION = 2;
+
+	/**
+	 * Predefined "exclude" option.
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.IncludeExclude}
+	 */
+	public static final int EXCLUDE = 1;
+
+	/**
+	 * Predefined "include" option.
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.IncludeExclude}
+	 */
+	public static final int INCLUDE = 0;
 
 	/**
 	 * Log4j Logger for component
@@ -163,72 +221,39 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	private static Logger logger = LogManager.getLogger();
 
 	/**
-	 * Predefined "male" option.
-	 */
-	public static final int MALE = 0;
-
-	/**
-	 * Predefined "no" option.
-	 */
-	public static final int NO = 0;
-
-	/**
 	 * Value to represent that no item has been selected in the combo box.
 	 */
+	//
+	// TODO: why not use Integer.MIN_VALUE?
+	// NON_SELECTED is Integer.MIN_VALUE + 1. Why?
+	//
 	public static final int NON_SELECTED = (int) ((Math.pow(2, 32) - 1) / (-2));
-
-	/**
-	 * unique serial ID
-	 */
-	private static final long serialVersionUID = 521308332266885608L;
-
-	/**
-	 * Constant indicating that combo box should display predefined gender options.
-	 *
-	 * @deprecated Use {@link #GENDER_OPTION} instead.
-	 */
-	@Deprecated
-	public static final int SEX_OPTION = 1;
-
-	/**
-	 * Predefined "unisex" option.
-	 *
-	 * @deprecated Use {@link #UNISEX} instead.
-	 */
-	@Deprecated
-	public static final int UNI_SEX = 2;
-
-	/**
-	 * Predefined "unisex" option.
-	 */
-	public static final int UNISEX = 2;
-
-	/**
-	 * Predefined "yes" option.
-	 */
-	public static final int YES = 1;
-
-	/**
-	 * Constant indicating that combo box should display predefined yes/no options.
-	 */
-	public static final int YES_NO_OPTION = 0;
 
 	/**
 	 * Underlying values for each combo box choice if different from defaults of 0,
 	 * 1, 2, 3, etc.
+	 * @deprecated use methods to access
 	 */
 	protected ArrayList<Integer> mappings = null;
 
 	/**
 	 * Options to be displayed in combo box.
+	 * @deprecated use methods to access
 	 */
 	protected ArrayList<String> options = null;
 
 	/**
 	 * Code representing of predefined options to be displayed in the combo box
 	 * (e.g. yes/no, exclude/include, etc.
+	 * @deprecated Use {@link #setOptions(java.lang.Class) }
 	 */
 	protected int predefinedOptions = -1;
+
+	/**
+	 * enum being displayed in combo box
+	 */
+	// TODO: needed?
+	private Class<?> enumOption;
 
 	/**
 	 * Component listener.
@@ -303,8 +328,20 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * the values that map to the items displayed in the combo box)
 	 *
 	 * @return returns the underlying values for each of the items in the combo box
+	 * @deprecated use getMappingsList()
 	 */
 	public int[] getMappings() {
+		return getMappingsInt();
+	}
+
+	/**
+	 * Returns the underlying values for each of the items in the combo box (e.g.
+	 * the values that map to the items displayed in the combo box)
+	 *
+	 * @return returns the underlying values for each of the items in the combo box
+	 * @deprecated use getMappingsList()
+	 */
+	public int[] getMappingsInt() {
 		return mappings.stream().mapToInt(i -> i).toArray();
 		// https://stackoverflow.com/questions/718554/how-to-convert-an-arraylist-containing-integers-to-primitive-int-array
 		// will choke on null, but shouldn't have nulls
@@ -314,6 +351,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * Returns the items displayed in the combo box.
 	 *
 	 * @return returns the items displayed in the combo box
+	 * @deprecated use getOptionsList()
 	 */
 	public String[] getOptions() {
 		return (String[]) options.toArray();
@@ -323,6 +361,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * Returns the option code used to display predefined options in the combo box.
 	 *
 	 * @return returns the predefined option code
+	 * @deprecated use enum with {@link #setOptions(java.lang.Class) }
 	 */
 	public int getPredefinedOptions() {
 		return predefinedOptions;
@@ -378,6 +417,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 *
 	 * @param _mappings an array of values that correspond to those in the combo
 	 *                  box.
+	 * @deprecated use {@link #setOptions(java.util.List, java.util.List) }
 	 */
 	public void setMappings(final int[] _mappings) {
 
@@ -476,9 +516,11 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * Adds an array of strings as combo box items.
 	 *
 	 * @param _options the list of options that you want to appear in the combo box.
+	 * @deprecated use {@link #setOptions(java.util.List) }
 	 */
 	public void setOptions(final String[] _options) {
 
+		// TODO why bother clearing? GC doesn't care; other references?
 		if (options != null) {
 			options.clear();
 		}
@@ -510,6 +552,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 * @return returns true if the options and mappings are set successfully -
 	 *         returns false if the size of arrays do not match or if the values
 	 *         could not be set
+	 * @deprecated use {@link #setOptions(java.util.List, java.util.List) }
 	 */
 	public boolean setOptions(final String[] _options, final int[] _mappings) {
 		if (_options.length != _mappings.length) {
@@ -525,6 +568,97 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	}
 
 	/**
+	 * Sets the options to be displayed in the combo box and their corresponding
+	 * values.
+	 *
+	 * @param _options  options to be displayed in the combo box.
+	 * @param _mappings integer values that correspond to the options in the combo
+	 *                  box.
+	 */
+	public void setOptions(List<String> _options, List<Integer> _mappings) {
+		Objects.requireNonNull(_options);
+		Objects.requireNonNull(_mappings);
+		if(_options.size() != _mappings.size()) {
+			throw new IllegalArgumentException("Options and Mappings must be the same length");
+		}
+		setOptions(_options.toArray(new String[0]),
+				   _mappings.stream().mapToInt(i -> i).toArray());
+	}
+
+	/**
+	 * Adds a list of strings as combo box items.
+	 *
+	 * @param _options the list of options that you want to appear in the combo box.
+	 */
+	public void setOptions(final List<String> _options) {
+		setOptions(_options.toArray(new String[0]));
+	}
+
+	//
+	// TODO: Study use case for enums
+	// TODO: When an enum is specified, should there be a way to
+	//		specify a mapping as well? Two possibilities, the first
+	//		is like the general pattern, mapping should have the
+	//		same number of elements as there are enum values.
+	//		The second could also be provided as setOptions([], Function)
+	//		 1) setOptions(enum, mapping)
+	//		 2) setOptions(enum, Function<enum, Object>)
+	//			For example
+	//				setOptions(ComboEnum.class, (e) -> e.someMethod())
+	//				setOptions(ComboEnum.class, (e) -> someMap.get(e))
+
+	/**
+	 * Sets the options to be displayed in the combo box based on
+	 * the enum class' value's toString(). Generate a {@literal [0-N)}
+	 * mapping.
+	 *
+	 * @param <T> inferred enum type
+	 * @param _enumOptions enum class with values to display
+	 */
+	public <T extends Enum<T>> void setOptions(Class<T> _enumOptions) {
+		// Could mark known enums for special handling,
+		// Could have a special method for getting the display string.
+		// But what's wrong with toString()
+
+		enumOption = _enumOptions;
+		setOptions(Stream.of(_enumOptions.getEnumConstants())
+				.map(e -> e.toString()).collect(Collectors.toList()));
+	}
+
+	/**
+	 * Returns the underlying values for each of the items in the combo box (e.g.
+	 * the values that map to the items displayed in the combo box)
+	 *
+	 * @return returns the underlying values for each of the items in the combo box
+	 */
+	public List<Integer> getMappingsList() {
+		return mappings;
+	}
+
+	/**
+	 * Returns the items displayed in the combo box.
+	 *
+	 * @return returns the items displayed in the combo box
+	 */
+	public List<String> getOptionsList() {
+		return options;
+	}
+
+	// TODO: Is this needed or the remains of wanting to be a good bean?
+	//       It could be useful to distinguish when an enum was used.
+	//
+	//       To keep it, must clear enumOption in any setOption path
+	//       that doesn't originate with an enum, a little tricky but not bad.
+	// /**
+	//  * Returns the option code used to display predefined options in the combo box.
+	//  *
+	//  * @return returns the predefined option code
+	//  */
+	// public Class<?> getEnumOption() {
+	// 	return enumOption;
+	// }
+
+	/**
 	 * Sets the options to be displayed in the combo box based on common predefined
 	 * options.
 	 *
@@ -532,6 +666,7 @@ public class SSComboBox extends JComboBox<String> implements SSComponentInterfac
 	 *                           box.
 	 * @return true or false indicating if the predefined options were set
 	 *         successfully
+	 * @deprecated use enum with {@link #setOptions(java.lang.Class) }
 	 */
 	public boolean setPredefinedOptions(final int _predefinedOptions) {
 		final int oldValue = predefinedOptions;
