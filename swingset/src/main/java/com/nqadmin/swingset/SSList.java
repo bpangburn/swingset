@@ -550,7 +550,7 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 			return;
 		}
 
-		logger.debug("{}: Updating component with array of [" + array.toString() + "].", () -> getColumnForLog());
+		logger.debug("{}: Updating component with array of " + Arrays.toString(array) + ".", () -> getColumnForLog());
 		setSelectedValues(array);
 	}
 
