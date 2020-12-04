@@ -46,6 +46,7 @@ import java.io.Serializable;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.text.Format;
+import java.text.ParseException;
 
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
@@ -90,35 +91,54 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * More on input verifiers here: https://www.drdobbs.com/jvm/java-better-interfaces-via-jformattedtex/224700979?pgno=1
 	 * Some discussion on dates and validation here: https://docs.oracle.com/javase/tutorial/uiswing/misc/focus.html#inputVerification
 	 */
+	// TODO: This still needs some work.
 	public class FormattedTextFieldVerifier extends InputVerifier {
 
 		@Override
 		public boolean verify(final JComponent input) {
 
-			boolean result = false;
+			boolean result = true;
+			Object value = null;
 
 			if (input instanceof SSFormattedTextField) {
 				logger.debug("{}: Instance of SSFormattedTextField.", () -> getColumnForLog());
 				final SSFormattedTextField ssftf = (SSFormattedTextField) input;
-				try {
-					logger.debug("{}: Text in Formatted Text Field is {}.", () -> getColumnForLog(), () -> ssftf.getText());
-					// this will throw a parse exception if something goes wrong
-					ssftf.commitEdit();
-
-					// get current value
-					final Object value = (ssftf.getValue());
-
-					// now perform custom checks
-					result = validateField(value);
-
-					// update text color for negatives
-					if (result) {
-						updateTextColor(value);
+				AbstractFormatter formatter = ssftf.getFormatter();
+				String formattedText = ssftf.getText();
+				logger.debug("Formatter is: " + formatter + ".");
+				if (formatter!=null && formattedText!=null && !formattedText.isEmpty()) {
+					
+					try {
+						value = formatter.stringToValue(formattedText);
+						// Apparently formatter.stringToValue(formattedText) accomplished the same thing as commitEdit(),
+						// but this approach lets us know if the formatter is null.
+						//ssftf.commitEdit(); 
+					} catch (ParseException pe) {
+						logger.warn(getColumnForLog() + ": String of '" + formattedText + "' generated a Parse Exception at " + pe.getErrorOffset() + ".", pe);
+						result = false;
+						// We're not going to call setValue(null) if result is false.
 					}
-
-				} catch (final java.text.ParseException pe) {
-					logger.warn(getColumnForLog() + ": Parse Exception at " + pe.getErrorOffset() + ".", pe);
+				} else {
+					logger.debug("Null formatter or text. Setting value to null.");
+// TODO: Deal with null formatter and non-null text.					
+					// Value is already null.
 				}
+
+				// now perform custom checks
+				if (result) {
+					result = validateField(value);
+				}
+
+				// update text color for negatives
+				if (result) {
+					updateTextColor(value);
+				}
+				
+				if (result) {
+// TODO: This seems to call the property change listener twice??					
+					ssftf.setValue(value);
+				}
+
 			}
 
 			// Update background color to RED for invalid value.
