@@ -165,6 +165,12 @@ public class SSCommon implements Serializable {
 		 * unique serial ID
 		 */
 		private static final long serialVersionUID = -5194433723970625351L;
+		
+		/**
+		 * variables needed to consolidate multiple calls
+		 */
+		private int lastChange = 0;
+		private int lastNotifiedChange = 0;
 
 		/**
 		 * When the cursor moves we want to trigger a change to the bound Component
@@ -173,7 +179,8 @@ public class SSCommon implements Serializable {
 		@Override
 		public void cursorMoved(final RowSetEvent event) {
 			logger.trace("Rowset cursor moved. {}", () -> getColumnForLog());
-			updateSSComponent();
+			//updateSSComponent();
+			performUpdates();
 		}
 
 		/**
@@ -196,9 +203,10 @@ public class SSCommon implements Serializable {
 		@Override
 		public void rowChanged(final RowSetEvent event) {
 			logger.trace("Rowset row changed. {}", () -> getColumnForLog());
-			if (!getSSRowSet().isUpdatingRow()) {
-				updateSSComponent();
-			}
+//			if (!getSSRowSet().isUpdatingRow()) {
+//				updateSSComponent();
+//			}
+			performUpdates();
 		}
 
 		/**
@@ -208,7 +216,25 @@ public class SSCommon implements Serializable {
 		@Override
 		public void rowSetChanged(final RowSetEvent event) {
 			logger.trace("Rowset changed. {}", () -> getColumnForLog());
-			updateSSComponent();
+			//updateSSComponent();
+			performUpdates();
+		}
+		
+
+		private void performUpdates() {
+			lastChange++;
+			logger.debug("{} - performUpdates(): lastChange=" + lastChange
+					+ ", lastNotifiedChange=" + lastNotifiedChange, () -> getColumnForLog());
+			
+			// Delay execution of logic until all listener methods are called for current event
+			// Based on: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
+			SwingUtilities.invokeLater(() -> {
+				if (lastNotifiedChange != lastChange) {
+					lastNotifiedChange = lastChange;
+
+					updateSSComponent();
+				}
+			});
 		}
 
 	} // end protected class SSRowSetListener
@@ -767,6 +793,11 @@ public class SSCommon implements Serializable {
 	 * after update.
 	 */
 	public void updateSSComponent() {
+		
+		// If you see this in the logs back to back for the same component a listener is likely
+		// not handled properly. Maybe incorporate SwingUtilities.invokeLater()? 
+		logger.debug("Updating component {}.", () -> getColumnForLog());
+		
 		ssComponent.removeSSComponentListener();
 
 		ssComponent.updateSSComponent();

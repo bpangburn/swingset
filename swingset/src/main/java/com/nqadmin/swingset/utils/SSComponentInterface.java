@@ -62,6 +62,10 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * <p>
  * Developer needs to insure that each implementation has an SSCommon data
  * member that is instantiated in the Component's constructor.
+ * <p>
+ * IMPORTANT: Do not call {@link #updateSSComponent()} directly from 
+ * SwingSet components unless you disable/enable the component listener.
+ * Best practice is to call {@code #getSSCommon().updateSSComponent()}
  */
 public interface SSComponentInterface {
 
@@ -458,6 +462,10 @@ public interface SSComponentInterface {
 	/**
 	 * Updates the value of the SwingSet component based on the bound database
 	 * column.
+	 * <p>
+	 * IMPORTANT: Do not call {@link #updateSSComponent()} directly from 
+	 * SwingSet components unless you disable/enable the component listener.
+	 * Best practice is to call {@link #getSSCommon().updateSSComponent()}
 	 * <p>
 	 * updateSSComponent() should eliminate the need for updateDisplay()
 	 *
