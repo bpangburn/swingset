@@ -165,7 +165,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 			final int index = getSelectedIndex();
 
-			if (index == -1) {
+			if (index == -1 || getSelectedValue()==null) {
 				logger.debug("{}: SSDBComboListener.actionPerformed setting bound column to  null.", () -> getColumnForLog());
 				setBoundColumnText(null);
 			} else {
@@ -566,10 +566,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// since the list was likely blank when the component was bound we need to update the component again so it can get the text from the list
 		// we don't want to do this if the component is unbound as with an SSDBComboBox used for navigation.
 		if (getSSRowSet() != null) {
-			// 2020-12-03_BP: if we call updateSSComponent() directly from a component, we MUST turn the component listeners off first
-			removeSSComponentListener();
-			updateSSComponent();
-			addSSComponentListener();
+			// 2020-12-03_BP: If we call updateSSComponent() directly from a component, we MUST turn the component listeners off first, but cleaner to
+			// 	call using getSSCommon()
+			getSSCommon().updateSSComponent();
 		}
 	}
 
@@ -737,7 +736,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @return returns the value associated with the selected item OR -1 if nothing
 	 *         is selected.
 	 */
-	public long getSelectedValue() {
+	public Long getSelectedValue() {
 		
 		// TODO Consider overriding getSelectedIndex() to account for GlazedList impact
 		
@@ -767,11 +766,11 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				}
 			}
 		}
-
-		// If anything above returned null, change to NON_SELECTED.
-		if (result==null) {
-			result = (long) NON_SELECTED;
-		}
+// 2020-12-03: Changing method signature to Long so we can now return null.
+//		// If anything above returned null, change to NON_SELECTED.
+//		if (result==null) {
+//			result = (long) NON_SELECTED;
+//		}
 
 		return result;
 	}
