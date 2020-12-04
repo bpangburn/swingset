@@ -39,12 +39,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * This is a copy of AbstractComboBoxListSwingModel just for events.
+ * This is a copy of AbstractComboBoxListSwingModelEventTest just for events.
  * @author err
  */
-public class SSAbstractListInfoEventTest {
+public class AbstractComboBoxListSwingModelEventTest {
 	
-	public SSAbstractListInfoEventTest() {
+	public AbstractComboBoxListSwingModelEventTest() {
 	}
 	
 	@BeforeAll
@@ -255,6 +255,12 @@ public class SSAbstractListInfoEventTest {
 			if (li.isComboBoxModel()) {
 				expectEvent(CHANGED, -1, -1);
 			}
+			assertTrue(events.isEmpty());
+
+			List<SSListItem> items2 = liCreateMany(li.getItemNumElems(), li);
+			remodel.addAll(2, items2);
+			expectEvent(ADDED, 2, 6);
+			// adding if not empty, does not get a selected event
 			assertTrue(events.isEmpty());
 
 			// verify the first item got automatically selected

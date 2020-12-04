@@ -41,9 +41,9 @@ import org.junit.jupiter.params.provider.MethodSource;
  *
  * @author err
  */
-public class SSAbstractListInfoTest {
+public class AbstractComboBoxListSwingModelTest {
 	
-	public SSAbstractListInfoTest() {
+	public AbstractComboBoxListSwingModelTest() {
 	}
 	
 	@BeforeAll
