@@ -451,14 +451,14 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	// Methods from DefaultComboBoxModel (make sure Vector never gets referenced)
 
-	@Override
+	// @Override not in jdk1.8
 	public void addAll(int index, Collection<? extends SSListItem> c) {
 		try (Remodel remodel = getRemodel()) {
 			remodel.addAll(index, c);
 		}
 	}
 
-	@Override
+	// @Override not in jdk1.8
 	public void addAll(Collection<? extends SSListItem> c) {
 		try (Remodel remodel = getRemodel()) {
 			remodel.addAll(c);
