@@ -79,7 +79,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	private static final String screenQuery = "SELECT * FROM part_data ORDER BY part_id;";
 	private static final String cmbNavQuery = "SELECT part_id, part_name FROM part_data ORDER BY part_id;";
 	private static final String pkColumn = "part_id";
-	private static final String cmbNavDisplayColumn = "part_id";
+	private static final String cmbNavDisplayColumn = "part_name";
 	
 	// Screen Labels
 	JLabel lblSelectPart = new JLabel("Parts");
