@@ -45,7 +45,11 @@ import ca.odell.glazedlists.EventList;
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * This class adds support for GlazedLists locking.
+ * This class adds support for GlazedLists locking,
+ * see {@link Remodel}.
+ * @param <M> mapping type; mapping is typically primary key
+ * @param <O> option type; option provides display string
+ * @param <O2>  option2 type; if present, supplementary display string
  * @see <a target="_top" href="https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html">GlazedLists AutoCompletion javadoc</a>
  * @see <a href="https://publicobject.com/glazedlistsdeveloper/screencasts/autocompletesupport/">GlazedLists AutoCompletion Video</a>
  * @since 4.0.0
@@ -60,7 +64,6 @@ public class GlazedListsOptionMappingInfo<M,O,O2> extends OptionMappingSwingMode
 	 * @param _option2Enabled true says to provide an options2 field in SSListItem
 	 * @param _eventList which is installed into AutoCompleteSupport
 	 */
-	@SuppressWarnings("unchecked")
 	public GlazedListsOptionMappingInfo(boolean _option2Enabled, EventList<SSListItem> _eventList) {
 		super(_option2Enabled, _eventList);
 		eventList = _eventList;

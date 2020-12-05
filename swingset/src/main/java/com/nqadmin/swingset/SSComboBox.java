@@ -88,7 +88,7 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
  * <pre>
  * {@code
  * SSComboBox combo = new SSComboBox();
- * String[] options = {"111", "2222", "33333"};
+ * List<String> options = {"111", "2222", "33333"};
  * combo.setOptions(options);
  * }
  * </pre>
@@ -96,19 +96,24 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
  * For the above items the combobox assumes that the values start from zero:
  * {@literal "111" -> 0, "2222" -> 1, "33333" -> 2}
  * <p>
- * To give your own mappings you can set the mappings separately or pass them
- * along with the options:
+ * To give your own mappings you can set the mappings along with the options.
  * <pre>
  * {@code
  * SSComboBox combo = new SSComboBox();
- * String[] options = {"111", "2222", "33333"};
- * int[] mappings = { 1,5,7 };
+ * List<String> options = {"111", "2222", "33333"};
+ * List<Integer> mappings = { 1,5,7 };
  * combo.setOptions(options, mappings);
  *
  * // next line is assuming mysSRowSet has been initialized and my_column is a
  * // column in mysSRowSet
  * combo.bind(mysSRowSet,"my_column"); }
  * </pre>
+ * Previously this class supported "predefinedOptions". These options are
+ * now encapsulated in enums, see {@link com.nqadmin.swingset.enums.YesNo},
+ * {@link com.nqadmin.swingset.enums.IncludeExclude}, and
+ * {@link com.nqadmin.swingset.enums.Gender3}.
+ * The {@link #setOptions(java.lang.Class)}
+ * takes any enum, not just these three.
  */
 public class SSComboBox extends JComboBox<SSListItem> implements SSComponentInterface {
 	/**

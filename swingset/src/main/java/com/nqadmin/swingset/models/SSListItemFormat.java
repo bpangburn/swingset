@@ -95,8 +95,11 @@ import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.ListItem0;
 //		 contributes to string description, so...
 //
 public class SSListItemFormat extends Format {
+	/** default date format */
 	public static final String dateDefault = "yyyy/MM/dd";
+	/** default time format */
 	public static final String timeDefault = "HH:mm:ss";
+	/** default timestamp format */
 	public static final String timestampDefault = "yyyy/MM/dd'T'HH:mm:ss";
 	private static final long serialVersionUID = 1L;
 	/** default elem separator */

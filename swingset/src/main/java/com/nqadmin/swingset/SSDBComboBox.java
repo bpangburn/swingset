@@ -214,6 +214,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		}
 
 		/** this only works once, use it for install */
+		@Override
 		public EventList<SSListItem> getEventList() {
 			return super.getEventList();
 		}
@@ -257,7 +258,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * <p>
 	 * Appears to determine if GlazedList is used for filtering or original
 	 * keystroke listener/filter.
-	 * @deprecated 
+	 * @deprecated unneeded
 	 */
 	protected boolean filterSwitch = true;
 
@@ -266,13 +267,13 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * <p>
 	 * Note that mappings for the SSDBComboBox are Longs whereas in SSComboBox they
 	 * are Integers.
-	 * @deprecated
+	 * @deprecated unneeded
 	 */
 	protected ArrayList<Long> mappings = null;
 
 	/**
 	 * Options to be displayed in the combobox (based on a query).
-	 * @deprecated
+	 * @deprecated unneeded
 	 */
 	protected ArrayList<String> options = null;
 
@@ -619,6 +620,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	}
 
 	/**
+	 * Get the mappings currently in use.
 	 * @return the mappings
 	 */
 	public List<Long> getMappings() {
@@ -653,6 +655,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	}
 
 	/**
+	 * Get the options currently in use.
 	 * @return the options
 	 */
 	public List<Object> getOptions() {
@@ -691,7 +694,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	}
 
 	/**
-//	 * Returns the query used to retrieve values from database for the combo box.
+	 * Returns the query used to retrieve values from database for the combo box.
 	 *
 	 * @return returns the query used.
 	 */
@@ -833,7 +836,13 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //		}
 //	};
 
-	// This is the old method, now handled in format
+	/**
+	 *  deprecated
+	 * @param _rs deprecated
+	 * @param _columnName deprecated
+	 * @return  deprecated
+	 * @deprecated unneeded, the old method, now handled in format
+	 */
 	protected String getStringValue(final ResultSet _rs, final String _columnName) {
 		throw new UnsupportedOperationException();
 	}
@@ -1107,7 +1116,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * @param mappings the mappings to set
-	 * @deprecated
+	 * @deprecated values come from database query
 	 */
 	public void setMappings(final ArrayList<Long> mappings) {
 		throw new UnsupportedOperationException();
@@ -1116,7 +1125,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * @param options the options to set
-	 * @deprecated
+	 * @deprecated values come from database query
 	 */
 	public void setOptions(final ArrayList<String> options) {
 		throw new UnsupportedOperationException();

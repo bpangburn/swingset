@@ -103,13 +103,16 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	 * @param _option2Enabled true says to provide an options2 field in SSListItem
 	 * @param _itemList model backing store
 	 */
-	@SuppressWarnings("unchecked")
 	public OptionMappingSwingModel(boolean _option2Enabled, List<SSListItem> _itemList) {
 		super(_option2Enabled ? 3 : 2, _itemList);
 		option2Enabled = _option2Enabled;
 	}
 
-	/** create List slices lazily */
+	/**
+	 * create List slices lazily
+	 * @param sliceIndex elem index in SSListItem
+	 * @return the slice for the specified elem
+	 */
 	private List<?> getSlice(int sliceIndex) {
 		List<?> slice = slices[sliceIndex];
 		if (slice == null) {
@@ -262,6 +265,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 		return OPT2_IDX;
 	}
 
+	@Override
 	public Remodel getRemodel() {
 		return new Remodel();
 	}

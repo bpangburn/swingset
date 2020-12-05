@@ -84,7 +84,8 @@ import org.apache.logging.log4j.Logger;
  * The encapsulated data can be thought of as a two dimensional
  * array [ height X width ]; the height is the size of {@code List<SSListItem>},
  * the width is the number of elements in a SSListItem .
- * The number of elements in an SSListItem is controlled by a property;
+ * The number of elements in an SSListItem is controlled by a property,
+ * see {@link #setItemNumElems};
  * the property may only be changed when the item list is empty.
  * <p>
  * {@code createElementSlice} creates live, read-only, lists of
@@ -214,7 +215,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	/**
 	 * Used for testing to set combo handling flag.
-	 * @param _itemNumElems
+	 * @param _itemNumElems number of elements in an SSListItem
 	 * @param _isCombo in a combo box
 	 */
 	/*package-test*/ AbstractComboBoxListSwingModel(int _itemNumElems, boolean _isCombo) {
@@ -329,6 +330,9 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		return listItemFormat;
 	}
 
+	/**
+	 * Cell renderer that works with a SSListItemFormat.
+	 */
 	protected class LocalListCellRenderer extends DefaultListCellRenderer {
 		private static final long serialVersionUID = 1L;
 
@@ -340,6 +344,9 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		}
 	}
 
+	/**
+	 * Cell renderer that works with a SSListItemFormat.
+	 */
 	protected class LocalComboBoxCellRenderer extends BasicComboBoxRenderer {
 		private static final long serialVersionUID = 1L;
 
@@ -448,6 +455,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	// Methods from DefaultComboBoxModel (make sure Vector never gets referenced)
 
+	/** {@inheritDoc } */
 	// @Override not in jdk1.8
 	public void addAll(int index, Collection<? extends SSListItem> c) {
 		try (Remodel remodel = getRemodel()) {
@@ -455,6 +463,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		}
 	}
 
+	/** {@inheritDoc } */
 	// @Override not in jdk1.8
 	public void addAll(Collection<? extends SSListItem> c) {
 		try (Remodel remodel = getRemodel()) {
@@ -462,6 +471,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		}
 	}
 
+	/** {@inheritDoc } */
 	@Override
 	public void removeAllElements() {
 		try (Remodel remodel = getRemodel()) {
@@ -469,6 +479,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		}
 	}
 
+	/** {@inheritDoc } */
 	@Override
 	public int getIndexOf(Object anObject) {
 		try (Remodel remodel = getRemodel()) {
@@ -611,17 +622,30 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		final int elemIndex;
 		final boolean isValid;
 
+		/**
+		 * state info
+		 * @param elemIndex elem index
+		 * @param isValid true if it's valid
+		 */
 		public SliceInfo(int elemIndex, boolean isValid) {
 			this.elemIndex = elemIndex;
 			this.isValid = isValid;
 		}
 
+		/**
+		 * debug
+		 * @return string
+		 */
 		@Override
 		public String toString() {
 			return "SliceInfo{" + "elemIndex=" + elemIndex + ", isValid=" + isValid + '}';
 		}
 	}
-	/** not used. package access for testing */
+	/**
+	 * Some state of slice. Not used. Package access for testing.
+	 * @param l slice
+	 * @return state info
+	 */
 	SliceInfo sliceInfo(List<Object> l) {
 		ItemElementSlice slice = null;
 		if(l instanceof ItemElementSlice) {
@@ -875,6 +899,16 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		return el;
 	}
 
+	/**
+	 * Determine if the argument list is a slice of this item list.
+	 * A slice is a live list of an SSListItem element;
+	 * it is backed by an item list.
+	 * <p>
+	 * Note that if the list is a slice from a different item list, 
+	 * then false is returned.
+	 * @param list check this list
+	 * @return true if the specified list is backed by this
+	 */
 	public boolean hasShadow(List<?> list) {
 		if (list instanceof ItemElementSlice) {
 			return ((ItemElementSlice)list).isShadow(this);
@@ -882,10 +916,23 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		return false;
 	}
 
+	/**
+	 * This method checks if the specified list is
+	 * a shadow of this itemlist.
+	 * If it is a shadow, then a copy of the list is created.
+	 * @see #hasShadow(java.util.List) 
+	 * @param <T> type of list element
+	 * @param list list to check
+	 * @return a list disconnected from the item list.
+	 */
 	public <T> List<T> getDisconnectedList(List<T> list) {
 		return hasShadow(list) ? new ArrayList<T>(list) : list;
 	}
 
+	/**
+	 * For debug.
+	 * @return the item list as a string
+	 */
 	public String dump() {
 		return itemList.stream().collect(StringBuilder::new,
 				StringBuilder::append, StringBuilder::append).toString();
@@ -943,8 +990,11 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	 * access to AbstractComboBoxListSwingModel.
 	 * The {@link #verifyOpened()}
 	 * method is useful for that.
-	 * Methods in subclasses should call verifyOpened
-	 * as their first statement; this avoids modifications
+	 * Typically methods in a subclass invoke
+	 * super.someMethod which does {@code verifyOpened()}.
+	 * If a method in a subclass directly modifies
+	 * the item list or its contents it should call verifyOpened
+	 * as its first statement; this avoids modifications
 	 * after the lock is released.
 	 * 
 	 * @see GlazedListsOptionMappingInfo for example of Remodel locking
@@ -1060,6 +1110,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		/**
 		 * Appends all of the list items in the specified list
 		 * to the end of this list.
+		 * 
+		 * @param _index insert the items at this position in the list
 		 * @param _newItems items to add to this list.
 		 * @return true if the list changed
 		 */
