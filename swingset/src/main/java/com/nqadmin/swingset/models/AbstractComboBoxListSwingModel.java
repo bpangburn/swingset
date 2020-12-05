@@ -256,9 +256,12 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	//
 
 	/**
-	 * Installs a default {@link SSListItemFormat}
-	 * into the model and installs
-	 * a default ListCellRenderer that uses it into the JComponent. 
+	 * Installs a ListCellRenderer into the JComponent which
+	 * uses {@link #getListItemFormat() }
+	 * to get the value to render. The rederer is either 
+	 * a {@code DefaultListCellRenderer} or a {@code  BasicComboBoxRenderer}
+	 * as appropriate.
+	 * <p>
 	 * The model is installed into the JComponent as a convenience.
 	 * 
 	 * @param _jc Jcomponent to set up with model; must be JList or JComboBox
@@ -269,41 +272,23 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	}
 
 	/**
-	 * Installs the specified {@link SSListItemFormat}
-	 * into the model and installs
-	 * a default ListCellRenderer that uses it into the JComponent. 
+	 * Installs the specified ListCellRenderer into the JComponent. 
 	 * The model is installed into the JComponent as a convenience.
 	 * 
-	 * @param _jc Jcomponent to set up with model; must be JList or JComboBox
+	 * @param _jc Jcomponent to set up with model
 	 * @param _model associated model
-	 * @param _lif list item format
-	 */
-	public static void install(JComponent _jc, AbstractComboBoxListSwingModel _model,
-			SSListItemFormat _lif) {
-		install(_jc, _model, null, null);
-	}
-
-	/**
-	 * Installs the specified {@link SSListItemFormat}
-	 * into the model and installs
-	 * the specified ListCellRenderer into the JComponent. 
-	 * The model is installed into the JComponent as a convenience.
-	 * 
-	 * @param _jc Jcomponent to set up with model; must be JList or JComboBox
-	 * @param _model associated model
-	 * @param _lif list item format
 	 * @param _render list cell renderer
+	 * @throws IllegalArgumentException if _jc is not JList or JComboBox
 	 */
 	@SuppressWarnings("unchecked")
 	public static void install(JComponent _jc, AbstractComboBoxListSwingModel _model,
-			SSListItemFormat _lif, ListCellRenderer<?> _render) {
+			ListCellRenderer<?> _render) {
 		Objects.requireNonNull(_jc);
 		Objects.requireNonNull(_model);
 		if(_model.installed) {
 			throw new IllegalStateException("model already installed");
 		}
 
-		_model.listItemFormat = _lif == null ? new SSListItemFormat() : _lif;
 		_model.installed = true;
 
 		if (_jc instanceof JList) {
@@ -323,12 +308,24 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	}
 
 	private SSListItemFormat listItemFormat;
+
 	/**
-	 * Return the listItemFormat associated with this model;
-	 * it was installed into the JComponent as part of the cell renderer.
+	 * Set the format to use with this model.
+	 * 
+	 * @param _listItemFormat the format used with this model
+	 */
+	public void setListItemFormat(SSListItemFormat _listItemFormat) {
+		listItemFormat = _listItemFormat;
+	}
+
+	/**
+	 * Return the listItemFormat associated with this model.
 	 * @return the associated listItemFormat
 	 */
 	public SSListItemFormat getListItemFormat() {
+		if (listItemFormat == null) {
+			listItemFormat = new SSListItemFormat();
+		}
 		return listItemFormat;
 	}
 
