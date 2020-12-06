@@ -348,9 +348,15 @@ public class SSComboBox extends JComboBox<SSListItem> implements SSComponentInte
 				: null;
 	}
 
+	/**
+	 * <b>It is probably an error to use this.</b>
+	 * {@inheritDoc}
+	 */
+	// TODO: throw exception?
 	@Override
 	public void setModel(ComboBoxModel<SSListItem> model) {
-		optionSwingModel = model instanceof Model ? (Model)model : null;
+		optionSwingModel = model instanceof Model ? (Model)model
+				: model instanceof GlazedModel ? (GlazedModel)model : null;
 
 		super.setModel(model);
 	}

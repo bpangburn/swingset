@@ -48,6 +48,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 
 import org.apache.logging.log4j.LogManager;
@@ -64,7 +65,9 @@ import ca.odell.glazedlists.matchers.TextMatcherEditor;
 import ca.odell.glazedlists.swing.AutoCompleteSupport;
 
 import static com.nqadmin.swingset.datasources.RowSetOps.*;
+import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
 import com.nqadmin.swingset.models.GlazedListsOptionMappingInfo;
+import com.nqadmin.swingset.models.OptionMappingSwingModel;
 import com.nqadmin.swingset.models.SSListItemFormat;
 
 
@@ -146,6 +149,7 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  */
 
 public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentInterface {
+	private static final long serialVersionUID = -4203338788107410027L;
 
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
@@ -190,26 +194,48 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	public static final int NON_SELECTED = Integer.MIN_VALUE + 1;
 
 	/**
-	 * unique serial id
+	 * Start with option2 disabled
 	 */
-	private static final long serialVersionUID = -4203338788107410027L;
-
-	/**
-	 * Indicates if GlazedList autocompletion has already been installed
-	 */
-	private boolean autoCompleteInstalled = false;
-
-
-	/**
-	 * Define this class here because {@literal DefaultGla....<.....>}
-	 * messes up the code. In particular:
-	 * {@code try (GlazedListsOptionMappingInfo<Long,String,String>.Remodel remodel = xxx) }
-	 */
-	private static class ComboInfo extends GlazedListsOptionMappingInfo<Long,Object,Object> {
+	private static class Model extends OptionMappingSwingModel<Long, Object, Object> {
 		private static final long serialVersionUID = 1L;
 
-		public ComboInfo(boolean _hasOption2) {
-			super(_hasOption2, new BasicEventList<SSListItem>());
+		static Model install(JComboBox<SSListItem> _jc) {
+			Model model = new Model();
+			AbstractComboBoxListSwingModel.install(_jc, model);
+			return model;
+		}
+
+		private Model() {
+			// false means no Options2
+			super(false);
+		}
+	}
+
+	/**
+	 * Start with option2 disabled
+	 */
+	private static class GlazedModel extends GlazedListsOptionMappingInfo<Long,Object,Object> {
+		private static final long serialVersionUID = 1L;
+		private AutoCompleteSupport<SSListItem> autoComplete;
+
+		// See https://stackoverflow.com/questions/15210771/autocomplete-with-glazedlists for info on modifying lists.
+		// See https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html
+		// We would like to call autoComplete.setStrict(true), but it is not currently compatible with TextMatcherEditor.CONTAINS, which is the more important feature.
+		// There is a support request to support STRICT and CONTAINS: https://github.com/glazedlists/glazedlists/issues/676
+		// Note that installing AutoComplete support makes the ComboBox editable.
+		// Should already in the event dispatch thread so don't use invokeAndWait()
+
+		static GlazedModel install(JComboBox<SSListItem> _jc) {
+			GlazedModel model = new GlazedModel();
+			model.autoComplete = AutoCompleteSupport.install(_jc, model.getEventList(), null, model.getListItemFormat());
+			model.autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
+			//model.autoComplete.setStrict(true);
+			return model;
+		}
+
+		public GlazedModel() {
+			// false means no Options2
+			super(false, new BasicEventList<SSListItem>());
 		}
 
 		/** this only works once, use it for install */
@@ -222,7 +248,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * comboInfo handles eventList, mappings, options access.
 	 */
-	private final ComboInfo comboInfo;
+	private OptionMappingSwingModel<Long, Object, Object> comboInfo;
 
 	/**
 	 * Format an SSListItem. Used to AutoCompleteSupport.install.
@@ -328,16 +354,23 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	protected final SSDBComboBoxListener ssDBComboBoxListener = new SSDBComboBoxListener();
 
+	private static final boolean useGlazedModel = true;
+
 	/**
 	 * Creates an object of the SSDBComboBox.
 	 */
 	public SSDBComboBox() {
 		// Note that call to parent default constructor is implicit.
 		//super();
-		eventList = new BasicEventList<SSListItem>();
-		comboInfo = new ComboInfo(false);
-		listItemFormat = new SSListItemFormat();
+
+		if (useGlazedModel) {
+			comboInfo = GlazedModel.install(this);
+		} else {
+			comboInfo = Model.install(this);
+		}
+		listItemFormat = comboInfo.getListItemFormat();
 		listItemFormat.setPattern(JDBCType.DATE, dateFormat);
+		listItemFormat.setSeparator(separator);
 	}
 
 	/**
@@ -360,6 +393,30 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	}
 
 	/**
+	 * Get the support for the glazed lists installed in this combo box.
+	 * 
+	 * @return the support or null if GlazedLists not installed
+	 */
+	private AutoCompleteSupport<SSListItem> getAutoComplete() {
+		return comboInfo instanceof GlazedModel
+				? ((GlazedModel)comboInfo).autoComplete
+				: null;
+	}
+
+	/**
+	 * <b>It is probably an error to use this.</b>
+	 * {@inheritDoc}
+	 */
+	// TODO: throw exception?
+	@Override
+	public void setModel(ComboBoxModel<SSListItem> model) {
+		comboInfo = model instanceof Model ? (Model)model
+				: model instanceof GlazedModel ? (GlazedModel)model : null;
+
+		super.setModel(model);
+	}
+
+	/**
 	 * Adds an item to the existing list of items in the combo box.
 	 *
 	 * @param _displayText text that should be displayed in the combobox
@@ -373,7 +430,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		// TODO Determine if any change is needed to actually add item to combobox.
 
-		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+		try (Model.Remodel remodel = comboInfo.getRemodel()) {
 			remodel.add(_primaryKey, _displayText);
 		} catch (final Exception e) {
 			logger.error(getColumnForLog() + ": Exception.", e);
@@ -470,7 +527,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		boolean result = false;
 
-		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+		try (Model.Remodel remodel = comboInfo.getRemodel()) {
 			// GET INDEX FOR mappings and options
 			int index = remodel.getMappings().indexOf(_primaryKey);
 			// PROCEED IF INDEX WAS FOUND
@@ -531,7 +588,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		boolean result = false;
 
 		// TODO: javadoc says "list items" plural. Is that what's wanted.
-		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+		try (Model.Remodel remodel = comboInfo.getRemodel()) {
 			final int index = remodel.getOptions().indexOf(_displayText);
 			result = deleteItem(index);
 		}
@@ -563,11 +620,11 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// There is a support request to support STRICT and CONTAINS: https://github.com/glazedlists/glazedlists/issues/676
 		// Note that installing AutoComplete support makes the ComboBox editable.
 		// Should already in the event dispatch thread so don't use invokeAndWait()
-		if (!autoCompleteInstalled) {
-			final AutoCompleteSupport<SSListItem> autoComplete = AutoCompleteSupport.install(this, comboInfo.getEventList(), null, listItemFormat);
-			autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
-			autoCompleteInstalled = true;
-		}
+		// if (!autoCompleteInstalled) {
+		// 	final AutoCompleteSupport<SSListItem> autoComplete = AutoCompleteSupport.install(this, comboInfo.getEventList(), null, listItemFormat);
+		// 	autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
+		// 	autoCompleteInstalled = true;
+		// }
 
 		// autoComplete.setStrict(true);
 
@@ -677,7 +734,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		//		 THEN THE FOLLOWING CAN BE USED.
 
 		// List<String> options = new ArrayList<>();
-		// try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+		// try (Model.Remodel remodel = comboInfo.getRemodel()) {
 		// 	List<SSListItem> items = remodel.getEventList();
 		// 	for(SSListItem item : items) {
 		// 		options.add(listItemFormat.format(item));
@@ -729,7 +786,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *         no item is selected.
 	 */
 	public String getSelectedStringValue() {
-		// try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+		// try (Model.Remodel remodel = comboInfo.getRemodel()) {
 		// 	SSListItem currentItem = (SSListItem)getSelectedItem();
 		// 	return currentItem != null ? remodel.getOption(currentItem) : null;
 		// }
@@ -758,7 +815,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// When filtering is taking place, getSelectedIndex() returns -1
 
 		// Determine if the call to getSelectedValue() is happening during a call to setSelectedItem()
-		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+		try (Model.Remodel remodel = comboInfo.getRemodel()) {
 			if (settingSelectedItem) {
 				if (selectedItem == null) {
 					result = (long) NON_SELECTED;
@@ -900,7 +957,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		ResultSet rs;
 
 		// this.data.getReadWriteLock().writeLock().lock();
-		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+		try (Model.Remodel remodel = comboInfo.getRemodel()) {
 			logger.trace("{}: Clearing eventList.", () -> getColumnForLog());
 			remodel.clear();
 			logger.debug("{}: Nulls allowed? [{}].", () -> getColumnForLog(), () -> getAllowNull());
@@ -1375,7 +1432,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		// ONLY NEED TO PROCEED IF THERE IS A CHANGE
 		// TODO consider firing a property change
-		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+		try (Model.Remodel remodel = comboInfo.getRemodel()) {
 			if(!remodel.isEmpty()) {
 				if (_value != getSelectedItem()) {
 					
@@ -1421,7 +1478,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// IF MAPPINGS ARE SPECIFIED THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
 		// SPECIFIED CODE IS STORED
 
-		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+		try (Model.Remodel remodel = comboInfo.getRemodel()) {
 			if (!remodel.isEmpty()) {
 				//final int index = mappings.indexOf(_value);
 				final int index = remodel.getMappings().indexOf(_value);
@@ -1501,7 +1558,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		boolean result = false;
 
-		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+		try (Model.Remodel remodel = comboInfo.getRemodel()) {
 			final int index = remodel.getMappings().indexOf(_primaryKey);
 			if (index < 0) {
 				remodel.setOption(index, _updatedDisplayText);
@@ -1645,7 +1702,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		boolean result = false;
 
-		try (ComboInfo.Remodel remodel = comboInfo.getRemodel()) {
+		try (Model.Remodel remodel = comboInfo.getRemodel()) {
 			final int index = remodel.getOptions().indexOf(_existingDisplayText);
 			result = updateItem(remodel.getMapping(index), _updatedDisplayText);
 		}
