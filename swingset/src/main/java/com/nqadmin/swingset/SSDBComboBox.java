@@ -187,8 +187,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Value to represent that no item has been selected in the combo box.
 	 */
-	// TODO: why not Integer.MIN_VALUE?
-	public static final int NON_SELECTED = (int) ((Math.pow(2, 32) - 1) / (-2));
+	public static final int NON_SELECTED = Integer.MIN_VALUE + 1;
 
 	/**
 	 * unique serial id
@@ -365,8 +364,12 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *
 	 * @param _displayText text that should be displayed in the combobox
 	 * @param _primaryKey  primary key value corresponding the the display text
+	 * @deprecated no replacement
 	 */
-	public void addItem(final String _displayText, final long _primaryKey) {
+	//
+	// Introduce setOptions(List options, List mappings) if functionality needed
+	//
+	protected void addItem(final String _displayText, final long _primaryKey) {
 
 		// TODO Determine if any change is needed to actually add item to combobox.
 
@@ -423,9 +426,13 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *
 	 * @param _name  name that should be displayed in the combo
 	 * @param _value value corresponding the the name
+	 * @deprecated in favor of addItem
 	 */
+	//
+	// Introduce setOptions(List options, List mappings) if functionality needed
+	//
 	@Deprecated
-	public void addStringItem(final String _name, final String _value) {
+	protected void addStringItem(final String _name, final String _value) {
 		addItem(_name, Long.valueOf(_value));
 
 	}

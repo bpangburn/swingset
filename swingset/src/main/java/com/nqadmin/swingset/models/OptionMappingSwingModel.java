@@ -76,7 +76,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	/** index of option in SSListItem */
 	// Option IS FIRST. THIS IS THE DEFAULT FOR SSListItemFormat
 	// In addition, only Option is required.
-	// LOOK AT createComboItem BEFORE THINKING ABOUT CHANGING THESE DEFINES
+	// LOOK AT createOptionItem BEFORE THINKING ABOUT CHANGING THESE DEFINES
 	protected final static int OPT_IDX = 0; // 
 	/** index of primary key in SSListItem */
 	protected final static int KEY_IDX = 1;
@@ -89,7 +89,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	private boolean option2Enabled = false;
 
 	/**
-	 * Create an empty ComboInfo.
+	 * Create an empty OptionMappingSwingModel .
 	 * 
 	 * @param _option2Enabled true says to provide an options2 field in SSListItem
 	 */
@@ -99,7 +99,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 
 
 	/**
-	 * Create an empty ComboInfo.
+	 * Create an empty OptionMappingSwingModel.
 	 * @param _option2Enabled true says to provide an options2 field in SSListItem
 	 * @param _itemList model backing store
 	 */
@@ -191,7 +191,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	 * @param _option2 additional display info
 	 * @return the new list item
 	 */
-	protected SSListItem createComboItem(M _mapping, O _option, O2 _option2) { 
+	protected SSListItem createOptionItem(M _mapping, O _option, O2 _option2) { 
 		// ALL ListItem CREATION GOES THROUGH HERE
 		// THE DEFINES FOR KEY_INDEX, OPT_INDEX ARE RELEVANT TO THE ORDER.
 		// _option MUST GO FIRST
@@ -209,7 +209,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	 * @param _options2 additional display info
 	 * @return the new list item
 	 */
-	protected List<SSListItem> createComboItems(List<M> _mappings, List<O> _options, List<O2>_options2) {
+	protected List<SSListItem> createOptionItems(List<M> _mappings, List<O> _options, List<O2>_options2) {
 		Objects.requireNonNull(_mappings);
 		Objects.requireNonNull(_options);
 		if (option2Enabled) {
@@ -223,12 +223,12 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 		if (_options.size() != n || _options2 != null && _options2.size() != n) {
 			throw new IllegalArgumentException("Lists must be the same size");
 		}
-		List<SSListItem> comboItems = new ArrayList<>();
+		List<SSListItem> optionItems = new ArrayList<>();
 		for (int i = 0; i < _mappings.size(); i++) {
-			comboItems.add(createComboItem(_mappings.get(i), _options.get(i),
+			optionItems.add(createOptionItem(_mappings.get(i), _options.get(i),
 					option2Enabled ? _options2.get(i) : null));
 		}
-		return comboItems;
+		return optionItems;
 	}
 
 	/**
@@ -407,7 +407,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 			if (_options2 != null) {
 				usingOption2();
 			}
-			List<SSListItem> list = OptionMappingSwingModel.this.createComboItems(_mappings, _options, _options2);
+			List<SSListItem> list = OptionMappingSwingModel.this.createOptionItems(_mappings, _options, _options2);
 			return super.addAll(list);
 			//isModifiedLength = true;
 		}
@@ -438,7 +438,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 				usingOption2();
 			}
 			return super.add(createComboItem(_mapping, _option, _option2));
-			//itemList.add(createComboItem(_mapping, _option, _option2));
+			//itemList.add(createOptionItem(_mapping, _option, _option2));
 			//isModifiedLength = true;
 			//return true;
 		}
@@ -451,7 +451,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 		 * @return the new list item
 		 */
 		public SSListItem createComboItem(M _mapping, O _option, O2 _option2) {
-			return OptionMappingSwingModel.this.createComboItem(_mapping, _option, _option2);
+			return OptionMappingSwingModel.this.createOptionItem(_mapping, _option, _option2);
 		}
 	}
 }

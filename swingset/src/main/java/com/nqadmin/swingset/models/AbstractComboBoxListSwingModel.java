@@ -259,7 +259,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	/**
 	 * Installs a ListCellRenderer into the JComponent which
 	 * uses {@link #getListItemFormat() }
-	 * to get the value to render. The rederer is either 
+	 * to get the value to render. The renderer is either 
 	 * a {@code DefaultListCellRenderer} or a {@code  BasicComboBoxRenderer}
 	 * as appropriate.
 	 * <p>
@@ -1153,7 +1153,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		}
 
 		/**
-		 * @param _listItem item to remove from combobox
+		 * Remove the listItem from ite itemList.
+		 * @param _listItem item to remove from item list
 		 * @return true if the item was removed
 		 */
 		public boolean remove(Object _listItem) {

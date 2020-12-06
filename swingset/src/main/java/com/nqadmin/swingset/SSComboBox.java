@@ -316,7 +316,7 @@ public class SSComboBox extends JComboBox<SSListItem> implements SSComponentInte
 	 * Creates an object of SSComboBox.
 	 */
 	public SSComboBox() {
-		this(false);
+		this(true);
 	}
 
 	/**
