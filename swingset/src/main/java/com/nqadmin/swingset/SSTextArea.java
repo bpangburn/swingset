@@ -37,12 +37,12 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
+import javax.sql.RowSet;
 import javax.swing.JTextArea;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
@@ -51,7 +51,7 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * SSTextArea extends the JTextArea to add SSRowSet binding.
+ * SSTextArea extends the JTextArea to add RowSet binding.
  */
 public class SSTextArea extends JTextArea implements SSComponentInterface {
 
@@ -91,14 +91,14 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
     }
 
     /**
-     * Creates a multi-line text box and binds it to the specified SSRowSet column.
+     * Creates a multi-line text box and binds it to the specified RowSet column.
      *
-     * @param _ssRowSet    datasource to be used.
+     * @param _rowSet    datasource to be used.
      * @param _boundColumnName    name of the column to which this text area should be bound
      */
-    public SSTextArea(final SSRowSet _ssRowSet, final String _boundColumnName) {
+    public SSTextArea(final RowSet _rowSet, final String _boundColumnName) {
     	this();
-        bind(_ssRowSet, _boundColumnName);
+        bind(_rowSet, _boundColumnName);
     }
 
     /**
@@ -107,7 +107,7 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	 */
 	@Override
 	public void addSSComponentListener() {
-		addSSDocumentListener();
+		addDocumentListener();
 	}
 
     @Override
@@ -133,7 +133,7 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	 */
 	@Override
 	public void removeSSComponentListener() {
-		removeSSDocumentListener();
+		removeDocumentListener();
 	}
 
 	/**

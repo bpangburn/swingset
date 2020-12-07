@@ -42,13 +42,13 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 
+import javax.sql.RowSet;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
@@ -82,11 +82,11 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 			// CONFIRM THE PROPERTY NAME IN CASE SOMEONE ADDS A DIFFERENT PROPERTY LISTENER TO ssLabelListener
 			if (pce.getPropertyName()=="text") {
 
-				removeSSRowSetListener();
+				removeRowSetListener();
 
 				setBoundColumnText(getText());
 
-				addSSRowSetListener();
+				addRowSetListener();
 			}
 
 		}
@@ -143,14 +143,14 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 
 	/**
      * Creates a SSLabel instance with no image and binds it to the specified
-     * SSRowSet column.
+     * RowSet column.
      *
-     * @param _ssRowSet    datasource to be used.
+     * @param _rowSet    datasource to be used.
      * @param _boundColumnName    name of the column to which this label should be bound
      */
-    public SSLabel(final SSRowSet _ssRowSet, final String _boundColumnName) {
+    public SSLabel(final RowSet _rowSet, final String _boundColumnName) {
 		this();
-		bind(_ssRowSet, _boundColumnName);
+		bind(_rowSet, _boundColumnName);
     }
 
 	/**

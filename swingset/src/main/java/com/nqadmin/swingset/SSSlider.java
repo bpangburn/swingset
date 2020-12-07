@@ -40,6 +40,7 @@ package com.nqadmin.swingset;
 import java.awt.Dimension;
 import java.io.Serializable;
 
+import javax.sql.RowSet;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -47,7 +48,6 @@ import javax.swing.event.ChangeListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
@@ -74,11 +74,11 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 		@Override
 		public void stateChanged(final ChangeEvent ce) {
 
-			removeSSRowSetListener();
+			removeRowSetListener();
 
 			setBoundColumnText(String.valueOf(getValue()));
 
-			addSSRowSetListener();
+			addRowSetListener();
 
         }
 
@@ -134,15 +134,15 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 
     /**
      * Creates a horizontal slider with the range 0 to 100 and binds it
-     * to the specified SSRowSet column.
+     * to the specified RowSet column.
      *
-     * @param _ssRowSet    datasource to be used.
+     * @param _rowSet    datasource to be used.
      * @param _boundColumnName    name of the column to which this slider should be bound
      * @throws java.sql.SQLException SQLException
      */
-    public SSSlider(final SSRowSet _ssRowSet, final String _boundColumnName) throws java.sql.SQLException {
+    public SSSlider(final RowSet _rowSet, final String _boundColumnName) throws java.sql.SQLException {
     	this();
-		bind(_ssRowSet, _boundColumnName);
+		bind(_rowSet, _boundColumnName);
     }
 
 	/**

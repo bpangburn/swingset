@@ -75,7 +75,7 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
     private static final int PROPERTY_preferredSize = 6;
     private static final int PROPERTY_SSDataNavigator = 7;
 
-    private static final int PROPERTY_SSRowSet = 8;
+    private static final int PROPERTY_RowSet = 8;
 
     private static final int PROPERTY_toolTipText = 9;
     private static final int PROPERTY_visible = 10;
@@ -123,9 +123,9 @@ public class SSImageFieldBeanInfo extends SimpleBeanInfo {
             properties[PROPERTY_SSDataNavigator] = new PropertyDescriptor ( "SSDataNavigator", com.nqadmin.swingset.formatting.SSImageField.class, "getSSDataNavigator", "setSSDataNavigator" );
             properties[PROPERTY_SSDataNavigator].setPreferred ( true );
             properties[PROPERTY_SSDataNavigator].setDisplayName ( "SSDataNavigator" );
-            properties[PROPERTY_SSRowSet] = new PropertyDescriptor ( "SSRowSet", com.nqadmin.swingset.formatting.SSImageField.class, "getSSRowSet", "setSSRowSet" );
-            properties[PROPERTY_SSRowSet].setPreferred ( true );
-            properties[PROPERTY_SSRowSet].setDisplayName ( "SSRowSet" );
+            properties[PROPERTY_RowSet] = new PropertyDescriptor ( "RowSet", com.nqadmin.swingset.formatting.SSImageField.class, "getRowSet", "setRowSet" );
+            properties[PROPERTY_RowSet].setPreferred ( true );
+            properties[PROPERTY_RowSet].setDisplayName ( "RowSet" );
             properties[PROPERTY_toolTipText] = new PropertyDescriptor ( "toolTipText", com.nqadmin.swingset.formatting.SSImageField.class, "getToolTipText", "setToolTipText" );
             properties[PROPERTY_toolTipText].setPreferred ( true );
             properties[PROPERTY_visible] = new PropertyDescriptor ( "visible", com.nqadmin.swingset.formatting.SSImageField.class, "isVisible", "setVisible" );

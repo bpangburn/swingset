@@ -42,12 +42,12 @@ import java.awt.event.ItemListener;
 import java.io.Serializable;
 import java.sql.SQLException;
 
+import javax.sql.RowSet;
 import javax.swing.JCheckBox;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
@@ -83,7 +83,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 		@Override
 		public void itemStateChanged(final ItemEvent ie) {
 
-			removeSSRowSetListener();
+			removeRowSetListener();
 
 			if (((JCheckBox) ie.getSource()).isSelected()) {
 				// switch(SSCheckBox.this.columnType) {
@@ -121,7 +121,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 				}
 			}
 
-			addSSRowSetListener();
+			addRowSetListener();
 		}
 
 	} // end private class SSCheckBoxListener
@@ -177,17 +177,17 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 
 	/**
 	 * Creates an object of SSCheckBox binding it so the specified column in the
-	 * given SSRowSet.
+	 * given RowSet.
 	 *
-	 * @param _ssRowSet        datasource to be used.
+	 * @param _rowSet        datasource to be used.
 	 * @param _boundColumnName name of the column to which this check box should be
 	 *                         bound
 	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
-	public SSCheckBox(final SSRowSet _ssRowSet, final String _boundColumnName) throws java.sql.SQLException {
+	public SSCheckBox(final RowSet _rowSet, final String _boundColumnName) throws java.sql.SQLException {
 		this();
-		bind(_ssRowSet, _boundColumnName);
+		bind(_rowSet, _boundColumnName);
 	}
 
 	/**

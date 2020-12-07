@@ -45,12 +45,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.StringTokenizer;
 
+import javax.sql.RowSet;
 import javax.swing.JTextField;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
@@ -277,14 +277,14 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 
     /**
      * Creates a SSTextField instance and binds it to the specified
-     * SSRowSet column.
+     * RowSet column.
      *
-     * @param _ssRowSet    datasource to be used.
+     * @param _rowSet    datasource to be used.
      * @param _boundColumnName    name of the column to which this label should be bound
      */
-    public SSTextField(final SSRowSet _ssRowSet, final String _boundColumnName) {
+    public SSTextField(final RowSet _rowSet, final String _boundColumnName) {
     	this();
-        bind(_ssRowSet, _boundColumnName);
+        bind(_rowSet, _boundColumnName);
     }
 
     /**
@@ -304,7 +304,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	 */
 	@Override
 	public void addSSComponentListener() {
-		addSSDocumentListener();
+		addDocumentListener();
 	}
 
     /**
@@ -458,7 +458,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	 */
 	@Override
 	public void removeSSComponentListener() {
-		removeSSDocumentListener();
+		removeDocumentListener();
 	}
 
 	/**

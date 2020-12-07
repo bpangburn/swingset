@@ -57,6 +57,7 @@ import javax.swing.SwingUtilities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
@@ -169,7 +170,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 			if (_pce.getPropertyName().equals("value")) {
 
-				removeSSRowSetListener();
+				removeRowSetListener();
 
 			    final SSFormattedTextField ftf = (SSFormattedTextField)_pce.getSource();
 
@@ -190,19 +191,19 @@ public class SSFormattedTextField extends JFormattedTextField
 				    	if (currentValue instanceof java.util.Date) {
 				    		switch (getBoundColumnJDBCType()) {
 				    		case DATE:
-				    			getSSRowSet().updateObject(getBoundColumnName(), new java.sql.Date(((java.util.Date)currentValue).getTime()));
+				    			getRowSet().updateObject(getBoundColumnName(), new java.sql.Date(((java.util.Date)currentValue).getTime()));
 				    			break;
 				    		case TIME:
-				    			getSSRowSet().updateObject(getBoundColumnName(), new java.sql.Time(((java.util.Date)currentValue).getTime()));
+				    			getRowSet().updateObject(getBoundColumnName(), new java.sql.Time(((java.util.Date)currentValue).getTime()));
 				    			break;
 				    		case TIMESTAMP:
-				    			getSSRowSet().updateObject(getBoundColumnName(), new java.sql.Timestamp(((java.util.Date)currentValue).getTime()));
+				    			getRowSet().updateObject(getBoundColumnName(), new java.sql.Timestamp(((java.util.Date)currentValue).getTime()));
 				    			break;
 				    		default:
 				    			logger.warn(getColumnForLog() + ": getValue() returned a java.sql.Date, but JDBCType is " + getBoundColumnJDBCType() + ". Unable to update column.");
 				    		}
 				    	} else{
-				    		getSSRowSet().updateObject(getBoundColumnName(), currentValue);
+				    		getRowSet().updateObject(getBoundColumnName(), currentValue);
 				    	}		    	
 
 					} catch (final SQLException _se) {
@@ -212,7 +213,7 @@ public class SSFormattedTextField extends JFormattedTextField
 					}
 			    }
 
-				addSSRowSetListener();
+				addRowSetListener();
 			}
 
 		}
@@ -434,7 +435,8 @@ public class SSFormattedTextField extends JFormattedTextField
 
 		try {
 			// IF THERE ARE NO RECORDS OR THE COLUMN VALUE IS NULL SET THE FIELD TO NULL AND RETURN
-			if ((getSSRowSet().getColumnCount()==0) || (getSSRowSet().getObject(getBoundColumnName()) == null)) {
+			//if ((getRowSet().getColumnCount()==0) || (getRowSet().getObject(getBoundColumnName()) == null)) {
+			if ((RowSetOps.getColumnCount(getRowSet())==0) || (getRowSet().getObject(getBoundColumnName()) == null)) {
 				setValue(null);
 				return;
 			}
@@ -448,7 +450,7 @@ public class SSFormattedTextField extends JFormattedTextField
 			// Based on: https://docs.oracle.com/javase/8/docs/api/java/sql/ResultSet.html#getObject-java.lang.String-
 			//
 			// getObject() will return the given column as a Java object. JDBC specification should contain the mappings for built in types.
-			newValue = getSSRowSet().getObject(columnName);
+			newValue = getRowSet().getObject(columnName);
 
 			/* Java types we want to support for JFormattedTextFields:
 			 * 	String
@@ -518,7 +520,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	public boolean validateField(final Object _value) {
 
 
-		// TODO May want to add null check here or let SSRowSet handle. Hard to enforce if method overridden.
+		// TODO May want to add null check here or let RowSet handle. Hard to enforce if method overridden.
 		//if (this.getAllowNull() == false && _value == null)
 		//	return false;
 

@@ -54,6 +54,7 @@ import java.util.GregorianCalendar;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import javax.sql.RowSet;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -74,7 +75,7 @@ import javax.swing.table.TableColumnModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.swingset.datasources.SSRowSet;
+import com.nqadmin.swingset.datasources.RowSetOps;
 
 // SSDataGrid.java
 //
@@ -83,7 +84,7 @@ import com.nqadmin.swingset.datasources.SSRowSet;
 /**
  * SSDataGrid provides a way to display information from a database in a table
  * format (aka "spreadsheet" or "datasheet" view). The SSDataGrid takes a
- * SSRowSet as a source of data. It also provides different cell renderers
+ * RowSet as a source of data. It also provides different cell renderers
  * including a comboboxes renderer and a date renderer.
  * <p>
  * SSDataGrid internally uses the SSTableModel to display the information in a
@@ -103,19 +104,19 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * SSDataGrid also provides an "extra" row to facilitate the addition of rows to
  * the table. Default values for various columns can be set programmatically. A
  * programmer can also specify which column is the primary key column for the
- * underlying SSRowSet and supply a primary key for that column when a new row
+ * underlying RowSet and supply a primary key for that column when a new row
  * is being added.
  * <p>
- * While using the headers always set them before you set the SSRowSet.
+ * While using the headers always set them before you set the RowSet.
  * Otherwise the headers will not appear.
  * <p>
  * Also if you are using column names rather than column numbers for different
- * function you have to call them only after setting the SSRowSet. Because
- * SSDataGrid uses the SSRowSet to convert the column names to column numbers.
+ * function you have to call them only after setting the RowSet. Because
+ * SSDataGrid uses the RowSet to convert the column names to column numbers.
  * If you specify the column numbers you can do before or after setting the
- * SSRowSet, it does not matter.
+ * RowSet, it does not matter.
  * <p>
- * You can simply remember this order 1.Set the headers 2.Set the SSRowSet 3.Any
+ * You can simply remember this order 1.Set the headers 2.Set the RowSet 3.Any
  * other function calls.
  * <pre>
  * Simple Example:
@@ -123,7 +124,7 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  *{@code
  * // SET THE HEADER BEFORE SETTING THE SSROWSET
  * 	dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
- * 	dataGrid.setSSRowSet(ssRowSet);
+ * 	dataGrid.setRowSet(rowSet);
  *
  * // HIDE THE PART ID COLUMN
  * // THIS SETS THE WIDTH OF THE COLUMN TO 0
@@ -684,12 +685,12 @@ public class SSDataGrid extends JTable {
 	protected boolean allowDeletion = true;
 
 	/**
-	 * Variable to indicate if execute() should be called on the SSRowSet.
+	 * Variable to indicate if execute() should be called on the RowSet.
 	 */
 	protected boolean callExecute = true;
 
 	/**
-	 * Number of columns in the SSRowSet.
+	 * Number of columns in the RowSet.
 	 */
 	protected int columnCount = -1;
 
@@ -725,7 +726,7 @@ public class SSDataGrid extends JTable {
 	protected Component messageWindow = null;
 
 	/**
-	 * Number of records retrieved from the SSRowSet.
+	 * Number of records retrieved from the RowSet.
 	 */
 	protected int rowCount = -1;
 
@@ -735,9 +736,9 @@ public class SSDataGrid extends JTable {
 	protected JScrollPane scrollPane = null; // new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 	/**
-	 * SSRowSet from which component will get/set values.
+	 * RowSet from which component will get/set values.
 	 */
-	protected SSRowSet sSRowSet = null;
+	protected RowSet rowSet = null;
 
 	/**
 	 * Table model to construct the JTable
@@ -752,30 +753,30 @@ public class SSDataGrid extends JTable {
 	}
 
 	/**
-	 * Constructs a data grid with the data source set to the given SSRowSet.
+	 * Constructs a data grid with the data source set to the given RowSet.
 	 *
-	 * @param _sSRowSet SSRowSet from which values have to be retrieved.
+	 * @param _rowSet RowSet from which values have to be retrieved.
 	 */
-	public SSDataGrid(final SSRowSet _sSRowSet) {
+	public SSDataGrid(final RowSet _rowSet) {
 		this();
-		sSRowSet = _sSRowSet;
+		rowSet = _rowSet;
 		bind();
 	}
 
 	/**
 	 * Initializes the data grid control. Collects metadata information about the
-	 * given SSRowSet.
+	 * given RowSet.
 	 */
 	protected void bind() {
 
 		try {
 			// EXECUTE THE QUERY
 			if (callExecute) {
-				sSRowSet.execute();
+				rowSet.execute();
 			}
 
 			// SPECIFY THE SSROWSET TO THE TABLE MODEL.
-			tableModel.setSSRowSet(sSRowSet);
+			tableModel.setRowSet(rowSet);
 
 			// SET THE TABLE MODEL FOR JTABLE
 			setModel(tableModel);
@@ -804,7 +805,7 @@ public class SSDataGrid extends JTable {
 
 	/**
 	 * Returns the callExecute property. If set to true causes the navigator to skip
-	 * the execute function call on the specified SSRowSet. (See FAQ for further
+	 * the execute function call on the specified RowSet. (See FAQ for further
 	 * details).
 	 *
 	 * @return true if execute function call has to be skipped else false
@@ -861,10 +862,11 @@ public class SSDataGrid extends JTable {
 	 *         column.
 	 *
 	 * @throws SQLException is the specified column name is not present in the
-	 *                      SSRowSet
+	 *                      RowSet
 	 */
 	public Object getDefaultValue(final String _columnName) throws SQLException {
-		final int columnNumber = sSRowSet.getColumnIndex(_columnName);
+		//final int columnNumber = rowSet.getColumnIndex(_columnName);
+		final int columnNumber = RowSetOps.getColumnIndex(rowSet,_columnName);
 		return tableModel.getDefaultValue(columnNumber - 1);
 	}
 
@@ -953,12 +955,12 @@ public class SSDataGrid extends JTable {
 	}
 
 	/**
-	 * Returns the SSRowSet being used to get the values.
+	 * Returns the RowSet being used to get the values.
 	 *
-	 * @return returns the SSRowSet being used.
+	 * @return returns the RowSet being used.
 	 */
-	public SSRowSet getSSRowSet() {
-		return sSRowSet;
+	public RowSet getRowSet() {
+		return rowSet;
 	}
 
 	/**
@@ -1117,7 +1119,7 @@ public class SSDataGrid extends JTable {
 
 	/**
 	 * Sets the callExecute property. If set to true causes the navigator to skip
-	 * the execute function call on the specified SSRowSet. (See FAQ for further
+	 * the execute function call on the specified RowSet. (See FAQ for further
 	 * details)
 	 *
 	 * @param _callExecute true if execute function call has to be skipped else
@@ -1152,7 +1154,8 @@ public class SSDataGrid extends JTable {
 	 * @throws SQLException	SQLException
 	 */
 	public void setCheckBoxRenderer(final String _column) throws SQLException {
-		final int column = sSRowSet.getColumnIndex(_column) - 1;
+		//final int column = rowSet.getColumnIndex(_column) - 1;
+		final int column = RowSetOps.getColumnIndex(rowSet,_column) - 1;
 		setCheckBoxRenderer(column);
 	}
 
@@ -1243,7 +1246,8 @@ public class SSDataGrid extends JTable {
 	 */
 	public void setComboRenderer(final String _column, final Object[] _displayItems, final Object[] _underlyingValues, final int _columnWidth)
 			throws SQLException {
-		final int column = sSRowSet.getColumnIndex(_column) - 1;
+		//final int column = rowSet.getColumnIndex(_column) - 1;
+		final int column = RowSetOps.getColumnIndex(rowSet,_column) - 1;
 		setComboRenderer(column, _displayItems, _underlyingValues, _columnWidth);
 	}
 
@@ -1274,7 +1278,8 @@ public class SSDataGrid extends JTable {
 	 * @throws SQLException	SQLException
 	 */
 	public void setDateRenderer(final String _column) throws SQLException {
-		final int tmpColumn = sSRowSet.getColumnIndex(_column) - 1;
+		//final int tmpColumn = rowSet.getColumnIndex(_column) - 1;
+		final int tmpColumn = RowSetOps.getColumnIndex(rowSet,_column) - 1;
 		final TableColumnModel tmpColumnModel = getColumnModel();
 		final TableColumn tmpTableColumn = tmpColumnModel.getColumn(tmpColumn);
 		tmpTableColumn.setCellRenderer(new DateRenderer());
@@ -1315,7 +1320,7 @@ public class SSDataGrid extends JTable {
 	 *                     _columnNames.
 	 *
 	 * @throws SQLException if the specified column name is not present in the
-	 *                      SSRowSet
+	 *                      RowSet
 	 */
 	public void setDefaultValues(final String[] _columnNames, final Object[] _values) throws SQLException {
 
@@ -1325,7 +1330,8 @@ public class SSDataGrid extends JTable {
 			columnNumbers = new int[_columnNames.length];
 
 			for (int i = 0; i < _columnNames.length; i++) {
-				columnNumbers[i] = sSRowSet.getColumnIndex(_columnNames[i]) - 1;
+				//columnNumbers[i] = rowSet.getColumnIndex(_columnNames[i]) - 1;
+				columnNumbers[i] = RowSetOps.getColumnIndex(rowSet,_columnNames[i]) - 1;
 			}
 		}
 
@@ -1334,7 +1340,7 @@ public class SSDataGrid extends JTable {
 
 	/**
 	 * Sets the header for the JTable. This function has to be called before setting
-	 * the SSRowSet for SSDataGrid.
+	 * the RowSet for SSDataGrid.
 	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
@@ -1385,7 +1391,8 @@ public class SSDataGrid extends JTable {
 		if (_columnNames != null) {
 			hiddenColumns = new int[_columnNames.length];
 			for (int i = 0; i < _columnNames.length; i++) {
-				hiddenColumns[i] = sSRowSet.getColumnIndex(_columnNames[i]) - 1;
+				//hiddenColumns[i] = rowSet.getColumnIndex(_columnNames[i]) - 1;
+				hiddenColumns[i] = RowSetOps.getColumnIndex(rowSet,_columnNames[i]) - 1;
 			}
 		}
 		hideColumns();
@@ -1445,21 +1452,22 @@ public class SSDataGrid extends JTable {
 	 * @throws SQLException	SQLException
 	 */
 	public void setPrimaryColumn(final String _columnName) throws SQLException {
-		final int columnNumber = sSRowSet.getColumnIndex(_columnName) - 1;
+		//final int columnNumber = rowSet.getColumnIndex(_columnName) - 1;
+		final int columnNumber = RowSetOps.getColumnIndex(rowSet,_columnName) - 1;
+		
 		tableModel.setPrimaryColumn(columnNumber);
 	}
 
 	/**
-	 * Sets the new SSRowSet for the combo box.
+	 * Sets the new RowSet for the combo box.
 	 *
-	 * @param _sSRowSet SSRowSet to which the combo has to update values.
-	 *
-	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
+	 * @param _rowSet RowSet to which the combo has to update values.
 	 */
-	@Deprecated
-	public void setRowSet(final SSRowSet _sSRowSet) {
-		setSSRowSet(_sSRowSet);
-	}
+	public void setRowSet(final RowSet _rowSet) {
+		final RowSet oldValue = rowSet;
+		rowSet = _rowSet;
+		firePropertyChange("rowSet", oldValue, rowSet);
+		bind();	}
 
 	/**
 	 * If the user has to decide on which cell has to be editable and which is not
@@ -1497,18 +1505,6 @@ public class SSDataGrid extends JTable {
 	}
 
 	/**
-	 * Binds the SSRowSet to the grid. Data is taken from the new SSRowSet.
-	 *
-	 * @param _sSRowSet the SSRowSet which acts as the data source.
-	 */
-	public void setSSRowSet(final SSRowSet _sSRowSet) {
-		final SSRowSet oldValue = sSRowSet;
-		sSRowSet = _sSRowSet;
-		firePropertyChange("sSRowSet", oldValue, sSRowSet);
-		bind();
-	} // end public void setSSRowSet(SSRowSet _sSRowSet) {
-
-	/**
 	 * Sets the uneditable columns. The columns specified as uneditable will not be
 	 * available for user to edit. This overrides the isCellEditable function in
 	 * SSCellEditing.
@@ -1539,7 +1535,8 @@ public class SSDataGrid extends JTable {
 			columnNumbers = new int[_columnNames.length];
 
 			for (int i = 0; i < _columnNames.length; i++) {
-				columnNumbers[i] = sSRowSet.getColumnIndex(_columnNames[i]) - 1;
+				//columnNumbers[i] = rowSet.getColumnIndex(_columnNames[i]) - 1;
+				columnNumbers[i] = RowSetOps.getColumnIndex(rowSet,_columnNames[i]) - 1;
 			}
 		}
 

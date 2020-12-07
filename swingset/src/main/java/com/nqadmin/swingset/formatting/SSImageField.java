@@ -54,6 +54,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.sql.RowSet;
 import javax.sql.RowSetListener;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -65,7 +66,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSDataNavigator;
-import com.nqadmin.swingset.datasources.SSRowSet;
+import com.nqadmin.swingset.datasources.RowSetOps;
 
 /**
  * SSImageField.java
@@ -101,7 +102,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	protected byte[] imageBytes;
 	private SSDataNavigator navigator = null;
 	private ImageIcon nullIcon;
-	protected SSRowSet rowset = null;
+	protected RowSet rowset = null;
 
 	private ImageIcon scaledIcon;
 
@@ -193,7 +194,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	}
 
 	/**
-	 * Binds the component to the specified column in the given SSRowSet
+	 * Binds the component to the specified column in the given RowSet
 	 */
 	private void bind() {
 
@@ -205,7 +206,8 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 		}
 
 		try {
-			colType = rowset.getColumnType(columnName);
+			//colType = rowset.getColumnType(columnName);
+			colType = RowSetOps.getColumnType(rowset, columnName);
 		} catch (final java.sql.SQLException sqe) {
 			logger.error(getColumnForLog() + ": SQL Exception.", sqe);
 		}
@@ -215,13 +217,13 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 
 
 	/**
-	 * Sets the SSRowSet and column name to which the component is to be bound.
+	 * Sets the RowSet and column name to which the component is to be bound.
 	 *
-	 * @param _sSRowSet   datasource to be used.
+	 * @param _rowSet   datasource to be used.
 	 * @param _columnName Name of the column to which this check box should be bound
 	 */
-	public void bind(final SSRowSet _sSRowSet, final String _columnName) {
-		rowset = _sSRowSet;
+	public void bind(final RowSet _rowSet, final String _columnName) {
+		rowset = _rowSet;
 		columnName = _columnName;
 		bind();
 	}
@@ -347,15 +349,13 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	}
 
 	/**
-	 * SSRowSet object being used to get/set the bound column value
+	 * RowSet object being used to get/set the bound column value
 	 *
-	 * @return - returns the SSRowSet object being used to get/set the bound column
+	 * @return - returns the RowSet object being used to get/set the bound column
 	 *         value
-	 * @deprecated Use {@link #getSSRowSet()} instead.
 	 */
-	@Deprecated
-	public SSRowSet getRowSet() {
-		return getSSRowSet();
+	public RowSet getRowSet() {
+		return rowset;
 	}
 
 	/**
@@ -365,16 +365,6 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	 */
 	public SSDataNavigator getSSDataNavigator() {
 		return navigator;
-	}
-
-	/**
-	 * SSRowSet object being used to get/set the bound column value
-	 *
-	 * @return - returns the SSRowSet object being used to get/set the bound column
-	 *         value
-	 */
-	public SSRowSet getSSRowSet() {
-		return rowset;
 	}
 
 	/**
@@ -489,9 +479,9 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	}
 
 	/**
-	 * Column name in the SSRowSet to which this component will be bound to
+	 * Column name in the RowSet to which this component will be bound to
 	 *
-	 * @param _columnName - column name in the SSRowSet to which this component will
+	 * @param _columnName - column name in the RowSet to which this component will
 	 *                    be bound to
 	 */
 	public void setColumnName(final String _columnName) {
@@ -500,13 +490,13 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	}
 
 	/**
-	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
+	 * Sets the SSDataNavigator being used to navigate the RowSet This is needed
 	 * only if you want to include the function keys as short cuts to perform
 	 * operations on the DataNavigator like saving the current row/ undo changes/
 	 * delete current row. <b><i>The functionality for this is not yet
 	 * finalized so try to avoid using this </i></b>
 	 *
-	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
+	 * @param _navigator - SSDataNavigator being used to navigate the RowSet
 	 * @deprecated Use {@link #setSSDataNavigator(SSDataNavigator _navigator)}
 	 *             instead.
 	 **/
@@ -516,40 +506,28 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	}
 
 	/**
-	 * Sets the SSRowSet object to be used to get/set the value of the bound column
+	 * Sets the RowSet object to be used to get/set the value of the bound column
 	 *
-	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
+	 * @param _rowset - RowSet object to be used to get/set the value of the bound
 	 *                column
-	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
 	 */
-	@Deprecated
-	public void setRowSet(final SSRowSet _rowset) {
-		setSSRowSet(_rowset);
+	public void setRowSet(final RowSet _rowset) {
+		rowset = _rowset;
+		bind();
 	}
 
 	/**
-	 * Sets the SSDataNavigator being used to navigate the SSRowSet This is needed
+	 * Sets the SSDataNavigator being used to navigate the RowSet This is needed
 	 * only if you want to include the function keys as short cuts to perform
 	 * operations on the DataNavigator like saving the current row/ undo changes/
 	 * delete current row. <b><i>The functionality for this is not yet
 	 * finalized so try to avoid using this </i></b>
 	 *
-	 * @param _navigator - SSDataNavigator being used to navigate the SSRowSet
+	 * @param _navigator - SSDataNavigator being used to navigate the RowSet
 	 */
 	public void setSSDataNavigator(final SSDataNavigator _navigator) {
 		navigator = _navigator;
-		setSSRowSet(_navigator.getSSRowSet());
-		bind();
-	}
-
-	/**
-	 * Sets the SSRowSet object to be used to get/set the value of the bound column
-	 *
-	 * @param _rowset - SSRowSet object to be used to get/set the value of the bound
-	 *                column
-	 */
-	public void setSSRowSet(final SSRowSet _rowset) {
-		rowset = _rowset;
+		setRowSet(_navigator.getRowSet());
 		bind();
 	}
 

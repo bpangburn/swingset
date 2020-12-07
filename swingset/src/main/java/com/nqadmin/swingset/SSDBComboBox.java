@@ -81,8 +81,8 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  * represents a foreign key to another table, and the combobox needs to display
  * a list of one (or more) columns from the other table.
  * <p>
- * Note, if changing both a sSRowSet and column name consider using the bind()
- * method rather than individual setSSRowSet() and setColumName() calls.
+ * Note, if changing both a rowSet and column name consider using the bind()
+ * method rather than individual setRowSet() and setColumName() calls.
  * <p>
  * e.g.
  * <p>
@@ -99,7 +99,7 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  * <pre>
  * {@code
  * SSConnection connection = null;
- * SSJdbcRowSetImpl sSRowSet = null;
+ * RowSet rowSet = null;
  * SSDataNavigator navigator = null;
  * SSDBComboBox combo = null;
  *
@@ -109,14 +109,14 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  * SSConnection connection = new SSConnection(........);
  *
  * // CREATE AN INSTANCE OF SSJDBCROWSETIMPL
- * SSJdbcRowsetImpl sSRowSet = new SSJdbcRowsetImpl(connection);
- * sSRowSet.setCommand("SELECT * FROM shipment_data;");
+ * JdbcRowsetImpl rowSet = new JdbcRowsetImpl(connection);
+ * rowSet.setCommand("SELECT * FROM shipment_data;");
  *
  * // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE SSROWSET.
  * // IF YOU ARE NOT USING THE DATA NAVIGATOR YOU HAVE TO INCLUDE THOSE.
- * // sSRowSet.execute();
- * // sSRowSet.next();
- * SSDataNavigator navigator = new SSDataNavigator(sSRowSet);
+ * // rowSet.execute();
+ * // rowSet.next();
+ * SSDataNavigator navigator = new SSDataNavigator(rowSet);
  *
  * // QUERY FOR THE COMBOBOX.
  * String query = "SELECT * FROM part_data;";
@@ -127,12 +127,12 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  *
  * // THIS BASICALLY SPECIFIES THE COLUMN AND THE SSROWSET WHERE UPDATES HAVE
  * // TO BE MADE.
- * combo.bind(sSRowSet,"part_id");
+ * combo.bind(rowSet,"part_id");
  * combo.execute();
  *
  * // CREATE A TEXTFIELD
  * JTextField myText = new JTextField();
- * myText.setDocument(new SSTextDocument(sSRowSet, "quantity");
+ * myText.setDocument(new SSTextDocument(rowSet, "quantity");
  *
  * } catch(Exception e) {
  *	// EXCEPTION HANDLER HERE...
@@ -165,7 +165,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 
-			removeSSRowSetListener();
+			removeRowSetListener();
 
 			final int index = getSelectedIndex();
 
@@ -178,7 +178,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 			}
 
-			addSSRowSetListener();
+			addRowSetListener();
 		}
 	}
 
@@ -630,7 +630,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		// since the list was likely blank when the component was bound we need to update the component again so it can get the text from the list
 		// we don't want to do this if the component is unbound as with an SSDBComboBox used for navigation.
-		if (getSSRowSet() != null) {
+		if (getRowSet() != null) {
 			// 2020-12-03_BP: If we call updateSSComponent() directly from a component, we MUST turn the component listeners off first, but cleaner to
 			// 	call using getSSCommon()
 			getSSCommon().updateSSComponent();
@@ -1541,11 +1541,11 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * If more than one item is present in the combo for that value, only the first
 	 * one is changed.
 	 * <p>
-	 * NOTE: To retain changes made to current SSRowSet call updateRow before
+	 * NOTE: To retain changes made to current RowSet call updateRow before
 	 * calling the updateItem on SSDBComboBox. (Only if you are using the
 	 * SSDBComboBox and SSDataNavigator for navigation in the screen. If you are not
 	 * using the SSDBComboBox for navigation then no need to call updateRow on the
-	 * SSRowSet. Also if you are using only SSDBComboBox for navigation you need not
+	 * RowSet. Also if you are using only SSDBComboBox for navigation you need not
 	 * call the updateRow.)
 	 *
 	 * @param _primaryKey         primary key value corresponding the the display

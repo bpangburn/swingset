@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 
+import javax.sql.RowSet;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -59,7 +60,6 @@ import javax.swing.ScrollPaneConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.swingset.datasources.SSRowSet;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
@@ -86,10 +86,10 @@ public class SSImage extends JPanel implements SSComponentInterface {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 
-				removeSSRowSetListener();
+				removeRowSetListener();
 
                 try {
-                    if (getSSRowSet() != null) {
+                    if (getRowSet() != null) {
                         //FileInputStream inStream = null;
                         File inFile = null;
                         final JFileChooser fileChooser = new JFileChooser();
@@ -107,7 +107,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 									bytesRead += read;
                                 }
                                 //inStream.close();
-                                getSSRowSet().updateBytes(getBoundColumnName(), bytes);
+                                getRowSet().updateBytes(getBoundColumnName(), bytes);
                                 img = new ImageIcon(bytes);
                                 lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
                                 lblImage.setIcon(img);
@@ -124,7 +124,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
                 	logger.error(getColumnForLog() + ": IO Exception.", ioe);;
                 }
 
-                addSSRowSetListener();
+                addRowSetListener();
             }
 
 	} // end private class SSImageListener
@@ -179,14 +179,14 @@ public class SSImage extends JPanel implements SSComponentInterface {
     }
 
     /**
-     * Constructs a SSImage Object bound to the specified column in the specified sSRowSet.
+     * Constructs a SSImage Object bound to the specified column in the specified rowSet.
      *
-     * @param _ssRowSet - SSRowSet from/to which data has to be read/written
-     * @param _boundColumnName - column in the sSRowSet to which the component should be bound.
+     * @param _rowSet - RowSet from/to which data has to be read/written
+     * @param _boundColumnName - column in the rowSet to which the component should be bound.
      */
-    public SSImage(final SSRowSet _ssRowSet, final String _boundColumnName) {
+    public SSImage(final RowSet _rowSet, final String _boundColumnName) {
 		this();
-		bind(_ssRowSet, _boundColumnName);
+		bind(_rowSet, _boundColumnName);
     }
 
     /**
@@ -216,7 +216,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	}
 
     /**
-     * Removes the current image. The image is not removed from the underlying sSRowSet.
+     * Removes the current image. The image is not removed from the underlying rowSet.
      */
     public void clearImage(){
         lblImage.setIcon(null);
@@ -313,7 +313,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 		
 
         try {
-            final byte[] imageData = getSSRowSet().getRow() >0 ? getSSRowSet().getBytes(getBoundColumnName()) : null;
+            final byte[] imageData = getRowSet().getRow() >0 ? getRowSet().getBytes(getBoundColumnName()) : null;
             if(imageData != null){
             	logger.debug("{}: Setting non-null image.", () -> getColumnForLog());
                 img = new ImageIcon(imageData);

@@ -82,8 +82,8 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
  * <p>
  * SSComboBox assumes that it will be bound to an integer column
  * <p>
- * Also, if changing both a sSRowSet and column name consider using the bind()
- * method rather than individual setSSRowSet() and setColumName() calls. <br>
+ * Also, if changing both a rowSet and column name consider using the bind()
+ * method rather than individual setRowSet() and setColumName() calls. <br>
  * For example,
  * <pre>
  * {@code
@@ -104,9 +104,9 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
  * List<Integer> mappings = { 1,5,7 };
  * combo.setOptions(options, mappings);
  *
- * // next line is assuming mysSRowSet has been initialized and my_column is a
- * // column in mysSRowSet
- * combo.bind(mysSRowSet,"my_column"); }
+ * // next line is assuming myrowSet has been initialized and my_column is a
+ * // column in myrowSet
+ * combo.bind(myrowSet,"my_column"); }
  * </pre>
  * Previously this class supported "predefinedOptions". These options are
  * now encapsulated in enums, see {@link com.nqadmin.swingset.enums.YesNo},
@@ -135,7 +135,7 @@ public class SSComboBox extends JComboBox<SSListItem> implements SSComponentInte
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 
-			removeSSRowSetListener();
+			removeRowSetListener();
 
 			final int index = getSelectedIndex();
 
@@ -147,7 +147,7 @@ public class SSComboBox extends JComboBox<SSListItem> implements SSComponentInte
 				logger.debug("{}: Setting to {}.", () -> getColumnForLog(), () -> getSelectedValue());
 			}
 
-			addSSRowSetListener();
+			addRowSetListener();
 		}
 	}
 

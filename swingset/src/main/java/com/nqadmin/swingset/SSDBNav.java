@@ -62,10 +62,10 @@ import com.nqadmin.swingset.utils.SSEnums.Navigation;
  * this function will not be called.
  * <p>
  * performPreDeletionOps() is called when the user presses the delete button,
- * but just before the deleteRow() method is called on the SSRowSet.
+ * but just before the deleteRow() method is called on the RowSet.
  * <p>
  * performPostDeletionOps() is called when the user presses the delete button
- * and after the deleteRow() method is called on the SSRowSet.
+ * and after the deleteRow() method is called on the RowSet.
  * <p>
  * Note that both the performPreDeletionOps() and performPostDeletionOps() will
  * be executed when the user presses the delete button.
@@ -186,7 +186,7 @@ public interface SSDBNav extends Serializable {
 	/**
 	 * Method to perform post-deletion operations.
 	 * <p>
-	 * The SSRowSet listener also provides the notification after the deletion of
+	 * The RowSet listener also provides the notification after the deletion of
 	 * the row.
 	 */
 	default void performPostDeletionOps() {
@@ -197,7 +197,7 @@ public interface SSDBNav extends Serializable {
 	/**
 	 * Method to perform post-insertion operations.
 	 * <p>
-	 * In addition to this you can have a listener on the SSRowSet attached to a
+	 * In addition to this you can have a listener on the RowSet attached to a
 	 * SSDataNavigator to get notified when a row is inserted.
 	 */
 	default void performPostInsertOps() {
@@ -216,7 +216,7 @@ public interface SSDBNav extends Serializable {
 	/**
 	 * Method to perform pre-deletion operations.
 	 * <p>
-	 * SSRowSet provides notification before the deletion of a row.
+	 * RowSet provides notification before the deletion of a row.
 	 */
 	default void performPreDeletionOps() {
 		// no action by default

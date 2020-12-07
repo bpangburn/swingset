@@ -44,6 +44,7 @@ import java.awt.event.KeyListener;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.sql.RowSet;
 import javax.sql.RowSetListener;
 import javax.swing.InputVerifier;
 import javax.swing.JCheckBox;
@@ -54,7 +55,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSDataNavigator;
-import com.nqadmin.swingset.datasources.SSRowSet;
+import com.nqadmin.swingset.datasources.RowSetOps;
 
 /**
  * SSBooleanField.java
@@ -143,7 +144,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 
 	private SSDataNavigator navigator = null;
 
-	protected SSRowSet rowset = null;
+	protected RowSet rowset = null;
 
 	/** Creates a new instance of SSBooleanField */
 	public SSBooleanField() {
@@ -178,7 +179,8 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 		}
 
 		try {
-			colType = rowset.getColumnType(columnName);
+			//colType = rowset.getColumnType(columnName);
+			colType = RowSetOps.getColumnType(rowset, columnName);
 		} catch (final java.sql.SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		}
@@ -187,13 +189,13 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	}
 
 	/**
-	 * Sets the SSRowSet and column name to which the component is to be bound.
+	 * Sets the RowSet and column name to which the component is to be bound.
 	 *
-	 * @param _sSRowSet   datasource to be used.
+	 * @param _rowSet   datasource to be used.
 	 * @param _columnName Name of the column to which this check box should be bound
 	 */
-	public void bind(final SSRowSet _sSRowSet, final String _columnName) {
-		rowset = _sSRowSet;
+	public void bind(final RowSet _rowSet, final String _columnName) {
+		rowset = _rowSet;
 		columnName = _columnName;
 		bind();
 	}
@@ -257,7 +259,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	}
 
 	/**
-	 * Returns the SSRowSet column name to which the component is bound.
+	 * Returns the RowSet column name to which the component is bound.
 	 *
 	 * @return returns column name to which the component is bound
 	 */
@@ -277,12 +279,12 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	}
 
 	/**
-	 * Returns the SSRowSet to which the component is bound
+	 * Returns the RowSet to which the component is bound
 	 *
-	 * @return returns the SSRowSet to which the component is bound
+	 * @return returns the RowSet to which the component is bound
 	 */
-	public SSRowSet getRowSet() {
-		return getSSRowSet();
+	public RowSet getRowSet() {
+		return rowset;
 	}
 
 	/**
@@ -292,15 +294,6 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	 */
 	public SSDataNavigator getSSDataNavigator() {
 		return navigator;
-	}
-
-	/**
-	 * Returns the SSRowSet to which the component is bound
-	 *
-	 * @return returns the SSRowSet to which the component is bound
-	 */
-	public SSRowSet getSSRowSet() {
-		return rowset;
 	}
 
 	/**
@@ -395,7 +388,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	}
 
 	/**
-	 * Sets the SSRowSet column name to which the component is bound.
+	 * Sets the RowSet column name to which the component is bound.
 	 *
 	 * @param _columnName - column name to which the component is bound
 	 */
@@ -405,11 +398,11 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	}
 
 	/**
-	 * Sets the SSDataNavigator used for navigating the SSRowSet to which this
+	 * Sets the SSDataNavigator used for navigating the RowSet to which this
 	 * component is bound. <b><i>The functionality for this is not yet
 	 * finalized so try to avoid using this </i></b>
 	 *
-	 * @param _navigator - SSDataNavigator used for navigating the SSRowSet to which
+	 * @param _navigator - SSDataNavigator used for navigating the RowSet to which
 	 *                   this component is bound to
 	 * @deprecated Use {@link #setSSDataNavigator(SSDataNavigator _navigator)}
 	 *             instead.
@@ -420,38 +413,28 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	}
 
 	/**
-	 * Sets the SSRowSet to which the component is bound
+	 * Sets the RowSet to which the component is bound.
 	 *
-	 * @param _rowset SSRowSet to which the component is bound
-	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
+	 * @param _rowset RowSet to which the component is bound.
 	 */
-	@Deprecated
-	public void setRowSet(final SSRowSet _rowset) {
-		setSSRowSet(_rowset);
+	public void setRowSet(final RowSet _rowset) {
+		rowset = _rowset;
+		bind();
 	}
 
 	/**
-	 * Sets the SSDataNavigator used for navigating the SSRowSet to which this
+	 * Sets the SSDataNavigator used for navigating the RowSet to which this
 	 * component is bound to. <b>The functionality for this is not yet
 	 * finalized so try to avoid using this </b>
 	 *
-	 * @param _navigator - SSDataNavigator used for navigating the SSRowSet to which
+	 * @param _navigator - SSDataNavigator used for navigating the RowSet to which
 	 *                   this component is bound to
 	 */
 	public void setSSDataNavigator(final SSDataNavigator _navigator) {
 		navigator = _navigator;
-		setSSRowSet(_navigator.getSSRowSet());
+		setRowSet(_navigator.getRowSet());
 		bind();
 	}
 
-	/**
-	 * Sets the SSRowSet to which the component is bound.
-	 *
-	 * @param _rowset SSRowSet to which the component is bound.
-	 */
-	public void setSSRowSet(final SSRowSet _rowset) {
-		rowset = _rowset;
-		bind();
-	}
 }
 

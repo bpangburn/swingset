@@ -47,6 +47,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.sql.RowSet;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -54,7 +55,7 @@ import javax.swing.table.AbstractTableModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.swingset.datasources.SSRowSet;
+import com.nqadmin.swingset.datasources.RowSetOps;
 
 // SSTableModel.java
 //
@@ -62,7 +63,7 @@ import com.nqadmin.swingset.datasources.SSRowSet;
 
 /**
  * SSTableModel provides an implementation of the TableModel interface. The
- * SSDataGrid uses this class for providing a grid view for a SSRowSet.
+ * SSDataGrid uses this class for providing a grid view for a RowSet.
  * SSTableModel can be used without the SSDataGrid (e.g. in conjunction with a
  * JTable), but the cell renderers and hidden columns features of the SSDataGrid
  * will not be available.
@@ -124,7 +125,7 @@ public class SSTableModel extends AbstractTableModel {
 	protected SSCellEditing cellEditing = null;
 
 	/**
-	 * Number of columns in the SSRowSet.
+	 * Number of columns in the RowSet.
 	 */
 	protected transient int columnCount = 0;
 
@@ -162,7 +163,7 @@ public class SSTableModel extends AbstractTableModel {
 	protected int[] hiddenColumns = null;
 
 	/**
-	 * Indicator to determine if the SSRowSet is on the insertion row.
+	 * Indicator to determine if the RowSet is on the insertion row.
 	 */
 	protected boolean inInsertRow = false;
 
@@ -172,11 +173,11 @@ public class SSTableModel extends AbstractTableModel {
 	private int primaryColumn = -1;
 
 	/**
-	 * Number of rows in the SSRowSet.
+	 * Number of rows in the RowSet.
 	 */
 	protected transient int rowCount = 0;
 
-	protected SSRowSet rowset = null;
+	protected RowSet rowset = null;
 
 	/**
 	 * JTable being modeled.
@@ -190,7 +191,7 @@ public class SSTableModel extends AbstractTableModel {
 
 	/**
 	 * Constructs a SSTableModel object. If this contructor is used the
-	 * setSSRowSet() method has to be used to set the SSRowSet before constructing
+	 * setRowSet() method has to be used to set the RowSet before constructing
 	 * the JTable.
 	 */
 	public SSTableModel() {
@@ -199,12 +200,12 @@ public class SSTableModel extends AbstractTableModel {
 	}
 
 	/**
-	 * Constructs a SSTableModel object with the given SSRowSet. This will call the
-	 * execute method on the given SSRowSet.
+	 * Constructs a SSTableModel object with the given RowSet. This will call the
+	 * execute method on the given RowSet.
 	 *
-	 * @param _rowset SSRowSet object whose records has to be displayed in JTable.
+	 * @param _rowset RowSet object whose records has to be displayed in JTable.
 	 */
-	public SSTableModel(final SSRowSet _rowset) {
+	public SSTableModel(final RowSet _rowset) {
 		this();
 		rowset = _rowset;
 		init();
@@ -258,11 +259,12 @@ public class SSTableModel extends AbstractTableModel {
 	public Class<?> getColumnClass(final int _column) {
 		
 		// TODO May be able to utilize JDBCType Enum here.
-		// TODO This may be better as a static method in SSJdbcRowSetImpl
+		// TODO This may be better as a static method in RowSetOps
 		
 		int type;
 		try {
-			type = rowset.getColumnType(_column + 1);
+			//type = rowset.getColumnType(_column + 1);
+			type = RowSetOps.getColumnType(rowset, _column + 1);
 		} catch (final SQLException se) {
 			logger.debug("SQL Exception.",  se);
 			return super.getColumnClass(_column);
@@ -396,11 +398,12 @@ public class SSTableModel extends AbstractTableModel {
 			}
 			
 			// TODO May be able to utilize JDBCType Enum here.
-			// TODO This may be better as a static method in SSJdbcRowSetImpl. Could use getObject() and instanceof.
+			// TODO This may be better as a static method in RowSetOps. Could use getObject() and instanceof.
 
 			// COLUMN NUMBERS IN SSROWSET START FROM 1 WHERE AS COLUMN NUMBERING FOR JTABLE
 			// START FROM 0
-			final int type = rowset.getColumnType(_column + 1);
+			//final int type = rowset.getColumnType(_column + 1);
+			final int type = RowSetOps.getColumnType(rowset, _column + 1);
 			switch (type) {
 			case Types.INTEGER:
 			case Types.SMALLINT:
@@ -447,12 +450,13 @@ public class SSTableModel extends AbstractTableModel {
 
 	/**
 	 * Initializes the SSTableModel. (Gets the column count and row count for the
-	 * given SSRowSet.)
+	 * given RowSet.)
 	 */
 	protected void init() {
 		try {
 
-			columnCount = rowset.getColumnCount();
+			//columnCount = rowset.getColumnCount();
+			columnCount = RowSetOps.getColumnCount(rowset);
 			rowset.last();
 			// ROWS IN THE SSROWSET ARE NUMBERED FROM 1, SO LAST ROW NUMBER GIVES THE
 			// ROW COUNT
@@ -500,9 +504,10 @@ public class SSTableModel extends AbstractTableModel {
 			}
 			
 			// TODO May be able to utilize JDBCType Enum here.
-			// TODO This may be better as a static method in SSJdbcRowSetImpl
+			// TODO This may be better as a static method in RowSetOps
 
-			final int type = rowset.getColumnType(_column + 1);
+			//final int type = rowset.getColumnType(_column + 1);
+			final int type = RowSetOps.getColumnType(rowset, _column + 1);
 
 			switch (type) {
 			case Types.INTEGER:
@@ -624,10 +629,11 @@ public class SSTableModel extends AbstractTableModel {
 				logger.debug("Column number is:" + column);
 				
 				// TODO May be able to utilize JDBCType Enum here.
-				// TODO This may be better as a static method in SSJdbcRowSetImpl
+				// TODO This may be better as a static method in RowSetOps
 
 				// COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
-				final int type = rowset.getColumnType(column.intValue() + 1);
+				//final int type = rowset.getColumnType(column.intValue() + 1);
+				final int type = RowSetOps.getColumnType(rowset, column.intValue() + 1);
 				switch (type) {
 				case Types.INTEGER:
 				case Types.SMALLINT:
@@ -702,7 +708,7 @@ public class SSTableModel extends AbstractTableModel {
 
 	/**
 	 * Sets the headers for the JTable. This function has to be called before
-	 * setting the SSRowSet for SSDataGrid.
+	 * setting the RowSet for SSDataGrid.
 	 *
 	 * @param _headers array of string objects representing the header for each
 	 *                 column.
@@ -764,9 +770,10 @@ public class SSTableModel extends AbstractTableModel {
 		try {
 			
 			// TODO May be able to utilize JDBCType Enum here.
-			// TODO This may be better as a static method in SSJdbcRowSetImpl
+			// TODO This may be better as a static method in RowSetOps
 
-			final int type = rowset.getColumnType(primaryColumn + 1);
+			//final int type = rowset.getColumnType(primaryColumn + 1);
+			final int type = RowSetOps.getColumnType(rowset, primaryColumn + 1);
 
 			switch (type) {
 			case Types.INTEGER:
@@ -826,19 +833,16 @@ public class SSTableModel extends AbstractTableModel {
 	}
 
 	/**
-	 * Sets the SSRowSet for SSTableModel to the given SSRowSet. This SSRowSet will
+	 * Sets the RowSet for SSTableModel to the given RowSet. This RowSet will
 	 * be used to get the data for JTable.
 	 *
-	 * @param _rowset SSRowSet object whose records has to be displayed in JTable.
-	 *
-	 * @deprecated Use {@link #setSSRowSet(SSRowSet _rowset)} instead.
+	 * @param _rowset RowSet object whose records has to be displayed in JTable.
 	 */
-	@Deprecated
-	public void setRowSet(final SSRowSet _rowset) {
+	public void setRowSet(final RowSet _rowset) {
 		rowset = _rowset;
 		init();
 	}
-
+	
 	/**
 	 * Used to set an implementation of SSCellEditing interface which can be used to
 	 * determine dynamically if a given cell can be edited and to determine if a
@@ -872,17 +876,6 @@ public class SSTableModel extends AbstractTableModel {
 	}
 
 	/**
-	 * Sets the SSRowSet for SSTableModel to the given SSRowSet. This SSRowSet will
-	 * be used to get the data for JTable.
-	 *
-	 * @param _rowset SSRowSet object whose records has to be displayed in JTable.
-	 */
-	public void setSSRowSet(final SSRowSet _rowset) {
-		rowset = _rowset;
-		init();
-	}
-
-	/**
 	 * Sets the uneditable columns. The columns specified as uneditable will not be
 	 * available for user to edit. This overrides the isCellEditable function in
 	 * SSCellEditing.
@@ -893,8 +886,6 @@ public class SSTableModel extends AbstractTableModel {
 	public void setUneditableColumns(final int[] _columnNumbers) {
 		uneditableColumns = _columnNumbers;
 	}
-
-// DEPRECATED STUFF....................
 
 	/**
 	 * Sets the value in the cell at _row and _column to _value.
@@ -912,7 +903,8 @@ public class SSTableModel extends AbstractTableModel {
 		// GET THE TYPE OF THE COLUMN
 		int type = -1;
 		try {
-			type = rowset.getColumnType(_column + 1);
+			//type = rowset.getColumnType(_column + 1);
+			type = RowSetOps.getColumnType(rowset, _column + 1);
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while updating value.",  se);
 			if (component != null) {
@@ -975,7 +967,7 @@ public class SSTableModel extends AbstractTableModel {
 			}
 			
 			// TODO May be able to utilize JDBCType Enum here.
-			// TODO This may be better as a static method in SSJdbcRowSetImpl
+			// TODO This may be better as a static method in RowSetOps
 
 			switch (type) {
 			case Types.INTEGER:
