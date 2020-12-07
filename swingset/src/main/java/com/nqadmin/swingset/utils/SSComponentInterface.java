@@ -45,13 +45,14 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.sql.RowSet;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
 import org.apache.logging.log4j.LogManager;
 
 import com.nqadmin.swingset.datasources.SSConnection;
-import com.nqadmin.swingset.datasources.SSRowSet;
+//import com.nqadmin.swingset.datasources.SSRowSet;
 
 // SSComponentInterface.java
 //
@@ -73,10 +74,29 @@ public interface SSComponentInterface {
 
 	/**
 	 * Convenience method to add both RowSet and SwingSet Component listeners.
+	 * <p>
+	 * Does not add DocumentListener.
 	 */
 	default void addListeners() {
-		addSSRowSetListener();
+		addRowSetListener();
 		addSSComponentListener();
+	}
+
+	/**
+	 * Adds listener for Document if SwingSet component is a JTextComponent.
+	 * <p>
+	 * Implementation of addSSComponentListener() can just call this method when the
+	 * component is a JTextComponent.
+	 */
+	default void addDocumentListener() {
+		getSSCommon().addDocumentListener();
+	}
+
+	/**
+	 * Adds listener for RowSet.
+	 */
+	default void addRowSetListener() {
+		getSSCommon().addRowSetListener();
 	}
 
 	/**
@@ -95,23 +115,6 @@ public interface SSComponentInterface {
 	void addSSComponentListener();
 
 	/**
-	 * Adds listener for Document if SwingSet component is a JTextComponent.
-	 * <p>
-	 * Implementation of addSSComponentListener() can just call this method when the
-	 * component is a JTextComponent.
-	 */
-	default void addSSDocumentListener() {
-		getSSCommon().addSSDocumentListener();
-	}
-
-	/**
-	 * Adds listener for RowSet.
-	 */
-	default void addSSRowSetListener() {
-		getSSCommon().addSSRowSetListener();
-	}
-
-	/**
 	 * Sets (or resets) the binding from the component to a database column
 	 * <p>
 	 * Assumes that RowSet and Column Name are already set properly
@@ -123,18 +126,17 @@ public interface SSComponentInterface {
 	}
 
 	/**
-	 * Sets the SSRowSet and column name to which the component is to be bound.
+	 * Sets the rowSet and column name to which the component is to be bound.
 	 * <p>
 	 * Takes care of setting RowSet and Column Name for ssCommon and then calls
 	 * bind(this.ssCommon);
 	 *
-	 * @param _ssRowSet        datasource to be used.
-	 * @param _boundColumnName Name of the column to which this check box should be
-	 *                         bound
+	 * @param _rowSet datasource to be used.
+	 * @param _boundColumnName Name of the column to which this check box should be bound
 	 */
-	default void bind(final SSRowSet _ssRowSet, final String _boundColumnName) {// throws java.sql.SQLException {
+	default void bind(final RowSet _rowSet, final String _boundColumnName) {// throws java.sql.SQLException {
 
-		getSSCommon().bind(_ssRowSet, _boundColumnName);
+		getSSCommon().bind(_rowSet, _boundColumnName);
 
 	}
 
@@ -302,17 +304,31 @@ public interface SSComponentInterface {
 	/**
 	 * Returns the RowSet containing queried data from the database.
 	 *
-	 * @return the ssRowSet
+	 * @return the rowSet
 	 */
-	default SSRowSet getSSRowSet() {
-		return getSSCommon().getSSRowSet();
+	default RowSet getRowSet() {
+		return getSSCommon().getRowSet();
+	}
+	
+	/**
+	 * Returns the RowSet containing queried data from the database.
+	 *
+	 * @return the rowSet
+	 *
+	 * @deprecated use {@link #getRowSet()} instead.
+	 */
+	@Deprecated
+	default RowSet getSSRowSet() {
+		return getRowSet();
 	}
 
 	/**
 	 * Removes listeners for bound RowSet and SwingSet component.
+	 * <p>
+	 * Does not remove DocumentListener.
 	 */
 	default void removeListeners() {
-		removeSSRowSetListener();
+		removeRowSetListener();
 		removeSSComponentListener();
 	}
 
@@ -337,16 +353,16 @@ public interface SSComponentInterface {
 	 * Implementation of removeSSComponentListener() can just call this method when
 	 * the component is a JTextComponent.
 	 */
-	default void removeSSDocumentListener() {
-		getSSCommon().removeSSDocumentListener();
-	};
+	default void removeDocumentListener() {
+		getSSCommon().removeDocumentListener();
+	}
 
 	/**
 	 * Removes listener for RowSet.
 	 */
-	default void removeSSRowSetListener() {
-		getSSCommon().removeSSRowSetListener();
-	};
+	default void removeRowSetListener() {
+		getSSCommon().removeRowSetListener();
+	}
 
 	/**
 	 * Sets the allowNull flag for the bound database column.
@@ -431,6 +447,17 @@ public interface SSComponentInterface {
 	default void setColumnName(final String _columnName) throws SQLException {
 		setBoundColumnName(_columnName);
 	}
+	
+	/**
+	 * Sets the RowSet to hold queried data from the database.
+	 *
+	 * @param _rowSet datasource
+	 *
+	 * @throws java.sql.SQLException - if a database access error occurs
+	 */
+	default void setRowSet(final RowSet _rowSet) throws java.sql.SQLException {
+		getSSCommon().setRowSet(_rowSet);
+	}
 
 	/**
 	 * Sets the SSCommon data member of the Swingset Component.
@@ -451,12 +478,15 @@ public interface SSComponentInterface {
 	/**
 	 * Sets the RowSet to hold queried data from the database.
 	 *
-	 * @param _ssRowSet the ssRowSet to set
+	 * @param _rowSet datasource
 	 *
 	 * @throws java.sql.SQLException - if a database access error occurs
+	 * 
+	 * @deprecated use {@link #setRowSet(RowSet)} instead.
 	 */
-	default void setSSRowSet(final SSRowSet _ssRowSet) throws java.sql.SQLException {
-		getSSCommon().setSSRowSet(_ssRowSet);
+	@Deprecated
+	default void setSSRowSet(final RowSet _rowSet) throws java.sql.SQLException {
+		setRowSet(_rowSet);
 	}
 
 	/**

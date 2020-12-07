@@ -43,6 +43,7 @@ import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.StringTokenizer;
 
+import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
 import javax.swing.JComponent;
@@ -56,7 +57,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.datasources.SSConnection;
-import com.nqadmin.swingset.datasources.SSRowSet;
+//import com.nqadmin.swingset.datasources.SSRowSet;
 
 // SSCommon.java
 //
@@ -71,7 +72,7 @@ import com.nqadmin.swingset.datasources.SSRowSet;
  * <p>
  * SwingSet components will implement addComponentListener() and
  * removeComponentListener() to maintain data flow from the JComponent to
- * ssCommon.ssRowSet and from ssCommon.ssRowSet to JComponent
+ * ssCommon.rowSet and from ssCommon.rowSet to JComponent
  * <p>
  * Generally the developer will need to add an inner class and corresponding
  * data member that implements the appropriate listener for the JComponent
@@ -106,7 +107,7 @@ public class SSCommon implements Serializable {
 	 * changedUpdate() uses counters and SwingUtilities.invokeLater() to only update
 	 * the display on the last method called.
 	 */
-	protected class SSDocumentListener implements DocumentListener, Serializable {
+	protected class SSCommonDocumentListener implements DocumentListener, Serializable {
 
 		/**
 		 * unique serial id
@@ -132,12 +133,12 @@ public class SSCommon implements Serializable {
 				if (lastNotifiedChange != lastChange) {
 					lastNotifiedChange = lastChange;
 
-					removeSSRowSetListener();
+					removeRowSetListener();
 
 					try {
 						setBoundColumnText(((javax.swing.text.JTextComponent) getSSComponent()).getText());
 					} finally {
-						addSSRowSetListener();
+						addRowSetListener();
 					}
 				}
 			});
@@ -155,13 +156,13 @@ public class SSCommon implements Serializable {
 			changedUpdate(de);
 		}
 
-	} // end protected class SSDocumentListener
+	} // end protected class SSCommonDocumentListener
 
 	/**
-	 * Listener(s) for the underlying SSRowSet used to update the bound SwingSet
+	 * Listener(s) for the underlying RowSet used to update the bound SwingSet
 	 * component.
 	 */
-	protected class SSRowSetListener implements RowSetListener, Serializable {
+	protected class SSCommonRowSetListener implements RowSetListener, Serializable {
 		/**
 		 * unique serial ID
 		 */
@@ -204,7 +205,7 @@ public class SSCommon implements Serializable {
 		@Override
 		public void rowChanged(final RowSetEvent event) {
 			logger.trace("Rowset row changed. {}", () -> getColumnForLog());
-//			if (!getSSRowSet().isUpdatingRow()) {
+//			if (!getRowSet().isUpdatingRow()) {
 //				updateSSComponent();
 //			}
 			performUpdates();
@@ -238,7 +239,7 @@ public class SSCommon implements Serializable {
 			});
 		}
 
-	} // end protected class SSRowSetListener
+	} // end protected class SSCommonRowSetListener
 
 	/**
 	 * Log4j Logger for component
@@ -292,7 +293,7 @@ public class SSCommon implements Serializable {
 	private boolean allowNull = true;
 
 	/**
-	 * Index of SSRowSet column to which the SwingSet component will be bound.
+	 * Index of RowSet column to which the SwingSet component will be bound.
 	 */
 	private int boundColumnIndex = NO_COLUMN_INDEX;
 
@@ -302,7 +303,7 @@ public class SSCommon implements Serializable {
 	private JDBCType boundColumnJDBCType = java.sql.JDBCType.NULL;
 
 	/**
-	 * Name of SSRowSet column to which the SwingSet component will be bound.
+	 * Name of RowSet column to which the SwingSet component will be bound.
 	 */
 	private String boundColumnName = null;
 
@@ -329,17 +330,17 @@ public class SSCommon implements Serializable {
 	/**
 	 * Underlying Document listener (where SwingSet component is a JTextComponent)
 	 */
-	private final SSDocumentListener ssDocumentListener = new SSDocumentListener();
+	private final SSCommonDocumentListener documentListener = new SSCommonDocumentListener();
 
 	/**
-	 * SSRowSet from which component will get/set values.
+	 * RowSet from which component will get/set values.
 	 */
-	private SSRowSet ssRowSet = null;
+	private RowSet rowSet = null;
 
 	/**
-	 * Underlying SSRowSet listener.
+	 * Underlying RowSet listener.
 	 */
-	private final SSRowSetListener ssRowSetListener = new SSRowSetListener();
+	private final SSCommonRowSetListener rowSetListener = new SSCommonRowSetListener();
 
 	/**
 	 * Constructor expecting a SwingSet component as an argument (usually called as
@@ -355,33 +356,34 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Convenience method to add both RowSet and SwingSet Component listeners.
+	 * <p>
+	 * Does not add DocumentListener.
 	 */
 	public void addListeners() {
-		addSSRowSetListener();
+		addRowSetListener();
 		addSSComponentListener();
 	}
 
 	/**
-	 * Method to add any SwingSet Component listener(s).
+	 * Methold to add a document listener when the SwingSet component is a
+	 * JTextComponent.
 	 */
-	public void addSSComponentListener() {
-		ssComponent.addSSComponentListener();
-	}
-
-	/**
-	 * Class to add a Document listener when the SwingSet component is a
-	 * JTextComponent
-	 */
-	public void addSSDocumentListener() {
-		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().addDocumentListener(ssDocumentListener);
-
+	public void addDocumentListener() {
+		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().addDocumentListener(documentListener);
 	}
 
 	/**
 	 * Method to add the RowSet listener.
 	 */
-	public void addSSRowSetListener() {
-		ssRowSet.addRowSetListener(ssRowSetListener);
+	public void addRowSetListener() {
+		rowSet.addRowSetListener(rowSetListener);
+	}
+	
+	/**
+	 * Method to add any SwingSet Component listener(s).
+	 */
+	public void addSSComponentListener() {
+		ssComponent.addSSComponentListener();
 	}
 
 	/**
@@ -392,8 +394,8 @@ public class SSCommon implements Serializable {
 		// TODO consider updating Component to null/zero/empty string if not valid column name, column index, or rowset
 		
 		// CHECK FOR NULL COLUMN/ROWSET
-		if (((boundColumnName == null) && (boundColumnIndex == NO_COLUMN_INDEX)) || (ssRowSet == null)) {
-			logger.warn("Binding failed: column name={}, column index={}{}.", ()->boundColumnName, ()->boundColumnIndex, ()->ssRowSet==null ? ", rowset=null" : "");
+		if (((boundColumnName == null) && (boundColumnIndex == NO_COLUMN_INDEX)) || (rowSet == null)) {
+			logger.warn("Binding failed: column name={}, column index={}{}.", ()->boundColumnName, ()->boundColumnIndex, ()->rowSet==null ? ", rowset=null" : "");
 			return;
 		}
 
@@ -409,18 +411,18 @@ public class SSCommon implements Serializable {
 	 * Takes care of setting RowSet and Column Index for ssCommon and then calls
 	 * bind() to update Component;
 	 *
-	 * @param _ssRowSet         datasource to be used
+	 * @param _rowSet         datasource to be used
 	 * @param _boundColumnIndex index of the column to which this check box should
 	 *                          be bound
 	 */
-	public void bind(final SSRowSet _ssRowSet, final int _boundColumnIndex) {// throws java.sql.SQLException {
+	public void bind(final RowSet _rowSet, final int _boundColumnIndex) {// throws java.sql.SQLException {
 		// INDICATE THAT WE'RE UPDATING THE BINDINGS
 		inBinding = true;
 
 		// UPDATE ROWSET
-		removeSSRowSetListener();
-		setSSRowSet(_ssRowSet);
-		addSSRowSetListener();
+		removeRowSetListener();
+		setRowSet(_rowSet);
+		addRowSetListener();
 
 		// STORE COLUMN INDEX & NAME
 		setBoundColumnIndex(_boundColumnIndex);
@@ -437,13 +439,13 @@ public class SSCommon implements Serializable {
 	 * Takes care of setting RowSet and Column Name for ssCommon and then calls
 	 * bind() to update Component;
 	 *
-	 * @param _ssRowSet        datasource to be used
+	 * @param _rowSet        datasource to be used
 	 * @param _boundColumnName name of the column to which this check box should be
 	 *                         bound
 	 */
-	public void bind(final SSRowSet _ssRowSet, final String _boundColumnName) { // throws java.sql.SQLException {
+	public void bind(final RowSet _rowSet, final String _boundColumnName) { // throws java.sql.SQLException {
 		try {
-			bind(_ssRowSet, RowSetOps.getColumnIndex(_ssRowSet, _boundColumnName));
+			bind(_rowSet, RowSetOps.getColumnIndex(_rowSet, _boundColumnName));
 		} catch (final SQLException se) {
 			logger.error(_boundColumnName + " - Failed to retrieve column index while binding.", se);
 		}
@@ -452,7 +454,7 @@ public class SSCommon implements Serializable {
 //
 //		// UPDATE ROWSET
 //		removeSSRowSetListener();
-//		setSSRowSet(_ssRowSet);
+//		setRowSet(_rowSet);
 //		addSSRowSetListener();
 //
 //		// UPDATE COLUMN NAME
@@ -524,8 +526,9 @@ public class SSCommon implements Serializable {
 		String value = "";
 
 		try {
-			if (getSSRowSet().getRow() != 0) {
-				value = getSSRowSet().getColumnText(getBoundColumnName());
+			if (getRowSet().getRow() != 0) {
+				//value = getRowSet().getColumnText(getBoundColumnName());
+				value = RowSetOps.getColumnText(getRowSet(),getBoundColumnName());
 				if (!getAllowNull() && (value == null)) {
 					value = "";
 				}
@@ -575,12 +578,12 @@ public class SSCommon implements Serializable {
 	}
 
 	/**
-	 * Returns the SSRowSet to which the SwingSet component is bound.
+	 * Returns the RowSet to which the SwingSet component is bound.
 	 *
-	 * @return SSRowSet to which the SwingSet component is bound
+	 * @return RowSet to which the SwingSet component is bound
 	 */
-	public SSRowSet getSSRowSet() {
-		return ssRowSet;
+	public RowSet getRowSet() {
+		return rowSet;
 	}
 
 	/**
@@ -588,8 +591,8 @@ public class SSCommon implements Serializable {
 	 *
 	 * @return listener for the bound RowSet
 	 */
-	public SSRowSetListener getSSRowSetListener() {
-		return ssRowSetListener;
+	public SSCommonRowSetListener getRowSetListener() {
+		return rowSetListener;
 	}
 
 	/**
@@ -604,10 +607,30 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Convenience method to remove both RowSet and SwingSet Component listeners.
+	 * <p>
+	 * Does not remove DocumentListener.
 	 */
 	public void removeListeners() {
-		removeSSRowSetListener();
+		removeRowSetListener();
 		removeSSComponentListener();
+	}
+
+	/**
+	 * Class to remove a Document listener when the SwingSet component is a
+	 * JTextComponent
+	 */
+	public void removeDocumentListener() {
+		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().removeDocumentListener(documentListener);
+
+	}
+
+	/**
+	 * Method to remove the RowSet listener.
+	 */
+	public void removeRowSetListener() {
+		if (rowSet != null) {
+			rowSet.removeRowSetListener(rowSetListener);
+		}
 	}
 
 	/**
@@ -615,24 +638,6 @@ public class SSCommon implements Serializable {
 	 */
 	public void removeSSComponentListener() {
 		ssComponent.removeSSComponentListener();
-	}
-
-	/**
-	 * Class to remove a Document listener when the SwingSet component is a
-	 * JTextComponent
-	 */
-	public void removeSSDocumentListener() {
-		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().removeDocumentListener(ssDocumentListener);
-
-	}
-
-	/**
-	 * Method to remove the RowSet listener.
-	 */
-	public void removeSSRowSetListener() {
-		if (ssRowSet != null) {
-			ssRowSet.removeRowSetListener(ssRowSetListener);
-		}
 	}
 
 	/**
@@ -654,7 +659,7 @@ public class SSCommon implements Serializable {
 	 *                      RowSet
 	 */
 	public void setBoundColumnArray(final SSArray _boundColumnArray) throws SQLException {
-		getSSRowSet().updateArray(getBoundColumnName(), _boundColumnArray);
+		getRowSet().updateArray(getBoundColumnName(), _boundColumnArray);
 	}
 
 	/**
@@ -674,10 +679,12 @@ public class SSCommon implements Serializable {
 		// DETERMINE COLUMN NAME AND TYPE
 		try {
 			// IF COLUMN INDEX IS VALID, GET COLUMN NAME, OTHERWISE SET TO NULL
-// TODO Update SSRowSet to return constant or throw Exception if invalid/out of bounds.
+// TODO Update RowSet to return constant or throw Exception if invalid/out of bounds.
 			if (boundColumnIndex != NO_COLUMN_INDEX) {
-				boundColumnName = getSSRowSet().getColumnName(boundColumnIndex);
-				boundColumnType = getSSRowSet().getColumnType(boundColumnIndex);
+				//boundColumnName = getRowSet().getColumnName(boundColumnIndex);
+				//boundColumnType = getRowSet().getColumnType(boundColumnIndex);
+				boundColumnName = RowSetOps.getColumnName(getRowSet(),boundColumnIndex);
+				boundColumnType = RowSetOps.getColumnType(getRowSet(),boundColumnIndex);
 			} else {
 				boundColumnName = null;
 				boundColumnType = java.sql.Types.NULL;
@@ -713,10 +720,12 @@ public class SSCommon implements Serializable {
 		try {
 			// IF COLUMN NAME ISN'T NULL, SET COLUMN INDEX - OTHERWISE, SET INDEX TO
 			// NO_INDEX
-// TODO Update SSRowSet to return constant or throw Exception if invalid/out of bounds.
+// TODO Update RowSet to return constant or throw Exception if invalid/out of bounds.
 			if (boundColumnName != null) {
-				boundColumnIndex = getSSRowSet().getColumnIndex(boundColumnName);
-				boundColumnType = getSSRowSet().getColumnType(boundColumnIndex);
+				//boundColumnIndex = getRowSet().getColumnIndex(boundColumnName);
+				//boundColumnType = getRowSet().getColumnType(boundColumnIndex);
+				boundColumnIndex = RowSetOps.getColumnIndex(getRowSet(),boundColumnName);
+				boundColumnType = RowSetOps.getColumnType(getRowSet(),boundColumnIndex);
 			} else {
 				boundColumnIndex = NO_COLUMN_INDEX;
 				boundColumnType = java.sql.Types.NULL;
@@ -740,7 +749,8 @@ public class SSCommon implements Serializable {
 	 */
 	public void setBoundColumnText(final String _boundColumnText) {
 		try {
-			getSSRowSet().updateColumnText(_boundColumnText, getBoundColumnName(), getAllowNull());
+			//getRowSet().updateColumnText(_boundColumnText, getBoundColumnName(), getAllowNull());
+			RowSetOps.updateColumnText(getRowSet(),_boundColumnText, getBoundColumnName(), getAllowNull());
 		} catch(final NullPointerException _npe) {
 			logger.warn("Null Pointer Exception.", _npe);
 			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
@@ -781,19 +791,19 @@ public class SSCommon implements Serializable {
 	}
 
 	/**
-	 * Sets the SSRowSet to which the Component is bound.
+	 * Sets the RowSet to which the Component is bound.
 	 *
-	 * @param _ssRowSet SSRowSet to which the component is bound
+	 * @param _rowSet RowSet to which the component is bound
 	 */
-	public void setSSRowSet(final SSRowSet _ssRowSet) {
-		ssRowSet = _ssRowSet;
+	public void setRowSet(final RowSet _rowSet) {
+		rowSet = _rowSet;
 		if (!inBinding) {
 			bind();
 		}
 	}
 
 	/**
-	 * Method used by SSRowSet listeners to update the bound SwingSet component.
+	 * Method used by RowSet listeners to update the bound SwingSet component.
 	 * <p>
 	 * Handles removal of Component listener before update and addition of listener
 	 * after update.
