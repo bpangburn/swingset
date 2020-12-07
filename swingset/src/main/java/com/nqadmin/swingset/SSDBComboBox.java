@@ -426,7 +426,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	//
 	// Introduce setOptions(List options, List mappings) if functionality needed
 	//
-	protected void addItem(final String _displayText, final long _primaryKey) {
+	public void addItem(final String _displayText, final long _primaryKey) {
 
 		// TODO Determine if any change is needed to actually add item to combobox.
 
@@ -1518,6 +1518,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * Deprecated for misspelling.
 	 *
 	 * @param _separator separator to be used.
+	 * 
+	 * @deprecated Use {@link #setSeparator(String)}
 	 */
 	@Deprecated
 	public void setSeperator(final String _separator) {
