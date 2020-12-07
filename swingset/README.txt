@@ -132,14 +132,14 @@ CLASS DESCRIPTIONS - SWINGSET COMPONENTS
 ***********************
 SSTextField
 ***********************
-SSTextField extends the JTextField. This class provides SSRowSet binding and
+SSTextField extends the JTextField. This class provides RowSet binding and
 different masks including a date mask, a social security number mask, etc.
 
 
 ***********************
 SSTextArea
 ***********************
-SSTextArea extends the JTextArea to include SSRowSet binding.
+SSTextArea extends the JTextArea to include RowSet binding.
 
 
 ***********************
@@ -267,14 +267,14 @@ images stored in a database.
 ***********************
 SSLabel
 ***********************
-SSLabel extends the JLabel. This class provides SSRowSet binding and can be
+SSLabel extends the JLabel. This class provides RowSet binding and can be
 used to display database values in a "read-only" JLabel.
 
 
 ***********************
 SSSlider
 ***********************
-SSLabel extends the JLabel. This class provides SSRowSet binding and can be
+SSLabel extends the JLabel. This class provides RowSet binding and can be
 used to link a JSlider to a numeric column in a database.
 
 
@@ -282,14 +282,14 @@ used to link a JSlider to a numeric column in a database.
 SSDataNavigator
 ***********************
 Component that can be used for data navigation. It provides buttons for
-navigation, insertion, and deletion of records in a SSRowSet. The modification
-of a SSRowSet can be prevented using the setModificaton() method.  Any changes
+navigation, insertion, and deletion of records in a RowSet. The modification
+of a RowSet can be prevented using the setModificaton() method.  Any changes
 made to the columns of a record will be updated whenever there is a
 navigation.
 
 For example if you are displaying three columns using the JTextField and the
 user changes the text in the text fields then the columns will be updated to
-the new values when the user navigates the SSRowSet. If the user wants to revert
+the new values when the user navigates the RowSet. If the user wants to revert
 the changes he made he can press the Undo button, however this must be done
 before any navigation.  Once navigation takes place changes can't be reverted
 using Undo button (has to be done manually by the user).
@@ -299,7 +299,7 @@ using Undo button (has to be done manually by the user).
 SSDataGrid
 ***********************
 SSDataGrid provides a way to display information from a database in a table 
-format (aka "spreadsheet" or "datasheet" view). The SSDataGrid takes a SSRowSet
+format (aka "spreadsheet" or "datasheet" view). The SSDataGrid takes a RowSet
 as a source of data. It also provides different cell renderers including a
 combo box renderer and a date renderer.
 
@@ -320,7 +320,7 @@ information the new value can be rejected or accepted by the program.
 SSDataGrid also provides an "extra" row to facilitate the addition of rows to
 the table.  Default values for various columns can be set programmatically.  A
 programmer can also specify which column is the primary key column for the
-underlying SSRowSet and supply a primary key for that column when a new row is
+underlying RowSet and supply a primary key for that column when a new row is
 being added.
 
 
@@ -328,7 +328,7 @@ being added.
 CLASS DESCRIPTIONS - DATASOURCES
 ==============================================================================
 ***********************
-SSRowSet
+RowSet
 ***********************
 Interface that extends serializable and basically clones the RowSet interface
 methods required by SSTextDocument.  Used as the basis for datasources
@@ -336,25 +336,25 @@ throughout the SwingSet components.
 
 
 ***********************
-SSRowSetAdapter
+RowSetAdapter
 ***********************
 Abstract class that provides empty implementations of all the methods for the
-SSRowSet interface.  
+RowSet interface.  
 
 This class is provided for convenience so that users wishing to write their
-own SSRowSet implementations can just extend the abstract class and override
+own RowSet implementations can just extend the abstract class and override
 the desired methods.
 
 
 ***********************
 SSJdbcRowSetImpl
 ***********************
-Implementation of SSRowSet that is basically a serializable wrapper for Sun's
+Implementation of RowSet that is basically a serializable wrapper for Sun's
 JdbcRowSetImpl.
 
 SSJdbcRowSetImpl can be extended with custom setXYZ() methods to handle
 database updates via INSERT/UPDATE queries.  SSJdbcRowSetImpl can also serve as
-a template for writing SSRowSet wrappers for other RowSets (e.g., CachedRowSet,
+a template for writing RowSet wrappers for other RowSets (e.g., CachedRowSet,
 WebRowSet, etc.).
 
 
@@ -388,12 +388,12 @@ application the SSTextDocument can be used in conjunction with the
 SSDataNavigator to allow for both editing and navigation of the rows in a
 database table.
 
-The SSTextDocument takes a SSRowSet and either a column index or a column name
+The SSTextDocument takes a RowSet and either a column index or a column name
 as arguments.  Whenever the cursor is moved (e.g., navigation occurs on the 
 SSDataNavigator), the document property of the bound Swing control changes to
 reflect the new value for the database column.
 
-Note that a SSRowSet insert doesn't implicitly modify the cursor which is why 
+Note that a RowSet insert doesn't implicitly modify the cursor which is why 
 the SSDBNavImp is provided for clearing controls followoing an insert.
 
 
@@ -417,10 +417,10 @@ SSDataNavigator.
 
      performPreDeletionOps() is called when the user presses the delete
           button, but just before the deleteRow() method is called on the
-          SSRowSet.
+          RowSet.
 
      performPostDeletionOps() is called when the user presses the delete
-          button and after the deleteRow() method is called on the SSRowSet.
+          button and after the deleteRow() method is called on the RowSet.
 
      Note that both the performPreDeletionOps() and performPostDeletionOps()
      will be executed when the user presses the delete button.
@@ -460,7 +460,7 @@ JTabbedPane inside the specified container.
 SSTableModel    
 ***********************
 SSTableModel provides an implementation of the TableModel interface.
-The SSDataGrid uses this class for providing a grid view for a SSRowSet. 
+The SSDataGrid uses this class for providing a grid view for a RowSet. 
 SSTableModel can be used without the SSDataGrid (e.g., in conjunction with a
 JTable), but the cell renderers and hidden columns features of the SSDataGrid
 will not be available.
