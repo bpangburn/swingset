@@ -1,6 +1,4 @@
-==============================================================================
 ReadMe file for the swingset-parent folder.
-==============================================================================
 
 When SwingSet was converted to a Maven project, SwingSet and it's Demo
 were split into two separate modules, swingset and swingset-demo.
