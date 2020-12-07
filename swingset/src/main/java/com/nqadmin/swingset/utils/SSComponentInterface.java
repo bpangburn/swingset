@@ -52,7 +52,6 @@ import javax.swing.KeyStroke;
 import org.apache.logging.log4j.LogManager;
 
 import com.nqadmin.swingset.datasources.SSConnection;
-//import com.nqadmin.swingset.datasources.SSRowSet;
 
 // SSComponentInterface.java
 //
@@ -310,17 +309,17 @@ public interface SSComponentInterface {
 		return getSSCommon().getRowSet();
 	}
 	
-	/**
-	 * Returns the RowSet containing queried data from the database.
-	 *
-	 * @return the rowSet
-	 *
-	 * @deprecated use {@link #getRowSet()} instead.
-	 */
-	@Deprecated
-	default RowSet getSSRowSet() {
-		return getRowSet();
-	}
+//	/**
+//	 * Returns the RowSet containing queried data from the database.
+//	 *
+//	 * @return the rowSet
+//	 *
+//	 * @deprecated use {@link #getRowSet()} instead.
+//	 */
+//	@Deprecated
+//	default RowSet getSSRowSet() {
+//		return getRowSet();
+//	}
 
 	/**
 	 * Removes listeners for bound RowSet and SwingSet component.
@@ -475,19 +474,19 @@ public interface SSComponentInterface {
 		getSSCommon().setSSConnection(_ssConnection);
 	}
 
-	/**
-	 * Sets the RowSet to hold queried data from the database.
-	 *
-	 * @param _rowSet datasource
-	 *
-	 * @throws java.sql.SQLException - if a database access error occurs
-	 * 
-	 * @deprecated use {@link #setRowSet(RowSet)} instead.
-	 */
-	@Deprecated
-	default void setSSRowSet(final RowSet _rowSet) throws java.sql.SQLException {
-		setRowSet(_rowSet);
-	}
+//	/**
+//	 * Sets the RowSet to hold queried data from the database.
+//	 *
+//	 * @param _rowSet datasource
+//	 *
+//	 * @throws java.sql.SQLException - if a database access error occurs
+//	 * 
+//	 * @deprecated use {@link #setRowSet(RowSet)} instead.
+//	 */
+//	@Deprecated
+//	default void setSSRowSet(final RowSet _rowSet) throws java.sql.SQLException {
+//		setRowSet(_rowSet);
+//	}
 
 	/**
 	 * Updates the value of the SwingSet component based on the bound database

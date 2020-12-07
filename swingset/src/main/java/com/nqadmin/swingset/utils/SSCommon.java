@@ -57,7 +57,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.datasources.SSConnection;
-//import com.nqadmin.swingset.datasources.SSRowSet;
 
 // SSCommon.java
 //
@@ -453,9 +452,9 @@ public class SSCommon implements Serializable {
 //		inBinding = true;
 //
 //		// UPDATE ROWSET
-//		removeSSRowSetListener();
+//		removeRowSetListener();
 //		setRowSet(_rowSet);
-//		addSSRowSetListener();
+//		addRowSetListener();
 //
 //		// UPDATE COLUMN NAME
 //		setBoundColumnName(_boundColumnName);
