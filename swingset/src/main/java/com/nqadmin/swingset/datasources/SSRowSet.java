@@ -95,7 +95,7 @@ public interface SSRowSet extends RowSet {
 	}
 
 	/**
-	 * Method used by ssRowSet listeners to get the new text when the SSRowSet
+	 * Method used by RowSet listeners to get the new text when the RowSet
 	 * events are triggered.
 	 *
 	 * @param _columnName - name of database column to retrieve
@@ -175,7 +175,6 @@ public interface SSRowSet extends RowSet {
 //					}
 //					value = value + calendar.get(Calendar.DAY_OF_MONTH) + "/";
 //					value = value + calendar.get(Calendar.YEAR);
-//					// value = String.valueOf(sSRowSet.getDate(columnName));
 //				}
 //				break;
 //
@@ -247,7 +246,7 @@ public interface SSRowSet extends RowSet {
 
 	/**
 	 * Method used by SwingSet component listeners to update the underlying
-	 * SSRowSet.
+	 * RowSet.
 	 * <p>
 	 * When the user changes/edits the SwingSet column this method propagates the
 	 * change to the RowSet. A separate call is required to flush/commit the change
