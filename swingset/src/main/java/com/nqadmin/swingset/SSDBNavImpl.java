@@ -45,6 +45,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
@@ -52,6 +53,7 @@ import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -161,6 +163,12 @@ public class SSDBNavImpl implements SSDBNav {
             	// nothing to do...
             } else if(comps[i] instanceof JButton) {
             // IF IT IS A JButton - DO NOTHING
+            	// nothing to do...
+            } else if(comps[i] instanceof JMenuBar) {
+            // IF IT IS A JMenuBar - DO NOTHING
+            	// nothing to do...
+            } else if(comps[i] instanceof BasicInternalFrameTitlePane) {
+            // IF IT IS A BasicInternalFrameTitlePane (including MetalInternalFrameTitlePane - DO NOTHING)
             	// nothing to do...
             } else if(comps[i] instanceof JSlider) {
             // IF IT IS A JSlider, SET TO AVERAGE OF MIN/MAX VALUES
