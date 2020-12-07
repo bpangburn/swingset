@@ -42,6 +42,7 @@ import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.sql.SQLException;
 
+import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
 import javax.swing.SwingUtilities;
@@ -51,7 +52,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDataNavigator;
-import com.nqadmin.swingset.datasources.SSRowSet;
 
 // SSSyncManager.java
 //
@@ -60,7 +60,7 @@ import com.nqadmin.swingset.datasources.SSRowSet;
 /**
  * Used to synchronize a data navigator and a navigation combobox.
  * <p>
- * IMPORTANT: The SSDBComboBox and the SSRowSet queries should select the same
+ * IMPORTANT: The SSDBComboBox and the RowSet queries should select the same
  * records and in the same order. Otherwise the SSSyncManager will spend a lot of
  * time looping through records to match.
  */
@@ -96,13 +96,11 @@ public class SSSyncManager {
 
 				comboPK = comboBox.getSelectedValue();
 
-
 				// UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
 				// This code was removed to improve performance.
 				//
 				// 2020-12-02_BP: adding back
 				dataNavigator.updatePresentRow();
-
 
 				// Note that the rowset count starts at 1 whereas combobox index starts at 0.
 
@@ -130,7 +128,7 @@ public class SSSyncManager {
 						count++;
 
 						logger.warn(
-								"SSSyncManager SSRowSet and SSDBComboBox values do not match for the same index. This can be caused by SSDBComboBox and SSRowSet "
+								"SSSyncManager RowSet and SSDBComboBox values do not match for the same index. This can be caused by SSDBComboBox and RowSet "
 								+ " queries not selecting the same records in the same order. Looping through each record for a match. Pass # "
 										+ count + ".");
 
@@ -151,7 +149,6 @@ public class SSSyncManager {
 							}
 							rowset.absolute(rowsetSearchFrom);
 						}
-
 
 						// number of items in combo is the number of records in resultset.
 						// so if for some reason item is in combo but deleted in rowset
@@ -174,7 +171,7 @@ public class SSSyncManager {
 				addRowsetListener();
 			}
 		}
-	} // protected class MyComboListener implements ActionListener {
+	} // protected class SyncComboListener implements ActionListener {
 
 	/**
 	 * Listener for rowset.
@@ -244,17 +241,17 @@ public class SSSyncManager {
 	private static Logger logger = LogManager.getLogger();
 
 	/**
-	 * # of records to step back if doing a sequential search because SSDBComboBox and SSRowSet results don't match.
+	 * # of records to step back if doing a sequential search because SSDBComboBox and RowSet results don't match.
 	 */
 	private static final int offsetToCheck = 7;
 
 	/**
-	 * # of records of overlap to check if SSDBComboBox and SSRowSet results don't match due to record additions/deletions.
+	 * # of records of overlap to check if SSDBComboBox and RowSet results don't match due to record additions/deletions.
 	 */
 	private static final int overlapToCheck = 7;
 
 	/**
-	 * SSRowSet column used as basis for synchronization.
+	 * RowSet column used as basis for synchronization.
 	 */
 	private String columnName;
 
@@ -279,12 +276,12 @@ public class SSSyncManager {
 	private SSDataNavigator dataNavigator;
 
 	/**
-	 * SSRowSet navigated with data navigator and combo box.
+	 * RowSet navigated with data navigator and combo box.
 	 */
-	private SSRowSet rowset;
+	private RowSet rowset;
 
 	/**
-	 * Listener on SSRowSet to detect data navigator-based navigations.
+	 * Listener on RowSet to detect data navigator-based navigations.
 	 */
 	private final SyncRowSetListener rowsetListener = new SyncRowSetListener();
 	
@@ -304,7 +301,7 @@ public class SSSyncManager {
 	public SSSyncManager(final SSDBComboBox _comboBox, final SSDataNavigator _dataNavigator) {
 		comboBox = _comboBox;
 		dataNavigator = _dataNavigator;
-		rowset = dataNavigator.getSSRowSet();
+		rowset = dataNavigator.getRowSet();
 		dataNavigator.setNavCombo(comboBox);
 	}
 	
@@ -331,7 +328,7 @@ public class SSSyncManager {
 	 */
 	private void addRowsetListener() {
 		if (!rowsetListenerAdded) {
-			dataNavigator.getSSRowSet().addRowSetListener(rowsetListener);
+			dataNavigator.getRowSet().addRowSetListener(rowsetListener);
 			rowsetListenerAdded = true;
 		}
 	}
@@ -404,7 +401,7 @@ public class SSSyncManager {
 	 */
 	private void removeRowsetListener() {
 		if (rowsetListenerAdded) {
-			dataNavigator.getSSRowSet().removeRowSetListener(rowsetListener);
+			dataNavigator.getRowSet().removeRowSetListener(rowsetListener);
 			rowsetListenerAdded = false;
 		}
 	}
@@ -412,7 +409,7 @@ public class SSSyncManager {
 	/**
 	 * Sets column to be used as basis for synchronization.
 	 *
-	 * @param _columnName SSRowSet column used as basis for synchronization.
+	 * @param _columnName RowSet column used as basis for synchronization.
 	 */
 	public void setColumnName(final String _columnName) {
 		columnName = _columnName;
@@ -435,7 +432,7 @@ public class SSSyncManager {
 	 */
 	public void setDataNavigator(final SSDataNavigator _dataNavigator) {
 		dataNavigator = _dataNavigator;
-		rowset = dataNavigator.getSSRowSet();
+		rowset = dataNavigator.getRowSet();
 	}
 
 	/**

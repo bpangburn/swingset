@@ -47,12 +47,12 @@ import javax.swing.event.InternalFrameEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.datasources.SSConnection;
-import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 //SSFormViewScreenHelper.java
@@ -620,7 +620,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * @throws Exception exception thrown while initializing rowset
 	 */
 	private void initRowset() throws SQLException, Exception {
-		setRowset(new SSJdbcRowSetImpl(getSSConnection().getConnection()));
+		setRowset(new JdbcRowSetImpl(getSSConnection().getConnection()));
 		updateRowset();
 	}
 	
@@ -904,7 +904,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * Update data navigator with latest rowset
 	 */
 	private void updateDataNavigator() {
-		getDataNavigator().setSSRowSet(getRowset());
+		getDataNavigator().setRowSet(getRowset());
 	}
 
 	/**

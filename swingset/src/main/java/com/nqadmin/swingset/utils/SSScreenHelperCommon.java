@@ -44,6 +44,7 @@ import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenuBar;
@@ -53,7 +54,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.SSConnection;
-import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 
 //SSScreenHelperCommon.java
 //
@@ -80,7 +80,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	protected static final Properties ssProps = SSProperties.getProperties();
 	
 	private SSConnection ssConnection; // Database connection.
-	private SSJdbcRowSetImpl rowset; // Rowset to be used for screen/form.
+	private RowSet rowset; // Rowset to be used for screen/form.
 
 	private String pkColumn; // Primary key column name for rowset.
 	
@@ -243,7 +243,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	/**
 	 * @return the rowset
 	 */
-	protected SSJdbcRowSetImpl getRowset() {
+	protected RowSet getRowset() {
 		return rowset;
 	}
 
@@ -385,7 +385,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	/**
 	 * @param _rowset rowset to be used by the screen/form
 	 */
-	protected void setRowset(final SSJdbcRowSetImpl _rowset) {
+	protected void setRowset(final RowSet _rowset) {
 		rowset = _rowset;
 	}
 
