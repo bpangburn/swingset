@@ -31,6 +31,7 @@ Changes:
 	12.Added line wrapping to SSTextArea.
 	13.Preliminary support for JDBCType enum.
 	14.mysql support for swingset-demo
+	15.Deprecated SSRowSet and SSJdbCRowSetImpl. Using RowSet and RowSetOps.
 
 ==============================================================================
 SwingSet 3.0.0 - Released 2020-01-10

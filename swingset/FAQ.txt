@@ -67,93 +67,11 @@ Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
    There are report of problems with very old versions of the mysql jdbc driver.
    See http://sourceforge.net/forum/forum.php?thread_id=1005899&forum_id=313186
      
-7. I'm currently using a SwingSet release prior to 0.9.0.  What is this new
-   SSConnection and SSRowSet?  How do I fix my programs?
+7. I see that SSJdbcRowSetImpl and SSRowSet have been deprecated.
+
+   SwingSet has been modified to allow for any RowSet implementation.
    
-   For version 0.9.0 a datasource abstraction layer was added to SwingSet. All
-   of the SwingSet components are now based on a new SSRowSet interface rather
-   than Sun's existing RowSet interface.  The SSRowSet differs from RowSet in
-   two important ways:
-     1. SSRowSet extends serializable which greatly facilitates serialization/
-        deserialization in the rest of the SwingSet components
-     2. SSRowSet only contains methods necessary to support the data types in
-        used by SSTextDocument which will make writing SSRowSet implementations
-        for non-updatable RowSets and other non-database datasources (e.g. a
-        HashMap) much easier
-     
-   A SSJdbcRowSetImpl implementation of SSRowSet is provided to replace the
-   JdbcRowSetImpl used in most existing SwingSet applications. It is basically
-   a serialized wrapper of JdbcRowSetImpl. It can be used in conjunction with
-   the new SSConnection, a serialized wrapper of the Connection interface, which
-   handles serialization/deserialization of database connection info (path,
-   username, password, etc.). Finally, an SSRowSetAdapter is provided with
-   empty method implementations of everything in SSRowSet. This adapter can be
-   easily extended with non-empty method implementations for non-database
-   datasources.
-
-   To accommodate non-updatable RowSets, SSJdbcRowSetImpl can be extended with
-   custom updateXYZ() methods to handle database updates via INSERT/UPDATE
-   queries. SSJdbcRowSetImpl can also serve as a template for writing SSRowSet
-   wrappers for other RowSets (e.g. CachedRowSet, WebRowSet, etc.).
-
-   Unfortunately, the introduction of the SSRowSet requires modification of
-   existing SwingSet applications, but with the SSJdbcRowSetImpl and
-   SSConnection, these changes should be minimal. Below is an example of changes
-   required to transition to 0.9.0 and later versions of SwingSet:
-
-    ***********************
-    OLD - Connection/RowSet
-    ***********************
-    import java.sql.*;
-    import com.sun.rowset.JdbcRowSetImpl;
-
-    Connection conn = null;
-    JdbcRowSetImpl rowset = null;
-    
-    Class.forName("org.postgresql.Driver");
-    conn = DriverManager.getConnection
-        ("jdbc:postgresql://pgserver.mycompany.com/suppliers_and_parts",
-        "swingset","test");
-    rowset = new JdbcRowSetImpl(conn);  
-
-    ***************************
-    NEW - SSConnection/SSRowSet
-    ***************************
-    import java.sql.*;  // still needed
-    import com.nqadmin.swingSet.datasources.SSJdbcRowSetImpl;
-    import com.nqadmin.swingSet.datasources.SSConnection;
-
-    SSConnection ssConnection = null;
-    SSJdbcRowSetImpl rowset = null;
-
-    ssConnection = new SSConnection
-        ("jdbc:postgresql://pgserver.mycompany.com/suppliers_and_parts",
-        "swingset", "test");
-    ssConnection.setDriverName("org.postgresql.Driver");
-    ssConnection.createConnection();
-    rowset = new SSJdbcRowSetImpl(ssConnection);
-    
-8. I'm building some screens graphically in NetBeans using the SwingSet
-   JavaBeans.  I've setup my SSConnection and SSRowSet properly, but when I
-   launch the screen, I'm getting null pointer exceptions on the bind() methods
-   of the individual SwingSet components?  How do I correct this?
+   For JDBC 1.8+ we recommend https://github.com/bpangburn/jdbcrowsetimpl
    
-   When building an application in NetBeans you have to call the execute()
-   method explicitly on SSJdbcRowSetImpl. This has to be done in the post
-   initialization code for the last rowset/connection property you set.
-
-   Assuming that you are setting the four connection-related properties for
-   SSConnection followed by the two connection-related properties for
-   SSJdbcRowSetImpl, you would put the following code in the post initialization
-   code for the last property set for SSJdbcRowSetImpl:
-
-    // ASSUMING THAT THE ROWSET VARIABLE NAME IS sSJdbcRowSetImpl1
-        try {
-            sSJdbcRowSetImpl1.execute();
-        } catch(SQLException se) {
-            se.printStackTrace();
-        }
-        
-   Note that in NetBeans you should add your SSConnection and SSJdbcRowSetImpl,
-   set their properties, and add the above call to execute() before adding and
-   binding individual SwingSet components to SSRowSet column names.
+   com.nqadmin.swingset.datasources.RowSetOps has been added with static
+   methods to replace any custom/convenience functions in SSJdbcRowSetImpl.
