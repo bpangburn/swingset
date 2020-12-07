@@ -43,6 +43,7 @@ import java.awt.GridBagLayout;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -54,7 +55,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 import com.nqadmin.swingset.utils.SSFormViewScreenHelper;
 
@@ -104,7 +104,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	public Example4UsingHelper(final Connection _dbConn, final Container _container) {
 
 		// Instantiate Screen
-		super("Example 4 Using Helper", new SSConnection(_dbConn), pkColumn, null, screenQuery, cmbNavDisplayColumn, null, null, cmbNavQuery);
+		super("Example 4 Using Helper", _dbConn, pkColumn, null, screenQuery, cmbNavDisplayColumn, null, null, cmbNavQuery);
 		
 		// For H2, the rowset has to be requeried following a record insertion or deletion
 		// TODO: Investigate how MySQL handles insert/delete and implement addNewRecordToCmbNavigator if needed.
@@ -145,7 +145,8 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		txtPartCity.setPreferredSize(MainClass.ssDim);
 		
 	// SET COMBO OPTIONS
-		cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
+		//cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
+		cmbPartColor.setOptions(Arrays.asList(new String[] { "Red", "Green", "Blue" }));
 
 	// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
 		final Container contentPane = getContentPane();
@@ -234,7 +235,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		try {
 
 		// GET THE NEW RECORD ID.
-			final ResultSet rs = getSSConnection().getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+			final ResultSet rs = getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 					.executeQuery("SELECT nextval('part_data_seq') as nextVal;");
 			rs.next();
 			final int partID = rs.getInt("nextVal");

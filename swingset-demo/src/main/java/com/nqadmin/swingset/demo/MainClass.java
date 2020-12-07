@@ -37,8 +37,6 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
-import com.nqadmin.swingset.models.SSCollectionModel;
-import com.nqadmin.swingset.models.SSMysqlSetModel;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,11 +50,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.function.Supplier;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -67,11 +69,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.h2.tools.RunScript;
 
+import com.nqadmin.swingset.models.SSCollectionModel;
+import com.nqadmin.swingset.models.SSMysqlSetModel;
+
 import gnu.getopt.Getopt;
-import java.sql.JDBCType;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.

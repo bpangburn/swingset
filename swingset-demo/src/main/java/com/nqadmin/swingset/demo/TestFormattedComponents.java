@@ -56,7 +56,6 @@ import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.formatting.SSCuitField;
 import com.nqadmin.swingset.formatting.SSCurrencyField;
 import com.nqadmin.swingset.formatting.SSDateField;
@@ -125,7 +124,7 @@ public class TestFormattedComponents extends JFrame {
 	/**
 	 * database component declarations
 	 */
-	SSConnection ssConnection = null;
+	Connection connection = null;
 	RowSet rowset = null;
 	SSDataNavigator navigator = null;
 
@@ -146,7 +145,7 @@ public class TestFormattedComponents extends JFrame {
 			super("SwingSet Formatted Component Test");
 
 		// SET CONNECTION
-			ssConnection = new SSConnection(_dbConn);
+			connection = _dbConn;
 
 		// SET SCREEN DIMENSIONS
 			setSize(MainClass.childScreenWidth, MainClass.childScreenHeightTall);
@@ -156,7 +155,7 @@ public class TestFormattedComponents extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				rowset = new JdbcRowSetImpl(ssConnection.getConnection());
+				rowset = new JdbcRowSetImpl(connection);
 				rowset.setCommand("SELECT * FROM swingset_formatted_test_data;");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
@@ -247,7 +246,7 @@ public class TestFormattedComponents extends JFrame {
 
 			// SETUP NAVIGATOR QUERY
 				final String query = "SELECT * FROM swingset_formatted_test_data;";
-				cmbSSDBComboNav = new SSDBComboBox(ssConnection, query, "swingset_formatted_test_pk", "swingset_formatted_test_pk");
+				cmbSSDBComboNav = new SSDBComboBox(connection, query, "swingset_formatted_test_pk", "swingset_formatted_test_pk");
 
 				try {
 					cmbSSDBComboNav.execute();
@@ -394,7 +393,7 @@ public class TestFormattedComponents extends JFrame {
 		try {
 
 		// GET THE NEW RECORD ID.
-			final ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+			final ResultSet rs = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 					.executeQuery("SELECT nextval('swingset_formatted_test_seq') as nextVal;");
 			rs.next();
 			final int recordPK = rs.getInt("nextVal");

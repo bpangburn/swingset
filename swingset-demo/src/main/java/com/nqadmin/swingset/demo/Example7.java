@@ -50,7 +50,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDataGrid;
-import com.nqadmin.swingset.datasources.SSConnection;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view
@@ -79,7 +78,7 @@ public class Example7 extends JFrame {
 	/**
 	 * database component declarations
 	 */
-	SSConnection ssConnection = null;
+	Connection connection = null;
 	RowSet rowset = null;
 
 	/**
@@ -93,7 +92,7 @@ public class Example7 extends JFrame {
 			super("Example7");
 
 		// SET CONNECTION
-			ssConnection = new SSConnection(_dbConn);
+			connection = _dbConn;
 
 		// SET SCREEN DIMENSIONS
 			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
@@ -113,7 +112,7 @@ public class Example7 extends JFrame {
 		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
 			try {
 			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-				rowset = new JdbcRowSetImpl(ssConnection.getConnection());
+				rowset = new JdbcRowSetImpl(connection);
 				rowset.setCommand("SELECT supplier_part_id, supplier_id, part_id, quantity, ship_date FROM supplier_part_data ORDER BY supplier_id, part_id;");
 
 			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
@@ -135,7 +134,7 @@ public class Example7 extends JFrame {
 
 			// BUILD COMBO RENDERERS FOR SUPPLIER AND PART
 			// ADDED STATEMENT "SCROLL INSENSITIVITY" FOR EXAMPLE TO BE COMPATIBLE WITH H2 DATABASE DEFAULT SETTINGS.
-				try (Statement stmt = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+				try (Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
 						ResultSet.CONCUR_UPDATABLE)) {
 
 					String[] displayItems = null;

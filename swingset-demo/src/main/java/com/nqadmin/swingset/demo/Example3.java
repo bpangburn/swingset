@@ -56,7 +56,6 @@ import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.datasources.SSConnection;
 
 /**
  * This example displays data from the supplier_part_data table.
@@ -97,7 +96,7 @@ public class Example3 extends JFrame {
 	/**
 	 * database component declarations
 	 */
-	SSConnection ssConnection = null;
+	Connection connection = null;
 	RowSet rowset = null;
 	SSDataNavigator navigator = null;
 
@@ -112,7 +111,7 @@ public class Example3 extends JFrame {
 			super("Example3");
 
 		// SET CONNECTION
-			ssConnection = new SSConnection(_dbConn);
+			connection = _dbConn;
 
 		// SET SCREEN DIMENSIONS
 			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
@@ -122,7 +121,7 @@ public class Example3 extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				rowset = new JdbcRowSetImpl(ssConnection.getConnection());
+				rowset = new JdbcRowSetImpl(connection);
 				rowset.setCommand("SELECT * FROM supplier_part_data");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
@@ -177,7 +176,7 @@ public class Example3 extends JFrame {
 				try {
 
 				// GET THE NEW RECORD ID.
-					final ResultSet rs = ssConnection.getConnection()
+					final ResultSet rs = connection
 							.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 							.executeQuery("SELECT nextval('supplier_part_data_seq') as nextVal;");
 					rs.next();
@@ -202,10 +201,10 @@ public class Example3 extends JFrame {
 
 		// SETUP DB COMBO QUERIES
 			String query = "SELECT * FROM supplier_data;";
-			cmbSupplierName = new SSDBComboBox(ssConnection, query, "supplier_id", "supplier_name");
+			cmbSupplierName = new SSDBComboBox(connection, query, "supplier_id", "supplier_name");
 
 			query = "SELECT * FROM part_data;";
-			cmbPartName = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
+			cmbPartName = new SSDBComboBox(connection, query, "part_id", "part_name");
 
 		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
 			txtSupplierPartID.bind(rowset, "supplier_part_id");

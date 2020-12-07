@@ -50,7 +50,6 @@ import org.apache.logging.log4j.Logger;
 import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDataGrid;
 import com.nqadmin.swingset.SSDataValue;
-import com.nqadmin.swingset.datasources.SSConnection;
 
 /**
  * This example is similar to Example5, demonstrating the use of an SSDataGrid
@@ -77,7 +76,7 @@ public class Example6 extends JFrame {
 	/**
 	 * database component declarations
 	 */
-	SSConnection ssConnection = null;
+	Connection connection = null;
 	RowSet rowset = null;
 
 	/**
@@ -91,7 +90,7 @@ public class Example6 extends JFrame {
 			super("Example6");
 
 		// SET CONNECTION
-			ssConnection = new SSConnection(_dbConn);
+			connection = _dbConn;
 			
 		// SET SCREEN POSITION
 			setLocation(DemoUtil.getChildScreenLocation(this.getName()));
@@ -111,7 +110,7 @@ public class Example6 extends JFrame {
 		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
 			try {
 			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-				rowset = new JdbcRowSetImpl(ssConnection.getConnection());
+				rowset = new JdbcRowSetImpl(connection);
 				rowset.setCommand("SELECT * FROM part_data ORDER BY part_name;");
 
 			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
@@ -144,7 +143,7 @@ public class Example6 extends JFrame {
 
 						try {
 						// GET THE NEW RECORD ID.
-							final ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+							final ResultSet rs = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 									.executeQuery("SELECT nextval('part_data_seq') as nextVal;");
 							rs.next();
 							partID = rs.getInt("nextVal");

@@ -43,6 +43,7 @@ import java.awt.GridBagLayout;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import javax.sql.RowSet;
 import javax.swing.JFrame;
@@ -56,7 +57,6 @@ import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.datasources.SSConnection;
 
 /**
  * This example displays data from the supplier_data table.
@@ -96,7 +96,7 @@ public class Example2 extends JFrame {
 	/**
 	 * database component declarations
 	 */
-	SSConnection ssConnection = null;
+	Connection connection = null;
 	RowSet rowset = null;
 	SSDataNavigator navigator = null;
 
@@ -111,7 +111,7 @@ public class Example2 extends JFrame {
 			super("Example2");
 
 		// SET CONNECTION
-			ssConnection = new SSConnection(_dbConn);
+			connection = _dbConn;
 
 		// SET SCREEN DIMENSIONS
 			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
@@ -121,7 +121,7 @@ public class Example2 extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				rowset = new JdbcRowSetImpl(ssConnection.getConnection());
+				rowset = new JdbcRowSetImpl(connection);
 				rowset.setCommand("SELECT * FROM supplier_data");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
@@ -177,7 +177,7 @@ public class Example2 extends JFrame {
 				try {
 
 				// GET THE NEW RECORD ID.
-					final ResultSet rs = ssConnection.getConnection()
+					final ResultSet rs = connection
 							.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 							.executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");
 					rs.next();
@@ -205,9 +205,11 @@ public class Example2 extends JFrame {
 		// 		10 -> BAD
 		// 		20 -> BETTER
 		// 		30 -> GOOD
-			final int[] codes = { 10, 20, 30 };
+			//final int[] codes = { 10, 20, 30 };
+			final Integer[] codes = { 10, 20, 30 };
 			final String[] options = { "Bad", "Better", "Good" };
-			cmbSupplierStatus.setOptions(options, codes);
+			//cmbSupplierStatus.setOptions(options, codes);
+			cmbSupplierStatus.setOptions(Arrays.asList(options), Arrays.asList(codes));
 
 		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
 			txtSupplierID.bind(rowset, "supplier_id");

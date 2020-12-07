@@ -43,6 +43,7 @@ import java.awt.GridBagLayout;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import javax.sql.RowSet;
 import javax.swing.JFrame;
@@ -57,7 +58,6 @@ import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.utils.SSSyncManager;
 
 /**
@@ -110,7 +110,7 @@ public class Example4 extends JFrame {
 	/**
 	 * database component declarations
 	 */
-	SSConnection ssConnection = null;
+	Connection connection = null;
 	RowSet rowset = null;
 	SSDataNavigator navigator = null;
 
@@ -131,7 +131,7 @@ public class Example4 extends JFrame {
 			super("Example4");
 
 		// SET CONNECTION
-			ssConnection = new SSConnection(_dbConn);
+			connection = _dbConn;
 
 		// SET SCREEN DIMENSIONS
 			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
@@ -141,7 +141,7 @@ public class Example4 extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				rowset = new JdbcRowSetImpl(ssConnection.getConnection());
+				rowset = new JdbcRowSetImpl(connection);
 				rowset.setCommand("SELECT * FROM part_data;");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
@@ -209,7 +209,7 @@ public class Example4 extends JFrame {
 					try {
 
 					// GET THE NEW RECORD ID.
-						final ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+						final ResultSet rs = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 								.executeQuery("SELECT nextval('part_data_seq') as nextVal;");
 						rs.next();
 						final int partID = rs.getInt("nextVal");
@@ -254,7 +254,7 @@ public class Example4 extends JFrame {
 
 			// SETUP NAVIGATOR QUERY
 				final String query = "SELECT * FROM part_data;";
-				cmbSelectPart = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
+				cmbSelectPart = new SSDBComboBox(connection, query, "part_id", "part_name");
 
 				try {
 					cmbSelectPart.execute();
@@ -265,7 +265,10 @@ public class Example4 extends JFrame {
 				}
 
 			// SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES
-				cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
+				//cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
+				cmbPartColor.setOptions(Arrays.asList(new String[] { "Red", "Green", "Blue" }));
+				
+				//Arrays.asList(options)
 
 			// BIND THE COMPONENTS TO THE DATABASE COLUMNS
 				txtPartID.bind(rowset, "part_id");

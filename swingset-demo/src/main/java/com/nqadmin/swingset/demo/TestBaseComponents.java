@@ -69,7 +69,6 @@ import com.nqadmin.swingset.SSList;
 import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.SSTextArea;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.datasources.SSConnection;
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSDbArrayModel;
 import com.nqadmin.swingset.utils.SSSyncManager;
@@ -140,7 +139,7 @@ public class TestBaseComponents extends JFrame {
 		}
 	}
 	private static final String[] comboItems = {"Combo Item 0","Combo Item 1", "Combo Item 2", "Combo Item 3"};
-	private static final int[] comboCodes = {0,1,2,3};
+	//private static final int[] comboCodes = {0,1,2,3};
 	private static final Integer[] comboCodesIntegers = new Integer[] {0,1,2,3};
 	private static final Object[] listCodes = {1,2,3,4,5,6,7};
 	private static final String[] listItems = {"List Item 1","List Item 2", "List Item 3", "List Item 4", "List Item 5", "List Item 6", "List Item 7"};
@@ -179,7 +178,7 @@ public class TestBaseComponents extends JFrame {
 	/**
 	 * database component declarations
 	 */
-	SSConnection ssConnection = null;
+	Connection connection = null;
 	RowSet rowset = null;
 	SSDataNavigator navigator = null;
 
@@ -214,7 +213,7 @@ public class TestBaseComponents extends JFrame {
 			lstSSList = new SSList(getCollectionModel());
 
 		// SET CONNECTION
-			ssConnection = new SSConnection(_dbConn);
+			connection = _dbConn;
 
 		// SET SCREEN DIMENSIONS
 			setSize(MainClass.childScreenWidth, MainClass.childScreenHeightTall);
@@ -224,7 +223,7 @@ public class TestBaseComponents extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				rowset = new JdbcRowSetImpl(ssConnection.getConnection());
+				rowset = new JdbcRowSetImpl(connection);
 				rowset.setCommand("SELECT * FROM swingset_base_test_data;");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
@@ -314,7 +313,7 @@ public class TestBaseComponents extends JFrame {
 
 			// SETUP NAVIGATOR QUERY
 				final String query = "SELECT * FROM swingset_base_test_data;";
-				cmbSSDBComboNav = new SSDBComboBox(ssConnection, query, "swingset_base_test_pk", "swingset_base_test_pk");
+				cmbSSDBComboNav = new SSDBComboBox(connection, query, "swingset_base_test_pk", "swingset_base_test_pk");
 
 				try {
 					cmbSSDBComboNav.execute();
@@ -348,7 +347,7 @@ public class TestBaseComponents extends JFrame {
 				lstSSList.setOptions(Arrays.asList(listItems), Arrays.asList(listCodes));
 
 				final String dbComboQuery = "SELECT * FROM part_data;";
-				cmbSSDBComboBox = new SSDBComboBox(ssConnection, dbComboQuery, "part_id", "part_name");
+				cmbSSDBComboBox = new SSDBComboBox(connection, dbComboQuery, "part_id", "part_name");
 				cmbSSDBComboBox.setAllowNull(false);
 				// TODO if getAllowNull() is false, user can still blank out the combo - we may want to prevent this
 
@@ -499,7 +498,7 @@ public class TestBaseComponents extends JFrame {
 		try {
 
 		// GET THE NEW RECORD ID.
-			final ResultSet rs = ssConnection.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+			final ResultSet rs = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 					.executeQuery("SELECT nextval('swingset_base_test_seq') as nextVal;");
 			rs.next();
 			final int recordPK = rs.getInt("nextVal");
