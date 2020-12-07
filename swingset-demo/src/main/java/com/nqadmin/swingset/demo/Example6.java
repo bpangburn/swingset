@@ -41,15 +41,16 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.sql.RowSet;
 import javax.swing.JFrame;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDataGrid;
 import com.nqadmin.swingset.SSDataValue;
 import com.nqadmin.swingset.datasources.SSConnection;
-import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 
 /**
  * This example is similar to Example5, demonstrating the use of an SSDataGrid
@@ -77,7 +78,7 @@ public class Example6 extends JFrame {
 	 * database component declarations
 	 */
 	SSConnection ssConnection = null;
-	SSJdbcRowSetImpl rowset = null;
+	RowSet rowset = null;
 
 	/**
 	 * Constructor for Example6
@@ -110,13 +111,13 @@ public class Example6 extends JFrame {
 		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
 			try {
 			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-				rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
+				rowset = new JdbcRowSetImpl(ssConnection.getConnection());
 				rowset.setCommand("SELECT * FROM part_data ORDER BY part_name;");
 
 			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
 				dataGrid = new SSDataGrid();
 				dataGrid.setHeaders(new String[] { "Part ID", "Part Name", "Color Code", "Weight", "City" });
-				dataGrid.setSSRowSet(rowset);
+				dataGrid.setRowSet(rowset);
 				dataGrid.setMessageWindow(this);
 
 			// DISABLES NEW INSERTIONS TO THE DATABASE. - NOT CURRENTLY WORKING FOR H2

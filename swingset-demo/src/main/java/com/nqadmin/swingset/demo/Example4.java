@@ -44,19 +44,20 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.datasources.SSConnection;
-import com.nqadmin.swingset.datasources.SSJdbcRowSetImpl;
 import com.nqadmin.swingset.utils.SSSyncManager;
 
 /**
@@ -110,7 +111,7 @@ public class Example4 extends JFrame {
 	 * database component declarations
 	 */
 	SSConnection ssConnection = null;
-	SSJdbcRowSetImpl rowset = null;
+	RowSet rowset = null;
 	SSDataNavigator navigator = null;
 
 	/**
@@ -140,7 +141,7 @@ public class Example4 extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				rowset = new SSJdbcRowSetImpl(ssConnection.getConnection());
+				rowset = new JdbcRowSetImpl(ssConnection.getConnection());
 				rowset.setCommand("SELECT * FROM part_data;");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
