@@ -208,7 +208,7 @@ e.g.,
      table.
 
      SSConnection ssConnection = null;
-     SSJdbcRowSetImpl ssJdbcRowSet = null;
+     RowSet rowSet = null;
      SSDataNavigator navigator = null;
      SSDBComboBox combo = null;
      
@@ -217,15 +217,15 @@ e.g.,
     // CREATE A DATABASE CONNECTION OBJECT
         ssConnection = new SSConnection(........);
           
-    // CREATE AN INSTANCE OF SSJdbcRowSetImpl
-        ssJdbcRowSet = new SSJdbcRowSetImpl(ssConnection);
-        ssJdbcRowSet.setCommand("SELECT * FROM shipment_data;");
+    // CREATE AN INSTANCE OF JdbcRowSetImpl
+        rowSet = new JdbcRowSetImpl(ssConnection);
+        rowSet.setCommand("SELECT * FROM shipment_data;");
           
     // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE SSROWSET.
     // IF YOU ARE NOT USING THE DATA NAVIGATOR YOU HAVE TO INCLUDE THOSE.
-    //   ssJdbcRowSet.execute();
-    //   ssJdbcRowSet.next();
-        SSDataNavigator navigator = new SSDataNavigator(ssJdbcRowSet);
+    //   rowSet.execute();
+    //   rowSet.next();
+        SSDataNavigator navigator = new SSDataNavigator(rowSet);
 
     // QUERY FOR THE COMBO BOX.
         String query = "SELECT * FROM part_data;";
@@ -236,14 +236,14 @@ e.g.,
           
     // THIS BASICALLY SPECIFIES THE COLUMN AND THE SSROWSET WHERE UPDATES HAVE
     // TO BE MADE.
-        combo.bind(ssJdbcRowSet, "part_id");
+        combo.bind(rowSet, "part_id");
         combo.execute();
 
     // CREATE A TEXTFIELD
         SSTextField myText = new SSTextField();
         
     // BIND TEXTFIELD
-        myText.bind(ssJdbcRowSet, "quantity");
+        myText.bind(rowSet, "quantity");
            
      } catch(Exception e) {
      // EXCEPTION HANDLER HERE...
@@ -327,36 +327,6 @@ being added.
 ==============================================================================
 CLASS DESCRIPTIONS - DATASOURCES
 ==============================================================================
-***********************
-RowSet
-***********************
-Interface that extends serializable and basically clones the RowSet interface
-methods required by SSTextDocument.  Used as the basis for datasources
-throughout the SwingSet components.
-
-
-***********************
-RowSetAdapter
-***********************
-Abstract class that provides empty implementations of all the methods for the
-RowSet interface.  
-
-This class is provided for convenience so that users wishing to write their
-own RowSet implementations can just extend the abstract class and override
-the desired methods.
-
-
-***********************
-SSJdbcRowSetImpl
-***********************
-Implementation of RowSet that is basically a serializable wrapper for Sun's
-JdbcRowSetImpl.
-
-SSJdbcRowSetImpl can be extended with custom setXYZ() methods to handle
-database updates via INSERT/UPDATE queries.  SSJdbcRowSetImpl can also serve as
-a template for writing RowSet wrappers for other RowSets (e.g., CachedRowSet,
-WebRowSet, etc.).
-
 
 ***********************
 SSConnection
