@@ -57,7 +57,10 @@ import org.apache.logging.log4j.Logger;
  * should be called before calling the getConnection method. Whenever any
  * connection parameters are changed, createConnection has to be called to
  * change the connection object.
+ *
+ * @deprecated Starting in 4.0.0+ use {@link java.sql.Connection} instead.
  */
+@Deprecated
 public class SSConnection implements Serializable {
 
 	/**
