@@ -51,6 +51,8 @@ import java.io.Serializable;
  * SSDataGridHandlerImpl defines empty functions so that the programmer can define
  * only the functions desired.
  */
+// TODO Should this class be named SSDataGridHandlerImpl?
+// TODO Can this be eliminated by making empty default metholds to SSDataGridHandler?
 public abstract class SSDataGridAdapter implements SSDataGridHandler, Serializable {
 
     /**
