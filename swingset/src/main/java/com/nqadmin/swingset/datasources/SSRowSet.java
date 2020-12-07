@@ -49,7 +49,10 @@ import javax.sql.RowSet;
  * Previously this was a custom Interface that was a subset of RowSet. Now we
  * will try to support the full RowSet interface, but still need to accommodate
  * code where SSRowSet was referenced as a type.
+ * 
+ * @deprecated Starting in 4.0.0+ use {@link com.nqadmin.swingset.datasources.RowSetOps} instead.
  */
+@Deprecated
 public interface SSRowSet extends RowSet {
 
 	/**

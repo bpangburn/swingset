@@ -54,8 +54,10 @@ import com.nqadmin.rowset.JdbcRowSetImpl;
  * The SSJdbcRowSetImpl class is a wrapper for JdbcRowSetImpl. It provides all
  * rowset-related functionality for linking SwingSet components to an
  * SSConnection.
+ * 
+ * @deprecated Starting in 4.0.0+ use {@link com.nqadmin.rowset.JdbcRowSetImpl} instead.
  */
-// TODO: See if we can eliminate this class.
+@Deprecated
 public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 
 	/**
