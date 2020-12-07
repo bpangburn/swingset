@@ -53,7 +53,7 @@ import javax.swing.SwingUtilities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.swingset.datasources.SSConnection;
+import java.sql.Connection;
 
 //SSScreenHelperCommon.java
 //
@@ -79,7 +79,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 */
 	protected static final Properties ssProps = SSProperties.getProperties();
 	
-	private SSConnection ssConnection; // Database connection.
+	private Connection connection; // Database connection.
 	private RowSet rowset; // Rowset to be used for screen/form.
 
 	private String pkColumn; // Primary key column name for rowset.
@@ -275,10 +275,10 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 
 	/**
-	 * @return a SwingSet SSConnection based on the DBConnector
+	 * @return a SwingSet Connection based on the DBConnector
 	 */
-	protected SSConnection getSSConnection() {
-		return ssConnection;
+	protected Connection getConnection() {
+		return connection;
 	}
 	
 	/**
@@ -404,10 +404,10 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 	
 	/**
-	 * @param _ssConnection the ssConnection to set
+	 * @param _connection the connection to set
 	 */
-	protected void setSSConnection(final SSConnection _ssConnection) {
-		ssConnection = _ssConnection;
+	protected void setConnection(final Connection _connection) {
+		connection = _connection;
 	}
 
 	/**

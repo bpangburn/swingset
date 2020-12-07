@@ -54,7 +54,7 @@ import javax.swing.JComboBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.swingset.datasources.SSConnection;
+import java.sql.Connection;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.models.SSListItem;
@@ -98,7 +98,7 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  * store the id of the part chosen by the user in the shipment table.
  * <pre>
  * {@code
- * SSConnection connection = null;
+ * Connection connection = null;
  * RowSet rowSet = null;
  * SSDataNavigator navigator = null;
  * SSDBComboBox combo = null;
@@ -106,7 +106,7 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  * try {
  *
  * // CREATE A DATABASE CONNECTION OBJECT
- * SSConnection connection = new SSConnection(........);
+ * Connection connection = new Connection(........);
  *
  * // CREATE AN INSTANCE OF SSJDBCROWSETIMPL
  * JdbcRowsetImpl rowSet = new JdbcRowsetImpl(connection);
@@ -376,17 +376,17 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Constructs a SSDBComboBox with the given parameters.
 	 *
-	 * @param _ssConnection         database connection to be used.
+	 * @param _connection         database connection to be used.
 	 * @param _query                query to be used to retrieve the values from the
 	 *                              database.
 	 * @param _primaryKeyColumnName column name whose value has to be stored.
 	 * @param _displayColumnName    column name whose values are displayed in the
 	 *                              combo box.
 	 */
-	public SSDBComboBox(final SSConnection _ssConnection, final String _query,
+	public SSDBComboBox(final Connection _connection, final String _query,
 			final String _primaryKeyColumnName, final String _displayColumnName) {
 		this();
-		setSSConnection(_ssConnection);
+		setConnection(_connection);
 		setQuery(_query);
 		setPrimaryKeyColumnName(_primaryKeyColumnName);
 		setDisplayColumnName(_displayColumnName);
@@ -968,7 +968,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				remodel.add(null, "");
 			}
 
-			Statement statement = ssCommon.getSSConnection().getConnection().createStatement();
+			Statement statement = ssCommon.getConnection().createStatement();
 			rs = statement.executeQuery(getQuery());
 
 			//optionColumnType = getJDBCColumnType(rs, rs.findColumn(displayColumnName));
@@ -1070,7 +1070,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //				options.add(listItem.getListItem());
 //			}
 //
-//			final Statement statement = ssCommon.getSSConnection().getConnection().createStatement();
+//			final Statement statement = ssCommon.getConnection().createStatement();
 //			rs = statement.executeQuery(getQuery());
 //
 //			logger.debug("{}: Query [{}].", () -> getColumnForLog(), () -> getQuery());

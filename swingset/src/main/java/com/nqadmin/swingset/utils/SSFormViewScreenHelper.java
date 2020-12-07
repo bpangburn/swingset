@@ -52,7 +52,7 @@ import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.datasources.SSConnection;
+import java.sql.Connection;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 //SSFormViewScreenHelper.java
@@ -283,7 +283,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * specified window.
 	 *
 	 * @param _title     	title of window
-	 * @param _ssConnection database connection
+	 * @param _connection database connection
 	 * 
 	 * @param _pkColumn  	name of primary key column
 	 * @param _parentID 	primary key value of parent record (FK for current rowset)
@@ -296,11 +296,11 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * 
 	 * @param _cmbNavigatorFullSQL the full SQL query to set for the combo navigator
 	 */
-	public SSFormViewScreenHelper(final String _title, final SSConnection _ssConnection, final String _pkColumn,
+	public SSFormViewScreenHelper(final String _title, final Connection _connection, final String _pkColumn,
 			final Long _parentID, final String _fullSQL, final String _cmbDisplayColumn1, final String _cmbDisplayColumn2,
 			final String _cmbSeparator, final String _cmbNavigatorFullSQL) {
 		
-		this(_title, _ssConnection, _pkColumn, _parentID, _fullSQL, null, null, _cmbDisplayColumn1, _cmbDisplayColumn2,
+		this(_title, _connection, _pkColumn, _parentID, _fullSQL, null, null, _cmbDisplayColumn1, _cmbDisplayColumn2,
 				_cmbSeparator, _cmbNavigatorFullSQL, null);
 	}
 	
@@ -309,7 +309,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * specified window.
 	 *
 	 * @param _title     	title of window
-	 * @param _ssConnection database connection
+	 * @param _connection database connection
 	 * 
 	 * @param _pkColumn  	name of primary key column
 	 * @param _parentID 	primary key value of parent record (FK for current rowset)
@@ -323,11 +323,11 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * 
 	 * @param _cmbNavigatorSelectSQL the SELECT clause to set for the combo navigator
 	 */
-	public SSFormViewScreenHelper(final String _title, final SSConnection _ssConnection, final String _pkColumn,
+	public SSFormViewScreenHelper(final String _title, final Connection _connection, final String _pkColumn,
 			final Long _parentID, final String _selectSQL, final String _orderBySQL, final String _cmbDisplayColumn1, final String _cmbDisplayColumn2,
 			final String _cmbSeparator, final String _cmbNavigatorSelectSQL) {
 		
-		this(_title, _ssConnection, _pkColumn, _parentID, null, _selectSQL, _orderBySQL, _cmbDisplayColumn1, _cmbDisplayColumn2,
+		this(_title, _connection, _pkColumn, _parentID, null, _selectSQL, _orderBySQL, _cmbDisplayColumn1, _cmbDisplayColumn2,
 				_cmbSeparator, null, _cmbNavigatorSelectSQL);
 	}
 	
@@ -336,7 +336,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * specified window.
 	 *
 	 * @param _title     	title of window
-	 * @param _ssConnection database connection
+	 * @param _connection database connection
 	 * 
 	 * @param _pkColumn  	name of primary key column
 	 * @param _parentID 	primary key value of parent record (FK for current rowset)
@@ -352,7 +352,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * @param _cmbNavigatorFullSQL the full SQL query to set for the combo navigator
 	 * @param _cmbNavigatorSelectSQL the SELECT clause to set for the combo navigator
 	 */
-	private SSFormViewScreenHelper(final String _title, final SSConnection _ssConnection, final String _pkColumn,
+	private SSFormViewScreenHelper(final String _title, final Connection _connection, final String _pkColumn,
 			final Long _parentID, final String _fullSQL, final String _selectSQL, final String _orderBySQL, final String _cmbDisplayColumn1, final String _cmbDisplayColumn2,
 			final String _cmbSeparator, final String _cmbNavigatorFullSQL, final String _cmbNavigatorSelectSQL) {
 
@@ -361,7 +361,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 
 		try {
 			// SET PARAMETERS
-			setSSConnection(_ssConnection);
+			setConnection(_connection);
 			setPkColumn(_pkColumn);
 			setParentID(_parentID);
 			setFullSQL(_fullSQL);
@@ -591,7 +591,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 */
 	private void initCmbNavigator() throws SQLException, Exception {
 
-		setCmbNavigator(new SSDBComboBox(getSSConnection(), getCmbNavigatorQuery(),
+		setCmbNavigator(new SSDBComboBox(getConnection(), getCmbNavigatorQuery(),
 				getPkColumn(), getCmbDisplayColumn1()));
 
 		if (getCmbDisplayColumn2() != null) {
@@ -620,7 +620,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * @throws Exception exception thrown while initializing rowset
 	 */
 	private void initRowset() throws SQLException, Exception {
-		setRowset(new JdbcRowSetImpl(getSSConnection().getConnection()));
+		setRowset(new JdbcRowSetImpl(getConnection()));
 		updateRowset();
 	}
 	

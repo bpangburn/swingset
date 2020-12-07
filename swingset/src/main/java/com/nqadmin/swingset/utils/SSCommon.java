@@ -56,7 +56,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
-import com.nqadmin.swingset.datasources.SSConnection;
+import java.sql.Connection;
 
 // SSCommon.java
 //
@@ -324,7 +324,7 @@ public class SSCommon implements Serializable {
 	/**
 	 * database connection
 	 */
-	private SSConnection ssConnection = null;
+	private Connection connection = null;
 
 	/**
 	 * Underlying Document listener (where SwingSet component is a JTextComponent)
@@ -568,12 +568,12 @@ public class SSCommon implements Serializable {
 	}
 
 	/**
-	 * Returns the SSConnection to the database
+	 * Returns the Connection to the database
 	 *
-	 * @return the ssConnection
+	 * @return the connection
 	 */
-	public SSConnection getSSConnection() {
-		return ssConnection;
+	public Connection getConnection() {
+		return connection;
 	}
 
 	/**
@@ -781,12 +781,12 @@ public class SSCommon implements Serializable {
 	}
 
 	/**
-	 * Sets the SSConnection to the database
+	 * Sets the Connection to the database
 	 *
-	 * @param _ssConnection the ssConnection to set
+	 * @param _connection the connection to set
 	 */
-	public void setSSConnection(final SSConnection _ssConnection) {
-		ssConnection = _ssConnection;
+	public void setConnection(final Connection _connection) {
+		connection = _connection;
 	}
 
 	/**

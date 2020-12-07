@@ -56,7 +56,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDataGrid;
-import com.nqadmin.swingset.datasources.SSConnection;
+import java.sql.Connection;
 
 //SSDataGridScreenHelper.java
 //
@@ -82,13 +82,13 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 *
 	 * @param _title		title of window
 	 * @param _parentID		parent ID used for record retrieval
-	 * @param _ssConnection 	database connection
+	 * @param _connection 	database connection
 	 * @param _contentPane	Container to which JInternalFrame containing SSDataGrid should be attached
 	 * @param _fullSQL		full SQL query for rowset
 	 * @param _selectSQL	SELECT clause for rowset such that selectSQL + parentID + " " + orderBySQL is a valid query
 	 * @param _orderBySQL	ORDER BY clause for rowset including at least a semicolon
 	 */
-	private SSDataGridScreenHelper(final String _title, final Long _parentID, final SSConnection _ssConnection, final Container _contentPane, final String _fullSQL,
+	private SSDataGridScreenHelper(final String _title, final Long _parentID, final Connection _connection, final Container _contentPane, final String _fullSQL,
 			final String _selectSQL, final String _orderBySQL) {
 
 		// CALL TO PARENT CONSTRUCTOR
@@ -97,7 +97,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			try {
 				// SET PARAMETERS
 				super.setParentID(_parentID);
-				setSSConnection(_ssConnection);
+				setConnection(_connection);
 				contentPane = _contentPane;
 				setFullSQL(_fullSQL);
 				setSelectSQL(_selectSQL);
@@ -121,14 +121,14 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 *
 	 * @param _title		title of window
 	 * @param _parentID		parent ID used for record retrieval
-	 * @param _ssConnection 	database connection
+	 * @param _connection 	database connection
 	 * @param _contentPane	Container to which JInternalFrame containing SSDataGrid should be attached
 	 * @param _fullSQL		full SQL query for rowset
 	 */
-	public SSDataGridScreenHelper(final String _title, final Long _parentID, final SSConnection _ssConnection,
+	public SSDataGridScreenHelper(final String _title, final Long _parentID, final Connection _connection,
 			final Container _contentPane, final String _fullSQL) {
 
-		this(_title, _parentID, _ssConnection, _contentPane, _fullSQL, null, null);
+		this(_title, _parentID, _connection, _contentPane, _fullSQL, null, null);
     }
 	
 	/**
@@ -137,15 +137,15 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 *
 	 * @param _title		title of window
 	 * @param _parentID		parent ID used for record retrieval
-	 * @param _ssConnection	database connection
+	 * @param _connection	database connection
 	 * @param _contentPane	Container to which JInternalFrame containing SSDataGrid should be attached
 	 * @param _selectSQL	SELECT clause for rowset such that selectSQL + parentID + " " + orderBySQL is a valid query
 	 * @param _orderBySQL	ORDER BY clause for rowset including at least a semicolon
 	 */
-	public SSDataGridScreenHelper(final String _title, final Long _parentID, final SSConnection _ssConnection, final Container _contentPane,
+	public SSDataGridScreenHelper(final String _title, final Long _parentID, final Connection _connection, final Container _contentPane,
 			final String _selectSQL, final String _orderBySQL) {
 		
-		this(_title, _parentID, _ssConnection, _contentPane, null, _selectSQL, _orderBySQL);
+		this(_title, _parentID, _connection, _contentPane, null, _selectSQL, _orderBySQL);
 	}
 	
 	/**
@@ -376,7 +376,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * @throws Exception exception thrown while initializing rowset
 	 */
 	private void initRowset() throws SQLException, Exception {
-		setRowset(new JdbcRowSetImpl(getSSConnection().getConnection()));
+		setRowset(new JdbcRowSetImpl(getConnection()));
 		updateRowset();
 	}
 	

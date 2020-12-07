@@ -51,7 +51,7 @@ import javax.swing.KeyStroke;
 
 import org.apache.logging.log4j.LogManager;
 
-import com.nqadmin.swingset.datasources.SSConnection;
+import java.sql.Connection;
 
 // SSComponentInterface.java
 //
@@ -292,12 +292,12 @@ public interface SSComponentInterface {
 	SSCommon getSSCommon();
 
 	/**
-	 * Returns the SSConnection to the database
+	 * Returns the Connection to the database
 	 *
-	 * @return the ssConnection
+	 * @return the connection
 	 */
-	default SSConnection getSSConnection() {
-		return getSSCommon().getSSConnection();
+	default Connection getConnection() {
+		return getSSCommon().getConnection();
 	}
 
 	/**
@@ -466,12 +466,12 @@ public interface SSComponentInterface {
 	void setSSCommon(SSCommon _ssCommon);
 
 	/**
-	 * Sets the SSConnection to the database
+	 * Sets the Connection to the database
 	 *
-	 * @param _ssConnection the ssConnection to set
+	 * @param _connection the connection to set
 	 */
-	default void setSSConnection(final SSConnection _ssConnection) {
-		getSSCommon().setSSConnection(_ssConnection);
+	default void setConnection(final Connection _connection) {
+		getSSCommon().setConnection(_connection);
 	}
 
 //	/**
