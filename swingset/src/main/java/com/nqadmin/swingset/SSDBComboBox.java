@@ -576,28 +576,29 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	}
 
 	/**
-	 * Removes the display text provided from the combobox and removes any
-	 * corresponding list items.
+	 * Removes the list item that has an option that equals the parameter.
 	 * <p>
-	 * If more than one item is present in the combo for the specified value, only
+	 * If more than one item is present in the combo that matches, only
 	 * the first one is removed.
 	 *
-	 * @param _displayText value of the item to be deleted.
+	 * @param _option list item with this option is deleted
 	 *
 	 * @return returns true on successful deletion otherwise returns false.
 	 */
-	public boolean deleteStringItem(final String _displayText) {
+	public boolean deleteStringItem(final Object _option) {
 
 		boolean result = false;
 
-		// TODO: javadoc says "list items" plural. Is that what's wanted.
 		try (Model.Remodel remodel = comboInfo.getRemodel()) {
-			final int index = remodel.getOptions().indexOf(_displayText);
-			result = deleteItem(index);
+			final int index = remodel.getOptions().indexOf(_option);
+			if (index != -1) {
+				remodel.remove(index);
+				result = true;
+			}
 		}
 
 		// if (options != null) {
-		// 	final int index = options.indexOf(_displayText);
+		// 	final int index = options.indexOf(_option);
 		// 	result = deleteItem(mappings.get(index));
 		// }
 
