@@ -193,6 +193,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	public static final int NON_SELECTED = Integer.MIN_VALUE + 1;
 
+	/** when null allowed, this is the null item. if null, not allowed */
+	private static SSListItem nullItem;
+
 	/**
 	 * Start with option2 disabled
 	 */
@@ -407,7 +410,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * <b>It is probably an error to use this.</b>
 	 * {@inheritDoc}
 	 */
-	// TODO: throw exception?
+	// TODO: throw exception? Is this safe?
 	@Override
 	public void setModel(ComboBoxModel<SSListItem> model) {
 		comboInfo = model instanceof Model ? (Model)model
@@ -963,9 +966,11 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			logger.debug("{}: Nulls allowed? [{}].", () -> getColumnForLog(), () -> getAllowNull());
 			// 2020-07-24: adding support for a nullable first item if nulls are supported
 			// 2020-10-02: For a SSDBComboBox used as a navigator, we don't want a null first item. Look at getBoundColumnName().
+			nullItem = null;
 			if (getAllowNull() && (getBoundColumnName()!=null)) {
 				logger.trace("{}: Adding blank list item", () -> getColumnForLog());
-				remodel.add(null, "");
+				nullItem = remodel.createComboItem(null, "", null);
+				remodel.add(nullItem);
 			}
 
 			Statement statement = ssCommon.getConnection().createStatement();
@@ -1156,6 +1161,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * @param eventList the eventList to set
+	 * @deprecated no replacement
 	 */
 	public void setEventList(final EventList<SSListItem> eventList) {
 		// TODO: what/how is this used?
@@ -1284,7 +1290,11 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				getEditor().selectAll(); // after we find a match, do a select all on the editor so if the user starts typing again it won't be appended
 				logger.debug("{}: Selected Index AFTER setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedIndex());
 			} else {
-				logger.debug("{}: No matching list item found so not updating. Current editor text is '{}'", () -> getColumnForLog(), () -> getEditor().getItem().toString());
+				if (nullItem != null) {
+					super.setSelectedItem(nullItem);
+				} else {
+					logger.debug("{}: No matching list item found so not updating. Current editor text is '{}'", () -> getColumnForLog(), () -> getEditor().getItem().toString());
+				}
 			}
 
 
