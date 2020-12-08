@@ -228,7 +228,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 								}
 								//final Integer linkID = (Integer)dataGrid.getValueAt(dataGrid.getSelectedRow(),_columns[i]);
 								try {
-									Runtime.getRuntime().exec(ssProps.getProperty("Browser") + " " + _urlPrefixesForColumns[i] + columnValue);
+									Runtime.getRuntime().exec(new String[] {ssProps.getProperty("Browser"), _urlPrefixesForColumns[i] + columnValue});
 								} catch (final IOException ioe) {
 									logger.error("IO Exception.", ioe);
 								}
@@ -246,7 +246,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 					if((column >= 0) && (_urlPrefixesForColumns.length > column)) {
 						final String url = _urlPrefixesForColumns[column] + columnValue;
 						try {
-							Runtime.getRuntime().exec(ssProps.getProperty("Browser") + " " + url);
+							Runtime.getRuntime().exec(new String[] {ssProps.getProperty("Browser"), url});
 						} catch (final IOException ioe) {
 							logger.error("IO Exception.", ioe);
 						}
