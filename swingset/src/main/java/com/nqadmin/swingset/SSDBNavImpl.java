@@ -112,6 +112,7 @@ public class SSDBNavImpl implements SSDBNav {
 	@Override
 	public void performPreInsertOps() {
 
+		logger.debug("About to call setComponents() to clear values.");
 		setComponents(container);
 
 	} // end public void performPreInsertOps() {
