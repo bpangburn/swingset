@@ -299,19 +299,27 @@ public class AbstractComboBoxListSwingModelTest {
 			assertTrue(getElemEquals(elems, testItemIndex, remodel));
 
 			SSListItem testItem = linfo.createListItem((Object[])elems);
-			SSListItem getItem = remodel.get(testItemIndex);
-			assertTrue(testItem.equals(getItem));
+			SSListItem originalListItem = remodel.get(testItemIndex);
+			assertTrue(testItem.equals(originalListItem));
 
 			int modElemIndex = 2 % nElem;
 			// create a testItem that won't match what's in the item list
 			elems[modElemIndex] = 99;
 			testItem = linfo.createListItem((Object[])elems);
-			assertFalse(testItem.equals(getItem));
+			assertFalse(testItem.equals(originalListItem));
 
 			// modify the element in the list item, should match now
 			// note, using the same reference for item in the list
 			remodel.setElem(testItemIndex, modElemIndex, 99);
-			assertTrue(testItem.equals(getItem));
+			// should be a clone, so must refetch
+			SSListItem newListItem = remodel.get(testItemIndex);
+			assertTrue(testItem.equals(newListItem));
+
+			// try the clone directly
+			SSListItem cloneListItem = linfo.getClone(newListItem);
+			assertTrue(newListItem.equals(cloneListItem));
+			assertTrue(newListItem != cloneListItem);
+
 
 			// change the item to 70,71,72,73
 			for (int i = 0; i < nElem; i++) {
