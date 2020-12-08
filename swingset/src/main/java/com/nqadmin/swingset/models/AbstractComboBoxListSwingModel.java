@@ -48,15 +48,14 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
 
-import javax.swing.AbstractListModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import javax.swing.MutableComboBoxModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
@@ -115,6 +114,23 @@ import org.apache.logging.log4j.Logger;
  *		for use with GlazedLists AutoComplete feature
  * @since 4.0.0
  */
+//
+// There is an issue that arises from modifying the contents of a list item;
+// in this case, the list itself is not modified. There is a fireContentsChanged
+// event. This all is good when this is used as a model in a JComponent.
+// The setElem method is the only one that would modify a list item in place.
+//
+// However, when this is used to mangage a GlazedList, there is no event
+// listener. Glazed listens to changes in the EventList which this manages.
+// When working on a glazed list, a newListItem must be created and then
+// list.set(index, newListItem) and that notifies the event list. Note that
+// it is generally insufficient to do something like
+//     listItem = list.get(index)
+//     modify-listItem
+//     list.set(index, listItem)
+// becase if the set is optimized by currentListItem.equals(setListItem)
+// that will say that nothing is changed. So must create a new list item.
+// 
 public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxModel<SSListItem> {
 	private static final long serialVersionUID = 1L;
 
@@ -122,6 +138,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	private boolean comboBoxModel;
 	/** this has been installed into a JComponent */
 	private boolean installed;
+	/** do not modify list items in place, create new use set */
+	private final boolean modifyListItemWithSet = true;
 	
 	/**
 	 * Log4j Logger for component
@@ -815,12 +833,36 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	 */
 	// NOTE: setElem(listItem, elemIndex, newElem)
 	// is a problem because need listitemindex for fireContentsChanged
+	// Could just fire everything changed if that's needed,
+	// but what about glazed lists...
 	private Object setElem(int _listItemIndex, int _elemIndex, Object _newElem) {
-		SSListItem listItem = itemList.get(_listItemIndex);
-		Object oldElem = ((ListItemWrite0)listItem).getElem(_elemIndex);
-		((ListItemWrite0)listItem).setElem(_elemIndex, _newElem);
+		ListItemWrite0 listItem = (ListItemWrite0) itemList.get(_listItemIndex);
+		if (modifyListItemWithSet) {
+			try {
+				listItem = (ListItemWrite0) listItem.clone();
+			} catch (CloneNotSupportedException ex) {
+			}
+		}
+		Object oldElem = listItem.getElem(_elemIndex);
+		listItem.setElem(_elemIndex, _newElem);
+		if (modifyListItemWithSet) {
+			itemList.set(_listItemIndex, listItem);
+		}
 		fireContentsChanged(this, _listItemIndex, _listItemIndex);
 		return oldElem;
+	}
+	
+	/**
+	 * for testing 
+	 * @param _listItem clone this
+	 * @return clone
+	 */
+	SSListItem getClone(SSListItem _listItem) {
+		try {
+			return (SSListItem) ((ListItemWrite0)_listItem).clone();
+		} catch (CloneNotSupportedException ex) {
+		}
+		return null;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -1239,9 +1281,10 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		 * @return the object from the SSListItem
 		 */
 		Object getElem(int index);
+		Object clone() throws CloneNotSupportedException;
 	}
 
-	private interface ListItemWrite0 extends ListItem0 {
+	private interface ListItemWrite0 extends ListItem0, Cloneable {
 		/**
 		 * Put an object into the SSListItem.
 		 * @param index which item to set
@@ -1267,7 +1310,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	/**
 	 * An SSListItem with 1 Objects.
 	 */
-	private static class ListItem1 implements ListItemWrite0 {
+	private static class ListItem1 implements ListItemWrite0, Cloneable {
 		Object arg0;
 
 		public ListItem1(Object[] elems) {
@@ -1323,12 +1366,17 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 			return true;
 		}
 
+		@Override
+		public Object clone() throws CloneNotSupportedException {
+			return super.clone();
+		}
+
 	}
 
 	/**
 	 * An SSListItem with 2 Objects.
 	 */
-	private static class ListItem2 implements ListItemWrite0 {
+	private static class ListItem2 implements ListItemWrite0, Cloneable {
 		Object arg0;
 		Object arg1;
 
@@ -1391,12 +1439,17 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 			return true;
 		}
 
+		@Override
+		public Object clone() throws CloneNotSupportedException {
+			return super.clone();
+		}
+
 	}
 
 	/**
 	 * An SSListItem with 3 Objects.
 	 */
-	private static class ListItem3 implements ListItemWrite0 {
+	private static class ListItem3 implements ListItemWrite0, Cloneable {
 		Object arg0;
 		Object arg1;
 		Object arg2;
@@ -1465,11 +1518,17 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 			}
 			return true;
 		}
+
+		@Override
+		public Object clone() throws CloneNotSupportedException {
+			return super.clone();
+		}
+
 	}
 
 	// This can be used for an arbitrary, but fixed, number of items
 	// in an SSListItem. Typically 4 or more items.
-	private static class ListItemAsArray implements ListItemWrite0 {
+	private static class ListItemAsArray implements ListItemWrite0, Cloneable {
 		Object[] elems;
 
 		public ListItemAsArray(Object [] elems) {
@@ -1516,6 +1575,11 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 			return true;
 		}
 
-
+		@Override
+		public Object clone() throws CloneNotSupportedException {
+			 ListItemAsArray clone = (ListItemAsArray) super.clone();
+			 clone.elems = elems.clone();
+			 return clone;
+		}
 	}
 }
