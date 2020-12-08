@@ -162,6 +162,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		 */
 		private static final long serialVersionUID = 5078725576768393489L;
 
+		/** {@inheritDoc} */
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 
@@ -272,6 +273,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Map of string/value pairings for the ComboBox (generally the text to be
 	 * display (SSListItem) and its corresponding primary key)
+	 * @deprecated can't use
 	 */
 	protected EventList<SSListItem> eventList;
 
@@ -357,11 +359,12 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	protected final SSDBComboBoxListener ssDBComboBoxListener = new SSDBComboBoxListener();
 
-	private static final boolean useGlazedModel = true;
+	private final boolean useGlazedModel = true;
 
 	/**
 	 * Creates an object of the SSDBComboBox.
 	 */
+	@SuppressWarnings("LeakingThisInConstructor")
 	public SSDBComboBox() {
 		// Note that call to parent default constructor is implicit.
 		//super();
@@ -386,6 +389,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _displayColumnName    column name whose values are displayed in the
 	 *                              combo box.
 	 */
+	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSDBComboBox(final Connection _connection, final String _query,
 			final String _primaryKeyColumnName, final String _displayColumnName) {
 		this();
@@ -400,7 +404,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * 
 	 * @return the support or null if GlazedLists not installed
 	 */
-	private AutoCompleteSupport<SSListItem> getAutoComplete() {
+	protected AutoCompleteSupport<SSListItem> getAutoComplete() {
 		return comboInfo instanceof GlazedModel
 				? ((GlazedModel)comboInfo).autoComplete
 				: null;
@@ -422,22 +426,35 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	/**
 	 * Adds an item to the existing list of items in the combo box.
 	 *
+	 * @param _option text that should be displayed in the combobox
+	 * @param _mapping  mapping of _option, typically a primary key
+	 */
+	public void addOption(String _option, Long _mapping) {
+		try (Model.Remodel remodel = comboInfo.getRemodel()) {
+			remodel.add(_mapping, _option);
+		} catch (final Exception e) {
+			logger.error(getColumnForLog() + ": Exception.", e);
+		}
+		// try (Model.Remodel remodel = comboInfo.getRemodel()) {
+		// 	remodel.add(_primaryKey, _displayText);
+		// } catch (final Exception e) {
+		// 	logger.error(getColumnForLog() + ": Exception.", e);
+		// }
+
+	}
+
+	/**
+	 * Adds an item to the existing list of items in the combo box.
+	 *
 	 * @param _displayText text that should be displayed in the combobox
 	 * @param _primaryKey  primary key value corresponding the the display text
-	 * @deprecated no replacement
+	 * @deprecated use {@link #addOption(java.lang.String, java.lang.Long) }
 	 */
-	//
-	// Introduce setOptions(List options, List mappings) if functionality needed
-	//
 	public void addItem(final String _displayText, final long _primaryKey) {
 
 		// TODO Determine if any change is needed to actually add item to combobox.
 
-		try (Model.Remodel remodel = comboInfo.getRemodel()) {
-			remodel.add(_primaryKey, _displayText);
-		} catch (final Exception e) {
-			logger.error(getColumnForLog() + ": Exception.", e);
-		}
+		addOption(_displayText, _primaryKey);
 
 		// // LOCK EVENT LIST
 		// eventList.getReadWriteLock().writeLock().lock();
@@ -486,11 +503,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 *
 	 * @param _name  name that should be displayed in the combo
 	 * @param _value value corresponding the the name
-	 * @deprecated in favor of addItem
+	 * @deprecated use {@link #addOption(java.lang.String, java.lang.Long) }
 	 */
-	//
-	// Introduce setOptions(List options, List mappings) if functionality needed
-	//
 	@Deprecated
 	protected void addStringItem(final String _name, final String _value) {
 		addItem(_name, Long.valueOf(_value));
@@ -514,25 +528,23 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	}
 
 	/**
-	 * Removes an item from the combobox and underlying lists based on the record
-	 * primary key provided.
+	 * Removes an item from the combobox's item list where the
+	 * list item's mapping equals the param.
 	 * <p>
 	 * If more than one item is present in the combo for that value the first one is
 	 * changed.
 	 *
-	 * @param _primaryKey primary key value for the item that should be removed
+	 * @param _mapping mapping value for the item that should be removed
 	 *
 	 * @return returns true on successful deletion otherwise returns false.
 	 */
-	public boolean deleteItem(final long _primaryKey) {
-
-		// TODO Determine if any change is needed to actually remove item from combobox.
+	public boolean removeMapping(final Long _mapping) {
 
 		boolean result = false;
 
 		try (Model.Remodel remodel = comboInfo.getRemodel()) {
 			// GET INDEX FOR mappings and options
-			int index = remodel.getMappings().indexOf(_primaryKey);
+			int index = remodel.getMappings().indexOf(_mapping);
 			// PROCEED IF INDEX WAS FOUND
 			if (index != -1) {
 				remodel.remove(index);
@@ -543,6 +555,22 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		}
 
 		return result;
+	}
+
+	/**
+	 * Removes an item from the combobox and underlying lists based on the record
+	 * primary key provided.
+	 *
+	 * @param _primaryKey primary key value for the item that should be removed
+	 *
+	 * @return returns true on successful deletion otherwise returns false.
+	 * @deprecated use {@link #removeMapping(java.lang.Long) }
+	 */
+	public boolean deleteItem(final long _primaryKey) {
+		return removeMapping(_primaryKey);
+
+		// TODO Determine if any change is needed to actually remove item from combobox.
+
 
 //		if (eventList != null) {
 //
@@ -584,25 +612,27 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _option list item with this option is deleted
 	 *
 	 * @return returns true on successful deletion otherwise returns false.
+	 * @deprecated no replacement, throws exception
 	 */
 	public boolean deleteStringItem(final Object _option) {
+		throw new UnsupportedOperationException();
 
-		boolean result = false;
+		//boolean result = false;
 
-		try (Model.Remodel remodel = comboInfo.getRemodel()) {
-			final int index = remodel.getOptions().indexOf(_option);
-			if (index != -1) {
-				remodel.remove(index);
-				result = true;
-			}
-		}
+		//try (Model.Remodel remodel = comboInfo.getRemodel()) {
+		//	final int index = remodel.getOptions().indexOf(_option);
+		//	if (index != -1) {
+		//		remodel.remove(index);
+		//		result = true;
+		//	}
+		//}
 
-		// if (options != null) {
-		// 	final int index = options.indexOf(_option);
-		// 	result = deleteItem(mappings.get(index));
-		// }
+		//// if (options != null) {
+		//// 	final int index = options.indexOf(_option);
+		//// 	result = deleteItem(mappings.get(index));
+		//// }
 
-		return result;
+		//return result;
 
 	}
 
@@ -662,11 +692,13 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * @return the eventList
+	 * @deprecated no replacement
 	 */
 	// TODO: public method? Why? How/where used.
 	//		Make private, see what happens
-	private EventList<SSListItem> getEventList() {
-		return eventList;
+	protected EventList<SSListItem> getEventList() {
+		throw new UnsupportedOperationException();
+		//return eventList;
 	}
 
 	/**
@@ -683,7 +715,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// returning 0
 		// TODO Remove completely from future release.
 
-		logger.warn(getColumnForLog() + ": This method was never properly implemented so it has been Deprecated and just returns 0. \n" + Thread.currentThread().getStackTrace());
+		logger.warn(getColumnForLog() + ": This method was never properly implemented so it has been Deprecated and just returns 0. \n", new Exception());
 		return 0;
 	}
 
@@ -810,10 +842,12 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	public Long getSelectedValue() {
 		
 		// TODO Consider overriding getSelectedIndex() to account for GlazedList impact
+
+		// TODO Leaking NON_SELECTED. Use null? Use -1? Use Long.MIN_VALUE?
 		
 		logger.trace("{}: Call to getSelectedValue().", () -> getColumnForLog());
 
-		Long result = null;
+		Long result;
 
 		// 2020-10-03_BP: getSelectedValue() seems to be the root of problems with filtered/glazed lists.
 		// When filtering is taking place, getSelectedIndex() returns -1
@@ -949,7 +983,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //	}
 
 	private boolean hasOption2() {
-		return secondDisplayColumnName != null && !secondDisplayColumnName.equals("");
+		return secondDisplayColumnName != null && !secondDisplayColumnName.isEmpty();
 	}
 
 	/**
@@ -1182,7 +1216,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	public void setFilterable(final boolean _filter) {
 		// TODO remove this method in future release
 		filterSwitch = _filter;
-		logger.warn(getColumnForLog() + ": This method has been Deprecated because GlazedList filtering is now fully integrated.\n" + Thread.currentThread().getStackTrace());
+		logger.warn(getColumnForLog() + ": This method has been Deprecated because GlazedList filtering is now fully integrated.\n", new Exception());
 	}
 
 	/**
@@ -1305,7 +1339,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			selectedItem = null;
 		}
 
-		return;
+		//return;
+
 //		// DECLARATIONS
 //		String currentEditorText = "";
 //		int possibleMatches;
@@ -1549,6 +1584,44 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	}
 
 	/**
+	 * Update an option of an item in the combobox's item list.
+	 * <p>
+	 * If more than one item is present in the combo for that value, only the first
+	 * one is changed.
+	 * <p>
+	 * NOTE: To retain changes made to current RowSet call updateRow before
+	 * calling the updateItem on SSDBComboBox. (Only if you are using the
+	 * SSDBComboBox and SSDataNavigator for navigation in the screen. If you are not
+	 * using the SSDBComboBox for navigation then no need to call updateRow on the
+	 * RowSet. Also if you are using only SSDBComboBox for navigation you need not
+	 * call the updateRow.)
+	 *
+	 * @param _mapping         typically a primary key value corresponding the
+	 *                         the displayed option to be updated
+	 * @param _option option that should be updated in the combobox
+	 *
+	 * @return returns true if update is successful otherwise returns false.
+	 */
+	public boolean updateOption(final Long _mapping, final String _option) {
+
+		boolean result = false;
+
+		try (Model.Remodel remodel = comboInfo.getRemodel()) {
+			final int index = remodel.getMappings().indexOf(_mapping);
+			if (index < 0) {
+				remodel.setOption(index, _option);
+				result = true;
+// TODO Confirm that eventList is not reordered by GlazedLists code.
+			}
+// TODO may need to call repaint()
+		} catch (final Exception e) {
+			logger.error(getColumnForLog() + ": Exception.", e);
+		}
+
+		return result;
+	}
+
+	/**
 	 * Updates an item available in the combobox and associated lists.
 	 * <p>
 	 * If more than one item is present in the combo for that value, only the first
@@ -1566,24 +1639,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _updatedDisplayText text that should be updated in the combobox
 	 *
 	 * @return returns true if update is successful otherwise returns false.
+	 * @deprecated use {@link #updateOption(java.lang.Long, java.lang.String) }
 	 */
 	public boolean updateItem(final long _primaryKey, final String _updatedDisplayText) {
-
-		boolean result = false;
-
-		try (Model.Remodel remodel = comboInfo.getRemodel()) {
-			final int index = remodel.getMappings().indexOf(_primaryKey);
-			if (index < 0) {
-				remodel.setOption(index, _updatedDisplayText);
-				result = true;
-// TODO Confirm that eventList is not reordered by GlazedLists code.
-			}
-// TODO may need to call repaint()
-		} catch (final Exception e) {
-			logger.error(getColumnForLog() + ": Exception.", e);
-		}
-
-		return result;
+		return updateOption(_primaryKey, _updatedDisplayText);
 
 // 		if (eventList != null) {
 // 
@@ -1710,22 +1769,24 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * @param _updatedDisplayText  text that should be updated in the combobox
 	 *
 	 * @return returns true if successful otherwise returns false.
+	 * @deprecated use {@link #updateOption(java.lang.Long, java.lang.String) }
 	 */
 	public boolean updateStringItem(final String _existingDisplayText, final String _updatedDisplayText) {
+		throw new UnsupportedOperationException();
 
-		boolean result = false;
+		// boolean result;
 
-		try (Model.Remodel remodel = comboInfo.getRemodel()) {
-			final int index = remodel.getOptions().indexOf(_existingDisplayText);
-			result = updateItem(remodel.getMapping(index), _updatedDisplayText);
-		}
+		// try (Model.Remodel remodel = comboInfo.getRemodel()) {
+		// 	final int index = remodel.getOptions().indexOf(_existingDisplayText);
+		// 	result = updateItem(remodel.getMapping(index), _updatedDisplayText);
+		// }
 
-		//if (options != null) {
-		//	final int index = options.indexOf(_existingDisplayText);
-		//	result = updateItem(mappings.get(index), _updatedDisplayText);
-		//}
+		// //if (options != null) {
+		// //	final int index = options.indexOf(_existingDisplayText);
+		// //	result = updateItem(mappings.get(index), _updatedDisplayText);
+		// //}
 
-		return result;
+		// return result;
 	}
 
 } // end public class SSDBComboBox
