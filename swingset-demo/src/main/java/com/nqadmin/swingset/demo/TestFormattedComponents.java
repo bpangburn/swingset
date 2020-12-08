@@ -220,6 +220,7 @@ public class TestFormattedComponents extends JFrame {
 				@Override
 				public void performPreInsertOps() {
 
+					// SSDBNavImpl will clear the component values
 					super.performPreInsertOps();
 
 					setDefaultValues();
@@ -401,16 +402,16 @@ public class TestFormattedComponents extends JFrame {
 			rs.close();
 
 		// SET OTHER DEFAULTS
-			fmtSSCuitField.setText(null);
-			fmtSSCurrencyField.setText(null);
-			fmtSSDateField.setText(null);
-			fmtSSFormattedTextField.setText(null);
-			fmtSSIntegerField.setText(null);
-			fmtSSNumericField.setText(null);
-			fmtSSPercentField.setText(null);
-			fmtSSSSNField.setText(null);
-			fmtSSTimeField.setText(null);
-			fmtSSTimestampField.setText(null);
+//			fmtSSCuitField.setText(null);
+//			fmtSSCurrencyField.setText(null);
+//			fmtSSDateField.setText(null);
+//			fmtSSFormattedTextField.setText(null);
+//			fmtSSIntegerField.setText(null);
+//			fmtSSNumericField.setText(null);
+//			fmtSSPercentField.setText(null);
+//			fmtSSSSNField.setText(null);
+//			fmtSSTimeField.setText(null);
+//			fmtSSTimestampField.setText(null);
 
 		} catch(final SQLException se) {
 			logger.error("SQL Exception occured during setting default values.",se);

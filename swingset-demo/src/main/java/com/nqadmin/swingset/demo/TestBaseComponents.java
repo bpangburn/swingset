@@ -286,6 +286,7 @@ public class TestBaseComponents extends JFrame {
 				@Override
 				public void performPreInsertOps() {
 
+					// SSDBNavImpl will clear the component values
 					super.performPreInsertOps();
 
 					setDefaultValues();
@@ -506,17 +507,17 @@ public class TestBaseComponents extends JFrame {
 			rs.close();
 
 		// SET OTHER DEFAULTS
-			chkSSCheckBox.setSelected(false);
-			cmbSSComboBox.setSelectedIndex(-1);
-			cmbEnumSSComboBox.setSelectedIndex(-1);
-			cmbSSDBComboBox.setSelectedIndex(-1);
-			imgSSImage.clearImage();
-			lblSSLabel2.setText(null);
-			lstSSList.clearSelection();
+//			chkSSCheckBox.setSelected(false);
+//			cmbSSComboBox.setSelectedIndex(-1);
+//			cmbEnumSSComboBox.setSelectedIndex(-1);
+//			cmbSSDBComboBox.setSelectedIndex(-1);
+//			imgSSImage.clearImage();
+//			lblSSLabel2.setText(null);
+//			lstSSList.clearSelection();
 // TODO determine range for slider, 0 was not accepted
-			sliSSSlider.setValue(1);
-			txtSSTextArea.setText(null);
-			txtSSTextField.setText(null);
+//			sliSSSlider.setValue(1);
+//			txtSSTextArea.setText(null);
+//			txtSSTextField.setText(null);
 
 		} catch(final SQLException se) {
 			logger.error("SQL Exception occured during setting default values.",se);

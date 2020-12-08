@@ -255,7 +255,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	protected void setDefaultValues() throws Exception {
 		//txtPartName.setText(null);
 		//cmbPartColor.setSelectedValue(0);
-		txtPartWeight.setText("0");
+		//txtPartWeight.setText("0");
 		//txtPartCity.setText(null);
 	}
 

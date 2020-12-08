@@ -172,6 +172,7 @@ public class Example2 extends JFrame {
 			@Override
 			public void performPreInsertOps() {
 
+				// SSDBNavImpl will clear the component values
 				super.performPreInsertOps();
 
 				try {
@@ -186,9 +187,9 @@ public class Example2 extends JFrame {
 					rs.close();
 
 				// SET OTHER DEFAULTS
-					 txtSupplierName.setText(null);
-					 txtSupplierCity.setText(null);
-					 cmbSupplierStatus.setSelectedValue(0);
+//					 txtSupplierName.setText(null);
+//					 txtSupplierCity.setText(null);
+//					 cmbSupplierStatus.setSelectedValue(0);
 
 				} catch(final SQLException se) {
 					logger.error("SQL Exception occured initializing new record.",se);

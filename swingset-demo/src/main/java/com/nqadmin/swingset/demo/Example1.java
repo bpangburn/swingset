@@ -184,9 +184,9 @@ public class Example1 extends JFrame {
 					rs.close();
 
 				// SET OTHER DEFAULTS
-					 txtSupplierName.setText(null);
-					 txtSupplierCity.setText(null);
-					 txtSupplierStatus.setText("0");
+//					 txtSupplierName.setText(null);
+//					 txtSupplierCity.setText(null);
+//					 txtSupplierStatus.setText("0");
 
 				} catch(final SQLException se) {
 					logger.error("SQL Exception occured initializing new record.", se);
