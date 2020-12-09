@@ -48,7 +48,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -191,7 +190,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	 * and slices that are now active are marked valid.
 	 * Keep a weakreference so they can go away gracefully.
 	 */
-	private List<WeakReference<ItemElementSlice>> createdLists = new ArrayList<>();
+	private final List<WeakReference<ItemElementSlice>> createdLists = new ArrayList<>();
 
 	/**
 	 * The constructor to create SSListItem
@@ -386,6 +385,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	// ListModel
 
+	/** {@inheritDoc } */
 	@Override
 	public int getSize() {
 		try (Remodel remodel = getRemodel()) {
@@ -393,6 +393,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		}
 	}
 
+	/** {@inheritDoc } */
 	@Override
 	public SSListItem getElementAt(int index) {
 		try (Remodel remodel = getRemodel()) {
@@ -413,6 +414,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	private SSListItem selectedObject;
 
+	/** {@inheritDoc } */
 	@Override
 	public void setSelectedItem(Object anItem) {
 		// TODO: exception if not combo?
@@ -430,6 +432,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		}
 	}
 
+	/** {@inheritDoc } */
 	@Override
 	public SSListItem getSelectedItem() {
 		// TODO: exception if not combo?
@@ -440,6 +443,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	//		NOTE the helper methods for keeping selection
 	//			comboAdjustSelectedAfterAdd and comboAdjustSelectedForRemove
 
+	/** {@inheritDoc } */
 	@Override
 	public void addElement(SSListItem item) {
 		try (Remodel remodel = getRemodel()) {
@@ -447,6 +451,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		}
 	}
 
+	/** {@inheritDoc } */
 	@Override
 	public void insertElementAt(SSListItem item, int index) {
 		try (Remodel remodel = getRemodel()) {
@@ -454,6 +459,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		}
 	}
 
+	/** {@inheritDoc } */
 	@Override
 	public void removeElement(Object obj) {
 		try (Remodel remodel = getRemodel()) {
@@ -464,6 +470,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		}
 	}
 
+	/** {@inheritDoc } */
 	@Override
 	public void removeElementAt(int index) {
 		try (Remodel remodel = getRemodel()) {
@@ -475,6 +482,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	/** {@inheritDoc } */
 	// @Override not in jdk1.8
+	@SuppressWarnings("override")
 	public void addAll(int index, Collection<? extends SSListItem> c) {
 		try (Remodel remodel = getRemodel()) {
 			remodel.addAll(index, c);
@@ -483,6 +491,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	/** {@inheritDoc } */
 	// @Override not in jdk1.8
+	@SuppressWarnings("override")
 	public void addAll(Collection<? extends SSListItem> c) {
 		try (Remodel remodel = getRemodel()) {
 			remodel.addAll(c);
@@ -665,9 +674,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	 * @return state info
 	 */
 	SliceInfo sliceInfo(List<Object> l) {
-		ItemElementSlice slice = null;
 		if(l instanceof ItemElementSlice) {
-			slice = (ItemElementSlice) l;
+			ItemElementSlice slice = (ItemElementSlice) l;
 			return new SliceInfo(slice.elemIndex, slice.isValid);
 		}
 		return null;
@@ -921,24 +929,26 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	}
 
 	/**
-	 * Create a list slice of the item list. There is no checking on the
-	 * element index.
-	 * <p>
+	 * Create a list slice of the item list.There is no checking on the
+ element index.<p>
 	 * If a returned element slice is not valid according to the
 	 * itemNumElems property, {@link #setItemNumElems},
 	 * then an attempt to use that slice
 	 * causes an exception. An element slice becomes valid/invalid
 	 * dynamically as itemNumElems changes.
+	 * @param <T> list type
 	 * @param elemIndex position in {@code SSListItem} of elements
 	 * @return list of elements at the specified position
 	 */
-	protected List<Object> createElementSlice(int elemIndex) {
+	protected <T>List<T> createElementSlice(int elemIndex) {
 		if (elemIndex < 0) {
 			throw new IllegalArgumentException("elemIndex must be positive");
 		}
 		ItemElementSlice el = new ItemElementSlice(elemIndex);
 		createdLists.add(new WeakReference<>(el));
-		return el;
+		@SuppressWarnings("unchecked")
+		List<T> l = (List<T>) el;
+		return l;
 	}
 
 	/**
@@ -968,7 +978,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	 * @return a list disconnected from the item list.
 	 */
 	public <T> List<T> getDisconnectedList(List<T> list) {
-		return hasShadow(list) ? new ArrayList<T>(list) : list;
+		return hasShadow(list) ? new ArrayList<>(list) : list;
 	}
 
 	/**
@@ -1050,7 +1060,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		// protected boolean isModifiedLength = false;
 
 		/**
-		 * This is invoked during construction.
+		 * This is invoked during construction, be careful.
 		 * If there is no locking, implement an empty method
 		 */
 		protected abstract void takeWriteLock();
@@ -1062,6 +1072,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		protected abstract void releaseWriteLock();
 
 		/** a Remodel */
+		@SuppressWarnings("OverridableMethodCallInConstructor")
 		protected Remodel() {
 			takeWriteLock();
 		}
@@ -1281,6 +1292,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		 * @return the object from the SSListItem
 		 */
 		Object getElem(int index);
+		/** {@inheritDoc } */
 		Object clone() throws CloneNotSupportedException;
 	}
 
@@ -1360,10 +1372,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 				return false;
 			}
 			final ListItem1 other = (ListItem1) obj;
-			if (!Objects.equals(this.arg0, other.arg0)) {
-				return false;
-			}
-			return true;
+			return Objects.equals(this.arg0, other.arg0);
 		}
 
 		@Override
@@ -1433,10 +1442,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 			if (!Objects.equals(this.arg0, other.arg0)) {
 				return false;
 			}
-			if (!Objects.equals(this.arg1, other.arg1)) {
-				return false;
-			}
-			return true;
+			return Objects.equals(this.arg1, other.arg1);
 		}
 
 		@Override
@@ -1476,9 +1482,11 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		@Override
 		public void setElem(int index, Object object) {
 			checkIndex(index);
-			if (index == 0)		 arg0 = object;
-			else if (index == 1) arg1 = object;
-			else				 arg2 = object;
+			switch (index) {
+			case 0:  arg0 = object; break;
+			case 1:  arg1 = object; break;
+			default: arg2 = object; break;
+			}
 		}
 
 		@Override
@@ -1513,10 +1521,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 			if (!Objects.equals(this.arg1, other.arg1)) {
 				return false;
 			}
-			if (!Objects.equals(this.arg2, other.arg2)) {
-				return false;
-			}
-			return true;
+			return Objects.equals(this.arg2, other.arg2);
 		}
 
 		@Override
@@ -1569,10 +1574,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 				return false;
 			}
 			final ListItemAsArray other = (ListItemAsArray) obj;
-			if (!Arrays.deepEquals(this.elems, other.elems)) {
-				return false;
-			}
-			return true;
+			return Arrays.deepEquals(this.elems, other.elems);
 		}
 
 		@Override

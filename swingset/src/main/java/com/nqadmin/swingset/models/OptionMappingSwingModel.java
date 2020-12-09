@@ -113,8 +113,9 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	 * @param sliceIndex elem index in SSListItem
 	 * @return the slice for the specified elem
 	 */
-	private List<?> getSlice(int sliceIndex) {
-		List<?> slice = slices[sliceIndex];
+	private <T>List<T> getSlice(int sliceIndex) {
+		@SuppressWarnings("unchecked")
+		List<T> slice = (List<T>) slices[sliceIndex];
 		if (slice == null) {
 			slice = createElementSlice(sliceIndex);
 			slices[sliceIndex] = slice;
@@ -126,17 +127,15 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	/**
 	 * @return unmodifiable list of mappings
 	 */
-	@SuppressWarnings("unchecked")
 	public List<M> getMappings() {
-		return (List)getSlice(KEY_IDX);
+		return getSlice(KEY_IDX);
 	}
 	
 	/**
 	 * @return unmodifiable list of options
 	 */
-	@SuppressWarnings("unchecked")
 	public List<O> getOptions() {
-		return (List)getSlice(OPT_IDX);
+		return getSlice(OPT_IDX);
 	}
 	
 	/**
@@ -144,7 +143,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	 */
 	@SuppressWarnings("unchecked")
 	public List<O2> getOptions2() {
-		return (List)getSlice(OPT2_IDX);
+		return getSlice(OPT2_IDX);
 	}
 	
 	/**
@@ -224,9 +223,15 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 			throw new IllegalArgumentException("Lists must be the same size");
 		}
 		List<SSListItem> optionItems = new ArrayList<>();
-		for (int i = 0; i < _mappings.size(); i++) {
-			optionItems.add(createOptionItem(_mappings.get(i), _options.get(i),
-					option2Enabled ? _options2.get(i) : null));
+		if(option2Enabled && _options2 != null) {
+			for (int i = 0; i < _mappings.size(); i++) {
+				optionItems.add(createOptionItem(_mappings.get(i), _options.get(i),
+						_options2.get(i)));
+			}
+		} else {
+			for (int i = 0; i < _mappings.size(); i++) {
+				optionItems.add(createOptionItem(_mappings.get(i), _options.get(i), null));
+			}
 		}
 		return optionItems;
 	}
@@ -265,6 +270,11 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 		return OPT2_IDX;
 	}
 
+	/**
+	 * Get object to make changes.
+	 * @return Remodel
+	 * @see Remodel
+	 */
 	@Override
 	public Remodel getRemodel() {
 		return new Remodel();
@@ -274,7 +284,9 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	public class Remodel extends AbstractComboBoxListSwingModel.Remodel {
 
 		// no locking by default
+		/** {@inheritDoc} */
 		@Override protected void takeWriteLock() { }
+		/** {@inheritDoc} */
 		@Override protected void releaseWriteLock() { }
 		
 		/**
