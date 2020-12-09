@@ -845,7 +845,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		// TODO Leaking NON_SELECTED. Use null? Use -1? Use Long.MIN_VALUE?
 		
-		logger.trace("{}: Call to getSelectedValue().", () -> getColumnForLog());
+		logger.trace(String.format("%s: getSelectedValue(), fromSet %b:%s, selectedIndex %d.",
+				getColumnForLog(), settingSelectedItem, selectedItem, getSelectedIndex()));
 
 		Long result = null;
 
@@ -1294,6 +1295,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	@Override
 	public void setSelectedItem(final Object _value) {
+		logger.debug(() -> String.format("%s: setSelectedItem(%s), allowNull? %b",
+				getColumnForLog(), _value, getAllowNull()));
 
 // TODO Need to deal with null on focus lost event. SSDBComboListener.actionPerformed setting bound column to  null when focus lost.
 
@@ -1304,7 +1307,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		try {
 
 // NOTE THAT CALLING setSelectedIndex(-1) IN THIS METHOD CAUSES  CYCLE HERE BECAUSE setSelectedIndex() CALLS setSelectedItem()
-		logger.debug("{}: Selected Item=" + _value, () -> getColumnForLog());
 
 //		logger.debug("{}: Selected Index BEFORE hidePopup()={}", () -> getColumnForLog(), () -> getSelectedIndex());
 //

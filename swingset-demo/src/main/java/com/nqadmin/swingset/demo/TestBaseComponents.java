@@ -185,7 +185,9 @@ public class TestBaseComponents extends JFrame {
 	/**
 	 * combo navigator and sync manger
 	 */
-	SSDBComboBox cmbSSDBComboNav = new SSDBComboBox(); // SSDBComboBox used just for navigation
+	// TODO: this gets set again, why set it here? listeners?
+	//SSDBComboBox cmbSSDBComboNav = new SSDBComboBox(); // SSDBComboBox used just for navigation
+	final SSDBComboBox cmbSSDBComboNav; // SSDBComboBox used just for navigation
 	SSSyncManager syncManager;
 
 	/**
@@ -315,6 +317,7 @@ public class TestBaseComponents extends JFrame {
 			// SETUP NAVIGATOR QUERY
 				final String query = "SELECT * FROM swingset_base_test_data;";
 				cmbSSDBComboNav = new SSDBComboBox(connection, query, "swingset_base_test_pk", "swingset_base_test_pk");
+				cmbSSDBComboNav.setLogColumnName("combo_nav");
 
 				try {
 					cmbSSDBComboNav.execute();
