@@ -847,28 +847,36 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		
 		logger.trace("{}: Call to getSelectedValue().", () -> getColumnForLog());
 
-		Long result;
+		Long result = null;
 
 		// 2020-10-03_BP: getSelectedValue() seems to be the root of problems with filtered/glazed lists.
 		// When filtering is taking place, getSelectedIndex() returns -1
 
 		// Determine if the call to getSelectedValue() is happening during a call to setSelectedItem()
+		// During setSelectedItem() selectedItem may have a value, but is otherwise null and we want
+		// to call getSelectedIndex(). Per above we do NOT want to call getSelectedIndex() while 
+		// filtering is taking place.
 		try (Model.Remodel remodel = comboInfo.getRemodel()) {
-			if (settingSelectedItem) {
-				if (selectedItem == null) {
-					result = (long) NON_SELECTED;
-				} else {
-					//result = selectedItem.getPrimaryKey();
-					result = remodel.getMapping(selectedItem);
-				}
-			} else {
-				// Existing code not impacted by GlazedList dynamically impacting the list.
-				if (getSelectedIndex() == -1) {
-					result = (long) NON_SELECTED;
-				} else {
-					result = remodel.getMapping(getSelectedIndex());
-					
-				}
+//			if (settingSelectedItem) {
+//				if (selectedItem == null) {
+//					result = (long) NON_SELECTED;
+//				} else {
+//					//result = selectedItem.getPrimaryKey();
+//					result = remodel.getMapping(selectedItem);
+//				}
+//			} else {
+//				// Existing code not impacted by GlazedList dynamically impacting the list.
+//				if (getSelectedIndex() == -1) {
+//					result = (long) NON_SELECTED;
+//				} else {
+//					result = remodel.getMapping(getSelectedIndex());
+//					
+//				}
+//			}
+			if (settingSelectedItem && selectedItem != null) {
+				result = remodel.getMapping(selectedItem);
+			} else if (getSelectedIndex() != -1) {
+				result = remodel.getMapping(getSelectedIndex());
 			}
 		}
 // 2020-12-03: Changing method signature to Long so we can now return null.
