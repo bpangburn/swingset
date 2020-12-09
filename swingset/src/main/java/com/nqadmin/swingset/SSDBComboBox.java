@@ -191,7 +191,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 	/**
 	 * Value to represent that no item has been selected in the combo box.
+	 * @deprecated 
 	 */
+	@Deprecated
 	public static final int NON_SELECTED = Integer.MIN_VALUE + 1;
 
 	/** when null allowed, this is the null item. if null, not allowed */
@@ -330,11 +332,11 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	protected String secondDisplayColumnName = null;
 
-	/**
-	 * SSListItem currently selected in combobox. Needed because GlazedList can cause getSelectedIndex()
-	 * to return -1 (while editing) or 0 (after selection is made from list subset)
-	 */
-	private SSListItem selectedItem = null;
+	// /**
+	//  * SSListItem currently selected in combobox. Needed because GlazedList can cause getSelectedIndex()
+	//  * to return -1 (while editing) or 0 (after selection is made from list subset)
+	//  */
+	// private SSListItem selectedItem = null;
 
 	/**
 	 * Alphanumeric separator used to separate values in multi-column comboboxes.
@@ -344,10 +346,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	//protected String separator = " - ";
 	protected String separator = " | ";
 
-	/**
-	 * Boolean to indicated that a call to setSelectedItem() is in progress.
-	 */
-	private boolean settingSelectedItem = false;
+	// /**
+	//  * Boolean to indicated that a call to setSelectedItem() is in progress.
+	//  */
+	// private boolean settingSelectedItem = false;
 
 	/**
 	 * Common fields shared across SwingSet components
@@ -845,8 +847,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		// TODO Leaking NON_SELECTED. Use null? Use -1? Use Long.MIN_VALUE?
 		
-		logger.trace(String.format("%s: getSelectedValue(), fromSet %b:%s, selectedIndex %d.",
-				getColumnForLog(), settingSelectedItem, selectedItem, getSelectedIndex()));
+		logger.trace(() -> String.format("%s: getSelectedValue(), idx:val %d:%s.",
+				getColumnForLog(), getSelectedIndex(), getSelectedItem()));
+		// logger.trace(String.format("%s: getSelectedValue(), fromSet %b:%s, selectedIndex %d.",
+		// 		getColumnForLog(), settingSelectedItem, selectedItem, getSelectedIndex()));
 
 		Long result = null;
 
@@ -874,11 +878,15 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //					
 //				}
 //			}
-			if (settingSelectedItem && selectedItem != null) {
-				result = remodel.getMapping(selectedItem);
-			} else if (getSelectedIndex() != -1) {
-				result = remodel.getMapping(getSelectedIndex());
+			Object item = getSelectedItem();
+			if (item instanceof SSListItem) {
+				result = remodel.getMapping((SSListItem)item);
 			}
+			// if (settingSelectedItem && selectedItem != null) {
+			// 	result = remodel.getMapping(selectedItem);
+			// } else if (getSelectedIndex() != -1) {
+			// 	result = remodel.getMapping(getSelectedIndex());
+			// }
 		}
 // 2020-12-03: Changing method signature to Long so we can now return null.
 //		// If anything above returned null, change to NON_SELECTED.
@@ -1295,16 +1303,16 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 */
 	@Override
 	public void setSelectedItem(final Object _value) {
-		logger.debug(() -> String.format("%s: setSelectedItem(%s), allowNull? %b",
+		logger.debug(() -> String.format("%s: setSelectedItem(%s), allowNull %b",
 				getColumnForLog(), _value, getAllowNull()));
 
 // TODO Need to deal with null on focus lost event. SSDBComboListener.actionPerformed setting bound column to  null when focus lost.
 
 // INTERCEPTING GLAZEDLISTS CALLS TO setSelectedItem() SO THAT WE CAN PREVENT IT FROM TRYING TO SET VALUES NOT IN THE LIST
 
-		settingSelectedItem = true;
+		// settingSelectedItem = true;
 
-		try {
+		// try {
 
 // NOTE THAT CALLING setSelectedIndex(-1) IN THIS METHOD CAUSES  CYCLE HERE BECAUSE setSelectedIndex() CALLS setSelectedItem()
 
@@ -1321,7 +1329,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		// Extract selected item
 			//selectedItem = (SSListItem) _value;
-			selectedItem = (SSListItem) _value;
+			SSListItem selectedItem = (SSListItem) _value;
 
 		// Call to super.setSelectedItem() triggers SSDBComboListener.actionPerformed, which calls getSelectedValue(), which calls getSelectedIndex(), which returns -1 while still in the editor
 		// and returns 0 after focus is lost.
@@ -1333,21 +1341,23 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			if (selectedItem!=null) {
 				super.setSelectedItem(_value);
 				getEditor().selectAll(); // after we find a match, do a select all on the editor so if the user starts typing again it won't be appended
-				logger.debug("{}: Selected Index AFTER setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedIndex());
+				logger.debug("{}: Selected Index AFTER super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedIndex());
 			} else {
 				if (nullItem != null) {
 					super.setSelectedItem(nullItem);
 				} else {
+					// TODO: why not super.setSelectedItem(null)?
+					//       BTW: can't make this happen now
 					logger.debug("{}: No matching list item found so not updating. Current editor text is '{}'", () -> getColumnForLog(), () -> getEditor().getItem().toString());
 				}
 			}
 
 
 
-		} finally {
-			settingSelectedItem = false;
-			selectedItem = null;
-		}
+		// } finally {
+		// 	settingSelectedItem = false;
+		// 	selectedItem = null;
+		// }
 
 		//return;
 
