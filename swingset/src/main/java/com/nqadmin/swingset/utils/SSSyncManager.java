@@ -348,7 +348,7 @@ public class SSSyncManager {
 		try {
 			if ((rowset != null) && (rowset.getRow() > 0)) {
 				// GET THE PRIMARY KEY FOR THE CURRENT RECORD IN THE ROWSET
-				final long currentRowPK = rowset.getLong(columnName);
+				final Long currentRowPK = rowset.getLong(columnName);
 
 				logger.debug("SSSyncManager().adjustValue() - RowSet value: " + currentRowPK);
 
