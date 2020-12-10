@@ -50,7 +50,7 @@ The SwingSet feature-set currently includes:
 2. binding of a "hidden" numeric column for combo boxes with text choices
    (e.g., 0, 1, & 2 are stored for "Yes," "No," & "Maybe," respectively)
 3. population of combo boxes based on columns in a database query (can also be used for combo box-based record navigation)
-4. a data-aware image component with support for JPEG & GIF image formats
+4. a data-aware image component with image support
 5. a graphical record navigator
     (a) allows for database traversal, insertion, deletion, commit, and rollback
     (b) supplies current record index (editable) and total record count
@@ -63,9 +63,7 @@ The SwingSet feature-set currently includes:
     (f) allows addition and deletion of records
     (g) allows deletion of multiple, non-consecutive records
     (h) allows data entry "masks" to be applied to text columns
-7. a serializable datasource abstraction layer
-8. JavaBean support for all major components (removed in version 2.3+)
-9. Formatted fields for various types like currency, percent, SSN, date etc.
+7. Formatted fields for various types like currency, percent, SSN, date etc.
 
 More information on SwingSet is available from:
 https://github.com/bpangburn/swingset
