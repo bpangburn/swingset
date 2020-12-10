@@ -56,7 +56,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
+
 import java.sql.Connection;
+import java.util.Objects;
 
 // SSCommon.java
 //
@@ -754,7 +756,16 @@ public class SSCommon implements Serializable {
 	 * @param _logColumnName text
 	 */
 	public void setLogColumnName(final String _logColumnName) {
+		Objects.requireNonNull(_logColumnName);
 		logColumnName = _logColumnName;
+	}
+
+	/**
+	 * Name/text to display in log messages if boundColumnName is not set.
+	 * @return text for log entries, null if never set
+	 */
+	public String getLogColumnName() {
+		return logColumnName;
 	}
 
 	/**

@@ -81,6 +81,11 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  * represents a foreign key to another table, and the combobox needs to display
  * a list of one (or more) columns from the other table.
  * <p>
+ * <b>Warning. This combobox may use GlazedLists. Do not use methods
+ * that are based on index in the list. Unless you're sure...</b>
+ * setSelectedIndex(-1) is OK, though it may end up at selected
+ * index 0, which is "null/empty" if allowing null.
+ * <p>
  * Note, if changing both a rowSet and column name consider using the bind()
  * method rather than individual setRowSet() and setColumName() calls.
  * <p>
@@ -1347,6 +1352,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				// The next statement either selects
 				// the first item in combo, or a null.
 				super.setSelectedItem(nullItem);
+				if (nullItem == null) {
+					logger.debug(() -> String.format("%s : Setting null when null not allowed. Current editor text is '%s'", getColumnForLog(), getEditor().getItem()));
+				}
 				// if (nullItem != null) {
 				// 	super.setSelectedItem(nullItem);
 				// } else {
@@ -1508,12 +1516,23 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 					// SPECIFIED TEXT IS STORED
 					//final int index = options.indexOf(_value);
 					final int index = remodel.getOptions().indexOf(_value);
-					
-					if (index == -1) {
-						logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for display text of " + _value + ". Setting index to -1 (blank).");
+
+					SSListItem item = null;
+					if (index != -1) {
+						item = remodel.get(index);
+					} else {
+						logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for display text of " + _value + ". Setting selectedItem to null (blank).");
 					}
 					
-					setSelectedIndex(index);
+					//
+					// TODO: GET RID OF THIS, USE ITEM OR SOME OTHER TECHNIQUE,
+					//       NOT RELIABLE WITH GLAZED LISTS
+					//
+					// setSelectedIndex()->setSelectedItem().
+					// setSelectedIndex(index);
+
+					setSelectedItem(item);
+
 					//updateUI();
 					
 				}

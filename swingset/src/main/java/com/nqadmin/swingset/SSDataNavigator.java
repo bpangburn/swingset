@@ -84,6 +84,7 @@ import com.nqadmin.swingset.utils.SSEnums.Navigation;
  * reverted using Undo button (has to be done manually by the user).
  */
 public class SSDataNavigator extends JPanel {
+
 	private static class RowSetState {
 		private boolean inserting;
 	}
@@ -101,6 +102,11 @@ public class SSDataNavigator extends JPanel {
 		}
 	}
 
+	/**
+	 * Find out if the specified RowSet is on the insert row.
+	 * @param rs get state for this RowSet
+	 * @return true if on the insert row
+	 */
 	public static boolean isInserting(RowSet rs) {
 		return rs == null ? false : getRowSetState(rs).inserting;
 	}
@@ -277,11 +283,6 @@ public class SSDataNavigator extends JPanel {
 	 * Button to navigate to the next record in the RowSet.
 	 */
 	protected JButton nextButton = new JButton();
-
-	/**
-	 * Indicator used to determine if a row is being inserted into the RowSet.
-	 */
-	protected boolean onInsertRow = false;
 
 	/**
 	 * Button to navigate to the previous record in the RowSet.
@@ -521,7 +522,7 @@ public class SSDataNavigator extends JPanel {
 				logger.debug("COMMIT button clicked.");
 				removeRowsetListener();
 				try {
-					if (onInsertRow) {
+					if (isInserting(rowSet)) {
 						// IF ON INSERT ROW ADD THE ROW.
 						// CHECK IF THE ROW CAN BE INSERTED.
 						if (!dBNav.allowInsertion()) {
@@ -530,8 +531,7 @@ public class SSDataNavigator extends JPanel {
 							return;
 						}
 						rowSet.insertRow();
-						onInsertRow = false;
-						setInserting(rowSet, onInsertRow);
+						setInserting(rowSet, false);
 						dBNav.performPostInsertOps();
 						
 						// 2019-10-14: next bit of code seems odd. not sure why we're calling moveToCurrentRow() and last().
@@ -604,7 +604,7 @@ public class SSDataNavigator extends JPanel {
 				removeRowsetListener();
 				try {
 					// CALL MOVE TO CURRENT ROW IF ON INSERT ROW.
-					if (onInsertRow) {
+					if (isInserting(rowSet)) {
 				rowSet.moveToCurrentRow();
 					}
 					// THIS FUNCTION IS NOT NEED IF ON INSERT ROW
@@ -613,8 +613,7 @@ public class SSDataNavigator extends JPanel {
 					// SINCE USER IS MOVED TO CURRENT ROW PRIOR TO INSERT IT IS SAFE TO
 					// CALL CANCELROWUPDATE TO GET A TRIGGER
 					rowSet.cancelRowUpdates();
-					onInsertRow = false;
-					setInserting(rowSet, onInsertRow);
+					setInserting(rowSet, false);
 					dBNav.performCancelOps();
 					rowSet.refreshRow();
 
@@ -687,8 +686,7 @@ public class SSDataNavigator extends JPanel {
 				try {
 
 					rowSet.moveToInsertRow();
-					onInsertRow = true;
-					setInserting(rowSet, onInsertRow);
+					setInserting(rowSet, true);
 					if (navCombo!=null) {
 						navCombo.setEnabled(false);
 					}
@@ -1052,7 +1050,7 @@ public class SSDataNavigator extends JPanel {
 	 * @return boolean indicating if the navigator is on an insert row
 	 */
 	public boolean isOnInsertRow() {
-		return onInsertRow;
+		return isInserting(rowSet);
 	}
 	
 	/**
@@ -1253,8 +1251,7 @@ public class SSDataNavigator extends JPanel {
 		// RESET INSERT FLAG THIS IS NEED IF USERS LEFT THE LAST ROWSET IN INSERTION
 		// MODE
 		// WITH OUT SAVING THE RECORD OR UNDOING THE INSERTION
-		onInsertRow = false;
-		setInserting(rowSet, onInsertRow);
+		setInserting(rowSet, false);
 
 		// REMOVE ROWSET LISTENER
 		if (rowSet != null) {
@@ -1409,7 +1406,7 @@ public class SSDataNavigator extends JPanel {
 	 * @return returns true if update succeeds else false.
 	 */
 	public boolean updatePresentRow() {
-		if (onInsertRow || (currentRow > 0)) {
+		if (isInserting(rowSet) || (currentRow > 0)) {
 			logger.debug("Calling doCommitButtonClick().");
 			doCommitButtonClick();
 		}

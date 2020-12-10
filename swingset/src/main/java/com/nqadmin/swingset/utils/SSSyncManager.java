@@ -303,6 +303,10 @@ public class SSSyncManager {
 		dataNavigator = _dataNavigator;
 		rowset = dataNavigator.getRowSet();
 		dataNavigator.setNavCombo(comboBox);
+		if (_comboBox.getLogColumnName() == null) {
+			_comboBox.setLogColumnName(String.format("**ComboBoxNavigator@%x**",
+					System.identityHashCode(_comboBox)));
+		}
 	}
 	
 	/**
