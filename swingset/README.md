@@ -40,10 +40,7 @@ Contributors:
 
 ## DESCRIPTION
 
-SwingSet is an open source Java toolkit containing data-aware replacements for
-many of the standard Java Swing components. While there are several commercially
-available solutions that perform similar tasks, SwingSet is the first known
-open source solution.
+SwingSet is an open source Java toolkit containing data-aware replacements for many of the standard Java Swing components.
 
 The SwingSet feature-set currently includes:
 1. data-aware replacements for JTextField, JTextArea, JComboBox, JCheckBox, JLabel, JSlider, & JFormattedTextField
@@ -63,7 +60,7 @@ The SwingSet feature-set currently includes:
     (f) allows addition and deletion of records
     (g) allows deletion of multiple, non-consecutive records
     (h) allows data entry "masks" to be applied to text columns
-7. Formatted fields for various types like currency, percent, SSN, date etc.
+7. formatted fields for various types like currency, percent, SSN, date etc.
 
 More information on SwingSet is available from:
 https://github.com/bpangburn/swingset
