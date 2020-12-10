@@ -185,7 +185,9 @@ public class TestBaseComponents extends JFrame {
 	/**
 	 * combo navigator and sync manger
 	 */
-	SSDBComboBox cmbSSDBComboNav = new SSDBComboBox(); // SSDBComboBox used just for navigation
+	// TODO: this gets set again, why set it here? listeners?
+	//SSDBComboBox cmbSSDBComboNav = new SSDBComboBox(); // SSDBComboBox used just for navigation
+	final SSDBComboBox cmbSSDBComboNav; // SSDBComboBox used just for navigation
 	SSSyncManager syncManager;
 
 	/**

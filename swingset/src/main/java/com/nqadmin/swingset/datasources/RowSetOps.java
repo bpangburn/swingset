@@ -54,6 +54,7 @@ import javax.sql.RowSet;
 
 import org.apache.logging.log4j.LogManager;
 
+import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.utils.SSCommon;
 
 // RowSetOps.java
@@ -289,13 +290,13 @@ public class RowSetOps {
 		return getJDBCType(getColumnType(_resultSet, _columnName));
 	}
 
-	private static EnumSet<JDBCType> textUpdateEmptyOK = EnumSet.of(
+	private static final EnumSet<JDBCType> textUpdateEmptyOK = EnumSet.of(
 			JDBCType.CHAR,
 			JDBCType.VARCHAR,
 			JDBCType.LONGVARCHAR
 	);
 	
-	private static EnumSet<JDBCType> textUpdateOK = EnumSet.of(
+	private static final EnumSet<JDBCType> textUpdateOK = EnumSet.of(
 			JDBCType.INTEGER,
 			JDBCType.SMALLINT,
 			JDBCType.TINYINT,
@@ -343,6 +344,11 @@ public class RowSetOps {
 			return;
 		}
 
+		if (_updatedValue == null && SSDataNavigator.isInserting(_rowSet)) {
+			_rowSet.updateNull(_columnName);
+			return;
+		}
+
 		/*
 		 * FIRST - NULL HANDLING:
 		 * 
@@ -378,6 +384,7 @@ public class RowSetOps {
                 throw new NullPointerException("Null values are not allowed for this field.");
             }
         }
+		assert(_updatedValue != null);
 
 		/*
 		 * SECOND - WRITING NON-NULL VALUES TO DATABASE BASED ON APPROPRIATE STRING CONVERSIONS
@@ -527,7 +534,7 @@ public class RowSetOps {
 
 	// TODO: for override of type mapping for local/dbms requirements
 	// with_timezone might be the perfect candidates
-	private static EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType = new EnumMap<JDBCType, Class<?>>(JDBCType.class);
+	private static final EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType = new EnumMap<JDBCType, Class<?>>(JDBCType.class);
 	/**
 	 * Determine the Java type class for the given database type.
 	 * @param _jdbcType JDBCType of interest

@@ -407,6 +407,22 @@ public interface SSComponentInterface {
 	}
 
 	/**
+	 * Set the text for log entries; only used if boundColumnName is null.
+	 * @param _boundColumnName
+	 */
+	default void setLogColumnName(final String _boundColumnName) {
+		getSSCommon().setLogColumnName(_boundColumnName);
+	}
+
+	/**
+	 * Get the text for log entries; only used if boundColumnName is null.
+	 * @return text for log entries, null if never set
+	 */
+	default String getLogColumnName() {
+		return getSSCommon().getLogColumnName();
+	}
+
+	/**
 	 * Sets the value of the bound database column
 	 *
 	 * @param _boundColumnText the value to set in the bound database column

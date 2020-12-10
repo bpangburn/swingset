@@ -56,7 +56,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
+
 import java.sql.Connection;
+import java.util.Objects;
 
 // SSCommon.java
 //
@@ -307,9 +309,14 @@ public class SSCommon implements Serializable {
 	private String boundColumnName = null;
 
 	/**
-	 * Column SQL data type.
+	 * Name for log in boundColumnName is not set.
 	 */
-	private int boundColumnType = java.sql.Types.NULL;
+	private String logColumnName = null;
+
+	// /**
+	//  * Column SQL data type.
+	//  */
+	// private int boundColumnType = java.sql.Types.NULL;
 
 	/**
 	 * flag to indicate if we're inside of a bind() method
@@ -547,7 +554,8 @@ public class SSCommon implements Serializable {
 	 * @return the data type of the bound column
 	 */
 	public int getBoundColumnType() {
-		return boundColumnType;
+		// return boundColumnType;
+		return boundColumnJDBCType.getVendorTypeNumber();
 	}
 
 	/**
@@ -556,7 +564,7 @@ public class SSCommon implements Serializable {
 	 * @return the boundColumnName in square brackets
 	 */
 	public String getColumnForLog() {
-		return "[" + boundColumnName + "]";
+		return "[" + (boundColumnName != null ? boundColumnName : logColumnName) + "]";
 	}
 
 	/**
@@ -679,6 +687,7 @@ public class SSCommon implements Serializable {
 		try {
 			// IF COLUMN INDEX IS VALID, GET COLUMN NAME, OTHERWISE SET TO NULL
 // TODO Update RowSet to return constant or throw Exception if invalid/out of bounds.
+			int boundColumnType;
 			if (boundColumnIndex != NO_COLUMN_INDEX) {
 				//boundColumnName = getRowSet().getColumnName(boundColumnIndex);
 				//boundColumnType = getRowSet().getColumnType(boundColumnIndex);
@@ -720,6 +729,7 @@ public class SSCommon implements Serializable {
 			// IF COLUMN NAME ISN'T NULL, SET COLUMN INDEX - OTHERWISE, SET INDEX TO
 			// NO_INDEX
 // TODO Update RowSet to return constant or throw Exception if invalid/out of bounds.
+			int boundColumnType;
 			if (boundColumnName != null) {
 				//boundColumnIndex = getRowSet().getColumnIndex(boundColumnName);
 				//boundColumnType = getRowSet().getColumnType(boundColumnIndex);
@@ -739,6 +749,23 @@ public class SSCommon implements Serializable {
 		if (!inBinding) {
 			bind();
 		}
+	}
+
+	/**
+	 * Name/text to display in log messages if boundColumnName is not set.
+	 * @param _logColumnName text
+	 */
+	public void setLogColumnName(final String _logColumnName) {
+		Objects.requireNonNull(_logColumnName);
+		logColumnName = _logColumnName;
+	}
+
+	/**
+	 * Name/text to display in log messages if boundColumnName is not set.
+	 * @return text for log entries, null if never set
+	 */
+	public String getLogColumnName() {
+		return logColumnName;
 	}
 
 	/**
