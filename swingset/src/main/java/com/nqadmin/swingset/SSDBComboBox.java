@@ -197,7 +197,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	public static final int NON_SELECTED = Integer.MIN_VALUE + 1;
 
 	/** when null allowed, this is the null item. if null, not allowed */
-	private static SSListItem nullItem;
+	private SSListItem nullItem;
 
 	/**
 	 * Start with option2 disabled
@@ -1343,13 +1343,15 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				getEditor().selectAll(); // after we find a match, do a select all on the editor so if the user starts typing again it won't be appended
 				logger.debug("{}: Selected Index AFTER super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedIndex());
 			} else {
-				if (nullItem != null) {
-					super.setSelectedItem(nullItem);
-				} else {
-					// TODO: why not super.setSelectedItem(null)?
-					//       BTW: can't make this happen now
-					logger.debug("{}: No matching list item found so not updating. Current editor text is '{}'", () -> getColumnForLog(), () -> getEditor().getItem().toString());
-				}
+				// Note that nullItem is null when allowNull is false.
+				// The next statement either selects
+				// the first item in combo, or a null.
+				super.setSelectedItem(nullItem);
+				// if (nullItem != null) {
+				// 	super.setSelectedItem(nullItem);
+				// } else {
+				// 	logger.debug("{}: No matching list item found so not updating. Current editor text is '{}'", () -> getColumnForLog(), () -> getEditor().getItem().toString());
+				// }
 			}
 
 

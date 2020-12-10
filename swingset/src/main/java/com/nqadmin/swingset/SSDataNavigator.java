@@ -44,6 +44,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
@@ -82,6 +84,26 @@ import com.nqadmin.swingset.utils.SSEnums.Navigation;
  * reverted using Undo button (has to be done manually by the user).
  */
 public class SSDataNavigator extends JPanel {
+	private static class RowSetState {
+		private boolean inserting;
+	}
+
+	// don't have to worry about concurrency, always EDT
+	private static Map<RowSet,RowSetState> rowSetState = new WeakHashMap<>();
+
+	private static RowSetState getRowSetState(RowSet rs) {
+		return rowSetState.computeIfAbsent(rs, k -> new RowSetState());
+	}
+
+	private static void setInserting(RowSet rs, boolean flag) {
+		if (rs != null) {
+			getRowSetState(rs).inserting = flag;
+		}
+	}
+
+	public static boolean isInserting(RowSet rs) {
+		return rs == null ? false : getRowSetState(rs).inserting;
+	}
 
 	/**
 	 * Rowset Listener on the RowSet used by data navigator.
@@ -509,6 +531,7 @@ public class SSDataNavigator extends JPanel {
 						}
 						rowSet.insertRow();
 						onInsertRow = false;
+						setInserting(rowSet, onInsertRow);
 						dBNav.performPostInsertOps();
 						
 						// 2019-10-14: next bit of code seems odd. not sure why we're calling moveToCurrentRow() and last().
@@ -591,6 +614,7 @@ public class SSDataNavigator extends JPanel {
 					// CALL CANCELROWUPDATE TO GET A TRIGGER
 					rowSet.cancelRowUpdates();
 					onInsertRow = false;
+					setInserting(rowSet, onInsertRow);
 					dBNav.performCancelOps();
 					rowSet.refreshRow();
 
@@ -664,6 +688,7 @@ public class SSDataNavigator extends JPanel {
 
 					rowSet.moveToInsertRow();
 					onInsertRow = true;
+					setInserting(rowSet, onInsertRow);
 					if (navCombo!=null) {
 						navCombo.setEnabled(false);
 					}
@@ -1229,6 +1254,7 @@ public class SSDataNavigator extends JPanel {
 		// MODE
 		// WITH OUT SAVING THE RECORD OR UNDOING THE INSERTION
 		onInsertRow = false;
+		setInserting(rowSet, onInsertRow);
 
 		// REMOVE ROWSET LISTENER
 		if (rowSet != null) {
