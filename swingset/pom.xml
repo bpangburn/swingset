@@ -13,7 +13,7 @@
 
 	<name>swingset</name>
 	<description>Data-aware replacements for manyof the standard Java Swing components</description>
-	<url>https://sourceforge.net/projects/swingset</url>
+	<url>https://github.com/bpangburn/swingset</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -60,9 +60,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:https://git.code.sf.net/p/swingset/code</connection>
-		<developerConnection>scm:git:https://git.code.sf.net/p/swingset/code</developerConnection>
-		<url>https://sf.net/p/swingset/code</url>
+		<url>https://github.com/bpangburn/swingset</url>
+		<connection>scm:git:git@github.com:bpangburn/swingset.git</connection>
+		<developerConnection>scm:git:git@github.com:bpangburn/swingset.git</developerConnection>
 	</scm>
 
 	<distributionManagement>

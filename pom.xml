@@ -10,7 +10,7 @@
 	<packaging>pom</packaging>
 
 	<name>swingset-parent</name>
-	<url>https://sourceforge.net/projects/swingset</url>
+	<url>https://github.com/bpangburn/swingset</url>
 
 	<!--ONLY INCLUDING PROPERTIES/BUILD TO ENFORCE MAVEN AND JAVA VERSION -->
 

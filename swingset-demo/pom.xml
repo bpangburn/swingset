@@ -13,7 +13,7 @@
 
 	<name>swingset-demo</name>
 	<description>Demo for SwingSet</description>
-	<url>https://sourceforge.net/projects/swingset</url>
+	<url>https://github.com/bpangburn/swingset</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
