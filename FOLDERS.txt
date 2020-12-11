@@ -1,5 +1,5 @@
 ==============================================================================
-ReadMe file for the swingset-parent folder.
+ReadMe file for the top-level swingset folder.
 ==============================================================================
 
 When SwingSet was converted to a Maven project, SwingSet and it's Demo
@@ -17,5 +17,6 @@ To view as a single project:
  1. Window->Show View->Project Explorer
  2. View Menu (down arrow/triangle)->Project Presentation->Hierarchical
  
- Detailed ReadMe files for swingset and swingset-demo can be found in
- their respective folders.
+A project overview README.md is located in the same folder as this file
+(FOLDERS.txt). Detailed README.md files for swingset and swingset-demo
+can be found in their respective subfolders.
