@@ -41,6 +41,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -49,6 +50,7 @@ import java.util.Calendar;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.GregorianCalendar;
+import java.util.Optional;
 
 import javax.sql.RowSet;
 
@@ -114,6 +116,43 @@ public class RowSetOps {
 		return _resultSet.getMetaData().getColumnName(_columnIndex);
 	}
 
+	/**
+	 * Determine if the specified column is nullable. If the nullability
+	 * of the column is unknown, then an empty Optional is returned.
+	 * @param _resultSet RowSet on which to operate
+	 * @param _columnIndex column index
+	 * @return Optional of true if nullable, empty Optional if unknown.
+	 */
+	public static Optional<Boolean> isNullable(final ResultSet _resultSet, final int _columnIndex) {
+		try {
+			int nullable = _resultSet.getMetaData().isNullable(_columnIndex);
+			return nullable == ResultSetMetaData.columnNullableUnknown
+					? Optional.empty()
+					: Optional.of(nullable == ResultSetMetaData.columnNullable);
+		} catch (SQLException ex) {
+			LogManager.getLogger().error(() -> String.format("SQL Exception for column %d.",
+					_columnIndex, ex));
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * Determine if the specified column is nullable.If the nullability
+	 * of the column is unknown, then an empty Optional is returned.
+	 * @param _resultSet RowSet on which to operate
+	 * @param _columnName column name
+	 * @return Optional of true if nullable, empty Optional if unknown.
+	 */
+	public static Optional<Boolean> isNullable(final ResultSet _resultSet, final String _columnName) {
+		try {
+			return isNullable(_resultSet, getColumnIndex(_resultSet, _columnName));
+		} catch (SQLException ex) {
+			LogManager.getLogger().error(() -> String.format("SQL Exception for column %s.",
+					_columnName, ex));
+			return Optional.empty();
+		}
+	}
+	
 	/**
 	 * Method used by RowSet listeners to get the new text when the RowSet
 	 * events are triggered.

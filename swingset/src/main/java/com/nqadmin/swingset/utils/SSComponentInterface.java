@@ -114,17 +114,6 @@ public interface SSComponentInterface {
 	void addSSComponentListener();
 
 	/**
-	 * Sets (or resets) the binding from the component to a database column
-	 * <p>
-	 * Assumes that RowSet and Column Name are already set properly
-	 */
-	default void bind() {// throws java.sql.SQLException {
-
-		getSSCommon().bind();
-
-	}
-
-	/**
 	 * Sets the rowSet and column name to which the component is to be bound.
 	 * <p>
 	 * Takes care of setting RowSet and Column Name for ssCommon and then calls
@@ -137,6 +126,13 @@ public interface SSComponentInterface {
 
 		getSSCommon().bind(_rowSet, _boundColumnName);
 
+	}
+
+	/**
+	 * Override this method for notification of a change in metadata.
+	 * Typically from setRowSet() or bind().
+	 */
+	default void metadataChange() {
 	}
 
 	/**
@@ -408,10 +404,10 @@ public interface SSComponentInterface {
 
 	/**
 	 * Set the text for log entries; only used if boundColumnName is null.
-	 * @param _boundColumnName
+	 * @param _logColumnName show this in log entry if boundColumnName is null
 	 */
-	default void setLogColumnName(final String _boundColumnName) {
-		getSSCommon().setLogColumnName(_boundColumnName);
+	default void setLogColumnName(final String _logColumnName) {
+		getSSCommon().setLogColumnName(_logColumnName);
 	}
 
 	/**

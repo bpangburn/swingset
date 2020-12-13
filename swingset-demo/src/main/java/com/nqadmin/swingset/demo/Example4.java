@@ -277,6 +277,7 @@ public class Example4 extends JFrame {
 				cmbPartColor.bind(rowset, "color_code");
 				txtPartWeight.bind(rowset, "weight");
 				txtPartCity.bind(rowset, "city");
+				//SSComboBox.testComboAdjustForNull(cmbPartColor);
 
 			// SETUP SYNCMANAGER, WHICH WILL TAKE CARE OF KEEPING THE COMBO NAVIGATOR AND
 			// DATA NAVIGATOR IN SYNC.
@@ -350,5 +351,4 @@ public class Example4 extends JFrame {
 				setVisible(true);
 				pack();
 			}
-
 }
