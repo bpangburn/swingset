@@ -154,14 +154,14 @@ public class SSComboBox extends JComboBox<SSListItem> implements SSComponentInte
 
 			removeRowSetListener();
 
-			final int index = SSComboBox.super.getSelectedIndex();
+			Integer mapping = getSelectedMapping();
 
-			if (index == -1) {
+			if (mapping == null) {
 				setBoundColumnText(null);
 				logger.debug("{}: Setting to null.", () -> getColumnForLog());
 			} else {
-				setBoundColumnText(String.valueOf(getSelectedMapping()));
-				logger.debug("{}: Setting to {}.", () -> getColumnForLog(), () -> getSelectedMapping());
+				setBoundColumnText(String.valueOf(mapping));
+				logger.debug("{}: Setting to {}.", () -> getColumnForLog(), () -> mapping);
 			}
 
 			addRowSetListener();
