@@ -290,10 +290,9 @@ public class SSCommon implements Serializable {
 	 * <p>
 	 * Adds in a blank item being added to SSCombobox and SSDBComboBox.
 	 * <p>
-	 * Setting to true by default and will let database throw exceptions if not overwritten.
+	 * Usage determines default when allowNull.isPresent() == false.
 	 */
-	//private boolean allowNull = true;
-	Optional<Boolean> allowNull = Optional.empty();
+	private Optional<Boolean> allowNull = Optional.empty();
 
 	/**
 	 * Index of RowSet column to which the SwingSet component will be bound.
@@ -314,6 +313,11 @@ public class SSCommon implements Serializable {
 	 * Name for log in boundColumnName is not set.
 	 */
 	private String logColumnName = null;
+
+	/**
+	 * cache of metadata.
+	 */
+	private Optional<Boolean> isNullable = Optional.empty();
 
 	// /**
 	//  * Column SQL data type.
@@ -399,7 +403,9 @@ public class SSCommon implements Serializable {
 	 */
 	protected void bind() {
 
-
+		// Not sure of implications of bind fail,
+		// set default in case case bind fails.
+		// TODO: is this the right thing to do if bind fails?
 		isNullable = Optional.empty();
 
 		// TODO consider updating Component to null/zero/empty string if not valid column name, column index, or rowset
@@ -414,11 +420,8 @@ public class SSCommon implements Serializable {
 				boundColumnName, boundColumnIndex, rowSet==null ? ", rowset=null" : ""));
 
 		//
-		// TODO: is this the right place to do this?
-		//       Will this catch any metadata changes
-		//
-
 		// This is used a lot, just get it now.
+		// If done lazy, flush the cache here.
 		isNullable = RowSetOps.isNullable(rowSet, boundColumnIndex);
 
 		logger.trace(() -> String.format("Column isNullable: %s.", isNullable));
@@ -498,12 +501,9 @@ public class SSCommon implements Serializable {
 	 * @return true if bound database column can contain null values, otherwise
 	 *         returns false
 	 */
-	// TODO: Should result of RSOps.isNullable be cached? Probably not?
-	//       Clear cache when metadata changes
 	public boolean getAllowNull() {
 		return allowNull.orElseGet(() -> isNullable.orElse(true));
 	}
-	private Optional<Boolean> isNullable = Optional.empty();
 
 	/**
 	 * Returns the index of the database column to which the SwingSet component is
@@ -541,14 +541,10 @@ public class SSCommon implements Serializable {
 	 * Returns a String representing the value in the bound database column.
 	 * <p>
 	 * New functionality added (2020) to allow this method to return a null String
-	 * if allowNull==true. allowNull is false by default so nulls will be converted
-	 * to empty strings.
+	 * if allowNull==true.
 	 *
 	 * @return String containing the value in the bound database column
 	 */
-	//
-	// TODO: javadoc seems wrong, looks like allowNull is *TRUE* by default
-	//
 	public String getBoundColumnText() {
 
 // TODO Consider checking for a null RowSet. This would be the case for an unbound SSDBComboBox used for navigation.
