@@ -401,7 +401,7 @@ public class SSCommon implements Serializable {
 	/**
 	 * Updates the SSComponent with a valid RowSet and Column (Name or Index)
 	 */
-	protected void bind() {
+	private void bind() {
 
 		// Not sure of implications of bind fail,
 		// set default in case case bind fails.
@@ -421,10 +421,13 @@ public class SSCommon implements Serializable {
 
 		//
 		// This is used a lot, just get it now.
-		// If done lazy, flush the cache here.
-		isNullable = RowSetOps.isNullable(rowSet, boundColumnIndex);
+		// If doing this lazy elsewhere, flush the cache here.
 
+		isNullable = RowSetOps.isNullable(rowSet, boundColumnIndex);
 		logger.trace(() -> String.format("Column isNullable: %s.", isNullable));
+
+		// Provide notification of a change in metadata
+		ssComponent.metadataChange();
 
 		// UPDATE COMPONENT
 		// For an SSDBComboBox, we have likely not yet called execute to populate the
@@ -497,6 +500,8 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Retrieves the allowNull flag for the bound database column.
+	 * If setAllowNull() is not set, then the database metadata is used
+	 * to determine nullability; if unknown then return true;
 	 *
 	 * @return true if bound database column can contain null values, otherwise
 	 *         returns false

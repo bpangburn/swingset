@@ -50,7 +50,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.sql.RowSet;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 
@@ -94,8 +93,8 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
  *   <li>nothing is selected in this combo box</li>
  *   <li>the <em>nullItem</em> is selected in this combo box</li>
  * </ul>
- * {@code getSelectedItem() == null } means there is no selection;
- * if that distinction is wanted.
+ * {@code getSelectedItem() == null } indicates there is no selection;
+ * use this when the distinction is needed.
  * <p>
  * SSComboBox assumes that it will be bound to an integer column
  * <p>
@@ -803,25 +802,25 @@ public class SSComboBox extends JComboBox<SSListItem> implements SSComponentInte
 	// 	}
 	// 	setOptions(_options.toArray(new String[0]),
 	// 			   _mappings.stream().mapToInt(i -> i).toArray());
-// }
+	// }
 
-/**
- * Adds a list of strings as combo box items
- * with {@literal [0-N)} mapping.
- *
- * @param _options the list of options that you want to appear in the combo box.
- */
-public void setOptions(final List<String> _options) {
-	setOptions(_options, null);
-}
+	/**
+	 * Adds a list of strings as combo box items
+	 * with {@literal [0-N)} mapping.
+	 *
+	 * @param _options the list of options that you want to appear in the combo box.
+	 */
+	public void setOptions(final List<String> _options) {
+		setOptions(_options, null);
+	}
 
-//
-// TODO: Study use case for enums
-// TODO: When an enum is specified, should there be a way to
-//		specify a mapping as well? Two possibilities, the first
-//		is like the general pattern, mapping should have the
-//		same number of elements as there are enum values.
-//		The second could also be provided as setOptions([], Function)
+	//
+	// TODO: Study use case for enums
+	// TODO: When an enum is specified, should there be a way to
+	//		specify a mapping as well? Two possibilities, the first
+	//		is like the general pattern, mapping should have the
+	//		same number of elements as there are enum values.
+	//		The second could also be provided as setOptions([], Function)
 	//		 1) setOptions(enum, mapping)
 	//		 2) setOptions(enum, Function<enum, Object>)
 	//			For example
@@ -960,7 +959,8 @@ public void setOptions(final List<String> _options) {
 	/**
 	 * Change combo selection
 	 * 
-	 * {@link #setSelectedMapping() } is the preferred/alternative method.
+	 * {@link #setSelectedMapping(java.lang.Integer) }
+	 * is the preferred/alternative method.
 	 * 
 	 * @param _value value
 	 */
@@ -1057,34 +1057,34 @@ public void setOptions(final List<String> _options) {
 	//
 	// unregisterAllActionListeners/registerAllActionListeners kudos glazed lists
 	//
-    /**
-     * A convenience method to unregister and return all {@link ActionListener}s
-     * currently installed on the given <code>comboBox</code>. This is the only
-     * technique we can rely on to prevent the <code>comboBox</code> from
-     * broadcasting {@link ActionEvent}s at inappropriate times.
-     *
-     * This method is the logical inverse of {@link #registerAllActionListeners}.
-     */
-    private static ActionListener[] unregisterAllActionListeners(JComboBox<?> comboBox) {
-        final ActionListener[] listeners = comboBox.getActionListeners();
+	/**
+	 * A convenience method to unregister and return all {@link ActionListener}s
+	 * currently installed on the given <code>comboBox</code>. This is the only
+	 * technique we can rely on to prevent the <code>comboBox</code> from
+	 * broadcasting {@link ActionEvent}s at inappropriate times.
+	 *
+	 * This method is the logical inverse of {@link #registerAllActionListeners}.
+	 */
+	private static ActionListener[] unregisterAllActionListeners(JComboBox<?> comboBox) {
+		final ActionListener[] listeners = comboBox.getActionListeners();
 		for (ActionListener listener : listeners) {
 			comboBox.removeActionListener(listener);
 		}
 
-        return listeners;
-    }
+		return listeners;
+	}
 
-    /**
-     * A convenience method to register all of the given <code>listeners</code>
-     * with the given <code>comboBox</code>.
-     *
-     * This method is the logical inverse of {@link #unregisterAllActionListeners}.
-     */
-    private static void registerAllActionListeners(JComboBox<?> comboBox, ActionListener[] listeners) {
+	/**
+	 * A convenience method to register all of the given <code>listeners</code>
+	 * with the given <code>comboBox</code>.
+	 *
+	 * This method is the logical inverse of {@link #unregisterAllActionListeners}.
+	 */
+	private static void registerAllActionListeners(JComboBox<?> comboBox, ActionListener[] listeners) {
 		for (ActionListener listener : listeners) {
 			comboBox.addActionListener(listener);
 		}
-    }
+	}
 
 	/**
 	 * After this, make some adjustments.
@@ -1096,23 +1096,15 @@ public void setOptions(final List<String> _options) {
 		adjustForNullItem();
 	}
 
-	// TODO: remove this method from the SSComponentInterface API
-	@Override
-	public void bind() {
-		SSComponentInterface.super.bind();
-		adjustForNullItem();
-	}
-
 	/**
-	 * Catch this to make some adjustments after bind.
+	 * Catch this to make some adjustments after a change in metadata.
 	 * {@inheritDoc }
 	 */
 	@Override
-	public void bind(RowSet _rowSet, String _boundColumnName) {
-		SSComponentInterface.super.bind(_rowSet, _boundColumnName);
+	public void metadataChange() {
+		SSComponentInterface.super.metadataChange();
 		adjustForNullItem();
 	}
-
 
 	/**
 	 * Sets the SSCommon data member for the current Swingset Component.
@@ -1160,35 +1152,36 @@ public void setOptions(final List<String> _options) {
 		}
 	}
 
+	////////////////////////////////////////////////////////////////////////
 	//
-	// Stuff for testing
+	// for testing
 	//
 
 	/**
-	 * Can call this from an example for example.
+	 * Can call this from an example for example. Tested with example4.
 	 * @param combo test this
 	 */
 
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	static void testComboAdjustForNull(SSComboBox combo) {
+	public static void testComboAdjustForNull(SSComboBox combo) {
 		tracker = 0;
 		trackout.clear();
 		track("start");
 		combo.setAllowNull(false);
-		p(combo);
+		p(combo); // example: n 3, i 0, item {Red,0}
 
 		// to get into the mood
-		// causes an exception
+		// my cause an EXCEPTION
 		track("select -1");
 		combo.setSelectedIndex(-1);
-		p(combo);
+		p(combo); // example: n 3, i -1, item null
 
 		// should not see an exception
 		// and should see consistent state
 
 		track("allow null true");
 		combo.setAllowNull(true);
-		p(combo);
+		p(combo); // example: n 4, i 0, item {,null}
 
 		// track("select 0");
 		// combo.setSelectedIndex(0);
@@ -1196,7 +1189,7 @@ public void setOptions(final List<String> _options) {
 
 		track("allow null false");
 		combo.setAllowNull(false);
-		p(combo);
+		p(combo); // example: n 3, i -1, item null
 
 		// track("select -1");
 		// combo.setSelectedIndex(-1);
