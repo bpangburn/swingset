@@ -57,6 +57,7 @@ import javax.swing.SwingUtilities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -178,7 +179,8 @@ public class SSFormattedTextField extends JFormattedTextField
 			    logger.info(getColumnForLog() + ": Object to be passed to database is " + currentValue + ".");
 
 			    // TODO May want to see if we can veto invalid updates
-			    if (!getAllowNull() && (currentValue==null)) {
+			    // 2020-12-14_BP: allow null if on insert row
+			    if (!getAllowNull() && (currentValue==null) && !SSDataNavigator.isInserting(getRowSet())) {
 			    	logger.warn("Null value encounted, but not allowed.");
 					JOptionPane.showMessageDialog(ftf,
 							"Null values are not allowed for " + getBoundColumnName(), "Null Exception", JOptionPane.ERROR_MESSAGE);
