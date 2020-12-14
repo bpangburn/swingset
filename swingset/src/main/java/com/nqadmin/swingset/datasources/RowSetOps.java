@@ -383,7 +383,8 @@ public class RowSetOps {
 			return;
 		}
 
-		if (_updatedValue == null && SSDataNavigator.isInserting(_rowSet)) {
+		// On insert row, write null if updatedValue is null or empty string, and do not perform other checks. 
+		if ((_updatedValue == null || _updatedValue.isEmpty()) && SSDataNavigator.isInserting(_rowSet)) {
 			_rowSet.updateNull(_columnName);
 			return;
 		}
