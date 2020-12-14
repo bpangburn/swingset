@@ -78,6 +78,19 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
  * @since 4.0.0
  *
  */
+//
+// TODO: There are more things that can be pulled into here.
+//       The following are identical in both subclasses, there may be more.
+//       - protected class ComboBoxListener ....
+//       - protected final ComboBoxListener ssComboBoxListener = new ComboBoxListener();
+//       - getSelectedMapping()
+//       - public void addSSComponentListener() {...}
+//       - public void removeSSComponentListener() {...}
+//       - public void customInit() {...}
+//       - getMappings()
+//       - getOptions()
+//       - 
+//
 public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> implements SSComponentInterface
 {
 	private static final long serialVersionUID = 1L;
@@ -261,7 +274,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	@Override
 	public void metadataChange() {
-		SSComponentInterface.super.metadataChange();
 		adjustForNullItem();
 	}
 
@@ -273,12 +285,21 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	protected abstract SSListItem createNullItem(BaseModel<M,O,O2>.Remodel remodel);
 
 	/**
+	 * A combobox used as a navigator has some restriction; for example,
+	 * it can not have nullItem. Override this as needed.
+	 * @return true if this ComboBox is a navigator
+	 */
+	protected boolean isComboBoxNavigator() {
+		return false;
+	}
+
+	/**
 	 * Add or remove the nullItem from the itemList if needed depending
 	 * on {@code getAllowNull()} and the current existence of a nullItem.
 	 * If logical null is selected before, keep it selected after.
 	 */
 	protected void adjustForNullItem() {
-		boolean wantNull = getAllowNull();
+		boolean wantNull = getAllowNull() && !isComboBoxNavigator();
 		boolean hasNull = nullItem != null;
 		
 		if (wantNull == hasNull) {
