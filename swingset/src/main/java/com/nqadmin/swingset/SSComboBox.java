@@ -72,9 +72,12 @@ import com.nqadmin.swingset.models.SSListItem;
  * must be set before calling the bind() method to bind the combobox to a
  * database column.
  * <p>
- * <b>Warning. This combobox may use GlazedLists. Do not use methods
- * that are based on index in the list. Unless you're sure...</b>
- * setSelectedItem(SSListItem) is the correct technique.
+ * <b>Warning. This combobox may use GlazedLists and an item is automatically
+ * inserted when {@link #getAllowNull() is true }. Do not use methods
+ * that are based on index in the list, unless you're sure...</b>
+ * {@link #setSelectedItem(java.lang.Object) setSelectedItem(SSListItem)}
+ * or {@link #getSelectedItem() }
+ * are the correct techniques.
  * There are a variety of method to change the current combobox item
  * such as {@link #setSelectedMapping(java.lang.Integer) }.
  * <p>
@@ -85,7 +88,7 @@ import com.nqadmin.swingset.models.SSListItem;
  *   <li>the <em>nullItem</em> is selected in this combo box
  * </ul>
  * {@code getSelectedItem() == null } indicates there is no selection;
- * use this when the distinction is needed.
+ * use this if the distinction is needed.
  * <p>
  * SSComboBox assumes that it will be bound to an integer column
  * <p>
@@ -175,8 +178,8 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>{
 	 * @return a nullItem
 	 */
 	@Override
-	protected SSListItem createNullItem(BaseModel<Integer,String,Object>.Remodel remodel) {
-		return remodel.createComboItem(null, "", null);
+	protected SSListItem createNullItem(Model.Remodel remodel) {
+		return remodel.createOptionMappingItem(null, "", null);
 	}
 
 	/**

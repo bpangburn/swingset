@@ -172,7 +172,11 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * When {@link #getAllowNull() } is true, this is the null item;
 	 * when false this is null. So {@link #setSelectedItem(java.lang.Object)
 	 * setSelectedItem(nullItem)} does the right thing whether getAllowNull()
-	 * is true or false;
+	 * is true or false.
+	 * <p>
+	 * <b>When the item list is cleared, for example
+	 * {@link OptionMappingSwingModel.Remodel#clear() remodel.clear()},
+	 * the nullItem must be set to null.</b>
 	 * @see #createNullItem(com.nqadmin.swingset.models.OptionMappingSwingModel.Remodel)
 	 */
 	protected SSListItem nullItem;
