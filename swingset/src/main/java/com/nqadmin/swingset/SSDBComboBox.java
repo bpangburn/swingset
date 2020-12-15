@@ -52,6 +52,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
+import java.util.Objects;
 
 import com.nqadmin.swingset.models.SSListItem;
 
@@ -1262,19 +1263,9 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	}
 
 	/**
-	 * Sets the currently selected value. This is called when the user clicks on an
-	 * item or when they type in the combo's textfield.
-	 * <p>
-	 * Currently not a bean property since there is no associated variable.
-	 *
-	 * @param _value value to set as currently selected.
+	 * {@inheritDoc }
+	 * This method override additionally selects a currently edited item in the combo box
 	 */
-	//
-	// TODO: The code currently assumes that _value is an SSListItem.
-	//       But the description above makes me dubious of that claim.
-	//       Is _value a string? Should the type be checked and
-	//       and then proceed accordingly?
-	//
 	@Override
 	public void setSelectedItem(final Object _value) {
 		logger.debug(() -> String.format("%s: setSelectedItem(%s), allowNull %b",
@@ -1301,40 +1292,35 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 //		logger.debug("{}: Possible matches AFTER hidePopup() - " + possibleMatches, () -> getColumnForLog());
 //		logger.debug("{}: Selected Index AFTER hidePopup()={}", () -> getColumnForLog(), () -> getSelectedIndex());
 
-		// Extract selected item
-			//selectedItem = (SSListItem) _value;
-			// TODO: seems like this might be cast exception
-			SSListItem newSelectedItem = (SSListItem) _value;
-
 		// Call to super.setSelectedItem() triggers SSDBComboListener.actionPerformed, which calls getSelectedValue(), which calls getSelectedIndex(), which returns -1 while still in the editor
 		// and returns 0 after focus is lost.
 		//
 		// Calling hidePopup() restores the list, but messes up the GlazedList filtering.
 		//
 		// 2020-10-03_BP: Updated getSelectedValue() to properly return the primary key rather than using getSelectedIndex() during a call to this method.
+
+		// TODO: NOT SURE WHERE THE FOLLOWING COMMENT CAME FROM,
+		//       BUT THAT'S NOT HOW IT WORKS NOW
 		// Only try to update item for a valid list item.
 
-			// TODO: when this method is called internally,
-			//       newSelectedItem may be nullItem. Should
-			//       the other branch be taken in that case?
-			if (newSelectedItem!=null) {
-				super.setSelectedItem(_value);
-				getEditor().selectAll(); // after we find a match, do a select all on the editor so if the user starts typing again it won't be appended
-				logger.debug("{}: Selected Index AFTER super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedIndex());
-			} else {
-				// Note that nullItem is null when allowNull is false.
-				// The next statement either selects
-				// the first item in combo, or a null.
-				super.setSelectedItem(nullItem);
-				if (nullItem == null) {
-					logger.debug(() -> String.format("%s : Setting null when null not allowed. Current editor text is '%s'", getColumnForLog(), getEditor().getItem()));
-				}
-				// if (nullItem != null) {
-				// 	super.setSelectedItem(nullItem);
-				// } else {
-				// 	logger.debug("{}: No matching list item found so not updating. Current editor text is '{}'", () -> getColumnForLog(), () -> getEditor().getItem().toString());
-				// }
+		Object newSelectedItem = _value;
+		if (newSelectedItem!=null) {
+			super.setSelectedItem(_value);
+			if (getEditor() != null) {
+				// after we find a match, do a select all on the editor so
+				// if the user starts typing again it won't be appended
+				getEditor().selectAll();
 			}
+			logger.debug("{}: Selected Index AFTER super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedIndex());
+		} else {
+			// Note that nullItem is null when allowNull is false.
+			// The next statement either selects null or the nullItem.
+			super.setSelectedItem(nullItem);
+			if (nullItem == null) {
+				logger.debug(() -> String.format("%s : Setting null when null not allowed. Current editor text is '%s'", getColumnForLog(), getEditor().getItem()));
+			}
+		}
+	}
 
 
 
@@ -1469,71 +1455,62 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 //			updateUI(); // This refreshes the characters displayed.
 //		}
 
+
+	/**
+	 * Finds the listItem having option that matches the specified option
+	 * and make it the selected listItem. If no matching item is found
+	 * the _option is used for {@link #setSelectedItem(java.lang.Object) 
+	 * setSelectedItem(_option)}
+	 *
+	 * @param _option option value of list item
+	 * @throws IllegalStateException if option2 enabled
+	 */
+	public void setSelectedOption(final String _option) {
+		if (hasOption2()) {
+			throw new IllegalStateException("option2 enabled");
+		}
+
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
+			if(remodel.isEmpty()) {
+				return;
+			}
+			
+			Object tItem = getSelectedItem();
+			// Extract the option from the selected list item.
+			// If not an SSListItem, it's editable, use it as current option.
+			Object currentSelectedOption = tItem instanceof SSListItem
+					? remodel.getOption((SSListItem)tItem)
+					: tItem;
+			
+			// only need to proceed if there is a change.
+			if (Objects.equals(_option, currentSelectedOption)) {
+				return;
+			}
+			
+			// find the first matching option in the list
+			final int index = remodel.getOptions().indexOf(_option);
+			
+			Object item;
+			if (index != -1) {
+				item = remodel.get(index);
+			} else {
+				// Didn't find it in the list, so just use it as is.
+				item = _option != null ? _option : nullItem;
+				logger.warn(() -> String.format("%s: Could not find a corresponding combobox item for %s. Using it for selectedItem.", getColumnForLog(), _option));
+			}
+			
+			setSelectedItem(item);
+		}
+
 	}
 
 	/**
-	 * Sets the currently selected value
-	 * <p>
-	 * Currently not a bean property since there is no associated variable.
-	 *
-	 * @param _value value to set as currently selected.
+	 * 
+	 * @param _value option
+	 * @deprecated use {@link #setSelectedOption(java.lang.String) }
 	 */
-	//
-	// TODO: WHAT IS THIS SUPPOSED TO DO IF BOTH O,O2 are set?
-	//
-	// TODO: thought this was deprecated/removed. Maybe that was SSComboBox
-	// 
 	public void setSelectedStringValue(final String _value) {
-
-		// TODO consider firing a property change ??? there are already events
-
-		try (Model.Remodel remodel = optionModel.getRemodel()) {
-			// TODO: If getAllowNull, might be empty, but still have 1 item.
-			// TODO: Why bother checking if empty? If it's empty,
-			//       then there is nothing expensive that happens in here.
-			if(!remodel.isEmpty()) {
-				boolean force = false;
-				Object currentSelectedOption = null;
-				if (!(getSelectedItem() instanceof SSListItem)) {
-					// TODO: Is this correct behavior? warning? exception?
-					force = true;
-				} else {
-					SSListItem item = (SSListItem)getSelectedItem();
-					currentSelectedOption = item != null ? remodel.getOption(item) : null;
-				}
-
-				//
-				// ONLY NEED TO PROCEED IF THERE IS A CHANGE
-				//
-				// TODO: Is it important to check if the same value is already selected?
-				//       If thousands of entries, good to skip
-				//
-				if (force || !_value.equals(currentSelectedOption)) {
-					
-					// IF OPTIONS ARE NON-NULL THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
-					// SPECIFIED TEXT IS STORED
-					//final int index = options.indexOf(_value);
-					final int index = remodel.getOptions().indexOf(_value);
-
-					SSListItem item;
-					if (index != -1) {
-						item = remodel.get(index);
-					} else {
-						item = nullItem;
-						logger.warn(() -> String.format("%s: Could not find a corresponding combobox item for %s. Setting selectedItem to null (blank).", getColumnForLog(), _value));
-					}
-					
-					// setSelectedIndex()->setSelectedItem() For glazed reliability.
-					// setSelectedIndex(index);
-
-					setSelectedItem(item);
-
-					//updateUI();
-					
-				}
-			}
-		}
-
+		setSelectedOption(_value);
 	}
 
 	/**
@@ -1549,19 +1526,17 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 */
 	public void setSelectedMapping(final long _value) {
 
-		// HANDLED BY UNDERLYING INFRASTRUCTURE: TODO consider firing a property change
-		// HANDLED: TODO what if user pass null or if getSelectedValue() is null?
-
+		// TODO: IS THIS COMMENT CORRECT? multiple items with same mapping?
 		// 2020-08-03: Removing conditional as this could be called when consecutive records
 		// have the same value and we want to make sure to update the editor Strings
 
-		// IF MAPPINGS ARE SPECIFIED THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
+		// LOCATE THE FIRST INDEX AT WHICH THE
 		// SPECIFIED CODE IS STORED
 
 		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			// TODO: if getAllowNull, might be empty, but still have 1 item.
 			if (!remodel.isEmpty()) {
-				//final int index = mappings.indexOf(_value);
+				// find first matching mapping, since usually a key expect only one
 				final int index = remodel.getMappings().indexOf(_value);
 
 				SSListItem item;
@@ -1570,7 +1545,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 				} else {
 					item = nullItem;
 					if (item == null) {
-						logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for value of " + _value + ". Setting index to -1 (blank).");
+						logger.warn(String.format("%s: No mapping available for %s in combobox, setSelectedItem(null)", getColumnForLog(), _value));
 					}
 				}
 				
@@ -1581,7 +1556,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 				logger.trace("{}: options - [{}].", () -> getColumnForLog(), () ->  remodel.getOptions().toString());
 				logger.trace("{}: mappings - [{}].", () -> getColumnForLog(), () ->  remodel.getMappings().toString());
 			} else {
-				logger.warn(getColumnForLog() + ": No mappings available for current component. No value set by setSelectedValue().");
+				setSelectedItem(null);
+				logger.warn(String.format("%s: No mappings available in combobox, setting to null", getColumnForLog()));
 			}
 		}
 

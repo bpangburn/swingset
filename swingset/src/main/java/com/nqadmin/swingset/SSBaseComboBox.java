@@ -71,6 +71,10 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
  * use with or without glazed lists; these models have static methods for
  * hooking things up to the JComboBox.
  * <p>
+ * Classes that extend this class, should use {@link #adjustForNullItem() }
+ * after clearing the itemList or when a change is made that might affect
+ * whether or not a nullItem is required.
+ * <p>
  * Initially no Option2.
  * @param <M> mapping type
  * @param <O> option type
@@ -83,10 +87,14 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
 //       The following are identical in both subclasses, there may be more.
 //       - protected class ComboBoxListener ....
 //       - protected final ComboBoxListener ssComboBoxListener = new ComboBoxListener();
-//       - getSelectedMapping()
 //       - public void addSSComponentListener() {...}
 //       - public void removeSSComponentListener() {...}
 //       - public void customInit() {...}
+//       
+//       Above this line feels like scaffolding, below is usage
+//       - getSelectedMapping()
+//
+//       Following are the same after deprecated stuff is removed
 //       - getMappings()
 //       - getOptions()
 //       - 
@@ -269,7 +277,8 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	}
 
 	/**
-	 * Catch this to make some adjustments after a change in metadata.
+	 * Catch this to make some adjustments after a change in metadata;
+	 * in particular checking for a change in nullability.
 	 * {@inheritDoc }
 	 */
 	@Override

@@ -314,8 +314,16 @@ public class SSCommon implements Serializable {
 	 */
 	private String logColumnName = null;
 
+	//
+	// isNullable is a cache of metadata.
+	// TODO: Incorporate into a more formal metadata cache
+	//       if/when there is one.
+	//
+
 	/**
-	 * cache of metadata.
+	 * Reflects the state of the data source metadata about nullability
+	 * of the bound column. False when there's a "NOT NULL" constraint.
+	 * Empty if the metadata specifies unknown.
 	 */
 	private Optional<Boolean> isNullable = Optional.empty();
 
