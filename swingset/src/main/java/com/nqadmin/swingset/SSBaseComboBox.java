@@ -71,6 +71,10 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
  * use with or without glazed lists; these models have static methods for
  * hooking things up to the JComboBox.
  * <p>
+ * Classes that extend this class, should use {@link #adjustForNullItem() }
+ * after clearing the itemList or when a change is made that might affect
+ * whether or not a nullItem is required.
+ * <p>
  * Initially no Option2.
  * @param <M> mapping type
  * @param <O> option type
@@ -78,6 +82,23 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
  * @since 4.0.0
  *
  */
+//
+// TODO: There are more things that can be pulled into here.
+//       The following are identical in both subclasses, there may be more.
+//       - protected class ComboBoxListener ....
+//       - protected final ComboBoxListener ssComboBoxListener = new ComboBoxListener();
+//       - public void addSSComponentListener() {...}
+//       - public void removeSSComponentListener() {...}
+//       - public void customInit() {...}
+//       
+//       Above this line feels like scaffolding, below is usage
+//       - getSelectedMapping()
+//
+//       Following are the same after deprecated stuff is removed
+//       - getMappings()
+//       - getOptions()
+//       - 
+//
 public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> implements SSComponentInterface
 {
 	private static final long serialVersionUID = 1L;
@@ -172,7 +193,11 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * When {@link #getAllowNull() } is true, this is the null item;
 	 * when false this is null. So {@link #setSelectedItem(java.lang.Object)
 	 * setSelectedItem(nullItem)} does the right thing whether getAllowNull()
-	 * is true or false;
+	 * is true or false.
+	 * <p>
+	 * <b>When the item list is cleared, for example
+	 * {@link OptionMappingSwingModel.Remodel#clear() remodel.clear()},
+	 * the nullItem must be set to null.</b>
 	 * @see #createNullItem(com.nqadmin.swingset.models.OptionMappingSwingModel.Remodel)
 	 */
 	protected SSListItem nullItem;
@@ -252,12 +277,12 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	}
 
 	/**
-	 * Catch this to make some adjustments after a change in metadata.
+	 * Catch this to make some adjustments after a change in metadata;
+	 * in particular checking for a change in nullability.
 	 * {@inheritDoc }
 	 */
 	@Override
 	public void metadataChange() {
-		SSComponentInterface.super.metadataChange();
 		adjustForNullItem();
 	}
 
@@ -269,12 +294,21 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	protected abstract SSListItem createNullItem(BaseModel<M,O,O2>.Remodel remodel);
 
 	/**
+	 * A combobox used as a navigator has some restriction; for example,
+	 * it can not have nullItem. Override this as needed.
+	 * @return true if this ComboBox is a navigator
+	 */
+	protected boolean isComboBoxNavigator() {
+		return false;
+	}
+
+	/**
 	 * Add or remove the nullItem from the itemList if needed depending
 	 * on {@code getAllowNull()} and the current existence of a nullItem.
 	 * If logical null is selected before, keep it selected after.
 	 */
 	protected void adjustForNullItem() {
-		boolean wantNull = getAllowNull();
+		boolean wantNull = getAllowNull() && !isComboBoxNavigator();
 		boolean hasNull = nullItem != null;
 		
 		if (wantNull == hasNull) {

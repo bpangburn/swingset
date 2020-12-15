@@ -48,26 +48,18 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.ComboBoxModel;
-import javax.swing.JComboBox;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
-import com.nqadmin.swingset.utils.SSCommon;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import java.util.Objects;
+
 import com.nqadmin.swingset.models.SSListItem;
 
-import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.matchers.TextMatcherEditor;
-import ca.odell.glazedlists.swing.AutoCompleteSupport;
 
 import static com.nqadmin.swingset.datasources.RowSetOps.*;
-import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
-import com.nqadmin.swingset.models.GlazedListsOptionMappingInfo;
-import com.nqadmin.swingset.models.OptionMappingSwingModel;
+
 import com.nqadmin.swingset.models.SSListItemFormat;
 
 
@@ -77,14 +69,31 @@ import com.nqadmin.swingset.models.SSListItemFormat;
 
 /**
  * Similar to the SSComboBox, but used when both the 'bound' values and the
- * 'display' values are pulled from a database table. Generally the bound value
+ * 'display' values are pulled from a database table.
+ * The bound value is called the 'mapping' and the display value the 'option'.
+ * An 'option2' may be specified; in that case the display value
+ * for the mapping is a composite of option and option2.
+ * Generally the mapping 
  * represents a foreign key to another table, and the combobox needs to display
  * a list of one (or more) columns from the other table.
  * <p>
- * <b>Warning. This combobox may use GlazedLists. Do not use methods
- * that are based on index in the list. Unless you're sure...</b>
- * setSelectedIndex(-1) is OK, though it may end up at selected
- * index 0, which is "null/empty" if allowing null.
+ * <b>Warning. This combobox may use GlazedLists and an item is automatically
+ * inserted when {@link #getAllowNull() } is true. Do not use methods
+ * that are based on index in the list, unless you're sure...</b>
+ * {@link #setSelectedItem(java.lang.Object) setSelectedItem(SSListItem)}
+ * and {@link #getSelectedItem() getSelectedItem()}
+ * are the correct techniques.
+ * such as {@link #setSelectedMapping(long)}.
+ * <p>
+ * Notice that {@link #getSelectedMapping() }
+ * returns null in two situations related to {@link #getAllowNull() }
+ * <ul>
+ *   <li>nothing is selected in this combo box
+ *   <li>the <em>nullItem</em> is selected in this combo box
+ * </ul>
+ * <p>
+ * {@code getSelectedItem() == null } indicates there is no selection;
+ * use this if the distinction is needed.
  * <p>
  * Note, if changing both a rowSet and column name consider using the bind()
  * method rather than individual setRowSet() and setColumName() calls.
@@ -153,18 +162,16 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  * </pre>
  */
 
-public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentInterface {
+public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
+{
 	private static final long serialVersionUID = -4203338788107410027L;
 
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
 	 * database column.
 	 */
-	protected class SSDBComboBoxListener implements ActionListener, Serializable {
-
-		/**
-		 * unique serial ID
-		 */
+	protected class SSDBComboBoxListener implements ActionListener, Serializable
+	{
 		private static final long serialVersionUID = 5078725576768393489L;
 
 		/** {@inheritDoc} */
@@ -173,14 +180,15 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 			removeRowSetListener();
 
-			final int index = getSelectedIndex();
+			//final int index = getSelectedIndex();
+			Long mapping = getSelectedMapping();
 
-			if (index == -1 || getSelectedValue()==null) {
+			if (mapping == null) {
 				logger.debug("{}: SSDBComboListener.actionPerformed setting bound column to  null.", () -> getColumnForLog());
 				setBoundColumnText(null);
 			} else {
-				logger.debug("{}: SSDBComboListener.actionPerformed setting bound column to {}.", () -> getColumnForLog(), () -> getSelectedValue());
-				setBoundColumnText(String.valueOf(getSelectedValue()));
+				logger.debug("{}: SSDBComboListener.actionPerformed setting bound column to {}.", () -> getColumnForLog(), () -> mapping);
+				setBoundColumnText(String.valueOf(mapping));
 
 			}
 
@@ -201,65 +209,25 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	@Deprecated
 	public static final int NON_SELECTED = Integer.MIN_VALUE + 1;
 
-	/** when null allowed, this is the null item. if null, not allowed */
-	private SSListItem nullItem;
+	@SuppressWarnings("serial")
+	private static class Model extends SSBaseComboBox.BaseModel<Long, Object, Object>
+	{
+	}
 
-	/**
-	 * Start with option2 disabled
-	 */
-	private static class Model extends OptionMappingSwingModel<Long, Object, Object> {
-		private static final long serialVersionUID = 1L;
-
-		static Model install(JComboBox<SSListItem> _jc) {
-			Model model = new Model();
-			AbstractComboBoxListSwingModel.install(_jc, model);
-			return model;
-		}
-
-		private Model() {
-			// false means no Options2
-			super(false);
-		}
+	@SuppressWarnings("serial")
+	private static class GlazedModel extends SSBaseComboBox.BaseGlazedModel<Long, Object, Object>
+	{
 	}
 
 	/**
-	 * Start with option2 disabled
+	 * Create a nullItem.
+	 * @param remodel the active Remodel
+	 * @return a nullItem
 	 */
-	private static class GlazedModel extends GlazedListsOptionMappingInfo<Long,Object,Object> {
-		private static final long serialVersionUID = 1L;
-		private AutoCompleteSupport<SSListItem> autoComplete;
-
-		// See https://stackoverflow.com/questions/15210771/autocomplete-with-glazedlists for info on modifying lists.
-		// See https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html
-		// We would like to call autoComplete.setStrict(true), but it is not currently compatible with TextMatcherEditor.CONTAINS, which is the more important feature.
-		// There is a support request to support STRICT and CONTAINS: https://github.com/glazedlists/glazedlists/issues/676
-		// Note that installing AutoComplete support makes the ComboBox editable.
-		// Should already in the event dispatch thread so don't use invokeAndWait()
-
-		static GlazedModel install(JComboBox<SSListItem> _jc) {
-			GlazedModel model = new GlazedModel();
-			model.autoComplete = AutoCompleteSupport.install(_jc, model.getEventList(), null, model.getListItemFormat());
-			model.autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
-			//model.autoComplete.setStrict(true);
-			return model;
-		}
-
-		public GlazedModel() {
-			// false means no Options2
-			super(false, new BasicEventList<SSListItem>());
-		}
-
-		/** this only works once, use it for install */
-		@Override
-		public EventList<SSListItem> getEventList() {
-			return super.getEventList();
-		}
+	@Override
+	protected SSListItem createNullItem(Model.Remodel remodel) {
+		return remodel.createOptionMappingItem(null, "", null);
 	}
-
-	/**
-	 * comboInfo handles eventList, mappings, options access.
-	 */
-	private OptionMappingSwingModel<Long, Object, Object> comboInfo;
 
 	/**
 	 * Format an SSListItem. Used to AutoCompleteSupport.install.
@@ -357,16 +325,11 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	// private boolean settingSelectedItem = false;
 
 	/**
-	 * Common fields shared across SwingSet components
-	 */
-	protected SSCommon ssCommon = new SSCommon(this);
-
-	/**
 	 * Component listener.
 	 */
 	protected final SSDBComboBoxListener ssDBComboBoxListener = new SSDBComboBoxListener();
 
-	private final boolean useGlazedModel = true;
+	private static final boolean USE_GLAZED_MODEL = true;
 
 	/**
 	 * Creates an object of the SSDBComboBox.
@@ -376,12 +339,12 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// Note that call to parent default constructor is implicit.
 		//super();
 
-		if (useGlazedModel) {
-			comboInfo = GlazedModel.install(this);
+		if (USE_GLAZED_MODEL) {
+			optionModel = GlazedModel.install(this);
 		} else {
-			comboInfo = Model.install(this);
+			optionModel = Model.install(this);
 		}
-		listItemFormat = comboInfo.getListItemFormat();
+		listItemFormat = optionModel.getListItemFormat();
 		listItemFormat.setPattern(JDBCType.DATE, dateFormat);
 		listItemFormat.setSeparator(separator);
 	}
@@ -407,42 +370,18 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	}
 
 	/**
-	 * Get the support for the glazed lists installed in this combo box.
-	 * 
-	 * @return the support or null if GlazedLists not installed
-	 */
-	protected AutoCompleteSupport<SSListItem> getAutoComplete() {
-		return comboInfo instanceof GlazedModel
-				? ((GlazedModel)comboInfo).autoComplete
-				: null;
-	}
-
-	/**
-	 * <b>It is probably an error to use this.</b>
-	 * {@inheritDoc}
-	 */
-	// TODO: throw exception? Is this safe?
-	@Override
-	public void setModel(ComboBoxModel<SSListItem> model) {
-		comboInfo = model instanceof Model ? (Model)model
-				: model instanceof GlazedModel ? (GlazedModel)model : null;
-
-		super.setModel(model);
-	}
-
-	/**
 	 * Adds an item to the existing list of items in the combo box.
 	 *
 	 * @param _option text that should be displayed in the combobox
 	 * @param _mapping  mapping of _option, typically a primary key
 	 */
 	public void addOption(String _option, Long _mapping) {
-		try (Model.Remodel remodel = comboInfo.getRemodel()) {
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			remodel.add(_mapping, _option);
 		} catch (final Exception e) {
 			logger.error(getColumnForLog() + ": Exception.", e);
 		}
-		// try (Model.Remodel remodel = comboInfo.getRemodel()) {
+		// try (Model.Remodel remodel = optionModel.getRemodel()) {
 		// 	remodel.add(_primaryKey, _displayText);
 		// } catch (final Exception e) {
 		// 	logger.error(getColumnForLog() + ": Exception.", e);
@@ -549,7 +488,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		boolean result = false;
 
-		try (Model.Remodel remodel = comboInfo.getRemodel()) {
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			// GET INDEX FOR mappings and options
 			int index = remodel.getMappings().indexOf(_mapping);
 			// PROCEED IF INDEX WAS FOUND
@@ -616,7 +555,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * If more than one item is present in the combo that matches, only
 	 * the first one is removed.
 	 *
-	 * @param _option list item with this option is deleted
+	 * @param _option list item with this currentSelectedOption is deleted
 	 *
 	 * @return returns true on successful deletion otherwise returns false.
 	 * @deprecated no replacement, throws exception
@@ -735,7 +674,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		//		 Changed signature to avoid strange casting exception
 		//		 having to do with unmodifiable lists...
 		//return mappings;
-		return comboInfo.getMappings();
+		return optionModel.getMappings();
 	}
 
 	/**
@@ -752,7 +691,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		
 		// int result = 0;
 
-		return comboInfo.getSize();
+		return optionModel.getSize();
 
 		// if (eventList != null) {
 		// 	result = eventList.size();
@@ -771,7 +710,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// TODO: is this used?
 		//return options;
 
-		return comboInfo.getOptions();
+		return optionModel.getOptions();
 
 		// NOTE: IF A LIST OF THE STRINGS IN COMBOBOX IS WANTED,
 		//		 THEN THE FOLLOWING CAN BE USED.
@@ -843,10 +782,10 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
-	 * @return returns the value associated with the selected item OR -1 if nothing
-	 *         is selected.
+	 * @return returns the value associated with the selected item
+	 * OR null if nothing is selected.
 	 */
-	public Long getSelectedValue() {
+	public Long getSelectedMapping() {
 		
 		// TODO Consider overriding getSelectedIndex() to account for GlazedList impact
 
@@ -866,7 +805,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		// During setSelectedItem() selectedItem may have a value, but is otherwise null and we want
 		// to call getSelectedIndex(). Per above we do NOT want to call getSelectedIndex() while 
 		// filtering is taking place.
-		try (Model.Remodel remodel = comboInfo.getRemodel()) {
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
 //			if (settingSelectedItem) {
 //				if (selectedItem == null) {
 //					result = (long) NON_SELECTED;
@@ -903,6 +842,21 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	}
 
 	/**
+	 * Returns the underlying database record primary key value corresponding to the
+	 * currently selected item in the combobox.
+	 * <p>
+	 * Currently not a bean property since there is no associated variable.
+	 *
+	 * @return returns the value associated with the selected item OR -1 if nothing
+	 *         is selected.
+	 * 
+	 * @deprecated use {@link #getSelectedMapping() }
+	 */
+	public Long getSelectedValue() {
+		return getSelectedMapping();
+	}
+
+	/**
 	 * Returns the separator used when multiple columns are displayed
 	 *
 	 * @return separator used.
@@ -921,16 +875,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	@Deprecated
 	public String getSeperator() {
 		return separator;
-	}
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
 	}
 
 //	/** type of column being formatted, date types special */
@@ -1009,6 +953,24 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	}
 
 	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	protected boolean isComboBoxNavigator() {
+		return getBoundColumnName() == null;
+	}
+
+	/**
+	 * After this, make some adjustments.
+	 * {@inheritDoc }
+	 */
+	@Override
+	public void setBoundColumnName(String _boundColumnName) {
+		ssCommon.setBoundColumnName(_boundColumnName);
+		adjustForNullItem();
+	}
+
+	/**
 	 * Populates the list model with the data by fetching it from the database.
 	 */
 	private void queryData() {
@@ -1017,18 +979,20 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 		ResultSet rs;
 
 		// this.data.getReadWriteLock().writeLock().lock();
-		try (Model.Remodel remodel = comboInfo.getRemodel()) {
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			logger.trace("{}: Clearing eventList.", () -> getColumnForLog());
 			remodel.clear();
+			nullItem = null;
+
 			logger.debug("{}: Nulls allowed? [{}].", () -> getColumnForLog(), () -> getAllowNull());
 			// 2020-07-24: adding support for a nullable first item if nulls are supported
-			// 2020-10-02: For a SSDBComboBox used as a navigator, we don't want a null first item. Look at getBoundColumnName().
-			nullItem = null;
-			if (getAllowNull() && (getBoundColumnName()!=null)) {
-				logger.trace("{}: Adding blank list item", () -> getColumnForLog());
-				nullItem = remodel.createComboItem(null, "", null);
-				remodel.add(nullItem);
-			}
+			// 2020-10-02: For a SSDBComboBox used as a navigator, we don't want a null first item. Look at getBoundColumnName() and isComboBoxNavigator.
+			// if (getAllowNull() && (getBoundColumnName()!=null)) {
+			// 	logger.trace("{}: Adding blank list item", () -> getColumnForLog());
+			// 	nullItem = remodel.createOptionMappingItem(null, "", null);
+			// 	remodel.add(nullItem);
+			// }
+			adjustForNullItem();
 
 			Statement statement = ssCommon.getConnection().createStatement();
 			rs = statement.executeQuery(getQuery());
@@ -1037,11 +1001,11 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 			// Configure the listItemFormat with this queries column types
 			listItemFormat.clear();
-			listItemFormat.addElemType(comboInfo.getOptionListItemElemIndex(),
+			listItemFormat.addElemType(optionModel.getOptionListItemElemIndex(),
 					getJDBCColumnType(rs, rs.findColumn(displayColumnName)));
 			if (hasOption2()) {
 				//option2ColumnType = getJDBCColumnType(rs, rs.findColumn(secondDisplayColumnName));
-				listItemFormat.addElemType(comboInfo.getOption2ListItemElemIndex(),
+				listItemFormat.addElemType(optionModel.getOption2ListItemElemIndex(),
 						getJDBCColumnType(rs, rs.findColumn(secondDisplayColumnName)));
 			}
 
@@ -1056,7 +1020,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 				if (hasOption2()) {
 					logger.trace("{}: Second column to display - " + opt2, () -> getColumnForLog());
 				}
-				newItems.add(remodel.createComboItem(pk, opt, opt2));
+				newItems.add(remodel.createOptionMappingItem(pk, opt, opt2));
 			}
 			remodel.addAll(newItems);
 			rs.close();
@@ -1294,17 +1258,13 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	public void setSecondDisplayColumnName(final String _secondDisplayColumnName) {
 		final String oldValue = secondDisplayColumnName;
 		secondDisplayColumnName = _secondDisplayColumnName;
-		comboInfo.setOption2Enabled(hasOption2());
+		optionModel.setOption2Enabled(hasOption2());
 		firePropertyChange("secondDisplayColumnName", oldValue, secondDisplayColumnName);
 	}
 
 	/**
-	 * Sets the currently selected value. This is called when the user clicks on an
-	 * item or when they type in the combo's textfield.
-	 * <p>
-	 * Currently not a bean property since there is no associated variable.
-	 *
-	 * @param _value value to set as currently selected.
+	 * {@inheritDoc }
+	 * This method override additionally selects a currently edited item in the combo box
 	 */
 	@Override
 	public void setSelectedItem(final Object _value) {
@@ -1332,35 +1292,35 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //		logger.debug("{}: Possible matches AFTER hidePopup() - " + possibleMatches, () -> getColumnForLog());
 //		logger.debug("{}: Selected Index AFTER hidePopup()={}", () -> getColumnForLog(), () -> getSelectedIndex());
 
-		// Extract selected item
-			//selectedItem = (SSListItem) _value;
-			SSListItem selectedItem = (SSListItem) _value;
-
 		// Call to super.setSelectedItem() triggers SSDBComboListener.actionPerformed, which calls getSelectedValue(), which calls getSelectedIndex(), which returns -1 while still in the editor
 		// and returns 0 after focus is lost.
 		//
 		// Calling hidePopup() restores the list, but messes up the GlazedList filtering.
 		//
 		// 2020-10-03_BP: Updated getSelectedValue() to properly return the primary key rather than using getSelectedIndex() during a call to this method.
+
+		// TODO: NOT SURE WHERE THE FOLLOWING COMMENT CAME FROM,
+		//       BUT THAT'S NOT HOW IT WORKS NOW
 		// Only try to update item for a valid list item.
-			if (selectedItem!=null) {
-				super.setSelectedItem(_value);
-				getEditor().selectAll(); // after we find a match, do a select all on the editor so if the user starts typing again it won't be appended
-				logger.debug("{}: Selected Index AFTER super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedIndex());
-			} else {
-				// Note that nullItem is null when allowNull is false.
-				// The next statement either selects
-				// the first item in combo, or a null.
-				super.setSelectedItem(nullItem);
-				if (nullItem == null) {
-					logger.debug(() -> String.format("%s : Setting null when null not allowed. Current editor text is '%s'", getColumnForLog(), getEditor().getItem()));
-				}
-				// if (nullItem != null) {
-				// 	super.setSelectedItem(nullItem);
-				// } else {
-				// 	logger.debug("{}: No matching list item found so not updating. Current editor text is '{}'", () -> getColumnForLog(), () -> getEditor().getItem().toString());
-				// }
+
+		Object newSelectedItem = _value;
+		if (newSelectedItem!=null) {
+			super.setSelectedItem(_value);
+			if (getEditor() != null) {
+				// after we find a match, do a select all on the editor so
+				// if the user starts typing again it won't be appended
+				getEditor().selectAll();
 			}
+			logger.debug("{}: Selected Index AFTER super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedIndex());
+		} else {
+			// Note that nullItem is null when allowNull is false.
+			// The next statement either selects null or the nullItem.
+			super.setSelectedItem(nullItem);
+			if (nullItem == null) {
+				logger.debug(() -> String.format("%s : Setting null when null not allowed. Current editor text is '%s'", getColumnForLog(), getEditor().getItem()));
+			}
+		}
+	}
 
 
 
@@ -1495,96 +1455,122 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 //			updateUI(); // This refreshes the characters displayed.
 //		}
 
-	}
 
 	/**
-	 * Sets the currently selected value
-	 * <p>
-	 * Currently not a bean property since there is no associated variable.
+	 * Finds the listItem having option that matches the specified option
+	 * and make it the selected listItem. If no matching item is found
+	 * the _option is used for {@link #setSelectedItem(java.lang.Object) 
+	 * setSelectedItem(_option)}
 	 *
-	 * @param _value value to set as currently selected.
+	 * @param _option option value of list item
+	 * @throws IllegalStateException if option2 enabled
 	 */
-	public void setSelectedStringValue(final String _value) {
+	public void setSelectedOption(final String _option) {
+		if (hasOption2()) {
+			throw new IllegalStateException("option2 enabled");
+		}
 
-		// ONLY NEED TO PROCEED IF THERE IS A CHANGE
-		// TODO consider firing a property change
-		try (Model.Remodel remodel = comboInfo.getRemodel()) {
-			if(!remodel.isEmpty()) {
-				if (_value != getSelectedItem()) {
-					
-					// IF OPTIONS ARE NON-NULL THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
-					// SPECIFIED TEXT IS STORED
-					//final int index = options.indexOf(_value);
-					final int index = remodel.getOptions().indexOf(_value);
-
-					SSListItem item = null;
-					if (index != -1) {
-						item = remodel.get(index);
-					} else {
-						logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for display text of " + _value + ". Setting selectedItem to null (blank).");
-					}
-					
-					//
-					// TODO: GET RID OF THIS, USE ITEM OR SOME OTHER TECHNIQUE,
-					//       NOT RELIABLE WITH GLAZED LISTS
-					//
-					// setSelectedIndex()->setSelectedItem().
-					// setSelectedIndex(index);
-
-					setSelectedItem(item);
-
-					//updateUI();
-					
-				}
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
+			if(remodel.isEmpty()) {
+				return;
 			}
+			
+			Object tItem = getSelectedItem();
+			// Extract the option from the selected list item.
+			// If not an SSListItem, it's editable, use it as current option.
+			Object currentSelectedOption = tItem instanceof SSListItem
+					? remodel.getOption((SSListItem)tItem)
+					: tItem;
+			
+			// only need to proceed if there is a change.
+			if (Objects.equals(_option, currentSelectedOption)) {
+				return;
+			}
+			
+			// find the first matching option in the list
+			final int index = remodel.getOptions().indexOf(_option);
+			
+			Object item;
+			if (index != -1) {
+				item = remodel.get(index);
+			} else {
+				// Didn't find it in the list, so just use it as is.
+				item = _option != null ? _option : nullItem;
+				logger.warn(() -> String.format("%s: Could not find a corresponding combobox item for %s. Using it for selectedItem.", getColumnForLog(), _option));
+			}
+			
+			setSelectedItem(item);
 		}
 
 	}
 
 	/**
-	 * Sets the value stored in the component.
+	 * 
+	 * @param _value option
+	 * @deprecated use {@link #setSelectedOption(java.lang.String) }
+	 */
+	public void setSelectedStringValue(final String _value) {
+		setSelectedOption(_value);
+	}
+
+	/**
+	 * Sets the selected ComboBox item according to the specified mapping/key.
 	 * <p>
 	 * If called from updateSSComponent() from a RowSet change then the Component
 	 * listener should already be turned off. Otherwise we want it on so the
 	 * ultimate call to setSelectedIndex() will trigger an update the to RowSet.
 	 * <p>
-	 * The mappings ArrayList will be null until execute is called so
-	 * <p>
 	 * Currently not a bean property since there is no associated variable.
 	 *
-	 * @param _value database record primary key value to assign to combobox
+	 * @param _value database record mapping/key
 	 */
-	public void setSelectedValue(final long _value) {
+	public void setSelectedMapping(final long _value) {
 
-		// TODO consider firing a property change
-		// TODO what happens if user tries to pass null or if getSelectedValue() is null?
-
+		// TODO: IS THIS COMMENT CORRECT? multiple items with same mapping?
 		// 2020-08-03: Removing conditional as this could be called when consecutive records
 		// have the same value and we want to make sure to update the editor Strings
 
-		// IF MAPPINGS ARE SPECIFIED THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
+		// LOCATE THE FIRST INDEX AT WHICH THE
 		// SPECIFIED CODE IS STORED
 
-		try (Model.Remodel remodel = comboInfo.getRemodel()) {
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
+			// TODO: if getAllowNull, might be empty, but still have 1 item.
 			if (!remodel.isEmpty()) {
-				//final int index = mappings.indexOf(_value);
+				// find first matching mapping, since usually a key expect only one
 				final int index = remodel.getMappings().indexOf(_value);
-				
-				if (index == -1) {
-					logger.warn(getColumnForLog() + ": Could not find a corresponding item in combobox for value of " + _value + ". Setting index to -1 (blank).");
+
+				SSListItem item;
+				if (index != -1) {
+					item = remodel.get(index);
+				} else {
+					item = nullItem;
+					if (item == null) {
+						logger.warn(String.format("%s: No mapping available for %s in combobox, setSelectedItem(null)", getColumnForLog(), _value));
+					}
 				}
+				
+				setSelectedItem(item);
+				//setSelectedIndex(index);
 				
 				logger.trace("{}: eventList - [{}].", () -> getColumnForLog(), () ->  remodel.getItemList().toString());
 				logger.trace("{}: options - [{}].", () -> getColumnForLog(), () ->  remodel.getOptions().toString());
 				logger.trace("{}: mappings - [{}].", () -> getColumnForLog(), () ->  remodel.getMappings().toString());
-				
-				setSelectedItem(index == -1 ? null : remodel.get(index));
-				//setSelectedIndex(index);
 			} else {
-				logger.warn(getColumnForLog() + ": No mappings available for current component. No value set by setSelectedValue().");
+				setSelectedItem(null);
+				logger.warn(String.format("%s: No mappings available in combobox, setting to null", getColumnForLog()));
 			}
 		}
 
+	}
+
+	/**
+	 * Sets the selected ComboBox item according to the specified mapping/key.
+	 * 
+	 * @param _value database record mapping/key
+	 * @deprecated use {@link #setSelectedMapping(long) }
+	 */
+	public void setSelectedValue(final long _value) {
+		setSelectedMapping(_value);
 	}
 
 	/**
@@ -1614,17 +1600,6 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	}
 
 	/**
-	 * Sets the SSCommon data member for the current Swingset Component.
-	 *
-	 * @param _ssCommon shared/common SwingSet component data and methods
-	 */
-	@Override
-	public void setSSCommon(final SSCommon _ssCommon) {
-		ssCommon = _ssCommon;
-
-	}
-
-	/**
 	 * Update an option of an item in the combobox's item list.
 	 * <p>
 	 * If more than one item is present in the combo for that value, only the first
@@ -1638,8 +1613,8 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 	 * call the updateRow.)
 	 *
 	 * @param _mapping         typically a primary key value corresponding the
-	 *                         the displayed option to be updated
-	 * @param _option option that should be updated in the combobox
+                         the displayed currentSelectedOption to be updated
+	 * @param _option currentSelectedOption that should be updated in the combobox
 	 *
 	 * @return returns true if update is successful otherwise returns false.
 	 */
@@ -1647,9 +1622,9 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 
 		boolean result = false;
 
-		try (Model.Remodel remodel = comboInfo.getRemodel()) {
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			final int index = remodel.getMappings().indexOf(_mapping);
-			if (index < 0) {
+			if (index >= 0) {
 				remodel.setOption(index, _option);
 				result = true;
 // TODO Confirm that eventList is not reordered by GlazedLists code.
@@ -1735,7 +1710,7 @@ public class SSDBComboBox extends JComboBox<SSListItem> implements SSComponentIn
 			//if (eventList==null) {
 			//	return;
 			//}
-			if (comboInfo.getItemList().isEmpty()) {
+			if (optionModel.getItemList().isEmpty()) {
 				return;
 			}
 

@@ -449,7 +449,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 			if (_option2 != null) {
 				usingOption2();
 			}
-			return super.add(createComboItem(_mapping, _option, _option2));
+			return super.add(createOptionMappingItem(_mapping, _option, _option2));
 			//itemList.add(createOptionItem(_mapping, _option, _option2));
 			//isModifiedLength = true;
 			//return true;
@@ -462,7 +462,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 		 * @param _option2 additional display info
 		 * @return the new list item
 		 */
-		public SSListItem createComboItem(M _mapping, O _option, O2 _option2) {
+		public SSListItem createOptionMappingItem(M _mapping, O _option, O2 _option2) {
 			return OptionMappingSwingModel.this.createOptionItem(_mapping, _option, _option2);
 		}
 	}
