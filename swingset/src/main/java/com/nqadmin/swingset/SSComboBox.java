@@ -801,6 +801,10 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long or Integer
 		
 		try {
+			if (!hasItems()) {
+				return;
+			}
+
 			// Expecting an integer so trim in case the database column is a String AND has padding
 			// TODO: #17 string casting
 			final String rawText = getBoundColumnText();

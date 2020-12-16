@@ -225,7 +225,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 
 	/**
 	 * When {@link #getAllowNull() } is true, this is the null item;
@@ -301,6 +301,16 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	//
 
 	/**
+	 * Determine if there are option/mapping items. This is tricky because
+	 * if getAllowNull is true then nullItem is in the item list.
+	 * 
+	 * @return true if there are options/mappings
+	 */
+	public boolean hasItems() {
+		return optionModel.getItemList().size() != (getAllowNull() ? 1 : 0);
+	}
+
+	/**
 	 * Returns the mapping code corresponding to the currently selected item in the
 	 * combobox. Typically, this is the underlying database record
 	 * primary key value corresponding to the currently selected item.
@@ -341,9 +351,11 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				getColumnForLog(), getSelectedMapping(), _mapping ));
 
 		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
-			if (remodel.isEmpty()) {
+			if (!hasItems()) {
 				logger.warn(String.format("%s: combobox is empty", getColumnForLog()));
-				// selected item already null
+				// Doesn't have items, that doesn't mean that the list is empty.
+				// Make sure the appropriate null is selected.
+				setSelectedItem(nullItem);
 				return;
 			}
 			
@@ -381,7 +393,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	public void setSelectedOption(final O _option) {
 
 		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
-			if(remodel.isEmpty()) {
+			if(!hasItems()) {
 				logger.warn(String.format("%s: combobox is empty", getColumnForLog()));
 				// Even if combo is empty, stick _option in editor. Do not return;
 			}
