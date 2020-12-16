@@ -39,13 +39,19 @@ package com.nqadmin.swingset;
 
 // SSBaseComboBox.java
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
 import com.nqadmin.swingset.models.GlazedListsOptionMappingInfo;
@@ -84,24 +90,51 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
  */
 //
 // TODO: There are more things that can be pulled into here.
-//       The following are identical in both subclasses, there may be more.
-//       - protected class ComboBoxListener ....
-//       - protected final ComboBoxListener ssComboBoxListener = new ComboBoxListener();
-//       - public void addSSComponentListener() {...}
-//       - public void removeSSComponentListener() {...}
-//       - public void customInit() {...}
-//       
-//       Above this line feels like scaffolding, below is usage
-//       - getSelectedMapping()
 //
-//       Following are the same after deprecated stuff is removed
+//       Might want to put listItemFormat field in here.
+//
+//       Following are the same and can be moved into here
+//       after deprecated stuff is removed. There may be more.
 //       - getMappings()
 //       - getOptions()
+//       - 
+//
+//       Some things are only in one subclass, but feel like
+//       they belong in here.
+//       - removeMapping(M)
 //       - 
 //
 public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> implements SSComponentInterface
 {
 	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Listener(s) for the component's value used to propagate changes back to bound
+	 * database column.
+	 */
+	protected class SSBaseComboBoxListener implements ActionListener, Serializable
+	{
+		private static final long serialVersionUID = -3131533966245488092L;
+
+		/** {@inheritDoc} */
+		@Override
+		public void actionPerformed(final ActionEvent ae) {
+
+			removeRowSetListener();
+
+			M mapping = getSelectedMapping();
+
+			if (mapping == null) {
+				setBoundColumnText(null);
+				logger.debug(() -> String.format("%s: Setting to null.", getColumnForLog()));
+			} else {
+				setBoundColumnText(String.valueOf(mapping));
+				logger.debug(String.format("%s: Setting to %s.",  getColumnForLog(), mapping));
+			}
+
+			addRowSetListener();
+		}
+	}
 
 	/**
 	 * OptionMapping model that can be installed in a JComboBox; this model has methods
@@ -190,6 +223,11 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	}
 
 	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+
+	/**
 	 * When {@link #getAllowNull() } is true, this is the null item;
 	 * when false this is null. So {@link #setSelectedItem(java.lang.Object)
 	 * setSelectedItem(nullItem)} does the right thing whether getAllowNull()
@@ -208,9 +246,19 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	protected SSCommon ssCommon = new SSCommon(this);
 
 	/**
+	 * Component listener.
+	 */
+	protected final SSBaseComboBoxListener ssBaseComboBoxListener = new SSBaseComboBoxListener();
+
+	/**
 	 * The combo model.
 	 */
 	protected OptionMappingSwingModel<M,O,O2> optionModel;
+
+	//////////////////////////////////////////////////////////////////////////
+	//
+	// Model stuff
+	//
 
 	/**
 	 * <b>It is probably an error to use this.</b>
@@ -247,6 +295,131 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				: null;
 	}
 
+	/////////////////////////////////////////////////////////////////////////
+	//
+	// Option/Mapping
+	//
+
+	/**
+	 * Returns the mapping code corresponding to the currently selected item in the
+	 * combobox. Typically, this is the underlying database record
+	 * primary key value corresponding to the currently selected item.
+	 *
+	 * @return returns the value associated with the selected item
+	 * OR null if nothing is selected.
+	 */
+	public M getSelectedMapping() {
+		logger.trace(() -> String.format("%s: getSelectedMapping(), idx:map %d:%s.",
+				getColumnForLog(), getSelectedIndex(), getSelectedItem()));
+
+		M result = null;
+
+		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
+			Object item = getSelectedItem();
+			if (item instanceof SSListItem) {
+				result = remodel.getMapping((SSListItem)item);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Sets the selected ComboBox item according to the specified mapping/key.
+	 * The selectedItem is set to nullItem or null if mapping not found.
+	 * <p>
+	 * If called from updateSSComponent() from a RowSet change then the Component
+	 * listener should already be turned off. Otherwise we want it on so the
+	 * ultimate call to setSelectedItem() will trigger an update the to RowSet.
+	 *
+	 * @param _mapping key of item value to assign to combobox,
+	 *                 which may or may not correlate to the combobox index
+	 */
+	public void setSelectedMapping(final M _mapping) {
+		
+		logger.debug(String.format("%s: current value: %s, new value: %s.",
+				getColumnForLog(), getSelectedMapping(), _mapping ));
+
+		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
+			if (remodel.isEmpty()) {
+				logger.warn(String.format("%s: combobox is empty", getColumnForLog()));
+				// selected item already null
+				return;
+			}
+			
+			// only need to proceed if there is a change.
+			if (Objects.equals(_mapping, getSelectedMapping())) {
+				return;
+			}
+			
+			final int index = remodel.getMappings().indexOf(_mapping);
+			SSListItem item;
+			if (index != -1) {
+				item = remodel.get(index);
+			} else {
+				// nullItem is either special first list item
+				// or it is null. It is null when getAllowNull() is false
+				item = nullItem;
+				logger.warn(String.format("%s: No mapping available for %s in combobox, setSelectedItem(null)", getColumnForLog(), _mapping));
+			}
+			setSelectedItem(item);
+			
+			logger.trace("{}: eventList - [{}].", () -> getColumnForLog(), () ->  remodel.getItemList().toString());
+			logger.trace("{}: options - [{}].", () -> getColumnForLog(), () ->  remodel.getOptions().toString());
+			logger.trace("{}: mappings - [{}].", () -> getColumnForLog(), () ->  remodel.getMappings().toString());
+		}
+	}
+
+	/**
+	 * Finds the listItem having option that matches the specified option
+	 * and make it the selected listItem. If no matching item is found
+	 * the _option is used for {@link #setSelectedItem(java.lang.Object) 
+	 * setSelectedItem(_option)}
+	 *
+	 * @param _option option value of list item
+	 */
+	public void setSelectedOption(final O _option) {
+
+		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
+			if(remodel.isEmpty()) {
+				logger.warn(String.format("%s: combobox is empty", getColumnForLog()));
+				// Even if combo is empty, stick _option in editor. Do not return;
+			}
+			
+			Object tItem = getSelectedItem();
+			// Extract the option from the selected list item.
+			// If not an SSListItem, it's editable, use it as current option.
+			Object currentSelectedOption = tItem instanceof SSListItem
+					? remodel.getOption((SSListItem)tItem)
+					: tItem;
+			
+			// only need to proceed if there is a change.
+			if (Objects.equals(_option, currentSelectedOption)) {
+				return;
+			}
+			
+			// find the first matching option in the list
+			final int index = remodel.getOptions().indexOf(_option);
+			
+			Object item;
+			if (index != -1) {
+				item = remodel.get(index);
+			} else {
+				// Didn't find it in the list, so just use it as is.
+				item = _option != null ? _option : nullItem;
+				logger.warn(() -> String.format("%s: option %s not in combobox, do setSelectedItem.", getColumnForLog(), _option));
+			}
+			
+			setSelectedItem(item);
+		}
+	}
+
+
+	/////////////////////////////////////////////////////////////////////////
+	//
+	// Here's SwingSet scaffolding and nullItem maintenance.
+	//
+
 	/**
 	 * Returns the ssCommon data member for the current Swingset component.
 	 *
@@ -264,6 +437,41 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	public void setSSCommon(final SSCommon _ssCommon) {
 		ssCommon = _ssCommon;
 
+	}
+
+	/**
+	 * Adds any necessary listeners for the current SwingSet component. These will
+	 * trigger changes in the underlying RowSet column.
+	 */
+	@Override
+	public void addSSComponentListener() {
+		addActionListener(ssBaseComboBoxListener);
+
+	}
+
+	/**
+	 * Removes any necessary listeners for the current SwingSet component. These
+	 * will trigger changes in the underlying RowSet column.
+	 */
+	@Override
+	public void removeSSComponentListener() {
+		removeActionListener(ssBaseComboBoxListener);
+	}
+
+	/**
+	 * Method to allow Developer to add functionality when SwingSet component is
+	 * instantiated.
+	 * <p>
+	 * It will actually be called from SSCommon.init() once the SSCommon data member
+	 * is instantiated.
+	 */
+	@Override
+	public void customInit() {
+		// SET PREFERRED DIMENSIONS
+// TODO not sure SwingSet should be setting component dimensions
+		setPreferredSize(new Dimension(200, 20));
+// TODO This was added during SwingSet rewrite 4/2020. Need to confirm it doesn't break anything.
+		setEditable(false);
 	}
 
 	/**
