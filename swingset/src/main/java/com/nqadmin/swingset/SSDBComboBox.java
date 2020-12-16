@@ -1549,7 +1549,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 			//if (eventList==null) {
 			//	return;
 			//}
-			if (optionModel.getItemList().isEmpty()) {
+			if (!hasItems()) {
 				return;
 			}
 
