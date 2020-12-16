@@ -37,10 +37,6 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.Serializable;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -52,7 +48,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
-import java.util.Objects;
 
 import com.nqadmin.swingset.models.SSListItem;
 
@@ -83,7 +78,8 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  * {@link #setSelectedItem(java.lang.Object) setSelectedItem(SSListItem)}
  * and {@link #getSelectedItem() getSelectedItem()}
  * are the correct techniques.
- * such as {@link #setSelectedMapping(long)}.
+ * such as
+ * {@link #setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}.
  * <p>
  * Notice that {@link #getSelectedMapping() }
  * returns null in two situations related to {@link #getAllowNull() }
@@ -167,37 +163,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	private static final long serialVersionUID = -4203338788107410027L;
 
 	/**
-	 * Listener(s) for the component's value used to propagate changes back to bound
-	 * database column.
-	 */
-	protected class SSDBComboBoxListener implements ActionListener, Serializable
-	{
-		private static final long serialVersionUID = 5078725576768393489L;
-
-		/** {@inheritDoc} */
-		@Override
-		public void actionPerformed(final ActionEvent ae) {
-
-			removeRowSetListener();
-
-			//final int index = getSelectedIndex();
-			Long mapping = getSelectedMapping();
-
-			if (mapping == null) {
-				logger.debug("{}: SSDBComboListener.actionPerformed setting bound column to  null.", () -> getColumnForLog());
-				setBoundColumnText(null);
-			} else {
-				logger.debug("{}: SSDBComboListener.actionPerformed setting bound column to {}.", () -> getColumnForLog(), () -> mapping);
-				setBoundColumnText(String.valueOf(mapping));
-
-			}
-
-			addRowSetListener();
-		}
-	}
-
-
-	/**
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = LogManager.getLogger();
@@ -220,9 +185,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	}
 
 	/**
-	 * Create a nullItem.
-	 * @param remodel the active Remodel
-	 * @return a nullItem
+	 * {@inheritDoc }
 	 */
 	@Override
 	protected SSListItem createNullItem(Model.Remodel remodel) {
@@ -323,11 +286,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	//  * Boolean to indicated that a call to setSelectedItem() is in progress.
 	//  */
 	// private boolean settingSelectedItem = false;
-
-	/**
-	 * Component listener.
-	 */
-	protected final SSDBComboBoxListener ssDBComboBoxListener = new SSDBComboBoxListener();
 
 	private static final boolean USE_GLAZED_MODEL = true;
 
@@ -435,16 +393,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	}
 
 	/**
-	 * Adds any necessary listeners for the current SwingSet component. These will
-	 * trigger changes in the underlying RowSet column.
-	 */
-	@Override
-	public void addSSComponentListener() {
-		addActionListener(ssDBComboBoxListener);
-
-	}
-
-	/**
 	 * Adds an item to the existing list of items in the combo box.
 	 *
 	 * @param _name  name that should be displayed in the combo
@@ -455,22 +403,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	protected void addStringItem(final String _name, final String _value) {
 		addItem(_name, Long.valueOf(_value));
 
-	}
-
-	/**
-	 * Method to allow Developer to add functionality when SwingSet component is
-	 * instantiated.
-	 * <p>
-	 * It will actually be called from SSCommon.init() once the SSCommon data member
-	 * is instantiated.
-	 */
-	@Override
-	public void customInit() {
-		// SET PREFERRED DIMENSIONS
-// TODO not sure SwingSet should be setting component dimensions
-		setPreferredSize(new Dimension(200, 20));
-// TODO This was added during SwingSet rewrite 4/2020. Need to confirm it doesn't break anything.
-		setEditable(false); // GlazedList overrides this and sets it to true
 	}
 
 	/**
@@ -667,6 +599,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 
 	/**
 	 * Get the mappings currently in use.
+	 * <p>
+	 * <b>When getAllowNull() is true, the first list item is null/""</b>
 	 * @return the mappings
 	 */
 	public List<Long> getMappings() {
@@ -702,6 +636,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 
 	/**
 	 * Get the options currently in use.
+	 * <p>
+	 * <b>When getAllowNull() is true, the first list item is null/""</b>
 	 * @return the options
 	 */
 	public List<Object> getOptions() {
@@ -776,70 +712,70 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		return currentItem != null ? listItemFormat.format(currentItem) : null;
 	}
 
-	/**
-	 * Returns the underlying database record primary key value corresponding to the
-	 * currently selected item in the combobox.
-	 * <p>
-	 * Currently not a bean property since there is no associated variable.
-	 *
-	 * @return returns the value associated with the selected item
-	 * OR null if nothing is selected.
-	 */
-	public Long getSelectedMapping() {
-		
-		// TODO Consider overriding getSelectedIndex() to account for GlazedList impact
+	// /**
+	//  * Returns the underlying database record primary key value corresponding to the
+	//  * currently selected item in the combobox.
+	//  * <p>
+	//  * Currently not a bean property since there is no associated variable.
+	//  *
+	//  * @return returns the value associated with the selected item
+	//  * OR null if nothing is selected.
+	//  */
+	// public Long getSelectedMapping() {
+	// 	
+	// 	// TODO Consider overriding getSelectedIndex() to account for GlazedList impact
 
-		// TODO Leaking NON_SELECTED. Use null? Use -1? Use Long.MIN_VALUE?
-		
-		logger.trace(() -> String.format("%s: getSelectedValue(), idx:val %d:%s.",
-				getColumnForLog(), getSelectedIndex(), getSelectedItem()));
-		// logger.trace(String.format("%s: getSelectedValue(), fromSet %b:%s, selectedIndex %d.",
-		// 		getColumnForLog(), settingSelectedItem, selectedItem, getSelectedIndex()));
+	// 	// TODO Leaking NON_SELECTED. Use null? Use -1? Use Long.MIN_VALUE?
+	// 	
+	// 	logger.trace(() -> String.format("%s: getSelectedValue(), idx:val %d:%s.",
+	// 			getColumnForLog(), getSelectedIndex(), getSelectedItem()));
+	// 	// logger.trace(String.format("%s: getSelectedValue(), fromSet %b:%s, selectedIndex %d.",
+	// 	// 		getColumnForLog(), settingSelectedItem, selectedItem, getSelectedIndex()));
 
-		Long result = null;
+	// 	Long result = null;
 
-		// 2020-10-03_BP: getSelectedValue() seems to be the root of problems with filtered/glazed lists.
-		// When filtering is taking place, getSelectedIndex() returns -1
+	// 	// 2020-10-03_BP: getSelectedValue() seems to be the root of problems with filtered/glazed lists.
+	// 	// When filtering is taking place, getSelectedIndex() returns -1
 
-		// Determine if the call to getSelectedValue() is happening during a call to setSelectedItem()
-		// During setSelectedItem() selectedItem may have a value, but is otherwise null and we want
-		// to call getSelectedIndex(). Per above we do NOT want to call getSelectedIndex() while 
-		// filtering is taking place.
-		try (Model.Remodel remodel = optionModel.getRemodel()) {
-//			if (settingSelectedItem) {
-//				if (selectedItem == null) {
-//					result = (long) NON_SELECTED;
-//				} else {
-//					//result = selectedItem.getPrimaryKey();
-//					result = remodel.getMapping(selectedItem);
-//				}
-//			} else {
-//				// Existing code not impacted by GlazedList dynamically impacting the list.
-//				if (getSelectedIndex() == -1) {
-//					result = (long) NON_SELECTED;
-//				} else {
-//					result = remodel.getMapping(getSelectedIndex());
-//					
-//				}
-//			}
-			Object item = getSelectedItem();
-			if (item instanceof SSListItem) {
-				result = remodel.getMapping((SSListItem)item);
-			}
-			// if (settingSelectedItem && selectedItem != null) {
-			// 	result = remodel.getMapping(selectedItem);
-			// } else if (getSelectedIndex() != -1) {
-			// 	result = remodel.getMapping(getSelectedIndex());
-			// }
-		}
-// 2020-12-03: Changing method signature to Long so we can now return null.
-//		// If anything above returned null, change to NON_SELECTED.
-//		if (result==null) {
-//			result = (long) NON_SELECTED;
-//		}
+	// 	// Determine if the call to getSelectedValue() is happening during a call to setSelectedItem()
+	// 	// During setSelectedItem() selectedItem may have a value, but is otherwise null and we want
+	// 	// to call getSelectedIndex(). Per above we do NOT want to call getSelectedIndex() while 
+	// 	// filtering is taking place.
+	// 	try (Model.Remodel remodel = optionModel.getRemodel()) {
+//	// 		if (settingSelectedItem) {
+//	// 			if (selectedItem == null) {
+//	// 				result = (long) NON_SELECTED;
+//	// 			} else {
+//	// 				//result = selectedItem.getPrimaryKey();
+//	// 				result = remodel.getMapping(selectedItem);
+//	// 			}
+//	// 		} else {
+//	// 			// Existing code not impacted by GlazedList dynamically impacting the list.
+//	// 			if (getSelectedIndex() == -1) {
+//	// 				result = (long) NON_SELECTED;
+//	// 			} else {
+//	// 				result = remodel.getMapping(getSelectedIndex());
+//	// 				
+//	// 			}
+//	// 		}
+	// 		Object item = getSelectedItem();
+	// 		if (item instanceof SSListItem) {
+	// 			result = remodel.getMapping((SSListItem)item);
+	// 		}
+	// 		// if (settingSelectedItem && selectedItem != null) {
+	// 		// 	result = remodel.getMapping(selectedItem);
+	// 		// } else if (getSelectedIndex() != -1) {
+	// 		// 	result = remodel.getMapping(getSelectedIndex());
+	// 		// }
+	// 	}
+// 2// 020-12-03: Changing method signature to Long so we can now return null.
+//	// 	// If anything above returned null, change to NON_SELECTED.
+//	// 	if (result==null) {
+//	// 		result = (long) NON_SELECTED;
+//	// 	}
 
-		return result;
-	}
+	// 	return result;
+	// }
 
 	/**
 	 * Returns the underlying database record primary key value corresponding to the
@@ -1146,16 +1082,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 //	}
 
 	/**
-	 * Removes any necessary listeners for the current SwingSet component. These
-	 * will trigger changes in the underlying RowSet column.
-	 */
-	@Override
-	public void removeSSComponentListener() {
-		removeActionListener(ssDBComboBoxListener);
-
-	}
-
-	/**
 	 * When a display column is of type date you can choose the format in which it
 	 * has to be displayed. For the pattern refer SimpleDateFormat in java.text
 	 * package.
@@ -1455,53 +1381,15 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 //			updateUI(); // This refreshes the characters displayed.
 //		}
 
-
 	/**
-	 * Finds the listItem having option that matches the specified option
-	 * and make it the selected listItem. If no matching item is found
-	 * the _option is used for {@link #setSelectedItem(java.lang.Object) 
-	 * setSelectedItem(_option)}
-	 *
-	 * @param _option option value of list item
+	 * {@inheritDoc }
 	 * @throws IllegalStateException if option2 enabled
 	 */
 	public void setSelectedOption(final String _option) {
 		if (hasOption2()) {
 			throw new IllegalStateException("option2 enabled");
 		}
-
-		try (Model.Remodel remodel = optionModel.getRemodel()) {
-			if(remodel.isEmpty()) {
-				return;
-			}
-			
-			Object tItem = getSelectedItem();
-			// Extract the option from the selected list item.
-			// If not an SSListItem, it's editable, use it as current option.
-			Object currentSelectedOption = tItem instanceof SSListItem
-					? remodel.getOption((SSListItem)tItem)
-					: tItem;
-			
-			// only need to proceed if there is a change.
-			if (Objects.equals(_option, currentSelectedOption)) {
-				return;
-			}
-			
-			// find the first matching option in the list
-			final int index = remodel.getOptions().indexOf(_option);
-			
-			Object item;
-			if (index != -1) {
-				item = remodel.get(index);
-			} else {
-				// Didn't find it in the list, so just use it as is.
-				item = _option != null ? _option : nullItem;
-				logger.warn(() -> String.format("%s: Could not find a corresponding combobox item for %s. Using it for selectedItem.", getColumnForLog(), _option));
-			}
-			
-			setSelectedItem(item);
-		}
-
+		super.setSelectedOption(_option);
 	}
 
 	/**
@@ -1515,59 +1403,10 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 
 	/**
 	 * Sets the selected ComboBox item according to the specified mapping/key.
-	 * <p>
-	 * If called from updateSSComponent() from a RowSet change then the Component
-	 * listener should already be turned off. Otherwise we want it on so the
-	 * ultimate call to setSelectedIndex() will trigger an update the to RowSet.
-	 * <p>
-	 * Currently not a bean property since there is no associated variable.
-	 *
-	 * @param _value database record mapping/key
-	 */
-	public void setSelectedMapping(final long _value) {
-
-		// TODO: IS THIS COMMENT CORRECT? multiple items with same mapping?
-		// 2020-08-03: Removing conditional as this could be called when consecutive records
-		// have the same value and we want to make sure to update the editor Strings
-
-		// LOCATE THE FIRST INDEX AT WHICH THE
-		// SPECIFIED CODE IS STORED
-
-		try (Model.Remodel remodel = optionModel.getRemodel()) {
-			// TODO: if getAllowNull, might be empty, but still have 1 item.
-			if (!remodel.isEmpty()) {
-				// find first matching mapping, since usually a key expect only one
-				final int index = remodel.getMappings().indexOf(_value);
-
-				SSListItem item;
-				if (index != -1) {
-					item = remodel.get(index);
-				} else {
-					item = nullItem;
-					if (item == null) {
-						logger.warn(String.format("%s: No mapping available for %s in combobox, setSelectedItem(null)", getColumnForLog(), _value));
-					}
-				}
-				
-				setSelectedItem(item);
-				//setSelectedIndex(index);
-				
-				logger.trace("{}: eventList - [{}].", () -> getColumnForLog(), () ->  remodel.getItemList().toString());
-				logger.trace("{}: options - [{}].", () -> getColumnForLog(), () ->  remodel.getOptions().toString());
-				logger.trace("{}: mappings - [{}].", () -> getColumnForLog(), () ->  remodel.getMappings().toString());
-			} else {
-				setSelectedItem(null);
-				logger.warn(String.format("%s: No mappings available in combobox, setting to null", getColumnForLog()));
-			}
-		}
-
-	}
-
-	/**
-	 * Sets the selected ComboBox item according to the specified mapping/key.
 	 * 
 	 * @param _value database record mapping/key
-	 * @deprecated use {@link #setSelectedMapping(long) }
+	 * @deprecated use
+	 * {@link #setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}
 	 */
 	public void setSelectedValue(final long _value) {
 		setSelectedMapping(_value);

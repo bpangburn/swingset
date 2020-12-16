@@ -125,6 +125,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	}
 	
 	/**
+	 * Note when getAllowNull is true, the first list item is null/""
 	 * @return unmodifiable list of mappings
 	 */
 	public List<M> getMappings() {
@@ -132,6 +133,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	}
 	
 	/**
+	 * Note when getAllowNull is true, the first list item is null/""
 	 * @return unmodifiable list of options
 	 */
 	public List<O> getOptions() {
@@ -139,9 +141,9 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	}
 	
 	/**
+	 * Note when getAllowNull is true, the first list item is null/""
 	 * @return unmodifiable list of options2
 	 */
-	@SuppressWarnings("unchecked")
 	public List<O2> getOptions2() {
 		return getSlice(OPT2_IDX);
 	}
@@ -291,6 +293,8 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 		
 		/**
 		 * Return an unmodifiable list of mappings.
+		 * <p>
+		 * <b>When getAllowNull() is true, the first list item is null/""</b>
 		 * @return list of mappings
 		 */
 		public List<M> getMappings() {
@@ -300,6 +304,8 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 		
 		/**
 		 * Return an unmodifiable list of option.
+		 * <p>
+		 * <b>When getAllowNull() is true, the first list item is null/""</b>
 		 * @return list of options
 		 */
 		public List<O> getOptions() {
@@ -309,6 +315,8 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 		
 		/**
 		 * Return an unmodifiable list of option2.
+		 * <p>
+		 * <b>When getAllowNull() is true, the first list item is null/""</b>
 		 * @return list of options2
 		 */
 		public List<O2> getOptions2() {
