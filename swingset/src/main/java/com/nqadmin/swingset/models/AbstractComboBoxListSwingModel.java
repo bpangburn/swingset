@@ -403,8 +403,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 				// does throw an exception.
 				if ( index >= 0 && index < itemList.size() )
 					return itemList.get(index);
-				else
-					return null;
+				return null;
 			}
 			return itemList.get(index);
 		}

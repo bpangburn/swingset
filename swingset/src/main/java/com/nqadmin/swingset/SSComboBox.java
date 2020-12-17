@@ -154,24 +154,28 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * Constant indicating that combo box should display predefined yes/no options.
 	 * @deprecated Use {@link com.nqadmin.swingset.enums.YesNo}
 	 */
+	@Deprecated
 	public static final int YES_NO_OPTION = 0;
 
 	/**
 	 * Predefined "no" option.
 	 * @deprecated Use {@link com.nqadmin.swingset.enums.YesNo}
 	 */
+	@Deprecated
 	public static final int NO = 0;
 
 	/**
 	 * Predefined "yes" option.
 	 * @deprecated Use {@link com.nqadmin.swingset.enums.YesNo}
 	 */
+	@Deprecated
 	public static final int YES = 1;
 
 	/**
 	 * Constant indicating that combo box should display predefined gender options.
 	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
 	 */
+	@Deprecated
 	public static final int GENDER_OPTION = 1;
 
 	/**
@@ -186,18 +190,21 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * Predefined "male" option.
 	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
 	 */
+	@Deprecated
 	public static final int MALE = 0;
 
 	/**
 	 * Predefined "female" option.
 	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
 	 */
+	@Deprecated
 	public static final int FEMALE = 1;
 
 	/**
 	 * Predefined "unisex" option.
 	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
 	 */
+	@Deprecated
 	public static final int UNISEX = 2;
 
 	/**
@@ -213,18 +220,21 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * options.
 	 * @deprecated Use {@link com.nqadmin.swingset.enums.IncludeExclude}
 	 */
+	@Deprecated
 	public static final int INCLUDE_EXCLUDE_OPTION = 2;
 
 	/**
 	 * Predefined "exclude" option.
 	 * @deprecated Use {@link com.nqadmin.swingset.enums.IncludeExclude}
 	 */
+	@Deprecated
 	public static final int EXCLUDE = 1;
 
 	/**
 	 * Predefined "include" option.
 	 * @deprecated Use {@link com.nqadmin.swingset.enums.IncludeExclude}
 	 */
+	@Deprecated
 	public static final int INCLUDE = 0;
 
 	/**
@@ -242,12 +252,14 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * 1, 2, 3, etc.
 	 * @deprecated use methods to access
 	 */
+	@Deprecated
 	protected List<Integer> mappings = null;
 
 	/**
 	 * Options to be displayed in combo box.
 	 * @deprecated use methods to access
 	 */
+	@Deprecated
 	protected List<String> options = null;
 
 	/**
@@ -255,6 +267,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * e.g. yes/no, exclude/include, etc.
 	 * @deprecated Use {@link #setOptions(java.lang.Class) }
 	 */
+	@Deprecated
 	protected int predefinedOptions = -1;
 
 	/**
@@ -322,6 +335,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * @return returns the underlying values for each of the items in the combo box
 	 * @deprecated use {@link #getMappingsList() } or {@link #getMappingsInt() }
 	 */
+	@Deprecated
 	public int[] getMappings() {
 		return getMappingsInt();
 	}
@@ -344,6 +358,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * @return returns the items displayed in the combo box
 	 * @deprecated use getOptionsList()
 	 */
+	@Deprecated
 	public String[] getOptions() {
 		return getOptionsList().toArray(new String[0]);
 		//return (String[]) options.toArray();
@@ -355,6 +370,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * @return returns the predefined option code
 	 * @deprecated use enum with {@link #setOptions(java.lang.Class) }
 	 */
+	@Deprecated
 	public int getPredefinedOptions() {
 		return predefinedOptions;
 	}
@@ -380,6 +396,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 *                  box.
 	 * @deprecated use {@link #setOptions(java.util.List, java.util.List) }
 	 */
+	@Deprecated
 	public void setMappings(final int[] _mappings) {
 		if (true) throw new UnsupportedOperationException("old API");
 
@@ -714,6 +731,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 *         successfully
 	 * @deprecated use enum with {@link #setOptions(java.lang.Class) }
 	 */
+	@Deprecated
 	public boolean setPredefinedOptions(final int _predefinedOptions) {
 		setPredefinedOptionsInternal(_predefinedOptions, null);
 		return true;

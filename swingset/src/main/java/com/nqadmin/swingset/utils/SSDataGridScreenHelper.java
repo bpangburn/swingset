@@ -157,6 +157,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * 
 	 * @deprecated Starting in 4.0.0+ use {@link #addKeyBasedURLLinking(int[], String, String, String[], boolean)} instead.
 	 */
+	@Deprecated
 	public void addF2Linking(final int[] _columns, final String _key, final String[] _urlPrefix) {
 		addKeyBasedURLLinking(_columns, "F2", _key, _urlPrefix, true);
 	}

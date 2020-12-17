@@ -217,6 +217,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * display (SSListItem) and its corresponding primary key)
 	 * @deprecated can't use
 	 */
+	@Deprecated
 	protected EventList<SSListItem> eventList;
 
 	/**
@@ -232,6 +233,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * keystroke listener/filter.
 	 * @deprecated unneeded
 	 */
+	@Deprecated
 	protected boolean filterSwitch = true;
 
 	/**
@@ -241,12 +243,14 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * are Integers.
 	 * @deprecated unneeded
 	 */
+	@Deprecated
 	protected ArrayList<Long> mappings = null;
 
 	/**
 	 * Options to be displayed in the combobox (based on a query).
 	 * @deprecated unneeded
 	 */
+	@Deprecated
 	protected ArrayList<String> options = null;
 
 	/**
@@ -358,6 +362,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @param _primaryKey  primary key value corresponding the the display text
 	 * @deprecated use {@link #addOption(java.lang.String, java.lang.Long) }
 	 */
+	@Deprecated
 	public void addItem(final String _displayText, final long _primaryKey) {
 
 		// TODO Determine if any change is needed to actually add item to combobox.
@@ -448,6 +453,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @return returns true on successful deletion otherwise returns false.
 	 * @deprecated use {@link #removeMapping(java.lang.Long) }
 	 */
+	@Deprecated
 	public boolean deleteItem(final long _primaryKey) {
 		return removeMapping(_primaryKey);
 
@@ -496,6 +502,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @return returns true on successful deletion otherwise returns false.
 	 * @deprecated no replacement, throws exception
 	 */
+	@Deprecated
 	public boolean deleteStringItem(final Object _option) {
 		throw new UnsupportedOperationException();
 
@@ -578,6 +585,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 */
 	// TODO: public method? Why? How/where used.
 	//		Make private, see what happens
+	@Deprecated
 	protected EventList<SSListItem> getEventList() {
 		throw new UnsupportedOperationException();
 		//return eventList;
@@ -792,6 +800,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * 
 	 * @deprecated use {@link #getSelectedMapping() }
 	 */
+	@Deprecated
 	public Long getSelectedValue() {
 		return getSelectedMapping();
 	}
@@ -851,6 +860,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @return  deprecated
 	 * @deprecated unneeded, the old method, now handled in format
 	 */
+	@Deprecated
 	protected String getStringValue(final ResultSet _rs, final String _columnName) {
 		throw new UnsupportedOperationException();
 	}
@@ -1362,6 +1372,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @throws IllegalStateException if option2 enabled
 	 */
 	//public void setSelectedOption(final String _option) {
+	@Override
 	public void setSelectedOption(final Object _option) {
 		if (hasOption2()) {
 			throw new IllegalStateException("option2 enabled");
@@ -1374,6 +1385,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @param _value option
 	 * @deprecated use {@link #setSelectedOption(Object) }
 	 */
+	@Deprecated
 	public void setSelectedStringValue(final String _value) {
 		setSelectedOption(_value);
 	}
@@ -1385,6 +1397,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @deprecated use
 	 * {@link #setSelectedMapping(Long)}
 	 */
+	@Deprecated
 	public void setSelectedValue(final long _value) {
 		setSelectedMapping(_value);
 	}
@@ -1473,6 +1486,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @return returns true if update is successful otherwise returns false.
 	 * @deprecated use {@link #updateOption(java.lang.Long, java.lang.String) }
 	 */
+	@Deprecated
 	public boolean updateItem(final long _primaryKey, final String _updatedDisplayText) {
 		return updateOption(_primaryKey, _updatedDisplayText);
 
@@ -1603,6 +1617,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @return returns true if successful otherwise returns false.
 	 * @deprecated use {@link #updateOption(java.lang.Long, java.lang.String) }
 	 */
+	@Deprecated
 	public boolean updateStringItem(final String _existingDisplayText, final String _updatedDisplayText) {
 		throw new UnsupportedOperationException();
 
