@@ -1126,24 +1126,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	}
 
 	/**
-	 * @param mappings the mappings to set
-	 * @deprecated values come from database query
-	 */
-	public void setMappings(final ArrayList<Long> mappings) {
-		throw new UnsupportedOperationException();
-		//this.mappings = mappings;
-	}
-
-	/**
-	 * @param options the options to set
-	 * @deprecated values come from database query
-	 */
-	public void setOptions(final ArrayList<String> options) {
-		throw new UnsupportedOperationException();
-		//this.options = options;
-	}
-
-	/**
 	 * Sets the database table primary column name.
 	 *
 	 * @param _primaryKeyColumnName name of primary key column
