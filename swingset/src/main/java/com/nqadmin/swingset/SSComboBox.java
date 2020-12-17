@@ -76,9 +76,9 @@ import com.nqadmin.swingset.models.SSListItem;
  * are the correct techniques.
  * There are a variety of method to change the current combobox item
  * such as
- * {@link #setSelectedMapping(java.lang.Object) setSelectedMapping(Integer)}.
+ * {@link #setSelectedMapping(Integer)} / {@link #setSelectedItem(Object)}.
  * <p>
- * Notice that {@link #getSelectedMapping() }/{@link #getSelectedValue() }
+ * Notice that {@link #getSelectedMapping()} / {@link #getSelectedValue() }
  * return null in two situations related to {@link #getAllowNull() }
  * <ul>
  *   <li>nothing is selected in this combo box
@@ -403,7 +403,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	@Deprecated
 	public void setMappingValues(final int[] _mappings) {
 		if (true) throw new UnsupportedOperationException("old API");
-		setMappings(_mappings);
+		// setMappings(_mappings);
 	}
 
 	/**
@@ -742,7 +742,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	/**
 	 * Change combo selection
 	 * 
-	 * {@link #setSelectedMapping(java.lang.Object) setSelectedMapping(Integer)}
+	 * {@link #setSelectedMapping(Integer)}
 	 * is the preferred/alternative method.
 	 * @param _value value
 	 */

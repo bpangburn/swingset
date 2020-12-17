@@ -234,7 +234,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * is true or false.
 	 * <p>
 	 * <b>When the item list is cleared, for example
-	 * {@link OptionMappingSwingModel.Remodel#clear() remodel.clear()},
+	 * {@link com.nqadmin.swingset.models.OptionMappingSwingModel.Remodel#clear() remodel.clear()},
 	 * the nullItem must be set to null.</b>
 	 * @see #createNullItem(com.nqadmin.swingset.models.OptionMappingSwingModel.Remodel)
 	 */
@@ -586,6 +586,9 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * broadcasting {@link ActionEvent}s at inappropriate times.
 	 *
 	 * This method is the logical inverse of {@link #registerAllActionListeners}.
+	 * 
+	 * @param comboBox combo box from which to remove listeners
+	 * @return array of ActionListeners removed from combo box (for adding back later)
 	 */
 	static ActionListener[] unregisterAllActionListeners(JComboBox<?> comboBox) {
 		final ActionListener[] listeners = comboBox.getActionListeners();
@@ -601,6 +604,9 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * with the given <code>comboBox</code>.
 	 *
 	 * This method is the logical inverse of {@link #unregisterAllActionListeners}.
+	 * 
+	 * @param comboBox combo box for which to add listeners
+	 * @param listeners array of ActionListners to be 
 	 */
 	static void registerAllActionListeners(JComboBox<?> comboBox, ActionListener[] listeners) {
 		for (ActionListener listener : listeners) {

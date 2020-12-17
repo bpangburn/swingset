@@ -42,6 +42,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * This is a copy of AbstractComboBoxListSwingModelEventTest just for events.
  * @author err
  */
+@SuppressWarnings("javadoc")
 public class AbstractComboBoxListSwingModelEventTest {
 	
 	public AbstractComboBoxListSwingModelEventTest() {
@@ -82,7 +83,6 @@ public class AbstractComboBoxListSwingModelEventTest {
 	// and an empty listInfo that handles 3 elements.
 	//
 	@BeforeEach
-	@SuppressWarnings("unchecked")
 	public void setUp() {
 		clearAll();
 
@@ -135,8 +135,8 @@ public class AbstractComboBoxListSwingModelEventTest {
 
 	List<String> events;
 
-	// return an aray for ListItem creation
-	// n is how many elments in list item, index is which original
+	// return an array for ListItem creation
+	// n is how many elements in list item, index is which original
 	private Object [] liCreateArray(int n, int index) {
 		Object[] o = new Object[] {l1.get(index), l2.get(index), l3.get(index), l4.get(index)};
 		return Arrays.copyOf(o, n);

@@ -79,7 +79,7 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  * and {@link #getSelectedItem() getSelectedItem()}
  * are the correct techniques.
  * such as
- * {@link #setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}.
+ * {@link #setSelectedMapping(Long)}.
  * <p>
  * Notice that {@link #getSelectedMapping() }
  * returns null in two situations related to {@link #getAllowNull() }
@@ -134,8 +134,11 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  * // CREATE AN INSTANCE OF THE SSDBCOMBOBOX WITH THE CONNECTION OBJECT
  * // QUERY AND COLUMN NAMES
  * combo = new SSDBComboBox(connection,query,"part_id","part_name");
- *
- * // THIS BASICALLY SPECIFIES THE COLUMN AND THE SSROWSET WHERE UPDATES HAVE
+ * 
+ * // EXECUTE THE QUERY
+ * combo.execute();
+ * 
+ * // THIS BASICALLY SPECIFIES THE COLUMN AND THE ROWSET WHERE UPDATES HAVE
  * // TO BE MADE.
  * combo.bind(rowSet,"part_id");
  * combo.execute();
@@ -169,7 +172,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 
 	/**
 	 * Value to represent that no item has been selected in the combo box.
-	 * @deprecated 
+	 * 
+	 * @deprecated check for {@code #getSelectedMapping()==null}
 	 */
 	@Deprecated
 	public static final int NON_SELECTED = Integer.MIN_VALUE + 1;
@@ -1385,7 +1389,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * {@inheritDoc }
 	 * @throws IllegalStateException if option2 enabled
 	 */
-	public void setSelectedOption(final String _option) {
+	//public void setSelectedOption(final String _option) {
+	public void setSelectedOption(final Object _option) {
 		if (hasOption2()) {
 			throw new IllegalStateException("option2 enabled");
 		}
@@ -1395,7 +1400,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	/**
 	 * 
 	 * @param _value option
-	 * @deprecated use {@link #setSelectedOption(java.lang.String) }
+	 * @deprecated use {@link #setSelectedOption(Object) }
 	 */
 	public void setSelectedStringValue(final String _value) {
 		setSelectedOption(_value);
@@ -1406,7 +1411,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * 
 	 * @param _value database record mapping/key
 	 * @deprecated use
-	 * {@link #setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}
+	 * {@link #setSelectedMapping(Long)}
 	 */
 	public void setSelectedValue(final long _value) {
 		setSelectedMapping(_value);

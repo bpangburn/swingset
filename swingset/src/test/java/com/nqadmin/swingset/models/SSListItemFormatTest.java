@@ -59,6 +59,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author err
  */
+@SuppressWarnings("javadoc")
 public class SSListItemFormatTest {
 	
 	public SSListItemFormatTest() {
@@ -96,6 +97,8 @@ public class SSListItemFormatTest {
 	}
 
 	static class LI extends AbstractComboBoxListSwingModel {
+
+		private static final long serialVersionUID = 1L;
 
 		public LI(int itemNumElems, List<SSListItem> itemList) {
 			super(itemNumElems, itemList);

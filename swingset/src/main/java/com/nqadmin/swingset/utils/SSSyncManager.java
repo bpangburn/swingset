@@ -94,7 +94,7 @@ public class SSSyncManager {
 					return;
 				}
 
-				comboPK = comboBox.getSelectedValue();
+				comboPK = comboBox.getSelectedMapping();
 
 				// UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
 				// This code was removed to improve performance.
@@ -358,10 +358,10 @@ public class SSSyncManager {
 
 				// CHECK IF THE COMBO BOX IS DISPLAYING THE SAME ONE.
 				if ((comboBox.getSelectedStringValue() == null)
-						|| (comboBox.getSelectedValue()!=currentRowPK)) {
+						|| (comboBox.getSelectedMapping()!=currentRowPK)) {
 					// IF NOT CHANGE THE SELECTION OF THE COMBO BOX.
 					// this.comboBox.setSelectedStringValue(this.rowset.getString(this.columnName));
-					comboBox.setSelectedValue(currentRowPK);
+					comboBox.setSelectedMapping(currentRowPK);
 				}
 			} else {
 				comboBox.setSelectedIndex(-1);

@@ -482,7 +482,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	/** {@inheritDoc } */
 	// @Override not in jdk1.8
-	@SuppressWarnings("override")
+	@SuppressWarnings({ "override", "javadoc" })
 	public void addAll(int index, Collection<? extends SSListItem> c) {
 		try (Remodel remodel = getRemodel()) {
 			remodel.addAll(index, c);
@@ -491,7 +491,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	/** {@inheritDoc } */
 	// @Override not in jdk1.8
-	@SuppressWarnings("override")
+	@SuppressWarnings({"override", "javadoc"})
 	public void addAll(Collection<? extends SSListItem> c) {
 		try (Remodel remodel = getRemodel()) {
 			remodel.addAll(c);
@@ -1292,7 +1292,9 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		 * @return the object from the SSListItem
 		 */
 		Object getElem(int index);
-		/** {@inheritDoc } */
+		
+		/** {@inheritDoc} */
+		@SuppressWarnings("javadoc")
 		Object clone() throws CloneNotSupportedException;
 	}
 
