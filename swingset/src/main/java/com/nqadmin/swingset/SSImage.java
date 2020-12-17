@@ -121,7 +121,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
                 }catch(final SQLException se){
                 	logger.error(getColumnForLog() + ": SQL Exception.", se);
                 }catch(final IOException ioe){
-                	logger.error(getColumnForLog() + ": IO Exception.", ioe);;
+                	logger.error(getColumnForLog() + ": IO Exception.", ioe);
                 }
 
                 addRowSetListener();
