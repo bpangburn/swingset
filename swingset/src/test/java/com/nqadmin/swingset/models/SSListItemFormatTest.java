@@ -171,21 +171,21 @@ public class SSListItemFormatTest {
 	@Test
 	public void testSetPattern() {
 		System.out.println("setDatePattern");
-		SSListItemFormat fmt = new SSListItemFormat();
+		SSListItemFormat fmt1 = new SSListItemFormat();
 
 		assertThrows(IllegalArgumentException.class,
-				() -> fmt.setPattern(JDBCType.REF, null));
+				() -> fmt1.setPattern(JDBCType.REF, null));
 
 		// check initial patterns
 		// by setting new pattern
 		// and the retrun value is the previous pattern
 		String previousPat;
 
-		previousPat = fmt.setPattern(JDBCType.DATE, null);
+		previousPat = fmt1.setPattern(JDBCType.DATE, null);
 		assertEquals(SSListItemFormat.dateDefault, previousPat);
-		previousPat = fmt.setPattern(JDBCType.TIME, null);
+		previousPat = fmt1.setPattern(JDBCType.TIME, null);
 		assertEquals(SSListItemFormat.timeDefault, previousPat);
-		previousPat = fmt.setPattern(JDBCType.TIMESTAMP, null);
+		previousPat = fmt1.setPattern(JDBCType.TIMESTAMP, null);
 		assertEquals(SSListItemFormat.timestampDefault, previousPat);
 	}
 
@@ -195,32 +195,32 @@ public class SSListItemFormatTest {
 	@Test
 	public void testGetPattern() {
 		System.out.println("getDatePattern");
-		SSListItemFormat fmt = new SSListItemFormat();
+		SSListItemFormat fmt1 = new SSListItemFormat();
 
 		assertThrows(IllegalArgumentException.class,
-				() -> fmt.getPattern(JDBCType.REF));
+				() -> fmt1.getPattern(JDBCType.REF));
 
 		// check initial patterns
 		// by getting the patterns
 		String currentPattern;
 
-		currentPattern = fmt.getPattern(JDBCType.DATE);
+		currentPattern = fmt1.getPattern(JDBCType.DATE);
 		assertEquals(SSListItemFormat.dateDefault, currentPattern);
-		currentPattern = fmt.getPattern(JDBCType.TIME);
+		currentPattern = fmt1.getPattern(JDBCType.TIME);
 		assertEquals(SSListItemFormat.timeDefault, currentPattern);
-		currentPattern = fmt.getPattern(JDBCType.TIMESTAMP);
+		currentPattern = fmt1.getPattern(JDBCType.TIMESTAMP);
 		assertEquals(SSListItemFormat.timestampDefault, currentPattern);
 
 		// set some arbitrary strings and read them back
-		fmt.setPattern(JDBCType.DATE, "date");
-		fmt.setPattern(JDBCType.TIME, "time");
-		fmt.setPattern(JDBCType.TIMESTAMP, "timestamp");
+		fmt1.setPattern(JDBCType.DATE, "date");
+		fmt1.setPattern(JDBCType.TIME, "time");
+		fmt1.setPattern(JDBCType.TIMESTAMP, "timestamp");
 
-		currentPattern = fmt.getPattern(JDBCType.DATE);
+		currentPattern = fmt1.getPattern(JDBCType.DATE);
 		assertEquals(currentPattern, "date");
-		currentPattern = fmt.getPattern(JDBCType.TIME);
+		currentPattern = fmt1.getPattern(JDBCType.TIME);
 		assertEquals(currentPattern, "time");
-		currentPattern = fmt.getPattern(JDBCType.TIMESTAMP);
+		currentPattern = fmt1.getPattern(JDBCType.TIMESTAMP);
 		assertEquals(currentPattern, "timestamp");
 	}
 

@@ -651,12 +651,12 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 		/**
 		 * state info
-		 * @param elemIndex elem index
-		 * @param isValid true if it's valid
+		 * @param _elemIndex elem index
+		 * @param _isValid true if it's valid
 		 */
-		public SliceInfo(int elemIndex, boolean isValid) {
-			this.elemIndex = elemIndex;
-			this.isValid = isValid;
+		public SliceInfo(int _elemIndex, boolean _isValid) {
+			elemIndex = _elemIndex;
+			isValid = _isValid;
 		}
 
 		/**
@@ -1538,8 +1538,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	private static class ListItemAsArray implements ListItemWrite0, Cloneable {
 		Object[] elems;
 
-		public ListItemAsArray(Object [] elems) {
-			this.elems = Arrays.copyOf(elems, elems.length);
+		public ListItemAsArray(Object [] _elems) {
+			elems = Arrays.copyOf(_elems, _elems.length);
 		}
 
 		@Override
@@ -1560,7 +1560,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		@Override
 		public int hashCode() {
 			int hash = 7;
-			hash = 83 * hash + Arrays.deepHashCode(this.elems);
+			hash = 83 * hash + Arrays.deepHashCode(elems);
 			return hash;
 		}
 
@@ -1576,7 +1576,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 				return false;
 			}
 			final ListItemAsArray other = (ListItemAsArray) obj;
-			return Arrays.deepEquals(this.elems, other.elems);
+			return Arrays.deepEquals(elems, other.elems);
 		}
 
 		@Override
