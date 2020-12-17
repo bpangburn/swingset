@@ -750,7 +750,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	 * @param _elemIndex which element to extract
 	 * @return the element extracted from the list item.
 	 */
-	private Object getElem(SSListItem _listItem, int _elemIndex) {
+	private static Object getElem(SSListItem _listItem, int _elemIndex) {
 		return ((ListItem0)_listItem).getElem(_elemIndex);
 	}
 
@@ -1237,7 +1237,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		 */
 		public Object getElem(SSListItem _listItem, int _elemIndex) {
 			verifyOpened();
-			return AbstractComboBoxListSwingModel.this.getElem(_listItem, _elemIndex);
+			return AbstractComboBoxListSwingModel.getElem(_listItem, _elemIndex);
 		}
 		
 		/**
@@ -1331,7 +1331,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 			arg0 = elems[0];
 		}
 
-		private void checkIndex(int index) {
+		private static void checkIndex(int index) {
 			if (index != 0) {
 				throw new ArrayIndexOutOfBoundsException(
 						"Only 0 index available for this ListItem, not " + index);
@@ -1396,7 +1396,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 			arg1 = elems[1];
 		}
 
-		private void checkIndex(int index) {
+		private static void checkIndex(int index) {
 			if ((0b011 & (1 << index)) == 0) {
 				throw new ArrayIndexOutOfBoundsException(
 						"Only 0 or 1 index available for this ListItem, not " + index);
@@ -1468,7 +1468,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 			arg2 = elems[2];
 		}
 
-		private void checkIndex(int index) {
+		private static void checkIndex(int index) {
 			if ((0b0111 & (1 << index)) == 0) {
 				throw new ArrayIndexOutOfBoundsException(
 						"Only 0, 1 or 2 index available for this ListItem, not " + index);

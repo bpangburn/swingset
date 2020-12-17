@@ -261,7 +261,7 @@ public class AbstractComboBoxListSwingModelTest {
 		assertFalse(result.equals(result2));
 	}
 
-	private boolean getElemEquals(Object[] elems, int listItemIndex, LI.Remodel remodel) {
+	private static boolean getElemEquals(Object[] elems, int listItemIndex, LI.Remodel remodel) {
 		for (int i = 0; i < elems.length; i++) {
 			if(!elems[i].equals(remodel.getElem(listItemIndex, i))) {
 				return false;
