@@ -89,6 +89,7 @@ public class MainClass extends JFrame {
 			super();
 		}
 
+		@SuppressWarnings("unused")
 		@Override
 		public void actionPerformed( final ActionEvent ae){
 			final Map<String, Object> hints = new HashMap<>(globalHints);
@@ -148,34 +149,34 @@ public class MainClass extends JFrame {
 	/**
 	 * component dimensions
 	 */
-	public static final int buttonHeight = 25;
-	public static final int buttonWidth = 250;
-	public static final Dimension buttonDim = new Dimension(buttonWidth, buttonHeight);
+	protected static final int buttonHeight = 25;
+	protected static final int buttonWidth = 250;
+	protected static final Dimension buttonDim = new Dimension(buttonWidth, buttonHeight);
 	
-	public static final int gridColumnWidth = 60;
+	protected static final int gridColumnWidth = 60;
 	
 	private static final int labelHeight = 20;
 	private static final int labelHeightTall = 100; // used for lists, textareas
 	private static final int labelHeightVeryTall = 100;  // used for images
 	private static final int labelWidth = 200;
 	
-	public static final Dimension labelDim = new Dimension(labelWidth, labelHeight);
-	public static final Dimension labelDimTall = new Dimension(labelWidth, labelHeightTall); // used for lists, textareas
-	public static final Dimension labelDimVeryTall = new Dimension(labelWidth, labelHeightVeryTall); // used for images
+	protected static final Dimension labelDim = new Dimension(labelWidth, labelHeight);
+	protected static final Dimension labelDimTall = new Dimension(labelWidth, labelHeightTall); // used for lists, textareas
+	protected static final Dimension labelDimVeryTall = new Dimension(labelWidth, labelHeightVeryTall); // used for images
 	
 	private static final int ssHeight = 20;
 	private static final int ssHeightTall = 100; // used for lists, textareas
 	private static final int ssHeightVeryTall = 200; // used for images
 	private static final int ssWidth = 200;
 	
-	public static final Dimension ssDim = new Dimension(ssWidth, ssHeight);
-	public static final Dimension ssDimTall = new Dimension(ssWidth, ssHeightTall); // used for lists, textareas
-	public static final Dimension ssDimVeryTall = new Dimension(ssWidth, ssHeightVeryTall); // used for images
+	protected static final Dimension ssDim = new Dimension(ssWidth, ssHeight);
+	protected static final Dimension ssDimTall = new Dimension(ssWidth, ssHeightTall); // used for lists, textareas
+	protected static final Dimension ssDimVeryTall = new Dimension(ssWidth, ssHeightVeryTall); // used for images
 
-	public static final int childScreenHeight = 400;
-	public static final int childScreenHeightTall = 800;
-	public static final int childScreenWidth = 600;
-	public static final int childScreenCount = 10;
+	protected static final int childScreenHeight = 400;
+	protected static final int childScreenHeightTall = 800;
+	protected static final int childScreenWidth = 600;
+	protected static final int childScreenCount = 10;
 
 	/**
 	 * database
@@ -290,6 +291,8 @@ public class MainClass extends JFrame {
 
     /**
      * Class to initialize the database connection and load the database content from a script
+     * 
+     * @return database connection
      */
     protected Connection getDatabase() {
 
@@ -366,7 +369,7 @@ public class MainClass extends JFrame {
 		 * Find resource;
 		 * an alternate implementation could take the resource as a file.
 		 * @param resourceName name of resource
-		 * @return 
+		 * @return BufferReader for specified resource
 		 */
 		BufferedReader getBufferedReader(String resourceName) {
 			InputStream stream = MainClass.class.getResourceAsStream(resourceName);
@@ -474,8 +477,8 @@ public class MainClass extends JFrame {
 	static class ExternalSetup extends DatabaseSetup {
 		List<String> sqlFiles;
 
-		public ExternalSetup(List<String> sqlFiles) {
-			this.sqlFiles = sqlFiles;
+		public ExternalSetup(List<String> _sqlFiles) {
+			sqlFiles = _sqlFiles;
 		}
 
 		@Override
@@ -651,6 +654,7 @@ public class MainClass extends JFrame {
 				case 's': userSqlFiles.add(g.getOptarg());  break;
 				case '?':
 				case 'h':
+				default: // TODO: not sure if default is OK here meaning all other characters indicate an error??
 					some_error = true;
 					break; // getopt() already printed an error
 			}

@@ -37,7 +37,7 @@ public class DemoUtil
 	 * 
 	 * @param url database url
 	 * @param props properties for connection
-	 * @return 
+	 * @return database connection
 	 */
 	public static Connection getConnection(String url, Properties props) {
 		Connection conn = null;
@@ -53,6 +53,7 @@ public class DemoUtil
 	 * Provide a point with the child screen location based on the class name.
 	 * 
 	 * @param _className name of screen to position
+	 * @return top-left point to locate child screen in relation to parent screen
 	 */
 	public static Point getChildScreenLocation(String _className) {
 		// TODO Consider cascading based on name.
@@ -74,22 +75,23 @@ public class DemoUtil
 	 * Run SQL statements from the sql file against the database.
 	 * If an error is encountered a message is printed to stderr.
 	 * 
-	 * @param conn database connection
-	 * @param resource sql resource name to run against the database
-	 * @return false if an error was encounted
+	 * @param _conn database connection
+	 * @param _resource sql resource name to run against the database
+	 * @param _verbose indicates verbose mode
+	 * @return false if an error was encountered
 	 */
-	public static boolean runSqlStatements(Connection conn, String resource, boolean verbose) {
+	public static boolean runSqlStatements(Connection _conn, String _resource, boolean _verbose) {
 		boolean ok;
-		if (verbose) {
-			System.err.println("===== Executing sql script: " + resource);
+		if (_verbose) {
+			System.err.println("===== Executing sql script: " + _resource);
 		}
-		try (InputStream stream = MainClass.class.getResourceAsStream(resource)) {
+		try (InputStream stream = MainClass.class.getResourceAsStream(_resource)) {
 			if (stream == null) {
-				System.err.println("Script '" + resource +"' not found. Exiting.");
+				System.err.println("Script '" + _resource +"' not found. Exiting.");
 				ok = false;
 			} else {
 				BufferedReader br = new BufferedReader(new InputStreamReader(stream));  
-				ok = DemoUtil.runSqlStatements(conn, br, verbose);
+				ok = DemoUtil.runSqlStatements(_conn, br, _verbose);
 			}
 		} catch (IOException ex) {
 			ok = false;
@@ -100,22 +102,23 @@ public class DemoUtil
 	/**
 	 * Run SQL statements from the sql file against the database.
 	 * 
-	 * @param conn database connection
-	 * @param stream sql file to run against the database
+	 * @param _conn database connection
+	 * @param _br sql file to run against the database
+	 * @param _verbose indicates verbose mode
 	 * @return connection to the database
 	 */
-	public static boolean runSqlStatements(Connection conn, BufferedReader br, boolean verbose) {
+	public static boolean runSqlStatements(Connection _conn, BufferedReader _br, boolean _verbose) {
 
 		boolean ok = false;
 		
 		try {
-			Statement statement = conn.createStatement();
+			Statement statement = _conn.createStatement();
 			
 			// Parse the sql
-			List<String> queries = extractStatements(br);
+			List<String> queries = extractStatements(_br);
 			
 			for(String sql: queries) {
-				runS(statement, sql, verbose);
+				runS(statement, sql, _verbose);
 			}
 			ok = true;
 		} catch(SQLException ex) {
@@ -142,10 +145,10 @@ public class DemoUtil
 	 * NOTE: for SQL file, column names must not have 
 	 * '#', '--' or SlashStar since those are treated as comments.
 	 *
-	 * @param   stream  the file resource.
-	 * @return          List of query strings 
+	 * @param _br the file resource.
+	 * @return List of query strings 
 	 */
-    public static ArrayList<String> extractStatements(BufferedReader br)
+    public static ArrayList<String> extractStatements(BufferedReader _br)
     { 
 		ArrayList<String> listOfQueries = new ArrayList<String>();
 		ArrayList<String> listOfLines = new ArrayList<String>();
@@ -155,7 +158,7 @@ public class DemoUtil
         StringBuilder sBuffer =  new StringBuilder();
          
         try {  
-			lr = new LineReader(br);
+			lr = new LineReader(_br);
        
             //read the file line by line
             while((line = lr.getNext()) != null)  {  
@@ -183,7 +186,7 @@ public class DemoUtil
                     }
                     //sBuffer.append(line + " ");  
             }  
-            br.close();
+            _br.close();
 
             // make one big string, preserve new lines
             for(String l : listOfLines) {
@@ -215,8 +218,8 @@ public class DemoUtil
 		private BufferedReader br;
 		private int lino;
 
-		private LineReader(BufferedReader br) {
-			this.br = br;
+		private LineReader(BufferedReader _br) {
+			br = _br;
 		}
 
 		String getNext() throws IOException {
@@ -250,39 +253,47 @@ public class DemoUtil
         return line;
     }
 
-    /** Called with a string that starts or is in a comment.
+    /** 
+     * Called with a string that starts or is in a comment.
      * Find the chars within that line that are not part of a comment
-     * @param endComment is true if the comment has finished
+     * @param _s string to analyze
+     * @param _inComment indicates that string to analyze is within a comment
+     * @param _endComment is true if the comment has finished
      * @return not comment chars
      */
-    private static String removeSlashStarCommentsOnLine(String s, boolean _inComment, boolean[] endComment) {
+    private static String removeSlashStarCommentsOnLine(String _s, boolean _inComment, boolean[] _endComment) {
         // Handle weird stuff like: xxx */f/* sdf */o/*dfdf*/o bar
         // which returns: foo bar
+    	
+    	// local copy of string to use
+    	// Strings are immutable in Java so unnecessary, but eliminates a warning
+    	String localS = _s;
+    	
         boolean inComment = _inComment;
         StringBuilder sb = new StringBuilder();
-        endComment[0] = true;
+        _endComment[0] = true;
         int idx;
         while(true) {
             if(inComment) {
-                if((idx = s.indexOf("*/")) == -1) {
+                if((idx = localS.indexOf("*/")) == -1) {
                     // done with this line
-                    endComment[0] = false;
+                	_endComment[0] = false;
                     break;
                 }
                 // found an end of comment
-                s = s.substring(idx+2);
+                localS = localS.substring(idx+2);
 
                 inComment = false;
             }
             // not in a comment
-            if((idx = s.indexOf("/*")) >= 0) {
+            if((idx = localS.indexOf("/*")) >= 0) {
                 // another comment on this line, stash what we've got
-                sb.append(s.substring(0, idx));
+                sb.append(localS.substring(0, idx));
                 inComment = true;
             } else {
                 // done with this line
-                sb.append(s);
-                endComment[0] = true;
+                sb.append(localS);
+                _endComment[0] = true;
                 break;
             }
         }
@@ -300,7 +311,7 @@ public class DemoUtil
 	 * @param resourceName list of files/keys
 	 * @param sql use to put the binary data into the file
 	 * @param verbose output progress information
-	 * @return 
+	 * @return true if successful
 	 */
 	public static boolean loadBinaries(Connection conn, String resourceName, String sql, boolean verbose) {
 		boolean ok = false;
