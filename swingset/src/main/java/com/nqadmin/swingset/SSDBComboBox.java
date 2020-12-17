@@ -1111,16 +1111,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	}
 
 	/**
-	 * @param eventList the eventList to set
-	 * @deprecated no replacement
-	 */
-	public void setEventList(final EventList<SSListItem> eventList) {
-		// TODO: what/how is this used?
-		throw new UnsupportedOperationException();
-		//this.eventList = eventList;
-	}
-
-	/**
 	 * Method that sets the combo box to be filterable.
 	 * <p>
 	 * GlazedList filtering is now fully integrated so this no longer serves a
