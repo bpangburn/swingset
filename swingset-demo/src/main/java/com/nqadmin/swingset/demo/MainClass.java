@@ -381,6 +381,7 @@ public class MainClass extends JFrame {
 			return br;
 		}
 
+		@Override
 		public void run() {
 			Properties info = getDatabaseProperties();
 			if(info == null) {
@@ -514,6 +515,7 @@ public class MainClass extends JFrame {
 			return null;
 		}
 
+		@Override
 		public void run() {
 			return;
 		}
