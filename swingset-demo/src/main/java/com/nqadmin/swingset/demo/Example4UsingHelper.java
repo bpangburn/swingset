@@ -100,13 +100,14 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	 * Constructor for Example4
 	 * <p>
 	 * @param _dbConn - database connection
+	 * @param _container parent container
 	 */
 	public Example4UsingHelper(final Connection _dbConn, final Container _container) {
 
 		// Instantiate Screen
 		super("Example 4 Using Helper", _dbConn, pkColumn, null, screenQuery, cmbNavDisplayColumn, null, null, cmbNavQuery);
 		
-		// For H2, the rowset has to be requeried following a record insertion or deletion
+		// For H2, the rowset has to be re-queried following a record insertion or deletion
 		// TODO: Investigate how MySQL handles insert/delete and implement addNewRecordToCmbNavigator if needed.
 		setRequeryAfterInsertOrDelete(true);
 		
@@ -304,8 +305,8 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	// THIS IS A HACK TO HIDE THE TITLE BAR SINCE WE'RE PUTTING THE JINTERNALFRAME IN ITS OWN JFRAME FOR THE SWINGSET DEMO
 	// https://stackoverflow.com/a/51254020
     @Override
-    public void setUI(InternalFrameUI ui) {
-        super.setUI(ui); // this gets called internally when updating the ui and makes the northPane reappear
+    public void setUI(InternalFrameUI _ui) {
+        super.setUI(_ui); // this gets called internally when updating the ui and makes the northPane reappear
         BasicInternalFrameUI frameUI = (BasicInternalFrameUI) getUI(); // so...
         if (frameUI != null) frameUI.setNorthPane(null); // lets get rid of it
     }

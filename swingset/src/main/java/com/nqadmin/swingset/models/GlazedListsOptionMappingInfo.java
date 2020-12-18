@@ -50,8 +50,10 @@ import ca.odell.glazedlists.EventList;
  * @param <M> mapping type; mapping is typically primary key
  * @param <O> option type; option provides display string
  * @param <O2>  option2 type; if present, supplementary display string
- * @see <a target="_top" href="https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html">GlazedLists AutoCompletion javadoc</a>
- * @see <a href="https://publicobject.com/glazedlistsdeveloper/screencasts/autocompletesupport/">GlazedLists AutoCompletion Video</a>
+ * 
+ * @see <a href="https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html" target="_blank" rel="noopener noreferrer">GlazedLists AutoCompletion javadoc</a>
+ * @see <a href="https://publicobject.com/glazedlistsdeveloper/screencasts/autocompletesupport/" target="_blank" rel="noopener noreferrer">GlazedLists AutoCompletion Video</a>
+ * 
  * @since 4.0.0
  */
 public class GlazedListsOptionMappingInfo<M,O,O2> extends OptionMappingSwingModel<M,O,O2> {

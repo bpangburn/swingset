@@ -191,10 +191,10 @@ public class SSListItemFormat extends Format {
 
 	/**
 	 * The separator is goes between elements in a formatted string.
-	 * @param separator the separator
+	 * @param _separator the separator
 	 */
-	public void setSeparator(String separator) {
-		this.separator = separator;
+	public void setSeparator(String _separator) {
+		separator = _separator;
 	}
 
 	/**

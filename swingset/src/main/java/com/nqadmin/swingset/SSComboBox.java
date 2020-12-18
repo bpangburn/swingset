@@ -71,14 +71,19 @@ import com.nqadmin.swingset.models.SSListItem;
  * <b>Warning. This combobox may use GlazedLists and an item is automatically
  * inserted when {@link #getAllowNull()} is true. Do not use methods
  * that are based on index in the list, unless you're sure...</b>
+ * 
  * {@link #setSelectedItem(java.lang.Object) setSelectedItem(SSListItem)}
  * and {@link #getSelectedItem() getSelectedItem()}
  * are the correct techniques.
- * There are a variety of method to change the current combobox item
- * such as
- * {@link #setSelectedMapping(java.lang.Object) setSelectedMapping(Integer)}.
+ * 
+ * There are a variety of methods to change the current combobox item
+ * such as:
+ * {@link SSBaseComboBox#setSelectedMapping(java.lang.Object) setSelectedMapping(Integer)}
+ * {@link SSBaseComboBox#setSelectedOption(java.lang.Object) setSelectedOption(String)}
  * <p>
- * Notice that {@link #getSelectedMapping() }/{@link #getSelectedValue() }
+ * Notice that:
+ * {@link #getSelectedValue()} and 
+ * {@link SSBaseComboBox#getSelectedMapping()}
  * return null in two situations related to {@link #getAllowNull() }
  * <ul>
  *   <li>nothing is selected in this combo box
@@ -152,58 +157,65 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 
 	/**
 	 * Constant indicating that combo box should display predefined yes/no options.
-	 * @deprecated Use {@link com.nqadmin.swingset.enums.YesNo}
+	 * @deprecated Use @see com.nqadmin.swingset.enums.YesNo
 	 */
+	@Deprecated
 	public static final int YES_NO_OPTION = 0;
 
 	/**
 	 * Predefined "no" option.
-	 * @deprecated Use {@link com.nqadmin.swingset.enums.YesNo}
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.YesNo#NO}
 	 */
+	@Deprecated
 	public static final int NO = 0;
 
 	/**
 	 * Predefined "yes" option.
-	 * @deprecated Use {@link com.nqadmin.swingset.enums.YesNo}
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.YesNo#YES}
 	 */
+	@Deprecated
 	public static final int YES = 1;
 
 	/**
 	 * Constant indicating that combo box should display predefined gender options.
-	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
+	 * @deprecated Use @see com.nqadmin.swingset.enums.Gender3
 	 */
+	@Deprecated
 	public static final int GENDER_OPTION = 1;
 
 	/**
 	 * Constant indicating that combo box should display predefined gender options.
 	 *
-	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
+	 * @deprecated Use @see com.nqadmin.swingset.enums.Gender3
 	 */
 	@Deprecated
 	public static final int SEX_OPTION = 1;
 
 	/**
 	 * Predefined "male" option.
-	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3#MALE}
 	 */
+	@Deprecated
 	public static final int MALE = 0;
 
 	/**
 	 * Predefined "female" option.
-	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3#FEMALE}
 	 */
+	@Deprecated
 	public static final int FEMALE = 1;
 
 	/**
 	 * Predefined "unisex" option.
-	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3#UNISEX}
 	 */
+	@Deprecated
 	public static final int UNISEX = 2;
 
 	/**
 	 * Predefined "unisex" option.
 	 *
-	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3}
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.Gender3#UNISEX}
 	 */
 	@Deprecated
 	public static final int UNI_SEX = 2;
@@ -211,20 +223,23 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	/**
 	 * Constant indicating that combo box should display predefined include/exclude
 	 * options.
-	 * @deprecated Use {@link com.nqadmin.swingset.enums.IncludeExclude}
+	 * @deprecated Use @see com.nqadmin.swingset.enums.IncludeExclude
 	 */
+	@Deprecated
 	public static final int INCLUDE_EXCLUDE_OPTION = 2;
 
 	/**
 	 * Predefined "exclude" option.
-	 * @deprecated Use {@link com.nqadmin.swingset.enums.IncludeExclude}
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.IncludeExclude#EXCLUDE}
 	 */
+	@Deprecated
 	public static final int EXCLUDE = 1;
 
 	/**
 	 * Predefined "include" option.
-	 * @deprecated Use {@link com.nqadmin.swingset.enums.IncludeExclude}
+	 * @deprecated Use {@link com.nqadmin.swingset.enums.IncludeExclude#INCLUDE}
 	 */
+	@Deprecated
 	public static final int INCLUDE = 0;
 
 	/**
@@ -242,12 +257,14 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * 1, 2, 3, etc.
 	 * @deprecated use methods to access
 	 */
+	@Deprecated
 	protected List<Integer> mappings = null;
 
 	/**
 	 * Options to be displayed in combo box.
 	 * @deprecated use methods to access
 	 */
+	@Deprecated
 	protected List<String> options = null;
 
 	/**
@@ -255,6 +272,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * e.g. yes/no, exclude/include, etc.
 	 * @deprecated Use {@link #setOptions(java.lang.Class) }
 	 */
+	@Deprecated
 	protected int predefinedOptions = -1;
 
 	/**
@@ -280,7 +298,8 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * 
 	 * @param useGlazedLists install glazed lists
 	 */
-	@SuppressWarnings("LeakingThisInConstructor")
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	@SuppressWarnings({"all","LeakingThisInConstructor"})
 	public SSComboBox(boolean useGlazedLists) {
 		// Note that call to parent default constructor is implicit.
 		//super();
@@ -322,6 +341,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * @return returns the underlying values for each of the items in the combo box
 	 * @deprecated use {@link #getMappingsList() } or {@link #getMappingsInt() }
 	 */
+	@Deprecated
 	public int[] getMappings() {
 		return getMappingsInt();
 	}
@@ -344,6 +364,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * @return returns the items displayed in the combo box
 	 * @deprecated use getOptionsList()
 	 */
+	@Deprecated
 	public String[] getOptions() {
 		return getOptionsList().toArray(new String[0]);
 		//return (String[]) options.toArray();
@@ -355,6 +376,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * @return returns the predefined option code
 	 * @deprecated use enum with {@link #setOptions(java.lang.Class) }
 	 */
+	@Deprecated
 	public int getPredefinedOptions() {
 		return predefinedOptions;
 	}
@@ -380,6 +402,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 *                  box.
 	 * @deprecated use {@link #setOptions(java.util.List, java.util.List) }
 	 */
+	@Deprecated
 	public void setMappings(final int[] _mappings) {
 		if (true) throw new UnsupportedOperationException("old API");
 
@@ -403,7 +426,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	@Deprecated
 	public void setMappingValues(final int[] _mappings) {
 		if (true) throw new UnsupportedOperationException("old API");
-		setMappings(_mappings);
+		// setMappings(_mappings);
 	}
 
 	/**
@@ -714,6 +737,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 *         successfully
 	 * @deprecated use enum with {@link #setOptions(java.lang.Class) }
 	 */
+	@Deprecated
 	public boolean setPredefinedOptions(final int _predefinedOptions) {
 		setPredefinedOptionsInternal(_predefinedOptions, null);
 		return true;
@@ -742,7 +766,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	/**
 	 * Change combo selection
 	 * 
-	 * {@link #setSelectedMapping(java.lang.Object) setSelectedMapping(Integer)}
+	 * {@link SSBaseComboBox#setSelectedMapping(java.lang.Object) setSelectedMapping(Integer)}
 	 * is the preferred/alternative method.
 	 * @param _value value
 	 */

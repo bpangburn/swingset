@@ -298,7 +298,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	 * @param _render list cell renderer
 	 * @throws IllegalArgumentException if _jc is not JList or JComboBox
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	// TODO Remove warning suppression post Java 8.
 	public static void install(JComponent _jc, AbstractComboBoxListSwingModel _model,
 			ListCellRenderer<?> _render) {
 		Objects.requireNonNull(_jc);
@@ -370,6 +371,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		// In following, "JList<?> list" gets an error with 1.8 compiler,
 		// and is OK with j-14 compiler. I remember the old one
 		// has some inference issues with nested classes
+		@SuppressWarnings("rawtypes")
+		// TODO Remove warning suppression post Java 8.
 		@Override
 		public Component getListCellRendererComponent( JList list,
 				Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -403,8 +406,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 				// does throw an exception.
 				if ( index >= 0 && index < itemList.size() )
 					return itemList.get(index);
-				else
-					return null;
+				return null;
 			}
 			return itemList.get(index);
 		}
@@ -482,7 +484,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	/** {@inheritDoc } */
 	// @Override not in jdk1.8
-	@SuppressWarnings("override")
+	@SuppressWarnings({ "all", "override", "javadoc" })
+	//TODO: Un-suppress these warnings post Java 8
 	public void addAll(int index, Collection<? extends SSListItem> c) {
 		try (Remodel remodel = getRemodel()) {
 			remodel.addAll(index, c);
@@ -491,7 +494,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	/** {@inheritDoc } */
 	// @Override not in jdk1.8
-	@SuppressWarnings("override")
+	//TODO: Un-suppress these warnings post Java 8
+	@SuppressWarnings({"all", "override", "javadoc"})
 	public void addAll(Collection<? extends SSListItem> c) {
 		try (Remodel remodel = getRemodel()) {
 			remodel.addAll(c);
@@ -651,12 +655,12 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 		/**
 		 * state info
-		 * @param elemIndex elem index
-		 * @param isValid true if it's valid
+		 * @param _elemIndex elem index
+		 * @param _isValid true if it's valid
 		 */
-		public SliceInfo(int elemIndex, boolean isValid) {
-			this.elemIndex = elemIndex;
-			this.isValid = isValid;
+		public SliceInfo(int _elemIndex, boolean _isValid) {
+			elemIndex = _elemIndex;
+			isValid = _isValid;
 		}
 
 		/**
@@ -750,7 +754,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	 * @param _elemIndex which element to extract
 	 * @return the element extracted from the list item.
 	 */
-	private Object getElem(SSListItem _listItem, int _elemIndex) {
+	private static Object getElem(SSListItem _listItem, int _elemIndex) {
 		return ((ListItem0)_listItem).getElem(_elemIndex);
 	}
 
@@ -1072,7 +1076,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		protected abstract void releaseWriteLock();
 
 		/** a Remodel */
-		@SuppressWarnings("OverridableMethodCallInConstructor")
+		// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+		@SuppressWarnings({"all","OverridableMethodCallInConstructor"})
 		protected Remodel() {
 			takeWriteLock();
 		}
@@ -1237,7 +1242,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		 */
 		public Object getElem(SSListItem _listItem, int _elemIndex) {
 			verifyOpened();
-			return AbstractComboBoxListSwingModel.this.getElem(_listItem, _elemIndex);
+			return AbstractComboBoxListSwingModel.getElem(_listItem, _elemIndex);
 		}
 		
 		/**
@@ -1292,7 +1297,9 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		 * @return the object from the SSListItem
 		 */
 		Object getElem(int index);
-		/** {@inheritDoc } */
+		
+		/** {@inheritDoc} */
+		@SuppressWarnings("javadoc")
 		Object clone() throws CloneNotSupportedException;
 	}
 
@@ -1325,11 +1332,13 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	private static class ListItem1 implements ListItemWrite0, Cloneable {
 		Object arg0;
 
+		@SuppressWarnings("unused")
+		// TODO Unused warning is a false positive. Used by reflection.
 		public ListItem1(Object[] elems) {
 			arg0 = elems[0];
 		}
 
-		private void checkIndex(int index) {
+		private static void checkIndex(int index) {
 			if (index != 0) {
 				throw new ArrayIndexOutOfBoundsException(
 						"Only 0 index available for this ListItem, not " + index);
@@ -1389,12 +1398,14 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		Object arg0;
 		Object arg1;
 
+		@SuppressWarnings("unused")
+		// TODO Unused warning is a false positive. Used by reflection.
 		public ListItem2(Object[] elems) {
 			arg0 = elems[0];
 			arg1 = elems[1];
 		}
 
-		private void checkIndex(int index) {
+		private static void checkIndex(int index) {
 			if ((0b011 & (1 << index)) == 0) {
 				throw new ArrayIndexOutOfBoundsException(
 						"Only 0 or 1 index available for this ListItem, not " + index);
@@ -1460,13 +1471,15 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		Object arg1;
 		Object arg2;
 
+		@SuppressWarnings("unused")
+		// TODO Unused warning is a false positive. Used by reflection.
 		public ListItem3(Object[] elems) {
 			arg0 = elems[0];
 			arg1 = elems[1];
 			arg2 = elems[2];
 		}
 
-		private void checkIndex(int index) {
+		private static void checkIndex(int index) {
 			if ((0b0111 & (1 << index)) == 0) {
 				throw new ArrayIndexOutOfBoundsException(
 						"Only 0, 1 or 2 index available for this ListItem, not " + index);
@@ -1536,8 +1549,10 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	private static class ListItemAsArray implements ListItemWrite0, Cloneable {
 		Object[] elems;
 
-		public ListItemAsArray(Object [] elems) {
-			this.elems = Arrays.copyOf(elems, elems.length);
+		@SuppressWarnings("unused")
+		// TODO Unused warning is a false positive. Used by reflection.
+		public ListItemAsArray(Object [] _elems) {
+			elems = Arrays.copyOf(_elems, _elems.length);
 		}
 
 		@Override
@@ -1558,7 +1573,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		@Override
 		public int hashCode() {
 			int hash = 7;
-			hash = 83 * hash + Arrays.deepHashCode(this.elems);
+			hash = 83 * hash + Arrays.deepHashCode(elems);
 			return hash;
 		}
 
@@ -1574,7 +1589,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 				return false;
 			}
 			final ListItemAsArray other = (ListItemAsArray) obj;
-			return Arrays.deepEquals(this.elems, other.elems);
+			return Arrays.deepEquals(elems, other.elems);
 		}
 
 		@Override

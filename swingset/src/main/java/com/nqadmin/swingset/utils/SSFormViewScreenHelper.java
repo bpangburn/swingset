@@ -167,7 +167,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 // TODO Check this....				
 				updateScreen(getParentID());
 			} else {
-				getCmbNavigator().deleteItem(pkOfDeletedRecord);
+				getCmbNavigator().removeMapping(pkOfDeletedRecord);
 			}
 			ssDBNavPerformPostDeletionOps();
 			pkOfDeletedRecord=null; 

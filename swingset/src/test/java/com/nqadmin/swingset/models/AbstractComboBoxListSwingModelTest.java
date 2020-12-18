@@ -18,7 +18,7 @@ package com.nqadmin.swingset.models;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.Instant;
+//import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -41,6 +41,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  *
  * @author err
  */
+@SuppressWarnings("javadoc")
 public class AbstractComboBoxListSwingModelTest {
 	
 	public AbstractComboBoxListSwingModelTest() {
@@ -74,7 +75,7 @@ public class AbstractComboBoxListSwingModelTest {
 	// and an empty listInfo that handles 3 elements.
 	//
 	@BeforeEach
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void setUp() {
 		clearAll();
 
@@ -86,7 +87,7 @@ public class AbstractComboBoxListSwingModelTest {
 
 		// divide to get milliseconds from nanosec
 		//long day = TimeUnit.DAYS.convert(1, TimeUnit.DAYS) / (1000 * 1000);
-		Instant now = Instant.now();
+		//Instant now = Instant.now();
 		LocalDate d2 = LocalDate.of(2021, Month.JANUARY, 1);
 		d2.plusDays(1);
 
@@ -260,7 +261,7 @@ public class AbstractComboBoxListSwingModelTest {
 		assertFalse(result.equals(result2));
 	}
 
-	private boolean getElemEquals(Object[] elems, int listItemIndex, LI.Remodel remodel) {
+	private static boolean getElemEquals(Object[] elems, int listItemIndex, LI.Remodel remodel) {
 		for (int i = 0; i < elems.length; i++) {
 			if(!elems[i].equals(remodel.getElem(listItemIndex, i))) {
 				return false;
@@ -284,6 +285,7 @@ public class AbstractComboBoxListSwingModelTest {
 	public void testGetSetElem(LI linfo) {
 		System.err.println("" + linfo);
 		// calculate expected item element value, slice is 0 - n-1
+		@SuppressWarnings("unused")
 		BiFunction<Integer, Integer, Integer> f = (slice, listIndex) -> slice*10 + listIndex;
 		// test equals/get/set for item index 3
 		int testItemIndex = 3;

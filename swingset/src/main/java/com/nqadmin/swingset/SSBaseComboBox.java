@@ -234,7 +234,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * is true or false.
 	 * <p>
 	 * <b>When the item list is cleared, for example
-	 * {@link OptionMappingSwingModel.Remodel#clear() remodel.clear()},
+	 * {@link com.nqadmin.swingset.models.OptionMappingSwingModel.Remodel#clear() remodel.clear()},
 	 * the nullItem must be set to null.</b>
 	 * @see #createNullItem(com.nqadmin.swingset.models.OptionMappingSwingModel.Remodel)
 	 */
@@ -586,6 +586,9 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * broadcasting {@link ActionEvent}s at inappropriate times.
 	 *
 	 * This method is the logical inverse of {@link #registerAllActionListeners}.
+	 * 
+	 * @param comboBox combo box from which to remove listeners
+	 * @return array of ActionListeners removed from combo box (for adding back later)
 	 */
 	static ActionListener[] unregisterAllActionListeners(JComboBox<?> comboBox) {
 		final ActionListener[] listeners = comboBox.getActionListeners();
@@ -601,6 +604,9 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * with the given <code>comboBox</code>.
 	 *
 	 * This method is the logical inverse of {@link #unregisterAllActionListeners}.
+	 * 
+	 * @param comboBox combo box for which to add listeners
+	 * @param listeners array of ActionListners to be 
 	 */
 	static void registerAllActionListeners(JComboBox<?> comboBox, ActionListener[] listeners) {
 		for (ActionListener listener : listeners) {
@@ -643,8 +649,8 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * Can call this from an example for example. Tested with example4.
 	 * @param combo test this
 	 */
-
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	@SuppressWarnings({"all","UseOfSystemOutOrSystemErr"})
 	public static void testComboAdjustForNull(SSComboBox combo) {
 		tracker = 0;
 		trackout.clear();
@@ -685,21 +691,27 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	
 	private static final List<String> trackout = new ArrayList<>();
 	private static int tracker;
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	@SuppressWarnings({"all","UseOfSystemOutOrSystemErr"})
 	private static void track(String tag) {
 		String s = "tag: " + tracker + " " + tag;
 		trackout.add(s);
 		System.err.println(s);
 		tracker++;
 	}
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	@SuppressWarnings({"all","UseOfSystemOutOrSystemErr"})
 	private static void p(SSComboBox combo) {
 		String s = "allowNull " + combo.getAllowNull();
 		trackout.add(s);
 		System.err.println(s);
 		p(combo.getItemCount(), combo.getSelectedIndex(), combo.getSelectedItem());
 	}
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	@SuppressWarnings({"all","UseOfSystemOutOrSystemErr"})
 	private static void p(int n, int i, Object item) {
 		String s = String.format("n %d, i %d, item %s", n, i, item);
 		trackout.add(s);

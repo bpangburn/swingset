@@ -192,6 +192,7 @@ public class TestBaseComponents extends JFrame {
 
 	/**
 	 * Method to obtain proper data structure/model for SSList based on database used
+	 * @return collection model to use for lists based on underlying database
 	 */
 	private SSCollectionModel getCollectionModel() {
 		@SuppressWarnings("unchecked")
@@ -203,7 +204,8 @@ public class TestBaseComponents extends JFrame {
 	/**
 	 * Constructor for Base Component Test
 	 * <p>
-	 * @param _dbConn - database connection
+	 * @param _dbConn database connection
+	 * @param _hints dynamic information on collection model, other
 	 */
 	public TestBaseComponents(final Connection _dbConn, Map<String,Object> _hints) {
 

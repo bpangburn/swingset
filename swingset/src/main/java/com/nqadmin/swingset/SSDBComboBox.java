@@ -75,11 +75,15 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  * <b>Warning. This combobox may use GlazedLists and an item is automatically
  * inserted when {@link #getAllowNull() } is true. Do not use methods
  * that are based on index in the list, unless you're sure...</b>
+ * 
  * {@link #setSelectedItem(java.lang.Object) setSelectedItem(SSListItem)}
  * and {@link #getSelectedItem() getSelectedItem()}
  * are the correct techniques.
- * such as
- * {@link #setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}.
+ * 
+ * There are a variety of methods to change the current combobox item
+ * such as:
+ * {@link SSBaseComboBox#setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}
+ * {@link SSBaseComboBox#setSelectedOption(java.lang.Object) setSelectedOption(String)}
  * <p>
  * Notice that {@link #getSelectedMapping() }
  * returns null in two situations related to {@link #getAllowNull() }
@@ -134,26 +138,21 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  * // CREATE AN INSTANCE OF THE SSDBCOMBOBOX WITH THE CONNECTION OBJECT
  * // QUERY AND COLUMN NAMES
  * combo = new SSDBComboBox(connection,query,"part_id","part_name");
- *
- * // THIS BASICALLY SPECIFIES THE COLUMN AND THE SSROWSET WHERE UPDATES HAVE
+ * 
+ * // EXECUTE THE QUERY
+ * combo.execute();
+ * 
+ * // THIS BASICALLY SPECIFIES THE COLUMN AND THE ROWSET WHERE UPDATES HAVE
  * // TO BE MADE.
  * combo.bind(rowSet,"part_id");
- * combo.execute();
- *
- * // CREATE A TEXTFIELD
- * JTextField myText = new JTextField();
- * myText.setDocument(new SSTextDocument(rowSet, "quantity");
- *
+
  * } catch(Exception e) {
  *	// EXCEPTION HANDLER HERE...
  * }
  *
- *
  * // ADD THE SSDBCOMBOBOX TO THE JFRAME
  * getContentPane().add(combo.getComboBox());
- *
- * // ADD THE JTEXTFIELD TO THE JFRAME
- * getContentPane().add(myText);
+ * 
  * }
  * </pre>
  */
@@ -169,7 +168,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 
 	/**
 	 * Value to represent that no item has been selected in the combo box.
-	 * @deprecated 
+	 * 
+	 * @deprecated check for {@code #getSelectedMapping()==null}
 	 */
 	@Deprecated
 	public static final int NON_SELECTED = Integer.MIN_VALUE + 1;
@@ -213,6 +213,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * display (SSListItem) and its corresponding primary key)
 	 * @deprecated can't use
 	 */
+	@Deprecated
 	protected EventList<SSListItem> eventList;
 
 	/**
@@ -228,6 +229,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * keystroke listener/filter.
 	 * @deprecated unneeded
 	 */
+	@Deprecated
 	protected boolean filterSwitch = true;
 
 	/**
@@ -237,12 +239,14 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * are Integers.
 	 * @deprecated unneeded
 	 */
+	@Deprecated
 	protected ArrayList<Long> mappings = null;
 
 	/**
 	 * Options to be displayed in the combobox (based on a query).
 	 * @deprecated unneeded
 	 */
+	@Deprecated
 	protected ArrayList<String> options = null;
 
 	/**
@@ -292,7 +296,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	/**
 	 * Creates an object of the SSDBComboBox.
 	 */
-	@SuppressWarnings("LeakingThisInConstructor")
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	@SuppressWarnings({"all","LeakingThisInConstructor"})
 	public SSDBComboBox() {
 		// Note that call to parent default constructor is implicit.
 		//super();
@@ -317,7 +322,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @param _displayColumnName    column name whose values are displayed in the
 	 *                              combo box.
 	 */
-	@SuppressWarnings("OverridableMethodCallInConstructor")
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	@SuppressWarnings({"all","OverridableMethodCallInConstructor"})
 	public SSDBComboBox(final Connection _connection, final String _query,
 			final String _primaryKeyColumnName, final String _displayColumnName) {
 		this();
@@ -354,6 +360,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @param _primaryKey  primary key value corresponding the the display text
 	 * @deprecated use {@link #addOption(java.lang.String, java.lang.Long) }
 	 */
+	@Deprecated
 	public void addItem(final String _displayText, final long _primaryKey) {
 
 		// TODO Determine if any change is needed to actually add item to combobox.
@@ -444,6 +451,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @return returns true on successful deletion otherwise returns false.
 	 * @deprecated use {@link #removeMapping(java.lang.Long) }
 	 */
+	@Deprecated
 	public boolean deleteItem(final long _primaryKey) {
 		return removeMapping(_primaryKey);
 
@@ -492,6 +500,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @return returns true on successful deletion otherwise returns false.
 	 * @deprecated no replacement, throws exception
 	 */
+	@Deprecated
 	public boolean deleteStringItem(final Object _option) {
 		throw new UnsupportedOperationException();
 
@@ -574,6 +583,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 */
 	// TODO: public method? Why? How/where used.
 	//		Make private, see what happens
+	@Deprecated
 	protected EventList<SSListItem> getEventList() {
 		throw new UnsupportedOperationException();
 		//return eventList;
@@ -788,6 +798,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * 
 	 * @deprecated use {@link #getSelectedMapping() }
 	 */
+	@Deprecated
 	public Long getSelectedValue() {
 		return getSelectedMapping();
 	}
@@ -847,6 +858,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @return  deprecated
 	 * @deprecated unneeded, the old method, now handled in format
 	 */
+	@Deprecated
 	protected String getStringValue(final ResultSet _rs, final String _columnName) {
 		throw new UnsupportedOperationException();
 	}
@@ -1107,16 +1119,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	}
 
 	/**
-	 * @param eventList the eventList to set
-	 * @deprecated no replacement
-	 */
-	public void setEventList(final EventList<SSListItem> eventList) {
-		// TODO: what/how is this used?
-		throw new UnsupportedOperationException();
-		//this.eventList = eventList;
-	}
-
-	/**
 	 * Method that sets the combo box to be filterable.
 	 * <p>
 	 * GlazedList filtering is now fully integrated so this no longer serves a
@@ -1129,24 +1131,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		// TODO remove this method in future release
 		filterSwitch = _filter;
 		logger.warn(getColumnForLog() + ": This method has been Deprecated because GlazedList filtering is now fully integrated.\n", new Exception());
-	}
-
-	/**
-	 * @param mappings the mappings to set
-	 * @deprecated values come from database query
-	 */
-	public void setMappings(final ArrayList<Long> mappings) {
-		throw new UnsupportedOperationException();
-		//this.mappings = mappings;
-	}
-
-	/**
-	 * @param options the options to set
-	 * @deprecated values come from database query
-	 */
-	public void setOptions(final ArrayList<String> options) {
-		throw new UnsupportedOperationException();
-		//this.options = options;
 	}
 
 	/**
@@ -1385,7 +1369,9 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * {@inheritDoc }
 	 * @throws IllegalStateException if option2 enabled
 	 */
-	public void setSelectedOption(final String _option) {
+	//public void setSelectedOption(final String _option) {
+	@Override
+	public void setSelectedOption(final Object _option) {
 		if (hasOption2()) {
 			throw new IllegalStateException("option2 enabled");
 		}
@@ -1395,8 +1381,9 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	/**
 	 * 
 	 * @param _value option
-	 * @deprecated use {@link #setSelectedOption(java.lang.String) }
+	 * @deprecated use {@link #setSelectedOption(Object) }
 	 */
+	@Deprecated
 	public void setSelectedStringValue(final String _value) {
 		setSelectedOption(_value);
 	}
@@ -1405,9 +1392,9 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * Sets the selected ComboBox item according to the specified mapping/key.
 	 * 
 	 * @param _value database record mapping/key
-	 * @deprecated use
-	 * {@link #setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}
+	 * @deprecated use {@link SSBaseComboBox#setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}
 	 */
+	@Deprecated
 	public void setSelectedValue(final long _value) {
 		setSelectedMapping(_value);
 	}
@@ -1496,6 +1483,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @return returns true if update is successful otherwise returns false.
 	 * @deprecated use {@link #updateOption(java.lang.Long, java.lang.String) }
 	 */
+	@Deprecated
 	public boolean updateItem(final long _primaryKey, final String _updatedDisplayText) {
 		return updateOption(_primaryKey, _updatedDisplayText);
 
@@ -1626,6 +1614,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @return returns true if successful otherwise returns false.
 	 * @deprecated use {@link #updateOption(java.lang.Long, java.lang.String) }
 	 */
+	@Deprecated
 	public boolean updateStringItem(final String _existingDisplayText, final String _updatedDisplayText) {
 		throw new UnsupportedOperationException();
 
