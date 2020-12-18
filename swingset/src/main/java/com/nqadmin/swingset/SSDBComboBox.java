@@ -75,11 +75,15 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  * <b>Warning. This combobox may use GlazedLists and an item is automatically
  * inserted when {@link #getAllowNull() } is true. Do not use methods
  * that are based on index in the list, unless you're sure...</b>
+ * 
  * {@link #setSelectedItem(java.lang.Object) setSelectedItem(SSListItem)}
  * and {@link #getSelectedItem() getSelectedItem()}
  * are the correct techniques.
- * such as
- * {@link #setSelectedMapping(Long)}.
+ * 
+ * There are a variety of methods to change the current combobox item
+ * such as:
+ * {@link SSBaseComboBox#setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}
+ * {@link SSBaseComboBox#setSelectedOption(java.lang.Object) setSelectedOption(String)}
  * <p>
  * Notice that {@link #getSelectedMapping() }
  * returns null in two situations related to {@link #getAllowNull() }
@@ -141,22 +145,14 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  * // THIS BASICALLY SPECIFIES THE COLUMN AND THE ROWSET WHERE UPDATES HAVE
  * // TO BE MADE.
  * combo.bind(rowSet,"part_id");
- * combo.execute();
- *
- * // CREATE A TEXTFIELD
- * JTextField myText = new JTextField();
- * myText.setDocument(new SSTextDocument(rowSet, "quantity");
- *
+
  * } catch(Exception e) {
  *	// EXCEPTION HANDLER HERE...
  * }
  *
- *
  * // ADD THE SSDBCOMBOBOX TO THE JFRAME
  * getContentPane().add(combo.getComboBox());
- *
- * // ADD THE JTEXTFIELD TO THE JFRAME
- * getContentPane().add(myText);
+ * 
  * }
  * </pre>
  */
@@ -1396,8 +1392,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * Sets the selected ComboBox item according to the specified mapping/key.
 	 * 
 	 * @param _value database record mapping/key
-	 * @deprecated use
-	 * {@link #setSelectedMapping(Long)}
+	 * @deprecated use {@link SSBaseComboBox#setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}
 	 */
 	@Deprecated
 	public void setSelectedValue(final long _value) {
