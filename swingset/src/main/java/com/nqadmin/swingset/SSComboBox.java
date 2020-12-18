@@ -82,8 +82,8 @@ import com.nqadmin.swingset.models.SSListItem;
  * {@link SSBaseComboBox#setSelectedOption(java.lang.Object) setSelectedOption(String)}
  * <p>
  * Notice that:
- * {@link #setSelectedValue(Integer)} and 
- * {@link SSBaseComboBox#setSelectedMapping(java.lang.Object) setSelectedMapping(Integer)}
+ * {@link #getSelectedValue()} and 
+ * {@link SSBaseComboBox#getSelectedMapping()}
  * return null in two situations related to {@link #getAllowNull() }
  * <ul>
  *   <li>nothing is selected in this combo box
