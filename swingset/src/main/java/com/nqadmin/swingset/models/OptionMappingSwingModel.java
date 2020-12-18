@@ -66,7 +66,7 @@ import java.util.Objects;
  * @param <O2>  option2 type; if present, supplementary display string
  * 
  * @see AbstractComboBoxListSwingModel for general description of using this class
- * @see <a href="https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html">GlazedLists AutoCompletion javadoc</a>
+ * @see <a href="https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html" target="_blank" rel="noopener noreferrer">GlazedLists AutoCompletion javadoc</a>
  * 
  * @since 4.0.0
  */
