@@ -300,7 +300,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	/**
 	 * Creates an object of the SSDBComboBox.
 	 */
-	@SuppressWarnings("LeakingThisInConstructor")
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	@SuppressWarnings({"all","LeakingThisInConstructor"})
 	public SSDBComboBox() {
 		// Note that call to parent default constructor is implicit.
 		//super();
@@ -325,7 +326,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * @param _displayColumnName    column name whose values are displayed in the
 	 *                              combo box.
 	 */
-	@SuppressWarnings("OverridableMethodCallInConstructor")
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	@SuppressWarnings({"all","OverridableMethodCallInConstructor"})
 	public SSDBComboBox(final Connection _connection, final String _query,
 			final String _primaryKeyColumnName, final String _displayColumnName) {
 		this();

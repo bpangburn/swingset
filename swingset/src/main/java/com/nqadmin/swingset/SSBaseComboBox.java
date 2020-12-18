@@ -649,8 +649,8 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * Can call this from an example for example. Tested with example4.
 	 * @param combo test this
 	 */
-
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	@SuppressWarnings({"all","UseOfSystemOutOrSystemErr"})
 	public static void testComboAdjustForNull(SSComboBox combo) {
 		tracker = 0;
 		trackout.clear();
@@ -691,21 +691,27 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	
 	private static final List<String> trackout = new ArrayList<>();
 	private static int tracker;
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	@SuppressWarnings({"all","UseOfSystemOutOrSystemErr"})
 	private static void track(String tag) {
 		String s = "tag: " + tracker + " " + tag;
 		trackout.add(s);
 		System.err.println(s);
 		tracker++;
 	}
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	@SuppressWarnings({"all","UseOfSystemOutOrSystemErr"})
 	private static void p(SSComboBox combo) {
 		String s = "allowNull " + combo.getAllowNull();
 		trackout.add(s);
 		System.err.println(s);
 		p(combo.getItemCount(), combo.getSelectedIndex(), combo.getSelectedItem());
 	}
-	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	@SuppressWarnings({"all","UseOfSystemOutOrSystemErr"})
 	private static void p(int n, int i, Object item) {
 		String s = String.format("n %d, i %d, item %s", n, i, item);
 		trackout.add(s);

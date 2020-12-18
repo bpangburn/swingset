@@ -298,7 +298,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	 * @param _render list cell renderer
 	 * @throws IllegalArgumentException if _jc is not JList or JComboBox
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	// TODO Remove warning suppression post Java 8.
 	public static void install(JComponent _jc, AbstractComboBoxListSwingModel _model,
 			ListCellRenderer<?> _render) {
 		Objects.requireNonNull(_jc);
@@ -370,6 +371,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		// In following, "JList<?> list" gets an error with 1.8 compiler,
 		// and is OK with j-14 compiler. I remember the old one
 		// has some inference issues with nested classes
+		@SuppressWarnings("rawtypes")
+		// TODO Remove warning suppression post Java 8.
 		@Override
 		public Component getListCellRendererComponent( JList list,
 				Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -481,7 +484,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	/** {@inheritDoc } */
 	// @Override not in jdk1.8
-	@SuppressWarnings({ "override", "javadoc" })
+	@SuppressWarnings({ "all", "override", "javadoc" })
+	//TODO: Un-suppress these warnings post Java 8
 	public void addAll(int index, Collection<? extends SSListItem> c) {
 		try (Remodel remodel = getRemodel()) {
 			remodel.addAll(index, c);
@@ -490,7 +494,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	/** {@inheritDoc } */
 	// @Override not in jdk1.8
-	@SuppressWarnings({"override", "javadoc"})
+	//TODO: Un-suppress these warnings post Java 8
+	@SuppressWarnings({"all", "override", "javadoc"})
 	public void addAll(Collection<? extends SSListItem> c) {
 		try (Remodel remodel = getRemodel()) {
 			remodel.addAll(c);
@@ -1071,7 +1076,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		protected abstract void releaseWriteLock();
 
 		/** a Remodel */
-		@SuppressWarnings("OverridableMethodCallInConstructor")
+		// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+		@SuppressWarnings({"all","OverridableMethodCallInConstructor"})
 		protected Remodel() {
 			takeWriteLock();
 		}
@@ -1326,6 +1332,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	private static class ListItem1 implements ListItemWrite0, Cloneable {
 		Object arg0;
 
+		@SuppressWarnings("unused")
+		// TODO Unused warning is a false positive. Used by reflection.
 		public ListItem1(Object[] elems) {
 			arg0 = elems[0];
 		}
@@ -1390,6 +1398,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		Object arg0;
 		Object arg1;
 
+		@SuppressWarnings("unused")
+		// TODO Unused warning is a false positive. Used by reflection.
 		public ListItem2(Object[] elems) {
 			arg0 = elems[0];
 			arg1 = elems[1];
@@ -1461,6 +1471,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		Object arg1;
 		Object arg2;
 
+		@SuppressWarnings("unused")
+		// TODO Unused warning is a false positive. Used by reflection.
 		public ListItem3(Object[] elems) {
 			arg0 = elems[0];
 			arg1 = elems[1];
@@ -1537,6 +1549,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	private static class ListItemAsArray implements ListItemWrite0, Cloneable {
 		Object[] elems;
 
+		@SuppressWarnings("unused")
+		// TODO Unused warning is a false positive. Used by reflection.
 		public ListItemAsArray(Object [] _elems) {
 			elems = Arrays.copyOf(_elems, _elems.length);
 		}
