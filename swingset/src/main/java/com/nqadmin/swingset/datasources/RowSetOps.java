@@ -372,6 +372,8 @@ public class RowSetOps {
 	 * @throws SQLException  thrown if a database error is encountered
 	 * @throws NumberFormatException thrown if unable to parse a string to number format
 	 */
+	// TODO: Eclipse is giving a Potential null pointer access, but we have assert(_updatedValue != null) so may be able to remove warning in future.
+	@SuppressWarnings("null")
 	public static void updateColumnText(final RowSet _rowSet, final String _updatedValue, final String _columnName, final boolean _allowNull) throws NullPointerException, SQLException, NumberFormatException {
 
 		LogManager.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
@@ -470,7 +472,7 @@ public class RowSetOps {
 			
 		case DATE:
 // TODO Good to get rid of getSQLDate if possible.
-			if (_updatedValue!=null && _updatedValue.length() == 10) {
+			if (_updatedValue.length() == 10) {
 				Date dateValue = SSCommon.getSQLDate(_updatedValue);
 				_rowSet.updateDate(_columnName, dateValue);
 			} else {
@@ -489,7 +491,7 @@ public class RowSetOps {
 		// TODO: We're not doing anything here
 		// TODO: Probably a better way to handle date to timestamp conversion. Formatter? Get rid of getSQLDate() if possible.
 			// CONVERT ANY 10 CHARACTER DATE (e.g., yyyy-mm-dd, mm/dd/yyyy to a date/time)
-			if (_updatedValue!=null && _updatedValue.length() == 10) {
+			if (_updatedValue.length() == 10) {
 				Timestamp timestampValue = new Timestamp(SSCommon.getSQLDate(_updatedValue).getTime());
 				_rowSet.updateTimestamp(_columnName, timestampValue);
 			} else {
