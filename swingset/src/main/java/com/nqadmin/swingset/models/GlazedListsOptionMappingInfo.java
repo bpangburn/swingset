@@ -52,7 +52,7 @@ import ca.odell.glazedlists.EventList;
  * @param <O2>  option2 type; if present, supplementary display string
  * 
  * @see <a href="https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html" target="_blank" rel="noopener noreferrer">GlazedLists AutoCompletion javadoc</a>
- * @see <a href="https://publicobject.com/glazedlistsdeveloper/screencasts/autocompletesupport/" target="_blank" rel="noopener noreferrer">GlazedLists AutoCompletion Video</a>
+ * @see <a href="https://publicobject.com/glazedlistsdeveloper/screencasts/autocompletesupport/AutoCompleteSupport.wmv" target="_blank" rel="noopener noreferrer">GlazedLists AutoCompletion Video</a>
  * 
  * @since 4.0.0
  */
