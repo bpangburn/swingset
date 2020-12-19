@@ -482,20 +482,20 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	// Methods from DefaultComboBoxModel (make sure Vector never gets referenced)
 
-	/** {@inheritDoc } */
+	// TODO: Add @Override and remove SuppressWarnings annotation post Java 8
+	@SuppressWarnings({"all","javadoc"})
+	/** {@inheritDoc} */
 	// @Override not in jdk1.8
-	@SuppressWarnings({ "all", "override", "javadoc" })
-	//TODO: Un-suppress these warnings post Java 8
 	public void addAll(int index, Collection<? extends SSListItem> c) {
 		try (Remodel remodel = getRemodel()) {
 			remodel.addAll(index, c);
 		}
 	}
 
-	/** {@inheritDoc } */
+	// TODO: Add @Override and remove SuppressWarnings annotation post Java 8
+	@SuppressWarnings({"all","javadoc"})
+	/** {@inheritDoc} */
 	// @Override not in jdk1.8
-	//TODO: Un-suppress these warnings post Java 8
-	@SuppressWarnings({"all", "override", "javadoc"})
 	public void addAll(Collection<? extends SSListItem> c) {
 		try (Remodel remodel = getRemodel()) {
 			remodel.addAll(c);
@@ -1298,8 +1298,9 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		 */
 		Object getElem(int index);
 		
+		// TODO: Remove SuppressWarnings annotation post Java 8
+		@SuppressWarnings({"all","javadoc"})
 		/** {@inheritDoc} */
-		@SuppressWarnings("javadoc")
 		Object clone() throws CloneNotSupportedException;
 	}
 
