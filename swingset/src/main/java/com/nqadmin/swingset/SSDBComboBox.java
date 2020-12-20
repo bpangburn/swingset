@@ -72,18 +72,22 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  * represents a foreign key to another table, and the combobox needs to display
  * a list of one (or more) columns from the other table.
  * <p>
- * <b>Warning. This combobox may use GlazedLists and an item is automatically
- * inserted when {@link #getAllowNull() } is true. Do not use methods
- * that are based on index in the list, unless you're sure...</b>
+ * <b>Warning. This combobox may use GlazedLists which changes the contents
+ * of the combo box and an item is automatically
+ * inserted when {@link #getAllowNull()} is true. Do not use methods
+ * that are based on index in the combo box list, unless you're sure...</b>
  * 
- * {@link #setSelectedItem(java.lang.Object) setSelectedItem(SSListItem)}
- * and {@link #getSelectedItem() getSelectedItem()}
- * are the correct techniques.
- * 
- * There are a variety of methods to change the current combobox item
+ * For example use 
+ * {@link SSBaseComboBox#getSelectedMapping() getSelectedMapping()}
+ * not something that is based on {@code getSelectedIndex()}.
+ * Change the current combo box item with methods
  * such as:
- * {@link SSBaseComboBox#setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}
- * {@link SSBaseComboBox#setSelectedOption(java.lang.Object) setSelectedOption(String)}
+ * {@link #setSelectedMapping(java.lang.Object) setSelectedMapping(Integer)}
+ * and
+ * {@link SSBaseComboBox#setSelectedOption(java.lang.Object) setSelectedOption(String)}.
+ * Use the methods {@link SSBaseComboBox#hasItems() hasItems() } and
+ * {@link SSBaseComboBox#hasSelection() hasSelection() } which take into account
+ * {@code getAllowNull()}.
  * <p>
  * Notice that {@link #getSelectedMapping() }
  * returns null in two situations related to {@link #getAllowNull() }
@@ -92,8 +96,14 @@ import com.nqadmin.swingset.models.SSListItemFormat;
  *   <li>the <em>nullItem</em> is selected in this combo box
  * </ul>
  * <p>
- * {@code getSelectedItem() == null } indicates there is no selection;
- * use this if the distinction is needed.
+ * {@code getSelectedItem() == null } indicates there is no
+ * combo box selection; it is different than {@code !hasSelection()}
+ * when {@code getAllowNull()} is true.
+ * <p>
+ * If subclasses need to work directly with the combo box model,
+ * refer to {@link com.nqadmin.swingset.models.OptionMappingSwingModel}
+ * and especially
+ * {@link com.nqadmin.swingset.models.OptionMappingSwingModel.Remodel}
  * <p>
  * Note, if changing both a rowSet and column name consider using the bind()
  * method rather than individual setRowSet() and setColumName() calls.
