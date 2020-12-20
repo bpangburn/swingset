@@ -301,13 +301,32 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	//
 
 	/**
-	 * Determine if there are option/mapping items. This is tricky because
-	 * if getAllowNull is true then nullItem is in the item list.
+	 * Determine if there are option/mapping items 
+	 * that have been added to this combo box.
+	 * This is tricky because
+	 * if getAllowNull is true then nullItem is in the item list and
+	 * shouldn't be consider an item.
 	 * 
 	 * @return true if there are options/mappings
 	 */
 	public boolean hasItems() {
 		return optionModel.getItemList().size() != (getAllowNull() ? 1 : 0);
+	}
+
+	/**
+	 * Determine if the combo box has a selection, either an item that
+	 * has been added or if the combo box is editable then user entry.
+	 * This is tricky because
+	 * if getAllowNull is true then nullItem may be selected
+	 * and that should not be considered. In particular
+	 * {@code getSelectedItem() != null} and {@code getSelectedIndex() != -1}
+	 * may not work as expected.
+	 * 
+	 * @return true if the combo box has a selection
+	 */
+	public boolean hasSelection() {
+		Object item = getSelectedItem();
+		return item != null && item != nullItem;
 	}
 
 	/**

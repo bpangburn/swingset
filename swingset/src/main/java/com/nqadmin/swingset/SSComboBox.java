@@ -68,30 +68,40 @@ import com.nqadmin.swingset.models.SSListItem;
  * must be set before calling the bind() method to bind the combobox to a
  * database column.
  * <p>
- * <b>Warning. This combobox may use GlazedLists and an item is automatically
+ * <b>Warning. This combobox may use GlazedLists which changes the contents
+ * of the combo box and an item is automatically
  * inserted when {@link #getAllowNull()} is true. Do not use methods
- * that are based on index in the list, unless you're sure...</b>
+ * that are based on index in the combo box list, unless you're sure...</b>
  * 
- * {@link #setSelectedItem(java.lang.Object) setSelectedItem(SSListItem)}
- * and {@link #getSelectedItem() getSelectedItem()}
- * are the correct techniques.
- * 
- * There are a variety of methods to change the current combobox item
+ * For example use 
+ * {@link SSBaseComboBox#getSelectedMapping() getSelectedMapping()}
+ * not something that is based on {@code getSelectedIndex()}.
+ * Change the current combo box item with methods
  * such as:
- * {@link SSBaseComboBox#setSelectedMapping(java.lang.Object) setSelectedMapping(Integer)}
- * {@link SSBaseComboBox#setSelectedOption(java.lang.Object) setSelectedOption(String)}
+ * {@link #setSelectedMapping(java.lang.Object) setSelectedMapping(Integer)}
+ * and
+ * {@link SSBaseComboBox#setSelectedOption(java.lang.Object) setSelectedOption(String)}.
+ * Use the methods {@link SSBaseComboBox#hasItems() hasItems() } and
+ * {@link SSBaseComboBox#hasSelection() hasSelection() } which take into account
+ * {@code getAllowNull()}.
  * <p>
  * Notice that:
  * {@link #getSelectedValue()} and 
- * {@link SSBaseComboBox#getSelectedMapping()}
+ * {@link SSBaseComboBox#getSelectedMapping() getSelectedMapping()}
  * return null in two situations related to {@link #getAllowNull() }
  * <ul>
  *   <li>nothing is selected in this combo box
  *   <li>the <em>nullItem</em> is selected in this combo box
  * </ul>
  * <p>
- * {@code getSelectedItem() == null } indicates there is no selection;
- * use this if the distinction is needed.
+ * {@code getSelectedItem() == null } indicates there is no
+ * combo box selection; it is different than {@code !hasSelection()}
+ * when {@code getAllowNull()} is true.
+ * <p>
+ * If subclasses need to work directly with the combo box model,
+ * refer to {@link com.nqadmin.swingset.models.OptionMappingSwingModel}
+ * and especially
+ * {@link com.nqadmin.swingset.models.OptionMappingSwingModel.Remodel}
  * <p>
  * SSComboBox assumes that it will be bound to an integer column
  * <p>
