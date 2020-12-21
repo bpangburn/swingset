@@ -74,7 +74,7 @@ public class SSSyncManager {
 		
 		int actionPerformedCount = 0;
 
-		protected long comboPK = -1;
+		protected Long comboPK;
 
 		// WHEN THERE IS A CHANGE IN THIS VALUE MOVE THE ROWSET SO THAT
 		// ITS POSITIONED AT THE RIGHT RECORD.
@@ -85,16 +85,23 @@ public class SSSyncManager {
 
 			try {
 				// IF THIS IS NOT CAUSED BY THE USER ACTION (IN WHICH THE FOCUS WILL BE ON THE COMBO) THERE IS NOTHING TO DO
-				if ((rowset == null) || (rowset.getRow() < 1) || (comboBox.getSelectedIndex() == -1)
-						/* || comboBox.textField == null */
-						/* || comboBox.isBoundTextFieldNull() */
-						/* || !comboBox.hasFocus() */ // with rewrite, the editor and not the combo likely has the focus
-						) {
+				if ((rowset == null) || (rowset.getRow() < 1)) {
+//				if ((rowset == null) || (rowset.getRow() < 1) || (comboBox.getSelectedIndex() == -1)
+//						|| comboBox.textField == null
+//						|| comboBox.isBoundTextFieldNull()
+//						|| !comboBox.hasFocus() // with rewrite, the editor and not the combo likely has the focus
+//						) {
 
 					return;
 				}
 
 				comboPK = comboBox.getSelectedMapping();
+				
+				// getSelectedMapping() could return null during initialization or 
+				// If using UP/DOWN arrows with a GlazedList and you above first item or below last item.
+				if (comboPK==null) {
+					return;
+				}
 
 				// UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
 				// This code was removed to improve performance.
