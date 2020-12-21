@@ -1226,9 +1226,11 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		Object newSelectedItem = _value;
 		if (newSelectedItem!=null) {
 			super.setSelectedItem(_value);
-			if (getEditor() != null) {
+			if (getEditor() != null && hasFocus()) {
 				// after we find a match, do a select all on the editor so
 				// if the user starts typing again it won't be appended
+				// 2020-12-21_BP: if we don't limited to field with focus, the comboboxes blink on navigation
+				// this also causes the focus to jump out of a navigation combo
 				getEditor().selectAll();
 			}
 			logger.debug("{}: Selected Index AFTER super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedIndex());
