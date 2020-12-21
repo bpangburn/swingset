@@ -46,7 +46,7 @@
  *	<li>models which manage a collection of objects to/from a database</li>
  *	<li>models, some derived from java.swing, for use with UI components</li>
  * </ul>
- * <h3>Database Collection Models</h3>
+ * <h2>Database Collection Models</h2>
  * These models abstract away the storage specifics; they all 
  * implement {@link com.nqadmin.swingset.models.SSCollectionModel}.
  * they generally read and write to database.
@@ -54,7 +54,7 @@
  * as an array or set independent of how it might be stored in a data.
  * A model
  * could represent data from a single field or data resulting from a join.
- * <h3>UI support Models</h3>
+ * <h2>UI support Models</h2>
  * These models, sub-classes of
  * {@link com.nqadmin.swingset.models.AbstractComboBoxListSwingModel},
  * generally revolve around managing

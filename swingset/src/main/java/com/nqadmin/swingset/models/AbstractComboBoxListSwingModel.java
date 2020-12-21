@@ -98,7 +98,7 @@ import org.apache.logging.log4j.Logger;
  * <p>
  * This class is not parameterized; all SSListItem elements are Objects.
  * It is expected that sub-classes are parameterized and cast as needed.
- * <h3>Remodel</h3>
+ * <h2>Remodel</h2>
  * Inspections and modifications of the item list, and of its SSListItems,
  * are done through a Remodel Object see {@link #getRemodel() }. The
  * remodel object is "try with resource" compatible and subclasses
