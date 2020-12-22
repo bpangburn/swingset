@@ -465,7 +465,10 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
      * If GlazedLists ever changes the arrow key behavior, this can be removed.
      */
 	protected void glazedListArrowHandler() {
-		// TODO: if not dealing with GlazedList then we can just return.
+		// If not dealing with GlazedList then we can just return.
+//		if (getAutoComplete()== null) {
+//			return;
+//		}
 		
         // ADD KEY LISTENER - INTERCEPTING KEYPRESSED APPEARS TO BLOCK GL
         getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
