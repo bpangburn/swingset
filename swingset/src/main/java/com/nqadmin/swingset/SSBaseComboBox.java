@@ -42,6 +42,8 @@ package com.nqadmin.swingset;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -444,6 +446,51 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			setSelectedItem(item);
 		}
 	}
+	
+	/////////////////////////////////////////////////////////////////////////
+	//
+	// Deal with non-standard GlazedList UP/DOWN arrow handling
+	//
+	
+    /**
+     * When dealing with GlazedLists (1.11) restore expected combo behavior.
+     *
+     * Per GL JavaDoc:
+     * https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html
+     *<p>
+     *  4. typing the up arrow key when the popup is visible and the selected element is the first element causes the autocompletion to be cleared and the popup's selection to be removed.
+     *  6. typing the down arrow key when the popup is visible and the selected element is the last element causes the autocompletion to be cleared and the popup's selection to be removed
+     *<p>
+     * We want to restore the normal JComboBox behavior of not going past the first or last item. This would be the ideal case, matching JComboBox.
+     * If GlazedLists ever changes the arrow key behavior, this can be removed.
+     */
+	protected void glazedListArrowHandler() {
+		// TODO: if not dealing with GlazedList then we can just return.
+		
+        // ADD KEY LISTENER - INTERCEPTING KEYPRESSED APPEARS TO BLOCK GL
+        getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
+
+            @Override
+            // OVERRIDE KEYPRESSED, NOT KEYTYPED OR KEY RELEASED
+            public void keyPressed(KeyEvent keyEvent) {
+                int keyCode = keyEvent.getKeyCode();
+                if (keyCode == KeyEvent.VK_UP) {
+                	logger.trace(() -> String.format("%s: Intercepted UP key.", getColumnForLog()));
+                    System.out.println("");
+                    if (getSelectedIndex() == 0) {
+                        keyEvent.consume();
+                        logger.debug(() -> String.format("%s: UP key consumed.", getColumnForLog()));
+                    }
+                } else if (keyCode == KeyEvent.VK_DOWN) {
+                	logger.trace(() -> String.format("%s: Intercepted DOWN key.", getColumnForLog()));
+                    if (getSelectedIndex() == getModel().getSize()-1) {
+                        keyEvent.consume();
+                        logger.debug(() -> String.format("%s: DOWN key consumed.", getColumnForLog()));
+                    }
+                }
+            }
+        });
+	}
 
 
 	/////////////////////////////////////////////////////////////////////////
@@ -503,6 +550,10 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		setPreferredSize(new Dimension(200, 20));
 // TODO This was added during SwingSet rewrite 4/2020. Need to confirm it doesn't break anything.
 		setEditable(false);
+		
+		// RESTORE JComboBox UP/DOWN arrow behavior at beginning/end of list
+		glazedListArrowHandler();
+
 	}
 
 	/**
