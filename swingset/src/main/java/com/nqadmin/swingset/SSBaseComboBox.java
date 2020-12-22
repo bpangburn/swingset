@@ -158,7 +158,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		 * @param _jc install model into this
 		 * @return OptionMapping model
 		 */
-		protected static <M,O,O2>BaseModel<M,O,O2> install(JComboBox<SSListItem> _jc) {
+		protected static <M,O,O2>BaseModel<M,O,O2> install(SSBaseComboBox<M,O,O2> _jc) {
 			BaseModel<M,O,O2> model = new BaseModel<>();
 			AbstractComboBoxListSwingModel.install(_jc, model);
 			return model;
@@ -207,10 +207,12 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		 * @param _jc install auto completion into this
 		 * @return OptionMapping model
 		 */
-		protected static <M,O,O2>BaseGlazedModel<M,O,O2> install(JComboBox<SSListItem> _jc) {
+		protected static <M,O,O2>BaseGlazedModel<M,O,O2> install(SSBaseComboBox<M,O,O2> _jc) {
 			BaseGlazedModel<M,O,O2> model = new BaseGlazedModel<>();
 			model.autoComplete = AutoCompleteSupport.install(_jc, model.getEventList(), null, model.getListItemFormat());
 			model.autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
+			// RESTORE JCOMBOBOX UP/DOWN ARROW HANDLING OVERRIDING GLAZEDLIST
+			_jc.glazedListArrowHandler();
 			//model.autoComplete.setStrict(true);
 			return model;
 		}
@@ -465,10 +467,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
      * If GlazedLists ever changes the arrow key behavior, this can be removed.
      */
 	protected void glazedListArrowHandler() {
-		// If not dealing with GlazedList then we can just return.
-//		if (getAutoComplete()== null) {
-//			return;
-//		}
 		
         // ADD KEY LISTENER - INTERCEPTING KEYPRESSED APPEARS TO BLOCK GL
         getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
@@ -553,10 +551,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		setPreferredSize(new Dimension(200, 20));
 // TODO This was added during SwingSet rewrite 4/2020. Need to confirm it doesn't break anything.
 		setEditable(false);
-		
-		// RESTORE JComboBox UP/DOWN arrow behavior at beginning/end of list
-		glazedListArrowHandler();
-
 	}
 
 	/**
