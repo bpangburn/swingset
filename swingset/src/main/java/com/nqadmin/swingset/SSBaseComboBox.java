@@ -694,8 +694,10 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * If getAllowNull() then throw an exception if this method is used
 	 * from "com.nqadmin" outside of swingset itself.
 	 * {@inheritDoc }
+	 * @deprecated Avoid using getSelectedIndex() unless you are very familiar with GlazedLists and SwingSet nullItem
 	 */
 	@Override
+	@Deprecated
 	public int getSelectedIndex() {
 
 		StackTraceElement[] stack = new Throwable().getStackTrace();
@@ -708,6 +710,16 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		}
 
 		return super.getSelectedIndex();
+	}
+	
+	/**
+	 * {@inheritDoc }
+	 * @deprecated Avoid using setSelectedIndex() unless you are very familiar with GlazedLists and SwingSet nullItem
+	 */
+	@Override
+	@Deprecated
+	public void setSelectedIndex(int _index) {
+		super.setSelectedIndex(_index);
 	}
 
 	////////////////////////////////////////////////////////////////////////
