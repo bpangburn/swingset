@@ -98,7 +98,8 @@ public class SSSyncManager {
 				comboPK = comboBox.getSelectedMapping();
 				
 				// getSelectedMapping() could return null during initialization or 
-				// If using UP/DOWN arrows with a GlazedList and you above first item or below last item.
+				// If using UP/DOWN arrows with a GlazedList and you above first item or below last item. Note that this should
+				// not happen now that glazedListArrowHandler() has been added to SSBaseComboBox.
 				if (comboPK==null) {
 					return;
 				}
