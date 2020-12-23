@@ -42,6 +42,8 @@ package com.nqadmin.swingset;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -156,7 +158,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		 * @param _jc install model into this
 		 * @return OptionMapping model
 		 */
-		protected static <M,O,O2>BaseModel<M,O,O2> install(JComboBox<SSListItem> _jc) {
+		protected static <M,O,O2>BaseModel<M,O,O2> install(SSBaseComboBox<M,O,O2> _jc) {
 			BaseModel<M,O,O2> model = new BaseModel<>();
 			AbstractComboBoxListSwingModel.install(_jc, model);
 			return model;
@@ -205,10 +207,12 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		 * @param _jc install auto completion into this
 		 * @return OptionMapping model
 		 */
-		protected static <M,O,O2>BaseGlazedModel<M,O,O2> install(JComboBox<SSListItem> _jc) {
+		protected static <M,O,O2>BaseGlazedModel<M,O,O2> install(SSBaseComboBox<M,O,O2> _jc) {
 			BaseGlazedModel<M,O,O2> model = new BaseGlazedModel<>();
 			model.autoComplete = AutoCompleteSupport.install(_jc, model.getEventList(), null, model.getListItemFormat());
 			model.autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
+			// RESTORE JCOMBOBOX UP/DOWN ARROW HANDLING OVERRIDING GLAZEDLIST
+			_jc.glazedListArrowHandler();
 			//model.autoComplete.setStrict(true);
 			return model;
 		}
@@ -444,6 +448,50 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			setSelectedItem(item);
 		}
 	}
+	
+	/////////////////////////////////////////////////////////////////////////
+	//
+	// Deal with non-standard GlazedList UP/DOWN arrow handling
+	//
+	
+    /**
+     * When dealing with GlazedLists (1.11) restore expected combo behavior.
+     *
+     * Per GL JavaDoc:
+     * https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html
+     *<p>
+     *  4. typing the up arrow key when the popup is visible and the selected element is the first element causes the autocompletion to be cleared and the popup's selection to be removed.
+     *  6. typing the down arrow key when the popup is visible and the selected element is the last element causes the autocompletion to be cleared and the popup's selection to be removed
+     *<p>
+     * We want to restore the normal JComboBox behavior of not going past the first or last item. This would be the ideal case, matching JComboBox.
+     * If GlazedLists ever changes the arrow key behavior, this can be removed.
+     */
+	protected void glazedListArrowHandler() {
+		
+        // ADD KEY LISTENER - INTERCEPTING KEYPRESSED APPEARS TO BLOCK GL
+        getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
+
+            @Override
+            // OVERRIDE KEYPRESSED, NOT KEYTYPED OR KEY RELEASED
+            public void keyPressed(KeyEvent keyEvent) {
+                int keyCode = keyEvent.getKeyCode();
+                if (keyCode == KeyEvent.VK_UP) {
+                	logger.trace(() -> String.format("%s: Intercepted UP key.", getColumnForLog()));
+                    System.out.println("");
+                    if (getSelectedIndex() == 0) {
+                        keyEvent.consume();
+                        logger.debug(() -> String.format("%s: UP key consumed.", getColumnForLog()));
+                    }
+                } else if (keyCode == KeyEvent.VK_DOWN) {
+                	logger.trace(() -> String.format("%s: Intercepted DOWN key.", getColumnForLog()));
+                    if (getSelectedIndex() == getModel().getSize()-1) {
+                        keyEvent.consume();
+                        logger.debug(() -> String.format("%s: DOWN key consumed.", getColumnForLog()));
+                    }
+                }
+            }
+        });
+	}
 
 
 	/////////////////////////////////////////////////////////////////////////
@@ -643,8 +691,10 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * If getAllowNull() then throw an exception if this method is used
 	 * from "com.nqadmin" outside of swingset itself.
 	 * {@inheritDoc }
+	 * @deprecated Avoid using getSelectedIndex() unless you are very familiar with GlazedLists and SwingSet nullItem
 	 */
 	@Override
+	@Deprecated
 	public int getSelectedIndex() {
 
 		StackTraceElement[] stack = new Throwable().getStackTrace();
@@ -657,6 +707,16 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		}
 
 		return super.getSelectedIndex();
+	}
+	
+	/**
+	 * {@inheritDoc }
+	 * @deprecated Avoid using setSelectedIndex() unless you are very familiar with GlazedLists and SwingSet nullItem
+	 */
+	@Override
+	@Deprecated
+	public void setSelectedIndex(int _index) {
+		super.setSelectedIndex(_index);
 	}
 
 	////////////////////////////////////////////////////////////////////////
