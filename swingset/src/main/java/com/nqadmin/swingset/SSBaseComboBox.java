@@ -42,6 +42,8 @@ package com.nqadmin.swingset;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.Serializable;
@@ -51,6 +53,7 @@ import java.util.Objects;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -111,32 +114,101 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Listener(s) for the component's value used to propagate changes back to bound
-	 * database column.
+	 * Listener(s) for the component's value used to propagate changes back to the rowset in certain instances.
+	 * <p>
+	 * The focus listener is the primary driver of rowset updates from the combo box to minimize noise while
+	 * traversing and to gracefully handle nulls.
+	 * <p>
+	 * NOTE: No guaranty whether ActionListener or FocusLister will be called first when focus is lost.
 	 */
 	protected class SSBaseComboBoxListener implements ActionListener, Serializable
 	{
 		private static final long serialVersionUID = -3131533966245488092L;
 
-		/** {@inheritDoc} */
+		/**
+		 * For JComboBox ActionListener and ItemListener are very similar.
+		 * 
+		 * {@inheritDoc} */
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
+			
+			boolean editorHasFocus = getEditor().getEditorComponent().hasFocus();
+			
+			Object selectedItem = getSelectedItem();
+			
+			logger.debug(() -> String.format("%s: Action event. Editor has focus?: %b. Selected item: %s.",
+					getColumnForLog(), editorHasFocus, selectedItem));
 
-			removeRowSetListener();
-
-			M mapping = getSelectedMapping();
-
-			if (mapping == null) {
-				setBoundColumnText(null);
-				logger.debug(() -> String.format("%s: Setting to null.", getColumnForLog()));
-			} else {
-				setBoundColumnText(String.valueOf(mapping));
-				logger.debug(String.format("%s: Setting to %s.",  getColumnForLog(), mapping));
+			// This is intended to catch updates from the developer. E.g., setting of defaults for a screen.
+			//
+			// No guaranty of order for FocusListener and ActionListener so adding check
+			// for valid SSListItem
+			if (!editorHasFocus && !revertingItem && (selectedItem instanceof SSListItem)) {
+				logger.debug(() -> String.format("%s: ActionListener updating rowset with %s.", getColumnForLog(), selectedItem));
+				updateRowset();
+				revertItem = (SSListItem) selectedItem;
 			}
 
-			addRowSetListener();
 		}
 	}
+	
+	/**
+	 * Listener to store value on focusGained and validate (and revert if needed) on focusLost.
+	 * <p>
+	 * The combo selected item can be updated frequently if the user is typing in the editor and/or if the
+	 * user is using the arrow keys to traverse the items in the list. We really only care about the end result
+	 * and don't need to constantly update the rowset (or perform navigations for a combo navigator).
+	 * <p>
+	 * See https://github.com/bpangburn/swingset/issues/38
+	 * <p>
+	 * NOTE: No guaranty whether ActionListener or FocusLister will be called first when focus is lost.
+	 */
+	protected class SSBaseComboBoxFocusListener implements FocusListener, Serializable
+	//TODO: Further investigate ordering of ActionListener and FocusListener.
+	{
+
+		private static final long serialVersionUID = 1L;
+
+		/** {@inheritDoc} */
+		@Override
+		public void focusGained(FocusEvent arg0) {
+			logger.debug(() -> String.format("%s: focusGained(). Selected item: %s", getColumnForLog(),getSelectedItem()));
+			revertItem = (SSListItem) getSelectedItem();
+			
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void focusLost(FocusEvent arg0) {
+			logger.debug(() -> String.format("%s: focusLost(). Selected item: %s", getColumnForLog(),getSelectedItem()));
+			
+			Object currentItem = getSelectedItem();
+			
+			if (currentItem instanceof SSListItem) {
+				// PROPAGATE LATEST VALUE TO ROWSET
+					updateRowset();
+										
+				// Update revertItem for next use
+					revertItem = (SSListItem) getSelectedItem();
+				
+			} else {
+				// A PROPER ITEM HAS NOT BEEN SELECTED. WARN USER AND REVERT.
+
+				// NOTIFY THE USER
+					JOptionPane.showMessageDialog(SSBaseComboBox.this,
+						"An item was not selected from the combobox. Reverting to " + revertItem);
+				
+				// Revert the selectedItem. This will trigger the action listener so set a flag.
+					revertingItem = true;
+					setSelectedItem(revertItem);
+					revertingItem = false;
+					
+				// There is nothing to do with the rowset - it should already have the last value
+			}
+			
+		}
+	}
+
 
 	/**
 	 * OptionMapping model that can be installed in a JComboBox; this model has methods
@@ -161,6 +233,10 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		protected static <M,O,O2>BaseModel<M,O,O2> install(SSBaseComboBox<M,O,O2> _jc) {
 			BaseModel<M,O,O2> model = new BaseModel<>();
 			AbstractComboBoxListSwingModel.install(_jc, model);
+			
+			// ADD FOCUS LISTENER TO UPDATE ROWSET AND REVERT INVALID ITEM, IF NECESSARY
+			_jc.getEditor().getEditorComponent().addFocusListener(_jc.ssBaseComboBoxFocusListener);
+			
 			return model;
 		}
 
@@ -214,6 +290,10 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			// RESTORE JCOMBOBOX UP/DOWN ARROW HANDLING OVERRIDING GLAZEDLIST
 			_jc.glazedListArrowHandler();
 			//model.autoComplete.setStrict(true);
+			
+			// ADD FOCUS LISTENER TO UPDATE ROWSET AND REVERT INVALID ITEM, IF NECESSARY
+			_jc.getEditor().getEditorComponent().addFocusListener(_jc.ssBaseComboBoxFocusListener);
+			
 			return model;
 		}
 
@@ -253,6 +333,21 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * Component listener.
 	 */
 	protected final SSBaseComboBoxListener ssBaseComboBoxListener = new SSBaseComboBoxListener();
+	
+	/**
+	 * Focus listener.
+	 */
+	protected final SSBaseComboBoxFocusListener ssBaseComboBoxFocusListener = new SSBaseComboBoxFocusListener();
+	
+	/**
+	 * SSListItem to stash value when the combo gains the focus so it can be reverted if necessary.
+	 */
+	protected SSListItem revertItem;
+	
+	/**
+	 * Boolean flag to indicate that the focus listener is reverting the selected item
+	 */
+	private boolean revertingItem = false;
 
 	/**
 	 * The combo model.
@@ -520,7 +615,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 
 	/**
 	 * Adds any necessary listeners for the current SwingSet component. These will
-	 * trigger changes in the underlying RowSet column.
+	 * trigger changes in the underlying rowset column.
 	 */
 	@Override
 	public void addSSComponentListener() {
@@ -562,6 +657,24 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		ssCommon.setAllowNull(_allowNull);
 		adjustForNullItem();
 	}
+
+// TODO: Review this. GlazedLists is probably still calling it so need to detect those calls.
+//	/**
+//	 * SwingSet combo boxes works under the assumption that the only time a combo is editable is when GlazedLists
+//	 * are in use.
+//	 * <p>
+//	 * Don't call this yourself.
+//	 * {@inheritDoc }
+//	 */
+//	@Override
+//	@Deprecated
+//	public void setEditable(boolean _editable) {
+//		if (_editable && getAutoComplete() == null) {
+//			logger.warn(String.format("%s: SwingSet requires non-editable combo boxes.", getColumnForLog()));
+//		} else {
+//			super.setEditable(_editable);
+//		}
+//	}
 
 	/**
 	 * Catch this to make some adjustments after a change in metadata;
@@ -641,6 +754,26 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Common code to update the rowset based on getSelectedMapping().
+	 */
+	private void updateRowset() {
+		
+		removeRowSetListener();
+		
+		M mapping = getSelectedMapping();
+	
+		if (mapping == null) {
+			setBoundColumnText(null);
+			logger.debug(() -> String.format("%s: Setting column to null.", getColumnForLog()));
+		} else {
+			setBoundColumnText(String.valueOf(mapping));
+			logger.debug(String.format("%s: Setting column to %s.",  getColumnForLog(), mapping));
+		}
+	
+		addRowSetListener();
 	}
 
 	//
