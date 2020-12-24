@@ -132,55 +132,11 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 			
-			boolean editorHasFocus = getEditor().getEditorComponent().hasFocus();
-			
-			Object selectedItem = getSelectedItem();
-			
-			logger.debug(() -> String.format("%s: Action event. Editor has focus?: %b. Selected item: %s.",
-					getColumnForLog(), editorHasFocus, selectedItem));
-
-			// This is intended to catch updates from the developer. E.g., setting of defaults for a screen.
+			// If the ActionListener has to revert a change it will fire the ActionListener again
 			//
-			// No guaranty of order for FocusListener and ActionListener so adding check
-			// for valid SSListItem
-			if (!editorHasFocus && !revertingItem && (selectedItem instanceof SSListItem)) {
-				logger.debug(() -> String.format("%s: ActionListener updating rowset with %s.", getColumnForLog(), selectedItem));
-				updateRowset();
-				revertItem = (SSListItem) selectedItem;
-			}
-
-		}
-	}
-	
-	/**
-	 * Listener to store value on focusGained and validate (and revert if needed) on focusLost.
-	 * <p>
-	 * The combo selected item can be updated frequently if the user is typing in the editor and/or if the
-	 * user is using the arrow keys to traverse the items in the list. We really only care about the end result
-	 * and don't need to constantly update the rowset (or perform navigations for a combo navigator).
-	 * <p>
-	 * See https://github.com/bpangburn/swingset/issues/38
-	 * <p>
-	 * NOTE: No guaranty whether ActionListener or FocusLister will be called first when focus is lost.
-	 */
-	protected class SSBaseComboBoxFocusListener implements FocusListener, Serializable
-	//TODO: Further investigate ordering of ActionListener and FocusListener.
-	{
-
-		private static final long serialVersionUID = 1L;
-
-		/** {@inheritDoc} */
-		@Override
-		public void focusGained(FocusEvent arg0) {
-			logger.debug(() -> String.format("%s: focusGained(). Selected item: %s", getColumnForLog(),getSelectedItem()));
-			revertItem = (SSListItem) getSelectedItem();
-			
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void focusLost(FocusEvent arg0) {
-			logger.debug(() -> String.format("%s: focusLost(). Selected item: %s", getColumnForLog(),getSelectedItem()));
+			// If this is a combo navigator, SSSyncManager will have it's own listeners.
+			// This is just for keeping a bound column in sync.
+			if (revertingItem || (getBoundColumnName() == null)) return;
 			
 			Object currentItem = getSelectedItem();
 			
@@ -205,7 +161,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 					
 				// There is nothing to do with the rowset - it should already have the last value
 			}
-			
+
 		}
 	}
 
@@ -233,10 +189,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		protected static <M,O,O2>BaseModel<M,O,O2> install(SSBaseComboBox<M,O,O2> _jc) {
 			BaseModel<M,O,O2> model = new BaseModel<>();
 			AbstractComboBoxListSwingModel.install(_jc, model);
-			
-			// ADD FOCUS LISTENER TO UPDATE ROWSET AND REVERT INVALID ITEM, IF NECESSARY
-			_jc.getEditor().getEditorComponent().addFocusListener(_jc.ssBaseComboBoxFocusListener);
-			
+
 			return model;
 		}
 
@@ -290,10 +243,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			// RESTORE JCOMBOBOX UP/DOWN ARROW HANDLING OVERRIDING GLAZEDLIST
 			_jc.glazedListArrowHandler();
 			//model.autoComplete.setStrict(true);
-			
-			// ADD FOCUS LISTENER TO UPDATE ROWSET AND REVERT INVALID ITEM, IF NECESSARY
-			_jc.getEditor().getEditorComponent().addFocusListener(_jc.ssBaseComboBoxFocusListener);
-			
+
 			return model;
 		}
 
@@ -323,6 +273,11 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * @see #createNullItem(com.nqadmin.swingset.models.OptionMappingSwingModel.Remodel)
 	 */
 	protected SSListItem nullItem;
+	
+	/**
+	 * String typed by user into combobox
+	 */
+	private String priorEditorText = "";
 
 	/**
 	 * Common fields shared across SwingSet components
@@ -333,12 +288,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * Component listener.
 	 */
 	protected final SSBaseComboBoxListener ssBaseComboBoxListener = new SSBaseComboBoxListener();
-	
-	/**
-	 * Focus listener.
-	 */
-	protected final SSBaseComboBoxFocusListener ssBaseComboBoxFocusListener = new SSBaseComboBoxFocusListener();
-	
+
 	/**
 	 * SSListItem to stash value when the combo gains the focus so it can be reverted if necessary.
 	 */
@@ -426,6 +376,94 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	public boolean hasSelection() {
 		Object item = getSelectedItem();
 		return item != null && item != nullItem;
+	}
+	
+	/**
+	 * {@inheritDoc }
+	 * This method override additionally selects a currently edited item in the combo box.
+	 * 
+	 * If there is a string in the combo editor that does not have any matches, it will revert the string.
+	 */
+	@Override
+	public void setSelectedItem(final Object _value) {
+		// 2020-12-24_BP: setSelectedItem outcomes:
+		//
+		// See https://docs.oracle.com/javase/8/docs/api/javax/swing/JComboBox.html#setSelectedItem-java.lang.Object-
+		//
+		//  1. We get a valid, non-null object - this should match something in the list (GL seems to always return a match or null). Note that nullItem
+		//     (our special blank first item) can be a valid, not-null item and is covered by this case:
+		//     -> call super.setSelectedItem(_value) and move on
+		//  2. We get an invalid (no match in list), non-null object. SHOULD BE IMPOSSIBLE. GL always returns a match or null. For a non-GL combo,
+		//     we call setEditable(false) in SSBaseComboBox.customInit() and then override the method to block the developer from making it editable.
+		//	   Per the JDK JavaDoc for setSelectedItem(), "If anObject is not in the list and the combo box is uneditable, it will not change the current selection."
+		//     -> not checking for this since it should not happen
+		//  3. We get a null value:
+		//
+		//		A. A non UI call was made to setSelectedItem(null). This could be a value from the rowset listener, a programmatically set default, etc.
+		//		   In this case the editorComponent should not be visible. Needs to be confirmed. May also consider isPopupVisible().
+		//         -> call super.setSelectedItem(null) and move on
+		//      B. GlazedList bug where for the first character entered, the START_WITH matching is performed over the CONTAINS matching. In this case,
+		//         (getModel().getSize() > 0)
+		//         -> call super.setSelectedItem(getItemAt(0));
+		//      C. The user's entry into the editor results in zero matches. In this case ((getModel().getSize()==0) && (hasItems()==true))
+		//         -> revert the editor string and return (simulated STRICT)
+		
+		// INITIALIZATION
+		Object newSelectedItem = _value;
+		final String currentEditorText;
+		
+		// GET CURRENT EDITOR TEXT IF AVAILABLE
+		if (getEditor().getItem() == null) {
+			currentEditorText = "";
+		} else {
+			currentEditorText = getEditor().getItem().toString();
+		}
+		
+		// INITIAL LOGGING
+		logger.debug(() -> String.format("%s: setSelectedItem(%s), allowNull: %b, priorEditorText: '%s', currentEditorText: '%s'",
+				getColumnForLog(), _value, getAllowNull(), priorEditorText, currentEditorText));
+		
+		// EVALUATE SCENARIOS DOCUMENTED ABOVE
+		if (newSelectedItem!=null) {
+		// SCENARIO #1 ABOVE - a valid item that should match something in the list (including nullItem, if not null)
+			super.setSelectedItem(_value);
+			priorEditorText = currentEditorText;
+			// TODO See if we can get rid of this conditional to do selectAll() completely.
+//			if (getEditor() != null && hasFocus()) {
+//				// after we find a match, do a select all on the editor so
+//				// if the user starts typing again it won't be appended
+//				// 2020-12-21_BP: if we don't limited to field with focus, the comboboxes blink on navigation
+//				// this also causes the focus to jump out of a navigation combo
+//				getEditor().selectAll();
+//			}
+			logger.debug("{}: Valid match. Selected item after super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedItem());
+        } else if (!getEditor().getEditorComponent().hasFocus()) {
+        // SCENARIO #3-A ABOVE - setting null from a rowset listener or programmatically (e.g., a default) 
+        	super.setSelectedItem(null);
+        	priorEditorText = currentEditorText;
+        	logger.debug("{}: Null not from UI (e.g., rowset, default). Selected item after super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedItem());
+        	
+        } else if (getModel().getSize() > 0) {
+        // SCENARIO #3-B ABOVE - null due to GlazedList glitch when items contain the first character, but GL does not match the first item returned 
+        	super.setSelectedItem(getItemAt(0));
+        	priorEditorText = getEditor().getItem().toString();
+        	logger.debug("{}: Null due to GlazedLists glitch so selecting first item in model. Selected item after super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedItem());
+
+        } else if (!currentEditorText.isEmpty()) {
+        // SCENARIO #3-C ABOVE - null because user likely entered garbage - revert editor and return without a call to setSelectedItem()
+        	getEditor().setItem(priorEditorText);
+        	updateUI(); // THIS IS REQUIRED TO REFRESH THE REVERTED STRING
+        	//showPopup();
+        	logger.debug(() -> String.format("%s: User entered string of '%s' did not match any list items. Reverting to '%s'.",
+        			getColumnForLog(), currentEditorText, priorEditorText));
+
+        } else {
+        // SOMETHING ELSE NOT ANTICIPATED
+        	logger.warn(() -> String.format("%s: Unexpected call to setSelectedItem() with %s. Prior editor text was '%s'.)",
+        			getColumnForLog(), newSelectedItem, priorEditorText));
+        	
+        	// NO ADDITIONAL ACTION TAKEN
+        }
 	}
 
 	/**
