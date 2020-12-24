@@ -24,6 +24,8 @@
 		<version.glazedlists>1.11.0</version.glazedlists>
 		<version.log4j>2.14.0</version.log4j>
 		<version.jdbcrowsetimpl>1.0.2</version.jdbcrowsetimpl>
+		<version.google-guava>29.0-jre</version.google-guava>
+		<version.netbeans>RELEASE120</version.netbeans>
 
 		<version.maven-enforcer-plugin>3.0.0-M3</version.maven-enforcer-plugin>
 		<version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
@@ -96,6 +98,21 @@
 			<artifactId>jdbcrowsetimpl</artifactId>
 			<version>${version.jdbcrowsetimpl}</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.netbeans.api/org-openide-util-lookup -->
+		<dependency>
+			<groupId>org.netbeans.api</groupId>
+			<artifactId>org-openide-util-lookup</artifactId>
+			<version>${version.netbeans}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${version.google-guava}</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
 		<dependency>
 			<groupId>org.apache.maven.plugins</groupId>
