@@ -27,6 +27,8 @@
 		<version.glazedlists>1.11.1203</version.glazedlists>
 		<version.log4j>2.22.0</version.log4j>
 		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
+		<version.google-guava>33.0.0-jre</version.google-guava>
+		<version.netbeans>RELEASE200</version.netbeans>
 
 		<!-- PLUGINS -->
 		<!-- Shared by swingset-parent, swingset, and swingset-demo -->
@@ -136,6 +138,21 @@
 			<artifactId>jdbcrowsetimpl</artifactId>
 			<version>${version.jdbcrowsetimpl}</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.netbeans.api/org-openide-util-lookup -->
+		<dependency>
+			<groupId>org.netbeans.api</groupId>
+			<artifactId>org-openide-util-lookup</artifactId>
+			<version>${version.netbeans}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${version.google-guava}</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
 		<dependency>
 			<groupId>org.apache.maven.plugins</groupId>
