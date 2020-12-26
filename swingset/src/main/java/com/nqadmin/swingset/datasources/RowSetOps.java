@@ -58,6 +58,9 @@ import org.apache.logging.log4j.LogManager;
 
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.utils.SSCommon;
+import com.nqadmin.swingset.utils.SSComponentInterface;
+
+import static com.nqadmin.swingset.utils.SSUtils.postRowSetModified;
 
 // RowSetOps.java
 //
@@ -363,6 +366,7 @@ public class RowSetOps {
 	 * change to the RowSet. A separate call is required to flush/commit the change
 	 * to the database.
 	 *
+	 * @param comp The SSComponent doing the update
 	 * @param _rowSet RowSet on which to operate
 	 * @param _updatedValue string to be type-converted as needed and updated in
 	 *                      underlying RowSet column
@@ -374,7 +378,7 @@ public class RowSetOps {
 	 */
 	// TODO: Eclipse is giving a Potential null pointer access, but we have assert(_updatedValue != null) so may be able to remove warning in future.
 	@SuppressWarnings("null")
-	public static void updateColumnText(final RowSet _rowSet, final String _updatedValue, final String _columnName, final boolean _allowNull) throws NullPointerException, SQLException, NumberFormatException {
+	public static void updateColumnText(final SSComponentInterface comp, final RowSet _rowSet, final String _updatedValue, final String _columnName, final boolean _allowNull) throws NullPointerException, SQLException, NumberFormatException {
 
 		LogManager.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
@@ -388,6 +392,7 @@ public class RowSetOps {
 		// On insert row, write null if updatedValue is null or empty string, and do not perform other checks. 
 		if ((_updatedValue == null || _updatedValue.isEmpty()) && SSDataNavigator.isInserting(_rowSet)) {
 			_rowSet.updateNull(_columnName);
+			postRowSetModified(comp, _rowSet);
 			return;
 		}
 
@@ -407,25 +412,26 @@ public class RowSetOps {
 		 * If !_allowNull then a character based field with 0 or more blank spaced will be allowed
 		 * and code will continue to the switch/case statement below.
 		 */
-       if (_updatedValue == null
-    		   || _updatedValue.isEmpty()
-               || (_updatedValue.trim().isEmpty() && !textUpdateEmptyOK.contains(jdbcType))) {
-    	    // TODO: Switch to isBlank) for Java 11+
-    	   	// Java 11: || (_updatedValue.isBlank() && !textUpdateEmptyOK.contains(jdbcType))) {
-
-            if (_allowNull) {
-                _rowSet.updateNull(_columnName);
-                return;
-            } else if (!textUpdateEmptyOK.contains(jdbcType)) {
-                // This will throw an exception for a non-char type, but allow a char-based type with
-            	// an empty string to continue to the switch/case below and write the empty string via
-            	// _rowSet.updateString(_columnName, _updatedValue)
-            	//
-            	// Note that if there is a UNIQUE constraint on such a text column then repeatedly writing the same 
-            	// number (0 to N) spaces should throw an SQL exception (as should any other duplicate string)
-                throw new NullPointerException("Null values are not allowed for this field.");
-            }
-        }
+		if (_updatedValue == null
+				|| _updatedValue.isEmpty()
+				|| (_updatedValue.trim().isEmpty() && !textUpdateEmptyOK.contains(jdbcType))) {
+			// TODO: Switch to isBlank) for Java 11+
+			// Java 11: || (_updatedValue.isBlank() && !textUpdateEmptyOK.contains(jdbcType))) {
+			
+			if (_allowNull) {
+				postRowSetModified(comp, _rowSet);
+				_rowSet.updateNull(_columnName);
+				return;
+			} else if (!textUpdateEmptyOK.contains(jdbcType)) {
+				// This will throw an exception for a non-char type, but allow a char-based type with
+				// an empty string to continue to the switch/case below and write the empty string via
+				// _rowSet.updateString(_columnName, _updatedValue)
+				//
+				// Note that if there is a UNIQUE constraint on such a text column then repeatedly writing the same
+				// number (0 to N) spaces should throw an SQL exception (as should any other duplicate string)
+				throw new NullPointerException("Null values are not allowed for this field.");
+			}
+		}
 		assert(_updatedValue != null);
 
 		/*
@@ -510,9 +516,9 @@ public class RowSetOps {
 		default:
 			throw new IllegalStateException("switch cases out of sync");
 		} // end switch
+		postRowSetModified(comp, _rowSet);
 
 	} // end protected void updateColumnText(String _updatedValue, String _columnName)
-
 	/**
 	 * Convenience method for getting {@link JDBCType} enum from
 	 * {@link java.sql.Types}.

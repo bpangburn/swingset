@@ -261,7 +261,7 @@ public interface SSRowSet extends RowSet {
 	 * @throws NumberFormatException thrown if unable to parse a string to number format
 	 */
 	public default void updateColumnText(final String _updatedValue, final String _columnName, final boolean _allowNull) throws NullPointerException, SQLException, NumberFormatException {
-		RowSetOps.updateColumnText(this, _updatedValue, _columnName, _allowNull);
+		RowSetOps.updateColumnText(null, this, _updatedValue, _columnName, _allowNull);
 //			// 2020-09-11_BP: Probably not a good idea to trim here as it may be desirable to have padding for some strings
 //			// Also, it's coded wrong.
 //			// Should be:

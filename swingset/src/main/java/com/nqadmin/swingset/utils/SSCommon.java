@@ -61,6 +61,11 @@ import java.sql.Connection;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.google.common.eventbus.EventBus;
+import com.nqadmin.swingset.SSDataNavigator;
+
+import static com.nqadmin.swingset.utils.SSUtils.postRowSetModifiedError;
+
 // SSCommon.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
@@ -89,6 +94,8 @@ import java.util.Optional;
  * navigation.
  */
 public class SSCommon implements Serializable {
+	/** Unique serial ID. */
+	protected static final long serialVersionUID = -7670575893542057725L;
 
 	/**
 	 * Document listener provided for convenience for SwingSet Components based on
@@ -264,11 +271,6 @@ public class SSCommon implements Serializable {
 	 */
 	@Deprecated
 	public static final int NO_COLUMN_TYPE = -1;
-
-	/**
-	 * Unique serial ID.
-	 */
-	protected static final long serialVersionUID = -7670575893542057725L;
 
 	/**
 	 * Converts a date string in "MM/dd/yyyy" format to an SQL Date.
@@ -809,9 +811,10 @@ public class SSCommon implements Serializable {
 	 * @param _boundColumnText value to write to bound database column
 	 */
 	public void setBoundColumnText(final String _boundColumnText) {
+		boolean isError = true;
 		try {
-			//getRowSet().updateColumnText(_boundColumnText, getBoundColumnName(), getAllowNull());
-			RowSetOps.updateColumnText(getRowSet(),_boundColumnText, getBoundColumnName(), getAllowNull());
+			RowSetOps.updateColumnText(getSSComponent(), getRowSet(),_boundColumnText, getBoundColumnName(), getAllowNull());
+			isError = false;
 		} catch(final NullPointerException _npe) {
 			logger.warn("Null Pointer Exception.", _npe);
 			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
@@ -828,6 +831,9 @@ public class SSCommon implements Serializable {
 					"Number Format Exception encountered for " + getBoundColumnName() + " converting " + _boundColumnText + " to a number.",
 					"Number Format Exception", JOptionPane.ERROR_MESSAGE);
 
+		}
+		if (isError) {
+			postRowSetModifiedError(getSSComponent(), getRowSet());
 		}
 
 	}
