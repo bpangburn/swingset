@@ -377,18 +377,23 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("FIRST button clicked.");
-				removeRowsetListener();
+				
 				try {
-					if (modification) {
-						if (!dBNav.allowUpdate()) {
-							// UPDATE NOT ALLOWED SO DO NOTHING.
-							// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
-							// TO THE ROW THAT SHOULD BE UNDONE.
-							return;
-						}
-						rowSet.updateRow();
-						dBNav.performPostUpdateOps();
-					}
+					removeRowsetListener();
+					
+					if (!commitChanges()) return;
+					
+//					if (modification) {
+//						if (!dBNav.allowUpdate()) {
+//							// UPDATE NOT ALLOWED SO DO NOTHING.
+//							// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
+//							// TO THE ROW THAT SHOULD BE UNDONE.
+//							return;
+//						}
+//						rowSet.updateRow();
+//						dBNav.performPostUpdateOps();
+//					}
+					
 					rowSet.first();
 
 					updateNavigator();
@@ -399,8 +404,9 @@ public class SSDataNavigator extends JPanel {
 					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
+				} finally {
+					addRowsetListener();
 				}
-				addRowsetListener();
 			}
 		});
 
@@ -410,19 +416,23 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("PREVIOUS button clicked.");
-				removeRowsetListener();
+				
 				try {
-					// if( rowSet.rowUpdated() )
-					if (modification) {
-						if (!dBNav.allowUpdate()) {
-							// UPDATE NOT ALLOWED SO DO NOTHING.
-							// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
-							// TO THE ROW THAT SHOULD BE UNDONE.
-							return;
-						}
-						rowSet.updateRow();
-						dBNav.performPostUpdateOps();
-					}
+					removeRowsetListener();
+					
+					if (!commitChanges()) return;
+					
+//					if (modification) {
+//						if (!dBNav.allowUpdate()) {
+//							// UPDATE NOT ALLOWED SO DO NOTHING.
+//							// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
+//							// TO THE ROW THAT SHOULD BE UNDONE.
+//							return;
+//						}
+//						rowSet.updateRow();
+//						dBNav.performPostUpdateOps();
+//					}
+					
 					if ((rowSet.getRow() != 0) && !rowSet.previous()) {
 						rowSet.first();
 					}
@@ -434,8 +444,9 @@ public class SSDataNavigator extends JPanel {
 					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
+				} finally {
+					addRowsetListener();
 				}
-				addRowsetListener();
 			}
 		});
 
@@ -446,19 +457,22 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("NEXT button clicked.");
-				removeRowsetListener();
+				
 				try {
-					// if( rowSet.rowUpdated() )
-					if (modification) {
-						if (!dBNav.allowUpdate()) {
-							// UPDATE NOT ALLOWED SO DO NOTHING.
-							// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
-							// TO THE ROW THAT SHOULD BE UNDONE.
-							return;
-						}
-						rowSet.updateRow();
-						dBNav.performPostUpdateOps();
-					}
+					removeRowsetListener();
+					
+					if (!commitChanges()) return;
+					
+//					if (modification) {
+//						if (!dBNav.allowUpdate()) {
+//							// UPDATE NOT ALLOWED SO DO NOTHING.
+//							// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
+//							// TO THE ROW THAT SHOULD BE UNDONE.
+//							return;
+//						}
+//						rowSet.updateRow();
+//						dBNav.performPostUpdateOps();
+//					}
 
 					rowSet.next();
 
@@ -470,8 +484,9 @@ public class SSDataNavigator extends JPanel {
 					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
+				} finally {
+					addRowsetListener();
 				}
-				addRowsetListener();
 			}
 		});
 
@@ -483,19 +498,23 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("LAST button clicked.");
-				removeRowsetListener();
+				
 				try {
-					// if( rowSet.rowUpdated() )
-					if (modification) {
-						if (!dBNav.allowUpdate()) {
-							// UPDATE NOT ALLOWED SO DO NOTHING.
-							// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
-							// TO THE ROW THAT SHOULD BE UNDONE.
-							return;
-						}
-						rowSet.updateRow();
-						dBNav.performPostUpdateOps();
-					}
+					removeRowsetListener();
+					
+					if (!commitChanges()) return;
+					
+//					if (modification) {
+//						if (!dBNav.allowUpdate()) {
+//							// UPDATE NOT ALLOWED SO DO NOTHING.
+//							// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
+//							// TO THE ROW THAT SHOULD BE UNDONE.
+//							return;
+//						}
+//						rowSet.updateRow();
+//						dBNav.performPostUpdateOps();
+//					}
+					
 					rowSet.last();
 
 					updateNavigator();
@@ -506,8 +525,9 @@ public class SSDataNavigator extends JPanel {
 					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
+				} finally {
+					addRowsetListener();
 				}
-				addRowsetListener();
 			}
 		});
 
@@ -520,8 +540,10 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("COMMIT button clicked.");
-				removeRowsetListener();
+				
 				try {
+					removeRowsetListener();
+					
 					if (isInserting(rowSet)) {
 						// IF ON INSERT ROW ADD THE ROW.
 						// CHECK IF THE ROW CAN BE INSERTED.
@@ -530,6 +552,7 @@ public class SSDataNavigator extends JPanel {
 							// HAS TO FIX THE DATA AND SAVE THE ROW OR CANCEL THE INSERTION.
 							return;
 						}
+						
 						rowSet.insertRow();
 						setInserting(rowSet, false);
 						dBNav.performPostInsertOps();
@@ -571,6 +594,7 @@ public class SSDataNavigator extends JPanel {
 							// TO THE ROW THAT SHOULD BE UNDONE.
 							return;
 						}
+						
 						rowSet.updateRow();
 						
 						// 2020-11-24: Generally redundant, but force a refresh the screen with the 
@@ -589,8 +613,9 @@ public class SSDataNavigator extends JPanel {
 					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while saving row.\n" + se.getMessage());
+				} finally {
+					addRowsetListener();
 				}
-				addRowsetListener();
 			}
 		});
 
@@ -601,11 +626,13 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("UNDO button clicked.");
-				removeRowsetListener();
+				
 				try {
+					removeRowsetListener();
+					
 					// CALL MOVE TO CURRENT ROW IF ON INSERT ROW.
 					if (isInserting(rowSet)) {
-				rowSet.moveToCurrentRow();
+						rowSet.moveToCurrentRow();
 					}
 					// THIS FUNCTION IS NOT NEED IF ON INSERT ROW
 					// BUT MOVETOINSERTROW WILL NOT TRIGGER ANY EVENT SO FOR THE SCREEN
@@ -631,8 +658,9 @@ public class SSDataNavigator extends JPanel {
 					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while undoing changes.\n" + se.getMessage());
+				} finally {
+					addRowsetListener();
 				}
-				addRowsetListener();
 			}
 		});
 
@@ -646,8 +674,10 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("REFRESH button clicked.");
-				removeRowsetListener();
+				
 				try {
+					removeRowsetListener();
+					
 					if (callExecute) {
 						rowSet.execute();
 
@@ -670,8 +700,9 @@ public class SSDataNavigator extends JPanel {
 					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured refreshing the data.\n" + se.getMessage());
+				} finally {
+					addRowsetListener();
 				}
-				addRowsetListener();
 			}
 		});
 
@@ -682,8 +713,9 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("ADD button clicked.");
-				removeRowsetListener();
+				
 				try {
+					removeRowsetListener();
 
 					rowSet.moveToInsertRow();
 					setInserting(rowSet, true);
@@ -707,8 +739,9 @@ public class SSDataNavigator extends JPanel {
 					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while moving to insert row.\n" + se.getMessage());
+				} finally {
+					addRowsetListener();
 				}
-				addRowsetListener();
 			}
 		});
 
@@ -719,8 +752,10 @@ public class SSDataNavigator extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
 				logger.debug("DELETE button clicked.");
-				removeRowsetListener();
+				
 				try {
+					removeRowsetListener();
+					
 					if (confirmDeletes) {
 						final int answer = JOptionPane.showConfirmDialog(SSDataNavigator.this,
 								"Are you sure you want to delete this record?", "Delete Present Record",
@@ -767,8 +802,9 @@ public class SSDataNavigator extends JPanel {
 					logger.error("SQL Exception.", se);
 					JOptionPane.showMessageDialog(SSDataNavigator.this,
 							"Exception occured while deleting row.\n" + se.getMessage());
+				} finally {
+					addRowsetListener();
 				}
-				addRowsetListener();
 			}
 		});
 
@@ -778,20 +814,30 @@ public class SSDataNavigator extends JPanel {
 		// NOTHING HAPPENS.
 		txtCurrentRow.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyReleased(final KeyEvent ke) {
-				logger.debug("Record number manually updated.");
-				removeRowsetListener();
+			public void keyPressed(final KeyEvent ke) {
+				
 				if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
+					
 					try {
+						removeRowsetListener();
+						
+						if (!commitChanges()) return;
+						
 						final int row = Integer.parseInt(txtCurrentRow.getText().trim());
+						
+						logger.debug("Record number manually updated to " + row + ".");
 						if ((row <= rowCount) && (row > 0)) {
 							rowSet.absolute(row);
 						}
+						
+						updateNavigator();
 					} catch (final Exception e) {
 						// do nothing
+					} finally {
+						addRowsetListener();
 					}
 				}
-				addRowsetListener();
+				
 			}
 		});
 
@@ -848,6 +894,27 @@ public class SSDataNavigator extends JPanel {
 		deleteButton.setToolTipText("Delete Record");
 
 	} // end protected void addToolTips() {
+	
+	/**
+	 * Common code to commit changes to the database from the rowset if
+	 * modifications are allowed.
+	 * @return true unless dBNav.allowUpdate() returns false
+	 * @throws SQLException SQL Exception if rowset call to updateRow() fails
+	 */
+	private boolean commitChanges() throws SQLException {
+		if (modification) {
+			if (!dBNav.allowUpdate()) {
+				// UPDATE NOT ALLOWED SO DO NOTHING.
+				// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
+				// TO THE ROW THAT SHOULD BE UNDONE.
+				return false;
+			}
+			rowSet.updateRow();
+			dBNav.performPostUpdateOps();
+		}
+		
+		return true;
+	}
 
 	/**
 	 * Returns true if the RowSet contains one or more rows, else false.
