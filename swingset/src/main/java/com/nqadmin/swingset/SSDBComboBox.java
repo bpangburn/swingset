@@ -1532,6 +1532,88 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 //		return result;
 	}
 
+//	/**
+//	 * Updates the value stored and displayed in the SwingSet component based on
+//	 * getBoundColumnText()
+//	 * <p>
+//	 * Call to this method should be coming from SSCommon and should already have
+//	 * the Component listener removed
+//	 */
+//	@Override
+//	public void updateSSComponent() {
+//		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long or Integer
+//		try {
+//			// 2020-10-05_BP: If initialization is taking place then there won't be any mappings so don't try to update anything yet.
+//
+//			// TODO: how does this happen?
+//			//if (eventList==null) {
+//			//	return;
+//			//}
+//			if (!hasItems()) {
+//				return;
+//			}
+//
+//			// If the user was on this component and the GlazedList had a subset of items, then
+//			// navigating resulting in a call to updateSSComponent()->setSelectedValue() may try to do a lookup based on
+//			// the GlazedList subset and generate:
+//			// Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: setSelectedIndex: X out of bounds
+//			//int possibleMatches = getItemCount();
+//			//logger.debug("{}: Possible matches BEFORE setPopupVisible(false): " + possibleMatches, () -> getColumnForLog());
+//
+//			//this.setPopupVisible(false);
+//			//updateUI();
+//
+//			//possibleMatches = getItemCount();
+//			//logger.debug("{}: Possible matches AFTER setPopupVisible(false): " + possibleMatches, () -> getColumnForLog());
+//
+//			// THIS SHOULD BE CALLED AS A RESULT OF SOME ACTION ON THE ROWSET SO RESET THE EDITOR STRINGS BEFORE DOING ANYTHING ELSE
+//			// This is going to make a little noise in the debug logs since it results in an "extra" call to setSelectedItem()
+//			getEditor().setItem("");
+//
+//
+//			// Combobox primary key column data queried from the database will generally be of data type long.
+//			// The bound column text should generally be a long integer as well, but trimming to be safe.
+//			// TODO Consider starting with a Long and passing directly to setSelectedValue(primaryKey). Modify setSelectedValue to accept a Long vs long.
+//			final String text = getBoundColumnText();
+//
+//			logger.trace("{}: getBoundColumnText() - " + text, () -> getColumnForLog());
+//
+//			// GET THE BOUND VALUE STORED IN THE ROWSET
+//			//if (text != null && !(text.equals(""))) {
+//			if ((text != null) && !text.isEmpty()) {
+//
+//				final long primaryKey = Long.parseLong(text);
+//
+//				logger.debug("{}: Calling setSelectedValue(" + primaryKey + ").", () -> getColumnForLog());
+//
+//				setSelectedValue(primaryKey);
+//
+//			} else {
+//				logger.debug("{}: Calling setSelectedIndex(-1).", () -> getColumnForLog());
+//
+//				setSelectedIndex(-1);
+//				//updateUI();
+//			}
+//
+//			// TODO Consider commenting this out for performance.
+//			//String editorString = null;
+//			//if (getEditor().getItem() != null) {
+//			//	editorString = getEditor().getItem().toString();
+//			//}
+//			//logger.debug("{}: Combo editor string: " + editorString, () -> getColumnForLog());
+//			logger.trace(() -> {
+//				String editorString = null;
+//				if (getEditor().getItem() != null) {
+//					editorString = getEditor().getItem().toString();
+//				}
+//				return getColumnForLog() + ": Combo editor string: " + editorString;
+//			});
+//
+//		} catch (final NumberFormatException nfe) {
+//			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
+//		}
+//	}
+	
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText()
@@ -1541,73 +1623,35 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 */
 	@Override
 	public void updateSSComponent() {
-		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long or Integer
+		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only limit JDBC types accepted
 		try {
-			// 2020-10-05_BP: If initialization is taking place then there won't be any mappings so don't try to update anything yet.
-
-			// TODO: how does this happen?
-			//if (eventList==null) {
-			//	return;
-			//}
+			// If initialization is taking place then there won't be any mappings so don't try to update anything yet.
 			if (!hasItems()) {
 				return;
 			}
 
-			// If the user was on this component and the GlazedList had a subset of items, then
-			// navigating resulting in a call to updateSSComponent()->setSelectedValue() may try to do a lookup based on
-			// the GlazedList subset and generate:
-			// Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: setSelectedIndex: X out of bounds
-			//int possibleMatches = getItemCount();
-			//logger.debug("{}: Possible matches BEFORE setPopupVisible(false): " + possibleMatches, () -> getColumnForLog());
+			// SSDBComboBox will generally work with primary key column data queried from the database, which will generally be of data type long.
+			// SSComboBox is generally used with 2 or 4 byte integer columns.
+			final String boundColumnText = getBoundColumnText();
 
-			//this.setPopupVisible(false);
-			//updateUI();
+			// LOGGING
+			logger.debug("{}: getBoundColumnText() - " + boundColumnText, () -> getColumnForLog());
 
-			//possibleMatches = getItemCount();
-			//logger.debug("{}: Possible matches AFTER setPopupVisible(false): " + possibleMatches, () -> getColumnForLog());
-
-			// THIS SHOULD BE CALLED AS A RESULT OF SOME ACTION ON THE ROWSET SO RESET THE EDITOR STRINGS BEFORE DOING ANYTHING ELSE
-			// This is going to make a little noise in the debug logs since it results in an "extra" call to setSelectedItem()
-			getEditor().setItem("");
-
-
-			// Combobox primary key column data queried from the database will generally be of data type long.
-			// The bound column text should generally be a long integer as well, but trimming to be safe.
-			// TODO Consider starting with a Long and passing directly to setSelectedValue(primaryKey). Modify setSelectedValue to accept a Long vs long.
-			final String text = getBoundColumnText();
-
-			logger.trace("{}: getBoundColumnText() - " + text, () -> getColumnForLog());
-
-			// GET THE BOUND VALUE STORED IN THE ROWSET
-			//if (text != null && !(text.equals(""))) {
-			if ((text != null) && !text.isEmpty()) {
-
-				final long primaryKey = Long.parseLong(text);
-
-				logger.debug("{}: Calling setSelectedValue(" + primaryKey + ").", () -> getColumnForLog());
-
-				setSelectedValue(primaryKey);
-
-			} else {
-				logger.debug("{}: Calling setSelectedIndex(-1).", () -> getColumnForLog());
-
-				setSelectedIndex(-1);
-				//updateUI();
+			// GET THE BOUND VALUE STORED IN THE ROWSET - may throw a NumberFormatException
+			Long targetValue = null;
+			if ((boundColumnText != null) && !boundColumnText.isEmpty()) {
+				targetValue = Long.parseLong(boundColumnText);
 			}
-
-			// TODO Consider commenting this out for performance.
-			//String editorString = null;
-			//if (getEditor().getItem() != null) {
-			//	editorString = getEditor().getItem().toString();
-			//}
-			//logger.debug("{}: Combo editor string: " + editorString, () -> getColumnForLog());
-			logger.trace(() -> {
-				String editorString = null;
-				if (getEditor().getItem() != null) {
-					editorString = getEditor().getItem().toString();
-				}
-				return getColumnForLog() + ": Combo editor string: " + editorString;
-			});
+			
+			// LOGGING
+			logger.debug("{}: targetValue - " + targetValue, () -> getColumnForLog());
+			
+			// UPDATE COMPONENT
+			if (targetValue==null) {
+				setSelectedItem(nullItem);
+			} else {
+				setSelectedMapping(targetValue);
+			}
 
 		} catch (final NumberFormatException nfe) {
 			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);

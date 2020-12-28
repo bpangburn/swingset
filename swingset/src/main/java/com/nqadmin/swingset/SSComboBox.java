@@ -822,6 +822,45 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 
 	// }
 
+//	/**
+//	 * Updates the value stored and displayed in the SwingSet component based on
+//	 * getBoundColumnText()
+//	 * <p>
+//	 * Call to this method should be coming from SSCommon and should already have
+//	 * the Component listener removed
+//	 */
+//	@Override
+//	public void updateSSComponent() {
+//		
+//		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long or Integer
+//		
+//		try {
+//			if (!hasItems()) {
+//				return;
+//			}
+//
+//			// Expecting an integer so trim in case the database column is a String AND has padding
+//			// TODO: #17 string casting
+//			final String rawText = getBoundColumnText();
+//			logger.debug("{}: getBoundColumnText() returns {}.", () -> getColumnForLog(), () -> rawText);
+//			final String trimmedText = rawText != null ? rawText.trim() : null;
+//
+//			// GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD
+//			if ((trimmedText != null) && !(trimmedText.isEmpty())) {
+//				final int comboCode = Integer.parseInt(trimmedText);
+//
+//				setSelectedMapping(comboCode);
+//
+//			} else {
+//				//setSelectedIndex(-1);
+//				setSelectedItem(nullItem);
+//			}
+//
+//		} catch (final NumberFormatException nfe) {
+//			logger.warn(getColumnForLog() + ": Number Format Exception.", nfe);
+//		}
+//	}
+	
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText()
@@ -831,33 +870,38 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 */
 	@Override
 	public void updateSSComponent() {
-		
-		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long or Integer
-		
+		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only limit JDBC types accepted
 		try {
+			// If initialization is taking place then there won't be any mappings so don't try to update anything yet.
 			if (!hasItems()) {
 				return;
 			}
 
-			// Expecting an integer so trim in case the database column is a String AND has padding
-			// TODO: #17 string casting
-			final String rawText = getBoundColumnText();
-			logger.debug("{}: getBoundColumnText() returns {}.", () -> getColumnForLog(), () -> rawText);
-			final String trimmedText = rawText != null ? rawText.trim() : null;
+			// SSDBComboBox will generally work with primary key column data queried from the database, which will generally be of data type long.
+			// SSComboBox is generally used with 2 or 4 byte integer columns.
+			final String boundColumnText = getBoundColumnText();
 
-			// GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD
-			if ((trimmedText != null) && !(trimmedText.isEmpty())) {
-				final int comboCode = Integer.parseInt(trimmedText);
+			// LOGGING
+			logger.debug("{}: getBoundColumnText() - " + boundColumnText, () -> getColumnForLog());
 
-				setSelectedMapping(comboCode);
-
-			} else {
-				//setSelectedIndex(-1);
+			// GET THE BOUND VALUE STORED IN THE ROWSET - may throw a NumberFormatException
+			Integer targetValue = null;
+			if ((boundColumnText != null) && !boundColumnText.isEmpty()) {
+				targetValue = Integer.parseInt(boundColumnText);
+			}
+			
+			// LOGGING
+			logger.debug("{}: targetValue - " + targetValue, () -> getColumnForLog());
+			
+			// UPDATE COMPONENT
+			if (targetValue==null) {
 				setSelectedItem(nullItem);
+			} else {
+				setSelectedMapping(targetValue);
 			}
 
 		} catch (final NumberFormatException nfe) {
-			logger.warn(getColumnForLog() + ": Number Format Exception.", nfe);
+			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
 		}
 	}
 
