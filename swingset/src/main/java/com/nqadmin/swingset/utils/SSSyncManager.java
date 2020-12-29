@@ -52,6 +52,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.models.SSListItem;
 
 // SSSyncManager.java
 //
@@ -72,36 +73,48 @@ public class SSSyncManager {
 	 */
 	protected class SyncComboListener implements ActionListener {
 		
-		int actionPerformedCount = 0;
+		private int actionPerformedCount = 0;
+		
+		private SSListItem lastValidItem = null;
 
-		protected Long comboPK;
+		private Long comboPK;
 
 		// WHEN THERE IS A CHANGE IN THIS VALUE MOVE THE ROWSET SO THAT
 		// ITS POSITIONED AT THE RIGHT RECORD.
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 
+			// ADD/REMOVE METHODS HAVE A CHECK TO ADD/REMOVE ONLY ONCE
 			removeRowsetListener();
 
 			try {
-				// IF THIS IS NOT CAUSED BY THE USER ACTION (IN WHICH THE FOCUS WILL BE ON THE COMBO) THERE IS NOTHING TO DO
+				// NOTHING TO DO FOR AN EMPTY/NULL ROWSET
 				if ((rowset == null) || (rowset.getRow() < 1)) {
-//				if ((rowset == null) || (rowset.getRow() < 1) || (comboBox.getSelectedIndex() == -1)
-//						|| comboBox.textField == null
-//						|| comboBox.isBoundTextFieldNull()
-//						|| !comboBox.hasFocus() // with rewrite, the editor and not the combo likely has the focus
-//						) {
-
 					return;
 				}
 
 				comboPK = comboBox.getSelectedMapping();
+				logger.debug("COMBO NAVIGATOR: getSelectedMapping() returned: {}.", () -> comboPK);
 				
 				// getSelectedMapping() could return null during initialization or 
 				// If using UP/DOWN arrows with a GlazedList and you above first item or below last item. Note that this should
 				// not happen now that glazedListArrowHandler() has been added to SSBaseComboBox.
 				if (comboPK==null) {
+					if (lastValidItem!=null) {
+					// WE GET A NULL PK WHEN THE USER CLEARS THE COMBO EDITOR. NORMALLY lastValidItem WILL BE THE VERY FIRST RECORD IF THIS HAPPENS.
+						comboBox.setSelectedItem(lastValidItem); 
+					}
 					return;
+				}
+				
+				// EXTRACT SELECTED ITEM
+				Object selectedItem = comboBox.getSelectedItem();
+					
+				// THIS SHOULD ALWAYS BE A SSLISTITEM, BUT COULD BE SOME EDGE CASES?
+				if (selectedItem instanceof SSListItem) {
+					lastValidItem = (SSListItem)selectedItem;
+				} else {
+					logger.warn(" -- Selected Item is not a SSListItem.");
 				}
 
 				// UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
