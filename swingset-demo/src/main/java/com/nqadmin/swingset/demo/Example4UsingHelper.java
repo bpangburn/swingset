@@ -119,7 +119,6 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		
 		// Display Screen
 		showUp(_container);
-
 	}
 
 	@Override
@@ -145,10 +144,6 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		txtPartWeight.setPreferredSize(MainClass.ssDim);
 		txtPartCity.setPreferredSize(MainClass.ssDim);
 		
-	// SET COMBO OPTIONS
-		//cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
-		cmbPartColor.setOptions(Arrays.asList(new String[] { "Red", "Green", "Blue" }));
-
 	// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
 		final Container contentPane = getContentPane();
 		contentPane.setLayout(new GridBagLayout());
@@ -202,6 +197,10 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 
 	@Override
 	protected void bindComponents() throws Exception {
+		// SET COMBO OPTIONS
+		//cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
+		cmbPartColor.setOptions(Arrays.asList(new String[] { "Red", "Green", "Blue" }));
+		
 		//txtPartID.bind(getRowset(), "part_id");
 		txtPartName.bind(getRowset(), "part_name");
 		cmbPartColor.bind(getRowset(), "color_code");
