@@ -114,9 +114,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to the rowset in certain instances.
 	 * <p>
-	 * The focus listener is the primary driver of rowset updates from the combo box to minimize noise while
-	 * traversing and to gracefully handle nulls.
-	 * <p>
 	 * NOTE: No guaranty whether ActionListener or FocusLister will be called first when focus is lost.
 	 */
 	protected class SSBaseComboBoxListener implements ActionListener, Serializable
@@ -129,37 +126,41 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		 * {@inheritDoc} */
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
-			
-			// If the ActionListener has to revert a change it will fire the ActionListener again
-			//
+
 			// If this is a combo navigator, SSSyncManager will have it's own listeners.
 			// This is just for keeping a bound column in sync.
-			if (revertingItem || (getBoundColumnName() == null)) return;
-			
-			Object currentItem = getSelectedItem();
-			
-			if (currentItem instanceof SSListItem) {
-				// PROPAGATE LATEST VALUE TO ROWSET
-					updateRowset();
-										
-				// Update revertItem for next use
-					revertItem = (SSListItem) getSelectedItem();
-				
-			} else {
-				// A PROPER ITEM HAS NOT BEEN SELECTED. WARN USER AND REVERT.
-
-				// NOTIFY THE USER
-					JOptionPane.showMessageDialog(SSBaseComboBox.this,
-						"An item was not selected from the combobox. Reverting to " + revertItem);
-				
-				// Revert the selectedItem. This will trigger the action listener so set a flag.
-					revertingItem = true;
-					setSelectedItem(revertItem);
-					revertingItem = false;
-					
-				// There is nothing to do with the rowset - it should already have the last value
+			//
+			// Could be combined with next block, but keeping them separate for debugging.
+			// May be able to eliminate actionListenerNoUpdate when GlazedLists fully supports STRICT/CONTAINS
+			if (getBoundColumnName() == null) {
+				logger.debug("{}: Action Listener returning. No bound column.", () -> getColumnForLog());
+				return;
 			}
-
+			
+			// Could be combined with prior block, but keeping them separate for debugging.
+			// May be able to eliminate actionListenerNoUpdate when GlazedLists fully supports STRICT/CONTAINS
+			if (actionListenerNoUpdate) {
+				logger.debug("{}: Action Listener returning. actionListenerNoUpdate set to TRUE.", () -> getColumnForLog());
+				return;
+			}
+			
+			// EXTRACT SELECTED ITEM
+			Object selectedItem = getSelectedItem();
+			logger.debug("{}: Selected item from inside Action Listener: {}.", () -> getColumnForLog(), () -> selectedItem);
+			
+			// CHECK FOR A STRING - EXPECT EMPTY STRING WHEN THE USER CLEARS THE EDITOR (E.G., BACKSPACE)
+			if (selectedItem instanceof String) {
+				if (!((String)selectedItem).isEmpty()) {
+					logger.warn("{}: Selected item is a String of '{}'. This is unexpected unless the user clears the editor.",
+							() -> getColumnForLog(), () -> selectedItem);
+				}
+				setSelectedItem(glGlitchItem); // GENERALLY SELECTED ITEM IS EMPTY STRING AND glGlitchItem IS FIRST ITEM IN LIST
+				return; // GLAZEDLIST GLITCH - KEEP LAST VALUE AND DON'T UPDATE ROWSET
+			}
+			
+			// UPDATE ROWSET
+			logger.debug("{}: About to update RowSet with {}.", () -> getColumnForLog(), () -> getSelectedItem());
+			updateRowset();
 		}
 	}
 
@@ -240,6 +241,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			model.autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
 			// RESTORE JCOMBOBOX UP/DOWN ARROW HANDLING OVERRIDING GLAZEDLIST
 			_jc.glazedListArrowHandler();
+
 			//model.autoComplete.setStrict(true);
 
 			return model;
@@ -288,14 +290,14 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	protected final SSBaseComboBoxListener ssBaseComboBoxListener = new SSBaseComboBoxListener();
 
 	/**
-	 * SSListItem to stash value when the combo gains the focus so it can be reverted if necessary.
+	 * List item just used only to workaround GlazedList CONTAINS bug.
 	 */
-	protected SSListItem revertItem;
+	private SSListItem glGlitchItem = null;
 	
 	/**
-	 * Boolean flag to indicate that the focus listener is reverting the selected item
+	 * Indicates that a garbage string has been entered and the Action Listener should not 
 	 */
-	private boolean revertingItem = false;
+	private boolean actionListenerNoUpdate = false;
 
 	/**
 	 * The combo model.
@@ -408,6 +410,16 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		
 		// INITIALIZATION
 		Object newSelectedItem = _value;
+		glGlitchItem = null; // WORKAROUND FOR GL 'CONTAINS' GLITCH
+		actionListenerNoUpdate = false; // TRUE WHEN THE USER HAS ENTERED SOMETHING RESULTING IN NO MATCHES
+		
+		logger.debug("{}: setSelectedItem called with {}.", () -> getColumnForLog(), () -> newSelectedItem);
+
+// TODO: This is likely an empty string where the user cleared the editor. Could add a popup.
+//		if (newSelectedItem instanceof String) {
+//			logger.warn("{}: setSelectedItem called with a String of {}. Likely GL glitch. Ignore.", () -> getColumnForLog(), () -> newSelectedItem);
+//		}
+		
 		final String currentEditorText;
 		
 		// GET CURRENT EDITOR TEXT IF AVAILABLE
@@ -426,14 +438,15 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		// SCENARIO #1 ABOVE - a valid item that should match something in the list (including nullItem, if not null)
 			super.setSelectedItem(_value);
 			priorEditorText = currentEditorText;
-			// TODO See if we can get rid of this conditional to do selectAll() completely.
-//			if (getEditor() != null && hasFocus()) {
-//				// after we find a match, do a select all on the editor so
-//				// if the user starts typing again it won't be appended
-//				// 2020-12-21_BP: if we don't limited to field with focus, the comboboxes blink on navigation
-//				// this also causes the focus to jump out of a navigation combo
-//				getEditor().selectAll();
-//			}
+			// 2020-12-29_BP: CONFIRMED THIS IS NEEDED FOLLOWING A NORMAL ITEM SELECTION
+			//   OTHERWISE USER IS APPENDING EXISTING ITEM STRING IF THEY START TO TYPE
+			if (getEditor() != null && getEditor().getEditorComponent().hasFocus()) {
+				// after we find a match, do a select all on the editor so
+				// if the user starts typing again it won't be appended
+				// 2020-12-21_BP: if we don't limited to field with focus, the comboboxes blink on navigation
+				// this also causes the focus to jump out of a navigation combo
+				getEditor().selectAll();
+			}
 			logger.debug("{}: Valid match. Selected item after super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedItem());
         } else if (!getEditor().getEditorComponent().hasFocus()) {
         // SCENARIO #3-A ABOVE - setting null from a rowset listener or programmatically (e.g., a default) 
@@ -442,21 +455,44 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
         	logger.debug("{}: Null not from UI (e.g., rowset, default). Selected item after super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedItem());
         	
         } else if (getModel().getSize() > 0) {
-        // SCENARIO #3-B ABOVE - null due to GlazedList glitch when items contain the first character, but GL does not match the first item returned 
-        	super.setSelectedItem(getItemAt(0));
+        // SCENARIO #3-B ABOVE - null due to GlazedList glitch when items contain the first character, but GL does not match the first item returned
+        	glGlitchItem = getItemAt(0);
+        	super.setSelectedItem(glGlitchItem);
         	priorEditorText = getEditor().getItem().toString();
         	logger.debug("{}: Null due to GlazedLists glitch so selecting first item in model. Selected item after super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedItem());
 
         } else if (!currentEditorText.isEmpty()) {
         // SCENARIO #3-C ABOVE - null because user likely entered garbage - revert editor and return without a call to setSelectedItem()
-        	getEditor().setItem(priorEditorText);
-        	updateUI(); // THIS IS REQUIRED TO REFRESH THE REVERTED STRING
-        	//showPopup();
-        	logger.debug(() -> String.format("%s: User entered string of '%s' did not match any list items. Reverting to '%s'.",
+        	// 2020-12-29_BP: AT ONE POINT THE FOLLOWING CODE SEEMED TO WORK, BUT NOW THE CALL TO getEditor().setItem(priorEditorText) DOES NOT APPEAR TO
+        	//   REVERT THE TEXT
+        	//   - HAVE TINKERED WITH THE ORDERING OF showPopup() AND updateUI()
+        	//   - HAVE CONFIRMED THAT isEditable() IS TRUE
+        	logger.debug(() -> String.format("%s: User entered string of '%s' did not match any list items. Attempting to revert to '%s'.",
         			getColumnForLog(), currentEditorText, priorEditorText));
+        
+        	actionListenerNoUpdate = true; // TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
+        	
+        	// REVERT STRING
+        	getEditor().setItem(priorEditorText);   
+        	//showPopup();// When this was working as intended, the ordering of showPopup() before updateUI() was relevant.
+        	updateUI(); // NEEDED TO SHOW REVERTED ITEM (ORIGINALLY INTENDED TO SHOW REVERTED TEXT IN EDITOR)
+        	
+        	// WARN USER AND LOG
+        	String editorText = getEditor().getItem().toString();
+        	
+        	JOptionPane.showMessageDialog(SSBaseComboBox.this,
+					"The text entered does not match any item in the list. Reverting to '" + editorText + "'.");
+       	
+        	logger.debug(() -> String.format("%s:   Editor string following revert action: '%s'.",
+        			getColumnForLog(), editorText));
 
         } else {
         // SOMETHING ELSE NOT ANTICIPATED
+        	actionListenerNoUpdate = true; // TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
+        	
+        	JOptionPane.showMessageDialog(SSBaseComboBox.this, String.format(
+					"Unexpected call to setSelectedItem() for column %s with value '%s'.", getColumnForLog(), newSelectedItem));
+        	
         	logger.warn(() -> String.format("%s: Unexpected call to setSelectedItem() with %s. Prior editor text was '%s'.)",
         			getColumnForLog(), newSelectedItem, priorEditorText));
         	
@@ -680,8 +716,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		// SET PREFERRED DIMENSIONS
 // TODO not sure SwingSet should be setting component dimensions
 		setPreferredSize(new Dimension(200, 20));
-// TODO This was added during SwingSet rewrite 4/2020. Need to confirm it doesn't break anything.
-		setEditable(false);
+		setEditable(false); // NOTE: GLAZED LIST WILL OVERRIDE THIS
 	}
 
 	/**
