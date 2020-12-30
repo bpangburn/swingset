@@ -75,6 +75,9 @@ public class SSSyncManager {
 		
 		private int actionPerformedCount = 0;
 		
+		// **** GL STRICT/CONTAINS ****
+		//
+		// Hopefully lastValidItem can be eliminated once GlazedLists fully supports STRICT/CONTAINS
 		private SSListItem lastValidItem = null;
 
 		private Long comboPK;
@@ -96,10 +99,12 @@ public class SSSyncManager {
 				comboPK = comboBox.getSelectedMapping();
 				logger.debug("COMBO NAVIGATOR: getSelectedMapping() returned: {}.", () -> comboPK);
 				
-				// getSelectedMapping() could return null during initialization or 
-				// If using UP/DOWN arrows with a GlazedList and you above first item or below last item. Note that this should
-				// not happen now that glazedListArrowHandler() has been added to SSBaseComboBox.
+				// getSelectedMapping() could return null during initialization.
+				// We check for null/empty rowset in the prior block.
 				if (comboPK==null) {
+					// **** GL STRICT/CONTAINS ****
+					//
+					// Hopefully lastValidItem can be eliminated once GlazedLists fully supports STRICT/CONTAINS
 					if (lastValidItem!=null) {
 					// WE GET A NULL PK WHEN THE USER CLEARS THE COMBO EDITOR. NORMALLY lastValidItem WILL BE THE VERY FIRST RECORD IF THIS HAPPENS.
 						comboBox.setSelectedItem(lastValidItem); 
@@ -107,15 +112,18 @@ public class SSSyncManager {
 					return;
 				}
 				
-				// EXTRACT SELECTED ITEM
-				Object selectedItem = comboBox.getSelectedItem();
-					
-				// THIS SHOULD ALWAYS BE A SSLISTITEM, BUT COULD BE SOME EDGE CASES?
-				if (selectedItem instanceof SSListItem) {
-					lastValidItem = (SSListItem)selectedItem;
-				} else {
-					logger.warn(" -- Selected Item is not a SSListItem.");
-				}
+				// **** GL STRICT/CONTAINS ****
+				//
+				// Hopefully selectedItem and lastValidItem can be eliminated once GlazedLists fully supports STRICT/CONTAINS
+					// EXTRACT AND STORE SELECTED ITEM
+					Object selectedItem = comboBox.getSelectedItem();
+						
+					// THIS SHOULD ALWAYS BE A SSLISTITEM, BUT COULD BE SOME EDGE CASES?
+					if (selectedItem instanceof SSListItem) {
+						lastValidItem = (SSListItem)selectedItem;
+					} else {
+						logger.warn(" -- Selected Item is not a SSListItem.");
+					}
 
 				// UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
 				// This code was removed to improve performance.
