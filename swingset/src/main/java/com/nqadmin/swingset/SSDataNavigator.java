@@ -790,7 +790,7 @@ public class SSDataNavigator extends JPanel {
 		txtCurrentRow.addKeyListener(new KeyAdapter() {
 			@Override
 			@SuppressWarnings({"BroadCatchBlock", "TooBroadCatch", "UseSpecificCatch"})
-			public void keyReleased(final KeyEvent ke) {
+//			public void keyReleased(final KeyEvent ke) {
 //				logger.debug("Record number manually updated.");
 //				removeRowsetListener();
 //				if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -804,6 +804,7 @@ public class SSDataNavigator extends JPanel {
 //					}
 //				}
 //				addRowsetListener();
+			public void keyPressed(final KeyEvent ke) {			
 				if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
 					removeRowsetListener();
 					
