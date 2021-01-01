@@ -132,7 +132,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			//
 			// Could be combined with next block, but keeping them separate for debugging.
 			// May be able to eliminate actionListenerNoUpdate when GlazedLists fully supports STRICT/CONTAINS
-			if (getBoundColumnName() == null) {
+			if (isComboBoxNavigator()) {
 				logger.debug("{}: Action Listener returning. No bound column.", () -> getColumnForLog());
 				return;
 			}
