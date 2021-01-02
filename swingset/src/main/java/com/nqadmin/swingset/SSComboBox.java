@@ -47,6 +47,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -901,6 +902,8 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 			}
 
 		} catch (final NumberFormatException nfe) {
+			JOptionPane.showMessageDialog(this, String.format(
+					"Encountered database value of '%s' for column [%s], which cannot be converted to a number.", getBoundColumnText(), getColumnForLog()));
 			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
 		}
 	}

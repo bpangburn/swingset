@@ -131,7 +131,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			// This is just for keeping a bound column in sync.
 			//
 			// Could be combined with next block, but keeping them separate for debugging.
-			// May be able to eliminate actionListenerNoUpdate when GlazedLists fully supports STRICT/CONTAINS
 			if (isComboBoxNavigator()) {
 				logger.debug("{}: Action Listener returning. No bound column.", () -> getColumnForLog());
 				return;
@@ -163,7 +162,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			// IF SELECTED ITEM IS NOT AN SSLISTITEM, CHECK THE glGlitchItem
 			// 
 			// This seems to be a strange timing issue. The logs indicate that setSelectedItem() below has encountered 
-			// SCENARIO 1-B or 1-C and has made a call to super.setSelectedItem() to select the correct/updated SSListItem, but
+			// SCENARIO 1-B and has made a call to super.setSelectedItem() to select the correct/updated SSListItem, but
 			// selectedItem here still has a String. glGlitchItem has the correct/updated SSListItem.
 			//
 			// Making a 2nd call to super.setSelectedItem(glGlitchItem) appears to resolve the issue and does not trigger an
@@ -312,13 +311,14 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	protected final SSBaseComboBoxListener ssBaseComboBoxListener = new SSBaseComboBoxListener();
 
 	/**
-	 * List item just used only to workaround GlazedList CONTAINS bug.
+	 * List item used to workaround GlazedList CONTAINS bug/glitch.
 	 */
 	// **** GL STRICT/CONTAINS ****
 	private SSListItem glGlitchItem = null;
 	
 	/**
-	 * Indicates that a garbage string has been entered and the Action Listener should not 
+	 * Indicates that a garbage string has been entered and the Action Listener should not
+	 * try to update the rowset.
 	 */
 	// **** GL STRICT/CONTAINS ****
 	private boolean actionListenerNoUpdate = false;
@@ -404,9 +404,8 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	
 	/**
 	 * {@inheritDoc }
-	 * This method override additionally selects a currently edited item in the combo box.
-	 * 
-	 * If there is a string in the combo editor that does not have any matches, it will revert the string.
+	 * Deal with edge cases for combo editor interaction with GlazedLists and lack of support
+	 * for STRICT/CONTAINS in GlazedLists.
 	 */
 	// **** GL STRICT/CONTAINS ****
 	//
@@ -466,12 +465,12 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	        	priorEditorText = currentEditorText;
 	        	logger.debug("{}: Null not from UI (e.g., rowset, default). Selected item after super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedItem());
 	        	
-	        } else if (getModel().getSize() > 0) {
-	        // SCENARIO #1-B ABOVE - null due to GlazedList glitch when items contain the first character, but GL does not match the first item returned
-	        	glGlitchItem = getItemAt(0);
-	        	super.setSelectedItem(glGlitchItem);
-	        	priorEditorText = getEditor().getItem().toString();
-	        	logger.debug("{}: Null due to GlazedLists glitch so selecting first item in model. Selected item after super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedItem());
+			} else if (getModel().getSize() > 0) {
+			// SCENARIO #1-B ABOVE - null due to GlazedList glitch when items contain the first character, but GL does not match the first item returned
+				glGlitchItem = getItemAt(0);
+				super.setSelectedItem(glGlitchItem);
+				priorEditorText = getEditor().getItem().toString();
+				logger.debug("{}: Null due to GlazedLists glitch so selecting first item in model. Selected item after super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedItem());
 
 	        } else if (!currentEditorText.isEmpty()) {
 	        // SCENARIO #1-C ABOVE - null because user likely entered garbage - revert editor and return without a call to setSelectedItem()
