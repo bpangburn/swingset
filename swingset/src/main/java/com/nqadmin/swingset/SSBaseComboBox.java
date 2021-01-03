@@ -522,7 +522,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			priorEditorText = currentEditorText;
 			// 2020-12-29_BP: CONFIRMED selectAll() IS NEEDED FOLLOWING A NORMAL ITEM SELECTION
 			//   OTHERWISE USER IS APPENDING EXISTING ITEM STRING IF THEY START TO TYPE
-			if (getEditor() != null && getEditor().getEditorComponent().hasFocus()) {
+			if (getEditor().getEditorComponent().hasFocus()) {
 				// after we find a match, do a select all on the editor so
 				// if the user starts typing again it won't be appended
 				// 2020-12-21_BP: if we don't limited to field with focus, the comboboxes blink on navigation
