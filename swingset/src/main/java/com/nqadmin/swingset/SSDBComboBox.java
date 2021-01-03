@@ -1649,11 +1649,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 			logger.debug("{}: targetValue - " + targetValue, () -> getColumnForLog());
 			
 			// UPDATE COMPONENT
-			if (targetValue==null) {
-				setSelectedItem(nullItem);
-			} else {
-				setSelectedMapping(targetValue);
-			}
+			setSelectedMapping(targetValue);// setSelectedMapping() should handle null OK.}
 
 		} catch (final NumberFormatException nfe) {
 			JOptionPane.showMessageDialog(this, String.format(
