@@ -121,8 +121,14 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		private static final long serialVersionUID = -3131533966245488092L;
 
 		/**
-		 * For JComboBox ActionListener and ItemListener are very similar.
+		 * For JComboBox ActionListener and ItemListener are similar, but ActionListener
+		 * seems more appropriate since we don't care about the de-selection of the
+		 * previously selected item.
 		 * 
+		 * Per https://docs.oracle.com/javase/tutorial/uiswing/components/combobox.html#listeners
+		 * ActionListener just tells us that the selection changed whereas ItemListener fires
+		 * separate events for deselection of previous item and selection of current item.
+		 *
 		 * {@inheritDoc} */
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
