@@ -424,9 +424,9 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		// See https://docs.oracle.com/javase/8/docs/api/javax/swing/JComboBox.html#setSelectedItem-java.lang.Object-
 		//
 		//  1. We get a null:
-		//		A. A direct/indirect non-UI call was made to setSelectedItem(null).
+		//      A. A direct/indirect non-UI call was made to setSelectedItem(null).
 		//         This could be a value from the rowset listener, a programmatically set default, etc.
-		//		   In this case the editorComponent should NOT have the focus.
+		//         In this case the editorComponent should NOT have the focus.
 		//         -> call super.setSelectedItem(null) and continue
 		//      B. GlazedList bug where for the first character entered, the START_WITH matching is performed over the CONTAINS matching. In this case,
 		//         (getModel().getSize() > 0)
@@ -434,7 +434,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		//      C. The user's entry into the editor results in zero matches. In this case ((getModel().getSize()==0) && (hasItems()==true))
 		//         -> set actionListenerNoUpdate to true so the Action Listener does not try to update the rowset
 		//         -> warn user, (attempt to) revert the editor string, and continue (simulated STRICT)
-	    //      D. SOMETHING ELSE???
+		//      D. SOMETHING ELSE???
 		//         -> set actionListenerNoUpdate to true so the Action Listener does not try to update the rowset
 		//         -> warn user and continue
 		//         
@@ -463,85 +463,100 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				getColumnForLog(), _value, getAllowNull(), priorEditorText, currentEditorText));
 		
 		// EVALUATE SCENARIOS DOCUMENTED ABOVE
-		if (_value==null) {
-		// #1 - WE HAVE A NULL
+		if (_value == null) {
+			// #1 - WE HAVE A NULL
 			if (!getEditor().getEditorComponent().hasFocus()) {
-	        // SCENARIO #1-A ABOVE - setting null from a rowset listener or programmatically (e.g., a default) 
-	        	super.setSelectedItem(null);
-	        	priorEditorText = currentEditorText;
-	        	logger.debug("{}: Null not from UI (e.g., rowset, default). Selected item after super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedItem());
-	        	
+				// SCENARIO #1-A ABOVE - setting null from a rowset listener or programmatically
+				// (e.g., a default)
+				super.setSelectedItem(null);
+				priorEditorText = currentEditorText;
+				logger.debug(
+						"{}: Null not from UI (e.g., rowset, default). Selected item after super.setSelectedItem()={}",
+						() -> getColumnForLog(), () -> getSelectedItem());
+
 			} else if (getModel().getSize() > 0) {
-			// SCENARIO #1-B ABOVE - null due to GlazedList glitch when items contain the first character, but GL does not match the first item returned
+				// SCENARIO #1-B ABOVE - null due to GlazedList glitch when items contain the
+				// first character, but GL does not match the first item returned
 				glGlitchItem = getItemAt(0);
 				super.setSelectedItem(glGlitchItem);
 				priorEditorText = getEditor().getItem().toString();
-				logger.debug("{}: Null due to GlazedLists glitch so selecting first item in model. Selected item after super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedItem());
+				logger.debug(
+						"{}: Null due to GlazedLists glitch so selecting first item in model. Selected item after super.setSelectedItem()={}",
+						() -> getColumnForLog(), () -> getSelectedItem());
 
-	        } else if (!currentEditorText.isEmpty()) {
-	        // SCENARIO #1-C ABOVE - null because user likely entered garbage - revert editor and return without a call to setSelectedItem()
-	        	// 2020-12-29_BP: AT ONE POINT THE FOLLOWING CODE SEEMED TO WORK, BUT NOW THE CALL TO getEditor().setItem(priorEditorText) DOES NOT APPEAR TO
-	        	//   REVERT THE TEXT
-	        	//   - HAVE TINKERED WITH THE ORDERING OF showPopup() AND updateUI()
-	        	//   - HAVE CONFIRMED THAT isEditable() IS TRUE
-	        	logger.debug(() -> String.format("%s: User entered string of '%s' did not match any list items. Attempting to revert to '%s'.",
-	        			getColumnForLog(), currentEditorText, priorEditorText));
-	        
-	        	// TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
-	        	actionListenerNoUpdate = true; 
-	        	
-	        	// REVERT STRING
-	        	getEditor().setItem(priorEditorText);   
-	        	//showPopup();// When this was working as intended, the ordering of showPopup() before updateUI() was relevant.
-	        	updateUI(); // NEEDED TO SHOW REVERTED ITEM (ORIGINALLY INTENDED TO SHOW REVERTED TEXT IN EDITOR)
-	        	
-	        	// WARN USER AND LOG
-	        	String editorText = getEditor().getItem().toString();
-	        	
-	        	JOptionPane.showMessageDialog(SSBaseComboBox.this,
+			} else if (!currentEditorText.isEmpty()) {
+				// SCENARIO #1-C ABOVE - null because user likely entered garbage - revert
+				// editor and return without a call to setSelectedItem()
+				// 2020-12-29_BP: AT ONE POINT THE FOLLOWING CODE SEEMED TO WORK, BUT NOW THE
+				// CALL TO getEditor().setItem(priorEditorText) DOES NOT APPEAR TO
+				// REVERT THE TEXT
+				// - HAVE TINKERED WITH THE ORDERING OF showPopup() AND updateUI()
+				// - HAVE CONFIRMED THAT isEditable() IS TRUE
+				logger.debug(() -> String.format(
+						"%s: User entered string of '%s' did not match any list items. Attempting to revert to '%s'.",
+						getColumnForLog(), currentEditorText, priorEditorText));
+
+				// TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
+				actionListenerNoUpdate = true;
+
+				// REVERT STRING
+				getEditor().setItem(priorEditorText);
+				// showPopup();// When this was working as intended, the ordering of showPopup()
+				// before updateUI() was relevant.
+				updateUI(); // NEEDED TO SHOW REVERTED ITEM (ORIGINALLY INTENDED TO SHOW REVERTED TEXT IN
+							// EDITOR)
+
+				// WARN USER AND LOG
+				String editorText = getEditor().getItem().toString();
+
+				JOptionPane.showMessageDialog(SSBaseComboBox.this,
 						"The text entered does not match any item in the list. Reverting to '" + editorText + "'.");
-	       	
-	        	logger.debug(() -> String.format("%s:   Editor string following revert action: '%s'.",
-	        			getColumnForLog(), editorText));
 
-	        } else {
-	        // SCENARIO #1-D ABOVE - SOMETHING ELSE NOT ANTICIPATED
-	        // SAME RESULT AS SCENARIO #3 BELOW
-	        	// TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
-	        	actionListenerNoUpdate = true; // TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
-	        	
-	        	// WARN USER AND LOG
-	        	JOptionPane.showMessageDialog(SSBaseComboBox.this, String.format(
-						"Unexpected call to setSelectedItem() for column %s with value '%s'.", getColumnForLog(), _value));
-	        	logger.warn(() -> String.format("%s: Unexpected call to setSelectedItem() with '%s'.)",
-	        			getColumnForLog(), _value));
-	        }
+				logger.debug(() -> String.format("%s:   Editor string following revert action: '%s'.",
+						getColumnForLog(), editorText));
+
+			} else {
+				// SCENARIO #1-D ABOVE - SOMETHING ELSE NOT ANTICIPATED
+				// SAME RESULT AS SCENARIO #3 BELOW
+				// TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
+				actionListenerNoUpdate = true; // TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
+
+				// WARN USER AND LOG
+				JOptionPane.showMessageDialog(SSBaseComboBox.this,
+						String.format("Unexpected call to setSelectedItem() for column %s with value '%s'.",
+								getColumnForLog(), _value));
+				logger.warn(() -> String.format("%s: Unexpected call to setSelectedItem() with '%s'.)",
+						getColumnForLog(), _value));
+			}
 		} else if (_value instanceof SSListItem) {
-		// #2 - WE HAVE A SSLISTITEM (including nullItem if getAllowNull()==true)
+			// #2 - WE HAVE A SSLISTITEM (including nullItem if getAllowNull()==true)
 			super.setSelectedItem(_value);
 			priorEditorText = currentEditorText;
-			// 2020-12-29_BP: CONFIRMED selectAll() IS NEEDED FOLLOWING A NORMAL ITEM SELECTION
-			//   OTHERWISE USER IS APPENDING EXISTING ITEM STRING IF THEY START TO TYPE
+			// 2020-12-29_BP: CONFIRMED selectAll() IS NEEDED FOLLOWING A NORMAL ITEM
+			// SELECTION
+			// OTHERWISE USER IS APPENDING EXISTING ITEM STRING IF THEY START TO TYPE
 			if (getEditor().getEditorComponent().hasFocus()) {
 				// after we find a match, do a select all on the editor so
 				// if the user starts typing again it won't be appended
-				// 2020-12-21_BP: if we don't limited to field with focus, the comboboxes blink on navigation
+				// 2020-12-21_BP: if we don't limited to field with focus, the comboboxes blink
+				// on navigation
 				// this also causes the focus to jump out of a navigation combo
 				getEditor().selectAll();
 			}
-			logger.debug("{}: Valid match. Selected item after super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedItem());
+			logger.debug("{}: Valid match. Selected item after super.setSelectedItem()={}", () -> getColumnForLog(),
+					() -> getSelectedItem());
 		} else {
-	    // SCENARIO #3 - WE HAVE A STRING OR SOME OBJECT OTHER THAN NULL OR SSLISTITEM
-		// SAME RESULT AS SCENARIO #1-D ABOVE
-        	// TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
-        	actionListenerNoUpdate = true; // TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
-        	
-        	// WARN USER AND LOG
-        	JOptionPane.showMessageDialog(SSBaseComboBox.this, String.format(
+			// SCENARIO #3 - WE HAVE A STRING OR SOME OBJECT OTHER THAN NULL OR SSLISTITEM
+			// SAME RESULT AS SCENARIO #1-D ABOVE
+			// TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
+			actionListenerNoUpdate = true; // TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
+
+			// WARN USER AND LOG
+			JOptionPane.showMessageDialog(SSBaseComboBox.this, String.format(
 					"Unexpected call to setSelectedItem() for column %s with value '%s'.", getColumnForLog(), _value));
-        	logger.warn(() -> String.format("%s: Unexpected call to setSelectedItem() with '%s'.)",
-        			getColumnForLog(), _value));
-			
+			logger.warn(() -> String.format("%s: Unexpected call to setSelectedItem() with '%s'.)", getColumnForLog(),
+					_value));
+
 		}
 	}
 
@@ -666,43 +681,43 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	// Deal with non-standard GlazedList UP/DOWN arrow handling
 	//
 	
-    /**
-     * When dealing with GlazedLists (1.11) restore expected combo behavior.
-     *
-     * Per GL JavaDoc:
-     * https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html
-     *<p>
-     *  4. typing the up arrow key when the popup is visible and the selected element is the first element causes the autocompletion to be cleared and the popup's selection to be removed.
-     *  6. typing the down arrow key when the popup is visible and the selected element is the last element causes the autocompletion to be cleared and the popup's selection to be removed
-     *<p>
-     * We want to restore the normal JComboBox behavior of not going past the first or last item. This would be the ideal case, matching JComboBox.
-     * If GlazedLists ever changes the arrow key behavior, this can be removed.
-     */
+	/**
+	 * When dealing with GlazedLists (1.11) restore expected combo behavior.
+	 *
+	 * Per GL JavaDoc:
+	 * https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html
+	 *<p>
+	 *  4. typing the up arrow key when the popup is visible and the selected element is the first element causes the autocompletion to be cleared and the popup's selection to be removed.
+	 *  6. typing the down arrow key when the popup is visible and the selected element is the last element causes the autocompletion to be cleared and the popup's selection to be removed
+	 *<p>
+	 * We want to restore the normal JComboBox behavior of not going past the first or last item. This would be the ideal case, matching JComboBox.
+	 * If GlazedLists ever changes the arrow key behavior, this can be removed.
+	 */
 	protected void glazedListArrowHandler() {
-		
-        // ADD KEY LISTENER - INTERCEPTING KEYPRESSED APPEARS TO BLOCK GL
-        getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
 
-            @Override
-            // OVERRIDE KEYPRESSED, NOT KEYTYPED OR KEY RELEASED
-            public void keyPressed(KeyEvent keyEvent) {
-                int keyCode = keyEvent.getKeyCode();
-                if (keyCode == KeyEvent.VK_UP) {
-                	logger.trace(() -> String.format("%s: Intercepted UP key.", getColumnForLog()));
-                    System.out.println("");
-                    if (getSelectedIndex() == 0) {
-                        keyEvent.consume();
-                        logger.debug(() -> String.format("%s: UP key consumed.", getColumnForLog()));
-                    }
-                } else if (keyCode == KeyEvent.VK_DOWN) {
-                	logger.trace(() -> String.format("%s: Intercepted DOWN key.", getColumnForLog()));
-                    if (getSelectedIndex() == getModel().getSize()-1) {
-                        keyEvent.consume();
-                        logger.debug(() -> String.format("%s: DOWN key consumed.", getColumnForLog()));
-                    }
-                }
-            }
-        });
+		// ADD KEY LISTENER - INTERCEPTING KEYPRESSED APPEARS TO BLOCK GL
+		getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
+
+			@Override
+			// OVERRIDE KEYPRESSED, NOT KEYTYPED OR KEY RELEASED
+			public void keyPressed(KeyEvent keyEvent) {
+				int keyCode = keyEvent.getKeyCode();
+				if (keyCode == KeyEvent.VK_UP) {
+					logger.trace(() -> String.format("%s: Intercepted UP key.", getColumnForLog()));
+					System.out.println("");
+					if (getSelectedIndex() == 0) {
+						keyEvent.consume();
+						logger.debug(() -> String.format("%s: UP key consumed.", getColumnForLog()));
+					}
+				} else if (keyCode == KeyEvent.VK_DOWN) {
+					logger.trace(() -> String.format("%s: Intercepted DOWN key.", getColumnForLog()));
+					if (getSelectedIndex() == getModel().getSize() - 1) {
+						keyEvent.consume();
+						logger.debug(() -> String.format("%s: DOWN key consumed.", getColumnForLog()));
+					}
+				}
+			}
+		});
 	}
 
 
