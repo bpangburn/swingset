@@ -197,9 +197,6 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 
 	@Override
 	protected void bindComponents() throws Exception {
-		// SET COMBO OPTIONS
-		//cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
-		cmbPartColor.setOptions(Arrays.asList(new String[] { "Red", "Green", "Blue" }));
 		
 		//txtPartID.bind(getRowset(), "part_id");
 		txtPartName.bind(getRowset(), "part_name");
@@ -224,6 +221,14 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	public JMenuBar getJMenuBar() {
 		// nothing to do...
 		return null;
+	}
+	
+	@Override
+	protected void populateSSComboBoxes() {
+		// SET COMBO OPTIONS
+		//cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
+		cmbPartColor.setOptions(Arrays.asList(new String[] { "Red", "Green", "Blue" }));
+		
 	}
 
 	/**
@@ -303,12 +308,12 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	
 	// THIS IS A HACK TO HIDE THE TITLE BAR SINCE WE'RE PUTTING THE JINTERNALFRAME IN ITS OWN JFRAME FOR THE SWINGSET DEMO
 	// https://stackoverflow.com/a/51254020
-    @Override
-    public void setUI(InternalFrameUI _ui) {
-        super.setUI(_ui); // this gets called internally when updating the ui and makes the northPane reappear
-        BasicInternalFrameUI frameUI = (BasicInternalFrameUI) getUI(); // so...
-        if (frameUI != null) frameUI.setNorthPane(null); // lets get rid of it
-    }
+	@Override
+	public void setUI(InternalFrameUI _ui) {
+		super.setUI(_ui); // this gets called internally when updating the ui and makes the northPane reappear
+		BasicInternalFrameUI frameUI = (BasicInternalFrameUI) getUI(); // so...
+		if (frameUI != null) frameUI.setNorthPane(null); // lets get rid of it
+	}
 
 	@Override
 	protected void updateSSDBComboBoxes() {
