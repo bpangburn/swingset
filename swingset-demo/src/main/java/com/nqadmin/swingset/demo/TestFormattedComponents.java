@@ -265,7 +265,7 @@ public class TestFormattedComponents extends JFrame {
 			//
 			// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
 				syncManager = new SSSyncManager(cmbSSDBComboNav, navigator);
-				syncManager.setColumnName("swingset_formatted_test_pk");
+				syncManager.setSyncColumnName("swingset_formatted_test_pk");
 				syncManager.sync();
 
 			// SETUP BOUND COMPONENTS

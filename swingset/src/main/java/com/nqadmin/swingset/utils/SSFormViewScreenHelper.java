@@ -399,7 +399,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	private void activateSyncManager() {
 		if (getSyncManager() == null) {
 			setSyncManager(new SSSyncManager(getCmbNavigator(), getDataNavigator()));
-			getSyncManager().setColumnName(getPkColumn());
+			getSyncManager().setSyncColumnName(getPkColumn());
 		}
 
 		getSyncManager().sync();

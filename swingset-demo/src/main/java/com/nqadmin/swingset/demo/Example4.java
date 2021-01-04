@@ -287,7 +287,7 @@ public class Example4 extends JFrame {
 			//
 			// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
 				syncManager = new SSSyncManager(cmbSelectPart, navigator);
-				syncManager.setColumnName("part_id");
+				syncManager.setSyncColumnName("part_id");
 				syncManager.sync();
 
 			// SET LABEL DIMENSIONS
