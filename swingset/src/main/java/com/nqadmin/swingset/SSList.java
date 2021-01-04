@@ -106,9 +106,9 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 		
 		@Override
 		public void valueChanged(final ListSelectionEvent e) {
-			removeListeners();
+			removeRowSetListener();
 			updateRowSet();
-			addListeners();
+			addRowSetListener();
 		}
 	}
 
