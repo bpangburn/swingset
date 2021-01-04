@@ -262,9 +262,9 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	protected ArrayList<String> options = null;
 
 	/**
-	 * The column name whose value is written back to the database when the user
-	 * chooses an item in the combo box. This is generally the PK of the table to
-	 * which a foreign key is mapped.
+	 * The column name used to query the values for the bound column mappings.
+	 * This is generally the PK of the table to which a foreign key is mapped.
+	 * NOTE: This is NOT the bound column. It is the source of the mappings.
 	 */
 	protected String primaryKeyColumnName = "";
 
@@ -328,11 +328,10 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * Constructs a SSDBComboBox with the given parameters.
 	 *
 	 * @param _connection         database connection to be used.
-	 * @param _query                query to be used to retrieve the values from the
-	 *                              database.
-	 * @param _primaryKeyColumnName column name whose value has to be stored.
-	 * @param _displayColumnName    column name whose values are displayed in the
-	 *                              combo box.
+	 * @param _query                query to be used to retrieve the values to display in
+	 *                              the combo from the database.
+	 * @param _primaryKeyColumnName column name used to query/generate the combo Mappings
+	 * @param _displayColumnName    column name used to query/generate the combo Options
 	 */
 	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
 	@SuppressWarnings({"all","OverridableMethodCallInConstructor"})
@@ -691,7 +690,10 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	}
 
 	/**
-	 * @return the primaryKeyColumnName
+	 * Retrieves the database column (normally a primary key) from which
+	 * to query the mappings for the bound column.
+	 *
+	 * @return name of the PK value to query for the bound column mappings
 	 */
 	public String getPrimaryKeyColumnName() {
 		return primaryKeyColumnName;
@@ -1146,9 +1148,9 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	}
 
 	/**
-	 * Sets the database table primary column name.
+	 * Sets database column (normally a primary key) from which to query the mappings for the bound column.
 	 *
-	 * @param _primaryKeyColumnName name of primary key column
+	 * @param _primaryKeyColumnName name of the PK value to query for the bound column mappings
 	 */
 	public void setPrimaryKeyColumnName(final String _primaryKeyColumnName) {
 		final String oldValue = primaryKeyColumnName;
