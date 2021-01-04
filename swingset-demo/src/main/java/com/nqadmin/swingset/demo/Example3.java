@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+ * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -186,7 +186,8 @@ public class Example3 extends JFrame {
 					rs.close();
 
 				// SET OTHER DEFAULTS
-//					 cmbSupplierName.setSelectedValue(0);
+					 logger.debug("Setting default for Supplier Name mapping to 2.");
+					 cmbSupplierName.setSelectedMapping((long) 2);
 //					 cmbPartName.setSelectedValue(0);
 //					 txtQuantity.setText("0");
 

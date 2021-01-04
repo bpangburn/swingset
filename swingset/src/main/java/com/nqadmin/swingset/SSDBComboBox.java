@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+ * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -43,6 +43,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JOptionPane;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -1182,200 +1184,200 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		firePropertyChange("secondDisplayColumnName", oldValue, secondDisplayColumnName);
 	}
 
-	/**
-	 * {@inheritDoc }
-	 * This method override additionally selects a currently edited item in the combo box
-	 */
-	@Override
-	public void setSelectedItem(final Object _value) {
-		logger.debug(() -> String.format("%s: setSelectedItem(%s), allowNull %b",
-				getColumnForLog(), _value, getAllowNull()));
-
-// TODO Need to deal with null on focus lost event. SSDBComboListener.actionPerformed setting bound column to  null when focus lost.
-
-// INTERCEPTING GLAZEDLISTS CALLS TO setSelectedItem() SO THAT WE CAN PREVENT IT FROM TRYING TO SET VALUES NOT IN THE LIST
-
-		// settingSelectedItem = true;
-
-		// try {
-
-// NOTE THAT CALLING setSelectedIndex(-1) IN THIS METHOD CAUSES  CYCLE HERE BECAUSE setSelectedIndex() CALLS setSelectedItem()
-
-//		logger.debug("{}: Selected Index BEFORE hidePopup()={}", () -> getColumnForLog(), () -> getSelectedIndex());
+//	/**
+//	 * {@inheritDoc }
+//	 * This method override additionally selects a currently edited item in the combo box
+//	 */
+//	@Override
+//	public void setSelectedItem(final Object _value) {
+//		logger.debug(() -> String.format("%s: setSelectedItem(%s), allowNull %b",
+//				getColumnForLog(), _value, getAllowNull()));
 //
-//		int possibleMatches = getItemCount();
-//		logger.debug("{}: Possible matches BEFORE hidePopup() - " + possibleMatches, () -> getColumnForLog());
+//// TODO Need to deal with null on focus lost event. SSDBComboListener.actionPerformed setting bound column to  null when focus lost.
 //
-//		//hidePopup();
+//// INTERCEPTING GLAZEDLISTS CALLS TO setSelectedItem() SO THAT WE CAN PREVENT IT FROM TRYING TO SET VALUES NOT IN THE LIST
 //
-//		possibleMatches = getItemCount();
-//		logger.debug("{}: Possible matches AFTER hidePopup() - " + possibleMatches, () -> getColumnForLog());
-//		logger.debug("{}: Selected Index AFTER hidePopup()={}", () -> getColumnForLog(), () -> getSelectedIndex());
-
-		// Call to super.setSelectedItem() triggers SSDBComboListener.actionPerformed, which calls getSelectedValue(), which calls getSelectedIndex(), which returns -1 while still in the editor
-		// and returns 0 after focus is lost.
-		//
-		// Calling hidePopup() restores the list, but messes up the GlazedList filtering.
-		//
-		// 2020-10-03_BP: Updated getSelectedValue() to properly return the primary key rather than using getSelectedIndex() during a call to this method.
-
-		// TODO: NOT SURE WHERE THE FOLLOWING COMMENT CAME FROM,
-		//       BUT THAT'S NOT HOW IT WORKS NOW
-		// Only try to update item for a valid list item.
-
-		Object newSelectedItem = _value;
-		if (newSelectedItem!=null) {
-			super.setSelectedItem(_value);
-			if (getEditor() != null && hasFocus()) {
-				// after we find a match, do a select all on the editor so
-				// if the user starts typing again it won't be appended
-				// 2020-12-21_BP: if we don't limited to field with focus, the comboboxes blink on navigation
-				// this also causes the focus to jump out of a navigation combo
-				getEditor().selectAll();
-			}
-			logger.debug("{}: Selected Index AFTER super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedIndex());
-		} else {
-			// Note that nullItem is null when allowNull is false.
-			// The next statement either selects null or the nullItem.
-			super.setSelectedItem(nullItem);
-			if (nullItem == null) {
-				logger.debug(() -> String.format("%s : Setting null when null not allowed. Current editor text is '%s'", getColumnForLog(), getEditor().getItem()));
-			}
-		}
-	}
-
-
-
-		// } finally {
-		// 	settingSelectedItem = false;
-		// 	selectedItem = null;
-		// }
-
-		//return;
-
-//		// DECLARATIONS
-//		String currentEditorText = "";
-//		int possibleMatches;
-//		SSListItem selectedItem;
+//		// settingSelectedItem = true;
 //
-//		// WE COULD BE HERE DUE TO:
-//		// 1. MOUSE CLICK ON AN ITEM
-//		// 2. KEYBASED NAVIGATION
-//		// 3. USER TYPING SEQUENTIALLY:
-//		// THIS MAY TRIGGER MATCHING ITEMS, OR MAY NOT MATCH ANY SUBSTRINGS SO WE DELETE
-//		// THE LAST CHARACTER
-//		// 4. USER DOING SOMETHING UNEXPECTED LIKE INSERTING CHARACTERS, DELETING ALL
-//		// TEXT, ETC.
-//		// THIS MAY TRIGGER MATCHING ITEMS, OR MAY NOT MATCH ANY SUBSTRINGS SO WE REVERT
-//		// TO THE LAST STRING AVAILABLE
-//		// IF NOT MATCH, COULD ALSO REVERT TO EMPTY STRING
+//		// try {
 //
-//		// GET LATEST TEXT TYPED BY USER
+//// NOTE THAT CALLING setSelectedIndex(-1) IN THIS METHOD CAUSES  CYCLE HERE BECAUSE setSelectedIndex() CALLS setSelectedItem()
 //
-//		if (getEditor().getItem() != null) {
-//			currentEditorText = getEditor().getItem().toString();
-//		}
+////		logger.debug("{}: Selected Index BEFORE hidePopup()={}", () -> getColumnForLog(), () -> getSelectedIndex());
+////
+////		int possibleMatches = getItemCount();
+////		logger.debug("{}: Possible matches BEFORE hidePopup() - " + possibleMatches, () -> getColumnForLog());
+////
+////		//hidePopup();
+////
+////		possibleMatches = getItemCount();
+////		logger.debug("{}: Possible matches AFTER hidePopup() - " + possibleMatches, () -> getColumnForLog());
+////		logger.debug("{}: Selected Index AFTER hidePopup()={}", () -> getColumnForLog(), () -> getSelectedIndex());
 //
-//		selectedItem = (SSListItem) _value;
+//		// Call to super.setSelectedItem() triggers SSDBComboListener.actionPerformed, which calls getSelectedValue(), which calls getSelectedIndex(), which returns -1 while still in the editor
+//		// and returns 0 after focus is lost.
+//		//
+//		// Calling hidePopup() restores the list, but messes up the GlazedList filtering.
+//		//
+//		// 2020-10-03_BP: Updated getSelectedValue() to properly return the primary key rather than using getSelectedIndex() during a call to this method.
 //
-//		// FOUR OUTCOMES:
-//		// 1. _value is null, but selectedItem is not null, indicating a match (so null
-//		// is a valid choice)
-//		// 2. _value is null and selectedItem is null, indicating no match
-//		// 3. neither _value nor selectedItem are null, indicating a match
-//		// 4. _value is not null, but selectedItem is null, indicating no match (have to
-//		// revert text)
+//		// TODO: NOT SURE WHERE THE FOLLOWING COMMENT CAME FROM,
+//		//       BUT THAT'S NOT HOW IT WORKS NOW
+//		// Only try to update item for a valid list item.
 //
-//		if (selectedItem != null) {
-//			// OUTCOME 1 & 3 ABOVE, MAKE CALL TO SUPER AND MOVE ALONG
-//			// Display contents of selectedItem for debugging
-//			logger.debug("{}: PK={}, Item={}.", () -> getColumnForLog(), () -> selectedItem.getPrimaryKey(), () -> selectedItem.getListItem());
-//			logger.debug("{}: Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.", () -> getColumnForLog());
-//
-//			// We have to be VERY careful with calls to setSelectedItem() because it will
-//			// set the value based on the index of any SUBSET list returned by GlazedList,
-//			// not the full list
-//			//
-//			// Calling hidePopup() clears the subset list so that the subsequent
-//			// call to setSelectedItem works as intended.
-//
-//			possibleMatches = getItemCount();
-//			logger.debug("{}: Possible matches BEFORE hidePopup() - " + possibleMatches, () -> getColumnForLog());
-//
-//			hidePopup();
-//
-//			possibleMatches = getItemCount();
-//			logger.debug("{}: Possible matches AFTER hidePopup() - " + possibleMatches, () -> getColumnForLog());
-//
-//			// Call to parent method.
-//			// Don't call setSelectedIndex() as this causes a cycle
-//			// setSelectedIndex()->setSelectedItem().
-//			logger.debug("{}: Calling super.setSelectedItem(" + selectedItem + ")", () -> getColumnForLog());
-//			super.setSelectedItem(selectedItem);
-//
-//			// Update editor text
-//			currentEditorText = selectedItem.getListItem();
-//			getEditor().setItem(currentEditorText);
-//			updateUI();
-//
-//			logger.debug("{}: Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.", () -> getColumnForLog());
-//
-//			// update priorEditorText
-//			priorEditorText = currentEditorText;
-//
-//		} else if (_value == null) {
-//			// OUTCOME 2 ABOVE
-//			// setSelectedItem() was called with null, but there is no match (so null is not a valid selection in the list)
-//			// There may be partial matches from GlazedList.
-//			logger.debug("{}: Method called with null. Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.", () -> getColumnForLog());
-//
-//			// Determine if there are partial matches on the popup list due to user typing.
-//			possibleMatches = getItemCount();
-//			logger.debug("{}: Possible matches - " + possibleMatches, () -> getColumnForLog());
-//
-//			if (possibleMatches > 0) {
-//				// update the latestTypedText, but don't make a call to super.setSelectedItem(). No change to bound value.
-//				priorEditorText = currentEditorText;
-//			} else {
-//// 2020-08-03: if user types "x" and it is not a choice we land here
-//// on call to updateUI(), focus is lost and list items revert to 6 for "ss_db_combo_box" column in swingset_tests.sql
-//// if "x" is typed a 2nd time, the popup does not become visible again and there are zero items in the list before and after the call
-//// to setItem() and/or to updateUI()
-//
-//
-//// This could also be the result of the first call to execute() where nothing has been typed and the popup is not visible.
-//// This will throw a 'java.awt.IllegalComponentStateException' exception when showPopup() is called.
-//				//if (!this.isVisible()) {
-//				if (currentEditorText.isEmpty()) {
-//					logger.debug("{}: Method called with null, but nothing has been typed. This occurs during screen initialization.", () -> getColumnForLog());
-//					super.setSelectedItem(selectedItem);
-//					// 2020-10-03_BP: Probably need to update priorEditorText here
-//					priorEditorText = currentEditorText;
-//				} else {
-//					logger.debug("{}: Reverting to prior typed text.", () -> getColumnForLog());
-//					getEditor().setItem(priorEditorText);
-//					// IMPORTANT: The particular order here of showPopup() and then updateUI() seems to restore the
-//					// underlying GlazedList to all of the items. Reversing this order breaks things. Calling hidePopup() does not work.
-//					showPopup();
-//					updateUI(); // This refreshes the characters displayed. Display does not update without call to updateUI();
-//								// updateUI() triggers focus lost
-//					possibleMatches = getItemCount();
-//
-//					logger.debug("{}: Possible matches AFTER reverting text - " + possibleMatches, () -> getColumnForLog());
-//				}
+//		Object newSelectedItem = _value;
+//		if (newSelectedItem!=null) {
+//			super.setSelectedItem(_value);
+//			if (getEditor() != null && hasFocus()) {
+//				// after we find a match, do a select all on the editor so
+//				// if the user starts typing again it won't be appended
+//				// 2020-12-21_BP: if we don't limited to field with focus, the comboboxes blink on navigation
+//				// this also causes the focus to jump out of a navigation combo
+//				getEditor().selectAll();
 //			}
-//
+//			logger.debug("{}: Selected Index AFTER super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedIndex());
 //		} else {
-//			// OUTCOME 4 ABOVE
-//			// generally not expecting this outcome
-//			// revert to prior string and don't select anything
-//			logger.warn(getColumnForLog() + ": Method called with " + _value + ", but there is no match. Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.");
-//
-//			// TODO Throw an exception here? May be the result of a coding error.
-//			getEditor().setItem(priorEditorText);
-//			currentEditorText = priorEditorText;
-//			updateUI(); // This refreshes the characters displayed.
+//			// Note that nullItem is null when allowNull is false.
+//			// The next statement either selects null or the nullItem.
+//			super.setSelectedItem(nullItem);
+//			if (nullItem == null) {
+//				logger.debug(() -> String.format("%s : Setting null when null not allowed. Current editor text is '%s'", getColumnForLog(), getEditor().getItem()));
+//			}
 //		}
+//	}
+//
+//
+//
+//		// } finally {
+//		// 	settingSelectedItem = false;
+//		// 	selectedItem = null;
+//		// }
+//
+//		//return;
+//
+////		// DECLARATIONS
+////		String currentEditorText = "";
+////		int possibleMatches;
+////		SSListItem selectedItem;
+////
+////		// WE COULD BE HERE DUE TO:
+////		// 1. MOUSE CLICK ON AN ITEM
+////		// 2. KEYBASED NAVIGATION
+////		// 3. USER TYPING SEQUENTIALLY:
+////		// THIS MAY TRIGGER MATCHING ITEMS, OR MAY NOT MATCH ANY SUBSTRINGS SO WE DELETE
+////		// THE LAST CHARACTER
+////		// 4. USER DOING SOMETHING UNEXPECTED LIKE INSERTING CHARACTERS, DELETING ALL
+////		// TEXT, ETC.
+////		// THIS MAY TRIGGER MATCHING ITEMS, OR MAY NOT MATCH ANY SUBSTRINGS SO WE REVERT
+////		// TO THE LAST STRING AVAILABLE
+////		// IF NOT MATCH, COULD ALSO REVERT TO EMPTY STRING
+////
+////		// GET LATEST TEXT TYPED BY USER
+////
+////		if (getEditor().getItem() != null) {
+////			currentEditorText = getEditor().getItem().toString();
+////		}
+////
+////		selectedItem = (SSListItem) _value;
+////
+////		// FOUR OUTCOMES:
+////		// 1. _value is null, but selectedItem is not null, indicating a match (so null
+////		// is a valid choice)
+////		// 2. _value is null and selectedItem is null, indicating no match
+////		// 3. neither _value nor selectedItem are null, indicating a match
+////		// 4. _value is not null, but selectedItem is null, indicating no match (have to
+////		// revert text)
+////
+////		if (selectedItem != null) {
+////			// OUTCOME 1 & 3 ABOVE, MAKE CALL TO SUPER AND MOVE ALONG
+////			// Display contents of selectedItem for debugging
+////			logger.debug("{}: PK={}, Item={}.", () -> getColumnForLog(), () -> selectedItem.getPrimaryKey(), () -> selectedItem.getListItem());
+////			logger.debug("{}: Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.", () -> getColumnForLog());
+////
+////			// We have to be VERY careful with calls to setSelectedItem() because it will
+////			// set the value based on the index of any SUBSET list returned by GlazedList,
+////			// not the full list
+////			//
+////			// Calling hidePopup() clears the subset list so that the subsequent
+////			// call to setSelectedItem works as intended.
+////
+////			possibleMatches = getItemCount();
+////			logger.debug("{}: Possible matches BEFORE hidePopup() - " + possibleMatches, () -> getColumnForLog());
+////
+////			hidePopup();
+////
+////			possibleMatches = getItemCount();
+////			logger.debug("{}: Possible matches AFTER hidePopup() - " + possibleMatches, () -> getColumnForLog());
+////
+////			// Call to parent method.
+////			// Don't call setSelectedIndex() as this causes a cycle
+////			// setSelectedIndex()->setSelectedItem().
+////			logger.debug("{}: Calling super.setSelectedItem(" + selectedItem + ")", () -> getColumnForLog());
+////			super.setSelectedItem(selectedItem);
+////
+////			// Update editor text
+////			currentEditorText = selectedItem.getListItem();
+////			getEditor().setItem(currentEditorText);
+////			updateUI();
+////
+////			logger.debug("{}: Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.", () -> getColumnForLog());
+////
+////			// update priorEditorText
+////			priorEditorText = currentEditorText;
+////
+////		} else if (_value == null) {
+////			// OUTCOME 2 ABOVE
+////			// setSelectedItem() was called with null, but there is no match (so null is not a valid selection in the list)
+////			// There may be partial matches from GlazedList.
+////			logger.debug("{}: Method called with null. Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.", () -> getColumnForLog());
+////
+////			// Determine if there are partial matches on the popup list due to user typing.
+////			possibleMatches = getItemCount();
+////			logger.debug("{}: Possible matches - " + possibleMatches, () -> getColumnForLog());
+////
+////			if (possibleMatches > 0) {
+////				// update the latestTypedText, but don't make a call to super.setSelectedItem(). No change to bound value.
+////				priorEditorText = currentEditorText;
+////			} else {
+////// 2020-08-03: if user types "x" and it is not a choice we land here
+////// on call to updateUI(), focus is lost and list items revert to 6 for "ss_db_combo_box" column in swingset_tests.sql
+////// if "x" is typed a 2nd time, the popup does not become visible again and there are zero items in the list before and after the call
+////// to setItem() and/or to updateUI()
+////
+////
+////// This could also be the result of the first call to execute() where nothing has been typed and the popup is not visible.
+////// This will throw a 'java.awt.IllegalComponentStateException' exception when showPopup() is called.
+////				//if (!this.isVisible()) {
+////				if (currentEditorText.isEmpty()) {
+////					logger.debug("{}: Method called with null, but nothing has been typed. This occurs during screen initialization.", () -> getColumnForLog());
+////					super.setSelectedItem(selectedItem);
+////					// 2020-10-03_BP: Probably need to update priorEditorText here
+////					priorEditorText = currentEditorText;
+////				} else {
+////					logger.debug("{}: Reverting to prior typed text.", () -> getColumnForLog());
+////					getEditor().setItem(priorEditorText);
+////					// IMPORTANT: The particular order here of showPopup() and then updateUI() seems to restore the
+////					// underlying GlazedList to all of the items. Reversing this order breaks things. Calling hidePopup() does not work.
+////					showPopup();
+////					updateUI(); // This refreshes the characters displayed. Display does not update without call to updateUI();
+////								// updateUI() triggers focus lost
+////					possibleMatches = getItemCount();
+////
+////					logger.debug("{}: Possible matches AFTER reverting text - " + possibleMatches, () -> getColumnForLog());
+////				}
+////			}
+////
+////		} else {
+////			// OUTCOME 4 ABOVE
+////			// generally not expecting this outcome
+////			// revert to prior string and don't select anything
+////			logger.warn(getColumnForLog() + ": Method called with " + _value + ", but there is no match. Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.");
+////
+////			// TODO Throw an exception here? May be the result of a coding error.
+////			getEditor().setItem(priorEditorText);
+////			currentEditorText = priorEditorText;
+////			updateUI(); // This refreshes the characters displayed.
+////		}
 
 	/**
 	 * {@inheritDoc }
@@ -1532,6 +1534,88 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 //		return result;
 	}
 
+//	/**
+//	 * Updates the value stored and displayed in the SwingSet component based on
+//	 * getBoundColumnText()
+//	 * <p>
+//	 * Call to this method should be coming from SSCommon and should already have
+//	 * the Component listener removed
+//	 */
+//	@Override
+//	public void updateSSComponent() {
+//		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long or Integer
+//		try {
+//			// 2020-10-05_BP: If initialization is taking place then there won't be any mappings so don't try to update anything yet.
+//
+//			// TODO: how does this happen?
+//			//if (eventList==null) {
+//			//	return;
+//			//}
+//			if (!hasItems()) {
+//				return;
+//			}
+//
+//			// If the user was on this component and the GlazedList had a subset of items, then
+//			// navigating resulting in a call to updateSSComponent()->setSelectedValue() may try to do a lookup based on
+//			// the GlazedList subset and generate:
+//			// Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: setSelectedIndex: X out of bounds
+//			//int possibleMatches = getItemCount();
+//			//logger.debug("{}: Possible matches BEFORE setPopupVisible(false): " + possibleMatches, () -> getColumnForLog());
+//
+//			//this.setPopupVisible(false);
+//			//updateUI();
+//
+//			//possibleMatches = getItemCount();
+//			//logger.debug("{}: Possible matches AFTER setPopupVisible(false): " + possibleMatches, () -> getColumnForLog());
+//
+//			// THIS SHOULD BE CALLED AS A RESULT OF SOME ACTION ON THE ROWSET SO RESET THE EDITOR STRINGS BEFORE DOING ANYTHING ELSE
+//			// This is going to make a little noise in the debug logs since it results in an "extra" call to setSelectedItem()
+//			getEditor().setItem("");
+//
+//
+//			// Combobox primary key column data queried from the database will generally be of data type long.
+//			// The bound column text should generally be a long integer as well, but trimming to be safe.
+//			// TODO Consider starting with a Long and passing directly to setSelectedValue(primaryKey). Modify setSelectedValue to accept a Long vs long.
+//			final String text = getBoundColumnText();
+//
+//			logger.trace("{}: getBoundColumnText() - " + text, () -> getColumnForLog());
+//
+//			// GET THE BOUND VALUE STORED IN THE ROWSET
+//			//if (text != null && !(text.equals(""))) {
+//			if ((text != null) && !text.isEmpty()) {
+//
+//				final long primaryKey = Long.parseLong(text);
+//
+//				logger.debug("{}: Calling setSelectedValue(" + primaryKey + ").", () -> getColumnForLog());
+//
+//				setSelectedValue(primaryKey);
+//
+//			} else {
+//				logger.debug("{}: Calling setSelectedIndex(-1).", () -> getColumnForLog());
+//
+//				setSelectedIndex(-1);
+//				//updateUI();
+//			}
+//
+//			// TODO Consider commenting this out for performance.
+//			//String editorString = null;
+//			//if (getEditor().getItem() != null) {
+//			//	editorString = getEditor().getItem().toString();
+//			//}
+//			//logger.debug("{}: Combo editor string: " + editorString, () -> getColumnForLog());
+//			logger.trace(() -> {
+//				String editorString = null;
+//				if (getEditor().getItem() != null) {
+//					editorString = getEditor().getItem().toString();
+//				}
+//				return getColumnForLog() + ": Combo editor string: " + editorString;
+//			});
+//
+//		} catch (final NumberFormatException nfe) {
+//			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
+//		}
+//	}
+	
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText()
@@ -1541,75 +1625,35 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 */
 	@Override
 	public void updateSSComponent() {
-		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long or Integer
+		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only limit JDBC types accepted
 		try {
-			// 2020-10-05_BP: If initialization is taking place then there won't be any mappings so don't try to update anything yet.
-
-			// TODO: how does this happen?
-			//if (eventList==null) {
-			//	return;
-			//}
+			// If initialization is taking place then there won't be any mappings so don't try to update anything yet.
 			if (!hasItems()) {
 				return;
 			}
 
-			// If the user was on this component and the GlazedList had a subset of items, then
-			// navigating resulting in a call to updateSSComponent()->setSelectedValue() may try to do a lookup based on
-			// the GlazedList subset and generate:
-			// Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: setSelectedIndex: X out of bounds
-			//int possibleMatches = getItemCount();
-			//logger.debug("{}: Possible matches BEFORE setPopupVisible(false): " + possibleMatches, () -> getColumnForLog());
+			// SSDBComboBox will generally work with primary key column data queried from the database, which will generally be of data type long.
+			// SSComboBox is generally used with 2 or 4 byte integer columns.
+			final String boundColumnText = getBoundColumnText();
 
-			//this.setPopupVisible(false);
-			//updateUI();
+			// LOGGING
+			logger.debug("{}: getBoundColumnText() - " + boundColumnText, () -> getColumnForLog());
 
-			//possibleMatches = getItemCount();
-			//logger.debug("{}: Possible matches AFTER setPopupVisible(false): " + possibleMatches, () -> getColumnForLog());
-
-			// THIS SHOULD BE CALLED AS A RESULT OF SOME ACTION ON THE ROWSET SO RESET THE EDITOR STRINGS BEFORE DOING ANYTHING ELSE
-			// This is going to make a little noise in the debug logs since it results in an "extra" call to setSelectedItem()
-			getEditor().setItem("");
-
-
-			// Combobox primary key column data queried from the database will generally be of data type long.
-			// The bound column text should generally be a long integer as well, but trimming to be safe.
-			// TODO Consider starting with a Long and passing directly to setSelectedValue(primaryKey). Modify setSelectedValue to accept a Long vs long.
-			final String text = getBoundColumnText();
-
-			logger.trace("{}: getBoundColumnText() - " + text, () -> getColumnForLog());
-
-			// GET THE BOUND VALUE STORED IN THE ROWSET
-			//if (text != null && !(text.equals(""))) {
-			if ((text != null) && !text.isEmpty()) {
-
-				final long primaryKey = Long.parseLong(text);
-
-				logger.debug("{}: Calling setSelectedValue(" + primaryKey + ").", () -> getColumnForLog());
-
-				setSelectedValue(primaryKey);
-
-			} else {
-				logger.debug("{}: Calling setSelectedIndex(-1).", () -> getColumnForLog());
-
-				setSelectedIndex(-1);
-				//updateUI();
+			// GET THE BOUND VALUE STORED IN THE ROWSET - may throw a NumberFormatException
+			Long targetValue = null;
+			if ((boundColumnText != null) && !boundColumnText.isEmpty()) {
+				targetValue = Long.parseLong(boundColumnText);
 			}
-
-			// TODO Consider commenting this out for performance.
-			//String editorString = null;
-			//if (getEditor().getItem() != null) {
-			//	editorString = getEditor().getItem().toString();
-			//}
-			//logger.debug("{}: Combo editor string: " + editorString, () -> getColumnForLog());
-			logger.trace(() -> {
-				String editorString = null;
-				if (getEditor().getItem() != null) {
-					editorString = getEditor().getItem().toString();
-				}
-				return getColumnForLog() + ": Combo editor string: " + editorString;
-			});
+			
+			// LOGGING
+			logger.debug("{}: targetValue - " + targetValue, () -> getColumnForLog());
+			
+			// UPDATE COMPONENT
+			setSelectedMapping(targetValue);// setSelectedMapping() should handle null OK.}
 
 		} catch (final NumberFormatException nfe) {
+			JOptionPane.showMessageDialog(this, String.format(
+					"Encountered database value of '%s' for column [%s], which cannot be converted to a number.", getBoundColumnText(), getColumnForLog()));
 			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
 		}
 	}
