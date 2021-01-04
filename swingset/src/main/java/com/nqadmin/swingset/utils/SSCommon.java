@@ -356,6 +356,16 @@ public class SSCommon implements Serializable {
 	 * RowSet from which component will get/set values.
 	 */
 	private RowSet rowSet = null;
+	
+	/**
+	 * Indicates if rowset listener is added (or removed)
+	 */
+	private boolean rowsetListenerAdded = false;
+	
+	/**
+	 * Indicates if swingset component listener is added (or removed)
+	 */
+	private boolean ssComponentListenerAdded = false;
 
 	/**
 	 * Underlying RowSet listener.
@@ -374,15 +384,15 @@ public class SSCommon implements Serializable {
 		init();
 	}
 
-	/**
-	 * Convenience method to add both RowSet and SwingSet Component listeners.
-	 * <p>
-	 * Does not add DocumentListener.
-	 */
-	public void addListeners() {
-		addRowSetListener();
-		addSSComponentListener();
-	}
+//	/**
+//	 * Convenience method to add both RowSet and SwingSet Component listeners.
+//	 * <p>
+//	 * Does not add DocumentListener.
+//	 */
+//	public void addListeners() {
+//		addRowSetListener();
+//		addSSComponentListener();
+//	}
 
 	/**
 	 * Methold to add a document listener when the SwingSet component is a
@@ -396,14 +406,20 @@ public class SSCommon implements Serializable {
 	 * Method to add the RowSet listener.
 	 */
 	public void addRowSetListener() {
-		rowSet.addRowSetListener(rowSetListener);
+		if (!rowsetListenerAdded) {
+			rowSet.addRowSetListener(rowSetListener);
+			rowsetListenerAdded = true;
+		}
 	}
 	
 	/**
 	 * Method to add any SwingSet Component listener(s).
 	 */
 	public void addSSComponentListener() {
-		ssComponent.addSSComponentListener();
+		if (!ssComponentListenerAdded) {
+			ssComponent.addSSComponentListener();
+			ssComponentListenerAdded = true;
+		}
 	}
 
 	/**
@@ -645,15 +661,15 @@ public class SSCommon implements Serializable {
 		getSSComponent().customInit();
 	}
 
-	/**
-	 * Convenience method to remove both RowSet and SwingSet Component listeners.
-	 * <p>
-	 * Does not remove DocumentListener.
-	 */
-	public void removeListeners() {
-		removeRowSetListener();
-		removeSSComponentListener();
-	}
+//	/**
+//	 * Convenience method to remove both RowSet and SwingSet Component listeners.
+//	 * <p>
+//	 * Does not remove DocumentListener.
+//	 */
+//	public void removeListeners() {
+//		removeRowSetListener();
+//		removeSSComponentListener();
+//	}
 
 	/**
 	 * Class to remove a Document listener when the SwingSet component is a
@@ -668,8 +684,9 @@ public class SSCommon implements Serializable {
 	 * Method to remove the RowSet listener.
 	 */
 	public void removeRowSetListener() {
-		if (rowSet != null) {
+		if (rowsetListenerAdded && rowSet != null) { //rowsetListenerAdded likely won't be true if rowset is null
 			rowSet.removeRowSetListener(rowSetListener);
+			rowsetListenerAdded = false;
 		}
 	}
 
@@ -677,7 +694,10 @@ public class SSCommon implements Serializable {
 	 * Method to remove any SwingSet Component listener(s).
 	 */
 	public void removeSSComponentListener() {
-		ssComponent.removeSSComponentListener();
+		if (ssComponentListenerAdded) {
+			ssComponent.removeSSComponentListener();
+			ssComponentListenerAdded = false;
+		}
 	}
 
 	/**
