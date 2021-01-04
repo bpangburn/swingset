@@ -79,6 +79,22 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 */
 	protected static final Properties ssProps = SSProperties.getProperties();
 	
+	/**
+	 * Arbitrary negative value that can be used as the primary key
+	 * value in a WHERE clause if there is no mapping/null mapping
+	 * for a SSDBComboBox. Null could cause an SQL Exception, but
+	 * an arbitrary should just return with 0 records.
+	 * <p><pre>
+	 * For example:
+	 *     "SELECT * FROM part_data WHERE part_id = {null};"
+	 * may throw an SQL Exception whereas:
+	 *     "SELECT * FROM part_data WHERE part_id = -998877;"
+	 * should execute properly with 0 records returned.
+	 * </pre><p>
+	 * ASSUMES that -998877 would never be a primary/foreign key value.
+	 */
+	public final static long hopefullyNoPKValue = -998877;
+	
 	private Connection connection; // Database connection.
 	private RowSet rowset; // Rowset to be used for screen/form.
 
@@ -279,6 +295,28 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 */
 	protected Connection getConnection() {
 		return connection;
+	}
+	
+	/**
+	 * Convenience method when developer wants to pass the result of
+	 * getSelectedMapping() for a SSDBComboBox directly into the WHERE clause of
+	 * a SQL query. Will either return not null Long from getSelectedMapping
+	 * or hopefullyNoPKValue (-998877), but should never return null.
+	 * <p>
+	 * Presumes that there are no records matching hopefullyNoPKValue (-998877)
+	 * so if this value is returned, the query will not return any records, but
+	 * should not throw a SQL Exception.
+	 * 
+	 * @param _combo combobox for which to retrieve selected mapping
+	 * @return Long containing selectedMapping if not null, otherwise hopefullyNoPKValue
+	 */
+	public static Long getPKForQuery(com.nqadmin.swingset.SSDBComboBox _combo) {
+		Long result = _combo.getSelectedMapping();
+		if (result==null) {
+			result = hopefullyNoPKValue;
+		}
+		
+		return result;
 	}
 	
 	/**
