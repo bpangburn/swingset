@@ -186,7 +186,8 @@ public class Example3 extends JFrame {
 					rs.close();
 
 				// SET OTHER DEFAULTS
-//					 cmbSupplierName.setSelectedValue(0);
+					 logger.debug("Setting default for Supplier Name mapping to 2.");
+					 cmbSupplierName.setSelectedMapping((long) 2);
 //					 cmbPartName.setSelectedValue(0);
 //					 txtQuantity.setText("0");
 
