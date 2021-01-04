@@ -395,7 +395,8 @@ public class SSSyncManager {
 					comboBox.setSelectedMapping(currentRowPK);
 				}
 			} else {
-				comboBox.setSelectedIndex(-1);
+				//comboBox.setSelectedIndex(-1);
+				comboBox.setSelectedMapping(null);
 			}
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
