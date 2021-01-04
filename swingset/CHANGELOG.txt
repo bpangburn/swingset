@@ -30,8 +30,17 @@ Changes:
 	   in formatting package.
 	12.Added line wrapping to SSTextArea.
 	13.Preliminary support for JDBCType enum.
-	14.mysql support for swingset-demo
+	14.mysql support for swingset-demo.
 	15.Deprecated SSRowSet and SSJdbCRowSetImpl. Using RowSet and RowSetOps.
+	16.For GlazedLists, restored the normal JComboBox behavior of not going past
+	   the first or last item.
+	17.Addition of SSFormViewScreenHelper and SSDataGridScreenHelper to utils
+	   package to assist with standardized screen creation.
+	18.Addition of GlazedList support to SSComboBox (enabled by default).
+	19.Support for null/empty first item in combo boxes via special nullItem.
+	20.Addition of hasItems() method to comboboxes to determine when a combo
+	   does not have any items (excluding null first item).
+	21.Demo: added new screens that exercise all available components.
 
 ==============================================================================
 SwingSet 3.0.0 - Released 2020-01-10
