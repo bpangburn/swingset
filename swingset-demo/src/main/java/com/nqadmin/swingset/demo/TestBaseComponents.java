@@ -336,7 +336,7 @@ public class TestBaseComponents extends JFrame {
 			//
 			// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
 				syncManager = new SSSyncManager(cmbSSDBComboNav, navigator);
-				syncManager.setColumnName("swingset_base_test_pk");
+				syncManager.setSyncColumnName("swingset_base_test_pk");
 				syncManager.sync();
 
 			// SETUP COMBO AND LIST OPTIONS

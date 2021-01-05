@@ -133,7 +133,7 @@ public class SSSyncManager {
 
 				// Note that the rowset count starts at 1 whereas combobox index starts at 0.
 
-				final long rowsetPK = rowset.getLong(columnName);
+				final long rowsetPK = rowset.getLong(syncColumnName);
 
 				if (comboPK != rowsetPK) {
 					// long indexOfId = SSSyncManager.this.comboBox.itemMap.get(this.id) + 1;
@@ -148,7 +148,7 @@ public class SSSyncManager {
 					// PERFORM A MANUAL LOOP TO TRY TO FIND A MATCH
 					// PRESUMING RECORDS COULD BE ADDED/DELETED BY OTHER CONNECTIONS, DON'T LOOP
 					// THROUGH ALL OF THE RECORDS MORE THAN ONCE PLUS A CUSHION OF overlapToCheck
-					while (comboPK != rowset.getLong(columnName)) {
+					while (comboPK != rowset.getLong(syncColumnName)) {
 						if (!rowset.next()) {
 							rowset.beforeFirst();
 							rowset.next();
@@ -280,11 +280,6 @@ public class SSSyncManager {
 	private static final int overlapToCheck = 7;
 
 	/**
-	 * RowSet column used as basis for synchronization.
-	 */
-	private String columnName;
-
-	/**
 	 * SSDBComboBox used for record navigation.
 	 */
 	private SSDBComboBox comboBox;
@@ -318,6 +313,13 @@ public class SSSyncManager {
 	 * Indicates if rowset listener is added (or removed)
 	 */
 	private boolean rowsetListenerAdded = false;
+	
+
+	/**
+	 * RowSet column used as basis for synchronization.
+	 */
+	private String syncColumnName;
+
 
 	/**
 	 * <p>
@@ -381,7 +383,7 @@ public class SSSyncManager {
 		try {
 			if ((rowset != null) && (rowset.getRow() > 0)) {
 				// GET THE PRIMARY KEY FOR THE CURRENT RECORD IN THE ROWSET
-				final Long currentRowPK = rowset.getLong(columnName);
+				final Long currentRowPK = rowset.getLong(syncColumnName);
 
 				logger.debug("SSSyncManager().adjustValue() - RowSet value: " + currentRowPK);
 
@@ -393,7 +395,8 @@ public class SSSyncManager {
 					comboBox.setSelectedMapping(currentRowPK);
 				}
 			} else {
-				comboBox.setSelectedIndex(-1);
+				//comboBox.setSelectedIndex(-1);
+				comboBox.setSelectedMapping(null);
 			}
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
@@ -443,9 +446,11 @@ public class SSSyncManager {
 	 * Sets column to be used as basis for synchronization.
 	 *
 	 * @param _columnName RowSet column used as basis for synchronization.
+	 * @deprecated use {@link #setSyncColumnName(java.lang.String) }
 	 */
+	@Deprecated
 	public void setColumnName(final String _columnName) {
-		columnName = _columnName;
+		setSyncColumnName(_columnName);
 	}
 
 	/**
@@ -467,7 +472,16 @@ public class SSSyncManager {
 		dataNavigator = _dataNavigator;
 		rowset = dataNavigator.getRowSet();
 	}
-
+	
+	/**
+	 * Sets column to be used as basis for synchronization.
+	 *
+	 * @param _syncColumnName RowSet column used as basis for synchronization.
+	 */
+	public void setSyncColumnName(final String _syncColumnName) {
+		syncColumnName = _syncColumnName;
+	}
+	
 	/**
 	 * Start synchronization between navigation components.
 	 * 

@@ -38,6 +38,7 @@
 package com.nqadmin.swingset.utils;
 
 import java.awt.Container;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
@@ -52,7 +53,6 @@ import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
-import java.sql.Connection;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 //SSFormViewScreenHelper.java
@@ -399,7 +399,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	private void activateSyncManager() {
 		if (getSyncManager() == null) {
 			setSyncManager(new SSSyncManager(getCmbNavigator(), getDataNavigator()));
-			getSyncManager().setColumnName(getPkColumn());
+			getSyncManager().setSyncColumnName(getPkColumn());
 		}
 
 		getSyncManager().sync();
@@ -662,6 +662,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			// BIND PRIMARY KEY
 			txtPrimaryKey.bind(getRowset(), getPkColumn());
 			
+			// ADD OPTIONS FOR ANY SSComboBoxes()
+			populateSSComboBoxes();
+			
 			// INITIALIZE and BIND SCREEN COMPONENTS
 			bindComponents();
 
@@ -721,6 +724,14 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		logger.error("initScreen() Method no longer supported. These parameters should be passed to the appropriate constructor.");
 		
 	}
+	
+	/**
+	 * Set the Options for any SSComboBoxes (not SSDBComboBoxes).
+	 * <p>
+	 * E.g.,
+	 * {@code #mySSCombobox.setOptions(Arrays.asList(new String[] { "Red", "Green", "Blue" }));}
+	 */
+	protected abstract void populateSSComboBoxes();
 	
 	/**
 	 * Retrieve and set the primary key value for a new record.
