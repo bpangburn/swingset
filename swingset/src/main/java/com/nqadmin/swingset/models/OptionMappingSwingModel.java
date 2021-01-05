@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+ * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -67,7 +67,7 @@ import java.util.Objects;
  * 
  * @see AbstractComboBoxListSwingModel
  * AbstractComboBoxListSwingModel for general description of using this class
- * @see <a href="https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html" target="_blank">GlazedLists AutoCompletion javadoc</a>
+ * @see <a href="https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html" target="_blank" rel="noopener noreferrer">GlazedLists AutoCompletion javadoc</a>
  * 
  * @since 4.0.0
  */

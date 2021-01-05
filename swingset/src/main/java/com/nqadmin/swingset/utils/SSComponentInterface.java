@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+ * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -47,6 +47,7 @@ import java.util.Set;
 
 import javax.sql.RowSet;
 import javax.swing.JComponent;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
 import org.apache.logging.log4j.LogManager;
@@ -71,15 +72,15 @@ public interface SSComponentInterface {
 
 	// TODO Fire property changes where applicable.
 
-	/**
-	 * Convenience method to add both RowSet and SwingSet Component listeners.
-	 * <p>
-	 * Does not add DocumentListener.
-	 */
-	default void addListeners() {
-		addRowSetListener();
-		addSSComponentListener();
-	}
+//	/**
+//	 * Convenience method to add both RowSet and SwingSet Component listeners.
+//	 * <p>
+//	 * Does not add DocumentListener.
+//	 */
+//	default void addListeners() {
+//		addRowSetListener();
+//		addSSComponentListener();
+//	}
 
 	/**
 	 * Adds listener for Document if SwingSet component is a JTextComponent.
@@ -145,7 +146,9 @@ public interface SSComponentInterface {
 		final Set<AWTKeyStroke> forwardKeys = ((JComponent) this)
 				.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
 		final Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
-		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+		if (!(this instanceof JTextArea)) {
+			newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+		}
 		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK));
 		((JComponent) this).setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
 
@@ -317,15 +320,15 @@ public interface SSComponentInterface {
 //		return getRowSet();
 //	}
 
-	/**
-	 * Removes listeners for bound RowSet and SwingSet component.
-	 * <p>
-	 * Does not remove DocumentListener.
-	 */
-	default void removeListeners() {
-		removeRowSetListener();
-		removeSSComponentListener();
-	}
+//	/**
+//	 * Removes listeners for bound RowSet and SwingSet component.
+//	 * <p>
+//	 * Does not remove DocumentListener.
+//	 */
+//	default void removeListeners() {
+//		removeRowSetListener();
+//		removeSSComponentListener();
+//	}
 
 	/**
 	 * Remove the listener detecting changes in value for the current component.

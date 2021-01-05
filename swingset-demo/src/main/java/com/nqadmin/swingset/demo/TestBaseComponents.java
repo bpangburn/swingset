@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+ * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -336,7 +336,7 @@ public class TestBaseComponents extends JFrame {
 			//
 			// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
 				syncManager = new SSSyncManager(cmbSSDBComboNav, navigator);
-				syncManager.setColumnName("swingset_base_test_pk");
+				syncManager.setSyncColumnName("swingset_base_test_pk");
 				syncManager.sync();
 
 			// SETUP COMBO AND LIST OPTIONS

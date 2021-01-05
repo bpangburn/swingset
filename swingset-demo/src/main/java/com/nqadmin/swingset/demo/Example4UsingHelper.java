@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+ * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -119,7 +119,6 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		
 		// Display Screen
 		showUp(_container);
-
 	}
 
 	@Override
@@ -145,10 +144,6 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		txtPartWeight.setPreferredSize(MainClass.ssDim);
 		txtPartCity.setPreferredSize(MainClass.ssDim);
 		
-	// SET COMBO OPTIONS
-		//cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
-		cmbPartColor.setOptions(Arrays.asList(new String[] { "Red", "Green", "Blue" }));
-
 	// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
 		final Container contentPane = getContentPane();
 		contentPane.setLayout(new GridBagLayout());
@@ -202,6 +197,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 
 	@Override
 	protected void bindComponents() throws Exception {
+		
 		//txtPartID.bind(getRowset(), "part_id");
 		txtPartName.bind(getRowset(), "part_name");
 		cmbPartColor.bind(getRowset(), "color_code");
@@ -225,6 +221,14 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	public JMenuBar getJMenuBar() {
 		// nothing to do...
 		return null;
+	}
+	
+	@Override
+	protected void populateSSComboBoxes() {
+		// SET COMBO OPTIONS
+		//cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
+		cmbPartColor.setOptions(Arrays.asList(new String[] { "Red", "Green", "Blue" }));
+		
 	}
 
 	/**
@@ -304,12 +308,12 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	
 	// THIS IS A HACK TO HIDE THE TITLE BAR SINCE WE'RE PUTTING THE JINTERNALFRAME IN ITS OWN JFRAME FOR THE SWINGSET DEMO
 	// https://stackoverflow.com/a/51254020
-    @Override
-    public void setUI(InternalFrameUI _ui) {
-        super.setUI(_ui); // this gets called internally when updating the ui and makes the northPane reappear
-        BasicInternalFrameUI frameUI = (BasicInternalFrameUI) getUI(); // so...
-        if (frameUI != null) frameUI.setNorthPane(null); // lets get rid of it
-    }
+	@Override
+	public void setUI(InternalFrameUI _ui) {
+		super.setUI(_ui); // this gets called internally when updating the ui and makes the northPane reappear
+		BasicInternalFrameUI frameUI = (BasicInternalFrameUI) getUI(); // so...
+		if (frameUI != null) frameUI.setNorthPane(null); // lets get rid of it
+	}
 
 	@Override
 	protected void updateSSDBComboBoxes() {
