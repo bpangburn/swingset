@@ -66,6 +66,8 @@ import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSDbArrayModel;
 import com.nqadmin.swingset.models.SSListItem;
 
+import static com.nqadmin.swingset.models.OptionMappingSwingModel.asOptionMappingSwingModel;
+
 // SSList.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
@@ -341,11 +343,16 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 		removeListSelectionListener(ssListListener);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * Set up OptionMappingSwingModel if parameter matches.
+	 */
 	@Override
-	public void setModel(ListModel<SSListItem> model) {
+	public void setModel(ListModel<SSListItem> _model) {
+		OptionMappingSwingModel<?, ?, ?> model = asOptionMappingSwingModel(_model);
 		optionSwingModel = model instanceof Model ? (Model)model : null;
 
-		super.setModel(model);
+		super.setModel(_model);
 	}
 
 	/**

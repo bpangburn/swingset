@@ -645,7 +645,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		
 		// int result = 0;
 
-		return optionModel.getSize();
+		//return optionModel.getSize();
+		return optionModel.getItemList().size();
 
 		// if (eventList != null) {
 		// 	result = eventList.size();
