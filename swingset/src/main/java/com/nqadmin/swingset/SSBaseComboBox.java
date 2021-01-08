@@ -913,7 +913,12 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			//       setBoundColumnText or RowSetOps.updateColumnText
 
 			String tStringMapping = String.valueOf(mapping);
-			if (!getBoundColumnText().equals(tStringMapping)) {
+			String rowsetValue = getBoundColumnText();
+			if (rowsetValue==null) {
+				if (tStringMapping!=null) {
+					setBoundColumnText(tStringMapping);
+				}
+			} else if (!rowsetValue.equals(tStringMapping)) {
 				setBoundColumnText(tStringMapping);
 			}
 		}
