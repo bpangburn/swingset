@@ -45,9 +45,12 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -55,12 +58,15 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import static com.nqadmin.swingset.utils.SSUtils.objectID;
 
 // AbstractComboBoxListSwingModel.java
 //
@@ -71,10 +77,10 @@ import org.apache.logging.log4j.Logger;
  * list and combobox components. 
  * The class holds a reference to a {@code List<SSListItem>} and
  * it's method {@link #createListItem(java.lang.Object...) }
- * is a factory that creates SSListItem objects. It does not have
+ * is a factory that creates SSListItem objects. It does not have public
  * methods to modify the list; getRemodel and sub-classes provide that.
- * This class implements MutableComboBoxModel; it installs into either
- * JList or JComboBox, adjusting as needed.
+ * Using {@link #install(javax.swing.JComponent, com.nqadmin.swingset.models.AbstractComboBoxListSwingModel, javax.swing.ListCellRenderer)} a proxy that delegates
+ * to this class is installed into a JList or JComboBox.
  * <p>
  * Where possible, this class and subclasses name methods
  * similarly to the List interface, such as "add*", "remove*".
@@ -130,14 +136,28 @@ import org.apache.logging.log4j.Logger;
 // becase if the set is optimized by currentListItem.equals(setListItem)
 // that will say that nothing is changed. So must create a new list item.
 // 
-public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxModel<SSListItem> {
-	private static final long serialVersionUID = 1L;
+public abstract class AbstractComboBoxListSwingModel {
 
 	/** when true, handle combo box selected item (about the events) */
 	private boolean comboBoxModel;
-	/** this has been installed into a JComponent */
+	/** this class (it's proxy) has been installed into a JComponent */
 	private boolean installed;
-	/** do not modify list items in place, create new use set */
+	/** Install this when not using glazed, and send events through this */
+	private final ComboBoxModelProxy modelProxy;
+	/**
+	 * If true, <em>do not</em> modify the listItem's contents
+	 * directly in place by
+	 * using {@link #setElem(int, int, java.lang.Object) }.
+	 * Instead clone list item, modify it, use list.set(clonedItem)
+	 * to insure glazed event for single item changed.
+	 * When this is false, and this is not the actual model,
+	 * a listItem is modified in place.
+	 * <p>
+	 * I think this behavior can be conditional on whether or not
+	 * glazed is used or if this is actually the model.
+	 * In the "right" places could do "modifyListItemWithSet = !installed".
+	 * But it doesn't seem worth the testing for a minor performance gain.
+	 */
 	private final boolean modifyListItemWithSet = true;
 	
 	/**
@@ -222,12 +242,11 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		if(_itemList != null && !_itemList.isEmpty()) {
 			throw new IllegalArgumentException("item list must be empty");
 		}
-		if (eventLogger.isTraceEnabled()) {
-			addEventLogging();
-		}
+
 		itemList = _itemList != null ? _itemList : new ArrayList<>();
 		this.itemNumElems = _itemNumElems;
 		setupNumElems(_itemNumElems);
+		modelProxy = new ComboBoxModelProxy();
 	}
 
 	/**
@@ -245,24 +264,65 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		return comboBoxModel;
 	}
 
-	private void addEventLogging() {
-		addListDataListener(new ListDataListener() {
-			@Override
-			public void intervalAdded(ListDataEvent e) {
-				eventLogger.trace(() -> e.toString());
-			}
-
-			@Override
-			public void intervalRemoved(ListDataEvent e) {
-				eventLogger.trace(() -> e.toString());
-			}
-
-			@Override
-			public void contentsChanged(ListDataEvent e) {
-				eventLogger.trace(() -> e.toString());
-			}
-		});
+	/*package-test*/ ComboBoxModelProxy getProxyJunitTextOnly() {
+		return modelProxy;
 	}
+
+	static class EventLoggingDataListener implements ListDataListener {
+		private final ListModel<?> model;
+		public EventLoggingDataListener(ListModel<?> _model) {
+			model = _model;
+		}
+
+		private String getMsg(ListDataEvent e) {
+
+			int t = e.getType();
+			String eventString = String.format("%s[%d,%d]",
+					t == ListDataEvent.CONTENTS_CHANGED ? "CH"
+							: t == ListDataEvent.INTERVAL_ADDED ? "ADD"
+							: t == ListDataEvent.INTERVAL_REMOVED ? "REM"
+							: "?",
+					e.getIndex0(), e.getIndex1());
+			return String.format("%s: %s", objectID(model), eventString);
+		}
+
+		@Override
+		public void intervalAdded(ListDataEvent e) {
+			eventLogger.trace(() -> getMsg(e));
+		}
+		
+		@Override
+		public void intervalRemoved(ListDataEvent e) {
+			eventLogger.trace(() -> getMsg(e));
+		}
+		
+		@Override
+		public void contentsChanged(ListDataEvent e) {
+			eventLogger.trace(() -> getMsg(e));
+		}
+	}
+
+	/**
+	 * If event logging is enabled, log the model
+	 * unless the model is already logging.
+	 * @param _model the model to log
+	 */
+	// TODO: refine method for adding a model; maybe custom String tag.
+	public static void addEventLogging(ListModel<?> _model) {
+		Objects.requireNonNull(_model);
+		if (!eventLogger.isTraceEnabled()) {
+			return;
+		}
+		if (weakModelSet == null) {
+			weakModelSet = Collections.newSetFromMap(new WeakHashMap<>());
+		}
+		if (weakModelSet.contains(_model)) {
+			return;
+		}
+		weakModelSet.add(_model);
+		_model.addListDataListener(new EventLoggingDataListener(_model));
+	}
+	private static Set<ListModel<?>> weakModelSet;
 
 	//////////////////////////////////////////////////////////////////////////
 	//
@@ -314,12 +374,13 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 			ListCellRenderer<?> render = _render == null
 					? _model.new LocalListCellRenderer() : _render;
 			((JList) _jc).setCellRenderer(render);
-			((JList) _jc).setModel(_model);
+			((JList) _jc).setModel(_model.modelProxy);
+			_model.comboBoxModel = false;
 		} else if (_jc instanceof JComboBox) {
 			ListCellRenderer<?> render = _render == null
 					? _model.new LocalComboBoxCellRenderer() : _render;
 			((JComboBox) _jc).setRenderer(render);
-			((JComboBox) _jc).setModel(_model);
+			((JComboBox) _jc).setModel(_model.modelProxy);
 			_model.comboBoxModel = true;
 		} else {
 			throw new IllegalArgumentException("must be JList or JComboBox");
@@ -354,6 +415,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	protected class LocalListCellRenderer extends DefaultListCellRenderer {
 		private static final long serialVersionUID = 1L;
 
+		/** {@inheritDoc} */
 		@Override
 		public Component getListCellRendererComponent( JList<?> list,
 				Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -371,6 +433,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		// In following, "JList<?> list" gets an error with 1.8 compiler,
 		// and is OK with j-14 compiler. I remember the old one
 		// has some inference issues with nested classes
+		/** {@inheritDoc} */
 		@SuppressWarnings("rawtypes")
 		// TODO Remove warning suppression post Java 8.
 		@Override
@@ -386,141 +449,190 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	// Swing Model methods
 	//
 
-	// ListModel
+	//
+	// A ComboBoxModelProxy is created during construction, see modelProxy. 
+	// This proxy delegates to methods in the AbstractComboBoxListSwingModel,
+	// it's enclosing class. The proxy is not used when glazed.
+	//
+	// The list is managed/modified using a Remodel object.
+	// The Remodel has hooks for locking; the are used when
+	// Glazedlists and it's EventList are used,
+	// see GlazedListsOptionMappingInfo.
+	//
+	// Locking is not provided when this class' proxy is installed
+	// into a JList/JComboBox.
+	// See https://github.com/bpangburn/swingset/issues/52
+	// For a discussion of how that might be achieved.
 
-	/** {@inheritDoc } */
-	@Override
-	public int getSize() {
-		try (Remodel remodel = getRemodel()) {
-			return itemList.size();
-		}
+	/**
+	 * This interface provides a method to get the real
+	 * model from the proxy model.
+	 */
+	public interface ComboBoxListSwingModel {
+
+		/**
+		 * Return the model being proxied.
+		 * @return the model
+		 */
+		AbstractComboBoxListSwingModel getComboBoxListSwingModel();
+	}
+
+	private interface ComboBoxListFireProxy {
+		void doFireContentsChanged(Object source, int index0, int index1);
+		void doFireIntervalAdded(Object source, int index0, int index1);
+		void doFireIntervalRemoved(Object source, int index0, int index1);
 	}
 
 	/** {@inheritDoc } */
-	@Override
-	public SSListItem getElementAt(int index) {
-		try (Remodel remodel = getRemodel()) {
+	@SuppressWarnings("serial")
+	/*package-test*/
+	class ComboBoxModelProxy
+			extends DefaultComboBoxModel<SSListItem>
+			implements ComboBoxListSwingModel
+	{
+		@Override
+		public AbstractComboBoxListSwingModel getComboBoxListSwingModel() {
+			return AbstractComboBoxListSwingModel.this;
+		}
+		
+		private final ComboBoxListFireProxy fire = new ComboBoxListFireProxy() {
+			@Override
+			public void doFireContentsChanged(Object source, int index0, int index1) {
+				fireContentsChanged(source, index0, index1);
+			}
+			
+			@Override
+			public void doFireIntervalAdded(Object source, int index0, int index1) {
+				fireIntervalAdded(source, index0, index1);
+			}
+			
+			@Override
+			public void doFireIntervalRemoved(Object source, int index0, int index1) {
+				fireIntervalRemoved(source, index0, index1);
+			}
+		};
+		
+		//
+		// ListModel
+		//
+		
+		/** {@inheritDoc } */
+		@Override
+		public int getSize() {
+			return itemList.size();
+		}
+		
+		/** {@inheritDoc } */
+		@Override
+		public SSListItem getElementAt(int index) {
 			if (comboBoxModel) {
-				// The DefaultComboBoxModel never throws an exception
-				// Curiously, the DefaultListModel for this same method
-				// does throw an exception.
+				// The DefaultComboBoxModel never throws an exception.
 				if ( index >= 0 && index < itemList.size() )
 					return itemList.get(index);
 				return null;
 			}
+			// DefaultListModel might throw an exception
 			return itemList.get(index);
 		}
-	}
 
-	// ComboBoxModel
-
-	private SSListItem selectedObject;
-
-	/** {@inheritDoc } */
-	@Override
-	public void setSelectedItem(Object anItem) {
-		// TODO: exception if not combo?
-		try (Remodel remodel = getRemodel()) {
+		//
+		// ComboBoxModel
+		//
+		
+		private SSListItem selectedObject;
+		
+		/** {@inheritDoc } */
+		@Override
+		public void setSelectedItem(Object anItem) {
+			// TODO: exception if not combo?
 			if (comboBoxModel) {
 				if (!Objects.equals(selectedObject, anItem)) {
 					if (anItem == null || anItem instanceof SSListItem) {
 						selectedObject = (SSListItem)anItem;
-						fireContentsChanged(this, -1, -1);
+						modelProxy.fire.doFireContentsChanged(this, -1, -1);
 					} else {
 						logger.warn(() -> "ComboBox#setSelectedItem(" + anItem + ") not SSListItem");
 					}
 				}
 			}
 		}
-	}
-
-	/** {@inheritDoc } */
-	@Override
-	public SSListItem getSelectedItem() {
-		// TODO: exception if not combo?
-        return selectedObject;
-	}
-
-	// MutableComboBoxModel
-	//		NOTE the helper methods for keeping selection
-	//			comboAdjustSelectedAfterAdd and comboAdjustSelectedForRemove
-
-	/** {@inheritDoc } */
-	@Override
-	public void addElement(SSListItem item) {
-		try (Remodel remodel = getRemodel()) {
-			remodel.add(item);
+		
+		/** {@inheritDoc } */
+		@Override
+		public SSListItem getSelectedItem() {
+			// TODO: exception if not combo?
+			return selectedObject;
+		}
+		
+		//
+		// MutableComboBoxModel
+		// NOTE the helper methods for keeping selection:
+		//      comboAdjustSelectedAfterAdd and comboAdjustSelectedForRemove
+		//
+		
+		/** {@inheritDoc } */
+		@Override
+		public void addElement(SSListItem item) {
+			add(item);
+		}
+		
+		/** {@inheritDoc } */
+		@Override
+		public void insertElementAt(SSListItem item, int index) {
+			add(index, item);
+		}
+		
+		/** {@inheritDoc } */
+		@Override
+		public void removeElement(Object obj) {
+			remove(obj);
+			if (!(obj instanceof SSListItem)) {
+				logger.warn(() -> "ComboBox#removeElement(" + obj + ") not SSListItem");
+			}
+		}
+		
+		/** {@inheritDoc } */
+		@Override
+		public void removeElementAt(int index) {
+			remove(index);
+		}
+		
+		//
+		// DefaultComboBoxModel (make sure Vector never gets referenced)
+		//
+		
+		// TODO: Add @Override and remove SuppressWarnings annotation post Java 8
+		@SuppressWarnings({"all","javadoc"})
+		/** {@inheritDoc} */
+		// @Override not in jdk1.8
+		public void addAll(int index, Collection<? extends SSListItem> c) {
+			internalAddAll(index, c);
+		}
+		
+		// TODO: Add @Override and remove SuppressWarnings annotation post Java 8
+		@SuppressWarnings({"all","javadoc"})
+		/** {@inheritDoc} */
+		// @Override not in jdk1.8
+		public void addAll(Collection<? extends SSListItem> c) {
+			internalAddAll(c);
+		}
+		
+		/** {@inheritDoc } */
+		@Override
+		public void removeAllElements() {
+			clear();
+		}
+		
+		/** {@inheritDoc } */
+		@Override
+		public int getIndexOf(Object anObject) {
+			return itemList.indexOf(anObject);
 		}
 	}
 
-	/** {@inheritDoc } */
-	@Override
-	public void insertElementAt(SSListItem item, int index) {
-		try (Remodel remodel = getRemodel()) {
-			remodel.add(index, item);
-		}
-	}
-
-	/** {@inheritDoc } */
-	@Override
-	public void removeElement(Object obj) {
-		try (Remodel remodel = getRemodel()) {
-			remodel.remove(obj);
-		}
-		if (!(obj instanceof SSListItem)) {
-			logger.warn(() -> "ComboBox#removeElement(" + obj + ") not SSListItem");
-		}
-	}
-
-	/** {@inheritDoc } */
-	@Override
-	public void removeElementAt(int index) {
-		try (Remodel remodel = getRemodel()) {
-			remodel.remove(index);
-		}
-	}
-
-	// Methods from DefaultComboBoxModel (make sure Vector never gets referenced)
-
-	// TODO: Add @Override and remove SuppressWarnings annotation post Java 8
-	@SuppressWarnings({"all","javadoc"})
-	/** {@inheritDoc} */
-	// @Override not in jdk1.8
-	public void addAll(int index, Collection<? extends SSListItem> c) {
-		try (Remodel remodel = getRemodel()) {
-			remodel.addAll(index, c);
-		}
-	}
-
-	// TODO: Add @Override and remove SuppressWarnings annotation post Java 8
-	@SuppressWarnings({"all","javadoc"})
-	/** {@inheritDoc} */
-	// @Override not in jdk1.8
-	public void addAll(Collection<? extends SSListItem> c) {
-		try (Remodel remodel = getRemodel()) {
-			remodel.addAll(c);
-		}
-	}
-
-	/** {@inheritDoc } */
-	@Override
-	public void removeAllElements() {
-		try (Remodel remodel = getRemodel()) {
-			remodel.clear();
-		}
-	}
-
-	/** {@inheritDoc } */
-	@Override
-	public int getIndexOf(Object anObject) {
-		try (Remodel remodel = getRemodel()) {
-			return remodel.indexOf(anObject);
-		}
-	}
-
-
-
+	//
 	// Helper methods for adjusting selected
+	//
 
 	/**
 	 * After adding what becomes the only list item in the list
@@ -530,8 +642,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	 */
 	private void comboAdjustSelectedAfterAdd(SSListItem item) {
 		if (comboBoxModel) {
-			if ( itemList.size() == 1 && selectedObject == null && item != null ) {
-				setSelectedItem(item);
+			if ( itemList.size() == 1 && modelProxy.selectedObject == null && item != null ) {
+				modelProxy.setSelectedItem(item);
 			}
 		}
 	}
@@ -545,10 +657,10 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	private void comboAdjustSelectedAfterAdd(int oldSize) {
 		if (comboBoxModel) {
 			if (oldSize == 0) {
-				if ( itemList.size() >= 1 && selectedObject == null ) {
+				if ( itemList.size() >= 1 && modelProxy.selectedObject == null ) {
 					SSListItem item = itemList.get(0);
 					if (item != null) {
-						setSelectedItem(item);
+						modelProxy.setSelectedItem(item);
 					}
 				}
 			}
@@ -557,12 +669,13 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	private void comboAdjustSelectedForRemove(int _index) {
 		if (comboBoxModel) {
-			if ( getElementAt( _index ) == selectedObject ) {
+			if ( modelProxy.getElementAt( _index ) == modelProxy.selectedObject ) {
 				if ( _index == 0 ) {
-					setSelectedItem( getSize() == 1 ? null : getElementAt( _index + 1 ) );
+					modelProxy.setSelectedItem( modelProxy.getSize() == 1
+							? null : modelProxy.getElementAt( _index + 1 ) );
 				}
 				else {
-					setSelectedItem( getElementAt( _index - 1 ) );
+					modelProxy.setSelectedItem( modelProxy.getElementAt( _index - 1 ) );
 				}
 			}
 		}
@@ -571,7 +684,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	private void comboAdjustSelectedForClear() {
 		// NOTE seems like should throw change event,
 		// but guess it's covered by the remove event.
-		selectedObject = null;
+		modelProxy.selectedObject = null;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -587,7 +700,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	 * This is used to configure the number of elements in an SSListItem.
 	 * The itemList must be empty.
 	 * 
-	 * @param nElems number of elements, only 2,3 currently supported
+	 * @param nElems number of elements, 1,2,3,4-30 supported
 	 */
 	private void setupNumElems(int nElems) {
 		if (!itemList.isEmpty()) {
@@ -762,14 +875,17 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	//
 	// Modifications, list or item.
 	//
-	// These should only be invoked from constructor or remodel.
+	// Typically should only be invoked from constructor or remodel.
+	//
+	// Exception is some combox model methods invoke directly.
+	// If the models want locking, thier methods must handle locking
 	//
 
 	private boolean add(SSListItem _listItem) {
 		int addAt = itemList.size();
 		boolean isChanged = itemList.add(_listItem);
 		if (isChanged) {
-            fireIntervalAdded(this, addAt, addAt);
+            modelProxy.fire.doFireIntervalAdded(this, addAt, addAt);
 			comboAdjustSelectedAfterAdd(_listItem);
 		}
 		return isChanged;
@@ -777,7 +893,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	private void add(int _index, SSListItem _listItem) {
 		itemList.add(_index, _listItem);
-		fireIntervalAdded(this, _index, _index);
+		modelProxy.fire.doFireIntervalAdded(this, _index, _index);
 		comboAdjustSelectedAfterAdd(_listItem);
 	}
 
@@ -786,7 +902,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		int oldSize = itemList.size();
 		boolean isChanged = itemList.addAll(newItems);
 		if (isChanged) {
-			fireIntervalAdded(this, oldSize, itemList.size()-1);
+			modelProxy.fire.doFireIntervalAdded(this, oldSize, itemList.size()-1);
 			comboAdjustSelectedAfterAdd(oldSize);
 		}
 		return isChanged;
@@ -796,7 +912,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		boolean isChanged = itemList.addAll(index, newItems);
 		int oldSize = itemList.size();
 		if (isChanged) {
-			fireIntervalAdded(this, index, index + newItems.size() - 1);
+			modelProxy.fire.doFireIntervalAdded(this, index, index + newItems.size() - 1);
 			comboAdjustSelectedAfterAdd(oldSize);
 		}
 		return isChanged;
@@ -804,7 +920,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 
 	private SSListItem set(int _index, SSListItem _newItem) {
 		SSListItem oldVal = itemList.set(_index, _newItem);
-		fireContentsChanged(this, _index, _index);
+		modelProxy.fire.doFireContentsChanged(this, _index, _index);
 		return oldVal;
 	}
 
@@ -814,14 +930,14 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 			int firstIndex = 0;
 			int lastIndex = itemList.size() - 1;
 			itemList.clear();
-            fireIntervalRemoved(this, firstIndex, lastIndex);
+            modelProxy.fire.doFireIntervalRemoved(this, firstIndex, lastIndex);
 		}
 	}
 
 	private SSListItem remove(int _index) {
 		comboAdjustSelectedForRemove(_index);
 		SSListItem item = itemList.remove(_index);
-        fireIntervalRemoved(this, _index, _index);
+        modelProxy.fire.doFireIntervalRemoved(this, _index, _index);
 		return item;
 	}
 
@@ -836,7 +952,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	}
 
 	/**
-	 * With the list item at the specified list item index,
+	 * Using the list item at the specified list item index,
 	 * replace an element in the list item at the specified position.
 	 * @param _listItemIndex operate on the list item at this index
 	 * @param _elemIndex index of elem to replace
@@ -849,7 +965,8 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	// but what about glazed lists...
 	private Object setElem(int _listItemIndex, int _elemIndex, Object _newElem) {
 		ListItemWrite0 listItem = (ListItemWrite0) itemList.get(_listItemIndex);
-		if (modifyListItemWithSet) {
+		boolean useClone = modifyListItemWithSet || !installed;
+		if (useClone) {
 			try {
 				listItem = (ListItemWrite0) listItem.clone();
 			} catch (CloneNotSupportedException ex) {
@@ -857,10 +974,10 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		}
 		Object oldElem = listItem.getElem(_elemIndex);
 		listItem.setElem(_elemIndex, _newElem);
-		if (modifyListItemWithSet) {
+		if (useClone) {
 			itemList.set(_listItemIndex, listItem);
 		}
-		fireContentsChanged(this, _listItemIndex, _listItemIndex);
+		modelProxy.fire.doFireContentsChanged(this, _listItemIndex, _listItemIndex);
 		return oldElem;
 	}
 	
@@ -1005,6 +1122,23 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 	 * consistency checks can be placed in this method.
 	 */
 	protected abstract void checkState();
+	
+	/**
+	 * This is invoked during Remodel construction, be careful.
+	 * If there is no locking, implement an empty method
+	 */
+	protected abstract void remodelTakeWriteLock();
+	
+	/**
+	 * This is invoked during Remodel close.
+	 * If there is no locking, implement an empty method.
+	 * <p>
+	 * This method is responsible for setting
+	 * {@code remodel.isClosed = true}
+	 * to prevent re-use
+	 * @param remodel base remodel for re-use handling
+	 */
+	protected abstract void remodelReleaseWriteLock(Remodel remodel);
 
 	/**
 	 * This returns a Remodel which has method for
@@ -1063,23 +1197,11 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 		// /** if optimized indexOfItem, following means must rebuild optimizations */
 		// protected boolean isModifiedLength = false;
 
-		/**
-		 * This is invoked during construction, be careful.
-		 * If there is no locking, implement an empty method
-		 */
-		protected abstract void takeWriteLock();
-
-		/**
-		 * This is invoked during close.
-		 * If there is no locking, implement an empty method
-		 */
-		protected abstract void releaseWriteLock();
-
 		/** a Remodel */
 		// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
 		@SuppressWarnings({"all","OverridableMethodCallInConstructor"})
 		protected Remodel() {
-			takeWriteLock();
+			remodelTakeWriteLock();
 		}
 
 		/**
@@ -1270,8 +1392,7 @@ public abstract class AbstractComboBoxListSwingModel extends DefaultComboBoxMode
 			// 	// NOT NEEDED UNTIL OPTIMIZATIONS
 			// 	// buildEventListItems();
 			// }
-			releaseWriteLock();
-			isClosed = true;
+			remodelReleaseWriteLock(this);
 		}
 	}
 

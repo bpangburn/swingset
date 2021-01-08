@@ -67,6 +67,9 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.matchers.TextMatcherEditor;
 import ca.odell.glazedlists.swing.AutoCompleteSupport;
 
+import static com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.addEventLogging;
+import static com.nqadmin.swingset.models.OptionMappingSwingModel.asOptionMappingSwingModel;
+
 // SSBaseComboBox.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
@@ -196,7 +199,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	protected static class BaseModel<M,O,O2> extends OptionMappingSwingModel<M,O,O2>
 	{
-		private static final long serialVersionUID = 1L;
 
 		/**
 		 * Create model and install it in the specified JComboBox.
@@ -232,7 +234,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	protected static class BaseGlazedModel<M,O,O2> extends GlazedListsOptionMappingInfo<M,O,O2>
 	{
-		private static final long serialVersionUID = 1L;
 
 		/**
 		 * The GlazedLists auto completion support for the
@@ -346,12 +347,14 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	// TODO: throw exception?
 	@Override
 	@SuppressWarnings("unchecked")
-	public void setModel(ComboBoxModel<SSListItem> model) {
+	public void setModel(ComboBoxModel<SSListItem> _model) {
+		addEventLogging(_model);
+		OptionMappingSwingModel<?, ?, ?> model = asOptionMappingSwingModel(_model);
 		optionModel = model instanceof BaseModel ? (BaseModel<M,O,O2>)model
 				: model instanceof BaseGlazedModel ? (BaseGlazedModel<M,O,O2>)model
 				: null;
 
-		super.setModel(model);
+		super.setModel(_model);
 	}
 
 	/**
