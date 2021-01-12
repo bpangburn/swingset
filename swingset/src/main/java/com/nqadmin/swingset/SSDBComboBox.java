@@ -184,12 +184,10 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	@Deprecated
 	public static final int NON_SELECTED = Integer.MIN_VALUE + 1;
 
-	@SuppressWarnings("serial")
 	private static class Model extends SSBaseComboBox.BaseModel<Long, Object, Object>
 	{
 	}
 
-	@SuppressWarnings("serial")
 	private static class GlazedModel extends SSBaseComboBox.BaseGlazedModel<Long, Object, Object>
 	{
 	}

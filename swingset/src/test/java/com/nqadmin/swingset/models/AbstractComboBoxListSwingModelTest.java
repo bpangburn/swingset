@@ -55,7 +55,6 @@ public class AbstractComboBoxListSwingModelTest {
 	public static void tearDownClass() {
 	}
 
-	@SuppressWarnings("serial")
 	static class LI extends AbstractComboBoxListSwingModel {
 		ComboBoxModelProxy proxy;
 

@@ -96,7 +96,6 @@ public class SSListItemFormatTest {
 	public void tearDown() {
 	}
 
-	@SuppressWarnings("serial")
 	static class LI extends AbstractComboBoxListSwingModel {
 
 		public LI(int itemNumElems, List<SSListItem> itemList) {
