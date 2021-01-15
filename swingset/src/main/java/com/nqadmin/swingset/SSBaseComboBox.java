@@ -707,7 +707,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				int keyCode = keyEvent.getKeyCode();
 				if (keyCode == KeyEvent.VK_UP) {
 					logger.trace(() -> String.format("%s: Intercepted UP key.", getColumnForLog()));
-					System.out.println("");
 					if (getSelectedIndex() == 0) {
 						keyEvent.consume();
 						logger.debug(() -> String.format("%s: UP key consumed.", getColumnForLog()));
