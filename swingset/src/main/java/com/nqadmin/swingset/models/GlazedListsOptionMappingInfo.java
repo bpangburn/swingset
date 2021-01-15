@@ -57,7 +57,6 @@ import ca.odell.glazedlists.EventList;
  * @since 4.0.0
  */
 public class GlazedListsOptionMappingInfo<M,O,O2> extends OptionMappingSwingModel<M,O,O2> {
-	private static final long serialVersionUID = 1L;
 	private final EventList<SSListItem> eventList;
 	private boolean hasReturnedEventList;
 

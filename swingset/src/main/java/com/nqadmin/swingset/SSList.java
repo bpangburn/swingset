@@ -115,7 +115,6 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	}
 
 	private static class Model extends OptionMappingSwingModel<Object, String, Object> {
-		private static final long serialVersionUID = 1L;
 		static Model install(JList<SSListItem> _jl) {
 			Model model = new Model();
 			AbstractComboBoxListSwingModel.install(_jl, model);
