@@ -37,11 +37,11 @@
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
-// SSBaseComboBox.java
-
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.Serializable;
@@ -134,10 +134,29 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				logger.debug(() -> String.format("%s: Setting to null.", getColumnForLog()));
 			} else {
 				setBoundColumnText(String.valueOf(mapping));
-				logger.debug(String.format("%s: Setting to %s.",  getColumnForLog(), mapping));
+				logger.debug(() -> String.format("%s: Setting to %s.",  getColumnForLog(), mapping));
 			}
 
 			addRowSetListener();
+		}
+	}
+
+	/**
+	 * Listens/waits for selected item not nullItem. When not nullItem is
+	 * set, selectionPending set to false.
+	 */
+    private final class SSBaseComboBoxItemListener implements ItemListener
+	{
+		@Override
+		public void itemStateChanged(ItemEvent e)
+		{
+			//System.err.println(e.paramString());
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				if (getSelectedItem() != nullItem && selectionPending) {
+					setSelectionPending(false);
+					//System.err.println("itemStateChanged true --> false");
+				}
+			}
 		}
 	}
 
@@ -212,6 +231,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			BaseGlazedModel<M,O,O2> model = new BaseGlazedModel<>();
 			model.autoComplete = AutoCompleteSupport.install(_jc, model.getEventList(), null, model.getListItemFormat());
 			model.autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
+			model.autoComplete.setStrict(true);
 			// RESTORE JCOMBOBOX UP/DOWN ARROW HANDLING OVERRIDING GLAZEDLIST
 			_jc.glazedListArrowHandler();
 			//model.autoComplete.setStrict(true);
@@ -254,6 +274,17 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * Component listener.
 	 */
 	protected final SSBaseComboBoxListener ssBaseComboBoxListener = new SSBaseComboBoxListener();
+
+	/**
+	 * This is used when moving to a new row when getAllowNull() == false 
+	 * and strict glazed is true. The ComboBox needs to be shown empty,
+	 * ie. without a value, until something is selected. After something
+	 * is selected then strict applies.
+	 * 
+	 * There are some event issues check out {@link #setSelectionPending(boolean) }.
+	 * With cleaner event model, Navigator events?, can probably ...
+	 */
+	private boolean selectionPending;
 
 	/**
 	 * The combo model.
@@ -302,6 +333,15 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				: null;
 	}
 
+	/**
+	 * create SSBaseComboBox
+	 */
+	public SSBaseComboBox() {
+		addItemListener(new SSBaseComboBoxItemListener());
+	}
+
+
+
 	/////////////////////////////////////////////////////////////////////////
 	//
 	// Option/Mapping
@@ -334,6 +374,50 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	public boolean hasSelection() {
 		Object item = getSelectedItem();
 		return item != null && item != nullItem;
+	}
+
+	/**
+	 * Typically true when at a new row waiting for use to select something;
+	 * it is as though getAlowNull() is temporarily true.
+	 * @return true if waiting for not nullItem
+	 */
+	public boolean isSelectionPending() {
+		return selectionPending;
+	}
+
+	/**
+	 * Control whether or not waiting for pending user selection. When selectionPending
+	 * is true, there is a nullItem and it is selected in the combo.
+	 * selectionPending is set to false automatically when a non nullItem is selected.
+	 * @param selectionPending true selects a possibly tempory nullItem
+	 */
+	public void setSelectionPending(boolean selectionPending) {
+		if (this.selectionPending == selectionPending) {
+			return;
+		}
+		this.selectionPending = selectionPending;
+
+		adjustForNullItem();
+		if (selectionPending) {
+			// Setting to true from false, select the nullItem;
+			// Events are a problem. After SSDBNavImpl.setSelectionPending
+			// the following ends up in SSBaseComboBoxListener.actionPerformed()
+			// then into setBoundColumnText then exception in RowSetOps.updateColumnText.
+			// TODO: merge this into adjustForNullItem, to avoid extra unregister/register
+			//
+			// Or better, with cleaner event model, like Navigator events,
+			// might be easier to avoid RowSetOps.updateColumnText.
+			// Actually, if there was an error badge next to the ComboBox
+			// (instead of those f*ing dialogs) then when AllowNull is false
+			// the blank combo would start with the error badge after inster row.
+			// That sounds pretty good.
+			final ActionListener[] listeners = unregisterAllActionListeners(this);
+			try {
+				super.setSelectedItem(nullItem);
+			} finally {
+				registerAllActionListeners(this, listeners);
+			}
+		}
 	}
 
 	/**
@@ -598,7 +682,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * If logical null is selected before, keep it selected after.
 	 */
 	protected void adjustForNullItem() {
-		boolean wantNull = getAllowNull() && !isComboBoxNavigator();
+		boolean wantNull = (getAllowNull() || selectionPending) && !isComboBoxNavigator();
 		boolean hasNull = nullItem != null;
 		
 		if (wantNull == hasNull) {
@@ -629,7 +713,8 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				nullItem = null;
 			}
 
-			// only manipulate listeners and selection if needed
+			// Only manipulate listeners and selection if needed.
+			// Note that if selected item was not null, then followin is not entered.
 			if (selectNull || selectNone) {
 				final ActionListener[] listeners = unregisterAllActionListeners(this);
 				try {

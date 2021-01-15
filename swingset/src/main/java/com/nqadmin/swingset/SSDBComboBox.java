@@ -1567,8 +1567,10 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 
 			// THIS SHOULD BE CALLED AS A RESULT OF SOME ACTION ON THE ROWSET SO RESET THE EDITOR STRINGS BEFORE DOING ANYTHING ELSE
 			// This is going to make a little noise in the debug logs since it results in an "extra" call to setSelectedItem()
-			getEditor().setItem("");
 
+			//getEditor().setItem("");
+			// Maybe insures blank in case of later exception.
+			setSelectionPending(true);
 
 			// Combobox primary key column data queried from the database will generally be of data type long.
 			// The bound column text should generally be a long integer as well, but trimming to be safe.

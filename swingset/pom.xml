@@ -79,10 +79,17 @@
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/com.glazedlists/glazedlists -->
 		<dependency>
+			<groupId>com.raelity.3rdparty.com.glazedlists</groupId>
+			<artifactId>glazedlists</artifactId>
+			<version>1.11.1201</version>
+		</dependency>
+		<!--
+		<dependency>
 			<groupId>com.glazedlists</groupId>
 			<artifactId>glazedlists</artifactId>
 			<version>${version.glazedlists}</version>
 		</dependency>
+		-->
 
 		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
 		<dependency>
