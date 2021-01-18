@@ -632,13 +632,13 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * Control whether or not waiting for pending user selection. When selectionPending
 	 * is true, there is a nullItem and it is selected in the combo.
 	 * selectionPending is set to false automatically when a non nullItem is selected.
-	 * @param selectionPending true selects a possibly tempory nullItem
+	 * @param _selectionPending true selects a possibly tempory nullItem
 	 */
-	public void setSelectionPending(boolean selectionPending) {
-		if (this.selectionPending == selectionPending) {
+	public void setSelectionPending(boolean _selectionPending) {
+		if (selectionPending == _selectionPending) {
 			return;
 		}
-		this.selectionPending = selectionPending;
+		selectionPending = _selectionPending;
 
 		adjustForNullItem();
 		if (selectionPending) {
