@@ -21,7 +21,8 @@
 		<version.maven>3.6.3</version.maven>
 		<version.java>1.8</version.java>
 
-		<version.glazedlists>1.11.0</version.glazedlists>
+		<!--<version.glazedlists>1.11.0</version.glazedlists>-->
+		<version.glazedlists>1.11.1201</version.glazedlists>
 		<version.log4j>2.14.0</version.log4j>
 		<version.jdbcrowsetimpl>1.0.2</version.jdbcrowsetimpl>
 
@@ -76,13 +77,19 @@
 		</repository>
 	</distributionManagement>
 
+	<repositories>
+		<repository>
+			<id>oss-sonatype</id>
+			<name>oss-sonatype</name>
+			<url> https://oss.sonatype.org/content/repositories/snapshots/ </url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/com.glazedlists/glazedlists -->
-		<dependency>
-			<groupId>com.raelity.3rdparty.com.glazedlists</groupId>
-			<artifactId>glazedlists</artifactId>
-			<version>1.11.1201</version>
-		</dependency>
 		<!--
 		<dependency>
 			<groupId>com.glazedlists</groupId>
@@ -90,6 +97,14 @@
 			<version>${version.glazedlists}</version>
 		</dependency>
 		-->
+
+		<!--ERNIE RAEL'S CUSTOM SNAPSHOT-->
+    <!-- https://mvnrepository.com/artifact/com.raelity.3rdparty.com.glazedlists -->
+		<dependency>
+		  <groupId>com.raelity.3rdparty.com.glazedlists</groupId>
+		  <artifactId>glazedlists</artifactId>
+		  <version>${version.glazedlists}</version>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
 		<dependency>

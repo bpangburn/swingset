@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+ * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -287,7 +287,7 @@ public class Example4 extends JFrame {
 			//
 			// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
 				syncManager = new SSSyncManager(cmbSelectPart, navigator);
-				syncManager.setColumnName("part_id");
+				syncManager.setSyncColumnName("part_id");
 				syncManager.sync();
 
 			// SET LABEL DIMENSIONS

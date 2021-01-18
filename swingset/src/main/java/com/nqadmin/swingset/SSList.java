@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+ * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -108,9 +108,9 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 		
 		@Override
 		public void valueChanged(final ListSelectionEvent e) {
-			removeListeners();
+			removeRowSetListener();
 			updateRowSet();
-			addListeners();
+			addRowSetListener();
 		}
 	}
 
