@@ -99,12 +99,12 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	public static OptionMappingSwingModel<?,?,?> asOptionMappingSwingModel(ListModel<SSListItem> _model) {
 
 		if (_model instanceof OptionMappingSwingModel) {
-			return (OptionMappingSwingModel) _model;
+			return (OptionMappingSwingModel<?,?,?>) _model;
 		}
 		if (_model instanceof ComboBoxListSwingModel) {
 			Object model = ((ComboBoxListSwingModel)_model).getComboBoxListSwingModel();
 			if (model instanceof OptionMappingSwingModel) {
-				return (OptionMappingSwingModel) model;
+				return (OptionMappingSwingModel<?,?,?>) model;
 			}
 		}
 		return null;
@@ -313,7 +313,7 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	/** {@inheritDoc} */
 	@Override protected void remodelTakeWriteLock() { }
 	/** {@inheritDoc} */
-	@Override protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) { }
+	@Override protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel _remodel) { }
 	
 	/** Methods for inspecting and modifying list info */
 	public class Remodel extends AbstractComboBoxListSwingModel.Remodel {

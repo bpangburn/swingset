@@ -143,12 +143,10 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 {
 	private static final long serialVersionUID = 521308332266885608L;
 
-	@SuppressWarnings("serial")
 	private static class Model extends SSBaseComboBox.BaseModel<Integer, String, Object>
 	{
 	}
 
-	@SuppressWarnings("serial")
 	private static class GlazedModel extends SSBaseComboBox.BaseGlazedModel<Integer, String, Object>
 	{
 	}
