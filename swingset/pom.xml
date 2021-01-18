@@ -77,7 +77,8 @@
 		</repository>
 	</distributionManagement>
 
-	<repositories>
+	<!-- ENABLE IF USING SNAPSHOTS -->
+	<!-- <repositories>
 		<repository>
 			<id>oss-sonatype</id>
 			<name>oss-sonatype</name>
@@ -87,6 +88,7 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	-->
 	
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/com.glazedlists/glazedlists -->
@@ -98,8 +100,8 @@
 		</dependency>
 		-->
 
-		<!--ERNIE RAEL'S CUSTOM SNAPSHOT-->
-    <!-- https://mvnrepository.com/artifact/com.raelity.3rdparty.com.glazedlists -->
+		<!--ERNIE RAEL'S CUSTOM GLAZEDLIST ARTIFACT-->
+		<!-- https://mvnrepository.com/artifact/com.raelity.3rdparty.com.glazedlists -->
 		<dependency>
 		  <groupId>com.raelity.3rdparty.com.glazedlists</groupId>
 		  <artifactId>glazedlists</artifactId>
