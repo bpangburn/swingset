@@ -1003,7 +1003,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			logger.debug(() -> String.format("%s: Setting to null.", getColumnForLog()));
 			setBoundColumnText(null);
 		} else {
-			logger.debug(String.format("%s: Setting to %s.",  getColumnForLog(), mapping));
+			logger.debug(() -> String.format("%s: Setting to %s.",  getColumnForLog(), mapping));
 			// TODO: need to avoid setting to same value
 			// for NavGroupState. Wonder why, avoids event?
 			//setBoundColumnText(String.valueOf(mapping));
