@@ -136,6 +136,10 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 
+// ***********
+// @errael this block that you added is taking place in updateRowset(), which is called at the bottom of this method (actionPerformed() )
+// ***********
+/*
 // ER selection-pending code
 			removeRowSetListener();
 
@@ -147,18 +151,17 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			} else {
 				setBoundColumnText(String.valueOf(mapping));
 				logger.debug(() -> String.format("%s: Setting to %s.",  getColumnForLog(), mapping));
-      }
+      			}
+*/			
 // BP gl-strict-contains code
 			// If this is a combo navigator, SSSyncManager will have it's own listeners.
 			// This is just for keeping a bound column in sync.
 			//
 			// Could be combined with next block, but keeping them separate for debugging.
-      /*
 			if (isComboBoxNavigator()) {
 				logger.debug("{}: Action Listener returning. No bound column.", () -> getColumnForLog());
 				return;
 			}
-      */
 			
 //			// **** GL STRICT/CONTAINS ****
 //			//
