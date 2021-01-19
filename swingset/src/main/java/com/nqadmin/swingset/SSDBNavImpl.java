@@ -147,6 +147,9 @@ public class SSDBNavImpl implements SSDBNav {
             } else if(comps[i] instanceof JTextArea) {
             // IF IT IS A JTextArea, SET TO EMPTY STRING
                 ((JTextArea)comps[i]).setText("");
+            } else if (comps[i] instanceof SSBaseComboBox) {
+            // IF IT IS A SSBaseComboBox THEN SET IT TO 'EMPTY' ITEM BEFORE FIRST ITEM
+                ((SSBaseComboBox<?,?,?>)comps[i]).setSelectionPending(true);
             } else if (comps[i] instanceof JComboBox) {
             // IF IT IS A JComboBox THEN SET IT TO 'EMPTY' ITEM BEFORE FIRST ITEM
                 ((JComboBox<?>)comps[i]).setSelectedIndex(-1);

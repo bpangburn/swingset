@@ -1632,6 +1632,10 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 			if (!hasItems()) {
 				return;
 			}
+      
+      // ER selection-pending code
+      // Maybe insures blank in case of later exception.
+			setSelectionPending(true);
 
 			// SSDBComboBox will generally work with primary key column data queried from the database, which will generally be of data type long.
 			// SSComboBox is generally used with 2 or 4 byte integer columns.
@@ -1640,7 +1644,42 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 			// LOGGING
 			logger.debug("{}: getBoundColumnText() - " + boundColumnText, () -> getColumnForLog());
 
-			// GET THE BOUND VALUE STORED IN THE ROWSET - may throw a NumberFormatException
+// ER selection-pending code
+/*
+			// THIS SHOULD BE CALLED AS A RESULT OF SOME ACTION ON THE ROWSET SO RESET THE EDITOR STRINGS BEFORE DOING ANYTHING ELSE
+			// This is going to make a little noise in the debug logs since it results in an "extra" call to setSelectedItem()
+
+			//getEditor().setItem("");
+			// Maybe insures blank in case of later exception.
+			setSelectionPending(true);
+
+			// Combobox primary key column data queried from the database will generally be of data type long.
+			// The bound column text should generally be a long integer as well, but trimming to be safe.
+			// TODO Consider starting with a Long and passing directly to setSelectedValue(primaryKey). Modify setSelectedValue to accept a Long vs long.
+			final String text = getBoundColumnText();
+
+			logger.trace("{}: getBoundColumnText() - " + text, () -> getColumnForLog());
+
+			// GET THE BOUND VALUE STORED IN THE ROWSET
+			//if (text != null && !(text.equals(""))) {
+			if ((text != null) && !text.isEmpty()) {
+
+				final long primaryKey = Long.parseLong(text);
+
+				logger.debug("{}: Calling setSelectedValue(" + primaryKey + ").", () -> getColumnForLog());
+
+				setSelectedValue(primaryKey);
+
+			} else {
+				logger.debug("{}: Calling setSelectedIndex(-1).", () -> getColumnForLog());
+
+				setSelectedIndex(-1);
+				//updateUI();
+      }
+*/      
+
+// BP gl-strict-contains
+    // GET THE BOUND VALUE STORED IN THE ROWSET - may throw a NumberFormatException
 			Long targetValue = null;
 			if ((boundColumnText != null) && !boundColumnText.isEmpty()) {
 				targetValue = Long.parseLong(boundColumnText);
