@@ -100,7 +100,7 @@
 		</dependency>
 		-->
 
-		<!--ERNIE RAEL'S CUSTOM GLAZEDLIST ARTIFACT-->
+		<!-- ERNIE RAEL'S CUSTOM GLAZEDLIST ARTIFACT -->
 		<!-- https://mvnrepository.com/artifact/com.raelity.3rdparty.com.glazedlists -->
 		<dependency>
 		  <groupId>com.raelity.3rdparty.com.glazedlists</groupId>
