@@ -1633,6 +1633,9 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 				return;
 			}
 
+			// Maybe insures blank in case of later exception.
+			setSelectionPending(true);
+
 			// SSDBComboBox will generally work with primary key column data queried from the database, which will generally be of data type long.
 			// SSComboBox is generally used with 2 or 4 byte integer columns.
 			final String boundColumnText = getBoundColumnText();
