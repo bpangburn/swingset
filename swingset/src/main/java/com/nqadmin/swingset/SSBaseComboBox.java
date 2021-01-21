@@ -923,7 +923,11 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * If logical null is selected before, keep it selected after.
 	 */
 	protected void adjustForNullItem() {
-		boolean wantNull = (getAllowNull() || selectionPending) && !isComboBoxNavigator();
+		// 2021-01-20_BP: Slight modification needed to avoid Beep in combo navigator on
+		//   insert row as SSDBNavImpl calls setSelectionPending(true) and that will fail
+		//   for the combo navigator without this tweak.
+		//boolean wantNull = (getAllowNull() || selectionPending) && !isComboBoxNavigator();
+		boolean wantNull = (getAllowNull() && !isComboBoxNavigator()) || selectionPending;
 		boolean hasNull = nullItem != null;
 		
 		if (wantNull == hasNull) {
