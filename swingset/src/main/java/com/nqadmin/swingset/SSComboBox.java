@@ -143,12 +143,10 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 {
 	private static final long serialVersionUID = 521308332266885608L;
 
-	@SuppressWarnings("serial")
 	private static class Model extends SSBaseComboBox.BaseModel<Integer, String, Object>
 	{
 	}
 
-	@SuppressWarnings("serial")
 	private static class GlazedModel extends SSBaseComboBox.BaseGlazedModel<Integer, String, Object>
 	{
 	}
@@ -877,6 +875,9 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 			if (!hasItems()) {
 				return;
 			}
+			
+			// Maybe insures blank in case of later exception.
+			setSelectionPending(true);
 
 			// SSDBComboBox will generally work with primary key column data queried from the database, which will generally be of data type long.
 			// SSComboBox is generally used with 2 or 4 byte integer columns.

@@ -52,7 +52,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDataNavigator;
-import com.nqadmin.swingset.models.SSListItem;
+//import com.nqadmin.swingset.models.SSListItem;
 
 // SSSyncManager.java
 //
@@ -75,10 +75,10 @@ public class SSSyncManager {
 		
 		private int actionPerformedCount = 0;
 		
-		// **** GL STRICT/CONTAINS ****
-		//
-		// Hopefully lastValidItem can be eliminated once GlazedLists fully supports STRICT/CONTAINS
-		private SSListItem lastValidItem = null;
+//		// **** GL STRICT/CONTAINS ****
+//		//
+//		// Hopefully lastValidItem can be eliminated once GlazedLists fully supports STRICT/CONTAINS
+//		private SSListItem lastValidItem = null;
 
 		private Long comboPK;
 
@@ -102,28 +102,31 @@ public class SSSyncManager {
 				// getSelectedMapping() could return null during initialization.
 				// We check for null/empty rowset in the prior block.
 				if (comboPK==null) {
-					// **** GL STRICT/CONTAINS ****
-					//
-					// Hopefully lastValidItem can be eliminated once GlazedLists fully supports STRICT/CONTAINS
-					if (lastValidItem!=null) {
-					// WE GET A NULL PK WHEN THE USER CLEARS THE COMBO EDITOR. NORMALLY lastValidItem WILL BE THE VERY FIRST RECORD IF THIS HAPPENS.
-						comboBox.setSelectedItem(lastValidItem); 
-					}
+					logger.warn("Null selected in Combo Navigator.");
+					
+//					// **** GL STRICT/CONTAINS ****
+//					//
+//					// Hopefully lastValidItem can be eliminated once GlazedLists fully supports STRICT/CONTAINS
+//					if (lastValidItem!=null) {
+//					// WE GET A NULL PK WHEN THE USER CLEARS THE COMBO EDITOR. NORMALLY lastValidItem WILL BE THE VERY FIRST RECORD IF THIS HAPPENS.
+//						comboBox.setSelectedItem(lastValidItem); 
+//					}
+					
 					return;
 				}
 				
-				// **** GL STRICT/CONTAINS ****
-				//
-				// Hopefully selectedItem and lastValidItem can be eliminated once GlazedLists fully supports STRICT/CONTAINS
-					// EXTRACT AND STORE SELECTED ITEM
-					Object selectedItem = comboBox.getSelectedItem();
-						
-					// THIS SHOULD ALWAYS BE A SSLISTITEM, BUT COULD BE SOME EDGE CASES?
-					if (selectedItem instanceof SSListItem) {
-						lastValidItem = (SSListItem)selectedItem;
-					} else {
-						logger.warn(" -- Selected Item is not a SSListItem.");
-					}
+//				// **** GL STRICT/CONTAINS ****
+//				//
+//				// Hopefully selectedItem and lastValidItem can be eliminated once GlazedLists fully supports STRICT/CONTAINS
+//					// EXTRACT AND STORE SELECTED ITEM
+//					Object selectedItem = comboBox.getSelectedItem();
+//						
+//					// THIS SHOULD ALWAYS BE A SSLISTITEM, BUT COULD BE SOME EDGE CASES?
+//					if (selectedItem instanceof SSListItem) {
+//						lastValidItem = (SSListItem)selectedItem;
+//					} else {
+//						logger.warn(" -- Selected Item is not a SSListItem.");
+//					}
 
 				// UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
 				// This code was removed to improve performance.

@@ -56,17 +56,19 @@ public class AbstractComboBoxListSwingModelTest {
 	}
 
 	static class LI extends AbstractComboBoxListSwingModel {
-		private static final long serialVersionUID = 1L;
+		ComboBoxModelProxy proxy;
 
 		public LI(int itemNumElems, List<SSListItem> itemList) {
 			super(itemNumElems, itemList);
+			proxy = getProxyJunitTextOnly();
 		}
+
 		@Override protected void checkState() { }
+		@Override protected void remodelTakeWriteLock() { }
+		@Override protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) { }
 		@Override protected Remodel getRemodel() { return new RM(); }
 
 		class RM extends AbstractComboBoxListSwingModel.Remodel {
-			@Override protected void takeWriteLock() { }
-			@Override protected void releaseWriteLock() { }
 		}
 	}
 	

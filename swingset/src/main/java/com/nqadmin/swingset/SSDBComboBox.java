@@ -186,12 +186,10 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	@Deprecated
 	public static final int NON_SELECTED = Integer.MIN_VALUE + 1;
 
-	@SuppressWarnings("serial")
 	private static class Model extends SSBaseComboBox.BaseModel<Long, Object, Object>
 	{
 	}
 
-	@SuppressWarnings("serial")
 	private static class GlazedModel extends SSBaseComboBox.BaseGlazedModel<Long, Object, Object>
 	{
 	}
@@ -646,7 +644,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		
 		// int result = 0;
 
-		return optionModel.getSize();
+		//return optionModel.getSize();
+		return optionModel.getItemList().size();
 
 		// if (eventList != null) {
 		// 	result = eventList.size();
@@ -1633,6 +1632,9 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 			if (!hasItems()) {
 				return;
 			}
+
+			// Maybe insures blank in case of later exception.
+			setSelectionPending(true);
 
 			// SSDBComboBox will generally work with primary key column data queried from the database, which will generally be of data type long.
 			// SSComboBox is generally used with 2 or 4 byte integer columns.

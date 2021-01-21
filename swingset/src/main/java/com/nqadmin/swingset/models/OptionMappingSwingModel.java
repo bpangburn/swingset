@@ -42,6 +42,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javax.swing.ListModel;
+
 
 // OptionMappingSwingModel.java
 //
@@ -72,7 +74,6 @@ import java.util.Objects;
  * @since 4.0.0
  */
 public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingModel {
-	private static final long serialVersionUID = 1L;
 
 	/** index of option in SSListItem */
 	// Option IS FIRST. THIS IS THE DEFAULT FOR SSListItemFormat
@@ -88,6 +89,26 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	private final List<?>[] slices = new List<?>[3];
 	/** when true, there can be options2 */
 	private boolean option2Enabled = false;
+
+	/**
+	 * Given some model, if possible return the model
+	 * cast as a OptionMappingSwingModel.
+	 * @param _model model to check
+	 * @return OptionMappingSwingModel or null
+	 */
+	public static OptionMappingSwingModel<?,?,?> asOptionMappingSwingModel(ListModel<SSListItem> _model) {
+
+		if (_model instanceof OptionMappingSwingModel) {
+			return (OptionMappingSwingModel<?,?,?>) _model;
+		}
+		if (_model instanceof ComboBoxListSwingModel) {
+			Object model = ((ComboBoxListSwingModel)_model).getComboBoxListSwingModel();
+			if (model instanceof OptionMappingSwingModel) {
+				return (OptionMappingSwingModel<?,?,?>) model;
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * Create an empty OptionMappingSwingModel .
@@ -280,17 +301,22 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	 */
 	@Override
 	public Remodel getRemodel() {
-		return new Remodel();
+		// default is no locking, re-use the model.
+		if (remodel == null) {
+			remodel = new Remodel();
+		}
+		return remodel;
 	}
-
+	private Remodel remodel;
+	
+	// no locking by default
+	/** {@inheritDoc} */
+	@Override protected void remodelTakeWriteLock() { }
+	/** {@inheritDoc} */
+	@Override protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel _remodel) { }
+	
 	/** Methods for inspecting and modifying list info */
 	public class Remodel extends AbstractComboBoxListSwingModel.Remodel {
-
-		// no locking by default
-		/** {@inheritDoc} */
-		@Override protected void takeWriteLock() { }
-		/** {@inheritDoc} */
-		@Override protected void releaseWriteLock() { }
 		
 		/**
 		 * Return an unmodifiable list of mappings.

@@ -57,8 +57,7 @@ import ca.odell.glazedlists.EventList;
  * @since 4.0.0
  */
 public class GlazedListsOptionMappingInfo<M,O,O2> extends OptionMappingSwingModel<M,O,O2> {
-	private static final long serialVersionUID = 1L;
-	private EventList<SSListItem> eventList;
+	private final EventList<SSListItem> eventList;
 	private boolean hasReturnedEventList;
 
 	/**
@@ -104,29 +103,26 @@ public class GlazedListsOptionMappingInfo<M,O,O2> extends OptionMappingSwingMode
 	public Remodel getRemodel() {
 		return new Remodel();
 	}
-
+	
 	/**
-	 * Remodel that locks the GlazedLists EventList.
+	 * This is called during Remodel construction,
+	 * take the EventList's write lock.
 	 */
-	public class Remodel extends OptionMappingSwingModel<M, O, O2>.Remodel implements AutoCloseable {
-
-		/**
-		 * This is called during construction,
-		 * take the EventList's write lock.
-		 */
-		@Override
-		protected void takeWriteLock() {
-			eventList.getReadWriteLock().writeLock().lock();
-		}
-
-		/**
-		 * This is called during close,
-		 * release the EventList's write lock.
-		 */
-		@Override
-		protected void releaseWriteLock() {
-			eventList.getReadWriteLock().writeLock().unlock();
-		}
+	@Override
+	protected void remodelTakeWriteLock() {
+		eventList.getReadWriteLock().writeLock().lock();
+	}
+	
+	/**
+	 * This is called during Remodel close,
+	 * release the EventList's write lock.
+	 * NOTE: {@code remodel.isClosed = true} prevents re-use of the remodel.
+	 * @param remodel base remodel
+	 */
+	@Override
+	protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {
+		eventList.getReadWriteLock().writeLock().unlock();
+		remodel.isClosed = true;
 	}
 	
 }
