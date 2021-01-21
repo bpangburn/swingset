@@ -135,70 +135,75 @@ public class SSDBNavImpl implements SSDBNav {
 			
 			//logger.debug("Clearing component type of: {}. Loop index=" + i, () -> comps[i].getClass().getSimpleName());
 
-            if (comps[i] instanceof JTextField) {
-                // IF IT IS A SSFormattedTextField SET ITS VALUE TO NULL (to avoid parse exception)
-                   if (comps[i] instanceof SSFormattedTextField) {
-        	       		((SSFormattedTextField)comps[i]).setValue(null);
-                   } else {
-                   // IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING
-		                ((JTextField)comps[i]).setText("");
-                   }
+			if (comps[i] instanceof JTextField) {
+				// IF IT IS A SSFormattedTextField SET ITS VALUE TO NULL (to avoid parse
+				// exception)
+				if (comps[i] instanceof SSFormattedTextField) {
+					((SSFormattedTextField) comps[i]).setValue(null);
+				} else {
+					// IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING
+					((JTextField) comps[i]).setText("");
+				}
 
-            } else if(comps[i] instanceof JTextArea) {
-            // IF IT IS A JTextArea, SET TO EMPTY STRING
-                ((JTextArea)comps[i]).setText("");
-            } else if (comps[i] instanceof SSBaseComboBox) {
-            // IF IT IS A SSBaseComboBox THEN SET IT TO 'EMPTY' ITEM BEFORE FIRST ITEM
-                ((SSBaseComboBox<?,?,?>)comps[i]).setSelectionPending(true);
-            } else if (comps[i] instanceof JComboBox) {
-            // IF IT IS A JComboBox THEN SET IT TO 'EMPTY' ITEM BEFORE FIRST ITEM
-                ((JComboBox<?>)comps[i]).setSelectedIndex(-1);
-            } else if(comps[i] instanceof SSImage) {
-            // IF IT IS A SSImage CLEAR THE IMAGE.
-                ((SSImage)comps[i]).clearImage();
-            } else if(comps[i] instanceof JCheckBox) {
-            // IF IT IS A JCheckBox UNCHECK
-                ((JCheckBox)comps[i]).setSelected(false);
-            } else if(comps[i] instanceof SSLabel) {
-            // IF IT IS A SSLabel, SET TO EMPTY STRING
-                ((SSLabel)comps[i]).setText("");
-            } else if(comps[i] instanceof JLabel) {
-            // IF IT IS A JLabel - DO NOTHING
-            	// nothing to do...
-            } else if(comps[i] instanceof JButton) {
-            // IF IT IS A JButton - DO NOTHING
-            	// nothing to do...
-            } else if(comps[i] instanceof JMenuBar) {
-            // IF IT IS A JMenuBar - DO NOTHING
-            	// nothing to do...
-            } else if(comps[i] instanceof BasicInternalFrameTitlePane) {
-            // IF IT IS A BasicInternalFrameTitlePane (including MetalInternalFrameTitlePane - DO NOTHING)
-            	// nothing to do...
-            } else if(comps[i] instanceof JSlider) {
-            // IF IT IS A JSlider, SET TO AVERAGE OF MIN/MAX VALUES
-                ((JSlider)comps[i]).setValue((((JSlider)comps[i]).getMinimum() + ((JSlider)comps[i]).getMaximum()) / 2);
-            } else if(comps[i] instanceof JRootPane) {
-            // IF IT IS A JRootPane RECURSIVELY SET THE FIELDS
-                setComponents((Container)comps[i]);
-            } else if(comps[i] instanceof JPanel) {
-            // IF IT IS A JPanel RECURSIVELY SET THE FIELDS
-                setComponents((Container)comps[i]);
-            } else if(comps[i] instanceof JLayeredPane) {
-            // IF IT IS A JLayeredPane RECURSIVELY SET THE FIELDS
-                setComponents((Container)comps[i]);
-            } else if(comps[i] instanceof JTabbedPane) {
-            // IF IT IS A JTabbedPane RECURSIVELY SET THE FIELDS
-                setComponents((Container)comps[i]);
-            } else if(comps[i] instanceof JScrollPane) {
-            // IF IT IS A JScrollPane GET THE VIEW PORT AND RECURSIVELY SET THE FIELDS IN VIEW PORT
-                setComponents(((JScrollPane)comps[i]).getViewport());
-            } else {
-            // DIPLAY WARNING FOR UNKNOWN COMPONENT
-            	logger.warn("Encountered unknown component type of: " + comps[i].getClass().getSimpleName() + ". Unable to clear component.");
-            }
+			} else if (comps[i] instanceof JTextArea) {
+				// IF IT IS A JTextArea, SET TO EMPTY STRING
+				((JTextArea) comps[i]).setText("");
+			} else if (comps[i] instanceof SSBaseComboBox) {
+				// IF IT IS A SSBaseComboBox THEN SET IT TO 'EMPTY' ITEM BEFORE FIRST ITEM
+				((SSBaseComboBox<?, ?, ?>) comps[i]).setSelectionPending(true);
+			} else if (comps[i] instanceof JComboBox) {
+				// IF IT IS A JComboBox THEN SET IT TO 'EMPTY' ITEM BEFORE FIRST ITEM
+				((JComboBox<?>) comps[i]).setSelectedIndex(-1);
+			} else if (comps[i] instanceof SSImage) {
+				// IF IT IS A SSImage CLEAR THE IMAGE.
+				((SSImage) comps[i]).clearImage();
+			} else if (comps[i] instanceof JCheckBox) {
+				// IF IT IS A JCheckBox UNCHECK
+				((JCheckBox) comps[i]).setSelected(false);
+			} else if (comps[i] instanceof SSLabel) {
+				// IF IT IS A SSLabel, SET TO EMPTY STRING
+				((SSLabel) comps[i]).setText("");
+			} else if (comps[i] instanceof JLabel) {
+				// IF IT IS A JLabel - DO NOTHING
+				// nothing to do...
+			} else if (comps[i] instanceof JButton) {
+				// IF IT IS A JButton - DO NOTHING
+				// nothing to do...
+			} else if (comps[i] instanceof JMenuBar) {
+				// IF IT IS A JMenuBar - DO NOTHING
+				// nothing to do...
+			} else if (comps[i] instanceof BasicInternalFrameTitlePane) {
+				// IF IT IS A BasicInternalFrameTitlePane (including MetalInternalFrameTitlePane
+				// - DO NOTHING)
+				// nothing to do...
+			} else if (comps[i] instanceof JSlider) {
+				// IF IT IS A JSlider, SET TO AVERAGE OF MIN/MAX VALUES
+				((JSlider) comps[i])
+						.setValue((((JSlider) comps[i]).getMinimum() + ((JSlider) comps[i]).getMaximum()) / 2);
+			} else if (comps[i] instanceof JRootPane) {
+				// IF IT IS A JRootPane RECURSIVELY SET THE FIELDS
+				setComponents((Container) comps[i]);
+			} else if (comps[i] instanceof JPanel) {
+				// IF IT IS A JPanel RECURSIVELY SET THE FIELDS
+				setComponents((Container) comps[i]);
+			} else if (comps[i] instanceof JLayeredPane) {
+				// IF IT IS A JLayeredPane RECURSIVELY SET THE FIELDS
+				setComponents((Container) comps[i]);
+			} else if (comps[i] instanceof JTabbedPane) {
+				// IF IT IS A JTabbedPane RECURSIVELY SET THE FIELDS
+				setComponents((Container) comps[i]);
+			} else if (comps[i] instanceof JScrollPane) {
+				// IF IT IS A JScrollPane GET THE VIEW PORT AND RECURSIVELY SET THE FIELDS IN
+				// VIEW PORT
+				setComponents(((JScrollPane) comps[i]).getViewport());
+			} else {
+				// DIPLAY WARNING FOR UNKNOWN COMPONENT
+				logger.warn("Encountered unknown component type of: " + comps[i].getClass().getSimpleName()
+						+ ". Unable to clear component.");
+			}
 
 // TODO See if there is a way to use a case statement and/or the SwingSet component Enum here.
-            
+
 // 2019-09-29: PROBLEM WITH NEW SWITCH/ENUM IS THAT getSimpleName() RETURNS THE CLASS NAME OF THE CONTAINER SCREEEN
 //   WHICH COULD BE A CHILD ONE ONE OF THE JComponents E.G., XJPanelChildClass
 //
