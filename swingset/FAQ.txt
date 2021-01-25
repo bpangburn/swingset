@@ -9,7 +9,7 @@ Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
     the swingset-demo-x.y.z.jar file for detailed instructions on running
     the demo. The demo README.txt should also be available from:
     https://sourceforge.net/p/swingset/code/ci/master/tree/swingset-demo/README.txt
-        
+
 
 2.  I have set the headers for a SSDataGrid, so why I don't see them on the
     screen?
@@ -25,7 +25,7 @@ Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
     you set the rowset the JTable does not have any columns, so when you try
     to set a renderer SSDataGrid tries to access the specified column from
     JTable, which causes an exception.
-        
+
 
 4.  What happens to my default values and any other custom settings when I
     change my underlying rowset?
@@ -42,7 +42,8 @@ Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
                  dataGrid.setDefaultValues(null,null);
                  
              This will remove all the default values used.
-        
+
+
 5.  I setup a SSDataGrid based on a rowset querying columns "X," "Y," and "Z."
     I made a small change to the underlying query but return the same set of 
     columns. Why are my renderers and/or hidden columns not working as
@@ -56,8 +57,8 @@ Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
     apply the modified rowset to your SSDataGrid, SwingSet continues to use
     the "old" column numbers for any renderers or hidden columns.  You will
     have to supply new renderers/hidden columns for the reordered columns.
-    
-    
+
+
 6. I'm having trouble getting SwingSet to work with MySQL.  Are there any
    special instructions?
 
@@ -66,7 +67,8 @@ Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
 
    There are report of problems with very old versions of the mysql jdbc driver.
    See http://sourceforge.net/forum/forum.php?thread_id=1005899&forum_id=313186
-     
+
+
 7. I see that SSJdbcRowSetImpl and SSRowSet have been deprecated.
 
    SwingSet has been modified to allow for any RowSet implementation.
@@ -75,3 +77,9 @@ Frequently Asked Questions file for the SwingSet Open Toolkit for Java Swing.
    
    com.nqadmin.swingset.datasources.RowSetOps has been added with static
    methods to replace any custom/convenience functions in SSJdbcRowSetImpl.
+
+
+8. Are there instructions for migrating to SwingSet 4.x from earlier 
+   versions?
+   
+   See: https://github.com/bpangburn/swingset/wiki/Migration-to-SwingSet-4.x
