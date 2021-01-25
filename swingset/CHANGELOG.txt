@@ -9,11 +9,10 @@ SwingSet 4.0.0 - Released TBD
 Changes:
 	1. Demo: moved instantiation of MainClass to SwingUtilities.invokeLater()
 	2. Moved recurring data members and logic to SSCommon
-	3. Wrote SSComponentInterface interface to be implemented by all 
+	3. Established SSComponentInterface interface to be implemented by all 
 	   SwingSet components and eliminate redundant code.
 	4. Elimination of bound JTextFields/Document Listeners for components
 	   NOT based on JTextComponent
-	   Elimination of SSTextDocument
 	5. Generic SSDocumentListener in SSCommon deals with multiple calls
 	   better moving logic to changedUpdate() and SwingUtilities.invokeLater()
 	6. Added allowNull flag to SSCommon to allow user to leave certain
@@ -24,14 +23,17 @@ Changes:
 	   new jdbcrowsetimpl Maven artifact. See:
 	   https://github.com/bpangburn/jdbcrowsetimpl
 	9. Moved SSListItem to com.nqadmin.swingset.utils.
-	10.Deleted com.nqadmin.swingset.formatting.helpers package which just
+	10.Deleted com.nqadmin.swingset.formatting.helpers package, which just
 	   contained classes no longer used for SSDBComboBox filtering.
 	11.Deprecated SSBooleanField, SSImageField, SSMemoField, & SSStringField
 	   in formatting package.
 	12.Added line wrapping to SSTextArea.
 	13.Preliminary support for JDBCType enum.
-	14.mysql support for swingset-demo.
-	15.Deprecated SSRowSet and SSJdbCRowSetImpl. Using RowSet and RowSetOps.
+	14.Demo: mysql support.
+	15.Deprecated SSConnection, SSRowSet, and SSJdbcRowSetImpl. Now using
+	   java.sql.Connection, javax.sql.RowSet (com.nqadmin.rowset.JdbcRowSetImpl),
+	   and com.nqadmin.swingset.datasources.RowSetOps, which is a utility class
+	   with RowSet convenience methods.
 	16.For GlazedLists, restored the normal JComboBox behavior of not going past
 	   the first or last item.
 	17.Addition of SSFormViewScreenHelper and SSDataGridScreenHelper to utils
