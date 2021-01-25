@@ -45,6 +45,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JList;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
@@ -144,7 +145,9 @@ public class SSDBNavImpl implements SSDBNav {
 					// IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING
 					((JTextField) comps[i]).setText("");
 				}
-
+			} else if (comps[i] instanceof JList) {
+				// IF IT IS A JList, CLEAR IT
+				((JList<?>) comps[i]).clearSelection();
 			} else if (comps[i] instanceof JTextArea) {
 				// IF IT IS A JTextArea, SET TO EMPTY STRING
 				((JTextArea) comps[i]).setText("");
