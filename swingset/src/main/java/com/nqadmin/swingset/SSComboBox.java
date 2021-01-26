@@ -342,6 +342,27 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	public Component getComponent() {
 		return this;
 	}
+	
+	/**
+	 * Return the selected enum.
+	 * 
+	 * @param <T> type of enum
+	 * @return selected enum.
+	 * @throws IllegalStateException if not an enum.
+	 */
+	public <T extends Enum<T>> T getSelectedEnum() {
+		if (enumOption == null) {
+			throw new IllegalStateException("SSComboBox values not an enum");
+		}
+		Integer mapping = getSelectedMapping();
+		if (mapping == null) {
+			return null;
+		}
+		@SuppressWarnings("unchecked")
+		T enumVal = (T) enumOption.getEnumConstants()[mapping];
+		
+		return enumVal;
+	}
 
 	/**
 	 * Returns the underlying values for each of the items in the combo box (e.g.
