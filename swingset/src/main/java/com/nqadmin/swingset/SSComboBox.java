@@ -419,7 +419,10 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 *
 	 * @return returns the value associated with the selected item
 	 * OR null if nothing is selected.
+	 * 
+	 * @deprecated use {@link #getSelectedMapping() }
 	 */
+	@Deprecated
 	public Integer getSelectedValue() {
 		return getSelectedMapping();
 	}
@@ -799,8 +802,11 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * {@link SSBaseComboBox#setSelectedMapping(java.lang.Object) setSelectedMapping(Integer)}
 	 * is the preferred/alternative method.
 	 * @param _value value
+	 * 
+	 * @deprecated use {@link SSBaseComboBox#setSelectedMapping(java.lang.Object) setSelectedMapping(Integer)}
 	 */
-	public void setSelectedValue(final Integer _value) {
+	@Deprecated
+	public void setSelectedValue(final int _value) {
 		setSelectedMapping(_value);
 	}
 
