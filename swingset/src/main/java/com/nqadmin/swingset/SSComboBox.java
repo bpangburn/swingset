@@ -487,7 +487,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 */
 	@Deprecated
 	public void setOption(final int _options, final int[] _mappings) {
-		setPredefinedOptionsInternal(predefinedOptions, _mappings);
+		setPredefinedOptionsInternal(_options, _mappings);
 		// setPredefinedOptions(_options);
 		// setMappings(_mappings);
 	}
