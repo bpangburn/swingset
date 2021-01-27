@@ -346,11 +346,10 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	/**
 	 * Return the selected enum.
 	 * 
-	 * @param <T> type of enum
 	 * @return selected enum.
 	 * @throws IllegalStateException if not an enum.
 	 */
-	public <T extends Enum<T>> T getSelectedEnum() {
+	public Enum<?> getSelectedEnum() {
 		if (enumOption == null) {
 			throw new IllegalStateException("SSComboBox values not an enum");
 		}
@@ -358,10 +357,8 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 		if (mapping == null) {
 			return null;
 		}
-		@SuppressWarnings("unchecked")
-		T enumVal = (T) enumOption.getEnumConstants()[mapping];
 		
-		return enumVal;
+		return (Enum<?>)enumOption.getEnumConstants()[mapping];
 	}
 
 	/**
@@ -707,7 +704,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 		// But what's wrong with toString()
 
 		enumOption = _enumOptions;
-		setOptions(Stream.of(_enumOptions.getEnumConstants())
+		setOptionsInternal(Stream.of(_enumOptions.getEnumConstants())
 				.map(e -> e.toString()).collect(Collectors.toList()), null);
 	}
 
