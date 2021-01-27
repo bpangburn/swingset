@@ -717,13 +717,26 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			logger.trace("{}: mappings - [{}].", () -> getColumnForLog(), () ->  remodel.getMappings().toString());
 		}
 	}
-	
-	
-	
-	// TODO getSelectedOption()
-	
-	
-	
+
+	/**
+	 * Returns the Option corresponding to the currently selected item in the
+	 * combobox.
+	 *
+	 * @return returns the Option object associated with the selected item
+	 * OR null if nothing is selected.
+	 */
+	public O getSelectedOption() {
+		O result = null;
+
+		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
+			Object item = getSelectedItem();
+			if (item instanceof SSListItem) {
+				result = remodel.getOption((SSListItem)item);
+			}
+		}
+
+		return result;
+	}
 
 	/**
 	 * Finds the listItem having option that matches the specified option
