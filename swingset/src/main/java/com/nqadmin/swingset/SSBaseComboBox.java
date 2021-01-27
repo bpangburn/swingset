@@ -285,6 +285,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			
 			model.autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
 			model.autoComplete.setStrict(true);
+			model.autoComplete.setPositionCaretTowardZero(true);
 
 			// RESTORE JCOMBOBOX UP/DOWN ARROW HANDLING OVERRIDING GLAZEDLIST
 			_jc.glazedListArrowHandler();
@@ -715,6 +716,26 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			logger.trace("{}: options - [{}].", () -> getColumnForLog(), () ->  remodel.getOptions().toString());
 			logger.trace("{}: mappings - [{}].", () -> getColumnForLog(), () ->  remodel.getMappings().toString());
 		}
+	}
+
+	/**
+	 * Returns the Option corresponding to the currently selected item in the
+	 * combobox.
+	 *
+	 * @return returns the Option object associated with the selected item
+	 * OR null if nothing is selected.
+	 */
+	public O getSelectedOption() {
+		O result = null;
+
+		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
+			Object item = getSelectedItem();
+			if (item instanceof SSListItem) {
+				result = remodel.getOption((SSListItem)item);
+			}
+		}
+
+		return result;
 	}
 
 	/**

@@ -22,7 +22,7 @@
 		<version.java>1.8</version.java>
 
 		<!--<version.glazedlists>1.11.0</version.glazedlists>-->
-		<version.glazedlists>1.11.1201</version.glazedlists>
+		<version.glazedlists>1.11.1203-SNAPSHOT</version.glazedlists>
 		<version.log4j>2.14.0</version.log4j>
 		<version.jdbcrowsetimpl>1.0.2</version.jdbcrowsetimpl>
 
@@ -78,7 +78,7 @@
 	</distributionManagement>
 
 	<!-- ENABLE IF USING SNAPSHOTS -->
-	<!-- <repositories>
+	<repositories>
 		<repository>
 			<id>oss-sonatype</id>
 			<name>oss-sonatype</name>
@@ -88,7 +88,6 @@
 			</snapshots>
 		</repository>
 	</repositories>
-	-->
 	
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/com.glazedlists/glazedlists -->

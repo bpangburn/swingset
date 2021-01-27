@@ -342,6 +342,24 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	public Component getComponent() {
 		return this;
 	}
+	
+	/**
+	 * Return the selected enum.
+	 * 
+	 * @return selected enum.
+	 * @throws IllegalStateException if not an enum.
+	 */
+	public Enum<?> getSelectedEnum() {
+		if (enumOption == null) {
+			throw new IllegalStateException("SSComboBox values not an enum");
+		}
+		Integer mapping = getSelectedMapping();
+		if (mapping == null) {
+			return null;
+		}
+		
+		return (Enum<?>)enumOption.getEnumConstants()[mapping];
+	}
 
 	/**
 	 * Returns the underlying values for each of the items in the combo box (e.g.
@@ -398,7 +416,10 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 *
 	 * @return returns the value associated with the selected item
 	 * OR null if nothing is selected.
+	 * 
+	 * @deprecated use {@link #getSelectedMapping() }
 	 */
+	@Deprecated
 	public Integer getSelectedValue() {
 		return getSelectedMapping();
 	}
@@ -683,7 +704,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 		// But what's wrong with toString()
 
 		enumOption = _enumOptions;
-		setOptions(Stream.of(_enumOptions.getEnumConstants())
+		setOptionsInternal(Stream.of(_enumOptions.getEnumConstants())
 				.map(e -> e.toString()).collect(Collectors.toList()), null);
 	}
 
@@ -778,8 +799,11 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * {@link SSBaseComboBox#setSelectedMapping(java.lang.Object) setSelectedMapping(Integer)}
 	 * is the preferred/alternative method.
 	 * @param _value value
+	 * 
+	 * @deprecated use {@link SSBaseComboBox#setSelectedMapping(java.lang.Object) setSelectedMapping(Integer)}
 	 */
-	public void setSelectedValue(final Integer _value) {
+	@Deprecated
+	public void setSelectedValue(final int _value) {
 		setSelectedMapping(_value);
 	}
 
