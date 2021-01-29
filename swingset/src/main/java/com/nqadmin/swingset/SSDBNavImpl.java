@@ -66,17 +66,15 @@ import com.nqadmin.swingset.formatting.SSFormattedTextField;
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * Custom implementation of SSDBNav that clears/resets the various
- * database-aware fields on a screen when the user adds a new record. To achieve
- * this, special implementation of the performPreInsertOps() method is provided.
- * An instance of this class can be created for the container where the fields
- * are to be cleared and passed to the data navigator.
+ * Custom implementation of SSDBNav that overrides performPreInsertOps() to
+ * clear/reset the various database-aware fields on a screen when the user adds
+ * a new record. An instance of this class can be created for the container
+ * where the fields are to be cleared and passed to the data navigator.
  * <p>
  * The data navigator will call the performPreInsertOps() method whenever the
  * user presses the insert button on the navigator. This functions recursively
- * clears any JTextFields, JTextAreas, and SSCheckBoxes, and if their are any
- * SSComboBoxes or SSDBComboBoxes they will be reset to the first item in the
- * list.
+ * clears (null, empty string, deselect) any SwingSet components or other
+ * JComponents on the screen
  * <p>
  * This recursive behavior performed on all the components inside the JPanel or
  * JTabbedPane inside the specified container.
@@ -204,61 +202,6 @@ public class SSDBNavImpl implements SSDBNav {
 				logger.warn("Encountered unknown component type of: " + comps[i].getClass().getSimpleName()
 						+ ". Unable to clear component.");
 			}
-
-// TODO See if there is a way to use a case statement and/or the SwingSet component Enum here.
-
-// 2019-09-29: PROBLEM WITH NEW SWITCH/ENUM IS THAT getSimpleName() RETURNS THE CLASS NAME OF THE CONTAINER SCREEEN
-//   WHICH COULD BE A CHILD ONE ONE OF THE JComponents E.G., XJPanelChildClass
-//
-// HAVE TO SEE IF WE CAN GET THE NAME OF THE SUPER CLASS
-
-/*
-			SSComponent ssComponent = SSComponent.valueOf(comps[i].getClass().getSimpleName());
-			switch (ssComponent) {
-			case JPanel:
-				// RECURSIVELY SET COMPONENTS ON JPANEL
-				setComponents((Container) comps[i]);
-				break;
-			case JScrollPane:
-				// RECURSIVELY SET COMPONENTS ON JSCROLLPANE VIEWPORT
-				setComponents(((JScrollPane) comps[i]).getViewport());
-				break;
-			case JTabbedPane:
-				// RECURSIVELY SET COMPONENTS ON JTABBEDPANE
-				setComponents((Container) comps[i]);
-				break;
-			case SSCheckBox:
-				((SSCheckBox) comps[i]).setSelected(false);
-				break;
-			case SSComboBox:
-				((SSComboBox) comps[i]).setSelectedIndex(-1);
-				break;
-			case SSFormattedTextField:
-				((SSFormattedTextField) comps[i]).setValue(null);
-				break;
-			case SSImage:
-				((SSImage) comps[i]).clearImage();
-				break;
-			case SSLabel:
-				((SSLabel) comps[i]).setText("");
-				break;
-			case SSSlider:
-				((SSSlider) comps[i])
-						.setValue((((SSSlider) comps[i]).getMinimum() + ((SSSlider) comps[i]).getMaximum()) / 2);
-				break;
-			case SSTextArea:
-				((SSTextArea) comps[i]).setText("");
-				break;
-			case SSTextField:
-				((SSTextField) comps[i]).setText("");
-				break;
-
-			default:
-            	logger.warn("Encountered unknown component type of: " + comps[i].getClass().getSimpleName() + ". Unable to clear component.");
-				break;
-
-			}
-*/
 
 		}
 
