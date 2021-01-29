@@ -81,9 +81,9 @@ public class MainClass extends JFrame {
 	private static final Map<String, Object> globalHints = new HashMap<>();
 
 	/**
-     * ActionListener implementation to call code for each button.
-     */
-    private class MyButtonListener implements ActionListener{
+	 * ActionListener implementation to call code for each button.
+	 */
+	private class MyButtonListener implements ActionListener {
 
 		public MyButtonListener() {
 			super();
@@ -91,60 +91,57 @@ public class MainClass extends JFrame {
 
 		@SuppressWarnings("unused")
 		@Override
-		public void actionPerformed( final ActionEvent ae){
+		public void actionPerformed(final ActionEvent ae) {
 			final Map<String, Object> hints = new HashMap<>(globalHints);
 
-            if(ae.getSource().equals(btnExample1)){
-            	logger.debug("**** Opening Example1 ****");
-                new Example1(dbConnection);
-            }
-            else if(ae.getSource().equals(btnExample2)){
-            	logger.debug("**** Opening Example2 ****");
-            	new Example2(dbConnection);
-            }
-            else if(ae.getSource().equals(btnExample3)){
-            	logger.debug("**** Opening Example3 ****");
-            	new Example3(dbConnection);
-            }
-            else if(ae.getSource().equals(btnExample4)){
-            	logger.debug("**** Opening Example4 ****");
-            	new Example4(dbConnection);
-            }
-            else if(ae.getSource().equals(btnExample4UsingHelper)){
-            	logger.debug("**** Opening Example4UsingHelper ****");
-            	JFrame e4JFrame = new JFrame("Example4UsingHelper");
-            	e4JFrame.add(new Example4UsingHelper(dbConnection, e4JFrame));
-            	e4JFrame.setLocation(DemoUtil.getChildScreenLocation("Example4UsingHelper"));
-            	e4JFrame.setVisible(true);
-            	e4JFrame.pack();
-            }
-            else if(ae.getSource().equals(btnExample5)){
-            	logger.debug("**** Opening Example5 ****");
-            	new Example5(dbConnection);
-            }
-            else if(ae.getSource().equals(btnExample6)){
-            	logger.debug("**** Opening Example6 ****");
-            	new Example6(dbConnection);
-            }
-            else if(ae.getSource().equals(btnExample7)){
-            	logger.debug("**** Opening Example7 ****");
-            	new Example7(dbConnection);
-            }
-            else if(ae.getSource().equals(btnTestBase)){
-            	logger.debug("**** Opening TestBaseComponents ****");
-            	new TestBaseComponents(dbConnection, hints);
-            }
-            else if(ae.getSource().equals(btnTestGrid)){
-            	logger.debug("**** TestGridComponents not implemented ****");
-            	// TODO
-            	//new TestGridComponents(dbConnection);
-            }
-            else if(ae.getSource().equals(btnTestFormatted)){
-            	logger.debug("**** Opening TestFormattedComponents ****");
-            	new TestFormattedComponents(dbConnection);
-            }
-        }
-    }
+			if (ae.getSource().equals(btnExample1)) {
+				logger.debug("**** Opening Example1 ****");
+				new Example1(dbConnection);
+			} else if (ae.getSource().equals(btnExample2)) {
+				logger.debug("**** Opening Example2 ****");
+				new Example2(dbConnection);
+			} else if (ae.getSource().equals(btnExample3)) {
+				logger.debug("**** Opening Example3 ****");
+				new Example3(dbConnection);
+			} else if (ae.getSource().equals(btnExample4)) {
+				logger.debug("**** Opening Example4 ****");
+				new Example4(dbConnection);
+			} else if (ae.getSource().equals(btnExample4UsingHelper)) {
+				logger.debug("**** Opening Example4UsingHelper ****");
+				JFrame e4JFrame = new JFrame("Example4UsingHelper");
+				e4JFrame.add(new Example4UsingHelper(dbConnection, e4JFrame));
+				e4JFrame.setLocation(DemoUtil.getChildScreenLocation("Example4UsingHelper"));
+				e4JFrame.setVisible(true);
+				e4JFrame.pack();
+			} else if (ae.getSource().equals(btnExample5)) {
+				logger.debug("**** Opening Example5 ****");
+				new Example5(dbConnection);
+			} else if (ae.getSource().equals(btnExample6)) {
+				logger.debug("**** Opening Example6 ****");
+				new Example6(dbConnection);
+			} else if (ae.getSource().equals(btnExample7)) {
+				logger.debug("**** Opening Example7 ****");
+				new Example7(dbConnection);
+			} else if (ae.getSource().equals(btnExample7UsingHelper)) {
+				logger.debug("**** Opening Example7UsingHelper ****");
+				JFrame e7JFrame = new JFrame("Example7UsingHelper");
+				e7JFrame.add(new Example7UsingHelper(dbConnection, e7JFrame));
+				e7JFrame.setLocation(DemoUtil.getChildScreenLocation("Example7UsingHelper"));
+				e7JFrame.setVisible(true);
+				e7JFrame.pack();
+			} else if (ae.getSource().equals(btnTestBase)) {
+				logger.debug("**** Opening TestBaseComponents ****");
+				new TestBaseComponents(dbConnection, hints);
+			} else if (ae.getSource().equals(btnTestGrid)) {
+				logger.debug("**** TestGridComponents not implemented ****");
+				// TODO
+				// new TestGridComponents(dbConnection);
+			} else if (ae.getSource().equals(btnTestFormatted)) {
+				logger.debug("**** Opening TestFormattedComponents ****");
+				new TestFormattedComponents(dbConnection);
+			}
+		}
+	}
 
 	/**
 	 * component dimensions
@@ -152,23 +149,25 @@ public class MainClass extends JFrame {
 	protected static final int buttonHeight = 25;
 	protected static final int buttonWidth = 250;
 	protected static final Dimension buttonDim = new Dimension(buttonWidth, buttonHeight);
-	
+
 	protected static final int gridColumnWidth = 60;
-	
+
 	private static final int labelHeight = 20;
 	private static final int labelHeightTall = 100; // used for lists, textareas
-	private static final int labelHeightVeryTall = 100;  // used for images
+	private static final int labelHeightVeryTall = 100; // used for images
 	private static final int labelWidth = 200;
-	
+
 	protected static final Dimension labelDim = new Dimension(labelWidth, labelHeight);
-	protected static final Dimension labelDimTall = new Dimension(labelWidth, labelHeightTall); // used for lists, textareas
-	protected static final Dimension labelDimVeryTall = new Dimension(labelWidth, labelHeightVeryTall); // used for images
-	
+	protected static final Dimension labelDimTall = new Dimension(labelWidth, labelHeightTall); // used for lists,
+																								// textareas
+	protected static final Dimension labelDimVeryTall = new Dimension(labelWidth, labelHeightVeryTall); // used for
+																										// images
+
 	private static final int ssHeight = 20;
 	private static final int ssHeightTall = 100; // used for lists, textareas
 	private static final int ssHeightVeryTall = 200; // used for images
 	private static final int ssWidth = 200;
-	
+
 	protected static final Dimension ssDim = new Dimension(ssWidth, ssHeight);
 	protected static final Dimension ssDimTall = new Dimension(ssWidth, ssHeightTall); // used for lists, textareas
 	protected static final Dimension ssDimVeryTall = new Dimension(ssWidth, ssHeightVeryTall); // used for images
@@ -185,14 +184,14 @@ public class MainClass extends JFrame {
 	private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
 
 	private static final boolean USE_IN_MEMORY_DATABASE = true;
-	 
+
 	private static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
 	private static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
 	private static final String DATABASE_SCRIPT_TEST_IMAGES = "swingset_tests_load_blobs.sql";
-	
-    private Connection dbConnection = null;
-    
-    /**
+
+	private Connection dbConnection = null;
+
+	/**
 	 * buttons to launch code examples
 	 */
 	private JButton btnExample1 = new JButton("Example1");
@@ -203,6 +202,7 @@ public class MainClass extends JFrame {
 	private JButton btnExample5 = new JButton("Example5");
 	private JButton btnExample6 = new JButton("Example6");
 	private JButton btnExample7 = new JButton("Example7");
+	private JButton btnExample7UsingHelper = new JButton("Example7 Using Helper");
 	private JButton btnTestBase = new JButton("Test Base Components");
 	private JButton btnTestFormatted = new JButton("Test Formatted Components");
 	private JButton btnTestGrid = new JButton("Test Grid Components");
@@ -210,93 +210,96 @@ public class MainClass extends JFrame {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(MainClass.class);
+	private static final Logger logger = LogManager.getLogger(MainClass.class);
 	private static final boolean RUN_SQL_SCRIPTS = true;
-	
+
 	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -6316984401822746124L;
 
-    /**
-     * Constructor for MainClass
-     */
-    public MainClass(){
+	/**
+	 * Constructor for MainClass
+	 */
+	public MainClass() {
 
-        // SETUP WINDOW
-	    	super("SwingSet Demo");
-	        setSize(300,300);
-	        setDefaultCloseOperation(EXIT_ON_CLOSE);
-		
-	    // ECHO WORKING DIRECTORY
-	        logger.info("Working Directory = " +
-	                System.getProperty("user.dir"));
+		// SETUP WINDOW
+		super("SwingSet Demo");
+		setSize(300, 300);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-	    // INITIALIZE DATABASE
-			if ("h2".equals(dbname)) {
-				dbConnection = getDatabase();
-			} else {
-				databaseSetup.run();
-				dbConnection = databaseSetup.getConnection();
-			}
-    		if (dbConnection == null) {
-				logger.fatal("Error initializing database. Exiting.");
-				System.exit(1);
-    		}
+		// ECHO WORKING DIRECTORY
+		logger.info("Working Directory = " + System.getProperty("user.dir"));
 
-	    // ADD ACTION LISTENERS FOR BUTTONS
-	        btnExample1.addActionListener( new MyButtonListener());
-	        btnExample2.addActionListener( new MyButtonListener());
-	        btnExample3.addActionListener( new MyButtonListener());
-	        btnExample4.addActionListener( new MyButtonListener());
-	        btnExample4UsingHelper.addActionListener( new MyButtonListener());
-	        btnExample5.addActionListener( new MyButtonListener());
-	        btnExample6.addActionListener( new MyButtonListener());
-	        btnExample7.addActionListener( new MyButtonListener());
-	        btnTestBase.addActionListener( new MyButtonListener());
-	        btnTestGrid.addActionListener( new MyButtonListener());
-	        btnTestFormatted.addActionListener( new MyButtonListener());
+		// INITIALIZE DATABASE
+		if ("h2".equals(dbname)) {
+			dbConnection = getDatabase();
+		} else {
+			databaseSetup.run();
+			dbConnection = databaseSetup.getConnection();
+		}
+		if (dbConnection == null) {
+			logger.fatal("Error initializing database. Exiting.");
+			System.exit(1);
+		}
 
-        // SET BUTTON DIMENSIONS
-	        btnExample1.setPreferredSize(buttonDim);
-	        btnExample2.setPreferredSize(buttonDim);
-	        btnExample3.setPreferredSize(buttonDim);
-	        btnExample4.setPreferredSize(buttonDim);
-	        btnExample4UsingHelper.setPreferredSize(buttonDim);
-	        btnExample5.setPreferredSize(buttonDim);
-	        btnExample6.setPreferredSize(buttonDim);
-	        btnExample7.setPreferredSize(buttonDim);
-	        btnTestBase.setPreferredSize(buttonDim);
-	        btnTestGrid.setPreferredSize(buttonDim);
-	        btnTestFormatted.setPreferredSize(buttonDim);
+		// ADD ACTION LISTENERS FOR BUTTONS
+		btnExample1.addActionListener(new MyButtonListener());
+		btnExample2.addActionListener(new MyButtonListener());
+		btnExample3.addActionListener(new MyButtonListener());
+		btnExample4.addActionListener(new MyButtonListener());
+		btnExample4UsingHelper.addActionListener(new MyButtonListener());
+		btnExample5.addActionListener(new MyButtonListener());
+		btnExample6.addActionListener(new MyButtonListener());
+		btnExample7.addActionListener(new MyButtonListener());
+		btnExample7UsingHelper.addActionListener(new MyButtonListener());
+		btnTestBase.addActionListener(new MyButtonListener());
+		btnTestGrid.addActionListener(new MyButtonListener());
+		btnTestFormatted.addActionListener(new MyButtonListener());
 
-	    // LAYOUT BUTTONS
-	        getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
-	        getContentPane().add(btnExample1);
-	        getContentPane().add(btnExample2);
-	        getContentPane().add(btnExample3);
-	        getContentPane().add(btnExample4);
-	        getContentPane().add(btnExample4UsingHelper);
-	        getContentPane().add(btnExample5);
-	        getContentPane().add(btnExample6);
-	        getContentPane().add(btnExample7);
-	        getContentPane().add(btnTestBase);
-	        //getContentPane().add(this.btnTestGrid);
-	        getContentPane().add(btnTestFormatted);
+		// SET BUTTON DIMENSIONS
+		btnExample1.setPreferredSize(buttonDim);
+		btnExample2.setPreferredSize(buttonDim);
+		btnExample3.setPreferredSize(buttonDim);
+		btnExample4.setPreferredSize(buttonDim);
+		btnExample4UsingHelper.setPreferredSize(buttonDim);
+		btnExample5.setPreferredSize(buttonDim);
+		btnExample6.setPreferredSize(buttonDim);
+		btnExample7.setPreferredSize(buttonDim);
+		btnExample7UsingHelper.setPreferredSize(buttonDim);
+		btnTestBase.setPreferredSize(buttonDim);
+		btnTestGrid.setPreferredSize(buttonDim);
+		btnTestFormatted.setPreferredSize(buttonDim);
 
-        // DISPLAY SCREEN
-	        setVisible(true);
-	        pack();
-    }
+		// LAYOUT BUTTONS
+		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+		getContentPane().add(btnExample1);
+		getContentPane().add(btnExample2);
+		getContentPane().add(btnExample3);
+		getContentPane().add(btnExample4);
+		getContentPane().add(btnExample4UsingHelper);
+		getContentPane().add(btnExample5);
+		getContentPane().add(btnExample6);
+		getContentPane().add(btnExample7);
+		getContentPane().add(btnExample7UsingHelper);
+		getContentPane().add(btnTestBase);
+		// getContentPane().add(this.btnTestGrid);
+		getContentPane().add(btnTestFormatted);
 
-    /**
-     * Class to initialize the database connection and load the database content from a script
-     * 
-     * @return database connection
-     */
-    protected Connection getDatabase() {
+		// DISPLAY SCREEN
+		setVisible(true);
+		pack();
+	}
 
-    	Connection result = null;
+	/**
+	 * Class to initialize the database connection and load the database content
+	 * from a script
+	 * 
+	 * @return database connection
+	 */
+	protected Connection getDatabase() {
+
+		Connection result = null;
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 		try {
@@ -306,43 +309,39 @@ public class MainClass extends JFrame {
 			logger.debug("Resource path: {}.", () -> getClass().getPackage().getName());
 			logger.debug("Resource path: {}.", () -> getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
 
-	        final InputStream inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
-        	final InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
-	        if ((inStreamDemo == null) || (inStreamTest == null)) {
-	            logger.fatal("Please add the file "
-	            		+ DATABASE_SCRIPT_DEMO
-	            		+ " and "
-	            		+ DATABASE_SCRIPT_TEST
-	            		+ " and "
-	            		+ DATABASE_SCRIPT_TEST_IMAGES
-	            		+ " to the classpath, package "
-	                    + getClass().getPackage().getName());
-	        } else {
-	        	if (USE_IN_MEMORY_DATABASE) {
-	        		result = DriverManager.getConnection("jdbc:h2:mem:" + DATABASE_NAME);
-	        		logger.info("Established connection to in-memory database.");
-	        	} else {
-	        	// ASSUMING DATABASE IS IN LOCAL ./h2/databases/ FOLDER WITH DEFAULT USERNAME OF sa AND BLANK PASSWORD
-	        	// USEFUL FOR WORKING WITH DATASET FOR SWINGSET TESTS
-	        		result = DriverManager.getConnection("jdbc:h2:tcp:" + DATABASE_PATH + DATABASE_NAME,"sa","");
-	        		logger.info("Established connection to database server.");
-	        	}
+			final InputStream inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
+			final InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
+			if ((inStreamDemo == null) || (inStreamTest == null)) {
+				logger.fatal("Please add the file " + DATABASE_SCRIPT_DEMO + " and " + DATABASE_SCRIPT_TEST + " and "
+						+ DATABASE_SCRIPT_TEST_IMAGES + " to the classpath, package "
+						+ getClass().getPackage().getName());
+			} else {
+				if (USE_IN_MEMORY_DATABASE) {
+					result = DriverManager.getConnection("jdbc:h2:mem:" + DATABASE_NAME);
+					logger.info("Established connection to in-memory database.");
+				} else {
+					// ASSUMING DATABASE IS IN LOCAL ./h2/databases/ FOLDER WITH DEFAULT USERNAME OF
+					// sa AND BLANK PASSWORD
+					// USEFUL FOR WORKING WITH DATASET FOR SWINGSET TESTS
+					result = DriverManager.getConnection("jdbc:h2:tcp:" + DATABASE_PATH + DATABASE_NAME, "sa", "");
+					logger.info("Established connection to database server.");
+				}
 
-	        	// RUN SCRIPTS AND CLOSE STREAMS
-	        	if (RUN_SQL_SCRIPTS) {
-		            RunScript.execute(result, new InputStreamReader(inStreamDemo));
-		            inStreamDemo.close();
+				// RUN SCRIPTS AND CLOSE STREAMS
+				if (RUN_SQL_SCRIPTS) {
+					RunScript.execute(result, new InputStreamReader(inStreamDemo));
+					inStreamDemo.close();
 
-		            RunScript.execute(result, new InputStreamReader(inStreamTest));
-		            inStreamTest.close();
+					RunScript.execute(result, new InputStreamReader(inStreamTest));
+					inStreamTest.close();
 
 					if (!no_load_images) {
 						String sql = "UPDATE swingset_base_test_data"
 								+ " SET ss_image = ? WHERE swingset_base_test_pk = ?";
 						DemoUtil.loadBinaries(result, "/swingset-demo-images.txt", sql, verbose);
 					}
-	        	}
-	        }
+				}
+			}
 
 		} catch (final IOException ioe) {
 			logger.error("IO Exception.", ioe);
@@ -353,12 +352,13 @@ public class MainClass extends JFrame {
 		}
 
 		return result;
-    }
+	}
 
 	static abstract class DatabaseSetup implements Runnable {
 		private Connection conn;
 
 		abstract Properties getDatabaseProperties();
+
 		abstract List<String> getScripts();
 
 		Connection getConnection() {
@@ -366,25 +366,25 @@ public class MainClass extends JFrame {
 		}
 
 		/**
-		 * Find resource;
-		 * an alternate implementation could take the resource as a file.
+		 * Find resource; an alternate implementation could take the resource as a file.
+		 * 
 		 * @param resourceName name of resource
 		 * @return BufferReader for specified resource
 		 */
 		BufferedReader getBufferedReader(String resourceName) {
 			InputStream stream = MainClass.class.getResourceAsStream(resourceName);
 			if (stream == null) {
-				System.err.println("Script '" + resourceName +"' not found. Exiting.");
+				System.err.println("Script '" + resourceName + "' not found. Exiting.");
 				return null;
 			}
-			BufferedReader br = new BufferedReader(new InputStreamReader(stream));  
+			BufferedReader br = new BufferedReader(new InputStreamReader(stream));
 			return br;
 		}
 
 		@Override
 		public void run() {
 			Properties info = getDatabaseProperties();
-			if(info == null) {
+			if (info == null) {
 				return;
 			}
 			String clazz = info.getProperty("DB_DRIVER_CLASS", "");
@@ -394,7 +394,7 @@ public class MainClass extends JFrame {
 				conn = null;
 				return;
 			}
-			
+
 			try {
 				Class.forName(clazz);
 			} catch (ClassNotFoundException ex) {
@@ -402,7 +402,7 @@ public class MainClass extends JFrame {
 				conn = null;
 				return;
 			}
-			
+
 			conn = DemoUtil.getConnection(info.getProperty("DB_URL"), info);
 			if (conn == null) {
 				return;
@@ -411,7 +411,7 @@ public class MainClass extends JFrame {
 			if (no_initialize_db) {
 				return;
 			}
-			
+
 			boolean ok = false;
 			for (String script : getScripts()) {
 				ok = false;
@@ -423,14 +423,13 @@ public class MainClass extends JFrame {
 					break;
 				}
 			}
-			
+
 			if (ok && !no_load_images) {
 				// Load up the images
-				String sql = "UPDATE swingset_base_test_data"
-						+ " SET ss_image = ? WHERE swingset_base_test_pk = ?";
+				String sql = "UPDATE swingset_base_test_data" + " SET ss_image = ? WHERE swingset_base_test_pk = ?";
 				ok = DemoUtil.loadBinaries(conn, "/swingset-demo-images.txt", sql, verbose);
 			}
-			
+
 			if (!ok) {
 				conn = null;
 			}
@@ -453,16 +452,16 @@ public class MainClass extends JFrame {
 		void dump() {
 			for (String script : getScripts()) {
 				boolean ok = false;
-				try (BufferedReader br = getBufferedReader(script)){
+				try (BufferedReader br = getBufferedReader(script)) {
 					if (br != null) {
-							String name = "dump." + new File(script).getName();
-							try (FileWriter fout = new FileWriter(name)) {
-								char buf[] = new char[4 * 1024];
-								int n;
-								while((n = br.read(buf)) > 0) {
-									fout.write(buf, 0, n);
-								}
+						String name = "dump." + new File(script).getName();
+						try (FileWriter fout = new FileWriter(name)) {
+							char buf[] = new char[4 * 1024];
+							int n;
+							while ((n = br.read(buf)) > 0) {
+								fout.write(buf, 0, n);
 							}
+						}
 					}
 					ok = true;
 				} catch (IOException ex) {
@@ -487,7 +486,7 @@ public class MainClass extends JFrame {
 			try {
 				return new BufferedReader(new FileReader(fileName));
 			} catch (FileNotFoundException ex) {
-				System.err.println("Script '" + fileName +"' not found. Exiting.");
+				System.err.println("Script '" + fileName + "' not found. Exiting.");
 				return null;
 			}
 		}
@@ -522,11 +521,8 @@ public class MainClass extends JFrame {
 
 		@Override
 		List<String> getScripts() {
-			return Arrays.asList(new String[] {
-				"/" + DATABASE_SCRIPT_DEMO ,
-				"/" + DATABASE_SCRIPT_TEST ,
-				"/" + DATABASE_SCRIPT_TEST_IMAGES
-			});
+			return Arrays.asList(new String[] { "/" + DATABASE_SCRIPT_DEMO, "/" + DATABASE_SCRIPT_TEST,
+					"/" + DATABASE_SCRIPT_TEST_IMAGES });
 		}
 	}
 
@@ -535,18 +531,18 @@ public class MainClass extends JFrame {
 		@Override
 		public void run() {
 			super.run();
-			globalHints.put("collectionModel", (Supplier<SSCollectionModel>)
-					() -> new SSMysqlSetModel(JDBCType.INTEGER));
-			// 		() -> new SSStringArrayModel(JDBCType.INTEGER));
+			globalHints.put("collectionModel",
+					(Supplier<SSCollectionModel>) () -> new SSMysqlSetModel(JDBCType.INTEGER));
+			// () -> new SSStringArrayModel(JDBCType.INTEGER));
 		}
 
 		@Override
 		Properties getDatabaseProperties() {
-			//      <dependency>
-			//          <groupId>mysql</groupId>
-			//          <artifactId>mysql-connector-java</artifactId>
-			//          <version>8.0.21</version>
-			//      </dependency>
+			// <dependency>
+			// <groupId>mysql</groupId>
+			// <artifactId>mysql-connector-java</artifactId>
+			// <version>8.0.21</version>
+			// </dependency>
 			Properties info;
 			if (propertyFile != null) {
 				info = getFileProperties(propertyFile);
@@ -564,10 +560,8 @@ public class MainClass extends JFrame {
 
 		@Override
 		List<String> getScripts() {
-			return Arrays.asList(new String[] {
-				"/mysql.swingset-demo-app.sql",
-				"/mysql.swingset-demo-components.sql"
-			});
+			return Arrays
+					.asList(new String[] { "/mysql.swingset-demo-app.sql", "/mysql.swingset-demo-components.sql" });
 		}
 	}
 
@@ -582,7 +576,7 @@ public class MainClass extends JFrame {
 	private static boolean dump = false;
 	private static boolean no_load_images = false;
 	private static boolean no_initialize_db = false;
-	//private static boolean readme = false;
+	// private static boolean readme = false;
 	private static String dbname = DBMS_H2;
 	private static String propertyFile = null;
 	private static List<String> userSqlFiles = new ArrayList<>();
@@ -592,73 +586,75 @@ public class MainClass extends JFrame {
 
 	private static void usage() {
 		// TODO: specify don't load images
-		String usage =
-				"\n"
-				+ "Run the SwingSet demo. With no options/args use the self contained\n"
-				+ "in memory database.\n"
-				+ "\n"
-				+ cmdName + " [-h] [-v] [-d] [-n] [-i] [-r] [-p fname] [-s sql]* [dbms-server]\n"
-				+ "\n"
-				+ "    -h             help\n"
-				+ "    -v             verbose; output initialization sql as executed\n"
+		String usage = "\n" + "Run the SwingSet demo. With no options/args use the self contained\n"
+				+ "in memory database.\n" + "\n" + cmdName
+				+ " [-h] [-v] [-d] [-n] [-i] [-r] [-p fname] [-s sql]* [dbms-server]\n" + "\n"
+				+ "    -h             help\n" + "    -v             verbose; output initialization sql as executed\n"
 				+ "    -d             dump/create sql scripts in local directory, exit\n"
 				+ "    -n             do NOT initialize database, just run demo\n"
 				+ "    -i             do NOT load images\n"
-			//	+ "    -r             print a readme to stdout\n"
+				// + " -r print a readme to stdout\n"
 				+ "    -p fname       properties file for jdbc database connection\n"
 				+ "                   'DB_URL', 'DB_DRIVER_CLASS' keys required\n"
-				+ "    -s sqlScript   sql file to initialize database, multiple OK\n"
-				+ "\n"
+				+ "    -s sqlScript   sql file to initialize database, multiple OK\n" + "\n"
 				+ "If specified, dbms-server in {mysql}\n"
 				+ "Internal mysql properties use database swingset_demo_suppliers_and_parts.\n"
 				+ "After the sql files are run, the images are loaded, unless '-i'.\n"
 				+ "Use '-n -p props' to run demo with a previously initialized database.\n"
 				+ "Use '-d' or '-d mysql' to create local files with sql initialization.\n"
-				+ "See swingset-demo/README.txt for more information.\n"
-				+ "\n"
+				+ "See swingset-demo/README.txt for more information.\n" + "\n"
 				+ "Examples: (ss.jar like swingset-demo-vers-jar-with-dependencies.jar)\n"
 				+ "    java -jar ss.jar -d   # dump sql that creates in memory database\n"
 				+ "    java -jar ss.jar -d mysql   # dump sql to create mysql database\n"
 				+ "    java -cp jdbc_driver:ss.jar com.nqadmin.swingset.demo.MainClass \\\n"
-				+ "        -p db_props -s initializer.sql\n"
-				+ "\n"
-				;
+				+ "        -p db_props -s initializer.sql\n" + "\n";
 		System.err.println(usage);
 		System.exit(1);
 	}
-	
+
 	/**
 	 * Main method for SwingSet samples/demo
 	 * <p>
-	 * @param _args - optional command line arguments, which are ignored by this program
+	 * 
+	 * @param _args - optional command line arguments, which are ignored by this
+	 *              program
 	 */
 	public static void main(final String[] _args) {
 		boolean some_error = false;
-		System.err.println(String.format("java:%s vm:%s date:%s os:%s",
-				System.getProperty("java.version"),
-				System.getProperty("java.vm.version"),
-				System.getProperty("java.version.date"),
+		System.err.println(String.format("java:%s vm:%s date:%s os:%s", System.getProperty("java.version"),
+				System.getProperty("java.vm.version"), System.getProperty("java.version.date"),
 				System.getProperty("os.name")));
 
 		Getopt g = new Getopt(cmdName, _args, "hvdinrp:s:");
 
 		int c;
-		while ((c = g.getopt()) != -1)
-		{
-			switch(c)
-			{
-				case 'v': verbose = true;                   break;
-				case 'd': dump = true;                      break;
-				case 'n': no_initialize_db = true;          break;
-				case 'i': no_load_images = true;            break;
-				//case 'r': readme = true;                    break;
-				case 'p': propertyFile = g.getOptarg();     break;
-				case 's': userSqlFiles.add(g.getOptarg());  break;
-				case '?':
-				case 'h':
-				default: // TODO: not sure if default is OK here meaning all other characters indicate an error??
-					some_error = true;
-					break; // getopt() already printed an error
+		while ((c = g.getopt()) != -1) {
+			switch (c) {
+			case 'v':
+				verbose = true;
+				break;
+			case 'd':
+				dump = true;
+				break;
+			case 'n':
+				no_initialize_db = true;
+				break;
+			case 'i':
+				no_load_images = true;
+				break;
+			// case 'r': readme = true; break;
+			case 'p':
+				propertyFile = g.getOptarg();
+				break;
+			case 's':
+				userSqlFiles.add(g.getOptarg());
+				break;
+			case '?':
+			case 'h':
+			default: // TODO: not sure if default is OK here meaning all other characters indicate an
+						// error??
+				some_error = true;
+				break; // getopt() already printed an error
 			}
 		}
 
@@ -677,7 +673,7 @@ public class MainClass extends JFrame {
 		}
 
 		// if (readme) {
-		// 	return;
+		// return;
 		// }
 
 		boolean databaseServerSpecified = false;
@@ -713,20 +709,20 @@ public class MainClass extends JFrame {
 			}
 		}
 
-		switch(dbname) {
-			case DBMS_MYSQL:
-				databaseSetup = new MysqlSetup();
-				break;
-			case DBMS_EXTERNAL:
-				databaseSetup = new ExternalSetup(userSqlFiles);
-				break;
-			case DBMS_H2:
-				databaseSetup = new H2Setup();
-				break;
-			default:
-				System.err.println("Unknown database server '" + dbname + "' . Exiting.");
-				some_error = true;
-				break;
+		switch (dbname) {
+		case DBMS_MYSQL:
+			databaseSetup = new MysqlSetup();
+			break;
+		case DBMS_EXTERNAL:
+			databaseSetup = new ExternalSetup(userSqlFiles);
+			break;
+		case DBMS_H2:
+			databaseSetup = new H2Setup();
+			break;
+		default:
+			System.err.println("Unknown database server '" + dbname + "' . Exiting.");
+			some_error = true;
+			break;
 		}
 
 		if (some_error) {
@@ -737,7 +733,7 @@ public class MainClass extends JFrame {
 			databaseSetup.dump();
 			return;
 		}
-		
+
 		// create application screen
 		SwingUtilities.invokeLater(() -> new MainClass());
 	}
