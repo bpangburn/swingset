@@ -129,6 +129,7 @@ public class MainClass extends JFrame {
 				e7JFrame.setLocation(DemoUtil.getChildScreenLocation("Example7UsingHelper"));
 				e7JFrame.setVisible(true);
 				e7JFrame.pack();
+				e7JFrame.setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 			} else if (ae.getSource().equals(btnTestBase)) {
 				logger.debug("**** Opening TestBaseComponents ****");
 				new TestBaseComponents(dbConnection, hints);

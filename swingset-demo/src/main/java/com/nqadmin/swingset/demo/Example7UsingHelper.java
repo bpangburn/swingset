@@ -44,6 +44,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.swing.JMenuBar;
+import javax.swing.plaf.InternalFrameUI;
+import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -81,7 +83,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 	/**
 	 * table/grid column headings
 	 */
-	private static final String[] tableHeadings = { "Supplier-Part ID", "Supplier Name", "Part Name", "Quantity", "Ship Date" };
+	private static final String[] tableHeaders = { "Supplier-Part ID", "Supplier Name", "Part Name", "Quantity", "Ship Date" };
 	
 //	/**
 //	 * data grid
@@ -108,7 +110,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 		super("Example 7 Using Helper", _container, _dbConn, "supplier_part_id", null);
 
 		// Hide the frame since we're putting the JInternalFrame in its own JFrame for the demo
-		//setBorder(null);
+		setBorder(null);
 		
 		// Finish Initialization
 		initScreen();
@@ -210,16 +212,24 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 		// NOTHING TO DO...
 	}
 	
+
 	@Override
-	public String[] getHeadings() {
-		return tableHeadings;
+	public String[] getDefaultColumnNames() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public String getRowsetQuery() {
-		return rowsetQuery;
+	public Object[] getDefaultColumnValues() {
+		// TODO Auto-generated method stub
+		return null;
 	}
-
+	
+	@Override
+	public String[] getHeaders() {
+		return tableHeaders;
+	}
+	
 	@Override
 	public JMenuBar getJMenuBar() {
 		// NOTHING TO DO...
@@ -227,8 +237,17 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 	}
 
 	@Override
-	protected void setDefaultValues() throws Exception {
-		// NOTHING TO DO...
+	public String getRowsetQuery() {
+		return rowsetQuery;
+	}
+	
+	// THIS IS A HACK TO HIDE THE TITLE BAR SINCE WE'RE PUTTING THE JINTERNALFRAME IN ITS OWN JFRAME FOR THE SWINGSET DEMO
+	// https://stackoverflow.com/a/51254020
+	@Override
+	public void setUI(InternalFrameUI _ui) {
+		super.setUI(_ui); // this gets called internally when updating the ui and makes the northPane reappear
+		BasicInternalFrameUI frameUI = (BasicInternalFrameUI) getUI(); // so...
+		if (frameUI != null) frameUI.setNorthPane(null); // lets get rid of it
 	}
 
 }

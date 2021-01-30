@@ -182,6 +182,10 @@ This example demonstrates the use of an SSDataGrid to display a tabular view of 
 
 It adds a ComboRenderer with a lookup to the supplier_data table for the supplier name, and adds a DateRenderer for the ship date column.
 
+### Example7WithHelper
+
+Same as Example7, but built by extending the SSDataGridScreenHelper helper class to organize construction.
+
 ### TestBaseComponents
 
 This example demonstrates all of the Base SwingSet Components except for the SSDataGrid.
