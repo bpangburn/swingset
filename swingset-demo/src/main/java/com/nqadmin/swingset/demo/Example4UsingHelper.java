@@ -55,7 +55,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.utils.SSEnums.Navigation;
 import com.nqadmin.swingset.utils.SSFormViewScreenHelper;
 
 /**
