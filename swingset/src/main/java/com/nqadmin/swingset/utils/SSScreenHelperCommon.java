@@ -327,16 +327,19 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * @param _defaultY the default Y coordinate for the screen
 	 */
 	public void setDefaultScreenLocation(final int _defaultX, final int _defaultY) {
-		setDefaultX(Integer.valueOf(ssProps.getProperty("Level_2_X_Position")));
-		setDefaultY(Integer.valueOf(ssProps.getProperty("Level_2_Y_Position")));
+		setDefaultX(Integer.valueOf(_defaultX));
+		setDefaultY(Integer.valueOf(_defaultY));
 	}
 	
 	/**
 	 * Sets any default values for the screen's components.
 	 * <p>
-	 * If there is a call to SSDBNavImpl.performPreInsertOps(), it should
-	 * take care of clearing all of the component values before defaults are
-	 * set.
+	 * For a Form View screen, if there is a call to SSDBNavImpl.performPreInsertOps(),
+	 * it should take care of clearing all of the component values before defaults
+	 * are set.
+	 * <p>
+	 * For a Data Grid screen, this will be a one-time call to
+	 * {@link #SSDataGrid.setDefaultValues()};
 	 * 
 	 * @throws Exception exception thrown while setting default values for screen components
 	 */

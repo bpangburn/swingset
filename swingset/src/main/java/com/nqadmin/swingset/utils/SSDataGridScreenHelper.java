@@ -47,6 +47,7 @@ import java.sql.SQLException;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
@@ -100,9 +101,6 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 				setParentContainer(_parentContainer);
 				setPkColumn(_pkColumn);
 				setParentID(_parentID);
-
-				// CALL INIT ROUTINE
-				//initScreen();
 
 				// SET SCREEN SIZE AND LOCATION
 				setScreenSize();
@@ -324,11 +322,28 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	public abstract void configureDataGrid();
 	
 	/**
-	 * Method implemented by screen developer to a String array with the table/grid column headings.
+	 * Method implemented by screen developer to return a String array with the table/grid
+	 * column names for which to set default values.
+	 * 
+	 * @return a String array with the table/grid column names
+	 */
+	public abstract String[] getDefaultColumnNames();
+	
+	/**
+	 * Method implemented by screen developer to return a String array with the table/grid
+	 * column default values.
+	 * 
+	 * @return an Object array with the table/grid column default values
+	 */
+	public abstract Object[] getDefaultColumnValues();
+	
+	/**
+	 * Method implemented by screen developer to return a String array with the table/grid
+	 * column headings.
 	 * 
 	 * @return a String array with the table/grid column headings
 	 */
-	public abstract String[] getHeadings();
+	public abstract String[] getHeaders();
 
 	/**
 	 * Performs post construction initialization.  Needs to be called from constructor in implementation.
@@ -384,8 +399,12 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			// SET ROWSET QUERY
 			initRowset();
 			
-			// SET TABLE/GRID HEADINGS
-			dataGrid.setHeaders(getHeadings());
+			// SET TABLE/GRID HEADERS
+			//dataGrid.setHeaders(getHeaders());
+			dataGrid.setHeaders(new String[] { "Supplier-Part ID", "Supplier Name", "Part Name", "Quantity", "Ship Date" });
+			
+			// TODO: HEADERS ARE NOT SHOWING UP, AND AN UNNECESSARY TITLE BAR IS
+			logger.warn(getHeaders());
 			
 			// SET ROWSET FOR DATAGRID
 			dataGrid.setRowSet(getRowset());
@@ -403,20 +422,21 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			configureToolBars();
 			
 			// ADD DATAGRID TO CONTAINER
-	 		getParentContainer().add(dataGrid.getComponent());
+			//  - PUT INSIDE OF A JSCROLLPANE SO WE HAVE SCROLL BARS WHEN NEEDED
+			//  - WITHOUT THE JSCROLLPANE, SOMETIMES THE COLUMN HEADERS DON'T RENDER
+	 		//getContentPane().add(dataGrid);
+	 		getContentPane().add(new JScrollPane(dataGrid));
 			
 			// SET CELL ENABLING/DISABLING
 			setActivateDeactivate();
 	
 			// ADD SCREEN LISTENERS
 			addCoreListeners();
-			
+
 			// SET DEFAULT VALUES
 			setDefaultValues();
 			
 			// MAKE SCREEN VISIBLE
-// todo: need this???			
-			setVisible(true);
 			showUp(getParentContainer());
 			
 		} catch (final SQLException se) {
@@ -459,6 +479,16 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			}
 		});
 
+	}
+	
+	/**
+	 * Sets any default values for the data grid columns.
+	 * 
+	 * @throws Exception exception thrown while setting default values for the data grid
+	 */
+	@Override
+	protected void setDefaultValues() throws Exception {
+		dataGrid.setDefaultValues(getDefaultColumnNames(),getDefaultColumnValues());
 	}
 
 	/**
