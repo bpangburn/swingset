@@ -154,7 +154,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * @param _urlPrefixesForColumns prefix of URL without ID
 	 * @param _appendColumnValue Boolean indicating if column value should be appended to URL
 	 */
-	public void addKeyBasedURLLinking(final String _key, final String _keyLabel,
+	protected void addKeyBasedURLLinking(final String _key, final String _keyLabel,
 			final String[] _urlPrefixesForColumns, final boolean _appendColumnValue) {
 		addKeyBasedURLLinking(null, _key, _keyLabel, _urlPrefixesForColumns, _appendColumnValue);
 	}
@@ -174,7 +174,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * @param _urlPrefixesForColumns prefix of URL without ID
 	 * @param _appendColumnValue Boolean indicating if column value should be appended to URL
 	 */
-	public void addKeyBasedURLLinking(final int[] _columns, final String _key, final String _keyLabel,
+	protected void addKeyBasedURLLinking(final int[] _columns, final String _key, final String _keyLabel,
 			final String[] _urlPrefixesForColumns, final boolean _appendColumnValue) {
 		
 		dataGrid.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(_key), _keyLabel);
@@ -319,7 +319,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * <p>
 	 * Calls for dataGrid.setRowSet() and dataGrid.setPrimaryColumn() are handled automatically.
 	 */
-	public abstract void configureDataGrid();
+	protected abstract void configureDataGrid();
 	
 	/**
 	 * Method implemented by screen developer to return a String array with the table/grid
@@ -327,7 +327,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * 
 	 * @return a String array with the table/grid column names
 	 */
-	public abstract String[] getDefaultColumnNames();
+	protected abstract String[] getDefaultColumnNames();
 	
 	/**
 	 * Method implemented by screen developer to return a String array with the table/grid
@@ -335,7 +335,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * 
 	 * @return an Object array with the table/grid column default values
 	 */
-	public abstract Object[] getDefaultColumnValues();
+	protected abstract Object[] getDefaultColumnValues();
 	
 	/**
 	 * Method implemented by screen developer to return a String array with the table/grid
@@ -343,7 +343,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * 
 	 * @return a String array with the table/grid column headings
 	 */
-	public abstract String[] getHeaders();
+	protected abstract String[] getHeaders();
 
 	/**
 	 * Performs post construction initialization.  Needs to be called from constructor in implementation.
@@ -457,7 +457,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * @param _column JTable/SSDatagrid column to evaluate
 	 * @return true if cell should be editable/enabled, otherwise false
 	 */
-	public abstract boolean isGridCellEditable(int _row, int _column);
+	protected abstract boolean isGridCellEditable(int _row, int _column);
 	
 	/**
 	 * Used to enable/disable cells based on adjacent cell value or other criteria.
@@ -505,7 +505,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * if necessary for getRowsetQuery();
 	 */
 	@Override
-	public void updateScreen() {
+	protected void updateScreen() {
 
 		try {
 

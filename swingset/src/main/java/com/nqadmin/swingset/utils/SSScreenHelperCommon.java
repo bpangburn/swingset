@@ -146,7 +146,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	/**
 	 * Closes any child screens that are open.
 	 */
-	public abstract void closeChildScreens();
+	protected abstract void closeChildScreens();
 
 	/**
 	 * Closes the current screen.
@@ -161,22 +161,22 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 
 	/**
-	 * Adds and configures any required buttons to the mainFrame toolbar.
+	 * Adds and configures any required buttons to the main application toolbar.
 	 *
 	 * <pre>
 	 * Separators added with:
 	 * {@code
-	 * 	mainFrame.getToolBar().addSeparator();
+	 * 	getRootFrame().getToolBar().addSeparator();
 	 * }
 	 *
 	 * Buttons added with:
 	 * {@code
-	 *  btnMyButtonName = mainFrame.addToolBarButton(new AbstractAction() {
+	 *  btnMyButtonName = getRootFrame().addToolBarButton(new AbstractAction() {
 	 *  	public void actionPerformed(ActionEvent ae) {
 	 *          myButtonNameActionMethod();
 	 *      }
 	 *  }, "My Button Description", "images/myButtonGraphic.gif");
-	 *  }
+	 * }
 	 * </pre>
 	 */
 	protected abstract void configureToolBars();
@@ -215,7 +215,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * 
 	 * @return the full SQL Query for the rowset
 	 */
-	public abstract String getRowsetQuery();
+	protected abstract String getRowsetQuery();
 
 	/**
 	 * Builds menu bar and adds applicable listeners.
@@ -231,7 +231,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * @deprecated Starting in 4.0.0+ use {@link #getRootFrame()} instead.
 	 */
 	@Deprecated
-	public Frame getMainFrame() {
+	protected Frame getMainFrame() {
 		return getRootFrame();
 	}
 
@@ -240,7 +240,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 *
 	 * @return primary key value of parent record (FK for current rowset) used for record retrieval
 	 */
-	public Long getParentID() {
+	protected Long getParentID() {
 		return parentID;
 	}
 
@@ -486,6 +486,6 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * Implementation should presume that parentID has already been updated
 	 * if applicable.
 	 */
-	public abstract void updateScreen();
+	protected abstract void updateScreen();
 
 }

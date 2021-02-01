@@ -457,7 +457,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * 
 	 * @return String with the full SQL query for the combo navigator
 	 */
-	public abstract String getComboNavQuery();
+	protected abstract String getComboNavQuery();
 
 	/**
 	 * @return character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator
@@ -830,7 +830,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * Updates the rowset, data navigator, combo navigator, and any DB comboboxes.
 	 */
 	@Override
-	public void updateScreen() {
+	protected void updateScreen() {
 
 		try {
 			// TURN OFF THE SYNC MANAGER
@@ -869,8 +869,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 
 	/**
 	 * Used to update any SSDBComboBox that change when parent ID changes (e.g. a
-	 * record selector combo). Assumes that any SSDBComboBoxes are created in
-	 * configureScreen().
+	 * record selector combo). This is called from initScreen() after bindComponents()
+	 * and addComponents(). It is also called from updateScreen() after the rowset
+	 * has been requeried.
 	 */
 	protected abstract void updateSSDBComboBoxes();
 
