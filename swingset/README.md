@@ -48,18 +48,18 @@ The SwingSet feature-set currently includes:
    (e.g., 0, 1, & 2 are stored for "Yes," "No," & "Maybe," respectively)
 3. population of combo boxes based on columns in a database query (can also be used for combo box-based record navigation)
 4. a data-aware image component with image support
-5. a graphical record navigator
-    (a) allows for database traversal, insertion, deletion, commit, and rollback
-    (b) supplies current record index (editable) and total record count
-6. a data grid component for creating datasheet/spreadsheet/table views of queries
-    (a) allows cut & paste to/from spreadsheet programs or other data grids
-    (b) allows custom column headings
-    (c) allows hiding of specified columns
-    (d) allows disabling of specified columns
-    (e) allows columns to be displayed as text boxes or combo boxes
-    (f) allows addition and deletion of records
-    (g) allows deletion of multiple, non-consecutive records
-    (h) allows data entry "masks" to be applied to text columns
+5. a graphical record navigator  
+    a. allows for database traversal, insertion, deletion, commit, and rollback  
+    b. supplies current record index (editable) and total record count  
+6. a data grid component for creating datasheet/spreadsheet/table views of queries  
+    a. allows cut & paste to/from spreadsheet programs or other data grids  
+    b. allows custom column headings  
+    c. allows hiding of specified columns  
+    d. allows disabling of specified columns  
+    e. allows columns to be displayed as text boxes or combo boxes  
+    f. allows addition and deletion of records  
+    g. allows deletion of multiple, non-consecutive records  
+    h. allows data entry "masks" to be applied to text columns  
 7. formatted fields for various types like currency, percent, SSN, date etc.
 
 More information on SwingSet is available from:
@@ -73,32 +73,32 @@ swingset#NO-SPAM#@pangburngroup.com
 SwingSet should work with Java 8 (JRE/JDK 1.8) or later.
 
 Traditional CLASSPATH:
-  Download the latest SwingSet jar (swingset-x.y.z.jar) from:
+  Download the latest SwingSet jar (swingset-x.y.z.jar) from:  
     https://repo1.maven.org/maven2/com/nqadmin/swingset/swingset/
   
-  Download the latest GlazedLists jar (glazedlists-x.y.z.jar) from:
-    https://repo1.maven.org/maven2/com/raelity/3rdparty/com/glazedlists/glazedlists/
-  ***NOTE: Normally the GlazedLists artifact comes from:
-     https://repo1.maven.org/maven2/com/glazedlists/glazedlists/,
-     but SwingSet 4.0.0 is relying on some preview features.***
+  Download the latest GlazedLists jar (glazedlists-x.y.z.jar) from:  
+    https://repo1.maven.org/maven2/com/raelity/3rdparty/com/glazedlists/glazedlists/  
+  ***NOTE: Normally the GlazedLists artifact comes from:  
+    https://repo1.maven.org/maven2/com/glazedlists/glazedlists/  
+  but SwingSet 4.0.0 is relying on some preview features.***
     
-  Download the latest jdbcrowsetimpl from:
+  Download the latest jdbcrowsetimpl from:  
     https://repo1.maven.org/maven2/com/nqadmin/rowset/jdbcrowsetimpl/
     
-  Download the latest log4j-core and log4j-api from:
-    https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/
+  Download the latest log4j-core and log4j-api from:  
+    https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/  
     https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/
     
-  Add the above jars to your CLASSPATH
+  Add the above jars to your CLASSPATH  
   Add any JDBC drivers needed for your database to your CLASSPATH
   
 Maven:
   Add SwingSet to the Maven dependencies in your POM file:
-  	<dependency>
+  	`<dependency>
 		<groupId>com.nqadmin.swingset</groupId>
 		<artifactId>swingset</artifactId>
 		<version>x.y.z</version>
-	</dependency> 
+	</dependency>`
 
 
 ## SAMPLE/DEMO PROGRAMS
@@ -124,7 +124,7 @@ Used to display the boolean values stored in the database. The SSCheckBox can be
 Provides a way of displaying text corresponding to codes that are stored in the database. By default the codes start from zero. If you want to provide a different mapping for the items in the combo box then a string of integers containing the corresponding numeric values for each choice must be provided.
 
 e.g.,
-     SSComboBox combo = new SSComboBox();
+     `SSComboBox combo = new SSComboBox();
      String[] options = {"111", "2222", "33333"};
      combo.setOptions(options);
   
@@ -141,7 +141,7 @@ e.g.,
 
      // next line is assuming myrowset has been initialized and my_column is a
      // column in myrowset
-     combo.bind(myrowset,"my_column");
+     combo.bind(myrowset,"my_column");`
      
      Note that if you DO NOT want to use the default mappings, the custom
      mappings must be set before calling the bind() method to bind the
@@ -166,7 +166,7 @@ e.g.,
      want to store the id of the part chosen by the user in the shipment
      table.
 
-     Connection connection = null;
+     `Connection connection = null;
      RowSet rowSet = null;
      SSDataNavigator navigator = null;
      SSDBComboBox combo = null;
@@ -212,7 +212,7 @@ e.g.,
           getContentPane().add(combo);
           
      // ADD THE SSTEXTFIELD TO THE JFRAME
-          getContentPane().add(myText);
+          getContentPane().add(myText);`
 
 ### SSImage
 
