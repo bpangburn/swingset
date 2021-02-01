@@ -339,7 +339,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * are set.
 	 * <p>
 	 * For a Data Grid screen, this will be a one-time call to
-	 * {@link #SSDataGrid.setDefaultValues()};
+	 * {@link com.nqadmin.swingset.SSDataGrid#setDefaultValues(String[],Object[])};
 	 * 
 	 * @throws Exception exception thrown while setting default values for screen components
 	 */
