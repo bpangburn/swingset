@@ -98,7 +98,7 @@ Maven:
     <dependency>
         <groupId>com.nqadmin.swingset</groupId>
         <artifactId>swingset</artifactId>
-	<version>x.y.z</version>
+        <version>x.y.z</version>
     </dependency>
 
 ## SAMPLE/DEMO PROGRAMS
@@ -154,6 +154,7 @@ Similar to the SSComboBox, but used when both the 'bound' values and the 'displa
   
 e.g.,  
     
+    /*
     Consider two tables:
         1. part_data (part_id, part_name, ...)
         2. shipment_data (shipment_id, part_id, quantity, ...)
@@ -166,6 +167,7 @@ e.g.,
     part_id so that it is easier for the user to choose. At the same time you
     want to store the id of the part chosen by the user in the shipment
     table.
+    */
     
     Connection connection = null;
     RowSet rowSet = null;
