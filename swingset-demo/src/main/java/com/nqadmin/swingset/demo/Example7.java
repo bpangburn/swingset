@@ -124,8 +124,6 @@ public class Example7 extends JFrame {
 			// DISABLES NEW INSERTIONS TO THE DATABASE. - NOT CURRENTLY WORKING FOR H2
 				dataGrid.setInsertion(false);
 
-			//	this.dataGrid.updateUI();
-
 			// MAKE THE SUPPLIER-PART ID UNEDITABLE
 				dataGrid.setUneditableColumns(new String[] { "supplier_part_id" });
 

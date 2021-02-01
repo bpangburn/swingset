@@ -41,11 +41,13 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
@@ -55,8 +57,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.rowset.JdbcRowSetImpl;
+import com.nqadmin.swingset.SSCellEditing;
 import com.nqadmin.swingset.SSDataGrid;
-import java.sql.Connection;
 
 //SSDataGridScreenHelper.java
 //
@@ -72,38 +74,35 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	
 	private static final long serialVersionUID = 3558830097072342112L; // unique serial ID
 
-	protected Container contentPane; // Container for the JInternalFrame containing the SSDataGrid
+	protected Container container; // Container for the JInternalFrame containing the SSDataGrid
 	protected SSDataGrid dataGrid = new SSDataGrid(); // SSDataGrid used for this screen
 
 
 	/**
-	 * Constructs a DataGrid with the specified title and parent ID, and attaches it to the specified window.
-	 * Sets up query based on specified SELECT and ORDER BY strings.
+	 * Constructs a Data Grid screen with the specified title and attaches it
+	 * to the specified window.
 	 *
-	 * @param _title		title of window
-	 * @param _parentID		parent ID used for record retrieval
-	 * @param _connection 	database connection
-	 * @param _contentPane	Container to which JInternalFrame containing SSDataGrid should be attached
-	 * @param _fullSQL		full SQL query for rowset
-	 * @param _selectSQL	SELECT clause for rowset such that selectSQL + parentID + " " + orderBySQL is a valid query
-	 * @param _orderBySQL	ORDER BY clause for rowset including at least a semicolon
+	 * @param _title                  title of window
+	 * @param _parentContainer        parent window/container
+	 * @param _connection             database connection
+	 * @param _pkColumn               name of primary key column
+	 * @param _parentID               primary key value of parent record (FK for
+	 *                                current rowset), if applicable
 	 */
-	private SSDataGridScreenHelper(final String _title, final Long _parentID, final Connection _connection, final Container _contentPane, final String _fullSQL,
-			final String _selectSQL, final String _orderBySQL) {
+	public SSDataGridScreenHelper(final String _title, final Container _parentContainer, final Connection _connection,
+			final String _pkColumn, final Long _parentID) {
 
 		// CALL TO PARENT CONSTRUCTOR
 			super(_title,true,true,false,true);
 			
 			try {
 				// SET PARAMETERS
-				super.setParentID(_parentID);
 				setConnection(_connection);
-				contentPane = _contentPane;
-				setFullSQL(_fullSQL);
-				setSelectSQL(_selectSQL);
-				setOrderBySQL(_orderBySQL);
+				setParentContainer(_parentContainer);
+				setPkColumn(_pkColumn);
+				setParentID(_parentID);
 
-				// SET SCREEN DEFAULTS
+				// SET SCREEN SIZE AND LOCATION
 				setScreenSize();
 				setDefaultScreenLocation();
 
@@ -113,40 +112,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 						"Error while constructing screen, parent ID: " + getParentID() + ".\n" + e.getMessage());
 			}
 
-    }
-	
-	/**
-	 * Constructs a DataGrid with the specified title and parent ID, and attaches it to the specified window.
-	 * Sets up query based on specified SELECT and ORDER BY strings.
-	 *
-	 * @param _title		title of window
-	 * @param _parentID		parent ID used for record retrieval
-	 * @param _connection 	database connection
-	 * @param _contentPane	Container to which JInternalFrame containing SSDataGrid should be attached
-	 * @param _fullSQL		full SQL query for rowset
-	 */
-	public SSDataGridScreenHelper(final String _title, final Long _parentID, final Connection _connection,
-			final Container _contentPane, final String _fullSQL) {
-
-		this(_title, _parentID, _connection, _contentPane, _fullSQL, null, null);
-    }
-	
-	/**
-	 * Constructs a DataGrid with the specified title and parent ID, and attaches it to the specified window.
-	 * Sets up query based on specified SELECT and ORDER BY strings.
-	 *
-	 * @param _title		title of window
-	 * @param _parentID		parent ID used for record retrieval
-	 * @param _connection	database connection
-	 * @param _contentPane	Container to which JInternalFrame containing SSDataGrid should be attached
-	 * @param _selectSQL	SELECT clause for rowset such that selectSQL + parentID + " " + orderBySQL is a valid query
-	 * @param _orderBySQL	ORDER BY clause for rowset including at least a semicolon
-	 */
-	public SSDataGridScreenHelper(final String _title, final Long _parentID, final Connection _connection, final Container _contentPane,
-			final String _selectSQL, final String _orderBySQL) {
-		
-		this(_title, _parentID, _connection, _contentPane, null, _selectSQL, _orderBySQL);
-	}
+		}
 	
 	/**
 	 * Method to add F2 linking based on an ID for specified column (e.g. wiki links, contact links)
@@ -317,29 +283,28 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			/**
 			 * Stops the editing of cell, if any.
 			 */
-			public void stopEditing(){
-			// CHECK IF ANY CELL IS IN EDITING MODE.
-				if(dataGrid.isEditing()){
+			public void stopEditing() {
+				// CHECK IF ANY CELL IS IN EDITING MODE.
+				if (dataGrid.isEditing()) {
 					try {
-					// GET THE COLUMN IN WHICH EDITING IS TAKING PLACE
-				        final int column = dataGrid.getEditingColumn();
-				        if (column > -1) {
-				        // GET THE EDITOR FOR THAT CELL.
-				            TableCellEditor cellEditor = dataGrid.getColumnModel().getColumn(column).getCellEditor();
-				        // IF NO SPECIFIC EDITOR IS PRESENT THEN GET THE DEFAULT CELL EDITOR.
-				            if (cellEditor == null) {
-				                cellEditor = dataGrid.getDefaultEditor(dataGrid.getColumnClass(column));
-				            }
-				        // IF THERE IS ANY EDITOR THEN STOP THE EDITING.
-				            if (cellEditor != null) {
-				                cellEditor.stopCellEditing();
-				                cellEditor.cancelCellEditing();
-				            }
-				        }
-				    }
-				    catch (final Exception e) {
-				    	logger.error("Exception.", e);
-				    }
+						// GET THE COLUMN IN WHICH EDITING IS TAKING PLACE
+						final int column = dataGrid.getEditingColumn();
+						if (column > -1) {
+							// GET THE EDITOR FOR THAT CELL.
+							TableCellEditor cellEditor = dataGrid.getColumnModel().getColumn(column).getCellEditor();
+							// IF NO SPECIFIC EDITOR IS PRESENT THEN GET THE DEFAULT CELL EDITOR.
+							if (cellEditor == null) {
+								cellEditor = dataGrid.getDefaultEditor(dataGrid.getColumnClass(column));
+							}
+							// IF THERE IS ANY EDITOR THEN STOP THE EDITING.
+							if (cellEditor != null) {
+								cellEditor.stopCellEditing();
+								cellEditor.cancelCellEditing();
+							}
+						}
+					} catch (final Exception e) {
+						logger.error("Exception.", e);
+					}
 				}
 			}
 		});
@@ -351,8 +316,34 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 
 	/**
 	 * Adds and configures the DataGrid components.
+	 * <p>
+	 * Calls for dataGrid.setRowSet() and dataGrid.setPrimaryColumn() are handled automatically.
 	 */
 	public abstract void configureDataGrid();
+	
+	/**
+	 * Method implemented by screen developer to return a String array with the table/grid
+	 * column names for which to set default values.
+	 * 
+	 * @return a String array with the table/grid column names
+	 */
+	public abstract String[] getDefaultColumnNames();
+	
+	/**
+	 * Method implemented by screen developer to return a String array with the table/grid
+	 * column default values.
+	 * 
+	 * @return an Object array with the table/grid column default values
+	 */
+	public abstract Object[] getDefaultColumnValues();
+	
+	/**
+	 * Method implemented by screen developer to return a String array with the table/grid
+	 * column headings.
+	 * 
+	 * @return a String array with the table/grid column headings
+	 */
+	public abstract String[] getHeaders();
 
 	/**
 	 * Performs post construction initialization.  Needs to be called from constructor in implementation.
@@ -407,28 +398,42 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			// SETUP QUERY, DEFAULTS, and BUILD SCREEN
 			// SET ROWSET QUERY
 			initRowset();
-	
+			
+			// SET TABLE/GRID HEADERS
+			dataGrid.setHeaders(getHeaders());
+
+			// SET ROWSET FOR DATAGRID
+			dataGrid.setRowSet(getRowset());
+			
+			// SET PRIMARY COLUMN
+			dataGrid.setPrimaryColumn(getPkColumn());
+
 			// CONFIGURE DATAGRID
 			configureDataGrid();
-			
-			// ADD DATAGRID TO CONTENT PANE
-	 		contentPane.add(dataGrid.getComponent());
-	
+
 			// ADD MENU BAR TO THE SCREEN.
 			setJMenuBar(getJMenuBar());
 	
 			// ADD/CONFIGURE TOOLBARS
 			configureToolBars();
+			
+			// ADD DATAGRID TO CONTAINER
+			//  - PUT INSIDE OF A JSCROLLPANE SO WE HAVE SCROLL BARS WHEN NEEDED
+			//  - WITHOUT THE JSCROLLPANE, SOMETIMES THE COLUMN HEADERS DON'T RENDER
+	 		//getContentPane().add(dataGrid);
+	 		getContentPane().add(new JScrollPane(dataGrid));
+			
+			// SET CELL ENABLING/DISABLING
+			setActivateDeactivate();
 	
 			// ADD SCREEN LISTENERS
 			addCoreListeners();
-			
+
 			// SET DEFAULT VALUES
 			setDefaultValues();
 			
 			// MAKE SCREEN VISIBLE
-			//setVisible(true);
-			// Parent to call screenClass.showUp(this);
+			showUp(getParentContainer());
 			
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
@@ -440,33 +445,46 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 					"Error while initializing screen, parent ID: " + getParentID() + ".\n" + e.getMessage());
 		}
 	}
-
+	
 	/**
-	 * Updates the parent ID used for record retrieval, sets the rowset query, updates the DataGrid rowset,
-	 * and updates any DataGrid default values.
-	 *
-	 * @param _parentID the parent ID linking the records to be displayed.
+	 * Used to enable/disable cells based on adjacent cell value or other criteria.
 	 * 
-	 * @deprecated Starting in 4.0.0+ use {@link #updateScreen(Long)} instead.
+	 * JTables/SSDataGrids count rows and columns from zero.
+	 * 
+	 * Can simply override and return true if not enabling/disabling is needed.
+	 * 
+	 * @param _row JTable/SSDatagrid row to evaluate
+	 * @param _column JTable/SSDatagrid column to evaluate
+	 * @return true if cell should be editable/enabled, otherwise false
 	 */
-	@Override
-	@Deprecated
-	public void setParentID(final Long _parentID) {
-		updateScreen(_parentID);
+	public abstract boolean isGridCellEditable(int _row, int _column);
+	
+	/**
+	 * Used to enable/disable cells based on adjacent cell value or other criteria.
+	 * 
+	 * @throws Exception thrown if an exception is encountered enabling/disabling cells
+	 */
+	private void setActivateDeactivate() throws Exception {
+		dataGrid.setSSCellEditing(new SSCellEditing(){
+
+			private static final long serialVersionUID = 1L; // UNIQUE SERIAL ID
+
+			@Override
+			public boolean isCellEditable(int _row, int _column) {
+				return isGridCellEditable(_row, _column);
+			}
+		});
+
 	}
 	
 	/**
-	 * Updates the parent ID used for record retrieval, sets the rowset query, updates the DataGrid rowset,
-	 * and updates any DataGrid default values.
-	 *
-	 * @param _parentID the parent ID linking the records to be displayed.
-	 * @param _fullSQL	full query for rowset
+	 * Sets any default values for the data grid columns.
 	 * 
-	 * @deprecated Starting in 4.0.0+ use {@link #updateScreen(Long, String)} instead.
+	 * @throws Exception exception thrown while setting default values for the data grid
 	 */
-	@Deprecated
-	public void setParentID(final Long _parentID, final String _fullSQL) {
-		updateScreen(_parentID, _fullSQL);
+	@Override
+	protected void setDefaultValues() throws Exception {
+		dataGrid.setDefaultValues(getDefaultColumnNames(),getDefaultColumnValues());
 	}
 
 	/**
@@ -480,69 +498,22 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	@Deprecated
 	public void setPosition(final int _defaultX, final int _defaultY) {
 		setDefaultScreenLocation(_defaultX, _defaultY);
-
-	}
-	
-	/**
-	 * Updates the parent ID used for record retrieval, sets the rowset query, updates the DataGrid rowset,
-	 * and updates any DataGrid default values.
-	 *
-	 * @param _parentID the parent ID linking the records to be displayed.
-	 * @param _fullSQL	full query for rowset
-	 */
-	public void updateScreen(final Long _parentID, final String _fullSQL) {
-	    updateScreen(_parentID, _fullSQL, null, null);
-	}
-	
-	/**
-	 * Updates the parent ID used for record retrieval, sets the rowset query, updates the DataGrid rowset,
-	 * and updates any DataGrid default values.
-	 *
-	 * @param _parentID the parent ID linking the records to be displayed.
-	 * @param _selectSQL	SELECT clause for rowset such that selectSQL + parentID + " " + orderBySQL is a valid query
-	 * @param _orderBySQL	ORDER BY clause for rowset including at least a semicolon
-	 */
-	public void updateScreen(final Long _parentID, final String _selectSQL, final String _orderBySQL) {
-		updateScreen(_parentID, null, _selectSQL, _orderBySQL);
-	}
-	
-	/**
-	 * Updates the parent ID used for record retrieval, sets the rowset query, updates the DataGrid rowset,
-	 * and updates any DataGrid default values.
-	 *
-	 * @param _parentID the parent ID linking the records to be displayed.
-	 * @param _fullSQL	full query for rowset
-	 * @param _selectSQL	SELECT clause for rowset such that selectSQL + parentID + " " + orderBySQL is a valid query
-	 * @param _orderBySQL	ORDER BY clause for rowset including at least a semicolon
-	 */
-	private void updateScreen(final Long _parentID, final String _fullSQL, final String _selectSQL, final String _orderBySQL) {
-
-	    setFullSQL(_fullSQL);
-	    setSelectSQL(_selectSQL);
-	    setOrderBySQL(_orderBySQL);
-	    
-	    updateScreen(_parentID);
 	}
 
 	/**
-	 * Updates the rowset
-	 *
-	 * @param _parentID primary key value of parent record (FK for current rowset)
+	 * Updates the rowset. Developer can call setParentID() prior to calling updateScreen()
+	 * if necessary for getRowsetQuery();
 	 */
 	@Override
-	public void updateScreen(final Long _parentID) {
-		
-		// Update parameters
-			super.setParentID(_parentID);
+	public void updateScreen() {
 
-			try {
+		try {
 
-		    // UPDATE ROWSET
-	    		updateRowset();
-		        dataGrid.setRowSet(getRowset());
-
-	        // SET ANY DEFAULT VALUES
-		        setDefaultValues();
+			// UPDATE/REQUERY ROWSET
+			updateRowset();
+			
+			// UPDATE DATAGRID ROWSET
+			dataGrid.setRowSet(getRowset());
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
@@ -554,6 +525,6 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 					"Error while updating screen for parent ID: " + getParentID() + ".\n" + e.getMessage());
 		}
 
-	} 
+	}
 
 } // end SSDataGridScreenHelper class

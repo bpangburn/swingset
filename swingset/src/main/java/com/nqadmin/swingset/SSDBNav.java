@@ -120,9 +120,7 @@ public interface SSDBNav extends Serializable {
 	 * @return true if the row can be deleted else false.
 	 */
 	default boolean allowDeletion() {
-
 		return true;
-
 	}
 
 	/**
@@ -132,7 +130,6 @@ public interface SSDBNav extends Serializable {
 	 */
 	default boolean allowInsertion() {
 		return true;
-
 	}
 
 	/**
@@ -141,9 +138,7 @@ public interface SSDBNav extends Serializable {
 	 * @return true is the row can be updated else false.
 	 */
 	default boolean allowUpdate() {
-
 		return true;
-
 	}
 
 	/**

@@ -96,15 +96,16 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	public final static long hopefullyNoPKValue = -998877;
 	
 	private Connection connection; // Database connection.
+	private Container parentContainer; // Screen/window to which form/grid is to be attached
 	private RowSet rowset; // Rowset to be used for screen/form.
 
 	private String pkColumn; // Primary key column name for rowset.
 	
 	private Long parentID = null; // Primary key value of parent record (FK for current rowset).
 	
-	private String fullSQL = null; // Full SQL for rowset
-	private String selectSQL = null; // SELECT CLAUSE FOR RECORDSET SUCH THAT selectSQL + parentID + " " + orderBySQL IS A VALID QUERY
-	private String orderBySQL = null; // ORDER BY CLAUSE FOR RECORDSET INCLUDING AT LEAST A SEMICOLON
+//	private String fullSQL = null; // Full SQL for rowset
+//	private String selectSQL = null; // SELECT CLAUSE FOR RECORDSET SUCH THAT selectSQL + parentID + " " + orderBySQL IS A VALID QUERY
+//	private String orderBySQL = null; // ORDER BY CLAUSE FOR RECORDSET INCLUDING AT LEAST A SEMICOLON
 
 	private int defaultX = 0; // Default top left horizontal offset for screen/form.
 	private int defaultY = 0; // Default top left vertical offset for screen/form.
@@ -179,6 +180,13 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * </pre>
 	 */
 	protected abstract void configureToolBars();
+	
+	/**
+	 * @return a database Connection
+	 */
+	protected Connection getConnection() {
+		return connection;
+	}
 
 	/**
 	 * @return the top left horizontal screen offset
@@ -195,11 +203,19 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 	
 	/**
-	 * @return the full SQL for the rowset
+	 * @return the parent container/window for this screen
 	 */
-	protected String getFullSQL() {
-		return fullSQL;
+	protected Container getParentContainer() {
+		return parentContainer;
 	}
+	
+	/**
+	 * Method implemented by screen developer to provide the entire SQL query for the rowset
+	 * on demand. It may or may not utilize getParentID() for filtering the results.
+	 * 
+	 * @return the full SQL Query for the rowset
+	 */
+	public abstract String getRowsetQuery();
 
 	/**
 	 * Builds menu bar and adds applicable listeners.
@@ -209,13 +225,6 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	@Override
 	public abstract JMenuBar getJMenuBar();
 
-	/**
-	 * @return the ORDER BY clause of the SQL for the rowset
-	 */
-	protected String getOrderBySQL() {
-		return orderBySQL;
-	}
-	
 	/**
 	 * @return Parent window/container.
 	 *
@@ -250,51 +259,10 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 
 	/**
-	 * @return the SELECT clause of SQL for the rowset
-	 */
-	protected String getSelectSQL() {
-		return selectSQL;
-	}
-
-	/**
 	 * @return the rowset
 	 */
 	protected RowSet getRowset() {
 		return rowset;
-	}
-
-	/**
-	 * Provides the full SQL query for the rowset.
-	 * <p>
-	 * Often the implementation may include a call to {@link #getParentID()} for filtering.
-	 *
-	 * @return String with the full SQL query for the rowset
-	 * 
-	 * @throws Exception exception thrown while retrieving the selection query
-	 */
-	protected String getSelectionQuery() throws Exception {
-		
-		String result = null;
-		
-		if (getFullSQL()==null) {
-			if (getParentID()==null) {
-				result = getSelectSQL() + " " + getOrderBySQL();
-			} else {
-				result = getSelectSQL() + " " + getParentID() + " " + getOrderBySQL();
-			}
-		} else {
-			result = getFullSQL();
-		}
-		
-		return result;
-		
-	}
-
-	/**
-	 * @return a SwingSet Connection based on the DBConnector
-	 */
-	protected Connection getConnection() {
-		return connection;
 	}
 	
 	/**
@@ -359,16 +327,19 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * @param _defaultY the default Y coordinate for the screen
 	 */
 	public void setDefaultScreenLocation(final int _defaultX, final int _defaultY) {
-		setDefaultX(Integer.valueOf(ssProps.getProperty("Level_2_X_Position")));
-		setDefaultY(Integer.valueOf(ssProps.getProperty("Level_2_Y_Position")));
+		setDefaultX(Integer.valueOf(_defaultX));
+		setDefaultY(Integer.valueOf(_defaultY));
 	}
 	
 	/**
 	 * Sets any default values for the screen's components.
 	 * <p>
-	 * If there is a call to SSDBNavImpl.performPreInsertOps(), it should
-	 * take care of clearing all of the component values before defaults are
-	 * set.
+	 * For a Form View screen, if there is a call to SSDBNavImpl.performPreInsertOps(),
+	 * it should take care of clearing all of the component values before defaults
+	 * are set.
+	 * <p>
+	 * For a Data Grid screen, this will be a one-time call to
+	 * {@link #SSDataGrid.setDefaultValues()};
 	 * 
 	 * @throws Exception exception thrown while setting default values for screen components
 	 */
@@ -391,14 +362,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	public void setDefaultY(final int _defaultY) {
 		defaultY = _defaultY;
 	}
-	
-	/**
-	 * @param _fullSQL the full SQL to set for the rowset
-	 */
-	protected void setFullSQL(final String _fullSQL) {
-		fullSQL = _fullSQL;
-	}
-	
+
 	/**
 	 * @param _parentID the parentID to set
 	 */
@@ -411,13 +375,6 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 */
 	protected void setPkColumn(final String _pkColumn) {
 		pkColumn = _pkColumn;
-	}
-
-	/**
-	 * @param _orderBySQL the ORDER BY clause of the SQL to set for for the rowset
-	 */
-	protected void setOrderBySQL(final String _orderBySQL) {
-		orderBySQL = _orderBySQL;
 	}
 
 	/**
@@ -435,17 +392,17 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 	
 	/**
-	 * @param _selectSQL the SELECT clause of the SQL to set  for the rowset
-	 */
-	protected void setSelectSQL(final String _selectSQL) {
-		selectSQL = _selectSQL;
-	}
-	
-	/**
-	 * @param _connection the connection to set
+	 * @param _connection the database connection
 	 */
 	protected void setConnection(final Connection _connection) {
 		connection = _connection;
+	}
+	
+	/**
+	 * @param _parentContainer parent screen/window to which the form/grid should be attached
+	 */
+	protected void setParentContainer(final Container _parentContainer) {
+		parentContainer = _parentContainer;
 	}
 
 	/**
@@ -512,22 +469,23 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	protected void updateRowset() throws SQLException, Exception {
 		logger.debug("Rowset query: [{}].", () -> {
 			try {
-				return getSelectionQuery();
-			} catch (SQLException se) {
-				return "*** getSelectionQuery() threw an SQL Exception ***";
+				return getRowsetQuery();
+//			} catch (SQLException se) {
+//				return "*** getSelectionQuery() threw an SQL Exception ***";
 			} catch (Exception e) {
 				return "*** getSelectionQuery() threw an Exception ***";
 			}
 		});
-		getRowset().setCommand(getSelectionQuery());
+		getRowset().setCommand(getRowsetQuery());
 		getRowset().execute();
 	}
-
+	
 	/**
-	 * Updates the rowset and any components dependent upon the rowset
-	 *
-	 * @param _parentID primary key value of parent record (FK for current rowset)
+	 * Updates the rowset and any components dependent upon the rowset.
+	 * 
+	 * Implementation should presume that parentID has already been updated
+	 * if applicable.
 	 */
-	public abstract void updateScreen(final Long _parentID);
+	public abstract void updateScreen();
 
 }

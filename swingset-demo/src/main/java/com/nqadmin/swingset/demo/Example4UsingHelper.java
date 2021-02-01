@@ -55,7 +55,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.utils.SSEnums.Navigation;
 import com.nqadmin.swingset.utils.SSFormViewScreenHelper;
 
 /**
@@ -76,8 +75,8 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
     private static final Logger logger = LogManager.getLogger(Example4UsingHelper.class);
     
     // String Constants
-	private static final String screenQuery = "SELECT * FROM part_data ORDER BY part_id;";
-	private static final String cmbNavQuery = "SELECT part_id, part_name FROM part_data ORDER BY part_id;";
+	private static final String rowsetQuery = "SELECT * FROM part_data ORDER BY part_id;";
+	private static final String comboNavQuery = "SELECT part_id, part_name FROM part_data ORDER BY part_id;";
 	private static final String pkColumn = "part_id";
 	private static final String cmbNavDisplayColumn = "part_name";
 	
@@ -100,25 +99,22 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	 * Constructor for Example4
 	 * <p>
 	 * @param _dbConn - database connection
-	 * @param _container parent container
+	 * @param _container parent window/container
 	 */
 	public Example4UsingHelper(final Connection _dbConn, final Container _container) {
 
-		// Instantiate Screen
-		super("Example 4 Using Helper", _dbConn, pkColumn, null, screenQuery, cmbNavDisplayColumn, null, null, cmbNavQuery);
+		// Parent Constructor
+		super("Example 4 Using Helper", _container, _dbConn, pkColumn, null, cmbNavDisplayColumn);
 		
 		// For H2, the rowset has to be re-queried following a record insertion or deletion
 		// TODO: Investigate how MySQL handles insert/delete and implement addNewRecordToCmbNavigator if needed.
 		setRequeryAfterInsertOrDelete(true);
 		
-		// Finish Initialization
-		initScreen();
-		
 		// Hide the frame since we're putting the JInternalFrame in its own JFrame for the demo
 		setBorder(null);
 		
-		// Display Screen
-		showUp(_container);
+		// Finish Initialization
+		initScreen();
 	}
 
 	@Override
@@ -137,7 +133,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		lblPartCity.setPreferredSize(MainClass.labelDim);
 
 	// SET BOUND COMPONENT DIMENSIONS
-		getCmbNavigator().setPreferredSize(MainClass.ssDim);
+		getComboNav().setPreferredSize(MainClass.ssDim);
 		getTxtPrimaryKey().setPreferredSize(MainClass.ssDim);
 		txtPartName.setPreferredSize(MainClass.ssDim);
 		cmbPartColor.setPreferredSize(MainClass.ssDim);
@@ -165,7 +161,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 
 		constraints.gridx = 1;
 		constraints.gridy = 0;
-		contentPane.add(getCmbNavigator(), constraints);
+		contentPane.add(getComboNav(), constraints);
 		constraints.gridy = 1;
 		contentPane.add(getTxtPrimaryKey(), constraints);
 		constraints.gridy = 2;
@@ -185,19 +181,26 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 
 	@Override
 	protected void addCustomListeners() throws Exception {
-		// nothing to do...
+		// nothing to do..
 	}
 	
-	@Override
-	protected void addNewRecordToCmbNavigator() {
+	@Override//	/**
+//	 * data grid
+//	 */
+//	SSDataGrid dataGrid = null;
+//	
+//	/**
+//	 * database component declarations
+//	 */
+//	Connection connection = null;
+//	RowSet rowset = null;
+	protected void addNewRecordToComboNav() {
 		// nothing to do because H2 requires that the rowset be 
 		// requeried following a record insertion or deletion
-		
 	}
 
 	@Override
 	protected void bindComponents() throws Exception {
-		
 		//txtPartID.bind(getRowset(), "part_id");
 		txtPartName.bind(getRowset(), "part_name");
 		cmbPartColor.bind(getRowset(), "color_code");
@@ -208,13 +211,17 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	@Override
 	public void closeChildScreens() {
 		// nothing to do...
-
 	}
 
 	@Override
 	protected void configureToolBars() {
 		// nothing to do...
+	}
+	
 
+	@Override
+	public String getComboNavQuery() {
+		return comboNavQuery;
 	}
 
 	@Override
@@ -224,9 +231,15 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	}
 	
 	@Override
+	public String getRowsetQuery() {
+		return rowsetQuery;
+	}
+	
+	@Override
 	protected void populateSSComboBoxes() {
 		// SET COMBO OPTIONS
 		//cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
+		System.out.println(cmbPartColor);
 		cmbPartColor.setOptions(Arrays.asList(new String[] { "Red", "Green", "Blue" }));
 		
 	}
@@ -258,52 +271,11 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 
 	@Override
 	protected void setDefaultValues() throws Exception {
+		// ALL SET TO NULL/EMPTY STRING BY DEFAULT
 		//txtPartName.setText(null);
 		//cmbPartColor.setSelectedValue(0);
 		//txtPartWeight.setText("0");
 		//txtPartCity.setText(null);
-	}
-
-	@Override
-	protected void ssDBNavPerformCancelOps() {
-		// nothing to do...
-
-	}
-
-	@Override
-	protected void ssDBNavPerformNavigationOps(Navigation _navigationType) {
-		// nothing to do...
-
-	}
-
-	@Override
-	protected void ssDBNavPerformPostDeletionOps() {
-		// nothing to do...
-		
-	}
-
-	@Override
-	protected void ssDBNavPerformPostInsertOps() {
-		// nothing to do...
-		
-	}
-
-	@Override
-	protected void ssDBNavPerformPreDeletionOps() {
-		// nothing to do...
-
-	}
-
-	@Override
-	protected void ssDBNavPerformPreInsertOps() {
-		// nothing to do...
-
-	}
-
-	@Override
-	protected void ssDBNavPerformRefreshOps() {
-		// nothing to do...
-
 	}
 	
 	// THIS IS A HACK TO HIDE THE TITLE BAR SINCE WE'RE PUTTING THE JINTERNALFRAME IN ITS OWN JFRAME FOR THE SWINGSET DEMO
@@ -318,7 +290,5 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	@Override
 	protected void updateSSDBComboBoxes() {
 		// nothing to do...
-
 	}
-
 }
