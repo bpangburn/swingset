@@ -12,7 +12,7 @@
 	<packaging>jar</packaging>
 
 	<name>swingset</name>
-	<description>Data-aware replacements for manyof the standard Java Swing components</description>
+	<description>Data-aware replacements for many of the standard Java Swing components</description>
 	<url>https://github.com/bpangburn/swingset</url>
 
 	<properties>
