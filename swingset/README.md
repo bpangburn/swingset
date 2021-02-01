@@ -77,7 +77,10 @@ Traditional CLASSPATH:
     https://repo1.maven.org/maven2/com/nqadmin/swingset/swingset/
   
   Download the latest GlazedLists jar (glazedlists-x.y.z.jar) from:
-    https://repo1.maven.org/maven2/com/glazedlists/glazedlists/
+    https://repo1.maven.org/maven2/com/raelity/3rdparty/com/glazedlists/glazedlists/
+  ***NOTE: Normally the GlazedLists artifact comes from:
+     https://repo1.maven.org/maven2/com/glazedlists/glazedlists/,
+     but SwingSet 4.0.0 is relying on some preview features.***
     
   Download the latest jdbcrowsetimpl from:
     https://repo1.maven.org/maven2/com/nqadmin/rowset/jdbcrowsetimpl/
@@ -163,56 +166,54 @@ e.g.,
      want to store the id of the part chosen by the user in the shipment
      table.
 
-     SSConnection ssConnection = null;
+     Connection connection = null;
      RowSet rowSet = null;
      SSDataNavigator navigator = null;
      SSDBComboBox combo = null;
      
      try {
 
-    // CREATE A DATABASE CONNECTION OBJECT
-        ssConnection = new SSConnection(........);
-          
-    // CREATE AN INSTANCE OF JdbcRowSetImpl
-        rowSet = new JdbcRowSetImpl(ssConnection);
-        rowSet.setCommand("SELECT * FROM shipment_data;");
-          
-    // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE SSROWSET.
-    // IF YOU ARE NOT USING THE DATA NAVIGATOR YOU HAVE TO INCLUDE THOSE.
-    //   rowSet.execute();
-    //   rowSet.next();
-        SSDataNavigator navigator = new SSDataNavigator(rowSet);
+       // CREATE A DATABASE CONNECTION OBJECT
+           connection = new Connection(........);
 
-    // QUERY FOR THE COMBO BOX.
-        String query = "SELECT * FROM part_data;";
-          
-    // CREATE AN INSTANCE OF THE SSDBCOMBOBOX WITH THE CONNECTION OBJECT
-    // QUERY AND COLUMN NAMES
-        combo = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
-          
-    // THIS BASICALLY SPECIFIES THE COLUMN AND THE SSROWSET WHERE UPDATES HAVE
-    // TO BE MADE.
-        combo.bind(rowSet, "part_id");
-        combo.execute();
+       // CREATE AN INSTANCE OF JdbcRowSetImpl
+           rowSet = new JdbcRowSetImpl(connection);
+           rowSet.setCommand("SELECT * FROM shipment_data;");
 
-    // CREATE A TEXTFIELD
-        SSTextField myText = new SSTextField();
-        
-    // BIND TEXTFIELD
-        myText.bind(rowSet, "quantity");
-           
+       // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE ROWSET.
+       // IF YOU ARE NOT USING THE DATA NAVIGATOR YOU HAVE TO INCLUDE THOSE.
+       //   rowSet.execute();
+       //   rowSet.next();
+           SSDataNavigator navigator = new SSDataNavigator(rowSet);
+
+       // QUERY FOR THE COMBO BOX.
+           String query = "SELECT * FROM part_data;";
+
+       // CREATE AN INSTANCE OF THE SSDBCOMBOBOX WITH THE CONNECTION OBJECT
+       // QUERY AND COLUMN NAMES
+           combo = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
+
+       // THIS BASICALLY SPECIFIES THE COLUMN AND THE SSROWSET WHERE UPDATES HAVE
+       // TO BE MADE.
+           combo.bind(rowSet, "part_id");
+           combo.execute();
+
+       // CREATE A TEXTFIELD
+           SSTextField myText = new SSTextField();
+
+       // BIND TEXTFIELD
+           myText.bind(rowSet, "quantity");
+
      } catch(Exception e) {
-     // EXCEPTION HANDLER HERE...
+       // EXCEPTION HANDLER HERE...
      }
-
 
      // ADD THE SSDBCOMBOBOX TO THE JFRAME
           getContentPane().add(combo);
           
      // ADD THE SSTEXTFIELD TO THE JFRAME
           getContentPane().add(myText);
-          
-          
+
 ### SSImage
 
 SSImage is a component which can be used to load, store, & display JPEG & GIF images stored in a database.
