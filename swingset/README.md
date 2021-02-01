@@ -93,12 +93,12 @@ Traditional CLASSPATH:
   Add any JDBC drivers needed for your database to your CLASSPATH
   
 Maven:
-  Add SwingSet to the Maven dependencies in your POM file:
-  	`<dependency>
-		<groupId>com.nqadmin.swingset</groupId>
-		<artifactId>swingset</artifactId>
-		<version>x.y.z</version>
-	</dependency>`
+  Add SwingSet to the Maven dependencies in your POM file:  
+  	<dependency>  
+		<groupId>com.nqadmin.swingset</groupId>  
+		<artifactId>swingset</artifactId>  
+		<version>x.y.z</version>  
+	</dependency>  
 
 
 ## SAMPLE/DEMO PROGRAMS
