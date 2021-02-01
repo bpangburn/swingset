@@ -94,13 +94,13 @@ Traditional CLASSPATH:
   
 Maven:
   Add SwingSet to the Maven dependencies in your POM file:  
+  `
   	<dependency>  
 		<groupId>com.nqadmin.swingset</groupId>  
 		<artifactId>swingset</artifactId>  
 		<version>x.y.z</version>  
 	</dependency>  
-
-
+`
 ## SAMPLE/DEMO PROGRAMS
 
 See https://github.com/bpangburn/swingset/blob/master/swingset-demo/README.md
@@ -123,16 +123,17 @@ Used to display the boolean values stored in the database. The SSCheckBox can be
 
 Provides a way of displaying text corresponding to codes that are stored in the database. By default the codes start from zero. If you want to provide a different mapping for the items in the combo box then a string of integers containing the corresponding numeric values for each choice must be provided.
 
-e.g.,
-     `SSComboBox combo = new SSComboBox();
+e.g.,  
+`
+     SSComboBox combo = new SSComboBox();
      String[] options = {"111", "2222", "33333"};
      combo.setOptions(options);
   
-     For the above items the combo box assumes that the values start from zero:
-          "111" -> 0, "2222" -> 1, "33333" -> 2
+     //For the above items the combo box assumes that the values start from zero:
+     //     "111" -> 0, "2222" -> 1, "33333" -> 2
     
-     To give your own mappings  you can set the mappings separately or pass
-     them along with the options:
+     //To give your own mappings  you can set the mappings separately or pass
+     //them along with the options:
 
      SSComboBox combo = new SSComboBox();
      String[] options = {"111", "2222", "33333"};
@@ -141,11 +142,12 @@ e.g.,
 
      // next line is assuming myrowset has been initialized and my_column is a
      // column in myrowset
-     combo.bind(myrowset,"my_column");`
+     combo.bind(myrowset,"my_column");
      
-     Note that if you DO NOT want to use the default mappings, the custom
-     mappings must be set before calling the bind() method to bind the
-     combo box to a database column.
+     //Note that if you DO NOT want to use the default mappings, the custom
+     //mappings must be set before calling the bind() method to bind the
+     // combo box to a database column.
+`    
 
 ### SSDBComboBox
 
@@ -166,7 +168,8 @@ e.g.,
      want to store the id of the part chosen by the user in the shipment
      table.
 
-     `Connection connection = null;
+`     
+     Connection connection = null;
      RowSet rowSet = null;
      SSDataNavigator navigator = null;
      SSDBComboBox combo = null;
@@ -212,7 +215,8 @@ e.g.,
           getContentPane().add(combo);
           
      // ADD THE SSTEXTFIELD TO THE JFRAME
-          getContentPane().add(myText);`
+          getContentPane().add(myText);
+`	  
 
 ### SSImage
 
