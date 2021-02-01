@@ -400,12 +400,8 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			initRowset();
 			
 			// SET TABLE/GRID HEADERS
-			//dataGrid.setHeaders(getHeaders());
-			dataGrid.setHeaders(new String[] { "Supplier-Part ID", "Supplier Name", "Part Name", "Quantity", "Ship Date" });
-			
-			// TODO: HEADERS ARE NOT SHOWING UP, AND AN UNNECESSARY TITLE BAR IS
-			logger.warn(getHeaders());
-			
+			dataGrid.setHeaders(getHeaders());
+
 			// SET ROWSET FOR DATAGRID
 			dataGrid.setRowSet(getRowset());
 			
