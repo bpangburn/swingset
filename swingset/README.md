@@ -94,13 +94,13 @@ Traditional CLASSPATH:
   
 Maven:
   Add SwingSet to the Maven dependencies in your POM file:  
-  `
-  	<dependency>  
-		<groupId>com.nqadmin.swingset</groupId>  
-		<artifactId>swingset</artifactId>  
-		<version>x.y.z</version>  
-	</dependency>  
-`
+
+    <dependency>
+        <groupId>com.nqadmin.swingset</groupId>
+        <artifactId>swingset</artifactId>
+	<version>x.y.z</version>
+    </dependency>
+
 ## SAMPLE/DEMO PROGRAMS
 
 See https://github.com/bpangburn/swingset/blob/master/swingset-demo/README.md
@@ -124,71 +124,69 @@ Used to display the boolean values stored in the database. The SSCheckBox can be
 Provides a way of displaying text corresponding to codes that are stored in the database. By default the codes start from zero. If you want to provide a different mapping for the items in the combo box then a string of integers containing the corresponding numeric values for each choice must be provided.
 
 e.g.,  
-`
-     SSComboBox combo = new SSComboBox();
-     String[] options = {"111", "2222", "33333"};
-     combo.setOptions(options);
-  
-     //For the above items the combo box assumes that the values start from zero:
-     //     "111" -> 0, "2222" -> 1, "33333" -> 2
+
+    SSComboBox combo = new SSComboBox();
+    String[] options = {"111", "2222", "33333"};
+    combo.setOptions(options);
     
-     //To give your own mappings  you can set the mappings separately or pass
-     //them along with the options:
-
-     SSComboBox combo = new SSComboBox();
-     String[] options = {"111", "2222", "33333"};
-     int[] mappings = { 1,5,7 };
-     combo.setOptions(options, mappings);
-
-     // next line is assuming myrowset has been initialized and my_column is a
-     // column in myrowset
-     combo.bind(myrowset,"my_column");
-     
-     //Note that if you DO NOT want to use the default mappings, the custom
-     //mappings must be set before calling the bind() method to bind the
-     // combo box to a database column.
-`    
+    //For the above items the combo box assumes that the values start from zero:
+    //     "111" -> 0, "2222" -> 1, "33333" -> 2
+    
+    //To give your own mappings  you can set the mappings separately or pass
+    //them along with the options:
+       
+    SSComboBox combo = new SSComboBox();
+    String[] options = {"111", "2222", "33333"};
+    int[] mappings = { 1,5,7 };
+    combo.setOptions(options, mappings);
+    
+    // next line is assuming myrowset has been initialized and my_column is a
+    // column in myrowset
+    combo.bind(myrowset,"my_column");
+    
+    //Note that if you DO NOT want to use the default mappings, the custom
+    //mappings must be set before calling the bind() method to bind the
+    // combo box to a database column.
 
 ### SSDBComboBox
 
 Similar to the SSComboBox, but used when both the 'bound' values and the 'display' values are pulled from a database table.  Generally the bound value represents a foreign key to another table, and the combo box needs to diplay a list of one (or more) columns from the other table.
   
-e.g.,
+e.g.,  
+    
+    Consider two tables:
+        1. part_data (part_id, part_name, ...)
+        2. shipment_data (shipment_id, part_id, quantity, ...)
+    
+    Assume you would like to develop a screen for the shipment table and you
+    want to have a screen with a combo box where the user can choose a
+    part and a text box where the user can specify a  quantity.
 
-     Consider two tables:
-       1. part_data (part_id, part_name, ...)
-       2. shipment_data (shipment_id, part_id, quantity, ...)
-  
-     Assume you would like to develop a screen for the shipment table and you
-     want to have a screen with a combo box where the user can choose a
-     part and a text box where the user can specify a  quantity.
-
-     In the combo box you would want to display the part name rather than
-     part_id so that it is easier for the user to choose. At the same time you
-     want to store the id of the part chosen by the user in the shipment
-     table.
-
-`     
-     Connection connection = null;
-     RowSet rowSet = null;
-     SSDataNavigator navigator = null;
-     SSDBComboBox combo = null;
-     
-     try {
-
-       // CREATE A DATABASE CONNECTION OBJECT
-           connection = new Connection(........);
-
-       // CREATE AN INSTANCE OF JdbcRowSetImpl
+    In the combo box you would want to display the part name rather than
+    part_id so that it is easier for the user to choose. At the same time you
+    want to store the id of the part chosen by the user in the shipment
+    table.
+    
+    Connection connection = null;
+    RowSet rowSet = null;
+    SSDataNavigator navigator = null;
+    SSDBComboBox combo = null;
+    
+    try {
+    
+        // CREATE A DATABASE CONNECTION OBJECT
+          connection = new Connection(........);
+    
+        // CREATE AN INSTANCE OF JdbcRowSetImpl
            rowSet = new JdbcRowSetImpl(connection);
            rowSet.setCommand("SELECT * FROM shipment_data;");
-
-       // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE ROWSET.
-       // IF YOU ARE NOT USING THE DATA NAVIGATOR YOU HAVE TO INCLUDE THOSE.
-       //   rowSet.execute();
-       //   rowSet.next();
+    
+        // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE ROWSET.
+        // IF YOU ARE NOT USING THE DATA NAVIGATOR YOU HAVE TO INCLUDE THOSE.
+        //   rowSet.execute();
+        //   rowSet.next();
            SSDataNavigator navigator = new SSDataNavigator(rowSet);
-
+    
        // QUERY FOR THE COMBO BOX.
            String query = "SELECT * FROM part_data;";
 
@@ -200,23 +198,22 @@ e.g.,
        // TO BE MADE.
            combo.bind(rowSet, "part_id");
            combo.execute();
-
-       // CREATE A TEXTFIELD
+    
+        // CREATE A TEXTFIELD
            SSTextField myText = new SSTextField();
 
-       // BIND TEXTFIELD
+        // BIND TEXTFIELD
            myText.bind(rowSet, "quantity");
-
-     } catch(Exception e) {
-       // EXCEPTION HANDLER HERE...
-     }
-
-     // ADD THE SSDBCOMBOBOX TO THE JFRAME
-          getContentPane().add(combo);
+    
+    } catch(Exception e) {
+        // EXCEPTION HANDLER HERE...
+    }
+    
+    // ADD THE SSDBCOMBOBOX TO THE JFRAME
+        getContentPane().add(combo);
           
-     // ADD THE SSTEXTFIELD TO THE JFRAME
-          getContentPane().add(myText);
-`	  
+    // ADD THE SSTEXTFIELD TO THE JFRAME
+        getContentPane().add(myText);
 
 ### SSImage
 
