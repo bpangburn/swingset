@@ -102,34 +102,34 @@ Command line:
   4. Make a "lib" subdirectory  
      	`mkdir lib`
   5. Save the following jar files to the "lib" subdirectory  
-    * a. Download the latest SwingSet jar (currently, swingset-4.0.0.jar) from:  
+     a. Download the latest SwingSet jar (currently, swingset-4.0.0.jar) from:  
         https://repo1.maven.org/maven2/com/nqadmin/swingset/swingset/  
-    * b. Download the latest GlazedLists jar (currently, glazedlists-1.11.1203.jar) from:  
+     b. Download the latest GlazedLists jar (currently, glazedlists-1.11.1203.jar) from:  
         https://repo1.maven.org/maven2/com/raelity/3rdparty/com/glazedlists/glazedlists/   
         ***NOTE: Normally the GlazedLists artifact comes from:  
-	https://repo1.maven.org/maven2/com/glazedlists/glazedlists/, but SwingSet 4.0.0 is relying on some preview features.***  
-    * c. Download the latest H2 Database jar (currently, h2-1.4.200.jar)  
+	https://repo1.maven.org/maven2/com/glazedlists/glazedlists/  
+	but SwingSet 4.0.0 is relying on some preview features.***  
+     c. Download the latest H2 Database jar (currently, h2-1.4.200.jar)  
         https://repo1.maven.org/maven2/com/h2database/h2/  
-    * d. Download the latest jdbcrowsetimpl (currently, jdbcrowsetimpl-1.0.2.jar)  
+     d. Download the latest jdbcrowsetimpl (currently, jdbcrowsetimpl-1.0.2.jar)  
         https://repo1.maven.org/maven2/com/nqadmin/rowset/jdbcrowsetimpl/  
-    * e. Download the latest log4j-core (currently, log4j-core-2.13.3.jar)  
+     e. Download the latest log4j-core (currently, log4j-core-2.13.3.jar)  
         https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/  
-    * f. Download the latest log4j-api (currently, log4j-api-2.13.3.jar)  
+     f. Download the latest log4j-api (currently, log4j-api-2.13.3.jar)  
         https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/  
-    * g. Download the latest java-getopt (currently, java-getopt-1.0.13.jar)  
+     g. Download the latest java-getopt (currently, java-getopt-1.0.13.jar)  
         https://repo1.maven.org/maven2/gnu/getopt/java-getopt/  
      
-  6. Compile the demo (using latest dependency jars as of 2020-10-29):
-  	 Linux:
-		`javac -classpath .:./lib/glazedlists-1.11.1203.jar:./lib/h2-1.4.200.jar:./lib/java-getopt-1.0.13.jar:./lib/jdbcrowsetimpl-1.0.2.jar:./lib/log4j-api-2.13.3.jar:./lib/log4j-core-2.13.3.jar:./lib/swingset-4.0.0.jar ./com/nqadmin/swingset/demo/*.java`
-	 Windows:
-		`javac -classpath ..;.\lib\glazedlists-1.11.1203.jar;.\lib\h2-1.4.200.jar;.\lib\java-getopt-1.0.13.jar;.\lib\jdbcrowsetimpl-1.0.2.jar;.\lib\log4j-api-2.13.3.jar;.\lib\log4j-core-2.13.3.jar;.\lib\swingset-4.0.0.jar .\com\nqadmin\swingset\demo\*.java`
+  6. Compile the demo (using latest dependency jars as of 2020-10-29):  
+  	 Linux:  
+		`javac -classpath .:./lib/glazedlists-1.11.1203.jar:./lib/h2-1.4.200.jar:./lib/java-getopt-1.0.13.jar:./lib/jdbcrowsetimpl-1.0.2.jar:./lib/log4j-api-2.13.3.jar:./lib/log4j-core-2.13.3.jar:./lib/swingset-4.0.0.jar ./com/nqadmin/swingset/demo/*.java`  
+	 Windows:  
+		`javac -classpath ..;.\lib\glazedlists-1.11.1203.jar;.\lib\h2-1.4.200.jar;.\lib\java-getopt-1.0.13.jar;.\lib\jdbcrowsetimpl-1.0.2.jar;.\lib\log4j-api-2.13.3.jar;.\lib\log4j-core-2.13.3.jar;.\lib\swingset-4.0.0.jar .\com\nqadmin\swingset\demo\*.java`  
   7. Run the demo:
-  	 Linux:
-		`java -classpath .:./lib/glazedlists-1.11.1203.jar:./lib/h2-1.4.200.jar:./lib/java-getopt-1.0.13.jar:./lib/jdbcrowsetimpl-1.0.2.jar:./lib/log4j-api-2.13.3.jar:./lib/log4j-core-2.13.3.jar:./lib/swingset-4.0.0.jar com.nqadmin.swingset.demo.MainClass`
-	 Windows:
-		`java -classpath .;.\lib\glazedlists-1.11.1203.jar;.\lib\h2-1.4.200.jar;.\lib\java-getopt-1.0.13.jar;.\lib\jdbcrowsetimpl-1.0.2.jar;.\lib\log4j-api-2.13.3.jar;.\lib\log4j-core-2.13.3.jar;.\lib\swingset-4.0.0.jar com.nqadmin.swingset.demo.MainClass`
-
+  	 Linux:  
+		`java -classpath .:./lib/glazedlists-1.11.1203.jar:./lib/h2-1.4.200.jar:./lib/java-getopt-1.0.13.jar:./lib/jdbcrowsetimpl-1.0.2.jar:./lib/log4j-api-2.13.3.jar:./lib/log4j-core-2.13.3.jar:./lib/swingset-4.0.0.jar com.nqadmin.swingset.demo.MainClass`  
+	 Windows:  
+		`java -classpath .;.\lib\glazedlists-1.11.1203.jar;.\lib\h2-1.4.200.jar;.\lib\java-getopt-1.0.13.jar;.\lib\jdbcrowsetimpl-1.0.2.jar;.\lib\log4j-api-2.13.3.jar;.\lib\log4j-core-2.13.3.jar;.\lib\swingset-4.0.0.jar com.nqadmin.swingset.demo.MainClass`  
 
 ## CLASS DESCRIPTIONS
 
