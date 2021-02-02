@@ -253,12 +253,12 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	private SSDBComboBox comboNav; // Combo navigator.
 	private String comboNavDisplayColumn1 = null; // name of the 1st database column to display in the combo navigator
 	private String comboNavDisplayColumn2 = null; // name of the 2nd database column to display in the combo navigator
-
 	private String comboNavSeparator = null; // character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator
-	private SSDataNavigator dataNavigator; // Data navigator.
-	private boolean requeryAfterInsertOrDelete = false; // for some databases like H2, you have to call .execute() on the rowset following insertion or deletion
 	
+	private SSDataNavigator dataNavigator; // Data navigator.
 	private SSSyncManager syncManager; // SYNC DB NAV COMBO and NAVIGATOR
+	
+	private boolean requeryAfterInsertOrDelete = false; // for some databases like H2, you have to call .execute() on the rowset following insertion or deletion
 
 	//private SSTextField txtParentID = new SSTextField(); // Always keep a SSTextField with the parent ID.
 	private SSTextField txtPrimaryKey = new SSTextField(); // Always keep a SSTextField with the primary key.
