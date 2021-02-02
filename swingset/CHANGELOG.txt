@@ -8,7 +8,8 @@ SwingSet 4.0.1 - Released TBD
 ==============================================================================
 
 Changes:
-	1. Something goes here...
+	1. Changed some ScreenHelper class methods from public to protected.
+	2. 
 
 ==============================================================================
 SwingSet 4.0.0 - Released 2021-01-31
