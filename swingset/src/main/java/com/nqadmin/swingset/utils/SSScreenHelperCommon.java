@@ -47,7 +47,9 @@ import java.util.Properties;
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
 import org.apache.logging.log4j.LogManager;
@@ -94,31 +96,14 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * SwingSet properties
 	 */
 	protected static final Properties ssProps = SSProperties.getProperties();
-	
-	/**
-	 * Convenience method when developer wants to pass the result of
-	 * getSelectedMapping() for a SSDBComboBox directly into the WHERE clause of
-	 * a SQL query. Will either return not null Long from getSelectedMapping
-	 * or hopefullyNoPKValue (-998877), but should never return null.
-	 * <p>
-	 * Presumes that there are no records matching hopefullyNoPKValue (-998877)
-	 * so if this value is returned, the query will not return any records, but
-	 * should not throw a SQL Exception.
-	 * 
-	 * @param _combo combobox for which to retrieve selected mapping
-	 * @return Long containing selectedMapping if not null, otherwise hopefullyNoPKValue
-	 */
-	public static Long getPKForQuery(com.nqadmin.swingset.SSDBComboBox _combo) {
-		Long result = _combo.getSelectedMapping();
-		if (result==null) {
-			result = hopefullyNoPKValue;
-		}
-		
-		return result;
-	}
-	private Connection connection; // Database connection.
-	private int defaultX = 0; // Default top left horizontal offset for screen/form.
 
+	private Connection connection; // Database connection.
+	private RowSet rowset; // Rowset to be used for screen/form.
+	private String pkColumn; // Primary key column name for rowset.
+	
+	private Long parentID = null; // Primary key value of parent record (FK for current rowset).
+	
+	private int defaultX = 0; // Default top left horizontal offset for screen/form.
 	private int defaultY = 0; // Default top left vertical offset for screen/form.
 	
 	private Container parentContainer; // Screen/window to which form/grid is to be attached
@@ -126,11 +111,6 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 //	private String fullSQL = null; // Full SQL for rowset
 //	private String selectSQL = null; // SELECT CLAUSE FOR RECORDSET SUCH THAT selectSQL + parentID + " " + orderBySQL IS A VALID QUERY
 //	private String orderBySQL = null; // ORDER BY CLAUSE FOR RECORDSET INCLUDING AT LEAST A SEMICOLON
-
-	private Long parentID = null; // Primary key value of parent record (FK for current rowset).
-	private String pkColumn; // Primary key column name for rowset.
-	
-	private RowSet rowset; // Rowset to be used for screen/form.
 
 	/**
 	 * Creates a SSScreenHelperCommon based on an JInternalFrame with the specified title,
@@ -164,6 +144,29 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * @throws Exception exception thrown while adding any custom screen listeners
 	 */
 	protected abstract void addCustomListeners() throws Exception;
+	
+	/**
+	 * Helper method to add a screen closer to a JMenu. Usually this is 
+	 * the "File" JMenu.
+	 * 
+	 * @param _jInternalFrame screen that the menu item should close
+	 * @param _menu menu to which "Close" should be added
+	 */
+	public static void addInternalFrameCloserToMenu(JInternalFrame _jInternalFrame, JMenu _menu) {
+		
+		// CREATE MENU ITEMS FOR EACH TOP-LEVEL MENU
+		JMenuItem menuFileClose = _menu.add("Close");
+		
+		// ADD LISTENERS FOR EACH MENU ITEM
+		menuFileClose.addActionListener((event) -> {
+			try {
+				_jInternalFrame.setClosed(true);
+			} catch (PropertyVetoException _pve) {
+				logger.warn("Unable to close {}.",()-> {return _jInternalFrame.getTitle();});
+			}
+		});
+		
+	}
 
 	/**
 	 * Closes any child screens that are open.
@@ -217,7 +220,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * @return JMenuBar complete with any menu items and listeners (ideally using Lambdas)
 	 */
 	protected abstract JMenuBar getCustomMenu();
-
+	
 	/**
 	 * @return the top left horizontal screen offset
 	 */
@@ -241,6 +244,32 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	protected Frame getMainFrame() {
 		return getRootFrame();
 	}
+	
+	/**
+	 * Helper method provide a JMenuBar with a single File Menu
+	 * with a Menu Item to close the screen.
+	 * 
+	 * @param _jInternalFrame screen that the menu item should close
+	 * 
+	 * @return a JMenuBar with a single File menu containing a single Close menu item
+	 */
+	public static JMenuBar getMenuBarWithInternalFrameCloser(JInternalFrame _jInternalFrame) {
+		
+		// CREATE MENU BAR
+		JMenuBar thisMenu = new JMenuBar();
+		
+		// CREATE TOP-LEVEL MENUS FOR THE MENU BAR.
+		JMenu menuFile = new JMenu("File");
+		
+		addInternalFrameCloserToMenu(_jInternalFrame, menuFile);
+		
+		// ADD TOP-LEVEL MENUS TO THE MENU BAR.
+		thisMenu.add(menuFile);
+
+		// RETURN
+		return thisMenu;
+		
+	}
 
 	/**
 	 * @return the parent container/window for this screen
@@ -263,6 +292,29 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 */
 	public String getPkColumn() {
 		return pkColumn;
+	}
+	
+	
+	/**
+	 * Convenience method when developer wants to pass the result of
+	 * getSelectedMapping() for a SSDBComboBox directly into the WHERE clause of
+	 * a SQL query. Will either return not null Long from getSelectedMapping
+	 * or hopefullyNoPKValue (-998877), but should never return null.
+	 * <p>
+	 * Presumes that there are no records matching hopefullyNoPKValue (-998877)
+	 * so if this value is returned, the query will not return any records, but
+	 * should not throw a SQL Exception.
+	 * 
+	 * @param _combo combobox for which to retrieve selected mapping
+	 * @return Long containing selectedMapping if not null, otherwise hopefullyNoPKValue
+	 */
+	public static Long getPKForQuery(com.nqadmin.swingset.SSDBComboBox _combo) {
+		Long result = _combo.getSelectedMapping();
+		if (result==null) {
+			result = hopefullyNoPKValue;
+		}
+		
+		return result;
 	}
 	
 	/**
