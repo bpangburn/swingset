@@ -251,14 +251,14 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	private static final long serialVersionUID = 266766406708536384L; // unique serial ID
 	
 	private SSDBComboBox comboNav; // Combo navigator.
-	private SSDataNavigator dataNavigator; // Data navigator.
-	private SSSyncManager syncManager; // SYNC DB NAV COMBO and NAVIGATOR
-
 	private String comboNavDisplayColumn1 = null; // name of the 1st database column to display in the combo navigator
 	private String comboNavDisplayColumn2 = null; // name of the 2nd database column to display in the combo navigator
+
 	private String comboNavSeparator = null; // character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator
-	
+	private SSDataNavigator dataNavigator; // Data navigator.
 	private boolean requeryAfterInsertOrDelete = false; // for some databases like H2, you have to call .execute() on the rowset following insertion or deletion
+	
+	private SSSyncManager syncManager; // SYNC DB NAV COMBO and NAVIGATOR
 
 	//private SSTextField txtParentID = new SSTextField(); // Always keep a SSTextField with the parent ID.
 	private SSTextField txtPrimaryKey = new SSTextField(); // Always keep a SSTextField with the primary key.
@@ -441,6 +441,13 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	}
 	
 	/**
+	 * @return character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator
+	 */
+	protected String getCmbSeparator() {
+		return comboNavSeparator;
+	}
+
+	/**
 	 * @return the combo navigator
 	 */
 	protected SSDBComboBox getComboNav() {
@@ -458,13 +465,6 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * @return String with the full SQL query for the combo navigator
 	 */
 	protected abstract String getComboNavQuery();
-
-	/**
-	 * @return character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator
-	 */
-	protected String getCmbSeparator() {
-		return comboNavSeparator;
-	}
 
 	/**
 	 * @return the dataNavigator
@@ -550,24 +550,6 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	}
 	
 	/**
-	 * Performs post construction initialization.
-	 *
-	 * @param _parentID primary key value of parent record (FK for current rowset)
- 	 * @param _comboNavDisplayColumn1 name of the 1st database column to display in the combo navigator
- 	 * 
-	 * @deprecated Starting in 4.0.0+ these parameters are passed to constructor and initialization
-	 *  	is performed in handled {@link #initScreen()}.
-	 */
-	@Deprecated
-	protected void initScreen(final Long _parentID, final String _comboNavDisplayColumn1) {
-		
-		logger.error("initScreen() Method no longer supported. These parameters should be passed to the appropriate constructor.");
-		
-//		initScreen(_parentID, _comboNavDisplayColumn1, null, null);
-		
-	}
-	
-	/**
 	 * Performs post construction screen initialization.
 	 */
 	@Override
@@ -597,7 +579,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			addComponents();
 
 			// ADD MENU BAR TO THE SCREEN.
-			setJMenuBar(getJMenuBar());
+			setJMenuBar(getCustomMenu());
 
 			// ADD/CONFIGURE TOOLBARS
 			configureToolBars();
@@ -629,6 +611,24 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			JOptionPane.showMessageDialog(this,
 					"Error while initializing screen. Parent ID is: " + getParentID() + ".\n" + e.getMessage());
 		}
+	}
+	
+	/**
+	 * Performs post construction initialization.
+	 *
+	 * @param _parentID primary key value of parent record (FK for current rowset)
+ 	 * @param _comboNavDisplayColumn1 name of the 1st database column to display in the combo navigator
+ 	 * 
+	 * @deprecated Starting in 4.0.0+ these parameters are passed to constructor and initialization
+	 *  	is performed in handled {@link #initScreen()}.
+	 */
+	@Deprecated
+	protected void initScreen(final Long _parentID, final String _comboNavDisplayColumn1) {
+		
+		logger.error("initScreen() Method no longer supported. These parameters should be passed to the appropriate constructor.");
+		
+//		initScreen(_parentID, _comboNavDisplayColumn1, null, null);
+		
 	}
 
 	/**
@@ -663,6 +663,13 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	protected abstract void retrieveAndSetNewPrimaryKey();
 	
 	/**
+	 * @param _comboNav the combo navigator to use for this screen/form
+	 */
+	private void setComboNav(final SSDBComboBox _comboNav) {
+		comboNav = _comboNav;
+	}
+
+	/**
 	 * @param _comboNavDisplayColumn1 name of the 1st database column to display in the combo navigator
 	 */
 	protected void setComboNavDisplayColumn1(final String _comboNavDisplayColumn1) {
@@ -674,13 +681,6 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 */
 	protected void setComboNavDisplayColumn2(final String _comboNavDisplayColumn2) {
 		comboNavDisplayColumn2 = _comboNavDisplayColumn2;
-	}
-
-	/**
-	 * @param _comboNav the combo navigator to use for this screen/form
-	 */
-	private void setComboNav(final SSDBComboBox _comboNav) {
-		comboNav = _comboNav;
 	}
 
 	/**
