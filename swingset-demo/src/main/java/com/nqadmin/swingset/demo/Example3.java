@@ -270,6 +270,9 @@ public class Example3 extends JFrame {
 
 		// DISABLE THE PRIMARY KEY
 			txtSupplierPartID.setEnabled(false);
+			
+//			cmbSupplierName.addOption("Adams2", (long)5);
+//			cmbSupplierName.updateOption((long)55, "Hello");
 
 		// MAKE THE JFRAME VISIBLE
 			setVisible(true);

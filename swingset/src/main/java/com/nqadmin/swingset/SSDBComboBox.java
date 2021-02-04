@@ -350,6 +350,11 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 */
 	public void addOption(String _option, Long _mapping) {
 		try (Model.Remodel remodel = optionModel.getRemodel()) {
+			final int index = remodel.getMappings().indexOf(_mapping);
+			if (index >= 0) {
+				logger.warn(() -> String.format("%s: Mapping of [%s] already exists. Creating duplicate Mapping with Option of '%s'.",
+					getColumnForLog(), _mapping, _option));
+			}
 			remodel.add(_mapping, _option);
 		} catch (final Exception e) {
 			logger.error(getColumnForLog() + ": Exception.", e);
@@ -1441,21 +1446,22 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	}
 
 	/**
-	 * Update an option of an item in the combobox's item list.
+	 * Update an option of an item in the combobox's item list based on a mapping
+	 * value.
 	 * <p>
-	 * If more than one item is present in the combo for that value, only the first
-	 * one is changed.
+	 * If more than one item is present in the combo for that mapping, only the
+	 * first one is changed.
 	 * <p>
-	 * NOTE: To retain changes made to current RowSet call updateRow before
-	 * calling the updateItem on SSDBComboBox. (Only if you are using the
-	 * SSDBComboBox and SSDataNavigator for navigation in the screen. If you are not
-	 * using the SSDBComboBox for navigation then no need to call updateRow on the
+	 * NOTE: To retain changes made to current RowSet, call updateRow before calling
+	 * the updateOption() on SSDBComboBox. (Only if you are using the SSDBComboBox
+	 * and SSDataNavigator for navigation in the screen. If you are not using the
+	 * SSDBComboBox for navigation then there is no need to call updateRow on the
 	 * RowSet. Also if you are using only SSDBComboBox for navigation you need not
 	 * call the updateRow.)
 	 *
-	 * @param _mapping         typically a primary key value corresponding the
-                         the displayed currentSelectedOption to be updated
-	 * @param _option currentSelectedOption that should be updated in the combobox
+	 * @param _mapping typically a primary key value corresponding the the displayed
+	 *                 currentSelectedOption to be updated
+	 * @param _option  currentSelectedOption that should be updated in the combobox
 	 *
 	 * @return returns true if update is successful otherwise returns false.
 	 */
@@ -1473,6 +1479,11 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 // TODO may need to call repaint()
 		} catch (final Exception e) {
 			logger.error(getColumnForLog() + ": Exception.", e);
+		}
+		
+		if (!result) {
+			logger.warn(() -> String.format("%s: Unable to update Mapping of [%s] with Option of '%s'.",
+				getColumnForLog(), _mapping, _option));
 		}
 
 		return result;
