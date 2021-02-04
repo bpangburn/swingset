@@ -765,6 +765,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * Perform any actions needed after the specified Navigation
 	 * takes place.
 	 * <p>
+	 * This method can be overridden to handle re-querying of a sub-screen
+	 * or SSDBComboBox upon each record navigation.
+	 * <p>
 	 * The helper manages closing of any child screens.
 	 *
 	 * @param _navigationType Enum indicating type of navigation
@@ -828,6 +831,10 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 
 	/**
 	 * Updates the rowset, data navigator, combo navigator, and any DB comboboxes.
+	 * 
+	 * Generally the developer should call this when the entire screen should be refreshed due to
+	 * a change in for foreign key used for the rowset (e.g., a navigation is performed on a parent
+	 * screen of the current screen).
 	 */
 	@Override
 	protected void updateScreen() {
