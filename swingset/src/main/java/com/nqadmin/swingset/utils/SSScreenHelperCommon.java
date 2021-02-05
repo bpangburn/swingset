@@ -246,7 +246,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 	
 	/**
-	 * Helper method provide a JMenuBar with a single File Menu
+	 * Helper method to provide a JMenuBar with a single File Menu
 	 * with a Menu Item to close the screen.
 	 * 
 	 * @param _jInternalFrame screen that the menu item should close

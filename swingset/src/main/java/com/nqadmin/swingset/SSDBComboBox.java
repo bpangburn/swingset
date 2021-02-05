@@ -1452,14 +1452,13 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * If more than one item is present in the combo for that mapping, only the
 	 * first one is changed.
 	 * <p>
-	 * NOTE: To retain changes made to current RowSet, call updateRow before calling
-	 * the updateOption() on SSDBComboBox. (Only if you are using the SSDBComboBox
-	 * and SSDataNavigator for navigation in the screen. If you are not using the
-	 * SSDBComboBox for navigation then there is no need to call updateRow on the
-	 * RowSet. Also if you are using only SSDBComboBox for navigation you need not
-	 * call the updateRow.)
+	 * NOTE: To retain changes made to current RowSet, call updateRow() before
+	 * calling the updateOption() on SSDBComboBox. This only applies if you if you
+	 * are using the SSDBComboBox and SSDataNavigator for record navigation. If you
+	 * are not using the SSDBComboBox for record navigation then there is no need to
+	 * call updateRow() on the RowSet.
 	 *
-	 * @param _mapping typically a primary key value corresponding the the displayed
+	 * @param _mapping typically a primary key value corresponding to the displayed
 	 *                 currentSelectedOption to be updated
 	 * @param _option  currentSelectedOption that should be updated in the combobox
 	 *
