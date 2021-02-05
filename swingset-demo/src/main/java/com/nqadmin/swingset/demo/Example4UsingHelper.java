@@ -220,18 +220,18 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	
 
 	@Override
-	public String getComboNavQuery() {
+	protected String getComboNavQuery() {
 		return comboNavQuery;
 	}
 
 	@Override
-	public JMenuBar getJMenuBar() {
+	protected JMenuBar getCustomMenu() {
 		// nothing to do...
 		return null;
 	}
 	
 	@Override
-	public String getRowsetQuery() {
+	protected String getRowsetQuery() {
 		return rowsetQuery;
 	}
 	

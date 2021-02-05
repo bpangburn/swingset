@@ -117,7 +117,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 	}
 
 	@Override
-	public void configureDataGrid() {
+	protected void configureDataGrid() {
 		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
 		try {
 //		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
@@ -192,7 +192,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 	}
 
 	@Override
-	public boolean isGridCellEditable(int _row, int _column) {
+	protected boolean isGridCellEditable(int _row, int _column) {
 	// ALL CELLS ARE EDITABLE
 		return true;
 	}
@@ -214,30 +214,30 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 	
 
 	@Override
-	public String[] getDefaultColumnNames() {
+	protected String[] getDefaultColumnNames() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Object[] getDefaultColumnValues() {
+	protected Object[] getDefaultColumnValues() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	@Override
-	public String[] getHeaders() {
+	protected String[] getHeaders() {
 		return tableHeaders;
 	}
 	
 	@Override
-	public JMenuBar getJMenuBar() {
+	protected JMenuBar getCustomMenu() {
 		// NOTHING TO DO...
 		return null;
 	}
 
 	@Override
-	public String getRowsetQuery() {
+	protected String getRowsetQuery() {
 		return rowsetQuery;
 	}
 	

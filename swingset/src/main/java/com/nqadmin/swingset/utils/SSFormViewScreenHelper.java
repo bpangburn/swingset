@@ -251,12 +251,12 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	private static final long serialVersionUID = 266766406708536384L; // unique serial ID
 	
 	private SSDBComboBox comboNav; // Combo navigator.
-	private SSDataNavigator dataNavigator; // Data navigator.
-	private SSSyncManager syncManager; // SYNC DB NAV COMBO and NAVIGATOR
-
 	private String comboNavDisplayColumn1 = null; // name of the 1st database column to display in the combo navigator
 	private String comboNavDisplayColumn2 = null; // name of the 2nd database column to display in the combo navigator
 	private String comboNavSeparator = null; // character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator
+	
+	private SSDataNavigator dataNavigator; // Data navigator.
+	private SSSyncManager syncManager; // SYNC DB NAV COMBO and NAVIGATOR
 	
 	private boolean requeryAfterInsertOrDelete = false; // for some databases like H2, you have to call .execute() on the rowset following insertion or deletion
 
@@ -441,6 +441,13 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	}
 	
 	/**
+	 * @return character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator
+	 */
+	protected String getCmbSeparator() {
+		return comboNavSeparator;
+	}
+
+	/**
 	 * @return the combo navigator
 	 */
 	protected SSDBComboBox getComboNav() {
@@ -457,14 +464,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * 
 	 * @return String with the full SQL query for the combo navigator
 	 */
-	public abstract String getComboNavQuery();
-
-	/**
-	 * @return character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator
-	 */
-	protected String getCmbSeparator() {
-		return comboNavSeparator;
-	}
+	protected abstract String getComboNavQuery();
 
 	/**
 	 * @return the dataNavigator
@@ -550,24 +550,6 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	}
 	
 	/**
-	 * Performs post construction initialization.
-	 *
-	 * @param _parentID primary key value of parent record (FK for current rowset)
- 	 * @param _comboNavDisplayColumn1 name of the 1st database column to display in the combo navigator
- 	 * 
-	 * @deprecated Starting in 4.0.0+ these parameters are passed to constructor and initialization
-	 *  	is performed in handled {@link #initScreen()}.
-	 */
-	@Deprecated
-	protected void initScreen(final Long _parentID, final String _comboNavDisplayColumn1) {
-		
-		logger.error("initScreen() Method no longer supported. These parameters should be passed to the appropriate constructor.");
-		
-//		initScreen(_parentID, _comboNavDisplayColumn1, null, null);
-		
-	}
-	
-	/**
 	 * Performs post construction screen initialization.
 	 */
 	@Override
@@ -597,7 +579,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			addComponents();
 
 			// ADD MENU BAR TO THE SCREEN.
-			setJMenuBar(getJMenuBar());
+			setJMenuBar(getCustomMenu());
 
 			// ADD/CONFIGURE TOOLBARS
 			configureToolBars();
@@ -629,6 +611,24 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			JOptionPane.showMessageDialog(this,
 					"Error while initializing screen. Parent ID is: " + getParentID() + ".\n" + e.getMessage());
 		}
+	}
+	
+	/**
+	 * Performs post construction initialization.
+	 *
+	 * @param _parentID primary key value of parent record (FK for current rowset)
+ 	 * @param _comboNavDisplayColumn1 name of the 1st database column to display in the combo navigator
+ 	 * 
+	 * @deprecated Starting in 4.0.0+ these parameters are passed to constructor and initialization
+	 *  	is performed in handled {@link #initScreen()}.
+	 */
+	@Deprecated
+	protected void initScreen(final Long _parentID, final String _comboNavDisplayColumn1) {
+		
+		logger.error("initScreen() Method no longer supported. These parameters should be passed to the appropriate constructor.");
+		
+//		initScreen(_parentID, _comboNavDisplayColumn1, null, null);
+		
 	}
 
 	/**
@@ -663,6 +663,13 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	protected abstract void retrieveAndSetNewPrimaryKey();
 	
 	/**
+	 * @param _comboNav the combo navigator to use for this screen/form
+	 */
+	private void setComboNav(final SSDBComboBox _comboNav) {
+		comboNav = _comboNav;
+	}
+
+	/**
 	 * @param _comboNavDisplayColumn1 name of the 1st database column to display in the combo navigator
 	 */
 	protected void setComboNavDisplayColumn1(final String _comboNavDisplayColumn1) {
@@ -674,13 +681,6 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 */
 	protected void setComboNavDisplayColumn2(final String _comboNavDisplayColumn2) {
 		comboNavDisplayColumn2 = _comboNavDisplayColumn2;
-	}
-
-	/**
-	 * @param _comboNav the combo navigator to use for this screen/form
-	 */
-	private void setComboNav(final SSDBComboBox _comboNav) {
-		comboNav = _comboNav;
 	}
 
 	/**
@@ -765,6 +765,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * Perform any actions needed after the specified Navigation
 	 * takes place.
 	 * <p>
+	 * This method can be overridden to handle re-querying of a sub-screen
+	 * or SSDBComboBox upon each record navigation.
+	 * <p>
 	 * The helper manages closing of any child screens.
 	 *
 	 * @param _navigationType Enum indicating type of navigation
@@ -828,9 +831,13 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 
 	/**
 	 * Updates the rowset, data navigator, combo navigator, and any DB comboboxes.
+	 * 
+	 * Generally the developer should call this when the entire screen should be refreshed due to
+	 * a change in for foreign key used for the rowset (e.g., a navigation is performed on a parent
+	 * screen of the current screen).
 	 */
 	@Override
-	public void updateScreen() {
+	protected void updateScreen() {
 
 		try {
 			// TURN OFF THE SYNC MANAGER
@@ -869,8 +876,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 
 	/**
 	 * Used to update any SSDBComboBox that change when parent ID changes (e.g. a
-	 * record selector combo). Assumes that any SSDBComboBoxes are created in
-	 * configureScreen().
+	 * record selector combo). This is called from initScreen() after bindComponents()
+	 * and addComponents(). It is also called from updateScreen() after the rowset
+	 * has been requeried.
 	 */
 	protected abstract void updateSSDBComboBoxes();
 

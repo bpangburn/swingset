@@ -115,6 +115,67 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 		}
 	
 	/**
+	 * Adds screen listeners.
+	 * 
+	 * @throws Exception exception thrown while adding core screen listeners
+	 */
+	@Override
+	protected final void addCoreListeners() throws Exception {
+		// ADD LISTENERS TO SAVE RECORD WHEN FORM LOSES FOCUS and TO CLOSE ANY CHILD
+		// SCREENS IF FORM IS CLOSED
+		addInternalFrameListener(new InternalFrameAdapter() {
+			/**
+			 *	Stop editing of any cell when the screen is closing & close any child screens.
+			 */
+			@Override
+			public void internalFrameClosing(final InternalFrameEvent ife) {
+				stopEditing();
+				closeChildScreens();
+			}
+
+			/**
+			 *	Stop editing of any cell when the screen is losing focus.
+			 */
+			@Override
+			public void internalFrameDeactivated(final InternalFrameEvent ife) {
+				stopEditing();
+			}
+			
+			/**
+			 * Stops the editing of cell, if any.
+			 */
+			public void stopEditing() {
+				// CHECK IF ANY CELL IS IN EDITING MODE.
+				if (dataGrid.isEditing()) {
+					try {
+						// GET THE COLUMN IN WHICH EDITING IS TAKING PLACE
+						final int column = dataGrid.getEditingColumn();
+						if (column > -1) {
+							// GET THE EDITOR FOR THAT CELL.
+							TableCellEditor cellEditor = dataGrid.getColumnModel().getColumn(column).getCellEditor();
+							// IF NO SPECIFIC EDITOR IS PRESENT THEN GET THE DEFAULT CELL EDITOR.
+							if (cellEditor == null) {
+								cellEditor = dataGrid.getDefaultEditor(dataGrid.getColumnClass(column));
+							}
+							// IF THERE IS ANY EDITOR THEN STOP THE EDITING.
+							if (cellEditor != null) {
+								cellEditor.stopCellEditing();
+								cellEditor.cancelCellEditing();
+							}
+						}
+					} catch (final Exception e) {
+						logger.error("Exception.", e);
+					}
+				}
+			}
+		});
+		
+		// ADD OTHER LISTENERS IN IMPLEMENTATION
+		addCustomListeners();
+
+	}
+
+	/**
 	 * Method to add F2 linking based on an ID for specified column (e.g. wiki links, contact links)
 	 *
 	 * @param _columns array of column of data containing ID to link (count starts from zero)
@@ -127,7 +188,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	public void addF2Linking(final int[] _columns, final String _key, final String[] _urlPrefix) {
 		addKeyBasedURLLinking(_columns, "F2", _key, _urlPrefix, true);
 	}
-
+	
 	/**
 	 * Adds F1/Help key support where F1 will bring up the URL specified for each column in a browser
 	 * 
@@ -147,25 +208,6 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * Column-based look ups are helpful for an F1 based help system. Cell-based look ups are helpful for looking up
 	 * values in another system (e.g., a primary key based Wiki entry).
 	 * <p>
-	 * This method signature should be used if there is a URL for all columns.
-	 *
-	 * @param _key keystroke name (e.g., "F1")
-	 * @param _keyLabel label for keystroke (e.g. "Help")
-	 * @param _urlPrefixesForColumns prefix of URL without ID
-	 * @param _appendColumnValue Boolean indicating if column value should be appended to URL
-	 */
-	public void addKeyBasedURLLinking(final String _key, final String _keyLabel,
-			final String[] _urlPrefixesForColumns, final boolean _appendColumnValue) {
-		addKeyBasedURLLinking(null, _key, _keyLabel, _urlPrefixesForColumns, _appendColumnValue);
-	}
-	
-	/**
-	 * Method to bring up a URL based on a keystroke (e.g., F1, F2) linking based on an ID for specified column.
-	 * The column value can be appended to the URL for a cell-specific lookup.
-	 * <p>
-	 * Column-based look ups are helpful for an F1 based help system. Cell-based look ups are helpful for looking up
-	 * values in another system (e.g., a primary key based Wiki entry).
-	 * <p>
 	 * This method signature should be used if only some columns have a URL.
 	 * 
 	 * @param _columns Array of columns indices to link.
@@ -174,7 +216,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * @param _urlPrefixesForColumns prefix of URL without ID
 	 * @param _appendColumnValue Boolean indicating if column value should be appended to URL
 	 */
-	public void addKeyBasedURLLinking(final int[] _columns, final String _key, final String _keyLabel,
+	protected void addKeyBasedURLLinking(final int[] _columns, final String _key, final String _keyLabel,
 			final String[] _urlPrefixesForColumns, final boolean _appendColumnValue) {
 		
 		dataGrid.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(_key), _keyLabel);
@@ -254,64 +296,22 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	}
 	
 	/**
-	 * Adds screen listeners.
-	 * 
-	 * @throws Exception exception thrown while adding core screen listeners
+	 * Method to bring up a URL based on a keystroke (e.g., F1, F2) linking based on an ID for specified column.
+	 * The column value can be appended to the URL for a cell-specific lookup.
+	 * <p>
+	 * Column-based look ups are helpful for an F1 based help system. Cell-based look ups are helpful for looking up
+	 * values in another system (e.g., a primary key based Wiki entry).
+	 * <p>
+	 * This method signature should be used if there is a URL for all columns.
+	 *
+	 * @param _key keystroke name (e.g., "F1")
+	 * @param _keyLabel label for keystroke (e.g. "Help")
+	 * @param _urlPrefixesForColumns prefix of URL without ID
+	 * @param _appendColumnValue Boolean indicating if column value should be appended to URL
 	 */
-	@Override
-	protected final void addCoreListeners() throws Exception {
-		// ADD LISTENERS TO SAVE RECORD WHEN FORM LOSES FOCUS and TO CLOSE ANY CHILD
-		// SCREENS IF FORM IS CLOSED
-		addInternalFrameListener(new InternalFrameAdapter() {
-			/**
-			 *	Stop editing of any cell when the screen is closing & close any child screens.
-			 */
-			@Override
-			public void internalFrameClosing(final InternalFrameEvent ife) {
-				stopEditing();
-				closeChildScreens();
-			}
-
-			/**
-			 *	Stop editing of any cell when the screen is losing focus.
-			 */
-			@Override
-			public void internalFrameDeactivated(final InternalFrameEvent ife) {
-				stopEditing();
-			}
-			
-			/**
-			 * Stops the editing of cell, if any.
-			 */
-			public void stopEditing() {
-				// CHECK IF ANY CELL IS IN EDITING MODE.
-				if (dataGrid.isEditing()) {
-					try {
-						// GET THE COLUMN IN WHICH EDITING IS TAKING PLACE
-						final int column = dataGrid.getEditingColumn();
-						if (column > -1) {
-							// GET THE EDITOR FOR THAT CELL.
-							TableCellEditor cellEditor = dataGrid.getColumnModel().getColumn(column).getCellEditor();
-							// IF NO SPECIFIC EDITOR IS PRESENT THEN GET THE DEFAULT CELL EDITOR.
-							if (cellEditor == null) {
-								cellEditor = dataGrid.getDefaultEditor(dataGrid.getColumnClass(column));
-							}
-							// IF THERE IS ANY EDITOR THEN STOP THE EDITING.
-							if (cellEditor != null) {
-								cellEditor.stopCellEditing();
-								cellEditor.cancelCellEditing();
-							}
-						}
-					} catch (final Exception e) {
-						logger.error("Exception.", e);
-					}
-				}
-			}
-		});
-		
-		// ADD OTHER LISTENERS IN IMPLEMENTATION
-		addCustomListeners();
-
+	protected void addKeyBasedURLLinking(final String _key, final String _keyLabel,
+			final String[] _urlPrefixesForColumns, final boolean _appendColumnValue) {
+		addKeyBasedURLLinking(null, _key, _keyLabel, _urlPrefixesForColumns, _appendColumnValue);
 	}
 
 	/**
@@ -319,7 +319,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * <p>
 	 * Calls for dataGrid.setRowSet() and dataGrid.setPrimaryColumn() are handled automatically.
 	 */
-	public abstract void configureDataGrid();
+	protected abstract void configureDataGrid();
 	
 	/**
 	 * Method implemented by screen developer to return a String array with the table/grid
@@ -327,7 +327,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * 
 	 * @return a String array with the table/grid column names
 	 */
-	public abstract String[] getDefaultColumnNames();
+	protected abstract String[] getDefaultColumnNames();
 	
 	/**
 	 * Method implemented by screen developer to return a String array with the table/grid
@@ -335,7 +335,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * 
 	 * @return an Object array with the table/grid column default values
 	 */
-	public abstract Object[] getDefaultColumnValues();
+	protected abstract Object[] getDefaultColumnValues();
 	
 	/**
 	 * Method implemented by screen developer to return a String array with the table/grid
@@ -343,7 +343,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * 
 	 * @return a String array with the table/grid column headings
 	 */
-	public abstract String[] getHeaders();
+	protected abstract String[] getHeaders();
 
 	/**
 	 * Performs post construction initialization.  Needs to be called from constructor in implementation.
@@ -373,22 +373,6 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	}
 	
 	/**
-	 * Performs post construction initialization.  Generally be called from constructor in implementation.
-	 *
-	 * @param _parentID		parent ID used for record retrieval
-	 * @param _fullSQL		full SQL query for rowset
-	 * 
-	 * @deprecated Starting in 4.0.0+ these parameters are passed to constructor and initialization
-	 *  	is performed in handled {@link #initScreen()}.
-	 */
-	@Deprecated	
-	public void initScreen(final Long _parentID, final String _fullSQL) {
-		
-		logger.error("initScreen() Method no longer supported. These parameters should be passed to the appropriate constructor.");
-
-	}
-	
-	/**
 	 * Performs post construction screen initialization.
 	 */
 	@Override
@@ -412,7 +396,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			configureDataGrid();
 
 			// ADD MENU BAR TO THE SCREEN.
-			setJMenuBar(getJMenuBar());
+			setJMenuBar(getCustomMenu());
 	
 			// ADD/CONFIGURE TOOLBARS
 			configureToolBars();
@@ -447,6 +431,22 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	}
 	
 	/**
+	 * Performs post construction initialization.  Generally be called from constructor in implementation.
+	 *
+	 * @param _parentID		parent ID used for record retrieval
+	 * @param _fullSQL		full SQL query for rowset
+	 * 
+	 * @deprecated Starting in 4.0.0+ these parameters are passed to constructor and initialization
+	 *  	is performed in handled {@link #initScreen()}.
+	 */
+	@Deprecated	
+	public void initScreen(final Long _parentID, final String _fullSQL) {
+		
+		logger.error("initScreen() Method no longer supported. These parameters should be passed to the appropriate constructor.");
+
+	}
+	
+	/**
 	 * Used to enable/disable cells based on adjacent cell value or other criteria.
 	 * 
 	 * JTables/SSDataGrids count rows and columns from zero.
@@ -457,7 +457,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * @param _column JTable/SSDatagrid column to evaluate
 	 * @return true if cell should be editable/enabled, otherwise false
 	 */
-	public abstract boolean isGridCellEditable(int _row, int _column);
+	protected abstract boolean isGridCellEditable(int _row, int _column);
 	
 	/**
 	 * Used to enable/disable cells based on adjacent cell value or other criteria.
@@ -505,7 +505,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * if necessary for getRowsetQuery();
 	 */
 	@Override
-	public void updateScreen() {
+	protected void updateScreen() {
 
 		try {
 

@@ -4,11 +4,16 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 
 
 ==============================================================================
-SwingSet 4.0.1 - Released TBD
+SwingSet 4.0.1 - Released 2021-02-05
 ==============================================================================
 
 Changes:
-	1. Something goes here...
+	1. Changed some ScreenHelper class methods from public to protected.
+	2. Changed abstract getJMenuBar() to getCustomMenu() in
+	   SSScreenHelperCommon to avoid naming collision. Updated Demos. 
+	3. Added static menu helper methods to SSScreenHelperCommon.
+	4. Added setSelectedEnum() to SSComboBox
+	5. Added some log4j warnings to SSDBComboBox.addOption() and updateOption()
 
 ==============================================================================
 SwingSet 4.0.0 - Released 2021-01-31

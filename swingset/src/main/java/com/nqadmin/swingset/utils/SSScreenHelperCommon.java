@@ -47,7 +47,9 @@ import java.util.Properties;
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
 import org.apache.logging.log4j.LogManager;
@@ -65,21 +67,6 @@ import java.sql.Connection;
 public abstract class SSScreenHelperCommon extends JInternalFrame {
 
 	/**
-	 * unique serial ID
-	 */
-	private static final long serialVersionUID = 9108320379306383142L;
-
-	/**
-	 * Log4j Logger for component
-	 */
-	private static Logger logger = LogManager.getLogger();
-
-	/**
-	 * SwingSet properties
-	 */
-	protected static final Properties ssProps = SSProperties.getProperties();
-	
-	/**
 	 * Arbitrary negative value that can be used as the primary key
 	 * value in a WHERE clause if there is no mapping/null mapping
 	 * for a SSDBComboBox. Null could cause an SQL Exception, but
@@ -94,22 +81,37 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * ASSUMES that -998877 would never be a primary/foreign key value.
 	 */
 	public final static long hopefullyNoPKValue = -998877;
-	
-	private Connection connection; // Database connection.
-	private Container parentContainer; // Screen/window to which form/grid is to be attached
-	private RowSet rowset; // Rowset to be used for screen/form.
 
+	/**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = LogManager.getLogger();
+
+	/**
+	 * unique serial ID
+	 */
+	private static final long serialVersionUID = 9108320379306383142L;
+	
+	/**
+	 * SwingSet properties
+	 */
+	protected static final Properties ssProps = SSProperties.getProperties();
+
+	private Connection connection; // Database connection.
+	private RowSet rowset; // Rowset to be used for screen/form.
 	private String pkColumn; // Primary key column name for rowset.
 	
 	private Long parentID = null; // Primary key value of parent record (FK for current rowset).
+	
+	private int defaultX = 0; // Default top left horizontal offset for screen/form.
+	private int defaultY = 0; // Default top left vertical offset for screen/form.
+	
+	private Container parentContainer; // Screen/window to which form/grid is to be attached
 	
 //	private String fullSQL = null; // Full SQL for rowset
 //	private String selectSQL = null; // SELECT CLAUSE FOR RECORDSET SUCH THAT selectSQL + parentID + " " + orderBySQL IS A VALID QUERY
 //	private String orderBySQL = null; // ORDER BY CLAUSE FOR RECORDSET INCLUDING AT LEAST A SEMICOLON
 
-	private int defaultX = 0; // Default top left horizontal offset for screen/form.
-	private int defaultY = 0; // Default top left vertical offset for screen/form.
-	
 	/**
 	 * Creates a SSScreenHelperCommon based on an JInternalFrame with the specified title,
 	 * resizability, closability, maximizability, and iconifiability.
@@ -124,14 +126,14 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 			final boolean _maximizable, final boolean _iconifiable) {
 		super(_title, _resizable, _closable, _maximizable, _iconifiable);
 	}
-
+	
 	/**
 	 * Adds screen listeners.
 	 * 
 	 * @throws Exception exception thrown while adding core screen listeners
 	 */
 	protected abstract void addCoreListeners() throws Exception;
-	
+
 	/**
 	 * Method to allow Developer to add custom listeners to a SwingSet screen.
 	 * <p>
@@ -142,11 +144,34 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * @throws Exception exception thrown while adding any custom screen listeners
 	 */
 	protected abstract void addCustomListeners() throws Exception;
+	
+	/**
+	 * Helper method to add a screen closer to a JMenu. Usually this is 
+	 * the "File" JMenu.
+	 * 
+	 * @param _jInternalFrame screen that the menu item should close
+	 * @param _menu menu to which "Close" should be added
+	 */
+	public static void addInternalFrameCloserToMenu(JInternalFrame _jInternalFrame, JMenu _menu) {
+		
+		// CREATE MENU ITEMS FOR EACH TOP-LEVEL MENU
+		JMenuItem menuFileClose = _menu.add("Close");
+		
+		// ADD LISTENERS FOR EACH MENU ITEM
+		menuFileClose.addActionListener((event) -> {
+			try {
+				_jInternalFrame.setClosed(true);
+			} catch (PropertyVetoException _pve) {
+				logger.warn("Unable to close {}.",()-> {return _jInternalFrame.getTitle();});
+			}
+		});
+		
+	}
 
 	/**
 	 * Closes any child screens that are open.
 	 */
-	public abstract void closeChildScreens();
+	protected abstract void closeChildScreens();
 
 	/**
 	 * Closes the current screen.
@@ -159,42 +184,50 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 			logger.error("Property Veto Exception.", pve);
 		}
 	}
-
+	
 	/**
-	 * Adds and configures any required buttons to the mainFrame toolbar.
+	 * Adds and configures any required buttons to the main application toolbar.
 	 *
 	 * <pre>
 	 * Separators added with:
 	 * {@code
-	 * 	mainFrame.getToolBar().addSeparator();
+	 * 	getRootFrame().getToolBar().addSeparator();
 	 * }
 	 *
 	 * Buttons added with:
 	 * {@code
-	 *  btnMyButtonName = mainFrame.addToolBarButton(new AbstractAction() {
+	 *  btnMyButtonName = getRootFrame().addToolBarButton(new AbstractAction() {
 	 *  	public void actionPerformed(ActionEvent ae) {
 	 *          myButtonNameActionMethod();
 	 *      }
 	 *  }, "My Button Description", "images/myButtonGraphic.gif");
-	 *  }
+	 * }
 	 * </pre>
 	 */
 	protected abstract void configureToolBars();
-	
+
 	/**
 	 * @return a database Connection
 	 */
 	protected Connection getConnection() {
 		return connection;
 	}
-
+	
+	/**
+	 * Builds and returns custom menu bar and with applicable listeners.
+	 * Cleanest to implement listeners with Lambda expressions.
+	 *
+	 * @return JMenuBar complete with any menu items and listeners (ideally using Lambdas)
+	 */
+	protected abstract JMenuBar getCustomMenu();
+	
 	/**
 	 * @return the top left horizontal screen offset
 	 */
 	public int getDefaultX() {
 		return defaultX;
 	}
-
+	
 	/**
 	 * @return the top left vertical screen offset
 	 */
@@ -203,36 +236,46 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 	
 	/**
-	 * @return the parent container/window for this screen
-	 */
-	protected Container getParentContainer() {
-		return parentContainer;
-	}
-	
-	/**
-	 * Method implemented by screen developer to provide the entire SQL query for the rowset
-	 * on demand. It may or may not utilize getParentID() for filtering the results.
-	 * 
-	 * @return the full SQL Query for the rowset
-	 */
-	public abstract String getRowsetQuery();
-
-	/**
-	 * Builds menu bar and adds applicable listeners.
-	 *
-	 * @return JMenuBar complete with any menu items and listeners
-	 */
-	@Override
-	public abstract JMenuBar getJMenuBar();
-
-	/**
 	 * @return Parent window/container.
 	 *
 	 * @deprecated Starting in 4.0.0+ use {@link #getRootFrame()} instead.
 	 */
 	@Deprecated
-	public Frame getMainFrame() {
+	protected Frame getMainFrame() {
 		return getRootFrame();
+	}
+	
+	/**
+	 * Helper method to provide a JMenuBar with a single File Menu
+	 * with a Menu Item to close the screen.
+	 * 
+	 * @param _jInternalFrame screen that the menu item should close
+	 * 
+	 * @return a JMenuBar with a single File menu containing a single Close menu item
+	 */
+	public static JMenuBar getMenuBarWithInternalFrameCloser(JInternalFrame _jInternalFrame) {
+		
+		// CREATE MENU BAR
+		JMenuBar thisMenu = new JMenuBar();
+		
+		// CREATE TOP-LEVEL MENUS FOR THE MENU BAR.
+		JMenu menuFile = new JMenu("File");
+		
+		addInternalFrameCloserToMenu(_jInternalFrame, menuFile);
+		
+		// ADD TOP-LEVEL MENUS TO THE MENU BAR.
+		thisMenu.add(menuFile);
+
+		// RETURN
+		return thisMenu;
+		
+	}
+
+	/**
+	 * @return the parent container/window for this screen
+	 */
+	protected Container getParentContainer() {
+		return parentContainer;
 	}
 
 	/**
@@ -240,7 +283,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 *
 	 * @return primary key value of parent record (FK for current rowset) used for record retrieval
 	 */
-	public Long getParentID() {
+	protected Long getParentID() {
 		return parentID;
 	}
 
@@ -251,19 +294,6 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 		return pkColumn;
 	}
 	
-	/**
-	 * @return the root component for the current component tree
-	 */
-	public JFrame getRootFrame() {
-		return (JFrame) SwingUtilities.getRoot(this);
-	}
-
-	/**
-	 * @return the rowset
-	 */
-	protected RowSet getRowset() {
-		return rowset;
-	}
 	
 	/**
 	 * Convenience method when developer wants to pass the result of
@@ -286,6 +316,28 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 		
 		return result;
 	}
+	
+	/**
+	 * @return the root component for the current component tree
+	 */
+	public JFrame getRootFrame() {
+		return (JFrame) SwingUtilities.getRoot(this);
+	}
+
+	/**
+	 * @return the rowset
+	 */
+	protected RowSet getRowset() {
+		return rowset;
+	}
+	
+	/**
+	 * Method implemented by screen developer to provide the entire SQL query for the rowset
+	 * on demand. It may or may not utilize getParentID() for filtering the results.
+	 * 
+	 * @return the full SQL Query for the rowset
+	 */
+	protected abstract String getRowsetQuery();
 	
 	/**
 	 * Performs post construction screen initialization.
@@ -314,12 +366,19 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 
 	/**
+	 * @param _connection the database connection
+	 */
+	protected void setConnection(final Connection _connection) {
+		connection = _connection;
+	}
+
+	/**
 	 * Sets default X and Y coordinates for the screen (top left offset)
 	 */
 	public void setDefaultScreenLocation() {
 		setDefaultScreenLocation(Integer.valueOf(ssProps.getProperty("Level_2_X_Position")), Integer.valueOf(ssProps.getProperty("Level_2_Y_Position")));
 	}
-
+	
 	/**
 	 * Sets default X and Y coordinates for the screen (top left offset)
 	 * 
@@ -344,7 +403,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * @throws Exception exception thrown while setting default values for screen components
 	 */
 	protected abstract void setDefaultValues() throws Exception;
-	
+
 	/**
 	 * Sets the default X coordinate for the screen (top left horizontal offset)
 	 * 
@@ -364,6 +423,13 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 
 	/**
+	 * @param _parentContainer parent screen/window to which the form/grid should be attached
+	 */
+	protected void setParentContainer(final Container _parentContainer) {
+		parentContainer = _parentContainer;
+	}
+
+	/**
 	 * @param _parentID the parentID to set
 	 */
 	protected void setParentID(final Long _parentID) {
@@ -376,33 +442,19 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	protected void setPkColumn(final String _pkColumn) {
 		pkColumn = _pkColumn;
 	}
-
+	
 	/**
 	 * @param _rowset rowset to be used by the screen/form
 	 */
 	protected void setRowset(final RowSet _rowset) {
 		rowset = _rowset;
 	}
-
+	
 	/**
 	 * Sets the screen size
 	 */
 	public void setScreenSize() {
 		setSize(Integer.valueOf(ssProps.getProperty("Frame_Width")), Integer.valueOf(ssProps.getProperty("Frame_Height")));
-	}
-	
-	/**
-	 * @param _connection the database connection
-	 */
-	protected void setConnection(final Connection _connection) {
-		connection = _connection;
-	}
-	
-	/**
-	 * @param _parentContainer parent screen/window to which the form/grid should be attached
-	 */
-	protected void setParentContainer(final Container _parentContainer) {
-		parentContainer = _parentContainer;
 	}
 
 	/**
@@ -486,6 +538,6 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * Implementation should presume that parentID has already been updated
 	 * if applicable.
 	 */
-	public abstract void updateScreen();
+	protected abstract void updateScreen();
 
 }

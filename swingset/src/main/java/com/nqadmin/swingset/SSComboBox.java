@@ -360,6 +360,34 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 		
 		return (Enum<?>)enumOption.getEnumConstants()[mapping];
 	}
+	
+	/**
+	 * Finds the listItem that matches the specified enum and make it the selected
+	 * listItem.
+	 *
+	 * @param _option select list item for this
+	 * @throws ClassCastException if _option is wrong enum type
+	 */
+	public void setSelectedEnum(Enum<?> _option) {
+		if (enumOption == null) {
+			throw new IllegalStateException("SSComboBox values not an enum.");
+		}
+		Objects.requireNonNull(_option, "Enum to be selected cannnot be null.");
+		enumOption.cast(_option);
+
+		// The following an alternate way to check
+		// if (!enumOption.isAssignableFrom(_option.getClass())) {
+		// throw new IllegalArgumentException("Wrong enum type, " +
+		// enumOption.getSimpleName() + " required");
+		// }
+		// enumOption == _option.getClass() // also works?, feels more brittle
+
+		// This could be performance optimized since itemList index == ordinal()
+		// within the current constraints of mapping == ordinal().
+		// But the whole nullItem comes into play to affect the index.
+
+		setSelectedMapping(_option.ordinal());
+	}
 
 	/**
 	 * Returns the underlying values for each of the items in the combo box (e.g.
