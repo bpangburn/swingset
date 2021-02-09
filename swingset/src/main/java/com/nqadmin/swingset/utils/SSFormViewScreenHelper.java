@@ -42,6 +42,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
@@ -578,6 +579,10 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 
 			// ADD COMPONENTS TO SCREEN
 			addComponents();
+			
+			// DISABLE & RIGHT JUSTIFY PRIMARY KEY
+			getTxtPrimaryKey().setEnabled(false);
+			getTxtPrimaryKey().setHorizontalAlignment(SwingConstants.RIGHT);
 
 			// ADD MENU BAR TO THE SCREEN.
 			setJMenuBar(getCustomMenu());
