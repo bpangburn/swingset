@@ -212,7 +212,8 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			logger.debug("");
 			super.performPreInsertOps(); // THIS CALL RECURSIVELY CLEARS ALL OF THE COMPONENT VALUES
 			// DATA NAVIGATOR SHOULD DISABLE COMBO NAVIGATOR
-			retrieveAndSetNewPrimaryKey();
+			//retrieveAndSetNewPrimaryKey();
+			txtPrimaryKey.setText(retrieveNewPrimaryKey());
 			try {
 				setDefaultValues();
 			} catch (final Exception e) {
@@ -658,9 +659,11 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	protected abstract void populateSSComboBoxes();
 	
 	/**
-	 * Retrieve and set the primary key value for a new record.
+	 * Retrieve the primary key value for a new record.
+	 * 
+	 * @return String value of new primary key
 	 */
-	protected abstract void retrieveAndSetNewPrimaryKey();
+	protected abstract String retrieveNewPrimaryKey();
 	
 	/**
 	 * @param _comboNav the combo navigator to use for this screen/form

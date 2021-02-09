@@ -7,7 +7,12 @@ SwingSet 4.0.2 - Released TBD
 ==============================================================================
 
 Changes:
-	1. stuff goes here...
+	1. SSDBComboBox - added constructor without _query parameter.
+	2. SSFormViewScreenHelper API change, replacing:
+	     protected abstract void retrieveAndSetNewPrimaryKey();
+	   with:
+	     protected abstract String retrieveNewPrimaryKey();
+	3. 
 
 ==============================================================================
 SwingSet 4.0.1 - Released 2021-02-04

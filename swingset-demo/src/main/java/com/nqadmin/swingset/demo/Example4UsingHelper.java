@@ -245,10 +245,12 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	}
 
 	/**
-	 * Obtain and set the PK value for the new record.
+	 * Obtain and return the primary key value for the new record.
 	 */
 	@Override
-	protected void retrieveAndSetNewPrimaryKey() {
+	protected String retrieveNewPrimaryKey() {
+		
+		String newPrimaryKey = null;
 
 		try {
 
@@ -257,8 +259,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 					.executeQuery("SELECT nextval('part_data_seq') as nextVal;");
 			rs.next();
 			final int partID = rs.getInt("nextVal");
-			//txtPartID.setText(String.valueOf(partID));
-			getTxtPrimaryKey().setText(String.valueOf(partID));
+			newPrimaryKey = String.valueOf(partID);
 			rs.close();
 			
 		} catch(final SQLException se) {
@@ -266,6 +267,8 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		} catch(final Exception e) {
 			logger.error("Exception occured initializing new record.",e);
 		}
+		
+		return newPrimaryKey;
 
 	}
 
