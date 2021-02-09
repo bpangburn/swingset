@@ -321,6 +321,24 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		listItemFormat.setPattern(JDBCType.DATE, dateFormat);
 		listItemFormat.setSeparator(separator);
 	}
+	
+	/**
+	 * Constructs a SSDBComboBox with the given parameters. It is best practice to
+	 * pair setQuery() and execute() when building a screen where SSDBComboBoxes may
+	 * need to be requeried so this is the preferred constructor.
+	 *
+	 * @param _connection           database connection to be used.
+	 * @param _primaryKeyColumnName column name used to query/generate the combo
+	 *                              Mappings
+	 * @param _displayColumnName    column name used to query/generate the combo
+	 *                              Options
+	 */
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	@SuppressWarnings({ "all", "OverridableMethodCallInConstructor" })
+	public SSDBComboBox(final Connection _connection, final String _primaryKeyColumnName,
+			final String _displayColumnName) {
+		this(_connection, null, _primaryKeyColumnName, _displayColumnName);
+	}
 
 	/**
 	 * Constructs a SSDBComboBox with the given parameters.
