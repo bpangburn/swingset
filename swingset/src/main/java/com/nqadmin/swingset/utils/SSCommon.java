@@ -395,7 +395,7 @@ public class SSCommon implements Serializable {
 //	}
 
 	/**
-	 * Methold to add a document listener when the SwingSet component is a
+	 * Method to add a document listener when the SwingSet component is a
 	 * JTextComponent.
 	 */
 	public void addDocumentListener() {
@@ -409,6 +409,7 @@ public class SSCommon implements Serializable {
 		if (!rowsetListenerAdded) {
 			rowSet.addRowSetListener(rowSetListener);
 			rowsetListenerAdded = true;
+			logger.debug(boundColumnName + " - RowSet Listener added.");
 		}
 	}
 	
@@ -419,6 +420,7 @@ public class SSCommon implements Serializable {
 		if (!ssComponentListenerAdded) {
 			ssComponent.addSSComponentListener();
 			ssComponentListenerAdded = true;
+			logger.debug(boundColumnName + " - Component Listener added.");
 		}
 	}
 
@@ -687,6 +689,7 @@ public class SSCommon implements Serializable {
 		if (rowsetListenerAdded && rowSet != null) { //rowsetListenerAdded likely won't be true if rowset is null
 			rowSet.removeRowSetListener(rowSetListener);
 			rowsetListenerAdded = false;
+			logger.debug(boundColumnName + " - RowSet Listener removed.");
 		}
 	}
 
@@ -697,6 +700,7 @@ public class SSCommon implements Serializable {
 		if (ssComponentListenerAdded) {
 			ssComponent.removeSSComponentListener();
 			ssComponentListenerAdded = false;
+			logger.debug(boundColumnName + " - Component Listener removed.");
 		}
 	}
 
