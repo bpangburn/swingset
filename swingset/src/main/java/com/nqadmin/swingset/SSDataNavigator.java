@@ -838,6 +838,7 @@ public class SSDataNavigator extends JPanel {
 		if (!rowsetListenerAdded) {
 			rowSet.addRowSetListener(rowsetListener);
 			rowsetListenerAdded = true;
+			logger.debug("RowsetListener is ON.");
 		}
 	}
 
@@ -1112,6 +1113,7 @@ public class SSDataNavigator extends JPanel {
 		if (rowsetListenerAdded) {
 			rowSet.removeRowSetListener(rowsetListener);
 			rowsetListenerAdded = false;
+			logger.debug("RowsetListener is OFF.");
 		}
 	}
 
