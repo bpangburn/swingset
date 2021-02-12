@@ -37,10 +37,16 @@
  ******************************************************************************/
 package com.nqadmin.swingset.utils;
 
+import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
+import java.beans.PropertyChangeListener;
 import java.io.Serializable;
+import java.sql.Connection;
 import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.SQLException;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.StringTokenizer;
 
 import javax.sql.RowSet;
@@ -49,17 +55,23 @@ import javax.sql.RowSetListener;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.text.JTextComponent;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.SSBaseComboBox;
+import com.nqadmin.swingset.SSCheckBox;
+import com.nqadmin.swingset.SSImage;
+import com.nqadmin.swingset.SSLabel;
+import com.nqadmin.swingset.SSList;
+import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.datasources.RowSetOps;
-
-import java.sql.Connection;
-import java.util.Objects;
-import java.util.Optional;
+import com.nqadmin.swingset.formatting.SSFormattedTextField;
 
 // SSCommon.java
 //
@@ -91,11 +103,23 @@ import java.util.Optional;
 public class SSCommon implements Serializable {
 
 	/**
-	 * Document listener provided for convenience for SwingSet Components based on
-	 * JTextComponents
+	 * Document listener provided for convenience for SwingSet Components that are
+	 * based on JTextComponents. SwingSet components that need a Document listener
+	 * to trigger a change to the bound RowSet should return an instance of
+	 * SSCommonDocumentListener() when implementing the abstract method
+	 * getSSComponentListener().
 	 * <p>
-	 * Updates the underlying RowSet there is a change to the Document object. E.g.,
-	 * a call to setText() on a JTextField.
+	 * A typical implementation might look like: {@code
+	 * 
+	 * 	if (ssTextFieldListener==null) {
+	 * 		ssTextFieldListener = new SSCommon.SSDocumentListener();
+	 * 	}
+	 * 
+	 * 	return ssTextFieldListener;
+	 * }
+	 * <p>
+	 * This listener updates the underlying RowSet there is a change to the Document
+	 * object. E.g., a call to setText() on a JTextField.
 	 * <p>
 	 * DocumentListener events generally, but not always get fired twice any time
 	 * there is an update to the JTextField: a removeUpdate() followed by
@@ -109,7 +133,7 @@ public class SSCommon implements Serializable {
 	 * changedUpdate() uses counters and SwingUtilities.invokeLater() to only update
 	 * the display on the last method called.
 	 */
-	protected class SSCommonDocumentListener implements DocumentListener, Serializable {
+	public class SSDocumentListener implements DocumentListener, Serializable {
 
 		/**
 		 * unique serial id
@@ -148,23 +172,23 @@ public class SSCommon implements Serializable {
 
 		@Override
 		public void insertUpdate(final DocumentEvent de) {
-			logger.trace("{}", () -> getColumnForLog());
+			logger.trace("{} - insertUpdate().", () -> getColumnForLog());
 			changedUpdate(de);
 		}
 
 		@Override
 		public void removeUpdate(final DocumentEvent de) {
-			logger.trace("{}", () -> getColumnForLog());
+			logger.trace("{} - removeUpdate().", () -> getColumnForLog());
 			changedUpdate(de);
 		}
 
-	} // end protected class SSCommonDocumentListener
+	} // end protected class SSDocumentListener
 
 	/**
 	 * Listener(s) for the underlying RowSet used to update the bound SwingSet
 	 * component.
 	 */
-	protected class SSCommonRowSetListener implements RowSetListener, Serializable {
+	protected class SSRowSetListener implements RowSetListener, Serializable {
 		/**
 		 * unique serial ID
 		 */
@@ -182,7 +206,7 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void cursorMoved(final RowSetEvent event) {
-			logger.trace("Rowset cursor moved. {}", () -> getColumnForLog());
+			logger.trace("{} - RowSet cursor moved.", () -> getColumnForLog());
 			//updateSSComponent();
 			performUpdates();
 		}
@@ -206,7 +230,7 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void rowChanged(final RowSetEvent event) {
-			logger.trace("Rowset row changed. {}", () -> getColumnForLog());
+			logger.trace("{} - RowSet row changed.", () -> getColumnForLog());
 //			if (!getRowSet().isUpdatingRow()) {
 //				updateSSComponent();
 //			}
@@ -219,7 +243,7 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void rowSetChanged(final RowSetEvent event) {
-			logger.trace("Rowset changed. {}", () -> getColumnForLog());
+			logger.trace("{} - RowSet changed.", () -> getColumnForLog());
 			//updateSSComponent();
 			performUpdates();
 		}
@@ -241,7 +265,7 @@ public class SSCommon implements Serializable {
 			});
 		}
 
-	} // end protected class SSCommonRowSetListener
+	} // end protected class SSRowSetListener
 
 	/**
 	 * Log4j Logger for component
@@ -348,9 +372,9 @@ public class SSCommon implements Serializable {
 	private Connection connection = null;
 
 	/**
-	 * Underlying Document listener (where SwingSet component is a JTextComponent)
+	 * Component value change listener (where SwingSet component is a JTextComponent)
 	 */
-	private final SSCommonDocumentListener documentListener = new SSCommonDocumentListener();
+	private SSDocumentListener ssDocumentListener;
 
 	/**
 	 * RowSet from which component will get/set values.
@@ -360,7 +384,7 @@ public class SSCommon implements Serializable {
 	/**
 	 * Indicates if rowset listener is added (or removed)
 	 */
-	private boolean rowsetListenerAdded = false;
+	private boolean rowSetListenerAdded = false;
 	
 	/**
 	 * Indicates if swingset component listener is added (or removed)
@@ -370,7 +394,7 @@ public class SSCommon implements Serializable {
 	/**
 	 * Underlying RowSet listener.
 	 */
-	private final SSCommonRowSetListener rowSetListener = new SSCommonRowSetListener();
+	private SSRowSetListener rowSetListener = null;
 
 	/**
 	 * Constructor expecting a SwingSet component as an argument (usually called as
@@ -398,17 +422,20 @@ public class SSCommon implements Serializable {
 	 * Method to add a document listener when the SwingSet component is a
 	 * JTextComponent.
 	 */
-	public void addDocumentListener() {
-		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().addDocumentListener(documentListener);
+	private void addSSDocumentListener() {
+		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().addDocumentListener(ssDocumentListener);
 	}
 
 	/**
 	 * Method to add the RowSet listener.
 	 */
 	public void addRowSetListener() {
-		if (!rowsetListenerAdded) {
+		if (rowSetListener==null) {
+			rowSetListener = new SSRowSetListener();
+		}
+		if (!rowSetListenerAdded && rowSet!=null) {
 			rowSet.addRowSetListener(rowSetListener);
-			rowsetListenerAdded = true;
+			rowSetListenerAdded = true;
 			logger.debug(boundColumnName + " - RowSet Listener added.");
 		}
 	}
@@ -416,12 +443,40 @@ public class SSCommon implements Serializable {
 	/**
 	 * Method to add any SwingSet Component listener(s).
 	 */
-	public void addSSComponentListener() {
+	public final void addSSComponentListener() {
 		if (!ssComponentListenerAdded) {
-			ssComponent.addSSComponentListener();
-			ssComponentListenerAdded = true;
-			logger.debug(boundColumnName + " - Component Listener added.");
+			
+			Object eventListener = getSSComponent().getSSComponentListener();
+			
+			if (ssComponent instanceof SSCheckBox) {
+				((SSCheckBox)ssComponent).addItemListener((ItemListener) eventListener);
+			} else if (ssComponent instanceof SSBaseComboBox) {
+				((SSBaseComboBox<?, ?, ?>)ssComponent).addActionListener((ActionListener) eventListener);
+			} else if (ssComponent instanceof SSImage) {
+				((SSImage)ssComponent).getBtnUpdateImage().addActionListener((ActionListener) eventListener);
+			} else if (ssComponent instanceof SSLabel) {
+				((SSLabel)ssComponent).addPropertyChangeListener("text", ((PropertyChangeListener) eventListener));
+			} else if (ssComponent instanceof SSList) {
+				((SSList)ssComponent).addListSelectionListener((ListSelectionListener) eventListener);
+			} else if (ssComponent instanceof SSSlider) {
+				((SSSlider)ssComponent).addChangeListener((ChangeListener) eventListener);
+			} else if (ssComponent instanceof SSFormattedTextField) {
+				((SSFormattedTextField)ssComponent).addPropertyChangeListener("value", ((PropertyChangeListener) eventListener));
+//			} else if (ssComponent instanceof SSTextArea) {
+//			} else if (ssComponent instanceof SSTextField) {
+			} else if (ssComponent instanceof JTextComponent) {
+				addSSDocumentListener();
+			} else {
+				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
+				String message = String.format("%s - Encountered unknown Component Event Listener for: %s. Unable to add component listener.",
+						getColumnForLog(), ssComponent.getClass().getSimpleName());
+				logger.error(message);
+				JOptionPane.showMessageDialog((JComponent)getSSComponent(), message, "Unknown Component Event Listener", JOptionPane.ERROR_MESSAGE);
+			}
 		}
+
+		ssComponentListenerAdded = true;
+		logger.debug("{} - Component Listener added.", () -> getColumnForLog());
 	}
 
 	/**
@@ -503,7 +558,7 @@ public class SSCommon implements Serializable {
 		try {
 			bind(_rowSet, RowSetOps.getColumnIndex(_rowSet, _boundColumnName));
 		} catch (final SQLException se) {
-			logger.error(_boundColumnName + " - Failed to retrieve column index while binding.", se);
+			logger.error("[" + _boundColumnName + "] - Failed to retrieve column index while binding.", se);
 		}
 //		// INDICATE THAT WE'RE UPDATING THE BINDINGS
 //		inBinding = true;
@@ -634,6 +689,19 @@ public class SSCommon implements Serializable {
 	public Connection getConnection() {
 		return connection;
 	}
+	
+	/**
+	 * Returns SSDocumentListener if the component is a JTextComponent
+	 *
+	 * @return SSDocumentListener for a JTextComponent
+	 */
+	public SSDocumentListener getSSDocumentListener() {
+		if (ssDocumentListener==null) {
+			ssDocumentListener = new SSDocumentListener();
+		}
+		
+		return ssDocumentListener;
+	}
 
 	/**
 	 * Returns the RowSet to which the SwingSet component is bound.
@@ -644,14 +712,15 @@ public class SSCommon implements Serializable {
 		return rowSet;
 	}
 
-	/**
-	 * Returns Listener for the RowSet bound to the database
-	 *
-	 * @return listener for the bound RowSet
-	 */
-	public SSCommonRowSetListener getRowSetListener() {
-		return rowSetListener;
-	}
+// BP_2021-02-11: Eliminating this method. Seems dangerous to provide access.
+//	/**
+//	 * Returns Listener for the RowSet bound to the database
+//	 *
+//	 * @return listener for the bound RowSet
+//	 */
+//	public SSRowSetListener getRowSetListener() {
+//		return rowSetListener;
+//	}
 
 	/**
 	 * Method called from Constructor to perform one-time setup tasks including
@@ -661,6 +730,24 @@ public class SSCommon implements Serializable {
 	protected void init() {
 		getSSComponent().configureTraversalKeys();
 		getSSComponent().customInit();
+	}
+	
+	/**
+	 * Indicates if the components RowSet listener is added/enabled
+	 *
+	 * @return true if the components RowSet listener is added/enabled, otherwise false
+	 */
+	public final boolean isRowSetListenerAdded() {
+		return rowSetListenerAdded;
+	}
+
+	/**
+	 * Indicates if the components value change listener is currently added/enabled
+	 *
+	 * @return true if the components value change listener is added/enabled, otherwise false
+	 */
+	public final boolean isSSComponentListenerAdded() {
+		return ssComponentListenerAdded;
 	}
 
 //	/**
@@ -672,35 +759,65 @@ public class SSCommon implements Serializable {
 //		removeRowSetListener();
 //		removeSSComponentListener();
 //	}
+	
+	/**
+	 * Method to add any SwingSet Component listener(s).
+	 */
+	public final void removeSSComponentListener() {
+		if (!ssComponentListenerAdded) {
+			
+			Object eventListener = getSSComponent().getSSComponentListener();
+			
+			if (ssComponent instanceof SSCheckBox) {
+				((SSCheckBox)ssComponent).removeItemListener((ItemListener) eventListener);
+			} else if (ssComponent instanceof SSBaseComboBox) {
+				((SSBaseComboBox<?, ?, ?>)ssComponent).removeActionListener((ActionListener) eventListener);
+			} else if (ssComponent instanceof SSImage) {
+				((SSImage)ssComponent).getBtnUpdateImage().removeActionListener((ActionListener) eventListener);
+			} else if (ssComponent instanceof SSLabel) {
+				((SSLabel)ssComponent).removePropertyChangeListener("text", ((PropertyChangeListener) eventListener));
+			} else if (ssComponent instanceof SSList) {
+				((SSList)ssComponent).removeListSelectionListener((ListSelectionListener) eventListener);
+			} else if (ssComponent instanceof SSSlider) {
+				((SSSlider)ssComponent).removeChangeListener((ChangeListener) eventListener);
+			} else if (ssComponent instanceof SSFormattedTextField) {
+				((SSFormattedTextField)ssComponent).removePropertyChangeListener("value", ((PropertyChangeListener) eventListener));
+//			} else if (ssComponent instanceof SSTextArea) {
+//			} else if (ssComponent instanceof SSTextField) {
+			} else if (ssComponent instanceof JTextComponent) {
+				removeSSDocumentListener();
+			} else {
+				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
+				String message = String.format("%s - Encountered unknown Component Event Listener for: %s. Unable to remove component listener.",
+						getColumnForLog(), ssComponent.getClass().getSimpleName());
+				logger.error(message);
+				JOptionPane.showMessageDialog((JComponent)getSSComponent(), message, "Unknown Component Event Listener", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+
+		ssComponentListenerAdded = false;
+		logger.debug("{} - Component Listener removed.", () -> getColumnForLog());
+	}
 
 	/**
 	 * Class to remove a Document listener when the SwingSet component is a
 	 * JTextComponent
 	 */
-	public void removeDocumentListener() {
-		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().removeDocumentListener(documentListener);
-
+	private void removeSSDocumentListener() {
+		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().removeDocumentListener(ssDocumentListener);
 	}
 
 	/**
 	 * Method to remove the RowSet listener.
 	 */
-	public void removeRowSetListener() {
-		if (rowsetListenerAdded && rowSet != null) { //rowsetListenerAdded likely won't be true if rowset is null
+	public final void removeRowSetListener() {
+		// rowSetListenerAdded==true indicates that rowset is not null, so not checking
+		// rowSetListenerAdded==true indicates that rowSetListener is not null, so not checking
+		//if (rowSetListenerAdded && rowSet != null) {
+		if (rowSetListenerAdded) {
 			rowSet.removeRowSetListener(rowSetListener);
-			rowsetListenerAdded = false;
-			logger.debug(boundColumnName + " - RowSet Listener removed.");
-		}
-	}
-
-	/**
-	 * Method to remove any SwingSet Component listener(s).
-	 */
-	public void removeSSComponentListener() {
-		if (ssComponentListenerAdded) {
-			ssComponent.removeSSComponentListener();
-			ssComponentListenerAdded = false;
-			logger.debug(boundColumnName + " - Component Listener removed.");
+			rowSetListenerAdded = false;
+			logger.debug("{} - RowSet Listener removed.", () -> getColumnForLog());
 		}
 	}
 
@@ -837,17 +954,17 @@ public class SSCommon implements Serializable {
 			//getRowSet().updateColumnText(_boundColumnText, getBoundColumnName(), getAllowNull());
 			RowSetOps.updateColumnText(getRowSet(),_boundColumnText, getBoundColumnName(), getAllowNull());
 		} catch(final NullPointerException _npe) {
-			logger.warn("Null Pointer Exception.", _npe);
+			logger.warn(getBoundColumnName() + " - Null Pointer Exception.", _npe);
 			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
 					"Null values are not allowed for " + getBoundColumnName(), "Null Exception", JOptionPane.ERROR_MESSAGE);
 
 		} catch(final SQLException _se) {
-			logger.warn("SQL Exception.", _se);
+			logger.warn(getBoundColumnName() + " - SQL Exception.", _se);
 			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
 					"SQL Exception encountered for " + getBoundColumnName(), "SQL Exception", JOptionPane.ERROR_MESSAGE);
 
 		} catch(final NumberFormatException _pe) {
-			logger.warn("Number Format Exception.", _pe);
+			logger.warn(getBoundColumnName() + " - Number Format Exception.", _pe);
 			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
 					"Number Format Exception encountered for " + getBoundColumnName() + " converting " + _boundColumnText + " to a number.",
 					"Number Format Exception", JOptionPane.ERROR_MESSAGE);
@@ -899,11 +1016,11 @@ public class SSCommon implements Serializable {
 		// not handled properly. Maybe incorporate SwingUtilities.invokeLater()? 
 		logger.trace("Updating component {}.", () -> getColumnForLog());
 		
-		ssComponent.removeSSComponentListener();
+		removeSSComponentListener();
 
 		ssComponent.updateSSComponent();
 
-		ssComponent.addSSComponentListener();
+		addSSComponentListener();
 
 	}
 

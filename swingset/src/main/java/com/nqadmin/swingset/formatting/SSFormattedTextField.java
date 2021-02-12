@@ -159,7 +159,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * Listener(s) for the component's value used to propagate changes back to bound
 	 * database column
 	 */
-	protected class SSFormattedValueListener implements PropertyChangeListener, Serializable {
+	protected class SSFormattedTextFieldListener implements PropertyChangeListener, Serializable {
 
 		/**
 		 * unique serial id
@@ -171,7 +171,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 			if (_pce.getPropertyName().equals("value")) {
 
-				removeRowSetListener();
+				ssCommon.removeRowSetListener();
 
 			    final SSFormattedTextField ftf = (SSFormattedTextField)_pce.getSource();
 
@@ -215,7 +215,7 @@ public class SSFormattedTextField extends JFormattedTextField
 					}
 			    }
 
-				addRowSetListener();
+			    ssCommon.addRowSetListener();
 			}
 
 		}
@@ -246,11 +246,11 @@ public class SSFormattedTextField extends JFormattedTextField
 	/**
 	 * Component listener.
 	 */
-	protected final SSFormattedValueListener ssFormattedValueListener = new SSFormattedValueListener();
+	protected SSFormattedTextFieldListener ssFormattedTextFieldListener;
 
 	private java.awt.Color standardColor = null;
 
-
+	
 	/**
 	 * Creates a new instance of SSFormattedTextField
 	 */
@@ -287,15 +287,6 @@ public class SSFormattedTextField extends JFormattedTextField
 	 */
 	public SSFormattedTextField(final Format _format) {
     	super(_format);
-	}
-
-	/**
-	 * Adds any necessary listeners for the current SwingSet component. These will trigger changes
-	 * in the underlying RowSet column.
-	 */
-	@Override
-	public void addSSComponentListener() {
-		addPropertyChangeListener(ssFormattedValueListener);
 	}
 
 	/**
@@ -373,6 +364,17 @@ public class SSFormattedTextField extends JFormattedTextField
 	public SSCommon getSSCommon() {
 		return ssCommon;
 	}
+    
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public SSFormattedTextFieldListener getSSComponentListener() {
+		if (ssFormattedTextFieldListener == null) {
+			ssFormattedTextFieldListener = new SSFormattedTextFieldListener();
+		}
+		return ssFormattedTextFieldListener;
+	}
 
 	/**
 	 * Getter for property nullable.
@@ -383,15 +385,6 @@ public class SSFormattedTextField extends JFormattedTextField
 	public boolean isNullable() {
 
 		return getAllowNull();
-	}
-
-    /**
-	 * Removes any necessary listeners for the current SwingSet component. These will trigger changes
-	 * in the underlying RowSet column.
-	 */
-	@Override
-	public void removeSSComponentListener() {
-		removePropertyChangeListener(ssFormattedValueListener);
 	}
 
     /**

@@ -37,6 +37,9 @@
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
+import static com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.addEventLogging;
+import static com.nqadmin.swingset.models.OptionMappingSwingModel.asOptionMappingSwingModel;
+
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -66,9 +69,6 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.matchers.TextMatcherEditor;
 import ca.odell.glazedlists.swing.AutoCompleteSupport;
-
-import static com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.addEventLogging;
-import static com.nqadmin.swingset.models.OptionMappingSwingModel.asOptionMappingSwingModel;
 
 // SSBaseComboBox.java
 //
@@ -334,7 +334,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	/**
 	 * Component listener.
 	 */
-	protected final SSBaseComboBoxListener ssBaseComboBoxListener = new SSBaseComboBoxListener();
+	protected SSBaseComboBoxListener ssBaseComboBoxListener;
 
 //	/**
 //	 * List item used to workaround GlazedList CONTAINS bug/glitch.
@@ -840,6 +840,17 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	public SSCommon getSSCommon() {
 		return ssCommon;
 	}
+	
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public SSBaseComboBoxListener getSSComponentListener() {
+		if (ssBaseComboBoxListener==null) {
+			ssBaseComboBoxListener = new SSBaseComboBoxListener();
+		}
+		return ssBaseComboBoxListener;
+	}
 
 	/**
 	 * {@inheritDoc }
@@ -848,25 +859,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	public void setSSCommon(final SSCommon _ssCommon) {
 		ssCommon = _ssCommon;
 
-	}
-
-	/**
-	 * Adds any necessary listeners for the current SwingSet component. These will
-	 * trigger changes in the underlying rowset column.
-	 */
-	@Override
-	public void addSSComponentListener() {
-		addActionListener(ssBaseComboBoxListener);
-
-	}
-
-	/**
-	 * Removes any necessary listeners for the current SwingSet component. These
-	 * will trigger changes in the underlying RowSet column.
-	 */
-	@Override
-	public void removeSSComponentListener() {
-		removeActionListener(ssBaseComboBoxListener);
 	}
 
 	/**
@@ -1002,7 +994,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	private void updateRowset() {
 		
-		removeRowSetListener();
+		ssCommon.removeRowSetListener();
 		
 		M mapping = getSelectedMapping();
 	
@@ -1025,7 +1017,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			}
 		}
 	
-		addRowSetListener();
+		ssCommon.addRowSetListener();
 	}
 
 	//
@@ -1036,12 +1028,16 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * currently installed on the given <code>comboBox</code>. This is the only
 	 * technique we can rely on to prevent the <code>comboBox</code> from
 	 * broadcasting {@link ActionEvent}s at inappropriate times.
-	 *
+	 * <p>
 	 * This method is the logical inverse of {@link #registerAllActionListeners}.
+	 * <p>
+	 * Note that the ActionListener used for binding will be removed without
+	 * passing through SSCommon.removeSSComponentListener()
 	 * 
 	 * @param comboBox combo box from which to remove listeners
 	 * @return array of ActionListeners removed from combo box (for adding back later)
 	 */
+	// TODO: Consider passing in SSBaseComboBox and identifying SSBaseComboBoxListener
 	static ActionListener[] unregisterAllActionListeners(JComboBox<?> comboBox) {
 		final ActionListener[] listeners = comboBox.getActionListeners();
 		for (ActionListener listener : listeners) {
@@ -1054,12 +1050,16 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	/**
 	 * A convenience method to register all of the given <code>listeners</code>
 	 * with the given <code>comboBox</code>.
-	 *
+	 * <p>
 	 * This method is the logical inverse of {@link #unregisterAllActionListeners}.
+	 * <p>
+	 * Note that the ActionListener used for binding will be removed without
+	 * passing through SSCommon.addSSComponentListener()
 	 * 
 	 * @param comboBox combo box for which to add listeners
 	 * @param listeners array of ActionListners to be 
 	 */
+	// TODO: Consider passing in SSBaseComboBox and identifying SSBaseComboBoxListener
 	static void registerAllActionListeners(JComboBox<?> comboBox, ActionListener[] listeners) {
 		for (ActionListener listener : listeners) {
 			comboBox.addActionListener(listener);

@@ -12,7 +12,8 @@ Changes:
 	     protected abstract void retrieveAndSetNewPrimaryKey();
 	   with:
 	     protected abstract String retrieveNewPrimaryKey();
-	3. 
+	3. Moved addSSComponentListener() and removeSSComponentListener() to
+	   SSCommon, making companion methods in SSComponentInterface static.
 
 ==============================================================================
 SwingSet 4.0.1 - Released 2021-02-04

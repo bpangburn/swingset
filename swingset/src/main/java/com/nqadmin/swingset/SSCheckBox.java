@@ -83,7 +83,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 		@Override
 		public void itemStateChanged(final ItemEvent ie) {
 
-			removeRowSetListener();
+			ssCommon.removeRowSetListener();
 
 			if (((JCheckBox) ie.getSource()).isSelected()) {
 				// switch(SSCheckBox.this.columnType) {
@@ -121,7 +121,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 				}
 			}
 
-			addRowSetListener();
+			ssCommon.addRowSetListener();
 		}
 
 	} // end private class SSCheckBoxListener
@@ -155,7 +155,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	/**
 	 * Component listener.
 	 */
-	protected final SSCheckBoxListener ssCheckBoxListener = new SSCheckBoxListener();
+	protected SSCheckBoxListener ssCheckBoxListener;
 
 	/**
 	 * Common fields shared across SwingSet components
@@ -200,16 +200,6 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	}
 
 	/**
-	 * Adds any necessary listeners for the current SwingSet component. These will
-	 * trigger changes in the underlying RowSet column.
-	 */
-	@Override
-	public void addSSComponentListener() {
-		addItemListener(ssCheckBoxListener);
-
-	}
-
-	/**
 	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
 	 * <p>
@@ -231,15 +221,16 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	public SSCommon getSSCommon() {
 		return ssCommon;
 	}
-
+	
 	/**
-	 * Removes any necessary listeners for the current SwingSet component. These
-	 * will trigger changes in the underlying RowSet column.
+	 * {@inheritDoc }
 	 */
 	@Override
-	public void removeSSComponentListener() {
-		removeItemListener(ssCheckBoxListener);
-
+	public SSCheckBoxListener getSSComponentListener() {
+		if (ssCheckBoxListener==null) {
+			ssCheckBoxListener = new SSCheckBoxListener();
+		}
+		return ssCheckBoxListener;
 	}
 
 	/**

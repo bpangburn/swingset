@@ -37,10 +37,12 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
+import static com.nqadmin.swingset.models.OptionMappingSwingModel.asOptionMappingSwingModel;
+
 import java.awt.Dimension;
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.sql.JDBCType;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -59,14 +61,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
-import com.nqadmin.swingset.utils.SSCommon;
-import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.models.OptionMappingSwingModel;
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSDbArrayModel;
 import com.nqadmin.swingset.models.SSListItem;
-
-import static com.nqadmin.swingset.models.OptionMappingSwingModel.asOptionMappingSwingModel;
+import com.nqadmin.swingset.utils.SSCommon;
+import com.nqadmin.swingset.utils.SSComponentInterface;
 
 // SSList.java
 //
@@ -108,9 +108,9 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 		
 		@Override
 		public void valueChanged(final ListSelectionEvent e) {
-			removeRowSetListener();
+			ssCommon.removeRowSetListener();
 			updateRowSet();
-			addRowSetListener();
+			ssCommon.addRowSetListener();
 		}
 	}
 
@@ -177,7 +177,7 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	/**
 	 * Component listener for list selection changes.
 	 */
-	protected final SSListListener ssListListener = new SSListListener();
+	protected SSListListener ssListListener;
 
 	/**
 	 * Creates an object of SSList with mapping type of {@code JDBCType.NULL}.
@@ -209,15 +209,6 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 
 		// uncomment this to run some tests
 		// testStuff(this);
-	}
-
-	/**
-	 * Adds any necessary listeners for the current SwingSet component. These will
-	 * trigger changes in the underlying RowSet column.
-	 */
-	@Override
-	public void addSSComponentListener() {
-		addListSelectionListener(ssListListener);
 	}
 
 	/**
@@ -332,14 +323,16 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	public SSCommon getSSCommon() {
 		return ssCommon;
 	}
-
+	
 	/**
-	 * Removes any necessary listeners for the current SwingSet component. These
-	 * will trigger changes in the underlying RowSet column.
+	 * {@inheritDoc }
 	 */
 	@Override
-	public void removeSSComponentListener() {
-		removeListSelectionListener(ssListListener);
+	public SSListListener getSSComponentListener() {
+		if (ssListListener==null) {
+			ssListListener = new SSListListener();
+		}
+		return ssListListener;
 	}
 
 	/**
