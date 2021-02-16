@@ -764,7 +764,7 @@ public class SSCommon implements Serializable {
 	 * Method to add any SwingSet Component listener(s).
 	 */
 	public final void removeSSComponentListener() {
-		if (!ssComponentListenerAdded) {
+		if (ssComponentListenerAdded) {
 			
 			Object eventListener = getSSComponent().getSSComponentListener();
 			
