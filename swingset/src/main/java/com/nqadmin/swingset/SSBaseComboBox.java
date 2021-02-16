@@ -708,7 +708,17 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				// nullItem is either special first list item
 				// or it is null. It is null when getAllowNull() is false
 				item = nullItem;
-				logger.warn(String.format("%s: No mapping available for %s in combobox, setSelectedItem(null)", getColumnForLog(), _mapping));
+				// BP_2021-02-16:
+				// We expect to get here if we have a child combo where the contents are requeried on each record.
+				// As soon as a navigation occurs, the component values are cleared and then the new value is loaded,
+				// but the combo has not been re-queried yet so there are no matches for setSelectedMapping() and we
+				// call setSelectedItem(nullItem). This is OK so long as the component listener used for binding
+				// is removed/disabled because the rowset will not get the null value. Later when the combo is
+				// requeried, the component will try to load the current column value from the rowset and this time
+				// setSelectedMapping() should succeed.
+				if (getSSCommon().isSSComponentListenerAdded()) {
+					logger.warn(String.format("%s: No mapping available for %s in combobox, setSelectedItem(null)", getColumnForLog(), _mapping));
+				}
 			}
 			setSelectedItem(item);
 			
