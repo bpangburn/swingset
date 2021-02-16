@@ -336,12 +336,8 @@ public interface SSComponentInterface {
 	 *	return ssCheckBoxListener;
 	 * }
 	 * 
-	 * OR: {@code
-	 * 	if (ssTextFieldListener==null) {
-	 * 		ssTextFieldListener = new SSCommon.SSCommonDocumentListener();
-	 * 	}
-	 * 
-	 * 	return ssTextFieldListener;
+	 * OR (for a JTextComponent): {@code
+	 * 	return getSSCommon().getSSDocumentListener();
 	 * }
 	 * 
 	 * @return change listener for the current SwingSet component to trigger RowSet update
