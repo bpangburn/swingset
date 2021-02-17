@@ -238,10 +238,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	@Override
 	protected void populateSSComboBoxes() {
 		// SET COMBO OPTIONS
-		//cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
-		System.out.println(cmbPartColor);
-		cmbPartColor.setOptions(Arrays.asList(new String[] { "Red", "Green", "Blue" }));
-		
+		cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
 	}
 
 	/**
