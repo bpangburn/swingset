@@ -440,6 +440,12 @@ public class SSCommon implements Serializable {
 	 * Method to add any SwingSet Component listener(s).
 	 */
 	public final void addSSComponentListener() {
+		
+		// Probably should not have a null eventListener here, but just in case
+		if (eventListener==null) {
+			return;
+		}
+		
 		if (!ssComponentListenerAdded) {
 			
 			ssComponentListenerAdded = true;
@@ -766,6 +772,12 @@ public class SSCommon implements Serializable {
 	 * Method to add any SwingSet Component listener(s).
 	 */
 	public final void removeSSComponentListener() {
+		
+		// Probably should not have a null eventListener here, but just in case
+		if (eventListener==null) {
+			return;
+		}
+		
 		if (ssComponentListenerAdded) {
 			
 			ssComponentListenerAdded = false;
