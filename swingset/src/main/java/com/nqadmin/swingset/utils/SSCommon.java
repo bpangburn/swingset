@@ -822,10 +822,9 @@ public class SSCommon implements Serializable {
 	 * Method to remove the RowSet listener.
 	 */
 	public final void removeRowSetListener() {
-		// rowSetListenerAdded==true generally indicates that rowset is not null,
-		//   but there could be a call to setRowSet(null) so checking
+		// rowSetListenerAdded==true indicates that rowset is not null and we do not let the user call setRowSet(null), so not checking
 		// rowSetListenerAdded==true indicates that rowSetListener is not null, so not checking
-		if (rowSetListenerAdded && rowSet != null) {
+		if (rowSetListenerAdded) {
 			rowSet.removeRowSetListener(rowSetListener);
 			rowSetListenerAdded = false;
 			logger.debug("{} - RowSet Listener removed.", () -> getColumnForLog());
@@ -1009,6 +1008,7 @@ public class SSCommon implements Serializable {
 	 * @param _rowSet RowSet to which the component is bound
 	 */
 	public void setRowSet(final RowSet _rowSet) {
+		Objects.requireNonNull(_rowSet);
 		rowSet = _rowSet;
 		if (!inBinding) {
 			bind();
