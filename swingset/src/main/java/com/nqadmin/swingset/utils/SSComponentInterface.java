@@ -318,6 +318,10 @@ public interface SSComponentInterface {
 	 * Return the listener that should detect a change in value for the current
 	 * component.
 	 * <p>
+	 * IMPORTANT: A component should have exactly one listener for component
+	 * changes related to RowSet binding so this method should ALWAYS return the
+	 * SAME listener.
+	 * <p>
 	 * Generally the developer will need to add an inner class and corresponding
 	 * data member that implements the appropriate listener for the JComponent
 	 * involved (e.g., ItemListener for a class extending JCheckBox, ChangeListener
@@ -340,7 +344,7 @@ public interface SSComponentInterface {
 	 * 	return getSSCommon().getSSDocumentListener();
 	 * }
 	 * 
-	 * @return change listener for the current SwingSet component to trigger RowSet update
+	 * @return single change listener for the current SwingSet component to trigger RowSet update
 	 */
 	EventListener getSSComponentListener();
 	
