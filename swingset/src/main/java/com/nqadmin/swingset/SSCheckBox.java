@@ -153,11 +153,6 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	protected int CHECKED = 1;
 
 	/**
-	 * Component listener.
-	 */
-	protected SSCheckBoxListener ssCheckBoxListener;
-
-	/**
 	 * Common fields shared across SwingSet components
 	 */
 	protected SSCommon ssCommon = new SSCommon(this);
@@ -227,10 +222,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	 */
 	@Override
 	public SSCheckBoxListener getSSComponentListener() {
-		if (ssCheckBoxListener==null) {
-			ssCheckBoxListener = new SSCheckBoxListener();
-		}
-		return ssCheckBoxListener;
+		return new SSCheckBoxListener();
 	}
 
 	/**

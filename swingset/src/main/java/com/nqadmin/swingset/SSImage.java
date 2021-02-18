@@ -165,11 +165,6 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	protected SSCommon ssCommon = new SSCommon(this);
 
 	/**
-	 * Component listener.
-	 */
-	protected SSImageListener ssImageListener;
-
-	/**
 	 * Construct a default SSImage Object.
 	 */
 	public SSImage() {
@@ -271,10 +266,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 */
 	@Override
 	public SSImageListener getSSComponentListener() {
-		if (ssImageListener == null) {
-			ssImageListener = new SSImageListener();
-		}
-		return ssImageListener;
+		return new SSImageListener();
 	}
 
 	/**

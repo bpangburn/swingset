@@ -101,11 +101,6 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	protected SSCommon ssCommon = new SSCommon(this);
 
 	/**
-	 * Component listener.
-	 */
-	protected SSSliderListener ssSliderListener;
-
-	/**
 	 * Empty constructor needed for deserialization. Creates a horizontal slider
 	 * with the range 0 to 100.
 	 */
@@ -176,10 +171,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	 */
 	@Override
 	public SSSliderListener getSSComponentListener() {
-		if (ssSliderListener==null) {
-			ssSliderListener = new SSSliderListener();
-		}
-		return ssSliderListener;
+		return new SSSliderListener();
 	}
 
 	/**

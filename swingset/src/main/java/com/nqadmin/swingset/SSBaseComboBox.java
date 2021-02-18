@@ -331,11 +331,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	protected SSCommon ssCommon = new SSCommon(this);
 
-	/**
-	 * Component listener.
-	 */
-	protected SSBaseComboBoxListener ssBaseComboBoxListener;
-
 //	/**
 //	 * List item used to workaround GlazedList CONTAINS bug/glitch.
 //	 */
@@ -856,10 +851,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	@Override
 	public SSBaseComboBoxListener getSSComponentListener() {
-		if (ssBaseComboBoxListener==null) {
-			ssBaseComboBoxListener = new SSBaseComboBoxListener();
-		}
-		return ssBaseComboBoxListener;
+		return new SSBaseComboBoxListener();
 	}
 
 	/**

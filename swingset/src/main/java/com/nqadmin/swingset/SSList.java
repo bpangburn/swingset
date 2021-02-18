@@ -175,11 +175,6 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	protected SSCommon ssCommon = new SSCommon(this);
 
 	/**
-	 * Component listener for list selection changes.
-	 */
-	protected SSListListener ssListListener;
-
-	/**
 	 * Creates an object of SSList with mapping type of {@code JDBCType.NULL}.
 	 */
 	public SSList() {
@@ -329,10 +324,7 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	 */
 	@Override
 	public SSListListener getSSComponentListener() {
-		if (ssListListener==null) {
-			ssListListener = new SSListListener();
-		}
-		return ssListListener;
+		return new SSListListener();
 	}
 
 	/**

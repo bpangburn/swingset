@@ -110,11 +110,6 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	protected SSCommon ssCommon = new SSCommon(this);
 
 	/**
-	 * Component listener.
-	 */
-	protected SSLabelListener ssLabelListener;
-
-	/**
 	 * Empty constructor needed for deserialization. Creates a SSLabel instance with
 	 * no image and no text.
 	 */
@@ -184,10 +179,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	 */
 	@Override
 	public SSLabelListener getSSComponentListener() {
-		if (ssLabelListener == null) {
-			ssLabelListener = new SSLabelListener();
-		}
-		return ssLabelListener;
+		return new SSLabelListener();
 	}
 
 	/**

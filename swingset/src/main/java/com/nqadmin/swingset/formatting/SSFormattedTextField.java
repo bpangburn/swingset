@@ -243,11 +243,6 @@ public class SSFormattedTextField extends JFormattedTextField
      */
     protected SSCommon ssCommon = new SSCommon(this);
 
-	/**
-	 * Component listener.
-	 */
-	protected SSFormattedTextFieldListener ssFormattedTextFieldListener;
-
 	private java.awt.Color standardColor = null;
 
 	
@@ -370,10 +365,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 */
 	@Override
 	public SSFormattedTextFieldListener getSSComponentListener() {
-		if (ssFormattedTextFieldListener == null) {
-			ssFormattedTextFieldListener = new SSFormattedTextFieldListener();
-		}
-		return ssFormattedTextFieldListener;
+		return new SSFormattedTextFieldListener();
 	}
 
 	/**

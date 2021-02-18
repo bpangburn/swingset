@@ -318,12 +318,12 @@ public interface SSComponentInterface {
 	 * Return the listener that should detect a change in value for the current
 	 * component.
 	 * <p>
-	 * IMPORTANT: A component should have exactly one listener for component
-	 * changes related to RowSet binding so this method should ALWAYS return the
-	 * SAME listener.
+	 * IMPORTANT: A component will have exactly one listener for component
+	 * changes related to RowSet binding so this method will only be called
+	 * one time in the SSCommon constructor to obtain that listener.
 	 * <p>
-	 * Generally the developer will need to add an inner class and corresponding
-	 * data member that implements the appropriate listener for the JComponent
+	 * Generally the developer will need to return an instance of an inner class
+	 * that implements the appropriate listener for the JComponent
 	 * involved (e.g., ItemListener for a class extending JCheckBox, ChangeListener
 	 * for a class extending JSlider, DocumentListener for a class extending
 	 * JTextField, etc.).
@@ -332,12 +332,7 @@ public interface SSComponentInterface {
 	 * instance variable of type SSCommon.SSCommonDocumentListener().
 	 * <p>
 	 * A typical implementation might look like: {@code
-	 * 
-	 * 	if (ssCheckBoxListener==null) {
-	 * 		ssCheckBoxListener = new SSCheckBoxListener();
-	 * 	}
-	 * 
-	 *	return ssCheckBoxListener;
+	 * 	return new SSCheckBoxListener();
 	 * }
 	 * 
 	 * OR (for a JTextComponent): {@code

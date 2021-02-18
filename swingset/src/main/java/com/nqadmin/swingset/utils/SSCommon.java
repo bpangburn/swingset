@@ -111,12 +111,7 @@ public class SSCommon implements Serializable {
 	 * getSSComponentListener().
 	 * <p>
 	 * A typical implementation might look like: {@code
-	 * 
-	 * 	if (ssTextFieldListener==null) {
-	 * 		ssTextFieldListener = new SSCommon.SSDocumentListener();
-	 * 	}
-	 * 
-	 * 	return ssTextFieldListener;
+	 * 	return getSSCommon().getSSDocumentListener();
 	 * }
 	 * <p>
 	 * This listener updates the underlying RowSet there is a change to the Document
@@ -333,6 +328,11 @@ public class SSCommon implements Serializable {
 	 * Name of RowSet column to which the SwingSet component will be bound.
 	 */
 	private String boundColumnName = null;
+	
+	/**
+	 * EventListener use for detecting component changes for RowSet column binding
+	 */
+	private EventListener eventListener = null;
 
 	/**
 	 * Name for log in boundColumnName is not set.
@@ -371,11 +371,6 @@ public class SSCommon implements Serializable {
 	 * database connection
 	 */
 	private Connection connection = null;
-
-	/**
-	 * Component value change listener (where SwingSet component is a JTextComponent)
-	 */
-	private SSDocumentListener ssDocumentListener;
 
 	/**
 	 * RowSet from which component will get/set values.
@@ -424,7 +419,7 @@ public class SSCommon implements Serializable {
 	 * JTextComponent.
 	 */
 	private void addSSDocumentListener() {
-		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().addDocumentListener(ssDocumentListener);
+		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().addDocumentListener((SSDocumentListener)eventListener);
 	}
 
 	/**
@@ -447,7 +442,6 @@ public class SSCommon implements Serializable {
 	public final void addSSComponentListener() {
 		if (!ssComponentListenerAdded) {
 			
-			EventListener eventListener = getSSComponent().getSSComponentListener();
 			ssComponentListenerAdded = true;
 			
 			if (ssComponent instanceof SSCheckBox) {
@@ -489,6 +483,10 @@ public class SSCommon implements Serializable {
 	 * Updates the SSComponent with a valid RowSet and Column (Name or Index)
 	 */
 	private void bind() {
+		
+		if (eventListener==null) {
+			eventListener = getSSComponent().getSSComponentListener();
+		}
 
 		// Not sure of implications of bind fail,
 		// set default in case case bind fails.
@@ -698,15 +696,13 @@ public class SSCommon implements Serializable {
 	
 	/**
 	 * Returns SSDocumentListener if the component is a JTextComponent
+	 * <p>
+	 * Should only be called once per component.
 	 *
 	 * @return SSDocumentListener for a JTextComponent
 	 */
 	public SSDocumentListener getSSDocumentListener() {
-		if (ssDocumentListener==null) {
-			ssDocumentListener = new SSDocumentListener();
-		}
-		
-		return ssDocumentListener;
+		return new SSDocumentListener();
 	}
 
 	/**
@@ -772,7 +768,6 @@ public class SSCommon implements Serializable {
 	public final void removeSSComponentListener() {
 		if (ssComponentListenerAdded) {
 			
-			EventListener eventListener = getSSComponent().getSSComponentListener();
 			ssComponentListenerAdded = false;
 			
 			if (ssComponent instanceof SSCheckBox) {
@@ -815,7 +810,7 @@ public class SSCommon implements Serializable {
 	 * JTextComponent
 	 */
 	private void removeSSDocumentListener() {
-		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().removeDocumentListener(ssDocumentListener);
+		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().removeDocumentListener((SSDocumentListener)eventListener);
 	}
 
 	/**
