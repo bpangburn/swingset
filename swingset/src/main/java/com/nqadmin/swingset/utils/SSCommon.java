@@ -45,6 +45,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.SQLException;
+import java.util.EventListener;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -446,7 +447,8 @@ public class SSCommon implements Serializable {
 	public final void addSSComponentListener() {
 		if (!ssComponentListenerAdded) {
 			
-			Object eventListener = getSSComponent().getSSComponentListener();
+			EventListener eventListener = getSSComponent().getSSComponentListener();
+			ssComponentListenerAdded = true;
 			
 			if (ssComponent instanceof SSCheckBox) {
 				((SSCheckBox)ssComponent).addItemListener((ItemListener) eventListener);
@@ -472,11 +474,15 @@ public class SSCommon implements Serializable {
 						getColumnForLog(), ssComponent.getClass().getSimpleName());
 				logger.error(message);
 				JOptionPane.showMessageDialog((JComponent)getSSComponent(), message, "Unknown Component Event Listener", JOptionPane.ERROR_MESSAGE);
+				
+				// INDICATE FAILURE TO ADD LISTENER
+				ssComponentListenerAdded = false;
 			}
 		}
 
-		ssComponentListenerAdded = true;
-		logger.debug("{} - Component Listener added.", () -> getColumnForLog());
+		if (ssComponentListenerAdded) {
+			logger.debug("{} - Component Listener added.", () -> getColumnForLog());
+		}
 	}
 
 	/**
@@ -766,7 +772,8 @@ public class SSCommon implements Serializable {
 	public final void removeSSComponentListener() {
 		if (ssComponentListenerAdded) {
 			
-			Object eventListener = getSSComponent().getSSComponentListener();
+			EventListener eventListener = getSSComponent().getSSComponentListener();
+			ssComponentListenerAdded = false;
 			
 			if (ssComponent instanceof SSCheckBox) {
 				((SSCheckBox)ssComponent).removeItemListener((ItemListener) eventListener);
@@ -792,11 +799,15 @@ public class SSCommon implements Serializable {
 						getColumnForLog(), ssComponent.getClass().getSimpleName());
 				logger.error(message);
 				JOptionPane.showMessageDialog((JComponent)getSSComponent(), message, "Unknown Component Event Listener", JOptionPane.ERROR_MESSAGE);
+				
+				// INDICATE FAILURE TO REMOVE LISTENER
+				ssComponentListenerAdded = true;
 			}
 		}
 
-		ssComponentListenerAdded = false;
-		logger.debug("{} - Component Listener removed.", () -> getColumnForLog());
+		if (!ssComponentListenerAdded) {
+			logger.debug("{} - Component Listener removed.", () -> getColumnForLog());
+		}
 	}
 
 	/**
