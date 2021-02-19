@@ -328,8 +328,8 @@ public interface SSComponentInterface {
 	 * for a class extending JSlider, DocumentListener for a class extending
 	 * JTextField, etc.).
 	 * <p>
-	 * If the component is JTextComponent then the implementation can add an
-	 * instance variable of type SSCommon.SSCommonDocumentListener().
+	 * If the component is JTextComponent then the implementation can return
+	 * an instance of SSCommon.SSCommonDocumentListener().
 	 * <p>
 	 * A typical implementation might look like: {@code
 	 * 	return new SSCheckBoxListener();
