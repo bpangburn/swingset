@@ -3,11 +3,22 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
 ==============================================================================
-SwingSet 4.0.2 - Released TBD
+SwingSet 4.0.2 - Released 2021-02-18
 ==============================================================================
 
 Changes:
-	1. stuff goes here...
+	1. SSDBComboBox - added constructor without _query parameter.
+	2. SSFormViewScreenHelper API change, replacing:
+	     protected abstract void retrieveAndSetNewPrimaryKey();
+	   with:
+	     protected abstract String retrieveNewPrimaryKey();
+	3. Moved addSSComponentListener() and removeSSComponentListener() to
+	   SSCommon, making companion methods in SSComponentInterface static.
+	4. Added abstract method EventListener getSSComponentListener() to
+	   SSComponentInterface and implemented in applicable SwingSet
+	   components.
+	5. Component change listener for binding is stored as private data member
+	   in SSCommon and initialized in the bind() method.
 
 ==============================================================================
 SwingSet 4.0.1 - Released 2021-02-04

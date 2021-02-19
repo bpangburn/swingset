@@ -61,17 +61,17 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  */
 public class SSLabel extends JLabel implements SSComponentInterface {
 
-    /**
-     * Listener(s) for the component's value used to propagate changes back to
-     * bound database column.
-     * <p>
-     * There is not an obvious use-case where a label would change, but could be
-     * tied to a menu, screen logic, or some other Developer driven change that could
-     * conceivably need to be synchronized back to the RowSet.
-     */
-    protected class SSLabelListener implements PropertyChangeListener, Serializable {
-    	
-        /**
+	/**
+	 * Listener(s) for the component's value used to propagate changes back to bound
+	 * database column.
+	 * <p>
+	 * There is not an obvious use-case where a label would change, but could be
+	 * tied to a menu, screen logic, or some other Developer driven change that
+	 * could conceivably need to be synchronized back to the RowSet.
+	 */
+	protected class SSLabelListener implements PropertyChangeListener, Serializable {
+
+		/**
 		 * unique serial ID
 		 */
 		private static final long serialVersionUID = 6786673052979566820L;
@@ -79,90 +79,75 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 		@Override
 		public void propertyChange(final PropertyChangeEvent pce) {
 
-			// CONFIRM THE PROPERTY NAME IN CASE SOMEONE ADDS A DIFFERENT PROPERTY LISTENER TO ssLabelListener
-			if (pce.getPropertyName()=="text") {
+			// CONFIRM THE PROPERTY NAME IN CASE SOMEONE ADDS A DIFFERENT PROPERTY LISTENER
+			// TO ssLabelListener
+			if (pce.getPropertyName() == "text") {
 
-				removeRowSetListener();
+				ssCommon.removeRowSetListener();
 
 				setBoundColumnText(getText());
 
-				addRowSetListener();
+				ssCommon.addRowSetListener();
 			}
 
 		}
 
-    } // end protected class SSLabelListener
-    
+	} // end protected class SSLabelListener
+
 	/**
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = LogManager.getLogger();
 
-    /**
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -5232780793538061537L;
 
-    /**
-     * Common fields shared across SwingSet components
-     */
-    protected SSCommon ssCommon = new SSCommon(this);
-
-    /**
-     * Component listener.
-     */
-    protected final SSLabelListener ssLabelListener = new SSLabelListener();
-
-    /**
-     * Empty constructor needed for deserialization. Creates a SSLabel instance
-     * with no image and no text.
-     */
-    public SSLabel() {
-		// Note that call to parent default constructor is implicit.
-		//super();
-    }
-
-    /**
-     * Creates a SSLabel instance with the specified image.
-     *
-     * @param _image    specified image for label
-     */
-    public SSLabel(final Icon _image) {
-		super(_image);
-    }
-
-    /**
-     * Creates a SSLabel instance with the specified image and horizontal alignment.
-     *
-     * @param _image    specified image for label
-     * @param _horizontalAlignment	horizontal alignment
-     */
-    public SSLabel(final Icon _image, final int _horizontalAlignment) {
-		super(_image, _horizontalAlignment);
-    }
+	/**
+	 * Common fields shared across SwingSet components
+	 */
+	protected SSCommon ssCommon = new SSCommon(this);
 
 	/**
-     * Creates a SSLabel instance with no image and binds it to the specified
-     * RowSet column.
-     *
-     * @param _rowSet    datasource to be used.
-     * @param _boundColumnName    name of the column to which this label should be bound
-     */
-    public SSLabel(final RowSet _rowSet, final String _boundColumnName) {
+	 * Empty constructor needed for deserialization. Creates a SSLabel instance with
+	 * no image and no text.
+	 */
+	public SSLabel() {
+		// Note that call to parent default constructor is implicit.
+		// super();
+	}
+
+	/**
+	 * Creates a SSLabel instance with the specified image.
+	 *
+	 * @param _image specified image for label
+	 */
+	public SSLabel(final Icon _image) {
+		super(_image);
+	}
+
+	/**
+	 * Creates a SSLabel instance with the specified image and horizontal alignment.
+	 *
+	 * @param _image               specified image for label
+	 * @param _horizontalAlignment horizontal alignment
+	 */
+	public SSLabel(final Icon _image, final int _horizontalAlignment) {
+		super(_image, _horizontalAlignment);
+	}
+
+	/**
+	 * Creates a SSLabel instance with no image and binds it to the specified RowSet
+	 * column.
+	 *
+	 * @param _rowSet          datasource to be used.
+	 * @param _boundColumnName name of the column to which this label should be
+	 *                         bound
+	 */
+	public SSLabel(final RowSet _rowSet, final String _boundColumnName) {
 		this();
 		bind(_rowSet, _boundColumnName);
-    }
-
-	/**
-	 * Adds any necessary listeners for the current SwingSet component. These will
-	 * trigger changes in the underlying RowSet column.
-	 * <p>
-	 * Generally an SSLabel will be read-only, but Developer could change the text
-	 * so we'll support a property listener.
-	 */
-	@Override
-	public void addSSComponentListener() {
-		addPropertyChangeListener("text", ssLabelListener);
 	}
 
 	/**
@@ -174,34 +159,28 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	 */
 	@Override
 	public void customInit() {
-        // SET PREFERRED DIMENSIONS
+		// SET PREFERRED DIMENSIONS
 // TODO not sure SwingSet should be setting component dimensions
-            setPreferredSize(new Dimension(200,20));
-    }
+		setPreferredSize(new Dimension(200, 20));
+	}
 
 	/**
 	 * Returns the ssCommon data member for the current Swingset component.
 	 *
 	 * @return shared/common SwingSet component data and methods
 	 */
-    @Override
+	@Override
 	public SSCommon getSSCommon() {
 		return ssCommon;
 	}
 
 	/**
-	 * Removes any necessary listeners for the current SwingSet component. These will
-	 * trigger changes in the underlying RowSet column.
-	 * <p>
-	 * Generally an SSLabel will be read-only, but Developer could change the text so
-	 * we'll support a property listener.
+	 * {@inheritDoc }
 	 */
 	@Override
-	public void removeSSComponentListener() {
-		removePropertyChangeListener("text", ssLabelListener);
+	public SSLabelListener getSSComponentListener() {
+		return new SSLabelListener();
 	}
-
-
 
 	/**
 	 * Sets the SSCommon data member for the current Swingset Component.

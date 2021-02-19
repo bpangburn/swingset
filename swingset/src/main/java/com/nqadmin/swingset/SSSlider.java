@@ -60,13 +60,13 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  */
 public class SSSlider extends JSlider implements SSComponentInterface {
 
-    /**
-     * Listener(s) for the component's value used to propagate changes back to
-     * bound text field.
-     */
-    protected class SSSliderListener implements ChangeListener, Serializable {
+	/**
+	 * Listener(s) for the component's value used to propagate changes back to bound
+	 * text field.
+	 */
+	protected class SSSliderListener implements ChangeListener, Serializable {
 
-        /**
+		/**
 		 * unique serial ID
 		 */
 		private static final long serialVersionUID = -5004328872032247853L;
@@ -74,85 +74,72 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 		@Override
 		public void stateChanged(final ChangeEvent ce) {
 
-			removeRowSetListener();
+			ssCommon.removeRowSetListener();
 
 			setBoundColumnText(String.valueOf(getValue()));
 
-			addRowSetListener();
+			ssCommon.addRowSetListener();
 
-        }
+		}
 
-    } // end protected class SSSliderListener implements ChangeListener, Serializable {
+	} // end protected class SSSliderListener implements ChangeListener, Serializable
+		// {
 
-    /**
+	/**
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = LogManager.getLogger();
 
-    /**
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 8477179080546081481L;
 
-    /**
-     * Common fields shared across SwingSet components
-     */
+	/**
+	 * Common fields shared across SwingSet components
+	 */
 	protected SSCommon ssCommon = new SSCommon(this);
 
 	/**
-     * Component listener.
-     */
-    protected final SSSliderListener ssSliderListener = new SSSliderListener();
-
-    /**
-     * Empty constructor needed for deserialization. Creates a horizontal
-     * slider with the range 0 to 100.
-     */
-    public SSSlider() {
+	 * Empty constructor needed for deserialization. Creates a horizontal slider
+	 * with the range 0 to 100.
+	 */
+	public SSSlider() {
 		// Note that call to parent default constructor is implicit.
-		//super();
-    }
-
-    /**
-     * Creates a slider using the specified orientation with the range 0 to 100.
-     *
-     * @param _orientation	slider spatial orientation
-     */
-    public SSSlider(final int _orientation) {
-		super(_orientation);
-    }
-
-    /**
-     * Creates a horizontal slider using the specified min and max.
-     *
-     * @param _min	minimum slider value
-     * @param _max	maximum slider value
-     */
-    public SSSlider(final int _min, final int _max) {
-		super(_min, _max);
-    }
-
-    /**
-     * Creates a horizontal slider with the range 0 to 100 and binds it
-     * to the specified RowSet column.
-     *
-     * @param _rowSet    datasource to be used.
-     * @param _boundColumnName    name of the column to which this slider should be bound
-     * @throws java.sql.SQLException SQLException
-     */
-    public SSSlider(final RowSet _rowSet, final String _boundColumnName) throws java.sql.SQLException {
-    	this();
-		bind(_rowSet, _boundColumnName);
-    }
+		// super();
+	}
 
 	/**
-	 * Adds any necessary listeners for the current SwingSet component. These will
-	 * trigger changes in the underlying RowSet column.
+	 * Creates a slider using the specified orientation with the range 0 to 100.
+	 *
+	 * @param _orientation slider spatial orientation
 	 */
-	@Override
-	public void addSSComponentListener() {
-		addChangeListener(ssSliderListener);
+	public SSSlider(final int _orientation) {
+		super(_orientation);
+	}
 
+	/**
+	 * Creates a horizontal slider using the specified min and max.
+	 *
+	 * @param _min minimum slider value
+	 * @param _max maximum slider value
+	 */
+	public SSSlider(final int _min, final int _max) {
+		super(_min, _max);
+	}
+
+	/**
+	 * Creates a horizontal slider with the range 0 to 100 and binds it to the
+	 * specified RowSet column.
+	 *
+	 * @param _rowSet          datasource to be used.
+	 * @param _boundColumnName name of the column to which this slider should be
+	 *                         bound
+	 * @throws java.sql.SQLException SQLException
+	 */
+	public SSSlider(final RowSet _rowSet, final String _boundColumnName) throws java.sql.SQLException {
+		this();
+		bind(_rowSet, _boundColumnName);
 	}
 
 	/**
@@ -165,8 +152,8 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	@Override
 	public void customInit() {
 		// TODO Consider removing default dimensions.
-        // SET PREFERRED DIMENSIONS
-        	setPreferredSize(new Dimension(200,20));
+		// SET PREFERRED DIMENSIONS
+		setPreferredSize(new Dimension(200, 20));
 	}
 
 	/**
@@ -178,15 +165,13 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	public SSCommon getSSCommon() {
 		return ssCommon;
 	}
-
+	
 	/**
-	 * Removes any necessary listeners for the current SwingSet component. These
-	 * will trigger changes in the underlying RowSet column.
+	 * {@inheritDoc }
 	 */
 	@Override
-	public void removeSSComponentListener() {
-		removeChangeListener(ssSliderListener);
-
+	public SSSliderListener getSSComponentListener() {
+		return new SSSliderListener();
 	}
 
 	/**
@@ -203,36 +188,39 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	@Override
 	public void updateSSComponent() {
 
-		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to numeric types
+		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField
+		// and only allow JDBC types that convert to numeric types
 
 		// SET THE SLIDER BASED ON THE VALUE IN THE TEXT FIELD
 		switch (getBoundColumnType()) {
-            case java.sql.Types.INTEGER:
-            case java.sql.Types.SMALLINT:
-            case java.sql.Types.TINYINT:
-            case java.sql.Types.BIGINT:
-            case java.sql.Types.FLOAT:
-            case java.sql.Types.DOUBLE:
-            case java.sql.Types.NUMERIC:
-        	// SET THE SLIDER BASED ON THE VALUE IN TEXT FIELD
-            	final String columnValue = getBoundColumnText();
-            	try {
-            		if ((columnValue==null) || columnValue.isEmpty()) {
-            			logger.debug("{}: Setting slider to 0.", () -> getColumnForLog());
-            			setValue(0);
-	            	} else {
-	            		logger.debug("{}: Setting slider to " + columnValue + ".", () -> getColumnForLog());
-	            		setValue(Integer.parseInt(columnValue));
-	            	}
-            	} catch (final NumberFormatException _nfe) {
-            		logger.error(getColumnForLog() + ": Number Format Exception. Cannot update slider to " + columnValue, _nfe);
-            	}
-                break;
+		case java.sql.Types.INTEGER:
+		case java.sql.Types.SMALLINT:
+		case java.sql.Types.TINYINT:
+		case java.sql.Types.BIGINT:
+		case java.sql.Types.FLOAT:
+		case java.sql.Types.DOUBLE:
+		case java.sql.Types.NUMERIC:
+			// SET THE SLIDER BASED ON THE VALUE IN TEXT FIELD
+			final String columnValue = getBoundColumnText();
+			try {
+				if ((columnValue == null) || columnValue.isEmpty()) {
+					logger.debug("{}: Setting slider to 0.", () -> getColumnForLog());
+					setValue(0);
+				} else {
+					logger.debug("{}: Setting slider to " + columnValue + ".", () -> getColumnForLog());
+					setValue(Integer.parseInt(columnValue));
+				}
+			} catch (final NumberFormatException _nfe) {
+				logger.error(getColumnForLog() + ": Number Format Exception. Cannot update slider to " + columnValue,
+						_nfe);
+			}
+			break;
 
-            default:
-            	logger.warn(getColumnForLog() + ": Unable to update Slider bound to " + getBoundColumnName() + " because the data type is not supported (" + getBoundColumnType() + ".");
-                break;
-        }
+		default:
+			logger.warn(getColumnForLog() + ": Unable to update Slider bound to " + getBoundColumnName()
+					+ " because the data type is not supported (" + getBoundColumnType() + ".");
+			break;
+		}
 
 	}
 

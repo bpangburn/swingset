@@ -55,64 +55,60 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  */
 public class SSTextArea extends JTextArea implements SSComponentInterface {
 
-	// TODO Consider adding an InputVerifier to prevent component from losing focus. See SSFormattedTextField. May be able to add to SSDocumentListener in SSCommon.
-	
+	// TODO Consider adding an InputVerifier to prevent component from losing focus.
+	// See SSFormattedTextField. May be able to add to SSDocumentListener in
+	// SSCommon.
+
 	/**
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = LogManager.getLogger();
 
-    /**
+	/**
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = -1256528482424744463L;
 
-    /**
-     * Common fields shared across SwingSet components
-     */
-    protected SSCommon ssCommon = new SSCommon(this);
-
-    /**
-     * Empty constructor needed for deserialization.
-     */
-    public SSTextArea() {
-		// Note that call to parent default constructor is implicit.
-		//super();
-    }
-
-    /**
-     * Constructs a new empty SSTextArea with the specified number of rows and columns.
-     *
-     * @param _rows     {@literal the number of rows >= 0}
-     * @param _columns     {@literal the number of columns >= 0}
-     */
-    public SSTextArea(final int _rows, final int _columns) {
-        super(_rows, _columns);
-    }
-
-    /**
-     * Creates a multi-line text box and binds it to the specified RowSet column.
-     *
-     * @param _rowSet    datasource to be used.
-     * @param _boundColumnName    name of the column to which this text area should be bound
-     */
-    public SSTextArea(final RowSet _rowSet, final String _boundColumnName) {
-    	this();
-        bind(_rowSet, _boundColumnName);
-    }
-
-    /**
-	 * Adds any necessary listeners for the current SwingSet component. These will trigger changes
-	 * in the underlying RowSet column.
+	/**
+	 * Common fields shared across SwingSet components
 	 */
-	@Override
-	public void addSSComponentListener() {
-		addDocumentListener();
+	protected SSCommon ssCommon = new SSCommon(this);
+
+	/**
+	 * Empty constructor needed for deserialization.
+	 */
+	public SSTextArea() {
+		// Note that call to parent default constructor is implicit.
+		// super();
 	}
 
-    @Override
+	/**
+	 * Constructs a new empty SSTextArea with the specified number of rows and
+	 * columns.
+	 *
+	 * @param _rows    {@literal the number of rows >= 0}
+	 * @param _columns {@literal the number of columns >= 0}
+	 */
+	public SSTextArea(final int _rows, final int _columns) {
+		super(_rows, _columns);
+	}
+
+	/**
+	 * Creates a multi-line text box and binds it to the specified RowSet column.
+	 *
+	 * @param _rowSet          datasource to be used.
+	 * @param _boundColumnName name of the column to which this text area should be
+	 *                         bound
+	 */
+	public SSTextArea(final RowSet _rowSet, final String _boundColumnName) {
+		this();
+		bind(_rowSet, _boundColumnName);
+	}
+
+	@Override
 	public void customInit() {
-    	// Adding some logic from SSMemoField (deprecated), which seems generally helpful.
+		// Adding some logic from SSMemoField (deprecated), which seems generally
+		// helpful.
 		setLineWrap(true);
 		setWrapStyleWord(true);
 	}
@@ -128,12 +124,11 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	}
 
 	/**
-	 * Removes any necessary listeners for the current SwingSet component. These will trigger changes
-	 * in the underlying RowSet column.
+	 * {@inheritDoc }
 	 */
 	@Override
-	public void removeSSComponentListener() {
-		removeDocumentListener();
+	public SSCommon.SSDocumentListener getSSComponentListener() {
+		return getSSCommon().getSSDocumentListener();
 	}
 
 	/**

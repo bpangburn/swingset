@@ -43,7 +43,6 @@ import java.awt.GridBagLayout;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 
 import javax.sql.RowSet;
 import javax.swing.JFrame;
@@ -266,10 +265,7 @@ public class Example4 extends JFrame {
 				}
 
 			// SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES
-				//cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
-				cmbPartColor.setOptions(Arrays.asList(new String[] { "Red", "Green", "Blue" }));
-				
-				//Arrays.asList(options)
+				cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
 
 			// BIND THE COMPONENTS TO THE DATABASE COLUMNS
 				txtPartID.bind(rowset, "part_id");

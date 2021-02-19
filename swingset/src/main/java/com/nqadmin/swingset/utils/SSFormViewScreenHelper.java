@@ -42,6 +42,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
@@ -212,7 +213,8 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			logger.debug("");
 			super.performPreInsertOps(); // THIS CALL RECURSIVELY CLEARS ALL OF THE COMPONENT VALUES
 			// DATA NAVIGATOR SHOULD DISABLE COMBO NAVIGATOR
-			retrieveAndSetNewPrimaryKey();
+			//retrieveAndSetNewPrimaryKey();
+			txtPrimaryKey.setText(retrieveNewPrimaryKey());
 			try {
 				setDefaultValues();
 			} catch (final Exception e) {
@@ -577,6 +579,10 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 
 			// ADD COMPONENTS TO SCREEN
 			addComponents();
+			
+			// DISABLE & RIGHT JUSTIFY PRIMARY KEY
+			getTxtPrimaryKey().setEnabled(false);
+			getTxtPrimaryKey().setHorizontalAlignment(SwingConstants.RIGHT);
 
 			// ADD MENU BAR TO THE SCREEN.
 			setJMenuBar(getCustomMenu());
@@ -658,9 +664,11 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	protected abstract void populateSSComboBoxes();
 	
 	/**
-	 * Retrieve and set the primary key value for a new record.
+	 * Retrieve the primary key value for a new record.
+	 * 
+	 * @return String value of new primary key
 	 */
-	protected abstract void retrieveAndSetNewPrimaryKey();
+	protected abstract String retrieveNewPrimaryKey();
 	
 	/**
 	 * @param _comboNav the combo navigator to use for this screen/form
@@ -873,12 +881,20 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 
 	} 
 
-
 	/**
-	 * Used to update any SSDBComboBox that change when parent ID changes (e.g. a
-	 * record selector combo). This is called from initScreen() after bindComponents()
-	 * and addComponents(). It is also called from updateScreen() after the rowset
-	 * has been requeried.
+	 * Used to update any SSDBComboBox that change when parent ID changes (i.e.,
+	 * whenever the rowset for the screen changes). This is called from initScreen()
+	 * after bindComponents() and addComponents(). It is also called from
+	 * updateScreen() after the rowset has been requeried.
+	 * <p>
+	 * Generally there will be calls to cmbMySSDBCombo.setQuery(myNewCmbSQL); and
+	 * cmbMySSDBCombo.execute();
+	 * <p>
+	 * If the SSDBComboBox query is unchanged regardless of the rowset, then it is
+	 * sufficient to just call cmbMySSDBCombo.execute();
+	 * <p>
+	 * It is REDUNDANT/UNNECESSARY to call cmbMySSDBCombo.execute() here and in
+	 * bindComponents().
 	 */
 	protected abstract void updateSSDBComboBoxes();
 

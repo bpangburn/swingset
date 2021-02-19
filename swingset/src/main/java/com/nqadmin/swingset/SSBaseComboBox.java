@@ -37,6 +37,9 @@
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
+import static com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.addEventLogging;
+import static com.nqadmin.swingset.models.OptionMappingSwingModel.asOptionMappingSwingModel;
+
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -66,9 +69,6 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.matchers.TextMatcherEditor;
 import ca.odell.glazedlists.swing.AutoCompleteSupport;
-
-import static com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.addEventLogging;
-import static com.nqadmin.swingset.models.OptionMappingSwingModel.asOptionMappingSwingModel;
 
 // SSBaseComboBox.java
 //
@@ -330,11 +330,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * Common fields shared across SwingSet components
 	 */
 	protected SSCommon ssCommon = new SSCommon(this);
-
-	/**
-	 * Component listener.
-	 */
-	protected final SSBaseComboBoxListener ssBaseComboBoxListener = new SSBaseComboBoxListener();
 
 //	/**
 //	 * List item used to workaround GlazedList CONTAINS bug/glitch.
@@ -708,7 +703,17 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				// nullItem is either special first list item
 				// or it is null. It is null when getAllowNull() is false
 				item = nullItem;
-				logger.warn(String.format("%s: No mapping available for %s in combobox, setSelectedItem(null)", getColumnForLog(), _mapping));
+				// BP_2021-02-16:
+				// We expect to get here if we have a child combo where the contents are requeried on each record.
+				// As soon as a navigation occurs, the component values are cleared and then the new value is loaded,
+				// but the combo has not been re-queried yet so there are no matches for setSelectedMapping() and we
+				// call setSelectedItem(nullItem). This is OK so long as the component listener used for binding
+				// is removed/disabled because the rowset will not get the null value. Later when the combo is
+				// requeried, the component will try to load the current column value from the rowset and this time
+				// setSelectedMapping() should succeed.
+				if (getSSCommon().isSSComponentListenerAdded()) {
+					logger.warn(String.format("%s: No mapping available for %s in combobox, setSelectedItem(null)", getColumnForLog(), _mapping));
+				}
 			}
 			setSelectedItem(item);
 			
@@ -840,6 +845,14 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	public SSCommon getSSCommon() {
 		return ssCommon;
 	}
+	
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public SSBaseComboBoxListener getSSComponentListener() {
+		return new SSBaseComboBoxListener();
+	}
 
 	/**
 	 * {@inheritDoc }
@@ -848,25 +861,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	public void setSSCommon(final SSCommon _ssCommon) {
 		ssCommon = _ssCommon;
 
-	}
-
-	/**
-	 * Adds any necessary listeners for the current SwingSet component. These will
-	 * trigger changes in the underlying rowset column.
-	 */
-	@Override
-	public void addSSComponentListener() {
-		addActionListener(ssBaseComboBoxListener);
-
-	}
-
-	/**
-	 * Removes any necessary listeners for the current SwingSet component. These
-	 * will trigger changes in the underlying RowSet column.
-	 */
-	@Override
-	public void removeSSComponentListener() {
-		removeActionListener(ssBaseComboBoxListener);
 	}
 
 	/**
@@ -1002,7 +996,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	private void updateRowset() {
 		
-		removeRowSetListener();
+		ssCommon.removeRowSetListener();
 		
 		M mapping = getSelectedMapping();
 	
@@ -1025,7 +1019,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			}
 		}
 	
-		addRowSetListener();
+		ssCommon.addRowSetListener();
 	}
 
 	//
@@ -1036,12 +1030,16 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * currently installed on the given <code>comboBox</code>. This is the only
 	 * technique we can rely on to prevent the <code>comboBox</code> from
 	 * broadcasting {@link ActionEvent}s at inappropriate times.
-	 *
+	 * <p>
 	 * This method is the logical inverse of {@link #registerAllActionListeners}.
+	 * <p>
+	 * Note that the ActionListener used for binding will be removed without
+	 * passing through SSCommon.removeSSComponentListener()
 	 * 
 	 * @param comboBox combo box from which to remove listeners
 	 * @return array of ActionListeners removed from combo box (for adding back later)
 	 */
+	// TODO: Consider passing in SSBaseComboBox and identifying SSBaseComboBoxListener
 	static ActionListener[] unregisterAllActionListeners(JComboBox<?> comboBox) {
 		final ActionListener[] listeners = comboBox.getActionListeners();
 		for (ActionListener listener : listeners) {
@@ -1054,12 +1052,16 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	/**
 	 * A convenience method to register all of the given <code>listeners</code>
 	 * with the given <code>comboBox</code>.
-	 *
+	 * <p>
 	 * This method is the logical inverse of {@link #unregisterAllActionListeners}.
+	 * <p>
+	 * Note that the ActionListener used for binding will be removed without
+	 * passing through SSCommon.addSSComponentListener()
 	 * 
 	 * @param comboBox combo box for which to add listeners
 	 * @param listeners array of ActionListners to be 
 	 */
+	// TODO: Consider passing in SSBaseComboBox and identifying SSBaseComboBoxListener
 	static void registerAllActionListeners(JComboBox<?> comboBox, ActionListener[] listeners) {
 		for (ActionListener listener : listeners) {
 			comboBox.addActionListener(listener);

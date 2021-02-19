@@ -72,60 +72,60 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  */
 public class SSImage extends JPanel implements SSComponentInterface {
 
-    /**
+	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
 	 * database column
 	 */
 	protected class SSImageListener implements ActionListener, Serializable {
 
-        /**
+		/**
 		 * Unique serial ID
 		 */
 		private static final long serialVersionUID = -997068820028544504L;
 
-			@Override
-			public void actionPerformed(final ActionEvent ae) {
+		@Override
+		public void actionPerformed(final ActionEvent ae) {
 
-				removeRowSetListener();
+			ssCommon.removeRowSetListener();
 
-                try {
-                    if (getRowSet() != null) {
-                        //FileInputStream inStream = null;
-                        File inFile = null;
-                        final JFileChooser fileChooser = new JFileChooser();
-                        if(fileChooser.showOpenDialog(btnUpdateImage) == JFileChooser.APPROVE_OPTION){
-                            inFile = fileChooser.getSelectedFile();
-                            try (FileInputStream inStream = new FileInputStream(inFile)) {
-                                final int totalLength = (int)inFile.length();
-                                final byte[] bytes = new byte[totalLength];
-                                int bytesRead = inStream.read(bytes);
-                                while (bytesRead < totalLength){
-                                    final int read = inStream.read(bytes, bytesRead, totalLength - bytesRead);
-                                    if(read == -1) {
-										break;
-									}
-									bytesRead += read;
-                                }
-                                //inStream.close();
-                                getRowSet().updateBytes(getBoundColumnName(), bytes);
-                                img = new ImageIcon(bytes);
-                                lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
-                                lblImage.setIcon(img);
-                                lblImage.setText("");
-                                updateUI();
-                            }
-                        } else {
-                            return;
-                        }
-                    }
-                }catch(final SQLException se){
-                	logger.error(getColumnForLog() + ": SQL Exception.", se);
-                }catch(final IOException ioe){
-                	logger.error(getColumnForLog() + ": IO Exception.", ioe);
-                }
+			try {
+				if (getRowSet() != null) {
+					// FileInputStream inStream = null;
+					File inFile = null;
+					final JFileChooser fileChooser = new JFileChooser();
+					if (fileChooser.showOpenDialog(btnUpdateImage) == JFileChooser.APPROVE_OPTION) {
+						inFile = fileChooser.getSelectedFile();
+						try (FileInputStream inStream = new FileInputStream(inFile)) {
+							final int totalLength = (int) inFile.length();
+							final byte[] bytes = new byte[totalLength];
+							int bytesRead = inStream.read(bytes);
+							while (bytesRead < totalLength) {
+								final int read = inStream.read(bytes, bytesRead, totalLength - bytesRead);
+								if (read == -1) {
+									break;
+								}
+								bytesRead += read;
+							}
+							// inStream.close();
+							getRowSet().updateBytes(getBoundColumnName(), bytes);
+							img = new ImageIcon(bytes);
+							lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
+							lblImage.setIcon(img);
+							lblImage.setText("");
+							updateUI();
+						}
+					} else {
+						return;
+					}
+				}
+			} catch (final SQLException se) {
+				logger.error(getColumnForLog() + ": SQL Exception.", se);
+			} catch (final IOException ioe) {
+				logger.error(getColumnForLog() + ": IO Exception.", ioe);
+			}
 
-                addRowSetListener();
-            }
+			ssCommon.addRowSetListener();
+		}
 
 	} // end private class SSImageListener
 
@@ -140,93 +140,81 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	private static final long serialVersionUID = -2726746843832259767L;
 
 	/**
-     * Button to update the image.
-     */
-    protected JButton btnUpdateImage = new JButton("Update");
+	 * Button to update the image.
+	 */
+	protected JButton btnUpdateImage = new JButton("Update");
 
-    /**
-     * ImageIcon to store the image.
-     */
-    protected ImageIcon img;
+	/**
+	 * ImageIcon to store the image.
+	 */
+	protected ImageIcon img;
 
-    /**
-     * Label to display the image
-     */
-    protected JLabel lblImage = new JLabel("No Picture");
+	/**
+	 * Label to display the image
+	 */
+	protected JLabel lblImage = new JLabel("No Picture");
 
-    /**
-     * The preferred size of the image component.
-     */
-    protected Dimension preferredSize = new Dimension(200,200);
+	/**
+	 * The preferred size of the image component.
+	 */
+	protected Dimension preferredSize = new Dimension(200, 200);
 
-    /**
+	/**
 	 * Common fields shared across SwingSet components
 	 */
 	protected SSCommon ssCommon = new SSCommon(this);
 
 	/**
-	 * Component listener.
+	 * Construct a default SSImage Object.
 	 */
-	protected final SSImageListener ssImageListener = new SSImageListener();
-
-    /**
-     * <p>
-     *  Construct a default SSImage Object.
-     */
-    public SSImage() {
+	public SSImage() {
 		// Note that call to parent default constructor is implicit.
-		//super();
-    }
-
-    /**
-     * Constructs a SSImage Object bound to the specified column in the specified rowSet.
-     *
-     * @param _rowSet - RowSet from/to which data has to be read/written
-     * @param _boundColumnName - column in the rowSet to which the component should be bound.
-     */
-    public SSImage(final RowSet _rowSet, final String _boundColumnName) {
-		this();
-		bind(_rowSet, _boundColumnName);
-    }
-
-    /**
-     *  Adds the label and button to the panel
-     */
-    protected void addComponents() {
-        setLayout(new GridBagLayout());
-        final GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy= 0;
-        final JScrollPane scrollPane = new JScrollPane(lblImage, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scrollPane.setPreferredSize(new Dimension(200, 180));
-        btnUpdateImage.setPreferredSize(new Dimension(200,20));
-        add(scrollPane, constraints);
-        constraints.gridy = 1;
-        add(btnUpdateImage, constraints);
-    }
-
-    /**
-	 * Adds any necessary listeners for the current SwingSet component. These will
-	 * trigger changes in the underlying RowSet column.
-	 */
-	@Override
-	public void addSSComponentListener() {
-		btnUpdateImage.addActionListener(ssImageListener);
-
+		// super();
 	}
 
-    /**
-     * Removes the current image. The image is not removed from the underlying rowSet.
-     */
-    public void clearImage(){
-        lblImage.setIcon(null);
-        lblImage.setText("No Picture");
-        final Dimension dimension = getPreferredSize();
-        lblImage.setPreferredSize(new Dimension((int)dimension.getWidth(), (int)dimension.getHeight()-20));
-        updateUI();
-    }
+	/**
+	 * Constructs a SSImage Object bound to the specified column in the specified
+	 * rowSet.
+	 *
+	 * @param _rowSet          - RowSet from/to which data has to be read/written
+	 * @param _boundColumnName - column in the rowSet to which the component should
+	 *                         be bound.
+	 */
+	public SSImage(final RowSet _rowSet, final String _boundColumnName) {
+		this();
+		bind(_rowSet, _boundColumnName);
+	}
 
-    /**
+	/**
+	 * Adds the label and button to the panel
+	 */
+	protected void addComponents() {
+		setLayout(new GridBagLayout());
+		final GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridx = 0;
+		constraints.gridy = 0;
+		final JScrollPane scrollPane = new JScrollPane(lblImage, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.setPreferredSize(new Dimension(200, 180));
+		btnUpdateImage.setPreferredSize(new Dimension(200, 20));
+		add(scrollPane, constraints);
+		constraints.gridy = 1;
+		add(btnUpdateImage, constraints);
+	}
+
+	/**
+	 * Removes the current image. The image is not removed from the underlying
+	 * rowSet.
+	 */
+	public void clearImage() {
+		lblImage.setIcon(null);
+		lblImage.setText("No Picture");
+		final Dimension dimension = getPreferredSize();
+		lblImage.setPreferredSize(new Dimension((int) dimension.getWidth(), (int) dimension.getHeight() - 20));
+		updateUI();
+	}
+
+	/**
 	 * Method to allow Developer to add functionality when SwingSet component is
 	 * instantiated.
 	 * <p>
@@ -235,22 +223,33 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 */
 	@Override
 	public void customInit() {
-        // SET PREFERRED DIMENSIONS
-        setPreferredSize(preferredSize);
+		// SET PREFERRED DIMENSIONS
+		setPreferredSize(preferredSize);
 
-    // ADD LABEL & BUTTON TO PANEL
-        addComponents();
+		// ADD LABEL & BUTTON TO PANEL
+		addComponents();
+	}
+	
+	/**
+	 * Returns the button that indicates a new image has been selected and accepted.
+	 * <p>
+	 * Getter is needed for action listener processing in SSCommon.
+	 *
+	 * @return button that indicates a new image has been selected and accepted
+	 */
+	public JButton getBtnUpdateImage() {
+		return btnUpdateImage;
 	}
 
 	/**
-     * Returns the preferred size of the image component.
-     *
-     * @return returns preferred size of the image component
-     */
-    @Override
+	 * Returns the preferred size of the image component.
+	 *
+	 * @return returns preferred size of the image component
+	 */
+	@Override
 	public Dimension getPreferredSize() {
-        return preferredSize;
-    }
+		return preferredSize;
+	}
 
 	/**
 	 * Returns the ssCommon data member for the current Swingset component.
@@ -263,13 +262,11 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	}
 
 	/**
-	 * Removes any necessary listeners for the current SwingSet component. These
-	 * will trigger changes in the underlying RowSet column.
+	 * {@inheritDoc }
 	 */
 	@Override
-	public void removeSSComponentListener() {
-		btnUpdateImage.removeActionListener(ssImageListener);
-
+	public SSImageListener getSSComponentListener() {
+		return new SSImageListener();
 	}
 
 	/**
@@ -309,30 +306,28 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 */
 	@Override
 	public void updateSSComponent() {
-		
-		
 
-        try {
-            final byte[] imageData = getRowSet().getRow() >0 ? getRowSet().getBytes(getBoundColumnName()) : null;
-            if(imageData != null){
-            	logger.debug("{}: Setting non-null image.", () -> getColumnForLog());
-                img = new ImageIcon(imageData);
-                lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
-                lblImage.setText("");
-            } else {
-            	logger.debug("{}: Setting null image.", () -> getColumnForLog());
-                img = null;
-                lblImage.setText("No Picture");
-            }
-        } catch(final SQLException se) {
-        	logger.error(getColumnForLog() + ": SQL Exception.", se);
-            img = null;
-        }
+		try {
+			final byte[] imageData = getRowSet().getRow() > 0 ? getRowSet().getBytes(getBoundColumnName()) : null;
+			if (imageData != null) {
+				logger.debug("{}: Setting non-null image.", () -> getColumnForLog());
+				img = new ImageIcon(imageData);
+				lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
+				lblImage.setText("");
+			} else {
+				logger.debug("{}: Setting null image.", () -> getColumnForLog());
+				img = null;
+				lblImage.setText("No Picture");
+			}
+		} catch (final SQLException se) {
+			logger.error(getColumnForLog() + ": SQL Exception.", se);
+			img = null;
+		}
 
-        lblImage.setIcon(img);
+		lblImage.setIcon(img);
 
-        // TODO Confirm updateUI is needed here.
-        updateUI();
+		// TODO Confirm updateUI is needed here.
+		updateUI();
 
 	}
 
