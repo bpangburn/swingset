@@ -704,14 +704,16 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("ADD button clicked.");
 			removeRowsetListener();
 			try {
-				
+				if (!commitChanges()) return;
+
 				rowSet.moveToInsertRow();
 				setInserting(rowSet, true);
 				if (navCombo!=null) {
 					navCombo.setEnabled(false);
 				}
 
-				dBNav.performPreInsertOps();
+				// If we don't use invokeLater() here, the values from the just-committed prior record are displayed for the insert row.
+				SwingUtilities.invokeLater(() -> dBNav.performPreInsertOps());
 				
 				updateButtonState();
 				

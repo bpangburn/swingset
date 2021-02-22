@@ -3,6 +3,18 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
 ==============================================================================
+SwingSet 4.0.3 - Released 2021-02-22
+==============================================================================
+
+Changes:
+	1. SSBaseComboBox - Remove check against getBoundColumnText() because
+	   the rowset not updating as expected. New value from setBoundColumnText()
+	   is not reflected in getBoundColumnText() until after call to updateRow().
+	2. Add auto commit to Add button to be consistent with other buttons.
+	   Had to put dBNav.performPreInsertOps() in SwingUtilities.invokeLater()
+	   or insert row would show values from newly-committed record.
+
+==============================================================================
 SwingSet 4.0.2 - Released 2021-02-18
 ==============================================================================
 
