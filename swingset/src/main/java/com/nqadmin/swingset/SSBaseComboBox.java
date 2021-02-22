@@ -1014,9 +1014,13 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			//       setBoundColumnText or RowSetOps.updateColumnText
 
 			String tStringMapping = String.valueOf(mapping);
-			if (!Objects.equals(getBoundColumnText(), tStringMapping)) {
+			// 2021-02-22_BP: RowSet does not seem to support 'dirty' reads so 
+			// a call to getBoundColumnText() won't reflect any updates using
+			// setBoundColumnText() until after a call to updateRow().
+			
+			//if (!Objects.equals(getBoundColumnText(), tStringMapping)) {
 				setBoundColumnText(tStringMapping);
-			}
+			//}
 		}
 	
 		ssCommon.addRowSetListener();
