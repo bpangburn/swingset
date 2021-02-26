@@ -128,17 +128,19 @@ public class SSSyncManager {
 //						logger.warn(" -- Selected Item is not a SSListItem.");
 //					}
 
-				// UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
-				// This code was removed to improve performance.
-				//
-				// 2020-12-02_BP: adding back
-				dataNavigator.updatePresentRow();
 
 				// Note that the rowset count starts at 1 whereas combobox index starts at 0.
 
 				final long rowsetPK = rowset.getLong(syncColumnName);
 
 				if (comboPK != rowsetPK) {
+					// UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
+					// This code was removed to improve performance.
+					//
+					// 2020-12-02_BP: adding back
+					// 2021-02-26_BP: moving inside 'if (comboPK != rowsetPK) {' block
+					dataNavigator.updatePresentRow();
+					
 					// long indexOfId = SSSyncManager.this.comboBox.itemMap.get(this.id) + 1;
 					final int indexOfPK = comboBox.getMappings().indexOf(comboPK) + 1;
 					//int index = (int) indexOfPK;
