@@ -40,13 +40,16 @@ package com.nqadmin.swingset.demo;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.plaf.InternalFrameUI;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
@@ -179,9 +182,27 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		contentPane.add(getDataNavigator(), constraints);
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	protected void addCustomListeners() throws Exception {
-		// nothing to do..
+	protected void addCustomListeners() {
+
+		txtPartName.addFocusListener(new FocusAdapter() {
+			String oldValue = new String("");
+
+			@Override
+			public void focusGained(FocusEvent fe) {
+				oldValue = txtPartName.getText();
+			}
+
+			@Override
+			public void focusLost(FocusEvent fe) {
+				if (!txtPartName.getText().equals(oldValue)) {
+					logger.debug("txtPartName triggering update to combo navigator.");
+					SwingUtilities.invokeLater(() -> updateNavigatorText());
+				}
+			}
+
+		});
 	}
 	
 	@Override//	/**
@@ -290,5 +311,42 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	@Override
 	protected void updateSSDBComboBoxes() {
 		// nothing to do...
+	}
+	
+	/**
+	 * Updates the Combo Navigator based on the current screen values - used after
+	 * editing a component field
+	 */
+	// TODO: Navigator is not always updating even when confirming this code is
+	// traversed using System.out. Maybe JDK issue?
+	private void updateNavigatorText() {
+
+		try {
+			if (getRowset().getRow() > 0) {
+
+				long partID = getRowset().getLong("part_id");
+
+				getSyncManager().async();
+
+				final String update = txtPartName.getText();
+				
+				logger.debug("Running on EDT? " + SwingUtilities.isEventDispatchThread());
+				
+				logger.debug("Updating navigator text to: " + update);
+
+				getComboNav().updateOption(partID, update);
+				
+				logger.debug("Resulting option: " + getComboNav().getSelectedOption());
+				
+				getSyncManager().sync();
+
+			}
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+			JOptionPane.showMessageDialog(getRootFrame(),
+					"Error occured updating Combo Navigator text.\n" + se.getMessage());
+		}
+
 	}
 }
