@@ -1485,6 +1485,9 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 */
 	public boolean updateOption(final Long _mapping, final String _option) {
 
+		// 2021-02-28: @errael patched this method to deal with inconsistent
+		// updating of combo editor. See https://github.com/bpangburn/swingset/issues/85
+		
 		boolean result = false;
 
 		try (Model.Remodel remodel = optionModel.getRemodel()) {
@@ -1493,6 +1496,9 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 				boolean isSelectedItem = Objects.equals(_mapping, getSelectedMapping());
 				remodel.setOption(index, _option);
 				result = true;
+				// TODO: Possible that this block and isSelectedItem variable
+				// may be eliminated if a bug is discovered/fixed in GlazedLists.
+				// See https://github.com/glazedlists/glazedlists/issues/702
 				if (isSelectedItem) {
 					// Modifying the underlying list item that corresponds to the
 					// current selection; strict glazed may change the selection.
@@ -1502,7 +1508,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 				}
 // TODO Confirm that eventList is not reordered by GlazedLists code.
 			}
-// TODO may need to call repaint()
 		} catch (final Exception e) {
 			logger.error(getColumnForLog() + ": Exception.", e);
 		}

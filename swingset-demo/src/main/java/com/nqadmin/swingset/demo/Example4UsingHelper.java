@@ -317,8 +317,6 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	 * Updates the Combo Navigator based on the current screen values - used after
 	 * editing a component field
 	 */
-	// TODO: Navigator is not always updating even when confirming this code is
-	// traversed using System.out. Maybe JDK issue?
 	private void updateNavigatorText() {
 
 		try {
@@ -330,22 +328,21 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 
 				final String update = txtPartName.getText();
 				
-				logger.debug("Running on EDT? " + SwingUtilities.isEventDispatchThread());
-				
-				logger.debug("Updating navigator text to: " + update);
+//				logger.debug("Running on EDT? " + SwingUtilities.isEventDispatchThread());
+//				logger.debug("Attempting to update combo navigator Option to: " + update);
 
 				getComboNav().updateOption(partID, update);
 				
-				logger.debug("Resulting option: " + getComboNav().getSelectedOption());
+//				logger.debug("Combo navigator Option after call to getComboNav().updateOption(): " + getComboNav().getSelectedOption());
 				
 				getSyncManager().sync();
 
 			}
 
-		} catch (SQLException se) {
-			se.printStackTrace();
+		} catch (SQLException _se) {
+			logger.error("Error occured updating Combo Navigator text.",_se);
 			JOptionPane.showMessageDialog(getRootFrame(),
-					"Error occured updating Combo Navigator text.\n" + se.getMessage());
+					"Error occured updating Combo Navigator text.\n" + _se.getMessage());
 		}
 
 	}
