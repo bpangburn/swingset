@@ -50,6 +50,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
+import java.util.Objects;
 
 import com.nqadmin.swingset.models.SSListItem;
 
@@ -1489,8 +1490,16 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			final int index = remodel.getMappings().indexOf(_mapping);
 			if (index >= 0) {
+				boolean isSelectedItem = Objects.equals(_mapping, getSelectedMapping());
 				remodel.setOption(index, _option);
 				result = true;
+				if (isSelectedItem) {
+					// Modifying the underlying list item that corresponds to the
+					// current selection; strict glazed may change the selection.
+					// Select the modified item so the same mapping is selected.
+					SSListItem item = remodel.get(index);
+					setSelectedItem(item);
+				}
 // TODO Confirm that eventList is not reordered by GlazedLists code.
 			}
 // TODO may need to call repaint()
