@@ -23,7 +23,7 @@
 
 		<!--<version.glazedlists>1.11.0</version.glazedlists>-->
 		<version.glazedlists>1.11.1203</version.glazedlists>
-		<version.log4j>2.14.0</version.log4j>
+		<version.log4j>2.14.1</version.log4j>
 		<version.jdbcrowsetimpl>1.0.2</version.jdbcrowsetimpl>
 
 		<version.maven-enforcer-plugin>3.0.0-M3</version.maven-enforcer-plugin>
@@ -35,7 +35,7 @@
 		<version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
 		<version.maven-surefire-plugin>3.0.0-M5</version.maven-surefire-plugin>
 		<version.maven-failsafe-plugin>3.0.0-M5</version.maven-failsafe-plugin>
-		<version.junit-jupiter-any>5.7.0</version.junit-jupiter-any>
+		<version.junit-jupiter-any>5.8.0-M1</version.junit-jupiter-any>
 	</properties>
 
 	<licenses>
@@ -342,12 +342,14 @@
 					<plugins>
 						<plugin>
 							<artifactId>maven-compiler-plugin</artifactId>
+							<version>${version.maven-compiler-plugin}</version>
 							<configuration>
 								<release>8</release>
 							</configuration>
 						</plugin>
 						<plugin>
 							<artifactId>maven-javadoc-plugin</artifactId>
+							<version>${version.maven-javadoc-plugin}</version>
 							<configuration>
 								<additionalOptions>-html5</additionalOptions>
 								<doclint>all,-missing,-html</doclint>
