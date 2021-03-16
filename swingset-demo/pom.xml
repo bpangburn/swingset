@@ -27,6 +27,14 @@
 		<version.java-getopt>1.0.13</version.java-getopt>
 
 		<version.maven-enforcer-plugin>3.0.0-M3</version.maven-enforcer-plugin>
+		<version.maven-clean-plugin>3.1.0</version.maven-clean-plugin>
+		<version.maven-deploy-plugin>3.0.0-M1</version.maven-deploy-plugin>
+		<version.maven-install-plugin>3.0.0-M1</version.maven-install-plugin>
+		<version.maven-jar-plugin>3.2.0</version.maven-jar-plugin>
+		<version.maven-resources-plugin>3.2.0</version.maven-resources-plugin>
+		<version.maven-site-plugin>3.9.1</version.maven-site-plugin>
+		<version.maven-surefire-plugin>3.0.0-M5</version.maven-surefire-plugin>
+		
 		<version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
 		<version.dependency-check-maven>6.1.1</version.dependency-check-maven>
 		<version.maven-source-plugin>3.2.1</version.maven-source-plugin>
@@ -108,18 +116,17 @@
 						</goals>
 						<configuration>
 							<rules>
-								<bannedPlugins>
-									<!-- will only display a warning but does not fail the build. -->
-									<level>WARN</level>
-									<excludes>
-										<exclude>org.apache.maven.plugins:maven-verifier-plugin</exclude>
-									</excludes>
-									<message>Please consider using the maven-invoker-plugin
-										(http://maven.apache.org/plugins/maven-invoker-plugin/)!</message>
-								</bannedPlugins>
+								<requirePluginVersions>
+									<message>Best Practice is to always define plugin versions!</message>
+									<banLatest>true</banLatest>
+									<banRelease>true</banRelease>
+									<banSnapshots>true</banSnapshots>
+								</requirePluginVersions>
+								
 								<requireMavenVersion>
 									<version>${version.maven}</version>
 								</requireMavenVersion>
+								
 								<requireJavaVersion>
 									<version>${version.java}</version>
 								</requireJavaVersion>
@@ -127,6 +134,42 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>${version.maven-clean-plugin}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>${version.maven-deploy-plugin}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>${version.maven-install-plugin}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${version.maven-jar-plugin}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>${version.maven-resources-plugin}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>${version.maven-site-plugin}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${version.maven-surefire-plugin}</version>
 			</plugin>
 
 			<plugin>

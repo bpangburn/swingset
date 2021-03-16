@@ -9,7 +9,8 @@ SwingSet 4.0.4 - Released TBD
 Changes:
 	1. SSBaseComboBox.updateOption(). Combo editor was not updating
 	   consistently. See https://github.com/bpangburn/swingset/issues/85
-	2. 
+	2. Updated Log4j and JUnit Maven dependencies.
+	3. Added explicit Maven plugins versions to eliminate warnings.
 
 ==============================================================================
 SwingSet 4.0.3 - Released 2021-02-22
