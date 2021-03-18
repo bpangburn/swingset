@@ -11,6 +11,8 @@ Changes:
 	   consistently. See https://github.com/bpangburn/swingset/issues/85
 	2. Updated Log4j and JUnit Maven dependencies.
 	3. Added explicit Maven plugins versions to eliminate warnings.
+	4. Initial fix for Issue #46 moving updateSSComponent out of SSComboBox
+	   and SSDBComboBox.
 
 ==============================================================================
 SwingSet 4.0.3 - Released 2021-02-22
