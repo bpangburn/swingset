@@ -47,7 +47,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -254,6 +253,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	/**
 	 * Log4j Logger for component
 	 */
+	@SuppressWarnings("unused")
 	private static Logger logger = LogManager.getLogger();
 
 	/**
@@ -835,44 +835,6 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 		setSelectedMapping(_value);
 	}
 
-	// public void setSelectedValue(final int _value) {
-
-	// 	// TODO consider firing a property change
-	// 	
-	// 	logger.debug("{}: Currently selected value: {}, New value: " + _value + ".", () -> getColumnForLog(), () -> getSelectedValue());
-
-	// 	// ONLY NEED TO PROCEED IF THERE IS A CHANGE
-	// 	if (_value != getSelectedValue()) {
-
-	// 		if ((mappings == null) && ((_value < 0) || (_value >= getItemCount()))) {
-	// 			// IF EXPLICIT VALUES FOR THE ITEMS IN COMBO ARE NOT SPECIFIED THEN CODES START
-	// 			// FROM ZERO. IN SUCH A CASE CHECK IF THE NUMBER EXCEEDS THE NUMBER OF ITEMS
-	// 			// IN COMBO BOX (THIS IS ERROR CONDITION SO NOTIFY USER)
-	// 			logger.warn(getColumnForLog() + ": Value from database:" + _value + ". Items in combobox: " + getItemCount());
-
-	// 			setSelectedIndex(-1);
-	// 		} else {
-	// 			// IF MAPPINGS ARE SPECIFIED THEN LOCATE THE SEQUENTIAL INDEX AT WHICH THE
-	// 			// SPECIFIED CODE IS STORED
-	// 			if (mappings != null) {
-	// 				final int index = mappings.indexOf(_value);
-
-	// 				if (index == -1) {
-	// 					logger.warn(getColumnForLog() + ": Warning: could not find a corresponding item in combobox for code of " + _value + ". Setting index to -1 (blank).");
-	// 				}
-
-	// 				setSelectedIndex(index);
-	// 			} else {
-	// 				// IF MAPPINGS ARE NOT SPECIFIED SET THE SELECTED ITEM AS THE ITEM AT INDEX
-	// 				// EQUAL TO THE VALUE IN TEXT FIELD
-	// 				setSelectedIndex(_value);
-	// 			}
-	// 		}
-
-	// 	}
-
-	// }
-
 //	/**
 //	 * Updates the value stored and displayed in the SwingSet component based on
 //	 * getBoundColumnText()
@@ -882,79 +844,40 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 //	 */
 //	@Override
 //	public void updateSSComponent() {
-//		
-//		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long or Integer
-//		
+//		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only limit JDBC types accepted
 //		try {
+//			// If initialization is taking place then there won't be any mappings so don't try to update anything yet.
 //			if (!hasItems()) {
 //				return;
 //			}
+//			
+//			// Maybe insures blank in case of later exception.
+//			setSelectionPending(true);
 //
-//			// Expecting an integer so trim in case the database column is a String AND has padding
-//			// TODO: #17 string casting
-//			final String rawText = getBoundColumnText();
-//			logger.debug("{}: getBoundColumnText() returns {}.", () -> getColumnForLog(), () -> rawText);
-//			final String trimmedText = rawText != null ? rawText.trim() : null;
+//			// SSDBComboBox will generally work with primary key column data queried from the database, which will generally be of data type long.
+//			// SSComboBox is generally used with 2 or 4 byte integer columns.
+//			final String boundColumnText = getBoundColumnText();
 //
-//			// GET THE INTEGER EQUIVALENT OF THE TEXT IN THE TEXT FIELD
-//			if ((trimmedText != null) && !(trimmedText.isEmpty())) {
-//				final int comboCode = Integer.parseInt(trimmedText);
+//			// LOGGING
+//			logger.debug("{}: getBoundColumnText() - " + boundColumnText, () -> getColumnForLog());
 //
-//				setSelectedMapping(comboCode);
-//
-//			} else {
-//				//setSelectedIndex(-1);
-//				setSelectedItem(nullItem);
+//			// GET THE BOUND VALUE STORED IN THE ROWSET - may throw a NumberFormatException
+//			Integer targetValue = null;
+//			if ((boundColumnText != null) && !boundColumnText.isEmpty()) {
+//				targetValue = Integer.parseInt(boundColumnText);
 //			}
+//			
+//			// LOGGING
+//			logger.debug("{}: targetValue - " + targetValue, () -> getColumnForLog());
+//			
+//			// UPDATE COMPONENT
+//			setSelectedMapping(targetValue);// setSelectedMapping() should handle null OK.
 //
 //		} catch (final NumberFormatException nfe) {
-//			logger.warn(getColumnForLog() + ": Number Format Exception.", nfe);
+//			JOptionPane.showMessageDialog(this, String.format(
+//					"Encountered database value of '%s' for column [%s], which cannot be converted to a number.", getBoundColumnText(), getColumnForLog()));
+//			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
 //		}
 //	}
-	
-	/**
-	 * Updates the value stored and displayed in the SwingSet component based on
-	 * getBoundColumnText()
-	 * <p>
-	 * Call to this method should be coming from SSCommon and should already have
-	 * the Component listener removed
-	 */
-	@Override
-	public void updateSSComponent() {
-		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only limit JDBC types accepted
-		try {
-			// If initialization is taking place then there won't be any mappings so don't try to update anything yet.
-			if (!hasItems()) {
-				return;
-			}
-			
-			// Maybe insures blank in case of later exception.
-			setSelectionPending(true);
-
-			// SSDBComboBox will generally work with primary key column data queried from the database, which will generally be of data type long.
-			// SSComboBox is generally used with 2 or 4 byte integer columns.
-			final String boundColumnText = getBoundColumnText();
-
-			// LOGGING
-			logger.debug("{}: getBoundColumnText() - " + boundColumnText, () -> getColumnForLog());
-
-			// GET THE BOUND VALUE STORED IN THE ROWSET - may throw a NumberFormatException
-			Integer targetValue = null;
-			if ((boundColumnText != null) && !boundColumnText.isEmpty()) {
-				targetValue = Integer.parseInt(boundColumnText);
-			}
-			
-			// LOGGING
-			logger.debug("{}: targetValue - " + targetValue, () -> getColumnForLog());
-			
-			// UPDATE COMPONENT
-			setSelectedMapping(targetValue);// setSelectedMapping() should handle null OK.
-
-		} catch (final NumberFormatException nfe) {
-			JOptionPane.showMessageDialog(this, String.format(
-					"Encountered database value of '%s' for column [%s], which cannot be converted to a number.", getBoundColumnText(), getColumnForLog()));
-			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
-		}
-	}
 
 } // end public class SSComboBox extends JComboBox {

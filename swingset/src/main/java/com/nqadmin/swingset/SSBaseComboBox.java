@@ -54,7 +54,7 @@ import java.util.Objects;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
-//import javax.swing.JOptionPane;
+import javax.swing.JOptionPane;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -1024,6 +1024,73 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		}
 	
 		ssCommon.addRowSetListener();
+	}
+	
+	/**
+	 * Updates the value stored and displayed in the SwingSet component based on
+	 * getBoundColumnText().
+	 * <p>
+	 * Call to this method should be coming from SSCommon and should already have
+	 * the Component listener removed.
+	 * <p>
+	 * This is a quick fix for https://github.com/bpangburn/swingset/issues/46
+	 * As discussed in Issue 46, @errael has proposed a more thorough fix to work
+	 * with any Mapping type, but it requires additional dependencies (Guava)
+	 * which we'd like to avoid for SwingSet 4.x. The generic solution should be
+	 * integrated into SwingSet 5 and the changes can be found here:
+	 * https://github.com/errael/swingset/tree/updateSSComponent-into-SSBaseComboBox
+	 * <p>
+	 * As written this method will only work with the two current implementations of
+	 * SSBaseComboBox: SSComboBox where M is Integer and SSDBComboBox where M is Long.
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public void updateSSComponent() {
+		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only limit JDBC types accepted
+		try {
+			// If initialization is taking place then there won't be any mappings so don't try to update anything yet.
+			if (!hasItems()) {
+				return;
+			}
+
+			// Maybe insures blank in case of later exception.
+			setSelectionPending(true);
+
+			// SSDBComboBox will generally work with primary key column data queried from the database, which will generally be of data type long.
+			// SSComboBox is generally used with 2 or 4 byte integer columns.
+			final String boundColumnText = getBoundColumnText();
+
+			// LOGGING
+			logger.debug("{}: getBoundColumnText() - " + boundColumnText, () -> getColumnForLog());
+			
+			// GET THE BOUND VALUE STORED IN THE ROWSET - may throw a NumberFormatException
+			M targetValue = null;
+			if ((boundColumnText != null) && !boundColumnText.isEmpty()) {
+				// https://github.com/bpangburn/swingset/issues/46
+				if (this instanceof SSComboBox) {
+					targetValue = (M)(Object)Integer.parseInt(boundColumnText);
+				} else if (this instanceof SSDBComboBox) {
+					targetValue = (M)(Object)Long.parseLong(boundColumnText);
+				} else {
+					throw new Exception();
+				}
+			}
+			
+			// LOGGING
+			logger.debug("{}: targetValue - " + targetValue, () -> getColumnForLog());
+			
+			// UPDATE COMPONENT
+			setSelectedMapping(targetValue);// setSelectedMapping() should handle null OK.}
+
+		} catch (final NumberFormatException nfe) {
+			JOptionPane.showMessageDialog(this, String.format(
+					"Encountered database value of '%s' for column [%s], which cannot be converted to a number.", getBoundColumnText(), getColumnForLog()));
+			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, String.format(
+					"Expecting SSComboBox or SSDBComboBox, but component for column [%s] is of type %s.", this.getClass(), getColumnForLog()));
+			logger.error(getColumnForLog() + ": Unknown SwingSet component of " + this.getClass() + ".", e);
+		}
 	}
 
 	//
