@@ -1043,7 +1043,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * As written this method will only work with the two current implementations of
 	 * SSBaseComboBox: SSComboBox where M is Integer and SSDBComboBox where M is Long.
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void updateSSComponent() {
 		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only limit JDBC types accepted
@@ -1061,23 +1060,25 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			final String boundColumnText = getBoundColumnText();
 
 			// LOGGING
-			logger.debug("{}: getBoundColumnText() - " + boundColumnText, () -> getColumnForLog());
+			logger.debug(() -> String.format("%s: getBoundColumnText() - %s", getColumnForLog(), boundColumnText));
 			
 			// GET THE BOUND VALUE STORED IN THE ROWSET - may throw a NumberFormatException
-			M targetValue = null;
+			Object objValue = null;
 			if ((boundColumnText != null) && !boundColumnText.isEmpty()) {
 				// https://github.com/bpangburn/swingset/issues/46
 				if (this instanceof SSComboBox) {
-					targetValue = (M)(Object)Integer.parseInt(boundColumnText);
+					objValue = Integer.parseInt(boundColumnText);
 				} else if (this instanceof SSDBComboBox) {
-					targetValue = (M)(Object)Long.parseLong(boundColumnText);
+					objValue = Long.parseLong(boundColumnText);
 				} else {
 					throw new Exception();
 				}
 			}
+			@SuppressWarnings("unchecked")
+			M targetValue = (M) objValue;
 			
 			// LOGGING
-			logger.debug("{}: targetValue - " + targetValue, () -> getColumnForLog());
+			logger.debug(() -> String.format("%s: targetValue - %s", getColumnForLog(), targetValue));
 			
 			// UPDATE COMPONENT
 			setSelectedMapping(targetValue);// setSelectedMapping() should handle null OK.}
