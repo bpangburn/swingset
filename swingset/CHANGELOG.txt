@@ -13,6 +13,9 @@ Changes:
 	3. Added explicit Maven plugins versions to eliminate warnings.
 	4. Initial fix for Issue #46 moving updateSSComponent out of SSComboBox
 	   and SSDBComboBox.
+	5. SSTableKeyAdapter - Updated getObjectToSet method to use Date.valueOf
+       for converting string to date object. See:
+       https://github.com/bpangburn/swingset/issues/89
 
 ==============================================================================
 SwingSet 4.0.3 - Released 2021-02-22
