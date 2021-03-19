@@ -95,20 +95,19 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 		final Class<?> objectClass = _jTable.getColumnClass(_column);
 		Object newValue = null;
 		try {
-			// CONSTRUCT THE OBJECT ONLY IF THE STRING IS NOT NULL			
+			// CONSTRUCT THE OBJECT ONLY IF THE STRING IS NOT NULL
 			if (_value != null) {
 				// DATE CLASS DOESN'T HAVE A CONSTRUCTOR THAT TAKES A STRING
-				if(objectClass.equals(java.sql.Date.class)) {
+				if (objectClass.equals(java.sql.Date.class)) {
 					newValue = Date.valueOf(_value);
-				}
-				else {
+				} else {
 					// GET THE CONSTRUCTOR FOR THE CLASS WHICH TAKES A STRING
 					final Constructor<?> constructor = objectClass.getConstructor(new Class<?>[] { String.class });
-	
+
 					// CREATE AN INSTANCE OF THE OBJECT
 					newValue = constructor.newInstance(new Object[] { _value });
 				}
-			}			
+			}		
 		} catch (final NoSuchMethodException nsme) {
 			logger.warn("No Such Method Exception. Failed to copy data.",  nsme);
 			newValue = _value;
