@@ -353,11 +353,17 @@
 			</build>
 		</profile>
 
-		<!-- java-9-plus profile * set javac release=8 * javadoc - target html5 
-			- Newer javadoc complains about private methods/fields missing javadoc. So, 
-			at least for now, add "all,-missing" - Add ",-html" to avoid 'rel=' issue. 
-			Removing these checks is not too bad since there's a lot of dependency on 
-			the IDE for most checking. -->
+		<!-- java-9-plus profile
+			* set javac release=8
+			* javadoc
+			  - target html5
+			  - Newer javadoc complains about private methods/fields missing javadoc.
+			    So, at least for now, add "all,-missing"
+			  - Add ",-html" to avoid 'rel=' issue.
+
+			  Removing these checks is not too bad since there's a lot of
+			  dependency on the IDE for most checking.
+		-->
 		<profile>
 			<id>java-9-plus</id>
 			<activation>
