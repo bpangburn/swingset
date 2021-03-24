@@ -1466,12 +1466,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * <p>
 	 * If more than one item is present in the combo for that mapping, only the
 	 * first one is changed.
-	 * <p>
-	 * NOTE: To retain changes made to current RowSet, call updateRow() before
-	 * calling the updateOption() on SSDBComboBox. This only applies if you if you
-	 * are using the SSDBComboBox and SSDataNavigator for record navigation. If you
-	 * are not using the SSDBComboBox for record navigation then there is no need to
-	 * call updateRow() on the RowSet.
 	 *
 	 * @param _mapping typically a primary key value corresponding to the displayed
 	 *                 currentSelectedOption to be updated
@@ -1492,9 +1486,17 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 				boolean isSelectedItem = Objects.equals(_mapping, getSelectedMapping());
 				remodel.setOption(index, _option);
 				result = true;
-				// TODO: Possible that this block and isSelectedItem variable
-				// may be eliminated if a bug is discovered/fixed in GlazedLists.
-				// See https://github.com/glazedlists/glazedlists/issues/702
+				// Changing what's in the ComboEditor, which may be done indirectly when
+				// modifying the current item, might change the currently selected item when
+				// GlazedList is set to STRICT. So something is needed to insure that the
+				// selected mapping before the change is the selected mapping after the change.
+				// Otherwise the first item in the list becomes selected. If the combo is used
+				// for navigation, this can trigger a change in the current row. 
+				//
+				// The call to setSelectedItem() below has the added benefit of working around
+				// a possible bug in GlazedList (see https://github.com/glazedlists/glazedlists/issues/702),
+				// but it's likely best to keep this block even if the issue is determine to be
+				// a bug and resolved.
 				if (isSelectedItem) {
 					// Modifying the underlying list item that corresponds to the
 					// current selection; strict glazed may change the selection.
