@@ -49,6 +49,7 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
+import java.sql.Date;
 import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
@@ -96,12 +97,17 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 		try {
 			// CONSTRUCT THE OBJECT ONLY IF THE STRING IS NOT NULL
 			if (_value != null) {
-				// GET THE CONSTRUCTOR FOR THE CLASS WHICH TAKES A STRING
-				final Constructor<?> constructor = objectClass.getConstructor(new Class<?>[] { String.class });
+				// DATE CLASS DOESN'T HAVE A CONSTRUCTOR THAT TAKES A STRING
+				if (objectClass.equals(java.sql.Date.class)) {
+					newValue = Date.valueOf(_value);
+				} else {
+					// GET THE CONSTRUCTOR FOR THE CLASS WHICH TAKES A STRING
+					final Constructor<?> constructor = objectClass.getConstructor(new Class<?>[] { String.class });
 
-				// CREATE AN INSTANCE OF THE OBJECT
-				newValue = constructor.newInstance(new Object[] { _value });
-			}
+					// CREATE AN INSTANCE OF THE OBJECT
+					newValue = constructor.newInstance(new Object[] { _value });
+				}
+			}		
 		} catch (final NoSuchMethodException nsme) {
 			logger.warn("No Such Method Exception. Failed to copy data.",  nsme);
 			newValue = _value;

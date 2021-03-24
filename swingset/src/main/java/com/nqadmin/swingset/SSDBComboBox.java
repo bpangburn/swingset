@@ -37,27 +37,24 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
+import static com.nqadmin.swingset.datasources.RowSetOps.getJDBCColumnType;
+
+import java.sql.Connection;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.JOptionPane;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.Connection;
-
 import com.nqadmin.swingset.models.SSListItem;
+import com.nqadmin.swingset.models.SSListItemFormat;
 
 import ca.odell.glazedlists.EventList;
-
-import static com.nqadmin.swingset.datasources.RowSetOps.*;
-
-import com.nqadmin.swingset.models.SSListItemFormat;
 
 
 // SSDBComboBox.java
@@ -1469,12 +1466,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * <p>
 	 * If more than one item is present in the combo for that mapping, only the
 	 * first one is changed.
-	 * <p>
-	 * NOTE: To retain changes made to current RowSet, call updateRow() before
-	 * calling the updateOption() on SSDBComboBox. This only applies if you if you
-	 * are using the SSDBComboBox and SSDataNavigator for record navigation. If you
-	 * are not using the SSDBComboBox for record navigation then there is no need to
-	 * call updateRow() on the RowSet.
 	 *
 	 * @param _mapping typically a primary key value corresponding to the displayed
 	 *                 currentSelectedOption to be updated
@@ -1484,16 +1475,37 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 */
 	public boolean updateOption(final Long _mapping, final String _option) {
 
+		// 2021-02-28: @errael patched this method to deal with inconsistent
+		// updating of combo editor. See https://github.com/bpangburn/swingset/issues/85
+		
 		boolean result = false;
 
 		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			final int index = remodel.getMappings().indexOf(_mapping);
 			if (index >= 0) {
+				boolean isSelectedItem = Objects.equals(_mapping, getSelectedMapping());
 				remodel.setOption(index, _option);
 				result = true;
+				// Changing what's in the ComboEditor, which may be done indirectly when
+				// modifying the current item, might change the currently selected item when
+				// GlazedList is set to STRICT. So something is needed to insure that the
+				// selected mapping before the change is the selected mapping after the change.
+				// Otherwise the first item in the list becomes selected. If the combo is used
+				// for navigation, this can trigger a change in the current row. 
+				//
+				// The call to setSelectedItem() below has the added benefit of working around
+				// a possible bug in GlazedList (see https://github.com/glazedlists/glazedlists/issues/702),
+				// but it's likely best to keep this block even if the issue is determine to be
+				// a bug and resolved.
+				if (isSelectedItem) {
+					// Modifying the underlying list item that corresponds to the
+					// current selection; strict glazed may change the selection.
+					// Select the modified item so the same mapping is selected.
+					SSListItem item = remodel.get(index);
+					setSelectedItem(item);
+				}
 // TODO Confirm that eventList is not reordered by GlazedLists code.
 			}
-// TODO may need to call repaint()
 		} catch (final Exception e) {
 			logger.error(getColumnForLog() + ": Exception.", e);
 		}
@@ -1572,123 +1584,41 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 //	 */
 //	@Override
 //	public void updateSSComponent() {
-//		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long or Integer
+//		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only limit JDBC types accepted
 //		try {
-//			// 2020-10-05_BP: If initialization is taking place then there won't be any mappings so don't try to update anything yet.
-//
-//			// TODO: how does this happen?
-//			//if (eventList==null) {
-//			//	return;
-//			//}
+//			// If initialization is taking place then there won't be any mappings so don't try to update anything yet.
 //			if (!hasItems()) {
 //				return;
 //			}
 //
-//			// If the user was on this component and the GlazedList had a subset of items, then
-//			// navigating resulting in a call to updateSSComponent()->setSelectedValue() may try to do a lookup based on
-//			// the GlazedList subset and generate:
-//			// Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: setSelectedIndex: X out of bounds
-//			//int possibleMatches = getItemCount();
-//			//logger.debug("{}: Possible matches BEFORE setPopupVisible(false): " + possibleMatches, () -> getColumnForLog());
+//			// Maybe insures blank in case of later exception.
+//			setSelectionPending(true);
 //
-//			//this.setPopupVisible(false);
-//			//updateUI();
+//			// SSDBComboBox will generally work with primary key column data queried from the database, which will generally be of data type long.
+//			// SSComboBox is generally used with 2 or 4 byte integer columns.
+//			final String boundColumnText = getBoundColumnText();
 //
-//			//possibleMatches = getItemCount();
-//			//logger.debug("{}: Possible matches AFTER setPopupVisible(false): " + possibleMatches, () -> getColumnForLog());
+//			// LOGGING
+//			logger.debug("{}: getBoundColumnText() - " + boundColumnText, () -> getColumnForLog());
 //
-//			// THIS SHOULD BE CALLED AS A RESULT OF SOME ACTION ON THE ROWSET SO RESET THE EDITOR STRINGS BEFORE DOING ANYTHING ELSE
-//			// This is going to make a little noise in the debug logs since it results in an "extra" call to setSelectedItem()
-//			getEditor().setItem("");
-//
-//
-//			// Combobox primary key column data queried from the database will generally be of data type long.
-//			// The bound column text should generally be a long integer as well, but trimming to be safe.
-//			// TODO Consider starting with a Long and passing directly to setSelectedValue(primaryKey). Modify setSelectedValue to accept a Long vs long.
-//			final String text = getBoundColumnText();
-//
-//			logger.trace("{}: getBoundColumnText() - " + text, () -> getColumnForLog());
-//
-//			// GET THE BOUND VALUE STORED IN THE ROWSET
-//			//if (text != null && !(text.equals(""))) {
-//			if ((text != null) && !text.isEmpty()) {
-//
-//				final long primaryKey = Long.parseLong(text);
-//
-//				logger.debug("{}: Calling setSelectedValue(" + primaryKey + ").", () -> getColumnForLog());
-//
-//				setSelectedValue(primaryKey);
-//
-//			} else {
-//				logger.debug("{}: Calling setSelectedIndex(-1).", () -> getColumnForLog());
-//
-//				setSelectedIndex(-1);
-//				//updateUI();
+//			// GET THE BOUND VALUE STORED IN THE ROWSET - may throw a NumberFormatException
+//			Long targetValue = null;
+//			if ((boundColumnText != null) && !boundColumnText.isEmpty()) {
+//				targetValue = Long.parseLong(boundColumnText);
 //			}
-//
-//			// TODO Consider commenting this out for performance.
-//			//String editorString = null;
-//			//if (getEditor().getItem() != null) {
-//			//	editorString = getEditor().getItem().toString();
-//			//}
-//			//logger.debug("{}: Combo editor string: " + editorString, () -> getColumnForLog());
-//			logger.trace(() -> {
-//				String editorString = null;
-//				if (getEditor().getItem() != null) {
-//					editorString = getEditor().getItem().toString();
-//				}
-//				return getColumnForLog() + ": Combo editor string: " + editorString;
-//			});
+//			
+//			// LOGGING
+//			logger.debug("{}: targetValue - " + targetValue, () -> getColumnForLog());
+//			
+//			// UPDATE COMPONENT
+//			setSelectedMapping(targetValue);// setSelectedMapping() should handle null OK.}
 //
 //		} catch (final NumberFormatException nfe) {
+//			JOptionPane.showMessageDialog(this, String.format(
+//					"Encountered database value of '%s' for column [%s], which cannot be converted to a number.", getBoundColumnText(), getColumnForLog()));
 //			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
 //		}
 //	}
-	
-	/**
-	 * Updates the value stored and displayed in the SwingSet component based on
-	 * getBoundColumnText()
-	 * <p>
-	 * Call to this method should be coming from SSCommon and should already have
-	 * the Component listener removed
-	 */
-	@Override
-	public void updateSSComponent() {
-		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only limit JDBC types accepted
-		try {
-			// If initialization is taking place then there won't be any mappings so don't try to update anything yet.
-			if (!hasItems()) {
-				return;
-			}
-
-			// Maybe insures blank in case of later exception.
-			setSelectionPending(true);
-
-			// SSDBComboBox will generally work with primary key column data queried from the database, which will generally be of data type long.
-			// SSComboBox is generally used with 2 or 4 byte integer columns.
-			final String boundColumnText = getBoundColumnText();
-
-			// LOGGING
-			logger.debug("{}: getBoundColumnText() - " + boundColumnText, () -> getColumnForLog());
-
-			// GET THE BOUND VALUE STORED IN THE ROWSET - may throw a NumberFormatException
-			Long targetValue = null;
-			if ((boundColumnText != null) && !boundColumnText.isEmpty()) {
-				targetValue = Long.parseLong(boundColumnText);
-			}
-			
-			// LOGGING
-			logger.debug("{}: targetValue - " + targetValue, () -> getColumnForLog());
-			
-			// UPDATE COMPONENT
-			setSelectedMapping(targetValue);// setSelectedMapping() should handle null OK.}
-
-		} catch (final NumberFormatException nfe) {
-			JOptionPane.showMessageDialog(this, String.format(
-					"Encountered database value of '%s' for column [%s], which cannot be converted to a number.", getBoundColumnText(), getColumnForLog()));
-			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
-		}
-	}
 
 	/**
 	 * Updates the string thats being displayed.

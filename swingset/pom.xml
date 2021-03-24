@@ -8,7 +8,7 @@
 
 	<groupId>com.nqadmin.swingset</groupId>
 	<artifactId>swingset</artifactId>
-	<version>4.0.3</version>
+	<version>4.0.4-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>swingset</name>
@@ -21,12 +21,19 @@
 		<version.maven>3.6.3</version.maven>
 		<version.java>1.8</version.java>
 
-		<!--<version.glazedlists>1.11.0</version.glazedlists>-->
+		<!--<version.glazedlists>1.11.0</version.glazedlists> -->
 		<version.glazedlists>1.11.1203</version.glazedlists>
-		<version.log4j>2.14.0</version.log4j>
+		<version.log4j>2.14.1</version.log4j>
 		<version.jdbcrowsetimpl>1.0.2</version.jdbcrowsetimpl>
 
 		<version.maven-enforcer-plugin>3.0.0-M3</version.maven-enforcer-plugin>
+		<version.maven-clean-plugin>3.1.0</version.maven-clean-plugin>
+		<version.maven-deploy-plugin>3.0.0-M1</version.maven-deploy-plugin>
+		<version.maven-install-plugin>3.0.0-M1</version.maven-install-plugin>
+		<version.maven-jar-plugin>3.2.0</version.maven-jar-plugin>
+		<version.maven-resources-plugin>3.2.0</version.maven-resources-plugin>
+		<version.maven-site-plugin>3.9.1</version.maven-site-plugin>
+
 		<version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
 		<version.dependency-check-maven>6.1.1</version.dependency-check-maven>
 		<version.maven-source-plugin>3.2.1</version.maven-source-plugin>
@@ -35,7 +42,7 @@
 		<version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
 		<version.maven-surefire-plugin>3.0.0-M5</version.maven-surefire-plugin>
 		<version.maven-failsafe-plugin>3.0.0-M5</version.maven-failsafe-plugin>
-		<version.junit-jupiter-any>5.7.0</version.junit-jupiter-any>
+		<version.junit-jupiter-any>5.8.0-M1</version.junit-jupiter-any>
 	</properties>
 
 	<licenses>
@@ -88,23 +95,18 @@
 			</snapshots>
 		</repository>
 	</repositories>
-	
+
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/com.glazedlists/glazedlists -->
-		<!--
-		<dependency>
-			<groupId>com.glazedlists</groupId>
-			<artifactId>glazedlists</artifactId>
-			<version>${version.glazedlists}</version>
-		</dependency>
-		-->
+		<!-- <dependency> <groupId>com.glazedlists</groupId> <artifactId>glazedlists</artifactId> 
+			<version>${version.glazedlists}</version> </dependency> -->
 
 		<!-- ERNIE RAEL'S CUSTOM GLAZEDLIST ARTIFACT -->
 		<!-- https://mvnrepository.com/artifact/com.raelity.3rdparty.com.glazedlists -->
 		<dependency>
-		  <groupId>com.raelity.3rdparty.com.glazedlists</groupId>
-		  <artifactId>glazedlists</artifactId>
-		  <version>${version.glazedlists}</version>
+			<groupId>com.raelity.3rdparty.com.glazedlists</groupId>
+			<artifactId>glazedlists</artifactId>
+			<version>${version.glazedlists}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
@@ -170,18 +172,17 @@
 						</goals>
 						<configuration>
 							<rules>
-								<bannedPlugins>
-									<!-- will only display a warning but does not fail the build. -->
-									<level>WARN</level>
-									<excludes>
-										<exclude>org.apache.maven.plugins:maven-verifier-plugin</exclude>
-									</excludes>
-									<message>Please consider using the maven-invoker-plugin
-										(http://maven.apache.org/plugins/maven-invoker-plugin/)!</message>
-								</bannedPlugins>
+								<requirePluginVersions>
+									<message>Best Practice is to always define plugin versions!</message>
+									<banLatest>true</banLatest>
+									<banRelease>true</banRelease>
+									<banSnapshots>true</banSnapshots>
+								</requirePluginVersions>
+
 								<requireMavenVersion>
 									<version>${version.maven}</version>
 								</requireMavenVersion>
+
 								<requireJavaVersion>
 									<version>${version.java}</version>
 								</requireJavaVersion>
@@ -189,6 +190,37 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>${version.maven-clean-plugin}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>${version.maven-deploy-plugin}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>${version.maven-install-plugin}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${version.maven-jar-plugin}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>${version.maven-resources-plugin}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>${version.maven-site-plugin}</version>
 			</plugin>
 
 			<plugin>
@@ -217,8 +249,8 @@
 
 	<profiles>
 		<profile>
-	<!-- invoked during verify phase -->
-	<!-- https://jeremylong.github.io/DependencyCheck/dependency-check-maven/ -->
+			<!-- invoked during verify phase -->
+			<!-- https://jeremylong.github.io/DependencyCheck/dependency-check-maven/ -->
 			<id>owasp-check</id>
 			<build>
 				<plugins>
@@ -341,13 +373,17 @@
 				<pluginManagement>
 					<plugins>
 						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
 							<artifactId>maven-compiler-plugin</artifactId>
+							<version>${version.maven-compiler-plugin}</version>
 							<configuration>
 								<release>8</release>
 							</configuration>
 						</plugin>
 						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
 							<artifactId>maven-javadoc-plugin</artifactId>
+							<version>${version.maven-javadoc-plugin}</version>
 							<configuration>
 								<additionalOptions>-html5</additionalOptions>
 								<doclint>all,-missing,-html</doclint>
