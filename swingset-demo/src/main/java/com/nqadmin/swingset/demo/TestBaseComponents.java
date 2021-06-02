@@ -159,6 +159,7 @@ public class TestBaseComponents extends JFrame {
 	JLabel lblSSSlider = new JLabel("SSSlider");
 	JLabel lblSSTextArea = new JLabel("SSTextArea");
 	JLabel lblSSTextField = new JLabel("SSTextField");
+	JLabel lblSSTextField2 = new JLabel("SSTextField (date)");
 	
 	/**
 	 * bound component declarations
@@ -174,6 +175,9 @@ public class TestBaseComponents extends JFrame {
 	SSSlider sliSSSlider = new SSSlider();
 	SSTextArea txtSSTextArea = new SSTextArea();
 	SSTextField txtSSTextField = new SSTextField();
+	SSTextField txtSSTextField2 = new SSTextField();
+	//SSTextField txtSSTextField2 = new SSTextField(SSTextField.MMDDYYYY);
+	//SSTextField txtSSTextField2 = new SSTextField(SSTextField.DDMMYYYY);
 
 	/**
 	 * database component declarations
@@ -373,6 +377,7 @@ public class TestBaseComponents extends JFrame {
 				sliSSSlider.bind(rowset, "ss_slider");
 				txtSSTextArea.bind(rowset, "ss_text_area");
 				txtSSTextField.bind(rowset, "ss_text_field");
+				txtSSTextField2.bind(rowset, "ss_date_test");
 
 			// RUN DB COMBO QUERIES
 				try {
@@ -398,6 +403,7 @@ public class TestBaseComponents extends JFrame {
 				lblSSSlider.setPreferredSize(MainClass.labelDim);
 				lblSSTextArea.setPreferredSize(MainClass.labelDimTall);
 				lblSSTextField.setPreferredSize(MainClass.labelDim);
+				lblSSTextField2.setPreferredSize(MainClass.labelDim);
 
 			// SET BOUND COMPONENT DIMENSIONS
 				cmbSSDBComboNav.setPreferredSize(MainClass.ssDim);
@@ -419,6 +425,7 @@ public class TestBaseComponents extends JFrame {
 				sliSSSlider.setPreferredSize(MainClass.ssDim);
 				txtSSTextArea.setPreferredSize(MainClass.ssDimTall);
 				txtSSTextField.setPreferredSize(MainClass.ssDim);
+				txtSSTextField2.setPreferredSize(MainClass.ssDim);
 
 			// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
 				final Container contentPane = getContentPane();
@@ -451,6 +458,8 @@ public class TestBaseComponents extends JFrame {
 				contentPane.add(lblSSTextArea, constraints);
 				constraints.gridy++;
 				contentPane.add(lblSSTextField, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSSTextField2, constraints);
 
 				constraints.gridx = 1;
 				constraints.gridy = 0;
@@ -479,6 +488,8 @@ public class TestBaseComponents extends JFrame {
 				contentPane.add(txtSSTextArea, constraints);
 				constraints.gridy++;
 				contentPane.add(txtSSTextField, constraints);
+				constraints.gridy++;
+				contentPane.add(txtSSTextField2, constraints);
 
 				constraints.gridx = 0;
 				constraints.gridy++;

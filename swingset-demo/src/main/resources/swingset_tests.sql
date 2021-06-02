@@ -60,18 +60,19 @@ CREATE TABLE IF NOT EXISTS swingset_base_test_data
 	ss_list ARRAY, /* arbitrary range 2-8 */
 	ss_slider INTEGER, /* arbitrary range 0-20 */
 	ss_text_area VARCHAR(255),
-	ss_text_field VARCHAR(100)
+	ss_text_field VARCHAR(100),
+	ss_date_test DATE
 );
 
 /* NOTE THAT THE FILE_READ COMMAND USED TO LOAD THE IMAGE BLOBS WILL ***NOT*** WORK FOR A CLIENT-SERVER DATABASE. IN-MEMORY DATABASE MUST BE USED */
 
-MERGE INTO swingset_base_test_data VALUES (1,0,2,3,NULL,'This is Label 1',ARRAY[1,2,3],12,'This is Text Area 1','This is TextField 1') ;
-MERGE INTO swingset_base_test_data VALUES (2,1,1,2,NULL,'This is Label 2',ARRAY[3,4,5],3,'This is Text Area 2. Image is NULL by default for this record.','This is TextField 2') ;
-MERGE INTO swingset_base_test_data VALUES (3,1,0,1,NULL,'This is Label 3',ARRAY[4,5,1],8,'This is Text Area 3','This is TextField 3') ;
-MERGE INTO swingset_base_test_data VALUES (4,0,3,4,NULL,'This is Label 4',ARRAY[1,5,4],15,'This is Text Area 4','This is TextField 4') ;
-MERGE INTO swingset_base_test_data VALUES (5,1,2,5,NULL,'This is Label 5',ARRAY[5,3,4],20,'This is Text Area 5','This is TextField 5') ;
-MERGE INTO swingset_base_test_data VALUES (6,0,1,6,NULL,'This is Label 6',ARRAY[1,3,4],1,'This is Text Area 6.','This is TextField 6') ;
-MERGE INTO swingset_base_test_data VALUES (7,1,0,3,NULL,'This is Label 7',ARRAY[5,2,3],17,'This is Text Area 7','This is TextField 7') ;
+MERGE INTO swingset_base_test_data VALUES (1,0,2,3,NULL,'This is Label 1',ARRAY[1,2,3],12,'This is Text Area 1','This is TextField 1','2021-01-02') ;
+MERGE INTO swingset_base_test_data VALUES (2,1,1,2,NULL,'This is Label 2',ARRAY[3,4,5],3,'This is Text Area 2. Image is NULL by default for this record.','This is TextField 2','2040-10-02') ;
+MERGE INTO swingset_base_test_data VALUES (3,1,0,1,NULL,'This is Label 3',ARRAY[4,5,1],8,'This is Text Area 3','This is TextField 3','1996-06-25') ;
+MERGE INTO swingset_base_test_data VALUES (4,0,3,4,NULL,'This is Label 4',ARRAY[1,5,4],15,'This is Text Area 4','This is TextField 4','2001-11-22') ;
+MERGE INTO swingset_base_test_data VALUES (5,1,2,5,NULL,'This is Label 5',ARRAY[5,3,4],20,'This is Text Area 5','This is TextField 5','2003-12-02') ;
+MERGE INTO swingset_base_test_data VALUES (6,0,1,6,NULL,'This is Label 6',ARRAY[1,3,4],1,'This is Text Area 6.','This is TextField 6','2005-01-10') ;
+MERGE INTO swingset_base_test_data VALUES (7,1,0,3,NULL,'This is Label 7',ARRAY[5,2,3],17,'This is Text Area 7','This is TextField 7','2007-01-15') ;
 
 
 /* swingset_formatted_test_data */
