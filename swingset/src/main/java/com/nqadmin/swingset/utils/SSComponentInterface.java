@@ -42,6 +42,7 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.sql.JDBCType;
 import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
 import java.util.EventListener;
 import java.util.HashSet;
 import java.util.Set;
@@ -242,6 +243,14 @@ public interface SSComponentInterface {
 	 */
 	default String getColumnForLog() {
 		return getSSCommon().getColumnForLog();
+	}
+	
+	/**
+	 * @return the format to use when converting sql date/time columns to strings
+	 */
+	default DateTimeFormatter getDateTimeFormatter() {
+		
+		return getSSCommon().getDateTimeFormatter();
 	}
 
 	/**
@@ -462,6 +471,15 @@ public interface SSComponentInterface {
 	 */
 	default void setBoundColumnName(final String _boundColumnName) {// throws java.sql.SQLException {
 		getSSCommon().setBoundColumnName(_boundColumnName);
+	}
+	
+	/**
+	 * Sets the format to use when converting sql date/time columns to strings.
+	 * 
+	 * @param _dateTimeFormatter to use for date and/or time
+	 */
+	default void setDateTimeFormatter(DateTimeFormatter _dateTimeFormatter) {
+		getSSCommon().setDateTimeFormatter(_dateTimeFormatter);
 	}
 
 	/**

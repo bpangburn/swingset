@@ -206,37 +206,48 @@ public class RowSetOps {
 			case BIT:
 				value = String.valueOf(_rowSet.getBoolean(_columnName));
 				break;
-
+				
 			case DATE:
-			case TIMESTAMP:
-				final Date date = _rowSet.getDate(_columnName);
-				if (date == null) {
-					value = "";
-				} else {
-					final GregorianCalendar calendar = new GregorianCalendar();
-					calendar.setTime(date);
-					value = "";
-					if ((calendar.get(Calendar.MONTH) + 1) < 10) {
-						value = "0";
-					}
-					value = value + (calendar.get(Calendar.MONTH) + 1) + "/";
-
-					if (calendar.get(Calendar.DAY_OF_MONTH) < 10) {
-						value = value + "0";
-					}
-					value = value + calendar.get(Calendar.DAY_OF_MONTH) + "/";
-					value = value + calendar.get(Calendar.YEAR);
-				}
+				value = String.valueOf(_rowSet.getDate(_columnName).toLocalDate());
 				break;
-
 			case TIME:
-				final Time time = _rowSet.getTime(_columnName);
-				if (time == null) {
-					value = "";
-				} else {
-					value=time.toString();
-				}
+				value = String.valueOf(_rowSet.getTime(_columnName).toLocalTime());
 				break;
+			case TIMESTAMP:
+				value = String.valueOf(_rowSet.getTimestamp(_columnName).toLocalDateTime());
+				break;
+				
+
+//			case DATE:
+//			case TIMESTAMP:
+//				final Date date = _rowSet.getDate(_columnName);
+//				if (date == null) {
+//					value = "";
+//				} else {
+//					final GregorianCalendar calendar = new GregorianCalendar();
+//					calendar.setTime(date);
+//					value = "";
+//					if ((calendar.get(Calendar.MONTH) + 1) < 10) {
+//						value = "0";
+//					}
+//					value = value + (calendar.get(Calendar.MONTH) + 1) + "/";
+//
+//					if (calendar.get(Calendar.DAY_OF_MONTH) < 10) {
+//						value = value + "0";
+//					}
+//					value = value + calendar.get(Calendar.DAY_OF_MONTH) + "/";
+//					value = value + calendar.get(Calendar.YEAR);
+//				}
+//				break;
+//
+//			case TIME:
+//				final Time time = _rowSet.getTime(_columnName);
+//				if (time == null) {
+//					value = "";
+//				} else {
+//					value=time.toString();
+//				}
+//				break;
 
 			case CHAR:
 			case VARCHAR:
@@ -472,6 +483,19 @@ public class RowSetOps {
 			
 		case DATE:
 // TODO Good to get rid of getSQLDate if possible.
+//
+// 2021-06-02: Want to assume that any string for a date, time, or timestamp will be
+//  in accordance with the DateTimeFormatter returned by getDateTimeFormatter()
+//  for the current component (implemented in SSCommon).
+//
+// SSTextField will be a known exception, but we should be able to determine if a 
+// mask is in use there and return a proper java.time.LocalDate, LocalTime, or
+// LocalDate time.
+//
+// Also need to review/deprecate SSDateField, SSTimeField, and SSTimestampField.
+//
+// SEARCH FOR OTHER INSTANCES OF updateDate(), updateTime(), and updateTimestamp()
+
 			if (_updatedValue.length() == 10) {
 				Date dateValue = SSCommon.getSQLDate(_updatedValue);
 				_rowSet.updateDate(_columnName, dateValue);
@@ -611,6 +635,7 @@ public class RowSetOps {
 			case NUMERIC:
 				clazz = BigDecimal.class;
 				break;
+// TODO: Review this....				
 			case DATE:
 			case TIME:
 			case TIMESTAMP:
