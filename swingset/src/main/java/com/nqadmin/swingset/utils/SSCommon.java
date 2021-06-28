@@ -45,7 +45,6 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
 import java.util.EventListener;
 import java.util.Objects;
 import java.util.Optional;
@@ -280,8 +279,8 @@ public class SSCommon implements Serializable {
 	 * Per https://www.tutorialspoint.com/java-resultsetmetadata-getcolumntype-method-with-example
 	 * value can be positive or negative so it's dangerous to presume -1 can represent that
 	 * no column type has been specified.
-	 * 
-	 * @deprecated There is a java.sql.Type of of NULL
+	 * <p>
+	 * There is a java.sql.Type of of NULL
 	 */
 	@Deprecated
 	public static final int NO_COLUMN_TYPE = -1;
@@ -297,10 +296,7 @@ public class SSCommon implements Serializable {
 	 * @param _strDate date string in "MM/dd/yyyy" format
 	 *
 	 * @return return SQL date for the string specified
-	 * 
-	 * @deprecated removing assumption that date is ever in MM/dd/yyyy format
 	 */
-	@Deprecated
 	public static Date getSQLDate(final String _strDate) {
 		final StringTokenizer strtok = new StringTokenizer(_strDate, "/", false);
 		final String month = strtok.nextToken();
@@ -332,17 +328,6 @@ public class SSCommon implements Serializable {
 	 * Name of RowSet column to which the SwingSet component will be bound.
 	 */
 	private String boundColumnName = null;
-	
-	/**
-	 * java.time.format.DateTimeFormatter that will be used for converting
-	 * java.sql.Date, Time, and Timestamp to/from String representations.
-	 * 
-	 * If null, then:
-	 *   java.sql.Date will use ISO_LOCAL_DATE
-	 *   java.sql.Time will use ISO_LOCAL_TIME
-	 *   java.sql.Timestamp will use ISO_LOCAL_DATE_TIME
-	 */
-	private DateTimeFormatter dateTimeFormatter = null;
 	
 	/**
 	 * EventListener use for detecting component changes for RowSet column binding
@@ -697,26 +682,6 @@ public class SSCommon implements Serializable {
 	public String getColumnForLog() {
 		return "[" + (boundColumnName != null ? boundColumnName : logColumnName) + "]";
 	}
-	
-	/**
-	 * @return the format to use when converting sql date/time columns to strings
-	 */
-	public DateTimeFormatter getDateTimeFormatter() {
-		
-		// If the DateTimeFormatter has not been set AND we're dealing with an
-		// SQL date or time column then return the ISO LOCAL formatters by default.
-		
-		if (dateTimeFormatter==null) {
-			if (boundColumnJDBCType==java.sql.JDBCType.DATE) {
-				return DateTimeFormatter.ISO_LOCAL_DATE;
-			} else if (boundColumnJDBCType==java.sql.JDBCType.TIME) {
-				return DateTimeFormatter.ISO_LOCAL_TIME;
-			} else if (boundColumnJDBCType==java.sql.JDBCType.TIMESTAMP) {
-				return DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-			}
-		}
-		return dateTimeFormatter;
-	}
 
 	/**
 	 * @return the parent/calling SwingSet JComponent implementing
@@ -1042,15 +1007,6 @@ public class SSCommon implements Serializable {
 	 */
 	public void setConnection(final Connection _connection) {
 		connection = _connection;
-	}
-	
-	/**
-	 * Sets the format to use when converting sql date/time columns to strings.
-	 * 
-	 * @param _dateTimeFormatter string format to use for date and/or time
-	 */
-	public void setDateTimeFormatter(DateTimeFormatter _dateTimeFormatter) {
-		dateTimeFormatter = _dateTimeFormatter;
 	}
 
 	/**
