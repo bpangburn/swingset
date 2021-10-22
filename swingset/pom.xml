@@ -365,7 +365,7 @@
 			  dependency on the IDE for most checking.
 		-->
 		<profile>
-			<id></id>
+			<id>java-9-plus</id>
 			<activation>
 				<jdk>[1.9,)</jdk>
 			</activation>
