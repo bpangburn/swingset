@@ -7,8 +7,7 @@ SwingSet 4.0.5 - Released 2021-10-25
 ==============================================================================
 
 Changes:
-	1. Clean up code, removing legacy block comments.
-	2. Updated POM dependencies.
+	1. Updated POM dependencies.
 	
 ==============================================================================
 SwingSet 4.0.4 - Released 2021-03-24
