@@ -3,6 +3,13 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
 ==============================================================================
+SwingSet 4.0.5 - Released 2021-10-25
+==============================================================================
+
+Changes:
+	1. Updated POM dependencies.
+	
+==============================================================================
 SwingSet 4.0.4 - Released 2021-03-24
 ==============================================================================
 
@@ -14,13 +21,13 @@ Changes:
 	4. Initial fix for Issue #46 moving updateSSComponent out of SSComboBox
 	   and SSDBComboBox.
 	5. SSTableKeyAdapter - Updated getObjectToSet method to use Date.valueOf
-       for converting string to date object. See:
-       https://github.com/bpangburn/swingset/issues/89
-    6. SSSyncManager - Calling updatePresentRow() on SSDataNavigator in the
-       combo ActionListener only when a row navigation is needed.
-    7. Demo: Logging level set to DEBUG by default.
-    8. Demo: Example4UsingHelper - update combo navigator dynamically when
-       Part Name is modified.
+	   for converting string to date object. See:
+	   https://github.com/bpangburn/swingset/issues/89
+	6. SSSyncManager - Calling updatePresentRow() on SSDataNavigator in the
+	   combo ActionListener only when a row navigation is needed.
+	7. Demo: Logging level set to DEBUG by default.
+	8. Demo: Example4UsingHelper - update combo navigator dynamically when
+	   Part Name is modified.
 
 ==============================================================================
 SwingSet 4.0.3 - Released 2021-02-22
