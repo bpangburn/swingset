@@ -437,16 +437,6 @@ public class SSDataNavigator extends JPanel {
 //			}
 //		}
 	}
-	
-	private void doUpdateRowWithoutPostUpdateOps() throws SQLException {
-		rowSet.updateRow();
-	}
-
-	private void doUpdateRow() throws SQLException {
-		// TODO: check consistency row state, button state
-		doUpdateRowWithoutPostUpdateOps();
-		dBNav.performPostUpdateOps();
-	}
 
 	/**
 	 * Adds the listeners for the navigator components.
@@ -460,7 +450,7 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("FIRST button clicked.");
 			removeRowsetListener();
 			try {
-				if (!commitChanges()) return;
+				if (!commitChangesIfAllowed()) return;
 				
 				rowSet.first();
 				
@@ -484,7 +474,7 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("PREVIOUS button clicked.");
 			removeRowsetListener();
 			try {
-				if (!commitChanges()) return;
+				if (!commitChangesIfAllowed()) return;
 				
 				if ((rowSet.getRow() != 0) && !rowSet.previous()) {
 					rowSet.first();
@@ -511,7 +501,7 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("NEXT button clicked.");
 			removeRowsetListener();
 			try {
-				if (!commitChanges()) return;
+				if (!commitChangesIfAllowed()) return;
 
 				rowSet.next();
 				
@@ -537,7 +527,7 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("LAST button clicked.");
 			removeRowsetListener();
 			try {
-				if (!commitChanges()) return;
+				if (!commitChangesIfAllowed()) return;
 				
 				rowSet.last();
 				
@@ -585,13 +575,13 @@ public class SSDataNavigator extends JPanel {
 					updateNavigator();
 				} else {
 					// ELSE UPDATE THE PRESENT ROW VALUES.
-					if (!dBNav.allowUpdate()) {
+					if (!commitChangesIfAllowedWithoutPostUpdateOps()) {
 						// UPDATE NOT ALLOWED SO DO NOTHING.
 						// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
 						// TO THE ROW THAT SHOULD BE UNDONE.
 						return;
 					}
-					doUpdateRowWithoutPostUpdateOps();
+				
 					setRowModified(false);
 					// TODO: why not updateNavigator?
 					updateButtonState();
@@ -605,7 +595,7 @@ public class SSDataNavigator extends JPanel {
 					// number did.
 					//
 					// 2020-12-24
-					// TODO: might get rid of this if broadcasing the right info,
+					// TODO: might get rid of this if broadcasting the right info,
 					//       like picking up on the "other" component broadcast
 					//
 					rowSet.absolute(rowSet.getRow());
@@ -704,7 +694,7 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("ADD button clicked.");
 			removeRowsetListener();
 			try {
-				if (!commitChanges()) return;
+				if (!commitChangesIfAllowed()) return;
 
 				rowSet.moveToInsertRow();
 				setInserting(rowSet, true);
@@ -812,7 +802,7 @@ public class SSDataNavigator extends JPanel {
 					
 					try {
 						
-						if (!commitChanges()) return;
+						if (!commitChangesIfAllowed()) return;
 						
 						final int row = Integer.parseInt(txtCurrentRow.getText().trim());
 						
@@ -888,11 +878,33 @@ public class SSDataNavigator extends JPanel {
 	
 	/**
 	 * Common code to commit changes to the database from the rowset if
-	 * modifications are allowed.
+	 * modifications are allowed. After commit is performs any
+	 * post-update operations.
+	 * 
 	 * @return true unless dBNav.allowUpdate() returns false
 	 * @throws SQLException SQL Exception if rowset call to updateRow() fails
 	 */
-	private boolean commitChanges() throws SQLException {
+	private boolean commitChangesIfAllowed() throws SQLException {
+		
+		boolean result = commitChangesIfAllowedWithoutPostUpdateOps();
+		
+		// After successful commit, perform any post-update operations
+		if (result) {
+			dBNav.performPostUpdateOps();
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Common code to commit changes to the database from the rowset if
+	 * modifications are allowed.
+	 * 
+	 * @return true unless dBNav.allowUpdate() returns false
+	 * @throws SQLException SQL Exception if rowset call to updateRow() fails
+	 */
+	private boolean commitChangesIfAllowedWithoutPostUpdateOps() throws SQLException {
+		
 		if (modification) {
 			if (!dBNav.allowUpdate()) {
 				// UPDATE NOT ALLOWED SO DO NOTHING.
@@ -900,13 +912,11 @@ public class SSDataNavigator extends JPanel {
 				// TO THE ROW THAT SHOULD BE UNDONE.
 				return false;
 			}
-			//rowSet.updateRow();
-			//dBNav.performPostUpdateOps();
 
 			// 2021-11-18: prasanthreddy-git noticed that we didn't check for an empty
 			// rowset before trying to save changes
 			if (rowSet.getRow() > 0) {
-				doUpdateRow();
+				rowSet.updateRow();
 			}
 		}
 		
