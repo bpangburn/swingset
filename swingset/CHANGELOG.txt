@@ -3,11 +3,13 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
 ==============================================================================
-SwingSet 4.0.5 - Released 2021-10-25
+SwingSet 4.0.5 - Released 2021-11-19
 ==============================================================================
 
 Changes:
 	1. Updated POM dependencies.
+	2. Fix for Issue #95 where adding a record to an empty rowset throws an
+	   exception.
 	
 ==============================================================================
 SwingSet 4.0.4 - Released 2021-03-24

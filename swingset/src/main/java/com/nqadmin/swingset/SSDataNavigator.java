@@ -902,7 +902,12 @@ public class SSDataNavigator extends JPanel {
 			}
 			//rowSet.updateRow();
 			//dBNav.performPostUpdateOps();
-			doUpdateRow();
+
+			// 2021-11-18: prasanthreddy-git noticed that we didn't check for an empty
+			// rowset before trying to save changes
+			if (rowSet.getRow() > 0) {
+				doUpdateRow();
+			}
 		}
 		
 		return true;
