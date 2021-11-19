@@ -631,7 +631,11 @@ public class SSDataNavigator extends JPanel {
 				rowSet.cancelRowUpdates();
 				setInserting(rowSet, false);
 				dBNav.performCancelOps();
-				rowSet.refreshRow();
+				
+				// Only attempt to refresh row if we have at least one record
+				if (rowSet.getRow() > 0) {
+					rowSet.refreshRow();
+				}
 				
 				setRowModified(false);
 				updateNavigator();
@@ -690,7 +694,10 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("ADD button clicked.");
 			removeRowsetListener();
 			try {
-				if (!commitChangesToDatabase(true)) return;
+				// Only attempt to commit to database if we are on a row (non-empty rowset)
+				if (rowSet.getRow() > 0) {
+					if (!commitChangesToDatabase(true)) return;
+				}
 
 				rowSet.moveToInsertRow();
 				setInserting(rowSet, true);
