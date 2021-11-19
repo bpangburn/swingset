@@ -898,11 +898,13 @@ public class SSDataNavigator extends JPanel {
 	
 	/**
 	 * Common code to commit changes to the database from the rowset if
-	 * modifications are allowed.
+	 * modifications are allowed. If modifications are not allowed, the
+	 * method will return true and dBNav.performPostUpdateOps() may be called.
 	 * 
-	 * @return true unless dBNav.allowUpdate() returns false
+	 * @return true unless: 1. dBNav.allowUpdate() returns false OR 2. there are no records
 	 * @throws SQLException SQL Exception if rowset call to updateRow() fails
 	 */
+	// TODO: determine if we really want to return true if modification==false
 	private boolean commitChangesIfAllowedWithoutPostUpdateOps() throws SQLException {
 		
 		if (modification) {
@@ -917,6 +919,8 @@ public class SSDataNavigator extends JPanel {
 			// rowset before trying to save changes
 			if (rowSet.getRow() > 0) {
 				rowSet.updateRow();
+			} else {
+				return false;
 			}
 		}
 		
