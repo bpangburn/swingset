@@ -450,7 +450,7 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("FIRST button clicked.");
 			removeRowsetListener();
 			try {
-				if (!commitChangesIfAllowed()) return;
+				if (!commitChangesToDatabase(true)) return;
 				
 				rowSet.first();
 				
@@ -474,7 +474,7 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("PREVIOUS button clicked.");
 			removeRowsetListener();
 			try {
-				if (!commitChangesIfAllowed()) return;
+				if (!commitChangesToDatabase(true)) return;
 				
 				if ((rowSet.getRow() != 0) && !rowSet.previous()) {
 					rowSet.first();
@@ -501,7 +501,7 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("NEXT button clicked.");
 			removeRowsetListener();
 			try {
-				if (!commitChangesIfAllowed()) return;
+				if (!commitChangesToDatabase(true)) return;
 
 				rowSet.next();
 				
@@ -527,7 +527,7 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("LAST button clicked.");
 			removeRowsetListener();
 			try {
-				if (!commitChangesIfAllowed()) return;
+				if (!commitChangesToDatabase(true)) return;
 				
 				rowSet.last();
 				
@@ -574,13 +574,9 @@ public class SSDataNavigator extends JPanel {
 					setRowModified(false);
 					updateNavigator();
 				} else {
-					// ELSE UPDATE THE PRESENT ROW VALUES.
-					if (!commitChangesIfAllowedWithoutPostUpdateOps()) {
-						// UPDATE NOT ALLOWED SO DO NOTHING.
-						// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
-						// TO THE ROW THAT SHOULD BE UNDONE.
-						return;
-					}
+					// ELSE UPDATE THE DATABASE BASED ON THE PRESENT ROW VALUES.
+					// IN THIS CASE WE WILL WAIT TO PERFORM POST-UPDATE OPS BELOW
+					if (!commitChangesToDatabase(false)) return;
 				
 					setRowModified(false);
 					// TODO: why not updateNavigator?
@@ -694,7 +690,7 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("ADD button clicked.");
 			removeRowsetListener();
 			try {
-				if (!commitChangesIfAllowed()) return;
+				if (!commitChangesToDatabase(true)) return;
 
 				rowSet.moveToInsertRow();
 				setInserting(rowSet, true);
@@ -802,7 +798,7 @@ public class SSDataNavigator extends JPanel {
 					
 					try {
 						
-						if (!commitChangesIfAllowed()) return;
+						if (!commitChangesToDatabase(true)) return;
 						
 						final int row = Integer.parseInt(txtCurrentRow.getText().trim());
 						
@@ -878,53 +874,48 @@ public class SSDataNavigator extends JPanel {
 	
 	/**
 	 * Common code to commit changes to the database from the rowset if
-	 * modifications are allowed. After commit is performs any
+	 * modifications are allowed. After committing, it performs any
 	 * post-update operations.
+	 * <p>
+	 * If modification==false, then skip the update and return as
+	 * successful, unless we have an empty rowset. 
+	 * 
+	 * @param _performPostUpdateOps true if performPostUpdateOps() should
+	 * 	be called after successful update, otherwise false
 	 * 
 	 * @return true unless dBNav.allowUpdate() returns false
 	 * @throws SQLException SQL Exception if rowset call to updateRow() fails
 	 */
-	private boolean commitChangesIfAllowed() throws SQLException {
+	private boolean commitChangesToDatabase(final boolean _performPostUpdateOps) throws SQLException {
 		
-		boolean result = commitChangesIfAllowedWithoutPostUpdateOps();
+		boolean result = true;
 		
-		// After successful commit, perform any post-update operations
-		if (result) {
+		// check for an empty rowset 
+		if (rowSet.getRow() == 0) {
+			result = false;
+		}
+		
+		// if we have at least one row and the user has not set modifications to false (read-only)
+		// then continue to attempt to update database based on current rowset values
+		if (result && modification) {
+			if (!dBNav.allowUpdate()) {
+				result = false;
+			} else {
+				rowSet.updateRow();
+			}
+		}
+		
+		// if update was successful or modifications are set to false (read-only) then
+		// attempt post-update operations based on method parameter
+		//
+		// note that where modifications are set to false, we're pretending to have
+		// successfully updated the database
+		if (result && _performPostUpdateOps) {
 			dBNav.performPostUpdateOps();
 		}
 		
+		// return
 		return result;
-	}
-	
-	/**
-	 * Common code to commit changes to the database from the rowset if
-	 * modifications are allowed. If modifications are not allowed, the
-	 * method will return true and dBNav.performPostUpdateOps() may be called.
-	 * 
-	 * @return true unless: 1. dBNav.allowUpdate() returns false OR 2. there are no records
-	 * @throws SQLException SQL Exception if rowset call to updateRow() fails
-	 */
-	// TODO: determine if we really want to return true if modification==false
-	private boolean commitChangesIfAllowedWithoutPostUpdateOps() throws SQLException {
-		
-		if (modification) {
-			if (!dBNav.allowUpdate()) {
-				// UPDATE NOT ALLOWED SO DO NOTHING.
-				// WE SHOULD NOT MOVE TO THE ROW AS THE USER HAS MADE CHANGES TO
-				// TO THE ROW THAT SHOULD BE UNDONE.
-				return false;
-			}
-
-			// 2021-11-18: prasanthreddy-git noticed that we didn't check for an empty
-			// rowset before trying to save changes
-			if (rowSet.getRow() > 0) {
-				rowSet.updateRow();
-			} else {
-				return false;
-			}
-		}
-		
-		return true;
 	}
 
 	/**
