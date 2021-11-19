@@ -890,7 +890,7 @@ public class SSDataNavigator extends JPanel {
 	 * @param _performPostUpdateOps true if performPostUpdateOps() should
 	 * 	be called after successful update, otherwise false
 	 * 
-	 * @return true unless dBNav.allowUpdate() returns false
+	 * @return true unless there are no records OR dBNav.allowUpdate() returns false
 	 * @throws SQLException SQL Exception if rowset call to updateRow() fails
 	 */
 	private boolean commitChangesToDatabase(final boolean _performPostUpdateOps) throws SQLException {
