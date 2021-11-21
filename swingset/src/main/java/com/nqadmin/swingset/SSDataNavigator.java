@@ -694,11 +694,10 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("ADD button clicked.");
 			removeRowsetListener();
 			try {
-				// Only attempt to commit to database if we are on a row (non-empty rowset)
-				if (rowSet.getRow() > 0) {
-					if (!commitChangesToDatabase(true)) return;
-				}
+				// Commit changes for current row to database
+				commitChangesToDatabase(true);
 
+				// Move to insert row, update status, and update combo navigator (if applicable)
 				rowSet.moveToInsertRow();
 				setInserting(rowSet, true);
 				if (navCombo!=null) {
