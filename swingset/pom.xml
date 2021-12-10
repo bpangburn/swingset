@@ -8,7 +8,7 @@
 
 	<groupId>com.nqadmin.swingset</groupId>
 	<artifactId>swingset</artifactId>
-	<version>4.0.6-SNAPSHOT</version>
+	<version>4.0.6</version>
 	<packaging>jar</packaging>
 
 	<name>swingset</name>
@@ -23,7 +23,7 @@
 
 		<!--<version.glazedlists>1.11.0</version.glazedlists> -->
 		<version.glazedlists>1.11.1203</version.glazedlists>
-		<version.log4j>2.14.1</version.log4j>
+		<version.log4j>2.15.0</version.log4j>
 		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
 
 		<version.maven-enforcer-plugin>3.0.0</version.maven-enforcer-plugin>
@@ -42,7 +42,7 @@
 		<version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
 		<version.maven-surefire-plugin>3.0.0-M5</version.maven-surefire-plugin>
 		<version.maven-failsafe-plugin>3.0.0-M5</version.maven-failsafe-plugin>
-		<version.junit-jupiter-any>5.8.1</version.junit-jupiter-any>
+		<version.junit-jupiter-any>5.8.2</version.junit-jupiter-any>
 	</properties>
 
 	<licenses>
