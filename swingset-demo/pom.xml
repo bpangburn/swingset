@@ -22,7 +22,7 @@
 		<version.java>1.8</version.java>
 
 		<version.log4j>2.15.0</version.log4j>
-    <version.swingset>4.0.6</version.swingset>
+		<version.swingset>4.0.6</version.swingset>
 		<version.h2>1.4.200</version.h2>
 		<!-- <version.h2>2.0.202</version.h2> -->
 		<version.java-getopt>1.0.13</version.java-getopt>
