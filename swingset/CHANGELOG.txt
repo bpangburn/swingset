@@ -3,12 +3,13 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
 ==============================================================================
-SwingSet 4.0.7 - Released TBD
+SwingSet 4.0.7 - Released 2021-12-14
 ==============================================================================
 
 Changes:
-	1. Something goes here...
-	2. Something goes here...
+	1. Updated log4j dependencies to 2.16.0 to further address CVE-2021-44228.
+	2. Override the default implementation of getAllowNull() in SSBaseComboBox
+	   to take combobox navigator into account.
 
 ==============================================================================
 SwingSet 4.0.6 - Released 2021-12-10
