@@ -933,6 +933,16 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	}
 
 	/**
+	 * Override the default implementation to take combobox navigator
+	 * into account. If navigator then always false, don't need to check
+	 * database.
+	 * @return true if combo box can have null value
+	 */
+	public boolean getAllowNull() {
+		return !isComboBoxNavigator() && getSSCommon().getAllowNull();
+	}
+
+	/**
 	 * Add or remove the nullItem from the itemList if needed depending
 	 * on {@code getAllowNull()} and the current existence of a nullItem.
 	 * If logical null is selected before, keep it selected after.
@@ -942,7 +952,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		//   insert row as SSDBNavImpl calls setSelectionPending(true) and that will fail
 		//   for the combo navigator without this tweak.
 		//boolean wantNull = (getAllowNull() || selectionPending) && !isComboBoxNavigator();
-		boolean wantNull = (getAllowNull() && !isComboBoxNavigator()) || selectionPending;
+		boolean wantNull = getAllowNull() || selectionPending;
 		boolean hasNull = nullItem != null;
 		
 		if (wantNull == hasNull) {
