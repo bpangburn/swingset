@@ -86,12 +86,16 @@ public class SSFormattedTextField extends JFormattedTextField
 		implements FocusListener, SSComponentInterface {
 
 	/**
-	 * This class should implements validation AND calls setValue() which triggers RowSet updates.
+	 * We want an InputVerifier in order to lock the focus down while the JFormattedTextField is an invalid edit state.
+	 * 
+	 * Also, we add a call to validateField(), the default implementation of which just returns true.
+	 * This allows for the developer to add additional checks (normally range validation) beyond what
+	 * is provided by the Formatter/FormatterFactory, which generally only handles display of values
+	 * and/or character masks.
+	 * 
+	 * This class should implement validation AND call setValue() which will trigger a RowSet update.
 	 * <p>
-	 * See https://docs.oracle.com/javase/8/docs/api/javax/swing/JFormattedTextField.html
-	 * <p>
-	 * More on input verifiers here: https://www.drdobbs.com/jvm/java-better-interfaces-via-jformattedtex/224700979?pgno=1
-	 * Some discussion on dates and validation here: https://docs.oracle.com/javase/tutorial/uiswing/misc/focus.html#inputVerification
+	 * See https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/JFormattedTextField.html
 	 */
 	// TODO: This still needs some work.
 	public class FormattedTextFieldVerifier extends InputVerifier {
@@ -106,11 +110,13 @@ public class SSFormattedTextField extends JFormattedTextField
 				logger.debug("{}: Instance of SSFormattedTextField.", () -> getColumnForLog());
 				final SSFormattedTextField ssftf = (SSFormattedTextField) input;
 				AbstractFormatter formatter = ssftf.getFormatter();
+// TODO: Throw an exception or make a log warning if formatter==null?				
 				String formattedText = ssftf.getText();
 				logger.debug("Formatter is: " + formatter + ".");
+				
 				if (formatter!=null && formattedText!=null && !formattedText.isEmpty()) {
-					
 					try {
+// TODO: Confirm stringToValue() sets the value for the SSTextField. If so we don't need to call .setValue again.					
 						value = formatter.stringToValue(formattedText);
 						// Apparently formatter.stringToValue(formattedText) accomplished the same thing as commitEdit(),
 						// but this approach lets us know if the formatter is null.
@@ -121,23 +127,24 @@ public class SSFormattedTextField extends JFormattedTextField
 						// We're not going to call setValue(null) if result is false.
 					}
 				} else {
-					logger.debug("Null formatter or text. Setting value to null.");
-// TODO: Deal with null formatter and non-null text.					
-					// Value is already null.
+				// value is set to null be default, but make a log entry
+					logger.debug("Null formatter, empty string, or null text. Value set to null.");
 				}
 
-				// now perform custom checks
+				// now perform custom validation/range checks
 				if (result) {
 					result = validateField(value);
 				}
 
-				// update text color for negatives
+				// update text color for negatives, where applicable
 				if (result) {
 					updateTextColor(value);
 				}
 				
+				// set the value for the component based on the validated text
 				if (result) {
-// TODO: This seems to call the property change listener twice??					
+// TODO: Determine if this is resulting in a second property listener. See stringToValue() note above. Maybe commitEdit() is called automatically?
+					
 					ssftf.setValue(value);
 				}
 
@@ -151,7 +158,13 @@ public class SSFormattedTextField extends JFormattedTextField
 				setForeground(Color.BLACK);
 			}
 
+			// return
 			return result;
+		}
+		
+		@Override
+		public boolean shouldYieldFocus(JComponent input) {
+			return verify(input);
 		}
 	}
 
@@ -308,7 +321,7 @@ public class SSFormattedTextField extends JFormattedTextField
 		addFocusListener(this);
 
 		// Setting inputVerifier to validate field before focus is lost
-		// See https://docs.oracle.com/javase/8/docs/api/javax/swing/JFormattedTextField.html
+		// See https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/JFormattedTextField.html
 		setInputVerifier(new FormattedTextFieldVerifier());
 
 	}
@@ -506,12 +519,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 */
 	public boolean validateField(final Object _value) {
 
-
-		// TODO May want to add null check here or let RowSet handle. Hard to enforce if method overridden.
-		//if (this.getAllowNull() == false && _value == null)
-		//	return false;
-
-		// RETURN
-			return true;
+		// just return true for default implementation
+		return true;
 	}
 }
