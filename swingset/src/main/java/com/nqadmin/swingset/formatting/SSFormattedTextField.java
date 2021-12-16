@@ -86,14 +86,15 @@ public class SSFormattedTextField extends JFormattedTextField
 		implements FocusListener, SSComponentInterface {
 
 	/**
-	 * We want an InputVerifier in order to lock the focus down while the JFormattedTextField is an invalid edit state.
+	 * We want an InputVerifier in order to lock the focus down while the JFormattedTextField is in
+	 * an invalid edit state.
 	 * 
 	 * Also, we add a call to validateField(), the default implementation of which just returns true.
 	 * This allows for the developer to add additional checks (normally range validation) beyond what
 	 * is provided by the Formatter/FormatterFactory, which generally only handles display of values
 	 * and/or character masks.
 	 * 
-	 * This class should implement validation AND call setValue() which will trigger a RowSet update.
+	 * This class should perform validation AND call setValue() which will trigger a RowSet update.
 	 * <p>
 	 * See https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/JFormattedTextField.html
 	 */
@@ -116,7 +117,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				
 				if (formatter!=null && formattedText!=null && !formattedText.isEmpty()) {
 					try {
-// TODO: Confirm stringToValue() sets the value for the SSTextField. If so we don't need to call .setValue again.					
+// TODO: Determine if call to stringToValue() sets the value for the SSTextField (or allows it to be set after exiting method). If so, we don't need to call .setValue() again below.					
 						value = formatter.stringToValue(formattedText);
 						// Apparently formatter.stringToValue(formattedText) accomplished the same thing as commitEdit(),
 						// but this approach lets us know if the formatter is null.
@@ -127,8 +128,8 @@ public class SSFormattedTextField extends JFormattedTextField
 						// We're not going to call setValue(null) if result is false.
 					}
 				} else {
-				// value is set to null be default, but make a log entry
-					logger.debug("Null formatter, empty string, or null text. Value set to null.");
+				// value variable is set to null be default, but make a log entry
+					logger.debug("Null formatter, empty string, or null text.");
 				}
 
 				// now perform custom validation/range checks
@@ -141,11 +142,11 @@ public class SSFormattedTextField extends JFormattedTextField
 					updateTextColor(value);
 				}
 				
-				// set the value for the component based on the validated text
-				if (result) {
-// TODO: Determine if this is resulting in a second property listener. See stringToValue() note above. Maybe commitEdit() is called automatically?
-					
-					ssftf.setValue(value);
+				// set the value to null manually if stringToValue() was not called above, but null
+				// is a valid result (e.g., result==true)
+				if (result && value==null) {
+					// TODO: this call is resulting in 2 property change events - both passing null to the database
+					ssftf.setValue(null);
 				}
 
 			}
