@@ -249,16 +249,18 @@ public class SSFormattedTextField extends JFormattedTextField
 	/**
 	 * color for the field that has the focus
 	 */
-	// TODO Add setters/getters and allow developer to customize
-	private final java.awt.Color focusColor = new java.awt.Color(204, 255, 255);
+	private java.awt.Color focusBackgroundColor = new java.awt.Color(204, 255, 255);
 
 	/**
      * Common fields shared across SwingSet components
      */
     protected SSCommon ssCommon = new SSCommon(this);
 
-	private java.awt.Color standardColor = null;
-
+	/**
+	 * Used to store background color prior to change following focusGained event
+	 * so that the color can be restored upon focusLost.
+	 */
+    private java.awt.Color standardBackgroundColor = null;
 	
 	/**
 	 * Creates a new instance of SSFormattedTextField
@@ -337,8 +339,8 @@ public class SSFormattedTextField extends JFormattedTextField
 	public void focusGained(final FocusEvent _event) {
 
 		// USE A DIFFERENT COLOR TO HIGHLIGHT THE FIELD WITH THE FOCUS
-		standardColor = getBackground();
-		setBackground(focusColor);
+		standardBackgroundColor = getBackground();
+		setBackground(focusBackgroundColor);
 
 
 		// HIGHLIGHT THE TEXT IN THE FIELD WHEN FOCUS IS GAINED SO USE CAN JUST TYPE OVER WHAT IS THERE
@@ -354,14 +356,23 @@ public class SSFormattedTextField extends JFormattedTextField
 	}
 
 	/**
-	 * Remove highlighting when the focus is lost.
+	 * Remove highlighting (custom background color) when the focus is lost.
 	 *
 	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
 	 */
 	@Override
 	public void focusLost(final FocusEvent _event) {
-		// Remove highlighting
-		setBackground(standardColor);
+		// Restore original background color
+		setBackground(standardBackgroundColor);
+	}
+	
+	/**
+	 * Returns the background color to be used when this component has the focus
+	 * 
+	 * @return background color used for component with the focus
+	 */
+	public java.awt.Color getFocusBackgroundColor() {
+		return focusBackgroundColor;
 	}
 
 	/**
@@ -391,6 +402,15 @@ public class SSFormattedTextField extends JFormattedTextField
 	public boolean isNullable() {
 
 		return getAllowNull();
+	}
+	
+	/**
+	 * Setter for the background color to be used when this component has the focus
+	 * 
+	 * @param _focusBackgroundColor background color to be used when this component has the focus
+	 */
+	public void setFocusBackgroundColor(final java.awt.Color _focusBackgroundColor) {
+		focusBackgroundColor = _focusBackgroundColor;
 	}
 
     /**
