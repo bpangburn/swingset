@@ -98,7 +98,6 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * <p>
 	 * See https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/JFormattedTextField.html
 	 */
-	// TODO: This still needs some work.
 	public class FormattedTextFieldVerifier extends InputVerifier {
 
 		@Override
@@ -106,6 +105,10 @@ public class SSFormattedTextField extends JFormattedTextField
 
 			boolean result = true;
 			Object value = null;
+			
+			// Set indicator to suppress duplicate property change event if
+			// a call is made to setValue()
+			verifyingText = true;
 
 			if (input instanceof SSFormattedTextField) {
 				logger.debug("{}: Instance of SSFormattedTextField.", () -> getColumnForLog());
@@ -121,15 +124,14 @@ public class SSFormattedTextField extends JFormattedTextField
 				
 				if (formatter!=null && formattedText!=null && !formattedText.isEmpty()) {
 					try {
-// TODO: Determine if call to stringToValue() sets the value for the SSTextField (or allows it to be set after exiting method). If so, we don't need to call .setValue() again below.					
 						value = formatter.stringToValue(formattedText);
-						// Apparently formatter.stringToValue(formattedText) accomplished the same thing as commitEdit(),
+						// Apparently formatter.stringToValue(formattedText) accomplishes the same thing as commitEdit(),
 						// but this approach lets us know if the formatter is null.
-						//ssftf.commitEdit(); 
 					} catch (ParseException pe) {
 						logger.warn(getColumnForLog() + ": String of '" + formattedText + "' generated a Parse Exception at " + pe.getErrorOffset() + ".", pe);
 						result = false;
-						// We're not going to call setValue(null) if result is false.
+						// We're not going to call setValue(null) if result is false, rather we'll keep the
+						// focus in the current field.
 					}
 				} else {
 				// value variable is set to null be default, but make a log entry
@@ -146,10 +148,13 @@ public class SSFormattedTextField extends JFormattedTextField
 					updateTextColor(value);
 				}
 				
-				// set the value to null manually if stringToValue() was not called above, but null
+				// Set the value to null manually if stringToValue() was not called above, but null
 				// is a valid result (e.g., result==true)
+				//
+				// Note that any call to setValue() in this method was triggering a second property change
+				// event so we added a boolean, verifyingText, that will immediately return from the
+				// second property change, without additional action.
 				if (result && value==null) {
-					// TODO: this call is resulting in 2 property change events - both passing null to the database
 					ssftf.setValue(null);
 				}
 
@@ -162,6 +167,10 @@ public class SSFormattedTextField extends JFormattedTextField
 				setBackground(Color.RED);
 				setForeground(Color.BLACK);
 			}
+			
+			// Update indicator used to suppress duplicate property change event if
+			// a call is made to setValue()
+			verifyingText = false;
 
 			// return
 			return result;
@@ -188,6 +197,10 @@ public class SSFormattedTextField extends JFormattedTextField
 		public void propertyChange(final PropertyChangeEvent _pce) {
 
 			if (_pce.getPropertyName().equals("value")) {
+				
+				// If this property change was triggered by FormattedTextFieldVerifier
+				// return with no action
+				if (verifyingText) return;
 
 				ssCommon.removeRowSetListener();
 
@@ -239,6 +252,12 @@ public class SSFormattedTextField extends JFormattedTextField
 		}
 
 	}
+	
+	/**
+	 * Indicates if text is current being validated by InputVerifier. This allows
+	 * suppression of second property change if a call is made to setValue().
+	 */
+	private boolean verifyingText = false;
 
 	/**
 	 * Log4j Logger for component
