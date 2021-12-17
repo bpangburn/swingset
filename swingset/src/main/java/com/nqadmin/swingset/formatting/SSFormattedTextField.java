@@ -109,11 +109,15 @@ public class SSFormattedTextField extends JFormattedTextField
 
 			if (input instanceof SSFormattedTextField) {
 				logger.debug("{}: Instance of SSFormattedTextField.", () -> getColumnForLog());
+				
 				final SSFormattedTextField ssftf = (SSFormattedTextField) input;
-				AbstractFormatter formatter = ssftf.getFormatter();
-// TODO: Throw an exception or make a log warning if formatter==null?				
 				String formattedText = ssftf.getText();
+				
+				AbstractFormatter formatter = ssftf.getFormatter();
 				logger.debug("Formatter is: " + formatter + ".");
+				if (formatter==null) {
+					logger.warn("Null formatter encountered for formatted text field.");
+				}
 				
 				if (formatter!=null && formattedText!=null && !formattedText.isEmpty()) {
 					try {
