@@ -432,7 +432,7 @@ public class SSCommon implements Serializable {
 		if (!rowSetListenerAdded && rowSet!=null) {
 			rowSet.addRowSetListener(rowSetListener);
 			rowSetListenerAdded = true;
-			logger.debug(boundColumnName + " - RowSet Listener added.");
+			logger.debug("{} - RowSet Listener added.", () -> getColumnForLog());
 		}
 	}
 	
