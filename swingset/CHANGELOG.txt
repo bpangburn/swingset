@@ -7,8 +7,12 @@ SwingSet 4.0.8 - Released TBD
 ==============================================================================
 
 Changes:
-	1. stuff goes here...
-	2. stuff goes here...
+	1. SSFormattedTextField: Added setter/getter for background color used
+	   when focus is gained.
+	2. SSFormattedTextField: Added logic to immediately return from property
+	   change listener when setValue() is called from the input verifier.
+	3. SSCommon: Fixed minor logging inconsistency when RowSet Listener was
+	   added vs. removed.
 
 ==============================================================================
 SwingSet 4.0.7 - Released 2021-12-14
