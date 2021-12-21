@@ -13,6 +13,7 @@ Changes:
 	   change listener when setValue() is called from the input verifier.
 	3. SSCommon: Fixed minor logging inconsistency when RowSet Listener was
 	   added vs. removed.
+	4. Updated Log4j to 2.17.0.
 
 ==============================================================================
 SwingSet 4.0.7 - Released 2021-12-14
