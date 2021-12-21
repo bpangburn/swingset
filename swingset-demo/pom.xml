@@ -23,8 +23,7 @@
 
 		<version.log4j>2.17.0</version.log4j>
 		<version.swingset>4.0.8-SNAPSHOT</version.swingset>
-		<version.h2>1.4.200</version.h2>
-		<!-- <version.h2>2.0.202</version.h2> -->
+		<version.h2>2.0.202</version.h2>
 		<version.java-getopt>1.0.13</version.java-getopt>
 
 		<version.maven-enforcer-plugin>3.0.0</version.maven-enforcer-plugin>
