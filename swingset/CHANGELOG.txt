@@ -14,7 +14,7 @@ Changes:
 	3. SSCommon: Fixed minor logging inconsistency when RowSet Listener was
 	   added vs. removed.
 	4. Updated Log4j to 2.17.0.
-	5. Updated H2 to 2.0.202. Added type for ARRAY in demo (INTEGER) as
+	5. Updated H2 to 2.0.204. Added type for ARRAY in demo (INTEGER) as
 	   required by H2 2.x+.
 
 ==============================================================================
