@@ -78,7 +78,17 @@ The SwingSet samples/demo requires Java 1.8 or later.
 The swingset-demo can be run against any database.
 
 See "USING ALTERNATE DATABASE SERVERS" at the end of this document.
-  		
+
+NOTE: H2 was upgraded from 1.4.x to 2.0.x on 2021-12-23. If you have a 1.4.x EBLA database you can:
+  1. Backup/Restore the file as discussed here: http://h2database.com/html/tutorial.html#upgrade_backup_restore
+  2. **If you don't need your 1.4.x database file** you can delete it from your local file system:
+    `[user@domain ~]$ cd`
+    `[user@domain ~]$ rm ebla.mv.db`
+    `[user@domain ~]$ rm ebla.trace.db`
+  3. **If you don't need your 1.4.x database file** you can delete it using an H2 command:
+    `[user@domain ~]$ cd {folder_with_h2_jar}`
+    `[user@domain {folder_with_h2_jar}]$ java -cp h2*.jar org.h2.tools.DeleteDbFiles -dir "~" -db "ebla"`
+
 ## COMPILATION
 
 The SwingSet samples/demo requires Java 1.8 or later.
