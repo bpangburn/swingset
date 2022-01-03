@@ -134,7 +134,7 @@ public class SSFormattedTextField extends JFormattedTextField
 						// focus in the current field.
 					}
 				} else {
-				// value variable is set to null be default, but make a log entry
+					// value variable is set to null be default, but make a log entry
 					logger.debug("Null formatter, empty string, or null text.");
 				}
 
