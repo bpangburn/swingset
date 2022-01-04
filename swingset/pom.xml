@@ -23,7 +23,7 @@
 
 		<!--<version.glazedlists>1.11.0</version.glazedlists> -->
 		<version.glazedlists>1.11.1203</version.glazedlists>
-		<version.log4j>2.17.0</version.log4j>
+		<version.log4j>2.17.1</version.log4j>
 		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
 
 		<version.maven-enforcer-plugin>3.0.0</version.maven-enforcer-plugin>
