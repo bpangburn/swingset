@@ -86,16 +86,18 @@ public class SSFormattedTextField extends JFormattedTextField
 		implements FocusListener, SSComponentInterface {
 
 	/**
-	 * We want an InputVerifier in order to lock the focus down while the JFormattedTextField is in
+	 * Implementing an InputVerifier in order to lock the focus down while the JFormattedTextField is in
 	 * an invalid edit state.
 	 * 
-	 * Also, we add a call to validateField(), the default implementation of which just returns true.
-	 * This allows for the developer to add additional checks (normally range validation) beyond what
-	 * is provided by the Formatter/FormatterFactory, which generally only handles display of values
-	 * and/or character masks.
+	 * This implementation makes a call to validateField(), the default implementation of which just returns true.
+	 * 
+	 * The developer can override validateField() for a SwingSet formatted component to add additional checks
+	 * (normally range validation) beyond what is provided by the Formatter/FormatterFactory, which generally
+	 * only handles display of values and/or character masks.
 	 * 
 	 * This class should perform validation AND call setValue() which will trigger a RowSet update.
 	 * <p>
+	 * See https://docs.oracle.com/javase/8/docs/api/javax/swing/JFormattedTextField.html
 	 * See https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/JFormattedTextField.html
 	 */
 	public class FormattedTextFieldVerifier extends InputVerifier {
@@ -119,7 +121,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				AbstractFormatter formatter = ssftf.getFormatter();
 				logger.debug("Formatter is: " + formatter + ".");
 				if (formatter==null) {
-					logger.warn("Null formatter encountered for formatted text field.");
+					logger.error("Null formatter encountered for formatted text field.");
 				}
 				
 				if (formatter!=null && formattedText!=null && !formattedText.isEmpty()) {
@@ -128,7 +130,9 @@ public class SSFormattedTextField extends JFormattedTextField
 						// Apparently formatter.stringToValue(formattedText) accomplishes the same thing as commitEdit(),
 						// but this approach lets us know if the formatter is null.
 					} catch (ParseException pe) {
-						logger.warn(getColumnForLog() + ": String of '" + formattedText + "' generated a Parse Exception at " + pe.getErrorOffset() + ".", pe);
+						// Changing logging from 'warn' to 'debug' since we expect a ParseException for any
+						// user keystroke error.
+						logger.debug(getColumnForLog() + ": String of '" + formattedText + "' generated a Parse Exception at " + pe.getErrorOffset() + ".", pe);
 						result = false;
 						// We're not going to call setValue(null) if result is false, rather we'll keep the
 						// focus in the current field.
@@ -176,10 +180,13 @@ public class SSFormattedTextField extends JFormattedTextField
 			return result;
 		}
 		
-		@Override
-		public boolean shouldYieldFocus(JComponent input) {
-			return verify(input);
-		}
+//		// TODO: Single JComponent argument version of shouldYieldFocus is deprecated in Java 17
+//		// so eventually need to deprecate and add a method of the format:
+//		// shouldYieldFocus(JComponent source, JComponent target)
+//		@Override
+//		public boolean shouldYieldFocus(JComponent input) {
+//			return verify(input);
+//		}
 	}
 
 	/**
