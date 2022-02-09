@@ -130,12 +130,10 @@ public class SSFormattedTextField extends JFormattedTextField
 						try {
 							value = formatter.stringToValue(formattedText);
 							// Apparently formatter.stringToValue(formattedText) accomplishes the same thing
-							// as commitEdit(),
-							// but this approach lets us know if the formatter is null.
+							// as commitEdit(), but this approach lets us know if the formatter is null.
 						} catch (ParseException pe) {
 							// Changing logging from 'warn' to 'debug' since we expect a ParseException for
-							// any
-							// user keystroke error.
+							// any user keystroke error.
 							logger.debug(getColumnForLog() + ": String of '" + formattedText
 									+ "' generated a Parse Exception at " + pe.getErrorOffset() + ".", pe);
 							result = false;
@@ -159,14 +157,12 @@ public class SSFormattedTextField extends JFormattedTextField
 					}
 
 					// Set the value to null manually if stringToValue() was not called above, but
-					// null
-					// is a valid result (e.g., result==true)
+					// null is a valid result (e.g., result==true)
 					//
 					// Note that any call to setValue() in this method was triggering a second
-					// property change
-					// event so we added a boolean, verifyingText, that will immediately return from
-					// the
-					// second property change, without additional action.
+					// property change event so we added a boolean, verifyingText, that will
+					// immediately return from the second property change, without additional
+					// action.
 					if (result && value == null) {
 						ssftf.setValue(null);
 					}
@@ -175,7 +171,8 @@ public class SSFormattedTextField extends JFormattedTextField
 
 				// Update background color to RED for invalid value.
 				// Also force foreground color to BLACK in case it was previous RED (negative
-				// number)
+				// number).
+				//
 				// If value is valid, the background color will change when focus is lost.
 				//
 				// TODO: Consider moving this into a separate method (e.g.,
@@ -351,8 +348,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	}
 
 	// WE DON'T WANT TO REPLICATE THE JFormattedTextField CONSTRUCTOR THAT ACCEPTS
-	// AN OBJECT.
-	// FOR SWINGSET THAT SHOULD BE HANDLED SEPARATELY WITH BINDING.
+	// AN OBJECT. FOR SWINGSET THAT SHOULD BE HANDLED SEPARATELY WITH BINDING.
 
 	/**
 	 * Creates a new instance of SSFormattedTextField
