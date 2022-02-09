@@ -2,7 +2,7 @@
 
 ## LICENSE
 
-Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+Copyright (C) 2003-2022, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -75,10 +75,11 @@ The SwingSet samples/demo requires Java 1.8 or later.
   2. Download/save swingset-demo-x.y.z-jar-with-dependencies.jar to a local folder
   3. Type: `java -jar swingset-demo-x.y.z-jar-with-dependencies.jar`
   		
-The swingset-demo can be run against any database.
+The swingset-demo uses an in-memory H2 database by default, but can be run using other databases with some effort.
 
-See "USING ALTERNATE DATABASE SERVERS" at the end of this document.
-  		
+See "USING ALTERNATE DATABASE SERVERS" at the end of this document for more information.
+
+
 ## COMPILATION
 
 The SwingSet samples/demo requires Java 1.8 or later.

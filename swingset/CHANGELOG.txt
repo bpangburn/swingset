@@ -3,6 +3,22 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
 ==============================================================================
+SwingSet 4.0.8 - Released 2022-02-10
+==============================================================================
+
+Changes:
+	1. SSFormattedTextField: Added setter/getter for background color used
+	   when focus is gained.
+	2. SSFormattedTextField: Added logic to immediately return from property
+	   change listener when setValue() is called from the input verifier.
+	3. SSCommon: Fixed minor logging inconsistency when RowSet Listener was
+	   added vs. removed.
+	4. Updated Log4j to 2.17.1.
+	5. Updated H2 to 2.0.204. Added type for ARRAY in demo (INTEGER) as
+	   required by H2 2.x+.
+	6. Updated H2 to 2.1.110.
+	   
+==============================================================================
 SwingSet 4.0.7 - Released 2021-12-14
 ==============================================================================
 

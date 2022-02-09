@@ -8,7 +8,7 @@
 
 	<groupId>com.nqadmin.swingset</groupId>
 	<artifactId>swingset</artifactId>
-	<version>4.0.7</version>
+	<version>4.0.8-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>swingset</name>
@@ -23,7 +23,7 @@
 
 		<!--<version.glazedlists>1.11.0</version.glazedlists> -->
 		<version.glazedlists>1.11.1203</version.glazedlists>
-		<version.log4j>2.17.0</version.log4j>
+		<version.log4j>2.17.1</version.log4j>
 		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
 
 		<version.maven-enforcer-plugin>3.0.0</version.maven-enforcer-plugin>
@@ -35,7 +35,7 @@
 		<version.maven-site-plugin>3.9.1</version.maven-site-plugin>
 
 		<version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
-		<version.dependency-check-maven>6.5.0</version.dependency-check-maven>
+		<version.dependency-check-maven>6.5.3</version.dependency-check-maven>
 		<version.maven-source-plugin>3.2.1</version.maven-source-plugin>
 		<version.maven-javadoc-plugin>3.3.1</version.maven-javadoc-plugin>
 		<version.maven-gpg-plugin>3.0.1</version.maven-gpg-plugin>
