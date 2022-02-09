@@ -552,11 +552,35 @@ public class SSFormattedTextField extends JFormattedTextField
 	}
 
 	/**
-	 * Sets text color to red for negative numbers, otherwise black.
+	 * This currently sets text color to red for negative numbers, otherwise black.
+	 * 
+	 * A developer could override this method to do other things.
+	 * 
+	 * TODO: In the future it might be nice to make a plugable decorator and/or maintain
+	 * some of the details in a properties file.
+	 *
+	 * @param _value - value to be validated
+	 * 
+	 * @deprecated use updateTextDecorator()
+	 */
+	@Deprecated
+	public void updateTextColor(final Object _value) {
+
+		updateTextDecorator(_value);
+
+	}
+	
+	/**
+	 * This currently sets text color to red for negative numbers, otherwise black.
+	 * 
+	 * A developer could override this method to do other things.
+	 * 
+	 * TODO: In the future it might be nice to make a plugable decorator and/or maintain
+	 * some of the details in a properties file.
 	 *
 	 * @param _value - value to be validated
 	 */
-	public void updateTextColor(final Object _value) {
+	public void updateTextDecorator(final Object _value) {
 
 		if (((_value instanceof Double) && ((Double) _value < 0.0))
 				|| ((_value instanceof Float) && ((Float) _value < 0.0))
@@ -568,7 +592,6 @@ public class SSFormattedTextField extends JFormattedTextField
 		}
 
 	}
-
 
 	/**
 	 * Checks if the value is valid of the component. Override for custom validations
