@@ -168,6 +168,9 @@ public class SSFormattedTextField extends JFormattedTextField
 			// Update background color to RED for invalid value.
 			// Also force foreground color to BLACK in case it was previous RED (negative number)
 			// If value is valid, the background color will change when focus is lost.
+			//
+			// TODO: Consider moving this into a separate method (e.g., displayErrorIndicator()).
+			// May be able to place all decoration code in one method.
 			if (result==false) {
 				setBackground(Color.RED);
 				setForeground(Color.BLACK);
