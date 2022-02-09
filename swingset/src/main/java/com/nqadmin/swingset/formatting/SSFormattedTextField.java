@@ -95,7 +95,8 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * (normally range validation) beyond what is provided by the Formatter/FormatterFactory, which generally
 	 * only handles display of values and/or character masks.
 	 * 
-	 * This class should perform validation AND call setValue() which will trigger a RowSet update.
+	 * This inner class performs validation via verifyField() AND calls setValue(),
+	 * which triggers a RowSet update.
 	 * <p>
 	 * See https://docs.oracle.com/javase/8/docs/api/javax/swing/JFormattedTextField.html
 	 * See https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/JFormattedTextField.html
