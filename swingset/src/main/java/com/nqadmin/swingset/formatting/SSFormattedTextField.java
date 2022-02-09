@@ -108,80 +108,98 @@ public class SSFormattedTextField extends JFormattedTextField
 
 			boolean result = true;
 			Object value = null;
-			
+
 			// Set indicator to suppress duplicate property change event if
 			// a call is made to setValue()
 			verifyingText = true;
 
-			if (input instanceof SSFormattedTextField) {
-				logger.debug("{}: Instance of SSFormattedTextField.", () -> getColumnForLog());
-				
-				final SSFormattedTextField ssftf = (SSFormattedTextField) input;
-				String formattedText = ssftf.getText();
-				
-				AbstractFormatter formatter = ssftf.getFormatter();
-				logger.debug("Formatter is: " + formatter + ".");
-				if (formatter==null) {
-					logger.error("Null formatter encountered for formatted text field.");
-				}
-				
-				if (formatter!=null && formattedText!=null && !formattedText.isEmpty()) {
-					try {
-						value = formatter.stringToValue(formattedText);
-						// Apparently formatter.stringToValue(formattedText) accomplishes the same thing as commitEdit(),
-						// but this approach lets us know if the formatter is null.
-					} catch (ParseException pe) {
-						// Changing logging from 'warn' to 'debug' since we expect a ParseException for any
-						// user keystroke error.
-						logger.debug(getColumnForLog() + ": String of '" + formattedText + "' generated a Parse Exception at " + pe.getErrorOffset() + ".", pe);
-						result = false;
-						// We're not going to call setValue(null) if result is false, rather we'll keep the
-						// focus in the current field.
+			try {
+				if (input instanceof SSFormattedTextField) {
+					logger.debug("{}: Instance of SSFormattedTextField.", () -> getColumnForLog());
+
+					final SSFormattedTextField ssftf = (SSFormattedTextField) input;
+					String formattedText = ssftf.getText();
+
+					AbstractFormatter formatter = ssftf.getFormatter();
+					logger.debug("Formatter is: " + formatter + ".");
+					if (formatter == null) {
+						logger.error("Null formatter encountered for formatted text field.");
 					}
-				} else {
-					// value variable is set to null by default, but make a log entry
-					logger.debug("Null formatter, empty string, or null text.");
+
+					if (formatter != null && formattedText != null && !formattedText.isEmpty()) {
+						try {
+							value = formatter.stringToValue(formattedText);
+							// Apparently formatter.stringToValue(formattedText) accomplishes the same thing
+							// as commitEdit(),
+							// but this approach lets us know if the formatter is null.
+						} catch (ParseException pe) {
+							// Changing logging from 'warn' to 'debug' since we expect a ParseException for
+							// any
+							// user keystroke error.
+							logger.debug(getColumnForLog() + ": String of '" + formattedText
+									+ "' generated a Parse Exception at " + pe.getErrorOffset() + ".", pe);
+							result = false;
+							// We're not going to call setValue(null) if result is false, rather we'll keep
+							// the
+							// focus in the current field.
+						}
+					} else {
+						// value variable is set to null by default, but make a log entry
+						logger.debug("Null formatter, empty string, or null text.");
+					}
+
+					// now perform custom validation/range checks
+					if (result) {
+						result = validateField(value);
+					}
+
+					// update text color for negatives, where applicable
+					if (result) {
+						updateTextColor(value);
+					}
+
+					// Set the value to null manually if stringToValue() was not called above, but
+					// null
+					// is a valid result (e.g., result==true)
+					//
+					// Note that any call to setValue() in this method was triggering a second
+					// property change
+					// event so we added a boolean, verifyingText, that will immediately return from
+					// the
+					// second property change, without additional action.
+					if (result && value == null) {
+						ssftf.setValue(null);
+					}
+
 				}
 
-				// now perform custom validation/range checks
-				if (result) {
-					result = validateField(value);
-				}
-
-				// update text color for negatives, where applicable
-				if (result) {
-					updateTextColor(value);
-				}
-				
-				// Set the value to null manually if stringToValue() was not called above, but null
-				// is a valid result (e.g., result==true)
+				// Update background color to RED for invalid value.
+				// Also force foreground color to BLACK in case it was previous RED (negative
+				// number)
+				// If value is valid, the background color will change when focus is lost.
 				//
-				// Note that any call to setValue() in this method was triggering a second property change
-				// event so we added a boolean, verifyingText, that will immediately return from the
-				// second property change, without additional action.
-				if (result && value==null) {
-					ssftf.setValue(null);
+				// TODO: Consider moving this into a separate method (e.g.,
+				// displayErrorIndicator()).
+				// May be able to place all decoration code in one method.
+				if (result == false) {
+					setBackground(Color.RED);
+					setForeground(Color.BLACK);
 				}
 
-			}
+			} catch (final Exception _e) {
+				// Log the error and fail the validation.
+				logger.error(getColumnForLog() + ": Field validation triggered an exception.", _e);
+				result = false;
 
-			// Update background color to RED for invalid value.
-			// Also force foreground color to BLACK in case it was previous RED (negative number)
-			// If value is valid, the background color will change when focus is lost.
-			//
-			// TODO: Consider moving this into a separate method (e.g., displayErrorIndicator()).
-			// May be able to place all decoration code in one method.
-			if (result==false) {
-				setBackground(Color.RED);
-				setForeground(Color.BLACK);
+			} finally {
+				// Update indicator used to suppress duplicate property change event if
+				// a call is made to setValue()
+				verifyingText = false;
 			}
-			
-			// Update indicator used to suppress duplicate property change event if
-			// a call is made to setValue()
-			verifyingText = false;
 
 			// return
 			return result;
+
 		}
 		
 //		// TODO: Single JComponent argument version of shouldYieldFocus is deprecated in Java 17
