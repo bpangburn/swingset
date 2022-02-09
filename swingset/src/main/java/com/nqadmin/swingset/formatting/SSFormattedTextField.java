@@ -315,6 +315,9 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * Creates a new instance of SSFormattedTextField
 	 *
 	 * @param _formatter AbstractFormatter to use for formatting.
+	 * 
+	 * TODO: Consider using this() to force all constructors through one method
+	 * so that any constructor customizations don't have to be duplicated. 
 	 */
 	public SSFormattedTextField(final AbstractFormatter _formatter) {
 		super(_formatter);
