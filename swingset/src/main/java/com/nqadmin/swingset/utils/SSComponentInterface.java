@@ -55,6 +55,8 @@ import org.apache.logging.log4j.LogManager;
 
 import java.sql.Connection;
 
+import com.nqadmin.swingset.SSDataNavigator;
+
 // SSComponentInterface.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
@@ -312,6 +314,14 @@ public interface SSComponentInterface {
 	 */
 	default RowSet getRowSet() {
 		return getSSCommon().getRowSet();
+	}
+
+	/**
+	 * Returns the SSDataNavigator associated with this component.
+	 * @return the SSDataNavigator
+	 */
+	default SSDataNavigator getSSDataNavigator() {
+		return SSDataNavigator.getSSDataNavigator(getRowSet());
 	}
 	
 	/**

@@ -97,6 +97,7 @@ public class SSDataNavigator extends JPanel {
 
 	private static class RowSetState {
 		private boolean inserting;
+		private SSDataNavigator navigator;
 	}
 
 	// don't have to worry about concurrency, always EDT
@@ -112,6 +113,12 @@ public class SSDataNavigator extends JPanel {
 		}
 	}
 
+	private static void setDataNavigator(RowSet rs, SSDataNavigator navigator) {
+		if (rs != null) {
+			getRowSetState(rs).navigator = navigator;
+		}
+	}
+
 	/**
 	 * Find out if the specified RowSet is on the insert row.
 	 * @param rs get state for this RowSet
@@ -119,6 +126,15 @@ public class SSDataNavigator extends JPanel {
 	 */
 	public static boolean isInserting(RowSet rs) {
 		return rs == null ? false : getRowSetState(rs).inserting;
+	}
+
+	/**
+	 * Find the data navigator for the specified RowSet.
+	 * @param rs get information for this RowSet
+	 * @return the associated data navigator
+	 */
+	public static SSDataNavigator getSSDataNavigator(RowSet rs) {
+		return rs == null ? null : getRowSetState(rs).navigator;
 	}
 
 	/**
@@ -1342,6 +1358,7 @@ public class SSDataNavigator extends JPanel {
 
 		try {
 			setRowModified(false);
+			setDataNavigator(rowSet, this);
 			updateNavigator();
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
