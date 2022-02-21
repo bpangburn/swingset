@@ -50,12 +50,16 @@ public class SSDateField extends SSFormattedTextField {
 
 	/**
 	 * constant representing the dd/mm/yyyy date format
+	 * @deprecated
 	 */
+	@Deprecated
 	public static final int DDMMYYYY = 1;
 
 	/**
 	 * constant representing the mm/dd/yyyy date format
+	 * @deprecated 
 	 */
+	@Deprecated
 	public static final int MMDDYYYY = 0;
 
 	/**
@@ -67,7 +71,16 @@ public class SSDateField extends SSFormattedTextField {
      *  Creates a default SSDateField object
      */
     public SSDateField(){
-    	this(new SSDateFormatterFactory());
+    	this(SSDateFormatterFactory.get());
+    }
+
+    /**
+     *  Creates a new instance of SSDateField with the specified format
+     *  @param _format - format to be used while the date field is in edit mode
+     *  allowed values are MMDDYYYY or DDMMYYYY or YYYYMMDD
+     */
+    public SSDateField(final Format _format) {
+        this(SSDateFormatterFactory.get(_format));
     }
 
     /**
@@ -75,8 +88,9 @@ public class SSDateField extends SSFormattedTextField {
      *  @param format - format to be used while the date field is in edit mode
      *  allowed values are MMDDYYYY or DDMMYYYY
      */
+	@Deprecated
     public SSDateField(final int format) {
-        this(new SSDateFormatterFactory(format));
+        this(SSDateFormatterFactory.get(format));
     }
 
     /**
@@ -85,8 +99,10 @@ public class SSDateField extends SSFormattedTextField {
      */
     public SSDateField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
-        // TODO Consider setting to null vs system date.
-        setValue(new java.util.Date());
+		// TODO Consider setting to null vs system date.
+		if (!getAllowNull()) {
+			setValue(new java.util.Date());
+		}
     }
 
     /**
@@ -94,7 +110,9 @@ public class SSDateField extends SSFormattedTextField {
      */
     @Override
 	public void cleanField() {
-    	// TODO Consider setting to null vs system date.
-        setValue(new java.util.Date());
+		// TODO Consider setting to null vs system date.
+		if (!getAllowNull()) {
+			setValue(new java.util.Date());
+		}
     }
 }

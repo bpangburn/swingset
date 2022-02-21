@@ -56,6 +56,7 @@ import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.formatting.Format;
 import com.nqadmin.swingset.formatting.SSCuitField;
 import com.nqadmin.swingset.formatting.SSCurrencyField;
 import com.nqadmin.swingset.formatting.SSDateField;
@@ -98,6 +99,7 @@ public class TestFormattedComponents extends JFrame {
 	JLabel lblSSCuitField = new JLabel("SSCuitField");
 	JLabel lblSSCurrencyField = new JLabel("SSCurrencyField");
 	JLabel lblSSDateField = new JLabel("SSDateField");
+	JLabel lblSSDateFieldNull = new JLabel("SSDateFieldNull");
 	JLabel lblSSFormattedTextField = new JLabel("SSFormattedTextField");
 	JLabel lblSSIntegerField = new JLabel("SSIntegerField");
 	JLabel lblSSNumericField = new JLabel("SSNumericField");
@@ -112,7 +114,8 @@ public class TestFormattedComponents extends JFrame {
 	SSTextField txtSwingSetFormattedTestPK = new SSTextField();
 	SSCuitField fmtSSCuitField = new SSCuitField();
 	SSCurrencyField fmtSSCurrencyField = new SSCurrencyField();
-	SSDateField fmtSSDateField = new SSDateField(SSDateField.MMDDYYYY);
+	SSDateField fmtSSDateField = new SSDateField(Format.DATE_MMDDYYYY);
+	SSDateField fmtSSDateFieldNull = new SSDateField(Format.DATE_YYYYMMDD);
 	SSFormattedTextField fmtSSFormattedTextField = new SSFormattedTextField();
 	SSIntegerField fmtSSIntegerField = new SSIntegerField();
 	SSNumericField fmtSSNumericField = new SSNumericField();
@@ -274,6 +277,7 @@ public class TestFormattedComponents extends JFrame {
 				fmtSSCuitField.bind(rowset, "ss_cuit_field");
 				fmtSSCurrencyField.bind(rowset, "ss_currency_field");
 				fmtSSDateField.bind(rowset, "ss_date_field");
+				fmtSSDateFieldNull.bind(rowset, "ss_date_field_null");
 				fmtSSFormattedTextField.bind(rowset, "ss_formatted_text_field");
 				fmtSSIntegerField.bind(rowset, "ss_integer_field");
 				fmtSSNumericField.bind(rowset, "ss_numeric_field");
@@ -290,6 +294,7 @@ public class TestFormattedComponents extends JFrame {
 				lblSSCuitField.setPreferredSize(MainClass.labelDim);
 				lblSSCurrencyField.setPreferredSize(MainClass.labelDim);
 				lblSSDateField.setPreferredSize(MainClass.labelDim);
+				lblSSDateFieldNull.setPreferredSize(MainClass.labelDim);
 				lblSSFormattedTextField.setPreferredSize(MainClass.labelDim);
 				lblSSIntegerField.setPreferredSize(MainClass.labelDim);
 				lblSSNumericField.setPreferredSize(MainClass.labelDim);
@@ -306,6 +311,7 @@ public class TestFormattedComponents extends JFrame {
 				fmtSSCuitField.setPreferredSize(MainClass.ssDim);
 				fmtSSCurrencyField.setPreferredSize(MainClass.ssDim);
 				fmtSSDateField.setPreferredSize(MainClass.ssDim);
+				fmtSSDateFieldNull.setPreferredSize(MainClass.ssDim);
 				fmtSSFormattedTextField.setPreferredSize(MainClass.ssDim);
 				fmtSSIntegerField.setPreferredSize(MainClass.ssDim);
 				fmtSSNumericField.setPreferredSize(MainClass.ssDim);
@@ -331,6 +337,8 @@ public class TestFormattedComponents extends JFrame {
 				contentPane.add(lblSSCurrencyField, constraints);
 				constraints.gridy++;
 				contentPane.add(lblSSDateField, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSSDateFieldNull, constraints);
 				constraints.gridy++;
 				contentPane.add(lblSSFormattedTextField, constraints);
 				constraints.gridy++;
@@ -358,6 +366,8 @@ public class TestFormattedComponents extends JFrame {
 				contentPane.add(fmtSSCurrencyField, constraints);
 				constraints.gridy++;
 				contentPane.add(fmtSSDateField, constraints);
+				constraints.gridy++;
+				contentPane.add(fmtSSDateFieldNull, constraints);
 				constraints.gridy++;
 				contentPane.add(fmtSSFormattedTextField, constraints);
 				constraints.gridy++;

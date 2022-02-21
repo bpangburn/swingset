@@ -81,7 +81,8 @@ CREATE TABLE IF NOT EXISTS swingset_formatted_test_data
     swingset_formatted_test_pk INTEGER DEFAULT nextval('swingset_formatted_test_seq') NOT NULL PRIMARY KEY,
     ss_cuit_field VARCHAR(13), /* Tax ID for the country of Argentina. See https://meta.cdq.ch/CUIT_number_(Argentina) */
     ss_currency_field DECIMAL(20,2),
-    ss_date_field DATE,
+    ss_date_field DATE NOT NULL,
+    ss_date_field_null DATE,
     ss_formatted_text_field VARCHAR(50), /* parent class for formatted components */
     ss_integer_field INT, 
     ss_numeric_field DECIMAL(20,4),
@@ -92,13 +93,13 @@ CREATE TABLE IF NOT EXISTS swingset_formatted_test_data
 );
 
 
-MERGE INTO swingset_formatted_test_data VALUES (1,'20-10563145-8',1234567.89,'2020-01-01','This is some random text 1.',2384709,4534.4321,0.99375,'111-22-3333','12:34:56',NULL);
-MERGE INTO swingset_formatted_test_data VALUES (2,'23-10563146-8',7222567.11,'2021-02-03','This is some random text 2.',435634,1237643.1111,0.78345,'221-22-3333','12:00:00',NULL);
-MERGE INTO swingset_formatted_test_data VALUES (3,'24-10563147-8',52347.23,'2020-02-29','This is some random text 3.',345237745,435652.2222,0.23456,'331-22-3333','01:22:33',NULL);
-MERGE INTO swingset_formatted_test_data VALUES (4,'27-10563148-8',123567.34,'2022-03-04','This is some random text 4.',45234,4523456.3333,0.12345,'441-22-3333','00:15:20',NULL);
-MERGE INTO swingset_formatted_test_data VALUES (5,'20-10563149-8',334567.45,'2020-04-05','This is some random text 5.',345,435645.4444,0.88888,'551-22-3333','23:44:55',NULL);
-MERGE INTO swingset_formatted_test_data VALUES (6,'23-10563140-8',441234567.67,'2020-05-06','This is some random text 6.',95678467,5555.4321,1.00000,'661-22-3333','03:59:59',NULL);
-MERGE INTO swingset_formatted_test_data VALUES (7,'24-10563141-8',77234567.89,'2020-06-07','This is some random text 7.',345678343,345645777345.6666,0.66666,'771-22-3333','14:55:00',NULL);
+MERGE INTO swingset_formatted_test_data VALUES (1,'20-10563145-8',1234567.89,  '2020-01-01','2010-01-01','This is some random text 1.',2384709,4534.4321,0.99375,'111-22-3333','12:34:56',NULL);
+MERGE INTO swingset_formatted_test_data VALUES (2,'23-10563146-8',7222567.11,  '2021-02-03','2011-02-03','This is some random text 2.',435634,1237643.1111,0.78345,'221-22-3333','12:00:00',NULL);
+MERGE INTO swingset_formatted_test_data VALUES (3,'24-10563147-8',52347.23,    '2020-02-29','2010-02-29','This is some random text 3.',345237745,435652.2222,0.23456,'331-22-3333','01:22:33',NULL);
+MERGE INTO swingset_formatted_test_data VALUES (4,'27-10563148-8',123567.34,   '2022-03-04','2012-03-04','This is some random text 4.',45234,4523456.3333,0.12345,'441-22-3333','00:15:20',NULL);
+MERGE INTO swingset_formatted_test_data VALUES (5,'20-10563149-8',334567.45,   '2020-04-05','2010-04-05','This is some random text 5.',345,435645.4444,0.88888,'551-22-3333','23:44:55',NULL);
+MERGE INTO swingset_formatted_test_data VALUES (6,'23-10563140-8',441234567.67,'2020-05-06','2010-05-06','This is some random text 6.',95678467,5555.4321,1.00000,'661-22-3333','03:59:59',NULL);
+MERGE INTO swingset_formatted_test_data VALUES (7,'24-10563141-8',77234567.89, '2020-06-07','2010-06-07','This is some random text 7.',345678343,345645777345.6666,0.66666,'771-22-3333','14:55:00',NULL);
 
 
 
