@@ -318,8 +318,15 @@ public interface SSComponentInterface {
 
 	/**
 	 * Returns the SSDataNavigator associated with this component.
+	 * <p>
+	 * This was added per discussion #93 to support a legacy
+	 * SwingSet with the need to setup key listeners on individual
+	 * components to trigger action on the SSDataNavigator buttons.
+	 * <p>
+	 * @deprecated Use ActionMap instead.
 	 * @return the SSDataNavigator
 	 */
+	@Deprecated
 	default SSDataNavigator getSSDataNavigator() {
 		return SSDataNavigator.getSSDataNavigator(getRowSet());
 	}

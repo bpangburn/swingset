@@ -130,6 +130,10 @@ public class SSDataNavigator extends JPanel {
 
 	/**
 	 * Find the data navigator for the specified RowSet.
+	 * <p>
+	 * Originally added to support SSCOmponentInterface.getSSDataNavigator(),
+	 * see discussion #93,
+	 * but may come in handy when implementing ActionMap interface.
 	 * @param rs get information for this RowSet
 	 * @return the associated data navigator
 	 */
