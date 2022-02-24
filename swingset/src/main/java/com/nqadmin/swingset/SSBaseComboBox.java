@@ -938,6 +938,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * database.
 	 * @return true if combo box can have null value
 	 */
+	@Override
 	public boolean getAllowNull() {
 		return !isComboBoxNavigator() && getSSCommon().getAllowNull();
 	}
