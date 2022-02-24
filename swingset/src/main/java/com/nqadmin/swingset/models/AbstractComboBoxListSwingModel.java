@@ -952,11 +952,9 @@ public abstract class AbstractComboBoxListSwingModel {
 	//
 	// I think this behavior can be conditional on whether or not
 	// glazed is used or if this is actually installed as a model.
-	// In the "right" places could do "modifyListItemWithSet = !installed".
-	// or "useClone = modifyListItemWithSet || !installed"
-	// But it doesn't seem worth the testing for a tiny performance gain.
-	// Could just fire everything changed if that's needed,
-	// but that would would prbably be a big performance loss in many cases.
+	// But it doesn't seem worth the testing for a miniscule performance gain.
+	// Don't want to fire everything changed since that's
+	// probably be a big performance loss in most cases.
 	private Object setElem(int _listItemIndex, int _elemIndex, Object _newElem) {
 		ListItemWrite0 listItem = (ListItemWrite0) itemList.get(_listItemIndex);
 		try {
