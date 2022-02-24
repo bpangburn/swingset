@@ -589,7 +589,10 @@ public class SSFormattedTextField extends JFormattedTextField
 				logger.debug("{}: getObject() - " + newValue, () -> getColumnForLog());
 				setValue(newValue);
 			} else {
-				logger.error(getColumnForLog() + ": JDBCType of " + jdbcType.toString() + " was cast to unsupported type of " + newValue.getClass().getName() + " based on JDBC connection getTypeMap().");
+				String newValueString = newValue == null
+						? "(null)"
+						: newValue.getClass().getName();
+				logger.error(getColumnForLog() + ": JDBCType of " + jdbcType.toString() + " was cast to unsupported type of " + newValueString + " based on JDBC connection getTypeMap().");
 			}
 
 		} catch (final java.sql.SQLException sqe) {
