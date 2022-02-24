@@ -45,9 +45,9 @@ package com.nqadmin.swingset.formatting;
 public enum Format {
 	/** default date format */
 	DATE,
-	/** Date MMDDYYY */
+	/** Date MMDDYYYY */
 	DATE_MMDDYYYY  (DATE),
-	/** Date DDMMYYY */
+	/** Date DDMMYYYY */
 	DATE_DDMMYYYY (DATE),
 	/** Date YYYYMMDD */
 	DATE_YYYYMMDD (DATE) 

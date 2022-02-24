@@ -133,18 +133,16 @@ public class SSDBNavImpl implements SSDBNav {
 			
 			//logger.debug("Clearing component type of: {}. Loop index=" + i, () -> comps[i].getClass().getSimpleName());
 
-			//
-			// TODO: how about "initComponentValue()" in SSComponent.
-			//
-			// Are the non-sscomponent items needed?
-			//
-
-			// IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING
-			if (comps[i] instanceof SSFormattedTextField) {
-				((SSFormattedTextField) comps[i]).setValue(null);
-			} else if (comps[i] instanceof JTextField) {
-				((JTextField) comps[i]).setText("");
-			} else if (comps[i] instanceof JList<?>) {
+			if (comps[i] instanceof JTextField) {
+				// IF IT IS A SSFormattedTextField SET ITS VALUE TO NULL (to avoid parse
+				// exception)
+				if (comps[i] instanceof SSFormattedTextField) {
+					((SSFormattedTextField) comps[i]).cleanField();
+				} else {
+					// IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING
+					((JTextField) comps[i]).setText("");
+				}
+			} else if (comps[i] instanceof JList) {
 				// IF IT IS A JList, CLEAR IT
 				((JList<?>) comps[i]).clearSelection();
 			} else if (comps[i] instanceof JTextArea) {

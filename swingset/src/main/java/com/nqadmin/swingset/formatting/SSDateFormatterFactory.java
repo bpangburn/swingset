@@ -60,7 +60,7 @@ public class SSDateFormatterFactory {
 
 	/**
 	 * Constant for dd/MM/yyyy date format
-	 * @deprecated 
+	 * @deprecated use {@link Format}'s DATE_DDMMYYYY
 	 */
 	@Deprecated
 	public static final int DDMMYYYY = 1;
@@ -72,14 +72,14 @@ public class SSDateFormatterFactory {
 
 	/**
 	 * Constant for MM/dd/yyyy date format
-	 * @deprecated 
+	 * @deprecated use {@link Format}'s DATE_MMDDYYYY
 	 */
 	@Deprecated
 	public static final int MMDDYYYY = 0;
 
 	/**
 	 * Constant for yyyy-MM-dd date format
-	 * @deprecated 
+	 * @deprecated use {@link Format}'s DATE_YYYYMMDD
 	 */
 	@Deprecated
 	public static final int YYYYMMDD = 2;
@@ -88,8 +88,6 @@ public class SSDateFormatterFactory {
 	 * Create formatter factory with default pattern.
 	 * @return
 	 */
-	// Don't like the way default is buried in get(Format) case label.
-	// Could add a default field in enum.
 	public static DefaultFormatterFactory get() {
 		return get(Format.DATE);
 	}
