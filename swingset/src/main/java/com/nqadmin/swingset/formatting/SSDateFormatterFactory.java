@@ -58,7 +58,7 @@ public class SSDateFormatterFactory {
 
 	/**
 	 * Constant for dd/MM/yyyy date format
-	 * @deprecated use {@link Format}'s DATE_DDMMYYYY
+	 * @deprecated use {@link Format#DATE_DDMMYYYY}
 	 */
 	@Deprecated
 	public static final int DDMMYYYY = 1;
@@ -70,14 +70,14 @@ public class SSDateFormatterFactory {
 
 	/**
 	 * Constant for MM/dd/yyyy date format
-	 * @deprecated use {@link Format}'s DATE_MMDDYYYY
+	 * @deprecated use {@link Format#DATE_MMDDYYYY}
 	 */
 	@Deprecated
 	public static final int MMDDYYYY = 0;
 
 	/**
 	 * Constant for yyyy-MM-dd date format
-	 * @deprecated use {@link Format}'s DATE_YYYYMMDD
+	 * @deprecated use {@link Format#DATE_YYYYMMDD}
 	 */
 	@Deprecated
 	public static final int YYYYMMDD = 2;

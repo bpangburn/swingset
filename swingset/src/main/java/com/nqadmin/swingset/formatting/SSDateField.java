@@ -50,14 +50,14 @@ public class SSDateField extends SSFormattedTextField {
 
 	/**
 	 * constant representing the dd/mm/yyyy date format
-	 * @deprecated use {@link Format}'s DATE_DDMMYYYY
+	 * @deprecated use {@link Format#DATE_DDMMYYYY}
 	 */
 	@Deprecated
 	public static final int DDMMYYYY = 1;
 
 	/**
 	 * constant representing the mm/dd/yyyy date format
-	 * @deprecated use {@link Format}'s DATE_MMDDYYYY
+	 * @deprecated use {@link Format#DATE_MMDDYYYY}
 	 */
 	@Deprecated
 	public static final int MMDDYYYY = 0;
