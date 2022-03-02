@@ -45,7 +45,6 @@ import java.sql.SQLException;
 import javax.sql.RowSet;
 import javax.swing.JCheckBox;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.utils.SSCommon;

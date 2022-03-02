@@ -48,7 +48,6 @@ import java.util.List;
 
 import javax.sql.RowSet;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static com.nqadmin.swingset.datasources.RowSetOps.*;

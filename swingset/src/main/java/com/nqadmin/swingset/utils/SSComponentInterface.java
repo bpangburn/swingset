@@ -51,8 +51,6 @@ import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
-import org.apache.logging.log4j.LogManager;
-
 import java.sql.Connection;
 
 import com.nqadmin.swingset.SSDataNavigator;

@@ -46,7 +46,6 @@ import javax.sql.RowSet;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.utils.SSCommon;

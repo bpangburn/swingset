@@ -41,7 +41,6 @@ import java.text.SimpleDateFormat;
 
 import javax.swing.text.DateFormatter;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.utils.SSUtils;

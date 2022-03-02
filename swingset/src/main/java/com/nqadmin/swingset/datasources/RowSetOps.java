@@ -54,8 +54,6 @@ import java.util.Optional;
 
 import javax.sql.RowSet;
 
-import org.apache.logging.log4j.LogManager;
-
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSUtils;

@@ -39,7 +39,6 @@ package com.nqadmin.swingset.formatting;
 
 import javax.swing.text.MaskFormatter;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.utils.SSUtils;

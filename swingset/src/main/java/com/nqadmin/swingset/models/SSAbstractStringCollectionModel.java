@@ -47,8 +47,6 @@ import java.util.List;
 
 import javax.sql.RowSet;
 
-import org.apache.logging.log4j.LogManager;
-
 import com.nqadmin.swingset.utils.SSUtils;
 
 // SSAbstractStringCollectionModel.java
