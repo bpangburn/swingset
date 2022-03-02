@@ -70,7 +70,7 @@ import com.nqadmin.swingset.SSDataGrid;
 //public abstract class SSDataGridScreenHelper extends JInternalFrame {
 public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	
-	private static Logger logger = LogManager.getLogger(); // Log4j Logger for component
+	private static Logger logger = SSUtils.getLogger(); // Log4j Logger for component
 	
 	private static final long serialVersionUID = 3558830097072342112L; // unique serial ID
 

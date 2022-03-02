@@ -42,6 +42,8 @@ import javax.swing.text.MaskFormatter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.utils.SSUtils;
+
 // 2019-02-27-BP: this should be named SSSSSSNFormatterFactory for consistency.
 // SSSSNFormatterFactory.java
 //
@@ -56,7 +58,7 @@ public class SSSSNFormatterFactory extends javax.swing.text.DefaultFormatterFact
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 	/**
 	 * unique serial id
 	 */

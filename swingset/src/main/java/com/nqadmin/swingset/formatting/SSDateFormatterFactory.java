@@ -44,6 +44,8 @@ import javax.swing.text.DateFormatter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.utils.SSUtils;
+
 // SSDateFormatterFactory.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
@@ -61,7 +63,7 @@ public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFac
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Constant for MM/dd/yyyy date format

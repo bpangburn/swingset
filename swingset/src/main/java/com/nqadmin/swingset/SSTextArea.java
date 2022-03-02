@@ -45,6 +45,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSUtils;
 
 // SSTextArea.java
 //
@@ -62,7 +63,7 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id

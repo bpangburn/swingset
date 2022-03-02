@@ -272,7 +272,7 @@ public class SSSyncManager {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * # of records to step back if doing a sequential search because SSDBComboBox and RowSet results don't match.

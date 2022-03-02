@@ -56,7 +56,7 @@ public class SSProperties {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 	
 	/**
 	 * SwingSet key/value pair properties from swingset.properties file.

@@ -66,6 +66,8 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.utils.SSUtils;
+
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
 
 // AbstractComboBoxListSwingModel.java
@@ -163,7 +165,7 @@ public abstract class AbstractComboBoxListSwingModel {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Log4j Logger for component

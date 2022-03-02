@@ -52,6 +52,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.models.SSListItem;
+import com.nqadmin.swingset.utils.SSUtils;
 
 
 // SSComboBox.java
@@ -254,7 +255,7 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * Log4j Logger for component
 	 */
 	@SuppressWarnings("unused")
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Value to represent that no item has been selected in the combo box.

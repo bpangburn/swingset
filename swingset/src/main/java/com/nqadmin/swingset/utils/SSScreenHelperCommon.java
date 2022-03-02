@@ -85,7 +85,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial ID

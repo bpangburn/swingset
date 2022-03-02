@@ -58,6 +58,7 @@ import org.apache.logging.log4j.LogManager;
 
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.utils.SSCommon;
+import com.nqadmin.swingset.utils.SSUtils;
 
 // RowSetOps.java
 //
@@ -130,7 +131,7 @@ public class RowSetOps {
 					? Optional.empty()
 					: Optional.of(nullable == ResultSetMetaData.columnNullable);
 		} catch (SQLException ex) {
-			LogManager.getLogger().error(() -> String.format("SQL Exception for column %d.",
+			SSUtils.getLogger().error(() -> String.format("SQL Exception for column %d.",
 					_columnIndex, ex));
 			return Optional.empty();
 		}
@@ -147,7 +148,7 @@ public class RowSetOps {
 		try {
 			return isNullable(_resultSet, getColumnIndex(_resultSet, _columnName));
 		} catch (SQLException ex) {
-			LogManager.getLogger().error(() -> String.format("SQL Exception for column %s.",
+			SSUtils.getLogger().error(() -> String.format("SQL Exception for column %s.",
 					_columnName, ex));
 			return Optional.empty();
 		}
@@ -250,11 +251,11 @@ public class RowSetOps {
 				break;
 
 			default:
-				LogManager.getLogger().error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
+				SSUtils.getLogger().error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
 			} // end switch
 
 		} catch (final SQLException se) {
-			LogManager.getLogger().error("SQL Exception for column " + _columnName + ".", se);
+			SSUtils.getLogger().error("SQL Exception for column " + _columnName + ".", se);
 		}
 
 		return value;
@@ -376,12 +377,12 @@ public class RowSetOps {
 	@SuppressWarnings("null")
 	public static void updateColumnText(final RowSet _rowSet, final String _updatedValue, final String _columnName, final boolean _allowNull) throws NullPointerException, SQLException, NumberFormatException {
 
-		LogManager.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
+		SSUtils.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
 		JDBCType jdbcType = getJDBCType(getColumnType(_rowSet, _columnName));
 		
 		if (!textUpdateOK.contains(jdbcType)) {
-			LogManager.getLogger().error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
+			SSUtils.getLogger().error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
 			return;
 		}
 

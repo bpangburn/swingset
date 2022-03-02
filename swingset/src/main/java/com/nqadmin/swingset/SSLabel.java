@@ -51,6 +51,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSUtils;
 
 // SSLabel.java
 //
@@ -97,7 +98,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id

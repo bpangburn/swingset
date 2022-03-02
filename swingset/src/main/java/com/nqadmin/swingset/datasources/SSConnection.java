@@ -47,6 +47,8 @@ import java.sql.SQLException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.utils.SSUtils;
+
 // SSConnection.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
@@ -66,7 +68,7 @@ public class SSConnection implements Serializable {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id

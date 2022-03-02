@@ -49,6 +49,8 @@ import javax.sql.RowSet;
 
 import org.apache.logging.log4j.LogManager;
 
+import com.nqadmin.swingset.utils.SSUtils;
+
 // SSAbstractStringCollectionModel.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
@@ -130,7 +132,7 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 			return null;
 		}
 		
-		LogManager.getLogger().debug("SSList.toObjArray() contents: " + _dbstring);
+		SSUtils.getLogger().debug("SSList.toObjArray() contents: " + _dbstring);
 		List<Object> data = new ArrayList<>();
 		List<String> dbSplit= Arrays.asList(_dbstring.split(separator));
 		try {

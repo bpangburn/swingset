@@ -248,7 +248,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		}
 	}
 	
-	private static Logger logger = LogManager.getLogger(); // Log4j Logger for component
+	private static Logger logger = SSUtils.getLogger(); // Log4j Logger for component
 
 	private static final long serialVersionUID = 266766406708536384L; // unique serial ID
 	

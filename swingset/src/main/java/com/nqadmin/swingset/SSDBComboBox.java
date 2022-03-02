@@ -53,6 +53,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
+import com.nqadmin.swingset.utils.SSUtils;
 
 import ca.odell.glazedlists.EventList;
 
@@ -173,7 +174,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Value to represent that no item has been selected in the combo box.
