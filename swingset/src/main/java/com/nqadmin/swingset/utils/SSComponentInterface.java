@@ -495,8 +495,6 @@ public interface SSComponentInterface {
 	 */
 	default void setBoundColumnText(final String _boundColumnText) {
 		getSSCommon().setBoundColumnText(_boundColumnText);
-
-		SSUtils.getLogger().debug("{}: " + _boundColumnText, () -> getColumnForLog());
 	}
 
 	/**

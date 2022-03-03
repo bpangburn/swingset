@@ -966,6 +966,7 @@ public class SSCommon implements Serializable {
 	 * @param _boundColumnText value to write to bound database column
 	 */
 	public void setBoundColumnText(final String _boundColumnText) {
+		logger.debug("{}: " + _boundColumnText, () -> getColumnForLog());
 		try {
 			//getRowSet().updateColumnText(_boundColumnText, getBoundColumnName(), getAllowNull());
 			RowSetOps.updateColumnText(getRowSet(),_boundColumnText, getBoundColumnName(), getAllowNull());

@@ -47,6 +47,8 @@ import java.util.List;
 
 import javax.sql.RowSet;
 
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.utils.SSUtils;
 
 // SSAbstractStringCollectionModel.java
@@ -63,6 +65,8 @@ import com.nqadmin.swingset.utils.SSUtils;
 public abstract class SSAbstractStringCollectionModel extends SSAbstractCollectionModel {
 	private final String separator;
 	private final String separatorName;
+
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Create model.
@@ -130,7 +134,7 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 			return null;
 		}
 		
-		SSUtils.getLogger().debug("SSList.toObjArray() contents: " + _dbstring);
+		logger.debug("SSList.toObjArray() contents: " + _dbstring);
 		List<Object> data = new ArrayList<>();
 		List<String> dbSplit= Arrays.asList(_dbstring.split(separator));
 		try {
