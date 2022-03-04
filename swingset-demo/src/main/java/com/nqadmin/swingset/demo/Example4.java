@@ -45,8 +45,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.sql.RowSet;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.KeyStroke;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -346,5 +348,8 @@ public class Example4 extends JFrame {
 			// MAKE THE JFRAME VISIBLE
 				setVisible(true);
 				pack();
+				
+			// Setup F3 mnemonic for 'FIRST' button on Navigator.
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F3"),"FirstButton");
 			}
 }
