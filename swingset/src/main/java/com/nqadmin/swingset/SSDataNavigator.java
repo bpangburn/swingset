@@ -52,6 +52,7 @@ import java.util.WeakHashMap;
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
+import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -223,6 +224,13 @@ public class SSDataNavigator extends JPanel {
 	 * unique serial id
 	 */
 	private static final long serialVersionUID = 3129669039062103212L;
+	
+	/**
+	 * ActionMap of Actions used by SSDataNavigator buttons.
+	 * 
+	 * Exposed via getActionMap() so that developers can add their own mnemonic shortcuts.
+	 */
+	private JButton actionMap;
 
 	/**
 	 * Button to add a record to the RowSet.
@@ -280,11 +288,14 @@ public class SSDataNavigator extends JPanel {
 //	 * NavGroup event bus.
 //	 */
 //	protected EventBus eventBus;
+	
+	protected AbstractAction firstButtonAction = new FirstButtonAction();
 
 	/**
 	 * Button to navigate to the first record in the RowSet.
 	 */
-	protected JButton firstButton = new JButton();
+	//protected JButton firstButton = new JButton();
+	protected JButton firstButton = new JButton(firstButtonAction);
 
 	/**
 	 * Indicator to allow/disallow insertions to the RowSet.
@@ -413,12 +424,17 @@ public class SSDataNavigator extends JPanel {
 		if (_buttonSize!=null) {
 			buttonSize = _buttonSize;
 		}
-		addToolTips();
+		
+		hideActionText(); // For each nav button, suppress the Action name from appearing next to the icon.
+		//addToolTips(); // Integrated into button Action code.
 		createPanel();
-		addNavListeners();
+
+		addNavListeners(); // Add listener to row text box. Other action listeners moved to button Actions.
 
 		// setSSRowSet will typically set the eventBus
 		setupEventBus();
+		
+		buildActionMap(); // Build an action map for use by getSSDataNavigatorActionMap() so that button actions are exposed for addition of mnemonic shortcuts.
 	}
 
 	// TODO: Is it necessary to replace event bus when something changes?
@@ -453,16 +469,38 @@ public class SSDataNavigator extends JPanel {
 //			}
 //		}
 	}
-
-	/**
-	 * Adds the listeners for the navigator components.
+	
+	/*
+	 		final ClassLoader cl = this.getClass().getClassLoader();
+			firstButton.setIcon(new ImageIcon(cl.getResource("images/first.gif")));
+			previousButton.setIcon(new ImageIcon(cl.getResource("images/prev.gif")));
+			nextButton.setIcon(new ImageIcon(cl.getResource("images/next.gif")));
+			lastButton.setIcon(new ImageIcon(cl.getResource("images/last.gif")));
+			commitButton.setIcon(new ImageIcon(cl.getResource("images/commit.gif")));
+			undoButton.setIcon(new ImageIcon(cl.getResource("images/undo.gif")));
+			refreshButton.setIcon(new ImageIcon(cl.getResource("images/refresh.gif")));
+			addButton.setIcon(new ImageIcon(cl.getResource("images/add.gif")));
+			deleteButton.setIcon(new ImageIcon(cl.getResource("images/delete.gif")));
 	 */
-	private void addNavListeners() {
+	
+	protected class FirstButtonAction extends AbstractAction {
 
-		// WHEN THIS BUTTON IS PRESSED THE RECORD ON WHICH USER WAS WORKING IS SAVED
-		// AND MOVES THE SSROWSET TO THE FIRST ROW
-		// SINCE ROW SET IS IN FIRST ROW DISABLE PREVIOUS BUTTON AND ENABLE NEXT BUTTON
-		firstButton.addActionListener((final ActionEvent ae) -> {
+		private static final long serialVersionUID = 1L; // Unique ID
+		
+	    public FirstButtonAction() {
+	        super("FirstButton");
+	        putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/first.gif")));
+	        putValue(SHORT_DESCRIPTION, "Navigate to First Record");
+//	        putValue(MNEMONIC_KEY, mnemonic);
+	    }
+	    
+	    /**
+	     * WHEN THIS BUTTON IS PRESSED THE RECORD ON WHICH USER WAS WORKING IS SAVED
+		 * AND MOVES THE SSROWSET TO THE FIRST ROW
+		 * SINCE ROW SET IS IN FIRST ROW DISABLE PREVIOUS BUTTON AND ENABLE NEXT BUTTON
+	     */
+	    @Override
+		public void actionPerformed(ActionEvent e) {
 			logger.debug("FIRST button clicked.");
 			removeRowsetListener();
 			try {
@@ -482,7 +520,38 @@ public class SSDataNavigator extends JPanel {
 			} finally {
 				addRowsetListener();
 			}
-		});
+	    }
+	}
+
+	/**
+	 * Adds the listeners for the navigator components.
+	 */
+	private void addNavListeners() {
+
+//		// WHEN THIS BUTTON IS PRESSED THE RECORD ON WHICH USER WAS WORKING IS SAVED
+//		// AND MOVES THE SSROWSET TO THE FIRST ROW
+//		// SINCE ROW SET IS IN FIRST ROW DISABLE PREVIOUS BUTTON AND ENABLE NEXT BUTTON
+//		firstButton.addActionListener((final ActionEvent ae) -> {
+//			logger.debug("FIRST button clicked.");
+//			removeRowsetListener();
+//			try {
+//				if (!commitChangesToDatabase(true)) return;
+//				
+//				rowSet.first();
+//				
+//				setRowModified(false);
+//				updateNavigator();
+//				
+//				dBNav.performNavigationOps(Navigation.First);
+//				
+//			} catch (final SQLException se) {
+//				logger.error("SQL Exception.", se);
+//				JOptionPane.showMessageDialog(SSDataNavigator.this,
+//						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
+//			} finally {
+//				addRowsetListener();
+//			}
+//		});
 
 		// WHEN BUTTON 2 IS PRESSED THE CURRENT RECORD IS SAVED AND SSROWSET IS MOVED TO PREVIOUS RECORD
 		// CALLING PREVIOUS ON EMPTY SSROWSET IS ILLEGAL SO A CHECK IS PERFORMED
@@ -852,47 +921,57 @@ public class SSDataNavigator extends JPanel {
 		}
 	}
 
+//	/**
+//	 * Method to add tooltips and button graphics (or text) to navigator components.
+//	 */
+//	protected void addToolTips() {
+//
+//		try {
+//			final ClassLoader cl = this.getClass().getClassLoader();
+//			//firstButton.setIcon(new ImageIcon(cl.getResource("images/first.gif")));
+//			previousButton.setIcon(new ImageIcon(cl.getResource("images/prev.gif")));
+//			nextButton.setIcon(new ImageIcon(cl.getResource("images/next.gif")));
+//			lastButton.setIcon(new ImageIcon(cl.getResource("images/last.gif")));
+//			commitButton.setIcon(new ImageIcon(cl.getResource("images/commit.gif")));
+//			undoButton.setIcon(new ImageIcon(cl.getResource("images/undo.gif")));
+//			refreshButton.setIcon(new ImageIcon(cl.getResource("images/refresh.gif")));
+//			addButton.setIcon(new ImageIcon(cl.getResource("images/add.gif")));
+//			deleteButton.setIcon(new ImageIcon(cl.getResource("images/delete.gif")));
+//		} catch (final Exception e) {
+//			//firstButton.setText("<<");
+//			previousButton.setText("<");
+//			nextButton.setText(">");
+//			lastButton.setText(">>");
+//			commitButton.setText("Commit");
+//			undoButton.setText("Undo");
+//			refreshButton.setText("Refresh");
+//			addButton.setText("Add");
+//			deleteButton.setText("Delete");
+//			logger.warn("Unable to load images for navigator buttons.", e);
+//		}
+//
+//		// SET TOOL TIPS FOR THE BUTTONS
+//		firstButton.setToolTipText("First");
+//		previousButton.setToolTipText("Previous");
+//		nextButton.setToolTipText("Next");
+//		lastButton.setToolTipText("Last");
+//		commitButton.setToolTipText("Commit");
+//		undoButton.setToolTipText("Undo");
+//		refreshButton.setToolTipText("Refresh");
+//		addButton.setToolTipText("Add Record");
+//		deleteButton.setToolTipText("Delete Record");
+//
+//	} // end protected void addToolTips() {
+	
 	/**
-	 * Method to add tooltips and button graphics (or text) to navigator components.
+	 * Builds the ActionMap for the SSDataNavigator.
+	 * 
+	 * Exposes navigator ActionMap so that developers can add their own mnemonic shortcuts.
 	 */
-	protected void addToolTips() {
-
-		try {
-			final ClassLoader cl = this.getClass().getClassLoader();
-			firstButton.setIcon(new ImageIcon(cl.getResource("images/first.gif")));
-			previousButton.setIcon(new ImageIcon(cl.getResource("images/prev.gif")));
-			nextButton.setIcon(new ImageIcon(cl.getResource("images/next.gif")));
-			lastButton.setIcon(new ImageIcon(cl.getResource("images/last.gif")));
-			commitButton.setIcon(new ImageIcon(cl.getResource("images/commit.gif")));
-			undoButton.setIcon(new ImageIcon(cl.getResource("images/undo.gif")));
-			refreshButton.setIcon(new ImageIcon(cl.getResource("images/refresh.gif")));
-			addButton.setIcon(new ImageIcon(cl.getResource("images/add.gif")));
-			deleteButton.setIcon(new ImageIcon(cl.getResource("images/delete.gif")));
-		} catch (final Exception e) {
-			firstButton.setText("<<");
-			previousButton.setText("<");
-			nextButton.setText(">");
-			lastButton.setText(">>");
-			commitButton.setText("Commit");
-			undoButton.setText("Undo");
-			refreshButton.setText("Refresh");
-			addButton.setText("Add");
-			deleteButton.setText("Delete");
-			logger.warn("Unable to load images for navigator buttons.", e);
-		}
-
-		// SET TOOL TIPS FOR THE BUTTONS
-		firstButton.setToolTipText("First");
-		previousButton.setToolTipText("Previous");
-		nextButton.setToolTipText("Next");
-		lastButton.setToolTipText("Last");
-		commitButton.setToolTipText("Commit");
-		undoButton.setToolTipText("Undo");
-		refreshButton.setToolTipText("Refresh");
-		addButton.setToolTipText("Add Record");
-		deleteButton.setToolTipText("Delete Record");
-
-	} // end protected void addToolTips() {
+	private void buildActionMap() {
+		
+		getActionMap().put("FirstButton", firstButtonAction);
+	}
 	
 	/**
 	 * Common code to commit changes to the database from the rowset if
@@ -1132,6 +1211,22 @@ public class SSDataNavigator extends JPanel {
 //	public RowSet getSSRowSet() {
 //		return rowSet;
 //	}
+	
+	/**
+	 * Prevent the navigator buttons from displaying the Action name with the icon.
+	 */
+	private void hideActionText() {
+		// HIDE ACTION TEXT FOR BUTTONS
+		firstButton.setHideActionText(true);
+		previousButton.setHideActionText(true);
+		nextButton.setHideActionText(true);
+		lastButton.setHideActionText(true);
+		commitButton.setHideActionText(true);
+		undoButton.setHideActionText(true);
+		refreshButton.setHideActionText(true);
+		addButton.setHideActionText(true);
+		deleteButton.setHideActionText(true);
+	}
 
 	/**
 	 * @return boolean indicating if the navigator is on an insert row
