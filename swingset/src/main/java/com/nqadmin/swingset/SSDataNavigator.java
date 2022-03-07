@@ -510,40 +510,42 @@ public class SSDataNavigator extends JPanel {
 	protected class FirstButtonAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
-		
-	    public FirstButtonAction() {
-	        super("FirstButton");
-	        putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/first.gif")));
-	        putValue(SHORT_DESCRIPTION, "Navigate to First Record");
+
+		public FirstButtonAction() {
+			super("FirstButton");
+			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/first.gif")));
+			putValue(SHORT_DESCRIPTION, "Navigate to First Record");
 //	        putValue(MNEMONIC_KEY, mnemonic);
-	    }
-	    
-	    /**
-	     * When the "first" button is pressed, the record upon which the user was working is saved
-	     * and the user is taken to the first row in the rowset.
-	     * 
-	     * Since the rowset is on the first row, disable the "previous" button and enable
-	     * the "next" button.
-	     */
-	    @Override
+		}
+
+		/**
+		 * When the "first" button is pressed, the current record is saved and the user
+		 * is taken to the first row in the rowset.
+		 * 
+		 * Since the rowset is on the first row, disable the "previous" button and
+		 * enable the "next" button.
+		 */
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			logger.debug("FIRST button clicked.");
-			
-// ++++++++++++++++++++++++++++++++			
-// TODO: If button is disabled then return without action (a mnemonic/shortcut can trigger action for a disabled button).  	
-// ++++++++++++++++++++++++++++++++			
+
+			// If button is disabled then return without action
+			// (a mnemonic/shortcut can trigger action for a disabled button).
+			if (!firstButton.isEnabled())
+				return;
 
 			removeRowsetListener();
 			try {
-				if (!commitChangesToDatabase(true)) return;
-				
+				if (!commitChangesToDatabase(true))
+					return;
+
 				rowSet.first();
-				
+
 				setRowModified(false);
 				updateNavigator();
-				
+
 				dBNav.performNavigationOps(Navigation.First);
-				
+
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 				JOptionPane.showMessageDialog(SSDataNavigator.this,
@@ -551,273 +553,133 @@ public class SSDataNavigator extends JPanel {
 			} finally {
 				addRowsetListener();
 			}
-	    }
-	    
+		}
 	} // end FirstButtonAction
-	
+
 	// PREVOUS BUTTON
 	protected class PreviousButtonAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
-		
-	    public PreviousButtonAction() {
-	        super("PreviousButton");
-	        putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/prev.gif")));
-	        putValue(SHORT_DESCRIPTION, "Navigate to Previous Record");
-//	        putValue(MNEMONIC_KEY, mnemonic);
-	    }
-	    
-	    /**
-	     * ----something----
-	     */
-	    @Override
-		public void actionPerformed(ActionEvent e) {
 
-	    }
-	    
+		public PreviousButtonAction() {
+			super("PreviousButton");
+			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/prev.gif")));
+			putValue(SHORT_DESCRIPTION, "Navigate to Previous Record");
+//	        putValue(MNEMONIC_KEY, mnemonic);
+		}
+
+		/**
+		 * When the "previous" button is pressed, the current record is saved and the
+		 * user is taken to the previous row in the rowset.
+		 * 
+		 * If there are records in the rowset and the move to the previous record fails,
+		 * then the user is taken to the first row.
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			logger.debug("PREVIOUS button clicked.");
+
+			// If button is disabled then return without action
+			// (a mnemonic/shortcut can trigger action for a disabled button).
+			if (!previousButton.isEnabled())
+				return;
+
+			removeRowsetListener();
+			try {
+				if (!commitChangesToDatabase(true))
+					return;
+
+				if ((rowSet.getRow() != 0) && !rowSet.previous()) {
+					rowSet.first();
+				}
+
+				setRowModified(false);
+				updateNavigator();
+
+				dBNav.performNavigationOps(Navigation.Previous);
+
+			} catch (final SQLException se) {
+				logger.error("SQL Exception.", se);
+				JOptionPane.showMessageDialog(SSDataNavigator.this,
+						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
+			} finally {
+				addRowsetListener();
+			}
+		}
 	} // end PreviousButtonAction
-	
+
 	// NEXT BUTTON
 	protected class NextButtonAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
-		
-	    public NextButtonAction() {
-	        super("NextButton");
-	        putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/next.gif")));
-	        putValue(SHORT_DESCRIPTION, "Navigate to Next Record");
-//	        putValue(MNEMONIC_KEY, mnemonic);
-	    }
-	    
-	    /**
-	     * ----something----
-	     */
-	    @Override
-		public void actionPerformed(ActionEvent e) {
 
-	    }
-	    
+		public NextButtonAction() {
+			super("NextButton");
+			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/next.gif")));
+			putValue(SHORT_DESCRIPTION, "Navigate to Next Record");
+//	        putValue(MNEMONIC_KEY, mnemonic);
+		}
+
+		/**
+		 * When the "next" button is pressed, the current record is saved and the user
+		 * is taken to the next row in the rowset.
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			logger.debug("NEXT button clicked.");
+
+			// If button is disabled then return without action
+			// (a mnemonic/shortcut can trigger action for a disabled button).
+			if (!nextButton.isEnabled())
+				return;
+
+			removeRowsetListener();
+			try {
+				if (!commitChangesToDatabase(true))
+					return;
+
+				rowSet.next();
+
+				setRowModified(false);
+				updateNavigator();
+
+				dBNav.performNavigationOps(Navigation.Next);
+
+			} catch (final SQLException se) {
+				logger.error("SQL Exception.", se);
+				JOptionPane.showMessageDialog(SSDataNavigator.this,
+						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
+			} finally {
+				addRowsetListener();
+			}
+		}
 	} // end NextButtonAction
-	
+
 	// LAST
 	protected class LastButtonAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
-		
-	    public LastButtonAction() {
-	        super("LastButton");
-	        putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/last.gif")));
-	        putValue(SHORT_DESCRIPTION, "Navigate to Last Record");
+
+		public LastButtonAction() {
+			super("LastButton");
+			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/last.gif")));
+			putValue(SHORT_DESCRIPTION, "Navigate to Last Record");
 //	        putValue(MNEMONIC_KEY, mnemonic);
-	    }
-	    
-	    /**
-	     * ----something----
-	     */
-	    @Override
+		}
+
+		/**
+		 * When the "last" button is pressed, the current record is saved and the user
+		 * is taken to the last row in the rowset.
+		 */
+		@Override
 		public void actionPerformed(ActionEvent e) {
-
-	    }
-	    
-	} // end LastButtonAction
-	
-	// COMMIT
-	protected class CommitButtonAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L; // Unique ID
-		
-	    public CommitButtonAction() {
-	        super("CommitButton");
-	        putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/commit.gif")));
-	        putValue(SHORT_DESCRIPTION, "Commit/Save Current Record");
-//	        putValue(MNEMONIC_KEY, mnemonic);
-	    }
-	    
-	    /**
-	     * ----something----
-	     */
-	    @Override
-		public void actionPerformed(ActionEvent e) {
-
-	    }
-	    
-	} // end CommitButtonAction
-	
-	// UNDO
-	protected class UndoButtonAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L; // Unique ID
-		
-	    public UndoButtonAction() {
-	        super("UndoButton");
-	        putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/undo.gif")));
-	        putValue(SHORT_DESCRIPTION, "Undo/Revert Changes to Current Record");
-//	        putValue(MNEMONIC_KEY, mnemonic);
-	    }
-	    
-	    /**
-	     * ----something----
-	     */
-	    @Override
-		public void actionPerformed(ActionEvent e) {
-
-	    }
-	    
-	} // end UndoButtonAction
-	
-	// REFRESH
-	protected class RefreshButtonAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L; // Unique ID
-		
-	    public RefreshButtonAction() {
-	        super("RefreshButton");
-	        putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/refresh.gif")));
-	        putValue(SHORT_DESCRIPTION, "Refresh/Reload Current Record");
-//	        putValue(MNEMONIC_KEY, mnemonic);
-	    }
-	    
-	    /**
-	     * ----something----
-	     */
-	    @Override
-		public void actionPerformed(ActionEvent e) {
-
-	    }
-	    
-	} // end RefreshButtonAction
-	
-	// ADD
-	protected class AddButtonAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L; // Unique ID
-		
-	    public AddButtonAction() {
-	        super("AddButton");
-	        putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/add.gif")));
-	        putValue(SHORT_DESCRIPTION, "Add a New Record");
-//	        putValue(MNEMONIC_KEY, mnemonic);
-	    }
-	    
-	    /**
-	     * ----something----
-	     */
-	    @Override
-		public void actionPerformed(ActionEvent e) {
-
-	    }
-	    
-	} // end AddButtonAction
-	
-	// DELETE
-	protected class DeleteButtonAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L; // Unique ID
-		
-	    public DeleteButtonAction() {
-	        super("DeleteButton");
-	        putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/delete.gif")));
-	        putValue(SHORT_DESCRIPTION, "Delete the Current Record");
-//	        putValue(MNEMONIC_KEY, mnemonic);
-	    }
-	    
-	    /**
-	     * ----something----
-	     */
-	    @Override
-		public void actionPerformed(ActionEvent e) {
-
-	    }
-	    
-	} // end DeleteButtonAction
-
-	/**
-	 * Adds the listeners for the navigator components.
-	 */
-	private void addNavListeners() {
-
-//		// WHEN THIS BUTTON IS PRESSED THE RECORD ON WHICH USER WAS WORKING IS SAVED
-//		// AND MOVES THE SSROWSET TO THE FIRST ROW
-//		// SINCE ROW SET IS IN FIRST ROW DISABLE PREVIOUS BUTTON AND ENABLE NEXT BUTTON
-//		firstButton.addActionListener((final ActionEvent ae) -> {
-//			logger.debug("FIRST button clicked.");
-//			removeRowsetListener();
-//			try {
-//				if (!commitChangesToDatabase(true)) return;
-//				
-//				rowSet.first();
-//				
-//				setRowModified(false);
-//				updateNavigator();
-//				
-//				dBNav.performNavigationOps(Navigation.First);
-//				
-//			} catch (final SQLException se) {
-//				logger.error("SQL Exception.", se);
-//				JOptionPane.showMessageDialog(SSDataNavigator.this,
-//						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
-//			} finally {
-//				addRowsetListener();
-//			}
-//		});
-
-		// WHEN BUTTON 2 IS PRESSED THE CURRENT RECORD IS SAVED AND SSROWSET IS MOVED TO PREVIOUS RECORD
-		// CALLING PREVIOUS ON EMPTY SSROWSET IS ILLEGAL SO A CHECK IS PERFORMED
-		previousButton.addActionListener((final ActionEvent ae) -> {
-			logger.debug("PREVIOUS button clicked.");
-			removeRowsetListener();
-			try {
-				if (!commitChangesToDatabase(true)) return;
-				
-				if ((rowSet.getRow() != 0) && !rowSet.previous()) {
-					rowSet.first();
-				}
-				
-				setRowModified(false);
-				updateNavigator();
-				
-				dBNav.performNavigationOps(Navigation.Previous);
-				
-			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
-				JOptionPane.showMessageDialog(SSDataNavigator.this,
-						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
-			} finally {
-				addRowsetListener();
-			}
-		});
-
-		// WHEN BUTTON 3 PRESSED THE CURRENT RECORD IS SAVED AND THE SSROWSET IS
-		// MOVED TO NEXT RECORD. IF THIS IS THE LAST RECORD THEN BUTTON 3 IS DISABLED
-		// ALSO IF THE PREVIOUS BUTTON IS NOT ENABLED THEN IT IS ENABLED
-		nextButton.addActionListener((final ActionEvent ae) -> {
-			logger.debug("NEXT button clicked.");
-			removeRowsetListener();
-			try {
-				if (!commitChangesToDatabase(true)) return;
-
-				rowSet.next();
-				
-				setRowModified(false);
-				updateNavigator();
-				
-				dBNav.performNavigationOps(Navigation.Next);
-				
-			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
-				JOptionPane.showMessageDialog(SSDataNavigator.this,
-						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
-			} finally {
-				addRowsetListener();
-			}
-		});
-
-		// BUTTON 4 ( "LAST" BUTTON ) CAUSED THE SSROWSET TO MOVE TO LAST RECORD.
-		// BEFORE MOVING CURRENT RECORD IS SAVED
-		// AFTER MOVING TO LAST RECORD THE NEXT BUTTON IS DIAABLED AND PREVIOUS BUTTON
-		// ENABLED
-		lastButton.addActionListener((final ActionEvent ae) -> {
 			logger.debug("LAST button clicked.");
+			
+			// If button is disabled then return without action
+			// (a mnemonic/shortcut can trigger action for a disabled button).
+			if (!lastButton.isEnabled())
+				return;
+			
 			removeRowsetListener();
 			try {
 				if (!commitChangesToDatabase(true)) return;
@@ -836,15 +698,37 @@ public class SSDataNavigator extends JPanel {
 			} finally {
 				addRowsetListener();
 			}
-		});
+		}
+	} // end LastButtonAction
 
-		// THIS BUTTON COMMITS ANY CHANGES TO THE DATABASE
-		// IF YOU ARE ON THE INSERT ROW FOR
-		// A NEW RECORD, IT INSERTS THE ROW AND MOVES TO THE NEWLY INSERTED ROW.
-		// WHEN INSERT BUTTON IS PRESSED NAVIGATION WILL BE DISABLED SO THOSE HAVE TO BE
-		// RE-ENABLED HERE
-		commitButton.addActionListener((final ActionEvent ae) -> {
+	// COMMIT
+	protected class CommitButtonAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L; // Unique ID
+
+		public CommitButtonAction() {
+			super("CommitButton");
+			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/commit.gif")));
+			putValue(SHORT_DESCRIPTION, "Commit/Save Current Record");
+//	        putValue(MNEMONIC_KEY, mnemonic);
+		}
+
+		/**
+		 * When the "commit" button is pressed, any changes are committed to the database.
+		 * 
+		 * If the user is on the 'insert' row (new record) at the time of a commit,
+		 * the record is inserted and the rowset is moved to the newly added/inserted row,
+		 * and the other navigation buttons are re-enabled.
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
 			logger.debug("COMMIT button clicked.");
+			
+			// If button is disabled then return without action
+			// (a mnemonic/shortcut can trigger action for a disabled button).
+			if (!commitButton.isEnabled())
+				return;
+			
 			removeRowsetListener();
 			try {
 				if (isInserting(rowSet)) {
@@ -903,13 +787,36 @@ public class SSDataNavigator extends JPanel {
 			} finally {
 				addRowsetListener();
 			}
-		});
+		}
+	} // end CommitButtonAction
 
-		// THIS BUTTON IS USED TO CANCEL THE CHANGES MADE TO THE RECORD.
-		// IT CAN ALSO BE USED TO CANCEL INSERT ROW.
-		// SO THE BUTTONS DISABLED AT THE INSERT BUTTON EVENT HAVE TO BE ENABLED
-		undoButton.addActionListener((final ActionEvent ae) -> {
+	// UNDO
+	protected class UndoButtonAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L; // Unique ID
+
+		public UndoButtonAction() {
+			super("UndoButton");
+			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/undo.gif")));
+			putValue(SHORT_DESCRIPTION, "Undo/Revert Changes to Current Record");
+//	        putValue(MNEMONIC_KEY, mnemonic);
+		}
+
+		/**
+		 * When the "undo" button is pressed, revert any changes to the current record.
+		 * 
+		 * This button can also be used to cancel an insertion so if on the insert row,
+		 * re-enable the other navigation buttons.
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
 			logger.debug("UNDO button clicked.");
+			
+			// If button is disabled then return without action
+			// (a mnemonic/shortcut can trigger action for a disabled button).
+			if (!undoButton.isEnabled())
+				return;
+			
 			removeRowsetListener();
 			try {
 				// CALL MOVE TO CURRENT ROW IF ON INSERT ROW.
@@ -940,17 +847,40 @@ public class SSDataNavigator extends JPanel {
 			} finally {
 				addRowsetListener();
 			}
-		});
+		}
+	} // end UndoButtonAction
 
-		// REFETCH REFETCHES THE ROWS FROMS THE DATABASE AND MOVES THE CURSOR TO THE
-		// FIRST
-		// RECORD IF THERE ARE NO RECORDS NAVIGATION BUTTONS ARE DIABLED
-		// EVEN IS THERE ARE RECORDS PREVIOUS BUTTON IS DISABLED BECAUSE THE SSROWSET IS
-		// ON
-		// THE FIRST ROW
-		refreshButton.addActionListener((final ActionEvent ae) -> {
+	
+	
+	
+	// REFRESH
+	protected class RefreshButtonAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L; // Unique ID
+
+		public RefreshButtonAction() {
+			super("RefreshButton");
+			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/refresh.gif")));
+			putValue(SHORT_DESCRIPTION, "Refresh/Reload Current Record");
+//	        putValue(MNEMONIC_KEY, mnemonic);
+		}
+
+		/**
+		 * When the "refresh" button is pressed, re-fetch all rows from the database
+		 * and move the cursor to the first record. If there are no records, disable
+		 * the other navigation buttons. Disable the first and previous buttons
+		 * regardless because the rowset will be on the first record.
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
 			logger.debug("REFRESH button clicked.");
+			
+			// (a mnemonic/shortcut can trigger action for a disabled button).
+			if (!refreshButton.isEnabled())
+				return;
+			
 			removeRowsetListener();
+			
 			try {
 				if (callExecute) {
 					rowSet.execute();
@@ -978,14 +908,35 @@ public class SSDataNavigator extends JPanel {
 			} finally {
 				addRowsetListener();
 			}
-		});
+		}
+	} // end RefreshButtonAction
 
-		// INSERT ROW BUTTON MOVES THE SSROWSET TO THE INSERT ROW POSITION
-		// AT THIS TIME NAVIGATION HAS TO BE DISABLED
-		// ONLY COMMIT AND CANCEL ARE ENABLED
-		addButton.addActionListener((final ActionEvent ae) -> {
+	// ADD
+	protected class AddButtonAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L; // Unique ID
+
+		public AddButtonAction() {
+			super("AddButton");
+			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/add.gif")));
+			putValue(SHORT_DESCRIPTION, "Add a New Record");
+//	        putValue(MNEMONIC_KEY, mnemonic);
+		}
+
+		/**
+		 * When the "add" button is pressed, move to the insert row and
+		 * disable other navigation buttons except for Commit and Undo (cancel).
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
 			logger.debug("ADD button clicked.");
+			
+			// (a mnemonic/shortcut can trigger action for a disabled button).
+			if (!addButton.isEnabled())
+				return;
+			
 			removeRowsetListener();
+			
 			try {
 				// Commit changes for current row to database
 				commitChangesToDatabase(true);
@@ -1009,13 +960,34 @@ public class SSDataNavigator extends JPanel {
 			} finally {
 				addRowsetListener();
 			}
-		});
+		}
+	} // end AddButtonAction
 
-		// DELETES THE CURRENT ROW AND MOVES TO NEXT ROW
-		// IF THE DELETED ROW IS THE LAST ROW THEN MOVES TO LAST ROW IN SSROWSET
-		// AFTER THE DELETION IS MADE (THATS THE PREVIOUS ROW TO THE DELETED ROW)
-		deleteButton.addActionListener((final ActionEvent ae) -> {
+	// DELETE
+	protected class DeleteButtonAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L; // Unique ID
+
+		public DeleteButtonAction() {
+			super("DeleteButton");
+			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/delete.gif")));
+			putValue(SHORT_DESCRIPTION, "Delete the Current Record");
+//	        putValue(MNEMONIC_KEY, mnemonic);
+		}
+
+		/**
+		 * When the "delete" button is pressed, delete the current row and move
+		 * to the next row. If the deleted row is the last row then move the the
+		 * record that was previous to the deleted row/record.
+		 */
+		@Override
+		public void actionPerformed(ActionEvent e) {
 			logger.debug("DELETE button clicked.");
+			
+			// (a mnemonic/shortcut can trigger action for a disabled button).
+			if (!addButton.isEnabled())
+				return;
+			
 			removeRowsetListener();
 			try {
 				if (confirmDeletes) {
@@ -1068,7 +1040,347 @@ public class SSDataNavigator extends JPanel {
 			} finally {
 				addRowsetListener();
 			}
-		});
+		}
+	} // end DeleteButtonAction
+
+	/**
+	 * Adds the listeners for the navigator components.
+	 */
+	private void addNavListeners() {
+
+//		// WHEN THIS BUTTON IS PRESSED THE RECORD ON WHICH USER WAS WORKING IS SAVED
+//		// AND MOVES THE SSROWSET TO THE FIRST ROW
+//		// SINCE ROW SET IS IN FIRST ROW DISABLE PREVIOUS BUTTON AND ENABLE NEXT BUTTON
+//		firstButton.addActionListener((final ActionEvent ae) -> {
+//			logger.debug("FIRST button clicked.");
+//			removeRowsetListener();
+//			try {
+//				if (!commitChangesToDatabase(true)) return;
+//				
+//				rowSet.first();
+//				
+//				setRowModified(false);
+//				updateNavigator();
+//				
+//				dBNav.performNavigationOps(Navigation.First);
+//				
+//			} catch (final SQLException se) {
+//				logger.error("SQL Exception.", se);
+//				JOptionPane.showMessageDialog(SSDataNavigator.this,
+//						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
+//			} finally {
+//				addRowsetListener();
+//			}
+//		});
+
+//		// WHEN BUTTON 2 IS PRESSED THE CURRENT RECORD IS SAVED AND SSROWSET IS MOVED TO PREVIOUS RECORD
+//		// CALLING PREVIOUS ON EMPTY SSROWSET IS ILLEGAL SO A CHECK IS PERFORMED
+//		previousButton.addActionListener((final ActionEvent ae) -> {
+//			logger.debug("PREVIOUS button clicked.");
+//			removeRowsetListener();
+//			try {
+//				if (!commitChangesToDatabase(true)) return;
+//				
+//				if ((rowSet.getRow() != 0) && !rowSet.previous()) {
+//					rowSet.first();
+//				}
+//				
+//				setRowModified(false);
+//				updateNavigator();
+//				
+//				dBNav.performNavigationOps(Navigation.Previous);
+//				
+//			} catch (final SQLException se) {
+//				logger.error("SQL Exception.", se);
+//				JOptionPane.showMessageDialog(SSDataNavigator.this,
+//						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
+//			} finally {
+//				addRowsetListener();
+//			}
+//		});
+
+//		// WHEN BUTTON 3 IS PRESSED THE CURRENT RECORD IS SAVED AND THE SSROWSET IS
+//		// MOVED TO NEXT RECORD. IF THIS IS THE LAST RECORD THEN BUTTON 3 IS DISABLED
+//		// ALSO IF THE PREVIOUS BUTTON IS NOT ENABLED THEN IT IS ENABLED
+//		nextButton.addActionListener((final ActionEvent ae) -> {
+//			logger.debug("NEXT button clicked.");
+//			removeRowsetListener();
+//			try {
+//				if (!commitChangesToDatabase(true)) return;
+//
+//				rowSet.next();
+//				
+//				setRowModified(false);
+//				updateNavigator();
+//				
+//				dBNav.performNavigationOps(Navigation.Next);
+//				
+//			} catch (final SQLException se) {
+//				logger.error("SQL Exception.", se);
+//				JOptionPane.showMessageDialog(SSDataNavigator.this,
+//						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
+//			} finally {
+//				addRowsetListener();
+//			}
+//		});
+
+//		// BUTTON 4 ( "LAST" BUTTON ) CAUSED THE SSROWSET TO MOVE TO LAST RECORD.
+//		// BEFORE MOVING CURRENT RECORD IS SAVED
+//		// AFTER MOVING TO LAST RECORD THE NEXT BUTTON IS DIAABLED AND PREVIOUS BUTTON
+//		// ENABLED
+//		lastButton.addActionListener((final ActionEvent ae) -> {
+//			logger.debug("LAST button clicked.");
+//			removeRowsetListener();
+//			try {
+//				if (!commitChangesToDatabase(true)) return;
+//				
+//				rowSet.last();
+//				
+//				setRowModified(false);
+//				updateNavigator();
+//				
+//				dBNav.performNavigationOps(Navigation.Last);
+//				
+//			} catch (final SQLException se) {
+//				logger.error("SQL Exception.", se);
+//				JOptionPane.showMessageDialog(SSDataNavigator.this,
+//						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
+//			} finally {
+//				addRowsetListener();
+//			}
+//		});
+
+//		// THIS BUTTON COMMITS ANY CHANGES TO THE DATABASE
+//		// IF YOU ARE ON THE INSERT ROW FOR
+//		// A NEW RECORD, IT INSERTS THE ROW AND MOVES TO THE NEWLY INSERTED ROW.
+//		// WHEN INSERT BUTTON IS PRESSED NAVIGATION WILL BE DISABLED SO THOSE HAVE TO BE
+//		// RE-ENABLED HERE
+//		commitButton.addActionListener((final ActionEvent ae) -> {
+//			logger.debug("COMMIT button clicked.");
+//			removeRowsetListener();
+//			try {
+//				if (isInserting(rowSet)) {
+//					// IF ON INSERT ROW ADD THE ROW.
+//					// CHECK IF THE ROW CAN BE INSERTED.
+//					if (!dBNav.allowInsertion()) {
+//						// WE DO NOTHING. THE ROWSET STAYS IN INSERT ROW. EITHER USER
+//						// HAS TO FIX THE DATA AND SAVE THE ROW OR CANCEL THE INSERTION.
+//						return;
+//					}
+//					
+//					rowSet.insertRow();
+//					setInserting(rowSet, false);
+//					dBNav.performPostInsertOps();
+//
+//					rowSet.last();
+//
+//					rowCount = rowSet.getRow();
+//					
+//					setRowModified(false);
+//					updateNavigator();
+//				} else {
+//					// ELSE UPDATE THE DATABASE BASED ON THE PRESENT ROW VALUES.
+//					// IN THIS CASE WE WILL WAIT TO PERFORM POST-UPDATE OPS BELOW
+//					if (!commitChangesToDatabase(false)) return;
+//				
+//					setRowModified(false);
+//					// TODO: why not updateNavigator?
+//					updateButtonState();
+//					
+//					// 2020-11-24: Generally redundant, but force a refresh the screen with the
+//					// values from the rowset. This will be most noticeable if you have
+//					// two fields bound to the same column.
+//					//
+//					// rowSet.refreshRow() did not accomplish the intended result, but
+//					// navigating to the same row using absolute and the current record
+//					// number did.
+//					//
+//					// 2020-12-24
+//					// TODO: might get rid of this if broadcasting the right info,
+//					//       like picking up on the "other" component broadcast
+//					//
+//					rowSet.absolute(rowSet.getRow());
+//					
+//					//
+//					// TODO: if above cleaned up can remove following
+//					//       in favor of simpler doUpdateRow() further above
+//					//
+//					dBNav.performPostUpdateOps();
+//				}
+//
+//			} catch (final SQLException se) {
+//				logger.error("SQL Exception.", se);
+//				JOptionPane.showMessageDialog(SSDataNavigator.this,
+//						"Exception occured while saving row.\n" + se.getMessage());
+//			} finally {
+//				addRowsetListener();
+//			}
+//		});
+
+//		// THIS BUTTON IS USED TO CANCEL THE CHANGES MADE TO THE RECORD.
+//		// IT CAN ALSO BE USED TO CANCEL INSERT ROW.
+//		// SO THE BUTTONS DISABLED AT THE INSERT BUTTON EVENT HAVE TO BE ENABLED
+//		undoButton.addActionListener((final ActionEvent ae) -> {
+//			logger.debug("UNDO button clicked.");
+//			removeRowsetListener();
+//			try {
+//				// CALL MOVE TO CURRENT ROW IF ON INSERT ROW.
+//				if (isInserting(rowSet)) {
+//					rowSet.moveToCurrentRow();
+//				}
+//				// THIS FUNCTION IS NOT NEED IF ON INSERT ROW
+//				// BUT MOVETOINSERTROW WILL NOT TRIGGER ANY EVENT SO FOR THE SCREEN
+//				// TO UPDATE WE NEED TO TRIGGER SOME THING.
+//				// SINCE USER IS MOVED TO CURRENT ROW PRIOR TO INSERT IT IS SAFE TO
+//				// CALL CANCELROWUPDATE TO GET A TRIGGER
+//				rowSet.cancelRowUpdates();
+//				setInserting(rowSet, false);
+//				dBNav.performCancelOps();
+//				
+//				// Only attempt to refresh row if we have at least one record
+//				if (rowSet.getRow() > 0) {
+//					rowSet.refreshRow();
+//				}
+//				
+//				setRowModified(false);
+//				updateNavigator();
+//				
+//			} catch (final SQLException se) {
+//				logger.error("SQL Exception.", se);
+//				JOptionPane.showMessageDialog(SSDataNavigator.this,
+//						"Exception occured while undoing changes.\n" + se.getMessage());
+//			} finally {
+//				addRowsetListener();
+//			}
+//		});
+
+//		// REFETCH REFETCHES THE ROWS FROMS THE DATABASE AND MOVES THE CURSOR TO THE
+//		// FIRST
+//		// RECORD IF THERE ARE NO RECORDS NAVIGATION BUTTONS ARE DIABLED
+//		// EVEN IS THERE ARE RECORDS PREVIOUS BUTTON IS DISABLED BECAUSE THE SSROWSET IS
+//		// ON
+//		// THE FIRST ROW
+//		refreshButton.addActionListener((final ActionEvent ae) -> {
+//			logger.debug("REFRESH button clicked.");
+//			removeRowsetListener();
+//			try {
+//				if (callExecute) {
+//					rowSet.execute();
+//					
+//					if (!rowSet.next()) {
+//						// THERE ARE NO RECORDS IN THE ROWSET
+//						rowCount = 0;
+//					} else {
+//						// WE HAVE ROWS GET THE ROW COUNT AND MOVE BACK TO FIRST ROW
+//						rowSet.last();
+//						rowCount = rowSet.getRow();
+//						rowSet.first();
+//					}
+//					
+//					setRowModified(false);
+//					updateNavigator();
+//				}
+//
+//				dBNav.performRefreshOps();
+//				
+//			} catch (final SQLException se) {
+//				logger.error("SQL Exception.", se);
+//				JOptionPane.showMessageDialog(SSDataNavigator.this,
+//						"Exception occured refreshing the data.\n" + se.getMessage());
+//			} finally {
+//				addRowsetListener();
+//			}
+//		});
+
+//		// INSERT ROW BUTTON MOVES THE SSROWSET TO THE INSERT ROW POSITION
+//		// AT THIS TIME NAVIGATION HAS TO BE DISABLED
+//		// ONLY COMMIT AND CANCEL ARE ENABLED
+//		addButton.addActionListener((final ActionEvent ae) -> {
+//			logger.debug("ADD button clicked.");
+//			removeRowsetListener();
+//			try {
+//				// Commit changes for current row to database
+//				commitChangesToDatabase(true);
+//
+//				// Move to insert row, update status, and update combo navigator (if applicable)
+//				rowSet.moveToInsertRow();
+//				setInserting(rowSet, true);
+//				if (navCombo!=null) {
+//					navCombo.setEnabled(false);
+//				}
+//
+//				// If we don't use invokeLater() here, the values from the just-committed prior record are displayed for the insert row.
+//				SwingUtilities.invokeLater(() -> dBNav.performPreInsertOps());
+//				
+//				updateButtonState();
+//				
+//			} catch (final SQLException se) {
+//				logger.error("SQL Exception.", se);
+//				JOptionPane.showMessageDialog(SSDataNavigator.this,
+//						"Exception occured while moving to insert row.\n" + se.getMessage());
+//			} finally {
+//				addRowsetListener();
+//			}
+//		});
+
+//		// DELETES THE CURRENT ROW AND MOVES TO NEXT ROW
+//		// IF THE DELETED ROW IS THE LAST ROW THEN MOVES TO LAST ROW IN SSROWSET
+//		// AFTER THE DELETION IS MADE (THATS THE PREVIOUS ROW TO THE DELETED ROW)
+//		deleteButton.addActionListener((final ActionEvent ae) -> {
+//			logger.debug("DELETE button clicked.");
+//			removeRowsetListener();
+//			try {
+//				if (confirmDeletes) {
+//					final int answer = JOptionPane.showConfirmDialog(SSDataNavigator.this,
+//							"Are you sure you want to delete this record?", "Delete Present Record",
+//							JOptionPane.YES_NO_OPTION);
+//					if (answer != JOptionPane.YES_OPTION) {
+//						return;
+//					}
+//				}
+//
+//				if (!dBNav.allowDeletion()) {
+//					return;
+//				}
+//				
+//				// CAPTURE CURRENT ROW PRE-DELETION
+//				final int tmpPosition = currentRow;
+//				
+//				// SET ANTICIPATED ROW COUNT POST-DELETION
+//				final int tmpSize = rowCount-1;
+//				
+//				// PERFORM ANY PRE DELETION OPS
+//				dBNav.performPreDeletionOps();
+//				
+//				// DELETE ROW FROM ROWSET
+//				rowSet.deleteRow();
+//				
+//				// PERFORM ANY POST DELETION OPS (WHICH MAY INVOLVE REQUERYING WHICH IS NEEDED FOR H2)
+//				dBNav.performPostDeletionOps();
+//				
+//				// UPDATE TOTAL ROW COUNT
+//				rowCount=tmpSize;
+//				
+//				// TRY TO NAVIGATE TO THE RECORD AFTER THE DELETED RECORD, OTHERWISE GO TO
+//				// WHATEVER IS THE LAST RECORD
+//				if ((tmpPosition <= rowCount) && (tmpPosition > 0)) {
+//					rowSet.absolute(tmpPosition);
+//				} else {
+//					rowSet.last();
+//				}
+//				
+//				setRowModified(false);
+//				// UPDATE THE STATUS OF THE NAVIGATOR
+//				updateNavigator();
+//				
+//			} catch (final SQLException se) {
+//				logger.error("SQL Exception.", se);
+//				JOptionPane.showMessageDialog(SSDataNavigator.this,
+//						"Exception occured while deleting row.\n" + se.getMessage());
+//			} finally {
+//				addRowsetListener();
+//			}
+//		});
 
 		// LISTENER FOR THE TEXT FIELD. USER CAN ENTER A ROW NUMBER IN THE TEXT
 		// FIELD TO MOVE THE THE SPECIFIED ROW.
@@ -1177,8 +1489,15 @@ public class SSDataNavigator extends JPanel {
 	 * Exposes navigator ActionMap so that developers can add their own mnemonic shortcuts.
 	 */
 	private void buildActionMap() {
-		
 		getActionMap().put("FirstButton", firstButtonAction);
+		getActionMap().put("PreviousButton", previousButtonAction);
+		getActionMap().put("NextButton", nextButtonAction);
+		getActionMap().put("LastButton", lastButtonAction);
+		getActionMap().put("CommitButton", commitButtonAction);
+		getActionMap().put("UndoButton", undoButtonAction);
+		getActionMap().put("RefreshButton", refreshButtonAction);
+		getActionMap().put("AddButton", addButtonAction);
+		getActionMap().put("DeleteButton", deleteButtonAction);
 	}
 	
 	/**
