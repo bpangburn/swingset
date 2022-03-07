@@ -349,7 +349,15 @@ public class Example4 extends JFrame {
 				setVisible(true);
 				pack();
 				
-			// Setup F3 mnemonic for 'FIRST' button on Navigator.
+			// Setup F3-F11 mnemonics for buttons on Navigator.
 				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F3"),"FirstButton");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F4"),"PreviousButton");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F5"),"NextButton");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F6"),"LastButton");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F7"),"CommitButton");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F8"),"UndoButton");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F9"),"RefreshButton");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F10"),"AddButton");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F11"),"DeleteButton");
 			}
 }
