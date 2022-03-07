@@ -506,11 +506,16 @@ public class SSDataNavigator extends JPanel {
 //		}
 	}
 	
-	// FIRST BUTTON
+	/**
+	 * Action for the "First" button on the navigator.
+	 */
 	protected class FirstButtonAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
+		/**
+		 * Constructor for the "First" button Action.
+		 */
 		public FirstButtonAction() {
 			super("FirstButton");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/first.gif")));
@@ -556,11 +561,16 @@ public class SSDataNavigator extends JPanel {
 		}
 	} // end FirstButtonAction
 
-	// PREVOUS BUTTON
+	/**
+	 * Action for the "Previous" button on the navigator.
+	 */
 	protected class PreviousButtonAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
+		/**
+		 * Constructor for the "Previous" button Action.
+		 */
 		public PreviousButtonAction() {
 			super("PreviousButton");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/prev.gif")));
@@ -608,11 +618,16 @@ public class SSDataNavigator extends JPanel {
 		}
 	} // end PreviousButtonAction
 
-	// NEXT BUTTON
+	/**
+	 * Action for the "Next" button on the navigator.
+	 */
 	protected class NextButtonAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
+		/**
+		 * Constructor for the "Next" button Action.
+		 */
 		public NextButtonAction() {
 			super("NextButton");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/next.gif")));
@@ -655,11 +670,16 @@ public class SSDataNavigator extends JPanel {
 		}
 	} // end NextButtonAction
 
-	// LAST
+	/**
+	 * Action for the "Last" button on the navigator.
+	 */
 	protected class LastButtonAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
+		/**
+		 * Constructor for the "Last" button Action.
+		 */
 		public LastButtonAction() {
 			super("LastButton");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/last.gif")));
@@ -701,11 +721,16 @@ public class SSDataNavigator extends JPanel {
 		}
 	} // end LastButtonAction
 
-	// COMMIT
+	/**
+	 * Action for the "Commit" button on the navigator.
+	 */
 	protected class CommitButtonAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
+		/**
+		 * Constructor for the "Commit" button Action.
+		 */
 		public CommitButtonAction() {
 			super("CommitButton");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/commit.gif")));
@@ -790,11 +815,16 @@ public class SSDataNavigator extends JPanel {
 		}
 	} // end CommitButtonAction
 
-	// UNDO
+	/**
+	 * Action for the "Undo" button on the navigator.
+	 */
 	protected class UndoButtonAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
+		/**
+		 * Constructor for the "Undo" button Action.
+		 */
 		public UndoButtonAction() {
 			super("UndoButton");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/undo.gif")));
@@ -850,14 +880,16 @@ public class SSDataNavigator extends JPanel {
 		}
 	} // end UndoButtonAction
 
-	
-	
-	
-	// REFRESH
+	/**
+	 * Action for the "Refresh" button on the navigator.
+	 */
 	protected class RefreshButtonAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
+		/**
+		 * Constructor for the "Refresh" button Action.
+		 */
 		public RefreshButtonAction() {
 			super("RefreshButton");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/refresh.gif")));
@@ -911,11 +943,16 @@ public class SSDataNavigator extends JPanel {
 		}
 	} // end RefreshButtonAction
 
-	// ADD
+	/**
+	 * Action for the "Add" button on the navigator.
+	 */
 	protected class AddButtonAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
+		/**
+		 * Constructor for the "Add" button Action.
+		 */
 		public AddButtonAction() {
 			super("AddButton");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/add.gif")));
@@ -963,11 +1000,16 @@ public class SSDataNavigator extends JPanel {
 		}
 	} // end AddButtonAction
 
-	// DELETE
+	/**
+	 * Action for the "Delete" button on the navigator.
+	 */
 	protected class DeleteButtonAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
+		/**
+		 * Action for the "Delete" button Action.
+		 */
 		public DeleteButtonAction() {
 			super("DeleteButton");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/delete.gif")));
