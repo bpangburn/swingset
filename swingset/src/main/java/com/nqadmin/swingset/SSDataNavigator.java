@@ -1027,7 +1027,7 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("DELETE button clicked.");
 			
 			// (a mnemonic/shortcut can trigger action for a disabled button).
-			if (!addButton.isEnabled())
+			if (!deleteButton.isEnabled())
 				return;
 			
 			removeRowsetListener();
