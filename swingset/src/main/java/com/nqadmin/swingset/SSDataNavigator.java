@@ -229,7 +229,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Add' button on navigator
 	 */
-	protected AbstractAction navAddAction = new NavAddAction();
+	private AbstractAction navAddAction = new NavAddAction();
 
 	/**
 	 * Button to add a record to the RowSet.
@@ -250,7 +250,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Commit' button on navigator
 	 */
-	protected AbstractAction navCommitAction = new NavCommitAction();
+	private AbstractAction navCommitAction = new NavCommitAction();
 
 	/**
 	 * Button to commit screen changes to the RowSet.
@@ -280,7 +280,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Delete' button on navigator
 	 */
-	protected AbstractAction navDeleteAction = new NavDeleteAction();
+	private AbstractAction navDeleteAction = new NavDeleteAction();
 
 	/**
 	 * Button to delete the current record in the RowSet.
@@ -301,7 +301,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'First' button on navigator
 	 */
-	protected AbstractAction navFirstAction = new NavFirstAction();
+	private AbstractAction navFirstAction = new NavFirstAction();
 
 	/**
 	 * Button to navigate to the first record in the RowSet.
@@ -322,7 +322,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Last' button on navigator
 	 */
-	protected AbstractAction navLastAction = new NavLastAction();
+	private AbstractAction navLastAction = new NavLastAction();
 
 	/**
 	 * Button to navigate to the last record in the RowSet.
@@ -351,7 +351,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Next' button on navigator
 	 */
-	protected AbstractAction navNextAction = new NavNextAction();
+	private AbstractAction navNextAction = new NavNextAction();
 
 	/**
 	 * Button to navigate to the next record in the RowSet.
@@ -361,7 +361,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Previous' button on navigator
 	 */
-	protected AbstractAction navPreviousAction = new NavPreviousAction();
+	private AbstractAction navPreviousAction = new NavPreviousAction();
 
 	/**
 	 * Button to navigate to the previous record in the RowSet.
@@ -371,7 +371,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Refresh' button on navigator
 	 */
-	protected AbstractAction navRefreshAction = new NavRefreshAction();
+	private AbstractAction navRefreshAction = new NavRefreshAction();
 	
 	/**
 	 * Button to refresh the screen based on any changes to the RowSet.
@@ -411,7 +411,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Undo' button on navigator
 	 */
-	protected AbstractAction navUndoAction = new NavUndoAction();
+	private AbstractAction navUndoAction = new NavUndoAction();
 
 	/**
 	 * Button to revert screen changes based on the RowSet.
