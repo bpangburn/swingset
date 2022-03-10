@@ -228,12 +228,12 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Add' button on navigator
 	 */
-	protected AbstractAction addButtonAction = new AddButtonAction();
+	protected AbstractAction navAddAction = new NavAddAction();
 
 	/**
 	 * Button to add a record to the RowSet.
 	 */
-	protected JButton addButton = new JButton(addButtonAction);
+	protected JButton addButton = new JButton(navAddAction);
 
 	/**
 	 * Navigator button dimensions.
@@ -249,12 +249,12 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Commit' button on navigator
 	 */
-	protected AbstractAction commitButtonAction = new CommitButtonAction();
+	protected AbstractAction navCommitAction = new NavCommitAction();
 
 	/**
 	 * Button to commit screen changes to the RowSet.
 	 */
-	protected JButton commitButton = new JButton(commitButtonAction);
+	protected JButton commitButton = new JButton(navCommitAction);
 
 	/**
 	 * Indicator to force confirmation of RowSet deletions.
@@ -279,12 +279,12 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Delete' button on navigator
 	 */
-	protected AbstractAction deleteButtonAction = new DeleteButtonAction();
+	protected AbstractAction navDeleteAction = new NavDeleteAction();
 
 	/**
 	 * Button to delete the current record in the RowSet.
 	 */
-	protected JButton deleteButton = new JButton(deleteButtonAction);
+	protected JButton deleteButton = new JButton(navDeleteAction);
 
 	/**
 	 * Indicator to allow/disallow deletions from the RowSet.
@@ -300,13 +300,13 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'First' button on navigator
 	 */
-	protected AbstractAction firstButtonAction = new FirstButtonAction();
+	protected AbstractAction navFirstAction = new NavFirstAction();
 
 	/**
 	 * Button to navigate to the first record in the RowSet.
 	 */
 	//protected JButton firstButton = new JButton();
-	protected JButton firstButton = new JButton(firstButtonAction);
+	protected JButton firstButton = new JButton(navFirstAction);
 
 	/**
 	 * Indicator to allow/disallow insertions to the RowSet.
@@ -321,12 +321,12 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Last' button on navigator
 	 */
-	protected AbstractAction lastButtonAction = new LastButtonAction();
+	protected AbstractAction navLastAction = new NavLastAction();
 
 	/**
 	 * Button to navigate to the last record in the RowSet.
 	 */
-	protected JButton lastButton = new JButton(lastButtonAction);
+	protected JButton lastButton = new JButton(navLastAction);
 
 	/**
 	 * Label to display the total number of records in the RowSet.
@@ -350,32 +350,32 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Next' button on navigator
 	 */
-	protected AbstractAction nextButtonAction = new NextButtonAction();
+	protected AbstractAction navNextAction = new NavNextAction();
 
 	/**
 	 * Button to navigate to the next record in the RowSet.
 	 */
-	protected JButton nextButton = new JButton(nextButtonAction);
+	protected JButton nextButton = new JButton(navNextAction);
 	
 	/**
 	 * Action for 'Previous' button on navigator
 	 */
-	protected AbstractAction previousButtonAction = new PreviousButtonAction();
+	protected AbstractAction navPreviousAction = new NavPreviousAction();
 
 	/**
 	 * Button to navigate to the previous record in the RowSet.
 	 */
-	protected JButton previousButton = new JButton(previousButtonAction);
+	protected JButton previousButton = new JButton(navPreviousAction);
 
 	/**
 	 * Action for 'Refresh' button on navigator
 	 */
-	protected AbstractAction refreshButtonAction = new RefreshButtonAction();
+	protected AbstractAction navRefreshAction = new NavRefreshAction();
 	
 	/**
 	 * Button to refresh the screen based on any changes to the RowSet.
 	 */
-	protected JButton refreshButton = new JButton(refreshButtonAction);
+	protected JButton refreshButton = new JButton(navRefreshAction);
 
 	/**
 	 * Number of rows in RowSet. Set to zero if next() method returns false.
@@ -410,12 +410,12 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Undo' button on navigator
 	 */
-	protected AbstractAction undoButtonAction = new UndoButtonAction();
+	protected AbstractAction navUndoAction = new NavUndoAction();
 
 	/**
 	 * Button to revert screen changes based on the RowSet.
 	 */
-	protected JButton undoButton = new JButton(undoButtonAction);
+	protected JButton undoButton = new JButton(navUndoAction);
 
 	//
 	// TODO:
@@ -509,15 +509,15 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for the "First" button on the navigator.
 	 */
-	protected class FirstButtonAction extends AbstractAction {
+	protected class NavFirstAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
 		/**
 		 * Constructor for the "First" button Action.
 		 */
-		public FirstButtonAction() {
-			super("FirstButton");
+		public NavFirstAction() {
+			super("First");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/first.gif")));
 			putValue(SHORT_DESCRIPTION, "Navigate to First Record");
 //	        putValue(MNEMONIC_KEY, mnemonic);
@@ -559,20 +559,20 @@ public class SSDataNavigator extends JPanel {
 				addRowsetListener();
 			}
 		}
-	} // end FirstButtonAction
+	} // end NavFirstAction
 
 	/**
 	 * Action for the "Previous" button on the navigator.
 	 */
-	protected class PreviousButtonAction extends AbstractAction {
+	protected class NavPreviousAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
 		/**
 		 * Constructor for the "Previous" button Action.
 		 */
-		public PreviousButtonAction() {
-			super("PreviousButton");
+		public NavPreviousAction() {
+			super("Previous");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/prev.gif")));
 			putValue(SHORT_DESCRIPTION, "Navigate to Previous Record");
 //	        putValue(MNEMONIC_KEY, mnemonic);
@@ -616,20 +616,20 @@ public class SSDataNavigator extends JPanel {
 				addRowsetListener();
 			}
 		}
-	} // end PreviousButtonAction
+	} // end NavPreviousAction
 
 	/**
 	 * Action for the "Next" button on the navigator.
 	 */
-	protected class NextButtonAction extends AbstractAction {
+	protected class NavNextAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
 		/**
 		 * Constructor for the "Next" button Action.
 		 */
-		public NextButtonAction() {
-			super("NextButton");
+		public NavNextAction() {
+			super("Next");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/next.gif")));
 			putValue(SHORT_DESCRIPTION, "Navigate to Next Record");
 //	        putValue(MNEMONIC_KEY, mnemonic);
@@ -668,20 +668,20 @@ public class SSDataNavigator extends JPanel {
 				addRowsetListener();
 			}
 		}
-	} // end NextButtonAction
+	} // end NavNextAction
 
 	/**
 	 * Action for the "Last" button on the navigator.
 	 */
-	protected class LastButtonAction extends AbstractAction {
+	protected class NavLastAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
 		/**
 		 * Constructor for the "Last" button Action.
 		 */
-		public LastButtonAction() {
-			super("LastButton");
+		public NavLastAction() {
+			super("Last");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/last.gif")));
 			putValue(SHORT_DESCRIPTION, "Navigate to Last Record");
 //	        putValue(MNEMONIC_KEY, mnemonic);
@@ -719,20 +719,20 @@ public class SSDataNavigator extends JPanel {
 				addRowsetListener();
 			}
 		}
-	} // end LastButtonAction
+	} // end NavLastAction
 
 	/**
 	 * Action for the "Commit" button on the navigator.
 	 */
-	protected class CommitButtonAction extends AbstractAction {
+	protected class NavCommitAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
 		/**
 		 * Constructor for the "Commit" button Action.
 		 */
-		public CommitButtonAction() {
-			super("CommitButton");
+		public NavCommitAction() {
+			super("Commit");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/commit.gif")));
 			putValue(SHORT_DESCRIPTION, "Commit/Save Current Record");
 //	        putValue(MNEMONIC_KEY, mnemonic);
@@ -813,20 +813,20 @@ public class SSDataNavigator extends JPanel {
 				addRowsetListener();
 			}
 		}
-	} // end CommitButtonAction
+	} // end NavCommitAction
 
 	/**
 	 * Action for the "Undo" button on the navigator.
 	 */
-	protected class UndoButtonAction extends AbstractAction {
+	protected class NavUndoAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
 		/**
 		 * Constructor for the "Undo" button Action.
 		 */
-		public UndoButtonAction() {
-			super("UndoButton");
+		public NavUndoAction() {
+			super("Undo");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/undo.gif")));
 			putValue(SHORT_DESCRIPTION, "Undo/Revert Changes to Current Record");
 //	        putValue(MNEMONIC_KEY, mnemonic);
@@ -878,20 +878,20 @@ public class SSDataNavigator extends JPanel {
 				addRowsetListener();
 			}
 		}
-	} // end UndoButtonAction
+	} // end NavUndoAction
 
 	/**
 	 * Action for the "Refresh" button on the navigator.
 	 */
-	protected class RefreshButtonAction extends AbstractAction {
+	protected class NavRefreshAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
 		/**
 		 * Constructor for the "Refresh" button Action.
 		 */
-		public RefreshButtonAction() {
-			super("RefreshButton");
+		public NavRefreshAction() {
+			super("Refresh");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/refresh.gif")));
 			putValue(SHORT_DESCRIPTION, "Refresh/Reload Current Record");
 //	        putValue(MNEMONIC_KEY, mnemonic);
@@ -941,20 +941,20 @@ public class SSDataNavigator extends JPanel {
 				addRowsetListener();
 			}
 		}
-	} // end RefreshButtonAction
+	} // end NavRefreshAction
 
 	/**
 	 * Action for the "Add" button on the navigator.
 	 */
-	protected class AddButtonAction extends AbstractAction {
+	protected class NavAddAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
 		/**
 		 * Constructor for the "Add" button Action.
 		 */
-		public AddButtonAction() {
-			super("AddButton");
+		public NavAddAction() {
+			super("Add");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/add.gif")));
 			putValue(SHORT_DESCRIPTION, "Add a New Record");
 //	        putValue(MNEMONIC_KEY, mnemonic);
@@ -998,20 +998,20 @@ public class SSDataNavigator extends JPanel {
 				addRowsetListener();
 			}
 		}
-	} // end AddButtonAction
+	} // end NavAddAction
 
 	/**
 	 * Action for the "Delete" button on the navigator.
 	 */
-	protected class DeleteButtonAction extends AbstractAction {
+	protected class NavDeleteAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
 		/**
 		 * Action for the "Delete" button Action.
 		 */
-		public DeleteButtonAction() {
-			super("DeleteButton");
+		public NavDeleteAction() {
+			super("Delete");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/delete.gif")));
 			putValue(SHORT_DESCRIPTION, "Delete the Current Record");
 //	        putValue(MNEMONIC_KEY, mnemonic);
@@ -1083,7 +1083,7 @@ public class SSDataNavigator extends JPanel {
 				addRowsetListener();
 			}
 		}
-	} // end DeleteButtonAction
+	} // end NavDeleteAction
 
 	/**
 	 * Adds the listeners for the navigator components.
@@ -1531,15 +1531,15 @@ public class SSDataNavigator extends JPanel {
 	 * Exposes navigator ActionMap so that developers can add their own mnemonic shortcuts.
 	 */
 	private void buildActionMap() {
-		getActionMap().put("FirstButton", firstButtonAction);
-		getActionMap().put("PreviousButton", previousButtonAction);
-		getActionMap().put("NextButton", nextButtonAction);
-		getActionMap().put("LastButton", lastButtonAction);
-		getActionMap().put("CommitButton", commitButtonAction);
-		getActionMap().put("UndoButton", undoButtonAction);
-		getActionMap().put("RefreshButton", refreshButtonAction);
-		getActionMap().put("AddButton", addButtonAction);
-		getActionMap().put("DeleteButton", deleteButtonAction);
+		getActionMap().put("NavFirst", navFirstAction);
+		getActionMap().put("NavPrevious", navPreviousAction);
+		getActionMap().put("NavNext", navNextAction);
+		getActionMap().put("NavLast", navLastAction);
+		getActionMap().put("NavCommit", navCommitAction);
+		getActionMap().put("NavUndo", navUndoAction);
+		getActionMap().put("NavRefresh", navRefreshAction);
+		getActionMap().put("NavAdd", navAddAction);
+		getActionMap().put("NavDelete", navDeleteAction);
 	}
 	
 	/**
