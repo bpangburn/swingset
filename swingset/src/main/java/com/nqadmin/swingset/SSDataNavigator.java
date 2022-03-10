@@ -53,6 +53,7 @@ import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -533,12 +534,6 @@ public class SSDataNavigator extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			logger.debug("FIRST button clicked.");
-
-			// If button is disabled then return without action
-			// (a mnemonic/shortcut can trigger action for a disabled button).
-			if (!firstButton.isEnabled())
-				return;
-
 			removeRowsetListener();
 			try {
 				if (!commitChangesToDatabase(true))
@@ -588,12 +583,6 @@ public class SSDataNavigator extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			logger.debug("PREVIOUS button clicked.");
-
-			// If button is disabled then return without action
-			// (a mnemonic/shortcut can trigger action for a disabled button).
-			if (!previousButton.isEnabled())
-				return;
-
 			removeRowsetListener();
 			try {
 				if (!commitChangesToDatabase(true))
@@ -642,12 +631,6 @@ public class SSDataNavigator extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			logger.debug("NEXT button clicked.");
-
-			// If button is disabled then return without action
-			// (a mnemonic/shortcut can trigger action for a disabled button).
-			if (!nextButton.isEnabled())
-				return;
-
 			removeRowsetListener();
 			try {
 				if (!commitChangesToDatabase(true))
@@ -694,12 +677,6 @@ public class SSDataNavigator extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			logger.debug("LAST button clicked.");
-			
-			// If button is disabled then return without action
-			// (a mnemonic/shortcut can trigger action for a disabled button).
-			if (!lastButton.isEnabled())
-				return;
-			
 			removeRowsetListener();
 			try {
 				if (!commitChangesToDatabase(true)) return;
@@ -748,12 +725,6 @@ public class SSDataNavigator extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			logger.debug("COMMIT button clicked.");
-			
-			// If button is disabled then return without action
-			// (a mnemonic/shortcut can trigger action for a disabled button).
-			if (!commitButton.isEnabled())
-				return;
-			
 			removeRowsetListener();
 			try {
 				if (isInserting(rowSet)) {
@@ -841,12 +812,6 @@ public class SSDataNavigator extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			logger.debug("UNDO button clicked.");
-			
-			// If button is disabled then return without action
-			// (a mnemonic/shortcut can trigger action for a disabled button).
-			if (!undoButton.isEnabled())
-				return;
-			
 			removeRowsetListener();
 			try {
 				// CALL MOVE TO CURRENT ROW IF ON INSERT ROW.
@@ -906,13 +871,7 @@ public class SSDataNavigator extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			logger.debug("REFRESH button clicked.");
-			
-			// (a mnemonic/shortcut can trigger action for a disabled button).
-			if (!refreshButton.isEnabled())
-				return;
-			
 			removeRowsetListener();
-			
 			try {
 				if (callExecute) {
 					rowSet.execute();
@@ -967,13 +926,7 @@ public class SSDataNavigator extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			logger.debug("ADD button clicked.");
-			
-			// (a mnemonic/shortcut can trigger action for a disabled button).
-			if (!addButton.isEnabled())
-				return;
-			
 			removeRowsetListener();
-			
 			try {
 				// Commit changes for current row to database
 				commitChangesToDatabase(true);
@@ -1025,11 +978,6 @@ public class SSDataNavigator extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			logger.debug("DELETE button clicked.");
-			
-			// (a mnemonic/shortcut can trigger action for a disabled button).
-			if (!deleteButton.isEnabled())
-				return;
-			
 			removeRowsetListener();
 			try {
 				if (confirmDeletes) {
@@ -2070,9 +2018,15 @@ public class SSDataNavigator extends JPanel {
 		}
 	}
 
-	private static void updb(JButton b, boolean flag) {
-		if(b.isEnabled() != flag) {
-			b.setEnabled(flag);
+//	private static void updb(JButton b, boolean flag) {
+//		if(b.isEnabled() != flag) {
+//			b.setEnabled(flag);
+//		}
+//	}
+	
+	private static void updateEnable(Action _action, boolean _flag) {
+		if(_action.isEnabled() != _flag) {
+			_action.setEnabled(_flag);
 		}
 	}
 
@@ -2157,30 +2111,30 @@ public class SSDataNavigator extends JPanel {
 		boolean atFirst = currentRow == 1;
 		boolean atLast = currentRow == rowCount;
 
-		updb(firstButton, canNavigate && !atFirst);
-		updb(previousButton, canNavigate && !atFirst);
-		updb(nextButton, canNavigate && !atLast);
-		updb(lastButton, canNavigate && !atLast);
+		updateEnable(navFirstAction, canNavigate && !atFirst);
+		updateEnable(navPreviousAction, canNavigate && !atFirst);
+		updateEnable(navNextAction, canNavigate && !atLast);
+		updateEnable(navLastAction, canNavigate && !atLast);
 
 		// Handle commit, undo
 		boolean commitUndoOk = (onInsertRow || isRowModified || commitUndoAlwaysEnabled) && modification;
-		updb(commitButton, commitUndoOk  && !hasError);
-		updb(undoButton, commitUndoOk);
+		updateEnable(navCommitAction, commitUndoOk  && !hasError);
+		updateEnable(navUndoAction, commitUndoOk);
 
 		// TODO: Consider if row is dirty, delete button makes sense,
 		//			but, does the add button make sense?
 		// Handle add, delete
 		if (onInsertRow) {
-			updb(addButton, false);
-			updb(deleteButton, false);
+			updateEnable(navAddAction, false);
+			updateEnable(navDeleteAction, false);
 		} else {
 			// Perhaps the following should only be "!isRowModified"
-			updb(addButton, insertion && !disablingAutoCommit && modification);
-			updb(deleteButton, deletion && modification && rowCount != 0);
+			updateEnable(navAddAction, insertion && !disablingAutoCommit && modification);
+			updateEnable(navDeleteAction, deletion && modification && rowCount != 0);
 		}
 
 		// refresh
-		updb(refreshButton, !onInsertRow && !disablingAutoCommit);
+		updateEnable(navRefreshAction, !onInsertRow && !disablingAutoCommit);
 	}
 
 	/**
@@ -2193,12 +2147,12 @@ public class SSDataNavigator extends JPanel {
 		updateButtonState();
 		try {
 			if (rowSet.isLast()) {
-				updb(nextButton, false);
-				updb(lastButton, false);
+				updateEnable(navNextAction, false);
+				updateEnable(navLastAction, false);
 			}
 			if (rowSet.isFirst()) {
-				updb(firstButton, false);
-				updb(previousButton, false);
+				updateEnable(navFirstAction, false);
+				updateEnable(navPreviousAction, false);
 			}
 		} catch (SQLException ex) {
 			logger.error("SQL Exception.", ex);
