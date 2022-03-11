@@ -41,6 +41,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.StackLocatorUtil;
+
 /**
  *
  * @author err
@@ -48,7 +52,29 @@ import java.util.List;
 public class SSUtils {
 	private SSUtils() {}
 
-	//private static final Logger logger = LogManager.getLogger();
+	/**
+	 * This is similar to LogManager.getLogger(), except that
+	 * if getLogger fails then this method returns the root logger.
+	 * So this is suitable for UI components that might get instantiated
+	 * by a gui builder.
+	 *
+	 * See: https://github.com/bpangburn/swingset/pull/123
+	 * 
+	 * @return the Logger
+	 */
+	public static Logger getLogger() {
+		// NOTE: this can be re-implemented by examining
+		// new Throwable().getStackTrace();
+		Logger logger;
+		try {
+			return LogManager.getLogger(StackLocatorUtil.getCallerClass(2));
+		} catch(UnsupportedOperationException ex) {}
+		logger = LogManager.getRootLogger();
+		// Note: can check for root logger with
+		// logger.getName().isEmpty()
+		logger.error("Using RootLogger", new Throwable());
+		return logger;
+	}
 
 	/**
 	 * Returns an unmodifiable list containing an arbitrary number of elements.
@@ -58,7 +84,7 @@ public class SSUtils {
 	 * @return list
 	 */
 	@SafeVarargs
-	static <T> List<T> listOf(T... args) {
+	public static <T> List<T> listOf(T... args) {
 		Object[] arr = Arrays.copyOf(args, args.length);
 		@SuppressWarnings("unchecked")
 		List<T> list = (List<T>) Collections.unmodifiableList(Arrays.asList(arr));

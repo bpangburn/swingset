@@ -53,7 +53,6 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.table.TableCellEditor;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.rowset.JdbcRowSetImpl;
@@ -70,7 +69,7 @@ import com.nqadmin.swingset.SSDataGrid;
 //public abstract class SSDataGridScreenHelper extends JInternalFrame {
 public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	
-	private static Logger logger = LogManager.getLogger(); // Log4j Logger for component
+	private static Logger logger = SSUtils.getLogger(); // Log4j Logger for component
 	
 	private static final long serialVersionUID = 3558830097072342112L; // unique serial ID
 

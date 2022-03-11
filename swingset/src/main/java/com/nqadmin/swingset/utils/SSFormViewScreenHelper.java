@@ -46,7 +46,6 @@ import javax.swing.SwingConstants;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.rowset.JdbcRowSetImpl;
@@ -248,7 +247,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		}
 	}
 	
-	private static Logger logger = LogManager.getLogger(); // Log4j Logger for component
+	private static Logger logger = SSUtils.getLogger(); // Log4j Logger for component
 
 	private static final long serialVersionUID = 266766406708536384L; // unique serial ID
 	

@@ -51,8 +51,6 @@ import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
-import org.apache.logging.log4j.LogManager;
-
 import java.sql.Connection;
 
 import com.nqadmin.swingset.SSDataNavigator;
@@ -497,8 +495,6 @@ public interface SSComponentInterface {
 	 */
 	default void setBoundColumnText(final String _boundColumnText) {
 		getSSCommon().setBoundColumnText(_boundColumnText);
-
-		LogManager.getLogger().debug("{}: " + _boundColumnText, () -> getColumnForLog());
 	}
 
 	/**

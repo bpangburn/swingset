@@ -38,17 +38,23 @@
 package com.nqadmin.swingset.models;
 
 import com.nqadmin.swingset.utils.SSArray;
+
 import java.sql.Array;
 import java.sql.JDBCType;
 import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.sql.RowSet;
-import org.apache.logging.log4j.LogManager;
+
 import org.apache.logging.log4j.Logger;
+
 import static com.nqadmin.swingset.datasources.RowSetOps.*;
+
 import java.util.Arrays;
+
+import com.nqadmin.swingset.utils.SSUtils;
 
 // SSDbArrayModel.java
 //
@@ -76,7 +82,7 @@ public class SSDbArrayModel extends SSAbstractCollectionModel {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/** {@inheritDoc } */
 	@Override

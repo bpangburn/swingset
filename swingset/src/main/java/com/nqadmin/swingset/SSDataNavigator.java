@@ -62,15 +62,16 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 //TODO: ENABLE FOR EVENTBUS
 //import com.google.common.eventbus.EventBus;
 //import com.google.common.eventbus.Subscribe;
 //import com.nqadmin.swingset.utils.RowSetModificationEvent;
+
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
+import com.nqadmin.swingset.utils.SSUtils;
 
 //TODO: ENABLE FOR EVENTBUS
 //import static com.nqadmin.swingset.utils.SSUtils.getLocalEventBus;
@@ -217,7 +218,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id

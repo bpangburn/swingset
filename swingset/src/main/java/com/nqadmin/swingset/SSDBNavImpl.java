@@ -56,10 +56,10 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
+import com.nqadmin.swingset.utils.SSUtils;
 
 // SSDBNavImpl.java
 //
@@ -84,7 +84,7 @@ public class SSDBNavImpl implements SSDBNav {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id

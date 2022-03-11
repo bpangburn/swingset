@@ -57,7 +57,6 @@ import javax.swing.ListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
@@ -67,6 +66,7 @@ import com.nqadmin.swingset.models.SSDbArrayModel;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSUtils;
 
 // SSList.java
 //
@@ -132,7 +132,7 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id
