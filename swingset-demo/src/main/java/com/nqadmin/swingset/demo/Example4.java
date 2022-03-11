@@ -349,7 +349,11 @@ public class Example4 extends JFrame {
 				setVisible(true);
 				pack();
 				
-			// Setup F3-F11 mnemonics for buttons on Navigator.
+			// Illustrate use of InputMap/ActionMap for custom key handling.
+			// Setup F3-F11 mnemonics to correspond to the buttons on Navigator.
+			// These are currently the only Actions available in the SSDataNavigator ActionMap.
+			//
+			// See https://docs.oracle.com/javase/tutorial/uiswing/misc/action.html
 				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F3"),"NavFirst");
 				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F4"),"NavPrevious");
 				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F5"),"NavNext");
