@@ -229,7 +229,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Add' button on navigator
 	 */
-	private AbstractAction navAddAction = new NavAddAction();
+	final private AbstractAction navAddAction = new NavAddAction();
 
 	/**
 	 * Button to add a record to the RowSet.
@@ -250,7 +250,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Commit' button on navigator
 	 */
-	private AbstractAction navCommitAction = new NavCommitAction();
+	final private AbstractAction navCommitAction = new NavCommitAction();
 
 	/**
 	 * Button to commit screen changes to the RowSet.
@@ -280,7 +280,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Delete' button on navigator
 	 */
-	private AbstractAction navDeleteAction = new NavDeleteAction();
+	final private AbstractAction navDeleteAction = new NavDeleteAction();
 
 	/**
 	 * Button to delete the current record in the RowSet.
@@ -301,7 +301,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'First' button on navigator
 	 */
-	private AbstractAction navFirstAction = new NavFirstAction();
+	final private AbstractAction navFirstAction = new NavFirstAction();
 
 	/**
 	 * Button to navigate to the first record in the RowSet.
@@ -322,7 +322,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Last' button on navigator
 	 */
-	private AbstractAction navLastAction = new NavLastAction();
+	final private AbstractAction navLastAction = new NavLastAction();
 
 	/**
 	 * Button to navigate to the last record in the RowSet.
@@ -351,7 +351,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Next' button on navigator
 	 */
-	private AbstractAction navNextAction = new NavNextAction();
+	final private AbstractAction navNextAction = new NavNextAction();
 
 	/**
 	 * Button to navigate to the next record in the RowSet.
@@ -361,7 +361,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Previous' button on navigator
 	 */
-	private AbstractAction navPreviousAction = new NavPreviousAction();
+	final private AbstractAction navPreviousAction = new NavPreviousAction();
 
 	/**
 	 * Button to navigate to the previous record in the RowSet.
@@ -371,7 +371,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Refresh' button on navigator
 	 */
-	private AbstractAction navRefreshAction = new NavRefreshAction();
+	final private AbstractAction navRefreshAction = new NavRefreshAction();
 	
 	/**
 	 * Button to refresh the screen based on any changes to the RowSet.
@@ -411,7 +411,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for 'Undo' button on navigator
 	 */
-	private AbstractAction navUndoAction = new NavUndoAction();
+	final private AbstractAction navUndoAction = new NavUndoAction();
 
 	/**
 	 * Button to revert screen changes based on the RowSet.
@@ -510,7 +510,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for the "First" button on the navigator.
 	 */
-	protected class NavFirstAction extends AbstractAction {
+	final private class NavFirstAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
@@ -559,7 +559,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for the "Previous" button on the navigator.
 	 */
-	protected class NavPreviousAction extends AbstractAction {
+	final private class NavPreviousAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
@@ -610,7 +610,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for the "Next" button on the navigator.
 	 */
-	protected class NavNextAction extends AbstractAction {
+	final private class NavNextAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
@@ -656,7 +656,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for the "Last" button on the navigator.
 	 */
-	protected class NavLastAction extends AbstractAction {
+	final private class NavLastAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
@@ -701,7 +701,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for the "Commit" button on the navigator.
 	 */
-	protected class NavCommitAction extends AbstractAction {
+	final private class NavCommitAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
@@ -789,7 +789,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for the "Undo" button on the navigator.
 	 */
-	protected class NavUndoAction extends AbstractAction {
+	final private class NavUndoAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
@@ -848,7 +848,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for the "Refresh" button on the navigator.
 	 */
-	protected class NavRefreshAction extends AbstractAction {
+	final private class NavRefreshAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
@@ -905,7 +905,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for the "Add" button on the navigator.
 	 */
-	protected class NavAddAction extends AbstractAction {
+	final private class NavAddAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
@@ -956,7 +956,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * Action for the "Delete" button on the navigator.
 	 */
-	protected class NavDeleteAction extends AbstractAction {
+	final private class NavDeleteAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L; // Unique ID
 
