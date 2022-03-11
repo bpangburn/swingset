@@ -57,6 +57,8 @@ public class SSUtils {
 	 * if getLogger fails then this method returns the root logger.
 	 * So this is suitable for UI components that might get instantiated
 	 * by a gui builder.
+	 *
+	 * See: https://github.com/bpangburn/swingset/pull/123
 	 * 
 	 * @return the Logger
 	 */
