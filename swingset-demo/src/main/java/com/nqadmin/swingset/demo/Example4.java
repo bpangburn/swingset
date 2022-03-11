@@ -61,7 +61,6 @@ import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import javax.swing.Action;
-import javax.swing.ActionMap;
 import javax.swing.JButton;
 
 /**
