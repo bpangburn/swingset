@@ -60,6 +60,9 @@ import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.utils.SSSyncManager;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.JButton;
 
 /**
  * This example displays data from the part_data table.
@@ -341,6 +344,21 @@ public class Example4 extends JFrame {
 				constraints.gridy = 6;
 				constraints.gridwidth = 2;
 				contentPane.add(navigator, constraints);
+
+				constraints.gridy = 7;
+				constraints.gridwidth = 1;
+				Action a;
+				JButton b;
+
+				a = navigator.getActionMap().get("NavFirst");
+				b = new JButton(a);
+				constraints.gridx = 0;
+				contentPane.add(b, constraints);
+
+				a = navigator.getActionMap().get("NavLast");
+				b = new JButton(a);
+				constraints.gridx = 1;
+				contentPane.add(b, constraints);
 
 			// DISABLE THE PRIMARY KEY
 				txtPartID.setEnabled(false);
