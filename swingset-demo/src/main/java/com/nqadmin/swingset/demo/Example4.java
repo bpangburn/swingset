@@ -347,31 +347,17 @@ public class Example4 extends JFrame {
 
 				constraints.gridy = 7;
 				constraints.gridwidth = 1;
-				Action a;
-				JButton b;
-
-				a = navigator.getActionMap().get("NavFirst");
-				b = new JButton(a);
-				constraints.gridx = 0;
-				contentPane.add(b, constraints);
-
-				a = navigator.getActionMap().get("NavLast");
-				b = new JButton(a);
-				constraints.gridx = 1;
-				contentPane.add(b, constraints);
-
-			// DISABLE THE PRIMARY KEY
-				txtPartID.setEnabled(false);
-	
-			// MAKE THE JFRAME VISIBLE
-				setVisible(true);
-				pack();
 				
-			// Illustrate use of InputMap/ActionMap for custom key handling.
+			// Illustrate use of InputMap/ActionMap for custom key and extra button handling.
 			// Setup F3-F11 mnemonics to correspond to the buttons on Navigator.
-			// These are currently the only Actions available in the SSDataNavigator ActionMap.
+			// There are also two new buttons below the Navigator (extra first and last)
+			//
+			// The actions here are currently the only Actions available in the SSDataNavigator
+			// ActionMap.
 			//
 			// See https://docs.oracle.com/javase/tutorial/uiswing/misc/action.html
+				
+			// Hotkeys/mnemonics
 				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F3"),"NavFirst");
 				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F4"),"NavPrevious");
 				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F5"),"NavNext");
@@ -381,5 +367,28 @@ public class Example4 extends JFrame {
 				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F9"),"NavRefresh");
 				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F10"),"NavAdd");
 				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F11"),"NavDelete");
+				
+			// "Extra" buttons
+				Action tmpAction;
+				JButton tmpButton;
+
+				// First record
+				tmpAction = navigator.getActionMap().get("NavFirst");
+				tmpButton = new JButton(tmpAction);
+				constraints.gridx = 0;
+				contentPane.add(tmpButton, constraints);
+				
+				// Last record
+				tmpAction = navigator.getActionMap().get("NavLast");
+				tmpButton = new JButton(tmpAction);
+				constraints.gridx = 1;
+				contentPane.add(tmpButton, constraints);
+
+			// DISABLE THE PRIMARY KEY
+				txtPartID.setEnabled(false);
+	
+			// MAKE THE JFRAME VISIBLE
+				setVisible(true);
+				pack();
 			}
 }
