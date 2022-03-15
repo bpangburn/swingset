@@ -27,8 +27,10 @@ Changes:
 	   https://github.com/bpangburn/swingset/issues/121.
 	6. Updated Dependency Check Maven Plugin to 7.0.0.
 	7. Updated Log4j to 2.17.2.
-    
-	   
+	8. Added variable and updated Versions Maven Plugin to 2.10.0,
+	9. Updated Maven Deploy Plugin to 3.0.0-M2.
+	10.Updated Maven Site Plugin to 3.11.0.
+	11.Updated Maven Compiler Plugin to 3.10.1.
 
 ==============================================================================
 SwingSet 4.0.8 - Released 2022-02-10
