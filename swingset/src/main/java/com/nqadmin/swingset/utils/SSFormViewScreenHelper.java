@@ -605,7 +605,8 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			addCoreListeners();
 			
 			// MAKE SCREEN VISIBLE
-			showUp(getParentContainer());
+			// THIS SHOULD HAPPEN SEPARATELY FROM INITIALIZING OF SCREEN
+//			showUp(getParentContainer());
 				
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
