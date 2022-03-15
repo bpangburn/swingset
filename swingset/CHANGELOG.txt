@@ -24,8 +24,9 @@ Changes:
 	   https://github.com/bpangburn/swingset/discussions/93#discussioncomment-2258596
 	4. Minor code cleanup to eliminate some Eclipse warnings.
 	5. SSDataGrid container bug. See:
-	   https://github.com/bpangburn/swingset/issues/121
-	6. 
+	   https://github.com/bpangburn/swingset/issues/121.
+	6. Updated Dependency Check Maven Plugin to 7.0.0.
+	7. Updated Log4j to 2.17.2.
     
 	   
 
