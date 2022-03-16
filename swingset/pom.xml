@@ -99,9 +99,16 @@
 	</repositories>
 
 	<dependencies>
+		<!-- MAIN GLAZED LIST ARTIFACT - CURRENTLY DISABLED AWAITING NEXT RELEASE FEATURES:
+		     https://github.com/glazedlists/glazedlists -->
 		<!-- https://mvnrepository.com/artifact/com.glazedlists/glazedlists -->
-		<!-- <dependency> <groupId>com.glazedlists</groupId> <artifactId>glazedlists</artifactId> 
-			<version>${version.glazedlists}</version> </dependency> -->
+		<!-- 
+		<dependency>
+			<groupId>com.glazedlists</groupId>
+			<artifactId>glazedlists</artifactId> 
+			<version>${version.glazedlists}</version>
+		</dependency>
+		-->
 
 		<!-- ERNIE RAEL'S CUSTOM GLAZEDLIST ARTIFACT -->
 		<!-- https://mvnrepository.com/artifact/com.raelity.3rdparty.com.glazedlists -->
