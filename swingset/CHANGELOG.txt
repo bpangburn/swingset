@@ -31,6 +31,9 @@ Changes:
 	9. Updated Maven Deploy Plugin to 3.0.0-M2.
 	10.Updated Maven Site Plugin to 3.11.0.
 	11.Updated Maven Compiler Plugin to 3.10.1.
+	12.Updated Maven JAR Plugin to 3.10.1.
+	13.Updated Maven JavaDoc Plugin to 3.10.1.
+	14.Updated Nexus Staging Maven Plugin to 3.10.1.
 
 ==============================================================================
 SwingSet 4.0.8 - Released 2022-02-10
