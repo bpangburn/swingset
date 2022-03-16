@@ -62,11 +62,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * SSImageField.java
@@ -92,7 +92,7 @@ public class SSImageField extends JPanel implements RowSetListener, KeyListener,
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 	private static final long serialVersionUID = 889303691158522232L;
 	private int colType = -99;
 	protected String columnName = null;

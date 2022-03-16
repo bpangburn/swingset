@@ -53,7 +53,6 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.table.TableCellEditor;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.rowset.JdbcRowSetImpl;
@@ -70,11 +69,10 @@ import com.nqadmin.swingset.SSDataGrid;
 //public abstract class SSDataGridScreenHelper extends JInternalFrame {
 public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	
-	private static Logger logger = LogManager.getLogger(); // Log4j Logger for component
+	private static Logger logger = SSUtils.getLogger(); // Log4j Logger for component
 	
 	private static final long serialVersionUID = 3558830097072342112L; // unique serial ID
 
-	protected Container container; // Container for the JInternalFrame containing the SSDataGrid
 	protected SSDataGrid dataGrid = new SSDataGrid(); // SSDataGrid used for this screen
 
 
@@ -405,7 +403,12 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			//  - PUT INSIDE OF A JSCROLLPANE SO WE HAVE SCROLL BARS WHEN NEEDED
 			//  - WITHOUT THE JSCROLLPANE, SOMETIMES THE COLUMN HEADERS DON'T RENDER
 	 		//getContentPane().add(dataGrid);
-	 		getContentPane().add(new JScrollPane(dataGrid));
+			if(getParentContainer() == null) {
+				getContentPane().add(new JScrollPane(dataGrid));
+			}
+			else {
+				getParentContainer().add(new JScrollPane(dataGrid));
+			}
 			
 			// SET CELL ENABLING/DISABLING
 			setActivateDeactivate();
@@ -416,8 +419,9 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			// SET DEFAULT VALUES
 			setDefaultValues();
 			
-			// MAKE SCREEN VISIBLE
-			showUp(getParentContainer());
+			// MAKE SCREEN VISIBLE 
+			// USER HAS TO DECIDE WHEN TO SHOW THE SCREEN
+//			showUp(getParentContainer());
 			
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);

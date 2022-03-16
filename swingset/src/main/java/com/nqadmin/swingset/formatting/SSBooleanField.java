@@ -51,11 +51,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * SSBooleanField.java
@@ -134,7 +134,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 	/**
 	 * unique serial id
 	 */

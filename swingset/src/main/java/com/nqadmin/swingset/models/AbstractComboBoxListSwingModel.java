@@ -66,6 +66,8 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.utils.SSUtils;
+
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
 
 // AbstractComboBoxListSwingModel.java
@@ -144,26 +146,11 @@ public abstract class AbstractComboBoxListSwingModel {
 	private boolean installed;
 	/** Install this when not using glazed, and send events through this */
 	private final ComboBoxModelProxy modelProxy;
-	/**
-	 * If true, <em>do not</em> modify the listItem's contents
-	 * directly in place by
-	 * using {@link #setElem(int, int, java.lang.Object) }.
-	 * Instead clone list item, modify it, use list.set(clonedItem)
-	 * to insure glazed event for single item changed.
-	 * When this is false, and this is not the actual model,
-	 * a listItem is modified in place.
-	 * <p>
-	 * I think this behavior can be conditional on whether or not
-	 * glazed is used or if this is actually the model.
-	 * In the "right" places could do "modifyListItemWithSet = !installed".
-	 * But it doesn't seem worth the testing for a minor performance gain.
-	 */
-	private final boolean modifyListItemWithSet = true;
 	
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Log4j Logger for component
@@ -483,7 +470,6 @@ public abstract class AbstractComboBoxListSwingModel {
 		void doFireIntervalRemoved(Object source, int index0, int index1);
 	}
 
-	/** {@inheritDoc } */
 	@SuppressWarnings("serial")
 	/*package-test*/
 	class ComboBoxModelProxy
@@ -960,23 +946,26 @@ public abstract class AbstractComboBoxListSwingModel {
 	 * @return the previous contents of the list item at the specified position
 	 */
 	// NOTE: setElem(listItem, elemIndex, newElem)
-	// is a problem because need listitemindex for fireContentsChanged
-	// Could just fire everything changed if that's needed,
-	// but what about glazed lists...
+	// is a problem because this method wants to modify something inside
+	// of a listItem, so the listItem's identity, via '==',
+	// doesn't change. Best way to insure that changes are
+	// correctly detected is to make a listItem immutable.
+	// So make a copy/clone of the listItem.
+	//
+	// I think this behavior can be conditional on whether or not
+	// glazed is used or if this is actually installed as a model.
+	// But it doesn't seem worth the testing for a miniscule performance gain.
+	// Don't want to fire everything changed since that's
+	// probably be a big performance loss in most cases.
 	private Object setElem(int _listItemIndex, int _elemIndex, Object _newElem) {
 		ListItemWrite0 listItem = (ListItemWrite0) itemList.get(_listItemIndex);
-		boolean useClone = modifyListItemWithSet || !installed;
-		if (useClone) {
-			try {
-				listItem = (ListItemWrite0) listItem.clone();
-			} catch (CloneNotSupportedException ex) {
-			}
+		try {
+			listItem = (ListItemWrite0) listItem.clone();
+		} catch (CloneNotSupportedException ex) {
 		}
 		Object oldElem = listItem.getElem(_elemIndex);
 		listItem.setElem(_elemIndex, _newElem);
-		if (useClone) {
-			itemList.set(_listItemIndex, listItem);
-		}
+		itemList.set(_listItemIndex, listItem);
 		modelProxy.fire.doFireContentsChanged(this, _listItemIndex, _listItemIndex);
 		return oldElem;
 	}

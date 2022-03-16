@@ -47,7 +47,6 @@ import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
 import javax.swing.SwingUtilities;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSDBComboBox;
@@ -272,7 +271,7 @@ public class SSSyncManager {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * # of records to step back if doing a sequential search because SSDBComboBox and RowSet results don't match.

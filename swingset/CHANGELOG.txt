@@ -3,6 +3,39 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
 ==============================================================================
+SwingSet 4.0.9 - Released 2022-03-16
+==============================================================================
+
+Changes:
+	1. Add SSComponentInterface.getSSDataNavigator() to allow all components
+	   to access the data navigator. Is it deprecated as we think there should
+	   generally NOT be a need to access the data navigator now that screens
+	   can add their own mnemonic/hotkeys that can/will work regardless of
+	   which field has the focus. See next item.
+	2. Addition of Actions for SSDataNavigator buttons. Allow for easy
+	   implementation of mnemonic/hotkeys using an InputMap. See:
+	   https://github.com/bpangburn/swingset/pull/124
+	3. Work around for Log4j LogManager.getLogger() issue with NetBeans
+	   GUI builder. See:
+	   https://github.com/bpangburn/swingset/pull/123
+	   https://issues.apache.org/jira/browse/LOG4J2-3420
+	   https://lists.apache.org/thread/sp2ngsp0qmhptvts2rwhprqfrb7f0bpl
+	   https://lists.apache.org/thread/plkhc38f5g7cxgv6p53hg5s1k9x3mrvt
+	   https://github.com/bpangburn/swingset/discussions/93#discussioncomment-2258596
+	4. Minor code cleanup to eliminate some Eclipse warnings.
+	5. SSDataGrid container bug. See:
+	   https://github.com/bpangburn/swingset/issues/121.
+	6. Updated Dependency Check Maven Plugin to 7.0.0.
+	7. Updated Log4j to 2.17.2.
+	8. Added variable and updated Versions Maven Plugin to 2.10.0,
+	9. Updated Maven Deploy Plugin to 3.0.0-M2.
+	10.Updated Maven Site Plugin to 3.11.0.
+	11.Updated Maven Compiler Plugin to 3.10.1.
+	12.Updated Maven JAR Plugin to 3.2.2.
+	13.Updated Maven JavaDoc Plugin to 3.3.2.
+	14.Updated Nexus Staging Maven Plugin to 1.6.12.
+
+==============================================================================
 SwingSet 4.0.8 - Released 2022-02-10
 ==============================================================================
 
