@@ -54,10 +54,11 @@ import java.util.Optional;
 
 import javax.sql.RowSet;
 
-import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.utils.SSCommon;
+import com.nqadmin.swingset.utils.SSUtils;
 
 // RowSetOps.java
 //
@@ -74,6 +75,8 @@ import com.nqadmin.swingset.utils.SSCommon;
 public class RowSetOps {
 
 	private RowSetOps(){}
+
+	private static final Logger logger = SSUtils.getLogger();
 
 	// TODO Audit type handling based on http://www.java2s.com/Code/Java/Database-SQL-JDBC/StandardSQLDataTypeswithTheirJavaEquivalents.htm
 
@@ -130,7 +133,7 @@ public class RowSetOps {
 					? Optional.empty()
 					: Optional.of(nullable == ResultSetMetaData.columnNullable);
 		} catch (SQLException ex) {
-			LogManager.getLogger().error(() -> String.format("SQL Exception for column %d.",
+			logger.error(() -> String.format("SQL Exception for column %d.",
 					_columnIndex, ex));
 			return Optional.empty();
 		}
@@ -147,7 +150,7 @@ public class RowSetOps {
 		try {
 			return isNullable(_resultSet, getColumnIndex(_resultSet, _columnName));
 		} catch (SQLException ex) {
-			LogManager.getLogger().error(() -> String.format("SQL Exception for column %s.",
+			logger.error(() -> String.format("SQL Exception for column %s.",
 					_columnName, ex));
 			return Optional.empty();
 		}
@@ -250,11 +253,11 @@ public class RowSetOps {
 				break;
 
 			default:
-				LogManager.getLogger().error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
+				logger.error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
 			} // end switch
 
 		} catch (final SQLException se) {
-			LogManager.getLogger().error("SQL Exception for column " + _columnName + ".", se);
+			logger.error("SQL Exception for column " + _columnName + ".", se);
 		}
 
 		return value;
@@ -376,12 +379,12 @@ public class RowSetOps {
 	@SuppressWarnings("null")
 	public static void updateColumnText(final RowSet _rowSet, final String _updatedValue, final String _columnName, final boolean _allowNull) throws NullPointerException, SQLException, NumberFormatException {
 
-		LogManager.getLogger().debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
+		logger.debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
 		JDBCType jdbcType = getJDBCType(getColumnType(_rowSet, _columnName));
 		
 		if (!textUpdateOK.contains(jdbcType)) {
-			LogManager.getLogger().error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
+			logger.error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
 			return;
 		}
 

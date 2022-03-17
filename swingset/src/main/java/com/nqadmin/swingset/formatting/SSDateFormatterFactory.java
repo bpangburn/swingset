@@ -42,8 +42,9 @@ import java.text.SimpleDateFormat;
 import javax.swing.text.DateFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.nqadmin.swingset.utils.SSUtils;
 
 // SSDateFormatterFactory.java
 //
@@ -66,7 +67,7 @@ public class SSDateFormatterFactory {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static final Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Constant for MM/dd/yyyy date format

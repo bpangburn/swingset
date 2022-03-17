@@ -8,7 +8,7 @@
 
 	<groupId>com.nqadmin.swingset</groupId>
 	<artifactId>swingset</artifactId>
-	<version>4.0.9-SNAPSHOT</version>
+	<version>4.1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>swingset</name>
@@ -21,26 +21,32 @@
 		<version.maven>3.6.3</version.maven>
 		<version.java>1.8</version.java>
 
+		<!-- primary swingset dependencies -->
 		<!--<version.glazedlists>1.11.0</version.glazedlists> -->
 		<version.glazedlists>1.11.1203</version.glazedlists>
-		<version.log4j>2.17.1</version.log4j>
+		<version.log4j>2.17.2</version.log4j>
 		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
 
+		<!-- Shared by swingset-parent, swingset, and swingset-demo -->
+        <version.versions-maven-plugin>2.10.0</version.versions-maven-plugin>
 		<version.maven-enforcer-plugin>3.0.0</version.maven-enforcer-plugin>
 		<version.maven-clean-plugin>3.1.0</version.maven-clean-plugin>
-		<version.maven-deploy-plugin>3.0.0-M1</version.maven-deploy-plugin>
+		<version.maven-deploy-plugin>3.0.0-M2</version.maven-deploy-plugin>
 		<version.maven-install-plugin>3.0.0-M1</version.maven-install-plugin>
-		<version.maven-jar-plugin>3.2.0</version.maven-jar-plugin>
-		<version.maven-resources-plugin>3.2.0</version.maven-resources-plugin>
-		<version.maven-site-plugin>3.9.1</version.maven-site-plugin>
+		<version.maven-site-plugin>3.11.0</version.maven-site-plugin>
 
-		<version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
-		<version.dependency-check-maven>6.5.3</version.dependency-check-maven>
-		<version.maven-source-plugin>3.2.1</version.maven-source-plugin>
-		<version.maven-javadoc-plugin>3.3.1</version.maven-javadoc-plugin>
+		<!-- Shared by swingset and swingset-demo -->
+		<version.maven-jar-plugin>3.2.2</version.maven-jar-plugin>
+		<version.maven-resources-plugin>3.2.0</version.maven-resources-plugin>
+		<version.maven-compiler-plugin>3.10.1</version.maven-compiler-plugin>
+		<version.dependency-check-maven>7.0.0</version.dependency-check-maven>
 		<version.maven-gpg-plugin>3.0.1</version.maven-gpg-plugin>
-		<version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
 		<version.maven-surefire-plugin>3.0.0-M5</version.maven-surefire-plugin>
+		<version.maven-source-plugin>3.2.1</version.maven-source-plugin>
+
+		<!-- swingset-only -->
+		<version.maven-javadoc-plugin>3.3.2</version.maven-javadoc-plugin>
+		<version.nexus-staging-maven-plugin>1.6.12</version.nexus-staging-maven-plugin>
 		<version.maven-failsafe-plugin>3.0.0-M5</version.maven-failsafe-plugin>
 		<version.junit-jupiter-any>5.8.2</version.junit-jupiter-any>
 	</properties>
@@ -97,9 +103,16 @@
 	</repositories>
 
 	<dependencies>
+		<!-- MAIN GLAZED LIST ARTIFACT - CURRENTLY DISABLED AWAITING NEXT RELEASE FEATURES:
+		     https://github.com/glazedlists/glazedlists -->
 		<!-- https://mvnrepository.com/artifact/com.glazedlists/glazedlists -->
-		<!-- <dependency> <groupId>com.glazedlists</groupId> <artifactId>glazedlists</artifactId> 
-			<version>${version.glazedlists}</version> </dependency> -->
+		<!-- 
+		<dependency>
+			<groupId>com.glazedlists</groupId>
+			<artifactId>glazedlists</artifactId> 
+			<version>${version.glazedlists}</version>
+		</dependency>
+		-->
 
 		<!-- ERNIE RAEL'S CUSTOM GLAZEDLIST ARTIFACT -->
 		<!-- https://mvnrepository.com/artifact/com.raelity.3rdparty.com.glazedlists -->
@@ -159,6 +172,12 @@
 
 	<build>
 		<plugins>
+	        <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
+	        <plugin>
+	            <groupId>org.codehaus.mojo</groupId>
+	            <artifactId>versions-maven-plugin</artifactId>
+	            <version>${version.versions-maven-plugin}</version>
+	        </plugin>
 			<!-- Maven Enforcer forces specified version of Java and Maven -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -191,7 +210,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>

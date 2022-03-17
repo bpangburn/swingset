@@ -51,8 +51,6 @@ import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
-import org.apache.logging.log4j.LogManager;
-
 import java.sql.Connection;
 
 import com.nqadmin.swingset.SSDataNavigator;
@@ -318,8 +316,15 @@ public interface SSComponentInterface {
 
 	/**
 	 * Returns the SSDataNavigator associated with this component.
+	 * <p>
+	 * This was added per discussion #93 to support a legacy
+	 * SwingSet with the need to setup key listeners on individual
+	 * components to trigger action on the SSDataNavigator buttons.
+	 * <p>
+	 * @deprecated Use ActionMap instead.
 	 * @return the SSDataNavigator
 	 */
+	@Deprecated
 	default SSDataNavigator getSSDataNavigator() {
 		return SSDataNavigator.getSSDataNavigator(getRowSet());
 	}
@@ -497,8 +502,6 @@ public interface SSComponentInterface {
 	 */
 	default void setBoundColumnText(final String _boundColumnText) {
 		getSSCommon().setBoundColumnText(_boundColumnText);
-
-		LogManager.getLogger().debug("{}: " + _boundColumnText, () -> getColumnForLog());
 	}
 
 	/**

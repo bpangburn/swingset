@@ -62,7 +62,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.JTextComponent;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSBaseComboBox;
@@ -266,7 +265,7 @@ public class SSCommon implements Serializable {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Constant to indicate that no RowSet column index has been specified.
@@ -967,6 +966,7 @@ public class SSCommon implements Serializable {
 	 * @param _boundColumnText value to write to bound database column
 	 */
 	public void setBoundColumnText(final String _boundColumnText) {
+		logger.debug("{}: " + _boundColumnText, () -> getColumnForLog());
 		try {
 			//getRowSet().updateColumnText(_boundColumnText, getBoundColumnName(), getAllowNull());
 			RowSetOps.updateColumnText(getRowSet(),_boundColumnText, getBoundColumnName(), getAllowNull());

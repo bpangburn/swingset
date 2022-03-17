@@ -40,11 +40,12 @@ package com.nqadmin.swingset.datasources;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 //import com.sun.rowset.JdbcRowSetImpl;
+
 import com.nqadmin.rowset.JdbcRowSetImpl;
+import com.nqadmin.swingset.utils.SSUtils;
 
 // SSJdbcRowSetImpl.java
 //
@@ -63,7 +64,7 @@ public class SSJdbcRowSetImpl extends JdbcRowSetImpl implements SSRowSet {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id

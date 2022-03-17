@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 // SSProperties.java
@@ -56,7 +55,7 @@ public class SSProperties {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = LogManager.getLogger();
+	private static Logger logger = SSUtils.getLogger();
 	
 	/**
 	 * SwingSet key/value pair properties from swingset.properties file.

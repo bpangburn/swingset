@@ -6,7 +6,7 @@
 
 	<groupId>com.nqadmin.swingset</groupId>
 	<artifactId>swingset-parent</artifactId>
-	<version>4.0.9-SNAPSHOT</version>
+	<version>4.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>swingset-parent</name>
@@ -18,15 +18,23 @@
 		<version.maven>3.6.3</version.maven>
 		<version.java>1.8</version.java>
 
+		<!-- Shared by swingset-parent, swingset, and swingset-demo -->
+        <version.versions-maven-plugin>2.10.0</version.versions-maven-plugin>
 		<version.maven-enforcer-plugin>3.0.0</version.maven-enforcer-plugin>
 		<version.maven-clean-plugin>3.1.0</version.maven-clean-plugin>
-		<version.maven-deploy-plugin>3.0.0-M1</version.maven-deploy-plugin>
+		<version.maven-deploy-plugin>3.0.0-M2</version.maven-deploy-plugin>
 		<version.maven-install-plugin>3.0.0-M1</version.maven-install-plugin>
-		<version.maven-site-plugin>3.9.1</version.maven-site-plugin>
+		<version.maven-site-plugin>3.11.0</version.maven-site-plugin>
 	</properties>
 
 	<build>
 		<plugins>
+	        <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
+	        <plugin>
+	            <groupId>org.codehaus.mojo</groupId>
+	            <artifactId>versions-maven-plugin</artifactId>
+	            <version>${version.versions-maven-plugin}</version>
+	        </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
@@ -58,7 +66,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>

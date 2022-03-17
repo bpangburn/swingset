@@ -56,7 +56,6 @@ import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
@@ -65,6 +64,7 @@ import com.nqadmin.swingset.models.OptionMappingSwingModel;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSUtils;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.matchers.TextMatcherEditor;
@@ -305,7 +305,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	/**
 	 * Log4j Logger for component
 	 */
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * When {@link #getAllowNull() } is true, this is the null item;
@@ -938,6 +938,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * database.
 	 * @return true if combo box can have null value
 	 */
+	@Override
 	public boolean getAllowNull() {
 		return !isComboBoxNavigator() && getSSCommon().getAllowNull();
 	}

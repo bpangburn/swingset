@@ -45,8 +45,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.sql.RowSet;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.KeyStroke;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,6 +60,8 @@ import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.utils.SSSyncManager;
+import javax.swing.Action;
+import javax.swing.JButton;
 
 /**
  * This example displays data from the part_data table.
@@ -339,6 +343,45 @@ public class Example4 extends JFrame {
 				constraints.gridy = 6;
 				constraints.gridwidth = 2;
 				contentPane.add(navigator, constraints);
+
+				constraints.gridy = 7;
+				constraints.gridwidth = 1;
+				
+			// Illustrate use of InputMap/ActionMap for custom key and extra button handling.
+			// Setup F3-F11 mnemonics to correspond to the buttons on Navigator.
+			// There are also two new buttons below the Navigator (extra first and last)
+			//
+			// The actions here are currently the only Actions available in the SSDataNavigator
+			// ActionMap.
+			//
+			// See https://docs.oracle.com/javase/tutorial/uiswing/misc/action.html
+				
+			// Hotkeys/mnemonics
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F3"),"NavFirst");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F4"),"NavPrevious");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F5"),"NavNext");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F6"),"NavLast");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F7"),"NavCommit");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F8"),"NavUndo");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F9"),"NavRefresh");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F10"),"NavAdd");
+				navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F11"),"NavDelete");
+				
+			// "Extra" buttons
+				Action tmpAction;
+				JButton tmpButton;
+
+				// First record
+				tmpAction = navigator.getActionMap().get("NavFirst");
+				tmpButton = new JButton(tmpAction);
+				constraints.gridx = 0;
+				contentPane.add(tmpButton, constraints);
+				
+				// Last record
+				tmpAction = navigator.getActionMap().get("NavLast");
+				tmpButton = new JButton(tmpAction);
+				constraints.gridx = 1;
+				contentPane.add(tmpButton, constraints);
 
 			// DISABLE THE PRIMARY KEY
 				txtPartID.setEnabled(false);
