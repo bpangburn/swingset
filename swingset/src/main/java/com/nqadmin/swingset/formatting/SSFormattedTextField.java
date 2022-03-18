@@ -87,7 +87,6 @@ import com.nqadmin.swingset.utils.SSUtils;
 public class SSFormattedTextField extends JFormattedTextField
 		implements FocusListener, SSComponentInterface {
 
-	// static final boolean VISIBLE_ERROR_STATE = true;
 	/**
 	 * Implementing an InputVerifier in order to lock the focus down while the JFormattedTextField is in
 	 * an invalid edit state.
@@ -629,7 +628,6 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	}
 
-	// experimental for VISIBLE_ERROR_STATE
 	void displayValidIndicator(boolean isValid) {
 		if(isValid) {
 			setBackground(isFocusOwner() ? focusBackgroundColor : standardBackgroundColor);

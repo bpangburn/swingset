@@ -108,7 +108,7 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Get a new FormatterFactory with the specified parameters.Unless noted, a parameter is used when constructing the MaskFormatter.<p>
