@@ -46,7 +46,7 @@ public enum Format {
 	/** default date format */
 	DATE,
 	/** Date MMDDYYYY */
-	DATE_MMDDYYYY  (DATE),
+	DATE_MMDDYYYY (DATE),
 	/** Date DDMMYYYY */
 	DATE_DDMMYYYY (DATE),
 	/** Date YYYYMMDD */
