@@ -45,8 +45,9 @@ import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * A FormatterFactory, with formatters based on MaskFormatter, which uses
