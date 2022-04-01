@@ -404,14 +404,14 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			//  - WITHOUT THE JSCROLLPANE, SOMETIMES THE COLUMN HEADERS DON'T RENDER
 	 		//getContentPane().add(dataGrid);
 			if(getParentContainer() == null) {
-				getContentPane().add(new JScrollPane(dataGrid));
+				getContentPane().add(dataGrid.getComponent());
 			}
 			else {
-				getParentContainer().add(new JScrollPane(dataGrid));
+				getParentContainer().add(dataGrid.getComponent());
 			}
 			
 			// SET CELL ENABLING/DISABLING
-			setActivateDeactivate();
+//			setActivateDeactivate();
 	
 			// ADD SCREEN LISTENERS
 			addCoreListeners();
@@ -460,14 +460,19 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * @param _row JTable/SSDatagrid row to evaluate
 	 * @param _column JTable/SSDatagrid column to evaluate
 	 * @return true if cell should be editable/enabled, otherwise false
+	 * @deprecated - {@link #setSSCellEditing should be used
 	 */
-	protected abstract boolean isGridCellEditable(int _row, int _column);
+	@Deprecated
+	protected boolean isGridCellEditable(int _row, int _column) {
+		return true;
+	}
 	
 	/**
 	 * Used to enable/disable cells based on adjacent cell value or other criteria.
 	 * 
 	 * @throws Exception thrown if an exception is encountered enabling/disabling cells
 	 */
+	@Deprecated
 	private void setActivateDeactivate() throws Exception {
 		dataGrid.setSSCellEditing(new SSCellEditing(){
 
@@ -480,6 +485,16 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 		});
 
 	}
+	
+	/**
+	 * Used to set the SSCellEditing for the SSDataGrid to activate/deactivate cells or validate cell values.
+	 * <p>
+	 * dataGrid.setSSCellEditing(new SSCellEditing() {
+	 *  // implement the methods in SSCellEditing
+	 * });
+	 * </p>
+	 */
+	protected abstract void configureSSCellEditing(); 
 	
 	/**
 	 * Sets any default values for the data grid columns.
