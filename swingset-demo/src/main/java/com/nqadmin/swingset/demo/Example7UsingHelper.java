@@ -212,7 +212,11 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 		// NOTHING TO DO...
 	}
 	
-
+	@Override
+	protected void configureSSCellEditing() {
+		// NOTHING TO DO...
+	}
+	
 	@Override
 	protected String[] getDefaultColumnNames() {
 		// TODO Auto-generated method stub
