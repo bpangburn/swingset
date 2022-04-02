@@ -468,24 +468,24 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 		return true;
 	}
 	
-	/**
-	 * Used to enable/disable cells based on adjacent cell value or other criteria.
-	 * 
-	 * @throws Exception thrown if an exception is encountered enabling/disabling cells
-	 */
-	@Deprecated
-	private void setActivateDeactivate() throws Exception {
-		dataGrid.setSSCellEditing(new SSCellEditing(){
-
-			private static final long serialVersionUID = 1L; // UNIQUE SERIAL ID
-
-			@Override
-			public boolean isCellEditable(int _row, int _column) {
-				return isGridCellEditable(_row, _column);
-			}
-		});
-
-	}
+//	/**
+//	 * Used to enable/disable cells based on adjacent cell value or other criteria.
+//	 * 
+//	 * @throws Exception thrown if an exception is encountered enabling/disabling cells
+//	 */
+//	@Deprecated
+//	private void setActivateDeactivate() throws Exception {
+//		dataGrid.setSSCellEditing(new SSCellEditing(){
+//
+//			private static final long serialVersionUID = 1L; // UNIQUE SERIAL ID
+//
+//			@Override
+//			public boolean isCellEditable(int _row, int _column) {
+//				return isGridCellEditable(_row, _column);
+//			}
+//		});
+//
+//	}
 	
 	/**
 	 * Used to set the SSCellEditing for the SSDataGrid to activate/deactivate cells or validate cell values.
