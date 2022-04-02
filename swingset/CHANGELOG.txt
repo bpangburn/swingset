@@ -7,7 +7,12 @@ SwingSet 4.1.0 - Released TBD
 ==============================================================================
 
 Changes:
-	1. Something goes here...
+	1. Remove/deprecate isGridCellEditable() function from SSDataGridHelper
+	   https://github.com/bpangburn/swingset/issues/128
+	2. SSDataGridHelper - Unable to set the size of the datagrid when it is
+	   added to another component:
+	   https://github.com/bpangburn/swingset/issues/129
+	3. 
 	
 ==========================================================================
 SwingSet 4.0.9 - Released 2022-03-16
