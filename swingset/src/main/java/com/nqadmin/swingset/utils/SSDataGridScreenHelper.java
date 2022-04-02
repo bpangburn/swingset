@@ -55,7 +55,6 @@ import javax.swing.table.TableCellEditor;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.rowset.JdbcRowSetImpl;
-import com.nqadmin.swingset.SSCellEditing;
 import com.nqadmin.swingset.SSDataGrid;
 
 //SSDataGridScreenHelper.java
