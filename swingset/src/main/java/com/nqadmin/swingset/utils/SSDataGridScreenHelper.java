@@ -47,7 +47,6 @@ import java.sql.SQLException;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
@@ -412,6 +411,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			
 			// SET CELL ENABLING/DISABLING
 //			setActivateDeactivate();
+			configureSSCellEditing();
 	
 			// ADD SCREEN LISTENERS
 			addCoreListeners();
@@ -460,7 +460,8 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * @param _row JTable/SSDatagrid row to evaluate
 	 * @param _column JTable/SSDatagrid column to evaluate
 	 * @return true if cell should be editable/enabled, otherwise false
-	 * @deprecated - {@link #setSSCellEditing should be used
+	 * 
+	 * @deprecated - use dataGrid.setSSCellEditing() instead
 	 */
 	@Deprecated
 	protected boolean isGridCellEditable(int _row, int _column) {
@@ -488,11 +489,11 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	
 	/**
 	 * Used to set the SSCellEditing for the SSDataGrid to activate/deactivate cells or validate cell values.
-	 * <p>
+	 * <pre>
 	 * dataGrid.setSSCellEditing(new SSCellEditing() {
 	 *  // implement the methods in SSCellEditing
 	 * });
-	 * </p>
+	 * </pre>
 	 */
 	protected abstract void configureSSCellEditing(); 
 	
