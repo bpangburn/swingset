@@ -47,7 +47,6 @@ import java.sql.SQLException;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
@@ -56,7 +55,6 @@ import javax.swing.table.TableCellEditor;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.rowset.JdbcRowSetImpl;
-import com.nqadmin.swingset.SSCellEditing;
 import com.nqadmin.swingset.SSDataGrid;
 
 //SSDataGridScreenHelper.java
@@ -404,14 +402,15 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			//  - WITHOUT THE JSCROLLPANE, SOMETIMES THE COLUMN HEADERS DON'T RENDER
 	 		//getContentPane().add(dataGrid);
 			if(getParentContainer() == null) {
-				getContentPane().add(new JScrollPane(dataGrid));
+				getContentPane().add(dataGrid.getComponent());
 			}
 			else {
-				getParentContainer().add(new JScrollPane(dataGrid));
+				getParentContainer().add(dataGrid.getComponent());
 			}
 			
 			// SET CELL ENABLING/DISABLING
-			setActivateDeactivate();
+//			setActivateDeactivate();
+			configureSSCellEditing();
 	
 			// ADD SCREEN LISTENERS
 			addCoreListeners();
@@ -460,26 +459,42 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * @param _row JTable/SSDatagrid row to evaluate
 	 * @param _column JTable/SSDatagrid column to evaluate
 	 * @return true if cell should be editable/enabled, otherwise false
+	 * 
+	 * @deprecated - use dataGrid.setSSCellEditing() instead
 	 */
-	protected abstract boolean isGridCellEditable(int _row, int _column);
+	@Deprecated
+	protected boolean isGridCellEditable(int _row, int _column) {
+		return true;
+	}
+	
+//	/**
+//	 * Used to enable/disable cells based on adjacent cell value or other criteria.
+//	 * 
+//	 * @throws Exception thrown if an exception is encountered enabling/disabling cells
+//	 */
+//	@Deprecated
+//	private void setActivateDeactivate() throws Exception {
+//		dataGrid.setSSCellEditing(new SSCellEditing(){
+//
+//			private static final long serialVersionUID = 1L; // UNIQUE SERIAL ID
+//
+//			@Override
+//			public boolean isCellEditable(int _row, int _column) {
+//				return isGridCellEditable(_row, _column);
+//			}
+//		});
+//
+//	}
 	
 	/**
-	 * Used to enable/disable cells based on adjacent cell value or other criteria.
-	 * 
-	 * @throws Exception thrown if an exception is encountered enabling/disabling cells
+	 * Used to set the SSCellEditing for the SSDataGrid to activate/deactivate cells or validate cell values.
+	 * <pre>
+	 * dataGrid.setSSCellEditing(new SSCellEditing() {
+	 *  // implement the methods in SSCellEditing
+	 * });
+	 * </pre>
 	 */
-	private void setActivateDeactivate() throws Exception {
-		dataGrid.setSSCellEditing(new SSCellEditing(){
-
-			private static final long serialVersionUID = 1L; // UNIQUE SERIAL ID
-
-			@Override
-			public boolean isCellEditable(int _row, int _column) {
-				return isGridCellEditable(_row, _column);
-			}
-		});
-
-	}
+	protected abstract void configureSSCellEditing(); 
 	
 	/**
 	 * Sets any default values for the data grid columns.

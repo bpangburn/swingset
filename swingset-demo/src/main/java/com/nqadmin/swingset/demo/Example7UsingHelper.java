@@ -192,12 +192,6 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 	}
 
 	@Override
-	protected boolean isGridCellEditable(int _row, int _column) {
-	// ALL CELLS ARE EDITABLE
-		return true;
-	}
-
-	@Override
 	protected void addCustomListeners() throws Exception {
 		// NOTHING TO DO...
 	}
@@ -212,7 +206,11 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 		// NOTHING TO DO...
 	}
 	
-
+	@Override
+	protected void configureSSCellEditing() {
+		// NOTHING TO DO...
+	}
+	
 	@Override
 	protected String[] getDefaultColumnNames() {
 		// TODO Auto-generated method stub

@@ -2,7 +2,18 @@
 ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
+==================================================================================
+SwingSet 4.0.10 - Released 2022-04-29
 ==============================================================================
+
+Changes:
+	1. Remove/deprecate isGridCellEditable() function from SSDataGridHelper
+	   https://github.com/bpangburn/swingset/issues/128
+	2. SSDataGridHelper - Unable to set the size of the datagrid when it is
+	   added to another component:
+	   https://github.com/bpangburn/swingset/issues/129
+	
+==========================================================================
 SwingSet 4.0.9 - Released 2022-03-16
 ==============================================================================
 
