@@ -460,7 +460,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * @param _column JTable/SSDatagrid column to evaluate
 	 * @return true if cell should be editable/enabled, otherwise false
 	 * 
-	 * @deprecated - use dataGrid.setSSCellEditing() instead
+	 * @deprecated - use {@link SSDataGrid#setSSCellEditing(com.nqadmin.swingset.SSCellEditing)} instead
 	 */
 	@Deprecated
 	protected boolean isGridCellEditable(int _row, int _column) {
