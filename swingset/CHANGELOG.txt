@@ -12,6 +12,10 @@ Changes:
 	2. SSDataGridHelper - Unable to set the size of the datagrid when it is
 	   added to another component:
 	   https://github.com/bpangburn/swingset/issues/129
+	3. Updated Dependency Check to 7.1.0.
+	4. Updated H2 Database to 2.1.212.
+	5. Update Maven Failsafe Plugin to 3.0.0-M6.
+	6. Update Maven Surefire Plugin to 3.0.0-M6.
 	
 ==========================================================================
 SwingSet 4.0.9 - Released 2022-03-16
