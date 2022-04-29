@@ -241,10 +241,10 @@ public class SSListItemFormat extends Format {
 		case TIME:
 		case TIMESTAMP:
 			String pattern = patterns.get(jdbcType);
-			if (pattern != null) {
+			if (pattern != null && elem != null) {
 				SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
 				dateFormat.format(elem, _sb, FP0);
-			} else {
+			} else if(elem != null){
 				_sb.append(elem.toString());
 			}
 			break;
