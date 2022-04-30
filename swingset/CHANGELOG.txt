@@ -17,6 +17,11 @@ Changes:
 	5. Update Maven Failsafe Plugin to 3.0.0-M6.
 	6. Update Maven Surefire Plugin to 3.0.0-M6.
 	7. Issue #134: fix display of Example4UsingHelper and Example7UsingHelper
+	8. Issue #131: SSComboBox causes IllegalArgumentException
+	9. Issue #132: SSCheckBox throws a NullPointerException when
+	   column value is null
+	10.Issue #133: SSList causes a NullPointerException when value in database
+	   is null
 	
 ==============================================================================
 SwingSet 4.0.9 - Released 2022-03-16
