@@ -132,8 +132,7 @@ public class MainClass extends JFrame {
 				e7JFrame.add(example7);
 				e7JFrame.setLocation(DemoUtil.getChildScreenLocation("Example7UsingHelper"));
 				example7.showUp(e7JFrame);
-				e7JFrame.pack();
-				// .setSize() has to be after call to .pack()
+				//e7JFrame.pack(); // NOT USING .pack() FOR DATA GRID SCREENS
 				e7JFrame.setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 				e7JFrame.setVisible(true);
 			} else if (ae.getSource().equals(btnTestBase)) {
