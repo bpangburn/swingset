@@ -84,17 +84,6 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 	 * table/grid column headings
 	 */
 	private static final String[] tableHeaders = { "Supplier-Part ID", "Supplier Name", "Part Name", "Quantity", "Ship Date" };
-	
-//	/**
-//	 * data grid
-//	 */
-//	SSDataGrid dataGrid = null;
-//	
-//	/**
-//	 * database component declarations
-//	 */
-//	Connection connection = null;
-//	RowSet rowset = null;
 
 	/**
 	 * Constructor for Example7UsingHelper

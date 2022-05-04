@@ -105,7 +105,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	private int defaultX = 0; // Default top left horizontal offset for screen/form.
 	private int defaultY = 0; // Default top left vertical offset for screen/form.
 	
-	private Container parentContainer; // Screen/window to which form/grid is to be attached
+	private Container parentContainer = null; // container/window from which current screen was opened
 	
 //	private String fullSQL = null; // Full SQL for rowset
 //	private String selectSQL = null; // SELECT CLAUSE FOR RECORDSET SUCH THAT selectSQL + parentID + " " + orderBySQL IS A VALID QUERY
@@ -282,7 +282,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 *
 	 * @return primary key value of parent record (FK for current rowset) used for record retrieval
 	 */
-	protected Long getParentID() {
+	public Long getParentID() {
 		return parentID;
 	}
 
@@ -422,6 +422,8 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 
 	/**
+	 * Sets the parent container/window for this screen if applicable.
+	 * 
 	 * @param _parentContainer parent screen/window to which the form/grid should be attached
 	 */
 	protected void setParentContainer(final Container _parentContainer) {
@@ -429,9 +431,16 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 
 	/**
+	 * Sets the parent ID used to query records for the current screen.
+	 * 
+	 * Null if the there is not a foreign key to include in rowset query.
+	 * 
+	 * Normally used in conjunction with updateScreen() to refresh a child
+	 * screen if there is a navigation in a parent screen.
+	 * 
 	 * @param _parentID the parentID to set
 	 */
-	protected void setParentID(final Long _parentID) {
+	public void setParentID(final Long _parentID) {
 		parentID = _parentID;
 	}
 
@@ -537,6 +546,6 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * Implementation should presume that parentID has already been updated
 	 * if applicable.
 	 */
-	protected abstract void updateScreen();
+	public abstract void updateScreen();
 
 }
