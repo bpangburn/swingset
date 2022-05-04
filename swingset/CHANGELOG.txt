@@ -22,6 +22,8 @@ Changes:
 	   column value is null
 	10.Issue #133: SSList causes a NullPointerException when value in database
 	   is null
+	11.Public visibility for updateScreen(), get/setParentID() in screen
+	   helper classes.
 	
 ==============================================================================
 SwingSet 4.0.9 - Released 2022-03-16

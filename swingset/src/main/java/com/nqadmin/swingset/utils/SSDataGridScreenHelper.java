@@ -524,7 +524,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * if necessary for getRowsetQuery();
 	 */
 	@Override
-	protected void updateScreen() {
+	public void updateScreen() {
 
 		try {
 
