@@ -175,10 +175,12 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	protected SSCommon ssCommon = new SSCommon(this);
 
 	/**
-	 * Creates an object of SSList with mapping type of {@code JDBCType.NULL}.
+	 * Creates an object of SSList with mapping type of {@code JDBCType.INTEGER}.
 	 */
 	public SSList() {
-		this(JDBCType.NULL);
+		// 2022-05-04: Changing from JDBCType.NULL to INTEGER as that will be the most likely
+		//  mapping type and NULL is known to generate errors.
+		this(JDBCType.INTEGER);
 	}
 
 	/**

@@ -24,6 +24,8 @@ Changes:
 	   is null
 	11.Public visibility for updateScreen(), get/setParentID() in screen
 	   helper classes.
+	12.SSList: using default mapping type of JDBCType.INTEGER rather than
+	   JDBCType.NULL in empty constructor.
 	
 ==============================================================================
 SwingSet 4.0.9 - Released 2022-03-16
