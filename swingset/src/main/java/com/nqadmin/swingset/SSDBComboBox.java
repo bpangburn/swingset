@@ -196,7 +196,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 */
 	@Override
 	protected SSListItem createNullItem(Model.Remodel remodel) {
-		return remodel.createOptionMappingItem(null, "", null);
+		return remodel.createOptionMappingItem(null, null, null);
 	}
 
 	/**
