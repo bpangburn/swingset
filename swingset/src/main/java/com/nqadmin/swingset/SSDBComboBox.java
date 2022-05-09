@@ -360,7 +360,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	/**
 	 * Adds an item to the existing list of items in the combo box.
 	 *
-	 * @param _option text that should be displayed in the combobox
+	 * @param _option item that should be displayed in the combobox
 	 * @param _mapping  mapping of _option, typically a primary key
 	 */
 	public void addOption(Object _option, Long _mapping) {
@@ -370,8 +370,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	/**
 	 * Adds an item to the existing list of items in the combo box.
 	 *
-	 * @param _option text that should be displayed in the combobox
-	 * @param _option2  second display text for combobox
+	 * @param _option item that should be displayed in the combobox
+	 * @param _option2  second display item for combobox
 	 * @param _mapping  mapping of _option, typically a primary key
 	 */
 	public void addOption(Object _option, Object _option2, Long _mapping) {
