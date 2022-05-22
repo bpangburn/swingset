@@ -26,6 +26,15 @@ Changes:
 	   helper classes.
 	12.SSList: using default mapping type of JDBCType.INTEGER rather than
 	   JDBCType.NULL in empty constructor.
+	13.Component null pointer fixea,
+	   https://github.com/bpangburn/swingset/issues/139
+	14.Use Format for SSListItemFormat - all types. See PR:
+	   https://github.com/bpangburn/swingset/pull/138
+        - Each JDBCType can have a default Format
+        - Each SSListItem element can have Format
+       The use of a format string is deprecated (it still works, now built on
+       the new Format mechanisms). Previously only the data/time types could
+       have a format string; everything else was toString().
 	
 ==============================================================================
 SwingSet 4.0.9 - Released 2022-03-16
