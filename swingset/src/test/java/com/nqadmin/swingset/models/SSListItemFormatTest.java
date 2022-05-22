@@ -41,6 +41,11 @@ import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.FieldPosition;
+import java.text.Format;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -53,6 +58,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -88,8 +94,9 @@ public class SSListItemFormatTest {
 
 		// 5 items in listItem
 		LI listInfo = new LI(5, itemList);
-		listItem = listInfo.createListItem(integer, string, date, time, timestamp);
-		fmt = new SSListItemFormat();
+
+		listItemOld = listInfo.createListItem(integer, string, date, time, timestamp);
+		fmtOld = new SSListItemFormat();
 	}
 	
 	@AfterEach
@@ -112,6 +119,7 @@ public class SSListItemFormatTest {
 	}
 
 	String string = "everything";
+	Float floatnum =  (float)3.14159;
 	Integer integer = 42;
 	Date date;
 	Time time;
@@ -120,47 +128,224 @@ public class SSListItemFormatTest {
 	SSListItem listItem;
 	SSListItemFormat fmt;
 
+	SSListItem listItemOld;
+	SSListItemFormat fmtOld;
+
 	/**
 	 * Test of format method, of class SSListItemFormat.
 	 * 
 	 * This is the only test method, and it tests a superclass method
 	 */
 	@Test
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testFormat() {
-		System.out.println("format");
+		System.out.print("format");
+
+		List<SSListItem> itemList = new ArrayList<>();
+		LI listInfo = new LI(5, itemList);
+		listItem = listInfo.createListItem(integer, floatnum, date, time, timestamp);
+		fmt = new SSListItemFormat();
 
 		// format everything in the list item
 		fmt.clear();
 		fmt.addElemType(0, JDBCType.INTEGER);
-		fmt.addElemType(1, JDBCType.VARCHAR);
+		fmt.addElemType(1, JDBCType.FLOAT);
 		fmt.addElemType(2, JDBCType.DATE);
 		fmt.addElemType(3, JDBCType.TIME);
 		fmt.addElemType(4, JDBCType.TIMESTAMP);
 		String format = fmt.format(listItem);
+		String expect = "42 | 3.14159 | 2021/02/13 | 04:25:26 | 2023/04/15T07:38:39";
+		assertEquals(expect, format);
+
+		// use toString by setting null
+		fmt.setFormat(JDBCType.DATE, null);
+		fmt.setFormat(JDBCType.TIME, null);
+		fmt.setFormat(JDBCType.TIMESTAMP, null);
+		format = fmt.format(listItem);
+		expect = "42 | 3.14159 | 2021-02-13 | 04:25:26 | 2023-04-15 07:38:39.0";
+		assertEquals(expect, format);
+
+		// change the order elements get formatted
+		// leave something out
+		// different format pattern
+		fmt.setFormat(JDBCType.DATE,      new SimpleDateFormat("YY"));
+		fmt.setFormat(JDBCType.TIME,      new SimpleDateFormat("HH"));
+		fmt.setFormat(JDBCType.TIMESTAMP, new SimpleDateFormat("YY*HH"));
+		fmt.setSeparator(" @@@ ");
+		fmt.clear();
+		fmt.addElemType(4, JDBCType.TIMESTAMP);
+		fmt.addElemType(1, JDBCType.FLOAT);
+		fmt.addElemType(3, JDBCType.TIME);
+		fmt.addElemType(2, JDBCType.DATE);
+		format = fmt.format(listItem);
+		expect = "23*07 @@@ 3.14159 @@@ 04 @@@ 21";
+		assertEquals(expect, format);
+
+		// change the order elements get formatted
+		// leave something out
+		// different format
+		// format for INTEGER and FLOAT
+
+		fmt.setFormat(JDBCType.INTEGER, new DecimalFormat("$#0000.00"));
+		fmt.setFormat(JDBCType.FLOAT, new DecimalFormat(".00"));
+		fmt.setFormat(JDBCType.DATE,      new SimpleDateFormat("YY"));
+		fmt.setFormat(JDBCType.TIME,      new SimpleDateFormat("HH"));
+		fmt.setFormat(JDBCType.TIMESTAMP, new SimpleDateFormat("YY*HH"));
+		fmt.setSeparator(" @@@ ");
+		fmt.clear();
+		fmt.addElemType(4, JDBCType.TIMESTAMP);
+		fmt.addElemType(1, JDBCType.FLOAT);
+		fmt.addElemType(0, JDBCType.INTEGER);
+		fmt.addElemType(2, JDBCType.DATE);
+		format = fmt.format(listItem);
+		expect = "23*07 @@@ 3.14 @@@ $0042.00 @@@ 21";
+		assertEquals(expect, format);
+
+		// add element format to override the default
+		fmt.clear();
+		fmt.addElemType(4, JDBCType.TIMESTAMP);
+		fmt.addElemType(1, JDBCType.FLOAT, new DecimalFormat(".0000"));
+		fmt.addElemType(0, JDBCType.INTEGER, new DecimalFormat("$.00"));
+		fmt.addElemType(2, JDBCType.DATE);
+		format = fmt.format(listItem);
+		expect = "23*07 @@@ 3.1416 @@@ $42.00 @@@ 21";
+		assertEquals(expect, format);
+
+		// Check exceptions in Format are handled.
+		Format exceptionFormat = new Format() {
+			@Override
+			public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
+				throw new UnsupportedOperationException("Not supported yet.");
+			}
+
+			@Override
+			public Object parseObject(String source, ParsePosition pos) {
+				throw new UnsupportedOperationException("Not supported yet.");
+			}
+		};
+		// NOTE: TIMESTAMP is formatted with toString()
+		// because of exception
+		fmt.clear();
+		fmt.addElemType(4, JDBCType.TIMESTAMP, exceptionFormat);
+		fmt.addElemType(1, JDBCType.FLOAT, new DecimalFormat(".0000"));
+		fmt.addElemType(0, JDBCType.INTEGER, new DecimalFormat("$.00"));
+		fmt.addElemType(2, JDBCType.DATE);
+		format = fmt.format(listItem);
+		// TIMESTAMP formatted with toString().
+		expect = "2023-04-15 07:38:39.0 @@@ 3.1416 @@@ $42.00 @@@ 21";
+		assertEquals(expect, format);
+
+		// Get an exception from the date formatter
+		listItem = listInfo.createListItem(true, null, null, null, null);
+		fmt.clear();
+		fmt.addElemType(0, JDBCType.TIMESTAMP);
+		format = fmt.format(listItem);
+		expect = "true";
+		assertEquals(expect, format);
+	}
+	/**
+	 * Test of setDatePattern method, of class SSListItemFormat.
+	 */
+	@Test
+	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "ThrowableResultIgnored"})
+	public void testSetPattern() {
+		System.out.print("setDatePattern");
+		SSListItemFormat fmt1 = new SSListItemFormat();
+
+		// check initial patterns
+		// by setting new pattern
+		// and the retrun value is the previous pattern
+		String previousPat;
+
+		previousPat = ((SimpleDateFormat)fmt1.setFormat(JDBCType.DATE, null)).toPattern();
+		assertEquals(SSListItemFormat.dateDefault, previousPat);
+		previousPat = ((SimpleDateFormat)fmt1.setFormat(JDBCType.TIME, null)).toPattern();
+		assertEquals(SSListItemFormat.timeDefault, previousPat);
+		previousPat = ((SimpleDateFormat)fmt1.setFormat(JDBCType.TIMESTAMP, null)).toPattern();
+		assertEquals(SSListItemFormat.timestampDefault, previousPat);
+	}
+
+	/**
+	 * Test of getPattern method, of class SSListItemFormat.
+	 */
+	@Test
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	public void testGetPattern() {
+		System.out.print("getDatePattern");
+		SSListItemFormat fmt1 = new SSListItemFormat();
+
+		// check initial patterns
+		// by getting the patterns
+		Format currentFormat;
+
+		currentFormat = fmt1.getFormat(JDBCType.DATE);
+		assertEquals(new SimpleDateFormat(SSListItemFormat.dateDefault),
+					 currentFormat);
+		currentFormat = fmt1.getFormat(JDBCType.TIME);
+		assertEquals(new SimpleDateFormat(SSListItemFormat.timeDefault),
+					 currentFormat);
+		currentFormat = fmt1.getFormat(JDBCType.TIMESTAMP);
+		assertEquals(new SimpleDateFormat(SSListItemFormat.timestampDefault),
+					 currentFormat);
+
+		// set some arbitrary strings and read them back
+		Format f1 = new SimpleDateFormat("yyyy");
+		Format f2 = new SimpleDateFormat("HH");
+		Format f3 = new SimpleDateFormat("MM");
+		fmt1.setFormat(JDBCType.DATE, f1);
+		fmt1.setFormat(JDBCType.TIME, f2);
+		fmt1.setFormat(JDBCType.TIMESTAMP, f3);
+
+		currentFormat = fmt1.getFormat(JDBCType.DATE);
+		assertEquals(currentFormat, f1);
+		currentFormat = fmt1.getFormat(JDBCType.TIME);
+		assertEquals(currentFormat, f2);
+		currentFormat = fmt1.getFormat(JDBCType.TIMESTAMP);
+		assertEquals(currentFormat, f3);
+	}
+
+	/**
+	 * Test of format method, of class SSListItemFormat.
+	 * 
+	 * This is the only test method, and it tests a superclass method
+	 */
+	@Test
+	@SuppressWarnings({"deprecation", "UseOfSystemOutOrSystemErr"})
+	public void testFormatDeprecated() {
+		System.out.print("formatDeprecated");
+
+		// format everything in the list item
+		fmtOld.clear();
+		fmtOld.addElemType(0, JDBCType.INTEGER);
+		fmtOld.addElemType(1, JDBCType.VARCHAR);
+		fmtOld.addElemType(2, JDBCType.DATE);
+		fmtOld.addElemType(3, JDBCType.TIME);
+		fmtOld.addElemType(4, JDBCType.TIMESTAMP);
+		String format = fmtOld.format(listItemOld);
 		String expect = "42 | everything | 2021/02/13 | 04:25:26 | 2023/04/15T07:38:39";
 		assertEquals(expect, format);
 
 		// use toString by setting null
-		fmt.setPattern(JDBCType.DATE, null);
-		fmt.setPattern(JDBCType.TIME, null);
-		fmt.setPattern(JDBCType.TIMESTAMP, null);
-		format = fmt.format(listItem);
+		fmtOld.setPattern(JDBCType.DATE, null);
+		fmtOld.setPattern(JDBCType.TIME, null);
+		fmtOld.setPattern(JDBCType.TIMESTAMP, null);
+		format = fmtOld.format(listItemOld);
 		expect = "42 | everything | 2021-02-13 | 04:25:26 | 2023-04-15 07:38:39.0";
 		assertEquals(expect, format);
 
 		// change the order elements get formatted
 		// leave something out
 		// different format pattern
-		fmt.setPattern(JDBCType.DATE, "YY");
-		fmt.setPattern(JDBCType.TIME, "HH");
-		fmt.setPattern(JDBCType.TIMESTAMP, "YY*HH");
-		fmt.setSeparator(" @@@ ");
-		fmt.clear();
-		fmt.addElemType(4, JDBCType.TIMESTAMP);
-		fmt.addElemType(1, JDBCType.VARCHAR);
-		fmt.addElemType(3, JDBCType.TIME);
-		fmt.addElemType(2, JDBCType.DATE);
-		format = fmt.format(listItem);
+		fmtOld.setPattern(JDBCType.DATE, "YY");
+		fmtOld.setPattern(JDBCType.TIME, "HH");
+		fmtOld.setPattern(JDBCType.TIMESTAMP, "YY*HH");
+		fmtOld.setSeparator(" @@@ ");
+		fmtOld.clear();
+		fmtOld.addElemType(4, JDBCType.TIMESTAMP);
+		fmtOld.addElemType(1, JDBCType.VARCHAR);
+		fmtOld.addElemType(3, JDBCType.TIME);
+		fmtOld.addElemType(2, JDBCType.DATE);
+		format = fmtOld.format(listItemOld);
 		expect = "23*07 @@@ everything @@@ 04 @@@ 21";
 		assertEquals(expect, format);
 	}
@@ -168,8 +353,9 @@ public class SSListItemFormatTest {
 	 * Test of setDatePattern method, of class SSListItemFormat.
 	 */
 	@Test
-	public void testSetPattern() {
-		System.out.println("setDatePattern");
+	@SuppressWarnings({"deprecation", "UseOfSystemOutOrSystemErr", "ThrowableResultIgnored"})
+	public void testSetPatternDeprecated() {
+		System.out.print("setDatePatternDeprecated");
 		SSListItemFormat fmt1 = new SSListItemFormat();
 
 		assertThrows(IllegalArgumentException.class,
@@ -192,8 +378,9 @@ public class SSListItemFormatTest {
 	 * Test of getPattern method, of class SSListItemFormat.
 	 */
 	@Test
-	public void testGetPattern() {
-		System.out.println("getDatePattern");
+	@SuppressWarnings({"deprecation", "UseOfSystemOutOrSystemErr", "ThrowableResultIgnored"})
+	public void testGetPatternDeprecated() {
+		System.out.print("getDatePatternDeprecated");
 		SSListItemFormat fmt1 = new SSListItemFormat();
 
 		assertThrows(IllegalArgumentException.class,
@@ -211,16 +398,16 @@ public class SSListItemFormatTest {
 		assertEquals(SSListItemFormat.timestampDefault, currentPattern);
 
 		// set some arbitrary strings and read them back
-		fmt1.setPattern(JDBCType.DATE, "date");
-		fmt1.setPattern(JDBCType.TIME, "time");
-		fmt1.setPattern(JDBCType.TIMESTAMP, "timestamp");
+		fmt1.setPattern(JDBCType.DATE, "yyyy");
+		fmt1.setPattern(JDBCType.TIME, "HH");
+		fmt1.setPattern(JDBCType.TIMESTAMP, "MM");
 
 		currentPattern = fmt1.getPattern(JDBCType.DATE);
-		assertEquals(currentPattern, "date");
+		assertEquals(currentPattern, "yyyy");
 		currentPattern = fmt1.getPattern(JDBCType.TIME);
-		assertEquals(currentPattern, "time");
+		assertEquals(currentPattern, "HH");
 		currentPattern = fmt1.getPattern(JDBCType.TIMESTAMP);
-		assertEquals(currentPattern, "timestamp");
+		assertEquals(currentPattern, "MM");
 	}
 
 	// /**
