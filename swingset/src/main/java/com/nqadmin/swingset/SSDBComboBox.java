@@ -196,7 +196,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 */
 	@Override
 	protected SSListItem createNullItem(Model.Remodel remodel) {
-		return remodel.createOptionMappingItem(null, "", null);
+		return remodel.createOptionMappingItem(null, null, null);
 	}
 
 	/**
@@ -360,17 +360,28 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	/**
 	 * Adds an item to the existing list of items in the combo box.
 	 *
-	 * @param _option text that should be displayed in the combobox
+	 * @param _option item that should be displayed in the combobox
 	 * @param _mapping  mapping of _option, typically a primary key
 	 */
-	public void addOption(String _option, Long _mapping) {
+	public void addOption(Object _option, Long _mapping) {
+		addOption(_option, null, _mapping);
+	}
+	
+	/**
+	 * Adds an item to the existing list of items in the combo box.
+	 *
+	 * @param _option item that should be displayed in the combobox
+	 * @param _option2  second display item for combobox
+	 * @param _mapping  mapping of _option, typically a primary key
+	 */
+	public void addOption(Object _option, Object _option2, Long _mapping) {
 		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			final int index = remodel.getMappings().indexOf(_mapping);
 			if (index >= 0) {
 				logger.warn(() -> String.format("%s: Mapping of [%s] already exists. Creating duplicate Mapping with Option of '%s'.",
 					getColumnForLog(), _mapping, _option));
 			}
-			remodel.add(_mapping, _option);
+			remodel.add(_mapping, _option, _option2);
 		} catch (final Exception e) {
 			logger.error(getColumnForLog() + ": Exception.", e);
 		}
