@@ -26,7 +26,7 @@ Changes:
 	   helper classes.
 	12.SSList: using default mapping type of JDBCType.INTEGER rather than
 	   JDBCType.NULL in empty constructor.
-	13.Component null pointer fixea,
+	13.Component null pointer fixes,
 	   https://github.com/bpangburn/swingset/issues/139
 	14.Use Format for SSListItemFormat - all types. See PR:
 	   https://github.com/bpangburn/swingset/pull/138
@@ -35,6 +35,13 @@ Changes:
        The use of a format string is deprecated (it still works, now built on
        the new Format mechanisms). Previously only the data/time types could
        have a format string; everything else was toString().
+    15.Issue #140: SSDateField bind fails when there are no records in the
+       rowset. See commit to SSFormattedTextField:
+       https://github.com/bpangburn/swingset/commit/e1d38b3
+    16.Overloaded SSDBComboBox.addOption() to support multi-column combo.
+       See commit to SSDBComboBox:
+       https://github.com/bpangburn/swingset/commit/e1d38b3
+        
 	
 ==============================================================================
 SwingSet 4.0.9 - Released 2022-03-16
