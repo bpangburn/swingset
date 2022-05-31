@@ -6,7 +6,7 @@
 
 	<groupId>com.nqadmin.swingset</groupId>
 	<artifactId>swingset-parent</artifactId>
-	<version>4.0.10-SNAPSHOT</version>
+	<version>4.0.10</version>
 	<packaging>pom</packaging>
 
 	<name>swingset-parent</name>
