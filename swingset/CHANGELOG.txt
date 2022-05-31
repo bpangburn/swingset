@@ -3,7 +3,7 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
 ==============================================================================
-SwingSet 4.0.10 - Released TBD
+SwingSet 4.0.10 - Released 2022-05-31
 ==============================================================================
 
 Changes:
@@ -30,18 +30,19 @@ Changes:
 	   https://github.com/bpangburn/swingset/issues/139
 	14.Use Format for SSListItemFormat - all types. See PR:
 	   https://github.com/bpangburn/swingset/pull/138
-        - Each JDBCType can have a default Format
-        - Each SSListItem element can have Format
-       The use of a format string is deprecated (it still works, now built on
-       the new Format mechanisms). Previously only the data/time types could
-       have a format string; everything else was toString().
-    15.Issue #140: SSDateField bind fails when there are no records in the
-       rowset. See commit to SSFormattedTextField:
-       https://github.com/bpangburn/swingset/commit/e1d38b3
-    16.Overloaded SSDBComboBox.addOption() to support multi-column combo.
-       See commit to SSDBComboBox:
-       https://github.com/bpangburn/swingset/commit/e1d38b3
-        
+		- Each JDBCType can have a default Format
+		- Each SSListItem element can have Format
+	   The use of a format string is deprecated (it still works, now built on
+	   the new Format mechanisms). Previously only the data/time types could
+	   have a format string; everything else was toString().
+	15.Issue #140: SSDateField bind fails when there are no records in the
+	   rowset. See commit to SSFormattedTextField:
+	   https://github.com/bpangburn/swingset/commit/e1d38b3
+	16.Overloaded SSDBComboBox.addOption() to support multi-column combo.
+	   See commit to SSDBComboBox:
+	   https://github.com/bpangburn/swingset/commit/e1d38b3
+	17.Issue #141: SSTextField date mask is throwing exceptions while
+	   composing the date.
 	
 ==============================================================================
 SwingSet 4.0.9 - Released 2022-03-16
