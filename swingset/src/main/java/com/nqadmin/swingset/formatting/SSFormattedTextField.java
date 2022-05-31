@@ -561,7 +561,7 @@ public class SSFormattedTextField extends JFormattedTextField
 		try {
 			// IF THERE ARE NO RECORDS OR THE COLUMN VALUE IS NULL SET THE FIELD TO NULL AND RETURN
 			//if ((getRowSet().getColumnCount()==0) || (getRowSet().getObject(getBoundColumnName()) == null)) {
-			if ((RowSetOps.getColumnCount(getRowSet())==0) || (getRowSet().getObject(getBoundColumnName()) == null)) {
+			if ( getRowSet().getRow() < 1 || RowSetOps.getColumnCount(getRowSet())==0 || getRowSet().getObject(getBoundColumnName()) == null ) {
 				setValue(null);
 				return;
 			}

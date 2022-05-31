@@ -845,7 +845,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * screen of the current screen).
 	 */
 	@Override
-	protected void updateScreen() {
+	public void updateScreen() {
 
 		try {
 			// TURN OFF THE SYNC MANAGER

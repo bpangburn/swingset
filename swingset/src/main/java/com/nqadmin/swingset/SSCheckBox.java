@@ -256,7 +256,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 		case java.sql.Types.SMALLINT:
 		case java.sql.Types.TINYINT:
 			// SET THE CHECK BOX BASED ON THE VALUE IN ROWSET
-			if (text.equals(String.valueOf(CHECKED))) {
+			if (String.valueOf(CHECKED).equals(text)) {
 				setSelected(true);
 			} else {
 				setSelected(false);
@@ -266,7 +266,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 		case java.sql.Types.BIT:
 		case java.sql.Types.BOOLEAN:
 			// SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-			if (text.equals(BOOLEAN_CHECKED)) {
+			if (BOOLEAN_CHECKED.equals(text)) {
 				setSelected(true);
 			} else {
 				setSelected(false);
