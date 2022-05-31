@@ -87,7 +87,11 @@ public class SSDbArrayModel extends SSAbstractCollectionModel {
 	/** {@inheritDoc } */
 	@Override
 	public Object[] readData(final RowSet _rowSet, final String _columnName) throws SQLException {
-		return toObjList(getJDBCType(), _rowSet.getArray(_columnName)).toArray();
+		List<Object> data = toObjList(getJDBCType(), _rowSet.getArray(_columnName));
+		if(data == null) {
+			return null;
+		}
+		return data.toArray();
 	}
 
 	/** {@inheritDoc } */

@@ -84,17 +84,6 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 	 * table/grid column headings
 	 */
 	private static final String[] tableHeaders = { "Supplier-Part ID", "Supplier Name", "Part Name", "Quantity", "Ship Date" };
-	
-//	/**
-//	 * data grid
-//	 */
-//	SSDataGrid dataGrid = null;
-//	
-//	/**
-//	 * database component declarations
-//	 */
-//	Connection connection = null;
-//	RowSet rowset = null;
 
 	/**
 	 * Constructor for Example7UsingHelper
@@ -192,12 +181,6 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 	}
 
 	@Override
-	protected boolean isGridCellEditable(int _row, int _column) {
-	// ALL CELLS ARE EDITABLE
-		return true;
-	}
-
-	@Override
 	protected void addCustomListeners() throws Exception {
 		// NOTHING TO DO...
 	}
@@ -212,7 +195,11 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 		// NOTHING TO DO...
 	}
 	
-
+	@Override
+	protected void configureSSCellEditing() {
+		// NOTHING TO DO...
+	}
+	
 	@Override
 	protected String[] getDefaultColumnNames() {
 		// TODO Auto-generated method stub

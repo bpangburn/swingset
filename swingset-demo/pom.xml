@@ -8,7 +8,7 @@
 
 	<groupId>com.nqadmin.swingset.demo</groupId>
 	<artifactId>swingset-demo</artifactId>
-	<version>4.0.9</version>
+	<version>4.0.10-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>swingset-demo</name>
@@ -22,9 +22,9 @@
 		<version.java>1.8</version.java>
 
 		<!-- primary swingset-demo dependencies -->
-		<version.swingset>4.0.9</version.swingset>
+		<version.swingset>4.0.10-SNAPSHOT</version.swingset>
 		<version.log4j>2.17.2</version.log4j>
-		<version.h2>2.1.210</version.h2>
+		<version.h2>2.1.212</version.h2>
 		<version.java-getopt>1.0.13</version.java-getopt>
 
 		<!-- Shared by swingset-parent, swingset, and swingset-demo -->
@@ -39,9 +39,9 @@
 		<version.maven-jar-plugin>3.2.2</version.maven-jar-plugin>
 		<version.maven-resources-plugin>3.2.0</version.maven-resources-plugin>
 		<version.maven-compiler-plugin>3.10.1</version.maven-compiler-plugin>
-		<version.dependency-check-maven>7.0.0</version.dependency-check-maven>
+		<version.dependency-check-maven>7.1.0</version.dependency-check-maven>
 		<version.maven-gpg-plugin>3.0.1</version.maven-gpg-plugin>
-		<version.maven-surefire-plugin>3.0.0-M5</version.maven-surefire-plugin>
+		<version.maven-surefire-plugin>3.0.0-M6</version.maven-surefire-plugin>
 		<version.maven-source-plugin>3.2.1</version.maven-source-plugin>
 		
 		<!-- swingset-demo-only -->

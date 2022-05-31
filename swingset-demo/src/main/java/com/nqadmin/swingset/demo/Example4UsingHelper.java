@@ -205,16 +205,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		});
 	}
 	
-	@Override//	/**
-//	 * data grid
-//	 */
-//	SSDataGrid dataGrid = null;
-//	
-//	/**
-//	 * database component declarations
-//	 */
-//	Connection connection = null;
-//	RowSet rowset = null;
+	@Override
 	protected void addNewRecordToComboNav() {
 		// nothing to do because H2 requires that the rowset be 
 		// requeried following a record insertion or deletion

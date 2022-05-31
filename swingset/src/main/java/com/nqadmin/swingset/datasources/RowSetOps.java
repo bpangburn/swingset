@@ -209,7 +209,7 @@ public class RowSetOps {
 			case BIT:
 				value = String.valueOf(_rowSet.getBoolean(_columnName));
 				break;
-
+// TODO: Convert this to use java.time.LocalDate, LocalTime, or LocalDateTime as needed.
 			case DATE:
 			case TIMESTAMP:
 				final Date date = _rowSet.getDate(_columnName);
@@ -231,7 +231,7 @@ public class RowSetOps {
 					value = value + calendar.get(Calendar.YEAR);
 				}
 				break;
-
+// TODO: Convert this to use java.time.LocalTime.
 			case TIME:
 				final Time time = _rowSet.getTime(_columnName);
 				if (time == null) {
@@ -475,24 +475,33 @@ public class RowSetOps {
 			
 		case DATE:
 // TODO Good to get rid of getSQLDate if possible.
+// 2022-05-31_BP: Probably best to cast to a LocalDate and return if that fails.
+// 	Can convert to SQL Date if successful.
 			if (_updatedValue.length() == 10) {
 				Date dateValue = SSCommon.getSQLDate(_updatedValue);
 				_rowSet.updateDate(_columnName, dateValue);
-			} else {
-			// 2020-12-01_BP: Might as well at least try to process a date that is other than 10 characters
-				Date dateValue = java.sql.Date.valueOf(_updatedValue);
-				_rowSet.updateDate(_columnName, dateValue);
+// Per https://github.com/bpangburn/swingset/issues/141,
+// this else block is throwing an exception for every character pressed for the SSTextField date mask.				
+//			} else {
+//			// 2020-12-01_BP: Might as well at least try to process a date that is other than 10 characters
+//				Date dateValue = java.sql.Date.valueOf(_updatedValue);
+//				_rowSet.updateDate(_columnName, dateValue);
 			}
 			break;
 			
 		case TIME:
+// TODO: Probably a better way to handle date to timestamp conversion. Formatter? Get rid of getSQLDate() if possible.
+// 2022-05-31_BP: Probably best to cast to a LocalDateTime and return if that fails.
+//	Can convert to SQL Timestamp if successful.			
+			// CONVERT ANY 10 CHARACTER DATE (e.g., yyyy-mm-dd, mm/dd/yyyy to a date/time)			
 			Time timeValue = java.sql.Time.valueOf(_updatedValue);
 			_rowSet.updateTime(_columnName, timeValue);
 			break;
 			
 		case TIMESTAMP:
-		// TODO: We're not doing anything here
-		// TODO: Probably a better way to handle date to timestamp conversion. Formatter? Get rid of getSQLDate() if possible.
+// TODO: Probably a better way to handle date to timestamp conversion. Formatter? Get rid of getSQLDate() if possible.
+// 2022-05-31_BP: Probably best to cast to a LocalDateTime and return if that fails.
+//	Can convert to SQL Timestamp if successful.			
 			// CONVERT ANY 10 CHARACTER DATE (e.g., yyyy-mm-dd, mm/dd/yyyy to a date/time)
 			if (_updatedValue.length() == 10) {
 				Timestamp timestampValue = new Timestamp(SSCommon.getSQLDate(_updatedValue).getTime());

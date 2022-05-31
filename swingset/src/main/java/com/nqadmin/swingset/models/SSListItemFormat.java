@@ -47,7 +47,10 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.logging.log4j.Logger;
+
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.ListItem0;
+import com.nqadmin.swingset.utils.SSUtils;
 
 // SSListItemFormat.java
 //
@@ -56,22 +59,27 @@ import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.ListItem0;
 /**
  * Use this to produce a string representation of an SSListItem.
  * Configure the order in which the list item elements are formatted,
- * and each element type, with {@link #addElemType}.
+ * each element type, and optionally Format,
+ * with {@link #addElemType(int, java.sql.JDBCType, java.text.Format) }.
  * After this object is created, by default
  * element 0 is formatted with toString(). Start with {@link #clear()}
  * to set up a different formatting specification.
  * <p>
- * Time related elements can have a format pattern specified;
- * The time patterns use {@link java.text.SimpleDateFormat}.
- * If the pattern is null, then toString() is used to format the pattern.
+ * Each JDBCType can have a default Format specified; use
+ * {@link #setFormat(java.sql.JDBCType, java.text.Format) }.
+ * There are preset defaults for the data/time types
  * <pre>
  * {@code
- * The default patterns are:
+ * The builtin default Formats {@link java.text.SimpleDateFormat} are:
  *    JDBCType.DATE       "yyyy/MM/dd"
  *    JDBCType.TIME,      "HH:mm:ss"
  *    JDBCType.TIMESTAMP, "yyyy/MM/dd'T'HH:mm:ss"
  * }
  * </pre>
+ * When an elem is formatted, first a format assigned to the elem is checked,
+ * then the default format for the elem type is checked,
+ * if neither is available, then toString() is used to format the elem.
+ * the default time formats use .
  * <p>
  * Use {@link #format(java.lang.Object)}, where the argument
  * is an SSListItem, to get the String representation. Note
@@ -82,18 +90,6 @@ import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.ListItem0;
  * 
  * @since 4.0.0
  */
-// TODO: Handle considerably more config for specific elem formatting
-//		map: {elemIndex:jdbcType} DONE
-//		map: {jdbcType:format} NO, there's a format for DATE
-//		map: {elemIndex:format} to override the defaults
-//		possibly option to specify function associated with elemIndex
-//
-// TODO: How about an object which describes an SSListItem properties,
-//		 this would include elements database type, format, ...
-//		 Then use this in preference to individually configuring elems.
-//		 But there's typically only one elem of SSListItem that
-//		 contributes to string description, so...
-//
 public class SSListItemFormat extends Format {
 	/** default date format */
 	public static final String dateDefault = "yyyy/MM/dd";
@@ -107,13 +103,34 @@ public class SSListItemFormat extends Format {
 	private static final FieldPosition FP0 = new FieldPosition(0);
 
 	private String separator = defaultSeparator;
-	/** elemTypes.get(elemIndex) == jdbcType. Cheap map. Null is unspecified type */
-	protected List<JDBCType> elemTypes = new ArrayList<>(4);
-	/** format these item elem in order */
+	/** elemInfos.get(elemIndex) == elemInfo. */
+	protected List<ElemInfo> elemInfos = new ArrayList<>(4);
+	/** format these elem in order of List. */
 	protected List<Integer> itemElemIndexes = new ArrayList<>(4);
 
 	// allow customization of date/time formats
-	private EnumMap<JDBCType, String> patterns = new EnumMap<>(JDBCType.class);
+	private final EnumMap<JDBCType, Format> formats = new EnumMap<>(JDBCType.class);
+
+	private static Logger logger = SSUtils.getLogger();
+
+	/**
+	 * Encapsulate info about element in SSListInfo.
+	 */
+	protected static class ElemInfo {
+		/** type of the elem */
+		final JDBCType type;
+		/** Format to use with this elem, may be null */
+		final Format format;
+
+		/**
+		 * @param type
+		 * @param format
+		 */
+		protected ElemInfo(JDBCType type, Format format) {
+			this.type = type;
+			this.format = format;
+		}
+	}
 
 	
 	/**
@@ -121,14 +138,15 @@ public class SSListItemFormat extends Format {
 	 * elements, in order, that are formatted.
 	 * By default, element 0 is formatted with toString()
 	 */
+	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSListItemFormat() {
 		// format elment 0 with toString()
 		addElemType(0, JDBCType.NULL);
 
 		// initialize default format patterns
-		patterns.put(JDBCType.DATE, dateDefault);
-		patterns.put(JDBCType.TIME, timeDefault);
-		patterns.put(JDBCType.TIMESTAMP, timestampDefault);
+		formats.put(JDBCType.DATE,      new SimpleDateFormat(dateDefault));
+		formats.put(JDBCType.TIME,      new SimpleDateFormat(timeDefault));
+		formats.put(JDBCType.TIMESTAMP, new SimpleDateFormat(timestampDefault));
 	}
 
 	/**
@@ -137,28 +155,65 @@ public class SSListItemFormat extends Format {
 	 * Note that default formatting patterns are not restored.
 	 */
 	public void clear() {
-		elemTypes.clear();
+		elemInfos.clear();
 		itemElemIndexes.clear();
 	}
 
 	/**
-	 * Add element for formatting. Elements are formatted in
+	 * Add element for formatting.Elements are formatted in
 	 * the same order as they are added. If the same elemIndex
-	 * is added, the previous information is discarded.
+ 	 * is added, the previous information is discarded.
+	 * 
+	 * @param _elemIndex ListItem elemIndex for formatting
+	 * @param _jdbcType type of element
+	 * @param _format format to use for the element, may be null
+	 */
+	public void addElemType(int _elemIndex, JDBCType _jdbcType, Format _format) {
+		Objects.requireNonNull(_jdbcType);
+		// first make sure there's room
+		while (_elemIndex >= elemInfos.size()) {
+			elemInfos.add(null);
+		}
+		elemInfos.set(_elemIndex, new ElemInfo(_jdbcType, _format));
+
+		// SSListItem is formatted in the order the items are added
+		Integer indexAsObject = _elemIndex;
+		itemElemIndexes.remove(indexAsObject);
+		itemElemIndexes.add(indexAsObject);
+	}
+
+	/**
+	 * Add element for formatting.Elements are formatted in
+	 * the same order as they are added. If the same elemIndex
+ 	 * is added, the previous information is discarded.
+	 * The default Format for this type is used.
 	 * 
 	 * @param _elemIndex ListItem elemIndex for formatting
 	 * @param _jdbcType type of element
 	 */
 	public void addElemType(int _elemIndex, JDBCType _jdbcType) {
-		Objects.requireNonNull(_jdbcType);
-		// first make sure there's room
-		while (_elemIndex >= elemTypes.size()) {
-			elemTypes.add(null);
-		}
-		elemTypes.set(_elemIndex, _jdbcType);
-		Integer indexAsObject = _elemIndex;
-		itemElemIndexes.remove(indexAsObject);
-		itemElemIndexes.add(indexAsObject);
+		addElemType(_elemIndex, _jdbcType, null);
+	}
+
+	/**
+	 * Set the default Format for the specified jdbc type.
+	 * Only the {@link Format#format(Object, StringBuffer, java.text.FieldPosition)}
+	 * method is used with the argument Format.
+	 * @param _jdbcType all elements of this type use the specified format
+	 * @param _format the format
+	 * @return the previous format
+	 */
+	public Format setFormat(JDBCType _jdbcType, Format _format) {
+		return formats.put(_jdbcType, _format);
+	}
+
+	/**
+	 * Get the default Format for the specified JDBCType.
+	 * @param _jdbcType
+	 * @return format or null if no format has been set
+	 */
+	public Format getFormat(JDBCType _jdbcType) {
+		return formats.get(_jdbcType);
 	}
 
 	/**
@@ -169,12 +224,24 @@ public class SSListItemFormat extends Format {
 	 * @param _jdbcType all elements of this type use the specified pattern
 	 * @param _pattern format pattern
 	 * @return the previous format string
+	 * @deprecated Use {@link #setFormat(java.sql.JDBCType, java.text.Format) }
 	 */
+	@Deprecated
 	public String setPattern(JDBCType _jdbcType, String _pattern) {
-		if (!patterns.containsKey(_jdbcType)) {
+		if (!formats.containsKey(_jdbcType)) {
 			throw new IllegalArgumentException("JDBCType " + _jdbcType + " not handled");
 		}
-		return patterns.put(_jdbcType, _pattern);
+		String pat = null;
+		Format f;
+		if (_pattern == null) {
+			f = formats.put(_jdbcType, null);
+		} else {
+			f = formats.put(_jdbcType, new SimpleDateFormat(_pattern));
+		}
+		if (f instanceof SimpleDateFormat) {
+			pat = ((SimpleDateFormat)f).toPattern();
+		}
+		return pat;
 	}
 
 	/**
@@ -182,11 +249,17 @@ public class SSListItemFormat extends Format {
 	 * @param _jdbcType the JDBCTyep
 	 * @return the pattern or null
 	 */
+	@Deprecated
 	public String getPattern(JDBCType _jdbcType) {
-		if (!patterns.containsKey(_jdbcType)) {
+		if (!formats.containsKey(_jdbcType)) {
 			throw new IllegalArgumentException("JDBCType " + _jdbcType + " not handled");
 		}
-		return patterns.get(_jdbcType);
+		String pat = null;
+		Format f = formats.get(_jdbcType);
+		if (f instanceof SimpleDateFormat) {
+			pat = ((SimpleDateFormat)f).toPattern();
+		}
+		return pat;
 	}
 
 	/**
@@ -204,12 +277,24 @@ public class SSListItemFormat extends Format {
 		return separator;
 	}
 	
+	/**
+	 * @param source
+	 * @param pos
+	 * @return
+	 */
 	@Override
 	public Object parseObject(String source, ParsePosition pos) {
 		// Do not create objects from here
 		return source;
 	}
 	
+	/**
+	 * Note that pos is ignored. (at least for now)
+	 * @param _listItem
+	 * @param toAppendTo
+	 * @param pos
+	 * @return
+	 */
 	@Override
 	public StringBuffer format(Object _listItem, StringBuffer toAppendTo, FieldPosition pos) {
 		if (_listItem != null && _listItem instanceof ListItem0) {
@@ -235,25 +320,27 @@ public class SSListItemFormat extends Format {
 	 */
 	protected void appendValue(StringBuffer _sb, int _elemIndex, ListItem0 _listItem) {
 		Object elem = _listItem.getElem(_elemIndex);
-		JDBCType jdbcType = elemTypes.get(_elemIndex);
-		switch(jdbcType) {
-		case DATE:
-		case TIME:
-		case TIMESTAMP:
-			String pattern = patterns.get(jdbcType);
-			if (pattern != null) {
-				SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
-				dateFormat.format(elem, _sb, FP0);
-			} else {
-				_sb.append(elem.toString());
-			}
-			break;
-		default:
-			if(elem != null) {
-				_sb.append(elem.toString());
-			}
-			break;
+		if (elem == null) {
+			return;
 		}
+		
+		ElemInfo elemInfo = elemInfos.get(_elemIndex);
+		JDBCType jdbcType = elemInfo.type;
+		Format format = elemInfo.format;
+		if (format == null) {
+			format = formats.get(jdbcType);
+		}
+		if (format != null) {
+			try {
+				format.format(elem, _sb, FP0);
+				return;
+			} catch (Exception ex) {
+				logger.error(String.format("can't format %s with %s. Exception: %s",
+						elem.toString(), format.toString(), ex.getMessage()));
+			}
+		}
+		// No formatter, or formatter got an exception
+		_sb.append(elem.toString());
 	}
 	
 }
