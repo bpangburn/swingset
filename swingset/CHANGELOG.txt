@@ -43,6 +43,7 @@ Changes:
 	   https://github.com/bpangburn/swingset/commit/e1d38b3
 	17.Issue #141: SSTextField date mask is throwing exceptions while
 	   composing the date.
+	18.Update junit-jupiter dependencies from 5.8.2 to 5.9.0-M1.
 	
 ==============================================================================
 SwingSet 4.0.9 - Released 2022-03-16
