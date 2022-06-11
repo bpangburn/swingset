@@ -62,6 +62,7 @@ import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
 import com.nqadmin.swingset.models.GlazedListsOptionMappingInfo;
 import com.nqadmin.swingset.models.OptionMappingSwingModel;
 import com.nqadmin.swingset.models.SSListItem;
+import com.nqadmin.swingset.models.SSListItemFormat;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -230,6 +231,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		 */
 		protected static <M,O,O2>BaseModel<M,O,O2> install(SSBaseComboBox<M,O,O2> _jc) {
 			BaseModel<M,O,O2> model = new BaseModel<>();
+			model.setListItemFormat(_jc.createListItemFormat());
 			AbstractComboBoxListSwingModel.install(_jc, model);
 
 			return model;
@@ -281,6 +283,9 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		 */
 		protected static <M,O,O2>BaseGlazedModel<M,O,O2> install(SSBaseComboBox<M,O,O2> _jc) {
 			BaseGlazedModel<M,O,O2> model = new BaseGlazedModel<>();
+			model.setListItemFormat(_jc.createListItemFormat());
+			// Notice that the following uses the list item format;
+			// it can not be effectively changed after this point.
 			model.autoComplete = AutoCompleteSupport.install(_jc, model.getEventList(), null, model.getListItemFormat());
 			
 			model.autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
@@ -300,6 +305,38 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			// false means no Options2
 			super(false, new BasicEventList<SSListItem>());
 		}
+	}
+
+	/**
+	 * Create the ListItemFormat to use with this combobox.
+	 * This default implementation returns a formatter that
+	 * displays the mapping if the option is null. This method
+	 * may return null to use the default formatter.
+	 * @return formatter for this combo box display
+	 */
+	protected SSListItemFormat createListItemFormat() {
+		return new ShowMappingIfNullOption();
+	}
+
+	/**
+	 * A list item formatter that displays the mapping if the option
+	 * is null.
+	 */
+	@SuppressWarnings("serial")
+	class ShowMappingIfNullOption extends SSListItemFormat
+	{
+		@Override
+		protected void appendValue(StringBuffer _sb, int _elemIndex,
+				SSListItem _listItem)
+		{
+			if(optionModel.getOptionListItemElemIndex() == _elemIndex
+					&& getElem(_elemIndex, _listItem) == null)
+				
+				_sb.append(getElem(optionModel.getMappingListItemElemIndex(), _listItem).toString());
+			else
+				super.appendValue(_sb, _elemIndex, _listItem);
+		}
+		
 	}
 
 	/**

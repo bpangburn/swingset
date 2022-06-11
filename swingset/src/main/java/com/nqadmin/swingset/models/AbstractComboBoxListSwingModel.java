@@ -378,10 +378,12 @@ public abstract class AbstractComboBoxListSwingModel {
 
 	/**
 	 * Set the format to use with this model.
+	 * Note this method can not be used after the model is installed
+	 * into a combo box.
 	 * 
 	 * @param _listItemFormat the format used with this model
 	 */
-	public void setListItemFormat(SSListItemFormat _listItemFormat) {
+	protected void setListItemFormat(SSListItemFormat _listItemFormat) {
 		listItemFormat = _listItemFormat;
 	}
 
@@ -1400,8 +1402,6 @@ public abstract class AbstractComboBoxListSwingModel {
 	protected interface ListItem0 extends SSListItem {
 		/**
 		 * Get an item from the SSListItem.
-		 * <p>
-		 * Typically index == 0 is a primary key
 		 * 
 		 * @param index which item to get
 		 * @return the object from the SSListItem

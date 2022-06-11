@@ -44,6 +44,7 @@ import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -315,7 +316,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 			optionModel = Model.install(this);
 		}
 		listItemFormat = optionModel.getListItemFormat();
-		listItemFormat.setPattern(JDBCType.DATE, dateFormat);
+		listItemFormat.setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
 		listItemFormat.setSeparator(separator);
 	}
 	
@@ -1148,7 +1149,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		final String oldValue = dateFormat;
 		dateFormat = _dateFormat;
 		firePropertyChange("dateFormat", oldValue, dateFormat);
-		listItemFormat.setPattern(JDBCType.DATE, _dateFormat);
+		listItemFormat.setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
 	}
 
 	/**
