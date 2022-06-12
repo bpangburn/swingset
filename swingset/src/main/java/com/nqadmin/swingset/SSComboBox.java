@@ -308,15 +308,8 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 	 * @param useGlazedLists install glazed lists
 	 */
 	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-	@SuppressWarnings({"all","LeakingThisInConstructor"})
 	public SSComboBox(boolean useGlazedLists) {
-		// Note that call to parent default constructor is implicit.
-		//super();
-		if (useGlazedLists) {
-			optionModel = GlazedModel.install(this);
-		} else {
-			optionModel = Model.install(this);
-		}
+		super(useGlazedLists);
 	}
 
 	/**

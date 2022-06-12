@@ -313,13 +313,25 @@ public class SSListItemFormat extends Format {
 	}
 
 	/**
+	 * This method allows overriding classes to access the list item
+	 * elements directly without going through remodel.
+	 *
+	 * @param _elemIndex index of element
+	 * @param _listItem container holding the element
+	 * @return the element
+	 */
+	protected Object getElem(int _elemIndex, SSListItem _listItem) {
+		return ((ListItem0) _listItem).getElem(_elemIndex);
+	}
+
+	/**
 	 * Format the indicated element, by default use toString().
 	 * @param _sb append string value to this
 	 * @param _elemIndex index of element
 	 * @param _listItem container holding the element
 	 */
-	protected void appendValue(StringBuffer _sb, int _elemIndex, ListItem0 _listItem) {
-		Object elem = _listItem.getElem(_elemIndex);
+	protected void appendValue(StringBuffer _sb, int _elemIndex, SSListItem _listItem) {
+		Object elem = getElem(_elemIndex, _listItem);
 		if (elem == null) {
 			return;
 		}

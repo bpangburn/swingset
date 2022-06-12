@@ -106,6 +106,9 @@ public class MainClass extends JFrame {
 			} else if (ae.getSource().equals(btnExample4)) {
 				logger.debug("**** Opening Example4 ****");
 				new Example4(dbConnection);
+			} else if (ae.getSource().equals(btnExample4Advanced)) {
+				logger.debug("**** Opening Example4Advanced ****");
+				new Example4Advanced(dbConnection);
 			} else if (ae.getSource().equals(btnExample4UsingHelper)) {
 				logger.debug("**** Opening Example4UsingHelper ****");
 				JFrame e4JFrame = new JFrame("Example4UsingHelper");
@@ -204,6 +207,7 @@ public class MainClass extends JFrame {
 	private JButton btnExample2 = new JButton("Example2");
 	private JButton btnExample3 = new JButton("Example3");
 	private JButton btnExample4 = new JButton("Example4");
+	private JButton btnExample4Advanced = new JButton("Example4Advanced");
 	private JButton btnExample4UsingHelper = new JButton("Example4 Using Helper");
 	private JButton btnExample5 = new JButton("Example5");
 	private JButton btnExample6 = new JButton("Example6");
@@ -254,6 +258,7 @@ public class MainClass extends JFrame {
 		btnExample2.addActionListener(new MyButtonListener());
 		btnExample3.addActionListener(new MyButtonListener());
 		btnExample4.addActionListener(new MyButtonListener());
+		btnExample4Advanced.addActionListener(new MyButtonListener());
 		btnExample4UsingHelper.addActionListener(new MyButtonListener());
 		btnExample5.addActionListener(new MyButtonListener());
 		btnExample6.addActionListener(new MyButtonListener());
@@ -268,6 +273,7 @@ public class MainClass extends JFrame {
 		btnExample2.setPreferredSize(buttonDim);
 		btnExample3.setPreferredSize(buttonDim);
 		btnExample4.setPreferredSize(buttonDim);
+		btnExample4Advanced.setPreferredSize(buttonDim);
 		btnExample4UsingHelper.setPreferredSize(buttonDim);
 		btnExample5.setPreferredSize(buttonDim);
 		btnExample6.setPreferredSize(buttonDim);
@@ -283,6 +289,7 @@ public class MainClass extends JFrame {
 		getContentPane().add(btnExample2);
 		getContentPane().add(btnExample3);
 		getContentPane().add(btnExample4);
+		getContentPane().add(btnExample4Advanced);
 		getContentPane().add(btnExample4UsingHelper);
 		getContentPane().add(btnExample5);
 		getContentPane().add(btnExample6);

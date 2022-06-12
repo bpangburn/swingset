@@ -44,6 +44,7 @@ import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -304,18 +305,11 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * Creates an object of the SSDBComboBox.
 	 */
 	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-	@SuppressWarnings({"all","LeakingThisInConstructor"})
 	public SSDBComboBox() {
-		// Note that call to parent default constructor is implicit.
-		//super();
+		super(USE_GLAZED_MODEL);
 
-		if (USE_GLAZED_MODEL) {
-			optionModel = GlazedModel.install(this);
-		} else {
-			optionModel = Model.install(this);
-		}
-		listItemFormat = optionModel.getListItemFormat();
-		listItemFormat.setPattern(JDBCType.DATE, dateFormat);
+		listItemFormat = getListItemFormat();
+		listItemFormat.setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
 		listItemFormat.setSeparator(separator);
 	}
 	
@@ -1148,7 +1142,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		final String oldValue = dateFormat;
 		dateFormat = _dateFormat;
 		firePropertyChange("dateFormat", oldValue, dateFormat);
-		listItemFormat.setPattern(JDBCType.DATE, _dateFormat);
+		listItemFormat.setFormat(JDBCType.DATE, new SimpleDateFormat(_dateFormat));
 	}
 
 	/**
