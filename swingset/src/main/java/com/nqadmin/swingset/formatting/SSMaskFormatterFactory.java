@@ -116,7 +116,7 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 	 * <p>
 	 * TODO: extend to allow specification of a displayFormatter.
 	 * @see <em>Effective Java</em> Item 2 about override.
-	 * @param <T>
+	 * @param <T> a builder type
 	 */
 	public static class Builder<T extends Builder<T>> {
 		// Required params
@@ -138,29 +138,29 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		}
 
 		/** Literals in the mask; used in determining null data.
-		 * @param val
+		 * @param val value for maskListerals
 		 * @return  builder */
 		public T maskLiterals(String val) { maskLiterals = val; return self(); }
 		/** formatter
-		 * @param val
+		 * @param val indicate if value contains literals
 		 * @return  builder */
 		public T valueContainsLiteral(boolean val) { valueContainsLiterals = val; return self(); }
 		/** Used by the mask formatter in string2Value and value2String.
 		 * It's the last step in stringToValue; it produces the Value
 		 * in the formatted text field.
-		 * @param val
+		 * @param val formatter use to convert strings to/from values
 		 * @return  builder */
 		public T converter(AbstractFormatter val) { converter = val; return self(); }
 		/** formatter
-		 * @param val
+		 * @param val placeholder char
 		 * @return  builder */
 		public T placeholder(char val) { placeholder = val; return self(); }
 		/** formatter
-		 * @param val
+		 * @param val valid characters in the field
 		 * @return  builder */
 		public T validCharacters(String val) { validCharacters = val; return self(); }
 		/** formatter
-		 * @param val
+		 * @param val invalid characters in the field.
 		 * @return  builder */
 		public T invalidCharacters(String val) { invalidCharacters = val; return self(); }
 
@@ -168,20 +168,21 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		 * @return the factory */
 		public SSMaskFormatterFactory build() { return new SSMaskFormatterFactory(this); }
 		/**
-		 *
-		 * @return
+		 * See "effective java" about builders. "simulated self type" idiom.
+		 * @return typed self
 		 */
-
 		@SuppressWarnings("unchecked")
 		protected T self() {
 			return (T) this;
 		}
 
 		/**
-		 * Override this to provide custom SSMaskFormatter.
-		 * @param builder
-		 * @return
-		 * @throws ParseException 
+		 * Create mask formatter from builder params.
+		 * Override this to provide custom SSMaskFormatter;
+		 * see class javadoc for example.
+		 * @param builder params for mask formatter
+		 * @return mask formatter
+		 * @throws ParseException conversion error during creation
 		 */
 		protected SSMaskFormatter getSSMaskFormatter(Builder<?> builder) throws ParseException {
 			return new SSMaskFormatter(builder);
@@ -190,9 +191,8 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 
 	/**
 	 * Create the factory, populate it with mask formatter.
-	 * @param builder
+	 * @param builder params for mask formatter
 	 */
-
 	protected SSMaskFormatterFactory(Builder<?> builder) {
 		try {
 			SSMaskFormatter mf = builder.getSSMaskFormatter(builder);
@@ -208,7 +208,7 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 	 * consistent with getAllowNull. If they do not agree, then
 	 * the factory's null formatter is set/cleared as needed.
 	 * 
-	 * @param _ftf 
+	 * @param _ftf fixup this formatted text field's null handling
 	 */
 	protected static void adjustNullFormatter(SSFormattedTextField _ftf) {
 		if (_ftf.getFormatterFactory() instanceof SSMaskFormatterFactory) {
@@ -221,7 +221,12 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		}
 	}
 
-	/** Uses setEditValid method to check that formatter should flip. */
+	/**
+	 * This is the basic mask formatter produced by the factory;
+	 * it handles flipping to the {@link SSNullFormatter} as needed.
+	 * <p>
+	 * Uses setEditValid method to check that formatter should flip.
+	 */
 	@SuppressWarnings("serial")
 	protected static class SSMaskFormatter extends MaskFormatter {
 
@@ -229,8 +234,8 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		private final String maskLiterals;
 
 		/**
-		 * 
-		 * @param builder
+		 *  Create the mask formatter as specified by the builder.
+		 * @param builder params for the mask formatter
 		 * @throws ParseException 
 		 */
 		protected SSMaskFormatter(Builder<?> builder) throws ParseException {
@@ -257,16 +262,16 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		}
 
 		/**
-		 *
-		 * @return
+		 * Converts between string and value.
+		 * @return converter
 		 */
 		public AbstractFormatter getConverter() {
 			return converter;
 		}
 
 		/**
-		 *
-		 * @return
+		 * The mask literals. These characters are not part of user input.
+		 * @return mask listerals
 		 */
 		public String getLiterals() {
 			return maskLiterals;
@@ -275,9 +280,9 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		/**
 		 * If the value is not a String and there is a converter,
 		 * then first convert the value before super.valueToString.
-		 * @param value
+		 * @param value value associated with field
 		 * @return String representation of the value
-		 * @throws ParseException 
+		 * @throws ParseException if conversion fails
 		 */
 		@Override
 		public String valueToString(Object value) throws ParseException {
@@ -302,9 +307,9 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		 * First convert the string with super.stringToValue,
 		 * then use the converter (if there is one) to create
 		 * the value object.
-		 * @param s
-		 * @return
-		 * @throws ParseException 
+		 * @param s string visible in the field
+		 * @return value of the field
+		 * @throws ParseException if conversion fails
 		 */
 		@Override
 		public Object stringToValue(String s) throws ParseException {
@@ -322,7 +327,7 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		 * This method is invoked by the formatter when it is almost done.
 		 * After super.setEditValid, if the text field does not have
 		 * user input, set the value to null (which switches the formatter).
-		 * @param valid
+		 * @param valid see {@link MaskFormatter#setEditValid(boolean) }
 		 */
 		@Override
 		protected void setEditValid(boolean valid) {
@@ -379,7 +384,7 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		 * This method is invoked by the formatter when it is almost done.
 		 * After super.setEditValid, if the text field is a String
 		 * set the value to the String (which switches the formatter).
-		 * @param valid
+		 * @param valid see {@link MaskFormatter#setEditValid(boolean) }
 		 */
 		@Override
 		protected void setEditValid(boolean valid) {
