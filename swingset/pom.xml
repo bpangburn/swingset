@@ -18,37 +18,39 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+		<!-- MAVEN AND JAVA VERSIONS -->
 		<version.maven>3.6.3</version.maven>
 		<version.java>1.8</version.java>
 
-		<!-- primary swingset dependencies -->
+		<!-- DEPENDENCIES -->
 		<!--<version.glazedlists>1.11.0</version.glazedlists> -->
 		<version.glazedlists>1.11.1203</version.glazedlists>
-		<version.log4j>2.17.2</version.log4j>
+		<version.log4j>2.19.0</version.log4j>
 		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
 
+		<!-- PLUGINS -->
 		<!-- Shared by swingset-parent, swingset, and swingset-demo -->
-        <version.versions-maven-plugin>2.10.0</version.versions-maven-plugin>
-		<version.maven-enforcer-plugin>3.0.0</version.maven-enforcer-plugin>
-		<version.maven-clean-plugin>3.1.0</version.maven-clean-plugin>
-		<version.maven-deploy-plugin>3.0.0-M2</version.maven-deploy-plugin>
-		<version.maven-install-plugin>3.0.0-M1</version.maven-install-plugin>
-		<version.maven-site-plugin>3.11.0</version.maven-site-plugin>
+		<version.versions-maven-plugin>2.12.0</version.versions-maven-plugin>
+		<version.maven-enforcer-plugin>3.1.0</version.maven-enforcer-plugin>
+		<version.maven-clean-plugin>3.2.0</version.maven-clean-plugin>
+		<version.maven-deploy-plugin>3.0.0</version.maven-deploy-plugin>
+		<version.maven-install-plugin>3.0.1</version.maven-install-plugin>
+		<version.maven-site-plugin>4.0.0-M3</version.maven-site-plugin>
 
 		<!-- Shared by swingset and swingset-demo -->
-		<version.maven-jar-plugin>3.2.2</version.maven-jar-plugin>
-		<version.maven-resources-plugin>3.2.0</version.maven-resources-plugin>
+		<version.maven-jar-plugin>3.3.0</version.maven-jar-plugin>
+		<version.maven-resources-plugin>3.3.0</version.maven-resources-plugin>
 		<version.maven-compiler-plugin>3.10.1</version.maven-compiler-plugin>
-		<version.dependency-check-maven>7.1.0</version.dependency-check-maven>
+		<version.dependency-check-maven>7.3.0</version.dependency-check-maven>
 		<version.maven-gpg-plugin>3.0.1</version.maven-gpg-plugin>
-		<version.maven-surefire-plugin>3.0.0-M6</version.maven-surefire-plugin>
+		<version.maven-surefire-plugin>3.0.0-M7</version.maven-surefire-plugin>
 		<version.maven-source-plugin>3.2.1</version.maven-source-plugin>
 
 		<!-- swingset-only -->
-		<version.maven-javadoc-plugin>3.3.2</version.maven-javadoc-plugin>
-		<version.nexus-staging-maven-plugin>1.6.12</version.nexus-staging-maven-plugin>
-		<version.maven-failsafe-plugin>3.0.0-M6</version.maven-failsafe-plugin>
-		<version.junit-jupiter-any>5.9.0-M1</version.junit-jupiter-any>
+		<version.maven-javadoc-plugin>3.4.1</version.maven-javadoc-plugin>
+		<version.nexus-staging-maven-plugin>1.6.13</version.nexus-staging-maven-plugin>
+		<version.maven-failsafe-plugin>3.0.0-M7</version.maven-failsafe-plugin>
+		<version.junit-jupiter-any>5.9.1</version.junit-jupiter-any>
 	</properties>
 
 	<licenses>
