@@ -422,7 +422,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * Add highlighting when the focus is gained and select all of the text so
 	 * overwriting is easier.
 	 *
-	 * @param _event
+	 * @param _event focus event
 	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
 	 */
 	@Override
@@ -442,7 +442,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	/**
 	 * Remove highlighting (custom background color) when the focus is lost.
 	 *
-	 * @param _event
+	 * @param _event focus event
 	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
 	 */
 	@Override
@@ -722,7 +722,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	/**
 	 * Set the text fields value.
-	 * @param value
+	 * @param value set text field to this value
 	 */
 	@Override
 	public void setValue(Object value) {
@@ -741,7 +741,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	/**
 	 * 
-	 * @param _allowNull
+	 * @param _allowNull if true, null are allowed
 	 */
 	@Override
 	public void setAllowNull(boolean _allowNull) {

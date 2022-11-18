@@ -85,14 +85,15 @@ public class SSDateFormatterFactory {
 
 	/**
 	 * Create formatter factory with default pattern.
-	 * @return
+	 * @return factory with default pattern
 	 */
 	public static DefaultFormatterFactory get() {
 		return get(Format.DATE);
 	}
 	/** compatibility
-	 * @param f
-	 * @return 
+	 * @param f int code for style
+	 * @return  factory 
+	 * @deprecated use {@link #get(com.nqadmin.swingset.formatting.Format) }
 	 */
 	@Deprecated
 	public static DefaultFormatterFactory get(int f) {
@@ -100,6 +101,12 @@ public class SSDateFormatterFactory {
 		return get(getFormat(f));
 	}
 
+	/**
+	 * Returns Format enum for old style constant.
+	 * @param _format int constant for style
+	 * @return enum
+	 * @deprecated use enum, never int constants
+	 */
 	// NOTE: package private
 	@Deprecated
 	static Format getFormat(final int _format) {
