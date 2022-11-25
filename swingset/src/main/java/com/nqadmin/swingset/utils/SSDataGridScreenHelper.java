@@ -397,6 +397,9 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			// ADD/CONFIGURE TOOLBARS
 			configureToolBars();
 			
+			// UPDATE SELECTION CRITERIA FOR ANY OTHER SSDBCombos
+			updateSSDBComboBoxes();
+			
 			// ADD DATAGRID TO CONTAINER
 			//  - PUT INSIDE OF A JSCROLLPANE SO WE HAVE SCROLL BARS WHEN NEEDED
 			//  - WITHOUT THE JSCROLLPANE, SOMETIMES THE COLUMN HEADERS DON'T RENDER
@@ -533,6 +536,9 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			
 			// UPDATE DATAGRID ROWSET
 			dataGrid.setRowSet(getRowset());
+			
+			// UPDATE SELECTION CRITERIA FOR ANY OTHER SSDBCombos
+			updateSSDBComboBoxes();
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
