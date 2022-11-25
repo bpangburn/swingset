@@ -43,6 +43,7 @@ import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
@@ -148,6 +149,13 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			logger.debug("");
 			closeChildScreens();
 			ssDBNavPerformNavigationOps(_navigationType);
+			SwingUtilities.invokeLater(()->{
+				try {
+					activateDeactivateComponents();
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+				}
+			});
 		}
 
 		/**
@@ -235,7 +243,13 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 				deactivateSyncManager();
 				updateComboNav();
 				updateSSDBComboBoxes();
-				activateDeactivateComponents();
+				SwingUtilities.invokeLater(()->{
+					try {
+						activateDeactivateComponents();
+					} catch (Exception e) {
+						logger.error(e.getMessage(), e);
+					}
+				});
 				ssDBNavPerformRefreshOps();
 			} catch (final Exception e) {
 				logger.error("Exception.", e);
@@ -867,7 +881,13 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			activateSyncManager();
 
 			// ACTIVATE/DEACTIVATE SCREEN COMPONENTS
-			activateDeactivateComponents();
+			SwingUtilities.invokeLater(()->{
+				try {
+					activateDeactivateComponents();
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+				}
+			});
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
