@@ -74,7 +74,8 @@ public class Example4Advanced extends Example4 {
 	void cmbPartColorChangeOptions() {
 		// This method must be called from Example4 before
 		// some other initialization, like bind, SSSyncManager.
-		cmbPartColor.setOptions(new String[] { "Green" }, new int[] {1});
+		cmbPartColor.setOptions(new String[] { "Green", "Blue" }, new int[] {1,2});
+		//cmbPartColor.setOptions(new String[] { "Yellow", "Purple" }, new int[] {3,4});
 	}
 
 	/**
