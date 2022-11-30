@@ -111,7 +111,7 @@ public class MainClass extends JFrame {
 				new Example4Advanced(dbConnection);
 			} else if (ae.getSource().equals(btnExample4UsingHelper)) {
 				logger.debug("**** Opening Example4UsingHelper ****");
-				JFrame e4JFrame = new JFrame("Example4UsingHelper");
+				JFrame e4JFrame = new JFrame("Example4 Using Helper");
 				e4JFrame.setLocation(DemoUtil.getChildScreenLocation("Example4UsingHelper"));
 				Example4UsingHelper example4 = new Example4UsingHelper(dbConnection, e4JFrame);
 				e4JFrame.add(example4);
@@ -130,7 +130,7 @@ public class MainClass extends JFrame {
 				new Example7(dbConnection);
 			} else if (ae.getSource().equals(btnExample7UsingHelper)) {
 				logger.debug("**** Opening Example7UsingHelper ****");
-				JFrame e7JFrame = new JFrame("Example7UsingHelper");
+				JFrame e7JFrame = new JFrame("Example7 Using Helper");
 				Example7UsingHelper example7 = new Example7UsingHelper(dbConnection, null);
 				e7JFrame.add(example7);
 				e7JFrame.setLocation(DemoUtil.getChildScreenLocation("Example7UsingHelper"));
@@ -207,7 +207,7 @@ public class MainClass extends JFrame {
 	private JButton btnExample2 = new JButton("Example2");
 	private JButton btnExample3 = new JButton("Example3");
 	private JButton btnExample4 = new JButton("Example4");
-	private JButton btnExample4Advanced = new JButton("Example4Advanced");
+	private JButton btnExample4Advanced = new JButton("Example4 Advanced");
 	private JButton btnExample4UsingHelper = new JButton("Example4 Using Helper");
 	private JButton btnExample5 = new JButton("Example5");
 	private JButton btnExample6 = new JButton("Example6");
