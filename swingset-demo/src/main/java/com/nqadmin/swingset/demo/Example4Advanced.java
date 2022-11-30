@@ -77,6 +77,11 @@ public class Example4Advanced extends Example4 {
 		cmbPartColor.setOptions(new String[] { "Green" }, new int[] {1});
 	}
 
+	/**
+	 * Constructor for Example4Advanced
+	 * <p>
+	 * @param _dbConn - database connection
+	 */
 	public Example4Advanced(Connection _dbConn) {
 		super(_dbConn);
 
@@ -176,7 +181,7 @@ public class Example4Advanced extends Example4 {
 		// a problem using a new feature, setListItemFormat, after the
 		// combobox is fully initialized.
 
-		// Test that chaning ListItemFormat redraws the combo.
+		// Test that changing ListItemFormat redraws the combo.
 		// Change the formatter when first char of txtPartName set to '***'
 
 		// *******************************************************************
@@ -185,7 +190,7 @@ public class Example4Advanced extends Example4 {
 		// *******************************************************************
 		if(Boolean.TRUE) {
 			// Use this to demonstrate a failure.
-			// Forces the row to be updated changes collor to null
+			// Forces the row to be updated changes color to null
 			// if the current row has a missing option
 			AbstractDocument doc = (AbstractDocument) txtPartName.getDocument();
 			// both branches show the same failure mode.
@@ -242,7 +247,7 @@ public class Example4Advanced extends Example4 {
 	}
 
 	private int countChange = 2;
-	// Test that chaning ListItemFormat redraws the combo
+	// Test that changing ListItemFormat redraws the combo
 	private void changeListFormatter(String tag) {
 		countChange++;
 		int captureCountChange = countChange;
