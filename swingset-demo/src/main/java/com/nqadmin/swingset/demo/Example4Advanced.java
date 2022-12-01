@@ -225,8 +225,8 @@ public class Example4Advanced extends Example4 {
 							super.remove(fb, 0, 2);
 							changeListFormatter("2");
 							return false;
-						} else
-							return true;
+						}
+						return true;
 					}
 				});
 			} else {
