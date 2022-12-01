@@ -468,7 +468,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 
 	/**
 	 * create SSBaseComboBox
-	 * @param useGlazed
+	 * @param useGlazed use glazedlists
 	 */
 	@SuppressWarnings("LeakingThisInConstructor")
 	public SSBaseComboBox(boolean useGlazed) {
@@ -839,7 +839,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * from the database is encountered and no Option was specified,
 	 * a combobox list entry is created for the Mapping with null option;
 	 * a custom message, see
- 	 * {@link #setListItemFormat(com.nqadmin.swingset.models.SSListItemFormat),
+ 	 * {@link #setListItemFormat(com.nqadmin.swingset.models.SSListItemFormat)},
 	 * may be setup for handling these entries for the combobox display.
 	 * If {@code MOC_CLEANUP} then when the combobox navigates away
 	 * from a record with a missing option, the automatically created

@@ -82,7 +82,7 @@ import ca.odell.glazedlists.EventList;
  * not something that is based on {@code getSelectedIndex()}.
  * Change the current combo box item with methods
  * such as:
- * {@link #setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}
+ * {@link #setSelectedMapping(java.lang.Long) setSelectedMapping(Long)}
  * and
  * {@link SSBaseComboBox#setSelectedOption(java.lang.Object) setSelectedOption(String)}.
  * Use the methods {@link SSBaseComboBox#hasItems() hasItems() } and
@@ -392,7 +392,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 *
 	 * @param _displayText text that should be displayed in the combobox
 	 * @param _primaryKey  primary key value corresponding the the display text
-	 * @deprecated use {@link #addOption(java.lang.String, java.lang.Long) }
+	 * @deprecated use {@link #addOption(java.lang.Object, java.lang.Long) }
 	 */
 	@Deprecated
 	public void addItem(final String _displayText, final long _primaryKey) {
@@ -438,7 +438,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 *
 	 * @param _name  name that should be displayed in the combo
 	 * @param _value value corresponding the the name
-	 * @deprecated use {@link #addOption(java.lang.String, java.lang.Long) }
+	 * @deprecated use {@link #addOption(java.lang.Object, java.lang.Long) }
 	 */
 	@Deprecated
 	protected void addStringItem(final String _name, final String _value) {

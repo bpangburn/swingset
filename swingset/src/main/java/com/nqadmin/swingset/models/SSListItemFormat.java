@@ -123,12 +123,13 @@ public class SSListItemFormat extends Format {
 		final Format format;
 
 		/**
-		 * @param type
-		 * @param format
+		 * Type and format for an SSListItem.
+		 * @param _type type
+		 * @param _format format
 		 */
-		protected ElemInfo(JDBCType type, Format format) {
-			this.type = type;
-			this.format = format;
+		protected ElemInfo(JDBCType _type, Format _format) {
+			this.type = _type;
+			this.format = _format;
 		}
 	}
 
@@ -209,7 +210,7 @@ public class SSListItemFormat extends Format {
 
 	/**
 	 * Get the default Format for the specified JDBCType.
-	 * @param _jdbcType
+	 * @param _jdbcType format for this
 	 * @return format or null if no format has been set
 	 */
 	public Format getFormat(JDBCType _jdbcType) {
@@ -278,9 +279,10 @@ public class SSListItemFormat extends Format {
 	}
 	
 	/**
-	 * @param source
-	 * @param pos
-	 * @return
+	 * This implementation does not create Object from String.
+	 * @param source text
+	 * @param pos pos
+	 * @return the original string
 	 */
 	@Override
 	public Object parseObject(String source, ParsePosition pos) {
@@ -289,11 +291,11 @@ public class SSListItemFormat extends Format {
 	}
 	
 	/**
-	 * Note that pos is ignored. (at least for now)
-	 * @param _listItem
-	 * @param toAppendTo
-	 * @param pos
-	 * @return
+	 * Note that pos is ignored.
+	 * @param _listItem item being formatted
+	 * @param toAppendTo StringBuffer being worked on
+	 * @param pos pos
+	 * @return StringBuffer being worked on
 	 */
 	@Override
 	public StringBuffer format(Object _listItem, StringBuffer toAppendTo, FieldPosition pos) {

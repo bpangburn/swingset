@@ -217,10 +217,10 @@ public class Example4Advanced extends Example4 {
 					boolean checkText(FilterBypass fb,
 							int offset, int length, String text, AttributeSet attrs)
 							throws BadLocationException {
-						Document doc = fb.getDocument();
-						String newText = doc.getText(0, offset) + text
-								+ doc.getText(offset + length,
-										doc.getLength() - (offset + length));
+						Document doc01 = fb.getDocument();
+						String newText = doc01.getText(0, offset) + text
+								+ doc01.getText(offset + length,
+										doc01.getLength() - (offset + length));
 						if(newText.startsWith("***") && offset < 3) {
 							super.remove(fb, 0, 2);
 							changeListFormatter("2");
