@@ -6,10 +6,12 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 SwingSet 4.0.11 - Released TBD
 ==============================================================================
 
-Changes:
-	1. (test changelog entry 2022-11-25)
-	1. (test changelog entry #2 2022-11-25)
-	   
+	1. Due to the many version changes on an ongoing basis, starting with
+	   SwingSet 4.0.11, POM changes have been moved to CHANGELOG-POMS.txt
+	   in the same folder.
+	2. (stuff goes here)
+
+
 ==============================================================================
 SwingSet 4.0.10 - Released 2022-05-31
 ==============================================================================
