@@ -50,6 +50,7 @@ import javax.swing.JComboBox;
 
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.models.OptionMappingSwingModel;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -78,7 +79,7 @@ import com.nqadmin.swingset.utils.SSUtils;
  * not something that is based on {@code getSelectedIndex()}.
  * Change the current combo box item with methods
  * such as:
- * {@link #setSelectedMapping(java.lang.Object) setSelectedMapping(Integer)}
+ * {@link #setSelectedMapping(M) setSelectedMapping(Integer)}
  * and
  * {@link SSBaseComboBox#setSelectedOption(java.lang.Object) setSelectedOption(String)}.
  * Use the methods {@link SSBaseComboBox#hasItems() hasItems() } and
@@ -142,12 +143,10 @@ public class SSComboBox extends SSBaseComboBox<Integer, String, Object>
 {
 	private static final long serialVersionUID = 521308332266885608L;
 
-	private static class Model extends SSBaseComboBox.BaseModel<Integer, String, Object>
-	{
-	}
-
-	private static class GlazedModel extends SSBaseComboBox.BaseGlazedModel<Integer, String, Object>
-	{
+	/** A convenience for variable declarations. Can not instantiate. */
+	private static class Model extends OptionMappingSwingModel<Integer,String,Object> {
+		/** Exception if invoked. */
+		public Model() { Objects.requireNonNull(null); } 
 	}
 
 	/**

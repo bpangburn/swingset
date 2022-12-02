@@ -201,7 +201,7 @@ public class Example4Advanced extends Example4 {
 					public void insertString(DocumentFilter.FilterBypass fb,
 							int offset, String string, AttributeSet attr)
 							throws BadLocationException {
-						if(checkText(fb, offset, 0, string, attr))
+						if(checkText(fb, offset, 0, string))
 							super.insertString(fb, offset, string, attr);
 					}
 					
@@ -209,13 +209,13 @@ public class Example4Advanced extends Example4 {
 					public void replace(DocumentFilter.FilterBypass fb,
 							int offset, int length, String text, AttributeSet attrs)
 							throws BadLocationException {
-						if(checkText(fb, offset, length, text, attrs))
+						if(checkText(fb, offset, length, text))
 							super.replace(fb, offset, length, text, attrs);
 					}
 					
 					/** return true to proceed with action */
 					boolean checkText(FilterBypass fb,
-							int offset, int length, String text, AttributeSet attrs)
+							int offset, int length, String text)
 							throws BadLocationException {
 						Document doc01 = fb.getDocument();
 						String newText = doc01.getText(0, offset) + text
