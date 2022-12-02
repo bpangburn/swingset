@@ -246,7 +246,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${version.maven-compiler-plugin}</version>
+				<version>${version.maven-compiler-plugin}</version><!--$NO-MVN-MAN-VER$-->
 
 				<configuration>
 					<source>${version.java}</source>

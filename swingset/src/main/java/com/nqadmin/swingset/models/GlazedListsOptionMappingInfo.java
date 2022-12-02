@@ -46,7 +46,7 @@ import ca.odell.glazedlists.EventList;
 
 /**
  * This class adds support for GlazedLists locking,
- * see {@link Remodel}.
+ * see {@link OptionMappingSwingModel.Remodel}.
  * @param <M> mapping type; mapping is typically primary key
  * @param <O> option type; option provides display string
  * @param <O2>  option2 type; if present, supplementary display string

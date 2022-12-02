@@ -111,6 +111,13 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 	}
 
 	/**
+	 * Create an empty OptionMappingSwingModel with no options2.
+	 */
+	protected OptionMappingSwingModel() {
+		this(false);
+	}
+
+	/**
 	 * Create an empty OptionMappingSwingModel .
 	 * 
 	 * @param _option2Enabled true says to provide an options2 field in SSListItem
