@@ -356,5 +356,5 @@ public class Example4 extends JFrame {
 				pack();
 			}
 
-	void cmbPartColorChangeOptions() {};
+	void cmbPartColorChangeOptions() {}
 }

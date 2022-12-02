@@ -404,7 +404,7 @@ public abstract class AbstractComboBoxListSwingModel {
 			return listItemFormat != null
 					? listItemFormat.parseObject(source, pos) : source;
 		}
-	};
+	}
 
 	/**
 	 * Delegates formatting on the fly.
