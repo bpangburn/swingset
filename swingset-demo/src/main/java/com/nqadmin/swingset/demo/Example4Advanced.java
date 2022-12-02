@@ -45,6 +45,7 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.sql.Connection;
 import java.util.EnumSet;
+import java.util.Objects;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -258,7 +259,8 @@ public class Example4Advanced extends Example4 {
 				@Override
 				protected void appendValue(StringBuffer _sb, int _elemIndex, SSListItem _listItem) {
 					if (cmbPartColor.getOptionFormatIndex() == _elemIndex
-							&& getElem(_elemIndex, _listItem) == null) {
+							&& getElem(_elemIndex, _listItem) == null
+							&& !Objects.equals(cmbPartColor.getNullItem(), _listItem)) {
 						Object key = getElem(cmbPartColor.getMappingFormatIndex(), _listItem);
 						_sb.append(key != null ? key.toString() : null)
 								.append(" - change: ")

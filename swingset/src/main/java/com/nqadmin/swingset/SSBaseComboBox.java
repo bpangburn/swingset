@@ -347,7 +347,8 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		@Override
 		protected void appendValue(StringBuffer _sb, int _elemIndex, SSListItem _listItem) {
 			if (getOptionFormatIndex() == _elemIndex
-					&& getElem(_elemIndex, _listItem) == null) {
+					&& getElem(_elemIndex, _listItem) == null
+					&& !Objects.equals(getNullItem(), _listItem)) {
 				Object key = getElem(getMappingFormatIndex(), _listItem);
 				_sb.append(key != null ? key.toString() : null)
 						.append(" - Option Not Found");
@@ -1116,6 +1117,14 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * @return the created null item.
 	 */
 	protected abstract SSListItem createNullItem(BaseModel<M,O,O2>.Remodel remodel);
+
+	/**
+	 * Return this ComboBox's nullItem.
+	 * @return the nullItem
+	 */
+	public SSListItem getNullItem() {
+		return nullItem;
+	}
 
 	/**
 	 * A combobox used as a navigator has some restriction; for example,
