@@ -41,6 +41,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.sql.RowSet;
+import java.sql.ResultSet;
 import javax.swing.JFrame;
 
 import org.apache.logging.log4j.LogManager;
@@ -48,6 +49,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDataGrid;
+import java.awt.BorderLayout;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view
@@ -102,6 +104,21 @@ public class Example5 extends JFrame {
 			init();
 	}
 
+	private Object getNewPrimaryKey() {
+		try (final ResultSet rs = connection.createStatement(
+				ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+				.executeQuery("SELECT nextval('part_data_seq') as nextVal;")) {
+			// GET THE NEW RECORD ID.
+			rs.next();
+			return rs.getInt("nextVal");
+		} catch(final SQLException se) {
+			logger.error("SQL Exception occured initializing new record.",se);
+		} catch(final Exception e) {
+			logger.error("Exception occured initializing new record.",e);
+		}
+		return null;
+	}
+
 	/**
 	 * Initialize the screen & datagrid
 	 */
@@ -119,18 +136,27 @@ public class Example5 extends JFrame {
 				dataGrid.setRowSet(rowset);
 				dataGrid.setMessageWindow(this);
 
-			// DISABLES NEW INSERTIONS TO THE DATABASE. - NOT CURRENTLY WORKING FOR H2
+			// DISABLES NEW INSERTIONS TO THE DATABASE.
 				dataGrid.setInsertion(false);
+
 
 			// MAKE THE PART ID UNEDITABLE
 				dataGrid.setUneditableColumns(new String[] { "part_id" });
 
+			// SETUP THE CONTAINER AND ADD THE DATAGRID
+				getContentPane().setLayout(new BorderLayout());
+				getContentPane().add(dataGrid.getComponent(), BorderLayout.CENTER);
+
+				DataGridExampleSupport.setup(logger, getContentPane(),
+						rowset, dataGrid,
+						0, () -> getNewPrimaryKey(),
+						new String[]{ "part_name", "color_code", "weight", "city", },
+						new Object[]{ null, 0, 1, "New Roads" }
+				);
+
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
 			}
-
-		// SETUP THE CONTAINER AND ADD THE DATAGRID
-			getContentPane().add(dataGrid.getComponent());
 
 		// MAKE THE JFRAME VISIBLE
 			setVisible(true);
