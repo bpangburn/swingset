@@ -71,6 +71,7 @@ import org.h2.tools.RunScript;
 
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSMysqlSetModel;
+import com.raelity.lib.ui.Screens;
 
 import gnu.getopt.Getopt;
 
@@ -231,6 +232,7 @@ public class MainClass extends JFrame {
 	/**
 	 * Constructor for MainClass
 	 */
+	@SuppressWarnings("LeakingThisInConstructor")
 	public MainClass() {
 
 		// SETUP WINDOW
@@ -302,6 +304,7 @@ public class MainClass extends JFrame {
 		// DISPLAY SCREEN
 		setVisible(true);
 		pack();
+		Screens.translateToPrefScreen(this);
 	}
 
 	/**
