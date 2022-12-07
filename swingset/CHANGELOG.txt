@@ -3,14 +3,27 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
 ==============================================================================
-SwingSet 4.0.11 - Released TBD
+SwingSet 4.0.11 - Released 2022-12-09
 ==============================================================================
 
 	1. Due to the many version changes on an ongoing basis, starting with
 	   SwingSet 4.0.11, POM changes have been moved to CHANGELOG-POMS.txt
 	   in the same folder.
-	2. (stuff goes here)
-
+	2. Fix for SSTableModel draw after a deletion:
+	   https://github.com/bpangburn/swingset/issues/156
+	3. Fix for component updates following navigation:
+	   https://github.com/bpangburn/swingset/issues/144
+	4. Add updateSSDBComboBoxes to SSDataGridScreenHelper:
+	   https://github.com/bpangburn/swingset/issues/153
+	5. SSComboBox/SSDBComboBox - Ability to display underlying database
+	   value when a combobox doesn't have a corresponding Option:
+	   https://github.com/bpangburn/swingset/issues/145
+	6. Addition of Example4 Advanced to SwingSet demo to demonstrate
+	   #5 above.
+	7. Ability to use an environment variable, JAVA_PREFERRED_SCREEN,
+	   to control placement of the SwingSet demo in a multi-monitor
+	   environment.
+	8. SwingSet demo button, screen name, and README cleanup.
 
 ==============================================================================
 SwingSet 4.0.10 - Released 2022-05-31
