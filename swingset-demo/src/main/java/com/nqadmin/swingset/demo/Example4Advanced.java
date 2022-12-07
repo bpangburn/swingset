@@ -89,7 +89,7 @@ public class Example4Advanced extends Example4 {
 
 		setTitle("Example4 Advanced");
 
-		// NOTE: cmbPartColorChangeOptions has alread been called.
+		// NOTE: cmbPartColorChangeOptions has already been called.
 
 		//////////////////////////////////////////////////////////////////////
 
