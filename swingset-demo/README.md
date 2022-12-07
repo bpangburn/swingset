@@ -79,6 +79,9 @@ The swingset-demo uses an in-memory H2 database by default, but can be run using
 
 See "USING ALTERNATE DATABASE SERVERS" at the end of this document for more information.
 
+Note that the default screen for placement of the demo can be specified using the environment variable: `JAVA_PREFERRED_SCREEN`.
+For example, in a dual monitor Linux environment, you can type `export JAVA_PREFERRED_SCREEN=1` prior to running the demo, and the SwingSet demo will appear on the right screen (presuming the left monitor is the default). 
+If the environment variable is not present or out of bound, the default is used.
 
 ## COMPILATION
 
