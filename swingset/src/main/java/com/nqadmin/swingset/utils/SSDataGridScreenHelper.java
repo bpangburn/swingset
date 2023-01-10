@@ -539,6 +539,9 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			
 			// UPDATE SELECTION CRITERIA FOR ANY OTHER SSDBCombos
 			updateSSDBComboBoxes();
+			
+			// THIS IS NEEDED AS PARENT ID IS ALSO SET AS DEFAULT
+			setDefaultValues();
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
