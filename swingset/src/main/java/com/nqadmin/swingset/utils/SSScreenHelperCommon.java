@@ -548,7 +548,16 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 */
 	public abstract void updateScreen();
 	
-
+	/**
+	 * Convenience method to combine setParentID() and updateScreen().
+	 * 
+	 * @param _parentID the parentID to set
+	 */
+	public void updateScreen(final Long _parentID) {
+		setParentID(_parentID);
+		updateScreen();
+	}
+	
 	/**
 	 * Used to update any SSDBComboBox that change when parent ID changes (i.e.,
 	 * whenever the rowset for the screen changes). This is called from initScreen()
