@@ -541,6 +541,10 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			updateSSDBComboBoxes();
 			
 			// THIS IS NEEDED AS PARENT ID IS ALSO SET AS DEFAULT
+			//
+			// NOTE THAT {@link #setDefaultValues()} DOES NOT CHANGE THE "CURRENT" RECORD
+			// AS IT DOES FOR A FORM, BUT RATHER IT STORES THE DEFAULTS FOR THE UNDERLYING
+			// SSTableModel TO USE WHEN A RECORD IS ADDED
 			setDefaultValues();
 
 		} catch (final SQLException se) {
