@@ -83,7 +83,7 @@ import ca.odell.glazedlists.EventList;
  * not something that is based on {@code getSelectedIndex()}.
  * Change the current combo box item with methods
  * such as:
- * {@link #setSelectedMapping(M) setSelectedMapping(Long)}
+ * {@link SSBaseComboBox#setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}
  * and
  * {@link SSBaseComboBox#setSelectedOption(java.lang.Object) setSelectedOption(String)}.
  * Use the methods {@link SSBaseComboBox#hasItems() hasItems() } and
