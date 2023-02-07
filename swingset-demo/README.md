@@ -2,7 +2,7 @@
 
 ## LICENSE
 
-Copyright (C) 2003-2022, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+Copyright (C) 2003-2023, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -79,6 +79,9 @@ The swingset-demo uses an in-memory H2 database by default, but can be run using
 
 See "USING ALTERNATE DATABASE SERVERS" at the end of this document for more information.
 
+Note that the default screen for placement of the demo can be specified using the environment variable: `JAVA_PREFERRED_SCREEN`.
+For example, in a dual monitor Linux environment, you can type `export JAVA_PREFERRED_SCREEN=1` prior to running the demo, and the SwingSet demo will appear on the right screen (presuming the left monitor is the default). 
+If the environment variable is not present or out of bound, the default is used.
 
 ## COMPILATION
 
@@ -164,7 +167,14 @@ Record navigation can be handled with a SSDataNavigator or with a SSDBComboBox.
 
 Since the navigation can take place by multiple methods, the navigation controls have to be synchronized. This is accomplished with the SSSyncManager.
 
-### Example4WithHelper
+### Example4 Advanced
+
+Extension of Example4, showing:
+1. Custom handling of a missing Option (Red) in the Color SSComboBox.
+2. Use of InputMap/ActionMap for custom key and extra button handling with F3-F11 mnemonics corresponding to the buttons on Navigator.
+3. Use of InputMap/ActionMap to add "extra" First and Last record navigation buttons at the bottom of the screen.
+
+### Example4 Using Helper
 
 Same as Example4, but built by extending the SSFormViewScreenHelper helper class to organize construction.
 
@@ -184,17 +194,17 @@ This example demonstrates the use of an SSDataGrid to display a tabular view of 
 
 It adds a ComboRenderer with a lookup to the supplier_data table for the supplier name, and adds a DateRenderer for the ship date column.
 
-### Example7WithHelper
+### Example7 Using Helper
 
 Same as Example7, but built by extending the SSDataGridScreenHelper helper class to organize construction.
 
-### TestBaseComponents
+### Test Base Components
 
 This example demonstrates all of the Base SwingSet Components except for the SSDataGrid.
 
 There is a separate example screen to demonstrate the Formatted SwingSet Components.
 
-### TestFormattedComponents
+### Test Formatted Components
 
 This example demonstrates all of the Formatted SwingSet Components.
 

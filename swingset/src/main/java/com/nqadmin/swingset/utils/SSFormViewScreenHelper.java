@@ -43,6 +43,7 @@ import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
@@ -148,6 +149,13 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			logger.debug("");
 			closeChildScreens();
 			ssDBNavPerformNavigationOps(_navigationType);
+			SwingUtilities.invokeLater(()->{
+				try {
+					activateDeactivateComponents();
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+				}
+			});
 		}
 
 		/**
@@ -235,7 +243,13 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 				deactivateSyncManager();
 				updateComboNav();
 				updateSSDBComboBoxes();
-				activateDeactivateComponents();
+				SwingUtilities.invokeLater(()->{
+					try {
+						activateDeactivateComponents();
+					} catch (Exception e) {
+						logger.error(e.getMessage(), e);
+					}
+				});
 				ssDBNavPerformRefreshOps();
 			} catch (final Exception e) {
 				logger.error("Exception.", e);
@@ -867,7 +881,13 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			activateSyncManager();
 
 			// ACTIVATE/DEACTIVATE SCREEN COMPONENTS
-			activateDeactivateComponents();
+			SwingUtilities.invokeLater(()->{
+				try {
+					activateDeactivateComponents();
+				} catch (Exception e) {
+					logger.error(e.getMessage(), e);
+				}
+			});
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
@@ -880,22 +900,5 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		}
 
 	} 
-
-	/**
-	 * Used to update any SSDBComboBox that change when parent ID changes (i.e.,
-	 * whenever the rowset for the screen changes). This is called from initScreen()
-	 * after bindComponents() and addComponents(). It is also called from
-	 * updateScreen() after the rowset has been requeried.
-	 * <p>
-	 * Generally there will be calls to cmbMySSDBCombo.setQuery(myNewCmbSQL); and
-	 * cmbMySSDBCombo.execute();
-	 * <p>
-	 * If the SSDBComboBox query is unchanged regardless of the rowset, then it is
-	 * sufficient to just call cmbMySSDBCombo.execute();
-	 * <p>
-	 * It is REDUNDANT/UNNECESSARY to call cmbMySSDBCombo.execute() here and in
-	 * bindComponents().
-	 */
-	protected abstract void updateSSDBComboBoxes();
 
 }

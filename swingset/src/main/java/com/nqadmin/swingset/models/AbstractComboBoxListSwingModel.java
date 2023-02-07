@@ -41,6 +41,9 @@ import java.awt.Component;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.text.FieldPosition;
+import java.text.Format;
+import java.text.ParsePosition;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -226,6 +229,7 @@ public abstract class AbstractComboBoxListSwingModel {
 	
 	
 	protected AbstractComboBoxListSwingModel(int _itemNumElems, List<SSListItem> _itemList) {
+		this.listItemFormatDelegate = new FormatDelegate();
 		if(_itemList != null && !_itemList.isEmpty()) {
 			throw new IllegalArgumentException("item list must be empty");
 		}
@@ -374,7 +378,41 @@ public abstract class AbstractComboBoxListSwingModel {
 		}
 	}
 
-	private SSListItemFormat listItemFormat;
+	final private FormatDelegate listItemFormatDelegate;
+
+	/**
+	 * When used with glazed lists, the format is set at install into combo
+	 * time and can not be changed. So glazed installs FormatDelegate, and
+	 * then setItemListFormat is set/changed as convenient.
+	 * <p>
+	 * If the format is changed after combo box initialization is complete,
+	 * then it is up to the user to force the combo to redraw.
+	 */
+	@SuppressWarnings("serial")
+	private static class FormatDelegate extends Format {
+		private SSListItemFormat listItemFormat;
+
+		@Override
+		public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
+			return listItemFormat != null
+					? listItemFormat.format(obj, toAppendTo, pos)
+					: toAppendTo.append(obj);
+		}
+
+		@Override
+		public Object parseObject(String source, ParsePosition pos) {
+			return listItemFormat != null
+					? listItemFormat.parseObject(source, pos) : source;
+		}
+	}
+
+	/**
+	 * Delegates formatting on the fly.
+	 * @return Format to install in the model
+	 */
+	protected Format getListItemFormatDelegate() {
+		return listItemFormatDelegate;
+	}
 
 	/**
 	 * Set the format to use with this model.
@@ -382,7 +420,12 @@ public abstract class AbstractComboBoxListSwingModel {
 	 * @param _listItemFormat the format used with this model
 	 */
 	public void setListItemFormat(SSListItemFormat _listItemFormat) {
-		listItemFormat = _listItemFormat;
+		listItemFormatDelegate.listItemFormat = _listItemFormat;
+		if(modelProxy != null && !itemList.isEmpty()) {
+			// assume everything changed
+			modelProxy.fire.doFireContentsChanged(this, 0, itemList.size() - 1);
+			modelProxy.fire.doFireContentsChanged(this, -1, -1);
+		}
 	}
 
 	/**
@@ -390,10 +433,10 @@ public abstract class AbstractComboBoxListSwingModel {
 	 * @return the associated listItemFormat
 	 */
 	public SSListItemFormat getListItemFormat() {
-		if (listItemFormat == null) {
-			listItemFormat = new SSListItemFormat();
+		if (listItemFormatDelegate.listItemFormat == null) {
+			listItemFormatDelegate.listItemFormat = new SSListItemFormat();
 		}
-		return listItemFormat;
+		return listItemFormatDelegate.listItemFormat;
 	}
 
 	/**

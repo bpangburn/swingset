@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.raelity.lib.ui.Screens;
 
  
 /**
@@ -68,6 +69,7 @@ public class DemoUtil
 //			break;
 //		}
 		
+		Screens.translateToPrefScreen(result);
 		return result;
 	}
 
