@@ -138,7 +138,7 @@ public class SSDBNavImpl implements SSDBNav {
 				// IF IT IS A SSFormattedTextField SET ITS VALUE TO NULL (to avoid parse
 				// exception)
 				if (comps[i] instanceof SSFormattedTextField) {
-					((SSFormattedTextField) comps[i]).setValue(null);
+					((SSFormattedTextField) comps[i]).cleanField();
 				} else {
 					// IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING
 					((JTextField) comps[i]).setText("");
