@@ -44,12 +44,14 @@ import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.models.OptionMappingSwingModel;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -81,7 +83,7 @@ import ca.odell.glazedlists.EventList;
  * not something that is based on {@code getSelectedIndex()}.
  * Change the current combo box item with methods
  * such as:
- * {@link #setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}
+ * {@link #setSelectedMapping(M) setSelectedMapping(Long)}
  * and
  * {@link SSBaseComboBox#setSelectedOption(java.lang.Object) setSelectedOption(String)}.
  * Use the methods {@link SSBaseComboBox#hasItems() hasItems() } and
@@ -183,12 +185,10 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	@Deprecated
 	public static final int NON_SELECTED = Integer.MIN_VALUE + 1;
 
-	private static class Model extends SSBaseComboBox.BaseModel<Long, Object, Object>
-	{
-	}
-
-	private static class GlazedModel extends SSBaseComboBox.BaseGlazedModel<Long, Object, Object>
-	{
+	/** A convenience for variable declarations. Can not instantiate. */
+	private static class Model extends OptionMappingSwingModel<Long,Object,Object> {
+		/** Exception if invoked. */
+		public Model() { Objects.requireNonNull(null); } 
 	}
 
 	/**
@@ -304,18 +304,11 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * Creates an object of the SSDBComboBox.
 	 */
 	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-	@SuppressWarnings({"all","LeakingThisInConstructor"})
 	public SSDBComboBox() {
-		// Note that call to parent default constructor is implicit.
-		//super();
+		super(USE_GLAZED_MODEL);
 
-		if (USE_GLAZED_MODEL) {
-			optionModel = GlazedModel.install(this);
-		} else {
-			optionModel = Model.install(this);
-		}
-		listItemFormat = optionModel.getListItemFormat();
-		listItemFormat.setPattern(JDBCType.DATE, dateFormat);
+		listItemFormat = getListItemFormat();
+		listItemFormat.setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
 		listItemFormat.setSeparator(separator);
 	}
 	
@@ -398,7 +391,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 *
 	 * @param _displayText text that should be displayed in the combobox
 	 * @param _primaryKey  primary key value corresponding the the display text
-	 * @deprecated use {@link #addOption(java.lang.String, java.lang.Long) }
+	 * @deprecated use {@link #addOption(java.lang.Object, java.lang.Long) }
 	 */
 	@Deprecated
 	public void addItem(final String _displayText, final long _primaryKey) {
@@ -444,7 +437,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 *
 	 * @param _name  name that should be displayed in the combo
 	 * @param _value value corresponding the the name
-	 * @deprecated use {@link #addOption(java.lang.String, java.lang.Long) }
+	 * @deprecated use {@link #addOption(java.lang.Object, java.lang.Long) }
 	 */
 	@Deprecated
 	protected void addStringItem(final String _name, final String _value) {
@@ -1148,7 +1141,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		final String oldValue = dateFormat;
 		dateFormat = _dateFormat;
 		firePropertyChange("dateFormat", oldValue, dateFormat);
-		listItemFormat.setPattern(JDBCType.DATE, _dateFormat);
+		listItemFormat.setFormat(JDBCType.DATE, new SimpleDateFormat(_dateFormat));
 	}
 
 	/**

@@ -213,6 +213,8 @@ public class SSListItemFormatTest {
 
 		// Check exceptions in Format are handled.
 		Format exceptionFormat = new Format() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
 				throw new UnsupportedOperationException("Not supported yet.");

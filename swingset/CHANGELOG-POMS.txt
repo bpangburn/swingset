@@ -1,0 +1,56 @@
+==============================================================================
+POM ChangeLog file for the SwingSet Open Toolkit for Java Swing.
+
+Latest version determined based on search of https://mvnrepository.com/
+
+NOTE: Tracking POM updates in a separate file starting with 4.0.11.
+==============================================================================
+
+==============================================================================
+SwingSet 4.0.11 - 2023-02-07
+==============================================================================
+
+(all - Java & Maven version)
+1. maven ............................3.6.3 -> (no change for now - latest is 3.9.0)
+2. java .............................1.8 -> (no change for now)
+
+(swingset-parent dependencies)
+1. (none)
+
+(swingset-dependences)
+1. glazedlists ......................1.11.1203 -> (no change)
+2. log4j ............................2.17.2 -> 2.19.0
+3. jdbcrowsetimpl ...................1.0.3 -> (no change)
+
+(swingset-demo dependencies)
+1. swingset .........................4.0.10 -> 4.0.11
+2. log4j ............................2.17.2 -> 2.19.0
+3. h2 ...............................2.1.212 -> 2.1.214
+4. java-getopt ......................1.0.13 -> (no change)
+5. raelity-lib ......................(new) -> 1.2.0
+
+(swingset-parent, swingset, and swingset-demo plugins)
+1. versions-maven-plugin ............2.10.0 -> 2.13.0
+2. maven-enforcer-plugin ............3.0.0 -> 3.1.0
+3. maven-clean-plugin ...............3.1.0 -> 3.2.0
+4. maven-deploy-plugin ..............3.0.0-M2 -> 3.0.0
+5. maven-install-plugin .............3.0.0-M1 -> 3.1.0
+6. maven-site-plugin ................3.11.0 -> 4.0.0-M3
+
+(swingset and swingset-demo plugins)
+1. maven-jar-plugin .................3.2.2 -> 3.3.0
+2. maven-resources-plugin ...........3.2.0 -> 3.3.0
+3. maven-compiler-plugin ............3.10.1 -> (no change)
+4. dependency-check-maven ...........7.1.0 -> 8.0.2
+5. maven-gpg-plugin .................3.0.1 -> (no change)
+6. maven-surefire-plugin ............3.0.0-M7 -> 3.0.0-M8
+7. maven-source-plugin ..............3.2.1 -> (no change)
+
+(swingset plugins)
+1. maven-javadoc-plugin .............3.3.2 -> 3.4.1
+2. nexus-staging-maven-plugin .......1.6.12 ->1.6.13
+3. maven-failsafe-plugin ............3.0.0-M6 -> 3.0.0-M8
+4. junit-jupiter ....................5.9.0-M1 -> 5.9.2
+
+(swingset-demo plugins)
+1. maven-assembly-plugin ............3.3.0 -> 3.4.2

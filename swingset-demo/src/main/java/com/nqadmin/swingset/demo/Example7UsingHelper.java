@@ -236,5 +236,14 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 		BasicInternalFrameUI frameUI = (BasicInternalFrameUI) getUI(); // so...
 		if (frameUI != null) frameUI.setNorthPane(null); // lets get rid of it
 	}
+	
+	@Override
+	protected void updateSSDBComboBoxes() {
+
+		// IF NEEDED, ADD CODE/METHODS TO RE-QUERY/RE-POPULATE THE COMBO RENDERER.
+		// THIS WOULD BE NEEDED IF THE SSDBComboBox LOOKUP NEEDED TO CHANGE BASED
+		// ON A VALUE IN THE CURRENT RECORD.
+
+	}
 
 }

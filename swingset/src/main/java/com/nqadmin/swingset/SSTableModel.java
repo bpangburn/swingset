@@ -234,6 +234,7 @@ public class SSTableModel extends AbstractTableModel {
 				if (dataGridHandler != null) {
 					dataGridHandler.performPostDeletionOps(_row);
 				}
+				fireTableRowsDeleted(_row, _row);
 				return true;
 			} catch (final SQLException se) {
 				logger.error("SQL Exception while deleting row.",  se);

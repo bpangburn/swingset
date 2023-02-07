@@ -3,6 +3,43 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 ==============================================================================
 
 ==============================================================================
+SwingSet 4.0.11 - Released 2023-02-07
+==============================================================================
+
+	1. Due to the many version changes on an ongoing basis, starting with
+	   SwingSet 4.0.11, POM changes have been moved to CHANGELOG-POMS.txt
+	   in the same folder.
+	2. Fix for component updates following navigation:
+	   https://github.com/bpangburn/swingset/issues/144
+	3. SSComboBox/SSDBComboBox - Ability to display underlying database
+	   value when a combobox doesn't have a corresponding Option:
+	   https://github.com/bpangburn/swingset/issues/145
+	4. Add updateSSDBComboBoxes to SSDataGridScreenHelper:
+	   https://github.com/bpangburn/swingset/issues/153
+	5. Fix for SSTableModel draw after a deletion:
+	   https://github.com/bpangburn/swingset/issues/156
+	6. Fix for updating of default parent ID when using
+	   SSDataGridScreenHelper:
+	   https://github.com/bpangburn/swingset/issues/157
+	7. Add screen helper method to combine setParentID()
+	   and updateScreen():
+	   https://github.com/bpangburn/swingset/issues/159
+	8. Add 'Example4 Advanced' to SwingSet Demo:
+	   a. Move code from Example4 that demos navigator actions:
+	      - assigning actions to function keys
+	      - assigning actions to buttons
+	   b. Add code showing use of MissingOptionControl and custom
+	      ListItemFormat for null/missing Options
+	9. Add DataGridExampleSupport used by SwingSet Demo Example5:
+	   a. Provides more testing/examples of grid usage
+	   b. Improves H2 handling so demo can now do row insertion/deletion
+	      into grid (note that this exposed #5 above)
+	10.Ability to use an environment variable, JAVA_PREFERRED_SCREEN,
+	   to control placement of the SwingSet demo in a multi-monitor
+	   environment.
+	11.SwingSet Demo button, screen name, and README cleanup.
+
+==============================================================================
 SwingSet 4.0.10 - Released 2022-05-31
 ==============================================================================
 

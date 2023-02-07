@@ -397,6 +397,9 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			// ADD/CONFIGURE TOOLBARS
 			configureToolBars();
 			
+			// UPDATE SELECTION CRITERIA FOR ANY OTHER SSDBCombos
+			updateSSDBComboBoxes();
+			
 			// ADD DATAGRID TO CONTAINER
 			//  - PUT INSIDE OF A JSCROLLPANE SO WE HAVE SCROLL BARS WHEN NEEDED
 			//  - WITHOUT THE JSCROLLPANE, SOMETIMES THE COLUMN HEADERS DON'T RENDER
@@ -533,6 +536,16 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			
 			// UPDATE DATAGRID ROWSET
 			dataGrid.setRowSet(getRowset());
+			
+			// UPDATE SELECTION CRITERIA FOR ANY OTHER SSDBCombos
+			updateSSDBComboBoxes();
+			
+			// THIS IS NEEDED AS PARENT ID IS ALSO SET AS DEFAULT
+			//
+			// NOTE THAT {@link #setDefaultValues()} DOES NOT CHANGE THE "CURRENT" RECORD
+			// AS IT DOES FOR A FORM, BUT RATHER IT STORES THE DEFAULTS FOR THE UNDERLYING
+			// SSTableModel TO USE WHEN A RECORD IS ADDED
+			setDefaultValues();
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
