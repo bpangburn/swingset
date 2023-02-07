@@ -162,7 +162,7 @@ class DataGridExampleSupport {
 				logger.error("SQL Exception.", se);
 			}
 		}
-	};
+	}
 
 	private void setupDebugButtons() {
 		JPanel buttons = new JPanel();
