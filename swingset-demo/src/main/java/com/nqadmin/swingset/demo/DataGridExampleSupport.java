@@ -90,33 +90,34 @@ class DataGridExampleSupport {
 	private final SSDataGrid dataGrid;
 	private final Logger logger;
 
-	@SuppressWarnings("ResultOfObjectAllocationIgnored")
 	static void setup(Logger logger, Container uiContainer,
 			RowSet rowset, SSDataGrid dataGrid,
-			int primaryColumn, SSDataValue dataValue,
-			String[] columnNames, Object[] defaultValues)
+			int primaryColumn, SSDataValue dataValue, String[] columnNames, Object[] defaultValues)
 			throws SQLException {
-		new DataGridExampleSupport(logger, uiContainer, rowset, dataGrid,
-				primaryColumn, dataValue, columnNames, defaultValues);
+		DataGridExampleSupport dges = new DataGridExampleSupport(
+				logger, uiContainer, rowset, dataGrid);
+		dges.init(primaryColumn, dataValue, columnNames, defaultValues);
 	}
 
 
-	DataGridExampleSupport(Logger logger, Container uiContainer,
-			RowSet rowset, SSDataGrid dataGrid,
-			int primaryColumn, SSDataValue dataValue,
-			String[] columnNames, Object[] defaultValues)
+	private DataGridExampleSupport(Logger _logger, Container _uiContainer,
+			RowSet _rowset, SSDataGrid _dataGrid)
 			throws SQLException {
 
-		if(!(uiContainer.getLayout() instanceof BorderLayout)) {
+		if(!(_uiContainer.getLayout() instanceof BorderLayout)) {
 			throw new IllegalArgumentException("uiContainer without BorderLayout");
 		}
 
-		this.uiContainer = uiContainer;
-		this.rowset = rowset;
-		this.dataGrid = dataGrid;
-		this.logger = logger;
+		this.uiContainer = _uiContainer;
+		this.rowset = _rowset;
+		this.dataGrid = _dataGrid;
+		this.logger = _logger;
 
-		
+	}
+	
+	private void init(int primaryColumn, SSDataValue dataValue,
+			String[] columnNames, Object[] defaultValues)
+			throws SQLException {
 		// stuff needed if there's going to be an insertion
 		dataGrid.setSSDataGridHandler(new DataGridHandler());
 		dataGrid.setPrimaryColumn(primaryColumn);
