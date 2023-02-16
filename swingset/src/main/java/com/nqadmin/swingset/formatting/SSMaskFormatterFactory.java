@@ -112,9 +112,8 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 	private static final Logger logger = SSUtils.getLogger();
 
 	/**
-	 * Get a new FormatterFactory with the specified parameters.Unless noted, a parameter is used when constructing the MaskFormatter.<p>
+	 * Get a new FormatterFactory with the specified parameters. Unless noted, a parameter is used when constructing the MaskFormatter.<p>
 	 * <p>
-	 * TODO: extend to allow specification of a displayFormatter.
 	 * @see <em>Effective Java</em> Item 2 about override.
 	 * @param <T> a builder type
 	 */
@@ -125,6 +124,7 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		private String maskLiterals = "";
 		private boolean valueContainsLiterals = false;
 		private AbstractFormatter converter = null;
+		private AbstractFormatter displayer = null;
 		private Character placeholder = null;
 		private String validCharacters = null;
 		private String invalidCharacters = null;
@@ -141,32 +141,46 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		 * @param val value for maskListerals
 		 * @return  builder */
 		public T maskLiterals(String val) { maskLiterals = val; return self(); }
+		
 		/** formatter
 		 * @param val indicate if value contains literals
 		 * @return  builder */
 		public T valueContainsLiteral(boolean val) { valueContainsLiterals = val; return self(); }
-		/** Used by the mask formatter in string2Value and value2String.
+		
+		/** Used by the mask formatter in stringToValue and valueToString.
 		 * It's the last step in stringToValue; it produces the Value
 		 * in the formatted text field.
-		 * @param val formatter use to convert strings to/from values
+		 * @param val formatter used to convert strings to/from values
 		 * @return  builder */
 		public T converter(AbstractFormatter val) { converter = val; return self(); }
+		
+		/** Used to format the JFormattedTextField when it does not have the focus.
+		 * Only needed if the format should be different than the mask formatter
+		 * when the field does not have the focus. Otherwise null.
+		 * @param val formatter use to convert strings to/from values
+		 * @return  builder */
+		public T displayer(AbstractFormatter val) { displayer = val; return self(); }
+		
 		/** formatter
 		 * @param val placeholder char
 		 * @return  builder */
 		public T placeholder(char val) { placeholder = val; return self(); }
+		
 		/** formatter
 		 * @param val valid characters in the field
 		 * @return  builder */
 		public T validCharacters(String val) { validCharacters = val; return self(); }
+		
 		/** formatter
 		 * @param val invalid characters in the field.
 		 * @return  builder */
 		public T invalidCharacters(String val) { invalidCharacters = val; return self(); }
+		
 
 		/** create the factory
 		 * @return the factory */
 		public SSMaskFormatterFactory build() { return new SSMaskFormatterFactory(this); }
+		
 		/**
 		 * See "effective java" about builders. "simulated self type" idiom.
 		 * @return typed self
@@ -197,6 +211,10 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		try {
 			SSMaskFormatter mf = builder.getSSMaskFormatter(builder);
 			setDefaultFormatter(mf);
+			AbstractFormatter displayFormatter = mf.getDisplayer();
+			if (displayFormatter!=null) {
+				setDisplayFormatter(displayFormatter);
+			}
 		} catch (ParseException ex) {
 			logger.error("Bad mask format: " + builder.mask);
 		}
@@ -231,6 +249,7 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 	protected static class SSMaskFormatter extends MaskFormatter {
 
 		private final AbstractFormatter converter;
+		private final AbstractFormatter displayer;
 		private final String maskLiterals;
 
 		/**
@@ -243,6 +262,7 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 			maskLiterals = builder.maskLiterals;
 			setValueContainsLiteralCharacters(builder.valueContainsLiterals);
 			converter = builder.converter;
+			displayer = builder.displayer;
 			if (builder.placeholder != null) {
 				setPlaceholderCharacter(builder.placeholder);
 			}
@@ -268,6 +288,14 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		public AbstractFormatter getConverter() {
 			return converter;
 		}
+		
+		/**
+		 * Converts between string and value.
+		 * @return displayer
+		 */
+		public AbstractFormatter getDisplayer() {
+			return displayer;
+		}
 
 		/**
 		 * The mask literals. These characters are not part of user input.
@@ -289,7 +317,7 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 			String s = "";
 			if (value != null) {
 				if (value instanceof String) {
-					// handle the case where where was null formatter
+					// handle the case where there was null formatter
 					s = (String) value;
 				} else {
 					if (converter != null) {
