@@ -167,6 +167,7 @@ public class SSDateFormatterFactory {
 
 		return new SSMaskFormatterFactory.Builder<>(formatMask)
 			.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
+			//.displayer(new DateFormatter(new SimpleDateFormat("MMM d, yyyy")))
 			.maskLiterals(maskLiterals).placeholder('_')
 			.build();
 	}
