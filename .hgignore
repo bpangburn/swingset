@@ -1,0 +1,10 @@
+/target/
+\.log$
+
+syntax: glob
+*~
+*.sw[pmno]
+*.orig
+*.orig.*
+*.rej
+

@@ -39,6 +39,7 @@ package com.nqadmin.swingset;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
@@ -48,13 +49,21 @@ import java.awt.event.MouseEvent;
 import java.lang.reflect.Constructor;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.EventObject;
 import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Objects;
 import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.sql.RowSet;
+import javax.swing.AbstractAction;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -64,17 +73,24 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.RowFilter;
+import javax.swing.RowSorter;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.models.SimpleComboListSwingModels;
 import com.nqadmin.swingset.utils.SSUtils;
 
 // SSDataGrid.java
@@ -285,37 +301,50 @@ public class SSDataGrid extends JTable {
 		private static final long serialVersionUID = -6439941232160386725L;
 		
 		// Set the # of clicks required to edit the combo to 2.
-		int tmpClickCountToStart = 2;
-		Object[] underlyingValues = null;
+		final int tmpClickCountToStart = 2;
+		transient final Object[] items;
+		transient final Object[] underlyingValues;
 
+		/** {@inheritDoc} */
 		public ComboEditor(final Object[] _items, final Object[] _underlyingValues) {
-			super(new JComboBox<>(_items));
+			super(new JComboBox<>());
+			// TODO: copy the arrays? Or just agree that they are never modified.
+			//		 Could use guava immutable then not worry about it.
+			items = _items;
 			underlyingValues = _underlyingValues;
+
+			@SuppressWarnings("unchecked")
+			JComboBox<GridComboModels.GridComboItem> combo = (JComboBox) getComponent();
+			ComboBoxModel<GridComboModels.GridComboItem> model = new GridComboModels().getComboModel();
+			combo.setModel(model);
 		}
 
+		/** {@inheritDoc} */
 		@Override
 		public Object getCellEditorValue() {
-			if (underlyingValues == null) {
-				return new Integer(((JComboBox<?>) getComponent()).getSelectedIndex());
+
+			final GridComboModels.GridComboItem item = (GridComboModels.GridComboItem) ((JComboBox<?>) getComponent()).getSelectedItem();
+
+			// TODO: -1 seems weird, why not 0?
+			if(item == null) {
+				return underlyingValues != null ? underlyingValues[0] : -1;
 			}
 
-			final int index = ((JComboBox<?>) getComponent()).getSelectedIndex();
-
-			logger.trace("Index is "+ index);
-
-			if (index == -1) {
-				return underlyingValues[0];
-			}
-
-			return underlyingValues[index];
+			logger.trace(() -> String.format("Item %s:%s",
+					item.getElem(0), item.getElem(1)));
+			return item.getElem(1);
 		}
 
+		/** {@inheritDoc} */
 		protected int getIndexOf(final Object _value) {
 			if (underlyingValues == null) {
 				// IF THE VALUE IS NULL THEN SET THE DISPLAY ON THE COMBO TO BLANK (INDEX -1)
+				// TODO: does this have to be null compatible?
 				if (_value == null) {
 					return -1;
 				}
+				// TODO: Could the following extract a class cast exception?
+				//		 Guess not, since null underlyingVals means int
 				return ((Integer) _value);
 			}
 			for (int i = 0; i < underlyingValues.length; i++) {
@@ -327,6 +356,7 @@ public class SSDataGrid extends JTable {
 			return -1;
 		}
 
+		/** {@inheritDoc} */
 		@Override
 		public Component getTableCellEditorComponent(final JTable _table, final Object _value, final boolean _selected, final int _row,
 				final int _column) {
@@ -336,12 +366,44 @@ public class SSDataGrid extends JTable {
 			return comboBox;
 		}
 
+		/** {@inheritDoc} */
 		@Override
 		public boolean isCellEditable(final EventObject event) {
 			if (event instanceof MouseEvent) {
 				return ((MouseEvent) event).getClickCount() >= tmpClickCountToStart;
 			}
 			return true;
+		}
+
+		private final class GridComboModels extends SimpleComboListSwingModels {
+			
+			private GridComboModels() {
+				super(2, new ArrayList<>(items.length));
+				for (int i = 0; i < items.length; i++) {
+					getRemodel().add(new GridComboItem(i));
+				}
+			}
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public ComboBoxModel<GridComboItem> getComboModel() {
+				return (ComboBoxModel<GridComboItem>) super.getComboModel();
+			}
+
+			class GridComboItem implements ListItem0, Cloneable {
+				private final int listIdx;
+
+				public GridComboItem(int _listIdx) { listIdx = _listIdx; }
+
+				@Override
+				public Object getElem(int index) {
+					return index == 0 ? items[listIdx]
+							: underlyingValues != null ? underlyingValues[listIdx] : listIdx;
+				}
+				@Override public Object clone() throws CloneNotSupportedException {
+					return super.clone(); }
+				@Override public String toString() { return items[listIdx].toString(); }
+			}
 		}
 	}
 
@@ -598,6 +660,7 @@ public class SSDataGrid extends JTable {
 		/**
 		 * Value of the editor.
 		 */
+		// TODO: get rid of value, see getCellEditorValue/stopCellEditing
 		Object value;
 
 		/**
@@ -614,6 +677,7 @@ public class SSDataGrid extends JTable {
 		/**
 		 * Returns the cell value.
 		 */
+		// TODO: get rid of value, put the stop Cell Editing code here.
 		@Override
 		public Object getCellEditorValue() {
 			return value;
@@ -681,74 +745,112 @@ public class SSDataGrid extends JTable {
 
 	/**
 	 * Variable to indicate if rows can be deleted.
+	 * 
+	 * @deprecated use isAllowDeletion()
 	 */
 	protected boolean allowDeletion = true;
 
 	/**
 	 * Variable to indicate if execute() should be called on the RowSet.
+	 * @deprecated use getCallExecute()
 	 */
 	protected boolean callExecute = true;
 
 	/**
 	 * Number of columns in the RowSet.
+	 * @deprecated use getColumnCount() or getModel.getColumnCount() as appropriate
 	 */
 	protected int columnCount = -1;
 
 	/**
 	 * Minimum width of the columns in the data grid.
+	 * @deprecated use getColumnWidth()
 	 */
 	protected int columnWidth = 100;
 
 	/**
 	 * DagaGridHandler to help with row deletions, and insertions
+	 * @deprecated always null, no replacement
 	 */
 	protected SSDataGridHandler dataGridHandler;
 
 	/**
 	 * Array used to store the column names that have to hidden.
+	 * @deprecated not used, always null
 	 */
 	protected String[] hiddenColumnNames = null;
 
 	/**
 	 * Array used to store the column numbers that have to be hidden.
+	 * @deprecated always null, use getHiddenColumns()
 	 */
 	protected int[] hiddenColumns = null;
+	private transient List<Integer> hiddenColumnsList = Collections.emptyList();
 
 	/**
 	 * Variable to indicate if the data grid will display an additional row for
 	 * inserting new rows.
+	 * @deprecated use getInsertion()
 	 */
 	protected boolean insertion = true;
 
 	/**
+	 * Variable indicating that sorting, by clicking on column header,
+	 * is allowed.
+	 */
+	private boolean sorting = true;
+
+	/**
+	 * Keep rowSorter state here while it's disabled by insertion row.
+	 * Should be null if sorting not enabled.
+	 */
+	private transient List<? extends RowSorter.SortKey> savedRowSorterKeys;
+	private transient RowFilter<SSTableModel,Integer> savedRowFilter;
+
+	/**
 	 * Component where messages should be popped up.
+	 * @deprecated use getMessageWindow()
 	 */
 	protected Component messageWindow = null;
 
 	/**
 	 * Number of records retrieved from the RowSet.
+	 * @deprecated use getRowCount()
 	 */
 	protected int rowCount = -1;
 
 	/**
 	 * Scrollpane used to scroll datagrid.
+	 * @deprecated use getComponent()
 	 */
 	protected JScrollPane scrollPane = null; // new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 	/**
 	 * RowSet from which component will get/set values.
+	 * @deprecated use getRowSet()
 	 */
 	protected RowSet rowSet = null;
 
 	/**
 	 * Table model to construct the JTable
+	 * @deprecated use getModel()
 	 */
+	// TODO: why does this variable exist? Use getModel()?
+	// Currently doesn't work to pass model in constructor.
+	// At least get rid of protected.
+	// Looks like it might be used before it becomes the model in use
 	protected SSTableModel tableModel = new SSTableModel();
+	private boolean tableModelSet;
 
 	/**
 	 * Constructs an empty data grid.
 	 */
+	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSDataGrid() {
+		// TODO: why can't table model be installed right away?
+		//super(new SSTableModel());
+		//tableModel = (SSTableModel) getModel();
+		//checkCreateSorter();
 		init();
 	}
 
@@ -757,6 +859,8 @@ public class SSDataGrid extends JTable {
 	 *
 	 * @param _rowSet RowSet from which values have to be retrieved.
 	 */
+	// TODO: is this version needed? Calling overridable bind is problematic
+	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSDataGrid(final RowSet _rowSet) {
 		this();
 		rowSet = _rowSet;
@@ -764,9 +868,140 @@ public class SSDataGrid extends JTable {
 	}
 
 	/**
+	 * Cast model for use.
+	 * @return null if not expected type
+	 */
+	protected SSTableModel getMyModel() {
+		TableModel m = super.getModel();
+		if(m instanceof SSTableModel)
+			return (SSTableModel) m;
+		return null;
+	}
+
+	/**
+	 * Create row sorter as needed.
+	 * @param dataModel 
+	 * @throws IllegalArgumentException if not SSTableModel
+	 */
+	// TODO: throw exception if currently has SSTableModel?
+	//		 It couldn't have worked before since the
+	//		 tableModel variable was not changed.
+	@Override
+	public void setModel(TableModel dataModel) {
+		if(!(dataModel instanceof SSTableModel)) {
+			if(tableModelSet)
+				throw new IllegalArgumentException("Must be SSTableModel");
+			super.setModel(dataModel);
+			return;
+		}
+		super.setModel(dataModel);
+		tableModelSet = true;
+		tableModel = (SSTableModel) dataModel;
+		checkCreateAddSorter(true);
+	}
+
+	private class Sorter extends TableRowSorter<SSTableModel> {
+		
+		public Sorter(SSTableModel model) {
+			super(model);
+		}
+		
+		/** Cycle: {@literal ASC --> DESC --> UNSORTED --> ASC} ... */
+		@Override
+		public void toggleSortOrder(int column) {
+			List<SortKey> keys = new ArrayList<>(getSortKeys());
+			// The primary sorting key may get some special handling
+			if(!keys.isEmpty() && keys.get(0).getColumn() == column) {
+				if(keys.get(0).getSortOrder() == SortOrder.DESCENDING) {
+					// cycloe from descending no sort on this key
+					if(Boolean.TRUE) {
+						// Like removing all keys.
+						// Next toggle restores sorts.
+						keys.set(0, new SortKey(column, SortOrder.UNSORTED));
+					} else {
+						// Remove the primary key, any remaining keys will sort.
+						// Like backing out key by key.
+						keys.remove(0);
+					}
+					setSortKeys(keys);
+					return;
+				}
+			}
+			super.toggleSortOrder(column);
+		}
+		
+		//private void checkColumn(int column) {
+		//	if (column < 0 || column >= getModelWrapper().getColumnCount()) {
+		//		throw new IndexOutOfBoundsException(
+		//				"column beyond range of TableModel");
+		//	}
+		//}
+	}
+
+	/** Note: toggling insertion on/off/on/off does not create new sorter. */
+	// TODO: both setInsertion/setSorting toggle; is that the right thing?
+	private void checkCreateAddSorter(boolean clearFirst) {
+		logger.debug(() -> String.format("clear: %b, sorting %b, insert %b",
+					 clearFirst, getSorting(), getInsertion()));
+		if(clearFirst || !getSorting()) {
+			RowSorter<?> rowSorter = getRowSorter();
+
+			if(rowSorter != null) // clear column sorted indicators
+				rowSorter.setSortKeys(null);
+			setRowSorter(null);
+			savedRowSorterKeys = null;
+			savedRowFilter = null;
+		}
+		SSTableModel model = getMyModel();
+		if(model == null || !getSorting())
+			return;
+
+		// sorting's enabled, save or restore state as needed
+
+		if(getInsertion()) { // save rowSorter state: keys, filter
+			RowSorter<?> rowSorter = getRowSorter();
+			if(rowSorter == null) {
+				savedRowSorterKeys = null; // to be sure
+				savedRowFilter = null;
+				return;
+			}
+			// make sure the types are OK
+			if(!(rowSorter instanceof Sorter)
+					|| !(rowSorter.getModel() instanceof SSTableModel)) {
+				logger.error(() -> "Wrong sorter type: " + rowSorter);
+				return;
+			}
+			// cast to correct types
+			@SuppressWarnings("unchecked")
+			Sorter sorter = (Sorter) rowSorter;
+			@SuppressWarnings("unchecked")
+			RowFilter<SSTableModel, Integer> t = (RowFilter<SSTableModel, Integer>) sorter.getRowFilter();
+			// and save the state
+			savedRowFilter = t;
+			savedRowSorterKeys = sorter.getSortKeys();
+			// and clear current
+			sorter.setSortKeys(null);
+			sorter.setRowFilter(null);
+			setRowSorter(null);
+		} else { // restore sorting/filtering
+			Sorter rowSorter= new Sorter(model);
+			setRowSorter(rowSorter);
+			rowSorter.setSortKeys(savedRowSorterKeys);
+			rowSorter.setRowFilter(savedRowFilter);
+		}
+	}
+
+
+	/**
 	 * Initializes the data grid control. Collects metadata information about the
 	 * given RowSet.
 	 */
+
+	/**
+	 * Initializes the data grid control. Collects metadata information about the
+	 * given RowSet.
+	 */
+	// TODO: does this need to be overridable? It's called from constructor.
 	protected void bind() {
 
 		try {
@@ -815,6 +1050,15 @@ public class SSDataGrid extends JTable {
 	}
 
 	/**
+	 * Return the enumeration of {@linkplain getColumnModel().getColumns()}
+	 * as a List.
+	 * @return the List
+	 */
+	public List<TableColumn> getColumnsList() {
+		return Collections.list(getColumnModel().getColumns());
+	}
+
+	/**
 	 * Returns the minimum column width for the data grid.
 	 *
 	 * @return minimum column width of the each column
@@ -830,7 +1074,7 @@ public class SSDataGrid extends JTable {
 	 *
 	 * @return scroll pane with embedded JTable
 	 */
-	public Component getComponent() {
+	public JScrollPane getComponent() {
 		return scrollPane;
 	}
 
@@ -920,38 +1164,13 @@ public class SSDataGrid extends JTable {
 	@Override
 	public int[] getSelectedColumns() {
 		// IF THERE ARE NO HIDDEN COLUMNS THEN RETURN THE SAME LIST
-		if (hiddenColumns == null) {
+		if (hiddenColumnsList.isEmpty()) {
 			return super.getSelectedColumns();
 		}
 
-		// GET THE LIST OF SELECTED COLUMNS FROM SUPER CLASS.
-		final int[] selectedColumns = super.getSelectedColumns();
-		final Vector<Object> filteredColumns = new Vector<>();
-
-		// FILTER OUT THE HIDDEN COLUMNS FROM THIS LIST.
-		for (int i = 0; i < selectedColumns.length; i++) {
-			boolean found = false;
-			// CHECK THIS COLUMN NUMBER WITH HIDDEN COLUMNS
-			for (int j = 0; j < hiddenColumns.length; j++) {
-				// IF ITS THERES INDICATE THE SAME AND BREAK OUT.
-				if (selectedColumns[i] == hiddenColumns[j]) {
-					found = true;
-					break;
-				}
-			}
-			// IF THIS COLUMN IS NOT IN HIDDEN COLUMNS ADD IT TO FILTERED LIST
-			if (!found) {
-				filteredColumns.add(new Integer(selectedColumns[i]));
-			}
-		}
-
-		// CREATE AN INT ARRAY CONTAINING THE FILETED LIST OF COLUMNS
-		final int[] result = new int[filteredColumns.size()];
-		for (int i = 0; i < filteredColumns.size(); i++) {
-			result[i] = ((Integer) filteredColumns.elementAt(i));
-		}
-
-		return result;
+		return IntStream.of(super.getSelectedColumns())
+				.filter((selCol) -> !hiddenColumnsList.contains(selCol))
+				.toArray();
 	}
 
 	/**
@@ -964,50 +1183,48 @@ public class SSDataGrid extends JTable {
 	}
 
 	/**
+	 * Get whether or not sorting is enable.
+	 * 
+	 * @return true if sorting enabled
+	 */
+	public boolean getSorting() {
+		return sorting;
+	}
+
+	/**
 	 * Hides the columns specified in the hidden columns list.
 	 */
 	protected void hideColumns() {
+		// Set width of hidden columns to 0
+		// TODO: maybe remove the column instead, with ability to restore.
 
-		// SET THE MINIMUM WIDTH OF COLUMNS
-		final TableColumnModel tmpColumnModel = getColumnModel();
-		TableColumn tmpColumn;
-		for (int i = tmpColumnModel.getColumnCount() - 1; i >= 0; i--) {
-			tmpColumn = tmpColumnModel.getColumn(i);
-			int j = -1;
-
-			if (hiddenColumns != null) {
-				// SET THE WIDTH OF HIDDEN COLUMNS AS 0
-				for (j = 0; j < hiddenColumns.length; j++) {
-					if (hiddenColumns[j] == i) {
-						tmpColumn.setMaxWidth(0);
-						tmpColumn.setMinWidth(0);
-						tmpColumn.setPreferredWidth(0);
-						break;
-					}
-				}
-				// AUTO RESIZE IS SET TO OFF IN THE INIT FUNCTION.
-				// SO IF IT IS NOT IN AUTO RESIZE MODE THEN USER HAS REQUESTED
-				// AUTO RESIZING. SO DON'T SET ANY SPECIFIC SIZE TO THE COLUMNS.
-				if (j == hiddenColumns.length) {
-					if (getAutoResizeMode() == AUTO_RESIZE_OFF) {
-						tmpColumn.setPreferredWidth(columnWidth);
-					}
-
-				}
+		for (TableColumn col : getColumnsList()) {
+			if(hiddenColumnsList.contains(col.getModelIndex())) {
+				// Set hidden column width to 0
+				col.setMinWidth(0);
+				col.setMaxWidth(0);
+				col.setPreferredWidth(0);
 			} else {
-				// SET OTHER COLUMNS MIN WIDTH TO 100
+				// TODO: Does this belong in init()?
 				if (getAutoResizeMode() == AUTO_RESIZE_OFF) {
-					tmpColumn.setPreferredWidth(columnWidth);
+					col.setPreferredWidth(columnWidth);
 				}
-
+				// Restore the column to some visibility
+				if(col.getMinWidth() == 0 && col.getMaxWidth() <= 15) {
+					// If the column used to be hidden, then restore it to defaults
+					// TODO: not sure where the 15 comes from, but ...
+					col.setMaxWidth(Integer.MAX_VALUE);
+					col.setPreferredWidth(columnWidth);
+					col.setMinWidth(15);
+				}
 			}
 		}
-		updateUI();
 	}
 
 	/**
 	 * Initialization code.
 	 */
+	// TODO: does this need to be overridable? It's called from constructor.
 	protected void init() {
 
 		// FORCE JTABLE TO SURRENDER TO THE EDITOR WHEN KEYSTROKES CAUSE THE EDITOR TO
@@ -1017,68 +1234,40 @@ public class SSDataGrid extends JTable {
 		setDefaultEditor(String.class, new DefaultEditor());
 		setDefaultEditor(Object.class, new DefaultEditor());
 
-		// ADD KEY LISTENER TO JTABLE.
-		// THIS IS USED FOR DELETING THE ROWS
-		// ALLOWS MULTIPLE ROW DELETION.
-		// KEY SEQUENCE FOR DELETING ROWS IS CTRL-X.
-		addKeyListener(new KeyAdapter() {
-			private boolean controlPressed = false;
-
-			// IF THE KEY PRESSED IS CONTROL STORE THAT INFO.
+		// Handle Control-X for selected rows deletion
+		KeyStroke ks = KeyStroke.getKeyStroke("control released X");
+		String key = "GridDeleteSelectedRows";
+		getInputMap(WHEN_FOCUSED).put(ks, key);
+		getActionMap().put(key, new AbstractAction() {
 			@Override
-			public void keyPressed(final KeyEvent ke) {
-				if (ke.getKeyCode() == KeyEvent.VK_CONTROL) {
-					controlPressed = true;
+			public void actionPerformed(ActionEvent e) {
+				if(!allowDeletion)
+					return;
+				final int numRows = getSelectedRowCount();
+				if (numRows == 0) {
+					return;
 				}
-			}
-
-			// HANDLE KEY RELEASES
-			@Override
-			public void keyReleased(final KeyEvent ke) {
-				// IF CONTROL KEY IS RELEASED SET THAT CONTROL IS NOT PRESSED.
-				if (ke.getKeyCode() == KeyEvent.VK_CONTROL) {
-					controlPressed = false;
-				}
-				// IF X IS PRESSED WHILE THE CONTROL KEY IS STILL PRESSED
-				// DELETE THE SELECTED ROWS.
-				if (ke.getKeyCode() == KeyEvent.VK_X) {
-					if (!allowDeletion) {
+				final int[] rows = getSelectedRows();
+				// CONFIRM THE DELETION
+				// TODO: why not: "JOptionPane.showConfirmDialog(this, ..."
+				//		 Is this for a "confirm flag"?
+				if (messageWindow != null) {
+					final int returnValue = JOptionPane.showConfirmDialog(messageWindow,
+							"You are about to delete " + rows.length + " rows. "
+									+ "\nAre you sure you want to delete the rows?");
+					if (returnValue != JOptionPane.YES_OPTION) {
 						return;
 					}
-
-					if (!controlPressed) {
-						return;
-					}
-					// GET THE NUMBER OF ROWS SELECTED
-					final int numRows = getSelectedRowCount();
-					if (numRows == 0) {
-						return;
-					}
-					// GET LIST OF ROWS SELECTED
-					final int[] rows = getSelectedRows();
-					// IF USER HAS PROVIDED A PARENT COMPONENT FOR ERROR MESSAGES
-					// CONFIRM THE DELETION
-					if (messageWindow != null) {
-						final int returnValue = JOptionPane.showConfirmDialog(messageWindow,
-								"You are about to delete " + rows.length + " rows. "
-										+ "\nAre you sure you want to delete the rows?");
-						if (returnValue != JOptionPane.YES_OPTION) {
-							return;
-						}
-					}
-					// START DELETING THE ROWS IN BOTTON UP FASHION
-					// IN DOING SO YOU RETAIN THE ROW NUMBERS THAT HAVE TO BE DELETED
-					// IF YOU DO IT TOP DOWN THE ROW NUMBERING CHANGES AS SOON AS A
-					// ROW IS DELETED AS A RESULT LOT OF CARE HAS TO BE TAKEN
-					// TO IDENTIFY THE NEW ROW NUMBERS AND THEN DELETE THE ROWS
-					// INSTEAD OF THAT ITS MUCH EASIER IF YOU DO IT BOTTOM UP.
-					for (int i = rows.length - 1; i >= 0; i--) {
-						tableModel.deleteRow(rows[i]);
-					}
-					updateUI();
 				}
+				// Delete in reverse order so row numbers don't change while deleting
+				for (int i = rows.length - 1; i >= 0; i--) {
+					tableModel.deleteRow(convertRowIndexToModel(rows[i]));
+				}
+				//updateUI(); // TODO: test 
 			}
 		});
+
+		// TODO: why is this copy/paste thing needed?
 
 		// CREATE AN INSTANCE OF KEY ADAPTER ADD PROVIDE THE PRESET GRID TO THE ADAPTER.
 		// THIS IS FOR COPY AND PASTE SUPPORT
@@ -1365,10 +1554,23 @@ public class SSDataGrid extends JTable {
 	 * @param _columnNumbers array specifying the column numbers which should be
 	 *                       hidden
 	 */
-	public void setHiddenColumns(final int[] _columnNumbers) {
-		hiddenColumns = _columnNumbers;
-		tableModel.setHiddenColumns(_columnNumbers);
+	public void setHiddenColumns(List<Integer> _columnNumbers) {
+		Objects.nonNull(_columnNumbers);
+
+		hiddenColumnsList = new ArrayList<>(_columnNumbers);
 		hideColumns();
+	}
+	/**
+	 * Sets the column numbers that should be hidden. 
+	 * @param _columnNumbers columms to hide
+	 * @deprecated use setHiddenColumns(List)}
+	 */
+	public void setHiddenColumns(final int[] _columnNumbers) {
+		if(_columnNumbers == null) {
+			setHiddenColumns(Collections.emptyList());
+			return;
+		}
+		setHiddenColumns(IntStream.of(_columnNumbers).boxed().collect(Collectors.toList()));
 	}
 
 	/**
@@ -1385,17 +1587,38 @@ public class SSDataGrid extends JTable {
 	 * @param _columnNames array specifying the column names which should be hidden
 	 * @throws SQLException	SQLException
 	 */
-	public void setHiddenColumns(final String[] _columnNames) throws SQLException {
-		hiddenColumns = null;
-		tableModel.setHiddenColumns(hiddenColumns);
-		if (_columnNames != null) {
-			hiddenColumns = new int[_columnNames.length];
-			for (int i = 0; i < _columnNames.length; i++) {
-				//hiddenColumns[i] = rowSet.getColumnIndex(_columnNames[i]) - 1;
-				hiddenColumns[i] = RowSetOps.getColumnIndex(rowSet,_columnNames[i]) - 1;
-			}
+	public void setHiddenColumnsByName(List<String> _columnNames) throws SQLException {
+		Objects.nonNull(_columnNames);
+		List<Integer> hiddenCols = new ArrayList<>(_columnNames.size());
+		for(String colName : _columnNames) {
+			hiddenCols.add(RowSetOps.getColumnIndex(rowSet, colName) - 1);
 		}
-		hideColumns();
+		setHiddenColumns(hiddenCols);
+	}
+	/**
+	 * Sets the column numbers that should be hidden.
+	 * @param _columnNames names
+	 * @throws SQLException 
+	 * @deprecated use SetHiddenColumnsByName
+	 */
+	public void setHiddenColumns(final String[] _columnNames) throws SQLException {
+		// TODO: does null need to be supported?
+		if(_columnNames == null) {
+			setHiddenColumnsByName(Collections.emptyList());
+			return;
+		}
+		setHiddenColumnsByName(Arrays.stream(_columnNames).collect(Collectors.toList()));
+	}
+
+	/**
+	 * Retrieve the hidden columns.
+	 * @return an unmodifiable list of the columns
+	 */
+	public List<Integer> getHiddenColumns() {
+		return Collections.unmodifiableList(hiddenColumnsList);
+		// TODO: if need int[] getHiddenColumns
+		//		int[] array = new int[list.size()];
+		//		array = list.toArray(array);
 	}
 
 	/**
@@ -1407,9 +1630,14 @@ public class SSDataGrid extends JTable {
 	public void setInsertion(final boolean _insertion) {
 		final boolean oldValue = insertion;
 		insertion = _insertion;
-		firePropertyChange("insertion", oldValue, insertion);
+		if(insertion) // remove sorter before events for adding row
+			checkCreateAddSorter(false);
 		tableModel.setInsertion(_insertion);
-		updateUI();
+		if(!insertion) // add sorter after events for removing rows
+			checkCreateAddSorter(false);
+		// TODO: moved fire after the changes; is that right?
+		firePropertyChange("insertion", oldValue, insertion);
+		//updateUI();
 	}
 
 	/**
@@ -1420,6 +1648,7 @@ public class SSDataGrid extends JTable {
 	 *                       messages
 	 */
 	public void setMessageWindow(final Component _messageWindow) {
+		// TODO: Why does this exist? Is it used?
 		final Component oldValue = messageWindow;
 		messageWindow = _messageWindow;
 		firePropertyChange("messageWindow", oldValue, messageWindow);
@@ -1467,7 +1696,26 @@ public class SSDataGrid extends JTable {
 		final RowSet oldValue = rowSet;
 		rowSet = _rowSet;
 		firePropertyChange("rowSet", oldValue, rowSet);
-		bind();	}
+		bind();
+	}
+
+	/**
+	 * Enable/disable sorting by column gesture;
+	 * when true, always create new sorter.
+	 * Note that if insertRow, then the sorter is not applied.
+	 * @param _sorting 
+	 */
+	// TODO: support a getCreatedSorter to 
+	//		 allow getting the sorter while insert row.
+	//		 Not absolutely required, since can get the
+	//		 sorter directly from the JTable; just turn off insert row.
+	public void setSorting(boolean _sorting) {
+		boolean oldValue = sorting;
+		sorting = _sorting;
+		checkCreateAddSorter(true);
+			
+		firePropertyChange("sorting", oldValue, sorting);
+	}
 
 	/**
 	 * If the user has to decide on which cell has to be editable and which is not
@@ -1544,3 +1792,4 @@ public class SSDataGrid extends JTable {
 	}
 
 } // end public class SSDataGrid extends JTable {
+//  vi: ts=4 sw=4
