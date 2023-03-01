@@ -63,6 +63,9 @@ import com.nqadmin.swingset.utils.SSUtils;
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
+// TODO: because of the insert row, it looks like the model is "locked"
+//		 to a specific JTable. Is this true? Any fix possible/needed?
+
 /**
  * SSTableModel provides an implementation of the TableModel interface. The
  * SSDataGrid uses this class for providing a grid view for a RowSet.
@@ -92,6 +95,8 @@ public class SSTableModel extends AbstractTableModel {
 	 * @return String date reformatted as an SQL date
 	 */
 	protected static Date getSQLDate(final String _strDate) {
+		// TODO: 4.x: this should be available somewhere else
+		//		 as part of SwingSet.
 
 		// remove any leading/trailing spaces (e.g., could be introduced from
 		// copy/paste)
@@ -118,11 +123,12 @@ public class SSTableModel extends AbstractTableModel {
 	/**
 	 * Indicator to determine if insertions are allowed.
 	 */
-	protected boolean allowInsertion = true;
+	private boolean allowInsertion = true;
 
 	/**
 	 * Implementation of SSCellEditing interface used to determine dynamically if a
 	 * given cell can be edited and to determine if a given value is valid.
+	 * @deprecated use the 
 	 */
 	protected SSCellEditing cellEditing = null;
 
@@ -133,6 +139,7 @@ public class SSTableModel extends AbstractTableModel {
 
 	/**
 	 * Window where messages should be displayed.
+	 * @deprecated direct r/w access not needed
 	 */
 	protected transient Component component = null;
 
@@ -140,32 +147,38 @@ public class SSTableModel extends AbstractTableModel {
 	 * Implementation of DataGridHandler interface used to determine dynamically if
 	 * a given row can be deleted, and what to do before and after a row is added or
 	 * removed.
+	 * @deprecated r/w not needed, go through table
 	 */
 	protected SSDataGridHandler dataGridHandler = null;
 
 	/**
 	 * Implementation of SSDataValue interface used to determine PK value for new
 	 * rows.
+	 * @deprecated direct r/w access not needed
 	 */
 	protected SSDataValue dataValue = null;
 
 	/**
 	 * Map to store the default values of different columns.
+	 * @deprecated direct r/w access not needed
 	 */
 	protected HashMap<Integer, Object> defaultValuesMap = null;
 
 	/**
 	 * JTable headers.
+	 * @deprecated direct r/w access not needed
 	 */
 	protected transient String[] headers = null;
 
 	/**
 	 * List of hidden columns.
+	 * @deprecated no replacement, this is view oriented
 	 */
 	protected int[] hiddenColumns = null;
 
 	/**
 	 * Indicator to determine if the RowSet is on the insertion row.
+	 * @deprecated direct r/w access not needed
 	 */
 	protected boolean inInsertRow = false;
 
@@ -176,18 +189,25 @@ public class SSTableModel extends AbstractTableModel {
 
 	/**
 	 * Number of rows in the RowSet.
+	 * @deprecated direct r/w access not needed
 	 */
 	protected transient int rowCount = 0;
 
+	/**
+	 * @deprecated direct r/w access not needed
+	 */
 	protected RowSet rowset = null;
 
 	/**
 	 * JTable being modeled.
+	 * @deprecated no not use
 	 */
+	// TODO: remove this
 	protected transient JTable table = null;
 
 	/**
 	 * List of uneditable columns.
+	 * @deprecated direct r/w access not needed
 	 */
 	protected int[] uneditableColumns = null;
 
@@ -565,15 +585,19 @@ public class SSTableModel extends AbstractTableModel {
 				}
 			});
 
-			if (table != null) {
-				table.updateUI();
-			}
+			//if (table != null) {
+			//	table.updateUI();
+			//}
 			inInsertRow = false;
 			rowCount++;
 
 			if (dataGridHandler != null) {
 				dataGridHandler.performPostInsertOps(rowCount - 1);
 			}
+			// TODO: What to fire? n-1 inserted, last row may have changed values
+			int newRow = allowInsertion ? rowCount : rowCount - 1;
+			fireTableRowsInserted(newRow, newRow);
+			//fireTableRowsUpdated(newRow + 1, newRow + 1)
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while inserting row.",  se);
@@ -731,6 +755,7 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @param _columnNumbers array specifying the column numbers which should be
 	 *                       hidden.
+	 * @deprecated no replacement, hidden columns are view oriented
 	 */
 	public void setHiddenColumns(final int[] _columnNumbers) {
 		hiddenColumns = _columnNumbers;
@@ -741,8 +766,17 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @param _insert true if user can insert new rows, else false.
 	 */
-	public void setInsertion(final boolean _insert) {
+	/* package */ void setInsertion(final boolean _insert) {
+		boolean change = allowInsertion != _insert;
 		allowInsertion = _insert;
+		//fireTableStructureChanged(); // TODO: just do row added/removed
+		// rowCount is the index of the row after the actual rows
+		if(change) {
+			if(_insert)
+				fireTableRowsInserted(rowCount, rowCount);
+			else
+				fireTableRowsDeleted(rowCount, rowCount);
+		}
 	}
 
 	/**
@@ -750,9 +784,11 @@ public class SSTableModel extends AbstractTableModel {
 	 * has taken place TableModel tries to update the UI.
 	 *
 	 * @param _table JTable to which SSTableModel is bound to.
+	 * @deprecated no replacement
 	 */
+	@Deprecated
 	public void setJTable(final JTable _table) {
-		table = _table;
+		//table = _table;
 	}
 
 	/**
@@ -853,6 +889,8 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @param _cellEditing implementation of SSCellEditing interface.
 	 */
+	// TODO: this should not be here, sync issues between table/model
+	//		 make it package scope
 	public void setSSCellEditing(final SSCellEditing _cellEditing) {
 		cellEditing = _cellEditing;
 	}
