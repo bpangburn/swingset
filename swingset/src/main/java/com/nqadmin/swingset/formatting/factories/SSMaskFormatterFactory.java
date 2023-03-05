@@ -229,7 +229,7 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 	 * 
 	 * @param _ftf fixup this formatted text field's null handling
 	 */
-	protected static void adjustNullFormatter(SSFormattedTextField _ftf) {
+	public static void adjustNullFormatter(SSFormattedTextField _ftf) {
 		if (_ftf.getFormatterFactory() instanceof SSMaskFormatterFactory) {
 			SSMaskFormatterFactory ff = (SSMaskFormatterFactory) _ftf.getFormatterFactory();
 			boolean allowNull = _ftf.getAllowNull();
