@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
-package com.nqadmin.swingset.formatting;
+package com.nqadmin.swingset.formatting.factories;
 
 import java.text.SimpleDateFormat;
 
@@ -44,6 +44,7 @@ import javax.swing.text.DefaultFormatterFactory;
 
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.formatting.Format;
 import com.nqadmin.swingset.utils.SSUtils;
 
 // SSDateFormatterFactory.java

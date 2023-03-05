@@ -62,6 +62,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.formatting.factories.SSMaskFormatterFactory;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;

@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
-package com.nqadmin.swingset.formatting;
+package com.nqadmin.swingset.formatting.factories;
 
 import java.text.ParseException;
 
@@ -47,6 +47,7 @@ import javax.swing.text.MaskFormatter;
 
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.formatting.SSFormattedTextField;
 import com.nqadmin.swingset.utils.SSUtils;
 
 /**

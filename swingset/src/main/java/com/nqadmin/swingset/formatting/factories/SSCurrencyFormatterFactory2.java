@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+ * Copyright (C) 2003-2023, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ import javax.swing.text.NumberFormatter;
 /**
  * SSCurrencyFormatterFactory extends DefaultFormatterFactory for US Currency fields.
  */
-public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
+public class SSCurrencyFormatterFactory2 extends javax.swing.text.DefaultFormatterFactory {
 
     /**
 	 * unique serial id
@@ -60,7 +60,7 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
      *  SSCurrencyFormatterFactory constructor, without arguments.
      *  Creates a SSCurrencyFormatter with default Locale
      */
-    public SSCurrencyFormatterFactory() {
+    public SSCurrencyFormatterFactory2() {
     	this(null,null,null,null);
     }
 
@@ -69,7 +69,7 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
      * @param _precision - number of digits needed in the integer portion of the number
      * @param _decimals - number of digits needed in the fraction portion of the number
      */
-    public SSCurrencyFormatterFactory(final Integer _precision, final Integer _decimals) {
+    public SSCurrencyFormatterFactory2(final Integer _precision, final Integer _decimals) {
     	this(_precision,_decimals,null,null);
     }
 
@@ -80,7 +80,7 @@ public class SSCurrencyFormatterFactory extends javax.swing.text.DefaultFormatte
      * @param _editorLocale  - locale to be used by the editor
      * @param _displayLocale - locale to be used while displaying number
      */
-    public SSCurrencyFormatterFactory(final Integer _precision, final Integer _decimals, final Locale _editorLocale, final Locale _displayLocale) {
+    public SSCurrencyFormatterFactory2(final Integer _precision, final Integer _decimals, final Locale _editorLocale, final Locale _displayLocale) {
     	super();
     	
     	NumberFormat editorFormat;

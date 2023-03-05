@@ -39,6 +39,8 @@ package com.nqadmin.swingset.formatting;
 
 import java.util.Calendar;
 
+import com.nqadmin.swingset.formatting.factories.SSTimeFormatterFactory;
+
 // SSTimeField.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
