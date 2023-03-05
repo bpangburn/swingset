@@ -50,7 +50,11 @@ public enum Format {
 	/** Date DDMMYYYY */
 	DATE_DDMMYYYY (DATE),
 	/** Date YYYYMMDD */
-	DATE_YYYYMMDD (DATE) 
+	DATE_YYYYMMDD (DATE),
+	/** default currency format */
+	CURRENCY,
+	/** US Currency: $#.## */
+	CURRENCY_US (CURRENCY)
 	;
 
 	final private Format type;
@@ -81,6 +85,7 @@ public enum Format {
 	static Format getDefaultFormat(Format _format) {
 		switch(_format.getType()) {
 		case DATE: return DATE_DDMMYYYY;
+		case CURRENCY: return CURRENCY_US;
 		}
 		return null;
 	}
