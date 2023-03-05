@@ -71,7 +71,7 @@ public enum Format {
 	/** Is this enum value the default for the given type
 	 * @return true if this enum is the default.
 	 */
-	boolean isBase() {
+	public boolean isBase() {
 		return type == this;
 	}
 
@@ -82,7 +82,7 @@ public enum Format {
 		return type;
 	}
 
-	static Format getDefaultFormat(Format _format) {
+	public static Format getDefaultFormat(Format _format) {
 		switch(_format.getType()) {
 		case DATE: return DATE_DDMMYYYY;
 		case CURRENCY: return CURRENCY_US;
