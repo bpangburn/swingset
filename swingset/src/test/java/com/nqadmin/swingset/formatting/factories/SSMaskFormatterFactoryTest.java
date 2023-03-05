@@ -35,7 +35,7 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
-package com.nqadmin.swingset.formatting;
+package com.nqadmin.swingset.formatting.factories;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
