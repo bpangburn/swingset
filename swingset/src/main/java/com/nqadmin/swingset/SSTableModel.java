@@ -126,9 +126,8 @@ public class SSTableModel extends AbstractTableModel {
 	/**
 	 * Implementation of SSCellEditing interface used to determine dynamically if a
 	 * given cell can be edited and to determine if a given value is valid.
-	 * @deprecated use the 
 	 */
-	protected SSCellEditing cellEditing = null;
+	private SSCellEditing cellEditing = null;
 
 	/**
 	 * Number of columns in the RowSet.
@@ -137,48 +136,36 @@ public class SSTableModel extends AbstractTableModel {
 
 	/**
 	 * Window where messages should be displayed.
-	 * @deprecated direct r/w access not needed
 	 */
-	protected transient Component component = null;
+	private transient Component component = null;
 
 	/**
 	 * Implementation of DataGridHandler interface used to determine dynamically if
 	 * a given row can be deleted, and what to do before and after a row is added or
 	 * removed.
-	 * @deprecated r/w not needed, go through table
 	 */
-	protected SSDataGridHandler dataGridHandler = null;
+	transient private SSDataGridHandler dataGridHandler = null;
 
 	/**
 	 * Implementation of SSDataValue interface used to determine PK value for new
 	 * rows.
-	 * @deprecated direct r/w access not needed
 	 */
-	protected SSDataValue dataValue = null;
+	transient private SSDataValue dataValue = null;
 
 	/**
 	 * Map to store the default values of different columns.
-	 * @deprecated direct r/w access not needed
 	 */
-	protected HashMap<Integer, Object> defaultValuesMap = null;
+	private HashMap<Integer, Object> defaultValuesMap = null;
 
 	/**
 	 * JTable headers.
-	 * @deprecated direct r/w access not needed
 	 */
-	protected transient String[] headers = null;
-
-	/**
-	 * List of hidden columns.
-	 * @deprecated no replacement, this is view oriented
-	 */
-	protected int[] hiddenColumns = null;
+	private transient String[] headers = null;
 
 	/**
 	 * Indicator to determine if the RowSet is on the insertion row.
-	 * @deprecated direct r/w access not needed
 	 */
-	protected boolean inInsertRow = false;
+	private boolean inInsertRow = false;
 
 	/**
 	 * Column containing primary key.
@@ -187,27 +174,16 @@ public class SSTableModel extends AbstractTableModel {
 
 	/**
 	 * Number of rows in the RowSet.
-	 * @deprecated direct r/w access not needed
 	 */
-	protected transient int rowCount = 0;
+	// TODO: Can the result set change and invalidate this?
+	private transient int rowCount = 0;
 
-	/**
-	 * @deprecated direct r/w access not needed
-	 */
-	protected RowSet rowset = null;
-
-	/**
-	 * JTable being modeled.
-	 * @deprecated no not use
-	 */
-	// TODO: remove this
-	protected transient JTable table = null;
+	transient private RowSet rowset = null;
 
 	/**
 	 * List of uneditable columns.
-	 * @deprecated direct r/w access not needed
 	 */
-	protected int[] uneditableColumns = null;
+	private int[] uneditableColumns = null;
 
 	/**
 	 * Constructs a SSTableModel object. If this contructor is used the
@@ -473,7 +449,7 @@ public class SSTableModel extends AbstractTableModel {
 	 * Initializes the SSTableModel. (Gets the column count and row count for the
 	 * given RowSet.)
 	 */
-	protected void init() {
+	private void init() {
 		try {
 
 			//columnCount = rowset.getColumnCount();
@@ -743,23 +719,6 @@ public class SSTableModel extends AbstractTableModel {
 	}
 
 	/**
-	 * Sets the column numbers that should be hidden. The SSDataGrid sets the column
-	 * width of these columns to 0. The columns are set to zero width rather than
-	 * removing the column from the table. Thus preserving the column numbering. If
-	 * a column is removed then the column numbers for columns after the removed
-	 * column will change. Even if the column is specified as hidden user will be
-	 * seeing a tiny strip. Make sure that you specify the hidden column numbers in
-	 * the uneditable column list.
-	 *
-	 * @param _columnNumbers array specifying the column numbers which should be
-	 *                       hidden.
-	 * @deprecated no replacement, hidden columns are view oriented
-	 */
-	public void setHiddenColumns(final int[] _columnNumbers) {
-		hiddenColumns = _columnNumbers;
-	}
-
-	/**
 	 * Sets row insertion indicator.
 	 *
 	 * @param _insert true if user can insert new rows, else false.
@@ -775,18 +734,6 @@ public class SSTableModel extends AbstractTableModel {
 			else
 				fireTableRowsDeleted(rowCount, rowCount);
 		}
-	}
-
-	/**
-	 * This sets the JTable to which the table model is bound to. When an insert row
-	 * has taken place TableModel tries to update the UI.
-	 *
-	 * @param _table JTable to which SSTableModel is bound to.
-	 * @deprecated no replacement
-	 */
-	@Deprecated
-	public void setJTable(final JTable _table) {
-		//table = _table;
 	}
 
 	/**

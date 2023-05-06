@@ -745,54 +745,29 @@ public class SSDataGrid extends JTable {
 
 	/**
 	 * Variable to indicate if rows can be deleted.
-	 * 
-	 * @deprecated use isAllowDeletion()
 	 */
-	protected boolean allowDeletion = true;
+	private boolean allowDeletion = true;
 
 	/**
 	 * Variable to indicate if execute() should be called on the RowSet.
-	 * @deprecated use getCallExecute()
 	 */
-	protected boolean callExecute = true;
-
-	/**
-	 * Number of columns in the RowSet.
-	 * @deprecated use getColumnCount() or getModel.getColumnCount() as appropriate
-	 */
-	protected int columnCount = -1;
+	private boolean callExecute = true;
 
 	/**
 	 * Minimum width of the columns in the data grid.
-	 * @deprecated use getColumnWidth()
 	 */
-	protected int columnWidth = 100;
+	private int columnWidth = 100;
 
 	/**
-	 * DagaGridHandler to help with row deletions, and insertions
-	 * @deprecated always null, no replacement
+	 * Column numbers that have to be hidden.
 	 */
-	protected SSDataGridHandler dataGridHandler;
-
-	/**
-	 * Array used to store the column names that have to hidden.
-	 * @deprecated not used, always null
-	 */
-	protected String[] hiddenColumnNames = null;
-
-	/**
-	 * Array used to store the column numbers that have to be hidden.
-	 * @deprecated always null, use getHiddenColumns()
-	 */
-	protected int[] hiddenColumns = null;
 	private transient List<Integer> hiddenColumnsList = Collections.emptyList();
 
 	/**
 	 * Variable to indicate if the data grid will display an additional row for
 	 * inserting new rows.
-	 * @deprecated use getInsertion()
 	 */
-	protected boolean insertion = true;
+	private boolean insertion = true;
 
 	/**
 	 * Variable indicating that sorting, by clicking on column header,
@@ -809,37 +784,27 @@ public class SSDataGrid extends JTable {
 
 	/**
 	 * Component where messages should be popped up.
-	 * @deprecated use getMessageWindow()
 	 */
-	protected Component messageWindow = null;
-
-	/**
-	 * Number of records retrieved from the RowSet.
-	 * @deprecated use getRowCount()
-	 */
-	protected int rowCount = -1;
+	private Component messageWindow = null;
 
 	/**
 	 * Scrollpane used to scroll datagrid.
-	 * @deprecated use getComponent()
 	 */
-	protected JScrollPane scrollPane = null; // new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	private JScrollPane scrollPane = null;
 
 	/**
 	 * RowSet from which component will get/set values.
-	 * @deprecated use getRowSet()
 	 */
-	protected RowSet rowSet = null;
+	transient private RowSet rowSet = null;
 
 	/**
 	 * Table model to construct the JTable
-	 * @deprecated use getModel()
 	 */
 	// TODO: why does this variable exist? Use getModel()?
 	// Currently doesn't work to pass model in constructor.
 	// At least get rid of protected.
 	// Looks like it might be used before it becomes the model in use
-	protected SSTableModel tableModel = new SSTableModel();
+	private SSTableModel tableModel = new SSTableModel();
 	private boolean tableModelSet;
 
 	/**
@@ -1015,12 +980,6 @@ public class SSDataGrid extends JTable {
 
 			// SET THE TABLE MODEL FOR JTABLE
 			setModel(tableModel);
-
-			// GET THE ROW COUNT
-			rowCount = tableModel.getRowCount();
-
-			// GET THE COLUMN COUNT
-			columnCount = tableModel.getColumnCount();
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
@@ -1280,7 +1239,6 @@ public class SSDataGrid extends JTable {
 		// SPECIFY THE MESSAGE WINDOW TO WHICH THE TABLE MODEL HAS TO POP UP
 		// ERROR MESSAGES.
 		tableModel.setMessageWindow(messageWindow);
-		tableModel.setJTable(this);
 
 		// THIS CAUSES THE JTABLE TO DISPLAY THE HORIZONTAL SCROLL BAR AS NEEDED.
 		// CODE IN HIDECOLUMNS FUNCTION DEPENDS ON THIS VARIABLE.
@@ -1489,6 +1447,7 @@ public class SSDataGrid extends JTable {
 	 * @param _values        the values for the column numbers specified in
 	 *                       _columnNumbers.
 	 */
+	// TODO: Use List not Array
 	public void setDefaultValues(final int[] _columnNumbers, final Object[] _values) {
 
 		tableModel.setDefaultValues(_columnNumbers, _values);
@@ -1511,6 +1470,7 @@ public class SSDataGrid extends JTable {
 	 * @throws SQLException if the specified column name is not present in the
 	 *                      RowSet
 	 */
+	// TODO: Use List not Array
 	public void setDefaultValues(final String[] _columnNames, final Object[] _values) throws SQLException {
 
 		int[] columnNumbers = null;
@@ -1536,6 +1496,7 @@ public class SSDataGrid extends JTable {
 	 * @param _headers array of string objects representing the header of each
 	 *                 column.
 	 */
+	// TODO: Use List not Array
 	public void setHeaders(final String[] _headers) {
 		tableModel.setHeaders(_headers);
 	}
@@ -1574,12 +1535,11 @@ public class SSDataGrid extends JTable {
 	}
 
 	/**
-	 * Sets the column numbers that should be hidden. The SSDataGrid sets the column
+	 * Sets the columns, by name, that should be hidden. The SSDataGrid sets the column
 	 * width of these columns to 0. The columns are set to zero width rather than
-	 * removing the column from the table. Thus preserving the column numbering.If a
+	 * removing the column from the table. Thus preserving the column numbering. If a
 	 * column is removed then the column numbers for columns after the removed
-	 * column will change. Even if the column is specified as hidden user will be
-	 * seeing a tiny strip. Make sure that you specify the hidden column numbers in
+	 * column will change. Make sure that you specify the hidden column numbers in
 	 * the uneditable column list.
 	 * <p>
 	 * Currently not a bean property since there is no associated variable.
@@ -1735,6 +1695,7 @@ public class SSDataGrid extends JTable {
 	 * deletions and insertions
 	 *
 	 * @param _dataGridHandler implementation of SSDataGridHandler interface.
+	 * @deprecated Use SSTableModel.setSSDataGridHandler
 	 */
 	public void setSSDataGridHandler(final SSDataGridHandler _dataGridHandler) {
 		tableModel.setSSDataGridHandler(_dataGridHandler);
@@ -1762,6 +1723,7 @@ public class SSDataGrid extends JTable {
 	 * @param _columnNumbers array specifying the column numbers which should be
 	 *                       uneditable.
 	 */
+	// TODO: Use List not Array
 	public void setUneditableColumns(final int[] _columnNumbers) {
 		tableModel.setUneditableColumns(_columnNumbers);
 	}
@@ -1777,6 +1739,7 @@ public class SSDataGrid extends JTable {
 	 *                     uneditable.
 	 * @throws SQLException	SQLException
 	 */
+	// TODO: Use List not Array
 	public void setUneditableColumns(final String[] _columnNames) throws SQLException {
 		int[] columnNumbers = null;
 		if (_columnNames != null) {
