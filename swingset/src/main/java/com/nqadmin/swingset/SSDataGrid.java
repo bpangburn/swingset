@@ -199,14 +199,14 @@ public class SSDataGrid extends JTable {
 				// CHECK THE COLUMN TYPE AND RETURN CORRESPONDING OBJECT.
 				// IF IT IS INTEGER THEN 1 IS CONSIDERED TRUE AND 0 FALSE.
 				if (columnClass == java.sql.Types.BOOLEAN) {
-					return new Boolean(true);
+					return true;
 				}
-				return new Integer(1);
+				return 1;
 			}
 			if (columnClass == java.sql.Types.BOOLEAN) {
-				return new Boolean(false);
+				return false;
 			}
-			return new Integer(0);
+			return 0;
 		}
 
 		@Override
@@ -235,7 +235,7 @@ public class SSDataGrid extends JTable {
 				// BASED ON THE INTEGER VALUE CHECK OR UNCHECK THE CHECK BOX.
 				// A VALUE OF 0 IS CONSIDERED TRUE - CHECK BOX IS CHECKED.
 				// ANY OTHER VALUE IS CONSIDERED FALSE - UNCHECK THE CHECK BOX.
-				if (((Integer) _value).intValue() != 0) {
+				if (((Integer) _value) != 0) {
 					checkBox.setSelected(true);
 				} else {
 					checkBox.setSelected(false);
@@ -276,7 +276,7 @@ public class SSDataGrid extends JTable {
 					setSelected(false);
 				}
 			} else if (_value instanceof Integer) {
-				if (((Integer) _value).intValue() != 0) {
+				if (((Integer) _value) != 0) {
 					setSelected(true);
 				} else {
 					setSelected(false);
@@ -417,8 +417,8 @@ public class SSDataGrid extends JTable {
 		 */
 		private static final long serialVersionUID = 2010609036458432567L;
 		
-		Object[] displayValues = null;
-		Object[] underlyingValues = null;
+		transient Object[] displayValues = null;
+		transient Object[] underlyingValues = null;
 
 		public ComboRenderer(final Object[] _items, final Object[] _underlyingValues) {
 			underlyingValues = _underlyingValues;
@@ -655,13 +655,13 @@ public class SSDataGrid extends JTable {
 		/**
 		 * Constructor to instantiate an object of column type from a string.
 		 */
-		Constructor<?> constructor;
+		transient Constructor<?> constructor;
 
 		/**
 		 * Value of the editor.
 		 */
 		// TODO: get rid of value, see getCellEditorValue/stopCellEditing
-		Object value;
+		transient Object value;
 
 		/**
 		 * Constructs Default Editor.
@@ -684,6 +684,7 @@ public class SSDataGrid extends JTable {
 		}
 
 		@Override
+		@SuppressWarnings({"UseSpecificCatch", "BroadCatchBlock", "TooBroadCatch"})
 		public Component getTableCellEditorComponent(final JTable _table, final Object _value,
 				final boolean _isSelected, final int _row, final int _column) {
 
@@ -708,11 +709,12 @@ public class SSDataGrid extends JTable {
 		}
 
 		@Override
+		@SuppressWarnings({"UseSpecificCatch", "BroadCatchBlock", "TooBroadCatch"})
 		public boolean stopCellEditing() {
 
 			final String s = (String) super.getCellEditorValue();
 
-			if (s.trim().equals("")) {
+			if (s.trim().isEmpty()) {
 				if (constructor.getDeclaringClass() == String.class) {
 					value = s;
 				}
@@ -798,24 +800,10 @@ public class SSDataGrid extends JTable {
 	transient private RowSet rowSet = null;
 
 	/**
-	 * Table model to construct the JTable
-	 */
-	// TODO: why does this variable exist? Use getModel()?
-	// Currently doesn't work to pass model in constructor.
-	// At least get rid of protected.
-	// Looks like it might be used before it becomes the model in use
-	private SSTableModel tableModel = new SSTableModel();
-	private boolean tableModelSet;
-
-	/**
 	 * Constructs an empty data grid.
 	 */
-	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSDataGrid() {
-		// TODO: why can't table model be installed right away?
-		//super(new SSTableModel());
-		//tableModel = (SSTableModel) getModel();
-		//checkCreateSorter();
+		super(new SSTableModel());
 		init();
 	}
 
@@ -824,8 +812,6 @@ public class SSDataGrid extends JTable {
 	 *
 	 * @param _rowSet RowSet from which values have to be retrieved.
 	 */
-	// TODO: is this version needed? Calling overridable bind is problematic
-	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSDataGrid(final RowSet _rowSet) {
 		this();
 		rowSet = _rowSet;
@@ -834,35 +820,24 @@ public class SSDataGrid extends JTable {
 
 	/**
 	 * Cast model for use.
-	 * @return null if not expected type
+	 * @return the model
 	 */
-	protected SSTableModel getMyModel() {
-		TableModel m = super.getModel();
-		if(m instanceof SSTableModel)
-			return (SSTableModel) m;
-		return null;
+	@Override
+	public final SSTableModel getModel() {
+		return (SSTableModel) super.getModel();
 	}
 
 	/**
 	 * Create row sorter as needed.
 	 * @param dataModel 
-	 * @throws IllegalArgumentException if not SSTableModel
+	 * @throws IllegalArgumentException if would change SSTableModel
 	 */
-	// TODO: throw exception if currently has SSTableModel?
-	//		 It couldn't have worked before since the
-	//		 tableModel variable was not changed.
 	@Override
 	public void setModel(TableModel dataModel) {
-		if(!(dataModel instanceof SSTableModel)) {
-			if(tableModelSet)
-				throw new IllegalArgumentException("Must be SSTableModel");
-			super.setModel(dataModel);
-			return;
-		}
+		// TODO: Support setModel to change SSTableModel?
+		if(getModel() instanceof SSTableModel)
+			throw new IllegalArgumentException("Can not change SSTableModel");
 		super.setModel(dataModel);
-		tableModelSet = true;
-		tableModel = (SSTableModel) dataModel;
-		checkCreateAddSorter(true);
 	}
 
 	private class Sorter extends TableRowSorter<SSTableModel> {
@@ -878,7 +853,7 @@ public class SSDataGrid extends JTable {
 			// The primary sorting key may get some special handling
 			if(!keys.isEmpty() && keys.get(0).getColumn() == column) {
 				if(keys.get(0).getSortOrder() == SortOrder.DESCENDING) {
-					// cycloe from descending no sort on this key
+					// cycle from descending no sort on this key
 					if(Boolean.TRUE) {
 						// Like removing all keys.
 						// Next toggle restores sorts.
@@ -894,13 +869,6 @@ public class SSDataGrid extends JTable {
 			}
 			super.toggleSortOrder(column);
 		}
-		
-		//private void checkColumn(int column) {
-		//	if (column < 0 || column >= getModelWrapper().getColumnCount()) {
-		//		throw new IndexOutOfBoundsException(
-		//				"column beyond range of TableModel");
-		//	}
-		//}
 	}
 
 	/** Note: toggling insertion on/off/on/off does not create new sorter. */
@@ -917,8 +885,7 @@ public class SSDataGrid extends JTable {
 			savedRowSorterKeys = null;
 			savedRowFilter = null;
 		}
-		SSTableModel model = getMyModel();
-		if(model == null || !getSorting())
+		if(!getSorting())
 			return;
 
 		// sorting's enabled, save or restore state as needed
@@ -949,7 +916,7 @@ public class SSDataGrid extends JTable {
 			sorter.setRowFilter(null);
 			setRowSorter(null);
 		} else { // restore sorting/filtering
-			Sorter rowSorter= new Sorter(model);
+			Sorter rowSorter= new Sorter(getModel());
 			setRowSorter(rowSorter);
 			rowSorter.setSortKeys(savedRowSorterKeys);
 			rowSorter.setRowFilter(savedRowFilter);
@@ -961,13 +928,8 @@ public class SSDataGrid extends JTable {
 	 * Initializes the data grid control. Collects metadata information about the
 	 * given RowSet.
 	 */
-
-	/**
-	 * Initializes the data grid control. Collects metadata information about the
-	 * given RowSet.
-	 */
 	// TODO: does this need to be overridable? It's called from constructor.
-	protected void bind() {
+	protected final void bind() {
 
 		try {
 			// EXECUTE THE QUERY
@@ -976,10 +938,8 @@ public class SSDataGrid extends JTable {
 			}
 
 			// SPECIFY THE SSROWSET TO THE TABLE MODEL.
-			tableModel.setRowSet(rowSet);
-
-			// SET THE TABLE MODEL FOR JTABLE
-			setModel(tableModel);
+			getModel().setRowSet(rowSet);
+			getModel().fireTableStructureChanged();
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
@@ -1050,7 +1010,7 @@ public class SSDataGrid extends JTable {
 	 *         column.
 	 */
 	public Object getDefaultValue(final int _columnNumber) {
-		return tableModel.getDefaultValue(_columnNumber);
+		return getModel().getDefaultValue(_columnNumber);
 	}
 
 	/**
@@ -1070,7 +1030,7 @@ public class SSDataGrid extends JTable {
 	public Object getDefaultValue(final String _columnName) throws SQLException {
 		//final int columnNumber = rowSet.getColumnIndex(_columnName);
 		final int columnNumber = RowSetOps.getColumnIndex(rowSet,_columnName);
-		return tableModel.getDefaultValue(columnNumber - 1);
+		return getModel().getDefaultValue(columnNumber - 1);
 	}
 
 	/**
@@ -1183,8 +1143,7 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Initialization code.
 	 */
-	// TODO: does this need to be overridable? It's called from constructor.
-	protected void init() {
+	protected final void init() {
 
 		// FORCE JTABLE TO SURRENDER TO THE EDITOR WHEN KEYSTROKES CAUSE THE EDITOR TO
 		// BE ACTIVATED
@@ -1220,7 +1179,7 @@ public class SSDataGrid extends JTable {
 				}
 				// Delete in reverse order so row numbers don't change while deleting
 				for (int i = rows.length - 1; i >= 0; i--) {
-					tableModel.deleteRow(convertRowIndexToModel(rows[i]));
+					getModel().deleteRow(convertRowIndexToModel(rows[i]));
 				}
 				//updateUI(); // TODO: test 
 			}
@@ -1233,12 +1192,9 @@ public class SSDataGrid extends JTable {
 		final SSTableKeyAdapter keyAdapter = new SSTableKeyAdapter(this);
 		keyAdapter.setAllowInsertion(true);
 
-		// SET THE TABLE MODEL FOR JTABLE
-		// this.setModel(tableModel);
-
 		// SPECIFY THE MESSAGE WINDOW TO WHICH THE TABLE MODEL HAS TO POP UP
 		// ERROR MESSAGES.
-		tableModel.setMessageWindow(messageWindow);
+		getModel().setMessageWindow(messageWindow);
 
 		// THIS CAUSES THE JTABLE TO DISPLAY THE HORIZONTAL SCROLL BAR AS NEEDED.
 		// CODE IN HIDECOLUMNS FUNCTION DEPENDS ON THIS VARIABLE.
@@ -1450,7 +1406,7 @@ public class SSDataGrid extends JTable {
 	// TODO: Use List not Array
 	public void setDefaultValues(final int[] _columnNumbers, final Object[] _values) {
 
-		tableModel.setDefaultValues(_columnNumbers, _values);
+		getModel().setDefaultValues(_columnNumbers, _values);
 	}
 
 	/**
@@ -1484,7 +1440,7 @@ public class SSDataGrid extends JTable {
 			}
 		}
 
-		tableModel.setDefaultValues(columnNumbers, _values);
+		getModel().setDefaultValues(columnNumbers, _values);
 	}
 
 	/**
@@ -1498,7 +1454,7 @@ public class SSDataGrid extends JTable {
 	 */
 	// TODO: Use List not Array
 	public void setHeaders(final String[] _headers) {
-		tableModel.setHeaders(_headers);
+		getModel().setHeaders(_headers);
 	}
 
 	/**
@@ -1592,7 +1548,7 @@ public class SSDataGrid extends JTable {
 		insertion = _insertion;
 		if(insertion) // remove sorter before events for adding row
 			checkCreateAddSorter(false);
-		tableModel.setInsertion(_insertion);
+		getModel().setInsertion(_insertion);
 		if(!insertion) // add sorter after events for removing rows
 			checkCreateAddSorter(false);
 		// TODO: moved fire after the changes; is that right?
@@ -1612,7 +1568,7 @@ public class SSDataGrid extends JTable {
 		final Component oldValue = messageWindow;
 		messageWindow = _messageWindow;
 		firePropertyChange("messageWindow", oldValue, messageWindow);
-		tableModel.setMessageWindow(messageWindow);
+		getModel().setMessageWindow(messageWindow);
 	}
 
 	/**
@@ -1626,7 +1582,7 @@ public class SSDataGrid extends JTable {
 	 * @param _columnNumber the column which is the primary column.
 	 */
 	public void setPrimaryColumn(final int _columnNumber) {
-		tableModel.setPrimaryColumn(_columnNumber);
+		getModel().setPrimaryColumn(_columnNumber);
 	}
 
 	/**
@@ -1644,7 +1600,7 @@ public class SSDataGrid extends JTable {
 		//final int columnNumber = rowSet.getColumnIndex(_columnName) - 1;
 		final int columnNumber = RowSetOps.getColumnIndex(rowSet,_columnName) - 1;
 		
-		tableModel.setPrimaryColumn(columnNumber);
+		getModel().setPrimaryColumn(columnNumber);
 	}
 
 	/**
@@ -1687,7 +1643,7 @@ public class SSDataGrid extends JTable {
 	 * @param _cellEditing implementation of SSCellEditable interface.
 	 */
 	public void setSSCellEditing(final SSCellEditing _cellEditing) {
-		tableModel.setSSCellEditing(_cellEditing);
+		getModel().setSSCellEditing(_cellEditing);
 	}
 
 	/**
@@ -1698,7 +1654,7 @@ public class SSDataGrid extends JTable {
 	 * @deprecated Use SSTableModel.setSSDataGridHandler
 	 */
 	public void setSSDataGridHandler(final SSDataGridHandler _dataGridHandler) {
-		tableModel.setSSDataGridHandler(_dataGridHandler);
+		getModel().setSSDataGridHandler(_dataGridHandler);
 	}
 
 	/**
@@ -1710,7 +1666,7 @@ public class SSDataGrid extends JTable {
 	 * @param _dataValue implementation of SSDataValue
 	 */
 	public void setSSDataValue(final SSDataValue _dataValue) {
-		tableModel.setSSDataValue(_dataValue);
+		getModel().setSSDataValue(_dataValue);
 	}
 
 	/**
@@ -1725,7 +1681,7 @@ public class SSDataGrid extends JTable {
 	 */
 	// TODO: Use List not Array
 	public void setUneditableColumns(final int[] _columnNumbers) {
-		tableModel.setUneditableColumns(_columnNumbers);
+		getModel().setUneditableColumns(_columnNumbers);
 	}
 
 	/**
@@ -1751,7 +1707,7 @@ public class SSDataGrid extends JTable {
 			}
 		}
 
-		tableModel.setUneditableColumns(columnNumbers);
+		getModel().setUneditableColumns(columnNumbers);
 	}
 
 } // end public class SSDataGrid extends JTable {
