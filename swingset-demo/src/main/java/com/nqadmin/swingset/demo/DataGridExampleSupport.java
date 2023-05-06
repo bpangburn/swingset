@@ -217,18 +217,20 @@ class DataGridExampleSupport {
 			setAllowDelete((AbstractButton) e.getSource());
 		});
 
-		// trigger for random debug stuff
-		button = new JButton("trigger");
-		buttons.add(button);
-		button.addActionListener((ActionEvent e) -> {
-			System.err.println("BANG");
-			List<Integer> cols = new ArrayList<>();
-			for(int col : dataGrid.getSelectedColumns())
-				cols.add(col);
-
-			System.err.println("selCols: " + cols);
-			//outputColInfo();
-		});
+		if(Boolean.FALSE) {
+			// trigger for random debug stuff
+			button = new JButton("trigger");
+			buttons.add(button);
+			button.addActionListener((ActionEvent e) -> {
+				System.err.println("BANG");
+				List<Integer> cols = new ArrayList<>();
+				for(int col : dataGrid.getSelectedColumns())
+					cols.add(col);
+				
+				System.err.println("selCols: " + cols);
+				//outputColInfo();
+			});
+		}
 
 		// delete selected row
 		button = new JButton("delete");
