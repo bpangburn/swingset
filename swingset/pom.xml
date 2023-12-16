@@ -8,7 +8,7 @@
 
 	<groupId>com.nqadmin.swingset</groupId>
 	<artifactId>swingset</artifactId>
-	<version>4.0.12-SNAPSHOT</version>
+	<version>4.0.12</version>
 	<packaging>jar</packaging>
 
 	<name>swingset</name>
@@ -174,12 +174,13 @@
 
 	<build>
 		<plugins>
-	        <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
-	        <plugin>
-	            <groupId>org.codehaus.mojo</groupId>
-	            <artifactId>versions-maven-plugin</artifactId>
-	            <version>${version.versions-maven-plugin}</version>
-	        </plugin>
+			<!--
+			https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>${version.versions-maven-plugin}</version>
+			</plugin>
 			<!-- Maven Enforcer forces specified version of Java and Maven -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

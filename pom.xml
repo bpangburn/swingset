@@ -6,7 +6,7 @@
 
 	<groupId>com.nqadmin.swingset</groupId>
 	<artifactId>swingset-parent</artifactId>
-	<version>4.0.12-SNAPSHOT</version>
+	<version>4.0.12</version>
 	<packaging>pom</packaging>
 
 	<name>swingset-parent</name>
@@ -16,6 +16,8 @@
 
 	<properties>
 		<!-- MAVEN AND JAVA VERSIONS -->
+		<!-- Requiring maven 3.6.3, but installing 3.9.6 per:
+		     https://linuxize.com/post/how-to-install-apache-maven-on-debian-10/ -->
 		<version.maven>3.6.3</version.maven>
 		<version.java>8</version.java>
 
@@ -33,12 +35,13 @@
 
 	<build>
 		<plugins>
-	        <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
-	        <plugin>
-	            <groupId>org.codehaus.mojo</groupId>
-	            <artifactId>versions-maven-plugin</artifactId>
-	            <version>${version.versions-maven-plugin}</version>
-	        </plugin>
+			<!--
+			https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>${version.versions-maven-plugin}</version>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
