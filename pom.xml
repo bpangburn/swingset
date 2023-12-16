@@ -6,7 +6,7 @@
 
 	<groupId>com.nqadmin.swingset</groupId>
 	<artifactId>swingset-parent</artifactId>
-	<version>4.0.12</version>
+	<version>4.0.13-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>swingset-parent</name>
@@ -15,8 +15,10 @@
 	<!--ONLY INCLUDING PROPERTIES/BUILD TO ENFORCE MAVEN AND JAVA VERSION -->
 
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		
 		<!-- MAVEN AND JAVA VERSIONS -->
-		<!-- Requiring maven 3.6.3, but installing 3.9.6 per:
+		<!-- Requiring maven 3.6.3, but installing latest production release per:
 		     https://linuxize.com/post/how-to-install-apache-maven-on-debian-10/ -->
 		<version.maven>3.6.3</version.maven>
 		<version.java>8</version.java>
