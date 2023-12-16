@@ -2,7 +2,7 @@
 
 ## LICENSE
 
-Copyright (C) 2003-2023, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+Copyright (C) 2003-2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -68,31 +68,23 @@ https://github.com/bpangburn/swingset
 For questions regarding SwingSet, send an email to:
 swingset#NO-SPAM#@pangburngroup.com
 
-## INSTALLATION
+## COMPILATION
 
-SwingSet should work with Java 8 (JRE/JDK 1.8) or later.
+The SwingSet samples/demo requires Java 1.8 or later.
 
-Traditional CLASSPATH:
-  Download the latest SwingSet jar (swingset-x.y.z.jar) from:  
-    https://repo1.maven.org/maven2/com/nqadmin/swingset/swingset/
+Git/Maven:
+  `git clone https://github.com/bpangburn/swingset.git`
+
+  After cloning, you can use an IDE, e.g. Eclipse or NetBeans, to compile/run.
+  Or you can use mvn directly and then run as shown here. Note that compiled
+  jar files will be in the ./target subdirectory.
   
-  Download the latest GlazedLists jar (glazedlists-x.y.z.jar) from:  
-    https://repo1.maven.org/maven2/com/raelity/3rdparty/com/glazedlists/glazedlists/  
-  ***NOTE: Normally the GlazedLists artifact comes from:  
-    https://repo1.maven.org/maven2/com/glazedlists/glazedlists/  
-  but SwingSet 4.0.0 is relying on some preview features.***
-    
-  Download the latest jdbcrowsetimpl from:  
-    https://repo1.maven.org/maven2/com/nqadmin/rowset/jdbcrowsetimpl/
-    
-  Download the latest log4j-core and log4j-api from:  
-    https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/  
-    https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/
-    
-  Add the above jars to your CLASSPATH  
-  Add any JDBC drivers needed for your database to your CLASSPATH
-  
-Maven:
+  SwingSet Library:
+    `cd ./swingset/swingset/`
+    `mvn clean package -Prelease`
+
+## DEPENDENCY INTEGRATION
+
   Add SwingSet to the Maven dependencies in your POM file:  
 
     <dependency>
