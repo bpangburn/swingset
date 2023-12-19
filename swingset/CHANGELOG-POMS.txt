@@ -10,7 +10,50 @@ NOTE: Tracking POM updates in a separate file starting with 4.0.11.
 SwingSet 4.0.13 - TBD
 ==============================================================================
 
-(**** stuff goes here ****)
+(all - Java & Maven version)
+1. maven ............................3.6.3 -> (no change for now - latest is 3.9.6)
+2. java .............................1.8 -> 8 (using <release> rather than <source> and <target>
+
+(swingset-parent dependencies)
+1. (none)
+
+(swingset-dependences)
+1. glazedlists ......................1.11.1203 -> (no change)
+2. log4j ............................2.22.0 -> X
+3. jdbcrowsetimpl ...................1.0.3 -> (no change)
+
+(swingset-demo dependencies)
+1. swingset .........................4.0.12 -> 4.1.0 (need to confirm)
+2. log4j ............................2.22.0 -> X
+3. h2 ...............................2.2.224 -> X
+4. java-getopt ......................1.0.13 -> (no change)
+5. raelity-lib ......................1.2.0 -> (no change)
+
+(swingset-parent, swingset, and swingset-demo plugins)
+1. versions-maven-plugin ............2.16.2 -> X
+2. maven-enforcer-plugin ............3.4.1 -> X
+3. maven-clean-plugin ...............3.3.2 -> X
+4. maven-deploy-plugin ..............3.1.1 -> X
+5. maven-install-plugin .............3.1.1 -> X
+6. maven-site-plugin ................4.0.0-M12 -> X
+
+(swingset and swingset-demo plugins)
+1. maven-jar-plugin .................3.3.0 -> (no change)
+2. maven-resources-plugin ...........3.3.1 -> X
+3. maven-compiler-plugin ............3.11.0 -> X
+4. dependency-check-maven ...........9.0.6 -> 9.0.7
+5. maven-gpg-plugin .................3.1.0 -> X
+6. maven-surefire-plugin ............3.2.3 -> X
+7. maven-source-plugin ..............3.3.0 -> X
+
+(swingset plugins)
+1. maven-javadoc-plugin .............3.6.3 -> X
+2. nexus-staging-maven-plugin .......1.6.13 -> (no change)
+3. maven-failsafe-plugin ............3.2.3 -> X
+4. junit-jupiter ....................5.10.1 -> X
+
+(swingset-demo plugins)
+1. maven-assembly-plugin ............3.6.0 -> X
 
 ==============================================================================
 SwingSet 4.0.12 - 2023-12-16
