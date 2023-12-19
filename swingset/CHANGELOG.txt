@@ -6,7 +6,7 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 SwingSet 4.0.13 - TBD
 ==============================================================================
 
-(**** stuff goes here ****)
+(****** stuff goes here ******)
 
 ==============================================================================
 SwingSet 4.0.12 - Released 2023-12-16
