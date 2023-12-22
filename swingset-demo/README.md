@@ -2,7 +2,7 @@
 
 ## LICENSE
 
-Copyright (C) 2003-2023, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+Copyright (C) 2003-2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -66,7 +66,6 @@ The sample database is based on the suppliers-and-parts database referenced in t
 For questions regarding SwingSet, send an email to:
 swingset#NO-SPAM#@pangburngroup.com
 
-
 ## EXECUTION
 
 The SwingSet samples/demo requires Java 1.8 or later.
@@ -91,49 +90,18 @@ Git/Maven:
   `git clone https://github.com/bpangburn/swingset.git`
 
   After cloning, you can use an IDE, e.g. Eclipse or NetBeans, to compile/run.
-  Or you can use mvn directly and then run as shown here:
-    `cd swingset-code/swingset-demo`
-    `mvn -Prelease clean package`
-    `java -jar target/swingset-demo-*-jar-with-dependencies.jar`
+  Or you can use mvn directly and then run as shown here. Note that compiled
+  jar files will be in the ./target subdirectory.
   
-Command line:
-
-  1. Download/save swingset-demo-x.y.z-sources.jar to a local swingset folder
-  2. Open a terminal / command line window and cd to the swingset folder  
-	 (e.g. `cd /tmp/swingset` or `cd c:\downloads\swingset`)
-  3. unpackage the demo jar:  
-	 `jar -xf swingset-demo-x.y.z-sources.jar`
-  4. Make a "lib" subdirectory  
-     	`mkdir lib`
-  5. Save the following jar files to the "lib" subdirectory  
-     a. Download the latest SwingSet jar (currently, swingset-4.0.0.jar) from:  
-        https://repo1.maven.org/maven2/com/nqadmin/swingset/swingset/  
-     b. Download the latest GlazedLists jar (currently, glazedlists-1.11.1203.jar) from:  
-        https://repo1.maven.org/maven2/com/raelity/3rdparty/com/glazedlists/glazedlists/   
-        ***NOTE: Normally the GlazedLists artifact comes from:  
-	https://repo1.maven.org/maven2/com/glazedlists/glazedlists/  
-	but SwingSet 4.0.0 is relying on some preview features.***  
-     c. Download the latest H2 Database jar (currently, h2-1.4.200.jar)  
-        https://repo1.maven.org/maven2/com/h2database/h2/  
-     d. Download the latest jdbcrowsetimpl (currently, jdbcrowsetimpl-1.0.2.jar)  
-        https://repo1.maven.org/maven2/com/nqadmin/rowset/jdbcrowsetimpl/  
-     e. Download the latest log4j-core (currently, log4j-core-2.13.3.jar)  
-        https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-core/  
-     f. Download the latest log4j-api (currently, log4j-api-2.13.3.jar)  
-        https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/  
-     g. Download the latest java-getopt (currently, java-getopt-1.0.13.jar)  
-        https://repo1.maven.org/maven2/gnu/getopt/java-getopt/  
-     
-  6. Compile the demo (using latest dependency jars as of 2020-10-29):  
-  	 Linux:  
-		`javac -classpath .:./lib/glazedlists-1.11.1203.jar:./lib/h2-1.4.200.jar:./lib/java-getopt-1.0.13.jar:./lib/jdbcrowsetimpl-1.0.2.jar:./lib/log4j-api-2.13.3.jar:./lib/log4j-core-2.13.3.jar:./lib/swingset-4.0.0.jar ./com/nqadmin/swingset/demo/*.java`  
-	 Windows:  
-		`javac -classpath ..;.\lib\glazedlists-1.11.1203.jar;.\lib\h2-1.4.200.jar;.\lib\java-getopt-1.0.13.jar;.\lib\jdbcrowsetimpl-1.0.2.jar;.\lib\log4j-api-2.13.3.jar;.\lib\log4j-core-2.13.3.jar;.\lib\swingset-4.0.0.jar .\com\nqadmin\swingset\demo\*.java`  
-  7. Run the demo:
-  	 Linux:  
-		`java -classpath .:./lib/glazedlists-1.11.1203.jar:./lib/h2-1.4.200.jar:./lib/java-getopt-1.0.13.jar:./lib/jdbcrowsetimpl-1.0.2.jar:./lib/log4j-api-2.13.3.jar:./lib/log4j-core-2.13.3.jar:./lib/swingset-4.0.0.jar com.nqadmin.swingset.demo.MainClass`  
-	 Windows:  
-		`java -classpath .;.\lib\glazedlists-1.11.1203.jar;.\lib\h2-1.4.200.jar;.\lib\java-getopt-1.0.13.jar;.\lib\jdbcrowsetimpl-1.0.2.jar;.\lib\log4j-api-2.13.3.jar;.\lib\log4j-core-2.13.3.jar;.\lib\swingset-4.0.0.jar com.nqadmin.swingset.demo.MainClass`  
+  SwingSet Library:
+    `cd ./swingset/swingset/`
+    `mvn clean package -Prelease`
+    
+  SwingSet Demo:
+    `cd ./swingset/swingset-demo/`
+    `mvn clean package -Prelease`
+    `cd target`
+    `java -jar swingset-demo-X.Y.Z-jar-with-dependencies.jar`
 
 ## CLASS DESCRIPTIONS
 

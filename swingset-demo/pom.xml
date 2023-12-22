@@ -8,7 +8,7 @@
 
 	<groupId>com.nqadmin.swingset.demo</groupId>
 	<artifactId>swingset-demo</artifactId>
-	<version>4.0.12-SNAPSHOT</version>
+	<version>4.0.13-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>swingset-demo</name>
@@ -19,37 +19,38 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- MAVEN AND JAVA VERSIONS -->
-		<version.maven>3.6.3</version.maven>
-		<version.java>1.8</version.java>
+		<!-- Requiring maven 3.6.3, but installing latest production release per:
+		     https://linuxize.com/post/how-to-install-apache-maven-on-debian-10/ -->		<version.maven>3.6.3</version.maven>
+		<version.java>8</version.java>
 
 		<!-- DEPENDENCIES -->
 		<!-- primary swingset-demo dependencies -->
-		<version.swingset>4.0.12-SNAPSHOT</version.swingset>
-		<version.log4j>2.19.0</version.log4j>
-		<version.h2>2.1.214</version.h2>
+		<version.swingset>4.0.13-SNAPSHOT</version.swingset>
+		<version.log4j>2.22.0</version.log4j>
+		<version.h2>2.2.224</version.h2>
 		<version.java-getopt>1.0.13</version.java-getopt>
 		<version.raelity-lib>1.2.0</version.raelity-lib>
 
 		<!-- PLUGINS -->
 		<!-- Shared by swingset-parent, swingset, and swingset-demo -->
-		<version.versions-maven-plugin>2.13.0</version.versions-maven-plugin>
-		<version.maven-enforcer-plugin>3.1.0</version.maven-enforcer-plugin>
-		<version.maven-clean-plugin>3.2.0</version.maven-clean-plugin>
-		<version.maven-deploy-plugin>3.0.0</version.maven-deploy-plugin>
-		<version.maven-install-plugin>3.1.0</version.maven-install-plugin>
-		<version.maven-site-plugin>4.0.0-M3</version.maven-site-plugin>
+		<version.versions-maven-plugin>2.16.2</version.versions-maven-plugin>
+		<version.maven-enforcer-plugin>3.4.1</version.maven-enforcer-plugin>
+		<version.maven-clean-plugin>3.3.2</version.maven-clean-plugin>
+		<version.maven-deploy-plugin>3.1.1</version.maven-deploy-plugin>
+		<version.maven-install-plugin>3.1.1</version.maven-install-plugin>
+		<version.maven-site-plugin>4.0.0-M12</version.maven-site-plugin>
 
 		<!-- Shared by swingset and swingset-demo -->
 		<version.maven-jar-plugin>3.3.0</version.maven-jar-plugin>
-		<version.maven-resources-plugin>3.3.0</version.maven-resources-plugin>
-		<version.maven-compiler-plugin>3.10.1</version.maven-compiler-plugin>
-		<version.dependency-check-maven>8.0.2</version.dependency-check-maven>
-		<version.maven-gpg-plugin>3.0.1</version.maven-gpg-plugin>
-		<version.maven-surefire-plugin>3.0.0-M8</version.maven-surefire-plugin>
-		<version.maven-source-plugin>3.2.1</version.maven-source-plugin>
+		<version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
+		<version.maven-compiler-plugin>3.11.0</version.maven-compiler-plugin>
+		<version.dependency-check-maven>9.0.7</version.dependency-check-maven>
+		<version.maven-gpg-plugin>3.1.0</version.maven-gpg-plugin>
+		<version.maven-surefire-plugin>3.2.3</version.maven-surefire-plugin>
+		<version.maven-source-plugin>3.3.0</version.maven-source-plugin>
 		
 		<!-- swingset-demo-only -->
-		<version.maven-assembly-plugin>3.4.2</version.maven-assembly-plugin>
+		<version.maven-assembly-plugin>3.6.0</version.maven-assembly-plugin>
 	</properties>
 
 	<licenses>
@@ -121,12 +122,13 @@
 
 	<build>
 		<plugins>
-	        <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
-	        <plugin>
-	            <groupId>org.codehaus.mojo</groupId>
-	            <artifactId>versions-maven-plugin</artifactId>
-	            <version>${version.versions-maven-plugin}</version>
-	        </plugin>
+			<!--
+			https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>${version.versions-maven-plugin}</version>
+			</plugin>
 			<!-- Maven Enforcer forces specified version of Java and Maven -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -201,8 +203,7 @@
 				<version>${version.maven-compiler-plugin}</version>
 
 				<configuration>
-					<source>${version.java}</source>
-					<target>${version.java}</target>
+					<release>${version.java}</release>
 				</configuration>
 			</plugin>
 		</plugins>
