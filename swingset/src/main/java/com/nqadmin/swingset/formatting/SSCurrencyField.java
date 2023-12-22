@@ -41,6 +41,8 @@ import java.util.Locale;
 
 import javax.swing.SwingConstants;
 
+import com.nqadmin.swingset.formatting.factories.SSCurrencyFormatterFactory;
+
 // SSCurrencyField.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware

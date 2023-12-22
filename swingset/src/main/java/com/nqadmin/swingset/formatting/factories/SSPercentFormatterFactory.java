@@ -35,48 +35,56 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
-package com.nqadmin.swingset;
+package com.nqadmin.swingset.formatting.factories;
 
-import java.awt.Container;
+import java.text.NumberFormat;
+import java.util.Locale;
 
-// SSDBNavImp.java
+import javax.swing.text.NumberFormatter;
+
+// SSPercentFormatterFactory.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * Custom implementation of SSDBNav that clears/resets the various
- * database-aware fields on a screen when the user adds a new record. To achieve
- * this, special implementation of the performPreInsertOps() method is provided.
- * An instance of this class can be created for the container where the fields
- * are to be cleared and passed to the data navigator.
- * <p>
- * The data navigator will call the performPreInsertOps() method whenever the
- * user presses the insert button on the navigator. This functions recursively
- * clears any JTextFields, JTextAreas, and SSCheckBoxes, and if their are any
- * SSComboBoxes or SSDBComboBoxes they will be reset to the first item in the
- * list.
- * <p>
- * This recursive behavior performed on all the components inside the JPanel or
- * JTabbedPane inside the specified container.
- *
- * @deprecated Starting in 2.3.0+ use {@link SSDBNavImpl} instead.
+ * SSPercentFormatterFactory extends DefaultFormatterFactory for percentage fields.
  */
-@Deprecated
-public class SSDBNavImp extends SSDBNavImpl {
+public class SSPercentFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
-	/**
+    /**
 	 * unique serial id
 	 */
-	private static final long serialVersionUID = -5655819033580093495L;
+	private static final long serialVersionUID = -2567959171805065991L;
 
 	/**
-	 * Constructs a SSDBNavImpl with the specified container.
-	 *
-	 * @param _container	GUI Container to scan for Swing components to clear/reset
-	 */
-	public SSDBNavImp(final Container _container) {
-		super(_container);
-	}
+     * Creates a default object of SSPercentFormatterFactory
+     */
+    public SSPercentFormatterFactory() {
+    	this(null,null);
+    }
 
-} // end public class SSDBNavImp extends SSDBNavAdapter {
+    /**
+     * Creates an object of SSPercentFormatterFactory with the specified precision and decimals
+     * @param _precision - number of digits needed for integer part of the number
+     * @param _decimals - number of digits needed for fraction part of the number
+     */
+    public SSPercentFormatterFactory(final Integer _precision, final Integer _decimals) {
+        final NumberFormat nfd = NumberFormat.getPercentInstance(Locale.US);
+        
+        if (_precision!=null) {
+        	nfd.setMaximumIntegerDigits(_precision);
+        	nfd.setMinimumIntegerDigits(1);
+        }
+       
+        if (_decimals!=null) {
+            nfd.setMaximumFractionDigits(_decimals);
+            nfd.setMinimumFractionDigits(_decimals);
+        }
 
+        setDefaultFormatter(new NumberFormatter(NumberFormat.getPercentInstance()));
+        setNullFormatter(null);
+        setEditFormatter(new NumberFormatter(NumberFormat.getPercentInstance(Locale.US)));
+        setDisplayFormatter(new NumberFormatter(nfd));
+
+    }
+}

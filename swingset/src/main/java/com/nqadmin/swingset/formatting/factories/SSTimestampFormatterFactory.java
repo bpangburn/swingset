@@ -35,49 +35,34 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
-package com.nqadmin.swingset;
+package com.nqadmin.swingset.formatting.factories;
 
-// SSCellEditingAdapter.java
+import java.text.SimpleDateFormat;
+
+import javax.swing.text.DateFormatter;
+
+// SSTimestampFormatterFactory.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * This abstract adapter class is provided as a convenience for creating custom
- * SSCellEditing objects. Extend this class to create a SSCellEditing
- * implementation.
- * <p>
- * SSCellEditingAdapter defines empty functions so that the programmer can
- * define only the functions desired. Both isCellEditable() and
- * cellUpdateRequested() always return true.
- *
- * @deprecated Starting in 2.3.0+ use {@link SSCellEditing} instead.
- *
+ * SSTimestampFormatterFactory extends DefaultFormatterFactory for timestamp fields.
  */
-@Deprecated
-public abstract class SSCellEditingAdapter implements SSCellEditing {
+public class SSTimestampFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
-	/**
+    /**
 	 * unique serial id
 	 */
-	private static final long serialVersionUID = -8081589658308592606L;
+	private static final long serialVersionUID = 1206910593127977868L;
 
 	/**
-	 * This empty implementation always returns true. For description about the
-	 * function look in SSCellEditing class.
-	 */
-	@Override
-	public boolean cellUpdateRequested(final int _row, final int _column, final Object _oldValue, final Object _newValue) {
-		return true;
-	}
-
-	/**
-	 * This empty implementation always returns true. For description about the
-	 * function look in SSCellEditing class.
-	 */
-	@Override
-	public boolean isCellEditable(final int _row, final int _column) {
-		return true;
-	}
-
-} // end public abstract class SSCellEditingAdapter
-
+     * Creates an instance of SSTimestampFormatterFactory
+     * the display format used is dd/MM/yyyy hh:mm:ss SSS Z and the edit format is ddMMyyyyHHmmssSSSZ
+     */
+    public SSTimestampFormatterFactory() {
+        setDefaultFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss SSS Z")));
+        setNullFormatter(null);
+        setEditFormatter(new DateFormatter(new SimpleDateFormat("ddMMyyyyHHmmssSSSZ")));
+        setDisplayFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss SSS Z")));
+    }
+}

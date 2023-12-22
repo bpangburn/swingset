@@ -37,6 +37,7 @@
  ******************************************************************************/
 package com.nqadmin.swingset.formatting;
 
+import com.nqadmin.swingset.formatting.factories.SSDateFormatterFactory;
 
 // SSDateField.java
 //
@@ -50,12 +51,16 @@ public class SSDateField extends SSFormattedTextField {
 
 	/**
 	 * constant representing the dd/mm/yyyy date format
+	 * @deprecated use {@link Format#DATE_DDMMYYYY}
 	 */
+	@Deprecated
 	public static final int DDMMYYYY = 1;
 
 	/**
 	 * constant representing the mm/dd/yyyy date format
+	 * @deprecated use {@link Format#DATE_MMDDYYYY}
 	 */
+	@Deprecated
 	public static final int MMDDYYYY = 0;
 
 	/**
@@ -63,38 +68,51 @@ public class SSDateField extends SSFormattedTextField {
 	 */
 	private static final long serialVersionUID = 9138021901389692436L;
 
-    /**
-     *  Creates a default SSDateField object
-     */
-    public SSDateField(){
-    	this(new SSDateFormatterFactory());
-    }
+	/**
+	 *  Creates a default SSDateField object
+	 */
+	public SSDateField(){
+		this(SSDateFormatterFactory.get());
+	}
 
-    /**
-     *  Creates a new instance of SSDateField with the specified format
-     *  @param format - format to be used while the date field is in edit mode
-     *  allowed values are MMDDYYYY or DDMMYYYY
-     */
-    public SSDateField(final int format) {
-        this(new SSDateFormatterFactory(format));
-    }
+	/**
+	 *  Creates a new instance of SSDateField with the specified format
+	 *  @param _format - format to be used while the date field is in edit mode
+	 *  allowed values are MMDDYYYY or DDMMYYYY or YYYYMMDD
+	 */
+	public SSDateField(final Format _format) {
+		this(SSDateFormatterFactory.get(_format));
+	}
 
-    /**
-     * Creates an object of SSDateField with the specified formatter factory
-     * @param factory - formatter factory to be used
-     */
-    public SSDateField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
-        super(factory);
-        // TODO Consider setting to null vs system date.
-        setValue(new java.util.Date());
-    }
+	/**
+	 *  Creates a new instance of SSDateField with the specified format
+	 *  @param format - format to be used while the date field is in edit mode
+	 *  allowed values are MMDDYYYY or DDMMYYYY
+	 * @deprecated use {@link SSDateField#SSDateField(Format) }
+	 */
+	@Deprecated
+	public SSDateField(final int format) {
+		this(SSDateFormatterFactory.get(format));
+	}
 
-    /**
-     * Sets the value of the field to the current system date
-     */
-    @Override
+	/**
+	 * Creates an object of SSDateField with the specified formatter factory
+	 * @param factory - formatter factory to be used
+	 */
+	public SSDateField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+		super(factory);
+	}
+
+	/**
+	 * Sets the value of the field to an initial state consistent with
+	 * the AllowNull property. If not AllowNull the nuse the current system date.
+	 */
+	@Override
 	public void cleanField() {
-    	// TODO Consider setting to null vs system date.
-        setValue(new java.util.Date());
-    }
+		if (getAllowNull()) {
+			setValue(null);
+		} else {
+			setValue(new java.util.Date());
+		}
+	}
 }

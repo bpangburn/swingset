@@ -35,54 +35,60 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
-package com.nqadmin.swingset.formatting;
+package com.nqadmin.swingset.formatting.factories;
 
-import java.text.NumberFormat;
+import javax.swing.text.MaskFormatter;
 
-import javax.swing.text.NumberFormatter;
+import org.apache.logging.log4j.Logger;
 
-// SSIntegerFormatterFactory.java
+import com.nqadmin.swingset.utils.SSUtils;
+
+// 2019-02-27-BP: this should be named SSSSSSNFormatterFactory for consistency.
+// SSSSNFormatterFactory.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * SSIntegerFormatterFactory extends DefaultFormatterFactory for Integer fields.
+ * SSSSNFormatterFactory extends DefaultFormatterFactory for US Social Security
+ * Number fields.
  */
-public class SSIntegerFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
-
-    /**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 7431201446112333734L;
+public class SSSSNFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
 	/**
-     * Constructs a default SSIntegerFormatterFactory
-     */
-    public SSIntegerFormatterFactory() {
-    	this(null);
-    }
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = SSUtils.getLogger();
+	/**
+	 * unique serial id
+	 */
+	private static final long serialVersionUID = 7141905652057051134L;
+	private MaskFormatter defaultFormatter;
+	private MaskFormatter displayFormatter;
+	private MaskFormatter editFormatter;
 
-    /**
-     * Creates an object of SSIntegerFormatterFactory with the specified precision
-     * @param _precision - number of digits needed to display the number
-     */
-    public SSIntegerFormatterFactory(final Integer _precision) {
-    	super();
-    	
-    	final NumberFormat format = NumberFormat.getIntegerInstance();
-    	
-    	if (_precision!=null) {
-            format.setMaximumIntegerDigits(_precision);
-            format.setMinimumIntegerDigits(1);
-    	}
+	private MaskFormatter nullFormatter;
 
-//        setDefaultFormatter(new NumberFormatter(NumberFormat.getIntegerInstance()));
-//        setNullFormatter(null);
-//        setEditFormatter(new NumberFormatter(NumberFormat.getIntegerInstance(Locale.US)));
-        setDefaultFormatter(new NumberFormatter(format));
-        setNullFormatter(null);
-        setEditFormatter(new NumberFormatter(format));
-        setDisplayFormatter(new NumberFormatter(format));
+	/**
+	 * Creates a default SSSSNFormatterFactory
+	 */
+	public SSSSNFormatterFactory() {
 
-    }
+		try {
+			defaultFormatter = new MaskFormatter("###-##-####");
+			nullFormatter = null;
+			editFormatter = new MaskFormatter("###-##-####");
+			displayFormatter = new MaskFormatter("###-##-####");
+
+			editFormatter.setPlaceholderCharacter('0');
+
+			setDefaultFormatter(defaultFormatter);
+			setNullFormatter(nullFormatter);
+			setEditFormatter(editFormatter);
+			setDisplayFormatter(displayFormatter);
+		} catch (final java.text.ParseException pe) {
+			logger.warn("Parse Exception.", pe);
+			// do nothing
+		}
+	}
 }
+

@@ -35,31 +35,71 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
-package com.nqadmin.swingset;
+package com.nqadmin.swingset.formatting.factories;
 
-// SSDBNavAdapter.java
+import java.text.NumberFormat;
+import java.util.Locale;
+
+import javax.swing.text.NumberFormatter;
+
+
+// SSNumericFormatterFactory.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * Abstract class that provides empty implementations of all the methods for the
- * SSDBNav interface.
- * <p>
- * This class is provided for convenience. so that users wishing to write their
- * own SSDBNav implementations can just extend the abstract class and override
- * the desired methods.
- *
- * @deprecated Starting in 2.3.0+ use {@link SSDBNav} instead.
+ * SSNumericFormatterFactory extends DefaultFormatterFactory for numeric fields.
  */
-@Deprecated
-public class SSDBNavAdapter implements SSDBNav {
+public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
-	/**
+    /**
 	 * unique serial id
 	 */
-	private static final long serialVersionUID = -6951967166432878580L;
+	private static final long serialVersionUID = 3335183379540169892L;
+	NumberFormatter dnf = null;
+    NumberFormatter enf = null;
+    NumberFormatter snf = null;
 
-// All logic in this class has been moved to default methods in the interface class.
+    /**
+     * Creates a default SSNumericFormatterFactory
+     */
+    public SSNumericFormatterFactory() {
+    	this(null,null);
+    }
 
-} // end public class SSDBNavAdapter implements SSDBNav, Serializable {
+    /**
+     * Creates an object of SSFormatterFactory with the specified precision and decimals
+     * @param _precision - number of digits needed for integer part of the number
+     * @param _decimals - number of digits needed for fraction part of the number
+     */
+    public SSNumericFormatterFactory(final Integer _precision, final Integer _decimals) {
+    	super();
+    	
+        final NumberFormat nfd = NumberFormat.getInstance(Locale.US);
+        
+        if (_precision!=null) {
+        	nfd.setMaximumIntegerDigits(_precision);
+        	nfd.setMinimumIntegerDigits(1);
+        }
+       
+        if (_decimals!=null) {
+            nfd.setMaximumFractionDigits(_decimals);
+            nfd.setMinimumFractionDigits(_decimals);
+        }
+
+        snf = new NumberFormatter(NumberFormat.getInstance());
+        snf.setCommitsOnValidEdit(true);
+        setDefaultFormatter(snf);
+
+        setNullFormatter(null);
+
+        enf = new NumberFormatter(NumberFormat.getInstance(Locale.US));
+        enf.setCommitsOnValidEdit(true);
+        setEditFormatter(enf);
+
+        dnf = new NumberFormatter(nfd);
+        dnf.setCommitsOnValidEdit(true);
+        setDisplayFormatter(dnf);
+    }
+}
 

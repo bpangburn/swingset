@@ -39,6 +39,8 @@ package com.nqadmin.swingset.formatting;
 
 import javax.swing.SwingConstants;
 
+import com.nqadmin.swingset.formatting.factories.SSPercentFormatterFactory;
+
 // SSPercentField.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
