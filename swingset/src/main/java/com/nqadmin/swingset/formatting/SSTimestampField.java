@@ -37,6 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset.formatting;
 
+import com.nqadmin.swingset.formatting.factories.SSTimestampFormatterFactory;
+
 // SSTimestampField.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware

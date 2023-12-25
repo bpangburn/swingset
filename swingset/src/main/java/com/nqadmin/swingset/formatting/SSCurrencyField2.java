@@ -37,60 +37,80 @@
  ******************************************************************************/
 package com.nqadmin.swingset.formatting;
 
+import java.util.Locale;
+
 import javax.swing.SwingConstants;
 
-import com.nqadmin.swingset.formatting.factories.SSNumericFormatterFactory;
+import com.nqadmin.swingset.formatting.factories.SSCurrencyFormatterFactory;
+import com.nqadmin.swingset.formatting.factories.SSCurrencyFormatterFactory2;
 
-// SSNumericField.java
+// SSCurrencyField.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * Used to link a SSFormattedTextField to a numeric column in a database.
+ * Used to link a SSFormattedTextField to a currency column in a database.
  */
-
-public class SSNumericField extends SSFormattedTextField {
+public class SSCurrencyField2 extends SSFormattedTextField {
 
 	/**
 	 * unique serial id
 	 */
-	private static final long serialVersionUID = -5922010378310406148L;
+	private static final long serialVersionUID = 1636264407572416306L;
+	
 	private int decimals = 2;
 	private int precision = 3;
 
 	/**
-	 * Creates a new instance of SSNumericField
+	 * Creates a new instance of SSCurrencyField
 	 */
-	public SSNumericField() {
-		this(new SSNumericFormatterFactory());
+	public SSCurrencyField2() {
+		this(new SSCurrencyFormatterFactory2());
 	}
 
 	/**
-	 * Creates an instance of SSNumericField with the specified number of integer and
+	 * Creates an instance of SSCurrenyField with the specified number of integer and
 	 * fraction digits
 	 *
 	 * @param _precision - number of digits needed for integer part of the number
 	 * @param _decimals  - number of digits needed for the fraction part of the
 	 *                   number
 	 */
-	public SSNumericField(final int _precision, final int _decimals) {
-		this(new SSNumericFormatterFactory(_precision, _decimals));
+	public SSCurrencyField2(final int _precision, final int _decimals) {
+		this(new SSCurrencyFormatterFactory2(_precision, _decimals));
+	}
+
+	/**
+	 * Creates an instance of SSCurrenyField with the specified number of integer and
+	 * fraction digits using the given locale
+	 *
+	 * @param _precision     - number of digits needed for integer part of the
+	 *                       number
+	 * @param _decimals      - number of digits needed for the fraction part of the
+	 *                       number
+	 * @param _editorLocale  - locale to be used while in editing mode
+	 * @param _displayLocale - locate to be used for displaying the number
+	 */
+	public SSCurrencyField2(final int _precision, final int _decimals, final Locale _editorLocale,
+			final Locale _displayLocale) {
+		this(new SSCurrencyFormatterFactory2(_precision, _decimals, _editorLocale, _displayLocale));
 	}
 
 	/**
 	 * Creates an SSCurrencyField with the specified formatter factory
 	 *
-	 * @param factory - formatter factory to be used
+	 * @param _factory - formatter factory to be used
 	 */
-	public SSNumericField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
-		super(factory);
+	public SSCurrencyField2(final javax.swing.JFormattedTextField.AbstractFormatterFactory _factory) {
+		super(_factory);
 		setHorizontalAlignment(SwingConstants.RIGHT);
+		setValue(new java.lang.Double(0.00));
 	}
 
 	/**
-	 * Returns the number of digits used for fraction part of the number
+	 * Getter for property decimals.
 	 *
-	 * @return returns the number of digits used for fraction part of the number
+	 * @return Value of property decimals.
 	 */
 	public int getDecimals() {
 		return decimals;
@@ -112,7 +132,7 @@ public class SSNumericField extends SSFormattedTextField {
 	 */
 	public void setDecimals(final int _decimals) {
 		decimals = _decimals;
-		setFormatterFactory(new SSNumericFormatterFactory(precision, _decimals));
+		setFormatterFactory(new SSCurrencyFormatterFactory(precision, _decimals));
 	}
 
 	/**
@@ -122,8 +142,6 @@ public class SSNumericField extends SSFormattedTextField {
 	 */
 	public void setPrecision(final int _precision) {
 		precision = _precision;
-		setFormatterFactory(new SSNumericFormatterFactory(_precision, decimals));
+		setFormatterFactory(new SSCurrencyFormatterFactory(_precision, decimals));
 	}
-
 }
-

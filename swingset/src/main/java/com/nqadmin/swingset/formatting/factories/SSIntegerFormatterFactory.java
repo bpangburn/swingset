@@ -35,56 +35,54 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
-package com.nqadmin.swingset.formatting;
+package com.nqadmin.swingset.formatting.factories;
 
 import java.text.NumberFormat;
-import java.util.Locale;
 
 import javax.swing.text.NumberFormatter;
 
-// SSPercentFormatterFactory.java
+// SSIntegerFormatterFactory.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * SSPercentFormatterFactory extends DefaultFormatterFactory for percentage fields.
+ * SSIntegerFormatterFactory extends DefaultFormatterFactory for Integer fields.
  */
-public class SSPercentFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
+public class SSIntegerFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
     /**
 	 * unique serial id
 	 */
-	private static final long serialVersionUID = -2567959171805065991L;
+	private static final long serialVersionUID = 7431201446112333734L;
 
 	/**
-     * Creates a default object of SSPercentFormatterFactory
+     * Constructs a default SSIntegerFormatterFactory
      */
-    public SSPercentFormatterFactory() {
-    	this(null,null);
+    public SSIntegerFormatterFactory() {
+    	this(null);
     }
 
     /**
-     * Creates an object of SSPercentFormatterFactory with the specified precision and decimals
-     * @param _precision - number of digits needed for integer part of the number
-     * @param _decimals - number of digits needed for fraction part of the number
+     * Creates an object of SSIntegerFormatterFactory with the specified precision
+     * @param _precision - number of digits needed to display the number
      */
-    public SSPercentFormatterFactory(final Integer _precision, final Integer _decimals) {
-        final NumberFormat nfd = NumberFormat.getPercentInstance(Locale.US);
-        
-        if (_precision!=null) {
-        	nfd.setMaximumIntegerDigits(_precision);
-        	nfd.setMinimumIntegerDigits(1);
-        }
-       
-        if (_decimals!=null) {
-            nfd.setMaximumFractionDigits(_decimals);
-            nfd.setMinimumFractionDigits(_decimals);
-        }
+    public SSIntegerFormatterFactory(final Integer _precision) {
+    	super();
+    	
+    	final NumberFormat format = NumberFormat.getIntegerInstance();
+    	
+    	if (_precision!=null) {
+            format.setMaximumIntegerDigits(_precision);
+            format.setMinimumIntegerDigits(1);
+    	}
 
-        setDefaultFormatter(new NumberFormatter(NumberFormat.getPercentInstance()));
+//        setDefaultFormatter(new NumberFormatter(NumberFormat.getIntegerInstance()));
+//        setNullFormatter(null);
+//        setEditFormatter(new NumberFormatter(NumberFormat.getIntegerInstance(Locale.US)));
+        setDefaultFormatter(new NumberFormatter(format));
         setNullFormatter(null);
-        setEditFormatter(new NumberFormatter(NumberFormat.getPercentInstance(Locale.US)));
-        setDisplayFormatter(new NumberFormatter(nfd));
+        setEditFormatter(new NumberFormatter(format));
+        setDisplayFormatter(new NumberFormatter(format));
 
     }
 }
