@@ -117,7 +117,7 @@ public abstract class SimpleComboListSwingModels extends AbstractComboBoxListSwi
 
 	/** {@inheritDoc} */
 	@Override
-	protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {
+	protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel _remodel) {
 	}
 
 	/** {@inheritDoc} */
