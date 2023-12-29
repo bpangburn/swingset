@@ -982,7 +982,7 @@ public class SSDataGrid extends JTable {
 	}
 
 	/**
-	 * Return the enumeration of {@linkplain getColumnModel().getColumns()}
+	 * Return the enumeration of {@linkplain #getColumnModel()}.{@linkplain TableColumnModel#getColumns()}
 	 * as a List.
 	 * @return the List
 	 */
