@@ -790,7 +790,7 @@ public class SSDataGrid extends JTable {
 	 * Variable indicating that sorting, by clicking on column header,
 	 * is allowed.
 	 */
-	private boolean sorting = true;
+	private boolean sorting = false;
 
 	/**
 	 * Keep rowSorter state here while it's disabled by insertion row.
