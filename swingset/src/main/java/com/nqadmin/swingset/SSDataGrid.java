@@ -1170,6 +1170,8 @@ public class SSDataGrid extends JTable {
 		String key = "GridDeleteSelectedRows";
 		getInputMap(WHEN_FOCUSED).put(ks, key);
 		getActionMap().put(key, new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(!allowDeletion)
