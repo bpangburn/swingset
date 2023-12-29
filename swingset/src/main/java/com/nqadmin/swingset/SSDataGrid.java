@@ -305,7 +305,6 @@ public class SSDataGrid extends JTable {
 		transient final Object[] items;
 		transient final Object[] underlyingValues;
 
-		/** {@inheritDoc} */
 		public ComboEditor(final Object[] _items, final Object[] _underlyingValues) {
 			super(new GridComboEditorComboBox());
 			// TODO: copy the arrays? Or just agree that they are never modified.
@@ -339,7 +338,6 @@ public class SSDataGrid extends JTable {
 			return item.getElem(1);
 		}
 
-		/** {@inheritDoc} */
 		protected int getIndexOf(final Object _value) {
 			if (underlyingValues == null) {
 				// IF THE VALUE IS NULL THEN SET THE DISPLAY ON THE COMBO TO BLANK (INDEX -1)
