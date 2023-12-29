@@ -1497,6 +1497,7 @@ public class SSDataGrid extends JTable {
 	 * @param _columnNumbers columms to hide
 	 * @deprecated use setHiddenColumns(List)}
 	 */
+	@Deprecated
 	public void setHiddenColumns(final int[] _columnNumbers) {
 		if(_columnNumbers == null) {
 			setHiddenColumns(Collections.emptyList());
@@ -1532,6 +1533,7 @@ public class SSDataGrid extends JTable {
 	 * @throws SQLException 
 	 * @deprecated use SetHiddenColumnsByName
 	 */
+	@Deprecated
 	public void setHiddenColumns(final String[] _columnNames) throws SQLException {
 		// TODO: does null need to be supported?
 		if(_columnNames == null) {
@@ -1668,6 +1670,7 @@ public class SSDataGrid extends JTable {
 	 * @param _dataGridHandler implementation of SSDataGridHandler interface.
 	 * @deprecated Use SSTableModel.setSSDataGridHandler
 	 */
+	@Deprecated
 	public void setSSDataGridHandler(final SSDataGridHandler _dataGridHandler) {
 		getModel().setSSDataGridHandler(_dataGridHandler);
 	}
