@@ -844,7 +844,7 @@ public class SSDataGrid extends JTable {
 
 	/**
 	 * Create row sorter as needed.
-	 * @param _dataModel 
+	 * @param _dataModel table model to set
 	 * @throws IllegalArgumentException if would change SSTableModel
 	 */
 	@Override
