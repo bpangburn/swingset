@@ -54,6 +54,7 @@ import javax.swing.ListModel;
  * // outer class does
  * 	ComboBoxModel<MyComboModels.MyComboItem> model
  * 		= new MyComboModels().getComboModel()
+ * }
  * 
  * private final class MyComboModels extends SimpleComboListSwingModels {
  * 	
