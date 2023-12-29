@@ -55,7 +55,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComboBox;
