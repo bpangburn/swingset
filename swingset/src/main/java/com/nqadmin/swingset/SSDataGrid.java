@@ -307,23 +307,27 @@ public class SSDataGrid extends JTable {
 
 		/** {@inheritDoc} */
 		public ComboEditor(final Object[] _items, final Object[] _underlyingValues) {
-			super(new JComboBox<>());
+			super(new GridComboEditorComboBox());
 			// TODO: copy the arrays? Or just agree that they are never modified.
 			//		 Could use guava immutable then not worry about it.
 			items = _items;
 			underlyingValues = _underlyingValues;
 
-			@SuppressWarnings("unchecked")
-			JComboBox<GridComboModels.GridComboItem> combo = (JComboBox) getComponent();
-			ComboBoxModel<GridComboModels.GridComboItem> model = new GridComboModels().getComboModel();
-			combo.setModel(model);
+			getComponent().setModel(new GridComboModels().getComboModel());
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		@SuppressWarnings("NonPublicExported")
+		final public GridComboEditorComboBox getComponent() {
+			return (GridComboEditorComboBox) super.getComponent();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public Object getCellEditorValue() {
 
-			final GridComboModels.GridComboItem item = (GridComboModels.GridComboItem) ((JComboBox<?>) getComponent()).getSelectedItem();
+			final GridComboModels.GridComboItem item = getComponent().getGridSelItem();
 
 			// TODO: -1 seems weird, why not 0?
 			if(item == null) {
@@ -361,7 +365,7 @@ public class SSDataGrid extends JTable {
 		public Component getTableCellEditorComponent(final JTable _table, final Object _value, final boolean _selected, final int _row,
 				final int _column) {
 
-			final JComboBox<?> comboBox = (JComboBox<?>) getComponent();
+			final JComboBox<?> comboBox = getComponent();
 			comboBox.setSelectedIndex(getIndexOf(_value));
 			return comboBox;
 		}
@@ -375,6 +379,9 @@ public class SSDataGrid extends JTable {
 			return true;
 		}
 
+		/** Simple combox model that maps each combobox item to
+		 * the index into this ComboEditor's items array.
+		 */
 		private final class GridComboModels extends SimpleComboListSwingModels {
 			
 			private GridComboModels() {
@@ -389,7 +396,7 @@ public class SSDataGrid extends JTable {
 			public ComboBoxModel<GridComboItem> getComboModel() {
 				return (ComboBoxModel<GridComboItem>) super.getComboModel();
 			}
-
+			
 			class GridComboItem implements ListItem0, Cloneable {
 				private final int listIdx;
 
@@ -404,6 +411,14 @@ public class SSDataGrid extends JTable {
 					return super.clone(); }
 				@Override public String toString() { return items[listIdx].toString(); }
 			}
+		}
+	}
+
+	@SuppressWarnings("serial")
+	private final class GridComboEditorComboBox
+			extends JComboBox<ComboEditor.GridComboModels.GridComboItem> {
+		public ComboEditor.GridComboModels.GridComboItem getGridSelItem() {
+			return (ComboEditor.GridComboModels.GridComboItem) super.getSelectedItem();
 		}
 	}
 
@@ -709,7 +724,7 @@ public class SSDataGrid extends JTable {
 		}
 
 		@Override
-		@SuppressWarnings({"UseSpecificCatch", "BroadCatchBlock", "TooBroadCatch"})
+		@SuppressWarnings({"UseSpecificCatch", "TooBroadCatch"})
 		public boolean stopCellEditing() {
 
 			final String s = (String) super.getCellEditorValue();
@@ -829,15 +844,15 @@ public class SSDataGrid extends JTable {
 
 	/**
 	 * Create row sorter as needed.
-	 * @param dataModel 
+	 * @param _dataModel 
 	 * @throws IllegalArgumentException if would change SSTableModel
 	 */
 	@Override
-	public void setModel(TableModel dataModel) {
+	public void setModel(TableModel _dataModel) {
 		// TODO: Support setModel to change SSTableModel?
 		if(getModel() instanceof SSTableModel)
 			throw new IllegalArgumentException("Can not change SSTableModel");
-		super.setModel(dataModel);
+		super.setModel(_dataModel);
 	}
 
 	private class Sorter extends TableRowSorter<SSTableModel> {
@@ -1472,7 +1487,7 @@ public class SSDataGrid extends JTable {
 	 *                       hidden
 	 */
 	public void setHiddenColumns(List<Integer> _columnNumbers) {
-		Objects.nonNull(_columnNumbers);
+		Objects.requireNonNull(_columnNumbers);
 
 		hiddenColumnsList = new ArrayList<>(_columnNumbers);
 		hideColumns();
@@ -1504,7 +1519,7 @@ public class SSDataGrid extends JTable {
 	 * @throws SQLException	SQLException
 	 */
 	public void setHiddenColumnsByName(List<String> _columnNames) throws SQLException {
-		Objects.nonNull(_columnNames);
+		Objects.requireNonNull(_columnNames);
 		List<Integer> hiddenCols = new ArrayList<>(_columnNames.size());
 		for(String colName : _columnNames) {
 			hiddenCols.add(RowSetOps.getColumnIndex(rowSet, colName) - 1);

@@ -49,6 +49,8 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.sql.RowSet;
 import javax.swing.AbstractButton;
@@ -84,8 +86,7 @@ class DataGridExampleSupport {
 
 
 	private DataGridExampleSupport(Logger _logger, Container _uiContainer,
-			RowSet _rowset, SSDataGrid _dataGrid)
-			throws SQLException {
+			RowSet _rowset, SSDataGrid _dataGrid) {
 
 		if(!(_uiContainer.getLayout() instanceof BorderLayout)) {
 			throw new IllegalArgumentException("uiContainer without BorderLayout");
@@ -98,11 +99,12 @@ class DataGridExampleSupport {
 
 	}
 	
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	private void init(int primaryColumn, SSDataValue dataValue,
 			String[] columnNames, Object[] defaultValues)
 			throws SQLException {
 		// stuff needed if there's going to be an insertion
-		dataGrid.setSSDataGridHandler(new DataGridHandler());
+		dataGrid.getModel().setSSDataGridHandler(new DataGridHandler());
 		dataGrid.setPrimaryColumn(primaryColumn);
 		dataGrid.setSSDataValue(dataValue);
 		dataGrid.setDefaultValues(columnNames, defaultValues);
@@ -183,7 +185,7 @@ class DataGridExampleSupport {
 				+ "</center></html>");
 	}
 
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	private void setupDebugButtons() {
 		JPanel buttons = new JPanel();
 		buttons.setLayout(new GridLayout(2, 3));
@@ -245,7 +247,7 @@ class DataGridExampleSupport {
 				JOptionPane.showMessageDialog((Component) e.getSource(),
 						msg, "Can not delete", JOptionPane.ERROR_MESSAGE);
 			} else {
-				SSTableModel model = (SSTableModel) dataGrid.getModel();
+				SSTableModel model = dataGrid.getModel();
 				model.deleteRow(row);
 			}
 		});
@@ -258,28 +260,27 @@ class DataGridExampleSupport {
 			//System.err.println("BEFORE:");
 			//outputColInfo();
 			// Alternate between column index and column name
-			// and check out using 'null' for an array.
-			int[] i_hide_cols = new int[0]; // don't hide anything
-			String[] s_hide_cols = new String[0];
+			List<Integer> i_hide_cols = Collections.emptyList(); // don't hide anything
+			List<String> s_hide_cols = Collections.emptyList();
 			if(!hidden[0]) {
 				indexOrName = (indexOrName + 1) % 4;
-				i_hide_cols = new int[] { 1, 3 };
-				s_hide_cols = new String[i_hide_cols.length];
+				i_hide_cols = Arrays.asList(1, 3);
+				s_hide_cols = new ArrayList<>();
 				// convert int column to name column
-				int i = 0;
 				for(int colIdx : i_hide_cols) {
 					try {
-						s_hide_cols[i++] = RowSetOps.getColumnName(rowset, colIdx+1);
+						s_hide_cols.add(RowSetOps.getColumnName(rowset, colIdx+1));
 					} catch (SQLException ex) {
 						throw new IllegalStateException("SQL: " + ex.getMessage());
 					}
 				}
 			}
+			// TODO: since not using arrays, don't need cases 2/3
 			switch(indexOrName) {
 				case 0:
 				case 2:
-					if(indexOrName == 2 && i_hide_cols.length == 0)
-						i_hide_cols = null;
+					if(indexOrName == 2 && i_hide_cols.isEmpty())
+						i_hide_cols = Collections.emptyList();
 					System.err.println("setHiddenColumns(int)"
 						+ (i_hide_cols == null ? " null" : ""));
 					dataGrid.setHiddenColumns(i_hide_cols);
@@ -287,12 +288,10 @@ class DataGridExampleSupport {
 				default:
 				case 1:
 				case 3:
-					if(indexOrName == 3 && s_hide_cols.length == 0)
-						s_hide_cols = null;
-					System.err.println("setHiddenColumns(string)"
+					System.err.println("setHiddenColumnsByName(string)"
 						+ (s_hide_cols == null ? " null" : ""));
 					try {
-						dataGrid.setHiddenColumns(s_hide_cols);
+						dataGrid.setHiddenColumnsByName(s_hide_cols);
 					} catch (SQLException ex) {
 						throw new IllegalStateException("SQL: " + ex.getMessage());
 					}
@@ -308,6 +307,7 @@ class DataGridExampleSupport {
 	boolean[] hidden = new boolean[1];
 	int indexOrName = 0;
 
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	void outputColInfo() {
 		for (TableColumn col : dataGrid.getColumnsList()) {
 			System.err.printf("id: %s, widths: max %d, min %d, pref %d, set %d,\n",
