@@ -917,7 +917,6 @@ public class SSDataGrid extends JTable {
 				return;
 			}
 			// cast to correct types
-			@SuppressWarnings("unchecked")
 			Sorter sorter = (Sorter) rowSorter;
 			@SuppressWarnings("unchecked")
 			RowFilter<SSTableModel, Integer> t = (RowFilter<SSTableModel, Integer>) sorter.getRowFilter();
