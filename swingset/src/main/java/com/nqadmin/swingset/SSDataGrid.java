@@ -848,7 +848,7 @@ public class SSDataGrid extends JTable {
 	@Override
 	public void setModel(TableModel _dataModel) {
 		// TODO: Support setModel to change SSTableModel?
-		if(getModel() instanceof SSTableModel)
+		if(super.getModel() instanceof SSTableModel)
 			throw new IllegalArgumentException("Can not change SSTableModel");
 		super.setModel(_dataModel);
 	}
