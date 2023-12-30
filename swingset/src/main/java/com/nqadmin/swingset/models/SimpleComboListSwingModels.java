@@ -54,6 +54,7 @@ import javax.swing.ListModel;
  * // outer class does
  * 	ComboBoxModel<MyComboModels.MyComboItem> model
  * 		= new MyComboModels().getComboModel()
+ * }
  * 
  * private final class MyComboModels extends SimpleComboListSwingModels {
  * 	
@@ -80,7 +81,9 @@ import javax.swing.ListModel;
  * }
  * }
  * </pre>
- * {@inheritDoc} */
+ *
+ */
+
 public abstract class SimpleComboListSwingModels extends AbstractComboBoxListSwingModel
 {
 
@@ -93,14 +96,11 @@ public abstract class SimpleComboListSwingModels extends AbstractComboBoxListSwi
 		super(_itemNumElems, _itemList);
 	}
 
-	/** {@inheritDoc}
-	 */
+
 	protected ListModel<?> getListModel() {
 		return AbstractComboBoxListSwingModel.getSimpleListModel(this);
 	}
 
-	/** {@inheritDoc}
-	 */
 	protected ComboBoxModel<?> getComboModel() {
 		return AbstractComboBoxListSwingModel.getSimpleComboBoxModel(this);
 	}
@@ -120,7 +120,6 @@ public abstract class SimpleComboListSwingModels extends AbstractComboBoxListSwi
 	protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel _remodel) {
 	}
 
-	/** {@inheritDoc} */
 	final public class Remodel extends AbstractComboBoxListSwingModel.Remodel { }
 	private final Remodel remodel = new Remodel();
 

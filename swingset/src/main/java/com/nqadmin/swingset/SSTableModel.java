@@ -49,7 +49,6 @@ import java.util.StringTokenizer;
 
 import javax.sql.RowSet;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import org.apache.logging.log4j.Logger;

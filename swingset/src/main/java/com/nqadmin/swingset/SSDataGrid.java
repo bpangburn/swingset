@@ -305,7 +305,6 @@ public class SSDataGrid extends JTable {
 		transient final Object[] items;
 		transient final Object[] underlyingValues;
 
-		/** {@inheritDoc} */
 		public ComboEditor(final Object[] _items, final Object[] _underlyingValues) {
 			super(new GridComboEditorComboBox());
 			// TODO: copy the arrays? Or just agree that they are never modified.
@@ -339,7 +338,6 @@ public class SSDataGrid extends JTable {
 			return item.getElem(1);
 		}
 
-		/** {@inheritDoc} */
 		protected int getIndexOf(final Object _value) {
 			if (underlyingValues == null) {
 				// IF THE VALUE IS NULL THEN SET THE DISPLAY ON THE COMBO TO BLANK (INDEX -1)
@@ -790,7 +788,7 @@ public class SSDataGrid extends JTable {
 	 * Variable indicating that sorting, by clicking on column header,
 	 * is allowed.
 	 */
-	private boolean sorting = true;
+	private boolean sorting = false;
 
 	/**
 	 * Keep rowSorter state here while it's disabled by insertion row.
@@ -844,13 +842,13 @@ public class SSDataGrid extends JTable {
 
 	/**
 	 * Create row sorter as needed.
-	 * @param _dataModel 
+	 * @param _dataModel table model to set
 	 * @throws IllegalArgumentException if would change SSTableModel
 	 */
 	@Override
 	public void setModel(TableModel _dataModel) {
 		// TODO: Support setModel to change SSTableModel?
-		if(getModel() instanceof SSTableModel)
+		if(super.getModel() instanceof SSTableModel)
 			throw new IllegalArgumentException("Can not change SSTableModel");
 		super.setModel(_dataModel);
 	}
@@ -919,7 +917,6 @@ public class SSDataGrid extends JTable {
 				return;
 			}
 			// cast to correct types
-			@SuppressWarnings("unchecked")
 			Sorter sorter = (Sorter) rowSorter;
 			@SuppressWarnings("unchecked")
 			RowFilter<SSTableModel, Integer> t = (RowFilter<SSTableModel, Integer>) sorter.getRowFilter();
@@ -984,7 +981,7 @@ public class SSDataGrid extends JTable {
 	}
 
 	/**
-	 * Return the enumeration of {@linkplain getColumnModel().getColumns()}
+	 * Return the enumeration of {@linkplain #getColumnModel()}.{@linkplain TableColumnModel#getColumns()}
 	 * as a List.
 	 * @return the List
 	 */
@@ -1172,6 +1169,8 @@ public class SSDataGrid extends JTable {
 		String key = "GridDeleteSelectedRows";
 		getInputMap(WHEN_FOCUSED).put(ks, key);
 		getActionMap().put(key, new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(!allowDeletion)
@@ -1497,6 +1496,7 @@ public class SSDataGrid extends JTable {
 	 * @param _columnNumbers columms to hide
 	 * @deprecated use setHiddenColumns(List)}
 	 */
+	@Deprecated
 	public void setHiddenColumns(final int[] _columnNumbers) {
 		if(_columnNumbers == null) {
 			setHiddenColumns(Collections.emptyList());
@@ -1532,6 +1532,7 @@ public class SSDataGrid extends JTable {
 	 * @throws SQLException 
 	 * @deprecated use SetHiddenColumnsByName
 	 */
+	@Deprecated
 	public void setHiddenColumns(final String[] _columnNames) throws SQLException {
 		// TODO: does null need to be supported?
 		if(_columnNames == null) {
@@ -1668,6 +1669,7 @@ public class SSDataGrid extends JTable {
 	 * @param _dataGridHandler implementation of SSDataGridHandler interface.
 	 * @deprecated Use SSTableModel.setSSDataGridHandler
 	 */
+	@Deprecated
 	public void setSSDataGridHandler(final SSDataGridHandler _dataGridHandler) {
 		getModel().setSSDataGridHandler(_dataGridHandler);
 	}
