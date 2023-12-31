@@ -75,6 +75,8 @@ import com.nqadmin.swingset.utils.SSVersion;
 import com.raelity.lib.ui.Screens;
 
 import gnu.getopt.Getopt;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
@@ -191,7 +193,7 @@ public class MainClass extends JFrame {
 	/**
 	 * database
 	 */
-	private static final String DATABASE_NAME = "suppliers_and_parts";
+	public static final String DATABASE_NAME = "suppliers_and_parts";
 	private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
 
 	private static final boolean USE_IN_MEMORY_DATABASE = true;
@@ -240,6 +242,12 @@ public class MainClass extends JFrame {
 		super("SwingSet Demo");
 		setSize(300, 300);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				DemoUtil.logConnectionUsage();
+			}
+		});
 
 		// ECHO WORKING DIRECTORY
 		logger.info("Working Directory = " + System.getProperty("user.dir"));

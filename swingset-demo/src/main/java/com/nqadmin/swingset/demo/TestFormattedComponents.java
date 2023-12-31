@@ -51,7 +51,6 @@ import javax.swing.JLabel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
@@ -155,7 +154,7 @@ public class TestFormattedComponents extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				rowset = new JdbcRowSetImpl(connection);
+				rowset = DemoUtil.getNewRowSet(connection);
 				rowset.setCommand("SELECT * FROM swingset_formatted_test_data;");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {

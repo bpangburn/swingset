@@ -52,6 +52,8 @@ import java.util.WeakHashMap;
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.spi.SyncProviderException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
@@ -71,6 +73,7 @@ import org.apache.logging.log4j.Logger;
 //import com.google.common.eventbus.Subscribe;
 //import com.nqadmin.swingset.utils.RowSetModificationEvent;
 
+import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -684,7 +687,8 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("LAST button clicked.");
 			removeRowsetListener();
 			try {
-				if (!commitChangesToDatabase(true)) return;
+				if (!commitChangesToDatabase(true))
+					return;
 				
 				rowSet.last();
 				
@@ -741,7 +745,7 @@ public class SSDataNavigator extends JPanel {
 						return;
 					}
 					
-					rowSet.insertRow();
+					RowSetOps.insertRow(rowSet);
 					setInserting(rowSet, false);
 					dBNav.performPostInsertOps();
 
@@ -754,7 +758,8 @@ public class SSDataNavigator extends JPanel {
 				} else {
 					// ELSE UPDATE THE DATABASE BASED ON THE PRESENT ROW VALUES.
 					// IN THIS CASE WE WILL WAIT TO PERFORM POST-UPDATE OPS BELOW
-					if (!commitChangesToDatabase(false)) return;
+					if (!commitChangesToDatabase(false))
+						return;
 				
 					setRowModified(false);
 					// TODO: why not updateNavigator?
@@ -772,6 +777,7 @@ public class SSDataNavigator extends JPanel {
 					// TODO: might get rid of this if broadcasting the right info,
 					//       like picking up on the "other" component broadcast
 					//
+
 					rowSet.absolute(rowSet.getRow());
 					
 					//
@@ -1008,7 +1014,7 @@ public class SSDataNavigator extends JPanel {
 				dBNav.performPreDeletionOps();
 				
 				// DELETE ROW FROM ROWSET
-				rowSet.deleteRow();
+				RowSetOps.deleteRow(rowSet);
 				
 				// PERFORM ANY POST DELETION OPS (WHICH MAY INVOLVE REQUERYING WHICH IS NEEDED FOR H2)
 				dBNav.performPostDeletionOps();
@@ -1055,7 +1061,8 @@ public class SSDataNavigator extends JPanel {
 					removeRowsetListener();
 					try {
 						
-						if (!commitChangesToDatabase(true)) return;
+						if (!commitChangesToDatabase(true))
+							return;
 						
 						final int row = Integer.parseInt(txtCurrentRow.getText().trim());
 						
@@ -1133,7 +1140,7 @@ public class SSDataNavigator extends JPanel {
 			if (!dBNav.allowUpdate()) {
 				result = false;
 			} else {
-				rowSet.updateRow();
+				RowSetOps.updateRow(rowSet);
 			}
 		}
 		
