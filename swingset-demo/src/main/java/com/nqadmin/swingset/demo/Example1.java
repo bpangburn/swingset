@@ -51,7 +51,6 @@ import javax.swing.JLabel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
@@ -120,7 +119,7 @@ public class Example1 extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-		        rowset = new JdbcRowSetImpl(connection);
+				rowset = DemoUtil.getNewRowSet(connection);
 				rowset.setCommand("SELECT * FROM supplier_data");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {

@@ -53,6 +53,8 @@ import java.util.GregorianCalendar;
 import java.util.Optional;
 
 import javax.sql.RowSet;
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.spi.SyncProviderException;
 
 import org.apache.logging.log4j.Logger;
 
@@ -79,6 +81,73 @@ public class RowSetOps {
 	private static final Logger logger = SSUtils.getLogger();
 
 	// TODO Audit type handling based on http://www.java2s.com/Code/Java/Database-SQL-JDBC/StandardSQLDataTypeswithTheirJavaEquivalents.htm
+
+	/**
+	 * Inserts the context of the insert row into this {@linkplain ResultSet}
+	 * and into the database. Handle CachedRowSet.
+	 * @param _resultSet
+	 * @throws SQLException
+	 */
+	public static void insertRow(ResultSet _resultSet) throws SQLException {
+		_resultSet.insertRow();
+		if (_resultSet instanceof CachedRowSet) {
+			CachedRowSet crs = (CachedRowSet)_resultSet;
+			_resultSet.moveToCurrentRow();
+			try {
+				crs.acceptChanges();
+			} catch (SyncProviderException ex) {
+				// TODO: test CRS undoInsert after accept changes
+				crs.undoInsert();
+				throw ex;
+			}
+		}
+	}
+
+	/**
+	 * Updates the underlying database with the new contents of the current row
+	 * of this {@linkplain ResultSet} object. Handle CachedRowSet.
+	 * @param _resultSet
+	 * @throws SQLException
+	 */
+	public static void updateRow(ResultSet _resultSet) throws SQLException {
+		_resultSet.updateRow();
+		if (_resultSet instanceof CachedRowSet) {
+			CachedRowSet crs = (CachedRowSet)_resultSet;
+			//SQLException ex = null;
+			int thisRow = _resultSet.getRow();
+			try {
+				crs.acceptChanges();
+			} catch (SyncProviderException ex01) {
+				// TODO: test CRS undoUpdate after accept changes
+				//ex = ex01;
+				crs.undoUpdate();
+				throw ex01;
+			}
+			_resultSet.absolute(thisRow);
+			//if (ex != null) {
+			//	throw ex;
+			//}
+		}
+	}
+
+	/**
+	 * Deletes the current row from this {@linkplain ResultSet} and from the
+	 * underlying database. Handle CachedRowSet.
+	 * @param _resultSet
+	 * @throws SQLException 
+	 */
+	public static void deleteRow(ResultSet _resultSet) throws SQLException {
+		_resultSet.deleteRow();
+		if (_resultSet instanceof CachedRowSet) {
+			CachedRowSet crs = (CachedRowSet)_resultSet;
+			try {
+				crs.acceptChanges();
+			} catch (SyncProviderException ex) {
+				crs.undoDelete();
+				throw ex;
+			}
+		}
+	}
 
 	/**
 	 * Returns the number of columns in the underlying ResultSet object

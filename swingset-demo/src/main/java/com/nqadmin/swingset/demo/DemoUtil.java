@@ -5,6 +5,7 @@
  */
 package com.nqadmin.swingset.demo;
  
+import com.nqadmin.rowset.JdbcRowSetImpl;
 import java.awt.Point;
 import java.io.BufferedReader;  
 import java.io.IOException;
@@ -22,14 +23,166 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.raelity.lib.ui.Screens;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.Objects;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+import javax.sql.RowSet;
+import javax.sql.rowset.RowSetProvider;
 
  
 /**
  * Utilities for setting up a database to use with the demos.
  */
-public class DemoUtil
-{ 
-    private static final Logger logger = LogManager.getLogger(MainClass.class);
+public class DemoUtil { 
+	private DemoUtil() { }
+	private static final Logger logger = LogManager.getLogger(MainClass.class);
+
+	public static void logConnectionUsage() {
+		logger.info(() -> "RowSetSourceDefault: " + whichRowSetDefault);
+		logger.info(() -> String.format(
+				"Connection pool: max active: %d, nOpen %d, nClose %d",
+				DataSourcePool.cMax(), DataSourcePool.nOpen(), DataSourcePool.nClose()));
+		for (String dsName : connMap.values()) {
+			logger.info(() -> "Connection dsName: " + dsName);
+		}
+	}
+
+	/**
+	 * Used to specify how to create a new {@linkplain RowSet}.
+	 */
+	public enum RowSetSource {
+		NQADMIN,
+		POOL_CACHED,	// Use normal connection pool and CachedRowSet
+		SHARE_JDBC,		// Use one connection and JdbcRowSet
+	}
+	/** Track every connection that's seen. If a connection does not have an
+	 * associated DataSourceName then the value is null.
+	 */
+	private static final Map<Connection, String> connMap = new IdentityHashMap<>();
+	private static InitialContext demoInitialContext = null;
+
+	public static final RowSetSource whichRowSetDefault = RowSetSource.NQADMIN;
+	//public static final RowSetSource whichRowSetDefault = RowSetSource.POOL_CACHED;
+	//public static final RowSetSource whichRowSetDefault = RowSetSource.SHARE_JDBC;
+
+	/**
+	 * Build a RowSet with a connection, or how to get one, for use in the Demo.
+	 * There a flag for whether or not to use the jdk standard mechanisms or
+	 * Pangburn group's JdbcRowSetImpl.
+	 * @param connection only used to build JdbcRowSetImpl.
+	 * @return The RowSet with either a Connection or DataSource
+	 * @throws SQLException 
+	 */
+	public static RowSet getNewRowSet(Connection connection) throws SQLException {
+		return getNewRowSet(connection, whichRowSetDefault);
+	}
+
+	/**
+	 * Like {@linkplain getNewRowSet(Connection)}, but specify RowSetSource.
+	 * Note: connection can be null, but only if whichRowSet is POOL_CACHED.
+	 * @param connection only used to build JdbcRowSetImpl.
+	 * @param whichRowSet how to construct the RowSet and/or get it's connection
+	 * @return The RowSet with either a Connection or DataSource
+	 * @throws SQLException 
+	 */
+	public static RowSet getNewRowSet(Connection connection, RowSetSource whichRowSet) throws SQLException {
+		if (whichRowSet != RowSetSource.POOL_CACHED) {
+			Objects.requireNonNull(connection);
+		}
+
+		if (connection != null) {
+			connMap.putIfAbsent(connection, null);
+		}
+
+		RowSet rs;
+		switch (whichRowSet) {
+			case SHARE_JDBC: {
+				String dsName = getDsName(connection);
+				rs = RowSetProvider.newFactory().createJdbcRowSet();
+				rs.setDataSourceName(dsName);
+				break;
+			}
+			case POOL_CACHED: {
+				getDemoInitialContext(); // Make sure the pool exists
+				rs = RowSetProvider.newFactory().createCachedRowSet();
+				rs.setDataSourceName(DataSourcePool.DATA_SOURCE_NAME);
+				break;
+			}
+			case NQADMIN:
+				rs = new JdbcRowSetImpl(connection);
+				break;
+			default:
+				throw new RuntimeException("Unknown data source");
+		}
+		return rs;
+	}
+
+	private static String getDsName(Connection conn) {
+		return connMap.computeIfAbsent(conn, k -> {
+			// create a ds name and binding for this specific connection
+			int id = System.identityHashCode(k);
+			String dsName = null;
+			// For production, must guarentee that same ds not in use.
+			int t = 0;
+			while (dsName == null || connMap.values().contains(dsName)) {
+				++t;
+				dsName = "ds-" + t + "-" + id;
+			}
+			String finalDsName = dsName;
+			logger.info(() -> "Creating new DataSourceShareConnection: " + finalDsName );
+			InitialContext ctx = getDemoInitialContext();
+			try {
+				ctx.bind(dsName, DataSourceShareConnection.getDataSource(conn));
+			} catch (NamingException ex) {
+				throw new RuntimeException(ex);
+			}
+			return dsName;
+		});
+	}
+
+	private static InitialContext getDemoInitialContext() {
+		if (demoInitialContext == null) {
+			String factory = TrivialCtxFactory.class.getName();
+			logger.info(() -> "Initializing naming factory: " + factory);
+			System.setProperty("java.naming.factory.initial", factory);
+			try {
+				InitialContext ctx = new InitialContext();
+				// Create and bind the Pool
+				ctx.bind(DataSourcePool.DATA_SOURCE_NAME,
+						DataSourcePool.getDataSource());
+				demoInitialContext = ctx;
+			} catch (NamingException ex) {
+				throw new RuntimeException(ex);
+			}
+			if (Boolean.FALSE) {	// For debug
+				debugRowSetSourceConnections(demoInitialContext);
+			}
+		}
+		return demoInitialContext;
+	}
+
+	/** open/close stuff to show up in statistics */
+	@SuppressWarnings("CallToPrintStackTrace")
+	private static void debugRowSetSourceConnections(InitialContext ctx) {
+		try {
+			DataSource ds = (DataSource) ctx.lookup(DataSourcePool.DATA_SOURCE_NAME);
+			Connection c = ds.getConnection();
+			RowSet rs1 = getNewRowSet(c, RowSetSource.POOL_CACHED);
+			RowSet rs2 = getNewRowSet(c, RowSetSource.SHARE_JDBC);
+			c.close();
+			c = ds.getConnection();
+			RowSet rs3 = getNewRowSet(c, RowSetSource.SHARE_JDBC);
+			c.close();
+			rs1.close();
+			rs2.close();
+			rs3.close();
+		} catch (SQLException | NamingException ex) {
+			ex.printStackTrace();
+		}
+	}
 
 	/**
 	 * Create connection using properties; the properties are passed to
@@ -82,6 +235,7 @@ public class DemoUtil
 	 * @param _verbose indicates verbose mode
 	 * @return false if an error was encountered
 	 */
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static boolean runSqlStatements(Connection _conn, String _resource, boolean _verbose) {
 		boolean ok;
 		if (_verbose) {
@@ -129,6 +283,7 @@ public class DemoUtil
 		return ok;
 	}
 	
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	private static void runS(Statement statement, String sql, boolean verbose)
 	throws SQLException {
 		if (verbose) {
@@ -150,10 +305,11 @@ public class DemoUtil
 	 * @param _br the file resource.
 	 * @return List of query strings 
 	 */
+	@SuppressWarnings({"BroadCatchBlock", "TooBroadCatch", "UseSpecificCatch"})
     public static ArrayList<String> extractStatements(BufferedReader _br)
     { 
-		ArrayList<String> listOfQueries = new ArrayList<String>();
-		ArrayList<String> listOfLines = new ArrayList<String>();
+		ArrayList<String> listOfQueries = new ArrayList<>();
+		ArrayList<String> listOfLines = new ArrayList<>();
 		LineReader lr = null;
         String line;
         int indexOfCommentSign;
@@ -165,7 +321,7 @@ public class DemoUtil
             //read the file line by line
             while((line = lr.getNext()) != null)  {  
                 // first stip out comments surrounded by /* */
-                if(line.indexOf("/*") != -1) {
+                if(line.contains("/*")) {
                     line = removeSlashStarComments(line, lr);
                 }
 
@@ -201,7 +357,7 @@ public class DemoUtil
             // filter out empty statements
             for(String query : splitQueries) {
                 query = query.trim();
-                if(!query.equals("") && !query.equals("\t"))  
+                if(!query.isEmpty() && !query.equals("\t"))  
                     listOfQueries.add(query);
 
             }
@@ -285,7 +441,7 @@ public class DemoUtil
                 // found an end of comment
                 localS = localS.substring(idx+2);
 
-                inComment = false;
+                // inComment = false; warning: Assigned value never used
             }
             // not in a comment
             if((idx = localS.indexOf("/*")) >= 0) {
@@ -315,6 +471,7 @@ public class DemoUtil
 	 * @param verbose output progress information
 	 * @return true if successful
 	 */
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static boolean loadBinaries(Connection conn, String resourceName, String sql, boolean verbose) {
 		boolean ok = false;
 
