@@ -45,7 +45,9 @@ import javax.sql.DataSource;
 import org.h2.jdbcx.JdbcDataSource;
 
 /**
- * Provides a data source to use with the demo's naming service.
+ * Provides a data source that returns a pre-specifies connection; typically
+ * used to share a single connection with multiple JdbcRowSets.
+ * To use with the demo's naming service.
  */
 public class DataSourceShareConnection {
 	public static final String DATA_SOURCE_NAME = "ShareConnection";

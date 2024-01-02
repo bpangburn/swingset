@@ -39,6 +39,8 @@ package com.nqadmin.swingset;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -59,6 +61,7 @@ import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
+import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
 // SSDBNavImpl.java
@@ -206,5 +209,25 @@ public class SSDBNavImpl implements SSDBNav {
 		}
 
 	} // end protected void setComponents(Container _container) {
+
+	/**
+	 * Find all SSComponents in this navigator's container.
+	 * @return List of SScomponents
+	 */
+	@Override
+	public List<SSComponentInterface> findSSComponents() {
+		ArrayList<SSComponentInterface> l = new ArrayList<>();
+		findSSComponents(container, l);
+		return l;
+	}
+	private void findSSComponents(final Container _container, List<SSComponentInterface> l) {
+		for (Component comp : _container.getComponents()) {
+			if (comp instanceof SSComponentInterface) {
+				l.add((SSComponentInterface) comp);
+			} else if (comp instanceof Container) {
+				findSSComponents((Container) comp, l);
+			}
+		}
+	}
 
 } // end public class SSDBNavImpl

@@ -307,6 +307,8 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	@Override
 	public void updateSSComponent() {
 
+		// TODO: If CachedRowSet, BLOBs don't work. As a convenience could,
+		//		 grab a connection, find the primary keys, and read the BLOB.
 		try {
 			final byte[] imageData = getRowSet().getRow() > 0 ? getRowSet().getBytes(getBoundColumnName()) : null;
 			if (imageData != null) {
