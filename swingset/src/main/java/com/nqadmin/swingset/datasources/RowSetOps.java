@@ -94,7 +94,7 @@ public class RowSetOps {
 			CachedRowSet crs = (CachedRowSet)_resultSet;
 			_resultSet.moveToCurrentRow();
 			try {
-				crs.acceptChanges();
+				SSDataNavigator.acceptChanges(crs, null);
 			} catch (SyncProviderException ex) {
 				// TODO: test CRS undoInsert after accept changes
 				crs.undoInsert();
@@ -116,14 +116,18 @@ public class RowSetOps {
 			//SQLException ex = null;
 			int thisRow = _resultSet.getRow();
 			try {
-				crs.acceptChanges();
+				SSDataNavigator.acceptChanges(crs, () -> {
+					try {
+						_resultSet.absolute(thisRow);
+					} catch (SQLException ex) { }	// TODO: find nice way to propogate
+				});
 			} catch (SyncProviderException ex01) {
 				// TODO: test CRS undoUpdate after accept changes
 				//ex = ex01;
 				crs.undoUpdate();
 				throw ex01;
 			}
-			_resultSet.absolute(thisRow);
+			//_resultSet.absolute(thisRow);
 			//if (ex != null) {
 			//	throw ex;
 			//}
@@ -141,7 +145,7 @@ public class RowSetOps {
 		if (_resultSet instanceof CachedRowSet) {
 			CachedRowSet crs = (CachedRowSet)_resultSet;
 			try {
-				crs.acceptChanges();
+				SSDataNavigator.acceptChanges(crs, null);
 			} catch (SyncProviderException ex) {
 				crs.undoDelete();
 				throw ex;

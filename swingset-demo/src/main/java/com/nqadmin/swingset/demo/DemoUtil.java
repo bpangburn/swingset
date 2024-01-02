@@ -30,6 +30,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.sql.RowSet;
+import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
 
  
@@ -54,19 +55,53 @@ public class DemoUtil {
 	 * Used to specify how to create a new {@linkplain RowSet}.
 	 */
 	public enum RowSetSource {
-		NQADMIN,
+		SHARE_JDBC,		// Use specified connection and JdbcRowSet
 		POOL_CACHED,	// Use normal connection pool and CachedRowSet
-		SHARE_JDBC,		// Use one connection and JdbcRowSet
+		NQADMIN,
 	}
 	/** Track every connection that's seen. If a connection does not have an
 	 * associated DataSourceName then the value is null.
 	 */
 	private static final Map<Connection, String> connMap = new IdentityHashMap<>();
-	private static InitialContext demoInitialContext = null;
+	private static InitialContext initialContext = null;
+	private static RowSetFactory rsFactory = null;
 
-	public static final RowSetSource whichRowSetDefault = RowSetSource.NQADMIN;
-	//public static final RowSetSource whichRowSetDefault = RowSetSource.POOL_CACHED;
-	//public static final RowSetSource whichRowSetDefault = RowSetSource.SHARE_JDBC;
+	private static RowSetSource whichRowSetDefault = RowSetSource.SHARE_JDBC;
+
+	public static RowSetSource getWhichRowSetDefault() {
+		return whichRowSetDefault;
+	}
+
+	public static void setWhichRowSetDefault(RowSetSource _whichRowSetDefault) {
+		if (_whichRowSetDefault != null) {
+			whichRowSetDefault = _whichRowSetDefault;
+		}
+	}
+
+	private static void rowSetSourceInit(RowSetSource whichRowSet) throws SQLException {
+		if (whichRowSet == RowSetSource.NQADMIN || rsFactory != null) {
+			return;
+		}
+
+		String factory = TrivialCtxFactory.class.getName();
+		logger.info(() -> "Initializing naming factory: " + factory);
+		System.setProperty("java.naming.factory.initial", factory);
+		try {
+			InitialContext ctx = new InitialContext();
+			// Create and bind the Pool
+			ctx.bind(DataSourcePool.DATA_SOURCE_NAME,
+					DataSourcePool.getDataSource());
+			initialContext = ctx;
+		} catch (NamingException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		rsFactory = RowSetProvider.newFactory();
+
+		if (Boolean.FALSE) {	// For debug to see variety of stats
+			debugRowSetSourceConnections(initialContext);
+		}
+	}
 
 	/**
 	 * Build a RowSet with a connection, or how to get one, for use in the Demo.
@@ -89,6 +124,8 @@ public class DemoUtil {
 	 * @throws SQLException 
 	 */
 	public static RowSet getNewRowSet(Connection connection, RowSetSource whichRowSet) throws SQLException {
+		rowSetSourceInit(whichRowSet);
+
 		if (whichRowSet != RowSetSource.POOL_CACHED) {
 			Objects.requireNonNull(connection);
 		}
@@ -99,20 +136,19 @@ public class DemoUtil {
 
 		RowSet rs;
 		switch (whichRowSet) {
-			case SHARE_JDBC: {
-				String dsName = getDsName(connection);
+			case SHARE_JDBC:
 				rs = RowSetProvider.newFactory().createJdbcRowSet();
-				rs.setDataSourceName(dsName);
+				rs.setDataSourceName(getDsName(connection));
+				logger.debug(() -> "DataSource: " + getDsName(connection));
 				break;
-			}
-			case POOL_CACHED: {
-				getDemoInitialContext(); // Make sure the pool exists
+			case POOL_CACHED:
 				rs = RowSetProvider.newFactory().createCachedRowSet();
 				rs.setDataSourceName(DataSourcePool.DATA_SOURCE_NAME);
+				logger.debug(() -> "DataSource: " + DataSourcePool.DATA_SOURCE_NAME);
 				break;
-			}
 			case NQADMIN:
 				rs = new JdbcRowSetImpl(connection);
+				logger.debug(() -> "DataSource: " + RowSetSource.NQADMIN);
 				break;
 			default:
 				throw new RuntimeException("Unknown data source");
@@ -133,35 +169,13 @@ public class DemoUtil {
 			}
 			String finalDsName = dsName;
 			logger.info(() -> "Creating new DataSourceShareConnection: " + finalDsName );
-			InitialContext ctx = getDemoInitialContext();
 			try {
-				ctx.bind(dsName, DataSourceShareConnection.getDataSource(conn));
+				initialContext.bind(dsName, DataSourceShareConnection.getDataSource(conn));
 			} catch (NamingException ex) {
 				throw new RuntimeException(ex);
 			}
 			return dsName;
 		});
-	}
-
-	private static InitialContext getDemoInitialContext() {
-		if (demoInitialContext == null) {
-			String factory = TrivialCtxFactory.class.getName();
-			logger.info(() -> "Initializing naming factory: " + factory);
-			System.setProperty("java.naming.factory.initial", factory);
-			try {
-				InitialContext ctx = new InitialContext();
-				// Create and bind the Pool
-				ctx.bind(DataSourcePool.DATA_SOURCE_NAME,
-						DataSourcePool.getDataSource());
-				demoInitialContext = ctx;
-			} catch (NamingException ex) {
-				throw new RuntimeException(ex);
-			}
-			if (Boolean.FALSE) {	// For debug
-				debugRowSetSourceConnections(demoInitialContext);
-			}
-		}
-		return demoInitialContext;
 	}
 
 	/** open/close stuff to show up in statistics */

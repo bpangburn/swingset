@@ -38,7 +38,10 @@
 package com.nqadmin.swingset;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
 
+import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 // SSDBNav.java
@@ -232,6 +235,14 @@ public interface SSDBNav extends Serializable {
 	default void performRefreshOps() {
 		// no action by default
 
+	}
+
+	/**
+	 * Find all the SSComponents in the navigator window.
+	 * @return
+	 */
+	default List<SSComponentInterface> findSSComponents() {
+		return Collections.emptyList();
 	}
 
 } // end public interface SSDBNav {
