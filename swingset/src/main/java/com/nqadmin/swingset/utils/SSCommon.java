@@ -60,7 +60,11 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.PlainDocument;
 
 import org.apache.logging.log4j.Logger;
 
@@ -71,6 +75,7 @@ import com.nqadmin.swingset.SSLabel;
 import com.nqadmin.swingset.SSList;
 import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.datasources.RowSetOps.SSSQLNullException;
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
 
 // SSCommon.java
@@ -113,7 +118,7 @@ public class SSCommon {
 	 * 	return getSSCommon().getSSDocumentListener();
 	 * }
 	 * <p>
-	 * This listener updates the underlying RowSet there is a change to the Document
+	 * This listener updates the underlying RowSet when there is a change to the Document
 	 * object. E.g., a call to setText() on a JTextField.
 	 * <p>
 	 * DocumentListener events generally, but not always get fired twice any time
@@ -141,6 +146,10 @@ public class SSCommon {
 		 */
 		private int lastChange = 0;
 		private int lastNotifiedChange = 0;
+		private String previousValue = null;
+		/** True when listener is temporarily removed. */
+		private boolean listenerNeedsRestoration;
+	
 
 		/** {@inheritDoc} */
 		@Override
@@ -157,9 +166,29 @@ public class SSCommon {
 
 					removeRowSetListener();
 
+					boolean ok = true;
 					try {
-						setBoundColumnText(((javax.swing.text.JTextComponent) getSSComponent()).getText());
+						ok = setBoundColumnText(((JTextComponent) getSSComponent()).getText());
 					} finally {
+						if (!ok) {
+							// restore previous text value
+							if(previousValue != null) {
+								if (ssComponentListenerAdded) {
+									// avoid generating events while restoring text
+									removeSSDocumentListener();
+									listenerNeedsRestoration = true;
+								}
+								try {
+									((JTextComponent) getSSComponent()).setText(previousValue);
+								} finally {
+									if (listenerNeedsRestoration) {
+										listenerNeedsRestoration = false;
+										addSSDocumentListener();
+									}
+								}
+							}
+						}
+						previousValue = null;	// Seems safer, is this the right spot?
 						addRowSetListener();
 					}
 				}
@@ -181,6 +210,53 @@ public class SSCommon {
 		}
 
 	} // end protected class SSDocumentListener
+	
+	/**
+	 * For JTextField to track previous text field value.
+	 */
+	@SuppressWarnings("serial")
+	public class SSPlainDocument extends PlainDocument {
+		DocumentFilter filter;
+
+		void capturePrevious(DocumentFilter.FilterBypass fb) {
+			try {
+				String prev = fb.getDocument().getText(0, fb.getDocument().getLength());
+				logger.trace(() -> "Capture previous text value: " + prev);
+				if (eventListener instanceof SSDocumentListener) {
+					((SSDocumentListener) eventListener).previousValue = prev;
+				}
+			} catch (BadLocationException ex) {
+				logger.debug("Capture previous text value", ex);
+			}
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public DocumentFilter getDocumentFilter() {
+			if (filter == null) {
+				filter = new DocumentFilter() {
+					@Override
+					public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+						capturePrevious(fb);
+						super.replace(fb, offset, length, text, attrs);
+					}
+
+					@Override
+					public void insertString(DocumentFilter.FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+						capturePrevious(fb);
+						super.insertString(fb, offset, string, attr);
+					}
+
+					@Override
+					public void remove(DocumentFilter.FilterBypass fb, int offset, int length) throws BadLocationException {
+						capturePrevious(fb);
+						super.remove(fb, offset, length);
+					}
+				};
+			}
+			return filter;
+		}
+	}
 
 	/**
 	 * Listener(s) for the underlying RowSet used to update the bound SwingSet
@@ -422,7 +498,7 @@ public class SSCommon {
 	 * JTextComponent.
 	 */
 	private void addSSDocumentListener() {
-		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().addDocumentListener((SSDocumentListener)eventListener);
+		((JTextComponent) getSSComponent()).getDocument().addDocumentListener((SSDocumentListener)eventListener);
 	}
 
 	/**
@@ -704,13 +780,14 @@ public class SSCommon {
 	}
 	
 	/**
-	 * Returns SSDocumentListener if the component is a JTextComponent
+	 * Returns SSDocumentListener; assumes the component is a JTextComponent.
 	 * <p>
 	 * Should only be called once per component.
 	 *
 	 * @return SSDocumentListener for a JTextComponent
 	 */
 	public SSDocumentListener getSSDocumentListener() {
+		// TODO: assert not called before
 		return new SSDocumentListener();
 	}
 
@@ -821,11 +898,11 @@ public class SSCommon {
 	}
 
 	/**
-	 * Class to remove a Document listener when the SwingSet component is a
-	 * JTextComponent
+	 * Method to remove a Document listener when the SwingSet component is a
+	 * JTextComponent.
 	 */
 	private void removeSSDocumentListener() {
-		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().removeDocumentListener((SSDocumentListener)eventListener);
+		((JTextComponent) getSSComponent()).getDocument().removeDocumentListener((SSDocumentListener)eventListener);
 	}
 
 	/**
@@ -968,14 +1045,17 @@ public class SSCommon {
 	 * Updates the bound database column with the specified String.
 	 *
 	 * @param _boundColumnText value to write to bound database column
+	 * @return false if there was a detected failure
 	 */
-	public void setBoundColumnText(final String _boundColumnText) {
+	public boolean setBoundColumnText(final String _boundColumnText) {
+		boolean ok = false;
 		logger.debug("{}: " + _boundColumnText, () -> getColumnForLog());
 		try {
 			//getRowSet().updateColumnText(_boundColumnText, getBoundColumnName(), getAllowNull());
 			RowSetOps.updateColumnText(getRowSet(),_boundColumnText, getBoundColumnName(), getAllowNull());
-		} catch(final NullPointerException _npe) {
-			logger.warn(getBoundColumnName() + " - Null Pointer Exception.", _npe);
+			ok = true;
+		} catch(final SSSQLNullException _npe) {
+			logger.warn(getBoundColumnName() + " - Null Value Exception.", _npe);
 			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
 					"Null values are not allowed for " + getBoundColumnName(), "Null Exception", JOptionPane.ERROR_MESSAGE);
 
@@ -991,7 +1071,7 @@ public class SSCommon {
 					"Number Format Exception", JOptionPane.ERROR_MESSAGE);
 
 		}
-
+		return ok;
 	}
 
 	/**

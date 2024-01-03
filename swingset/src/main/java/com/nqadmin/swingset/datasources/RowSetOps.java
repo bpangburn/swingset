@@ -371,13 +371,13 @@ public class RowSetOps {
 	 *                      underlying RowSet column
 	 * @param _columnName   name of the database column
 	 * @param _allowNull 	indicates if Component and underlying column can contain null values
-	 * @throws NullPointerException thrown if null is not allowed
+	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 * @throws NumberFormatException thrown if unable to parse a string to number format
 	 */
 	// TODO: Eclipse is giving a Potential null pointer access, but we have assert(_updatedValue != null) so may be able to remove warning in future.
 	@SuppressWarnings("null")
-	public static void updateColumnText(final RowSet _rowSet, final String _updatedValue, final String _columnName, final boolean _allowNull) throws NullPointerException, SQLException, NumberFormatException {
+	public static void updateColumnText(final RowSet _rowSet, final String _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException, NumberFormatException {
 
 		logger.debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
@@ -426,7 +426,7 @@ public class RowSetOps {
             	//
             	// Note that if there is a UNIQUE constraint on such a text column then repeatedly writing the same 
             	// number (0 to N) spaces should throw an SQL exception (as should any other duplicate string)
-                throw new NullPointerException("Null values are not allowed for this field.");
+                throw new SSSQLNullException("Null values are not allowed for this field.");
             }
         }
 		assert(_updatedValue != null);
@@ -434,6 +434,9 @@ public class RowSetOps {
 		/*
 		 * SECOND - WRITING NON-NULL VALUES TO DATABASE BASED ON APPROPRIATE STRING CONVERSIONS
 		 */
+		// TODO: Use setObject(_updatedValue) for numerics?
+		//		 But it is nice to catch problems early,
+		//		 as long as TextField stays consistent.
 		switch (jdbcType) {
 	
 		case INTEGER:
@@ -469,7 +472,7 @@ public class RowSetOps {
 		case BOOLEAN:
 		case BIT:
 			// CONVERT THE GIVEN STRING TO BOOLEAN TYPE
-			final boolean boolValue = Boolean.valueOf(_updatedValue);
+			final boolean boolValue = Boolean.parseBoolean(_updatedValue);
 			_rowSet.updateBoolean(_columnName, boolValue);
 			break;
 			
@@ -588,7 +591,7 @@ public class RowSetOps {
 
 	// TODO: for override of type mapping for local/dbms requirements
 	// with_timezone might be the perfect candidates
-	private static final EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType = new EnumMap<JDBCType, Class<?>>(JDBCType.class);
+	private static final EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType = new EnumMap<>(JDBCType.class);
 	/**
 	 * Determine the Java type class for the given database type.
 	 * @param _jdbcType JDBCType of interest
@@ -644,5 +647,22 @@ public class RowSetOps {
 				throw new SQLException("Unhandled type: " + _jdbcType);
 		}
 		return clazz;
+	}
+
+	/**
+	 * Null used as database value where not allowed.
+	 */
+	@SuppressWarnings("serial")
+	public static class SSSQLNullException extends SQLException {
+
+		/**
+		 * Construct an SQLException with given reason.
+		 * 
+		 * @param reason description of the exception
+		 */
+		public SSSQLNullException(String reason) {
+			super(reason);
+		}
+
 	}
 }
