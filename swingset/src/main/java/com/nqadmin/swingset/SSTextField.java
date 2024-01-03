@@ -47,6 +47,7 @@ import java.util.StringTokenizer;
 
 import javax.sql.RowSet;
 import javax.swing.JTextField;
+import javax.swing.text.Document;
 
 import org.apache.logging.log4j.Logger;
 
@@ -62,6 +63,7 @@ import com.nqadmin.swingset.utils.SSUtils;
  * SSTextField extends the JTextField. This class provides different masks like
  * date mask, SSN mask etc.
  */
+// TODO: get rid of "mask"/... and use formatted text fields.
 public class SSTextField extends JTextField implements SSComponentInterface {
 
 	// TODO Consider adding an InputVerifier to prevent component from losing focus.
@@ -209,27 +211,36 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 
 	}
 
-	/**
-	 * Type of mask to be used for text field (default = none).
-	 */
-	protected int mask = 0;
+	private static final int ANY_ALIGNMENT = 0xffff;
 
-	/**
-	 * Default number of decimals to show for float, double, etc.
-	 */
-	protected int numberOfDecimalPlaces = 2;
+	private static final int DEFAULT_MASK = 0;
+	/** Type of mask to be used for text field (default = none). */
+	protected int mask = DEFAULT_MASK;
+
+	private static final int DEFAULT_NUMBER_OF_DECIMAL_PLACES = 2;
+	/** Default number of decimals to show for float, double, etc. */
+	protected int numberOfDecimalPlaces = DEFAULT_NUMBER_OF_DECIMAL_PLACES;
 
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	transient protected final SSCommon ssCommon = new SSCommon(this);
+	transient protected final SSCommon ssCommon;
 
 	/**
 	 * Constructs a new, empty text field.
 	 */
 	public SSTextField() {
-		// Note that call to parent default constructor is implicit.
-		// super();
+		this(null, DEFAULT_MASK);
+	}
+
+	/**
+	 * Constructs a new text field with the specified text and mask.
+	 *
+	 * @param _text the text to be displayed.
+	 * @param _mask the mask required for this textfield.
+	 */
+	public SSTextField(final String _text, final int _mask) {
+		this(_text, null, null, _mask, DEFAULT_NUMBER_OF_DECIMAL_PLACES, ANY_ALIGNMENT);
 	}
 
 	/**
@@ -238,7 +249,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	 * @param _mask the mask required for this textfield.
 	 */
 	public SSTextField(final int _mask) {
-		this("", _mask);
+		this( _mask, DEFAULT_NUMBER_OF_DECIMAL_PLACES);
 	}
 
 	/**
@@ -249,8 +260,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	 * @param _numberOfDecimalPlaces number of decimal places required
 	 */
 	public SSTextField(final int _mask, final int _numberOfDecimalPlaces) {
-		this(_mask);
-		numberOfDecimalPlaces = _numberOfDecimalPlaces;
+		this(_mask, _numberOfDecimalPlaces, ANY_ALIGNMENT);
 	}
 
 	/**
@@ -275,8 +285,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	 * @param _align                 alignment required
 	 */
 	public SSTextField(final int _mask, final int _numberOfDecimalPlaces, final int _align) {
-		this(_mask, _numberOfDecimalPlaces);
-		setHorizontalAlignment(_align);
+		this("", null, null, _mask, _numberOfDecimalPlaces, _align);
 	}
 
 	/**
@@ -287,20 +296,43 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	 *                         bound
 	 */
 	public SSTextField(final RowSet _rowSet, final String _boundColumnName) {
-		this();
-		bind(_rowSet, _boundColumnName);
+		this(null, _rowSet, _boundColumnName,
+			 DEFAULT_MASK, DEFAULT_NUMBER_OF_DECIMAL_PLACES, ANY_ALIGNMENT);
 	}
 
-	/**
-	 * Constructs a new text field with the specified text and mask.
-	 *
-	 * @param _text the text to be displayed.
-	 * @param _mask the mask required for this textfield.
-	 */
-	public SSTextField(final String _text, final int _mask) {
+	/** All the contructors feed through here */
+	private SSTextField(String _text, final RowSet _rowSet, final String _boundColumnName,
+	final int _mask, final int _numberOfDecimalPlaces, final int _align) {
 		super(_text);
+		ssCommon = constructingSSCommon();
+		constructingSSCommon = null;
 		mask = _mask;
+		numberOfDecimalPlaces = _numberOfDecimalPlaces;
+		if (_align != ANY_ALIGNMENT) {
+			setHorizontalAlignment(_align);
+		}
+		if (_rowSet != null) {
+			bind(_rowSet, _boundColumnName);
+		}
 	}
+
+	/** Only non-null during object construction. */
+	transient private SSCommon constructingSSCommon;
+
+	/** For capturing text before modification */
+	@Override
+	protected Document createDefaultModel() {
+		return constructingSSCommon().new SSPlainDocument();
+	}
+
+	private SSCommon constructingSSCommon() {
+		if (constructingSSCommon == null) {
+			constructingSSCommon = new SSCommon(this);
+		}
+		return constructingSSCommon;
+	}
+
+
 
 	/**
 	 * Method to allow Developer to add functionality when SwingSet component is
