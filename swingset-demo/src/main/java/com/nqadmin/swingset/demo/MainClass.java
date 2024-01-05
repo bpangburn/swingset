@@ -71,6 +71,7 @@ import org.h2.tools.RunScript;
 
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSMysqlSetModel;
+import com.nqadmin.swingset.utils.SSVersion;
 import com.raelity.lib.ui.Screens;
 
 import gnu.getopt.Getopt;
@@ -635,11 +636,15 @@ public class MainClass extends JFrame {
 	 * @param _args - optional command line arguments, which are ignored by this
 	 *              program
 	 */
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static void main(final String[] _args) {
 		boolean some_error = false;
-		System.err.println(String.format("java:%s vm:%s date:%s os:%s", System.getProperty("java.version"),
-				System.getProperty("java.vm.version"), System.getProperty("java.version.date"),
-				System.getProperty("os.name")));
+		System.err.printf("java:%s vm:%s date:%s os:%s\n",
+				System.getProperty("java.version"),
+				System.getProperty("java.vm.version"),
+				System.getProperty("java.version.date"),
+				System.getProperty("os.name"));
+		System.err.printf("SwingSet: %s\n", SSVersion.get().toString());
 
 		Getopt g = new Getopt(cmdName, _args, "hvdinrp:s:");
 
