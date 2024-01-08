@@ -222,7 +222,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon = new SSCommon(this);
+	transient protected final SSCommon ssCommon = new SSCommon(this);
 
 	/**
 	 * Constructs a new, empty text field.
@@ -472,16 +472,6 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 		final int oldValue = numberOfDecimalPlaces;
 		numberOfDecimalPlaces = _numberOfDecimalPlaces;
 		firePropertyChange("numberOfDecimalPlaces", oldValue, numberOfDecimalPlaces);
-	}
-
-	/**
-	 * Sets the SSCommon data member for the current Swingset Component.
-	 *
-	 * @param _ssCommon shared/common SwingSet component data and methods
-	 */
-	@Override
-	public void setSSCommon(final SSCommon _ssCommon) {
-		ssCommon = _ssCommon;
 	}
 
 	/**

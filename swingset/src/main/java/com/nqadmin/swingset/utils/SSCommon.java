@@ -107,7 +107,7 @@ import static com.nqadmin.swingset.SSDataNavigator.isAcceptingChanges;
  * A good example of this is SSDBComboBox, which may be used solely for
  * navigation.
  */
-public class SSCommon implements Serializable {
+public class SSCommon {
 
 	private static final Boolean DISABLE_GENERAL_VALIDATION = false;
 
@@ -151,6 +151,7 @@ public class SSCommon implements Serializable {
 		private int lastChange = 0;
 		private int lastNotifiedChange = 0;
 
+		/** {@inheritDoc} */
 		@Override
 		public void changedUpdate(final DocumentEvent de) {
 			lastChange++;
@@ -178,12 +179,14 @@ public class SSCommon implements Serializable {
 			});
 		}
 
+		/** {@inheritDoc} */
 		@Override
 		public void insertUpdate(final DocumentEvent de) {
 			logger.trace("{} - insertUpdate().", () -> getColumnForLog());
 			changedUpdate(de);
 		}
 
+		/** {@inheritDoc} */
 		@Override
 		public void removeUpdate(final DocumentEvent de) {
 			logger.trace("{} - removeUpdate().", () -> getColumnForLog());
@@ -289,7 +292,7 @@ public class SSCommon implements Serializable {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Constant to indicate that no RowSet column index has been specified.
@@ -391,7 +394,7 @@ public class SSCommon implements Serializable {
 	/**
 	 * parent SwingSet component
 	 */
-	transient private SSComponentInterface ssComponent = null;
+	transient private final SSComponentInterface ssComponent;
 
 	/**
 	 * database connection
@@ -425,11 +428,9 @@ public class SSCommon implements Serializable {
 	 * @param _ssComponent SwingSet component having this SSCommon instance as a
 	 *                     datamember
 	 */
+	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSCommon(final SSComponentInterface _ssComponent) {
-		decorator = Decorator.nullDecorator;
-		validator = Validator.nullValidator;
-		setSSComponent(_ssComponent);
-		initDecorator();
+=======
 		init();
 	}
 
@@ -1018,16 +1019,6 @@ public class SSCommon implements Serializable {
 
 		}
 
-	}
-
-	/**
-	 * Sets the SwingSet component of which this SSCommon instance is a datamember.
-	 *
-	 * @param _ssComponent the parent/calling SwingSet JComponent implementing
-	 *                     SSComponentInterface
-	 */
-	public void setSSComponent(final SSComponentInterface _ssComponent) {
-		ssComponent = _ssComponent;
 	}
 
 	/**

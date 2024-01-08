@@ -162,7 +162,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon = new SSCommon(this);
+	transient protected final SSCommon ssCommon = new SSCommon(this);
 
 	/**
 	 * Construct a default SSImage Object.
@@ -284,17 +284,6 @@ public class SSImage extends JPanel implements SSComponentInterface {
 				new Dimension((int) _preferredSize.getWidth(), (int) _preferredSize.getHeight() - 20));
 		btnUpdateImage.setPreferredSize(new Dimension((int) _preferredSize.getWidth(), 20));
 		super.setPreferredSize(_preferredSize);
-	}
-
-	/**
-	 * Sets the SSCommon data member for the current Swingset Component.
-	 *
-	 * @param _ssCommon shared/common SwingSet component data and methods
-	 */
-	@Override
-	public void setSSCommon(final SSCommon _ssCommon) {
-		ssCommon = _ssCommon;
-
 	}
 
 	/**

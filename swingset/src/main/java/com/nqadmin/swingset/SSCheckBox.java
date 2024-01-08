@@ -155,7 +155,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon = new SSCommon(this);
+	transient protected final SSCommon ssCommon = new SSCommon(this);
 
 	/**
 	 * Unchecked value for numeric columns.
@@ -223,17 +223,6 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	@Override
 	public SSCheckBoxListener getSSComponentListener() {
 		return new SSCheckBoxListener();
-	}
-
-	/**
-	 * Sets the SSCommon data member for the current Swingset Component.
-	 *
-	 * @param _ssCommon shared/common SwingSet component data and methods
-	 */
-	@Override
-	public void setSSCommon(final SSCommon _ssCommon) {
-		ssCommon = _ssCommon;
-
 	}
 
 	/**

@@ -316,8 +316,14 @@ public class SSFormattedTextField extends JFormattedTextField
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon = new SSCommon(this);
-		
+	transient protected final SSCommon ssCommon = new SSCommon(this);
+
+	/**
+	 * Used to store background color prior to change following focusGained event so
+	 * that the color can be restored upon focusLost.
+	 */
+	private java.awt.Color standardBackgroundColor = null;
+
 	/**
 	 * Creates a new instance of SSFormattedTextField
 	 */
@@ -493,16 +499,6 @@ public class SSFormattedTextField extends JFormattedTextField
 
 		setAllowNull(_nullable);
 
-	}
-
-	/**
-	 * Sets the SSCommon data member for the current Swingset Component.
-	 *
-	 * @param _ssCommon shared/common SwingSet component data and methods
-	 */
-	@Override
-	public void setSSCommon(final SSCommon _ssCommon) {
-		ssCommon = _ssCommon;
 	}
 
 	/**
