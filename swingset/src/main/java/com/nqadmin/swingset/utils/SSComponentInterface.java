@@ -544,13 +544,6 @@ public interface SSComponentInterface {
 	}
 
 	/**
-	 * Sets the SSCommon data member of the Swingset Component.
-	 *
-	 * @param _ssCommon shared/common SwingSet component data and methods
-	 */
-	void setSSCommon(SSCommon _ssCommon);
-
-	/**
 	 * Sets the Connection to the database
 	 *
 	 * @param _connection the connection to set
