@@ -45,7 +45,6 @@ import java.sql.Types;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.sql.RowSet;
 import javax.swing.JOptionPane;
@@ -54,6 +53,7 @@ import javax.swing.table.AbstractTableModel;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSUtils;
 
 // SSTableModel.java
@@ -90,31 +90,11 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _strDate String containing a date in "MM/dd/yyyy" format.
 	 *
 	 * @return String date reformatted as an SQL date
+	 * @deprecated Use SSCommon.getSQLDate
 	 */
+	@Deprecated
 	protected static Date getSQLDate(final String _strDate) {
-		// TODO: 4.x: this should be available somewhere else
-		//		 as part of SwingSet.
-
-		// remove any leading/trailing spaces (e.g., could be introduced from
-		// copy/paste)
-		String newStrDate = _strDate.trim();
-
-		// check for empty string
-		if (newStrDate.equals("")) {
-			return null;
-		}
-
-		// REMOVE ANY SPACES IF ANY (This could happen if copying from another
-		// application)
-		// _strDate = _strDate.trim();
-		// String newStrDate = _strDate;
-		if (newStrDate.indexOf("/") != -1) {
-			final StringTokenizer strtok = new StringTokenizer(newStrDate, "/", false);
-			final String month = strtok.nextToken();
-			final String day = strtok.nextToken();
-			newStrDate = strtok.nextToken() + "-" + month + "-" + day;
-		}
-		return Date.valueOf(newStrDate);
+		return SSCommon.getSQLDate(_strDate);
 	}
 
 	/**
@@ -344,7 +324,7 @@ public class SSTableModel extends AbstractTableModel {
 	public Object getDefaultValue(final int _columnNumber) {
 		Object value = null;
 		if (defaultValuesMap != null) {
-			value = defaultValuesMap.get(new Integer(_columnNumber));
+			value = defaultValuesMap.get(_columnNumber);
 		}
 		return value;
 	}
@@ -400,25 +380,27 @@ public class SSTableModel extends AbstractTableModel {
 			// START FROM 0
 			//final int type = rowset.getColumnType(_column + 1);
 			final int type = RowSetOps.getColumnType(rowset, _column + 1);
+			// TODO: Types not consistent with RowSetOps.
+			//		 May not matter because jdbc does a lot of conversions.
 			switch (type) {
 			case Types.INTEGER:
 			case Types.SMALLINT:
 			case Types.TINYINT:
-				value = new Integer(rowset.getInt(_column + 1));
+				value = rowset.getInt(_column + 1);
 				break;
 			case Types.BIGINT:
-				value = new Long(rowset.getLong(_column + 1));
+				value = rowset.getLong(_column + 1);
 				break;
 			case Types.FLOAT:
-				value = new Float(rowset.getFloat(_column + 1));
+				value = rowset.getFloat(_column + 1);
 				break;
 			case Types.DOUBLE:
 			case Types.NUMERIC:
-				value = new Double(rowset.getDouble(_column + 1));
+				value = rowset.getDouble(_column + 1);
 				break;
 			case Types.BOOLEAN:
 			case Types.BIT:
-				value = new Boolean(rowset.getBoolean(_column + 1));
+				value = rowset.getBoolean(_column + 1);
 				break;
 			case Types.DATE:
 			case Types.TIMESTAMP:
@@ -528,7 +510,7 @@ public class SSTableModel extends AbstractTableModel {
 				break;
 			case Types.DATE:
 				if (_value instanceof String) {
-					rowset.updateDate(_column + 1, getSQLDate((String) _value));
+					rowset.updateDate(_column + 1, SSCommon.getSQLDate((String) _value));
 				} else {
 					rowset.updateDate(_column + 1, (Date) _value);
 				}
@@ -633,39 +615,39 @@ public class SSTableModel extends AbstractTableModel {
 
 				// COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
 				//final int type = rowset.getColumnType(column.intValue() + 1);
-				final int type = RowSetOps.getColumnType(rowset, column.intValue() + 1);
+				final int type = RowSetOps.getColumnType(rowset, column + 1);
 				switch (type) {
 				case Types.INTEGER:
 				case Types.SMALLINT:
 				case Types.TINYINT:
-					rowset.updateInt(column.intValue() + 1,
+					rowset.updateInt(column + 1,
 							((Integer) defaultValuesMap.get(column)));
 					break;
 				case Types.BIGINT:
-					rowset.updateLong(column.intValue() + 1,
+					rowset.updateLong(column + 1,
 							((Long) defaultValuesMap.get(column)));
 					break;
 				case Types.FLOAT:
-					rowset.updateFloat(column.intValue() + 1,
+					rowset.updateFloat(column + 1,
 							((Float) defaultValuesMap.get(column)));
 					break;
 				case Types.DOUBLE:
 				case Types.NUMERIC:
-					rowset.updateDouble(column.intValue() + 1,
+					rowset.updateDouble(column + 1,
 							((Double) defaultValuesMap.get(column)));
 					break;
 				case Types.BOOLEAN:
 				case Types.BIT:
-					rowset.updateBoolean(column.intValue() + 1,
+					rowset.updateBoolean(column + 1,
 							((Boolean) defaultValuesMap.get(column)));
 					break;
 				case Types.DATE:
-					rowset.updateDate(column.intValue() + 1, (Date) defaultValuesMap.get(column));
+					rowset.updateDate(column + 1, (Date) defaultValuesMap.get(column));
 					break;
 				case Types.CHAR:
 				case Types.VARCHAR:
 				case Types.LONGVARCHAR:
-					rowset.updateString(column.intValue() + 1, (String) defaultValuesMap.get(column));
+					rowset.updateString(column + 1, (String) defaultValuesMap.get(column));
 					break;
 				default:
 					logger.warn("Unknown data type of " + type);
@@ -701,7 +683,7 @@ public class SSTableModel extends AbstractTableModel {
 		}
 		if ((_columnNumbers != null) && (_values != null)) {
 			for (int i = 0; i < _columnNumbers.length; i++) {
-				defaultValuesMap.put(new Integer(_columnNumbers[i]), _values[i]);
+				defaultValuesMap.put(_columnNumbers[i], _values[i]);
 			}
 		}
 	}
@@ -886,7 +868,7 @@ public class SSTableModel extends AbstractTableModel {
 		Object valueCopy = _value;
 
 		// GET THE TYPE OF THE COLUMN
-		int type = -1;
+		int type;
 		try {
 			//type = rowset.getColumnType(_column + 1);
 			type = RowSetOps.getColumnType(rowset, _column + 1);
@@ -903,11 +885,11 @@ public class SSTableModel extends AbstractTableModel {
 		// IF COPYING VALUES THE DATE WILL COME AS STRING SO CONVERT IT TO DATE OBJECT.
 		if (type == Types.DATE) {
 			if (valueCopy instanceof String) {
-				valueCopy = getSQLDate((String) valueCopy);
+				valueCopy = SSCommon.getSQLDate((String) valueCopy);
 			}
 		} else if (type == Types.TIMESTAMP) {
 			if (valueCopy instanceof String) {
-				valueCopy = new Timestamp(getSQLDate((String) valueCopy).getTime());
+				valueCopy = new Timestamp(SSCommon.getSQLDate((String) valueCopy).getTime());
 			}
 		}
 

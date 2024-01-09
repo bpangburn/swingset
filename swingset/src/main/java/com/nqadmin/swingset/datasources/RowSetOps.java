@@ -469,7 +469,7 @@ public class RowSetOps {
 		case BOOLEAN:
 		case BIT:
 			// CONVERT THE GIVEN STRING TO BOOLEAN TYPE
-			final boolean boolValue = Boolean.valueOf(_updatedValue);
+			final boolean boolValue = Boolean.parseBoolean(_updatedValue);
 			_rowSet.updateBoolean(_columnName, boolValue);
 			break;
 			
@@ -588,7 +588,7 @@ public class RowSetOps {
 
 	// TODO: for override of type mapping for local/dbms requirements
 	// with_timezone might be the perfect candidates
-	private static final EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType = new EnumMap<JDBCType, Class<?>>(JDBCType.class);
+	private static final EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType = new EnumMap<>(JDBCType.class);
 	/**
 	 * Determine the Java type class for the given database type.
 	 * @param _jdbcType JDBCType of interest
