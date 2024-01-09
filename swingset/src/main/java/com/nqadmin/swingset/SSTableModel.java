@@ -39,6 +39,7 @@ package com.nqadmin.swingset;
 
 import java.awt.Component;
 import java.sql.Date;
+import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -58,6 +59,8 @@ import org.apache.logging.log4j.Logger;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.datasources.RowSetOps.updateColumnObject;
 
 // SSTableModel.java
 //
@@ -238,51 +241,14 @@ public class SSTableModel extends AbstractTableModel {
 	 */
 	@Override
 	public Class<?> getColumnClass(final int _column) {
-		
-		// TODO May be able to utilize JDBCType Enum here.
-		// TODO This may be better as a static method in RowSetOps
-		
-		int type;
 		try {
-			//type = rowset.getColumnType(_column + 1);
-			type = RowSetOps.getColumnType(rowset, _column + 1);
+			JDBCType type = RowSetOps.getJDBCColumnType(rowset, _column + 1);
+			return RowSetOps.findJavaTypeClass(type);
+			
 		} catch (final SQLException se) {
 			logger.debug("SQL Exception.",  se);
 			return super.getColumnClass(_column);
 		}
-
-		switch (type) {
-		case Types.INTEGER:
-		case Types.SMALLINT:
-		case Types.TINYINT:
-			return Integer.class;
-
-		case Types.BIGINT:
-			return Long.class;
-
-		case Types.FLOAT:
-			return Float.class;
-
-		case Types.DOUBLE:
-		case Types.NUMERIC:
-			return Double.class;
-
-		case Types.BOOLEAN:
-		case Types.BIT:
-			return Boolean.class;
-
-		case Types.DATE:
-			return java.sql.Date.class;
-
-		case Types.CHAR:
-		case Types.VARCHAR:
-		case Types.LONGVARCHAR:
-			return String.class;
-
-		default:
-			return Object.class;
-		}
-
 	} // end public Class getColumnClass(int _column) {
 
 	/**
@@ -639,48 +605,10 @@ public class SSTableModel extends AbstractTableModel {
 
 				logger.debug("Column number is:" + column);
 				
-				// TODO May be able to utilize JDBCType Enum here.
-				// TODO This may be better as a static method in RowSetOps
-
 				// COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
 				//final int type = rowset.getColumnType(column.intValue() + 1);
-				final int type = RowSetOps.getColumnType(rowset, column + 1);
-				switch (type) {
-				case Types.INTEGER:
-				case Types.SMALLINT:
-				case Types.TINYINT:
-					rowset.updateInt(column + 1,
-							((Integer) defaultValuesMap.get(column)));
-					break;
-				case Types.BIGINT:
-					rowset.updateLong(column + 1,
-							((Long) defaultValuesMap.get(column)));
-					break;
-				case Types.FLOAT:
-					rowset.updateFloat(column + 1,
-							((Float) defaultValuesMap.get(column)));
-					break;
-				case Types.DOUBLE:
-				case Types.NUMERIC:
-					rowset.updateDouble(column + 1,
-							((Double) defaultValuesMap.get(column)));
-					break;
-				case Types.BOOLEAN:
-				case Types.BIT:
-					rowset.updateBoolean(column + 1,
-							((Boolean) defaultValuesMap.get(column)));
-					break;
-				case Types.DATE:
-					rowset.updateDate(column + 1, (Date) defaultValuesMap.get(column));
-					break;
-				case Types.CHAR:
-				case Types.VARCHAR:
-				case Types.LONGVARCHAR:
-					rowset.updateString(column + 1, (String) defaultValuesMap.get(column));
-					break;
-				default:
-					logger.warn("Unknown data type of " + type);
-				} // END OF SWITCH
+				updateColumnObject(rowset, defaultValuesMap.get(column), column + 1,
+								   RowSetOps.getJDBCColumnType(rowset, column + 1));
 
 			} // END OF WHILE
 
@@ -763,49 +691,9 @@ public class SSTableModel extends AbstractTableModel {
 	 */
 	protected void setPrimaryColumn() {
 		try {
-			
-			// TODO May be able to utilize JDBCType Enum here.
-			// TODO This may be better as a static method in RowSetOps
-
 			//final int type = rowset.getColumnType(primaryColumn + 1);
-			final int type = RowSetOps.getColumnType(rowset, primaryColumn + 1);
-
-			switch (type) {
-			case Types.INTEGER:
-			case Types.SMALLINT:
-			case Types.TINYINT:
-				rowset.updateInt(primaryColumn + 1,
-						((Integer) dataValue.getPrimaryColumnValue()));
-				break;
-			case Types.BIGINT:
-				rowset.updateLong(primaryColumn + 1,
-						((Long) dataValue.getPrimaryColumnValue()));
-				break;
-			case Types.FLOAT:
-				rowset.updateFloat(primaryColumn + 1,
-						((Float) dataValue.getPrimaryColumnValue()));
-				break;
-			case Types.DOUBLE:
-			case Types.NUMERIC:
-				rowset.updateDouble(primaryColumn + 1,
-						((Double) dataValue.getPrimaryColumnValue()));
-				break;
-			case Types.BOOLEAN:
-			case Types.BIT:
-				rowset.updateBoolean(primaryColumn + 1,
-						((Boolean) dataValue.getPrimaryColumnValue()));
-				break;
-			case Types.DATE:
-				rowset.updateDate(primaryColumn + 1, (Date) dataValue.getPrimaryColumnValue());
-				break;
-			case Types.CHAR:
-			case Types.VARCHAR:
-			case Types.LONGVARCHAR:
-				rowset.updateString(primaryColumn + 1, (String) dataValue.getPrimaryColumnValue());
-				break;
-			default:
-				logger.warn("Unknown data type of " + type);
-			}
+			updateColumnObject(rowset, dataValue.getPrimaryColumnValue(), primaryColumn + 1,
+							   RowSetOps.getJDBCColumnType(rowset, primaryColumn + 1));
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while insering Primary Key value.",  se);
 			if (component != null) {
@@ -961,44 +849,8 @@ public class SSTableModel extends AbstractTableModel {
 				return;
 			}
 			
-			// TODO May be able to utilize JDBCType Enum here.
-			// TODO This may be better as a static method in RowSetOps
+			updateColumnObject(rowset, valueCopy, _column + 1, JDBCType.valueOf(type));
 
-			switch (type) {
-			case Types.INTEGER:
-			case Types.SMALLINT:
-			case Types.TINYINT:
-				rowset.updateInt(_column + 1, ((Integer) valueCopy));
-				break;
-			case Types.BIGINT:
-// adding update long support 11-01-2004
-				rowset.updateLong(_column + 1, ((Long) valueCopy));
-				break;
-			case Types.FLOAT:
-				rowset.updateFloat(_column + 1, ((Float) valueCopy));
-				break;
-			case Types.DOUBLE:
-			case Types.NUMERIC:
-				rowset.updateDouble(_column + 1, ((Double) valueCopy));
-				break;
-			case Types.BOOLEAN:
-			case Types.BIT:
-				rowset.updateBoolean(_column + 1, ((Boolean) valueCopy));
-				break;
-			case Types.DATE:
-				rowset.updateDate(_column + 1, (Date) valueCopy);
-				break;
-			case Types.TIMESTAMP:
-				rowset.updateTimestamp(_column + 1, (Timestamp) valueCopy);
-				break;
-			case Types.CHAR:
-			case Types.VARCHAR:
-			case Types.LONGVARCHAR:
-				rowset.updateString(_column + 1, (String) valueCopy);
-				break;
-			default:
-				logger.warn("Unknown data type of " + type);
-			}
 			rowset.updateRow();
 
 			logger.debug("Updated value: {}.", () -> getValueAt(_row,_column));

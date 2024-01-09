@@ -45,7 +45,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
 import java.util.Calendar;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -164,6 +165,7 @@ public class RowSetOps {
 	 * @param _columnName - name of database column to retrieve
 	 *
 	 * @return text representation of data in specified column
+	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
 	 */
 	public static String getColumnText(final RowSet _rowSet, final String _columnName) {
 		String value = null;
@@ -191,12 +193,12 @@ public class RowSetOps {
 				value = String.valueOf(_rowSet.getLong(_columnName));
 				break;
 
-			case FLOAT:
+			case REAL:
 				value = String.valueOf(_rowSet.getFloat(_columnName));
 				break;
 
 			case DOUBLE:
-			case REAL:
+			case FLOAT:
 				value = String.valueOf(_rowSet.getDouble(_columnName));
 				break;
 				
@@ -205,32 +207,48 @@ public class RowSetOps {
 				value = String.valueOf(_rowSet.getBigDecimal(_columnName));
 				break;
 
-			case BOOLEAN:
 			case BIT:
+			case BOOLEAN:
 				value = String.valueOf(_rowSet.getBoolean(_columnName));
 				break;
 // TODO: Convert this to use java.time.LocalDate, LocalTime, or LocalDateTime as needed.
 			case DATE:
-			case TIMESTAMP:
+				// NOTE: See SSCommon/getStringDate for a modified version
+				// Convert to "##/##/####", month/day/year, month day has two digits.
 				final Date date = _rowSet.getDate(_columnName);
 				if (date == null) {
 					value = "";
 				} else {
+					//
+					// TODO: Would the "SSCommon.getStringDate" format be OK?
+					//		 That format does not have leading zero on
+					//		 single digit month or day.
+					//
 					final GregorianCalendar calendar = new GregorianCalendar();
 					calendar.setTime(date);
-					value = "";
-					if ((calendar.get(Calendar.MONTH) + 1) < 10) {
-						value = "0";
-					}
-					value = value + (calendar.get(Calendar.MONTH) + 1) + "/";
-
-					if (calendar.get(Calendar.DAY_OF_MONTH) < 10) {
-						value = value + "0";
-					}
-					value = value + calendar.get(Calendar.DAY_OF_MONTH) + "/";
-					value = value + calendar.get(Calendar.YEAR);
+					value = String.format("%02d/%02d/%d",
+							calendar.get(Calendar.MONTH) + 1,
+							calendar.get(Calendar.DAY_OF_MONTH),
+							calendar.get(Calendar.YEAR));
 				}
 				break;
+			case TIMESTAMP:
+				Timestamp timestamp = _rowSet.getTimestamp(_columnName);
+				if (timestamp == null) {
+					value = "";
+				} else {
+					//
+					// TODO: this isn't "month/day/year". DOES THAT MATTER?
+					//
+					// Convert to "yyyy-mm-dd hh:mm:ss.fffffffff"
+					// substring(0, 19) // without the nanoseconds
+					// This format matches what "updateColumnText" expects
+					//System.err.println("TIMESTAMP get: " + timestamp);
+					value = timestamp.toString();
+				}
+				break;
+
+				
 // TODO: Convert this to use java.time.LocalTime.
 			case TIME:
 				final Time time = _rowSet.getTime(_columnName);
@@ -244,6 +262,9 @@ public class RowSetOps {
 			case CHAR:
 			case VARCHAR:
 			case LONGVARCHAR:
+			case NCHAR:
+			case NVARCHAR:
+			case LONGNVARCHAR:
 				final String str = _rowSet.getString(_columnName);
 				if (str == null) {
 					value = "";
@@ -253,6 +274,7 @@ public class RowSetOps {
 				break;
 
 			default:
+				// TODO: SSSQLExceptionUnhandledType
 				logger.error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
 			} // end switch
 
@@ -403,6 +425,7 @@ public class RowSetOps {
 	 * @throws NullPointerException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 * @throws NumberFormatException thrown if unable to parse a string to number format
+	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
 	 */
 	// TODO: Eclipse is giving a Potential null pointer access, but we have assert(_updatedValue != null) so may be able to remove warning in future.
 	@SuppressWarnings("null")
@@ -477,15 +500,13 @@ public class RowSetOps {
 			_rowSet.updateLong(_columnName, longValue);
 			break;
 			
-		case FLOAT:
+		case REAL:
 			final float floatValue = Float.parseFloat(_updatedValue);
 			_rowSet.updateFloat(_columnName, floatValue);
 			break;
 			
 		case DOUBLE:
-		//case NUMERIC: 
-		//case DECIMAL:
-		case REAL:
+		case FLOAT:
 			final double doubleValue = Double.parseDouble(_updatedValue);
 			_rowSet.updateDouble(_columnName, doubleValue);
 			break;
@@ -503,12 +524,19 @@ public class RowSetOps {
 			break;
 			
 		case DATE:
+			// TODO: there's an ignored IllegalArgumentException possible
+			// Convert a 10 character date "mm/dd/yyyy" or "yyyy-mm-dd"
 // TODO Good to get rid of getSQLDate if possible.
 // 2022-05-31_BP: Probably best to cast to a LocalDate and return if that fails.
 // 	Can convert to SQL Date if successful.
 			if (_updatedValue.length() == 10) {
-				Date dateValue = SSCommon.getSQLDate(_updatedValue);
-				_rowSet.updateDate(_columnName, dateValue);
+				try {
+					Date dateValue = SSCommon.getSQLDate(_updatedValue);
+					_rowSet.updateDate(_columnName, dateValue);
+				} catch(IllegalArgumentException ex) {
+					logger.warn("updateColumnText: DATE: " + ex.getMessage());
+					throw ex;
+				}
 // Per https://github.com/bpangburn/swingset/issues/141,
 // this else block is throwing an exception for every character pressed for the SSTextField date mask.				
 //			} else {
@@ -519,36 +547,51 @@ public class RowSetOps {
 			break;
 			
 		case TIME:
-// TODO: Probably a better way to handle date to timestamp conversion. Formatter? Get rid of getSQLDate() if possible.
-// 2022-05-31_BP: Probably best to cast to a LocalDateTime and return if that fails.
-//	Can convert to SQL Timestamp if successful.			
-			// CONVERT ANY 10 CHARACTER DATE (e.g., yyyy-mm-dd, mm/dd/yyyy to a date/time)			
-			Time timeValue = java.sql.Time.valueOf(_updatedValue);
-			_rowSet.updateTime(_columnName, timeValue);
+			// TODO: there's an ignored IllegalArgumentException possible
+			// Convert a time like "hh:mm:ss"
+// TODO: Better way to handle Time conversion? Formatter? 
+			if (_updatedValue.length() == 8) {
+				try {
+					Time timeValue = java.sql.Time.valueOf(_updatedValue);
+					_rowSet.updateTime(_columnName, timeValue);
+				} catch(IllegalArgumentException ex) {
+					logger.warn("updateColumnText: TIME: " + ex.getMessage());
+					throw ex;
+				}
+			}
 			break;
 			
 		case TIMESTAMP:
-// TODO: Probably a better way to handle date to timestamp conversion. Formatter? Get rid of getSQLDate() if possible.
+			// TODO: there's an ignored IllegalArgumentException possible
+			// Convert something like
+			// "yyyy-mm-dd hh:mm:ss" or "yyyy-mm-dd hh:mm:ss.f[ff...]"
+
+// TODO: Probably a better way to handle date to timestamp conversion. Formatter?
 // 2022-05-31_BP: Probably best to cast to a LocalDateTime and return if that fails.
-//	Can convert to SQL Timestamp if successful.			
-			// CONVERT ANY 10 CHARACTER DATE (e.g., yyyy-mm-dd, mm/dd/yyyy to a date/time)
-			if (_updatedValue.length() == 10) {
-				Timestamp timestampValue = new Timestamp(SSCommon.getSQLDate(_updatedValue).getTime());
-				_rowSet.updateTimestamp(_columnName, timestampValue);
-			} else {
-			// Per ER email 2020-11-25, we weren't even trying to handle a legitimate timestamp
-				Timestamp timeStampValue = java.sql.Timestamp.valueOf(_updatedValue);
-				_rowSet.updateTimestamp(_columnName, timeStampValue);
+			Timestamp timestampValue;
+			try {
+				if (_updatedValue.length() == 19 || _updatedValue.length() > 20) {
+					//System.err.println("TIMESTAMP update: " + _updatedValue);
+					timestampValue = java.sql.Timestamp.valueOf(_updatedValue);
+					_rowSet.updateTimestamp(_columnName, timestampValue);
+				}
+			} catch(IllegalArgumentException ex) {
+				logger.warn("updateColumnText: TIMESTAMP: " + ex.getMessage());
+				throw ex;
 			}
 			break;
 			
 		case CHAR:
 		case VARCHAR:
 		case LONGVARCHAR:
+		case NCHAR:
+		case NVARCHAR:
+		case LONGNVARCHAR:
 			_rowSet.updateString(_columnName, _updatedValue);
 			break;
 
 		default:
+			// TODO: SSSQLExceptionUnhandledType
 			throw new IllegalStateException("switch cases out of sync");
 		} // end switch
 
@@ -618,16 +661,33 @@ public class RowSetOps {
 	// TODO: for override of type mapping for local/dbms requirements
 	// with_timezone might be the perfect candidates
 	private static final EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType = new EnumMap<>(JDBCType.class);
+	private static void overrideJdbcStandard()
+	{
+		// The *_WITH_TIMEZONE aren't mentioned in appendix B.1 or B.3
+		overrideJdbcToJavaType.put(JDBCType.TIME_WITH_TIMEZONE,
+								   OffsetTime.class);
+		overrideJdbcToJavaType.put(JDBCType.TIMESTAMP_WITH_TIMEZONE,
+								   OffsetDateTime.class);
+
+		// overrideJdbcToJavaType.put(JDBCType.SMALLINT, Byte.class);
+		// overrideJdbcToJavaType.put(JDBCType.TINYINT, Short.class);
+	}
+	static { overrideJdbcStandard(); }
+	
 	/**
 	 * Determine the Java type class for the given database type.
 	 * @param _jdbcType JDBCType of interest
 	 * @return the class object used for the given type
 	 * @throws SQLException if the JDBCType is not handled
+	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B.3 JDBC Types Mapped to Java Object Types
 	 */
 	public static Class<?> findJavaTypeClass(final JDBCType _jdbcType)
 	throws SQLException {
 		Class<?> clazz = overrideJdbcToJavaType.getOrDefault(_jdbcType, null);
 		if (clazz != null) {
+			if (clazz == Exception.class) {
+				throw new SQLException("Unhandled type: " + _jdbcType);
+			}
 			return clazz;
 		}
 
@@ -637,29 +697,33 @@ public class RowSetOps {
 			case TINYINT:
 				clazz = Integer.class;
 				break;
-			case BIT:
-				clazz = Boolean.class;
-				break;
 			case BIGINT:
 				clazz = Long.class;
 				break;
+			case REAL:
+				clazz = Float.class;
+				break;
 			case FLOAT:
 			case DOUBLE:
-			case REAL:
 				clazz = Double.class;
 				break;
 			case DECIMAL:
 			case NUMERIC:
 				clazz = BigDecimal.class;
 				break;
-			case DATE:
-			case TIME:
-			case TIMESTAMP:
-				clazz = java.util.Date.class;
+			case BIT:
+			case BOOLEAN:
+				clazz = Boolean.class;
 				break;
-			case TIME_WITH_TIMEZONE:
-			case TIMESTAMP_WITH_TIMEZONE:
-				clazz = Instant.class;
+			//case DATE: case TIME: case TIMESTAMP: clazz = java.util.Date.class; break;
+			case DATE:
+				clazz = java.sql.Date.class;
+				break;
+			case TIME:
+				clazz = java.sql.Time.class;
+				break;
+			case TIMESTAMP:
+				clazz = java.sql.Timestamp.class;
 				break;
 			case CHAR:
 			case VARCHAR:
@@ -669,9 +733,119 @@ public class RowSetOps {
 			case LONGNVARCHAR:
 				clazz = String.class;
 				break;
+
+			// case ARRAY:
+			// 	clazz = java.sql.Array.class;
+			// 	break;
+
+			// case BINARY:
+			// case VARBINARY:
+			// case LONGVARBINARY:
+			// 	clazz = byte[].class;
+			// 	break;
+
+			// case CLOB: clazz = java.sql.Clob.class; break;
+			// case BLOB: clazz = java.sql.Blob.class; break;
+			// case REF: clazz = java.sql.Ref.class; break;
+			// case DATALINK: clazz = java.net.URL.class; break;
+			// case ROWID: clazz = java.sql.RowId.class; break;
+			// case NCLOB: clazz = java.sql.NClob.class; break;
+			// case SQLXML: clazz = java.sql.SQLXML.class; break;
 			default:
+				// TODO: SSSQLExceptionUnhandledType
 				throw new SQLException("Unhandled type: " + _jdbcType);
 		}
 		return clazz;
+
+		// case DISTINCT: Object type of underlying type
+		// case STRUCT: java.sql.Struct or java.sql.SQLData
+		// case JAVA_OBJECT: Underlying Java class
+	}
+
+	// FOLLOWING ONLY USED FROM SSTableModel (AT LEAST FOR NOW)
+
+
+	/**
+	 * Update the Grid's RowSet at the specified column index with the given Object value.
+	 * RowSet. Operate on the current row.
+	 * <p>
+	 * When the user changes/edits the SSDataGrid cell this method propagates the
+	 * change to the RowSet. A separate call is required to flush/commit the change
+	 * to the database.
+	 *
+	 * @param _rowSet RowSet on which to operate
+	 * @param _value string to be type-converted as needed and updated in
+	 *                      underlying RowSet column
+	 * @param _columnIndex   index of the database column
+	 * @param type NOT USED, the jdbc driver does the conversion
+	 * @throws SQLException  thrown if a database error is encountered
+	 */
+	public static void updateColumnObject(RowSet _rowSet, Object _value, int _columnIndex, JDBCType type) throws SQLException {
+		_rowSet.updateObject(_columnIndex, _value);
+	}
+
+	/**
+	 * Update the Grid's RowSet at the specified column index with the given Object value.
+	 * RowSet. Operate on the current row.
+	 * <p>
+	 * When the user changes/edits the SSDataGrid cell this method propagates the
+	 * change to the RowSet. A separate call is required to flush/commit the change
+	 * to the database.
+	 *
+	 * @param _rowSet RowSet on which to operate
+	 * @param _value string to be type-converted as needed and updated in
+	 *                      underlying RowSet column
+	 * @param _columnIndex   index of the database column
+	 * @param type The JDBCType of the column
+	 * @throws SQLException  thrown if a database error is encountered
+	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
+	 */
+	public static void updateColumnObject2(RowSet _rowSet, Object _value, int _columnIndex, JDBCType type) throws SQLException {
+		switch (type) {
+		case INTEGER:
+		case SMALLINT:
+		case TINYINT:
+			_rowSet.updateInt(_columnIndex, ((Integer) _value));
+			break;
+		case BIGINT:
+			_rowSet.updateLong(_columnIndex, ((Long) _value));
+			break;
+		case REAL:
+			_rowSet.updateFloat(_columnIndex, ((Float) _value));
+			break;
+		case FLOAT:
+		case DOUBLE:
+			_rowSet.updateDouble(_columnIndex, ((Double) _value));
+			break;
+		case DECIMAL:
+		case NUMERIC:
+			_rowSet.updateBigDecimal(_columnIndex, ((BigDecimal) _value));
+			break;
+		case BOOLEAN:
+		case BIT:
+			_rowSet.updateBoolean(_columnIndex, ((Boolean) _value));
+			break;
+		case DATE:
+			_rowSet.updateDate(_columnIndex, (Date) _value);
+			break;
+		case TIME:
+			_rowSet.updateTime(_columnIndex, (Time) _value);
+			break;
+		case TIMESTAMP:
+			_rowSet.updateTimestamp(_columnIndex, (Timestamp) _value);
+			break;
+		case CHAR:
+		case VARCHAR:
+		case LONGVARCHAR:
+		case NCHAR:
+		case NVARCHAR:
+		case LONGNVARCHAR:
+			_rowSet.updateString(_columnIndex, (String) _value);
+			break;
+		default:
+			// TODO: SSSQLExceptionUnhandledType
+			logger.warn("Unknown data type of " + type);
+		}
+		
 	}
 }

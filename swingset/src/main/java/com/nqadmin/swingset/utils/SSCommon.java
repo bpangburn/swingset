@@ -298,9 +298,11 @@ public class SSCommon implements Serializable {
 	 * @param _strDate date string in "[m]m/[d]d/yyyy" format
 	 *
 	 * @return return SQL date for the string specified
-	 * @throws NoSuchElementException if there are no more tokens in this tokenizer's string
+	 * @throws IllegalArgumentException if data conversion fails
 	 */
-	public static Date getSQLDate(final String _strDate) {
+	// TODO: check that all callers handle excepted as needed
+	public static Date getSQLDate(final String _strDate)
+	throws IllegalArgumentException {
 		if (_strDate == null) {
 			return null;
 		}
@@ -309,10 +311,14 @@ public class SSCommon implements Serializable {
 			return null;
 		}
 		if (strDate.contains("/")) {
-			StringTokenizer strtok = new StringTokenizer(strDate, "/", false);
-			String month = strtok.nextToken();
-			String day = strtok.nextToken();
-			strDate = strtok.nextToken() + "-" + month + "-" + day;
+			try {
+				StringTokenizer strtok = new StringTokenizer(strDate, "/", false);
+				String month = strtok.nextToken();
+				String day = strtok.nextToken();
+				strDate = strtok.nextToken() + "-" + month + "-" + day;
+			} catch (NoSuchElementException ex) {
+				throw new IllegalArgumentException("Date conversion: not enough tokens", ex);
+			}
 		}
 		return Date.valueOf(strDate);
 	}
