@@ -48,6 +48,7 @@ import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EventListener;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -398,13 +399,21 @@ public class SSCommon {
 	 * @param _strDate date string in "MM/dd/yyyy" format
 	 *
 	 * @return return SQL date for the string specified
+	 * @throws NoSuchElementException if there are no more tokens in this tokenizer's string
+	 * @throws IllegalArgumentException if the date given is not in the JDBC date escape format (yyyy-[m]m-[d]d)
 	 */
 	public static Date getSQLDate(final String _strDate) {
-		final StringTokenizer strtok = new StringTokenizer(_strDate, "/", false);
-		final String month = strtok.nextToken();
-		final String day = strtok.nextToken();
-		final String newStrDate = strtok.nextToken() + "-" + month + "-" + day;
-		return Date.valueOf(newStrDate);
+		String strDate = _strDate.trim();
+		if (strDate.isEmpty()) {
+			return null;
+		}
+		if (strDate.contains("/")) {
+			final StringTokenizer strtok = new StringTokenizer(strDate, "/", false);
+			final String month = strtok.nextToken();
+			final String day = strtok.nextToken();
+			strDate = strtok.nextToken() + "-" + month + "-" + day;
+		}
+		return Date.valueOf(strDate);
 	}
 
 	/**

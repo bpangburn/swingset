@@ -816,8 +816,13 @@ public class SSDataGrid extends JTable {
 	 * Constructs an empty data grid.
 	 */
 	public SSDataGrid() {
-		super(new SSTableModel());
 		init();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	protected SSTableModel createDefaultDataModel() {
+		return new SSTableModel();
 	}
 
 	/**
@@ -841,16 +846,17 @@ public class SSDataGrid extends JTable {
 	}
 
 	/**
-	 * Create row sorter as needed.
-	 * @param _dataModel table model to set
-	 * @throws IllegalArgumentException if would change SSTableModel
+	 * Do not use; can not change the model.
+	 * @param _dataModel not used
+	 * @throws IllegalStateException if would change SSTableModel
 	 */
 	@Override
 	public void setModel(TableModel _dataModel) {
-		// TODO: Support setModel to change SSTableModel?
-		if(super.getModel() instanceof SSTableModel)
-			throw new IllegalArgumentException("Can not change SSTableModel");
-		super.setModel(_dataModel);
+		if (getModel() == null) {
+			super.setModel(_dataModel);
+		} else {
+			throw new IllegalStateException("Can not change SSTableModel");
+		}
 	}
 
 	private class Sorter extends TableRowSorter<SSTableModel> {
