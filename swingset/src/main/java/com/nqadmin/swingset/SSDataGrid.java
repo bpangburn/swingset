@@ -48,6 +48,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Constructor;
 import java.sql.Date;
+import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -192,68 +193,54 @@ public class SSDataGrid extends JTable {
 		 */
 		private static final long serialVersionUID = 966225988861238964L;
 		
-		// Variable to store the java.sql.Type
-		protected int columnClass = 0;
+		/** Variable to store the sql type. */
+		protected JDBCType columnClass = null;
 
+		/** Grid boolean editor. */
 		public CheckBoxEditor() {
 			super(new JCheckBox());
 		}
 
+		/** @return boolean/int */
 		@Override
 		public Object getCellEditorValue() {
 			// GET THE COMPONENT AND CHECK IF IT IS CHECKED OR NOT.
-			if (((JCheckBox) getComponent()).isSelected()) {
-				// CHECK THE COLUMN TYPE AND RETURN CORRESPONDING OBJECT.
-				// IF IT IS INTEGER THEN 1 IS CONSIDERED TRUE AND 0 FALSE.
-				if (columnClass == java.sql.Types.BOOLEAN) {
-					return true;
-				}
-				return 1;
+			boolean isSelected = ((JCheckBox) getComponent()).isSelected();
+
+			// CHECK THE COLUMN TYPE AND RETURN CORRESPONDING OBJECT.
+			// IF IT IS INTEGER THEN 1 IS CONSIDERED TRUE AND 0 FALSE.
+			if (columnClass == JDBCType.BOOLEAN) {
+				return isSelected;
+			} else {
+				return isSelected ? 1 : 0;
 			}
-			if (columnClass == java.sql.Types.BOOLEAN) {
-				return false;
-			}
-			return 0;
 		}
 
+		/** {@inheritDoc} */
 		@Override
 		public Component getTableCellEditorComponent(final JTable _table, final Object _value, final boolean _selected, final int _row,
 				final int _column) {
 
 			// GET THE COMPONENT RENDERING THE VALUE.
 			final JCheckBox checkBox = (JCheckBox) getComponent();
+			boolean isSelected = false;
 
 			// CHECK THE TYPE OF COLUMN, IT SHOULD BE THE SAME AS THE TYPE OF _VALUE.
 			if (_value instanceof Boolean) {
-				// STORE THE TYPE OF COLUMN WE NEED THIS WHEN EDITOR HAS TO RETURN
-				// VALUE BACK.
-				columnClass = java.sql.Types.BOOLEAN;
-				// BASED ON THE VALUE CHECK THE BOX OR UNCHECK IT.
-				if (((Boolean) _value)) {
-					checkBox.setSelected(true);
-				} else {
-					checkBox.setSelected(false);
-				}
+				columnClass = JDBCType.BOOLEAN; // STORE THE TYPE OF COLUMN WE NEED
+				isSelected = (Boolean) _value;
 			}
-			// IF THE COLUMN CLASS IS INTEGER
 			else if (_value instanceof Integer) {
-				// STORE THE COLUMN CLASS.
-				columnClass = java.sql.Types.INTEGER;
-				// BASED ON THE INTEGER VALUE CHECK OR UNCHECK THE CHECK BOX.
-				// A VALUE OF 0 IS CONSIDERED TRUE - CHECK BOX IS CHECKED.
-				// ANY OTHER VALUE IS CONSIDERED FALSE - UNCHECK THE CHECK BOX.
-				if (((Integer) _value) != 0) {
-					checkBox.setSelected(true);
-				} else {
-					checkBox.setSelected(false);
-				}
+				columnClass = JDBCType.INTEGER; // STORE THE COLUMN CLASS.
+				// A VALUE OF 0 IS FALSE - ANY OTHER VALUE IS TRUE
+				isSelected = (Integer) _value != 0;
 			}
-			// IF THE COLUMN CLASS IS NOT BOOLEAN OR INTEGER
-			// LOG ERROR MESSAGE.
 			else {
+				// THE COLUMN IS NOT BOOLEAN OR INTEGER, LOG ERROR MESSAGE.
 				logger.error("Can't set check box value. Unknown data type. Column type should be Boolean or Integer for check box columns.");
 			}
-			// RETURN THE EDITOR COMPONENT
+
+			checkBox.setSelected(isSelected); // USE VALUE TO CHECK OR UNCHECK BOX.
 			return checkBox;
 		}
 	}
@@ -268,33 +255,22 @@ public class SSDataGrid extends JTable {
 		 */
 		private static final long serialVersionUID = -8310278203475303010L;
 
-		public CheckBoxRenderer() {
-			super();
-		}
-
+		/** {@inheritDoc} */
 		@Override
 		public Component getTableCellRendererComponent(final JTable _table, final Object _value, final boolean _selected,
 				final boolean _hasFocus, final int _row, final int _column) {
-
+			boolean isSelected = false;
 			if (_value instanceof Boolean) {
-				if (((Boolean) _value)) {
-					setSelected(true);
-				} else {
-					setSelected(false);
-				}
+				isSelected = (Boolean) _value;
 			} else if (_value instanceof Integer) {
-				if (((Integer) _value) != 0) {
-					setSelected(true);
-				} else {
-					setSelected(false);
-				}
+				isSelected = (Integer) _value != 0;
 			} else {
 				logger.error("Can't set check box value. Unknown data type. Column type should be Boolean or Integer for check box columns.");
 			}
+			setSelected(isSelected);
 
 			return this;
 		}
-
 	}
 
 	/**
@@ -312,6 +288,11 @@ public class SSDataGrid extends JTable {
 		transient final Object[] items;
 		transient final Object[] underlyingValues;
 
+		/**
+		 * Combo Editor.
+		 * @param _items the combo items
+		 * @param _underlyingValues database values; may be null
+		 */
 		public ComboEditor(final Object[] _items, final Object[] _underlyingValues) {
 			super(new GridComboEditorComboBox());
 			// TODO: copy the arrays? Or just agree that they are never modified.
@@ -329,7 +310,10 @@ public class SSDataGrid extends JTable {
 			return (GridComboEditorComboBox) super.getComponent();
 		}
 
-		/** {@inheritDoc} */
+		/**
+		 * Combo editor value.
+		 * @return value for selected item
+		 */
 		@Override
 		public Object getCellEditorValue() {
 
@@ -344,6 +328,11 @@ public class SSDataGrid extends JTable {
 			return item.getElem(1);
 		}
 
+		/**
+		 * Return index of _value in underlyingValues.
+		 * @param _value look for this
+		 * @return index or -1 if can not find
+		 */
 		protected int getIndexOf(final Object _value) {
 			if (underlyingValues == null) {
 				// IF THE VALUE IS NULL THEN SET THE DISPLAY ON THE COMBO TO BLANK (INDEX -1)
@@ -436,11 +425,22 @@ public class SSDataGrid extends JTable {
 		transient Object[] displayValues = null;
 		transient Object[] underlyingValues = null;
 
+		/**
+		 * Combo renderer.
+		 * @param _items the combo items
+		 * @param _underlyingValues database values; may be null
+		 */
 		public ComboRenderer(final Object[] _items, final Object[] _underlyingValues) {
 			underlyingValues = _underlyingValues;
 			displayValues = _items;
 		}
 
+		/**
+		 * Return index of _value in underlyingValues.
+		 * return index of first item if match not found.
+		 * @param _value look for this
+		 * @return index
+		 */
 		protected int getIndexOf(final Object _value) {
 			if (_value == null) {
 				return -1;
@@ -456,6 +456,7 @@ public class SSDataGrid extends JTable {
 			return 0;
 		}
 
+		/** {@inheritDoc} */
 		@Override
 		public Component getTableCellRendererComponent(final JTable _table, final Object _value, final boolean _selected,
 				final boolean _hasFocus, final int _row, final int _column) {
@@ -489,7 +490,9 @@ public class SSDataGrid extends JTable {
 		 */
 		private static final long serialVersionUID = 8741829961228359406L;
 
-		// CONSTRUCTOR FOR THE EDITOR CLASS
+		/**
+		 * Grid date editor.
+		 */
 		public DateEditor() {
 			super(new SSTextField(SSTextField.MMDDYYYY));
 			getComponent().setFocusTraversalKeysEnabled(false);
@@ -524,7 +527,11 @@ public class SSDataGrid extends JTable {
 			});
 		}
 
-		// RETURNS A DATE OBJECT REPRESENTING THE VALUE IN THE CELL.
+
+		/**
+		 * RETURNS A DATE OBJECT REPRESENTING THE VALUE IN THE CELL.
+		 * @return sql date
+		 */
 		@Override
 		public Object getCellEditorValue() {
 			final String strDate = ((JTextField) (DateEditor.this.getComponent())).getText();
@@ -540,8 +547,11 @@ public class SSDataGrid extends JTable {
 			return new Date(calendar.getTimeInMillis());
 		}
 
-		// RETURNS THE TEXTFIELD WITH THE GIVEN DATE IN THE TEXTFIELD
-		// (AFTER THE FORMAT IS CHANGED TO MM/DD/YYYY
+		/**
+		 * RETURNS THE TEXTFIELD WITH THE GIVEN DATE IN THE TEXTFIELD
+		 * (AFTER THE FORMAT IS CHANGED TO MM/DD/YYYY
+		 * {@inheritDoc}
+		 */
 		@Override
 		public synchronized Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected,
 				final int row, final int column) {
@@ -559,10 +569,16 @@ public class SSDataGrid extends JTable {
 
 		}
 
+		/**
+		 * Check if the cell is editable.
+		 * <p>
+		 * IF NUMBER OF CLICKS IS LESS THAN THE CLICKCOUNTTOSTART RETURN FALSE
+		 * FOR CELL EDITING.
+		 * @param event may be mouse event
+		 * @return true if editable
+		 */
 		@Override
 		public boolean isCellEditable(final EventObject event) {
-			// IF NUMBER OF CLICKS IS LESS THAN THE CLICKCOUNTTOSTART RETURN FALSE
-			// FOR CELL EDITING.
 			if (event instanceof MouseEvent) {
 				return ((MouseEvent) event).getClickCount() >= getClickCountToStart();
 			}
@@ -581,6 +597,10 @@ public class SSDataGrid extends JTable {
 		 */
 		private static final long serialVersionUID = 2167118906692276587L;
 
+		/**
+		 * Set the value to render. Expect date; if not, give it to super.
+		 * @param value probably a date
+		 */
 		@Override
 		public void setValue(final Object value) {
 			if (value instanceof java.sql.Date) {
