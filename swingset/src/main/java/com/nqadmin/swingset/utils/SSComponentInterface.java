@@ -54,6 +54,7 @@ import javax.swing.KeyStroke;
 import java.sql.Connection;
 
 import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.decorators.Validator;
 
 // SSComponentInterface.java
 //
@@ -599,5 +600,13 @@ public interface SSComponentInterface {
 	 * removal (and subsequent restoration) of the component's value change listener.
 	 */
 	void updateSSComponent();
+
+	/**
+	 * Indication of whether or not the component decides its data is valid.
+	 * There may be additional checks defined by a {@link Validator}; those
+	 * are not considered here.
+	 * @return false for error in data, otherwise true
+	 */
+	default boolean isDataValid() { return true; }
 
 }
