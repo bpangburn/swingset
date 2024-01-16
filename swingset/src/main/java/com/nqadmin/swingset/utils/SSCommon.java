@@ -37,6 +37,9 @@
  ******************************************************************************/
 package com.nqadmin.swingset.utils;
 
+import com.nqadmin.swingset.decorators.BackgroundDecorator;
+import com.nqadmin.swingset.decorators.BorderDecorator;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeListener;
@@ -72,6 +75,7 @@ import com.nqadmin.swingset.SSList;
 import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
+import com.nqadmin.swingset.decorators.Decorator;
 
 // SSCommon.java
 //
@@ -344,6 +348,8 @@ public class SSCommon implements Serializable {
 	//       if/when there is one.
 	//
 
+	private Decorator decorator;
+
 	/**
 	 * Reflects the state of the data source metadata about nullability
 	 * of the bound column. False when there's a "NOT NULL" constraint.
@@ -399,7 +405,9 @@ public class SSCommon implements Serializable {
 	 *                     datamember
 	 */
 	public SSCommon(final SSComponentInterface _ssComponent) {
+		decorator = Decorator.nullDecorator;
 		setSSComponent(_ssComponent);
+		initDecorator();
 		init();
 	}
 
@@ -1040,6 +1048,64 @@ public class SSCommon implements Serializable {
 
 		addSSComponentListener();
 
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// The idea is to extend the decorators to handle a variety of component
+	// types and ways to decorate. Wonder how to do that?
+	//
+
+	/**
+	 * Find the default decorator for this component type and set it.
+	 */
+	private void initDecorator() {
+		// For now just pick any decorator as the default.
+		// Probably want to get it from a provider and use this component
+		// type as part of the decision. If a component wants to extend
+		// behavior, could get the current decorator, delegate to it,
+		// with some custom behavior used by the component.
+
+		// Is the following snippet a good way to override the default?
+		//		decorator deco = getSSComponent().createDefaultDecorator();
+		// where there's a default implementation that returns null
+
+		Decorator deco = null;
+		if (deco == null) {
+			//deco = new BorderDecorator();
+			deco = new BackgroundDecorator();
+			if (Boolean.FALSE) {
+				decorator = new BorderDecorator();
+				decorator = new BackgroundDecorator();
+			}
+		}
+
+		setDecorator(deco);
+	}
+
+	/**
+	 * Run the decorator.
+	 */
+	public void hightlight() {
+		decorator.decorate();
+	}
+
+	/**
+	 * Install the given decorator.
+	 * @param deco decorator to install
+	 */
+	public void setDecorator(Decorator deco) {
+		decorator.uninstall();
+		deco.install(getSSComponent());
+		decorator = deco;
+	}
+
+	/**
+	 * Return the decorator used by this component.
+	 * @return the decorator
+	 */
+	public Decorator getDecorator() {
+		return decorator;
 	}
 
 }

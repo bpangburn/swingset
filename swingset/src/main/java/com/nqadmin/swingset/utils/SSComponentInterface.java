@@ -600,4 +600,10 @@ public interface SSComponentInterface {
 	 */
 	void updateSSComponent();
 
+	/**
+	 * Indication of whether or not the data in the component is valid.
+	 * @return false for error in data, otherwise true
+	 */
+	default boolean isDataValid() { return true; }
+
 }

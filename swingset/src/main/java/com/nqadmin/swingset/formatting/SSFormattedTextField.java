@@ -48,14 +48,11 @@ import java.sql.SQLException;
 import java.text.Format;
 import java.text.ParseException;
 
-import javax.swing.BorderFactory;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.border.Border;
 import javax.swing.text.DefaultFormatterFactory;
 
 import org.apache.logging.log4j.Logger;
@@ -66,6 +63,10 @@ import com.nqadmin.swingset.formatting.factories.SSMaskFormatterFactory;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.decorators.TextDecorationStyle;
+import com.nqadmin.swingset.decorators.TextDecorator;
+import com.nqadmin.swingset.decorators.BackgroundDecorator;
+import com.nqadmin.swingset.decorators.Decorator;
 
 // SSFormattedTextField.java
 //
@@ -188,7 +189,8 @@ public class SSFormattedTextField extends JFormattedTextField
 				// displayErrorIndicator()).
 				// May be able to place all decoration code in one method.
 				if (result == false) {
-					displayValidIndicator(false);
+					forceError();
+					//displayValidIndicator(false);
 				}
 
 			} catch (final Exception _e) {
@@ -313,32 +315,32 @@ public class SSFormattedTextField extends JFormattedTextField
 	 */
 	private static final long serialVersionUID = 5349618425984728006L;
 
-	/**
-	 * color for the field that has the focus
-	 */
-	private Color focusBackgroundColor = new Color(204, 255, 255);
-	
-	/**
-	 * border for the field that has the focus
-	 */
-	private Border focusBorder = BorderFactory.createLineBorder(Color.GREEN);
+	// /**
+	//  * color for the field that has the focus
+	//  */
+	// private Color focusBackgroundColor = new Color(204, 255, 255);
+	// 
+	// /**
+	//  * border for the field that has the focus
+	//  */
+	// private Border focusBorder = BorderFactory.createLineBorder(Color.GREEN);
 
 	/**
 	 * Common fields shared across SwingSet components
 	 */
 	protected SSCommon ssCommon = new SSCommon(this);
 
-	/**
-	 * Used to store background color prior to change following focusGained event so
-	 * that the color can be restored upon focusLost.
-	 */
-	private final Color standardBackgroundColor = getDefaultBackgroundColor();
-	
-	/**
-	 * Used to store border color prior to change following focusGained event so
-	 * that the color can be restored upon focusLost.
-	 */
-	private final Border standardBorder = getDefaultBorder();
+	// /**
+	//  * Used to store background color prior to change following focusGained event so
+	//  * that the color can be restored upon focusLost.
+	//  */
+	// private final Color standardBackgroundColor = getDefaultBackgroundColor();
+	// 
+	// /**
+	//  * Used to store border color prior to change following focusGained event so
+	//  * that the color can be restored upon focusLost.
+	//  */
+	// private final Border standardBorder = getDefaultBorder();
 		
 	/**
 	 * Creates a new instance of SSFormattedTextField
@@ -414,7 +416,9 @@ public class SSFormattedTextField extends JFormattedTextField
 
 		addPropertyChangeListener("editValid", (e)->{
 			// System.err.println("EditValid: " + e.getNewValue());
-			displayValidIndicator((boolean) e.getNewValue());
+			//displayValidIndicator((boolean) e.getNewValue());
+			clearForceErrorFlag();
+			displayValidIndicator();
 		});
 
 	}
@@ -429,9 +433,9 @@ public class SSFormattedTextField extends JFormattedTextField
 	@Override
 	public void focusGained(final FocusEvent _event) {
 
-		// USE A DIFFERENT COLOR TO HIGHLIGHT THE FIELD WITH THE FOCUS
-		//setBackground(focusBackgroundColor);
-		setBorder(focusBorder);
+		// // USE A DIFFERENT COLOR TO HIGHLIGHT THE FIELD WITH THE FOCUS
+		// //setBackground(focusBackgroundColor);
+		// //setBorder(focusBorder);
 
 		// HIGHLIGHT THE TEXT IN THE FIELD WHEN FOCUS IS GAINED SO USE CAN JUST TYPE OVER WHAT IS THERE
 		//
@@ -441,16 +445,12 @@ public class SSFormattedTextField extends JFormattedTextField
 	}
 
 	/**
-	 * Remove highlighting (custom background color) when the focus is lost.
+	 * Nothing to do.
 	 *
 	 * @param _event focus event
-	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
 	 */
 	@Override
 	public void focusLost(final FocusEvent _event) {
-		// Restore original background color
-		//setBackground(standardBackgroundColor);
-		setBorder(standardBorder);
 	}
 	
 	/**
@@ -458,18 +458,26 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * 
 	 * @return background color used for component with the focus
 	 */
+	// TODO: Is this used? Should it be deprecated?
 	public Color getFocusBackgroundColor() {
-		return focusBackgroundColor;
+		Decorator hl = getSSCommon().getDecorator();
+		Color color;
+		if (hl instanceof BackgroundDecorator) {
+			color = ((BackgroundDecorator)hl).getFocusBackgroundColor();
+		} else {
+			color = Color.WHITE;	// don't want to return null
+		}
+		return color;
 	}
 	
-	/**
-	 * Returns the border to be used when this component has the focus
-	 * 
-	 * @return background color used for component with the focus
-	 */
-	public Border getFocusBorder() {
-		return focusBorder;
-	}
+	// /**
+	//  * Returns the border to be used when this component has the focus
+	//  * 
+	//  * @return background color used for component with the focus
+	//  */
+	// public Border getFocusBorder() {
+	// 	return focusBorder;
+	// }
 
 	/**
 	 * Returns the ssCommon data member for the current Swingset component.
@@ -505,18 +513,22 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * 
 	 * @param _focusBackgroundColor background color to be used when this component has the focus
 	 */
+	// TODO: Is this used? Should it be deprecated?
 	public void setFocusBackgroundColor(final Color _focusBackgroundColor) {
-		focusBackgroundColor = _focusBackgroundColor;
+		Decorator hl = getSSCommon().getDecorator();
+		if (hl instanceof BackgroundDecorator) {
+			((BackgroundDecorator)hl).setFocusBackgroundColor(_focusBackgroundColor);
+		}
 	}
-	
-	/**
-	 * Setter for the border to be used when this component has the focus
-	 * 
-	 * @param _focusBorder border to be used when this component has the focus
-	 */
-	public void setFocusBorder(final Border _focusBorder) {
-		focusBorder = _focusBorder;
-	}
+	// 
+	// /**
+	//  * Setter for the border to be used when this component has the focus
+	//  * 
+	//  * @param _focusBorder border to be used when this component has the focus
+	//  */
+	// public void setFocusBorder(final Border _focusBorder) {
+	// 	focusBorder = _focusBorder;
+	// }
 
 	/**
 	 * Setter for property nullable.
@@ -646,33 +658,56 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * 
 	 * TODO: In the future it might be nice to make a plugable decorator and/or maintain
 	 * some of the details in a properties file.
+	 * TODO: Should this apply after keytype?
 	 *
 	 * @param _value - value to be validated
 	 */
 	public void updateTextDecorator(final Object _value) {
-
-		if (((_value instanceof Double) && ((Double) _value < 0.0))
-				|| ((_value instanceof Float) && ((Float) _value < 0.0))
-				|| ((_value instanceof Long) && ((Long) _value < 0))
-				|| ((_value instanceof Integer) && ((Integer) _value < 0))) {
-			setForeground(Color.RED);
-		} else {
-			setForeground(Color.BLACK);
-		}
-
-	}
-
-	void displayValidIndicator(boolean isValid) {
-		if(isValid) {
-			//setBackground(isFocusOwner() ? focusBackgroundColor : standardBackgroundColor);
-			setBorder(isFocusOwner() ? focusBorder : standardBorder);
-			setForeground(Color.BLACK);
-		} else {
-			//setBackground(Color.PINK);
-			setBorder(BorderFactory.createLineBorder(Color.RED));			
-			setForeground(Color.BLACK);
+		Decorator hl = getSSCommon().getDecorator();
+		if (hl instanceof TextDecorator) {
+			TextDecorationStyle style;
+			if (((_value instanceof Double) && ((Double) _value < 0.0))
+					|| ((_value instanceof Float) && ((Float) _value < 0.0))
+					|| ((_value instanceof Long) && ((Long) _value < 0))
+					|| ((_value instanceof Integer) && ((Integer) _value < 0))) {
+				style = TextDecorationStyle.NEGATIVE_NUMBER;
+			} else {
+				style = TextDecorationStyle.RESET;
+			}
+			((TextDecorator)hl).decorateText(style);
 		}
 	}
+
+	/** {@inheritDoc} */
+	@Override
+	public boolean isDataValid() {
+		return !forceErrorState && isEditValid();
+	}
+
+	private boolean forceErrorState;
+	private void forceError() {
+		forceErrorState = true;
+		displayValidIndicator();
+	}
+	private void clearForceErrorFlag() {
+		forceErrorState = false;
+	}
+
+	private void displayValidIndicator() {
+		getSSCommon().hightlight();
+	}
+
+	// void displayValidIndicator(boolean isValid) {
+	// 	if(isValid) {
+	// 		//setBackground(isFocusOwner() ? focusBackgroundColor : standardBackgroundColor);
+	// 		setBorder(isFocusOwner() ? focusBorder : standardBorder);
+	// 		setForeground(Color.BLACK);
+	// 	} else {
+	// 		//setBackground(Color.PINK);
+	// 		setBorder(BorderFactory.createLineBorder(Color.RED));			
+	// 		setForeground(Color.BLACK);
+	// 	}
+	// }
 
 	/**
 	 * Checks if the value is valid of the component. Override for custom validations
@@ -687,35 +722,36 @@ public class SSFormattedTextField extends JFormattedTextField
 		return true;
 	}
 
-	//
-	// TODO: work out global setDefault, instance setDefault
-	// TODO: listener for L&F change and adjust accordingly?
-	//
-	private static Color defaultBackgroundColor;
-	private static Color getDefaultBackgroundColor() {
-		if (defaultBackgroundColor == null) {
-			defaultBackgroundColor = UIManager.getColor("FormattedTextField.background");
-			if (defaultBackgroundColor == null) {
-				defaultBackgroundColor = Color.WHITE;
-			}
-		}
-		return defaultBackgroundColor;
-	}
+	// //
+	// // TODO: work out global setDefault, instance setDefault
+	// // TODO: listener for L&F change and adjust accordingly?
+	// //
+	// private static Color defaultBackgroundColor;
+	// private static Color getDefaultBackgroundColor() {
+	// 	if (defaultBackgroundColor == null) {
+	// 		defaultBackgroundColor = UIManager.getColor("FormattedTextField.background");
+	// 		if (defaultBackgroundColor == null) {
+	// 			defaultBackgroundColor = Color.WHITE;
+	// 		}
+	// 	}
+	// 	return defaultBackgroundColor;
+	// }
 
-	// TODO: work out global setDefault, instance setDefault
-	// TODO: listener for L&F change and adjust accordingly?
+	// // TODO: work out global setDefault, instance setDefault
+	// // TODO: listener for L&F change and adjust accordingly?
+	// //
+	// private static Border defaultBorder;
+	// private static Border getDefaultBorder() {
+	// 	if (defaultBorder == null) {
+	// 		defaultBorder = UIManager.getBorder("FormattedTextField.border");
+	// 		if (defaultBorder == null) {
+	// 			defaultBorder = BorderFactory.createLineBorder(Color.BLACK);
+	// 		}
+	// 	}
+	// 	return defaultBorder;
+	// }
 	//
-	private static Border defaultBorder;
-	private static Border getDefaultBorder() {
-		if (defaultBorder == null) {
-			defaultBorder = UIManager.getBorder("FormattedTextField.border");
-			if (defaultBorder == null) {
-				defaultBorder = BorderFactory.createLineBorder(Color.BLACK);
-			}
-		}
-		return defaultBorder;
-	}
-	//
+
 	// Handle changes that might affect value/AllowNull
 	//
 	// TODO: Wonder if listeners are better? Probably not.
