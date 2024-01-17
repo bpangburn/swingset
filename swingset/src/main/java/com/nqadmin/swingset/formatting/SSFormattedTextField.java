@@ -53,6 +53,7 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.text.DefaultFormatterFactory;
 
 import org.apache.logging.log4j.Logger;
 
@@ -61,6 +62,10 @@ import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.decorators.TextDecorationStyle;
+import com.nqadmin.swingset.decorators.TextDecorator;
+import com.nqadmin.swingset.decorators.BackgroundDecorator;
+import com.nqadmin.swingset.decorators.Decorator;
 
 // SSFormattedTextField.java
 //
@@ -103,6 +108,10 @@ public class SSFormattedTextField extends JFormattedTextField
 	 */
 	public class FormattedTextFieldVerifier extends InputVerifier {
 
+		/**
+		 * @param input
+		 * @return
+		 */
 		@Override
 		public boolean verify(final JComponent input) {
 
@@ -179,8 +188,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				// displayErrorIndicator()).
 				// May be able to place all decoration code in one method.
 				if (result == false) {
-					setBackground(Color.RED);
-					setForeground(Color.BLACK);
+					forceError();
 				}
 
 			} catch (final Exception _e) {
@@ -219,6 +227,9 @@ public class SSFormattedTextField extends JFormattedTextField
 		 */
 		private static final long serialVersionUID = -8060207437911787572L;
 
+		/**
+		 * @param _pce
+		 */
 		@Override
 		public void propertyChange(final PropertyChangeEvent _pce) {
 
@@ -303,11 +314,6 @@ public class SSFormattedTextField extends JFormattedTextField
 	private static final long serialVersionUID = 5349618425984728006L;
 
 	/**
-	 * color for the field that has the focus
-	 */
-	private java.awt.Color focusBackgroundColor = new java.awt.Color(204, 255, 255);
-
-	/**
 	 * Common fields shared across SwingSet components
 	 */
 	transient protected final SSCommon ssCommon = new SSCommon(this);
@@ -335,7 +341,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * so that any constructor customizations don't have to be duplicated. 
 	 */
 	public SSFormattedTextField(final AbstractFormatter _formatter) {
-		super(_formatter);
+		this(new DefaultFormatterFactory(_formatter));
 	}
 
 	/**
@@ -344,7 +350,8 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * @param _factory AbstractFormatterFactory used for formatting.
 	 */
 	public SSFormattedTextField(final AbstractFormatterFactory _factory) {
-		super(_factory);
+		this();
+		setFormatterFactory(_factory);
 	}
 
 	// WE DON'T WANT TO REPLICATE THE JFormattedTextField CONSTRUCTOR THAT ACCEPTS
@@ -356,6 +363,8 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * @param _format Format used to look up an AbstractFormatter
 	 */
 	public SSFormattedTextField(final Format _format) {
+		// Don't need "this()" since _format can't access
+		// things in SSFOrmattedTextField.
 		super(_format);
 	}
 
@@ -387,42 +396,35 @@ public class SSFormattedTextField extends JFormattedTextField
 		// See https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/JFormattedTextField.html
 		setInputVerifier(new FormattedTextFieldVerifier());
 
+		addPropertyChangeListener("editValid", (e)->{
+			clearForceErrorFlag();
+		});
+
 	}
 
 	/**
 	 * Add highlighting when the focus is gained and select all of the text so
 	 * overwriting is easier.
 	 *
+	 * @param _event focus event
 	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
 	 */
 	@Override
 	public void focusGained(final FocusEvent _event) {
-
-		// USE A DIFFERENT COLOR TO HIGHLIGHT THE FIELD WITH THE FOCUS
-		standardBackgroundColor = getBackground();
-		setBackground(focusBackgroundColor);
-
 		// HIGHLIGHT THE TEXT IN THE FIELD WHEN FOCUS IS GAINED SO USE CAN JUST TYPE OVER WHAT IS THERE
 		//
 		// This is a workaround based on the following thread:
 		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4740914
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				selectAll();
-			}
-		});
+		SwingUtilities.invokeLater(() -> { selectAll(); });
 	}
 
 	/**
-	 * Remove highlighting (custom background color) when the focus is lost.
+	 * Nothing to do.
 	 *
-	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
+	 * @param _event focus event
 	 */
 	@Override
 	public void focusLost(final FocusEvent _event) {
-		// Restore original background color
-		setBackground(standardBackgroundColor);
 	}
 	
 	/**
@@ -430,8 +432,17 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * 
 	 * @return background color used for component with the focus
 	 */
-	public java.awt.Color getFocusBackgroundColor() {
-		return focusBackgroundColor;
+	// TODO: Is this used? Should it be deprecated?
+	public Color getFocusBackgroundColor() {
+		Decorator hl = getSSCommon().getDecorator();
+		Color color;
+		if (hl instanceof BackgroundDecorator) {
+			color = ((BackgroundDecorator)hl).getFocusBackgroundColor();
+		} else {
+			// Since it's not changed (AFAIK), just return the background
+			color = getBackground();
+		}
+		return color;
 	}
 
 	/**
@@ -468,9 +479,15 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * 
 	 * @param _focusBackgroundColor background color to be used when this component has the focus
 	 */
-	public void setFocusBackgroundColor(final java.awt.Color _focusBackgroundColor) {
-		focusBackgroundColor = _focusBackgroundColor;
+	// TODO: Is this used? Should it be deprecated?
+	// TODO: Use a [sg]etProperty style for Decorators?
+	public void setFocusBackgroundColor(final Color _focusBackgroundColor) {
+		Decorator hl = getSSCommon().getDecorator();
+		if (hl instanceof BackgroundDecorator) {
+			((BackgroundDecorator)hl).setFocusBackgroundColor(_focusBackgroundColor);
+		}
 	}
+
 
 	/**
 	 * Setter for property nullable.
@@ -548,7 +565,10 @@ public class SSFormattedTextField extends JFormattedTextField
 				logger.debug("{}: getObject() - " + newValue, () -> getColumnForLog());
 				setValue(newValue);
 			} else {
-				logger.error(getColumnForLog() + ": JDBCType of " + jdbcType.toString() + " was cast to unsupported type of " + newValue.getClass().getName() + " based on JDBC connection getTypeMap().");
+				String newValueString = newValue == null
+						? "(null)"
+						: newValue.getClass().getName();
+				logger.error(getColumnForLog() + ": JDBCType of " + jdbcType.toString() + " was cast to unsupported type of " + newValueString + " based on JDBC connection getTypeMap().");
 			}
 
 		} catch (final java.sql.SQLException sqe) {
@@ -587,20 +607,40 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * 
 	 * TODO: In the future it might be nice to make a plugable decorator and/or maintain
 	 * some of the details in a properties file.
+	 * TODO: Should this apply after keytype?
 	 *
 	 * @param _value - value to be validated
 	 */
 	public void updateTextDecorator(final Object _value) {
-
-		if (((_value instanceof Double) && ((Double) _value < 0.0))
-				|| ((_value instanceof Float) && ((Float) _value < 0.0))
-				|| ((_value instanceof Long) && ((Long) _value < 0))
-				|| ((_value instanceof Integer) && ((Integer) _value < 0))) {
-			setForeground(Color.RED);
-		} else {
-			setForeground(Color.BLACK);
+		Decorator hl = getSSCommon().getDecorator();
+		if (hl instanceof TextDecorator) {
+			TextDecorationStyle style;
+			if (((_value instanceof Double) && ((Double) _value < 0.0))
+					|| ((_value instanceof Float) && ((Float) _value < 0.0))
+					|| ((_value instanceof Long) && ((Long) _value < 0))
+					|| ((_value instanceof Integer) && ((Integer) _value < 0))) {
+				style = TextDecorationStyle.NEGATIVE_NUMBER;
+			} else {
+				style = TextDecorationStyle.RESET;
+			}
+			((TextDecorator)hl).decorateText(style);
 		}
+	}
 
+	/** {@inheritDoc} */
+	@Override
+	public boolean isDataValid() {
+		return !forceErrorState && isEditValid();
+	}
+
+	private boolean forceErrorState;
+	private void forceError() {
+		forceErrorState = true;
+		getSSCommon().decorate();
+	}
+	private void clearForceErrorFlag() {
+		forceErrorState = false;
+		getSSCommon().decorate();
 	}
 
 	/**
@@ -614,5 +654,52 @@ public class SSFormattedTextField extends JFormattedTextField
 
 		// just return true for default implementation
 		return true;
+	}
+
+	// Handle changes that might affect value/AllowNull
+	//
+	// TODO: Wonder if listeners are better? Probably not.
+	//
+
+	/**
+	 * Set the text fields value.
+	 * @param value set text field to this value
+	 */
+	@Override
+	public void setValue(Object value) {
+		checkNeedsNullFormatter();
+		super.setValue(value);
+	}
+
+	/**
+	 * If metadataChang, might affect AllowNull
+	 */
+	@Override
+	public void metadataChange() {
+		SSComponentInterface.super.metadataChange();
+		checkNeedsNullFormatter();
+	}
+
+	/**
+	 * 
+	 * @param _allowNull if true, null are allowed
+	 */
+	@Override
+	public void setAllowNull(boolean _allowNull) {
+		// Too bad can't simply override setAllowNull,
+		// guess that's a disadvantage of default methods.
+		SSComponentInterface.super.setAllowNull(_allowNull);
+		checkNeedsNullFormatter();
+	}
+
+	private void checkNeedsNullFormatter() {
+		// NOTE: following does nothing, if not our mask formatter
+
+		//
+		// TODO: Retrofitting Decorator, this comes in later
+		//
+		// ***** Add this back in later *****
+		//
+		//SSMaskFormatterFactory.adjustNullFormatter(this);
 	}
 }
