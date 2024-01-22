@@ -109,7 +109,7 @@ import static com.nqadmin.swingset.SSDataNavigator.isAcceptingChanges;
  */
 public class SSCommon implements Serializable {
 
-	private static final Boolean DISABLE_GENERAL_VALIDATION = true;
+	private static final Boolean DISABLE_GENERAL_VALIDATION = false;
 
 	/**
 	 * Document listener provided for convenience for SwingSet Components that are
