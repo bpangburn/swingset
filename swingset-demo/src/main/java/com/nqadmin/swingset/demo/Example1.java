@@ -56,6 +56,13 @@ import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.decorators.TextComponentValidator;
+import com.nqadmin.swingset.demo.simpval.SVUtils;
+import com.nqadmin.swingset.demo.simpval.StringValidator;
+import javax.swing.JPanel;
+import org.netbeans.validation.api.ui.ValidationGroup;
+import org.netbeans.validation.api.ui.ValidationItem;
+import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
+import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
 /**
  * This example displays data from the supplier_data table.
@@ -109,6 +116,7 @@ public class Example1 extends JFrame {
 
 		// SET SCREEN TITLE
 			super("Example1");
+			JFrame frame = this;
 
 		// SET CONNECTION
 			connection = _dbConn;
@@ -120,12 +128,23 @@ public class Example1 extends JFrame {
 			setLocation(DemoUtil.getChildScreenLocation(this.getName()));
 		
 		// SET A VALIDATOR (may be a no-op is disabled in SwingSet library)
-			txtSupplierName.getSSCommon().setValidator(new TextComponentValidator() {
-				@Override
-				public boolean validate() {
-					return !jc().getText().equalsIgnoreCase("oops");
-				}
-			});
+			final boolean USE_SIMPLE_VALIDATION = true;
+			//SSTextComponentValidationItem valSupplierName = null;
+			ValidationItem decoSupplierName = null;
+			if (!USE_SIMPLE_VALIDATION) {
+				txtSupplierName.getSSCommon().setValidator(new TextComponentValidator() {
+					@Override
+					public boolean validate() {
+						return !jc().getText().equalsIgnoreCase("oops");
+					}
+				});
+			} else {
+				SwingValidationGroup.setComponentName(txtSupplierName, "Supplier Name");
+				StringValidator validator = SVUtils.getStringValidator(
+						(model) -> !"oops".equalsIgnoreCase(model),
+						() -> "Supplier can not be 'oops'");
+				decoSupplierName = SVUtils.decorator(txtSupplierName, validator);
+			}
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
@@ -226,12 +245,14 @@ public class Example1 extends JFrame {
 			txtSupplierStatus.setPreferredSize(MainClass.ssDim);
 
 		// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-			final Container contentPane = getContentPane();
+			final Container contentPane = new JPanel();
 			contentPane.setLayout(new GridBagLayout());
 			final GridBagConstraints constraints = new GridBagConstraints();
 
 			constraints.gridx = 0;
 			constraints.gridy = 0;
+			constraints.weightx = .40;
+			constraints.anchor = GridBagConstraints.WEST;
 			contentPane.add(lblSupplierID, constraints);
 			constraints.gridy = 1;
 			contentPane.add(lblSupplierName, constraints);
@@ -242,6 +263,9 @@ public class Example1 extends JFrame {
 
 			constraints.gridx = 1;
 			constraints.gridy = 0;
+			constraints.weightx = .60;
+			constraints.anchor = GridBagConstraints.CENTER;
+			constraints.fill = GridBagConstraints.HORIZONTAL;
 			contentPane.add(txtSupplierID, constraints);
 			constraints.gridy = 1;
 			contentPane.add(txtSupplierName, constraints);
@@ -258,9 +282,21 @@ public class Example1 extends JFrame {
 		// DISABLE THE PRIMARY KEY
 			txtSupplierID.setEnabled(false);
 
+		// SET UP THE SIMPLE VALIDATION PANEL
+			JPanel uiPanel;
+			if (USE_SIMPLE_VALIDATION) {
+				ValidationPanel valiPanel = new ValidationPanel();
+				valiPanel.setInnerComponent(contentPane);
+				ValidationGroup group = valiPanel.getValidationGroup();
+				group.addItem(decoSupplierName, false);
+				uiPanel =  valiPanel;
+			} else {
+				uiPanel = (JPanel) contentPane;
+			}
 		// MAKE THE JFRAME VISIBLE
-			setVisible(true);
-			pack();
+			frame.add(uiPanel);
+			frame.pack();
+			frame.setVisible(true);
 	}
 
 }
