@@ -6,7 +6,8 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 SwingSet 4.0.13 - Released TBD
 ==============================================================================
 
-	1. stuff goes here.....
+	1. PR#177 - Automatically make the version from pom.xml available to the
+	   running program. Versions can be compared.
 
 ==============================================================================
 SwingSet 4.0.12 - Released 2023-12-16
