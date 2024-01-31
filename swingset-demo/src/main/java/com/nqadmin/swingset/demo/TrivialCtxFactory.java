@@ -58,10 +58,17 @@ public class TrivialCtxFactory implements InitialContextFactory
 {
 private Map<String,Object> jndiStuff = new HashMap<>();
 
+/**
+ * Used by java's JNDI infrastructure to create initial context.
+ * @throws NamingException 
+ */
 public TrivialCtxFactory() throws NamingException
 {
 }
 
+/**
+ * {@inheritDoc }
+ */
 @Override
 public Context getInitialContext(
         @SuppressWarnings("UseOfObsoleteCollectionType")
