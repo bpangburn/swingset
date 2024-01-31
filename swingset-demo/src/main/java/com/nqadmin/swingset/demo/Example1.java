@@ -119,6 +119,12 @@ public class Example1 extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
+				// In a standalone situation, or when working with Pangburn groups's
+				// applications, get a JdbcRowSetImpl directly by doing
+				//		import com.nqadmin.rowset.JdbcRowSetImpl;
+				//		...
+				//		rowset = new JdbcRowSetImpl(connection);
+				// See DemoUtil opening comment for more information.
 				rowset = DemoUtil.getNewRowSet(connection);
 				rowset.setCommand("SELECT * FROM supplier_data");
 				navigator = new SSDataNavigator(rowset);

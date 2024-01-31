@@ -36,6 +36,46 @@ import javax.sql.rowset.RowSetProvider;
  
 /**
  * Utilities for setting up a database to use with the demos.
+ * <p>
+ * The Demo environment supports 3 ways to get a Rowset using
+ * {@link #getNewRowSet(java.sql.Connection, com.nqadmin.swingset.demo.DemoUtil.RowSetSource) }. 
+ * Two of the ways allow the assignment of a connection to a JdbcRowSet,
+ * several JdbcRowSet can share a single connection;
+ * any threading and/or concurancy issues are handled by the connection.
+ * The third way hooks into an actual connection pool, which is provided
+ * by the database, and uses a {@link CachedRowSet}; in the case of the demo
+ * the pool is never bigger than one.
+ * <p>
+ * One way uses {@link com.nqadmin.rowset.JdbcRowSetImpl}, which is a custom
+ * JdbcRowSet implementation, which allows the direct assignment of a connection
+ * to the RowSet for its use. This is useful in environments where a
+ * {@link RowSetProvider} can not be used. For example
+ * <pre>
+ * {@code 
+ *    rowSet = new JdbcRowSetImpl(connection);
+ * }
+ * </pre>
+ * <p>
+ * The demo contains two different DataSource implementations. One is trivial
+ * and allows a given connection to be associated with a factory provided
+ * RowSet. This scheme is semantically equivelent to the previously mentioned
+ * mechanism, but without requiring a custom RowSet implementation.
+ * It is used like
+ * <pre>
+ * {@code 
+ *    rs = RowSetProvider.newFactory().createJdbcRowSet();
+ *    rs.setDataSourceName(getDsName(connection));
+ * }
+ * </pre>
+ * <p>
+ * Here is an example for the third way using connection pool,
+ * based on a connection pool provided by the database.
+ * <pre>
+ * {@code 
+ *    rs = RowSetProvider.newFactory().createCachedRowSet();
+ *    rs.setDataSourceName(DataSourcePool.DATA_SOURCE_NAME);
+ * }
+ * </pre>
  */
 public class DemoUtil { 
 	private DemoUtil() { }

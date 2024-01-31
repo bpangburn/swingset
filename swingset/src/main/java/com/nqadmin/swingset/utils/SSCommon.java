@@ -184,7 +184,9 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Listener(s) for the underlying RowSet used to update the bound SwingSet
-	 * component.
+	 * component. When working with a {@linkplain CachedRowSet} there are
+	 * extra steps involved which require the listener to ignore some events,
+	 * see {@link SSDataNavigator#acceptChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable) }.
 	 */
 	protected class SSRowSetListener implements RowSetListener, Serializable {
 		/**
@@ -204,7 +206,7 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void cursorMoved(final RowSetEvent event) {
-			if (isAcceptingChanges(rowSet)) {
+			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
 				return;
 			}
 			logger.trace("{} - RowSet cursor moved.", () -> getColumnForLog());
@@ -231,7 +233,7 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void rowChanged(final RowSetEvent event) {
-			if (isAcceptingChanges(rowSet)) {
+			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
 				return;
 			}
 			logger.trace("{} - RowSet row changed.", () -> getColumnForLog());
@@ -247,7 +249,7 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void rowSetChanged(final RowSetEvent event) {
-			if (isAcceptingChanges(rowSet)) {
+			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
 				return;
 			}
 			logger.trace("{} - RowSet changed.", () -> getColumnForLog());
