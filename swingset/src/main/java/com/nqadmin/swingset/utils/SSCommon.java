@@ -184,7 +184,7 @@ public class SSCommon implements Serializable {
 
 	/**
 	 * Listener(s) for the underlying RowSet used to update the bound SwingSet
-	 * component. When working with a {@linkplain CachedRowSet} there are
+	 * component. When working with a {@linkplain javax.sql.rowset.CachedRowSet} there are
 	 * extra steps involved which require the listener to ignore some events,
 	 * see {@link SSDataNavigator#acceptChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable) }.
 	 */
