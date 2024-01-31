@@ -148,8 +148,8 @@ public class SSDataNavigator extends JPanel {
 	}
 
 	/**
-	 * Find out if the specified RowSet is doing {@linkplain acceptingChanges}.
-	 * Only applies to CachedRowSet.
+	 * Find out if the specified RowSet is
+	 * a {@linkplain CachedRowSet} doing {@linkplain acceptingChanges}.
 	 * @param rs check this rowset
 	 * @return true if accepting
 	 */
@@ -158,20 +158,23 @@ public class SSDataNavigator extends JPanel {
 	}
 
 	/**
-	 * Do {@linkplain acceptChanges} on the given {@linkplain CachedRowSet}
-	 * set the state for the rowset so that it's listeners can be ignored.
-	 * {@linkplain code}, if not null, is executed after acceptChanges, even
-	 * if there's an exception.
+	 * A {@linkplain CachedRowSet} requires an extra step to effect changes
+	 * in its underlying data source;
+	 * this method does {@linkplain acceptChanges} on the given {@linkplain CachedRowSet}.
+	 * Set the state for the CachedRowSet so that it's listeners can ignore
+	 * the extra events.
+	 * The runnable {@linkplain runAfterChange}, if not null, is executed after
+	 * acceptChanges on the CachedRowSet is successful.
 	 * @param _crs accept change on this.
-	 * @param code execute if not null
+	 * @param runAfterChanges execute if not null
 	 * @throws SQLException
 	 */
-	public static void acceptChanges(CachedRowSet _crs, Runnable code) throws SQLException {
+	public static void acceptChanges(CachedRowSet _crs, Runnable runAfterChanges) throws SQLException {
 		try {
 			SSDataNavigator.setAcceptingChanges(_crs, true);
 			_crs.acceptChanges();
-			if (code != null) {
-				code.run();		// assume if acceptChanges throws, don't need "code"
+			if (runAfterChanges != null) {
+				runAfterChanges.run();		// assume if acceptChanges throws, don't need "code"
 			}
 		} finally {
 			SSDataNavigator.setAcceptingChanges(_crs, false);
