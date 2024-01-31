@@ -72,6 +72,7 @@ import org.h2.jdbcx.JdbcDataSource;
 public class DataSourcePool {
 	private DataSourcePool() { }
 
+	/** Data source name for binding lookup.  */
 	public static final String DATA_SOURCE_NAME = "PoolDataSource";
 	private static final Logger logger = LogManager.getLogger(MainClass.class);
 

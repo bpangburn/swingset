@@ -43,7 +43,7 @@ import javax.sql.rowset.RowSetProvider;
  * several JdbcRowSet can share a single connection;
  * any threading and/or concurancy issues are handled by the connection.
  * The third way hooks into an actual connection pool, which is provided
- * by the database, and uses a {@link CachedRowSet}; in the case of the demo
+ * by the database, and uses a {@link javax.sql.rowset.CachedRowSet}; in the case of the demo
  * the pool is never bigger than one.
  * <p>
  * One way uses {@link com.nqadmin.rowset.JdbcRowSetImpl}, which is a custom
@@ -81,6 +81,7 @@ public class DemoUtil {
 	private DemoUtil() { }
 	private static final Logger logger = LogManager.getLogger(MainClass.class);
 
+	/** Invoke this method to output collected statistics to log. */
 	public static void logConnectionUsage() {
 		logger.info(() -> "RowSetSourceDefault: " + whichRowSetDefault);
 		logger.info(() -> String.format(
@@ -95,8 +96,11 @@ public class DemoUtil {
 	 * Used to specify how to create a new {@linkplain RowSet}.
 	 */
 	public enum RowSetSource {
-		SHARE_JDBC,		// Use specified connection and JdbcRowSet
-		POOL_CACHED,	// Use normal connection pool and CachedRowSet
+		/** Use specified connection and JdbcRowSet. */
+		SHARE_JDBC,
+		/** Use normal connection pool and CachedRowSet. */
+		POOL_CACHED,
+		/** Use custom JdbcRowSet. */
 		NQADMIN,
 	}
 	/** Track every connection that's seen. If a connection does not have an
@@ -158,19 +162,19 @@ public class DemoUtil {
 	 * Pangburn group's JdbcRowSetImpl.
 	 * @param connection only used to build JdbcRowSetImpl.
 	 * @return The RowSet with either a Connection or DataSource
-	 * @throws SQLException 
+	 * @throws SQLException passed through
 	 */
 	public static RowSet getNewRowSet(Connection connection) throws SQLException {
 		return getNewRowSet(connection, whichRowSetDefault);
 	}
 
 	/**
-	 * Like {@linkplain getNewRowSet(Connection)}, but specify RowSetSource.
+	 * Like {@linkplain #getNewRowSet(Connection)}, but specify RowSetSource.
 	 * Note: connection can be null, but only if whichRowSet is POOL_CACHED.
 	 * @param connection only used to build JdbcRowSetImpl.
 	 * @param whichRowSet how to construct the RowSet and/or get it's connection
 	 * @return The RowSet with either a Connection or DataSource
-	 * @throws SQLException 
+	 * @throws SQLException passed through
 	 */
 	public static RowSet getNewRowSet(Connection connection, RowSetSource whichRowSet) throws SQLException {
 		rowSetSourceInit(whichRowSet);
@@ -227,7 +231,10 @@ public class DemoUtil {
 		});
 	}
 
-	/** open/close stuff to show up in statistics */
+	/**
+	 * open/close stuff to show up in statistics
+	 * @param ctx the context
+	 */
 	@SuppressWarnings("CallToPrintStackTrace")
 	private static void debugRowSetSourceConnections(InitialContext ctx) {
 		try {
