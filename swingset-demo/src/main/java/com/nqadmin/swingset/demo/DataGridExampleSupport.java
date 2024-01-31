@@ -101,27 +101,27 @@ class DataGridExampleSupport {
 	}
 
 
-	DataGridExampleSupport(Logger logger, Container uiContainer,
-			RowSet rowset, SSDataGrid dataGrid,
-			int primaryColumn, SSDataValue dataValue,
-			String[] columnNames, Object[] defaultValues)
+	DataGridExampleSupport(Logger _logger, Container _uiContainer,
+			RowSet _rowset, SSDataGrid _dataGrid,
+			int _primaryColumn, SSDataValue _dataValue,
+			String[] _columnNames, Object[] _defaultValues)
 			throws SQLException {
 
-		if(!(uiContainer.getLayout() instanceof BorderLayout)) {
+		if(!(_uiContainer.getLayout() instanceof BorderLayout)) {
 			throw new IllegalArgumentException("uiContainer without BorderLayout");
 		}
 
-		this.uiContainer = uiContainer;
-		this.rowset = rowset;
-		this.dataGrid = dataGrid;
-		this.logger = logger;
+		this.uiContainer = _uiContainer;
+		this.rowset = _rowset;
+		this.dataGrid = _dataGrid;
+		this.logger = _logger;
 
 		
 		// stuff needed if there's going to be an insertion
-		dataGrid.setSSDataGridHandler(new DataGridHandler());
-		dataGrid.setPrimaryColumn(primaryColumn);
-		dataGrid.setSSDataValue(dataValue);
-		dataGrid.setDefaultValues(columnNames, defaultValues);
+		_dataGrid.setSSDataGridHandler(new DataGridHandler());
+		_dataGrid.setPrimaryColumn(_primaryColumn);
+		_dataGrid.setSSDataValue(_dataValue);
+		_dataGrid.setDefaultValues(_columnNames, _defaultValues);
 
 		setupDebugButtons();
 	}

@@ -108,10 +108,19 @@ public class DemoUtil {
 
 	private static RowSetSource whichRowSetDefault = RowSetSource.SHARE_JDBC;
 
+	/**
+	 * The property {@code WhichRowSetDefault} controls how a {@linkplain RowSet}
+	 * is created by {@linkplain #getNewRowSet(java.sql.Connection) }.
+	 * @return default type of RowSet
+	 */
 	public static RowSetSource getWhichRowSetDefault() {
 		return whichRowSetDefault;
 	}
 
+	/**
+	 * Establish the default for how a RowSet is created.
+	 * @param _whichRowSetDefault default
+	 */
 	public static void setWhichRowSetDefault(RowSetSource _whichRowSetDefault) {
 		if (_whichRowSetDefault != null) {
 			whichRowSetDefault = _whichRowSetDefault;

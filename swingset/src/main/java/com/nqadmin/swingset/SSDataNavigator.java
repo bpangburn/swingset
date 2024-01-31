@@ -149,9 +149,9 @@ public class SSDataNavigator extends JPanel {
 
 	/**
 	 * Find out if the specified RowSet is
-	 * a {@linkplain CachedRowSet} doing {@linkplain acceptingChanges}.
+	 * a {@linkplain CachedRowSet} doing {@linkplain CachedRowSet#acceptChanges}.
 	 * @param rs check this rowset
-	 * @return true if accepting
+	 * @return true if executing acceptingChanges
 	 */
 	public static boolean isAcceptingChanges(RowSet rs) {
 		return rs == null ? false : getRowSetState(rs).acceptingChanges;
@@ -160,10 +160,10 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * A {@linkplain CachedRowSet} requires an extra step to effect changes
 	 * in its underlying data source;
-	 * this method does {@linkplain acceptChanges} on the given {@linkplain CachedRowSet}.
+	 * this method does {@linkplain #acceptChanges(CachedRowSet, Runnable)} on the given {@linkplain CachedRowSet}.
 	 * Set the state for the CachedRowSet so that it's listeners can ignore
 	 * the extra events.
-	 * The runnable {@linkplain runAfterChange}, if not null, is executed after
+	 * The runnable {@code runAfterChanges}, if not null, is executed after
 	 * acceptChanges on the CachedRowSet is successful.
 	 * @param _crs accept change on this.
 	 * @param runAfterChanges execute if not null

@@ -78,6 +78,11 @@ public class DataSourcePool {
 	private static DataSource ds;
 	private static JdbcConnectionPool cp;
 
+	/**
+	 * Createn a {@linkplain DataSource} object for the "H2" database's
+	 * connection pool.
+	 * @return datasource
+	 */
 	public static DataSource getDataSource() {
 		if (cp == null) {
 			// Setup the connection pool
@@ -89,14 +94,26 @@ public class DataSourcePool {
 		return new MyDataSource(ds);
 	}
 
+	/**
+	 * The maximum number of connections in the pool is tracked.
+	 * @return max connection in pool
+	 */
 	public static int cMax() {
 		return cMax;
 	}
 
+	/**
+	 * The number of connection opens for connections from the pool is tracked.
+	 * @return how many opens
+	 */
 	public static int nOpen() {
 		return nOpen;
 	}
 
+	/**
+	 * The number of connection closes for connections from the pool is tracked.
+	 * @return how many closes
+	 */
 	public static int nClose() {
 		return nClose;
 	}
@@ -106,12 +123,13 @@ public class DataSourcePool {
 	private static int nClose;
 
 	// TODO: don't allow changing url, ...
+	/** A DataSource wrapper so usage statistics can be gathered. */
 	private static class MyDataSource implements DataSource
 	{
 		private final DataSource delegate;
 
-		public MyDataSource(DataSource delegate) {
-			this.delegate = delegate;
+		private MyDataSource(DataSource _delegate) {
+			this.delegate = _delegate;
 		}
 
 		// Count the opens
@@ -131,7 +149,7 @@ public class DataSourcePool {
 			return conn;
 		}
 
-		private void checkMax() {
+		private static void checkMax() {
 			int activeConnections = cp.getActiveConnections();
 			if (activeConnections > cMax) {
 				cMax = activeConnections;
@@ -196,8 +214,8 @@ public class DataSourcePool {
 	{
 		private final Connection delegate;
 
-		public MyConnection(Connection delegate) {
-			this.delegate = delegate;
+		public MyConnection(Connection _delegate) {
+			this.delegate = _delegate;
 		}
 
 		// Count the closes

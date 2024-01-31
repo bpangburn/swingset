@@ -50,10 +50,16 @@ import org.h2.jdbcx.JdbcDataSource;
  * To use with the demo's naming service.
  */
 public class DataSourceShareConnection {
+	/** Name of the DataSource. */
 	public static final String DATA_SOURCE_NAME = "ShareConnection";
 
 	private DataSourceShareConnection() { }
 
+	/**
+	 * Provide a DataSource that always returns a specified connection.
+	 * @param conn hook up the DataSource to this connection
+	 * @return DataSource
+	 */
 	public static DataSource getDataSource(Connection conn) {
 		JdbcDataSource ds01 = new JdbcDataSource();
 		ds01.setURL("jdbc:h2:mem:" + MainClass.DATABASE_NAME);
@@ -64,9 +70,9 @@ public class DataSourceShareConnection {
 	{
 		private final DataSource delegate;
 		private final Connection sharedConnection;
-
-		public MyDataSource(DataSource delegate, Connection conn) {
-			this.delegate = delegate;
+		
+		private MyDataSource(DataSource _delegate, Connection conn) {
+			this.delegate = _delegate;
 			this.sharedConnection = conn;
 		}
 
