@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
 import java.awt.AWTKeyStroke;
@@ -327,7 +332,8 @@ public interface SSComponentInterface {
 	 */
 	@Deprecated
 	default SSDataNavigator getSSDataNavigator() {
-		return SSDataNavigator.getSSDataNavigator(getRowSet());
+		//return SSDataNavigator.getSSDataNavigator(getRowSet());
+		return null;
 	}
 	
 	/**

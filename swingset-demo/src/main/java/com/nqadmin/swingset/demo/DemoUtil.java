@@ -41,7 +41,7 @@ import javax.sql.rowset.RowSetProvider;
  * {@link #getNewRowSet(java.sql.Connection, com.nqadmin.swingset.demo.DemoUtil.RowSetSource) }. 
  * Two of the ways allow the assignment of a connection to a JdbcRowSet,
  * several JdbcRowSet can share a single connection;
- * any threading and/or concurancy issues are handled by the connection.
+ * any threading and/or concurrency issues are handled by the connection.
  * The third way hooks into an actual connection pool, which is provided
  * by the database, and uses a {@link javax.sql.rowset.CachedRowSet}; in the case of the demo
  * the pool is never bigger than one.
@@ -58,7 +58,7 @@ import javax.sql.rowset.RowSetProvider;
  * <p>
  * The demo contains two different DataSource implementations. One is trivial
  * and allows a given connection to be associated with a factory provided
- * RowSet. This scheme is semantically equivelent to the previously mentioned
+ * RowSet. This scheme is semantically equivalent to the previously mentioned
  * mechanism, but without requiring a custom RowSet implementation.
  * It is used like
  * <pre>

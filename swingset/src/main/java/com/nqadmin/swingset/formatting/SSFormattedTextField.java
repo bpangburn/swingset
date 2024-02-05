@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
 import java.awt.Color;
@@ -59,6 +64,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -248,7 +254,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 				// TODO May want to see if we can veto invalid updates
 				// 2020-12-14_BP: allow null if on insert row
-				if (!getAllowNull() && (currentValue == null) && !SSDataNavigator.isInserting(getRowSet())) {
+				if (!getAllowNull() && (currentValue == null) && !RowSetState.isInserting(getRowSet())) {
 					logger.warn("Null value encounted, but not allowed.");
 					JOptionPane.showMessageDialog(ftf, "Null values are not allowed for " + getBoundColumnName(),
 							"Null Exception", JOptionPane.ERROR_MESSAGE);

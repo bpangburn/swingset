@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
 import java.util.Arrays;
@@ -109,14 +114,5 @@ public class SSUtils {
 		}
 		return String.format("%s@%X", o.getClass().getSimpleName(), System.identityHashCode(o));
 	}
-
-	////////////////////////////////////////////////////////////////////////////
-	//
-	// EventBus
-	//
-	//     posting Events
-	//     finding a bus
-	//
-	// TODO:
 
 }

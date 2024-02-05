@@ -128,6 +128,7 @@ public class SSMemoField extends JTextArea implements RowSetListener, KeyListene
 					logger.error(getColumnForLog() + ": SQL Exception.", se);
 					tf.setText("");
 				} catch (final java.lang.NullPointerException np) {
+					// TODO: why NullPointerException
 					logger.error(getColumnForLog() + ": Null Pointer Exception.", np);
 					tf.setText("");
 				}

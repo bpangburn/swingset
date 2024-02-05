@@ -125,6 +125,7 @@ public class SSBooleanField extends JCheckBox implements RowSetListener, KeyList
 			} catch (final java.sql.SQLException se) {
 				logger.error(getColumnForLog() + ": SQL Exception.", se);
 			} catch (final java.lang.NullPointerException np) {
+				// TODO: why NullPointerException
 				logger.error(getColumnForLog() + ": Null Pointer Exception.", np);
 			}
 			return true;

@@ -13,9 +13,7 @@ You can copy and paste the single properties, into the pom.xml file and the IDE 
 That way multiple projects can share the same settings (useful for formatting rules for example).
 Any value defined here will override the pom.xml file value but is only applicable to the current project.
 -->
-        <org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.enable-indent>true</org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.enable-indent>
         <org-netbeans-modules-editor-indent.text.x-yaml.CodeStyle.project.enable-indent>true</org-netbeans-modules-editor-indent.text.x-yaml.CodeStyle.project.enable-indent>
-        <org-netbeans-modules-editor-indent.text.javascript.CodeStyle.project.enable-indent>true</org-netbeans-modules-editor-indent.text.javascript.CodeStyle.project.enable-indent>
         <org-netbeans-modules-editor-indent.text.xml.CodeStyle.project.enable-indent>true</org-netbeans-modules-editor-indent.text.xml.CodeStyle.project.enable-indent>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.enable-indent>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.enable-indent>
         <org-netbeans-modules-editor-indent.text.html.CodeStyle.project.enable-indent>true</org-netbeans-modules-editor-indent.text.html.CodeStyle.project.enable-indent>
@@ -71,6 +69,11 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-spi-editor-hints-projects.text.x-java.Javac_5f_DIVISION_5f_BY_5f_ZERO.enabled>true</org-netbeans-spi-editor-hints-projects.text.x-java.Javac_5f_DIVISION_5f_BY_5f_ZERO.enabled>
         <netbeans.hint.licensePath>${project.basedir}/LICENSE.ftl</netbeans.hint.licensePath>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.separateStaticImports>true</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.separateStaticImports>
-        <netbeans.hint.jdkPlatform>JDK_21</netbeans.hint.jdkPlatform>
+        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.methodDeclBracePlacement>NEW_LINE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.methodDeclBracePlacement>
+        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.classDeclBracePlacement>NEW_LINE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.classDeclBracePlacement>
+        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantDoWhileBraces>LEAVE_ALONE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantDoWhileBraces>
+        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantIfBraces>ELIMINATE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantIfBraces>
+        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantForBraces>LEAVE_ALONE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantForBraces>
+        <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantWhileBraces>LEAVE_ALONE</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.redundantWhileBraces>
     </properties>
 </project-shared-configuration>

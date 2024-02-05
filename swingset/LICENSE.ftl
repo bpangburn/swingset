@@ -47,3 +47,20 @@ ${licensePrefix}  Ernie R. Rael
 ${licenseLast}
 </#if>
 </#if>
+<#if licenseFirst??>
+<#if licenseFirst == "/*">
+/* *****************************************************************************
+<#else>
+${licenseFirst}
+</#if>
+</#if>
+${licensePrefix}The conditions in the above copyright notice apply to this copyright notice.
+${licensePrefix}Additions and modifications made by Ernie R. Rael are
+${licensePrefix}copyright (C) ${date?date?string("yyyy")}, Ernie R. Rael. All rights reserved.
+<#if licenseLast??>
+<#if licenseLast == " */">
+ * ****************************************************************************/
+<#else>
+${licenseLast}
+</#if>
+</#if>

@@ -131,6 +131,7 @@ public class SSCuitField extends SSFormattedTextField {
         try {
             cuitCaret.setSelectionVisible(true);
         } catch(final java.lang.NullPointerException np) {
+			// TODO: why NullPointerException
         	// do nothing - there may not be anything to select during initialization
         	//logger.warn(getColumnForLog() + ": Null Pointer Exception.", np);
         }

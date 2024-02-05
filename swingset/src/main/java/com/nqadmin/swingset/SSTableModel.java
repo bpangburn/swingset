@@ -51,8 +51,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.sql.RowSet;
-import javax.sql.rowset.CachedRowSet;
-import javax.sql.rowset.spi.SyncProviderException;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
@@ -853,7 +851,7 @@ public class SSTableModel extends AbstractTableModel {
 			
 			updateColumnObject(rowset, valueCopy, _column + 1, JDBCType.valueOf(type));
 
-			rowset.updateRow();
+			RowSetOps.updateRow(rowset);
 
 			logger.debug("Updated value: {}.", () -> getValueAt(_row,_column));
 		} catch (final SQLException se) {

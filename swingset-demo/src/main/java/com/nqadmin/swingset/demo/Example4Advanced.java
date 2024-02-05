@@ -40,9 +40,12 @@ package com.nqadmin.swingset.demo;
 import com.nqadmin.swingset.SSBaseComboBox.MissingOptionControl;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
+import static com.nqadmin.swingset.navigate.NavAction.*;
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.sql.Connection;
 import java.util.EnumSet;
 import java.util.Objects;
@@ -69,7 +72,10 @@ import javax.swing.text.DocumentFilter;
  * </ul>
  */
 @SuppressWarnings("serial")
-public class Example4Advanced extends Example4 {
+public class Example4Advanced extends Example4
+{
+	private final JButton extraButton1 = new JButton();
+	private final JButton extraButton2 = new JButton();
 
 	@Override
 	void cmbPartColorChangeOptions() {
@@ -144,41 +150,44 @@ public class Example4Advanced extends Example4 {
 		// See https://docs.oracle.com/javase/tutorial/uiswing/misc/action.html
 			
 		// Hotkeys/mnemonics
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F3"),"NavFirst");
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F4"),"NavPrevious");
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F5"),"NavNext");
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F6"),"NavLast");
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F7"),"NavCommit");
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F8"),"NavUndo");
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F9"),"NavRefresh");
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F10"),"NavAdd");
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F11"),"NavDelete");
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F3"), NAV_FIRST);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F4"), NAV_PREVIOUS);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F5"), NAV_NEXT);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F6"), NAV_LAST);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F7"), NAV_COMMIT);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F8"), NAV_UNDO);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F9"), NAV_REFRESH);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F10"), NAV_ADD);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F11"), NAV_DELETE);
 
 		final Container contentPane = getContentPane();
 		final GridBagConstraints constraints = new GridBagConstraints();
 		
-	// "Extra" buttons
-		Action tmpAction;
-		JButton tmpButton;
+		// Do something with the "Extra" buttons
 
-		// First record
-		tmpAction = navigator.getActionMap().get("NavFirst");
-		tmpButton = new JButton(tmpAction);
+		// goto First record
+		extraButton1.setAction(navigator.getActionMap().get(NAV_FIRST));
 		constraints.gridx = 0;
-		contentPane.add(tmpButton, constraints);
+		contentPane.add(extraButton1, constraints);
 		
-		// Last record
-		tmpAction = navigator.getActionMap().get("NavLast");
-		tmpButton = new JButton(tmpAction);
+		// goto Last record
+		extraButton2.setAction(navigator.getActionMap().get(NAV_LAST));
 		constraints.gridx = 1;
-		contentPane.add(tmpButton, constraints);
+		contentPane.add(extraButton2, constraints);
 
 		pack();
 
-		////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////
+		testFormatChange();
 
+		navigator.addPropertyChangeListener("rowSet", (PropertyChangeEvent evt) -> {
+			extraButton1.setAction(navigator.getActionMap().get(NAV_FIRST));
+			extraButton2.setAction(navigator.getActionMap().get(NAV_LAST));
+		});
+
+	}
+
+	private void testFormatChange()
+	{
 		// The following is not a feature per se. It is for tracking down
 		// a problem using a new feature, setListItemFormat, after the
 		// combobox is fully initialized.
@@ -246,6 +255,7 @@ public class Example4Advanced extends Example4 {
 				});
 			}
 		}
+
 	}
 
 	private int countChange = 2;

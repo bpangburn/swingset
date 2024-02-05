@@ -1039,6 +1039,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		} catch (final SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		} catch (final java.lang.NullPointerException npe) {
+			// TODO: why is NullPointerException here?
 			logger.error(getColumnForLog() + ": Null Pointer Exception.", npe);
 		}
 	}
