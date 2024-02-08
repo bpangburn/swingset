@@ -64,6 +64,7 @@ import javax.sql.rowset.spi.SyncProviderException;
 
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.utils.SSArray;
 import com.nqadmin.swingset.utils.SSCommon;
@@ -369,6 +370,96 @@ public class RowSetOps {
 	} // end protected String getColumnText(RowSet rs, String _columnName) {
 
 	/**
+	 * Get the column text from the current undo/redo value.
+	 * @param comp
+	 * @return
+	 */
+	public static String getObjectText(SSComponentInterface comp)
+	{
+		final RowSet _rowSet = comp.getRowSet();
+		final String _columnName = comp.getBoundColumnName();
+
+		String value = null;
+		try {
+			// IF THE COLUMN IS NULL SO RETURN NULL
+			if (getColumnCount(_rowSet)==0) {
+				return null;
+			}
+
+			Object objectValue = NavigateActions.fetchCurrentValue(comp);
+			if (objectValue == null)
+				return null;
+
+			if (objectValue instanceof String s)
+				return s;
+
+			final JDBCType jdbcType = getJDBCType(getColumnType(_rowSet, _columnName));
+
+			switch (jdbcType) {
+			case INTEGER: case SMALLINT: case TINYINT: case BIGINT:
+			case REAL: case DOUBLE: case FLOAT: case NUMERIC: case DECIMAL:
+			case BIT: case BOOLEAN:
+			case CHAR: case VARCHAR: case LONGVARCHAR:
+			case NCHAR: case NVARCHAR: case LONGNVARCHAR:
+				// TODO: don't need to include the CHAR... cases
+				value = String.valueOf(objectValue);
+				break;
+
+// TODO: Convert this to use java.time.LocalDate, LocalTime, or LocalDateTime as needed.
+			case DATE:
+				// NOTE: See SSCommon/getStringDate for a modified version
+				// Convert to "##/##/####", month/day/year, month day has two digits.
+				//final Date date = _rowSet.getDate(_columnName);
+				final Date date = (Date) objectValue;
+
+				//
+				// TODO: Would the "SSCommon.getStringDate" format be OK?
+				//		 That format does not have leading zero on
+				//		 single digit month or day.
+				//
+				final GregorianCalendar calendar = new GregorianCalendar();
+				calendar.setTime(date);
+				value = String.format("%02d/%02d/%d",
+						calendar.get(Calendar.MONTH) + 1,
+						calendar.get(Calendar.DAY_OF_MONTH),
+						calendar.get(Calendar.YEAR));
+				break;
+			case TIMESTAMP:
+				//Timestamp timestamp = _rowSet.getTimestamp(_columnName);
+				Timestamp timestamp = (Timestamp) objectValue;
+				//
+				// TODO: this isn't "month/day/year". DOES THAT MATTER?
+				//
+				// Convert to "yyyy-mm-dd hh:mm:ss.fffffffff"
+				// substring(0, 19) // without the nanoseconds
+				// This format matches what "updateColumnText" expects
+				//System.err.println("TIMESTAMP get: " + timestamp);
+				value = timestamp.toString();
+				break;
+
+				
+// TODO: Convert this to use java.time.LocalTime.
+			case TIME:
+				//final Time time = _rowSet.getTime(_columnName);
+				Time time = (Time) objectValue;
+				value = time.toString();
+				break;
+
+
+			default:
+				// TODO: SSSQLExceptionUnhandledType
+				logger.error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
+			} // end switch
+
+		} catch (final SQLException se) {
+			logger.error("SQL Exception for column " + _columnName + ".", se);
+		}
+
+		return value;
+
+	} // end protected String getColumnText(RowSet rs, String _columnName) {
+
+	/**
 	 * Retrieves an integer corresponding to the designated column's type based on
 	 * the column index (starting from 1)
 	 *
@@ -524,8 +615,12 @@ public class RowSetOps {
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	private static void updateColumnArray(final SSComponentInterface comp, final RowSet _rowSet, final SSArray _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException {
+	private static void updateColumnArray(final SSComponentInterface comp, final RowSet _rowSet, final SSArray _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException
+	{
 		logger.debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
+
+		if (NavigateActions.ENABLE_UNDO_REDO)
+			NavigateActions.captureInitialValue(comp);
 
 		// On insert row, write null if updatedValue is null, and do not perform other checks. 
 		boolean did_update = false;
@@ -596,8 +691,8 @@ public class RowSetOps {
 	// TODO: Eclipse is giving a Potential null pointer access, but we have assert(_updatedValue != null) so may be able to remove warning in future.
 	@SuppressWarnings("null")
 	private static void updateColumnText(final SSComponentInterface comp, final RowSet
-			_rowSet, final String _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException, NumberFormatException {
-
+			_rowSet, final String _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException, NumberFormatException
+	{
 		logger.debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
 		JDBCType jdbcType = getJDBCType(getColumnType(_rowSet, _columnName));
@@ -606,6 +701,9 @@ public class RowSetOps {
 			logger.error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
 			return;
 		}
+
+		if (NavigateActions.ENABLE_UNDO_REDO)
+			NavigateActions.captureInitialValue(comp);
 
 		boolean did_update = false;
 		try {

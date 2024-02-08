@@ -20,7 +20,7 @@
 
 		<!-- MAVEN AND JAVA VERSIONS -->
 		<version.maven>3.6.3</version.maven>
-		<version.java>8</version.java>
+		<version.java>17</version.java>
 
 		<!-- DEPENDENCIES -->
 		<!-- primary swingset-demo dependencies -->

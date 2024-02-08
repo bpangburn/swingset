@@ -52,7 +52,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.WeakHashMap;
 
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
@@ -132,10 +131,137 @@ import static com.nqadmin.swingset.navigate.RowSetState.setNavigateActions;
  */
 public class NavigateActions
 {
-	// TODO: should this go into RowSetState?
-	private static final Map<RowSet, NavigateActions> rowSetActions = new WeakHashMap<>();
+	/** False if no undo/redo and disables related code. */
+	public static final boolean ENABLE_UNDO_REDO = true;
+	/** Undo/redo commands */
+	public static enum UndoRedo {
+		/** Undo command */
+		UNDO,
+		/** Redo command */
+		REDO;
+	}
 
-	private final Map<NavAction, Action> actions;
+	/** Log4j Logger for component */
+	private static final Logger logger = SSUtils.getLogger();
+
+	//
+	// TODO:
+	//     For now, have the defaults here. In the future,
+	//     probably want to set the defaults from some
+	//     configurable spot, via CentralLookup?
+	//     Maybe: interface SwingSetConfiguration {}
+	//
+	private static final boolean V3_BUTTONS_DEFAULT = false;
+	private static final boolean AUTO_COMMIT_DEFAULT = false;
+
+	/** logger for package use. */
+	static Logger getLogger()
+	{
+		return logger;
+	}
+
+	////////////////////////////////////////////////////////////////////////////
+	//
+	// TODO: Consider
+	// Should the usage of these static access functions should probably
+	// be reduced, if not eliminated, in favor of including a navAction
+	// reference in the SSComponent.
+	//
+
+	private static NavigateActions dummy;
+	private static NavigateActions dummy() {
+		if (dummy == null)
+			dummy = new NavigateActions(null);
+		return dummy;
+	}
+
+	/**
+	 * Return the navigate actions for the given {@linkplain RowSet}.
+	 * @param rowSet rowSet
+	 * @return actions
+	 */
+	public static NavigateActions get(RowSet rowSet)
+	{
+		if (rowSet == null)
+			return dummy();
+		NavigateActions navActs = RowSetState.getNavigateActions(rowSet);
+		if (navActs != null)
+			return navActs;
+		navActs = new NavigateActions(rowSet);
+
+		setNavigateActions(rowSet, navActs);
+		return navActs;
+	}
+
+	/**
+         * Make sure the column's undo/redo stack is initialized; the
+         * database value (an object) is the base.
+         * This must be used before any updates are done to the rowset.
+	 * @param comp rowset/column
+	 * @throws SQLException
+	 */
+	public static void captureInitialValue(SSComponentInterface comp) throws SQLException
+	{
+		if (!NavigateActions.ENABLE_UNDO_REDO)
+			throw new IllegalStateException("UNDO/REDO disabled");
+		NavigateActions navActs = get(comp.getRowSet());
+		navActs.undoRow.captureInitialValue(comp);
+	}
+
+	/**
+	 * Return the current undo/redo value for the specified component.
+	 * @param comp ssComponent
+	 * @return current value
+	 * @throws SQLException
+	 */
+	public static Object fetchCurrentValue(SSComponentInterface comp) throws SQLException
+	{
+		if (!NavigateActions.ENABLE_UNDO_REDO)
+			throw new IllegalStateException("UNDO/REDO disabled");
+		NavigateActions navActs = get(comp.getRowSet());
+		return navActs.undoRow.fetchCurrentValue(comp);
+	}
+
+	/**
+	 * Perform the specified undo/redo cmd on the specified component.
+	 * @param comp ssComponent
+	 * @param cmd undo or redo
+	 * @throws java.sql.SQLException
+	 */
+	public static void undoRedo(SSComponentInterface comp, UndoRedo cmd) throws SQLException
+	{
+		if (!NavigateActions.ENABLE_UNDO_REDO)
+			throw new IllegalStateException("UNDO/REDO disabled");
+		logger.debug(() -> String.format("%s: %s for %s", cmd,
+				comp.getClass().getSimpleName(), comp.getBoundColumnName()));
+		NavigateActions navActs = get(comp.getRowSet());
+		navActs.doUndoRedo(comp, cmd);
+	}
+
+	/**
+	 * Make the next undo/redo change goes into a new slot.
+	 * @param comp ssComponent
+	 */
+	public static void newSlot(SSComponentInterface comp)
+	{
+		if (!NavigateActions.ENABLE_UNDO_REDO)
+			throw new IllegalStateException("UNDO/REDO disabled");
+		NavigateActions navActs = get(comp.getRowSet());
+		navActs.undoRow.focusChange(null);
+	}
+
+	/**
+	 * Add a modification to the undo/redo stack.
+	 * @param ev
+	 * @throws SQLException
+	 */
+	public static void addUndoableChange(RowSetModificationEvent ev) throws SQLException
+	{
+		if (!NavigateActions.ENABLE_UNDO_REDO)
+			return;
+		NavigateActions navActs = get(ev.getSource().getRowSet());
+		navActs.undoRow.addChange(ev);
+	}
 
 	/**
 	 * Rowset Listener on the RowSet used by data navigator.
@@ -199,7 +325,7 @@ public class NavigateActions
 
 					try {
 						logger.debug("Calling updateNavigator().");
-						setRowModified(false);
+						freshRow();
 						updateNavigator();
 					} catch (final SQLException se) {
 						logger.error("SQL Exception.", se);
@@ -210,10 +336,7 @@ public class NavigateActions
 
 	}
 
-	/**
-	 * Log4j Logger for component
-	 */
-	private static final Logger logger = SSUtils.getLogger();
+	private final Map<NavAction, Action> actions;
 
 	/**
 	 * Indicator to cause the navigator to skip the execute() function call on the
@@ -221,44 +344,22 @@ public class NavigateActions
 	 */
 	private boolean callExecute = true;
 
-	/**
-	 * Indicator to force confirmation of RowSet deletions.
-	 */
+	/** Indicator to force confirmation of RowSet deletions. */
 	private boolean confirmDeletes = true;
 	
-	/**
-	 * Row number for current record in RowSet.
-	 */
+	/** Row number for current record in RowSet. */
 	private int currentRow = 0;
 
-	/**
-	 * Container (frame or internal frame) which contains the navigator.
-	 */
+	/** Container (frame or internal frame) which contains the navigator. */
 	private SSDBNav dBNav = new SSDBNav() {};
 
-	/**
-	 * Indicator to allow/disallow deletions from the RowSet.
-	 */
+	/** Indicator to allow/disallow deletions from the RowSet. */
 	private boolean deletion = true;
 
-	/**
-	 * NavGroup event bus.
-	 */
-	private EventBus eventBus;
-
-	/**
-	 * Indicator to allow/disallow insertions to the RowSet.
-	 */
+	/** Indicator to allow/disallow insertions to the RowSet. */
 	private boolean insertion = true;
 
-	/**
-	 * Indicator that current row is dirty.
-	 */
-	private boolean isRowModified = false;
-
-	/**
-	 * Indicator to allow/disallow changes to the RowSet.
-	 */
+	/** Indicator to allow/disallow changes to the RowSet. */
 	private boolean modification = true;
 
 	/**
@@ -270,19 +371,13 @@ public class NavigateActions
 	 */
 	private SSDBComboBox navCombo = null;
 
-	/**
-	 * Number of rows in RowSet. Set to zero if next() method returns false.
-	 */
+	/** Number of rows in RowSet. Set to zero if next() method returns false. */
 	private int rowCount = 0;
 
-	/**
-	 * RowSet from which component will get/set values.
-	 */
+	/** RowSet from which component will get/set values. */
 	private RowSet rowSet = null;
 
-	/**
-	 * Listener on the RowSet used by data navigator.
-	 */
+	/** Listener on the RowSet used by data navigator. */
 	private final NavRowSetListener rowsetListener = new NavRowSetListener();
 	
 	/** Indicates if rowset listener is added (or removed) */
@@ -294,55 +389,20 @@ public class NavigateActions
 	/** Indicates if rownumber listener is added (or removed) */
 	private boolean rownumberListenerAdded = false;
 
-	//
-	// TODO:
-	//     For now, have the defaults here. In the future,
-	//     probably want to set the defaults from some
-	//     configurable spot, via CentralLookup?
-	//     Maybe: interface SwingSetConfiguration {}
-	//
-	private static final boolean V3_BUTTONS_DEFAULT = false;
-	private static final boolean AUTO_COMMIT_DEFAULT = false;
+	/** NavGroup event bus. */
+	private EventBus eventBus;
 
-	private static NavigateActions dummy;
-	private static NavigateActions dummy() {
-		if (dummy == null)
-			dummy = new NavigateActions(null);
-		return dummy;
-	}
+	/** Undo/redo this this rowset */
+	private final UndoRow undoRow;
 
 	/**
-	 * Return the navigate actions for the given {@linkplain RowSet}.
-	 * @param rowSet rowSet
-	 * @return actions
-	 */
-	public static NavigateActions get(RowSet rowSet)
-	{
-		if (rowSet == null)
-			return dummy();
-		// TODO: There's also RowSetState.[sg]etNavigateActions(). DON'T NEED BOTH
-		return rowSetNavActions.computeIfAbsent(rowSet, (rs) -> new NavigateActions(rs));
-	}
-
-	/**
-	 * Perform the specified undo/redo cmd on the specified component.
-	 * @param comp
-	 * @param cmd undo or redo
-	 */
-	public static void undoRedo(SSComponentInterface comp, UndoRedo cmd)
-	{
-		NavigateActions navActs = get(comp.getRowSet());
-		navActs.undoRow.doUndoRedo(comp, cmd);
-	}
-
-	/**
-	 * Constructs the SSDataNavigator with the given RowSet and sets the size of
-	 * the buttons on the navigator to the given size
+	 * Create actions and models for the RowSet.
+	 * Note that _rowSet may be null for a Dummy.
 	 *
 	 * @param _rowSet   the RowSet to which the navigator is bound to
 	 */
 	@SuppressWarnings("LeakingThisInConstructor")
-	NavigateActions(final RowSet _rowSet)
+	private NavigateActions(final RowSet _rowSet)
 	{
 		v3Buttons = V3_BUTTONS_DEFAULT;
 		autoCommit = AUTO_COMMIT_DEFAULT;
@@ -361,14 +421,16 @@ public class NavigateActions
 
 		rowNumberModel = new SpinnerNumberModel(1, 1, 1, 1);
 
-		// setSSRowSet will typically set the eventBus
-		setupEventBus();
-
-		if (_rowSet != null)
-			setRowSet(_rowSet);
+		undoRow = new UndoRow();
 
 		rownumberListener = (ChangeEvent e)
 				-> gotoRow((int) rowNumberModel.getNumber());
+
+		if (_rowSet == null)
+			return;
+
+		setupEventBus();
+		setRowSet(_rowSet);
 		addRownumberListener();
 	}
 
@@ -377,19 +439,32 @@ public class NavigateActions
 	private void setupEventBus() {
 		if (eventBus == null) {
 			eventBus = getLocalEventBus(this, rowSet);
+			eventBus.register(new BusReceiver());
 		}
-		eventBus.register(new BusReceiver());
 	}
+
+	// TODO: Make sure there's no memory leak. must unregister BusReceiver.
+	//		 Could make sure any leak is minimized to single instance of
+	//		 BusReceiver class and not all NavigateActions.
+	//		 Make BusReceiver static, spin through rowSetNavActions.
+	//		 Track rowset collected (how?) and unregister.
 
 	// TODO: also have Set<SSComponentInterface> modifiedComponents
 	transient private final Set<SSComponentInterface> errorComponents = new HashSet<>();
 	class BusReceiver {
 		@Subscribe
-		public void handleRowDataChanged(RowSetModificationEvent ev) {
+		public void handleRowDataChanged(RowSetModificationEvent ev)
+		{
 			if (ev.matches(rowSet)) {
 				// Our RowSet's row has changed
-
+				
 				// TODO what about ev.getSource == null ?
+
+				try {
+					ev.getSource().addUndoableChange(ev);
+				} catch (SQLException ex) {
+					logger.error("Undo/redo exception", ex);
+				}
 				if(ev.isError()) {
 					errorComponents.add(ev.getSource());
 				} else {
@@ -397,10 +472,31 @@ public class NavigateActions
 				}
 
 				logger.trace(() -> ev.toString());
-				setRowModified(true);
+				setRowModified();
 				updateActionState();
 			}
 		}
+
+		@Subscribe
+		public void handleFocusChangeEvent(FocusChangeEvent ev)
+		{
+			undoRow.focusChange(ev);
+		}
+	}
+
+	/**
+	 * Perform the specified undo/redo cmd on the specified component.
+	 * @param comp ssComponent
+	 * @param cmd undo or redo
+	 * @throws java.sql.SQLException
+	 */
+	// TODO: Should this be public?
+	void doUndoRedo(SSComponentInterface comp, UndoRedo cmd) throws SQLException
+	{
+		if (!NavigateActions.ENABLE_UNDO_REDO)
+			throw new IllegalStateException("UNDO/REDO disabled");
+		undoRow.doUndoRedo(comp, cmd);
+		updateActionState();
 	}
 
 	/**
@@ -432,7 +528,7 @@ public class NavigateActions
 	private final class NavFirstAction extends AbstractAction
 	{
 		/**
-		 * Constructor for the "First" button Action.
+		 * Constructor for the "First" Action.
 		 */
 		public NavFirstAction() {
 			super("First");
@@ -458,7 +554,7 @@ public class NavigateActions
 
 				rowSet.first();
 
-				setRowModified(false);
+				freshRow();
 				updateNavigator();
 
 				dBNav.performNavigationOps(Navigation.First);
@@ -480,7 +576,7 @@ public class NavigateActions
 	private final class NavPreviousAction extends AbstractAction
 	{
 		/**
-		 * Constructor for the "Previous" button Action.
+		 * Constructor for the "Previous" Action.
 		 */
 		public NavPreviousAction() {
 			super("Previous");
@@ -508,7 +604,7 @@ public class NavigateActions
 					rowSet.first();
 				}
 
-				setRowModified(false);
+				freshRow();
 				updateNavigator();
 
 				dBNav.performNavigationOps(Navigation.Previous);
@@ -526,13 +622,10 @@ public class NavigateActions
 	/**
 	 * Action for the "Next" button on the navigator.
 	 */
-	private final class NavNextAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L; // Unique ID
-
-		/**
-		 * Constructor for the "Next" button Action.
-		 */
+	@SuppressWarnings("serial")
+	private final class NavNextAction extends AbstractAction
+	{
+		/** Constructor for the "Next" Action. */
 		public NavNextAction() {
 			super("Next");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/next.gif")));
@@ -554,7 +647,7 @@ public class NavigateActions
 
 				rowSet.next();
 
-				setRowModified(false);
+				freshRow();
 				updateNavigator();
 
 				dBNav.performNavigationOps(Navigation.Next);
@@ -572,13 +665,10 @@ public class NavigateActions
 	/**
 	 * Action for the "Last" button on the navigator.
 	 */
-	private final class NavLastAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L; // Unique ID
-
-		/**
-		 * Constructor for the "Last" button Action.
-		 */
+	@SuppressWarnings("serial")
+	private final class NavLastAction extends AbstractAction
+	{
+		/** Constructor for the "Last" Action. */
 		public NavLastAction() {
 			super("Last");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/last.gif")));
@@ -600,7 +690,7 @@ public class NavigateActions
 				
 				rowSet.last();
 				
-				setRowModified(false);
+				freshRow();
 				updateNavigator();
 				
 				dBNav.performNavigationOps(Navigation.Last);
@@ -618,13 +708,10 @@ public class NavigateActions
 	/**
 	 * Action for the "Commit" button on the navigator.
 	 */
-	private final class NavCommitAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L; // Unique ID
-
-		/**
-		 * Constructor for the "Commit" button Action.
-		 */
+	@SuppressWarnings("serial")
+	private final class NavCommitAction extends AbstractAction
+	{
+		/** Constructor for the "Commit" Action. */
 		public NavCommitAction() {
 			super("Commit");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/commit.gif")));
@@ -661,7 +748,7 @@ public class NavigateActions
 
 					rowCount = rowSet.getRow();
 					
-					setRowModified(false);
+					freshRow();
 					updateNavigator();
 				} else {
 					// ELSE UPDATE THE DATABASE BASED ON THE PRESENT ROW VALUES.
@@ -669,7 +756,7 @@ public class NavigateActions
 					if (!commitChangesToDatabase(false))
 						return;
 				
-					setRowModified(false);
+					freshRow();
 					// TODO: why not updateNavigator?
 					updateActionState();
 					
@@ -708,13 +795,10 @@ public class NavigateActions
 	/**
 	 * Action for the "Undo" button on the navigator.
 	 */
-	private final class NavUndoAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L; // Unique ID
-
-		/**
-		 * Constructor for the "Undo" button Action.
-		 */
+	@SuppressWarnings("serial")
+	private final class NavUndoAction extends AbstractAction
+	{
+		/** Constructor for the "Undo" Action. */
 		public NavUndoAction() {
 			super("Undo");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/undo.gif")));
@@ -762,7 +846,7 @@ public class NavigateActions
 					rowSet.refreshRow();
 				}
 				
-				setRowModified(false);
+				freshRow();
 				updateNavigator();
 				
 			} catch (final SQLException se) {
@@ -778,13 +862,10 @@ public class NavigateActions
 	/**
 	 * Action for the "Refresh" button on the navigator.
 	 */
-	private final class NavRefreshAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L; // Unique ID
-
-		/**
-		 * Constructor for the "Refresh" button Action.
-		 */
+	@SuppressWarnings("serial")
+	private final class NavRefreshAction extends AbstractAction
+	{
+		/** Constructor for the "Refresh" Action. */
 		public NavRefreshAction() {
 			super("Refresh");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/refresh.gif")));
@@ -816,7 +897,7 @@ public class NavigateActions
 						rowSet.first();
 					}
 					
-					setRowModified(false);
+					freshRow();
 					updateNavigator();
 				}
 
@@ -835,13 +916,10 @@ public class NavigateActions
 	/**
 	 * Action for the "Add" button on the navigator.
 	 */
-	private final class NavAddAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L; // Unique ID
-
-		/**
-		 * Constructor for the "Add" button Action.
-		 */
+	@SuppressWarnings("serial")
+	private final class NavAddAction extends AbstractAction
+	{
+		/** Constructor for the "Add" Action. */
 		public NavAddAction() {
 			super("Add");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/add.gif")));
@@ -888,13 +966,10 @@ public class NavigateActions
 	/**
 	 * Action for the "Delete" button on the navigator.
 	 */
-	private final class NavDeleteAction extends AbstractAction {
-
-		private static final long serialVersionUID = 1L; // Unique ID
-
-		/**
-		 * Action for the "Delete" button Action.
-		 */
+	@SuppressWarnings("serial")
+	private final class NavDeleteAction extends AbstractAction
+	{
+		/** Action for the "Delete" Action. */
 		public NavDeleteAction() {
 			super("Delete");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/delete.gif")));
@@ -951,7 +1026,7 @@ public class NavigateActions
 					rowSet.last();
 				}
 				
-				setRowModified(false);
+				freshRow();
 				// UPDATE THE STATUS OF THE NAVIGATOR
 				updateNavigator();
 				
@@ -1009,7 +1084,8 @@ public class NavigateActions
 	
 	/**
 	 * Common code to commit changes to the database from the rowset if
-	 * modifications are allowed. After committing, it performs any
+	 * modifications are allowed; called before every action.
+	 * After committing, it performs any
 	 * post-update operations.
 	 * <p>
 	 * If modification==false, then skip the update and return as
@@ -1029,6 +1105,9 @@ public class NavigateActions
 		if (rowSet.getRow() == 0) {
 			result = false;
 		}
+
+		//boolean isDirty = undoRow.isDirty();
+		cleanupUpdateRow();	// CURRENTLY A NO-OP
 		
 		// if we have at least one row and the user has not set modifications to false (read-only)
 		// then continue to attempt to update database based on current rowset values
@@ -1052,6 +1131,28 @@ public class NavigateActions
 		// return
 		return result;
 	}
+
+	/**
+	 * Make sure updateRow only has values that are user changes.
+	 * After making a change, undo can back off to the original (base value
+	 * of undo/redo stack); if that happened, cancelRowUpdates, and
+	 * re-update that actual changes.
+	 */
+	private void cleanupUpdateRow()
+	{
+		// TODO: is this actually needed/desirable?
+		// It seems nice to not "change" things in the database that don't change.
+	}
+
+	// //
+	// // NOTE: looking at h2, doing deleteRow also clears updateRow
+	// //
+	// /**
+	//  * Before something like refresh/delete Actions should clear the updateRow.
+	//  */
+	// private void clearUpdateRow()
+	// {
+	// }
 
 	/**
 	 * Returns true if the RowSet contains one or more rows, else false.
@@ -1149,6 +1250,7 @@ public class NavigateActions
 	 *
 	 * @param _confirmDeletes indicates whether or not to confirm deletions
 	 */
+	// TODO: WHAT?
 	public void setConfirmDeletes(final boolean _confirmDeletes) {
 		//final boolean oldValue = confirmDeletes;
 		confirmDeletes = _confirmDeletes;
@@ -1287,11 +1389,11 @@ public class NavigateActions
 	 *
 	 * @param _rowSet data source for navigator
 	 */
-	public final void setRowSet(final RowSet _rowSet)
+	private void setRowSet(final RowSet _rowSet)
 	{
 		Objects.requireNonNull(_rowSet);
-
-		rowSetActions.put(rowSet, this);
+		if (rowSet != null)
+			throw new IllegalStateException("RowSet already set");
 
 		// RESET INSERT FLAG THIS IS NEED IF USERS LEFT THE LAST ROWSET
 		// IN INSERTION MODE WITH OUT SAVING THE RECORD OR UNDOING THE INSERTION
@@ -1307,6 +1409,7 @@ public class NavigateActions
 		// TODO: what is this about?
 		//firePropertyChange("rowSet", oldValue, rowSet);
 
+		undoRow.clear();
 		setupEventBus();
 
 		// SEE IF THERE ARE ANY ROWS IN THE GIVEN SSROWSET
@@ -1334,8 +1437,7 @@ public class NavigateActions
 		addRowsetListener();
 
 		try {
-			setRowModified(false);
-			setNavigateActions(rowSet, this);
+			freshRow();
 			updateNavigator();
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
@@ -1373,11 +1475,31 @@ public class NavigateActions
 		return rowSet;
 	}
 
-	private void setRowModified(boolean isDirty) {
-		isRowModified = isDirty;
-		if (!isDirty) {
-			errorComponents.clear();
-		}
+	//////////////////////////////////////////////////////////////////////
+	//
+	// State maintenance - set enable/disable on various actions
+	//
+
+	/** Indicator that current row is dirty. */
+	//private boolean isRowModified = false;
+
+	/** Moved to a new row, or undo updates, or refresh row.
+	 */
+	private void freshRow()
+	{
+		undoRow.clear();
+		errorComponents.clear();
+		//isRowModified = false; // TODO: get rid of this
+	}
+	// TODO: Use undoRow.isDirty() to check for modification.
+
+	// TODO: get rid of the following
+	private void setRowModified() {
+		//isRowModified = true; // TODO: get rid of this
+		//if (!isDirty) {
+		//	undoRow.clear();
+		//	errorComponents.clear();
+		//}
 	}
 	
 	private void updateEnable(NavAction navAction, boolean _flag) {
@@ -1446,6 +1568,8 @@ public class NavigateActions
 	 */
 	private void updateActionState() {
 		logger.trace(() -> String.format("rowCount=%d, currentRow=%d", rowCount, currentRow));
+
+		boolean isRowModified = undoRow.isDirty();
 
 		boolean onInsertRow = RowSetState.isInserting(rowSet);
 		boolean hasError = !errorComponents.isEmpty();

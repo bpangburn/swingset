@@ -106,15 +106,25 @@ public class Example1 extends JFrame {
 	RowSet rowset = null;
 	SSDataNavigator navigator = null;
 
+	private void cleanup()
+	{
+		connection = null;
+		rowset = null;
+		navigator = null;
+	}
+
 	/**
 	 * Constructor for Example1
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
-	public Example1(final Connection _dbConn) {
-
+	@SuppressWarnings("LeakingThisInConstructor")
+	public Example1(final Connection _dbConn)
+	{
 		// SET SCREEN TITLE
 			super("Example1");
+			DemoUtil.initExampleFrame(this, this::cleanup);
+
 			JFrame frame = this;
 
 		// SET CONNECTION

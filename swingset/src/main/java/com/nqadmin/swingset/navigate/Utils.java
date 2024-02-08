@@ -42,6 +42,8 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
+import java.awt.KeyboardFocusManager;
+
 import javax.sql.RowSet;
 
 import com.google.common.eventbus.EventBus;
@@ -107,6 +109,12 @@ public class Utils
 				globalEventBus = new EventBus("SwingSetGlobal");
 				CentralLookup.getDefault().add(globalEventBus);
 			}
+
+			// TODO: be more careful about tacking who's managing focus
+			//		 and the current focusOwner
+			KeyboardFocusManager.getCurrentKeyboardFocusManager()
+					.addPropertyChangeListener("focusOwner",
+							(pce) -> globalEventBus.post(new FocusChangeEvent(pce)));
 		}
 		return globalEventBus;
 	}

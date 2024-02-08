@@ -65,8 +65,12 @@ import java.util.StringTokenizer;
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -92,8 +96,8 @@ import com.nqadmin.swingset.datasources.RowSetOps.SSSQLNullException;
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
-
-import static com.nqadmin.swingset.SSDataNavigator.isAcceptingChanges;
+import com.nqadmin.swingset.navigate.NavigateActions;
+import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 
 import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingChanges;
 import static com.nqadmin.swingset.navigate.Utils.postRowSetModifiedError;
@@ -552,6 +556,35 @@ public class SSCommon {
 		init();
 	}
 
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	private void debugTrackRowSetListener()
+	{
+		if (Boolean.TRUE)
+			return;
+		if (getRowSet() == null)
+			return;
+		getRowSet().addRowSetListener(new RowSetListener()
+		{
+			@Override
+			public void rowSetChanged(RowSetEvent event)
+			{
+				System.err.println("DEBUG LISTENER: rowSetChanged: " + getBoundColumnName());
+			}
+
+			@Override
+			public void rowChanged(RowSetEvent event)
+			{
+				System.err.println("DEBUG LISTENER: rowChanged: " + getBoundColumnName());
+			}
+
+			@Override
+			public void cursorMoved(RowSetEvent event)
+			{
+				System.err.println("DEBUG LISTENER: cursorMoved: " + getBoundColumnName());
+			}
+		});
+	}
+
 //	/**
 //	 * Convenience method to add both RowSet and SwingSet Component listeners.
 //	 * <p>
@@ -797,8 +830,11 @@ public class SSCommon {
 
 		try {
 			if (getRowSet().getRow() != 0) {
-				//value = getRowSet().getColumnText(getBoundColumnName());
-				value = RowSetOps.getColumnText(getRowSet(),getBoundColumnName());
+				if (NavigateActions.ENABLE_UNDO_REDO) {
+					value = RowSetOps.getObjectText(ssComponent);
+				} else {
+					value = RowSetOps.getColumnText(getRowSet(),getBoundColumnName());
+				}
 				if (!getAllowNull() && (value == null)) {
 					value = "";
 				}
@@ -886,6 +922,7 @@ public class SSCommon {
 	 */
 	protected void init() {
 		getSSComponent().configureTraversalKeys();
+		getSSComponent().setupUndoRedoKeys();
 		getSSComponent().customInit();
 	}
 	
@@ -1181,6 +1218,80 @@ public class SSCommon {
 		if (!inBinding) {
 			bind();
 		}
+		debugTrackRowSetListener();
+	}
+
+	private static final String U = "SwingSetColumnUndo";
+	private static final String R = "SwingSetColumnRedo";
+	/**
+	 * Setup undo/redo action bindings for a component.
+	 * @param comp
+	 */
+	public static void setupUndoRedoKeys(SSComponentInterface comp)
+	{
+		if (!NavigateActions.ENABLE_UNDO_REDO)
+			return;
+		logger.debug(() -> String.format("UndoRedoKeys: %s", comp.getClass().getSimpleName()));
+
+		JComponent jc = (JComponent)comp;
+
+		//int cond = JComponent.WHEN_FOCUSED;
+		KeyStroke ksUndo = KeyStroke.getKeyStroke("ctrl Z");
+		KeyStroke ksRedo = KeyStroke.getKeyStroke("ctrl Y");
+		int cond = JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
+		InputMap im = new InputMap();
+		im.put(ksUndo, U);
+		im.put(ksRedo, R);
+		im.setParent(jc.getInputMap(cond));
+		jc.setInputMap(cond, im);
+		ActionMap am = new ActionMap();
+		am.put(U, new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				try {
+					NavigateActions.undoRedo(comp, UndoRedo.UNDO);
+				} catch (SQLException ex) {
+					logger.error("UNDO action:", ex);
+				}
+			}
+		});
+		am.put(R, new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				try {
+					NavigateActions.undoRedo(comp, UndoRedo.REDO);
+				} catch (SQLException ex) {
+					logger.error("REDO action:", ex);
+				}
+			}
+		});
+		am.setParent(jc.getActionMap());
+		jc.setActionMap(am);
+	};
+
+	/**
+	 * Use the specified argument, which comes from an undo or redo command,
+	 * to set the components value.
+	 * Whether the command was undo or redo generally doesn't matter.
+	 * @param cmd undo or redo
+	 * @param value the new value
+	 * @throws java.sql.SQLException if...
+	 */
+	public void undoRedoUpdateObject(UndoRedo cmd, Object value) throws SQLException
+	{
+		if (!NavigateActions.ENABLE_UNDO_REDO)
+			throw new IllegalStateException("UNDO/REDO disabled");
+		logger.debug(() -> String.format("%s: %s", cmd, value));
+		// TODO: put following in RowSetOps
+		// NOTE: following does not generate any events
+		getRowSet().updateObject(getBoundColumnIndex(), value);
+		// NOTE: Previous line sets value in RowSet's pending update.
+		//		 Following line causes updateSSComponent which gets the
+		//		 value to display from undoRedo; the update values
+		//		 can not always be reliably read JdbcRowSet vs CachedRowSet.
+		issueRowChanged();
 	}
 
 	/**

@@ -23,6 +23,8 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.raelity.lib.ui.Screens;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -32,6 +34,8 @@ import javax.sql.DataSource;
 import javax.sql.RowSet;
 import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
  
 /**
@@ -80,6 +84,19 @@ import javax.sql.rowset.RowSetProvider;
 public class DemoUtil { 
 	private DemoUtil() { }
 	private static final Logger logger = LogManager.getLogger(MainClass.class);
+
+	public static void initExampleFrame(JFrame frame, Runnable runOnClose)
+	{
+		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e)
+			{
+				if (runOnClose != null)
+					runOnClose.run();
+			}
+		});
+	}
 
 	/** Invoke this method to output collected statistics to log. */
 	public static void logConnectionUsage() {

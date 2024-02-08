@@ -60,6 +60,9 @@ import java.sql.Connection;
 
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.decorators.Validator;
+import com.nqadmin.swingset.navigate.NavigateActions;
+import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
+import com.nqadmin.swingset.navigate.RowSetModificationEvent;
 
 // SSComponentInterface.java
 //
@@ -237,6 +240,7 @@ public interface SSComponentInterface {
 	 *
 	 * @return the data type of the bound column
 	 */
+	// TODO: deprecate
 	default int getBoundColumnType() {
 		return getSSCommon().getBoundColumnType();
 	}
@@ -608,4 +612,32 @@ public interface SSComponentInterface {
 	 */
 	default boolean isDataValid() { return true; }
 
+	/**
+	 * Setup action bindings for undo/redo.
+	 */
+	default void setupUndoRedoKeys() {
+		SSCommon.setupUndoRedoKeys(this);
+	};
+
+	/**
+	 * Add a change to this components undo/redo stack.
+	 * @param ev modification event
+	 * @throws java.sql.SQLException
+	 */
+	default void addUndoableChange(RowSetModificationEvent ev) throws SQLException {
+		NavigateActions.addUndoableChange(ev);
+	}
+
+	/**
+	 * Set the component to the new value.
+	 * <p>
+	 * WARNING: do not override unless ...
+	 * @param cmd undo or redo
+	 * @param value new value
+	 * @throws java.sql.SQLException
+	 */
+	default void undoRedoUpdateObject(UndoRedo cmd, Object value) throws SQLException
+	{
+		getSSCommon().undoRedoUpdateObject(cmd, value);
+	};
 }

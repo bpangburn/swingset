@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+ * Copyright (C) 2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,72 +40,32 @@
  * Additions and modifications made by Ernie R. Rael are
  * copyright (C) 2024, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
-package com.nqadmin.swingset.utils;
+package com.nqadmin.swingset.navigate;
 
-import java.awt.Toolkit;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.StackLocatorUtil;
+import java.beans.PropertyChangeEvent;
 
 /**
- *
- * @author err
+ * Broadcast focus has changed
  */
-public class SSUtils {
-	private SSUtils() {}
+public class FocusChangeEvent
+{
+	private final PropertyChangeEvent pce;
 
 	/**
-	 * This is similar to LogManager.getLogger(), except that
-	 * if getLogger fails then this method returns the root logger.
-	 * So this is suitable for UI components that might get instantiated
-	 * by a gui builder.
-	 *
-	 * See: https://github.com/bpangburn/swingset/pull/123
-	 * 
-	 * @return the Logger
+	 * Broadcast event for focus change.
+	 * @param pce pce
 	 */
-	public static Logger getLogger() {
-		// NOTE: this can be re-implemented by examining
-		// new Throwable().getStackTrace();
-		Logger logger;
-		try {
-			return LogManager.getLogger(StackLocatorUtil.getCallerClass(2));
-		} catch(UnsupportedOperationException ex) {}
-		logger = LogManager.getRootLogger();
-		// Note: can check for root logger with
-		// logger.getName().isEmpty()
-		logger.error("Using RootLogger", new Throwable());
-		return logger;
-	}
-
-	/**
-	 * Notify the user of something...
-	 */
-	// TODO: add option to flash window/panel...
-	public static void beep()
+	public FocusChangeEvent(PropertyChangeEvent pce)
 	{
-		Toolkit.getDefaultToolkit().beep();
+		this.pce = pce;
 	}
 
-	////////////////////////////////////////////////////////////////////////////
-	//
-	// Debug Support
-	//
-
-	/**
-	 * Return a unique name for an Object, for example "String@89AB".
-	 * Name is SimpleClassName followed by identityHashCode in hex.
-	 * Used primarily for debug messages.
-	 * @param o The Object
-	 * @return unique name for the object or "null"
+	/** 
+	 * The change event.
+	 * @return event
 	 */
-	// TODO: put this in utils/SSUtil
-	public static String objectID(Object o) {
-		if (o == null) {
-			return "null";
-		}
-		return String.format("%s@%X", o.getClass().getSimpleName(), System.identityHashCode(o));
+	public PropertyChangeEvent getPce()
+	{
+		return pce;
 	}
-
 }

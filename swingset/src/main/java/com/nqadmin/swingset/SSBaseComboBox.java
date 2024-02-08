@@ -48,6 +48,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -57,6 +58,7 @@ import java.util.Objects;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import org.apache.logging.log4j.Logger;
 
@@ -65,6 +67,8 @@ import com.nqadmin.swingset.models.GlazedListsOptionMappingInfo;
 import com.nqadmin.swingset.models.OptionMappingSwingModel;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
+import com.nqadmin.swingset.navigate.NavigateActions;
+import com.nqadmin.swingset.navigate.RowSetModificationEvent;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -308,6 +312,22 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			// false means no Options2
 			super(false, new BasicEventList<SSListItem>());
 		}
+	}
+
+	/** {@inheritDoc } */
+	@Override
+	public void addUndoableChange(RowSetModificationEvent ev) throws SQLException
+	{
+		SSComponentInterface.super.addUndoableChange(ev);
+		NavigateActions.newSlot(this);
+	}
+
+	/** {@inheritDoc } */
+	@Override
+	public void undoRedoUpdateObject(NavigateActions.UndoRedo cmd, Object value) throws SQLException
+	{
+		SSComponentInterface.super.undoRedoUpdateObject(cmd, value);
+		SwingUtilities.invokeLater(() -> this.hidePopup());
 	}
 
 	/**
