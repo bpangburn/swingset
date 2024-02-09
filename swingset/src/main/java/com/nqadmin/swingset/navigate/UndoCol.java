@@ -126,7 +126,7 @@ final class UndoCol
 	void addChange(RowSetModificationEvent me) throws SQLException
 	{
 		if (needNewSlot) {
-			// First modification after a focus change.
+			// First modification after a focus change or change that needs new slot.
 			// Put change in a new spot.
 			++curIdx;
 			if (curIdx >= changes.size())

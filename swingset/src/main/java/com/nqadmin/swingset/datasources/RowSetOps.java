@@ -43,6 +43,7 @@
 package com.nqadmin.swingset.datasources;
 
 import java.math.BigDecimal;
+import java.sql.Array;
 import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
@@ -57,6 +58,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.GregorianCalendar;
 import java.util.Optional;
+import java.util.logging.Level;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
@@ -239,6 +241,27 @@ public class RowSetOps {
 			return Optional.empty();
 		}
 	}
+
+	/**
+	 *
+	 * @param comp
+	 * @return
+	 */
+	public static Array getColumnArray(SSComponentInterface comp)
+	{
+		try {
+			if (getColumnCount(comp.getRowSet())==0)
+				return null;
+			Object objectValue = NavigateActions.fetchCurrentValue(comp);
+			if (objectValue == null)
+				return null;
+
+			return (Array) objectValue;
+		} catch (SQLException ex) {
+			logger.error("SQL Exception for column " + comp.getBoundColumnName() + ".", ex);
+		}
+		return null;
+	}
 	
 	/**
 	 * Method used by RowSet listeners to get the new text when the RowSet
@@ -250,6 +273,8 @@ public class RowSetOps {
 	 * @return text representation of data in specified column
 	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
 	 */
+	// TODO: pass in SSComponent
+	// TODO: use columnIndex
 	public static String getColumnText(final RowSet _rowSet, final String _columnName) {
 		String value = null;
 

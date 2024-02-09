@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
 import java.math.BigDecimal;
@@ -45,10 +50,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.sql.RowSet;
-
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
 // SSAbstractStringCollectionModel.java
@@ -104,14 +109,14 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 
 	/** {@inheritDoc} */
 	@Override
-	public Object[] readData(RowSet _rowSet, String _columnName) throws SQLException {
-		String dbstring = _rowSet.getString(_columnName);
+	public Object[] readData(SSComponentInterface comp) throws SQLException {
+		String dbstring = RowSetOps.getColumnText(comp.getRowSet(), comp.getBoundColumnName());
 		return toObjArray(getJDBCType(), dbstring);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void writeData(RowSet _rowSet, String _columnName, Object[] _data) throws SQLException {
+	public void writeData(SSComponentInterface comp, Object[] _data) throws SQLException {
 		List<String> arr = new ArrayList<>(_data.length);
 		// Transform the array of object into an array of String representations
 		for(Object object : Arrays.asList(_data)) {
@@ -125,10 +130,11 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 		// Combine the array of strings into a single String
 		String result = String.join(separator, arr);
 		// and write it to the database
-		_rowSet.updateString(_columnName, result);
+		RowSetOps.updateColumnText(comp, result);
 	}
 
 	// TODO: use a common parse String to Object
+	// TODO: put into RowSetOps?
 	private Object[] toObjArray(final JDBCType _jdbcType, final String _dbstring) throws SQLException {
 		if (_dbstring == null) {
 			return null;
@@ -137,21 +143,25 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 		logger.debug("SSList.toObjArray() contents: " + _dbstring);
 		List<Object> data = new ArrayList<>();
 		List<String> dbSplit= Arrays.asList(_dbstring.split(separator));
+
+		// TODO: fixup the cases
 		try {
 			for(String s : dbSplit) {
 				switch (_jdbcType) {
 				case INTEGER:
 				case SMALLINT:
 				case TINYINT:
-					data.add(Integer.parseInt(s));
+					data.add(Integer.valueOf(s));
 					break;
 				case BIGINT:
-					data.add(Long.parseLong(s));
+					data.add(Long.valueOf(s));
+					break;
+				case REAL:
+					data.add(Float.valueOf(s));
 					break;
 				case FLOAT:
 				case DOUBLE:
-				case REAL:
-					data.add(Double.parseDouble(s));
+					data.add(Double.valueOf(s));
 					break;
 				case DECIMAL:
 				case NUMERIC:

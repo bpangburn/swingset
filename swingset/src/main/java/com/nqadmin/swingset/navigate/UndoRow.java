@@ -47,6 +47,7 @@ import java.sql.SQLException;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * A support class for undo/redo on a single row in a rowsest.
@@ -155,7 +156,9 @@ final class UndoRow
 		if (col == null)
 			return;
 		Object value = col.findUndoRedoValue(cmd);
-		if (value != UndoCol.none)
+		if (value == UndoCol.none)
+			SSUtils.beep();
+		else
 			comp.undoRedoUpdateObject(cmd, value);
 	}
 }
