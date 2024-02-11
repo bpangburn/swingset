@@ -60,8 +60,8 @@ import com.google.common.collect.MapMaker;
 public class RowSetState
 {
 	private boolean inserting;
-	private WeakReference<NavigateActions> refNavigateActions = new WeakReference<>(null);
 	private boolean acceptingChanges;
+	private WeakReference<NavigateActions> refNavigateActions = new WeakReference<>(null);
 
 	// don't have to worry about concurrency, always EDT
 	private static final Map<RowSet,RowSetState> rowSetState

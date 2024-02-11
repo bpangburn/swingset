@@ -42,10 +42,11 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
+import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.Action;
@@ -54,45 +55,88 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JSpinner;
 import javax.swing.KeyStroke;
+import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.plaf.basic.BasicSpinnerUI;
 
+import com.nqadmin.swingset.navigate.NavigateActions.NavGotoRowAction;
+
 /**
- * Spinner for RowSet row number that listens to an Action for enabled.
+ * Spinner for {@linkplain RowSet}'s row number that accepts an Action;
+ * it listens to an Action for enabled and forwards events to the Action.
+ * Note setAction must be called for things to work properly;
+ * the action contains a {@link javax.swing.SpinnerNumberModel} which
+ * tracks the RowSet's current row and its limits.
+ * <p>
+ * There are some static helper methods for configuring a JSpinner:
+ * {@link #removeTinyArrows(javax.swing.JSpinner, java.awt.Dimension)},
+ * {@link #inWindowUpDownKeys(javax.swing.JComponent)},
+ * and {@link #disableUpDownKeys(javax.swing.JComponent)}.
  */
 @SuppressWarnings("serial")
-public class RowNumberSpinner extends JSpinner implements PropertyChangeListener
+public class RowNumberSpinner extends JSpinner
 {
 	private Action action;
 
 	/**
-	 * Construct spinner with a numeric model.
-	 * @param model
+	 * Construct spinner for row number in a data navigator.
 	 */
-	public RowNumberSpinner(SpinnerNumberModel model)
+	public RowNumberSpinner()
 	{
-		super(model);
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public SpinnerNumberModel getModel()
+	{
+		return (SpinnerNumberModel) super.getModel();
+	}
+
+	private boolean actionSetModel;
+	/** {@inheritDoc} */
+	@Override
+	public void setModel(SpinnerModel model)
+	{
+		if(!actionSetModel)
+			throw new IllegalArgumentException("Must use setAction");
+		super.setModel(model);
+	}
+
+	/** Use this to track enabled. */
+	final private PropertyChangeListener pclEnableDisableAction = (evt) -> {
+		if ("enabled".equals(evt.getPropertyName()))
+			setEnabled((boolean) evt.getNewValue());
+	};
+
 	/** 
-	 * Listen to the specified action for enabled.
+	 * Listen to the specified action for enabled; send events to it.
+	 * The action contains the model for the JSpinner.
 	 * @param action provides enabled
 	 */
 	public void setAction(Action action)
 	{
 		if (this.action != null)
-			this.action.removePropertyChangeListener(this);
-		this.action = action;
-		action.addPropertyChangeListener(this);
-		setEnabled(action.isEnabled());
-	}
+			this.action.removePropertyChangeListener(pclEnableDisableAction);
+		if(!(action instanceof NavGotoRowAction gotoRowAction))
+			throw new IllegalArgumentException("Must be NavGotoRowAction");
+		this.action = gotoRowAction;
 
-	/** listen to enabled */
-	@Override
-	public void propertyChange(PropertyChangeEvent evt)
-	{
-		if ("enabled".equals(evt.getPropertyName()))
-			setEnabled((boolean) evt.getNewValue());
+		// Set the JSpinner model taken from the gotAction.
+		actionSetModel = true;
+		try {
+			setModel(gotoRowAction.rowNumberModel());
+		} finally {
+			actionSetModel = false;
+		}
+		// Listen to the gotoAction for enable/disable Spinner.
+		gotoRowAction.addPropertyChangeListener(pclEnableDisableAction);
+		// Copy the enable/disable state.
+		setEnabled(gotoRowAction.isEnabled());
+		// Forward JSpinner events through the action.
+		addChangeListener((e) -> {
+			gotoRowAction.actionPerformed(new ActionEvent(RowNumberSpinner.this,
+										  AWTEvent.RESERVED_ID_MAX + 1, ""));
+		});
 	}
 
 	/**

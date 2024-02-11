@@ -51,7 +51,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 
@@ -69,64 +68,27 @@ import static com.nqadmin.swingset.navigate.NavAction.*;
  * Component that can be used for data navigation. It provides buttons for
  * navigation, insertion, and deletion of records in a RowSet. The
  * modification of a RowSet can be prevented using the setModificaton()
- * method. Any changes made to the columns of a record will be updated whenever
- * there is a navigation.
+ * method. Any changes made to the columns of a record are updated by
+ * the commit button; there's row undo and re-read table (re-execute query).
  * <p>
  * For example if you are displaying three columns using the JTextField and the
  * user changes the text in the text fields then the columns will be updated to
- * the new values when the user navigates the RowSet. If the user wants to
- * revert the changes he made he can press the Undo button, however this must be
- * done before any navigation. Once navigation takes place changes can't be
- * reverted using Undo button (has to be done manually by the user).
+ * the new values when the user presses commit. If the user wants to
+ * revert the changes he made he can press the Undo button.
+ * <p>
+ * Normally the navigation buttons are disabled if the row is modified.
+ * When auto commit mode is enabled, the navigation buttons remain enabled;
+ * a navigation automatically commits any changes. Once navigation takes place
+ * changes can't be reverted using Undo button (has to be done manually by the user).
  */
 @SuppressWarnings("serial")
 public class SSDataNavigator extends JPanel
 {
-	/** Button to add a record to the RowSet. */
-	protected final JButton addButton;
-
-	/** Button to commit screen changes to the RowSet. */
-	protected final JButton commitButton;
-
-	/** Button to delete the current record in the RowSet. */
-	protected final JButton deleteButton;
-
-	/** Button to navigate to the first record in the RowSet. */
-	protected final JButton firstButton;
-
-	/** Button to navigate to the last record in the RowSet. */
-	protected final JButton lastButton;
-
-	/** Button to navigate to the next record in the RowSet. */
-	protected final JButton nextButton;
-
-	/** Button to navigate to the previous record in the RowSet. */
-	protected final JButton previousButton;
-	
-	/** Button to refresh the screen based on any changes to the RowSet. */
-	protected final JButton refreshButton;
-
-	/** Button to revert screen changes based on the RowSet. */
-	protected final JButton undoButton;
-
-	/** Navigator button dimensions. */
-	private Dimension buttonSize = new Dimension(40, 20);
-
-	/** Label to display the total number of records in the RowSet. */
-	private final JLabel lblRowCount = new JLabel();
-
-	/** Component for viewing/changing the current record number. */
-	protected final RowNumberSpinner rowNumberSpinner;
-
-	/** Current record spinner dimensions. */
-	private final Dimension rowSpinnerSize = new Dimension(65, 20);
-
-
-	/** Get the actions for the buttons from here */
+	/** The RowSet's actions/models for the buttons are in here. */
 	private NavigateActions navActs;
 
 	/** This panel's original action map is the parent of any navActionMap. */
-	private final ActionMap parentActionMap = getActionMap();
+	private final ActionMap parentActionMap;
 
 	/**
 	 * Creates a object of SSDataNavigator. Note: you have to set the RowSet
@@ -155,28 +117,12 @@ public class SSDataNavigator extends JPanel
 	@SuppressWarnings("LeakingThisInConstructor")
 	public SSDataNavigator(final RowSet _rowSet, final Dimension _buttonSize)
 	{
-		navActs = NavigateActions.get(_rowSet);
-		ActionMap navActionMap = navActs.createActionMap();
-		// insert the Actions in front of the original actions
-		navActionMap.setParent(parentActionMap);
-		setActionMap(navActionMap);
+		parentActionMap = getActionMap();
+		rowSpinnerSize = new Dimension(65, 20);
+		buttonSize = new Dimension(40, 20);
 
-		firstButton =    new JButton(navActionMap.get(NAV_FIRST));
-		previousButton = new JButton(navActionMap.get(NAV_PREVIOUS));
-		nextButton =     new JButton(navActionMap.get(NAV_NEXT));
-		lastButton =     new JButton(navActionMap.get(NAV_LAST));
-		commitButton =   new JButton(navActionMap.get(NAV_COMMIT));
-		undoButton =     new JButton(navActionMap.get(NAV_UNDO));
-		refreshButton =  new JButton(navActionMap.get(NAV_REFRESH));
-		addButton =      new JButton(navActionMap.get(NAV_ADD));
-		deleteButton =   new JButton(navActionMap.get(NAV_DELETE));
-
-		rowNumberSpinner = new RowNumberSpinner(navActs.getRowNumberModel());
-		rowNumberSpinner.setAction(navActionMap.get(NAV_GOTOROW));
 		RowNumberSpinner.removeTinyArrows(rowNumberSpinner, rowSpinnerSize);
-		//RowNumberSpinner.disableUpDownKeys(rowNumberSpinner);
 		RowNumberSpinner.inWindowUpDownKeys(rowNumberSpinner);
-		updateLblRowCount();
 		rowNumberSpinner.addChangeListener((ChangeEvent e) -> {
 			updateLblRowCount();
 		});
@@ -184,28 +130,44 @@ public class SSDataNavigator extends JPanel
 		if (_buttonSize!=null) {
 			buttonSize = _buttonSize;
 		}
+
+		installRowSet(_rowSet);
 		
 		hideActionText(); // For each nav button, suppress the Action name from appearing next to the icon.
 		//addToolTips(); // Integrated into button Action code.
+
 		createPanel();
+
 	}
 
 	/**
 	 * Set the navigator to use a different row set;
-	 * the navigators ActionMap is changed.
+	 * swap in the new navigate ActionMap.
 	 *
 	 * @param rowSet data for navigator
 	 */
 	public final void setRowSet(final RowSet rowSet)
 	{
+		// Could allow null, use dummy with all buttons disabled
 		Objects.requireNonNull(rowSet);
-		RowSet oldValue = navActs.getRowSet();
 
-		// setup new Actions
+		RowSet oldValue = navActs.getRowSet();
+		installRowSet(rowSet);
+		firePropertyChange("rowSet", oldValue, rowSet);
+	}
+
+	/**
+	 * Set the navigator to use a different row set;
+	 * swap in the new navigate ActionMap.
+	 *
+	 * @param rowSet data for navigator
+	 */
+	private void installRowSet(final RowSet rowSet)
+	{
+		// Setup new Actions for this navigator.
 		navActs = NavigateActions.get(rowSet);
 		ActionMap navActionMap = navActs.createActionMap();
-
-		// make the navigation actions available to this component
+		// Insert the Actions in front of the original actions.
 		navActionMap.setParent(parentActionMap);
 		setActionMap(navActionMap);
 
@@ -220,17 +182,13 @@ public class SSDataNavigator extends JPanel
 		addButton.setAction(navActionMap.get(NAV_ADD));
 		deleteButton.setAction(navActionMap.get(NAV_DELETE));
 
-		rowNumberSpinner.setModel(navActs.getRowNumberModel());
 		rowNumberSpinner.setAction(navActionMap.get(NAV_GOTOROW));
 		updateLblRowCount();
-
-		firePropertyChange("rowSet", oldValue, rowSet);
 	}
 
 	private void updateLblRowCount()
 	{
-		lblRowCount.setText("of "
-				+ ((SpinnerNumberModel)rowNumberSpinner.getModel()).getMaximum());
+		lblRowCount.setText("of " + rowNumberSpinner.getModel().getMaximum());
 	}
 
 
@@ -571,14 +529,64 @@ public class SSDataNavigator extends JPanel
 	}
 
 	/**
-	 * Writes the present row back to the RowSet. This is done automatically when
-	 * any navigation takes place, but can also be called manually.
+	 * Writes the present row back to the RowSet.
+	 * 
+	 * This is typically done when commit it pressed,
+	 * but it may be done programmaticaly.
+	 * 
+	 * //		This is done automatically when
+	 * //		any navigation takes place, but can also be called manually.
 	 *
 	 * @return returns true if update succeeds else false.
 	 */
 	public boolean updatePresentRow() {
 		return navActs.updatePresentRow();
 	}
+
+	//////////////////////////////////////////////////////////////////////
+	//
+	// Components/dimensions
+	//
+
+	/** Button to add a record to the RowSet. */
+	protected final JButton addButton = new JButton();
+
+	/** Button to commit screen changes to the RowSet. */
+	protected final JButton commitButton = new JButton();
+
+	/** Button to delete the current record in the RowSet. */
+	protected final JButton deleteButton = new JButton();
+
+	/** Button to navigate to the first record in the RowSet. */
+	protected final JButton firstButton = new JButton();
+
+	/** Button to navigate to the last record in the RowSet. */
+	protected final JButton lastButton = new JButton();
+
+	/** Button to navigate to the next record in the RowSet. */
+	protected final JButton nextButton = new JButton();
+
+	/** Button to navigate to the previous record in the RowSet. */
+	protected final JButton previousButton = new JButton();
+	
+	/** Button to refresh the screen based on any changes to the RowSet. */
+	protected final JButton refreshButton = new JButton();
+
+	/** Button to revert screen changes based on the RowSet. */
+	protected final JButton undoButton = new JButton();
+
+	/** Navigator button dimensions. */
+	private Dimension buttonSize;
+
+	/** Label to display the total number of records in the RowSet. */
+	private final JLabel lblRowCount = new JLabel();
+
+	/** Component for viewing/changing the current record number. */
+	protected final RowNumberSpinner rowNumberSpinner = new RowNumberSpinner();
+
+	/** Current record spinner dimensions. */
+	private final Dimension rowSpinnerSize;
+
 
 } // end public class SSDataNavigator extends JPanel {
 

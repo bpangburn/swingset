@@ -42,6 +42,8 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
+import java.awt.Component;
+
 import com.nqadmin.swingset.*;
 
 import java.awt.event.ActionEvent;
@@ -49,6 +51,7 @@ import java.io.Serializable;
 import java.lang.ref.Cleaner;
 import java.lang.ref.WeakReference;
 import java.sql.SQLException;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -67,8 +70,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.apache.logging.log4j.Logger;
 
@@ -382,12 +383,6 @@ public class NavigateActions
 	/** Indicates if rowset listener is added (or removed) */
 	private boolean rowsetListenerAdded = false;
 
-	/** Listener on the rownumber spinner. */
-	private final ChangeListener rownumberListener;
-	
-	/** Indicates if rownumber listener is added (or removed) */
-	private boolean rownumberListenerAdded = false;
-
 	/** NavGroup event bus. */
 	private EventBus eventBus;
 
@@ -420,20 +415,15 @@ public class NavigateActions
 
 		rowNumberModel = new SpinnerNumberModel(1, 1, 1, 1);
 		undoRow = new UndoRow();
-		rownumberListener = (ChangeEvent e)
-				-> gotoRow((int) rowNumberModel.getNumber());
 
 		this.rowSet = _rowSet;
 		if (_rowSet == null)
 			return;
-
-		setInserting(rowSet, false);
 		setupEventBus();
 		setupRowSet();
-		addRownumberListener();
 	}
 
-	BusReceiver busReceiver; // Reference, other only weakly referenced
+	BusReceiver busReceiver; // Strong reference, other only weakly referenced.
 	private void setupEventBus() {
 		eventBus = getLocalEventBus(this, rowSet);
 		busReceiver = new BusReceiver();
@@ -540,14 +530,18 @@ public class NavigateActions
 
 	private final SpinnerNumberModel rowNumberModel;
 
-	/**
-	 * SpinnerModel for current row number.
-	 * @return 
-	 */
-	public SpinnerNumberModel getRowNumberModel()
+	private Component dlgParent(EventObject e)
 	{
-		return rowNumberModel;
+		return e != null && (e.getSource() instanceof Component)
+				? (Component)e.getSource() : null;
 	}
+
+	//////////////////////////////////////////////////////////////////////
+	//
+	// Navigator Actions
+	//
+	// TODO: The event source isn't used, should it be?
+	//
 	
 	/**
 	 * Action for the "First" button on the navigator.
@@ -589,7 +583,7 @@ public class NavigateActions
 
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
-				JOptionPane.showMessageDialog(null, //NavigateActions.this,
+				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 			} finally {
 				addRowsetListener();
@@ -639,7 +633,7 @@ public class NavigateActions
 
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
-				JOptionPane.showMessageDialog(null, //NavigateActions.this,
+				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 			} finally {
 				addRowsetListener();
@@ -682,7 +676,7 @@ public class NavigateActions
 
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
-				JOptionPane.showMessageDialog(null, //NavigateActions.this,
+				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 			} finally {
 				addRowsetListener();
@@ -725,7 +719,7 @@ public class NavigateActions
 				
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
-				JOptionPane.showMessageDialog(null, //NavigateActions.this,
+				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 			} finally {
 				addRowsetListener();
@@ -812,7 +806,7 @@ public class NavigateActions
 
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
-				JOptionPane.showMessageDialog(null, //NavigateActions.this,
+				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while saving row.\n" + se.getMessage());
 			} finally {
 				addRowsetListener();
@@ -879,7 +873,7 @@ public class NavigateActions
 				
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
-				JOptionPane.showMessageDialog(null, //NavigateActions.this,
+				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while undoing changes.\n" + se.getMessage());
 			} finally {
 				addRowsetListener();
@@ -933,7 +927,7 @@ public class NavigateActions
 				
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
-				JOptionPane.showMessageDialog(null, //NavigateActions.this,
+				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured refreshing the data.\n" + se.getMessage());
 			} finally {
 				addRowsetListener();
@@ -983,7 +977,7 @@ public class NavigateActions
 				
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
-				JOptionPane.showMessageDialog(null, //NavigateActions.this,
+				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while moving to insert row.\n" + se.getMessage());
 			} finally {
 				addRowsetListener();
@@ -1016,7 +1010,7 @@ public class NavigateActions
 			removeRowsetListener();
 			try {
 				if (confirmDeletes) {
-					final int answer = JOptionPane.showConfirmDialog(null, //NavigateActions.this,
+					final int answer = JOptionPane.showConfirmDialog(dlgParent(e),
 							"Are you sure you want to delete this record?", "Delete Present Record",
 							JOptionPane.YES_NO_OPTION);
 					if (answer != JOptionPane.YES_OPTION) {
@@ -1060,7 +1054,7 @@ public class NavigateActions
 				
 			} catch (final SQLException se) {
 				logger.error("SQL Exception.", se);
-				JOptionPane.showMessageDialog(null, //NavigateActions.this,
+				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while deleting row.\n" + se.getMessage());
 			} finally {
 				addRowsetListener();
@@ -1068,45 +1062,55 @@ public class NavigateActions
 		}
 	} // end NavDeleteAction
 
-	/** Fake action used with gotoRow used only for enable/disable. */
+	/**
+	 * The {@linkplain NavGotoRowAction} is used with {@link RowNumberSpinner}.
+	 * This action embeds a {@link SpinnerNumberModel} that tracks
+	 * the row number and its limits.
+	 */
 	@SuppressWarnings("serial")
-	private final class NavGotoRowAction extends AbstractAction
+	final class NavGotoRowAction extends AbstractAction
 	{
+		private NavGotoRowAction()
+		{
+		}
+
+		SpinnerNumberModel rowNumberModel()
+		{
+			return rowNumberModel;
+		}
+
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			throw new IllegalStateException("NavGotoRowAction called");
-		}
-	}
-
-	/**
-	 * Make the specified row the current row.
-	 * @param row goto this row
-	 */
-	public void gotoRow(int row)
-	{
-		Action gotoRowAction = actions.get(NAV_GOTOROW);
-		if (!gotoRowAction.isEnabled())
-			return;
-		
-		removeRowsetListener();
-		try {
-			
-			if (!commitChangesToDatabase(true))
+			// Avoid re-entrancy. Unlike buttons, spinner changes go both ways.
+			// While the rowset listeners are removed,
+			// we're in the middle of processing, possibly  a row move.
+			if (!rowsetListenerAdded)
+				return;
+			if (!isEnabled())
 				return;
 			
-			logger.debug("Record number manually updated to " + row + ".");
-			if ((row <= rowCount) && (row > 0)) {
-				rowSet.absolute(row);
+			removeRowsetListener();
+			try {
+				int row = (int) rowNumberModel.getNumber();
+
+				if (!commitChangesToDatabase(true))
+					return;
+				
+				logger.debug("Record number manually updated to " + row + ".");
+				if ((row <= rowCount) && (row > 0)) {
+					rowSet.absolute(row);
+				}
+				
+				freshRow();
+				updateNavigator();
+			} catch (final SQLException se) {
+				logger.error("SQL Exception.", se);
+				JOptionPane.showMessageDialog(null, //NavigateActions.this,
+						"Exception occured while going to row.\n" + se.getMessage());
+			} finally {
+				addRowsetListener();
 			}
-			
-			updateNavigator();
-		} catch (final SQLException se) {
-			logger.error("SQL Exception.", se);
-			JOptionPane.showMessageDialog(null, //NavigateActions.this,
-					"Exception occured while going to row.\n" + se.getMessage());
-		} finally {
-			addRowsetListener();
 		}
 	}
 	
@@ -1198,31 +1202,6 @@ public class NavigateActions
 	 */
 	public boolean isOnInsertRow() {
 		return RowSetState.isInserting(rowSet);
-	}
-	
-	/**
-	 * Adds listener to the rownumber spinner
-	 */
-	private void addRownumberListener() {
-		if (!rownumberListenerAdded) {
-			rowNumberModel.addChangeListener(rownumberListener);
-			rownumberListenerAdded = true;
-			logger.debug("RownumberListener is ON.");
-		}
-	}
-	
-	/**
-	 * Removes listener from the rownumber spinner
-	 */
-	private boolean removeRownumberListener() {
-		boolean isRemoved = false;
-		if (rownumberListenerAdded) {
-			rowNumberModel.removeChangeListener(rownumberListener);
-			isRemoved = true;
-			rownumberListenerAdded = false;
-			logger.debug("RownumberListener is OFF.");
-		}
-		return isRemoved;
 	}
 	
 	/**
@@ -1659,15 +1638,8 @@ public class NavigateActions
 
 		currentRow = rowSet.getRow();
 
-		boolean isRemoved = false;
 		rowNumberModel.setMaximum(rowCount);
-		try {
-			isRemoved = removeRownumberListener();
-			rowNumberModel.setValue(currentRow);
-		} finally {
-			if (isRemoved)
-				addRownumberListener();
-		}
+		rowNumberModel.setValue(currentRow);
 
 		logger.debug("Current Row: " + currentRow + ". Row Count: " + rowCount);
 		//logger.debug("Stack trace:", new Throwable());
@@ -1681,7 +1653,6 @@ public class NavigateActions
 	 *
 	 * @return returns true if update succeeds else false.
 	 */
-	// TODO: better name
 	public boolean updatePresentRow() {
 		if (RowSetState.isInserting(rowSet) || (currentRow > 0)) {
 			logger.debug("Doing NAV_COMMIT.");
