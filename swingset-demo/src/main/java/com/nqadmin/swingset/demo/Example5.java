@@ -89,6 +89,7 @@ public class Example5 extends JFrame {
 
 		// SET SCREEN TITLE
 			super("Example5");
+			DemoUtil.initExampleFrame(this, null);
 
 		// SET CONNECTION
 			connection = _dbConn;

@@ -108,9 +108,10 @@ public class Example1 extends JFrame {
 
 	private void cleanup()
 	{
-		connection = null;
-		rowset = null;
-		navigator = null;
+		//connection = null;
+		//rowset = null;
+		//navigator.cleanup();
+		//navigator = null;
 	}
 
 	/**

@@ -210,6 +210,7 @@ public class TestBaseComponents extends JFrame {
 
 		// SET SCREEN TITLE
 			super("SwingSet Base Component Test");
+			DemoUtil.initExampleFrame(this, null);
 
 		// INITIALIZE SOME DYNAMIC INFORMATION
 			hints =  _hints;

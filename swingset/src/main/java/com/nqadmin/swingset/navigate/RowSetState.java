@@ -42,12 +42,15 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
+import java.lang.ref.WeakReference;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
+
+import com.google.common.collect.MapMaker;
+
 
 
 /**
@@ -57,11 +60,12 @@ import javax.sql.rowset.CachedRowSet;
 public class RowSetState
 {
 	private boolean inserting;
-	private NavigateActions navigateActions;
+	private WeakReference<NavigateActions> refNavigateActions = new WeakReference<>(null);
 	private boolean acceptingChanges;
 
 	// don't have to worry about concurrency, always EDT
-	private static final Map<RowSet,RowSetState> rowSetState = new WeakHashMap<>();
+	private static final Map<RowSet,RowSetState> rowSetState
+			= new MapMaker().weakKeys().makeMap();
 
 	private static RowSetState getRowSetState(RowSet rs) {
 		return rowSetState.computeIfAbsent(rs, k -> new RowSetState());
@@ -75,7 +79,7 @@ public class RowSetState
 
 	static void setNavigateActions(RowSet rs, NavigateActions navigator) {
 		if (rs != null) {
-			getRowSetState(rs).navigateActions = navigator;
+			getRowSetState(rs).refNavigateActions = new WeakReference<>(navigator);
 		}
 	}
 
@@ -143,7 +147,7 @@ public class RowSetState
 	 * @return the associated data navigator
 	 */
 	public static NavigateActions getNavigateActions(RowSet rs) {
-		return rs == null ? null : getRowSetState(rs).navigateActions;
+		return rs == null ? null : getRowSetState(rs).refNavigateActions.get();
 	}
 	
 }

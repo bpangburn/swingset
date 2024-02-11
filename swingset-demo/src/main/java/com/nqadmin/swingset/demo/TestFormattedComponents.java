@@ -142,6 +142,7 @@ public class TestFormattedComponents extends JFrame {
 
 		// SET SCREEN TITLE
 			super("SwingSet Formatted Component Test");
+			DemoUtil.initExampleFrame(this, null);
 
 		// SET CONNECTION
 			connection = _dbConn;

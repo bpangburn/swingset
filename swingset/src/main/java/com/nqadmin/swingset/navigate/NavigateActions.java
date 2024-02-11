@@ -46,12 +46,14 @@ import com.nqadmin.swingset.*;
 
 import java.awt.event.ActionEvent;
 import java.io.Serializable;
+import java.lang.ref.Cleaner;
+import java.lang.ref.WeakReference;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
@@ -180,16 +182,13 @@ public class NavigateActions
 	 * @param rowSet rowSet
 	 * @return actions
 	 */
-	public static NavigateActions get(RowSet rowSet)
+	synchronized public static NavigateActions get(RowSet rowSet)
 	{
 		if (rowSet == null)
 			return dummy();
 		NavigateActions navActs = RowSetState.getNavigateActions(rowSet);
-		if (navActs != null)
-			return navActs;
-		navActs = new NavigateActions(rowSet);
-
-		setNavigateActions(rowSet, navActs);
+		if (navActs == null)
+			setNavigateActions(rowSet, navActs = new NavigateActions(rowSet));
 		return navActs;
 	}
 
@@ -375,7 +374,7 @@ public class NavigateActions
 	private int rowCount = 0;
 
 	/** RowSet from which component will get/set values. */
-	private RowSet rowSet = null;
+	private final RowSet rowSet;
 
 	/** Listener on the RowSet used by data navigator. */
 	private final NavRowSetListener rowsetListener = new NavRowSetListener();
@@ -420,39 +419,37 @@ public class NavigateActions
 		actions.put(NAV_GOTOROW,	new NavGotoRowAction());
 
 		rowNumberModel = new SpinnerNumberModel(1, 1, 1, 1);
-
 		undoRow = new UndoRow();
-
 		rownumberListener = (ChangeEvent e)
 				-> gotoRow((int) rowNumberModel.getNumber());
 
+		this.rowSet = _rowSet;
 		if (_rowSet == null)
 			return;
 
+		setInserting(rowSet, false);
 		setupEventBus();
-		setRowSet(_rowSet);
+		setupRowSet();
 		addRownumberListener();
 	}
 
-	// TODO: Is it necessary to replace event bus when something changes?
-	//       getLocalEventBus doesn't look at rowSet (or this for that matter)
+	BusReceiver busReceiver; // Reference, other only weakly referenced
 	private void setupEventBus() {
-		if (eventBus == null) {
-			eventBus = getLocalEventBus(this, rowSet);
-			eventBus.register(new BusReceiver());
-		}
+		eventBus = getLocalEventBus(this, rowSet);
+		busReceiver = new BusReceiver();
+		eventBus.register(new WeakBusReceiver(busReceiver, eventBus));
 	}
-
-	// TODO: Make sure there's no memory leak. must unregister BusReceiver.
-	//		 Could make sure any leak is minimized to single instance of
-	//		 BusReceiver class and not all NavigateActions.
-	//		 Make BusReceiver static, spin through rowSetNavActions.
-	//		 Track rowset collected (how?) and unregister.
+	
+	// Notes on implementing a weak subscriber
+	//		https://github.com/google/guava/issues/807#issuecomment-61328188
+	// Consider the following. much like event bus, does weak listener
+	//		https://github.com/bennidi/mbassador
 
 	// TODO: also have Set<SSComponentInterface> modifiedComponents
 	transient private final Set<SSComponentInterface> errorComponents = new HashSet<>();
-	class BusReceiver {
-		@Subscribe
+
+	private class BusReceiver {
+		//@Subscribe
 		public void handleRowDataChanged(RowSetModificationEvent ev)
 		{
 			if (ev.matches(rowSet)) {
@@ -477,11 +474,42 @@ public class NavigateActions
 			}
 		}
 
-		@Subscribe
+		//@Subscribe
 		public void handleFocusChangeEvent(FocusChangeEvent ev)
 		{
 			undoRow.focusChange(ev);
 		}
+	}
+
+	private static final Cleaner cleaner = Cleaner.create();
+	static class WeakBusReceiver {
+		private final WeakReference<BusReceiver> ref;
+
+		public WeakBusReceiver(BusReceiver realBusReceiver, EventBus evBus)
+		{
+			this.ref = new WeakReference<>(realBusReceiver);
+			cleaner.register(realBusReceiver, () -> evBus.unregister(this));
+		}
+
+		void doit(Consumer<BusReceiver> doit)
+		{
+			BusReceiver br = ref.get();
+			if(br != null)
+				doit.accept(br);
+		}
+
+		@Subscribe
+		public void handleRowDataChanged(RowSetModificationEvent ev)
+		{
+			doit((br) -> br.handleRowDataChanged(ev));
+		}
+
+		@Subscribe
+		public void handleFocusChangeEvent(FocusChangeEvent ev)
+		{
+			doit((br) -> br.handleFocusChangeEvent(ev));
+		}
+
 	}
 
 	/**
@@ -1389,28 +1417,8 @@ public class NavigateActions
 	 *
 	 * @param _rowSet data source for navigator
 	 */
-	private void setRowSet(final RowSet _rowSet)
+	private void setupRowSet()
 	{
-		Objects.requireNonNull(_rowSet);
-		if (rowSet != null)
-			throw new IllegalStateException("RowSet already set");
-
-		// RESET INSERT FLAG THIS IS NEED IF USERS LEFT THE LAST ROWSET
-		// IN INSERTION MODE WITH OUT SAVING THE RECORD OR UNDOING THE INSERTION
-		setInserting(rowSet, false);
-
-		// REMOVE ROWSET LISTENER
-		if (rowSet != null) {
-			removeRowsetListener();
-		}
-
-		//final RowSet oldValue = rowSet;
-		rowSet = _rowSet;
-		// TODO: what is this about?
-		//firePropertyChange("rowSet", oldValue, rowSet);
-
-		undoRow.clear();
-		setupEventBus();
 
 		// SEE IF THERE ARE ANY ROWS IN THE GIVEN SSROWSET
 		try {
