@@ -42,21 +42,15 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
-import java.awt.AWTKeyStroke;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.KeyEvent;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EventListener;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.sql.RowSet;
-import javax.swing.JComponent;
-import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
 
 import java.sql.Connection;
+
+import javax.swing.JComponent;
 
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.decorators.Validator;
@@ -147,27 +141,11 @@ public interface SSComponentInterface {
 	}
 
 	/**
-	 * Transfers focus to next Swing Component on the screen when Down Arrow or
-	 * Enter are pressed.
+	 * Setup additional focus transfer keys.
 	 */
-	default void configureTraversalKeys() {
-		
-		// Forward traversal keys.
-		final Set<AWTKeyStroke> forwardKeys = ((JComponent) this)
-				.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
-		final Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
-		if (!(this instanceof JTextArea)) {
-			newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
-		}
-		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK));
-		((JComponent) this).setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
-
-		// Backwards traversal keys.
-		final Set<AWTKeyStroke> backwardKeys = ((JComponent) this)
-				.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
-		final Set<AWTKeyStroke> newBackwardKeys = new HashSet<>(backwardKeys);
-		newBackwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_UP, java.awt.event.InputEvent.SHIFT_MASK));
-		((JComponent) this).setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, newBackwardKeys);
+	default void configureTraversalKeys()
+	{
+		SSCommon.configureTraversalKeys((JComponent)this);
 	}
 
 	/**

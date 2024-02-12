@@ -58,7 +58,6 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.GregorianCalendar;
 import java.util.Optional;
-import java.util.logging.Level;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;

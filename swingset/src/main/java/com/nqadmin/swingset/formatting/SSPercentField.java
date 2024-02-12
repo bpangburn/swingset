@@ -67,7 +67,7 @@ public class SSPercentField extends SSFormattedTextField {
     public SSPercentField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
         super(factory);
         setHorizontalAlignment(SwingConstants.RIGHT);
-        setValue(new java.lang.Double(0.00));
+        setValue(0.00);
     }
 
 }

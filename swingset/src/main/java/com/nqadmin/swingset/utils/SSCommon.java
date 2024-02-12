@@ -42,12 +42,15 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
+import java.awt.AWTKeyStroke;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 
 import com.nqadmin.swingset.decorators.BorderDecorator;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -57,9 +60,11 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.EventListener;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.sql.RowSet;
@@ -70,6 +75,7 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeListener;
@@ -159,7 +165,7 @@ public class SSCommon {
 	 * changedUpdate() uses counters and SwingUtilities.invokeLater() to only update
 	 * the display on the last method called.
 	 */
-	public class SSDocumentListener implements DocumentListener, Serializable
+	public class SSDocumentListener implements DocumentListener
 	{
 		/**
 		 * variables needed to consolidate calls to removeUpdate() and insertUpdate()
@@ -1219,6 +1225,33 @@ public class SSCommon {
 			bind();
 		}
 		debugTrackRowSetListener();
+	}
+
+	/**
+	 * Transfers focus to next Swing Component on the screen when either
+	 * Shift-Down-Arrow or Enter are pressed; previous is Shift-Up-Arrow.
+	 * 
+	 * @param jc configure this JComponent
+	 */
+	public static void configureTraversalKeys(JComponent jc)
+	{
+		// Forward traversal keys.
+		final Set<AWTKeyStroke> forwardKeys = jc
+				.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+		final Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
+		if (!(jc instanceof JTextArea)) {
+			newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+		}
+		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_DOWN_MASK));
+		jc.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
+
+		// Backwards traversal keys.
+		final Set<AWTKeyStroke> backwardKeys = jc
+				.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
+		final Set<AWTKeyStroke> newBackwardKeys = new HashSet<>(backwardKeys);
+		newBackwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_UP, java.awt.event.InputEvent.SHIFT_DOWN_MASK));
+		jc.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, newBackwardKeys);
+
 	}
 
 	private static final String U = "SwingSetColumnUndo";

@@ -57,17 +57,13 @@ import com.nqadmin.swingset.SSDataGrid;
  * It adds a ComboRenderer with a lookup to the supplier_data table for the supplier name,
  * and adds a DateRenderer for the ship date column.
  */
+@SuppressWarnings("serial")
 public class Example7 extends JFrame {
 
 	/**
 	 * Log4j2 Logger
 	 */
     private static final Logger logger = LogManager.getLogger(Example7.class);
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 5925004336834854311L;
 	
 	/**
 	 * data grid
@@ -85,6 +81,7 @@ public class Example7 extends JFrame {
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
+	@SuppressWarnings("LeakingThisInConstructor")
 	public Example7(final Connection _dbConn) {
 
 		// SET SCREEN TITLE
@@ -135,8 +132,8 @@ public class Example7 extends JFrame {
 				try (Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
 						ResultSet.CONCUR_UPDATABLE)) {
 
-					String[] displayItems = null;
-					Integer[] underlyingNumbers = null;
+					String[] displayItems;
+					Integer[] underlyingNumbers;
 
 					try (ResultSet rs = stmt
 							.executeQuery("SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;")) {
@@ -149,7 +146,7 @@ public class Example7 extends JFrame {
 						for (int i = 0; i < displayItems.length; i++) {
 							rs.next();
 							displayItems[i] = rs.getString("supplier_name");
-							underlyingNumbers[i] = new Integer(rs.getInt("supplier_id"));
+							underlyingNumbers[i] = rs.getInt("supplier_id");
 						}
 
 						dataGrid.setComboRenderer("supplier_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);
@@ -164,7 +161,7 @@ public class Example7 extends JFrame {
 						for (int i = 0; i < displayItems.length; i++) {
 							rs.next();
 							displayItems[i] = rs.getString("part_name");
-							underlyingNumbers[i] = new Integer(rs.getInt("part_id"));
+							underlyingNumbers[i] = rs.getInt("part_id");
 						}
 
 						dataGrid.setComboRenderer("part_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);
