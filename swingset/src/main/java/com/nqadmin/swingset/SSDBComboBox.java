@@ -281,12 +281,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 */
 	protected String secondDisplayColumnName = null;
 
-	// /**
-	//  * SSListItem currently selected in combobox. Needed because GlazedList can cause getSelectedIndex()
-	//  * to return -1 (while editing) or 0 (after selection is made from list subset)
-	//  */
-	// private SSListItem selectedItem = null;
-
 	/**
 	 * Alphanumeric separator used to separate values in multi-column comboboxes.
 	 * <p>
@@ -294,11 +288,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 */
 	//protected String separator = " - ";
 	protected String separator = " | ";
-
-	// /**
-	//  * Boolean to indicated that a call to setSelectedItem() is in progress.
-	//  */
-	// private boolean settingSelectedItem = false;
 
 	private static final boolean USE_GLAZED_MODEL = true;
 
@@ -380,12 +369,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		} catch (final Exception e) {
 			logger.error(getColumnForLog() + ": Exception.", e);
 		}
-		// try (Model.Remodel remodel = optionModel.getRemodel()) {
-		// 	remodel.add(_primaryKey, _displayText);
-		// } catch (final Exception e) {
-		// 	logger.error(getColumnForLog() + ": Exception.", e);
-		// }
-
 	}
 
 	/**
@@ -401,37 +384,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		// TODO Determine if any change is needed to actually add item to combobox.
 
 		addOption(_displayText, _primaryKey);
-
-		// // LOCK EVENT LIST
-		// eventList.getReadWriteLock().writeLock().lock();
-
-		// // INITIALIZE LISTS IF NULL
-		// if (eventList == null) {
-		// 	eventList = new BasicEventList<>();
-		// }
-		// if (mappings == null) {
-		// 	mappings = new ArrayList<Long>();
-		// }
-		// if (options == null) {
-		// 	options = new ArrayList<String>();
-		// }
-
-		// try {
-
-		// 	// create new list item
-		// 	final SSListItem listItem = new SSListItem(_primaryKey, _displayText);
-
-		// 	// add to lists
-		// 	eventList.add(listItem);
-		// 	mappings.add(listItem.getPrimaryKey());
-		// 	options.add(listItem.getListItem());
-
-		// } catch (final Exception e) {
-		// 	logger.error(getColumnForLog() + ": Exception.", e);
-		// } finally {
-		// 	eventList.getReadWriteLock().writeLock().unlock();
-		// }
-
 	}
 
 	/**
@@ -492,36 +444,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 
 		// TODO Determine if any change is needed to actually remove item from combobox.
 
-
-//		if (eventList != null) {
-//
-//			// LOCK EVENT LIST
-//			eventList.getReadWriteLock().writeLock().lock();
-//
-//			try {
-//
-//				// GET INDEX FOR mappings and options
-//				final int index = mappings.indexOf(_primaryKey);
-//
-//				// PROCEED IF INDEX WAS FOUND
-//				if (index != -1) {
-//					options.remove(index);
-//					mappings.remove(index);
-//					eventList.remove(index);
-//					result = true;
-//
-//				}
-//
-//			} catch (final Exception e) {
-//				logger.error(getColumnForLog() + ": Exception.", e);
-//			} finally {
-//				eventList.getReadWriteLock().writeLock().unlock();
-//			}
-//
-//		}
-//
-//		return result;
-
 	}
 
 	/**
@@ -539,22 +461,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	public boolean deleteStringItem(final Object _option) {
 		throw new UnsupportedOperationException();
 
-		//boolean result = false;
-
-		//try (Model.Remodel remodel = comboInfo.getRemodel()) {
-		//	final int index = remodel.getOptions().indexOf(_option);
-		//	if (index != -1) {
-		//		remodel.remove(index);
-		//		result = true;
-		//	}
-		//}
-
-		//// if (options != null) {
-		//// 	final int index = options.indexOf(_option);
-		//// 	result = deleteItem(mappings.get(index));
-		//// }
-
-		//return result;
 
 	}
 
@@ -569,20 +475,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		// (re)query data
 		queryData();
 
-		// Only install AutoCompleteSupport once.
 		// See https://stackoverflow.com/questions/15210771/autocomplete-with-glazedlists for info on modifying lists.
-		// See https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html
-		// We would like to call autoComplete.setStrict(true), but it is not currently compatible with TextMatcherEditor.CONTAINS, which is the more important feature.
-		// There is a support request to support STRICT and CONTAINS: https://github.com/glazedlists/glazedlists/issues/676
-		// Note that installing AutoComplete support makes the ComboBox editable.
-		// Should already in the event dispatch thread so don't use invokeAndWait()
-		// if (!autoCompleteInstalled) {
-		// 	final AutoCompleteSupport<SSListItem> autoComplete = AutoCompleteSupport.install(this, comboInfo.getEventList(), null, listItemFormat);
-		// 	autoComplete.setFilterMode(TextMatcherEditor.CONTAINS);
-		// 	autoCompleteInstalled = true;
-		// }
-
-		// autoComplete.setStrict(true);
 
 		// since the list was likely blank when the component was bound we need to update the component again so it can get the text from the list
 		// we don't want to do this if the component is unbound as with an SSDBComboBox used for navigation.
@@ -761,71 +654,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		return currentItem != null ? listItemFormat.format(currentItem) : null;
 	}
 
-	// /**
-	//  * Returns the underlying database record primary key value corresponding to the
-	//  * currently selected item in the combobox.
-	//  * <p>
-	//  * Currently not a bean property since there is no associated variable.
-	//  *
-	//  * @return returns the value associated with the selected item
-	//  * OR null if nothing is selected.
-	//  */
-	// public Long getSelectedMapping() {
-	// 	
-	// 	// TODO Consider overriding getSelectedIndex() to account for GlazedList impact
-
-	// 	// TODO Leaking NON_SELECTED. Use null? Use -1? Use Long.MIN_VALUE?
-	// 	
-	// 	logger.trace(() -> String.format("%s: getSelectedValue(), idx:val %d:%s.",
-	// 			getColumnForLog(), getSelectedIndex(), getSelectedItem()));
-	// 	// logger.trace(String.format("%s: getSelectedValue(), fromSet %b:%s, selectedIndex %d.",
-	// 	// 		getColumnForLog(), settingSelectedItem, selectedItem, getSelectedIndex()));
-
-	// 	Long result = null;
-
-	// 	// 2020-10-03_BP: getSelectedValue() seems to be the root of problems with filtered/glazed lists.
-	// 	// When filtering is taking place, getSelectedIndex() returns -1
-
-	// 	// Determine if the call to getSelectedValue() is happening during a call to setSelectedItem()
-	// 	// During setSelectedItem() selectedItem may have a value, but is otherwise null and we want
-	// 	// to call getSelectedIndex(). Per above we do NOT want to call getSelectedIndex() while 
-	// 	// filtering is taking place.
-	// 	try (Model.Remodel remodel = optionModel.getRemodel()) {
-//	// 		if (settingSelectedItem) {
-//	// 			if (selectedItem == null) {
-//	// 				result = (long) NON_SELECTED;
-//	// 			} else {
-//	// 				//result = selectedItem.getPrimaryKey();
-//	// 				result = remodel.getMapping(selectedItem);
-//	// 			}
-//	// 		} else {
-//	// 			// Existing code not impacted by GlazedList dynamically impacting the list.
-//	// 			if (getSelectedIndex() == -1) {
-//	// 				result = (long) NON_SELECTED;
-//	// 			} else {
-//	// 				result = remodel.getMapping(getSelectedIndex());
-//	// 				
-//	// 			}
-//	// 		}
-	// 		Object item = getSelectedItem();
-	// 		if (item instanceof SSListItem) {
-	// 			result = remodel.getMapping((SSListItem)item);
-	// 		}
-	// 		// if (settingSelectedItem && selectedItem != null) {
-	// 		// 	result = remodel.getMapping(selectedItem);
-	// 		// } else if (getSelectedIndex() != -1) {
-	// 		// 	result = remodel.getMapping(getSelectedIndex());
-	// 		// }
-	// 	}
-// 2// 020-12-03: Changing method signature to Long so we can now return null.
-//	// 	// If anything above returned null, change to NON_SELECTED.
-//	// 	if (result==null) {
-//	// 		result = (long) NON_SELECTED;
-//	// 	}
-
-	// 	return result;
-	// }
-
 	/**
 	 * Returns the underlying database record primary key value corresponding to the
 	 * currently selected item in the combobox.
@@ -863,33 +691,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		return separator;
 	}
 
-//	/** type of column being formatted, date types special */
-//	private JDBCType optionColumnType = null;
-//	/** type of secondary column being formatted, date types special */
-//	private JDBCType option2ColumnType = null;
-//
-//	private class ComboItemFormat extends Format {
-//		private static final long serialVersionUID = 1L;
-//		@Override
-//		public Object parseObject(String source, ParsePosition pos) {
-//			// Do not create objects from here
-//			return source;
-//		}
-//		@Override
-//		public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
-//			// GlazedLists guarentees only format(Object), so ignore pos.
-//			SSListItem listItem = (SSListItem)obj;
-//			toAppendTo.append(comboInfo.getOption(listItem).toString());
-//			if (hasOption2()) {
-//				Object option2 = comboInfo.getOption2(listItem);
-//				if (option2 != null) {
-//					toAppendTo.append(separator).append(option2.toString());
-//				}
-//			}
-//			return toAppendTo;
-//		}
-//	};
-
 	/**
 	 *  deprecated
 	 * @param _rs deprecated
@@ -901,39 +702,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	protected String getStringValue(final ResultSet _rs, final String _columnName) {
 		throw new UnsupportedOperationException();
 	}
-
-//	/**
-//	 * Converts the database column value into string.Only date columns are
-//	 * formatted as specified by dateFormat variable all other column types are
-//	 * retrieved as strings
-//	 *
-//	 * @param _jdbcType	  the type of data to get as a String
-//	 * @param _rs         ResultSet containing database column to convert to string
-//	 * @param _columnName database column to convert to string
-//	 * @return string value of database column
-//	 */
-//	// TODO: this goes into format; like getStringValue(type, object)
-//	protected String getStringValue(final JDBCType _jdbcType, final ResultSet _rs, final String _columnName) {
-//		String strValue = "";
-//		try {
-//			switch (_jdbcType) {
-//			case DATE:
-//				final SimpleDateFormat myDateFormat = new SimpleDateFormat(dateFormat);
-//				strValue = myDateFormat.format(_rs.getDate(_columnName));
-//				break;
-//			default:
-//				strValue = _rs.getString(_columnName);
-//				break;
-//			}
-//			if (strValue == null) {
-//				strValue = "";
-//			}
-//		} catch (final SQLException se) {
-//			logger.error(getColumnForLog() + ": SQL Exception.", se);
-//		}
-//		return strValue;
-//
-//	}
 
 	private boolean hasOption2() {
 		return secondDisplayColumnName != null && !secondDisplayColumnName.isEmpty();
@@ -962,8 +730,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 */
 	private void queryData() {
 
-		//Long primaryKey = null;
-		ResultSet rs;
+		ResultSet rs; // TODO: autocloseable
 
 		// this.data.getReadWriteLock().writeLock().lock();
 		try (Model.Remodel remodel = optionModel.getRemodel()) {
@@ -972,13 +739,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 			nullItem = null;
 
 			logger.debug("{}: Nulls allowed? [{}].", () -> getColumnForLog(), () -> getAllowNull());
-			// 2020-07-24: adding support for a nullable first item if nulls are supported
-			// 2020-10-02: For a SSDBComboBox used as a navigator, we don't want a null first item. Look at getBoundColumnName() and isComboBoxNavigator.
-			// if (getAllowNull() && (getBoundColumnName()!=null)) {
-			// 	logger.trace("{}: Adding blank list item", () -> getColumnForLog());
-			// 	nullItem = remodel.createOptionMappingItem(null, "", null);
-			// 	remodel.add(nullItem);
-			// }
 			adjustForNullItem();
 
 			Statement statement = ssCommon.getConnection().createStatement();
@@ -991,7 +751,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 			listItemFormat.addElemType(optionModel.getOptionListItemElemIndex(),
 					getJDBCColumnType(rs, rs.findColumn(displayColumnName)));
 			if (hasOption2()) {
-				//option2ColumnType = getJDBCColumnType(rs, rs.findColumn(secondDisplayColumnName));
 				listItemFormat.addElemType(optionModel.getOption2ListItemElemIndex(),
 						getJDBCColumnType(rs, rs.findColumn(secondDisplayColumnName)));
 			}
@@ -1011,31 +770,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 			}
 			remodel.addAll(newItems);
 			rs.close();
-
-//				// extract primary key
-//				primaryKey = rs.getLong(getPrimaryKeyColumnName());
-//
-//				// extract first column string
-//				// getStringValue() takes care of formatting dates
-//				// TODO: just get an object and use toString
-//				String displayString = getStringValue(optionColumnType, rs, displayColumnName);
-//				logger.trace("{}: First column to display - " + displayString, () -> getColumnForLog());
-//
-//				// extract second column string, if applicable
-//				// getStringValue() takes care of formatting dates
-//				if (hasOption2()) {
-//					String secondColumnString = getStringValue(option2ColumnType, rs, secondDisplayColumnName);
-//					if (!secondColumnString.isEmpty()) {
-//						displayString += separator + secondColumnString;
-//					}
-//					logger.trace("{}: Second column to display - " + secondColumnString, () -> getColumnForLog());
-//				}
-//
-//				// add to lists
-//				remodel.add(primaryKey, displayString);
-//			}
-//			rs.close();
-
 		} catch (final SQLException se) {
 			logger.error(getColumnForLog() + ": SQL Exception.", se);
 		} catch (final java.lang.NullPointerException npe) {
@@ -1043,95 +777,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 			logger.error(getColumnForLog() + ": Null Pointer Exception.", npe);
 		}
 	}
-//	private void queryDataXXX() {
-//
-//		if (eventList != null) {
-//		// .clear() appears to be the correct method vs. .dispose() for working with GlazedLists
-//			logger.trace("{}: Clearing eventList.", () -> getColumnForLog());
-//			eventList.clear();
-//		} else {
-//			eventList = new BasicEventList<>();
-//		}
-//		if (mappings != null) {
-//			mappings.clear();
-//		} else {
-//			mappings = new ArrayList<Long>();
-//		}
-//		if (options != null) {
-//			options.clear();
-//		} else {
-//			options = new ArrayList<String>();
-//		}
-//
-//		eventList.getReadWriteLock().writeLock().lock();
-//
-//		Long primaryKey = null;
-//		String firstColumnString = null;
-//		String secondColumnString = null;
-//		SSListItem listItem = null;
-//		ResultSet rs = null;
-//
-//		// this.data.getReadWriteLock().writeLock().lock();
-//		try {
-//			logger.debug("{}: Nulls allowed? [{}].", () -> getColumnForLog(), () -> getAllowNull());
-//			// 2020-07-24: adding support for a nullable first item if nulls are supported
-//			// 2020-10-02: For a SSDBComboBox used as a navigator, we don't want a null first item. Look at getBoundColumnName().
-//			if (getAllowNull() && (getBoundColumnName()!=null)) {
-//				listItem = new SSListItem(null, "");
-//				logger.debug("{}: Adding blank list item - " + listItem, () -> getColumnForLog());
-//				eventList.add(listItem);
-//				mappings.add(listItem.getPrimaryKey());
-//				options.add(listItem.getListItem());
-//			}
-//
-//			final Statement statement = ssCommon.getConnection().createStatement();
-//			rs = statement.executeQuery(getQuery());
-//
-//			logger.debug("{}: Query [{}].", () -> getColumnForLog(), () -> getQuery());
-//
-//			while (rs.next()) {
-//				// extract primary key
-//				primaryKey = rs.getLong(getPrimaryKeyColumnName());
-//
-//				// extract first column string
-//				// getStringValue() takes care of formatting dates
-//				firstColumnString = getStringValue(rs, displayColumnName, 0);
-//				logger.trace("{}: First column to display - " + firstColumnString, () -> getColumnForLog());
-//
-//				// extract second column string, if applicable
-//				// getStringValue() takes care of formatting dates
-//				secondColumnString = null;
-//				if ((secondDisplayColumnName != null) && !secondDisplayColumnName.equals("")) {
-//					secondColumnString = rs.getString(secondDisplayColumnName);
-//					if (secondColumnString.equals("")) {
-//						secondColumnString = null;
-//					}
-//					logger.trace("{}: Second column to display - " + secondColumnString, () -> getColumnForLog());
-//				}
-//
-//				// build eventList item
-//				if (secondColumnString != null) {
-//					listItem = new SSListItem(primaryKey, firstColumnString + separator + secondColumnString);
-//				} else {
-//					listItem = new SSListItem(primaryKey, firstColumnString);
-//				}
-//
-//				// add to lists
-//				eventList.add(listItem);
-//				mappings.add(listItem.getPrimaryKey());
-//				options.add(listItem.getListItem());
-//
-//			}
-//			rs.close();
-//
-//		} catch (final SQLException se) {
-//			logger.error(getColumnForLog() + ": SQL Exception.", se);
-//		} catch (final java.lang.NullPointerException npe) {
-//			logger.error(getColumnForLog() + ": Null Pointer Exception.", npe);
-//		} finally {
-//			eventList.getReadWriteLock().writeLock().unlock();
-//		}
-//	}
 
 	/**
 	 * When a display column is of type date you can choose the format in which it
@@ -1211,201 +856,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		optionModel.setOption2Enabled(hasOption2());
 		firePropertyChange("secondDisplayColumnName", oldValue, secondDisplayColumnName);
 	}
-
-//	/**
-//	 * {@inheritDoc }
-//	 * This method override additionally selects a currently edited item in the combo box
-//	 */
-//	@Override
-//	public void setSelectedItem(final Object _value) {
-//		logger.debug(() -> String.format("%s: setSelectedItem(%s), allowNull %b",
-//				getColumnForLog(), _value, getAllowNull()));
-//
-//// TODO Need to deal with null on focus lost event. SSDBComboListener.actionPerformed setting bound column to  null when focus lost.
-//
-//// INTERCEPTING GLAZEDLISTS CALLS TO setSelectedItem() SO THAT WE CAN PREVENT IT FROM TRYING TO SET VALUES NOT IN THE LIST
-//
-//		// settingSelectedItem = true;
-//
-//		// try {
-//
-//// NOTE THAT CALLING setSelectedIndex(-1) IN THIS METHOD CAUSES  CYCLE HERE BECAUSE setSelectedIndex() CALLS setSelectedItem()
-//
-////		logger.debug("{}: Selected Index BEFORE hidePopup()={}", () -> getColumnForLog(), () -> getSelectedIndex());
-////
-////		int possibleMatches = getItemCount();
-////		logger.debug("{}: Possible matches BEFORE hidePopup() - " + possibleMatches, () -> getColumnForLog());
-////
-////		//hidePopup();
-////
-////		possibleMatches = getItemCount();
-////		logger.debug("{}: Possible matches AFTER hidePopup() - " + possibleMatches, () -> getColumnForLog());
-////		logger.debug("{}: Selected Index AFTER hidePopup()={}", () -> getColumnForLog(), () -> getSelectedIndex());
-//
-//		// Call to super.setSelectedItem() triggers SSDBComboListener.actionPerformed, which calls getSelectedValue(), which calls getSelectedIndex(), which returns -1 while still in the editor
-//		// and returns 0 after focus is lost.
-//		//
-//		// Calling hidePopup() restores the list, but messes up the GlazedList filtering.
-//		//
-//		// 2020-10-03_BP: Updated getSelectedValue() to properly return the primary key rather than using getSelectedIndex() during a call to this method.
-//
-//		// TODO: NOT SURE WHERE THE FOLLOWING COMMENT CAME FROM,
-//		//       BUT THAT'S NOT HOW IT WORKS NOW
-//		// Only try to update item for a valid list item.
-//
-//		Object newSelectedItem = _value;
-//		if (newSelectedItem!=null) {
-//			super.setSelectedItem(_value);
-//			if (getEditor() != null && hasFocus()) {
-//				// after we find a match, do a select all on the editor so
-//				// if the user starts typing again it won't be appended
-//				// 2020-12-21_BP: if we don't limited to field with focus, the comboboxes blink on navigation
-//				// this also causes the focus to jump out of a navigation combo
-//				getEditor().selectAll();
-//			}
-//			logger.debug("{}: Selected Index AFTER super.setSelectedItem()={}", () -> getColumnForLog(), () -> getSelectedIndex());
-//		} else {
-//			// Note that nullItem is null when allowNull is false.
-//			// The next statement either selects null or the nullItem.
-//			super.setSelectedItem(nullItem);
-//			if (nullItem == null) {
-//				logger.debug(() -> String.format("%s : Setting null when null not allowed. Current editor text is '%s'", getColumnForLog(), getEditor().getItem()));
-//			}
-//		}
-//	}
-//
-//
-//
-//		// } finally {
-//		// 	settingSelectedItem = false;
-//		// 	selectedItem = null;
-//		// }
-//
-//		//return;
-//
-////		// DECLARATIONS
-////		String currentEditorText = "";
-////		int possibleMatches;
-////		SSListItem selectedItem;
-////
-////		// WE COULD BE HERE DUE TO:
-////		// 1. MOUSE CLICK ON AN ITEM
-////		// 2. KEYBASED NAVIGATION
-////		// 3. USER TYPING SEQUENTIALLY:
-////		// THIS MAY TRIGGER MATCHING ITEMS, OR MAY NOT MATCH ANY SUBSTRINGS SO WE DELETE
-////		// THE LAST CHARACTER
-////		// 4. USER DOING SOMETHING UNEXPECTED LIKE INSERTING CHARACTERS, DELETING ALL
-////		// TEXT, ETC.
-////		// THIS MAY TRIGGER MATCHING ITEMS, OR MAY NOT MATCH ANY SUBSTRINGS SO WE REVERT
-////		// TO THE LAST STRING AVAILABLE
-////		// IF NOT MATCH, COULD ALSO REVERT TO EMPTY STRING
-////
-////		// GET LATEST TEXT TYPED BY USER
-////
-////		if (getEditor().getItem() != null) {
-////			currentEditorText = getEditor().getItem().toString();
-////		}
-////
-////		selectedItem = (SSListItem) _value;
-////
-////		// FOUR OUTCOMES:
-////		// 1. _value is null, but selectedItem is not null, indicating a match (so null
-////		// is a valid choice)
-////		// 2. _value is null and selectedItem is null, indicating no match
-////		// 3. neither _value nor selectedItem are null, indicating a match
-////		// 4. _value is not null, but selectedItem is null, indicating no match (have to
-////		// revert text)
-////
-////		if (selectedItem != null) {
-////			// OUTCOME 1 & 3 ABOVE, MAKE CALL TO SUPER AND MOVE ALONG
-////			// Display contents of selectedItem for debugging
-////			logger.debug("{}: PK={}, Item={}.", () -> getColumnForLog(), () -> selectedItem.getPrimaryKey(), () -> selectedItem.getListItem());
-////			logger.debug("{}: Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.", () -> getColumnForLog());
-////
-////			// We have to be VERY careful with calls to setSelectedItem() because it will
-////			// set the value based on the index of any SUBSET list returned by GlazedList,
-////			// not the full list
-////			//
-////			// Calling hidePopup() clears the subset list so that the subsequent
-////			// call to setSelectedItem works as intended.
-////
-////			possibleMatches = getItemCount();
-////			logger.debug("{}: Possible matches BEFORE hidePopup() - " + possibleMatches, () -> getColumnForLog());
-////
-////			hidePopup();
-////
-////			possibleMatches = getItemCount();
-////			logger.debug("{}: Possible matches AFTER hidePopup() - " + possibleMatches, () -> getColumnForLog());
-////
-////			// Call to parent method.
-////			// Don't call setSelectedIndex() as this causes a cycle
-////			// setSelectedIndex()->setSelectedItem().
-////			logger.debug("{}: Calling super.setSelectedItem(" + selectedItem + ")", () -> getColumnForLog());
-////			super.setSelectedItem(selectedItem);
-////
-////			// Update editor text
-////			currentEditorText = selectedItem.getListItem();
-////			getEditor().setItem(currentEditorText);
-////			updateUI();
-////
-////			logger.debug("{}: Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.", () -> getColumnForLog());
-////
-////			// update priorEditorText
-////			priorEditorText = currentEditorText;
-////
-////		} else if (_value == null) {
-////			// OUTCOME 2 ABOVE
-////			// setSelectedItem() was called with null, but there is no match (so null is not a valid selection in the list)
-////			// There may be partial matches from GlazedList.
-////			logger.debug("{}: Method called with null. Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.", () -> getColumnForLog());
-////
-////			// Determine if there are partial matches on the popup list due to user typing.
-////			possibleMatches = getItemCount();
-////			logger.debug("{}: Possible matches - " + possibleMatches, () -> getColumnForLog());
-////
-////			if (possibleMatches > 0) {
-////				// update the latestTypedText, but don't make a call to super.setSelectedItem(). No change to bound value.
-////				priorEditorText = currentEditorText;
-////			} else {
-////// 2020-08-03: if user types "x" and it is not a choice we land here
-////// on call to updateUI(), focus is lost and list items revert to 6 for "ss_db_combo_box" column in swingset_tests.sql
-////// if "x" is typed a 2nd time, the popup does not become visible again and there are zero items in the list before and after the call
-////// to setItem() and/or to updateUI()
-////
-////
-////// This could also be the result of the first call to execute() where nothing has been typed and the popup is not visible.
-////// This will throw a 'java.awt.IllegalComponentStateException' exception when showPopup() is called.
-////				//if (!this.isVisible()) {
-////				if (currentEditorText.isEmpty()) {
-////					logger.debug("{}: Method called with null, but nothing has been typed. This occurs during screen initialization.", () -> getColumnForLog());
-////					super.setSelectedItem(selectedItem);
-////					// 2020-10-03_BP: Probably need to update priorEditorText here
-////					priorEditorText = currentEditorText;
-////				} else {
-////					logger.debug("{}: Reverting to prior typed text.", () -> getColumnForLog());
-////					getEditor().setItem(priorEditorText);
-////					// IMPORTANT: The particular order here of showPopup() and then updateUI() seems to restore the
-////					// underlying GlazedList to all of the items. Reversing this order breaks things. Calling hidePopup() does not work.
-////					showPopup();
-////					updateUI(); // This refreshes the characters displayed. Display does not update without call to updateUI();
-////								// updateUI() triggers focus lost
-////					possibleMatches = getItemCount();
-////
-////					logger.debug("{}: Possible matches AFTER reverting text - " + possibleMatches, () -> getColumnForLog());
-////				}
-////			}
-////
-////		} else {
-////			// OUTCOME 4 ABOVE
-////			// generally not expecting this outcome
-////			// revert to prior string and don't select anything
-////			logger.warn(getColumnForLog() + ": Method called with " + _value + ", but there is no match. Prior text was '" + priorEditorText + "'. Current text is '" + currentEditorText + "'.");
-////
-////			// TODO Throw an exception here? May be the result of a coding error.
-////			getEditor().setItem(priorEditorText);
-////			currentEditorText = priorEditorText;
-////			updateUI(); // This refreshes the characters displayed.
-////		}
 
 	/**
 	 * {@inheritDoc }
@@ -1549,83 +999,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	public boolean updateItem(final long _primaryKey, final String _updatedDisplayText) {
 		return updateOption(_primaryKey, _updatedDisplayText);
 
-// 		if (eventList != null) {
-// 
-// 			// LOCK EVENT LIST
-// 			eventList.getReadWriteLock().writeLock().lock();
-// 
-// 			try {
-// 
-// 				// GET INDEX FOR mappings and options
-// 				final int index = mappings.indexOf(_primaryKey);
-// 
-// 				// PROCEED IF INDEX WAS FOUND
-// 				if (index != -1) {
-// 					options.set(index, _updatedDisplayText);
-// 					// mappings.remove(index);
-// // TODO Confirm that eventList is not reordered by GlazedLists code.
-// 					eventList.get(index).setListItem(_updatedDisplayText);
-// 					result = true;
-// 
-// 				}
-// 
-// // TODO may need to call repaint()
-// 
-// 			} catch (final Exception e) {
-// 				logger.error(getColumnForLog() + ": Exception.", e);
-// 			} finally {
-// 				eventList.getReadWriteLock().writeLock().unlock();
-// 			}
-// 
-// 		}
-//
-//		return result;
 	}
 
-//	/**
-//	 * Updates the value stored and displayed in the SwingSet component based on
-//	 * getBoundColumnText()
-//	 * <p>
-//	 * Call to this method should be coming from SSCommon and should already have
-//	 * the Component listener removed
-//	 */
-//	@Override
-//	public void updateSSComponent() {
-//		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only limit JDBC types accepted
-//		try {
-//			// If initialization is taking place then there won't be any mappings so don't try to update anything yet.
-//			if (!hasItems()) {
-//				return;
-//			}
-//
-//			// Maybe insures blank in case of later exception.
-//			setSelectionPending(true);
-//
-//			// SSDBComboBox will generally work with primary key column data queried from the database, which will generally be of data type long.
-//			// SSComboBox is generally used with 2 or 4 byte integer columns.
-//			final String boundColumnText = getBoundColumnText();
-//
-//			// LOGGING
-//			logger.debug("{}: getBoundColumnText() - " + boundColumnText, () -> getColumnForLog());
-//
-//			// GET THE BOUND VALUE STORED IN THE ROWSET - may throw a NumberFormatException
-//			Long targetValue = null;
-//			if ((boundColumnText != null) && !boundColumnText.isEmpty()) {
-//				targetValue = Long.parseLong(boundColumnText);
-//			}
-//			
-//			// LOGGING
-//			logger.debug("{}: targetValue - " + targetValue, () -> getColumnForLog());
-//			
-//			// UPDATE COMPONENT
-//			setSelectedMapping(targetValue);// setSelectedMapping() should handle null OK.}
-//
-//		} catch (final NumberFormatException nfe) {
-//			JOptionPane.showMessageDialog(this, String.format(
-//					"Encountered database value of '%s' for column [%s], which cannot be converted to a number.", getBoundColumnText(), getColumnForLog()));
-//			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
-//		}
-//	}
 
 	/**
 	 * Updates the string thats being displayed.
@@ -1642,20 +1017,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	@Deprecated
 	public boolean updateStringItem(final String _existingDisplayText, final String _updatedDisplayText) {
 		throw new UnsupportedOperationException();
-
-		// boolean result;
-
-		// try (Model.Remodel remodel = comboInfo.getRemodel()) {
-		// 	final int index = remodel.getOptions().indexOf(_existingDisplayText);
-		// 	result = updateItem(remodel.getMapping(index), _updatedDisplayText);
-		// }
-
-		// //if (options != null) {
-		// //	final int index = options.indexOf(_existingDisplayText);
-		// //	result = updateItem(mappings.get(index), _updatedDisplayText);
-		// //}
-
-		// return result;
 	}
 
 } // end public class SSDBComboBox

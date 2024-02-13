@@ -73,11 +73,6 @@ public class SSSyncManager {
 	protected class SyncComboListener implements ActionListener {
 		
 		private int actionPerformedCount = 0;
-		
-//		// **** GL STRICT/CONTAINS ****
-//		//
-//		// Hopefully lastValidItem can be eliminated once GlazedLists fully supports STRICT/CONTAINS
-//		private SSListItem lastValidItem = null;
 
 		private Long comboPK;
 
@@ -102,32 +97,9 @@ public class SSSyncManager {
 				// We check for null/empty rowset in the prior block.
 				if (comboPK==null) {
 					logger.warn("Null selected in Combo Navigator.");
-					
-//					// **** GL STRICT/CONTAINS ****
-//					//
-//					// Hopefully lastValidItem can be eliminated once GlazedLists fully supports STRICT/CONTAINS
-//					if (lastValidItem!=null) {
-//					// WE GET A NULL PK WHEN THE USER CLEARS THE COMBO EDITOR. NORMALLY lastValidItem WILL BE THE VERY FIRST RECORD IF THIS HAPPENS.
-//						comboBox.setSelectedItem(lastValidItem); 
-//					}
-					
 					return;
 				}
 				
-//				// **** GL STRICT/CONTAINS ****
-//				//
-//				// Hopefully selectedItem and lastValidItem can be eliminated once GlazedLists fully supports STRICT/CONTAINS
-//					// EXTRACT AND STORE SELECTED ITEM
-//					Object selectedItem = comboBox.getSelectedItem();
-//						
-//					// THIS SHOULD ALWAYS BE A SSLISTITEM, BUT COULD BE SOME EDGE CASES?
-//					if (selectedItem instanceof SSListItem) {
-//						lastValidItem = (SSListItem)selectedItem;
-//					} else {
-//						logger.warn(" -- Selected Item is not a SSListItem.");
-//					}
-
-
 				// Note that the rowset count starts at 1 whereas combobox index starts at 0.
 
 				final long rowsetPK = rowset.getLong(syncColumnName);
