@@ -430,14 +430,12 @@ public class NavigateActions
 		eventBus.register(new WeakBusReceiver(busReceiver, eventBus));
 	}
 	
-	// Notes on implementing a weak subscriber
-	//		https://github.com/google/guava/issues/807#issuecomment-61328188
-	// Consider the following. much like event bus, does weak listener
-	//		https://github.com/bennidi/mbassador
-
 	// TODO: also have Set<SSComponentInterface> modifiedComponents
 	transient private final Set<SSComponentInterface> errorComponents = new HashSet<>();
 
+	/**
+	 * Weak Subscriber notes: {@link com.nqadmin.swingset.navigate.Utils}.
+	 */
 	private class BusReceiver {
 		//@Subscribe
 		public void handleRowDataChanged(RowSetModificationEvent ev)

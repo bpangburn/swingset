@@ -75,30 +75,13 @@ import static com.nqadmin.swingset.datasources.RowSetOps.updateColumnObject;
  * <p>
  * SSTableModel can be used with a JTable to get a Grid view of the data.
  */
+@SuppressWarnings("serial")
 public class SSTableModel extends AbstractTableModel {
 
 	/**
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = SSUtils.getLogger();
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -7650858998003486418L;
-
-	/**
-	 * Returns an SQL date for a string date formatted as "MM/dd/yyyy".
-	 *
-	 * @param _strDate String containing a date in "MM/dd/yyyy" format.
-	 *
-	 * @return String date reformatted as an SQL date
-	 * @deprecated Use SSCommon.getSQLDate
-	 */
-	@Deprecated
-	protected static Date getSQLDate(final String _strDate) {
-		return SSCommon.getSQLDate(_strDate);
-	}
 
 	/**
 	 * Indicator to determine if insertions are allowed.

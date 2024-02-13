@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset;
 
 import static com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.addEventLogging;
@@ -389,17 +394,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				: null;
 
 		super.setModel(_model);
-	}
-
-	/**
-	 * Convenience method for accessing the model with proper casting.
-	 * 
-	 * @return mapping list model with proper casting, may be null
-	 * @deprecated use field optionModel directly
-	 */
-	@Deprecated
-	protected OptionMappingSwingModel<M, O, O2> getOptionModel() {
-		return optionModel;
 	}
 
 	/**
@@ -1146,44 +1140,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		for (ActionListener listener : listeners) {
 			comboBox.addActionListener(listener);
 		}
-	}
-
-	////////////////////////////////////////////////////////////////////////
-	//
-	// THIS getSelectedIndex() IS A TRANSITION AID.
-	//
-	// Remove it when...
-
-	/**
-	 * If getAllowNull() then throw an exception if this method is used
-	 * from "com.nqadmin" outside of swingset itself.
-	 * {@inheritDoc }
-	 * @deprecated Avoid using getSelectedIndex() unless you are very familiar with GlazedLists and SwingSet nullItem
-	 */
-	@Override
-	@Deprecated
-	public int getSelectedIndex() {
-
-		StackTraceElement[] stack = new Throwable().getStackTrace();
-		String caller = stack.length >= 2 ? stack[1].getClassName() : "";
-
-		if((caller.startsWith("com.nqadmin") && !caller.startsWith("com.nqadmin.swingset")
-				|| caller.startsWith("com.nqadmin.swingset.demo")
-			) && ssCommon != null && ssCommon.getAllowNull()) {
-			throw new IllegalStateException("App::getSelectedIndex && getAllowNull()");
-		}
-
-		return super.getSelectedIndex();
-	}
-	
-	/**
-	 * {@inheritDoc }
-	 * @deprecated Avoid using setSelectedIndex() unless you are very familiar with GlazedLists and SwingSet nullItem
-	 */
-	@Override
-	@Deprecated
-	public void setSelectedIndex(int _index) {
-		super.setSelectedIndex(_index);
 	}
 
 	////////////////////////////////////////////////////////////////////////

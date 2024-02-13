@@ -1508,19 +1508,6 @@ public class SSDataGrid extends JTable {
 		hiddenColumnsList = new ArrayList<>(_columnNumbers);
 		hideColumns();
 	}
-	/**
-	 * Sets the column numbers that should be hidden. 
-	 * @param _columnNumbers columms to hide
-	 * @deprecated use setHiddenColumns(List)}
-	 */
-	@Deprecated
-	public void setHiddenColumns(final int[] _columnNumbers) {
-		if(_columnNumbers == null) {
-			setHiddenColumns(Collections.emptyList());
-			return;
-		}
-		setHiddenColumns(IntStream.of(_columnNumbers).boxed().collect(Collectors.toList()));
-	}
 
 	/**
 	 * Sets the columns, by name, that should be hidden. The SSDataGrid sets the column
@@ -1542,21 +1529,6 @@ public class SSDataGrid extends JTable {
 			hiddenCols.add(RowSetOps.getColumnIndex(rowSet, colName) - 1);
 		}
 		setHiddenColumns(hiddenCols);
-	}
-	/**
-	 * Sets the column numbers that should be hidden.
-	 * @param _columnNames names
-	 * @throws SQLException 
-	 * @deprecated use SetHiddenColumnsByName
-	 */
-	@Deprecated
-	public void setHiddenColumns(final String[] _columnNames) throws SQLException {
-		// TODO: does null need to be supported?
-		if(_columnNames == null) {
-			setHiddenColumnsByName(Collections.emptyList());
-			return;
-		}
-		setHiddenColumnsByName(Arrays.stream(_columnNames).collect(Collectors.toList()));
 	}
 
 	/**
@@ -1674,18 +1646,6 @@ public class SSDataGrid extends JTable {
 	 */
 	public void setSSCellEditing(final SSCellEditing _cellEditing) {
 		getModel().setSSCellEditing(_cellEditing);
-	}
-
-	/**
-	 * Set the implementation of DataGridHandler which can be use to handle row
-	 * deletions and insertions
-	 *
-	 * @param _dataGridHandler implementation of SSDataGridHandler interface.
-	 * @deprecated Use SSTableModel.setSSDataGridHandler
-	 */
-	@Deprecated
-	public void setSSDataGridHandler(final SSDataGridHandler _dataGridHandler) {
-		getModel().setSSDataGridHandler(_dataGridHandler);
 	}
 
 	/**

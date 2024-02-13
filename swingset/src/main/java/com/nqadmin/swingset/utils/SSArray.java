@@ -74,18 +74,6 @@ public class SSArray implements Array {
 
 	/**
 	 * Creates SSArray with the object array and data base type
-	 *
-	 * @param _data         object array of SSArray
-	 * @param _baseTypeName Array elements database type name
-	 * @deprecated Use constructor that takes JDBCType
-	 */
-	@Deprecated
-	public SSArray(final Object[] _data, final String _baseTypeName) {
-		this(_data, JDBCType.valueOf(_baseTypeName));
-	}
-
-	/**
-	 * Creates SSArray with the object array and data base type
 	 * @param _data     object array of SSArray
 	 * @param _baseType Array elements database type
 	 */

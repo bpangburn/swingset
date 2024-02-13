@@ -65,13 +65,13 @@ import com.nqadmin.swingset.SSDataGrid;
  * Helper class for designing SSDataGrid screens.
  */
 //public abstract class SSDataGridScreenHelper extends JInternalFrame {
+@SuppressWarnings("serial")
 public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	
-	private static Logger logger = SSUtils.getLogger(); // Log4j Logger for component
+	private static final Logger logger = SSUtils.getLogger();
 	
-	private static final long serialVersionUID = 3558830097072342112L; // unique serial ID
-
-	protected SSDataGrid dataGrid = new SSDataGrid(); // SSDataGrid used for this screen
+	/**  SSDataGrid used for this screen */
+	protected SSDataGrid dataGrid = new SSDataGrid();
 
 
 	/**
@@ -85,6 +85,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * @param _parentID               primary key value of parent record (FK for
 	 *                                current rowset), if applicable
 	 */
+	@SuppressWarnings("LeakingThisInConstructor")
 	public SSDataGridScreenHelper(final String _title, final Container _parentContainer, final Connection _connection,
 			final String _pkColumn, final Long _parentID) {
 
@@ -169,32 +170,6 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 		// ADD OTHER LISTENERS IN IMPLEMENTATION
 		addCustomListeners();
 
-	}
-
-	/**
-	 * Method to add F2 linking based on an ID for specified column (e.g. wiki links, contact links)
-	 *
-	 * @param _columns array of column of data containing ID to link (count starts from zero)
-	 * @param _key name for current action map
-	 * @param _urlPrefix prefix of URL without ID
-	 * 
-	 * @deprecated Starting in 4.0.0+ use {@link #addKeyBasedURLLinking(int[], String, String, String[], boolean)} instead.
-	 */
-	@Deprecated
-	public void addF2Linking(final int[] _columns, final String _key, final String[] _urlPrefix) {
-		addKeyBasedURLLinking(_columns, "F2", _key, _urlPrefix, true);
-	}
-	
-	/**
-	 * Adds F1/Help key support where F1 will bring up the URL specified for each column in a browser
-	 * 
-	 * @param _columnLinks String array of URLs with one URL per column
-	 * 
-	 * @deprecated Starting in 4.0.0+ use {@link #addKeyBasedURLLinking(String, String, String[], boolean)} instead.
-	 */
-	@Deprecated
-	public void addHelpSystemLinks(final String[] _columnLinks) {
-		addKeyBasedURLLinking("F1", "Help", _columnLinks, false);
 	}
 	
 	/**
@@ -340,22 +315,6 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * @return a String array with the table/grid column headings
 	 */
 	protected abstract String[] getHeaders();
-
-	/**
-	 * Performs post construction initialization.  Needs to be called from constructor in implementation.
-	 *
-	 * @param _parentID		parent ID used for record retrieval
-	 * @param _fullSQL		full SQL query for rowset
-	 * 
-	 * @deprecated Starting in 4.0.0+ these parameters are passed to constructor and initialization
-	 *  	is performed in handled {@link #initScreen()}.
-	 */
-	@Deprecated
-	public void init(final long _parentID, final String _fullSQL) {
-		
-		logger.error("initScreen() Method no longer supported. These parameters should be passed to the appropriate constructor.");
-
-	} 
 	
 	/**
 	 * Initialize rowset and loads sql query results
@@ -437,59 +396,6 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	}
 	
 	/**
-	 * Performs post construction initialization.  Generally be called from constructor in implementation.
-	 *
-	 * @param _parentID		parent ID used for record retrieval
-	 * @param _fullSQL		full SQL query for rowset
-	 * 
-	 * @deprecated Starting in 4.0.0+ these parameters are passed to constructor and initialization
-	 *  	is performed in handled {@link #initScreen()}.
-	 */
-	@Deprecated	
-	public void initScreen(final Long _parentID, final String _fullSQL) {
-		
-		logger.error("initScreen() Method no longer supported. These parameters should be passed to the appropriate constructor.");
-
-	}
-	
-	/**
-	 * Used to enable/disable cells based on adjacent cell value or other criteria.
-	 * 
-	 * JTables/SSDataGrids count rows and columns from zero.
-	 * 
-	 * Can simply override and return true if not enabling/disabling is needed.
-	 * 
-	 * @param _row JTable/SSDatagrid row to evaluate
-	 * @param _column JTable/SSDatagrid column to evaluate
-	 * @return true if cell should be editable/enabled, otherwise false
-	 * 
-	 * @deprecated - use {@link SSDataGrid#setSSCellEditing(com.nqadmin.swingset.SSCellEditing)} instead
-	 */
-	@Deprecated
-	protected boolean isGridCellEditable(int _row, int _column) {
-		return true;
-	}
-	
-//	/**
-//	 * Used to enable/disable cells based on adjacent cell value or other criteria.
-//	 * 
-//	 * @throws Exception thrown if an exception is encountered enabling/disabling cells
-//	 */
-//	@Deprecated
-//	private void setActivateDeactivate() throws Exception {
-//		dataGrid.setSSCellEditing(new SSCellEditing(){
-//
-//			private static final long serialVersionUID = 1L; // UNIQUE SERIAL ID
-//
-//			@Override
-//			public boolean isCellEditable(int _row, int _column) {
-//				return isGridCellEditable(_row, _column);
-//			}
-//		});
-//
-//	}
-	
-	/**
 	 * Used to set the SSCellEditing for the SSDataGrid to activate/deactivate cells or validate cell values.
 	 * <pre>
 	 * dataGrid.setSSCellEditing(new SSCellEditing() {
@@ -507,19 +413,6 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	@Override
 	protected void setDefaultValues() throws Exception {
 		dataGrid.setDefaultValues(getDefaultColumnNames(),getDefaultColumnValues());
-	}
-
-	/**
-	 * Set windows position on screen.
-	 *
-	 * @param _defaultX the default X coordinate for the screen
-	 * @param _defaultY the default Y coordinate for the screen
-	 * 
-	 * @deprecated Starting in 4.0.0+ use {@link #setDefaultScreenLocation()} instead.
-	 */
-	@Deprecated
-	public void setPosition(final int _defaultX, final int _defaultY) {
-		setDefaultScreenLocation(_defaultX, _defaultY);
 	}
 
 	/**

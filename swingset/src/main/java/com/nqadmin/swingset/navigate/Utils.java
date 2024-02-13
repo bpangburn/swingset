@@ -90,6 +90,12 @@ public class Utils
 		getLocalEventBus(source, source.getRowSet())
 				.post(new RowSetModificationEvent(source, _value, true));
 	}
+	
+	// Notes on implementing a weak subscriber
+	//		https://github.com/google/guava/issues/807#issuecomment-61328188
+	// Consider the following. much like event bus, does weak listener
+	//		https://github.com/bennidi/mbassador
+	// And see NavigateActions for example; includes use of Cleaner.register.
 
 	/**
 	 * EventBus to use Frame/Panel events
@@ -98,6 +104,7 @@ public class Utils
 
 	/**
 	 * Get the global EventBus.
+	 * Side affect on first call is creating a broadcaster for "focusOwner" changes.
 	 * @return EventBus for this
 	 */
 	public static EventBus getGlobalEventBus()
@@ -110,14 +117,17 @@ public class Utils
 				CentralLookup.getDefault().add(globalEventBus);
 			}
 
-			// TODO: be more careful about tacking who's managing focus
-			//		 and the current focusOwner
+			// TODO: Be more careful about tracking who's managing focus
+			//		 and the current focusOwner so that the events continue
+			//		 if the focus manager is changed.
 			KeyboardFocusManager.getCurrentKeyboardFocusManager()
 					.addPropertyChangeListener("focusOwner",
 							(pce) -> globalEventBus.post(new FocusChangeEvent(pce)));
 		}
 		return globalEventBus;
 	}
+
+	// Maybe get rid of this idea of localEventBus.
 
 	/**
 	 * Find the EventBus associated with the NavGroup to which

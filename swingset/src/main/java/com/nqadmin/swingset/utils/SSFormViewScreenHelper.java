@@ -400,21 +400,8 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		});
 
 		// ADD OTHER LISTENERS IN IMPLEMENTATION
-		addImplListeners();
 		addCustomListeners();
 
-	}
-
-	/**
-	 * Adds any implementation-specific listeners.
-	 * 
-	 * @throws Exception exception throwExample4UsingHelpern while adding any implementation-specific screen listeners
-	 * 
-	 * @deprecated Starting in 4.0.0+ use {@link #addCustomListeners()} instead.
-	 */
-	@Deprecated
-	protected void addImplListeners() throws Exception {
-		// Do nothing by default...
 	}
 
 	/**
@@ -507,14 +494,6 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	protected SSSyncManager getSyncManager() {
 		return syncManager;
 	}
-
-//	/**
-//	 * @return the txtParentID
-//	 */
-//	@Deprecated
-//	protected SSTextField getTxtParentID() {
-//		return txtParentID;
-//	}
 	
 	/**
 	 * @return the text field bound to the primary key column
@@ -631,42 +610,6 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			JOptionPane.showMessageDialog(this,
 					"Error while initializing screen. Parent ID is: " + getParentID() + ".\n" + e.getMessage());
 		}
-	}
-	
-	/**
-	 * Performs post construction initialization.
-	 *
-	 * @param _parentID primary key value of parent record (FK for current rowset)
- 	 * @param _comboNavDisplayColumn1 name of the 1st database column to display in the combo navigator
- 	 * 
-	 * @deprecated Starting in 4.0.0+ these parameters are passed to constructor and initialization
-	 *  	is performed in handled {@link #initScreen()}.
-	 */
-	@Deprecated
-	protected void initScreen(final Long _parentID, final String _comboNavDisplayColumn1) {
-		
-		logger.error("initScreen() Method no longer supported. These parameters should be passed to the appropriate constructor.");
-		
-//		initScreen(_parentID, _comboNavDisplayColumn1, null, null);
-		
-	}
-
-	/**
-	 * Performs post construction initialization.
-	 *
-	 * @param _parentID primary key value of parent record (FK for current rowset)
- 	 * @param _comboNavDisplayColumn1 name of the 1st database column to display in the combo navigator
-	 * @param _comboNavDisplayColumn2 name of the 2nd database column to display in the combo navigator
-	 * @param _comboNavSeparator character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator
-	 * 
- 	 * @deprecated Starting in 4.0.0+ this is handled in constructor.
-	 */
-	@Deprecated
-	protected void initScreen(final Long _parentID,
-			final String _comboNavDisplayColumn1, final String _comboNavDisplayColumn2, final String _comboNavSeparator) {
-		
-		logger.error("initScreen() Method no longer supported. These parameters should be passed to the appropriate constructor.");
-		
 	}
 	
 	/**

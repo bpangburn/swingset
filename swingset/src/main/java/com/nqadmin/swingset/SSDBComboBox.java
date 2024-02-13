@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset;
 
 import static com.nqadmin.swingset.datasources.RowSetOps.getJDBCColumnType;
@@ -55,8 +60,6 @@ import com.nqadmin.swingset.models.OptionMappingSwingModel;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
 import com.nqadmin.swingset.utils.SSUtils;
-
-import ca.odell.glazedlists.EventList;
 
 
 // SSDBComboBox.java
@@ -177,14 +180,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 */
 	private static Logger logger = SSUtils.getLogger();
 
-	/**
-	 * Value to represent that no item has been selected in the combo box.
-	 * 
-	 * @deprecated check for {@code #getSelectedMapping()==null}
-	 */
-	@Deprecated
-	public static final int NON_SELECTED = Integer.MIN_VALUE + 1;
-
 	/** A convenience for variable declarations. Can not instantiate. */
 	private static class Model extends OptionMappingSwingModel<Long,Object,Object> {
 		/** Exception if invoked. */
@@ -218,45 +213,10 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	protected String displayColumnName = "";
 
 	/**
-	 * Map of string/value pairings for the ComboBox (generally the text to be
-	 * display (SSListItem) and its corresponding primary key)
-	 * @deprecated can't use
-	 */
-	@Deprecated
-	protected EventList<SSListItem> eventList;
-
-	/**
 	 * counter for # times that execute() method is called - for testing
 	 */
 	// TODO remove this
 	protected int executeCount = 0;
-
-	/**
-	 * boolean value for activating or disabling the filter
-	 * <p>
-	 * Appears to determine if GlazedList is used for filtering or original
-	 * keystroke listener/filter.
-	 * @deprecated unneeded
-	 */
-	@Deprecated
-	protected boolean filterSwitch = true;
-
-	/**
-	 * Underlying database table primary key values corresponding to text displayed.
-	 * <p>
-	 * Note that mappings for the SSDBComboBox are Longs whereas in SSComboBox they
-	 * are Integers.
-	 * @deprecated unneeded
-	 */
-	@Deprecated
-	protected ArrayList<Long> mappings = null;
-
-	/**
-	 * Options to be displayed in the combobox (based on a query).
-	 * @deprecated unneeded
-	 */
-	@Deprecated
-	protected ArrayList<String> options = null;
 
 	/**
 	 * The column name used to query the values for the bound column mappings.
@@ -283,10 +243,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 
 	/**
 	 * Alphanumeric separator used to separate values in multi-column comboboxes.
-	 * <p>
-	 * Changing default from " - " to " | " for 2020 rewrite.
 	 */
-	//protected String separator = " - ";
 	protected String separator = " | ";
 
 	private static final boolean USE_GLAZED_MODEL = true;
@@ -372,34 +329,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	}
 
 	/**
-	 * Adds an item to the existing list of items in the combo box.
-	 *
-	 * @param _displayText text that should be displayed in the combobox
-	 * @param _primaryKey  primary key value corresponding the the display text
-	 * @deprecated use {@link #addOption(java.lang.Object, java.lang.Long) }
-	 */
-	@Deprecated
-	public void addItem(final String _displayText, final long _primaryKey) {
-
-		// TODO Determine if any change is needed to actually add item to combobox.
-
-		addOption(_displayText, _primaryKey);
-	}
-
-	/**
-	 * Adds an item to the existing list of items in the combo box.
-	 *
-	 * @param _name  name that should be displayed in the combo
-	 * @param _value value corresponding the the name
-	 * @deprecated use {@link #addOption(java.lang.Object, java.lang.Long) }
-	 */
-	@Deprecated
-	protected void addStringItem(final String _name, final String _value) {
-		addItem(_name, Long.valueOf(_value));
-
-	}
-
-	/**
 	 * Removes an item from the combobox's item list where the
 	 * list item's mapping equals the param.
 	 * <p>
@@ -427,41 +356,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		}
 
 		return result;
-	}
-
-	/**
-	 * Removes an item from the combobox and underlying lists based on the record
-	 * primary key provided.
-	 *
-	 * @param _primaryKey primary key value for the item that should be removed
-	 *
-	 * @return returns true on successful deletion otherwise returns false.
-	 * @deprecated use {@link #removeMapping(java.lang.Long) }
-	 */
-	@Deprecated
-	public boolean deleteItem(final long _primaryKey) {
-		return removeMapping(_primaryKey);
-
-		// TODO Determine if any change is needed to actually remove item from combobox.
-
-	}
-
-	/**
-	 * Removes the list item that has an option that equals the parameter.
-	 * <p>
-	 * If more than one item is present in the combo that matches, only
-	 * the first one is removed.
-	 *
-	 * @param _option list item with this currentSelectedOption is deleted
-	 *
-	 * @return returns true on successful deletion otherwise returns false.
-	 * @deprecated no replacement, throws exception
-	 */
-	@Deprecated
-	public boolean deleteStringItem(final Object _option) {
-		throw new UnsupportedOperationException();
-
-
 	}
 
 	/**
@@ -506,36 +400,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	}
 
 	/**
-	 * @return the eventList
-	 * @deprecated no replacement
-	 */
-	// TODO: public method? Why? How/where used.
-	//		Make private, see what happens
-	@Deprecated
-	protected EventList<SSListItem> getEventList() {
-		throw new UnsupportedOperationException();
-		//return eventList;
-	}
-
-	/**
-	 * Provides the initial number of items in the list underlying the CombobBox
-	 * <p>
-	 * NOTE: There does not appear to be any code that sets this value so marking as
-	 * Deprecated.
-	 *
-	 * @return the initial number of items in the combobox list
-	 */
-	@Deprecated
-	public int getInitialNumberOfItems() {
-		// it appears code was never written to set this value so Depreciated and
-		// returning 0
-		// TODO Remove completely from future release.
-
-		logger.warn(getColumnForLog() + ": This method was never properly implemented so it has been Deprecated and just returns 0. \n", new Exception());
-		return 0;
-	}
-
-	/**
 	 * Get the mappings currently in use.
 	 * <p>
 	 * <b>When getAllowNull() is true, the first list item is null/""</b>
@@ -547,30 +411,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		//		 having to do with unmodifiable lists...
 		//return mappings;
 		return optionModel.getMappings();
-	}
-
-	/**
-	 * Returns the number of items present in the combo box.
-	 * <p>
-	 * This is a read-only bean property.
-	 *
-	 * @return returns the number of items present in the combo box.
-	 */
-	@Deprecated
-	public int getNumberOfItems() {
-	
-		// TODO Determine where/how this is/was used.
-		
-		// int result = 0;
-
-		//return optionModel.getSize();
-		return optionModel.getItemList().size();
-
-		// if (eventList != null) {
-		// 	result = eventList.size();
-		// }
-
-		// return result;
 	}
 
 	/**
@@ -655,52 +495,12 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	}
 
 	/**
-	 * Returns the underlying database record primary key value corresponding to the
-	 * currently selected item in the combobox.
-	 * <p>
-	 * Currently not a bean property since there is no associated variable.
-	 *
-	 * @return returns the value associated with the selected item OR -1 if nothing
-	 *         is selected.
-	 * 
-	 * @deprecated use {@link #getSelectedMapping() }
-	 */
-	@Deprecated
-	public Long getSelectedValue() {
-		return getSelectedMapping();
-	}
-
-	/**
 	 * Returns the separator used when multiple columns are displayed
 	 *
 	 * @return separator used.
 	 */
 	public String getSeparator() {
 		return separator;
-	}
-
-	/**
-	 * Returns the separator used when multiple columns are displayed
-	 * <p>
-	 * Deprecated for misspelling.
-	 *
-	 * @return separator used.
-	 */
-	@Deprecated
-	public String getSeperator() {
-		return separator;
-	}
-
-	/**
-	 *  deprecated
-	 * @param _rs deprecated
-	 * @param _columnName deprecated
-	 * @return  deprecated
-	 * @deprecated unneeded, the old method, now handled in format
-	 */
-	@Deprecated
-	protected String getStringValue(final ResultSet _rs, final String _columnName) {
-		throw new UnsupportedOperationException();
 	}
 
 	private boolean hasOption2() {
@@ -804,21 +604,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	}
 
 	/**
-	 * Method that sets the combo box to be filterable.
-	 * <p>
-	 * GlazedList filtering is now fully integrated so this no longer serves a
-	 * purpose.
-	 *
-	 * @param _filter boolean to turn filtering on or off
-	 */
-	@Deprecated
-	public void setFilterable(final boolean _filter) {
-		// TODO remove this method in future release
-		filterSwitch = _filter;
-		logger.warn(getColumnForLog() + ": This method has been Deprecated because GlazedList filtering is now fully integrated.\n", new Exception());
-	}
-
-	/**
 	 * Sets database column (normally a primary key) from which to query the mappings for the bound column.
 	 *
 	 * @param _primaryKeyColumnName name of the PK value to query for the bound column mappings
@@ -871,27 +656,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	}
 
 	/**
-	 * 
-	 * @param _value option
-	 * @deprecated use {@link #setSelectedOption(Object) }
-	 */
-	@Deprecated
-	public void setSelectedStringValue(final String _value) {
-		setSelectedOption(_value);
-	}
-
-	/**
-	 * Sets the selected ComboBox item according to the specified mapping/key.
-	 * 
-	 * @param _value database record mapping/key
-	 * @deprecated use {@link SSBaseComboBox#setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}
-	 */
-	@Deprecated
-	public void setSelectedValue(final long _value) {
-		setSelectedMapping(_value);
-	}
-
-	/**
 	 * Set the separator to be used when multiple columns are displayed
 	 *
 	 * @param _separator separator to be used.
@@ -901,20 +665,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		separator = _separator;
 		firePropertyChange("separator", oldValue, separator);
 		listItemFormat.setSeparator(separator);
-	}
-
-	/**
-	 * Set the separator to be used when multiple columns are displayed
-	 * <p>
-	 * Deprecated for misspelling.
-	 *
-	 * @param _separator separator to be used.
-	 * 
-	 * @deprecated Use {@link #setSeparator(String)}
-	 */
-	@Deprecated
-	public void setSeperator(final String _separator) {
-		setSeparator(_separator);
 	}
 
 	/**
@@ -973,50 +723,6 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		}
 
 		return result;
-	}
-
-	/**
-	 * Updates an item available in the combobox and associated lists.
-	 * <p>
-	 * If more than one item is present in the combo for that value, only the first
-	 * one is changed.
-	 * <p>
-	 * NOTE: To retain changes made to current RowSet call updateRow before
-	 * calling the updateItem on SSDBComboBox. (Only if you are using the
-	 * SSDBComboBox and SSDataNavigator for navigation in the screen. If you are not
-	 * using the SSDBComboBox for navigation then no need to call updateRow on the
-	 * RowSet. Also if you are using only SSDBComboBox for navigation you need not
-	 * call the updateRow.)
-	 *
-	 * @param _primaryKey         primary key value corresponding the the display
-	 *                            text to be updated
-	 * @param _updatedDisplayText text that should be updated in the combobox
-	 *
-	 * @return returns true if update is successful otherwise returns false.
-	 * @deprecated use {@link #updateOption(java.lang.Long, java.lang.String) }
-	 */
-	@Deprecated
-	public boolean updateItem(final long _primaryKey, final String _updatedDisplayText) {
-		return updateOption(_primaryKey, _updatedDisplayText);
-
-	}
-
-
-	/**
-	 * Updates the string thats being displayed.
-	 * <p>
-	 * If more than one item is present in the combo for that value the first one is
-	 * changed.
-	 *
-	 * @param _existingDisplayText existing display text to be updated
-	 * @param _updatedDisplayText  text that should be updated in the combobox
-	 *
-	 * @return returns true if successful otherwise returns false.
-	 * @deprecated use {@link #updateOption(java.lang.Long, java.lang.String) }
-	 */
-	@Deprecated
-	public boolean updateStringItem(final String _existingDisplayText, final String _updatedDisplayText) {
-		throw new UnsupportedOperationException();
 	}
 
 } // end public class SSDBComboBox

@@ -419,17 +419,6 @@ public class SSSyncManager {
 	}
 
 	/**
-	 * Sets column to be used as basis for synchronization.
-	 *
-	 * @param _columnName RowSet column used as basis for synchronization.
-	 * @deprecated use {@link #setSyncColumnName(java.lang.String) }
-	 */
-	@Deprecated
-	public void setColumnName(final String _columnName) {
-		setSyncColumnName(_columnName);
-	}
-
-	/**
 	 * Sets combo box to be synchronized.
 	 *
 	 * @param _comboBox combo box to be synchronized

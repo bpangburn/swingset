@@ -39,7 +39,6 @@ package com.nqadmin.swingset.utils;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Frame;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -63,6 +62,7 @@ import java.sql.Connection;
 /**
  * Helper class for designing SwingSet Form View screens.
  */
+@SuppressWarnings("serial")
 public abstract class SSScreenHelperCommon extends JInternalFrame {
 
 	/**
@@ -79,12 +79,13 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * </pre><p>
 	 * ASSUMES that -998877 would never be a primary/foreign key value.
 	 */
+	// TODO: find a better way
 	public final static long hopefullyNoPKValue = -998877;
 
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial ID
@@ -235,16 +236,6 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 	
 	/**
-	 * @return Parent window/container.
-	 *
-	 * @deprecated Starting in 4.0.0+ use {@link #getRootFrame()} instead.
-	 */
-	@Deprecated
-	protected Frame getMainFrame() {
-		return getRootFrame();
-	}
-	
-	/**
 	 * Helper method to provide a JMenuBar with a single File Menu
 	 * with a Menu Item to close the screen.
 	 * 
@@ -375,7 +366,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * Sets default X and Y coordinates for the screen (top left offset)
 	 */
 	public void setDefaultScreenLocation() {
-		setDefaultScreenLocation(Integer.valueOf(ssProps.getProperty("Level_2_X_Position")), Integer.valueOf(ssProps.getProperty("Level_2_Y_Position")));
+		setDefaultScreenLocation(Integer.parseInt(ssProps.getProperty("Level_2_X_Position")), Integer.parseInt(ssProps.getProperty("Level_2_Y_Position")));
 	}
 	
 	/**
@@ -385,8 +376,8 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * @param _defaultY the default Y coordinate for the screen
 	 */
 	public void setDefaultScreenLocation(final int _defaultX, final int _defaultY) {
-		setDefaultX(Integer.valueOf(_defaultX));
-		setDefaultY(Integer.valueOf(_defaultY));
+		setDefaultX(_defaultX);
+		setDefaultY(_defaultY);
 	}
 	
 	/**
@@ -462,7 +453,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * Sets the screen size
 	 */
 	public void setScreenSize() {
-		setSize(Integer.valueOf(ssProps.getProperty("Frame_Width")), Integer.valueOf(ssProps.getProperty("Frame_Height")));
+		setSize(Integer.parseInt(ssProps.getProperty("Frame_Width")), Integer.parseInt(ssProps.getProperty("Frame_Height")));
 	}
 
 	/**
@@ -491,7 +482,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 
 		// SEE IF THE SCREEN IS IN THE CONTAINER
 		final Component[] components = _container.getComponents();
-		int i = 0;
+		int i;
 		for (i = 0; i < components.length; i++) {
 			// if (_callingClass.isInstance(components[i])) {
 			if (getClass().isInstance(components[i])) {

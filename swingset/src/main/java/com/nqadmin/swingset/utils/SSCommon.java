@@ -394,18 +394,6 @@ public class SSCommon {
 	public static final int NO_COLUMN_INDEX = -1;
 
 	/**
-	 * Constant to indicate that no RowSet column type has been specified.
-	 * <p>
-	 * Per https://www.tutorialspoint.com/java-resultsetmetadata-getcolumntype-method-with-example
-	 * value can be positive or negative so it's dangerous to presume -1 can represent that
-	 * no column type has been specified.
-	 * <p>
-	 * There is a java.sql.Type of of NULL
-	 */
-	@Deprecated
-	public static final int NO_COLUMN_TYPE = -1;
-
-	/**
 	 * Unique serial ID.
 	 */
 	protected static final long serialVersionUID = -7670575893542057725L;

@@ -52,7 +52,6 @@ import java.sql.Connection;
 
 import javax.swing.JComponent;
 
-import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
@@ -72,30 +71,8 @@ import com.nqadmin.swingset.navigate.RowSetModificationEvent;
  * SwingSet components unless you disable/enable the component listener.
  * Best practice is to call {@code #getSSCommon().updateSSComponent()}
  */
-public interface SSComponentInterface {
-
-	// TODO Fire property changes where applicable.
-
-//	/**
-//	 * Convenience method to add both RowSet and SwingSet Component listeners.
-//	 * <p>
-//	 * Does not add DocumentListener.
-//	 */
-//	default void addListeners() {
-//		addRowSetListener();
-//		addSSComponentListener();
-//	}
-
-//	/**
-//	 * Adds listener for Document if SwingSet component is a JTextComponent.
-//	 * <p>
-//	 * Implementation of addSSComponentListener() can just call this method when the
-//	 * component is a JTextComponent.
-//	 */
-//	default void addDocumentListener() {
-//		getSSCommon().addDocumentListener();
-//	}
-
+public interface SSComponentInterface
+{
 	/**
 	 * Adds listener for RowSet to trigger update to SwingSet component.
 	 * <p>
@@ -157,6 +134,7 @@ public interface SSComponentInterface {
 	 * <p>
 	 * This method can be empty.
 	 */
+	// TODO: default empty method.
 	void customInit();
 
 	/**
@@ -233,46 +211,6 @@ public interface SSComponentInterface {
 	}
 
 	/**
-	 * Returns the index of the database column to which the SwingSet component is
-	 * bound.
-	 *
-	 * @return returns the index of the column to which the SwingSet component is
-	 *         bound
-	 *
-	 * @deprecated use {@link #getBoundColumnIndex()} instead.
-	 */
-	@Deprecated
-	default int getColumnIndex() {
-		return getBoundColumnIndex();
-	}
-
-	/**
-	 * Returns the database column name bound to the Swingset component
-	 *
-	 * @return the bound column name
-	 *
-	 * @deprecated use {@link #getBoundColumnName()} instead.
-	 */
-	@Deprecated
-	default String getColumnName() {
-		return getBoundColumnName();
-	}
-
-	/**
-	 * Returns the integer code representing the bound database column data type.
-	 * <p>
-	 * Based on java.sql.Types
-	 *
-	 * @return the data type of the bound column
-	 *
-	 * @deprecated use {@link #getBoundColumnType()} instead.
-	 */
-	@Deprecated
-	default int getColumnType() {
-		return getBoundColumnType();
-	}
-
-	/**
 	 * Returns the ssCommon data member of the Swingset component.
 	 * <p>
 	 * A typical implementation might look like: {@code
@@ -300,22 +238,6 @@ public interface SSComponentInterface {
 	 */
 	default RowSet getRowSet() {
 		return getSSCommon().getRowSet();
-	}
-
-	/**
-	 * Returns the SSDataNavigator associated with this component.
-	 * <p>
-	 * This was added per discussion #93 to support a legacy
-	 * SwingSet with the need to setup key listeners on individual
-	 * components to trigger action on the SSDataNavigator buttons.
-	 * <p>
-	 * @deprecated Use ActionMap instead.
-	 * @return the SSDataNavigator
-	 */
-	@Deprecated
-	default SSDataNavigator getSSDataNavigator() {
-		//return SSDataNavigator.getSSDataNavigator(getRowSet());
-		return null;
 	}
 	
 	/**
@@ -346,38 +268,6 @@ public interface SSComponentInterface {
 	 * @return single change listener for the current SwingSet component to trigger RowSet update
 	 */
 	EventListener getSSComponentListener();
-	
-//	/**
-//	 * Returns the RowSet containing queried data from the database.
-//	 *
-//	 * @return the rowSet
-//	 *
-//	 * @deprecated use {@link #getRowSet()} instead.
-//	 */
-//	@Deprecated
-//	default RowSet getSSRowSet() {
-//		return getRowSet();
-//	}
-
-//	/**
-//	 * Removes listeners for bound RowSet and SwingSet component.
-//	 * <p>
-//	 * Does not remove DocumentListener.
-//	 */
-//	default void removeListeners() {
-//		removeRowSetListener();
-//		removeSSComponentListener();
-//	}
-
-//	/**
-//	 * Removes listener for Document if SwingSet component is a JTextComponent.
-//	 * <p>
-//	 * Implementation of removeSSComponentListener() can just call this method when
-//	 * the component is a JTextComponent.
-//	 */
-//	default void removeDocumentListener() {
-//		getSSCommon().removeDocumentListener();
-//	}
 	
 	/**
 	 * Indicates if the components RowSet listener is added/enabled.
@@ -492,34 +382,6 @@ public interface SSComponentInterface {
 	default void setBoundColumnText(final String _boundColumnText) {
 		getSSCommon().setBoundColumnText(_boundColumnText);
 	}
-
-	/**
-	 * Sets the rowset column index to which the Component is to be bound.
-	 *
-	 * @param _columnIndex rowset column index to which the Component is to be bound
-	 *
-	 * @throws java.sql.SQLException - if a database access error occurs
-	 *
-	 * @deprecated use {@link #setBoundColumnIndex(int _boundColumnIndex)} instead.
-	 */
-	@Deprecated
-	default void setColumnIndex(final int _columnIndex) throws SQLException {
-		setBoundColumnIndex(_columnIndex);
-	}
-
-	/**
-	 * Sets the database column name bound to the Swingset component
-	 *
-	 * @param _columnName the columnName to set
-	 *
-	 * @throws java.sql.SQLException - if a database access error occurs
-	 *
-	 * @deprecated use {@link #setBoundColumnName(String _boundColumnName)} instead.
-	 */
-	@Deprecated
-	default void setColumnName(final String _columnName) throws SQLException {
-		setBoundColumnName(_columnName);
-	}
 	
 	/**
 	 * Sets the RowSet to hold queried data from the database.
@@ -539,38 +401,6 @@ public interface SSComponentInterface {
 	 */
 	default void setConnection(final Connection _connection) {
 		getSSCommon().setConnection(_connection);
-	}
-
-//	/**
-//	 * Sets the RowSet to hold queried data from the database.
-//	 *
-//	 * @param _rowSet datasource
-//	 *
-//	 * @throws java.sql.SQLException - if a database access error occurs
-//	 * 
-//	 * @deprecated use {@link #setRowSet(RowSet)} instead.
-//	 */
-//	@Deprecated
-//	default void setSSRowSet(final RowSet _rowSet) throws java.sql.SQLException {
-//		setRowSet(_rowSet);
-//	}
-
-	/**
-	 * Updates the value of the SwingSet component based on the bound database
-	 * column.
-	 * <p>
-	 * IMPORTANT: Do not call {@link #updateDisplay()} directly from 
-	 * SwingSet components unless you disable/enable the component listener.
-	 * Best practice is to call {@code #getSSCommon().updateSSComponent()}
-	 * <p>
-	 * updateSSComponent() should eliminate the need for updateDisplay()
-	 *
-	 * @deprecated {@link #updateSSComponent()} should generally handle display
-	 *             update.
-	 */
-	@Deprecated
-	default void updateDisplay() {
-		updateSSComponent();
 	}
 
 	/**
