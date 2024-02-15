@@ -47,7 +47,8 @@ import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
 import javax.swing.SwingUtilities;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDataNavigator;
@@ -91,12 +92,12 @@ public class SSSyncManager {
 				}
 
 				comboPK = comboBox.getSelectedMapping();
-				logger.debug("COMBO NAVIGATOR: getSelectedMapping() returned: {}.", () -> comboPK);
+				logger.log(DEBUG, "COMBO NAVIGATOR: getSelectedMapping() returned: {}.", () -> comboPK);
 				
 				// getSelectedMapping() could return null during initialization.
 				// We check for null/empty rowset in the prior block.
 				if (comboPK==null) {
-					logger.warn("Null selected in Combo Navigator.");
+					logger.log(WARNING, "Null selected in Combo Navigator.");
 					return;
 				}
 				
@@ -115,7 +116,7 @@ public class SSSyncManager {
 					// long indexOfId = SSSyncManager.this.comboBox.itemMap.get(this.id) + 1;
 					final int indexOfPK = comboBox.getMappings().indexOf(comboPK) + 1;
 					//int index = (int) indexOfPK;
-					logger.debug("Rowset PK=" + rowsetPK + ", Combo PK=" + comboPK + ", Target rowset record # should be " + indexOfPK + ".");
+					logger.log(DEBUG, "Rowset PK=" + rowsetPK + ", Combo PK=" + comboPK + ", Target rowset record # should be " + indexOfPK + ".");
 					rowset.absolute(indexOfPK);
 					final int numRecords = comboBox.getItemCount();
 					int count = 0;
@@ -132,8 +133,7 @@ public class SSSyncManager {
 
 						count++;
 
-						logger.warn(
-								"SSSyncManager RowSet and SSDBComboBox values do not match for the same index. This can be caused by SSDBComboBox and RowSet "
+						logger.log(WARNING, "SSSyncManager RowSet and SSDBComboBox values do not match for the same index. This can be caused by SSDBComboBox and RowSet "
 								+ " queries not selecting the same records in the same order. Looping through each record for a match. Pass # "
 										+ count + ".");
 
@@ -160,7 +160,7 @@ public class SSSyncManager {
 						// To avoid infinite loop in such scenario
 						if (count > (numRecords + overlapToCheck)) {
 							comboBox.repaint();
-							logger.warn("SSSyncManager unable to find a record matching the selection in the dropdown list: " + comboBox.getSelectedStringValue() + ".");
+							logger.log(WARNING, "SSSyncManager unable to find a record matching the selection in the dropdown list: " + comboBox.getSelectedStringValue() + ".");
 							// JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin
 							// about this","Row not found",JOptionPane.OK_OPTION);
 							break;
@@ -170,9 +170,9 @@ public class SSSyncManager {
 
 
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 			} finally {
-				logger.debug("SyncComboListener actionPerformedCount=" + actionPerformedCount++);
+				logger.log(DEBUG, "SyncComboListener actionPerformedCount=" + actionPerformedCount++);
 				addRowsetListener();
 			}
 		}
@@ -199,7 +199,7 @@ public class SSSyncManager {
 		 */
 		@Override
 		public void cursorMoved(final RowSetEvent event) {
-			logger.trace("Rowset cursor moved.");
+			logger.log(TRACE, "Rowset cursor moved.");
 			performUpdates();
 		}
 
@@ -208,7 +208,7 @@ public class SSSyncManager {
 		 */
 		@Override
 		public void rowChanged(final RowSetEvent rse) {
-			logger.trace("Rowset row changed.");
+			logger.log(TRACE, "Rowset row changed.");
 			// Do nothing as there is no navigation involved
 			//performUpdates();
 		}
@@ -218,13 +218,13 @@ public class SSSyncManager {
 		 */
 		@Override
 		public void rowSetChanged(final RowSetEvent rse) {
-			logger.trace("Rowset changed.");
+			logger.log(TRACE, "Rowset changed.");
 			performUpdates();
 		}
 		
 		private void performUpdates() {
 			lastChange++;
-			logger.trace("performUpdates(): lastChange=" + lastChange
+			logger.log(TRACE, "performUpdates(): lastChange=" + lastChange
 					+ ", lastNotifiedChange=" + lastNotifiedChange);
 			
 			// Delay execution of logic until all listener methods are called for current event
@@ -361,7 +361,7 @@ public class SSSyncManager {
 				// GET THE PRIMARY KEY FOR THE CURRENT RECORD IN THE ROWSET
 				final Long currentRowPK = rowset.getLong(syncColumnName);
 
-				logger.debug("SSSyncManager().adjustValue() - RowSet value: " + currentRowPK);
+				logger.log(DEBUG, "SSSyncManager().adjustValue() - RowSet value: " + currentRowPK);
 
 				// CHECK IF THE COMBO BOX IS DISPLAYING THE SAME ONE.
 				if ((comboBox.getSelectedStringValue() == null)
@@ -375,7 +375,7 @@ public class SSSyncManager {
 				comboBox.setSelectedMapping(null);
 			}
 		} catch (final SQLException se) {
-			logger.error("SQL Exception.", se);
+			logger.log(ERROR, "SQL Exception.", se);
 		}
 		
 		comboBox.setEnabled(true);
@@ -386,7 +386,7 @@ public class SSSyncManager {
 	 * Stop synchronization between navigation components.
 	 */
 	public void async() {
-		logger.debug("");
+		logger.log(DEBUG, "");
 		removeListeners();
 	}
 
@@ -457,7 +457,7 @@ public class SSSyncManager {
 		//   Seems we should adjustValue() and then call addListeners() because adjustValue() starts by removing the combo listener.
 		//   However since adjustValue() was removing/adding the combo listener, it was getting called twice.
 		//   Added methods for adding/removing combo and rowset listeners along with booleans to indicate state.
-		logger.debug("");
+		logger.log(DEBUG, "");
 		adjustValue();
 		addListeners();
 	}

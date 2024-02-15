@@ -65,7 +65,8 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
 import com.nqadmin.swingset.models.GlazedListsOptionMappingInfo;
@@ -153,12 +154,12 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			//
 			// Could be combined with next block, but keeping them separate for debugging.
 			if (isComboBoxNavigator()) {
-				logger.debug("{}: Action Listener returning. No bound column.", () -> getColumnForLog());
+				logger.log(DEBUG, "{}: Action Listener returning. No bound column.", () -> getColumnForLog());
 				return;
 			}
 			
 			// UPDATE ROWSET
-			logger.debug("{}: About to update RowSet with {}.", () -> getColumnForLog(), () -> getSelectedItem());
+			logger.log(DEBUG, "{}: About to update RowSet with {}.", () -> getColumnForLog(), () -> getSelectedItem());
 			updateRowset();
 		}
 	}
@@ -546,7 +547,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * OR null if nothing is selected.
 	 */
 	public M getSelectedMapping() {
-		logger.trace(() -> String.format("%s: getSelectedMapping(), idx:map %d:%s.",
+		logger.log(TRACE, () -> String.format("%s: getSelectedMapping(), idx:map %d:%s.",
 				getColumnForLog(), getSelectedIndex(), getSelectedItem()));
 
 		M result = null;
@@ -568,7 +569,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			if(missingOptionControl.contains(MissingOptionControl.MOC_ADD)) {
 				remodel.add(_mapping, null);
 				index = remodel.getMappings().indexOf(_mapping);
-				logger.debug(() -> "missingMappingOption added: " + _mapping);
+				logger.log(DEBUG, () -> "missingMappingOption added: " + _mapping);
 				generatedMappingOptions.add(_mapping);
 			}
 		}
@@ -585,7 +586,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				|| !missingOptionControl.contains(MissingOptionControl.MOC_CLEANUP))
 			return;
 		if(generatedMappingOptions.size() > 1)
-			logger.warn(() -> "size: " + generatedMappingOptions.size());
+			logger.log(WARNING, () -> "size: " + generatedMappingOptions.size());
 		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
 			for (Iterator<M> it = generatedMappingOptions.iterator(); it.hasNext();) {
 				M missingMappingOption = it.next();
@@ -596,9 +597,9 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				int index = remodel.getMappings().indexOf(missingMappingOption);
 				if(index != -1) {
 					SSListItem removed = remodel.remove(index);
-					logger.debug(() -> "missingMappingOption removed: " + removed);
+					logger.log(DEBUG, () -> "missingMappingOption removed: " + removed);
 				} else {
-					logger.warn(() -> "not in combo: " + missingMappingOption);
+					logger.log(WARNING, () -> "not in combo: " + missingMappingOption);
 				}
 				it.remove(); // it's not in the combo list anymore
 			}
@@ -666,12 +667,12 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	public void setSelectedMapping(final M _mapping) {
 		
-		logger.debug(String.format("%s: current value: %s, new value: %s.",
+		logger.log(DEBUG, String.format("%s: current value: %s, new value: %s.",
 				getColumnForLog(), getSelectedMapping(), _mapping ));
 
 		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
 			if (!hasItems()) {
-				logger.warn(String.format("%s: combobox is empty", getColumnForLog()));
+				logger.log(WARNING, String.format("%s: combobox is empty", getColumnForLog()));
 				// Doesn't have items, that doesn't mean that the list is empty.
 				// Make sure the appropriate null is selected.
 				setSelectedItem(nullItem);
@@ -702,14 +703,14 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				// requeried, the component will try to load the current column value from the rowset and this time
 				// setSelectedMapping() should succeed.
 				if (getSSCommon().isSSComponentListenerAdded()) {
-					logger.warn(String.format("%s: No mapping available for %s in combobox, setSelectedItem(null)", getColumnForLog(), _mapping));
+					logger.log(WARNING, String.format("%s: No mapping available for %s in combobox, setSelectedItem(null)", getColumnForLog(), _mapping));
 				}
 			}
 			setSelectedItem(item);
 			
-			logger.trace("{}: eventList - [{}].", () -> getColumnForLog(), () ->  remodel.getItemList().toString());
-			logger.trace("{}: options - [{}].", () -> getColumnForLog(), () ->  remodel.getOptions().toString());
-			logger.trace("{}: mappings - [{}].", () -> getColumnForLog(), () ->  remodel.getMappings().toString());
+			logger.log(TRACE, "{}: eventList - [{}].", () -> getColumnForLog(), () ->  remodel.getItemList().toString());
+			logger.log(TRACE, "{}: options - [{}].", () -> getColumnForLog(), () ->  remodel.getOptions().toString());
+			logger.log(TRACE, "{}: mappings - [{}].", () -> getColumnForLog(), () ->  remodel.getMappings().toString());
 		}
 	}
 
@@ -745,7 +746,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 
 		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
 			if(!hasItems()) {
-				logger.warn(String.format("%s: combobox is empty", getColumnForLog()));
+				logger.log(WARNING, String.format("%s: combobox is empty", getColumnForLog()));
 				// Even if combo is empty, stick _option in editor. Do not return;
 			}
 			
@@ -770,7 +771,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			} else {
 				// Didn't find it in the list, so just use it as is.
 				item = _option != null ? _option : nullItem;
-				logger.warn(() -> String.format("%s: option %s not in combobox, do setSelectedItem.", getColumnForLog(), _option));
+				logger.log(WARNING, () -> String.format("%s: option %s not in combobox, do setSelectedItem.", getColumnForLog(), _option));
 			}
 			
 			setSelectedItem(item);
@@ -804,16 +805,16 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			public void keyPressed(KeyEvent keyEvent) {
 				int keyCode = keyEvent.getKeyCode();
 				if (keyCode == KeyEvent.VK_UP) {
-					logger.trace(() -> String.format("%s: Intercepted UP key.", getColumnForLog()));
+					logger.log(TRACE, () -> String.format("%s: Intercepted UP key.", getColumnForLog()));
 					if (getSelectedIndex() == 0) {
 						keyEvent.consume();
-						logger.debug(() -> String.format("%s: UP key consumed.", getColumnForLog()));
+						logger.log(DEBUG, () -> String.format("%s: UP key consumed.", getColumnForLog()));
 					}
 				} else if (keyCode == KeyEvent.VK_DOWN) {
-					logger.trace(() -> String.format("%s: Intercepted DOWN key.", getColumnForLog()));
+					logger.log(TRACE, () -> String.format("%s: Intercepted DOWN key.", getColumnForLog()));
 					if (getSelectedIndex() == getModel().getSize() - 1) {
 						keyEvent.consume();
-						logger.debug(() -> String.format("%s: DOWN key consumed.", getColumnForLog()));
+						logger.log(DEBUG, () -> String.format("%s: DOWN key consumed.", getColumnForLog()));
 					}
 				}
 			}
@@ -1001,10 +1002,10 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		M mapping = getSelectedMapping();
 	
 		if (mapping == null) {
-			logger.debug(() -> String.format("%s: Setting to null.", getColumnForLog()));
+			logger.log(DEBUG, () -> String.format("%s: Setting to null.", getColumnForLog()));
 			setBoundColumnText(null);
 		} else {
-			logger.debug(() -> String.format("%s: Setting to %s.",  getColumnForLog(), mapping));
+			logger.log(DEBUG, () -> String.format("%s: Setting to %s.",  getColumnForLog(), mapping));
 			// TODO: need to avoid setting to same value
 			// for NavGroupState. Wonder why, avoids event?
 			//setBoundColumnText(String.valueOf(mapping));
@@ -1060,7 +1061,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			final String boundColumnText = getBoundColumnText();
 
 			// LOGGING
-			logger.debug(() -> String.format("%s: getBoundColumnText() - %s", getColumnForLog(), boundColumnText));
+			logger.log(DEBUG, () -> String.format("%s: getBoundColumnText() - %s", getColumnForLog(), boundColumnText));
 			
 			// GET THE BOUND VALUE STORED IN THE ROWSET - may throw a NumberFormatException
 			Object objValue = null;
@@ -1078,7 +1079,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			M targetValue = (M) objValue;
 			
 			// LOGGING
-			logger.debug(() -> String.format("%s: targetValue - %s", getColumnForLog(), targetValue));
+			logger.log(DEBUG, () -> String.format("%s: targetValue - %s", getColumnForLog(), targetValue));
 			
 			// UPDATE COMPONENT
 			setSelectedMapping(targetValue);// setSelectedMapping() should handle null OK.}
@@ -1086,11 +1087,11 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		} catch (final NumberFormatException nfe) {
 			JOptionPane.showMessageDialog(this, String.format(
 					"Encountered database value of '%s' for column [%s], which cannot be converted to a number.", getBoundColumnText(), getColumnForLog()));
-			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
+			logger.log(ERROR, getColumnForLog() + ": Number Format Exception.", nfe);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this, String.format(
 					"Expecting SSComboBox or SSDBComboBox, but component for column [%s] is of type %s.", this.getClass(), getColumnForLog()));
-			logger.error(getColumnForLog() + ": Unknown SwingSet component of " + this.getClass() + ".", e);
+			logger.log(ERROR, getColumnForLog() + ": Unknown SwingSet component of " + this.getClass() + ".", e);
 		} finally {
 			cleanupMissingMappingOptions();
 		}

@@ -46,7 +46,8 @@ import javax.sql.RowSet;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -193,7 +194,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	@Override
 	public void updateSSComponent() {
 		final String text = getBoundColumnText();
-		logger.debug("{}: Setting label to " + text + ".", () -> getColumnForLog());
+		logger.log(DEBUG, "{}: Setting label to " + text + ".", () -> getColumnForLog());
 		setText(text);
 	}
 

@@ -21,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 import com.raelity.lib.ui.Screens;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -100,12 +101,12 @@ public class DemoUtil {
 
 	/** Invoke this method to output collected statistics to log. */
 	public static void logConnectionUsage() {
-		logger.info(() -> "RowSetSourceDefault: " + whichRowSetDefault);
-		logger.info(() -> String.format(
+		logger.log(INFO, () -> "RowSetSourceDefault: " + whichRowSetDefault);
+		logger.log(INFO, () -> String.format(
 				"Connection pool: max active: %d, nOpen %d, nClose %d",
 				DataSourcePool.cMax(), DataSourcePool.nOpen(), DataSourcePool.nClose()));
 		for (String dsName : connMap.values()) {
-			logger.info(() -> "Connection dsName: " + dsName);
+			logger.log(INFO, () -> "Connection dsName: " + dsName);
 		}
 	}
 
@@ -154,7 +155,7 @@ public class DemoUtil {
 		}
 
 		String factory = TrivialCtxFactory.class.getName();
-		logger.info(() -> "Initializing naming factory: " + factory);
+		logger.log(INFO, () -> "Initializing naming factory: " + factory);
 		System.setProperty("java.naming.factory.initial", factory);
 		try {
 			InitialContext ctx = new InitialContext();
@@ -209,16 +210,16 @@ public class DemoUtil {
 			case SHARE_JDBC:
 				rs = RowSetProvider.newFactory().createJdbcRowSet();
 				rs.setDataSourceName(getDsName(connection));
-				logger.debug(() -> "DataSource: " + getDsName(connection));
+				logger.log(DEBUG, () -> "DataSource: " + getDsName(connection));
 				break;
 			case POOL_CACHED:
 				rs = RowSetProvider.newFactory().createCachedRowSet();
 				rs.setDataSourceName(DataSourcePool.DATA_SOURCE_NAME);
-				logger.debug(() -> "DataSource: " + DataSourcePool.DATA_SOURCE_NAME);
+				logger.log(DEBUG, () -> "DataSource: " + DataSourcePool.DATA_SOURCE_NAME);
 				break;
 			case NQADMIN:
 				rs = new JdbcRowSetImpl(connection);
-				logger.debug(() -> "DataSource: " + RowSetSource.NQADMIN);
+				logger.log(DEBUG, () -> "DataSource: " + RowSetSource.NQADMIN);
 				break;
 			default:
 				throw new RuntimeException("Unknown data source");
@@ -238,7 +239,7 @@ public class DemoUtil {
 				dsName = "ds-" + t + "-" + id;
 			}
 			String finalDsName = dsName;
-			logger.info(() -> "Creating new DataSourceShareConnection: " + finalDsName );
+			logger.log(INFO, () -> "Creating new DataSourceShareConnection: " + finalDsName );
 			try {
 				initialContext.bind(dsName, DataSourceShareConnection.getDataSource(conn));
 			} catch (NamingException ex) {
@@ -285,7 +286,7 @@ public class DemoUtil {
 		try {
 			conn = DriverManager.getConnection(url, props);
 		} catch (SQLException ex) {
-			logger.error("SQL Exception. " + ex.getMessage());
+			logger.log(ERROR, "SQL Exception. " + ex.getMessage());
 		}
 		return conn;
 	}
@@ -365,7 +366,7 @@ public class DemoUtil {
 			}
 			ok = true;
 		} catch(SQLException ex) {
-			logger.error("SQL Exception.", ex);
+			logger.log(ERROR, "SQL Exception.", ex);
 		}
 		return ok;
 	}
@@ -452,9 +453,9 @@ public class DemoUtil {
         catch(Exception e)  
         {  
 			if(lr == null)
-				logger.error("initialization error");
+				logger.log(ERROR, "initialization error");
 			else
-				logger.error("*** Line "+lr.getLineNumber(), e);  
+				logger.log(ERROR, "*** Line "+lr.getLineNumber(), e);  
         }
         return listOfQueries;
     } 
@@ -583,7 +584,7 @@ public class DemoUtil {
 				}
 				ok = true;
 			} catch (SQLException ex) {
-				logger.error("SQL exception", ex);
+				logger.log(ERROR, "SQL exception", ex);
 			}
 		} catch (IOException ex) {
 			ok = false;

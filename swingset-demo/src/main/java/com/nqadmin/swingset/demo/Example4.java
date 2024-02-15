@@ -49,7 +49,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
@@ -144,7 +145,7 @@ public class Example4 extends JFrame {
 				rowset.setCommand("SELECT * FROM part_data;");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 			}
 
 
@@ -177,7 +178,7 @@ public class Example4 extends JFrame {
 					try {
 						rowset.execute();
 					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
+						logger.log(ERROR, "SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -192,7 +193,7 @@ public class Example4 extends JFrame {
 					try {
 						rowset.execute();
 					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
+						logger.log(ERROR, "SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -226,9 +227,9 @@ public class Example4 extends JFrame {
 //						txtPartCity.setText(null);
 
 					} catch(final SQLException se) {
-						logger.error("SQL Exception occured initializing new record.",se);
+						logger.log(ERROR, "SQL Exception occured initializing new record.",se);
 					} catch(final Exception e) {
-						logger.error("Exception occured initializing new record.",e);
+						logger.log(ERROR, "Exception occured initializing new record.",e);
 					}
 
 				}
@@ -243,9 +244,9 @@ public class Example4 extends JFrame {
 					try {
 						cmbSelectPart.execute();
 					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
+						logger.log(ERROR, "SQL Exception.", se);
 					} catch (final Exception e) {
-						logger.error("Exception.", e);
+						logger.log(ERROR, "Exception.", e);
 					}
 					syncManager.sync();
 				}
@@ -259,9 +260,9 @@ public class Example4 extends JFrame {
 				try {
 					cmbSelectPart.execute();
 				} catch (final SQLException se) {
-					logger.error("SQL Exception.", se);
+					logger.log(ERROR, "SQL Exception.", se);
 				} catch (final Exception e) {
-					logger.error("Exception.", e);
+					logger.log(ERROR, "Exception.", e);
 				}
 
 			// SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES

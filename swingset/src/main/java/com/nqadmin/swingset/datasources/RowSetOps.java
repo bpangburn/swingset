@@ -63,7 +63,8 @@ import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.spi.SyncProviderException;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.RowSetState;
@@ -218,7 +219,7 @@ public class RowSetOps {
 					? Optional.empty()
 					: Optional.of(nullable == ResultSetMetaData.columnNullable);
 		} catch (SQLException ex) {
-			logger.error(() -> String.format("SQL Exception for column %d.",
+			logger.log(ERROR, () -> String.format("SQL Exception for column %d.",
 					_columnIndex, ex));
 			return Optional.empty();
 		}
@@ -235,7 +236,7 @@ public class RowSetOps {
 		try {
 			return isNullable(_resultSet, getColumnIndex(_resultSet, _columnName));
 		} catch (SQLException ex) {
-			logger.error(() -> String.format("SQL Exception for column %s.",
+			logger.log(ERROR, () -> String.format("SQL Exception for column %s.",
 					_columnName, ex));
 			return Optional.empty();
 		}
@@ -257,7 +258,7 @@ public class RowSetOps {
 
 			return (Array) objectValue;
 		} catch (SQLException ex) {
-			logger.error("SQL Exception for column " + comp.getBoundColumnName() + ".", ex);
+			logger.log(ERROR, "SQL Exception for column " + comp.getBoundColumnName() + ".", ex);
 		}
 		return null;
 	}
@@ -382,11 +383,11 @@ public class RowSetOps {
 
 			default:
 				// TODO: SSSQLExceptionUnhandledType
-				logger.error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
+				logger.log(ERROR, "Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
 			} // end switch
 
 		} catch (final SQLException se) {
-			logger.error("SQL Exception for column " + _columnName + ".", se);
+			logger.log(ERROR, "SQL Exception for column " + _columnName + ".", se);
 		}
 
 		return value;
@@ -472,11 +473,11 @@ public class RowSetOps {
 
 			default:
 				// TODO: SSSQLExceptionUnhandledType
-				logger.error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
+				logger.log(ERROR, "Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
 			} // end switch
 
 		} catch (final SQLException se) {
-			logger.error("SQL Exception for column " + _columnName + ".", se);
+			logger.log(ERROR, "SQL Exception for column " + _columnName + ".", se);
 		}
 
 		return value;
@@ -641,7 +642,7 @@ public class RowSetOps {
 	 */
 	private static void updateColumnArray(final SSComponentInterface comp, final RowSet _rowSet, final SSArray _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException
 	{
-		logger.debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
+		logger.log(DEBUG, "[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
 		if (NavigateActions.ENABLE_UNDO_REDO)
 			NavigateActions.captureInitialValue(comp);
@@ -717,12 +718,12 @@ public class RowSetOps {
 	private static void updateColumnText(final SSComponentInterface comp, final RowSet
 			_rowSet, final String _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException, NumberFormatException
 	{
-		logger.debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
+		logger.log(DEBUG, "[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
 		JDBCType jdbcType = getJDBCType(getColumnType(_rowSet, _columnName));
 		
 		if (!textUpdateOK.contains(jdbcType)) {
-			logger.error("Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
+			logger.log(ERROR, "Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
 			return;
 		}
 
@@ -834,7 +835,7 @@ public class RowSetOps {
 						Date dateValue = SSCommon.getSQLDate(_updatedValue);
 						_rowSet.updateDate(_columnName, dateValue);
 					} catch(IllegalArgumentException ex) {
-						logger.warn("updateColumnText: DATE: " + ex.getMessage());
+						logger.log(WARNING, "updateColumnText: DATE: " + ex.getMessage());
 						throw ex;
 					}
 // Per https://github.com/bpangburn/swingset/issues/141,
@@ -855,7 +856,7 @@ public class RowSetOps {
 						Time timeValue = java.sql.Time.valueOf(_updatedValue);
 						_rowSet.updateTime(_columnName, timeValue);
 					} catch(IllegalArgumentException ex) {
-						logger.warn("updateColumnText: TIME: " + ex.getMessage());
+						logger.log(WARNING, "updateColumnText: TIME: " + ex.getMessage());
 						throw ex;
 					}
 				}
@@ -876,7 +877,7 @@ public class RowSetOps {
 						_rowSet.updateTimestamp(_columnName, timestampValue);
 					}
 				} catch(IllegalArgumentException ex) {
-					logger.warn("updateColumnText: TIMESTAMP: " + ex.getMessage());
+					logger.log(WARNING, "updateColumnText: TIMESTAMP: " + ex.getMessage());
 					throw ex;
 				}
 				break;
@@ -1154,7 +1155,7 @@ public class RowSetOps {
 			break;
 		default:
 			// TODO: SSSQLExceptionUnhandledType
-			logger.warn("Unknown data type of " + type);
+			logger.log(WARNING, "Unknown data type of " + type);
 		}
 		
 	}

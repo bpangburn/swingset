@@ -47,7 +47,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.ListItem0;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -349,7 +350,7 @@ public class SSListItemFormat extends Format {
 				format.format(elem, _sb, FP0);
 				return;
 			} catch (Exception ex) {
-				logger.error(String.format("can't format %s with %s. Exception: %s",
+				logger.log(ERROR, String.format("can't format %s with %s. Exception: %s",
 						elem.toString(), format.toString(), ex.getMessage()));
 			}
 		}

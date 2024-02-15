@@ -51,8 +51,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
-import org.apache.logging.log4j.Logger;
-
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 import java.sql.Connection;
 
 //SSScreenHelperCommon.java
@@ -162,7 +162,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 			try {
 				_jInternalFrame.setClosed(true);
 			} catch (PropertyVetoException _pve) {
-				logger.warn("Unable to close {}.",()-> {return _jInternalFrame.getTitle();});
+				logger.log(WARNING, "Unable to close {}.",()-> {return _jInternalFrame.getTitle();});
 			}
 		});
 		
@@ -181,7 +181,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 			setClosed(true);
 			closeChildScreens();
 		} catch (final PropertyVetoException pve) {
-			logger.error("Property Veto Exception.", pve);
+			logger.log(ERROR, "Property Veto Exception.", pve);
 		}
 	}
 	
@@ -506,7 +506,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 			setSelected(true);
 			setClosed(false);
 		} catch (final PropertyVetoException pve) {
-			logger.error("Property Veto Exception.", pve);
+			logger.log(ERROR, "Property Veto Exception.", pve);
 		}
 
 	}
@@ -518,7 +518,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * @throws Exception exception thrown while updating the rowset
 	 */
 	protected void updateRowset() throws SQLException, Exception {
-		logger.debug("Rowset query: [{}].", () -> {
+		logger.log(DEBUG, "Rowset query: [{}].", () -> {
 			try {
 				return getRowsetQuery();
 //			} catch (SQLException se) {

@@ -49,7 +49,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
@@ -127,7 +128,7 @@ public class Example3 extends JFrame {
 				rowset.setCommand("SELECT * FROM supplier_part_data");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 			}
 
 		/**
@@ -150,7 +151,7 @@ public class Example3 extends JFrame {
 				try {
 					rowset.execute();
 				} catch (final SQLException se) {
-					logger.error("SQL Exception.", se);
+					logger.log(ERROR, "SQL Exception.", se);
 				}
 			}
 
@@ -163,7 +164,7 @@ public class Example3 extends JFrame {
 				try {
 					rowset.execute();
 				} catch (final SQLException se) {
-					logger.error("SQL Exception.", se);
+					logger.log(ERROR, "SQL Exception.", se);
 				}
 			}
 
@@ -188,15 +189,15 @@ public class Example3 extends JFrame {
 					rs.close();
 
 				// SET OTHER DEFAULTS
-					 logger.debug("Setting default for Supplier Name mapping to 2.");
+					 logger.log(DEBUG, "Setting default for Supplier Name mapping to 2.");
 					 cmbSupplierName.setSelectedMapping((long) 2);
 //					 cmbPartName.setSelectedValue(0);
 //					 txtQuantity.setText("0");
 
 				} catch(final SQLException se) {
-					logger.error("SQL Exception occured initializing new record.",se);
+					logger.log(ERROR, "SQL Exception occured initializing new record.",se);
 				} catch(final Exception e) {
-					logger.error("Exception occured initializing new record.",e);
+					logger.log(ERROR, "Exception occured initializing new record.",e);
 				}
 
 			}
@@ -224,9 +225,9 @@ public class Example3 extends JFrame {
 				cmbSupplierName.execute();
 
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 			} catch (final Exception e) {
-				logger.error("Exception.", e);
+				logger.log(ERROR, "Exception.", e);
 			}
 
 		// SET LABEL DIMENSIONS

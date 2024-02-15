@@ -60,7 +60,8 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Add some buttons at the bottom of a DataGrid example
@@ -139,7 +140,7 @@ class DataGridExampleSupport {
 			try {
 				rowset.execute();
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 			}
 		}
 
@@ -152,7 +153,7 @@ class DataGridExampleSupport {
 			try {
 				rowset.execute();
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 			}
 		}
 	}

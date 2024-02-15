@@ -44,9 +44,9 @@ package com.nqadmin.swingset.utils;
 
 import java.awt.Toolkit;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.StackLocatorUtil;
+import java.lang.StackWalker.Option;
+
+import java.lang.System.Logger;
 
 /**
  *
@@ -66,18 +66,42 @@ public class SSUtils {
 	 * @return the Logger
 	 */
 	public static Logger getLogger() {
-		// NOTE: this can be re-implemented by examining
-		// new Throwable().getStackTrace();
-		Logger logger;
-		try {
-			return LogManager.getLogger(StackLocatorUtil.getCallerClass(2));
-		} catch(UnsupportedOperationException ex) {}
-		logger = LogManager.getRootLogger();
-		// Note: can check for root logger with
-		// logger.getName().isEmpty()
-		logger.error("Using RootLogger", new Throwable());
-		return logger;
+		Class<?> cc = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE)
+				.getCallerClass();
+		return System.getLogger(cc.getName());
+
+		// // NOTE: this can be re-implemented by examining
+		// // new Throwable().getStackTrace();
+		// Logger logger;
+		// try {
+		// 	return LogManager.getLogger(StackLocatorUtil.getCallerClass(2));
+		// } catch(UnsupportedOperationException ex) {}
+		// logger = LogManager.getRootLogger();
+		// // Note: can check for root logger with
+		// // logger.getName().isEmpty()
+		// logger.log(ERROR, "Using RootLogger", new Throwable());
+		// return logger;
 	}
+
+	/**
+	 * Shorthand for "String.format(fmt, args)".
+	 * @param fmt format
+	 * @param args args
+	 * @return string
+	 */
+	public static String sf(String fmt, Object... args) {
+		return args.length == 0 ? fmt : String.format(fmt, args);
+	}
+
+	// /**
+	//  * Shorthand for "() -> String.format(fmt, args)".
+	//  * @param fmt format
+	//  * @param args args
+	//  * @return string
+	//  */
+	// public static Supplier<String> ssf(String fmt, Object... args) {
+	// 	return () -> sf(fmt, args);
+	// }
 
 	/**
 	 * Notify the user of something...

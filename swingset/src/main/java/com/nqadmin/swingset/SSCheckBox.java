@@ -45,11 +45,15 @@ import java.sql.SQLException;
 import javax.sql.RowSet;
 import javax.swing.JCheckBox;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSCheckBox.java
 //
@@ -100,7 +104,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 					setBoundColumnText(BOOLEAN_CHECKED);
 					break;
 				default:
-					logger.warn(getColumnForLog() + ": Unknown column type of " + getBoundColumnType());
+					logger.log(WARNING, getColumnForLog() + ": Unknown column type of " + getBoundColumnType());
 					break;
 				}
 			} else {
@@ -116,7 +120,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 					setBoundColumnText(BOOLEAN_UNCHECKED);
 					break;
 				default:
-					logger.warn(getColumnForLog() + ": Unknown column type of " + getBoundColumnType());
+					logger.log(WARNING, getColumnForLog() + ": Unknown column type of " + getBoundColumnType());
 					break;
 				}
 			}
@@ -237,7 +241,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long, Integer, Boolean
 		
 		final String text = getBoundColumnText();
-		logger.debug("{}: getBoundColumnText() - " + text, () -> getColumnForLog());
+		logger.log(DEBUG, sf("%s: getBoundColumnText() - %s",getColumnForLog(), text));
 
 		// SELECT/DESELECT BASED ON UNDERLYING SQL TYPE
 		switch (getBoundColumnType()) {

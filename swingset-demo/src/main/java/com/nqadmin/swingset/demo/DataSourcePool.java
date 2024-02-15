@@ -62,7 +62,8 @@ import java.util.Properties;
 import java.util.concurrent.Executor;
 import javax.sql.DataSource;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.jdbcx.JdbcDataSource;
 
@@ -154,7 +155,7 @@ public class DataSourcePool {
 			int activeConnections = cp.getActiveConnections();
 			if (activeConnections > cMax) {
 				cMax = activeConnections;
-				logger.info("ConnectionPool new max: " + activeConnections);
+				logger.log(INFO, "ConnectionPool new max: " + activeConnections);
 			}
 		}
 

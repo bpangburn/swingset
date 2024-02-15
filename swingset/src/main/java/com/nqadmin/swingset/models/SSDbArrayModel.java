@@ -51,7 +51,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import static com.nqadmin.swingset.datasources.RowSetOps.*;
 
@@ -119,7 +120,7 @@ public class SSDbArrayModel extends SSAbstractCollectionModel {
 			return null;
 		}
 		
-		logger.debug("SSList.toObjArray() contents: " + _array);
+		logger.log(DEBUG, "SSList.toObjArray() contents: " + _array);
 		
 		Object dbArray = _array.getArray();
 		
@@ -165,12 +166,12 @@ public class SSDbArrayModel extends SSAbstractCollectionModel {
 					// TODO: String missing?
 					//
 					default:
-						logger.error("DataType: " + _array.getBaseTypeName() + " not supported and unable to convert to generic object.");
+						logger.log(ERROR, "DataType: " + _array.getBaseTypeName() + " not supported and unable to convert to generic object.");
 						throw new SQLDataException("Unknown primitive array type");
 				}
 			}
 		} catch (final ClassCastException cce) {
-			logger.error("Class Cast Exception.", cce);
+			logger.log(ERROR, "Class Cast Exception.", cce);
 			throw new SQLDataException(cce);
 		}
 		return data;

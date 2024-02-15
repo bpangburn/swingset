@@ -60,7 +60,8 @@ import javax.swing.ListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
 import com.nqadmin.swingset.models.OptionMappingSwingModel;
@@ -373,7 +374,7 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 		try {
 			selectedDBModel.writeData(this, getSelectedMappings().toArray());
 		} catch (final SQLException se) {
-			logger.error(() -> String.format("%s: SQL Exception.", getColumnForLog()), se);
+			logger.log(ERROR, () -> String.format("%s: SQL Exception.", getColumnForLog()), se);
 		}
 	}
 
@@ -413,17 +414,17 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 			    array = selectedDBModel.readData(this);
 			}
 		} catch (final SQLException se) {
-			logger.error(() -> String.format("%s: SQL Exception.", getColumnForLog()), se);
+			logger.log(ERROR, () -> String.format("%s: SQL Exception.", getColumnForLog()), se);
 		}
 		
 		if (array == null) {
-			logger.debug(() -> String.format("%s: Array is null. Clearing selection.", getColumnForLog()));
+			logger.log(DEBUG, () -> String.format("%s: Array is null. Clearing selection.", getColumnForLog()));
 			clearSelection();
 			return;
 		}
 
 		Object[] finalArray = array;
-		logger.debug(() -> String.format("%s: Updating component with array of %s.", getColumnForLog(), Arrays.toString(finalArray)));
+		logger.log(DEBUG, () -> String.format("%s: Updating component with array of %s.", getColumnForLog(), Arrays.toString(finalArray)));
 		setSelectedValues(finalArray);
 	}
 

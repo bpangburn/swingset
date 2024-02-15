@@ -45,7 +45,8 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 // TODO: could add isNull() method for 0.0.0-SNAPSHOT
 // TODO: could add getMajor(), ... methods
@@ -154,7 +155,7 @@ public class SSVersion implements Comparable<SSVersion> {
 			seq.add(m.group(5) != null ? Integer.valueOf(m.group(5)) : (Integer)0);
 			return new SSVersion(seq, isSnap);
 		} else {
-			logger.error(() -> "Version parse error: " + _sVer);
+			logger.log(ERROR, () -> "Version parse error: " + _sVer);
 			return parse(ERROR_VERSION);
 		}
 	}
@@ -167,7 +168,7 @@ public class SSVersion implements Comparable<SSVersion> {
 			props.load(SSVersion.class.getClassLoader().getResourceAsStream(SS_VERSION_FILENAME));
 			ver = props.getProperty(VERSION_KEY);
 		} catch (IOException | NullPointerException ex) {
-			logger.error("Unable to load SwingSet version properties file.", ex);
+			logger.log(ERROR, "Unable to load SwingSet version properties file.", ex);
 		}
 
 		return ver;

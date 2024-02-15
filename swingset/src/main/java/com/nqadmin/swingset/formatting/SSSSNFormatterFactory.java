@@ -39,7 +39,8 @@ package com.nqadmin.swingset.formatting;
 
 import javax.swing.text.MaskFormatter;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -86,7 +87,7 @@ public class SSSSNFormatterFactory extends javax.swing.text.DefaultFormatterFact
 			setEditFormatter(editFormatter);
 			setDisplayFormatter(displayFormatter);
 		} catch (final java.text.ParseException pe) {
-			logger.warn("Parse Exception.", pe);
+			logger.log(WARNING, "Parse Exception.", pe);
 			// do nothing
 		}
 	}

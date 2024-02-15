@@ -41,7 +41,8 @@ import java.text.SimpleDateFormat;
 
 import javax.swing.text.DateFormatter;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -113,7 +114,7 @@ public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFac
 			setDisplayFormatter(new DateFormatter(new SimpleDateFormat("yyyy-MM-dd")));
     		break;
     	default:
-    		logger.warn("Unknown date format type of " + format);
+    		logger.log(WARNING, "Unknown date format type of " + format);
         	break;
     	}
     }

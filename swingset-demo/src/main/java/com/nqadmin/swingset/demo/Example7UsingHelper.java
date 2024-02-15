@@ -48,7 +48,8 @@ import javax.swing.plaf.InternalFrameUI;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSDataGridScreenHelper;
 
@@ -171,7 +172,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 			}
 
 		} catch (final SQLException se) {
-			logger.error("SQL Exception.", se);
+			logger.log(ERROR, "SQL Exception.", se);
 		}
 
 //	// SETUP THE CONTAINER AND ADD THE DATAGRID

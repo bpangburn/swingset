@@ -88,7 +88,8 @@ import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSBaseComboBox;
 import com.nqadmin.swingset.SSCheckBox;
@@ -182,7 +183,7 @@ public class SSCommon {
 		@Override
 		public void changedUpdate(final DocumentEvent de) {
 			lastChange++;
-			logger.trace("{} - changedUpdate(): lastChange=" + lastChange
+			logger.log(TRACE, "{} - changedUpdate(): lastChange=" + lastChange
 					+ ", lastNotifiedChange=" + lastNotifiedChange, () -> getColumnForLog());
 			
 			// Delay execution of logic until all listener methods are called for current event
@@ -229,14 +230,14 @@ public class SSCommon {
 		/** {@inheritDoc} */
 		@Override
 		public void insertUpdate(final DocumentEvent de) {
-			logger.trace("{} - insertUpdate().", () -> getColumnForLog());
+			logger.log(TRACE, "{} - insertUpdate().", () -> getColumnForLog());
 			changedUpdate(de);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public void removeUpdate(final DocumentEvent de) {
-			logger.trace("{} - removeUpdate().", () -> getColumnForLog());
+			logger.log(TRACE, "{} - removeUpdate().", () -> getColumnForLog());
 			changedUpdate(de);
 		}
 
@@ -252,12 +253,12 @@ public class SSCommon {
 		void capturePrevious(DocumentFilter.FilterBypass fb) {
 			try {
 				String prev = fb.getDocument().getText(0, fb.getDocument().getLength());
-				logger.trace(() -> "Capture previous text value: " + prev);
+				logger.log(TRACE, () -> "Capture previous text value: " + prev);
 				if (eventListener instanceof SSDocumentListener) {
 					((SSDocumentListener) eventListener).previousValue = prev;
 				}
 			} catch (BadLocationException ex) {
-				logger.debug("Capture previous text value", ex);
+				logger.log(DEBUG, "Capture previous text value", ex);
 			}
 		}
 
@@ -316,7 +317,7 @@ public class SSCommon {
 			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
 				return;
 			}
-			logger.trace("{} - RowSet cursor moved.", () -> getColumnForLog());
+			logger.log(TRACE, "{} - RowSet cursor moved.", () -> getColumnForLog());
 			//updateSSComponent();
 			performUpdates();
 		}
@@ -343,7 +344,7 @@ public class SSCommon {
 			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
 				return;
 			}
-			logger.trace("{} - RowSet row changed.", () -> getColumnForLog());
+			logger.log(TRACE, "{} - RowSet row changed.", () -> getColumnForLog());
 //			if (!getRowSet().isUpdatingRow()) {
 //				updateSSComponent();
 //			}
@@ -359,7 +360,7 @@ public class SSCommon {
 			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
 				return;
 			}
-			logger.trace("{} - RowSet changed.", () -> getColumnForLog());
+			logger.log(TRACE, "{} - RowSet changed.", () -> getColumnForLog());
 			//updateSSComponent();
 			performUpdates();
 		}
@@ -367,7 +368,7 @@ public class SSCommon {
 
 		private void performUpdates() {
 			lastChange++;
-			logger.trace("{} - performUpdates(): lastChange=" + lastChange
+			logger.log(TRACE, "{} - performUpdates(): lastChange=" + lastChange
 					+ ", lastNotifiedChange=" + lastNotifiedChange, () -> getColumnForLog());
 			
 			// Delay execution of logic until all listener methods are called for current event
@@ -607,7 +608,7 @@ public class SSCommon {
 		if (!rowSetListenerAdded && rowSet!=null) {
 			rowSet.addRowSetListener(rowSetListener);
 			rowSetListenerAdded = true;
-			logger.debug("{} - RowSet Listener added.", () -> getColumnForLog());
+			logger.log(DEBUG, "{} - RowSet Listener added.", () -> getColumnForLog());
 		}
 	}
 	
@@ -647,7 +648,7 @@ public class SSCommon {
 				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
 				String message = String.format("%s - Encountered unknown Component Event Listener for: %s. Unable to add component listener.",
 						getColumnForLog(), ssComponent.getClass().getSimpleName());
-				logger.error(message);
+				logger.log(ERROR, message);
 				JOptionPane.showMessageDialog((JComponent)getSSComponent(), message, "Unknown Component Event Listener", JOptionPane.ERROR_MESSAGE);
 				
 				// INDICATE FAILURE TO ADD LISTENER
@@ -656,7 +657,7 @@ public class SSCommon {
 		}
 
 		if (ssComponentListenerAdded) {
-			logger.debug("{} - Component Listener added.", () -> getColumnForLog());
+			logger.log(DEBUG, "{} - Component Listener added.", () -> getColumnForLog());
 		}
 	}
 
@@ -678,11 +679,11 @@ public class SSCommon {
 		
 		// CHECK FOR NULL COLUMN/ROWSET
 		if (((boundColumnName == null) && (boundColumnIndex == NO_COLUMN_INDEX)) || (rowSet == null)) {
-			logger.warn("Binding failed: column name={}, column index={}{}.", ()->boundColumnName, ()->boundColumnIndex, ()->rowSet==null ? ", rowset=null" : "");
+			logger.log(WARNING, "Binding failed: column name={}, column index={}{}.", ()->boundColumnName, ()->boundColumnIndex, ()->rowSet==null ? ", rowset=null" : "");
 			return;
 		}
 
-		logger.trace(() -> String.format("Column bind succeeded: name=%s, index=%d %s.",
+		logger.log(TRACE, () -> String.format("Column bind succeeded: name=%s, index=%d %s.",
 				boundColumnName, boundColumnIndex, rowSet==null ? ", rowset=null" : ""));
 
 		//
@@ -690,7 +691,7 @@ public class SSCommon {
 		// If doing this lazy elsewhere, flush the cache here.
 
 		isNullable = RowSetOps.isNullable(rowSet, boundColumnIndex);
-		logger.trace(() -> String.format("Column isNullable: %s.", isNullable));
+		logger.log(TRACE, () -> String.format("Column isNullable: %s.", isNullable));
 
 		// Provide notification of a change in metadata
 		ssComponent.metadataChange();
@@ -743,7 +744,7 @@ public class SSCommon {
 		try {
 			bind(_rowSet, RowSetOps.getColumnIndex(_rowSet, _boundColumnName));
 		} catch (final SQLException se) {
-			logger.error("[" + _boundColumnName + "] - Failed to retrieve column index while binding.", se);
+			logger.log(ERROR, "[" + _boundColumnName + "] - Failed to retrieve column index while binding.", se);
 		}
 //		// INDICATE THAT WE'RE UPDATING THE BINDINGS
 //		inBinding = true;
@@ -834,7 +835,7 @@ public class SSCommon {
 				}
 			}
 		} catch (final SQLException se) {
-			logger.error(getColumnForLog() + " - SQL Exception.", se);
+			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
 		}
 
 		return value;
@@ -984,7 +985,7 @@ public class SSCommon {
 				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
 				String message = String.format("%s - Encountered unknown Component Event Listener for: %s. Unable to remove component listener.",
 						getColumnForLog(), ssComponent.getClass().getSimpleName());
-				logger.error(message);
+				logger.log(ERROR, message);
 				JOptionPane.showMessageDialog((JComponent)getSSComponent(), message, "Unknown Component Event Listener", JOptionPane.ERROR_MESSAGE);
 				
 				// INDICATE FAILURE TO REMOVE LISTENER
@@ -993,7 +994,7 @@ public class SSCommon {
 		}
 
 		if (!ssComponentListenerAdded) {
-			logger.debug("{} - Component Listener removed.", () -> getColumnForLog());
+			logger.log(DEBUG, "{} - Component Listener removed.", () -> getColumnForLog());
 		}
 	}
 
@@ -1014,7 +1015,7 @@ public class SSCommon {
 		if (rowSetListenerAdded) {
 			rowSet.removeRowSetListener(rowSetListener);
 			rowSetListenerAdded = false;
-			logger.debug("{} - RowSet Listener removed.", () -> getColumnForLog());
+			logger.log(DEBUG, "{} - RowSet Listener removed.", () -> getColumnForLog());
 		}
 	}
 
@@ -1060,7 +1061,7 @@ public class SSCommon {
 			boundColumnJDBCType = JDBCType.valueOf(boundColumnType);
 
 		} catch (final SQLException se) {
-			logger.error(getColumnForLog() + " - SQL Exception.", se);
+			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
 		}
 
 		// BIND UPDATED COLUMN IF APPLICABLE
@@ -1102,7 +1103,7 @@ public class SSCommon {
 			boundColumnJDBCType = JDBCType.valueOf(boundColumnType);
 
 		} catch (final SQLException se) {
-			logger.error(getColumnForLog() + " - SQL Exception.", se);
+			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
 		}
 
 		// BIND UPDATED COLUMN IF APPLICABLE
@@ -1139,7 +1140,7 @@ public class SSCommon {
 	 */
 	// TODO: SHOULD IT RETURN AN ERROR LIKE setBoundColumnText?
 	public void setBoundColumnArray(final SSArray _boundColumnArray) throws SQLException {
-		logger.debug(() -> String.format("%s: %s", getColumnForLog(), _boundColumnArray));
+		logger.log(DEBUG, () -> String.format("%s: %s", getColumnForLog(), _boundColumnArray));
 		boolean is_error = true;
 		try {
 			RowSetOps.updateColumnArray(getSSComponent(), _boundColumnArray);
@@ -1159,7 +1160,7 @@ public class SSCommon {
 	 * @return true if no error
 	 */
 	public boolean setBoundColumnText(final String _boundColumnText) {
-		logger.debug(() -> String.format("%s: %s", getColumnForLog(), _boundColumnText));
+		logger.log(DEBUG, () -> String.format("%s: %s", getColumnForLog(), _boundColumnText));
 		boolean ok = false;
 		try {
 			RowSetOps.updateColumnText(getSSComponent(), _boundColumnText);
@@ -1187,7 +1188,7 @@ public class SSCommon {
 			ex_title = "Number Format Exception";
 			ex_msg = "Number Format Exception encountered for " + getBoundColumnName() + " converting " + value + " to a number.";
 		}
-		logger.warn(getBoundColumnName() + " - " + ex_title + ".", ex);
+		logger.log(WARNING, getBoundColumnName() + " - " + ex_title + ".", ex);
 		JOptionPane.showMessageDialog((JComponent)getSSComponent(), ex_msg,
 									  ex_title, JOptionPane.ERROR_MESSAGE);
 	}
@@ -1252,7 +1253,7 @@ public class SSCommon {
 	{
 		if (!NavigateActions.ENABLE_UNDO_REDO)
 			return;
-		logger.debug(() -> String.format("UndoRedoKeys: %s", comp.getClass().getSimpleName()));
+		logger.log(DEBUG, () -> String.format("UndoRedoKeys: %s", comp.getClass().getSimpleName()));
 
 		JComponent jc = (JComponent)comp;
 
@@ -1273,7 +1274,7 @@ public class SSCommon {
 				try {
 					NavigateActions.undoRedo(comp, UndoRedo.UNDO);
 				} catch (SQLException ex) {
-					logger.error("UNDO action:", ex);
+					logger.log(ERROR, "UNDO action:", ex);
 				}
 			}
 		});
@@ -1284,7 +1285,7 @@ public class SSCommon {
 				try {
 					NavigateActions.undoRedo(comp, UndoRedo.REDO);
 				} catch (SQLException ex) {
-					logger.error("REDO action:", ex);
+					logger.log(ERROR, "REDO action:", ex);
 				}
 			}
 		});
@@ -1304,7 +1305,7 @@ public class SSCommon {
 	{
 		if (!NavigateActions.ENABLE_UNDO_REDO)
 			throw new IllegalStateException("UNDO/REDO disabled");
-		logger.debug(() -> String.format("%s: %s", cmd, value));
+		logger.log(DEBUG, () -> String.format("%s: %s", cmd, value));
 		// TODO: put following in RowSetOps
 		// NOTE: following does not generate any events
 		getRowSet().updateObject(getBoundColumnIndex(), value);
@@ -1325,7 +1326,7 @@ public class SSCommon {
 		
 		// If you see this in the logs back to back for the same component a listener is likely
 		// not handled properly. Maybe incorporate SwingUtilities.invokeLater()? 
-		logger.trace("Updating component {}.", () -> getColumnForLog());
+		logger.log(TRACE, "Updating component {}.", () -> getColumnForLog());
 		
 		removeSSComponentListener();
 

@@ -41,7 +41,8 @@ import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 // SSProperties.java
 //
@@ -81,7 +82,7 @@ public class SSProperties {
 				ssProps.load(SSProperties.class.getClassLoader().getResourceAsStream(ssPropsFileName));
 		
 			} catch (final IOException _ioe) {
-				logger.error("Unable to load SwingSet properties file.",_ioe);
+				logger.log(ERROR, "Unable to load SwingSet properties file.",_ioe);
 			}
 		}
 		

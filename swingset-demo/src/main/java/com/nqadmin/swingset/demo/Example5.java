@@ -45,7 +45,8 @@ import java.sql.ResultSet;
 import javax.swing.JFrame;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSDataGrid;
 import java.awt.BorderLayout;
@@ -112,9 +113,9 @@ public class Example5 extends JFrame {
 			rs.next();
 			return rs.getInt("nextVal");
 		} catch(final SQLException se) {
-			logger.error("SQL Exception occured initializing new record.",se);
+			logger.log(ERROR, "SQL Exception occured initializing new record.",se);
 		} catch(final Exception e) {
-			logger.error("Exception occured initializing new record.",e);
+			logger.log(ERROR, "Exception occured initializing new record.",e);
 		}
 		return null;
 	}
@@ -155,7 +156,7 @@ public class Example5 extends JFrame {
 				);
 
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 			}
 
 		// MAKE THE JFRAME VISIBLE

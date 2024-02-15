@@ -66,7 +66,8 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 import org.h2.tools.RunScript;
 
 import com.nqadmin.swingset.models.SSCollectionModel;
@@ -105,22 +106,22 @@ public class MainClass extends JFrame {
 			final Map<String, Object> hints = new HashMap<>(globalHints);
 
 			if (ae.getSource().equals(btnExample1)) {
-				logger.debug("**** Opening Example1 ****");
+				logger.log(DEBUG, "**** Opening Example1 ****");
 				new Example1(dbConnection);
 			} else if (ae.getSource().equals(btnExample2)) {
-				logger.debug("**** Opening Example2 ****");
+				logger.log(DEBUG, "**** Opening Example2 ****");
 				new Example2(dbConnection);
 			} else if (ae.getSource().equals(btnExample3)) {
-				logger.debug("**** Opening Example3 ****");
+				logger.log(DEBUG, "**** Opening Example3 ****");
 				new Example3(dbConnection);
 			} else if (ae.getSource().equals(btnExample4)) {
-				logger.debug("**** Opening Example4 ****");
+				logger.log(DEBUG, "**** Opening Example4 ****");
 				new Example4(dbConnection);
 			} else if (ae.getSource().equals(btnExample4Advanced)) {
-				logger.debug("**** Opening Example4Advanced ****");
+				logger.log(DEBUG, "**** Opening Example4Advanced ****");
 				new Example4Advanced(dbConnection);
 			} else if (ae.getSource().equals(btnExample4UsingHelper)) {
-				logger.debug("**** Opening Example4UsingHelper ****");
+				logger.log(DEBUG, "**** Opening Example4UsingHelper ****");
 				JFrame e4JFrame = new JFrame("Example4 Using Helper");
 				e4JFrame.setLocation(DemoUtil.getChildScreenLocation("Example4UsingHelper"));
 				Example4UsingHelper example4 = new Example4UsingHelper(dbConnection, e4JFrame);
@@ -130,16 +131,16 @@ public class MainClass extends JFrame {
 				// screen dimensions handled by SSScreenHelperCommon.setScreenSize()
 				e4JFrame.setVisible(true);
 			} else if (ae.getSource().equals(btnExample5)) {
-				logger.debug("**** Opening Example5 ****");
+				logger.log(DEBUG, "**** Opening Example5 ****");
 				new Example5(dbConnection);
 			} else if (ae.getSource().equals(btnExample6)) {
-				logger.debug("**** Opening Example6 ****");
+				logger.log(DEBUG, "**** Opening Example6 ****");
 				new Example6(dbConnection);
 			} else if (ae.getSource().equals(btnExample7)) {
-				logger.debug("**** Opening Example7 ****");
+				logger.log(DEBUG, "**** Opening Example7 ****");
 				new Example7(dbConnection);
 			} else if (ae.getSource().equals(btnExample7UsingHelper)) {
-				logger.debug("**** Opening Example7UsingHelper ****");
+				logger.log(DEBUG, "**** Opening Example7UsingHelper ****");
 				JFrame e7JFrame = new JFrame("Example7 Using Helper");
 				Example7UsingHelper example7 = new Example7UsingHelper(dbConnection, null);
 				e7JFrame.add(example7);
@@ -149,14 +150,14 @@ public class MainClass extends JFrame {
 				e7JFrame.setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 				e7JFrame.setVisible(true);
 			} else if (ae.getSource().equals(btnTestBase)) {
-				logger.debug("**** Opening TestBaseComponents ****");
+				logger.log(DEBUG, "**** Opening TestBaseComponents ****");
 				new TestBaseComponents(dbConnection, hints);
 			} else if (ae.getSource().equals(btnTestGrid)) {
-				logger.debug("**** TestGridComponents not implemented ****");
+				logger.log(DEBUG, "**** TestGridComponents not implemented ****");
 				// TODO
 				// new TestGridComponents(dbConnection);
 			} else if (ae.getSource().equals(btnTestFormatted)) {
-				logger.debug("**** Opening TestFormattedComponents ****");
+				logger.log(DEBUG, "**** Opening TestFormattedComponents ****");
 				new TestFormattedComponents(dbConnection);
 			}
 		}
@@ -309,7 +310,7 @@ public class MainClass extends JFrame {
 		});
 
 		// ECHO WORKING DIRECTORY
-		logger.info("Working Directory = " + System.getProperty("user.dir"));
+		logger.log(INFO, "Working Directory = " + System.getProperty("user.dir"));
 
 		// INITIALIZE DATABASE
 		if ("h2".equals(dbname)) {
@@ -393,8 +394,8 @@ public class MainClass extends JFrame {
 
 			Class.forName("org.h2.Driver");
 
-			logger.debug("Resource path: {}.", () -> getClass().getPackage().getName());
-			logger.debug("Resource path: {}.", () -> getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
+			logger.log(DEBUG, "Resource path: {}.", () -> getClass().getPackage().getName());
+			logger.log(DEBUG, "Resource path: {}.", () -> getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
 
 			final InputStream inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
 			final InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
@@ -405,13 +406,13 @@ public class MainClass extends JFrame {
 			} else {
 				if (USE_IN_MEMORY_DATABASE) {
 					result = DriverManager.getConnection("jdbc:h2:mem:" + DATABASE_NAME);
-					logger.info("Established connection to in-memory database.");
+					logger.log(INFO, "Established connection to in-memory database.");
 				} else {
 					// ASSUMING DATABASE IS IN LOCAL ./h2/databases/ FOLDER WITH DEFAULT USERNAME OF
 					// sa AND BLANK PASSWORD
 					// USEFUL FOR WORKING WITH DATASET FOR SWINGSET TESTS
 					result = DriverManager.getConnection("jdbc:h2:tcp:" + DATABASE_PATH + DATABASE_NAME, "sa", "");
-					logger.info("Established connection to database server.");
+					logger.log(INFO, "Established connection to database server.");
 				}
 
 				// RUN SCRIPTS AND CLOSE STREAMS
@@ -431,11 +432,11 @@ public class MainClass extends JFrame {
 			}
 
 		} catch (final IOException ioe) {
-			logger.error("IO Exception.", ioe);
+			logger.log(ERROR, "IO Exception.", ioe);
 		} catch (final SQLException se) {
-			logger.error("SQL Exception.", se);
+			logger.log(ERROR, "SQL Exception.", se);
 		} catch (final ClassNotFoundException cnfe) {
-			logger.error("Class Not Found Exception.", cnfe);
+			logger.log(ERROR, "Class Not Found Exception.", cnfe);
 		}
 
 		return result;
@@ -531,7 +532,7 @@ public class MainClass extends JFrame {
 			} catch (FileNotFoundException ex) {
 				System.err.println("Property file '" + fname + "' not found");
 			} catch (IOException ex) {
-				logger.error("IO exception.", ex);
+				logger.log(ERROR, "IO exception.", ex);
 			}
 			return null;
 		}
@@ -552,7 +553,7 @@ public class MainClass extends JFrame {
 					}
 					ok = true;
 				} catch (IOException ex) {
-					logger.error("IO exception.", ex);
+					logger.log(ERROR, "IO exception.", ex);
 				}
 				if (!ok) {
 					break;

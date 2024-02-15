@@ -57,7 +57,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -119,9 +120,9 @@ public class SSImage extends JPanel implements SSComponentInterface {
 					}
 				}
 			} catch (final SQLException se) {
-				logger.error(getColumnForLog() + ": SQL Exception.", se);
+				logger.log(ERROR, getColumnForLog() + ": SQL Exception.", se);
 			} catch (final IOException ioe) {
-				logger.error(getColumnForLog() + ": IO Exception.", ioe);
+				logger.log(ERROR, getColumnForLog() + ": IO Exception.", ioe);
 			}
 
 			ssCommon.addRowSetListener();
@@ -301,17 +302,17 @@ public class SSImage extends JPanel implements SSComponentInterface {
 		try {
 			final byte[] imageData = getRowSet().getRow() > 0 ? getRowSet().getBytes(getBoundColumnName()) : null;
 			if (imageData != null) {
-				logger.debug("{}: Setting non-null image.", () -> getColumnForLog());
+				logger.log(DEBUG, "{}: Setting non-null image.", () -> getColumnForLog());
 				img = new ImageIcon(imageData);
 				lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
 				lblImage.setText("");
 			} else {
-				logger.debug("{}: Setting null image.", () -> getColumnForLog());
+				logger.log(DEBUG, "{}: Setting null image.", () -> getColumnForLog());
 				img = null;
 				lblImage.setText("No Picture");
 			}
 		} catch (final SQLException se) {
-			logger.error(getColumnForLog() + ": SQL Exception.", se);
+			logger.log(ERROR, getColumnForLog() + ": SQL Exception.", se);
 			img = null;
 		}
 

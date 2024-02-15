@@ -60,7 +60,8 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultFormatterFactory;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.datasources.RowSetOps;
@@ -130,15 +131,15 @@ public class SSFormattedTextField extends JFormattedTextField
 
 			try {
 				if (input instanceof SSFormattedTextField) {
-					logger.debug("{}: Instance of SSFormattedTextField.", () -> getColumnForLog());
+					logger.log(DEBUG, "{}: Instance of SSFormattedTextField.", () -> getColumnForLog());
 
 					final SSFormattedTextField ssftf = (SSFormattedTextField) input;
 					String formattedText = ssftf.getText();
 
 					AbstractFormatter formatter = ssftf.getFormatter();
-					logger.debug("Formatter is: " + formatter + ".");
+					logger.log(DEBUG, "Formatter is: " + formatter + ".");
 					if (formatter == null) {
-						logger.error("Null formatter encountered for formatted text field.");
+						logger.log(ERROR, "Null formatter encountered for formatted text field.");
 					}
 
 					if (formatter != null && formattedText != null && !formattedText.isEmpty()) {
@@ -149,7 +150,7 @@ public class SSFormattedTextField extends JFormattedTextField
 						} catch (ParseException pe) {
 							// Changing logging from 'warn' to 'debug' since we expect a ParseException for
 							// any user keystroke error.
-							logger.debug(getColumnForLog() + ": String of '" + formattedText
+							logger.log(DEBUG, getColumnForLog() + ": String of '" + formattedText
 									+ "' generated a Parse Exception at " + pe.getErrorOffset() + ".", pe);
 							result = false;
 							// We're not going to call setValue(null) if result is false, rather we'll keep
@@ -158,7 +159,7 @@ public class SSFormattedTextField extends JFormattedTextField
 						}
 					} else {
 						// value variable is set to null by default, but make a log entry
-						logger.debug("Null formatter, empty string, or null text.");
+						logger.log(DEBUG, "Null formatter, empty string, or null text.");
 					}
 
 					// now perform custom validation/range checks
@@ -199,7 +200,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 			} catch (final Exception _e) {
 				// Log the error and fail the validation.
-				logger.error(getColumnForLog() + ": Field validation triggered an exception.", _e);
+				logger.log(ERROR, getColumnForLog() + ": Field validation triggered an exception.", _e);
 				result = false;
 
 			} finally {
@@ -250,12 +251,12 @@ public class SSFormattedTextField extends JFormattedTextField
 				final SSFormattedTextField ftf = (SSFormattedTextField) _pce.getSource();
 
 				final Object currentValue = ftf.getValue();
-				logger.info(getColumnForLog() + ": Object to be passed to database is " + currentValue + ".");
+				logger.log(INFO, getColumnForLog() + ": Object to be passed to database is " + currentValue + ".");
 
 				// TODO May want to see if we can veto invalid updates
 				// 2020-12-14_BP: allow null if on insert row
 				if (!getAllowNull() && (currentValue == null) && !RowSetState.isInserting(getRowSet())) {
-					logger.warn("Null value encounted, but not allowed.");
+					logger.log(WARNING, "Null value encounted, but not allowed.");
 					JOptionPane.showMessageDialog(ftf, "Null values are not allowed for " + getBoundColumnName(),
 							"Null Exception", JOptionPane.ERROR_MESSAGE);
 				} else {
@@ -281,8 +282,7 @@ public class SSFormattedTextField extends JFormattedTextField
 										new java.sql.Timestamp(((java.util.Date) currentValue).getTime()));
 								break;
 							default:
-								logger.warn(
-										getColumnForLog() + ": getValue() returned a java.sql.Date, but JDBCType is "
+								logger.log(WARNING, getColumnForLog() + ": getValue() returned a java.sql.Date, but JDBCType is "
 												+ getBoundColumnJDBCType() + ". Unable to update column.");
 							}
 						} else {
@@ -290,7 +290,7 @@ public class SSFormattedTextField extends JFormattedTextField
 						}
 
 					} catch (final SQLException _se) {
-						logger.error(getColumnForLog() + ": RowSet update triggered SQL Exception.", _se);
+						logger.log(ERROR, getColumnForLog() + ": RowSet update triggered SQL Exception.", _se);
 						JOptionPane.showMessageDialog(ftf, "SQL Exception encountered for " + getBoundColumnName(),
 								"SQL Exception", JOptionPane.ERROR_MESSAGE);
 					}
@@ -568,17 +568,17 @@ public class SSFormattedTextField extends JFormattedTextField
 					(newValue instanceof java.sql.Time) ||
 					(newValue instanceof java.sql.Timestamp)) {
 				
-				logger.debug("{}: getObject() - " + newValue, () -> getColumnForLog());
+				logger.log(DEBUG, "{}: getObject() - " + newValue, () -> getColumnForLog());
 				setValue(newValue);
 			} else {
 				String newValueString = newValue == null
 						? "(null)"
 						: newValue.getClass().getName();
-				logger.error(getColumnForLog() + ": JDBCType of " + jdbcType.toString() + " was cast to unsupported type of " + newValueString + " based on JDBC connection getTypeMap().");
+				logger.log(ERROR, getColumnForLog() + ": JDBCType of " + jdbcType.toString() + " was cast to unsupported type of " + newValueString + " based on JDBC connection getTypeMap().");
 			}
 
 		} catch (final java.sql.SQLException sqe) {
-			logger.error(getColumnForLog() + ": SQL Exception while updating rowset from formatted component.", sqe);
+			logger.log(ERROR, getColumnForLog() + ": SQL Exception while updating rowset from formatted component.", sqe);
 			setValue(null);
 		}
 

@@ -135,7 +135,7 @@ public class Example4Advanced extends Example4
 		//cmbPartColor.setMissingOptionControl(mmc);
 
 		// log the MissingOptionControl values
-		logger.info(() -> ("MissingMappingFlags: " + mmc));
+		logger.log(INFO, () -> ("MissingMappingFlags: " + mmc));
 
 
 		//////////////////////////////////////////////////////////////////////
@@ -263,7 +263,7 @@ public class Example4Advanced extends Example4
 	private void changeListFormatter(String tag) {
 		countChange++;
 		int captureCountChange = countChange;
-		logger.info(String.format("change%s formatter: %d", tag, countChange));
+		logger.log(INFO, String.format("change%s formatter: %d", tag, countChange));
 		EventQueue.invokeLater(() -> {
 			cmbPartColor.setListItemFormat(new SSListItemFormat() {
 				@Override

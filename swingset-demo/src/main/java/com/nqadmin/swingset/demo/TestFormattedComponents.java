@@ -49,7 +49,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
@@ -159,7 +160,7 @@ public class TestFormattedComponents extends JFrame {
 				rowset.setCommand("SELECT * FROM swingset_formatted_test_data;");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 			}
 
 
@@ -194,7 +195,7 @@ public class TestFormattedComponents extends JFrame {
 					try {
 						rowset.execute();
 					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
+						logger.log(ERROR, "SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -209,7 +210,7 @@ public class TestFormattedComponents extends JFrame {
 					try {
 						rowset.execute();
 					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
+						logger.log(ERROR, "SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -236,9 +237,9 @@ public class TestFormattedComponents extends JFrame {
 					try {
 						cmbSSDBComboNav.execute();
 					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
+						logger.log(ERROR, "SQL Exception.", se);
 					} catch (final Exception e) {
-						logger.error("Exception.", e);
+						logger.log(ERROR, "Exception.", e);
 					}
 					syncManager.sync();
 				}
@@ -252,9 +253,9 @@ public class TestFormattedComponents extends JFrame {
 				try {
 					cmbSSDBComboNav.execute();
 				} catch (final SQLException se) {
-					logger.error("SQL Exception.", se);
+					logger.log(ERROR, "SQL Exception.", se);
 				} catch (final Exception e) {
-					logger.error("Exception.", e);
+					logger.log(ERROR, "Exception.", e);
 				}
 
 			// SETUP SYNCMANAGER, WHICH WILL TAKE CARE OF KEEPING THE COMBO NAVIGATOR AND
@@ -414,9 +415,9 @@ public class TestFormattedComponents extends JFrame {
 //			fmtSSTimestampField.setText(null);
 
 		} catch(final SQLException se) {
-			logger.error("SQL Exception occured during setting default values.",se);
+			logger.log(ERROR, "SQL Exception occured during setting default values.",se);
 		} catch(final Exception e) {
-			logger.error("Exception occured during setting default values.",e);
+			logger.log(ERROR, "Exception occured during setting default values.",e);
 		}
 
 

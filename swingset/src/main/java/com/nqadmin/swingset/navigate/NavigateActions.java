@@ -71,7 +71,8 @@ import javax.swing.JOptionPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -232,7 +233,7 @@ public class NavigateActions
 	{
 		if (!NavigateActions.ENABLE_UNDO_REDO)
 			throw new IllegalStateException("UNDO/REDO disabled");
-		logger.debug(() -> String.format("%s: %s for %s", cmd,
+		logger.log(DEBUG, () -> String.format("%s: %s for %s", cmd,
 				comp.getClass().getSimpleName(), comp.getBoundColumnName()));
 		NavigateActions navActs = get(comp.getRowSet());
 		navActs.doUndoRedo(comp, cmd);
@@ -280,7 +281,7 @@ public class NavigateActions
 		 */
 		@Override
 		public void cursorMoved(final RowSetEvent rse) {
-			logger.trace("Rowset cursor moved.");
+			logger.log(TRACE, "Rowset cursor moved.");
 			performUpdates();
 		}
 
@@ -289,7 +290,7 @@ public class NavigateActions
 		 */
 		@Override
 		public void rowChanged(final RowSetEvent rse) {
-			logger.trace("Row changed.");
+			logger.log(TRACE, "Row changed.");
 			performUpdates();
 		}
 
@@ -298,15 +299,15 @@ public class NavigateActions
 		 */
 		@Override
 		public void rowSetChanged(final RowSetEvent rse) {
-			logger.trace("Rowset changed.");
+			logger.log(TRACE, "Rowset changed.");
 			// Update the record counts and navigator display following a navigation.
 			try {
-				logger.debug("Updating row count with last(), getRow(), and first().");
+				logger.log(DEBUG, "Updating row count with last(), getRow(), and first().");
 				rowSet.last();
 				rowCount = rowSet.getRow();
 				rowSet.first();
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 			}
 			performUpdates();
 
@@ -314,7 +315,7 @@ public class NavigateActions
 		
 		private void performUpdates() {
 			lastChange++;
-			logger.trace("performUpdates(): lastChange=" + lastChange
+			logger.log(TRACE, "performUpdates(): lastChange=" + lastChange
 					+ ", lastNotifiedChange=" + lastNotifiedChange);
 			
 			// Delay execution of logic until all listener methods are called for current event
@@ -324,11 +325,11 @@ public class NavigateActions
 					lastNotifiedChange = lastChange;
 
 					try {
-						logger.debug("Calling updateNavigator().");
+						logger.log(DEBUG, "Calling updateNavigator().");
 						freshRow();
 						updateNavigator();
 					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
+						logger.log(ERROR, "SQL Exception.", se);
 					}				
 				}
 			});
@@ -448,7 +449,7 @@ public class NavigateActions
 				try {
 					ev.getSource().addUndoableChange(ev);
 				} catch (SQLException ex) {
-					logger.error("Undo/redo exception", ex);
+					logger.log(ERROR, "Undo/redo exception", ex);
 				}
 				if(ev.isError()) {
 					errorComponents.add(ev.getSource());
@@ -456,7 +457,7 @@ public class NavigateActions
 					errorComponents.remove(ev.getSource());
 				}
 
-				logger.trace(() -> ev.toString());
+				logger.log(TRACE, () -> ev.toString());
 				setRowModified();
 				updateActionState();
 			}
@@ -566,7 +567,7 @@ public class NavigateActions
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			logger.debug("FIRST button clicked.");
+			logger.log(DEBUG, "FIRST button clicked.");
 			removeRowsetListener();
 			try {
 				if (!commitChangesToDatabase(true))
@@ -580,7 +581,7 @@ public class NavigateActions
 				dBNav.performNavigationOps(Navigation.First);
 
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 			} finally {
@@ -614,7 +615,7 @@ public class NavigateActions
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			logger.debug("PREVIOUS button clicked.");
+			logger.log(DEBUG, "PREVIOUS button clicked.");
 			removeRowsetListener();
 			try {
 				if (!commitChangesToDatabase(true))
@@ -630,7 +631,7 @@ public class NavigateActions
 				dBNav.performNavigationOps(Navigation.Previous);
 
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 			} finally {
@@ -659,7 +660,7 @@ public class NavigateActions
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			logger.debug("NEXT button clicked.");
+			logger.log(DEBUG, "NEXT button clicked.");
 			removeRowsetListener();
 			try {
 				if (!commitChangesToDatabase(true))
@@ -673,7 +674,7 @@ public class NavigateActions
 				dBNav.performNavigationOps(Navigation.Next);
 
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 			} finally {
@@ -702,7 +703,7 @@ public class NavigateActions
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			logger.debug("LAST button clicked.");
+			logger.log(DEBUG, "LAST button clicked.");
 			removeRowsetListener();
 			try {
 				if (!commitChangesToDatabase(true))
@@ -716,7 +717,7 @@ public class NavigateActions
 				dBNav.performNavigationOps(Navigation.Last);
 				
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 			} finally {
@@ -748,7 +749,7 @@ public class NavigateActions
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			logger.debug("COMMIT button clicked.");
+			logger.log(DEBUG, "COMMIT button clicked.");
 			removeRowsetListener();
 			try {
 				if (RowSetState.isInserting(rowSet)) {
@@ -803,7 +804,7 @@ public class NavigateActions
 				}
 
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while saving row.\n" + se.getMessage());
 			} finally {
@@ -834,7 +835,7 @@ public class NavigateActions
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			logger.debug("UNDO button clicked.");
+			logger.log(DEBUG, "UNDO button clicked.");
 			removeRowsetListener();
 			try {
 				// CALL MOVE TO CURRENT ROW IF ON INSERT ROW.
@@ -870,7 +871,7 @@ public class NavigateActions
 				updateNavigator();
 				
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while undoing changes.\n" + se.getMessage());
 			} finally {
@@ -901,7 +902,7 @@ public class NavigateActions
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			logger.debug("REFRESH button clicked.");
+			logger.log(DEBUG, "REFRESH button clicked.");
 			removeRowsetListener();
 			try {
 				if (callExecute) {
@@ -924,7 +925,7 @@ public class NavigateActions
 				dBNav.performRefreshOps();
 				
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured refreshing the data.\n" + se.getMessage());
 			} finally {
@@ -953,7 +954,7 @@ public class NavigateActions
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			logger.debug("ADD button clicked.");
+			logger.log(DEBUG, "ADD button clicked.");
 			removeRowsetListener();
 			try {
 				// Commit changes for current row to database
@@ -974,7 +975,7 @@ public class NavigateActions
 				updateActionState();
 				
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while moving to insert row.\n" + se.getMessage());
 			} finally {
@@ -1004,7 +1005,7 @@ public class NavigateActions
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			logger.debug("DELETE button clicked.");
+			logger.log(DEBUG, "DELETE button clicked.");
 			removeRowsetListener();
 			try {
 				if (confirmDeletes) {
@@ -1051,7 +1052,7 @@ public class NavigateActions
 				updateNavigator();
 				
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while deleting row.\n" + se.getMessage());
 			} finally {
@@ -1095,7 +1096,7 @@ public class NavigateActions
 				if (!commitChangesToDatabase(true))
 					return;
 				
-				logger.debug("Record number manually updated to " + row + ".");
+				logger.log(DEBUG, "Record number manually updated to " + row + ".");
 				if ((row <= rowCount) && (row > 0)) {
 					rowSet.absolute(row);
 				}
@@ -1103,7 +1104,7 @@ public class NavigateActions
 				freshRow();
 				updateNavigator();
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(null, //NavigateActions.this,
 						"Exception occured while going to row.\n" + se.getMessage());
 			} finally {
@@ -1209,7 +1210,7 @@ public class NavigateActions
 		if (!rowsetListenerAdded) {
 			rowSet.addRowSetListener(rowsetListener);
 			rowsetListenerAdded = true;
-			logger.debug("RowsetListener is ON.");
+			logger.log(DEBUG, "RowsetListener is ON.");
 		}
 	}
 	
@@ -1220,7 +1221,7 @@ public class NavigateActions
 		if (rowsetListenerAdded) {
 			rowSet.removeRowSetListener(rowsetListener);
 			rowsetListenerAdded = false;
-			logger.debug("RowsetListener is OFF.");
+			logger.log(DEBUG, "RowsetListener is OFF.");
 		}
 	}
 
@@ -1415,7 +1416,7 @@ public class NavigateActions
 				currentRow = rowSet.getRow();
 			}
 		} catch (final SQLException se) {
-			logger.error("SQL Exception.", se);
+			logger.log(ERROR, "SQL Exception.", se);
 		}
 		
 		// ADD ROWSET LISTENER
@@ -1425,7 +1426,7 @@ public class NavigateActions
 			freshRow();
 			updateNavigator();
 		} catch (final SQLException se) {
-			logger.error("SQL Exception.", se);
+			logger.log(ERROR, "SQL Exception.", se);
 		}
 
 		// TODO: This is new since first time NavGroupState was implemented.
@@ -1552,7 +1553,7 @@ public class NavigateActions
 	 * @see #updateActionStateWithDatabaseCheck() 
 	 */
 	private void updateActionState() {
-		logger.trace(() -> String.format("rowCount=%d, currentRow=%d", rowCount, currentRow));
+		logger.log(TRACE, () -> String.format("rowCount=%d, currentRow=%d", rowCount, currentRow));
 
 		boolean isRowModified = undoRow.isDirty();
 
@@ -1623,7 +1624,7 @@ public class NavigateActions
 				updateEnable(NAV_PREVIOUS, false);
 			}
 		} catch (SQLException ex) {
-			logger.error("SQL Exception.", ex);
+			logger.log(ERROR, "SQL Exception.", ex);
 		}
 	}
 
@@ -1639,7 +1640,7 @@ public class NavigateActions
 		rowNumberModel.setMaximum(rowCount);
 		rowNumberModel.setValue(currentRow);
 
-		logger.debug("Current Row: " + currentRow + ". Row Count: " + rowCount);
+		logger.log(DEBUG, "Current Row: " + currentRow + ". Row Count: " + rowCount);
 		//logger.debug("Stack trace:", new Throwable());
 
 		updateActionStateWithDatabaseCheck();
@@ -1653,7 +1654,7 @@ public class NavigateActions
 	 */
 	public boolean updatePresentRow() {
 		if (RowSetState.isInserting(rowSet) || (currentRow > 0)) {
-			logger.debug("Doing NAV_COMMIT.");
+			logger.log(DEBUG, "Doing NAV_COMMIT.");
 			actions.get(NAV_COMMIT).actionPerformed(null);
 		}
 

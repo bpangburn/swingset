@@ -46,7 +46,8 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSDataGrid;
 
@@ -169,7 +170,7 @@ public class Example7 extends JFrame {
 				}
 
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 			}
 
 		// SETUP THE CONTAINER AND ADD THE DATAGRID

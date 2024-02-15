@@ -45,7 +45,8 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSDataGrid;
 import com.nqadmin.swingset.SSDataValue;
@@ -150,9 +151,9 @@ public class Example6 extends JFrame {
 							rs.close();
 
 						} catch(final SQLException se) {
-							logger.error("SQL Exception occured obtaining primary key value for new record.",se);
+							logger.log(ERROR, "SQL Exception occured obtaining primary key value for new record.",se);
 						} catch(final Exception e) {
-							logger.error("Exception occured obtaining primary key value for new record.",e);
+							logger.log(ERROR, "Exception occured obtaining primary key value for new record.",e);
 						}
 
 						return partID;
@@ -160,7 +161,7 @@ public class Example6 extends JFrame {
 				});
 
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 			}
 
 		// SETUP THE CONTAINER AND ADD THE DATAGRID

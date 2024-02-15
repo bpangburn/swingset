@@ -58,7 +58,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -114,7 +115,7 @@ public class SSDBNavImpl implements SSDBNav {
 	@Override
 	public void performPreInsertOps() {
 
-		logger.debug("About to call setComponents() to clear values.");
+		logger.log(DEBUG, "About to call setComponents() to clear values.");
 		setComponents(container);
 
 	} // end public void performPreInsertOps() {
@@ -202,7 +203,7 @@ public class SSDBNavImpl implements SSDBNav {
 				setComponents(((JScrollPane) comps[i]).getViewport());
 			} else {
 				// DIPLAY WARNING FOR UNKNOWN COMPONENT
-				logger.warn("Encountered unknown component type of: " + comps[i].getClass().getSimpleName()
+				logger.log(WARNING, "Encountered unknown component type of: " + comps[i].getClass().getSimpleName()
 						+ ". Unable to clear component.");
 			}
 

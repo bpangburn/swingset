@@ -55,7 +55,8 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSCheckBox;
 import com.nqadmin.swingset.SSComboBox;
@@ -231,7 +232,7 @@ public class TestBaseComponents extends JFrame {
 				rowset.setCommand("SELECT * FROM swingset_base_test_data;");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(ERROR, "SQL Exception.", se);
 			}
 
 			/**
@@ -264,7 +265,7 @@ public class TestBaseComponents extends JFrame {
 					try {
 						rowset.execute();
 					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
+						logger.log(ERROR, "SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -279,7 +280,7 @@ public class TestBaseComponents extends JFrame {
 					try {
 						rowset.execute();
 					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
+						logger.log(ERROR, "SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -307,9 +308,9 @@ public class TestBaseComponents extends JFrame {
 					try {
 						cmbSSDBComboNav.execute();
 					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
+						logger.log(ERROR, "SQL Exception.", se);
 					} catch (final Exception e) {
-						logger.error("Exception.", e);
+						logger.log(ERROR, "Exception.", e);
 					}
 					syncManager.sync();
 				}
@@ -323,9 +324,9 @@ public class TestBaseComponents extends JFrame {
 				try {
 					cmbSSDBComboNav.execute();
 				} catch (final SQLException se) {
-					logger.error("SQL Exception.", se);
+					logger.log(ERROR, "SQL Exception.", se);
 				} catch (final Exception e) {
-					logger.error("Exception.", e);
+					logger.log(ERROR, "Exception.", e);
 				}
 
 			// SETUP SYNCMANAGER, WHICH WILL TAKE CARE OF KEEPING THE COMBO NAVIGATOR AND
@@ -378,9 +379,9 @@ public class TestBaseComponents extends JFrame {
 				try {
 					cmbSSDBComboBox.execute();
 				} catch (final SQLException se) {
-					logger.error("SQL Exception.", se);
+					logger.log(ERROR, "SQL Exception.", se);
 				} catch (final Exception e) {
-					logger.error("Exception.", e);
+					logger.log(ERROR, "Exception.", e);
 				}
 
 			// SET LABEL DIMENSIONS
@@ -524,9 +525,9 @@ public class TestBaseComponents extends JFrame {
 //			txtSSTextField.setText(null);
 
 		} catch(final SQLException se) {
-			logger.error("SQL Exception occured during setting default values.",se);
+			logger.log(ERROR, "SQL Exception occured during setting default values.",se);
 		} catch(final Exception e) {
-			logger.error("Exception occured during setting default values.",e);
+			logger.log(ERROR, "Exception occured during setting default values.",e);
 		}
 
 

@@ -68,7 +68,9 @@ import javax.swing.event.ListDataListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -280,17 +282,17 @@ public abstract class AbstractComboBoxListSwingModel {
 
 		@Override
 		public void intervalAdded(ListDataEvent e) {
-			eventLogger.trace(() -> getMsg(e));
+			eventLogger.log(TRACE, () -> getMsg(e));
 		}
 		
 		@Override
 		public void intervalRemoved(ListDataEvent e) {
-			eventLogger.trace(() -> getMsg(e));
+			eventLogger.log(TRACE, () -> getMsg(e));
 		}
 		
 		@Override
 		public void contentsChanged(ListDataEvent e) {
-			eventLogger.trace(() -> getMsg(e));
+			eventLogger.log(TRACE, () -> getMsg(e));
 		}
 	}
 
@@ -615,7 +617,7 @@ public abstract class AbstractComboBoxListSwingModel {
 						selectedObject = (SSListItem)anItem;
 						modelProxy.fire.doFireContentsChanged(this, -1, -1);
 					} else {
-						logger.warn(() -> "ComboBox#setSelectedItem(" + anItem + ") not SSListItem");
+						logger.log(WARNING, () -> "ComboBox#setSelectedItem(" + anItem + ") not SSListItem");
 					}
 				}
 			}
@@ -651,7 +653,7 @@ public abstract class AbstractComboBoxListSwingModel {
 		public void removeElement(Object obj) {
 			remove(obj);
 			if (!(obj instanceof SSListItem)) {
-				logger.warn(() -> "ComboBox#removeElement(" + obj + ") not SSListItem");
+				logger.log(WARNING, () -> "ComboBox#removeElement(" + obj + ") not SSListItem");
 			}
 		}
 		

@@ -49,7 +49,8 @@ import javax.sql.RowSet;
 import javax.swing.JTextField;
 import javax.swing.text.Document;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -475,7 +476,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 			setText(decimalMask(str, numberOfDecimalPlaces));
 			break;
 		default:
-			logger.warn(getColumnForLog() + ": Unknown textbox mask type of " + mask);
+			logger.log(WARNING, getColumnForLog() + ": Unknown textbox mask type of " + mask);
 			break;
 		} // end switch
 		return true;
@@ -517,7 +518,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	public void updateSSComponent() {
 
 		final String text = getBoundColumnText();
-		logger.debug("{}: Setting text field to " + text + ".", () -> getColumnForLog());
+		logger.log(DEBUG, "{}: Setting text field to " + text + ".", () -> getColumnForLog());
 		setText(text);
 	}
 

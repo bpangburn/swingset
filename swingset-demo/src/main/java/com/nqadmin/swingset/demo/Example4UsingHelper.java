@@ -54,7 +54,8 @@ import javax.swing.plaf.InternalFrameUI;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSTextField;
@@ -197,7 +198,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 			@Override
 			public void focusLost(FocusEvent fe) {
 				if (!txtPartName.getText().equals(oldValue)) {
-					logger.debug("txtPartName triggering update to combo navigator.");
+					logger.log(DEBUG, "txtPartName triggering update to combo navigator.");
 					SwingUtilities.invokeLater(() -> updateNavigatorText());
 				}
 			}
@@ -272,9 +273,9 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 			rs.close();
 			
 		} catch(final SQLException se) {
-			logger.error("SQL Exception occured initializing new record.",se);
+			logger.log(ERROR, "SQL Exception occured initializing new record.",se);
 		} catch(final Exception e) {
-			logger.error("Exception occured initializing new record.",e);
+			logger.log(ERROR, "Exception occured initializing new record.",e);
 		}
 		
 		return newPrimaryKey;
@@ -331,7 +332,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 			}
 
 		} catch (SQLException _se) {
-			logger.error("Error occured updating Combo Navigator text.",_se);
+			logger.log(ERROR, "Error occured updating Combo Navigator text.",_se);
 			JOptionPane.showMessageDialog(getRootFrame(),
 					"Error occured updating Combo Navigator text.\n" + _se.getMessage());
 		}

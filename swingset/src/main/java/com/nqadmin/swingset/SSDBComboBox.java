@@ -54,7 +54,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.models.OptionMappingSwingModel;
 import com.nqadmin.swingset.models.SSListItem;
@@ -319,12 +320,12 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			final int index = remodel.getMappings().indexOf(_mapping);
 			if (index >= 0) {
-				logger.warn(() -> String.format("%s: Mapping of [%s] already exists. Creating duplicate Mapping with Option of '%s'.",
+				logger.log(WARNING, () -> String.format("%s: Mapping of [%s] already exists. Creating duplicate Mapping with Option of '%s'.",
 					getColumnForLog(), _mapping, _option));
 			}
 			remodel.add(_mapping, _option, _option2);
 		} catch (final Exception e) {
-			logger.error(getColumnForLog() + ": Exception.", e);
+			logger.log(ERROR, getColumnForLog() + ": Exception.", e);
 		}
 	}
 
@@ -352,7 +353,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 				result = true;
 			}
 		} catch (final Exception e) {
-			logger.error(getColumnForLog() + ": Exception.", e);
+			logger.log(ERROR, getColumnForLog() + ": Exception.", e);
 		}
 
 		return result;
@@ -534,11 +535,11 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 
 		// this.data.getReadWriteLock().writeLock().lock();
 		try (Model.Remodel remodel = optionModel.getRemodel()) {
-			logger.trace("{}: Clearing eventList.", () -> getColumnForLog());
+			logger.log(TRACE, "{}: Clearing eventList.", () -> getColumnForLog());
 			remodel.clear();
 			nullItem = null;
 
-			logger.debug("{}: Nulls allowed? [{}].", () -> getColumnForLog(), () -> getAllowNull());
+			logger.log(DEBUG, "{}: Nulls allowed? [{}].", () -> getColumnForLog(), () -> getAllowNull());
 			adjustForNullItem();
 
 			Statement statement = ssCommon.getConnection().createStatement();
@@ -555,26 +556,26 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 						getJDBCColumnType(rs, rs.findColumn(secondDisplayColumnName)));
 			}
 
-			logger.debug("{}: Query [{}].", () -> getColumnForLog(), () -> getQuery());
+			logger.log(DEBUG, "{}: Query [{}].", () -> getColumnForLog(), () -> getQuery());
 
 			List<SSListItem> newItems = new ArrayList<>();
 			while (rs.next()) {
 				Long pk = rs.getLong(getPrimaryKeyColumnName());
 				Object opt = rs.getObject(displayColumnName);
 				Object opt2 = hasOption2() ? rs.getObject(secondDisplayColumnName) : null;
-				logger.trace("{}: First column to display - " + opt, () -> getColumnForLog());
+				logger.log(TRACE, "{}: First column to display - " + opt, () -> getColumnForLog());
 				if (hasOption2()) {
-					logger.trace("{}: Second column to display - " + opt2, () -> getColumnForLog());
+					logger.log(TRACE, "{}: Second column to display - " + opt2, () -> getColumnForLog());
 				}
 				newItems.add(remodel.createOptionMappingItem(pk, opt, opt2));
 			}
 			remodel.addAll(newItems);
 			rs.close();
 		} catch (final SQLException se) {
-			logger.error(getColumnForLog() + ": SQL Exception.", se);
+			logger.log(ERROR, getColumnForLog() + ": SQL Exception.", se);
 		} catch (final java.lang.NullPointerException npe) {
 			// TODO: why is NullPointerException here?
-			logger.error(getColumnForLog() + ": Null Pointer Exception.", npe);
+			logger.log(ERROR, getColumnForLog() + ": Null Pointer Exception.", npe);
 		}
 	}
 
@@ -714,11 +715,11 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 // TODO Confirm that eventList is not reordered by GlazedLists code.
 			}
 		} catch (final Exception e) {
-			logger.error(getColumnForLog() + ": Exception.", e);
+			logger.log(ERROR, getColumnForLog() + ": Exception.", e);
 		}
 		
 		if (!result) {
-			logger.warn(() -> String.format("%s: Unable to update Mapping of [%s] with Option of '%s'.",
+			logger.log(WARNING, () -> String.format("%s: Unable to update Mapping of [%s] with Option of '%s'.",
 				getColumnForLog(), _mapping, _option));
 		}
 

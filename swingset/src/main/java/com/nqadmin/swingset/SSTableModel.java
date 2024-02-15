@@ -54,7 +54,8 @@ import javax.sql.RowSet;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.utils.SSCommon;
@@ -203,7 +204,7 @@ public class SSTableModel extends AbstractTableModel {
 				fireTableRowsDeleted(_row, _row);
 				return true;
 			} catch (final SQLException se) {
-				logger.error("SQL Exception while deleting row.",  se);
+				logger.log(ERROR, "SQL Exception while deleting row.",  se);
 				if (component != null) {
 					JOptionPane.showMessageDialog(component, "Error while deleting row.\n" + se.getMessage());
 				}
@@ -229,7 +230,7 @@ public class SSTableModel extends AbstractTableModel {
 			return RowSetOps.findJavaTypeClass(type);
 			
 		} catch (final SQLException se) {
-			logger.debug("SQL Exception.",  se);
+			logger.log(DEBUG, "SQL Exception.",  se);
 			return super.getColumnClass(_column);
 		}
 	} // end public Class getColumnClass(int _column) {
@@ -258,11 +259,11 @@ public class SSTableModel extends AbstractTableModel {
 	public String getColumnName(final int _columnNumber) {
 		if (headers != null) {
 			if (_columnNumber < headers.length) {
-				logger.debug("Sending header " + headers[_columnNumber]);
+				logger.log(DEBUG, "Sending header " + headers[_columnNumber]);
 				return headers[_columnNumber];
 			}
 		}
-		logger.warn("Not able to supply header name.");
+		logger.log(WARNING, "Not able to supply header name.");
 		return "";
 	}
 
@@ -366,10 +367,10 @@ public class SSTableModel extends AbstractTableModel {
 				value = rowset.getString(_column + 1);
 				break;
 			default:
-				logger.warn("Unknown data type of " + type);
+				logger.log(WARNING, "Unknown data type of " + type);
 			}
 		} catch (final SQLException se) {
-			logger.error("SQL Exception while retrieving value.",  se);
+			logger.log(ERROR, "SQL Exception while retrieving value.",  se);
 			if (component != null) {
 				JOptionPane.showMessageDialog(component, "Error while retrieving value.\n" + se.getMessage());
 			}
@@ -429,7 +430,7 @@ public class SSTableModel extends AbstractTableModel {
 			}
 
 		} catch (final SQLException se) {
-			logger.error("SQL Exception.",  se);
+			logger.log(ERROR, "SQL Exception.",  se);
 		}
 	}
 
@@ -503,7 +504,7 @@ public class SSTableModel extends AbstractTableModel {
 				rowset.updateString(_column + 1, (String) _value);
 				break;
 			default:
-				logger.warn("SSTableModel.setValueAt(): Unknown data type.");
+				logger.log(WARNING, "SSTableModel.setValueAt(): Unknown data type.");
 			}
 
 			RowSetOps.insertRow(rowset);
@@ -514,7 +515,7 @@ public class SSTableModel extends AbstractTableModel {
 			}
 			rowset.refreshRow();
 
-			logger.debug("Row number of inserted row : {}", () -> {
+			logger.log(DEBUG, "Row number of inserted row : {}", () -> {
 				try {
 					return rowset.getRow();
 				} catch (SQLException e) {
@@ -533,14 +534,14 @@ public class SSTableModel extends AbstractTableModel {
 			fireTableRowsInserted(newRow, newRow);
 
 		} catch (final SQLException se) {
-			logger.error("SQL Exception while inserting row.",  se);
+			logger.log(ERROR, "SQL Exception while inserting row.",  se);
 			inInsertRow = false;
 			if (component != null) {
 				JOptionPane.showMessageDialog(component, "Error while inserting row.\n" + se.getMessage());
 			}
 		}
 
-		logger.debug("Successfully added row.");
+		logger.log(DEBUG, "Successfully added row.");
 
 	} // end protected void insertRow(Object _value, int _column) {
 
@@ -586,7 +587,7 @@ public class SSTableModel extends AbstractTableModel {
 			while (iterator.hasNext()) {
 				final Integer column = (Integer) iterator.next();
 
-				logger.debug("Column number is:" + column);
+				logger.log(DEBUG, "Column number is:" + column);
 				
 				// COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
 				//final int type = rowset.getColumnType(column.intValue() + 1);
@@ -596,7 +597,7 @@ public class SSTableModel extends AbstractTableModel {
 			} // END OF WHILE
 
 		} catch (final SQLException se) {
-			logger.error("SQL Exception while setting defaults for row.",  se);
+			logger.log(ERROR, "SQL Exception while setting defaults for row.",  se);
 			if (component != null) {
 				JOptionPane.showMessageDialog(component, "Error while setting defaults for row.\n" + se.getMessage());
 			}
@@ -678,7 +679,7 @@ public class SSTableModel extends AbstractTableModel {
 			updateColumnObject(rowset, dataValue.getPrimaryColumnValue(), primaryColumn + 1,
 							   RowSetOps.getJDBCColumnType(rowset, primaryColumn + 1));
 		} catch (final SQLException se) {
-			logger.error("SQL Exception while insering Primary Key value.",  se);
+			logger.log(ERROR, "SQL Exception while insering Primary Key value.",  se);
 			if (component != null) {
 				JOptionPane.showMessageDialog(component,
 						"Error while inserting Primary Key value.\n" + se.getMessage());
@@ -772,7 +773,7 @@ public class SSTableModel extends AbstractTableModel {
 			//type = rowset.getColumnType(_column + 1);
 			type = RowSetOps.getColumnType(rowset, _column + 1);
 		} catch (final SQLException se) {
-			logger.error("SQL Exception while updating value.",  se);
+			logger.log(ERROR, "SQL Exception while updating value.",  se);
 			if (component != null) {
 				JOptionPane.showMessageDialog(component, "Error while updating value.\n" + se.getMessage());
 			}
@@ -820,7 +821,7 @@ public class SSTableModel extends AbstractTableModel {
 			return;
 		}
 
-		logger.debug("Set value at "+ _row + "  " + _column + " with "+ valueCopy);
+		logger.log(DEBUG, "Set value at "+ _row + "  " + _column + " with "+ valueCopy);
 
 		try {
 			// YOU SHOULD BE ON THE RIGHT ROW IN THE SSROWSET
@@ -836,9 +837,9 @@ public class SSTableModel extends AbstractTableModel {
 
 			RowSetOps.updateRow(rowset);
 
-			logger.debug("Updated value: {}.", () -> getValueAt(_row,_column));
+			logger.log(DEBUG, "Updated value: {}.", () -> getValueAt(_row,_column));
 		} catch (final SQLException se) {
-			logger.error("SQL Exception while updating value.",  se);
+			logger.log(ERROR, "SQL Exception while updating value.",  se);
 			if (component != null) {
 				JOptionPane.showMessageDialog(component, "Error while updating value.\n" + se.getMessage());
 			}

@@ -50,7 +50,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -140,7 +141,7 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 			return null;
 		}
 		
-		logger.debug("SSList.toObjArray() contents: " + _dbstring);
+		logger.log(DEBUG, "SSList.toObjArray() contents: " + _dbstring);
 		List<Object> data = new ArrayList<>();
 		List<String> dbSplit= Arrays.asList(_dbstring.split(separator));
 
