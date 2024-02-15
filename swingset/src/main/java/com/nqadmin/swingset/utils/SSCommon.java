@@ -52,7 +52,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
-import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.JDBCType;
@@ -138,8 +137,8 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * A good example of this is SSDBComboBox, which may be used solely for
  * navigation.
  */
-public class SSCommon {
-
+public class SSCommon
+{
 	private static final Boolean DISABLE_GENERAL_VALIDATION = false;
 
 	/**
@@ -298,15 +297,9 @@ public class SSCommon {
 	 * extra steps involved which require the listener to ignore some events,
 	 * see {@link SSDataNavigator#acceptChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable) }.
 	 */
-	protected class SSRowSetListener implements RowSetListener, Serializable {
-		/**
-		 * unique serial ID
-		 */
-		private static final long serialVersionUID = -5194433723970625351L;
-		
-		/**
-		 * variables needed to consolidate multiple calls
-		 */
+	protected class SSRowSetListener implements RowSetListener
+	{
+		// variables needed to consolidate multiple calls
 		private int lastChange = 0;
 		private int lastNotifiedChange = 0;
 
@@ -320,8 +313,7 @@ public class SSCommon {
 				return;
 			}
 			logger.log(TRACE, () -> sf("%s - RowSet cursor moved.", getColumnForLog()));
-			//updateSSComponent();
-			performUpdates();
+			performUpdateSSComponent();
 		}
 
 		/**
@@ -350,7 +342,7 @@ public class SSCommon {
 //			if (!getRowSet().isUpdatingRow()) {
 //				updateSSComponent();
 //			}
-			performUpdates();
+			performUpdateSSComponent();
 		}
 
 		/**
@@ -363,12 +355,11 @@ public class SSCommon {
 				return;
 			}
 			logger.log(TRACE, () -> sf("%s - RowSet changed.", getColumnForLog()));
-			//updateSSComponent();
-			performUpdates();
+			performUpdateSSComponent();
 		}
 		
 
-		private void performUpdates() {
+		private void performUpdateSSComponent() {
 			lastChange++;
 			logger.log(TRACE, () -> sf("%s - performUpdates(): lastChange=%s, lastNotifiedChange=%s",
 					getColumnForLog(), lastChange, lastNotifiedChange));
@@ -627,26 +618,29 @@ public class SSCommon {
 		if (!ssComponentListenerAdded) {
 			
 			ssComponentListenerAdded = true;
-			
-			if (ssComponent instanceof SSCheckBox) {
-				((SSCheckBox)ssComponent).addItemListener((ItemListener) eventListener);
-			} else if (ssComponent instanceof SSBaseComboBox) {
-				((SSBaseComboBox<?, ?, ?>)ssComponent).addActionListener((ActionListener) eventListener);
-			} else if (ssComponent instanceof SSImage) {
-				((SSImage)ssComponent).getBtnUpdateImage().addActionListener((ActionListener) eventListener);
-			} else if (ssComponent instanceof SSLabel) {
-				((SSLabel)ssComponent).addPropertyChangeListener("text", ((PropertyChangeListener) eventListener));
-			} else if (ssComponent instanceof SSList) {
-				((SSList)ssComponent).addListSelectionListener((ListSelectionListener) eventListener);
-			} else if (ssComponent instanceof SSSlider) {
-				((SSSlider)ssComponent).addChangeListener((ChangeListener) eventListener);
-			} else if (ssComponent instanceof SSFormattedTextField) {
-				((SSFormattedTextField)ssComponent).addPropertyChangeListener("value", ((PropertyChangeListener) eventListener));
-//			} else if (ssComponent instanceof SSTextArea) {
-//			} else if (ssComponent instanceof SSTextField) {
+
+			/*
+			if (ssComponent instanceof SSCheckBox c) {
+				c.addItemListener((ItemListener) eventListener);
+			} else if (ssComponent instanceof SSBaseComboBox<?,?,?> c) {
+				c.addActionListener((ActionListener) eventListener);
+			} else if (ssComponent instanceof SSImage c) {
+				c.getBtnUpdateImage().addActionListener((ActionListener) eventListener);
+			} else if (ssComponent instanceof SSLabel c) {
+				c.addPropertyChangeListener("text", ((PropertyChangeListener) eventListener));
+			} else if (ssComponent instanceof SSList c) {
+				c.addListSelectionListener((ListSelectionListener) eventListener);
+			} else if (ssComponent instanceof SSSlider c) {
+				c.addChangeListener((ChangeListener) eventListener);
+			} else if (ssComponent instanceof SSFormattedTextField c) {
+				c.addPropertyChangeListener("value", ((PropertyChangeListener) eventListener));
 			} else if (ssComponent instanceof JTextComponent) {
 				addSSDocumentListener();
 			} else {
+				//
+				// TODO: Should programmer errors put up a dialog?
+				//
+
 				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
 				String message = String.format("%s - Encountered unknown Component Event Listener for: %s. Unable to add component listener.",
 						getColumnForLog(), ssComponent.getClass().getSimpleName());
@@ -656,12 +650,36 @@ public class SSCommon {
 				// INDICATE FAILURE TO ADD LISTENER
 				ssComponentListenerAdded = false;
 			}
+			*/
+			/* If JDK-21 and preview for "_" */
+			switch(ssComponent) {
+			case SSCheckBox c -> c.addItemListener((ItemListener) eventListener);
+			case SSBaseComboBox<?,?,?> c -> c.addActionListener((ActionListener) eventListener);
+			case SSImage c -> c.getBtnUpdateImage().addActionListener((ActionListener) eventListener);
+			case SSLabel c -> c.addPropertyChangeListener("text", ((PropertyChangeListener) eventListener));
+			case SSList c -> c.addListSelectionListener((ListSelectionListener) eventListener);
+			case SSSlider c -> c.addChangeListener((ChangeListener) eventListener);
+			case SSFormattedTextField c -> c.addPropertyChangeListener("value", ((PropertyChangeListener) eventListener));
+			case JTextComponent c -> addSSDocumentListener();
+
+			default -> {
+				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
+				String message = String.format("%s - Encountered unknown Component Event Listener for: %s. Unable to add component listener.",
+						getColumnForLog(), ssComponent.getClass().getSimpleName());
+				logger.log(ERROR, message);
+				JOptionPane.showMessageDialog((JComponent)getSSComponent(), message, "Unknown Component Event Listener", JOptionPane.ERROR_MESSAGE);
+				
+				// INDICATE FAILURE TO ADD LISTENER
+				ssComponentListenerAdded = false;
+			}
+			}
 		}
 
 		if (ssComponentListenerAdded) {
 			logger.log(DEBUG, () -> sf("%s - Component Listener added.", getColumnForLog()));
 		}
 	}
+
 
 	/**
 	 * Updates the SSComponent with a valid RowSet and Column (Name or Index)
@@ -704,7 +722,6 @@ public class SSCommon {
 		// combo lists so the text for the first record will be blank, but updateSSComponent() for
 		// SSDBComboBox checks for a null list and returns.
 		updateSSComponent();
-
 	}
 
 	/**

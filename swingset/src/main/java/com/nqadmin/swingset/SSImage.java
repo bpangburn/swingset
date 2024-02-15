@@ -45,7 +45,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.sql.SQLException;
 
 import javax.sql.RowSet;
@@ -81,13 +80,9 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 * Listener(s) for the component's value used to propagate changes back to bound
 	 * database column
 	 */
-	protected class SSImageListener implements ActionListener, Serializable {
+	protected class SSImageListener implements ActionListener {
 
-		/**
-		 * Unique serial ID
-		 */
-		private static final long serialVersionUID = -997068820028544504L;
-
+		/** {@inheritDoc} */
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 
@@ -96,7 +91,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 			try {
 				if (getRowSet() != null) {
 					// FileInputStream inStream = null;
-					File inFile = null;
+					File inFile;
 					final JFileChooser fileChooser = new JFileChooser();
 					if (fileChooser.showOpenDialog(btnUpdateImage) == JFileChooser.APPROVE_OPTION) {
 						inFile = fileChooser.getSelectedFile();

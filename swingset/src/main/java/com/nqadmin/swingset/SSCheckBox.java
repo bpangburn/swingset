@@ -39,7 +39,6 @@ package com.nqadmin.swingset;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.Serializable;
 import java.sql.SQLException;
 
 import javax.sql.RowSet;
@@ -70,19 +69,16 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * Note that for naming consistency, SSCheckBox replaced SSDBCheckBox
  * 01-10-2005.
  */
+@SuppressWarnings("serial")
 public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
 	 * database column
 	 */
-	protected class SSCheckBoxListener implements ItemListener, Serializable {
-
-		/**
-		 * unique serial id
-		 */
-		private static final long serialVersionUID = -8006881399306841024L;
-
+	protected class SSCheckBoxListener implements ItemListener
+	{
+		/** {@inheritDoc} */
 		@Override
 		public void itemStateChanged(final ItemEvent ie) {
 
@@ -143,12 +139,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = SSUtils.getLogger();
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -1204307502900668225L;
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Checked value for numeric columns.
