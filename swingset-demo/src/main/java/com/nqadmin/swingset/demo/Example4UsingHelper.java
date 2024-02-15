@@ -55,11 +55,13 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import org.apache.logging.log4j.LogManager;
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.utils.SSFormViewScreenHelper;
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * This example displays data from the part_data table.
@@ -76,7 +78,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	private static final long serialVersionUID = -5528806265008339747L;
 
 	// Log4j2 Logger
-    private static final Logger logger = LogManager.getLogger(Example4UsingHelper.class);
+    private static final Logger logger = SSUtils.getLogger();
     
     // String Constants
 	private static final String rowsetQuery = "SELECT * FROM part_data ORDER BY part_id;";
@@ -273,9 +275,9 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 			rs.close();
 			
 		} catch(final SQLException se) {
-			logger.log(ERROR, "SQL Exception occured initializing new record.",se);
+			logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
 		} catch(final Exception e) {
-			logger.log(ERROR, "Exception occured initializing new record.",e);
+			logger.log(Level.ERROR, "Exception occured initializing new record.",e);
 		}
 		
 		return newPrimaryKey;
@@ -332,7 +334,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 			}
 
 		} catch (SQLException _se) {
-			logger.log(ERROR, "Error occured updating Combo Navigator text.",_se);
+			logger.log(Level.ERROR, "Error occured updating Combo Navigator text.",_se);
 			JOptionPane.showMessageDialog(getRootFrame(),
 					"Error occured updating Combo Navigator text.\n" + _se.getMessage());
 		}

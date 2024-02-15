@@ -89,6 +89,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 
 import java.lang.System.Logger;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSBaseComboBox;
@@ -108,6 +109,7 @@ import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 
 import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingChanges;
 import static com.nqadmin.swingset.navigate.Utils.postRowSetModifiedError;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSCommon.java
 //
@@ -183,8 +185,8 @@ public class SSCommon {
 		@Override
 		public void changedUpdate(final DocumentEvent de) {
 			lastChange++;
-			logger.log(TRACE, "{} - changedUpdate(): lastChange=" + lastChange
-					+ ", lastNotifiedChange=" + lastNotifiedChange, () -> getColumnForLog());
+			logger.log(TRACE, () -> sf("%s - changedUpdate(): lastChange=%s, lastNotifiedChange=%s",
+					getColumnForLog(), lastChange, lastNotifiedChange));
 			
 			// Delay execution of logic until all listener methods are called for current event
 			// See: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
@@ -230,14 +232,14 @@ public class SSCommon {
 		/** {@inheritDoc} */
 		@Override
 		public void insertUpdate(final DocumentEvent de) {
-			logger.log(TRACE, "{} - insertUpdate().", () -> getColumnForLog());
+			logger.log(TRACE, () -> sf("%s - insertUpdate().", getColumnForLog()));
 			changedUpdate(de);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public void removeUpdate(final DocumentEvent de) {
-			logger.log(TRACE, "{} - removeUpdate().", () -> getColumnForLog());
+			logger.log(TRACE, () -> sf("%s - removeUpdate().", getColumnForLog()));
 			changedUpdate(de);
 		}
 
@@ -317,7 +319,7 @@ public class SSCommon {
 			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
 				return;
 			}
-			logger.log(TRACE, "{} - RowSet cursor moved.", () -> getColumnForLog());
+			logger.log(TRACE, () -> sf("%s - RowSet cursor moved.", getColumnForLog()));
 			//updateSSComponent();
 			performUpdates();
 		}
@@ -344,7 +346,7 @@ public class SSCommon {
 			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
 				return;
 			}
-			logger.log(TRACE, "{} - RowSet row changed.", () -> getColumnForLog());
+			logger.log(TRACE, () -> sf("%s - RowSet row changed.", getColumnForLog()));
 //			if (!getRowSet().isUpdatingRow()) {
 //				updateSSComponent();
 //			}
@@ -360,7 +362,7 @@ public class SSCommon {
 			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
 				return;
 			}
-			logger.log(TRACE, "{} - RowSet changed.", () -> getColumnForLog());
+			logger.log(TRACE, () -> sf("%s - RowSet changed.", getColumnForLog()));
 			//updateSSComponent();
 			performUpdates();
 		}
@@ -368,8 +370,8 @@ public class SSCommon {
 
 		private void performUpdates() {
 			lastChange++;
-			logger.log(TRACE, "{} - performUpdates(): lastChange=" + lastChange
-					+ ", lastNotifiedChange=" + lastNotifiedChange, () -> getColumnForLog());
+			logger.log(TRACE, () -> sf("%s - performUpdates(): lastChange=%s, lastNotifiedChange=%s",
+					getColumnForLog(), lastChange, lastNotifiedChange));
 			
 			// Delay execution of logic until all listener methods are called for current event
 			// Based on: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
@@ -608,7 +610,7 @@ public class SSCommon {
 		if (!rowSetListenerAdded && rowSet!=null) {
 			rowSet.addRowSetListener(rowSetListener);
 			rowSetListenerAdded = true;
-			logger.log(DEBUG, "{} - RowSet Listener added.", () -> getColumnForLog());
+			logger.log(DEBUG, () -> sf("%s - RowSet Listener added.", getColumnForLog()));
 		}
 	}
 	
@@ -657,7 +659,7 @@ public class SSCommon {
 		}
 
 		if (ssComponentListenerAdded) {
-			logger.log(DEBUG, "{} - Component Listener added.", () -> getColumnForLog());
+			logger.log(DEBUG, () -> sf("%s - Component Listener added.", getColumnForLog()));
 		}
 	}
 
@@ -679,7 +681,8 @@ public class SSCommon {
 		
 		// CHECK FOR NULL COLUMN/ROWSET
 		if (((boundColumnName == null) && (boundColumnIndex == NO_COLUMN_INDEX)) || (rowSet == null)) {
-			logger.log(WARNING, "Binding failed: column name={}, column index={}{}.", ()->boundColumnName, ()->boundColumnIndex, ()->rowSet==null ? ", rowset=null" : "");
+			logger.log(WARNING, () -> sf("Binding failed: column name=%s, column index=%s%s.",
+					boundColumnName, boundColumnIndex, rowSet==null ? ", rowset=null" : ""));
 			return;
 		}
 
@@ -994,7 +997,7 @@ public class SSCommon {
 		}
 
 		if (!ssComponentListenerAdded) {
-			logger.log(DEBUG, "{} - Component Listener removed.", () -> getColumnForLog());
+			logger.log(DEBUG, () -> sf("%s - Component Listener removed.", getColumnForLog()));
 		}
 	}
 
@@ -1015,7 +1018,7 @@ public class SSCommon {
 		if (rowSetListenerAdded) {
 			rowSet.removeRowSetListener(rowSetListener);
 			rowSetListenerAdded = false;
-			logger.log(DEBUG, "{} - RowSet Listener removed.", () -> getColumnForLog());
+			logger.log(DEBUG, () -> sf("%s - RowSet Listener removed.", getColumnForLog()));
 		}
 	}
 
@@ -1140,7 +1143,7 @@ public class SSCommon {
 	 */
 	// TODO: SHOULD IT RETURN AN ERROR LIKE setBoundColumnText?
 	public void setBoundColumnArray(final SSArray _boundColumnArray) throws SQLException {
-		logger.log(DEBUG, () -> String.format("%s: %s", getColumnForLog(), _boundColumnArray));
+		logger.log(DEBUG, () -> sf("%s: %s", getColumnForLog(), _boundColumnArray));
 		boolean is_error = true;
 		try {
 			RowSetOps.updateColumnArray(getSSComponent(), _boundColumnArray);
@@ -1160,7 +1163,7 @@ public class SSCommon {
 	 * @return true if no error
 	 */
 	public boolean setBoundColumnText(final String _boundColumnText) {
-		logger.log(DEBUG, () -> String.format("%s: %s", getColumnForLog(), _boundColumnText));
+		logger.log(DEBUG, () -> sf("%s: %s", getColumnForLog(), _boundColumnText));
 		boolean ok = false;
 		try {
 			RowSetOps.updateColumnText(getSSComponent(), _boundColumnText);
@@ -1253,7 +1256,7 @@ public class SSCommon {
 	{
 		if (!NavigateActions.ENABLE_UNDO_REDO)
 			return;
-		logger.log(DEBUG, () -> String.format("UndoRedoKeys: %s", comp.getClass().getSimpleName()));
+		logger.log(DEBUG, () -> sf("UndoRedoKeys: %s", comp.getClass().getSimpleName()));
 
 		JComponent jc = (JComponent)comp;
 
@@ -1305,7 +1308,7 @@ public class SSCommon {
 	{
 		if (!NavigateActions.ENABLE_UNDO_REDO)
 			throw new IllegalStateException("UNDO/REDO disabled");
-		logger.log(DEBUG, () -> String.format("%s: %s", cmd, value));
+		logger.log(DEBUG, () -> sf("%s: %s", cmd, value));
 		// TODO: put following in RowSetOps
 		// NOTE: following does not generate any events
 		getRowSet().updateObject(getBoundColumnIndex(), value);
@@ -1326,7 +1329,7 @@ public class SSCommon {
 		
 		// If you see this in the logs back to back for the same component a listener is likely
 		// not handled properly. Maybe incorporate SwingUtilities.invokeLater()? 
-		logger.log(TRACE, "Updating component {}.", () -> getColumnForLog());
+		logger.log(TRACE, () -> sf("Updating component %s.", getColumnForLog()));
 		
 		removeSSComponentListener();
 

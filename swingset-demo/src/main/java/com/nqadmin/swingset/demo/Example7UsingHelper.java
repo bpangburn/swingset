@@ -47,11 +47,11 @@ import javax.swing.JMenuBar;
 import javax.swing.plaf.InternalFrameUI;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
-import org.apache.logging.log4j.LogManager;
 import java.lang.System.Logger;
-import static java.lang.System.Logger.Level.*;
+import java.lang.System.Logger.Level;
 
 import com.nqadmin.swingset.utils.SSDataGridScreenHelper;
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view
@@ -69,7 +69,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(Example7UsingHelper.class);
+    private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id
@@ -172,7 +172,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 			}
 
 		} catch (final SQLException se) {
-			logger.log(ERROR, "SQL Exception.", se);
+			logger.log(Level.ERROR, "SQL Exception.", se);
 		}
 
 //	// SETUP THE CONTAINER AND ADD THE DATAGRID

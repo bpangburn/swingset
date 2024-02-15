@@ -55,12 +55,16 @@ import java.util.List;
 import java.util.Objects;
 
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.models.OptionMappingSwingModel;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 
 // SSDBComboBox.java
@@ -320,12 +324,12 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			final int index = remodel.getMappings().indexOf(_mapping);
 			if (index >= 0) {
-				logger.log(WARNING, () -> String.format("%s: Mapping of [%s] already exists. Creating duplicate Mapping with Option of '%s'.",
+				logger.log(WARNING, () -> sf("%s: Mapping of [%s] already exists. Creating duplicate Mapping with Option of '%s'.",
 					getColumnForLog(), _mapping, _option));
 			}
 			remodel.add(_mapping, _option, _option2);
 		} catch (final Exception e) {
-			logger.log(ERROR, getColumnForLog() + ": Exception.", e);
+			logger.log(Level.ERROR, getColumnForLog() + ": Exception.", e);
 		}
 	}
 
@@ -353,7 +357,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 				result = true;
 			}
 		} catch (final Exception e) {
-			logger.log(ERROR, getColumnForLog() + ": Exception.", e);
+			logger.log(Level.ERROR, getColumnForLog() + ": Exception.", e);
 		}
 
 		return result;
@@ -535,11 +539,11 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 
 		// this.data.getReadWriteLock().writeLock().lock();
 		try (Model.Remodel remodel = optionModel.getRemodel()) {
-			logger.log(TRACE, "{}: Clearing eventList.", () -> getColumnForLog());
+			logger.log(TRACE, () -> sf("%s: Clearing eventList.", getColumnForLog()));
 			remodel.clear();
 			nullItem = null;
 
-			logger.log(DEBUG, "{}: Nulls allowed? [{}].", () -> getColumnForLog(), () -> getAllowNull());
+			logger.log(DEBUG, () -> sf("%s: Nulls allowed? [%s].", getColumnForLog(), getAllowNull()));
 			adjustForNullItem();
 
 			Statement statement = ssCommon.getConnection().createStatement();
@@ -556,26 +560,26 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 						getJDBCColumnType(rs, rs.findColumn(secondDisplayColumnName)));
 			}
 
-			logger.log(DEBUG, "{}: Query [{}].", () -> getColumnForLog(), () -> getQuery());
+			logger.log(DEBUG, () -> sf("%s: Query [%s].", getColumnForLog(), getQuery()));
 
 			List<SSListItem> newItems = new ArrayList<>();
 			while (rs.next()) {
 				Long pk = rs.getLong(getPrimaryKeyColumnName());
 				Object opt = rs.getObject(displayColumnName);
 				Object opt2 = hasOption2() ? rs.getObject(secondDisplayColumnName) : null;
-				logger.log(TRACE, "{}: First column to display - " + opt, () -> getColumnForLog());
+				logger.log(TRACE, () -> sf("%s: First column to display - %s", getColumnForLog(), opt));
 				if (hasOption2()) {
-					logger.log(TRACE, "{}: Second column to display - " + opt2, () -> getColumnForLog());
+					logger.log(TRACE, () -> sf("%s: Second column to display - %s", getColumnForLog(), opt2));
 				}
 				newItems.add(remodel.createOptionMappingItem(pk, opt, opt2));
 			}
 			remodel.addAll(newItems);
 			rs.close();
 		} catch (final SQLException se) {
-			logger.log(ERROR, getColumnForLog() + ": SQL Exception.", se);
+			logger.log(Level.ERROR, getColumnForLog() + ": SQL Exception.", se);
 		} catch (final java.lang.NullPointerException npe) {
 			// TODO: why is NullPointerException here?
-			logger.log(ERROR, getColumnForLog() + ": Null Pointer Exception.", npe);
+			logger.log(Level.ERROR, getColumnForLog() + ": Null Pointer Exception.", npe);
 		}
 	}
 
@@ -715,11 +719,11 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 // TODO Confirm that eventList is not reordered by GlazedLists code.
 			}
 		} catch (final Exception e) {
-			logger.log(ERROR, getColumnForLog() + ": Exception.", e);
+			logger.log(Level.ERROR, getColumnForLog() + ": Exception.", e);
 		}
 		
 		if (!result) {
-			logger.log(WARNING, () -> String.format("%s: Unable to update Mapping of [%s] with Option of '%s'.",
+			logger.log(WARNING, () -> sf("%s: Unable to update Mapping of [%s] with Option of '%s'.",
 				getColumnForLog(), _mapping, _option));
 		}
 

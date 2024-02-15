@@ -48,9 +48,8 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import org.apache.logging.log4j.LogManager;
 import java.lang.System.Logger;
-import static java.lang.System.Logger.Level.*;
+import java.lang.System.Logger.Level;
 
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
@@ -58,6 +57,7 @@ import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.decorators.TextComponentValidator;
 import com.nqadmin.swingset.demo.simpval.SVUtils;
 import com.nqadmin.swingset.demo.simpval.StringValidator;
+import com.nqadmin.swingset.utils.SSUtils;
 import javax.swing.JPanel;
 import org.netbeans.validation.api.ui.ValidationGroup;
 import org.netbeans.validation.api.ui.ValidationItem;
@@ -77,7 +77,7 @@ public class Example1 extends JFrame {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(Example1.class);
+    private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id
@@ -169,7 +169,7 @@ public class Example1 extends JFrame {
 				rowset.setCommand("SELECT * FROM supplier_data");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
-				logger.log(ERROR, "SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 			}
 
 		/**
@@ -193,7 +193,7 @@ public class Example1 extends JFrame {
 				try {
 					rowset.execute();
 				} catch (final SQLException se) {
-					logger.log(ERROR, "SQL Exception.", se);
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				}
 			}
 
@@ -206,7 +206,7 @@ public class Example1 extends JFrame {
 				try {
 					rowset.execute();
 				} catch (final SQLException se) {
-					logger.log(ERROR, "SQL Exception.", se);
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				}
 			}
 
@@ -234,9 +234,9 @@ public class Example1 extends JFrame {
 //					 txtSupplierStatus.setText("0");
 
 				} catch(final SQLException se) {
-					logger.log(ERROR, "SQL Exception occured initializing new record.", se);
+					logger.log(Level.ERROR, "SQL Exception occured initializing new record.", se);
 				} catch(final Exception e) {
-					logger.log(ERROR, "Exception occured initializing new record.", e);
+					logger.log(Level.ERROR, "Exception occured initializing new record.", e);
 				}
 
 			}

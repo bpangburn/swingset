@@ -49,14 +49,14 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import org.apache.logging.log4j.LogManager;
 import java.lang.System.Logger;
-import static java.lang.System.Logger.Level.*;
+import java.lang.System.Logger.Level;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * This example displays data from the supplier_data table.
@@ -70,7 +70,7 @@ public class Example2 extends JFrame {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(Example2.class);
+    private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id
@@ -126,7 +126,7 @@ public class Example2 extends JFrame {
 				rowset.setCommand("SELECT * FROM supplier_data");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
-				logger.log(ERROR, "SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 			}
 
 		/**
@@ -150,7 +150,7 @@ public class Example2 extends JFrame {
 				try {
 					rowset.execute();
 				} catch (final SQLException se) {
-					logger.log(ERROR, "SQL Exception.", se);
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				}
 			}
 
@@ -163,7 +163,7 @@ public class Example2 extends JFrame {
 				try {
 					rowset.execute();
 				} catch (final SQLException se) {
-					logger.log(ERROR, "SQL Exception.", se);
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				}
 			}
 
@@ -193,9 +193,9 @@ public class Example2 extends JFrame {
 //					 cmbSupplierStatus.setSelectedValue(0);
 
 				} catch(final SQLException se) {
-					logger.log(ERROR, "SQL Exception occured initializing new record.",se);
+					logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
 				} catch(final Exception e) {
-					logger.log(ERROR, "Exception occured initializing new record.",e);
+					logger.log(Level.ERROR, "Exception occured initializing new record.",e);
 				}
 
 			}

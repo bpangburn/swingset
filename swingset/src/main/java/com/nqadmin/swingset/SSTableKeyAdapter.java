@@ -56,9 +56,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
 import java.lang.System.Logger;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSTableKeyAdapter.java
 //
@@ -166,8 +169,8 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
 		final JTable jTable = (JTable) ke.getSource();
 
-		logger.log(DEBUG, "Key Released on SSDataGrid. Key Released: {} {}.", () -> ke.getKeyCode(),
-				() -> ((ke.getModifiersEx() & (onMask | offMask)) == onMask));
+		logger.log(DEBUG, ()->sf("Key Released on SSDataGrid. Key Released: %s %s.",
+				ke.getKeyCode(), ((ke.getModifiersEx() & (onMask | offMask)) == onMask)));
 
 		if (((ke.getModifiersEx() & (onMask | offMask)) == onMask) && (ke.getKeyCode() == KeyEvent.VK_C)) {
 			// CHECK IF CONTROL-C IS PRESSED

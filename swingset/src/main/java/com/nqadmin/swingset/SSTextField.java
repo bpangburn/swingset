@@ -50,11 +50,14 @@ import javax.swing.JTextField;
 import javax.swing.text.Document;
 
 import java.lang.System.Logger;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSTextField.java
 //
@@ -518,7 +521,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	public void updateSSComponent() {
 
 		final String text = getBoundColumnText();
-		logger.log(DEBUG, "{}: Setting text field to " + text + ".", () -> getColumnForLog());
+		logger.log(DEBUG, ()->sf("%s: Setting text field to %s.", getColumnForLog(), text));
 		setText(text);
 	}
 

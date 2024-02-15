@@ -6,6 +6,7 @@
 package com.nqadmin.swingset.demo;
  
 import com.nqadmin.rowset.JdbcRowSetImpl;
+import com.nqadmin.swingset.utils.SSUtils;
 import java.awt.Point;
 import java.io.BufferedReader;  
 import java.io.IOException;
@@ -84,7 +85,7 @@ import javax.swing.WindowConstants;
  */
 public class DemoUtil { 
 	private DemoUtil() { }
-	private static final Logger logger = LogManager.getLogger(MainClass.class);
+	private static final Logger logger = System.getLogger(MainClass.class.getName());
 
 	public static void initExampleFrame(JFrame frame, Runnable runOnClose)
 	{

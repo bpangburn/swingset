@@ -51,6 +51,9 @@ import javax.sql.RowSet;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
+
 /**
  * This class holds the undo/redo data for a single column.
  * After a column gets focus, the next change adds a new current value.
@@ -141,7 +144,7 @@ final class UndoCol
 		assert curIdx == changes.size() - 1 : "curIdx must be last item";
 
 		changes.set(curIdx, me.getValue());
-		NavigateActions.getLogger().log(DEBUG, () -> String.format("UNDO/REDO change: %s - %s", me.getColumnName(), changes));
+		NavigateActions.getLogger().log(DEBUG, () -> sf("UNDO/REDO change: %s - %s", me.getColumnName(), changes));
 	}
 
 	boolean isDirty()

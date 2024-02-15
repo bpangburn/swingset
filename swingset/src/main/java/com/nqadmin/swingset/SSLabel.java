@@ -47,11 +47,14 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import java.lang.System.Logger;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSLabel.java
 //
@@ -194,7 +197,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	@Override
 	public void updateSSComponent() {
 		final String text = getBoundColumnText();
-		logger.log(DEBUG, "{}: Setting label to " + text + ".", () -> getColumnForLog());
+		logger.log(DEBUG, ()->sf("%s: Setting label to %s.", getColumnForLog(), text));
 		setText(text);
 	}
 

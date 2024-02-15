@@ -48,9 +48,8 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import org.apache.logging.log4j.LogManager;
 import java.lang.System.Logger;
-import static java.lang.System.Logger.Level.*;
+import java.lang.System.Logger.Level;
 
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
@@ -67,6 +66,7 @@ import com.nqadmin.swingset.formatting.SSSSNField;
 import com.nqadmin.swingset.formatting.SSTimeField;
 import com.nqadmin.swingset.formatting.SSTimestampField;
 import com.nqadmin.swingset.utils.SSSyncManager;
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * This example demonstrates all of the Formatted SwingSet Components.
@@ -83,7 +83,7 @@ public class TestFormattedComponents extends JFrame {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(TestFormattedComponents.class);
+    private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id
@@ -160,7 +160,7 @@ public class TestFormattedComponents extends JFrame {
 				rowset.setCommand("SELECT * FROM swingset_formatted_test_data;");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
-				logger.log(ERROR, "SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 			}
 
 
@@ -195,7 +195,7 @@ public class TestFormattedComponents extends JFrame {
 					try {
 						rowset.execute();
 					} catch (final SQLException se) {
-						logger.log(ERROR, "SQL Exception.", se);
+						logger.log(Level.ERROR, "SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -210,7 +210,7 @@ public class TestFormattedComponents extends JFrame {
 					try {
 						rowset.execute();
 					} catch (final SQLException se) {
-						logger.log(ERROR, "SQL Exception.", se);
+						logger.log(Level.ERROR, "SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -237,9 +237,9 @@ public class TestFormattedComponents extends JFrame {
 					try {
 						cmbSSDBComboNav.execute();
 					} catch (final SQLException se) {
-						logger.log(ERROR, "SQL Exception.", se);
+						logger.log(Level.ERROR, "SQL Exception.", se);
 					} catch (final Exception e) {
-						logger.log(ERROR, "Exception.", e);
+						logger.log(Level.ERROR, "Exception.", e);
 					}
 					syncManager.sync();
 				}
@@ -253,9 +253,9 @@ public class TestFormattedComponents extends JFrame {
 				try {
 					cmbSSDBComboNav.execute();
 				} catch (final SQLException se) {
-					logger.log(ERROR, "SQL Exception.", se);
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				} catch (final Exception e) {
-					logger.log(ERROR, "Exception.", e);
+					logger.log(Level.ERROR, "Exception.", e);
 				}
 
 			// SETUP SYNCMANAGER, WHICH WILL TAKE CARE OF KEEPING THE COMBO NAVIGATOR AND
@@ -415,9 +415,9 @@ public class TestFormattedComponents extends JFrame {
 //			fmtSSTimestampField.setText(null);
 
 		} catch(final SQLException se) {
-			logger.log(ERROR, "SQL Exception occured during setting default values.",se);
+			logger.log(Level.ERROR, "SQL Exception occured during setting default values.",se);
 		} catch(final Exception e) {
-			logger.log(ERROR, "Exception occured during setting default values.",e);
+			logger.log(Level.ERROR, "Exception occured during setting default values.",e);
 		}
 
 

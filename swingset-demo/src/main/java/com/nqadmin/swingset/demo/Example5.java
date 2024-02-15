@@ -46,9 +46,11 @@ import javax.swing.JFrame;
 
 import org.apache.logging.log4j.LogManager;
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSDataGrid;
+import com.nqadmin.swingset.utils.SSUtils;
 import java.awt.BorderLayout;
 
 /**
@@ -63,7 +65,7 @@ public class Example5 extends JFrame {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(Example5.class);
+    private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id
@@ -113,9 +115,9 @@ public class Example5 extends JFrame {
 			rs.next();
 			return rs.getInt("nextVal");
 		} catch(final SQLException se) {
-			logger.log(ERROR, "SQL Exception occured initializing new record.",se);
+			logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
 		} catch(final Exception e) {
-			logger.log(ERROR, "Exception occured initializing new record.",e);
+			logger.log(Level.ERROR, "Exception occured initializing new record.",e);
 		}
 		return null;
 	}
@@ -156,7 +158,7 @@ public class Example5 extends JFrame {
 				);
 
 			} catch (final SQLException se) {
-				logger.log(ERROR, "SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 			}
 
 		// MAKE THE JFRAME VISIBLE

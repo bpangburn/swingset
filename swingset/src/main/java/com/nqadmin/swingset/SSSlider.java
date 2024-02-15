@@ -46,11 +46,15 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSSlider.java
 //
@@ -194,21 +198,21 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 			final String columnValue = getBoundColumnText();
 			try {
 				if ((columnValue == null) || columnValue.isEmpty()) {
-					logger.log(DEBUG, "{}: Setting slider to 0.", () -> getColumnForLog());
+					logger.log(DEBUG, ()->sf("%s: Setting slider to 0.", getColumnForLog()));
 					setValue(0);
 				} else {
-					logger.log(DEBUG, "{}: Setting slider to " + columnValue + ".", () -> getColumnForLog());
+					logger.log(DEBUG, ()->sf("%s: Setting slider to %s.", getColumnForLog(), columnValue));
 					setValue(Integer.parseInt(columnValue));
 				}
 			} catch (final NumberFormatException _nfe) {
-				logger.log(ERROR, getColumnForLog() + ": Number Format Exception. Cannot update slider to " + columnValue,
+				logger.log(Level.ERROR, getColumnForLog() + ": Number Format Exception. Cannot update slider to " + columnValue,
 						_nfe);
 			}
 			break;
 
 		default:
-			logger.log(WARNING, getColumnForLog() + ": Unable to update Slider bound to " + getBoundColumnName()
-					+ " because the data type is not supported (" + getBoundColumnType() + ".");
+			logger.log(WARNING, ()->sf("%s: Unable to update Slider bound to %s because the data type is not supported (%s).",
+					getColumnForLog(), getBoundColumnName(), getBoundColumnType()));
 			break;
 		}
 

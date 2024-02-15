@@ -48,10 +48,13 @@ import javax.sql.RowSetListener;
 import javax.swing.SwingUtilities;
 
 import java.lang.System.Logger;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDataNavigator;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 //import com.nqadmin.swingset.models.SSListItem;
 
 // SSSyncManager.java
@@ -92,7 +95,7 @@ public class SSSyncManager {
 				}
 
 				comboPK = comboBox.getSelectedMapping();
-				logger.log(DEBUG, "COMBO NAVIGATOR: getSelectedMapping() returned: {}.", () -> comboPK);
+				logger.log(DEBUG, ()->sf("COMBO NAVIGATOR: getSelectedMapping() returned: %s.", comboPK));
 				
 				// getSelectedMapping() could return null during initialization.
 				// We check for null/empty rowset in the prior block.
@@ -116,7 +119,8 @@ public class SSSyncManager {
 					// long indexOfId = SSSyncManager.this.comboBox.itemMap.get(this.id) + 1;
 					final int indexOfPK = comboBox.getMappings().indexOf(comboPK) + 1;
 					//int index = (int) indexOfPK;
-					logger.log(DEBUG, "Rowset PK=" + rowsetPK + ", Combo PK=" + comboPK + ", Target rowset record # should be " + indexOfPK + ".");
+					logger.log(DEBUG, ()->sf("Rowset PK=%s, Combo PK=%s, Target rowset record # should be %s.",
+							rowsetPK, comboPK, indexOfPK));
 					rowset.absolute(indexOfPK);
 					final int numRecords = comboBox.getItemCount();
 					int count = 0;
@@ -172,7 +176,7 @@ public class SSSyncManager {
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
 			} finally {
-				logger.log(DEBUG, "SyncComboListener actionPerformedCount=" + actionPerformedCount++);
+				logger.log(DEBUG, ()->sf("SyncComboListener actionPerformedCount=%s", actionPerformedCount++));
 				addRowsetListener();
 			}
 		}
@@ -224,8 +228,8 @@ public class SSSyncManager {
 		
 		private void performUpdates() {
 			lastChange++;
-			logger.log(TRACE, "performUpdates(): lastChange=" + lastChange
-					+ ", lastNotifiedChange=" + lastNotifiedChange);
+			logger.log(TRACE, ()->sf("performUpdates(): lastChange=%s, lastNotifiedChange=%s",
+					lastChange, lastNotifiedChange));
 			
 			// Delay execution of logic until all listener methods are called for current event
 			// Based on: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
@@ -361,7 +365,7 @@ public class SSSyncManager {
 				// GET THE PRIMARY KEY FOR THE CURRENT RECORD IN THE ROWSET
 				final Long currentRowPK = rowset.getLong(syncColumnName);
 
-				logger.log(DEBUG, "SSSyncManager().adjustValue() - RowSet value: " + currentRowPK);
+				logger.log(DEBUG, ()->sf("SSSyncManager().adjustValue() - RowSet value: %s", currentRowPK));
 
 				// CHECK IF THE COMBO BOX IS DISPLAYING THE SAME ONE.
 				if ((comboBox.getSelectedStringValue() == null)

@@ -46,7 +46,6 @@ import javax.sql.RowSet;
 import javax.swing.JCheckBox;
 
 import java.lang.System.Logger;
-
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSCommon;
@@ -241,7 +240,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long, Integer, Boolean
 		
 		final String text = getBoundColumnText();
-		logger.log(DEBUG, sf("%s: getBoundColumnText() - %s",getColumnForLog(), text));
+		logger.log(DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), text));
 
 		// SELECT/DESELECT BASED ON UNDERLYING SQL TYPE
 		switch (getBoundColumnType()) {

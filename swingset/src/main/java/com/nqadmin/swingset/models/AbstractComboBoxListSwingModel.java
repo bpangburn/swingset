@@ -67,8 +67,6 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
-import org.apache.logging.log4j.LogManager;
-
 import java.lang.System.Logger;
 import static java.lang.System.Logger.Level.*;
 
@@ -161,7 +159,7 @@ public abstract class AbstractComboBoxListSwingModel {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger eventLogger = LogManager.getLogger(AbstractComboBoxListSwingModel.class.getName() + ".events");
+	private static Logger eventLogger = System.getLogger(AbstractComboBoxListSwingModel.class.getName() + ".events");
 
 	/**
 	 * number of objects in the SSListItem
@@ -304,7 +302,7 @@ public abstract class AbstractComboBoxListSwingModel {
 	// TODO: refine method for adding a model; maybe custom String tag.
 	public static void addEventLogging(ListModel<?> _model) {
 		Objects.requireNonNull(_model);
-		if (!eventLogger.isTraceEnabled()) {
+		if (!eventLogger.isLoggable(TRACE)) {
 			return;
 		}
 		if (weakModelSet == null) {

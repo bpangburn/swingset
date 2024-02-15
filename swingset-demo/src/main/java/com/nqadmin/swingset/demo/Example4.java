@@ -48,9 +48,8 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import org.apache.logging.log4j.LogManager;
 import java.lang.System.Logger;
-import static java.lang.System.Logger.Level.*;
+import java.lang.System.Logger.Level;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
@@ -58,6 +57,7 @@ import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.utils.SSSyncManager;
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * This example displays data from the part_data table.
@@ -80,7 +80,7 @@ public class Example4 extends JFrame {
 	/**
 	 * Log4j2 Logger
 	 */
-    static final Logger logger = LogManager.getLogger(Example4.class);
+    static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id
@@ -145,7 +145,7 @@ public class Example4 extends JFrame {
 				rowset.setCommand("SELECT * FROM part_data;");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
-				logger.log(ERROR, "SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 			}
 
 
@@ -178,7 +178,7 @@ public class Example4 extends JFrame {
 					try {
 						rowset.execute();
 					} catch (final SQLException se) {
-						logger.log(ERROR, "SQL Exception.", se);
+						logger.log(Level.ERROR, "SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -193,7 +193,7 @@ public class Example4 extends JFrame {
 					try {
 						rowset.execute();
 					} catch (final SQLException se) {
-						logger.log(ERROR, "SQL Exception.", se);
+						logger.log(Level.ERROR, "SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -227,9 +227,9 @@ public class Example4 extends JFrame {
 //						txtPartCity.setText(null);
 
 					} catch(final SQLException se) {
-						logger.log(ERROR, "SQL Exception occured initializing new record.",se);
+						logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
 					} catch(final Exception e) {
-						logger.log(ERROR, "Exception occured initializing new record.",e);
+						logger.log(Level.ERROR, "Exception occured initializing new record.",e);
 					}
 
 				}
@@ -244,9 +244,9 @@ public class Example4 extends JFrame {
 					try {
 						cmbSelectPart.execute();
 					} catch (final SQLException se) {
-						logger.log(ERROR, "SQL Exception.", se);
+						logger.log(Level.ERROR, "SQL Exception.", se);
 					} catch (final Exception e) {
-						logger.log(ERROR, "Exception.", e);
+						logger.log(Level.ERROR, "Exception.", e);
 					}
 					syncManager.sync();
 				}
@@ -260,9 +260,9 @@ public class Example4 extends JFrame {
 				try {
 					cmbSelectPart.execute();
 				} catch (final SQLException se) {
-					logger.log(ERROR, "SQL Exception.", se);
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				} catch (final Exception e) {
-					logger.log(ERROR, "Exception.", e);
+					logger.log(Level.ERROR, "Exception.", e);
 				}
 
 			// SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES

@@ -67,11 +67,14 @@ import javax.swing.SwingUtilities;
 
 import org.apache.logging.log4j.LogManager;
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import static java.lang.System.Logger.Level.*;
 import org.h2.tools.RunScript;
 
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSMysqlSetModel;
+import com.nqadmin.swingset.utils.SSUtils;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 import com.nqadmin.swingset.utils.SSVersion;
 import com.raelity.lib.ui.Screens;
 
@@ -284,7 +287,7 @@ public class MainClass extends JFrame {
 	/**
 	 * Log4j2 Logger
 	 */
-	private static final Logger logger = LogManager.getLogger(MainClass.class);
+	private static final Logger logger = SSUtils.getLogger();
 	private static final boolean RUN_SQL_SCRIPTS = true;
 
 	/**
@@ -320,7 +323,7 @@ public class MainClass extends JFrame {
 			dbConnection = databaseSetup.getConnection();
 		}
 		if (dbConnection == null) {
-			logger.fatal("Error initializing database. Exiting.");
+			logger.log(Level.ERROR, "Error initializing database. Exiting.");
 			System.exit(1);
 		}
 
@@ -394,15 +397,16 @@ public class MainClass extends JFrame {
 
 			Class.forName("org.h2.Driver");
 
-			logger.log(DEBUG, "Resource path: {}.", () -> getClass().getPackage().getName());
-			logger.log(DEBUG, "Resource path: {}.", () -> getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
+			logger.log(DEBUG, ()->sf("Resource path: %s.", getClass().getPackage().getName()));
+			logger.log(DEBUG, "Resource path: %s.", getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
 
 			final InputStream inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
 			final InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
 			if ((inStreamDemo == null) || (inStreamTest == null)) {
-				logger.fatal("Please add the file " + DATABASE_SCRIPT_DEMO + " and " + DATABASE_SCRIPT_TEST + " and "
+				logger.log(Level.ERROR, "Please add the file " + DATABASE_SCRIPT_DEMO + " and " + DATABASE_SCRIPT_TEST + " and "
 						+ DATABASE_SCRIPT_TEST_IMAGES + " to the classpath, package "
 						+ getClass().getPackage().getName());
+				System.exit(1);
 			} else {
 				if (USE_IN_MEMORY_DATABASE) {
 					result = DriverManager.getConnection("jdbc:h2:mem:" + DATABASE_NAME);
@@ -432,11 +436,11 @@ public class MainClass extends JFrame {
 			}
 
 		} catch (final IOException ioe) {
-			logger.log(ERROR, "IO Exception.", ioe);
+			logger.log(Level.ERROR, "IO Exception.", ioe);
 		} catch (final SQLException se) {
-			logger.log(ERROR, "SQL Exception.", se);
+			logger.log(Level.ERROR, "SQL Exception.", se);
 		} catch (final ClassNotFoundException cnfe) {
-			logger.log(ERROR, "Class Not Found Exception.", cnfe);
+			logger.log(Level.ERROR, "Class Not Found Exception.", cnfe);
 		}
 
 		return result;
@@ -532,7 +536,7 @@ public class MainClass extends JFrame {
 			} catch (FileNotFoundException ex) {
 				System.err.println("Property file '" + fname + "' not found");
 			} catch (IOException ex) {
-				logger.log(ERROR, "IO exception.", ex);
+				logger.log(Level.ERROR, "IO exception.", ex);
 			}
 			return null;
 		}
@@ -553,7 +557,7 @@ public class MainClass extends JFrame {
 					}
 					ok = true;
 				} catch (IOException ex) {
-					logger.log(ERROR, "IO exception.", ex);
+					logger.log(Level.ERROR, "IO exception.", ex);
 				}
 				if (!ok) {
 					break;

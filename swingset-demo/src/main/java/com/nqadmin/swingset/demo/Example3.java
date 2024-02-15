@@ -50,12 +50,14 @@ import javax.swing.JLabel;
 
 import org.apache.logging.log4j.LogManager;
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * This example displays data from the supplier_part_data table.
@@ -70,7 +72,7 @@ public class Example3 extends JFrame {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(Example3.class);
+    private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id
@@ -128,7 +130,7 @@ public class Example3 extends JFrame {
 				rowset.setCommand("SELECT * FROM supplier_part_data");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
-				logger.log(ERROR, "SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 			}
 
 		/**
@@ -151,7 +153,7 @@ public class Example3 extends JFrame {
 				try {
 					rowset.execute();
 				} catch (final SQLException se) {
-					logger.log(ERROR, "SQL Exception.", se);
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				}
 			}
 
@@ -164,7 +166,7 @@ public class Example3 extends JFrame {
 				try {
 					rowset.execute();
 				} catch (final SQLException se) {
-					logger.log(ERROR, "SQL Exception.", se);
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				}
 			}
 
@@ -195,9 +197,9 @@ public class Example3 extends JFrame {
 //					 txtQuantity.setText("0");
 
 				} catch(final SQLException se) {
-					logger.log(ERROR, "SQL Exception occured initializing new record.",se);
+					logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
 				} catch(final Exception e) {
-					logger.log(ERROR, "Exception occured initializing new record.",e);
+					logger.log(Level.ERROR, "Exception occured initializing new record.",e);
 				}
 
 			}
@@ -225,9 +227,9 @@ public class Example3 extends JFrame {
 				cmbSupplierName.execute();
 
 			} catch (final SQLException se) {
-				logger.log(ERROR, "SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 			} catch (final Exception e) {
-				logger.log(ERROR, "Exception.", e);
+				logger.log(Level.ERROR, "Exception.", e);
 			}
 
 		// SET LABEL DIMENSIONS

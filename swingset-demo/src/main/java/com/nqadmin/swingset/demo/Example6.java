@@ -46,10 +46,12 @@ import javax.swing.JFrame;
 
 import org.apache.logging.log4j.LogManager;
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSDataGrid;
 import com.nqadmin.swingset.SSDataValue;
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * This example is similar to Example5, demonstrating the use of an SSDataGrid
@@ -61,7 +63,7 @@ public class Example6 extends JFrame {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(Example6.class);
+    private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id
@@ -151,9 +153,9 @@ public class Example6 extends JFrame {
 							rs.close();
 
 						} catch(final SQLException se) {
-							logger.log(ERROR, "SQL Exception occured obtaining primary key value for new record.",se);
+							logger.log(Level.ERROR, "SQL Exception occured obtaining primary key value for new record.",se);
 						} catch(final Exception e) {
-							logger.log(ERROR, "Exception occured obtaining primary key value for new record.",e);
+							logger.log(Level.ERROR, "Exception occured obtaining primary key value for new record.",e);
 						}
 
 						return partID;
@@ -161,7 +163,7 @@ public class Example6 extends JFrame {
 				});
 
 			} catch (final SQLException se) {
-				logger.log(ERROR, "SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 			}
 
 		// SETUP THE CONTAINER AND ADD THE DATAGRID

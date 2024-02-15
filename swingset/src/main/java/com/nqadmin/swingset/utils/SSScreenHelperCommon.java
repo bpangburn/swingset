@@ -52,8 +52,14 @@ import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
 import static java.lang.System.Logger.Level.*;
+
 import java.sql.Connection;
+import java.util.function.Supplier;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 //SSScreenHelperCommon.java
 //
@@ -162,10 +168,9 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 			try {
 				_jInternalFrame.setClosed(true);
 			} catch (PropertyVetoException _pve) {
-				logger.log(WARNING, "Unable to close {}.",()-> {return _jInternalFrame.getTitle();});
+				logger.log(WARNING, ()->sf("Unable to close %s.", _jInternalFrame.getTitle()));
 			}
 		});
-		
 	}
 
 	/**
@@ -181,7 +186,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 			setClosed(true);
 			closeChildScreens();
 		} catch (final PropertyVetoException pve) {
-			logger.log(ERROR, "Property Veto Exception.", pve);
+			logger.log(Level.ERROR, "Property Veto Exception.", pve);
 		}
 	}
 	
@@ -506,7 +511,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 			setSelected(true);
 			setClosed(false);
 		} catch (final PropertyVetoException pve) {
-			logger.log(ERROR, "Property Veto Exception.", pve);
+			logger.log(Level.ERROR, "Property Veto Exception.", pve);
 		}
 
 	}
@@ -518,16 +523,9 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * @throws Exception exception thrown while updating the rowset
 	 */
 	protected void updateRowset() throws SQLException, Exception {
-		logger.log(DEBUG, "Rowset query: [{}].", () -> {
-			try {
-				return getRowsetQuery();
-//			} catch (SQLException se) {
-//				return "*** getSelectionQuery() threw an SQL Exception ***";
-			} catch (Exception e) {
-				return "*** getSelectionQuery() threw an Exception ***";
-			}
-		});
-		getRowset().setCommand(getRowsetQuery());
+		String query = getRowsetQuery();
+		logger.log(DEBUG, ()->sf("Rowset query: [%s].", query));
+		getRowset().setCommand(query);
 		getRowset().execute();
 	}
 	

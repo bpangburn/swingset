@@ -61,6 +61,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 
+import static java.lang.System.Logger.Level.*;
+
 /**
  * Demonstrate some advanced features of SSCombobox
  * and using Navigator actions.

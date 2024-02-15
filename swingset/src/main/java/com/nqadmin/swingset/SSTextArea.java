@@ -41,11 +41,14 @@ import javax.sql.RowSet;
 import javax.swing.JTextArea;
 
 import java.lang.System.Logger;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSTextArea.java
 //
@@ -143,7 +146,7 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	public void updateSSComponent() {
 		
 		final String text = getBoundColumnText();
-		logger.log(DEBUG, "{}: Setting text area to " + text + ".", () -> getColumnForLog());
+		logger.log(DEBUG, ()->sf("%s: Setting text area to %s.", getColumnForLog(), text));
 		setText(text);
 	}
 

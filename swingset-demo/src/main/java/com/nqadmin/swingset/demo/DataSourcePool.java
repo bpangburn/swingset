@@ -37,6 +37,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 import java.io.PrintWriter;
 import java.sql.Array;
 import java.sql.Blob;
@@ -61,7 +62,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 import javax.sql.DataSource;
-import org.apache.logging.log4j.LogManager;
 import java.lang.System.Logger;
 import static java.lang.System.Logger.Level.*;
 import org.h2.jdbcx.JdbcConnectionPool;
@@ -75,7 +75,7 @@ public class DataSourcePool {
 
 	/** Data source name for binding lookup.  */
 	public static final String DATA_SOURCE_NAME = "PoolDataSource";
-	private static final Logger logger = LogManager.getLogger(MainClass.class);
+	private static final Logger logger = System.getLogger(MainClass.class.getName());
 
 	private static DataSource ds;
 	private static JdbcConnectionPool cp;
@@ -155,7 +155,7 @@ public class DataSourcePool {
 			int activeConnections = cp.getActiveConnections();
 			if (activeConnections > cMax) {
 				cMax = activeConnections;
-				logger.log(INFO, "ConnectionPool new max: " + activeConnections);
+				logger.log(INFO, ()->sf("ConnectionPool new max: %s", activeConnections));
 			}
 		}
 

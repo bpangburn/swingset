@@ -55,6 +55,8 @@ import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 import java.lang.System.Logger;
+import java.util.function.Supplier;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
@@ -62,6 +64,7 @@ import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.RowSetOps.updateColumnObject;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSTableModel.java
 //
@@ -515,13 +518,14 @@ public class SSTableModel extends AbstractTableModel {
 			}
 			rowset.refreshRow();
 
-			logger.log(DEBUG, "Row number of inserted row : {}", () -> {
+			Supplier<String> text = () -> {
 				try {
-					return rowset.getRow();
+					return String.valueOf(rowset.getRow());
 				} catch (SQLException e) {
 					return "*** getRow() threw an SQLException ***";
 				}
-			});
+			};
+			logger.log(DEBUG, () -> sf("Row number of inserted row : %s", text.get()));
 
 			inInsertRow = false;
 			rowCount++;
@@ -821,7 +825,8 @@ public class SSTableModel extends AbstractTableModel {
 			return;
 		}
 
-		logger.log(DEBUG, "Set value at "+ _row + "  " + _column + " with "+ valueCopy);
+		var finalValueCopy = valueCopy;
+		logger.log(DEBUG, () -> "Set value at "+ _row + "  " + _column + " with "+ finalValueCopy);
 
 		try {
 			// YOU SHOULD BE ON THE RIGHT ROW IN THE SSROWSET
@@ -837,7 +842,7 @@ public class SSTableModel extends AbstractTableModel {
 
 			RowSetOps.updateRow(rowset);
 
-			logger.log(DEBUG, "Updated value: {}.", () -> getValueAt(_row,_column));
+			logger.log(DEBUG, () -> sf("Updated value: %s.", getValueAt(_row,_column)));
 		} catch (final SQLException se) {
 			logger.log(ERROR, "SQL Exception while updating value.",  se);
 			if (component != null) {

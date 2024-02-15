@@ -88,12 +88,16 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.models.SimpleComboListSwingModels;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSDataGrid.java
 //
@@ -238,7 +242,7 @@ public class SSDataGrid extends JTable {
 			}
 			else {
 				// THE COLUMN IS NOT BOOLEAN OR INTEGER, LOG ERROR MESSAGE.
-				logger.log(ERROR, "Can't set check box value. Unknown data type. Column type should be Boolean or Integer for check box columns.");
+				logger.log(Level.ERROR, "Can't set check box value. Unknown data type. Column type should be Boolean or Integer for check box columns.");
 			}
 
 			checkBox.setSelected(isSelected); // USE VALUE TO CHECK OR UNCHECK BOX.
@@ -266,7 +270,7 @@ public class SSDataGrid extends JTable {
 			} else if (_value instanceof Integer) {
 				isSelected = (Integer) _value != 0;
 			} else {
-				logger.log(ERROR, "Can't set check box value. Unknown data type. Column type should be Boolean or Integer for check box columns.");
+				logger.log(Level.ERROR, "Can't set check box value. Unknown data type. Column type should be Boolean or Integer for check box columns.");
 			}
 			setSelected(isSelected);
 
@@ -324,8 +328,7 @@ public class SSDataGrid extends JTable {
 				return underlyingValues != null ? underlyingValues[0] : null;
 			}
 
-			logger.log(TRACE, () -> String.format("Item %s:%s",
-					item.getElem(0), item.getElem(1)));
+			logger.log(TRACE, () -> sf("Item %s:%s", item.getElem(0), item.getElem(1)));
 			return item.getElem(1);
 		}
 
@@ -469,7 +472,7 @@ public class SSDataGrid extends JTable {
 			if (displayValues.length > 0) {
 				index = getIndexOf(_value);
 			} else {
-				logger.log(ERROR, "No item in combo that corresponds to " + _value);
+				logger.log(Level.ERROR, "No item in combo that corresponds to " + _value);
 			}
 
 			if (index == -1) {
@@ -913,7 +916,7 @@ public class SSDataGrid extends JTable {
 	/** Note: toggling insertion on/off/on/off does not create new sorter. */
 	// TODO: both setInsertion/setSorting toggle; is that the right thing?
 	private void checkCreateAddSorter(boolean clearFirst) {
-		logger.log(DEBUG, () -> String.format("clear: %b, sorting %b, insert %b",
+		logger.log(DEBUG, () -> sf("clear: %b, sorting %b, insert %b",
 					 clearFirst, getSorting(), getInsertion()));
 		if(clearFirst || !getSorting()) {
 			RowSorter<?> rowSorter = getRowSorter();
@@ -939,7 +942,7 @@ public class SSDataGrid extends JTable {
 			// make sure the types are OK
 			if(!(rowSorter instanceof Sorter)
 					|| !(rowSorter.getModel() instanceof SSTableModel)) {
-				logger.log(ERROR, () -> "Wrong sorter type: " + rowSorter);
+				logger.log(Level.ERROR, () -> "Wrong sorter type: " + rowSorter);
 				return;
 			}
 			// cast to correct types
@@ -979,7 +982,7 @@ public class SSDataGrid extends JTable {
 			getModel().setRowSet(rowSet);
 
 		} catch (final SQLException se) {
-			logger.log(ERROR, "SQL Exception.", se);
+			logger.log(Level.ERROR, "SQL Exception.", se);
 		}
 
 		// THIS IS NEEDED IF THE NUMBER OF COLUMNS IN THE NEW SSROWSET

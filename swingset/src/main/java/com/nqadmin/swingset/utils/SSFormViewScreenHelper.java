@@ -48,6 +48,7 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.rowset.JdbcRowSetImpl;
@@ -154,7 +155,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 				try {
 					activateDeactivateComponents();
 				} catch (Exception e) {
-					logger.log(ERROR, e.getMessage(), e);
+					logger.log(Level.ERROR, e.getMessage(), e);
 				}
 			});
 		}
@@ -203,7 +204,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			try {
 				pkOfDeletedRecord = getRowset().getLong(getPkColumn());
 			} catch (final SQLException se) {
-				logger.log(ERROR, "SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(container, "Database error while attempting to get ID of record to be deleted.");
 			}
 			ssDBNavPerformPreDeletionOps();
@@ -226,7 +227,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			try {
 				setDefaultValues();
 			} catch (final Exception e) {
-				logger.log(ERROR, "Exception.", e);
+				logger.log(Level.ERROR, "Exception.", e);
 				JOptionPane.showMessageDialog(container, "Database error while setting default values for new record.");
 			}
 			ssDBNavPerformPreInsertOps();
@@ -248,12 +249,12 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 					try {
 						activateDeactivateComponents();
 					} catch (Exception e) {
-						logger.log(ERROR, e.getMessage(), e);
+						logger.log(Level.ERROR, e.getMessage(), e);
 					}
 				});
 				ssDBNavPerformRefreshOps();
 			} catch (final Exception e) {
-				logger.log(ERROR, "Exception.", e);
+				logger.log(Level.ERROR, "Exception.", e);
 				JOptionPane.showMessageDialog(container, "Database error while refreshing record display.");
 			} finally {
 				activateSyncManager();
@@ -343,7 +344,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			setDefaultScreenLocation();
 
 		} catch (final Exception e) {
-			logger.log(ERROR, "Exception.", e);
+			logger.log(Level.ERROR, "Exception.", e);
 			JOptionPane.showMessageDialog(this,
 					"Error while constructing screen. Parent ID is: " + getParentID() + ".\n" + e.getMessage());
 		}
@@ -603,11 +604,11 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 //			showUp(getParentContainer());
 				
 		} catch (final SQLException se) {
-			logger.log(ERROR, "SQL Exception.", se);
+			logger.log(Level.ERROR, "SQL Exception.", se);
 			JOptionPane.showMessageDialog(this,
 					"Database error while initializing screen. Parent ID is: " + getParentID() + ".\n" + se.getMessage());
 		} catch (final Exception e) {
-			logger.log(ERROR, "Exception.", e);
+			logger.log(Level.ERROR, "Exception.", e);
 			JOptionPane.showMessageDialog(this,
 					"Error while initializing screen. Parent ID is: " + getParentID() + ".\n" + e.getMessage());
 		}
@@ -829,16 +830,16 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 				try {
 					activateDeactivateComponents();
 				} catch (Exception e) {
-					logger.log(ERROR, e.getMessage(), e);
+					logger.log(Level.ERROR, e.getMessage(), e);
 				}
 			});
 
 		} catch (final SQLException se) {
-			logger.log(ERROR, "SQL Exception.", se);
+			logger.log(Level.ERROR, "SQL Exception.", se);
 			JOptionPane.showMessageDialog(this,
 					"Database error while updating screen for parent ID: " + getParentID() + ".\n" + se.getMessage());
 		} catch (final Exception e) {
-			logger.log(ERROR, "Exception.", e);
+			logger.log(Level.ERROR, "Exception.", e);
 			JOptionPane.showMessageDialog(this,
 					"Error while updating screen for parent ID: " + getParentID() + ".\n" + e.getMessage());
 		}

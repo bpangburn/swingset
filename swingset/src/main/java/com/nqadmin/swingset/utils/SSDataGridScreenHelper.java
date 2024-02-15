@@ -53,6 +53,7 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.table.TableCellEditor;
 
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.rowset.JdbcRowSetImpl;
@@ -105,7 +106,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 				setDefaultScreenLocation();
 
 			} catch (final Exception e) {
-				logger.log(ERROR, "Exception.", e);
+				logger.log(Level.ERROR, "Exception.", e);
 				JOptionPane.showMessageDialog(this,
 						"Error while constructing screen, parent ID: " + getParentID() + ".\n" + e.getMessage());
 			}
@@ -162,7 +163,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 							}
 						}
 					} catch (final Exception e) {
-						logger.log(ERROR, "Exception.", e);
+						logger.log(Level.ERROR, "Exception.", e);
 					}
 				}
 			}
@@ -211,7 +212,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 								try {
 									Runtime.getRuntime().exec(new String[] {ssProps.getProperty("Browser"), _urlPrefixesForColumns[i] + columnValue});
 								} catch (final IOException ioe) {
-									logger.log(ERROR, "IO Exception.", ioe);
+									logger.log(Level.ERROR, "IO Exception.", ioe);
 								}
 								lastTimestamp = ae.getWhen();
 							}
@@ -229,7 +230,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 						try {
 							Runtime.getRuntime().exec(new String[] {ssProps.getProperty("Browser"), url});
 						} catch (final IOException ioe) {
-							logger.log(ERROR, "IO Exception.", ioe);
+							logger.log(Level.ERROR, "IO Exception.", ioe);
 						}
 					}
 					lastTimestamp = ae.getWhen();
@@ -386,11 +387,11 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 //			showUp(getParentContainer());
 			
 		} catch (final SQLException se) {
-			logger.log(ERROR, "SQL Exception.", se);
+			logger.log(Level.ERROR, "SQL Exception.", se);
 			JOptionPane.showMessageDialog(this,
 					"Database error while initializing screen. Parent ID is: " + getParentID() + ".\n" + se.getMessage());
 		} catch (final Exception e) {
-			logger.log(ERROR, "Exception.", e);
+			logger.log(Level.ERROR, "Exception.", e);
 			JOptionPane.showMessageDialog(this,
 					"Error while initializing screen, parent ID: " + getParentID() + ".\n" + e.getMessage());
 		}
@@ -442,11 +443,11 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			setDefaultValues();
 
 		} catch (final SQLException se) {
-			logger.log(ERROR, "SQL Exception.", se);
+			logger.log(Level.ERROR, "SQL Exception.", se);
 			JOptionPane.showMessageDialog(this,
 					"Database error while updating screen for parent ID: " + getParentID() + ".\n" + se.getMessage());
 		} catch (final Exception e) {
-			logger.log(ERROR, "Exception.", e);
+			logger.log(Level.ERROR, "Exception.", e);
 			JOptionPane.showMessageDialog(this,
 					"Error while updating screen for parent ID: " + getParentID() + ".\n" + e.getMessage());
 		}

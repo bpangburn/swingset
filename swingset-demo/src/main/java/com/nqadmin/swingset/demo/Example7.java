@@ -45,11 +45,11 @@ import java.sql.Statement;
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 
-import org.apache.logging.log4j.LogManager;
 import java.lang.System.Logger;
-import static java.lang.System.Logger.Level.*;
+import java.lang.System.Logger.Level;
 
 import com.nqadmin.swingset.SSDataGrid;
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view
@@ -64,7 +64,7 @@ public class Example7 extends JFrame {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(Example7.class);
+    private static final Logger logger = SSUtils.getLogger();
 	
 	/**
 	 * data grid
@@ -170,7 +170,7 @@ public class Example7 extends JFrame {
 				}
 
 			} catch (final SQLException se) {
-				logger.log(ERROR, "SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 			}
 
 		// SETUP THE CONTAINER AND ADD THE DATAGRID
