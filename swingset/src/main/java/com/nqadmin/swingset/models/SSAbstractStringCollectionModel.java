@@ -72,6 +72,7 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 	private final String separator;
 	private final String separatorName;
 
+	/** System Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
 
 	/**
@@ -102,11 +103,6 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 	public String getSeparatorName() {
 		return separatorName;
 	}
-	
-	/**
-	 * Log4j Logger for component
-	 */
-	//private static Logger logger = LogManager.getLogger();
 
 	/** {@inheritDoc} */
 	@Override

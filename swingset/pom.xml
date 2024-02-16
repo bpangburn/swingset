@@ -25,7 +25,6 @@
 		<!-- DEPENDENCIES -->
 		<!--<version.glazedlists>1.11.0</version.glazedlists> -->
 		<version.glazedlists>1.11.1203</version.glazedlists>
-		<version.log4j>2.22.0</version.log4j>
 		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
 		<version.google-guava>33.0.0-jre</version.google-guava>
 		<version.netbeans>RELEASE200</version.netbeans>
@@ -126,12 +125,6 @@
 			<version>${version.glazedlists}</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-			<version>${version.log4j}</version>
-		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.nqadmin.rowset/jdbcrowsetimpl -->
 		<dependency>
 			<groupId>com.nqadmin.rowset</groupId>

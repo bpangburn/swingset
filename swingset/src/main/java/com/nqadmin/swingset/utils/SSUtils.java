@@ -68,20 +68,18 @@ public class SSUtils {
 	public static Logger getLogger() {
 		Class<?> cc = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE)
 				.getCallerClass();
-		return System.getLogger(cc.getName());
-
-		// // NOTE: this can be re-implemented by examining
-		// // new Throwable().getStackTrace();
-		// Logger logger;
-		// try {
-		// 	return LogManager.getLogger(StackLocatorUtil.getCallerClass(2));
-		// } catch(UnsupportedOperationException ex) {}
-		// logger = LogManager.getRootLogger();
-		// // Note: can check for root logger with
-		// // logger.getName().isEmpty()
-		// logger.log(ERROR, "Using RootLogger", new Throwable());
-		// return logger;
+		return getLogger(cc.getName());
 	}
+
+	/**
+	 * Return a logger for the name.
+	 * @param loggerName name
+	 * @return logger
+	 */
+	public static Logger getLogger(String loggerName) {
+		return System.getLogger(loggerName);
+	}
+
 
 	/**
 	 * Shorthand for "String.format(fmt, args)".

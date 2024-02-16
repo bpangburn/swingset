@@ -25,7 +25,7 @@
 		<!-- DEPENDENCIES -->
 		<!-- primary swingset-demo dependencies -->
 		<version.swingset>4.0.13-SNAPSHOT</version.swingset>
-		<version.log4j>2.22.0</version.log4j>
+		<version.log4j>2.22.1</version.log4j>
 		<version.h2>2.2.224</version.h2>
 		<version.java-getopt>1.0.13</version.java-getopt>
 		<version.raelity-lib>1.2.0</version.raelity-lib>
@@ -89,13 +89,27 @@
 			<version>${version.h2}</version>
 		</dependency>
 
+		<!--
+			log4j-jpl: "The Log4j 2 JDK Logging Adapter allow
+			to route all System.Logger events to Log4j 2 APIs."
+
+			This single dependency can be removed to take
+			log4j out of the picture; or can comment out all 3.
+		-->
+		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-jpl -->
+		<!--
+		-->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-jpl</artifactId>
+			<version>${version.log4j}</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
 			<version>${version.log4j}</version>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -118,10 +132,20 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.mastfrog/simplevalidation-standalone -->
+		<!-- pick up simplevalidation from logman-lib -->
+		<!-- pick up simplevalidation from logman-lib
 		<dependency>
 			<groupId>com.mastfrog</groupId>
 			<artifactId>simplevalidation-standalone</artifactId>
 			<version>1.14.1</version>
+		</dependency>
+		-->
+
+		<!-- https://mvnrepository.com/artifact/com.raelity.logman/logman-lib -->
+		<dependency>
+			<groupId>com.raelity.logman</groupId>
+			<artifactId>logman-lib</artifactId>
+			<version>2.3.1</version>
 		</dependency>
 	</dependencies>
 

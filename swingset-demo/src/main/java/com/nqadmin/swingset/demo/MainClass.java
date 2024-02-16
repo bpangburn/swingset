@@ -38,6 +38,7 @@
 package com.nqadmin.swingset.demo;
 
 import com.nqadmin.swingset.SSComboBox;
+import static com.nqadmin.swingset.demo.DemoUtil.configureJavaUtilLogger;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -65,7 +66,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import org.apache.logging.log4j.LogManager;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import static java.lang.System.Logger.Level.*;
@@ -199,7 +199,7 @@ public class MainClass extends JFrame {
 		}
 	}
 
-	private class RowSetSourceMouseLIstener extends MouseAdapter {
+	private class RowSetSourceMouseListener extends MouseAdapter {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -215,6 +215,15 @@ public class MainClass extends JFrame {
 			popup.show();
 			SwingUtilities.invokeLater(() -> comboRowSetSource.showPopup());
 		}
+	}
+
+	private class LogManListener implements ActionListener
+	{
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+		}
+
 	}
 
 	/**
@@ -283,6 +292,7 @@ public class MainClass extends JFrame {
 	private JButton btnTestGrid = new JButton("Test Grid Components");
 	private JButton btnRowSetSource = new JButton("RowSet: XXXXXXXX");
 	private ComboRowSetSource comboRowSetSource = new ComboRowSetSource();
+	private JButton btnLogMan = new JButton("Manage Logging");
 
 	/**
 	 * Log4j2 Logger
@@ -341,7 +351,8 @@ public class MainClass extends JFrame {
 		btnTestBase.addActionListener(new MyButtonListener());
 		btnTestGrid.addActionListener(new MyButtonListener());
 		btnTestFormatted.addActionListener(new MyButtonListener());
-		btnRowSetSource.addMouseListener(new RowSetSourceMouseLIstener());
+		btnRowSetSource.addMouseListener(new RowSetSourceMouseListener());
+		//btnLogMan.addActionListener(new LogManListener());
 
 		// SET BUTTON DIMENSIONS
 		btnExample1.setPreferredSize(buttonDim);
@@ -358,6 +369,7 @@ public class MainClass extends JFrame {
 		btnTestGrid.setPreferredSize(buttonDim);
 		btnTestFormatted.setPreferredSize(buttonDim);
 		btnRowSetSource.setPreferredSize(buttonDim);
+		btnLogMan.setPreferredSize(buttonDim);
 
 		// LAYOUT BUTTONS
 		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
@@ -375,6 +387,10 @@ public class MainClass extends JFrame {
 		// getContentPane().add(this.btnTestGrid);
 		getContentPane().add(btnTestFormatted);
 		getContentPane().add(btnRowSetSource);
+		if (DemoUtil.isUtilLogging()) {
+			btnLogMan.setAction(DemoUtil.getLogManAction());
+			getContentPane().add(btnLogMan);
+		}
 
 		// DISPLAY SCREEN
 		setVisible(true);
@@ -712,7 +728,10 @@ public class MainClass extends JFrame {
 	 *              program
 	 */
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public static void main(final String[] _args) {
+	public static void main(final String[] _args) throws IOException
+	{
+		configureJavaUtilLogger();
+
 		boolean some_error = false;
 		System.err.printf("java:%s vm:%s date:%s os:%s\n",
 				System.getProperty("java.version"),

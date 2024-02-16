@@ -151,15 +151,12 @@ public abstract class AbstractComboBoxListSwingModel {
 	/** Install this when not using glazed, and send events through this */
 	private final ComboBoxModelProxy modelProxy;
 	
-	/**
-	 * Log4j Logger for component
-	 */
+	/** System Logger for component */
 	private static Logger logger = SSUtils.getLogger();
 
-	/**
-	 * Log4j Logger for component
-	 */
-	private static Logger eventLogger = System.getLogger(AbstractComboBoxListSwingModel.class.getName() + ".events");
+	/** System Logger for component */
+	private static Logger eventLogger = SSUtils.getLogger(
+			AbstractComboBoxListSwingModel.class.getName() + ".events");
 
 	/**
 	 * number of objects in the SSListItem

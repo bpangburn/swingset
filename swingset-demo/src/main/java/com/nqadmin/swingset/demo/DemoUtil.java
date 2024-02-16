@@ -6,7 +6,6 @@
 package com.nqadmin.swingset.demo;
  
 import com.nqadmin.rowset.JdbcRowSetImpl;
-import com.nqadmin.swingset.utils.SSUtils;
 import java.awt.Point;
 import java.io.BufferedReader;  
 import java.io.IOException;
@@ -21,23 +20,37 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import org.apache.logging.log4j.LogManager;
 import java.lang.System.Logger;
 import static java.lang.System.Logger.Level.*;
 import com.raelity.lib.ui.Screens;
+import com.raelity.logman.LocalLogCom;
+import com.raelity.logman.LogCom;
+import com.raelity.logman.LogUtil;
+import com.raelity.logman.ui.LogUI;
+import com.raelity.logman.ui.SwingLogTree;
+import java.awt.EventQueue;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.lang.ref.WeakReference;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.prefs.Preferences;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.sql.RowSet;
 import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
+import org.openide.util.Exceptions;
 
  
 /**
@@ -272,6 +285,189 @@ public class DemoUtil {
 			ex.printStackTrace();
 		}
 	}
+
+	private static boolean isUtilLogging;
+	static boolean isUtilLogging()
+	{
+		return isUtilLogging;
+	}
+	/** This does nothing if java.util.logging is not used */
+	private static final java.util.logging.Logger swingsetLogger
+			= java.util.logging.Logger .getLogger("com.nqadmin.swingset");
+	/** This does nothing if java.util.logging is not used */
+	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "UseSpecificCatch", "CallToPrintStackTrace"})
+	static void configureJavaUtilLogger()
+	{
+		// If log4j-jpl is in classpath, assume java.util.logging not used.
+		Class<?> jpl = null;
+		try {
+			jpl = Class.forName("org.apache.logging.log4j.jpl.Log4jSystemLogger");
+		} catch (ClassNotFoundException ex) {
+		}
+		if(jpl != null)
+			return;
+
+		// TODO: take the following values from a config file
+		try(InputStream is = MainClass.class.getResourceAsStream("/util.logging.properties");) {
+			if (is == null)
+				return;
+			is.mark(0x20000); // 2*64K
+			Properties props = new Properties();
+			try {
+				props.load(is);
+			} catch (IOException ex) {
+				System.err.println("CONFIGURE JAVA UTIL LOGGER FAIL");
+				return;
+			}
+			
+			// FINE is System.logger's DEBUG
+			Level level = Level.parse(props.getProperty("swingset_logger_level", "INFO"));
+			
+			try {
+				swingsetLogger.setLevel(level);
+			} catch(Exception ex) {
+				System.err.println(ex.getMessage());
+				ex.printStackTrace();
+			}
+			is.reset();
+			// merge in stuff from the config file
+			java.util.logging.LogManager.getLogManager().updateConfiguration(is,
+					(k) -> ((o, n) -> {
+						//System.err.printf("LOGGING: key %s, old %s, new %s\n", k, o, n);
+						return n == null ? o : n; }));
+
+            Preferences prefs = Preferences.userRoot()
+                    .node("com/raelity/logman/demo");
+            // Set up the logging manager
+            SwingLogTree logTree = initLogMan(prefs);
+            // Give the action the hook to display
+            LogManAction.setModel(logTree);
+			isUtilLogging = true;
+		} catch (IOException ex) {
+			Exceptions.printStackTrace(ex);
+		}
+	}
+
+	static Action getLogManAction()
+	{
+		return LogManAction.get("Display and configure logging tree");
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// initLogMan, LogManAction copied verbatim from LogMan Demo
+	//
+
+    /**
+     * Initialize jLogMan for this JVM's logging.
+     * 
+     * This should be invoked as early as possible
+     * during application startup so that initial
+     * configuration is setup, if requested,
+     * before there's much action.
+     *
+     * @param prefs used by LogMan
+     * @return lt model which references modified loggers.
+     */
+    private static SwingLogTree initLogMan(Preferences prefs) {
+        // create logging interface to this JVM's logger
+        LogCom logCom = new LocalLogCom();
+        // LogCom logCom = new RestrictedLogCom(LogManager.getLoggingMXBean());
+        SwingLogTree logTree = new SwingLogTree(logCom);
+        // Initialize jLogMan.
+        // The Current Configuration is applied if Preference so indicates
+        StringBuilder emsg = LogUtil.init(logTree, prefs);
+
+        if(emsg != null && emsg.length() != 0) {
+            EventQueue.invokeLater(() -> LogUI.displayTextDialog( null,
+                    emsg.toString(), "LogMan: Init Config Error", true));
+        }
+
+        // Even with an error during startup initialization,
+        // the model is OK; no exception was thrown.
+        return logTree;
+    }
+
+    /**
+     * Factory for Action that brings up jLogMan outline/tree-table.
+     * If the dialog containing the logTree table is still open,
+     * possibly minimized or hidden, then this action fronts it.
+     *
+     * TODO: This should have icons and such.
+     */
+    @SuppressWarnings({"serial", "CloneableImplementsClone"})
+    final static class LogManAction extends AbstractAction {
+        // The lock shouldn't be needed since everything is on EventQueue, but...
+        private static JDialog INSTANCE;
+        private static WeakReference<SwingLogTree> refLogTree;
+        private static SwingLogTree logTree;
+
+        static void setModel(SwingLogTree logTree) {
+            if(LogManAction.logTree != null)
+                throw new IllegalStateException("logTree already set");
+            LogManAction.logTree = logTree;
+            INSTANCE = null;
+        }
+
+        static LogManAction get(String name) {
+            if(LogManAction.logTree == null)
+                throw new IllegalStateException("logTree not set");
+            return new LogManAction(name);
+        }
+
+        private LogManAction(String name) {
+            super(name);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(INSTANCE == null) {
+                JDialog dialog;
+                
+                logTree.refresh();
+                dialog = LogUI.createOutlineDialog(logTree, null, true, true);
+                dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                dialog.addWindowListener(new WindowAdapter() {
+                @Override public void windowClosed(WindowEvent e) {
+                    INSTANCE = null;
+                }});
+                // Shutdown hook doesn't really work since the EDT
+                // doesn't seem to operate during shutdown
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    SwingLogTree lt = null;
+                    if(refLogTree != null)
+                        lt = refLogTree.get();
+                    if(INSTANCE != null && lt != null) {
+                        exitCleanup();
+                    }
+                }));
+                INSTANCE = dialog;
+                Screens.translateToPrefScreen(dialog);
+                dialog.setVisible(true);
+            } else {
+                INSTANCE.setVisible(true);
+                INSTANCE.toFront();
+            }
+        }
+        
+        private static void exitCleanup()
+        {
+            SwingLogTree lt = null;
+            if(INSTANCE != null && refLogTree != null
+                    && (lt = refLogTree.get()) != null) {
+                exitCleanupEDT(INSTANCE.getBounds(), lt);
+            }
+        }
+        
+        private static void exitCleanupEDT(Rectangle bounds, SwingLogTree logTree)
+        {
+            if(!EventQueue.isDispatchThread()) {
+                EventQueue.invokeLater(() -> exitCleanupEDT(bounds, logTree));
+                return;
+            }
+            LogUI.saveVisualPrefs(bounds, logTree);
+        }
+    }
 
 	/**
 	 * Create connection using properties; the properties are passed to

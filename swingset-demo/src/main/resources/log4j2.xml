@@ -8,10 +8,17 @@
             <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36}.%M() - %msg%n"/>
         </File>
     </Appenders>
+
     <Loggers>
+        <logger name="com.nqadmin.swingset" additivity="false" level="DEBUG">
+            <AppenderRef ref="ConsoleAppender" />
+            <AppenderRef ref="FileAppender"/>
+        </logger>
+        <!--
         <Root level="DEBUG">
             <AppenderRef ref="ConsoleAppender" />
             <AppenderRef ref="FileAppender"/>
         </Root>
+        -->
     </Loggers>
 </Configuration>
