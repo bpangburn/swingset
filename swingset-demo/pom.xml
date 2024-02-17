@@ -20,7 +20,7 @@
 
 		<!-- MAVEN AND JAVA VERSIONS -->
 		<version.maven>3.6.3</version.maven>
-		<version.java>17</version.java>
+		<version.java>21</version.java>
 
 		<!-- DEPENDENCIES -->
 		<!-- primary swingset-demo dependencies -->
@@ -158,6 +158,45 @@
 				<artifactId>versions-maven-plugin</artifactId>
 				<version>${version.versions-maven-plugin}</version>
 			</plugin>
+
+			<!-- Added from https://github.com/eppleton/frgaal -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${version.maven-compiler-plugin}</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.frgaal</groupId>
+						<artifactId>compiler-maven-plugin</artifactId>
+						<version>21.0.0</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<compilerId>frgaal</compilerId>
+					<source>21</source>
+					<target>11</target>
+					<compilerArgs>
+						<arg>-Xlint:deprecation</arg>
+						<!--only needed when using preview language features-->
+						<!-- <arg>- -enable-preview</arg> -->
+						<arg>--enable-preview</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${version.maven-jar-plugin}</version>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Multi-Release>true</Multi-Release>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			<!-- End frgaal -->
+
 			<!-- Maven Enforcer forces specified version of Java and Maven -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -205,11 +244,13 @@
 				<artifactId>maven-install-plugin</artifactId>
 				<version>${version.maven-install-plugin}</version>
 			</plugin>
+			<!-- Included above with frgaal
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>${version.maven-jar-plugin}</version>
 			</plugin>
+			-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -226,6 +267,7 @@
 				<version>${version.maven-surefire-plugin}</version>
 			</plugin>
 
+			<!-- Included above with frgaal
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -235,6 +277,7 @@
 					<release>${version.java}</release>
 				</configuration>
 			</plugin>
+			-->
 		</plugins>
 	</build>
 
