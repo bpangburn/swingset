@@ -35,71 +35,69 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
-package com.nqadmin.swingset.formatting;
+package com.nqadmin.swingset.formatting.factories;
 
-import java.text.NumberFormat;
-import java.util.Locale;
+import javax.swing.text.MaskFormatter;
 
-import javax.swing.text.NumberFormatter;
+import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.utils.SSUtils;
 
-// SSNumericFormatterFactory.java
+// SSCuitFormatterFactory.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * SSNumericFormatterFactory extends DefaultFormatterFactory for numeric fields.
+ * SSCuitFormatterFactory extends DefaultFormatterFactory for Argentina's Tax ID fields.
+ * <p>
+ * See https://meta.cdq.ch/CUIT_number_(Argentina)
  */
-public class SSNumericFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
+
+public class SSCuitFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
     /**
+	 * Log4j Logger for component
+	 */
+	private static Logger logger = SSUtils.getLogger();
+	/**
 	 * unique serial id
 	 */
-	private static final long serialVersionUID = 3335183379540169892L;
-	NumberFormatter dnf = null;
-    NumberFormatter enf = null;
-    NumberFormatter snf = null;
+	private static final long serialVersionUID = 3206796666162203982L;
+    private MaskFormatter defaultFormatter;
+    private MaskFormatter displayFormatter;
+    private MaskFormatter editFormatter;
+
+	private MaskFormatter nullFormatter;
 
     /**
-     * Creates a default SSNumericFormatterFactory
+     * Creates an default object of SSCuitFormatterFactory
      */
-    public SSNumericFormatterFactory() {
-    	this(null,null);
-    }
+    public SSCuitFormatterFactory() {
 
-    /**
-     * Creates an object of SSFormatterFactory with the specified precision and decimals
-     * @param _precision - number of digits needed for integer part of the number
-     * @param _decimals - number of digits needed for fraction part of the number
-     */
-    public SSNumericFormatterFactory(final Integer _precision, final Integer _decimals) {
-    	super();
-    	
-        final NumberFormat nfd = NumberFormat.getInstance(Locale.US);
-        
-        if (_precision!=null) {
-        	nfd.setMaximumIntegerDigits(_precision);
-        	nfd.setMinimumIntegerDigits(1);
+        try {
+            defaultFormatter = new MaskFormatter("##-########-#");
+            nullFormatter    = null;
+            editFormatter    = new MaskFormatter("##-########-#");
+            displayFormatter = new MaskFormatter("##-########-#");
+
+            defaultFormatter.setPlaceholderCharacter('0');
+            defaultFormatter.setAllowsInvalid(false);
+
+            editFormatter.setPlaceholderCharacter('0');
+            editFormatter.setAllowsInvalid(false);
+
+            displayFormatter.setPlaceholderCharacter('0');
+            displayFormatter.setAllowsInvalid(false);
+
+            setDefaultFormatter(defaultFormatter);
+            setNullFormatter(nullFormatter);
+            setEditFormatter(editFormatter);
+            setDisplayFormatter(displayFormatter);
         }
-       
-        if (_decimals!=null) {
-            nfd.setMaximumFractionDigits(_decimals);
-            nfd.setMinimumFractionDigits(_decimals);
+        catch (final java.text.ParseException pe) {
+        	logger.warn("Parse Exception.", pe);
+        	// do nothing
         }
-
-        snf = new NumberFormatter(NumberFormat.getInstance());
-        snf.setCommitsOnValidEdit(true);
-        setDefaultFormatter(snf);
-
-        setNullFormatter(null);
-
-        enf = new NumberFormatter(NumberFormat.getInstance(Locale.US));
-        enf.setCommitsOnValidEdit(true);
-        setEditFormatter(enf);
-
-        dnf = new NumberFormatter(nfd);
-        dnf.setCommitsOnValidEdit(true);
-        setDisplayFormatter(dnf);
     }
 }
 

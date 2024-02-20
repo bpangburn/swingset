@@ -35,34 +35,56 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
-package com.nqadmin.swingset.formatting;
+package com.nqadmin.swingset.formatting.factories;
 
-import java.text.SimpleDateFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 
-import javax.swing.text.DateFormatter;
+import javax.swing.text.NumberFormatter;
 
-// SSTimestampFormatterFactory.java
+// SSPercentFormatterFactory.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * SSTimestampFormatterFactory extends DefaultFormatterFactory for timestamp fields.
+ * SSPercentFormatterFactory extends DefaultFormatterFactory for percentage fields.
  */
-public class SSTimestampFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
+public class SSPercentFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
     /**
 	 * unique serial id
 	 */
-	private static final long serialVersionUID = 1206910593127977868L;
+	private static final long serialVersionUID = -2567959171805065991L;
 
 	/**
-     * Creates an instance of SSTimestampFormatterFactory
-     * the display format used is dd/MM/yyyy hh:mm:ss SSS Z and the edit format is ddMMyyyyHHmmssSSSZ
+     * Creates a default object of SSPercentFormatterFactory
      */
-    public SSTimestampFormatterFactory() {
-        setDefaultFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss SSS Z")));
+    public SSPercentFormatterFactory() {
+    	this(null,null);
+    }
+
+    /**
+     * Creates an object of SSPercentFormatterFactory with the specified precision and decimals
+     * @param _precision - number of digits needed for integer part of the number
+     * @param _decimals - number of digits needed for fraction part of the number
+     */
+    public SSPercentFormatterFactory(final Integer _precision, final Integer _decimals) {
+        final NumberFormat nfd = NumberFormat.getPercentInstance(Locale.US);
+        
+        if (_precision!=null) {
+        	nfd.setMaximumIntegerDigits(_precision);
+        	nfd.setMinimumIntegerDigits(1);
+        }
+       
+        if (_decimals!=null) {
+            nfd.setMaximumFractionDigits(_decimals);
+            nfd.setMinimumFractionDigits(_decimals);
+        }
+
+        setDefaultFormatter(new NumberFormatter(NumberFormat.getPercentInstance()));
         setNullFormatter(null);
-        setEditFormatter(new DateFormatter(new SimpleDateFormat("ddMMyyyyHHmmssSSSZ")));
-        setDisplayFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss SSS Z")));
+        setEditFormatter(new NumberFormatter(NumberFormat.getPercentInstance(Locale.US)));
+        setDisplayFormatter(new NumberFormatter(nfd));
+
     }
 }

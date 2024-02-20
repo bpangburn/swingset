@@ -35,69 +35,86 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
-package com.nqadmin.swingset.formatting;
+package com.nqadmin.swingset.formatting.factories;
 
-import javax.swing.text.MaskFormatter;
+import java.text.SimpleDateFormat;
+
+import javax.swing.text.DateFormatter;
 
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.utils.SSUtils;
 
-// SSCuitFormatterFactory.java
+// SSDateFormatterFactory.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * SSCuitFormatterFactory extends DefaultFormatterFactory for Argentina's Tax ID fields.
- * <p>
- * See https://meta.cdq.ch/CUIT_number_(Argentina)
+ * SSDateFormatterFactory extends DefaultFormatterFactory for Date fields.
  */
+public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
-public class SSCuitFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
+	/**
+	 * Constant for dd/MM/yyyy date format
+	 */
+	public static final int DDMMYYYY = 1;
 
-    /**
+	/**
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = SSUtils.getLogger();
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 3206796666162203982L;
-    private MaskFormatter defaultFormatter;
-    private MaskFormatter displayFormatter;
-    private MaskFormatter editFormatter;
 
-	private MaskFormatter nullFormatter;
+	/**
+	 * Constant for MM/dd/yyyy date format
+	 */
+	public static final int MMDDYYYY = 0;
+
+	/**
+	 * Unique serial ID
+	 */
+	private static final long serialVersionUID = -8205600502325364394L;
+
+	/**
+	 * Constant for yyyy-MM-dd date format
+	 */
+	public static final int YYYYMMDD = 2;
 
     /**
-     * Creates an default object of SSCuitFormatterFactory
+     * Constructs a default SSDateFormatterFactory.
      */
-    public SSCuitFormatterFactory() {
+    public SSDateFormatterFactory() {
+    	this(DDMMYYYY);
+    }
 
-        try {
-            defaultFormatter = new MaskFormatter("##-########-#");
-            nullFormatter    = null;
-            editFormatter    = new MaskFormatter("##-########-#");
-            displayFormatter = new MaskFormatter("##-########-#");
-
-            defaultFormatter.setPlaceholderCharacter('0');
-            defaultFormatter.setAllowsInvalid(false);
-
-            editFormatter.setPlaceholderCharacter('0');
-            editFormatter.setAllowsInvalid(false);
-
-            displayFormatter.setPlaceholderCharacter('0');
-            displayFormatter.setAllowsInvalid(false);
-
-            setDefaultFormatter(defaultFormatter);
-            setNullFormatter(nullFormatter);
-            setEditFormatter(editFormatter);
-            setDisplayFormatter(displayFormatter);
-        }
-        catch (final java.text.ParseException pe) {
-        	logger.warn("Parse Exception.", pe);
-        	// do nothing
-        }
+    /**
+     * Creates an object of SSDateFormatterFactory with the specified format.
+     * See https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html
+     *
+     * @param format - Format to be used for date while in editing mode. The default format is DDMMYYYY
+     */
+    public SSDateFormatterFactory(final int format) {
+    	switch(format){
+    	case MMDDYYYY:
+    		setDefaultFormatter(new DateFormatter(new SimpleDateFormat("MM/dd/yyyy")));
+            setNullFormatter(null);
+            setEditFormatter(new DateFormatter(new SimpleDateFormat("MMddyyyy")));
+            setDisplayFormatter(new DateFormatter(new SimpleDateFormat("MM/dd/yyyy")));
+    		break;
+    	case DDMMYYYY:
+			setDefaultFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy")));
+			setNullFormatter(null);
+			setEditFormatter(new DateFormatter(new SimpleDateFormat("ddMMyyyy")));
+			setDisplayFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy")));
+    		break;
+    	case YYYYMMDD:
+			setDefaultFormatter(new DateFormatter(new SimpleDateFormat("yyyy-MM-dd")));
+			setNullFormatter(null);
+			setEditFormatter(new DateFormatter(new SimpleDateFormat("yyyyMMdd")));
+			setDisplayFormatter(new DateFormatter(new SimpleDateFormat("yyyy-MM-dd")));
+    		break;
+    	default:
+    		logger.warn("Unknown date format type of " + format);
+        	break;
+    	}
     }
 }
-
