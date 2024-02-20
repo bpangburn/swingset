@@ -607,8 +607,7 @@ public class SSTableModel extends AbstractTableModel {
 				
 				// COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
 				//final int type = rowset.getColumnType(column.intValue() + 1);
-				updateColumnObject(rowset, defaultValuesMap.get(column), column + 1,
-								   RowSetOps.getJDBCColumnType(rowset, column + 1));
+				updateColumnObject(rowset, defaultValuesMap.get(column), column + 1);
 
 			} // END OF WHILE
 
@@ -692,8 +691,7 @@ public class SSTableModel extends AbstractTableModel {
 	protected void setPrimaryColumn() {
 		try {
 			//final int type = rowset.getColumnType(primaryColumn + 1);
-			updateColumnObject(rowset, dataValue.getPrimaryColumnValue(), primaryColumn + 1,
-							   RowSetOps.getJDBCColumnType(rowset, primaryColumn + 1));
+			updateColumnObject(rowset, dataValue.getPrimaryColumnValue(), primaryColumn + 1);
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while insering Primary Key value.",  se);
 			if (component != null) {
@@ -784,10 +782,10 @@ public class SSTableModel extends AbstractTableModel {
 		Object valueCopy = _value;
 
 		// GET THE TYPE OF THE COLUMN
-		int type;
+		JDBCType type;
 		try {
 			//type = rowset.getColumnType(_column + 1);
-			type = RowSetOps.getColumnType(rowset, _column + 1);
+			type = RowSetOps.getJDBCColumnType(rowset, _column + 1);
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while updating value.",  se);
 			if (component != null) {
@@ -799,11 +797,11 @@ public class SSTableModel extends AbstractTableModel {
 		// TODO Clean this up. Utilize java.util.Time.
 
 		// IF COPYING VALUES THE DATE WILL COME AS STRING SO CONVERT IT TO DATE OBJECT.
-		if (type == Types.DATE) {
+		if (type == JDBCType.DATE) {
 			if (valueCopy instanceof String) {
 				valueCopy = SSCommon.getSQLDate((String) valueCopy);
 			}
-		} else if (type == Types.TIMESTAMP) {
+		} else if (type == JDBCType.TIMESTAMP) {
 			if (valueCopy instanceof String) {
 				valueCopy = new Timestamp(SSCommon.getSQLDate((String) valueCopy).getTime());
 			}
@@ -849,7 +847,7 @@ public class SSTableModel extends AbstractTableModel {
 				return;
 			}
 			
-			updateColumnObject(rowset, valueCopy, _column + 1, JDBCType.valueOf(type));
+			updateColumnObject(rowset, valueCopy, _column + 1, type);
 
 			rowset.updateRow();
 
