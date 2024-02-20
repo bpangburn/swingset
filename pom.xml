@@ -15,6 +15,8 @@
 	<!--ONLY INCLUDING PROPERTIES/BUILD TO ENFORCE MAVEN AND JAVA VERSION -->
 
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		
 		<!-- MAVEN AND JAVA VERSIONS -->
 		<!-- Requiring maven 3.6.3, but installing 3.9.6 per:
 		     https://linuxize.com/post/how-to-install-apache-maven-on-debian-10/ -->
