@@ -40,9 +40,11 @@ package com.nqadmin.swingset.formatting;
 import java.text.SimpleDateFormat;
 
 import javax.swing.text.DateFormatter;
+import javax.swing.text.DefaultFormatterFactory;
 
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.formatting.Format;
 import com.nqadmin.swingset.utils.SSUtils;
 
 // SSDateFormatterFactory.java
@@ -50,13 +52,17 @@ import com.nqadmin.swingset.utils.SSUtils;
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * SSDateFormatterFactory extends DefaultFormatterFactory for Date fields.
+ * Static methods to create a DefaultFormatterFactory for Date fields.
  */
-public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
+public class SSDateFormatterFactory {
+
+	private SSDateFormatterFactory(){}
 
 	/**
 	 * Constant for dd/MM/yyyy date format
+	 * @deprecated use {@link Format#DATE_DDMMYYYY}
 	 */
+	@Deprecated
 	public static final int DDMMYYYY = 1;
 
 	/**
@@ -66,55 +72,104 @@ public class SSDateFormatterFactory extends javax.swing.text.DefaultFormatterFac
 
 	/**
 	 * Constant for MM/dd/yyyy date format
+	 * @deprecated use {@link Format#DATE_MMDDYYYY}
 	 */
+	@Deprecated
 	public static final int MMDDYYYY = 0;
 
 	/**
-	 * Unique serial ID
-	 */
-	private static final long serialVersionUID = -8205600502325364394L;
-
-	/**
 	 * Constant for yyyy-MM-dd date format
+	 * @deprecated use {@link Format#DATE_YYYYMMDD}
 	 */
+	@Deprecated
 	public static final int YYYYMMDD = 2;
 
-    /**
-     * Constructs a default SSDateFormatterFactory.
-     */
-    public SSDateFormatterFactory() {
-    	this(DDMMYYYY);
-    }
+	/**
+	 * Create formatter factory with default pattern.
+	 * @return factory with default pattern
+	 */
+	public static DefaultFormatterFactory get() {
+		return get(Format.DATE);
+	}
+	/** compatibility
+	 * @param f int code for style
+	 * @return  factory 
+	 * @deprecated use {@link #get(com.nqadmin.swingset.formatting.Format) }
+	 */
+	@Deprecated
+	public static DefaultFormatterFactory get(int f) {
+		// Don't like the way default is buried in get
+		return get(getFormat(f));
+	}
 
-    /**
-     * Creates an object of SSDateFormatterFactory with the specified format.
-     * See https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html
-     *
-     * @param format - Format to be used for date while in editing mode. The default format is DDMMYYYY
-     */
-    public SSDateFormatterFactory(final int format) {
-    	switch(format){
-    	case MMDDYYYY:
-    		setDefaultFormatter(new DateFormatter(new SimpleDateFormat("MM/dd/yyyy")));
-            setNullFormatter(null);
-            setEditFormatter(new DateFormatter(new SimpleDateFormat("MMddyyyy")));
-            setDisplayFormatter(new DateFormatter(new SimpleDateFormat("MM/dd/yyyy")));
-    		break;
-    	case DDMMYYYY:
-			setDefaultFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy")));
-			setNullFormatter(null);
-			setEditFormatter(new DateFormatter(new SimpleDateFormat("ddMMyyyy")));
-			setDisplayFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy")));
-    		break;
-    	case YYYYMMDD:
-			setDefaultFormatter(new DateFormatter(new SimpleDateFormat("yyyy-MM-dd")));
-			setNullFormatter(null);
-			setEditFormatter(new DateFormatter(new SimpleDateFormat("yyyyMMdd")));
-			setDisplayFormatter(new DateFormatter(new SimpleDateFormat("yyyy-MM-dd")));
-    		break;
-    	default:
-    		logger.warn("Unknown date format type of " + format);
-        	break;
-    	}
-    }
+	/**
+	 * Returns Format enum for old style constant.
+	 * @param _format int constant for style
+	 * @return enum
+	 * @deprecated use enum, never int constants
+	 */
+	// NOTE: package private
+	@Deprecated
+	static Format getFormat(final int _format) {
+		switch (_format) {
+		case MMDDYYYY:
+			return Format.DATE_MMDDYYYY;
+		case DDMMYYYY:
+			return Format.DATE_DDMMYYYY;
+		case YYYYMMDD:
+			return Format.DATE_YYYYMMDD;
+		default:
+			return Format.DATE;
+		}
+	}
+
+	/**
+	 * Create formatter factory with specified format pattern.See https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html
+	 * @param _format - Format to be used for date while in editing mode. The default format is DDMMYYYY
+	 * @return a DefaultFormatterFactory
+	 */
+	public static DefaultFormatterFactory get(Format _format) {
+		Format format = _format;
+		if ( _format.getType() != Format.DATE ) {
+			// I'd be inclined to exception
+			// throw new IllegalArgumentException(
+			// 		String.format("% is not a DATE", _format.toString()));
+			logger.error(() -> String.format("%s is not a DATE, using default",
+					_format.toString()));
+			format = Format.DATE;
+		}
+		if (format.isBase()) {
+			format = Format.getDefaultFormat(format);
+		}
+		String formatMask;
+		String editPattern;
+		String maskLiterals;
+		switch(format){
+			case DATE_MMDDYYYY:
+				formatMask = "##/##/####";
+				editPattern = "MMddyyyy";
+				maskLiterals = "/";
+				break;
+
+			case DATE_DDMMYYYY:
+				formatMask = "##/##/####";
+				editPattern = "ddMMyyyy";
+				maskLiterals = "/";
+				break;
+			case DATE_YYYYMMDD:
+				formatMask = "####-##-##";
+				editPattern = "yyyyMMdd";
+				maskLiterals = "-";
+				break;
+			default:
+				logger.error("Unknown date format type of " + format);
+				return null;
+		}
+
+		return new SSMaskFormatterFactory.Builder<>(formatMask)
+			.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
+			//.displayer(new DateFormatter(new SimpleDateFormat("MMM d, yyyy")))
+			.maskLiterals(maskLiterals).placeholder('_')
+			.build();
+	}
 }
