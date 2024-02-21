@@ -194,7 +194,7 @@ public class MainClass extends JFrame {
 		}
 	}
 
-	private class RowSetSourceMouseLIstener extends MouseAdapter {
+	private class RowSetSourceMouseListener extends MouseAdapter {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -336,7 +336,7 @@ public class MainClass extends JFrame {
 		btnTestBase.addActionListener(new MyButtonListener());
 		btnTestGrid.addActionListener(new MyButtonListener());
 		btnTestFormatted.addActionListener(new MyButtonListener());
-		btnRowSetSource.addMouseListener(new RowSetSourceMouseLIstener());
+		btnRowSetSource.addMouseListener(new RowSetSourceMouseListener());
 
 		// SET BUTTON DIMENSIONS
 		btnExample1.setPreferredSize(buttonDim);

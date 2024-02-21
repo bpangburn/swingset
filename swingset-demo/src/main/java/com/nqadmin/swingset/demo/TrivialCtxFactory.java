@@ -37,9 +37,9 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.naming.Binding;
 import javax.naming.Context;
 import javax.naming.Name;
@@ -56,7 +56,7 @@ import javax.naming.spi.InitialContextFactory;
  */
 public class TrivialCtxFactory implements InitialContextFactory
 {
-private Map<String,Object> jndiStuff = new HashMap<>();
+private static Map<String,Object> jndiStuff = new ConcurrentHashMap<>();
 
 /**
  * Used by java's JNDI infrastructure to create initial context.
