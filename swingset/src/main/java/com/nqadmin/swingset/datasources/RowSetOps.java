@@ -64,6 +64,9 @@ import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.spi.SyncProviderException;
 
 import java.lang.System.Logger;
+
+import javax.sql.rowset.spi.SyncResolver;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.navigate.NavigateActions;
@@ -74,6 +77,8 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.navigate.Utils.postRowSetModified;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.datasources.ConvertType.convertObject2JdbcObject;
 
 // RowSetOps.java
 //
@@ -103,13 +108,15 @@ public class RowSetOps {
 	 */
 	public static void insertRow(ResultSet _resultSet) throws SQLException {
 		_resultSet.insertRow();
-		if (_resultSet instanceof CachedRowSet) {
-			CachedRowSet crs = (CachedRowSet)_resultSet;
+		if (_resultSet instanceof CachedRowSet crs) {
+			logger.log(DEBUG, "using CachedRowSet");
 			_resultSet.moveToCurrentRow();
 			try {
 				RowSetState.acceptChanges(crs, null);
 			} catch (SyncProviderException ex) {
+				//
 				// TODO: test CRS undoInsert after accept changes
+				//
 				crs.undoInsert();
 				throw ex;
 			}
@@ -122,24 +129,51 @@ public class RowSetOps {
 	 * @param _resultSet
 	 * @throws SQLException
 	 */
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static void updateRow(ResultSet _resultSet) throws SQLException {
+		final int maxTry = 1;
+		SyncProviderException srEx = null;
 		_resultSet.updateRow();
-		if (_resultSet instanceof CachedRowSet) {
-			CachedRowSet crs = (CachedRowSet)_resultSet;
+		if (_resultSet instanceof CachedRowSet crs) {
 			//SQLException ex = null;
 			int thisRow = _resultSet.getRow();
-			try {
-				RowSetState.acceptChanges(crs, () -> {
-					try {
-						_resultSet.absolute(thisRow);
-					} catch (SQLException ex) { }	// TODO: find nice way to propogate
-				});
-			} catch (SyncProviderException ex01) {
-				// TODO: test CRS undoUpdate after accept changes
-				//ex = ex01;
-				crs.undoUpdate();
-				throw ex01;
+			int tryCount = 1;
+			for (; tryCount <= maxTry; ++tryCount) {
+				logger.log(DEBUG, "CachedRowSet.acceptChanges: try %d", tryCount);
+				try {
+					RowSetState.acceptChanges(crs, () -> {
+						try {
+							_resultSet.absolute(thisRow);
+						} catch (SQLException ex) {
+							logger.log(ERROR, "resetting row after acceptChanges", ex);
+							//
+							// TODO: find nice way to propogate
+							//
+						}
+					});
+					break;
+				} catch (SyncProviderException ex) {
+					srEx = ex;
+					//
+					// TODO: test CRS undoUpdate after accept changes
+					//
+					SyncResolver sr = srEx.getSyncResolver();
+					Utils.dump(System.err, sr, crs);
+					if (Boolean.TRUE) {
+						// THE undoUpdate IS AN UNEXPECTED EXCEPTION
+						try {
+							// This isn't quite right; must be per change not row.
+							// Maybe cancelRowUpdates.
+							crs.undoUpdate();
+							//crs.cancelRowUpdates(); // still gets exception
+						} catch(SQLException ex02) {
+							logger.log(ERROR, "cleanup after sync error in acceptChanges", ex02);
+						}
+					}
+				}
 			}
+			if (tryCount > maxTry)
+				throw srEx;
 			//_resultSet.absolute(thisRow);
 			//if (ex != null) {
 			//	throw ex;
@@ -155,8 +189,8 @@ public class RowSetOps {
 	 */
 	public static void deleteRow(ResultSet _resultSet) throws SQLException {
 		_resultSet.deleteRow();
-		if (_resultSet instanceof CachedRowSet) {
-			CachedRowSet crs = (CachedRowSet)_resultSet;
+		if (_resultSet instanceof CachedRowSet crs) {
+			logger.log(DEBUG, "using CachedRowSet");
 			try {
 				RowSetState.acceptChanges(crs, null);
 			} catch (SyncProviderException ex) {
@@ -262,6 +296,158 @@ public class RowSetOps {
 		}
 		return null;
 	}
+
+
+	//
+	// TODO: revisit these ColumnObject methods
+	//
+	/**
+	 * Returns an Object of the specified type
+	 * representing the value in the component's bound database column.
+	 * @param <T> type to return
+	 * @param comp component
+	 * @param type Class of returned type
+	 * @return value
+	 */
+	public static <T> T getColumnObject(SSComponentInterface comp, Class<T> type)
+	{
+		T value = null;
+		//try {
+		//	return getColumnObject1ex(comp, type);
+		//} catch (SQLException ex) {
+		//	System.err.println("GET COLUMN OBJECT: 1ex");
+		//	ex.printStackTrace();
+		//}
+		try {
+			return getColumnObject2ex(comp, type);
+		} catch (SQLException ex) {
+			logger.log(ERROR, "SQL Exception for column " + comp.getBoundColumnName() + ".", ex);
+		}
+
+		return value;
+	}
+
+	/**
+	 * Returns an Object of the specified type
+	 * representing the value in the component's bound database column.
+	 * @param <T> type to return
+	 * @param comp component
+	 * @param type Class of returned type
+	 * @return value
+	 */
+	private static <T> T getColumnObject1ex(SSComponentInterface comp, Class<T> type)
+			throws SQLException
+	{
+		final RowSet _rowSet = comp.getRowSet();
+		final int _columnIndex = comp.getBoundColumnIndex();
+		
+		T value;
+		// IF THE COLUMN IS NULL SO RETURN NULL
+		if (getColumnCount(_rowSet)==0)
+			return null;
+		
+		Object objectValue = NavigateActions.fetchCurrentValue(comp);
+		if (objectValue == null)
+			return null;
+		
+		value = _rowSet.getObject(_columnIndex , type);
+		return value;
+	}
+
+	static {
+		if(Boolean.FALSE) {
+			try {
+				getColumnObject1ex(null, null);
+				getColumnObject2ex(null, null);
+			} catch (SQLException ex) {
+			}
+		}
+	}
+
+	/**
+	 * Returns an Object of the specified type
+	 * representing the value in the component's bound database column.
+	 * @param <T> type to return
+	 * @param comp component
+	 * @param type Class of returned type
+	 * @return value
+	 */
+	private static <T> T getColumnObject2ex(SSComponentInterface comp, Class<T> type)
+			throws SQLException
+	{
+		final RowSet _rowSet = comp.getRowSet();
+		final int _columnIndex = comp.getBoundColumnIndex();
+		
+		// IF THE COLUMN IS NULL SO RETURN NULL
+		if (getColumnCount(_rowSet)==0)
+			return null;
+		
+		//
+		// TODO:
+		//
+		Object objectValue = NavigateActions.fetchCurrentValue(comp);
+		if (objectValue == null)
+			return null;
+		
+		Object obj = _rowSet.getObject(_columnIndex);
+		if (type.isAssignableFrom(obj.getClass()))
+			return type.cast(obj);
+
+		JDBCType jdbcType = comp.getBoundColumnJDBCType();
+		
+		switch (type.getName()) {
+		case "java.lang.Boolean" -> {
+			switch(jdbcType) { case INTEGER, SMALLINT, TINYINT
+					-> { return type.cast(((Integer)obj) != 0); } }
+		}
+		}
+		return null;
+	}
+
+	//
+	// Move verifyConvert* methods to ConvertType
+	//
+	/**
+	 * Check if the JDBC column type of as specified can be
+	 * converted to the specified type.
+	 * @param rs row set
+	 * @param name column name
+	 * @param type target type
+	 * @return true if rowset column is convertable to target type
+	 */
+	public static boolean verifyConvertToType(RowSet rs, String name, Class<?> type)
+	{
+		try {
+			return verifyConvertToType(rs, getColumnIndex(rs, name), type);
+		} catch (SQLException ex) {
+			throw new IllegalArgumentException("SQLException", ex);
+		}
+	}
+
+	/**
+	 * Check if the JDBC column type of as specified can be
+	 * converted to the specified type.
+	 * @param rs row set
+	 * @param index column index
+	 * @param type target type
+	 * @return true if rowset column is convertable to target type
+	 */
+	public static boolean verifyConvertToType(RowSet rs, int index, Class<?> type)
+	{
+		JDBCType jdbcType;
+		try {
+			jdbcType = getJDBCColumnType(rs, index);
+		} catch (SQLException ex) {
+			throw new IllegalArgumentException("SQLException", ex);
+		}
+		switch (type.getName()) {
+		case "java.lang.Boolean" -> {
+			switch(jdbcType) {
+			case BIT, BOOLEAN, INTEGER, SMALLINT, TINYINT -> { return true; } }
+		}
+		}
+		throw new IllegalArgumentException(sf("'%s' not convertable to '%s'", jdbcType, type.getName()));
+	}
 	
 	/**
 	 * Method used by RowSet listeners to get the new text when the RowSet
@@ -273,8 +459,11 @@ public class RowSetOps {
 	 * @return text representation of data in specified column
 	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
 	 */
+	//
 	// TODO: pass in SSComponent
+	//
 	// TODO: use columnIndex
+	//
 	public static String getColumnText(final RowSet _rowSet, final String _columnName) {
 		String value = null;
 
@@ -319,7 +508,9 @@ public class RowSetOps {
 			case BOOLEAN:
 				value = String.valueOf(_rowSet.getBoolean(_columnName));
 				break;
+//
 // TODO: Convert this to use java.time.LocalDate, LocalTime, or LocalDateTime as needed.
+//
 			case DATE:
 				// NOTE: See SSCommon/getStringDate for a modified version
 				// Convert to "##/##/####", month/day/year, month day has two digits.
@@ -355,9 +546,10 @@ public class RowSetOps {
 					value = timestamp.toString();
 				}
 				break;
-
 				
+//
 // TODO: Convert this to use java.time.LocalTime.
+//
 			case TIME:
 				final Time time = _rowSet.getTime(_columnName);
 				if (time == null) {
@@ -382,7 +574,9 @@ public class RowSetOps {
 				break;
 
 			default:
+				//
 				// TODO: SSSQLExceptionUnhandledType
+				//
 				logger.log(ERROR, "Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
 			} // end switch
 
@@ -399,7 +593,7 @@ public class RowSetOps {
 	 * @param comp
 	 * @return
 	 */
-	public static String getObjectText(SSComponentInterface comp)
+	public static String getColumnObjectText(SSComponentInterface comp)
 	{
 		final RowSet _rowSet = comp.getRowSet();
 		final String _columnName = comp.getBoundColumnName();
@@ -430,7 +624,9 @@ public class RowSetOps {
 				value = String.valueOf(objectValue);
 				break;
 
+//
 // TODO: Convert this to use java.time.LocalDate, LocalTime, or LocalDateTime as needed.
+//
 			case DATE:
 				// NOTE: See SSCommon/getStringDate for a modified version
 				// Convert to "##/##/####", month/day/year, month day has two digits.
@@ -662,7 +858,7 @@ public class RowSetOps {
 					did_update = true;
 					return;
 				} else
-					throw new SSSQLNullException("Null values are not allowed for this field.");
+					throw new SSSQLNullException("NULL not allowed for this field.");
 			}
 			
 			_rowSet.updateArray(_columnName, _updatedValue);
@@ -672,6 +868,59 @@ public class RowSetOps {
 				postRowSetModified(comp, _updatedValue);
 		}
 	}
+
+	/**
+	 * Method used by SwingSet component listeners to update the underlying
+	 * RowSet.
+	 * <p>
+	 * When the user changes/edits the SwingSet column this method propagates the
+	 * change to the RowSet. A separate call is required to flush/commit the change
+	 * to the database.
+	 *
+	 * @param comp The SSComponent doing the update
+	 * @param _updatedValue value to write to underlying RowSet column
+	 * @throws SSSQLNullException thrown if null is not allowed
+	 * @throws SQLException  thrown if a database error is encountered
+	 */
+	public static void updateColumnObject(final SSComponentInterface comp, final Object _updatedValue) throws SSSQLNullException, SQLException, NumberFormatException
+	{
+		if (_updatedValue instanceof String s) {
+			// This method doesn't have all the string checks,
+			// use updateColumnText if String Object.
+			updateColumnText(comp, s);
+			return;
+		}
+		final RowSet _rowSet = comp.getRowSet();
+		final int _columnIndex = comp.getBoundColumnIndex();
+		boolean _allowNull = comp.getAllowNull();
+		logger.log(DEBUG, "[" + comp.getLogColumnName()+ "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
+
+		if (NavigateActions.ENABLE_UNDO_REDO)
+			NavigateActions.captureInitialValue(comp);
+
+		boolean did_update = false;
+		try {
+			// On insert row, write null and do not perform other checks.
+			if (_updatedValue == null) {
+				if (RowSetState.isInserting(_rowSet) || _allowNull) {
+					_rowSet.updateNull(_columnIndex);
+					did_update = true;
+					return;
+				} else
+					throw new SSSQLNullException("NULL not allowed for this field.");
+			}
+
+			//_rowSet.updateObject(_columnIndex, _updatedValue);
+			JDBCType jdbcType = comp.getBoundColumnJDBCType();
+			Object obj = convertObject2JdbcObject(_updatedValue, jdbcType);
+			updateColumnObject2(_rowSet, _columnIndex, obj, jdbcType);
+			did_update = true;
+		} finally {
+			if (did_update)
+				postRowSetModified(comp, _updatedValue);
+		}
+	}
+
 
 	/**
 	 * Method used by SwingSet component listeners to update the underlying
@@ -713,12 +962,12 @@ public class RowSetOps {
 	 * @throws NumberFormatException thrown if unable to parse a string to number format
 	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
 	 */
-	// TODO: Eclipse is giving a Potential null pointer access, but we have assert(_updatedValue != null) so may be able to remove warning in future.
-	@SuppressWarnings("null")
 	private static void updateColumnText(final SSComponentInterface comp, final RowSet
 			_rowSet, final String _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException, NumberFormatException
 	{
-		logger.log(DEBUG, "[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
+		int row = logger.isLoggable(DEBUG) ? _rowSet.getRow() : -1;
+		logger.log(DEBUG, () -> sf("[%s] row %d. Update to: %s. Allow null? [%s]",
+				   _columnName, row, _updatedValue, _allowNull));
 
 		JDBCType jdbcType = getJDBCType(getColumnType(_rowSet, _columnName));
 		
@@ -758,9 +1007,11 @@ public class RowSetOps {
 			if (_updatedValue == null
 					|| _updatedValue.isEmpty()
 					|| (_updatedValue.trim().isEmpty() && !textUpdateEmptyOK.contains(jdbcType))) {
+				//
 				// TODO: Switch to isBlank) for Java 11+
+				//
 				// Java 11: || (_updatedValue.isBlank() && !textUpdateEmptyOK.contains(jdbcType))) {
-
+				//
 				if (_allowNull) {
 					_rowSet.updateNull(_columnName);
 					did_update = true;
@@ -825,6 +1076,7 @@ public class RowSetOps {
 				break;
 			
 			case DATE:
+				//
 				// TODO: there's an ignored IllegalArgumentException possible
 				// Convert a 10 character date "mm/dd/yyyy" or "yyyy-mm-dd"
 // TODO Good to get rid of getSQLDate if possible.
@@ -848,6 +1100,7 @@ public class RowSetOps {
 				break;
 
 			case TIME:
+				//
 				// TODO: there's an ignored IllegalArgumentException possible
 				// Convert a time like "hh:mm:ss"
 // TODO: Better way to handle Time conversion? Formatter? 
@@ -863,6 +1116,7 @@ public class RowSetOps {
 				break;
 
 			case TIMESTAMP:
+				//
 				// TODO: there's an ignored IllegalArgumentException possible
 				// Convert something like
 				// "yyyy-mm-dd hh:mm:ss" or "yyyy-mm-dd hh:mm:ss.f[ff...]"
@@ -892,7 +1146,9 @@ public class RowSetOps {
 				break;
 				
 			default:
+				//
 				// TODO: SSSQLExceptionUnhandledType
+				//
 				throw new IllegalStateException("switch cases out of sync");
 			} // end switch
 			did_update = true;
@@ -998,48 +1254,21 @@ public class RowSetOps {
 			return clazz;
 		}
 
-		switch (_jdbcType) {
-			case INTEGER:
-			case SMALLINT:
-			case TINYINT:
-				clazz = Integer.class;
-				break;
-			case BIGINT:
-				clazz = Long.class;
-				break;
-			case REAL:
-				clazz = Float.class;
-				break;
-			case FLOAT:
-			case DOUBLE:
-				clazz = Double.class;
-				break;
-			case DECIMAL:
-			case NUMERIC:
-				clazz = BigDecimal.class;
-				break;
-			case BIT:
-			case BOOLEAN:
-				clazz = Boolean.class;
-				break;
-			//case DATE: case TIME: case TIMESTAMP: clazz = java.util.Date.class; break;
-			case DATE:
-				clazz = java.sql.Date.class;
-				break;
-			case TIME:
-				clazz = java.sql.Time.class;
-				break;
-			case TIMESTAMP:
-				clazz = java.sql.Timestamp.class;
-				break;
-			case CHAR:
-			case VARCHAR:
-			case LONGVARCHAR:
-			case NCHAR:
-			case NVARCHAR:
-			case LONGNVARCHAR:
-				clazz = String.class;
-				break;
+		return switch (_jdbcType) {
+		case INTEGER, SMALLINT, TINYINT	-> Integer.class;
+		case BIGINT -> Long.class;
+		case REAL -> Float.class;
+		case FLOAT, DOUBLE -> Double.class;
+		case DECIMAL, NUMERIC -> BigDecimal.class;
+		case BIT, BOOLEAN -> Boolean.class;
+		case DATE -> java.sql.Date.class;
+		case TIME -> java.sql.Time.class;
+		case TIMESTAMP -> java.sql.Timestamp.class;
+		case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR -> String.class;
+		default ->
+			// TODO: SSSQLExceptionUnhandledType
+			throw new SQLException("Unhandled type: " + _jdbcType);
+		};
 
 			// case ARRAY:
 			// 	clazz = java.sql.Array.class;
@@ -1058,11 +1287,6 @@ public class RowSetOps {
 			// case ROWID: clazz = java.sql.RowId.class; break;
 			// case NCLOB: clazz = java.sql.NClob.class; break;
 			// case SQLXML: clazz = java.sql.SQLXML.class; break;
-			default:
-				// TODO: SSSQLExceptionUnhandledType
-				throw new SQLException("Unhandled type: " + _jdbcType);
-		}
-		return clazz;
 
 		// case DISTINCT: Object type of underlying type
 		// case STRUCT: java.sql.Struct or java.sql.SQLData
@@ -1070,7 +1294,6 @@ public class RowSetOps {
 	}
 
 	// FOLLOWING ONLY USED FROM SSTableModel (AT LEAST FOR NOW)
-
 
 	/**
 	 * Update the Grid's RowSet at the specified column index with the given Object value.
@@ -1088,6 +1311,25 @@ public class RowSetOps {
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
 	public static void updateColumnObject(RowSet _rowSet, Object _value, int _columnIndex, JDBCType type) throws SQLException {
+		updateColumnObject1(_rowSet, _columnIndex, _value, type);
+	}
+
+	/**
+	 * Update the Grid's RowSet at the specified column index with the given Object value.
+	 * RowSet. Operate on the current row.
+	 * <p>
+	 * When the user changes/edits the SSDataGrid cell this method propagates the
+	 * change to the RowSet. A separate call is required to flush/commit the change
+	 * to the database.
+	 *
+	 * @param _rowSet RowSet on which to operate
+	 * @param _value string to be type-converted as needed and updated in
+	 *                      underlying RowSet column
+	 * @param _columnIndex   index of the database column
+	 * @param type NOT USED, the jdbc driver does the conversion
+	 * @throws SQLException  thrown if a database error is encountered
+	 */
+	public static void updateColumnObject1(RowSet _rowSet, int _columnIndex, Object _value, JDBCType type) throws SQLException {
 		_rowSet.updateObject(_columnIndex, _value);
 	}
 
@@ -1111,75 +1353,34 @@ public class RowSetOps {
 	 * @throws SQLException  thrown if a database error is encountered
 	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
 	 */
-	public static void updateColumnObject2(RowSet _rowSet, Object _value, int _columnIndex, JDBCType type) throws SQLException {
+	public static void updateColumnObject2(RowSet _rowSet, int _columnIndex, Object _value, JDBCType type) throws SQLException {
 		switch (type) {
-		case INTEGER:
-		case SMALLINT:
-		case TINYINT:
-			_rowSet.updateInt(_columnIndex, ((Integer) _value));
-			break;
-		case BIGINT:
-			_rowSet.updateLong(_columnIndex, ((Long) _value));
-			break;
-		case REAL:
-			_rowSet.updateFloat(_columnIndex, ((Float) _value));
-			break;
-		case FLOAT:
-		case DOUBLE:
-			_rowSet.updateDouble(_columnIndex, ((Double) _value));
-			break;
-		case DECIMAL:
-		case NUMERIC:
-			_rowSet.updateBigDecimal(_columnIndex, ((BigDecimal) _value));
-			break;
-		case BOOLEAN:
-		case BIT:
-			_rowSet.updateBoolean(_columnIndex, ((Boolean) _value));
-			break;
-		case DATE:
-			_rowSet.updateDate(_columnIndex, (Date) _value);
-			break;
-		case TIME:
-			_rowSet.updateTime(_columnIndex, (Time) _value);
-			break;
-		case TIMESTAMP:
-			_rowSet.updateTimestamp(_columnIndex, (Timestamp) _value);
-			break;
-		case CHAR:
-		case VARCHAR:
-		case LONGVARCHAR:
-		case NCHAR:
-		case NVARCHAR:
-		case LONGNVARCHAR:
-			_rowSet.updateString(_columnIndex, (String) _value);
-			break;
-		default:
-			// TODO: SSSQLExceptionUnhandledType
-			logger.log(WARNING, "Unknown data type of " + type);
+		case INTEGER, SMALLINT, TINYINT
+				-> _rowSet.updateInt(_columnIndex, ((Integer) _value));
+		case BIGINT
+				-> _rowSet.updateLong(_columnIndex, ((Long) _value));
+		case REAL
+				-> _rowSet.updateFloat(_columnIndex, ((Float) _value));
+		case FLOAT, DOUBLE
+				-> _rowSet.updateDouble(_columnIndex, ((Double) _value));
+		case DECIMAL, NUMERIC
+				-> _rowSet.updateBigDecimal(_columnIndex, ((BigDecimal) _value));
+		case BOOLEAN, BIT
+				-> _rowSet.updateBoolean(_columnIndex, ((Boolean) _value));
+		case DATE
+				-> _rowSet.updateDate(_columnIndex, (Date) _value);
+		case TIME
+				-> _rowSet.updateTime(_columnIndex, (Time) _value);
+		case TIMESTAMP
+				-> _rowSet.updateTimestamp(_columnIndex, (Timestamp) _value);
+		case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR
+				-> _rowSet.updateString(_columnIndex, (String) _value);
+		default
+				//
+				// TODO: SSSQLExceptionUnhandledType
+				//
+				-> logger.log(ERROR, "Unknown data type of " + type);
 		}
-		
 	}
 
-	//
-	// TODO: put following in util? Datasources?
-	//		 Maybe a variety of stuff could go into data sources,
-	//		 consider that most of the stuff in there is going away.
-	//
-
-	/**
-	 * Null used as database value where not allowed.
-	 */
-	@SuppressWarnings("serial")
-	public static class SSSQLNullException extends SQLException {
-
-		/**
-		 * Construct an SQLException with given reason.
-		 * 
-		 * @param reason description of the exception
-		 */
-		public SSSQLNullException(String reason) {
-			super(reason);
-		}
-
-	}
 }

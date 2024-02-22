@@ -37,12 +37,14 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import com.nqadmin.swingset.demo.MainClass.H2Trace;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import javax.sql.DataSource;
 import org.h2.jdbcx.JdbcDataSource;
+import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 
 /**
  * Provides a data source that returns a pre-specifies connection; typically
@@ -62,7 +64,8 @@ public class DataSourceShareConnection {
 	 */
 	public static DataSource getDataSource(Connection conn) {
 		JdbcDataSource ds01 = new JdbcDataSource();
-		ds01.setURL("jdbc:h2:mem:" + MainClass.DATABASE_NAME);
+		ds01.setURL("jdbc:h2:mem:" + MainClass.DATABASE_NAME
+				+ defLookup(H2Trace.class).getTraceUrlFlags());
 		return new MyDataSource(ds01, conn);
 	}
 

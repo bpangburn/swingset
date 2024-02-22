@@ -99,7 +99,8 @@ import com.nqadmin.swingset.SSLabel;
 import com.nqadmin.swingset.SSList;
 import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.datasources.RowSetOps;
-import com.nqadmin.swingset.datasources.RowSetOps.SSSQLNullException;
+import com.nqadmin.swingset.datasources.SSSQLInternalException;
+import com.nqadmin.swingset.datasources.SSSQLNullException;
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
@@ -255,8 +256,8 @@ public class SSCommon
 			try {
 				String prev = fb.getDocument().getText(0, fb.getDocument().getLength());
 				logger.log(TRACE, () -> "Capture previous text value: " + prev);
-				if (eventListener instanceof SSDocumentListener) {
-					((SSDocumentListener) eventListener).previousValue = prev;
+				if (eventListener instanceof SSDocumentListener listener) {
+					listener.previousValue = prev;
 				}
 			} catch (BadLocationException ex) {
 				logger.log(DEBUG, "Capture previous text value", ex);
@@ -608,6 +609,10 @@ public class SSCommon
 	/**
 	 * Method to add any SwingSet Component listener(s).
 	 */
+	//
+	// TODO: Create SSComponent.addListener()/removeListener.
+	//       Then get rid of this switch statement.
+	//
 	public final void addSSComponentListener() {
 		
 		// Probably should not have a null eventListener here, but just in case
@@ -618,40 +623,7 @@ public class SSCommon
 		if (!ssComponentListenerAdded) {
 			
 			ssComponentListenerAdded = true;
-
-			/*
-			if (ssComponent instanceof SSCheckBox c) {
-				c.addItemListener((ItemListener) eventListener);
-			} else if (ssComponent instanceof SSBaseComboBox<?,?,?> c) {
-				c.addActionListener((ActionListener) eventListener);
-			} else if (ssComponent instanceof SSImage c) {
-				c.getBtnUpdateImage().addActionListener((ActionListener) eventListener);
-			} else if (ssComponent instanceof SSLabel c) {
-				c.addPropertyChangeListener("text", ((PropertyChangeListener) eventListener));
-			} else if (ssComponent instanceof SSList c) {
-				c.addListSelectionListener((ListSelectionListener) eventListener);
-			} else if (ssComponent instanceof SSSlider c) {
-				c.addChangeListener((ChangeListener) eventListener);
-			} else if (ssComponent instanceof SSFormattedTextField c) {
-				c.addPropertyChangeListener("value", ((PropertyChangeListener) eventListener));
-			} else if (ssComponent instanceof JTextComponent) {
-				addSSDocumentListener();
-			} else {
-				//
-				// TODO: Should programmer errors put up a dialog?
-				//
-
-				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
-				String message = String.format("%s - Encountered unknown Component Event Listener for: %s. Unable to add component listener.",
-						getColumnForLog(), ssComponent.getClass().getSimpleName());
-				logger.log(ERROR, message);
-				JOptionPane.showMessageDialog((JComponent)getSSComponent(), message, "Unknown Component Event Listener", JOptionPane.ERROR_MESSAGE);
-				
-				// INDICATE FAILURE TO ADD LISTENER
-				ssComponentListenerAdded = false;
-			}
-			*/
-			/* If JDK-21 and preview for "_" */
+			/* JDK-21 and preview for "_" */
 			switch(ssComponent) {
 			case SSCheckBox c -> c.addItemListener((ItemListener) eventListener);
 			case SSBaseComboBox<?,?,?> c -> c.addActionListener((ActionListener) eventListener);
@@ -660,7 +632,7 @@ public class SSCommon
 			case SSList c -> c.addListSelectionListener((ListSelectionListener) eventListener);
 			case SSSlider c -> c.addChangeListener((ChangeListener) eventListener);
 			case SSFormattedTextField c -> c.addPropertyChangeListener("value", ((PropertyChangeListener) eventListener));
-			case JTextComponent c -> addSSDocumentListener();
+			case JTextComponent _ -> addSSDocumentListener();
 
 			default -> {
 				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
@@ -830,6 +802,31 @@ public class SSCommon
 	}
 
 	/**
+	 * Returns an Object of the specified type
+	 * representing the value in the bound database column.
+	 * @param <T> type to return
+	 * @param type Class of returned type
+	 * @return value
+	 */
+	public <T> T getBoundColumnObject(Class<T> type)
+	{
+		T value = null;
+
+		try {
+			if (getRowSet().getRow() != 0) {
+				value = RowSetOps.getColumnObject(ssComponent, type);
+				//if (!getAllowNull() && (value == null)) {
+				//	value = "";
+				//}
+			}
+		} catch (final SQLException se) {
+			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
+		}
+
+		return value;
+	}
+
+	/**
 	 * Returns a String representing the value in the bound database column.
 	 * <p>
 	 * New functionality added (2020) to allow this method to return a null String
@@ -846,7 +843,7 @@ public class SSCommon
 		try {
 			if (getRowSet().getRow() != 0) {
 				if (NavigateActions.ENABLE_UNDO_REDO) {
-					value = RowSetOps.getObjectText(ssComponent);
+					value = RowSetOps.getColumnObjectText(ssComponent);
 				} else {
 					value = RowSetOps.getColumnText(getRowSet(),getBoundColumnName());
 				}
@@ -982,26 +979,17 @@ public class SSCommon
 		if (ssComponentListenerAdded) {
 			
 			ssComponentListenerAdded = false;
-			
-			if (ssComponent instanceof SSCheckBox) {
-				((SSCheckBox)ssComponent).removeItemListener((ItemListener) eventListener);
-			} else if (ssComponent instanceof SSBaseComboBox) {
-				((SSBaseComboBox<?, ?, ?>)ssComponent).removeActionListener((ActionListener) eventListener);
-			} else if (ssComponent instanceof SSImage) {
-				((SSImage)ssComponent).getBtnUpdateImage().removeActionListener((ActionListener) eventListener);
-			} else if (ssComponent instanceof SSLabel) {
-				((SSLabel)ssComponent).removePropertyChangeListener("text", ((PropertyChangeListener) eventListener));
-			} else if (ssComponent instanceof SSList) {
-				((SSList)ssComponent).removeListSelectionListener((ListSelectionListener) eventListener);
-			} else if (ssComponent instanceof SSSlider) {
-				((SSSlider)ssComponent).removeChangeListener((ChangeListener) eventListener);
-			} else if (ssComponent instanceof SSFormattedTextField) {
-				((SSFormattedTextField)ssComponent).removePropertyChangeListener("value", ((PropertyChangeListener) eventListener));
-//			} else if (ssComponent instanceof SSTextArea) {
-//			} else if (ssComponent instanceof SSTextField) {
-			} else if (ssComponent instanceof JTextComponent) {
-				removeSSDocumentListener();
-			} else {
+			/* JDK-21 and preview for "_" */
+			switch(ssComponent) {
+			case SSCheckBox c -> c.removeItemListener((ItemListener) eventListener);
+			case SSBaseComboBox<?,?,?> c -> c.removeActionListener((ActionListener) eventListener);
+			case SSImage c -> c.getBtnUpdateImage().removeActionListener((ActionListener) eventListener);
+			case SSLabel c -> c.removePropertyChangeListener("text", ((PropertyChangeListener) eventListener));
+			case SSList c -> c.removeListSelectionListener((ListSelectionListener) eventListener);
+			case SSSlider c -> c.removeChangeListener((ChangeListener) eventListener);
+			case SSFormattedTextField c -> c.removePropertyChangeListener("value", ((PropertyChangeListener) eventListener));
+			case JTextComponent _ -> removeSSDocumentListener();
+			default -> {
 				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
 				String message = String.format("%s - Encountered unknown Component Event Listener for: %s. Unable to remove component listener.",
 						getColumnForLog(), ssComponent.getClass().getSimpleName());
@@ -1011,8 +999,8 @@ public class SSCommon
 				// INDICATE FAILURE TO REMOVE LISTENER
 				ssComponentListenerAdded = true;
 			}
+			}
 		}
-
 		if (!ssComponentListenerAdded) {
 			logger.log(DEBUG, () -> sf("%s - Component Listener removed.", getColumnForLog()));
 		}
@@ -1176,6 +1164,27 @@ public class SSCommon
 	/**
 	 * Updates the bound database column with the specified String.
 	 *
+	 * @param _boundColumnObject value to write to bound database column
+	 * @return true if no error
+	 */
+	public boolean setBoundColumnObject(final Object _boundColumnObject) {
+		logger.log(DEBUG, () -> sf("%s: %s", getColumnForLog(), _boundColumnObject));
+		boolean ok = false;
+		try {
+			RowSetOps.updateColumnObject(getSSComponent(), _boundColumnObject);
+			ok = true;
+		} catch(SQLException | NumberFormatException ex) {
+			userErrorReporting(_boundColumnObject, ex);
+		} finally {
+			if (!ok)
+				postRowSetModifiedError(getSSComponent(), _boundColumnObject);
+		}
+		return ok;
+	}
+
+	/**
+	 * Updates the bound database column with the specified String.
+	 *
 	 * @param _boundColumnText value to write to bound database column
 	 * @return true if no error
 	 */
@@ -1198,19 +1207,39 @@ public class SSCommon
 	{
 		String ex_title = null;
 		String ex_msg = null;
-		if (ex instanceof SSSQLNullException) {
+		switch(ex) {
+		case SSSQLInternalException e -> {
+			ex_title = "SS Internal Error";
+			ex_msg = sf("%s: %s", getBoundColumnName(), e.getMessage());
+		}
+		case SSSQLNullException _ -> {
 			ex_title = "Null Exception";
 			ex_msg = "Null values are not allowed for " + getBoundColumnName();
-		} else if (ex instanceof SQLException) {
+		}
+		case SQLException _ -> {
 			ex_title = "SQL Exception";
 			ex_msg = "SQL Exception encountered for " + getBoundColumnName();
-		} else if (ex instanceof NumberFormatException) {
+		}
+		case NumberFormatException _ -> {
 			ex_title = "Number Format Exception";
 			ex_msg = "Number Format Exception encountered for " + getBoundColumnName() + " converting " + value + " to a number.";
+		}
+		default -> {}
 		}
 		logger.log(WARNING, getBoundColumnName() + " - " + ex_title + ".", ex);
 		JOptionPane.showMessageDialog((JComponent)getSSComponent(), ex_msg,
 									  ex_title, JOptionPane.ERROR_MESSAGE);
+
+		// if (ex instanceof SSSQLNullException) {
+		// 	ex_title = "Null Exception";
+		// 	ex_msg = "Null values are not allowed for " + getBoundColumnName();
+		// } else if (ex instanceof SQLException) {
+		// 	ex_title = "SQL Exception";
+		// 	ex_msg = "SQL Exception encountered for " + getBoundColumnName();
+		// } else if (ex instanceof NumberFormatException) {
+		// 	ex_title = "Number Format Exception";
+		// 	ex_msg = "Number Format Exception encountered for " + getBoundColumnName() + " converting " + value + " to a number.";
+		// }
 	}
 
 	/**

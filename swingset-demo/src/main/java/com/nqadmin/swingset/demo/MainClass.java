@@ -38,6 +38,7 @@
 package com.nqadmin.swingset.demo;
 
 import com.nqadmin.swingset.SSComboBox;
+import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
 import static com.nqadmin.swingset.demo.DemoUtil.configureJavaUtilLogger;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -73,6 +74,7 @@ import org.h2.tools.RunScript;
 
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSMysqlSetModel;
+import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSUtils;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import com.nqadmin.swingset.utils.SSVersion;
@@ -87,12 +89,42 @@ import java.awt.event.WindowEvent;
 import javax.swing.BoxLayout;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
+import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
  */
-public class MainClass extends JFrame {
+@SuppressWarnings("serial")
+public class MainClass extends JFrame
+{
+
+	/**
+	 * database
+	 */
+	public static final String DATABASE_NAME = "suppliers_and_parts";
+	private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
+
+	private static final boolean USE_IN_MEMORY_DATABASE = true;
+
+	private static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
+	private static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
+	private static final String DATABASE_SCRIPT_TEST_IMAGES = "swingset_tests_load_blobs.sql";
+	private static final String DATABASE_SCRIPT_DEBUG = "swingset_debug.sql";
+
+	private static final boolean RUN_DEMO_SQL_SCRIPTS = true;
+	private static final boolean RUN_TEST_SQL_SCRIPTS = true;
+	private static final boolean RUN_DEBUG_SQL_SCRIPTS = false;
+
+
 	private static final Map<String, Object> globalHints = new HashMap<>();
+
+	static class LoadDemoImages {}
+	static class H2Trace {
+		private final String flags;
+		H2Trace() { this.flags = ""; }
+		H2Trace(String flags) { this.flags = flags; }
+		String getTraceUrlFlags() { return flags; }
+	}
 
 	/**
 	 * ActionListener implementation to call code for each button.
@@ -260,18 +292,6 @@ public class MainClass extends JFrame {
 	protected static final int childScreenWidth = 600;
 	protected static final int childScreenCount = 10;
 
-	/**
-	 * database
-	 */
-	public static final String DATABASE_NAME = "suppliers_and_parts";
-	private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
-
-	private static final boolean USE_IN_MEMORY_DATABASE = true;
-
-	private static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
-	private static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
-	private static final String DATABASE_SCRIPT_TEST_IMAGES = "swingset_tests_load_blobs.sql";
-
 	private Connection dbConnection = null;
 
 	/**
@@ -298,12 +318,6 @@ public class MainClass extends JFrame {
 	 * Log4j2 Logger
 	 */
 	private static final Logger logger = SSUtils.getLogger();
-	private static final boolean RUN_SQL_SCRIPTS = true;
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -6316984401822746124L;
 
 	/**
 	 * Constructor for MainClass
@@ -336,6 +350,8 @@ public class MainClass extends JFrame {
 			logger.log(Level.ERROR, "Error initializing database. Exiting.");
 			System.exit(1);
 		}
+
+		CentralLookup.getDefault().add(new DefaultSSDBSupport(dbConnection));
 
 		// ADD ACTION LISTENERS FOR BUTTONS
 		btnExample1.addActionListener(new MyButtonListener());
@@ -416,39 +432,81 @@ public class MainClass extends JFrame {
 			logger.log(DEBUG, ()->sf("Resource path: %s.", getClass().getPackage().getName()));
 			logger.log(DEBUG, "Resource path: %s.", getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
 
-			final InputStream inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
-			final InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
-			if ((inStreamDemo == null) || (inStreamTest == null)) {
-				logger.log(Level.ERROR, "Please add the file " + DATABASE_SCRIPT_DEMO + " and " + DATABASE_SCRIPT_TEST + " and "
-						+ DATABASE_SCRIPT_TEST_IMAGES + " to the classpath, package "
-						+ getClass().getPackage().getName());
+			InputStream inStreamDemo = null;
+			InputStream inStreamTest = null;
+			InputStream inStreamDebug = null;
+
+			boolean has_startup_error = false;
+
+			if (RUN_DEMO_SQL_SCRIPTS) {
+				inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
+				if (inStreamDemo == null) {
+					logger.log(Level.ERROR, "Please add the file " + DATABASE_SCRIPT_DEMO
+							+ " to the classpath, package " + getClass().getPackage().getName());
+					has_startup_error = true;
+				}
+			}
+
+			if (RUN_TEST_SQL_SCRIPTS) {
+				inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
+				if (inStreamTest == null) {
+					logger.log(Level.ERROR, "Please add the file "
+							+ DATABASE_SCRIPT_TEST + " and " + DATABASE_SCRIPT_TEST_IMAGES
+							+ " to the classpath, package "
+							+ getClass().getPackage().getName());
+					has_startup_error = true;
+				}
+			}
+
+			if (RUN_DEBUG_SQL_SCRIPTS) {
+				inStreamDebug = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEBUG);
+				if (inStreamDebug == null) {
+					logger.log(Level.ERROR, "Please add the file " + DATABASE_SCRIPT_DEBUG
+							+ " to the classpath, package " + getClass().getPackage().getName());
+					has_startup_error = true;
+				}
+			}
+
+			if (has_startup_error) {
+				logger.log(Level.ERROR, "\n*******\n*******\n*******");
 				System.exit(1);
+			}
+
+			if (USE_IN_MEMORY_DATABASE) {
+				result = DriverManager.getConnection("jdbc:h2:mem:" + DATABASE_NAME
+						+ defLookup(H2Trace.class).getTraceUrlFlags());
+				logger.log(INFO, "Established connection to in-memory database.");
 			} else {
-				if (USE_IN_MEMORY_DATABASE) {
-					result = DriverManager.getConnection("jdbc:h2:mem:" + DATABASE_NAME);
-					logger.log(INFO, "Established connection to in-memory database.");
-				} else {
-					// ASSUMING DATABASE IS IN LOCAL ./h2/databases/ FOLDER WITH DEFAULT USERNAME OF
-					// sa AND BLANK PASSWORD
-					// USEFUL FOR WORKING WITH DATASET FOR SWINGSET TESTS
-					result = DriverManager.getConnection("jdbc:h2:tcp:" + DATABASE_PATH + DATABASE_NAME, "sa", "");
-					logger.log(INFO, "Established connection to database server.");
+				// ASSUMING DATABASE IS IN LOCAL ./h2/databases/ FOLDER WITH DEFAULT USERNAME OF
+				// sa AND BLANK PASSWORD
+				// USEFUL FOR WORKING WITH DATASET FOR SWINGSET TESTS
+				result = DriverManager.getConnection("jdbc:h2:tcp:" + DATABASE_PATH + DATABASE_NAME, "sa", "");
+				logger.log(INFO, "Established connection to database server.");
+			}
+
+			// RUN SCRIPTS AND CLOSE STREAMS
+			if (RUN_DEMO_SQL_SCRIPTS) {
+				assert inStreamDemo != null;
+				RunScript.execute(result, new InputStreamReader(inStreamDemo));
+				inStreamDemo.close();
+			}
+
+			if (RUN_TEST_SQL_SCRIPTS) {
+				assert inStreamTest != null;
+				RunScript.execute(result, new InputStreamReader(inStreamTest));
+				inStreamTest.close();
+
+				if (!no_load_images) {
+					String sql = "UPDATE swingset_base_test_data"
+							+ " SET ss_image = ? WHERE swingset_base_test_pk = ?";
+					DemoUtil.loadBinaries(result, "/swingset-demo-images.txt", sql, verbose);
 				}
+			}
 
-				// RUN SCRIPTS AND CLOSE STREAMS
-				if (RUN_SQL_SCRIPTS) {
-					RunScript.execute(result, new InputStreamReader(inStreamDemo));
-					inStreamDemo.close();
-
-					RunScript.execute(result, new InputStreamReader(inStreamTest));
-					inStreamTest.close();
-
-					if (!no_load_images) {
-						String sql = "UPDATE swingset_base_test_data"
-								+ " SET ss_image = ? WHERE swingset_base_test_pk = ?";
-						DemoUtil.loadBinaries(result, "/swingset-demo-images.txt", sql, verbose);
-					}
-				}
+			if (RUN_DEBUG_SQL_SCRIPTS) {
+				assert inStreamDebug != null;
+				RunScript.execute(result, new InputStreamReader(inStreamDebug));
+				inStreamDebug.close();
 			}
 
 		} catch (final IOException ioe) {
@@ -692,10 +750,11 @@ public class MainClass extends JFrame {
 
 	private static String cmdName = "SwingSetDemo";
 
+	@SuppressWarnings({"ResultOfMethodCallIgnored", "UseOfSystemOutOrSystemErr"})
 	private static void usage() {
 		// TODO: specify don't load images
 		String usage = "\n" + "Run the SwingSet demo. With no options/args use the self contained\n"
-				+ "in memory database.\n" + "\n" + cmdName
+				+ "in memory database.\n" + "\nCMD_NAME"
 				+ " [-h] [-v] [-d] [-n] [-i] [-r] [-p fname] [-s sql]* [dbms-server]\n" + "\n"
 				+ "    -h             help\n" + "    -v             verbose; output initialization sql as executed\n"
 				+ "    -d             dump/create sql scripts in local directory, exit\n"
@@ -716,6 +775,7 @@ public class MainClass extends JFrame {
 				+ "    java -jar ss.jar -d mysql   # dump sql to create mysql database\n"
 				+ "    java -cp jdbc_driver:ss.jar com.nqadmin.swingset.demo.MainClass \\\n"
 				+ "        -p db_props -s initializer.sql\n" + "\n";
+		usage.replace("CMD_NAME", cmdName);
 		System.err.println(usage);
 		System.exit(1);
 	}
@@ -728,9 +788,14 @@ public class MainClass extends JFrame {
 	 *              program
 	 */
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public static void main(final String[] _args) throws IOException
+	public static void main(final String[] _args)
 	{
 		configureJavaUtilLogger();
+
+		CentralLookup lkup = CentralLookup.getDefault();
+		lkup.add(new LoadDemoImages());
+		lkup.add(new H2Trace());
+		lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
 
 		boolean some_error = false;
 		System.err.printf("java:%s vm:%s date:%s os:%s\n",
@@ -776,8 +841,7 @@ public class MainClass extends JFrame {
 		if (verbose) {
 			StringBuilder sb = new StringBuilder();
 			sb.append('\n').append(cmdName);
-			for (int i = 0; i < _args.length; i++) {
-				String arg = _args[i];
+			for (String arg : _args) {
 				sb.append(' ').append(arg);
 			}
 			System.err.println(sb.toString());
@@ -824,20 +888,15 @@ public class MainClass extends JFrame {
 			}
 		}
 
-		switch (dbname) {
-		case DBMS_MYSQL:
-			databaseSetup = new MysqlSetup();
-			break;
-		case DBMS_EXTERNAL:
-			databaseSetup = new ExternalSetup(userSqlFiles);
-			break;
-		case DBMS_H2:
-			databaseSetup = new H2Setup();
-			break;
-		default:
+		databaseSetup = switch (dbname) {
+			case DBMS_MYSQL -> new MysqlSetup();
+			case DBMS_EXTERNAL -> new ExternalSetup(userSqlFiles);
+			case DBMS_H2 -> new H2Setup();
+			default -> null;
+		};
+		if (databaseSetup == null) {
 			System.err.println("Unknown database server '" + dbname + "' . Exiting.");
 			some_error = true;
-			break;
 		}
 
 		if (some_error) {

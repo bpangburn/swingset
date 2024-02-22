@@ -72,17 +72,13 @@ import org.netbeans.validation.api.ui.swing.ValidationPanel;
  * Record navigation is handled with a SSDataNavigator.
  */
 
+@SuppressWarnings("serial")
 public class Example1 extends JFrame {
 
 	/**
 	 * Log4j2 Logger
 	 */
     private static final Logger logger = SSUtils.getLogger();
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 1613223721461838426L;
 
 	/**
 	 * screen label declarations
@@ -177,18 +173,14 @@ public class Example1 extends JFrame {
 		 * H2 does not fully support updatable rowset so it must be
 		 * re-queried following insert and delete with rowset.execute()
 		 */
-		navigator.setDBNav(new SSDBNavImpl(this) {
-
-			/**
-			 * unique serial id
-			 */
-			private static final long serialVersionUID = -7698780157683623074L;
-
+		navigator.setDBNav(new SSDBNavImpl(this)
+		{
 			/**
 			 * Requery the rowset following a deletion. This is needed for H2.
 			 */
 			@Override
-			public void performPostDeletionOps() {
+			public void performPostDeletionOps()
+			{
 				super.performPostDeletionOps();
 				try {
 					rowset.execute();
@@ -201,7 +193,8 @@ public class Example1 extends JFrame {
 			 * Requery the rowset following an insertion. This is needed for H2.
 			 */
 			@Override
-			public void performPostInsertOps() {
+			public void performPostInsertOps()
+			{
 				super.performPostInsertOps();
 				try {
 					rowset.execute();
@@ -214,106 +207,104 @@ public class Example1 extends JFrame {
 			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
 			 */
 			@Override
-			public void performPreInsertOps() {
-
+			public void performPreInsertOps()
+			{
+				// SSDBNavImpl will clear the component values
 				super.performPreInsertOps();
 
-				try {
-
-				// GET THE NEW RECORD ID.
-					final ResultSet rs = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-							.executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");
+				try (final ResultSet rs = connection.createStatement(
+							ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+						.executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");
+				) {
+					// GET THE NEW RECORD ID.
 					rs.next();
 					final int supplierID = rs.getInt("nextVal");
 					txtSupplierID.setText(String.valueOf(supplierID));
-					rs.close();
-
-				// SET OTHER DEFAULTS
-//					 txtSupplierName.setText(null);
-//					 txtSupplierCity.setText(null);
-//					 txtSupplierStatus.setText("0");
+					
+					// // SET OTHER DEFAULTS
+					//  txtSupplierName.setText(null);
+					//  txtSupplierCity.setText(null);
+					//  txtSupplierStatus.setText("0");
 
 				} catch(final SQLException se) {
 					logger.log(Level.ERROR, "SQL Exception occured initializing new record.", se);
 				} catch(final Exception e) {
 					logger.log(Level.ERROR, "Exception occured initializing new record.", e);
 				}
-
 			}
-
 		});
 
 		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
-			txtSupplierID.bind(rowset, "supplier_id");
-			txtSupplierName.bind(rowset, "supplier_name");
-			txtSupplierCity.bind(rowset, "city");
-			txtSupplierStatus.bind(rowset, "status");
-
+		txtSupplierID.bind(rowset, "supplier_id");
+		txtSupplierName.bind(rowset, "supplier_name");
+		txtSupplierCity.bind(rowset, "city");
+		txtSupplierStatus.bind(rowset, "status");
+		
 		// SET LABEL DIMENSIONS
-			lblSupplierID.setPreferredSize(MainClass.labelDim);
-			lblSupplierName.setPreferredSize(MainClass.labelDim);
-			lblSupplierCity.setPreferredSize(MainClass.labelDim);
-			lblSupplierStatus.setPreferredSize(MainClass.labelDim);
-
+		lblSupplierID.setPreferredSize(MainClass.labelDim);
+		lblSupplierName.setPreferredSize(MainClass.labelDim);
+		lblSupplierCity.setPreferredSize(MainClass.labelDim);
+		lblSupplierStatus.setPreferredSize(MainClass.labelDim);
+		
 		// SET BOUND COMPONENT DIMENSIONS
-			txtSupplierID.setPreferredSize(MainClass.ssDim);
-			txtSupplierName.setPreferredSize(MainClass.ssDim);
-			txtSupplierCity.setPreferredSize(MainClass.ssDim);
-			txtSupplierStatus.setPreferredSize(MainClass.ssDim);
-
+		txtSupplierID.setPreferredSize(MainClass.ssDim);
+		txtSupplierName.setPreferredSize(MainClass.ssDim);
+		txtSupplierCity.setPreferredSize(MainClass.ssDim);
+		txtSupplierStatus.setPreferredSize(MainClass.ssDim);
+		
 		// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-			final Container contentPane = new JPanel();
-			contentPane.setLayout(new GridBagLayout());
-			final GridBagConstraints constraints = new GridBagConstraints();
-
-			constraints.gridx = 0;
-			constraints.gridy = 0;
-			constraints.weightx = .40;
-			constraints.anchor = GridBagConstraints.WEST;
-			contentPane.add(lblSupplierID, constraints);
-			constraints.gridy = 1;
-			contentPane.add(lblSupplierName, constraints);
-			constraints.gridy = 2;
-			contentPane.add(lblSupplierCity, constraints);
-			constraints.gridy = 3;
-			contentPane.add(lblSupplierStatus, constraints);
-
-			constraints.gridx = 1;
-			constraints.gridy = 0;
-			constraints.weightx = .60;
-			constraints.anchor = GridBagConstraints.CENTER;
-			constraints.fill = GridBagConstraints.HORIZONTAL;
-			contentPane.add(txtSupplierID, constraints);
-			constraints.gridy = 1;
-			contentPane.add(txtSupplierName, constraints);
-			constraints.gridy = 2;
-			contentPane.add(txtSupplierCity, constraints);
-			constraints.gridy = 3;
-			contentPane.add(txtSupplierStatus, constraints);
-
-			constraints.gridx = 0;
-			constraints.gridy = 4;
-			constraints.gridwidth = 2;
-			contentPane.add(navigator, constraints);
-
+		final Container contentPane = new JPanel();
+		contentPane.setLayout(new GridBagLayout());
+		final GridBagConstraints constraints = new GridBagConstraints();
+		
+		constraints.gridx = 0;
+		constraints.gridy = 0;
+		constraints.weightx = .40;
+		constraints.anchor = GridBagConstraints.WEST;
+		contentPane.add(lblSupplierID, constraints);
+		constraints.gridy = 1;
+		contentPane.add(lblSupplierName, constraints);
+		constraints.gridy = 2;
+		contentPane.add(lblSupplierCity, constraints);
+		constraints.gridy = 3;
+		contentPane.add(lblSupplierStatus, constraints);
+		
+		constraints.gridx = 1;
+		constraints.gridy = 0;
+		constraints.weightx = .60;
+		constraints.anchor = GridBagConstraints.CENTER;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		contentPane.add(txtSupplierID, constraints);
+		constraints.gridy = 1;
+		contentPane.add(txtSupplierName, constraints);
+		constraints.gridy = 2;
+		contentPane.add(txtSupplierCity, constraints);
+		constraints.gridy = 3;
+		contentPane.add(txtSupplierStatus, constraints);
+		
+		constraints.gridx = 0;
+		constraints.gridy = 4;
+		constraints.gridwidth = 2;
+		contentPane.add(navigator, constraints);
+		
 		// DISABLE THE PRIMARY KEY
-			txtSupplierID.setEnabled(false);
-
+		txtSupplierID.setEnabled(false);
+		
 		// SET UP THE SIMPLE VALIDATION PANEL
-			JPanel uiPanel;
-			if (USE_SIMPLE_VALIDATION) {
-				ValidationPanel valiPanel = new ValidationPanel();
-				valiPanel.setInnerComponent(contentPane);
-				ValidationGroup group = valiPanel.getValidationGroup();
-				group.addItem(decoSupplierName, false);
-				uiPanel =  valiPanel;
-			} else {
-				uiPanel = (JPanel) contentPane;
-			}
+		JPanel uiPanel;
+		if (USE_SIMPLE_VALIDATION) {
+			ValidationPanel valiPanel = new ValidationPanel();
+			valiPanel.setInnerComponent(contentPane);
+			ValidationGroup group = valiPanel.getValidationGroup();
+			group.addItem(decoSupplierName, false);
+			uiPanel =  valiPanel;
+		} else {
+			uiPanel = (JPanel) contentPane;
+		}
 		// MAKE THE JFRAME VISIBLE
-			frame.add(uiPanel);
-			frame.pack();
-			frame.setVisible(true);
+		frame.add(uiPanel);
+		frame.pack();
+		frame.setVisible(true);
 	}
-
+	
 }

@@ -74,4 +74,15 @@ InstanceContent
     public static CentralLookup getDefault() {
         return def;
     }
+
+	/**
+	 * Convenience method to Lookup from the default.
+	 * @param <T>
+	 * @param clazz
+	 * @return
+	 */
+	public static <T> T defLookup(Class<T> clazz)
+	{
+		return getDefault().lookup(clazz);
+	}
 }

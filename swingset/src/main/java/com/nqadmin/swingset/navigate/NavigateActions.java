@@ -853,9 +853,11 @@ public class NavigateActions
 
 				rowSet.cancelRowUpdates();
 				if (rowSet instanceof CachedRowSet) {
+					//
 					// TODO: if there are RowSet listeners outside of the nav
 					//		 container, they won't be signaled. Could set something
 					//		 up, but wait for the event bus...
+					//
 					dBNav.findSSComponents().forEach(
 							(ssc) -> ssc.getSSCommon().issueRowChanged());
 				}

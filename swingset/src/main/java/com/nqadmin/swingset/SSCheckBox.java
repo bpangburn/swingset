@@ -45,6 +45,10 @@ import javax.sql.RowSet;
 import javax.swing.JCheckBox;
 
 import java.lang.System.Logger;
+import java.sql.JDBCType;
+
+import com.nqadmin.swingset.datasources.RowSetOps;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSCommon;
@@ -70,7 +74,9 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * 01-10-2005.
  */
 @SuppressWarnings("serial")
-public class SSCheckBox extends JCheckBox implements SSComponentInterface {
+public class SSCheckBox extends JCheckBox implements SSComponentInterface
+{
+	private final boolean useObject = false; // To test read/write technique.
 
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
@@ -80,88 +86,46 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	{
 		/** {@inheritDoc} */
 		@Override
-		public void itemStateChanged(final ItemEvent ie) {
-
+		public void itemStateChanged(final ItemEvent ie)
+		{
 			ssCommon.removeRowSetListener();
 
-			if (((JCheckBox) ie.getSource()).isSelected()) {
-				// switch(SSCheckBox.this.columnType) {
-				switch (getBoundColumnType()) {
-				case java.sql.Types.INTEGER:
-				case java.sql.Types.SMALLINT:
-				case java.sql.Types.TINYINT:
-					// SSCheckBox.this.textField.setText(String.valueOf(SSCheckBox.this.CHECKED));
-					setBoundColumnText(String.valueOf(CHECKED));
-					break;
-				case java.sql.Types.BIT:
-				case java.sql.Types.BOOLEAN:
-					// SSCheckBox.this.textField.setText(BOOLEAN_CHECKED);
-					setBoundColumnText(BOOLEAN_CHECKED);
-					break;
-				default:
-					logger.log(WARNING, getColumnForLog() + ": Unknown column type of " + getBoundColumnType());
-					break;
-				}
-			} else {
-				// switch(SSCheckBox.this.columnType) {
-				switch (getBoundColumnType()) {
-				case java.sql.Types.INTEGER:
-				case java.sql.Types.SMALLINT:
-				case java.sql.Types.TINYINT:
-					setBoundColumnText(String.valueOf(UNCHECKED));
-					break;
-				case java.sql.Types.BIT:
-				case java.sql.Types.BOOLEAN:
-					setBoundColumnText(BOOLEAN_UNCHECKED);
-					break;
-				default:
-					logger.log(WARNING, getColumnForLog() + ": Unknown column type of " + getBoundColumnType());
-					break;
-				}
+			if (useObject)
+				setBoundColumnObject(isSelected());
+			else {
+				setBoundColumnText(switch (getBoundColumnJDBCType()) {
+				case INTEGER, SMALLINT, TINYINT -> isSelected() ? CHECKED : UNCHECKED;
+				case BIT, BOOLEAN -> isSelected() ? BOOLEAN_CHECKED : BOOLEAN_UNCHECKED;
+				default -> "";
+				});
 			}
 
 			ssCommon.addRowSetListener();
 		}
-
 	} // end private class SSCheckBoxListener
-		// {
 
-	/**
-	 * Checked value for Boolean columns.
-	 */
+	/** Checked value for Boolean columns. */
 	protected static String BOOLEAN_CHECKED = "true";
 
-	/**
-	 * Unchecked value for Boolean columns.
-	 */
+	/** Unchecked value for Boolean columns. */
 	protected static String BOOLEAN_UNCHECKED = "false";
 
-	/**
-	 * Log4j Logger for component
-	 */
-	private static final Logger logger = SSUtils.getLogger();
+	/** Checked value for numeric columns. */
+	protected String CHECKED = "1";
 
-	/**
-	 * Checked value for numeric columns.
-	 */
-	protected int CHECKED = 1;
+	/** Unchecked value for numeric columns. */
+	protected String UNCHECKED = "0";
 
-	/**
-	 * Common fields shared across SwingSet components
-	 */
+	/** Common fields shared across SwingSet components. */
 	transient protected final SSCommon ssCommon = new SSCommon(this);
 
-	/**
-	 * Unchecked value for numeric columns.
-	 */
-	protected int UNCHECKED = 0;
+	/** System Logger for component. */
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Creates an object of SSCheckBox.
 	 */
 	public SSCheckBox() {
-		// Note that call to parent default constructor is implicit.
-		//super();
 	}
 
 	/**
@@ -174,6 +138,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
+	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSCheckBox(final RowSet _rowSet, final String _boundColumnName) throws java.sql.SQLException {
 		this();
 		bind(_rowSet, _boundColumnName);
@@ -186,6 +151,30 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	 */
 	public SSCheckBox(final String _text) {
 		super(_text);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void bind(RowSet _rowSet, String _boundColumnName)
+	{
+		RowSetOps.verifyConvertToType(_rowSet, _boundColumnName, Boolean.class);
+
+		// TODO: the debugger shows _rowSet as null
+		SSComponentInterface.super.bind(_rowSet, _boundColumnName);
+
+		//
+		// TODO: RowSetOps.canConvertToType(this, Boolean.class)
+		//
+
+		// TODO: The following must be done before bind. Catch 22.
+		//RowSetOps.verifyConvertToType(this, Boolean.class);
+
+		//JDBCType typ = getBoundColumnJDBCType();
+		//switch(typ) {
+		//		case INTEGER, SMALLINT, TINYINT, BIT, BOOLEAN -> {}
+		//		default -> throw new IllegalArgumentException(
+		//				sf("'%s' invalid column type", typ));
+		//}
 	}
 
 	/**
@@ -233,33 +222,16 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 		final String text = getBoundColumnText();
 		logger.log(DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), text));
 
-		// SELECT/DESELECT BASED ON UNDERLYING SQL TYPE
-		switch (getBoundColumnType()) {
-		case java.sql.Types.INTEGER:
-		case java.sql.Types.SMALLINT:
-		case java.sql.Types.TINYINT:
-			// SET THE CHECK BOX BASED ON THE VALUE IN ROWSET
-			if (String.valueOf(CHECKED).equals(text)) {
-				setSelected(true);
-			} else {
-				setSelected(false);
+		if (useObject)
+			setSelected(getBoundColumnObject(Boolean.class));
+		else {
+			// SELECT/DESELECT BASED ON UNDERLYING SQL TYPE
+			switch(getBoundColumnJDBCType()) {
+			// Use "UNCHECKED", "0" is the only false, CHECKED COULD be many values
+			case INTEGER, SMALLINT, TINYINT -> setSelected(!UNCHECKED.equals(text));
+			case BIT, BOOLEAN -> setSelected(BOOLEAN_CHECKED.equals(text));
 			}
-			break;
-
-		case java.sql.Types.BIT:
-		case java.sql.Types.BOOLEAN:
-			// SET THE CHECK BOX BASED ON THE VALUE IN TEXT FIELD
-			if (BOOLEAN_CHECKED.equals(text)) {
-				setSelected(true);
-			} else {
-				setSelected(false);
-			}
-			break;
-
-		default:
-			break;
 		}
-
 	} // end protected void updateSSComponent() {
 
 } // end public class SSCheckBox

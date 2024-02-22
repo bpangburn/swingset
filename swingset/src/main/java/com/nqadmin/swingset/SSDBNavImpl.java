@@ -88,12 +88,7 @@ public class SSDBNavImpl implements SSDBNav {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = SSUtils.getLogger();
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -4632505399798312457L;
+	protected static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Screen where components to be cleared are located.
@@ -138,25 +133,27 @@ public class SSDBNavImpl implements SSDBNav {
 			
 			//logger.debug("Clearing component type of: {}. Loop index=" + i, () -> comps[i].getClass().getSimpleName());
 
-			if (comps[i] instanceof JTextField) {
-				// IF IT IS A SSFormattedTextField SET ITS VALUE TO NULL (to avoid parse
-				// exception)
-				if (comps[i] instanceof SSFormattedTextField) {
-					((SSFormattedTextField) comps[i]).setValue(null);
-				} else {
-					// IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING
-					((JTextField) comps[i]).setText("");
-				}
-			} else if (comps[i] instanceof JList) {
+			//
+			// TODO: how about "initComponentValue()" in SSComponent.
+			//
+			// Are the non-sscomponent items needed?
+			//
+
+			// IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING
+			if (comps[i] instanceof SSFormattedTextField) {
+				((SSFormattedTextField) comps[i]).setValue(null);
+			} else if (comps[i] instanceof JTextField) {
+				((JTextField) comps[i]).setText("");
+			} else if (comps[i] instanceof JList<?>) {
 				// IF IT IS A JList, CLEAR IT
 				((JList<?>) comps[i]).clearSelection();
 			} else if (comps[i] instanceof JTextArea) {
 				// IF IT IS A JTextArea, SET TO EMPTY STRING
 				((JTextArea) comps[i]).setText("");
-			} else if (comps[i] instanceof SSBaseComboBox) {
+			} else if (comps[i] instanceof SSBaseComboBox<?,?,?>) {
 				// IF IT IS A SSBaseComboBox THEN SET IT TO 'EMPTY' ITEM BEFORE FIRST ITEM
 				((SSBaseComboBox<?, ?, ?>) comps[i]).setSelectionPending(true);
-			} else if (comps[i] instanceof JComboBox) {
+			} else if (comps[i] instanceof JComboBox<?>) {
 				// IF IT IS A JComboBox THEN SET IT TO 'EMPTY' ITEM BEFORE FIRST ITEM
 				((JComboBox<?>) comps[i]).setSelectedIndex(-1);
 			} else if (comps[i] instanceof SSImage) {
@@ -187,16 +184,16 @@ public class SSDBNavImpl implements SSDBNav {
 						.setValue((((JSlider) comps[i]).getMinimum() + ((JSlider) comps[i]).getMaximum()) / 2);
 			} else if (comps[i] instanceof JRootPane) {
 				// IF IT IS A JRootPane RECURSIVELY SET THE FIELDS
-				setComponents((Container) comps[i]);
+				setComponents((JRootPane) comps[i]);
 			} else if (comps[i] instanceof JPanel) {
 				// IF IT IS A JPanel RECURSIVELY SET THE FIELDS
-				setComponents((Container) comps[i]);
+				setComponents((JPanel) comps[i]);
 			} else if (comps[i] instanceof JLayeredPane) {
 				// IF IT IS A JLayeredPane RECURSIVELY SET THE FIELDS
-				setComponents((Container) comps[i]);
+				setComponents((JLayeredPane) comps[i]);
 			} else if (comps[i] instanceof JTabbedPane) {
 				// IF IT IS A JTabbedPane RECURSIVELY SET THE FIELDS
-				setComponents((Container) comps[i]);
+				setComponents((JTabbedPane) comps[i]);
 			} else if (comps[i] instanceof JScrollPane) {
 				// IF IT IS A JScrollPane GET THE VIEW PORT AND RECURSIVELY SET THE FIELDS IN
 				// VIEW PORT
@@ -216,19 +213,9 @@ public class SSDBNavImpl implements SSDBNav {
 	 * @return List of SScomponents
 	 */
 	@Override
-	public List<SSComponentInterface> findSSComponents() {
-		ArrayList<SSComponentInterface> l = new ArrayList<>();
-		findSSComponents(container, l);
-		return l;
-	}
-	private void findSSComponents(final Container _container, List<SSComponentInterface> l) {
-		for (Component comp : _container.getComponents()) {
-			if (comp instanceof SSComponentInterface) {
-				l.add((SSComponentInterface) comp);
-			} else if (comp instanceof Container) {
-				findSSComponents((Container) comp, l);
-			}
-		}
+	public List<SSComponentInterface> findSSComponents()
+	{
+		return SSUtils.findSSComponents(container);
 	}
 
 } // end public class SSDBNavImpl

@@ -42,11 +42,28 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Toolkit;
 
 import java.lang.StackWalker.Option;
 
 import java.lang.System.Logger;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.sql.RowSet;
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.JoinRowSet;
+
+import com.nqadmin.swingset.datasources.SSDBSupport;
+
 
 /**
  *
@@ -80,7 +97,6 @@ public class SSUtils {
 		return System.getLogger(loggerName);
 	}
 
-
 	/**
 	 * Shorthand for "String.format(fmt, args)".
 	 * @param fmt format
@@ -91,15 +107,31 @@ public class SSUtils {
 		return args.length == 0 ? fmt : String.format(fmt, args);
 	}
 
-	// /**
-	//  * Shorthand for "() -> String.format(fmt, args)".
-	//  * @param fmt format
-	//  * @param args args
-	//  * @return string
-	//  */
-	// public static Supplier<String> ssf(String fmt, Object... args) {
-	// 	return () -> sf(fmt, args);
-	// }
+
+	/**
+	 * Find all SSComponents in the specified container.
+	 * @param _container
+	 * @return List of SScomponents
+	 */
+	public static List<SSComponentInterface> findSSComponents(Container _container)
+	{
+		ArrayList<SSComponentInterface> l = new ArrayList<>();
+		findSSComponents(_container, l);
+		return l;
+	}
+	private static void findSSComponents(Container _container, List<SSComponentInterface> l)
+	{
+		//
+		// TODO: Need a special case for getViewport() or anything else ???????
+		//
+		for (Component comp : _container.getComponents()) {
+			switch (comp) {
+			case SSComponentInterface c -> l.add(c);
+			case Container c -> findSSComponents(c, l);
+			default -> { }
+			}
+		}
+	}
 
 	/**
 	 * Notify the user of something...
@@ -108,6 +140,74 @@ public class SSUtils {
 	public static void beep()
 	{
 		Toolkit.getDefaultToolkit().beep();
+	}
+
+	/**
+	 * Setup a {@linkplain CachedRowSet}'s primary keys, use the component's
+	 * column to get the database table's keys.
+	 * If not a CachedRowSet or the key is already set, do nothing.
+	 * Note a JoinRowSet is skipped; only want to set keys for single table.
+	 * @param comp component
+	 */
+	// TODO: Could have an array of primary keys, one entry per column.
+	//		 Could this be needed for joins?
+	public static void setupDefaultPrimaryKeys(SSComponentInterface comp)
+	{
+		RowSet rs = comp.getRowSet();
+		if (rs instanceof JoinRowSet)
+			return;
+		if (!(rs instanceof CachedRowSet crs))
+			return;
+		try {
+			if (crs.getKeyColumns() != null)
+				return;
+			String tableName = crs.getMetaData().getTableName(comp.getBoundColumnIndex());
+			Set<Integer> key = getPrimaryKeyColumnsForTable(
+					SSDBSupport.getDefault().getTemporaryConnection(crs), tableName);
+			crs.setKeyColumns(key.stream().mapToInt(i -> i).toArray());
+		} catch (SQLException ex) {
+		}
+	}
+
+	//public static Set<Integer> getPrimaryKeyColumnsForTable(RowSet rs, int columnIndex)
+	//		throws SQLException
+	//{
+	//	String tableName = rs.getMetaData().getTableName(2);
+	//	DataSource ds = null;
+	//	try {
+	//		ds = InitialContext.doLookup(rs.getDataSourceName());
+	//	} catch (NamingException ex) {
+	//		ex.printStackTrace();
+	//	}
+	//	if(ds == null)
+	//		return Collections.emptySet();
+	//	try (Connection conn = ds.getConnection()) {
+	//		return SSUtils.getPrimaryKeyColumnsForTable(conn, tableName);
+	//	}
+	//}
+
+	// https://stackoverflow.com/questions/21328371/get-primary-key-column-from-resultset-java
+
+	/**
+	 *
+	 * @param connection
+	 * @param tableName
+	 * @return
+	 * @throws SQLException
+	 */
+
+	public static Set<Integer> getPrimaryKeyColumnsForTable(Connection connection, String tableName) throws SQLException
+	{
+		try(ResultSet pkColumns= connection.getMetaData().getPrimaryKeys(null,null,tableName);) {
+			SortedSet<Integer> pkColumnSet = new TreeSet<>();
+			while(pkColumns.next()) {
+				Integer pkPosition = pkColumns.getInt("KEY_SEQ");
+				//String pkColumnName = pkColumns.getString("COLUMN_NAME");
+				//System.out.println(""+pkColumnName+" is the "+pkPosition+". column of the primary key of the table "+tableName);
+				pkColumnSet.add(pkPosition);
+			}
+			return pkColumnSet;
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////

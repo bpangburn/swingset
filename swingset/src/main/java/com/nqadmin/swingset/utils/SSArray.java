@@ -58,8 +58,8 @@ import java.util.Objects;
  * Implementation of SQL array for SSList.
  */
 
-public class SSArray implements Array {
-	
+public class SSArray implements Array
+{
 	// TODO May be able to eliminate. Only reference is in com.nqadmin.swingset.SSList.
 
 	/**

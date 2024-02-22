@@ -37,6 +37,8 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import com.nqadmin.swingset.demo.MainClass.H2Trace;
+import com.nqadmin.swingset.utils.SSUtils;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import java.io.PrintWriter;
 import java.sql.Array;
@@ -44,7 +46,7 @@ import java.sql.Blob;
 import java.sql.CallableStatement;
 import java.sql.Clob;
 import java.sql.Connection;
-//JDK-9 import java.sql.ConnectionBuilder;
+import java.sql.ConnectionBuilder;
 import java.sql.DatabaseMetaData;
 import java.sql.NClob;
 import java.sql.PreparedStatement;
@@ -54,8 +56,8 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.sql.SQLWarning;
 import java.sql.SQLXML;
 import java.sql.Savepoint;
-//JDK-9 import java.sql.ShardingKey;
-//JDK-9 import java.sql.ShardingKeyBuilder;
+import java.sql.ShardingKey;
+import java.sql.ShardingKeyBuilder;
 import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Map;
@@ -66,6 +68,7 @@ import java.lang.System.Logger;
 import static java.lang.System.Logger.Level.*;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.jdbcx.JdbcDataSource;
+import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 
 /**
  * Provides a data source to use with the demo's naming service.
@@ -75,7 +78,7 @@ public class DataSourcePool {
 
 	/** Data source name for binding lookup.  */
 	public static final String DATA_SOURCE_NAME = "PoolDataSource";
-	private static final Logger logger = System.getLogger(MainClass.class.getName());
+	private static final Logger logger = SSUtils.getLogger();
 
 	private static DataSource ds;
 	private static JdbcConnectionPool cp;
@@ -89,7 +92,8 @@ public class DataSourcePool {
 		if (cp == null) {
 			// Setup the connection pool
 			JdbcDataSource ds01 = new JdbcDataSource();
-			ds01.setURL("jdbc:h2:mem:" + MainClass.DATABASE_NAME);
+			ds01.setURL("jdbc:h2:mem:" + MainClass.DATABASE_NAME
+					+ defLookup(H2Trace.class).getTraceUrlFlags());
 			cp = JdbcConnectionPool.create(ds01);
 			ds = ds01;
 		}
@@ -144,7 +148,9 @@ public class DataSourcePool {
 		}
 
 		@Override
-		public Connection getConnection(String username, String password) throws SQLException {
+		public Connection getConnection(String username, String password)
+				throws SQLException
+		{
 			nOpen++;
 			MyConnection conn = new MyConnection(cp.getConnection(username, password));
 			checkMax();
@@ -161,7 +167,7 @@ public class DataSourcePool {
 
 		////////////////////////////////////////////////////////////////////////
 		//
-		// unmodified delegation
+		// "MyDataSource implements DataSource" unmodified delegation
 		//
 
 		@Override
@@ -195,10 +201,10 @@ public class DataSourcePool {
 		}
 
 		// JDK-9
-		//@Override
-		//public ConnectionBuilder createConnectionBuilder() throws SQLException {
-		//	return delegate.createConnectionBuilder();
-		//}
+		@Override
+		public ConnectionBuilder createConnectionBuilder() throws SQLException {
+			return delegate.createConnectionBuilder();
+		}
 
 		@Override
 		public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
@@ -206,10 +212,10 @@ public class DataSourcePool {
 		}
 
 		// JDK-9
-		//@Override
-		//public ShardingKeyBuilder createShardingKeyBuilder() throws SQLException {
-		//	return delegate.createShardingKeyBuilder();
-		//}
+		@Override
+		public ShardingKeyBuilder createShardingKeyBuilder() throws SQLException {
+			return delegate.createShardingKeyBuilder();
+		}
 	}
 
 	private static class MyConnection implements Connection
@@ -218,12 +224,17 @@ public class DataSourcePool {
 
 		public MyConnection(Connection _delegate) {
 			this.delegate = _delegate;
+			logger.log(TRACE, () -> sf("open connection: %s - %s",
+					SSUtils.objectID(delegate), delegate));
 		}
 
 		// Count the closes
 		@Override
+		@SuppressWarnings("ConvertToTryWithResources")
 		public void close() throws SQLException {
 			nClose++;
+			logger.log(TRACE, () -> sf("close connection: %s - %s",
+					SSUtils.objectID(delegate), delegate));
 			delegate.close();
 		}
 
@@ -251,7 +262,7 @@ public class DataSourcePool {
 
 		////////////////////////////////////////////////////////////////////////
 		//
-		// unmodified delegation
+		// "MyConnection implements Connection" unmodified delegation
 		//
 
 		@Override
@@ -510,35 +521,35 @@ public class DataSourcePool {
 		}
 
 		// JDK-9
-		// @Override
-		// public void beginRequest() throws SQLException {
-		// 	delegate.beginRequest();
-		// }
+		@Override
+		public void beginRequest() throws SQLException {
+			delegate.beginRequest();
+		}
 
-		// @Override
-		// public void endRequest() throws SQLException {
-		// 	delegate.endRequest();
-		// }
+		@Override
+		public void endRequest() throws SQLException {
+			delegate.endRequest();
+		}
 
 		// JDK-9
-		// @Override
-		// public boolean setShardingKeyIfValid(ShardingKey shardingKey, ShardingKey superShardingKey, int timeout) throws SQLException {
-		// 	return delegate.setShardingKeyIfValid(shardingKey, superShardingKey, timeout);
-		// }
+		@Override
+		public boolean setShardingKeyIfValid(ShardingKey shardingKey, ShardingKey superShardingKey, int timeout) throws SQLException {
+			return delegate.setShardingKeyIfValid(shardingKey, superShardingKey, timeout);
+		}
 
-		// @Override
-		// public boolean setShardingKeyIfValid(ShardingKey shardingKey, int timeout) throws SQLException {
-		// 	return delegate.setShardingKeyIfValid(shardingKey, timeout);
-		// }
+		@Override
+		public boolean setShardingKeyIfValid(ShardingKey shardingKey, int timeout) throws SQLException {
+			return delegate.setShardingKeyIfValid(shardingKey, timeout);
+		}
 
-		// @Override
-		// public void setShardingKey(ShardingKey shardingKey, ShardingKey superShardingKey) throws SQLException {
-		// 	delegate.setShardingKey(shardingKey, superShardingKey);
-		// }
+		@Override
+		public void setShardingKey(ShardingKey shardingKey, ShardingKey superShardingKey) throws SQLException {
+			delegate.setShardingKey(shardingKey, superShardingKey);
+		}
 
-		// @Override
-		// public void setShardingKey(ShardingKey shardingKey) throws SQLException {
-		// 	delegate.setShardingKey(shardingKey);
-		// }
+		@Override
+		public void setShardingKey(ShardingKey shardingKey) throws SQLException {
+			delegate.setShardingKey(shardingKey);
+		}
 	}
 }

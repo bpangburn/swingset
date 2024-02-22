@@ -48,6 +48,7 @@ import java.util.Map;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.spi.SyncProviderException;
 
 import com.google.common.collect.MapMaker;
 
@@ -125,16 +126,30 @@ public class RowSetState
 	 * @param runAfterChanges execute if not null
 	 * @throws SQLException
 	 */
+	//
+	// TODO: Flag to always runAfterChanges
+	//		 Maybe instead of runnable,
+	//		 something that contains the flag,
+	//		 something that can throw SQLException
+	//
 	public static void acceptChanges(CachedRowSet _crs, Runnable runAfterChanges) throws SQLException {
+		SQLException sqlEx = null;
 		try {
 			setAcceptingChanges(_crs, true);
 			_crs.acceptChanges();
-			if (runAfterChanges != null) {
-				runAfterChanges.run();		// assume if acceptChanges throws, don't need "code"
-			}
+			//if (runAfterChanges != null) {
+			//	runAfterChanges.run();		// assume if acceptChanges throws, don't need "code"
+			//}
+		} catch(SyncProviderException ex) {
+			sqlEx = ex;
 		} finally {
+			if (runAfterChanges != null) {
+				runAfterChanges.run();
+			}
 			setAcceptingChanges(_crs, false);
 		}
+		if (sqlEx != null)
+			throw sqlEx;
 	}
 
 	/**

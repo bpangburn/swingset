@@ -6,6 +6,7 @@
 package com.nqadmin.swingset.demo;
  
 import com.nqadmin.rowset.JdbcRowSetImpl;
+import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 import java.awt.Point;
 import java.io.BufferedReader;  
 import java.io.IOException;
@@ -34,6 +35,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -229,6 +231,12 @@ public class DemoUtil {
 			case POOL_CACHED:
 				rs = RowSetProvider.newFactory().createCachedRowSet();
 				rs.setDataSourceName(DataSourcePool.DATA_SOURCE_NAME);
+				//
+				// TODO: H2 connection bug workaround, check H2 version
+				//
+				// Workaround for H2 Connection bug, see
+				// https://github.com/h2database/h2database/issues/4010
+				rs.setTypeMap(Collections.emptyMap());
 				logger.log(DEBUG, () -> "DataSource: " + DataSourcePool.DATA_SOURCE_NAME);
 				break;
 			case NQADMIN:
@@ -758,6 +766,8 @@ public class DemoUtil {
 	 */
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static boolean loadBinaries(Connection conn, String resourceName, String sql, boolean verbose) {
+		if(defLookup(MainClass.LoadDemoImages.class) == null)
+			return false;
 		boolean ok = false;
 
 		try (InputStream stream = MainClass.class.getResourceAsStream(resourceName)) {
