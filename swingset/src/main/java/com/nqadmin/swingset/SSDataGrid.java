@@ -58,7 +58,6 @@ import java.util.EventObject;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
-import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -92,6 +91,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.models.SimpleComboListSwingModels;
+import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSUtils;
 
 // SSDataGrid.java
@@ -529,40 +529,28 @@ public class SSDataGrid extends JTable {
 
 
 		/**
-		 * RETURNS A DATE OBJECT REPRESENTING THE VALUE IN THE CELL.
+		 * RETURNS A DATE OBJECT REPRESENTING THE "MM/dd/yyyy" VALUE IN THE CELL.
 		 * @return sql date
 		 */
 		@Override
 		public Object getCellEditorValue() {
 			final String strDate = ((JTextField) (DateEditor.this.getComponent())).getText();
-			// IF THE FIELD IS EMPTY RETURN NULL
-			if ((strDate == null) || "".equals(strDate.trim())) {
-				return null;
-			}
-			final StringTokenizer strtok = new StringTokenizer(strDate, "/", false);
-			final Calendar calendar = Calendar.getInstance();
-			calendar.set(Calendar.MONTH, Integer.parseInt(strtok.nextToken()) - 1);
-			calendar.set(Calendar.DATE, Integer.parseInt(strtok.nextToken()));
-			calendar.set(Calendar.YEAR, Integer.parseInt(strtok.nextToken()));
-			return new Date(calendar.getTimeInMillis());
+			return SSCommon.getSQLDate(strDate);
 		}
 
 		/**
 		 * RETURNS THE TEXTFIELD WITH THE GIVEN DATE IN THE TEXTFIELD
-		 * (AFTER THE FORMAT IS CHANGED TO MM/DD/YYYY
+		 * (AFTER THE DATE IS CHANGED TO "MM/DD/YYYY")
 		 * {@inheritDoc}
 		 */
 		@Override
-		public synchronized Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected,
+		public synchronized Component getTableCellEditorComponent(
+				final JTable table, final Object _value, final boolean isSelected,
 				final int row, final int column) {
 
+			Object value = _value;
 			if (value instanceof Date) {
-				final Date date = (Date) value;
-				final GregorianCalendar calendar = new GregorianCalendar();
-				calendar.setTime(date);
-				final String strDate = "" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH)
-						+ "/" + calendar.get(Calendar.YEAR);
-				return super.getTableCellEditorComponent(table, strDate, isSelected, row, column);
+				value = SSCommon.getStringDate((Date) value);
 			}
 
 			return super.getTableCellEditorComponent(table, value, isSelected, row, column);
@@ -604,11 +592,7 @@ public class SSDataGrid extends JTable {
 		@Override
 		public void setValue(final Object value) {
 			if (value instanceof java.sql.Date) {
-				final Date date = (Date) value;
-				final GregorianCalendar calendar = new GregorianCalendar();
-				calendar.setTime(date);
-				final String strDate = "" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH)
-						+ "/" + calendar.get(Calendar.YEAR);
+				String strDate = SSCommon.getStringDate((Date) value);
 				setHorizontalAlignment(SwingConstants.CENTER);
 				setText(strDate);
 			} else {
