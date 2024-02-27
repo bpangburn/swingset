@@ -385,7 +385,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon = new SSCommon(this);
+	transient protected final SSCommon ssCommon = new SSCommon(this);
 
 //	/**
 //	 * List item used to workaround GlazedList CONTAINS bug/glitch.
@@ -1047,15 +1047,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	@Override
 	public SSBaseComboBoxListener getSSComponentListener() {
 		return new SSBaseComboBoxListener();
-	}
-
-	/**
-	 * {@inheritDoc }
-	 */
-	@Override
-	public void setSSCommon(final SSCommon _ssCommon) {
-		ssCommon = _ssCommon;
-
 	}
 
 	/**
