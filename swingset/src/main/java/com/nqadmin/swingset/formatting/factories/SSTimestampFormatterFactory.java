@@ -35,39 +35,34 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
-package com.nqadmin.swingset.formatting;
+package com.nqadmin.swingset.formatting.factories;
 
-import com.nqadmin.swingset.formatting.factories.SSSSNFormatterFactory;
+import java.text.SimpleDateFormat;
 
-// SSCurrencyField.java
+import javax.swing.text.DateFormatter;
+
+// SSTimestampFormatterFactory.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * Used to link a SSFormattedTextField to a US Social Security Number column in
- * a database.
+ * SSTimestampFormatterFactory extends DefaultFormatterFactory for timestamp fields.
  */
-public class SSSSNField extends SSFormattedTextField {
+public class SSTimestampFormatterFactory extends javax.swing.text.DefaultFormatterFactory {
 
-	/**
+    /**
 	 * unique serial id
 	 */
-	private static final long serialVersionUID = -8330641913621926923L;
+	private static final long serialVersionUID = 1206910593127977868L;
 
 	/**
-	 * Creates a new instance of SSSSNField
-	 */
-	public SSSSNField() {
-		this(new SSSSNFormatterFactory());
-	}
-
-	/**
-	 * Creates an object of SSSSNField with the specified formatter factory
-	 *
-	 * @param factory - formatter factory to be used
-	 */
-	public SSSSNField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
-		super(factory);
-	}
+     * Creates an instance of SSTimestampFormatterFactory
+     * the display format used is dd/MM/yyyy hh:mm:ss SSS Z and the edit format is ddMMyyyyHHmmssSSSZ
+     */
+    public SSTimestampFormatterFactory() {
+        setDefaultFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss SSS Z")));
+        setNullFormatter(null);
+        setEditFormatter(new DateFormatter(new SimpleDateFormat("ddMMyyyyHHmmssSSSZ")));
+        setDisplayFormatter(new DateFormatter(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss SSS Z")));
+    }
 }
-

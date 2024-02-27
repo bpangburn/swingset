@@ -40,6 +40,8 @@ package com.nqadmin.swingset.formatting;
 import javax.swing.text.Caret;
 import javax.swing.text.DefaultCaret;
 
+import com.nqadmin.swingset.formatting.factories.SSCuitFormatterFactory;
+
 // SSCuitField.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
