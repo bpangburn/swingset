@@ -332,6 +332,35 @@ public class RowSetOps {
 		return getJDBCType(getColumnType(_resultSet, _columnName));
 	}
 
+	/**
+	 * Retrieve the Java Class corresponding to the designated column
+	 * based on the column name.
+	 * 
+	 * @param _columnName - name of the column
+	 *
+	 * @param _resultSet ResultSet on which to operate
+	 * @return
+	 * @throws SQLException
+	 */
+	public static Class<?> getClassColumnType(final ResultSet _resultSet, final String _columnName) throws SQLException {
+		return getClassColumnType(_resultSet, getColumnIndex(_resultSet, _columnName));
+	}
+
+	/**
+	 * Retrieve the Java Class corresponding to the designated column
+	 * based on the column index (starting from 1).
+	 * 
+	 * @param _columnIndex - index of the column
+	 *
+	 * @param _resultSet ResultSet on which to operate
+	 * @return
+	 * @throws SQLException
+	 */
+	public static Class<?> getClassColumnType(final ResultSet _resultSet, final int _columnIndex) throws SQLException {
+		JDBCType type = RowSetOps.getJDBCColumnType(_resultSet, _columnIndex);
+		return RowSetOps.findJavaTypeClass(type);
+	}
+
 	private static final EnumSet<JDBCType> textUpdateEmptyOK = EnumSet.of(
 			JDBCType.CHAR,
 			JDBCType.VARCHAR,
@@ -469,7 +498,7 @@ public class RowSetOps {
 		case BOOLEAN:
 		case BIT:
 			// CONVERT THE GIVEN STRING TO BOOLEAN TYPE
-			final boolean boolValue = Boolean.valueOf(_updatedValue);
+			final boolean boolValue = Boolean.parseBoolean(_updatedValue);
 			_rowSet.updateBoolean(_columnName, boolValue);
 			break;
 			
@@ -588,7 +617,7 @@ public class RowSetOps {
 
 	// TODO: for override of type mapping for local/dbms requirements
 	// with_timezone might be the perfect candidates
-	private static final EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType = new EnumMap<JDBCType, Class<?>>(JDBCType.class);
+	private static final EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType = new EnumMap<>(JDBCType.class);
 	/**
 	 * Determine the Java type class for the given database type.
 	 * @param _jdbcType JDBCType of interest

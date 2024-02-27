@@ -111,6 +111,9 @@ import com.nqadmin.swingset.utils.SSUtils;
  * this interface also provides a way to specify what kind of information is
  * valid for each cell.
  * <p>
+ * SSDataGrid maps Control-X to delete multiple selected rows.
+ * Adds copy/paste handling of rectangular regions.
+ * <p>
  * SSDataGrid uses the isCellEditable() method in SSCellEditing to determine if
  * a cell is editable or not. The cellUpdateRequested() method of SSCellEditing
  * is used to notify a user program when an update is requested. While doing so
@@ -172,6 +175,10 @@ import com.nqadmin.swingset.utils.SSUtils;
  */
 
 public class SSDataGrid extends JTable {
+
+	// TODO BUG? there's no programatic way to change COPY/PASTE.
+	//		For example to do keyAdapter.setAlloowInsertaion false.
+	// TODO Add documentation for CUT/PASTE keys/operation.
 
 	// TODO Add support for JFormattedTextField.
 	// TODO Add support for GlazedList table features.
@@ -328,9 +335,8 @@ public class SSDataGrid extends JTable {
 
 			final GridComboModels.GridComboItem item = getComponent().getGridSelItem();
 
-			// TODO: -1 seems weird, why not 0?
 			if(item == null) {
-				return underlyingValues != null ? underlyingValues[0] : -1;
+				return underlyingValues != null ? underlyingValues[0] : null;
 			}
 
 			logger.trace(() -> String.format("Item %s:%s",
@@ -341,12 +347,9 @@ public class SSDataGrid extends JTable {
 		protected int getIndexOf(final Object _value) {
 			if (underlyingValues == null) {
 				// IF THE VALUE IS NULL THEN SET THE DISPLAY ON THE COMBO TO BLANK (INDEX -1)
-				// TODO: does this have to be null compatible?
 				if (_value == null) {
 					return -1;
 				}
-				// TODO: Could the following extract a class cast exception?
-				//		 Guess not, since null underlyingVals means int
 				return ((Integer) _value);
 			}
 			for (int i = 0; i < underlyingValues.length; i++) {
@@ -674,6 +677,9 @@ public class SSDataGrid extends JTable {
 		 * Value of the editor.
 		 */
 		// TODO: get rid of value, see getCellEditorValue/stopCellEditing
+		//		 We could probably create a new method getCellValue and use
+		//		 initial part of stopCellEditing code in it and then call
+		//		 this new funds getCellEditorValue and in stopCellEditing.
 		transient Object value;
 
 		/**
@@ -690,7 +696,6 @@ public class SSDataGrid extends JTable {
 		/**
 		 * Returns the cell value.
 		 */
-		// TODO: get rid of value, put the stop Cell Editing code here.
 		@Override
 		public Object getCellEditorValue() {
 			return value;
@@ -816,8 +821,14 @@ public class SSDataGrid extends JTable {
 	 * Constructs an empty data grid.
 	 */
 	public SSDataGrid() {
-		super(new SSTableModel());
+		messageWindow = this;
 		init();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	protected SSTableModel createDefaultDataModel() {
+		return new SSTableModel();
 	}
 
 	/**
@@ -841,16 +852,26 @@ public class SSDataGrid extends JTable {
 	}
 
 	/**
-	 * Create row sorter as needed.
-	 * @param _dataModel table model to set
-	 * @throws IllegalArgumentException if would change SSTableModel
+	 * Do not use; can not change the model.
+	 * @param _dataModel not used
+	 * @throws IllegalStateException if would change SSTableModel
 	 */
 	@Override
 	public void setModel(TableModel _dataModel) {
-		// TODO: Support setModel to change SSTableModel?
-		if(super.getModel() instanceof SSTableModel)
-			throw new IllegalArgumentException("Can not change SSTableModel");
-		super.setModel(_dataModel);
+		if (!(_dataModel instanceof SSTableModel)) {
+			throw new IllegalArgumentException("Must be an SSTableModel");
+		}
+
+		if (getModel() == null) {
+			super.setModel(_dataModel);
+		} else {
+			throw new IllegalStateException("Can not change SSTableModel");
+		}
+
+		// Alternate implementation (untested) that allows changing
+		// an existing SSTable model.
+		// must also propogate messageWindow
+		// super.setModel(_dataModel);
 	}
 
 	private class Sorter extends TableRowSorter<SSTableModel> {
@@ -951,7 +972,6 @@ public class SSDataGrid extends JTable {
 
 			// SPECIFY THE SSROWSET TO THE TABLE MODEL.
 			getModel().setRowSet(rowSet);
-			getModel().fireTableStructureChanged();
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.", se);
@@ -961,12 +981,8 @@ public class SSDataGrid extends JTable {
 		// DOES NOT MATCH WITH THE OLD COLUMNS.
 		createDefaultColumnModel();
 
-		// HIDE COLUMNS AS NEEDED - ALSO CALLS updateUI()
+		// HIDE COLUMNS AS NEEDED
 		hideColumns();
-
-		// UPDATE DISPLAY
-		// updateUI();
-
 	} // end protected void bind() {
 
 	/**
@@ -1181,25 +1197,23 @@ public class SSDataGrid extends JTable {
 				}
 				final int[] rows = getSelectedRows();
 				// CONFIRM THE DELETION
-				// TODO: why not: "JOptionPane.showConfirmDialog(this, ..."
-				//		 Is this for a "confirm flag"?
-				if (messageWindow != null) {
-					final int returnValue = JOptionPane.showConfirmDialog(messageWindow,
-							"You are about to delete " + rows.length + " rows. "
-									+ "\nAre you sure you want to delete the rows?");
-					if (returnValue != JOptionPane.YES_OPTION) {
-						return;
-					}
+				final int returnValue = JOptionPane.showConfirmDialog(messageWindow,
+						"You are about to delete " + rows.length + " rows. "
+								+ "\nAre you sure you want to delete the rows?");
+				if (returnValue != JOptionPane.YES_OPTION) {
+					return;
 				}
+				// Convert visual row numbers to model row numbers
+				for (int i = 0; i < rows.length; ++i) {
+					rows[i] = convertRowIndexToModel(rows[i]);
+				}
+				Arrays.sort(rows);
 				// Delete in reverse order so row numbers don't change while deleting
 				for (int i = rows.length - 1; i >= 0; i--) {
-					getModel().deleteRow(convertRowIndexToModel(rows[i]));
+					getModel().deleteRow(rows[i]);
 				}
-				//updateUI(); // TODO: test 
 			}
 		});
-
-		// TODO: why is this copy/paste thing needed?
 
 		// CREATE AN INSTANCE OF KEY ADAPTER ADD PROVIDE THE PRESET GRID TO THE ADAPTER.
 		// THIS IS FOR COPY AND PASTE SUPPORT
@@ -1476,8 +1490,7 @@ public class SSDataGrid extends JTable {
 	 * width of these columns to 0. The columns are set to zero width rather than
 	 * removing the column from the table. Thus preserving the column numbering.If a
 	 * column is removed then the column numbers for columns after the removed
-	 * column will change. Even if the column is specified as hidden user will be
-	 * seeing a tiny strip. Make sure that you specify the hidden column numbers in
+	 * column will change. Make sure that you specify the hidden column numbers in
 	 * the uneditable column list.
 	 * <p>
 	 * Currently not a bean property since there is no associated variable.
@@ -1567,9 +1580,7 @@ public class SSDataGrid extends JTable {
 		getModel().setInsertion(_insertion);
 		if(!insertion) // add sorter after events for removing rows
 			checkCreateAddSorter(false);
-		// TODO: moved fire after the changes; is that right?
 		firePropertyChange("insertion", oldValue, insertion);
-		//updateUI();
 	}
 
 	/**
@@ -1580,9 +1591,8 @@ public class SSDataGrid extends JTable {
 	 *                       messages
 	 */
 	public void setMessageWindow(final Component _messageWindow) {
-		// TODO: Why does this exist? Is it used?
 		final Component oldValue = messageWindow;
-		messageWindow = _messageWindow;
+		messageWindow = _messageWindow != null ? _messageWindow : this;
 		firePropertyChange("messageWindow", oldValue, messageWindow);
 		getModel().setMessageWindow(messageWindow);
 	}
