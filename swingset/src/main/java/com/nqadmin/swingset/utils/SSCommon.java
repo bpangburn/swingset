@@ -381,7 +381,7 @@ public class SSCommon {
 	/**
 	 * parent SwingSet component
 	 */
-	transient private SSComponentInterface ssComponent = null;
+	final private SSComponentInterface ssComponent;
 
 	/**
 	 * database connection
