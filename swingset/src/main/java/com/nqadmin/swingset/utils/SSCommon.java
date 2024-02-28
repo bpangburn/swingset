@@ -171,6 +171,11 @@ public class SSCommon {
 						ok = setBoundColumnText(((JTextComponent) getSSComponent()).getText());
 					} finally {
 						if (!ok) {
+							// TODO:
+							// How about moving a state tracking variable to
+							// add/removeSSDocumentListener()?
+							// addSSDocumentListener() then uses listenerNeedsRestoration.
+
 							// restore previous text value
 							if(previousValue != null) {
 								if (ssComponentListenerAdded) {

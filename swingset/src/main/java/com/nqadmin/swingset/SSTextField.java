@@ -300,7 +300,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 			 DEFAULT_MASK, DEFAULT_NUMBER_OF_DECIMAL_PLACES, ANY_ALIGNMENT);
 	}
 
-	/** All the contructors feed through here */
+	/** All the constructors feed through here */
 	private SSTextField(String _text, final RowSet _rowSet, final String _boundColumnName,
 	final int _mask, final int _numberOfDecimalPlaces, final int _align) {
 		super(_text);
@@ -319,7 +319,12 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	/** Only non-null during object construction. */
 	transient private SSCommon constructingSSCommon;
 
-	/** For capturing text before modification */
+	/**
+	 * The following is called during JTextField's constructor and the ssCommon
+	 * is needed to create the document model. So we use constructingSSCommon()
+	 * to stash ssCommon in the constructingSSCommon variable, then during
+	 * SSTextField's constructor we save it in its final location.
+	 */
 	@Override
 	protected Document createDefaultModel() {
 		return constructingSSCommon().new SSPlainDocument();
