@@ -47,7 +47,6 @@ import javax.swing.JFrame;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDataGrid;
 import java.awt.BorderLayout;
 
@@ -127,7 +126,7 @@ public class Example5 extends JFrame {
 		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
 			try {
 			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-				rowset = new JdbcRowSetImpl(connection);
+				rowset = DemoUtil.getNewRowSet(connection);
 				rowset.setCommand("SELECT * FROM part_data ORDER BY part_name;");
 
 			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET

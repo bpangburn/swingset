@@ -66,12 +66,15 @@ import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSBaseComboBox;
 import com.nqadmin.swingset.SSCheckBox;
+import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSImage;
 import com.nqadmin.swingset.SSLabel;
 import com.nqadmin.swingset.SSList;
 import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
+
+import static com.nqadmin.swingset.SSDataNavigator.isAcceptingChanges;
 
 // SSCommon.java
 //
@@ -184,7 +187,9 @@ public class SSCommon {
 
 	/**
 	 * Listener(s) for the underlying RowSet used to update the bound SwingSet
-	 * component.
+	 * component. When working with a {@linkplain javax.sql.rowset.CachedRowSet} there are
+	 * extra steps involved which require the listener to ignore some events,
+	 * see {@link SSDataNavigator#acceptChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable) }.
 	 */
 	protected class SSRowSetListener implements RowSetListener, Serializable {
 		/**
@@ -204,6 +209,9 @@ public class SSCommon {
 		 */
 		@Override
 		public void cursorMoved(final RowSetEvent event) {
+			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
+				return;
+			}
 			logger.trace("{} - RowSet cursor moved.", () -> getColumnForLog());
 			//updateSSComponent();
 			performUpdates();
@@ -228,6 +236,9 @@ public class SSCommon {
 		 */
 		@Override
 		public void rowChanged(final RowSetEvent event) {
+			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
+				return;
+			}
 			logger.trace("{} - RowSet row changed.", () -> getColumnForLog());
 //			if (!getRowSet().isUpdatingRow()) {
 //				updateSSComponent();
@@ -241,6 +252,9 @@ public class SSCommon {
 		 */
 		@Override
 		public void rowSetChanged(final RowSetEvent event) {
+			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
+				return;
+			}
 			logger.trace("{} - RowSet changed.", () -> getColumnForLog());
 			//updateSSComponent();
 			performUpdates();
@@ -352,7 +366,7 @@ public class SSCommon {
 	 * of the bound column. False when there's a "NOT NULL" constraint.
 	 * Empty if the metadata specifies unknown.
 	 */
-	private Optional<Boolean> isNullable = Optional.empty();
+	transient private Optional<Boolean> isNullable = Optional.empty();
 
 	// /**
 	//  * Column SQL data type.
@@ -367,17 +381,17 @@ public class SSCommon {
 	/**
 	 * parent SwingSet component
 	 */
-	private final SSComponentInterface ssComponent;
+	final private SSComponentInterface ssComponent;
 
 	/**
 	 * database connection
 	 */
-	private Connection connection = null;
+	transient private Connection connection = null;
 
 	/**
 	 * RowSet from which component will get/set values.
 	 */
-	private RowSet rowSet = null;
+	transient private RowSet rowSet = null;
 	
 	/**
 	 * Indicates if rowset listener is added (or removed)
@@ -1034,6 +1048,16 @@ public class SSCommon {
 
 		addSSComponentListener();
 
+	}
+
+	/**
+	 * Issue a row changed event if there's an active RowSetListener.
+	 */
+	public void issueRowChanged() {
+		if(rowSetListenerAdded) {
+			// TODO: could create a valid event, but since it is not used...
+			rowSetListener.rowChanged(null);
+		}
 	}
 
 }

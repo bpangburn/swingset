@@ -48,6 +48,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.sql.RowSet;
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.spi.SyncProviderException;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -229,7 +231,7 @@ public class SSTableModel extends AbstractTableModel {
 					return false;
 				}
 				rowset.absolute(_row + 1);
-				rowset.deleteRow();
+				RowSetOps.deleteRow(rowset);
 				rowCount--;
 				if (dataGridHandler != null) {
 					dataGridHandler.performPostDeletionOps(_row);
@@ -547,7 +549,7 @@ public class SSTableModel extends AbstractTableModel {
 				logger.warn("SSTableModel.setValueAt(): Unknown data type.");
 			}
 
-			rowset.insertRow();
+			RowSetOps.insertRow(rowset);
 			if (rowCount != 0) {
 				rowset.moveToCurrentRow();
 			} else {
@@ -1005,7 +1007,7 @@ public class SSTableModel extends AbstractTableModel {
 			default:
 				logger.warn("Unknown data type of " + type);
 			}
-			rowset.updateRow();
+			RowSetOps.updateRow(rowset);
 
 			logger.debug("Updated value: {}.", () -> getValueAt(_row,_column));
 		} catch (final SQLException se) {
