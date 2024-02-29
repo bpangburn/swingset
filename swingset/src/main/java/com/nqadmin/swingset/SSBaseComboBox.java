@@ -1224,4 +1224,13 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		trackout.add(s);
 		System.err.println(s);
 	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("%s{item=%s, %s}", getClass().getSimpleName(),
+				getSelectedItem(), SSUtils.ssComponentToString(this));
+	}
+
 }

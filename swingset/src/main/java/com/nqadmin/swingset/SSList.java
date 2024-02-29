@@ -501,4 +501,13 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 			remodel.clear();
 		}
 	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("%s{items=%s, %s}", getClass().getSimpleName(),
+				getSelectedMappings(), SSUtils.ssComponentToString(this));
+	}
+
 }

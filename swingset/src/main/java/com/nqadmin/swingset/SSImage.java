@@ -74,8 +74,11 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 /**
  * Used to load, store, and display images stored in a database.
  */
-public class SSImage extends JPanel implements SSComponentInterface {
-
+@SuppressWarnings("serial")
+public class SSImage extends JPanel implements SSComponentInterface
+{
+	// TODO: try to get this initialized
+	private String fName = "";
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
 	 * database column
@@ -112,6 +115,8 @@ public class SSImage extends JPanel implements SSComponentInterface {
 							lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
 							lblImage.setIcon(img);
 							lblImage.setText("");
+							fName = inFile.getPath();
+							// TODO: why is updateUI here?
 							updateUI();
 						}
 					} else {
@@ -133,11 +138,6 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = SSUtils.getLogger();
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -2726746843832259767L;
 
 	/**
 	 * Button to update the image.
@@ -320,6 +320,14 @@ public class SSImage extends JPanel implements SSComponentInterface {
 		// TODO Confirm updateUI is needed here.
 		updateUI();
 
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("%s{file=%s, %s}", getClass().getSimpleName(),
+				fName, SSUtils.ssComponentToString(this));
 	}
 
 }

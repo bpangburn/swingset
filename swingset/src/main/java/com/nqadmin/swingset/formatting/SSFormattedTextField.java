@@ -715,4 +715,13 @@ public class SSFormattedTextField extends JFormattedTextField
 		//
 		//SSMaskFormatterFactory.adjustNullFormatter(this);
 	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("%s{text=%s, %s}", getClass().getSimpleName(),
+				getText(), SSUtils.ssComponentToString(this));
+	}
+
 }

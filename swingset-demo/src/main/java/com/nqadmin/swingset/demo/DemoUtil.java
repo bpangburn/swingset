@@ -231,12 +231,15 @@ public class DemoUtil {
 			case POOL_CACHED:
 				rs = RowSetProvider.newFactory().createCachedRowSet();
 				rs.setDataSourceName(DataSourcePool.DATA_SOURCE_NAME);
-				//
-				// TODO: H2 connection bug workaround, check H2 version
-				//
-				// Workaround for H2 Connection bug, see
-				// https://github.com/h2database/h2database/issues/4010
-				rs.setTypeMap(Collections.emptyMap());
+				if(defLookup(MainClass.H2Workaround.class) != null) {
+					//
+					// TODO: H2 connection bug workaround, check H2 version
+					//
+					// Workaround for H2 Connection bug, see
+					// https://github.com/h2database/h2database/issues/4010
+					rs.setTypeMap(Map.of());
+					logger.log(INFO, () -> "H2Workaround: rs.setTypeMap(Map.of())");
+				}
 				logger.log(DEBUG, () -> "DataSource: " + DataSourcePool.DATA_SOURCE_NAME);
 				break;
 			case NQADMIN:

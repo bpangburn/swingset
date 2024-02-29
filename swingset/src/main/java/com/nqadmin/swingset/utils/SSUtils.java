@@ -216,6 +216,16 @@ public class SSUtils {
 	//
 
 	/**
+	 * This is for toString() of an SSComponent, rather than the JComponents string.
+	 * @param comp string for this
+	 * @return string from component
+	 */
+	public static String ssComponentToString(SSComponentInterface comp)
+	{
+		return sf("%s, column=%s", objectID(comp.getRowSet()), comp.getBoundColumnName());
+	}
+
+	/**
 	 * Return a unique name for an Object, for example "String@89AB".
 	 * Name is SimpleClassName followed by identityHashCode in hex.
 	 * Used primarily for debug messages.

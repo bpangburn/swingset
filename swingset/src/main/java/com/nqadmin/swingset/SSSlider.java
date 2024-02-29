@@ -218,4 +218,11 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("%s{value=%s, %s}", getClass().getSimpleName(),
+				getValue(), SSUtils.ssComponentToString(this));
+	}
 } // end public class SSSlider extends JSlider

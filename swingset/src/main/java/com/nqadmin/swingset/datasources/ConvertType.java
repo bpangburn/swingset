@@ -57,6 +57,8 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  */
 public class ConvertType
 {
+	private ConvertType() { }
+
 	/** 
 	 * Convert the specified object to the object type
 	 * for the specified JDBCType.

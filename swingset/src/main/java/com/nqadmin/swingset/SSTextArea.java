@@ -150,4 +150,12 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 		setText(text);
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("%s{text=%s, %s}", getClass().getSimpleName(),
+				getText(), SSUtils.ssComponentToString(this));
+	}
+
 } // end public class SSTextArea extends JTextArea {

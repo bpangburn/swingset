@@ -50,7 +50,6 @@ import javax.sql.RowSet;
 
 import java.sql.Connection;
 
-import javax.sql.rowset.CachedRowSet;
 import javax.swing.JComponent;
 
 import com.nqadmin.swingset.decorators.Validator;

@@ -45,7 +45,6 @@ import javax.sql.RowSet;
 import javax.swing.JCheckBox;
 
 import java.lang.System.Logger;
-import java.sql.JDBCType;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
 
@@ -76,7 +75,7 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 @SuppressWarnings("serial")
 public class SSCheckBox extends JCheckBox implements SSComponentInterface
 {
-	private final boolean useObject = false; // To test read/write technique.
+	private final boolean useObject = true; // To test read/write technique.
 
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
@@ -233,5 +232,13 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 			}
 		}
 	} // end protected void updateSSComponent() {
+
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("SSCheckBox{selected=%s, %s}",
+				isSelected(), SSUtils.ssComponentToString(this));
+	}
 
 } // end public class SSCheckBox

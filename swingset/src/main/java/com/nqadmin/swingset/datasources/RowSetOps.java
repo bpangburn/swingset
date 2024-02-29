@@ -1123,19 +1123,23 @@ public class RowSetOps {
 
 // TODO: Probably a better way to handle date to timestamp conversion. Formatter?
 // 2022-05-31_BP: Probably best to cast to a LocalDateTime and return if that fails.
-				Timestamp timestampValue;
-				try {
-					if (_updatedValue.length() == 19 || _updatedValue.length() > 20) {
-						//System.err.println("TIMESTAMP update: " + _updatedValue);
-						timestampValue = java.sql.Timestamp.valueOf(_updatedValue);
-						_rowSet.updateTimestamp(_columnName, timestampValue);
-					}
-				} catch(IllegalArgumentException ex) {
-					logger.log(WARNING, "updateColumnText: TIMESTAMP: " + ex.getMessage());
-					throw ex;
+			Timestamp timestampValue = null;
+			try {
+				if (_updatedValue.length() == 10) {
+					Date dateValue = SSCommon.getSQLDate(_updatedValue);
+					timestampValue = new Timestamp(dateValue.getTime());
+				} else if (_updatedValue.length() == 19 || _updatedValue.length() > 20) {
+					timestampValue = java.sql.Timestamp.valueOf(_updatedValue);
 				}
-				break;
-
+				if (timestampValue != null) {
+						_rowSet.updateTimestamp(_columnName, timestampValue);
+				}
+			} catch(IllegalArgumentException ex) {
+				logger.log(WARNING, "updateColumnText: TIMESTAMP: " + ex.getMessage());
+				throw ex;
+			}
+			break;
+			
 			case CHAR:
 			case VARCHAR:
 			case LONGVARCHAR:
@@ -1310,8 +1314,11 @@ public class RowSetOps {
 	 * @param type NOT USED, the jdbc driver does the conversion
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	public static void updateColumnObject(RowSet _rowSet, Object _value, int _columnIndex, JDBCType type) throws SQLException {
-		updateColumnObject1(_rowSet, _columnIndex, _value, type);
+	public static void updateColumnObject(RowSet _rowSet, int _columnIndex, Object _value, JDBCType type) throws SQLException {
+		if (Boolean.TRUE)
+			updateColumnObject1(_rowSet, _columnIndex, _value);
+		else
+			updateColumnObject2(_rowSet, _columnIndex, _value, type);
 	}
 
 	/**
@@ -1326,10 +1333,30 @@ public class RowSetOps {
 	 * @param _value string to be type-converted as needed and updated in
 	 *                      underlying RowSet column
 	 * @param _columnIndex   index of the database column
-	 * @param type NOT USED, the jdbc driver does the conversion
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	public static void updateColumnObject1(RowSet _rowSet, int _columnIndex, Object _value, JDBCType type) throws SQLException {
+	public static void updateColumnObject(RowSet _rowSet, int _columnIndex, Object _value) throws SQLException {
+		if (Boolean.TRUE)
+			updateColumnObject1(_rowSet, _columnIndex, _value);
+		else
+			updateColumnObject2(_rowSet, _columnIndex, _value, getJDBCColumnType(_rowSet, _columnIndex));
+	}
+
+	/**
+	 * Update the Grid's RowSet at the specified column index with the given Object value.
+	 * RowSet. Operate on the current row.
+	 * <p>
+	 * When the user changes/edits the SSDataGrid cell this method propagates the
+	 * change to the RowSet. A separate call is required to flush/commit the change
+	 * to the database.
+	 *
+	 * @param _rowSet RowSet on which to operate
+	 * @param _value string to be type-converted as needed and updated in
+	 *                      underlying RowSet column
+	 * @param _columnIndex   index of the database column
+	 * @throws SQLException  thrown if a database error is encountered
+	 */
+	public static void updateColumnObject1(RowSet _rowSet, int _columnIndex, Object _value) throws SQLException {
 		_rowSet.updateObject(_columnIndex, _value);
 	}
 

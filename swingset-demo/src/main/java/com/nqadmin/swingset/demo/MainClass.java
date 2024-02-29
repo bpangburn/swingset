@@ -125,6 +125,7 @@ public class MainClass extends JFrame
 		H2Trace(String flags) { this.flags = flags; }
 		String getTraceUrlFlags() { return flags; }
 	}
+	static class H2Workaround {}
 
 	/**
 	 * ActionListener implementation to call code for each button.
@@ -796,6 +797,7 @@ public class MainClass extends JFrame
 		lkup.add(new LoadDemoImages());
 		lkup.add(new H2Trace());
 		lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
+		lkup.add(new H2Workaround());
 
 		boolean some_error = false;
 		System.err.printf("java:%s vm:%s date:%s os:%s\n",
