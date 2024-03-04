@@ -63,6 +63,7 @@ import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSUtils;
 
+import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
 import static com.nqadmin.swingset.datasources.RowSetOps.updateColumnObject;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
@@ -230,7 +231,7 @@ public class SSTableModel extends AbstractTableModel {
 	public Class<?> getColumnClass(final int _column) {
 		try {
 			JDBCType type = RowSetOps.getJDBCColumnType(rowset, _column + 1);
-			return RowSetOps.findJavaTypeClass(type);
+			return findJavaTypeClass(type);
 			
 		} catch (final SQLException se) {
 			logger.log(DEBUG, "SQL Exception.",  se);

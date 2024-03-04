@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import java.lang.System.Logger;
+
 import static java.lang.System.Logger.Level.*;
 
 import static com.nqadmin.swingset.datasources.RowSetOps.*;
@@ -61,6 +62,8 @@ import java.util.Arrays;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.datasources.ConvertType.castJDBCToJava;
 
 // SSDbArrayModel.java
 //

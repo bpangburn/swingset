@@ -49,6 +49,10 @@ import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.util.EnumMap;
 
+import javax.sql.RowSet;
+
+import static com.nqadmin.swingset.datasources.RowSetOps.getColumnIndex;
+import static com.nqadmin.swingset.datasources.RowSetOps.getJDBCColumnType;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
@@ -58,6 +62,64 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 public class ConvertType
 {
 	private ConvertType() { }
+
+	// TODO: for override of type mapping for local/dbms requirements
+	// with_timezone might be the perfect candidates
+	private static final EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType = new EnumMap<>(JDBCType.class);
+	static { overrideJdbcStandard(); }
+	private static void overrideJdbcStandard()
+	{
+		// The *_WITH_TIMEZONE aren't mentioned in appendix B.1 or B.3
+		overrideJdbcToJavaType.put(JDBCType.TIME_WITH_TIMEZONE,
+								   OffsetTime.class);
+		overrideJdbcToJavaType.put(JDBCType.TIMESTAMP_WITH_TIMEZONE,
+								   OffsetDateTime.class);
+
+		// overrideJdbcToJavaType.put(JDBCType.SMALLINT, Byte.class);
+		// overrideJdbcToJavaType.put(JDBCType.TINYINT, Short.class);
+	}
+
+	/**
+	 * Check if the JDBC column type of as specified can be
+	 * converted to the specified type.
+	 * @param rs row set
+	 * @param name column name
+	 * @param type target type
+	 * @return true if rowset column is convertable to target type
+	 */
+	public static boolean verifyConvertToType(RowSet rs, String name, Class<?> type)
+	{
+		try {
+			return verifyConvertToType(rs, getColumnIndex(rs, name), type);
+		} catch (SQLException ex) {
+			throw new IllegalArgumentException("SQLException", ex);
+		}
+	}
+
+	/**
+	 * Check if the JDBC column type of as specified can be
+	 * converted to the specified type.
+	 * @param rs row set
+	 * @param index column index
+	 * @param type target type
+	 * @return true if rowset column is convertable to target type
+	 */
+	public static boolean verifyConvertToType(RowSet rs, int index, Class<?> type)
+	{
+		JDBCType jdbcType;
+		try {
+			jdbcType = getJDBCColumnType(rs, index);
+		} catch (SQLException ex) {
+			throw new IllegalArgumentException("SQLException", ex);
+		}
+		switch (type.getName()) {
+		case "java.lang.Boolean" -> {
+			switch(jdbcType) {
+			case BIT, BOOLEAN, INTEGER, SMALLINT, TINYINT -> { return true; } }
+		}
+		}
+		throw new IllegalArgumentException(sf("'%s' not convertable to '%s'", jdbcType, type.getName()));
+	}
 
 	/** 
 	 * Convert the specified object to the object type
@@ -92,12 +154,65 @@ public class ConvertType
 	}
 
 	/**
-	 * Determine the Java type class for the given database type.
-	 * @param _jdbcType JDBCType of interest
-	 * @return the class object used for the given type
-	 * @throws SQLException if the JDBCType is not handled
-	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B.3 JDBC Types Mapped to Java Object Types
+	 * Convenience method for getting {@link JDBCType} enum from
+	 * {@link java.sql.Types}.
+	 * <p>
+	 * May perform better than using
+	 * {@link JDBCType#valueOf(java.lang.String) }
+	 * @param sqlType the type to translate
+	 * @return the corresponding JDBCType
 	 */
+	public static JDBCType getJDBCType(int sqlType) {
+		// TODO: can create a map of sqlType to JDBCType if performance issue
+		return JDBCType.valueOf(sqlType);
+	}
+
+	/**
+	 * Copy the elements of the _objects array into into
+	 * an array of the correct type for the {@code JDBCType}d objects.
+	 * <p>
+	 * If an array or even a collection of the accurate type is desired,
+	 * you can do the follow which is type safe, no compiler warnings.
+	 * There will be an exception if something is afoul.
+	 * <pre>
+	 * {@code
+	 * Object[] arr = f(); // But I "know" the elements are Integer
+	 * Integer[] newarr = (Integer[]) castJDBCToJava(JDBCType.INTEGER, arr);
+	 * List<Integer> properList = Arrays.asList(newarr);
+	 * }
+	 * </pre>
+	 * @param _objects array of objects to cast
+	 * @param _jdbcType cast objects to this JDBCType
+	 * @return array of corresponding type to the cast input objects
+	 * @throws SQLException This exception wraps a {@code ClassCastException}
+	 */
+	public static Object[] castJDBCToJava(final JDBCType _jdbcType, final Object[] _objects) throws SQLException {
+		Class<?> clazz = findJavaTypeClass(_jdbcType);
+		Object[] newArray = (Object[]) java.lang.reflect.Array.newInstance(clazz, _objects.length);
+		try {
+			System.arraycopy(_objects, 0, newArray, 0, _objects.length);
+		} catch(ArrayStoreException ex) {
+			throw new SQLException(ex);
+		}
+		return newArray;
+	}
+
+	/**
+	 * Cast the object to {@code JDBCType}. The idea is to verify
+	 * the the object is of the correct type.
+	 * @param _object object to cast
+	 * @param _jdbcType cast object to this JDBCType
+	 * @return Essentially the same Object that was input
+	 * @throws SQLException This exception wraps a {@code ClassCastException}
+	 */
+	public static Object castJDBCToJava(final JDBCType _jdbcType, final Object _object) throws SQLException {
+		try {
+			return findJavaTypeClass(_jdbcType).cast(_object);
+		} catch (ClassCastException ex) {
+			throw new SQLException(ex);
+		}
+	}
+
 	/**
 	 * Determine the Java type class for the given database type.
 	 * @param _jdbcType JDBCType of interest
@@ -106,7 +221,8 @@ public class ConvertType
 	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B.3 JDBC Types Mapped to Java Object Types
 	 */
 	public static Class<?> findJavaTypeClass(final JDBCType _jdbcType)
-	throws SQLException {
+			throws SQLException
+	{
 		Class<?> clazz = overrideJdbcToJavaType.getOrDefault(_jdbcType, null);
 		if (clazz != null) {
 			if (clazz == Exception.class) {
@@ -154,22 +270,6 @@ public class ConvertType
 		// case DISTINCT: Object type of underlying type
 		// case STRUCT: java.sql.Struct or java.sql.SQLData
 		// case JAVA_OBJECT: Underlying Java class
-	}
-
-	// TODO: for override of type mapping for local/dbms requirements
-	// with_timezone might be the perfect candidates
-	private static final EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType = new EnumMap<>(JDBCType.class);
-	static { overrideJdbcStandard(); }
-	private static void overrideJdbcStandard()
-	{
-		// The *_WITH_TIMEZONE aren't mentioned in appendix B.1 or B.3
-		overrideJdbcToJavaType.put(JDBCType.TIME_WITH_TIMEZONE,
-								   OffsetTime.class);
-		overrideJdbcToJavaType.put(JDBCType.TIMESTAMP_WITH_TIMEZONE,
-								   OffsetDateTime.class);
-
-		// overrideJdbcToJavaType.put(JDBCType.SMALLINT, Byte.class);
-		// overrideJdbcToJavaType.put(JDBCType.TINYINT, Short.class);
 	}
 	
 }

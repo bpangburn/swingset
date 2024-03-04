@@ -7,6 +7,7 @@ package com.nqadmin.swingset.demo;
  
 import com.nqadmin.rowset.JdbcRowSetImpl;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 import java.awt.Point;
 import java.io.BufferedReader;  
 import java.io.IOException;
@@ -35,7 +36,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.ref.WeakReference;
-import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -134,6 +134,8 @@ public class DemoUtil {
 		SHARE_JDBC,
 		/** Use normal connection pool and CachedRowSet. */
 		POOL_CACHED,
+		/** Use normal connection pool and JDBCRowSet. */
+		POOL_JDBC,
 		/** Use custom JdbcRowSet. */
 		NQADMIN,
 	}
@@ -223,12 +225,12 @@ public class DemoUtil {
 
 		RowSet rs;
 		switch (whichRowSet) {
-			case SHARE_JDBC:
+			case SHARE_JDBC -> {
 				rs = RowSetProvider.newFactory().createJdbcRowSet();
 				rs.setDataSourceName(getDsName(connection));
 				logger.log(DEBUG, () -> "DataSource: " + getDsName(connection));
-				break;
-			case POOL_CACHED:
+			}
+			case POOL_CACHED -> {
 				rs = RowSetProvider.newFactory().createCachedRowSet();
 				rs.setDataSourceName(DataSourcePool.DATA_SOURCE_NAME);
 				if(defLookup(MainClass.H2Workaround.class) != null) {
@@ -241,13 +243,17 @@ public class DemoUtil {
 					logger.log(INFO, () -> "H2Workaround: rs.setTypeMap(Map.of())");
 				}
 				logger.log(DEBUG, () -> "DataSource: " + DataSourcePool.DATA_SOURCE_NAME);
-				break;
-			case NQADMIN:
+			}
+			case POOL_JDBC -> {
+				rs = RowSetProvider.newFactory().createJdbcRowSet();
+				rs.setDataSourceName(DataSourcePool.DATA_SOURCE_NAME);
+				logger.log(DEBUG, () -> sf("JDBC: DataSource: %s", DataSourcePool.DATA_SOURCE_NAME));
+			}
+			case NQADMIN -> {
 				rs = new JdbcRowSetImpl(connection);
 				logger.log(DEBUG, () -> "DataSource: " + RowSetSource.NQADMIN);
-				break;
-			default:
-				throw new RuntimeException("Unknown data source");
+			}
+			default -> throw new RuntimeException("Unknown data source");
 		}
 		return rs;
 	}
@@ -611,7 +617,7 @@ public class DemoUtil {
         int indexOfCommentSign;
         StringBuilder sBuffer =  new StringBuilder();
          
-        try {  
+        try (_br) {
 			lr = new LineReader(_br);
        
             //read the file line by line
@@ -640,7 +646,6 @@ public class DemoUtil {
                     }
                     //sBuffer.append(line + " ");  
             }  
-            _br.close();
 
             // make one big string, preserve new lines
             for(String l : listOfLines) {

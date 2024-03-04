@@ -44,6 +44,7 @@
 package com.nqadmin.swingset.datasources;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.sql.RowSet;
 
@@ -68,5 +69,13 @@ public interface SSDBSupport {
 	 * @param rs row set from target database
 	 * @return connection
 	 */
-	Connection getTemporaryConnection(RowSet rs);
+	Connection getTemporaryConnection(RowSet rs) throws SQLException;
+
+	/** A row set with a connection (dataSource, url, or whatever)
+	 * that connects to same database as specified row set.
+	 * Should be closed when done with it.
+	 * @param rs row set from target database
+	 * @return rowset for "temporary" use.
+	 */
+	RowSet getJdbcRowSet(RowSet rs) throws SQLException;
 }

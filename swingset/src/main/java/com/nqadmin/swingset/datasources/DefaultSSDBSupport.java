@@ -43,13 +43,14 @@
 package com.nqadmin.swingset.datasources;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.sql.RowSet;
 
 /**
  *
  */
-public class DefaultSSDBSupport implements SSDBSupport
+public abstract class DefaultSSDBSupport implements SSDBSupport
 {
 	private Connection fallbackConnection;
 
@@ -65,9 +66,21 @@ public class DefaultSSDBSupport implements SSDBSupport
 
 
 	@Override
-	public Connection getTemporaryConnection(RowSet rs)
+	public Connection getTemporaryConnection(RowSet rs) throws SQLException
 	{
 		return fallbackConnection;
+	}
+
+	/**
+	 *
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	@Override
+	public RowSet getJdbcRowSet(RowSet rs) throws SQLException
+	{
+		return null;
 	}
 	
 }

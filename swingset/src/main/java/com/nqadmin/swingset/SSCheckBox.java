@@ -46,14 +46,13 @@ import javax.swing.JCheckBox;
 
 import java.lang.System.Logger;
 
-import com.nqadmin.swingset.datasources.RowSetOps;
-
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
+import static com.nqadmin.swingset.datasources.ConvertType.verifyConvertToType;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSCheckBox.java
@@ -156,7 +155,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 	@Override
 	public void bind(RowSet _rowSet, String _boundColumnName)
 	{
-		RowSetOps.verifyConvertToType(_rowSet, _boundColumnName, Boolean.class);
+		verifyConvertToType(_rowSet, _boundColumnName, Boolean.class);
 
 		// TODO: the debugger shows _rowSet as null
 		SSComponentInterface.super.bind(_rowSet, _boundColumnName);

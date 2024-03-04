@@ -39,6 +39,7 @@ package com.nqadmin.swingset.demo;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
+import com.nqadmin.swingset.datasources.RowSetOps.ForceConflict;
 import static com.nqadmin.swingset.demo.DemoUtil.configureJavaUtilLogger;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -90,6 +91,7 @@ import javax.swing.BoxLayout;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
+import javax.sql.RowSet;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
@@ -136,7 +138,7 @@ public class MainClass extends JFrame
 			super();
 		}
 
-		@SuppressWarnings("unused")
+		@SuppressWarnings({"unused", "ResultOfObjectAllocationIgnored"})
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 			final Map<String, Object> hints = new HashMap<>(globalHints);
@@ -352,7 +354,13 @@ public class MainClass extends JFrame
 			System.exit(1);
 		}
 
-		CentralLookup.getDefault().add(new DefaultSSDBSupport(dbConnection));
+		CentralLookup.getDefault().add(new DefaultSSDBSupport(dbConnection) {
+			@Override
+			public RowSet getJdbcRowSet(RowSet rs) throws SQLException
+			{
+				return DemoUtil.getNewRowSet(getTemporaryConnection(rs), DemoUtil.RowSetSource.POOL_JDBC);
+			}
+		});
 
 		// ADD ACTION LISTENERS FOR BUTTONS
 		btnExample1.addActionListener(new MyButtonListener());
@@ -549,6 +557,7 @@ public class MainClass extends JFrame
 		}
 
 		@Override
+		@SuppressWarnings("UseOfSystemOutOrSystemErr")
 		public void run() {
 			Properties info = getDatabaseProperties();
 			if (info == null) {
@@ -796,8 +805,9 @@ public class MainClass extends JFrame
 		CentralLookup lkup = CentralLookup.getDefault();
 		lkup.add(new LoadDemoImages());
 		lkup.add(new H2Trace());
-		lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
+		//lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
 		lkup.add(new H2Workaround());
+		lkup.add(new ForceConflict(1));
 
 		boolean some_error = false;
 		System.err.printf("java:%s vm:%s date:%s os:%s\n",

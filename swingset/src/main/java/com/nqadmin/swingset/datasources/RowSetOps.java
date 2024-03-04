@@ -51,10 +51,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
 import java.util.Calendar;
-import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.GregorianCalendar;
 import java.util.Optional;
@@ -64,8 +61,14 @@ import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.spi.SyncProviderException;
 
 import java.lang.System.Logger;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import javax.sql.rowset.spi.SyncResolver;
+
+import com.nqadmin.swingset.datasources.Utils.ConflictRow;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -79,6 +82,9 @@ import com.nqadmin.swingset.utils.SSUtils;
 import static com.nqadmin.swingset.navigate.Utils.postRowSetModified;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static com.nqadmin.swingset.datasources.ConvertType.convertObject2JdbcObject;
+import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
+import static com.nqadmin.swingset.datasources.ConvertType.getJDBCType;
+import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 
 // RowSetOps.java
 //
@@ -123,6 +129,35 @@ public class RowSetOps {
 		}
 	}
 
+	private static class ResetRowPosition
+	{
+		SQLException ex;
+
+		@SuppressWarnings("ResultOfObjectAllocationIgnored")
+		static void doit(ResultSet rs, int targetRow)
+		{
+			new ResetRowPosition(rs, targetRow);
+		}
+
+		static void doit(ResultSet rs, int targetRow, boolean mayThrow)
+				throws SQLException
+		{
+			ResetRowPosition rrp = new ResetRowPosition(rs, targetRow);
+			if(mayThrow && rrp.ex != null)
+				throw rrp.ex;
+		}
+
+		ResetRowPosition(ResultSet rs, int targetRow)
+		{
+			try {
+				rs.absolute(targetRow);
+			} catch (SQLException ex01) {
+				logger.log(ERROR, "resetting row after acceptChanges", ex01);
+				this.ex = ex01;
+			}
+		}
+	}
+
 	/**
 	 * Updates the underlying database with the new contents of the current row
 	 * of this {@linkplain ResultSet} object. Handle CachedRowSet.
@@ -131,54 +166,90 @@ public class RowSetOps {
 	 */
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static void updateRow(ResultSet _resultSet) throws SQLException {
-		final int maxTry = 1;
-		SyncProviderException srEx = null;
 		_resultSet.updateRow();
-		if (_resultSet instanceof CachedRowSet crs) {
-			//SQLException ex = null;
-			int thisRow = _resultSet.getRow();
-			int tryCount = 1;
-			for (; tryCount <= maxTry; ++tryCount) {
-				logger.log(DEBUG, "CachedRowSet.acceptChanges: try %d", tryCount);
-				try {
-					RowSetState.acceptChanges(crs, () -> {
-						try {
-							_resultSet.absolute(thisRow);
-						} catch (SQLException ex) {
-							logger.log(ERROR, "resetting row after acceptChanges", ex);
-							//
-							// TODO: find nice way to propogate
-							//
-						}
-					});
-					break;
-				} catch (SyncProviderException ex) {
-					srEx = ex;
-					//
-					// TODO: test CRS undoUpdate after accept changes
-					//
-					SyncResolver sr = srEx.getSyncResolver();
-					Utils.dump(System.err, sr, crs);
-					if (Boolean.TRUE) {
-						// THE undoUpdate IS AN UNEXPECTED EXCEPTION
-						try {
-							// This isn't quite right; must be per change not row.
-							// Maybe cancelRowUpdates.
-							crs.undoUpdate();
-							//crs.cancelRowUpdates(); // still gets exception
-						} catch(SQLException ex02) {
-							logger.log(ERROR, "cleanup after sync error in acceptChanges", ex02);
-						}
+		if (!(_resultSet instanceof CachedRowSet crs))
+			return;
+
+		final int maxTry = 2;
+		List<ConflictRow> conflictRows = null;
+		SyncProviderException srEx = null;
+		int currentRow = _resultSet.getRow();
+
+		int tryCount = 1;
+		for (; tryCount <= maxTry; ++tryCount) {
+			logger.log(DEBUG, sf("CachedRowSet.acceptChanges: try %d", tryCount));
+			try {
+				RowSetState.acceptChanges(crs, null);
+				ResetRowPosition.doit(_resultSet, currentRow, true);
+				break;
+			} catch (SyncProviderException ex) {
+				if (Boolean.TRUE) {
+					// Just log and re-throw the exception and
+					// try looping to do it again and see how conflicts go.
+					// In a real-life implementation, collect the conflicts
+					// and imediately re-run commit. Then use the collected
+					// conflicts for the UI to pick and chose, then use
+					// UI results to resolve.
+					List<ConflictRow> cRows = Utils.collectConflictNoThrow(
+							ex.getSyncResolver(), crs);
+					Utils.dumpConflict((s) -> logger.log(DEBUG, s), cRows);
+					Utils.dumpConflict((s) -> System.err.printf("%s\n", s), cRows);
+					if(conflictRows == null) {
+						conflictRows = cRows;
+						continue;
 					}
+
+					// The following only guaranteed in controlled/debug situation.
+					if(!Objects.equals(conflictRows, cRows))
+						throw new IllegalStateException("Conflicts should be equal");
+
+					ResetRowPosition.doit(_resultSet, currentRow);
+					throw ex;
 				}
+				// ============================================================
+
+				srEx = ex;
+				//
+				// TODO: test CRS undoUpdate after accept changes
+				//
+				SyncResolver sr = srEx.getSyncResolver();
+				//
+				// TODO: acceptChanges resolve persist DB
+				//		If the CRS value is persisted, then all correct.
+				//		If DB values persisted, then still dirty.
+				// 
+				boolean persistDB = Boolean.FALSE;
+				Utils.processConflict(System.err, sr, crs, false);
+				
+				// HACK TODO: acceptChanges resolve persist DB
+				//		There are still issues if the DB was selected.
+				//		After the exception, if the user does
+				//		cancel row update, then the value reverts
+				//		to what's in the CRS, which is probably NOT
+				//		what's in the DB. There is no indication that
+				//		there's a difference. But maybe it's not really
+				//		a problem because if the DB is async changed,
+				//		there's no indication.
+				//
+				//		Could have a "diff" button, or maybe keep
+				//		the row as "changed", and then the "diff"
+				//		just sends it all back.
+				//
+				//		Maybe set a visible state/status indicating that
+				//		the CRS should be reloaded from the database.
+				//
+
+				ResetRowPosition rrp = new ResetRowPosition(_resultSet, currentRow);
+				if (persistDB)
+					throw new SQLException("These value not persisted");
+				if (rrp.ex != null)
+					throw rrp.ex;
+				break;
 			}
-			if (tryCount > maxTry)
-				throw srEx;
-			//_resultSet.absolute(thisRow);
-			//if (ex != null) {
-			//	throw ex;
-			//}
 		}
+
+		if (tryCount > maxTry && srEx != null)
+			throw srEx;
 	}
 
 	/**
@@ -402,51 +473,6 @@ public class RowSetOps {
 		}
 		}
 		return null;
-	}
-
-	//
-	// Move verifyConvert* methods to ConvertType
-	//
-	/**
-	 * Check if the JDBC column type of as specified can be
-	 * converted to the specified type.
-	 * @param rs row set
-	 * @param name column name
-	 * @param type target type
-	 * @return true if rowset column is convertable to target type
-	 */
-	public static boolean verifyConvertToType(RowSet rs, String name, Class<?> type)
-	{
-		try {
-			return verifyConvertToType(rs, getColumnIndex(rs, name), type);
-		} catch (SQLException ex) {
-			throw new IllegalArgumentException("SQLException", ex);
-		}
-	}
-
-	/**
-	 * Check if the JDBC column type of as specified can be
-	 * converted to the specified type.
-	 * @param rs row set
-	 * @param index column index
-	 * @param type target type
-	 * @return true if rowset column is convertable to target type
-	 */
-	public static boolean verifyConvertToType(RowSet rs, int index, Class<?> type)
-	{
-		JDBCType jdbcType;
-		try {
-			jdbcType = getJDBCColumnType(rs, index);
-		} catch (SQLException ex) {
-			throw new IllegalArgumentException("SQLException", ex);
-		}
-		switch (type.getName()) {
-		case "java.lang.Boolean" -> {
-			switch(jdbcType) {
-			case BIT, BOOLEAN, INTEGER, SMALLINT, TINYINT -> { return true; } }
-		}
-		}
-		throw new IllegalArgumentException(sf("'%s' not convertable to '%s'", jdbcType, type.getName()));
 	}
 	
 	/**
@@ -774,7 +800,7 @@ public class RowSetOps {
 	 */
 	public static Class<?> getClassColumnType(final ResultSet _resultSet, final int _columnIndex) throws SQLException {
 		JDBCType type = RowSetOps.getJDBCColumnType(_resultSet, _columnIndex);
-		return RowSetOps.findJavaTypeClass(type);
+		return findJavaTypeClass(type);
 	}
 
 	private static final EnumSet<JDBCType> textUpdateEmptyOK = EnumSet.of(
@@ -913,7 +939,7 @@ public class RowSetOps {
 			//_rowSet.updateObject(_columnIndex, _updatedValue);
 			JDBCType jdbcType = comp.getBoundColumnJDBCType();
 			Object obj = convertObject2JdbcObject(_updatedValue, jdbcType);
-			updateColumnObject2(_rowSet, _columnIndex, obj, jdbcType);
+			updateColumnObject(_rowSet, _columnIndex, obj, jdbcType);
 			did_update = true;
 		} finally {
 			if (did_update)
@@ -921,6 +947,50 @@ public class RowSetOps {
 		}
 	}
 
+	public static class ForceConflict
+	{
+		/** Atomic just in case */
+		private final AtomicInteger nForce;
+
+		/** Argument is number of conflicts to create. */
+		public ForceConflict(int n)
+		{
+			nForce = new AtomicInteger(n);
+		}
+
+		/** Argument is number of conflicts to add. */
+		public void force(int n) {
+			if (n < 0)
+				throw new IllegalArgumentException();
+			nForce.getAndAdd(n);
+		}
+		/** Return true, and decrement, if conflict should be forced. */
+		boolean doForce() {
+			return nForce.getAndUpdate((val) -> (val > 0 ? val - 1 : 0)) != 0;
+		}
+	}
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	public static void checkForceConflict(final SSComponentInterface comp, final String _updatedValue)
+			throws SQLException
+	{
+		// Only do this for strings.
+		if(findJavaTypeClass(comp.getBoundColumnJDBCType()) != String.class)
+			return;
+
+		ForceConflict fc = defLookup(ForceConflict.class);
+		if (fc == null || !fc.doForce())
+			return;
+		
+		try(RowSet rs = defLookup(SSDBSupport.class).getJdbcRowSet(comp.getRowSet());) {
+			rs.setCommand(comp.getRowSet().getCommand());
+			rs.execute();
+			rs.absolute(comp.getRowSet().getRow());
+			System.err.printf("FORCE_CONFLICT: %s\n",
+					rs.getObject(comp.getBoundColumnIndex()));
+			rs.updateString(comp.getBoundColumnIndex(), _updatedValue + "_ForceConflict");
+			rs.updateRow();
+		}
+	}
 
 	/**
 	 * Method used by SwingSet component listeners to update the underlying
@@ -939,6 +1009,7 @@ public class RowSetOps {
 	 */
 	public static void updateColumnText(final SSComponentInterface comp, final String _updatedValue) throws SSSQLNullException, SQLException, NumberFormatException
 	{ 
+		checkForceConflict(comp, _updatedValue);
 		updateColumnText(comp, comp.getRowSet(), _updatedValue,
 						 comp.getBoundColumnName(), comp.getAllowNull());
 	}
@@ -1163,139 +1234,6 @@ public class RowSetOps {
 		}
 
 	} // end protected void updateColumnText(String _updatedValue, String _columnName)
-
-	/**
-	 * Convenience method for getting {@link JDBCType} enum from
-	 * {@link java.sql.Types}.
-	 * <p>
-	 * May perform better than using
-	 * {@link JDBCType#valueOf(java.lang.String) }
-	 * @param sqlType the type to translate
-	 * @return the corresponding JDBCType
-	 */
-	public static JDBCType getJDBCType(int sqlType) {
-		// TODO: can create a map of sqlType to JDBCType if performance issue
-		return JDBCType.valueOf(sqlType);
-	}
-
-	/**
-	 * Copy the elements of the _objects array into into
-	 * an array of the correct type for the {@code JDBCType}d objects.
-	 * <p>
-	 * If an array or even a collection of the accurate type is desired,
-	 * you can do the follow which is type safe, no compiler warnings.
-	 * There will be an exception if something is afoul.
-	 * <pre>
-	 * {@code
-	 * Object[] arr = f(); // But I "know" the elements are Integer
-	 * Integer[] newarr = (Integer[]) castJDBCToJava(JDBCType.INTEGER, arr);
-	 * List<Integer> properList = Arrays.asList(newarr);
-	 * }
-	 * </pre>
-	 * @param _objects array of objects to cast
-	 * @param _jdbcType cast objects to this JDBCType
-	 * @return array of corresponding type to the cast input objects
-	 * @throws SQLException This exception wraps a {@code ClassCastException}
-	 */
-	public static Object[] castJDBCToJava(final JDBCType _jdbcType, final Object[] _objects) throws SQLException {
-		Class<?> clazz = findJavaTypeClass(_jdbcType);
-		Object[] newArray = (Object[]) java.lang.reflect.Array.newInstance(clazz, _objects.length);
-		try {
-			System.arraycopy(_objects, 0, newArray, 0, _objects.length);
-		} catch(ArrayStoreException ex) {
-			throw new SQLException(ex);
-		}
-		return newArray;
-	}
-
-	/**
-	 * Cast the object to {@code JDBCType}. The idea is to verify
-	 * the the object is of the correct type.
-	 * @param _object object to cast
-	 * @param _jdbcType cast object to this JDBCType
-	 * @return Essentially the same Object that was input
-	 * @throws SQLException This exception wraps a {@code ClassCastException}
-	 */
-	public static Object castJDBCToJava(final JDBCType _jdbcType, final Object _object) throws SQLException {
-		try {
-			return findJavaTypeClass(_jdbcType).cast(_object);
-		} catch (ClassCastException ex) {
-			throw new SQLException(ex);
-		}
-	}
-
-
-	// TODO: for override of type mapping for local/dbms requirements
-	// with_timezone might be the perfect candidates
-	private static final EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType = new EnumMap<>(JDBCType.class);
-	private static void overrideJdbcStandard()
-	{
-		// The *_WITH_TIMEZONE aren't mentioned in appendix B.1 or B.3
-		overrideJdbcToJavaType.put(JDBCType.TIME_WITH_TIMEZONE,
-								   OffsetTime.class);
-		overrideJdbcToJavaType.put(JDBCType.TIMESTAMP_WITH_TIMEZONE,
-								   OffsetDateTime.class);
-
-		// overrideJdbcToJavaType.put(JDBCType.SMALLINT, Byte.class);
-		// overrideJdbcToJavaType.put(JDBCType.TINYINT, Short.class);
-	}
-	static { overrideJdbcStandard(); }
-	
-	/**
-	 * Determine the Java type class for the given database type.
-	 * @param _jdbcType JDBCType of interest
-	 * @return the class object used for the given type
-	 * @throws SQLException if the JDBCType is not handled
-	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B.3 JDBC Types Mapped to Java Object Types
-	 */
-	public static Class<?> findJavaTypeClass(final JDBCType _jdbcType)
-	throws SQLException {
-		Class<?> clazz = overrideJdbcToJavaType.getOrDefault(_jdbcType, null);
-		if (clazz != null) {
-			if (clazz == Exception.class) {
-				throw new SQLException("Unhandled type: " + _jdbcType);
-			}
-			return clazz;
-		}
-
-		return switch (_jdbcType) {
-		case INTEGER, SMALLINT, TINYINT	-> Integer.class;
-		case BIGINT -> Long.class;
-		case REAL -> Float.class;
-		case FLOAT, DOUBLE -> Double.class;
-		case DECIMAL, NUMERIC -> BigDecimal.class;
-		case BIT, BOOLEAN -> Boolean.class;
-		case DATE -> java.sql.Date.class;
-		case TIME -> java.sql.Time.class;
-		case TIMESTAMP -> java.sql.Timestamp.class;
-		case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR -> String.class;
-		default ->
-			// TODO: SSSQLExceptionUnhandledType
-			throw new SQLException("Unhandled type: " + _jdbcType);
-		};
-
-			// case ARRAY:
-			// 	clazz = java.sql.Array.class;
-			// 	break;
-
-			// case BINARY:
-			// case VARBINARY:
-			// case LONGVARBINARY:
-			// 	clazz = byte[].class;
-			// 	break;
-
-			// case CLOB: clazz = java.sql.Clob.class; break;
-			// case BLOB: clazz = java.sql.Blob.class; break;
-			// case REF: clazz = java.sql.Ref.class; break;
-			// case DATALINK: clazz = java.net.URL.class; break;
-			// case ROWID: clazz = java.sql.RowId.class; break;
-			// case NCLOB: clazz = java.sql.NClob.class; break;
-			// case SQLXML: clazz = java.sql.SQLXML.class; break;
-
-		// case DISTINCT: Object type of underlying type
-		// case STRUCT: java.sql.Struct or java.sql.SQLData
-		// case JAVA_OBJECT: Underlying Java class
-	}
 
 	// FOLLOWING ONLY USED FROM SSTableModel (AT LEAST FOR NOW)
 

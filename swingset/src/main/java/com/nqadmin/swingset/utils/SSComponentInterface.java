@@ -50,6 +50,7 @@ import javax.sql.RowSet;
 
 import java.sql.Connection;
 
+import javax.sql.rowset.CachedRowSet;
 import javax.swing.JComponent;
 
 import com.nqadmin.swingset.decorators.Validator;
@@ -108,11 +109,9 @@ public interface SSComponentInterface
 	 */
 	default void bind(final RowSet _rowSet, final String _boundColumnName) {// throws java.sql.SQLException {
 		getSSCommon().bind(_rowSet, _boundColumnName);
-		//
-		// TODO: setupDefaultPrimaryKeys
-		//
-		//if (_rowSet instanceof CachedRowSet)
-		//	SSUtils.setupDefaultPrimaryKeys(this);
+		// Primary keys for SyncResolver, joins
+		if (_rowSet instanceof CachedRowSet)
+			SSUtils.setupDefaultPrimaryKeys(this);
 	}
 
 	/**

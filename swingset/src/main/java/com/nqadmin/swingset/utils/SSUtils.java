@@ -144,7 +144,7 @@ public class SSUtils {
 
 	/**
 	 * Setup a {@linkplain CachedRowSet}'s primary keys, use the component's
-	 * column to get the database table's keys.
+	 * row set to get the database table's keys.
 	 * If not a CachedRowSet or the key is already set, do nothing.
 	 * Note a JoinRowSet is skipped; only want to set keys for single table.
 	 * @param comp component
