@@ -74,6 +74,7 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 /**
  * Used to load, store, and display images stored in a database.
  */
+// TODO: SSImage make all the load/store buttons/capabilities optional.
 @SuppressWarnings("serial")
 public class SSImage extends JPanel implements SSComponentInterface
 {
@@ -215,14 +216,14 @@ public class SSImage extends JPanel implements SSComponentInterface
 	}
 
 	/**
-	 * Method to allow Developer to add functionality when SwingSet component is
-	 * instantiated.
-	 * <p>
-	 * It will actually be called from SSCommon.init() once the SSCommon data member
-	 * is instantiated.
+	 * Add custom button for loading image from disk saving to database.
+	 * Add some preferredSize handling.
 	 */
+	// TODO: remove the prefered size stuff, let programmer handle it.
+	// TODO: make custom components optional, not builtin.
 	@Override
-	public void customInit() {
+	public void customInit()
+	{
 		// SET PREFERRED DIMENSIONS
 		setPreferredSize(preferredSize);
 
@@ -274,6 +275,7 @@ public class SSImage extends JPanel implements SSComponentInterface
 	 *
 	 * @param _preferredSize - preferred size of the image component
 	 */
+	// TODO: listen to preferredsize property to adjust btnUpdateImage.
 	@Override
 	public void setPreferredSize(final Dimension _preferredSize) {
 		final Dimension oldValue = preferredSize;

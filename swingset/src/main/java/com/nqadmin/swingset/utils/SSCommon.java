@@ -218,6 +218,7 @@ public class SSCommon
 									listenerNeedsRestoration = true;
 								}
 								try {
+									logger.log(DEBUG, () -> String.format("%s: restoring previous value '%s'", getColumnForLog(), previousValue));
 									((JTextComponent) getSSComponent()).setText(previousValue);
 								} finally {
 									if (listenerNeedsRestoration) {
@@ -809,6 +810,8 @@ public class SSCommon
 	/**
 	 * Returns an Object of the specified type
 	 * representing the value in the bound database column.
+	 * <p>
+	 * Note a null is never converted into ""; use getBoundColumnText for that.
 	 * @param <T> type to return
 	 * @param type Class of returned type
 	 * @return value
@@ -820,9 +823,6 @@ public class SSCommon
 		try {
 			if (getRowSet().getRow() != 0) {
 				value = RowSetOps.getColumnObject(ssComponent, type);
-				//if (!getAllowNull() && (value == null)) {
-				//	value = "";
-				//}
 			}
 		} catch (final SQLException se) {
 			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
@@ -937,7 +937,8 @@ public class SSCommon
 	 * field traversal and any custom initialization method specific to the SwingSet
 	 * component.
 	 */
-	protected void init() {
+	protected void init()
+	{
 		getSSComponent().configureTraversalKeys();
 		getSSComponent().setupUndoRedoKeys();
 		getSSComponent().customInit();

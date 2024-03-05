@@ -35,10 +35,14 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset;
 
 import java.awt.Dimension;
-import java.io.Serializable;
 
 import javax.sql.RowSet;
 import javax.swing.JSlider;
@@ -47,71 +51,54 @@ import javax.swing.event.ChangeListener;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.sql.JDBCType;
+import java.util.EnumSet;
 
-import static java.lang.System.Logger.Level.*;
+import static java.sql.JDBCType.*;
 
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
+import static com.nqadmin.swingset.datasources.ConvertType.verifyConvertToType;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
-
-// SSSlider.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
  * Used to link a JSlider to a numeric column in a database.
  */
+@SuppressWarnings("serial")
 public class SSSlider extends JSlider implements SSComponentInterface {
 
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
 	 * text field.
 	 */
-	protected class SSSliderListener implements ChangeListener, Serializable {
+	protected class SSSliderListener implements ChangeListener {
 
-		/**
-		 * unique serial ID
-		 */
-		private static final long serialVersionUID = -5004328872032247853L;
-
+		/** {@inheritDoc } */
 		@Override
-		public void stateChanged(final ChangeEvent ce) {
-
+		public void stateChanged(final ChangeEvent ce)
+		{
 			ssCommon.removeRowSetListener();
 
-			setBoundColumnText(String.valueOf(getValue()));
+			setBoundColumnObject(getValue());
 
 			ssCommon.addRowSetListener();
-
 		}
 
 	} // end protected class SSSliderListener implements ChangeListener, Serializable
-		// {
 
-	/**
-	 * Log4j Logger for component
-	 */
+	/** Log4j Logger for component */
 	private static Logger logger = SSUtils.getLogger();
 
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 8477179080546081481L;
-
-	/**
-	 * Common fields shared across SwingSet components
-	 */
-	transient protected final SSCommon ssCommon = new SSCommon(this);
+	/** Common fields shared across SwingSet components */
+	protected final SSCommon ssCommon = new SSCommon(this);
 
 	/**
 	 * Empty constructor needed for deserialization. Creates a horizontal slider
 	 * with the range 0 to 100.
 	 */
 	public SSSlider() {
-		// Note that call to parent default constructor is implicit.
-		// super();
 	}
 
 	/**
@@ -147,18 +134,15 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 		bind(_rowSet, _boundColumnName);
 	}
 
-	/**
-	 * Method to allow Developer to add functionality when SwingSet component is
-	 * instantiated.
-	 * <p>
-	 * It will actually be called from SSCommon.init() once the SSCommon data member
-	 * is instantiated.
-	 */
+	/** {@inheritDoc } */
 	@Override
-	public void customInit() {
-		// TODO Consider removing default dimensions.
-		// SET PREFERRED DIMENSIONS
-		setPreferredSize(new Dimension(200, 20));
+	public void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException
+	{
+		// only allow JDBC types that convert to numeric types
+		verifyConvertToType(jdbcType, Integer.class,
+				EnumSet.of(INTEGER, SMALLINT, TINYINT,
+						BIGINT, REAL, FLOAT, DOUBLE, DECIMAL, NUMERIC));
+
 	}
 
 	/**
@@ -179,43 +163,20 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 		return new SSSliderListener();
 	}
 
+	/** {@inheritDoc } */
 	@Override
-	public void updateSSComponent() {
-
-		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField
-		// and only allow JDBC types that convert to numeric types
-
-		// SET THE SLIDER BASED ON THE VALUE IN THE TEXT FIELD
-		switch (getBoundColumnType()) {
-		case java.sql.Types.INTEGER:
-		case java.sql.Types.SMALLINT:
-		case java.sql.Types.TINYINT:
-		case java.sql.Types.BIGINT:
-		case java.sql.Types.FLOAT:
-		case java.sql.Types.DOUBLE:
-		case java.sql.Types.NUMERIC:
-			// SET THE SLIDER BASED ON THE VALUE IN TEXT FIELD
-			final String columnValue = getBoundColumnText();
-			try {
-				if ((columnValue == null) || columnValue.isEmpty()) {
-					logger.log(DEBUG, ()->sf("%s: Setting slider to 0.", getColumnForLog()));
-					setValue(0);
-				} else {
-					logger.log(DEBUG, ()->sf("%s: Setting slider to %s.", getColumnForLog(), columnValue));
-					setValue(Integer.parseInt(columnValue));
-				}
-			} catch (final NumberFormatException _nfe) {
-				logger.log(Level.ERROR, getColumnForLog() + ": Number Format Exception. Cannot update slider to " + columnValue,
-						_nfe);
-			}
-			break;
-
-		default:
-			logger.log(WARNING, ()->sf("%s: Unable to update Slider bound to %s because the data type is not supported (%s).",
-					getColumnForLog(), getBoundColumnName(), getBoundColumnType()));
-			break;
+	public void updateSSComponent()
+	{
+		try {
+			Integer n = getBoundColumnObject(Integer.class);
+			setValue(n != null ? n : 0);
+		} catch (final NumberFormatException _nfe) {
+			// TODO: Hmm, probably should be an SQL conversion error.
+			// Output the text value
+			String columnValue = getBoundColumnText();
+			logger.log(Level.ERROR, getColumnForLog() + ": Number Format Exception. Cannot update slider to " + columnValue,
+					_nfe);
 		}
-
 	}
 
 	/** {@inheritDoc} */

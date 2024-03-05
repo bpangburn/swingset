@@ -53,6 +53,7 @@ import java.sql.Connection;
 import javax.sql.rowset.CachedRowSet;
 import javax.swing.JComponent;
 
+import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
@@ -98,6 +99,15 @@ public interface SSComponentInterface
 		_component.getSSCommon().addSSComponentListener();
 	}
 
+	/** Invoked during bind, component should verify that jdbcType is ok.
+	 * @param jdbcType column JDBCType
+	 * @throws IllegalArgumentException if can't handle JDBCType
+	 */
+	// TODO: checkColumnType use a different exception?
+	default void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException
+	{
+	}
+
 	/**
 	 * Sets the rowSet and column name to which the component is to be bound.
 	 * <p>
@@ -107,7 +117,13 @@ public interface SSComponentInterface
 	 * @param _rowSet datasource to be used.
 	 * @param _boundColumnName Name of the column to which this check box should be bound
 	 */
-	default void bind(final RowSet _rowSet, final String _boundColumnName) {// throws java.sql.SQLException {
+	default void bind(final RowSet _rowSet, final String _boundColumnName) {
+			// throws java.sql.SQLException {
+		try {
+			checkColumnType(RowSetOps.getJDBCColumnType(_rowSet, _boundColumnName));
+		} catch (SQLException ex) {
+			throw new IllegalArgumentException("SQLException getting column type", ex);
+		}
 		getSSCommon().bind(_rowSet, _boundColumnName);
 		// Primary keys for SyncResolver, joins
 		if (_rowSet instanceof CachedRowSet)
@@ -135,11 +151,8 @@ public interface SSComponentInterface
 	 * <p>
 	 * It will actually be called from SSCommon.init() once the SSCommon data member
 	 * is instantiated.
-	 * <p>
-	 * This method can be empty.
 	 */
-	// TODO: default empty method.
-	void customInit();
+	default void customInit() {}
 
 	/**
 	 * Retrieves the allowNull flag for the bound database column.

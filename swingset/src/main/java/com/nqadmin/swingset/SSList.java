@@ -44,7 +44,6 @@ package com.nqadmin.swingset;
 
 import static com.nqadmin.swingset.models.OptionMappingSwingModel.asOptionMappingSwingModel;
 
-import java.awt.Dimension;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -191,19 +190,6 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 
 		// uncomment this to run some tests
 		// testStuff(this);
-	}
-
-	/**
-	 * Method to allow Developer to add functionality when SwingSet component is
-	 * instantiated.
-	 * <p>
-	 * It will actually be called from SSCommon.init() once the SSCommon data member
-	 * is instantiated.
-	 */
-	@Override
-	public void customInit() {
-		// SET PREFERRED DIMENSIONS
-		setPreferredSize(new Dimension(200, 40));
 	}
 
 	/**

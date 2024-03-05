@@ -37,10 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
-import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.Serializable;
 
 import javax.sql.RowSet;
 import javax.swing.Icon;
@@ -63,29 +61,25 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 /**
  * Used to display database values in a read-only JLabel.
  */
+@SuppressWarnings("serial")
 public class SSLabel extends JLabel implements SSComponentInterface {
 
 	/**
-	 * Listener(s) for the component's value used to propagate changes back to bound
+	 * Listen for label changed externally; propogate the value to the
 	 * database column.
 	 * <p>
-	 * There is not an obvious use-case where a label would change, but could be
-	 * tied to a menu, screen logic, or some other Developer driven change that
-	 * could conceivably need to be synchronized back to the RowSet.
+	 * There is not an obvious use-case where a label would be changed, but
+	 * could be tied to a menu, screen logic, or some other Developer driven
+	 * change that could conceivably need to be synchronized back to the RowSet.
 	 */
-	protected class SSLabelListener implements PropertyChangeListener, Serializable {
-
-		/**
-		 * unique serial ID
-		 */
-		private static final long serialVersionUID = 6786673052979566820L;
+	protected class SSLabelListener implements PropertyChangeListener
+	{
 
 		/** {@inheritDoc} */
 		@Override
 		public void propertyChange(final PropertyChangeEvent pce) {
 
-			// CONFIRM THE PROPERTY NAME IN CASE SOMEONE ADDS A DIFFERENT PROPERTY LISTENER
-			// TO ssLabelListener
+			// Propogate "text" property change to database.
 			if ("text".equals(pce.getPropertyName())) {
 
 				ssCommon.removeRowSetListener();
@@ -99,28 +93,17 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 
 	} // end protected class SSLabelListener
 
-	/**
-	 * Log4j Logger for component
-	 */
+	/** Log4j Logger for component */
 	private static Logger logger = SSUtils.getLogger();
 
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -5232780793538061537L;
-
-	/**
-	 * Common fields shared across SwingSet components
-	 */
-	transient protected final SSCommon ssCommon = new SSCommon(this);
+	/** Common fields shared across SwingSet components */
+	protected final SSCommon ssCommon = new SSCommon(this);
 
 	/**
 	 * Empty constructor needed for deserialization. Creates a SSLabel instance with
 	 * no image and no text.
 	 */
 	public SSLabel() {
-		// Note that call to parent default constructor is implicit.
-		// super();
 	}
 
 	/**
@@ -153,20 +136,6 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	public SSLabel(final RowSet _rowSet, final String _boundColumnName) {
 		this();
 		bind(_rowSet, _boundColumnName);
-	}
-
-	/**
-	 * Method to allow Developer to add functionality when SwingSet component is
-	 * instantiated.
-	 * <p>
-	 * It will actually be called from SSCommon.init() once the SSCommon data member
-	 * is instantiated.
-	 */
-	@Override
-	public void customInit() {
-		// SET PREFERRED DIMENSIONS
-// TODO not sure SwingSet should be setting component dimensions
-		setPreferredSize(new Dimension(200, 20));
 	}
 
 	/**

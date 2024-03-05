@@ -109,10 +109,12 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 		bind(_rowSet, _boundColumnName);
 	}
 
+	/**
+	 * Set word linewrap.
+	 */
 	@Override
-	public void customInit() {
-		// Adding some logic from SSMemoField (deprecated), which seems generally
-		// helpful.
+	public void customInit()
+	{
 		setLineWrap(true);
 		setWrapStyleWord(true);
 	}

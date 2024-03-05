@@ -436,7 +436,7 @@ public class TestBaseComponents extends JFrame
 		}
 		
 		// SET SLIDER RANGE
-		// TODO Set slider range
+		sliSSSlider.setMaximum(25);
 
 		// SSComponents are setup, save info that may have changed.
 		replaceComponent(NAV, cmbSSDBComboNav);

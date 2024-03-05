@@ -344,17 +344,12 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 
 
 	/**
-	 * Method to allow Developer to add functionality when SwingSet component is
-	 * instantiated.
-	 * <p>
-	 * It will actually be called from SSCommon.init() once the SSCommon data member
-	 * is instantiated.
+	 * Add focus listener that selects all text.
+	 * Add key listener for when this is used with mask. Use Mask Formatters.
 	 */
 	@Override
-	public void customInit() {
-		// SET PREFERRED DIMENSIONS
-		setPreferredSize(new Dimension(200, 20));
-
+	public void customInit()
+	{
 		// ADD FOCUS LISTENER TO THE TEXT FIELD SO THAT WHEN THE FOCUS IS GAINED
 		// COMPLETE TEXT SHOULD BE SELECTED
 		addFocusListener(new FocusAdapter() {

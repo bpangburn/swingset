@@ -387,15 +387,12 @@ public class SSFormattedTextField extends JFormattedTextField
 	}
 
 	/**
-	 * Method to allow Developer to add functionality when SwingSet component is
-	 * instantiated.
-	 * <p>
-	 * It will actually be called from SSCommon.init() once the SSCommon data member
-	 * is instantiated.
+	 * Add custom focus behavior: gain selectAll, lose COMMIT_OR_REVERT.
+	 * Related behavior.
 	 */
 	@Override
-	public void customInit() {
-
+	public void customInit()
+	{
 		// COMMIT_OR_REVERT SHOULD ALREADY BE THE DEFAULT
 		setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 

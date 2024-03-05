@@ -121,11 +121,12 @@ final class UndoRow
 		return false;
 	}
 
-	// boolean isDirty(SSComponentInterface comp)
+	// /** return true if the specified column's value is not from the database */
+	// boolean isDirty(int columnIndex)
 	// {
 	// 	if (cols == null)
 	// 		return false;
-	// 	UndoCol col = cols[comp.getBoundColumnIndex()];
+	// 	UndoCol col = cols[columnIndex];
 	// 	if (col != null)
 	// 		return col.isDirty();
 	// 	return false;
@@ -143,7 +144,7 @@ final class UndoRow
 		return getCol(comp).fetchCurrentValue();
 	}
 
-	/** Process the undo/redoc command for the specified component.
+	/** Process the undo/redo command for the specified component.
 	 * Forward the new value to the component.
 	 * If there's nothing to do, for example UNDO but there has been
 	 * no changes, then do nothing.

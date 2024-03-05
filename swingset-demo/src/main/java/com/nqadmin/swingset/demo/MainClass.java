@@ -807,7 +807,7 @@ public class MainClass extends JFrame
 		lkup.add(new H2Trace());
 		//lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
 		lkup.add(new H2Workaround());
-		lkup.add(new ForceConflict(1));
+		lkup.add(new ForceConflict(0));
 
 		boolean some_error = false;
 		System.err.printf("java:%s vm:%s date:%s os:%s\n",

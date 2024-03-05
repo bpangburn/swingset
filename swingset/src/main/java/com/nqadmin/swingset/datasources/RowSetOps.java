@@ -64,7 +64,6 @@ import java.lang.System.Logger;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
 import javax.sql.rowset.spi.SyncResolver;
 
@@ -81,10 +80,10 @@ import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.navigate.Utils.postRowSetModified;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
-import static com.nqadmin.swingset.datasources.ConvertType.convertObject2JdbcObject;
 import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
 import static com.nqadmin.swingset.datasources.ConvertType.getJDBCType;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
+import static com.nqadmin.swingset.datasources.ConvertType.convertObjectType;
 
 // RowSetOps.java
 //
@@ -375,22 +374,23 @@ public class RowSetOps {
 	/**
 	 * Returns an Object of the specified type
 	 * representing the value in the component's bound database column.
+	 * <p>
+	 * Note that if a String type is specified, a null is not automatically
+	 * turned into "" use getColumnText for that.
 	 * @param <T> type to return
 	 * @param comp component
 	 * @param type Class of returned type
 	 * @return value
 	 */
+	// TODO: getColumnObject only boolean related so far
 	public static <T> T getColumnObject(SSComponentInterface comp, Class<T> type)
 	{
 		T value = null;
-		//try {
-		//	return getColumnObject1ex(comp, type);
-		//} catch (SQLException ex) {
-		//	System.err.println("GET COLUMN OBJECT: 1ex");
-		//	ex.printStackTrace();
-		//}
 		try {
-			return getColumnObject2ex(comp, type);
+			if(Boolean.TRUE)
+				return getColumnObject1ex(comp, type);
+			else
+				return getColumnObject2ex(comp, type);
 		} catch (SQLException ex) {
 			logger.log(ERROR, "SQL Exception for column " + comp.getBoundColumnName() + ".", ex);
 		}
@@ -409,30 +409,11 @@ public class RowSetOps {
 	private static <T> T getColumnObject1ex(SSComponentInterface comp, Class<T> type)
 			throws SQLException
 	{
-		final RowSet _rowSet = comp.getRowSet();
-		final int _columnIndex = comp.getBoundColumnIndex();
-		
-		T value;
-		// IF THE COLUMN IS NULL SO RETURN NULL
-		if (getColumnCount(_rowSet)==0)
+		if (getColumnCount(comp.getRowSet())==0)
 			return null;
 		
 		Object objectValue = NavigateActions.fetchCurrentValue(comp);
-		if (objectValue == null)
-			return null;
-		
-		value = _rowSet.getObject(_columnIndex , type);
-		return value;
-	}
-
-	static {
-		if(Boolean.FALSE) {
-			try {
-				getColumnObject1ex(null, null);
-				getColumnObject2ex(null, null);
-			} catch (SQLException ex) {
-			}
-		}
+		return convertObjectType(objectValue, type);
 	}
 
 	/**
@@ -449,30 +430,13 @@ public class RowSetOps {
 		final RowSet _rowSet = comp.getRowSet();
 		final int _columnIndex = comp.getBoundColumnIndex();
 		
+		T value;
 		// IF THE COLUMN IS NULL SO RETURN NULL
 		if (getColumnCount(_rowSet)==0)
 			return null;
 		
-		//
-		// TODO:
-		//
-		Object objectValue = NavigateActions.fetchCurrentValue(comp);
-		if (objectValue == null)
-			return null;
-		
-		Object obj = _rowSet.getObject(_columnIndex);
-		if (type.isAssignableFrom(obj.getClass()))
-			return type.cast(obj);
-
-		JDBCType jdbcType = comp.getBoundColumnJDBCType();
-		
-		switch (type.getName()) {
-		case "java.lang.Boolean" -> {
-			switch(jdbcType) { case INTEGER, SMALLINT, TINYINT
-					-> { return type.cast(((Integer)obj) != 0); } }
-		}
-		}
-		return null;
+		value = _rowSet.getObject(_columnIndex , type);
+		return value;
 	}
 	
 	/**
@@ -647,7 +611,7 @@ public class RowSetOps {
 			case CHAR: case VARCHAR: case LONGVARCHAR:
 			case NCHAR: case NVARCHAR: case LONGNVARCHAR:
 				// TODO: don't need to include the CHAR... cases
-				value = String.valueOf(objectValue);
+				value = objectValue.toString();
 				break;
 
 //
@@ -938,7 +902,8 @@ public class RowSetOps {
 
 			//_rowSet.updateObject(_columnIndex, _updatedValue);
 			JDBCType jdbcType = comp.getBoundColumnJDBCType();
-			Object obj = convertObject2JdbcObject(_updatedValue, jdbcType);
+			// TODO: maybe a component field that says use jdbc conversion
+			Object obj = convertObjectType(_updatedValue, jdbcType);
 			updateColumnObject(_rowSet, _columnIndex, obj, jdbcType);
 			did_update = true;
 		} finally {
@@ -947,28 +912,47 @@ public class RowSetOps {
 		}
 	}
 
+	/** Use this to force "n" acceptChanges conflicts after modifying
+	 * a character column in the database.
+	 * Only works with CachedRowSet and after
+	 * {@linkplain #updateColumnText(com.nqadmin.swingset.utils.SSComponentInterface, java.lang.String)}.
+	 */
 	public static class ForceConflict
 	{
 		/** Atomic just in case */
 		private final AtomicInteger nForce;
 
-		/** Argument is number of conflicts to create. */
+		/** Argument is number of conflicts to create.
+		 * @param n */
 		public ForceConflict(int n)
 		{
 			nForce = new AtomicInteger(n);
 		}
 
-		/** Argument is number of conflicts to add. */
+		/** Argument is number of conflicts to add.
+		 * @param n */
 		public void force(int n) {
 			if (n < 0)
 				throw new IllegalArgumentException();
 			nForce.getAndAdd(n);
 		}
-		/** Return true, and decrement, if conflict should be forced. */
+		/**
+		 * Check if conflict should be forced. If this returns true,
+		 * the nForce counter is decremented.
+		 * Return true to force a conflict
+		 */
 		boolean doForce() {
-			return nForce.getAndUpdate((val) -> (val > 0 ? val - 1 : 0)) != 0;
+			int n = nForce.getAndUpdate((val) -> (val > 0 ? val - 1 : 0));
+			return n != 0;
 		}
 	}
+
+	/**
+	 *
+	 * @param comp
+	 * @param _updatedValue
+	 * @throws SQLException
+	 */
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static void checkForceConflict(final SSComponentInterface comp, final String _updatedValue)
 			throws SQLException

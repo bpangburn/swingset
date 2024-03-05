@@ -48,11 +48,11 @@ import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.sql.RowSet;
-
-import static com.nqadmin.swingset.datasources.RowSetOps.getColumnIndex;
-import static com.nqadmin.swingset.datasources.RowSetOps.getJDBCColumnType;
+import static com.nqadmin.swingset.datasources.ConvertType.Clazz.getClazz;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
@@ -63,8 +63,12 @@ public class ConvertType
 {
 	private ConvertType() { }
 
-	// TODO: for override of type mapping for local/dbms requirements
-	// with_timezone might be the perfect candidates
+	/**
+	 * To override default type mapping for local/dbms requirements.
+	 * An entry with "Exception.class" generates an exception.
+	 * <p>
+	 * TODO: API/plugin
+	 */
 	private static final EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType = new EnumMap<>(JDBCType.class);
 	static { overrideJdbcStandard(); }
 	private static void overrideJdbcStandard()
@@ -80,45 +84,41 @@ public class ConvertType
 	}
 
 	/**
-	 * Check if the JDBC column type of as specified can be
-	 * converted to the specified type.
-	 * @param rs row set
-	 * @param name column name
+	 * Check if the specified type is convertible, using methods in this
+	 * class, to the JDBC type  of the specified RowSet column.
+	 * Typically used during bind.
+	 * @param jdbcType jdbc column type
 	 * @param type target type
-	 * @return true if rowset column is convertable to target type
+	 * @param restrict only allow these JDBC types, may be null
+	 * @throws IllegalArgumentException if can't handle JDBCType
 	 */
-	public static boolean verifyConvertToType(RowSet rs, String name, Class<?> type)
+	public static void verifyConvertToType(JDBCType jdbcType, Class<?> type, EnumSet<JDBCType> restrict)
 	{
+		if(restrict != null && !restrict.contains(jdbcType))
+			throw new IllegalArgumentException(sf("'%s' not in '%s'", jdbcType, restrict));
+		if(type == null)
+			return;
 		try {
-			return verifyConvertToType(rs, getColumnIndex(rs, name), type);
-		} catch (SQLException ex) {
-			throw new IllegalArgumentException("SQLException", ex);
+			Clazz source = getClazz(findJavaTypeClass(jdbcType));
+			Clazz target = getClazz(type);
+			if(source != null && target != null) {
+				// All number to number types supported.
+				if(source.isNumeric() && target.isNumeric())
+					return;
+				switch (target) {
+				case BOOL -> {
+					if(source == Clazz.BOOL || source.isNumeric())
+						return;
+				}
+				case LONG, INT, SHORT, BYTE, FLOAT, DOUBLE, BIGD -> {
+					if(source == Clazz.BOOL)
+						return;
+				}
+				}
+			}
+		} catch(SQLException ex) {
 		}
-	}
-
-	/**
-	 * Check if the JDBC column type of as specified can be
-	 * converted to the specified type.
-	 * @param rs row set
-	 * @param index column index
-	 * @param type target type
-	 * @return true if rowset column is convertable to target type
-	 */
-	public static boolean verifyConvertToType(RowSet rs, int index, Class<?> type)
-	{
-		JDBCType jdbcType;
-		try {
-			jdbcType = getJDBCColumnType(rs, index);
-		} catch (SQLException ex) {
-			throw new IllegalArgumentException("SQLException", ex);
-		}
-		switch (type.getName()) {
-		case "java.lang.Boolean" -> {
-			switch(jdbcType) {
-			case BIT, BOOLEAN, INTEGER, SMALLINT, TINYINT -> { return true; } }
-		}
-		}
-		throw new IllegalArgumentException(sf("'%s' not convertable to '%s'", jdbcType, type.getName()));
+		throw new IllegalArgumentException(sf("'%s' to '%s' conversion not supported", jdbcType, type.getName()));
 	}
 
 	/** 
@@ -133,24 +133,113 @@ public class ConvertType
 	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B.4 Java Object Types Mapped to JDBC
 	 * Types
 	 */
-	public static Object convertObject2JdbcObject(Object value, JDBCType jdbcType)
+	public static Object convertObjectType(Object value, JDBCType jdbcType)
 			throws SQLException
 	{
 		Class<?> type = findJavaTypeClass(jdbcType);
-		if (type.isAssignableFrom(value.getClass()))
-			return value;
 
-		switch (value.getClass().getName()) {
-		case "java.lang.Boolean" -> {
-			switch(jdbcType) { case INTEGER, SMALLINT, TINYINT
-					-> { return ((Boolean)value) ? 1 : 0; } } // Boolean to Integer
+		Object target = internalConvertObject(value, type);
+		if (target == CanNotConvert)
+			throw new SSSQLConversionException(sf("Missing conversion %s to %s",
+					value.getClass().getName(), jdbcType));
+		return target;
+	}
+
+	/**
+	 * Convert specified value to specified type; this can be more than a cast.
+	 * @param <T> target type
+	 * @param value value to convert
+	 * @param type class of target type
+	 * @return converted type, may be the same object
+	 * @throws com.nqadmin.swingset.datasources.SSSQLConversionException
+	 */
+	public static <T> T convertObjectType(Object value, Class<T> type) throws SSSQLConversionException
+	{
+		@SuppressWarnings("unchecked")
+		T target = (T) internalConvertObject(value, type);
+		if (target == CanNotConvert)
+			throw new SSSQLConversionException(sf("Missing conversion %s to %s",
+					value.getClass().getName(), type.getClass().getName()));
+		return type.cast(target); // Don't really need the cast, but it's cheap.
+	}
+
+	/** Return something of the specified type,
+	 * unless can't convert then "CanNotConvert" Object is returned.
+	 */
+	private static Object internalConvertObject(Object sourceValue, Class<?> type)
+	{
+		if (type.isAssignableFrom(sourceValue.getClass()))
+			return sourceValue;
+
+		Clazz source = getClazz(sourceValue.getClass());
+		Clazz target = getClazz(type);
+		if(source == null || target == null)
+			return CanNotConvert;
+
+		if(source.isNumeric() && target.isNumeric()) {
+			Number n = (Number) sourceValue;
+			switch(target) {
+			case LONG -> { return n.longValue(); }
+			case INT -> { return n.intValue(); }
+			case SHORT -> { return n.shortValue(); }
+			case BYTE -> { return n.byteValue(); }
+			case FLOAT -> { return n.floatValue(); }
+			case DOUBLE -> { return n.doubleValue(); }
+			case BIGD -> {
+				switch(source) {
+				case LONG, INT, SHORT, BYTE -> {
+					return BigDecimal.valueOf(n.longValue());
+				}
+				case FLOAT, DOUBLE -> { return BigDecimal.valueOf(n.doubleValue()); }
+				case BIGD -> { return n; }	// Should have been caught at entry.
+				}
+			}
+			}
+			assert false;
 		}
-		case "java.lang.Integer" -> {
-			switch(jdbcType) { case BIT, BOOLEAN
-					-> { return ((Integer)value) != 0; } } // Integer to Boolean
+
+		switch (sourceValue) {
+
+		case Boolean b -> {
+			Number n = b ? 1 : 0;
+			switch(target) {
+			case LONG -> { return n.longValue(); }
+			case INT -> { return n.intValue(); }
+			case SHORT -> { return n.shortValue(); }
+			case BYTE -> { return n.byteValue(); }
+			case FLOAT -> { return n.floatValue(); }
+			case DOUBLE -> { return n.doubleValue(); }
+			case BIGD -> { return BigDecimal.valueOf(b ? 1 : 0); }
+			}
 		}
+		case Integer n -> {
+			switch(target) {
+			case BOOL -> { return n != 0; }
+			}
 		}
-		throw new SSSQLConversionException(sf("Missing conversion %s to %s", value.getClass().getName(), jdbcType));
+		case Long n -> {
+			switch(target) {
+			case BOOL -> { return n != 0; }
+			}
+		}
+		case Short n -> {
+			switch(target) {
+			case BOOL -> { return n != 0; }
+			}
+		}
+		case Byte n -> {
+			switch(target) {
+			case BOOL -> { return n != 0; }
+			}
+		}
+		case BigDecimal n -> {
+			switch(target) {
+			case BOOL -> { return BigDecimal.valueOf(0).compareTo(n) != 0; }
+			}
+		}
+		default -> {}
+		}
+		return CanNotConvert;
 	}
 
 	/**
@@ -271,5 +360,42 @@ public class ConvertType
 		// case STRUCT: java.sql.Struct or java.sql.SQLData
 		// case JAVA_OBJECT: Underlying Java class
 	}
-	
+
+	private static final Object CanNotConvert = new Object();
+
+	private static Map<Class<?>,Clazz> mapClazz = new HashMap<>();
+	static enum Clazz {
+		INT(Integer.class, true),
+		SHORT(Short.class, true),
+		BYTE(Byte.class, true),
+		LONG(Long.class, true),
+		FLOAT(Float.class, true),
+		DOUBLE(Double.class, true),
+		BIGD(BigDecimal.class, true),
+		BOOL(Boolean.class)
+		;
+
+		public static Clazz getClazz(Class<?> c)
+		{
+			return mapClazz.get(c);
+		}
+
+		private final boolean isNumeric;
+		Clazz(Class<?> clazz)
+		{
+			this(clazz, false);
+		}
+		@SuppressWarnings("LeakingThisInConstructor")
+		Clazz(Class<?> clazz, boolean isNumeric)
+		{
+			mapClazz.put(clazz, this);
+			this.isNumeric = isNumeric;
+		}
+
+		boolean isNumeric()
+		{
+			return isNumeric;
+		}
+	}
+
 }

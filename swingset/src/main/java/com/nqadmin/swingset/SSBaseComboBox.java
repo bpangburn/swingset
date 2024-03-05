@@ -45,7 +45,6 @@ package com.nqadmin.swingset;
 import static com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.addEventLogging;
 import static com.nqadmin.swingset.models.OptionMappingSwingModel.asOptionMappingSwingModel;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -558,8 +557,8 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 
 		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
 			Object item = getSelectedItem();
-			if (item instanceof SSListItem) {
-				result = remodel.getMapping((SSListItem)item);
+			if (item instanceof SSListItem lItem) {
+				result = remodel.getMapping(lItem);
 			}
 		}
 
@@ -730,8 +729,8 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 
 		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
 			Object item = getSelectedItem();
-			if (item instanceof SSListItem) {
-				result = remodel.getOption((SSListItem)item);
+			if (item instanceof SSListItem lItem) {
+				result = remodel.getOption(lItem);
 			}
 		}
 
@@ -850,18 +849,12 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	}
 
 	/**
-	 * Method to allow Developer to add functionality when SwingSet component is
-	 * instantiated.
-	 * <p>
-	 * It will actually be called from SSCommon.init() once the SSCommon data member
-	 * is instantiated.
+	 * By default, the combo is not editable; Glazed lists will change.
 	 */
 	@Override
-	public void customInit() {
-		// SET PREFERRED DIMENSIONS
-// TODO not sure SwingSet should be setting component dimensions
-		setPreferredSize(new Dimension(200, 20));
-		setEditable(false); // NOTE: GLAZED LIST WILL OVERRIDE THIS
+	public void customInit()
+	{
+		setEditable(false);
 	}
 
 	/**

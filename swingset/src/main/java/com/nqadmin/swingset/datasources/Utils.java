@@ -53,7 +53,6 @@ import java.sql.Wrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.logging.Level;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -110,6 +109,7 @@ public class Utils
 				out.accept(sf("    column %d, conflict: '%s', crs: '%s'",
 						cc.columnIndex, cc.resolveValue(), cc.crsValue));
 		}
+		if(Boolean.FALSE) dumpConflict(out, null, null);
 	}
 
 	/**

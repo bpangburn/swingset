@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset;
 
 import java.awt.event.ItemEvent;
@@ -45,6 +50,8 @@ import javax.sql.RowSet;
 import javax.swing.JCheckBox;
 
 import java.lang.System.Logger;
+import java.sql.JDBCType;
+import java.util.EnumSet;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -54,6 +61,7 @@ import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.verifyConvertToType;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.sql.JDBCType.*;
 
 // SSCheckBox.java
 //
@@ -74,8 +82,6 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 @SuppressWarnings("serial")
 public class SSCheckBox extends JCheckBox implements SSComponentInterface
 {
-	private final boolean useObject = true; // To test read/write technique.
-
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
 	 * database column
@@ -88,34 +94,14 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 		{
 			ssCommon.removeRowSetListener();
 
-			if (useObject)
-				setBoundColumnObject(isSelected());
-			else {
-				setBoundColumnText(switch (getBoundColumnJDBCType()) {
-				case INTEGER, SMALLINT, TINYINT -> isSelected() ? CHECKED : UNCHECKED;
-				case BIT, BOOLEAN -> isSelected() ? BOOLEAN_CHECKED : BOOLEAN_UNCHECKED;
-				default -> "";
-				});
-			}
+			setBoundColumnObject(isSelected());
 
 			ssCommon.addRowSetListener();
 		}
 	} // end private class SSCheckBoxListener
 
-	/** Checked value for Boolean columns. */
-	protected static String BOOLEAN_CHECKED = "true";
-
-	/** Unchecked value for Boolean columns. */
-	protected static String BOOLEAN_UNCHECKED = "false";
-
-	/** Checked value for numeric columns. */
-	protected String CHECKED = "1";
-
-	/** Unchecked value for numeric columns. */
-	protected String UNCHECKED = "0";
-
 	/** Common fields shared across SwingSet components. */
-	transient protected final SSCommon ssCommon = new SSCommon(this);
+	protected final SSCommon ssCommon = new SSCommon(this);
 
 	/** System Logger for component. */
 	private static final Logger logger = SSUtils.getLogger();
@@ -151,41 +137,12 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 		super(_text);
 	}
 
-	/** {@inheritDoc} */
+	/** {@inheritDoc } */
 	@Override
-	public void bind(RowSet _rowSet, String _boundColumnName)
+	public void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException
 	{
-		verifyConvertToType(_rowSet, _boundColumnName, Boolean.class);
-
-		// TODO: the debugger shows _rowSet as null
-		SSComponentInterface.super.bind(_rowSet, _boundColumnName);
-
-		//
-		// TODO: RowSetOps.canConvertToType(this, Boolean.class)
-		//
-
-		// TODO: The following must be done before bind. Catch 22.
-		//RowSetOps.verifyConvertToType(this, Boolean.class);
-
-		//JDBCType typ = getBoundColumnJDBCType();
-		//switch(typ) {
-		//		case INTEGER, SMALLINT, TINYINT, BIT, BOOLEAN -> {}
-		//		default -> throw new IllegalArgumentException(
-		//				sf("'%s' invalid column type", typ));
-		//}
-	}
-
-	/**
-	 * Method to allow Developer to add functionality when SwingSet component is
-	 * instantiated.
-	 * <p>
-	 * It will actually be called from SSCommon.init() once the SSCommon data member
-	 * is instantiated.
-	 */
-	@Override
-	public void customInit() {
-		// NOTHING TO DO
-
+		verifyConvertToType(jdbcType, Boolean.class,
+				EnumSet.of(BIT, BOOLEAN, INTEGER, SMALLINT, TINYINT));
 	}
 
 	/**
@@ -220,16 +177,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 		final String text = getBoundColumnText();
 		logger.log(DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), text));
 
-		if (useObject)
-			setSelected(getBoundColumnObject(Boolean.class));
-		else {
-			// SELECT/DESELECT BASED ON UNDERLYING SQL TYPE
-			switch(getBoundColumnJDBCType()) {
-			// Use "UNCHECKED", "0" is the only false, CHECKED COULD be many values
-			case INTEGER, SMALLINT, TINYINT -> setSelected(!UNCHECKED.equals(text));
-			case BIT, BOOLEAN -> setSelected(BOOLEAN_CHECKED.equals(text));
-			}
-		}
+		setSelected(getBoundColumnObject(Boolean.class));
 	} // end protected void updateSSComponent() {
 
 	/** {@inheritDoc} */
