@@ -45,7 +45,9 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.EventListener;
+import java.util.GregorianCalendar;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
@@ -291,28 +293,45 @@ public class SSCommon implements Serializable {
 	protected static final long serialVersionUID = -7670575893542057725L;
 
 	/**
-	 * Converts a date string in "MM/dd/yyyy" format to an SQL Date.
+	 * Converts a date string in "[m]m/[d]d/yyyy" format to an SQL Date.
 	 *
-	 * @param _strDate date string in "MM/dd/yyyy" format
+	 * @param _strDate date string in "[m]m/[d]d/yyyy" format
 	 *
 	 * @return return SQL date for the string specified
 	 * @throws NoSuchElementException if there are no more tokens in this tokenizer's string
-	 * @throws IllegalArgumentException if the date given is not in the JDBC date escape format (yyyy-[m]m-[d]d)
 	 */
 	public static Date getSQLDate(final String _strDate) {
+		if (_strDate == null) {
+			return null;
+		}
 		String strDate = _strDate.trim();
 		if (strDate.isEmpty()) {
 			return null;
 		}
 		if (strDate.contains("/")) {
-			final StringTokenizer strtok = new StringTokenizer(strDate, "/", false);
-			final String month = strtok.nextToken();
-			final String day = strtok.nextToken();
+			StringTokenizer strtok = new StringTokenizer(strDate, "/", false);
+			String month = strtok.nextToken();
+			String day = strtok.nextToken();
 			strDate = strtok.nextToken() + "-" + month + "-" + day;
 		}
 		return Date.valueOf(strDate);
 	}
 
+	/**
+	 * Convert argument to "m[m]/d[d]/yyyy" format.
+	 * @param _date
+	 * @return
+	 */
+	public static String getStringDate(Date _date) {
+		GregorianCalendar calendar = new GregorianCalendar();
+		calendar.setTime(_date);
+		String strDate = "" + (calendar.get(Calendar.MONTH) + 1)
+				+ "/" + calendar.get(Calendar.DAY_OF_MONTH)
+				+ "/" + calendar.get(Calendar.YEAR);
+		return strDate;
+		
+	}
+	
 	/**
 	 * Flag to indicate if the bound database column can be null.
 	 * <p>
