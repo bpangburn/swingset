@@ -84,6 +84,7 @@ public class Example3 extends JFrame {
 	JLabel lblSupplierName = new JLabel("Supplier");
 	JLabel lblPartName = new JLabel("Part");
 	JLabel lblQuantity = new JLabel("Quantity");
+	JLabel lblShipDate = new JLabel("Ship Date");
 	
 	/**
 	 * bound component declarations
@@ -92,6 +93,7 @@ public class Example3 extends JFrame {
 	SSDBComboBox cmbSupplierName = null;
 	SSDBComboBox cmbPartName = null;
 	SSTextField txtQuantity = new SSTextField();
+	SSTextField txtShipDate = new SSTextField();
 	
 	/**
 	 * database component declarations
@@ -214,6 +216,7 @@ public class Example3 extends JFrame {
 			cmbPartName.setAllowNull(false);
 			cmbPartName.bind(rowset, "part_id");
 			txtQuantity.bind(rowset, "quantity");
+			txtShipDate.bind(rowset, "ship_date");
 
 		// RUN DB COMBO QUERIES
 			try {
@@ -231,12 +234,14 @@ public class Example3 extends JFrame {
 			lblSupplierName.setPreferredSize(MainClass.labelDim);
 			lblPartName.setPreferredSize(MainClass.labelDim);
 			lblQuantity.setPreferredSize(MainClass.labelDim);
+			lblShipDate.setPreferredSize(MainClass.labelDim);
 
 		// SET BOUND COMPONENT DIMENSIONS
 			txtSupplierPartID.setPreferredSize(MainClass.ssDim);
 			cmbSupplierName.setPreferredSize(MainClass.ssDim);
 			cmbPartName.setPreferredSize(MainClass.ssDim);
 			txtQuantity.setPreferredSize(MainClass.ssDim);
+			txtShipDate.setPreferredSize(MainClass.ssDim);
 
 		// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
 			final Container contentPane = getContentPane();
@@ -252,6 +257,8 @@ public class Example3 extends JFrame {
 			contentPane.add(lblPartName, constraints);
 			constraints.gridy = 3;
 			contentPane.add(lblQuantity, constraints);
+			constraints.gridy = 4;
+			contentPane.add(lblShipDate, constraints);
 
 			constraints.gridx = 1;
 			constraints.gridy = 0;
@@ -262,9 +269,11 @@ public class Example3 extends JFrame {
 			contentPane.add(cmbPartName, constraints);
 			constraints.gridy = 3;
 			contentPane.add(txtQuantity, constraints);
+			constraints.gridy = 4;
+			contentPane.add(txtShipDate, constraints);
 
 			constraints.gridx = 0;
-			constraints.gridy = 4;
+			constraints.gridy = 5;
 			constraints.gridwidth = 2;
 			contentPane.add(navigator, constraints);
 
