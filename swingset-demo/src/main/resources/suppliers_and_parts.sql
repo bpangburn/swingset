@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS supplier_data
 ( 
     supplier_id INTEGER DEFAULT nextval('supplier_data_seq') NOT NULL PRIMARY KEY,
     supplier_name VARCHAR(50), 
-    status SMALLINT, 
+    status SMALLINT NOT NULL CHECK (status <= 999), 
     city VARCHAR(50)
 );
 
