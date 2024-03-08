@@ -1,3 +1,0 @@
-*** THIS FILE CAN BE SAFELY DELETED ***
-
-2024-03-08_BP: After GridMoreDateStuff was merged into BooEd, we want to see if a change to the BooEd branch has an impact on the merged GridMoreDateStuff branch.
