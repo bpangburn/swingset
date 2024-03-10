@@ -237,7 +237,7 @@ public class SSUtils {
 		if (o == null) {
 			return "null";
 		}
-		return String.format("%s@%X", o.getClass().getSimpleName(), System.identityHashCode(o));
+		return sf("%s@%X", o.getClass().getSimpleName(), System.identityHashCode(o));
 	}
 
 }

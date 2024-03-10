@@ -118,7 +118,7 @@ public class DemoUtil {
 	/** Invoke this method to output collected statistics to log. */
 	public static void logConnectionUsage() {
 		logger.log(INFO, () -> "RowSetSourceDefault: " + whichRowSetDefault);
-		logger.log(INFO, () -> String.format(
+		logger.log(INFO, () -> sf(
 				"Connection pool: max active: %d, nOpen %d, nClose %d",
 				DataSourcePool.cMax(), DataSourcePool.nOpen(), DataSourcePool.nClose()));
 		for (String dsName : connMap.values()) {

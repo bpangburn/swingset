@@ -218,7 +218,7 @@ public class SSCommon
 									listenerNeedsRestoration = true;
 								}
 								try {
-									logger.log(DEBUG, () -> String.format("%s: restoring previous value '%s'", getColumnForLog(), previousValue));
+									logger.log(DEBUG, () -> sf("%s: restoring previous value '%s'", getColumnForLog(), previousValue));
 									((JTextComponent) getSSComponent()).setText(previousValue);
 								} finally {
 									if (listenerNeedsRestoration) {
@@ -395,11 +395,6 @@ public class SSCommon
 	public static final int NO_COLUMN_INDEX = -1;
 
 	/**
-	 * Unique serial ID.
-	 */
-	protected static final long serialVersionUID = -7670575893542057725L;
-
-	/**
 	 * Converts a date string in "[m]m/[d]d/yyyy" format to an SQL Date.
 	 *
 	 * @param _strDate date string in "[m]m/[d]d/yyyy" format
@@ -479,21 +474,21 @@ public class SSCommon
 	 */
 	private String logColumnName = null;
 
+	private Decorator decorator;
+	private Validator validator;
+
 	//
 	// isNullable is a cache of metadata.
 	// TODO: Incorporate into a more formal metadata cache
 	//       if/when there is one.
 	//
 
-	private Decorator decorator;
-	private Validator validator;
-
 	/**
 	 * Reflects the state of the data source metadata about nullability
 	 * of the bound column. False when there's a "NOT NULL" constraint.
 	 * Empty if the metadata specifies unknown.
 	 */
-	transient private Optional<Boolean> isNullable = Optional.empty();
+	private Optional<Boolean> isNullable = Optional.empty();
 
 	// /**
 	//  * Column SQL data type.
@@ -508,17 +503,17 @@ public class SSCommon
 	/**
 	 * parent SwingSet component
 	 */
-	transient private final SSComponentInterface ssComponent;
+	private final SSComponentInterface ssComponent;
 
 	/**
 	 * database connection
 	 */
-	transient private Connection connection = null;
+	private Connection connection = null;
 
 	/**
 	 * RowSet from which component will get/set values.
 	 */
-	transient private RowSet rowSet = null;
+	private RowSet rowSet = null;
 	
 	/**
 	 * Indicates if rowset listener is added (or removed)
@@ -642,7 +637,7 @@ public class SSCommon
 
 			default -> {
 				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
-				String message = String.format("%s - Encountered unknown Component Event Listener for: %s. Unable to add component listener.",
+				String message = sf("%s - Encountered unknown Component Event Listener for: %s. Unable to add component listener.",
 						getColumnForLog(), ssComponent.getClass().getSimpleName());
 				logger.log(ERROR, message);
 				JOptionPane.showMessageDialog((JComponent)getSSComponent(), message, "Unknown Component Event Listener", JOptionPane.ERROR_MESSAGE);
@@ -668,9 +663,8 @@ public class SSCommon
 			eventListener = getSSComponent().getSSComponentListener();
 		}
 
-		// Not sure of implications of bind fail,
-		// set default in case case bind fails.
-		// TODO: is this the right thing to do if bind fails?
+		// By default, if bind fails or database error,
+		// isNullable metadata is unknown.
 		isNullable = Optional.empty();
 
 		// TODO consider updating Component to null/zero/empty string if not valid column name, column index, or rowset
@@ -682,7 +676,7 @@ public class SSCommon
 			return;
 		}
 
-		logger.log(TRACE, () -> String.format("Column bind succeeded: name=%s, index=%d %s.",
+		logger.log(TRACE, () -> sf("Column bind succeeded: name=%s, index=%d %s.",
 				boundColumnName, boundColumnIndex, rowSet==null ? ", rowset=null" : ""));
 
 		//
@@ -690,7 +684,7 @@ public class SSCommon
 		// If doing this lazy elsewhere, flush the cache here.
 
 		isNullable = RowSetOps.isNullable(rowSet, boundColumnIndex);
-		logger.log(TRACE, () -> String.format("Column isNullable: %s.", isNullable));
+		logger.log(TRACE, () -> sf("Column isNullable: %s.", isNullable));
 
 		// Provide notification of a change in metadata
 		ssComponent.metadataChange();
@@ -766,7 +760,7 @@ public class SSCommon
 	/**
 	 * Retrieves the allowNull flag for the bound database column.
 	 * If setAllowNull() is not set, then the database metadata is used
-	 * to determine nullability; if unknown then return true;
+	 * to determine nullability; if database state unknown then return true;
 	 *
 	 * @return true if bound database column can contain null values, otherwise
 	 *         returns false
@@ -850,7 +844,7 @@ public class SSCommon
 				if (NavigateActions.ENABLE_UNDO_REDO) {
 					value = RowSetOps.getColumnObjectText(ssComponent);
 				} else {
-					value = RowSetOps.getColumnText(getRowSet(),getBoundColumnName());
+					value = RowSetOps.getColumnText(getSSComponent());
 				}
 				if (!getAllowNull() && (value == null)) {
 					value = "";
@@ -997,7 +991,7 @@ public class SSCommon
 			case JTextComponent _ -> removeSSDocumentListener();
 			default -> {
 				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
-				String message = String.format("%s - Encountered unknown Component Event Listener for: %s. Unable to remove component listener.",
+				String message = sf("%s - Encountered unknown Component Event Listener for: %s. Unable to remove component listener.",
 						getColumnForLog(), ssComponent.getClass().getSimpleName());
 				logger.log(ERROR, message);
 				JOptionPane.showMessageDialog((JComponent)getSSComponent(), message, "Unknown Component Event Listener", JOptionPane.ERROR_MESSAGE);

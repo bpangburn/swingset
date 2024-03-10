@@ -72,6 +72,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 
 import java.lang.System.Logger;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.google.common.eventbus.EventBus;
@@ -85,6 +86,7 @@ import static com.nqadmin.swingset.navigate.NavAction.*;
 import static com.nqadmin.swingset.navigate.RowSetState.setInserting;
 import static com.nqadmin.swingset.navigate.Utils.getLocalEventBus;
 import static com.nqadmin.swingset.navigate.RowSetState.setNavigateActions;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 //TODO: Handle CachedRowSet Paging
 
@@ -233,7 +235,7 @@ public class NavigateActions
 	{
 		if (!NavigateActions.ENABLE_UNDO_REDO)
 			throw new IllegalStateException("UNDO/REDO disabled");
-		logger.log(DEBUG, () -> String.format("%s: %s for %s", cmd,
+		logger.log(DEBUG, () -> sf("%s: %s for %s", cmd,
 				comp.getClass().getSimpleName(), comp.getBoundColumnName()));
 		NavigateActions navActs = get(comp.getRowSet());
 		navActs.doUndoRedo(comp, cmd);
@@ -1555,7 +1557,7 @@ public class NavigateActions
 	 * @see #updateActionStateWithDatabaseCheck() 
 	 */
 	private void updateActionState() {
-		logger.log(TRACE, () -> String.format("rowCount=%d, currentRow=%d", rowCount, currentRow));
+		logger.log(TRACE, () -> sf("rowCount=%d, currentRow=%d", rowCount, currentRow));
 
 		boolean isRowModified = undoRow.isDirty();
 

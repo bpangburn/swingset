@@ -879,7 +879,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 //	@Deprecated
 //	public void setEditable(boolean _editable) {
 //		if (_editable && getAutoComplete() == null) {
-//			logger.warn(String.format("%s: SwingSet requires non-editable combo boxes.", getColumnForLog()));
+//			logger.warn(sf("%s: SwingSet requires non-editable combo boxes.", getColumnForLog()));
 //		} else {
 //			super.setEditable(_editable);
 //		}

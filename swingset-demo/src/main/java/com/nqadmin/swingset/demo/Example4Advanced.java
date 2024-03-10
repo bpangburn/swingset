@@ -41,15 +41,14 @@ import com.nqadmin.swingset.SSBaseComboBox.MissingOptionControl;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
 import static com.nqadmin.swingset.navigate.NavAction.*;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.sql.Connection;
 import java.util.EnumSet;
 import java.util.Objects;
-import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
@@ -265,7 +264,7 @@ public class Example4Advanced extends Example4
 	private void changeListFormatter(String tag) {
 		countChange++;
 		int captureCountChange = countChange;
-		logger.log(INFO, String.format("change%s formatter: %d", tag, countChange));
+		logger.log(INFO, sf("change%s formatter: %d", tag, countChange));
 		EventQueue.invokeLater(() -> {
 			cmbPartColor.setListItemFormat(new SSListItemFormat() {
 				@Override

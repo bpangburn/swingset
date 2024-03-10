@@ -42,6 +42,7 @@ import com.nqadmin.swingset.SSDataGridHandler;
 import com.nqadmin.swingset.SSDataValue;
 import com.nqadmin.swingset.SSTableModel;
 import com.nqadmin.swingset.datasources.RowSetOps;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -244,7 +245,7 @@ class DataGridExampleSupport {
 			if(row == -1 || !dataGrid.isAllowDeletion()) {
 				String msg = row == -1
 						? "No row is selected."
-						: String.format("Deletion (%d --> %d) no allowed", rowSel, row);
+						: sf("Deletion (%d --> %d) no allowed", rowSel, row);
 				JOptionPane.showMessageDialog((Component) e.getSource(),
 						msg, "Can not delete", JOptionPane.ERROR_MESSAGE);
 			} else {

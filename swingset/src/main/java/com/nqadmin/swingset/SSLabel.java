@@ -60,37 +60,34 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
  * Used to display database values in a read-only JLabel.
+ * By default, programmatic changes to the label are not propagated,
+ * except of course to set a label's value from a RowSet.
  */
 @SuppressWarnings("serial")
-public class SSLabel extends JLabel implements SSComponentInterface {
-
+public class SSLabel extends JLabel implements SSComponentInterface
+{
+	// TODO: Come up with general way to allow selective prop change disable.
+	@SuppressWarnings("FieldMayBeFinal")
+	private boolean allowPropertyChangePropagation = false;
 	/**
-	 * Listen for label changed externally; propogate the value to the
-	 * database column.
-	 * <p>
-	 * There is not an obvious use-case where a label would be changed, but
-	 * could be tied to a menu, screen logic, or some other Developer driven
-	 * change that could conceivably need to be synchronized back to the RowSet.
+	 * Listener for label changed externally; propagate the value to the
+	 * database column. By default not enabled.
 	 */
 	protected class SSLabelListener implements PropertyChangeListener
 	{
-
-		/** {@inheritDoc} */
+		/** Propogate "text" property change to database.
+		 * {@inheritDoc} */
 		@Override
-		public void propertyChange(final PropertyChangeEvent pce) {
-
-			// Propogate "text" property change to database.
+		public void propertyChange(final PropertyChangeEvent pce)
+		{
+			if (!allowPropertyChangePropagation)
+				return;
 			if ("text".equals(pce.getPropertyName())) {
-
 				ssCommon.removeRowSetListener();
-
 				setBoundColumnText(getText());
-
 				ssCommon.addRowSetListener();
 			}
-
 		}
-
 	} // end protected class SSLabelListener
 
 	/** Log4j Logger for component */

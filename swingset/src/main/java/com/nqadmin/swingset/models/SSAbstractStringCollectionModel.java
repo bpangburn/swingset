@@ -51,11 +51,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import java.lang.System.Logger;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSAbstractStringCollectionModel.java
 //
@@ -107,7 +110,7 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 	/** {@inheritDoc} */
 	@Override
 	public Object[] readData(SSComponentInterface comp) throws SQLException {
-		String dbstring = RowSetOps.getColumnText(comp.getRowSet(), comp.getBoundColumnName());
+		String dbstring = RowSetOps.getColumnText(comp);
 		return toObjArray(getJDBCType(), dbstring);
 	}
 
@@ -120,7 +123,7 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 			String collectionElement = object.toString();
 			if(collectionElement.contains(separator))
 				throw new SQLException(new IllegalArgumentException(
-						String.format("SET element '%s' has a '%s' in it",
+						sf("SET element '%s' has a '%s' in it",
 								collectionElement, getSeparatorName())));
 			arr.add(object.toString());
 		}
@@ -132,7 +135,10 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 
 	// TODO: use a common parse String to Object
 	// TODO: put into RowSetOps?
-	private Object[] toObjArray(final JDBCType _jdbcType, final String _dbstring) throws SQLException {
+	// TODO: toObjArray additional JDBC types: TIME/TIMESTAMP/*_WITH_TIMEZONE/...
+	private Object[] toObjArray(final JDBCType _jdbcType, final String _dbstring)
+			throws SQLException
+	{
 		if (_dbstring == null) {
 			return null;
 		}
@@ -145,37 +151,22 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 		try {
 			for(String s : dbSplit) {
 				switch (_jdbcType) {
-				case INTEGER:
-				case SMALLINT:
-				case TINYINT:
-					data.add(Integer.valueOf(s));
-					break;
-				case BIGINT:
-					data.add(Long.valueOf(s));
-					break;
-				case REAL:
-					data.add(Float.valueOf(s));
-					break;
-				case FLOAT:
-				case DOUBLE:
-					data.add(Double.valueOf(s));
-					break;
-				case DECIMAL:
-				case NUMERIC:
-					data.add(new BigDecimal(s));
-					break;
-				case DATE:
-					data.add(Date.valueOf(s));
-					break;
-				case CHAR:
-				case VARCHAR:
-				case LONGVARCHAR:
+				case INTEGER, SMALLINT, TINYINT
+						-> data.add(Integer.valueOf(s));
+				case BIGINT
+						-> data.add(Long.valueOf(s));
+				case REAL
+						-> data.add(Float.valueOf(s));
+				case FLOAT, DOUBLE
+						-> data.add(Double.valueOf(s));
+				case DECIMAL, NUMERIC
+						-> data.add(new BigDecimal(s));
+				case DATE
+						-> data.add(Date.valueOf(s));
+				case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR
+						-> data.add(s);
+				default -> // TODO: toObjArray exception later?
 					data.add(s);
-					break;
-				default:
-					// TODO: exception later?
-					data.add(s);
-					break;
 				}
 			}
 		} catch (IllegalArgumentException ex) {
