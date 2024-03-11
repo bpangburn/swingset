@@ -37,7 +37,6 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
-import java.awt.Dimension;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;

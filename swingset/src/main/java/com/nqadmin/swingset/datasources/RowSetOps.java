@@ -51,9 +51,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.EnumSet;
-import java.util.GregorianCalendar;
 import java.util.Optional;
 
 import javax.sql.RowSet;
@@ -61,6 +59,9 @@ import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.spi.SyncProviderException;
 
 import java.lang.System.Logger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -466,60 +467,21 @@ public class RowSetOps {
 
 			// Based on the column data type convert column's value to a String.
 			switch (jdbcType) {
-			case INTEGER, SMALLINT, TINYINT
-					-> value = String.valueOf(_rowSet.getInt(_columnIndex));
-			case BIGINT
-					-> value = String.valueOf(_rowSet.getLong(_columnIndex));
-			case REAL
-					-> value = String.valueOf(_rowSet.getFloat(_columnIndex));
-			case DOUBLE, FLOAT
-					-> value = String.valueOf(_rowSet.getDouble(_columnIndex));
-			case NUMERIC, DECIMAL
-					-> value = String.valueOf(_rowSet.getBigDecimal(_columnIndex));
-			case BIT, BOOLEAN
-					-> value = String.valueOf(_rowSet.getBoolean(_columnIndex));
-			case DATE -> {
-				// NOTE: See SSCommon/getStringDate for a modified version
-				// Convert to "##/##/####", month/day/year, month day has two digits.
-				final Date date = _rowSet.getDate(_columnIndex);
-				if (date == null) {
-					value = "";
-				} else {
-					//
-					// TODO: Would the "SSCommon.getStringDate" format be OK?
-					//		 That format does not have leading zero on
-					//		 single digit month or day.
-					//
-					final GregorianCalendar calendar = new GregorianCalendar();
-					calendar.setTime(date);
-					value = sf("%02d/%02d/%d",
-							calendar.get(Calendar.MONTH) + 1,
-							calendar.get(Calendar.DAY_OF_MONTH),
-							calendar.get(Calendar.YEAR));
-				}
-			}
-			case TIMESTAMP -> {
-				Timestamp timestamp = _rowSet.getTimestamp(_columnIndex);
-				if (timestamp == null) {
-					value = "";
-				} else {
-					//
-					// TODO: this isn't "month/day/year". DOES THAT MATTER?
-					//
-					// Convert to "yyyy-mm-dd hh:mm:ss.fffffffff"
-					// substring(0, 19) // without the nanoseconds
-					// This format matches what "updateColumnText" expects
-					//System.err.println("TIMESTAMP get: " + timestamp);
-					value = timestamp.toString();
-				}
-			}
-			case TIME -> {
-				final Time time = _rowSet.getTime(_columnIndex);
-				if (time == null) {
-					value = "";
-				} else {
-					value=time.toString();
-				}
+			case INTEGER, SMALLINT, TINYINT ->
+				value = String.valueOf(_rowSet.getInt(_columnIndex));
+			case BIGINT ->
+				value = String.valueOf(_rowSet.getLong(_columnIndex));
+			case REAL ->
+				value = String.valueOf(_rowSet.getFloat(_columnIndex));
+			case DOUBLE, FLOAT ->
+				value = String.valueOf(_rowSet.getDouble(_columnIndex));
+			case NUMERIC, DECIMAL ->
+				value = String.valueOf(_rowSet.getBigDecimal(_columnIndex));
+			case BIT, BOOLEAN ->
+				value = String.valueOf(_rowSet.getBoolean(_columnIndex));
+			case DATE, TIME, TIMESTAMP -> {
+				Object dateTimeObject = _rowSet.getObject(_columnIndex);
+				value = DateTime.getDateTimeText(dateTimeObject, comp);
 			}
 			case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR -> {
 				final String str = _rowSet.getString(_columnIndex);
@@ -579,41 +541,8 @@ public class RowSetOps {
 					// the CHAR... cases already handled, but...
 					CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR ->
 				value = objectValue.toString();
-			case DATE -> 	{
-				// NOTE: See SSCommon/getStringDate for a modified version
-				// Convert to "##/##/####", month/day/year, month day has two digits.
-				//final Date date = _rowSet.getDate(_columnName);
-				final Date date = (Date) objectValue;
-				
-				//
-				// TODO: Would the "SSCommon.getStringDate" format be OK?
-				//		 That format does not have leading zero on
-				//		 single digit month or day.
-				//
-				final GregorianCalendar calendar = new GregorianCalendar();
-				calendar.setTime(date);
-				value = sf("%02d/%02d/%d",
-						calendar.get(Calendar.MONTH) + 1,
-						calendar.get(Calendar.DAY_OF_MONTH),
-						calendar.get(Calendar.YEAR));
-			}
-			case TIMESTAMP -> {
-				//Timestamp timestamp = _rowSet.getTimestamp(_columnName);
-				Timestamp timestamp = (Timestamp) objectValue;
-				//
-				// TODO: this isn't "month/day/year". DOES THAT MATTER?
-				//
-				// Convert to "yyyy-mm-dd hh:mm:ss.fffffffff"
-				// substring(0, 19) // without the nanoseconds
-				// This format matches what "updateColumnText" expects
-				//System.err.println("TIMESTAMP get: " + timestamp);
-				value = timestamp.toString();
-			}
-			case TIME -> 	{
-				//final Time time = _rowSet.getTime(_columnName);
-				Time time = (Time) objectValue;
-				value = time.toString();
-			}
+			case DATE, TIME, TIMESTAMP ->
+				value = DateTime.getDateTimeText(objectValue, comp);
 			default -> // TODO: SSSQLExceptionUnhandledType
 				logger.log(ERROR, "Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
 			} // end switch
@@ -1084,57 +1013,21 @@ public class RowSetOps {
 			case BOOLEAN, BIT -> {
 				final boolean boolValue = Boolean.parseBoolean(_updatedValue);
 				_rowSet.updateBoolean(_columnName, boolValue);
-				}
-			case DATE -> {
-				//
-				// TODO: there's an ignored IllegalArgumentException possible
-				// Convert a 10 character date "mm/dd/yyyy" or "yyyy-mm-dd"
-// TODO Good to get rid of getSQLDate if possible.
-// 2022-05-31_BP: Probably best to cast to a LocalDate and return if that fails.
-// 	Can convert to SQL Date if successful.
-				if (_updatedValue.length() == 10) {
-					try {
-						Date dateValue = SSCommon.getSQLDate(_updatedValue);
-						_rowSet.updateDate(_columnName, dateValue);
-					} catch(IllegalArgumentException ex) {
-						logger.log(WARNING, "updateColumnText: DATE: " + ex.getMessage());
-						throw ex;
-					}
-					// Per https://github.com/bpangburn/swingset/issues/141,
-				}
 			}
-				
+			case DATE -> {
+				final Date date = Date.valueOf((LocalDate)
+						DateTime.getDateTimeObject(_updatedValue, comp));
+				_rowSet.updateDate(_columnName, date);
+			}
 			case TIME -> {
-				//
-				// TODO: there's an ignored IllegalArgumentException possible
-				// Convert a time like "hh:mm:ss"
-				// TODO: Better way to handle Time conversion? Formatter?
-				if (_updatedValue.length() == 8) {
-					try {
-						Time timeValue = java.sql.Time.valueOf(_updatedValue);
-						_rowSet.updateTime(_columnName, timeValue);
-					} catch(IllegalArgumentException ex) {
-						logger.log(WARNING, "updateColumnText: TIME: " + ex.getMessage());
-						throw ex;
-					}
-				}
+				final Time time = Time.valueOf((LocalTime)
+						DateTime.getDateTimeObject(_updatedValue, comp));
+				_rowSet.updateTime(_columnName, time);
 			}
 			case TIMESTAMP -> {
-				Timestamp timestampValue = null;
-				try {
-					if (_updatedValue.length() == 10) {
-						Date dateValue = SSCommon.getSQLDate(_updatedValue);
-						timestampValue = new Timestamp(dateValue.getTime());
-					} else if (_updatedValue.length() == 19 || _updatedValue.length() > 20) {
-						timestampValue = java.sql.Timestamp.valueOf(_updatedValue);
-					}
-					if (timestampValue != null) {
-						_rowSet.updateTimestamp(_columnName, timestampValue);
-					}
-				} catch(IllegalArgumentException ex) {
-					logger.log(WARNING, "updateColumnText: TIMESTAMP: " + ex.getMessage());
-					throw ex;
-				}
+				final Timestamp timestamp = Timestamp.valueOf((LocalDateTime)
+						DateTime.getDateTimeObject(_updatedValue, comp));
+				_rowSet.updateTimestamp(_columnName, timestamp);
 			}
 			case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR
 					-> _rowSet.updateString(_columnName, _updatedValue);

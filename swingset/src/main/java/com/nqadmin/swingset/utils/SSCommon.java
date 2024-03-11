@@ -53,18 +53,13 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.SQLException;
-import java.util.Calendar;
 import java.util.EventListener;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
@@ -98,6 +93,7 @@ import com.nqadmin.swingset.SSImage;
 import com.nqadmin.swingset.SSLabel;
 import com.nqadmin.swingset.SSList;
 import com.nqadmin.swingset.SSSlider;
+import com.nqadmin.swingset.datasources.DateTime;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.datasources.SSSQLInternalException;
 import com.nqadmin.swingset.datasources.SSSQLNullException;
@@ -107,6 +103,7 @@ import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 
+import static com.nqadmin.swingset.datasources.DateTime.dateTimeColumnValidate;
 import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingChanges;
 import static com.nqadmin.swingset.navigate.Utils.postRowSetModifiedError;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -194,7 +191,10 @@ public class SSCommon
 				if (lastNotifiedChange != lastChange) {
 					lastNotifiedChange = lastChange;
 
+					String text = ((JTextComponent) getSSComponent()).getText();
+
 					if (!isValidChange()) {
+						postRowSetModifiedError(getSSComponent(), text);
 						return;
 					}
 
@@ -202,7 +202,7 @@ public class SSCommon
 
 					boolean ok = true;
 					try {
-						ok = setBoundColumnText(((JTextComponent) getSSComponent()).getText());
+						ok = setBoundColumnText(text);
 					} finally {
 						if (!ok) {
 							// TODO:
@@ -393,52 +393,6 @@ public class SSCommon
 	 * Constant to indicate that no RowSet column index has been specified.
 	 */
 	public static final int NO_COLUMN_INDEX = -1;
-
-	/**
-	 * Converts a date string in "[m]m/[d]d/yyyy" format to an SQL Date.
-	 *
-	 * @param _strDate date string in "[m]m/[d]d/yyyy" format
-	 *
-	 * @return return SQL date for the string specified
-	 * @throws IllegalArgumentException if data conversion fails
-	 */
-	// TODO: check that all callers handle excepted as needed
-	public static Date getSQLDate(final String _strDate)
-	throws IllegalArgumentException {
-		if (_strDate == null) {
-			return null;
-		}
-		String strDate = _strDate.trim();
-		if (strDate.isEmpty()) {
-			return null;
-		}
-		if (strDate.contains("/")) {
-			try {
-				StringTokenizer strtok = new StringTokenizer(strDate, "/", false);
-				String month = strtok.nextToken();
-				String day = strtok.nextToken();
-				strDate = strtok.nextToken() + "-" + month + "-" + day;
-			} catch (NoSuchElementException ex) {
-				throw new IllegalArgumentException("Date conversion: not enough tokens", ex);
-			}
-		}
-		return Date.valueOf(strDate);
-	}
-
-	/**
-	 * Convert argument to "m[m]/d[d]/yyyy" format.
-	 * @param _date
-	 * @return
-	 */
-	public static String getStringDate(Date _date) {
-		GregorianCalendar calendar = new GregorianCalendar();
-		calendar.setTime(_date);
-		String strDate = "" + (calendar.get(Calendar.MONTH) + 1)
-				+ "/" + calendar.get(Calendar.DAY_OF_MONTH)
-				+ "/" + calendar.get(Calendar.YEAR);
-		return strDate;
-		
-	}
 	
 	/**
 	 * Flag to indicate if the bound database column can be null.
@@ -489,11 +443,6 @@ public class SSCommon
 	 * Empty if the metadata specifies unknown.
 	 */
 	private Optional<Boolean> isNullable = Optional.empty();
-
-	// /**
-	//  * Column SQL data type.
-	//  */
-	// private int boundColumnType = java.sql.Types.NULL;
 
 	/**
 	 * flag to indicate if we're inside of a bind() method
@@ -574,16 +523,6 @@ public class SSCommon
 			}
 		});
 	}
-
-//	/**
-//	 * Convenience method to add both RowSet and SwingSet Component listeners.
-//	 * <p>
-//	 * Does not add DocumentListener.
-//	 */
-//	public void addListeners() {
-//		addRowSetListener();
-//		addSSComponentListener();
-//	}
 
 	/**
 	 * Method to add a document listener when the SwingSet component is a
@@ -732,29 +671,13 @@ public class SSCommon
 	 * @param _boundColumnName name of the column to which this check box should be
 	 *                         bound
 	 */
-	public void bind(final RowSet _rowSet, final String _boundColumnName) { // throws java.sql.SQLException {
+	public void bind(final RowSet _rowSet, final String _boundColumnName)
+	{ // throws java.sql.SQLException {
 		try {
 			bind(_rowSet, RowSetOps.getColumnIndex(_rowSet, _boundColumnName));
 		} catch (final SQLException se) {
 			logger.log(ERROR, "[" + _boundColumnName + "] - Failed to retrieve column index while binding.", se);
 		}
-//		// INDICATE THAT WE'RE UPDATING THE BINDINGS
-//		inBinding = true;
-//
-//		// UPDATE ROWSET
-//		removeRowSetListener();
-//		setRowSet(_rowSet);
-//		addRowSetListener();
-//
-//		// UPDATE COLUMN NAME
-//		setBoundColumnName(_boundColumnName);
-//
-//		// INDICATE THAT WE'RE DONE SETTING THE BINDINGS
-//		inBinding = false;
-//
-//		// UPDATE THE COMPONENT
-//		bind();
-
 	}
 
 	/**
@@ -916,16 +839,6 @@ public class SSCommon
 		return rowSet;
 	}
 
-// BP_2021-02-11: Eliminating this method. Seems dangerous to provide access.
-//	/**
-//	 * Returns Listener for the RowSet bound to the database
-//	 *
-//	 * @return listener for the bound RowSet
-//	 */
-//	public SSRowSetListener getRowSetListener() {
-//		return rowSetListener;
-//	}
-
 	/**
 	 * Method called from Constructor to perform one-time setup tasks including
 	 * field traversal and any custom initialization method specific to the SwingSet
@@ -955,16 +868,6 @@ public class SSCommon
 	public final boolean isSSComponentListenerAdded() {
 		return ssComponentListenerAdded;
 	}
-
-//	/**
-//	 * Convenience method to remove both RowSet and SwingSet Component listeners.
-//	 * <p>
-//	 * Does not remove DocumentListener.
-//	 */
-//	public void removeListeners() {
-//		removeRowSetListener();
-//		removeSSComponentListener();
-//	}
 	
 	/**
 	 * Method to add any SwingSet Component listener(s).
@@ -1229,17 +1132,6 @@ public class SSCommon
 		logger.log(WARNING, getBoundColumnName() + " - " + ex_title + ".", ex);
 		JOptionPane.showMessageDialog((JComponent)getSSComponent(), ex_msg,
 									  ex_title, JOptionPane.ERROR_MESSAGE);
-
-		// if (ex instanceof SSSQLNullException) {
-		// 	ex_title = "Null Exception";
-		// 	ex_msg = "Null values are not allowed for " + getBoundColumnName();
-		// } else if (ex instanceof SQLException) {
-		// 	ex_title = "SQL Exception";
-		// 	ex_msg = "SQL Exception encountered for " + getBoundColumnName();
-		// } else if (ex instanceof NumberFormatException) {
-		// 	ex_title = "Number Format Exception";
-		// 	ex_msg = "Number Format Exception encountered for " + getBoundColumnName() + " converting " + value + " to a number.";
-		// }
 	}
 
 	/**
@@ -1292,8 +1184,8 @@ public class SSCommon
 
 	}
 
-	private static final String U = "SwingSetColumnUndo";
-	private static final String R = "SwingSetColumnRedo";
+	private static final String UNDO_ACTION_KEY = "SwingSetColumnUndo";
+	private static final String REDO_ACTION_KEY = "SwingSetColumnRedo";
 	/**
 	 * Setup undo/redo action bindings for a component.
 	 * @param comp
@@ -1311,12 +1203,12 @@ public class SSCommon
 		KeyStroke ksRedo = KeyStroke.getKeyStroke("ctrl Y");
 		int cond = JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 		InputMap im = new InputMap();
-		im.put(ksUndo, U);
-		im.put(ksRedo, R);
+		im.put(ksUndo, UNDO_ACTION_KEY);
+		im.put(ksRedo, REDO_ACTION_KEY);
 		im.setParent(jc.getInputMap(cond));
 		jc.setInputMap(cond, im);
 		ActionMap am = new ActionMap();
-		am.put(U, new AbstractAction() {
+		am.put(UNDO_ACTION_KEY, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
@@ -1327,7 +1219,7 @@ public class SSCommon
 				}
 			}
 		});
-		am.put(R, new AbstractAction() {
+		am.put(REDO_ACTION_KEY, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
@@ -1373,16 +1265,15 @@ public class SSCommon
 	 */
 	public void updateSSComponent() {
 		
-		// If you see this in the logs back to back for the same component a listener is likely
-		// not handled properly. Maybe incorporate SwingUtilities.invokeLater()? 
+		// If you see this in the logs back to back for the same component
+		// a listener is likely not handled properly.
+		// Maybe incorporate SwingUtilities.invokeLater()? 
 		logger.log(TRACE, () -> sf("Updating component %s.", getColumnForLog()));
 		
 		removeSSComponentListener();
-
 		ssComponent.updateSSComponent();
-
 		addSSComponentListener();
-
+		decorate();
 	}
 	/**
 	 * Issue a row changed event if there's an active RowSetListener.
@@ -1436,6 +1327,7 @@ public class SSCommon
 	 * Run the decorator.
 	 */
 	public final void decorate() {
+		logger.log(DEBUG, sf("%s", getColumnForLog()));
 		decorator.decorate();
 	}
 
@@ -1479,6 +1371,11 @@ public class SSCommon
 	 * @return true if valid
 	 */
 	public final boolean validate() {
+		// Check a possible date/time validation. TODO: how to disable, where to put
+		if (DateTime.isHandledDateTime(getSSComponent())
+				&& !dateTimeColumnValidate(getSSComponent()))
+			return false;
+
 		return validator.validate();
 	}
 
@@ -1503,11 +1400,8 @@ public class SSCommon
 			return true;
 		}
 
-		// For now, always do validation
-
-		// boolean isValid = validate();
+		// decorator does validation
 		return decorator.decorate();
-		// return isValid;
 	}
 
 }

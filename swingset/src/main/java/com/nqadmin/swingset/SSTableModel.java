@@ -57,6 +57,8 @@ import javax.swing.table.AbstractTableModel;
 import java.lang.System.Logger;
 import java.util.function.Supplier;
 
+import com.nqadmin.swingset.datasources.DateTime;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
@@ -497,7 +499,7 @@ public class SSTableModel extends AbstractTableModel {
 				break;
 			case Types.DATE:
 				if (_value instanceof String) {
-					rowset.updateDate(_column + 1, SSCommon.getSQLDate((String) _value));
+					rowset.updateDate(_column + 1, DateTime.getSQLDate((String) _value));
 				} else {
 					rowset.updateDate(_column + 1, (Date) _value);
 				}
@@ -788,11 +790,11 @@ public class SSTableModel extends AbstractTableModel {
 		// IF COPYING VALUES THE DATE WILL COME AS STRING SO CONVERT IT TO DATE OBJECT.
 		if (type == JDBCType.DATE) {
 			if (valueCopy instanceof String) {
-				valueCopy = SSCommon.getSQLDate((String) valueCopy);
+				valueCopy = DateTime.getSQLDate((String) valueCopy);
 			}
 		} else if (type == JDBCType.TIMESTAMP) {
 			if (valueCopy instanceof String) {
-				valueCopy = new Timestamp(SSCommon.getSQLDate((String) valueCopy).getTime());
+				valueCopy = new Timestamp(DateTime.getSQLDate((String) valueCopy).getTime());
 			}
 		}
 

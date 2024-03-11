@@ -52,13 +52,10 @@ import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.EventObject;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.sql.RowSet;
@@ -89,6 +86,8 @@ import javax.swing.table.TableRowSorter;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+
+import com.nqadmin.swingset.datasources.DateTime;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -179,7 +178,7 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * Also See Examples 5, 6, 7 in the samples.
  * </pre>
  */
-
+@SuppressWarnings("serial")
 public class SSDataGrid extends JTable {
 
 	// TODO BUG? there's no programatic way to change COPY/PASTE.
@@ -192,12 +191,8 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Editor for check box fields.
 	 */
-	protected class CheckBoxEditor extends DefaultCellEditor {
-		/**
-		 * Unique serial ID
-		 */
-		private static final long serialVersionUID = 966225988861238964L;
-		
+	protected class CheckBoxEditor extends DefaultCellEditor
+	{
 		/** Variable to store the sql type. */
 		protected JDBCType columnClass = null;
 
@@ -231,14 +226,14 @@ public class SSDataGrid extends JTable {
 			boolean isSelected = false;
 
 			// CHECK THE TYPE OF COLUMN, IT SHOULD BE THE SAME AS THE TYPE OF _VALUE.
-			if (_value instanceof Boolean) {
+			if (_value instanceof Boolean b) {
 				columnClass = JDBCType.BOOLEAN; // STORE THE TYPE OF COLUMN WE NEED
-				isSelected = (Boolean) _value;
+				isSelected = b;
 			}
-			else if (_value instanceof Integer) {
+			else if (_value instanceof Integer i) {
 				columnClass = JDBCType.INTEGER; // STORE THE COLUMN CLASS.
 				// A VALUE OF 0 IS FALSE - ANY OTHER VALUE IS TRUE
-				isSelected = (Integer) _value != 0;
+				isSelected = i != 0;
 			}
 			else {
 				// THE COLUMN IS NOT BOOLEAN OR INTEGER, LOG ERROR MESSAGE.
@@ -253,13 +248,8 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Renderer for check box fields.
 	 */
-	protected class CheckBoxRenderer extends JCheckBox implements TableCellRenderer {
-
-		/**
-		 * Unique serial ID.
-		 */
-		private static final long serialVersionUID = -8310278203475303010L;
-
+	protected class CheckBoxRenderer extends JCheckBox implements TableCellRenderer
+	{
 		/** {@inheritDoc} */
 		@Override
 		public Component getTableCellRendererComponent(final JTable _table, final Object _value, final boolean _selected,
@@ -281,17 +271,12 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Editor for combo box fields.
 	 */
-	protected class ComboEditor extends DefaultCellEditor {
-		
-		/**
-		 * unique serial id
-		 */
-		private static final long serialVersionUID = -6439941232160386725L;
-		
+	protected class ComboEditor extends DefaultCellEditor
+	{
 		// Set the # of clicks required to edit the combo to 2.
 		final int tmpClickCountToStart = 2;
-		transient final Object[] items;
-		transient final Object[] underlyingValues;
+		final Object[] items;
+		final Object[] underlyingValues;
 
 		/**
 		 * Combo Editor.
@@ -408,7 +393,6 @@ public class SSDataGrid extends JTable {
 		}
 	}
 
-	@SuppressWarnings("serial")
 	private final class GridComboEditorComboBox
 			extends JComboBox<ComboEditor.GridComboModels.GridComboItem> {
 		public ComboEditor.GridComboModels.GridComboItem getGridSelItem() {
@@ -419,15 +403,10 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Renderer for combo box fields.
 	 */
-	protected class ComboRenderer extends DefaultTableCellRenderer.UIResource {
-		
-		/**
-		 * Unique serial ID.
-		 */
-		private static final long serialVersionUID = 2010609036458432567L;
-		
-		transient Object[] displayValues = null;
-		transient Object[] underlyingValues = null;
+	protected class ComboRenderer extends DefaultTableCellRenderer.UIResource
+	{
+		Object[] displayValues = null;
+		Object[] underlyingValues = null;
 
 		/**
 		 * Combo renderer.
@@ -488,12 +467,8 @@ public class SSDataGrid extends JTable {
 	 * Editor for date fields. Used the SSTextField as the editor, but changes the
 	 * format to mm/dd/yyy from yyyy-mm-dd.
 	 */
-	protected class DateEditor extends DefaultCellEditor {
-		/**
-		 * Unique serial ID.
-		 */
-		private static final long serialVersionUID = 8741829961228359406L;
-
+	protected class DateEditor extends DefaultCellEditor
+	{
 		/**
 		 * Grid date editor.
 		 */
@@ -539,7 +514,7 @@ public class SSDataGrid extends JTable {
 		@Override
 		public Object getCellEditorValue() {
 			final String strDate = ((JTextField) (DateEditor.this.getComponent())).getText();
-			return SSCommon.getSQLDate(strDate);
+			return DateTime.getSQLDate(strDate);
 		}
 
 		/**
@@ -554,7 +529,7 @@ public class SSDataGrid extends JTable {
 
 			Object value = _value;
 			if (value instanceof Date) {
-				value = SSCommon.getStringDate((Date) value);
+				value = DateTime.getStringDate((Date) value);
 			}
 
 			return super.getTableCellEditorComponent(table, value, isSelected, row, column);
@@ -582,13 +557,8 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Renderer for date fields. Displays dates using mm/dd/yyyy format.
 	 */
-	protected class DateRenderer extends DefaultTableCellRenderer {
-
-		/**
-		 * Unique serial ID.
-		 */
-		private static final long serialVersionUID = 2167118906692276587L;
-
+	protected class DateRenderer extends DefaultTableCellRenderer
+	{
 		/**
 		 * Set the value to render. Expect date; if not, give it to super.
 		 * @param value probably a date
@@ -596,7 +566,7 @@ public class SSDataGrid extends JTable {
 		@Override
 		public void setValue(final Object value) {
 			if (value instanceof java.sql.Date) {
-				String strDate = SSCommon.getStringDate((Date) value);
+				String strDate = DateTime.getStringDate((Date) value);
 				setHorizontalAlignment(SwingConstants.CENTER);
 				setText(strDate);
 			} else {
@@ -672,14 +642,9 @@ public class SSDataGrid extends JTable {
 		}
 
 		/**
-		 * Unique serial ID.
-		 */
-		private static final long serialVersionUID = -5408829003545103686L;
-
-		/**
 		 * Constructor to instantiate an object of column type from a string.
 		 */
-		transient Constructor<?> constructor;
+		Constructor<?> constructor;
 
 		/**
 		 * Value of the editor.
@@ -688,7 +653,7 @@ public class SSDataGrid extends JTable {
 		//		 We could probably create a new method getCellValue and use
 		//		 initial part of stopCellEditing code in it and then call
 		//		 this new funds getCellEditorValue and in stopCellEditing.
-		transient Object value;
+		Object value;
 
 		/**
 		 * Constructs Default Editor.
@@ -767,11 +732,6 @@ public class SSDataGrid extends JTable {
 	private static Logger logger = SSUtils.getLogger();
 
 	/**
-	 * Unique serial ID
-	 */
-	private static final long serialVersionUID = -7924790696188174770L;
-
-	/**
 	 * Variable to indicate if rows can be deleted.
 	 */
 	private boolean allowDeletion = true;
@@ -789,7 +749,7 @@ public class SSDataGrid extends JTable {
 	/**
 	 * Column numbers that have to be hidden.
 	 */
-	private transient List<Integer> hiddenColumnsList = Collections.emptyList();
+	private List<Integer> hiddenColumnsList = Collections.emptyList();
 
 	/**
 	 * Variable to indicate if the data grid will display an additional row for
@@ -807,8 +767,8 @@ public class SSDataGrid extends JTable {
 	 * Keep rowSorter state here while it's disabled by insertion row.
 	 * Should be null if sorting not enabled.
 	 */
-	private transient List<? extends RowSorter.SortKey> savedRowSorterKeys;
-	private transient RowFilter<SSTableModel,Integer> savedRowFilter;
+	private List<? extends RowSorter.SortKey> savedRowSorterKeys;
+	private RowFilter<SSTableModel,Integer> savedRowFilter;
 
 	/**
 	 * Component where messages should be popped up.
@@ -823,7 +783,7 @@ public class SSDataGrid extends JTable {
 	/**
 	 * RowSet from which component will get/set values.
 	 */
-	transient private RowSet rowSet = null;
+	private RowSet rowSet = null;
 
 	/**
 	 * Constructs an empty data grid.
@@ -1193,8 +1153,6 @@ public class SSDataGrid extends JTable {
 		String key = "GridDeleteSelectedRows";
 		getInputMap(WHEN_FOCUSED).put(ks, key);
 		getActionMap().put(key, new AbstractAction() {
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(!allowDeletion)

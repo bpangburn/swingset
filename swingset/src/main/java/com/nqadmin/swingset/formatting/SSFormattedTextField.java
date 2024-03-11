@@ -65,7 +65,6 @@ import java.lang.System.Logger.Level;
 
 import static java.lang.System.Logger.Level.*;
 
-import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.utils.SSCommon;
@@ -135,7 +134,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 			try {
 				if (input instanceof SSFormattedTextField) {
-					logger.log(DEBUG, ()->sf("%: Instance of SSFormattedTextField.", getColumnForLog()));
+					logger.log(DEBUG, ()->sf("%s: Instance of SSFormattedTextField.", getColumnForLog()));
 
 					final SSFormattedTextField ssftf = (SSFormattedTextField) input;
 					String formattedText = ssftf.getText();

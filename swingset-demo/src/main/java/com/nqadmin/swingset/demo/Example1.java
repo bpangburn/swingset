@@ -120,54 +120,46 @@ public class Example1 extends JFrame {
 	public Example1(final Connection _dbConn)
 	{
 		// SET SCREEN TITLE
-			super("Example1");
-			DemoUtil.initExampleFrame(this, this::cleanup);
-
-			JFrame frame = this;
-
+		super("Example1");
+		DemoUtil.initExampleFrame(this, this::cleanup);
+		
+		JFrame frame = this;
+		
 		// SET CONNECTION
-			connection = _dbConn;
-
+		connection = _dbConn;
+		
 		// SET SCREEN DIMENSIONS
-			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
-			
+		setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
+		
 		// SET SCREEN POSITION
-			setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+		setLocation(DemoUtil.getChildScreenLocation(this.getName()));
 		
 		// SET A VALIDATOR (may be a no-op is disabled in SwingSet library)
-			final boolean USE_SIMPLE_VALIDATION = true;
-			//SSTextComponentValidationItem valSupplierName = null;
-			ValidationItem decoSupplierName = null;
-			if (!USE_SIMPLE_VALIDATION) {
-				txtSupplierName.getSSCommon().setValidator(new TextComponentValidator() {
-					@Override
-					public boolean validate() {
-						return !jc().getText().equalsIgnoreCase("oops");
-					}
-				});
-			} else {
-				SwingValidationGroup.setComponentName(txtSupplierName, "Supplier Name");
-				StringValidator validator = SVUtils.getStringValidator(
-						(model) -> !"oops".equalsIgnoreCase(model),
-						() -> "Supplier can not be 'oops'");
-				decoSupplierName = SVUtils.decorator(txtSupplierName, validator);
-			}
-
+		final boolean USE_SIMPLE_VALIDATION = false;
+		//SSTextComponentValidationItem valSupplierName = null;
+		ValidationItem decoSupplierName = null;
+		if (!USE_SIMPLE_VALIDATION) {
+			txtSupplierName.getSSCommon().setValidator(TextComponentValidator.create(
+					(jtc) -> !jtc.getText().matches("(?i).*oops.{0,2}$")));
+			txtSupplierCity.getSSCommon().setValidator(TextComponentValidator.create(
+					(jtc) -> !jtc.getText().matches(".*X")));
+		} else {
+			SwingValidationGroup.setComponentName(txtSupplierName, "Supplier Name");
+			StringValidator validator = SVUtils.getStringValidator(
+					(model) -> !"oops".equalsIgnoreCase(model),
+					() -> "Supplier can not be 'oops'");
+			decoSupplierName = SVUtils.decorator(txtSupplierName, validator);
+		}
+		
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-			try {
-				// In a standalone situation, or when working with Pangburn groups's
-				// applications, get a JdbcRowSetImpl directly by doing
-				//		import com.nqadmin.rowset.JdbcRowSetImpl;
-				//		...
-				//		rowset = new JdbcRowSetImpl(connection);
-				// See DemoUtil opening comment for more information.
-				rowset = DemoUtil.getNewRowSet(connection);
-				rowset.setCommand("SELECT * FROM supplier_data");
-				navigator = new SSDataNavigator(rowset);
-			} catch (final SQLException se) {
-				logger.log(Level.ERROR, "SQL Exception.", se);
-			}
-
+		try {
+			rowset = DemoUtil.getNewRowSet(connection);
+			rowset.setCommand("SELECT * FROM supplier_data");
+			navigator = new SSDataNavigator(rowset);
+		} catch (final SQLException se) {
+			logger.log(Level.ERROR, "SQL Exception.", se);
+		}
+		
 		/**
 		 * Various navigator overrides needed to support H2
 		 * H2 does not fully support updatable rowset so it must be
