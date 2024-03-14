@@ -97,15 +97,25 @@ public class DateTime
 	 * @param comp
 	 * @return true is OK
 	 */
-	public static boolean isHandledDateTime(SSComponentInterface comp)
+	public static boolean isHandledDateTimeComp(SSComponentInterface comp)
 	{
 		return comp instanceof JTextComponent jtc
 				&& dateTimeHandled.contains(comp.getBoundColumnJDBCType());
 	}
 
 	/**
+	 * Check if jdbcType is handled; must be JDBC date/type.
+	 * @param jdbcType
+	 * @return true is OK
+	 */
+	public static boolean isHandledDateTimeJDBCType(JDBCType jdbcType)
+	{
+		return dateTimeHandled.contains(jdbcType);
+	}
+
+	/**
 	 * Check if the component is a valid date/time. To avoid exceptions
-	 * use {@linkplain #isHandledDateTime(com.nqadmin.swingset.utils.SSComponentInterface)}
+	 * use {@link #isHandledDateTimeComp(com.nqadmin.swingset.utils.SSComponentInterface)}
 	 * @param comp
 	 * @return
 	 */
@@ -198,7 +208,7 @@ public class DateTime
 		return internalDateTimeColumnParse(text, comp);
 	}
 
-	private static DtoParse internalDateTimeColumnParse(String text, SSComponentInterface comp)
+	private static DtoParse internalDateTimeColumnParse(String text, RSC comp)
 	{
 		List<DateTimeFormatter> formatters = getInternalDateTimeParsers(comp.getBoundColumnJDBCType());
 		if (formatters == null || formatters.isEmpty())
@@ -242,53 +252,111 @@ public class DateTime
 	 * @param comp target column
 	 * @return a date/time object, null if can't parse
 	 */
-	public static Temporal getDateTimeObject(String text, SSComponentInterface comp)
+	public static Temporal getDateTimeObject(String text, RSC comp)
 	{
 		DtoParse dtoParse = internalDateTimeColumnParse(text, comp);
 		return dtoParse.dto();
 	}
 
 	/**
+	 * Parse the specified text using this column's type's default parser,
+	 * and return the corresponding {@link java.time} object; for example,
+	 * {@link java.time.LocalDate}.
+	 * @param text new text
+	 * @param comp target column
+	 * @return a date/time object, null if can't parse
+	 */
+	public static Object getSQLDateTimeObject(String text, RSC comp)
+	{
+		DtoParse dtoParse = internalDateTimeColumnParse(text, comp);
+		JDBCType jdbcType = comp.getBoundColumnJDBCType();
+		Temporal dto = dtoParse.dto();
+		return switch(jdbcType) {
+		case DATE -> Date.valueOf((LocalDate) dto);
+		case TIME -> Time.valueOf((LocalTime) dto);
+		case TIMESTAMP -> Timestamp.valueOf((LocalDateTime) dto);
+		default -> throw new IllegalArgumentException(sf("%s not handled", jdbcType));
+		};
+	}
+
+	/**
 	 * Using the formatter for the column's specifiedJDBCType,
 	 * format the column's specified value.
 	 * Return empty string if column is null.
-	 * @param dateTimeObject convert this to text
 	 * @param comp target column
 	 * @return text for column
+	 * @throws java.sql.SQLException
+	 */
+	public static String getDateTimeText(RSC comp) throws SQLException
+	{
+		JDBCType jdbcType = comp.getBoundColumnJDBCType();
+		// TODO: should there be a way to do a switch on type, use getDate...?
+		Object o = comp.getRowSet().getObject(comp.getBoundColumnIndex());
+		return getDateTimeText(o, jdbcType);
+	}
+
+	/**
+	 * Using the formatter for the column's specifiedJDBCType,
+	 * format the column's specified value.
+	 * Return empty string if column is null.
+	 * @param jdbcDateTimeObject convert this to text
+	 * @param comp target column
+	 * @return text for column
+	 */
+	public static String getDateTimeText(Object jdbcDateTimeObject, RSC comp)
+	{
+		JDBCType jdbcType = comp.getBoundColumnJDBCType();
+		return getDateTimeText(jdbcDateTimeObject, jdbcType);
+	}
+
+	/**
+	 * Using the formatter for the column's specifiedJDBCType,
+	 * format the column's specified value.
+	 * Return empty string if column is null.
+	 * @param jdbcDateTimeObject convert this to text
+	 * @param jdbcType
+	 * @return date/time text for column
 	 * @throws SQLException if database access error
 	 */
-	public static String getDateTimeText(Object dateTimeObject, SSComponentInterface comp)
-			throws SQLException
+	private static String getDateTimeText(Object jdbcDateTimeObject, JDBCType jdbcType)
 	{
-		if(dateTimeObject instanceof String s)
+		if(jdbcDateTimeObject instanceof String s)
 			return s;
-		JDBCType jdbcType = comp.getBoundColumnJDBCType();
 		DateTimeFormatter formatter = getDateTimeFormatter(jdbcType);
 		if (formatter == null)
 			throw new IllegalArgumentException(sf("%s not handled", jdbcType));
 		switch(jdbcType) {
 		case TIME -> {
-			Time time = (Time) dateTimeObject;
+			Time time = (Time) jdbcDateTimeObject;
 			if(time == null)
 				return "";
 			return time.toLocalTime().format(formatter);
 		}
 		case DATE -> {
-			Date date = (Date) dateTimeObject;
+			Date date = (Date) jdbcDateTimeObject;
 			if(date == null)
 				return "";
 			return date.toLocalDate().format(formatter);
 		}
 		case TIMESTAMP -> {
-			Timestamp timestamp = (Timestamp) dateTimeObject;
+			Timestamp timestamp = (Timestamp) jdbcDateTimeObject;
 			if(timestamp == null)
 				return "";
 			return timestamp.toLocalDateTime().format(formatter);
 		}
-		default -> throw new IllegalArgumentException(sf("%s %s not handled",
-				comp.getColumnForLog(), comp.getBoundColumnJDBCType()));
+		default -> {
+			// Impossible since have a formatter.
+			throw new IllegalArgumentException(sf("Impossible: %s", jdbcType));
+		}
 		}
 	}
+
+	// These unused static methods, could be revived and take a JDBCType param.
+	// That's basically what getDateTimeText(...) does for formatting
+	// and getSQLDateTimeObject(...) for parsing.
+	// See getDateTimeObject(...) for returning java.time object.
+
+	static { if(Boolean.FALSE) { getSQLDate(""); getStringDate(null); } }
 
 	/**
 	 * Convert string to Date using default parser.
@@ -299,7 +367,7 @@ public class DateTime
 	 * @throws IllegalArgumentException if data conversion fails
 	 */
 	// TODO: check that all callers handle excepted as needed
-	public static Date getSQLDate(final String _strDate)
+	private static Date getSQLDate(final String _strDate)
 			throws IllegalArgumentException
 	{
 		if (_strDate == null) {
@@ -330,7 +398,7 @@ public class DateTime
 	 * @param _date
 	 * @return
 	 */
-	public static String getStringDate(Date _date)
+	private static String getStringDate(Date _date)
 	{
 		DateTimeFormatter formatter = getDateTimeFormatter(JDBCType.DATE);
 		return _date.toLocalDate().format(formatter);

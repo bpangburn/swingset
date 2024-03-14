@@ -42,47 +42,30 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.datasources;
 
-import java.sql.SQLException;
-
 /**
- * Specified type not handled.
+ * This exception is for unexpected (impossible) exception that comes
+ * across as an SQLException. For example, rowset.getColumnCount(), once
+ * there is a rowset should never happen.
  */
 @SuppressWarnings("serial")
-public class SSSQLUnhandledTypeException extends SQLException
+public class SSSQLRuntimeException extends RuntimeException
 {
 	/**
-	 * Unhandled type.
-	 * @param reason reason
+	 * Create exception.
+	 * @param message
+	 * @param cause
 	 */
-	public SSSQLUnhandledTypeException(String reason)
+	public SSSQLRuntimeException(String message, Throwable cause)
 	{
-		super(reason);
+		super(message, cause);
 	}
 
 	/**
-	 * Unhandled type.
+	 * Create exception.
+	 * @param cause
 	 */
-	public SSSQLUnhandledTypeException()
-	{
-	}
-
-	/**
-	 * Unhandled type.
-	 * @param cause cause
-	 */
-	public SSSQLUnhandledTypeException(Throwable cause)
+	public SSSQLRuntimeException(Throwable cause)
 	{
 		super(cause);
 	}
-
-	/**
-	 * Unhandled type.
-	 * @param reason reason
-	 * @param cause cause
-	 */
-	public SSSQLUnhandledTypeException(String reason, Throwable cause)
-	{
-		super(reason, cause);
-	}
-
 }

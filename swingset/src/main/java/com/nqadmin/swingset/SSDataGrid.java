@@ -87,15 +87,16 @@ import javax.swing.table.TableRowSorter;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 
-import com.nqadmin.swingset.datasources.DateTime;
+import com.nqadmin.swingset.datasources.RSC;
 
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.models.SimpleComboListSwingModels;
-import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSUtils;
 
+import static com.nqadmin.swingset.datasources.DateTime.getDateTimeText;
+import static com.nqadmin.swingset.datasources.DateTime.getSQLDateTimeObject;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSDataGrid.java
@@ -226,17 +227,17 @@ public class SSDataGrid extends JTable {
 			boolean isSelected = false;
 
 			// CHECK THE TYPE OF COLUMN, IT SHOULD BE THE SAME AS THE TYPE OF _VALUE.
-			if (_value instanceof Boolean b) {
+			switch (_value) {
+			case Boolean b -> {
 				columnClass = JDBCType.BOOLEAN; // STORE THE TYPE OF COLUMN WE NEED
 				isSelected = b;
 			}
-			else if (_value instanceof Integer i) {
+			case Integer i -> {
 				columnClass = JDBCType.INTEGER; // STORE THE COLUMN CLASS.
 				// A VALUE OF 0 IS FALSE - ANY OTHER VALUE IS TRUE
 				isSelected = i != 0;
 			}
-			else {
-				// THE COLUMN IS NOT BOOLEAN OR INTEGER, LOG ERROR MESSAGE.
+			default -> // THE COLUMN IS NOT BOOLEAN OR INTEGER, LOG ERROR MESSAGE.
 				logger.log(Level.ERROR, "Can't set check box value. Unknown data type. Column type should be Boolean or Integer for check box columns.");
 			}
 
@@ -255,12 +256,10 @@ public class SSDataGrid extends JTable {
 		public Component getTableCellRendererComponent(final JTable _table, final Object _value, final boolean _selected,
 				final boolean _hasFocus, final int _row, final int _column) {
 			boolean isSelected = false;
-			if (_value instanceof Boolean) {
-				isSelected = (Boolean) _value;
-			} else if (_value instanceof Integer) {
-				isSelected = (Integer) _value != 0;
-			} else {
-				logger.log(Level.ERROR, "Can't set check box value. Unknown data type. Column type should be Boolean or Integer for check box columns.");
+			switch (_value) {
+			case Boolean b -> isSelected = b;
+			case Integer i -> isSelected = i != 0;
+			default -> logger.log(Level.ERROR, "Can't set check box value. Unknown data type. Column type should be Boolean or Integer for check box columns.");
 			}
 			setSelected(isSelected);
 
@@ -352,8 +351,8 @@ public class SSDataGrid extends JTable {
 		/** {@inheritDoc} */
 		@Override
 		public boolean isCellEditable(final EventObject event) {
-			if (event instanceof MouseEvent) {
-				return ((MouseEvent) event).getClickCount() >= tmpClickCountToStart;
+			if (event instanceof MouseEvent mouseEvent) {
+				return mouseEvent.getClickCount() >= tmpClickCountToStart;
 			}
 			return true;
 		}
@@ -469,11 +468,14 @@ public class SSDataGrid extends JTable {
 	 */
 	protected class DateEditor extends DefaultCellEditor
 	{
+		private final int cIdx;
 		/**
 		 * Grid date editor.
+		 * @param cIdx
 		 */
-		public DateEditor() {
+		public DateEditor(int cIdx) {
 			super(new SSTextField(SSTextField.MMDDYYYY));
+			this.cIdx = cIdx;
 			getComponent().setFocusTraversalKeysEnabled(false);
 			getComponent().addKeyListener(new KeyAdapter() {
 				int keyPressed = 0;
@@ -493,9 +495,9 @@ public class SSDataGrid extends JTable {
 				@Override
 				public void keyReleased(final KeyEvent ke) {
 					final JComponent editor = (JComponent) DateEditor.this.getComponent();
-					if (editor instanceof JTextField) {
+					if (editor instanceof JTextField jtf) {
 						if (keyPressed == 0) {
-							((JTextField) editor).setText(String.valueOf(ke.getKeyChar()));
+							jtf.setText(String.valueOf(ke.getKeyChar()));
 						}
 					}
 					keyPressed--;
@@ -514,7 +516,7 @@ public class SSDataGrid extends JTable {
 		@Override
 		public Object getCellEditorValue() {
 			final String strDate = ((JTextField) (DateEditor.this.getComponent())).getText();
-			return DateTime.getSQLDate(strDate);
+			return (Date)getSQLDateTimeObject(strDate, RSC.get(rowSet, cIdx + 1));
 		}
 
 		/**
@@ -528,8 +530,8 @@ public class SSDataGrid extends JTable {
 				final int row, final int column) {
 
 			Object value = _value;
-			if (value instanceof Date) {
-				value = DateTime.getStringDate((Date) value);
+			if (value instanceof Date date) {
+				value = getDateTimeText(date, RSC.get(rowSet, cIdx + 1));
 			}
 
 			return super.getTableCellEditorComponent(table, value, isSelected, row, column);
@@ -546,8 +548,8 @@ public class SSDataGrid extends JTable {
 		 */
 		@Override
 		public boolean isCellEditable(final EventObject event) {
-			if (event instanceof MouseEvent) {
-				return ((MouseEvent) event).getClickCount() >= getClickCountToStart();
+			if (event instanceof MouseEvent mouseEvent) {
+				return mouseEvent.getClickCount() >= getClickCountToStart();
 			}
 
 			return true;
@@ -559,14 +561,21 @@ public class SSDataGrid extends JTable {
 	 */
 	protected class DateRenderer extends DefaultTableCellRenderer
 	{
+		private final int cIdx;
+
+		private DateRenderer(int cIdx)
+		{
+			this.cIdx = cIdx;
+		}
+
 		/**
 		 * Set the value to render. Expect date; if not, give it to super.
 		 * @param value probably a date
 		 */
 		@Override
 		public void setValue(final Object value) {
-			if (value instanceof java.sql.Date) {
-				String strDate = DateTime.getStringDate((Date) value);
+			if (value instanceof java.sql.Date date) {
+				String strDate = getDateTimeText(date, RSC.get(rowSet, cIdx + 1));
 				setHorizontalAlignment(SwingConstants.CENTER);
 				setText(strDate);
 			} else {
@@ -623,9 +632,9 @@ public class SSDataGrid extends JTable {
 			@Override
 			public void keyReleased(final KeyEvent ke) {
 				final JComponent editor = (JComponent) DefaultEditor.this.getComponent();
-				if (editor instanceof JTextField) {
+				if (editor instanceof JTextField jtf) {
 					if ((keyPressed == 0) && Character.isLetterOrDigit(ke.getKeyChar())) {
-						((JTextField) editor).setText(String.valueOf(ke.getKeyChar()));
+						jtf.setText(String.valueOf(ke.getKeyChar()));
 					}
 				}
 				keyPressed--;
@@ -1360,8 +1369,8 @@ public class SSDataGrid extends JTable {
 	public void setDateRenderer(final int _column) {
 		final TableColumnModel tmpColumnModel = getColumnModel();
 		final TableColumn tmpTableColumn = tmpColumnModel.getColumn(_column);
-		tmpTableColumn.setCellRenderer(new DateRenderer());
-		tmpTableColumn.setCellEditor(new DateEditor());
+		tmpTableColumn.setCellRenderer(new DateRenderer(_column));
+		tmpTableColumn.setCellEditor(new DateEditor(_column));
 	}
 
 	/**
@@ -1379,8 +1388,8 @@ public class SSDataGrid extends JTable {
 		final int tmpColumn = RowSetOps.getColumnIndex(rowSet,_column) - 1;
 		final TableColumnModel tmpColumnModel = getColumnModel();
 		final TableColumn tmpTableColumn = tmpColumnModel.getColumn(tmpColumn);
-		tmpTableColumn.setCellRenderer(new DateRenderer());
-		tmpTableColumn.setCellEditor(new DateEditor());
+		tmpTableColumn.setCellRenderer(new DateRenderer(tmpColumn));
+		tmpTableColumn.setCellEditor(new DateEditor(tmpColumn));
 	}
 
 	/**

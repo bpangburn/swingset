@@ -77,6 +77,7 @@ import static java.lang.System.Logger.Level.*;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
@@ -217,7 +218,7 @@ public class NavigateActions
 	 * @return current value
 	 * @throws SQLException
 	 */
-	public static Object fetchCurrentValue(SSComponentInterface comp) throws SQLException
+	public static Object fetchCurrentValue(RSC comp) throws SQLException
 	{
 		if (!NavigateActions.ENABLE_UNDO_REDO)
 			throw new IllegalStateException("UNDO/REDO disabled");

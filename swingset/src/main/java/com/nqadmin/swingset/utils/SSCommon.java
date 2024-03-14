@@ -1372,7 +1372,7 @@ public class SSCommon
 	 */
 	public final boolean validate() {
 		// Check a possible date/time validation. TODO: how to disable, where to put
-		if (DateTime.isHandledDateTime(getSSComponent())
+		if (DateTime.isHandledDateTimeComp(getSSComponent())
 				&& !dateTimeColumnValidate(getSSComponent()))
 			return false;
 

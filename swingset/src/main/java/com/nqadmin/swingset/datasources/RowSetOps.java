@@ -59,9 +59,6 @@ import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.spi.SyncProviderException;
 
 import java.lang.System.Logger;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -75,7 +72,6 @@ import static java.lang.System.Logger.Level.*;
 import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.utils.SSArray;
-import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -85,6 +81,7 @@ import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
 import static com.nqadmin.swingset.datasources.ConvertType.getJDBCType;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 import static com.nqadmin.swingset.datasources.ConvertType.convertObjectType;
+import static com.nqadmin.swingset.datasources.DateTime.getSQLDateTimeObject;
 
 // RowSetOps.java
 //
@@ -368,6 +365,59 @@ public class RowSetOps {
 		return null;
 	}
 
+	/**
+	 * Returns the Object from the rowset's specified column;
+	 * no object conversion.
+	 * There is no filtering, for example null conversion.
+	 * @param comp component
+	 * @return value
+	 * @throws java.sql.SQLException
+	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B-1
+	 */
+	public static Object getColumnObject(RSC comp) throws SQLException
+	{
+		if(Boolean.TRUE)
+			return comp.getRowSet().getObject(comp.getBoundColumnIndex());
+		else
+			return getColumnObject2(comp);
+	}
+
+	//
+	// This switch code is the original from SSDataGrid/SSTableModel,
+	// amended to include additional column types and to meet JDBC spec.
+	// Doing "rowset.getObject(_column)" should produce the same result,
+	// possibly since JDBC 2. This is here as a fallback/just-in-case,
+	// given the great divergence in JDBC drivers and database.
+	// 
+	// If it turns out that there is some need for flipping, maybe for
+	// different environments, then it's a question of how?
+	//
+	// Explore what things should be flippable and at what granularity.
+	// Should you be able to specify handling per column type?
+	// What switch to flip, in a property file, pluggable, ...
+	//
+	private static Object getColumnObject2(RSC comp) throws SQLException
+	{
+		RowSet rs = comp.getRowSet();
+		int cIdx = comp.getBoundColumnIndex();
+		return switch (comp.getBoundColumnJDBCType()) {
+		case INTEGER, SMALLINT, TINYINT ->	rs.getInt(cIdx);
+		case BIGINT ->				rs.getLong(cIdx);
+		case REAL ->				rs.getFloat(cIdx);
+		case DOUBLE, FLOAT ->		rs.getDouble(cIdx);
+		case NUMERIC, DECIMAL ->	rs.getBigDecimal(cIdx);
+		case BOOLEAN, BIT ->		rs.getBoolean(cIdx);
+		case DATE ->				rs.getDate(cIdx);
+		case TIME ->				rs.getTime(cIdx);
+		case TIMESTAMP ->			rs.getTimestamp(cIdx);
+		case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR ->
+									rs.getString(cIdx);
+		default -> {
+			logger.log(WARNING, "Unknown data type of " + comp.getBoundColumnJDBCType());
+			yield rs.getObject(cIdx);
+		}
+		};
+	}
 
 	//
 	// TODO: revisit these ColumnObject methods
@@ -375,28 +425,26 @@ public class RowSetOps {
 	/**
 	 * Returns an Object of the specified type
 	 * representing the value in the component's bound database column.
+	 * This may involve a conversion.
 	 * <p>
 	 * Note that if a String type is specified, a null is not automatically
 	 * turned into "" use getColumnText for that.
 	 * @param <T> type to return
 	 * @param comp component
 	 * @param type Class of returned type
-	 * @return value
+	 * @return object
+	 * @throws java.sql.SQLException
 	 */
-	// TODO: getColumnObject only boolean related so far
-	public static <T> T getColumnObject(SSComponentInterface comp, Class<T> type)
+	public static <T> T getColumnObject(RSC comp, Class<T> type) throws SQLException
 	{
-		T value = null;
-		try {
-			if(Boolean.TRUE)
-				return getColumnObject1ex(comp, type);
-			else
-				return getColumnObject2ex(comp, type);
-		} catch (SQLException ex) {
-			logger.log(ERROR, "SQL Exception for column " + comp.getBoundColumnName() + ".", ex);
-		}
+		// If there are no columns, return null.
+		if (getColumnCount(comp.getRowSet()) == 0)
+			return null;
 
-		return value;
+		if(Boolean.TRUE)
+			return getColumnObject1(comp, type); // undo/redo,convert
+		else
+			return getColumnObject2(comp, type); // getObject direct
 	}
 
 	/**
@@ -407,12 +455,9 @@ public class RowSetOps {
 	 * @param type Class of returned type
 	 * @return value
 	 */
-	private static <T> T getColumnObject1ex(SSComponentInterface comp, Class<T> type)
+	private static <T> T getColumnObject1(RSC comp, Class<T> type)
 			throws SQLException
 	{
-		if (getColumnCount(comp.getRowSet())==0)
-			return null;
-		
 		Object objectValue = NavigateActions.fetchCurrentValue(comp);
 		return convertObjectType(objectValue, type);
 	}
@@ -425,19 +470,10 @@ public class RowSetOps {
 	 * @param type Class of returned type
 	 * @return value
 	 */
-	private static <T> T getColumnObject2ex(SSComponentInterface comp, Class<T> type)
+	private static <T> T getColumnObject2(RSC comp, Class<T> type)
 			throws SQLException
 	{
-		final RowSet _rowSet = comp.getRowSet();
-		final int _columnIndex = comp.getBoundColumnIndex();
-		
-		T value;
-		// IF THE COLUMN IS NULL SO RETURN NULL
-		if (getColumnCount(_rowSet)==0)
-			return null;
-		
-		value = _rowSet.getObject(_columnIndex , type);
-		return value;
+		return comp.getRowSet().getObject(comp.getBoundColumnIndex() , type);
 	}
 	
 	/**
@@ -451,60 +487,41 @@ public class RowSetOps {
 	 */
 	public static String getColumnText(final SSComponentInterface comp)
 	{
-		final RowSet _rowSet = comp.getRowSet();
-		final int _columnIndex = comp.getBoundColumnIndex();
+		final RowSet rowSet = comp.getRowSet();
+		final int cIdx = comp.getBoundColumnIndex();
 		String value = null;
 
 		try {
-			// IF THE COLUMN IS NULL SO RETURN NULL
-			if ((getColumnCount(_rowSet)==0) || (_rowSet.getObject(_columnIndex) == null)) {
+			// If the column is null, return null.
+			if ((getColumnCount(rowSet)==0) || (rowSet.getObject(cIdx) == null)) {
 				return null;
 			}
 
-			//final int columnType = getColumnType(_rowSet, _columnName);
-			
-			final JDBCType jdbcType = getJDBCType(getColumnType(_rowSet, _columnIndex));
+			final JDBCType jdbcType = getJDBCType(getColumnType(rowSet, cIdx));
 
 			// Based on the column data type convert column's value to a String.
-			switch (jdbcType) {
-			case INTEGER, SMALLINT, TINYINT ->
-				value = String.valueOf(_rowSet.getInt(_columnIndex));
-			case BIGINT ->
-				value = String.valueOf(_rowSet.getLong(_columnIndex));
-			case REAL ->
-				value = String.valueOf(_rowSet.getFloat(_columnIndex));
-			case DOUBLE, FLOAT ->
-				value = String.valueOf(_rowSet.getDouble(_columnIndex));
-			case NUMERIC, DECIMAL ->
-				value = String.valueOf(_rowSet.getBigDecimal(_columnIndex));
-			case BIT, BOOLEAN ->
-				value = String.valueOf(_rowSet.getBoolean(_columnIndex));
-			case DATE, TIME, TIMESTAMP -> {
-				Object dateTimeObject = _rowSet.getObject(_columnIndex);
-				value = DateTime.getDateTimeText(dateTimeObject, comp);
-			}
+			value = switch (jdbcType) {
+			case INTEGER, SMALLINT, TINYINT -> String.valueOf(rowSet.getInt(cIdx));
+			case BIGINT -> String.valueOf(rowSet.getLong(cIdx));
+			case REAL -> String.valueOf(rowSet.getFloat(cIdx));
+			case DOUBLE, FLOAT -> String.valueOf(rowSet.getDouble(cIdx));
+			case NUMERIC, DECIMAL -> String.valueOf(rowSet.getBigDecimal(cIdx));
+			case BIT, BOOLEAN -> String.valueOf(rowSet.getBoolean(cIdx));
+			case DATE, TIME, TIMESTAMP -> DateTime.getDateTimeText(comp);
 			case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR -> {
-				final String str = _rowSet.getString(_columnIndex);
-				if (str == null) {
-					value = "";
-				} else {
-					value = String.valueOf(str);
-				}
+				String str = rowSet.getString(cIdx);
+				yield str == null ? "" : str;
 			}
 			default -> {
 				// TODO: SSSQLExceptionUnhandledType
-				logger.log(ERROR, "Unsupported data type of " + jdbcType.getName() + " for column " + _columnIndex + ".");
+				logger.log(ERROR, () -> sf("Unsupported data type of %s for column %d.",
+						jdbcType.getName(), cIdx));
+				yield null;
 			}
-
-			} // end switch
-			//
-			// TODO: Convert this to use java.time.LocalDate, LocalTime,
-			//		 or LocalDateTime as needed.
-			//
+			}; // end switch
 		} catch (final SQLException se) {
-			logger.log(ERROR, "SQL Exception for column " + _columnIndex + ".", se);
+			logger.log(ERROR, "SQL Exception for column " + cIdx + ".", se);
 		}
-
 		return value;
 
 	} // end protected String getColumnText(RowSet rs, String _columnName) {
@@ -514,7 +531,7 @@ public class RowSetOps {
 	 * @param comp this components rowset/column text
 	 * @return
 	 */
-	public static String getColumnObjectText(SSComponentInterface comp)
+	public static String getColumnObjectText(RSC comp)
 	{
 		final RowSet _rowSet = comp.getRowSet();
 		final String _columnName = comp.getBoundColumnName();
@@ -794,7 +811,7 @@ public class RowSetOps {
 			JDBCType jdbcType = comp.getBoundColumnJDBCType();
 			// TODO: maybe a component field that says use jdbc conversion
 			Object obj = convertObjectType(_updatedValue, jdbcType);
-			updateColumnObject(_rowSet, _columnIndex, obj, jdbcType);
+			updateColumnObjectDirect(_rowSet, _columnIndex, obj, jdbcType);
 			did_update = true;
 		} finally {
 			if (did_update)
@@ -1015,18 +1032,15 @@ public class RowSetOps {
 				_rowSet.updateBoolean(_columnName, boolValue);
 			}
 			case DATE -> {
-				final Date date = Date.valueOf((LocalDate)
-						DateTime.getDateTimeObject(_updatedValue, comp));
+				Date date = (Date) getSQLDateTimeObject(_updatedValue, comp);
 				_rowSet.updateDate(_columnName, date);
 			}
 			case TIME -> {
-				final Time time = Time.valueOf((LocalTime)
-						DateTime.getDateTimeObject(_updatedValue, comp));
+				Time time = (Time) getSQLDateTimeObject(_updatedValue, comp);
 				_rowSet.updateTime(_columnName, time);
 			}
 			case TIMESTAMP -> {
-				final Timestamp timestamp = Timestamp.valueOf((LocalDateTime)
-						DateTime.getDateTimeObject(_updatedValue, comp));
+				Timestamp timestamp = (Timestamp) getSQLDateTimeObject(_updatedValue, comp);
 				_rowSet.updateTimestamp(_columnName, timestamp);
 			}
 			case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR
@@ -1062,7 +1076,7 @@ public class RowSetOps {
 	 * @param type NOT USED, the jdbc driver does the conversion
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	public static void updateColumnObject(RowSet _rowSet, int _columnIndex, Object _value, JDBCType type) throws SQLException {
+	public static void updateColumnObjectDirect(RowSet _rowSet, int _columnIndex, Object _value, JDBCType type) throws SQLException {
 		if (Boolean.TRUE)
 			updateColumnObject1(_rowSet, _columnIndex, _value);
 		else
@@ -1083,7 +1097,7 @@ public class RowSetOps {
 	 * @param _columnIndex   index of the database column
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	public static void updateColumnObject(RowSet _rowSet, int _columnIndex, Object _value) throws SQLException {
+	public static void updateColumnObjectDirect(RowSet _rowSet, int _columnIndex, Object _value) throws SQLException {
 		if (Boolean.TRUE)
 			updateColumnObject1(_rowSet, _columnIndex, _value);
 		else

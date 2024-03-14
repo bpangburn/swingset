@@ -53,6 +53,7 @@ import java.sql.Connection;
 import javax.sql.rowset.CachedRowSet;
 import javax.swing.JComponent;
 
+import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.navigate.NavigateActions;
@@ -73,7 +74,7 @@ import com.nqadmin.swingset.navigate.RowSetModificationEvent;
  * SwingSet components unless you disable/enable the component listener.
  * Best practice is to call {@code #getSSCommon().updateSSComponent()}
  */
-public interface SSComponentInterface
+public interface SSComponentInterface extends RSC
 {
 	/**
 	 * Adds listener for RowSet to trigger update to SwingSet component.
@@ -160,6 +161,7 @@ public interface SSComponentInterface
 	 * @return true if bound database column can contain null values, otherwise
 	 *         returns false
 	 */
+	@Override
 	default boolean getAllowNull() {
 		return getSSCommon().getAllowNull();
 	}
@@ -171,6 +173,7 @@ public interface SSComponentInterface
 	 * @return returns the index of the column to which the SwingSet component is
 	 *         bound
 	 */
+	@Override
 	default int getBoundColumnIndex() {
 		return getSSCommon().getBoundColumnIndex();
 	}
@@ -182,6 +185,7 @@ public interface SSComponentInterface
 	 *
 	 * @return the enum value corresponding to the data type of the bound column
 	 */
+	@Override
 	default JDBCType getBoundColumnJDBCType() {
 		return getSSCommon().getBoundColumnJDBCType();
 	}
@@ -191,6 +195,7 @@ public interface SSComponentInterface
 	 *
 	 * @return the bound column name
 	 */
+	@Override
 	default String getBoundColumnName() {
 		return getSSCommon().getBoundColumnName();
 	}
@@ -202,6 +207,7 @@ public interface SSComponentInterface
 	 * @param type Class of returned type
 	 * @return value
 	 */
+	@Override
 	default <T> T getBoundColumnObject(Class<T> type) {
 		return getSSCommon().getBoundColumnObject(type);
 	}
@@ -213,6 +219,7 @@ public interface SSComponentInterface
 	 *
 	 * @return String containing the value in the bound database column
 	 */
+	@Override
 	default String getBoundColumnText() {
 		return getSSCommon().getBoundColumnText();
 	}
@@ -234,6 +241,7 @@ public interface SSComponentInterface
 	 *
 	 * @return the bound column name in square brackets
 	 */
+	@Override
 	default String getColumnForLog() {
 		return getSSCommon().getColumnForLog();
 	}
@@ -264,6 +272,7 @@ public interface SSComponentInterface
 	 *
 	 * @return the rowSet
 	 */
+	@Override
 	default RowSet getRowSet() {
 		return getSSCommon().getRowSet();
 	}

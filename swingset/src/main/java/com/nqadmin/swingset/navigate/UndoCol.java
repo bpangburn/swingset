@@ -48,8 +48,8 @@ import java.util.List;
 
 import javax.sql.RowSet;
 
+import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
-import com.nqadmin.swingset.utils.SSComponentInterface;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
@@ -87,7 +87,7 @@ final class UndoCol
 	 * Create UndoCol based on an SSComponent;
 	 * @param comp ssComponent
 	 */
-	UndoCol(SSComponentInterface comp) throws SQLException
+	UndoCol(RSC comp) throws SQLException
 	{
 		this(comp.getRowSet(), comp.getBoundColumnIndex());
 	}

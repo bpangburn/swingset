@@ -44,6 +44,7 @@ package com.nqadmin.swingset.navigate;
 
 import java.sql.SQLException;
 
+import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -80,7 +81,7 @@ final class UndoRow
 	}
 
 	/** return the column involved in the modification event */
-	private UndoCol getCol(SSComponentInterface comp) throws SQLException
+	private UndoCol getCol(RSC comp) throws SQLException
 	{
 		if (cols == null) {
 			int n = RowSetOps.getColumnCount(comp.getRowSet());
@@ -139,7 +140,7 @@ final class UndoRow
 	}
 
 	/** return the current Value for the comp: the last rowset.updateXxx. */
-	Object fetchCurrentValue(SSComponentInterface comp) throws SQLException
+	Object fetchCurrentValue(RSC comp) throws SQLException
 	{
 		return getCol(comp).fetchCurrentValue();
 	}
