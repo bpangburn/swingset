@@ -894,4 +894,95 @@ public class RowSetOps {
 		}
 		
 	}
+
+	/**
+	 * Fetch and return object for specified rowset's specified column
+	 * from the database; object type is determined by column's JDBCType.
+	 * There is no filtering, for example null conversion.
+	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B-1
+	 * @param rowset source rowset
+	 * @param _column source column
+	 * @return object from RowSet.getXxx
+	 * @throws SQLException database error
+	 */
+	public static Object getColumnObject(RowSet rowset, int _column) throws SQLException
+	{
+		if (Boolean.TRUE) {
+			return getColumnObjectDirect(rowset, _column);
+		} else {
+			// This returns null for items not enumerated in switch.
+			return getColumnObjectDirectSwitch(rowset, _column);
+		}
+	}
+
+	private static Object getColumnObjectDirect(RowSet rowset, int _column) throws SQLException
+	{
+		return rowset.getObject(_column);
+	}
+
+	//
+	// This switch code is the original from SSDataGrid/SSTableModel,
+	// amended to include additional column types and to meet JDBC spec.
+	// The "rowset.getObject(_column)" should produce the same result,
+	// possibly since JDBC 2. This is here as a fallback/just-in-case,
+	// given the great divergence in JDBC drivers and database.
+	// 
+	// If it turns out that there is some need for flipping, maybe for
+	// different environments, then it's a question of how?
+	//
+	// Explore what things should be flippable and at what granularity.
+	// Should you be able to specify handling per column type?
+	// What switch to flip, in a property file, pluggable, ...
+	//
+	private static Object getColumnObjectDirectSwitch(RowSet rowset, int _column) throws SQLException
+	{
+		Object value = null;
+		JDBCType type = RowSetOps.getJDBCColumnType(rowset, _column);
+
+		switch (type) {
+		case INTEGER:
+		case SMALLINT:
+		case TINYINT:
+			value = rowset.getInt(_column);
+			break;
+		case BIGINT:
+			value = rowset.getLong(_column);
+			break;
+		case REAL:
+			value = rowset.getFloat(_column);
+			break;
+		case FLOAT:
+		case DOUBLE:
+			value = rowset.getDouble(_column);
+			break;
+		case DECIMAL:
+		case NUMERIC:
+			value = rowset.getBigDecimal(_column);
+			break;
+		case BOOLEAN:
+		case BIT:
+			value = rowset.getBoolean(_column);
+			break;
+		case DATE:
+			value = rowset.getDate(_column);
+			break;
+		case TIME:
+			value = rowset.getTime(_column);
+			break;
+		case TIMESTAMP:
+			value = rowset.getTimestamp(_column);
+			break;
+		case CHAR:
+		case VARCHAR:
+		case LONGVARCHAR:
+		case NCHAR:
+		case NVARCHAR:
+		case LONGNVARCHAR:
+			value = rowset.getString(_column);
+			break;
+		default:
+			logger.warn("Unknown data type of " + type);
+		}
+		return value;
+	}
 }
