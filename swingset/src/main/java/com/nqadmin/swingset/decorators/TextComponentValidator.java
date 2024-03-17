@@ -37,16 +37,30 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.decorators;
 
+import java.util.function.Function;
+
 import javax.swing.text.JTextComponent;
 
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
 /**
- * Validator with convenience methods for working wiht JTextField.
+ * Validator with convenience methods for working with {@linkplain JTextComponent}.
+ * {@linkplain #jc() } returns the component cast as a {@linkplain JTextComponent}.
  */
 public abstract class TextComponentValidator implements Validator {
 	/** this component */
 	private SSComponentInterface component;
+
+	/**
+	 * Create a validator for use with a {@linkplain JTextComponent};
+	 * argument is a {@linkplain Function} that performs validation.
+	 * @param validator validation function returns true if valid
+	 * @return the validator
+	 */
+	public static Validator create(Function<JTextComponent, Boolean> validator)
+	{
+		return new TextComponentValidatorFunction(validator);
+	}
 
 	/**
 	 * Install this validator into the component.
@@ -80,5 +94,26 @@ public abstract class TextComponentValidator implements Validator {
 	 */
 	protected final JTextComponent jc() {
 		return (JTextComponent) component;
+	}
+
+	private static class TextComponentValidatorFunction
+			extends TextComponentValidator
+	{
+		private final Function<JTextComponent, Boolean> validator;
+		
+		/**
+		 * A validator for use with a {@linkplain JTextComponent};
+		 * argument is a {@linkplain Function} that performs validation.
+		 * @param validator validation function
+		 */
+		public TextComponentValidatorFunction(Function<JTextComponent, Boolean> validator)
+		{
+			this.validator = validator;
+		}
+		
+		@Override
+		public boolean validate() {
+			return validator.apply(jc());
+		}
 	}
 }

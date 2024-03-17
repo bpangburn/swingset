@@ -119,12 +119,14 @@ public class Example1 extends JFrame {
 			setLocation(DemoUtil.getChildScreenLocation(this.getName()));
 		
 		// SET A VALIDATOR (may be a no-op is disabled in SwingSet library)
-			txtSupplierName.getSSCommon().setValidator(new TextComponentValidator() {
-				@Override
-				public boolean validate() {
-					return !jc().getText().equalsIgnoreCase("oops");
-				}
-			});
+			txtSupplierName.getSSCommon().setValidator(TextComponentValidator.create(
+					(jtc) -> !jtc.getText().matches("(?i).*oops.{0,2}$")));
+			//txtSupplierName.getSSCommon().setValidator(new TextComponentValidator() {
+			//	@Override
+			//	public boolean validate() {
+			//		return !jc().getText().equalsIgnoreCase("oops");
+			//	}
+			//});
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {

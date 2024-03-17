@@ -114,7 +114,7 @@ import static com.nqadmin.swingset.SSDataNavigator.isAcceptingChanges;
  */
 public class SSCommon {
 
-	private static final Boolean DISABLE_GENERAL_VALIDATION = true;
+	private static final Boolean DISABLE_GENERAL_VALIDATION = false;
 
 	/**
 	 * Document listener provided for convenience for SwingSet Components that are
@@ -174,7 +174,10 @@ public class SSCommon {
 					lastNotifiedChange = lastChange;
 
 					if (!isValidChange()) {
-						return;
+						// TODO: have to change the data base
+						//		 because of autocommit
+						//		 so can't simply return
+						//return;
 					}
 
 					removeRowSetListener();
@@ -1149,6 +1152,8 @@ public class SSCommon {
 
 		addSSComponentListener();
 
+		decorate();
+
 	}
 
 	/**
@@ -1159,6 +1164,7 @@ public class SSCommon {
 			// TODO: could create a valid event, but since it is not used...
 			rowSetListener.rowChanged(null);
 		}
+	}
 
 	///////////////////////////////////////////////////////////////////////////
 	//
