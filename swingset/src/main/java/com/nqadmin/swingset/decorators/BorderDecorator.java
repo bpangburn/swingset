@@ -164,7 +164,6 @@ public class BorderDecorator extends FocusDecorator
 	 * @return border
 	 */
 	protected Border createDefaultBorder() {
-		//return UIManager.getBorder("TextField.border");
 		Insets i = jc().getInsets();
 		return BorderFactory.createEmptyBorder(Math.max(1, i.top),
 											   Math.max(1, i.left),
