@@ -42,11 +42,13 @@
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
+import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.SQLException;
 
 import javax.sql.RowSet;
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 
 import java.lang.System.Logger;
@@ -55,6 +57,7 @@ import java.util.EnumSet;
 
 import static java.lang.System.Logger.Level.*;
 
+import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -110,8 +113,13 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 	 * Creates an object of SSCheckBox.
 	 */
 	public SSCheckBox() {
+		// Note that call to parent default constructor is implicit.
+		//super();
+		setBorderPainted(true);
+		Insets i = getInsets();
+		setBorder(BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right));
 	}
-
+	
 	/**
 	 * Creates an object of SSCheckBox binding it so the specified column in the
 	 * given RowSet.

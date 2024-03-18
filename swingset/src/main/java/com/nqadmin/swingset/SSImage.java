@@ -63,6 +63,7 @@ import com.nqadmin.swingset.decorators.Decorator;
 
 import static java.lang.System.Logger.Level.*;
 
+import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -179,6 +180,14 @@ public class SSImage extends JPanel implements SSComponentInterface
 		//		jc().setForeground(textColor != null ? textColor : Color.BLACK);
 
 		getSSCommon().setDecorator(Decorator.nullDecorator);
+	}
+
+	/** {@inheritDoc } */
+	// TODO: This is a workaround because if default decorator is used
+	//		 then the SSImage doesn't display properly.
+	@Override
+	public Decorator createDefaultDecorator() {
+		return Decorator.nullDecorator;
 	}
 
 	/**

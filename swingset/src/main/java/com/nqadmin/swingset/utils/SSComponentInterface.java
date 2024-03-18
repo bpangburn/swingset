@@ -50,11 +50,9 @@ import javax.sql.RowSet;
 
 import java.sql.Connection;
 
-import javax.sql.rowset.CachedRowSet;
-import javax.swing.JComponent;
-
-import com.nqadmin.swingset.datasources.RSC;
-import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.decorators.BorderDecorator;
+import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
@@ -494,4 +492,13 @@ public interface SSComponentInterface extends RSC
 	{
 		getSSCommon().undoRedoUpdateObject(cmd, value);
 	};
+
+	/**
+	 * Create and return the default {@link Decorator}
+	 * used during construction.
+	 * @return decorator
+	 */
+	default Decorator createDefaultDecorator() {
+		return SSCommon.createDefaultDecorator();
+	}
 }
