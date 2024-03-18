@@ -158,7 +158,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	transient protected final SSCommon ssCommon = new SSCommon(this);
+	transient protected final SSCommon ssCommon;
 
 	/**
 	 * Unchecked value for numeric columns.
@@ -169,11 +169,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	 * Creates an object of SSCheckBox.
 	 */
 	public SSCheckBox() {
-		// Note that call to parent default constructor is implicit.
-		//super();
-		setBorderPainted(true);
-		Insets i = getInsets();
-		setBorder(BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right));
+		this(null);
 	}
 	
 	/**
@@ -187,7 +183,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	 * @throws SQLException - if a database access error occurs
 	 */
 	public SSCheckBox(final RowSet _rowSet, final String _boundColumnName) throws java.sql.SQLException {
-		this();
+		this(null);
 		bind(_rowSet, _boundColumnName);
 	}
 
@@ -198,6 +194,10 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	 */
 	public SSCheckBox(final String _text) {
 		super(_text);
+		Insets i = getInsets();
+		setBorder(BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right));
+		setBorderPainted(true);
+		ssCommon = new SSCommon(this);
 	}
 
 	/**
