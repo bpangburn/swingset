@@ -39,9 +39,11 @@
 package com.nqadmin.swingset.decorators;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -73,13 +75,22 @@ public abstract class FocusDecorator
 	@Override
 	public void install(SSComponentInterface component) {
 		this.component = component;
-		jc().addFocusListener(this);
+		fcomp().addFocusListener(this);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void uninstall() {
-		jc().removeFocusListener(this);
+		fcomp().removeFocusListener(this);
+	}
+
+	/**
+	 * Based on JComponent type, determine Component that gets focus.
+	 * @return focus target
+	 */
+	protected Component fcomp() {
+		return !(jc() instanceof JComboBox) ? jc()
+				: ((JComboBox)jc()).getEditor().getEditorComponent();
 	}
 
 	/** {@inheritDoc}

@@ -54,6 +54,8 @@ import javax.swing.KeyStroke;
 import java.sql.Connection;
 
 import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.decorators.BorderDecorator;
+import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
 
 // SSComponentInterface.java
@@ -601,5 +603,14 @@ public interface SSComponentInterface {
 	 * @return false for error in data, otherwise true
 	 */
 	default boolean isDataValid() { return true; }
+
+	/**
+	 * Create and return the default {@link Decorator}
+	 * used during construction.
+	 * @return decorator
+	 */
+	default Decorator createDefaultDecorator() {
+		return SSCommon.createDefaultDecorator();
+	}
 
 }

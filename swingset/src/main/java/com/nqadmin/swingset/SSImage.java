@@ -59,6 +59,7 @@ import javax.swing.ScrollPaneConstants;
 
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -170,6 +171,14 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	public SSImage() {
 		// Note that call to parent default constructor is implicit.
 		// super();
+	}
+
+	/** {@inheritDoc } */
+	// TODO: This is a workaround because if default decorator is used
+	//		 then the SSImage doesn't display properly.
+	@Override
+	public Decorator createDefaultDecorator() {
+		return Decorator.nullDecorator;
 	}
 
 	/**

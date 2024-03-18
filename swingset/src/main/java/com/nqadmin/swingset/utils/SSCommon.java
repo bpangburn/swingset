@@ -1175,6 +1175,12 @@ public class SSCommon {
 	//		 and whatever else is needed: InputVerifier, ???.
 	//
 
+	static Decorator createDefaultDecorator() {
+		return new BorderDecorator();
+		//return new BackgroundDecorator();
+	}
+
+
 	/**
 	 * Find the default decorator for this component type and set it.
 	 */
@@ -1195,15 +1201,8 @@ public class SSCommon {
 			return;
 		}
 
-		Decorator deco = null;
-		if (deco == null) {
-			deco = new BorderDecorator();
-			//deco = new BackgroundDecorator();
-		}
-
-		setDecorator(deco);
+		setDecorator(getSSComponent().createDefaultDecorator());
 	}
-
 	/**
 	 * Run the decorator.
 	 */
