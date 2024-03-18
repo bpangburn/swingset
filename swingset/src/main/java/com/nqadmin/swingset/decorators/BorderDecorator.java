@@ -117,23 +117,37 @@ public class BorderDecorator extends FocusDecorator
 	 * @return 
 	 */
 	protected Border getBorder(BorderState state) {
-		if (state == BorderState.DEFAULT)
-			return defaultBorder;
-
 		Color color = null;
 		switch(state) {
+		case DEFAULT: return defaultBorder;
 		case OK: color = Color.GREEN; break;
 		case ERROR: color = Color.RED; break;
 		}
-		Insets i = jc().getInsets();
-		Color fColor = color;
-		logger.trace(() -> String.format("%s %s", fColor, asString(i)));
-		return BorderFactory.createCompoundBorder(
-				BorderFactory.createEmptyBorder(Math.max(0, i.top - 1),
-											    Math.max(0, i.left - 1),
-											    Math.max(0, i.bottom - 1),
-											    Math.max(0, i.right - 1)),
-				BorderFactory.createLineBorder(color));
+		Insets insets = jc().getInsets();
+		Color finalColor = color;
+		Insets i = (Insets) insets.clone();
+		logger.trace(() -> String.format("%s %s", finalColor, asString(i)));
+		Border b;
+		if (i.top > 2 && i.left > 2 && i.bottom > 2 && i.right > 2) {
+			// For a "[5,5,5,5]" produce empty-3:line-1:empty-1,
+			// so there is one space between component and line.
+			b = BorderFactory.createCompoundBorder(
+					BorderFactory.createEmptyBorder(Math.max(0, i.top - 2),
+							Math.max(0, i.left - 2),
+							Math.max(0, i.bottom - 2),
+							Math.max(0, i.right - 2)),
+					BorderFactory.createCompoundBorder(
+							BorderFactory.createLineBorder(color),
+							BorderFactory.createEmptyBorder(1, 1, 1, 1)));
+		} else {
+			b = BorderFactory.createCompoundBorder(
+					BorderFactory.createEmptyBorder(Math.max(0, i.top - 1),
+							Math.max(0, i.left - 1),
+							Math.max(0, i.bottom - 1),
+							Math.max(0, i.right - 1)),
+					BorderFactory.createLineBorder(color));
+		}
+		return b;
 	}
 
 	/**
