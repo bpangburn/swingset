@@ -55,6 +55,11 @@ import java.lang.System.Logger;
 import java.sql.JDBCType;
 import java.util.EnumSet;
 
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+
+import com.nqadmin.swingset.decorators.BorderDecorator;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSCommon;
@@ -138,10 +143,31 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 	 */
 	public SSCheckBox(final String _text) {
 		super(_text);
-		Insets i = getInsets();
-		setBorder(BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right));
+		logger.log(DEBUG, () -> sf("original border: %s",
+				BorderDecorator.asString(getBorder(), this)));
+		// JCheckBox disables painting the borders.
+		// Replace the JCheckBox border with an empty border.
+		Border b = getBorder();
+		if (b instanceof CompoundBorder cb) {
+			Insets oInsets = toInsets(cb.getOutsideBorder());
+			Insets iInsets = toInsets(cb.getInsideBorder());
+			b = BorderFactory.createCompoundBorder(
+					BorderFactory.createEmptyBorder(
+							oInsets.top, oInsets.left, oInsets.bottom, oInsets.right),
+					BorderFactory.createEmptyBorder(
+							iInsets.top, iInsets.left, iInsets.bottom, iInsets.right));
+		} else {
+			Insets i = getInsets();
+			b = BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right);
+		}
+		setBorder(b);
 		setBorderPainted(true);
 		ssCommon = new SSCommon(this);
+	}
+
+	private Insets toInsets(Border b)
+	{
+		return b.getBorderInsets(this);
 	}
 
 	/** {@inheritDoc } */

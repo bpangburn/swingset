@@ -37,6 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -58,6 +60,12 @@ import javax.swing.ScrollPaneConstants;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+
+import javax.swing.JComponent;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+
+import com.nqadmin.swingset.decorators.BorderDecorator;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -169,7 +177,6 @@ public class SSImage extends JPanel implements SSComponentInterface
 	/**
 	 * Construct a default SSImage Object.
 	 */
-	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSImage() {
 	}
 
@@ -179,12 +186,64 @@ public class SSImage extends JPanel implements SSComponentInterface
 	//		jc().setBorder(jc().isFocusOwner() ? focusBorder : standardBorder);
 	//		jc().setForeground(textColor != null ? textColor : Color.BLACK);
 	
+	// /** {@inheritDoc } */
+	// // TODO: This is a workaround because if default decorator is used
+	// //		 then the SSImage doesn't display properly.
+	// @Override
+	// public Decorator createDefaultDecorator() {
+	// 	//return Decorator.nullDecorator;
+	// 	return new BorderDecorator() {
+	// 		@Override
+	// 		protected Component fcomp()
+	// 		{
+	// 			return btnUpdateImage;
+	// 		}
+	// 		
+	// 	};
+	// }
+
 	/** {@inheritDoc } */
-	// TODO: This is a workaround because if default decorator is used
-	//		 then the SSImage doesn't display properly.
 	@Override
 	public Decorator createDefaultDecorator() {
-		return Decorator.nullDecorator;
+		Decorator tDec = SSComponentInterface.super.createDefaultDecorator();
+		if (!(tDec instanceof BorderDecorator))
+			return tDec;
+		//if (Boolean.TRUE)
+		//	return tDec;
+
+		//return super.getBorder(state);
+
+		return new BorderDecorator() {
+			@Override
+			protected Border getBorder(BorderState state)
+			{
+				// The default border when just running the demo is
+				// the CompoundBorder: [[3,3,3,3],[2,14,2,14]].
+				Color color = getBorderColor(state);
+				if (color == null)
+					return defaultBorder;
+
+				if (jc().getBorder() instanceof CompoundBorder cb) {
+					return BorderDecorator.lineEmpty_empty(
+							cb.getOutsideBorder().getBorderInsets(jc()),
+							cb.getInsideBorder().getBorderInsets(jc()),
+							color);
+				}
+				return empty_line(jc().getInsets(), color);
+			}
+
+			@Override
+			protected JComponent jc()
+			{
+				return btnUpdateImage;
+			}
+			
+			@Override
+			protected Component fcomp()
+			{
+				return btnUpdateImage;
+			}
+		};
 	}
 
 	/**
@@ -195,7 +254,8 @@ public class SSImage extends JPanel implements SSComponentInterface
 	 * @param _boundColumnName - column in the rowSet to which the component should
 	 *                         be bound.
 	 */
-	public SSImage(final RowSet _rowSet, final String _boundColumnName) {
+	public SSImage(final RowSet _rowSet, final String _boundColumnName)
+	{
 		this();
 		bind(_rowSet, _boundColumnName);
 	}
@@ -276,9 +336,7 @@ public class SSImage extends JPanel implements SSComponentInterface
 		return ssCommon;
 	}
 
-	/**
-	 * {@inheritDoc }
-	 */
+	/** {@inheritDoc } */
 	@Override
 	public SSImageListener getSSComponentListener() {
 		return new SSImageListener();

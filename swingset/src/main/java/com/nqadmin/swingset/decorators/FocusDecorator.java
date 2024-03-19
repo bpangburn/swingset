@@ -137,7 +137,7 @@ public abstract class FocusDecorator
 	 * Return the SSComponent as a JComponent.
 	 * @return the SSComponent
 	 */
-	protected final JComponent jc() {
+	protected JComponent jc() {
 		return (JComponent) component;
 	}
     
