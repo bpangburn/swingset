@@ -58,6 +58,7 @@ import com.nqadmin.swingset.decorators.TextComponentValidator;
 import com.nqadmin.swingset.demo.simpval.SVUtils;
 import com.nqadmin.swingset.demo.simpval.StringValidator;
 import com.nqadmin.swingset.utils.SSUtils;
+import java.util.function.Function;
 import javax.swing.JPanel;
 import org.netbeans.validation.api.ui.ValidationGroup;
 import org.netbeans.validation.api.ui.ValidationItem;
@@ -138,16 +139,17 @@ public class Example1 extends JFrame {
 		final boolean USE_SIMPLE_VALIDATION = false;
 		//SSTextComponentValidationItem valSupplierName = null;
 		ValidationItem decoSupplierName = null;
+		Function<String, Boolean> validateSupplierName
+				= (str) -> str == null || !str.matches("(?i).*oops.{0,2}$");
 		if (!USE_SIMPLE_VALIDATION) {
 			txtSupplierName.getSSCommon().setValidator(TextComponentValidator.create(
-					(jtc) -> !jtc.getText().matches("(?i).*oops.{0,2}$")));
+					validateSupplierName));
 			txtSupplierCity.getSSCommon().setValidator(TextComponentValidator.create(
-					(jtc) -> !jtc.getText().matches(".*X")));
+					(str) -> !str.matches(".*X")));
 		} else {
 			SwingValidationGroup.setComponentName(txtSupplierName, "Supplier Name");
 			StringValidator validator = SVUtils.getStringValidator(
-					(model) -> !"oops".equalsIgnoreCase(model),
-					() -> "Supplier can not be 'oops'");
+					validateSupplierName, () -> "Supplier can not end with 'oops..'");
 			decoSupplierName = SVUtils.decorator(txtSupplierName, validator);
 		}
 		

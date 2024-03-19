@@ -58,11 +58,12 @@ public abstract class TextComponentValidator implements Validator {
 
 	/**
 	 * Create a validator for use with a {@linkplain JTextComponent};
-	 * argument is a {@linkplain Function} that performs validation.
+	 * argument is a {@linkplain Function} that takes a String and
+	 * performs validation.
 	 * @param validator validation function returns true if valid
 	 * @return the validator
 	 */
-	public static Validator create(Function<JTextComponent, Boolean> validator)
+	public static Validator create(Function<String, Boolean> validator)
 	{
 		return new TextComponentValidatorFunction(validator);
 	}
@@ -104,21 +105,21 @@ public abstract class TextComponentValidator implements Validator {
 	private static class TextComponentValidatorFunction
 			extends TextComponentValidator
 	{
-		private final Function<JTextComponent, Boolean> validator;
+		private final Function<String, Boolean> validator;
 		
 		/**
 		 * A validator for use with a {@linkplain JTextComponent};
 		 * argument is a {@linkplain Function} that performs validation.
 		 * @param validator validation function
 		 */
-		public TextComponentValidatorFunction(Function<JTextComponent, Boolean> validator)
+		public TextComponentValidatorFunction(Function<String, Boolean> validator)
 		{
 			this.validator = validator;
 		}
 		
 		@Override
 		public boolean validate() {
-			return validator.apply(jc());
+			return validator.apply(jc().getText());
 		}
 	}
 }

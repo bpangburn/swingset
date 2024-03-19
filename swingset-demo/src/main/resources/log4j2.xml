@@ -10,7 +10,7 @@
     </Appenders>
 
     <Loggers>
-        <logger name="com.nqadmin.swingset" additivity="false" level="DEBUG">
+        <logger name="com.nqadmin.swingset" additivity="false" level="TRACE">
             <AppenderRef ref="ConsoleAppender" />
             <AppenderRef ref="FileAppender"/>
         </logger>
