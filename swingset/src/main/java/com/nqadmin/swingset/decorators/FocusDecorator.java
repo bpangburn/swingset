@@ -88,6 +88,9 @@ public abstract class FocusDecorator
 	 * Based on JComponent type, determine Component that gets focus.
 	 * @return focus target
 	 */
+	// TODO: fcomp() - maybe just return jc() and dynamically override
+	//		 in combobox components, but would want to wrap default
+	//		 so the default decorator can be change but fcomp() is overridden.
 	protected Component fcomp() {
 		return !(jc() instanceof JComboBox) ? jc()
 				: ((JComboBox)jc()).getEditor().getEditorComponent();

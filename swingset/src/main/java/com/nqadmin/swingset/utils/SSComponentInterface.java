@@ -50,8 +50,11 @@ import javax.sql.RowSet;
 
 import java.sql.Connection;
 
-import com.nqadmin.swingset.SSDataNavigator;
-import com.nqadmin.swingset.decorators.BorderDecorator;
+import javax.sql.rowset.CachedRowSet;
+import javax.swing.JComponent;
+
+import com.nqadmin.swingset.datasources.RSC;
+import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.navigate.NavigateActions;
@@ -457,14 +460,6 @@ public interface SSComponentInterface extends RSC
 	void updateSSComponent();
 
 	/**
-	 * Indication of whether or not the component decides its data is valid.
-	 * There may be additional checks defined by a {@link Validator}; those
-	 * are not considered here.
-	 * @return false for error in data, otherwise true
-	 */
-	default boolean isDataValid() { return true; }
-
-	/**
 	 * Setup action bindings for undo/redo.
 	 */
 	default void setupUndoRedoKeys() {
@@ -492,6 +487,14 @@ public interface SSComponentInterface extends RSC
 	{
 		getSSCommon().undoRedoUpdateObject(cmd, value);
 	};
+
+	/**
+	 * Indication of whether or not the component decides its data is valid.
+	 * There may be additional checks defined by a {@link Validator}; those
+	 * are not considered here.
+	 * @return false for error in data, otherwise true
+	 */
+	default boolean isDataValid() { return true; }
 
 	/**
 	 * Create and return the default {@link Decorator}

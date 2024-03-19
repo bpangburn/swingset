@@ -59,8 +59,6 @@ import javax.swing.ScrollPaneConstants;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 
-import com.nqadmin.swingset.decorators.Decorator;
-
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.decorators.Decorator;
@@ -173,15 +171,14 @@ public class SSImage extends JPanel implements SSComponentInterface
 	 */
 	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSImage() {
-		// TODO: Why do decorators interfere with SSImage?
-		// In particular the following lines from BorderDecorator
-		// cause a miniscule scrollpane. Maybe some kind of decorator wrapper?
-		//		jc().setBorder(jc().isFocusOwner() ? focusBorder : standardBorder);
-		//		jc().setForeground(textColor != null ? textColor : Color.BLACK);
-
-		getSSCommon().setDecorator(Decorator.nullDecorator);
 	}
 
+	// TODO: Why do decorators interfere with SSImage?
+	// In particular the following lines from BorderDecorator
+	// cause a miniscule scrollpane. Maybe some kind of decorator wrapper?
+	//		jc().setBorder(jc().isFocusOwner() ? focusBorder : standardBorder);
+	//		jc().setForeground(textColor != null ? textColor : Color.BLACK);
+	
 	/** {@inheritDoc } */
 	// TODO: This is a workaround because if default decorator is used
 	//		 then the SSImage doesn't display properly.

@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 
 package com.nqadmin.swingset.decorators;
 
@@ -42,15 +47,16 @@ package com.nqadmin.swingset.decorators;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Insets;
+import java.lang.System.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
-import org.apache.logging.log4j.Logger;
-
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Decorate the border when SSComponent has focus, chose color dependent
@@ -62,7 +68,7 @@ import com.nqadmin.swingset.utils.SSUtils;
 // TODO: could listen to components border property and adjust accordingly.
 public class BorderDecorator extends FocusDecorator
 {
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/** The type of border to use */
 	// TODO: may want to treat as bit field for: error/focus/warning/dirty
@@ -83,7 +89,7 @@ public class BorderDecorator extends FocusDecorator
 	@Override
 	public boolean decorate() {
 		boolean dataValid = getComponent().getSSCommon().validate() && getComponent().isDataValid();
-		logger.trace(() -> String.format("%s focus: %s, dataValid: %s",
+		logger.log(TRACE, () -> String.format("%s focus: %s, dataValid: %s",
 				jc().getClass().getSimpleName(), fcomp().isFocusOwner(), dataValid));
 		if (dataValid) {
 			jc().setBorder(getBorder(fcomp().isFocusOwner() ? BorderState.OK : BorderState.DEFAULT));
@@ -119,14 +125,14 @@ public class BorderDecorator extends FocusDecorator
 	protected Border getBorder(BorderState state) {
 		Color color = null;
 		switch(state) {
-		case DEFAULT: return defaultBorder;
-		case OK: color = Color.GREEN; break;
-		case ERROR: color = Color.RED; break;
+		case DEFAULT -> { return defaultBorder; }
+		case OK -> color = Color.GREEN;
+		case ERROR -> color = Color.RED;
 		}
 		Insets insets = jc().getInsets();
 		Color finalColor = color;
 		Insets i = (Insets) insets.clone();
-		logger.trace(() -> String.format("%s %s", finalColor, asString(i)));
+		logger.log(TRACE, () -> String.format("%s %s", finalColor, asString(i)));
 		Border b;
 		if (i.top > 2 && i.left > 2 && i.bottom > 2 && i.right > 2) {
 			// For a "[5,5,5,5]" produce empty-3:line-1:empty-1,
@@ -155,7 +161,7 @@ public class BorderDecorator extends FocusDecorator
 	 */
 	protected void setupDefaultBorder() {
 		if (defaultBorder == null) {
-			logger.debug(() -> {
+			logger.log(DEBUG, () -> {
 				Border b = jc().getBorder();
 				String bi = asString(jc().getInsets());
 				String bc = b != null ? b.getClass().getSimpleName() : null;
@@ -194,8 +200,7 @@ public class BorderDecorator extends FocusDecorator
 	protected String asString(Border b) {
 		if(b == null)
 			return null;
-		if (b instanceof CompoundBorder) {
-			CompoundBorder cb = (CompoundBorder)b;
+		if (b instanceof CompoundBorder cb) {
 			return String.format("[%s,%s]",
 					asString(cb.getOutsideBorder()),
 					asString(cb.getInsideBorder()));

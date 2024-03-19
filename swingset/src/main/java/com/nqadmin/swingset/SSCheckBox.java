@@ -57,7 +57,6 @@ import java.util.EnumSet;
 
 import static java.lang.System.Logger.Level.*;
 
-import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -104,7 +103,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 	} // end private class SSCheckBoxListener
 
 	/** Common fields shared across SwingSet components. */
-	protected final SSCommon ssCommon = new SSCommon(this);
+	protected final SSCommon ssCommon;
 
 	/** System Logger for component. */
 	private static final Logger logger = SSUtils.getLogger();
