@@ -52,10 +52,8 @@ import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.EventObject;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -81,6 +79,7 @@ import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -90,6 +89,7 @@ import javax.swing.table.TableRowSorter;
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.models.GridTableHeader;
 import com.nqadmin.swingset.models.SimpleComboListSwingModels;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -833,6 +833,12 @@ public class SSDataGrid extends JTable {
 	@Override
 	protected SSTableModel createDefaultDataModel() {
 		return new SSTableModel();
+	}
+
+	/** {@inheritDoc } */
+	@Override
+	protected JTableHeader createDefaultTableHeader() {
+		return new GridTableHeader(columnModel);
 	}
 
 	/**
