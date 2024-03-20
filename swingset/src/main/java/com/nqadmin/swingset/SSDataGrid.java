@@ -87,11 +87,14 @@ import javax.swing.table.TableRowSorter;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 
+import javax.swing.table.JTableHeader;
+
 import com.nqadmin.swingset.datasources.RSC;
 
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.models.GridTableHeader;
 import com.nqadmin.swingset.models.SimpleComboListSwingModels;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -806,6 +809,12 @@ public class SSDataGrid extends JTable {
 	@Override
 	protected SSTableModel createDefaultDataModel() {
 		return new SSTableModel();
+	}
+
+	/** {@inheritDoc } */
+	@Override
+	protected JTableHeader createDefaultTableHeader() {
+		return new GridTableHeader(columnModel);
 	}
 
 	/**
