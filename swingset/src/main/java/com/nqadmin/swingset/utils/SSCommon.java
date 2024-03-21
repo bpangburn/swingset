@@ -37,6 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset.utils;
 
+import com.nqadmin.swingset.decorators.BorderDecorator;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeListener;
@@ -78,6 +80,8 @@ import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.datasources.RowSetOps.SSSQLNullException;
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
+import com.nqadmin.swingset.decorators.Decorator;
+import com.nqadmin.swingset.decorators.Validator;
 
 import static com.nqadmin.swingset.SSDataNavigator.isAcceptingChanges;
 
@@ -109,6 +113,8 @@ import static com.nqadmin.swingset.SSDataNavigator.isAcceptingChanges;
  * navigation.
  */
 public class SSCommon {
+
+	private static final Boolean DISABLE_GENERAL_VALIDATION = false;
 
 	/**
 	 * Document listener provided for convenience for SwingSet Components that are
@@ -166,6 +172,13 @@ public class SSCommon {
 			SwingUtilities.invokeLater(() -> {
 				if (lastNotifiedChange != lastChange) {
 					lastNotifiedChange = lastChange;
+
+					if (!isValidChange()) {
+						// TODO: have to change the data base
+						//		 because of autocommit
+						//		 so can't simply return
+						//return;
+					}
 
 					removeRowSetListener();
 
@@ -442,6 +455,9 @@ public class SSCommon {
 	//       if/when there is one.
 	//
 
+	private Decorator decorator;
+	private Validator validator;
+
 	/**
 	 * Reflects the state of the data source metadata about nullability
 	 * of the bound column. False when there's a "NOT NULL" constraint.
@@ -499,6 +515,9 @@ public class SSCommon {
 	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSCommon(final SSComponentInterface _ssComponent) {
 		ssComponent = _ssComponent;
+		decorator = Decorator.nullDecorator;
+		validator = Validator.nullValidator;
+		initDecorator();
 		init();
 	}
 
@@ -1133,6 +1152,8 @@ public class SSCommon {
 
 		addSSComponentListener();
 
+		decorate();
+
 	}
 
 	/**
@@ -1143,6 +1164,121 @@ public class SSCommon {
 			// TODO: could create a valid event, but since it is not used...
 			rowSetListener.rowChanged(null);
 		}
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// The idea is to extend the decorators to handle a variety of component
+	// types and ways to decorate. Wonder how to do that?
+	//
+	// TODO: Could have one interface that is both validator and decorator
+	//		 and whatever else is needed: InputVerifier, ???.
+	//
+
+	static Decorator createDefaultDecorator() {
+		return new BorderDecorator();
+		//return new BackgroundDecorator();
+	}
+
+
+	/**
+	 * Find the default decorator for this component type and set it.
+	 */
+	private void initDecorator() {
+		// For now just pick any decorator as the default.
+		// Probably want to get it from a factory/provider and use this
+		// component type as part of the decision. If a component wants to
+		// extend behavior, could get the current decorator, delegate to it,
+		// with some custom behavior used by the component.
+
+		// Is the following snippet a good way to override the default?
+		//		decorator deco = getSSComponent().createDefaultDecorator();
+		// where the default implementation returns null
+
+		// Only decorate/validate for SSFormattedTextField, as in v4.0.12.
+		if (!(getSSComponent() instanceof SSFormattedTextField)
+				&& DISABLE_GENERAL_VALIDATION) {
+			return;
+		}
+
+		setDecorator(getSSComponent().createDefaultDecorator());
+	}
+	/**
+	 * Run the decorator.
+	 */
+	public final void decorate() {
+		decorator.decorate();
+	}
+
+	/**
+	 * Install the given decorator.
+	 * @param deco decorator to install
+	 */
+	public final void setDecorator(Decorator deco) {
+		decorator.uninstall();
+		deco.install(getSSComponent());
+		decorator = deco;
+	}
+
+	/**
+	 * Return the decorator used by this component.
+	 * @return the decorator
+	 */
+	public final Decorator getDecorator() {
+		return decorator;
+	}
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Validator
+	//
+
+	/**
+	 * Install the given validator into the component
+	 * @param _validator validator to install
+	 */
+	public final void setValidator(Validator _validator) {
+		if (DISABLE_GENERAL_VALIDATION) {
+			return;
+		}
+		validator.uninstall();
+		_validator.install(ssComponent);
+		validator = _validator;
+	}
+	
+	/**
+	 * Run the SSComponents validator, return the result.
+	 * @return true if valid
+	 */
+	public final boolean validate() {
+		return validator.validate();
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Component Value Change
+	//
+
+	// TODO:	Implement a way to select when to do validation.
+	//			For example, OnChangeOrAction, InputVerifier, OnFocusChange, ...?
+	//
+	// TODO:	May need a plugin for whether or not to allow decorate().
+	//			Incorporate check into Validator? Decorator? ChangeHandler?
+	/**
+	 * This is called per change, like on a keystroke, if allowed may decorate
+	 * the component. 
+	 * 
+	 * @return true if the there is no detected error
+	 */
+	private boolean isValidChange() {
+		if (DISABLE_GENERAL_VALIDATION) {
+			return true;
+		}
+
+		// For now, always do validation
+
+		// boolean isValid = validate();
+		return decorator.decorate();
+		// return isValid;
 	}
 
 }
