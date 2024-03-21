@@ -35,6 +35,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.Serializable;
+import java.util.function.BiFunction;
 
 import javax.swing.*;
 import javax.swing.plaf.UIResource;
@@ -51,6 +52,10 @@ public class GridTableCellHeaderRenderer extends DefaultTableCellRenderer
     private boolean horizontalTextPositionSet;
     private Icon sortArrow;
     private final EmptyIcon emptyIcon = new EmptyIcon();
+	private BiFunction<Integer, Integer, String> toolTipGenerator
+			= (sortIndex, column) -> (sortIndex == null ? null
+					: ((sortIndex == 0 ? "primary"
+					: sortIndex == 1 ? "secondary" : "tertiary") + " sort key"));
 
 	static {
 		UIManager.put("Table.ascendingSortIcon-1", new SortArrowIcon(true, Color.green));
@@ -72,6 +77,21 @@ public class GridTableCellHeaderRenderer extends DefaultTableCellRenderer
         setHorizontalAlignment(JLabel.CENTER);
     }
 
+	/**
+	 * Set the function used to generate a column header's toolTip. The function's
+	 * parameters are index and column respectively. The default function returns
+	 * null unless the column is part of a sort, in that case somehing like
+	 * "secondary sort key" is returned; the default does not use the column
+	 * parameter.
+	 * <p>
+	 * If the column parameter is used by the function, the method
+	 * {@link JTable#convertColumnIndexToModel(int)} may be useful.
+	 * @param toolTipGenerator
+	 */
+	public void setToolTipGenerator(BiFunction<Integer, Integer, String> toolTipGenerator) {
+		this.toolTipGenerator = toolTipGenerator;
+	}
+
 	/** {@inheritDoc} */
 	@Override
 	public void setHorizontalTextPosition(int textPosition) {
@@ -87,6 +107,7 @@ public class GridTableCellHeaderRenderer extends DefaultTableCellRenderer
 
         boolean isPaintingForPrint = false;
 
+		Integer keyIndex = null;
         if (table != null) {
             JTableHeader header = table.getTableHeader();
             if (header != null) {
@@ -118,7 +139,7 @@ public class GridTableCellHeaderRenderer extends DefaultTableCellRenderer
                 }
                 Object[] result = getColumnSortOrder(table, column);
                 SortOrder sortOrder = (SortOrder) result[0];
-				int keyIndex = (int) result[1];
+				keyIndex = (Integer) result[1];
                 if (sortOrder != null) {
 					String iconLookupKey = switch(sortOrder) {
                     case ASCENDING -> "Table.ascendingSortIcon";
@@ -132,6 +153,7 @@ public class GridTableCellHeaderRenderer extends DefaultTableCellRenderer
             }
         }
 
+		setToolTipText(toolTipGenerator.apply(keyIndex, column));
         setText(value == null ? "" : value.toString());
         setIcon(sortIcon);
         sortArrow = sortIcon;
@@ -151,7 +173,7 @@ public class GridTableCellHeaderRenderer extends DefaultTableCellRenderer
 	/** return array { sortOrder, keyIndex } or null if none. */
     // public static SortOrder getColumnSortOrder(JTable table, int column) {
     private static Object[] getColumnSortOrder(JTable table, int column) {
-        Object[] rv = new Object[] {null, 0};
+        Object[] rv = new Object[] {null, null};
         if (table == null || table.getRowSorter() == null) {
             return rv;
         }
@@ -161,9 +183,8 @@ public class GridTableCellHeaderRenderer extends DefaultTableCellRenderer
 			RowSorter.SortKey sortKey = sortKeys.get(i);
 			if (i == 0 && sortKey.getSortOrder() == SortOrder.UNSORTED)
 				return rv; // If first key is unsorted, then there's no sort.
-			if (sortKey.getColumn() == table.convertColumnIndexToModel(column)) {
+			if (sortKey.getColumn() == table.convertColumnIndexToModel(column))
 				return new Object[] { sortKey.getSortOrder(), i };
-			}
 		}
         return rv;
     }
