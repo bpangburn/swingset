@@ -49,9 +49,9 @@ import javax.swing.event.InternalFrameEvent;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+
 import static java.lang.System.Logger.Level.*;
 
-import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
@@ -66,17 +66,13 @@ import com.nqadmin.swingset.utils.SSEnums.Navigation;
  * Helper class for designing SwingSet Form View screens.
  */
 //public abstract class SSFormViewScreenHelper extends JInternalFrame {
+@SuppressWarnings("serial")
 public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {	
 
 	/**
 	 * Implementation of SSDBNav interface.
 	 */
 	private class FormHelperSSDBNavImpl extends SSDBNavImpl {
-
-		/**
-		 * unique serial ID
-		 */
-		private static final long serialVersionUID = 3470473198734864411L;
 		
 		/**
 		 * Primary key of record being deleted.
@@ -265,8 +261,6 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	
 	private static Logger logger = SSUtils.getLogger(); // Log4j Logger for component
 
-	private static final long serialVersionUID = 266766406708536384L; // unique serial ID
-	
 	private SSDBComboBox comboNav; // Combo navigator.
 	private String comboNavDisplayColumn1 = null; // name of the 1st database column to display in the combo navigator
 	private String comboNavDisplayColumn2 = null; // name of the 2nd database column to display in the combo navigator
@@ -322,6 +316,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 *                                navigator, if null, the default separator will
 	 *                                be used
 	 */
+	@SuppressWarnings({"LeakingThisInConstructor", "OverridableMethodCallInConstructor"})
 	public SSFormViewScreenHelper(final String _title, final Container _parentContainer, final Connection _connection, final String _pkColumn,
 			final Long _parentID, final String _comboNavDisplayColumn1, final String _comboNavDisplayColumn2,
 			final String _comboNavSeparator) {
@@ -541,7 +536,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * @throws Exception exception thrown while initializing rowset
 	 */
 	private void initRowset() throws SQLException, Exception {
-		setRowset(new JdbcRowSetImpl(getConnection()));
+		setRowset(getNewRowSet(getConnection()));
 		updateRowset();
 	}
 	

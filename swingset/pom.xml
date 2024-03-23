@@ -25,7 +25,7 @@
 		<!-- DEPENDENCIES -->
 		<!--<version.glazedlists>1.11.0</version.glazedlists> -->
 		<version.glazedlists>1.11.1203</version.glazedlists>
-		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
+		<version.table-sort-header>1.0.1</version.table-sort-header>
 		<version.google-guava>33.0.0-jre</version.google-guava>
 		<version.netbeans>RELEASE200</version.netbeans>
 
@@ -125,11 +125,10 @@
 			<version>${version.glazedlists}</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.nqadmin.rowset/jdbcrowsetimpl -->
 		<dependency>
-			<groupId>com.nqadmin.rowset</groupId>
-			<artifactId>jdbcrowsetimpl</artifactId>
-			<version>${version.jdbcrowsetimpl}</version>
+			<groupId>com.raelity.jdk</groupId>
+			<artifactId>table-sort-header-renderer</artifactId>
+			<version>${version.table-sort-header}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.netbeans.api/org-openide-util-lookup -->

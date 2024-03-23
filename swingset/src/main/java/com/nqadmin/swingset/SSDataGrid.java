@@ -94,9 +94,9 @@ import com.nqadmin.swingset.datasources.RSC;
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
-import com.nqadmin.swingset.models.GridTableHeader;
 import com.nqadmin.swingset.models.SimpleComboListSwingModels;
 import com.nqadmin.swingset.utils.SSUtils;
+import com.raelity.jdk.sun.swing.table.TableSortHeaderRenderer;
 
 import static com.nqadmin.swingset.datasources.DateTime.getDateTimeText;
 import static com.nqadmin.swingset.datasources.DateTime.getSQLDateTimeObject;
@@ -814,7 +814,12 @@ public class SSDataGrid extends JTable {
 	/** {@inheritDoc } */
 	@Override
 	protected JTableHeader createDefaultTableHeader() {
-		return new GridTableHeader(columnModel);
+		return new JTableHeader(columnModel) {
+			@Override
+			protected TableCellRenderer createDefaultRenderer() {
+				return new TableSortHeaderRenderer();
+			}
+		};
 	}
 
 	/**

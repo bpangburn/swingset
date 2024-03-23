@@ -52,6 +52,7 @@ import java.lang.System.Logger.Level;
 
 import com.nqadmin.swingset.utils.SSDataGridScreenHelper;
 import com.nqadmin.swingset.utils.SSUtils;
+import javax.sql.RowSet;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view
@@ -180,6 +181,15 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 //
 //	// MAKE THE JFRAME VISIBLE
 //		setVisible(true);
+	}
+
+	/** {@inheritDoc}
+	 * The parameter is cast to a Connection.
+	 */
+	@Override
+	protected RowSet getNewRowSet(Object connectionOrDataSource) throws SQLException
+	{
+		return DemoUtil.getNewRowSet((Connection)connectionOrDataSource);
 	}
 
 	@Override

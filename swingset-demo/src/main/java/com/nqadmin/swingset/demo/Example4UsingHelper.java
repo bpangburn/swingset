@@ -62,6 +62,7 @@ import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.utils.SSFormViewScreenHelper;
 import com.nqadmin.swingset.utils.SSUtils;
+import javax.sql.RowSet;
 
 /**
  * This example displays data from the part_data table.
@@ -122,6 +123,16 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		// Finish Initialization
 		initScreen();
 	}
+
+	/** {@inheritDoc}
+	 * The parameter is cast to a Connection.
+	 */
+	@Override
+	protected RowSet getNewRowSet(Object connectionOrDataSource) throws SQLException
+	{
+		return DemoUtil.getNewRowSet((Connection)connectionOrDataSource);
+	}
+	
 
 	@Override
 	protected void activateDeactivateComponents() throws Exception {

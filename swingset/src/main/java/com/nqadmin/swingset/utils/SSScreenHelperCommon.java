@@ -57,7 +57,6 @@ import java.lang.System.Logger.Level;
 import static java.lang.System.Logger.Level.*;
 
 import java.sql.Connection;
-import java.util.function.Supplier;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
@@ -217,6 +216,13 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	protected Connection getConnection() {
 		return connection;
 	}
+
+	/**
+	 * @param connectionOrDataSource either Connection or String dataSourceName
+	 * @return a new rowset
+	 * @throws java.sql.SQLException
+	 */
+	protected abstract RowSet getNewRowSet(Object connectionOrDataSource) throws SQLException;
 	
 	/**
 	 * Builds and returns custom menu bar and with applicable listeners.

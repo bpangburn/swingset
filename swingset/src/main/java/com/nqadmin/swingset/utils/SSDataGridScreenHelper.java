@@ -54,9 +54,7 @@ import javax.swing.table.TableCellEditor;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
-import static java.lang.System.Logger.Level.*;
 
-import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDataGrid;
 
 //SSDataGridScreenHelper.java
@@ -325,7 +323,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * @throws Exception exception thrown while initializing rowset
 	 */
 	private void initRowset() throws SQLException, Exception {
-		setRowset(new JdbcRowSetImpl(getConnection()));
+		setRowset(getNewRowSet(getConnection()));
 		updateRowset();
 	}
 	

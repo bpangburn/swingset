@@ -25,6 +25,7 @@
 		<!-- DEPENDENCIES -->
 		<!-- primary swingset-demo dependencies -->
 		<version.swingset>4.0.13-SNAPSHOT</version.swingset>
+		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
 		<version.log4j>2.22.1</version.log4j>
 		<version.h2>2.2.224</version.h2>
 		<version.java-getopt>1.0.13</version.java-getopt>
@@ -80,6 +81,13 @@
 			<groupId>com.nqadmin.swingset</groupId>
 			<artifactId>swingset</artifactId>
 			<version>${version.swingset}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.nqadmin.rowset/jdbcrowsetimpl -->
+		<dependency>
+			<groupId>com.nqadmin.rowset</groupId>
+			<artifactId>jdbcrowsetimpl</artifactId>
+			<version>${version.jdbcrowsetimpl}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
