@@ -87,6 +87,13 @@ class DataGridExampleSupport {
 
 	private DataGridExampleSupport(Logger _logger, Container _uiContainer,
 			RowSet _rowset, SSDataGrid _dataGrid) {
+//=======
+//	DataGridExampleSupport(Logger _logger, Container _uiContainer,
+//			RowSet _rowset, SSDataGrid _dataGrid,
+//			int _primaryColumn, SSDataValue _dataValue,
+//			String[] _columnNames, Object[] _defaultValues)
+//			throws SQLException {
+//>>>>>>> 4.1.0-SNAPSHOT
 
 		if(!(_uiContainer.getLayout() instanceof BorderLayout)) {
 			throw new IllegalArgumentException("uiContainer without BorderLayout");
@@ -108,6 +115,12 @@ class DataGridExampleSupport {
 		dataGrid.setPrimaryColumn(primaryColumn);
 		dataGrid.setSSDataValue(dataValue);
 		dataGrid.setDefaultValues(columnNames, defaultValues);
+//=======
+//		_dataGrid.setSSDataGridHandler(new DataGridHandler());
+//		_dataGrid.setPrimaryColumn(_primaryColumn);
+//		_dataGrid.setSSDataValue(_dataValue);
+//		_dataGrid.setDefaultValues(_columnNames, _defaultValues);
+//>>>>>>> 4.1.0-SNAPSHOT
 
 		TableColumnModel cm = dataGrid.getColumnModel();
 		for (int i = 1; i <= cm.getColumnCount(); i++) {

@@ -1,21 +1,21 @@
-/*******************************************************************************
- * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+/* *****************************************************************************
+ * Copyright (C) 2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,39 +27,29 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
  *   Diego Gil
  *   Man "Bee" Vo
  *   Ernie R. Rael
- ******************************************************************************/
-package com.nqadmin.swingset;
+ * ****************************************************************************/
 
-// SSDBNavAdapter.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+package com.nqadmin.swingset.decorators;
 
 /**
- * Abstract class that provides empty implementations of all the methods for the
- * SSDBNav interface.
- * <p>
- * This class is provided for convenience. so that users wishing to write their
- * own SSDBNav implementations can just extend the abstract class and override
- * the desired methods.
- *
- * @deprecated Starting in 2.3.0+ use {@link SSDBNav} instead.
+ * Typically used to specify text color.
+ * Foreground in text JTextComponent.
  */
-@Deprecated
-public class SSDBNavAdapter implements SSDBNav {
+public enum TextDecorationStyle
+{
+	/** Use the original/default text style. */
+	RESET,
 
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -6951967166432878580L;
+	/** Text is a negative number. */
+	NEGATIVE_NUMBER,
 
-// All logic in this class has been moved to default methods in the interface class.
-
-} // end public class SSDBNavAdapter implements SSDBNav, Serializable {
-
+	/** Do not change anything. */
+	NO_CHANGE;
+}

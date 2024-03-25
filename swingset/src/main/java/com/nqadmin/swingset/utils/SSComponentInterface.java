@@ -54,6 +54,9 @@ import javax.swing.KeyStroke;
 import java.sql.Connection;
 
 import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.decorators.BorderDecorator;
+import com.nqadmin.swingset.decorators.Decorator;
+import com.nqadmin.swingset.decorators.Validator;
 
 // SSComponentInterface.java
 //
@@ -544,13 +547,6 @@ public interface SSComponentInterface {
 	}
 
 	/**
-	 * Sets the SSCommon data member of the Swingset Component.
-	 *
-	 * @param _ssCommon shared/common SwingSet component data and methods
-	 */
-	void setSSCommon(SSCommon _ssCommon);
-
-	/**
 	 * Sets the Connection to the database
 	 *
 	 * @param _connection the connection to set
@@ -599,5 +595,22 @@ public interface SSComponentInterface {
 	 * removal (and subsequent restoration) of the component's value change listener.
 	 */
 	void updateSSComponent();
+
+	/**
+	 * Indication of whether or not the component decides its data is valid.
+	 * There may be additional checks defined by a {@link Validator}; those
+	 * are not considered here.
+	 * @return false for error in data, otherwise true
+	 */
+	default boolean isDataValid() { return true; }
+
+	/**
+	 * Create and return the default {@link Decorator}
+	 * used during construction.
+	 * @return decorator
+	 */
+	default Decorator createDefaultDecorator() {
+		return SSCommon.createDefaultDecorator();
+	}
 
 }

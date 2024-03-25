@@ -51,10 +51,10 @@ import javax.swing.JLabel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.decorators.TextComponentValidator;
 
 /**
  * This example displays data from the supplier_data table.
@@ -117,10 +117,26 @@ public class Example1 extends JFrame {
 			
 		// SET SCREEN POSITION
 			setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+		
+		// SET A VALIDATOR (may be a no-op is disabled in SwingSet library)
+			txtSupplierName.getSSCommon().setValidator(TextComponentValidator.create(
+					(jtc) -> !jtc.getText().matches("(?i).*oops.{0,2}$")));
+			//txtSupplierName.getSSCommon().setValidator(new TextComponentValidator() {
+			//	@Override
+			//	public boolean validate() {
+			//		return !jc().getText().equalsIgnoreCase("oops");
+			//	}
+			//});
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-		        rowset = new JdbcRowSetImpl(connection);
+				// In a standalone situation, or when working with Pangburn groups's
+				// applications, get a JdbcRowSetImpl directly by doing
+				//		import com.nqadmin.rowset.JdbcRowSetImpl;
+				//		...
+				//		rowset = new JdbcRowSetImpl(connection);
+				// See DemoUtil opening comment for more information.
+				rowset = DemoUtil.getNewRowSet(connection);
 				rowset.setCommand("SELECT * FROM supplier_data");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {

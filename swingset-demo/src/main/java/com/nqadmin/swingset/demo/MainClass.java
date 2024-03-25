@@ -37,6 +37,7 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import com.nqadmin.swingset.SSComboBox;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -60,7 +61,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -71,9 +71,18 @@ import org.h2.tools.RunScript;
 
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSMysqlSetModel;
+import com.nqadmin.swingset.utils.SSVersion;
 import com.raelity.lib.ui.Screens;
 
 import gnu.getopt.Getopt;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.BoxLayout;
+import javax.swing.Popup;
+import javax.swing.PopupFactory;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
@@ -153,6 +162,57 @@ public class MainClass extends JFrame {
 		}
 	}
 
+	@SuppressWarnings("serial")
+	private class ComboRowSetSource extends SSComboBox {
+		Popup popup;
+
+		public ComboRowSetSource() {
+			super(false);
+			setMaximumSize(new Dimension(210, 25));
+			setAllowNull(false);
+			DemoUtil.RowSetSource rsSource = DemoUtil.getWhichRowSetDefault();
+			setOptions(DemoUtil.RowSetSource.class);
+			setSelectedEnum(rsSource);
+			btnRowSetSource.setText("RowSet: " + rsSource.toString());
+		}
+
+		@Override
+		public DemoUtil.RowSetSource getSelectedEnum() {
+			return (DemoUtil.RowSetSource) super.getSelectedEnum();
+		}
+
+		@Override
+		public void setSelectedItem(Object anObject) {
+			super.setSelectedItem(anObject);
+			DemoUtil.RowSetSource rsSource = getSelectedEnum();
+			DemoUtil.setWhichRowSetDefault(rsSource);
+			btnRowSetSource.setText("RowSet: " + rsSource.toString());
+			if (popup == null) {
+				return;
+			}
+			popup.hide();
+			popup = null;
+		}
+	}
+
+	private class RowSetSourceMouseListener extends MouseAdapter {
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (comboRowSetSource.popup != null) {
+				comboRowSetSource.popup.hide();
+				comboRowSetSource.popup = null;
+				return;
+			}
+			Point p = e.getLocationOnScreen();
+			Popup popup = PopupFactory.getSharedInstance().getPopup(
+					null, comboRowSetSource, p.x, p.y);
+			comboRowSetSource.popup = popup;
+			popup.show();
+			SwingUtilities.invokeLater(() -> comboRowSetSource.showPopup());
+		}
+	}
+
 	/**
 	 * component dimensions
 	 */
@@ -190,7 +250,7 @@ public class MainClass extends JFrame {
 	/**
 	 * database
 	 */
-	private static final String DATABASE_NAME = "suppliers_and_parts";
+	public static final String DATABASE_NAME = "suppliers_and_parts";
 	private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
 
 	private static final boolean USE_IN_MEMORY_DATABASE = true;
@@ -217,6 +277,8 @@ public class MainClass extends JFrame {
 	private JButton btnTestBase = new JButton("Test Base Components");
 	private JButton btnTestFormatted = new JButton("Test Formatted Components");
 	private JButton btnTestGrid = new JButton("Test Grid Components");
+	private JButton btnRowSetSource = new JButton("RowSet: XXXXXXXX");
+	private ComboRowSetSource comboRowSetSource = new ComboRowSetSource();
 
 	/**
 	 * Log4j2 Logger
@@ -239,6 +301,12 @@ public class MainClass extends JFrame {
 		super("SwingSet Demo");
 		setSize(300, 300);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				DemoUtil.logConnectionUsage();
+			}
+		});
 
 		// ECHO WORKING DIRECTORY
 		logger.info("Working Directory = " + System.getProperty("user.dir"));
@@ -269,6 +337,7 @@ public class MainClass extends JFrame {
 		btnTestBase.addActionListener(new MyButtonListener());
 		btnTestGrid.addActionListener(new MyButtonListener());
 		btnTestFormatted.addActionListener(new MyButtonListener());
+		btnRowSetSource.addMouseListener(new RowSetSourceMouseListener());
 
 		// SET BUTTON DIMENSIONS
 		btnExample1.setPreferredSize(buttonDim);
@@ -284,6 +353,7 @@ public class MainClass extends JFrame {
 		btnTestBase.setPreferredSize(buttonDim);
 		btnTestGrid.setPreferredSize(buttonDim);
 		btnTestFormatted.setPreferredSize(buttonDim);
+		btnRowSetSource.setPreferredSize(buttonDim);
 
 		// LAYOUT BUTTONS
 		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
@@ -300,17 +370,18 @@ public class MainClass extends JFrame {
 		getContentPane().add(btnTestBase);
 		// getContentPane().add(this.btnTestGrid);
 		getContentPane().add(btnTestFormatted);
+		getContentPane().add(btnRowSetSource);
 
 		// DISPLAY SCREEN
 		setVisible(true);
 		pack();
 		Screens.translateToPrefScreen(this);
 	}
-
+	
 	/**
 	 * Class to initialize the database connection and load the database content
 	 * from a script
-	 * 
+	 *
 	 * @return database connection
 	 */
 	protected Connection getDatabase() {
@@ -635,11 +706,15 @@ public class MainClass extends JFrame {
 	 * @param _args - optional command line arguments, which are ignored by this
 	 *              program
 	 */
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static void main(final String[] _args) {
 		boolean some_error = false;
-		System.err.println(String.format("java:%s vm:%s date:%s os:%s", System.getProperty("java.version"),
-				System.getProperty("java.vm.version"), System.getProperty("java.version.date"),
-				System.getProperty("os.name")));
+		System.err.printf("java:%s vm:%s date:%s os:%s\n",
+				System.getProperty("java.version"),
+				System.getProperty("java.vm.version"),
+				System.getProperty("java.version.date"),
+				System.getProperty("os.name"));
+		System.err.printf("SwingSet: %s\n", SSVersion.get().toString());
 
 		Getopt g = new Getopt(cmdName, _args, "hvdinrp:s:");
 

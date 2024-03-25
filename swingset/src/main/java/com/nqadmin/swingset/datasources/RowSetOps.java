@@ -54,6 +54,8 @@ import java.util.GregorianCalendar;
 import java.util.Optional;
 
 import javax.sql.RowSet;
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.spi.SyncProviderException;
 
 import org.apache.logging.log4j.Logger;
 
@@ -80,6 +82,77 @@ public class RowSetOps {
 	private static final Logger logger = SSUtils.getLogger();
 
 	// TODO Audit type handling based on http://www.java2s.com/Code/Java/Database-SQL-JDBC/StandardSQLDataTypeswithTheirJavaEquivalents.htm
+
+	/**
+	 * Inserts the context of the insert row into this {@linkplain ResultSet}
+	 * and into the database. Handle CachedRowSet.
+	 * @param _resultSet
+	 * @throws SQLException
+	 */
+	public static void insertRow(ResultSet _resultSet) throws SQLException {
+		_resultSet.insertRow();
+		if (_resultSet instanceof CachedRowSet) {
+			CachedRowSet crs = (CachedRowSet)_resultSet;
+			_resultSet.moveToCurrentRow();
+			try {
+				SSDataNavigator.acceptChanges(crs, null);
+			} catch (SyncProviderException ex) {
+				// TODO: test CRS undoInsert after accept changes
+				crs.undoInsert();
+				throw ex;
+			}
+		}
+	}
+
+	/**
+	 * Updates the underlying database with the new contents of the current row
+	 * of this {@linkplain ResultSet} object. Handle CachedRowSet.
+	 * @param _resultSet
+	 * @throws SQLException
+	 */
+	public static void updateRow(ResultSet _resultSet) throws SQLException {
+		_resultSet.updateRow();
+		if (_resultSet instanceof CachedRowSet) {
+			CachedRowSet crs = (CachedRowSet)_resultSet;
+			//SQLException ex = null;
+			int thisRow = _resultSet.getRow();
+			try {
+				SSDataNavigator.acceptChanges(crs, () -> {
+					try {
+						_resultSet.absolute(thisRow);
+					} catch (SQLException ex) { }	// TODO: find nice way to propogate
+				});
+			} catch (SyncProviderException ex01) {
+				// TODO: test CRS undoUpdate after accept changes
+				//ex = ex01;
+				crs.undoUpdate();
+				throw ex01;
+			}
+			//_resultSet.absolute(thisRow);
+			//if (ex != null) {
+			//	throw ex;
+			//}
+		}
+	}
+
+	/**
+	 * Deletes the current row from this {@linkplain ResultSet} and from the
+	 * underlying database. Handle CachedRowSet.
+	 * @param _resultSet
+	 * @throws SQLException 
+	 */
+	public static void deleteRow(ResultSet _resultSet) throws SQLException {
+		_resultSet.deleteRow();
+		if (_resultSet instanceof CachedRowSet) {
+			CachedRowSet crs = (CachedRowSet)_resultSet;
+			try {
+				SSDataNavigator.acceptChanges(crs, null);
+			} catch (SyncProviderException ex) {
+				crs.undoDelete();
+				throw ex;
+			}
+		}
+	}
 
 	/**
 	 * Returns the number of columns in the underlying ResultSet object
@@ -422,14 +495,14 @@ public class RowSetOps {
 	 *                      underlying RowSet column
 	 * @param _columnName   name of the database column
 	 * @param _allowNull 	indicates if Component and underlying column can contain null values
-	 * @throws NullPointerException thrown if null is not allowed
+	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 * @throws NumberFormatException thrown if unable to parse a string to number format
 	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
 	 */
 	// TODO: Eclipse is giving a Potential null pointer access, but we have assert(_updatedValue != null) so may be able to remove warning in future.
 	@SuppressWarnings("null")
-	public static void updateColumnText(final RowSet _rowSet, final String _updatedValue, final String _columnName, final boolean _allowNull) throws NullPointerException, SQLException, NumberFormatException {
+	public static void updateColumnText(final RowSet _rowSet, final String _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException, NumberFormatException {
 
 		logger.debug("[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
@@ -478,7 +551,7 @@ public class RowSetOps {
             	//
             	// Note that if there is a UNIQUE constraint on such a text column then repeatedly writing the same 
             	// number (0 to N) spaces should throw an SQL exception (as should any other duplicate string)
-                throw new NullPointerException("Null values are not allowed for this field.");
+                throw new SSSQLNullException("Null values are not allowed for this field.");
             }
         }
 		assert(_updatedValue != null);
@@ -486,6 +559,9 @@ public class RowSetOps {
 		/*
 		 * SECOND - WRITING NON-NULL VALUES TO DATABASE BASED ON APPROPRIATE STRING CONVERSIONS
 		 */
+		// TODO: Use setObject(_updatedValue) for numerics?
+		//		 But it is nice to catch problems early,
+		//		 as long as TextField stays consistent.
 		switch (jdbcType) {
 	
 		case INTEGER:
@@ -665,7 +741,8 @@ public class RowSetOps {
 	// TODO: for override of type mapping for local/dbms requirements
 	// with_timezone might be the perfect candidates
 	private static final EnumMap<JDBCType, Class<?>> overrideJdbcToJavaType = new EnumMap<>(JDBCType.class);
-	private static void overrideJdbcStandard()
+
+  private static void overrideJdbcStandard()
 	{
 		// The *_WITH_TIMEZONE aren't mentioned in appendix B.1 or B.3
 		overrideJdbcToJavaType.put(JDBCType.TIME_WITH_TIMEZONE,
@@ -678,6 +755,9 @@ public class RowSetOps {
 	}
 	static { overrideJdbcStandard(); }
 	
+//=======
+//>>>>>>> 4.1.0-SNAPSHOT
+  
 	/**
 	 * Determine the Java type class for the given database type.
 	 * @param _jdbcType JDBCType of interest
@@ -984,5 +1064,22 @@ public class RowSetOps {
 			logger.warn("Unknown data type of " + type);
 		}
 		return value;
+	}
+
+	/**
+	 * Null used as database value where not allowed.
+	 */
+	@SuppressWarnings("serial")
+	public static class SSSQLNullException extends SQLException {
+
+		/**
+		 * Construct an SQLException with given reason.
+		 * 
+		 * @param reason description of the exception
+		 */
+		public SSSQLNullException(String reason) {
+			super(reason);
+		}
+
 	}
 }

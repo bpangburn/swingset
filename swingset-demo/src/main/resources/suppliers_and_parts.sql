@@ -54,15 +54,18 @@ CREATE TABLE IF NOT EXISTS supplier_data
 ( 
     supplier_id INTEGER DEFAULT nextval('supplier_data_seq') NOT NULL PRIMARY KEY,
     supplier_name VARCHAR(50), 
-    status SMALLINT, 
+    status SMALLINT NOT NULL CHECK (status <= 999), 
     city VARCHAR(50)
 );
 
 MERGE INTO supplier_data VALUES (2,'Jones',  10, 'Paris') ;
 MERGE INTO supplier_data VALUES (5,'Adams', 30, 'Athens');
 MERGE INTO supplier_data VALUES (4,'Clark', 20, 'London');
+MERGE INTO supplier_data VALUES (6,'Anurak',73,'Bankok');
 MERGE INTO supplier_data VALUES (3,'Blake', 30, 'Paris');
 MERGE INTO supplier_data VALUES (1,'Smith',20,'London');
+MERGE INTO supplier_data VALUES (8,'Gupta',71,'Mumbai');
+MERGE INTO supplier_data VALUES (7,'Kozar',79,'Kyiv');
 
 /* SELECT * from supplier_data; */
 

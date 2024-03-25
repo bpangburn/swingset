@@ -8,3 +8,5 @@ syntax: glob
 *.orig.*
 *.rej
 
+syntax: rootglob
+NOTES-LOCAL

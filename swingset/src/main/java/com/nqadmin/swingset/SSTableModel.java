@@ -51,6 +51,8 @@ import java.util.List;
 import java.util.Set;
 
 import javax.sql.RowSet;
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.spi.SyncProviderException;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
@@ -212,7 +214,7 @@ public class SSTableModel extends AbstractTableModel {
 					return false;
 				}
 				rowset.absolute(_row + 1);
-				rowset.deleteRow();
+				RowSetOps.deleteRow(rowset);
 				rowCount--;
 				if (dataGridHandler != null) {
 					dataGridHandler.performPostDeletionOps(_row);
@@ -459,6 +461,9 @@ public class SSTableModel extends AbstractTableModel {
 			updateColumnObject(rowset, valueCopy, _column + 1);
 			
 			rowset.insertRow();
+//=======
+//			RowSetOps.insertRow(rowset);
+//>>>>>>> 4.1.0-SNAPSHOT
 			if (rowCount != 0) {
 				rowset.moveToCurrentRow();
 			} else {

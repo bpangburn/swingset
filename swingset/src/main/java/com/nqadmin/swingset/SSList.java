@@ -172,7 +172,7 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon = new SSCommon(this);
+	transient protected final SSCommon ssCommon = new SSCommon(this);
 
 	/**
 	 * Creates an object of SSList with mapping type of {@code JDBCType.INTEGER}.
@@ -495,17 +495,6 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 		setSelectedIndices(Arrays.stream(_selectedMappings)
 				.mapToInt(o -> optionSwingModel.getMappings().indexOf(o))
 				.toArray());
-	}
-
-	/**
-	 * Sets the SSCommon data member for the current Swingset Component.
-	 *
-	 * @param _ssCommon shared/common SwingSet component data and methods
-	 */
-	@Override
-	public void setSSCommon(final SSCommon _ssCommon) {
-		ssCommon = _ssCommon;
-
 	}
 
 	/**

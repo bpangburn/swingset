@@ -37,6 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -51,17 +53,24 @@ import java.sql.SQLException;
 import javax.sql.RowSet;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
 
 import org.apache.logging.log4j.Logger;
 
+import com.nqadmin.swingset.decorators.BorderDecorator;
+import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.decorators.BorderDecorator.empty_line;
 
 // SSImage.java
 //
@@ -162,7 +171,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon = new SSCommon(this);
+	transient protected final SSCommon ssCommon = new SSCommon(this);
 
 	/**
 	 * Construct a default SSImage Object.
@@ -170,6 +179,49 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	public SSImage() {
 		// Note that call to parent default constructor is implicit.
 		// super();
+	}
+
+	/** {@inheritDoc } */
+	// TODO: This is a workaround because if default decorator is used
+	//		 then the SSImage doesn't display properly.
+	@Override
+	public Decorator createDefaultDecorator() {
+		Decorator tDec = SSComponentInterface.super.createDefaultDecorator();
+		if (!(tDec instanceof BorderDecorator))
+			return tDec;
+
+		return new BorderDecorator() {
+			@Override
+			protected Border getBorder(BorderState state)
+			{
+				// The default border when just running the demo is
+				// the CompoundBorder: [[3,3,3,3],[2,14,2,14]].
+				Color color = getBorderColor(state);
+				if (color == null)
+					return defaultBorder;
+
+				if (jc().getBorder() instanceof CompoundBorder) {
+					CompoundBorder cb = (CompoundBorder) jc().getBorder();
+					return BorderDecorator.lineEmpty_empty(
+							cb.getOutsideBorder().getBorderInsets(jc()),
+							cb.getInsideBorder().getBorderInsets(jc()),
+							color);
+				}
+				return empty_line(jc().getInsets(), color);
+			}
+
+			@Override
+			protected JComponent jc()
+			{
+				return btnUpdateImage;
+			}
+			
+			@Override
+			protected Component fcomp()
+			{
+				return btnUpdateImage;
+			}
+		};
 	}
 
 	/**
@@ -287,17 +339,6 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	}
 
 	/**
-	 * Sets the SSCommon data member for the current Swingset Component.
-	 *
-	 * @param _ssCommon shared/common SwingSet component data and methods
-	 */
-	@Override
-	public void setSSCommon(final SSCommon _ssCommon) {
-		ssCommon = _ssCommon;
-
-	}
-
-	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText().
 	 * <p>
@@ -307,6 +348,8 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	@Override
 	public void updateSSComponent() {
 
+		// TODO: If CachedRowSet, BLOBs don't work. As a convenience could,
+		//		 grab a connection, find the primary keys, and read the BLOB.
 		try {
 			final byte[] imageData = getRowSet().getRow() > 0 ? getRowSet().getBytes(getBoundColumnName()) : null;
 			if (imageData != null) {
