@@ -39,25 +39,30 @@ package com.nqadmin.swingset;
 
 import java.awt.Component;
 import java.sql.Date;
+import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.spi.SyncProviderException;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.datasources.RowSetOps.updateColumnObject;
 
 // SSTableModel.java
 //
@@ -90,84 +95,63 @@ public class SSTableModel extends AbstractTableModel {
 	 * @param _strDate String containing a date in "MM/dd/yyyy" format.
 	 *
 	 * @return String date reformatted as an SQL date
+	 * @deprecated Use SSCommon.getSQLDate
 	 */
+	@Deprecated
 	protected static Date getSQLDate(final String _strDate) {
-
-		// remove any leading/trailing spaces (e.g., could be introduced from
-		// copy/paste)
-		String newStrDate = _strDate.trim();
-
-		// check for empty string
-		if (newStrDate.equals("")) {
-			return null;
-		}
-
-		// REMOVE ANY SPACES IF ANY (This could happen if copying from another
-		// application)
-		// _strDate = _strDate.trim();
-		// String newStrDate = _strDate;
-		if (newStrDate.indexOf("/") != -1) {
-			final StringTokenizer strtok = new StringTokenizer(newStrDate, "/", false);
-			final String month = strtok.nextToken();
-			final String day = strtok.nextToken();
-			newStrDate = strtok.nextToken() + "-" + month + "-" + day;
-		}
-		return Date.valueOf(newStrDate);
+		return SSCommon.getSQLDate(_strDate);
 	}
 
 	/**
 	 * Indicator to determine if insertions are allowed.
 	 */
-	protected boolean allowInsertion = true;
+	private boolean allowInsertion = true;
 
 	/**
 	 * Implementation of SSCellEditing interface used to determine dynamically if a
 	 * given cell can be edited and to determine if a given value is valid.
 	 */
-	protected SSCellEditing cellEditing = null;
+	private SSCellEditing cellEditing = null;
 
 	/**
 	 * Number of columns in the RowSet.
 	 */
 	protected transient int columnCount = 0;
 
+	private transient List<Class<?>> columnClasses = Collections.emptyList();
+
 	/**
 	 * Window where messages should be displayed.
 	 */
-	protected transient Component component = null;
+	private transient Component component = null;
 
 	/**
 	 * Implementation of DataGridHandler interface used to determine dynamically if
 	 * a given row can be deleted, and what to do before and after a row is added or
 	 * removed.
 	 */
-	protected SSDataGridHandler dataGridHandler = null;
+	transient private SSDataGridHandler dataGridHandler = null;
 
 	/**
 	 * Implementation of SSDataValue interface used to determine PK value for new
 	 * rows.
 	 */
-	protected SSDataValue dataValue = null;
+	transient private SSDataValue dataValue = null;
 
 	/**
 	 * Map to store the default values of different columns.
 	 */
-	protected HashMap<Integer, Object> defaultValuesMap = null;
+	private HashMap<Integer, Object> defaultValuesMap = null;
 
 	/**
 	 * JTable headers.
 	 */
-	protected transient String[] headers = null;
-
-	/**
-	 * List of hidden columns.
-	 */
-	protected int[] hiddenColumns = null;
+	private transient String[] headers = null;
 
 	/**
 	 * Indicator to determine if the RowSet is on the insertion row.
 	 */
-	protected boolean inInsertRow = false;
+	private boolean inInsertRow = false;
 
 	/**
 	 * Column containing primary key.
@@ -177,19 +161,15 @@ public class SSTableModel extends AbstractTableModel {
 	/**
 	 * Number of rows in the RowSet.
 	 */
-	protected transient int rowCount = 0;
+	// TODO: Can the result set change and invalidate this?
+	private transient int rowCount = 0;
 
-	protected RowSet rowset = null;
-
-	/**
-	 * JTable being modeled.
-	 */
-	protected transient JTable table = null;
+	transient private RowSet rowset = null;
 
 	/**
 	 * List of uneditable columns.
 	 */
-	protected int[] uneditableColumns = null;
+	private int[] uneditableColumns = null;
 
 	/**
 	 * Constructs a SSTableModel object. If this contructor is used the
@@ -207,17 +187,20 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @param _rowset RowSet object whose records has to be displayed in JTable.
 	 */
+	// TODO: If this constructor is used
+	//		 then it is unclear how this model
+	//		 and the rowset get hookup up to an SSDataGrid.
 	public SSTableModel(final RowSet _rowset) {
 		this();
 		rowset = _rowset;
-		init();
+		init(true);
 	}
 
 	/**
-	 * Deletes the specified row from the database. The rows are numbered as: 0, 1,
-	 * ..., n-1
+	 * Deletes the specified JTable row from the database.
+	 * The rows are numbered as: 0, 1, * ..., n-1
 	 *
-	 * @param _row the row number that has to be deleted.
+	 * @param _row the row number to delete.
 	 *
 	 * @return returns true on succesful deletion else false.
 	 */
@@ -260,51 +243,14 @@ public class SSTableModel extends AbstractTableModel {
 	 */
 	@Override
 	public Class<?> getColumnClass(final int _column) {
-		
-		// TODO May be able to utilize JDBCType Enum here.
-		// TODO This may be better as a static method in RowSetOps
-		
-		int type;
 		try {
-			//type = rowset.getColumnType(_column + 1);
-			type = RowSetOps.getColumnType(rowset, _column + 1);
+			JDBCType type = RowSetOps.getJDBCColumnType(rowset, _column + 1);
+			return RowSetOps.findJavaTypeClass(type);
+			
 		} catch (final SQLException se) {
 			logger.debug("SQL Exception.",  se);
 			return super.getColumnClass(_column);
 		}
-
-		switch (type) {
-		case Types.INTEGER:
-		case Types.SMALLINT:
-		case Types.TINYINT:
-			return Integer.class;
-
-		case Types.BIGINT:
-			return Long.class;
-
-		case Types.FLOAT:
-			return Float.class;
-
-		case Types.DOUBLE:
-		case Types.NUMERIC:
-			return Double.class;
-
-		case Types.BOOLEAN:
-		case Types.BIT:
-			return Boolean.class;
-
-		case Types.DATE:
-			return java.sql.Date.class;
-
-		case Types.CHAR:
-		case Types.VARCHAR:
-		case Types.LONGVARCHAR:
-			return String.class;
-
-		default:
-			return Object.class;
-		}
-
 	} // end public Class getColumnClass(int _column) {
 
 	/**
@@ -351,7 +297,7 @@ public class SSTableModel extends AbstractTableModel {
 	public Object getDefaultValue(final int _columnNumber) {
 		Object value = null;
 		if (defaultValuesMap != null) {
-			value = defaultValuesMap.get(new Integer(_columnNumber));
+			value = defaultValuesMap.get(_columnNumber);
 		}
 		return value;
 	}
@@ -400,45 +346,11 @@ public class SSTableModel extends AbstractTableModel {
 				return null;
 			}
 			
-			// TODO May be able to utilize JDBCType Enum here.
-			// TODO This may be better as a static method in RowSetOps. Could use getObject() and instanceof.
-
 			// COLUMN NUMBERS IN SSROWSET START FROM 1 WHERE AS COLUMN NUMBERING FOR JTABLE
 			// START FROM 0
-			//final int type = rowset.getColumnType(_column + 1);
-			final int type = RowSetOps.getColumnType(rowset, _column + 1);
-			switch (type) {
-			case Types.INTEGER:
-			case Types.SMALLINT:
-			case Types.TINYINT:
-				value = new Integer(rowset.getInt(_column + 1));
-				break;
-			case Types.BIGINT:
-				value = new Long(rowset.getLong(_column + 1));
-				break;
-			case Types.FLOAT:
-				value = new Float(rowset.getFloat(_column + 1));
-				break;
-			case Types.DOUBLE:
-			case Types.NUMERIC:
-				value = new Double(rowset.getDouble(_column + 1));
-				break;
-			case Types.BOOLEAN:
-			case Types.BIT:
-				value = new Boolean(rowset.getBoolean(_column + 1));
-				break;
-			case Types.DATE:
-			case Types.TIMESTAMP:
-				value = rowset.getDate(_column + 1);
-				break;
-			case Types.CHAR:
-			case Types.VARCHAR:
-			case Types.LONGVARCHAR:
-				value = rowset.getString(_column + 1);
-				break;
-			default:
-				logger.warn("Unknown data type of " + type);
-			}
+
+			value = RowSetOps.getColumnObject(rowset, _column + 1);
+
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while retrieving value.",  se);
 			if (component != null) {
@@ -452,13 +364,35 @@ public class SSTableModel extends AbstractTableModel {
 	} // end public Object getValueAt(int _row, int _column) {
 
 	/**
+	 * Check if previous Java class column types are different from the rowset;
+	 * save the new column types.
+	 * @return true if different types
+	 * @throws SQLException 
+	 */
+	private boolean columnTypesChanged() throws SQLException {
+		int newColumnCount = RowSetOps.getColumnCount(rowset);
+
+		List<Class<?>> colClasses = new ArrayList<>();
+		for (int col = 1; col <= newColumnCount; ++col) {
+			colClasses.add(RowSetOps.getClassColumnType(rowset, col));
+		}
+		if (colClasses.equals(columnClasses)) {
+			return false;
+		} else {
+			columnClasses = colClasses;
+			return true;
+		}
+	}
+
+	/**
 	 * Initializes the SSTableModel. (Gets the column count and row count for the
 	 * given RowSet.)
 	 */
-	protected void init() {
+	private void init(boolean inConstructor) {
 		try {
+			// If columnsChanged is true then will fireTableStructureChanged
+			boolean columnsChanged = columnTypesChanged();
 
-			//columnCount = rowset.getColumnCount();
 			columnCount = RowSetOps.getColumnCount(rowset);
 			rowset.last();
 			// ROWS IN THE SSROWSET ARE NUMBERED FROM 1, SO LAST ROW NUMBER GIVES THE
@@ -466,10 +400,16 @@ public class SSTableModel extends AbstractTableModel {
 			rowCount = rowset.getRow();
 			rowset.first();
 
-			// *** Following code added 11-01-2004 per forum suggestion from Diego Gil (dags).
-			// IF DATA CHANGES, ALERT LISTENERS
-			fireTableDataChanged();
-			// *** End addition
+			if (!inConstructor) {
+				// *** Following code added 11-01-2004 per forum suggestion from Diego Gil (dags).
+				// IF DATA CHANGES, ALERT LISTENERS
+				if (columnsChanged) {
+					fireTableStructureChanged();
+				} else {
+					fireTableDataChanged();
+				}
+				// *** End addition
+			}
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception.",  se);
@@ -505,51 +445,25 @@ public class SSTableModel extends AbstractTableModel {
 				}
 
 			}
-			
-			// TODO May be able to utilize JDBCType Enum here.
-			// TODO This may be better as a static method in RowSetOps
 
-			//final int type = rowset.getColumnType(_column + 1);
-			final int type = RowSetOps.getColumnType(rowset, _column + 1);
-
-			switch (type) {
-			case Types.INTEGER:
-			case Types.SMALLINT:
-			case Types.TINYINT:
-				rowset.updateInt(_column + 1, ((Integer) _value));
-				break;
-			case Types.BIGINT:
-// adding update long support 11-01-2004
-				rowset.updateLong(_column + 1, ((Long) _value));
-				break;
-			case Types.FLOAT:
-				rowset.updateFloat(_column + 1, ((Float) _value));
-				break;
-			case Types.DOUBLE:
-			case Types.NUMERIC:
-				rowset.updateDouble(_column + 1, ((Double) _value));
-				break;
-			case Types.BOOLEAN:
-			case Types.BIT:
-				rowset.updateBoolean(_column + 1, ((Boolean) _value));
-				break;
-			case Types.DATE:
-				if (_value instanceof String) {
-					rowset.updateDate(_column + 1, getSQLDate((String) _value));
-				} else {
-					rowset.updateDate(_column + 1, (Date) _value);
+			Object valueCopy = _value;
+			if (valueCopy instanceof String) {
+				switch(RowSetOps.getJDBCColumnType(rowset, _column + 1)) {
+				case DATE:
+					valueCopy = SSCommon.getSQLDate((String) valueCopy);
+					break;
+				case TIMESTAMP:
+					valueCopy = new Timestamp(SSCommon.getSQLDate((String) valueCopy).getTime());
+					break;
 				}
-				break;
-			case Types.CHAR:
-			case Types.VARCHAR:
-			case Types.LONGVARCHAR:
-				rowset.updateString(_column + 1, (String) _value);
-				break;
-			default:
-				logger.warn("SSTableModel.setValueAt(): Unknown data type.");
 			}
 
-			RowSetOps.insertRow(rowset);
+			updateColumnObject(rowset, valueCopy, _column + 1);
+			
+			rowset.insertRow();
+//=======
+//			RowSetOps.insertRow(rowset);
+//>>>>>>> 4.1.0-SNAPSHOT
 			if (rowCount != 0) {
 				rowset.moveToCurrentRow();
 			} else {
@@ -565,15 +479,15 @@ public class SSTableModel extends AbstractTableModel {
 				}
 			});
 
-			if (table != null) {
-				table.updateUI();
-			}
 			inInsertRow = false;
 			rowCount++;
 
 			if (dataGridHandler != null) {
 				dataGridHandler.performPostInsertOps(rowCount - 1);
 			}
+			// If allowInsertion then add another empty insert row.
+			int newRow = allowInsertion ? rowCount : rowCount - 1;
+			fireTableRowsInserted(newRow, newRow);
 
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while inserting row.",  se);
@@ -631,48 +545,9 @@ public class SSTableModel extends AbstractTableModel {
 
 				logger.debug("Column number is:" + column);
 				
-				// TODO May be able to utilize JDBCType Enum here.
-				// TODO This may be better as a static method in RowSetOps
-
 				// COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
 				//final int type = rowset.getColumnType(column.intValue() + 1);
-				final int type = RowSetOps.getColumnType(rowset, column.intValue() + 1);
-				switch (type) {
-				case Types.INTEGER:
-				case Types.SMALLINT:
-				case Types.TINYINT:
-					rowset.updateInt(column.intValue() + 1,
-							((Integer) defaultValuesMap.get(column)));
-					break;
-				case Types.BIGINT:
-					rowset.updateLong(column.intValue() + 1,
-							((Long) defaultValuesMap.get(column)));
-					break;
-				case Types.FLOAT:
-					rowset.updateFloat(column.intValue() + 1,
-							((Float) defaultValuesMap.get(column)));
-					break;
-				case Types.DOUBLE:
-				case Types.NUMERIC:
-					rowset.updateDouble(column.intValue() + 1,
-							((Double) defaultValuesMap.get(column)));
-					break;
-				case Types.BOOLEAN:
-				case Types.BIT:
-					rowset.updateBoolean(column.intValue() + 1,
-							((Boolean) defaultValuesMap.get(column)));
-					break;
-				case Types.DATE:
-					rowset.updateDate(column.intValue() + 1, (Date) defaultValuesMap.get(column));
-					break;
-				case Types.CHAR:
-				case Types.VARCHAR:
-				case Types.LONGVARCHAR:
-					rowset.updateString(column.intValue() + 1, (String) defaultValuesMap.get(column));
-					break;
-				default:
-					logger.warn("Unknown data type of " + type);
-				} // END OF SWITCH
+				updateColumnObject(rowset, defaultValuesMap.get(column), column + 1);
 
 			} // END OF WHILE
 
@@ -704,7 +579,7 @@ public class SSTableModel extends AbstractTableModel {
 		}
 		if ((_columnNumbers != null) && (_values != null)) {
 			for (int i = 0; i < _columnNumbers.length; i++) {
-				defaultValuesMap.put(new Integer(_columnNumbers[i]), _values[i]);
+				defaultValuesMap.put(_columnNumbers[i], _values[i]);
 			}
 		}
 	}
@@ -721,38 +596,22 @@ public class SSTableModel extends AbstractTableModel {
 	}
 
 	/**
-	 * Sets the column numbers that should be hidden. The SSDataGrid sets the column
-	 * width of these columns to 0. The columns are set to zero width rather than
-	 * removing the column from the table. Thus preserving the column numbering. If
-	 * a column is removed then the column numbers for columns after the removed
-	 * column will change. Even if the column is specified as hidden user will be
-	 * seeing a tiny strip. Make sure that you specify the hidden column numbers in
-	 * the uneditable column list.
-	 *
-	 * @param _columnNumbers array specifying the column numbers which should be
-	 *                       hidden.
-	 */
-	public void setHiddenColumns(final int[] _columnNumbers) {
-		hiddenColumns = _columnNumbers;
-	}
-
-	/**
-	 * Sets row insertion indicator.
+	 * Sets row insertion indicator; fireEvent so insertion row
+	 * is displayed. Note: must not be called directly, only through
+	 * SSDataGrid.
 	 *
 	 * @param _insert true if user can insert new rows, else false.
 	 */
-	public void setInsertion(final boolean _insert) {
+	/* package */ void setInsertion(final boolean _insert) {
+		boolean change = allowInsertion != _insert;
 		allowInsertion = _insert;
-	}
-
-	/**
-	 * This sets the JTable to which the table model is bound to. When an insert row
-	 * has taken place TableModel tries to update the UI.
-	 *
-	 * @param _table JTable to which SSTableModel is bound to.
-	 */
-	public void setJTable(final JTable _table) {
-		table = _table;
+		// rowCount is the JTABLE index of the row after the database rows
+		if(change) {
+			if(_insert)
+				fireTableRowsInserted(rowCount, rowCount);
+			else
+				fireTableRowsDeleted(rowCount, rowCount);
+		}
 	}
 
 	/**
@@ -771,49 +630,8 @@ public class SSTableModel extends AbstractTableModel {
 	 */
 	protected void setPrimaryColumn() {
 		try {
-			
-			// TODO May be able to utilize JDBCType Enum here.
-			// TODO This may be better as a static method in RowSetOps
-
 			//final int type = rowset.getColumnType(primaryColumn + 1);
-			final int type = RowSetOps.getColumnType(rowset, primaryColumn + 1);
-
-			switch (type) {
-			case Types.INTEGER:
-			case Types.SMALLINT:
-			case Types.TINYINT:
-				rowset.updateInt(primaryColumn + 1,
-						((Integer) dataValue.getPrimaryColumnValue()));
-				break;
-			case Types.BIGINT:
-				rowset.updateLong(primaryColumn + 1,
-						((Long) dataValue.getPrimaryColumnValue()));
-				break;
-			case Types.FLOAT:
-				rowset.updateFloat(primaryColumn + 1,
-						((Float) dataValue.getPrimaryColumnValue()));
-				break;
-			case Types.DOUBLE:
-			case Types.NUMERIC:
-				rowset.updateDouble(primaryColumn + 1,
-						((Double) dataValue.getPrimaryColumnValue()));
-				break;
-			case Types.BOOLEAN:
-			case Types.BIT:
-				rowset.updateBoolean(primaryColumn + 1,
-						((Boolean) dataValue.getPrimaryColumnValue()));
-				break;
-			case Types.DATE:
-				rowset.updateDate(primaryColumn + 1, (Date) dataValue.getPrimaryColumnValue());
-				break;
-			case Types.CHAR:
-			case Types.VARCHAR:
-			case Types.LONGVARCHAR:
-				rowset.updateString(primaryColumn + 1, (String) dataValue.getPrimaryColumnValue());
-				break;
-			default:
-				logger.warn("Unknown data type of " + type);
-			}
+			updateColumnObject(rowset, dataValue.getPrimaryColumnValue(), primaryColumn + 1);
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while insering Primary Key value.",  se);
 			if (component != null) {
@@ -841,9 +659,9 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @param _rowset RowSet object whose records has to be displayed in JTable.
 	 */
-	public void setRowSet(final RowSet _rowset) {
+	void setRowSet(final RowSet _rowset) {
 		rowset = _rowset;
-		init();
+		init(false);
 	}
 	
 	/**
@@ -904,10 +722,10 @@ public class SSTableModel extends AbstractTableModel {
 		Object valueCopy = _value;
 
 		// GET THE TYPE OF THE COLUMN
-		int type = -1;
+		JDBCType type;
 		try {
 			//type = rowset.getColumnType(_column + 1);
-			type = RowSetOps.getColumnType(rowset, _column + 1);
+			type = RowSetOps.getJDBCColumnType(rowset, _column + 1);
 		} catch (final SQLException se) {
 			logger.error("SQL Exception while updating value.",  se);
 			if (component != null) {
@@ -919,13 +737,13 @@ public class SSTableModel extends AbstractTableModel {
 		// TODO Clean this up. Utilize java.util.Time.
 
 		// IF COPYING VALUES THE DATE WILL COME AS STRING SO CONVERT IT TO DATE OBJECT.
-		if (type == Types.DATE) {
+		if (type == JDBCType.DATE) {
 			if (valueCopy instanceof String) {
-				valueCopy = getSQLDate((String) valueCopy);
+				valueCopy = SSCommon.getSQLDate((String) valueCopy);
 			}
-		} else if (type == Types.TIMESTAMP) {
+		} else if (type == JDBCType.TIMESTAMP) {
 			if (valueCopy instanceof String) {
-				valueCopy = new Timestamp(getSQLDate((String) valueCopy).getTime());
+				valueCopy = new Timestamp(SSCommon.getSQLDate((String) valueCopy).getTime());
 			}
 		}
 
@@ -969,45 +787,9 @@ public class SSTableModel extends AbstractTableModel {
 				return;
 			}
 			
-			// TODO May be able to utilize JDBCType Enum here.
-			// TODO This may be better as a static method in RowSetOps
+			updateColumnObject(rowset, valueCopy, _column + 1, type);
 
-			switch (type) {
-			case Types.INTEGER:
-			case Types.SMALLINT:
-			case Types.TINYINT:
-				rowset.updateInt(_column + 1, ((Integer) valueCopy));
-				break;
-			case Types.BIGINT:
-// adding update long support 11-01-2004
-				rowset.updateLong(_column + 1, ((Long) valueCopy));
-				break;
-			case Types.FLOAT:
-				rowset.updateFloat(_column + 1, ((Float) valueCopy));
-				break;
-			case Types.DOUBLE:
-			case Types.NUMERIC:
-				rowset.updateDouble(_column + 1, ((Double) valueCopy));
-				break;
-			case Types.BOOLEAN:
-			case Types.BIT:
-				rowset.updateBoolean(_column + 1, ((Boolean) valueCopy));
-				break;
-			case Types.DATE:
-				rowset.updateDate(_column + 1, (Date) valueCopy);
-				break;
-			case Types.TIMESTAMP:
-				rowset.updateTimestamp(_column + 1, (Timestamp) valueCopy);
-				break;
-			case Types.CHAR:
-			case Types.VARCHAR:
-			case Types.LONGVARCHAR:
-				rowset.updateString(_column + 1, (String) valueCopy);
-				break;
-			default:
-				logger.warn("Unknown data type of " + type);
-			}
-			RowSetOps.updateRow(rowset);
+			rowset.updateRow();
 
 			logger.debug("Updated value: {}.", () -> getValueAt(_row,_column));
 		} catch (final SQLException se) {

@@ -62,6 +62,7 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
+import javax.swing.MutableComboBoxModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
@@ -323,6 +324,40 @@ public abstract class AbstractComboBoxListSwingModel {
 	//
 	// TODO: uninstall
 	//
+
+	/**
+	 * Special case usage, grab the model configured for a JComboBox.
+	 * @param <T> model elements
+	 * @param _model the model source
+	 * @return the model
+	 */
+	protected static <T>MutableComboBoxModel<T> getSimpleComboBoxModel(AbstractComboBoxListSwingModel _model) {
+		if(_model.installed) {
+			throw new IllegalStateException("model already installed");
+		}
+		_model.installed = true;
+		_model.comboBoxModel = true;
+		@SuppressWarnings("unchecked")
+		MutableComboBoxModel<T> m = (MutableComboBoxModel<T>) _model.modelProxy;
+		return m;
+	}
+
+	/**
+	 * Special case usage, grab the model configured for a JList.
+	 * @param <T> model elements
+	 * @param _model the model source
+	 * @return the model
+	 */
+	protected static <T>ListModel<T> getSimpleListModel(AbstractComboBoxListSwingModel _model) {
+		if(_model.installed) {
+			throw new IllegalStateException("model already installed");
+		}
+		_model.installed = true;
+		_model.comboBoxModel = false;
+		@SuppressWarnings("unchecked")
+		ListModel<T> m = (ListModel<T>) _model.modelProxy;
+		return m;
+	}
 
 	/**
 	 * Installs a ListCellRenderer into the JComponent which
