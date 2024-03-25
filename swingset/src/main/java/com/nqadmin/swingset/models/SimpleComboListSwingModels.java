@@ -43,7 +43,7 @@ import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.ListModel;
 
-/** Simple JList JComboBox models that handle SSLIstItem 
+/** Simple JList or JComboBox models that handle SSLIstItem 
  * without locking or listItemFormat.
  * <p>
  * Example usage as an inner
@@ -59,17 +59,15 @@ import javax.swing.ListModel;
  * private final class MyComboModels extends SimpleComboListSwingModels {
  * 	
  * 	private MyComboModels() {
- * 		super(2, new ArrayList<>(items.length));
+ * 		super(2, new ArrayList{@literal <>}(items.length));
  * 		// initialization
- * 		for (int i = 0; i < items.length; i++) {
+ * 		for (int i = 0; i {@literal <} items.length; i++) {
  * 			getRemodel().add(new MyComboItem(i));
  * 		}
  * 	}
  * 
- * 	@SuppressWarnings("unchecked")
- * 	@Override
- * 	public ComboBoxModel<MyComboItem> getComboModel() {
- * 		return (ComboBoxModel<MyComboItem>) super.getComboModel();
+ * 	public ComboBoxModel{@literal <MyComboItem>} getComboModel() {
+ * 		return (ComboBoxModel{@literal <MyComboItem>}) super.getComboModel();
  * 	}
  * 
  * 	class MyComboItem implements ListItem0, Cloneable {
@@ -96,11 +94,16 @@ public abstract class SimpleComboListSwingModels extends AbstractComboBoxListSwi
 		super(_itemNumElems, _itemList);
 	}
 
-
+	/**
+	 * @return this as a ListModel
+	 */
 	protected ListModel<?> getListModel() {
 		return AbstractComboBoxListSwingModel.getSimpleListModel(this);
 	}
 
+	/**
+	 * @return this as a ComboModel
+	 */
 	protected ComboBoxModel<?> getComboModel() {
 		return AbstractComboBoxListSwingModel.getSimpleComboBoxModel(this);
 	}
@@ -120,6 +123,9 @@ public abstract class SimpleComboListSwingModels extends AbstractComboBoxListSwi
 	protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel _remodel) {
 	}
 
+	/**
+	 * A no locking, re-use the model.
+	 */
 	final public class Remodel extends AbstractComboBoxListSwingModel.Remodel { }
 	private final Remodel remodel = new Remodel();
 

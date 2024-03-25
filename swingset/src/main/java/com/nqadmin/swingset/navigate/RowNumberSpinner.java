@@ -62,7 +62,7 @@ import javax.swing.plaf.basic.BasicSpinnerUI;
 import com.nqadmin.swingset.navigate.NavigateActions.NavGotoRowAction;
 
 /**
- * Spinner for {@linkplain RowSet}'s row number that accepts an Action;
+ * Spinner for {@linkplain javax.sql.RowSet}'s row number that accepts an Action;
  * it listens to an Action for enabled and forwards events to the Action.
  * Note setAction must be called for things to work properly;
  * the action contains a {@link javax.swing.SpinnerNumberModel} which

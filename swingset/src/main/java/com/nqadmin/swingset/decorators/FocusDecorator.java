@@ -97,9 +97,9 @@ public abstract class FocusDecorator
 	}
 
 	/** {@inheritDoc}
-	 * Put here for convenience; Signature of "enum<?>" is so plugin authors
-	 * can define their own styles. Change the color of the text according
-	 * to _style.
+	 * Put here for convenience; Signature of {@literal "enum<?>"} is so plugin authors
+	 * can override and define their own styles.
+	 * Change the color of the text according * to _style.
 	 */
 	@Override
 	public <E extends Enum<E>> void decorateText(E _style) {

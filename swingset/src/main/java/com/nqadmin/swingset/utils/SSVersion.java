@@ -99,8 +99,8 @@ public class SSVersion implements Comparable<SSVersion> {
 	}
 
 	/**
-	 * Returns the SSVersion resulting from parsing the {@linkplain sVer}
-	 * argument. If there is a parse error, then 0.0.0-SNAPSHOT is used.
+	 * Returns the SSVersion resulting from parsing the {@code sVer}
+	 * param. If there is a parse error, then 0.0.0-SNAPSHOT is used.
 	 * The return values are useful for comparing.
 	 * @param sVer version string to parse
 	 * @return version

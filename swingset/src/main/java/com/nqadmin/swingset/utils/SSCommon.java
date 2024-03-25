@@ -102,6 +102,7 @@ import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
+import com.nqadmin.swingset.navigate.RowSetState;
 
 import static com.nqadmin.swingset.datasources.DateTime.dateTimeColumnValidate;
 import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingChanges;
@@ -302,7 +303,7 @@ public class SSCommon
 	 * Listener(s) for the underlying RowSet used to update the bound SwingSet
 	 * component. When working with a {@linkplain javax.sql.rowset.CachedRowSet} there are
 	 * extra steps involved which require the listener to ignore some events,
-	 * see {@link SSDataNavigator#acceptChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable) }.
+	 * see {@link RowSetState#acceptChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable) }.
 	 */
 	protected class SSRowSetListener implements RowSetListener
 	{
@@ -572,7 +573,7 @@ public class SSCommon
 			case SSList c -> c.addListSelectionListener((ListSelectionListener) eventListener);
 			case SSSlider c -> c.addChangeListener((ChangeListener) eventListener);
 			case SSFormattedTextField c -> c.addPropertyChangeListener("value", ((PropertyChangeListener) eventListener));
-			case JTextComponent _ -> addSSDocumentListener();
+			case JTextComponent x -> addSSDocumentListener();
 
 			default -> {
 				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
@@ -891,7 +892,7 @@ public class SSCommon
 			case SSList c -> c.removeListSelectionListener((ListSelectionListener) eventListener);
 			case SSSlider c -> c.removeChangeListener((ChangeListener) eventListener);
 			case SSFormattedTextField c -> c.removePropertyChangeListener("value", ((PropertyChangeListener) eventListener));
-			case JTextComponent _ -> removeSSDocumentListener();
+			case JTextComponent x -> removeSSDocumentListener();
 			default -> {
 				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
 				String message = sf("%s - Encountered unknown Component Event Listener for: %s. Unable to remove component listener.",
@@ -1115,15 +1116,15 @@ public class SSCommon
 			ex_title = "SS Internal Error";
 			ex_msg = sf("%s: %s", getBoundColumnName(), e.getMessage());
 		}
-		case SSSQLNullException _ -> {
+		case SSSQLNullException x -> {
 			ex_title = "Null Exception";
 			ex_msg = "Null values are not allowed for " + getBoundColumnName();
 		}
-		case SQLException _ -> {
+		case SQLException x -> {
 			ex_title = "SQL Exception";
 			ex_msg = "SQL Exception encountered for " + getBoundColumnName();
 		}
-		case NumberFormatException _ -> {
+		case NumberFormatException x -> {
 			ex_title = "Number Format Exception";
 			ex_msg = "Number Format Exception encountered for " + getBoundColumnName() + " converting " + value + " to a number.";
 		}

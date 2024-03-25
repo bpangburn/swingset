@@ -89,10 +89,8 @@ import com.nqadmin.swingset.utils.SSUtils;
  * {@link SSBaseComboBox#hasSelection() hasSelection() } which take into account
  * {@code getAllowNull()}.
  * <p>
- * Notice that:
- * {@link #getSelectedValue()} and 
- * {@link SSBaseComboBox#getSelectedMapping() getSelectedMapping()}
- * return null in two situations related to {@link #getAllowNull() }
+ * Notice that: {@link SSBaseComboBox#getSelectedMapping() getSelectedMapping()}
+ * returns null in two situations related to {@link #getAllowNull() }
  * <ul>
  *   <li>nothing is selected in this combo box
  *   <li>the <em>nullItem</em> is selected in this combo box

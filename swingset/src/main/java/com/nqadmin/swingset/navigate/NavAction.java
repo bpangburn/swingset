@@ -45,7 +45,8 @@ package com.nqadmin.swingset.navigate;
 import javax.sql.RowSet;
 
 /**
- * Actions for working with {@link RowSet}s; used with {@linkplain NaviagteActions}.
+ * Actions for working with {@link RowSet}s; used with
+ * {@linkplain com.nqadmin.swingset.navigate.NavigateActions}.
  */
 public enum NavAction
 {

@@ -1482,9 +1482,11 @@ public abstract class AbstractComboBoxListSwingModel {
 		 */
 		Object getElem(int index);
 		
-		// TODO: Remove SuppressWarnings annotation post Java 8
+		/**
+		 * @return a clone
+		 * @throws CloneNotSupportedException
+		 */
 
-		/** {@inheritDoc } */
 		Object clone() throws CloneNotSupportedException;
 	}
 

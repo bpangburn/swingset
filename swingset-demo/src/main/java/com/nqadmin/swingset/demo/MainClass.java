@@ -91,6 +91,7 @@ import javax.swing.BoxLayout;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
+import java.util.Objects;
 import javax.sql.RowSet;
 
 /**
@@ -119,6 +120,13 @@ public class MainClass extends JFrame
 
 
 	private static final Map<String, Object> globalHints = new HashMap<>();
+
+	static {
+		if(Boolean.FALSE) {
+			Objects.nonNull(new H2Trace(""));
+			Objects.nonNull(new MainClass().new LogManListener());
+		}
+	}
 
 	static class LoadDemoImages {}
 	static class H2Trace {
@@ -325,7 +333,7 @@ public class MainClass extends JFrame
 	/**
 	 * Constructor for MainClass
 	 */
-	@SuppressWarnings("LeakingThisInConstructor")
+	@SuppressWarnings({"LeakingThisInConstructor", "OverridableMethodCallInConstructor"})
 	public MainClass() {
 
 		// SETUP WINDOW
@@ -546,6 +554,7 @@ public class MainClass extends JFrame
 		 * @param resourceName name of resource
 		 * @return BufferReader for specified resource
 		 */
+		@SuppressWarnings("UseOfSystemOutOrSystemErr")
 		BufferedReader getBufferedReader(String resourceName) {
 			InputStream stream = MainClass.class.getResourceAsStream(resourceName);
 			if (stream == null) {
@@ -611,6 +620,7 @@ public class MainClass extends JFrame
 			}
 		}
 
+		@SuppressWarnings("UseOfSystemOutOrSystemErr")
 		Properties getFileProperties(String fname) {
 			try {
 				Properties props = new Properties();
@@ -658,6 +668,7 @@ public class MainClass extends JFrame
 		}
 
 		@Override
+		@SuppressWarnings("UseOfSystemOutOrSystemErr")
 		BufferedReader getBufferedReader(String fileName) {
 			try {
 				return new BufferedReader(new FileReader(fileName));
@@ -669,8 +680,7 @@ public class MainClass extends JFrame
 
 		@Override
 		Properties getDatabaseProperties() {
-			Properties info = null;
-			info = getFileProperties(propertyFile);
+			Properties info = getFileProperties(propertyFile);
 			return info;
 		}
 
@@ -692,7 +702,6 @@ public class MainClass extends JFrame
 
 		@Override
 		public void run() {
-			return;
 		}
 
 		@Override
@@ -763,29 +772,37 @@ public class MainClass extends JFrame
 	@SuppressWarnings({"ResultOfMethodCallIgnored", "UseOfSystemOutOrSystemErr"})
 	private static void usage() {
 		// TODO: specify don't load images
-		String usage = "\n" + "Run the SwingSet demo. With no options/args use the self contained\n"
-				+ "in memory database.\n" + "\nCMD_NAME"
-				+ " [-h] [-v] [-d] [-n] [-i] [-r] [-p fname] [-s sql]* [dbms-server]\n" + "\n"
-				+ "    -h             help\n" + "    -v             verbose; output initialization sql as executed\n"
-				+ "    -d             dump/create sql scripts in local directory, exit\n"
-				+ "    -n             do NOT initialize database, just run demo\n"
-				+ "    -i             do NOT load images\n"
-				// + " -r print a readme to stdout\n"
-				+ "    -p fname       properties file for jdbc database connection\n"
-				+ "                   'DB_URL', 'DB_DRIVER_CLASS' keys required\n"
-				+ "    -s sqlScript   sql file to initialize database, multiple OK\n" + "\n"
-				+ "If specified, dbms-server in {mysql}\n"
-				+ "Internal mysql properties use database swingset_demo_suppliers_and_parts.\n"
-				+ "After the sql files are run, the images are loaded, unless '-i'.\n"
-				+ "Use '-n -p props' to run demo with a previously initialized database.\n"
-				+ "Use '-d' or '-d mysql' to create local files with sql initialization.\n"
-				+ "See swingset-demo/README.txt for more information.\n" + "\n"
-				+ "Examples: (ss.jar like swingset-demo-vers-jar-with-dependencies.jar)\n"
-				+ "    java -jar ss.jar -d   # dump sql that creates in memory database\n"
-				+ "    java -jar ss.jar -d mysql   # dump sql to create mysql database\n"
-				+ "    java -cp jdbc_driver:ss.jar com.nqadmin.swingset.demo.MainClass \\\n"
-				+ "        -p db_props -s initializer.sql\n" + "\n";
-		usage.replace("CMD_NAME", cmdName);
+		String usage = """
+				
+				Run the SwingSet demo. With no options/args use the self contained
+				in memory database.
+				
+				CMD_NAME [-h] [-v] [-d] [-n] [-i] [-r] [-p fname] [-s sql]* [dbms-server]
+				
+				    -h             help
+				    -v             verbose; output initialization sql as executed
+				    -d             dump/create sql scripts in local directory, exit
+				    -n             do NOT initialize database, just run demo
+				    -i             do NOT load images
+				    -p fname       properties file for jdbc database connection
+				                   'DB_URL', 'DB_DRIVER_CLASS' keys required
+				    -s sqlScript   sql file to initialize database, multiple OK
+				
+				If specified, dbms-server in {mysql}
+				Internal mysql properties use database swingset_demo_suppliers_and_parts.
+				After the sql files are run, the images are loaded, unless '-i'.
+				Use '-n -p props' to run demo with a previously initialized database.
+				Use '-d' or '-d mysql' to create local files with sql initialization.
+				See swingset-demo/README.txt for more information.
+				
+				Examples: (ss.jar like swingset-demo-vers-jar-with-dependencies.jar)
+				    java -jar ss.jar -d   # dump sql that creates in memory database
+				    java -jar ss.jar -d mysql   # dump sql to create mysql database
+				    java -cp jdbc_driver:ss.jar com.nqadmin.swingset.demo.MainClass \\
+				        -p db_props -s initializer.sql
+				
+				""";
+		usage = usage.replace("CMD_NAME", cmdName);
 		System.err.println(usage);
 		System.exit(1);
 	}

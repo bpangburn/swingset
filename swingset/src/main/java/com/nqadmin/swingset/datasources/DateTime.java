@@ -269,6 +269,8 @@ public class DateTime
 	public static Object getSQLDateTimeObject(String text, RSC comp)
 	{
 		DtoParse dtoParse = internalDateTimeColumnParse(text, comp);
+		if (dtoParse.isError())
+			return null;
 		JDBCType jdbcType = comp.getBoundColumnJDBCType();
 		Temporal dto = dtoParse.dto();
 		return switch(jdbcType) {

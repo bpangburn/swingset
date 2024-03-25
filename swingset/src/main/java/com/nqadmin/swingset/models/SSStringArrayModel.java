@@ -48,8 +48,8 @@ import java.sql.JDBCType;
  * The elements in the string are separated by the ascii Unit Separator
  * control character.
  * The order of items is preserved by 
- * {@link #readData(javax.sql.RowSet, java.lang.String) readData} and
- * {@link #writeData(javax.sql.RowSet, java.lang.String, java.lang.Object[]) writeData}
+ * {@link #readData(com.nqadmin.swingset.utils.SSComponentInterface) readData}
+ * and {@link #writeData(com.nqadmin.swingset.utils.SSComponentInterface, java.lang.Object[]) writeData}
  * 
  * @since 4.0.0
  */

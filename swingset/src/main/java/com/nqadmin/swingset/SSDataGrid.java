@@ -42,12 +42,10 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Constructor;
-import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -86,6 +84,7 @@ import javax.swing.table.TableRowSorter;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.sql.Date;
 
 import javax.swing.table.JTableHeader;
 
@@ -465,99 +464,148 @@ public class SSDataGrid extends JTable {
 		}
 	}
 
-	/**
-	 * Editor for date fields. Used the SSTextField as the editor, but changes the
-	 * format to mm/dd/yyy from yyyy-mm-dd.
-	 */
-	protected class DateEditor extends DefaultCellEditor
-	{
-		private final int cIdx;
-		/**
-		 * Grid date editor.
-		 * @param cIdx
-		 */
-		public DateEditor(int cIdx) {
-			super(new SSTextField(SSTextField.MMDDYYYY));
+	// https://forums.oracle.com/ords/apexds/post/date-editing-in-a-jtable-1380
+	private class DateEditor extends DefaultCellEditor {
+		int cIdx;
+		private DateEditor(int cIdx) {
+			super(new JTextField());
 			this.cIdx = cIdx;
-			getComponent().setFocusTraversalKeysEnabled(false);
-			getComponent().addKeyListener(new KeyAdapter() {
-				int keyPressed = 0;
-
-				@Override
-				public void keyPressed(final KeyEvent ke) {
-					// changed date key listener to clear date field when a new key is pressed
-					if ((ke.getKeyCode() == KeyEvent.VK_UP) || (ke.getKeyCode() == KeyEvent.VK_DOWN)
-							|| (ke.getKeyCode() == KeyEvent.VK_LEFT) || (ke.getKeyCode() == KeyEvent.VK_RIGHT)
-							|| (ke.getKeyCode() == KeyEvent.VK_ENTER) || (ke.getKeyCode() == KeyEvent.VK_TAB)) {
-						return;
-					}
-
-					keyPressed++;
-				}
-
-				@Override
-				public void keyReleased(final KeyEvent ke) {
-					final JComponent editor = (JComponent) DateEditor.this.getComponent();
-					if (editor instanceof JTextField jtf) {
-						if (keyPressed == 0) {
-							jtf.setText(String.valueOf(ke.getKeyChar()));
-						}
-					}
-					keyPressed--;
-					if (keyPressed < 0) {
-						keyPressed = 0;
-					}
-				}
-			});
 		}
-
-
-		/**
-		 * RETURNS A DATE OBJECT REPRESENTING THE "MM/dd/yyyy" VALUE IN THE CELL.
-		 * @return sql date
-		 */
+		
 		@Override
 		public Object getCellEditorValue() {
-			final String strDate = ((JTextField) (DateEditor.this.getComponent())).getText();
+			String strDate= ((JTextField)getComponent()).getText();
 			return (Date)getSQLDateTimeObject(strDate, RSC.get(rowSet, cIdx + 1));
 		}
-
-		/**
-		 * RETURNS THE TEXTFIELD WITH THE GIVEN DATE IN THE TEXTFIELD
-		 * (AFTER THE DATE IS CHANGED TO "MM/DD/YYYY")
-		 * {@inheritDoc}
-		 */
+		
 		@Override
-		public synchronized Component getTableCellEditorComponent(
-				final JTable table, final Object _value, final boolean isSelected,
-				final int row, final int column) {
-
-			Object value = _value;
-			if (value instanceof Date date) {
-				value = getDateTimeText(date, RSC.get(rowSet, cIdx + 1));
+		public Component getTableCellEditorComponent(
+				final JTable table, final Object value,
+				final boolean isSelected, final int row, final int column) {
+			JTextField tf= ((JTextField)getComponent());
+			tf.setBorder(new LineBorder(Color.black));
+			try {
+				tf.setText(getDateTimeText(value, RSC.get(rowSet, cIdx + 1)));
 			}
-
-			return super.getTableCellEditorComponent(table, value, isSelected, row, column);
-
+			catch (Exception e) {
+				tf.setText("");
+			}
+			return tf;
 		}
-
-		/**
-		 * Check if the cell is editable.
-		 * <p>
-		 * IF NUMBER OF CLICKS IS LESS THAN THE CLICKCOUNTTOSTART RETURN FALSE
-		 * FOR CELL EDITING.
-		 * @param event may be mouse event
-		 * @return true if editable
-		 */
+		
+		public boolean parseDate(String value) {
+			Object dto = getSQLDateTimeObject(value, RSC.get(rowSet, cIdx + 1));
+			return dto != null;
+		}
+		
 		@Override
-		public boolean isCellEditable(final EventObject event) {
-			if (event instanceof MouseEvent mouseEvent) {
-				return mouseEvent.getClickCount() >= getClickCountToStart();
+		public boolean stopCellEditing() {
+			String value = ((JTextField)getComponent()).getText();
+			if (!value.isEmpty()) {
+				if (!parseDate(value)) {
+					((JComponent)getComponent()).setBorder(new LineBorder(Color.red));
+					return false;
+				}
 			}
-
-			return true;
+			return super.stopCellEditing();
 		}
-	}
+	} // end DateEditor
+
+	// /**
+	//  * Editor for date fields. Used the SSTextField as the editor, but changes the
+	//  * format to mm/dd/yyy from yyyy-mm-dd.
+	//  */
+	// protected class DateEditor extends DefaultCellEditor
+	// {
+	// 	private final int cIdx;
+
+	// 	/**
+	// 	 * Grid date editor.
+	// 	 * @param cIdx
+	// 	 */
+	// 	public DateEditor(int cIdx) {
+	// 		//super(new SSTextField(SSTextField.MMDDYYYY));
+	// 		super(new SSTextField(""));
+	// 		this.cIdx = cIdx;
+	// 		getComponent().setFocusTraversalKeysEnabled(false);
+	// 		getComponent().addKeyListener(new KeyAdapter() {
+	// 			int keyPressed = 0;
+
+	// 			@Override
+	// 			public void keyPressed(final KeyEvent ke) {
+	// 				// changed date key listener to clear date field when a new key is pressed
+	// 				if ((ke.getKeyCode() == KeyEvent.VK_UP) || (ke.getKeyCode() == KeyEvent.VK_DOWN)
+	// 						|| (ke.getKeyCode() == KeyEvent.VK_LEFT) || (ke.getKeyCode() == KeyEvent.VK_RIGHT)
+	// 						|| (ke.getKeyCode() == KeyEvent.VK_ENTER) || (ke.getKeyCode() == KeyEvent.VK_TAB)) {
+	// 					return;
+	// 				}
+
+	// 				keyPressed++;
+	// 			}
+
+	// 			@Override
+	// 			public void keyReleased(final KeyEvent ke) {
+	// 				final JComponent editor = (JComponent) DateEditor.this.getComponent();
+	// 				if (editor instanceof JTextField jtf) {
+	// 					if (keyPressed == 0) {
+	// 						jtf.setText(String.valueOf(ke.getKeyChar()));
+	// 					}
+	// 				}
+	// 				keyPressed--;
+	// 				if (keyPressed < 0) {
+	// 					keyPressed = 0;
+	// 				}
+	// 			}
+	// 		});
+	// 	}
+
+
+	// 	/**
+	// 	 * RETURNS A DATE OBJECT REPRESENTING THE "MM/dd/yyyy" VALUE IN THE CELL.
+	// 	 * @return sql date
+	// 	 */
+	// 	@Override
+	// 	public Object getCellEditorValue() {
+	// 		final String strDate = ((JTextField) (DateEditor.this.getComponent())).getText();
+	// 		return (Date)getSQLDateTimeObject(strDate, RSC.get(rowSet, cIdx + 1));
+	// 	}
+
+	// 	/**
+	// 	 * RETURNS THE TEXTFIELD WITH THE GIVEN DATE IN THE TEXTFIELD
+	// 	 * (AFTER THE DATE IS CHANGED TO "MM/DD/YYYY")
+	// 	 * {@inheritDoc}
+	// 	 */
+	// 	@Override
+	// 	public synchronized Component getTableCellEditorComponent(
+	// 			final JTable table, final Object _value, final boolean isSelected,
+	// 			final int row, final int column) {
+
+	// 		Object value = _value;
+	// 		if (value instanceof Date date) {
+	// 			value = getDateTimeText(date, RSC.get(rowSet, cIdx + 1));
+	// 		}
+
+	// 		return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+
+	// 	}
+
+	// 	/**
+	// 	 * Check if the cell is editable.
+	// 	 * <p>
+	// 	 * IF NUMBER OF CLICKS IS LESS THAN THE CLICKCOUNTTOSTART RETURN FALSE
+	// 	 * FOR CELL EDITING.
+	// 	 * @param event may be mouse event
+	// 	 * @return true if editable
+	// 	 */
+	// 	@Override
+	// 	public boolean isCellEditable(final EventObject event) {
+	// 		if (event instanceof MouseEvent mouseEvent) {
+	// 			return mouseEvent.getClickCount() >= getClickCountToStart();
+	// 		}
+
+	// 		return true;
+	// 	}
+	// }
 
 	/**
 	 * Renderer for date fields. Displays dates using mm/dd/yyyy format.
@@ -1398,12 +1446,7 @@ public class SSDataGrid extends JTable {
 	 * @throws SQLException	SQLException
 	 */
 	public void setDateRenderer(final String _column) throws SQLException {
-		//final int tmpColumn = rowSet.getColumnIndex(_column) - 1;
-		final int tmpColumn = RowSetOps.getColumnIndex(rowSet,_column) - 1;
-		final TableColumnModel tmpColumnModel = getColumnModel();
-		final TableColumn tmpTableColumn = tmpColumnModel.getColumn(tmpColumn);
-		tmpTableColumn.setCellRenderer(new DateRenderer(tmpColumn));
-		tmpTableColumn.setCellEditor(new DateEditor(tmpColumn));
+		setDateRenderer(RowSetOps.getColumnIndex(rowSet,_column) - 1);
 	}
 
 	/**
