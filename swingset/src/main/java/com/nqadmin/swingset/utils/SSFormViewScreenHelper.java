@@ -38,6 +38,7 @@
 package com.nqadmin.swingset.utils;
 
 import java.awt.Container;
+import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -431,6 +432,21 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * @throws Exception exception thrown while binding components
 	 */
 	protected abstract void bindComponents() throws Exception;
+	
+	/**
+	 * Sets the current screen to 'closed'.
+	 * 
+	 * Overriding to remove call to closeChildScreens() as SSFormViewScreenHelper
+	 * has a listener that calls closeChildScreens(), making a call here redundant.
+	 */
+	@Override
+	public void closeScreen() {
+		try {
+			setClosed(true);
+		} catch (final PropertyVetoException pve) {
+			logger.error("Property Veto Exception.", pve);
+		}
+	}
 
 	/**
 	 * Deactivate sync between cmbNavigator and dataNavigator.
