@@ -57,7 +57,6 @@ import javax.swing.JScrollPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSCheckBox;
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
@@ -227,7 +226,7 @@ public class TestBaseComponents extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				rowset = new JdbcRowSetImpl(connection);
+				rowset = DemoUtil.getNewRowSet(connection);
 				rowset.setCommand("SELECT * FROM swingset_base_test_data;");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {

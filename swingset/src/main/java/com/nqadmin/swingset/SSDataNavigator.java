@@ -52,6 +52,7 @@ import java.util.WeakHashMap;
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
+import javax.sql.rowset.CachedRowSet;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
@@ -71,12 +72,15 @@ import org.apache.logging.log4j.Logger;
 //import com.google.common.eventbus.Subscribe;
 //import com.nqadmin.swingset.utils.RowSetModificationEvent;
 
+import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 import com.nqadmin.swingset.utils.SSUtils;
 
 //TODO: ENABLE FOR EVENTBUS
 //import static com.nqadmin.swingset.utils.SSUtils.getLocalEventBus;
+
+//TODO: Handle CachedRowSet Paging
 
 // SSDataNavigator.java
 //
@@ -101,6 +105,7 @@ public class SSDataNavigator extends JPanel {
 	private static class RowSetState {
 		private boolean inserting;
 		private SSDataNavigator navigator;
+		private boolean acceptingChanges;
 	}
 
 	// don't have to worry about concurrency, always EDT
@@ -129,6 +134,51 @@ public class SSDataNavigator extends JPanel {
 	 */
 	public static boolean isInserting(RowSet rs) {
 		return rs == null ? false : getRowSetState(rs).inserting;
+	}
+
+	/**
+	 * Set or clear the state indicating that the CachedRowSet is accepting changes.
+	 * @param _crs modify state for this.
+	 * @param flag state set to this.
+	 */
+	private static void setAcceptingChanges(CachedRowSet _crs, boolean flag) {
+		if (_crs != null) {
+			getRowSetState(_crs).acceptingChanges = flag;
+		}
+	}
+
+	/**
+	 * Find out if the specified RowSet is
+	 * a {@linkplain CachedRowSet} doing {@linkplain CachedRowSet#acceptChanges}.
+	 * @param rs check this rowset
+	 * @return true if executing acceptingChanges
+	 */
+	public static boolean isAcceptingChanges(RowSet rs) {
+		return rs == null ? false : getRowSetState(rs).acceptingChanges;
+	}
+
+	/**
+	 * A {@linkplain CachedRowSet} requires an extra step to effect changes
+	 * in its underlying data source;
+	 * this method does {@linkplain #acceptChanges(CachedRowSet, Runnable)} on the given {@linkplain CachedRowSet}.
+	 * Set the state for the CachedRowSet so that it's listeners can ignore
+	 * the extra events.
+	 * The runnable {@code runAfterChanges}, if not null, is executed after
+	 * acceptChanges on the CachedRowSet is successful.
+	 * @param _crs accept change on this.
+	 * @param runAfterChanges execute if not null
+	 * @throws SQLException
+	 */
+	public static void acceptChanges(CachedRowSet _crs, Runnable runAfterChanges) throws SQLException {
+		try {
+			SSDataNavigator.setAcceptingChanges(_crs, true);
+			_crs.acceptChanges();
+			if (runAfterChanges != null) {
+				runAfterChanges.run();		// assume if acceptChanges throws, don't need "code"
+			}
+		} finally {
+			SSDataNavigator.setAcceptingChanges(_crs, false);
+		}
 	}
 
 	/**
@@ -391,7 +441,7 @@ public class SSDataNavigator extends JPanel {
 	/**
 	 * RowSet from which component will get/set values.
 	 */
-	protected RowSet rowSet = null;
+	transient protected RowSet rowSet = null;
 
 	/**
 	 * Listener on the RowSet used by data navigator.
@@ -457,6 +507,7 @@ public class SSDataNavigator extends JPanel {
 	 * @param _rowSet   the RowSet to which the navigator is bound to
 	 * @param _buttonSize the size to which the button on navigator have to be set
 	 */
+	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSDataNavigator(final RowSet _rowSet, final Dimension _buttonSize) {
 		v3Buttons = V3_BUTTONS_DEFAULT;
 		autoCommit = AUTO_COMMIT_DEFAULT;
@@ -482,6 +533,7 @@ public class SSDataNavigator extends JPanel {
 	// TODO: Is it necessary to replace event bus when something changes?
 	//       getLocalEventBus doesn't look at rowSet (or this for that matter)
 	private void setupEventBus() {
+		if (Boolean.FALSE) Objects.nonNull(new BusReceiver()); // clear warn not used
 // TODO: ENABLE FOR EVENTBUS
 //		if (eventBus == null) {
 //			eventBus = getLocalEventBus(this, rowSet);
@@ -490,7 +542,7 @@ public class SSDataNavigator extends JPanel {
 	}
 
 	// TODO: also have Set<SSComponentInterface> modifiedComponents
-	private final Set<SSComponentInterface> errorComponents = new HashSet<>();
+	transient private final Set<SSComponentInterface> errorComponents = new HashSet<>();
 	class BusReceiver {
 // TODO: ENABLE FOR EVENTBUS		
 //		@Subscribe
@@ -684,7 +736,8 @@ public class SSDataNavigator extends JPanel {
 			logger.debug("LAST button clicked.");
 			removeRowsetListener();
 			try {
-				if (!commitChangesToDatabase(true)) return;
+				if (!commitChangesToDatabase(true))
+					return;
 				
 				rowSet.last();
 				
@@ -741,7 +794,7 @@ public class SSDataNavigator extends JPanel {
 						return;
 					}
 					
-					rowSet.insertRow();
+					RowSetOps.insertRow(rowSet);
 					setInserting(rowSet, false);
 					dBNav.performPostInsertOps();
 
@@ -754,7 +807,8 @@ public class SSDataNavigator extends JPanel {
 				} else {
 					// ELSE UPDATE THE DATABASE BASED ON THE PRESENT ROW VALUES.
 					// IN THIS CASE WE WILL WAIT TO PERFORM POST-UPDATE OPS BELOW
-					if (!commitChangesToDatabase(false)) return;
+					if (!commitChangesToDatabase(false))
+						return;
 				
 					setRowModified(false);
 					// TODO: why not updateNavigator?
@@ -772,6 +826,7 @@ public class SSDataNavigator extends JPanel {
 					// TODO: might get rid of this if broadcasting the right info,
 					//       like picking up on the "other" component broadcast
 					//
+
 					rowSet.absolute(rowSet.getRow());
 					
 					//
@@ -823,12 +878,23 @@ public class SSDataNavigator extends JPanel {
 				if (isInserting(rowSet)) {
 					rowSet.moveToCurrentRow();
 				}
+
 				// THIS FUNCTION IS NOT NEED IF ON INSERT ROW
 				// BUT MOVETOINSERTROW WILL NOT TRIGGER ANY EVENT SO FOR THE SCREEN
 				// TO UPDATE WE NEED TO TRIGGER SOME THING.
 				// SINCE USER IS MOVED TO CURRENT ROW PRIOR TO INSERT IT IS SAFE TO
 				// CALL CANCELROWUPDATE TO GET A TRIGGER
+
+				// TODO: could cleanup/remove above comment and use issueRowChanged.
+
 				rowSet.cancelRowUpdates();
+				if (rowSet instanceof CachedRowSet) {
+					// TODO: if there are RowSet listeners outside of the nav
+					//		 container, they won't be signaled. Could set something
+					//		 up, but wait for the event bus...
+					dBNav.findSSComponents().forEach(
+							(ssc) -> ssc.getSSCommon().issueRowChanged());
+				}
 				setInserting(rowSet, false);
 				dBNav.performCancelOps();
 				
@@ -1008,7 +1074,7 @@ public class SSDataNavigator extends JPanel {
 				dBNav.performPreDeletionOps();
 				
 				// DELETE ROW FROM ROWSET
-				rowSet.deleteRow();
+				RowSetOps.deleteRow(rowSet);
 				
 				// PERFORM ANY POST DELETION OPS (WHICH MAY INVOLVE REQUERYING WHICH IS NEEDED FOR H2)
 				dBNav.performPostDeletionOps();
@@ -1055,7 +1121,8 @@ public class SSDataNavigator extends JPanel {
 					removeRowsetListener();
 					try {
 						
-						if (!commitChangesToDatabase(true)) return;
+						if (!commitChangesToDatabase(true))
+							return;
 						
 						final int row = Integer.parseInt(txtCurrentRow.getText().trim());
 						
@@ -1133,7 +1200,7 @@ public class SSDataNavigator extends JPanel {
 			if (!dBNav.allowUpdate()) {
 				result = false;
 			} else {
-				rowSet.updateRow();
+				RowSetOps.updateRow(rowSet);
 			}
 		}
 		
