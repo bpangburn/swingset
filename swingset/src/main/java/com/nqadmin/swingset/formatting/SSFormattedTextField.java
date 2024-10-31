@@ -415,7 +415,6 @@ public class SSFormattedTextField extends JFormattedTextField
 //		addPropertyChangeListener("editValid", (e)->{
 //			clearForceErrorFlag();
 //		});
-
 		addPropertyChangeListener("editValid", (e)->{
 			// System.err.println("EditValid: " + e.getNewValue());
 			displayValidIndicator((boolean) e.getNewValue());
@@ -673,7 +672,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * not handled by formatter / formatter factory.
 	 *
 	 * @param _value - value to be validated
-	 * @return returns true if the value is valid else false
+	 * @return returns true if the value is valid else false;
 	 */
 	public boolean validateField(final Object _value) {
 
