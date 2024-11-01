@@ -76,12 +76,13 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 		 */
 		private static final long serialVersionUID = 6786673052979566820L;
 
+		/** {@inheritDoc} */
 		@Override
 		public void propertyChange(final PropertyChangeEvent pce) {
 
 			// CONFIRM THE PROPERTY NAME IN CASE SOMEONE ADDS A DIFFERENT PROPERTY LISTENER
 			// TO ssLabelListener
-			if (pce.getPropertyName() == "text") {
+			if ("text".equals(pce.getPropertyName())) {
 
 				ssCommon.removeRowSetListener();
 
@@ -107,7 +108,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon = new SSCommon(this);
+	transient protected final SSCommon ssCommon = new SSCommon(this);
 
 	/**
 	 * Empty constructor needed for deserialization. Creates a SSLabel instance with
@@ -180,16 +181,6 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	@Override
 	public SSLabelListener getSSComponentListener() {
 		return new SSLabelListener();
-	}
-
-	/**
-	 * Sets the SSCommon data member for the current Swingset Component.
-	 *
-	 * @param _ssCommon shared/common SwingSet component data and methods
-	 */
-	@Override
-	public void setSSCommon(final SSCommon _ssCommon) {
-		ssCommon = _ssCommon;
 	}
 
 	/**
