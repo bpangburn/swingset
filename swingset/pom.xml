@@ -8,7 +8,7 @@
 
 	<groupId>com.nqadmin.swingset</groupId>
 	<artifactId>swingset</artifactId>
-	<version>4.0.13-SNAPSHOT</version>
+	<version>4.1.0-RC1</version>
 	<packaging>jar</packaging>
 
 	<name>swingset</name>
@@ -19,8 +19,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- MAVEN AND JAVA VERSIONS -->
-		<version.maven>3.6.3</version.maven>
-		<version.java>8</version.java>
+		<version.maven>3.8.7</version.maven>
+		<version.java>11</version.java>
 
 		<!-- DEPENDENCIES -->
 		<!--<version.glazedlists>1.11.0</version.glazedlists> -->
@@ -396,6 +396,9 @@
 			  Removing these checks is not too bad since there's a lot of
 			  dependency on the IDE for most checking.
 		-->
+		
+		
+		<!-- Hopefully we can comment this out now that we're requiring Java 11+.
 		<profile>
 			<id>java-9-plus</id>
 			<activation>
@@ -428,6 +431,8 @@
 				</pluginManagement>
 			</build>
 		</profile>
+		-->
+		
 	</profiles>
 
 </project>

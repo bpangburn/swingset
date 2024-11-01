@@ -8,7 +8,7 @@
 
 	<groupId>com.nqadmin.swingset.demo</groupId>
 	<artifactId>swingset-demo</artifactId>
-	<version>4.0.13-SNAPSHOT</version>
+	<version>4.1.0-RC1</version>
 	<packaging>jar</packaging>
 
 	<name>swingset-demo</name>
@@ -19,12 +19,12 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- MAVEN AND JAVA VERSIONS -->
-		<version.maven>3.6.3</version.maven>
-		<version.java>8</version.java>
+		<version.maven>3.8.7</version.maven>
+		<version.java>11</version.java>
 
 		<!-- DEPENDENCIES -->
 		<!-- primary swingset-demo dependencies -->
-		<version.swingset>4.0.13-SNAPSHOT</version.swingset>
+		<version.swingset>4.1.0-RC1</version.swingset>
 		<version.log4j>2.22.0</version.log4j>
 		<version.h2>2.2.224</version.h2>
 		<version.java-getopt>1.0.13</version.java-getopt>
