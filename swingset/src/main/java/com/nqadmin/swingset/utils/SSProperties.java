@@ -55,7 +55,7 @@ public class SSProperties {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 	
 	/**
 	 * SwingSet key/value pair properties from swingset.properties file.
@@ -93,6 +93,7 @@ public class SSProperties {
 	 * <p>
 	 * @param _args - optional command line arguments, which are ignored by this program
 	 */
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public static void main(final String _args[]) {
 	
 		final Properties myProps = getProperties();
