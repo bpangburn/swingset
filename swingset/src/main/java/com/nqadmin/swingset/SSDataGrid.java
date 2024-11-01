@@ -923,18 +923,18 @@ public class SSDataGrid extends JTable {
 			List<SortKey> keys = new ArrayList<>(getSortKeys());
 			
 // ============================================================
-// START PP datagrid sorting code - BLOCK #1
+// START @ppasala datagrid sorting code - BLOCK #1
 			
 			if (!SORT_JDK_ASSIST) {
-			
-			// REMOVE ANY UP DOWN ARROWS IN ALL THE EXISTING SORT COLUMNS
-			// AT THIS POINT column MAY NOT BE IN SORTKEYS			
-			for(SortKey sortKey: keys) {
-				getColumnModel().getColumn(sortKey.getColumn()).setHeaderValue(getColumnName(sortKey.getColumn()));
+
+				// REMOVE ANY UP DOWN ARROWS IN ALL THE EXISTING SORT COLUMNS
+				// AT THIS POINT column MAY NOT BE IN SORTKEYS
+				for (SortKey sortKey : keys) {
+					getColumnModel().getColumn(sortKey.getColumn()).setHeaderValue(getColumnName(sortKey.getColumn()));
+				}
 			}
-			}
 			
-// END PP datagrid sorting code - BLOCK #1
+// END @ppasala datagrid sorting code - BLOCK #1
 // ============================================================
 			
 			// The primary sorting key may get some special handling
@@ -959,38 +959,36 @@ public class SSDataGrid extends JTable {
 			super.toggleSortOrder(column);
 			
 // ============================================================
-// START PP datagrid sorting code - BLOCK #2	
+// START @ppasala datagrid sorting code - BLOCK #2	
 			
 			if (!SORT_JDK_ASSIST) {
-			// ADD UP/DOWN ARROWS TO SORT COLUMNS
-			// JAVA HAS THE ICON FOR THE FIRST KEY SO DON'T ADD IT TO THE FIRST KEY
-			int i=1;
-			for(SortKey sortKey: getSortKeys()) {
-				String header = (String) getColumnModel().getColumn(sortKey.getColumn()).getHeaderValue();
-				if(header.endsWith(" \u25BE") || header.endsWith(" \u25B4")) {
-					header = header.substring(0, header.length()-1);
-				}
-				if(i ==1) {
-					header += " (" + i + ")";
-				}
-				else {
-					if(sortKey.getSortOrder() == SortOrder.ASCENDING) {
-						header += " (" + i + ") \u25B4";
+				// ADD UP/DOWN ARROWS TO SORT COLUMNS
+				// JAVA HAS THE ICON FOR THE FIRST KEY SO DON'T ADD IT TO THE FIRST KEY
+				int i = 1;
+				for (SortKey sortKey : getSortKeys()) {
+					String header = (String) getColumnModel().getColumn(sortKey.getColumn()).getHeaderValue();
+					if (header.endsWith(" \u25BE") || header.endsWith(" \u25B4")) {
+						header = header.substring(0, header.length() - 1);
 					}
-					else if(sortKey.getSortOrder() == SortOrder.DESCENDING) {
-						header += " (" + i + ") \u25BE";
+					if (i == 1) {
+						header += " (" + i + ")";
+					} else {
+						if (sortKey.getSortOrder() == SortOrder.ASCENDING) {
+							header += " (" + i + ") \u25B4";
+						} else if (sortKey.getSortOrder() == SortOrder.DESCENDING) {
+							header += " (" + i + ") \u25BE";
+						}
+					}
+					getColumnModel().getColumn(sortKey.getColumn()).setHeaderValue(header);
+					// IGNORE COLUMN NUMBERING IF DATA IS NOT SORTED BY THIS COLUMN
+					if (sortKey.getSortOrder() != SortOrder.UNSORTED) {
+						i++;
 					}
 				}
-				getColumnModel().getColumn(sortKey.getColumn()).setHeaderValue(header);
-				// IGNORE COLUMN NUMBERING IF DATA IS NOT SORTED BY THIS COLUMN
-				if(sortKey.getSortOrder() != SortOrder.UNSORTED) {
-					i++;
-				}
-			}						
-			getTableHeader().repaint();
+				getTableHeader().repaint();
 			}
 			
-// END PP datagrid sorting code - BLOCK #2
+// END @ppasala datagrid sorting code - BLOCK #2
 // ============================================================		
 			
 		}
