@@ -1060,6 +1060,7 @@ public class RowSetOps {
 			logger.warn("Unknown data type of " + type);
 		}
 		return value;
+
 	}
 
 	/**

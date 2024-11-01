@@ -103,6 +103,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 		
 		// Finish Initialization
 		initScreen();
+		// updateScreen(); // Force a grid.setRowSet() to a new rowset for testing.
 	}
 
 	@Override
@@ -133,8 +134,8 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 			try (Statement stmt = getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
 					ResultSet.CONCUR_UPDATABLE)) {
 
-				String[] displayItems = null;
-				Integer[] underlyingNumbers = null;
+				String[] displayItems;
+				Integer[] underlyingNumbers;
 
 				try (ResultSet rs = stmt
 						.executeQuery("SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;")) {
@@ -147,7 +148,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 					for (int i = 0; i < displayItems.length; i++) {
 						rs.next();
 						displayItems[i] = rs.getString("supplier_name");
-						underlyingNumbers[i] = new Integer(rs.getInt("supplier_id"));
+						underlyingNumbers[i] = rs.getInt("supplier_id");
 					}
 
 					dataGrid.setComboRenderer("supplier_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);
@@ -162,7 +163,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 					for (int i = 0; i < displayItems.length; i++) {
 						rs.next();
 						displayItems[i] = rs.getString("part_name");
-						underlyingNumbers[i] = new Integer(rs.getInt("part_id"));
+						underlyingNumbers[i] = rs.getInt("part_id");
 					}
 
 					dataGrid.setComboRenderer("part_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);

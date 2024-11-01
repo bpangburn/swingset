@@ -190,6 +190,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 		/** Exception if invoked. */
 		public Model() { Objects.requireNonNull(null); } 
 	}
+	// avoid warning for Model() constructor unused
+	static { if(Boolean.FALSE) Objects.isNull(new Model()); }
 
 	/**
 	 * {@inheritDoc }
