@@ -181,6 +181,7 @@ public class SSDataGrid extends JTable {
 	 * If true, then use the table-sort-header-renderer from com.raelity.jdk.
 	 * If false, then use sorting logic embedded in Sorter() method.
 	 */
+	// TODO: Consider moving to swingset.properties.
 	final static boolean SORT_JDK_ASSIST = true;
 	
 	/**
@@ -191,6 +192,7 @@ public class SSDataGrid extends JTable {
 	 * If false, then the sort keys are backed out one at a time when a column becomes
 	 * UNSORTED.
 	 */
+	// TODO: Consider moving to swingset.properties.
 	final static boolean SORT_REMOVE_KEYS = false;
 
 	// TODO BUG? there's no programatic way to change COPY/PASTE.
