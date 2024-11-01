@@ -27,6 +27,7 @@
 		<version.glazedlists>1.11.1203</version.glazedlists>
 		<version.log4j>2.22.0</version.log4j>
 		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
+		<version.table-sort-header-renderer>1.0.1</version.table-sort-header-renderer>
 
 		<!-- PLUGINS -->
 		<!-- Shared by swingset-parent, swingset, and swingset-demo -->
@@ -123,7 +124,6 @@
 			<artifactId>glazedlists</artifactId>
 			<version>${version.glazedlists}</version>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -135,6 +135,13 @@
 			<groupId>com.nqadmin.rowset</groupId>
 			<artifactId>jdbcrowsetimpl</artifactId>
 			<version>${version.jdbcrowsetimpl}</version>
+		</dependency>
+		<!-- ERNIE RAEL'S CUSTOM TABLE HEADER SORTING -->
+		<!-- https://mvnrepository.com/artifact/com.raelity.jdk/table-sort-header-renderer -->
+		<dependency>
+		    <groupId>com.raelity.jdk</groupId>
+		    <artifactId>table-sort-header-renderer</artifactId>
+		    <version>1.0.1</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
 		<dependency>

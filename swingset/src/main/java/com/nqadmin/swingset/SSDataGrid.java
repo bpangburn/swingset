@@ -52,10 +52,8 @@ import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.EventObject;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -81,6 +79,7 @@ import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -93,6 +92,7 @@ import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.models.SimpleComboListSwingModels;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSUtils;
+import com.raelity.jdk.sun.swing.table.TableSortHeaderRenderer;
 
 // SSDataGrid.java
 //
@@ -176,6 +176,22 @@ import com.nqadmin.swingset.utils.SSUtils;
  */
 
 public class SSDataGrid extends JTable {
+	
+	/**
+	 * If true, then use the table-sort-header-renderer from com.raelity.jdk.
+	 * If false, then use sorting logic embedded in Sorter() method.
+	 */
+	final static boolean SORT_JDK_ASSIST = true;
+	
+	/**
+	 * Sorting happens in the following order: ASC --> DESC --> UNSORTED --> ASC
+	 * 
+	 * If true ,then when a column becomes UNSORTED all sorting is removed and restored
+	 * on the next column heading click.
+	 * If false, then the sort keys are backed out one at a time when a column becomes
+	 * UNSORTED.
+	 */
+	final static boolean SORT_REMOVE_KEYS = false;
 
 	// TODO BUG? there's no programatic way to change COPY/PASTE.
 	//		For example to do keyAdapter.setAlloowInsertaion false.
@@ -834,6 +850,21 @@ public class SSDataGrid extends JTable {
 	protected SSTableModel createDefaultDataModel() {
 		return new SSTableModel();
 	}
+	
+	@Override
+    protected JTableHeader createDefaultTableHeader() {
+		if (!SORT_JDK_ASSIST) {
+			return super.createDefaultTableHeader();
+		}
+		return new JTableHeader(columnModel) {
+		    private static final long serialVersionUID = 1L;
+
+			@Override
+		    protected TableCellRenderer createDefaultRenderer() {
+		        return new TableSortHeaderRenderer();
+		    }
+		};
+    }
 
 	/**
 	 * Constructs a data grid with the data source set to the given RowSet.
@@ -889,17 +920,26 @@ public class SSDataGrid extends JTable {
 		public void toggleSortOrder(int column) {
 			List<SortKey> keys = new ArrayList<>(getSortKeys());
 			
+// ============================================================
+// START PP datagrid sorting code - BLOCK #1
+			
+			if (!SORT_JDK_ASSIST) {
+			
 			// REMOVE ANY UP DOWN ARROWS IN ALL THE EXISTING SORT COLUMNS
 			// AT THIS POINT column MAY NOT BE IN SORTKEYS			
 			for(SortKey sortKey: keys) {
 				getColumnModel().getColumn(sortKey.getColumn()).setHeaderValue(getColumnName(sortKey.getColumn()));
 			}
+			}
+			
+// END PP datagrid sorting code - BLOCK #1
+// ============================================================
 			
 			// The primary sorting key may get some special handling
 			if(!keys.isEmpty() && keys.get(0).getColumn() == column) {
 				if(keys.get(0).getSortOrder() == SortOrder.DESCENDING) {
 					// cycle from descending no sort on this key
-					if(Boolean.TRUE) {
+					if (SORT_REMOVE_KEYS) {
 						// Like removing all keys.
 						// Next toggle restores sorts.
 						keys.set(0, new SortKey(column, SortOrder.UNSORTED));
@@ -916,6 +956,10 @@ public class SSDataGrid extends JTable {
 			// UPDATE SORT KEYS
 			super.toggleSortOrder(column);
 			
+// ============================================================
+// START PP datagrid sorting code - BLOCK #2	
+			
+			if (!SORT_JDK_ASSIST) {
 			// ADD UP/DOWN ARROWS TO SORT COLUMNS
 			// JAVA HAS THE ICON FOR THE FIRST KEY SO DON'T ADD IT TO THE FIRST KEY
 			int i=1;
@@ -942,6 +986,11 @@ public class SSDataGrid extends JTable {
 				}
 			}						
 			getTableHeader().repaint();
+			}
+			
+// END PP datagrid sorting code - BLOCK #2
+// ============================================================		
+			
 		}
 	}
 
