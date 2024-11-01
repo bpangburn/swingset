@@ -412,12 +412,9 @@ public class SSFormattedTextField extends JFormattedTextField
 		// See https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/JFormattedTextField.html
 		setInputVerifier(new FormattedTextFieldVerifier());
 
-//		addPropertyChangeListener("editValid", (e)->{
-//			clearForceErrorFlag();
-//		});
-
 		addPropertyChangeListener("editValid", (e)->{
 			// System.err.println("EditValid: " + e.getNewValue());
+      // clearForceErrorFlag();
 			displayValidIndicator((boolean) e.getNewValue());
 		});
 
@@ -673,7 +670,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * not handled by formatter / formatter factory.
 	 *
 	 * @param _value - value to be validated
-	 * @return returns true if the value is valid else false
+	 * @return returns true if the value is valid else false;
 	 */
 	public boolean validateField(final Object _value) {
 
