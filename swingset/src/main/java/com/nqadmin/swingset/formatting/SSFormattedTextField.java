@@ -187,6 +187,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				// displayErrorIndicator()).
 				// May be able to place all decoration code in one method.
 				if (result == false) {
+					//forceError();
 					displayValidIndicator(false);
 				}
 
@@ -325,7 +326,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon = new SSCommon(this);
+	transient protected final SSCommon ssCommon = new SSCommon(this);
 
 	/**
 	 * Used to store background color prior to change following focusGained event so
@@ -413,6 +414,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 		addPropertyChangeListener("editValid", (e)->{
 			// System.err.println("EditValid: " + e.getNewValue());
+      // clearForceErrorFlag();
 			displayValidIndicator((boolean) e.getNewValue());
 		});
 
@@ -527,16 +529,6 @@ public class SSFormattedTextField extends JFormattedTextField
 
 		setAllowNull(_nullable);
 
-	}
-
-	/**
-	 * Sets the SSCommon data member for the current Swingset Component.
-	 *
-	 * @param _ssCommon shared/common SwingSet component data and methods
-	 */
-	@Override
-	public void setSSCommon(final SSCommon _ssCommon) {
-		ssCommon = _ssCommon;
 	}
 
 	/**

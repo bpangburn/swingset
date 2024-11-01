@@ -40,6 +40,7 @@ package com.nqadmin.swingset.utils;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -308,6 +309,21 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	protected void addKeyBasedURLLinking(final String _key, final String _keyLabel,
 			final String[] _urlPrefixesForColumns, final boolean _appendColumnValue) {
 		addKeyBasedURLLinking(null, _key, _keyLabel, _urlPrefixesForColumns, _appendColumnValue);
+	}
+	
+	/**
+	 * Sets the current screen to 'closed'.
+	 * 
+	 * Overriding to remove call to closeChildScreens() as SSFormViewScreenHelper
+	 * has a listener that calls closeChildScreens(), making a call here redundant.
+	 */
+	@Override
+	public void closeScreen() {
+		try {
+			setClosed(true);
+		} catch (final PropertyVetoException pve) {
+			logger.error("Property Veto Exception.", pve);
+		}
 	}
 
 	/**

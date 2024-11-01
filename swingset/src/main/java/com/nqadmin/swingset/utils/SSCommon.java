@@ -37,6 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset.utils;
 
+import com.nqadmin.swingset.decorators.BorderDecorator;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeListener;
@@ -60,18 +62,28 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.PlainDocument;
 
 import org.apache.logging.log4j.Logger;
 
 import com.nqadmin.swingset.SSBaseComboBox;
 import com.nqadmin.swingset.SSCheckBox;
+import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSImage;
 import com.nqadmin.swingset.SSLabel;
 import com.nqadmin.swingset.SSList;
 import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.datasources.RowSetOps.SSSQLNullException;
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
+import com.nqadmin.swingset.decorators.Decorator;
+import com.nqadmin.swingset.decorators.Validator;
+
+import static com.nqadmin.swingset.SSDataNavigator.isAcceptingChanges;
 
 // SSCommon.java
 //
@@ -100,7 +112,9 @@ import com.nqadmin.swingset.formatting.SSFormattedTextField;
  * A good example of this is SSDBComboBox, which may be used solely for
  * navigation.
  */
-public class SSCommon implements Serializable {
+public class SSCommon {
+
+	private static final Boolean DISABLE_GENERAL_VALIDATION = false;
 
 	/**
 	 * Document listener provided for convenience for SwingSet Components that are
@@ -113,7 +127,7 @@ public class SSCommon implements Serializable {
 	 * 	return getSSCommon().getSSDocumentListener();
 	 * }
 	 * <p>
-	 * This listener updates the underlying RowSet there is a change to the Document
+	 * This listener updates the underlying RowSet when there is a change to the Document
 	 * object. E.g., a call to setText() on a JTextField.
 	 * <p>
 	 * DocumentListener events generally, but not always get fired twice any time
@@ -141,7 +155,12 @@ public class SSCommon implements Serializable {
 		 */
 		private int lastChange = 0;
 		private int lastNotifiedChange = 0;
+		private String previousValue = null;
+		/** True when listener is temporarily removed. */
+		private boolean listenerNeedsRestoration;
+	
 
+		/** {@inheritDoc} */
 		@Override
 		public void changedUpdate(final DocumentEvent de) {
 			lastChange++;
@@ -154,23 +173,57 @@ public class SSCommon implements Serializable {
 				if (lastNotifiedChange != lastChange) {
 					lastNotifiedChange = lastChange;
 
+					if (!isValidChange()) {
+						// TODO: have to change the data base
+						//		 because of autocommit
+						//		 so can't simply return
+						//return;
+					}
+
 					removeRowSetListener();
 
+					boolean ok = true;
 					try {
-						setBoundColumnText(((javax.swing.text.JTextComponent) getSSComponent()).getText());
+						ok = setBoundColumnText(((JTextComponent) getSSComponent()).getText());
 					} finally {
+						if (!ok) {
+							// TODO:
+							// How about moving a state tracking variable to
+							// add/removeSSDocumentListener()?
+							// addSSDocumentListener() then uses listenerNeedsRestoration.
+
+							// restore previous text value
+							if(previousValue != null) {
+								if (ssComponentListenerAdded) {
+									// avoid generating events while restoring text
+									removeSSDocumentListener();
+									listenerNeedsRestoration = true;
+								}
+								try {
+									((JTextComponent) getSSComponent()).setText(previousValue);
+								} finally {
+									if (listenerNeedsRestoration) {
+										listenerNeedsRestoration = false;
+										addSSDocumentListener();
+									}
+								}
+							}
+						}
+						previousValue = null;	// Seems safer, is this the right spot?
 						addRowSetListener();
 					}
 				}
 			});
 		}
 
+		/** {@inheritDoc} */
 		@Override
 		public void insertUpdate(final DocumentEvent de) {
 			logger.trace("{} - insertUpdate().", () -> getColumnForLog());
 			changedUpdate(de);
 		}
 
+		/** {@inheritDoc} */
 		@Override
 		public void removeUpdate(final DocumentEvent de) {
 			logger.trace("{} - removeUpdate().", () -> getColumnForLog());
@@ -178,10 +231,59 @@ public class SSCommon implements Serializable {
 		}
 
 	} // end protected class SSDocumentListener
+	
+	/**
+	 * For JTextField to track previous text field value.
+	 */
+	@SuppressWarnings("serial")
+	public class SSPlainDocument extends PlainDocument {
+		DocumentFilter filter;
+
+		void capturePrevious(DocumentFilter.FilterBypass fb) {
+			try {
+				String prev = fb.getDocument().getText(0, fb.getDocument().getLength());
+				logger.trace(() -> "Capture previous text value: " + prev);
+				if (eventListener instanceof SSDocumentListener) {
+					((SSDocumentListener) eventListener).previousValue = prev;
+				}
+			} catch (BadLocationException ex) {
+				logger.debug("Capture previous text value", ex);
+			}
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public DocumentFilter getDocumentFilter() {
+			if (filter == null) {
+				filter = new DocumentFilter() {
+					@Override
+					public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+						capturePrevious(fb);
+						super.replace(fb, offset, length, text, attrs);
+					}
+
+					@Override
+					public void insertString(DocumentFilter.FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+						capturePrevious(fb);
+						super.insertString(fb, offset, string, attr);
+					}
+
+					@Override
+					public void remove(DocumentFilter.FilterBypass fb, int offset, int length) throws BadLocationException {
+						capturePrevious(fb);
+						super.remove(fb, offset, length);
+					}
+				};
+			}
+			return filter;
+		}
+	}
 
 	/**
 	 * Listener(s) for the underlying RowSet used to update the bound SwingSet
-	 * component.
+	 * component. When working with a {@linkplain javax.sql.rowset.CachedRowSet} there are
+	 * extra steps involved which require the listener to ignore some events,
+	 * see {@link SSDataNavigator#acceptChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable) }.
 	 */
 	protected class SSRowSetListener implements RowSetListener, Serializable {
 		/**
@@ -201,6 +303,9 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void cursorMoved(final RowSetEvent event) {
+			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
+				return;
+			}
 			logger.trace("{} - RowSet cursor moved.", () -> getColumnForLog());
 			//updateSSComponent();
 			performUpdates();
@@ -225,6 +330,9 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void rowChanged(final RowSetEvent event) {
+			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
+				return;
+			}
 			logger.trace("{} - RowSet row changed.", () -> getColumnForLog());
 //			if (!getRowSet().isUpdatingRow()) {
 //				updateSSComponent();
@@ -238,6 +346,9 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void rowSetChanged(final RowSetEvent event) {
+			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
+				return;
+			}
 			logger.trace("{} - RowSet changed.", () -> getColumnForLog());
 			//updateSSComponent();
 			performUpdates();
@@ -265,7 +376,7 @@ public class SSCommon implements Serializable {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Constant to indicate that no RowSet column index has been specified.
@@ -344,12 +455,15 @@ public class SSCommon implements Serializable {
 	//       if/when there is one.
 	//
 
+	private Decorator decorator;
+	private Validator validator;
+
 	/**
 	 * Reflects the state of the data source metadata about nullability
 	 * of the bound column. False when there's a "NOT NULL" constraint.
 	 * Empty if the metadata specifies unknown.
 	 */
-	private Optional<Boolean> isNullable = Optional.empty();
+	transient private Optional<Boolean> isNullable = Optional.empty();
 
 	// /**
 	//  * Column SQL data type.
@@ -364,17 +478,17 @@ public class SSCommon implements Serializable {
 	/**
 	 * parent SwingSet component
 	 */
-	private SSComponentInterface ssComponent = null;
+	final private SSComponentInterface ssComponent;
 
 	/**
 	 * database connection
 	 */
-	private Connection connection = null;
+	transient private Connection connection = null;
 
 	/**
 	 * RowSet from which component will get/set values.
 	 */
-	private RowSet rowSet = null;
+	transient private RowSet rowSet = null;
 	
 	/**
 	 * Indicates if rowset listener is added (or removed)
@@ -398,8 +512,12 @@ public class SSCommon implements Serializable {
 	 * @param _ssComponent SwingSet component having this SSCommon instance as a
 	 *                     datamember
 	 */
+	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSCommon(final SSComponentInterface _ssComponent) {
-		setSSComponent(_ssComponent);
+		ssComponent = _ssComponent;
+		decorator = Decorator.nullDecorator;
+		validator = Validator.nullValidator;
+		initDecorator();
 		init();
 	}
 
@@ -418,7 +536,7 @@ public class SSCommon implements Serializable {
 	 * JTextComponent.
 	 */
 	private void addSSDocumentListener() {
-		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().addDocumentListener((SSDocumentListener)eventListener);
+		((JTextComponent) getSSComponent()).getDocument().addDocumentListener((SSDocumentListener)eventListener);
 	}
 
 	/**
@@ -700,13 +818,14 @@ public class SSCommon implements Serializable {
 	}
 	
 	/**
-	 * Returns SSDocumentListener if the component is a JTextComponent
+	 * Returns SSDocumentListener; assumes the component is a JTextComponent.
 	 * <p>
 	 * Should only be called once per component.
 	 *
 	 * @return SSDocumentListener for a JTextComponent
 	 */
 	public SSDocumentListener getSSDocumentListener() {
+		// TODO: assert not called before
 		return new SSDocumentListener();
 	}
 
@@ -817,11 +936,11 @@ public class SSCommon implements Serializable {
 	}
 
 	/**
-	 * Class to remove a Document listener when the SwingSet component is a
-	 * JTextComponent
+	 * Method to remove a Document listener when the SwingSet component is a
+	 * JTextComponent.
 	 */
 	private void removeSSDocumentListener() {
-		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().removeDocumentListener((SSDocumentListener)eventListener);
+		((JTextComponent) getSSComponent()).getDocument().removeDocumentListener((SSDocumentListener)eventListener);
 	}
 
 	/**
@@ -964,14 +1083,17 @@ public class SSCommon implements Serializable {
 	 * Updates the bound database column with the specified String.
 	 *
 	 * @param _boundColumnText value to write to bound database column
+	 * @return false if there was a detected failure
 	 */
-	public void setBoundColumnText(final String _boundColumnText) {
+	public boolean setBoundColumnText(final String _boundColumnText) {
+		boolean ok = false;
 		logger.debug("{}: " + _boundColumnText, () -> getColumnForLog());
 		try {
 			//getRowSet().updateColumnText(_boundColumnText, getBoundColumnName(), getAllowNull());
 			RowSetOps.updateColumnText(getRowSet(),_boundColumnText, getBoundColumnName(), getAllowNull());
-		} catch(final NullPointerException _npe) {
-			logger.warn(getBoundColumnName() + " - Null Pointer Exception.", _npe);
+			ok = true;
+		} catch(final SSSQLNullException _npe) {
+			logger.warn(getBoundColumnName() + " - Null Value Exception.", _npe);
 			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
 					"Null values are not allowed for " + getBoundColumnName(), "Null Exception", JOptionPane.ERROR_MESSAGE);
 
@@ -987,17 +1109,7 @@ public class SSCommon implements Serializable {
 					"Number Format Exception", JOptionPane.ERROR_MESSAGE);
 
 		}
-
-	}
-
-	/**
-	 * Sets the SwingSet component of which this SSCommon instance is a datamember.
-	 *
-	 * @param _ssComponent the parent/calling SwingSet JComponent implementing
-	 *                     SSComponentInterface
-	 */
-	public void setSSComponent(final SSComponentInterface _ssComponent) {
-		ssComponent = _ssComponent;
+		return ok;
 	}
 
 	/**
@@ -1040,6 +1152,133 @@ public class SSCommon implements Serializable {
 
 		addSSComponentListener();
 
+		decorate();
+
+	}
+
+	/**
+	 * Issue a row changed event if there's an active RowSetListener.
+	 */
+	public void issueRowChanged() {
+		if(rowSetListenerAdded) {
+			// TODO: could create a valid event, but since it is not used...
+			rowSetListener.rowChanged(null);
+		}
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// The idea is to extend the decorators to handle a variety of component
+	// types and ways to decorate. Wonder how to do that?
+	//
+	// TODO: Could have one interface that is both validator and decorator
+	//		 and whatever else is needed: InputVerifier, ???.
+	//
+
+	static Decorator createDefaultDecorator() {
+		return new BorderDecorator();
+		//return new BackgroundDecorator();
+	}
+
+
+	/**
+	 * Find the default decorator for this component type and set it.
+	 */
+	private void initDecorator() {
+		// For now just pick any decorator as the default.
+		// Probably want to get it from a factory/provider and use this
+		// component type as part of the decision. If a component wants to
+		// extend behavior, could get the current decorator, delegate to it,
+		// with some custom behavior used by the component.
+
+		// Is the following snippet a good way to override the default?
+		//		decorator deco = getSSComponent().createDefaultDecorator();
+		// where the default implementation returns null
+
+		// Only decorate/validate for SSFormattedTextField, as in v4.0.12.
+		if (!(getSSComponent() instanceof SSFormattedTextField)
+				&& DISABLE_GENERAL_VALIDATION) {
+			return;
+		}
+
+		setDecorator(getSSComponent().createDefaultDecorator());
+	}
+	/**
+	 * Run the decorator.
+	 */
+	public final void decorate() {
+		decorator.decorate();
+	}
+
+	/**
+	 * Install the given decorator.
+	 * @param deco decorator to install
+	 */
+	public final void setDecorator(Decorator deco) {
+		decorator.uninstall();
+		deco.install(getSSComponent());
+		decorator = deco;
+	}
+
+	/**
+	 * Return the decorator used by this component.
+	 * @return the decorator
+	 */
+	public final Decorator getDecorator() {
+		return decorator;
+	}
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Validator
+	//
+
+	/**
+	 * Install the given validator into the component
+	 * @param _validator validator to install
+	 */
+	public final void setValidator(Validator _validator) {
+		if (DISABLE_GENERAL_VALIDATION) {
+			return;
+		}
+		validator.uninstall();
+		_validator.install(ssComponent);
+		validator = _validator;
+	}
+	
+	/**
+	 * Run the SSComponents validator, return the result.
+	 * @return true if valid
+	 */
+	public final boolean validate() {
+		return validator.validate();
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Component Value Change
+	//
+
+	// TODO:	Implement a way to select when to do validation.
+	//			For example, OnChangeOrAction, InputVerifier, OnFocusChange, ...?
+	//
+	// TODO:	May need a plugin for whether or not to allow decorate().
+	//			Incorporate check into Validator? Decorator? ChangeHandler?
+	/**
+	 * This is called per change, like on a keystroke, if allowed may decorate
+	 * the component. 
+	 * 
+	 * @return true if the there is no detected error
+	 */
+	private boolean isValidChange() {
+		if (DISABLE_GENERAL_VALIDATION) {
+			return true;
+		}
+
+		// For now, always do validation
+
+		// boolean isValid = validate();
+		return decorator.decorate();
+		// return isValid;
 	}
 
 }

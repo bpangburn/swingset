@@ -41,7 +41,10 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Frame;
 import java.beans.PropertyVetoException;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 import javax.sql.RowSet;
@@ -53,8 +56,6 @@ import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
 import org.apache.logging.log4j.Logger;
-
-import java.sql.Connection;
 
 //SSScreenHelperCommon.java
 //
@@ -173,7 +174,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	protected abstract void closeChildScreens();
 
 	/**
-	 * Closes the current screen.
+	 * Sets the current screen to 'closed' and then closes any child screens. 
 	 */
 	public void closeScreen() {
 		try {
@@ -210,6 +211,23 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 */
 	protected Connection getConnection() {
 		return connection;
+	}
+	
+	/**
+	 * Returns a READONLY statement for running select queries against the database
+	 *
+	 * @return a READONLY statement for the database connection
+	 */
+	public Statement getReadOnlyStatement() {
+		Statement readOnlyStatement = null;
+
+		try {
+			readOnlyStatement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return readOnlyStatement;
 	}
 	
 	/**
