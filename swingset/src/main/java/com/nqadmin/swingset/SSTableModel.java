@@ -37,12 +37,13 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
+import static com.nqadmin.swingset.datasources.RowSetOps.updateColumnObject;
+
 import java.awt.Component;
 import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,8 +52,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.sql.RowSet;
-import javax.sql.rowset.CachedRowSet;
-import javax.sql.rowset.spi.SyncProviderException;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
@@ -61,8 +60,6 @@ import org.apache.logging.log4j.Logger;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSUtils;
-
-import static com.nqadmin.swingset.datasources.RowSetOps.updateColumnObject;
 
 // SSTableModel.java
 //
@@ -364,10 +361,11 @@ public class SSTableModel extends AbstractTableModel {
 	} // end public Object getValueAt(int _row, int _column) {
 
 	/**
-	 * Check if previous Java class column types are different from the rowset;
-	 * save the new column types.
+	 * Check if previous Java class column types are different from the rowset; save
+	 * the new column types.
+	 * 
 	 * @return true if different types
-	 * @throws SQLException 
+	 * @throws SQLException SQL Exception
 	 */
 	private boolean columnTypesChanged() throws SQLException {
 		int newColumnCount = RowSetOps.getColumnCount(rowset);
@@ -378,15 +376,17 @@ public class SSTableModel extends AbstractTableModel {
 		}
 		if (colClasses.equals(columnClasses)) {
 			return false;
-		} else {
-			columnClasses = colClasses;
-			return true;
 		}
+		columnClasses = colClasses;
+		return true;
 	}
 
 	/**
 	 * Initializes the SSTableModel. (Gets the column count and row count for the
 	 * given RowSet.)
+	 * 
+	 * @param inConstructor indicates if init() is being called from inside the
+	 *                      Constructor
 	 */
 	private void init(boolean inConstructor) {
 		try {
@@ -454,6 +454,8 @@ public class SSTableModel extends AbstractTableModel {
 					break;
 				case TIMESTAMP:
 					valueCopy = new Timestamp(SSCommon.getSQLDate((String) valueCopy).getTime());
+					break;
+				default:
 					break;
 				}
 			}

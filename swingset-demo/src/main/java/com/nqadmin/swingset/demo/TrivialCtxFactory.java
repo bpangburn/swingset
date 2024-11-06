@@ -60,10 +60,11 @@ private static Map<String,Object> jndiStuff = new ConcurrentHashMap<>();
 
 /**
  * Used by java's JNDI infrastructure to create initial context.
- * @throws NamingException 
+ * 
+ * @throws NamingException any exceptions thrown by operations in the Context
+ *                         interfaces
  */
-public TrivialCtxFactory() throws NamingException
-{
+public TrivialCtxFactory() throws NamingException {
 }
 
 /**

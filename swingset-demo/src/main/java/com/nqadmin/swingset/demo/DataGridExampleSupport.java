@@ -74,7 +74,19 @@ class DataGridExampleSupport {
 	private final SSDataGrid dataGrid;
 	private final Logger logger;
 
-	/** assumes rowset has been set */
+	/**
+	 * assumes rowset has been set
+	 * 
+	 * @param logger        output logger
+	 * @param uiContainer   datagrid container
+	 * @param rowset        rowset
+	 * @param dataGrid      SSDatagrid to attach to container
+	 * @param primaryColumn primary column for rowset
+	 * @param dataValue     SSDataValue object which handled primary key generation
+	 * @param columnNames   columns to display on datagrid
+	 * @param defaultValues default values for colummNames
+	 * @throws SQLException SQL Exception
+	 */
 	static void setup(Logger logger, Container uiContainer,
 			RowSet rowset, SSDataGrid dataGrid,
 			int primaryColumn, SSDataValue dataValue, String[] columnNames, Object[] defaultValues)

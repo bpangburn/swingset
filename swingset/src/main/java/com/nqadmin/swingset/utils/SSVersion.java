@@ -98,7 +98,7 @@ public class SSVersion implements Comparable<SSVersion> {
 	}
 
 	/**
-	 * Returns the SSVersion resulting from parsing the {@linkplain sVer}
+	 * Returns the SSVersion resulting from parsing the {@code sVer}
 	 * argument. If there is a parse error, then 0.0.0-SNAPSHOT is used.
 	 * The return values are useful for comparing.
 	 * @param sVer version string to parse
@@ -153,13 +153,16 @@ public class SSVersion implements Comparable<SSVersion> {
 			seq.add(m.group(3) != null ? Integer.valueOf(m.group(3)) : (Integer)0);
 			seq.add(m.group(5) != null ? Integer.valueOf(m.group(5)) : (Integer)0);
 			return new SSVersion(seq, isSnap);
-		} else {
-			logger.error(() -> "Version parse error: " + _sVer);
-			return parse(ERROR_VERSION);
 		}
+		logger.error(() -> "Version parse error: " + _sVer);
+		return parse(ERROR_VERSION);
 	}
 
-	/** return null if there's a problem */
+	/**
+	 * Return the SwingSet version number or null if there is an issue.
+	 * 
+	 * @return the SwingSet version number or null if there is an issue.
+	 */
 	private static String getVersionProperty() {
 		String ver = null;
 		Properties props = new Properties();

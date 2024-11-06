@@ -108,8 +108,8 @@ public class SSFormattedTextField extends JFormattedTextField
 	public class FormattedTextFieldVerifier extends InputVerifier {
 
 		/**
-		 * @param input
-		 * @return
+		 * @param input Component to be validated/verified
+		 * @return true if the input is valid, otherwise false
 		 */
 		@Override
 		public boolean verify(final JComponent input) {
@@ -228,7 +228,7 @@ public class SSFormattedTextField extends JFormattedTextField
 		private static final long serialVersionUID = -8060207437911787572L;
 
 		/**
-		 * @param _pce
+		 * @param _pce property change event
 		 */
 		@Override
 		public void propertyChange(final PropertyChangeEvent _pce) {
@@ -328,11 +328,11 @@ public class SSFormattedTextField extends JFormattedTextField
 	 */
 	transient protected final SSCommon ssCommon = new SSCommon(this);
 
-	/**
-	 * Used to store background color prior to change following focusGained event so
-	 * that the color can be restored upon focusLost.
-	 */
-	private final Color standardBackgroundColor = getDefaultBackgroundColor();
+//	/**
+//	 * Used to store background color prior to change following focusGained event so
+//	 * that the color can be restored upon focusLost.
+//	 */
+//	private final Color standardBackgroundColor = getDefaultBackgroundColor();
 	
 	/**
 	 * Used to store border color prior to change following focusGained event so
@@ -682,16 +682,16 @@ public class SSFormattedTextField extends JFormattedTextField
 	// TODO: work out global setDefault, instance setDefault
 	// TODO: listener for L&F change and adjust accordingly?
 	//
-	private static Color defaultBackgroundColor;
-	private static Color getDefaultBackgroundColor() {
-		if (defaultBackgroundColor == null) {
-			defaultBackgroundColor = UIManager.getColor("FormattedTextField.background");
-			if (defaultBackgroundColor == null) {
-				defaultBackgroundColor = Color.WHITE;
-			}
-		}
-		return defaultBackgroundColor;
-	}
+//	private static Color defaultBackgroundColor;
+//	private static Color getDefaultBackgroundColor() {
+//		if (defaultBackgroundColor == null) {
+//			defaultBackgroundColor = UIManager.getColor("FormattedTextField.background");
+//			if (defaultBackgroundColor == null) {
+//				defaultBackgroundColor = Color.WHITE;
+//			}
+//		}
+//		return defaultBackgroundColor;
+//	}
 
 	// TODO: work out global setDefault, instance setDefault
 	// TODO: listener for L&F change and adjust accordingly?

@@ -101,7 +101,7 @@ public class SSCurrencyField extends SSFormattedTextField {
 	public SSCurrencyField(final javax.swing.JFormattedTextField.AbstractFormatterFactory _factory) {
 		super(_factory);
 		setHorizontalAlignment(SwingConstants.RIGHT);
-		setValue(new java.lang.Double(0.00));
+		setValue(Double.valueOf(0.00));
 	}
 
 	/**

@@ -120,6 +120,9 @@ public abstract class SimpleComboListSwingModels extends AbstractComboBoxListSwi
 	protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel _remodel) {
 	}
 
+	/**
+	 * 
+	 */
 	final public class Remodel extends AbstractComboBoxListSwingModel.Remodel { }
 	private final Remodel remodel = new Remodel();
 

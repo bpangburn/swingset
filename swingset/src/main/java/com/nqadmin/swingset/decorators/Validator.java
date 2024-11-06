@@ -41,10 +41,8 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
 
 /**
  * A validator allows a specialized validation condition on a per component
- * basis. If {@linkplain validate()} is false there is no attempt to write
+ * basis. If {@linkplain #validate()} is false there is no attempt to write
  * to the data base. This is typically checked by a {@link Decorator}.
- * 
- * .
  * <p>
  * TODO: eventually define a factory to create these, a base
  *		 class might contain methods like getText.
@@ -61,12 +59,12 @@ public interface Validator {
 	//		 For now, just have a couple of defaults that do nothing.
 
 	/** Install this validator into the component. Installs listeners
-	 * @param component the componenet
+	 * @param component the component
 	 */
-	default void install(SSComponentInterface component) {};
+	default void install(SSComponentInterface component) {}
 
 	/** Remove validator/listeners from component. */
-	default void uninstall() {};
+	default void uninstall() {}
 
 	/**
 	 * A validator that always indicates valid.

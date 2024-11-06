@@ -148,7 +148,7 @@ public class Example7 extends JFrame {
 						for (int i = 0; i < displayItems.length; i++) {
 							rs.next();
 							displayItems[i] = rs.getString("supplier_name");
-							underlyingNumbers[i] = new Integer(rs.getInt("supplier_id"));
+							underlyingNumbers[i] = Integer.valueOf(rs.getInt("supplier_id"));
 						}
 
 						dataGrid.setComboRenderer("supplier_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);
@@ -163,7 +163,7 @@ public class Example7 extends JFrame {
 						for (int i = 0; i < displayItems.length; i++) {
 							rs.next();
 							displayItems[i] = rs.getString("part_name");
-							underlyingNumbers[i] = new Integer(rs.getInt("part_id"));
+							underlyingNumbers[i] = Integer.valueOf(rs.getInt("part_id"));
 						}
 
 						dataGrid.setComboRenderer("part_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);

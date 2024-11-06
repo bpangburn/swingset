@@ -51,57 +51,57 @@ import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * A FormatterFactory, with formatters based on MaskFormatter, which uses
- * getAllowNull() from the SSFormattedTextField to determine when
- * a NullFormatter should be provided. In addition, the 
- * formatted text field is monitored and its value is changed
- * to null/String as needed. This factory only specifies the default formatter,
- * so edit and display formatters use the default formatter.
+ * getAllowNull() from the SSFormattedTextField to determine when a
+ * NullFormatter should be provided. In addition, the formatted text field is
+ * monitored and its value is changed to null/String as needed. This factory
+ * only specifies the default formatter, so edit and display formatters use the
+ * default formatter.
  * <p>
- * These formatters internally use a String value and the supplied converter
- * is used to do the final conversion to a value of the correct type.
- * Typically an AbstractFormatter is
- * provided to convert objects to/from strings; see the code snippet below.
- * The converter may not be needed if the value objects are a string.
+ * These formatters internally use a String value and the supplied converter is
+ * used to do the final conversion to a value of the correct type. Typically an
+ * AbstractFormatter is provided to convert objects to/from strings; see the
+ * code snippet below. The converter may not be needed if the value objects are
+ * a string.
  * <p>
- * Here's a code snippet that creates a {@link SSMaskFormatterFactory}
- * that handles a {@link java.util.Date} field.
+ * Here's a code snippet that creates a {@link SSMaskFormatterFactory} that
+ * handles a {@link java.util.Date} field.
+ * 
  * <pre>{@code
- *     new SSMaskFormatterFactory.Builder<>("##/##/####").maskLiterals("/")
- *             .converter(new DateFormatter(new SimpleDateFormat("MMddyyyy")))
- *             .placeholder('_').build();
+ * new SSMaskFormatterFactory.Builder<>("##/##/####").maskLiterals("/")
+ * 		.converter(new DateFormatter(new SimpleDateFormat("MMddyyyy"))).placeholder('_').build();
  * }</pre>
+ * 
  * With this snippet, if the text field has AllowNull true and the Value is
- * null, then the text field is empty/blank; if the user then enters "1", 
- * the text field displays "1_/__/____"/; if then backspace, the field
- * becomes blank.
- * Note the maskLiterals: the placeholder and maskLiterals are used
- * when determining if the text field's value should be null;
- * in particular, when it would contain "__/__/____" the value is set to null
- * and the text field is empty; though conceivable, it is not simple to
- * automatically determine the literals.
- * Also note that the converter's format does not
- * contain "/" because in this example the factory's
- * {@link MaskFormatter}'s ValueContainsLiteralCharacters is false.
+ * null, then the text field is empty/blank; if the user then enters "1", the
+ * text field displays "1_/__/____"/; if then backspace, the field becomes
+ * blank. Note the maskLiterals: the placeholder and maskLiterals are used when
+ * determining if the text field's value should be null; in particular, when it
+ * would contain "__/__/____" the value is set to null and the text field is
+ * empty; though conceivable, it is not simple to automatically determine the
+ * literals. Also note that the converter's format does not contain "/" because
+ * in this example the factory's {@link MaskFormatter}'s
+ * ValueContainsLiteralCharacters is false.
  * <p>
- * Finer control over the edit input characters can be obtained by
- * overriding the Builder's getSSMaskFormatter to create a
- * subclass of SSMaskFormatter which has a custom DocumentFilter. For example:
+ * Finer control over the edit input characters can be obtained by overriding
+ * the Builder's getSSMaskFormatter to create a subclass of SSMaskFormatter
+ * which has a custom DocumentFilter. For example:
+ * 
  * <pre>{@code
  * static class CustomBuilder extends SSMaskFormatterFactory.Builder<CustomBuilder> {
- * 	   CustomBuilder(String mask) {
- * 	   	super(mask);
- * 	   }
- * 	   @Override
- * 	   protected SSMaskFormatter getSSMaskFormatter(
- * 	   		SSMaskFormatterFactory.Builder<?> builder) throws ParseException {
- * 	   	return new CustomSSMaskFormatter(self());
- * 	   }
+ * 		CustomBuilder(String mask) {
+ * 			super(mask);
+ * 		} @Override
+ * 		protected SSMaskFormatter getSSMaskFormatter(SSMaskFormatterFactory.Builder<?> builder) throws ParseException {
+ * 			return new CustomSSMaskFormatter(self());
+ * 		}
  * }
  * }</pre>
- * Use this custom formatter as: {@code new CustomBuilder(formatMask)...build();}.
+ * 
+ * Use this custom formatter as:
+ * {@code new CustomBuilder(formatMask)...build();}.
  * <p>
- * TODO: Should maskLiterals contain the placeholder rather than
- * assuming placeholder should be filtered out?
+ * TODO: Should maskLiterals contain the placeholder rather than assuming
+ * placeholder should be filtered out?
  */
 @SuppressWarnings("serial")
 public class SSMaskFormatterFactory extends DefaultFormatterFactory {
@@ -112,12 +112,15 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 	private static final Logger logger = SSUtils.getLogger();
 
 	/**
-	 * Get a new FormatterFactory with the specified parameters.Unless noted, a parameter is used when constructing the MaskFormatter.<p>
+	 * Get a new FormatterFactory with the specified parameters.Unless noted, a
+	 * parameter is used when constructing the MaskFormatter.
 	 * <p>
-	 * TODO: extend to allow specification of a displayFormatter.
-	 * @see <em>Effective Java</em> Item 2 about override.
+	 * See <em>Effective Java - 3rd Edition</em> Chapter 2, Item 2 paragraph beginning
+	 * with "The builder pattern is well suited to class hierarchies..."
+	 * 
 	 * @param <T> a builder type
 	 */
+	//TODO: Consider extending to allow specification of a displayFormatter.
 	public static class Builder<T extends Builder<T>> {
 		// Required params
 		private final String mask;
@@ -131,10 +134,10 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 
 		/**
 		 * Create the builder.
-		 * @param mask Formatter's mask
+		 * @param _mask Formatter's mask
 		 */
-		public Builder(String mask) {
-			this.mask = mask;
+		public Builder(String _mask) {
+			mask = _mask;
 		}
 
 		/** Literals in the mask; used in determining null data.
@@ -227,16 +230,16 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 	 * <p>
 	 * Uses setEditValid method to check that formatter should flip.
 	 */
-	@SuppressWarnings("serial")
 	protected static class SSMaskFormatter extends MaskFormatter {
 
 		private final AbstractFormatter converter;
 		private final String maskLiterals;
 
 		/**
-		 *  Create the mask formatter as specified by the builder.
+		 * Create the mask formatter as specified by the builder.
+		 * 
 		 * @param builder params for the mask formatter
-		 * @throws ParseException 
+		 * @throws ParseException Parse Exception
 		 */
 		protected SSMaskFormatter(Builder<?> builder) throws ParseException {
 			super(builder.mask);
@@ -367,7 +370,6 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 	}
 
 	/** use setEditValid method to check that formatter should flip */
-	@SuppressWarnings("serial")
 	protected static class SSNullFormatter extends DefaultFormatter {
 
 		/**
@@ -384,7 +386,7 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		 * This method is invoked by the formatter when it is almost done.
 		 * After super.setEditValid, if the text field is a String
 		 * set the value to the String (which switches the formatter).
-		 * @param valid see {@link MaskFormatter#setEditValid(boolean) }
+		 * @param valid see {@link javax.swing.text.DefaultFormatter#setEditValid(boolean) }
 		 */
 		@Override
 		protected void setEditValid(boolean valid) {

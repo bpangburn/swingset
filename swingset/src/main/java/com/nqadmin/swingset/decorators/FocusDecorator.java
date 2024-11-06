@@ -73,8 +73,8 @@ public abstract class FocusDecorator
 
 	/** {@inheritDoc} */
 	@Override
-	public void install(SSComponentInterface component) {
-		this.component = component;
+	public void install(SSComponentInterface _component) {
+		component = _component;
 		fcomp().addFocusListener(this);
 	}
 
@@ -90,7 +90,7 @@ public abstract class FocusDecorator
 	 */
 	protected Component fcomp() {
 		return !(jc() instanceof JComboBox) ? jc()
-				: ((JComboBox)jc()).getEditor().getEditorComponent();
+				: ((JComboBox<?>)jc()).getEditor().getEditorComponent();
 	}
 
 	/** {@inheritDoc}

@@ -64,15 +64,15 @@ public abstract class TextComponentValidator implements Validator {
 
 	/**
 	 * Install this validator into the component.
-	 * @param component to validate
+	 * @param _component to validate
 	 * @throws IllegalArgumentException if component is not a JTextComponent
 	 */
 	@Override
-	public void install(SSComponentInterface component) {
-		if (!(component instanceof JTextComponent)) {
+	public void install(SSComponentInterface _component) {
+		if (!(_component instanceof JTextComponent)) {
 			throw new IllegalArgumentException("Must be a JTextComponent");
 		}
-		this.component = component;
+		component = _component;
 	}
 
 	/** {@inheritDoc} */
@@ -104,11 +104,11 @@ public abstract class TextComponentValidator implements Validator {
 		/**
 		 * A validator for use with a {@linkplain JTextComponent};
 		 * argument is a {@linkplain Function} that performs validation.
-		 * @param validator validation function
+		 * @param _validator validation function
 		 */
-		public TextComponentValidatorFunction(Function<JTextComponent, Boolean> validator)
+		public TextComponentValidatorFunction(Function<JTextComponent, Boolean> _validator)
 		{
-			this.validator = validator;
+			validator = _validator;
 		}
 		
 		@Override

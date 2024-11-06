@@ -229,9 +229,8 @@ public class SSDataGrid extends JTable {
 			// IF IT IS INTEGER THEN 1 IS CONSIDERED TRUE AND 0 FALSE.
 			if (columnClass == JDBCType.BOOLEAN) {
 				return isSelected;
-			} else {
-				return isSelected ? 1 : 0;
 			}
+			return isSelected ? 1 : 0;
 		}
 
 		/** {@inheritDoc} */
@@ -994,7 +993,12 @@ public class SSDataGrid extends JTable {
 		}
 	}
 
-	/** Note: toggling insertion on/off/on/off does not create new sorter. */
+	/**
+	 * Note: toggling insertion on/off/on/off does not create new sorter.
+	 * 
+	 * @param clearFirst indicates if any existing sorting should be cleared before
+	 *                   setting new sorting
+	 */
 	// TODO: both setInsertion/setSorting toggle; is that the right thing?
 	private void checkCreateAddSorter(boolean clearFirst) {
 		logger.debug(() -> String.format("clear: %b, sorting %b, insert %b",
@@ -1628,10 +1632,12 @@ public class SSDataGrid extends JTable {
 		}
 		setHiddenColumns(hiddenCols);
 	}
+
 	/**
 	 * Sets the column numbers that should be hidden.
+	 * 
 	 * @param _columnNames names
-	 * @throws SQLException 
+	 * @throws SQLException SQL Exception
 	 * @deprecated use SetHiddenColumnsByName
 	 */
 	@Deprecated
@@ -1731,20 +1737,19 @@ public class SSDataGrid extends JTable {
 	}
 
 	/**
-	 * Enable/disable sorting by column gesture;
-	 * when true, always create new sorter.
-	 * Note that if insertRow, then the sorter is not applied.
-	 * @param _sorting 
+	 * Enable/disable sorting by column gesture; when true, always create new
+	 * sorter. Note that if insertRow, then the sorter is not applied.
+	 * 
+	 * @param _sorting boolean indicating if sorting should be applied
 	 */
-	// TODO: support a getCreatedSorter to 
-	//		 allow getting the sorter while insert row.
-	//		 Not absolutely required, since can get the
-	//		 sorter directly from the JTable; just turn off insert row.
+	// TODO: support a getCreatedSorter to allow getting the sorter while insert
+	// 		row. Not absolutely required, since can get the sorter directly from the
+	// 		JTable; just turn off insert row.
 	public void setSorting(boolean _sorting) {
 		boolean oldValue = sorting;
 		sorting = _sorting;
 		checkCreateAddSorter(true);
-			
+
 		firePropertyChange("sorting", oldValue, sorting);
 	}
 

@@ -158,16 +158,17 @@ public class SSDataNavigator extends JPanel {
 	}
 
 	/**
-	 * A {@linkplain CachedRowSet} requires an extra step to effect changes
-	 * in its underlying data source;
-	 * this method does {@linkplain #acceptChanges(CachedRowSet, Runnable)} on the given {@linkplain CachedRowSet}.
-	 * Set the state for the CachedRowSet so that it's listeners can ignore
-	 * the extra events.
-	 * The runnable {@code runAfterChanges}, if not null, is executed after
-	 * acceptChanges on the CachedRowSet is successful.
-	 * @param _crs accept change on this.
+	 * A {@linkplain CachedRowSet} requires an extra step to effect changes in its
+	 * underlying data source; this method does
+	 * {@linkplain #acceptChanges(CachedRowSet, Runnable)} on the given
+	 * {@linkplain CachedRowSet}. Set the state for the CachedRowSet so that it's
+	 * listeners can ignore the extra events. The runnable {@code runAfterChanges},
+	 * if not null, is executed after acceptChanges on the CachedRowSet is
+	 * successful.
+	 * 
+	 * @param _crs            accept change on this.
 	 * @param runAfterChanges execute if not null
-	 * @throws SQLException
+	 * @throws SQLException SQL Exception
 	 */
 	public static void acceptChanges(CachedRowSet _crs, Runnable runAfterChanges) throws SQLException {
 		try {

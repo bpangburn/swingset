@@ -70,8 +70,6 @@ import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
-import static com.nqadmin.swingset.decorators.BorderDecorator.empty_line;
-
 // SSImage.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware

@@ -84,10 +84,11 @@ public class RowSetOps {
 	// TODO Audit type handling based on http://www.java2s.com/Code/Java/Database-SQL-JDBC/StandardSQLDataTypeswithTheirJavaEquivalents.htm
 
 	/**
-	 * Inserts the context of the insert row into this {@linkplain ResultSet}
-	 * and into the database. Handle CachedRowSet.
-	 * @param _resultSet
-	 * @throws SQLException
+	 * Inserts the context of the insert row into this {@linkplain ResultSet} and
+	 * into the database. Handle CachedRowSet.
+	 * 
+	 * @param _resultSet resultset where row is to be inserted
+	 * @throws SQLException SQL Exception
 	 */
 	public static void insertRow(ResultSet _resultSet) throws SQLException {
 		_resultSet.insertRow();
@@ -105,10 +106,11 @@ public class RowSetOps {
 	}
 
 	/**
-	 * Updates the underlying database with the new contents of the current row
-	 * of this {@linkplain ResultSet} object. Handle CachedRowSet.
-	 * @param _resultSet
-	 * @throws SQLException
+	 * Updates the underlying database with the new contents of the current row of
+	 * this {@linkplain ResultSet} object. Handle CachedRowSet.
+	 * 
+	 * @param _resultSet resultset where row is to be inserted
+	 * @throws SQLException SQL Exception
 	 */
 	public static void updateRow(ResultSet _resultSet) throws SQLException {
 		_resultSet.updateRow();
@@ -138,8 +140,9 @@ public class RowSetOps {
 	/**
 	 * Deletes the current row from this {@linkplain ResultSet} and from the
 	 * underlying database. Handle CachedRowSet.
-	 * @param _resultSet
-	 * @throws SQLException 
+	 * 
+	 * @param _resultSet resultset where row is to be inserted
+	 * @throws SQLException SQL Exception
 	 */
 	public static void deleteRow(ResultSet _resultSet) throws SQLException {
 		_resultSet.deleteRow();
@@ -231,14 +234,16 @@ public class RowSetOps {
 	}
 	
 	/**
-	 * Method used by RowSet listeners to get the new text when the RowSet
-	 * events are triggered.
+	 * Method used by RowSet listeners to get the new text when the RowSet events
+	 * are triggered.
 	 *
-	 * @param _rowSet RowSet on which to operate
-	 * @param _columnName - name of database column to retrieve
+	 * @param _rowSet     RowSet on which to operate
+	 * @param _columnName name of database column to retrieve
 	 *
 	 * @return text representation of data in specified column
-	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
+	 * @see <a href=
+	 *      "https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC
+	 *      4.3 Specification- Appendix B</a>
 	 */
 	public static String getColumnText(final RowSet _rowSet, final String _columnName) {
 		String value = null;
@@ -428,28 +433,28 @@ public class RowSetOps {
 	}
 
 	/**
-	 * Retrieve the Java Class corresponding to the designated column
-	 * based on the column name.
+	 * Retrieve the Java Class corresponding to the designated rowset column based
+	 * on the column name.
 	 * 
-	 * @param _columnName - name of the column
+	 * @param _resultSet  ResultSet on which to operate
+	 * @param _columnName name of the rowset column
 	 *
-	 * @param _resultSet ResultSet on which to operate
-	 * @return
-	 * @throws SQLException
+	 * @return Java Class corresponding to the designated rowset column
+	 * @throws SQLException SQL Exception
 	 */
 	public static Class<?> getClassColumnType(final ResultSet _resultSet, final String _columnName) throws SQLException {
 		return getClassColumnType(_resultSet, getColumnIndex(_resultSet, _columnName));
 	}
 
 	/**
-	 * Retrieve the Java Class corresponding to the designated column
-	 * based on the column index (starting from 1).
-	 * 
-	 * @param _columnIndex - index of the column
+	 * Retrieve the Java Class corresponding to the designated column based on the
+	 * column index (starting from 1).
 	 *
-	 * @param _resultSet ResultSet on which to operate
-	 * @return
-	 * @throws SQLException
+	 * @param _resultSet   ResultSet on which to operate
+	 * @param _columnIndex index of the rowset column
+	 * 
+	 * @return Java Class corresponding to the designated rowset column
+	 * @throws SQLException SQL Exception
 	 */
 	public static Class<?> getClassColumnType(final ResultSet _resultSet, final int _columnIndex) throws SQLException {
 		JDBCType type = RowSetOps.getJDBCColumnType(_resultSet, _columnIndex);
@@ -498,7 +503,7 @@ public class RowSetOps {
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 * @throws NumberFormatException thrown if unable to parse a string to number format
-	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
+	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification - Appendix B</a>
 	 */
 	// TODO: Eclipse is giving a Potential null pointer access, but we have assert(_updatedValue != null) so may be able to remove warning in future.
 	@SuppressWarnings("null")
@@ -756,10 +761,14 @@ public class RowSetOps {
 	
 	/**
 	 * Determine the Java type class for the given database type.
+	 * 
 	 * @param _jdbcType JDBCType of interest
 	 * @return the class object used for the given type
 	 * @throws SQLException if the JDBCType is not handled
-	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B.3 JDBC Types Mapped to Java Object Types
+	 * @see <a href=
+	 *      "https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC
+	 *      4.3 Specification - Appendix B.3 JDBC Types Mapped to Java Object
+	 *      Types</a>
 	 */
 	public static Class<?> findJavaTypeClass(final JDBCType _jdbcType)
 	throws SQLException {
@@ -907,20 +916,22 @@ public class RowSetOps {
 	}
 
 	/**
-	 * Update the Grid's RowSet at the specified column index with the given Object value.
-	 * RowSet. Operate on the current row.
+	 * Update the Grid's RowSet at the specified column index with the given Object
+	 * value. RowSet. Operate on the current row.
 	 * <p>
 	 * When the user changes/edits the SSDataGrid cell this method propagates the
 	 * change to the RowSet. A separate call is required to flush/commit the change
 	 * to the database.
 	 *
-	 * @param _rowSet RowSet on which to operate
-	 * @param _value string to be type-converted as needed and updated in
-	 *                      underlying RowSet column
-	 * @param _columnIndex   index of the database column
-	 * @param type The JDBCType of the column
-	 * @throws SQLException  thrown if a database error is encountered
-	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
+	 * @param _rowSet      RowSet on which to operate
+	 * @param _value       string to be type-converted as needed and updated in
+	 *                     underlying RowSet column
+	 * @param _columnIndex index of the database column
+	 * @param type         The JDBCType of the column
+	 * @throws SQLException thrown if a database error is encountered
+	 * @see <a href=
+	 *      "https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC
+	 *      4.3 Specification - Appendix B</a>
 	 */
 	public static void updateColumnObject2(RowSet _rowSet, Object _value, int _columnIndex, JDBCType type) throws SQLException {
 		switch (type) {
@@ -972,11 +983,14 @@ public class RowSetOps {
 	}
 
 	/**
-	 * Fetch and return object for specified rowset's specified column
-	 * from the database; object type is determined by column's JDBCType.
-	 * There is no filtering, for example null conversion.
-	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B-1
-	 * @param rowset source rowset
+	 * Fetch and return object for specified rowset's specified column from the
+	 * database; object type is determined by column's JDBCType. There is no
+	 * filtering, for example null conversion.
+	 * 
+	 * @see <a href=
+	 *      "https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC
+	 *      4.3 Specification - Appendix B-1</a>
+	 * @param rowset  source rowset
 	 * @param _column source column
 	 * @return object from RowSet.getXxx
 	 * @throws SQLException database error
@@ -985,10 +999,9 @@ public class RowSetOps {
 	{
 		if (Boolean.TRUE) {
 			return getColumnObjectDirect(rowset, _column);
-		} else {
-			// This returns null for items not enumerated in switch.
-			return getColumnObjectDirectSwitch(rowset, _column);
 		}
+		// This returns null for items not enumerated in switch.
+		return getColumnObjectDirectSwitch(rowset, _column);
 	}
 
 	private static Object getColumnObjectDirect(RowSet rowset, int _column) throws SQLException

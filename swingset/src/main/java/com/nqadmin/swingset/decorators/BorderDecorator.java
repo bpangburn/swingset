@@ -113,10 +113,12 @@ public class BorderDecorator extends FocusDecorator
 		defaultBorder = null;
 	}
 
-	/** Create a compound border the size of defaultBorder.
-	 * Outside is empty, inside is 1 line.
-	 * @param state
-	 * @return 
+	/**
+	 * Create a compound border the size of defaultBorder. Outside is empty, inside
+	 * is 1 line.
+	 * 
+	 * @param state Enum of DEFAULT, OK, or ERROR
+	 * @return appropriate Border for current state
 	 */
 	protected Border getBorder(BorderState state) {
 		Color color = getBorderColor(state);
@@ -135,10 +137,9 @@ public class BorderDecorator extends FocusDecorator
 	}
 
 	/**
-	 * If a component has a border, then the defaultBorder is the
-	 * components original border.
-	 * If the component has no border, give it a default border
-	 * the size of it's insets, but with at least thickness 1.
+	 * If a component has a border, then the defaultBorder is the components
+	 * original border. If the component has no border, give it a default border the
+	 * size of it's insets, but with at least thickness 1.
 	 */
 	protected void setupDefaultBorder() {
 		if (defaultBorder == null) {
@@ -160,9 +161,10 @@ public class BorderDecorator extends FocusDecorator
 	}
 
 	/**
-	 * This is used to create a border in situations where the component
-	 * does not have a border. It returns an empty border
-	 * the size of it's insets, but with at least thickness 1.
+	 * This is used to create a border in situations where the component does not
+	 * have a border. It returns an empty border the size of it's insets, but with
+	 * at least thickness 1.
+	 * 
 	 * @return an empty border
 	 */
 	protected Border createDefaultBorder() {
@@ -174,10 +176,11 @@ public class BorderDecorator extends FocusDecorator
 	}
 
 	/**
-	 * Determine color for specified BorderState; null return means
-	 * use the defaultBorder.
-	 * @param state
-	 * @return
+	 * Determine color for specified BorderState; null return means use the
+	 * defaultBorder.
+	 * 
+	 * @param state Enum of DEFAULT, OK, or ERROR
+	 * @return Color for border state
 	 */
 	protected Color getBorderColor(BorderState state)
 	{
@@ -277,18 +280,18 @@ public class BorderDecorator extends FocusDecorator
 	}
 
 	/**
-	 * Create a CompoundBorder wth the sizes indicated by the outside-inside
-	 * parameters.
-	 * The top level outside-inside are the same sizes as the input;
-	 * the top level outside is a compound border where the inside is
-	 * a line and the outside is the remaining.
+	 * Create a CompoundBorder with the sizes indicated by the outside-inside
+	 * parameters. The top level outside-inside are the same sizes as the input; the
+	 * top level outside is a compound border where the inside is a line and the
+	 * outside is the remaining.
 	 * <p>
 	 * [______|][_______]
 	 * <p>
-	 * @param outside
-	 * @param inside
-	 * @param color line color
-	 * @return border
+	 * 
+	 * @param outside component outside border insets
+	 * @param inside  component inside border insets
+	 * @param color   line color
+	 * @return border compound border for component
 	 */
 	public static Border emptyLine_empty(Insets outside, Insets inside, Color color)
 	{
@@ -311,18 +314,18 @@ public class BorderDecorator extends FocusDecorator
 	}
 
 	/**
-	 * Create a CompoundBorder wth the sizes indicated by the outside-inside
-	 * parameters.
-	 * The top level outside-inside are the same sizes as the input;
-	 * the top level outside is a compound border where the outside is
-	 * a line and the inside is the remaining.
+	 * Create a CompoundBorder with the sizes indicated by the outside-inside
+	 * parameters. The top level outside-inside are the same sizes as the input; the
+	 * top level outside is a compound border where the outside is a line and the
+	 * inside is the remaining.
 	 * <p>
 	 * [|______][_______]
 	 * <p>
-	 * @param outside
-	 * @param inside
-	 * @param color line color
-	 * @return border
+	 * 
+	 * @param outside component outside border insets
+	 * @param inside  component inside border insets
+	 * @param color   line color
+	 * @return border compound border for component
 	 */
 	public static Border lineEmpty_empty(Insets outside, Insets inside, Color color)
 	{
@@ -345,10 +348,11 @@ public class BorderDecorator extends FocusDecorator
 	}
 
 	/**
-	 * Convert a border to a display string which shows compound border nesting
-	 * and terminal border insets.
-	 * @param b a border
-	 * @param jc
+	 * Convert a border to a display string which shows compound border nesting and
+	 * terminal border insets.
+	 * 
+	 * @param b  a border
+	 * @param jc JComponent for which to obtain border insets
 	 * @return String of border for output
 	 */
 	public static String asString(Border b, JComponent jc) {

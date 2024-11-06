@@ -81,6 +81,8 @@ public enum Format {
 	static Format getDefaultFormat(Format _format) {
 		switch(_format.getType()) {
 		case DATE: return DATE_DDMMYYYY;
+		default:
+			break;
 		}
 		return null;
 	}

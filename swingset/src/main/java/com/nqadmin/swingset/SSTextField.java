@@ -280,7 +280,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	 * Use this constructor only if you are using a decimal mask.
 	 * </pre>
 	 * 
-	 * @param _mask                  the mask required for this text field.
+	 * @param _mask                  the mask required for this text field
 	 * @param _numberOfDecimalPlaces number of decimal places required
 	 * @param _align                 alignment required
 	 */
@@ -300,7 +300,16 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 			 DEFAULT_MASK, DEFAULT_NUMBER_OF_DECIMAL_PLACES, ANY_ALIGNMENT);
 	}
 
-	/** All the constructors feed through here */
+	/**
+	 * All the constructors feed through here
+	 * 
+	 * @param _text                  the text to be displayed.
+	 * @param _rowSet                rowset with column to be bound
+	 * @param _boundColumnName       name of bound column
+	 * @param _mask                  the mask required for this text field
+	 * @param _numberOfDecimalPlaces number of decimal places required
+	 * @param _align                 alignment required
+	 */
 	private SSTextField(String _text, final RowSet _rowSet, final String _boundColumnName,
 	final int _mask, final int _numberOfDecimalPlaces, final int _align) {
 		super(_text);

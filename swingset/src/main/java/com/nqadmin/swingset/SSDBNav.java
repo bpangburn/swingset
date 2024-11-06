@@ -239,7 +239,8 @@ public interface SSDBNav extends Serializable {
 
 	/**
 	 * Find all the SSComponents in the navigator window.
-	 * @return
+	 * 
+	 * @return an empty list of SSComponents
 	 */
 	default List<SSComponentInterface> findSSComponents() {
 		return Collections.emptyList();

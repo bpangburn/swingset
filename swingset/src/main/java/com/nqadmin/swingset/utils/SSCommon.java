@@ -436,8 +436,9 @@ public class SSCommon {
 
 	/**
 	 * Convert argument to "m[m]/d[d]/yyyy" format.
-	 * @param _date
-	 * @return
+	 * 
+	 * @param _date SQL date
+	 * @return String with date in "m[m]/d[d]/yyyy" format
 	 */
 	public static String getStringDate(Date _date) {
 		GregorianCalendar calendar = new GregorianCalendar();
