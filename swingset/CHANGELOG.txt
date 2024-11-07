@@ -6,11 +6,26 @@ ChangeLog file for the SwingSet Open Toolkit for Java Swing.
 SwingSet 4.0.13 - Released TBD
 ==============================================================================
 
-	1. PR#177 - Automatically make the version from pom.xml available to the
-	   running program. Versions can be compared.
-	2. PR#179 - Make ssCommon/ssComponent final. Remove their setters.
-	3. 
-
+	1. Added generic SSMaskFormatterFactory that handles AllowNull.
+	2. Rewrote SSDateField and SSDateFormatterFactory to utilize new
+	   SSMaskFormatterFactory.
+	3. Fixed and cleaned up dynamic visible error state for formatted text
+	   fields.
+	4. Changed LogManager.getLogger() to SSUtils.getLogger() for
+	   SSMaskFormatterFactory.
+	5. Add a "sorter" to the SSDataGrid (see Issue #7).
+	6. Fixed SSDataGrid ComboBox Issue with duplicate entries (see Issue #126).
+	7. Made the version from pom.xml available to the running program.
+	   Versions can be compared. See PR#177.
+	8. Made ssCommon/ssComponent final. Remove their setters. See PR#179. 
+	9. Added multiple ways to get a RowSet. Added support for connection pooling.
+	10.Made grid database type usage consistent with RowSetOps.
+	11.Simplified Boolean handling in SSDataGrid.
+	12.Added SScomponent Decorator and Validate infrastructure.
+	13.Fixed Issue #175 with SSTextField where it was retaining a "bad" value
+	   and not reflecting what is in the database.
+	14.Added a convenience method, getReadOnlyStatement() to SSScreenHelperCommon.
+	15.Miscellaneous JavaDoc and other code cleanup.
 
 ==============================================================================
 SwingSet 4.0.12 - Released 2023-12-16
