@@ -45,8 +45,10 @@ import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
+
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * A FormatterFactory, with formatters based on MaskFormatter, which uses
@@ -106,9 +108,9 @@ import org.apache.logging.log4j.Logger;
 public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 
 	/**
-	 * Log4j Logger for component
+	 * Logger for component
 	 */
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Get a new FormatterFactory with the specified parameters.Unless noted, a parameter is used when constructing the MaskFormatter.<p>
@@ -197,7 +199,7 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 			SSMaskFormatter mf = builder.getSSMaskFormatter(builder);
 			setDefaultFormatter(mf);
 		} catch (ParseException ex) {
-			logger.error("Bad mask format: " + builder.mask);
+			logger.log(ERROR, "Bad mask format: " + builder.mask);
 		}
 	}
 	

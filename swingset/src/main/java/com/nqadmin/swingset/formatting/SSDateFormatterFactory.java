@@ -68,7 +68,7 @@ public class SSDateFormatterFactory {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Constant for MM/dd/yyyy date format
@@ -127,7 +127,7 @@ public class SSDateFormatterFactory {
 			// I'd be inclined to exception
 			// throw new IllegalArgumentException(
 			// 		String.format("% is not a DATE", _format.toString()));
-			logger.error(() -> String.format("%s is not a DATE, using default",
+			logger.log(ERROR, () -> String.format("%s is not a DATE, using default",
 					_format.toString()));
 			format = Format.DATE;
 		}
@@ -155,7 +155,7 @@ public class SSDateFormatterFactory {
 				maskLiterals = "-";
 				break;
 			default:
-				logger.error("Unknown date format type of " + format);
+				logger.log(ERROR, "Unknown date format type of " + format);
 				return null;
 		}
 

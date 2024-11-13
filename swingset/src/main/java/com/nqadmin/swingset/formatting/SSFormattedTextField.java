@@ -43,8 +43,8 @@
 package com.nqadmin.swingset.formatting;
 
 import java.awt.Color;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
@@ -58,7 +58,6 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.text.DefaultFormatterFactory;
 
 import java.lang.System.Logger;
@@ -99,7 +98,7 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 // TODO Add JDatePicker support or something similar: https://www.codejava.net/java-se/swing/how-to-use-jdatepicker-to-display-calendar-component and https://github.com/JDatePicker/JDatePicker
 
 public class SSFormattedTextField extends JFormattedTextField
-		implements FocusListener, SSComponentInterface {
+		implements SSComponentInterface {
 
 	// static final boolean VISIBLE_ERROR_STATE = true;
 	/**
@@ -121,8 +120,8 @@ public class SSFormattedTextField extends JFormattedTextField
 	public class FormattedTextFieldVerifier extends InputVerifier {
 
 		/**
-		 * @param input
-		 * @return
+		 * @param input Component to be validated/verified
+		 * @return true if the input is valid, otherwise false
 		 */
 		@Override
 		public boolean verify(final JComponent input) {
@@ -174,7 +173,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 					// update text color for negatives, where applicable
 					if (result) {
-						updateTextColor(value);
+						updateTextDecorator(value);
 					}
 
 					// Set the value to null manually if stringToValue() was not called above, but
@@ -190,17 +189,9 @@ public class SSFormattedTextField extends JFormattedTextField
 
 				}
 
-				// Update background color to RED for invalid value.
-				// Also force foreground color to BLACK in case it was previous RED (negative
-				// number).
-				//
-				// If value is valid, the background color will change when focus is lost.
-				//
-				// TODO: Consider moving this into a separate method (e.g.,
-				// displayErrorIndicator()).
-				// May be able to place all decoration code in one method.
 				if (result == false) {
-					displayValidIndicator(false);
+					//displayValidIndicator(false);
+					forceError();
 				}
 
 			} catch (final Exception _e) {
@@ -226,6 +217,18 @@ public class SSFormattedTextField extends JFormattedTextField
 //		public boolean shouldYieldFocus(JComponent input) {
 //			return verify(input);
 //		}
+
+		// This is the default behavior since jdk-9, no reason to re-implement it.
+		// /**
+		//  * Don't change focus if there's an error.
+		//  * 
+		//  * {@inheritDoc }
+		//  */
+		// @Override
+		// public boolean shouldYieldFocus(JComponent source, JComponent target)
+		// {
+		// 	return verify(source);
+		// }
 	}
 
 	/**
@@ -240,7 +243,7 @@ public class SSFormattedTextField extends JFormattedTextField
 		private static final long serialVersionUID = -8060207437911787572L;
 
 		/**
-		 * @param _pce
+		 * @param _pce property change event
 		 */
 		@Override
 		public void propertyChange(final PropertyChangeEvent _pce) {
@@ -302,6 +305,14 @@ public class SSFormattedTextField extends JFormattedTextField
 					}
 				}
 
+				// TODO: This seems like a kludge, but note verifyingText.
+				//		 When a date field becomes empty, setValue is called
+				//		 with null, but for some reason the nullformatter is
+				//		 not used
+				if (currentValue == null) {
+					//ftf.clearForceErrorFlag();
+				}
+
 				ssCommon.addRowSetListener();
 			}
 
@@ -329,13 +340,13 @@ public class SSFormattedTextField extends JFormattedTextField
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon = new SSCommon(this);
+	protected final SSCommon ssCommon = new SSCommon(this);
 
-	/**
-	 * Used to store background color prior to change following focusGained event so
-	 * that the color can be restored upon focusLost.
-	 */
-	private final Color standardBackgroundColor = getDefaultBackgroungColor();
+	// /**
+	//  * Used to store background color prior to change following focusGained event so
+	//  * that the color can be restored upon focusLost.
+	//  */
+	// private final Color standardBackgroundColor = getDefaultBackgroungColor();
 		
 	/**
 	 * Creates a new instance of SSFormattedTextField
@@ -399,7 +410,14 @@ public class SSFormattedTextField extends JFormattedTextField
 		setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 
 		// Adding focus listener to assist with highlighting and text selection
-		addFocusListener(this);
+		// addFocusListener(this);
+		addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(final FocusEvent fe) {
+				//SSTextField.this.selectAll();
+				SwingUtilities.invokeLater(() -> { selectAll(); });
+			}
+		});
 
 		// Setting inputVerifier to validate field before focus is lost
 		// See https://docs.oracle.com/javase/8/docs/api/javax/swing/JFormattedTextField.html
@@ -408,53 +426,57 @@ public class SSFormattedTextField extends JFormattedTextField
 
 		addPropertyChangeListener("editValid", (e)->{
 			// System.err.println("EditValid: " + e.getNewValue());
-			displayValidIndicator((boolean) e.getNewValue());
+			//displayValidIndicator((boolean) e.getNewValue());
+			logger.log(TRACE, sf("editValid: isValid %s", e.getNewValue()));
+			clearForceErrorFlag();
 		});
 
 	}
 
-	/**
-	 * Add highlighting when the focus is gained and select all of the text so
-	 * overwriting is easier.
-	 *
-	 * @param _event focus event
-	 * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
-	 */
-	@Override
-	public void focusGained(final FocusEvent _event) {
+	// /**
+	//  * Add highlighting when the focus is gained and select all of the text so
+	//  * overwriting is easier.
+	//  *
+	//  * @param _event focus event
+	//  * @see java.awt.event.FocusListener#focusGained(java.awt.event.FocusEvent)
+	//  */
+	// @Override
+	// public void focusGained(final FocusEvent _event) {
 
-		// USE A DIFFERENT COLOR TO HIGHLIGHT THE FIELD WITH THE FOCUS
-		// ran into capture problems
-		// TODO: shouldn't this be in decorator (focus decorator
-		setBackground(getFocusBackgroundColor);
-		displayValidIndicator(isEditValid());
+	// 	// USE A DIFFERENT COLOR TO HIGHLIGHT THE FIELD WITH THE FOCUS
+	// 	// ran into capture problems
+	// 	// TODO: shouldn't this be in decorator (focus decorator
+	// 	setBackground(getFocusBackgroundColor);
+	// 	displayValidIndicator(isEditValid());
 
-		// HIGHLIGHT THE TEXT IN THE FIELD WHEN FOCUS IS GAINED SO USE CAN JUST TYPE OVER WHAT IS THERE
-		//
-		// This is a workaround based on the following thread:
-		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4740914
-		SwingUtilities.invokeLater(() -> { selectAll(); });
-	}
+	// 	// HIGHLIGHT THE TEXT IN THE FIELD WHEN FOCUS IS GAINED SO USE CAN JUST TYPE OVER WHAT IS THERE
+	// 	//
+	// 	// This is a workaround based on the following thread:
+	// 	// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4740914
+	// 	SwingUtilities.invokeLater(() -> { selectAll(); });
+	// }
 
-	/**
-	 * Nothing to do.
-	 *
-	 * @param _event focus event
-	 * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
-	 */
-	@Override
-	public void focusLost(final FocusEvent _event) {
-		// Restore original background color
-		// TODO: shouldn't this be in decorator (focus decorator
-		setBackground(standardBackgroundColor);
-	}
+	// /**
+	//  * Nothing to do.
+	//  *
+	//  * @param _event focus event
+	//  * @see java.awt.event.FocusListener#focusLost(java.awt.event.FocusEvent)
+	//  */
+	// @Override
+	// public void focusLost(final FocusEvent _event) {
+	// 	// Restore original background color
+	// 	// TODO: shouldn't this be in decorator (focus decorator
+	// 	setBackground(standardBackgroundColor);
+	// }
 	
 	/**
 	 * Returns the background color to be used when this component has the focus
 	 * 
 	 * @return background color used for component with the focus
+	 * @deprecated use the decorator directly
 	 */
 	// TODO: Is this used? Should it be deprecated?
+	@Deprecated
 	public Color getFocusBackgroundColor() {
 		Decorator hl = getSSCommon().getDecorator();
 		Color color;
@@ -500,9 +522,11 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * Setter for the background color to be used when this component has the focus
 	 * 
 	 * @param _focusBackgroundColor background color to be used when this component has the focus
+	 * @deprecated use the decorator directly
 	 */
 	// TODO: Is this used? Should it be deprecated?
 	// TODO: Use a [sg]etProperty style for Decorators?
+	@Deprecated
 	public void setFocusBackgroundColor(final Color _focusBackgroundColor) {
 		Decorator hl = getSSCommon().getDecorator();
 		if (hl instanceof BackgroundDecorator) {
@@ -601,36 +625,14 @@ public class SSFormattedTextField extends JFormattedTextField
 		}
 
 		// SET TEXT COLOR TO RED FOR ANY NEGATIVE NUMBERS
-			updateTextColor(newValue);
-
-	}
-
-	/**
-	 * This currently sets text color to red for negative numbers, otherwise black.
-	 * 
-	 * A developer could override this method to do other things.
-	 * 
-	 * TODO: In the future it might be nice to make a plugable decorator and/or maintain
-	 * some of the details in a properties file.
-	 *
-	 * @param _value - value to be validated
-	 * 
-	 * @deprecated use updateTextDecorator()
-	 */
-	@Deprecated
-	public void updateTextColor(final Object _value) {
-
-		updateTextDecorator(_value);
+			updateTextDecorator(newValue);
 
 	}
 	
 	/**
-	 * This currently sets text color to red for negative numbers, otherwise black.
-	 * 
+	 * The default border decorator sets red for negative numbers, otherwise black.
 	 * A developer could override this method to do other things.
 	 * 
-	 * TODO: In the future it might be nice to make a plugable decorator and/or maintain
-	 * some of the details in a properties file.
 	 * TODO: Should this apply after keytype?
 	 *
 	 * @param _value - value to be validated
@@ -657,26 +659,29 @@ public class SSFormattedTextField extends JFormattedTextField
 		return !forceErrorState && isEditValid();
 	}
 
+	/** Set this if verify fails, gets cleared if "editValid" property change. */
 	private boolean forceErrorState;
 	private void forceError() {
+		logger.log(TRACE, "forceError");
 		forceErrorState = true;
 		getSSCommon().decorate();
 	}
 	private void clearForceErrorFlag() {
+		logger.log(TRACE, "clearForceErrorFlag");
 		forceErrorState = false;
 		getSSCommon().decorate();
 	}
 
-	// experimental for VISIBLE_ERROR_STATE
-	void displayValidIndicator(boolean isValid) {
-		if(isValid) {
-			setBackground(isFocusOwner() ? focusBackgroundColor : standardBackgroundColor);
-			setForeground(Color.BLACK);
-		} else {
-			setBackground(Color.PINK);
-			setForeground(Color.BLACK);
-		}
-	}
+	// // experimental for VISIBLE_ERROR_STATE
+	// void displayValidIndicator(boolean isValid) {
+	// 	if(isValid) {
+	// 		setBackground(isFocusOwner() ? focusBackgroundColor : standardBackgroundColor);
+	// 		setForeground(Color.BLACK);
+	// 	} else {
+	// 		setBackground(Color.PINK);
+	// 		setForeground(Color.BLACK);
+	// 	}
+	// }
 
 	/**
 	 * Checks if the value is valid of the component. Override for custom validations
@@ -695,15 +700,21 @@ public class SSFormattedTextField extends JFormattedTextField
 	// TODO: work out global setDefault, instance setDefault
 	// TODO: listener for L&F change and adjust accordingly?
 	//
-	private static Color defaultBackgroundColor;
+	// private static Color defaultBackgroundColor;
+	/*
+	 * Always return white.
+	 * @deprecated use the decorator directly
+	 */
+	@Deprecated
 	private static Color getDefaultBackgroungColor() {
-		if (defaultBackgroundColor == null) {
-			defaultBackgroundColor = UIManager.getColor("FormattedTextField.background");
-			if (defaultBackgroundColor == null) {
-				defaultBackgroundColor = Color.WHITE;
-			}
-		}
-		return defaultBackgroundColor;
+		return Color.WHITE;
+		// if (defaultBackgroundColor == null) {
+		// 	defaultBackgroundColor = UIManager.getColor("FormattedTextField.background");
+		// 	if (defaultBackgroundColor == null) {
+		// 		defaultBackgroundColor = Color.WHITE;
+		// 	}
+		// }
+		// return defaultBackgroundColor;
 	}
 
 	//
