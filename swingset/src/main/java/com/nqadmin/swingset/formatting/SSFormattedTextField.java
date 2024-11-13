@@ -71,6 +71,7 @@ import com.nqadmin.swingset.utils.SSUtils;
 import com.nqadmin.swingset.decorators.TextDecorationStyle;
 import com.nqadmin.swingset.decorators.TextDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
+import com.nqadmin.swingset.formatting.SSMaskFormatterFactory.SSMaskFormatter;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
@@ -98,9 +99,9 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * Implementing an InputVerifier in order to lock the focus down while the JFormattedTextField is in
 	 * an invalid edit state.
 	 * 
-	 * This implementation makes a call to validateField(), the default implementation of which just returns true.
+	 * This implementation makes a call to componentValidate(), the default implementation of which just returns true.
 	 * 
-	 * The developer can override validateField() for a SwingSet formatted component to add additional checks
+	 * The developer can override componentValidate() for a SwingSet formatted component to add additional checks
 	 * (normally range validation) beyond what is provided by the Formatter/FormatterFactory, which generally
 	 * only handles display of values and/or character masks.
 	 * 
@@ -110,8 +111,8 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * See https://docs.oracle.com/javase/8/docs/api/javax/swing/JFormattedTextField.html
 	 * See https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/JFormattedTextField.html
 	 */
-	public class FormattedTextFieldVerifier extends InputVerifier {
-
+	public class FormattedTextFieldVerifier extends InputVerifier
+	{
 		/**
 		 * @param input Component to be validated/verified
 		 * @return true if the input is valid, otherwise false
@@ -160,7 +161,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 					// now perform custom validation/range checks
 					if (result) {
-						result = validateField(value);
+						result = isAllValid().all();
 					}
 
 					// update text color for negatives, where applicable
@@ -182,7 +183,6 @@ public class SSFormattedTextField extends JFormattedTextField
 				}
 
 				if (result == false) {
-					//displayValidIndicator(false);
 					forceError();
 				}
 
@@ -205,7 +205,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
-	 * database column
+	 * database column.
 	 */
 	protected class SSFormattedTextFieldListener implements PropertyChangeListener {
 		/**
@@ -218,7 +218,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				
 				// If this property change was triggered by FormattedTextFieldVerifier
 				// return with no action
-				if (verifyingText) return;
+				if (verifyingText || !isAllValid().all()) return;
 
 				ssCommon.removeRowSetListener();
 
@@ -237,6 +237,9 @@ public class SSFormattedTextField extends JFormattedTextField
 				} else {
 
 					try {
+						// TODO: put the specialized handling into some kind
+						//		 of data base adaptor plugin.
+
 						// 2020-10-02_BP: Date (and presumably Time & Timestamp) fields are returned as
 						// java.util.Date and Postgres JDBC doesn't know how to handle them
 						// java.sql.Date, java.sql.Time, and java.sql.Timestamp are all subclasses of
@@ -248,10 +251,9 @@ public class SSFormattedTextField extends JFormattedTextField
 										new java.sql.Date(date.getTime()));
 							case TIME -> getRowSet().updateObject(getBoundColumnName(),
 										new java.sql.Time(date.getTime()));
-							case TIMESTAMP ->
-								getRowSet().updateObject(getBoundColumnName(),
+							case TIMESTAMP -> getRowSet().updateObject(getBoundColumnName(),
 										new java.sql.Timestamp(date.getTime()));
-							default -> logger.log(WARNING, getColumnForLog() + ": getValue() returned a java.sql.Date, but JDBCType is "
+							default -> logger.log(Level.ERROR, getColumnForLog() + ": getValue() returned a java.sql.Date, but JDBCType is "
 												+ getBoundColumnJDBCType() + ". Unable to update column.");
 							}
 						} else {
@@ -263,14 +265,6 @@ public class SSFormattedTextField extends JFormattedTextField
 						JOptionPane.showMessageDialog(ftf, "SQL Exception encountered for " + getBoundColumnName(),
 								"SQL Exception", JOptionPane.ERROR_MESSAGE);
 					}
-				}
-
-				// TODO: This seems like a KLUDGE, but note verifyingText.
-				//		 When a date field becomes empty, setValue is called
-				//		 with null, but for some reason the nullformatter is
-				//		 not used
-				if (currentValue == null) {
-					//ftf.clearForceErrorFlag();
 				}
 
 				ssCommon.addRowSetListener();
@@ -503,6 +497,20 @@ public class SSFormattedTextField extends JFormattedTextField
 		return !forceErrorState && isEditValid();
 	}
 
+	/**
+	 * Determine if there are user input characters. A formatted text field might
+	 * contain only the format pattern and no input characters.
+	 * @return true if there is user input
+	 */
+	public boolean containsUserText() {
+		if (getFormatter() instanceof SSMaskFormatter mf) {
+			return mf.containsData(getText());
+		} else {
+			// TODO: AbstractFormatter
+		}
+		return true;
+	}
+
 	/** Set this if verify fails, gets cleared if "editValid" property change. */
 	private boolean forceErrorState;
 	private void forceError() {
@@ -514,19 +522,6 @@ public class SSFormattedTextField extends JFormattedTextField
 		logger.log(TRACE, "clearForceErrorFlag");
 		forceErrorState = false;
 		getSSCommon().decorate();
-	}
-
-	/**
-	 * Checks if the value is valid of the component. Override for custom validations
-	 * not handled by formatter / formatter factory.
-	 *
-	 * @param _value - value to be validated
-	 * @return returns true if the value is valid else false
-	 */
-	public boolean validateField(final Object _value) {
-
-		// just return true for default implementation
-		return true;
 	}
 
 	//

@@ -133,14 +133,15 @@ public class DateTime
 	}
 
 	/**
-	 * Check if the component is a valid date/time. To avoid exceptions
-	 * use {@link #isHandledDateTimeComp(com.nqadmin.swingset.utils.SSComponentInterface)}
-	 * @param comp
+	 * Check if the component is a valid date/time. To avoid exceptions, first
+	 * use {@link #isHandledDateTimeComp(com.nqadmin.swingset.utils.SSComponentInterface)}.
+	 * @param text The text to validate
+	 * @param comp The component that the text is derived from
 	 * @return
 	 */
-	public static boolean dateTimeColumnValidate(SSComponentInterface comp)
+	public static boolean dateTimeColumnValidate(String text, RSC comp)
 	{
-		DtoParse dtoParse = internalDateTimeColumnParse(comp);
+		DtoParse dtoParse = internalDateTimeColumnParse(text, comp);
 		return !dtoParse.isError();
 	}
 
@@ -224,15 +225,6 @@ public class DateTime
 			JDBCType.TIME,
 			JDBCType.TIMESTAMP
 	);
-
-	private static DtoParse internalDateTimeColumnParse(SSComponentInterface comp)
-	{
-		// Only handle JTextComponent for now
-		if (!(comp instanceof JTextComponent jtc))
-			throw new IllegalArgumentException("only JTextComponent handled");
-		String text = jtc.getText(); // if ! OurMaskFormatter.containsData(text)
-		return internalDateTimeColumnParse(text, comp);
-	}
 
 	private static DtoParse internalDateTimeColumnParse(String text, RSC comp)
 	{

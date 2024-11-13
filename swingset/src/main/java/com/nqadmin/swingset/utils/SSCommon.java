@@ -88,7 +88,6 @@ import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSBaseComboBox;
 import com.nqadmin.swingset.SSCheckBox;
-import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSImage;
 import com.nqadmin.swingset.SSLabel;
 import com.nqadmin.swingset.SSList;
@@ -100,11 +99,11 @@ import com.nqadmin.swingset.datasources.SSSQLNullException;
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
+import com.nqadmin.swingset.formatting.SSMaskFormatterFactory.SSMaskFormatter;
 import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 import com.nqadmin.swingset.navigate.RowSetState;
 
-import static com.nqadmin.swingset.datasources.DateTime.dateTimeColumnValidate;
 import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingChanges;
 import static com.nqadmin.swingset.navigate.Utils.postRowSetModifiedError;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -138,6 +137,7 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  */
 public class SSCommon
 {
+	// TODO: get rid of this.
 	private static final Boolean DISABLE_GENERAL_VALIDATION = false;
 
 	/**
@@ -1327,7 +1327,6 @@ public class SSCommon
 	 * Run the decorator.
 	 */
 	public final void decorate() {
-		logger.log(DEBUG, sf("%s", getColumnForLog()));
 		decorator.decorate();
 	}
 
@@ -1365,17 +1364,50 @@ public class SSCommon
 		_validator.install(ssComponent);
 		validator = _validator;
 	}
+
+	/**
+	 * Specialized component validation, like for dates/times.
+	 * @return false if the component does not have valid data.
+	 */
+	// For now put this date/time code here.
+	// TODO: add componentValidate() as a default method to SSComponentInterface
+	// and move this to the date/time components.
+	private boolean componentValidate()
+	{
+		// NOTE: does not change any state.
+
+		SSComponentInterface comp = getSSComponent();
+		if (DateTime.isHandledDateTimeComp(comp)) {
+			if (!(comp instanceof JTextComponent jtc))
+				throw new IllegalArgumentException("only JTextComponent handled");
+			String text = jtc.getText();
+			// If the component has an SSMaskFormatter and there's no data
+			// then treat it as an empty string
+			if (comp instanceof SSFormattedTextField ftf) {
+				if (!ftf.containsUserText()) {
+					text = "";
+				}
+			}
+			if (!DateTime.dateTimeColumnValidate(text, comp)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 	
 	/**
 	 * Run the SSComponents validator, return the result.
+	 * 
 	 * @return true if valid
 	 */
-	public final boolean validate() {
-		// Check a possible date/time validation. TODO: how to disable, where to put
-		if (DateTime.isHandledDateTimeComp(getSSComponent())
-				&& !dateTimeColumnValidate(getSSComponent()))
+	public final boolean validate()
+	{
+		if (!componentValidate()) {
 			return false;
+		}
 
+		// Now invoke the user's validator
 		return validator.validate();
 	}
 

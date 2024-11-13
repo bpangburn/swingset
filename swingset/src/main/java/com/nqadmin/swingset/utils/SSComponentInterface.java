@@ -464,7 +464,7 @@ public interface SSComponentInterface extends RSC
 	 */
 	default void setupUndoRedoKeys() {
 		SSCommon.setupUndoRedoKeys(this);
-	};
+	}
 
 	/**
 	 * Add a change to this components undo/redo stack.
@@ -486,15 +486,34 @@ public interface SSComponentInterface extends RSC
 	default void undoRedoUpdateObject(UndoRedo cmd, Object value) throws SQLException
 	{
 		getSSCommon().undoRedoUpdateObject(cmd, value);
-	};
+	}
 
 	/**
-	 * Indication of whether or not the component decides its data is valid.
+	 * A low level indication of whether or not the component data is valid.
+	 * For example, a mask formatter indicates valid. Generally simple constraints
+	 * that are context independent.
 	 * There may be additional checks defined by a {@link Validator}; those
 	 * are not considered here.
 	 * @return false for error in data, otherwise true
 	 */
 	default boolean isDataValid() { return true; }
+
+	/**
+	 * The results of doing validation. <br>
+	 * {@linkplain comp} is typically isDataValid()<br>
+	 * {@linkplain all} is typically isDataValid() && validate()<br>
+	 */
+	record validResult(boolean comp, boolean all){}
+	/**
+	 * Run all the validators.
+	 * @return result
+	 */
+	default validResult isAllValid() {
+		boolean componentValid = isDataValid();
+		// NOTE: validate() is not invoked if not isDataValid().
+		boolean allValid = componentValid && getSSCommon().validate();
+		return new validResult(componentValid, allValid);
+	}
 
 	/**
 	 * Create and return the default {@link Decorator}

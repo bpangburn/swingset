@@ -90,11 +90,11 @@ public class BorderDecorator extends FocusDecorator
 	/** Decorate the component using current state. */
 	@Override
 	public boolean decorate() {
-		boolean dataValid = getComponent().getSSCommon().validate() && getComponent().isDataValid();
-		logger.log(TRACE, () -> String.format("%s focus: %s, dataValid: %s",
-				jc().getClass().getSimpleName(), fcomp().isFocusOwner(), dataValid));
+		SSComponentInterface.validResult valid = getComponent().isAllValid();
+		logger.log(TRACE, () -> String.format("%s focus: %s, compValid %s, allValid: %s",
+				jc().getClass().getSimpleName(), fcomp().isFocusOwner(), valid.comp(), valid.all()));
 		Border b;
-		if (dataValid) {
+		if (valid.all()) {
 			b = getBorder(fcomp().isFocusOwner() ? BorderState.OK : BorderState.DEFAULT);
 		} else {
 			b = getBorder(BorderState.ERROR);
@@ -103,7 +103,7 @@ public class BorderDecorator extends FocusDecorator
 		jc().setBorder(b);
 		// Why is the following here? It was in ss_formatted_text_field.
 		jc().setForeground(textColor != null ? textColor : Color.BLACK);
-		return dataValid;
+		return valid.all();
 	}
 
 	/** {@inheritDoc } */

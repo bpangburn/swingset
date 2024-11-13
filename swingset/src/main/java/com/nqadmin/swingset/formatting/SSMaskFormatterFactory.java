@@ -224,7 +224,7 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 
 	/** Uses setEditValid method to check that formatter should flip. */
 	@SuppressWarnings("serial")
-	protected static class SSMaskFormatter extends MaskFormatter {
+	public static class SSMaskFormatter extends MaskFormatter {
 
 		private final AbstractFormatter converter;
 		private final String maskLiterals;
@@ -348,7 +348,8 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		 * @param _text generally formatted text field
 		 * @return true if there is user input in the text
 		 */
-		protected boolean containsData (String _text) {
+		public boolean containsData (String _text) {
+			// NOTE: it's public must not change any state.
 			// first remove placeholder characters from the text
 			String text = _text.replace(String.valueOf(getPlaceholderCharacter()), "");
 			for (int i = 0; i < text.length(); i++) {
