@@ -74,6 +74,7 @@ import static java.sql.JDBCType.TIME;
 import static java.sql.JDBCType.TIMESTAMP;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 
 /**
  * Utility class for Date/Time handling. Parsing/formatting SQL
@@ -90,7 +91,25 @@ public class DateTime
 	private static final Map<JDBCType, DateTimeFormatter> dateTimeFormatterMap
 			= new EnumMap<>(JDBCType.class);
 
-	private static final boolean USE_MDY = true;
+	/** A style is one or more formats. Used to specify date types for parse. */
+	public enum DateParseStyle {
+		/** Custom Month/Day/Year */
+		MDY,
+		/** Some well know ISO formats. */
+		ISO,
+		/** All of the above. */
+		ALL
+	}
+	private static DateParseStyle date_parse = DateParseStyle.ALL;
+
+	private static DateTimeFormatter date_formatter = getMDYFormatter();
+
+	static {
+		if (Boolean.FALSE) {
+			date_parse = DateParseStyle.ALL;
+			date_formatter = ISO_LOCAL_DATE;
+		}
+	}
 
 	/**
 	 * Check if column is a handled; must be JDBC date/type and text component.
@@ -99,7 +118,7 @@ public class DateTime
 	 */
 	public static boolean isHandledDateTimeComp(SSComponentInterface comp)
 	{
-		return comp instanceof JTextComponent jtc
+		return comp instanceof JTextComponent
 				&& dateTimeHandled.contains(comp.getBoundColumnJDBCType());
 	}
 
@@ -146,10 +165,18 @@ public class DateTime
 		return dateTimeParsersMap.computeIfAbsent(jdbcType, 
 				(type) -> {
 					return switch(type) {
-					case DATE -> new ArrayList<>(USE_MDY
-							? List.of(getMDYParser())
-							: List.of(DateTimeFormatter.BASIC_ISO_DATE,
-									DateTimeFormatter.ISO_LOCAL_DATE));
+					case DATE -> 
+						new ArrayList<>(switch(date_parse) {
+						case MDY -> List.of(getMDYParser());
+						case ISO -> List.of(
+								DateTimeFormatter.BASIC_ISO_DATE,
+								DateTimeFormatter.ISO_LOCAL_DATE);
+						case ALL -> List.of(
+								getMDYParser(),
+								DateTimeFormatter.BASIC_ISO_DATE,
+								DateTimeFormatter.ISO_LOCAL_DATE);
+						default -> null;
+						});
 					case TIME -> new ArrayList<>(List.of(
 							DateTimeFormatter.ISO_LOCAL_TIME));
 					case TIMESTAMP -> new ArrayList<>(List.of(
@@ -172,8 +199,7 @@ public class DateTime
 		return dateTimeFormatterMap.computeIfAbsent(jdbcType, 
 				(type) -> {
 					return switch(type) {
-					case DATE -> USE_MDY
-							? getMDYFormatter() : DateTimeFormatter.ISO_LOCAL_DATE;
+					case DATE -> date_formatter;
 					case TIME -> DateTimeFormatter.ISO_LOCAL_TIME;
 					case TIMESTAMP -> DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 					default -> null;
@@ -204,7 +230,7 @@ public class DateTime
 		// Only handle JTextComponent for now
 		if (!(comp instanceof JTextComponent jtc))
 			throw new IllegalArgumentException("only JTextComponent handled");
-		String text = jtc.getText();
+		String text = jtc.getText(); // if ! OurMaskFormatter.containsData(text)
 		return internalDateTimeColumnParse(text, comp);
 	}
 

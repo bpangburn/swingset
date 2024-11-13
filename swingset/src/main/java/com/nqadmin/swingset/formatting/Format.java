@@ -79,9 +79,9 @@ public enum Format {
 	}
 
 	static Format getDefaultFormat(Format _format) {
-		switch(_format.getType()) {
-		case DATE: return DATE_DDMMYYYY;
-		}
-		return null;
+		return switch(_format.getType()) {
+		case DATE -> DATE_DDMMYYYY;
+		default -> null;
+		};
 	}
 }

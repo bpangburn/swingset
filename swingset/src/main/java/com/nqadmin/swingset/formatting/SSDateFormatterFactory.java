@@ -58,31 +58,8 @@ public class SSDateFormatterFactory {
 
 	private SSDateFormatterFactory(){}
 
-	/**
-	 * Constant for dd/MM/yyyy date format
-	 * @deprecated use {@link Format#DATE_DDMMYYYY}
-	 */
-	@Deprecated
-	public static final int DDMMYYYY = 1;
-
-	/**
-	 * Log4j Logger for component
-	 */
+	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
-
-	/**
-	 * Constant for MM/dd/yyyy date format
-	 * @deprecated use {@link Format#DATE_MMDDYYYY}
-	 */
-	@Deprecated
-	public static final int MMDDYYYY = 0;
-
-	/**
-	 * Constant for yyyy-MM-dd date format
-	 * @deprecated use {@link Format#DATE_YYYYMMDD}
-	 */
-	@Deprecated
-	public static final int YYYYMMDD = 2;
 
 	/**
 	 * Create formatter factory with default pattern.
@@ -90,30 +67,6 @@ public class SSDateFormatterFactory {
 	 */
 	public static DefaultFormatterFactory get() {
 		return get(Format.DATE);
-	}
-	/** compatibility
-	 * @param f
-	 * @return 
-	 */
-	@Deprecated
-	public static DefaultFormatterFactory get(int f) {
-		// Don't like the way default is buried in get
-		return get(getFormat(f));
-	}
-
-	// NOTE: package private
-	@Deprecated
-	static Format getFormat(final int _format) {
-		switch (_format) {
-		case MMDDYYYY:
-			return Format.DATE_MMDDYYYY;
-		case DDMMYYYY:
-			return Format.DATE_DDMMYYYY;
-		case YYYYMMDD:
-			return Format.DATE_YYYYMMDD;
-		default:
-			return Format.DATE;
-		}
 	}
 
 	/**
@@ -138,25 +91,25 @@ public class SSDateFormatterFactory {
 		String editPattern;
 		String maskLiterals;
 		switch(format){
-			case DATE_MMDDYYYY:
+			case DATE_MMDDYYYY -> {
 				formatMask = "##/##/####";
 				editPattern = "MMddyyyy";
 				maskLiterals = "/";
-				break;
-
-			case DATE_DDMMYYYY:
+			}
+			case DATE_DDMMYYYY -> {
 				formatMask = "##/##/####";
 				editPattern = "ddMMyyyy";
 				maskLiterals = "/";
-				break;
-			case DATE_YYYYMMDD:
+			}
+			case DATE_YYYYMMDD -> {
 				formatMask = "####-##-##";
 				editPattern = "yyyyMMdd";
 				maskLiterals = "-";
-				break;
-			default:
+			}
+			default -> {
 				logger.log(ERROR, "Unknown date format type of " + format);
 				return null;
+			}
 		}
 
 		return new SSMaskFormatterFactory.Builder<>(formatMask)

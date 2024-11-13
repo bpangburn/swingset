@@ -46,59 +46,28 @@ package com.nqadmin.swingset.formatting;
  * Used to link a SSFormattedTextField to a date column in a database.
  */
 
+@SuppressWarnings("serial")
 public class SSDateField extends SSFormattedTextField {
-
 	/**
-	 * constant representing the dd/mm/yyyy date format
-	 * @deprecated use {@link Format#DATE_DDMMYYYY}
-	 */
-	@Deprecated
-	public static final int DDMMYYYY = 1;
-
-	/**
-	 * constant representing the mm/dd/yyyy date format
-	 * @deprecated use {@link Format#DATE_MMDDYYYY}
-	 */
-	@Deprecated
-	public static final int MMDDYYYY = 0;
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 9138021901389692436L;
-
-	/**
-	 *  Creates a default SSDateField object
+	 *  Creates a default SSDateField object using the default date format.
 	 */
 	public SSDateField(){
 		this(SSDateFormatterFactory.get());
 	}
 
 	/**
-	 *  Creates a new instance of SSDateField with the specified format
-	 *  @param _format - format to be used while the date field is in edit mode
-	 *  allowed values are MMDDYYYY or DDMMYYYY or YYYYMMDD
+	 *  Creates a new instance of SSDateField with the specified format.
+	 *  @param _format - an enum format to be used while the date field is in edit mode
 	 */
 	public SSDateField(final Format _format) {
 		this(SSDateFormatterFactory.get(_format));
 	}
 
 	/**
-	 *  Creates a new instance of SSDateField with the specified format
-	 *  @param format - format to be used while the date field is in edit mode
-	 *  allowed values are MMDDYYYY or DDMMYYYY
-	 * @deprecated use {@link SSDateField#SSDateField(Format) }
-	 */
-	@Deprecated
-	public SSDateField(final int format) {
-		this(SSDateFormatterFactory.get(format));
-	}
-
-	/**
 	 * Creates an object of SSDateField with the specified formatter factory
 	 * @param factory - formatter factory to be used
 	 */
-	public SSDateField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+	public SSDateField(final AbstractFormatterFactory factory) {
 		super(factory);
 	}
 
