@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
 import java.text.ParseException;
@@ -212,8 +217,7 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 	 * @param _ftf 
 	 */
 	protected static void adjustNullFormatter(SSFormattedTextField _ftf) {
-		if (_ftf.getFormatterFactory() instanceof SSMaskFormatterFactory) {
-			SSMaskFormatterFactory ff = (SSMaskFormatterFactory) _ftf.getFormatterFactory();
+		if (_ftf.getFormatterFactory() instanceof SSMaskFormatterFactory ff) {
 			boolean allowNull = _ftf.getAllowNull();
 			boolean hasNullFormatter = ff.getNullFormatter() != null;
 			if (allowNull ^ hasNullFormatter) {
@@ -284,9 +288,16 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 		public String valueToString(Object value) throws ParseException {
 			String s = "";
 			if (value != null) {
-				if (value instanceof String) {
+				if (value instanceof String string) {
 					// handle the case where where was null formatter
-					s = (String) value;
+					s = string;
+					// Put this here as an experiment for the case where column is string
+					if (converter != null) {
+						s = converter.valueToString(value);
+					} else {
+						//s = value.toString();
+						s = string;
+					}
 				} else {
 					if (converter != null) {
 						s = converter.valueToString(value);
@@ -331,9 +342,9 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory {
 			// Check for empty string input.
 			// If empty and allows null, flip to NullFormatter
 			final JFormattedTextField ftf = getFormattedTextField();
-			if (ftf instanceof SSFormattedTextField) {
+			if (ftf instanceof SSFormattedTextField ssftf) {
 				// If doesn't allow null, don't even consider switching value
-				if (!((SSFormattedTextField)ftf).getAllowNull()) {
+				if (!ssftf.getAllowNull()) {
 					return;
 				}
 				if (containsData(ftf.getText())) {

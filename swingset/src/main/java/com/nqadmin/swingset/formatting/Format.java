@@ -35,23 +35,56 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
 /**
- * The various formats that are supported. There are Types, such as DATE and
- * subtypes such as DATE_MMDDYYYY. If the type is used, this is the default
- * format.
+ * The various formats that are supported for use in JFormattedTextField.
+ * There are Types, such as DATE and subtypes such as DATE_MMDDYYYY.
+ * If the type is used, this is the default format.
+ * <p>
+ * NOTE: Every format should be parseable in {@linkplain DateTime}.
  */
+// TODO: Need to make Format available for when somethings parsed,
+//		 consider MMDDYYYY vs DDMMYYYY.
 public enum Format {
 	/** default date format */
 	DATE,
 	/** Date MMDDYYYY */
-	DATE_MMDDYYYY  (DATE),
-	/** Date DDMMYYYY */
-	DATE_DDMMYYYY (DATE),
+	DATE_MMDDYYYY_SLASH  (DATE),
+	// /** Date DDMMYYYY */
+	// DATE_DDMMYYYY_SLASH (DATE),
 	/** Date YYYYMMDD */
-	DATE_YYYYMMDD (DATE) 
+	DATE_YYYYMMDD_STROKE (DATE),
+
+	/** default time format */
+	TIME,
+	/** Time HHMMSS */
+	TIME_HHMMSS (TIME),
+
+	/** default timestamp format */
+	TIMESTAMP,
+	/** Timestamp big */
+	TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ (TIMESTAMP),
+	/** Timestamp date-time, no milliseconds timezone */
+	TIMESTAMP_YYYYMMDD_STROKE_HHMMSS (TIMESTAMP),
+	/** Timestamp date, no date, milliseconds, timezone */
+	TIMESTAMP_YYYYMMDD_STROKE (TIMESTAMP),
 	;
+
+	static Format getDefaultFormat(Format _format) {
+		return switch(_format.getType()) {
+		case DATE -> DATE_MMDDYYYY_SLASH;
+		case TIME -> TIME_HHMMSS;
+		//case TIMESTAMP -> TIMESTAMP_YYYYMMDD_HHMMSS;
+		case TIMESTAMP -> TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ;
+		default -> null;
+		};
+	}
 
 	final private Format type;
 
@@ -76,12 +109,5 @@ public enum Format {
 	 */
 	public Format getType() {
 		return type;
-	}
-
-	static Format getDefaultFormat(Format _format) {
-		return switch(_format.getType()) {
-		case DATE -> DATE_DDMMYYYY;
-		default -> null;
-		};
 	}
 }

@@ -1,6 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
- * All rights reserved.
+ * Copyright (C) 2024, Ernie R. Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,18 +26,6 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- * Contributors:
- *   Prasanth R. Pasala
- *   Brian E. Pangburn
- *   Diego Gil
- *   Man "Bee" Vo
- *   Ernie R. Rael
- * ****************************************************************************/
-/* *****************************************************************************
- * The conditions in the above copyright notice apply to this copyright notice.
- * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.datasources;
 
@@ -51,6 +38,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.Temporal;
@@ -103,11 +91,15 @@ public class DateTime
 	private static DateParseStyle date_parse = DateParseStyle.ALL;
 
 	private static DateTimeFormatter date_formatter = getMDYFormatter();
+	private static DateTimeFormatter time_formatter = DateTimeFormatter.ISO_LOCAL_TIME;
+	private static DateTimeFormatter timestamp_formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 	static {
 		if (Boolean.FALSE) {
 			date_parse = DateParseStyle.ALL;
 			date_formatter = ISO_LOCAL_DATE;
+			time_formatter = DateTimeFormatter.ISO_LOCAL_TIME;
+			timestamp_formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 		}
 	}
 
@@ -180,10 +172,14 @@ public class DateTime
 						});
 					case TIME -> new ArrayList<>(List.of(
 							DateTimeFormatter.ISO_LOCAL_TIME));
-					case TIMESTAMP -> new ArrayList<>(List.of(
-							// DATE_TIMEs should be first
-							DateTimeFormatter.ISO_LOCAL_DATE_TIME,
-							DateTimeFormatter.ISO_LOCAL_DATE));
+					case TIMESTAMP -> {
+						ArrayList<DateTimeFormatter> l;
+						l = new ArrayList<>(getLongTimestampParsers());
+						l.addAll(List.of(DateTimeFormatter.ISO_LOCAL_DATE_TIME,
+										 //DateTimeFormatter.ofPattern("uuuu-M-d HH:mm:ss"),
+										 DateTimeFormatter.ISO_LOCAL_DATE));
+						yield l;
+					}
 					default -> null;
 					};
 				});
@@ -201,8 +197,8 @@ public class DateTime
 				(type) -> {
 					return switch(type) {
 					case DATE -> date_formatter;
-					case TIME -> DateTimeFormatter.ISO_LOCAL_TIME;
-					case TIMESTAMP -> DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+					case TIME -> time_formatter;
+					case TIMESTAMP -> timestamp_formatter;
 					default -> null;
 					};
 				});
@@ -216,6 +212,14 @@ public class DateTime
 	private static DateTimeFormatter getMDYParser()
 	{
 		return DateTimeFormatter.ofPattern("M/d/uuuu");
+	}
+
+	// These patterns have optional fraction and TZ.
+	// The one with '-' is like ISO, but no 'T'.
+	private static List<DateTimeFormatter> getLongTimestampParsers()
+	{
+		return List.of(DateTimeFormatter.ofPattern("M/d/uuuu HH:mm:ss[.SSS [xxx]]"),
+					   DateTimeFormatter.ofPattern("uuuu-M-d HH:mm:ss[.SSS[ xxx]]"));
 	}
 
 	private record DtoParse(Temporal dto, boolean isError, Exception ex) {}
@@ -244,7 +248,9 @@ public class DateTime
 				case TIMESTAMP -> {
 					// Prefer date/time but handle date only.
 					TemporalAccessor dt = formatter.parseBest(text,
-							LocalDateTime::from, LocalDate::from);
+							OffsetDateTime::from,
+							LocalDateTime::from,
+							LocalDate::from);
 					dto = switch(dt) {
 					case LocalDateTime ldt -> ldt;
 					case LocalDate ld -> LocalDateTime.of(ld, LocalTime.of(0, 0));
@@ -254,8 +260,9 @@ public class DateTime
 				}
 				return new DtoParse(dto, false, null);
 			} catch(DateTimeParseException ex) {
-				logger.log(DEBUG, () -> sf("%s '%s' fails for '%s' index %d",
-						comp.getColumnForLog(), formatter, text, ex.getErrorIndex()));
+				logger.log(DEBUG, () -> sf("%s at '%s', %s' fails for '%s' index %d",
+						comp.getColumnForLog(), text.substring(ex.getErrorIndex()),
+						formatter, text, ex.getErrorIndex()));
 				tex = ex;
 			}
 		}

@@ -1364,46 +1364,16 @@ public class SSCommon
 		_validator.install(ssComponent);
 		validator = _validator;
 	}
-
-	/**
-	 * Specialized component validation, like for dates/times.
-	 * @return false if the component does not have valid data.
-	 */
-	// For now put this date/time code here.
-	// TODO: add componentValidate() as a default method to SSComponentInterface
-	// and move this to the date/time components.
-	private boolean componentValidate()
-	{
-		// NOTE: does not change any state.
-
-		SSComponentInterface comp = getSSComponent();
-		if (DateTime.isHandledDateTimeComp(comp)) {
-			if (!(comp instanceof JTextComponent jtc))
-				throw new IllegalArgumentException("only JTextComponent handled");
-			String text = jtc.getText();
-			// If the component has an SSMaskFormatter and there's no data
-			// then treat it as an empty string
-			if (comp instanceof SSFormattedTextField ftf) {
-				if (!ftf.containsUserText()) {
-					text = "";
-				}
-			}
-			if (!DateTime.dateTimeColumnValidate(text, comp)) {
-				return false;
-			}
-		}
-
-		return true;
-	}
 	
 	/**
 	 * Run the SSComponents validator, return the result.
+	 * First check component specific validator, then plugin validator.
 	 * 
 	 * @return true if valid
 	 */
 	public final boolean validate()
 	{
-		if (!componentValidate()) {
+		if (!getSSComponent().componentValidate()) {
 			return false;
 		}
 

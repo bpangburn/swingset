@@ -79,17 +79,13 @@ import com.nqadmin.swingset.utils.SSUtils;
  * records and in the same order. Otherwise the SSSyncManager will spend a lot of
  * time looping through records to match.
  */
+@SuppressWarnings("serial")
 public class TestFormattedComponents extends JFrame {
 
 	/**
 	 * Log4j2 Logger
 	 */
     private static final Logger logger = SSUtils.getLogger();
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -1831202547517957436L;
 	
 	/**
 	 * screen label declarations
@@ -114,8 +110,8 @@ public class TestFormattedComponents extends JFrame {
 	SSTextField txtSwingSetFormattedTestPK = new SSTextField();
 	//SSCuitField fmtSSCuitField = new SSCuitField();
 	SSCurrencyField fmtSSCurrencyField = new SSCurrencyField();
-	SSDateField fmtSSDateField = new SSDateField(Format.DATE_MMDDYYYY);
-	SSDateField fmtSSDateFieldNull = new SSDateField(Format.DATE_YYYYMMDD);
+	SSDateField fmtSSDateField = new SSDateField(Format.DATE_MMDDYYYY_SLASH);
+	SSDateField fmtSSDateFieldNull = new SSDateField(Format.DATE_YYYYMMDD_STROKE);
 	SSFormattedTextField fmtSSFormattedTextField = new SSFormattedTextField();
 	SSIntegerField fmtSSIntegerField = new SSIntegerField();
 	SSNumericField fmtSSNumericField = new SSNumericField();
@@ -175,11 +171,6 @@ public class TestFormattedComponents extends JFrame {
 			 * re-queried following insert and delete with rowset.execute()
 			 */
 			navigator.setDBNav(new SSDBNavImpl(this) {
-				/**
-				 * unique serial id
-				 */
-				private static final long serialVersionUID = 4264119495814589191L;
-
 				/**
 				 * Re-enable DB Navigator following insertion Cancel
 				 */

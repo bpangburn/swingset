@@ -37,26 +37,20 @@
  ******************************************************************************/
 package com.nqadmin.swingset.formatting;
 
-// SSCurrencyField.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+import javax.swing.text.DefaultFormatterFactory;
 
 /**
  * Used to link a SSFormattedTextField to a US Social Security Number column in
  * a database.
  */
-public class SSSSNField extends SSFormattedTextField {
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -8330641913621926923L;
-
+@SuppressWarnings("serial")
+public class SSSSNField extends SSFormattedTextField
+{
 	/**
 	 * Creates a new instance of SSSSNField
 	 */
 	public SSSSNField() {
-		this(new SSSSNFormatterFactory());
+		this(createFormatterFactory());
 	}
 
 	/**
@@ -64,8 +58,22 @@ public class SSSSNField extends SSFormattedTextField {
 	 *
 	 * @param factory - formatter factory to be used
 	 */
-	public SSSSNField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+	public SSSSNField(final AbstractFormatterFactory factory) {
 		super(factory);
+	}
+
+	/**
+	 * SSN MaskFormatterFactory.
+	 * @return SSN factory
+	 */
+	public static DefaultFormatterFactory createFormatterFactory() {
+		String formatMask = "###-##-####";
+		String maskLiterals = "-";
+		return new SSMaskFormatterFactory.Builder<>(formatMask)
+				.valueContainsLiteral(true) // database string includes the '-'
+				.maskLiterals(maskLiterals)
+				.placeholder('_')
+				.build();
 	}
 }
 

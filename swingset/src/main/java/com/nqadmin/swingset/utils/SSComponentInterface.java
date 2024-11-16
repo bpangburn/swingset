@@ -499,11 +499,18 @@ public interface SSComponentInterface extends RSC
 	default boolean isDataValid() { return true; }
 
 	/**
+	 * This has component specific validation, for example for a SSDateField.
+	 * @return true if successful validation for the type of component
+	 */
+	default boolean componentValidate() { return true; }
+
+	/**
 	 * The results of doing validation. <br>
-	 * {@linkplain comp} is typically isDataValid()<br>
-	 * {@linkplain all} is typically isDataValid() && validate()<br>
+	 * @param comp is typically isDataValid()
+	 * @param all is typically isDataValid() && validate()
 	 */
 	record validResult(boolean comp, boolean all){}
+
 	/**
 	 * Run all the validators.
 	 * @return result
