@@ -42,6 +42,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
+import java.awt.Font;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
@@ -61,6 +62,8 @@ import javax.swing.text.DefaultFormatterFactory;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 
+import javax.swing.text.MaskFormatter;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
@@ -71,8 +74,8 @@ import com.nqadmin.swingset.utils.SSUtils;
 import com.nqadmin.swingset.decorators.TextDecorationStyle;
 import com.nqadmin.swingset.decorators.TextDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
-import com.nqadmin.swingset.formatting.SSMaskFormatterFactory.SSMaskFormatter;
 
+import static com.nqadmin.swingset.formatting.SSMaskFormatterFactory.containsData;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
@@ -215,6 +218,8 @@ public class SSFormattedTextField extends JFormattedTextField
 		public void propertyChange(final PropertyChangeEvent _pce) {
 
 			if (_pce.getPropertyName().equals("value")) {
+
+				final SSFormattedTextField ftf = SSFormattedTextField.this;
 				
 				// If this property change was triggered by FormattedTextFieldVerifier
 				// return with no action
@@ -222,10 +227,9 @@ public class SSFormattedTextField extends JFormattedTextField
 
 				ssCommon.removeRowSetListener();
 
-				final SSFormattedTextField ftf = (SSFormattedTextField) _pce.getSource();
 
 				final Object currentValue = ftf.getValue();
-				logger.log(INFO, ()->sf("%s: Object to be passed to database is %s.",
+				logger.log(INFO, ()->sf("%s: Object passed to database: '%s'.",
 						getColumnForLog(), currentValue));
 
 				// TODO May want to see if we can veto invalid updates
@@ -365,6 +369,15 @@ public class SSFormattedTextField extends JFormattedTextField
 			clearForceErrorFlag();
 		});
 
+		// TODO: plugin for default mono font and if should be used.
+		// Courier New?
+		if (getFormatter() instanceof MaskFormatter) {
+			Font currentFont = getFont();
+			//Font monoFont = new Font("Monospaced", currentFont.getStyle(), currentFont.getSize());
+			Font monoFont = new Font(Font.MONOSPACED, currentFont.getStyle(), currentFont.getSize());
+			//String fontName = monoFont.getFontName();
+			setFont(monoFont);
+		}
 	}
 
 	/**
@@ -503,12 +516,15 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * @return true if there is user input
 	 */
 	public boolean containsUserText() {
-		if (getFormatter() instanceof SSMaskFormatter mf) {
-			return mf.containsData(getText());
-		} else {
-			// TODO: AbstractFormatter
+		AbstractFormatter f = getFormatter();
+		boolean hasText = switch (f) {
+		case MaskFormatter mf -> containsData(mf, getText());
+		//case SSDefaultFormatter -> only to provide literal chars not in data?
+		default -> {
+			yield true;
 		}
-		return true;
+		};
+		return hasText;
 	}
 
 	/** Set this if verify fails, gets cleared if "editValid" property change. */

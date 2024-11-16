@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
 import javax.swing.text.DefaultFormatterFactory;
@@ -68,11 +73,9 @@ public class SSSSNField extends SSFormattedTextField
 	 */
 	public static DefaultFormatterFactory createFormatterFactory() {
 		String formatMask = "###-##-####";
-		String maskLiterals = "-";
 		return new SSMaskFormatterFactory.Builder<>(formatMask)
-				.valueContainsLiteral(true) // database string includes the '-'
-				.maskLiterals(maskLiterals)
-				.placeholder('_')
+				.valueContainsLiterals(true) // database string includes the '-'
+				.placeholderCharacter('_')
 				.build();
 	}
 }

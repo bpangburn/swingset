@@ -37,12 +37,20 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
+import java.text.ParseException;
+import java.util.List;
+
+import javax.swing.text.MaskFormatter;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static com.nqadmin.swingset.formatting.SSMaskFormatterFactory.getMaskLiterals;
+import static com.nqadmin.swingset.formatting.SSMaskFormatterFactory.getMaskLiteralsAndPositions;
+import static com.nqadmin.swingset.formatting.SSMaskFormatterFactory.userText;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -180,14 +188,14 @@ public class SSMaskFormatterFactoryTest {
 		CustomParentFormatterFactory.CustomParentBuilder<?> b
 				= new CustomParentFormatterFactory
 						.CustomParentBuilder<>("##/##", "parentArg")
-						.maskLiterals("AB").parentParam("parentParam");
+						.parentParam("parentParam");
 		CustomParentFormatterFactory ff = b.build();
 		assertEquals("parentArg", ff.getParentArg());
 		assertEquals("parentParam", ff.getParentParam());
 		SSMaskFormatterFactory.SSMaskFormatter f
 				= (SSMaskFormatterFactory.SSMaskFormatter) ff.getDefaultFormatter();
 		assertEquals("##/##", f.getMask());
-		assertEquals("AB", f.getLiterals());
+		assertEquals("/", getMaskLiterals(f.getMask()));
 	}
 
 	/** x */
@@ -196,7 +204,6 @@ public class SSMaskFormatterFactoryTest {
 		CustomChildFormatterFactory.CustomChildBuilder<?> b
 				= new CustomChildFormatterFactory
 						.CustomChildBuilder<>("##/##", "parentArg", "childArg")
-						.maskLiterals("AB")
 						.parentParam("parentParam").childParam("childParam");
 		CustomChildFormatterFactory ff = b.build();
 		assertEquals("parentArg", ff.getParentArg());
@@ -206,7 +213,45 @@ public class SSMaskFormatterFactoryTest {
 		SSMaskFormatterFactory.SSMaskFormatter f
 				= (SSMaskFormatterFactory.SSMaskFormatter) ff.getDefaultFormatter();
 		assertEquals("##/##", f.getMask());
-		assertEquals("AB", f.getLiterals());
+		assertEquals("/", getMaskLiterals(f.getMask()));
+	}
+
+	/** x */
+	@Test
+	public void testGetMaskLiteralsAndPositions() {
+		SSMaskFormatterFactory.LiteralsAndPositions lp;
+
+		lp = getMaskLiteralsAndPositions("##-## ##:#");
+		assertEquals("- :", lp.literals());
+		assertEquals(List.of(2, 5, 8), lp.positions());
+
+		lp = getMaskLiteralsAndPositions("####-##-## ##:##:##.### *##:##");
+		assertEquals("-- ::. :", lp.literals());
+		assertEquals(List.of(4, 7, 10, 13, 16, 19, 23, 27), lp.positions());
+
+		lp = getMaskLiteralsAndPositions("##-## H ##:#");
+		assertEquals("-  :", lp.literals());
+		assertEquals(List.of(2, 5, 7, 10), lp.positions());
+
+		lp = getMaskLiteralsAndPositions("##-## 'H ##:#");
+		assertEquals("- H :", lp.literals());
+		assertEquals(List.of(2, 5, 6, 7, 10), lp.positions());
+	}
+
+	/** x */
+	@Test
+	public void testUserText() throws ParseException {
+		String text;
+		MaskFormatter mf = new MaskFormatter();
+		mf.setMask("##-## ##:#");
+		assertEquals("", text = userText(mf, "  -     :  "));
+		assertEquals("12", text = userText(mf, "  -1   2:  "));
+		assertEquals("________", text = userText(mf, "__-__ __:__"));
+		assertEquals("_1__3___", text = userText(mf, "_1-__ 3_:__"));
+
+		mf.setPlaceholderCharacter('_');
+		assertEquals("", text = userText(mf, "__-__ __:__"));
+		assertEquals("13", text = userText(mf, "_1-__ 3_:__"));
 	}
 
 	/**

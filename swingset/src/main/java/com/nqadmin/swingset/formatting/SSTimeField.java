@@ -107,12 +107,10 @@ public class SSTimeField extends DateTimeField
 		}
 		String formatMask;
 		String editPattern;
-		String maskLiterals;
 		switch(format) {
 		case TIME_HHMMSS -> {
 			formatMask = "##:##:##";
 			editPattern = "HHmmss";
-			maskLiterals = ":";
 		}
 		default -> {
 			logger.log(Level.ERROR, "Unknown date format type of " + format);
@@ -121,7 +119,7 @@ public class SSTimeField extends DateTimeField
 		}
 		return new SSMaskFormatterFactory.Builder<>(formatMask)
 				.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
-				.maskLiterals(maskLiterals).placeholder('_')
+				.placeholderCharacter('_')
 				.build();
 	}
 }

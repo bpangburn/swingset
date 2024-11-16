@@ -49,15 +49,23 @@ package com.nqadmin.swingset.formatting;
  * <p>
  * NOTE: Every format should be parseable in {@linkplain DateTime}.
  */
-// TODO: Need to make Format available for when somethings parsed,
-//		 consider MMDDYYYY vs DDMMYYYY.
+// TODO: Need to make Format available for when somethings parsed by DateTime,
+//		 consider MMDDYYYY vs DDMMYYYY. The "editPattern" with the "*Field"
+//		 components has that info. Want the field tooltip for the format.
+//		 Maybe end up with a "FormatInfo" that has format specific stuff.
+//
+//		 Consider: Format has SLASH vs STROKE property.
+//
+//		 One question, how can a user define a Format? Have a base
+//		 "class Format<E extends Enum<E>>" that can be extended?
+//
 public enum Format {
 	/** default date format */
 	DATE,
 	/** Date MMDDYYYY */
 	DATE_MMDDYYYY_SLASH  (DATE),
-	// /** Date DDMMYYYY */
-	// DATE_DDMMYYYY_SLASH (DATE),
+	/** Date DDMMYYYY */
+	DATE_DDMMYYYY_SLASH (DATE),
 	/** Date YYYYMMDD */
 	DATE_YYYYMMDD_STROKE (DATE),
 

@@ -115,23 +115,19 @@ public class SSTimestampField extends DateTimeField
 		}
 		String formatMask;
 		String editPattern;
-		String maskLiterals;
 		switch(format) {
 		case TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ -> {
 			formatMask = "####-##-## ##:##:##.### *##:##";
 			// TODO: try "xxx" not "Z".
 			editPattern = "yyyyMMddHHmmssSSSZ";
-			maskLiterals = "-: .";
 		}
 		case TIMESTAMP_YYYYMMDD_STROKE_HHMMSS -> {
 			formatMask = "####-##-## ##:##:##";
 			editPattern = "yyyyMMddHHmmss";
-			maskLiterals = "-: ";
 		}
 		case TIMESTAMP_YYYYMMDD_STROKE -> {
 			formatMask = "####-##-##";
 			editPattern = "yyyyMMdd";
-			maskLiterals = "-";
 		}
 		default -> {
 			logger.log(Level.ERROR, "Unknown date format type of " + format);
@@ -140,7 +136,7 @@ public class SSTimestampField extends DateTimeField
 		}
 		return new SSMaskFormatterFactory.Builder<>(formatMask)
 				.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
-				.maskLiterals(maskLiterals).placeholder('_')
+				.placeholderCharacter('_')
 				.build();
 	}
 }

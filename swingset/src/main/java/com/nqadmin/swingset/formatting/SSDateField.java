@@ -109,22 +109,19 @@ public class SSDateField extends DateTimeField {
 		}
 		String formatMask;
 		String editPattern;
-		String maskLiterals;
 		switch(format) {
 		case DATE_MMDDYYYY_SLASH -> {
 			formatMask = "##/##/####";
 			editPattern = "MMddyyyy";
-			maskLiterals = "/";
 		}
+		//// TODO: DateTime needs to know the format to distinguish DDMM from MMDD
 		//case DATE_DDMMYYYY_SLASH -> {
 		//	formatMask = "##/##/####";
 		//	editPattern = "ddMMyyyy";
-		//	maskLiterals = "/";
 		//}
 		case DATE_YYYYMMDD_STROKE -> {
 			formatMask = "####-##-##";
 			editPattern = "yyyyMMdd";
-			maskLiterals = "-";
 		}
 		default -> {
 			logger.log(Level.ERROR, "Unknown date format type of " + format);
@@ -134,7 +131,7 @@ public class SSDateField extends DateTimeField {
 		
 		return new SSMaskFormatterFactory.Builder<>(formatMask)
 				.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
-				.maskLiterals(maskLiterals).placeholder('_')
+				.placeholderCharacter('_')
 				.build();
 	}
 }
