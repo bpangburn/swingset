@@ -46,8 +46,6 @@ package com.nqadmin.swingset.formatting;
  * The various formats that are supported for use in JFormattedTextField.
  * There are Types, such as DATE and subtypes such as DATE_MMDDYYYY.
  * If the type is used, this is the default format.
- * <p>
- * NOTE: Every format should be parseable in {@linkplain DateTime}.
  */
 // TODO: Need to make Format available for when somethings parsed by DateTime,
 //		 consider MMDDYYYY vs DDMMYYYY. The "editPattern" with the "*Field"
@@ -60,6 +58,8 @@ package com.nqadmin.swingset.formatting;
 //		 "class Format<E extends Enum<E>>" that can be extended?
 //
 public enum Format {
+	/** special circumstances or if format not needed (testing) */
+	CUSTOM,
 	/** default date format */
 	DATE,
 	/** Date MMDDYYYY */
@@ -83,6 +83,11 @@ public enum Format {
 	/** Timestamp date, no date, milliseconds, timezone */
 	TIMESTAMP_YYYYMMDD_STROKE (TIMESTAMP),
 	;
+
+	// TODO: look up the format as needed.
+	static Format getAssignedFormat(Format format) {
+		return format.isBase() ? getDefaultFormat(format) : format;
+	}
 
 	static Format getDefaultFormat(Format _format) {
 		return switch(_format.getType()) {

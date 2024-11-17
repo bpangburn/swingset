@@ -47,6 +47,8 @@ import java.sql.SQLException;
 
 import javax.sql.RowSet;
 
+import com.nqadmin.swingset.formatting.Format;
+
 /**
  * This interface is an accessor to a {@linkplain RowSet} and one of its
  * columns; it is extended by {@link com.nqadmin.swingset.utils.SSComponentInterface}.
@@ -71,6 +73,9 @@ public interface RSC
 	 * @throws SSSQLRuntimeException
 	 */
 	static RSC get(RowSet rs, int columnIndex) {
+		//
+		// TODO: accept format, implement in SimpleRSC
+		//
 		try {
 			return new SimpleRSC(rs, columnIndex);
 		} catch (SQLException ex) {
@@ -133,6 +138,12 @@ public interface RSC
 	 */
 	<T> T getBoundColumnObject(Class<T> clazz);
 	//<T> T getTypedObject() throws SQLException;
+
+	/**
+	 * A component may have a display/parse format.
+	 * @return The format for this component
+	 */
+	default Format getFormat() { return null; }
 
 	/**
 	 * @return Does the column allow null?

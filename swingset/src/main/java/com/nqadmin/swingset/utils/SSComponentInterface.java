@@ -57,6 +57,7 @@ import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
+import com.nqadmin.swingset.formatting.Format;
 import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 import com.nqadmin.swingset.navigate.RowSetModificationEvent;
@@ -487,6 +488,19 @@ public interface SSComponentInterface extends RSC
 	{
 		getSSCommon().undoRedoUpdateObject(cmd, value);
 	}
+
+	/**
+	 * A component may have a display/parse format.Especially used in
+	 * conjunction with, but not limited to, {@linkplain SSFormattedTextField}.
+	 * @param format format for this component
+	 */
+	default void setFormat(Format format) { getSSCommon().setFormat(format); }
+
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	default Format getFormat() { return getSSCommon().getFormat(); }
 
 	/**
 	 * A low level indication of whether or not the component data is valid.

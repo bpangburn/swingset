@@ -75,7 +75,6 @@ import com.nqadmin.swingset.decorators.TextDecorationStyle;
 import com.nqadmin.swingset.decorators.TextDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
 
-import static com.nqadmin.swingset.formatting.SSMaskFormatterFactory.containsData;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
@@ -311,7 +310,11 @@ public class SSFormattedTextField extends JFormattedTextField
 	 *
 	 * @param _factory AbstractFormatterFactory used for formatting.
 	 */
+	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSFormattedTextField(final AbstractFormatterFactory _factory) {
+		// Let the constructor complete before setting the factory
+		// to avoid getSSCommon returning null.
+		//super(_factory);
 		this();
 		setFormatterFactory(_factory);
 	}
@@ -319,15 +322,53 @@ public class SSFormattedTextField extends JFormattedTextField
 	// WE DON'T WANT TO REPLICATE THE JFormattedTextField CONSTRUCTOR THAT ACCEPTS
 	// AN OBJECT. FOR SWINGSET THAT SHOULD BE HANDLED SEPARATELY WITH BINDING.
 
+	// TO SUPPORT THIS NEED TO SET UP "constructingSSCommon()" like in SSTextField.
+	// OR PUT setFormat(ff.getFormat()); after construction is complete
+	// getSSCommon is also used for getAllowNull which is used from setEditValid
+	// which is used when the formatterFactory is set.
+	// The main idea is to defer setFormatterFactory until after ssCommon is done.
+	// getSSCommon could create and use constructingSSCommon until ssCommon
+	// has been initialized from the constructor.
+	//
+	// /**
+	//  * Creates a new instance of SSFormattedTextField
+	//  *
+	//  * @param _format Format used to look up an AbstractFormatter
+	//  */
+	// public SSFormattedTextField(final Format _format) {
+	// 	// Don't need "this()" since _format can't access
+	// 	// things in SSFormattedTextField.
+	// 	super(_format);
+	// }
+
 	/**
-	 * Creates a new instance of SSFormattedTextField
-	 *
-	 * @param _format Format used to look up an AbstractFormatter
+	 * {@inheritDoc }
 	 */
-	public SSFormattedTextField(final Format _format) {
-		// Don't need "this()" since _format can't access
-		// things in SSFormattedTextField.
-		super(_format);
+	@Override
+	public void setFormatterFactory(AbstractFormatterFactory factory)
+	{
+		super.setFormatterFactory(factory);
+		if (getSSCommon() == null) // HACK
+			return;
+		factorySet();
+	}
+	private void factorySet() {
+		if (getFormatterFactory() instanceof FormatterFactory ff) {
+			setFormat(ff.getFormat());
+		}
+		adjustFont();
+	}
+
+	private void adjustFont() {
+		// TODO: plugin for default mono font and if should be used.
+		// Courier New?
+		if (getFormatterFactory() instanceof SSMaskFormatterFactory) {
+			Font currentFont = getFont();
+			//Font monoFont = new Font("Monospaced", currentFont.getStyle(), currentFont.getSize());
+			Font monoFont = new Font(Font.MONOSPACED, currentFont.getStyle(), currentFont.getSize());
+			//String fontName = monoFont.getFontName();
+			setFont(monoFont);
+		}
 	}
 
 	/**
@@ -368,16 +409,6 @@ public class SSFormattedTextField extends JFormattedTextField
 			logger.log(TRACE, sf("editValid: isValid %s", e.getNewValue()));
 			clearForceErrorFlag();
 		});
-
-		// TODO: plugin for default mono font and if should be used.
-		// Courier New?
-		if (getFormatter() instanceof MaskFormatter) {
-			Font currentFont = getFont();
-			//Font monoFont = new Font("Monospaced", currentFont.getStyle(), currentFont.getSize());
-			Font monoFont = new Font(Font.MONOSPACED, currentFont.getStyle(), currentFont.getSize());
-			//String fontName = monoFont.getFontName();
-			setFont(monoFont);
-		}
 	}
 
 	/**
@@ -512,19 +543,20 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	/**
 	 * Determine if there are user input characters. A formatted text field might
-	 * contain only the format pattern and no input characters.
+	 * contain only the format pattern and no input characters. If there is
+	 * insufficient information to determine the result, true is returned.
 	 * @return true if there is user input
 	 */
 	public boolean containsUserText() {
+
 		AbstractFormatter f = getFormatter();
-		boolean hasText = switch (f) {
-		case MaskFormatter mf -> containsData(mf, getText());
+		return switch (f) {
+		case MaskFormatter mf -> FormatterAssist.containsUserText( getText(), mf);
 		//case SSDefaultFormatter -> only to provide literal chars not in data?
 		default -> {
-			yield true;
+			yield !getText().isEmpty();
 		}
 		};
-		return hasText;
 	}
 
 	/** Set this if verify fails, gets cleared if "editValid" property change. */
@@ -576,12 +608,12 @@ public class SSFormattedTextField extends JFormattedTextField
 		SSComponentInterface.super.setAllowNull(_allowNull);
 		checkNeedsNullFormatter();
 	}
-
+	
 	private void checkNeedsNullFormatter() {
 		// NOTE: following does nothing, if not our mask formatter
-		SSMaskFormatterFactory.adjustNullFormatter(this);
+		FormatterAssist.adjustNullFormatter(this);
 	}
-
+	
 	/** {@inheritDoc} */
 	@Override
 	public String toString()
@@ -589,5 +621,5 @@ public class SSFormattedTextField extends JFormattedTextField
 		return sf("%s{text=%s, %s}", getClass().getSimpleName(),
 				getText(), SSUtils.ssComponentToString(this));
 	}
-
+	
 }

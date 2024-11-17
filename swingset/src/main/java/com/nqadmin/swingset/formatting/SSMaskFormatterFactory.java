@@ -44,23 +44,18 @@ package com.nqadmin.swingset.formatting;
 
 import java.text.ParseException;
 
-import javax.swing.JFormattedTextField;
 import javax.swing.JFormattedTextField.AbstractFormatter;
-import javax.swing.text.DefaultFormatter;
-import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 
 import java.lang.System.Logger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSUtils;
-
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
  * A FormatterFactory, with formatters based on MaskFormatter, which uses
@@ -115,138 +110,22 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * <p>
  */
 @SuppressWarnings("serial")
-public class SSMaskFormatterFactory extends DefaultFormatterFactory
+public class SSMaskFormatterFactory extends FormatterFactory
 {
 	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
 
-	private static final String FORMATTING_CHARS = "#ULA?*H";
 	/**
-	 * There is a 1-1 correspondance between the literals and the positions
-	 * of where they show up in a value formatted by the mask.
-	 * So {@linkplain literals} may have duplicates and {@linkplain positions}
-	 * will not match the mask when there are escaped formatting characters.
-	 * @param literals
-	 * @param positions
-	 */
-	public static record LiteralsAndPositions(String literals, List<Integer> positions) {
-		public LiteralsAndPositions {
-		if (literals.length() != positions.size())
-			throw new IllegalArgumentException("size mismatch");
-		}
-	}
-
-	/** 
-	 * Find the characters in mask that are literals. The literals are not
-	 * the formatting characters. Note that there is no consideration for chars
-	 * beyond utf-16.
-	 * @param mask a formatting mask
-	 * @return the literals in the mask
-	 */
-	public static String getMaskLiterals(String mask)
-	{
-		String allLiterals = getMaskLiteralsAndPositions(mask).literals;
-		
-		String noDuplicates = Arrays.asList(allLiterals.split(""))
-				.stream()
-				.distinct()
-				.collect(Collectors.joining());
-		return noDuplicates;
-	}
-
-	// TODO: could have a private version of following that only creates
-	//		 sb/l if needed. Use null and adjust record valid check.
-	/** 
-	 * Find the characters in mask that are literals. The literals are not
-	 * the formatting characters. Note that there is no consideration for chars
-	 * beyond utf-16.
-	 * @param mask a formatting mask
-	 * @return the literals in the mask
-	 */
-	public static  LiteralsAndPositions getMaskLiteralsAndPositions(String mask)
-	{
-		StringBuilder sb = new StringBuilder();
-		List<Integer> l = new ArrayList<>();	// positions of literals from mask
-		int position = 0;
-		for (int i = 0; i < mask.length(); i++, position++) {
-			char c = mask.charAt(i);
-			if (Character.isHighSurrogate(c))
-				throw new IllegalArgumentException(sf("mask '%s' contains Unicode supplementary characters", mask));
-			if (FORMATTING_CHARS.indexOf(c) >= 0)
-				continue;
-			if (c == '\'') {
-				// The following character is a literal
-				i++;
-				c = mask.charAt(i);
-			}
-			sb.append(c);
-			l.add(position);
-		}
-		return new LiteralsAndPositions(sb.toString(), l);
-	}
-	
-	/**
-	 * Check the string for user data.
-	 * @param mf MaskFormatter that contains the text
-	 * @param _text generally formatted text field
-	 * @return true if there is user input in the text
-	 */
-	public static boolean containsData (MaskFormatter mf, String _text) {
-		// NOTE: it's public must not change any state.
-		// first remove placeholder characters from the text
-		// TODO: is the getPlaceholderCharacter needed/right? Optional?
-		String text = _text.replace(String.valueOf(mf.getPlaceholderCharacter()), "");
-		String lits = SSMaskFormatterFactory.getMaskLiterals(mf.getMask());
-		for (int i = 0; i < text.length(); i++) {
-			String c = String.valueOf(text.charAt(i));
-			if (!lits.contains(c)) {
-				// encountered some data, not empty
-				return true;
-			}
-		}
-		return false;
-	}
-
-	// TODO: tests
-	/**
+	 * To build a new FormatterFactory with the specified parameters. Unless noted,
+	 * a parameter is used when constructing the MaskFormatter.
 	 *
-	 * @param mf
-	 * @param text
-	 * @return
-	 */
-	public static String userText(MaskFormatter mf, String text) {
-		List<Integer> posLiterals = getMaskLiteralsAndPositions(mf.getMask()).positions();
-		// TODO: use reversed when full jdk-21
-		if (!posLiterals.isEmpty() || mf.getPlaceholder() != null) {
-			StringBuilder sb = new StringBuilder(text);
-			// start at the end so the indexes don't change
-			for (int i = posLiterals.size() - 1; i >= 0; i--) {
-				int pos = posLiterals.get(i);
-				if (pos < sb.length())
-					sb.deleteCharAt(pos);
-			}
-			// TODO: needs work
-			// Following gets weird if the place holder char is legit.
-			// Is it weird if initial text is shorter that mask.
-			char c = mf.getPlaceholderCharacter();
-			for (int pos = sb.length() - 1; pos >= 0; pos--) {
-				if (sb.charAt(pos) == c)
-					sb.deleteCharAt(pos);
-			}
-			return sb.toString();
-		}
-		return "";
-	}
-
-	/**
-	 * Get a new FormatterFactory with the specified parameters.Unless noted,
-	 * a parameter is used when constructing the MaskFormatter.<p>
-	 * <p>
-	 * TODO: extend to allow specification of a displayFormatter.
+	 * @param <T> 
 	 * @see <em>Effective Java</em> Item 2 about override.
-	 * @param <T>
+	 * @see https://www.baeldung.com/java-builder-pattern-inheritance
 	 */
-	public static class Builder<T extends Builder<T>> {
+	public static class Builder<T extends Builder<T>>
+			extends FormatterFactory.Builder<T>
+	{
 		// Required params
 		private final String mask;
 		// Optional params
@@ -255,7 +134,6 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory
 		private String placeholder = null;
 		private Character placeholderCharacter = null;
 		private boolean valueContainsLiterals = false;
-		private AbstractFormatter converter = null;
 
 		/**
 		 * Create the builder.
@@ -285,25 +163,10 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory
 		 * @param val
 		 * @return  builder */
 		public T valueContainsLiterals(boolean val) { valueContainsLiterals = val; return self(); }
-		/** Used by the mask formatter in string2Value and value2String.
-		 * It's the last step in stringToValue; it produces the Value
-		 * in the formatted text field.
-		 * @param val
-		 * @return  builder */
-		public T converter(AbstractFormatter val) { converter = val; return self(); }
 
 		/** create the factory
 		 * @return the factory */
 		public SSMaskFormatterFactory build() { return new SSMaskFormatterFactory(this); }
-		/**
-		 *
-		 * @return
-		 */
-
-		@SuppressWarnings("unchecked")
-		protected T self() {
-			return (T) this;
-		}
 
 		/**
 		 * Override this to provide custom SSMaskFormatter.
@@ -311,8 +174,31 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory
 		 * @return
 		 * @throws ParseException 
 		 */
-		protected SSMaskFormatter getSSMaskFormatter(Builder<?> builder) throws ParseException {
-			return new SSMaskFormatter(builder);
+		private SSMaskFormatter getSSMaskFormatter() throws ParseException
+		{
+			SSMaskFormatter mf = new SSMaskFormatter(
+					Objects.requireNonNull(mask, "must specify mask"), getConverter());
+			if (validCharacters != null) {
+				mf.setValidCharacters(validCharacters);
+			}
+			if (invalidCharacters != null) {
+				mf.setValidCharacters(invalidCharacters);
+			}
+			if (placeholder != null) {
+				mf.setPlaceholder(placeholder);
+			}
+			if (placeholderCharacter != null) {
+				mf.setPlaceholderCharacter(placeholderCharacter);
+			}
+			mf.setValueContainsLiteralCharacters(valueContainsLiterals);
+
+			// NOTE:  following required to flip as needed
+			// DO NOT CHANGE
+			mf.setCommitsOnValidEdit(true);
+
+			// DO NOT CHANGE --- TODO: NEEDED?
+			mf.setValueClass(String.class);
+			return mf;
 		}
 	}
 
@@ -320,76 +206,55 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory
 	 * Create the factory, populate it with mask formatter.
 	 * @param builder
 	 */
-
 	protected SSMaskFormatterFactory(Builder<?> builder) {
+		super(builder);
 		try {
-			SSMaskFormatter mf = builder.getSSMaskFormatter(builder);
+			SSMaskFormatter mf = builder.getSSMaskFormatter();
 			setDefaultFormatter(mf);
 		} catch (ParseException ex) {
 			logger.log(ERROR, "Bad mask format: " + builder.mask);
 		}
 	}
-	
-	/**
-	 * Ensure that a FormattedTextField's
-	 * DefaultFormatterFactory's NullFormatter is set
-	 * consistent with getAllowNull. If they do not agree, then
-	 * the factory's null formatter is set/cleared as needed.
-	 * 
-	 * @param _ftf 
-	 */
-	protected static void adjustNullFormatter(SSFormattedTextField _ftf) {
-		if (_ftf.getFormatterFactory() instanceof SSMaskFormatterFactory ff) {
-			boolean allowNull = _ftf.getAllowNull();
-			boolean hasNullFormatter = ff.getNullFormatter() != null;
-			if (allowNull ^ hasNullFormatter) {
-				ff.setNullFormatter(allowNull ? new SSNullFormatter() : null);
-			}
-		}
-	}
 
 	/** Uses setEditValid method to check that formatter should flip. */
 	@SuppressWarnings("serial")
-	public static class SSMaskFormatter extends MaskFormatter {
+	public static class SSMaskFormatter extends MaskFormatter implements FormatterAssist {
+
+		/** MaskFormatter valid formatted input chars */
+		public static final String FORMATTING_CHARS = "#ULA?*H";
 
 		private final AbstractFormatter converter;
 
 		/**
-		 * 
-		 * @param builder
+		 * Create the factory's MaskFormatter.
+		 * @param mask
+		 * @param converter
 		 * @throws ParseException 
 		 */
-		protected SSMaskFormatter(Builder<?> builder) throws ParseException {
-			super(builder.mask);
-			if (builder.validCharacters != null) {
-				setValidCharacters(builder.validCharacters);
-			}
-			if (builder.invalidCharacters != null) {
-				setValidCharacters(builder.invalidCharacters);
-			}
-			if (builder.placeholder != null) {
-				setPlaceholder(builder.placeholder);
-			}
-			if (builder.placeholderCharacter != null) {
-				setPlaceholderCharacter(builder.placeholderCharacter);
-			}
-			setValueContainsLiteralCharacters(builder.valueContainsLiterals);
-			converter = builder.converter;
-			
-			// NOTE:  following required to flip as needed
-			// DO NOT CHANGE
-			setCommitsOnValidEdit(true);
-
-			// DO NOT CHANGE --- TODO: NEEDED?
-			setValueClass(String.class);
+		protected SSMaskFormatter(String mask, AbstractFormatter converter) throws ParseException
+		{
+			super(mask);
+			this.converter = converter;
 		}
 
 		/**
 		 *
 		 * @return
 		 */
+		@Override
 		public AbstractFormatter getConverter() {
 			return converter;
+		}
+
+		/**
+		 * The Format of the FormattedTextField.
+		 * @return format
+		 */
+		@Override
+		public Format getFormat() {
+			if(getFormattedTextField() instanceof SSFormattedTextField ftf)
+				return ftf.getFormat();
+			return null;
 		}
 
 		/**
@@ -401,19 +266,7 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory
 		 */
 		@Override
 		public String valueToString(Object value) throws ParseException {
-			String s = "";
-			if (value != null) {
-				if (value instanceof String string) {
-					// handle the case where where was null formatter
-					s = string;
-				} else {
-					if (converter != null) {
-						s = converter.valueToString(value);
-					} else {
-						s = value.toString();
-					}
-				}
-			}
+			String s = assistValueToString(value);
 			s = super.valueToString(s);
 			return s;
 		}
@@ -429,13 +282,12 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory
 		@Override
 		public Object stringToValue(String s) throws ParseException {
 			if (s == null || s.trim().isEmpty()) {
+				// TODO: should check AllowNull, if not return "" ???
 				return null;
 			}
+			// TODO: why/when is this dance needed?
 			Object v = super.stringToValue(s);
-			if (converter != null) {
-				v = converter.stringToValue((String) v);
-			}
-			return v;
+			return assistStringToValue(v);
 		}
 
 		/**
@@ -447,75 +299,93 @@ public class SSMaskFormatterFactory extends DefaultFormatterFactory
 		@Override
 		protected void setEditValid(boolean valid) {
 			super.setEditValid(valid);
-			// Check for empty string input.
-			// If empty and allows null, flip to NullFormatter
-			final JFormattedTextField ftf = getFormattedTextField();
-			if (ftf instanceof SSFormattedTextField ssftf) {
-				// If doesn't allow null, don't even consider switching value
-				if (!ssftf.getAllowNull()) {
-					return;
-				}
-				if (containsData(this, ftf.getText())) {
-					return;
-				}
-				ftf.setValue(null);
-			}
-		}
-	}
-
-	/** use setEditValid method to check that formatter should flip */
-	@SuppressWarnings("serial")
-	protected static class SSNullFormatter extends DefaultFormatter {
-
-		/**
-		 * The null formatter.
-		 */
-		public SSNullFormatter() {
-			// DO NOT CHANGE
-			setValueClass(String.class);
-			// DO NOT CHANGE
-			setCommitsOnValidEdit(true);
+			assistSetEditValid(getFormattedTextField());
 		}
 
+		// getMaskLiterals() is somewhat expensive. (not too bad, but my obsession)
+		// Cache the results. Monitor setMask and setPlaceholderCharacter
+		// to flush the parts of the cache as needed.
+		
+		private LiteralsAndPositions maskLiteralsAndPositions;
+		private String maskLiterals_noPlaceholder;
+		private String maskLiterals_withPlaceholder;
+
 		/**
-		 * This method is invoked by the formatter when it is almost done.
-		 * After super.setEditValid, if the text field is a String
-		 * set the value to the String (which switches the formatter).
-		 * @param valid
+		 * {@inheritDoc }
 		 */
 		@Override
-		protected void setEditValid(boolean valid) {
-			super.setEditValid(valid);
-			
-			// if a character was added to the Null Formatter,
-			// then use setValue to flip to the MaskFormatter.
-			final JFormattedTextField ftf = getFormattedTextField();
-			Object value = ftf.getValue();
-			// May not need to check for SSNullFormatter, but things change :-)
-			if(value instanceof String
-					&& ftf.getFormatter() instanceof SSNullFormatter) {
-				try {
-					ftf.setValue(value);
-					// If ftf is still the null formatter,
-					// then MaskFormatter didn't like the value;
-					// notify and get out.
-					if (ftf.getFormatter() instanceof SSNullFormatter) {
-						invalidEdit();
-						return;
-					}
-					ftf.getFormatter().valueToString(value);
-					// Attempt to put the caret after the character.
-					try {
-						ftf.setCaretPosition(((String)value).length());
-					} catch (IllegalArgumentException ex) {
-					}
-				} catch(ParseException ex) {
-					// mask formatter (probably) got an exception,
-					// back to the null formatter
-					ftf.setValue(null);
-				}
-			}
+		public void setMask(String mask) throws ParseException
+		{
+			super.setMask(mask);
+			maskLiteralsAndPositions = null;
+			maskLiterals_noPlaceholder = null;
+			maskLiterals_withPlaceholder = null;
 		}
+
+		/**
+		 * {@inheritDoc }
+		 */
+		@Override
+		public void setPlaceholderCharacter(char placeholder)
+		{
+			super.setPlaceholderCharacter(placeholder);
+			maskLiterals_noPlaceholder = null;
+			maskLiterals_withPlaceholder = null;
+		}
+
+		private LiteralsAndPositions getMaskLiteralsAndPositions()
+		{
+			if (maskLiteralsAndPositions == null)
+				maskLiteralsAndPositions = FormatterAssist
+						.getLiteralsAndPositions(getMask(), FORMATTING_CHARS);
+			return maskLiteralsAndPositions;
+		}
+
+		/**
+		 * Find the characters in the specified {@linkplain MaskFormatter} that are
+		 * displayed literally; there's a flag for including the placeholder character.
+		 * These do not include the formatting characters like '#' or 'H';
+		 * they are not displayed. Common examples are '/', '$'.
+		 * Note that there is no consideration for chars beyond utf-16.
+		 * 
+		 * @param includePlaceholder when true include the placeholderChar in result
+		 * @return the literals in the mask
+		 */
+		public String getMaskLiterals(boolean includePlaceholder)
+		{
+			if (includePlaceholder) {
+				if (maskLiterals_withPlaceholder != null)
+					return maskLiterals_withPlaceholder;
+			} else {
+				if (maskLiterals_noPlaceholder != null)
+					return maskLiterals_noPlaceholder;
+			}
+			List<String> allLiterals = getMaskLiteralsAndPositions().literals();
+			if (includePlaceholder) {
+				allLiterals = new ArrayList<>(allLiterals);
+				allLiterals.add(String.valueOf(getPlaceholderCharacter()));
+			}
+			
+			String noDuplicates = allLiterals
+					.stream()
+					.distinct()
+					.collect(Collectors.joining());
+			if (includePlaceholder) {
+				maskLiterals_withPlaceholder = noDuplicates;
+			} else {
+				maskLiterals_noPlaceholder = noDuplicates;
+			}
+			return noDuplicates;
+		}
+		
+		/**
+		 * {@inheritDoc }
+		 */
+		@Override
+		public String getFormatLiterals()
+		{
+			return getMaskLiterals(true);
+		}
+		
 	}
-	
 }

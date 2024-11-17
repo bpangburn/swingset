@@ -38,6 +38,14 @@ import com.nqadmin.swingset.datasources.DateTime;
 abstract public class DateTimeField extends SSFormattedTextField
 {
 	/**
+	 * Create.
+	 * @param factory formatter factory
+	 */
+	public DateTimeField(AbstractFormatterFactory factory) {
+        super(factory);
+	}
+
+	/**
 	 * Sets the value of the field to an initial state consistent with
 	 * the AllowNull property. If not AllowNull then use the current system date.
 	 */
@@ -50,13 +58,6 @@ abstract public class DateTimeField extends SSFormattedTextField
 		}
 	}
 
-	/**
-	 * Create.
-	 * @param factory formatter factory
-	 */
-	public DateTimeField(AbstractFormatterFactory factory) {
-        super(factory);
-	}
 	/**
 	 * Specialized Date/Time/Timestamp component validation.
 	 * @return false if the component does not have valid data.

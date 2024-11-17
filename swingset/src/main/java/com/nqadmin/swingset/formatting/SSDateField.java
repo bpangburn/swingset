@@ -104,9 +104,7 @@ public class SSDateField extends DateTimeField {
 					_format.toString()));
 			format = Format.DATE;
 		}
-		if (format.isBase()) {
-			format = Format.getDefaultFormat(format);
-		}
+		format = Format.getAssignedFormat(format);
 		String formatMask;
 		String editPattern;
 		switch(format) {
@@ -130,6 +128,7 @@ public class SSDateField extends DateTimeField {
 		}
 		
 		return new SSMaskFormatterFactory.Builder<>(formatMask)
+				.format(format)
 				.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
 				.placeholderCharacter('_')
 				.build();
