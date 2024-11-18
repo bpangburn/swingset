@@ -8,7 +8,7 @@
 
 	<groupId>com.nqadmin.swingset</groupId>
 	<artifactId>swingset</artifactId>
-	<version>4.0.13-SNAPSHOT</version>
+	<version>5.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>swingset</name>
@@ -19,7 +19,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- MAVEN AND JAVA VERSIONS -->
-		<version.maven>3.6.3</version.maven>
+		<version.maven>3.8.7</version.maven>
 		<version.java>21</version.java>
 
 		<!-- DEPENDENCIES -->
@@ -31,27 +31,27 @@
 
 		<!-- PLUGINS -->
 		<!-- Shared by swingset-parent, swingset, and swingset-demo -->
-		<version.versions-maven-plugin>2.16.2</version.versions-maven-plugin>
-		<version.maven-enforcer-plugin>3.4.1</version.maven-enforcer-plugin>
-		<version.maven-clean-plugin>3.3.2</version.maven-clean-plugin>
-		<version.maven-deploy-plugin>3.1.1</version.maven-deploy-plugin>
-		<version.maven-install-plugin>3.1.1</version.maven-install-plugin>
-		<version.maven-site-plugin>4.0.0-M12</version.maven-site-plugin>
+		<version.versions-maven-plugin>2.17.1</version.versions-maven-plugin>
+		<version.maven-enforcer-plugin>3.5.0</version.maven-enforcer-plugin>
+		<version.maven-clean-plugin>3.4.0</version.maven-clean-plugin>
+		<version.maven-deploy-plugin>3.1.3</version.maven-deploy-plugin>
+		<version.maven-install-plugin>3.1.3</version.maven-install-plugin>
+		<version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
 
 		<!-- Shared by swingset and swingset-demo -->
-		<version.maven-jar-plugin>3.3.0</version.maven-jar-plugin>
+		<version.maven-jar-plugin>3.4.2</version.maven-jar-plugin>
 		<version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
-		<version.maven-compiler-plugin>3.11.0</version.maven-compiler-plugin>
-		<version.dependency-check-maven>9.0.7</version.dependency-check-maven>
-		<version.maven-gpg-plugin>3.1.0</version.maven-gpg-plugin>
-		<version.maven-surefire-plugin>3.2.3</version.maven-surefire-plugin>
-		<version.maven-source-plugin>3.3.0</version.maven-source-plugin>
+		<version.maven-compiler-plugin>3.13.0</version.maven-compiler-plugin>
+		<version.dependency-check-maven>11.1.0</version.dependency-check-maven>
+		<version.maven-gpg-plugin>3.2.7</version.maven-gpg-plugin>
+		<version.maven-surefire-plugin>3.5.1</version.maven-surefire-plugin>
+		<version.maven-source-plugin>3.3.1</version.maven-source-plugin>
 
 		<!-- swingset-only -->
-		<version.maven-javadoc-plugin>3.6.3</version.maven-javadoc-plugin>
-		<version.nexus-staging-maven-plugin>1.6.13</version.nexus-staging-maven-plugin>
-		<version.maven-failsafe-plugin>3.2.3</version.maven-failsafe-plugin>
-		<version.junit-jupiter-any>5.10.1</version.junit-jupiter-any>
+		<version.maven-javadoc-plugin>3.10.1</version.maven-javadoc-plugin>
+		<version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
+		<version.maven-failsafe-plugin>3.5.1</version.maven-failsafe-plugin>
+		<version.junit-jupiter-any>5.11.3</version.junit-jupiter-any>
 	</properties>
 
 	<licenses>
@@ -124,25 +124,22 @@
 			<artifactId>glazedlists</artifactId>
 			<version>${version.glazedlists}</version>
 		</dependency>
-
-		<dependency>
-			<groupId>com.raelity.jdk</groupId>
-			<artifactId>table-sort-header-renderer</artifactId>
-			<version>${version.table-sort-header}</version>
-		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.netbeans.api/org-openide-util-lookup -->
 		<dependency>
 			<groupId>org.netbeans.api</groupId>
 			<artifactId>org-openide-util-lookup</artifactId>
 			<version>${version.netbeans}</version>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>${version.google-guava}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.raelity.jdk</groupId>
+			<artifactId>table-sort-header-renderer</artifactId>
+			<version>${version.table-sort-header}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
@@ -442,6 +439,9 @@
 			  Removing these checks is not too bad since there's a lot of
 			  dependency on the IDE for most checking.
 		-->
+		
+		
+		<!-- Hopefully we can comment this out now that we're requiring Java 11+.
 		<profile>
 			<id>java-9-plus</id>
 			<activation>
@@ -474,6 +474,8 @@
 				</pluginManagement>
 			</build>
 		</profile>
+		-->
+		
 	</profiles>
 
 </project>

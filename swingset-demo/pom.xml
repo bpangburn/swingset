@@ -8,7 +8,7 @@
 
 	<groupId>com.nqadmin.swingset.demo</groupId>
 	<artifactId>swingset-demo</artifactId>
-	<version>4.0.13-SNAPSHOT</version>
+	<version>5.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>swingset-demo</name>
@@ -24,33 +24,33 @@
 
 		<!-- DEPENDENCIES -->
 		<!-- primary swingset-demo dependencies -->
-		<version.swingset>4.0.13-SNAPSHOT</version.swingset>
+		<version.swingset>5.0.0-SNAPSHOT</version.swingset>
 		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
-		<version.log4j>2.22.1</version.log4j>
-		<version.h2>2.2.224</version.h2>
+		<version.log4j>2.24.1</version.log4j>
+		<version.h2>2.3.232</version.h2>
 		<version.java-getopt>1.0.13</version.java-getopt>
 		<version.raelity-lib>1.2.0</version.raelity-lib>
 
 		<!-- PLUGINS -->
 		<!-- Shared by swingset-parent, swingset, and swingset-demo -->
-		<version.versions-maven-plugin>2.16.2</version.versions-maven-plugin>
-		<version.maven-enforcer-plugin>3.4.1</version.maven-enforcer-plugin>
-		<version.maven-clean-plugin>3.3.2</version.maven-clean-plugin>
-		<version.maven-deploy-plugin>3.1.1</version.maven-deploy-plugin>
-		<version.maven-install-plugin>3.1.1</version.maven-install-plugin>
-		<version.maven-site-plugin>4.0.0-M12</version.maven-site-plugin>
+		<version.versions-maven-plugin>2.17.1</version.versions-maven-plugin>
+		<version.maven-enforcer-plugin>3.5.0</version.maven-enforcer-plugin>
+		<version.maven-clean-plugin>3.4.0</version.maven-clean-plugin>
+		<version.maven-deploy-plugin>3.1.3</version.maven-deploy-plugin>
+		<version.maven-install-plugin>3.1.3</version.maven-install-plugin>
+		<version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
 
 		<!-- Shared by swingset and swingset-demo -->
-		<version.maven-jar-plugin>3.3.0</version.maven-jar-plugin>
+		<version.maven-jar-plugin>3.4.2</version.maven-jar-plugin>
 		<version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
-		<version.maven-compiler-plugin>3.11.0</version.maven-compiler-plugin>
-		<version.dependency-check-maven>9.0.7</version.dependency-check-maven>
-		<version.maven-gpg-plugin>3.1.0</version.maven-gpg-plugin>
-		<version.maven-surefire-plugin>3.2.3</version.maven-surefire-plugin>
-		<version.maven-source-plugin>3.3.0</version.maven-source-plugin>
+		<version.maven-compiler-plugin>3.13.0</version.maven-compiler-plugin>
+		<version.dependency-check-maven>11.1.0</version.dependency-check-maven>
+		<version.maven-gpg-plugin>3.2.7</version.maven-gpg-plugin>
+		<version.maven-surefire-plugin>3.5.1</version.maven-surefire-plugin>
+		<version.maven-source-plugin>3.3.1</version.maven-source-plugin>
 		
 		<!-- swingset-demo-only -->
-		<version.maven-assembly-plugin>3.6.0</version.maven-assembly-plugin>
+		<version.maven-assembly-plugin>3.7.1</version.maven-assembly-plugin>
 	</properties>
 
 	<licenses>
