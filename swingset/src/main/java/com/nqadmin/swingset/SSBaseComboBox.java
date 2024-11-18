@@ -126,10 +126,9 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 //       - removeMapping(M)
 //       - 
 //
+@SuppressWarnings("serial")
 public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> implements SSComponentInterface
 {
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to the rowset in certain instances.
 	 * <p>
@@ -269,6 +268,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		/**
 		 * Create a model with a glazed EventList.
 		 */
+		@SuppressWarnings("Convert2Diamond")
 		protected BaseGlazedModel() {
 			// false means no Options2
 			super(false, new BasicEventList<SSListItem>());
@@ -360,7 +360,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	transient protected final SSCommon ssCommon = new SSCommon(this);
+	private final SSCommon ssCommon;
 
 	/**
 	 * This is used when moving to a new row when getAllowNull() == false 
@@ -416,6 +416,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	public SSBaseComboBox() {
 		addItemListener(new SSBaseComboBoxItemListener());
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -829,16 +830,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	//
 	// Here's SwingSet scaffolding and nullItem maintenance.
 	//
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
-	}
 	
 	/**
 	 * {@inheritDoc }
@@ -863,7 +854,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	@Override
 	public void setAllowNull(boolean _allowNull) {
-		ssCommon.setAllowNull(_allowNull);
+		getSSCommon().setAllowNull(_allowNull);
 		adjustForNullItem();
 	}
 
@@ -994,7 +985,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	private void updateRowset() {
 		
-		ssCommon.removeRowSetListener();
+		getSSCommon().removeRowSetListener();
 		
 		M mapping = getSelectedMapping();
 	
@@ -1021,7 +1012,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			//}
 		}
 	
-		ssCommon.addRowSetListener();
+		getSSCommon().addRowSetListener();
 	}
 	
 	/**
@@ -1224,6 +1215,30 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	{
 		return sf("%s{item=%s, %s}", getClass().getSimpleName(),
 				getSelectedItem(), SSUtils.ssComponentToString(this));
+	}
+
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
 	}
 
 }

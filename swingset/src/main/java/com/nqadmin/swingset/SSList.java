@@ -121,9 +121,9 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 			if (e.getValueIsAdjusting())
 				return;
 
-			ssCommon.removeRowSetListener();
+			getSSCommon().removeRowSetListener();
 			updateRowSet();
-			ssCommon.addRowSetListener();
+			getSSCommon().addRowSetListener();
 		}
 	}
 
@@ -155,7 +155,7 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected final SSCommon ssCommon = new SSCommon(this);
+	private final SSCommon ssCommon;
 
 	/**
 	 * Creates an object of SSList with mapping type of {@code JDBCType.INTEGER}.
@@ -182,8 +182,7 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	 */
 	@SuppressWarnings("LeakingThisInConstructor")
 	public SSList(SSCollectionModel _collectionModel) {
-		// Note that call to parent default constructor is implicit.
-		//super();
+		ssCommon = finishSSCommon();
 		this.selectedDBModel = _collectionModel;
 		// last line of constructor safe to access this
 		Model.install(this);
@@ -237,16 +236,6 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 		return Arrays.stream(getSelectedIndices())
 				.mapToObj((index) -> optionSwingModel.getMappings().get(index))
 				.collect(Collectors.toList());
-	}
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
 	}
 	
 	/**
@@ -496,4 +485,27 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 				getSelectedMappings(), SSUtils.ssComponentToString(this));
 	}
 
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
+	}
 }

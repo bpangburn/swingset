@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset;
 
 import java.awt.event.FocusAdapter;
@@ -72,7 +77,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected final SSCommon ssCommon;
+	private final SSCommon ssCommon;
 
 	/**
 	 * Constructs a new, empty text field.
@@ -103,35 +108,20 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	/** All the constructors feed through here */
 	private SSTextField(String _text, final RowSet _rowSet, final String _boundColumnName) {
 		super(_text);
-		ssCommon = constructingSSCommon();
-		constructingSSCommon = null;
+		ssCommon = finishSSCommon();
 		if (_rowSet != null) {
 			bind(_rowSet, _boundColumnName);
 		}
 	}
 
-	/** Only non-null during object construction. */
-	private SSCommon constructingSSCommon;
-
 	/**
-	 * The following is called during JTextField's constructor and the ssCommon
-	 * is needed to create the document model. So we use constructingSSCommon()
-	 * to stash ssCommon in the constructingSSCommon variable, then during
-	 * SSTextField's constructor we save it in its final location.
+	 * Part of the scheme to keep text field in sync with data base.
+	 * See {@link SSCommon.SSPlainDocument}.
 	 */
 	@Override
 	protected Document createDefaultModel() {
-		return constructingSSCommon().new SSPlainDocument();
+		return getSSCommon().new SSPlainDocument();
 	}
-
-	private SSCommon constructingSSCommon() {
-		if (constructingSSCommon == null) {
-			constructingSSCommon = new SSCommon(this);
-		}
-		return constructingSSCommon;
-	}
-
-
 
 	/**
 	 * Add focus listener that selects all text.
@@ -148,16 +138,6 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 				SSTextField.this.selectAll();
 			}
 		});
-	}
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
 	}
 
 	/**
@@ -191,4 +171,32 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 				getText(), SSUtils.ssComponentToString(this));
 	}
 
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	//
+	// TODO: long term get rid of this half init stuff. Maybe a builder...
+	// NOTE: this variable could be used in methods that require a fully
+	//		 constructed SSCommon for error checking.
+	//
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
+	}
 } // end public class SSTextField extends JTextField {

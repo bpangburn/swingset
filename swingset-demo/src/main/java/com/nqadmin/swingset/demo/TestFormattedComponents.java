@@ -138,6 +138,7 @@ public class TestFormattedComponents extends JFrame {
 	 *
 	 * @param _dbConn - database connection
 	 */
+	@SuppressWarnings("LeakingThisInConstructor")
 	public TestFormattedComponents(final Connection _dbConn) {
 
 		// SET SCREEN TITLE
@@ -395,15 +396,14 @@ public class TestFormattedComponents extends JFrame {
 
 		try {
 
-		// GET THE NEW RECORD ID.
-			final ResultSet rs = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-					.executeQuery("SELECT nextval('swingset_formatted_test_seq') as nextVal;");
-			rs.next();
-			final int recordPK = rs.getInt("nextVal");
-			txtSwingSetFormattedTestPK.setText(String.valueOf(recordPK));
-			rs.close();
-
-		// SET OTHER DEFAULTS
+			try ( // GET THE NEW RECORD ID.
+					ResultSet rs = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+							.executeQuery("SELECT nextval('swingset_formatted_test_seq') as nextVal;")) {
+				rs.next();
+				final int recordPK = rs.getInt("nextVal");
+				txtSwingSetFormattedTestPK.setText(String.valueOf(recordPK));
+			}
+			// SET OTHER DEFAULTS
 //			fmtSSCuitField.setText(null);
 //			fmtSSCurrencyField.setText(null);
 //			fmtSSDateField.setText(null);
@@ -414,7 +414,6 @@ public class TestFormattedComponents extends JFrame {
 //			fmtSSSSNField.setText(null);
 //			fmtSSTimeField.setText(null);
 //			fmtSSTimestampField.setText(null);
-
 		} catch(final SQLException se) {
 			logger.log(Level.ERROR, "SQL Exception occured during setting default values.",se);
 		} catch(final Exception e) {

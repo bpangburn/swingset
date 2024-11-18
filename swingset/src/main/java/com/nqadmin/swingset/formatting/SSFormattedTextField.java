@@ -49,7 +49,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.sql.JDBCType;
 import java.sql.SQLException;
-import java.text.Format;
 import java.text.ParseException;
 
 import javax.swing.InputVerifier;
@@ -224,7 +223,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				// return with no action
 				if (verifyingText || !isAllValid().all()) return;
 
-				ssCommon.removeRowSetListener();
+				getSSCommon().removeRowSetListener();
 
 
 				final Object currentValue = ftf.getValue();
@@ -270,7 +269,7 @@ public class SSFormattedTextField extends JFormattedTextField
 					}
 				}
 
-				ssCommon.addRowSetListener();
+				getSSCommon().addRowSetListener();
 			}
 
 		}
@@ -287,10 +286,11 @@ public class SSFormattedTextField extends JFormattedTextField
 	private static Logger logger = SSUtils.getLogger();
 
 	/** Common fields shared across SwingSet components */
-	protected final SSCommon ssCommon = new SSCommon(this);
+	private final SSCommon ssCommon;
 		
 	/** Creates a new instance of SSFormattedTextField */
 	public SSFormattedTextField() {
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -312,34 +312,22 @@ public class SSFormattedTextField extends JFormattedTextField
 	 */
 	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSFormattedTextField(final AbstractFormatterFactory _factory) {
-		// Let the constructor complete before setting the factory
-		// to avoid getSSCommon returning null.
-		//super(_factory);
-		this();
-		setFormatterFactory(_factory);
+		super(_factory);
+		ssCommon = finishSSCommon();
 	}
 
 	// WE DON'T WANT TO REPLICATE THE JFormattedTextField CONSTRUCTOR THAT ACCEPTS
 	// AN OBJECT. FOR SWINGSET THAT SHOULD BE HANDLED SEPARATELY WITH BINDING.
 
-	// TO SUPPORT THIS NEED TO SET UP "constructingSSCommon()" like in SSTextField.
-	// OR PUT setFormat(ff.getFormat()); after construction is complete
-	// getSSCommon is also used for getAllowNull which is used from setEditValid
-	// which is used when the formatterFactory is set.
-	// The main idea is to defer setFormatterFactory until after ssCommon is done.
-	// getSSCommon could create and use constructingSSCommon until ssCommon
-	// has been initialized from the constructor.
-	//
-	// /**
-	//  * Creates a new instance of SSFormattedTextField
-	//  *
-	//  * @param _format Format used to look up an AbstractFormatter
-	//  */
-	// public SSFormattedTextField(final Format _format) {
-	// 	// Don't need "this()" since _format can't access
-	// 	// things in SSFormattedTextField.
-	// 	super(_format);
-	// }
+	/**
+	 * Creates a new instance of SSFormattedTextField
+	 *
+	 * @param _format Format used to look up an AbstractFormatter
+	 */
+	public SSFormattedTextField(final Format _format) {
+		super(_format);
+		ssCommon = finishSSCommon();
+	}
 
 	/**
 	 * {@inheritDoc }
@@ -348,25 +336,18 @@ public class SSFormattedTextField extends JFormattedTextField
 	public void setFormatterFactory(AbstractFormatterFactory factory)
 	{
 		super.setFormatterFactory(factory);
-		if (getSSCommon() == null) // HACK
-			return;
-		factorySet();
-	}
-	private void factorySet() {
 		if (getFormatterFactory() instanceof FormatterFactory ff) {
 			setFormat(ff.getFormat());
 		}
 		adjustFont();
 	}
 
+	// TODO: plugin for default mono font and/or if should be used.
+	// Use Courier New?
 	private void adjustFont() {
-		// TODO: plugin for default mono font and if should be used.
-		// Courier New?
 		if (getFormatterFactory() instanceof SSMaskFormatterFactory) {
 			Font currentFont = getFont();
-			//Font monoFont = new Font("Monospaced", currentFont.getStyle(), currentFont.getSize());
 			Font monoFont = new Font(Font.MONOSPACED, currentFont.getStyle(), currentFont.getSize());
-			//String fontName = monoFont.getFontName();
 			setFont(monoFont);
 		}
 	}
@@ -376,6 +357,33 @@ public class SSFormattedTextField extends JFormattedTextField
 	 */
 	public void cleanField() {
 		setValue(null);
+	}
+
+	/**
+	 * Returns the ssCommon data member for the current Swingset component.
+	 *
+	 * @return shared/common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	//
+	// TODO: long term get rid of this half init stuff. Maybe a builder...
+	//
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishInit()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
 	}
 
 	/**
@@ -409,16 +417,6 @@ public class SSFormattedTextField extends JFormattedTextField
 			logger.log(TRACE, sf("editValid: isValid %s", e.getNewValue()));
 			clearForceErrorFlag();
 		});
-	}
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-    @Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
 	}
     
 	/**

@@ -92,6 +92,7 @@ import com.nqadmin.swingset.SSImage;
 import com.nqadmin.swingset.SSLabel;
 import com.nqadmin.swingset.SSList;
 import com.nqadmin.swingset.SSSlider;
+import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.datasources.SSSQLInternalException;
 import com.nqadmin.swingset.datasources.SSSQLNullException;
@@ -140,6 +141,50 @@ public class SSCommon
 	private static final Boolean DISABLE_GENERAL_VALIDATION = false;
 
 	/**
+	 * Get a partially constructed SSCommon. If {@linkplain partialSSCommon} is not null
+	 * then return it, otherwise create and return a new partialSSCommon.
+	 * 
+	 * Typically partial initialization is done if SSCommon is needed before the
+	 * constructor finishes. The caller should invoke SSCommon.createFinish()
+	 * in the constructor.
+	 * <p>
+	 * Assert if a non null partialSSCommon doesn't match the ssComponent.
+	 * See {@link SSTextField#getSSCommon() } for example usage.
+	 *
+	 * @param ssComponent SwingSet component to attach to this SSCommon.
+	 * @param partialSSCommon if non null return it
+	 * @return partially constructed ssCommon
+	 */
+	public static SSCommon createStart(SSComponentInterface ssComponent,
+									   SSCommon partialSSCommon) {
+		if (partialSSCommon != null && ssComponent != partialSSCommon.ssComponent)
+			throw new IllegalArgumentException("ssComponent mismatch");
+		return partialSSCommon == null ? new SSCommon(ssComponent, false)
+										: partialSSCommon;
+	}
+
+	/**
+	 * Get a fully constructed SSCommon. If {@linkplain partialSSCommon} is not null
+	 * then finish it's construction, otherwise create and return a new SSCommon.
+	 * Doing "SSCommon.createFinish(this, null)" is equivalent to "new SSCommon(this)".
+	 * <p>
+	 * Assert if a non null partialSSCommon doesn't match the ssComponent.
+	 * See {@link SSTextField#SSTextField(javax.sql.RowSet, java.lang.String) }
+	 * for example usage.
+	 * 
+	 * @param ssComponent SwingSet component to attach to this SSCommon.
+	 * @param partialSSCommon if non null finish it's construction
+	 * @return fully constructed SSCommon
+	 */
+	public static SSCommon createFinish(SSComponentInterface ssComponent,
+										SSCommon partialSSCommon) {
+		if (partialSSCommon != null && ssComponent != partialSSCommon.ssComponent)
+			throw new IllegalArgumentException("ssComponent mismatch");
+		return partialSSCommon == null ? new SSCommon(ssComponent, true)
+										: partialSSCommon.finishInit();
+	}
+
+	/**
 	 * Document listener provided for convenience for SwingSet Components that are
 	 * based on JTextComponents. SwingSet components that need a Document listener
 	 * to trigger a change to the bound RowSet should return an instance of
@@ -151,7 +196,8 @@ public class SSCommon
 	 * }
 	 * <p>
 	 * This listener updates the underlying RowSet when there is a change to the Document
-	 * object. E.g., a call to setText() on a JTextField.
+	 * object. E.g., a call to setText() on a JTextField. If the update has an error
+	 * the text field is reverted to the current contents of the database.
 	 * <p>
 	 * DocumentListener events generally, but not always get fired twice any time
 	 * there is an update to the JTextField: a removeUpdate() followed by
@@ -253,6 +299,7 @@ public class SSCommon
 	
 	/**
 	 * For JTextField to track previous text field value.
+	 * Used in conjunction with {@link SSDocumentListener}.
 	 */
 	@SuppressWarnings("serial")
 	public class SSPlainDocument extends PlainDocument {
@@ -480,20 +527,41 @@ public class SSCommon
 	private SSRowSetListener rowSetListener = null;
 
 	/**
-	 * Constructor expecting a SwingSet component as an argument (usually called as
-	 * = new SSCommon(this);)
+	 * Constructor that has a flag to only "half" initialize; typically half
+	 * initialization is done iff SSCommon is needed before the constructor finishes.
+	 * The caller should invoke SSCommon in the constructor.
 	 *
-	 * @param _ssComponent SwingSet component having this SSCommon instance as a
+	 * @param ssComponent SwingSet component having this SSCommon instance as a
 	 *                     datamember
+	 * @param finishInit when false, the user must call 
 	 */
-	@SuppressWarnings("OverridableMethodCallInConstructor")
-	public SSCommon(final SSComponentInterface _ssComponent) {
-		ssComponent = _ssComponent;
+	private SSCommon(SSComponentInterface ssComponent, boolean finishInit) {
+		this.ssComponent = ssComponent;
 		decorator = Decorator.nullDecorator;
 		validator = Validator.nullValidator;
-		initDecorator();
-		init();
+		if (finishInit)
+			finishInit();
 	}
+
+	//
+	// TODO: long term get rid of this half init stuff. Maybe a builder...
+	//
+
+	/** Can use this to error if doing something that required fully constructed. */
+	private boolean didFinishInit;
+
+	/**
+	 * Finish the initialization, used if "half" construction.
+	 */
+	private SSCommon finishInit() {
+		if (!didFinishInit) {
+			didFinishInit = true;
+			initDecorator();
+			init();
+		}
+		return this;
+	}
+
 
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	private void debugTrackRowSetListener()

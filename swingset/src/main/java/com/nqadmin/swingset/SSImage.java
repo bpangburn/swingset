@@ -99,7 +99,7 @@ public class SSImage extends JPanel implements SSComponentInterface
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 
-			ssCommon.removeRowSetListener();
+			getSSCommon().removeRowSetListener();
 
 			try {
 				if (getRowSet() != null) {
@@ -139,7 +139,7 @@ public class SSImage extends JPanel implements SSComponentInterface
 				logger.log(Level.ERROR, getColumnForLog() + ": IO Exception.", ioe);
 			}
 
-			ssCommon.addRowSetListener();
+			getSSCommon().addRowSetListener();
 		}
 
 	} // end private class SSImageListener
@@ -172,12 +172,13 @@ public class SSImage extends JPanel implements SSComponentInterface
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected final SSCommon ssCommon = new SSCommon(this);
+	private final SSCommon ssCommon;
 
 	/**
 	 * Construct a default SSImage Object.
 	 */
 	public SSImage() {
+		ssCommon = finishSSCommon();
 	}
 
 	// TODO: Why do decorators interfere with SSImage?
@@ -186,32 +187,17 @@ public class SSImage extends JPanel implements SSComponentInterface
 	//		jc().setBorder(jc().isFocusOwner() ? focusBorder : standardBorder);
 	//		jc().setForeground(textColor != null ? textColor : Color.BLACK);
 	
-	// /** {@inheritDoc } */
-	// // TODO: This is a workaround because if default decorator is used
-	// //		 then the SSImage doesn't display properly.
-	// @Override
-	// public Decorator createDefaultDecorator() {
-	// 	//return Decorator.nullDecorator;
-	// 	return new BorderDecorator() {
-	// 		@Override
-	// 		protected Component fcomp()
-	// 		{
-	// 			return btnUpdateImage;
-	// 		}
-	// 		
-	// 	};
-	// }
-
-	/** {@inheritDoc } */
+	// TODO: This is a workaround because if default decorator is used
+	//		 then the SSImage doesn't display properly.
+	/**
+	 * Highlight the update button when this component gets focus.
+	 * {@inheritDoc }
+	 */
 	@Override
 	public Decorator createDefaultDecorator() {
-		Decorator tDec = SSComponentInterface.super.createDefaultDecorator();
-		if (!(tDec instanceof BorderDecorator))
-			return tDec;
-		//if (Boolean.TRUE)
-		//	return tDec;
-
-		//return super.getBorder(state);
+		Decorator decorator = SSComponentInterface.super.createDefaultDecorator();
+		if (!(decorator instanceof BorderDecorator))
+			return decorator;
 
 		return new BorderDecorator() {
 			@Override
@@ -326,16 +312,6 @@ public class SSImage extends JPanel implements SSComponentInterface
 		return preferredSize;
 	}
 
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
-	}
-
 	/** {@inheritDoc } */
 	@Override
 	public SSImageListener getSSComponentListener() {
@@ -404,4 +380,27 @@ public class SSImage extends JPanel implements SSComponentInterface
 				fName, SSUtils.ssComponentToString(this));
 	}
 
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
+	}
 }

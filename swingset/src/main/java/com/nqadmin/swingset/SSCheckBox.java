@@ -99,16 +99,16 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 		@Override
 		public void itemStateChanged(final ItemEvent ie)
 		{
-			ssCommon.removeRowSetListener();
+			getSSCommon().removeRowSetListener();
 
 			setBoundColumnObject(isSelected());
 
-			ssCommon.addRowSetListener();
+			getSSCommon().addRowSetListener();
 		}
 	} // end private class SSCheckBoxListener
 
 	/** Common fields shared across SwingSet components. */
-	protected final SSCommon ssCommon;
+	private final SSCommon ssCommon;
 
 	/** System Logger for component. */
 	private static final Logger logger = SSUtils.getLogger();
@@ -162,7 +162,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 		}
 		setBorder(b);
 		setBorderPainted(true);
-		ssCommon = new SSCommon(this);
+		ssCommon = finishSSCommon();
 	}
 
 	private Insets toInsets(Border b)
@@ -176,16 +176,6 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 	{
 		verifyConvertToType(jdbcType, Boolean.class,
 				EnumSet.of(BIT, BOOLEAN, INTEGER, SMALLINT, TINYINT));
-	}
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
 	}
 	
 	/**
@@ -219,6 +209,30 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 	{
 		return sf("SSCheckBox{selected=%s, %s}",
 				isSelected(), SSUtils.ssComponentToString(this));
+	}
+
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
 	}
 
 } // end public class SSCheckBox

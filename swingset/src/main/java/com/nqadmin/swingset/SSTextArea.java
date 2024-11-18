@@ -57,6 +57,7 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 /**
  * SSTextArea extends the JTextArea to add RowSet binding.
  */
+@SuppressWarnings("serial")
 public class SSTextArea extends JTextArea implements SSComponentInterface {
 
 	// TODO Consider adding an InputVerifier to prevent component from losing focus.
@@ -69,21 +70,15 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	private static Logger logger = SSUtils.getLogger();
 
 	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -1256528482424744463L;
-
-	/**
 	 * Common fields shared across SwingSet components
 	 */
-	transient protected final SSCommon ssCommon = new SSCommon(this);
+	private final SSCommon ssCommon;
 
 	/**
 	 * Empty constructor needed for deserialization.
 	 */
 	public SSTextArea() {
-		// Note that call to parent default constructor is implicit.
-		// super();
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -95,6 +90,7 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	 */
 	public SSTextArea(final int _rows, final int _columns) {
 		super(_rows, _columns);
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -117,16 +113,6 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	{
 		setLineWrap(true);
 		setWrapStyleWord(true);
-	}
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-    @Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
 	}
 
 	/**
@@ -160,4 +146,27 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 				getText(), SSUtils.ssComponentToString(this));
 	}
 
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
+	}
 } // end public class SSTextArea extends JTextArea {

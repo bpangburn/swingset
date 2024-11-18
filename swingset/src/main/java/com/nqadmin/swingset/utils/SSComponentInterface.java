@@ -252,7 +252,8 @@ public interface SSComponentInterface extends RSC
 	 * Returns the ssCommon data member of the Swingset component.
 	 * <p>
 	 * A typical implementation might look like: {@code
-	 * 
+	 *	if (ssCommon == null)
+	 *		return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
 	 * 	return ssCommon;
 	 * }
 	 *

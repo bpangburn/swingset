@@ -42,7 +42,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
-import java.awt.Dimension;
 
 import javax.sql.RowSet;
 import javax.swing.JSlider;
@@ -79,11 +78,11 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 		@Override
 		public void stateChanged(final ChangeEvent ce)
 		{
-			ssCommon.removeRowSetListener();
+			getSSCommon().removeRowSetListener();
 
 			setBoundColumnObject(getValue());
 
-			ssCommon.addRowSetListener();
+			getSSCommon().addRowSetListener();
 		}
 
 	} // end protected class SSSliderListener implements ChangeListener, Serializable
@@ -92,13 +91,14 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	private static Logger logger = SSUtils.getLogger();
 
 	/** Common fields shared across SwingSet components */
-	protected final SSCommon ssCommon = new SSCommon(this);
+	private final SSCommon ssCommon;
 
 	/**
 	 * Empty constructor needed for deserialization. Creates a horizontal slider
 	 * with the range 0 to 100.
 	 */
 	public SSSlider() {
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -108,6 +108,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	 */
 	public SSSlider(final int _orientation) {
 		super(_orientation);
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -118,6 +119,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	 */
 	public SSSlider(final int _min, final int _max) {
 		super(_min, _max);
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -143,16 +145,6 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 				EnumSet.of(INTEGER, SMALLINT, TINYINT,
 						BIGINT, REAL, FLOAT, DOUBLE, DECIMAL, NUMERIC));
 
-	}
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
 	}
 	
 	/**
@@ -185,5 +177,29 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	{
 		return sf("%s{value=%s, %s}", getClass().getSimpleName(),
 				getValue(), SSUtils.ssComponentToString(this));
+	}
+
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
 	}
 } // end public class SSSlider extends JSlider

@@ -39,7 +39,6 @@ package com.nqadmin.swingset.formatting;
 
 import java.text.ParseException;
 import java.util.List;
-import java.util.Objects;
 
 import javax.swing.text.MaskFormatter;
 
@@ -177,9 +176,9 @@ public class SSMaskFormatterFactoryTest {
 	@Test
 	public void testParentHier() {
 		CustomParentFormatterFactory.CustomParentBuilder<?> b
-				= new CustomParentFormatterFactory
-						.CustomParentBuilder<>("##/##", "parentArg");
-		b.parentParam("parentParam").format(CUSTOM);
+				= new CustomParentFormatterFactory.CustomParentBuilder<>
+			("##/##", "parentArg")
+			.parentParam("parentParam").format(CUSTOM);
 		CustomParentFormatterFactory ff = b.build();
 		assertEquals("parentArg", ff.getParentArg());
 		assertEquals("parentParam", ff.getParentParam());
@@ -192,10 +191,12 @@ public class SSMaskFormatterFactoryTest {
 	@Test
 	public void testChildHier() {
 		CustomChildFormatterFactory.CustomChildBuilder<?> b
-				= new CustomChildFormatterFactory
-						.CustomChildBuilder<>("##/##", "parentArg", "childArg");
-		b.parentParam("parentParam").childParam("childParam").format(CUSTOM);
-		b.childParam("childParam").parentParam("parentParam").format(CUSTOM);
+				= new CustomChildFormatterFactory.CustomChildBuilder<>
+			("##/##", "parentArg", "childArg")
+			.parentParam("parentParam").childParam("childParam").format(CUSTOM)
+			.format(CUSTOM).parentParam("parentParam").childParam("childParam")
+			.childParam("childParam").parentParam("parentParam").format(CUSTOM)
+			.format(CUSTOM).childParam("childParam").parentParam("parentParam");
 
 		CustomChildFormatterFactory ff = b.build();
 		assertEquals("parentArg", ff.getParentArg());

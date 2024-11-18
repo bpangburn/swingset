@@ -83,9 +83,9 @@ public class SSLabel extends JLabel implements SSComponentInterface
 			if (!allowPropertyChangePropagation)
 				return;
 			if ("text".equals(pce.getPropertyName())) {
-				ssCommon.removeRowSetListener();
+				getSSCommon().removeRowSetListener();
 				setBoundColumnText(getText());
-				ssCommon.addRowSetListener();
+				getSSCommon().addRowSetListener();
 			}
 		}
 	} // end protected class SSLabelListener
@@ -94,13 +94,14 @@ public class SSLabel extends JLabel implements SSComponentInterface
 	private static Logger logger = SSUtils.getLogger();
 
 	/** Common fields shared across SwingSet components */
-	protected final SSCommon ssCommon = new SSCommon(this);
+	private final SSCommon ssCommon;
 
 	/**
 	 * Empty constructor needed for deserialization. Creates a SSLabel instance with
 	 * no image and no text.
 	 */
 	public SSLabel() {
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -110,6 +111,7 @@ public class SSLabel extends JLabel implements SSComponentInterface
 	 */
 	public SSLabel(final Icon _image) {
 		super(_image);
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -120,6 +122,7 @@ public class SSLabel extends JLabel implements SSComponentInterface
 	 */
 	public SSLabel(final Icon _image, final int _horizontalAlignment) {
 		super(_image, _horizontalAlignment);
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -133,16 +136,6 @@ public class SSLabel extends JLabel implements SSComponentInterface
 	public SSLabel(final RowSet _rowSet, final String _boundColumnName) {
 		this();
 		bind(_rowSet, _boundColumnName);
-	}
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
 	}
 
 	/**
@@ -175,4 +168,27 @@ public class SSLabel extends JLabel implements SSComponentInterface
 				getText(), SSUtils.ssComponentToString(this));
 	}
 
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
+	}
 } // end public class SSLabel extends JLabel {
