@@ -141,7 +141,7 @@
 		<dependency>
 		    <groupId>com.raelity.jdk</groupId>
 		    <artifactId>table-sort-header-renderer</artifactId>
-		    <version>1.0.1</version>
+		    <version>${version.table-sort-header-renderer}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
 		<dependency>
