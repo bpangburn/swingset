@@ -137,9 +137,6 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  */
 public class SSCommon
 {
-	// TODO: get rid of this.
-	private static final Boolean DISABLE_GENERAL_VALIDATION = false;
-
 	/**
 	 * Get a partially constructed SSCommon. If {@linkplain partialSSCommon} is not null
 	 * then return it, otherwise create and return a new partialSSCommon.
@@ -1394,12 +1391,6 @@ public class SSCommon
 		//		decorator deco = getSSComponent().createDefaultDecorator();
 		// where the default implementation returns null
 
-		// Only decorate/validate for SSFormattedTextField, as in v4.0.12.
-		if (!(getSSComponent() instanceof SSFormattedTextField)
-				&& DISABLE_GENERAL_VALIDATION) {
-			return;
-		}
-
 		setDecorator(getSSComponent().createDefaultDecorator());
 	}
 	/**
@@ -1436,9 +1427,6 @@ public class SSCommon
 	 * @param _validator validator to install
 	 */
 	public final void setValidator(Validator _validator) {
-		if (DISABLE_GENERAL_VALIDATION) {
-			return;
-		}
 		validator.uninstall();
 		_validator.install(ssComponent);
 		validator = _validator;
@@ -1477,10 +1465,6 @@ public class SSCommon
 	 * @return true if the there is no detected error
 	 */
 	private boolean isValidChange() {
-		if (DISABLE_GENERAL_VALIDATION) {
-			return true;
-		}
-
 		// decorator does validation
 		return decorator.decorate();
 	}

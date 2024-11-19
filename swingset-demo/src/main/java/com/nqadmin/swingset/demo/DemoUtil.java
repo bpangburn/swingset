@@ -234,11 +234,8 @@ public class DemoUtil {
 				rs = RowSetProvider.newFactory().createCachedRowSet();
 				rs.setDataSourceName(DataSourcePool.DATA_SOURCE_NAME);
 				if(defLookup(MainClass.H2Workaround.class) != null) {
-					//
-					// TODO: H2 connection bug workaround, check H2 version
-					//
-					// Workaround for H2 Connection bug, see
 					// https://github.com/h2database/h2database/issues/4010
+					// fixed in H2 Version 2.3.230 (2024-07-15)
 					rs.setTypeMap(Map.of());
 					logger.log(INFO, () -> "H2Workaround: rs.setTypeMap(Map.of())");
 				}

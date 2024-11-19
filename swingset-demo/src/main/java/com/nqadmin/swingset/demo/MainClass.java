@@ -823,7 +823,7 @@ public class MainClass extends JFrame
 		lkup.add(new LoadDemoImages());
 		lkup.add(new H2Trace());
 		//lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
-		lkup.add(new H2Workaround());
+		//lkup.add(new H2Workaround()); // fixed in H2 Version 2.3.230 (2024-07-15
 		lkup.add(new ForceConflict(0));
 
 		boolean some_error = false;
