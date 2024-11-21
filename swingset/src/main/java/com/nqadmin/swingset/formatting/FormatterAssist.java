@@ -51,20 +51,43 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  */
 interface FormatterAssist
 {
-	AbstractFormatter getConverter();
+	/**
+	 * The Format associated with the FormattedTextField.
+	 * @return format
+	 */
+	SSFormat getSSFormat();
+
+	default AbstractFormatter getConverter() { return null; }
+
+	/**
+	 * @see AbstractFormatter#stringToValue(java.lang.String) 
+	 */
+	Object stringToValue(String string) throws ParseException;
+
+	/**
+	 * @see AbstractFormatter#valueToString(java.lang.Object) 
+	 */
+	String valueToString(Object value) throws ParseException;
 
 	/**
 	 * Most formats show extra characters that user use has not input.
 	 * For a mask this probably includes mask literals and placeholder characters.
 	 * @return characters not input by the user
 	 */
-	String getFormatLiterals();
+	default String getFormatLiterals() { return ""; }
 
-	/**
-	 * The Format associated with the FormattedTextField.
-	 * @return format
-	 */
-	Format getFormat();
+	/* *************************************************************************
+	 * Example usage: in SSMaskFormatterFactory:
+	 *
+	 *	public Object stringToValue(String s) throws ParseException {
+	 *		if (s == null || s.trim().isEmpty()) {
+	 *			// TODO: should check AllowNull, if not return "" ???
+	 *			return null;
+	 *		}
+	 *		// TODO: why/when is this dance needed?
+	 *		Object v = super.stringToValue(s);
+	 *		return assistStringToValue(v);
+	 * ************************************************************************/
 	
 	/**
 	 * If the value is not a String and there is a converter,
@@ -73,6 +96,8 @@ interface FormatterAssist
 	 * @return String representation of the value
 	 * @throws ParseException
 	 */
+	//
+	// TODO: should this be Object --> Object, let the caller sort it out
 	default String assistValueToString(Object value) throws ParseException {
 		String s = "";
 		if (value != null) {
@@ -133,11 +158,11 @@ interface FormatterAssist
 	 * consistent with getAllowNull. If they do not agree, then
 	 * the factory's null formatter is set/cleared as needed.
 	 * 
-	 * @param _ftf 
+	 * @param ftf 
 	 */
-	static void adjustNullFormatter(SSFormattedTextField _ftf) {
-		if (_ftf.getFormatterFactory() instanceof SSMaskFormatterFactory ff) {
-			boolean allowNull = _ftf.getAllowNull();
+	static void adjustNullFormatter(SSFormattedTextField ftf) {
+		if (ftf.getFormatterFactory() instanceof FormatterFactory ff) {
+			boolean allowNull = ftf.getAllowNull();
 			boolean hasNullFormatter = ff.getNullFormatter() != null;
 			if (allowNull ^ hasNullFormatter) {
 				ff.setNullFormatter(allowNull ? new SSNullFormatter() : null);

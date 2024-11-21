@@ -29,56 +29,29 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
-import com.nqadmin.swingset.datasources.DateTime;
-
 /**
- * Base class for date time fields; provides specialized component validation.
+ * Base class for formatted fields.
  */
 @SuppressWarnings("serial")
-abstract public class DateTimeField extends Field
+public abstract class Field extends SSFormattedTextField
 {
 	/**
-	 * Create.
+	 * Constructor.
 	 * @param factory formatter factory
 	 */
-	public DateTimeField(AbstractFormatterFactory factory) {
-        super(factory);
-	}
-
-	/**
-	 * Sets the value of the field to an initial state consistent with
-	 * the AllowNull property. If not AllowNull then use the current system date.
-	 */
-	@Override
-	public void cleanField() {
-		if (getAllowNull()) {
-			setValue(null);
-		} else {
-			setValue(new java.util.Date());
-		}
-	}
-
-	/**
-	 * Specialized Date/Time/Timestamp component validation.
-	 * @return false if the component does not have valid data.
-	 */
-	@Override
-	public boolean componentValidate()
+	public Field(AbstractFormatterFactory factory)
 	{
-		if (!super.componentValidate())
-			return false;
-		if (DateTime.isHandledDateTimeComp(this)) {
-			String text = getText();
-			// Check if the MaskFormatter has data;
-			// if not then treat it as an empty string.
-			if (!containsUserText()) {
-				text = "";
-			}
-			if (!DateTime.dateTimeColumnValidate(text, this)) {
-				return false;
-			}
-		}
-
-		return true;
+		super(factory);
 	}
+
+	/**
+	 * {@inheritDoc }
+	 * If a null value, make sure it's OK to have it.
+	 */
+
+	@Override
+	public boolean componentValidate() {
+		return getValue() != null || getAllowNull();
+	}
+	
 }

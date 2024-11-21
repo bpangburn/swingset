@@ -27,58 +27,41 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset.formatting;
 
-import com.nqadmin.swingset.datasources.DateTime;
+//package com.nqadmin.swingset.formatting;
+
+// TODO: THIS NEEDS LOTS OF WORK.
+//
+// The initial text in here is copied from SSFormattedTextField.
+//
+// TODO Consider adding back context help and calculators via popups. See 2020-01-07 revisions or earlier.
+// TODO Add JDatePicker support or something similar: https://www.codejava.net/java-se/swing/how-to-use-jdatepicker-to-display-calendar-component and https://github.com/JDatePicker/JDatePicker
 
 /**
- * Base class for date time fields; provides specialized component validation.
+ * This package contains components based on {@link JFormattedTextField} and has
+ * support/base classes for creating these components. The components interoperate
+ * with {@link com.nqadmin.swingset.decorators.Decorator}
+ * to provide visual feedback as data is entered into the component
+ * and {@link com.nqadmin.swingset.decorators.Validator} to detect bogus values
+ * as early as possible and avoid them getting into the database.
+ * The components also respects {@link RSC#getAllowNull()}.
+ * 
+ * Formatters and FormatterFactory
+ * 
+ * <p>
+ * OLD STUFF
+ * <p>
+ * Generally bound components are implemented by extending SSFormattedTextField and
+ * instantiating with a custom FormatterFactory. E.g. {@link SSDateField }
+ * 
+ * <p>
+ * It would be possible to instead use a MaskFormatter, but custom code has to be written if the field needs to be nullable/blanked
+ * by the user. For a MaskFormatter, this triggers a ParseException, which would need to be caught in the code and surplanted by
+ * a call to setValue(null); Using a MaskFormatter still requires additional validation of some sort. E.g. preventing a MM/dd/yyyy date of
+ * 99/99/9999 from being entered.
  */
-@SuppressWarnings("serial")
-abstract public class DateTimeField extends Field
-{
-	/**
-	 * Create.
-	 * @param factory formatter factory
-	 */
-	public DateTimeField(AbstractFormatterFactory factory) {
-        super(factory);
-	}
+package com.nqadmin.swingset.formatting;
 
-	/**
-	 * Sets the value of the field to an initial state consistent with
-	 * the AllowNull property. If not AllowNull then use the current system date.
-	 */
-	@Override
-	public void cleanField() {
-		if (getAllowNull()) {
-			setValue(null);
-		} else {
-			setValue(new java.util.Date());
-		}
-	}
-
-	/**
-	 * Specialized Date/Time/Timestamp component validation.
-	 * @return false if the component does not have valid data.
-	 */
-	@Override
-	public boolean componentValidate()
-	{
-		if (!super.componentValidate())
-			return false;
-		if (DateTime.isHandledDateTimeComp(this)) {
-			String text = getText();
-			// Check if the MaskFormatter has data;
-			// if not then treat it as an empty string.
-			if (!containsUserText()) {
-				text = "";
-			}
-			if (!DateTime.dateTimeColumnValidate(text, this)) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-}
+// public class package_info
+// {
+// }

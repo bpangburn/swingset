@@ -53,9 +53,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import javax.swing.JFormattedTextField;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
  * A FormatterFactory, with formatters based on MaskFormatter, which uses
@@ -216,6 +220,22 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		}
 	}
 
+	/**
+	 * For a MaskFormatter simply slam the stringValue into the FormattedTextField.
+	 * {@inheritDoc }
+	 */
+	@Override
+	public void switchToNonNullValue(JFormattedTextField ftf, String stringValue)
+			throws ParseException
+	{
+		ftf.setValue(stringValue);
+		if (logger.isLoggable(TRACE)) {
+			Object v = ftf.getValue();
+			logger.log(TRACE, ()->sf("switch: '%s' to %s %s", stringValue,
+					v != null ? v.getClass().getSimpleName() : null, v));
+		}
+	}
+
 	/** Uses setEditValid method to check that formatter should flip. */
 	@SuppressWarnings("serial")
 	public static class SSMaskFormatter extends MaskFormatter implements FormatterAssist {
@@ -281,8 +301,12 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		 */
 		@Override
 		public Object stringToValue(String s) throws ParseException {
-			if (s == null || s.trim().isEmpty())
+			if (s == null || s.isBlank()) {
+				//if(getFormattedTextField() instanceof SSFormattedTextField ftf
+				//		&& !ftf.getAllowNull())
+				//	throw new ParseException("Null value not allowed", 0);
 				return null;
+			}
 			// TODO: why/when is this dance needed?
 			Object v = super.stringToValue(s);
 			return assistStringToValue(v);

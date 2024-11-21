@@ -55,7 +55,7 @@ import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.formatting.Format;
+import com.nqadmin.swingset.formatting.SSFormat;
 //import com.nqadmin.swingset.formatting.SSCuitField;
 import com.nqadmin.swingset.formatting.SSCurrencyField;
 import com.nqadmin.swingset.formatting.SSDateField;
@@ -94,10 +94,12 @@ public class TestFormattedComponents extends JFrame {
 	JLabel lblSwingSetFormattedTestPK = new JLabel("Record ID");
 	//JLabel lblSSCuitField = new JLabel("SSCuitField");
 	JLabel lblSSCurrencyField = new JLabel("SSCurrencyField");
+	JLabel lblSSCurrencyFieldNull = new JLabel("SSCurrencyFieldNull");
 	JLabel lblSSDateField = new JLabel("SSDateField");
 	JLabel lblSSDateFieldNull = new JLabel("SSDateFieldNull");
 	JLabel lblSSFormattedTextField = new JLabel("SSFormattedTextField");
 	JLabel lblSSIntegerField = new JLabel("SSIntegerField");
+	JLabel lblSSIntegerFieldNull = new JLabel("SSIntegerFieldNull");
 	JLabel lblSSNumericField = new JLabel("SSNumericField");
 	JLabel lblSSPercentField = new JLabel("SSPercentField");
 	JLabel lblSSSSNField = new JLabel("SSSSNField");
@@ -110,10 +112,12 @@ public class TestFormattedComponents extends JFrame {
 	SSTextField txtSwingSetFormattedTestPK = new SSTextField();
 	//SSCuitField fmtSSCuitField = new SSCuitField();
 	SSCurrencyField fmtSSCurrencyField = new SSCurrencyField();
-	SSDateField fmtSSDateField = new SSDateField(Format.DATE_MMDDYYYY_SLASH);
-	SSDateField fmtSSDateFieldNull = new SSDateField(Format.DATE_YYYYMMDD_STROKE);
+	SSCurrencyField fmtSSCurrencyFieldNull = new SSCurrencyField();
+	SSDateField fmtSSDateField = new SSDateField(SSFormat.DATE_MMDDYYYY_SLASH);
+	SSDateField fmtSSDateFieldNull = new SSDateField(SSFormat.DATE_YYYYMMDD_STROKE);
 	SSFormattedTextField fmtSSFormattedTextField = new SSFormattedTextField();
 	SSIntegerField fmtSSIntegerField = new SSIntegerField();
+	SSIntegerField fmtSSIntegerFieldNull = new SSIntegerField();
 	SSNumericField fmtSSNumericField = new SSNumericField();
 	SSPercentField fmtSSPercentField = new SSPercentField();
 	SSSSNField fmtSSSSNField = new SSSSNField();
@@ -269,10 +273,12 @@ public class TestFormattedComponents extends JFrame {
 
 				//fmtSSCuitField.bind(rowset, "ss_cuit_field");
 				fmtSSCurrencyField.bind(rowset, "ss_currency_field");
+				fmtSSCurrencyFieldNull.bind(rowset, "ss_currency_field_null");
 				fmtSSDateField.bind(rowset, "ss_date_field");
 				fmtSSDateFieldNull.bind(rowset, "ss_date_field_null");
 				fmtSSFormattedTextField.bind(rowset, "ss_formatted_text_field");
 				fmtSSIntegerField.bind(rowset, "ss_integer_field");
+				fmtSSIntegerFieldNull.bind(rowset, "ss_integer_field_null");
 				fmtSSNumericField.bind(rowset, "ss_numeric_field");
 				fmtSSPercentField.bind(rowset, "ss_percent_field");
 				fmtSSSSNField.bind(rowset, "ss_ssn_field");
@@ -286,10 +292,12 @@ public class TestFormattedComponents extends JFrame {
 
 				//lblSSCuitField.setPreferredSize(MainClass.labelDim);
 				lblSSCurrencyField.setPreferredSize(MainClass.labelDim);
+				lblSSCurrencyFieldNull.setPreferredSize(MainClass.labelDim);
 				lblSSDateField.setPreferredSize(MainClass.labelDim);
 				lblSSDateFieldNull.setPreferredSize(MainClass.labelDim);
 				lblSSFormattedTextField.setPreferredSize(MainClass.labelDim);
 				lblSSIntegerField.setPreferredSize(MainClass.labelDim);
+				lblSSIntegerFieldNull.setPreferredSize(MainClass.labelDim);
 				lblSSNumericField.setPreferredSize(MainClass.labelDim);
 				lblSSPercentField.setPreferredSize(MainClass.labelDim);
 				lblSSSSNField.setPreferredSize(MainClass.labelDim);
@@ -303,10 +311,12 @@ public class TestFormattedComponents extends JFrame {
 
 				//fmtSSCuitField.setPreferredSize(MainClass.ssDim);
 				fmtSSCurrencyField.setPreferredSize(MainClass.ssDim);
+				fmtSSCurrencyFieldNull.setPreferredSize(MainClass.ssDim);
 				fmtSSDateField.setPreferredSize(MainClass.ssDim);
 				fmtSSDateFieldNull.setPreferredSize(MainClass.ssDim);
 				fmtSSFormattedTextField.setPreferredSize(MainClass.ssDim);
 				fmtSSIntegerField.setPreferredSize(MainClass.ssDim);
+				fmtSSIntegerFieldNull.setPreferredSize(MainClass.ssDim);
 				fmtSSNumericField.setPreferredSize(MainClass.ssDim);
 				fmtSSPercentField.setPreferredSize(MainClass.ssDim);
 				fmtSSSSNField.setPreferredSize(MainClass.ssDim);
@@ -329,6 +339,8 @@ public class TestFormattedComponents extends JFrame {
 				//constraints.gridy++;
 				contentPane.add(lblSSCurrencyField, constraints);
 				constraints.gridy++;
+				contentPane.add(lblSSCurrencyFieldNull, constraints);
+				constraints.gridy++;
 				contentPane.add(lblSSDateField, constraints);
 				constraints.gridy++;
 				contentPane.add(lblSSDateFieldNull, constraints);
@@ -336,6 +348,8 @@ public class TestFormattedComponents extends JFrame {
 				contentPane.add(lblSSFormattedTextField, constraints);
 				constraints.gridy++;
 				contentPane.add(lblSSIntegerField, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSSIntegerFieldNull, constraints);
 				constraints.gridy++;
 				contentPane.add(lblSSNumericField, constraints);
 				constraints.gridy++;
@@ -358,6 +372,8 @@ public class TestFormattedComponents extends JFrame {
 				//constraints.gridy++;
 				contentPane.add(fmtSSCurrencyField, constraints);
 				constraints.gridy++;
+				contentPane.add(fmtSSCurrencyFieldNull, constraints);
+				constraints.gridy++;
 				contentPane.add(fmtSSDateField, constraints);
 				constraints.gridy++;
 				contentPane.add(fmtSSDateFieldNull, constraints);
@@ -365,6 +381,8 @@ public class TestFormattedComponents extends JFrame {
 				contentPane.add(fmtSSFormattedTextField, constraints);
 				constraints.gridy++;
 				contentPane.add(fmtSSIntegerField, constraints);
+				constraints.gridy++;
+				contentPane.add(fmtSSIntegerFieldNull, constraints);
 				constraints.gridy++;
 				contentPane.add(fmtSSNumericField, constraints);
 				constraints.gridy++;

@@ -292,7 +292,7 @@ public class MainClass extends JFrame
 	private static final int ssHeight = 20;
 	private static final int ssHeightTall = 100; // used for lists, textareas
 	private static final int ssHeightVeryTall = 200; // used for images
-	private static final int ssWidth = 200;
+	private static final int ssWidth = 240;
 
 	protected static final Dimension ssDim = new Dimension(ssWidth, ssHeight);
 	protected static final Dimension ssDimTall = new Dimension(ssWidth, ssHeightTall); // used for lists, textareas

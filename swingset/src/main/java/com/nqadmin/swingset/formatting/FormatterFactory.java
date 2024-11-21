@@ -121,6 +121,16 @@ public abstract class FormatterFactory extends DefaultFormatterFactory
 	}
 
 	/**
+	 * Convert the string as needed and do
+	 * {@link JFormattedTextField#setValue(java.lang.Object) }.
+	 * @param ftf set this text field's value
+	 * @param string convert to a value
+	 * @throws ParseException
+	 */
+	public abstract void switchToNonNullValue(JFormattedTextField ftf, String string)
+			throws ParseException;
+
+	/**
 	 * Converter used with stringToValue and valueToString; typically null.
 	 * @return converter
 	 */
@@ -155,7 +165,7 @@ public abstract class FormatterFactory extends DefaultFormatterFactory
 		/**
 		 * This method is invoked by the formatter when it is almost done.
 		 * After super.setEditValid, if the text field is a String
-		 * set the value to the String (which switches the formatter).
+		 * attempt to set the value (which switches the formatter).
 		 * @param valid
 		 */
 		@Override
@@ -163,22 +173,22 @@ public abstract class FormatterFactory extends DefaultFormatterFactory
 			super.setEditValid(valid);
 			
 			// if a character was added to the Null Formatter,
-			// then use setValue to flip to the MaskFormatter.
+			// then set a value to flip to the  (presumably) edit formatter.
 			final JFormattedTextField ftf = getFormattedTextField();
 			Object value = ftf.getValue();
 			// May not need to check for SSNullFormatter, but things change :-)
-			if(value instanceof String
-					&& ftf.getFormatter() instanceof SSNullFormatter) {
+			if(value instanceof String stringValue
+					&& ftf.getFormatter() instanceof SSNullFormatter
+					&& ftf.getFormatterFactory() instanceof FormatterFactory ff) {
 				try {
-					ftf.setValue(value);
+					ff.switchToNonNullValue(ftf, stringValue);
 					// If ftf is still the null formatter,
-					// then MaskFormatter didn't like the value;
-					// notify and get out.
+					// then Formatter didn't like the value; notify and get out.
 					if (ftf.getFormatter() instanceof SSNullFormatter) {
 						invalidEdit();
 						return;
 					}
-					ftf.getFormatter().valueToString(value);
+
 					// Attempt to put the caret after the character.
 					try {
 						ftf.setCaretPosition(((String)value).length());

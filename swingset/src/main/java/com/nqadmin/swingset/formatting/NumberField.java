@@ -29,56 +29,49 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
-import com.nqadmin.swingset.datasources.DateTime;
+import java.text.NumberFormat;
+import java.util.function.Function;
+
+import javax.swing.SwingConstants;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
 
 /**
- * Base class for date time fields; provides specialized component validation.
+ * Number field.
  */
 @SuppressWarnings("serial")
-abstract public class DateTimeField extends Field
+public abstract class NumberField extends Field
 {
 	/**
-	 * Create.
+	 * Constructor.
 	 * @param factory formatter factory
 	 */
-	public DateTimeField(AbstractFormatterFactory factory) {
-        super(factory);
+	public NumberField(AbstractFormatterFactory factory)
+	{
+		super(factory);
+		setHorizontalAlignment(SwingConstants.RIGHT);
 	}
 
 	/**
 	 * Sets the value of the field to an initial state consistent with
-	 * the AllowNull property. If not AllowNull then use the current system date.
+	 * the AllowNull property. If not AllowNull then 0.
 	 */
 	@Override
 	public void cleanField() {
-		if (getAllowNull()) {
-			setValue(null);
-		} else {
-			setValue(new java.util.Date());
-		}
+		setValue(getAllowNull() ? null : 0);
 	}
 
 	/**
-	 * Specialized Date/Time/Timestamp component validation.
-	 * @return false if the component does not have valid data.
+	 * Apply the function to this' FormatFactory's DisplayFormatter's Format.
+	 * @param f the function to apply
+	 * @return the value from the NumberFormat or -1 if no NumberFormat
 	 */
-	@Override
-	public boolean componentValidate()
-	{
-		if (!super.componentValidate())
-			return false;
-		if (DateTime.isHandledDateTimeComp(this)) {
-			String text = getText();
-			// Check if the MaskFormatter has data;
-			// if not then treat it as an empty string.
-			if (!containsUserText()) {
-				text = "";
-			}
-			if (!DateTime.dateTimeColumnValidate(text, this)) {
-				return false;
-			}
+	protected int getNumberFormatParam(Function<NumberFormat, Integer> f) {
+		if (getFormatterFactory() instanceof DefaultFormatterFactory ff
+				&& ff.getDisplayFormatter() instanceof NumberFormatter nfer
+				&& nfer.getFormat() instanceof NumberFormat nf) {
+			return f.apply(nf);
 		}
-
-		return true;
+		return -1;
 	}
 }

@@ -991,6 +991,9 @@ public class RowSetOps {
 					// spaces should throw an SQL exception
 					// (as should any other duplicate string)
 			
+					// TODO: Have a method "CreateMessage(RSC) see also
+					//		 SSFormattedTextField, SSCommon
+					// NOTE: in following should mention column name
 					throw new SSSQLNullException("Null values are not allowed for this field.");
 				}
 			}
