@@ -57,7 +57,7 @@ import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
-import com.nqadmin.swingset.formatting.Format;
+import com.nqadmin.swingset.formatting.SSFormat;
 import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 import com.nqadmin.swingset.navigate.RowSetModificationEvent;
@@ -495,13 +495,13 @@ public interface SSComponentInterface extends RSC
 	 * conjunction with, but not limited to, {@linkplain SSFormattedTextField}.
 	 * @param format format for this component
 	 */
-	default void setFormat(Format format) { getSSCommon().setFormat(format); }
+	default void setSSFormat(SSFormat format) { getSSCommon().setSSFormat(format); }
 
 	/**
 	 * {@inheritDoc }
 	 */
 	@Override
-	default Format getFormat() { return getSSCommon().getFormat(); }
+	default SSFormat getFormat() { return getSSCommon().getFormat(); }
 
 	/**
 	 * A low level indication of whether or not the component data is valid.
@@ -515,6 +515,8 @@ public interface SSComponentInterface extends RSC
 
 	/**
 	 * This has component specific validation, for example for a SSDateField.
+	 * <p>
+	 * Useful minimum: "return getValue() != null || getAllowNull();"
 	 * @return true if successful validation for the type of component
 	 */
 	default boolean componentValidate() { return true; }

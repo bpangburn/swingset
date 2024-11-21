@@ -70,14 +70,14 @@ public class SSTimestampField extends DateTimeField
      * Create an SSTimestampField using the default format.
      */
     public SSTimestampField() {
-        this(Format.TIMESTAMP);
+        this(SSFormat.TIMESTAMP);
     }
 
     /**
      * Create an SSTimestampField using the specified format.
 	 *  @param format - an enum format for the timestamp field
      */
-    public SSTimestampField(Format format) {
+    public SSTimestampField(SSFormat format) {
         this(createFormatterFactory(format));
     }
 
@@ -103,14 +103,14 @@ public class SSTimestampField extends DateTimeField
 	 * @param _format - Format to use for timestamp while in editing mode.
 	 * @return a DefaultFormatterFactory for the specified time format
 	 */
-	public static DefaultFormatterFactory createFormatterFactory(Format _format) {
-		Format format = _format;
-		if (_format.getType() != Format.TIMESTAMP) {
+	public static DefaultFormatterFactory createFormatterFactory(SSFormat _format) {
+		SSFormat format = _format;
+		if (_format.getType() != SSFormat.TIMESTAMP) {
 			logger.log(Level.ERROR, () -> sf("%s is not a TIMESTAMP, using default",
 					_format.toString()));
-			format = Format.TIMESTAMP;
+			format = SSFormat.TIMESTAMP;
 		}
-		format = Format.getAssignedFormat(format);
+		format = SSFormat.getAssignedFormat(format);
 		String formatMask;
 		String editPattern;
 		switch(format) {
@@ -133,7 +133,7 @@ public class SSTimestampField extends DateTimeField
 		}
 		}
 		return new SSMaskFormatterFactory.Builder<>(formatMask)
-				.format(format)
+				.ssFormat(format)
 				.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
 				.placeholderCharacter('_')
 				.build();

@@ -70,14 +70,14 @@ public class SSTimeField extends DateTimeField
      * Create an SSTimeField using the default format.
      */
     public SSTimeField() {
-        this(Format.TIME);
+        this(SSFormat.TIME);
     }
 
 	/**
 	 *  Creates an SSTimeField with the specified format.
 	 *  @param format - an enum format to be used while the date field is in edit mode
      */
-    public SSTimeField(Format format) {
+    public SSTimeField(SSFormat format) {
         this(createFormatterFactory(format));
     }
 
@@ -95,14 +95,14 @@ public class SSTimeField extends DateTimeField
 	 * @param _format - Format to use for time while in editing mode.
 	 * @return a DefaultFormatterFactory for the specified time format
 	 */
-	public static DefaultFormatterFactory createFormatterFactory(Format _format) {
-		Format format = _format;
-		if (_format.getType() != Format.TIME) {
+	public static DefaultFormatterFactory createFormatterFactory(SSFormat _format) {
+		SSFormat format = _format;
+		if (_format.getType() != SSFormat.TIME) {
 			logger.log(Level.ERROR, () -> sf("%s is not a TIME, using default",
 					_format.toString()));
-			format = Format.TIME;
+			format = SSFormat.TIME;
 		}
-		format = Format.getAssignedFormat(format);
+		format = SSFormat.getAssignedFormat(format);
 		String formatMask;
 		String editPattern;
 		switch(format) {
@@ -116,7 +116,7 @@ public class SSTimeField extends DateTimeField
 		}
 		}
 		return new SSMaskFormatterFactory.Builder<>(formatMask)
-				.format(format)
+				.ssFormat(format)
 				.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
 				.placeholderCharacter('_')
 				.build();

@@ -44,7 +44,7 @@ import javax.swing.text.DefaultFormatterFactory;
 @SuppressWarnings("serial")
 public abstract class FormatterFactory extends DefaultFormatterFactory
 {
-	private final Format format;
+	private final SSFormat ssFormat;
 	private final AbstractFormatter converter;
 	private final BiFunction<JFormattedTextField, AbstractFormatter, Boolean> containsUserText;
 
@@ -57,7 +57,7 @@ public abstract class FormatterFactory extends DefaultFormatterFactory
 	 */
 	abstract protected static class Builder<T extends Builder<T>> {
 		private AbstractFormatter converter = null;
-		private Format format = null;
+		private SSFormat ssFormat = null;
 		private BiFunction<JFormattedTextField, AbstractFormatter, Boolean> containsUserText;
 
 		/** Used by the mask formatter in string2Value and value2String.
@@ -66,10 +66,10 @@ public abstract class FormatterFactory extends DefaultFormatterFactory
 		 * @param val
 		 * @return  builder */
 		public T converter(AbstractFormatter val) { converter = val; return self(); }
-		/** The {@linkplain Format} used when generating this format factory.
+		/** *  The {@link SSFormat} used when generating this format factory.
 		 * @param val
 		 * @return  builder */
-		public T format(Format val) { format = val; return self(); }
+		public T ssFormat(SSFormat val) { ssFormat = val; return self(); }
 		/**
 		 *  This overrides the default check for user input data present.The default
 		 * check is done using {@link FormatterAssist#userText(java.lang.String,
@@ -106,7 +106,7 @@ public abstract class FormatterFactory extends DefaultFormatterFactory
 	 */
 	public FormatterFactory(Builder<?> builder)
 	{
-		this.format = Objects.requireNonNull(builder.format, "format can not be null");
+		this.ssFormat = Objects.requireNonNull(builder.ssFormat, "format can not be null");
 		this.converter = builder.converter;
 		this.containsUserText = builder.containsUserText;
 	}
@@ -115,9 +115,9 @@ public abstract class FormatterFactory extends DefaultFormatterFactory
 	 * The Format used to create factory.
 	 * @return format
 	 */
-	public Format getFormat()
+	public SSFormat getSSFormat()
 	{
-		return format;
+		return ssFormat;
 	}
 
 	/**

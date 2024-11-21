@@ -57,7 +57,7 @@ package com.nqadmin.swingset.formatting;
 //		 One question, how can a user define a Format? Have a base
 //		 "class Format<E extends Enum<E>>" that can be extended?
 //
-public enum Format {
+public enum SSFormat {
 	/** special circumstances or if format not needed (testing) */
 	CUSTOM,
 	/** default date format */
@@ -85,11 +85,11 @@ public enum Format {
 	;
 
 	// TODO: look up the format as needed.
-	static Format getAssignedFormat(Format format) {
+	static SSFormat getAssignedFormat(SSFormat format) {
 		return format.isBase() ? getDefaultFormat(format) : format;
 	}
 
-	static Format getDefaultFormat(Format _format) {
+	static SSFormat getDefaultFormat(SSFormat _format) {
 		return switch(_format.getType()) {
 		case DATE -> DATE_MMDDYYYY_SLASH;
 		case TIME -> TIME_HHMMSS;
@@ -99,14 +99,14 @@ public enum Format {
 		};
 	}
 
-	final private Format type;
+	final private SSFormat type;
 
 	/** the default has no args */
-	Format() {
+	SSFormat() {
 		type = this;
 	}
 
-	Format(Format _base) {
+	SSFormat(SSFormat _base) {
 		type = _base;
 	}
 
@@ -120,7 +120,7 @@ public enum Format {
 	/** The type of this format, e.g. DATE. 
 	 * @return type
 	 */
-	public Format getType() {
+	public SSFormat getType() {
 		return type;
 	}
 }

@@ -51,7 +51,7 @@ import org.junit.jupiter.api.Test;
 import com.nqadmin.swingset.formatting.FormatterAssist.LiteralsAndPositions;
 import com.nqadmin.swingset.formatting.SSMaskFormatterFactory.SSMaskFormatter;
 
-import static com.nqadmin.swingset.formatting.Format.CUSTOM;
+import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
 import static com.nqadmin.swingset.formatting.FormatterAssist.getLiteralsAndPositions;
 import static com.nqadmin.swingset.formatting.SSMaskFormatterFactory.SSMaskFormatter.FORMATTING_CHARS;
 import static org.junit.jupiter.api.Assertions.*;
@@ -178,7 +178,7 @@ public class SSMaskFormatterFactoryTest {
 		CustomParentFormatterFactory.CustomParentBuilder<?> b
 				= new CustomParentFormatterFactory.CustomParentBuilder<>
 			("##/##", "parentArg")
-			.parentParam("parentParam").format(CUSTOM);
+			.parentParam("parentParam").ssFormat(CUSTOM);
 		CustomParentFormatterFactory ff = b.build();
 		assertEquals("parentArg", ff.getParentArg());
 		assertEquals("parentParam", ff.getParentParam());
@@ -193,10 +193,10 @@ public class SSMaskFormatterFactoryTest {
 		CustomChildFormatterFactory.CustomChildBuilder<?> b
 				= new CustomChildFormatterFactory.CustomChildBuilder<>
 			("##/##", "parentArg", "childArg")
-			.parentParam("parentParam").childParam("childParam").format(CUSTOM)
-			.format(CUSTOM).parentParam("parentParam").childParam("childParam")
-			.childParam("childParam").parentParam("parentParam").format(CUSTOM)
-			.format(CUSTOM).childParam("childParam").parentParam("parentParam");
+			.parentParam("parentParam").childParam("childParam").ssFormat(CUSTOM)
+			.ssFormat(CUSTOM).parentParam("parentParam").childParam("childParam")
+			.childParam("childParam").parentParam("parentParam").ssFormat(CUSTOM)
+			.ssFormat(CUSTOM).childParam("childParam").parentParam("parentParam");
 
 		CustomChildFormatterFactory ff = b.build();
 		assertEquals("parentArg", ff.getParentArg());

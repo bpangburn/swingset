@@ -69,14 +69,14 @@ public class SSDateField extends DateTimeField {
 	 *  Creates a default SSDateField object using the default date format.
 	 */
 	public SSDateField(){
-		this(Format.DATE);
+		this(SSFormat.DATE);
 	}
 
 	/**
 	 *  Creates a new instance of SSDateField with the specified format.
 	 *  @param _format - an enum format to be used while the date field is in edit mode
 	 */
-	public SSDateField(final Format _format) {
+	public SSDateField(final SSFormat _format) {
 		this(createFormatterFactory(_format));
 	}
 
@@ -94,17 +94,17 @@ public class SSDateField extends DateTimeField {
 	 * @param _format - Format to be used for date while in editing mode.
 	 * @return a DefaultFormatterFactory for the specified date format
 	 */
-	public static DefaultFormatterFactory createFormatterFactory(Format _format) {
-		Format format = _format;
-		if ( _format.getType() != Format.DATE ) {
+	public static DefaultFormatterFactory createFormatterFactory(SSFormat _format) {
+		SSFormat format = _format;
+		if ( _format.getType() != SSFormat.DATE ) {
 			// I'd be inclined to exception
 			// throw new IllegalArgumentException(
 			// 		String.format("% is not a DATE", _format.toString()));
 			logger.log(Level.ERROR, () -> String.format("%s is not a DATE, using default",
 					_format.toString()));
-			format = Format.DATE;
+			format = SSFormat.DATE;
 		}
-		format = Format.getAssignedFormat(format);
+		format = SSFormat.getAssignedFormat(format);
 		String formatMask;
 		String editPattern;
 		switch(format) {
@@ -128,7 +128,7 @@ public class SSDateField extends DateTimeField {
 		}
 		
 		return new SSMaskFormatterFactory.Builder<>(formatMask)
-				.format(format)
+				.ssFormat(format)
 				.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
 				.placeholderCharacter('_')
 				.build();

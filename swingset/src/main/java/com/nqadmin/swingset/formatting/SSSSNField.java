@@ -74,7 +74,7 @@ public class SSSSNField extends SSFormattedTextField
 	public static DefaultFormatterFactory createFormatterFactory() {
 		String formatMask = "###-##-####";
 		return new SSMaskFormatterFactory.Builder<>(formatMask)
-				.format(Format.CUSTOM)
+				.ssFormat(SSFormat.CUSTOM)
 				.valueContainsLiterals(true) // database string includes the '-'
 				.placeholderCharacter('_')
 				.build();

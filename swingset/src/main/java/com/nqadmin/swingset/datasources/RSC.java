@@ -47,7 +47,7 @@ import java.sql.SQLException;
 
 import javax.sql.RowSet;
 
-import com.nqadmin.swingset.formatting.Format;
+import com.nqadmin.swingset.formatting.SSFormat;
 
 /**
  * This interface is an accessor to a {@linkplain RowSet} and one of its
@@ -143,7 +143,7 @@ public interface RSC
 	 * A component may have a display/parse format.
 	 * @return The format for this component
 	 */
-	default Format getFormat() { return null; }
+	default SSFormat getFormat() { return null; }
 
 	/**
 	 * @return Does the column allow null?

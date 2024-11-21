@@ -251,7 +251,7 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		 * @return format
 		 */
 		@Override
-		public Format getFormat() {
+		public SSFormat getSSFormat() {
 			if(getFormattedTextField() instanceof SSFormattedTextField ftf)
 				return ftf.getFormat();
 			return null;
@@ -281,10 +281,8 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		 */
 		@Override
 		public Object stringToValue(String s) throws ParseException {
-			if (s == null || s.trim().isEmpty()) {
-				// TODO: should check AllowNull, if not return "" ???
+			if (s == null || s.trim().isEmpty())
 				return null;
-			}
 			// TODO: why/when is this dance needed?
 			Object v = super.stringToValue(s);
 			return assistStringToValue(v);

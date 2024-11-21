@@ -99,7 +99,7 @@ import com.nqadmin.swingset.datasources.SSSQLNullException;
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
-import com.nqadmin.swingset.formatting.Format;
+import com.nqadmin.swingset.formatting.SSFormat;
 import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 import com.nqadmin.swingset.navigate.RowSetState;
@@ -1364,18 +1364,18 @@ public class SSCommon
 		//return new BackgroundDecorator();
 	}
 
-	private Format format;
+	private SSFormat format;
 	/**
 	 * @param format
 	 * @see SSComponentInterface#setFormat(com.nqadmin.swingset.formatting.Format) 
 	 */
-	public void setFormat(Format format) { this.format = format; }
+	public void setSSFormat(SSFormat format) { this.format = format; }
 
 	/**
 	 * @return 
 	 * @see SSComponentInterface#getFormat() 
 	 */
-	public Format getFormat() { return format; }
+	public SSFormat getFormat() { return format; }
 
 	/**
 	 * Find the default decorator for this component type and set it.
