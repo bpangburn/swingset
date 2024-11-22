@@ -20,7 +20,7 @@
 
 		<!-- MAVEN AND JAVA VERSIONS -->
 		<version.maven>3.8.7</version.maven>
-		<version.java>11</version.java>
+		<version.java>21</version.java>
 
 		<!-- DEPENDENCIES -->
 		<!--<version.glazedlists>1.11.0</version.glazedlists> -->
@@ -194,6 +194,32 @@
 				<artifactId>versions-maven-plugin</artifactId>
 				<version>${version.versions-maven-plugin}</version>
 			</plugin>
+			
+			<!-- Added from https://github.com/eppleton/frgaal -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${version.maven-compiler-plugin}</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.frgaal</groupId>
+						<artifactId>compiler-maven-plugin</artifactId>
+						<version>21.0.0</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<compilerId>frgaal</compilerId>
+					<source>21</source>
+					<target>11</target>
+					<compilerArgs>
+						<arg>-Xlint:deprecation</arg>
+						<!--only needed when using preview language features-->
+						<!-- <arg>- -enable-preview</arg> -->
+						<arg>--enable-preview</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+			
 			<!-- Maven Enforcer forces specified version of Java and Maven -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -257,20 +283,25 @@
 				<version>${version.maven-site-plugin}</version>
 			</plugin>
 
+			<!--$NO-MVN-MAN-VER$-->
+			<!-- Included above with frgaal
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${version.maven-compiler-plugin}</version><!--$NO-MVN-MAN-VER$-->
+				<version>${version.maven-compiler-plugin}</version>
 
 				<configuration>
 					<release>${version.java}</release>
 				</configuration>
 			</plugin>
+			-->
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${version.maven-surefire-plugin}</version>
 			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
