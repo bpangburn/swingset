@@ -75,6 +75,16 @@ public class SSUtils {
 		logger.error("Using RootLogger", new Throwable());
 		return logger;
 	}
+	
+	/**
+	 * Shorthand for "String.format(fmt, args)".
+	 * @param fmt format
+	 * @param args args
+	 * @return string
+	 */
+	public static String sf(String fmt, Object... args) {
+		return args.length == 0 ? fmt : String.format(fmt, args);
+	}
 
 	/**
 	 * Returns an unmodifiable list containing an arbitrary number of elements.
