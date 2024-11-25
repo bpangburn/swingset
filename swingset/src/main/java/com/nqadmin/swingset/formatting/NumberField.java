@@ -29,8 +29,10 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.swing.SwingConstants;
 import javax.swing.text.DefaultFormatterFactory;
@@ -73,5 +75,33 @@ public abstract class NumberField extends Field
 			return f.apply(nf);
 		}
 		return -1;
+	}
+
+	/**
+	 * Take the supplied number format and configure it with defaults.
+	 * A number format that does big decimal.
+	 * @param f
+	 * @return 
+	 */
+	public static NumberFormat createFormat(Supplier<NumberFormat> f) {
+		NumberFormat format = f.get();
+		parseBigDecimal(format, true);
+		return format;
+	}
+
+	/**
+	 * Attempt to control whether the format generates a BigDecimal result
+	 * or not.Only {@link DecimalFormat} can control it.
+	 * 
+	 * @param format modify this format if possible
+	 * @param flag if true turn on BigDecimal format/parse
+	 * @return true if the modification was possible
+	 */
+	static public boolean parseBigDecimal(NumberFormat format, boolean flag) {
+		if (format instanceof DecimalFormat df) {
+			df.setParseBigDecimal(flag);
+			return true;
+		}
+		return false;
 	}
 }

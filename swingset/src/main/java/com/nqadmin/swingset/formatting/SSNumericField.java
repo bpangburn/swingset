@@ -133,7 +133,7 @@ public class SSNumericField extends NumberField
 	{
 		Objects.requireNonNull(ssFormat);
 
-		NumberFormat numericFormat = NumberFormat.getInstance(Locale.US);
+		NumberFormat numericFormat = createFormat(()->NumberFormat.getInstance(Locale.US));
 
 		if (precision!=null) {
 			numericFormat.setMaximumIntegerDigits(precision);
@@ -144,12 +144,12 @@ public class SSNumericField extends NumberField
 			numericFormat.setMinimumFractionDigits(decimals);
 		}
 		
-		// Note that the editFormatter does not specify precision/decimals.
-		
+		// Use the same format for edit and display.
+
 		return new SSFormatterFactory.Builder<>()
 				.ssFormat(ssFormat)
 				.displayFormatter(new SSNumberFormatter(numericFormat))
-				.editFormatter(new SSNumberFormatter(NumberFormat.getInstance(Locale.US)))
+				.editFormatter(new SSNumberFormatter(numericFormat))
 				.build();
 	}
 }

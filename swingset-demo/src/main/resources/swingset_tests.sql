@@ -79,8 +79,8 @@ CREATE TABLE IF NOT EXISTS swingset_formatted_test_data
 ( 
     swingset_formatted_test_pk INTEGER DEFAULT nextval('swingset_formatted_test_seq') NOT NULL PRIMARY KEY,
     ss_cuit_field VARCHAR(13), /* Tax ID for the country of Argentina. See https://meta.cdq.ch/CUIT_number_(Argentina) */
-    ss_currency_field DECIMAL(20,2) NOT NULL,
-    ss_currency_field_null DECIMAL(20,2),
+    ss_currency_field DECIMAL(25,2) NOT NULL,
+    ss_currency_field_null DECIMAL(25,2),
     ss_date_field DATE NOT NULL,
     ss_date_field_null DATE,
     ss_formatted_text_field VARCHAR(50), /* parent class for formatted components */

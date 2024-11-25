@@ -161,12 +161,11 @@ public class SSCurrencyField extends NumberField
 
 		Locale defaultLocale = Locale.getDefault(Locale.Category.FORMAT);
 		// For display use currency, e.g. might see '$'. TODO: use the same for both?
-		NumberFormat displayFormat = NumberFormat.getCurrencyInstance(
-				displayLocale != null ? displayLocale : defaultLocale);
-		//NumberFormat editorFormat = displayFormat;
+		NumberFormat displayFormat = createFormat(()->NumberFormat.getCurrencyInstance(
+				displayLocale != null ? displayLocale : defaultLocale));
 		// For editing use a plain number
-		NumberFormat editorFormat = NumberFormat.getInstance(
-				displayLocale != null ? displayLocale : defaultLocale);
+		NumberFormat editorFormat = createFormat(()->NumberFormat.getInstance(
+				displayLocale != null ? displayLocale : defaultLocale));
 
 		if (precision!=null) {
 			editorFormat.setMaximumIntegerDigits(precision);

@@ -110,7 +110,9 @@ public class SSIntegerField extends NumberField
 			SSFormat ssFormat, Integer precision)
 	{
 		Objects.requireNonNull(ssFormat);
-		NumberFormat integerFormat = NumberFormat.getIntegerInstance();
+
+		NumberFormat integerFormat = createFormat(()->NumberFormat.getIntegerInstance());
+
 		if (precision!=null) {
 			integerFormat.setMaximumIntegerDigits(precision);
 			integerFormat.setMinimumIntegerDigits(1);
