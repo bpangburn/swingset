@@ -286,7 +286,20 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		 */
 		@Override
 		public String valueToString(Object value) throws ParseException {
-			String s = assistValueToString(value);
+			String s = "";
+			if (value != null) {
+				if (value instanceof String string) {
+					// handle the case where where was null formatter
+					s = string;
+				} else {
+					if (getConverter() != null) {
+						s = getConverter().valueToString(value);
+					} else {
+						s = value.toString();
+					}
+				}
+			}
+
 			s = super.valueToString(s);
 			return s;
 		}
@@ -302,14 +315,16 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		@Override
 		public Object stringToValue(String s) throws ParseException {
 			if (s == null || s.isBlank()) {
-				//if(getFormattedTextField() instanceof SSFormattedTextField ftf
-				//		&& !ftf.getAllowNull())
-				//	throw new ParseException("Null value not allowed", 0);
+				if(getFormattedTextField() instanceof SSFormattedTextField ftf
+						&& !ftf.getAllowNull())
+					throw new ParseException("Null value not allowed", 0);
 				return null;
 			}
-			// TODO: why/when is this dance needed?
-			Object v = super.stringToValue(s);
-			return assistStringToValue(v);
+			Object v = super.stringToValue(s);	// the string without mask caracters.
+			if (getConverter() != null) {
+				v = getConverter().stringToValue((String)v);
+			}
+			return v;
 		}
 
 		/**
@@ -321,6 +336,7 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		@Override
 		protected void setEditValid(boolean valid) {
 			super.setEditValid(valid);
+			// TODO: should this be done if not valid?
 			assistSetEditValid(getFormattedTextField());
 		}
 

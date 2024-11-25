@@ -50,10 +50,6 @@ import javax.swing.text.DefaultFormatterFactory;
 
 import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
 
-// TODO: The locale maintenance is screwy; for example if you spec a locale,
-//		 and then do setPrecision() you lose the locale. There does not seem
-//		 to be any way to determine the locale of a given NumberFormat/Format.
-
 /**
  * Used to link a SSFormattedTextField to a currency column in a database.
  */
@@ -72,8 +68,7 @@ public class SSCurrencyField extends NumberField
 	 * fraction digits
 	 *
 	 * @param precision - number of digits needed for integer part of the number
-	 * @param decimals  - number of digits needed for the fraction part of the
-	 *                   number
+	 * @param decimals  - number of digits needed for the fraction part of the number
 	 */
 	public SSCurrencyField(int precision, int decimals) {
 		this(createFormatterFactory(CUSTOM, precision, decimals, null, null));
@@ -83,16 +78,13 @@ public class SSCurrencyField extends NumberField
 	 * Creates an instance of SSCurrenyField with the specified number of integer and
 	 * fraction digits using the given locale
 	 *
-	 * @param precision     - number of digits needed for integer part of the
-	 *                       number
-	 * @param decimals      - number of digits needed for the fraction part of the
-	 *                       number
-	 * @param editorLocale  - locale to be used while in editing mode
+	 * @param precision     - number of digits needed for integer part of the number
+	 * @param decimals      - number of digits needed for the fraction part of the number
+	 * @param editLocale  - locale to be used while in editing mode
 	 * @param displayLocale - locate to be used for displaying the number
 	 */
-	public SSCurrencyField(int precision, int decimals, Locale editorLocale,
-			Locale displayLocale) {
-		this(createFormatterFactory(CUSTOM, precision, decimals, editorLocale, displayLocale));
+	public SSCurrencyField(int precision, int decimals, Locale editLocale, Locale displayLocale) {
+		this(createFormatterFactory(CUSTOM, precision, decimals, editLocale, displayLocale));
 	}
 
 	/**
@@ -105,77 +97,37 @@ public class SSCurrencyField extends NumberField
 	}
 
 	/**
-	 * Getter for property decimals.
-	 *
-	 * @return Value of property decimals, -1 if a problem
-	 */
-	public int getDecimals() {
-		return getNumberFormatParam((nf) -> nf.getMaximumFractionDigits());
-	}
-
-	/**
-	 * Returns the number digits used for integer part of the number
-	 *
-	 * @return returns the number digits used for integer part of the number, -1 if a problem
-	 */
-	public int getPrecision() {
-		return getNumberFormatParam((nf) -> nf.getMaximumIntegerDigits());
-	}
-
-	/**
-	 * Sets the number of digits needed for fraction part of the number
-	 * <p>
-	 * <b>NOTE:</b> This does not preserve a previously set locale.
-	 * 
-	 * @param decimals - number of digits needed for fraction part of the number
-	 */
-	public void setDecimals(final int decimals) {
-		setFormatterFactory(createFormatterFactory(CUSTOM, getPrecision(), decimals, null, null));
-	}
-
-	/**
-	 * Sets the number of digits needed for integer part of the number
-	 * <p>
-	 * <b>NOTE:</b> This does not preserve a previously set locale.
-	 * 
-	 * @param precision - number of digits needed for integer part of the number
-	 */
-	public void setPrecision(final int precision) {
-		setFormatterFactory(createFormatterFactory(CUSTOM, precision, getDecimals(), null, null));
-	}
-
-	/**
 	 * Create a FormatterFactory.
 	 * @param ssFormat
 	 * @param precision - number of digits needed for integer part of the number
 	 * @param decimals - number of digits needed for fraction part of the number
-	 * @param editorLocale - locale while editing
+	 * @param editLocale - locale while editing
 	 * @param displayLocale - locale while not editing
 	 * @return FormatterFactory.
 	 */
 	public static DefaultFormatterFactory createFormatterFactory(
 			SSFormat ssFormat, Integer precision, Integer decimals,
-			Locale editorLocale, Locale displayLocale)
+			Locale editLocale, Locale displayLocale)
 	{
 		Objects.requireNonNull(ssFormat);
 
 		Locale defaultLocale = Locale.getDefault(Locale.Category.FORMAT);
 		// For display use currency, e.g. might see '$'. TODO: use the same for both?
-		NumberFormat displayFormat = createFormat(()->NumberFormat.getCurrencyInstance(
+		NumberFormat displayFormat = createNumberFormat(()->NumberFormat.getCurrencyInstance(
 				displayLocale != null ? displayLocale : defaultLocale));
 		// For editing use a plain number
-		NumberFormat editorFormat = createFormat(()->NumberFormat.getInstance(
+		NumberFormat editFormat = createNumberFormat(()->NumberFormat.getInstance(
 				displayLocale != null ? displayLocale : defaultLocale));
 
 		if (precision!=null) {
-			editorFormat.setMaximumIntegerDigits(precision);
-			editorFormat.setMinimumIntegerDigits(1);
+			editFormat.setMaximumIntegerDigits(precision);
+			editFormat.setMinimumIntegerDigits(1);
 			displayFormat.setMaximumIntegerDigits(precision);
 			displayFormat.setMinimumIntegerDigits(1);
 		}
 		if (decimals!=null) {
-			editorFormat.setMaximumFractionDigits(decimals);
-			editorFormat.setMinimumFractionDigits(decimals);
+			editFormat.setMaximumFractionDigits(decimals);
+			editFormat.setMinimumFractionDigits(decimals);
 			displayFormat.setMaximumFractionDigits(decimals);
 			displayFormat.setMinimumFractionDigits(decimals);
 		}
@@ -184,7 +136,7 @@ public class SSCurrencyField extends NumberField
 		
 		return new SSFormatterFactory.Builder<>()
 				.ssFormat(ssFormat)
-				.editFormatter(new SSNumberFormatter(editorFormat))
+				.editFormatter(new SSNumberFormatter(editFormat))
 				.displayFormatter(new SSNumberFormatter(displayFormat))
 				.build();
 	}

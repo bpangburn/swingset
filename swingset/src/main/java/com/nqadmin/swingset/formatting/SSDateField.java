@@ -104,7 +104,7 @@ public class SSDateField extends DateTimeField {
 					_format.toString()));
 			format = SSFormat.DATE;
 		}
-		format = SSFormat.getAssignedFormat(format);
+		format = SSFormat.getActualFormat(format);
 		String formatMask;
 		String editPattern;
 		switch(format) {

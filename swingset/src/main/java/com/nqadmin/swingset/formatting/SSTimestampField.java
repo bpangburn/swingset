@@ -110,7 +110,7 @@ public class SSTimestampField extends DateTimeField
 					_format.toString()));
 			format = SSFormat.TIMESTAMP;
 		}
-		format = SSFormat.getAssignedFormat(format);
+		format = SSFormat.getActualFormat(format);
 		String formatMask;
 		String editPattern;
 		switch(format) {

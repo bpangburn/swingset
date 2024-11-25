@@ -86,42 +86,6 @@ public class SSNumericField extends NumberField
 	}
 
 	/**
-	 * Returns the number of digits used for fraction part of the number
-	 *
-	 * @return returns the number of digits used for fraction part of the number, -1 if a problem
-	 */
-	public int getDecimals() {
-		return getNumberFormatParam((nf) -> nf.getMaximumFractionDigits());
-	}
-
-	/**
-	 * Returns the number digits used for integer part of the number
-	 *
-	 * @return returns the number digits used for integer part of the number, -1 if a problem
-	 */
-	public int getPrecision() {
-		return getNumberFormatParam((nf) -> nf.getMaximumIntegerDigits());
-	}
-
-	/**
-	 * Sets the number of digits needed for fraction part of the number
-	 *
-	 * @param decimals - number of digits needed for fraction part of the number
-	 */
-	public void setDecimals(int decimals) {
-		setFormatterFactory(createFormatterFactory(CUSTOM, getPrecision(), decimals));
-	}
-
-	/**
-	 * Sets the number of digits needed for integer part of the number
-	 *
-	 * @param precision - number of digits needed for integer part of the number
-	 */
-	public void setPrecision(int precision) {
-		setFormatterFactory(createFormatterFactory(CUSTOM, precision, getDecimals()));
-	}
-
-	/**
 	 * Create a FormatterFactory.
 	 * @param ssFormat
 	 * @param precision - number of digits needed for integer part of the number
@@ -133,7 +97,7 @@ public class SSNumericField extends NumberField
 	{
 		Objects.requireNonNull(ssFormat);
 
-		NumberFormat numericFormat = createFormat(()->NumberFormat.getInstance(Locale.US));
+		NumberFormat numericFormat = createNumberFormat(()->NumberFormat.getInstance(Locale.US));
 
 		if (precision!=null) {
 			numericFormat.setMaximumIntegerDigits(precision);

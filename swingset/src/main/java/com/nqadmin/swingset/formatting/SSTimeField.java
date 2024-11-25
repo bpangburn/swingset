@@ -102,7 +102,7 @@ public class SSTimeField extends DateTimeField
 					_format.toString()));
 			format = SSFormat.TIME;
 		}
-		format = SSFormat.getAssignedFormat(format);
+		format = SSFormat.getActualFormat(format);
 		String formatMask;
 		String editPattern;
 		switch(format) {

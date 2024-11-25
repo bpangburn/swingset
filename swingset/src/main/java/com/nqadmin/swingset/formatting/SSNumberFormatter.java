@@ -72,7 +72,7 @@ public class SSNumberFormatter extends NumberFormatter implements FormatterAssis
 	public String valueToString(Object value) throws ParseException {
 		String string;
 
-		// TODO: handle a converter
+		// TODO: handle a converter, see SSMaskFormatterFactory
 		//s = assistValueToString(value);
 
 		//Object v = value instanceof String s ? stringToValue(s) : value;
@@ -81,18 +81,6 @@ public class SSNumberFormatter extends NumberFormatter implements FormatterAssis
 		string = super.valueToString(v);
 		return string;
 	}
-
-	// @Override
-	// public String valueToString(Object value) throws ParseException {
-	// 	String s;
-	// 	s = assistValueToString(value);
-	// 	//String s = FormatterAssist.super.valueToString(value);
-	// 	//s = super.valueToString(s);		// <<<<<<<<<<<<<<< doesn't seem right
-
-	// 	Object v = value;
-	// 	s = super.valueToString(v);
-	// 	return s;
-	// }
 	
 	/**
 	 * First convert the string with super.stringToValue,
@@ -117,5 +105,6 @@ public class SSNumberFormatter extends NumberFormatter implements FormatterAssis
 					s, ppos.getIndex()), ppos.getIndex());
 		// Only need to do following so that min/max constraints are checked.
 		return super.stringToValue(s);
+		// TODO: handle a converter, see SSMaskFormatterFactory
 	}
 }

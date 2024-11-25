@@ -39,7 +39,7 @@ import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 
 /**
- * Specialized formatter; handles allow null and format.
+ * Base for SS formatter factories; supports allow null and ssFormat.
  */
 @SuppressWarnings("serial")
 public abstract class FormatterFactory extends DefaultFormatterFactory
@@ -60,7 +60,9 @@ public abstract class FormatterFactory extends DefaultFormatterFactory
 		private SSFormat ssFormat = null;
 		private BiFunction<JFormattedTextField, AbstractFormatter, Boolean> containsUserText;
 
-		/** Used by the mask formatter in string2Value and value2String.
+		/** May be used by a formatter to assist string2Value and value2String.
+		 * For example, the SS mask formatters work with strings, the converter
+		 * converts string to value; like a Date.
 		 * It's the last step in stringToValue; it produces the Value
 		 * in the formatted text field.
 		 * @param val

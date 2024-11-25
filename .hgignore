@@ -10,3 +10,4 @@ syntax: glob
 
 syntax: rootglob
 NOTES-LOCAL
+tags

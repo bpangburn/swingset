@@ -84,19 +84,25 @@ public enum SSFormat {
 	TIMESTAMP_YYYYMMDD_STROKE (TIMESTAMP),
 	;
 
-	// TODO: look up the format as needed.
-	static SSFormat getAssignedFormat(SSFormat format) {
-		return format.isBase() ? getDefaultFormat(format) : format;
-	}
-
-	static SSFormat getDefaultFormat(SSFormat _format) {
-		return switch(_format.getType()) {
+	// could add a field to contructor that says "I'm default".
+	private static SSFormat getDefaultFormat(SSFormat format) {
+		return switch(format.getType()) {
 		case DATE -> DATE_MMDDYYYY_SLASH;
 		case TIME -> TIME_HHMMSS;
 		//case TIMESTAMP -> TIMESTAMP_YYYYMMDD_HHMMSS;
 		case TIMESTAMP -> TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ;
-		default -> null;
+		default -> format;	// XXX
 		};
+	}
+
+	/**
+	 * The param format may resolve to another format.
+	 * Find the actual format to use.
+	 * @param format format
+	 * @return a format that can b
+	 */
+	public static SSFormat getActualFormat(SSFormat format) {
+		return format.isBase() ? getDefaultFormat(format) : format;
 	}
 
 	final private SSFormat type;

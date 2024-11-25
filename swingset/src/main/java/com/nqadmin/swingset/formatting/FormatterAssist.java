@@ -75,61 +75,6 @@ interface FormatterAssist
 	 * @return characters not input by the user
 	 */
 	default String getFormatLiterals() { return ""; }
-
-	/* *************************************************************************
-	 * Example usage: in SSMaskFormatterFactory:
-	 *
-	 *	public Object stringToValue(String s) throws ParseException {
-	 *		if (s == null || s.trim().isEmpty()) {
-	 *			// TODO: should check AllowNull, if not return "" ???
-	 *			return null;
-	 *		}
-	 *		// TODO: why/when is this dance needed?
-	 *		Object v = super.stringToValue(s);
-	 *		return assistStringToValue(v);
-	 * ************************************************************************/
-	
-	/**
-	 * If the value is not a String and there is a converter,
-	 * then first convert the value before caller's valueToString.
-	 * @param value
-	 * @return String representation of the value
-	 * @throws ParseException
-	 */
-	//
-	// TODO: should this be Object --> Object, let the caller sort it out
-	default String assistValueToString(Object value) throws ParseException {
-		String s = "";
-		if (value != null) {
-			if (value instanceof String string) {
-				// handle the case where where was null formatter
-				s = string;
-			} else {
-				if (getConverter() != null) {
-					s = getConverter().valueToString(value);
-				} else {
-					s = value.toString();
-				}
-			}
-		}
-		return s;
-	}
-	
-	/**
-	 * Take the caller's stringToValue,
-	 * then use the converter (if there is one) to create
-	 * the value object.
-	 * @param s
-	 * @return
-	 * @throws ParseException
-	 */
-	default Object assistStringToValue(Object s) throws ParseException {
-		Object v = s;
-		if (getConverter() != null) {
-			v = getConverter().stringToValue((String)s);
-		}
-		return v;
-	}
 	
 	/**
 	 * This method is invoked by the formatter when it is almost done.
@@ -267,6 +212,8 @@ interface FormatterAssist
 	 */
 	public static String userText(String text, String mask,
 			String formattingChars, Character placeholderChar) {
+		if (text == null)
+			return"";
 		List<Integer> posLiterals = getLiteralsAndPositions(mask, formattingChars).positions();
 		// TODO: use reversed when full jdk-21
 		//if (!posLiterals.isEmpty() || mf.getPlaceholder() != null)

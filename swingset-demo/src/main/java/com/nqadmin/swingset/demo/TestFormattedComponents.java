@@ -105,6 +105,8 @@ public class TestFormattedComponents extends JFrame {
 	JLabel lblSSSSNField = new JLabel("SSSSNField");
 	JLabel lblSSTimeField = new JLabel("SSTimeField");
 	JLabel lblSSTimestampField = new JLabel("SSTimestampField");
+	JLabel lblDebugField = new JLabel("DebugField");
+	JLabel lblDebugFieldNull = new JLabel("DebugFieldNull");
 
 	/**
 	 * bound component declarations
@@ -123,6 +125,8 @@ public class TestFormattedComponents extends JFrame {
 	SSSSNField fmtSSSSNField = new SSSSNField();
 	SSTimeField fmtSSTimeField = new SSTimeField();
 	SSTimestampField fmtSSTimestampField = new SSTimestampField();
+	DebugField fmtDebugField = new DebugField();
+	DebugField fmtDebugFieldNull = new DebugField();
 
 	/**
 	 * database component declarations
@@ -285,6 +289,11 @@ public class TestFormattedComponents extends JFrame {
 				fmtSSTimeField.bind(rowset, "ss_time_field");
 				fmtSSTimestampField.bind(rowset, "ss_timestamp_field");
 
+				//fmtDebugField.bind(rowset, "");
+				//fmtDebugFieldNull.bind(rowset, "");
+				fmtDebugField.setAllowNull(false);
+				fmtDebugField.setText("333");
+
 			// SET LABEL DIMENSIONS
 				lblSSDBComboNav.setPreferredSize(MainClass.labelDim);
 
@@ -303,6 +312,8 @@ public class TestFormattedComponents extends JFrame {
 				lblSSSSNField.setPreferredSize(MainClass.labelDim);
 				lblSSTimeField.setPreferredSize(MainClass.labelDim);
 				lblSSTimestampField.setPreferredSize(MainClass.labelDim);
+				lblDebugField.setPreferredSize(MainClass.labelDim);
+				lblDebugFieldNull.setPreferredSize(MainClass.labelDim);
 
 			// SET BOUND COMPONENT DIMENSIONS
 				cmbSSDBComboNav.setPreferredSize(MainClass.ssDim);
@@ -322,6 +333,8 @@ public class TestFormattedComponents extends JFrame {
 				fmtSSSSNField.setPreferredSize(MainClass.ssDim);
 				fmtSSTimeField.setPreferredSize(MainClass.ssDim);
 				fmtSSTimestampField.setPreferredSize(MainClass.ssDim);
+				fmtDebugField.setPreferredSize(MainClass.ssDim);
+				fmtDebugFieldNull.setPreferredSize(MainClass.ssDim);
 
 			// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
 				final Container contentPane = getContentPane();
@@ -360,6 +373,10 @@ public class TestFormattedComponents extends JFrame {
 				contentPane.add(lblSSTimeField, constraints);
 				constraints.gridy++;
 				contentPane.add(lblSSTimestampField, constraints);
+				constraints.gridy++;
+				contentPane.add(lblDebugField, constraints);
+				constraints.gridy++;
+				contentPane.add(lblDebugFieldNull, constraints);
 
 				constraints.gridx = 1;
 				constraints.gridy = 0;
@@ -393,6 +410,10 @@ public class TestFormattedComponents extends JFrame {
 				contentPane.add(fmtSSTimeField, constraints);
 				constraints.gridy++;
 				contentPane.add(fmtSSTimestampField, constraints);
+				constraints.gridy++;
+				contentPane.add(fmtDebugField, constraints);
+				constraints.gridy++;
+				contentPane.add(fmtDebugFieldNull, constraints);
 
 				constraints.gridx = 0;
 				constraints.gridy++;

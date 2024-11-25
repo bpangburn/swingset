@@ -79,24 +79,23 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 // TODO: Review state transitions (where it can happen).
 //		 Make sure to decorate at these points.
 // TODO: Remove extraneous decorate.
-// TODO: Get rid of forceErrorState
 
 /**
  * SSFormattedTextField extends the JFormattedTextField.
- * This is the pivotal class for this package.
+ * This is the pivotal class for this package. It operates as a {@link SSComponentInterface}.
+ * It locks focus while data is invalid and updates the database while editing.
  *
- * Note {@link #isAllValid()} is used to do validation. It does
+ * Note {@link #isAllValid()} is used to do validation; it does
  * {@linkplain #isDataValid() } and maybe {@linkplain SSCommon#validate() }.
  *
  * The component can implement {@link #componentValidate() } to add additional
  * checks (like date validation) beyond what is provided by the
- * Formatter/FormatterFactory, which generally only handles display of values
- * and/or character masks. Application checks are added with
+ * Formatter/FormatterFactory (which generally only handles display of values
+ * and/or character masks). Add application validity checks with
  * {@link SSCommon#setValidator(com.nqadmin.swingset.decorators.Validator)}.
- * <p>
- * See https://docs.oracle.com/javase/8/docs/api/javax/swing/JFormattedTextField.html
- * See https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/JFormattedTextField.html
  *
+ * @see https://docs.oracle.com/javase/8/docs/api/javax/swing/JFormattedTextField.html
+ * @see https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/JFormattedTextField.html
  * @see {@link FormattedTextFieldVerifier} which locks focus while data is invalid.
  * @see {@link SSFormattedTextFieldListener} which may update the database.
  */
@@ -108,180 +107,165 @@ public class SSFormattedTextField extends JFormattedTextField
 	/**
 	 * This InputVerifier locks the focus down while the 
 	 * JFormattedTextField has invalid data.
-	 * 
 	 * If non empty text do stringToValue validation check, then use
 	 * {@link #isAllValid()} for more validation checks. If the data is valid
 	 * and the value is null then do {@link #setValue(null) } to make sure the
 	 * null formatter is used subsequently.
+	 * <p>
+	 * If weird errors occur, return true to avoid a focus lock hang.
 	 */
 	public class FormattedTextFieldVerifier extends InputVerifier
 	{
 		/**
+		 * Check component text valid; allow focus change if it is.
+		 * If weird errors are encountered, allow focus to change
+		 * so focus doesn't get stuck.
 		 * @param input Component to be validated/verified
 		 * @return true if the input is valid, otherwise false
 		 */
 		@Override
-		public boolean verify(final JComponent input) {
-
-			boolean ok = true;
+		public boolean verify(final JComponent input)
+		{
+			// assert input == SSFormattedTextField.this; 
+			final SSFormattedTextField ftf = (SSFormattedTextField) input;
 			Object value = null;
-
-			// Suppress "value" property change event if a call is made to setValue()
-			verifyingText = true;
-
-			try {
-				if (input instanceof SSFormattedTextField ftf) {
-
-					String formattedText = ftf.getText();
-
-					AbstractFormatter formatter = ftf.getFormatter();
-					logger.log(DEBUG, ()->sf("SSFormattedTextField %s, Formatter %s",
+			String formattedText = ftf.getText();
+			AbstractFormatter formatter = ftf.getFormatter();
+			
+			logger.log((formatter == null || formattedText == null) ? Level.ERROR : DEBUG,
+					()->sf("FormattedText %s, Formatter %s",
 							getColumnForLog(), formatter == null ? null
 									: formatter.getClass().getSimpleName()));
-					if (formatter == null) {
-						logger.log(Level.ERROR, "Null formatter encountered for formatted text field.");
-					}
-
-					// TODO: Shouldn't empty text be ok to parse?
-					//		 Is this part of AllowNull?
-					// TODO: should this be ".isBlank()"?
-					if (formatter != null && formattedText != null && !formattedText.isEmpty()) {
-						try {
-							// Convert the text looking for ParseError. No commitEdit().
-							value = formatter.stringToValue(formattedText);
-						} catch (ParseException pe) {
-							// Only DEBUG since user entry may cause it
-							logger.log(DEBUG, ()->sf("%s: String of '%s' generated a Parse Exception at %s.",
-									getColumnForLog(), formattedText, pe.getErrorOffset()), pe);
-							ok = false;
-						}
-					} else {
-						if (formatter == null)
-							logger.log(WARNING, "formatter is null");
-						else // empty/null string, value remains null
-							logger.log(DEBUG, "Empty string, or null text");
-					}
-
-					// now perform custom validation/range checks
-					if (ok) {
-						ok = isAllValid().all();
-					}
-
-					// update text color for negatives, where applicable
-					if (ok) {
-						updateTextDecorator(value);
-					}
-					
-					// TODO: should this be added?
-					// if (value == null && !getAllowNull()) {
-					// 	logger.log(DEBUG, "Empty string, or null text");
-					// 	ok = false;
-					// }
-
-					// If string is empty or null (or no formatter), stringToValue()
-					// not called, value is still null. If "ok" , set the null value.
-					// Note: "verifyingText" skips property change handling for setValue.
-					if (ok && value == null) {
-						ftf.setValue(null);
-					}
+			if (formatter == null || formattedText == null)
+				return true; // just get out and let focus change
+			
+			boolean ok = true;
+			// Suppress "value" property change event if a call is made to setValue()
+			verifyingText = true;
+			try {
+				if (formattedText.isBlank())
+					logger.log(DEBUG, "formattedText is blank");
+				try {
+					// Convert the text looking for ParseError. Not like commitEdit().
+					value = formatter.stringToValue(formattedText);
+				} catch (ParseException pe) {
+					// Generally bad user input.
+					String finalFormattedText = formattedText;
+					logger.log(DEBUG, ()->sf("%s: '%s' Parse Exception offset %s.",
+							getColumnForLog(), finalFormattedText, pe.getErrorOffset()));
+					ok = false;
 				}
-
-				if (ok == false) {
-					forceError();
+				
+				if (value == null && !getAllowNull()) {
+					logger.log(WARNING, "null value but not getAllowNull");
+					ok = false;
 				}
-			} catch (final Exception _e) {
-				// TODO: Not right to skip all runtime exceptions.
-				// Log the error and fail the validation.
-				logger.log(Level.ERROR, getColumnForLog() + ": Field validation triggered an exception.", _e);
+				// Perform component and custom validation.
+				if (ok)
+					ok = isAllValid().all();
+				// Update text decoration, e.g. red for negatives, if applicable.
+				if (ok)
+					updateTextDecorator(value);
+				// If ok with null, make sure to use the null formatter. Needed?
+				if (ok && value == null)
+					ftf.setValue(null); // Note: "verifyingText" skips pce.
+				getSSCommon().decorate(); // TODO: not needed?
+			} catch (final Exception e) {
+				// TODO: Not right. What runtime exceptions should be looked for?
+				logger.log(Level.ERROR, getColumnForLog() + ": PROGRAM/RUNTIME ERROR");
 				ok = false;
-
 			} finally {
 				// Stop supressing "value" property change event handling.
 				verifyingText = false;
 			}
-
-			// return
 			return ok;
-
 		}
 	}
 
 	/**
-	 * Listener(s) for the component's value; used to propagate changes back to bound
-	 * database column. Careful to avoid cascading events, and always decorates at
-	 * exit. Does nothing if {@link #isAllValid()} indicates invalid.
+	 * Component's property change event handler.
+	 * Bounces "value" property to local function.
 	 */
 	protected class SSFormattedTextFieldListener implements PropertyChangeListener {
 		/**
-		 * @param _pce property change event
+		 * @param pce property change event
 		 */
 		@Override
-		public void propertyChange(final PropertyChangeEvent _pce) {
+		public void propertyChange(final PropertyChangeEvent pce) {
+			if (pce.getPropertyName().equals("value"))
+				handleValuePropertyChange(pce);
+		}
+	}
 
-			if (_pce.getPropertyName().equals("value")) {
-
-				final SSFormattedTextField ftf = SSFormattedTextField.this;
-				
-				// If this property change was triggered by FormattedTextFieldVerifier
-				// return with no action
-				if (verifyingText)
-					return;
-				if (!isAllValid().all()) {
-					getSSCommon().decorate();
-					return;
-				}
-
-				getSSCommon().removeRowSetListener();
-
-
-				final Object currentValue = ftf.getValue();
-				logger.log(INFO, ()->sf("%s: Object passed to database: '%s'.",
-						getColumnForLog(), currentValue));
-
-				// TODO May want to see if we can veto invalid updates
-				// 2020-12-14_BP: allow null if on insert row
-				if (!getAllowNull() && (currentValue == null) && !RowSetState.isInserting(getRowSet())) {
-					logger.log(WARNING, "Null value encounted, but not allowed.");
-					JOptionPane.showMessageDialog(ftf, "Null values are not allowed for " + getBoundColumnName(),
-							"Null Exception", JOptionPane.ERROR_MESSAGE);
-				} else {
-
-					try {
-						// TODO: put the specialized handling into some kind
-						//		 of data base adaptor plugin.
-
-						// 2020-10-02_BP: Date (and presumably Time & Timestamp) fields are returned as
-						// java.util.Date and Postgres JDBC doesn't know how to handle them
-						// java.sql.Date, java.sql.Time, and java.sql.Timestamp are all subclasses of
-						// java.util.Date
-// TODO This may be where we want to check and deal with NULL				    	
-						if (currentValue instanceof java.util.Date date) {
-							switch (getBoundColumnJDBCType()) {
-							case DATE -> getRowSet().updateObject(getBoundColumnName(),
-										new java.sql.Date(date.getTime()));
-							case TIME -> getRowSet().updateObject(getBoundColumnName(),
-										new java.sql.Time(date.getTime()));
-							case TIMESTAMP -> getRowSet().updateObject(getBoundColumnName(),
-										new java.sql.Timestamp(date.getTime()));
-							default -> logger.log(Level.ERROR, getColumnForLog() + ": getValue() returned a java.sql.Date, but JDBCType is "
-												+ getBoundColumnJDBCType() + ". Unable to update column.");
-							}
-						} else {
-							getRowSet().updateObject(getBoundColumnName(), currentValue);
-						}
-
-					} catch (final SQLException _se) {
-						logger.log(Level.ERROR, getColumnForLog() + ": RowSet update triggered SQL Exception.", _se);
-						JOptionPane.showMessageDialog(ftf, "SQL Exception encountered for " + getBoundColumnName(),
-								"SQL Exception", JOptionPane.ERROR_MESSAGE);
-					}
-				}
-
-				getSSCommon().addRowSetListener();
-				getSSCommon().decorate();
+	/**
+	 * Handle a "value" property change event; used to propagate changes back to bound
+	 * database column. Careful to avoid cascading events, and always decorates at
+	 * exit. Does nothing if {@link #isAllValid()} indicates invalid.
+	 * @param pce "value" from property change event
+	 */
+	protected void handleValuePropertyChange(PropertyChangeEvent pce)
+	{
+		final SSFormattedTextField ftf = this;
+		
+		// Ignore event if triggered by FormattedTextFieldVerifier.
+		if (verifyingText)
+			return;
+		if (!isAllValid().all()) {
+			getSSCommon().decorate();
+			return;
+		}
+		
+		getSSCommon().removeRowSetListener();
+		
+		
+		final Object currentValue = ftf.getValue();
+		logger.log(INFO, ()->sf("%s: to database '%s' type %s.",
+				getColumnForLog(), currentValue,
+				currentValue == null ? null : currentValue.getClass().getName()));
+		
+		// TODO May want to see if we can veto invalid updates
+		// 2020-12-14_BP: allow null if on insert row
+		if (!getAllowNull() && (currentValue == null) && !RowSetState.isInserting(getRowSet())) {
+			logger.log(WARNING, "Null value encounted, but not allowed.");
+			JOptionPane.showMessageDialog(ftf, "Null values are not allowed for " + getBoundColumnName(),
+					"Null Exception", JOptionPane.ERROR_MESSAGE);
+		} else {
+			
+			try {
+				// TODO: put the specialized handling into some kind
+				//		 of data base adaptor plugin.
+				// 2020-10-02_BP: Date (and presumably Time & Timestamp) fields are
+				// returned as java.util.Date and Postgres JDBC doesn't know how to
+				// handle them java.sql.Date, java.sql.Time, and java.sql.Timestamp
+				// are all subclasses of java.util.Date.
+				// Note this code will do java.sql.Date --> java.sql.Date.
+// TODO This may be where we want to check and deal with NULL
+			if (currentValue instanceof java.util.Date date) {
+				Object adjustedTypeValue = switch (getBoundColumnJDBCType()) {
+				case DATE -> new java.sql.Date(date.getTime());
+				case TIME -> new java.sql.Time(date.getTime());
+				case TIMESTAMP -> new java.sql.Timestamp(date.getTime());
+				default -> null;
+				};
+				if (adjustedTypeValue != null)
+					getRowSet().updateObject(getBoundColumnName(), adjustedTypeValue);
+				else
+					logger.log(Level.ERROR,
+							sf("%s: java.util.Date but JDBCType %s. Unable to update.",
+									getColumnForLog(), getBoundColumnJDBCType()));
+			} else {
+				getRowSet().updateObject(getBoundColumnName(), currentValue);
 			}
 
+			} catch (final SQLException _se) {
+				logger.log(Level.ERROR, getColumnForLog() + ": RowSet update triggered SQL Exception.", _se);
+				JOptionPane.showMessageDialog(ftf, "SQL Exception encountered for " + getBoundColumnName(),
+						"SQL Exception", JOptionPane.ERROR_MESSAGE);
+			}
 		}
+		
+		getSSCommon().addRowSetListener();
+		getSSCommon().decorate();
 	}
 	
 	/**
@@ -410,19 +394,16 @@ public class SSFormattedTextField extends JFormattedTextField
 		addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(final FocusEvent fe) {
-				//SSTextField.this.selectAll();
 				SwingUtilities.invokeLater(() -> { selectAll(); });
 			}
 		});
 
-		// Setting inputVerifier to validate field before focus is lost
-		// See https://docs.oracle.com/javase/8/docs/api/javax/swing/JFormattedTextField.html
-		// See https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/JFormattedTextField.html
+		// Setting inputVerifier to lock focus until valid.
 		setInputVerifier(new FormattedTextFieldVerifier());
 
 		addPropertyChangeListener("editValid", (e)->{
 			logger.log(TRACE, sf("editValid: isValid %s", e.getNewValue()));
-			clearForceErrorFlag();
+			getSSCommon().decorate();
 		});
 	}
     
@@ -436,55 +417,55 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
-	 * the object obtained from getValue().
+	 * the object obtained from getValue(). Currently only numeric, boolean and date
+	 * types are handled.
 	 * <p>
 	 * Calls to this method should be coming from SSCommon and should already have
 	 * the Component listener removed.
+	 *
+	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B.3 JDBC Types Mapped to Java Object Types
 	 */
 	@Override
 	public void updateSSComponent() {
+
+		// TODO: put discussion of type handling/mapping elsewhere,
+		//		 and reference it from here.
 
 		// It is OK to pass a String to SSFormattedTextField or a child class expecting a string (e.g., SSCuitField), but for
 		// child classes expecting a number format (e.g., SSCurrencyField) then it will not accept a string an an exception will be thrown.
 		//
 		// Previously, data type conversions for the component and rowset were handled with DbToFm() and updateRowSet().
 
-		Object newValue = null;
-
 		// TODO Review date/time handling: https://stackoverflow.com/questions/21162753/jdbc-resultset-i-need-a-getdatetime-but-there-is-only-getdate-and-gettimestamp
 
-		try {
-			// IF THERE ARE NO RECORDS OR THE COLUMN VALUE IS NULL SET THE FIELD TO NULL AND RETURN
-			//if ((getRowSet().getColumnCount()==0) || (getRowSet().getObject(getBoundColumnName()) == null)) {
-			if ( getRowSet().getRow() < 1 || RowSetOps.getColumnCount(getRowSet())==0 || getRowSet().getObject(getBoundColumnName()) == null ) {
-				setValue(null);
-				clearForceErrorFlag();
-				return;
-			}
+		// SQL TO JAVA CONVERSIONS: https://stackoverflow.com/questions/5251140/map-database-type-to-concrete-java-class
+		//
+		// 2020-09-14: Will use java <-> SQL mapping in JDBC to get appropriate Java object and then exclude ones that would cause a problem for JFormattedTextField
+		// Based on: https://docs.oracle.com/javase/8/docs/api/java/sql/ResultSet.html#getObject-java.lang.String-
+		//
+		// getObject() will return the given column as a Java object. JDBC specification should contain the mappings for built in types.
 
+
+		Object newValue = null;
+
+		try {
 			final JDBCType jdbcType = getBoundColumnJDBCType();
 			final String columnName = getBoundColumnName();
 
-			// SQL TO JAVA CONVERSIONS: https://stackoverflow.com/questions/5251140/map-database-type-to-concrete-java-class
-			//
-			// 2020-09-14: Will use java <-> SQL mapping in JDBC to get appropriate Java object and then exclude ones that would cause a problem for JFormattedTextField
-			// Based on: https://docs.oracle.com/javase/8/docs/api/java/sql/ResultSet.html#getObject-java.lang.String-
-			//
-			// getObject() will return the given column as a Java object. JDBC specification should contain the mappings for built in types.
+			// If no records, no columns, or record field null then set value null, bail.
+			if ( getRowSet().getRow() < 1 || RowSetOps.getColumnCount(getRowSet())==0
+					|| getRowSet().getObject(columnName) == null ) {
+				setValue(null);
+				updateTextDecorator(null);
+				getSSCommon().decorate();
+				return;
+			}
 			newValue = getRowSet().getObject(columnName); // TODO: MIGHT BE DONE ABOVE
 
-			/* Java types we want to support for JFormattedTextFields:
-			 * 	String
-			 *  Boolean
-			 *  Float
-			 *  Double
-			 *  Integer
-			 *  Long
-			 *  java.math.BigDecimal
-			 *  java.sql.Date
-			 *  java.sql.Time
-			 *  java.sql.Timestamp
-			 */
+			// Only support some Java types for JFormattedTextFields.
+			// TODO: Wonder if "vewValue instanceof Number" would work.
+			// TODO: What if an installed formatter doesn't handle the type?
+			//		 Where is that checked.
 			if ((newValue instanceof String) ||
 					(newValue instanceof Boolean) ||
 					(newValue instanceof Float) ||
@@ -499,32 +480,37 @@ public class SSFormattedTextField extends JFormattedTextField
 				var finalNewValue = newValue;
 				logger.log(DEBUG, ()->sf("%s: getObject() - %s",
 						getColumnForLog(), finalNewValue));
-				setValue(finalNewValue);
+				setValue(newValue);
 			} else {
-				String newValueString = newValue == null
-						? "(null)"
-						: newValue.getClass().getName();
-				logger.log(Level.ERROR, getColumnForLog() + ": JDBCType of " + jdbcType.toString() + " was cast to unsupported type of " + newValueString + " based on JDBC connection getTypeMap().");
+				String newValueType = newValue == null
+						? "(null)" : newValue.getClass().getName();
+				logger.log(Level.ERROR, sf("%s: JDBCType %s to %s not supported",
+						getColumnForLog(), jdbcType.toString(), newValueType));
+				//
+				// TODO: there is no "setValue()". Should do "setValue(null)"?
+				//
 			}
-
-		} catch (final java.sql.SQLException sqe) {
-			logger.log(Level.ERROR, getColumnForLog() + ": SQL Exception while updating rowset from formatted component.", sqe);
+		} catch (SQLException sqe) {
+			logger.log(Level.ERROR, sf("%s: Exception updating rowset.",
+					getColumnForLog(), sqe));
 			setValue(null);
 		}
 
 		// For example: color red for negative number
+		// TODO: updateTextDecorator should use "getValue()".
 		updateTextDecorator(newValue);
-		clearForceErrorFlag();
+		getSSCommon().decorate();
 	}
 	
 	/**
-	 * The default border decorator sets red for negative numbers, otherwise black.
-	 * A developer could override this method to do other things.
-	 * 
-	 * TODO: Should this apply after keytype?
+	 * This default text decorator distuinguishes negative numbers.
+	 * Typically red for negative numbers, otherwise black.
+	 * Override this method to do other things.
 	 *
 	 * @param _value - value to be validated
 	 */
+	// TODO: Should this apply after keytype?
+	// TODO: updateTextDecorator should use "getValue()".
 	public void updateTextDecorator(final Object _value) {
 		Decorator hl = getSSCommon().getDecorator();
 		if (hl instanceof TextDecorator textDecorator) {
@@ -544,7 +530,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	/** {@inheritDoc} */
 	@Override
 	public boolean isDataValid() {
-		return !forceErrorState && isEditValid();
+		return isEditValid();
 	}
 
 	/**
@@ -562,22 +548,9 @@ public class SSFormattedTextField extends JFormattedTextField
 			if (f instanceof FormatterAssist fa) {
 				System.err.printf("NOTICE ME HERE: %s", fa);
 			}
-			yield !getText().isEmpty();
+			yield !getText().isEmpty();	// TODO: isBlank()?
 		}
 		};
-	}
-
-	/** Set this if verify fails, gets cleared if "editValid" property change. */
-	private boolean forceErrorState;
-	private void forceError() {
-		logger.log(TRACE, "forceError");
-		forceErrorState = true;
-		getSSCommon().decorate();
-	}
-	private void clearForceErrorFlag() {
-		logger.log(TRACE, "clearForceErrorFlag");
-		forceErrorState = false;
-		getSSCommon().decorate();
 	}
 
 	//

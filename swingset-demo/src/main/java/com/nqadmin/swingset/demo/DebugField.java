@@ -40,78 +40,62 @@
  * Additions and modifications made by Ernie R. Rael are
  * copyright (C) 2024, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
-package com.nqadmin.swingset.formatting;
+package com.nqadmin.swingset.demo;
 
-import java.text.NumberFormat;
-import java.util.Objects;
-
+import com.nqadmin.swingset.formatting.Field;
+import com.nqadmin.swingset.formatting.SSFormat;
+import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
+import com.nqadmin.swingset.formatting.SSMaskFormatterFactory;
 import javax.swing.text.DefaultFormatterFactory;
 
-import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
+
+
+// SSDateField.java
+//
+// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * Typically used to bind a SSFormattedTextField to an integer column in a database.
+ * Used to link a SSFormattedTextField to a date column in a database.
  */
+
 @SuppressWarnings("serial")
-public class SSIntegerField extends NumberField
-{
+public class DebugField extends Field {
 	/**
-	 * Creates a new instance of SSIntegerField
+	 *  Creates a default SSDateField object using the default date format.
 	 */
-	public SSIntegerField()
-	{
-		this(createFormatterFactory(CUSTOM, null));
+	public DebugField(){
+		this(CUSTOM);
 	}
 
 	/**
-	 * Creates an object of SSIntegerField with the specified number of digits.
-	 *
-	 * @param precision - number of digits needed
+	 *  Creates a new instance of SSDateField with the specified format.
+	 *  @param _format - an enum format to be used while the date field is in edit mode
 	 */
-	public SSIntegerField(int precision) {
-		this(createFormatterFactory(CUSTOM, precision));
+	public DebugField(final SSFormat _format) {
+		this(createFormatterFactory(_format));
 	}
 
 	/**
-	 * Creates an object of SSIntegerField with the specified formatter factory
-	 *
+	 * Creates an object of SSDateField with the specified formatter factory
 	 * @param factory - formatter factory to be used
 	 */
-	public SSIntegerField(AbstractFormatterFactory factory) {
+	public DebugField(final AbstractFormatterFactory factory) {
 		super(factory);
 	}
-
-	/**
-	 * This class should throw a run-time exception if this method is used;
-	 * but it is silently ignored.
-	 * {@inheritDoc }
-	 */
-	@Override
-	public void setDecimals(final int decimals) {
-	}
-
-	/**
-	 * Create a FormatterFactory.
-	 * @param ssFormat
-	 * @param precision
-	 * @return FormatterFactory.
-	 */
-	public static DefaultFormatterFactory createFormatterFactory(
-			SSFormat ssFormat, Integer precision)
-	{
-		Objects.requireNonNull(ssFormat);
-
-		NumberFormat integerFormat = createNumberFormat(()->NumberFormat.getIntegerInstance());
-
-		if (precision!=null) {
-			integerFormat.setMaximumIntegerDigits(precision);
-			integerFormat.setMinimumIntegerDigits(1);
-		}
 		
-		return new SSFormatterFactory.Builder<>()
-				.ssFormat(ssFormat)
-				.displayFormatter(new SSNumberFormatter(integerFormat))
-				.editFormatter(new SSNumberFormatter(integerFormat))
+	/**
+	 * Create DATE formatter factory with specified format pattern.
+	 * See https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html
+	 * @param _format - Format to be used for date while in editing mode.
+	 * @return a DefaultFormatterFactory for the specified date format
+	 */
+	public static DefaultFormatterFactory createFormatterFactory(SSFormat _format) {
+		SSFormat format = _format;
+		format = SSFormat.getActualFormat(format);
+		String formatMask = "###";
+		
+		return new SSMaskFormatterFactory.Builder<>(formatMask)
+				.ssFormat(format)
 				.build();
 	}
 }
