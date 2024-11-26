@@ -98,6 +98,15 @@ public class NumberFieldTest
 		nf.setDecimals(decimals = 5);
 		assertEquals(precision, nf.getPrecision());
 		assertEquals(decimals, nf.getDecimals());
+
+		SSPercentField pf = new SSPercentField();
+		assertEquals(100, pf.getMultiplier());
+		pf.setMultiplier(1);
+		assertEquals(1, pf.getMultiplier());
+		NumberField.Params params;
+		params = pf.getFormatParams((x) -> x.getMultiplier());
+		assertEquals(new NumberField.Params(1,1,1,null), params);
+		System.err.println("");
 	}
 
 	/**

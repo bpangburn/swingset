@@ -146,7 +146,7 @@ public abstract class NumberField extends Field
 	 * @param param function that access the param value
 	 * @return the value from the NumberFormat or -1 if no NumberFormat
 	 */
-	protected int getNumberFormatParam(Function<NumberFormat, Object> param) {
+	protected int getNumberFormatParam(Function<DecimalFormat, Object> param) {
 		Object p = getFormatParam(param);
 		if (p instanceof Integer i)
 			return i;
@@ -158,7 +158,7 @@ public abstract class NumberField extends Field
 	 * @param paramF function that access the param value
 	 * @return the value from the NumberFormat or -1 if no NumberFormat
 	 */
-	protected Object getFormatParam(Function<NumberFormat, Object> paramF) {
+	protected Object getFormatParam(Function<DecimalFormat, Object> paramF) {
 		return getFormatParam(paramF, (ff)->ff.getEditFormatter());
 	}
 
@@ -168,13 +168,13 @@ public abstract class NumberField extends Field
 	 * @param paramF function that access the param value
 	 * @return the value from the NumberFormat or -1 if no NumberFormat
 	 */
-	protected Params setFormatParam(Consumer<NumberFormat> paramF) {
+	protected Params setFormatParam(Consumer<DecimalFormat> paramF) {
 		// Skip the null formatter.
 		Set<NumberFormat> formats = new HashSet<>(5);
 		List<Object> l = formatterFL.subList(0, 3).stream()
 				.map((f)-> {
 					Object rv = getNumberFormat(f);
-					if (rv instanceof NumberFormat nf) {
+					if (rv instanceof DecimalFormat nf) {
 						if (!formats.contains(nf)) {
 							paramF.accept(nf);
 							formats.add(nf);
@@ -228,10 +228,10 @@ public abstract class NumberField extends Field
 	 * @param formatterF access the formatter
 	 * @return the value from the NumberFormat or -1 if no NumberFormat
 	 */
-	protected Object getFormatParam(Function<NumberFormat, Object> paramF,
+	protected Object getFormatParam(Function<DecimalFormat, Object> paramF,
 			Function<DefaultFormatterFactory, AbstractFormatter> formatterF) {
 		Object o = getNumberFormat(formatterF);
-		if (o instanceof NumberFormat nf)
+		if (o instanceof DecimalFormat nf)
 			return paramF.apply(nf);
 		return o;
 	}
@@ -249,7 +249,7 @@ public abstract class NumberField extends Field
 	 * @param paramF function to access param
 	 * @return parm value
 	 */
-	protected Params getFormatParams(Function<NumberFormat, Object> paramF) {
+	protected Params getFormatParams(Function<DecimalFormat, Object> paramF) {
 		List<Object> l = formatterFL.stream()
 				.map((f)-> getFormatParam(paramF, f))
 				.collect(Collectors.toList());
