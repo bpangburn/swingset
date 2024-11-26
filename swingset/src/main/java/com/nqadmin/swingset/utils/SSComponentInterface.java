@@ -501,7 +501,7 @@ public interface SSComponentInterface extends RSC
 	 * {@inheritDoc }
 	 */
 	@Override
-	default SSFormat getFormat() { return getSSCommon().getFormat(); }
+	default SSFormat getSSFormat() { return getSSCommon().getSSFormat(); }
 
 	/**
 	 * A low level indication of whether or not the component data is valid.

@@ -273,7 +273,7 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		@Override
 		public SSFormat getSSFormat() {
 			if(getFormattedTextField() instanceof SSFormattedTextField ftf)
-				return ftf.getFormat();
+				return ftf.getSSFormat();
 			return null;
 		}
 

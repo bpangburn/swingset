@@ -1364,18 +1364,18 @@ public class SSCommon
 		//return new BackgroundDecorator();
 	}
 
-	private SSFormat format;
+	private SSFormat ssFormat;
 	/**
-	 * @param format
-	 * @see SSComponentInterface#setFormat(com.nqadmin.swingset.formatting.Format) 
+	 * @param ssFormat
+	 * @see SSComponentInterface#setFormat(com.nqadmin.swingset.formatting.SSFormat) 
 	 */
-	public void setSSFormat(SSFormat format) { this.format = format; }
+	public void setSSFormat(SSFormat ssFormat) { this.ssFormat = ssFormat; }
 
 	/**
 	 * @return 
-	 * @see SSComponentInterface#getFormat() 
+	 * @see SSComponentInterface#getSSFormat() 
 	 */
-	public SSFormat getFormat() { return format; }
+	public SSFormat getSSFormat() { return ssFormat; }
 
 	/**
 	 * Find the default decorator for this component type and set it.

@@ -143,7 +143,7 @@ public interface RSC
 	 * A component may have a display/parse format.
 	 * @return The format for this component
 	 */
-	default SSFormat getFormat() { return null; }
+	default SSFormat getSSFormat() { return null; }
 
 	/**
 	 * @return Does the column allow null?
