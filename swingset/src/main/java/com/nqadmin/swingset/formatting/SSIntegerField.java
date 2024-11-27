@@ -103,10 +103,7 @@ public class SSIntegerField extends NumberField
 
 		NumberFormat integerFormat = createNumberFormat(()->NumberFormat.getIntegerInstance());
 
-		if (precision!=null) {
-			integerFormat.setMaximumIntegerDigits(precision);
-			integerFormat.setMinimumIntegerDigits(1);
-		}
+		initPrecision(precision, integerFormat);
 		
 		return new SSFormatterFactory.Builder<>()
 				.ssFormat(ssFormat)

@@ -31,13 +31,14 @@ package com.nqadmin.swingset.formatting;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
+//import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.text.MaskFormatter;
 
+import com.google.common.collect.ImmutableList;
 import com.nqadmin.swingset.formatting.FormatterFactory.SSNullFormatter;
 
 import static com.nqadmin.swingset.formatting.SSMaskFormatterFactory.SSMaskFormatter.FORMATTING_CHARS;
@@ -148,8 +149,10 @@ interface FormatterAssist
 			if (!(positions == null || literals == null
 					|| literals.size() == positions.size()))
 				throw new IllegalArgumentException("size mismatch");
-			literals = Collections.unmodifiableList(literals);
-			positions = Collections.unmodifiableList(positions);
+			//literals = Collections.unmodifiableList(new ArrayList<>(literals));
+			//positions = Collections.unmodifiableList(new ArrayList<>(positions));
+			literals = ImmutableList.copyOf(literals);
+			positions = ImmutableList.copyOf(positions);
 		}
 	}
 

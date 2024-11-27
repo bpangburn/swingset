@@ -119,18 +119,8 @@ public class SSCurrencyField extends NumberField
 		NumberFormat editFormat = createNumberFormat(()->NumberFormat.getInstance(
 				displayLocale != null ? displayLocale : defaultLocale));
 
-		if (precision!=null) {
-			editFormat.setMaximumIntegerDigits(precision);
-			editFormat.setMinimumIntegerDigits(1);
-			displayFormat.setMaximumIntegerDigits(precision);
-			displayFormat.setMinimumIntegerDigits(1);
-		}
-		if (decimals!=null) {
-			editFormat.setMaximumFractionDigits(decimals);
-			editFormat.setMinimumFractionDigits(decimals);
-			displayFormat.setMaximumFractionDigits(decimals);
-			displayFormat.setMinimumFractionDigits(decimals);
-		}
+		initPrecision(precision, editFormat, displayFormat);
+		initDecimals(decimals, editFormat, displayFormat);
 		
 		// Note that the editFormatter does not specify precision/decimals.
 		

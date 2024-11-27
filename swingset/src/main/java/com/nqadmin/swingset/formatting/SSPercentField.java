@@ -42,11 +42,11 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Objects;
 
-import javax.swing.SwingConstants;
 import javax.swing.text.DefaultFormatterFactory;
 
 import static com.nqadmin.swingset.formatting.NumberField.createNumberFormat;
@@ -69,6 +69,23 @@ public class SSPercentField extends NumberField {
     }
 
 	/**
+     * Creates a default object of SSPercentField.
+	 * @param precision - number of digits needed for integer part of the number
+	 * @param decimals  - number of digits needed for the fraction part of the number
+     */
+    public SSPercentField(int precision, int decimals) {
+        this(createFormatterFactory(SSFormat.CUSTOM, precision, decimals));
+    }
+
+    /**
+     * Creates an object of SSPercentField with the specified formatter factory
+     * @param factory - formatter factory to be used
+     */
+    public SSPercentField(AbstractFormatterFactory factory) {
+        super(factory);
+    }
+
+	/**
 	 * Get the multiplier used in percent.
 	 * @return multiplier
 	 */
@@ -86,38 +103,10 @@ public class SSPercentField extends NumberField {
 	}
 
 	/**
-     * Creates a default object of SSPercentField.
-	 * @param precision - number of digits needed for integer part of the number
-	 * @param decimals  - number of digits needed for the fraction part of the number
-     */
-    public SSPercentField(int precision, int decimals) {
-        this(createFormatterFactory(SSFormat.CUSTOM, precision, decimals));
-    }
-
-    /**
-     * Creates an object of SSPercentField with the specified formatter factory
-     * @param factory - formatter factory to be used
-     */
-    public SSPercentField(AbstractFormatterFactory factory) {
-        super(factory);
-        setHorizontalAlignment(SwingConstants.RIGHT);
-        setValue(0.00);
-    }
-
-	// COPIED FROM SSCurrencyField AND COMMENT STUFF OUT.
-	// MADE TO MATCH ORIGINAL CODE, BUT IT LOOKS SCREWY, IT MAY NOT BE RIGHT.
-	//
-	// =========== REVIEW ===========
-	// The accuracy, precision/decimals, **only applied to display** (not edit?!)
-	// Locale.US applied to edit/display
-	//
-	/**
 	 * Create a FormatterFactory.
 	 * @param ssFormat
 	 * @param precision - number of digits needed for integer part of the number
 	 * @param decimals - number of digits needed for fraction part of the number
-//X	 * @param editLocale - locale while editing
-//X	 * @param displayLocale - locale while not editing
 	 * @return FormatterFactory.
 	 */
 	public static DefaultFormatterFactory createFormatterFactory(
@@ -127,39 +116,19 @@ public class SSPercentField extends NumberField {
 	{
 		Objects.requireNonNull(ssFormat);
 
-//X		Locale defaultLocale = Locale.getDefault(Locale.Category.FORMAT);
-//X		// For display use currency, e.g. might see '$'. TODO: use the same for both?
-//X		NumberFormat displayFormat = createFormat(()->NumberFormat.getCurrencyInstance(
-//X				displayLocale != null ? displayLocale : defaultLocale));
-//X		// For editing use a plain number
-//X		NumberFormat editFormat = createFormat(()->NumberFormat.getInstance(
-//X				displayLocale != null ? displayLocale : defaultLocale));
-
 		NumberFormat displayFormat = createNumberFormat(
 				()->NumberFormat.getPercentInstance(Locale.US));
 		NumberFormat editFormat = createNumberFormat(
-				()->NumberFormat.getPercentInstance(Locale.US));
-		NumberFormat defaultFormat = createNumberFormat(
-				()->NumberFormat.getPercentInstance());
+				()->NumberFormat.getInstance(Locale.US));
+		// Make sure edit format has the multiplier default for percent.
+		((DecimalFormat)editFormat).setMultiplier(
+				((DecimalFormat)displayFormat).getMultiplier());
 
-		if (precision!=null) {
-//X			editFormat.setMaximumIntegerDigits(precision);
-//X			editFormat.setMinimumIntegerDigits(1);
-			displayFormat.setMaximumIntegerDigits(precision);
-			displayFormat.setMinimumIntegerDigits(1);
-		}
-		if (decimals!=null) {
-//X			editFormat.setMaximumFractionDigits(decimals);
-//X			editFormat.setMinimumFractionDigits(decimals);
-			displayFormat.setMaximumFractionDigits(decimals);
-			displayFormat.setMinimumFractionDigits(decimals);
-		}
-		
-		// Note that the editFormatter does not specify precision/decimals.
+		initPrecision(precision, editFormat, displayFormat);
+		initDecimals(decimals, editFormat, displayFormat);
 		
 		return new SSFormatterFactory.Builder<>()
 				.ssFormat(ssFormat)
-				.defaultFormatter(new SSNumberFormatter(defaultFormat)) // get rid of this
 				.editFormatter(new SSNumberFormatter(editFormat))
 				.displayFormatter(new SSNumberFormatter(displayFormat))
 				.build();

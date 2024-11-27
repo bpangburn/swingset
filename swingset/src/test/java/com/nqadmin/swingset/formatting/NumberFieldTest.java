@@ -83,6 +83,7 @@ public class NumberFieldTest
 	public void testParamAccessMethods()
 	{
 		System.out.println("accessMethods");
+
 		SSNumericField nf = new SSNumericField();
 		int precision = nf.getPrecision();
 		int decimals = nf.getDecimals();
@@ -99,14 +100,51 @@ public class NumberFieldTest
 		assertEquals(precision, nf.getPrecision());
 		assertEquals(decimals, nf.getDecimals());
 
+		// Check out percent's multiplier.
 		SSPercentField pf = new SSPercentField();
+		NumberField.Params params;
+		params = pf.getFormatParams((x) -> x.getMultiplier());
+		assertEquals(new NumberField.Params(100,100,100,null), params);
+
 		assertEquals(100, pf.getMultiplier());
 		pf.setMultiplier(1);
 		assertEquals(1, pf.getMultiplier());
-		NumberField.Params params;
 		params = pf.getFormatParams((x) -> x.getMultiplier());
 		assertEquals(new NumberField.Params(1,1,1,null), params);
-		System.err.println("");
+	}
+
+	/**
+	 * Test the precision initialization.
+	 */
+	@Test
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	public void testFieldFormatsInit()
+	{
+		System.out.println("fieldFormatsInit");
+
+		NumberField ssnf;
+		NumberField.Params params;
+		ssnf = new SSIntegerField(11);
+		params = ssnf.getFormatParams((nf) -> nf.getMaximumIntegerDigits());
+		assertEquals(new NumberField.Params(11,11,11,null), params);
+
+		ssnf = new SSNumericField(11, 5);
+		params = ssnf.getFormatParams((nf) -> nf.getMaximumIntegerDigits());
+		assertEquals(new NumberField.Params(11,11,11,null), params);
+		params = ssnf.getFormatParams((nf) -> nf.getMaximumFractionDigits());
+		assertEquals(new NumberField.Params(5,5,5,null), params);
+
+		ssnf = new SSCurrencyField(11, 5);
+		params = ssnf.getFormatParams((nf) -> nf.getMaximumIntegerDigits());
+		assertEquals(new NumberField.Params(11,11,11,null), params);
+		params = ssnf.getFormatParams((nf) -> nf.getMaximumFractionDigits());
+		assertEquals(new NumberField.Params(5,5,5,null), params);
+
+		ssnf = new SSPercentField(11, 5);
+		params = ssnf.getFormatParams((nf) -> nf.getMaximumIntegerDigits());
+		assertEquals(new NumberField.Params(11,11,11,null), params);
+		params = ssnf.getFormatParams((nf) -> nf.getMaximumFractionDigits());
+		assertEquals(new NumberField.Params(5,5,5,null), params);
 	}
 
 	/**
@@ -117,18 +155,19 @@ public class NumberFieldTest
 	public void testFactoryParamsAccessMethods()
 	{
 		System.out.println("factoryParamsAccessMethods");
+
 		SSNumericField ssnf = new SSNumericField(15, 5);
 		NumberField.Params params;
 		params = ssnf.getFormatParams((nf) -> nf.getMaximumFractionDigits());
 		assertEquals(new NumberField.Params(5,5,5,null), params);
-		assertFalse(NumberField.hasAccessError(params));
+		assertFalse(params.hasAccessError());
 		assertFalse(NumberField.isAccessError(params.editP()));
 		assertFalse(NumberField.isAccessError(params.nullP()));
 
 		ssnf.setAllowNull(true);
 		params = ssnf.getFormatParams((nf) -> nf.getMaximumFractionDigits());
 		assertEquals(new NumberField.Params(5,5,5,null), params);
-		assertFalse(NumberField.hasAccessError(params));
+		assertFalse(params.hasAccessError());
 		assertFalse(NumberField.isAccessError(params.editP()));
 		assertFalse(NumberField.isAccessError(params.nullP()));
 
@@ -137,42 +176,40 @@ public class NumberFieldTest
 
 		params = ssnf.getFormatParams((nf) -> nf.getMaximumFractionDigits());
 		assertEquals(new NumberField.Params(5,5,5,NumberField.Error.NULL_FORMATTER), params);
-		assertTrue(NumberField.hasAccessError(params));
+		assertTrue(params.hasAccessError());
 		assertTrue(NumberField.isAccessError(params.nullP()));
 
 		// Write to the factory's formats.
 		ssnf.setDecimals(7);
 		params = ssnf.getFormatParams((nf) -> nf.getMaximumFractionDigits());
 		assertEquals(new NumberField.Params(7,7,7,NumberField.Error.NULL_FORMATTER), params);
-		assertTrue(NumberField.hasAccessError(params));
+		assertTrue(params.hasAccessError());
 		assertTrue(NumberField.isAccessError(params.nullP()));
 
 		// Test the internal function making the change
 		params = ssnf.setFormatParam((nf) -> nf.setMaximumFractionDigits(11));
 		assertEquals(new NumberField.Params(null,null,null,null), params);
-		assertFalse(NumberField.hasAccessError(params));
+		assertFalse(params.hasAccessError());
 		assertFalse(NumberField.isAccessError(params.nullP()));
 
 		// and check that the change did happen
 		params = ssnf.getFormatParams((nf) -> nf.getMaximumFractionDigits());
 		assertEquals(new NumberField.Params(11,11,11,NumberField.Error.NULL_FORMATTER), params);
-		assertTrue(NumberField.hasAccessError(params));
+		assertTrue(params.hasAccessError());
 		assertTrue(NumberField.isAccessError(params.nullP()));
 
 		// Currency has two formats.
 		SSCurrencyField sscf = new SSCurrencyField(15, 5);
 		params = sscf.setFormatParam((nf) -> nf.setMaximumFractionDigits(7));
 		assertEquals(new NumberField.Params(null,null,null,null), params);
-		assertFalse(NumberField.hasAccessError(params));
+		assertFalse(params.hasAccessError());
 		assertFalse(NumberField.isAccessError(params.nullP()));
 
 		// and check that the change did happen
 		params = sscf.getFormatParams((nf) -> nf.getMaximumFractionDigits());
 		assertEquals(new NumberField.Params(7,7,7,null), params);
-		assertFalse(NumberField.hasAccessError(params));
+		assertFalse(params.hasAccessError());
 		assertFalse(NumberField.isAccessError(params.nullP()));
-
-		System.err.println("");
 	}
 
 

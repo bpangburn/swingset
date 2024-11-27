@@ -99,14 +99,8 @@ public class SSNumericField extends NumberField
 
 		NumberFormat numericFormat = createNumberFormat(()->NumberFormat.getInstance(Locale.US));
 
-		if (precision!=null) {
-			numericFormat.setMaximumIntegerDigits(precision);
-			numericFormat.setMinimumIntegerDigits(1);
-		}
-		if (decimals!=null) {
-			numericFormat.setMaximumFractionDigits(decimals);
-			numericFormat.setMinimumFractionDigits(decimals);
-		}
+		initPrecision(precision, numericFormat);
+		initDecimals(decimals, numericFormat);
 		
 		// Use the same format for edit and display.
 
