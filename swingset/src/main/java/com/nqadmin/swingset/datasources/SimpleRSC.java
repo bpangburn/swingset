@@ -68,7 +68,7 @@ public class SimpleRSC implements RSC
 	private final RowSet rs;
 	private final int index;
 	private final String name;
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getSystemLogger();
 
 	private SimpleRSC(RowSet rs, Integer index, String name) throws SQLException
 	{

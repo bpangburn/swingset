@@ -35,7 +35,23 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
+
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.text.SimpleDateFormat;
+
+import javax.swing.text.DateFormatter;
+import javax.swing.text.DefaultFormatterFactory;
+
+import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSTimestampField.java
 //
@@ -44,29 +60,33 @@ package com.nqadmin.swingset.formatting;
 /**
  * Used to link a SSTimestampField to a timestamp column in a database.
  */
+@SuppressWarnings("serial")
+public class SSTimestampField extends DateTimeField
+{
+	/** Logger for component */
+	private static final Logger logger = SSUtils.getSystemLogger();
 
-public class SSTimestampField extends SSFormattedTextField {
     /**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 4689820569270582334L;
-
-    /**
-     * Creates a new instance of SSTimeField
+     * Create an SSTimestampField using the default format.
      */
     public SSTimestampField() {
-        this(new SSTimestampFormatterFactory());
+        this(SSFormat.TIMESTAMP);
+    }
+
+    /**
+     * Create an SSTimestampField using the specified format.
+	 *  @param format - an enum format for the timestamp field
+     */
+    public SSTimestampField(SSFormat format) {
+        this(createFormatterFactory(format));
     }
 
     /**
      * Creates an instance of SSTimestampField with the specified formatter factory
      * @param factory - formatter factory to be used
      */
-    public SSTimestampField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+    public SSTimestampField(final AbstractFormatterFactory factory) {
         super(factory);
-
-        // TODO Consider setting to null vs system date/time.
-        
         setValue(new java.util.Date(  ));
     }
 
@@ -75,11 +95,48 @@ public class SSTimestampField extends SSFormattedTextField {
      */
     @Override
 	public void cleanField() {
-    	
-    	// TODO Consider setting to null vs system date/time.
-
-        setValue(new java.util.Date( ) );
+		setValue(new java.util.Date());
     }
 
+	/**
+	 * Create TIMESTAMP formatter factory with specified format pattern.
+	 * @param _format - Format to use for timestamp while in editing mode.
+	 * @return a DefaultFormatterFactory for the specified time format
+	 */
+	public static DefaultFormatterFactory createFormatterFactory(SSFormat _format) {
+		SSFormat format = _format;
+		if (_format.getType() != SSFormat.TIMESTAMP) {
+			logger.log(Level.ERROR, () -> sf("%s is not a TIMESTAMP, using default",
+					_format.toString()));
+			format = SSFormat.TIMESTAMP;
+		}
+		format = SSFormat.getActualFormat(format);
+		String formatMask;
+		String editPattern;
+		switch(format) {
+		case TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ -> {
+			formatMask = "####-##-## ##:##:##.### *##:##";
+			// TODO: try "xxx" not "Z".
+			editPattern = "yyyyMMddHHmmssSSSZ";
+		}
+		case TIMESTAMP_YYYYMMDD_STROKE_HHMMSS -> {
+			formatMask = "####-##-## ##:##:##";
+			editPattern = "yyyyMMddHHmmss";
+		}
+		case TIMESTAMP_YYYYMMDD_STROKE -> {
+			formatMask = "####-##-##";
+			editPattern = "yyyyMMdd";
+		}
+		default -> {
+			logger.log(Level.ERROR, "Unknown date format type of " + format);
+			return null;
+		}
+		}
+		return new SSMaskFormatterFactory.Builder<>(formatMask)
+				.ssFormat(format)
+				.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
+				.placeholderCharacter('_')
+				.build();
+	}
 }
 

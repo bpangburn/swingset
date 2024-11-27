@@ -56,7 +56,7 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 public class SSFormatterFactory extends FormatterFactory
 {
 	/** Logger for component */
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getSystemLogger();
 
 	/**
 	 *

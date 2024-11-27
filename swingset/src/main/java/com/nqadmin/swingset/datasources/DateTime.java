@@ -72,7 +72,7 @@ public class DateTime
 {
 	private DateTime() { }
 
-	private static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getSystemLogger();
 
 	private static final Map<JDBCType, List<DateTimeFormatter>> dateTimeParsersMap
 			= new EnumMap<>(JDBCType.class);
