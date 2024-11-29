@@ -38,6 +38,7 @@
 package com.nqadmin.swingset;
 
 import java.awt.Dimension;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 import java.io.Serializable;
 
 import javax.sql.RowSet;
@@ -74,11 +75,11 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 		@Override
 		public void stateChanged(final ChangeEvent ce) {
 
-			ssCommon.removeRowSetListener();
+			getSSCommon().removeRowSetListener();
 
 			setBoundColumnText(String.valueOf(getValue()));
 
-			ssCommon.addRowSetListener();
+			getSSCommon().addRowSetListener();
 
 		}
 
@@ -95,18 +96,15 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	 */
 	private static final long serialVersionUID = 8477179080546081481L;
 
-	/**
-	 * Common fields shared across SwingSet components
-	 */
-	transient protected final SSCommon ssCommon = new SSCommon(this);
+	/** Common fields shared across SwingSet components */
+	private final SSCommon ssCommon;
 
 	/**
 	 * Empty constructor needed for deserialization. Creates a horizontal slider
 	 * with the range 0 to 100.
 	 */
 	public SSSlider() {
-		// Note that call to parent default constructor is implicit.
-		// super();
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -116,6 +114,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	 */
 	public SSSlider(final int _orientation) {
 		super(_orientation);
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -126,6 +125,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	 */
 	public SSSlider(final int _min, final int _max) {
 		super(_min, _max);
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -154,16 +154,6 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 		// TODO Consider removing default dimensions.
 		// SET PREFERRED DIMENSIONS
 		setPreferredSize(new Dimension(200, 20));
-	}
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
 	}
 	
 	/**
@@ -211,6 +201,38 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 			break;
 		}
 
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("%s{value=%s, %s}", getClass().getSimpleName(),
+				getValue(), SSUtils.ssComponentToString(this));
+	}
+
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
 	}
 
 } // end public class SSSlider extends JSlider

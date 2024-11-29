@@ -953,7 +953,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 */
 	@Override
 	public void setBoundColumnName(String _boundColumnName) {
-		ssCommon.setBoundColumnName(_boundColumnName);
+		getSSCommon().setBoundColumnName(_boundColumnName);
 		adjustForNullItem();
 	}
 
@@ -981,7 +981,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 			// }
 			adjustForNullItem();
 
-			Statement statement = ssCommon.getConnection().createStatement();
+			Statement statement = getSSCommon().getConnection().createStatement();
 			rs = statement.executeQuery(getQuery());
 
 			//optionColumnType = getJDBCColumnType(rs, rs.findColumn(displayColumnName));

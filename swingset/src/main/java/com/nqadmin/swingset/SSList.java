@@ -38,6 +38,8 @@
 package com.nqadmin.swingset;
 
 import static com.nqadmin.swingset.models.OptionMappingSwingModel.asOptionMappingSwingModel;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+
 
 import java.awt.Dimension;
 import java.io.Serializable;
@@ -108,9 +110,9 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 		
 		@Override
 		public void valueChanged(final ListSelectionEvent e) {
-			ssCommon.removeRowSetListener();
+			getSSCommon().removeRowSetListener();
 			updateRowSet();
-			ssCommon.addRowSetListener();
+			getSSCommon().addRowSetListener();
 		}
 	}
 
@@ -172,7 +174,7 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	transient protected final SSCommon ssCommon = new SSCommon(this);
+	private final SSCommon ssCommon;
 
 	/**
 	 * Creates an object of SSList with mapping type of {@code JDBCType.INTEGER}.
@@ -197,9 +199,9 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	/**
 	 * @param _collectionModel model to read/write the database
 	 */
+	@SuppressWarnings("LeakingThisInConstructor")
 	public SSList(SSCollectionModel _collectionModel) {
-		// Note that call to parent default constructor is implicit.
-		//super();
+		ssCommon = finishSSCommon();
 		this.selectedDBModel = _collectionModel;
 		// last line of constructor safe to access this
 		Model.install(this);
@@ -309,16 +311,6 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	@Override
 	public void setListData(Vector<? extends SSListItem> listData) {
 		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
 	}
 	
 	/**
@@ -606,5 +598,37 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 
 			remodel.clear();
 		}
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("%s{items=%s, %s}", getClass().getSimpleName(),
+				getSelectedMappings(), SSUtils.ssComponentToString(this));
+	}
+
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
 	}
 }

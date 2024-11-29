@@ -37,6 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -88,7 +90,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 		@Override
 		public void itemStateChanged(final ItemEvent ie) {
 
-			ssCommon.removeRowSetListener();
+			getSSCommon().removeRowSetListener();
 
 			if (((JCheckBox) ie.getSource()).isSelected()) {
 				// switch(SSCheckBox.this.columnType) {
@@ -126,7 +128,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 				}
 			}
 
-			ssCommon.addRowSetListener();
+			getSSCommon().addRowSetListener();
 		}
 
 	} // end private class SSCheckBoxListener
@@ -157,10 +159,8 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 	 */
 	protected int CHECKED = 1;
 
-	/**
-	 * Common fields shared across SwingSet components
-	 */
-	transient protected final SSCommon ssCommon;
+	/** Common fields shared across SwingSet components. */
+	private final SSCommon ssCommon;
 
 	/**
 	 * Unchecked value for numeric columns.
@@ -219,7 +219,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 
 
 		setBorderPainted(true);
-		ssCommon = new SSCommon(this);
+		ssCommon = finishSSCommon();
 	}
 
 	private Insets toInsets(Border b)
@@ -240,16 +240,6 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 
 	}
 
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
-	}
-	
 	/**
 	 * {@inheritDoc }
 	 */
@@ -300,5 +290,37 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface {
 		}
 
 	} // end protected void updateSSComponent() {
+	
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("SSCheckBox{selected=%s, %s}",
+				isSelected(), SSUtils.ssComponentToString(this));
+	}
+
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
+	}
 
 } // end public class SSCheckBox

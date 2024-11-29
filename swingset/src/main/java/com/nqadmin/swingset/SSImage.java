@@ -37,6 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -78,6 +80,9 @@ import com.nqadmin.swingset.utils.SSUtils;
  * Used to load, store, and display images stored in a database.
  */
 public class SSImage extends JPanel implements SSComponentInterface {
+	
+	// TODO: try to get this initialized
+	private String fName = "";
 
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
@@ -93,7 +98,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 
-			ssCommon.removeRowSetListener();
+			getSSCommon().removeRowSetListener();
 
 			try {
 				if (getRowSet() != null) {
@@ -119,6 +124,8 @@ public class SSImage extends JPanel implements SSComponentInterface {
 							lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
 							lblImage.setIcon(img);
 							lblImage.setText("");
+							fName = inFile.getPath();
+							// TODO: why is updateUI here?
 							updateUI();
 						}
 					} else {
@@ -131,7 +138,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 				logger.error(getColumnForLog() + ": IO Exception.", ioe);
 			}
 
-			ssCommon.addRowSetListener();
+			getSSCommon().addRowSetListener();
 		}
 
 	} // end private class SSImageListener
@@ -169,24 +176,32 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	transient protected final SSCommon ssCommon = new SSCommon(this);
+	private final SSCommon ssCommon;
 
 	/**
 	 * Construct a default SSImage Object.
 	 */
 	public SSImage() {
-		// Note that call to parent default constructor is implicit.
-		// super();
+		ssCommon = finishSSCommon();
 	}
 
-	/** {@inheritDoc } */
+	// TODO: Why do decorators interfere with SSImage?
+	// In particular the following lines from BorderDecorator
+	// cause a miniscule scrollpane. Maybe some kind of decorator wrapper?
+	//		jc().setBorder(jc().isFocusOwner() ? focusBorder : standardBorder);
+	//		jc().setForeground(textColor != null ? textColor : Color.BLACK);
+	
 	// TODO: This is a workaround because if default decorator is used
 	//		 then the SSImage doesn't display properly.
+	/**
+	 * Highlight the update button when this component gets focus.
+	 * {@inheritDoc }
+	 */
 	@Override
 	public Decorator createDefaultDecorator() {
-		Decorator tDec = SSComponentInterface.super.createDefaultDecorator();
-		if (!(tDec instanceof BorderDecorator))
-			return tDec;
+		Decorator decorator = SSComponentInterface.super.createDefaultDecorator();
+		if (!(decorator instanceof BorderDecorator))
+			return decorator;
 
 		return new BorderDecorator() {
 			@Override
@@ -198,8 +213,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 				if (color == null)
 					return defaultBorder;
 
-				if (jc().getBorder() instanceof CompoundBorder) {
-					CompoundBorder cb = (CompoundBorder) jc().getBorder();
+				if (jc().getBorder() instanceof CompoundBorder cb) {
 					return BorderDecorator.lineEmpty_empty(
 							cb.getOutsideBorder().getBorderInsets(jc()),
 							cb.getInsideBorder().getBorderInsets(jc()),
@@ -302,16 +316,6 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	}
 
 	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
-	}
-
-	/**
 	 * {@inheritDoc }
 	 */
 	@Override
@@ -370,6 +374,38 @@ public class SSImage extends JPanel implements SSComponentInterface {
 		// TODO Confirm updateUI is needed here.
 		updateUI();
 
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("%s{file=%s, %s}", getClass().getSimpleName(),
+				fName, SSUtils.ssComponentToString(this));
+	}
+
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
 	}
 
 }

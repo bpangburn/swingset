@@ -35,10 +35,16 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset;
 
 import static com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.addEventLogging;
 import static com.nqadmin.swingset.models.OptionMappingSwingModel.asOptionMappingSwingModel;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -385,7 +391,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	transient protected final SSCommon ssCommon = new SSCommon(this);
+	private final SSCommon ssCommon;
 
 //	/**
 //	 * List item used to workaround GlazedList CONTAINS bug/glitch.
@@ -465,6 +471,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	public SSBaseComboBox() {
 		addItemListener(new SSBaseComboBoxItemListener());
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -1030,16 +1037,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	//
 	// Here's SwingSet scaffolding and nullItem maintenance.
 	//
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
-	}
 	
 	/**
 	 * {@inheritDoc }
@@ -1070,7 +1067,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	@Override
 	public void setAllowNull(boolean _allowNull) {
-		ssCommon.setAllowNull(_allowNull);
+		getSSCommon().setAllowNull(_allowNull);
 		adjustForNullItem();
 	}
 
@@ -1201,7 +1198,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	private void updateRowset() {
 		
-		ssCommon.removeRowSetListener();
+		getSSCommon().removeRowSetListener();
 		
 		M mapping = getSelectedMapping();
 	
@@ -1228,7 +1225,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			//}
 		}
 	
-		ssCommon.addRowSetListener();
+		getSSCommon().addRowSetListener();
 	}
 	
 	/**
@@ -1368,7 +1365,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 
 		if((caller.startsWith("com.nqadmin") && !caller.startsWith("com.nqadmin.swingset")
 				|| caller.startsWith("com.nqadmin.swingset.demo")
-			) && ssCommon != null && ssCommon.getAllowNull()) {
+			) && getSSCommon() != null && getSSCommon().getAllowNull()) {
 			throw new IllegalStateException("App::getSelectedIndex && getAllowNull()");
 		}
 
@@ -1458,8 +1455,41 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
 	@SuppressWarnings({"all","UseOfSystemOutOrSystemErr"})
 	private static void p(int n, int i, Object item) {
-		String s = String.format("n %d, i %d, item %s", n, i, item);
+		String s = sf("n %d, i %d, item %s", n, i, item);
 		trackout.add(s);
 		System.err.println(s);
 	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("%s{item=%s, %s}", getClass().getSimpleName(),
+				getSelectedItem(), SSUtils.ssComponentToString(this));
+	}
+
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
+	}
+
 }

@@ -37,6 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+
 import javax.sql.RowSet;
 import javax.swing.JTextArea;
 
@@ -72,14 +74,13 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	transient protected final SSCommon ssCommon = new SSCommon(this);
+	private final SSCommon ssCommon;
 
 	/**
 	 * Empty constructor needed for deserialization.
 	 */
 	public SSTextArea() {
-		// Note that call to parent default constructor is implicit.
-		// super();
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -91,6 +92,7 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	 */
 	public SSTextArea(final int _rows, final int _columns) {
 		super(_rows, _columns);
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -105,22 +107,14 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 		bind(_rowSet, _boundColumnName);
 	}
 
+	/**
+	 * Set word linewrap.
+	 */
 	@Override
-	public void customInit() {
-		// Adding some logic from SSMemoField (deprecated), which seems generally
-		// helpful.
+	public void customInit()
+	{
 		setLineWrap(true);
 		setWrapStyleWord(true);
-	}
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-    @Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
 	}
 
 	/**
@@ -144,6 +138,38 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 		final String text = getBoundColumnText();
 		logger.debug("{}: Setting text area to " + text + ".", () -> getColumnForLog());
 		setText(text);
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("%s{text=%s, %s}", getClass().getSimpleName(),
+				getText(), SSUtils.ssComponentToString(this));
+	}
+
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
 	}
 
 } // end public class SSTextArea extends JTextArea {
