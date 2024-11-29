@@ -35,7 +35,21 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
+
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.text.SimpleDateFormat;
+
+import javax.swing.text.DateFormatter;
+import javax.swing.text.DefaultFormatterFactory;
+
+import com.nqadmin.swingset.utils.SSUtils;
 
 
 // SSDateField.java
@@ -46,72 +60,77 @@ package com.nqadmin.swingset.formatting;
  * Used to link a SSFormattedTextField to a date column in a database.
  */
 
-public class SSDateField extends SSFormattedTextField {
+@SuppressWarnings("serial")
+public class SSDateField extends DateTimeField {
+	/** Logger for component */
+	private static final Logger logger = SSUtils.getSystemLogger();
 
 	/**
-	 * constant representing the dd/mm/yyyy date format
-	 * @deprecated use {@link Format#DATE_DDMMYYYY}
-	 */
-	@Deprecated
-	public static final int DDMMYYYY = 1;
-
-	/**
-	 * constant representing the mm/dd/yyyy date format
-	 * @deprecated use {@link Format#DATE_MMDDYYYY}
-	 */
-	@Deprecated
-	public static final int MMDDYYYY = 0;
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 9138021901389692436L;
-
-	/**
-	 *  Creates a default SSDateField object
+	 *  Creates a default SSDateField object using the default date format.
 	 */
 	public SSDateField(){
-		this(SSDateFormatterFactory.get());
+		this(SSFormat.DATE);
 	}
 
 	/**
-	 *  Creates a new instance of SSDateField with the specified format
-	 *  @param _format - format to be used while the date field is in edit mode
-	 *  allowed values are MMDDYYYY or DDMMYYYY or YYYYMMDD
+	 *  Creates a new instance of SSDateField with the specified format.
+	 *  @param _format - an enum format to be used while the date field is in edit mode
 	 */
-	public SSDateField(final Format _format) {
-		this(SSDateFormatterFactory.get(_format));
-	}
-
-	/**
-	 *  Creates a new instance of SSDateField with the specified format
-	 *  @param format - format to be used while the date field is in edit mode
-	 *  allowed values are MMDDYYYY or DDMMYYYY
-	 * @deprecated use {@link SSDateField#SSDateField(Format) }
-	 */
-	@Deprecated
-	public SSDateField(final int format) {
-		this(SSDateFormatterFactory.get(format));
+	public SSDateField(final SSFormat _format) {
+		this(createFormatterFactory(_format));
 	}
 
 	/**
 	 * Creates an object of SSDateField with the specified formatter factory
 	 * @param factory - formatter factory to be used
 	 */
-	public SSDateField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+	public SSDateField(final AbstractFormatterFactory factory) {
 		super(factory);
 	}
-
+		
 	/**
-	 * Sets the value of the field to an initial state consistent with
-	 * the AllowNull property. If not AllowNull the nuse the current system date.
+	 * Create DATE formatter factory with specified format pattern.
+	 * See https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html
+	 * @param _format - Format to be used for date while in editing mode.
+	 * @return a DefaultFormatterFactory for the specified date format
 	 */
-	@Override
-	public void cleanField() {
-		if (getAllowNull()) {
-			setValue(null);
-		} else {
-			setValue(new java.util.Date());
+	public static DefaultFormatterFactory createFormatterFactory(SSFormat _format) {
+		SSFormat format = _format;
+		if ( _format.getType() != SSFormat.DATE ) {
+			// I'd be inclined to exception
+			// throw new IllegalArgumentException(
+			// 		String.format("% is not a DATE", _format.toString()));
+			logger.log(Level.ERROR, () -> String.format("%s is not a DATE, using default",
+					_format.toString()));
+			format = SSFormat.DATE;
 		}
+		format = SSFormat.getActualFormat(format);
+		String formatMask;
+		String editPattern;
+		switch(format) {
+		case DATE_MMDDYYYY_SLASH -> {
+			formatMask = "##/##/####";
+			editPattern = "MMddyyyy";
+		}
+		//// TODO: DateTime needs to know the format to distinguish DDMM from MMDD
+		//case DATE_DDMMYYYY_SLASH -> {
+		//	formatMask = "##/##/####";
+		//	editPattern = "ddMMyyyy";
+		//}
+		case DATE_YYYYMMDD_STROKE -> {
+			formatMask = "####-##-##";
+			editPattern = "yyyyMMdd";
+		}
+		default -> {
+			logger.log(Level.ERROR, "Unknown date format type of " + format);
+			return null;
+		}
+		}
+		
+		return new SSMaskFormatterFactory.Builder<>(formatMask)
+				.ssFormat(format)
+				.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
+				.placeholderCharacter('_')
+				.build();
 	}
 }
