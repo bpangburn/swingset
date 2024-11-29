@@ -37,13 +37,25 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
+import java.text.ParseException;
+import java.util.List;
+
+import javax.swing.text.MaskFormatter;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.nqadmin.swingset.formatting.FormatterAssist.LiteralsAndPositions;
+import com.nqadmin.swingset.formatting.SSMaskFormatterFactory.SSMaskFormatter;
+
+import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
+import static com.nqadmin.swingset.formatting.FormatterAssist.getLiteralsAndPositions;
+import static com.nqadmin.swingset.formatting.SSMaskFormatterFactory.SSMaskFormatter.FORMATTING_CHARS;
 import static org.junit.jupiter.api.Assertions.*;
+import static com.nqadmin.swingset.formatting.FormatterAssist.userText;
 
 /**
  * Most of the testing in here is to build class hierarchies
@@ -86,7 +98,7 @@ public class SSMaskFormatterFactoryTest {
 
 		/** @param <T> */
 		public static class CustomParentBuilder<T extends CustomParentBuilder<T>>
-				extends SSMaskFormatterFactory.Builder<CustomParentBuilder<T>> {
+				extends SSMaskFormatterFactory.Builder<T> {
 			private final String parentArg;
 			private String parentParam = "defaultParentParam";
 
@@ -104,13 +116,6 @@ public class SSMaskFormatterFactoryTest {
 			/** @return */
 			@Override
 			public CustomParentFormatterFactory build() { return new CustomParentFormatterFactory(this); }
-			
-			/** @return */
-			@Override
-			@SuppressWarnings("unchecked")
-			protected T self() {
-				return (T) this;
-			}
 		}
 
 		private final String parentArg;
@@ -133,7 +138,7 @@ public class SSMaskFormatterFactoryTest {
 
 		/** @param <T> */
 		public static class CustomChildBuilder<T extends CustomChildBuilder<T>>
-				extends CustomParentBuilder<CustomChildBuilder<T>> {
+				extends CustomParentBuilder<T> {
 			private final String childArg;
 			private String childParam = "defaultChildParam";
 
@@ -152,13 +157,6 @@ public class SSMaskFormatterFactoryTest {
 			/** @return */
 			@Override
 			public CustomChildFormatterFactory build() { return new CustomChildFormatterFactory(this); }
-
-			/** @return */
-			@Override
-			@SuppressWarnings("unchecked")
-			protected T self() {
-				return (T) this;
-			}
 		}
 
 		private final String childArg;
@@ -178,35 +176,119 @@ public class SSMaskFormatterFactoryTest {
 	@Test
 	public void testParentHier() {
 		CustomParentFormatterFactory.CustomParentBuilder<?> b
-				= new CustomParentFormatterFactory
-						.CustomParentBuilder<>("##/##", "parentArg")
-						.maskLiterals("AB").parentParam("parentParam");
+				= new CustomParentFormatterFactory.CustomParentBuilder<>
+			("##/##", "parentArg")
+			.parentParam("parentParam").ssFormat(CUSTOM);
 		CustomParentFormatterFactory ff = b.build();
 		assertEquals("parentArg", ff.getParentArg());
 		assertEquals("parentParam", ff.getParentParam());
-		SSMaskFormatterFactory.SSMaskFormatter f
-				= (SSMaskFormatterFactory.SSMaskFormatter) ff.getDefaultFormatter();
+		SSMaskFormatter f = (SSMaskFormatter) ff.getDefaultFormatter();
 		assertEquals("##/##", f.getMask());
-		assertEquals("AB", f.getLiterals());
+		assertEquals("/", f.getMaskLiterals(false));
 	}
 
 	/** x */
 	@Test
 	public void testChildHier() {
 		CustomChildFormatterFactory.CustomChildBuilder<?> b
-				= new CustomChildFormatterFactory
-						.CustomChildBuilder<>("##/##", "parentArg", "childArg")
-						.maskLiterals("AB")
-						.parentParam("parentParam").childParam("childParam");
+				= new CustomChildFormatterFactory.CustomChildBuilder<>
+			("##/##", "parentArg", "childArg")
+			.parentParam("parentParam").childParam("childParam").ssFormat(CUSTOM)
+			.ssFormat(CUSTOM).parentParam("parentParam").childParam("childParam")
+			.childParam("childParam").parentParam("parentParam").ssFormat(CUSTOM)
+			.ssFormat(CUSTOM).childParam("childParam").parentParam("parentParam");
+
 		CustomChildFormatterFactory ff = b.build();
 		assertEquals("parentArg", ff.getParentArg());
 		assertEquals("parentParam", ff.getParentParam());
 		assertEquals("childArg", ff.getChildArg());
 		assertEquals("childParam", ff.getChildParam());
-		SSMaskFormatterFactory.SSMaskFormatter f
-				= (SSMaskFormatterFactory.SSMaskFormatter) ff.getDefaultFormatter();
+		SSMaskFormatter f = (SSMaskFormatter) ff.getDefaultFormatter();
 		assertEquals("##/##", f.getMask());
-		assertEquals("AB", f.getLiterals());
+		assertEquals("/ ", f.getMaskLiterals(true));
+	}
+
+	/** x
+	 * @throws java.text.ParseException */
+	@Test
+	public void testGetMaskLiterals() throws ParseException {
+		SSMaskFormatter mf = new SSMaskFormatter("", null);
+		String s;
+
+		mf.setMask("# #/# #");
+
+		// NOTE default placeholder char is a space.
+		s = mf.getMaskLiterals(true);
+		assertEquals(" /", s);
+		s = mf.getMaskLiterals(false);
+		assertEquals(" /", s);
+
+		mf.setPlaceholderCharacter('_');
+		s = mf.getMaskLiterals(true);
+		assertEquals(" /_", s);
+		s = mf.getMaskLiterals(false);
+		assertEquals(" /", s);
+		// Repeat should come out of cache (not worth special code to verify in cache.
+		s = mf.getMaskLiterals(true);
+		assertEquals(" /_", s);
+		s = mf.getMaskLiterals(false);
+		assertEquals(" /", s);
+
+		mf.setMask("# #/# #-");
+		s = mf.getMaskLiterals(true);
+		assertEquals(" /-_", s);
+		s = mf.getMaskLiterals(false);
+		assertEquals(" /-", s);
+	}
+
+	/** x */
+	@Test
+	public void testGetMaskLiteralsAndPositions() {
+		LiteralsAndPositions lp;
+
+		lp = getLiteralsAndPositions("##-## ##:#", FORMATTING_CHARS);
+		assertEquals(List.of("-", " ", ":"), lp.literals());
+		assertEquals(List.of(2, 5, 8), lp.positions());
+
+		lp = getLiteralsAndPositions("####-##-## ##:##:##.### *##:##", FORMATTING_CHARS);
+		assertEquals(List.of("-", "-", " ", ":", ":", ".", " ", ":"), lp.literals());
+		assertEquals(List.of(4, 7, 10, 13, 16, 19, 23, 27), lp.positions());
+
+		lp = getLiteralsAndPositions("##-## H ##:#", FORMATTING_CHARS);
+		assertEquals(List.of("-", " ", " ", ":"), lp.literals());
+		assertEquals(List.of(2, 5, 7, 10), lp.positions());
+
+		lp = getLiteralsAndPositions("##-## 'H ##:#", FORMATTING_CHARS);
+		assertEquals(List.of("-", " ", "H", " ", ":"), lp.literals());
+		assertEquals(List.of(2, 5, 6, 7, 10), lp.positions());
+	}
+
+	private String bounceUserText(MaskFormatter mf, String text) {
+		return userText(
+				text, mf.getMask(), FORMATTING_CHARS, mf.getPlaceholderCharacter());
+	}
+
+	/** x
+	 * @throws java.text.ParseException */
+	@Test
+	public void testUserText() throws ParseException {
+		String text;
+		MaskFormatter mf = new MaskFormatter();
+		mf.setMask("##-## ##:#");
+		text = bounceUserText(mf, "  -     :  ");
+		assertEquals("", text);
+		text = userText("  -1   2:  ", mf);
+		assertEquals("12", text);
+		text = bounceUserText(mf, "__-__ __:__");
+		assertEquals("________", text);
+		text = userText("_1-__ 3_:__", mf);
+		assertEquals("_1__3___", text);
+
+		mf.setPlaceholderCharacter('_');
+		text = bounceUserText(mf, "__-__ __:__");
+		assertEquals("", text);
+		text = userText("_1-__ 3_:__", mf);
+		assertEquals("13", text);
 	}
 
 	/**
