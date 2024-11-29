@@ -35,39 +35,112 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
-import javax.swing.SwingConstants;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.Objects;
+
+import javax.swing.text.DefaultFormatterFactory;
+
+import static com.nqadmin.swingset.formatting.NumberField.createNumberFormat;
 
 // SSPercentField.java
 //
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * Used to link a SSFormattedTextField to a percentage column in a database.
+ * Used to bind a SSFormattedTextField to a percentage column in a database.
  */
-public class SSPercentField extends SSFormattedTextField {
-
-    /**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 3688135906130676106L;
+@SuppressWarnings("serial")
+public class SSPercentField extends NumberField {
 
 	/**
      * Creates a default object of SSPercentField
      */
     public SSPercentField() {
-        this(new SSPercentFormatterFactory());
+        this(createFormatterFactory(SSFormat.CUSTOM, null, null));
+    }
+
+	/**
+     * Creates a default object of SSPercentField.
+	 * @param precision - number of digits needed for integer part of the number
+	 * @param decimals  - number of digits needed for the fraction part of the number
+     */
+    public SSPercentField(int precision, int decimals) {
+        this(createFormatterFactory(SSFormat.CUSTOM, precision, decimals));
     }
 
     /**
      * Creates an object of SSPercentField with the specified formatter factory
      * @param factory - formatter factory to be used
      */
-    public SSPercentField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+    public SSPercentField(AbstractFormatterFactory factory) {
         super(factory);
-        setHorizontalAlignment(SwingConstants.RIGHT);
-        setValue(Double.valueOf(0.00));
     }
 
+	/**
+	 * Get the multiplier used in percent.
+	 * @return multiplier
+	 */
+	public int getMultiplier() {
+		return getNumberFormatParam((nf) -> nf.getMultiplier());
+	}
+
+	/**
+	 * Sets the multiplier for use in percent. With multiplier 100,
+	 * 1.23 is formatted as "123", and "123" is parsed into 1.23.
+	 * @param multiplier the new multiplier
+	 */
+	public void setMultiplier(int multiplier) {
+		setFormatParam((nf) -> nf.setMultiplier(multiplier));
+	}
+
+	/**
+	 * Create a FormatterFactory.
+	 * @param ssFormat
+	 * @param precision - number of digits needed for integer part of the number
+	 * @param decimals - number of digits needed for fraction part of the number
+	 * @return FormatterFactory.
+	 */
+	public static DefaultFormatterFactory createFormatterFactory(
+			SSFormat ssFormat, Integer precision, Integer decimals
+			//, Locale editLocale, Locale displayLocale
+	)
+	{
+		Objects.requireNonNull(ssFormat);
+
+		NumberFormat displayFormat = createNumberFormat(
+				()->NumberFormat.getPercentInstance(Locale.US));
+		NumberFormat editFormat = createNumberFormat(
+				()->NumberFormat.getInstance(Locale.US));
+		// Make sure edit format has the multiplier default for percent.
+		((DecimalFormat)editFormat).setMultiplier(
+				((DecimalFormat)displayFormat).getMultiplier());
+
+		if (precision!=null) {
+			editFormat.setMaximumIntegerDigits(precision);
+			editFormat.setMinimumIntegerDigits(1);
+			displayFormat.setMaximumIntegerDigits(precision);
+			displayFormat.setMinimumIntegerDigits(1);
+		}
+		if (decimals!=null) {
+			editFormat.setMaximumFractionDigits(decimals);
+			editFormat.setMinimumFractionDigits(decimals);
+			displayFormat.setMaximumFractionDigits(decimals);
+			displayFormat.setMinimumFractionDigits(decimals);
+		}
+		
+		return new SSFormatterFactory.Builder<>()
+				.ssFormat(ssFormat)
+				.editFormatter(new SSNumberFormatter(editFormat))
+				.displayFormatter(new SSNumberFormatter(displayFormat))
+				.build();
+	}
 }
