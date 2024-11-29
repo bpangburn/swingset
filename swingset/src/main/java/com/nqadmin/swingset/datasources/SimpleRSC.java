@@ -128,7 +128,9 @@ public class SimpleRSC implements RSC
 
 		try {
 			if (getRowSet().getRow() != 0) {
-				value = RowSetOps.getColumnObjectText(this);
+// TODO: 2024-11-29_BP: Disabling this for 4.1.x. Add back for 5.x.
+//				value = RowSetOps.getColumnObjectText(this);
+				value = RowSetOps.getColumnText(rs, name);
 				if (!getAllowNull() && (value == null)) {
 					value = "";
 				}

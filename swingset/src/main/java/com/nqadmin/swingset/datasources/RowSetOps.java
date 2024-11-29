@@ -35,9 +35,15 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.datasources;
 
 import java.math.BigDecimal;
+import java.sql.Array;
 import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
@@ -231,6 +237,139 @@ public class RowSetOps {
 					_columnName, ex));
 			return Optional.empty();
 		}
+	}
+
+//	/**
+//	 *
+//	 * @param comp
+//	 * @return
+//	 */
+//	public static Array getColumnArray(SSComponentInterface comp)
+//	{
+//		try {
+//			if (getColumnCount(comp.getRowSet())==0)
+//				return null;
+//			Object objectValue = NavigateActions.fetchCurrentValue(comp);
+//			if (objectValue == null)
+//				return null;
+//
+//			return (Array) objectValue;
+//		} catch (SQLException ex) {
+//			logger.log(ERROR, "SQL Exception for column " + comp.getBoundColumnName() + ".", ex);
+//		}
+//		return null;
+//	}
+
+	/**
+	 * Returns the Object from the rowset's specified column;
+	 * no object conversion.
+	 * There is no filtering, for example null conversion.
+	 * @param comp component
+	 * @return value
+	 * @throws java.sql.SQLException
+	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B-1
+	 */
+	public static Object getColumnObject(RSC comp) throws SQLException
+	{
+		if(Boolean.TRUE)
+			return comp.getRowSet().getObject(comp.getBoundColumnIndex());
+		else
+			return getColumnObject2(comp);
+	}
+
+	//
+	// This switch code is the original from SSDataGrid/SSTableModel,
+	// amended to include additional column types and to meet JDBC spec.
+	// Doing "rowset.getObject(_column)" should produce the same result,
+	// possibly since JDBC 2. This is here as a fallback/just-in-case,
+	// given the great divergence in JDBC drivers and database.
+	// 
+	// If it turns out that there is some need for flipping, maybe for
+	// different environments, then it's a question of how?
+	//
+	// Explore what things should be flippable and at what granularity.
+	// Should you be able to specify handling per column type?
+	// What switch to flip, in a property file, pluggable, ...
+	//
+	private static Object getColumnObject2(RSC comp) throws SQLException
+	{
+		RowSet rs = comp.getRowSet();
+		int cIdx = comp.getBoundColumnIndex();
+		return switch (comp.getBoundColumnJDBCType()) {
+		case INTEGER, SMALLINT, TINYINT ->	rs.getInt(cIdx);
+		case BIGINT ->				rs.getLong(cIdx);
+		case REAL ->				rs.getFloat(cIdx);
+		case DOUBLE, FLOAT ->		rs.getDouble(cIdx);
+		case NUMERIC, DECIMAL ->	rs.getBigDecimal(cIdx);
+		case BOOLEAN, BIT ->		rs.getBoolean(cIdx);
+		case DATE ->				rs.getDate(cIdx);
+		case TIME ->				rs.getTime(cIdx);
+		case TIMESTAMP ->			rs.getTimestamp(cIdx);
+		case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR ->
+									rs.getString(cIdx);
+		default -> {
+			logger.warn("Unknown data type of " + comp.getBoundColumnJDBCType());
+			yield rs.getObject(cIdx);
+		}
+		};
+	}
+
+	//
+	// TODO: revisit these ColumnObject methods
+	//
+	/**
+	 * Returns an Object of the specified type
+	 * representing the value in the component's bound database column.
+	 * This may involve a conversion.
+	 * <p>
+	 * Note that if a String type is specified, a null is not automatically
+	 * turned into "" use getColumnText for that.
+	 * @param <T> type to return
+	 * @param comp component
+	 * @param type Class of returned type
+	 * @return object
+	 * @throws java.sql.SQLException
+	 */
+	public static <T> T getColumnObject(RSC comp, Class<T> type) throws SQLException
+	{
+		// If there are no columns, return null.
+		if (getColumnCount(comp.getRowSet()) == 0)
+			return null;
+
+// TODO: 2024-11-29_BP: Disabling this for 4.1.x. Add back for 5.x.			
+//		if(Boolean.TRUE)
+//			return getColumnObject1(comp, type); // undo/redo,convert
+//		else
+			return getColumnObject2(comp, type); // getObject direct
+	}
+
+//	/**
+//	 * Returns an Object of the specified type
+//	 * representing the value in the component's bound database column.
+//	 * @param <T> type to return
+//	 * @param comp component
+//	 * @param type Class of returned type
+//	 * @return value
+//	 */
+//	private static <T> T getColumnObject1(RSC comp, Class<T> type)
+//			throws SQLException
+//	{
+//		Object objectValue = NavigateActions.fetchCurrentValue(comp);
+//		return convertObjectType(objectValue, type);
+//	}
+
+	/**
+	 * Returns an Object of the specified type
+	 * representing the value in the component's bound database column.
+	 * @param <T> type to return
+	 * @param comp component
+	 * @param type Class of returned type
+	 * @return value
+	 */
+	private static <T> T getColumnObject2(RSC comp, Class<T> type)
+			throws SQLException
+	{
+		return comp.getRowSet().getObject(comp.getBoundColumnIndex() , type);
 	}
 	
 	/**
