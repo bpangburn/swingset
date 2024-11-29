@@ -47,8 +47,18 @@ import java.awt.Container;
 import java.awt.Toolkit;
 import java.lang.StackWalker.Option;
 import java.lang.System.Logger;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.sql.RowSet;
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.JoinRowSet;
 
 import org.apache.logging.log4j.util.StackLocatorUtil;
 
@@ -153,7 +163,8 @@ public class SSUtils {
 	{
 		Toolkit.getDefaultToolkit().beep();
 	}
-
+ 
+// TODO: 2024-11-29_BP: Disabling this for 4.1.x. Add back for 5.x.
 //	/**
 //	 * Setup a {@linkplain CachedRowSet}'s primary keys, use the component's
 //	 * row set to get the database table's keys.
@@ -200,27 +211,27 @@ public class SSUtils {
 
 	// https://stackoverflow.com/questions/21328371/get-primary-key-column-from-resultset-java
 
-//	/**
-//	 *
-//	 * @param connection
-//	 * @param tableName
-//	 * @return
-//	 * @throws SQLException
-//	 */
-//
-//	public static Set<Integer> getPrimaryKeyColumnsForTable(Connection connection, String tableName) throws SQLException
-//	{
-//		try(ResultSet pkColumns= connection.getMetaData().getPrimaryKeys(null,null,tableName);) {
-//			SortedSet<Integer> pkColumnSet = new TreeSet<>();
-//			while(pkColumns.next()) {
-//				Integer pkPosition = pkColumns.getInt("KEY_SEQ");
-//				//String pkColumnName = pkColumns.getString("COLUMN_NAME");
-//				//System.out.println(""+pkColumnName+" is the "+pkPosition+". column of the primary key of the table "+tableName);
-//				pkColumnSet.add(pkPosition);
-//			}
-//			return pkColumnSet;
-//		}
-//	}
+	/**
+	 *
+	 * @param connection
+	 * @param tableName
+	 * @return
+	 * @throws SQLException
+	 */
+
+	public static Set<Integer> getPrimaryKeyColumnsForTable(Connection connection, String tableName) throws SQLException
+	{
+		try(ResultSet pkColumns= connection.getMetaData().getPrimaryKeys(null,null,tableName);) {
+			SortedSet<Integer> pkColumnSet = new TreeSet<>();
+			while(pkColumns.next()) {
+				Integer pkPosition = pkColumns.getInt("KEY_SEQ");
+				//String pkColumnName = pkColumns.getString("COLUMN_NAME");
+				//System.out.println(""+pkColumnName+" is the "+pkPosition+". column of the primary key of the table "+tableName);
+				pkColumnSet.add(pkPosition);
+			}
+			return pkColumnSet;
+		}
+	}
 
 	////////////////////////////////////////////////////////////////////////////
 	//
