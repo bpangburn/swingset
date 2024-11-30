@@ -66,9 +66,9 @@ import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
-import static com.nqadmin.swingset.datasources.ConvertType.verifyConvertToType;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.sql.JDBCType.*;
+import static com.nqadmin.swingset.datasources.ConvertType.assertConvertToType;
 
 // SSCheckBox.java
 //
@@ -174,7 +174,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 	@Override
 	public void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException
 	{
-		verifyConvertToType(jdbcType, Boolean.class,
+		assertConvertToType(jdbcType, Boolean.class,
 				EnumSet.of(BIT, BOOLEAN, INTEGER, SMALLINT, TINYINT));
 	}
 	

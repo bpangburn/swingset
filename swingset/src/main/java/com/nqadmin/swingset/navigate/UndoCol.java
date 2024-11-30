@@ -59,6 +59,8 @@ import static java.lang.System.Logger.Level.*;
  * After a column gets focus, the next change adds a new current value.
  * When a change comes in, the change replaces the current value
  * and all values after the current value are discarded.
+ * <p>
+ * The database is read for the initial value when this is created.
  */
 // TODO: 
 final class UndoCol

@@ -963,6 +963,7 @@ public class NavigateActions
 			removeRowsetListener();
 			try {
 				// Commit changes for current row to database
+				// Ignore return since doesn't matter if there's nothing to do.
 				commitChangesToDatabase(true);
 
 				// Move to insert row, update status, and update combo navigator (if applicable)
@@ -972,13 +973,32 @@ public class NavigateActions
 					navCombo.setEnabled(false);
 				}
 
+				//
+				// TODO:
+				//		The following does not inspire confidence.
+				//
+				//		AFAICT, performPreInsertOps causes saving of the
+				//		new fresh/empty values on top of the previous
+				//		db record in the undo/redo stuff: e.g. "[Smith, ]"
+				//
+				//		So, can't do freshRow(), which clears undo/redo
+				//		until after performPreInsertOps(), and any listeners
+				//		that are triggered by it, is finished.
+				//
+				//		Ideally, nothing should be done with undo/redo
+				//		during performPreInsertOps(). Should also take
+				//		a detailed look at next/prev record and such.
+				//
+
 				// If we don't use invokeLater() here,
 				// the values from the just-committed prior record
 				// are displayed for the insert row.
-				SwingUtilities.invokeLater(() -> dBNav.performPreInsertOps());
+				SwingUtilities.invokeLater(() -> {
+					dBNav.performPreInsertOps();
+					SwingUtilities.invokeLater(()->freshRow());
+				});
 				
 				updateActionState();
-				
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(dlgParent(e),
@@ -1478,6 +1498,7 @@ public class NavigateActions
 	 */
 	private void freshRow()
 	{
+		logger.log(TRACE, "freshRow");
 		undoRow.clear();
 		errorComponents.clear();
 		//isRowModified = false; // TODO: get rid of this

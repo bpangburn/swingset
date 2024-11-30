@@ -67,6 +67,8 @@ public interface RSC
 {
 	/**
 	 * Construct and return an object representing a RowSet column.
+	 * <p>
+	 * TODO: SO FAR ONLY USED WITH/FROM GRID. Issue with getColumnObject undo/redo.
 	 * @param rs
 	 * @param columnIndex
 	 * @return
@@ -85,6 +87,8 @@ public interface RSC
 
 	/**
 	 * Construct and return an object representing a RowSet column.
+	 * <p>
+	 * TODO: NOT USED
 	 * @param rs
 	 * @param columnIndex
 	 * @return
@@ -96,6 +100,8 @@ public interface RSC
 
 	/**
 	 * Construct and return an object representing a RowSet column.
+	 * <p>
+	 * TODO: NOT USED
 	 * @param rs
 	 * @param columnName 
 	 * @return

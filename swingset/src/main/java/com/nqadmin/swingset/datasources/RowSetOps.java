@@ -376,6 +376,21 @@ public class RowSetOps {
 	 */
 	public static Object getColumnObject(RSC comp) throws SQLException
 	{
+		return NavigateActions.fetchCurrentValue(comp); // undo/redo
+	}
+
+	/**
+	 * Returns the Object from the rowset's specified column;
+	 * no object conversion.
+	 * There is no filtering, for example null conversion.
+	 * @param comp component
+	 * @return value
+	 * @throws java.sql.SQLException
+	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B-1
+	 */
+	//TODO: rename this to "getColumnObjectDirect"? only used with grid
+	public static Object getColumnObjectLegacy(RSC comp) throws SQLException
+	{
 		if(Boolean.TRUE)
 			return comp.getRowSet().getObject(comp.getBoundColumnIndex());
 		else
@@ -809,7 +824,15 @@ public class RowSetOps {
 
 			//_rowSet.updateObject(_columnIndex, _updatedValue);
 			JDBCType jdbcType = comp.getBoundColumnJDBCType();
-			// TODO: maybe a component field that says use jdbc conversion
+			// TODO: Maybe a component field that says use jdbc conversion.
+			//		 Better, checkDriverConvertToType(),
+			//		 so "obj = convertObjectTypeIfNeeded(...)"
+			// TODO: Why isn't updateObject(index, object, type) used anywhere?
+			//		 Could always catch SQLFeatureNotSupportedException and do
+			//		 manual conversions as a last resort.
+			// TODO: It's weird that updateObject(idx,obj,type) javadoc says
+			//		 "type to be sent to the database". Does that mean the specified
+			//		 conversions for setObject kick in at that point?
 			Object obj = convertObjectType(_updatedValue, jdbcType);
 			updateColumnObjectDirect(_rowSet, _columnIndex, obj, jdbcType);
 			did_update = true;

@@ -202,13 +202,13 @@ public interface SSComponentInterface extends RSC
 		return getSSCommon().getBoundColumnName();
 	}
 
-	/**
-	 * Returns an Object of the specified type
-	 * representing the value in the bound database column.
-	 * @param <T> type to return
-	 * @param type Class of returned type
-	 * @return value
-	 */
+	/** {@inheritDoc } */
+	// TODO: put this in RSC?
+	default Object getBoundColumnObject() {
+		return getSSCommon().getBoundColumnObject();
+	}
+
+	/** {@inheritDoc } */
 	@Override
 	default <T> T getBoundColumnObject(Class<T> type) {
 		return getSSCommon().getBoundColumnObject(type);
@@ -515,8 +515,6 @@ public interface SSComponentInterface extends RSC
 
 	/**
 	 * This has component specific validation, for example for a SSDateField.
-	 * <p>
-	 * Useful minimum: "return getValue() != null || getAllowNull();"
 	 * @return true if successful validation for the type of component
 	 */
 	default boolean componentValidate() { return true; }

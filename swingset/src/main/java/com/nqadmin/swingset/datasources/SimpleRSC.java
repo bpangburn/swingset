@@ -55,6 +55,8 @@ import static java.lang.System.Logger.Level.*;
 
 /**
  * Row set column based only a RowSet and column.
+ * <p>
+ * TODO: SO FAR ONLY USED WITH/FROM GRID. Issue with getColumnObject undo/redo.
  */
 //
 // TODO: SimpleRSC exceptions

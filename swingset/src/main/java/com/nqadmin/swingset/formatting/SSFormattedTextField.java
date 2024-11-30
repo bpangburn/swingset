@@ -54,25 +54,23 @@ import java.text.ParseException;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultFormatterFactory;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.math.BigDecimal;
 
 import javax.swing.text.MaskFormatter;
 
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
-import com.nqadmin.swingset.navigate.RowSetState;
+import com.nqadmin.swingset.decorators.TextDecorationStyle;
+import com.nqadmin.swingset.decorators.TextDecorator;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
-import com.nqadmin.swingset.decorators.TextDecorationStyle;
-import com.nqadmin.swingset.decorators.TextDecorator;
-import com.nqadmin.swingset.decorators.Decorator;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
@@ -137,7 +135,7 @@ public class SSFormattedTextField extends JFormattedTextField
 							getColumnForLog(), formatter == null ? null
 									: formatter.getClass().getSimpleName()));
 			if (formatter == null || formattedText == null)
-				return true; // just get out and let focus change
+				return true; // Impossible. Just get out and let focus change.
 			
 			boolean ok = true;
 			// Suppress "value" property change event if a call is made to setValue()
@@ -156,20 +154,16 @@ public class SSFormattedTextField extends JFormattedTextField
 					ok = false;
 				}
 				
-				if (value == null && !getAllowNull()) {
-					logger.log(WARNING, "null value but not getAllowNull");
-					ok = false;
-				}
 				// Perform component and custom validation.
+				// TODO: ok = getSSCommon.decorate();??? But still want exit decorate
 				if (ok)
 					ok = isAllValid().all();
-				// Update text decoration, e.g. red for negatives, if applicable.
-				if (ok)
-					updateTextDecorator(value);
 				// If ok with null, make sure to use the null formatter. Needed?
 				if (ok && value == null)
 					ftf.setValue(null); // Note: "verifyingText" skips pce.
-				getSSCommon().decorate(); // TODO: not needed?
+				// Update text decoration, e.g. red for negative.
+				if (ok)
+					updateTextDecorator();
 			} catch (final Exception e) {
 				// TODO: Not right. What runtime exceptions should be looked for?
 				logger.log(Level.ERROR, getColumnForLog() + ": PROGRAM/RUNTIME ERROR");
@@ -178,13 +172,14 @@ public class SSFormattedTextField extends JFormattedTextField
 				// Stop supressing "value" property change event handling.
 				verifyingText = false;
 			}
+			getSSCommon().decorate();
 			return ok;
 		}
 	}
 
 	/**
 	 * Component's property change event handler.
-	 * Bounces "value" property to local function.
+	 * Only handles "value" property.
 	 */
 	protected class SSFormattedTextFieldListener implements PropertyChangeListener {
 		/**
@@ -199,73 +194,35 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	/**
 	 * Handle a "value" property change event; used to propagate changes back to bound
-	 * database column. Careful to avoid cascading events, and always decorates at
-	 * exit. Does nothing if {@link #isAllValid()} indicates invalid.
+	 * database column. Avoid cascading events and always decorate.
+	 * Does nothing if {@link #isAllValid()} via decorate indicates invalid.
 	 * @param pce "value" from property change event
 	 */
-	protected void handleValuePropertyChange(PropertyChangeEvent pce)
+	private void handleValuePropertyChange(
+			@SuppressWarnings("unused") PropertyChangeEvent pce)
 	{
 		final SSFormattedTextField ftf = this;
 		
 		// Ignore event if triggered by FormattedTextFieldVerifier.
 		if (verifyingText)
 			return;
-		if (!isAllValid().all()) {
-			getSSCommon().decorate();
-			return;
-		}
 		
 		getSSCommon().removeRowSetListener();
-		
-		
-		final Object currentValue = ftf.getValue();
-		logger.log(INFO, ()->sf("%s: to database '%s' type %s.",
-				getColumnForLog(), currentValue,
-				currentValue == null ? null : currentValue.getClass().getName()));
-		
-		// TODO May want to see if we can veto invalid updates
-		// 2020-12-14_BP: allow null if on insert row
-		if (!getAllowNull() && (currentValue == null) && !RowSetState.isInserting(getRowSet())) {
-			logger.log(WARNING, "Null value encounted, but not allowed.");
-			JOptionPane.showMessageDialog(ftf, "Null values are not allowed for " + getBoundColumnName(),
-					"Null Exception", JOptionPane.ERROR_MESSAGE);
-		} else {
-			
-			try {
-				// TODO: put the specialized handling into some kind
-				//		 of data base adaptor plugin.
-				// 2020-10-02_BP: Date (and presumably Time & Timestamp) fields are
-				// returned as java.util.Date and Postgres JDBC doesn't know how to
-				// handle them java.sql.Date, java.sql.Time, and java.sql.Timestamp
-				// are all subclasses of java.util.Date.
-				// Note this code will do java.sql.Date --> java.sql.Date.
-// TODO This may be where we want to check and deal with NULL
-			if (currentValue instanceof java.util.Date date) {
-				Object adjustedTypeValue = switch (getBoundColumnJDBCType()) {
-				case DATE -> new java.sql.Date(date.getTime());
-				case TIME -> new java.sql.Time(date.getTime());
-				case TIMESTAMP -> new java.sql.Timestamp(date.getTime());
-				default -> null;
-				};
-				if (adjustedTypeValue != null)
-					getRowSet().updateObject(getBoundColumnName(), adjustedTypeValue);
-				else
-					logger.log(Level.ERROR,
-							sf("%s: java.util.Date but JDBCType %s. Unable to update.",
-									getColumnForLog(), getBoundColumnJDBCType()));
-			} else {
-				getRowSet().updateObject(getBoundColumnName(), currentValue);
-			}
 
-			} catch (final SQLException _se) {
-				logger.log(Level.ERROR, getColumnForLog() + ": RowSet update triggered SQL Exception.", _se);
-				JOptionPane.showMessageDialog(ftf, "SQL Exception encountered for " + getBoundColumnName(),
-						"SQL Exception", JOptionPane.ERROR_MESSAGE);
-			}
+		try {
+			final Object currentValue = ftf.getValue();
+			logger.log(INFO, ()->sf("%s: to database '%s' type %s.",
+					getColumnForLog(), currentValue,
+					currentValue == null ? null : currentValue.getClass().getName()));
+			
+			// The formatter says it's valid, but there's more to check
+			if (getSSCommon().decorate())
+				setBoundColumnObject(currentValue);
+
+		} finally {
+			getSSCommon().addRowSetListener();
 		}
 		
-		getSSCommon().addRowSetListener();
-		getSSCommon().decorate();
 	}
 	
 	/**
@@ -394,6 +351,11 @@ public class SSFormattedTextField extends JFormattedTextField
 		addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(final FocusEvent fe) {
+				if (getSSCommon().getDecorator() instanceof TextDecorator td) {
+					// Turn off any text decorations while focused
+					td.decorateText(TextDecorationStyle.RESET);
+				}
+
 				SwingUtilities.invokeLater(() -> { selectAll(); });
 			}
 		});
@@ -445,85 +407,104 @@ public class SSFormattedTextField extends JFormattedTextField
 		//
 		// getObject() will return the given column as a Java object. JDBC specification should contain the mappings for built in types.
 
-
-		Object newValue = null;
-
 		try {
-			final JDBCType jdbcType = getBoundColumnJDBCType();
-			final String columnName = getBoundColumnName();
-
-			// If no records, no columns, or record field null then set value null, bail.
-			if ( getRowSet().getRow() < 1 || RowSetOps.getColumnCount(getRowSet())==0
-					|| getRowSet().getObject(columnName) == null ) {
-				setValue(null);
-				updateTextDecorator(null);
-				getSSCommon().decorate();
-				return;
-			}
-			newValue = getRowSet().getObject(columnName); // TODO: MIGHT BE DONE ABOVE
-
-			// Only support some Java types for JFormattedTextFields.
-			// TODO: Wonder if "vewValue instanceof Number" would work.
-			// TODO: What if an installed formatter doesn't handle the type?
-			//		 Where is that checked.
-			if ((newValue instanceof String) ||
-					(newValue instanceof Boolean) ||
-					(newValue instanceof Float) ||
-					(newValue instanceof Double) ||
-					(newValue instanceof Integer) ||
-					(newValue instanceof Long) ||
-					(newValue instanceof java.math.BigDecimal) ||
-					(newValue instanceof java.sql.Date) ||
-					(newValue instanceof java.sql.Time) ||
-					(newValue instanceof java.sql.Timestamp)) {
+			do {
+				// If no records, no columns, bail.
+				// TODO: is this check needed?
+				if ( getRowSet().getRow() < 1
+						|| RowSetOps.getColumnCount(getRowSet())==0) {
+					// TODO: should this check allow null?
+					setValue(null);
+					break;
+				}
 				
-				var finalNewValue = newValue;
-				logger.log(DEBUG, ()->sf("%s: getObject() - %s",
-						getColumnForLog(), finalNewValue));
-				setValue(newValue);
-			} else {
-				String newValueType = newValue == null
-						? "(null)" : newValue.getClass().getName();
-				logger.log(Level.ERROR, sf("%s: JDBCType %s to %s not supported",
-						getColumnForLog(), jdbcType.toString(), newValueType));
-				//
-				// TODO: there is no "setValue()". Should do "setValue(null)"?
-				//
-			}
+				final JDBCType jdbcType = getBoundColumnJDBCType();
+				final Object newValue = getBoundColumnObject();
+
+				// If record field null then set value null, bail.
+				if (newValue == null ) {
+					// TODO: should this check allow null?
+					setValue(null);
+					break;
+				}
+				
+				// Only support some Java types for JFormattedTextFields.
+				// TODO: Wonder if "newValue instanceof Number" would work.
+				// TODO: What if an installed formatter doesn't handle the type?
+				//		 Where is that checked.
+				if ((newValue instanceof String) ||
+						(newValue instanceof Boolean) ||
+						(newValue instanceof Float) ||
+						(newValue instanceof Double) ||
+						(newValue instanceof Integer) ||
+						(newValue instanceof Long) ||
+						(newValue instanceof java.math.BigDecimal) ||
+						(newValue instanceof java.sql.Date) ||
+						(newValue instanceof java.sql.Time) ||
+						(newValue instanceof java.sql.Timestamp)) {
+					logger.log(DEBUG, ()->sf("%s: getObject() - %s",
+							getColumnForLog(), newValue));
+					setValue(newValue);
+				} else {
+					logger.log(Level.ERROR, sf("%s: JDBCType %s to %s not supported",
+							getColumnForLog(), jdbcType, newValue.getClass().getName()));
+					//
+					// TODO: there is no "setValue()". Should do "setValue(null)"?
+					//
+				}
+			} while (false);
 		} catch (SQLException sqe) {
 			logger.log(Level.ERROR, sf("%s: Exception updating rowset.",
 					getColumnForLog(), sqe));
 			setValue(null);
 		}
-
-		// For example: color red for negative number
-		// TODO: updateTextDecorator should use "getValue()".
-		updateTextDecorator(newValue);
+		updateTextDecorator(); // For example: color red for negative number
 		getSSCommon().decorate();
 	}
-	
+
+	private boolean enableTextDecorator = true;
 	/**
-	 * This default text decorator distuinguishes negative numbers.
-	 * Typically red for negative numbers, otherwise black.
-	 * Override this method to do other things.
-	 *
-	 * @param _value - value to be validated
+	 * Set/reset the flag to enable text decoration.
+	 * @param flag
 	 */
-	// TODO: Should this apply after keytype?
-	// TODO: updateTextDecorator should use "getValue()".
-	public void updateTextDecorator(final Object _value) {
-		Decorator hl = getSSCommon().getDecorator();
-		if (hl instanceof TextDecorator textDecorator) {
-			TextDecorationStyle style;
-			if (((_value instanceof Double) && ((Double) _value < 0.0))
-					|| ((_value instanceof Float) && ((Float) _value < 0.0))
-					|| ((_value instanceof Long) && ((Long) _value < 0))
-					|| ((_value instanceof Integer) && ((Integer) _value < 0))) {
-				style = TextDecorationStyle.NEGATIVE_NUMBER;
-			} else {
-				style = TextDecorationStyle.RESET;
-			}
-			textDecorator.decorateText(style);
+	public final void setTextDecoratorEnabled(boolean flag) {
+		enableTextDecorator = flag;
+	}
+
+	/**
+	 * Whether or not text decoration is enabled.
+	 * @return true if enabled
+	 */
+	public final boolean isTextDecoratorEnabled() {
+		return enableTextDecorator;
+	}
+
+	/**
+	 * Decorate text based on current value of this component.
+	 * The following default text decorator distinguishes negative
+	 * numbers. Typically red for negative numbers, otherwise black.
+	 * Non numeric values are ignored.
+	 * Override this method to do other things.
+	 */
+	// Note: this might make more sense in NumberField.
+	// TODO: should this be updated while focused and any value change?
+	// TODO: should this be in SSComponentInterface?
+	public void updateTextDecorator() {
+		if (!isTextDecoratorEnabled())
+			return;
+		Object value = getValue();
+		if (getSSCommon().getDecorator() instanceof TextDecorator textDecorator) {
+			boolean isNeg = switch(value) {
+			case Double val ->		val < 0.0;
+			case Float val ->		val < 0.0;
+			case Long val ->		val < 0;
+			case Integer val ->		val < 0;
+			case BigDecimal val ->	val.signum() < 0;
+			case null, default ->	false;
+			};
+
+			textDecorator.decorateText(isNeg ? TextDecorationStyle.NEGATIVE_NUMBER
+									   : TextDecorationStyle.RESET);
 		}
 	}
 

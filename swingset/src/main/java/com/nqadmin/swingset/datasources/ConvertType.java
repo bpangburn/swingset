@@ -47,6 +47,7 @@ import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
+import java.util.Date;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -58,6 +59,11 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 /**
  * Different database jdbc drivers support different type conversion;
  * this utility class juggles types around.
+ * <p>
+ * TODO: Consider situations where JDBC does the requested conversion and so
+ *		 nothing to do. Maybe such a thing is checked before doing the convert
+ *		 methods. Like "verifyConvertToType()" below; "checkDriverConvertToType()".
+ * 
  */
 public class ConvertType
 {
@@ -84,55 +90,113 @@ public class ConvertType
 	}
 
 	/**
-	 * Check if the specified type is convertible, using methods in this
-	 * class, to the JDBC type  of the specified RowSet column.
-	 * Typically used during bind.
+	 * Throw if the specified JDBCType is not convertible, using methods in this
+	 * class, to the type. Typically used during bind.
+	 * <p>
+	 * The exception is thrown whether assertions are enabled or not.
+	 * <p>
+	 * TODO: or is automatically converted by JDBC driver?
+	 * 
 	 * @param jdbcType jdbc column type
-	 * @param type target type
-	 * @param restrict only allow these JDBC types, may be null
-	 * @throws IllegalArgumentException if can't handle JDBCType
+	 * @param targetType target type
+	 * @param allow only allow these JDBC types, may be null
+	 * @throws AssertionError if can't handle conversion to JDBCType
 	 */
-	public static void verifyConvertToType(JDBCType jdbcType, Class<?> type, EnumSet<JDBCType> restrict)
+	public static void assertConvertToType(JDBCType jdbcType, Class<?> targetType, EnumSet<JDBCType> allow)
 	{
-		if(restrict != null && !restrict.contains(jdbcType))
-			throw new IllegalArgumentException(sf("'%s' not in '%s'", jdbcType, restrict));
-		if(type == null)
-			return;
+		if(allow != null && !allow.contains(jdbcType))
+			throw new AssertionError(sf("'%s' not allowed in '%s'", jdbcType, allow));
+		if(!checkConvertToType(jdbcType, targetType, allow))
+			throw new AssertionError(sf("'%s' to '%s' conversion not supported", jdbcType, targetType.getName()));
+	}
+
+	/**
+	 * Check if the specified JDBCType is convertible, using methods in this
+	 * class, to the type.
+	 * <p>
+	 * TODO: or is automatically converted by JDBC driver?
+	 * 
+	 * @param jdbcType jdbc column type
+	 * @param targetType target type
+	 * @param allow only allow these JDBC types, may be null
+	 * @return true if conversion is handled
+	 */
+	public static boolean checkConvertToType(JDBCType jdbcType, Class<?> targetType, EnumSet<JDBCType> allow)
+	{
+		if(allow != null && !allow.contains(jdbcType))
+			return false;
+		if(targetType == null)
+			return true;
 		try {
-			Clazz source = getClazz(findJavaTypeClass(jdbcType));
-			Clazz target = getClazz(type);
-			if(source != null && target != null) {
+			Clazz sourceJDBC = getClazz(findJavaTypeClass(jdbcType));
+			Clazz target = getClazz(targetType);
+
+			if(sourceJDBC != null && target != null) {
+				if(sourceJDBC.isDateTime() && target.isDateTime()) {
+					return checkConvertToDateType(sourceJDBC, target);
+				}
 				// All number to number types supported.
-				if(source.isNumeric() && target.isNumeric())
-					return;
+				if(sourceJDBC.isNumeric() && target.isNumeric())
+					return true;
 				switch (target) {
 				case BOOL -> {
-					if(source == Clazz.BOOL || source.isNumeric())
-						return;
+					if(sourceJDBC == Clazz.BOOL || sourceJDBC.isNumeric())
+						return true;
 				}
 				case LONG, INT, SHORT, BYTE, FLOAT, DOUBLE, BIGD -> {
-					if(source == Clazz.BOOL)
-						return;
+					if(sourceJDBC == Clazz.BOOL)
+						return true;
 				}
+
 				}
 			}
-		} catch(SQLException ex) {
 		}
-		throw new IllegalArgumentException(sf("'%s' to '%s' conversion not supported", jdbcType, type.getName()));
+		catch(SQLException ex) {
+		}
+		return false;
+	}
+
+	/** Both source and target are date */
+	private static boolean checkConvertToDateType(Clazz sourceJDBC, Clazz target)
+	{
+		if (sourceJDBC == target)
+			return true;
+		return switch(target) {
+		case UTILDATE -> true;
+		case DATE -> switch (sourceJDBC) {
+			case TIMESTAMP -> true;
+			default -> false;
+		};
+		case TIME -> switch (sourceJDBC) {
+			case TIMESTAMP -> true;
+			default -> false;
+		};
+		case TIMESTAMP -> switch (sourceJDBC) {
+			case DATE, TIME -> true;
+			default -> false;
+		};
+		default -> false;
+		};
 	}
 
 	/** 
 	 * Convert the specified object to the object type
 	 * for the specified JDBCType.
 	 * This is not just casting; for example Boolen to Integer.
+	 * <p>
+	 * Note the spec B.2 vs B.4 updater methods vs setObject;
+	 * and B.5 for setObject when a target type is specified.
+	 * TODO: Is this is for when a target JDBCtype is NOT specified
+	 * or in the setObject (not appendix B.5).???
 	 * 
 	 * @param value
 	 * @param jdbcType
 	 * @return 
 	 * @throws java.sql.SQLException 
-	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B.4 Java Object Types Mapped to JDBC
-	 * Types
+	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B.4 Java Object Types Mapped to JDBC Types
 	 */
+	// TODO: move to the following?
+	//@see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B.5 Conversions by setObject and setNull from Java Object Types to JDBC Types
 	public static Object convertObjectType(Object value, JDBCType jdbcType)
 			throws SQLException
 	{
@@ -175,6 +239,34 @@ public class ConvertType
 		Clazz target = getClazz(type);
 		if(source == null || target == null)
 			return CanNotConvert;
+
+		if(source.isDateTime() && target.isDateTime()) {
+			if (source == target)
+				return sourceValue;
+			Date dateValue = (Date)sourceValue;
+			// NOTE: target can (should) never be DATETIME.
+			switch(target) {
+			case DATE -> {
+				switch (source) {
+				case TIMESTAMP, UTILDATE -> {
+					return new java.sql.Date(dateValue.getTime());
+				} }
+			}
+			case TIME -> {
+				switch (source) {
+				case TIMESTAMP, UTILDATE -> {
+					return new java.sql.Time(dateValue.getTime());
+				} }
+			}
+			case TIMESTAMP -> {
+				switch (source) {
+				case DATE, TIME, UTILDATE -> {
+					return new java.sql.Timestamp(dateValue.getTime());
+				} }
+			}
+			}
+			return CanNotConvert;
+		}
 
 		if(source.isNumeric() && target.isNumeric()) {
 			Number n = (Number) sourceValue;
@@ -365,14 +457,18 @@ public class ConvertType
 
 	private static Map<Class<?>,Clazz> mapClazz = new HashMap<>();
 	static enum Clazz {
-		INT(Integer.class, true),
-		SHORT(Short.class, true),
-		BYTE(Byte.class, true),
-		LONG(Long.class, true),
-		FLOAT(Float.class, true),
-		DOUBLE(Double.class, true),
-		BIGD(BigDecimal.class, true),
-		BOOL(Boolean.class)
+		BOOL(Boolean.class),
+		INT(Integer.class,			true, false),
+		SHORT(Short.class,			true, false),
+		BYTE(Byte.class,			true, false),
+		LONG(Long.class,			true, false),
+		FLOAT(Float.class,			true, false),
+		DOUBLE(Double.class,		true, false),
+		BIGD(BigDecimal.class,		true, false),
+		UTILDATE(Date.class,				false, true),
+		DATE(java.sql.Date.class,			false, true),
+		TIME(java.sql.Time.class,			false, true),
+		TIMESTAMP(java.sql.Timestamp.class,	false, true),
 		;
 
 		public static Clazz getClazz(Class<?> c)
@@ -381,20 +477,27 @@ public class ConvertType
 		}
 
 		private final boolean isNumeric;
+		private final boolean isDateTime;
 		Clazz(Class<?> clazz)
 		{
-			this(clazz, false);
+			this(clazz, false, false);
 		}
 		@SuppressWarnings("LeakingThisInConstructor")
-		Clazz(Class<?> clazz, boolean isNumeric)
+		Clazz(Class<?> clazz, boolean isNumeric, boolean isDateTime)
 		{
 			mapClazz.put(clazz, this);
 			this.isNumeric = isNumeric;
+			this.isDateTime = isDateTime;
 		}
 
 		boolean isNumeric()
 		{
 			return isNumeric;
+		}
+
+		boolean isDateTime()
+		{
+			return isDateTime;
 		}
 	}
 

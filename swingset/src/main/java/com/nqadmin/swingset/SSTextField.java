@@ -135,6 +135,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 		addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(final FocusEvent fe) {
+				// TODO: Turn off any TextDecorator while focused
 				SSTextField.this.selectAll();
 			}
 		});

@@ -790,6 +790,28 @@ public class SSCommon
 	}
 
 	/**
+	 * Returns an Object 
+	 * representing the value in the bound database column.
+	 * <p>
+	 * Note a null is never converted into ""; use getBoundColumnText for that.
+	 * @return value
+	 */
+	public Object getBoundColumnObject()
+	{
+		Object value = null;
+
+		try {
+			if (getRowSet().getRow() != 0) {
+				value = RowSetOps.getColumnObject(ssComponent);
+			}
+		} catch (final SQLException se) {
+			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
+		}
+
+		return value;
+	}
+
+	/**
 	 * Returns an Object of the specified type
 	 * representing the value in the bound database column.
 	 * <p>
@@ -1130,7 +1152,7 @@ public class SSCommon
 	}
 
 	/**
-	 * Updates the bound database column with the specified String.
+	 * Updates the bound database column with the specified Object.
 	 *
 	 * @param _boundColumnObject value to write to bound database column
 	 * @return true if no error
@@ -1395,9 +1417,10 @@ public class SSCommon
 	}
 	/**
 	 * Run the decorator.
+	 * @return true if component data valid
 	 */
-	public final void decorate() {
-		decorator.decorate();
+	public final boolean decorate() {
+		return decorator.decorate();
 	}
 
 	/**
