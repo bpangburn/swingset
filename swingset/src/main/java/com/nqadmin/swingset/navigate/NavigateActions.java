@@ -418,6 +418,7 @@ public class NavigateActions
 		actions.put(NAV_GOTOROW,	new NavGotoRowAction());
 
 		rowNumberModel = new SpinnerNumberModel(1, 1, 1, 1);
+		actions.get(NAV_GOTOROW).putValue("SPINNER_MODEL", rowNumberModel);
 		undoRow = new UndoRow();
 
 		this.rowSet = _rowSet;

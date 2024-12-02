@@ -51,7 +51,11 @@
 		<version.maven-javadoc-plugin>3.10.1</version.maven-javadoc-plugin>
 		<version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
 		<version.maven-failsafe-plugin>3.5.1</version.maven-failsafe-plugin>
+		<!-- testing --> 
 		<version.junit-jupiter-any>5.11.3</version.junit-jupiter-any>
+		<version.mockito>5.14.2</version.mockito>
+		<version.h2>2.3.232</version.h2>
+		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
 	</properties>
 
 	<licenses>
@@ -174,6 +178,27 @@
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
 			<version>${version.junit-jupiter-any}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>${version.mockito}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>${version.mockito}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>${version.h2}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

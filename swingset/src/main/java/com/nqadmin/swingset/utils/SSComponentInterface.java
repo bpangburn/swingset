@@ -104,7 +104,7 @@ public interface SSComponentInterface extends RSC
 
 	/** Invoked during bind, component should verify that jdbcType is ok.
 	 * @param jdbcType column JDBCType
-	 * @throws IllegalArgumentException if can't handle JDBCType
+	 * @throws AssertionError if can't handle JDBCType
 	 */
 	// TODO: checkColumnType use a different exception?
 	default void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException

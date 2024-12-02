@@ -77,6 +77,8 @@ public class ConvertTypeTest
 	{
 	}
 
+	// TODO: more tests
+
 	/**
 	 * Test of verifyConvertToType method, of class ConvertType.
 	 */

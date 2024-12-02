@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
 import com.nqadmin.swingset.demo.MainClass.H2Trace;
@@ -45,9 +50,11 @@ import java.sql.SQLFeatureNotSupportedException;
 import javax.sql.DataSource;
 import org.h2.jdbcx.JdbcDataSource;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
+import java.sql.ConnectionBuilder;
+import java.sql.ShardingKeyBuilder;
 
 /**
- * Provides a data source that returns a pre-specifies connection; typically
+ * Provides a data source that returns a pre-specified connection; typically
  * used to share a single connection with multiple JdbcRowSets.
  * To use with the demo's naming service.
  */
@@ -125,10 +132,10 @@ public class DataSourceShareConnection {
 		}
 
 		// JDK-9
-		//@Override
-		//public ConnectionBuilder createConnectionBuilder() throws SQLException {
-		//	return delegate.createConnectionBuilder();
-		//}
+		@Override
+		public ConnectionBuilder createConnectionBuilder() throws SQLException {
+			return delegate.createConnectionBuilder();
+		}
 
 		@Override
 		public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
@@ -136,10 +143,10 @@ public class DataSourceShareConnection {
 		}
 
 		// JDK-9
-		//@Override
-		//public ShardingKeyBuilder createShardingKeyBuilder() throws SQLException {
-		//	return delegate.createShardingKeyBuilder();
-		//}
+		@Override
+		public ShardingKeyBuilder createShardingKeyBuilder() throws SQLException {
+			return delegate.createShardingKeyBuilder();
+		}
 	}
 
 }
