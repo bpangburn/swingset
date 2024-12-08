@@ -57,6 +57,8 @@ import java.lang.System.Logger.Level;
 import static java.lang.System.Logger.Level.*;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
@@ -215,6 +217,24 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 */
 	protected Connection getConnection() {
 		return connection;
+	}
+	
+	/**
+	 * Returns a READONLY statement for running select queries against the database
+	 *
+	 * @return a READONLY statement for the database connection
+	 */
+	@SuppressWarnings({"BroadCatchBlock", "TooBroadCatch", "UseSpecificCatch", "CallToPrintStackTrace"})
+	public Statement getReadOnlyStatement() {
+		Statement readOnlyStatement = null;
+
+		try {
+			readOnlyStatement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return readOnlyStatement;
 	}
 
 	/**
