@@ -72,6 +72,8 @@ import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
+import static com.nqadmin.swingset.datasources.ConvertType.checkConvertToJdbcType;
+import static com.nqadmin.swingset.datasources.ConvertType.convertObjectType;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // TODO: Review state transitions (where it can happen).
@@ -418,16 +420,28 @@ public class SSFormattedTextField extends JFormattedTextField
 					break;
 				}
 				
-				final JDBCType jdbcType = getBoundColumnJDBCType();
-				final Object newValue = getBoundColumnObject();
+				final Object dbValue = getBoundColumnObject();
 
 				// If record field null then set value null, bail.
-				if (newValue == null ) {
+				if (dbValue == null ) {
 					// TODO: should this check allow null?
 					setValue(null);
 					break;
 				}
+
+				final JDBCType jdbcType = getBoundColumnJDBCType();
+				if (!(checkConvertToJdbcType(jdbcType, dbValue.getClass(), null)))
+					logger.log(Level.ERROR, ()->sf("%s CAN'T CONVERT %s to %s",
+							getColumnForLog(), jdbcType, dbValue.getClass().getName()));
 				
+				// NOTE: H2's "rx.updateObject(idx, obj)" converts Date
+				//		 to sql.Timestamp which is converted on commit (I guess)
+				//		 to sql.Date
+				// Avoid need for "(newValue instanceof Date) ||".
+				// See RowSetOps.updateColumnObject().
+				final Object newValue = Boolean.TRUE
+						? convertObjectType(dbValue, jdbcType) : dbValue;
+
 				// Only support some Java types for JFormattedTextFields.
 				// TODO: Wonder if "newValue instanceof Number" would work.
 				// TODO: What if an installed formatter doesn't handle the type?
@@ -442,12 +456,14 @@ public class SSFormattedTextField extends JFormattedTextField
 						(newValue instanceof java.sql.Date) ||
 						(newValue instanceof java.sql.Time) ||
 						(newValue instanceof java.sql.Timestamp)) {
+					Object finalNewValue = newValue;
 					logger.log(DEBUG, ()->sf("%s: getObject() - %s",
-							getColumnForLog(), newValue));
+							getColumnForLog(), finalNewValue));
 					setValue(newValue);
 				} else {
 					logger.log(Level.ERROR, sf("%s: JDBCType %s to %s not supported",
-							getColumnForLog(), jdbcType, newValue.getClass().getName()));
+							getColumnForLog(), jdbcType,
+							newValue != null ? newValue.getClass().getName() : null));
 					//
 					// TODO: there is no "setValue()". Should do "setValue(null)"?
 					//

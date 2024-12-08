@@ -177,7 +177,7 @@ public class SSDataNavigator extends JPanel
 		nextButton.setAction(navActionMap.get(NAV_NEXT));
 		lastButton.setAction(navActionMap.get(NAV_LAST));
 		commitButton.setAction(navActionMap.get(NAV_COMMIT));
-		undoButton.setAction(navActionMap.get(NAV_UNDO));
+		undoButton.setAction(navActionMap.get(NAV_REVERT));
 		refreshButton.setAction(navActionMap.get(NAV_REFRESH));
 		addButton.setAction(navActionMap.get(NAV_ADD));
 		deleteButton.setAction(navActionMap.get(NAV_DELETE));

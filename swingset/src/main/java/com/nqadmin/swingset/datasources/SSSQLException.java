@@ -1,6 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
- * All rights reserved.
+ * Copyright (C) 2024, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,49 +26,50 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- * Contributors:
- *   Prasanth R. Pasala
- *   Brian E. Pangburn
- *   Diego Gil
- *   Man "Bee" Vo
- *   Ernie R. Rael
  * ****************************************************************************/
-/* *****************************************************************************
- * The conditions in the above copyright notice apply to this copyright notice.
- * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
- * ****************************************************************************/
-package com.nqadmin.swingset.navigate;
+package com.nqadmin.swingset.datasources;
 
-import javax.sql.RowSet;
+import java.sql.SQLException;
 
 /**
- * Actions for working with {@link RowSet}s; used with
- * {@linkplain com.nqadmin.swingset.navigate.NavigateActions}.
+ * Base of all SS specific exceptions
  */
-public enum NavAction
+@SuppressWarnings("serial")
+public class SSSQLException extends SQLException
 {
-	/** Go to first record. */
-	NAV_FIRST,
-	/** Go to previous record. */
-	NAV_PREVIOUS,
-	/** Go to next record. */
-	NAV_NEXT,
-	/** Go to last record. */
-	NAV_LAST,
-	/** Commit current record to data base. */
-	NAV_COMMIT,
-	/** Undo changes to current record. */
-	NAV_REVERT,
-	/** Refresh record. */
-	NAV_REFRESH,
-	/** Add record. */
-	NAV_ADD,
-	/** Delete record. */
-	NAV_DELETE,
-	/** specialized action for goto the row number. */
-	NAV_GOTOROW,
-	;
+	/**
+	 * SSException
+	 * @param reason reason
+	 */
+	public SSSQLException(String reason)
+	{
+		super(reason);
+	}
+
+	/**
+	 * SSException
+	 */
+	public SSSQLException()
+	{
+	}
+
+	/**
+	 * SSException
+	 * @param cause cause
+	 */
+	public SSSQLException(Throwable cause)
+	{
+		super(cause);
+	}
+
+	/**
+	 * SSException
+	 * @param reason reason
+	 * @param cause cause
+	 */
+	public SSSQLException(String reason, Throwable cause)
+	{
+		super(reason, cause);
+	}
 	
 }

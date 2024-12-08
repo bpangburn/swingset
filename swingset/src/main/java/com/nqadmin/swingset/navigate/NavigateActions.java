@@ -411,13 +411,14 @@ public class NavigateActions
 		actions.put(NAV_NEXT,		new NavNextAction());
 		actions.put(NAV_LAST,		new NavLastAction());
 		actions.put(NAV_COMMIT,		new NavCommitAction());
-		actions.put(NAV_UNDO,		new NavUndoAction());
+		actions.put(NAV_REVERT,		new NavRevertRecordAction());
 		actions.put(NAV_REFRESH,	new NavRefreshAction());
 		actions.put(NAV_ADD,		new NavAddAction());
 		actions.put(NAV_DELETE,		new NavDeleteAction());
 		actions.put(NAV_GOTOROW,	new NavGotoRowAction());
 
 		rowNumberModel = new SpinnerNumberModel(1, 1, 1, 1);
+		actions.get(NAV_GOTOROW).putValue("SPINNER_MODEL", rowNumberModel);
 		undoRow = new UndoRow();
 
 		this.rowSet = _rowSet;
@@ -817,28 +818,29 @@ public class NavigateActions
 	} // end NavCommitAction
 
 	/**
-	 * Action for the "Undo" button on the navigator.
+	 * Action for the "RevertRecord" button on the navigator.
 	 */
+	// TODO: Rename to NavRevertRecordAction
 	@SuppressWarnings("serial")
-	private final class NavUndoAction extends AbstractAction
+	private final class NavRevertRecordAction extends AbstractAction
 	{
-		/** Constructor for the "Undo" Action. */
-		public NavUndoAction() {
-			super("Undo");
+		/** Constructor for the "RevertRecord" Action. */
+		public NavRevertRecordAction() {
+			super("RevertRecord");
 			putValue(LARGE_ICON_KEY, new ImageIcon(this.getClass().getClassLoader().getResource("images/undo.gif")));
 			putValue(SHORT_DESCRIPTION, "Undo/Revert Changes to Current Record");
 //	        putValue(MNEMONIC_KEY, mnemonic);
 		}
 
 		/**
-		 * When the "undo" button is pressed, revert any changes to the current record.
+		 * When the "revert" button is pressed, revert any changes to the current record.
 		 * 
 		 * This button can also be used to cancel an insertion so if on the insert row,
 		 * re-enable the other navigation buttons.
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			logger.log(DEBUG, "UNDO button clicked.");
+			logger.log(DEBUG, "Revert button clicked.");
 			removeRowsetListener();
 			try {
 				// CALL MOVE TO CURRENT ROW IF ON INSERT ROW.
@@ -878,12 +880,12 @@ public class NavigateActions
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(dlgParent(e),
-						"Exception occured while undoing changes.\n" + se.getMessage());
+						"Exception occured while reverting changes.\n" + se.getMessage());
 			} finally {
 				addRowsetListener();
 			}
 		}
-	} // end NavUndoAction
+	} // end NavRevertRecordAction
 
 	/**
 	 * Action for the "Refresh" button on the navigator.
@@ -1613,7 +1615,7 @@ public class NavigateActions
 		// Handle commit, undo
 		boolean commitUndoOk = (onInsertRow || isRowModified || commitUndoAlwaysEnabled) && modification;
 		updateEnable(NAV_COMMIT, commitUndoOk  && !hasError);
-		updateEnable(NAV_UNDO, commitUndoOk);
+		updateEnable(NAV_REVERT, commitUndoOk);
 
 		// TODO: Consider if row is dirty, delete button makes sense,
 		//			but, does the add button make sense?

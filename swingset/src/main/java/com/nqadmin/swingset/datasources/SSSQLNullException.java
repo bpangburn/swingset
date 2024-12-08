@@ -6,13 +6,11 @@
 
 package com.nqadmin.swingset.datasources;
 
-import java.sql.SQLException;
-
 /**
  * Null used as database value where not allowed.
  */
 @SuppressWarnings(value = "serial")
-public class SSSQLNullException extends SQLException
+public class SSSQLNullException extends SSSQLException
 {
 
 	/**

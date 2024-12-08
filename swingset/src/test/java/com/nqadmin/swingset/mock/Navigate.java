@@ -1,6 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
- * All rights reserved.
+ * Copyright (C) 2024, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,49 +26,63 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- * Contributors:
- *   Prasanth R. Pasala
- *   Brian E. Pangburn
- *   Diego Gil
- *   Man "Bee" Vo
- *   Ernie R. Rael
  * ****************************************************************************/
-/* *****************************************************************************
- * The conditions in the above copyright notice apply to this copyright notice.
- * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
- * ****************************************************************************/
-package com.nqadmin.swingset.navigate;
+package com.nqadmin.swingset.mock;
 
 import javax.sql.RowSet;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.SpinnerNumberModel;
+
+import com.nqadmin.swingset.navigate.NavigateActions;
+
+import static com.nqadmin.swingset.navigate.NavAction.*;
 
 /**
- * Actions for working with {@link RowSet}s; used with
- * {@linkplain com.nqadmin.swingset.navigate.NavigateActions}.
+ *
+ * @author err
  */
-public enum NavAction
+public class Navigate
 {
-	/** Go to first record. */
-	NAV_FIRST,
-	/** Go to previous record. */
-	NAV_PREVIOUS,
-	/** Go to next record. */
-	NAV_NEXT,
-	/** Go to last record. */
-	NAV_LAST,
-	/** Commit current record to data base. */
-	NAV_COMMIT,
-	/** Undo changes to current record. */
-	NAV_REVERT,
-	/** Refresh record. */
-	NAV_REFRESH,
-	/** Add record. */
-	NAV_ADD,
-	/** Delete record. */
-	NAV_DELETE,
-	/** specialized action for goto the row number. */
-	NAV_GOTOROW,
-	;
+	private final NavigateActions navActs;
+	private final ActionMap actionMap;
+
+	//public Navigate(NavigateActions navActs)
+	public Navigate(RowSet rs)
+	{
+		this.navActs = NavigateActions.get(rs);
+		actionMap = navActs.createActionMap();
+	}
+
+	public NavigateActions getNavActs()
+	{
+		return navActs;
+	}
 	
+	public void first() { actionMap.get(NAV_FIRST).actionPerformed(null); }
+	public void last() { actionMap.get(NAV_LAST).actionPerformed(null); }
+	public void next() { actionMap.get(NAV_NEXT).actionPerformed(null); }
+	public void prev() { actionMap.get(NAV_PREVIOUS).actionPerformed(null); }
+
+	public void go(int row) {
+		ModelAct spinModel = getSpinModelAct();
+		if (spinModel.model != null) {
+			spinModel.model.setValue(row);
+			spinModel.action.actionPerformed(null);
+		}
+	}
+
+	public int rowCount() {
+		ModelAct spinModel = getSpinModelAct();
+		if (spinModel.model != null)
+			return (Integer)spinModel.model.getMaximum();
+		return -1;
+	}
+
+	private record ModelAct(SpinnerNumberModel model, Action action){}
+	private ModelAct getSpinModelAct() {
+		Action act = actionMap.get(NAV_GOTOROW);
+		Object value = act.getValue("SPINNER_MODEL");
+		return new ModelAct((SpinnerNumberModel) value, act);
+	}
 }

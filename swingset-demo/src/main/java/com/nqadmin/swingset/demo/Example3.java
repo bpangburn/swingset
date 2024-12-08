@@ -48,7 +48,6 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import org.apache.logging.log4j.LogManager;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import static java.lang.System.Logger.Level.*;
@@ -57,6 +56,9 @@ import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.formatting.SSDateField;
+import static com.nqadmin.swingset.formatting.SSFormat.DATE_MMDDYYYY_SLASH;
+import com.nqadmin.swingset.formatting.SSIntegerField;
 import com.nqadmin.swingset.utils.SSUtils;
 
 /**
@@ -67,17 +69,13 @@ import com.nqadmin.swingset.utils.SSUtils;
  * <p>
  * Record navigation is handled with a SSDataNavigator.
  */
+@SuppressWarnings("serial")
 public class Example3 extends JFrame {
 
 	/**
 	 * Log4j2 Logger
 	 */
     private static final Logger logger = SSUtils.getLogger();
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 4859550616628544511L;
 	
 	/**
 	 * screen label declarations
@@ -94,8 +92,9 @@ public class Example3 extends JFrame {
 	SSTextField txtSupplierPartID = new SSTextField();
 	SSDBComboBox cmbSupplierName = null;
 	SSDBComboBox cmbPartName = null;
-	SSTextField txtQuantity = new SSTextField();
-	SSTextField txtShipDate = new SSTextField();
+
+	SSIntegerField txtQuantity = new SSIntegerField();
+	SSDateField txtShipDate = new SSDateField(DATE_MMDDYYYY_SLASH);
 	
 	/**
 	 * database component declarations
@@ -109,6 +108,7 @@ public class Example3 extends JFrame {
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
+	@SuppressWarnings("LeakingThisInConstructor")
 	public Example3(final Connection _dbConn) {
 
 		// SET SCREEN TITLE

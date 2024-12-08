@@ -805,7 +805,7 @@ public class RowSetOps {
 		final RowSet _rowSet = comp.getRowSet();
 		final int _columnIndex = comp.getBoundColumnIndex();
 		boolean _allowNull = comp.getAllowNull();
-		logger.log(DEBUG, "[" + comp.getLogColumnName()+ "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
+		logger.log(DEBUG,  comp.getColumnForLog() + " Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
 		if (NavigateActions.ENABLE_UNDO_REDO)
 			NavigateActions.captureInitialValue(comp);

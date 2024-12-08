@@ -140,6 +140,9 @@ public class SSUtils {
 	public static void beep()
 	{
 		Toolkit.getDefaultToolkit().beep();
+
+		// TODO:
+		// UIManager.getLookAndFeel().provideErrorFeedback(JFormattedTextField.this);
 	}
 
 	/**

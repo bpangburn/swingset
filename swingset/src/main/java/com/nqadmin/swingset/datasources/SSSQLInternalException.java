@@ -42,29 +42,35 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.datasources;
 
-import java.sql.SQLException;
-
 /**
- *
- * @author err
+ * Internal error.
  */
-public class SSSQLInternalException extends SQLException
+@SuppressWarnings("serial")
+public class SSSQLInternalException extends SSSQLException
 {
 
+	/** Internal errror.
+	 * {@inheritDoc} */
 	public SSSQLInternalException()
 	{
 	}
 
+	/** Internal errror.
+	 * {@inheritDoc} */
 	public SSSQLInternalException(String message)
 	{
 		super(message);
 	}
 
+	/** Internal errror.
+	 * {@inheritDoc} */
 	public SSSQLInternalException(String message, Throwable cause)
 	{
 		super(message, cause);
 	}
 
+	/** Internal errror.
+	 * {@inheritDoc} */
 	public SSSQLInternalException(Throwable cause)
 	{
 		super(cause);

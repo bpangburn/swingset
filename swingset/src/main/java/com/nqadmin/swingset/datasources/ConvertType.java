@@ -45,6 +45,9 @@ package com.nqadmin.swingset.datasources;
 import java.math.BigDecimal;
 import java.sql.JDBCType;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.util.Date;
@@ -55,6 +58,8 @@ import java.util.Map;
 
 import static com.nqadmin.swingset.datasources.ConvertType.Clazz.getClazz;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+
+// TODO: Wonder if a "X --> Y" sparse matrix filled with converters...
 
 /**
  * Different database jdbc drivers support different type conversion;
@@ -102,11 +107,11 @@ public class ConvertType
 	 * @param allow only allow these JDBC types, may be null
 	 * @throws AssertionError if can't handle conversion to JDBCType
 	 */
-	public static void assertConvertToType(JDBCType jdbcType, Class<?> targetType, EnumSet<JDBCType> allow)
+	public static void assertConvertFromJdbcType(JDBCType jdbcType, Class<?> targetType, EnumSet<JDBCType> allow)
 	{
 		if(allow != null && !allow.contains(jdbcType))
 			throw new AssertionError(sf("'%s' not allowed in '%s'", jdbcType, allow));
-		if(!checkConvertToType(jdbcType, targetType, allow))
+		if(!checkConvertFromJdbcType(jdbcType, targetType, allow))
 			throw new AssertionError(sf("'%s' to '%s' conversion not supported", jdbcType, targetType.getName()));
 	}
 
@@ -121,7 +126,7 @@ public class ConvertType
 	 * @param allow only allow these JDBC types, may be null
 	 * @return true if conversion is handled
 	 */
-	public static boolean checkConvertToType(JDBCType jdbcType, Class<?> targetType, EnumSet<JDBCType> allow)
+	public static boolean checkConvertFromJdbcType(JDBCType jdbcType, Class<?> targetType, EnumSet<JDBCType> allow)
 	{
 		if(allow != null && !allow.contains(jdbcType))
 			return false;
@@ -133,7 +138,7 @@ public class ConvertType
 
 			if(sourceJDBC != null && target != null) {
 				if(sourceJDBC.isDateTime() && target.isDateTime()) {
-					return checkConvertToDateType(sourceJDBC, target);
+					return checkConvertFromJdbcDateType(sourceJDBC, target);
 				}
 				// All number to number types supported.
 				if(sourceJDBC.isNumeric() && target.isNumeric())
@@ -146,9 +151,7 @@ public class ConvertType
 				case LONG, INT, SHORT, BYTE, FLOAT, DOUBLE, BIGD -> {
 					if(sourceJDBC == Clazz.BOOL)
 						return true;
-				}
-
-				}
+				} }
 			}
 		}
 		catch(SQLException ex) {
@@ -157,7 +160,8 @@ public class ConvertType
 	}
 
 	/** Both source and target are date */
-	private static boolean checkConvertToDateType(Clazz sourceJDBC, Clazz target)
+	// TODO: OFFSETTIME, OFFSETDATETIME
+	private static boolean checkConvertFromJdbcDateType(Clazz sourceJDBC, Clazz target)
 	{
 		if (sourceJDBC == target)
 			return true;
@@ -173,6 +177,74 @@ public class ConvertType
 		};
 		case TIMESTAMP -> switch (sourceJDBC) {
 			case DATE, TIME -> true;
+			default -> false;
+		};
+		default -> false;
+		};
+	}
+
+	/**
+	 * Check if the specified sourceType is convertible, using methods in this
+	 * class, to the JDBCType.
+	 * <p>
+	 * TODO: or is automatically converted by JDBC driver?
+	 * 
+	 * @param jdbcType target jdbc type
+	 * @param sourceType source type
+	 * @param allow only allow these JDBC types, may be null
+	 * @return true if conversion is handled
+	 */
+	public static boolean checkConvertToJdbcType(JDBCType jdbcType, Class<?> sourceType, EnumSet<JDBCType> allow)
+	{
+		if(allow != null && !allow.contains(jdbcType))
+			return false;
+		if(sourceType == null)
+			return true;
+		try {
+			Clazz targetJDBC = getClazz(findJavaTypeClass(jdbcType));
+			Clazz source = getClazz(sourceType);
+
+			if(targetJDBC != null && source != null) {
+				if(targetJDBC.isDateTime() && source.isDateTime()) {
+					return checkConvertToJdbcDateType(targetJDBC, source);
+				}
+				// All number to number types supported.
+				if(targetJDBC.isNumeric() && source.isNumeric())
+					return true;
+
+				switch (source) {
+				case BOOL -> {
+					if(targetJDBC == Clazz.BOOL || targetJDBC.isNumeric())
+						return true;
+				}
+				case LONG, INT, SHORT, BYTE, FLOAT, DOUBLE, BIGD -> {
+					if(targetJDBC == Clazz.BOOL)
+						return true;
+				} }
+			}
+		}
+		catch(SQLException ex) {
+		}
+		return false;
+	}
+
+	/** Both source and target are date. B.5. */
+	// TODO: OFFSETTIME, OFFSETDATETIME
+	private static boolean checkConvertToJdbcDateType(Clazz targetJDBC, Clazz source)
+	{
+		if (targetJDBC == source)
+			return true;
+		return switch(targetJDBC) {
+		case DATE -> switch (source) {
+			case TIMESTAMP, UTILDATE, LOCALDATE, LOCALDATETIME -> true;
+			default -> false;
+		};
+		case TIME -> switch (source) {
+			case TIMESTAMP, UTILDATE, LOCALTIME, LOCALDATETIME -> true;
+			default -> false;
+		};
+		case TIMESTAMP -> switch (source) {
+			case DATE, TIME, UTILDATE, LOCALDATETIME -> true;
 			default -> false;
 		};
 		default -> false;
@@ -224,7 +296,7 @@ public class ConvertType
 		if (target == CanNotConvert)
 			throw new SSSQLConversionException(sf("Missing conversion %s to %s",
 					value.getClass().getName(), type.getClass().getName()));
-		return type.cast(target); // Don't really need the cast, but it's cheap.
+		return type.cast(target); // TODO: Don't really need the cast, but it's cheap.
 	}
 
 	/** Return something of the specified type,
@@ -243,29 +315,7 @@ public class ConvertType
 		if(source.isDateTime() && target.isDateTime()) {
 			if (source == target)
 				return sourceValue;
-			Date dateValue = (Date)sourceValue;
-			// NOTE: target can (should) never be DATETIME.
-			switch(target) {
-			case DATE -> {
-				switch (source) {
-				case TIMESTAMP, UTILDATE -> {
-					return new java.sql.Date(dateValue.getTime());
-				} }
-			}
-			case TIME -> {
-				switch (source) {
-				case TIMESTAMP, UTILDATE -> {
-					return new java.sql.Time(dateValue.getTime());
-				} }
-			}
-			case TIMESTAMP -> {
-				switch (source) {
-				case DATE, TIME, UTILDATE -> {
-					return new java.sql.Timestamp(dateValue.getTime());
-				} }
-			}
-			}
-			return CanNotConvert;
+			return internalConvertObjectDateType(sourceValue, source, target);
 		}
 
 		if(source.isNumeric() && target.isNumeric()) {
@@ -326,11 +376,88 @@ public class ConvertType
 		}
 		case BigDecimal n -> {
 			switch(target) {
-			case BOOL -> { return BigDecimal.valueOf(0).compareTo(n) != 0; }
+			case BOOL -> { return n.signum() != 0; }
 			}
 		}
 		default -> {}
 		}
+		return CanNotConvert;
+	}
+
+	private static Object internalConvertObjectDateType(
+			Object sourceValue, Clazz source, Clazz target) {
+		switch(target) {
+		case TIMESTAMP -> {
+			switch (source) {
+			case DATE, TIME, UTILDATE -> {
+				return new java.sql.Timestamp(((Date)sourceValue).getTime());
+			}
+			case LOCALDATETIME -> {
+				return java.sql.Timestamp.valueOf((LocalDateTime)sourceValue);
+			} }
+		}
+		case DATE -> {	// year,month,day at midnight - no time
+			// TODO: switch on sourceValue
+			switch (source) {
+			case UTILDATE -> {
+				java.sql.Timestamp ts = new java.sql.Timestamp(
+						((Date)sourceValue).getTime());
+				return java.sql.Date.valueOf(ts.toLocalDateTime().toLocalDate());
+			}
+			case TIMESTAMP -> {
+				java.sql.Timestamp ts = ((java.sql.Timestamp)sourceValue);
+				return java.sql.Date.valueOf(ts.toLocalDateTime().toLocalDate());
+			}
+			case LOCALDATETIME -> {
+				return java.sql.Date.valueOf(
+						((LocalDateTime)sourceValue).toLocalDate());
+			}
+			case LOCALDATE -> {
+				return java.sql.Date.valueOf((LocalDate)sourceValue);
+			} }
+		}
+		case TIME -> {
+			switch (source) {
+			case UTILDATE -> {
+				java.sql.Timestamp ts = new java.sql.Timestamp(
+						((Date)sourceValue).getTime());
+				return java.sql.Time.valueOf(ts.toLocalDateTime().toLocalTime());
+			}
+			case TIMESTAMP -> {
+				java.sql.Timestamp ts = ((java.sql.Timestamp)sourceValue);
+				return java.sql.Time.valueOf(ts.toLocalDateTime().toLocalTime());
+			}
+			case LOCALDATETIME -> {
+				return java.sql.Time.valueOf(
+						((LocalDateTime)sourceValue).toLocalTime());
+			}
+			case LOCALTIME -> {
+				return java.sql.Time.valueOf((LocalTime)sourceValue);
+			}
+			}
+		}
+		case LOCALDATE -> {
+			switch(source) {
+			case DATE -> { return ((java.sql.Date)sourceValue).toLocalDate(); }
+			}
+		}
+		case LOCALTIME -> {
+			switch(source) {
+			case TIME -> { return ((java.sql.Time)sourceValue).toLocalTime(); }
+			}
+		}
+		case LOCALDATETIME -> {
+			switch(source) {
+			case TIMESTAMP -> {
+				return ((java.sql.Timestamp)sourceValue).toLocalDateTime();
+			}
+			case DATE -> {
+				return ((java.sql.Date)sourceValue).toLocalDate().atStartOfDay();
+			} }
+			// case TIME -> {
+			// 	LocalTime lt = ((java.sql.Time)sourceValue).toLocalTime()...;
+			// }
+		} }
 		return CanNotConvert;
 	}
 
@@ -362,16 +489,16 @@ public class ConvertType
 	 * List<Integer> properList = Arrays.asList(newarr);
 	 * }
 	 * </pre>
-	 * @param _objects array of objects to cast
-	 * @param _jdbcType cast objects to this JDBCType
+	 * @param objects array of objects to cast
+	 * @param jdbcType cast objects to this JDBCType
 	 * @return array of corresponding type to the cast input objects
 	 * @throws SQLException This exception wraps a {@code ClassCastException}
 	 */
-	public static Object[] castJDBCToJava(final JDBCType _jdbcType, final Object[] _objects) throws SQLException {
-		Class<?> clazz = findJavaTypeClass(_jdbcType);
-		Object[] newArray = (Object[]) java.lang.reflect.Array.newInstance(clazz, _objects.length);
+	public static Object[] castJDBCToJava(JDBCType jdbcType, Object[] objects) throws SQLException {
+		Class<?> clazz = findJavaTypeClass(jdbcType);
+		Object[] newArray = (Object[]) java.lang.reflect.Array.newInstance(clazz, objects.length);
 		try {
-			System.arraycopy(_objects, 0, newArray, 0, _objects.length);
+			System.arraycopy(objects, 0, newArray, 0, objects.length);
 		} catch(ArrayStoreException ex) {
 			throw new SQLException(ex);
 		}
@@ -379,16 +506,16 @@ public class ConvertType
 	}
 
 	/**
-	 * Cast the object to {@code JDBCType}. The idea is to verify
-	 * the the object is of the correct type.
-	 * @param _object object to cast
-	 * @param _jdbcType cast object to this JDBCType
+	 * Cast the object to {@code JDBCType}.The idea is to verify
+ the the object is of the correct type.
+	 * @param object object to cast
+	 * @param jdbcType cast object to this JDBCType
 	 * @return Essentially the same Object that was input
 	 * @throws SQLException This exception wraps a {@code ClassCastException}
 	 */
-	public static Object castJDBCToJava(final JDBCType _jdbcType, final Object _object) throws SQLException {
+	public static Object castJDBCToJava(JDBCType jdbcType, Object object) throws SQLException {
 		try {
-			return findJavaTypeClass(_jdbcType).cast(_object);
+			return findJavaTypeClass(jdbcType).cast(object);
 		} catch (ClassCastException ex) {
 			throw new SQLException(ex);
 		}
@@ -396,23 +523,23 @@ public class ConvertType
 
 	/**
 	 * Determine the Java type class for the given database type.
-	 * @param _jdbcType JDBCType of interest
+	 * @param jdbcType JDBCType of interest
 	 * @return the class object used for the given type
 	 * @throws SQLException if the JDBCType is not handled
 	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B.3 JDBC Types Mapped to Java Object Types
 	 */
-	public static Class<?> findJavaTypeClass(final JDBCType _jdbcType)
+	public static Class<?> findJavaTypeClass(JDBCType jdbcType)
 			throws SQLException
 	{
-		Class<?> clazz = overrideJdbcToJavaType.getOrDefault(_jdbcType, null);
+		Class<?> clazz = overrideJdbcToJavaType.getOrDefault(jdbcType, null);
 		if (clazz != null) {
 			if (clazz == Exception.class) {
-				throw new SSSQLUnhandledTypeException(_jdbcType.toString());
+				throw new SSSQLUnhandledTypeException(jdbcType.toString());
 			}
 			return clazz;
 		}
 
-		switch (_jdbcType) {
+		switch (jdbcType) {
 			case INTEGER, SMALLINT, TINYINT	-> clazz = Integer.class;
 			case BIGINT -> clazz = Long.class;
 			case REAL -> clazz = Float.class;
@@ -425,7 +552,7 @@ public class ConvertType
 			case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR
 					-> clazz = String.class;
 			default ->
-				throw new SSSQLUnhandledTypeException(_jdbcType.toString());
+				throw new SSSQLUnhandledTypeException(jdbcType.toString());
 		}
 		//case DATE: case TIME: case TIMESTAMP: clazz = java.util.Date.class; break;
 
@@ -458,6 +585,7 @@ public class ConvertType
 	private static Map<Class<?>,Clazz> mapClazz = new HashMap<>();
 	static enum Clazz {
 		BOOL(Boolean.class),
+
 		INT(Integer.class,			true, false),
 		SHORT(Short.class,			true, false),
 		BYTE(Byte.class,			true, false),
@@ -465,10 +593,17 @@ public class ConvertType
 		FLOAT(Float.class,			true, false),
 		DOUBLE(Double.class,		true, false),
 		BIGD(BigDecimal.class,		true, false),
+
 		UTILDATE(Date.class,				false, true),
 		DATE(java.sql.Date.class,			false, true),
 		TIME(java.sql.Time.class,			false, true),
 		TIMESTAMP(java.sql.Timestamp.class,	false, true),
+
+		LOCALDATE(java.time.LocalDate.class,			false, true),
+		LOCALTIME(java.time.LocalTime.class,			false, true),
+		LOCALDATETIME(java.time.LocalDateTime.class,	false, true),
+
+		// TODO: OFFSETTIME, OFFSETDATETIME
 		;
 
 		public static Clazz getClazz(Class<?> c)

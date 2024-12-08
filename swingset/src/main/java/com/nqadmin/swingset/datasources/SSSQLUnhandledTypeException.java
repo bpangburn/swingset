@@ -42,13 +42,11 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.datasources;
 
-import java.sql.SQLException;
-
 /**
  * Specified type not handled.
  */
 @SuppressWarnings("serial")
-public class SSSQLUnhandledTypeException extends SQLException
+public class SSSQLUnhandledTypeException extends SSSQLException
 {
 	/**
 	 * Unhandled type.

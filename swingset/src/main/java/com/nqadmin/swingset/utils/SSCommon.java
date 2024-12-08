@@ -104,6 +104,7 @@ import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 import com.nqadmin.swingset.navigate.RowSetState;
 
+import static com.nqadmin.swingset.datasources.ConvertType.convertObjectType;
 import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingChanges;
 import static com.nqadmin.swingset.navigate.Utils.postRowSetModifiedError;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -1334,9 +1335,14 @@ public class SSCommon
 		if (!NavigateActions.ENABLE_UNDO_REDO)
 			throw new IllegalStateException("UNDO/REDO disabled");
 		logger.log(DEBUG, () -> sf("%s: %s", cmd, value));
+
 		// TODO: put following in RowSetOps
+		
+		Object obj = value;
+		if (Boolean.TRUE)
+			obj = convertObjectType(obj, getBoundColumnJDBCType());
 		// NOTE: following does not generate any events
-		getRowSet().updateObject(getBoundColumnIndex(), value);
+		getRowSet().updateObject(getBoundColumnIndex(), obj);
 		// NOTE: Previous line sets value in RowSet's pending update.
 		//		 Following line causes updateSSComponent which gets the
 		//		 value to display from undoRedo; the update values

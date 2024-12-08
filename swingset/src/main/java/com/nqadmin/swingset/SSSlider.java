@@ -60,7 +60,7 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
-import static com.nqadmin.swingset.datasources.ConvertType.assertConvertToType;
+import static com.nqadmin.swingset.datasources.ConvertType.assertConvertFromJdbcType;
 
 /**
  * Used to link a JSlider to a numeric column in a database.
@@ -141,7 +141,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	public void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException
 	{
 		// only allow JDBC types that convert to numeric types
-		assertConvertToType(jdbcType, Integer.class,
+		assertConvertFromJdbcType(jdbcType, Integer.class,
 				EnumSet.of(INTEGER, SMALLINT, TINYINT,
 						BIGINT, REAL, FLOAT, DOUBLE, DECIMAL, NUMERIC));
 
