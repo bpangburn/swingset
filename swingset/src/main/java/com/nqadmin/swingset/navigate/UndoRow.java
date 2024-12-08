@@ -145,22 +145,29 @@ final class UndoRow
 		return getCol(comp).fetchCurrentValue();
 	}
 
-	/** Process the undo/redo command for the specified component.
+	/**
+	 * Process the undo/redo command for the specified component.
 	 * Forward the new value to the component.
 	 * If there's nothing to do, for example UNDO but there has been
 	 * no changes, then do nothing.
+	 * 
+	 * @param comp SSComponent to adjust
+	 * @param cmd undo/redo
+	 * @return new value (only for logging)
+	 * @throws SQLException 
 	 */
-	void doUndoRedo(SSComponentInterface comp, UndoRedo cmd) throws SQLException
+	Object doUndoRedo(SSComponentInterface comp, UndoRedo cmd) throws SQLException
 	{
 		if (cols == null)
-			return;
+			return UndoCol.none;
 		UndoCol col = cols[comp.getBoundColumnIndex()];
 		if (col == null)
-			return;
+			return UndoCol.none;
 		Object value = col.findUndoRedoValue(cmd);
 		if (value == UndoCol.none)
 			SSUtils.beep();
 		else
 			comp.undoRedoUpdateObject(cmd, value);
+		return value;
 	}
 }

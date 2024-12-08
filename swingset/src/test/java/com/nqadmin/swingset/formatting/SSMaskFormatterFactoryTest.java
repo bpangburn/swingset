@@ -95,7 +95,7 @@ public class SSMaskFormatterFactoryTest {
 	@SuppressWarnings("serial")
 	public static class CustomParentFormatterFactory
 			extends SSMaskFormatterFactory {
-
+		
 		/** @param <T> */
 		public static class CustomParentBuilder<T extends CustomParentBuilder<T>>
 				extends SSMaskFormatterFactory.Builder<T> {
@@ -174,7 +174,10 @@ public class SSMaskFormatterFactoryTest {
 
 	/** x */
 	@Test
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testParentHier() {
+		System.out.println("ParentHier");
+
 		CustomParentFormatterFactory.CustomParentBuilder<?> b
 				= new CustomParentFormatterFactory.CustomParentBuilder<>
 			("##/##", "parentArg")
@@ -189,7 +192,10 @@ public class SSMaskFormatterFactoryTest {
 
 	/** x */
 	@Test
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testChildHier() {
+		System.out.println("ChildHier");
+
 		CustomChildFormatterFactory.CustomChildBuilder<?> b
 				= new CustomChildFormatterFactory.CustomChildBuilder<>
 			("##/##", "parentArg", "childArg")
@@ -211,8 +217,11 @@ public class SSMaskFormatterFactoryTest {
 	/** x
 	 * @throws java.text.ParseException */
 	@Test
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testGetMaskLiterals() throws ParseException {
-		SSMaskFormatter mf = new SSMaskFormatter("", null);
+		System.out.println("GetMaskLiterals");
+
+		SSMaskFormatter mf = new SSMaskFormatter(null);
 		String s;
 
 		mf.setMask("# #/# #");
@@ -243,7 +252,10 @@ public class SSMaskFormatterFactoryTest {
 
 	/** x */
 	@Test
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testGetMaskLiteralsAndPositions() {
+		System.out.println("GetMaskLiteralsAndPositions");
+
 		LiteralsAndPositions lp;
 
 		lp = getLiteralsAndPositions("##-## ##:#", FORMATTING_CHARS);
@@ -271,7 +283,10 @@ public class SSMaskFormatterFactoryTest {
 	/** x
 	 * @throws java.text.ParseException */
 	@Test
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testUserText() throws ParseException {
+		System.out.println("UserText");
+
 		String text;
 		MaskFormatter mf = new MaskFormatter();
 		mf.setMask("##-## ##:#");

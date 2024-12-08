@@ -53,10 +53,6 @@ import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
-// SSTimestampField.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Used to link a SSTimestampField to a timestamp column in a database.
  */
@@ -134,6 +130,7 @@ public class SSTimestampField extends DateTimeField
 		}
 		return new SSMaskFormatterFactory.Builder<>(formatMask)
 				.ssFormat(format)
+				.stringValidator(DateTimeField::stringValidator)
 				.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
 				.placeholderCharacter('_')
 				.build();

@@ -36,6 +36,7 @@ import java.util.List;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.JFormattedTextField.AbstractFormatter;
+import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.text.MaskFormatter;
 
 import com.google.common.collect.ImmutableList;
@@ -83,7 +84,7 @@ interface FormatterAssist
 	 * user input, set the value to null (which switches the formatter).
 	 * @param valid
 	 */
-	default void assistSetEditValid(JFormattedTextField ftf) {
+	default void assistSetEditValidMaySwitchNull(JFormattedTextField ftf) {
 		// Check for empty string input.
 		// If empty and allows null, flip to NullFormatter
 		if (ftf instanceof SSFormattedTextField ssftf) {

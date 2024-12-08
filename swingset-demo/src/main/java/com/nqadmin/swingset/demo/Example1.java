@@ -139,8 +139,11 @@ public class Example1 extends JFrame {
 		final boolean USE_SIMPLE_VALIDATION = false;
 		//SSTextComponentValidationItem valSupplierName = null;
 		ValidationItem decoSupplierName = null;
-		Function<String, Boolean> validateSupplierName
-				= (str) -> str == null || !str.matches("(?i).*oops.{0,2}$");
+		Function<String, Boolean> validateSupplierName = (str) -> {
+			boolean valid = str == null || !str.matches("(?i).*oops.{0,2}$");
+			//logger.log(Level.TRACE, ()->sf("validateSupplierName %s", valid));
+			return valid;
+		};
 		if (!USE_SIMPLE_VALIDATION) {
 			txtSupplierName.getSSCommon().setValidator(TextComponentValidator.create(
 					validateSupplierName));

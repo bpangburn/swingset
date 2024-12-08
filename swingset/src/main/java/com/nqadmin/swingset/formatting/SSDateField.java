@@ -129,6 +129,7 @@ public class SSDateField extends DateTimeField {
 		
 		return new SSMaskFormatterFactory.Builder<>(formatMask)
 				.ssFormat(format)
+				.stringValidator(DateTimeField::stringValidator)
 				.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
 				.placeholderCharacter('_')
 				.build();

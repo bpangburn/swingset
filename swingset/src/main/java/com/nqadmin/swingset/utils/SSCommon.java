@@ -298,6 +298,14 @@ public class SSCommon
 	/**
 	 * For JTextField to track previous text field value.
 	 * Used in conjunction with {@link SSDocumentListener}.
+	 * <p>
+	 * Part of the fix for<br>
+	 * Text field has wrong value after error while editing<br>
+	 * https://github.com/bpangburn/swingset/issues/175<br>
+	 * Which came in with<br>
+	 * Fix error recovery after errors during SSTextField edit<br>
+	 * https://github.com/bpangburn/swingset/pull/178<br>
+	 * 
 	 */
 	@SuppressWarnings("serial")
 	public class SSPlainDocument extends PlainDocument {
@@ -1300,22 +1308,14 @@ public class SSCommon
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				try {
-					NavigateActions.undoRedo(comp, UndoRedo.UNDO);
-				} catch (SQLException ex) {
-					logger.log(ERROR, "UNDO action:", ex);
-				}
+				NavigateActions.undoRedo(comp, UndoRedo.UNDO);
 			}
 		});
 		am.put(REDO_ACTION_KEY, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				try {
-					NavigateActions.undoRedo(comp, UndoRedo.REDO);
-				} catch (SQLException ex) {
-					logger.log(ERROR, "REDO action:", ex);
-				}
+				NavigateActions.undoRedo(comp, UndoRedo.REDO);
 			}
 		});
 		am.setParent(jc.getActionMap());
@@ -1462,18 +1462,14 @@ public class SSCommon
 	}
 	
 	/**
-	 * Run the SSComponents validator, return the result.
+	 * Run the SSComponent's plugin validator, return the result.
 	 * First check component specific validator, then plugin validator.
 	 * 
-	 * @return true if valid
+	 * @return true if successful validation
 	 */
-	public final boolean validate()
+	public final boolean pluginValidate()
 	{
-		if (!getSSComponent().componentValidate()) {
-			return false;
-		}
-
-		// Now invoke the user's validator
+		// Invoke the user's validator
 		return validator.validate();
 	}
 

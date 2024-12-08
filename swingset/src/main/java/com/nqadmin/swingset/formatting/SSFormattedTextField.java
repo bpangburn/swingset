@@ -74,6 +74,7 @@ import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.checkConvertToJdbcType;
 import static com.nqadmin.swingset.datasources.ConvertType.convertObjectType;
+import static com.nqadmin.swingset.navigate.Utils.postRowSetModifiedError;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // TODO: Review state transitions (where it can happen).
@@ -81,11 +82,11 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 // TODO: Remove extraneous decorate.
 
 /**
- * SSFormattedTextField extends the JFormattedTextField.
- * This is the pivotal class for this package. It operates as a {@link SSComponentInterface}.
+ * SSFormattedTextField extends the JFormattedTextField.This is the pivotal class for this package.
+ * It operates as a {@link SSComponentInterface}.
  * It locks focus while data is invalid and updates the database while editing.
  *
- * Note {@link #isAllValid()} is used to do validation; it does
+ * Note {@link #allValidate()} is used to do validation; it does
  * {@linkplain #isDataValid() } and maybe {@linkplain SSCommon#validate() }.
  *
  * The component can implement {@link #componentValidate() } to add additional
@@ -106,11 +107,10 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	/**
 	 * This InputVerifier locks the focus down while the 
-	 * JFormattedTextField has invalid data.
-	 * If non empty text do stringToValue validation check, then use
-	 * {@link #isAllValid()} for more validation checks. If the data is valid
-	 * and the value is null then do {@link #setValue(null) } to make sure the
-	 * null formatter is used subsequently.
+	 * JFormattedTextField has invalid data.If non empty text do stringToValue
+	 * validation check, then use {@link #allValidate()} for more validation checks.
+	 * If the data is valid and the value is null then do
+	 * {@link #setValue(null) } to make sure the null formatter is used subsequently.
 	 * <p>
 	 * If weird errors occur, return true to avoid a focus lock hang.
 	 */
@@ -159,7 +159,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				// Perform component and custom validation.
 				// TODO: ok = getSSCommon.decorate();??? But still want exit decorate
 				if (ok)
-					ok = isAllValid().all();
+					ok = allValidate().all();
 				// If ok with null, make sure to use the null formatter. Needed?
 				if (ok && value == null)
 					ftf.setValue(null); // Note: "verifyingText" skips pce.
@@ -180,7 +180,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	}
 
 	/**
-	 * Component's property change event handler.
+	 * SSComponentListener for comp's "things have changed" event handler.
 	 * Only handles "value" property.
 	 */
 	protected class SSFormattedTextFieldListener implements PropertyChangeListener {
@@ -195,9 +195,9 @@ public class SSFormattedTextField extends JFormattedTextField
 	}
 
 	/**
-	 * Handle a "value" property change event; used to propagate changes back to bound
-	 * database column. Avoid cascading events and always decorate.
-	 * Does nothing if {@link #isAllValid()} via decorate indicates invalid.
+	 * Handle a "value" property change event; used to propagate changes back to
+	 * bound database column.Avoid cascading events and always decorate. Does
+	 * nothing if {@link #allValidate()} via decorate indicates invalid.
 	 * @param pce "value" from property change event
 	 */
 	private void handleValuePropertyChange(
@@ -220,7 +220,9 @@ public class SSFormattedTextField extends JFormattedTextField
 			// The formatter says it's valid, but there's more to check
 			if (getSSCommon().decorate())
 				setBoundColumnObject(currentValue);
-
+			else
+				postRowSetModifiedError(ftf, currentValue);
+			
 		} finally {
 			getSSCommon().addRowSetListener();
 		}
@@ -526,7 +528,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean isDataValid() {
+	public boolean baseValidate() {
 		return isEditValid();
 	}
 

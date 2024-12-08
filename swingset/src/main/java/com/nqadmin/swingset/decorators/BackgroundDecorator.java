@@ -39,8 +39,14 @@
 package com.nqadmin.swingset.decorators;
 
 import java.awt.Color;
+import java.lang.System.Logger;
 
 import javax.swing.UIManager;
+
+import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSUtils;
+
+import static java.lang.System.Logger.Level.*;
 
 
 /**
@@ -49,6 +55,7 @@ import javax.swing.UIManager;
  */
 public class BackgroundDecorator extends FocusDecorator
 {
+	private static final Logger logger = SSUtils.getLogger();
 
 	private final Color standardBackgroundColor = getDefaultBackgroundColor();
 	private Color focusBackgroundColor = new Color(204, 255, 255); // Tealish
@@ -57,14 +64,20 @@ public class BackgroundDecorator extends FocusDecorator
 	/** Decorate the component using current state. */
 	@Override
 	public boolean decorate() {
-		boolean dataValid = getComponent().getSSCommon().validate() && getComponent().isDataValid();
-		if (dataValid) {
+		SSComponentInterface.validateResult valid = getComponent().allValidate();
+		logger.log(TRACE, () -> String.format("%s focus: %s, compValid %s, allValid: %s",
+				jc().getClass().getSimpleName(), fcomp().isFocusOwner(), valid.comp(), valid.all()));
+
+
+
+		//boolean dataValid = getComponent().getSSCommon().validate() && getComponent().isDataValid();
+		if (valid.all()) {
 			jc().setBackground(jc().isFocusOwner()
 					? focusBackgroundColor : standardBackgroundColor);
 		} else {
 			jc().setBackground(errorBackgroundColor);
 		}
-		return dataValid;
+		return valid.all();
 	}
 
 	private static Color defaultBackgroundColor;

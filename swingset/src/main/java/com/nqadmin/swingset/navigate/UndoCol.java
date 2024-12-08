@@ -154,7 +154,10 @@ final class UndoCol
 		return curIdx != 0;
 	}
 
-	static final Object none = new Object();
+	static final Object none = new Object() {
+		@Override public String toString() { return "UNDO/REDO NONE"; }
+	};
+
 	Object findUndoRedoValue(UndoRedo cmd)
 	{
 		return switch(cmd) {

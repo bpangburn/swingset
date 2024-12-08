@@ -27,62 +27,72 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset.mock;
+package com.nqadmin.swingset.navigate;
+
+import java.util.EventObject;
 
 import javax.sql.RowSet;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.SpinnerNumberModel;
 
-import com.nqadmin.swingset.navigate.NavigateActions;
-
-import static com.nqadmin.swingset.navigate.NavAction.*;
+import com.nqadmin.swingset.utils.SSComponentInterface;
 
 /**
- *
- * @author err
+ * Sent by an SSComponent when value changes from undo/redo.
+ * The contents of the undo/redo stack is unchanged; note the error.
  */
-public class Navigate
+@SuppressWarnings("serial")
+public class RowSetUndoRedoEvent extends EventObject
 {
-	private final NavigateActions navActs;
-	private final ActionMap actionMap;
+	final private Object value;
+	final private boolean error;
 
-	//public Navigate(NavigateActions navActs)
-	public Navigate(RowSet rs)
+
+	/**
+	 * Create a undo/redo stack event.
+	 * Signals change in components current value and if newValue is an error.
+	 * @param source the component making the modification
+	 * @param value the value written to the rowSet
+	 * @param error true if the component value is in error
+	 */
+	public RowSetUndoRedoEvent( SSComponentInterface source, Object value,
+							   boolean error)
 	{
-		this.navActs = NavigateActions.get(rs);
-		actionMap = navActs.createActionMap();
+		super(source);
+		this.value = value;
+		this.error = error;
 	}
 
-	public NavigateActions getNavActs()
+	/**
+	 * Test if this event is for the specified rowSet.
+	 * @param _rowSet check against this rowSet
+	 * @return true if the event is for the specified rowSet
+	 */
+	public boolean matches(RowSet _rowSet) {
+		return getSource().getRowSet() == _rowSet;
+	}
+
+	/**
+	 *
+	 * {@inheritDoc }
+	 */
+	@Override
+	public SSComponentInterface getSource() {
+		return (SSComponentInterface) super.getSource();
+	}
+
+	/**
+	 * Value written to rowSet.
+	 * @return value
+	 */
+	public Object getValue()
 	{
-		return navActs;
-	}
-	
-	public void first() { actionMap.get(NAV_FIRST).actionPerformed(null); }
-	public void last() { actionMap.get(NAV_LAST).actionPerformed(null); }
-	public void next() { actionMap.get(NAV_NEXT).actionPerformed(null); }
-	public void prev() { actionMap.get(NAV_PREVIOUS).actionPerformed(null); }
-
-	public void go(int row) {
-		ModelAct spinModel = getSpinModelAct();
-		if (spinModel.model != null) {
-			spinModel.model.setValue(row);
-			spinModel.action.actionPerformed(null);
-		}
+		return value;
 	}
 
-	public int rowCount() {
-		ModelAct spinModel = getSpinModelAct();
-		if (spinModel.model != null)
-			return (Integer)spinModel.model.getMaximum();
-		return -1;
-	}
-
-	private record ModelAct(SpinnerNumberModel model, Action action){}
-	private ModelAct getSpinModelAct() {
-		Action act = actionMap.get(NAV_GOTOROW);
-		Object value = act.getValue("SPINNER_MODEL");
-		return new ModelAct((SpinnerNumberModel) value, act);
+	/**
+	 * Test if this event's component's value is in error.
+	 * @return true if in error.
+	 */
+	public boolean isError() {
+		return error;
 	}
 }

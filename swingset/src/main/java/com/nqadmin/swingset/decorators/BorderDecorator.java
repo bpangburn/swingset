@@ -90,7 +90,7 @@ public class BorderDecorator extends FocusDecorator
 	/** Decorate the component using current state. */
 	@Override
 	public boolean decorate() {
-		SSComponentInterface.validResult valid = getComponent().isAllValid();
+		SSComponentInterface.validateResult valid = getComponent().allValidate();
 		logger.log(TRACE, () -> String.format("%s focus: %s, compValid %s, allValid: %s",
 				jc().getClass().getSimpleName(), fcomp().isFocusOwner(), valid.comp(), valid.all()));
 		Border b;

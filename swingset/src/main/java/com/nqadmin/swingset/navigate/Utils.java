@@ -70,25 +70,38 @@ public class Utils
 	/**
 	 * Post a modification event; prefer a local eventBus.
 	 * @param source SSComponent modifying the rowset
-	 * @param _value new value
+	 * @param value new value
 	 */
-	public static void postRowSetModified(SSComponentInterface source, Object _value)
+	public static void postRowSetModified(SSComponentInterface source, Object value)
 	{
 		// May want to extend to handling local EventBus per Frame/Panel;
 		// Use either/both source/rs to find a local eventBus.
 		getLocalEventBus(source, source.getRowSet())
-				.post(new RowSetModificationEvent(source, _value));
+				.post(new RowSetModificationEvent(source, value));
 	}
 
 	/**
 	 * Post an error modification event; prefer a local eventBus.
 	 * @param source SSComponent modifying the rowset
-	 * @param _value new value
+	 * @param value new value
 	 */
-	public static void postRowSetModifiedError(SSComponentInterface source, Object _value)
+	public static void postRowSetModifiedError(SSComponentInterface source, Object value)
 	{
 		getLocalEventBus(source, source.getRowSet())
-				.post(new RowSetModificationEvent(source, _value, true));
+				.post(new RowSetModificationEvent(source, value, true));
+	}
+
+	/**
+	 * Post an undo/redo event and if value an error; prefer a local eventBus.
+	 * @param source SSComponent modifying the rowset
+	 * @param value new value
+	 * @param isError value is an error
+	 */
+	public static void postRowSetUndoRedo(SSComponentInterface source, Object value,
+									boolean isError)
+	{
+		getLocalEventBus(source, source.getRowSet())
+				.post(new RowSetUndoRedoEvent(source, value, isError));
 	}
 	
 	// Notes on implementing a weak subscriber

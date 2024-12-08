@@ -51,9 +51,12 @@ import java.lang.System.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import javax.swing.JFormattedTextField;
+
+import com.nqadmin.swingset.datasources.RSC;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -118,12 +121,12 @@ public class SSMaskFormatterFactory extends FormatterFactory
 {
 	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
-
+	
 	/**
 	 * To build a new FormatterFactory with the specified parameters. Unless noted,
 	 * a parameter is used when constructing the MaskFormatter.
 	 *
-	 * @param <T> 
+	 * @param <T>
 	 * @see <em>Effective Java</em> Item 2 about override.
 	 * @see https://www.baeldung.com/java-builder-pattern-inheritance
 	 */
@@ -138,6 +141,7 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		private String placeholder = null;
 		private Character placeholderCharacter = null;
 		private boolean valueContainsLiterals = false;
+		private BiFunction<List<String>, RSC, Boolean> stringValidator;
 
 		/**
 		 * Create the builder.
@@ -167,10 +171,21 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		 * @param val
 		 * @return  builder */
 		public T valueContainsLiterals(boolean val) { valueContainsLiterals = val; return self(); }
+		/**
+		 * Function that validates a string for the SSComponent, function returns
+		 * false if not valid.
+		 * After stringToValue, before converter.
+		 * @param val function used to validate
+		 * @return builder
+		 */
+		public T stringValidator(BiFunction<List<String>, RSC, Boolean> val)
+		{ stringValidator = val; return self(); }
 
 		/** create the factory
 		 * @return the factory */
-		public SSMaskFormatterFactory build() { return new SSMaskFormatterFactory(this); }
+		public SSMaskFormatterFactory build() {
+			return new SSMaskFormatterFactory(this);
+		}
 
 		/**
 		 * Override this to provide custom SSMaskFormatter.
@@ -178,10 +193,11 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		 * @return
 		 * @throws ParseException 
 		 */
+		// TODO: use builder not getConver...
 		private SSMaskFormatter getSSMaskFormatter() throws ParseException
 		{
-			SSMaskFormatter mf = new SSMaskFormatter(
-					Objects.requireNonNull(mask, "must specify mask"), getConverter());
+			Objects.requireNonNull(mask, "must specify mask");
+			SSMaskFormatter mf = new SSMaskFormatter(this);
 			if (validCharacters != null) {
 				mf.setValidCharacters(validCharacters);
 			}
@@ -244,17 +260,25 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		public static final String FORMATTING_CHARS = "#ULA?*H";
 
 		private final AbstractFormatter converter;
+		private final BiFunction<List<String>, RSC, Boolean> stringValidator;
 
 		/**
 		 * Create the factory's MaskFormatter.
-		 * @param mask
-		 * @param converter
+		 * @param builder (null is for testing)
 		 * @throws ParseException 
 		 */
-		protected SSMaskFormatter(String mask, AbstractFormatter converter) throws ParseException
+		// package so tests can access
+		SSMaskFormatter(Builder<?> builder) throws ParseException
 		{
-			super(mask);
-			this.converter = converter;
+			super(builder != null ? builder.mask : "");
+			if (builder != null) {
+				this.converter = builder.getConverter();
+				this.stringValidator = builder.stringValidator;
+			} else {
+				this.converter = null;
+				this.stringValidator = null;
+				
+			}
 		}
 
 		/**
@@ -264,6 +288,14 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		@Override
 		public AbstractFormatter getConverter() {
 			return converter;
+		}
+
+		/**
+		 *
+		 * @return
+		 */
+		public BiFunction<List<String>, RSC, Boolean> getStringValidator() {
+			return stringValidator;
 		}
 
 		/**
@@ -307,24 +339,33 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		/**
 		 * First convert the string with super.stringToValue,
 		 * then use the converter (if there is one) to create
-		 * the value object.
-		 * @param s
-		 * @return
+		 * the value object.This may be setEditValid arg.
+		 * @param masked
+		 * @return value for SSFTF
 		 * @throws ParseException 
 		 */
 		@Override
-		public Object stringToValue(String s) throws ParseException {
-			if (s == null || s.isBlank()) {
+		public Object stringToValue(String masked) throws ParseException {
+			if (masked == null || masked.isBlank()) {
 				if(getFormattedTextField() instanceof SSFormattedTextField ftf
 						&& !ftf.getAllowNull())
 					throw new ParseException("Null value not allowed", 0);
 				return null;
 			}
-			Object v = super.stringToValue(s);	// the string without mask caracters.
+			// "string" is without mask caracters.
+			String string = (String) super.stringToValue(masked);
+
+			Object value = string;
 			if (getConverter() != null) {
-				v = getConverter().stringToValue((String)v);
+				value = getConverter().stringToValue(string);
 			}
-			return v;
+			
+			if (getFormattedTextField() instanceof SSFormattedTextField ftf
+					&& getStringValidator() != null
+					&& !getStringValidator().apply(List.of(masked, string), ftf))
+				throw new ParseException("stringValidator failed", 0);
+
+			return value;
 		}
 
 		/**
@@ -337,7 +378,7 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		protected void setEditValid(boolean valid) {
 			super.setEditValid(valid);
 			// TODO: should this be done if not valid?
-			assistSetEditValid(getFormattedTextField());
+			assistSetEditValidMaySwitchNull(getFormattedTextField());
 		}
 
 		// getMaskLiterals() is somewhat expensive. (not too bad, but my obsession)

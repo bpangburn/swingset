@@ -505,13 +505,14 @@ public interface SSComponentInterface extends RSC
 
 	/**
 	 * A low level indication of whether or not the component data is valid.
-	 * For example, a mask formatter indicates valid. Generally simple constraints
-	 * that are context independent.
-	 * There may be additional checks defined by a {@link Validator}; those
-	 * are not considered here.
+	 * For example, a mask formatter indicates valid; generally simple
+	 * constraints that are context independent; e.g. {@literal month <= 12}.
+	 * There may be additional checks defined by {@link #componentValidate() }
+	 * and/or a {@link Validator}; those are not considered here.
+	 * This might be determined by stringToValue.
 	 * @return false for error in data, otherwise true
 	 */
-	default boolean isDataValid() { return true; }
+	default boolean baseValidate() { return true; }
 
 	/**
 	 * This has component specific validation, for example for a SSDateField.
@@ -520,21 +521,24 @@ public interface SSComponentInterface extends RSC
 	default boolean componentValidate() { return true; }
 
 	/**
-	 * The results of doing validation. <br>
-	 * @param comp is typically isDataValid()
-	 * @param all is typically isDataValid() && validate()
+	 * The results of doing SSComponent validations.
+	 * 
+	 * @param base result of baseValidate()
+	 * @param comp result of base and componentValidate()
+	 * @param all result of comp and pluginValidate()
 	 */
-	record validResult(boolean comp, boolean all){}
+	record validateResult(boolean base, boolean comp, boolean all){}
 
 	/**
-	 * Run all the validators.
+	 * Run the validators: baseValidate, componentValidate, pluginValidate.
+	 * The checks are done in order, they stop with any failure.
 	 * @return result
 	 */
-	default validResult isAllValid() {
-		boolean componentValid = isDataValid();
-		// NOTE: validate() is not invoked if not isDataValid().
-		boolean allValid = componentValid && getSSCommon().validate();
-		return new validResult(componentValid, allValid);
+	default validateResult allValidate() {
+		boolean baseValid = baseValidate();
+		boolean compValid = baseValid && componentValidate();
+		boolean allValid = compValid && getSSCommon().pluginValidate();
+		return new validateResult(baseValid, compValid, allValid);
 	}
 
 	/**

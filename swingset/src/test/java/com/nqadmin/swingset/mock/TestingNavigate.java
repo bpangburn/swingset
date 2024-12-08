@@ -27,60 +27,62 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset.formatting;
+package com.nqadmin.swingset.mock;
 
-import java.util.List;
+import javax.sql.RowSet;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.SpinnerNumberModel;
 
-import com.nqadmin.swingset.datasources.DateTime;
-import com.nqadmin.swingset.datasources.RSC;
+import com.nqadmin.swingset.navigate.NavigateActions;
+
+import static com.nqadmin.swingset.navigate.NavAction.*;
 
 /**
- * Base class for date time fields; provides specialized component validation.
+ *
+ * @author err
  */
-@SuppressWarnings("serial")
-abstract public class DateTimeField extends Field
+public class TestingNavigate
 {
-	/**
-	 * Create.
-	 * @param factory formatter factory
-	 */
-	public DateTimeField(AbstractFormatterFactory factory) {
-        super(factory);
-	}
+	private final NavigateActions navActs;
+	private final ActionMap actionMap;
 
-	/**
-	 * Sets the value of the field to an initial state consistent with
-	 * the AllowNull property. If not AllowNull then use the current system date.
-	 */
-	@Override
-	public void cleanField() {
-		if (getAllowNull()) {
-			setValue(null);
-		} else {
-			setValue(new java.util.Date());
-		}
-	}
-
-	/**
-	 * Specialized Date/Time/Timestamp component validation.
-	 * @param strings text to check: list[0] is masked, list[1] is plain
-	 * @param comp
-	 * @return false if the component does not have valid data.
-	 */
-	public static boolean stringValidator(List<String> strings, RSC comp)
+	//public Navigate(NavigateActions navActs)
+	public TestingNavigate(RowSet rs)
 	{
-		if (!(comp instanceof DateTimeField dtfield))
-			return false;
-		if (DateTime.isHandledDateTimeComp(dtfield)) {
-			if (!dtfield.containsUserText()) {
-				if (DateTime.dateTimeColumnValidate("", dtfield))
-					return true;
-			}
-			for (String string : strings) {
-				if (DateTime.dateTimeColumnValidate(string, dtfield))
-					return true;
-			}
+		this.navActs = NavigateActions.get(rs);
+		actionMap = navActs.createActionMap();
+	}
+
+	public NavigateActions getNavActs()
+	{
+		return navActs;
+	}
+	
+	public void first() { actionMap.get(NAV_FIRST).actionPerformed(null); }
+	public void last() { actionMap.get(NAV_LAST).actionPerformed(null); }
+	public void next() { actionMap.get(NAV_NEXT).actionPerformed(null); }
+	public void prev() { actionMap.get(NAV_PREVIOUS).actionPerformed(null); }
+
+	public void go(int row) {
+		ModelAct spinModel = getSpinModelAct();
+		if (spinModel.model != null) {
+			spinModel.model.setValue(row);
+			spinModel.action.actionPerformed(null);
 		}
-		return false;
+	}
+
+	public int rowCount() {
+		ModelAct spinModel = getSpinModelAct();
+		if (spinModel.model != null)
+			return (Integer)spinModel.model.getMaximum();
+		return -1;
+	}
+
+	private record ModelAct(SpinnerNumberModel model, Action action){}
+	private ModelAct getSpinModelAct() {
+		Action act = actionMap.get(NAV_GOTOROW);
+		Object value = act.getValue("SPINNER_MODEL");
+		return new ModelAct((SpinnerNumberModel) value, act);
 	}
 }

@@ -87,6 +87,7 @@ import static com.nqadmin.swingset.navigate.NavAction.*;
 import static com.nqadmin.swingset.navigate.RowSetState.setInserting;
 import static com.nqadmin.swingset.navigate.Utils.getLocalEventBus;
 import static com.nqadmin.swingset.navigate.RowSetState.setNavigateActions;
+import static com.nqadmin.swingset.navigate.Utils.postRowSetUndoRedo;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 //TODO: Handle CachedRowSet Paging
@@ -230,16 +231,26 @@ public class NavigateActions
 	 * Perform the specified undo/redo cmd on the specified component.
 	 * @param comp ssComponent
 	 * @param cmd undo or redo
-	 * @throws java.sql.SQLException
 	 */
-	public static void undoRedo(SSComponentInterface comp, UndoRedo cmd) throws SQLException
+	public static void undoRedo(SSComponentInterface comp, UndoRedo cmd)
 	{
 		if (!NavigateActions.ENABLE_UNDO_REDO)
 			throw new IllegalStateException("UNDO/REDO disabled");
 		logger.log(DEBUG, () -> sf("%s: %s for %s", cmd,
 				comp.getClass().getSimpleName(), comp.getBoundColumnName()));
-		NavigateActions navActs = get(comp.getRowSet());
-		navActs.doUndoRedo(comp, cmd);
+		try {
+			NavigateActions navActs = get(comp.getRowSet());
+			Object value = navActs.doUndoRedo(comp, cmd);
+			// Wait until value propogates to the component.
+			if (value != UndoCol.none)
+				SwingUtilities.invokeLater(() -> {
+					postRowSetUndoRedo(comp, value, !comp.allValidate().all());
+				});
+		} catch (SQLException ex) {
+			logger.log(ERROR, sf("%s:", cmd), ex);
+			// TODO: error dialog?
+			//postRowSetUndoRedo(comp, UndoCol.none, true); // show error?
+		}
 	}
 
 	/**
@@ -436,7 +447,7 @@ public class NavigateActions
 	}
 	
 	// TODO: also have Set<SSComponentInterface> modifiedComponents
-	transient private final Set<SSComponentInterface> errorComponents = new HashSet<>();
+	private final Set<SSComponentInterface> errorComponents = new HashSet<>();
 
 	/**
 	 * Weak Subscriber notes: {@link com.nqadmin.swingset.navigate.Utils}.
@@ -463,6 +474,21 @@ public class NavigateActions
 
 				logger.log(TRACE, () -> ev.toString());
 				setRowModified();
+				updateActionState();
+			}
+		}
+
+		//@Subscribe
+		public void handleRowUndoRedo(RowSetUndoRedoEvent ev)
+		{
+			if (ev.matches(rowSet)) {
+				// Our RowSet's row had an undo/redo.
+				if(ev.isError()) {
+					errorComponents.add(ev.getSource());
+				} else {
+					errorComponents.remove(ev.getSource());
+				}
+				logger.log(TRACE, () -> ev.toString());
 				updateActionState();
 			}
 		}
@@ -498,6 +524,12 @@ public class NavigateActions
 		}
 
 		@Subscribe
+		public void handleRowUndoRedo(RowSetUndoRedoEvent ev)
+		{
+			doit((br) -> br.handleRowUndoRedo(ev));
+		}
+
+		@Subscribe
 		public void handleFocusChangeEvent(FocusChangeEvent ev)
 		{
 			doit((br) -> br.handleFocusChangeEvent(ev));
@@ -509,15 +541,17 @@ public class NavigateActions
 	 * Perform the specified undo/redo cmd on the specified component.
 	 * @param comp ssComponent
 	 * @param cmd undo or redo
+	 * @return new value, only for logging
 	 * @throws java.sql.SQLException
 	 */
-	// TODO: Should this be public?
-	void doUndoRedo(SSComponentInterface comp, UndoRedo cmd) throws SQLException
+	// TODO: Should this be public? NO, go through the static method in this class
+	Object doUndoRedo(SSComponentInterface comp, UndoRedo cmd) throws SQLException
 	{
 		if (!NavigateActions.ENABLE_UNDO_REDO)
 			throw new IllegalStateException("UNDO/REDO disabled");
-		undoRow.doUndoRedo(comp, cmd);
+		Object value = undoRow.doUndoRedo(comp, cmd);
 		updateActionState();
+		return value;
 	}
 
 	/**

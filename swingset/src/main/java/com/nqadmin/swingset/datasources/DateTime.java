@@ -53,7 +53,8 @@ import java.util.Set;
 
 import javax.swing.text.JTextComponent;
 
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.google.common.collect.ImmutableMap;
+import com.nqadmin.swingset.formatting.SSFormat;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static java.lang.System.Logger.Level.*;
@@ -108,7 +109,7 @@ public class DateTime
 	 * @param comp
 	 * @return true is OK
 	 */
-	public static boolean isHandledDateTimeComp(SSComponentInterface comp)
+	public static boolean isHandledDateTimeComp(RSC comp)
 	{
 		return comp instanceof JTextComponent
 				&& dateTimeHandled.contains(comp.getBoundColumnJDBCType());
@@ -150,11 +151,35 @@ public class DateTime
 	// TODO: date/time formatters per component with app map as backup/default.
 	public static List<DateTimeFormatter> getDateTimeParsers(JDBCType jdbcType)
 	{
-		return Collections.unmodifiableList(getInternalDateTimeParsers(jdbcType));
+		return Collections.unmodifiableList(getInternalDateTimeParsers(jdbcType, null));
 	}
 
-	private static List<DateTimeFormatter> getInternalDateTimeParsers(JDBCType jdbcType)
+	private static final ImmutableMap<SSFormat,List<DateTimeFormatter>> ssFormatters
+			= new ImmutableMap.Builder<SSFormat, List<DateTimeFormatter>>()
+					.put(SSFormat.DATE_MMDDYYYY_SLASH,
+							List.of(DateTimeFormatter.ofPattern("M/d/uuuu"),
+									DateTimeFormatter.ofPattern("MMdduuuu")))
+					.put(SSFormat.TIME_HHMMSS,
+							List.of(DateTimeFormatter.ISO_LOCAL_TIME,
+									DateTimeFormatter.ofPattern("HHmmss")))
+					.put(SSFormat.TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ,
+							List.of(DateTimeFormatter
+									.ofPattern("uuuu-M-d HH:mm:ss[.SSS[ xxx]]")))
+			.buildOrThrow();
+
+	private static List<DateTimeFormatter> getInternalDateTimeParsers(RSC comp)
 	{
+		return getInternalDateTimeParsers(comp.getBoundColumnJDBCType(),
+										  comp.getSSFormat());
+	}
+	private static List<DateTimeFormatter> getInternalDateTimeParsers(
+			JDBCType jdbcType, SSFormat ssFormat)
+	{
+		if (ssFormat != null) {
+			List<DateTimeFormatter> rv = ssFormatters.get(ssFormat);
+			if (rv != null)
+				return rv;
+		}
 		return dateTimeParsersMap.computeIfAbsent(jdbcType, 
 				(type) -> {
 					return switch(type) {
@@ -232,7 +257,7 @@ public class DateTime
 
 	private static DtoParse internalDateTimeColumnParse(String text, RSC comp)
 	{
-		List<DateTimeFormatter> formatters = getInternalDateTimeParsers(comp.getBoundColumnJDBCType());
+		List<DateTimeFormatter> formatters = getInternalDateTimeParsers(comp);
 		if (formatters == null || formatters.isEmpty())
 			throw new IllegalArgumentException("only JTextComponent handled");
 		if(text.isBlank())
@@ -405,7 +430,7 @@ public class DateTime
 			return null;
 		}
 
-		List<DateTimeFormatter> formatters = getInternalDateTimeParsers(JDBCType.DATE);
+		List<DateTimeFormatter> formatters = getInternalDateTimeParsers(JDBCType.DATE, null);
 		if (formatters == null || formatters.isEmpty())
 			return null;
 
