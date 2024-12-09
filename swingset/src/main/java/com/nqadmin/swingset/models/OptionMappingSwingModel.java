@@ -101,8 +101,8 @@ public class OptionMappingSwingModel<M,O,O2> extends AbstractComboBoxListSwingMo
 		if (_model instanceof OptionMappingSwingModel) {
 			return (OptionMappingSwingModel<?,?,?>) _model;
 		}
-		if (_model instanceof ComboBoxListSwingModel) {
-			Object model = ((ComboBoxListSwingModel)_model).getComboBoxListSwingModel();
+		if (_model instanceof ComboBoxListSwingModel comboBoxListSwingModel) {
+			Object model = comboBoxListSwingModel.getComboBoxListSwingModel();
 			if (model instanceof OptionMappingSwingModel) {
 				return (OptionMappingSwingModel<?,?,?>) model;
 			}

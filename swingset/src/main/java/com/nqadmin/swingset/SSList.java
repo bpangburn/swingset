@@ -239,6 +239,15 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	}
 	
 	/**
+	 * @return a list with the options values corresponding to the selected indices
+	 */
+	public List<Object> getSelectedOptions() {
+		return Arrays.stream(getSelectedIndices())
+				.mapToObj((index) -> optionSwingModel.getOptions().get(index))
+				.collect(Collectors.toList());
+	}
+	
+	/**
 	 * {@inheritDoc }
 	 */
 	@Override
