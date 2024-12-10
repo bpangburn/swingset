@@ -53,10 +53,9 @@ import javax.sql.rowset.spi.SyncProviderException;
 import com.google.common.collect.MapMaker;
 
 
-
 /**
- *
- * @author err
+ * Track some global state for a row set.
+ * Access to some of this state is delegate to other classes in this package.
  */
 public class RowSetState
 {
@@ -78,6 +77,7 @@ public class RowSetState
 		}
 	}
 
+	// NOTE: only invoked from one method which is syncronized.
 	static void setNavigateActions(RowSet rs, NavigateActions navigator) {
 		if (rs != null) {
 			getRowSetState(rs).refNavigateActions = new WeakReference<>(navigator);
@@ -161,7 +161,7 @@ public class RowSetState
 	 * @param rs get information for this RowSet
 	 * @return the associated data navigator
 	 */
-	public static NavigateActions getNavigateActions(RowSet rs) {
+	static NavigateActions getNavigateActions(RowSet rs) {
 		return rs == null ? null : getRowSetState(rs).refNavigateActions.get();
 	}
 	

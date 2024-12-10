@@ -52,7 +52,7 @@ import java.lang.System.Logger;
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSDBComboBox;
-import com.nqadmin.swingset.SSDataNavigator;
+import com.nqadmin.swingset.navigate.NavigateActions;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 //import com.nqadmin.swingset.models.SSListItem;
@@ -82,6 +82,7 @@ public class SSSyncManager {
 
 		// WHEN THERE IS A CHANGE IN THIS VALUE MOVE THE ROWSET SO THAT
 		// ITS POSITIONED AT THE RIGHT RECORD.
+		/** {@inheritDoc } */
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 
@@ -114,7 +115,7 @@ public class SSSyncManager {
 					//
 					// 2020-12-02_BP: adding back
 					// 2021-02-26_BP: moving inside 'if (comboPK != rowsetPK) {' block
-					dataNavigator.updatePresentRow();
+					navigateActions.updatePresentRow();
 					
 					// long indexOfId = SSSyncManager.this.comboBox.itemMap.get(this.id) + 1;
 					final int indexOfPK = comboBox.getMappings().indexOf(comboPK) + 1;
@@ -147,8 +148,8 @@ public class SSSyncManager {
 							// If there are only a few records, just start at first record
 							int rowsetSearchFrom = 1;
 
-							if (numRecords>offsetToCheck) {
-								rowsetSearchFrom = indexOfPK - offsetToCheck;
+							if (numRecords>OFFSET_TO_CHECK) {
+								rowsetSearchFrom = indexOfPK - OFFSET_TO_CHECK;
 							}
 							if (rowsetSearchFrom<1) {
 								rowsetSearchFrom += numRecords;
@@ -162,7 +163,7 @@ public class SSSyncManager {
 						// number of items in combo is the number of records in resultset.
 						// so if for some reason item is in combo but deleted in rowset
 						// To avoid infinite loop in such scenario
-						if (count > (numRecords + overlapToCheck)) {
+						if (count > (numRecords + OVERLAP_TO_CHECK)) {
 							comboBox.repaint();
 							logger.log(WARNING, "SSSyncManager unable to find a record matching the selection in the dropdown list: " + comboBox.getSelectedStringValue() + ".");
 							// JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin
@@ -247,17 +248,19 @@ public class SSSyncManager {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
-	 * # of records to step back if doing a sequential search because SSDBComboBox and RowSet results don't match.
+	 * # of records to step back if doing a sequential search because
+	 * SSDBComboBox and RowSet results don't match.
 	 */
-	private static final int offsetToCheck = 7;
+	private static final int OFFSET_TO_CHECK = 7;
 
 	/**
-	 * # of records of overlap to check if SSDBComboBox and RowSet results don't match due to record additions/deletions.
+	 * # of records of overlap to check if SSDBComboBox and RowSet results
+	 * don't match due to record additions/deletions.
 	 */
-	private static final int overlapToCheck = 7;
+	private static final int OVERLAP_TO_CHECK = 7;
 
 	/**
 	 * SSDBComboBox used for record navigation.
@@ -275,9 +278,9 @@ public class SSSyncManager {
 	private boolean comboListenerAdded = false;
 
 	/**
-	 * SSDataNavigator to be synchronized with navigation combo box.
+	 * NavigateActions to be synchronized with navigation combo box.
 	 */
-	private SSDataNavigator dataNavigator;
+	private NavigateActions navigateActions;
 
 	/**
 	 * RowSet navigated with data navigator and combo box.
@@ -302,22 +305,34 @@ public class SSSyncManager {
 
 
 	/**
-	 * <p>
 	 * Creates a SSSyncManager with the specified combo box and data navigator.
 	 *
-	 * @param _comboBox      SSDBComboBox used for record navigation
-	 * @param _dataNavigator SSDataNavigator to be synchronized with navigation
+	 * @param comboBox      SSDBComboBox used for record navigation
+	 * @param navigateActions NavigateActions to be synchronized with navigation
 	 *                       combo box
 	 */
-	public SSSyncManager(final SSDBComboBox _comboBox, final SSDataNavigator _dataNavigator) {
-		comboBox = _comboBox;
-		dataNavigator = _dataNavigator;
-		rowset = dataNavigator.getRowSet();
-		dataNavigator.setNavCombo(comboBox);
-		if (_comboBox.getLogColumnName() == null) {
-			_comboBox.setLogColumnName(sf("**ComboBoxNavigator@%x**",
-					System.identityHashCode(_comboBox)));
+	public SSSyncManager(SSDBComboBox comboBox, NavigateActions navigateActions) {
+		this.comboBox = comboBox;
+		this.navigateActions = navigateActions;
+		this.rowset = navigateActions.getRowSet();
+		navigateActions.setNavCombo(comboBox);
+		if (comboBox.getLogColumnName() == null) {
+			comboBox.setLogColumnName(sf("**ComboBoxNavigator@%x**",
+					System.identityHashCode(comboBox)));
 		}
+	}
+
+	/**
+	 * Creates a SSSyncManager with the specified combo box and data navigator.
+	 * 
+	 * @param comboBox combobox
+	 * @param dataNavigator data navigator
+	 * @deprecated use {@linkplain SSSyncManager#SSSyncManager(com.nqadmin.swingset.SSDBComboBox, com.nqadmin.swingset.navigate.NavigateActions) }
+	 */
+	@Deprecated
+	public SSSyncManager(SSDBComboBox comboBox, com.nqadmin.swingset.SSDataNavigator dataNavigator)
+	{
+		this(comboBox, dataNavigator.getNavigateActions());
 	}
 	
 	/**
@@ -343,7 +358,7 @@ public class SSSyncManager {
 	 */
 	private void addRowsetListener() {
 		if (!rowsetListenerAdded) {
-			dataNavigator.getRowSet().addRowSetListener(rowsetListener);
+			navigateActions.getRowSet().addRowSetListener(rowsetListener);
 			rowsetListenerAdded = true;
 		}
 	}
@@ -417,7 +432,7 @@ public class SSSyncManager {
 	 */
 	private void removeRowsetListener() {
 		if (rowsetListenerAdded) {
-			dataNavigator.getRowSet().removeRowSetListener(rowsetListener);
+			navigateActions.getRowSet().removeRowSetListener(rowsetListener);
 			rowsetListenerAdded = false;
 		}
 	}
@@ -435,11 +450,22 @@ public class SSSyncManager {
 	/**
 	 * Sets data navigator to be synchronized.
 	 *
-	 * @param _dataNavigator data navigator to be synchronized
+	 * @param dataNavigator data navigator to be synchronized
+	 * @deprecated use {@linkplain SSSyncManager#setDataNavigator(com.nqadmin.swingset.navigate.NavigateActions) }
 	 */
-	public void setDataNavigator(final SSDataNavigator _dataNavigator) {
-		dataNavigator = _dataNavigator;
-		rowset = dataNavigator.getRowSet();
+	@Deprecated
+	public void setDataNavigator(com.nqadmin.swingset.SSDataNavigator dataNavigator) {
+		setDataNavigator(dataNavigator.getNavigateActions());
+	}
+
+	/**
+	 * Sets navigate actions to synchronize.
+	 *
+	 * @param navigateActions data navigator to be synchronized
+	 */
+	public void setDataNavigator(NavigateActions navigateActions) {
+		this.navigateActions = navigateActions;
+		this.rowset = navigateActions.getRowSet();
 	}
 	
 	/**

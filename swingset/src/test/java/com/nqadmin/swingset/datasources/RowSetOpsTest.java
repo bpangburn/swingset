@@ -47,7 +47,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.nqadmin.swingset.mock.H2;
-import com.nqadmin.swingset.mock.TestingNavigate;
+import com.nqadmin.swingset.mock.NavigateHook;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -100,7 +100,7 @@ public class RowSetOpsTest
 		RowSet rs = H2.getRowSet(null);
 		rs.setCommand("SELECT * FROM tbl");
 		@SuppressWarnings("UnusedAssignment")
-		TestingNavigate nav = new TestingNavigate(rs);
+		NavigateHook nav = new NavigateHook(rs);
 
 		Object fetch;
 		// Expected from the database
@@ -129,7 +129,7 @@ public class RowSetOpsTest
 									('2000-02-22','22:22:22','2222-02-22') ;
             """);
 		rs.setCommand("SELECT * FROM tbl");
-		nav = new TestingNavigate(rs);
+		nav = new NavigateHook(rs);
 
 		assertEquals(2, nav.rowCount());
 		fetch = RowSetOps.getColumnObject(RSC.getEx(rs, 1));
@@ -168,7 +168,7 @@ public class RowSetOpsTest
 
 		RowSet rs = H2.getRowSet(null);
 		rs.setCommand("SELECT * FROM tbl");
-		new TestingNavigate(rs);
+		new NavigateHook(rs);
 
 		Object fetch;
 		Timestamp fetch2;

@@ -170,7 +170,7 @@ public class Example1 extends JFrame {
 		 * H2 does not fully support updatable rowset so it must be
 		 * re-queried following insert and delete with rowset.execute()
 		 */
-		navigator.setDBNav(new SSDBNavImpl(this)
+		navigator.getNavigateActions().setDBNav(new SSDBNavImpl(this)
 		{
 			/**
 			 * Requery the rowset following a deletion. This is needed for H2.

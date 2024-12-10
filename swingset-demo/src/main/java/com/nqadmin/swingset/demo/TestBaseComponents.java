@@ -302,7 +302,7 @@ public class TestBaseComponents extends JFrame
 		 * H2 does not fully support updatable rowset so it must be
 		 * re-queried following insert and delete with rowset.execute()
 		 */
-		navigator.setDBNav(new SSDBNavImpl(this)
+		navigator.getNavigateActions().setDBNav(new SSDBNavImpl(this)
 		{
 			/**
 			 * Requery the rowset following a deletion. This is needed for H2.
@@ -405,7 +405,7 @@ public class TestBaseComponents extends JFrame
 			// YOU HAVE TO CALL THE .async() METHOD
 			//
 			// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
-			syncManager = new SSSyncManager(cmbSSDBComboNav, navigator);
+			syncManager = new SSSyncManager(cmbSSDBComboNav, navigator.getNavigateActions());
 			syncManager.setSyncColumnName("swingset_base_test_pk");
 			syncManager.sync();
 		}
