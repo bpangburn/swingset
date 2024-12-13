@@ -122,6 +122,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		
 		// Finish Initialization
 		initScreen();
+		// updateScreen(); // Force a setRowSet() for testing.
 	}
 
 	/** {@inheritDoc}

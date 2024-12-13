@@ -48,6 +48,7 @@ import javax.sql.RowSetListener;
 import javax.swing.SwingUtilities;
 
 import java.lang.System.Logger;
+import java.util.Objects;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -384,7 +385,7 @@ public class SSSyncManager {
 
 				// CHECK IF THE COMBO BOX IS DISPLAYING THE SAME ONE.
 				if ((comboBox.getSelectedStringValue() == null)
-						|| (comboBox.getSelectedMapping()!=currentRowPK)) {
+						|| !Objects.equals(comboBox.getSelectedMapping(), currentRowPK)) {
 					// IF NOT CHANGE THE SELECTION OF THE COMBO BOX.
 					// this.comboBox.setSelectedStringValue(this.rowset.getString(this.columnName));
 					comboBox.setSelectedMapping(currentRowPK);

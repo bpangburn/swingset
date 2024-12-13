@@ -14,9 +14,20 @@ minor issue to ignore for now.
 Add variable SORT_REMOVE_KEYS to SSDataGrid, an option eventually.
 
 ---
+NavigateActions is tied to a rowset; and that object may be shared. Maybe better
+situation, have a thin object, e.g. Navigation, that references, and delegates
+to, a NavigateActions. Then Navigation is the model that is usually used, and it
+can fire events (or send a message over the bus) when its rowset changes. As is
+common, multiple components can use the same Navigation. NavigateActions is
+still there pretty much as is, but hidden inside a Navigation. An example of
+where this is wanted; an SSDataNavigator has a Navigation model, if the rowset
+in the Navigation changes, the SSDataNavigator detects this event and adjusts
+accordingly.
+
+---
 Should the methods in SSDataNavigator that delegate to getNavigatorActions()
 be deprecated? If NavigatorActions are considered a model, then there's
-precedence to keep them.
+some precedence to keep some of them for convenience.
 
 ---
 re-indent swingset
@@ -80,22 +91,26 @@ Use DateTime for MaskFormatter's converter.
 Use DateTimeFormatter instead of DateFormatter in Fields, consider
 relationship with DateTime.java.
 
+---
+Rename SSDataNavigator to SSNavigatorBar?
+Rename NavigateActions to Navigation?
+
 ================================================================================
 =========================== CLEANUP ============================================
 ================================================================================
 
 Get rid of the @author tags.
 
+---
 Navigator
-    - The method "setV3Buttons()" has been mentioned. But the real method of interest is probably "setAutoCommit()". When this is set, the navigation actions remain enabled when the rowset is modified; navigating away from the row does commit the modified rowset. "setV3Buttons()" does "setAutoCommit()" and also always have commit/revert enabled even if nothing is modified.
+    - Consider that up/down arrows now optionally do next-row/prev-row. How
+      about, when AutoCommit is off, doing Shift-Ctrl-up/down (or whatever) does
+      commit then move. Then the convenience of autoCommit is still available.
+      And if people just started doing Shift-Ctrl-up all the time, then ...
 
-    - Consider that up/down arrows now optionally do next-row/prev-row. How about, when AutoCommit is off, doing Shift-Ctrl-up/down (or whatever) does commit then move. Then the convenience of autoCommit is still available. And if people just started doing Shift-Ctrl-up all the time, then ...
-
-    - There are some methods in SSDataNavigator, like setModification, which are really NavigateActions behavior. Currently
-        setModification(boolean modOK) { navActs.setModification(modOK); }
-    They should be deprecated and removed in a future release. Want to deprecate them for 4.1?
-
-    - The visual arrows show left/right, but the keys are up/down. Are there any button pngs around in the same style that display up/down? Maybe at some point...
+    - The visual arrows show left/right, but the keys are up/down. Are there any
+      button pngs around in the same style that display up/down? Maybe at some
+      point...
 
 ---
 Examine ConvertType both to/from convert?

@@ -799,6 +799,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * Update navigate actions with latest rowset
 	 */
 	private void updateNavigateActions() {
+		getDataNavigator().setRowSet(getRowset());
 		setNavigateActions(NavigateActions.get(getRowset()));
 	}
 
