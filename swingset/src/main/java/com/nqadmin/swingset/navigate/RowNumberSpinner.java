@@ -46,20 +46,21 @@ import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.Action;
 import javax.swing.ComponentInputMap;
 import javax.swing.InputMap;
-import javax.swing.JComponent;
 import javax.swing.JSpinner;
-import javax.swing.KeyStroke;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.plaf.basic.BasicSpinnerUI;
 
 import com.nqadmin.swingset.navigate.NavigateActions.NavGotoRowAction;
+
+import static java.awt.event.KeyEvent.VK_DOWN;
+import static java.awt.event.KeyEvent.VK_UP;
+import static javax.swing.KeyStroke.getKeyStroke;
 
 /**
  * Spinner for {@linkplain javax.sql.RowSet}'s row number that accepts an Action;
@@ -166,29 +167,61 @@ public class RowNumberSpinner extends JSpinner
 	}
 
 	/**
-	 * Wider use of the specified component's up/down arrow keys.
-	 * @param comp
+	 * Get one of this component's local input maps. If it doesn't exist
+	 * then create it and hook it in to the component.
+	 * @return the specified input map
 	 */
-	public static void inWindowUpDownKeys(JComponent comp)
+	private InputMap getMyInputMap(int whichMap)
 	{
-		InputMap im = new ComponentInputMap(comp);
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "increment");
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "decrement");
-		im.setParent(comp.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW));
-		comp.setInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW, im);
+		return switch (whichMap) {
+		case WHEN_IN_FOCUSED_WINDOW -> {
+			if (inFocusedWindowInputMap == null) {
+				InputMap im = new ComponentInputMap(this);
+				im.setParent(getInputMap(WHEN_IN_FOCUSED_WINDOW));
+				setInputMap(WHEN_IN_FOCUSED_WINDOW, im);
+				inFocusedWindowInputMap = im;
+			}
+			yield inFocusedWindowInputMap;
+		}
+		case WHEN_ANCESTOR_OF_FOCUSED_COMPONENT -> {
+			if (ancestorOfFocusedComponentInputMap == null) {
+				InputMap im = new InputMap();
+				im.setParent(getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT));
+				setInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, im);
+				ancestorOfFocusedComponentInputMap = im;
+			}
+			yield ancestorOfFocusedComponentInputMap;
+		}
+		default -> null;
+		};
+	}
+
+	private InputMap inFocusedWindowInputMap;
+	private InputMap ancestorOfFocusedComponentInputMap;
+
+	/**
+	 * Use the up/down arrow keys while this spinner's window is focused
+	 * to adjust row number.
+	 * @param enable true enables up/down keys when window has focus
+	 */
+	public void setWindowUpDownKeysEnable(boolean enable)
+	{
+		InputMap im = getMyInputMap(WHEN_IN_FOCUSED_WINDOW);
+		im.put(getKeyStroke(VK_UP, 0), enable ? "increment" : null);
+		im.put(getKeyStroke(VK_DOWN, 0), enable ? "decrement" : null);
 	}
 
 	/**
-	 * Disable the specified component's up/down arrow keys.
-	 * @param comp
+	 * Disable the up/down arrow keys for this spinner component.
+	 * When disabling, window up/down keys are disabled
+	 * using {@link RowNumberSpinner#setWindowUpDownKeysEnable(boolean)}.
+	 * 
+	 * @param enable true enables default
 	 */
-	public static void disableUpDownKeys(JComponent comp)
+	public void setUpDownKeysEnable(boolean enable)
 	{
-		InputMap im = new InputMap();
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "none");
-		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "none");
-		im.setParent(comp.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT));
-		comp.setInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, im);
+		InputMap im = getMyInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		im.put(getKeyStroke(VK_UP, 0), enable ? null : "none");
+		im.put(getKeyStroke(VK_DOWN, 0), enable ? null : "none");
 	}
-
 }

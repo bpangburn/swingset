@@ -149,6 +149,16 @@ public class NavigateActions
 		REDO;
 	}
 
+	/**
+	 * Which key does increment/decrement.
+	 */
+	public enum UpDownKeysAction {
+		/** This is like data in a grid. */
+		UP_DECREMENT,
+		/** Up key increments. */
+		UP_INCREMENT,
+	}
+
 	/** Log4j Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
 
@@ -429,6 +439,7 @@ public class NavigateActions
 		actions.put(NAV_GOTOROW,	new NavGotoRowAction());
 
 		rowNumberModel = new SpinnerNumberModel(1, 1, 1, 1);
+		setUpDownKeysAction(UpDownKeysAction.UP_DECREMENT);
 		actions.get(NAV_GOTOROW).putValue("SPINNER_MODEL", rowNumberModel);
 		undoRow = new UndoRow();
 
@@ -437,6 +448,18 @@ public class NavigateActions
 			return;
 		setupEventBus();
 		setupRowSet();
+	}
+
+	/**
+	 * Specifies how the up/down arrows increment/decrement.
+	 * However the up key is specified, the down key does the opposite.
+	 * @param act the up key behavior
+	 */
+	public final void setUpDownKeysAction(UpDownKeysAction act) {
+		int stepsize = act == UpDownKeysAction.UP_DECREMENT ? -1
+				: act == UpDownKeysAction.UP_INCREMENT ? 1 : 0;
+		if (stepsize != 0)
+			rowNumberModel.setStepSize(stepsize);
 	}
 
 	BusReceiver busReceiver; // Strong reference, other only weakly referenced.

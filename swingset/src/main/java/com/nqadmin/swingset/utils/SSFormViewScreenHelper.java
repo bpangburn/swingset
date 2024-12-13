@@ -56,6 +56,7 @@ import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 //SSFormViewScreenHelper.java
@@ -266,8 +267,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	private String comboNavDisplayColumn2 = null; // name of the 2nd database column to display in the combo navigator
 	private String comboNavSeparator = null; // character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator
 	
+	private NavigateActions navigateActions; // Navigate actions.
+	private SSSyncManager syncManager; // SYNC DB NAV COMBO and NAVIGATION
 	private SSDataNavigator dataNavigator; // Data navigator.
-	private SSSyncManager syncManager; // SYNC DB NAV COMBO and NAVIGATOR
 	
 	private boolean requeryAfterInsertOrDelete = false; // for some databases like H2, you have to call .execute() on the rowset following insertion or deletion
 
@@ -355,11 +357,11 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 
 	/**
 	 * Create syncManager if it doesn't exist and sync cmbNavigator and
-	 * dataNavigator
+	 * navigate actions.
 	 */
 	private void activateSyncManager() {
 		if (getSyncManager() == null) {
-			setSyncManager(new SSSyncManager(getComboNav(), getDataNavigator()));
+			setSyncManager(new SSSyncManager(getComboNav(), getNavigateActions()));
 			getSyncManager().setSyncColumnName(getPkColumn());
 		}
 
@@ -392,7 +394,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			// UPDATE PRESENT ROW WHEN SCREEN LOOSES FOCUS
 			@Override
 			public void internalFrameDeactivated(final InternalFrameEvent ife) {
-				getDataNavigator().updatePresentRow();
+				getNavigateActions().updatePresentRow();
 			}
 		});
 
@@ -417,7 +419,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	protected abstract void bindComponents() throws Exception;
 
 	/**
-	 * Deactivate sync between cmbNavigator and dataNavigator.
+	 * Deactivate sync between cmbNavigator and navigate actions.
 	 */
 	private void deactivateSyncManager() {
 		if (getSyncManager() != null) {
@@ -469,7 +471,16 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * @return the dataNavigator
 	 */
 	protected SSDataNavigator getDataNavigator() {
+		if (dataNavigator == null)
+			dataNavigator = new SSDataNavigator(getRowset());
 		return dataNavigator;
+	}
+
+	/**
+	 * @return the navigateActions
+	 */
+	protected NavigateActions getNavigateActions() {
+		return navigateActions;
 	}
 	
 	/**
@@ -522,11 +533,11 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	}
 
 	/**
-	 * Initialize dataNavigator
+	 * Initialize navigateActions
 	 */
-	private void initDataNavigator() {
-		setDataNavigator(new SSDataNavigator(getRowset()));
-		getDataNavigator().setDBNav(new FormHelperSSDBNavImpl(this));
+	private void initNavigatorActions() {
+		updateNavigateActions();
+		getNavigateActions().setDBNav(new FormHelperSSDBNavImpl(this));
 	}
 
 	/**
@@ -551,8 +562,8 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			// SET ROWSET QUERY
 			initRowset();
 
-			// INITIALIZE DATA NAVIGATOR
-			initDataNavigator();
+			// INITIALIZE NAVIGATION ACTIONS
+			initNavigatorActions();
 			
 			// INITIALIZE COMBO NAVIGATOR
 			initComboNav();
@@ -658,10 +669,10 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	}
 
 	/**
-	 * @param _dataNavigator the data navigator to use for this screen/form
+	 * @param _navigateActions the navigate actions to use for this screen/form
 	 */
-	private void setDataNavigator(final SSDataNavigator _dataNavigator) {
-		dataNavigator = _dataNavigator;
+	private void setNavigateActions(NavigateActions _navigateActions) {
+		navigateActions = _navigateActions;
 	}
 	
 	/**
@@ -785,10 +796,10 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	}
 
 	/**
-	 * Update data navigator with latest rowset
+	 * Update navigate actions with latest rowset
 	 */
-	private void updateDataNavigator() {
-		getDataNavigator().setRowSet(getRowset());
+	private void updateNavigateActions() {
+		setNavigateActions(NavigateActions.get(getRowset()));
 	}
 
 	/**
@@ -809,7 +820,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			updateRowset();
 
 			// SET NEW ROWSET FOR NAVIGATOR.
-			updateDataNavigator();
+			updateNavigateActions();
 			
 			// UPDATE THE COMBO NAVIGATOR
 			updateComboNav();

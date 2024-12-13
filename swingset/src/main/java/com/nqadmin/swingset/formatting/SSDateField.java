@@ -112,11 +112,10 @@ public class SSDateField extends DateTimeField {
 			formatMask = "##/##/####";
 			editPattern = "MMddyyyy";
 		}
-		//// TODO: DateTime needs to know the format to distinguish DDMM from MMDD
-		//case DATE_DDMMYYYY_SLASH -> {
-		//	formatMask = "##/##/####";
-		//	editPattern = "ddMMyyyy";
-		//}
+		case DATE_DDMMYYYY_SLASH -> {
+			formatMask = "##/##/####";
+			editPattern = "ddMMyyyy";
+		}
 		case DATE_YYYYMMDD_STROKE -> {
 			formatMask = "####-##-##";
 			editPattern = "yyyyMMdd";

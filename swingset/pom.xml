@@ -398,6 +398,13 @@
 						<configuration>
 							<release>${version.java}</release>
 							<failOnError>false</failOnError>
+							<additionalOptions>-html5</additionalOptions>
+							<doclint>all,-missing,-html</doclint>
+<!--
+							<links>
+								<link>https://javadoc.io/static/com.glazedlists/glazedlists/${version.glazedlists}</link>
+							</links>
+-->
 						</configuration>
 						<executions>
 							<execution>

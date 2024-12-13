@@ -179,7 +179,7 @@ public class TestFormattedComponents extends JFrame {
 			 * H2 does not fully support updatable rowset so it must be
 			 * re-queried following insert and delete with rowset.execute()
 			 */
-			navigator.setDBNav(new SSDBNavImpl(this) {
+			navigator.getNavigateActions().setDBNav(new SSDBNavImpl(this) {
 				/**
 				 * Re-enable DB Navigator following insertion Cancel
 				 */
@@ -268,7 +268,7 @@ public class TestFormattedComponents extends JFrame {
 			// YOU HAVE TO CALL THE .async() METHOD
 			//
 			// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
-				syncManager = new SSSyncManager(cmbSSDBComboNav, navigator);
+				syncManager = new SSSyncManager(cmbSSDBComboNav, navigator.getNavigateActions());
 				syncManager.setSyncColumnName("swingset_formatted_test_pk");
 				syncManager.sync();
 

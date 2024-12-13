@@ -42,13 +42,13 @@ import static com.nqadmin.swingset.navigate.NavAction.*;
  *
  * @author err
  */
-public class TestingNavigate
+public class NavigateHook
 {
 	private final NavigateActions navActs;
 	private final ActionMap actionMap;
 
 	//public Navigate(NavigateActions navActs)
-	public TestingNavigate(RowSet rs)
+	public NavigateHook(RowSet rs)
 	{
 		this.navActs = NavigateActions.get(rs);
 		actionMap = navActs.createActionMap();

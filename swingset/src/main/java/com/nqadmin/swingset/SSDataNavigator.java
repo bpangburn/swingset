@@ -56,7 +56,6 @@ import javax.swing.event.ChangeEvent;
 
 import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.RowNumberSpinner;
-import com.nqadmin.swingset.navigate.RowSetState;
 
 import static com.nqadmin.swingset.navigate.NavAction.*;
 
@@ -122,7 +121,9 @@ public class SSDataNavigator extends JPanel
 		buttonSize = new Dimension(40, 20);
 
 		RowNumberSpinner.removeTinyArrows(rowNumberSpinner, rowSpinnerSize);
-		RowNumberSpinner.inWindowUpDownKeys(rowNumberSpinner);
+
+		rowNumberSpinner.setWindowUpDownKeysEnable(true);
+
 		rowNumberSpinner.addChangeListener((ChangeEvent e) -> {
 			updateLblRowCount();
 		});
@@ -151,7 +152,7 @@ public class SSDataNavigator extends JPanel
 		// Could allow null, use dummy with all buttons disabled
 		Objects.requireNonNull(rowSet);
 
-		RowSet oldValue = navActs.getRowSet();
+		RowSet oldValue = getRowSet();
 		installRowSet(rowSet);
 		firePropertyChange("rowSet", oldValue, rowSet);
 	}
@@ -214,6 +215,16 @@ public class SSDataNavigator extends JPanel
 		add(deleteButton);
 		add(lblRowCount);
 		// pack();
+	}
+
+	/**
+	 * Use the up/down arrow keys while this spinner's window is focused
+	 * to adjust row number.
+	 * 
+	 * @param enable true enables up/down keys when window has focus
+	 */
+	public void setWindowUpDownKeysEnable(boolean enable) {
+		rowNumberSpinner.setWindowUpDownKeysEnable(enable);
 	}
 
 	/**
@@ -291,11 +302,21 @@ public class SSDataNavigator extends JPanel
 	}
 
 	/**
+	 * Get the NavigateActions used by this GUI element.
+	 * @return associated NavigateActions
+	 */
+	public NavigateActions getNavigateActions() {
+		return navActs;
+	}
+
+	/**
 	 * Indicates if the navigator will skip the execute function call on the
 	 * underlying RowSet (needed for MySQL - see FAQ).
 	 *
 	 * @return value of execute() indicator
+	 * @deprecated use {@linkplain NavigateActions#getCallExecute()  }
 	 */
+	@Deprecated
 	public boolean getCallExecute() {
 		return navActs.getCallExecute();
 	}
@@ -305,7 +326,9 @@ public class SSDataNavigator extends JPanel
 	 *
 	 * @return returns true if a confirmation dialog is displayed when the user
 	 *         deletes a record, else false.
+	 * @deprecated use {@linkplain NavigateActions#getConfirmDeletes() }
 	 */
+	@Deprecated
 	public boolean getConfirmDeletes() {
 		return navActs.getConfirmDeletes();
 	}
@@ -315,7 +338,9 @@ public class SSDataNavigator extends JPanel
 	 * when the insert button is pressed to perform custom actions.
 	 *
 	 * @return any custom implementation of the SSDBNav interface
+	 * @deprecated use {@linkplain NavigateActions#getDBNav() }
 	 */
+	@Deprecated
 	public SSDBNav getDBNav() {
 		return navActs.getDBNav();
 	}
@@ -324,7 +349,9 @@ public class SSDataNavigator extends JPanel
 	 * Returns true if deletions are allowed, else false.
 	 *
 	 * @return returns true if deletions are allowed, else false.
+	 * @deprecated use {@linkplain NavigateActions#getDeletion()   }
 	 */
+	@Deprecated
 	public boolean getDeletion() {
 		return navActs.getDeletion();
 	}
@@ -333,7 +360,9 @@ public class SSDataNavigator extends JPanel
 	 * Returns true if insertions are allowed, else false.
 	 *
 	 * @return returns true if insertions are allowed, else false.
+	 * @deprecated use {@linkplain NavigateActions#getInsertion()   }
 	 */
+	@Deprecated
 	public boolean getInsertion() {
 		return navActs.getInsertion();
 	}
@@ -343,14 +372,18 @@ public class SSDataNavigator extends JPanel
 	 *
 	 * @return returns true if the user modifications are written back to the
 	 *         database, else false.
+	 * @deprecated use {@linkplain NavigateActions#getModification()   }
 	 */
+	@Deprecated
 	public boolean getModification() {
 		return navActs.getModification();
 	}
 
 	/**
 	 * @return the navCombo
+	 * @deprecated use {@linkplain NavigateActions#getNavCombo() 
 	 */
+	@Deprecated
 	public SSDBComboBox getNavCombo() {
 		return navActs.getNavCombo();
 	}
@@ -361,7 +394,7 @@ public class SSDataNavigator extends JPanel
 	 * @return returns the RowSet being used.
 	 */
 	public RowSet getRowSet() {
-		return navActs.getRowSet();
+		return navActs != null ? navActs.getRowSet() : null;
 	}
 	
 	/**
@@ -381,10 +414,24 @@ public class SSDataNavigator extends JPanel
 	}
 
 	/**
-	 * @return boolean indicating if the navigator is on an insert row
+	 * Returns true if the RowSet contains one or more rows, else false.
+	 *
+	 * @return return true if RowSet contains data else false.
+	 * @deprecated use {@linkplain NavigateActions#containsRows() }
 	 */
+	@Deprecated
+	public boolean containsRows()
+	{
+		return navActs.containsRows();
+	}
+
+	/**
+	 * @return boolean indicating if the navigator is on an insert row
+	 * @deprecated use {@linkplain NavigateActions#isOnInsertRow()   }
+	 */
+	@Deprecated
 	public boolean isOnInsertRow() {
-		return RowSetState.isInserting(navActs.getRowSet());
+		return navActs.isOnInsertRow();
 	}
 
 	/**
@@ -438,7 +485,9 @@ public class SSDataNavigator extends JPanel
 	 * underlying RowSet. This is necessary for MySQL (see FAQ).
 	 *
 	 * @param _callExecute false if using MySQL database - otherwise true
+	 * @deprecated use {@linkplain NavigateActions#setCallExecute(boolean)  }
 	 */
+	@Deprecated
 	public void setCallExecute(final boolean _callExecute) {
 		navActs.setCallExecute(_callExecute);
 	}
@@ -449,7 +498,9 @@ public class SSDataNavigator extends JPanel
 	 * value is true.
 	 *
 	 * @param _confirmDeletes indicates whether or not to confirm deletions
+	 * @deprecated use {@linkplain NavigateActions#setConfirmDeletes(boolean)   }
 	 */
+	@Deprecated
 	public void setConfirmDeletes(final boolean _confirmDeletes) {
 		navActs.setConfirmDeletes(_confirmDeletes);
 	}
@@ -460,7 +511,9 @@ public class SSDataNavigator extends JPanel
 	 * the insert button is pressed
 	 *
 	 * @param _dBNav implementation of the SSDBNav interface
+	 * @deprecated use {@linkplain NavigateActions#setDBNav(com.nqadmin.swingset.SSDBNav)}
 	 */
+	@Deprecated
 	public void setDBNav(final SSDBNav _dBNav) {
 		navActs.setDBNav(_dBNav);
 	}
@@ -470,7 +523,9 @@ public class SSDataNavigator extends JPanel
 	 * row deletions are not allowed. True by default.
 	 *
 	 * @param _deletion indicates whether or not to allow deletions
+	 * @deprecated use {@linkplain NavigateActions#setDeletion(boolean)}
 	 */
+	@Deprecated
 	public void setDeletion(final boolean _deletion) {
 		navActs.setDeletion(_deletion);
 	}
@@ -504,7 +559,9 @@ public class SSDataNavigator extends JPanel
 	 * row insertions are not allowed. True by default.
 	 *
 	 * @param _insertion indicates whether or not to allow insertions
+	 * @deprecated use {@linkplain NavigateActions#setInsertion(boolean) }
 	 */
+	@Deprecated
 	public void setInsertion(final boolean _insertion) {
 		navActs.setInsertion(_insertion);
 	}
@@ -516,14 +573,18 @@ public class SSDataNavigator extends JPanel
 	 *
 	 * @param _modification indicates whether or not the modification-related
 	 *                      buttons are enabled.
+	 * @deprecated use {@linkplain NavigateActions#setModification(boolean) }
 	 */
+	@Deprecated
 	public void setModification(final boolean _modification) {
 		navActs.setModification(_modification);
 	}
 
 	/**
 	 * @param _navCombo the navCombo to set
+	 * @deprecated use {@linkplain NavigateActions#setNavCombo(com.nqadmin.swingset.SSDBComboBox) }
 	 */
+	@Deprecated
 	public void setNavCombo(final SSDBComboBox _navCombo) {
 		navActs.setNavCombo(_navCombo);
 	}
@@ -538,7 +599,9 @@ public class SSDataNavigator extends JPanel
 	 * //		any navigation takes place, but can also be called manually.
 	 *
 	 * @return returns true if update succeeds else false.
+	 * @deprecated use {@linkplain NavigateActions#updatePresentRow() }
 	 */
+	@Deprecated
 	public boolean updatePresentRow() {
 		return navActs.updatePresentRow();
 	}

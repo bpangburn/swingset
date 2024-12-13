@@ -159,6 +159,9 @@ public class DateTime
 					.put(SSFormat.DATE_MMDDYYYY_SLASH,
 							List.of(DateTimeFormatter.ofPattern("M/d/uuuu"),
 									DateTimeFormatter.ofPattern("MMdduuuu")))
+					.put(SSFormat.DATE_DDMMYYYY_SLASH,
+							List.of(DateTimeFormatter.ofPattern("d/M/uuuu"),
+									DateTimeFormatter.ofPattern("ddMMuuuu")))
 					.put(SSFormat.TIME_HHMMSS,
 							List.of(DateTimeFormatter.ISO_LOCAL_TIME,
 									DateTimeFormatter.ofPattern("HHmmss")))

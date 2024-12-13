@@ -138,7 +138,7 @@ public class Example3 extends JFrame {
 		 * H2 does not fully support updatable rowset so it must be
 		 * re-queried following insert and delete with rowset.execute()
 		 */
-		navigator.setDBNav(new SSDBNavImpl(this) {
+		navigator.getNavigateActions().setDBNav(new SSDBNavImpl(this) {
 			/**
 			 * unique serial id
 			 */
