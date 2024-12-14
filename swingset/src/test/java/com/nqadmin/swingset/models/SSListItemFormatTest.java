@@ -260,11 +260,11 @@ public class SSListItemFormatTest {
 		String previousPat;
 
 		previousPat = ((SimpleDateFormat)fmt1.setFormat(JDBCType.DATE, null)).toPattern();
-		assertEquals(SSListItemFormat.dateDefault, previousPat);
+		assertEquals(SSListItemFormat.DATE_DEFAULT, previousPat);
 		previousPat = ((SimpleDateFormat)fmt1.setFormat(JDBCType.TIME, null)).toPattern();
-		assertEquals(SSListItemFormat.timeDefault, previousPat);
+		assertEquals(SSListItemFormat.TIME_DEFAULT, previousPat);
 		previousPat = ((SimpleDateFormat)fmt1.setFormat(JDBCType.TIMESTAMP, null)).toPattern();
-		assertEquals(SSListItemFormat.timestampDefault, previousPat);
+		assertEquals(SSListItemFormat.TIMESTAMP_DEFAULT, previousPat);
 	}
 
 	/**
@@ -281,13 +281,13 @@ public class SSListItemFormatTest {
 		Format currentFormat;
 
 		currentFormat = fmt1.getFormat(JDBCType.DATE);
-		assertEquals(new SimpleDateFormat(SSListItemFormat.dateDefault),
+		assertEquals(new SimpleDateFormat(SSListItemFormat.DATE_DEFAULT),
 					 currentFormat);
 		currentFormat = fmt1.getFormat(JDBCType.TIME);
-		assertEquals(new SimpleDateFormat(SSListItemFormat.timeDefault),
+		assertEquals(new SimpleDateFormat(SSListItemFormat.TIME_DEFAULT),
 					 currentFormat);
 		currentFormat = fmt1.getFormat(JDBCType.TIMESTAMP);
-		assertEquals(new SimpleDateFormat(SSListItemFormat.timestampDefault),
+		assertEquals(new SimpleDateFormat(SSListItemFormat.TIMESTAMP_DEFAULT),
 					 currentFormat);
 
 		// set some arbitrary strings and read them back
@@ -369,11 +369,11 @@ public class SSListItemFormatTest {
 		String previousPat;
 
 		previousPat = fmt1.setPattern(JDBCType.DATE, null);
-		assertEquals(SSListItemFormat.dateDefault, previousPat);
+		assertEquals(SSListItemFormat.DATE_DEFAULT, previousPat);
 		previousPat = fmt1.setPattern(JDBCType.TIME, null);
-		assertEquals(SSListItemFormat.timeDefault, previousPat);
+		assertEquals(SSListItemFormat.TIME_DEFAULT, previousPat);
 		previousPat = fmt1.setPattern(JDBCType.TIMESTAMP, null);
-		assertEquals(SSListItemFormat.timestampDefault, previousPat);
+		assertEquals(SSListItemFormat.TIMESTAMP_DEFAULT, previousPat);
 	}
 
 	/**
@@ -393,11 +393,11 @@ public class SSListItemFormatTest {
 		String currentPattern;
 
 		currentPattern = fmt1.getPattern(JDBCType.DATE);
-		assertEquals(SSListItemFormat.dateDefault, currentPattern);
+		assertEquals(SSListItemFormat.DATE_DEFAULT, currentPattern);
 		currentPattern = fmt1.getPattern(JDBCType.TIME);
-		assertEquals(SSListItemFormat.timeDefault, currentPattern);
+		assertEquals(SSListItemFormat.TIME_DEFAULT, currentPattern);
 		currentPattern = fmt1.getPattern(JDBCType.TIMESTAMP);
-		assertEquals(SSListItemFormat.timestampDefault, currentPattern);
+		assertEquals(SSListItemFormat.TIMESTAMP_DEFAULT, currentPattern);
 
 		// set some arbitrary strings and read them back
 		fmt1.setPattern(JDBCType.DATE, "yyyy");

@@ -37,8 +37,10 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
-import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
 
+import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 // SSDBNav.java
@@ -74,44 +76,7 @@ import com.nqadmin.swingset.utils.SSEnums.Navigation;
  * implementation of performPreInsertOps() that will clear/reset component
  * values when a new record is added.
  */
-public interface SSDBNav extends Serializable {
-
-	/**
-	 * Constant indicating the navigation button first.
-	 *
-	 * @deprecated Starting in 2.3.0+ use {@link Navigation#First} instead.
-	 */
-	@Deprecated
-	public static final int NAVIGATION_FIRST = 3;
-
-	/**
-	 * Constant indicating the navigation button last.
-	 *
-	 * @deprecated Starting in 2.3.0+ use {@link Navigation#Last} instead.
-	 */
-	@Deprecated
-	public static final int NAVIGATION_LAST = 4;
-
-	/**
-	 * Constant indicating the navigation button next.
-	 *
-	 * @deprecated Starting in 2.3.0+ use {@link Navigation#Next} instead.
-	 */
-	@Deprecated
-	public static final int NAVIGATION_NEXT = 1;
-
-	/**
-	 * Constant indicating the navigation button previous.
-	 *
-	 * @deprecated Starting in 2.3.0+ use {@link Navigation#Previous} instead.
-	 */
-	@Deprecated
-	public static final int NAVIGATION_PREVIOUS = 2;
-
-	/**
-	 * unique serial id
-	 */
-	static final long serialVersionUID = -4632504656498312457L;
+public interface SSDBNav {
 
 	/**
 	 * This function will be called after performPreDeletionOps is called but before
@@ -146,24 +111,6 @@ public interface SSDBNav extends Serializable {
 	 * the insert by clicking on the undo button.
 	 */
 	default void performCancelOps() {
-		// no action by default
-
-	}
-
-	/**
-	 * Method to perform navigation-related operations.
-	 * <p>
-	 * Possible values are NAVIGATION_NEXT, NAVIGATION_PREVIOUS, NAVIGATION_FIRST,
-	 * NAVIGATION_LAST.
-	 *
-	 * @param _navigationType this indicates the type of navigation.
-	 *
-	 * @deprecated Use
-	 *             {@link #performNavigationOps(com.nqadmin.swingset.utils.SSEnums.Navigation _navType)}
-	 *             instead.
-	 */
-	@Deprecated
-	default void performNavigationOps(final int _navigationType) {
 		// no action by default
 
 	}
@@ -232,6 +179,14 @@ public interface SSDBNav extends Serializable {
 	default void performRefreshOps() {
 		// no action by default
 
+	}
+
+	/**
+	 * Find all the SSComponents in the navigator window.
+	 * @return
+	 */
+	default List<SSComponentInterface> findSSComponents() {
+		return Collections.emptyList();
 	}
 
 } // end public interface SSDBNav {

@@ -45,10 +45,12 @@ import java.sql.ResultSet;
 import javax.swing.JFrame;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import static java.lang.System.Logger.Level.*;
 
-import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDataGrid;
+import com.nqadmin.swingset.utils.SSUtils;
 import java.awt.BorderLayout;
 
 /**
@@ -63,7 +65,7 @@ public class Example5 extends JFrame {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(Example5.class);
+    private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id
@@ -90,6 +92,7 @@ public class Example5 extends JFrame {
 
 		// SET SCREEN TITLE
 			super("Example5");
+			DemoUtil.initExampleFrame(this, null);
 
 		// SET CONNECTION
 			connection = _dbConn;
@@ -112,9 +115,9 @@ public class Example5 extends JFrame {
 			rs.next();
 			return rs.getInt("nextVal");
 		} catch(final SQLException se) {
-			logger.error("SQL Exception occured initializing new record.",se);
+			logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
 		} catch(final Exception e) {
-			logger.error("Exception occured initializing new record.",e);
+			logger.log(Level.ERROR, "Exception occured initializing new record.",e);
 		}
 		return null;
 	}
@@ -127,7 +130,7 @@ public class Example5 extends JFrame {
 		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
 			try {
 			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-				rowset = new JdbcRowSetImpl(connection);
+				rowset = DemoUtil.getNewRowSet(connection);
 				rowset.setCommand("SELECT * FROM part_data ORDER BY part_name;");
 
 			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
@@ -155,7 +158,7 @@ public class Example5 extends JFrame {
 				);
 
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 			}
 
 		// MAKE THE JFRAME VISIBLE

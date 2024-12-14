@@ -1,0 +1,429 @@
+================================================================================
+============================= BUGS =============================================
+================================================================================
+
+---
+If at bottom of stack, then Redo to an error, swithes from canNavigate btns to
+only RevertChanges btn. There is a brief flash of the commit button on the way,
+minor issue to ignore for now.
+
+================================================================================
+============================= HMMMM ============================================
+================================================================================
+
+Add variable SORT_REMOVE_KEYS to SSDataGrid, an option eventually.
+
+---
+NavigateActions is tied to a rowset; and that object may be shared. Maybe better
+situation, have a thin object, e.g. Navigation, that references, and delegates
+to, a NavigateActions. Then Navigation is the model that is usually used, and it
+can fire events (or send a message over the bus) when its rowset changes. As is
+common, multiple components can use the same Navigation. NavigateActions is
+still there pretty much as is, but hidden inside a Navigation. An example of
+where this is wanted; an SSDataNavigator has a Navigation model, if the rowset
+in the Navigation changes, the SSDataNavigator detects this event and adjusts
+accordingly.
+
+---
+Should the methods in SSDataNavigator that delegate to getNavigatorActions()
+be deprecated? If NavigatorActions are considered a model, then there's
+some precedence to keep some of them for convenience.
+
+---
+re-indent swingset
+// vi:set ts=8 sw=4 sts=4 noet:
+
+---
+catch SQLFeatureNotSupportedException and do conversion manually? Option?
+Or run a program that checks what works and produces something that can be
+given to SS for configuration.
+
+---
+In Field's componentValidate "null&&nullOK" check.
+What can be done as default for SSComponent in general?
+
+---
+TextDecorator capable SSTextField.
+
+---
+NumberField
+    The use of Locale is inconsistent
+
+---
+Cleanup
+    more logging for null formatter switching
+    Error in not edit and display formatters
+    Clean up FormatterAssist, SSNumberFormatter, 
+
+---
+Fixup SSFormattedTextField to consider user's containsUserText.
+
+---
+There's
+    formatterAssist::getFormatLiterals - NOT USED
+    getDecimalFormatSymbols - for getLiterals?
+
+---
+Fixup SSFormattedTextField to consider user's containsUserText.
+Optimize contains user text.
+
+---
+stringToValue/valueToString
+    Look at the stringToValue/valueToString stuff in FormatterAssist. Get rid of it?
+    Examine MaskFormatter stringToValue. Add verifier check for getAllowNull()
+
+    DefaultFormatter::isValidEdit
+        InternationalFormatter::stringToValue(text)
+            NumberForatter::stringToValue(text, format)
+                parseObject thows, caught in isValidEdit
+    SSNumberFormatter::valueToString
+
+---
+utils/SSMsg - NOTE: RowSetOps CreateMessage(RSC)
+    Msg(text, (rsc) -> rsc.getBoundColumnText())
+    Msg(text, List.of((rsc) -> rsc.getBoundColumnText())) or "new []"?
+
+---
+Examine SSFormattedTextField::updateSSComponent
+
+---
+Use DateTime for MaskFormatter's converter.
+Use DateTimeFormatter instead of DateFormatter in Fields, consider
+relationship with DateTime.java.
+
+---
+Rename SSDataNavigator to SSNavigatorBar?
+Rename NavigateActions to Navigation?
+
+================================================================================
+=========================== CLEANUP ============================================
+================================================================================
+
+Get rid of the @author tags.
+
+---
+Navigator
+    - Consider that up/down arrows now optionally do next-row/prev-row. How
+      about, when AutoCommit is off, doing Shift-Ctrl-up/down (or whatever) does
+      commit then move. Then the convenience of autoCommit is still available.
+      And if people just started doing Shift-Ctrl-up all the time, then ...
+
+    - The visual arrows show left/right, but the keys are up/down. Are there any
+      button pngs around in the same style that display up/down? Maybe at some
+      point...
+
+---
+Examine ConvertType both to/from convert?
+
+---
+Rename convertObjectType to convertToType, or convertToJdbcType
+
+---
+Add verifier to JTextField.
+
+---
+Broader use of RSC
+Format field in RSC? For output format. (parse can be multiple)
+
+---
+setValidator in SSCommon, but not SSComponentInterface. Needed this in general?
+
+---
+Make getSSCommon final. Rename ssCommon to ssCommonUseGetSSCommon.
+
+---
+Get rid of all direct row set access; always go through RowSetOps.
+
+In SSCommon::undoRedoUpdateObject: getRowSet().updateObject(getBoundColumnIndex(), value);
+
+
+--- ?????
+Change to use SSFTF
+The DATE/TIMESTAMP in a JTextField has the problem of ignoring errors in format.
+Play with example3. Hit next on invalid value. 
+
+NOTE: There's an ignored exception thrown by
+Date/Time/Timestamp/getSQLDate.valueOf.
+
+---
+Is this about switching rowset? Might have to do with switching rowset in navigator.
+
+NavigateActions monitors a single RowSet. 1 - 1
+SSDataNavigator works on a given RowSet. can change the rowset
+
+Could have intermediate that can plug into SSDataNavigator actions don't change.
+Need to update Action/model state when Rowset changes.
+
+---
+UIManager.getLookAndFeel().provideErrorFeedback(JFormattedTextField.this);
+
+---
+Examine where conversions are used. And the conversion. Work this into 
+jdbc spec and behavior spec.
+
+---
+Add Calendar conversions? Skip it, go directly to java.time.
+
+---
+
+
+
+================================================================================
+=========================== OPTIONS ============================================
+================================================================================
+
+
+---
+Allow navigation away from error field. There can be several fields with red/yellow.
+Prevent navigation away from record with invalid field. SSFTF/SSTF consistent
+
+---
+Option to enable/disable verifier/focus-change. Globally, per window, per component.
+Window can have a lookup.
+
+================================================================================
+=========================== FEATURES ===========================================
+================================================================================
+
+Database update frequency, YELLOW STATE
+    Question about commitsOnValidEdit currently set to true (matches mask default I
+    think). So every keystroke causes database update. Without this wait for focus
+    change or return, but then the visible data is out out sync. Could have a
+    border, like yellow, that means the data looks ok so far, but hasn't been sent
+    to the database.
+
+    NOTE: every keystroke that's valid is a database write.
+    Safest, but might want to only write if loose focus,
+    or many seconds have gone by, or shutdown. Maybe an option.
+
+---
+
+TODO: Allow user to dynamically select input mask/format. Like Date style
+Field tooltip with format/...
+
+============================================================================
+============================ ARCHITECTURE ==================================
+============================================================================
+
+============== EVENTS
+
+Consider
+SSCheckBoxListener - does the decorator get called? Allthough either true/false
+is valid, there could be an interactions of components and this field
+should be marked?
+
+---
+Each SSComponent has getSSComponentListener. This listener, at lease for SSTF,
+may do postRowSetModifiedError. Explore...
+
+---
+postRowSetModified (not with Error) is only done from RowSetOps.
+
+---
+In NavigateActions.undoRedo after navActs.doUndoRedo() the database is
+updated directly, then issueRowChanged()
+    -->rowSetListener.rowChanged()-->invokeLater(updateSSComponent).
+So need to defer checking sscomponent valid and then
+posting modification messages.
+
+============== OPTIONS
+
+try to get rid of all the setters. cleanField/decorator/validator/...
+If all these items are Interfaces, then can use Lookup. Have a single
+method, e.g. addOp, that puts something into and/or replaces it in the
+Lookup. And get rid of the functions that can be overridden. After call
+to superclass, do addOp to replace it with "our".
+
+cleanField is currently method that's overridden. setValue(getAllowNull() ? null : 777)
+Could have map "Supplier<val>", look it up by class? Or maybe constructor
+    // maybe Function<SSComponent,Object> cleanFieldOp;
+    // maybe Runnable cleanFieldOp;
+    MyField(...) { // CONSTRUCTOR
+        ///// setCleanField((comp)->setValue(comp.getAllowNull() ? null : 777));
+        setCleanField(()->getAllowNull() ? null : 777); // or "... this.getAllowNull() ? ..."
+        // used like setValue(cleanFieldOp.get())
+    }
+    protected Supplier<?> cleanFieldOp;
+    private setCleanField(Supplier<?> cleanFieldOp) {
+        // Overwrites setting by superclasses.
+        this.cleanFieldOp = cleanFieldOp;
+    }
+    final public void cleanField() { // want final in SSComponent, but can't do it
+        if (xxx = Lookup(CleanField.class))
+            xxx.run();
+        //else if (cleanFieldOp)
+        //    cleanFieldOp.run();
+    }
+Maybe in SSCommon only, final cleanField(lookup...).
+
+Or just keep cleanField as is.
+
+Might want to specify cleanFieldOp per component, kind of like the way decorator specified.
+Or have Interface CleanFieldOp, add it to components lookup. First check lookup, then 
+SS-5 commit with some 4.1 applicable fixes
+
+
+============== ANNOTATIONS
+
+Have an annotation, e.g. @SSCompMethod NewM() {...}, used on something in SSCommon, and that
+automagically becomes "default NewM() { getSSCommon.NewM(); }" really want these things
+to be "final" in SSComponent.
+
+============== EVENTBUS
+
+EventBus replacement
+    rxjava as event bus the right way
+    https://kau.sh/blog/implementing-an-event-bus-with-rxjava-rxbus/
+    https://medium.com/dionysis-lorentzos-blog/rxjava-as-event-bus-the-right-way-10a36bdd49ba
+    https://metova.com/how-to-use-rxjava-as-an-event-bus/
+    https://medium.com/android-news/super-simple-event-bus-with-rxjava-and-kotlin-f1f969b21003
+
+============== CONVERT
+
+Allow character conversions to whatever.
+
+https://stackoverflow.com/questions/29773390/getting-the-date-from-a-resultset-for-use-with-java-time-classes
+
+Today most of us are using JDBC 4.2 compliant drivers, which improves the
+situation quite a bit compared to the answers from 2015.
+
+To get a LocalDate from your result set:
+
+LocalDate dateFromDatabase = yourResultSet.getObject(yourColumnIndex, LocalDate.class);
+
+or
+
+LocalDate dateFromDatabase = yourResultSet.getObject("yourColumnLabel", LocalDate.class);
+
+No new method has been added to ResultSet for this to work. The getObject method
+was there all the time. The new thing is that since JDBC 4.2 it accepts
+LocalDate.class as the second argument and returns a LocalDate. The above works
+when the query returns a column with SQL datatype date (really the JDBC type
+counts, but they tend to agree).
+
+You can pass classes of other java.time types too. And get the corresponding type back. For example:
+
+OffsetDateTime dateTimeFromDatabase
+        = yourResultSet.getObject(yourTimestampWithTimeZoneColumnIndex, OffsetDateTime.class);
+
+The java.time types to use are:
+
+SQL datatype            | java.time type
+------------------------+-----------------------------------------------------------
+date                    | LocalDate
+time                    | LocalTime
+timestamp               | LocalDateTime
+timestamp with timezone | Officially OffsetDateTime; many drivers accept Instant too
+time with timezone      | OffsetTime
+
+For passing the other way, from Java to your database (for use as query
+parameters or for storing) PreparedStatement.setObject now accepts objects of
+the above java.time types too. Since you are passing an object of a type, there
+is no need for a separate type parameter when going this way.
+
+============= DATETIME and/or _WITH_TIMEZONE
+
+Some of the conversions in convertType, while understandable, maybe shouldn't be there
+https://stackoverflow.com/questions/29773390/getting-the-date-from-a-resultset-for-use-with-java-time-classes
+For example converting date to timestamp uses zero for time. Not precise.
+
+Can probably just get rid of the Date, since JDBC has interop
+
+Date <--> LocalDate
+=============
+    https://stackoverflow.com/questions/33066904/localdate-to-java-util-date-and-vice-versa-simplest-conversion
+
+java.util.Date.from(    // Convert from modern java.time class to troublesome old
+                        // legacy class.  DO NOT DO THIS unless you must, to inter
+                        // operate with old code not yet updated for java.time.
+    myLocalDate         // `LocalDate` class represents a date-only, without
+                        // time-of-day and without time zone nor offset-from-UTC. 
+    .atStartOfDay(      // Let java.time determine the first moment of the day on
+                        // that date in that zone. Never assume the day starts at 00:00:00.
+        ZoneId.of( "America/Montreal" ) // Specify time zone using proper name in
+                                        //`continent/region` format, never 3-4
+                                        // letter pseudo-zones such as “PST”, “CST”, “IST”. )                   // Produce a `ZonedDateTime` object. 
+    .toInstant()        // Extract an `Instant` object, a moment always in UTC.
+)
+
+
+Retrieve LocalDate from result set
+    https://stackoverflow.com/questions/51632735/jdbc-result-set-retrieve-localdatetime
+
+Database support for timstamp with timezone/offset
+    https://github.com/hibernate/hibernate-orm/discussions/4201
+        Oracle/H2 supports them
+        Postgress supports by converting to UTC
+
+Hibernate 6 has incubating support. It has a split into two columns option.
+"When configuring TimeZoneStorageType.COLUMN, Hibernate stores the timestamp
+without timezone information and the timezone’s offset to UTC in separate
+database columns."
+    https://thorben-janssen.com/hibernate-6-offsetdatetime-and-zoneddatetime/
+
+=============KEYS
+
+Multi column keys
+
+================================================================================
+=========================== DID ================================================
+================================================================================
+
+!!! customInit called from constructor because of ssCommon = new SSCommon(this);
+Implement getSSCommon() creates a "constructingSSCommon" and saved from constructor,
+like SSTextField.
+TEST: public SSFormattedTextField(final Format _format) {
+
+---
+Added getSSCommon().decorate() at both exits from "value" prop change listener,
+this made the Number stuff work easily.
+ComponentValidate is called a lot
+Would like to simplify when it's called.
+
+---
+Problem entering decimal point
+Throw ParseException if not full string.
+    if AllowInvalid == true, then in SSNumberFormatter::stringToValue require parse full string.
+
+    WEIRD: in integer field, there's a bunch of numbers shown, with cursor in the
+    middle, enter '.' and all the after the '.' are gone. Would think that '.' is
+    invalid. Can't really have a decimal point in an integer.
+
+Fixed by SSNumberFormatter::stringToValue throwing ParseException if null and not allow null.
+    SSCurrencyField
+        selectall, backspace, goes red. Do refresh/reload current record, stays red.
+        Focus change doesn't fix it. Make it green, e.g. enter 0. Then refresh/reload DTRT.
+
+    Currency field.
+        Select all, enter 'x', ESC, back to full number.
+        Select all, enter space, ESC, stays at space.
+        Select all, enter space, enter 'x', ESC, back to space.
+---
+Surprisingly, found what I think is an ancient bug in SSCurrencyField. With the
+input "1,555,666,777,888,999,234,567.123", this stuffed Double into the database;
+should be java BigDecimal. Simple fix.
+
+---
+Add a New Record - BUG: needs to clear undo/redo record.
+    Probably just do "freshRow()" in NavigateActions::NavAddAction().
+Basically, but a little messy requriring nested invokeLater
+---
+Add checkDriverConvertToType() to CnvertType? Not exactly "Driver".
+Part of some DB config? (autogenerated by checkDB script/test)
+
+    assertConvertToType/checkConvertToType.
+
+---
+During undo/redo, ex1. Going to an error state leaves commit on.
+Undo/redo may need to do postRowSetModified*
+
+NOTE: undo/redo SSCommon.actionPerformed catches/logs SQLException,
+      no other handling of error.
+
+    In NavigateActions.undoRedo after navActs.doUndoRedo() the database is
+    updated directly, then issueRowChanged()
+        -->rowSetListener.rowChanged()-->invokeLater(updateSSComponent).
+    So need to defer checking sscomponent valid and then
+    posting modification messages.
+
+Fixed with postRowSetUndoRedo().

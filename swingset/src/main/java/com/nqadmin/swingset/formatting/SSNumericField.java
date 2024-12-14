@@ -35,44 +35,45 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
-import javax.swing.SwingConstants;
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.Objects;
 
-// SSNumericField.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+import javax.swing.text.DefaultFormatterFactory;
+
+import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
 
 /**
  * Used to link a SSFormattedTextField to a numeric column in a database.
  */
 
-public class SSNumericField extends SSFormattedTextField {
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -5922010378310406148L;
-	private int decimals = 2;
-	private int precision = 3;
-
+@SuppressWarnings("serial")
+public class SSNumericField extends NumberField
+{
 	/**
 	 * Creates a new instance of SSNumericField
 	 */
 	public SSNumericField() {
-		this(new SSNumericFormatterFactory());
+		this(createFormatterFactory(CUSTOM, null, null));
 	}
 
 	/**
 	 * Creates an instance of SSNumericField with the specified number of integer and
 	 * fraction digits
 	 *
-	 * @param _precision - number of digits needed for integer part of the number
-	 * @param _decimals  - number of digits needed for the fraction part of the
+	 * @param precision - number of digits needed for integer part of the number
+	 * @param decimals  - number of digits needed for the fraction part of the
 	 *                   number
 	 */
-	public SSNumericField(final int _precision, final int _decimals) {
-		this(new SSNumericFormatterFactory(_precision, _decimals));
+	public SSNumericField(final int precision, final int decimals) {
+		this(createFormatterFactory(CUSTOM, precision, decimals));
 	}
 
 	/**
@@ -80,48 +81,34 @@ public class SSNumericField extends SSFormattedTextField {
 	 *
 	 * @param factory - formatter factory to be used
 	 */
-	public SSNumericField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+	public SSNumericField(AbstractFormatterFactory factory) {
 		super(factory);
-		setHorizontalAlignment(SwingConstants.RIGHT);
 	}
 
 	/**
-	 * Returns the number of digits used for fraction part of the number
-	 *
-	 * @return returns the number of digits used for fraction part of the number
+	 * Create a FormatterFactory.
+	 * @param ssFormat
+	 * @param precision - number of digits needed for integer part of the number
+	 * @param decimals - number of digits needed for fraction part of the number
+	 * @return FormatterFactory.
 	 */
-	public int getDecimals() {
-		return decimals;
-	}
+	public static DefaultFormatterFactory createFormatterFactory(
+			SSFormat ssFormat, Integer precision, Integer decimals)
+	{
+		Objects.requireNonNull(ssFormat);
 
-	/**
-	 * Returns the number digits used for integer part of the number
-	 *
-	 * @return returns the number digits used for integer part of the number
-	 */
-	public int getPrecision() {
-		return precision;
-	}
+		NumberFormat numericFormat = createNumberFormat(()->NumberFormat.getInstance(Locale.US));
 
-	/**
-	 * Sets the number of digits needed for fraction part of the number
-	 *
-	 * @param _decimals - number of digits needed for fraction part of the number
-	 */
-	public void setDecimals(final int _decimals) {
-		decimals = _decimals;
-		setFormatterFactory(new SSNumericFormatterFactory(precision, _decimals));
-	}
+		initPrecision(precision, numericFormat);
+		initDecimals(decimals, numericFormat);
+		
+		// Use the same format for edit and display.
 
-	/**
-	 * Sets the number of digits needed for integer part of the number
-	 *
-	 * @param _precision - number of digits needed for integer part of the number
-	 */
-	public void setPrecision(final int _precision) {
-		precision = _precision;
-		setFormatterFactory(new SSNumericFormatterFactory(_precision, decimals));
+		return new SSFormatterFactory.Builder<>()
+				.ssFormat(ssFormat)
+				.displayFormatter(new SSNumberFormatter(numericFormat))
+				.editFormatter(new SSNumberFormatter(numericFormat))
+				.build();
 	}
-
 }
 

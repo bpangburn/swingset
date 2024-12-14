@@ -91,11 +91,12 @@ Git/Maven:
 
   After cloning, you can use an IDE, e.g. Eclipse or NetBeans, to compile/run.
   Or you can use mvn directly and then run as shown here. Note that compiled
-  jar files will be in the ./target subdirectory.
+  jar files will be in the ./target subdirectory. The library must be installed
+  into the maven repository; the demo build looks there.
   
   SwingSet Library:
     `cd ./swingset/swingset/`
-    `mvn clean package -Prelease`
+    `mvn clean install
     
   SwingSet Demo:
     `cd ./swingset/swingset-demo/`

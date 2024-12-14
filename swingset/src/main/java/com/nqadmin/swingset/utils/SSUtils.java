@@ -35,15 +35,35 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Toolkit;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.StackLocatorUtil;
+import java.lang.StackWalker.Option;
+
+import java.lang.System.Logger;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.sql.RowSet;
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.JoinRowSet;
+
+import com.nqadmin.swingset.datasources.SSDBSupport;
+
 
 /**
  *
@@ -63,37 +83,150 @@ public class SSUtils {
 	 * @return the Logger
 	 */
 	public static Logger getLogger() {
-		// NOTE: this can be re-implemented by examining
-		// new Throwable().getStackTrace();
-		Logger logger;
-		try {
-			return LogManager.getLogger(StackLocatorUtil.getCallerClass(2));
-		} catch(UnsupportedOperationException ex) {}
-		logger = LogManager.getRootLogger();
-		// Note: can check for root logger with
-		// logger.getName().isEmpty()
-		logger.error("Using RootLogger", new Throwable());
-		return logger;
+		Class<?> cc = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE)
+				.getCallerClass();
+		return getLogger(cc.getName());
 	}
 
 	/**
-	 * Returns an unmodifiable list containing an arbitrary number of elements.
-	 * This is not particularly efficient for small lists, but until java-9...
-	 * @param <T> type of elements in the list
-	 * @param args the elements of the list
-	 * @return list
+	 * Return a logger for the name.
+	 * @param loggerName name
+	 * @return logger
 	 */
-	@SafeVarargs
-	public static <T> List<T> listOf(T... args) {
-		Object[] arr = Arrays.copyOf(args, args.length);
-		@SuppressWarnings("unchecked")
-		List<T> list = (List<T>) Collections.unmodifiableList(Arrays.asList(arr));
-		return list;
+	public static Logger getLogger(String loggerName) {
+		return System.getLogger(loggerName);
 	}
+
+	/**
+	 * Shorthand for "String.format(fmt, args)".
+	 * @param fmt format
+	 * @param args args
+	 * @return string
+	 */
+	public static String sf(String fmt, Object... args) {
+		return args.length == 0 ? fmt : String.format(fmt, args);
+	}
+
+
+	/**
+	 * Find all SSComponents in the specified container.
+	 * @param _container
+	 * @return List of SScomponents
+	 */
+	public static List<SSComponentInterface> findSSComponents(Container _container)
+	{
+		ArrayList<SSComponentInterface> l = new ArrayList<>();
+		findSSComponents(_container, l);
+		return l;
+	}
+	private static void findSSComponents(Container _container, List<SSComponentInterface> l)
+	{
+		//
+		// TODO: Need a special case for getViewport() or anything else ???????
+		//
+		for (Component comp : _container.getComponents()) {
+			switch (comp) {
+			case SSComponentInterface c -> l.add(c);
+			case Container c -> findSSComponents(c, l);
+			default -> { }
+			}
+		}
+	}
+
+	/**
+	 * Notify the user of something...
+	 */
+	// TODO: add option to flash window/panel...
+	public static void beep()
+	{
+		Toolkit.getDefaultToolkit().beep();
+
+		// TODO:
+		// UIManager.getLookAndFeel().provideErrorFeedback(JFormattedTextField.this);
+	}
+
+	/**
+	 * Setup a {@linkplain CachedRowSet}'s primary keys, use the component's
+	 * row set to get the database table's keys.
+	 * If not a CachedRowSet or the key is already set, do nothing.
+	 * Note a JoinRowSet is skipped; only want to set keys for single table.
+	 * @param comp component
+	 */
+	// TODO: Could have an array of primary keys, one entry per column.
+	//		 Could this be needed for joins?
+	public static void setupDefaultPrimaryKeys(SSComponentInterface comp)
+	{
+		RowSet rs = comp.getRowSet();
+		if (rs instanceof JoinRowSet)
+			return;
+		if (!(rs instanceof CachedRowSet crs))
+			return;
+		try {
+			if (crs.getKeyColumns() != null)
+				return;
+			String tableName = crs.getMetaData().getTableName(comp.getBoundColumnIndex());
+			Set<Integer> key = getPrimaryKeyColumnsForTable(
+					SSDBSupport.getDefault().getTemporaryConnection(crs), tableName);
+			crs.setKeyColumns(key.stream().mapToInt(i -> i).toArray());
+		} catch (SQLException ex) {
+		}
+	}
+
+	//public static Set<Integer> getPrimaryKeyColumnsForTable(RowSet rs, int columnIndex)
+	//		throws SQLException
+	//{
+	//	String tableName = rs.getMetaData().getTableName(2);
+	//	DataSource ds = null;
+	//	try {
+	//		ds = InitialContext.doLookup(rs.getDataSourceName());
+	//	} catch (NamingException ex) {
+	//		ex.printStackTrace();
+	//	}
+	//	if(ds == null)
+	//		return Collections.emptySet();
+	//	try (Connection conn = ds.getConnection()) {
+	//		return SSUtils.getPrimaryKeyColumnsForTable(conn, tableName);
+	//	}
+	//}
+
+	// https://stackoverflow.com/questions/21328371/get-primary-key-column-from-resultset-java
+
+	/**
+	 *
+	 * @param connection
+	 * @param tableName
+	 * @return
+	 * @throws SQLException
+	 */
+
+	public static Set<Integer> getPrimaryKeyColumnsForTable(Connection connection, String tableName) throws SQLException
+	{
+		try(ResultSet pkColumns= connection.getMetaData().getPrimaryKeys(null,null,tableName);) {
+			SortedSet<Integer> pkColumnSet = new TreeSet<>();
+			while(pkColumns.next()) {
+				Integer pkPosition = pkColumns.getInt("KEY_SEQ");
+				//String pkColumnName = pkColumns.getString("COLUMN_NAME");
+				//System.out.println(""+pkColumnName+" is the "+pkPosition+". column of the primary key of the table "+tableName);
+				pkColumnSet.add(pkPosition);
+			}
+			return pkColumnSet;
+		}
+	}
+
 	////////////////////////////////////////////////////////////////////////////
 	//
 	// Debug Support
 	//
+
+	/**
+	 * This is for toString() of an SSComponent, rather than the JComponents string.
+	 * @param comp string for this
+	 * @return string from component
+	 */
+	public static String ssComponentToString(SSComponentInterface comp)
+	{
+		return sf("%s, column=%s", objectID(comp.getRowSet()), comp.getBoundColumnName());
+	}
 
 	/**
 	 * Return a unique name for an Object, for example "String@89AB".
@@ -107,16 +240,7 @@ public class SSUtils {
 		if (o == null) {
 			return "null";
 		}
-		return String.format("%s@%X", o.getClass().getSimpleName(), System.identityHashCode(o));
+		return sf("%s@%X", o.getClass().getSimpleName(), System.identityHashCode(o));
 	}
-
-	////////////////////////////////////////////////////////////////////////////
-	//
-	// EventBus
-	//
-	//     posting Events
-	//     finding a bus
-	//
-	// TODO:
 
 }

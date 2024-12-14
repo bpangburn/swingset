@@ -1,0 +1,13 @@
+/target/
+\.log$
+
+syntax: glob
+*~
+*.sw[pmno]
+*.orig
+*.orig.*
+*.rej
+
+syntax: rootglob
+NOTES/DOING
+tags

@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
 import com.nqadmin.swingset.utils.SSArray;
@@ -46,15 +51,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.RowSet;
+import java.lang.System.Logger;
 
-import org.apache.logging.log4j.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import static com.nqadmin.swingset.datasources.RowSetOps.*;
 
 import java.util.Arrays;
 
+import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.datasources.ConvertType.castJDBCToJava;
 
 // SSDbArrayModel.java
 //
@@ -63,8 +72,8 @@ import com.nqadmin.swingset.utils.SSUtils;
 /**
  * Implementation of SSCollectionModel as an array that uses a database
  * {@code JDBCType.ARRAY} for storage. The order of items is preserved by
- * {@link #readData(javax.sql.RowSet, java.lang.String) readData} and
- * {@link #writeData(javax.sql.RowSet, java.lang.String, java.lang.Object[])
+ * {@link #readData(com.nqadmin.swingset.utils.SSComponentInterface) readData} and
+ * {@link #writeData(com.nqadmin.swingset.utils.SSComponentInterface, java.lang.Object[]) 
  * writeData}.
  * 
  * @since 4.0.0
@@ -82,12 +91,12 @@ public class SSDbArrayModel extends SSAbstractCollectionModel {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/** {@inheritDoc } */
 	@Override
-	public Object[] readData(final RowSet _rowSet, final String _columnName) throws SQLException {
-		List<Object> data = toObjList(getJDBCType(), _rowSet.getArray(_columnName));
+	public Object[] readData(SSComponentInterface comp) throws SQLException {
+		List<Object> data = toObjList(getJDBCType(), RowSetOps.getColumnArray(comp));
 		if(data == null) {
 			return null;
 		}
@@ -96,9 +105,9 @@ public class SSDbArrayModel extends SSAbstractCollectionModel {
 
 	/** {@inheritDoc } */
 	@Override
-	public void writeData(final RowSet _rowSet, final String _columnName, final Object[] _data) throws SQLException {
+	public void writeData(SSComponentInterface comp, final Object[] _data) throws SQLException {
 		SSArray array = new SSArray(_data, getJDBCType());
-		_rowSet.updateArray(_columnName, array);
+		RowSetOps.updateColumnArray(comp, array);
 	}
 
 	/**
@@ -114,12 +123,13 @@ public class SSDbArrayModel extends SSAbstractCollectionModel {
 			return null;
 		}
 		
-		logger.debug("SSList.toObjArray() contents: " + _array);
+		logger.log(DEBUG, "SSList.toObjArray() contents: " + _array);
 		
 		Object dbArray = _array.getArray();
 		
 		final List<Object> data;
 		
+		// TODO: fixup the cases
 		try {
 			if (dbArray instanceof Object[]) {
 				data = Arrays.asList(castJDBCToJava(_jdbcType, (Object[])dbArray));
@@ -131,33 +141,40 @@ public class SSDbArrayModel extends SSAbstractCollectionModel {
 					case SMALLINT:
 					case TINYINT:
 						for (final int num : (int[]) dbArray) {
-							data.add(Integer.valueOf(num));
+							data.add(num);
 						}
 						break;
 					case BIT:
 						for (final boolean bit : (boolean[]) dbArray) {
-							data.add(Boolean.valueOf(bit));
+							data.add(bit);
 						}
 						break;
 					case BIGINT:
 						for (final long num : (long[]) dbArray) {
-							data.add(Long.valueOf(num));
+							data.add(num);
+						}
+						break;
+					case REAL:
+						for (final float num : (float[]) dbArray) {
+							data.add(num);
 						}
 						break;
 					case FLOAT:
 					case DOUBLE:
-					case REAL:
 						for (final double num : (double[]) dbArray) {
-							data.add(Double.valueOf(num));
+							data.add(num);
 						}
 						break;
+					//
+					// TODO: String missing?
+					//
 					default:
-						logger.error("DataType: " + _array.getBaseTypeName() + " not supported and unable to convert to generic object.");
+						logger.log(ERROR, "DataType: " + _array.getBaseTypeName() + " not supported and unable to convert to generic object.");
 						throw new SQLDataException("Unknown primitive array type");
 				}
 			}
 		} catch (final ClassCastException cce) {
-			logger.error("Class Cast Exception.", cce);
+			logger.log(ERROR, "Class Cast Exception.", cce);
 			throw new SQLDataException(cce);
 		}
 		return data;

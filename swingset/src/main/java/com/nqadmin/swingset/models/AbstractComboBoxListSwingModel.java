@@ -62,12 +62,14 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
+import javax.swing.MutableComboBoxModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -150,15 +152,12 @@ public abstract class AbstractComboBoxListSwingModel {
 	/** Install this when not using glazed, and send events through this */
 	private final ComboBoxModelProxy modelProxy;
 	
-	/**
-	 * Log4j Logger for component
-	 */
+	/** System Logger for component */
 	private static Logger logger = SSUtils.getLogger();
 
-	/**
-	 * Log4j Logger for component
-	 */
-	private static Logger eventLogger = LogManager.getLogger(AbstractComboBoxListSwingModel.class.getName() + ".events");
+	/** System Logger for component */
+	private static Logger eventLogger = SSUtils.getLogger(
+			AbstractComboBoxListSwingModel.class.getName() + ".events");
 
 	/**
 	 * number of objects in the SSListItem
@@ -213,6 +212,7 @@ public abstract class AbstractComboBoxListSwingModel {
 	 */
 	protected AbstractComboBoxListSwingModel(int _itemNumElems) {
 		this(_itemNumElems, null);
+		if(Boolean.FALSE) { Objects.isNull(sliceInfo(null)); }
 	}
 
 	/**
@@ -268,28 +268,28 @@ public abstract class AbstractComboBoxListSwingModel {
 		private String getMsg(ListDataEvent e) {
 
 			int t = e.getType();
-			String eventString = String.format("%s[%d,%d]",
+			String eventString = sf("%s[%d,%d]",
 					t == ListDataEvent.CONTENTS_CHANGED ? "CH"
 							: t == ListDataEvent.INTERVAL_ADDED ? "ADD"
 							: t == ListDataEvent.INTERVAL_REMOVED ? "REM"
 							: "?",
 					e.getIndex0(), e.getIndex1());
-			return String.format("%s: %s", objectID(model), eventString);
+			return sf("%s: %s", objectID(model), eventString);
 		}
 
 		@Override
 		public void intervalAdded(ListDataEvent e) {
-			eventLogger.trace(() -> getMsg(e));
+			eventLogger.log(TRACE, () -> getMsg(e));
 		}
 		
 		@Override
 		public void intervalRemoved(ListDataEvent e) {
-			eventLogger.trace(() -> getMsg(e));
+			eventLogger.log(TRACE, () -> getMsg(e));
 		}
 		
 		@Override
 		public void contentsChanged(ListDataEvent e) {
-			eventLogger.trace(() -> getMsg(e));
+			eventLogger.log(TRACE, () -> getMsg(e));
 		}
 	}
 
@@ -301,7 +301,7 @@ public abstract class AbstractComboBoxListSwingModel {
 	// TODO: refine method for adding a model; maybe custom String tag.
 	public static void addEventLogging(ListModel<?> _model) {
 		Objects.requireNonNull(_model);
-		if (!eventLogger.isTraceEnabled()) {
+		if (!eventLogger.isLoggable(TRACE)) {
 			return;
 		}
 		if (weakModelSet == null) {
@@ -323,6 +323,40 @@ public abstract class AbstractComboBoxListSwingModel {
 	//
 	// TODO: uninstall
 	//
+
+	/**
+	 * Special case usage, grab the model configured for a JComboBox.
+	 * @param <T> model elements
+	 * @param _model the model source
+	 * @return the model
+	 */
+	protected static <T>MutableComboBoxModel<T> getSimpleComboBoxModel(AbstractComboBoxListSwingModel _model) {
+		if(_model.installed) {
+			throw new IllegalStateException("model already installed");
+		}
+		_model.installed = true;
+		_model.comboBoxModel = true;
+		@SuppressWarnings("unchecked")
+		MutableComboBoxModel<T> m = (MutableComboBoxModel<T>) _model.modelProxy;
+		return m;
+	}
+
+	/**
+	 * Special case usage, grab the model configured for a JList.
+	 * @param <T> model elements
+	 * @param _model the model source
+	 * @return the model
+	 */
+	protected static <T>ListModel<T> getSimpleListModel(AbstractComboBoxListSwingModel _model) {
+		if(_model.installed) {
+			throw new IllegalStateException("model already installed");
+		}
+		_model.installed = true;
+		_model.comboBoxModel = false;
+		@SuppressWarnings("unchecked")
+		ListModel<T> m = (ListModel<T>) _model.modelProxy;
+		return m;
+	}
 
 	/**
 	 * Installs a ListCellRenderer into the JComponent which
@@ -361,20 +395,22 @@ public abstract class AbstractComboBoxListSwingModel {
 
 		_model.installed = true;
 
-		if (_jc instanceof JList) {
+		switch (_jc) {
+		case JList jl -> {
 			ListCellRenderer<?> render = _render == null
 					? _model.new LocalListCellRenderer() : _render;
-			((JList) _jc).setCellRenderer(render);
-			((JList) _jc).setModel(_model.modelProxy);
+			jl.setCellRenderer(render);
+			jl.setModel(_model.modelProxy);
 			_model.comboBoxModel = false;
-		} else if (_jc instanceof JComboBox) {
+		}
+		case JComboBox jcb -> {
 			ListCellRenderer<?> render = _render == null
 					? _model.new LocalComboBoxCellRenderer() : _render;
-			((JComboBox) _jc).setRenderer(render);
-			((JComboBox) _jc).setModel(_model.modelProxy);
+			jcb.setRenderer(render);
+			jcb.setModel(_model.modelProxy);
 			_model.comboBoxModel = true;
-		} else {
-			throw new IllegalArgumentException("must be JList or JComboBox");
+		}
+		default -> throw new IllegalArgumentException("must be JList or JComboBox");
 		}
 	}
 
@@ -580,7 +616,7 @@ public abstract class AbstractComboBoxListSwingModel {
 						selectedObject = (SSListItem)anItem;
 						modelProxy.fire.doFireContentsChanged(this, -1, -1);
 					} else {
-						logger.warn(() -> "ComboBox#setSelectedItem(" + anItem + ") not SSListItem");
+						logger.log(WARNING, () -> "ComboBox#setSelectedItem(" + anItem + ") not SSListItem");
 					}
 				}
 			}
@@ -616,7 +652,7 @@ public abstract class AbstractComboBoxListSwingModel {
 		public void removeElement(Object obj) {
 			remove(obj);
 			if (!(obj instanceof SSListItem)) {
-				logger.warn(() -> "ComboBox#removeElement(" + obj + ") not SSListItem");
+				logger.log(WARNING, () -> "ComboBox#removeElement(" + obj + ") not SSListItem");
 			}
 		}
 		
@@ -633,7 +669,7 @@ public abstract class AbstractComboBoxListSwingModel {
 		// TODO: Add @Override and remove SuppressWarnings annotation post Java 8
 		@SuppressWarnings({"all","javadoc"})
 		/** {@inheritDoc} */
-		// @Override not in jdk1.8
+		@Override
 		public void addAll(int index, Collection<? extends SSListItem> c) {
 			internalAddAll(index, c);
 		}
@@ -641,7 +677,7 @@ public abstract class AbstractComboBoxListSwingModel {
 		// TODO: Add @Override and remove SuppressWarnings annotation post Java 8
 		@SuppressWarnings({"all","javadoc"})
 		/** {@inheritDoc} */
-		// @Override not in jdk1.8
+		@Override
 		public void addAll(Collection<? extends SSListItem> c) {
 			internalAddAll(c);
 		}
@@ -741,17 +777,12 @@ public abstract class AbstractComboBoxListSwingModel {
 					"Only [1:30] items in a ListItem handled, not " + nElems);
 		}
 		validElemsMask = 0;
-		Class<?> clazz;
-		switch (nElems) {
-		case 1:
-			clazz = ListItem1.class; break;
-		case 2:
-			clazz = ListItem2.class; break;
-		case 3:
-			clazz = ListItem3.class; break;
-		default:
-			clazz = ListItemAsArray.class; break;
-		}
+		Class<?> clazz = switch (nElems) {
+		case 1 -> ListItem1.class;
+		case 2 -> ListItem2.class;
+		case 3 -> ListItem3.class;
+		default -> ListItemAsArray.class;
+		};
 		try {
 			listItemConstructor = clazz.getConstructor((new Object[0]).getClass());
 		} catch (NoSuchMethodException|SecurityException ex) {
@@ -819,9 +850,8 @@ public abstract class AbstractComboBoxListSwingModel {
 	 * @param l slice
 	 * @return state info
 	 */
-	SliceInfo sliceInfo(List<Object> l) {
-		if(l instanceof ItemElementSlice) {
-			ItemElementSlice slice = (ItemElementSlice) l;
+	final SliceInfo sliceInfo(List<Object> l) {
+		if(l instanceof ItemElementSlice slice) {
 			return new SliceInfo(slice.elemIndex, slice.isValid);
 		}
 		return null;
@@ -852,6 +882,7 @@ public abstract class AbstractComboBoxListSwingModel {
 	 * @param _itemNumElems number of elements in SSListItem
 	 */
 	protected void setItemNumElems(int _itemNumElems) {
+		// Using '_' for remodel failed by maven enforcer.
 		try (Remodel remodel = getRemodel()) {
 			setupNumElems(_itemNumElems);
 		}
@@ -955,7 +986,7 @@ public abstract class AbstractComboBoxListSwingModel {
 
 	private void clear() {
 		comboAdjustSelectedForClear();
-		if (itemList.size() > 0) {
+		if (!itemList.isEmpty()) {
 			int firstIndex = 0;
 			int lastIndex = itemList.size() - 1;
 			itemList.clear();
@@ -1074,7 +1105,7 @@ public abstract class AbstractComboBoxListSwingModel {
 
 		private void checkValid() {
 			if (!isValid) {
-				throw new IllegalAccessError(String.format(
+				throw new IllegalAccessError(sf(
 						"SSListItem element slice %d must be in [0:%d]",
 						elemIndex, itemNumElems-1));
 			}
@@ -1115,8 +1146,8 @@ public abstract class AbstractComboBoxListSwingModel {
 	 * @return true if the specified list is backed by this
 	 */
 	public boolean hasShadow(List<?> list) {
-		if (list instanceof ItemElementSlice) {
-			return ((ItemElementSlice)list).isShadow(this);
+		if (list instanceof ItemElementSlice slice) {
+			return slice.isShadow(this);
 		}
 		return false;
 	}
@@ -1451,9 +1482,11 @@ public abstract class AbstractComboBoxListSwingModel {
 		 */
 		Object getElem(int index);
 		
-		// TODO: Remove SuppressWarnings annotation post Java 8
-		@SuppressWarnings({"all","javadoc"})
-		/** {@inheritDoc} */
+		/**
+		 * @return a clone
+		 * @throws CloneNotSupportedException
+		 */
+
 		Object clone() throws CloneNotSupportedException;
 	}
 
@@ -1650,9 +1683,9 @@ public abstract class AbstractComboBoxListSwingModel {
 		public void setElem(int index, Object object) {
 			checkIndex(index);
 			switch (index) {
-			case 0:  arg0 = object; break;
-			case 1:  arg1 = object; break;
-			default: arg2 = object; break;
+			case 0 -> arg0 = object;
+			case 1 -> arg1 = object;
+			default -> arg2 = object;
 			}
 		}
 

@@ -35,110 +35,99 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
+import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Objects;
 
-import javax.swing.SwingConstants;
+import javax.swing.text.DefaultFormatterFactory;
 
-// SSCurrencyField.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
 
 /**
  * Used to link a SSFormattedTextField to a currency column in a database.
  */
-public class SSCurrencyField extends SSFormattedTextField {
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 1636264407572416306L;
-	
-	private int decimals = 2;
-	private int precision = 3;
-
+@SuppressWarnings("serial")
+public class SSCurrencyField extends NumberField
+{
 	/**
 	 * Creates a new instance of SSCurrencyField
 	 */
 	public SSCurrencyField() {
-		this(new SSCurrencyFormatterFactory());
+		this(createFormatterFactory(CUSTOM, null, null, null, null));
 	}
 
 	/**
 	 * Creates an instance of SSCurrenyField with the specified number of integer and
 	 * fraction digits
 	 *
-	 * @param _precision - number of digits needed for integer part of the number
-	 * @param _decimals  - number of digits needed for the fraction part of the
-	 *                   number
+	 * @param precision - number of digits needed for integer part of the number
+	 * @param decimals  - number of digits needed for the fraction part of the number
 	 */
-	public SSCurrencyField(final int _precision, final int _decimals) {
-		this(new SSCurrencyFormatterFactory(_precision, _decimals));
+	public SSCurrencyField(int precision, int decimals) {
+		this(createFormatterFactory(CUSTOM, precision, decimals, null, null));
 	}
 
 	/**
 	 * Creates an instance of SSCurrenyField with the specified number of integer and
 	 * fraction digits using the given locale
 	 *
-	 * @param _precision     - number of digits needed for integer part of the
-	 *                       number
-	 * @param _decimals      - number of digits needed for the fraction part of the
-	 *                       number
-	 * @param _editorLocale  - locale to be used while in editing mode
-	 * @param _displayLocale - locate to be used for displaying the number
+	 * @param precision     - number of digits needed for integer part of the number
+	 * @param decimals      - number of digits needed for the fraction part of the number
+	 * @param editLocale  - locale to be used while in editing mode
+	 * @param displayLocale - locate to be used for displaying the number
 	 */
-	public SSCurrencyField(final int _precision, final int _decimals, final Locale _editorLocale,
-			final Locale _displayLocale) {
-		this(new SSCurrencyFormatterFactory(_precision, _decimals, _editorLocale, _displayLocale));
+	public SSCurrencyField(int precision, int decimals, Locale editLocale, Locale displayLocale) {
+		this(createFormatterFactory(CUSTOM, precision, decimals, editLocale, displayLocale));
 	}
 
 	/**
 	 * Creates an SSCurrencyField with the specified formatter factory
 	 *
-	 * @param _factory - formatter factory to be used
+	 * @param factory - formatter factory to be used
 	 */
-	public SSCurrencyField(final javax.swing.JFormattedTextField.AbstractFormatterFactory _factory) {
-		super(_factory);
-		setHorizontalAlignment(SwingConstants.RIGHT);
-		setValue(new java.lang.Double(0.00));
+	public SSCurrencyField(AbstractFormatterFactory factory) {
+		super(factory);
 	}
 
 	/**
-	 * Getter for property decimals.
-	 *
-	 * @return Value of property decimals.
+	 * Create a FormatterFactory.
+	 * @param ssFormat
+	 * @param precision - number of digits needed for integer part of the number
+	 * @param decimals - number of digits needed for fraction part of the number
+	 * @param editLocale - locale while editing
+	 * @param displayLocale - locale while not editing
+	 * @return FormatterFactory.
 	 */
-	public int getDecimals() {
-		return decimals;
-	}
+	public static DefaultFormatterFactory createFormatterFactory(
+			SSFormat ssFormat, Integer precision, Integer decimals,
+			Locale editLocale, Locale displayLocale)
+	{
+		Objects.requireNonNull(ssFormat);
 
-	/**
-	 * Returns the number digits used for integer part of the number
-	 *
-	 * @return returns the number digits used for integer part of the number
-	 */
-	public int getPrecision() {
-		return precision;
-	}
+		Locale defaultLocale = Locale.getDefault(Locale.Category.FORMAT);
+		// For display use currency, e.g. might see '$'. TODO: use the same for both?
+		NumberFormat displayFormat = createNumberFormat(()->NumberFormat.getCurrencyInstance(
+				displayLocale != null ? displayLocale : defaultLocale));
+		// For editing use a plain number
+		NumberFormat editFormat = createNumberFormat(()->NumberFormat.getInstance(
+				displayLocale != null ? displayLocale : defaultLocale));
 
-	/**
-	 * Sets the number of digits needed for fraction part of the number
-	 *
-	 * @param _decimals - number of digits needed for fraction part of the number
-	 */
-	public void setDecimals(final int _decimals) {
-		decimals = _decimals;
-		setFormatterFactory(new SSCurrencyFormatterFactory(precision, _decimals));
-	}
-
-	/**
-	 * Sets the number of digits needed for integer part of the number
-	 *
-	 * @param _precision - number of digits needed for integer part of the number
-	 */
-	public void setPrecision(final int _precision) {
-		precision = _precision;
-		setFormatterFactory(new SSCurrencyFormatterFactory(_precision, decimals));
+		initPrecision(precision, editFormat, displayFormat);
+		initDecimals(decimals, editFormat, displayFormat);
+		
+		// Note that the editFormatter does not specify precision/decimals.
+		
+		return new SSFormatterFactory.Builder<>()
+				.ssFormat(ssFormat)
+				.editFormatter(new SSNumberFormatter(editFormat))
+				.displayFormatter(new SSNumberFormatter(displayFormat))
+				.build();
 	}
 }

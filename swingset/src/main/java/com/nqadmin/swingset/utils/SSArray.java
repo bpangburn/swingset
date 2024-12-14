@@ -35,12 +35,18 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
 import java.sql.Array;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
@@ -52,8 +58,8 @@ import java.util.Objects;
  * Implementation of SQL array for SSList.
  */
 
-public class SSArray implements Array {
-	
+public class SSArray implements Array
+{
 	// TODO May be able to eliminate. Only reference is in com.nqadmin.swingset.SSList.
 
 	/**
@@ -65,18 +71,6 @@ public class SSArray implements Array {
 	 * object array containing elements of sql array
 	 */
 	private final Object[] data;
-
-	/**
-	 * Creates SSArray with the object array and data base type
-	 *
-	 * @param _data         object array of SSArray
-	 * @param _baseTypeName Array elements database type name
-	 * @deprecated Use constructor that takes JDBCType
-	 */
-	@Deprecated
-	public SSArray(final Object[] _data, final String _baseTypeName) {
-		this(_data, JDBCType.valueOf(_baseTypeName));
-	}
 
 	/**
 	 * Creates SSArray with the object array and data base type
@@ -157,15 +151,7 @@ public class SSArray implements Array {
 	 */
 	@Override
 	public String toString() {
-		String text = "{";
-		for (int i = 0; i < data.length; ++i) {
-			if (i > 0) {
-				text += ",";
-			}
-			text += data[i];
-		}
-
-		text += "}";
+		String text = "SSArray " + Arrays.asList(data);
 		return text;
 	}
 }

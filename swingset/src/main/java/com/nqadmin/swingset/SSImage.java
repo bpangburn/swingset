@@ -37,6 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -45,7 +47,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.sql.SQLException;
 
 import javax.sql.RowSet;
@@ -57,11 +58,23 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
+import javax.swing.JComponent;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+
+import com.nqadmin.swingset.decorators.BorderDecorator;
+
+import static java.lang.System.Logger.Level.*;
+
+import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSImage.java
 //
@@ -70,28 +83,28 @@ import com.nqadmin.swingset.utils.SSUtils;
 /**
  * Used to load, store, and display images stored in a database.
  */
-public class SSImage extends JPanel implements SSComponentInterface {
-
+// TODO: SSImage make all the load/store buttons/capabilities optional.
+@SuppressWarnings("serial")
+public class SSImage extends JPanel implements SSComponentInterface
+{
+	// TODO: try to get this initialized
+	private String fName = "";
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
 	 * database column
 	 */
-	protected class SSImageListener implements ActionListener, Serializable {
+	protected class SSImageListener implements ActionListener {
 
-		/**
-		 * Unique serial ID
-		 */
-		private static final long serialVersionUID = -997068820028544504L;
-
+		/** {@inheritDoc} */
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 
-			ssCommon.removeRowSetListener();
+			getSSCommon().removeRowSetListener();
 
 			try {
 				if (getRowSet() != null) {
 					// FileInputStream inStream = null;
-					File inFile = null;
+					File inFile;
 					final JFileChooser fileChooser = new JFileChooser();
 					if (fileChooser.showOpenDialog(btnUpdateImage) == JFileChooser.APPROVE_OPTION) {
 						inFile = fileChooser.getSelectedFile();
@@ -112,6 +125,8 @@ public class SSImage extends JPanel implements SSComponentInterface {
 							lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
 							lblImage.setIcon(img);
 							lblImage.setText("");
+							fName = inFile.getPath();
+							// TODO: why is updateUI here?
 							updateUI();
 						}
 					} else {
@@ -119,12 +134,12 @@ public class SSImage extends JPanel implements SSComponentInterface {
 					}
 				}
 			} catch (final SQLException se) {
-				logger.error(getColumnForLog() + ": SQL Exception.", se);
+				logger.log(Level.ERROR, getColumnForLog() + ": SQL Exception.", se);
 			} catch (final IOException ioe) {
-				logger.error(getColumnForLog() + ": IO Exception.", ioe);
+				logger.log(Level.ERROR, getColumnForLog() + ": IO Exception.", ioe);
 			}
 
-			ssCommon.addRowSetListener();
+			getSSCommon().addRowSetListener();
 		}
 
 	} // end private class SSImageListener
@@ -133,11 +148,6 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 * Log4j Logger for component
 	 */
 	private static Logger logger = SSUtils.getLogger();
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -2726746843832259767L;
 
 	/**
 	 * Button to update the image.
@@ -162,14 +172,64 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon = new SSCommon(this);
+	private final SSCommon ssCommon;
 
 	/**
 	 * Construct a default SSImage Object.
 	 */
 	public SSImage() {
-		// Note that call to parent default constructor is implicit.
-		// super();
+		ssCommon = finishSSCommon();
+	}
+
+	// TODO: Why do decorators interfere with SSImage?
+	// In particular the following lines from BorderDecorator
+	// cause a miniscule scrollpane. Maybe some kind of decorator wrapper?
+	//		jc().setBorder(jc().isFocusOwner() ? focusBorder : standardBorder);
+	//		jc().setForeground(textColor != null ? textColor : Color.BLACK);
+	
+	// TODO: This is a workaround because if default decorator is used
+	//		 then the SSImage doesn't display properly.
+	/**
+	 * Highlight the update button when this component gets focus.
+	 * {@inheritDoc }
+	 */
+	@Override
+	public Decorator createDefaultDecorator() {
+		Decorator decorator = SSComponentInterface.super.createDefaultDecorator();
+		if (!(decorator instanceof BorderDecorator))
+			return decorator;
+
+		return new BorderDecorator() {
+			@Override
+			protected Border getBorder(BorderState state)
+			{
+				// The default border when just running the demo is
+				// the CompoundBorder: [[3,3,3,3],[2,14,2,14]].
+				Color color = getBorderColor(state);
+				if (color == null)
+					return defaultBorder;
+
+				if (jc().getBorder() instanceof CompoundBorder cb) {
+					return BorderDecorator.lineEmpty_empty(
+							cb.getOutsideBorder().getBorderInsets(jc()),
+							cb.getInsideBorder().getBorderInsets(jc()),
+							color);
+				}
+				return empty_line(jc().getInsets(), color);
+			}
+
+			@Override
+			protected JComponent jc()
+			{
+				return btnUpdateImage;
+			}
+			
+			@Override
+			protected Component fcomp()
+			{
+				return btnUpdateImage;
+			}
+		};
 	}
 
 	/**
@@ -180,7 +240,8 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 * @param _boundColumnName - column in the rowSet to which the component should
 	 *                         be bound.
 	 */
-	public SSImage(final RowSet _rowSet, final String _boundColumnName) {
+	public SSImage(final RowSet _rowSet, final String _boundColumnName)
+	{
 		this();
 		bind(_rowSet, _boundColumnName);
 	}
@@ -215,14 +276,14 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	}
 
 	/**
-	 * Method to allow Developer to add functionality when SwingSet component is
-	 * instantiated.
-	 * <p>
-	 * It will actually be called from SSCommon.init() once the SSCommon data member
-	 * is instantiated.
+	 * Add custom button for loading image from disk saving to database.
+	 * Add some preferredSize handling.
 	 */
+	// TODO: remove the prefered size stuff, let programmer handle it.
+	// TODO: make custom components optional, not builtin.
 	@Override
-	public void customInit() {
+	public void customInit()
+	{
 		// SET PREFERRED DIMENSIONS
 		setPreferredSize(preferredSize);
 
@@ -251,19 +312,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 		return preferredSize;
 	}
 
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
-	}
-
-	/**
-	 * {@inheritDoc }
-	 */
+	/** {@inheritDoc } */
 	@Override
 	public SSImageListener getSSComponentListener() {
 		return new SSImageListener();
@@ -274,6 +323,7 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	 *
 	 * @param _preferredSize - preferred size of the image component
 	 */
+	// TODO: listen to preferredsize property to adjust btnUpdateImage.
 	@Override
 	public void setPreferredSize(final Dimension _preferredSize) {
 		final Dimension oldValue = preferredSize;
@@ -287,17 +337,6 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	}
 
 	/**
-	 * Sets the SSCommon data member for the current Swingset Component.
-	 *
-	 * @param _ssCommon shared/common SwingSet component data and methods
-	 */
-	@Override
-	public void setSSCommon(final SSCommon _ssCommon) {
-		ssCommon = _ssCommon;
-
-	}
-
-	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText().
 	 * <p>
@@ -307,20 +346,22 @@ public class SSImage extends JPanel implements SSComponentInterface {
 	@Override
 	public void updateSSComponent() {
 
+		// TODO: If CachedRowSet, BLOBs don't work. As a convenience could,
+		//		 grab a connection, find the primary keys, and read the BLOB.
 		try {
 			final byte[] imageData = getRowSet().getRow() > 0 ? getRowSet().getBytes(getBoundColumnName()) : null;
 			if (imageData != null) {
-				logger.debug("{}: Setting non-null image.", () -> getColumnForLog());
+				logger.log(DEBUG, () -> sf("%s: Setting non-null image.", getColumnForLog()));
 				img = new ImageIcon(imageData);
 				lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
 				lblImage.setText("");
 			} else {
-				logger.debug("{}: Setting null image.", () -> getColumnForLog());
+				logger.log(DEBUG, () -> sf("%s: Setting null image.", getColumnForLog()));
 				img = null;
 				lblImage.setText("No Picture");
 			}
 		} catch (final SQLException se) {
-			logger.error(getColumnForLog() + ": SQL Exception.", se);
+			logger.log(Level.ERROR, getColumnForLog() + ": SQL Exception.", se);
 			img = null;
 		}
 
@@ -331,4 +372,35 @@ public class SSImage extends JPanel implements SSComponentInterface {
 
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("%s{file=%s, %s}", getClass().getSimpleName(),
+				fName, SSUtils.ssComponentToString(this));
+	}
+
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
+	}
 }

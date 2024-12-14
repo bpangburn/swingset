@@ -55,9 +55,13 @@ import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSTableKeyAdapter.java
 //
@@ -110,7 +114,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 				}
 			}		
 		} catch (final NoSuchMethodException nsme) {
-			logger.warn("No Such Method Exception. Failed to copy data.",  nsme);
+			logger.log(WARNING, "No Such Method Exception. Failed to copy data.",  nsme);
 			newValue = _value;
 		}
 
@@ -165,15 +169,15 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
 		final JTable jTable = (JTable) ke.getSource();
 
-		logger.debug("Key Released on SSDataGrid. Key Released: {} {}.", () -> ke.getKeyCode(),
-				() -> ((ke.getModifiersEx() & (onMask | offMask)) == onMask));
+		logger.log(DEBUG, ()->sf("Key Released on SSDataGrid. Key Released: %s %s.",
+				ke.getKeyCode(), ((ke.getModifiersEx() & (onMask | offMask)) == onMask)));
 
 		if (((ke.getModifiersEx() & (onMask | offMask)) == onMask) && (ke.getKeyCode() == KeyEvent.VK_C)) {
 			// CHECK IF CONTROL-C IS PRESSED
 			// SHIFT OR ALT SHOULD NOT BE DOWN
 
 			// ALERT USER
-			logger.debug("Going to handle copy");
+			logger.log(DEBUG, "Going to handle copy");
 
 			// GET COLUMNS INVOLVED
 			final int numRows = jTable.getSelectedRowCount();
@@ -238,10 +242,10 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 				try {
 					strData = (String) transferable.getTransferData(DataFlavor.stringFlavor);
 				} catch (final UnsupportedFlavorException ufe) {
-					logger.error("Unsupported Flavor Exception.",  ufe);
+					logger.log(ERROR, "Unsupported Flavor Exception.",  ufe);
 					return;
 				} catch (final IOException ioe) {
-					logger.error("IO Exception.",  ioe);
+					logger.log(ERROR, "IO Exception.",  ioe);
 					return;
 				}
 
@@ -350,16 +354,16 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 					jTable.updateUI();
 
 				} catch (final NoSuchMethodException nsme) {
-					logger.error("No Such Method Exception. One of the column classes does not provide a constructor that takes a single String argument.",  nsme);
+					logger.log(ERROR, "No Such Method Exception. One of the column classes does not provide a constructor that takes a single String argument.",  nsme);
 					JOptionPane.showMessageDialog(jTable, "One of the column classes does not provide a constructor that takes a single String argument.");
 				} catch (final SecurityException se) {
-					logger.error("Security Exception. One of the column class does not provide a constructor that takes a single String argument.",  se);
+					logger.log(ERROR, "Security Exception. One of the column class does not provide a constructor that takes a single String argument.",  se);
 					JOptionPane.showMessageDialog(jTable, "One of the column class does not provide a constructor that takes a single String argument.");
 				} catch (final InstantiationException ie) {
-					logger.error("(Instantiation Exception. Failed to copy data. Error occured while instantiating a single String argument constructor for a column.",  ie);
+					logger.log(ERROR, "(Instantiation Exception. Failed to copy data. Error occured while instantiating a single String argument constructor for a column.",  ie);
 					JOptionPane.showMessageDialog(jTable, "Failed to copy data. Error occured while instantiating a single String argument constructor for a column.");
 				} catch (final Exception e) {
-					logger.error("Exception. Failed to copy data.",  e);
+					logger.log(ERROR, "Exception. Failed to copy data.",  e);
 					JOptionPane.showMessageDialog(jTable, "Failed to copy data.");
 				}
 

@@ -54,10 +54,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
-import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSCheckBox;
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
@@ -71,7 +70,19 @@ import com.nqadmin.swingset.SSTextArea;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSDbArrayModel;
+import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSSyncManager;
+import com.nqadmin.swingset.utils.SSUtils;
+import java.util.EnumMap;
+
+import static com.nqadmin.swingset.demo.TestBaseComponents.Comps.*;
+import static com.nqadmin.swingset.demo.TestBaseComponents.CompDim.*;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.swing.JComponent;
 
 /**
  * This example demonstrates all of the Base SwingSet Components
@@ -85,16 +96,54 @@ import com.nqadmin.swingset.utils.SSSyncManager;
  * time looping through records to match.
  */
 
-public class TestBaseComponents extends JFrame {
+@SuppressWarnings("serial")
+public class TestBaseComponents extends JFrame
+{
+	// STAR means use "*" in query
+	enum Comps {
+		NAV, PK, CHECK, COMBO, ENUM_COMBO, DB_COMBO, IMAGE, LABEL,
+		LIST, SLIDER, TEXT_AREA, TEXT_FIELD,
+		STAR, // This, and anything after, are not components.
+	};
+	enum CompDim {
+		//NORMAL, TALL, VERY_TALL
+		H1, H2, H3
+	}
+
+	private record Comp(String col, SSComponentInterface comp, JLabel label, CompDim dim){};
+	private Map<Comps, Comp> compInfo = new EnumMap<>(Comps.class);
+	private EnumSet<Comps> activeComps = EnumSet.allOf(Comps.class);
+
+	private void populateComps()
+	{
+		// This list must be in the same order as the Comps enum.
+		List<Comp> tComps = List.of(
+				new Comp(null,              cmbSSDBComboNav,   lblSSDBComboNav,   H1),
+				new Comp("swingset_base_test_pk", txtSwingSetBaseTestPK,
+						 lblSwingSetBaseTestPK, H1),
+				new Comp("ss_check_box",    chkSSCheckBox,     lblSSCheckBox,     H1),
+				new Comp("ss_combo_box",    cmbSSComboBox,     lblSSComboBox,     H1),
+				new Comp("ss_combo_box",    cmbEnumSSComboBox, lblEnumSSComboBox, H1),
+				new Comp("ss_db_combo_box", cmbSSDBComboBox,   lblSSDBComboBox,   H1),
+				new Comp("ss_image",        imgSSImage,        lblSSImage,        H3),
+				new Comp("ss_label",        lblSSLabel2,       lblSSLabel,        H1),
+				new Comp("ss_list",         lstSSList,         lblSSList,         H2),
+				new Comp("ss_slider",       sliSSSlider,       lblSSSlider,       H1),
+				new Comp("ss_text_area",    txtSSTextArea,     lblSSTextArea,     H2),
+				new Comp("ss_text_field",   txtSSTextField,    lblSSTextField,    H1)
+		);
+
+		for (Comps comp : Comps.values()) {
+			if (comp == STAR)
+				break;
+			compInfo.put(comp, tComps.get(comp.ordinal()));
+		}
+	}
 
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(TestBaseComponents.class);
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 7155378273131680653L;
+    private static final Logger logger = SSUtils.getLogger();
 	
 	/**
 	 * map of 'hints' contianing info on which collection model to use
@@ -185,10 +234,8 @@ public class TestBaseComponents extends JFrame {
 	/**
 	 * combo navigator and sync manger
 	 */
-	// TODO: this gets set again, why set it here? listeners?
-	//SSDBComboBox cmbSSDBComboNav = new SSDBComboBox(); // SSDBComboBox used just for navigation
 	final SSDBComboBox cmbSSDBComboNav; // SSDBComboBox used just for navigation
-	SSSyncManager syncManager;
+	final SSSyncManager syncManager;
 
 	/**
 	 * Method to obtain proper data structure/model for SSList based on database used
@@ -207,127 +254,150 @@ public class TestBaseComponents extends JFrame {
 	 * @param _dbConn database connection
 	 * @param _hints dynamic information on collection model, other
 	 */
-	public TestBaseComponents(final Connection _dbConn, Map<String,Object> _hints) {
-
+	@SuppressWarnings("LeakingThisInConstructor")
+	public TestBaseComponents(final Connection _dbConn, Map<String, Object> _hints)
+	{
 		// SET SCREEN TITLE
-			super("SwingSet Base Component Test");
-
+		super("SwingSet Base Component Test");
+		DemoUtil.initExampleFrame(this, null);
+		
 		// INITIALIZE SOME DYNAMIC INFORMATION
-			hints =  _hints;
-			lstSSList = new SSList(getCollectionModel());
+		hints =  _hints;
+		lstSSList = new SSList(getCollectionModel());
 
+		populateComps();
+
+		//activeComps.removeAll(EnumSet.of(CHECK, LABEL));
+		//activeComps.clear();
+		//activeComps.addAll(EnumSet.of(
+		//		STAR, PK, LABEL, LIST, TEXT_FIELD
+		//		//NAV, LABEL, TEXT_FIELD
+		//		// NAV, PK, CHECK, COMBO, ENUM_COMBO, DB_COMBO, IMAGE, LABEL,
+		//		// LIST, SLIDER, TEXT_AREA, TEXT_FIELD
+		//));
+		
 		// SET CONNECTION
-			connection = _dbConn;
-
+		connection = _dbConn;
+		
 		// SET SCREEN DIMENSIONS
-			setSize(MainClass.childScreenWidth, MainClass.childScreenHeightTall);
-			
+		setSize(MainClass.childScreenWidth, MainClass.childScreenHeightTall);
+		
 		// SET SCREEN POSITION
-			setLocation(DemoUtil.getChildScreenLocation(this.getName()));
-
+		setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+		
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-			try {
-				rowset = new JdbcRowSetImpl(connection);
-				rowset.setCommand("SELECT * FROM swingset_base_test_data;");
-				navigator = new SSDataNavigator(rowset);
-			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
-			}
+		try {
+			rowset = DemoUtil.getNewRowSet(connection);
+			String sql = sf("SELECT %s FROM swingset_base_test_data", getColumnsSQL());
+			logger.log(INFO, sql);
+			rowset.setCommand(sql);
+			navigator = new SSDataNavigator(rowset);
+		} catch (final SQLException se) {
+			logger.log(Level.ERROR, "SQL Exception.", se);
+		}
 
+		/**
+		 * Various navigator overrides needed to support H2
+		 * <p>
+		 * H2 does not fully support updatable rowset so it must be
+		 * re-queried following insert and delete with rowset.execute()
+		 */
+		navigator.getNavigateActions().setDBNav(new SSDBNavImpl(this)
+		{
 			/**
-			 * Various navigator overrides needed to support H2
-			 * <p>
-			 * H2 does not fully support updatable rowset so it must be
-			 * re-queried following insert and delete with rowset.execute()
+			 * Requery the rowset following a deletion. This is needed for H2.
 			 */
-			navigator.setDBNav(new SSDBNavImpl(this) {
-				/**
-				 * unique serial id
-				 */
-				private static final long serialVersionUID = 4264119495814589191L;
-
-				/**
-				 * Re-enable DB Navigator following insertion Cancel
-				 */
-				@Override
-				public void performCancelOps() {
-					super.performCancelOps();
-					cmbSSDBComboNav.setEnabled(true);
+			@Override
+			public void performPostDeletionOps() {
+				super.performPostDeletionOps();
+				try {
+					rowset.execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				}
-
-				/**
-				 * Requery the rowset following a deletion. This is needed for H2.
-				 */
-				@Override
-				public void performPostDeletionOps() {
-					super.performPostDeletionOps();
-					try {
-						rowset.execute();
-					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
-					}
-					performRefreshOps();
+				performRefreshOps();
+			}
+			
+			/**
+			 * Requery the rowset following an insertion. This is needed for H2.
+			 */
+			@Override
+			public void performPostInsertOps() {
+				super.performPostInsertOps();
+				//TestBaseComponents.this.cmbSSDBComboNav.setEnabled(true);
+				try {
+					rowset.execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				}
+				performRefreshOps();
+			}
+			
+			/**
+			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
+			 */
+			@Override
+			public void performPreInsertOps() {
+				//
+				// WHERE IS THE PRIMARY KEY SET? See example1
+				// 
+				
+				// SSDBNavImpl will clear the component values
+				super.performPreInsertOps();
+				
+				setDefaultValues();
+				
+			}
+			
+			/**
+			 * Manage sync manager during a Refresh
+			 */
+			@Override
+			public void performRefreshOps() {
+				super.performRefreshOps();
+				if (syncManager == null)
+					return;
 
-				/**
-				 * Requery the rowset following an insertion. This is needed for H2.
-				 */
-				@Override
-				public void performPostInsertOps() {
-					super.performPostInsertOps();
-					//TestBaseComponents.this.cmbSSDBComboNav.setEnabled(true);
-					try {
-						rowset.execute();
-					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
-					}
-					performRefreshOps();
-				}
-
-				/**
-				 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
-				 */
-				@Override
-				public void performPreInsertOps() {
-
-					// SSDBNavImpl will clear the component values
-					super.performPreInsertOps();
-
-					setDefaultValues();
-
-				}
-
-				/**
-				 * Manage sync manager during a Refresh
-				 */
-				@Override
-				public void performRefreshOps() {
-					super.performRefreshOps();
-					syncManager.async();
-					try {
-						cmbSSDBComboNav.execute();
-					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
-					} catch (final Exception e) {
-						logger.error("Exception.", e);
-					}
-					syncManager.sync();
-				}
-
-			});
-
-			// SETUP NAVIGATOR QUERY
-				final String query = "SELECT * FROM swingset_base_test_data;";
-				cmbSSDBComboNav = new SSDBComboBox(connection, query, "swingset_base_test_pk", "swingset_base_test_pk");
-
+				syncManager.async();
 				try {
 					cmbSSDBComboNav.execute();
 				} catch (final SQLException se) {
-					logger.error("SQL Exception.", se);
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				} catch (final Exception e) {
-					logger.error("Exception.", e);
+					logger.log(Level.ERROR, "Exception.", e);
 				}
+				syncManager.sync();
+			}
+			
+			/**
+			 * Re-enable DB Navigator following insertion Cancel
+			 */
+			@Override
+			public void performCancelOps() {
+				super.performCancelOps();
+				if (cmbSSDBComboNav == null)
+					return;
 
+				cmbSSDBComboNav.setEnabled(true);
+			}
+		});
+
+		
+		if (!activeComps.contains(NAV)) {
+			cmbSSDBComboNav = null;
+			syncManager = null;
+		} else {
+			// SETUP NAVIGATOR QUERY
+			final String query = "SELECT * FROM swingset_base_test_data;";
+			cmbSSDBComboNav = new SSDBComboBox(connection, query, "swingset_base_test_pk", "swingset_base_test_pk");
+			try {
+				cmbSSDBComboNav.execute();
+			} catch (final SQLException se) {
+				logger.log(Level.ERROR, "SQL Exception.", se);
+			} catch (final Exception e) {
+				logger.log(Level.ERROR, "Exception.", e);
+			}
+			
 			// SETUP SYNCMANAGER, WHICH WILL TAKE CARE OF KEEPING THE COMBO NAVIGATOR AND
 			// DATA NAVIGATOR IN SYNC.
 			//
@@ -335,164 +405,158 @@ public class TestBaseComponents extends JFrame {
 			// YOU HAVE TO CALL THE .async() METHOD
 			//
 			// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
-				syncManager = new SSSyncManager(cmbSSDBComboNav, navigator);
-				syncManager.setSyncColumnName("swingset_base_test_pk");
-				syncManager.sync();
+			syncManager = new SSSyncManager(cmbSSDBComboNav, navigator.getNavigateActions());
+			syncManager.setSyncColumnName("swingset_base_test_pk");
+			syncManager.sync();
+		}
+		
+		// SETUP COMBO AND LIST OPTIONS
+		if (activeComps.contains(COMBO)) {
+			// TODO if getAllowNull() is true then add blank item to SSComboBox
+			cmbSSComboBox.setAllowNull(true);
+			cmbSSComboBox.setOptions(Arrays.asList(comboItems), Arrays.asList(comboCodesIntegers));
+		}
+		if (activeComps.contains(ENUM_COMBO)) {
+			cmbEnumSSComboBox.setAllowNull(true);
+			cmbEnumSSComboBox.setOptions(ComboEnum.class);
+		}
+		
+		// NOTE following enum has [0,N) mapping, but DB is [1,N]
+		//      Fortunately test DB doesn't have a "7" in ss_list array
+		//lstSSList.setOptions(ListEnum.class);
+		if (activeComps.contains(LIST)) {
+			lstSSList.setOptions(Arrays.asList(listItems), Arrays.asList(listCodes));
+		}
+		
+		if (activeComps.contains(DB_COMBO)) {
+			final String dbComboQuery = "SELECT * FROM part_data;";
+			cmbSSDBComboBox = new SSDBComboBox(connection, dbComboQuery, "part_id", "part_name");
+			cmbSSDBComboBox.setAllowNull(false);
+			// TODO if getAllowNull() is false, user can still blank out the combo - we may want to prevent this
+		}
+		
+		// SET SLIDER RANGE
+		sliSSSlider.setMaximum(25);
 
-			// SETUP COMBO AND LIST OPTIONS
-				// TODO if getAllowNull() is true then add blank item to SSComboBox
-				cmbSSComboBox.setAllowNull(true);
-				cmbSSComboBox.setOptions(Arrays.asList(comboItems), Arrays.asList(comboCodesIntegers));
-				cmbEnumSSComboBox.setAllowNull(true);
-				cmbEnumSSComboBox.setOptions(ComboEnum.class);
+		// SSComponents are setup, save info that may have changed.
+		replaceComponent(NAV, cmbSSDBComboNav);
+		replaceComponent(DB_COMBO, cmbSSDBComboBox);
 
-				// NOTE following enum has [0,N) mapping, but DB is [1,N]
-				//      Fortunately test DB doesn't have a "7" in ss_list array
-				//lstSSList.setOptions(ListEnum.class);
-				lstSSList.setOptions(Arrays.asList(listItems), Arrays.asList(listCodes));
+		// Bind the components to their database columns.
+		buildGui_bind();
 
-				final String dbComboQuery = "SELECT * FROM part_data;";
-				cmbSSDBComboBox = new SSDBComboBox(connection, dbComboQuery, "part_id", "part_name");
-				cmbSSDBComboBox.setAllowNull(false);
-				// TODO if getAllowNull() is false, user can still blank out the combo - we may want to prevent this
+		if (activeComps.contains(DB_COMBO)) {
+			// Run db combo queries.
+			try {
+				cmbSSDBComboBox.execute();
+			} catch (final SQLException se) {
+				logger.log(Level.ERROR, "SQL Exception.", se);
+			} catch (final Exception e) {
+				logger.log(Level.ERROR, "Exception.", e);
+			}
+		}
 
-			// SET SLIDER RANGE
-			// TODO Set slider range
+		// Set the dimensions of the labels and components.
+		buildGui_dim();
 
-			// SETUP BOUND COMPONENTS
-				txtSwingSetBaseTestPK.bind(rowset, "swingset_base_test_pk");
-
-				chkSSCheckBox.bind(rowset, "ss_check_box");
-				cmbSSComboBox.bind(rowset, "ss_combo_box");
-				cmbEnumSSComboBox.bind(rowset, "ss_combo_box");
-				cmbSSDBComboBox.bind(rowset, "ss_db_combo_box");
-				//cmbSSDBComboBox.setEditable(false);
-				imgSSImage.bind(rowset, "ss_image");
-				lblSSLabel2.bind(rowset, "ss_label");
-				lstSSList.bind(rowset, "ss_list");
-				sliSSSlider.bind(rowset, "ss_slider");
-				txtSSTextArea.bind(rowset, "ss_text_area");
-				txtSSTextField.bind(rowset, "ss_text_field");
-
-			// RUN DB COMBO QUERIES
-				try {
-					cmbSSDBComboBox.execute();
-				} catch (final SQLException se) {
-					logger.error("SQL Exception.", se);
-				} catch (final Exception e) {
-					logger.error("Exception.", e);
-				}
-
-			// SET LABEL DIMENSIONS
-				lblSSDBComboNav.setPreferredSize(MainClass.labelDim);
-
-				lblSwingSetBaseTestPK.setPreferredSize(MainClass.labelDim);
-
-				lblSSCheckBox.setPreferredSize(MainClass.labelDim);
-				lblSSComboBox.setPreferredSize(MainClass.labelDim);
-				lblEnumSSComboBox.setPreferredSize(MainClass.labelDim);
-				lblSSDBComboBox.setPreferredSize(MainClass.labelDim);
-				lblSSImage.setPreferredSize(MainClass.labelDimVeryTall);
-				lblSSLabel.setPreferredSize(MainClass.labelDim);
-				lblSSList.setPreferredSize(MainClass.labelDimTall);
-				lblSSSlider.setPreferredSize(MainClass.labelDim);
-				lblSSTextArea.setPreferredSize(MainClass.labelDimTall);
-				lblSSTextField.setPreferredSize(MainClass.labelDim);
-
-			// SET BOUND COMPONENT DIMENSIONS
-				cmbSSDBComboNav.setPreferredSize(MainClass.ssDim);
-
-				txtSwingSetBaseTestPK.setPreferredSize(MainClass.ssDim);
-
-				chkSSCheckBox.setPreferredSize(MainClass.ssDim);
-				cmbSSComboBox.setPreferredSize(MainClass.ssDim);
-				cmbEnumSSComboBox.setPreferredSize(MainClass.ssDim);
-				cmbSSDBComboBox.setPreferredSize(MainClass.ssDim);
-				imgSSImage.setPreferredSize(MainClass.ssDimVeryTall);
-				lblSSLabel2.setPreferredSize(MainClass.ssDim);
-
-				// NEED TO MAKE SURE LIST IS TALLER THAN THE SCROLLPANE TO SEE THE SCROLLBAR
-				lstSSList.setPreferredSize(new Dimension(MainClass.ssDimTall.width-20, MainClass.ssDimVeryTall.height));
-				final JScrollPane lstScrollPane = new JScrollPane(lstSSList);
-				lstScrollPane.setPreferredSize(MainClass.ssDimTall);
-
-				sliSSSlider.setPreferredSize(MainClass.ssDim);
-				txtSSTextArea.setPreferredSize(MainClass.ssDimTall);
-				txtSSTextField.setPreferredSize(MainClass.ssDim);
-
-			// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-				final Container contentPane = getContentPane();
-				contentPane.setLayout(new GridBagLayout());
-				final GridBagConstraints constraints = new GridBagConstraints();
-
-				constraints.gridx = 0;
-				constraints.gridy = 0;
-
-				contentPane.add(lblSSDBComboNav, constraints);
-				constraints.gridy++;
-				contentPane.add(lblSwingSetBaseTestPK, constraints);
-				constraints.gridy++;
-				contentPane.add(lblSSCheckBox, constraints);
-				constraints.gridy++;
-				contentPane.add(lblSSComboBox, constraints);
-				constraints.gridy++;
-				contentPane.add(lblEnumSSComboBox, constraints);
-				constraints.gridy++;
-				contentPane.add(lblSSDBComboBox, constraints);
-				constraints.gridy++;
-				contentPane.add(lblSSImage, constraints);
-				constraints.gridy++;
-				contentPane.add(lblSSLabel, constraints);
-				constraints.gridy++;
-				contentPane.add(lblSSList, constraints);
-				constraints.gridy++;
-				contentPane.add(lblSSSlider, constraints);
-				constraints.gridy++;
-				contentPane.add(lblSSTextArea, constraints);
-				constraints.gridy++;
-				contentPane.add(lblSSTextField, constraints);
-
-				constraints.gridx = 1;
-				constraints.gridy = 0;
-
-				contentPane.add(cmbSSDBComboNav, constraints);
-				constraints.gridy++;
-				contentPane.add(txtSwingSetBaseTestPK, constraints);
-				constraints.gridy++;
-				contentPane.add(chkSSCheckBox, constraints);
-				constraints.gridy++;
-				contentPane.add(cmbSSComboBox, constraints);
-				constraints.gridy++;
-				contentPane.add(cmbEnumSSComboBox, constraints);
-				constraints.gridy++;
-				contentPane.add(cmbSSDBComboBox, constraints);
-				constraints.gridy++;
-				contentPane.add(imgSSImage, constraints);
-				constraints.gridy++;
-				contentPane.add(lblSSLabel2, constraints);
-				constraints.gridy++;
-				//contentPane.add(lstSSList, constraints);
-				contentPane.add(lstScrollPane, constraints);
-				constraints.gridy++;
-				contentPane.add(sliSSSlider, constraints);
-				constraints.gridy++;
-				contentPane.add(txtSSTextArea, constraints);
-				constraints.gridy++;
-				contentPane.add(txtSSTextField, constraints);
-
-				constraints.gridx = 0;
-				constraints.gridy++;
-				constraints.gridwidth = 2;
-				contentPane.add(navigator, constraints);
-
-		// DISABLE THE PRIMARY KEY
-			txtSwingSetBaseTestPK.setEnabled(false);
-
-		// MAKE THE JFRAME VISIBLE
-			setVisible(true);
+		JScrollPane lstScrollPane = null;
+		if (activeComps.contains(LIST)) {
+			// NEED TO MAKE SURE LIST IS TALLER THAN THE SCROLLPANE TO SEE THE SCROLLBAR
+			lstSSList.setPreferredSize(new Dimension(MainClass.ssDimTall.width-20, MainClass.ssDimVeryTall.height));
+			lstScrollPane = new JScrollPane(lstSSList);
 			lstScrollPane.setPreferredSize(MainClass.ssDimTall);
-			pack();
+		}
 
+		// Setup the container and layout the components.
+		final Container contentPane = getContentPane();
+		contentPane.setLayout(new GridBagLayout());
+		final GridBagConstraints constraints = new GridBagConstraints();
+
+		// Add the components, there's a special case with the list scroll pane.
+		buildGui_add(contentPane, constraints, lstScrollPane);
+
+		constraints.gridx = 0;
+		constraints.gridwidth = 2;
+		contentPane.add(navigator, constraints);
+		
+		// Disable the primary key.
+		txtSwingSetBaseTestPK.setEnabled(false);
+		
+		// Make the JFrame visible.
+		setVisible(true);
+		if (activeComps.contains(LIST)) {
+			assert lstScrollPane != null;
+			lstScrollPane.setPreferredSize(MainClass.ssDimTall);
+		}
+		pack();
+	}
+
+	/** Some components aren't fully initialized until well after startup,
+	 * so replace the component in the info. */
+	private void replaceComponent(Comps eComp, SSComponentInterface comp)
+	{
+		Comp info = compInfo.get(eComp);
+		compInfo.put(eComp, new Comp(info.col, comp, info.label, info.dim));
+	}
+
+	private String getColumnsSQL()
+	{
+		if (activeComps.contains(STAR))
+			return "*";
+		List<String> l = getActiveCompInfo().stream()
+				.filter((comp) -> comp.col != null)
+				.filter((comp) -> comp.comp != cmbEnumSSComboBox) // skip dup column
+				.map((comp) -> comp.col).collect(Collectors.toList());
+		return String.join(", ", l);
+	}
+
+	/** For enabled components, return list of records. */
+	private List<Comp> getActiveCompInfo()
+	{
+		return activeComps.stream()
+				.filter((eComp) -> eComp != STAR)
+				.map((eComp) -> compInfo.get(eComp)).collect(Collectors.toList());
+	}
+
+	private void buildGui_bind()
+	{
+		for (Comp comp : getActiveCompInfo()) {
+			if (comp.col != null)
+				comp.comp.bind(rowset, comp.col);
+		}
+	}
+
+	private void buildGui_dim()
+	{
+		for (Comp comp : getActiveCompInfo()) {
+			comp.label.setPreferredSize( switch (comp.dim) {
+				case H1 -> MainClass.labelDim;
+				case H2 -> MainClass.labelDimTall;
+				case H3 -> MainClass.labelDimVeryTall;
+			});
+			((JComponent)comp.comp).setPreferredSize( switch (comp.dim) {
+				case H1 -> MainClass.ssDim;
+				case H2 -> MainClass.ssDimTall;
+				case H3 -> MainClass.ssDimVeryTall;
+			});
+		}
+	}
+
+	private void buildGui_add(Container contentPane, GridBagConstraints constraints, JScrollPane jspList)
+	{
+		constraints.gridx = 0;
+		constraints.gridy = 0;
+
+		for (Comp comp : getActiveCompInfo()) {
+			constraints.gridx = 0;
+			contentPane.add(comp.label, constraints);
+			constraints.gridx = 1;
+			if(comp.comp != lstSSList)
+				contentPane.add((JComponent)comp.comp, constraints);
+			else
+				contentPane.add(jspList, constraints);
+			constraints.gridy++;
+		}
 	}
 
 	/**
@@ -500,34 +564,31 @@ public class TestBaseComponents extends JFrame {
 	 */
 	public void setDefaultValues() {
 
-		try {
-
-		// GET THE NEW RECORD ID.
-			final ResultSet rs = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-					.executeQuery("SELECT nextval('swingset_base_test_seq') as nextVal;");
+		// Get the new record id.
+		try (ResultSet rs = connection
+				.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+				.executeQuery("SELECT nextval('swingset_base_test_seq') as nextVal;")) {
 			rs.next();
 			final int recordPK = rs.getInt("nextVal");
 			txtSwingSetBaseTestPK.setText(String.valueOf(recordPK));
-			rs.close();
+		} catch(final SQLException se) {
+			logger.log(Level.ERROR, "SQL Exception occured during setting default values.",se);
+		} catch(final Exception e) {
+			logger.log(Level.ERROR, "Exception occured during setting default values.",e);
+		}
 
 		// SET OTHER DEFAULTS
-//			chkSSCheckBox.setSelected(false);
-//			cmbSSComboBox.setSelectedIndex(-1);
-//			cmbEnumSSComboBox.setSelectedIndex(-1);
-//			cmbSSDBComboBox.setSelectedIndex(-1);
-//			imgSSImage.clearImage();
-//			lblSSLabel2.setText(null);
-//			lstSSList.clearSelection();
+//		chkSSCheckBox.setSelected(false);
+//		cmbSSComboBox.setSelectedIndex(-1);
+//		cmbEnumSSComboBox.setSelectedIndex(-1);
+//		cmbSSDBComboBox.setSelectedIndex(-1);
+//		imgSSImage.clearImage();
+//		lblSSLabel2.setText(null);
+//		lstSSList.clearSelection();
 // TODO determine range for slider, 0 was not accepted
-//			sliSSSlider.setValue(1);
-//			txtSSTextArea.setText(null);
-//			txtSSTextField.setText(null);
-
-		} catch(final SQLException se) {
-			logger.error("SQL Exception occured during setting default values.",se);
-		} catch(final Exception e) {
-			logger.error("Exception occured during setting default values.",e);
-		}
+//		sliSSSlider.setValue(1);
+//		txtSSTextArea.setText(null);
+//		txtSSTextField.setText(null);
 
 
 	}

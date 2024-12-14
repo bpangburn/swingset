@@ -48,15 +48,15 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
-import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.formatting.SSCuitField;
+import com.nqadmin.swingset.formatting.SSFormat;
+//import com.nqadmin.swingset.formatting.SSCuitField;
 import com.nqadmin.swingset.formatting.SSCurrencyField;
 import com.nqadmin.swingset.formatting.SSDateField;
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
@@ -67,6 +67,7 @@ import com.nqadmin.swingset.formatting.SSSSNField;
 import com.nqadmin.swingset.formatting.SSTimeField;
 import com.nqadmin.swingset.formatting.SSTimestampField;
 import com.nqadmin.swingset.utils.SSSyncManager;
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * This example demonstrates all of the Formatted SwingSet Components.
@@ -78,48 +79,54 @@ import com.nqadmin.swingset.utils.SSSyncManager;
  * records and in the same order. Otherwise the SSSyncManager will spend a lot of
  * time looping through records to match.
  */
+@SuppressWarnings("serial")
 public class TestFormattedComponents extends JFrame {
 
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(TestFormattedComponents.class);
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -1831202547517957436L;
+    private static final Logger logger = SSUtils.getLogger();
 	
 	/**
 	 * screen label declarations
 	 */
 	JLabel lblSSDBComboNav = new JLabel("SSDBComboNav"); // SSDBComboBox used just for navigation
 	JLabel lblSwingSetFormattedTestPK = new JLabel("Record ID");
-	JLabel lblSSCuitField = new JLabel("SSCuitField");
+	//JLabel lblSSCuitField = new JLabel("SSCuitField");
 	JLabel lblSSCurrencyField = new JLabel("SSCurrencyField");
+	JLabel lblSSCurrencyFieldNull = new JLabel("SSCurrencyFieldNull");
 	JLabel lblSSDateField = new JLabel("SSDateField");
+	JLabel lblSSDateFieldNull = new JLabel("SSDateFieldNull");
 	JLabel lblSSFormattedTextField = new JLabel("SSFormattedTextField");
 	JLabel lblSSIntegerField = new JLabel("SSIntegerField");
+	JLabel lblSSIntegerFieldNull = new JLabel("SSIntegerFieldNull");
 	JLabel lblSSNumericField = new JLabel("SSNumericField");
 	JLabel lblSSPercentField = new JLabel("SSPercentField");
 	JLabel lblSSSSNField = new JLabel("SSSSNField");
 	JLabel lblSSTimeField = new JLabel("SSTimeField");
 	JLabel lblSSTimestampField = new JLabel("SSTimestampField");
+	JLabel lblDebugField = new JLabel("DebugField");
+	JLabel lblDebugFieldNull = new JLabel("DebugFieldNull");
 
 	/**
 	 * bound component declarations
 	 */
 	SSTextField txtSwingSetFormattedTestPK = new SSTextField();
-	SSCuitField fmtSSCuitField = new SSCuitField();
+	//SSCuitField fmtSSCuitField = new SSCuitField();
 	SSCurrencyField fmtSSCurrencyField = new SSCurrencyField();
-	SSDateField fmtSSDateField = new SSDateField(SSDateField.MMDDYYYY);
+	SSCurrencyField fmtSSCurrencyFieldNull = new SSCurrencyField();
+	SSDateField fmtSSDateField = new SSDateField(SSFormat.DATE_MMDDYYYY_SLASH);
+	SSDateField fmtSSDateFieldNull = new SSDateField(SSFormat.DATE_YYYYMMDD_STROKE);
 	SSFormattedTextField fmtSSFormattedTextField = new SSFormattedTextField();
 	SSIntegerField fmtSSIntegerField = new SSIntegerField();
+	SSIntegerField fmtSSIntegerFieldNull = new SSIntegerField();
 	SSNumericField fmtSSNumericField = new SSNumericField();
 	SSPercentField fmtSSPercentField = new SSPercentField();
 	SSSSNField fmtSSSSNField = new SSSSNField();
 	SSTimeField fmtSSTimeField = new SSTimeField();
 	SSTimestampField fmtSSTimestampField = new SSTimestampField();
+	DebugField fmtDebugField = new DebugField();
+	DebugField fmtDebugFieldNull = new DebugField();
 
 	/**
 	 * database component declarations
@@ -139,10 +146,12 @@ public class TestFormattedComponents extends JFrame {
 	 *
 	 * @param _dbConn - database connection
 	 */
+	@SuppressWarnings("LeakingThisInConstructor")
 	public TestFormattedComponents(final Connection _dbConn) {
 
 		// SET SCREEN TITLE
 			super("SwingSet Formatted Component Test");
+			DemoUtil.initExampleFrame(this, null);
 
 		// SET CONNECTION
 			connection = _dbConn;
@@ -155,11 +164,11 @@ public class TestFormattedComponents extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				rowset = new JdbcRowSetImpl(connection);
+				rowset = DemoUtil.getNewRowSet(connection);
 				rowset.setCommand("SELECT * FROM swingset_formatted_test_data;");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 			}
 
 
@@ -170,12 +179,7 @@ public class TestFormattedComponents extends JFrame {
 			 * H2 does not fully support updatable rowset so it must be
 			 * re-queried following insert and delete with rowset.execute()
 			 */
-			navigator.setDBNav(new SSDBNavImpl(this) {
-				/**
-				 * unique serial id
-				 */
-				private static final long serialVersionUID = 4264119495814589191L;
-
+			navigator.getNavigateActions().setDBNav(new SSDBNavImpl(this) {
 				/**
 				 * Re-enable DB Navigator following insertion Cancel
 				 */
@@ -194,7 +198,7 @@ public class TestFormattedComponents extends JFrame {
 					try {
 						rowset.execute();
 					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
+						logger.log(Level.ERROR, "SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -209,7 +213,7 @@ public class TestFormattedComponents extends JFrame {
 					try {
 						rowset.execute();
 					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
+						logger.log(Level.ERROR, "SQL Exception.", se);
 					}
 					performRefreshOps();
 				}
@@ -236,9 +240,9 @@ public class TestFormattedComponents extends JFrame {
 					try {
 						cmbSSDBComboNav.execute();
 					} catch (final SQLException se) {
-						logger.error("SQL Exception.", se);
+						logger.log(Level.ERROR, "SQL Exception.", se);
 					} catch (final Exception e) {
-						logger.error("Exception.", e);
+						logger.log(Level.ERROR, "Exception.", e);
 					}
 					syncManager.sync();
 				}
@@ -252,9 +256,9 @@ public class TestFormattedComponents extends JFrame {
 				try {
 					cmbSSDBComboNav.execute();
 				} catch (final SQLException se) {
-					logger.error("SQL Exception.", se);
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				} catch (final Exception e) {
-					logger.error("Exception.", e);
+					logger.log(Level.ERROR, "Exception.", e);
 				}
 
 			// SETUP SYNCMANAGER, WHICH WILL TAKE CARE OF KEEPING THE COMBO NAVIGATOR AND
@@ -264,55 +268,73 @@ public class TestFormattedComponents extends JFrame {
 			// YOU HAVE TO CALL THE .async() METHOD
 			//
 			// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
-				syncManager = new SSSyncManager(cmbSSDBComboNav, navigator);
+				syncManager = new SSSyncManager(cmbSSDBComboNav, navigator.getNavigateActions());
 				syncManager.setSyncColumnName("swingset_formatted_test_pk");
 				syncManager.sync();
 
 			// SETUP BOUND COMPONENTS
 				txtSwingSetFormattedTestPK.bind(rowset, "swingset_formatted_test_pk");
 
-				fmtSSCuitField.bind(rowset, "ss_cuit_field");
+				//fmtSSCuitField.bind(rowset, "ss_cuit_field");
 				fmtSSCurrencyField.bind(rowset, "ss_currency_field");
+				fmtSSCurrencyFieldNull.bind(rowset, "ss_currency_field_null");
 				fmtSSDateField.bind(rowset, "ss_date_field");
+				fmtSSDateFieldNull.bind(rowset, "ss_date_field_null");
 				fmtSSFormattedTextField.bind(rowset, "ss_formatted_text_field");
 				fmtSSIntegerField.bind(rowset, "ss_integer_field");
+				fmtSSIntegerFieldNull.bind(rowset, "ss_integer_field_null");
 				fmtSSNumericField.bind(rowset, "ss_numeric_field");
 				fmtSSPercentField.bind(rowset, "ss_percent_field");
 				fmtSSSSNField.bind(rowset, "ss_ssn_field");
 				fmtSSTimeField.bind(rowset, "ss_time_field");
 				fmtSSTimestampField.bind(rowset, "ss_timestamp_field");
 
+				//fmtDebugField.bind(rowset, "");
+				//fmtDebugFieldNull.bind(rowset, "");
+				fmtDebugField.setAllowNull(false);
+				fmtDebugField.setText("333");
+
 			// SET LABEL DIMENSIONS
 				lblSSDBComboNav.setPreferredSize(MainClass.labelDim);
 
 				lblSwingSetFormattedTestPK.setPreferredSize(MainClass.labelDim);
 
-				lblSSCuitField.setPreferredSize(MainClass.labelDim);
+				//lblSSCuitField.setPreferredSize(MainClass.labelDim);
 				lblSSCurrencyField.setPreferredSize(MainClass.labelDim);
+				lblSSCurrencyFieldNull.setPreferredSize(MainClass.labelDim);
 				lblSSDateField.setPreferredSize(MainClass.labelDim);
+				lblSSDateFieldNull.setPreferredSize(MainClass.labelDim);
 				lblSSFormattedTextField.setPreferredSize(MainClass.labelDim);
 				lblSSIntegerField.setPreferredSize(MainClass.labelDim);
+				lblSSIntegerFieldNull.setPreferredSize(MainClass.labelDim);
 				lblSSNumericField.setPreferredSize(MainClass.labelDim);
 				lblSSPercentField.setPreferredSize(MainClass.labelDim);
 				lblSSSSNField.setPreferredSize(MainClass.labelDim);
 				lblSSTimeField.setPreferredSize(MainClass.labelDim);
 				lblSSTimestampField.setPreferredSize(MainClass.labelDim);
+				lblDebugField.setPreferredSize(MainClass.labelDim);
+				lblDebugFieldNull.setPreferredSize(MainClass.labelDim);
 
 			// SET BOUND COMPONENT DIMENSIONS
 				cmbSSDBComboNav.setPreferredSize(MainClass.ssDim);
 
 				txtSwingSetFormattedTestPK.setPreferredSize(MainClass.ssDim);
 
-				fmtSSCuitField.setPreferredSize(MainClass.ssDim);
+				//fmtSSCuitField.setPreferredSize(MainClass.ssDim);
 				fmtSSCurrencyField.setPreferredSize(MainClass.ssDim);
+				fmtSSCurrencyFieldNull.setPreferredSize(MainClass.ssDim);
 				fmtSSDateField.setPreferredSize(MainClass.ssDim);
+				fmtSSDateFieldNull.setPreferredSize(MainClass.ssDim);
 				fmtSSFormattedTextField.setPreferredSize(MainClass.ssDim);
 				fmtSSIntegerField.setPreferredSize(MainClass.ssDim);
+				fmtSSIntegerFieldNull.setPreferredSize(MainClass.ssDim);
 				fmtSSNumericField.setPreferredSize(MainClass.ssDim);
 				fmtSSPercentField.setPreferredSize(MainClass.ssDim);
 				fmtSSSSNField.setPreferredSize(MainClass.ssDim);
 				fmtSSTimeField.setPreferredSize(MainClass.ssDim);
 				fmtSSTimestampField.setPreferredSize(MainClass.ssDim);
+				fmtDebugField.setPreferredSize(MainClass.ssDim);
+				fmtDebugFieldNull.setPreferredSize(MainClass.ssDim);
 
 			// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
 				final Container contentPane = getContentPane();
@@ -326,15 +348,21 @@ public class TestFormattedComponents extends JFrame {
 				constraints.gridy++;
 				contentPane.add(lblSwingSetFormattedTestPK, constraints);
 				constraints.gridy++;
-				contentPane.add(lblSSCuitField, constraints);
-				constraints.gridy++;
+				//contentPane.add(lblSSCuitField, constraints);
+				//constraints.gridy++;
 				contentPane.add(lblSSCurrencyField, constraints);
 				constraints.gridy++;
+				contentPane.add(lblSSCurrencyFieldNull, constraints);
+				constraints.gridy++;
 				contentPane.add(lblSSDateField, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSSDateFieldNull, constraints);
 				constraints.gridy++;
 				contentPane.add(lblSSFormattedTextField, constraints);
 				constraints.gridy++;
 				contentPane.add(lblSSIntegerField, constraints);
+				constraints.gridy++;
+				contentPane.add(lblSSIntegerFieldNull, constraints);
 				constraints.gridy++;
 				contentPane.add(lblSSNumericField, constraints);
 				constraints.gridy++;
@@ -345,6 +373,10 @@ public class TestFormattedComponents extends JFrame {
 				contentPane.add(lblSSTimeField, constraints);
 				constraints.gridy++;
 				contentPane.add(lblSSTimestampField, constraints);
+				constraints.gridy++;
+				contentPane.add(lblDebugField, constraints);
+				constraints.gridy++;
+				contentPane.add(lblDebugFieldNull, constraints);
 
 				constraints.gridx = 1;
 				constraints.gridy = 0;
@@ -353,15 +385,21 @@ public class TestFormattedComponents extends JFrame {
 				constraints.gridy++;
 				contentPane.add(txtSwingSetFormattedTestPK, constraints);
 				constraints.gridy++;
-				contentPane.add(fmtSSCuitField, constraints);
-				constraints.gridy++;
+				//contentPane.add(fmtSSCuitField, constraints);
+				//constraints.gridy++;
 				contentPane.add(fmtSSCurrencyField, constraints);
 				constraints.gridy++;
+				contentPane.add(fmtSSCurrencyFieldNull, constraints);
+				constraints.gridy++;
 				contentPane.add(fmtSSDateField, constraints);
+				constraints.gridy++;
+				contentPane.add(fmtSSDateFieldNull, constraints);
 				constraints.gridy++;
 				contentPane.add(fmtSSFormattedTextField, constraints);
 				constraints.gridy++;
 				contentPane.add(fmtSSIntegerField, constraints);
+				constraints.gridy++;
+				contentPane.add(fmtSSIntegerFieldNull, constraints);
 				constraints.gridy++;
 				contentPane.add(fmtSSNumericField, constraints);
 				constraints.gridy++;
@@ -372,6 +410,10 @@ public class TestFormattedComponents extends JFrame {
 				contentPane.add(fmtSSTimeField, constraints);
 				constraints.gridy++;
 				contentPane.add(fmtSSTimestampField, constraints);
+				constraints.gridy++;
+				contentPane.add(fmtDebugField, constraints);
+				constraints.gridy++;
+				contentPane.add(fmtDebugFieldNull, constraints);
 
 				constraints.gridx = 0;
 				constraints.gridy++;
@@ -393,15 +435,14 @@ public class TestFormattedComponents extends JFrame {
 
 		try {
 
-		// GET THE NEW RECORD ID.
-			final ResultSet rs = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-					.executeQuery("SELECT nextval('swingset_formatted_test_seq') as nextVal;");
-			rs.next();
-			final int recordPK = rs.getInt("nextVal");
-			txtSwingSetFormattedTestPK.setText(String.valueOf(recordPK));
-			rs.close();
-
-		// SET OTHER DEFAULTS
+			try ( // GET THE NEW RECORD ID.
+					ResultSet rs = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+							.executeQuery("SELECT nextval('swingset_formatted_test_seq') as nextVal;")) {
+				rs.next();
+				final int recordPK = rs.getInt("nextVal");
+				txtSwingSetFormattedTestPK.setText(String.valueOf(recordPK));
+			}
+			// SET OTHER DEFAULTS
 //			fmtSSCuitField.setText(null);
 //			fmtSSCurrencyField.setText(null);
 //			fmtSSDateField.setText(null);
@@ -412,11 +453,10 @@ public class TestFormattedComponents extends JFrame {
 //			fmtSSSSNField.setText(null);
 //			fmtSSTimeField.setText(null);
 //			fmtSSTimestampField.setText(null);
-
 		} catch(final SQLException se) {
-			logger.error("SQL Exception occured during setting default values.",se);
+			logger.log(Level.ERROR, "SQL Exception occured during setting default values.",se);
 		} catch(final Exception e) {
-			logger.error("Exception occured during setting default values.",e);
+			logger.log(Level.ERROR, "Exception occured during setting default values.",e);
 		}
 
 

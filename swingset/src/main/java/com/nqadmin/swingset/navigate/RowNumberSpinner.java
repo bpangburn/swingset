@@ -1,0 +1,227 @@
+/* *****************************************************************************
+ * Copyright (C) 2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Contributors:
+ *   Prasanth R. Pasala
+ *   Brian E. Pangburn
+ *   Diego Gil
+ *   Man "Bee" Vo
+ *   Ernie R. Rael
+ * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
+package com.nqadmin.swingset.navigate;
+
+import java.awt.AWTEvent;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+
+import javax.swing.Action;
+import javax.swing.ComponentInputMap;
+import javax.swing.InputMap;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.plaf.basic.BasicSpinnerUI;
+
+import com.nqadmin.swingset.navigate.NavigateActions.NavGotoRowAction;
+
+import static java.awt.event.KeyEvent.VK_DOWN;
+import static java.awt.event.KeyEvent.VK_UP;
+import static javax.swing.KeyStroke.getKeyStroke;
+
+/**
+ * Spinner for {@linkplain javax.sql.RowSet}'s row number that accepts an Action;
+ * it listens to an Action for enabled and forwards events to the Action.
+ * Note setAction must be called for things to work properly;
+ * the action contains a {@link javax.swing.SpinnerNumberModel} which
+ * tracks the RowSet's current row and its limits.
+ * <p>
+ * There are some static helper methods for configuring a JSpinner:
+ * {@link #removeTinyArrows(javax.swing.JSpinner, java.awt.Dimension)},
+ * {@link #inWindowUpDownKeys(javax.swing.JComponent)},
+ * and {@link #disableUpDownKeys(javax.swing.JComponent)}.
+ */
+@SuppressWarnings("serial")
+public class RowNumberSpinner extends JSpinner
+{
+	private Action action;
+
+	/**
+	 * Construct spinner for row number in a data navigator.
+	 */
+	public RowNumberSpinner()
+	{
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public SpinnerNumberModel getModel()
+	{
+		return (SpinnerNumberModel) super.getModel();
+	}
+
+	private boolean actionSetModel;
+	/** {@inheritDoc} */
+	@Override
+	public void setModel(SpinnerModel model)
+	{
+		if(!actionSetModel)
+			throw new IllegalArgumentException("Must use setAction");
+		super.setModel(model);
+	}
+
+	/** Use this to track enabled. */
+	final private PropertyChangeListener pclEnableDisableAction = (evt) -> {
+		if ("enabled".equals(evt.getPropertyName()))
+			setEnabled((boolean) evt.getNewValue());
+	};
+
+	/** 
+	 * Listen to the specified action for enabled; send events to it.
+	 * The action contains the model for the JSpinner.
+	 * @param action provides enabled
+	 */
+	public void setAction(Action action)
+	{
+		if (this.action != null)
+			this.action.removePropertyChangeListener(pclEnableDisableAction);
+		if(!(action instanceof NavGotoRowAction gotoRowAction))
+			throw new IllegalArgumentException("Must be NavGotoRowAction");
+		this.action = gotoRowAction;
+
+		// Set the JSpinner model taken from the gotAction.
+		actionSetModel = true;
+		try {
+			setModel(gotoRowAction.rowNumberModel());
+		} finally {
+			actionSetModel = false;
+		}
+		// Listen to the gotoAction for enable/disable Spinner.
+		gotoRowAction.addPropertyChangeListener(pclEnableDisableAction);
+		// Copy the enable/disable state.
+		setEnabled(gotoRowAction.isEnabled());
+		// Forward JSpinner events through the action.
+		addChangeListener((e) -> {
+			gotoRowAction.actionPerformed(new ActionEvent(RowNumberSpinner.this,
+										  AWTEvent.RESERVED_ID_MAX + 1, ""));
+		});
+	}
+
+	/**
+	 * Customize the spinner to get rid of the tiny spinner up/down arrows.
+	 * There's also example code to disable/enable the keyboard up/down arrows.
+	 * @param spinner the spinnner to customize
+	 * @param targetSize used to set the width after removing the arrows
+	 */
+	//https://stackoverflow.com/questions/16284594/disable-up-and-down-arrow-buttons-on-jspinner
+	public static void removeTinyArrows(JSpinner spinner, Dimension targetSize)
+	{
+		Dimension d = spinner.getPreferredSize();
+		d.width = targetSize.width;
+		spinner.setUI(new BasicSpinnerUI() {
+			@Override
+			protected Component createNextButton() {
+				return null;
+			}
+			
+			@Override
+			protected Component createPreviousButton() {
+				return null;
+			}
+		});
+		spinner.setPreferredSize(d);
+
+	}
+
+	/**
+	 * Get one of this component's local input maps. If it doesn't exist
+	 * then create it and hook it in to the component.
+	 * @return the specified input map
+	 */
+	private InputMap getMyInputMap(int whichMap)
+	{
+		return switch (whichMap) {
+		case WHEN_IN_FOCUSED_WINDOW -> {
+			if (inFocusedWindowInputMap == null) {
+				InputMap im = new ComponentInputMap(this);
+				im.setParent(getInputMap(WHEN_IN_FOCUSED_WINDOW));
+				setInputMap(WHEN_IN_FOCUSED_WINDOW, im);
+				inFocusedWindowInputMap = im;
+			}
+			yield inFocusedWindowInputMap;
+		}
+		case WHEN_ANCESTOR_OF_FOCUSED_COMPONENT -> {
+			if (ancestorOfFocusedComponentInputMap == null) {
+				InputMap im = new InputMap();
+				im.setParent(getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT));
+				setInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, im);
+				ancestorOfFocusedComponentInputMap = im;
+			}
+			yield ancestorOfFocusedComponentInputMap;
+		}
+		default -> null;
+		};
+	}
+
+	private InputMap inFocusedWindowInputMap;
+	private InputMap ancestorOfFocusedComponentInputMap;
+
+	/**
+	 * Use the up/down arrow keys while this spinner's window is focused
+	 * to adjust row number.
+	 * @param enable true enables up/down keys when window has focus
+	 */
+	public void setWindowUpDownKeysEnable(boolean enable)
+	{
+		InputMap im = getMyInputMap(WHEN_IN_FOCUSED_WINDOW);
+		im.put(getKeyStroke(VK_UP, 0), enable ? "increment" : null);
+		im.put(getKeyStroke(VK_DOWN, 0), enable ? "decrement" : null);
+	}
+
+	/**
+	 * Disable the up/down arrow keys for this spinner component.
+	 * When disabling, window up/down keys are disabled
+	 * using {@link RowNumberSpinner#setWindowUpDownKeysEnable(boolean)}.
+	 * 
+	 * @param enable true enables default
+	 */
+	public void setUpDownKeysEnable(boolean enable)
+	{
+		InputMap im = getMyInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+		im.put(getKeyStroke(VK_UP, 0), enable ? null : "none");
+		im.put(getKeyStroke(VK_DOWN, 0), enable ? null : "none");
+	}
+}

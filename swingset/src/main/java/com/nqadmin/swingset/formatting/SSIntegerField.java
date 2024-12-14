@@ -35,97 +35,80 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
-import javax.swing.SwingConstants;
+import java.text.NumberFormat;
+import java.util.Objects;
 
-// SSIntegerField.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+import javax.swing.text.DefaultFormatterFactory;
+
+import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
 
 /**
- * Used to link a SSFormattedTextField to an integer column in a database.
+ * Typically used to bind a SSFormattedTextField to an integer column in a database.
  */
-
-public class SSIntegerField extends SSFormattedTextField {
-
+@SuppressWarnings("serial")
+public class SSIntegerField extends NumberField
+{
 	/**
-	 * Unique serial id
+	 * Creates a new instance of SSIntegerField
 	 */
-	private static final long serialVersionUID = -1820785941185499480L;
-
-//	/**
-//	 * Minimum number of digits for integer.
-//	 */
-//	private int minimumIntegerDigits;
-
-	/**
-	 * Precision for integer.
-	 */
-	private int precision = 1;
-
-	/**
-	 * Creates a new instance of PgIntegerField
-	 */
-	public SSIntegerField() {
-		this(new SSIntegerFormatterFactory());
+	public SSIntegerField()
+	{
+		this(createFormatterFactory(CUSTOM, null));
 	}
 
 	/**
 	 * Creates an object of SSIntegerField with the specified number of digits.
 	 *
-	 * @param _precision - number of digits needed
+	 * @param precision - number of digits needed
 	 */
-	public SSIntegerField(final int _precision) {
-		this(new SSIntegerFormatterFactory(_precision));
+	public SSIntegerField(int precision) {
+		this(createFormatterFactory(CUSTOM, precision));
 	}
 
 	/**
 	 * Creates an object of SSIntegerField with the specified formatter factory
 	 *
-	 * @param _factory - formatter factory to be used
+	 * @param factory - formatter factory to be used
 	 */
-	public SSIntegerField(final javax.swing.JFormattedTextField.AbstractFormatterFactory _factory) {
-		super(_factory);
-		setHorizontalAlignment(SwingConstants.RIGHT);
+	public SSIntegerField(AbstractFormatterFactory factory) {
+		super(factory);
 	}
 
-//	/**
-//	 * Getter for property minimumIntegerDigits.
-//	 *
-//	 * @return Value of property minimumIntegerDigits.
-//	 */
-//	public int getMinimumIntegerDigits() {
-//
-//		return minimumIntegerDigits;
-//	}
-
 	/**
-	 * Returns the number of digits used for displaying integer
-	 *
-	 * @return returns the number of digits used for displaying integer
+	 * This class should throw a run-time exception if this method is used;
+	 * but it is silently ignored.
+	 * {@inheritDoc }
 	 */
-	public int getPrecision() {
-		return precision;
+	@Override
+	public void setDecimals(final int decimals) {
 	}
 
-//	/**
-//	 * Setter for property minimumIntegerDigits.
-//	 *
-//	 * @param _minimumIntegerDigits New value of property minimumIntegerDigits.
-//	 */
-//	public void setMinimumIntegerDigits(final int _minimumIntegerDigits) {
-//
-//		minimumIntegerDigits = _minimumIntegerDigits;
-//	}
-
 	/**
-	 * Sets the number of digits needed to display the number
-	 *
-	 * @param _precision - number of digits to be used to display the number
+	 * Create a FormatterFactory.
+	 * @param ssFormat
+	 * @param precision
+	 * @return FormatterFactory.
 	 */
-	public void setPrecision(final int _precision) {
-		precision = _precision;
-		setFormatterFactory(new SSIntegerFormatterFactory(_precision));
+	public static DefaultFormatterFactory createFormatterFactory(
+			SSFormat ssFormat, Integer precision)
+	{
+		Objects.requireNonNull(ssFormat);
+
+		NumberFormat integerFormat = createNumberFormat(()->NumberFormat.getIntegerInstance());
+
+		initPrecision(precision, integerFormat);
+		
+		return new SSFormatterFactory.Builder<>()
+				.ssFormat(ssFormat)
+				.displayFormatter(new SSNumberFormatter(integerFormat))
+				.editFormatter(new SSNumberFormatter(integerFormat))
+				.build();
 	}
 }

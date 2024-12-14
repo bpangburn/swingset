@@ -5,8 +5,7 @@
 ${licenseFirst}
 </#if>
 </#if>
-${licensePrefix}Copyright (C) ${date?date?string("yyyy")}, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
-${licensePrefix}All rights reserved.
+${licensePrefix}Copyright (C) ${date?date?string("yyyy")}, Ernie R Rael. All rights reserved.
 ${licensePrefix?replace(" +$", "", "r")}
 ${licensePrefix}Redistribution and use in source and binary forms, with or without
 ${licensePrefix}modification, are permitted provided that the following conditions are met:
@@ -33,13 +32,6 @@ ${licensePrefix}INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHE
 ${licensePrefix}CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ${licensePrefix}ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ${licensePrefix}POSSIBILITY OF SUCH DAMAGE.
-${licensePrefix?replace(" +$", "", "r")}
-${licensePrefix}Contributors:
-${licensePrefix}  Prasanth R. Pasala
-${licensePrefix}  Brian E. Pangburn
-${licensePrefix}  Diego Gil
-${licensePrefix}  Man "Bee" Vo
-${licensePrefix}  Ernie R. Rael
 <#if licenseLast??>
 <#if licenseLast == " */">
  * ****************************************************************************/

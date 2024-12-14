@@ -39,6 +39,8 @@ package com.nqadmin.swingset;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -56,9 +58,11 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
+import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
 // SSDBNavImpl.java
@@ -84,12 +88,7 @@ public class SSDBNavImpl implements SSDBNav {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = SSUtils.getLogger();
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -4632505399798312457L;
+	protected static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Screen where components to be cleared are located.
@@ -111,7 +110,7 @@ public class SSDBNavImpl implements SSDBNav {
 	@Override
 	public void performPreInsertOps() {
 
-		logger.debug("About to call setComponents() to clear values.");
+		logger.log(DEBUG, "About to call setComponents() to clear values.");
 		setComponents(container);
 
 	} // end public void performPreInsertOps() {
@@ -138,7 +137,7 @@ public class SSDBNavImpl implements SSDBNav {
 				// IF IT IS A SSFormattedTextField SET ITS VALUE TO NULL (to avoid parse
 				// exception)
 				if (comps[i] instanceof SSFormattedTextField) {
-					((SSFormattedTextField) comps[i]).setValue(null);
+					((SSFormattedTextField) comps[i]).cleanField();
 				} else {
 					// IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING
 					((JTextField) comps[i]).setText("");
@@ -149,10 +148,10 @@ public class SSDBNavImpl implements SSDBNav {
 			} else if (comps[i] instanceof JTextArea) {
 				// IF IT IS A JTextArea, SET TO EMPTY STRING
 				((JTextArea) comps[i]).setText("");
-			} else if (comps[i] instanceof SSBaseComboBox) {
+			} else if (comps[i] instanceof SSBaseComboBox<?,?,?>) {
 				// IF IT IS A SSBaseComboBox THEN SET IT TO 'EMPTY' ITEM BEFORE FIRST ITEM
 				((SSBaseComboBox<?, ?, ?>) comps[i]).setSelectionPending(true);
-			} else if (comps[i] instanceof JComboBox) {
+			} else if (comps[i] instanceof JComboBox<?>) {
 				// IF IT IS A JComboBox THEN SET IT TO 'EMPTY' ITEM BEFORE FIRST ITEM
 				((JComboBox<?>) comps[i]).setSelectedIndex(-1);
 			} else if (comps[i] instanceof SSImage) {
@@ -183,28 +182,38 @@ public class SSDBNavImpl implements SSDBNav {
 						.setValue((((JSlider) comps[i]).getMinimum() + ((JSlider) comps[i]).getMaximum()) / 2);
 			} else if (comps[i] instanceof JRootPane) {
 				// IF IT IS A JRootPane RECURSIVELY SET THE FIELDS
-				setComponents((Container) comps[i]);
+				setComponents((JRootPane) comps[i]);
 			} else if (comps[i] instanceof JPanel) {
 				// IF IT IS A JPanel RECURSIVELY SET THE FIELDS
-				setComponents((Container) comps[i]);
+				setComponents((JPanel) comps[i]);
 			} else if (comps[i] instanceof JLayeredPane) {
 				// IF IT IS A JLayeredPane RECURSIVELY SET THE FIELDS
-				setComponents((Container) comps[i]);
+				setComponents((JLayeredPane) comps[i]);
 			} else if (comps[i] instanceof JTabbedPane) {
 				// IF IT IS A JTabbedPane RECURSIVELY SET THE FIELDS
-				setComponents((Container) comps[i]);
+				setComponents((JTabbedPane) comps[i]);
 			} else if (comps[i] instanceof JScrollPane) {
 				// IF IT IS A JScrollPane GET THE VIEW PORT AND RECURSIVELY SET THE FIELDS IN
 				// VIEW PORT
 				setComponents(((JScrollPane) comps[i]).getViewport());
 			} else {
 				// DIPLAY WARNING FOR UNKNOWN COMPONENT
-				logger.warn("Encountered unknown component type of: " + comps[i].getClass().getSimpleName()
+				logger.log(WARNING, "Encountered unknown component type of: " + comps[i].getClass().getSimpleName()
 						+ ". Unable to clear component.");
 			}
 
 		}
 
 	} // end protected void setComponents(Container _container) {
+
+	/**
+	 * Find all SSComponents in this navigator's container.
+	 * @return List of SScomponents
+	 */
+	@Override
+	public List<SSComponentInterface> findSSComponents()
+	{
+		return SSUtils.findSSComponents(container);
+	}
 
 } // end public class SSDBNavImpl

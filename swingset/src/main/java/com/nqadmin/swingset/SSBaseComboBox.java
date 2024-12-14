@@ -35,12 +35,16 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset;
 
 import static com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.addEventLogging;
 import static com.nqadmin.swingset.models.OptionMappingSwingModel.asOptionMappingSwingModel;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -48,6 +52,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -57,14 +62,20 @@ import java.util.Objects;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
 import com.nqadmin.swingset.models.GlazedListsOptionMappingInfo;
 import com.nqadmin.swingset.models.OptionMappingSwingModel;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
+import com.nqadmin.swingset.navigate.NavigateActions;
+import com.nqadmin.swingset.navigate.RowSetModificationEvent;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -72,6 +83,8 @@ import com.nqadmin.swingset.utils.SSUtils;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.matchers.TextMatcherEditor;
 import ca.odell.glazedlists.swing.AutoCompleteSupport;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSBaseComboBox.java
 //
@@ -113,10 +126,9 @@ import ca.odell.glazedlists.swing.AutoCompleteSupport;
 //       - removeMapping(M)
 //       - 
 //
+@SuppressWarnings("serial")
 public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> implements SSComponentInterface
 {
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to the rowset in certain instances.
 	 * <p>
@@ -144,51 +156,12 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			//
 			// Could be combined with next block, but keeping them separate for debugging.
 			if (isComboBoxNavigator()) {
-				logger.debug("{}: Action Listener returning. No bound column.", () -> getColumnForLog());
+				logger.log(DEBUG, () -> sf("%s: Action Listener returning. No bound column.", getColumnForLog()));
 				return;
 			}
 			
-//			// **** GL STRICT/CONTAINS ****
-//			//
-//			// Could be combined with prior block, but keeping them separate for debugging.
-//			// May be able to eliminate actionListenerNoUpdate when GlazedLists fully supports STRICT/CONTAINS
-//			//
-//			// actionListenerNoUpdate will be set to true in setSelectedItem() when the user enters a non-matching string.
-//			// It is also in the 'else' for unforeseen outcomes. The user is notified with a popup in both cases.
-//			// 
-//			// actionListenerNoUpdate is likely STRICT/CONTAINS workaround specific. Presumably if GL fully supported it,
-//			// we'd only ever have null or an SSListItem passed to setSelectedItem(). Will have to put some thought into
-//			// when we'd expect null (insert row, some escaping from/clearing of the combo editor)? Maybe we'd only ever
-//			// have null for the insert row OR getModel().getSize()==0 ?
-//			if (actionListenerNoUpdate) {
-//				logger.debug("{}: Action Listener returning. actionListenerNoUpdate set to TRUE.", () -> getColumnForLog());
-//				return;
-//			}
-//			
-//			// EXTRACT SELECTED ITEM
-//			Object selectedItem = getSelectedItem();
-//			logger.debug("{}: ACTION LISTENER: getSelectedItem() has '{}'.", () -> getColumnForLog(), () -> selectedItem);
-//			
-//			// **** GL STRICT/CONTAINS ****
-//			//
-//			// IF SELECTED ITEM IS NOT AN SSLISTITEM, CHECK THE glGlitchItem
-//			// 
-//			// This seems to be a strange timing issue. The logs indicate that setSelectedItem() below has encountered 
-//			// SCENARIO 1-B and has made a call to super.setSelectedItem() to select the correct/updated SSListItem, but
-//			// selectedItem here still has a String. glGlitchItem has the correct/updated SSListItem.
-//			//
-//			// Making a 2nd call to super.setSelectedItem(glGlitchItem) appears to resolve the issue and does not trigger an
-//			// additional ActionListener event.
-//			if (selectedItem==null || !(selectedItem instanceof SSListItem)) {
-//				if (glGlitchItem!=null) {
-//					logger.debug("{}:  -- About to call super.setSelectedItem({}) {}.", () -> getColumnForLog(), () -> glGlitchItem);
-//					SSBaseComboBox.super.setSelectedItem(glGlitchItem);
-//					logger.debug("{}:  -- getSelectedItem() now returns {}.", () -> getColumnForLog(), () -> getSelectedItem());
-//				}
-//			}
-			
 			// UPDATE ROWSET
-			logger.debug("{}: About to update RowSet with {}.", () -> getColumnForLog(), () -> getSelectedItem());
+			logger.log(DEBUG, () -> sf("%s: About to update RowSet with %s.", getColumnForLog(), getSelectedItem()));
 			updateRowset();
 		}
 	}
@@ -268,15 +241,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		 */
 		protected AutoCompleteSupport<SSListItem> autoComplete;
 
-		// **** GL STRICT/CONTAINS ****
-		//
-		// See https://stackoverflow.com/questions/15210771/autocomplete-with-glazedlists for info on modifying lists.
-		// See https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html
-		// We would like to call autoComplete.setStrict(true), but it is not currently compatible with TextMatcherEditor.CONTAINS, which is the more important feature.
-		// There is a support request to support STRICT and CONTAINS: https://github.com/glazedlists/glazedlists/issues/676
-		// Note that installing AutoComplete support makes the ComboBox editable.
-		// Should already in the event dispatch thread so don't use invokeAndWait()
-
 		/**
 		 * Create a model that has a glazed EventList;
 		 * install autocompletion in the specified JComboBox.
@@ -304,10 +268,27 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		/**
 		 * Create a model with a glazed EventList.
 		 */
+		@SuppressWarnings("Convert2Diamond")
 		protected BaseGlazedModel() {
 			// false means no Options2
 			super(false, new BasicEventList<SSListItem>());
 		}
+	}
+
+	/** {@inheritDoc } */
+	@Override
+	public void addUndoableChange(RowSetModificationEvent ev) throws SQLException
+	{
+		SSComponentInterface.super.addUndoableChange(ev);
+		NavigateActions.newSlot(this);
+	}
+
+	/** {@inheritDoc } */
+	@Override
+	public void undoRedoUpdateObject(NavigateActions.UndoRedo cmd, Object value) throws SQLException
+	{
+		SSComponentInterface.super.undoRedoUpdateObject(cmd, value);
+		SwingUtilities.invokeLater(() -> this.hidePopup());
 	}
 
 	/**
@@ -375,30 +356,11 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * @see #createNullItem(com.nqadmin.swingset.models.OptionMappingSwingModel.Remodel)
 	 */
 	transient protected SSListItem nullItem;
-	
-//	/**
-//	 * String typed by user into combobox
-//	 */
-//	// **** GL STRICT/CONTAINS ****
-//	private String priorEditorText = "";
 
 	/**
 	 * Common fields shared across SwingSet components
 	 */
-	protected SSCommon ssCommon = new SSCommon(this);
-
-//	/**
-//	 * List item used to workaround GlazedList CONTAINS bug/glitch.
-//	 */
-//	// **** GL STRICT/CONTAINS ****
-//	private SSListItem glGlitchItem = null;
-	
-//	/**
-//	 * Indicates that a garbage string has been entered and the Action Listener should not
-//	 * try to update the rowset.
-//	 */
-//	// **** GL STRICT/CONTAINS ****
-//	private boolean actionListenerNoUpdate = false;
+	private final SSCommon ssCommon;
 
 	/**
 	 * This is used when moving to a new row when getAllowNull() == false 
@@ -439,17 +401,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	}
 
 	/**
-	 * Convenience method for accessing the model with proper casting.
-	 * 
-	 * @return mapping list model with proper casting, may be null
-	 * @deprecated use field optionModel directly
-	 */
-	@Deprecated
-	protected OptionMappingSwingModel<M, O, O2> getOptionModel() {
-		return optionModel;
-	}
-
-	/**
 	 * Get the support for the glazed lists installed in this combo box.
 	 * 
 	 * @return the support or null if GlazedLists not installed
@@ -465,6 +416,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	public SSBaseComboBox() {
 		addItemListener(new SSBaseComboBoxItemListener());
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -545,158 +497,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		Object item = getSelectedItem();
 		return item != null && item != nullItem;
 	}
-	
-//	/**
-//	 * {@inheritDoc }
-//	 * Deal with edge cases for combo editor interaction with GlazedLists and lack of support
-//	 * for STRICT/CONTAINS in GlazedLists.
-//	 */
-//	// **** GL STRICT/CONTAINS ****
-//	//
-//	// IT IS POSSIBLE THAT NO OVERRIDE OF setSelectedItem() WILL BE NEEDED IF GLAZEDLISTS FULLY SUPPORTS
-//	// STRICT/CONTAINS
-//	@Override
-//	public void setSelectedItem(final Object _value) {
-//		// 2020-12-30_BP: setSelectedItem outcomes:
-//		//
-//		// See https://docs.oracle.com/javase/8/docs/api/javax/swing/JComboBox.html#setSelectedItem-java.lang.Object-
-//		//
-//		//  1. We get a null:
-//		//      A. A direct/indirect non-UI call was made to setSelectedItem(null).
-//		//         This could be a value from the rowset listener, a programmatically set default, etc.
-//		//         In this case the editorComponent should NOT have the focus.
-//		//         -> call super.setSelectedItem(null) and continue
-//		//      B. GlazedList bug where for the first character entered, the START_WITH matching is performed over the CONTAINS matching. In this case,
-//		//         (getModel().getSize() > 0)
-//		//         -> call super.setSelectedItem(getItemAt(0)) and continue
-//		//      C. The user's entry into the editor results in zero matches. In this case ((getModel().getSize()==0) && (hasItems()==true))
-//		//         -> set actionListenerNoUpdate to true so the Action Listener does not try to update the rowset
-//		//         -> warn user, (attempt to) revert the editor string, and continue (simulated STRICT)
-//		//      D. SOMETHING ELSE???
-//		//         -> set actionListenerNoUpdate to true so the Action Listener does not try to update the rowset
-//		//         -> warn user and continue
-//		//         
-//		//  2. We get a valid SSListItem including nullItem if getAllowNull()==true. This could be from the UI or from a 
-//		//     direct/indirect non UI call to setSelectedItem().
-//		//	   -> call super.setSelectedItem(_value) and continue
-//		//
-//		//  3. We get a String or something else.
-//		//     -> set actionListenerNoUpdate to true so the Action Listener does not try to update the rowset
-//		//     -> warn user and return
-//	
-//		// INITIALIZATION
-//		glGlitchItem = null; // WORKAROUND FOR GL 'CONTAINS' GLITCH
-//		actionListenerNoUpdate = false; // TRUE WHEN THE USER HAS ENTERED SOMETHING RESULTING IN NO MATCHES
-//
-//		// GET CURRENT EDITOR TEXT IF AVAILABLE
-//		final String currentEditorText;
-//		if (getEditor().getItem() == null) {
-//			currentEditorText = "";
-//		} else {
-//			currentEditorText = getEditor().getItem().toString();
-//		}
-//		
-//		// INITIAL LOGGING
-//		logger.debug(() -> String.format("%s: CALL TO setSelectedItem(%s), allowNull: %b, priorEditorText: '%s', currentEditorText: '%s'",
-//				getColumnForLog(), _value, getAllowNull(), priorEditorText, currentEditorText));
-//		
-//		// EVALUATE SCENARIOS DOCUMENTED ABOVE
-//		if (_value == null) {
-//			// #1 - WE HAVE A NULL
-//			if (!getEditor().getEditorComponent().hasFocus()) {
-//				// SCENARIO #1-A ABOVE - setting null from a rowset listener or programmatically
-//				// (e.g., a default)
-//				super.setSelectedItem(null);
-//				priorEditorText = currentEditorText;
-//				logger.debug(
-//						"{}: Null not from UI (e.g., rowset, default). Selected item after super.setSelectedItem()={}",
-//						() -> getColumnForLog(), () -> getSelectedItem());
-//
-//			} else if (getModel().getSize() > 0) {
-//				// SCENARIO #1-B ABOVE - null due to GlazedList glitch when items contain the
-//				// first character, but GL does not match the first item returned
-//				glGlitchItem = getItemAt(0);
-//				super.setSelectedItem(glGlitchItem);
-//				priorEditorText = getEditor().getItem().toString();
-//				logger.debug(
-//						"{}: Null due to GlazedLists glitch so selecting first item in model. Selected item after super.setSelectedItem()={}",
-//						() -> getColumnForLog(), () -> getSelectedItem());
-//
-//			} else if (!currentEditorText.isEmpty()) {
-//				// SCENARIO #1-C ABOVE - null because user likely entered garbage - revert
-//				// editor and return without a call to setSelectedItem()
-//				// 2020-12-29_BP: AT ONE POINT THE FOLLOWING CODE SEEMED TO WORK, BUT NOW THE
-//				// CALL TO getEditor().setItem(priorEditorText) DOES NOT APPEAR TO
-//				// REVERT THE TEXT
-//				// - HAVE TINKERED WITH THE ORDERING OF showPopup() AND updateUI()
-//				// - HAVE CONFIRMED THAT isEditable() IS TRUE
-//				logger.debug(() -> String.format(
-//						"%s: User entered string of '%s' did not match any list items. Attempting to revert to '%s'.",
-//						getColumnForLog(), currentEditorText, priorEditorText));
-//
-//				// TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
-//				actionListenerNoUpdate = true;
-//
-//				// REVERT STRING
-//				getEditor().setItem(priorEditorText);
-//				// showPopup();// When this was working as intended, the ordering of showPopup()
-//				// before updateUI() was relevant.
-//				updateUI(); // NEEDED TO SHOW REVERTED ITEM (ORIGINALLY INTENDED TO SHOW REVERTED TEXT IN
-//							// EDITOR)
-//
-//				// WARN USER AND LOG
-//				String editorText = getEditor().getItem().toString();
-//
-//				JOptionPane.showMessageDialog(SSBaseComboBox.this,
-//						"The text entered does not match any item in the list. Reverting to '" + editorText + "'.");
-//
-//				logger.debug(() -> String.format("%s:   Editor string following revert action: '%s'.",
-//						getColumnForLog(), editorText));
-//
-//			} else {
-//				// SCENARIO #1-D ABOVE - SOMETHING ELSE NOT ANTICIPATED
-//				// SAME RESULT AS SCENARIO #3 BELOW
-//				// TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
-//				actionListenerNoUpdate = true; // TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
-//
-//				// WARN USER AND LOG
-//				JOptionPane.showMessageDialog(SSBaseComboBox.this,
-//						String.format("Unexpected call to setSelectedItem() for column %s with value '%s'.",
-//								getColumnForLog(), _value));
-//				logger.warn(() -> String.format("%s: Unexpected call to setSelectedItem() with '%s'.)",
-//						getColumnForLog(), _value));
-//			}
-//		} else if (_value instanceof SSListItem) {
-//			// #2 - WE HAVE A SSLISTITEM (including nullItem if getAllowNull()==true)
-//			super.setSelectedItem(_value);
-//			priorEditorText = currentEditorText;
-//			// 2020-12-29_BP: CONFIRMED selectAll() IS NEEDED FOLLOWING A NORMAL ITEM
-//			// SELECTION
-//			// OTHERWISE USER IS APPENDING EXISTING ITEM STRING IF THEY START TO TYPE
-//			if (getEditor().getEditorComponent().hasFocus()) {
-//				// after we find a match, do a select all on the editor so
-//				// if the user starts typing again it won't be appended
-//				// 2020-12-21_BP: if we don't limited to field with focus, the comboboxes blink
-//				// on navigation
-//				// this also causes the focus to jump out of a navigation combo
-//				getEditor().selectAll();
-//			}
-//			logger.debug("{}: Valid match. Selected item after super.setSelectedItem()={}", () -> getColumnForLog(),
-//					() -> getSelectedItem());
-//		} else {
-//			// SCENARIO #3 - WE HAVE A STRING OR SOME OBJECT OTHER THAN NULL OR SSLISTITEM
-//			// SAME RESULT AS SCENARIO #1-D ABOVE
-//			// TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
-//			actionListenerNoUpdate = true; // TELL ACTION LISTENER NOT TO UPDATE ITEM OR ROWSET
-//
-//			// WARN USER AND LOG
-//			JOptionPane.showMessageDialog(SSBaseComboBox.this, String.format(
-//					"Unexpected call to setSelectedItem() for column %s with value '%s'.", getColumnForLog(), _value));
-//			logger.warn(() -> String.format("%s: Unexpected call to setSelectedItem() with '%s'.)", getColumnForLog(),
-//					_value));
-//
-//		}
-//	}
 
 	/**
 	 * Typically true when at a new row waiting for use to select something;
@@ -751,15 +551,15 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * OR null if nothing is selected.
 	 */
 	public M getSelectedMapping() {
-		logger.trace(() -> String.format("%s: getSelectedMapping(), idx:map %d:%s.",
+		logger.log(TRACE, () -> sf("%s: getSelectedMapping(), idx:map %d:%s.",
 				getColumnForLog(), getSelectedIndex(), getSelectedItem()));
 
 		M result = null;
 
 		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
 			Object item = getSelectedItem();
-			if (item instanceof SSListItem) {
-				result = remodel.getMapping((SSListItem)item);
+			if (item instanceof SSListItem lItem) {
+				result = remodel.getMapping(lItem);
 			}
 		}
 
@@ -773,7 +573,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			if(missingOptionControl.contains(MissingOptionControl.MOC_ADD)) {
 				remodel.add(_mapping, null);
 				index = remodel.getMappings().indexOf(_mapping);
-				logger.debug(() -> "missingMappingOption added: " + _mapping);
+				logger.log(DEBUG, () -> "missingMappingOption added: " + _mapping);
 				generatedMappingOptions.add(_mapping);
 			}
 		}
@@ -790,7 +590,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				|| !missingOptionControl.contains(MissingOptionControl.MOC_CLEANUP))
 			return;
 		if(generatedMappingOptions.size() > 1)
-			logger.warn(() -> "size: " + generatedMappingOptions.size());
+			logger.log(WARNING, () -> "size: " + generatedMappingOptions.size());
 		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
 			for (Iterator<M> it = generatedMappingOptions.iterator(); it.hasNext();) {
 				M missingMappingOption = it.next();
@@ -801,9 +601,9 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				int index = remodel.getMappings().indexOf(missingMappingOption);
 				if(index != -1) {
 					SSListItem removed = remodel.remove(index);
-					logger.debug(() -> "missingMappingOption removed: " + removed);
+					logger.log(DEBUG, () -> "missingMappingOption removed: " + removed);
 				} else {
-					logger.warn(() -> "not in combo: " + missingMappingOption);
+					logger.log(WARNING, () -> "not in combo: " + missingMappingOption);
 				}
 				it.remove(); // it's not in the combo list anymore
 			}
@@ -871,12 +671,12 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	public void setSelectedMapping(final M _mapping) {
 		
-		logger.debug(String.format("%s: current value: %s, new value: %s.",
+		logger.log(DEBUG, sf("%s: current value: %s, new value: %s.",
 				getColumnForLog(), getSelectedMapping(), _mapping ));
 
 		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
 			if (!hasItems()) {
-				logger.warn(String.format("%s: combobox is empty", getColumnForLog()));
+				logger.log(WARNING, sf("%s: combobox is empty", getColumnForLog()));
 				// Doesn't have items, that doesn't mean that the list is empty.
 				// Make sure the appropriate null is selected.
 				setSelectedItem(nullItem);
@@ -907,14 +707,14 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				// requeried, the component will try to load the current column value from the rowset and this time
 				// setSelectedMapping() should succeed.
 				if (getSSCommon().isSSComponentListenerAdded()) {
-					logger.warn(String.format("%s: No mapping available for %s in combobox, setSelectedItem(null)", getColumnForLog(), _mapping));
+					logger.log(WARNING, () -> sf("%s: No mapping available for %s in combobox, setSelectedItem(null)", getColumnForLog(), _mapping));
 				}
 			}
 			setSelectedItem(item);
 			
-			logger.trace("{}: eventList - [{}].", () -> getColumnForLog(), () ->  remodel.getItemList().toString());
-			logger.trace("{}: options - [{}].", () -> getColumnForLog(), () ->  remodel.getOptions().toString());
-			logger.trace("{}: mappings - [{}].", () -> getColumnForLog(), () ->  remodel.getMappings().toString());
+			logger.log(TRACE, () -> sf("%s: eventList - [%s].", getColumnForLog(), remodel.getItemList().toString()));
+			logger.log(TRACE, () -> sf("%s: options - [%s].", getColumnForLog(), remodel.getOptions().toString()));
+			logger.log(TRACE, () -> sf("%s: mappings - [%s].", getColumnForLog(), remodel.getMappings().toString()));
 		}
 	}
 
@@ -930,8 +730,8 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 
 		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
 			Object item = getSelectedItem();
-			if (item instanceof SSListItem) {
-				result = remodel.getOption((SSListItem)item);
+			if (item instanceof SSListItem lItem) {
+				result = remodel.getOption(lItem);
 			}
 		}
 
@@ -950,7 +750,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 
 		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
 			if(!hasItems()) {
-				logger.warn(String.format("%s: combobox is empty", getColumnForLog()));
+				logger.log(WARNING, sf("%s: combobox is empty", getColumnForLog()));
 				// Even if combo is empty, stick _option in editor. Do not return;
 			}
 			
@@ -975,7 +775,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			} else {
 				// Didn't find it in the list, so just use it as is.
 				item = _option != null ? _option : nullItem;
-				logger.warn(() -> String.format("%s: option %s not in combobox, do setSelectedItem.", getColumnForLog(), _option));
+				logger.log(WARNING, () -> sf("%s: option %s not in combobox, do setSelectedItem.", getColumnForLog(), _option));
 			}
 			
 			setSelectedItem(item);
@@ -1009,16 +809,16 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			public void keyPressed(KeyEvent keyEvent) {
 				int keyCode = keyEvent.getKeyCode();
 				if (keyCode == KeyEvent.VK_UP) {
-					logger.trace(() -> String.format("%s: Intercepted UP key.", getColumnForLog()));
+					logger.log(TRACE, () -> sf("%s: Intercepted UP key.", getColumnForLog()));
 					if (getSelectedIndex() == 0) {
 						keyEvent.consume();
-						logger.debug(() -> String.format("%s: UP key consumed.", getColumnForLog()));
+						logger.log(DEBUG, () -> sf("%s: UP key consumed.", getColumnForLog()));
 					}
 				} else if (keyCode == KeyEvent.VK_DOWN) {
-					logger.trace(() -> String.format("%s: Intercepted DOWN key.", getColumnForLog()));
+					logger.log(TRACE, () -> sf("%s: Intercepted DOWN key.", getColumnForLog()));
 					if (getSelectedIndex() == getModel().getSize() - 1) {
 						keyEvent.consume();
-						logger.debug(() -> String.format("%s: DOWN key consumed.", getColumnForLog()));
+						logger.log(DEBUG, () -> sf("%s: DOWN key consumed.", getColumnForLog()));
 					}
 				}
 			}
@@ -1030,16 +830,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	//
 	// Here's SwingSet scaffolding and nullItem maintenance.
 	//
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
-	}
 	
 	/**
 	 * {@inheritDoc }
@@ -1050,27 +840,12 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	}
 
 	/**
-	 * {@inheritDoc }
+	 * By default, the combo is not editable; Glazed lists will change.
 	 */
 	@Override
-	public void setSSCommon(final SSCommon _ssCommon) {
-		ssCommon = _ssCommon;
-
-	}
-
-	/**
-	 * Method to allow Developer to add functionality when SwingSet component is
-	 * instantiated.
-	 * <p>
-	 * It will actually be called from SSCommon.init() once the SSCommon data member
-	 * is instantiated.
-	 */
-	@Override
-	public void customInit() {
-		// SET PREFERRED DIMENSIONS
-// TODO not sure SwingSet should be setting component dimensions
-		setPreferredSize(new Dimension(200, 20));
-		setEditable(false); // NOTE: GLAZED LIST WILL OVERRIDE THIS
+	public void customInit()
+	{
+		setEditable(false);
 	}
 
 	/**
@@ -1079,7 +854,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	@Override
 	public void setAllowNull(boolean _allowNull) {
-		ssCommon.setAllowNull(_allowNull);
+		getSSCommon().setAllowNull(_allowNull);
 		adjustForNullItem();
 	}
 
@@ -1095,7 +870,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 //	@Deprecated
 //	public void setEditable(boolean _editable) {
 //		if (_editable && getAutoComplete() == null) {
-//			logger.warn(String.format("%s: SwingSet requires non-editable combo boxes.", getColumnForLog()));
+//			logger.warn(sf("%s: SwingSet requires non-editable combo boxes.", getColumnForLog()));
 //		} else {
 //			super.setEditable(_editable);
 //		}
@@ -1210,15 +985,15 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	private void updateRowset() {
 		
-		ssCommon.removeRowSetListener();
+		getSSCommon().removeRowSetListener();
 		
 		M mapping = getSelectedMapping();
 	
 		if (mapping == null) {
-			logger.debug(() -> String.format("%s: Setting to null.", getColumnForLog()));
+			logger.log(DEBUG, () -> sf("%s: Setting to null.", getColumnForLog()));
 			setBoundColumnText(null);
 		} else {
-			logger.debug(() -> String.format("%s: Setting to %s.",  getColumnForLog(), mapping));
+			logger.log(DEBUG, () -> sf("%s: Setting to %s.",  getColumnForLog(), mapping));
 			// TODO: need to avoid setting to same value
 			// for NavGroupState. Wonder why, avoids event?
 			//setBoundColumnText(String.valueOf(mapping));
@@ -1237,7 +1012,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			//}
 		}
 	
-		ssCommon.addRowSetListener();
+		getSSCommon().addRowSetListener();
 	}
 	
 	/**
@@ -1274,7 +1049,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			final String boundColumnText = getBoundColumnText();
 
 			// LOGGING
-			logger.debug(() -> String.format("%s: getBoundColumnText() - %s", getColumnForLog(), boundColumnText));
+			logger.log(DEBUG, () -> sf("%s: getBoundColumnText() - %s", getColumnForLog(), boundColumnText));
 			
 			// GET THE BOUND VALUE STORED IN THE ROWSET - may throw a NumberFormatException
 			Object objValue = null;
@@ -1292,19 +1067,19 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			M targetValue = (M) objValue;
 			
 			// LOGGING
-			logger.debug(() -> String.format("%s: targetValue - %s", getColumnForLog(), targetValue));
+			logger.log(DEBUG, () -> sf("%s: targetValue - %s", getColumnForLog(), targetValue));
 			
 			// UPDATE COMPONENT
 			setSelectedMapping(targetValue);// setSelectedMapping() should handle null OK.}
 
 		} catch (final NumberFormatException nfe) {
-			JOptionPane.showMessageDialog(this, String.format(
+			JOptionPane.showMessageDialog(this, sf(
 					"Encountered database value of '%s' for column [%s], which cannot be converted to a number.", getBoundColumnText(), getColumnForLog()));
-			logger.error(getColumnForLog() + ": Number Format Exception.", nfe);
+			logger.log(Level.ERROR, () -> sf("%s: Number Format Exception.", getColumnForLog()), nfe);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(this, String.format(
+			JOptionPane.showMessageDialog(this, sf(
 					"Expecting SSComboBox or SSDBComboBox, but component for column [%s] is of type %s.", this.getClass(), getColumnForLog()));
-			logger.error(getColumnForLog() + ": Unknown SwingSet component of " + this.getClass() + ".", e);
+			logger.log(Level.ERROR, getColumnForLog() + ": Unknown SwingSet component of " + this.getClass() + ".", e);
 		} finally {
 			cleanupMissingMappingOptions();
 		}
@@ -1354,44 +1129,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		for (ActionListener listener : listeners) {
 			comboBox.addActionListener(listener);
 		}
-	}
-
-	////////////////////////////////////////////////////////////////////////
-	//
-	// THIS getSelectedIndex() IS A TRANSITION AID.
-	//
-	// Remove it when...
-
-	/**
-	 * If getAllowNull() then throw an exception if this method is used
-	 * from "com.nqadmin" outside of swingset itself.
-	 * {@inheritDoc }
-	 * @deprecated Avoid using getSelectedIndex() unless you are very familiar with GlazedLists and SwingSet nullItem
-	 */
-	@Override
-	@Deprecated
-	public int getSelectedIndex() {
-
-		StackTraceElement[] stack = new Throwable().getStackTrace();
-		String caller = stack.length >= 2 ? stack[1].getClassName() : "";
-
-		if((caller.startsWith("com.nqadmin") && !caller.startsWith("com.nqadmin.swingset")
-				|| caller.startsWith("com.nqadmin.swingset.demo")
-			) && ssCommon != null && ssCommon.getAllowNull()) {
-			throw new IllegalStateException("App::getSelectedIndex && getAllowNull()");
-		}
-
-		return super.getSelectedIndex();
-	}
-	
-	/**
-	 * {@inheritDoc }
-	 * @deprecated Avoid using setSelectedIndex() unless you are very familiar with GlazedLists and SwingSet nullItem
-	 */
-	@Override
-	@Deprecated
-	public void setSelectedIndex(int _index) {
-		super.setSelectedIndex(_index);
 	}
 
 	////////////////////////////////////////////////////////////////////////
@@ -1467,8 +1204,41 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
 	@SuppressWarnings({"all","UseOfSystemOutOrSystemErr"})
 	private static void p(int n, int i, Object item) {
-		String s = String.format("n %d, i %d, item %s", n, i, item);
+		String s = sf("n %d, i %d, item %s", n, i, item);
 		trackout.add(s);
 		System.err.println(s);
 	}
+
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("%s{item=%s, %s}", getClass().getSimpleName(),
+				getSelectedItem(), SSUtils.ssComponentToString(this));
+	}
+
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
+	}
+
 }

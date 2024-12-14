@@ -37,6 +37,10 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import com.nqadmin.swingset.SSComboBox;
+import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
+import com.nqadmin.swingset.datasources.RowSetOps.ForceConflict;
+import static com.nqadmin.swingset.demo.DemoUtil.configureJavaUtilLogger;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -60,26 +64,78 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import static java.lang.System.Logger.Level.*;
 import org.h2.tools.RunScript;
 
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSMysqlSetModel;
+import com.nqadmin.swingset.utils.CentralLookup;
+import com.nqadmin.swingset.utils.SSUtils;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+import com.nqadmin.swingset.utils.SSVersion;
 import com.raelity.lib.ui.Screens;
 
 import gnu.getopt.Getopt;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.BoxLayout;
+import javax.swing.Popup;
+import javax.swing.PopupFactory;
+import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
+import java.util.Objects;
+import javax.sql.RowSet;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
  */
-public class MainClass extends JFrame {
+@SuppressWarnings("serial")
+public class MainClass extends JFrame
+{
+
+	/**
+	 * database
+	 */
+	public static final String DATABASE_NAME = "suppliers_and_parts";
+	private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
+
+	private static final boolean USE_IN_MEMORY_DATABASE = true;
+
+	private static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
+	private static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
+	private static final String DATABASE_SCRIPT_TEST_IMAGES = "swingset_tests_load_blobs.sql";
+	private static final String DATABASE_SCRIPT_DEBUG = "swingset_debug.sql";
+
+	private static final boolean RUN_DEMO_SQL_SCRIPTS = true;
+	private static final boolean RUN_TEST_SQL_SCRIPTS = true;
+	private static final boolean RUN_DEBUG_SQL_SCRIPTS = false;
+
+
 	private static final Map<String, Object> globalHints = new HashMap<>();
+
+	static {
+		if(Boolean.FALSE) {
+			Objects.nonNull(new H2Trace(""));
+			Objects.nonNull(new MainClass().new LogManListener());
+		}
+	}
+
+	static class LoadDemoImages {}
+	static class H2Trace {
+		private final String flags;
+		H2Trace() { this.flags = ""; }
+		H2Trace(String flags) { this.flags = flags; }
+		String getTraceUrlFlags() { return flags; }
+	}
+	static class H2Workaround {}
 
 	/**
 	 * ActionListener implementation to call code for each button.
@@ -90,28 +146,28 @@ public class MainClass extends JFrame {
 			super();
 		}
 
-		@SuppressWarnings("unused")
+		@SuppressWarnings({"unused", "ResultOfObjectAllocationIgnored"})
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 			final Map<String, Object> hints = new HashMap<>(globalHints);
 
 			if (ae.getSource().equals(btnExample1)) {
-				logger.debug("**** Opening Example1 ****");
+				logger.log(DEBUG, "**** Opening Example1 ****");
 				new Example1(dbConnection);
 			} else if (ae.getSource().equals(btnExample2)) {
-				logger.debug("**** Opening Example2 ****");
+				logger.log(DEBUG, "**** Opening Example2 ****");
 				new Example2(dbConnection);
 			} else if (ae.getSource().equals(btnExample3)) {
-				logger.debug("**** Opening Example3 ****");
+				logger.log(DEBUG, "**** Opening Example3 ****");
 				new Example3(dbConnection);
 			} else if (ae.getSource().equals(btnExample4)) {
-				logger.debug("**** Opening Example4 ****");
+				logger.log(DEBUG, "**** Opening Example4 ****");
 				new Example4(dbConnection);
 			} else if (ae.getSource().equals(btnExample4Advanced)) {
-				logger.debug("**** Opening Example4Advanced ****");
+				logger.log(DEBUG, "**** Opening Example4Advanced ****");
 				new Example4Advanced(dbConnection);
 			} else if (ae.getSource().equals(btnExample4UsingHelper)) {
-				logger.debug("**** Opening Example4UsingHelper ****");
+				logger.log(DEBUG, "**** Opening Example4UsingHelper ****");
 				JFrame e4JFrame = new JFrame("Example4 Using Helper");
 				e4JFrame.setLocation(DemoUtil.getChildScreenLocation("Example4UsingHelper"));
 				Example4UsingHelper example4 = new Example4UsingHelper(dbConnection, e4JFrame);
@@ -121,16 +177,16 @@ public class MainClass extends JFrame {
 				// screen dimensions handled by SSScreenHelperCommon.setScreenSize()
 				e4JFrame.setVisible(true);
 			} else if (ae.getSource().equals(btnExample5)) {
-				logger.debug("**** Opening Example5 ****");
+				logger.log(DEBUG, "**** Opening Example5 ****");
 				new Example5(dbConnection);
 			} else if (ae.getSource().equals(btnExample6)) {
-				logger.debug("**** Opening Example6 ****");
+				logger.log(DEBUG, "**** Opening Example6 ****");
 				new Example6(dbConnection);
 			} else if (ae.getSource().equals(btnExample7)) {
-				logger.debug("**** Opening Example7 ****");
+				logger.log(DEBUG, "**** Opening Example7 ****");
 				new Example7(dbConnection);
 			} else if (ae.getSource().equals(btnExample7UsingHelper)) {
-				logger.debug("**** Opening Example7UsingHelper ****");
+				logger.log(DEBUG, "**** Opening Example7UsingHelper ****");
 				JFrame e7JFrame = new JFrame("Example7 Using Helper");
 				Example7UsingHelper example7 = new Example7UsingHelper(dbConnection, null);
 				e7JFrame.add(example7);
@@ -140,17 +196,77 @@ public class MainClass extends JFrame {
 				e7JFrame.setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 				e7JFrame.setVisible(true);
 			} else if (ae.getSource().equals(btnTestBase)) {
-				logger.debug("**** Opening TestBaseComponents ****");
+				logger.log(DEBUG, "**** Opening TestBaseComponents ****");
 				new TestBaseComponents(dbConnection, hints);
 			} else if (ae.getSource().equals(btnTestGrid)) {
-				logger.debug("**** TestGridComponents not implemented ****");
+				logger.log(DEBUG, "**** TestGridComponents not implemented ****");
 				// TODO
 				// new TestGridComponents(dbConnection);
 			} else if (ae.getSource().equals(btnTestFormatted)) {
-				logger.debug("**** Opening TestFormattedComponents ****");
+				logger.log(DEBUG, "**** Opening TestFormattedComponents ****");
 				new TestFormattedComponents(dbConnection);
 			}
 		}
+	}
+
+	@SuppressWarnings("serial")
+	private class ComboRowSetSource extends SSComboBox {
+		Popup popup;
+
+		public ComboRowSetSource() {
+			super(false);
+			setMaximumSize(new Dimension(210, 25));
+			setAllowNull(false);
+			DemoUtil.RowSetSource rsSource = DemoUtil.getWhichRowSetDefault();
+			setOptions(DemoUtil.RowSetSource.class);
+			setSelectedEnum(rsSource);
+			btnRowSetSource.setText("RowSet: " + rsSource.toString());
+		}
+
+		@Override
+		public DemoUtil.RowSetSource getSelectedEnum() {
+			return (DemoUtil.RowSetSource) super.getSelectedEnum();
+		}
+
+		@Override
+		public void setSelectedItem(Object anObject) {
+			super.setSelectedItem(anObject);
+			DemoUtil.RowSetSource rsSource = getSelectedEnum();
+			DemoUtil.setWhichRowSetDefault(rsSource);
+			btnRowSetSource.setText("RowSet: " + rsSource.toString());
+			if (popup == null) {
+				return;
+			}
+			popup.hide();
+			popup = null;
+		}
+	}
+
+	private class RowSetSourceMouseListener extends MouseAdapter {
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (comboRowSetSource.popup != null) {
+				comboRowSetSource.popup.hide();
+				comboRowSetSource.popup = null;
+				return;
+			}
+			Point p = e.getLocationOnScreen();
+			Popup popup = PopupFactory.getSharedInstance().getPopup(
+					null, comboRowSetSource, p.x, p.y);
+			comboRowSetSource.popup = popup;
+			popup.show();
+			SwingUtilities.invokeLater(() -> comboRowSetSource.showPopup());
+		}
+	}
+
+	private class LogManListener implements ActionListener
+	{
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+		}
+
 	}
 
 	/**
@@ -176,7 +292,7 @@ public class MainClass extends JFrame {
 	private static final int ssHeight = 20;
 	private static final int ssHeightTall = 100; // used for lists, textareas
 	private static final int ssHeightVeryTall = 200; // used for images
-	private static final int ssWidth = 200;
+	private static final int ssWidth = 240;
 
 	protected static final Dimension ssDim = new Dimension(ssWidth, ssHeight);
 	protected static final Dimension ssDimTall = new Dimension(ssWidth, ssHeightTall); // used for lists, textareas
@@ -186,18 +302,6 @@ public class MainClass extends JFrame {
 	protected static final int childScreenHeightTall = 800;
 	protected static final int childScreenWidth = 600;
 	protected static final int childScreenCount = 10;
-
-	/**
-	 * database
-	 */
-	private static final String DATABASE_NAME = "suppliers_and_parts";
-	private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
-
-	private static final boolean USE_IN_MEMORY_DATABASE = true;
-
-	private static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
-	private static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
-	private static final String DATABASE_SCRIPT_TEST_IMAGES = "swingset_tests_load_blobs.sql";
 
 	private Connection dbConnection = null;
 
@@ -217,31 +321,34 @@ public class MainClass extends JFrame {
 	private JButton btnTestBase = new JButton("Test Base Components");
 	private JButton btnTestFormatted = new JButton("Test Formatted Components");
 	private JButton btnTestGrid = new JButton("Test Grid Components");
+	private JButton btnRowSetSource = new JButton("RowSet: XXXXXXXX");
+	private ComboRowSetSource comboRowSetSource = new ComboRowSetSource();
+	private JButton btnLogMan = new JButton("Manage Logging");
 
 	/**
 	 * Log4j2 Logger
 	 */
-	private static final Logger logger = LogManager.getLogger(MainClass.class);
-	private static final boolean RUN_SQL_SCRIPTS = true;
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -6316984401822746124L;
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Constructor for MainClass
 	 */
-	@SuppressWarnings("LeakingThisInConstructor")
+	@SuppressWarnings({"LeakingThisInConstructor", "OverridableMethodCallInConstructor"})
 	public MainClass() {
 
 		// SETUP WINDOW
 		super("SwingSet Demo");
 		setSize(300, 300);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				DemoUtil.logConnectionUsage();
+			}
+		});
 
 		// ECHO WORKING DIRECTORY
-		logger.info("Working Directory = " + System.getProperty("user.dir"));
+		logger.log(INFO, "Working Directory = " + System.getProperty("user.dir"));
 
 		// INITIALIZE DATABASE
 		if ("h2".equals(dbname)) {
@@ -251,9 +358,17 @@ public class MainClass extends JFrame {
 			dbConnection = databaseSetup.getConnection();
 		}
 		if (dbConnection == null) {
-			logger.fatal("Error initializing database. Exiting.");
+			logger.log(Level.ERROR, "Error initializing database. Exiting.");
 			System.exit(1);
 		}
+
+		CentralLookup.getDefault().add(new DefaultSSDBSupport(dbConnection) {
+			@Override
+			public RowSet getJdbcRowSet(RowSet rs) throws SQLException
+			{
+				return DemoUtil.getNewRowSet(getTemporaryConnection(rs), DemoUtil.RowSetSource.POOL_JDBC);
+			}
+		});
 
 		// ADD ACTION LISTENERS FOR BUTTONS
 		btnExample1.addActionListener(new MyButtonListener());
@@ -269,6 +384,8 @@ public class MainClass extends JFrame {
 		btnTestBase.addActionListener(new MyButtonListener());
 		btnTestGrid.addActionListener(new MyButtonListener());
 		btnTestFormatted.addActionListener(new MyButtonListener());
+		btnRowSetSource.addMouseListener(new RowSetSourceMouseListener());
+		//btnLogMan.addActionListener(new LogManListener());
 
 		// SET BUTTON DIMENSIONS
 		btnExample1.setPreferredSize(buttonDim);
@@ -284,6 +401,8 @@ public class MainClass extends JFrame {
 		btnTestBase.setPreferredSize(buttonDim);
 		btnTestGrid.setPreferredSize(buttonDim);
 		btnTestFormatted.setPreferredSize(buttonDim);
+		btnRowSetSource.setPreferredSize(buttonDim);
+		btnLogMan.setPreferredSize(buttonDim);
 
 		// LAYOUT BUTTONS
 		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
@@ -300,17 +419,22 @@ public class MainClass extends JFrame {
 		getContentPane().add(btnTestBase);
 		// getContentPane().add(this.btnTestGrid);
 		getContentPane().add(btnTestFormatted);
+		getContentPane().add(btnRowSetSource);
+		if (DemoUtil.isUtilLogging()) {
+			btnLogMan.setAction(DemoUtil.getLogManAction());
+			getContentPane().add(btnLogMan);
+		}
 
 		// DISPLAY SCREEN
 		setVisible(true);
 		pack();
 		Screens.translateToPrefScreen(this);
 	}
-
+	
 	/**
 	 * Class to initialize the database connection and load the database content
 	 * from a script
-	 * 
+	 *
 	 * @return database connection
 	 */
 	protected Connection getDatabase() {
@@ -322,49 +446,92 @@ public class MainClass extends JFrame {
 
 			Class.forName("org.h2.Driver");
 
-			logger.debug("Resource path: {}.", () -> getClass().getPackage().getName());
-			logger.debug("Resource path: {}.", () -> getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
+			logger.log(DEBUG, ()->sf("Resource path: %s.", getClass().getPackage().getName()));
+			logger.log(DEBUG, "Resource path: %s.", getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
 
-			final InputStream inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
-			final InputStream inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
-			if ((inStreamDemo == null) || (inStreamTest == null)) {
-				logger.fatal("Please add the file " + DATABASE_SCRIPT_DEMO + " and " + DATABASE_SCRIPT_TEST + " and "
-						+ DATABASE_SCRIPT_TEST_IMAGES + " to the classpath, package "
-						+ getClass().getPackage().getName());
-			} else {
-				if (USE_IN_MEMORY_DATABASE) {
-					result = DriverManager.getConnection("jdbc:h2:mem:" + DATABASE_NAME);
-					logger.info("Established connection to in-memory database.");
-				} else {
-					// ASSUMING DATABASE IS IN LOCAL ./h2/databases/ FOLDER WITH DEFAULT USERNAME OF
-					// sa AND BLANK PASSWORD
-					// USEFUL FOR WORKING WITH DATASET FOR SWINGSET TESTS
-					result = DriverManager.getConnection("jdbc:h2:tcp:" + DATABASE_PATH + DATABASE_NAME, "sa", "");
-					logger.info("Established connection to database server.");
-				}
+			InputStream inStreamDemo = null;
+			InputStream inStreamTest = null;
+			InputStream inStreamDebug = null;
 
-				// RUN SCRIPTS AND CLOSE STREAMS
-				if (RUN_SQL_SCRIPTS) {
-					RunScript.execute(result, new InputStreamReader(inStreamDemo));
-					inStreamDemo.close();
+			boolean has_startup_error = false;
 
-					RunScript.execute(result, new InputStreamReader(inStreamTest));
-					inStreamTest.close();
-
-					if (!no_load_images) {
-						String sql = "UPDATE swingset_base_test_data"
-								+ " SET ss_image = ? WHERE swingset_base_test_pk = ?";
-						DemoUtil.loadBinaries(result, "/swingset-demo-images.txt", sql, verbose);
-					}
+			if (RUN_DEMO_SQL_SCRIPTS) {
+				inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
+				if (inStreamDemo == null) {
+					logger.log(Level.ERROR, "Please add the file " + DATABASE_SCRIPT_DEMO
+							+ " to the classpath, package " + getClass().getPackage().getName());
+					has_startup_error = true;
 				}
 			}
 
+			if (RUN_TEST_SQL_SCRIPTS) {
+				inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
+				if (inStreamTest == null) {
+					logger.log(Level.ERROR, "Please add the file "
+							+ DATABASE_SCRIPT_TEST + " and " + DATABASE_SCRIPT_TEST_IMAGES
+							+ " to the classpath, package "
+							+ getClass().getPackage().getName());
+					has_startup_error = true;
+				}
+			}
+
+			if (RUN_DEBUG_SQL_SCRIPTS) {
+				inStreamDebug = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEBUG);
+				if (inStreamDebug == null) {
+					logger.log(Level.ERROR, "Please add the file " + DATABASE_SCRIPT_DEBUG
+							+ " to the classpath, package " + getClass().getPackage().getName());
+					has_startup_error = true;
+				}
+			}
+
+			if (has_startup_error) {
+				logger.log(Level.ERROR, "\n*******\n*******\n*******");
+				System.exit(1);
+			}
+
+			if (USE_IN_MEMORY_DATABASE) {
+				result = DriverManager.getConnection("jdbc:h2:mem:" + DATABASE_NAME
+						+ defLookup(H2Trace.class).getTraceUrlFlags());
+				logger.log(INFO, "Established connection to in-memory database.");
+			} else {
+				// ASSUMING DATABASE IS IN LOCAL ./h2/databases/ FOLDER WITH DEFAULT USERNAME OF
+				// sa AND BLANK PASSWORD
+				// USEFUL FOR WORKING WITH DATASET FOR SWINGSET TESTS
+				result = DriverManager.getConnection("jdbc:h2:tcp:" + DATABASE_PATH + DATABASE_NAME, "sa", "");
+				logger.log(INFO, "Established connection to database server.");
+			}
+
+			// RUN SCRIPTS AND CLOSE STREAMS
+			if (RUN_DEMO_SQL_SCRIPTS) {
+				assert inStreamDemo != null;
+				RunScript.execute(result, new InputStreamReader(inStreamDemo));
+				inStreamDemo.close();
+			}
+
+			if (RUN_TEST_SQL_SCRIPTS) {
+				assert inStreamTest != null;
+				RunScript.execute(result, new InputStreamReader(inStreamTest));
+				inStreamTest.close();
+
+				if (!no_load_images) {
+					String sql = "UPDATE swingset_base_test_data"
+							+ " SET ss_image = ? WHERE swingset_base_test_pk = ?";
+					DemoUtil.loadBinaries(result, "/swingset-demo-images.txt", sql, verbose);
+				}
+			}
+
+			if (RUN_DEBUG_SQL_SCRIPTS) {
+				assert inStreamDebug != null;
+				RunScript.execute(result, new InputStreamReader(inStreamDebug));
+				inStreamDebug.close();
+			}
+
 		} catch (final IOException ioe) {
-			logger.error("IO Exception.", ioe);
+			logger.log(Level.ERROR, "IO Exception.", ioe);
 		} catch (final SQLException se) {
-			logger.error("SQL Exception.", se);
+			logger.log(Level.ERROR, "SQL Exception.", se);
 		} catch (final ClassNotFoundException cnfe) {
-			logger.error("Class Not Found Exception.", cnfe);
+			logger.log(Level.ERROR, "Class Not Found Exception.", cnfe);
 		}
 
 		return result;
@@ -387,6 +554,7 @@ public class MainClass extends JFrame {
 		 * @param resourceName name of resource
 		 * @return BufferReader for specified resource
 		 */
+		@SuppressWarnings("UseOfSystemOutOrSystemErr")
 		BufferedReader getBufferedReader(String resourceName) {
 			InputStream stream = MainClass.class.getResourceAsStream(resourceName);
 			if (stream == null) {
@@ -398,6 +566,7 @@ public class MainClass extends JFrame {
 		}
 
 		@Override
+		@SuppressWarnings("UseOfSystemOutOrSystemErr")
 		public void run() {
 			Properties info = getDatabaseProperties();
 			if (info == null) {
@@ -451,6 +620,7 @@ public class MainClass extends JFrame {
 			}
 		}
 
+		@SuppressWarnings("UseOfSystemOutOrSystemErr")
 		Properties getFileProperties(String fname) {
 			try {
 				Properties props = new Properties();
@@ -460,7 +630,7 @@ public class MainClass extends JFrame {
 			} catch (FileNotFoundException ex) {
 				System.err.println("Property file '" + fname + "' not found");
 			} catch (IOException ex) {
-				logger.error("IO exception.", ex);
+				logger.log(Level.ERROR, "IO exception.", ex);
 			}
 			return null;
 		}
@@ -481,7 +651,7 @@ public class MainClass extends JFrame {
 					}
 					ok = true;
 				} catch (IOException ex) {
-					logger.error("IO exception.", ex);
+					logger.log(Level.ERROR, "IO exception.", ex);
 				}
 				if (!ok) {
 					break;
@@ -498,6 +668,7 @@ public class MainClass extends JFrame {
 		}
 
 		@Override
+		@SuppressWarnings("UseOfSystemOutOrSystemErr")
 		BufferedReader getBufferedReader(String fileName) {
 			try {
 				return new BufferedReader(new FileReader(fileName));
@@ -509,8 +680,7 @@ public class MainClass extends JFrame {
 
 		@Override
 		Properties getDatabaseProperties() {
-			Properties info = null;
-			info = getFileProperties(propertyFile);
+			Properties info = getFileProperties(propertyFile);
 			return info;
 		}
 
@@ -532,7 +702,6 @@ public class MainClass extends JFrame {
 
 		@Override
 		public void run() {
-			return;
 		}
 
 		@Override
@@ -600,30 +769,40 @@ public class MainClass extends JFrame {
 
 	private static String cmdName = "SwingSetDemo";
 
+	@SuppressWarnings({"ResultOfMethodCallIgnored", "UseOfSystemOutOrSystemErr"})
 	private static void usage() {
 		// TODO: specify don't load images
-		String usage = "\n" + "Run the SwingSet demo. With no options/args use the self contained\n"
-				+ "in memory database.\n" + "\n" + cmdName
-				+ " [-h] [-v] [-d] [-n] [-i] [-r] [-p fname] [-s sql]* [dbms-server]\n" + "\n"
-				+ "    -h             help\n" + "    -v             verbose; output initialization sql as executed\n"
-				+ "    -d             dump/create sql scripts in local directory, exit\n"
-				+ "    -n             do NOT initialize database, just run demo\n"
-				+ "    -i             do NOT load images\n"
-				// + " -r print a readme to stdout\n"
-				+ "    -p fname       properties file for jdbc database connection\n"
-				+ "                   'DB_URL', 'DB_DRIVER_CLASS' keys required\n"
-				+ "    -s sqlScript   sql file to initialize database, multiple OK\n" + "\n"
-				+ "If specified, dbms-server in {mysql}\n"
-				+ "Internal mysql properties use database swingset_demo_suppliers_and_parts.\n"
-				+ "After the sql files are run, the images are loaded, unless '-i'.\n"
-				+ "Use '-n -p props' to run demo with a previously initialized database.\n"
-				+ "Use '-d' or '-d mysql' to create local files with sql initialization.\n"
-				+ "See swingset-demo/README.txt for more information.\n" + "\n"
-				+ "Examples: (ss.jar like swingset-demo-vers-jar-with-dependencies.jar)\n"
-				+ "    java -jar ss.jar -d   # dump sql that creates in memory database\n"
-				+ "    java -jar ss.jar -d mysql   # dump sql to create mysql database\n"
-				+ "    java -cp jdbc_driver:ss.jar com.nqadmin.swingset.demo.MainClass \\\n"
-				+ "        -p db_props -s initializer.sql\n" + "\n";
+		String usage = """
+				
+				Run the SwingSet demo. With no options/args use the self contained
+				in memory database.
+				
+				CMD_NAME [-h] [-v] [-d] [-n] [-i] [-r] [-p fname] [-s sql]* [dbms-server]
+				
+				    -h             help
+				    -v             verbose; output initialization sql as executed
+				    -d             dump/create sql scripts in local directory, exit
+				    -n             do NOT initialize database, just run demo
+				    -i             do NOT load images
+				    -p fname       properties file for jdbc database connection
+				                   'DB_URL', 'DB_DRIVER_CLASS' keys required
+				    -s sqlScript   sql file to initialize database, multiple OK
+				
+				If specified, dbms-server in {mysql}
+				Internal mysql properties use database swingset_demo_suppliers_and_parts.
+				After the sql files are run, the images are loaded, unless '-i'.
+				Use '-n -p props' to run demo with a previously initialized database.
+				Use '-d' or '-d mysql' to create local files with sql initialization.
+				See swingset-demo/README.txt for more information.
+				
+				Examples: (ss.jar like swingset-demo-vers-jar-with-dependencies.jar)
+				    java -jar ss.jar -d   # dump sql that creates in memory database
+				    java -jar ss.jar -d mysql   # dump sql to create mysql database
+				    java -cp jdbc_driver:ss.jar com.nqadmin.swingset.demo.MainClass \\
+				        -p db_props -s initializer.sql
+				
+				""";
+		usage = usage.replace("CMD_NAME", cmdName);
 		System.err.println(usage);
 		System.exit(1);
 	}
@@ -635,11 +814,25 @@ public class MainClass extends JFrame {
 	 * @param _args - optional command line arguments, which are ignored by this
 	 *              program
 	 */
-	public static void main(final String[] _args) {
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	public static void main(final String[] _args)
+	{
+		configureJavaUtilLogger();
+
+		CentralLookup lkup = CentralLookup.getDefault();
+		lkup.add(new LoadDemoImages());
+		lkup.add(new H2Trace());
+		//lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
+		//lkup.add(new H2Workaround()); // fixed in H2 Version 2.3.230 (2024-07-15
+		lkup.add(new ForceConflict(0));
+
 		boolean some_error = false;
-		System.err.println(String.format("java:%s vm:%s date:%s os:%s", System.getProperty("java.version"),
-				System.getProperty("java.vm.version"), System.getProperty("java.version.date"),
-				System.getProperty("os.name")));
+		System.err.printf("java:%s vm:%s date:%s os:%s\n",
+				System.getProperty("java.version"),
+				System.getProperty("java.vm.version"),
+				System.getProperty("java.version.date"),
+				System.getProperty("os.name"));
+		System.err.printf("SwingSet: %s\n", SSVersion.get().toString());
 
 		Getopt g = new Getopt(cmdName, _args, "hvdinrp:s:");
 
@@ -677,8 +870,7 @@ public class MainClass extends JFrame {
 		if (verbose) {
 			StringBuilder sb = new StringBuilder();
 			sb.append('\n').append(cmdName);
-			for (int i = 0; i < _args.length; i++) {
-				String arg = _args[i];
+			for (String arg : _args) {
 				sb.append(' ').append(arg);
 			}
 			System.err.println(sb.toString());
@@ -725,20 +917,15 @@ public class MainClass extends JFrame {
 			}
 		}
 
-		switch (dbname) {
-		case DBMS_MYSQL:
-			databaseSetup = new MysqlSetup();
-			break;
-		case DBMS_EXTERNAL:
-			databaseSetup = new ExternalSetup(userSqlFiles);
-			break;
-		case DBMS_H2:
-			databaseSetup = new H2Setup();
-			break;
-		default:
+		databaseSetup = switch (dbname) {
+			case DBMS_MYSQL -> new MysqlSetup();
+			case DBMS_EXTERNAL -> new ExternalSetup(userSqlFiles);
+			case DBMS_H2 -> new H2Setup();
+			default -> null;
+		};
+		if (databaseSetup == null) {
 			System.err.println("Unknown database server '" + dbname + "' . Exiting.");
 			some_error = true;
-			break;
 		}
 
 		if (some_error) {

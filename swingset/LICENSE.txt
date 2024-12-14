@@ -1,4 +1,4 @@
-Copyright (C) 2003-2023, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+Copyright (C) 2003-2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,3 +33,7 @@ Contributors:
   Diego Gil
   Man "Bee" Vo
   Ernie R. Rael
+
+The conditions in the above copyright notice apply to this copyright notice.
+Additions and modifications made by Ernie R. Rael are
+copyright (C) 2024, Ernie R. Rael. All rights reserved.

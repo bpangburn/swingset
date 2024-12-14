@@ -47,13 +47,16 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
-import com.nqadmin.rowset.JdbcRowSetImpl;
+import static java.lang.System.Logger.Level.*;
+
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 //SSFormViewScreenHelper.java
@@ -64,17 +67,13 @@ import com.nqadmin.swingset.utils.SSEnums.Navigation;
  * Helper class for designing SwingSet Form View screens.
  */
 //public abstract class SSFormViewScreenHelper extends JInternalFrame {
+@SuppressWarnings("serial")
 public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {	
 
 	/**
 	 * Implementation of SSDBNav interface.
 	 */
 	private class FormHelperSSDBNavImpl extends SSDBNavImpl {
-
-		/**
-		 * unique serial ID
-		 */
-		private static final long serialVersionUID = 3470473198734864411L;
 		
 		/**
 		 * Primary key of record being deleted.
@@ -132,7 +131,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 */
 		@Override
 		public void performCancelOps() {
-			logger.debug("");
+			logger.log(DEBUG, "");
 			getComboNav().setEnabled(true);
 			ssDBNavPerformCancelOps();
 		}
@@ -146,14 +145,14 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 */
 		@Override
 		public void performNavigationOps(final Navigation _navigationType) {
-			logger.debug("");
+			logger.log(DEBUG, "");
 			closeChildScreens();
 			ssDBNavPerformNavigationOps(_navigationType);
 			SwingUtilities.invokeLater(()->{
 				try {
 					activateDeactivateComponents();
 				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
+					logger.log(Level.ERROR, e.getMessage(), e);
 				}
 			});
 		}
@@ -164,7 +163,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 */
 		@Override
 		public void performPostDeletionOps() {
-			logger.debug("");
+			logger.log(DEBUG, "");
 			if (requeryAfterInsertOrDelete) {
 			// FOR SOME DATABASES LIKE H2, WE HAVE TO REQUERY THE ROWSET
 				updateScreen();
@@ -181,7 +180,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 */
 		@Override
 		public void performPostInsertOps() {
-			logger.debug("");
+			logger.log(DEBUG, "");
 			if (requeryAfterInsertOrDelete) {
 			// FOR SOME DATABASES LIKE H2, WE HAVE TO REQUERY THE ROWSET
 				updateScreen();
@@ -198,11 +197,11 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 */
 		@Override
 		public void performPreDeletionOps() {
-			logger.debug("");
+			logger.log(DEBUG, "");
 			try {
 				pkOfDeletedRecord = getRowset().getLong(getPkColumn());
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(container, "Database error while attempting to get ID of record to be deleted.");
 			}
 			ssDBNavPerformPreDeletionOps();
@@ -217,7 +216,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 */
 		@Override
 		public void performPreInsertOps() {
-			logger.debug("");
+			logger.log(DEBUG, "");
 			super.performPreInsertOps(); // THIS CALL RECURSIVELY CLEARS ALL OF THE COMPONENT VALUES
 			// DATA NAVIGATOR SHOULD DISABLE COMBO NAVIGATOR
 			//retrieveAndSetNewPrimaryKey();
@@ -225,7 +224,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			try {
 				setDefaultValues();
 			} catch (final Exception e) {
-				logger.error("Exception.", e);
+				logger.log(Level.ERROR, "Exception.", e);
 				JOptionPane.showMessageDialog(container, "Database error while setting default values for new record.");
 			}
 			ssDBNavPerformPreInsertOps();
@@ -237,7 +236,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		 */
 		@Override
 		public void performRefreshOps() {
-			logger.debug("");
+			logger.log(DEBUG, "");
 			
 			try {
 				deactivateSyncManager();
@@ -247,12 +246,12 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 					try {
 						activateDeactivateComponents();
 					} catch (Exception e) {
-						logger.error(e.getMessage(), e);
+						logger.log(Level.ERROR, e.getMessage(), e);
 					}
 				});
 				ssDBNavPerformRefreshOps();
 			} catch (final Exception e) {
-				logger.error("Exception.", e);
+				logger.log(Level.ERROR, "Exception.", e);
 				JOptionPane.showMessageDialog(container, "Database error while refreshing record display.");
 			} finally {
 				activateSyncManager();
@@ -263,15 +262,14 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	
 	private static Logger logger = SSUtils.getLogger(); // Log4j Logger for component
 
-	private static final long serialVersionUID = 266766406708536384L; // unique serial ID
-	
 	private SSDBComboBox comboNav; // Combo navigator.
 	private String comboNavDisplayColumn1 = null; // name of the 1st database column to display in the combo navigator
 	private String comboNavDisplayColumn2 = null; // name of the 2nd database column to display in the combo navigator
 	private String comboNavSeparator = null; // character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator
 	
+	private NavigateActions navigateActions; // Navigate actions.
+	private SSSyncManager syncManager; // SYNC DB NAV COMBO and NAVIGATION
 	private SSDataNavigator dataNavigator; // Data navigator.
-	private SSSyncManager syncManager; // SYNC DB NAV COMBO and NAVIGATOR
 	
 	private boolean requeryAfterInsertOrDelete = false; // for some databases like H2, you have to call .execute() on the rowset following insertion or deletion
 
@@ -320,6 +318,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 *                                navigator, if null, the default separator will
 	 *                                be used
 	 */
+	@SuppressWarnings({"LeakingThisInConstructor", "OverridableMethodCallInConstructor"})
 	public SSFormViewScreenHelper(final String _title, final Container _parentContainer, final Connection _connection, final String _pkColumn,
 			final Long _parentID, final String _comboNavDisplayColumn1, final String _comboNavDisplayColumn2,
 			final String _comboNavSeparator) {
@@ -342,7 +341,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			setDefaultScreenLocation();
 
 		} catch (final Exception e) {
-			logger.error("Exception.", e);
+			logger.log(Level.ERROR, "Exception.", e);
 			JOptionPane.showMessageDialog(this,
 					"Error while constructing screen. Parent ID is: " + getParentID() + ".\n" + e.getMessage());
 		}
@@ -358,11 +357,11 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 
 	/**
 	 * Create syncManager if it doesn't exist and sync cmbNavigator and
-	 * dataNavigator
+	 * navigate actions.
 	 */
 	private void activateSyncManager() {
 		if (getSyncManager() == null) {
-			setSyncManager(new SSSyncManager(getComboNav(), getDataNavigator()));
+			setSyncManager(new SSSyncManager(getComboNav(), getNavigateActions()));
 			getSyncManager().setSyncColumnName(getPkColumn());
 		}
 
@@ -395,26 +394,13 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			// UPDATE PRESENT ROW WHEN SCREEN LOOSES FOCUS
 			@Override
 			public void internalFrameDeactivated(final InternalFrameEvent ife) {
-				getDataNavigator().updatePresentRow();
+				getNavigateActions().updatePresentRow();
 			}
 		});
 
 		// ADD OTHER LISTENERS IN IMPLEMENTATION
-		addImplListeners();
 		addCustomListeners();
 
-	}
-
-	/**
-	 * Adds any implementation-specific listeners.
-	 * 
-	 * @throws Exception exception throwExample4UsingHelpern while adding any implementation-specific screen listeners
-	 * 
-	 * @deprecated Starting in 4.0.0+ use {@link #addCustomListeners()} instead.
-	 */
-	@Deprecated
-	protected void addImplListeners() throws Exception {
-		// Do nothing by default...
 	}
 
 	/**
@@ -433,7 +419,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	protected abstract void bindComponents() throws Exception;
 
 	/**
-	 * Deactivate sync between cmbNavigator and dataNavigator.
+	 * Deactivate sync between cmbNavigator and navigate actions.
 	 */
 	private void deactivateSyncManager() {
 		if (getSyncManager() != null) {
@@ -485,7 +471,16 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * @return the dataNavigator
 	 */
 	protected SSDataNavigator getDataNavigator() {
+		if (dataNavigator == null)
+			dataNavigator = new SSDataNavigator(getRowset());
 		return dataNavigator;
+	}
+
+	/**
+	 * @return the navigateActions
+	 */
+	protected NavigateActions getNavigateActions() {
+		return navigateActions;
 	}
 	
 	/**
@@ -507,14 +502,6 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	protected SSSyncManager getSyncManager() {
 		return syncManager;
 	}
-
-//	/**
-//	 * @return the txtParentID
-//	 */
-//	@Deprecated
-//	protected SSTextField getTxtParentID() {
-//		return txtParentID;
-//	}
 	
 	/**
 	 * @return the text field bound to the primary key column
@@ -546,11 +533,11 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	}
 
 	/**
-	 * Initialize dataNavigator
+	 * Initialize navigateActions
 	 */
-	private void initDataNavigator() {
-		setDataNavigator(new SSDataNavigator(getRowset()));
-		getDataNavigator().setDBNav(new FormHelperSSDBNavImpl(this));
+	private void initNavigatorActions() {
+		updateNavigateActions();
+		getNavigateActions().setDBNav(new FormHelperSSDBNavImpl(this));
 	}
 
 	/**
@@ -560,7 +547,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * @throws Exception exception thrown while initializing rowset
 	 */
 	private void initRowset() throws SQLException, Exception {
-		setRowset(new JdbcRowSetImpl(getConnection()));
+		setRowset(getNewRowSet(getConnection()));
 		updateRowset();
 	}
 	
@@ -575,8 +562,8 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			// SET ROWSET QUERY
 			initRowset();
 
-			// INITIALIZE DATA NAVIGATOR
-			initDataNavigator();
+			// INITIALIZE NAVIGATION ACTIONS
+			initNavigatorActions();
 			
 			// INITIALIZE COMBO NAVIGATOR
 			initComboNav();
@@ -623,50 +610,14 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 //			showUp(getParentContainer());
 				
 		} catch (final SQLException se) {
-			logger.error("SQL Exception.", se);
+			logger.log(Level.ERROR, "SQL Exception.", se);
 			JOptionPane.showMessageDialog(this,
 					"Database error while initializing screen. Parent ID is: " + getParentID() + ".\n" + se.getMessage());
 		} catch (final Exception e) {
-			logger.error("Exception.", e);
+			logger.log(Level.ERROR, "Exception.", e);
 			JOptionPane.showMessageDialog(this,
 					"Error while initializing screen. Parent ID is: " + getParentID() + ".\n" + e.getMessage());
 		}
-	}
-	
-	/**
-	 * Performs post construction initialization.
-	 *
-	 * @param _parentID primary key value of parent record (FK for current rowset)
- 	 * @param _comboNavDisplayColumn1 name of the 1st database column to display in the combo navigator
- 	 * 
-	 * @deprecated Starting in 4.0.0+ these parameters are passed to constructor and initialization
-	 *  	is performed in handled {@link #initScreen()}.
-	 */
-	@Deprecated
-	protected void initScreen(final Long _parentID, final String _comboNavDisplayColumn1) {
-		
-		logger.error("initScreen() Method no longer supported. These parameters should be passed to the appropriate constructor.");
-		
-//		initScreen(_parentID, _comboNavDisplayColumn1, null, null);
-		
-	}
-
-	/**
-	 * Performs post construction initialization.
-	 *
-	 * @param _parentID primary key value of parent record (FK for current rowset)
- 	 * @param _comboNavDisplayColumn1 name of the 1st database column to display in the combo navigator
-	 * @param _comboNavDisplayColumn2 name of the 2nd database column to display in the combo navigator
-	 * @param _comboNavSeparator character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator
-	 * 
- 	 * @deprecated Starting in 4.0.0+ this is handled in constructor.
-	 */
-	@Deprecated
-	protected void initScreen(final Long _parentID,
-			final String _comboNavDisplayColumn1, final String _comboNavDisplayColumn2, final String _comboNavSeparator) {
-		
-		logger.error("initScreen() Method no longer supported. These parameters should be passed to the appropriate constructor.");
-		
 	}
 	
 	/**
@@ -718,10 +669,10 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	}
 
 	/**
-	 * @param _dataNavigator the data navigator to use for this screen/form
+	 * @param _navigateActions the navigate actions to use for this screen/form
 	 */
-	private void setDataNavigator(final SSDataNavigator _dataNavigator) {
-		dataNavigator = _dataNavigator;
+	private void setNavigateActions(NavigateActions _navigateActions) {
+		navigateActions = _navigateActions;
 	}
 	
 	/**
@@ -845,10 +796,11 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	}
 
 	/**
-	 * Update data navigator with latest rowset
+	 * Update navigate actions with latest rowset
 	 */
-	private void updateDataNavigator() {
+	private void updateNavigateActions() {
 		getDataNavigator().setRowSet(getRowset());
+		setNavigateActions(NavigateActions.get(getRowset()));
 	}
 
 	/**
@@ -869,7 +821,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			updateRowset();
 
 			// SET NEW ROWSET FOR NAVIGATOR.
-			updateDataNavigator();
+			updateNavigateActions();
 			
 			// UPDATE THE COMBO NAVIGATOR
 			updateComboNav();
@@ -885,16 +837,16 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 				try {
 					activateDeactivateComponents();
 				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
+					logger.log(Level.ERROR, e.getMessage(), e);
 				}
 			});
 
 		} catch (final SQLException se) {
-			logger.error("SQL Exception.", se);
+			logger.log(Level.ERROR, "SQL Exception.", se);
 			JOptionPane.showMessageDialog(this,
 					"Database error while updating screen for parent ID: " + getParentID() + ".\n" + se.getMessage());
 		} catch (final Exception e) {
-			logger.error("Exception.", e);
+			logger.log(Level.ERROR, "Exception.", e);
 			JOptionPane.showMessageDialog(this,
 					"Error while updating screen for parent ID: " + getParentID() + ".\n" + e.getMessage());
 		}

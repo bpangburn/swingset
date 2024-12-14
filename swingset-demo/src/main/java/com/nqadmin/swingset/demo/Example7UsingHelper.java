@@ -47,10 +47,12 @@ import javax.swing.JMenuBar;
 import javax.swing.plaf.InternalFrameUI;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
 import com.nqadmin.swingset.utils.SSDataGridScreenHelper;
+import com.nqadmin.swingset.utils.SSUtils;
+import javax.sql.RowSet;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view
@@ -68,7 +70,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(Example7UsingHelper.class);
+    private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial id
@@ -103,6 +105,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 		
 		// Finish Initialization
 		initScreen();
+		// updateScreen(); // Force a grid.setRowSet() to a new rowset for testing.
 	}
 
 	@Override
@@ -133,8 +136,8 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 			try (Statement stmt = getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
 					ResultSet.CONCUR_UPDATABLE)) {
 
-				String[] displayItems = null;
-				Integer[] underlyingNumbers = null;
+				String[] displayItems;
+				Integer[] underlyingNumbers;
 
 				try (ResultSet rs = stmt
 						.executeQuery("SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;")) {
@@ -147,7 +150,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 					for (int i = 0; i < displayItems.length; i++) {
 						rs.next();
 						displayItems[i] = rs.getString("supplier_name");
-						underlyingNumbers[i] = new Integer(rs.getInt("supplier_id"));
+						underlyingNumbers[i] = rs.getInt("supplier_id");
 					}
 
 					dataGrid.setComboRenderer("supplier_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);
@@ -162,7 +165,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 					for (int i = 0; i < displayItems.length; i++) {
 						rs.next();
 						displayItems[i] = rs.getString("part_name");
-						underlyingNumbers[i] = new Integer(rs.getInt("part_id"));
+						underlyingNumbers[i] = rs.getInt("part_id");
 					}
 
 					dataGrid.setComboRenderer("part_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);
@@ -170,7 +173,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 			}
 
 		} catch (final SQLException se) {
-			logger.error("SQL Exception.", se);
+			logger.log(Level.ERROR, "SQL Exception.", se);
 		}
 
 //	// SETUP THE CONTAINER AND ADD THE DATAGRID
@@ -178,6 +181,15 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
 //
 //	// MAKE THE JFRAME VISIBLE
 //		setVisible(true);
+	}
+
+	/** {@inheritDoc}
+	 * The parameter is cast to a Connection.
+	 */
+	@Override
+	protected RowSet getNewRowSet(Object connectionOrDataSource) throws SQLException
+	{
+		return DemoUtil.getNewRowSet((Connection)connectionOrDataSource);
 	}
 
 	@Override

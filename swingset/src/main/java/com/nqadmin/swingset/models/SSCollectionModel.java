@@ -35,11 +35,19 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
 import java.sql.JDBCType;
 import java.sql.SQLException;
+
 import javax.sql.RowSet;
+
+import com.nqadmin.swingset.utils.SSComponentInterface;
 
 // SSCollectionModel.java
 //
@@ -60,21 +68,19 @@ public interface SSCollectionModel {
 	JDBCType getJDBCType();
 
 	/**
-	 * Get the data from the RowSet as a java object array.
-	 * @param rowSet source of data, read from current row
-	 * @param columnName database column containing the data
+	 * Get the data from the comp's RowSet as a java object array.
+	 * @param comp has RowSet and column
 	 * @return array of objects of the data
 	 * @throws SQLException if a database related error occurs
 	 */
-	Object[] readData(RowSet rowSet, String columnName) throws SQLException;
+	Object[] readData(SSComponentInterface comp) throws SQLException;
 
 	/**
 	 * Put the data from a java object array to the RowSet.
 	 *
-	 * @param rowSet source of data, read from current row
-	 * @param columnName database column containing the data
+	 * @param comp has RowSet and column
 	 * @param data array of data to write to the database
 	 * @throws SQLException if a database related error occurs
 	 */
-	void writeData(RowSet rowSet, String columnName, Object[] data) throws SQLException;
+	void writeData(SSComponentInterface comp, Object[] data) throws SQLException;
 }

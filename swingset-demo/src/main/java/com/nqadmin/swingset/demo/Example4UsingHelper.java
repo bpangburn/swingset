@@ -54,11 +54,15 @@ import javax.swing.plaf.InternalFrameUI;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.utils.SSFormViewScreenHelper;
+import com.nqadmin.swingset.utils.SSUtils;
+import javax.sql.RowSet;
 
 /**
  * This example displays data from the part_data table.
@@ -75,7 +79,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	private static final long serialVersionUID = -5528806265008339747L;
 
 	// Log4j2 Logger
-    private static final Logger logger = LogManager.getLogger(Example4UsingHelper.class);
+    private static final Logger logger = SSUtils.getLogger();
     
     // String Constants
 	private static final String rowsetQuery = "SELECT * FROM part_data ORDER BY part_id;";
@@ -118,7 +122,18 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		
 		// Finish Initialization
 		initScreen();
+		// updateScreen(); // Force a setRowSet() for testing.
 	}
+
+	/** {@inheritDoc}
+	 * The parameter is cast to a Connection.
+	 */
+	@Override
+	protected RowSet getNewRowSet(Object connectionOrDataSource) throws SQLException
+	{
+		return DemoUtil.getNewRowSet((Connection)connectionOrDataSource);
+	}
+	
 
 	@Override
 	protected void activateDeactivateComponents() throws Exception {
@@ -197,7 +212,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 			@Override
 			public void focusLost(FocusEvent fe) {
 				if (!txtPartName.getText().equals(oldValue)) {
-					logger.debug("txtPartName triggering update to combo navigator.");
+					logger.log(DEBUG, "txtPartName triggering update to combo navigator.");
 					SwingUtilities.invokeLater(() -> updateNavigatorText());
 				}
 			}
@@ -272,9 +287,9 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 			rs.close();
 			
 		} catch(final SQLException se) {
-			logger.error("SQL Exception occured initializing new record.",se);
+			logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
 		} catch(final Exception e) {
-			logger.error("Exception occured initializing new record.",e);
+			logger.log(Level.ERROR, "Exception occured initializing new record.",e);
 		}
 		
 		return newPrimaryKey;
@@ -331,7 +346,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 			}
 
 		} catch (SQLException _se) {
-			logger.error("Error occured updating Combo Navigator text.",_se);
+			logger.log(Level.ERROR, "Error occured updating Combo Navigator text.",_se);
 			JOptionPane.showMessageDialog(getRootFrame(),
 					"Error occured updating Combo Navigator text.\n" + _se.getMessage());
 		}

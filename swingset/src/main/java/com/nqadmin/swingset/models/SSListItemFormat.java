@@ -47,10 +47,14 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel.ListItem0;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSListItemFormat.java
 //
@@ -90,19 +94,20 @@ import com.nqadmin.swingset.utils.SSUtils;
  * 
  * @since 4.0.0
  */
+@SuppressWarnings("serial")
 public class SSListItemFormat extends Format {
+	//TODO: Put default formats into a common location (not in SSListItemFormat).
 	/** default date format */
-	public static final String dateDefault = "yyyy/MM/dd";
+	public static final String DATE_DEFAULT = "yyyy/MM/dd";
 	/** default time format */
-	public static final String timeDefault = "HH:mm:ss";
+	public static final String TIME_DEFAULT = "HH:mm:ss";
 	/** default timestamp format */
-	public static final String timestampDefault = "yyyy/MM/dd'T'HH:mm:ss";
-	private static final long serialVersionUID = 1L;
+	public static final String TIMESTAMP_DEFAULT = "yyyy/MM/dd'T'HH:mm:ss";
 	/** default elem separator */
-	public static final String defaultSeparator = " | ";
+	public static final String DEFAULT_SEPARATOR = " | ";
 	private static final FieldPosition FP0 = new FieldPosition(0);
 
-	private String separator = defaultSeparator;
+	private String separator = DEFAULT_SEPARATOR;
 	/** elemInfos.get(elemIndex) == elemInfo. */
 	protected List<ElemInfo> elemInfos = new ArrayList<>(4);
 	/** format these elem in order of List. */
@@ -111,7 +116,7 @@ public class SSListItemFormat extends Format {
 	// allow customization of date/time formats
 	private final EnumMap<JDBCType, Format> formats = new EnumMap<>(JDBCType.class);
 
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Encapsulate info about element in SSListInfo.
@@ -145,9 +150,9 @@ public class SSListItemFormat extends Format {
 		addElemType(0, JDBCType.NULL);
 
 		// initialize default format patterns
-		formats.put(JDBCType.DATE,      new SimpleDateFormat(dateDefault));
-		formats.put(JDBCType.TIME,      new SimpleDateFormat(timeDefault));
-		formats.put(JDBCType.TIMESTAMP, new SimpleDateFormat(timestampDefault));
+		formats.put(JDBCType.DATE,      new SimpleDateFormat(DATE_DEFAULT));
+		formats.put(JDBCType.TIME,      new SimpleDateFormat(TIME_DEFAULT));
+		formats.put(JDBCType.TIMESTAMP, new SimpleDateFormat(TIMESTAMP_DEFAULT));
 	}
 
 	/**
@@ -239,8 +244,8 @@ public class SSListItemFormat extends Format {
 		} else {
 			f = formats.put(_jdbcType, new SimpleDateFormat(_pattern));
 		}
-		if (f instanceof SimpleDateFormat) {
-			pat = ((SimpleDateFormat)f).toPattern();
+		if (f instanceof SimpleDateFormat sdf) {
+			pat = sdf.toPattern();
 		}
 		return pat;
 	}
@@ -257,8 +262,8 @@ public class SSListItemFormat extends Format {
 		}
 		String pat = null;
 		Format f = formats.get(_jdbcType);
-		if (f instanceof SimpleDateFormat) {
-			pat = ((SimpleDateFormat)f).toPattern();
+		if (f instanceof SimpleDateFormat sdf) {
+			pat = sdf.toPattern();
 		}
 		return pat;
 	}
@@ -349,7 +354,7 @@ public class SSListItemFormat extends Format {
 				format.format(elem, _sb, FP0);
 				return;
 			} catch (Exception ex) {
-				logger.error(String.format("can't format %s with %s. Exception: %s",
+				logger.log(ERROR, sf("can't format %s with %s. Exception: %s",
 						elem.toString(), format.toString(), ex.getMessage()));
 			}
 		}

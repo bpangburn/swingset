@@ -37,20 +37,22 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
-import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.Serializable;
 
 import javax.sql.RowSet;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSLabel.java
 //
@@ -58,64 +60,48 @@ import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * Used to display database values in a read-only JLabel.
+ * By default, programmatic changes to the label are not propagated,
+ * except of course to set a label's value from a RowSet.
  */
-public class SSLabel extends JLabel implements SSComponentInterface {
-
+@SuppressWarnings("serial")
+public class SSLabel extends JLabel implements SSComponentInterface
+{
+	// TODO: Come up with general way to allow selective prop change disable.
+	@SuppressWarnings("FieldMayBeFinal")
+	private boolean allowPropertyChangePropagation = false;
 	/**
-	 * Listener(s) for the component's value used to propagate changes back to bound
-	 * database column.
-	 * <p>
-	 * There is not an obvious use-case where a label would change, but could be
-	 * tied to a menu, screen logic, or some other Developer driven change that
-	 * could conceivably need to be synchronized back to the RowSet.
+	 * Listener for label changed externally; propagate the value to the
+	 * database column. By default not enabled.
 	 */
-	protected class SSLabelListener implements PropertyChangeListener, Serializable {
-
-		/**
-		 * unique serial ID
-		 */
-		private static final long serialVersionUID = 6786673052979566820L;
-
+	protected class SSLabelListener implements PropertyChangeListener
+	{
+		/** Propogate "text" property change to database.
+		 * {@inheritDoc} */
 		@Override
-		public void propertyChange(final PropertyChangeEvent pce) {
-
-			// CONFIRM THE PROPERTY NAME IN CASE SOMEONE ADDS A DIFFERENT PROPERTY LISTENER
-			// TO ssLabelListener
-			if (pce.getPropertyName() == "text") {
-
-				ssCommon.removeRowSetListener();
-
+		public void propertyChange(final PropertyChangeEvent pce)
+		{
+			if (!allowPropertyChangePropagation)
+				return;
+			if ("text".equals(pce.getPropertyName())) {
+				getSSCommon().removeRowSetListener();
 				setBoundColumnText(getText());
-
-				ssCommon.addRowSetListener();
+				getSSCommon().addRowSetListener();
 			}
-
 		}
-
 	} // end protected class SSLabelListener
 
-	/**
-	 * Log4j Logger for component
-	 */
+	/** Log4j Logger for component */
 	private static Logger logger = SSUtils.getLogger();
 
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -5232780793538061537L;
-
-	/**
-	 * Common fields shared across SwingSet components
-	 */
-	protected SSCommon ssCommon = new SSCommon(this);
+	/** Common fields shared across SwingSet components */
+	private final SSCommon ssCommon;
 
 	/**
 	 * Empty constructor needed for deserialization. Creates a SSLabel instance with
 	 * no image and no text.
 	 */
 	public SSLabel() {
-		// Note that call to parent default constructor is implicit.
-		// super();
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -125,6 +111,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	 */
 	public SSLabel(final Icon _image) {
 		super(_image);
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -135,6 +122,7 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	 */
 	public SSLabel(final Icon _image, final int _horizontalAlignment) {
 		super(_image, _horizontalAlignment);
+		ssCommon = finishSSCommon();
 	}
 
 	/**
@@ -151,45 +139,11 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	}
 
 	/**
-	 * Method to allow Developer to add functionality when SwingSet component is
-	 * instantiated.
-	 * <p>
-	 * It will actually be called from SSCommon.init() once the SSCommon data member
-	 * is instantiated.
-	 */
-	@Override
-	public void customInit() {
-		// SET PREFERRED DIMENSIONS
-// TODO not sure SwingSet should be setting component dimensions
-		setPreferredSize(new Dimension(200, 20));
-	}
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	@Override
-	public SSCommon getSSCommon() {
-		return ssCommon;
-	}
-
-	/**
 	 * {@inheritDoc }
 	 */
 	@Override
 	public SSLabelListener getSSComponentListener() {
 		return new SSLabelListener();
-	}
-
-	/**
-	 * Sets the SSCommon data member for the current Swingset Component.
-	 *
-	 * @param _ssCommon shared/common SwingSet component data and methods
-	 */
-	@Override
-	public void setSSCommon(final SSCommon _ssCommon) {
-		ssCommon = _ssCommon;
 	}
 
 	/**
@@ -202,8 +156,39 @@ public class SSLabel extends JLabel implements SSComponentInterface {
 	@Override
 	public void updateSSComponent() {
 		final String text = getBoundColumnText();
-		logger.debug("{}: Setting label to " + text + ".", () -> getColumnForLog());
+		logger.log(DEBUG, ()->sf("%s: Setting label to %s.", getColumnForLog(), text));
 		setText(text);
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public String toString()
+	{
+		return sf("%s{text=%s, %s}", getClass().getSimpleName(),
+				getText(), SSUtils.ssComponentToString(this));
+	}
+
+	/**
+	 * Returns ssCommon for the current Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+    @Override
+	public SSCommon getSSCommon() {
+		if (ssCommon == null)
+			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
+		return ssCommon;
+	}
+
+	private SSCommon partialSSCommon;
+
+	/**
+	 * Either return a new create ssCommon or 
+	 * Only call from constructor; "ssCommon = finishSSCommon()".
+	 */
+	private SSCommon finishSSCommon() {
+		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
+		partialSSCommon = null;
+		return rv;
+	}
 } // end public class SSLabel extends JLabel {

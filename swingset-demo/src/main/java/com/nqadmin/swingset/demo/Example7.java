@@ -45,11 +45,11 @@ import java.sql.Statement;
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
-import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDataGrid;
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view
@@ -58,17 +58,13 @@ import com.nqadmin.swingset.SSDataGrid;
  * It adds a ComboRenderer with a lookup to the supplier_data table for the supplier name,
  * and adds a DateRenderer for the ship date column.
  */
+@SuppressWarnings("serial")
 public class Example7 extends JFrame {
 
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(Example7.class);
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 5925004336834854311L;
+    private static final Logger logger = SSUtils.getLogger();
 	
 	/**
 	 * data grid
@@ -86,10 +82,12 @@ public class Example7 extends JFrame {
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
+	@SuppressWarnings("LeakingThisInConstructor")
 	public Example7(final Connection _dbConn) {
 
 		// SET SCREEN TITLE
 			super("Example7");
+			DemoUtil.initExampleFrame(this, null);
 
 		// SET CONNECTION
 			connection = _dbConn;
@@ -112,7 +110,7 @@ public class Example7 extends JFrame {
 		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
 			try {
 			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-				rowset = new JdbcRowSetImpl(connection);
+				rowset = DemoUtil.getNewRowSet(connection);
 				rowset.setCommand("SELECT supplier_part_id, supplier_id, part_id, quantity, ship_date FROM supplier_part_data ORDER BY supplier_id, part_id;");
 
 			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
@@ -135,8 +133,8 @@ public class Example7 extends JFrame {
 				try (Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
 						ResultSet.CONCUR_UPDATABLE)) {
 
-					String[] displayItems = null;
-					Integer[] underlyingNumbers = null;
+					String[] displayItems;
+					Integer[] underlyingNumbers;
 
 					try (ResultSet rs = stmt
 							.executeQuery("SELECT supplier_name, supplier_id FROM supplier_data ORDER BY supplier_name;")) {
@@ -149,7 +147,7 @@ public class Example7 extends JFrame {
 						for (int i = 0; i < displayItems.length; i++) {
 							rs.next();
 							displayItems[i] = rs.getString("supplier_name");
-							underlyingNumbers[i] = new Integer(rs.getInt("supplier_id"));
+							underlyingNumbers[i] = rs.getInt("supplier_id");
 						}
 
 						dataGrid.setComboRenderer("supplier_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);
@@ -164,7 +162,7 @@ public class Example7 extends JFrame {
 						for (int i = 0; i < displayItems.length; i++) {
 							rs.next();
 							displayItems[i] = rs.getString("part_name");
-							underlyingNumbers[i] = new Integer(rs.getInt("part_id"));
+							underlyingNumbers[i] = rs.getInt("part_id");
 						}
 
 						dataGrid.setComboRenderer("part_id", displayItems, underlyingNumbers, MainClass.gridColumnWidth);
@@ -172,7 +170,7 @@ public class Example7 extends JFrame {
 				}
 
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 			}
 
 		// SETUP THE CONTAINER AND ADD THE DATAGRID

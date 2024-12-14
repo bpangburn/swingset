@@ -35,34 +35,56 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.utils;
+
+import java.awt.AWTKeyStroke;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+
+import com.nqadmin.swingset.decorators.BorderDecorator;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
-import java.io.Serializable;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EventListener;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.StringTokenizer;
+import java.util.Set;
 
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.PlainDocument;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+
+import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSBaseComboBox;
 import com.nqadmin.swingset.SSCheckBox;
@@ -70,8 +92,22 @@ import com.nqadmin.swingset.SSImage;
 import com.nqadmin.swingset.SSLabel;
 import com.nqadmin.swingset.SSList;
 import com.nqadmin.swingset.SSSlider;
+import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.datasources.SSSQLInternalException;
+import com.nqadmin.swingset.datasources.SSSQLNullException;
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
+import com.nqadmin.swingset.decorators.Decorator;
+import com.nqadmin.swingset.decorators.Validator;
+import com.nqadmin.swingset.formatting.SSFormat;
+import com.nqadmin.swingset.navigate.NavigateActions;
+import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
+import com.nqadmin.swingset.navigate.RowSetState;
+
+import static com.nqadmin.swingset.datasources.ConvertType.convertObjectType;
+import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingChanges;
+import static com.nqadmin.swingset.navigate.Utils.postRowSetModifiedError;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSCommon.java
 //
@@ -100,7 +136,51 @@ import com.nqadmin.swingset.formatting.SSFormattedTextField;
  * A good example of this is SSDBComboBox, which may be used solely for
  * navigation.
  */
-public class SSCommon implements Serializable {
+public class SSCommon
+{
+	/**
+	 * Get a partially constructed SSCommon. If {@linkplain partialSSCommon} is not null
+	 * then return it, otherwise create and return a new partialSSCommon.
+	 * 
+	 * Typically partial initialization is done if SSCommon is needed before the
+	 * constructor finishes. The caller should invoke SSCommon.createFinish()
+	 * in the constructor.
+	 * <p>
+	 * Assert if a non null partialSSCommon doesn't match the ssComponent.
+	 * See {@link SSTextField#getSSCommon() } for example usage.
+	 *
+	 * @param ssComponent SwingSet component to attach to this SSCommon.
+	 * @param partialSSCommon if non null return it
+	 * @return partially constructed ssCommon
+	 */
+	public static SSCommon createStart(SSComponentInterface ssComponent,
+									   SSCommon partialSSCommon) {
+		if (partialSSCommon != null && ssComponent != partialSSCommon.ssComponent)
+			throw new IllegalArgumentException("ssComponent mismatch");
+		return partialSSCommon == null ? new SSCommon(ssComponent, false)
+										: partialSSCommon;
+	}
+
+	/**
+	 * Get a fully constructed SSCommon. If {@linkplain partialSSCommon} is not null
+	 * then finish it's construction, otherwise create and return a new SSCommon.
+	 * Doing "SSCommon.createFinish(this, null)" is equivalent to "new SSCommon(this)".
+	 * <p>
+	 * Assert if a non null partialSSCommon doesn't match the ssComponent.
+	 * See {@link SSTextField#SSTextField(javax.sql.RowSet, java.lang.String) }
+	 * for example usage.
+	 * 
+	 * @param ssComponent SwingSet component to attach to this SSCommon.
+	 * @param partialSSCommon if non null finish it's construction
+	 * @return fully constructed SSCommon
+	 */
+	public static SSCommon createFinish(SSComponentInterface ssComponent,
+										SSCommon partialSSCommon) {
+		if (partialSSCommon != null && ssComponent != partialSSCommon.ssComponent)
+			throw new IllegalArgumentException("ssComponent mismatch");
+		return partialSSCommon == null ? new SSCommon(ssComponent, true)
+										: partialSSCommon.finishInit();
+	}
 
 	/**
 	 * Document listener provided for convenience for SwingSet Components that are
@@ -113,8 +193,9 @@ public class SSCommon implements Serializable {
 	 * 	return getSSCommon().getSSDocumentListener();
 	 * }
 	 * <p>
-	 * This listener updates the underlying RowSet there is a change to the Document
-	 * object. E.g., a call to setText() on a JTextField.
+	 * This listener updates the underlying RowSet when there is a change to the Document
+	 * object. E.g., a call to setText() on a JTextField. If the update has an error
+	 * the text field is reverted to the current contents of the database.
 	 * <p>
 	 * DocumentListener events generally, but not always get fired twice any time
 	 * there is an update to the JTextField: a removeUpdate() followed by
@@ -128,25 +209,25 @@ public class SSCommon implements Serializable {
 	 * changedUpdate() uses counters and SwingUtilities.invokeLater() to only update
 	 * the display on the last method called.
 	 */
-	public class SSDocumentListener implements DocumentListener, Serializable {
-
-		/**
-		 * unique serial id
-		 */
-		private static final long serialVersionUID = 2287696691641310793L;
-
+	public class SSDocumentListener implements DocumentListener
+	{
 		/**
 		 * variables needed to consolidate calls to removeUpdate() and insertUpdate()
 		 * from DocumentListener
 		 */
 		private int lastChange = 0;
 		private int lastNotifiedChange = 0;
+		private String previousValue = null;
+		/** True when listener is temporarily removed. */
+		private boolean listenerNeedsRestoration;
+	
 
+		/** {@inheritDoc} */
 		@Override
 		public void changedUpdate(final DocumentEvent de) {
 			lastChange++;
-			logger.trace("{} - changedUpdate(): lastChange=" + lastChange
-					+ ", lastNotifiedChange=" + lastNotifiedChange, () -> getColumnForLog());
+			logger.log(TRACE, () -> sf("%s - changedUpdate(): lastChange=%s, lastNotifiedChange=%s",
+					getColumnForLog(), lastChange, lastNotifiedChange));
 			
 			// Delay execution of logic until all listener methods are called for current event
 			// See: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
@@ -154,44 +235,131 @@ public class SSCommon implements Serializable {
 				if (lastNotifiedChange != lastChange) {
 					lastNotifiedChange = lastChange;
 
+					String text = ((JTextComponent) getSSComponent()).getText();
+
+					if (!isValidChange()) {
+						postRowSetModifiedError(getSSComponent(), text);
+						return;
+					}
+
 					removeRowSetListener();
 
+					boolean ok = true;
 					try {
-						setBoundColumnText(((javax.swing.text.JTextComponent) getSSComponent()).getText());
+						ok = setBoundColumnText(text);
 					} finally {
+						if (!ok) {
+							// TODO:
+							// How about moving a state tracking variable to
+							// add/removeSSDocumentListener()?
+							// addSSDocumentListener() then uses listenerNeedsRestoration.
+
+							// restore previous text value
+							if(previousValue != null) {
+								if (ssComponentListenerAdded) {
+									// avoid generating events while restoring text
+									removeSSDocumentListener();
+									listenerNeedsRestoration = true;
+								}
+								try {
+									logger.log(DEBUG, () -> sf("%s: restoring previous value '%s'", getColumnForLog(), previousValue));
+									((JTextComponent) getSSComponent()).setText(previousValue);
+								} finally {
+									if (listenerNeedsRestoration) {
+										listenerNeedsRestoration = false;
+										addSSDocumentListener();
+									}
+								}
+							}
+						}
+						previousValue = null;	// Seems safer, is this the right spot?
 						addRowSetListener();
 					}
 				}
 			});
 		}
 
+		/** {@inheritDoc} */
 		@Override
 		public void insertUpdate(final DocumentEvent de) {
-			logger.trace("{} - insertUpdate().", () -> getColumnForLog());
+			logger.log(TRACE, () -> sf("%s - insertUpdate().", getColumnForLog()));
 			changedUpdate(de);
 		}
 
+		/** {@inheritDoc} */
 		@Override
 		public void removeUpdate(final DocumentEvent de) {
-			logger.trace("{} - removeUpdate().", () -> getColumnForLog());
+			logger.log(TRACE, () -> sf("%s - removeUpdate().", getColumnForLog()));
 			changedUpdate(de);
 		}
 
 	} // end protected class SSDocumentListener
+	
+	/**
+	 * For JTextField to track previous text field value.
+	 * Used in conjunction with {@link SSDocumentListener}.
+	 * <p>
+	 * Part of the fix for<br>
+	 * Text field has wrong value after error while editing<br>
+	 * https://github.com/bpangburn/swingset/issues/175<br>
+	 * Which came in with<br>
+	 * Fix error recovery after errors during SSTextField edit<br>
+	 * https://github.com/bpangburn/swingset/pull/178<br>
+	 * 
+	 */
+	@SuppressWarnings("serial")
+	public class SSPlainDocument extends PlainDocument {
+		DocumentFilter filter;
+
+		void capturePrevious(DocumentFilter.FilterBypass fb) {
+			try {
+				String prev = fb.getDocument().getText(0, fb.getDocument().getLength());
+				logger.log(TRACE, () -> "Capture previous text value: " + prev);
+				if (eventListener instanceof SSDocumentListener listener) {
+					listener.previousValue = prev;
+				}
+			} catch (BadLocationException ex) {
+				logger.log(DEBUG, "Capture previous text value", ex);
+			}
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public DocumentFilter getDocumentFilter() {
+			if (filter == null) {
+				filter = new DocumentFilter() {
+					@Override
+					public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+						capturePrevious(fb);
+						super.replace(fb, offset, length, text, attrs);
+					}
+
+					@Override
+					public void insertString(DocumentFilter.FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+						capturePrevious(fb);
+						super.insertString(fb, offset, string, attr);
+					}
+
+					@Override
+					public void remove(DocumentFilter.FilterBypass fb, int offset, int length) throws BadLocationException {
+						capturePrevious(fb);
+						super.remove(fb, offset, length);
+					}
+				};
+			}
+			return filter;
+		}
+	}
 
 	/**
 	 * Listener(s) for the underlying RowSet used to update the bound SwingSet
-	 * component.
+	 * component. When working with a {@linkplain javax.sql.rowset.CachedRowSet} there are
+	 * extra steps involved which require the listener to ignore some events,
+	 * see {@link RowSetState#acceptChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable) }.
 	 */
-	protected class SSRowSetListener implements RowSetListener, Serializable {
-		/**
-		 * unique serial ID
-		 */
-		private static final long serialVersionUID = -5194433723970625351L;
-		
-		/**
-		 * variables needed to consolidate multiple calls
-		 */
+	protected class SSRowSetListener implements RowSetListener
+	{
+		// variables needed to consolidate multiple calls
 		private int lastChange = 0;
 		private int lastNotifiedChange = 0;
 
@@ -201,9 +369,11 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void cursorMoved(final RowSetEvent event) {
-			logger.trace("{} - RowSet cursor moved.", () -> getColumnForLog());
-			//updateSSComponent();
-			performUpdates();
+			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
+				return;
+			}
+			logger.log(TRACE, () -> sf("%s - RowSet cursor moved.", getColumnForLog()));
+			performUpdateSSComponent();
 		}
 
 		/**
@@ -225,11 +395,14 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void rowChanged(final RowSetEvent event) {
-			logger.trace("{} - RowSet row changed.", () -> getColumnForLog());
+			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
+				return;
+			}
+			logger.log(TRACE, () -> sf("%s - RowSet row changed.", getColumnForLog()));
 //			if (!getRowSet().isUpdatingRow()) {
 //				updateSSComponent();
 //			}
-			performUpdates();
+			performUpdateSSComponent();
 		}
 
 		/**
@@ -238,16 +411,18 @@ public class SSCommon implements Serializable {
 		 */
 		@Override
 		public void rowSetChanged(final RowSetEvent event) {
-			logger.trace("{} - RowSet changed.", () -> getColumnForLog());
-			//updateSSComponent();
-			performUpdates();
+			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
+				return;
+			}
+			logger.log(TRACE, () -> sf("%s - RowSet changed.", getColumnForLog()));
+			performUpdateSSComponent();
 		}
 		
 
-		private void performUpdates() {
+		private void performUpdateSSComponent() {
 			lastChange++;
-			logger.trace("{} - performUpdates(): lastChange=" + lastChange
-					+ ", lastNotifiedChange=" + lastNotifiedChange, () -> getColumnForLog());
+			logger.log(TRACE, () -> sf("%s - performUpdates(): lastChange=%s, lastNotifiedChange=%s",
+					getColumnForLog(), lastChange, lastNotifiedChange));
 			
 			// Delay execution of logic until all listener methods are called for current event
 			// Based on: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
@@ -265,45 +440,13 @@ public class SSCommon implements Serializable {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Constant to indicate that no RowSet column index has been specified.
 	 */
 	public static final int NO_COLUMN_INDEX = -1;
-
-	/**
-	 * Constant to indicate that no RowSet column type has been specified.
-	 * <p>
-	 * Per https://www.tutorialspoint.com/java-resultsetmetadata-getcolumntype-method-with-example
-	 * value can be positive or negative so it's dangerous to presume -1 can represent that
-	 * no column type has been specified.
-	 * <p>
-	 * There is a java.sql.Type of of NULL
-	 */
-	@Deprecated
-	public static final int NO_COLUMN_TYPE = -1;
-
-	/**
-	 * Unique serial ID.
-	 */
-	protected static final long serialVersionUID = -7670575893542057725L;
-
-	/**
-	 * Converts a date string in "MM/dd/yyyy" format to an SQL Date.
-	 *
-	 * @param _strDate date string in "MM/dd/yyyy" format
-	 *
-	 * @return return SQL date for the string specified
-	 */
-	public static Date getSQLDate(final String _strDate) {
-		final StringTokenizer strtok = new StringTokenizer(_strDate, "/", false);
-		final String month = strtok.nextToken();
-		final String day = strtok.nextToken();
-		final String newStrDate = strtok.nextToken() + "-" + month + "-" + day;
-		return Date.valueOf(newStrDate);
-	}
-
+	
 	/**
 	 * Flag to indicate if the bound database column can be null.
 	 * <p>
@@ -338,6 +481,9 @@ public class SSCommon implements Serializable {
 	 */
 	private String logColumnName = null;
 
+	private Decorator decorator;
+	private Validator validator;
+
 	//
 	// isNullable is a cache of metadata.
 	// TODO: Incorporate into a more formal metadata cache
@@ -351,11 +497,6 @@ public class SSCommon implements Serializable {
 	 */
 	private Optional<Boolean> isNullable = Optional.empty();
 
-	// /**
-	//  * Column SQL data type.
-	//  */
-	// private int boundColumnType = java.sql.Types.NULL;
-
 	/**
 	 * flag to indicate if we're inside of a bind() method
 	 */
@@ -364,7 +505,7 @@ public class SSCommon implements Serializable {
 	/**
 	 * parent SwingSet component
 	 */
-	private SSComponentInterface ssComponent = null;
+	private final SSComponentInterface ssComponent;
 
 	/**
 	 * database connection
@@ -392,33 +533,77 @@ public class SSCommon implements Serializable {
 	private SSRowSetListener rowSetListener = null;
 
 	/**
-	 * Constructor expecting a SwingSet component as an argument (usually called as
-	 * = new SSCommon(this);)
+	 * Constructor that has a flag to only "half" initialize; typically half
+	 * initialization is done iff SSCommon is needed before the constructor finishes.
+	 * The caller should invoke SSCommon in the constructor.
 	 *
-	 * @param _ssComponent SwingSet component having this SSCommon instance as a
+	 * @param ssComponent SwingSet component having this SSCommon instance as a
 	 *                     datamember
+	 * @param finishInit when false, the user must call 
 	 */
-	public SSCommon(final SSComponentInterface _ssComponent) {
-		setSSComponent(_ssComponent);
-		init();
+	private SSCommon(SSComponentInterface ssComponent, boolean finishInit) {
+		this.ssComponent = ssComponent;
+		decorator = Decorator.nullDecorator;
+		validator = Validator.nullValidator;
+		if (finishInit)
+			finishInit();
 	}
 
-//	/**
-//	 * Convenience method to add both RowSet and SwingSet Component listeners.
-//	 * <p>
-//	 * Does not add DocumentListener.
-//	 */
-//	public void addListeners() {
-//		addRowSetListener();
-//		addSSComponentListener();
-//	}
+	//
+	// TODO: long term get rid of this half init stuff. Maybe a builder...
+	//
+
+	/** Can use this to error if doing something that required fully constructed. */
+	private boolean didFinishInit;
+
+	/**
+	 * Finish the initialization, used if "half" construction.
+	 */
+	private SSCommon finishInit() {
+		if (!didFinishInit) {
+			didFinishInit = true;
+			initDecorator();
+			init();
+		}
+		return this;
+	}
+
+
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	private void debugTrackRowSetListener()
+	{
+		if (Boolean.TRUE)
+			return;
+		if (getRowSet() == null)
+			return;
+		getRowSet().addRowSetListener(new RowSetListener()
+		{
+			@Override
+			public void rowSetChanged(RowSetEvent event)
+			{
+				System.err.println("DEBUG LISTENER: rowSetChanged: " + getBoundColumnName());
+			}
+
+			@Override
+			public void rowChanged(RowSetEvent event)
+			{
+				System.err.println("DEBUG LISTENER: rowChanged: " + getBoundColumnName());
+			}
+
+			@Override
+			public void cursorMoved(RowSetEvent event)
+			{
+				System.err.println("DEBUG LISTENER: cursorMoved: " + getBoundColumnName());
+			}
+		});
+	}
 
 	/**
 	 * Method to add a document listener when the SwingSet component is a
 	 * JTextComponent.
 	 */
 	private void addSSDocumentListener() {
-		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().addDocumentListener((SSDocumentListener)eventListener);
+		((JTextComponent) getSSComponent()).getDocument().addDocumentListener((SSDocumentListener)eventListener);
 	}
 
 	/**
@@ -431,13 +616,17 @@ public class SSCommon implements Serializable {
 		if (!rowSetListenerAdded && rowSet!=null) {
 			rowSet.addRowSetListener(rowSetListener);
 			rowSetListenerAdded = true;
-			logger.debug("{} - RowSet Listener added.", () -> getColumnForLog());
+			logger.log(DEBUG, () -> sf("%s - RowSet Listener added.", getColumnForLog()));
 		}
 	}
 	
 	/**
 	 * Method to add any SwingSet Component listener(s).
 	 */
+	//
+	// TODO: Create SSComponent.addListener()/removeListener.
+	//       Then get rid of this switch statement.
+	//
 	public final void addSSComponentListener() {
 		
 		// Probably should not have a null eventListener here, but just in case
@@ -448,41 +637,35 @@ public class SSCommon implements Serializable {
 		if (!ssComponentListenerAdded) {
 			
 			ssComponentListenerAdded = true;
-			
-			if (ssComponent instanceof SSCheckBox) {
-				((SSCheckBox)ssComponent).addItemListener((ItemListener) eventListener);
-			} else if (ssComponent instanceof SSBaseComboBox) {
-				((SSBaseComboBox<?, ?, ?>)ssComponent).addActionListener((ActionListener) eventListener);
-			} else if (ssComponent instanceof SSImage) {
-				((SSImage)ssComponent).getBtnUpdateImage().addActionListener((ActionListener) eventListener);
-			} else if (ssComponent instanceof SSLabel) {
-				((SSLabel)ssComponent).addPropertyChangeListener("text", ((PropertyChangeListener) eventListener));
-			} else if (ssComponent instanceof SSList) {
-				((SSList)ssComponent).addListSelectionListener((ListSelectionListener) eventListener);
-			} else if (ssComponent instanceof SSSlider) {
-				((SSSlider)ssComponent).addChangeListener((ChangeListener) eventListener);
-			} else if (ssComponent instanceof SSFormattedTextField) {
-				((SSFormattedTextField)ssComponent).addPropertyChangeListener("value", ((PropertyChangeListener) eventListener));
-//			} else if (ssComponent instanceof SSTextArea) {
-//			} else if (ssComponent instanceof SSTextField) {
-			} else if (ssComponent instanceof JTextComponent) {
-				addSSDocumentListener();
-			} else {
+			/* JDK-21 and preview for "_" */
+			switch(ssComponent) {
+			case SSCheckBox c -> c.addItemListener((ItemListener) eventListener);
+			case SSBaseComboBox<?,?,?> c -> c.addActionListener((ActionListener) eventListener);
+			case SSImage c -> c.getBtnUpdateImage().addActionListener((ActionListener) eventListener);
+			case SSLabel c -> c.addPropertyChangeListener("text", ((PropertyChangeListener) eventListener));
+			case SSList c -> c.addListSelectionListener((ListSelectionListener) eventListener);
+			case SSSlider c -> c.addChangeListener((ChangeListener) eventListener);
+			case SSFormattedTextField c -> c.addPropertyChangeListener("value", ((PropertyChangeListener) eventListener));
+			case JTextComponent x -> addSSDocumentListener();
+
+			default -> {
 				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
-				String message = String.format("%s - Encountered unknown Component Event Listener for: %s. Unable to add component listener.",
+				String message = sf("%s - Encountered unknown Component Event Listener for: %s. Unable to add component listener.",
 						getColumnForLog(), ssComponent.getClass().getSimpleName());
-				logger.error(message);
+				logger.log(ERROR, message);
 				JOptionPane.showMessageDialog((JComponent)getSSComponent(), message, "Unknown Component Event Listener", JOptionPane.ERROR_MESSAGE);
 				
 				// INDICATE FAILURE TO ADD LISTENER
 				ssComponentListenerAdded = false;
 			}
+			}
 		}
 
 		if (ssComponentListenerAdded) {
-			logger.debug("{} - Component Listener added.", () -> getColumnForLog());
+			logger.log(DEBUG, () -> sf("%s - Component Listener added.", getColumnForLog()));
 		}
 	}
+
 
 	/**
 	 * Updates the SSComponent with a valid RowSet and Column (Name or Index)
@@ -493,20 +676,20 @@ public class SSCommon implements Serializable {
 			eventListener = getSSComponent().getSSComponentListener();
 		}
 
-		// Not sure of implications of bind fail,
-		// set default in case case bind fails.
-		// TODO: is this the right thing to do if bind fails?
+		// By default, if bind fails or database error,
+		// isNullable metadata is unknown.
 		isNullable = Optional.empty();
 
 		// TODO consider updating Component to null/zero/empty string if not valid column name, column index, or rowset
 		
 		// CHECK FOR NULL COLUMN/ROWSET
 		if (((boundColumnName == null) && (boundColumnIndex == NO_COLUMN_INDEX)) || (rowSet == null)) {
-			logger.warn("Binding failed: column name={}, column index={}{}.", ()->boundColumnName, ()->boundColumnIndex, ()->rowSet==null ? ", rowset=null" : "");
+			logger.log(WARNING, () -> sf("Binding failed: column name=%s, column index=%s%s.",
+					boundColumnName, boundColumnIndex, rowSet==null ? ", rowset=null" : ""));
 			return;
 		}
 
-		logger.trace(() -> String.format("Column bind succeeded: name=%s, index=%d %s.",
+		logger.log(TRACE, () -> sf("Column bind succeeded: name=%s, index=%d %s.",
 				boundColumnName, boundColumnIndex, rowSet==null ? ", rowset=null" : ""));
 
 		//
@@ -514,7 +697,7 @@ public class SSCommon implements Serializable {
 		// If doing this lazy elsewhere, flush the cache here.
 
 		isNullable = RowSetOps.isNullable(rowSet, boundColumnIndex);
-		logger.trace(() -> String.format("Column isNullable: %s.", isNullable));
+		logger.log(TRACE, () -> sf("Column isNullable: %s.", isNullable));
 
 		// Provide notification of a change in metadata
 		ssComponent.metadataChange();
@@ -524,7 +707,6 @@ public class SSCommon implements Serializable {
 		// combo lists so the text for the first record will be blank, but updateSSComponent() for
 		// SSDBComboBox checks for a null list and returns.
 		updateSSComponent();
-
 	}
 
 	/**
@@ -563,35 +745,19 @@ public class SSCommon implements Serializable {
 	 * @param _boundColumnName name of the column to which this check box should be
 	 *                         bound
 	 */
-	public void bind(final RowSet _rowSet, final String _boundColumnName) { // throws java.sql.SQLException {
+	public void bind(final RowSet _rowSet, final String _boundColumnName)
+	{ // throws java.sql.SQLException {
 		try {
 			bind(_rowSet, RowSetOps.getColumnIndex(_rowSet, _boundColumnName));
 		} catch (final SQLException se) {
-			logger.error("[" + _boundColumnName + "] - Failed to retrieve column index while binding.", se);
+			logger.log(ERROR, "[" + _boundColumnName + "] - Failed to retrieve column index while binding.", se);
 		}
-//		// INDICATE THAT WE'RE UPDATING THE BINDINGS
-//		inBinding = true;
-//
-//		// UPDATE ROWSET
-//		removeRowSetListener();
-//		setRowSet(_rowSet);
-//		addRowSetListener();
-//
-//		// UPDATE COLUMN NAME
-//		setBoundColumnName(_boundColumnName);
-//
-//		// INDICATE THAT WE'RE DONE SETTING THE BINDINGS
-//		inBinding = false;
-//
-//		// UPDATE THE COMPONENT
-//		bind();
-
 	}
 
 	/**
 	 * Retrieves the allowNull flag for the bound database column.
 	 * If setAllowNull() is not set, then the database metadata is used
-	 * to determine nullability; if unknown then return true;
+	 * to determine nullability; if database state unknown then return true;
 	 *
 	 * @return true if bound database column can contain null values, otherwise
 	 *         returns false
@@ -633,6 +799,52 @@ public class SSCommon implements Serializable {
 	}
 
 	/**
+	 * Returns an Object 
+	 * representing the value in the bound database column.
+	 * <p>
+	 * Note a null is never converted into ""; use getBoundColumnText for that.
+	 * @return value
+	 */
+	public Object getBoundColumnObject()
+	{
+		Object value = null;
+
+		try {
+			if (getRowSet().getRow() != 0) {
+				value = RowSetOps.getColumnObject(ssComponent);
+			}
+		} catch (final SQLException se) {
+			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
+		}
+
+		return value;
+	}
+
+	/**
+	 * Returns an Object of the specified type
+	 * representing the value in the bound database column.
+	 * <p>
+	 * Note a null is never converted into ""; use getBoundColumnText for that.
+	 * @param <T> type to return
+	 * @param type Class of returned type
+	 * @return value
+	 */
+	public <T> T getBoundColumnObject(Class<T> type)
+	{
+		T value = null;
+
+		try {
+			if (getRowSet().getRow() != 0) {
+				value = RowSetOps.getColumnObject(ssComponent, type);
+			}
+		} catch (final SQLException se) {
+			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
+		}
+
+		return value;
+	}
+
+	/**
 	 * Returns a String representing the value in the bound database column.
 	 * <p>
 	 * New functionality added (2020) to allow this method to return a null String
@@ -648,14 +860,17 @@ public class SSCommon implements Serializable {
 
 		try {
 			if (getRowSet().getRow() != 0) {
-				//value = getRowSet().getColumnText(getBoundColumnName());
-				value = RowSetOps.getColumnText(getRowSet(),getBoundColumnName());
+				if (NavigateActions.ENABLE_UNDO_REDO) {
+					value = RowSetOps.getColumnObjectText(ssComponent);
+				} else {
+					value = RowSetOps.getColumnText(getSSComponent());
+				}
 				if (!getAllowNull() && (value == null)) {
 					value = "";
 				}
 			}
 		} catch (final SQLException se) {
-			logger.error(getColumnForLog() + " - SQL Exception.", se);
+			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
 		}
 
 		return value;
@@ -700,13 +915,14 @@ public class SSCommon implements Serializable {
 	}
 	
 	/**
-	 * Returns SSDocumentListener if the component is a JTextComponent
+	 * Returns SSDocumentListener; assumes the component is a JTextComponent.
 	 * <p>
 	 * Should only be called once per component.
 	 *
 	 * @return SSDocumentListener for a JTextComponent
 	 */
 	public SSDocumentListener getSSDocumentListener() {
+		// TODO: assert not called before
 		return new SSDocumentListener();
 	}
 
@@ -719,23 +935,15 @@ public class SSCommon implements Serializable {
 		return rowSet;
 	}
 
-// BP_2021-02-11: Eliminating this method. Seems dangerous to provide access.
-//	/**
-//	 * Returns Listener for the RowSet bound to the database
-//	 *
-//	 * @return listener for the bound RowSet
-//	 */
-//	public SSRowSetListener getRowSetListener() {
-//		return rowSetListener;
-//	}
-
 	/**
 	 * Method called from Constructor to perform one-time setup tasks including
 	 * field traversal and any custom initialization method specific to the SwingSet
 	 * component.
 	 */
-	protected void init() {
+	protected void init()
+	{
 		getSSComponent().configureTraversalKeys();
+		getSSComponent().setupUndoRedoKeys();
 		getSSComponent().customInit();
 	}
 	
@@ -756,16 +964,6 @@ public class SSCommon implements Serializable {
 	public final boolean isSSComponentListenerAdded() {
 		return ssComponentListenerAdded;
 	}
-
-//	/**
-//	 * Convenience method to remove both RowSet and SwingSet Component listeners.
-//	 * <p>
-//	 * Does not remove DocumentListener.
-//	 */
-//	public void removeListeners() {
-//		removeRowSetListener();
-//		removeSSComponentListener();
-//	}
 	
 	/**
 	 * Method to add any SwingSet Component listener(s).
@@ -780,48 +978,39 @@ public class SSCommon implements Serializable {
 		if (ssComponentListenerAdded) {
 			
 			ssComponentListenerAdded = false;
-			
-			if (ssComponent instanceof SSCheckBox) {
-				((SSCheckBox)ssComponent).removeItemListener((ItemListener) eventListener);
-			} else if (ssComponent instanceof SSBaseComboBox) {
-				((SSBaseComboBox<?, ?, ?>)ssComponent).removeActionListener((ActionListener) eventListener);
-			} else if (ssComponent instanceof SSImage) {
-				((SSImage)ssComponent).getBtnUpdateImage().removeActionListener((ActionListener) eventListener);
-			} else if (ssComponent instanceof SSLabel) {
-				((SSLabel)ssComponent).removePropertyChangeListener("text", ((PropertyChangeListener) eventListener));
-			} else if (ssComponent instanceof SSList) {
-				((SSList)ssComponent).removeListSelectionListener((ListSelectionListener) eventListener);
-			} else if (ssComponent instanceof SSSlider) {
-				((SSSlider)ssComponent).removeChangeListener((ChangeListener) eventListener);
-			} else if (ssComponent instanceof SSFormattedTextField) {
-				((SSFormattedTextField)ssComponent).removePropertyChangeListener("value", ((PropertyChangeListener) eventListener));
-//			} else if (ssComponent instanceof SSTextArea) {
-//			} else if (ssComponent instanceof SSTextField) {
-			} else if (ssComponent instanceof JTextComponent) {
-				removeSSDocumentListener();
-			} else {
+			/* JDK-21 and preview for "_" */
+			switch(ssComponent) {
+			case SSCheckBox c -> c.removeItemListener((ItemListener) eventListener);
+			case SSBaseComboBox<?,?,?> c -> c.removeActionListener((ActionListener) eventListener);
+			case SSImage c -> c.getBtnUpdateImage().removeActionListener((ActionListener) eventListener);
+			case SSLabel c -> c.removePropertyChangeListener("text", ((PropertyChangeListener) eventListener));
+			case SSList c -> c.removeListSelectionListener((ListSelectionListener) eventListener);
+			case SSSlider c -> c.removeChangeListener((ChangeListener) eventListener);
+			case SSFormattedTextField c -> c.removePropertyChangeListener("value", ((PropertyChangeListener) eventListener));
+			case JTextComponent x -> removeSSDocumentListener();
+			default -> {
 				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
-				String message = String.format("%s - Encountered unknown Component Event Listener for: %s. Unable to remove component listener.",
+				String message = sf("%s - Encountered unknown Component Event Listener for: %s. Unable to remove component listener.",
 						getColumnForLog(), ssComponent.getClass().getSimpleName());
-				logger.error(message);
+				logger.log(ERROR, message);
 				JOptionPane.showMessageDialog((JComponent)getSSComponent(), message, "Unknown Component Event Listener", JOptionPane.ERROR_MESSAGE);
 				
 				// INDICATE FAILURE TO REMOVE LISTENER
 				ssComponentListenerAdded = true;
 			}
+			}
 		}
-
 		if (!ssComponentListenerAdded) {
-			logger.debug("{} - Component Listener removed.", () -> getColumnForLog());
+			logger.log(DEBUG, () -> sf("%s - Component Listener removed.", getColumnForLog()));
 		}
 	}
 
 	/**
-	 * Class to remove a Document listener when the SwingSet component is a
-	 * JTextComponent
+	 * Method to remove a Document listener when the SwingSet component is a
+	 * JTextComponent.
 	 */
 	private void removeSSDocumentListener() {
-		((javax.swing.text.JTextComponent) getSSComponent()).getDocument().removeDocumentListener((SSDocumentListener)eventListener);
+		((JTextComponent) getSSComponent()).getDocument().removeDocumentListener((SSDocumentListener)eventListener);
 	}
 
 	/**
@@ -833,7 +1022,7 @@ public class SSCommon implements Serializable {
 		if (rowSetListenerAdded) {
 			rowSet.removeRowSetListener(rowSetListener);
 			rowSetListenerAdded = false;
-			logger.debug("{} - RowSet Listener removed.", () -> getColumnForLog());
+			logger.log(DEBUG, () -> sf("%s - RowSet Listener removed.", getColumnForLog()));
 		}
 	}
 
@@ -846,19 +1035,6 @@ public class SSCommon implements Serializable {
 	 */
 	public void setAllowNull(final Boolean _allowNull) {
 		allowNull = _allowNull == null ? Optional.empty() : Optional.of(_allowNull);
-	}
-
-	/**
-	 * Updates the bound database column with the specified Array.
-	 * <p>
-	 * Used for SSList or other component where multiple items can be selected.
-	 *
-	 * @param _boundColumnArray Array to write to bound database column
-	 * @throws SQLException thrown if there is a problem writing the array to the
-	 *                      RowSet
-	 */
-	public void setBoundColumnArray(final SSArray _boundColumnArray) throws SQLException {
-		getRowSet().updateArray(getBoundColumnName(), _boundColumnArray);
 	}
 
 	/**
@@ -892,7 +1068,7 @@ public class SSCommon implements Serializable {
 			boundColumnJDBCType = JDBCType.valueOf(boundColumnType);
 
 		} catch (final SQLException se) {
-			logger.error(getColumnForLog() + " - SQL Exception.", se);
+			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
 		}
 
 		// BIND UPDATED COLUMN IF APPLICABLE
@@ -934,7 +1110,7 @@ public class SSCommon implements Serializable {
 			boundColumnJDBCType = JDBCType.valueOf(boundColumnType);
 
 		} catch (final SQLException se) {
-			logger.error(getColumnForLog() + " - SQL Exception.", se);
+			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
 		}
 
 		// BIND UPDATED COLUMN IF APPLICABLE
@@ -961,43 +1137,97 @@ public class SSCommon implements Serializable {
 	}
 
 	/**
-	 * Updates the bound database column with the specified String.
+	 * Updates the bound database column with the specified Array.
+	 * <p>
+	 * Used for SSList or other component where multiple items can be selected.
 	 *
-	 * @param _boundColumnText value to write to bound database column
+	 * @param _boundColumnArray Array to write to bound database column
+	 * @throws SQLException thrown if there is a problem writing the array to the
+	 *                      RowSet
 	 */
-	public void setBoundColumnText(final String _boundColumnText) {
-		logger.debug("{}: " + _boundColumnText, () -> getColumnForLog());
+	// TODO: SHOULD IT RETURN AN ERROR LIKE setBoundColumnText?
+	public void setBoundColumnArray(final SSArray _boundColumnArray) throws SQLException {
+		logger.log(DEBUG, () -> sf("%s: %s", getColumnForLog(), _boundColumnArray));
+		boolean is_error = true;
 		try {
-			//getRowSet().updateColumnText(_boundColumnText, getBoundColumnName(), getAllowNull());
-			RowSetOps.updateColumnText(getRowSet(),_boundColumnText, getBoundColumnName(), getAllowNull());
-		} catch(final NullPointerException _npe) {
-			logger.warn(getBoundColumnName() + " - Null Pointer Exception.", _npe);
-			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
-					"Null values are not allowed for " + getBoundColumnName(), "Null Exception", JOptionPane.ERROR_MESSAGE);
-
-		} catch(final SQLException _se) {
-			logger.warn(getBoundColumnName() + " - SQL Exception.", _se);
-			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
-					"SQL Exception encountered for " + getBoundColumnName(), "SQL Exception", JOptionPane.ERROR_MESSAGE);
-
-		} catch(final NumberFormatException _pe) {
-			logger.warn(getBoundColumnName() + " - Number Format Exception.", _pe);
-			JOptionPane.showMessageDialog((JComponent)getSSComponent(),
-					"Number Format Exception encountered for " + getBoundColumnName() + " converting " + _boundColumnText + " to a number.",
-					"Number Format Exception", JOptionPane.ERROR_MESSAGE);
-
+			RowSetOps.updateColumnArray(getSSComponent(), _boundColumnArray);
+			is_error = false;
+		} catch(SQLException ex) {
+			userErrorReporting(_boundColumnArray, ex);
+		} finally {
+			if (is_error)
+				postRowSetModifiedError(getSSComponent(), _boundColumnArray);
 		}
-
 	}
 
 	/**
-	 * Sets the SwingSet component of which this SSCommon instance is a datamember.
+	 * Updates the bound database column with the specified Object.
 	 *
-	 * @param _ssComponent the parent/calling SwingSet JComponent implementing
-	 *                     SSComponentInterface
+	 * @param _boundColumnObject value to write to bound database column
+	 * @return true if no error
 	 */
-	public void setSSComponent(final SSComponentInterface _ssComponent) {
-		ssComponent = _ssComponent;
+	public boolean setBoundColumnObject(final Object _boundColumnObject) {
+		logger.log(DEBUG, () -> sf("%s: %s", getColumnForLog(), _boundColumnObject));
+		boolean ok = false;
+		try {
+			RowSetOps.updateColumnObject(getSSComponent(), _boundColumnObject);
+			ok = true;
+		} catch(SQLException | NumberFormatException ex) {
+			userErrorReporting(_boundColumnObject, ex);
+		} finally {
+			if (!ok)
+				postRowSetModifiedError(getSSComponent(), _boundColumnObject);
+		}
+		return ok;
+	}
+
+	/**
+	 * Updates the bound database column with the specified String.
+	 *
+	 * @param _boundColumnText value to write to bound database column
+	 * @return true if no error
+	 */
+	public boolean setBoundColumnText(final String _boundColumnText) {
+		logger.log(DEBUG, () -> sf("%s: %s", getColumnForLog(), _boundColumnText));
+		boolean ok = false;
+		try {
+			RowSetOps.updateColumnText(getSSComponent(), _boundColumnText);
+			ok = true;
+		} catch(SQLException | NumberFormatException ex) {
+			userErrorReporting(_boundColumnText, ex);
+		} finally {
+			if (!ok)
+				postRowSetModifiedError(getSSComponent(), _boundColumnText);
+		}
+		return ok;
+	}
+
+	private void userErrorReporting(Object value, Exception ex)
+	{
+		String ex_title = null;
+		String ex_msg = null;
+		switch(ex) {
+		case SSSQLInternalException e -> {
+			ex_title = "SS Internal Error";
+			ex_msg = sf("%s: %s", getBoundColumnName(), e.getMessage());
+		}
+		case SSSQLNullException x -> {
+			ex_title = "Null Exception";
+			ex_msg = "Null values are not allowed for " + getBoundColumnName();
+		}
+		case SQLException x -> {
+			ex_title = "SQL Exception";
+			ex_msg = "SQL Exception encountered for " + getBoundColumnName();
+		}
+		case NumberFormatException x -> {
+			ex_title = "Number Format Exception";
+			ex_msg = "Number Format Exception encountered for " + getBoundColumnName() + " converting " + value + " to a number.";
+		}
+		default -> {}
+		}
+		logger.log(WARNING, getBoundColumnName() + " - " + ex_title + ".", ex);
+		JOptionPane.showMessageDialog((JComponent)getSSComponent(), ex_msg,
+									  ex_title, JOptionPane.ERROR_MESSAGE);
 	}
 
 	/**
@@ -1020,6 +1250,104 @@ public class SSCommon implements Serializable {
 		if (!inBinding) {
 			bind();
 		}
+		debugTrackRowSetListener();
+	}
+
+	/**
+	 * Transfers focus to next Swing Component on the screen when either
+	 * Shift-Down-Arrow or Enter are pressed; previous is Shift-Up-Arrow.
+	 * 
+	 * @param jc configure this JComponent
+	 */
+	public static void configureTraversalKeys(JComponent jc)
+	{
+		// Forward traversal keys.
+		final Set<AWTKeyStroke> forwardKeys = jc
+				.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
+		final Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
+		if (!(jc instanceof JTextArea)) {
+			newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+		}
+		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_DOWN_MASK));
+		jc.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
+
+		// Backwards traversal keys.
+		final Set<AWTKeyStroke> backwardKeys = jc
+				.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
+		final Set<AWTKeyStroke> newBackwardKeys = new HashSet<>(backwardKeys);
+		newBackwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_UP, java.awt.event.InputEvent.SHIFT_DOWN_MASK));
+		jc.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, newBackwardKeys);
+
+	}
+
+	private static final String UNDO_ACTION_KEY = "SwingSetColumnUndo";
+	private static final String REDO_ACTION_KEY = "SwingSetColumnRedo";
+	/**
+	 * Setup undo/redo action bindings for a component.
+	 * @param comp
+	 */
+	public static void setupUndoRedoKeys(SSComponentInterface comp)
+	{
+		if (!NavigateActions.ENABLE_UNDO_REDO)
+			return;
+		logger.log(DEBUG, () -> sf("UndoRedoKeys: %s", comp.getClass().getSimpleName()));
+
+		JComponent jc = (JComponent)comp;
+
+		//int cond = JComponent.WHEN_FOCUSED;
+		KeyStroke ksUndo = KeyStroke.getKeyStroke("ctrl Z");
+		KeyStroke ksRedo = KeyStroke.getKeyStroke("ctrl Y");
+		int cond = JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
+		InputMap im = new InputMap();
+		im.put(ksUndo, UNDO_ACTION_KEY);
+		im.put(ksRedo, REDO_ACTION_KEY);
+		im.setParent(jc.getInputMap(cond));
+		jc.setInputMap(cond, im);
+		ActionMap am = new ActionMap();
+		am.put(UNDO_ACTION_KEY, new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				NavigateActions.undoRedo(comp, UndoRedo.UNDO);
+			}
+		});
+		am.put(REDO_ACTION_KEY, new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				NavigateActions.undoRedo(comp, UndoRedo.REDO);
+			}
+		});
+		am.setParent(jc.getActionMap());
+		jc.setActionMap(am);
+	};
+
+	/**
+	 * Use the specified argument, which comes from an undo or redo command,
+	 * to set the components value.
+	 * Whether the command was undo or redo generally doesn't matter.
+	 * @param cmd undo or redo
+	 * @param value the new value
+	 * @throws java.sql.SQLException if...
+	 */
+	public void undoRedoUpdateObject(UndoRedo cmd, Object value) throws SQLException
+	{
+		if (!NavigateActions.ENABLE_UNDO_REDO)
+			throw new IllegalStateException("UNDO/REDO disabled");
+		logger.log(DEBUG, () -> sf("%s: %s", cmd, value));
+
+		// TODO: put following in RowSetOps
+		
+		Object obj = value;
+		if (Boolean.TRUE)
+			obj = convertObjectType(obj, getBoundColumnJDBCType());
+		// NOTE: following does not generate any events
+		getRowSet().updateObject(getBoundColumnIndex(), obj);
+		// NOTE: Previous line sets value in RowSet's pending update.
+		//		 Following line causes updateSSComponent which gets the
+		//		 value to display from undoRedo; the update values
+		//		 can not always be reliably read JdbcRowSet vs CachedRowSet.
+		issueRowChanged();
 	}
 
 	/**
@@ -1030,16 +1358,140 @@ public class SSCommon implements Serializable {
 	 */
 	public void updateSSComponent() {
 		
-		// If you see this in the logs back to back for the same component a listener is likely
-		// not handled properly. Maybe incorporate SwingUtilities.invokeLater()? 
-		logger.trace("Updating component {}.", () -> getColumnForLog());
+		// If you see this in the logs back to back for the same component
+		// a listener is likely not handled properly.
+		// Maybe incorporate SwingUtilities.invokeLater()? 
+		logger.log(TRACE, () -> sf("Updating component %s.", getColumnForLog()));
 		
 		removeSSComponentListener();
-
 		ssComponent.updateSSComponent();
-
 		addSSComponentListener();
+		decorate();
+	}
+	/**
+	 * Issue a row changed event if there's an active RowSetListener.
+	 */
+	public void issueRowChanged() {
+		if(rowSetListenerAdded) {
+			// TODO: could create a valid event, but since it is not used...
+			rowSetListener.rowChanged(null);
+		}
+	}
 
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// The idea is to extend the decorators to handle a variety of component
+	// types and ways to decorate. Wonder how to do that?
+	//
+	// TODO: Could have one interface that is both validator and decorator
+	//		 and whatever else is needed: InputVerifier, ???.
+	//
+
+	static Decorator createDefaultDecorator() {
+		return new BorderDecorator();
+		//return new BackgroundDecorator();
+	}
+
+	private SSFormat ssFormat;
+	/**
+	 * @param ssFormat
+	 * @see SSComponentInterface#setFormat(com.nqadmin.swingset.formatting.SSFormat) 
+	 */
+	public void setSSFormat(SSFormat ssFormat) { this.ssFormat = ssFormat; }
+
+	/**
+	 * @return 
+	 * @see SSComponentInterface#getSSFormat() 
+	 */
+	public SSFormat getSSFormat() { return ssFormat; }
+
+	/**
+	 * Find the default decorator for this component type and set it.
+	 */
+	private void initDecorator() {
+		// For now just pick any decorator as the default.
+		// Probably want to get it from a factory/provider and use this
+		// component type as part of the decision. If a component wants to
+		// extend behavior, could get the current decorator, delegate to it,
+		// with some custom behavior used by the component.
+
+		// Is the following snippet a good way to override the default?
+		//		decorator deco = getSSComponent().createDefaultDecorator();
+		// where the default implementation returns null
+
+		setDecorator(getSSComponent().createDefaultDecorator());
+	}
+	/**
+	 * Run the decorator.
+	 * @return true if component data valid
+	 */
+	public final boolean decorate() {
+		return decorator.decorate();
+	}
+
+	/**
+	 * Install the given decorator.
+	 * @param deco decorator to install
+	 */
+	public final void setDecorator(Decorator deco) {
+		decorator.uninstall();
+		deco.install(getSSComponent());
+		decorator = deco;
+	}
+
+	/**
+	 * Return the decorator used by this component.
+	 * @return the decorator
+	 */
+	public final Decorator getDecorator() {
+		return decorator;
+	}
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Validator
+	//
+
+	/**
+	 * Install the given validator into the component
+	 * @param _validator validator to install
+	 */
+	public final void setValidator(Validator _validator) {
+		validator.uninstall();
+		_validator.install(ssComponent);
+		validator = _validator;
+	}
+	
+	/**
+	 * Run the SSComponent's plugin validator, return the result.
+	 * First check component specific validator, then plugin validator.
+	 * 
+	 * @return true if successful validation
+	 */
+	public final boolean pluginValidate()
+	{
+		// Invoke the user's validator
+		return validator.validate();
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Component Value Change
+	//
+
+	// TODO:	Implement a way to select when to do validation.
+	//			For example, OnChangeOrAction, InputVerifier, OnFocusChange, ...?
+	//
+	// TODO:	May need a plugin for whether or not to allow decorate().
+	//			Incorporate check into Validator? Decorator? ChangeHandler?
+	/**
+	 * This is called per change, like on a keystroke, if allowed may decorate
+	 * the component. 
+	 * 
+	 * @return true if the there is no detected error
+	 */
+	private boolean isValidChange() {
+		// decorator does validation
+		return decorator.decorate();
 	}
 
 }

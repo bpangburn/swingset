@@ -35,28 +35,27 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
-// SSCurrencyField.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+import javax.swing.text.DefaultFormatterFactory;
 
 /**
  * Used to link a SSFormattedTextField to a US Social Security Number column in
  * a database.
  */
-public class SSSSNField extends SSFormattedTextField {
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -8330641913621926923L;
-
+@SuppressWarnings("serial")
+public class SSSSNField extends SSFormattedTextField
+{
 	/**
 	 * Creates a new instance of SSSSNField
 	 */
 	public SSSSNField() {
-		this(new SSSSNFormatterFactory());
+		this(createFormatterFactory());
 	}
 
 	/**
@@ -64,8 +63,21 @@ public class SSSSNField extends SSFormattedTextField {
 	 *
 	 * @param factory - formatter factory to be used
 	 */
-	public SSSSNField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+	public SSSSNField(final AbstractFormatterFactory factory) {
 		super(factory);
+	}
+
+	/**
+	 * SSN MaskFormatterFactory.
+	 * @return SSN factory
+	 */
+	public static DefaultFormatterFactory createFormatterFactory() {
+		String formatMask = "###-##-####";
+		return new SSMaskFormatterFactory.Builder<>(formatMask)
+				.ssFormat(SSFormat.CUSTOM)
+				.valueContainsLiterals(true) // database string includes the '-'
+				.placeholderCharacter('_')
+				.build();
 	}
 }
 

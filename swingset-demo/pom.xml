@@ -8,7 +8,7 @@
 
 	<groupId>com.nqadmin.swingset.demo</groupId>
 	<artifactId>swingset-demo</artifactId>
-	<version>4.0.12</version>
+	<version>5.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>swingset-demo</name>
@@ -20,36 +20,37 @@
 
 		<!-- MAVEN AND JAVA VERSIONS -->
 		<version.maven>3.6.3</version.maven>
-		<version.java>8</version.java>
+		<version.java>21</version.java>
 
 		<!-- DEPENDENCIES -->
 		<!-- primary swingset-demo dependencies -->
-		<version.swingset>4.0.12</version.swingset>
-		<version.log4j>2.22.0</version.log4j>
-		<version.h2>2.2.224</version.h2>
+		<version.swingset>5.0.0-SNAPSHOT</version.swingset>
+		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
+		<version.log4j>2.24.1</version.log4j>
+		<version.h2>2.3.232</version.h2>
 		<version.java-getopt>1.0.13</version.java-getopt>
 		<version.raelity-lib>1.2.0</version.raelity-lib>
 
 		<!-- PLUGINS -->
 		<!-- Shared by swingset-parent, swingset, and swingset-demo -->
-		<version.versions-maven-plugin>2.16.2</version.versions-maven-plugin>
-		<version.maven-enforcer-plugin>3.4.1</version.maven-enforcer-plugin>
-		<version.maven-clean-plugin>3.3.2</version.maven-clean-plugin>
-		<version.maven-deploy-plugin>3.1.1</version.maven-deploy-plugin>
-		<version.maven-install-plugin>3.1.1</version.maven-install-plugin>
-		<version.maven-site-plugin>4.0.0-M12</version.maven-site-plugin>
+		<version.versions-maven-plugin>2.17.1</version.versions-maven-plugin>
+		<version.maven-enforcer-plugin>3.5.0</version.maven-enforcer-plugin>
+		<version.maven-clean-plugin>3.4.0</version.maven-clean-plugin>
+		<version.maven-deploy-plugin>3.1.3</version.maven-deploy-plugin>
+		<version.maven-install-plugin>3.1.3</version.maven-install-plugin>
+		<version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
 
 		<!-- Shared by swingset and swingset-demo -->
-		<version.maven-jar-plugin>3.3.0</version.maven-jar-plugin>
+		<version.maven-jar-plugin>3.4.2</version.maven-jar-plugin>
 		<version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
-		<version.maven-compiler-plugin>3.11.0</version.maven-compiler-plugin>
-		<version.dependency-check-maven>9.0.7</version.dependency-check-maven>
-		<version.maven-gpg-plugin>3.1.0</version.maven-gpg-plugin>
-		<version.maven-surefire-plugin>3.2.3</version.maven-surefire-plugin>
-		<version.maven-source-plugin>3.3.0</version.maven-source-plugin>
+		<version.maven-compiler-plugin>3.13.0</version.maven-compiler-plugin>
+		<version.dependency-check-maven>11.1.0</version.dependency-check-maven>
+		<version.maven-gpg-plugin>3.2.7</version.maven-gpg-plugin>
+		<version.maven-surefire-plugin>3.5.1</version.maven-surefire-plugin>
+		<version.maven-source-plugin>3.3.1</version.maven-source-plugin>
 		
 		<!-- swingset-demo-only -->
-		<version.maven-assembly-plugin>3.6.0</version.maven-assembly-plugin>
+		<version.maven-assembly-plugin>3.7.1</version.maven-assembly-plugin>
 	</properties>
 
 	<licenses>
@@ -82,6 +83,13 @@
 			<version>${version.swingset}</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.nqadmin.rowset/jdbcrowsetimpl -->
+		<dependency>
+			<groupId>com.nqadmin.rowset</groupId>
+			<artifactId>jdbcrowsetimpl</artifactId>
+			<version>${version.jdbcrowsetimpl}</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
 		<dependency>
 			<groupId>com.h2database</groupId>
@@ -89,13 +97,27 @@
 			<version>${version.h2}</version>
 		</dependency>
 
+		<!--
+			log4j-jpl: "The Log4j 2 JDK Logging Adapter allow
+			to route all System.Logger events to Log4j 2 APIs."
+
+			This single dependency can be removed to take
+			log4j out of the picture; or can comment out all 3.
+		-->
+		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-jpl -->
+		<!--
+		-->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-jpl</artifactId>
+			<version>${version.log4j}</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
 			<version>${version.log4j}</version>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -117,6 +139,22 @@
 			<version>${version.raelity-lib}</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.mastfrog/simplevalidation-standalone -->
+		<!-- pick up simplevalidation from logman-lib -->
+		<!-- pick up simplevalidation from logman-lib
+		<dependency>
+			<groupId>com.mastfrog</groupId>
+			<artifactId>simplevalidation-standalone</artifactId>
+			<version>1.14.1</version>
+		</dependency>
+		-->
+
+		<!-- https://mvnrepository.com/artifact/com.raelity.logman/logman-lib -->
+		<dependency>
+			<groupId>com.raelity.logman</groupId>
+			<artifactId>logman-lib</artifactId>
+			<version>2.3.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -128,6 +166,45 @@
 				<artifactId>versions-maven-plugin</artifactId>
 				<version>${version.versions-maven-plugin}</version>
 			</plugin>
+
+			<!-- Added from https://github.com/eppleton/frgaal -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${version.maven-compiler-plugin}</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.frgaal</groupId>
+						<artifactId>compiler-maven-plugin</artifactId>
+						<version>21.0.0</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<compilerId>frgaal</compilerId>
+					<source>21</source>
+					<target>11</target>
+					<compilerArgs>
+						<arg>-Xlint:deprecation</arg>
+						<!--only needed when using preview language features-->
+						<!-- <arg>- -enable-preview</arg> -->
+						<arg>--enable-preview</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${version.maven-jar-plugin}</version>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Multi-Release>true</Multi-Release>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			<!-- End frgaal -->
+
 			<!-- Maven Enforcer forces specified version of Java and Maven -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -175,11 +252,13 @@
 				<artifactId>maven-install-plugin</artifactId>
 				<version>${version.maven-install-plugin}</version>
 			</plugin>
+			<!-- Included above with frgaal
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>${version.maven-jar-plugin}</version>
 			</plugin>
+			-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -196,6 +275,7 @@
 				<version>${version.maven-surefire-plugin}</version>
 			</plugin>
 
+			<!-- Included above with frgaal
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -205,6 +285,7 @@
 					<release>${version.java}</release>
 				</configuration>
 			</plugin>
+			-->
 		</plugins>
 	</build>
 

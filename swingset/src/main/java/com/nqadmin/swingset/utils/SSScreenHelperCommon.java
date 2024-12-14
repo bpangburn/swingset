@@ -39,7 +39,6 @@ package com.nqadmin.swingset.utils;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Frame;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -52,9 +51,16 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
+import static java.lang.System.Logger.Level.*;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 //SSScreenHelperCommon.java
 //
@@ -63,6 +69,7 @@ import java.sql.Connection;
 /**
  * Helper class for designing SwingSet Form View screens.
  */
+@SuppressWarnings("serial")
 public abstract class SSScreenHelperCommon extends JInternalFrame {
 
 	/**
@@ -79,12 +86,13 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * </pre><p>
 	 * ASSUMES that -998877 would never be a primary/foreign key value.
 	 */
+	// TODO: find a better way
 	public final static long hopefullyNoPKValue = -998877;
 
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * unique serial ID
@@ -161,10 +169,9 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 			try {
 				_jInternalFrame.setClosed(true);
 			} catch (PropertyVetoException _pve) {
-				logger.warn("Unable to close {}.",()-> {return _jInternalFrame.getTitle();});
+				logger.log(WARNING, ()->sf("Unable to close %s.", _jInternalFrame.getTitle()));
 			}
 		});
-		
 	}
 
 	/**
@@ -180,7 +187,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 			setClosed(true);
 			closeChildScreens();
 		} catch (final PropertyVetoException pve) {
-			logger.error("Property Veto Exception.", pve);
+			logger.log(Level.ERROR, "Property Veto Exception.", pve);
 		}
 	}
 	
@@ -213,6 +220,31 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 	
 	/**
+	 * Returns a READONLY statement for running select queries against the database
+	 *
+	 * @return a READONLY statement for the database connection
+	 */
+	@SuppressWarnings({"BroadCatchBlock", "TooBroadCatch", "UseSpecificCatch", "CallToPrintStackTrace"})
+	public Statement getReadOnlyStatement() {
+		Statement readOnlyStatement = null;
+
+		try {
+			readOnlyStatement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return readOnlyStatement;
+	}
+
+	/**
+	 * @param connectionOrDataSource either Connection or String dataSourceName
+	 * @return a new rowset
+	 * @throws java.sql.SQLException
+	 */
+	protected abstract RowSet getNewRowSet(Object connectionOrDataSource) throws SQLException;
+	
+	/**
 	 * Builds and returns custom menu bar and with applicable listeners.
 	 * Cleanest to implement listeners with Lambda expressions.
 	 *
@@ -232,16 +264,6 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 */
 	public int getDefaultY() {
 		return defaultY;
-	}
-	
-	/**
-	 * @return Parent window/container.
-	 *
-	 * @deprecated Starting in 4.0.0+ use {@link #getRootFrame()} instead.
-	 */
-	@Deprecated
-	protected Frame getMainFrame() {
-		return getRootFrame();
 	}
 	
 	/**
@@ -375,7 +397,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * Sets default X and Y coordinates for the screen (top left offset)
 	 */
 	public void setDefaultScreenLocation() {
-		setDefaultScreenLocation(Integer.valueOf(ssProps.getProperty("Level_2_X_Position")), Integer.valueOf(ssProps.getProperty("Level_2_Y_Position")));
+		setDefaultScreenLocation(Integer.parseInt(ssProps.getProperty("Level_2_X_Position")), Integer.parseInt(ssProps.getProperty("Level_2_Y_Position")));
 	}
 	
 	/**
@@ -385,8 +407,8 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * @param _defaultY the default Y coordinate for the screen
 	 */
 	public void setDefaultScreenLocation(final int _defaultX, final int _defaultY) {
-		setDefaultX(Integer.valueOf(_defaultX));
-		setDefaultY(Integer.valueOf(_defaultY));
+		setDefaultX(_defaultX);
+		setDefaultY(_defaultY);
 	}
 	
 	/**
@@ -462,7 +484,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * Sets the screen size
 	 */
 	public void setScreenSize() {
-		setSize(Integer.valueOf(ssProps.getProperty("Frame_Width")), Integer.valueOf(ssProps.getProperty("Frame_Height")));
+		setSize(Integer.parseInt(ssProps.getProperty("Frame_Width")), Integer.parseInt(ssProps.getProperty("Frame_Height")));
 	}
 
 	/**
@@ -491,7 +513,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 
 		// SEE IF THE SCREEN IS IN THE CONTAINER
 		final Component[] components = _container.getComponents();
-		int i = 0;
+		int i;
 		for (i = 0; i < components.length; i++) {
 			// if (_callingClass.isInstance(components[i])) {
 			if (getClass().isInstance(components[i])) {
@@ -515,7 +537,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 			setSelected(true);
 			setClosed(false);
 		} catch (final PropertyVetoException pve) {
-			logger.error("Property Veto Exception.", pve);
+			logger.log(Level.ERROR, "Property Veto Exception.", pve);
 		}
 
 	}
@@ -527,16 +549,9 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * @throws Exception exception thrown while updating the rowset
 	 */
 	protected void updateRowset() throws SQLException, Exception {
-		logger.debug("Rowset query: [{}].", () -> {
-			try {
-				return getRowsetQuery();
-//			} catch (SQLException se) {
-//				return "*** getSelectionQuery() threw an SQL Exception ***";
-			} catch (Exception e) {
-				return "*** getSelectionQuery() threw an Exception ***";
-			}
-		});
-		getRowset().setCommand(getRowsetQuery());
+		String query = getRowsetQuery();
+		logger.log(DEBUG, ()->sf("Rowset query: [%s].", query));
+		getRowset().setCommand(query);
 		getRowset().execute();
 	}
 	

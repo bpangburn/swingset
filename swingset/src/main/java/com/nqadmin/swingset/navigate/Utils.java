@@ -1,0 +1,160 @@
+/* *****************************************************************************
+ * Copyright (C) 2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Contributors:
+ *   Prasanth R. Pasala
+ *   Brian E. Pangburn
+ *   Diego Gil
+ *   Man "Bee" Vo
+ *   Ernie R. Rael
+ * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
+package com.nqadmin.swingset.navigate;
+
+import java.awt.KeyboardFocusManager;
+
+import javax.sql.RowSet;
+
+import com.google.common.eventbus.EventBus;
+import com.nqadmin.swingset.utils.CentralLookup;
+import com.nqadmin.swingset.utils.SSComponentInterface;
+
+/**
+ * TODO: Replace EventBUs with https://dagger.dev/ and RxJava
+ *			https://www.baeldung.com/rx-java
+ */
+public class Utils
+{
+	private Utils() { }
+
+
+	////////////////////////////////////////////////////////////////////////////
+	//
+	// EventBus
+	//
+	//     posting Events
+	//     finding a bus
+	//
+
+	/**
+	 * Post a modification event; prefer a local eventBus.
+	 * @param source SSComponent modifying the rowset
+	 * @param value new value
+	 */
+	public static void postRowSetModified(SSComponentInterface source, Object value)
+	{
+		// May want to extend to handling local EventBus per Frame/Panel;
+		// Use either/both source/rs to find a local eventBus.
+		getLocalEventBus(source, source.getRowSet())
+				.post(new RowSetModificationEvent(source, value));
+	}
+
+	/**
+	 * Post an error modification event; prefer a local eventBus.
+	 * @param source SSComponent modifying the rowset
+	 * @param value new value
+	 */
+	public static void postRowSetModifiedError(SSComponentInterface source, Object value)
+	{
+		getLocalEventBus(source, source.getRowSet())
+				.post(new RowSetModificationEvent(source, value, true));
+	}
+
+	/**
+	 * Post an undo/redo event and if value an error; prefer a local eventBus.
+	 * @param source SSComponent modifying the rowset
+	 * @param value new value
+	 * @param isError value is an error
+	 */
+	public static void postRowSetUndoRedo(SSComponentInterface source, Object value,
+									boolean isError)
+	{
+		getLocalEventBus(source, source.getRowSet())
+				.post(new RowSetUndoRedoEvent(source, value, isError));
+	}
+	
+	// Notes on implementing a weak subscriber
+	//		https://github.com/google/guava/issues/807#issuecomment-61328188
+	// Consider the following. much like event bus, does weak listener
+	//		https://github.com/bennidi/mbassador
+	// And see NavigateActions for example; includes use of Cleaner.register.
+
+	/**
+	 * EventBus to use Frame/Panel events
+	 */
+	private static EventBus globalEventBus = null;
+
+	/**
+	 * Get the global EventBus.
+	 * Side affect on first call is creating a broadcaster for "focusOwner" changes.
+	 * @return EventBus for this
+	 */
+	public static EventBus getGlobalEventBus()
+	{
+		// TODO: CentralLookup could be set up by app, or some general init.
+		if (globalEventBus == null) {
+			globalEventBus = CentralLookup.getDefault().lookup(EventBus.class);
+			if(globalEventBus == null) {
+				globalEventBus = new EventBus("SwingSetGlobal");
+				CentralLookup.getDefault().add(globalEventBus);
+			}
+
+			// TODO: Be more careful about tracking who's managing focus
+			//		 and the current focusOwner so that the events continue
+			//		 if the focus manager is changed.
+			KeyboardFocusManager.getCurrentKeyboardFocusManager()
+					.addPropertyChangeListener("focusOwner",
+							(pce) -> globalEventBus.post(new FocusChangeEvent(pce)));
+		}
+		return globalEventBus;
+	}
+
+	// Maybe get rid of this idea of localEventBus.
+
+	/**
+	 * Find the EventBus associated with the NavGroup to which
+	 * the component belongs.
+	 * @param component typically JComponent that wants the eventBus
+	 * @param rs RowSet involved in EventBus
+	 * @return component's NavGroup EventBus
+	 */
+	public static EventBus getLocalEventBus(Object component, RowSet rs)
+	{
+		// TODO: per navigator or per row set or per NavGroup event bus
+		// TODO: get rid of this method, create local event bus
+		//       as client property of root pane/panel of NavGroup
+		return getGlobalEventBus();
+	}
+	
+}

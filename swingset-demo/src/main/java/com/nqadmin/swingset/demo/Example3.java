@@ -48,14 +48,18 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import static java.lang.System.Logger.Level.*;
 
-import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.formatting.SSDateField;
+import static com.nqadmin.swingset.formatting.SSFormat.DATE_MMDDYYYY_SLASH;
+import com.nqadmin.swingset.formatting.SSIntegerField;
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * This example displays data from the supplier_part_data table.
@@ -65,17 +69,13 @@ import com.nqadmin.swingset.SSTextField;
  * <p>
  * Record navigation is handled with a SSDataNavigator.
  */
+@SuppressWarnings("serial")
 public class Example3 extends JFrame {
 
 	/**
 	 * Log4j2 Logger
 	 */
-    private static final Logger logger = LogManager.getLogger(Example3.class);
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = 4859550616628544511L;
+    private static final Logger logger = SSUtils.getLogger();
 	
 	/**
 	 * screen label declarations
@@ -84,6 +84,7 @@ public class Example3 extends JFrame {
 	JLabel lblSupplierName = new JLabel("Supplier");
 	JLabel lblPartName = new JLabel("Part");
 	JLabel lblQuantity = new JLabel("Quantity");
+	JLabel lblShipDate = new JLabel("Ship Date");
 	
 	/**
 	 * bound component declarations
@@ -91,7 +92,9 @@ public class Example3 extends JFrame {
 	SSTextField txtSupplierPartID = new SSTextField();
 	SSDBComboBox cmbSupplierName = null;
 	SSDBComboBox cmbPartName = null;
-	SSTextField txtQuantity = new SSTextField();
+
+	SSIntegerField txtQuantity = new SSIntegerField();
+	SSDateField txtShipDate = new SSDateField(DATE_MMDDYYYY_SLASH);
 	
 	/**
 	 * database component declarations
@@ -105,10 +108,12 @@ public class Example3 extends JFrame {
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
+	@SuppressWarnings("LeakingThisInConstructor")
 	public Example3(final Connection _dbConn) {
 
 		// SET SCREEN TITLE
 			super("Example3");
+			DemoUtil.initExampleFrame(this, null);
 
 		// SET CONNECTION
 			connection = _dbConn;
@@ -121,11 +126,11 @@ public class Example3 extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 			try {
-				rowset = new JdbcRowSetImpl(connection);
+				rowset = DemoUtil.getNewRowSet(connection);
 				rowset.setCommand("SELECT * FROM supplier_part_data");
 				navigator = new SSDataNavigator(rowset);
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 			}
 
 		/**
@@ -133,7 +138,7 @@ public class Example3 extends JFrame {
 		 * H2 does not fully support updatable rowset so it must be
 		 * re-queried following insert and delete with rowset.execute()
 		 */
-		navigator.setDBNav(new SSDBNavImpl(this) {
+		navigator.getNavigateActions().setDBNav(new SSDBNavImpl(this) {
 			/**
 			 * unique serial id
 			 */
@@ -148,7 +153,7 @@ public class Example3 extends JFrame {
 				try {
 					rowset.execute();
 				} catch (final SQLException se) {
-					logger.error("SQL Exception.", se);
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				}
 			}
 
@@ -161,7 +166,7 @@ public class Example3 extends JFrame {
 				try {
 					rowset.execute();
 				} catch (final SQLException se) {
-					logger.error("SQL Exception.", se);
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				}
 			}
 
@@ -186,15 +191,15 @@ public class Example3 extends JFrame {
 					rs.close();
 
 				// SET OTHER DEFAULTS
-					 logger.debug("Setting default for Supplier Name mapping to 2.");
+					 logger.log(DEBUG, "Setting default for Supplier Name mapping to 2.");
 					 cmbSupplierName.setSelectedMapping((long) 2);
 //					 cmbPartName.setSelectedValue(0);
 //					 txtQuantity.setText("0");
 
 				} catch(final SQLException se) {
-					logger.error("SQL Exception occured initializing new record.",se);
+					logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
 				} catch(final Exception e) {
-					logger.error("Exception occured initializing new record.",e);
+					logger.log(Level.ERROR, "Exception occured initializing new record.",e);
 				}
 
 			}
@@ -214,6 +219,7 @@ public class Example3 extends JFrame {
 			cmbPartName.setAllowNull(false);
 			cmbPartName.bind(rowset, "part_id");
 			txtQuantity.bind(rowset, "quantity");
+			txtShipDate.bind(rowset, "ship_date");
 
 		// RUN DB COMBO QUERIES
 			try {
@@ -221,9 +227,9 @@ public class Example3 extends JFrame {
 				cmbSupplierName.execute();
 
 			} catch (final SQLException se) {
-				logger.error("SQL Exception.", se);
+				logger.log(Level.ERROR, "SQL Exception.", se);
 			} catch (final Exception e) {
-				logger.error("Exception.", e);
+				logger.log(Level.ERROR, "Exception.", e);
 			}
 
 		// SET LABEL DIMENSIONS
@@ -231,12 +237,14 @@ public class Example3 extends JFrame {
 			lblSupplierName.setPreferredSize(MainClass.labelDim);
 			lblPartName.setPreferredSize(MainClass.labelDim);
 			lblQuantity.setPreferredSize(MainClass.labelDim);
+			lblShipDate.setPreferredSize(MainClass.labelDim);
 
 		// SET BOUND COMPONENT DIMENSIONS
 			txtSupplierPartID.setPreferredSize(MainClass.ssDim);
 			cmbSupplierName.setPreferredSize(MainClass.ssDim);
 			cmbPartName.setPreferredSize(MainClass.ssDim);
 			txtQuantity.setPreferredSize(MainClass.ssDim);
+			txtShipDate.setPreferredSize(MainClass.ssDim);
 
 		// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
 			final Container contentPane = getContentPane();
@@ -252,6 +260,8 @@ public class Example3 extends JFrame {
 			contentPane.add(lblPartName, constraints);
 			constraints.gridy = 3;
 			contentPane.add(lblQuantity, constraints);
+			constraints.gridy = 4;
+			contentPane.add(lblShipDate, constraints);
 
 			constraints.gridx = 1;
 			constraints.gridy = 0;
@@ -262,9 +272,11 @@ public class Example3 extends JFrame {
 			contentPane.add(cmbPartName, constraints);
 			constraints.gridy = 3;
 			contentPane.add(txtQuantity, constraints);
+			constraints.gridy = 4;
+			contentPane.add(txtShipDate, constraints);
 
 			constraints.gridx = 0;
-			constraints.gridy = 4;
+			constraints.gridy = 5;
 			constraints.gridwidth = 2;
 			contentPane.add(navigator, constraints);
 

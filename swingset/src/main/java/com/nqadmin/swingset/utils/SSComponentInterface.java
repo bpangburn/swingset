@@ -35,25 +35,32 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
-import java.awt.AWTKeyStroke;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.KeyEvent;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EventListener;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.sql.RowSet;
-import javax.swing.JComponent;
-import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
 
 import java.sql.Connection;
 
-import com.nqadmin.swingset.SSDataNavigator;
+import javax.sql.rowset.CachedRowSet;
+import javax.swing.JComponent;
+
+import com.nqadmin.swingset.datasources.RSC;
+import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.decorators.Decorator;
+import com.nqadmin.swingset.decorators.Validator;
+import com.nqadmin.swingset.formatting.SSFormat;
+import com.nqadmin.swingset.navigate.NavigateActions;
+import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
+import com.nqadmin.swingset.navigate.RowSetModificationEvent;
 
 // SSComponentInterface.java
 //
@@ -69,30 +76,8 @@ import com.nqadmin.swingset.SSDataNavigator;
  * SwingSet components unless you disable/enable the component listener.
  * Best practice is to call {@code #getSSCommon().updateSSComponent()}
  */
-public interface SSComponentInterface {
-
-	// TODO Fire property changes where applicable.
-
-//	/**
-//	 * Convenience method to add both RowSet and SwingSet Component listeners.
-//	 * <p>
-//	 * Does not add DocumentListener.
-//	 */
-//	default void addListeners() {
-//		addRowSetListener();
-//		addSSComponentListener();
-//	}
-
-//	/**
-//	 * Adds listener for Document if SwingSet component is a JTextComponent.
-//	 * <p>
-//	 * Implementation of addSSComponentListener() can just call this method when the
-//	 * component is a JTextComponent.
-//	 */
-//	default void addDocumentListener() {
-//		getSSCommon().addDocumentListener();
-//	}
-
+public interface SSComponentInterface extends RSC
+{
 	/**
 	 * Adds listener for RowSet to trigger update to SwingSet component.
 	 * <p>
@@ -117,6 +102,15 @@ public interface SSComponentInterface {
 		_component.getSSCommon().addSSComponentListener();
 	}
 
+	/** Invoked during bind, component should verify that jdbcType is ok.
+	 * @param jdbcType column JDBCType
+	 * @throws AssertionError if can't handle JDBCType
+	 */
+	// TODO: checkColumnType use a different exception?
+	default void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException
+	{
+	}
+
 	/**
 	 * Sets the rowSet and column name to which the component is to be bound.
 	 * <p>
@@ -126,8 +120,17 @@ public interface SSComponentInterface {
 	 * @param _rowSet datasource to be used.
 	 * @param _boundColumnName Name of the column to which this check box should be bound
 	 */
-	default void bind(final RowSet _rowSet, final String _boundColumnName) {// throws java.sql.SQLException {
+	default void bind(final RowSet _rowSet, final String _boundColumnName) {
+			// throws java.sql.SQLException {
+		try {
+			checkColumnType(RowSetOps.getJDBCColumnType(_rowSet, _boundColumnName));
+		} catch (SQLException ex) {
+			throw new IllegalArgumentException("SQLException getting column type", ex);
+		}
 		getSSCommon().bind(_rowSet, _boundColumnName);
+		// Primary keys for SyncResolver, joins
+		if (_rowSet instanceof CachedRowSet)
+			SSUtils.setupDefaultPrimaryKeys(this);
 	}
 
 	/**
@@ -138,27 +141,11 @@ public interface SSComponentInterface {
 	}
 
 	/**
-	 * Transfers focus to next Swing Component on the screen when Down Arrow or
-	 * Enter are pressed.
+	 * Setup additional focus transfer keys.
 	 */
-	default void configureTraversalKeys() {
-		
-		// Forward traversal keys.
-		final Set<AWTKeyStroke> forwardKeys = ((JComponent) this)
-				.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS);
-		final Set<AWTKeyStroke> newForwardKeys = new HashSet<>(forwardKeys);
-		if (!(this instanceof JTextArea)) {
-			newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
-		}
-		newForwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, java.awt.event.InputEvent.SHIFT_MASK));
-		((JComponent) this).setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
-
-		// Backwards traversal keys.
-		final Set<AWTKeyStroke> backwardKeys = ((JComponent) this)
-				.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS);
-		final Set<AWTKeyStroke> newBackwardKeys = new HashSet<>(backwardKeys);
-		newBackwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_UP, java.awt.event.InputEvent.SHIFT_MASK));
-		((JComponent) this).setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, newBackwardKeys);
+	default void configureTraversalKeys()
+	{
+		SSCommon.configureTraversalKeys((JComponent)this);
 	}
 
 	/**
@@ -167,10 +154,8 @@ public interface SSComponentInterface {
 	 * <p>
 	 * It will actually be called from SSCommon.init() once the SSCommon data member
 	 * is instantiated.
-	 * <p>
-	 * This method can be empty.
 	 */
-	void customInit();
+	default void customInit() {}
 
 	/**
 	 * Retrieves the allowNull flag for the bound database column.
@@ -178,6 +163,7 @@ public interface SSComponentInterface {
 	 * @return true if bound database column can contain null values, otherwise
 	 *         returns false
 	 */
+	@Override
 	default boolean getAllowNull() {
 		return getSSCommon().getAllowNull();
 	}
@@ -189,6 +175,7 @@ public interface SSComponentInterface {
 	 * @return returns the index of the column to which the SwingSet component is
 	 *         bound
 	 */
+	@Override
 	default int getBoundColumnIndex() {
 		return getSSCommon().getBoundColumnIndex();
 	}
@@ -200,6 +187,7 @@ public interface SSComponentInterface {
 	 *
 	 * @return the enum value corresponding to the data type of the bound column
 	 */
+	@Override
 	default JDBCType getBoundColumnJDBCType() {
 		return getSSCommon().getBoundColumnJDBCType();
 	}
@@ -209,8 +197,21 @@ public interface SSComponentInterface {
 	 *
 	 * @return the bound column name
 	 */
+	@Override
 	default String getBoundColumnName() {
 		return getSSCommon().getBoundColumnName();
+	}
+
+	/** {@inheritDoc } */
+	// TODO: put this in RSC?
+	default Object getBoundColumnObject() {
+		return getSSCommon().getBoundColumnObject();
+	}
+
+	/** {@inheritDoc } */
+	@Override
+	default <T> T getBoundColumnObject(Class<T> type) {
+		return getSSCommon().getBoundColumnObject(type);
 	}
 
 	/**
@@ -220,6 +221,7 @@ public interface SSComponentInterface {
 	 *
 	 * @return String containing the value in the bound database column
 	 */
+	@Override
 	default String getBoundColumnText() {
 		return getSSCommon().getBoundColumnText();
 	}
@@ -231,6 +233,7 @@ public interface SSComponentInterface {
 	 *
 	 * @return the data type of the bound column
 	 */
+	// TODO: deprecate
 	default int getBoundColumnType() {
 		return getSSCommon().getBoundColumnType();
 	}
@@ -240,55 +243,17 @@ public interface SSComponentInterface {
 	 *
 	 * @return the bound column name in square brackets
 	 */
+	@Override
 	default String getColumnForLog() {
 		return getSSCommon().getColumnForLog();
-	}
-
-	/**
-	 * Returns the index of the database column to which the SwingSet component is
-	 * bound.
-	 *
-	 * @return returns the index of the column to which the SwingSet component is
-	 *         bound
-	 *
-	 * @deprecated use {@link #getBoundColumnIndex()} instead.
-	 */
-	@Deprecated
-	default int getColumnIndex() {
-		return getBoundColumnIndex();
-	}
-
-	/**
-	 * Returns the database column name bound to the Swingset component
-	 *
-	 * @return the bound column name
-	 *
-	 * @deprecated use {@link #getBoundColumnName()} instead.
-	 */
-	@Deprecated
-	default String getColumnName() {
-		return getBoundColumnName();
-	}
-
-	/**
-	 * Returns the integer code representing the bound database column data type.
-	 * <p>
-	 * Based on java.sql.Types
-	 *
-	 * @return the data type of the bound column
-	 *
-	 * @deprecated use {@link #getBoundColumnType()} instead.
-	 */
-	@Deprecated
-	default int getColumnType() {
-		return getBoundColumnType();
 	}
 
 	/**
 	 * Returns the ssCommon data member of the Swingset component.
 	 * <p>
 	 * A typical implementation might look like: {@code
-	 * 
+	 *	if (ssCommon == null)
+	 *		return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
 	 * 	return ssCommon;
 	 * }
 	 *
@@ -310,23 +275,9 @@ public interface SSComponentInterface {
 	 *
 	 * @return the rowSet
 	 */
+	@Override
 	default RowSet getRowSet() {
 		return getSSCommon().getRowSet();
-	}
-
-	/**
-	 * Returns the SSDataNavigator associated with this component.
-	 * <p>
-	 * This was added per discussion #93 to support a legacy
-	 * SwingSet with the need to setup key listeners on individual
-	 * components to trigger action on the SSDataNavigator buttons.
-	 * <p>
-	 * @deprecated Use ActionMap instead.
-	 * @return the SSDataNavigator
-	 */
-	@Deprecated
-	default SSDataNavigator getSSDataNavigator() {
-		return SSDataNavigator.getSSDataNavigator(getRowSet());
 	}
 	
 	/**
@@ -357,38 +308,6 @@ public interface SSComponentInterface {
 	 * @return single change listener for the current SwingSet component to trigger RowSet update
 	 */
 	EventListener getSSComponentListener();
-	
-//	/**
-//	 * Returns the RowSet containing queried data from the database.
-//	 *
-//	 * @return the rowSet
-//	 *
-//	 * @deprecated use {@link #getRowSet()} instead.
-//	 */
-//	@Deprecated
-//	default RowSet getSSRowSet() {
-//		return getRowSet();
-//	}
-
-//	/**
-//	 * Removes listeners for bound RowSet and SwingSet component.
-//	 * <p>
-//	 * Does not remove DocumentListener.
-//	 */
-//	default void removeListeners() {
-//		removeRowSetListener();
-//		removeSSComponentListener();
-//	}
-
-//	/**
-//	 * Removes listener for Document if SwingSet component is a JTextComponent.
-//	 * <p>
-//	 * Implementation of removeSSComponentListener() can just call this method when
-//	 * the component is a JTextComponent.
-//	 */
-//	default void removeDocumentListener() {
-//		getSSCommon().removeDocumentListener();
-//	}
 	
 	/**
 	 * Indicates if the components RowSet listener is added/enabled.
@@ -498,38 +417,19 @@ public interface SSComponentInterface {
 	/**
 	 * Sets the value of the bound database column
 	 *
+	 * @param _boundColumnObject the value to set in the bound database column
+	 */
+	default void setBoundColumnObject(final Object _boundColumnObject) {
+		getSSCommon().setBoundColumnObject(_boundColumnObject);
+	}
+
+	/**
+	 * Sets the value of the bound database column
+	 *
 	 * @param _boundColumnText the value to set in the bound database column
 	 */
 	default void setBoundColumnText(final String _boundColumnText) {
 		getSSCommon().setBoundColumnText(_boundColumnText);
-	}
-
-	/**
-	 * Sets the rowset column index to which the Component is to be bound.
-	 *
-	 * @param _columnIndex rowset column index to which the Component is to be bound
-	 *
-	 * @throws java.sql.SQLException - if a database access error occurs
-	 *
-	 * @deprecated use {@link #setBoundColumnIndex(int _boundColumnIndex)} instead.
-	 */
-	@Deprecated
-	default void setColumnIndex(final int _columnIndex) throws SQLException {
-		setBoundColumnIndex(_columnIndex);
-	}
-
-	/**
-	 * Sets the database column name bound to the Swingset component
-	 *
-	 * @param _columnName the columnName to set
-	 *
-	 * @throws java.sql.SQLException - if a database access error occurs
-	 *
-	 * @deprecated use {@link #setBoundColumnName(String _boundColumnName)} instead.
-	 */
-	@Deprecated
-	default void setColumnName(final String _columnName) throws SQLException {
-		setBoundColumnName(_columnName);
 	}
 	
 	/**
@@ -544,51 +444,12 @@ public interface SSComponentInterface {
 	}
 
 	/**
-	 * Sets the SSCommon data member of the Swingset Component.
-	 *
-	 * @param _ssCommon shared/common SwingSet component data and methods
-	 */
-	void setSSCommon(SSCommon _ssCommon);
-
-	/**
 	 * Sets the Connection to the database
 	 *
 	 * @param _connection the connection to set
 	 */
 	default void setConnection(final Connection _connection) {
 		getSSCommon().setConnection(_connection);
-	}
-
-//	/**
-//	 * Sets the RowSet to hold queried data from the database.
-//	 *
-//	 * @param _rowSet datasource
-//	 *
-//	 * @throws java.sql.SQLException - if a database access error occurs
-//	 * 
-//	 * @deprecated use {@link #setRowSet(RowSet)} instead.
-//	 */
-//	@Deprecated
-//	default void setSSRowSet(final RowSet _rowSet) throws java.sql.SQLException {
-//		setRowSet(_rowSet);
-//	}
-
-	/**
-	 * Updates the value of the SwingSet component based on the bound database
-	 * column.
-	 * <p>
-	 * IMPORTANT: Do not call {@link #updateDisplay()} directly from 
-	 * SwingSet components unless you disable/enable the component listener.
-	 * Best practice is to call {@code #getSSCommon().updateSSComponent()}
-	 * <p>
-	 * updateSSComponent() should eliminate the need for updateDisplay()
-	 *
-	 * @deprecated {@link #updateSSComponent()} should generally handle display
-	 *             update.
-	 */
-	@Deprecated
-	default void updateDisplay() {
-		updateSSComponent();
 	}
 
 	/**
@@ -600,4 +461,92 @@ public interface SSComponentInterface {
 	 */
 	void updateSSComponent();
 
+	/**
+	 * Setup action bindings for undo/redo.
+	 */
+	default void setupUndoRedoKeys() {
+		SSCommon.setupUndoRedoKeys(this);
+	}
+
+	/**
+	 * Add a change to this components undo/redo stack.
+	 * @param ev modification event
+	 * @throws java.sql.SQLException
+	 */
+	default void addUndoableChange(RowSetModificationEvent ev) throws SQLException {
+		NavigateActions.addUndoableChange(ev);
+	}
+
+	/**
+	 * Set the component to the new value.
+	 * <p>
+	 * WARNING: do not override unless ...
+	 * @param cmd undo or redo
+	 * @param value new value
+	 * @throws java.sql.SQLException
+	 */
+	default void undoRedoUpdateObject(UndoRedo cmd, Object value) throws SQLException
+	{
+		getSSCommon().undoRedoUpdateObject(cmd, value);
+	}
+
+	/**
+	 * A component may have a display/parse format.Especially used in
+	 * conjunction with, but not limited to, {@linkplain SSFormattedTextField}.
+	 * @param format format for this component
+	 */
+	default void setSSFormat(SSFormat format) { getSSCommon().setSSFormat(format); }
+
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	default SSFormat getSSFormat() { return getSSCommon().getSSFormat(); }
+
+	/**
+	 * A low level indication of whether or not the component data is valid.
+	 * For example, a mask formatter indicates valid; generally simple
+	 * constraints that are context independent; e.g. {@literal month <= 12}.
+	 * There may be additional checks defined by {@link #componentValidate() }
+	 * and/or a {@link Validator}; those are not considered here.
+	 * This might be determined by stringToValue.
+	 * @return false for error in data, otherwise true
+	 */
+	default boolean baseValidate() { return true; }
+
+	/**
+	 * This has component specific validation, for example for a SSDateField.
+	 * @return true if successful validation for the type of component
+	 */
+	default boolean componentValidate() { return true; }
+
+	/**
+	 * The results of doing SSComponent validations.
+	 * 
+	 * @param base result of baseValidate()
+	 * @param comp result of base and componentValidate()
+	 * @param all result of comp and pluginValidate()
+	 */
+	record validateResult(boolean base, boolean comp, boolean all){}
+
+	/**
+	 * Run the validators: baseValidate, componentValidate, pluginValidate.
+	 * The checks are done in order, they stop with any failure.
+	 * @return result
+	 */
+	default validateResult allValidate() {
+		boolean baseValid = baseValidate();
+		boolean compValid = baseValid && componentValidate();
+		boolean allValid = compValid && getSSCommon().pluginValidate();
+		return new validateResult(baseValid, compValid, allValid);
+	}
+
+	/**
+	 * Create and return the default {@link Decorator}
+	 * used during construction.
+	 * @return decorator
+	 */
+	default Decorator createDefaultDecorator() {
+		return SSCommon.createDefaultDecorator();
+	}
 }

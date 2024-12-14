@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
 import java.math.BigDecimal;
@@ -45,11 +50,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.sql.RowSet;
+import java.lang.System.Logger;
 
-import org.apache.logging.log4j.Logger;
+import static java.lang.System.Logger.Level.*;
 
+import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSAbstractStringCollectionModel.java
 //
@@ -66,6 +75,7 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 	private final String separator;
 	private final String separatorName;
 
+	/** System Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
 
 	/**
@@ -96,79 +106,67 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 	public String getSeparatorName() {
 		return separatorName;
 	}
-	
-	/**
-	 * Log4j Logger for component
-	 */
-	//private static Logger logger = LogManager.getLogger();
 
 	/** {@inheritDoc} */
 	@Override
-	public Object[] readData(RowSet _rowSet, String _columnName) throws SQLException {
-		String dbstring = _rowSet.getString(_columnName);
+	public Object[] readData(SSComponentInterface comp) throws SQLException {
+		String dbstring = RowSetOps.getColumnText(comp);
 		return toObjArray(getJDBCType(), dbstring);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void writeData(RowSet _rowSet, String _columnName, Object[] _data) throws SQLException {
+	public void writeData(SSComponentInterface comp, Object[] _data) throws SQLException {
 		List<String> arr = new ArrayList<>(_data.length);
 		// Transform the array of object into an array of String representations
 		for(Object object : Arrays.asList(_data)) {
 			String collectionElement = object.toString();
 			if(collectionElement.contains(separator))
 				throw new SQLException(new IllegalArgumentException(
-						String.format("SET element '%s' has a '%s' in it",
+						sf("SET element '%s' has a '%s' in it",
 								collectionElement, getSeparatorName())));
 			arr.add(object.toString());
 		}
 		// Combine the array of strings into a single String
 		String result = String.join(separator, arr);
 		// and write it to the database
-		_rowSet.updateString(_columnName, result);
+		RowSetOps.updateColumnText(comp, result);
 	}
 
 	// TODO: use a common parse String to Object
-	private Object[] toObjArray(final JDBCType _jdbcType, final String _dbstring) throws SQLException {
+	// TODO: put into RowSetOps?
+	// TODO: toObjArray additional JDBC types: TIME/TIMESTAMP/*_WITH_TIMEZONE/...
+	private Object[] toObjArray(final JDBCType _jdbcType, final String _dbstring)
+			throws SQLException
+	{
 		if (_dbstring == null) {
 			return null;
 		}
 		
-		logger.debug("SSList.toObjArray() contents: " + _dbstring);
+		logger.log(DEBUG, "SSList.toObjArray() contents: " + _dbstring);
 		List<Object> data = new ArrayList<>();
 		List<String> dbSplit= Arrays.asList(_dbstring.split(separator));
+
+		// TODO: fixup the cases
 		try {
 			for(String s : dbSplit) {
 				switch (_jdbcType) {
-				case INTEGER:
-				case SMALLINT:
-				case TINYINT:
-					data.add(Integer.parseInt(s));
-					break;
-				case BIGINT:
-					data.add(Long.parseLong(s));
-					break;
-				case FLOAT:
-				case DOUBLE:
-				case REAL:
-					data.add(Double.parseDouble(s));
-					break;
-				case DECIMAL:
-				case NUMERIC:
-					data.add(new BigDecimal(s));
-					break;
-				case DATE:
-					data.add(Date.valueOf(s));
-					break;
-				case CHAR:
-				case VARCHAR:
-				case LONGVARCHAR:
+				case INTEGER, SMALLINT, TINYINT
+						-> data.add(Integer.valueOf(s));
+				case BIGINT
+						-> data.add(Long.valueOf(s));
+				case REAL
+						-> data.add(Float.valueOf(s));
+				case FLOAT, DOUBLE
+						-> data.add(Double.valueOf(s));
+				case DECIMAL, NUMERIC
+						-> data.add(new BigDecimal(s));
+				case DATE
+						-> data.add(Date.valueOf(s));
+				case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR
+						-> data.add(s);
+				default -> // TODO: toObjArray exception later?
 					data.add(s);
-					break;
-				default:
-					// TODO: exception later?
-					data.add(s);
-					break;
 				}
 			}
 		} catch (IllegalArgumentException ex) {

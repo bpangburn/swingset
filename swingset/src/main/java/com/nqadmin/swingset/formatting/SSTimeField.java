@@ -35,9 +35,23 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
-import java.util.Calendar;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.text.SimpleDateFormat;
+
+import javax.swing.text.DateFormatter;
+import javax.swing.text.DefaultFormatterFactory;
+
+import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 // SSTimeField.java
 //
@@ -46,38 +60,67 @@ import java.util.Calendar;
 /**
  * Used to link a SSTimeField to a time column in a database.
  */
-public class SSTimeField extends SSFormattedTextField {
-
-    /**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -9007900169899885575L;
+@SuppressWarnings("serial")
+public class SSTimeField extends DateTimeField
+{
+	/** Logger for component */
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
-     * Creates a new instance of SSTimeField
+     * Create an SSTimeField using the default format.
      */
     public SSTimeField() {
-        this(new SSTimeFormatterFactory());
+        this(SSFormat.TIME);
+    }
+
+	/**
+	 *  Creates an SSTimeField with the specified format.
+	 *  @param format - an enum format to be used while the date field is in edit mode
+     */
+    public SSTimeField(SSFormat format) {
+        this(createFormatterFactory(format));
     }
 
     /**
      * Creates an object of SSTimeField with the specified formatter factory
      * @param factory - formatter factory to be used
      */
-    public SSTimeField(final javax.swing.JFormattedTextField.AbstractFormatterFactory factory) {
+    public SSTimeField(final AbstractFormatterFactory factory) {
         super(factory);
-        // TODO Consider setting to null vs system time.
-        setValue( Calendar.getInstance().getTime() );
+        setValue(new java.util.Date());
     }
 
-    /**
-     * Sets the value of the field to the current system time
-     */
-    @Override
-	public void cleanField() {
-    	// TODO Consider setting to null vs system time.
-        setValue( Calendar.getInstance().getTime() );
-    }
-
+	/**
+	 * Create TIME formatter factory with specified format pattern.
+	 * @param _format - Format to use for time while in editing mode.
+	 * @return a DefaultFormatterFactory for the specified time format
+	 */
+	public static DefaultFormatterFactory createFormatterFactory(SSFormat _format) {
+		SSFormat format = _format;
+		if (_format.getType() != SSFormat.TIME) {
+			logger.log(Level.ERROR, () -> sf("%s is not a TIME, using default",
+					_format.toString()));
+			format = SSFormat.TIME;
+		}
+		format = SSFormat.getActualFormat(format);
+		String formatMask;
+		String editPattern;
+		switch(format) {
+		case TIME_HHMMSS -> {
+			formatMask = "##:##:##";
+			editPattern = "HHmmss";
+		}
+		default -> {
+			logger.log(Level.ERROR, "Unknown date format type of " + format);
+			return null;
+		}
+		}
+		return new SSMaskFormatterFactory.Builder<>(formatMask)
+				.ssFormat(format)
+				.stringValidator(DateTimeField::stringValidator)
+				.converter(new DateFormatter(new SimpleDateFormat(editPattern)))
+				.placeholderCharacter('_')
+				.build();
+	}
 }
 
