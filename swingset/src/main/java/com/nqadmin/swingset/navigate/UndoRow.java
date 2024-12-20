@@ -42,6 +42,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
+import java.io.PrintStream;
 import java.sql.SQLException;
 
 import com.nqadmin.swingset.datasources.RSC;
@@ -49,6 +50,8 @@ import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * A support class for undo/redo on a single row in a rowsest.
@@ -68,6 +71,31 @@ final class UndoRow
 	void clear()
 	{
 		cols = null;
+	}
+
+	/**
+	 * Moving to the insertRow; capture preIsertOps' values from the undo/redo stack.
+	 * cols is fully built (not lazily).
+	 * See comments in NavigateActions.
+	 */
+	// TODO: might be handy to have access to each column's component,
+	//		 but that's a whole new thing. And don't want to prevent
+	//		 multiple components from binding to the same column.
+	//		 So access to at least one of a column's components.
+	void clearInsertRow()
+	{
+		dump(cols);
+		UndoCol[] insertRowCols = new UndoCol[cols.length];
+		for (int i = 1; i < cols.length; i++) {
+			UndoCol prevCol = cols[i];
+			if (prevCol == null)
+				NavigateActions.getLogger().log(ERROR,
+						"clearInsertRow has null column; impossible");
+			insertRowCols[i] = new UndoCol(
+					prevCol != null ? prevCol.fetchCurrentValue() : null);
+		}
+		cols = insertRowCols;
+		dump(cols);
 	}
 	
 	/**
@@ -172,5 +200,19 @@ final class UndoRow
 		else
 			comp.undoRedoUpdateObject(cmd, value);
 		return value;
+	}
+
+	@SuppressWarnings("UseOfSystemOutOrSystemErr")
+	public static void dump(UndoCol[] cols)
+	{
+		dump(cols, System.err);
+	}
+	public static void dump(UndoCol[] cols, PrintStream out)
+	{
+		out.printf("UndoRow with %d columns\n", cols.length - 1);
+		for (int i = 1; i < cols.length; i++) {
+			UndoCol col = cols[i];
+			out.printf("    col %d: %s\n", i, col != null ? col.toString() : null);
+		}
 	}
 }

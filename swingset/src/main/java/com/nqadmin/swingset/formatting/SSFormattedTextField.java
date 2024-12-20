@@ -60,6 +60,7 @@ import javax.swing.text.DefaultFormatterFactory;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 import javax.swing.text.MaskFormatter;
 
@@ -68,6 +69,7 @@ import static java.lang.System.Logger.Level.*;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.decorators.TextDecorationStyle;
 import com.nqadmin.swingset.decorators.TextDecorator;
+import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -204,15 +206,32 @@ public class SSFormattedTextField extends JFormattedTextField
 			@SuppressWarnings("unused") PropertyChangeEvent pce)
 	{
 		final SSFormattedTextField ftf = this;
+
+		// OUCH: very weird, if either oldValue or newValue is null
+		//		 then "value" fires even when both are null.
 		
 		// Ignore event if triggered by FormattedTextFieldVerifier.
 		if (verifyingText)
 			return;
+
+		final Object currentValue = ftf.getValue();
+		try {
+			// // TODO: old == new just return; IS THIS THE RIGHT THING TO DO?
+			// if (Objects.equals(pce.getOldValue(), pce.getNewValue()))
+			// 	return;
+			
+			if (!NavigateActions.hasActiveRow(this))
+				return;
+		} catch (SQLException ex) {
+			logger.log(Level.ERROR, sf("Exception checking if active row. %s: value '%s' type %s.",
+					getColumnForLog(), currentValue,
+					currentValue == null ? null : currentValue.getClass().getName()));
+			return;
+		}
 		
 		getSSCommon().removeRowSetListener();
 
 		try {
-			final Object currentValue = ftf.getValue();
 			logger.log(INFO, ()->sf("%s: to database '%s' type %s.",
 					getColumnForLog(), currentValue,
 					currentValue == null ? null : currentValue.getClass().getName()));
@@ -415,8 +434,9 @@ public class SSFormattedTextField extends JFormattedTextField
 			do {
 				// If no records, no columns, bail.
 				// TODO: is this check needed?
-				if ( getRowSet().getRow() < 1
-						|| RowSetOps.getColumnCount(getRowSet())==0) {
+
+				if (!NavigateActions.hasActiveRow(this)
+					|| RowSetOps.getColumnCount(getRowSet())==0) {
 					// TODO: should this check allow null?
 					setValue(null);
 					break;

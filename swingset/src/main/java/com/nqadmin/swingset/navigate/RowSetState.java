@@ -61,6 +61,7 @@ public class RowSetState
 {
 	private boolean inserting;
 	private boolean acceptingChanges;
+	private boolean preInsertOps;
 	private WeakReference<NavigateActions> refNavigateActions = new WeakReference<>(null);
 
 	// don't have to worry about concurrency, always EDT
@@ -91,6 +92,16 @@ public class RowSetState
 	 */
 	public static boolean isInserting(RowSet rs) {
 		return rs == null ? false : getRowSetState(rs).inserting;
+	}
+
+	static void setPreInsertOps(RowSet rs, boolean flag) {
+		if (rs != null) {
+			getRowSetState(rs).preInsertOps = flag;
+		}
+	}
+
+	static boolean isPreInsertOps(RowSet rs) {
+		return rs == null ? false : getRowSetState(rs).preInsertOps;
 	}
 
 	/**

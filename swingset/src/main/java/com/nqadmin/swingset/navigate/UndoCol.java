@@ -45,12 +45,15 @@ package com.nqadmin.swingset.navigate;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import javax.sql.RowSet;
+import javax.swing.text.JTextComponent;
 
 import com.nqadmin.swingset.datasources.RSC;
+import com.nqadmin.swingset.formatting.SSFormattedTextField;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 
+import static com.nqadmin.swingset.navigate.RowSetState.isPreInsertOps;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
@@ -60,13 +63,14 @@ import static java.lang.System.Logger.Level.*;
  * When a change comes in, the change replaces the current value
  * and all values after the current value are discarded.
  * <p>
- * The database is read for the initial value when this is created.
+ * The database is read for the initial value when this is created,
+ * except for the insertRow.
  */
-// TODO: 
 final class UndoCol
 {
-	/** One item per change, changes.get(0) is the current value in the database. */
-	private final List<Object> changes = new ArrayList<>(3);
+	/** One item per change, changes.get(0) is the current value in the database;
+	 * or the value from preInsertOps. */
+	private final List<Object> changes;
 	/** The index of the previous Value. */
 	private int curIdx;
 	/**
@@ -76,25 +80,51 @@ final class UndoCol
 	private boolean needNewSlot;
 
 	/**
-	 * Create UndoCol and initialize undo/redo stack from database value.
+	 * Create an empty UndoCol.
 	 */
-	private UndoCol(RowSet rs, int columnIdx) throws SQLException
+	private UndoCol()
 	{
-		changes.add(rs.getObject(columnIdx));
+		changes = new ArrayList<>(3);
 		curIdx = 0;
 		needNewSlot = true;
 	}
 
 	/**
-	 * Create UndoCol based on an SSComponent;
+	 * Create UndoCol; initialize undo/redo stack from the value.
+	 * @param value ssComponent
+	 */
+	UndoCol(Object value)
+	{
+		this();
+		changes.add(value);
+	}
+
+	/**
+	 * Create UndoCol; initialize undo/redo stack from SSComponent's database value;
 	 * @param comp ssComponent
 	 */
 	UndoCol(RSC comp) throws SQLException
 	{
-		this(comp.getRowSet(), comp.getBoundColumnIndex());
+		this(initialValue(comp));
 	}
 
-	/** Check if there a undo (previous) value. */
+	private static Object initialValue(RSC comp) throws SQLException
+	{
+		//return isPreInsertOps(comp.getRowSet())
+		//		? null : comp.getRowSet().getObject(comp.getBoundColumnIndex());
+
+		// If doing preInsertOps, just use a null for the initial value
+		// (special case text field); the real value is on the way.
+		if (isPreInsertOps(comp.getRowSet())) {
+			if (comp instanceof JTextComponent)
+				return comp.getAllowNull() ? null : "";
+			else
+				return null;
+		} else
+			return comp.getRowSet().getObject(comp.getBoundColumnIndex());
+	}
+
+	/** Check if there is an undo (previous) value. */
 	boolean hasPrev()
 	{
 		return curIdx > 0;
@@ -130,6 +160,11 @@ final class UndoCol
 	 */
 	void addChange(RowSetModificationEvent me) throws SQLException
 	{
+		// TODO: only do this if null?
+		// Don't push something on the top if it equals what's on the top.
+		if (Objects.equals(fetchCurrentValue(), me.getValue()))
+			return;
+
 		if (needNewSlot) {
 			// First modification after a focus change or change that needs new slot.
 			// Put change in a new spot.
@@ -185,4 +220,10 @@ final class UndoCol
 		needNewSlot = true;
 	}
 
+	@Override
+	public String toString()
+	{
+		return sf("UndoCol{curIdx=%s, needNewSlot=%s, nChanges %d, changes=%s}",
+				curIdx, needNewSlot, changes.size(), changes);
+	}
 }

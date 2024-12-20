@@ -184,6 +184,10 @@ public class NavigateActions
 	// reference in the SSComponent.
 	//
 
+	// TODO: Should the static methods have instance counterparts,
+	//		 e.g. hasActiveRow. Then could make direct queries when
+	//		 a Navigation is available.
+
 	private static NavigateActions dummy;
 	private static NavigateActions dummy() {
 		if (dummy == null)
@@ -206,6 +210,20 @@ public class NavigateActions
 		return navActs;
 	}
 
+
+	// UNDO/REDO NOTES
+	//
+	// Currently undo/redo can NOT be changed while running.
+	// If/when changing is supported, it should only be changed
+	// when going to a new row or insertRow. Any user interface to
+	// enable/disable undo/redo should queue the change request
+	// and then apply it during the transition to a new row.
+	//
+	// Part of undo/redo for insertRow is capturing the values set
+	// by preInsertOps; the values are captured by the undo/redo
+	// logic. So if going from disabled to enabled, the enable must
+	// come before preInsertOps.
+
 	/**
 	 * Check if the specified {@linkplain RowSet} is currently enabled
 	 * for undo/redo. The enable state may only change when the RowSet's
@@ -215,11 +233,8 @@ public class NavigateActions
 	 */
 	public static boolean isUndoRedoEnabled(RowSet rs)
 	{
-		return !get(rs).isOnInsertRow();
-		//return false;
-
-		//return NavigateActions.ENABLE_UNDO_REDO && !get(rs).isOnInsertRow();
-		//return NavigateActions.ENABLE_UNDO_REDO;
+		return true;
+		//return !get(rs).isOnInsertRow();
 	}
 
 	/**
@@ -235,6 +250,29 @@ public class NavigateActions
 	public static boolean isUndoRedoEnabled(RSC comp)
 	{
 		return isUndoRedoEnabled(comp.getRowSet());
+	}
+
+	/**
+	 * Check if the rowSet's cursor is on a row or on the insert row.
+	 * @param rs rowset for this component
+	 * @return true if cursor on a row or insert row
+	 * @throws SQLException 
+	 */
+	public static boolean hasActiveRow(RowSet rs) throws SQLException
+	{
+		return rs.getRow() != 0
+				|| RowSetState.isInserting(rs);
+	}
+
+	/**
+	 * Check if the rowSet's cursor is on a row or on the insert row.
+	 * @param comp rowset for this component
+	 * @return true if cursor on a row or insert row
+	 * @throws SQLException 
+	 */
+	public static boolean hasActiveRow(RSC comp) throws SQLException
+	{
+		return hasActiveRow(comp.getRowSet());
 	}
 
 	/**
@@ -1084,8 +1122,23 @@ public class NavigateActions
 				// the values from the just-committed prior record
 				// are displayed for the insert row.
 				SwingUtilities.invokeLater(() -> {
-					dBNav.performPreInsertOps();
-					SwingUtilities.invokeLater(()->freshRow());
+					// The values set during preInsertOps are collected in the
+					// undo/redo stack. (undo/redo must be enabled for PreInsertOps.)
+					// The preInsertOps flag may be used to avoid DB access
+					// related to setting up an empty undo/redo stack.
+					RowSetState.setPreInsertOps(rowSet, true);
+					try {
+						dBNav.performPreInsertOps();
+					} catch(Exception ex) {
+						// Catch exception to insure that preInsertOps false.
+						logger.log(ERROR, "SQL Exception in preInsertOps.", ex);
+						JOptionPane.showMessageDialog(dlgParent(e),
+								"Pleae report exception in preInsertOps.\n" + ex.getMessage());
+					}
+					SwingUtilities.invokeLater(() -> {
+						RowSetState.setPreInsertOps(rowSet, false);
+						freshInsertRow();
+					});
 				});
 				
 				updateActionState();
@@ -1584,8 +1637,8 @@ public class NavigateActions
 	/** Indicator that current row is dirty. */
 	//private boolean isRowModified = false;
 
-	/** Moved to a new row, or undo updates, or refresh row.
-	 */
+
+	/** Going to a new row, or undo updates, or refresh row. */
 	private void freshRow()
 	{
 		logger.log(TRACE, "freshRow");
@@ -1593,6 +1646,16 @@ public class NavigateActions
 		errorComponents.clear();
 		//isRowModified = false; // TODO: get rid of this
 	}
+
+	/** Moving to insertRow. */
+	private void freshInsertRow()
+	{
+		logger.log(TRACE, "freshInsertRow");
+		undoRow.clearInsertRow();
+		errorComponents.clear();
+	}
+
+
 	// TODO: Use undoRow.isDirty() to check for modification.
 
 	// TODO: get rid of the following

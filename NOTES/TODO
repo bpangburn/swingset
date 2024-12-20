@@ -99,11 +99,19 @@ relationship with DateTime.java.
 Rename SSDataNavigator to SSNavigatorBar?
 Rename NavigateActions to Navigation?
 
+---
+Add cleanField to SSComponentInterface. Use it from SSDBNavImpl#setComponents.
+But then again the helper classes provide ways to set it...
+
 ================================================================================
 =========================== CLEANUP ============================================
 ================================================================================
 
 Get rid of the @author tags.
+
+---
+In NavigateActions, should the static methods have instance counterparts,
+e.g. hasActiveRow. Then could make direct queries when a Navigation is available.
 
 ---
 Navigator
@@ -208,6 +216,12 @@ Field tooltip with format/...
 ============================================================================
 ============================ ARCHITECTURE ==================================
 ============================================================================
+
+============== ERRORS
+
+Make sure error dialogs clearly differentiate (as much as possible)
+user error, datebase error, internal error.
+
 
 ============== EVENTS
 

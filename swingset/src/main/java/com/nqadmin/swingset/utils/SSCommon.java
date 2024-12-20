@@ -810,7 +810,7 @@ public class SSCommon
 		Object value = null;
 
 		try {
-			if (getRowSet().getRow() != 0) {
+			if (NavigateActions.hasActiveRow(getSSComponent())) {
 				value = RowSetOps.getColumnObject(ssComponent);
 			}
 		} catch (final SQLException se) {
@@ -859,7 +859,7 @@ public class SSCommon
 		String value = "";
 
 		try {
-			if (getRowSet().getRow() != 0) {
+			if (NavigateActions.hasActiveRow(ssComponent)) {
 				// if (NavigateActions.ENABLE_UNDO_REDO) {
 				// 	value = RowSetOps.getColumnObjectText(ssComponent);
 				// } else {

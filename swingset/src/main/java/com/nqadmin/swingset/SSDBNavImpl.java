@@ -39,7 +39,6 @@ package com.nqadmin.swingset;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -59,6 +58,8 @@ import javax.swing.JTextField;
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
 import java.lang.System.Logger;
+import java.util.Objects;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
@@ -116,92 +117,48 @@ public class SSDBNavImpl implements SSDBNav {
 	} // end public void performPreInsertOps() {
 
 	/**
-	 * Clears all the JTextFields and resets the combo boxes to empty item before
-	 * first item.
+	 * In the specified container, clear JTextFields, reset combo boxes to empty
+	 * item and make other components of interest "clean".
+	 * Typically done for a new row.
 	 * <p>
 	 * This is done for all SwingSet components, text fields, and text areas,
 	 * recursively looking in to the JTabbedPanes and JPanels inside the given
 	 * container as needed.
 	 *
-	 * @param _container container in which to recursively initialize components
+	 * @param container container in which to recursively initialize components
 	 */
-	protected void setComponents(final Container _container) {
+	protected void setComponents(final Container container) {
 
-		final Component[] comps = _container.getComponents();
+		final Component[] comps = container.getComponents();
 
-		for (int i = 0; i < comps.length; i++) {
-			
+		// TODO: should more components have cleanField?
+		for (Component comp : comps) {
 			//logger.debug("Clearing component type of: {}. Loop index=" + i, () -> comps[i].getClass().getSimpleName());
 
-			if (comps[i] instanceof JTextField) {
-				// IF IT IS A SSFormattedTextField SET ITS VALUE TO NULL (to avoid parse
-				// exception)
-				if (comps[i] instanceof SSFormattedTextField) {
-					((SSFormattedTextField) comps[i]).cleanField();
-				} else {
-					// IF IT IS A JTextField SET ITS TEXT TO EMPTY STRING
-					((JTextField) comps[i]).setText("");
-				}
-			} else if (comps[i] instanceof JList) {
-				// IF IT IS A JList, CLEAR IT
-				((JList<?>) comps[i]).clearSelection();
-			} else if (comps[i] instanceof JTextArea) {
-				// IF IT IS A JTextArea, SET TO EMPTY STRING
-				((JTextArea) comps[i]).setText("");
-			} else if (comps[i] instanceof SSBaseComboBox<?,?,?>) {
-				// IF IT IS A SSBaseComboBox THEN SET IT TO 'EMPTY' ITEM BEFORE FIRST ITEM
-				((SSBaseComboBox<?, ?, ?>) comps[i]).setSelectionPending(true);
-			} else if (comps[i] instanceof JComboBox<?>) {
-				// IF IT IS A JComboBox THEN SET IT TO 'EMPTY' ITEM BEFORE FIRST ITEM
-				((JComboBox<?>) comps[i]).setSelectedIndex(-1);
-			} else if (comps[i] instanceof SSImage) {
-				// IF IT IS A SSImage CLEAR THE IMAGE.
-				((SSImage) comps[i]).clearImage();
-			} else if (comps[i] instanceof JCheckBox) {
-				// IF IT IS A JCheckBox UNCHECK
-				((JCheckBox) comps[i]).setSelected(false);
-			} else if (comps[i] instanceof SSLabel) {
-				// IF IT IS A SSLabel, SET TO EMPTY STRING
-				((SSLabel) comps[i]).setText("");
-			} else if (comps[i] instanceof JLabel) {
-				// IF IT IS A JLabel - DO NOTHING
-				// nothing to do...
-			} else if (comps[i] instanceof JButton) {
-				// IF IT IS A JButton - DO NOTHING
-				// nothing to do...
-			} else if (comps[i] instanceof JMenuBar) {
-				// IF IT IS A JMenuBar - DO NOTHING
-				// nothing to do...
-			} else if (comps[i] instanceof BasicInternalFrameTitlePane) {
-				// IF IT IS A BasicInternalFrameTitlePane (including MetalInternalFrameTitlePane
-				// - DO NOTHING)
-				// nothing to do...
-			} else if (comps[i] instanceof JSlider) {
-				// IF IT IS A JSlider, SET TO AVERAGE OF MIN/MAX VALUES
-				((JSlider) comps[i])
-						.setValue((((JSlider) comps[i]).getMinimum() + ((JSlider) comps[i]).getMaximum()) / 2);
-			} else if (comps[i] instanceof JRootPane) {
-				// IF IT IS A JRootPane RECURSIVELY SET THE FIELDS
-				setComponents((JRootPane) comps[i]);
-			} else if (comps[i] instanceof JPanel) {
-				// IF IT IS A JPanel RECURSIVELY SET THE FIELDS
-				setComponents((JPanel) comps[i]);
-			} else if (comps[i] instanceof JLayeredPane) {
-				// IF IT IS A JLayeredPane RECURSIVELY SET THE FIELDS
-				setComponents((JLayeredPane) comps[i]);
-			} else if (comps[i] instanceof JTabbedPane) {
-				// IF IT IS A JTabbedPane RECURSIVELY SET THE FIELDS
-				setComponents((JTabbedPane) comps[i]);
-			} else if (comps[i] instanceof JScrollPane) {
-				// IF IT IS A JScrollPane GET THE VIEW PORT AND RECURSIVELY SET THE FIELDS IN
-				// VIEW PORT
-				setComponents(((JScrollPane) comps[i]).getViewport());
-			} else {
-				// DIPLAY WARNING FOR UNKNOWN COMPONENT
-				logger.log(WARNING, "Encountered unknown component type of: " + comps[i].getClass().getSimpleName()
-						+ ". Unable to clear component.");
+			switch (comp) {
+			case SSBaseComboBox<?,?,?> c ->	c.setSelectionPending(true);
+			case SSFormattedTextField c ->	c.cleanField();
+			case JTextField c ->	c.setText("");
+			case JList<?> c ->		c.clearSelection();
+			case JTextArea c ->		c.setText("");
+			case JComboBox<?> c ->	c.setSelectedIndex(-1);
+			case SSImage c ->		c.clearImage();
+			case JCheckBox c ->		c.setSelected(false);
+			case SSLabel c ->		c.setText("");
+			case JSlider c -> // Slider to the middle.
+				c.setValue((c.getMinimum() + c.getMaximum()) / 2);
+			case JLabel c ->						{ Objects.isNull(c); }
+			case JButton c ->						{ Objects.isNull(c); }
+			case JMenuBar c ->						{ Objects.isNull(c); }
+			case BasicInternalFrameTitlePane c ->	{ Objects.isNull(c); }
+			case JRootPane c ->		setComponents(c);
+			case JPanel c ->		setComponents(c);
+			case JLayeredPane c ->	setComponents(c);
+			case JTabbedPane c ->	setComponents(c);
+			case JScrollPane c ->	setComponents(c.getViewport());
+			default ->
+				logger.log(WARNING, "Encountered unknown component type of: " + comp.getClass().getSimpleName() + ". Unable to clear component.");
 			}
-
 		}
 
 	} // end protected void setComponents(Container _container) {
