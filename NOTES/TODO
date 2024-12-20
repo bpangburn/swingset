@@ -25,6 +25,10 @@ in the Navigation changes, the SSDataNavigator detects this event and adjusts
 accordingly.
 
 ---
+RowSetState why not both weak keys and weak values. Problem is that state
+for inserting/acceptingChanges is allowed without NavigateActions.
+
+---
 Should the methods in SSDataNavigator that delegate to getNavigatorActions()
 be deprecated? If NavigatorActions are considered a model, then there's
 some precedence to keep some of them for convenience.

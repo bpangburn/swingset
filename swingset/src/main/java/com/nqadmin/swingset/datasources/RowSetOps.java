@@ -354,11 +354,9 @@ public class RowSetOps {
 		try {
 			if (getColumnCount(comp.getRowSet())==0)
 				return null;
-			Object objectValue = NavigateActions.fetchCurrentValue(comp);
-			if (objectValue == null)
-				return null;
-
-			return (Array) objectValue;
+			return (Array)(NavigateActions.isUndoRedoEnabled(comp)
+					? NavigateActions.fetchCurrentValue(comp)
+					: comp.getRowSet().getArray(comp.getBoundColumnIndex()));
 		} catch (SQLException ex) {
 			logger.log(ERROR, "SQL Exception for column " + comp.getBoundColumnName() + ".", ex);
 		}
@@ -376,7 +374,9 @@ public class RowSetOps {
 	 */
 	public static Object getColumnObject(RSC comp) throws SQLException
 	{
-		return NavigateActions.fetchCurrentValue(comp); // undo/redo
+		return NavigateActions.isUndoRedoEnabled(comp)
+				? NavigateActions.fetchCurrentValue(comp)
+				: comp.getRowSet().getObject(comp.getBoundColumnIndex());
 	}
 
 	/**
@@ -473,7 +473,9 @@ public class RowSetOps {
 	private static <T> T getColumnObject1(RSC comp, Class<T> type)
 			throws SQLException
 	{
-		Object objectValue = NavigateActions.fetchCurrentValue(comp);
+		Object objectValue = NavigateActions.isUndoRedoEnabled(comp)
+				? NavigateActions.fetchCurrentValue(comp)
+				: comp.getRowSet().getObject(comp.getBoundColumnIndex());
 		return convertObjectType(objectValue, type);
 	}
 
@@ -558,7 +560,9 @@ public class RowSetOps {
 				return null;
 			}
 
-			Object objectValue = NavigateActions.fetchCurrentValue(comp);
+			Object objectValue = NavigateActions.isUndoRedoEnabled(comp)
+					? NavigateActions.fetchCurrentValue(comp)
+					: comp.getRowSet().getObject(comp.getBoundColumnIndex());
 			if (objectValue == null)
 				return null;
 
@@ -752,8 +756,7 @@ public class RowSetOps {
 	{
 		logger.log(DEBUG, "[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
-		if (NavigateActions.ENABLE_UNDO_REDO)
-			NavigateActions.captureInitialValue(comp);
+		NavigateActions.captureInitialValue(comp); // undo/redo
 
 		// On insert row, write null if updatedValue is null, and do not perform other checks. 
 		boolean did_update = false;
@@ -807,8 +810,7 @@ public class RowSetOps {
 		boolean _allowNull = comp.getAllowNull();
 		logger.log(DEBUG,  comp.getColumnForLog() + " Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
-		if (NavigateActions.ENABLE_UNDO_REDO)
-			NavigateActions.captureInitialValue(comp);
+		NavigateActions.captureInitialValue(comp); // undo/redo
 
 		boolean did_update = false;
 		try {
@@ -963,8 +965,7 @@ public class RowSetOps {
 			return;
 		}
 
-		if (NavigateActions.ENABLE_UNDO_REDO)
-			NavigateActions.captureInitialValue(comp);
+		NavigateActions.captureInitialValue(comp); // undo/redo
 
 		boolean did_update = false;
 		try {

@@ -860,11 +860,12 @@ public class SSCommon
 
 		try {
 			if (getRowSet().getRow() != 0) {
-				if (NavigateActions.ENABLE_UNDO_REDO) {
-					value = RowSetOps.getColumnObjectText(ssComponent);
-				} else {
-					value = RowSetOps.getColumnText(getSSComponent());
-				}
+				// if (NavigateActions.ENABLE_UNDO_REDO) {
+				// 	value = RowSetOps.getColumnObjectText(ssComponent);
+				// } else {
+				// 	value = RowSetOps.getColumnText(getSSComponent());
+				// }
+				value = RowSetOps.getColumnObjectText(ssComponent);
 				if (!getAllowNull() && (value == null)) {
 					value = "";
 				}
@@ -1288,8 +1289,6 @@ public class SSCommon
 	 */
 	public static void setupUndoRedoKeys(SSComponentInterface comp)
 	{
-		if (!NavigateActions.ENABLE_UNDO_REDO)
-			return;
 		logger.log(DEBUG, () -> sf("UndoRedoKeys: %s", comp.getClass().getSimpleName()));
 
 		JComponent jc = (JComponent)comp;
@@ -1332,7 +1331,7 @@ public class SSCommon
 	 */
 	public void undoRedoUpdateObject(UndoRedo cmd, Object value) throws SQLException
 	{
-		if (!NavigateActions.ENABLE_UNDO_REDO)
+		if (!NavigateActions.isUndoRedoEnabled(ssComponent))
 			throw new IllegalStateException("UNDO/REDO disabled");
 		logger.log(DEBUG, () -> sf("%s: %s", cmd, value));
 

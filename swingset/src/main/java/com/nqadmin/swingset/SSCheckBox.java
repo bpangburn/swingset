@@ -200,7 +200,8 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 		final String text = getBoundColumnText();
 		logger.log(DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), text));
 
-		setSelected(getBoundColumnObject(Boolean.class));
+		Boolean value = getBoundColumnObject(Boolean.class);
+		setSelected(value == null ? false : value);
 	} // end protected void updateSSComponent() {
 
 	/** {@inheritDoc} */
