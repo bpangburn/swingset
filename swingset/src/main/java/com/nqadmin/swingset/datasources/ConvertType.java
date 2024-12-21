@@ -304,7 +304,7 @@ public class ConvertType
 	 */
 	private static Object internalConvertObject(Object sourceValue, Class<?> type)
 	{
-		if (sourceValue == null || type.isAssignableFrom(sourceValue.getClass()))
+		if (type.isAssignableFrom(sourceValue.getClass()))
 			return sourceValue;
 
 		Clazz source = getClazz(sourceValue.getClass());

@@ -133,10 +133,7 @@ final class UndoRow
 	// 	return false;
 	// }
 
-	/**
-	 * Force the capture of the database column for the comp;
-	 * does nothing if the column is already captured.
-	 */
+	/** force the capture of the database column for the comp. */
 	void captureInitialValue(SSComponentInterface comp) throws SQLException
 	{
 		getCol(comp);

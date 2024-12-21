@@ -139,6 +139,8 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  */
 public class NavigateActions
 {
+	/** False if no undo/redo and disables related code. */
+	public static final boolean ENABLE_UNDO_REDO = true;
 	/** Undo/redo commands */
 	public static enum UndoRedo {
 		/** Undo command */
@@ -207,48 +209,16 @@ public class NavigateActions
 	}
 
 	/**
-	 * Check if the specified {@linkplain RowSet} is currently enabled
-	 * for undo/redo. The enable state may only change when the RowSet's
-	 * current row changes.
-	 * @param rs RowSet of interest
-	 * @return true if undo/redo is OK
-	 */
-	public static boolean isUndoRedoEnabled(RowSet rs)
-	{
-		return !get(rs).isOnInsertRow();
-		//return false;
-
-		//return NavigateActions.ENABLE_UNDO_REDO && !get(rs).isOnInsertRow();
-		//return NavigateActions.ENABLE_UNDO_REDO;
-	}
-
-	/**
-	 * Check if the specified {@linkplain RSC} is currently enabled
-	 * for undo/redo. The enable state may only change when the RowSet's
-	 * current row changes.
-	 * <p>
-	 * This method currently delegates to check the rowset. In the future
-	 * it's possible that per column enable may be implemented.
-	 * @param comp RSC of interest
-	 * @return true if undo/redo is OK
-	 */
-	public static boolean isUndoRedoEnabled(RSC comp)
-	{
-		return isUndoRedoEnabled(comp.getRowSet());
-	}
-
-	/**
-	 * Make sure the column's undo/redo stack is initialized; the
-	 * database value (an object) is the base.
-	 * This must be used before any updates are done to the rowset.
+         * Make sure the column's undo/redo stack is initialized; the
+         * database value (an object) is the base.
+         * This must be used before any updates are done to the rowset.
 	 * @param comp rowset/column
 	 * @throws SQLException
 	 */
-	public static void captureInitialValue(SSComponentInterface comp)
-			throws SQLException
+	public static void captureInitialValue(SSComponentInterface comp) throws SQLException
 	{
-		if (!isUndoRedoEnabled(comp))
-			return;
+		if (!NavigateActions.ENABLE_UNDO_REDO)
+			throw new IllegalStateException("UNDO/REDO disabled");
 		NavigateActions navActs = get(comp.getRowSet());
 		navActs.undoRow.captureInitialValue(comp);
 	}
@@ -259,10 +229,9 @@ public class NavigateActions
 	 * @return current value
 	 * @throws SQLException
 	 */
-	public static Object fetchCurrentValue(RSC comp)
-			throws SQLException
+	public static Object fetchCurrentValue(RSC comp) throws SQLException
 	{
-		if (!isUndoRedoEnabled(comp))
+		if (!NavigateActions.ENABLE_UNDO_REDO)
 			throw new IllegalStateException("UNDO/REDO disabled");
 		NavigateActions navActs = get(comp.getRowSet());
 		return navActs.undoRow.fetchCurrentValue(comp);
@@ -275,8 +244,8 @@ public class NavigateActions
 	 */
 	public static void undoRedo(SSComponentInterface comp, UndoRedo cmd)
 	{
-		if (!isUndoRedoEnabled(comp))
-			return;
+		if (!NavigateActions.ENABLE_UNDO_REDO)
+			throw new IllegalStateException("UNDO/REDO disabled");
 		logger.log(DEBUG, () -> sf("%s: %s for %s", cmd,
 				comp.getClass().getSimpleName(), comp.getBoundColumnName()));
 		try {
@@ -300,8 +269,8 @@ public class NavigateActions
 	 */
 	public static void newSlot(SSComponentInterface comp)
 	{
-		if (!isUndoRedoEnabled(comp))
-			return;
+		if (!NavigateActions.ENABLE_UNDO_REDO)
+			throw new IllegalStateException("UNDO/REDO disabled");
 		NavigateActions navActs = get(comp.getRowSet());
 		navActs.undoRow.focusChange(null);
 	}
@@ -313,7 +282,7 @@ public class NavigateActions
 	 */
 	public static void addUndoableChange(RowSetModificationEvent ev) throws SQLException
 	{
-		if (!isUndoRedoEnabled(ev.getSource()))
+		if (!NavigateActions.ENABLE_UNDO_REDO)
 			return;
 		NavigateActions navActs = get(ev.getSource().getRowSet());
 		navActs.undoRow.addChange(ev);
@@ -601,7 +570,7 @@ public class NavigateActions
 	// TODO: Should this be public? NO, go through the static method in this class
 	Object doUndoRedo(SSComponentInterface comp, UndoRedo cmd) throws SQLException
 	{
-		if (!isUndoRedoEnabled(comp))
+		if (!NavigateActions.ENABLE_UNDO_REDO)
 			throw new IllegalStateException("UNDO/REDO disabled");
 		Object value = undoRow.doUndoRedo(comp, cmd);
 		updateActionState();
