@@ -49,6 +49,7 @@ import java.util.EventListener;
 import javax.sql.RowSet;
 
 import java.sql.Connection;
+import java.util.function.Supplier;
 
 import javax.sql.rowset.CachedRowSet;
 import javax.swing.JComponent;
@@ -460,6 +461,16 @@ public interface SSComponentInterface extends RSC
 	 * removal (and subsequent restoration) of the component's value change listener.
 	 */
 	void updateSSComponent();
+
+	/** {@inheritDoc} */
+	default boolean checkRowOK() {
+		return getSSCommon().checkRowOK();
+	}
+
+	/** {@inheritDoc} */
+	default boolean checkRowOK(Supplier<Boolean> dialogOK) {
+		return getSSCommon().checkRowOK(dialogOK);
+	}
 
 	/**
 	 * Setup action bindings for undo/redo.

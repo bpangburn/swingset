@@ -208,26 +208,35 @@ public class SSFormattedTextField extends JFormattedTextField
 		final SSFormattedTextField ftf = this;
 
 		// OUCH: very weird, if either oldValue or newValue is null
-		//		 then "value" fires even when both are null.
+		//		 then "value" property fires even when both are null.
 		
 		// Ignore event if triggered by FormattedTextFieldVerifier.
 		if (verifyingText)
 			return;
 
-		final Object currentValue = ftf.getValue();
-		try {
-			// // TODO: old == new just return; IS THIS THE RIGHT THING TO DO?
-			// if (Objects.equals(pce.getOldValue(), pce.getNewValue()))
-			// 	return;
-			
-			if (!NavigateActions.hasActiveRow(this))
-				return;
-		} catch (SQLException ex) {
-			logger.log(Level.ERROR, sf("Exception checking if active row. %s: value '%s' type %s.",
-					getColumnForLog(), currentValue,
-					currentValue == null ? null : currentValue.getClass().getName()));
+		// TODO: listener's bombarded when getting focus and null involved.
+		//		 Use a document listener for doing "checkRowOK()";
+		//		 then can avoid the Objects.equals stuff.
+		if (!checkRowOK(() -> {
+			// This short circuit for debugging.
+			//if (pce.getOldValue() == null && pce.getNewValue() == null)
+			//		return false;
+
+			try {
+				// This avoids extra dialogs.
+				JDBCType jdbcType = getBoundColumnJDBCType();
+				Object v1 = convertObjectType(pce.getOldValue(), jdbcType);
+				Object v2 = convertObjectType(pce.getNewValue(), jdbcType);
+				// Avoid dialog if old and new are equal
+				return !Objects.equals(v1, v2);
+			} catch (SQLException ex) {
+				return true; // Dialog's OK
+			}
+		})) {
 			return;
 		}
+
+		final Object currentValue = ftf.getValue();
 		
 		getSSCommon().removeRowSetListener();
 

@@ -99,6 +99,9 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 		@Override
 		public void itemStateChanged(final ItemEvent ie)
 		{
+			if (!checkRowOK())
+				return;
+
 			getSSCommon().removeRowSetListener();
 
 			setBoundColumnObject(isSelected());

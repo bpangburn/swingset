@@ -289,7 +289,9 @@ public class ConvertType
 	 * @return converted type, may be the same object
 	 * @throws com.nqadmin.swingset.datasources.SSSQLConversionException
 	 */
-	public static <T> T convertObjectType(Object value, Class<T> type) throws SSSQLConversionException
+	// TODO: handle primitive types??? See enum Clazz for notes.
+	public static <T> T convertObjectType(Object value, Class<T> type)
+			throws SSSQLConversionException
 	{
 		@SuppressWarnings("unchecked")
 		T target = (T) internalConvertObject(value, type);
@@ -303,6 +305,7 @@ public class ConvertType
 	 * unless can't convert then "CanNotConvert" Object is returned.
 	 */
 	private static Object internalConvertObject(Object sourceValue, Class<?> type)
+			throws SSSQLConversionException
 	{
 		if (sourceValue == null || type.isAssignableFrom(sourceValue.getClass()))
 			return sourceValue;
@@ -377,6 +380,25 @@ public class ConvertType
 		case BigDecimal n -> {
 			switch(target) {
 			case BOOL -> { return n.signum() != 0; }
+			}
+		}
+		case String s -> {
+			try {
+				switch(target) {
+				case LONG -> { return Long.valueOf(s); }
+				case INT -> { return Integer.valueOf(s); }
+				case SHORT -> { return Short.valueOf(s); }
+				case BYTE -> { return Byte.valueOf(s); }
+				case FLOAT -> { return Float.valueOf(s); }
+				case DOUBLE -> { return Double.valueOf(s); }
+				case BIGD -> { return new BigDecimal(s); }
+
+				// TODO: add date converstions.
+				// TODO: add other converstions.
+				}
+			} catch (NumberFormatException ex) {
+				throw new SSSQLConversionException(sf("Convert '%s' to %s: %s",
+						s, target, ex.getMessage()), ex);
 			}
 		}
 		default -> {}
@@ -584,12 +606,19 @@ public class ConvertType
 
 	private static Map<Class<?>,Clazz> mapClazz = new HashMap<>();
 	static enum Clazz {
+		STRING(String.class),
 		BOOL(Boolean.class),
+
+		// TODO: how to handle primitives
+		//		- INT(List.of(Integer.class, int.class))
+		//		- PINT
+		//		- don't have primitives *** this seems right
 
 		INT(Integer.class,			true, false),
 		SHORT(Short.class,			true, false),
 		BYTE(Byte.class,			true, false),
 		LONG(Long.class,			true, false),
+		
 		FLOAT(Float.class,			true, false),
 		DOUBLE(Double.class,		true, false),
 		BIGD(BigDecimal.class,		true, false),

@@ -78,6 +78,12 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 		@Override
 		public void stateChanged(final ChangeEvent ce)
 		{
+			// While adjusting don't need to update the database.
+			if (getValueIsAdjusting())
+				return;
+			if (!checkRowOK())
+				return;
+
 			getSSCommon().removeRowSetListener();
 
 			setBoundColumnObject(getValue());

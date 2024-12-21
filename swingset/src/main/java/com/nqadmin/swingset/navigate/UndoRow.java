@@ -84,18 +84,18 @@ final class UndoRow
 	//		 So access to at least one of a column's components.
 	void clearInsertRow()
 	{
-		dump(cols);
+		//dump(cols);
 		UndoCol[] insertRowCols = new UndoCol[cols.length];
 		for (int i = 1; i < cols.length; i++) {
 			UndoCol prevCol = cols[i];
-			if (prevCol == null)
-				NavigateActions.getLogger().log(ERROR,
-						"clearInsertRow has null column; impossible");
+			// if (prevCol == null)	// not so impossible
+			// 	NavigateActions.getLogger().log(ERROR,
+			// 			"clearInsertRow has null column; impossible");
 			insertRowCols[i] = new UndoCol(
 					prevCol != null ? prevCol.fetchCurrentValue() : null);
 		}
 		cols = insertRowCols;
-		dump(cols);
+		//dump(cols);
 	}
 	
 	/**

@@ -97,7 +97,10 @@ public class SSImage extends JPanel implements SSComponentInterface
 
 		/** {@inheritDoc} */
 		@Override
-		public void actionPerformed(final ActionEvent ae) {
+		public void actionPerformed(final ActionEvent ae)
+		{
+			if(!checkRowOK())
+				return;
 
 			getSSCommon().removeRowSetListener();
 
@@ -348,6 +351,10 @@ public class SSImage extends JPanel implements SSComponentInterface
 
 		// TODO: If CachedRowSet, BLOBs don't work. As a convenience could,
 		//		 grab a connection, find the primary keys, and read the BLOB.
+
+		// TODO: Should getBoundColumnObject() be used here?
+		//		 Seems like it, it's used just about everywhere else.
+
 		try {
 			final byte[] imageData = getRowSet().getRow() > 0 ? getRowSet().getBytes(getBoundColumnName()) : null;
 			if (imageData != null) {

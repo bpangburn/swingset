@@ -82,6 +82,8 @@ public class SSLabel extends JLabel implements SSComponentInterface
 		{
 			if (!allowPropertyChangePropagation)
 				return;
+			if (!checkRowOK())
+				return;
 			if ("text".equals(pce.getPropertyName())) {
 				getSSCommon().removeRowSetListener();
 				setBoundColumnText(getText());

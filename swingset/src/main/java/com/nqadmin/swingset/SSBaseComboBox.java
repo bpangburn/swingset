@@ -149,8 +149,10 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		 *
 		 * {@inheritDoc} */
 		@Override
-		public void actionPerformed(final ActionEvent ae) {
-
+		public void actionPerformed(final ActionEvent ae)
+		{
+			if (!checkRowOK())
+				return;
 			// If this is a combo navigator, SSSyncManager will have it's own listeners.
 			// This is just for keeping a bound column in sync.
 			//

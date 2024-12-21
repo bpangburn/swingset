@@ -116,9 +116,12 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	{
 		/** {@inheritDoc} */
 		@Override
-		public void valueChanged(final ListSelectionEvent e) {
+		public void valueChanged(final ListSelectionEvent e)
+		{
 			// While adjusting don't need to update the database.
 			if (e.getValueIsAdjusting())
+				return;
+			if (!checkRowOK())
 				return;
 
 			getSSCommon().removeRowSetListener();
@@ -397,6 +400,10 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 		}
 
 		Object[] array = null;
+		//
+		// TODO: Should getBoundColumnObject() be used here?
+		//		 Seems like it, it's used just about everywhere else.
+		//
 		try {
 			if (getRowSet().getRow() > 0) {
 			    array = selectedDBModel.readData(this);

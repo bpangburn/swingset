@@ -114,6 +114,25 @@ In NavigateActions, should the static methods have instance counterparts,
 e.g. hasActiveRow. Then could make direct queries when a Navigation is available.
 
 ---
+Want checkRowOK() done in RowSetOps.update*, might throw "no records"
+exception, caught in SSCommon. Problem with SSFTF and arrays (SSList).
+But ... Maybe don't want that, the check really belongs in listener.
+Having the check in the component listener does seem like the right place.
+Wonder about generating a hidden listener wrapper.
+
+---
+When onInsertRow, visual indication new record. Color the "Add record" icon; Yellow?
+
+---
+When no records and not insertRow, visual indication that can't edit.
+Disable all fields, and/or green border around "Add new record" icon.
+
+---
+Navigation/rowset state change event. Like inInsertRow, noRecords, ...
+Need this so navigator UI can show things...
+
+
+---
 Navigator
     - Consider that up/down arrows now optionally do next-row/prev-row. How
       about, when AutoCommit is off, doing Shift-Ctrl-up/down (or whatever) does
@@ -231,8 +250,14 @@ is valid, there could be an interactions of components and this field
 should be marked?
 
 ---
-Each SSComponent has getSSComponentListener. This listener, at lease for SSTF,
+Each SSComponent has getSSComponentListener. This listener, at lease for SSSTF,
 may do postRowSetModifiedError. Explore...
+
+---
+In bind, when doing "eventListener = getSSComponent().getSSComponentListener()",
+could generate a wrapper that does "checkRowOK()". But then can't return even
+earlier if isAdjusting, slider/list-select (so what).
+Does doing getRow() involve contacting the DB server?
 
 ---
 postRowSetModified (not with Error) is only done from RowSetOps.
@@ -379,9 +404,13 @@ without timezone information and the timezone’s offset to UTC in separate
 database columns."
     https://thorben-janssen.com/hibernate-6-offsetdatetime-and-zoneddatetime/
 
-=============KEYS
+============= KEYS
 
 Multi column keys
+
+============= SQL
+
+Any issues involved with prepared statements?
 
 ================================================================================
 =========================== DID ================================================

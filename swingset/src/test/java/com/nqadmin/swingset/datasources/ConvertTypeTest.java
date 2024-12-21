@@ -29,6 +29,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.datasources;
 
+import java.math.BigDecimal;
 import java.sql.JDBCType;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -121,6 +122,72 @@ public class ConvertTypeTest
 				JDBCType.TIMESTAMP, java.sql.Time.class, allow));
 		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
 				JDBCType.TIMESTAMP, java.sql.Timestamp.class, allow));
+	}
+
+	/** x
+	 * @throws java.lang.Exception */
+	@Test
+	@SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
+	public void testConvertStringToNumber() throws Exception
+	{
+		System.out.println("convertStringToNumber");
+		Object rv;
+		
+		rv = convertObjectType("123", JDBCType.TINYINT);
+		assertEquals(Integer.class, rv.getClass());
+		assertEquals(123, rv);
+		rv = convertObjectType("123", JDBCType.SMALLINT);
+		assertEquals(Integer.class, rv.getClass());
+		assertEquals((Integer)123, rv);
+		rv = convertObjectType("123", JDBCType.INTEGER);
+		assertEquals(Integer.class, rv.getClass());
+		assertEquals((Integer)123, rv);
+		rv = convertObjectType("123", JDBCType.BIGINT);
+		assertEquals(Long.class, rv.getClass());
+		assertEquals(123L, rv);
+		rv = convertObjectType("123", JDBCType.REAL);
+		assertEquals(Float.class, rv.getClass());
+		assertEquals(123F, rv);
+		rv = convertObjectType("123", JDBCType.FLOAT);
+		assertEquals(Double.class, rv.getClass());
+		assertEquals(123D, rv);
+		rv = convertObjectType("123", JDBCType.DOUBLE);
+		assertEquals(Double.class, rv.getClass());
+		assertEquals(123D, rv);
+		rv = convertObjectType("123", JDBCType.NUMERIC);
+		assertEquals(BigDecimal.class, rv.getClass());
+		assertEquals(BigDecimal.valueOf(123), rv);
+		rv = convertObjectType("123", JDBCType.DECIMAL);
+		assertEquals(BigDecimal.class, rv.getClass());
+		assertEquals(BigDecimal.valueOf(123), rv);
+
+		// Java types
+		rv = convertObjectType("123", Byte.class);
+		assertEquals(Byte.class, rv.getClass());
+		assertEquals((byte)123, rv);
+		rv = convertObjectType("123", Short.class);
+		assertEquals(Short.class, rv.getClass());
+		assertEquals((short)123, rv);
+		rv = convertObjectType("123", Integer.class);
+		assertEquals(Integer.class, rv.getClass());
+		assertEquals(123, rv);
+		rv = convertObjectType("123", Long.class);
+		assertEquals(Long.class, rv.getClass());
+		assertEquals(123L, rv);
+		rv = convertObjectType("123", Float.class);
+		assertEquals(Float.class, rv.getClass());
+		assertEquals(123F, rv);
+		rv = convertObjectType("123", Double.class);
+		assertEquals(Double.class, rv.getClass());
+		assertEquals(123D, rv);
+		rv = convertObjectType("123", BigDecimal.class);
+		assertEquals(BigDecimal.class, rv.getClass());
+		assertEquals(BigDecimal.valueOf(123), rv);
+
+		// Primitive types ???
+		// rv = convertObjectType("123", long.class);
+		// assertEquals(Long.class, rv.getClass());
+		// assertEquals(123L, rv);
 	}
 
 	/**

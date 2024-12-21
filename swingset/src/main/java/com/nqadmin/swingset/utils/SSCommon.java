@@ -83,6 +83,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 
 import java.lang.System.Logger;
+import java.util.function.Supplier;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -234,6 +235,8 @@ public class SSCommon
 			SwingUtilities.invokeLater(() -> {
 				if (lastNotifiedChange != lastChange) {
 					lastNotifiedChange = lastChange;
+					if (!checkRowOK())
+						return;
 
 					String text = ((JTextComponent) getSSComponent()).getText();
 
@@ -720,21 +723,24 @@ public class SSCommon
 	public void bind(final RowSet _rowSet, final int _boundColumnIndex) {// throws java.sql.SQLException {
 		// INDICATE THAT WE'RE UPDATING THE BINDINGS
 		inBinding = true;
-
-		// UPDATE ROWSET
-		removeRowSetListener();
-		setRowSet(_rowSet);
-		addRowSetListener();
-
-		// STORE COLUMN INDEX & NAME
-		setBoundColumnIndex(_boundColumnIndex);
-
-		// INDICATE THAT WE'RE DONE SETTING THE BINDINGS
-		inBinding = false;
-
-		// UPDATE THE COMPONENT
-		bind();
-
+		try {
+			
+			// UPDATE ROWSET
+			removeRowSetListener();
+			setRowSet(_rowSet);
+			addRowSetListener();
+			
+			// STORE COLUMN INDEX & NAME
+			setBoundColumnIndex(_boundColumnIndex);
+			
+			// INDICATE THAT WE'RE DONE SETTING THE BINDINGS
+			inBinding = false;
+			
+			// UPDATE THE COMPONENT
+			bind();
+		} finally {
+			inBinding = false;
+		}
 	}
 
 	/**
@@ -1231,6 +1237,18 @@ public class SSCommon
 									  ex_title, JOptionPane.ERROR_MESSAGE);
 	}
 
+	//public enum SSMessage { NO_ROW }
+    // public void userErrorReporting(SSMessage msg)
+	/**
+	 * Entering data into black hole.
+	 */
+	public void reportNeedRow()
+	{
+		JOptionPane.showMessageDialog((JComponent)getSSComponent(),
+				"Please add a row before entering data.",
+				"", JOptionPane.WARNING_MESSAGE);
+	}
+
 	/**
 	 * Sets the Connection to the database
 	 *
@@ -1355,8 +1373,8 @@ public class SSCommon
 	 * Handles removal of Component listener before update and addition of listener
 	 * after update.
 	 */
-	public void updateSSComponent() {
-		
+	public void updateSSComponent()
+	{
 		// If you see this in the logs back to back for the same component
 		// a listener is likely not handled properly.
 		// Maybe incorporate SwingUtilities.invokeLater()? 
@@ -1367,6 +1385,55 @@ public class SSCommon
 		addSSComponentListener();
 		decorate();
 	}
+
+	/**
+	 * Determine if there's a row that can be modified; dialog if not.
+	 * Typically used in an SSComponent's listener.
+	 * @return true if there's a row
+	 */
+	public boolean checkRowOK()
+	{
+		return checkRowOK(null);
+	}
+
+	/** part of avoiding multiple dialogs for same user action */
+	private boolean doingCheckRowOK;
+
+	/**
+	 * Determine if there's a row that can be modified; optionally dialog if not.
+	 * If there's no row, only dialog if dialogOK is true.
+	 * A nested check never does the dialog.
+	 * Typically used in an SSComponent's listener.
+	 *
+	 * @param dialogOK if null or evaluates true then dialog
+	 * @return true if there's a row
+	 */
+	public boolean checkRowOK(Supplier<Boolean> dialogOK)
+	{
+		// Focus change events may cause listeners to trigger. Don't want
+		// to give multiple dialogs.
+		if (doingCheckRowOK) 
+			try {
+				return NavigateActions.hasActiveRow(getSSComponent());
+			} catch (SQLException ex) {
+				return false;
+			}
+
+		doingCheckRowOK = true;
+		try {
+			try {
+				if (NavigateActions.hasActiveRow(getSSComponent()))
+					return true;
+			} catch (SQLException ex) {
+			}
+			if (dialogOK == null || dialogOK.get())
+				reportNeedRow();
+		} finally {
+			doingCheckRowOK = false;
+		}
+		return false;
+	}
+
 	/**
 	 * Issue a row changed event if there's an active RowSetListener.
 	 */
