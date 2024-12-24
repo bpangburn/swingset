@@ -48,15 +48,12 @@ import com.nqadmin.swingset.*;
 
 import java.awt.event.ActionEvent;
 import java.io.Serializable;
-import java.lang.ref.Cleaner;
-import java.lang.ref.WeakReference;
 import java.sql.SQLException;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
@@ -75,13 +72,13 @@ import java.lang.System.Logger;
 
 import static java.lang.System.Logger.Level.*;
 
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 import com.nqadmin.swingset.utils.SSUtils;
+import com.raelity.lib.eventbus.WeakEventBus;
+import com.raelity.lib.eventbus.WeakSubscribe;
 
 import static com.nqadmin.swingset.navigate.NavAction.*;
 import static com.nqadmin.swingset.navigate.RowSetState.setInserting;
@@ -477,9 +474,6 @@ public class NavigateActions
 	/** Indicates if rowset listener is added (or removed) */
 	private boolean rowsetListenerAdded = false;
 
-	/** NavGroup event bus. */
-	private EventBus eventBus;
-
 	/** Undo/redo this this rowset */
 	private final UndoRow undoRow;
 
@@ -531,21 +525,19 @@ public class NavigateActions
 			rowNumberModel.setStepSize(stepsize);
 	}
 
-	BusReceiver busReceiver; // Strong reference, other only weakly referenced.
+	BusReceiver busReceiver; // Must have a strong reference.
 	private void setupEventBus() {
-		eventBus = getLocalEventBus(this, rowSet);
 		busReceiver = new BusReceiver();
-		eventBus.register(new WeakBusReceiver(busReceiver, eventBus));
+		WeakEventBus.register(busReceiver, getLocalEventBus(this, rowSet));
 	}
 	
-	// TODO: also have Set<SSComponentInterface> modifiedComponents
+	// TODO: Also have Set<SSComponentInterface> modifiedComponents.
+	//		 Paint modified/OK fields with identifying color, e.g. yellow.
 	private final Set<SSComponentInterface> errorComponents = new HashSet<>();
 
-	/**
-	 * Weak Subscriber notes: {@link com.nqadmin.swingset.navigate.Utils}.
-	 */
-	private class BusReceiver {
-		//@Subscribe
+	/** Weak Subscriber notes: {@link com.nqadmin.swingset.navigate.Utils}. */
+	class BusReceiver {
+		@WeakSubscribe
 		public void handleRowDataChanged(RowSetModificationEvent ev)
 		{
 			if (ev.matches(rowSet)) {
@@ -570,7 +562,7 @@ public class NavigateActions
 			}
 		}
 
-		//@Subscribe
+		@WeakSubscribe
 		public void handleRowUndoRedo(RowSetUndoRedoEvent ev)
 		{
 			if (ev.matches(rowSet)) {
@@ -585,48 +577,11 @@ public class NavigateActions
 			}
 		}
 
-		//@Subscribe
+		@WeakSubscribe
 		public void handleFocusChangeEvent(FocusChangeEvent ev)
 		{
 			undoRow.focusChange(ev);
 		}
-	}
-
-	private static final Cleaner cleaner = Cleaner.create();
-	static class WeakBusReceiver {
-		private final WeakReference<BusReceiver> ref;
-
-		public WeakBusReceiver(BusReceiver realBusReceiver, EventBus evBus)
-		{
-			this.ref = new WeakReference<>(realBusReceiver);
-			cleaner.register(realBusReceiver, () -> evBus.unregister(this));
-		}
-
-		void doit(Consumer<BusReceiver> doit)
-		{
-			BusReceiver br = ref.get();
-			if(br != null)
-				doit.accept(br);
-		}
-
-		@Subscribe
-		public void handleRowDataChanged(RowSetModificationEvent ev)
-		{
-			doit((br) -> br.handleRowDataChanged(ev));
-		}
-
-		@Subscribe
-		public void handleRowUndoRedo(RowSetUndoRedoEvent ev)
-		{
-			doit((br) -> br.handleRowUndoRedo(ev));
-		}
-
-		@Subscribe
-		public void handleFocusChangeEvent(FocusChangeEvent ev)
-		{
-			doit((br) -> br.handleFocusChangeEvent(ev));
-		}
-
 	}
 
 	/**
