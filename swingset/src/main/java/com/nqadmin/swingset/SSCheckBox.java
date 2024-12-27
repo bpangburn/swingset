@@ -45,7 +45,6 @@ package com.nqadmin.swingset;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.sql.SQLException;
 
 import javax.sql.RowSet;
 import javax.swing.BorderFactory;
@@ -54,6 +53,7 @@ import javax.swing.JCheckBox;
 import java.lang.System.Logger;
 import java.sql.JDBCType;
 import java.util.EnumSet;
+import java.util.EventListener;
 
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -62,7 +62,6 @@ import com.nqadmin.swingset.decorators.BorderDecorator;
 
 import static java.lang.System.Logger.Level.*;
 
-import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -75,16 +74,15 @@ import static com.nqadmin.swingset.datasources.ConvertType.assertConvertFromJdbc
 // SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
- * Used to display the boolean values stored in the database. The SSCheckBox can
- * be bound to a numeric or boolean database column. Currently, binding to a
- * boolean column has been tested only with PostgreSQL. If bound to a numeric
- * database column, a checked SSCheckBox returns a '1' to the database and an
- * unchecked SSCheckBox will returns a '0'. In the future an option may be added
- * to allow the user to specify the values returned for the checked and
- * unchecked SSCheckBox states.
+ * Used to display values stored in the database as a boolean.
+ * The SSCheckBox can be bound to a numeric or boolean database column. 
+ * The boolean value is converted to the data base type by the
+ * {@linkplain #setBoundColumnObject(java.lang.Object) } infrastructure.
+ * Currently, Dec 2024, if bound to a numeric database column, a checked
+ * SSCheckBox puts a '1' to the database and an unchecked SSCheckBox puts a '0'.
  * <p>
- * Note that for naming consistency, SSCheckBox replaced SSDBCheckBox
- * 01-10-2005.
+ * TODO: In the future an option may be added to allow the user to specify the
+ * values returned for the checked and unchecked SSCheckBox states.
  */
 @SuppressWarnings("serial")
 public class SSCheckBox extends JCheckBox implements SSComponentInterface
@@ -110,9 +108,6 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 		}
 	} // end private class SSCheckBoxListener
 
-	/** Common fields shared across SwingSet components. */
-	private final SSCommon ssCommon;
-
 	/** System Logger for component. */
 	private static final Logger logger = SSUtils.getLogger();
 
@@ -124,17 +119,15 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 	}
 	
 	/**
-	 * Creates an object of SSCheckBox binding it so the specified column in the
+	 * Creates an object of SSCheckBox binding it to the specified column in the
 	 * given RowSet.
 	 *
 	 * @param _rowSet        datasource to be used.
 	 * @param _boundColumnName name of the column to which this check box should be
 	 *                         bound
-	 *
-	 * @throws SQLException - if a database access error occurs
 	 */
 	@SuppressWarnings("OverridableMethodCallInConstructor")
-	public SSCheckBox(final RowSet _rowSet, final String _boundColumnName) throws java.sql.SQLException {
+	public SSCheckBox(final RowSet _rowSet, final String _boundColumnName) {
 		this(null);
 		bind(_rowSet, _boundColumnName);
 	}
@@ -165,7 +158,7 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 		}
 		setBorder(b);
 		setBorderPainted(true);
-		ssCommon = finishSSCommon();
+		finishSSCommon();
 	}
 
 	private Insets toInsets(Border b)
@@ -180,32 +173,58 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 		assertConvertFromJdbcType(jdbcType, Boolean.class,
 				EnumSet.of(BIT, BOOLEAN, INTEGER, SMALLINT, TINYINT));
 	}
-	
-	/**
-	 * {@inheritDoc }
-	 */
+
+	/** {@inheritDoc } */
 	@Override
-	public SSCheckBoxListener getSSComponentListener() {
-		return new SSCheckBoxListener();
+	public void cleanField()
+	{
+		setSelected(false);
 	}
 
-	/**
-	 * Updates the value stored and displayed in the SwingSet component based on
-	 * getBoundColumnText()
-	 * <p>
-	 * Call to this method should be coming from SSCommon and should already have
-	 * the Component listener removed
-	 */
-	@Override
-	public void updateSSComponent() {
-		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only allow JDBC types that convert to Long, Integer, Boolean
-		
-		final String text = getBoundColumnText();
-		logger.log(DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), text));
+	private Hook hook;
 
-		Boolean value = getBoundColumnObject(Boolean.class);
-		setSelected(value == null ? false : value);
-	} // end protected void updateSSComponent() {
+	/** {@inheritDoc } */
+	@Override
+	public final Hook getSSComponentHook()
+	{
+		if (hook == null)
+			hook = new Hook(this) {
+				/**
+				 * Updates the value stored and displayed in the SwingSet component
+				 * based on getBoundColumnText()
+				 */
+				@Override
+				protected void updateSSComponent()
+				{
+					logger.log(DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), getBoundColumnText()));
+					
+					Boolean value = getBoundColumnObject(Boolean.class);
+					setSelected(value == null ? false : value);
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected SSCheckBoxListener getSSComponentListener() {
+					return new SSCheckBoxListener();
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void addSSComponentListener(EventListener eventListener)
+				{
+					addItemListener((ItemListener) eventListener);
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void removeSSComponentListener(EventListener eventListener)
+				{
+					removeItemListener((ItemListener) eventListener);
+				}
+				
+			};
+		return hook;
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -213,30 +232,6 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 	{
 		return sf("SSCheckBox{selected=%s, %s}",
 				isSelected(), SSUtils.ssComponentToString(this));
-	}
-
-	/**
-	 * Returns ssCommon for the current Swingset component.
-	 *
-	 * @return common SwingSet component data and methods
-	 */
-    @Override
-	public SSCommon getSSCommon() {
-		if (ssCommon == null)
-			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
-		return ssCommon;
-	}
-
-	private SSCommon partialSSCommon;
-
-	/**
-	 * Either return a new create ssCommon or 
-	 * Only call from constructor; "ssCommon = finishSSCommon()".
-	 */
-	private SSCommon finishSSCommon() {
-		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
-		partialSSCommon = null;
-		return rv;
 	}
 
 } // end public class SSCheckBox

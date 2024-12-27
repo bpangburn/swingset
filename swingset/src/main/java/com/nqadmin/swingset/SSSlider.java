@@ -52,10 +52,10 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.sql.JDBCType;
 import java.util.EnumSet;
+import java.util.EventListener;
 
 import static java.sql.JDBCType.*;
 
-import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -96,15 +96,12 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	/** Log4j Logger for component */
 	private static Logger logger = SSUtils.getLogger();
 
-	/** Common fields shared across SwingSet components */
-	private final SSCommon ssCommon;
-
 	/**
 	 * Empty constructor needed for deserialization. Creates a horizontal slider
 	 * with the range 0 to 100.
 	 */
 	public SSSlider() {
-		ssCommon = finishSSCommon();
+		finishSSCommon();
 	}
 
 	/**
@@ -114,7 +111,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	 */
 	public SSSlider(final int _orientation) {
 		super(_orientation);
-		ssCommon = finishSSCommon();
+		finishSSCommon();
 	}
 
 	/**
@@ -125,7 +122,7 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	 */
 	public SSSlider(final int _min, final int _max) {
 		super(_min, _max);
-		ssCommon = finishSSCommon();
+		finishSSCommon();
 	}
 
 	/**
@@ -152,29 +149,61 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 						BIGINT, REAL, FLOAT, DOUBLE, DECIMAL, NUMERIC));
 
 	}
-	
-	/**
-	 * {@inheritDoc }
-	 */
-	@Override
-	public SSSliderListener getSSComponentListener() {
-		return new SSSliderListener();
-	}
 
 	/** {@inheritDoc } */
 	@Override
-	public void updateSSComponent()
+	public void cleanField()
 	{
-		try {
-			Integer n = getBoundColumnObject(Integer.class);
-			setValue(n != null ? n : 0);
-		} catch (final NumberFormatException _nfe) {
-			// TODO: Hmm, probably should be an SQL conversion error.
-			// Output the text value
-			String columnValue = getBoundColumnText();
-			logger.log(Level.ERROR, getColumnForLog() + ": Number Format Exception. Cannot update slider to " + columnValue,
-					_nfe);
-		}
+		// Slider to the middle.
+		setValue((getMinimum() + getMaximum()) / 2);
+	}
+
+	private Hook hook;
+
+	/** {@inheritDoc } */
+	@Override
+	public final Hook getSSComponentHook()
+	{
+		if (hook == null)
+			hook = new Hook(this) {
+				/** {@inheritDoc } */
+				@Override
+				protected void updateSSComponent()
+				{
+					try {
+						Integer n = getBoundColumnObject(Integer.class);
+						setValue(n != null ? n : 0);
+					} catch (final NumberFormatException _nfe) {
+						// TODO: Hmm, probably should be an SQL conversion error.
+						// Output the text value
+						String columnValue = getBoundColumnText();
+						logger.log(Level.ERROR, getColumnForLog() + ": Number Format Exception. Cannot update slider to " + columnValue,
+								_nfe);
+					}
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected SSSliderListener getSSComponentListener() {
+					return new SSSliderListener();
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void addSSComponentListener(EventListener eventListener)
+				{
+					addChangeListener((ChangeListener) eventListener);
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void removeSSComponentListener(EventListener eventListener)
+				{
+					removeChangeListener((ChangeListener) eventListener);
+				}
+				
+			};
+		return hook;
 	}
 
 	/** {@inheritDoc} */
@@ -183,29 +212,5 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 	{
 		return sf("%s{value=%s, %s}", getClass().getSimpleName(),
 				getValue(), SSUtils.ssComponentToString(this));
-	}
-
-	/**
-	 * Returns ssCommon for the current Swingset component.
-	 *
-	 * @return common SwingSet component data and methods
-	 */
-    @Override
-	public SSCommon getSSCommon() {
-		if (ssCommon == null)
-			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
-		return ssCommon;
-	}
-
-	private SSCommon partialSSCommon;
-
-	/**
-	 * Either return a new create ssCommon or 
-	 * Only call from constructor; "ssCommon = finishSSCommon()".
-	 */
-	private SSCommon finishSSCommon() {
-		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
-		partialSSCommon = null;
-		return rv;
 	}
 } // end public class SSSlider extends JSlider

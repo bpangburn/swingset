@@ -41,28 +41,16 @@ import java.awt.Component;
 import java.awt.Container;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
-import javax.swing.JList;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
 import java.lang.System.Logger;
-import java.util.Objects;
 
 import static java.lang.System.Logger.Level.*;
 
-import com.nqadmin.swingset.formatting.SSFormattedTextField;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -136,28 +124,26 @@ public class SSDBNavImpl implements SSDBNav {
 			//logger.debug("Clearing component type of: {}. Loop index=" + i, () -> comps[i].getClass().getSimpleName());
 
 			switch (comp) {
-			case SSBaseComboBox<?,?,?> c ->	c.setSelectionPending(true);
-			case SSFormattedTextField c ->	c.cleanField();
-			case JTextField c ->	c.setText("");
-			case JList<?> c ->		c.clearSelection();
-			case JTextArea c ->		c.setText("");
-			case JComboBox<?> c ->	c.setSelectedIndex(-1);
-			case SSImage c ->		c.clearImage();
-			case JCheckBox c ->		c.setSelected(false);
-			case SSLabel c ->		c.setText("");
-			case JSlider c -> // Slider to the middle.
-				c.setValue((c.getMinimum() + c.getMaximum()) / 2);
-			case JLabel c ->						{ Objects.isNull(c); }
-			case JButton c ->						{ Objects.isNull(c); }
-			case JMenuBar c ->						{ Objects.isNull(c); }
-			case BasicInternalFrameTitlePane c ->	{ Objects.isNull(c); }
+			case SSComponentInterface c -> c.cleanField();
+
+			// TODO: could add "case Container c -> setComponects(c);"
+			//		 but note that any JComponent is a Container.
+			//		 So how about "case JComponent c -> setComponects(c);".
+			//		 Avoid the small? overhead by listing JContainers
+
 			case JRootPane c ->		setComponents(c);
 			case JPanel c ->		setComponents(c);
 			case JLayeredPane c ->	setComponents(c);
 			case JTabbedPane c ->	setComponents(c);
 			case JScrollPane c ->	setComponents(c.getViewport());
-			default ->
-				logger.log(WARNING, "Encountered unknown component type of: " + comp.getClass().getSimpleName() + ". Unable to clear component.");
+
+			// case JLabel c ->						{ Objects.isNull(c); }
+			// case JButton c ->						{ Objects.isNull(c); }
+			// case JMenuBar c ->						{ Objects.isNull(c); }
+			// case BasicInternalFrameTitlePane c ->	{ Objects.isNull(c); }
+			default -> {
+				// logger.log(WARNING, "Encountered unknown component type of: " + comp.getClass().getSimpleName() + ". Unable to clear component.");
+			}
 			}
 		}
 

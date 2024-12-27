@@ -60,6 +60,7 @@ import javax.swing.text.DefaultFormatterFactory;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.math.BigDecimal;
+import java.util.EventListener;
 import java.util.Objects;
 
 import javax.swing.text.MaskFormatter;
@@ -265,13 +266,10 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	/** Logger for component */
 	private static Logger logger = SSUtils.getLogger();
-
-	/** Common fields shared across SwingSet components */
-	private final SSCommon ssCommon;
 		
 	/** Creates a new instance of SSFormattedTextField */
 	public SSFormattedTextField() {
-		ssCommon = finishSSCommon();
+		finishSSCommon();
 	}
 
 	/**
@@ -294,7 +292,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	@SuppressWarnings("OverridableMethodCallInConstructor")
 	public SSFormattedTextField(final AbstractFormatterFactory _factory) {
 		super(_factory);
-		ssCommon = finishSSCommon();
+		finishSSCommon();
 	}
 
 	// WE DON'T WANT TO REPLICATE THE JFormattedTextField CONSTRUCTOR THAT ACCEPTS
@@ -307,7 +305,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 */
 	public SSFormattedTextField(SSFormat format) {
 		super(format);
-		ssCommon = finishSSCommon();
+		finishSSCommon();
 	}
 
 	/**
@@ -331,41 +329,6 @@ public class SSFormattedTextField extends JFormattedTextField
 			Font monoFont = new Font(Font.MONOSPACED, currentFont.getStyle(), currentFont.getSize());
 			setFont(monoFont);
 		}
-	}
-
-	/**
-	 * Sets the value that will be formatted to null.
-	 * If getAllowNull() is false subclasses may chose to do something else.
-	 */
-	public void cleanField() {
-		setValue(null);
-	}
-
-	/**
-	 * Returns the ssCommon data member for the current Swingset component.
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-    @Override
-	public SSCommon getSSCommon() {
-		if (ssCommon == null)
-			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
-		return ssCommon;
-	}
-
-	//
-	// TODO: long term get rid of this half init stuff. Maybe a builder...
-	//
-	private SSCommon partialSSCommon;
-
-	/**
-	 * Either return a new create ssCommon or 
-	 * Only call from constructor; "ssCommon = finishInit()".
-	 */
-	private SSCommon finishSSCommon() {
-		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
-		partialSSCommon = null;
-		return rv;
 	}
 
 	/**
@@ -400,27 +363,62 @@ public class SSFormattedTextField extends JFormattedTextField
 			getSSCommon().decorate();
 		});
 	}
-    
+
 	/**
-	 * {@inheritDoc }
+	 * Sets the value that will be formatted to null. Subclasses may chose to do
+	 * something else; for example, the current date could be set possibly
+	 * conditioned on getAllowNull() false.
 	 */
 	@Override
-	public SSFormattedTextFieldListener getSSComponentListener() {
-		return new SSFormattedTextFieldListener();
+	public void cleanField() {
+		setValue(null);
+	}
+
+	private Hook hook;
+
+	/** {@inheritDoc } */
+	@Override
+	public final Hook getSSComponentHook()
+	{
+		if (hook == null)
+			hook = new Hook(this) {
+				@Override
+				protected void updateSSComponent()
+				{
+					updateJComponent();
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected SSFormattedTextFieldListener getSSComponentListener() {
+					return new SSFormattedTextFieldListener();
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void addSSComponentListener(EventListener eventListener)
+				{
+					addPropertyChangeListener("value", ((PropertyChangeListener) eventListener));
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void removeSSComponentListener(EventListener eventListener)
+				{
+					removePropertyChangeListener("value", ((PropertyChangeListener) eventListener));
+				}
+			};
+		return hook;
 	}
 
 	/**
-	 * Updates the value stored and displayed in the SwingSet component based on
-	 * the object obtained from getValue(). Currently only numeric, boolean and date
-	 * types are handled.
+	 * {@inheritDoc }
 	 * <p>
-	 * Calls to this method should be coming from SSCommon and should already have
-	 * the Component listener removed.
+	 * Only numeric, boolean and date types are handled.
 	 *
 	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B.3 JDBC Types Mapped to Java Object Types
 	 */
-	@Override
-	public void updateSSComponent() {
+	private void updateJComponent() {
 
 		// TODO: put discussion of type handling/mapping elsewhere,
 		//		 and reference it from here.
@@ -509,6 +507,7 @@ public class SSFormattedTextField extends JFormattedTextField
 		getSSCommon().decorate();
 	}
 
+	// TODO: is this needed? If it is, it should be in 
 	private boolean enableTextDecorator = true;
 	/**
 	 * Set/reset the flag to enable text decoration.

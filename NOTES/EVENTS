@@ -1,0 +1,52 @@
+Read/write/update rowset/SSComponent
+====================================
+SSComponent.bind() --- SSComponent.updateSSComponent   <<< 
+
+
+SSCommon.RowSetListener
+write to SSComponenet
+
+    SSCommon.updateSSComponent
+
+        removeSSComponentListener
+
+        SSComponent.updateSSComponent   <<<
+
+            getBoundColumn*
+            write to SSComponent
+
+        addSSComponentListener
+
+
+
+Component Listener --- sscommon doc listeners much more complex
+update RowSet
+
+    removeRowSetListener
+
+    SSCommon.setBoundColumn*
+
+    addRowSetListener
+
+SSCommon.setBoundColumn*
+
+    try {
+        RowSetOps.updateColumn*
+    } catch () {
+        postRowSetModifiedError
+    }
+
+RowSetOps.updateColumn*
+
+    NavigateActions.captureInitialValue
+    try {
+        rowset.update*
+        did_update = true
+    } finally {
+        if (did_update)
+            postRowsetModified
+    }
+
+
+
+

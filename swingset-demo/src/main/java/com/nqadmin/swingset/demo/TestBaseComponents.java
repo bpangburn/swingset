@@ -46,16 +46,20 @@ import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.function.Supplier;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.sql.RowSet;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
-
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 
 import com.nqadmin.swingset.SSCheckBox;
 import com.nqadmin.swingset.SSComboBox;
@@ -73,16 +77,15 @@ import com.nqadmin.swingset.models.SSDbArrayModel;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
-import java.util.EnumMap;
+import com.nqadmin.swingset.demo.datepicker.DbDatePicker;
 
 import static com.nqadmin.swingset.demo.TestBaseComponents.Comps.*;
 import static com.nqadmin.swingset.demo.TestBaseComponents.CompDim.*;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+
 import static java.lang.System.Logger.Level.*;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.swing.JComponent;
+
+
 
 /**
  * This example demonstrates all of the Base SwingSet Components
@@ -102,7 +105,7 @@ public class TestBaseComponents extends JFrame
 	// STAR means use "*" in query
 	enum Comps {
 		NAV, PK, CHECK, COMBO, ENUM_COMBO, DB_COMBO, IMAGE, LABEL,
-		LIST, SLIDER, TEXT_AREA, TEXT_FIELD,
+		LIST, SLIDER, TEXT_AREA, TEXT_FIELD, DATE_PICKER,
 		STAR, // This, and anything after, are not components.
 	};
 	enum CompDim {
@@ -130,7 +133,8 @@ public class TestBaseComponents extends JFrame
 				new Comp("ss_list",         lstSSList,         lblSSList,         H2),
 				new Comp("ss_slider",       sliSSSlider,       lblSSSlider,       H1),
 				new Comp("ss_text_area",    txtSSTextArea,     lblSSTextArea,     H2),
-				new Comp("ss_text_field",   txtSSTextField,    lblSSTextField,    H1)
+				new Comp("ss_text_field",   txtSSTextField,    lblSSTextField,    H1),
+				new Comp("ss_date_field_null",dpDatePicker,    lblDatePicker,     H1)
 		);
 
 		for (Comps comp : Comps.values()) {
@@ -208,6 +212,7 @@ public class TestBaseComponents extends JFrame
 	JLabel lblSSSlider = new JLabel("SSSlider");
 	JLabel lblSSTextArea = new JLabel("SSTextArea");
 	JLabel lblSSTextField = new JLabel("SSTextField");
+	JLabel lblDatePicker = new JLabel("DbDatePicker");
 	
 	/**
 	 * bound component declarations
@@ -223,6 +228,7 @@ public class TestBaseComponents extends JFrame
 	SSSlider sliSSSlider = new SSSlider();
 	SSTextArea txtSSTextArea = new SSTextArea();
 	SSTextField txtSSTextField = new SSTextField();
+	DbDatePicker dpDatePicker = new DbDatePicker();
 
 	/**
 	 * database component declarations

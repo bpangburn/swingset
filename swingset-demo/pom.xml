@@ -51,6 +51,11 @@
 		
 		<!-- swingset-demo-only -->
 		<version.maven-assembly-plugin>3.7.1</version.maven-assembly-plugin>
+		<version.ldatepicker>11.2.1</version.ldatepicker>
+		<!--
+		<version.ldatepicker>11.2.300</version.ldatepicker>
+		-->
+		<version.logman>2.3.1</version.logman>
 	</properties>
 
 	<licenses>
@@ -149,11 +154,23 @@
 		</dependency>
 		-->
 
+		<dependency>
+			<groupId>com.github.lgooddatepicker</groupId>
+			<artifactId>LGoodDatePicker</artifactId>
+			<version>${version.ldatepicker}</version>
+		</dependency>
+<!--
+		<dependency>
+			<groupId>com.raelity.3rdparty.com.github.lgooddatepicker</groupId>
+			<artifactId>LGoodDatePicker</artifactId>
+			<version>${version.ldatepicker}</version>
+		</dependency>
+-->
 		<!-- https://mvnrepository.com/artifact/com.raelity.logman/logman-lib -->
 		<dependency>
 			<groupId>com.raelity.logman</groupId>
 			<artifactId>logman-lib</artifactId>
-			<version>2.3.1</version>
+			<version>${version.logman}</version>
 		</dependency>
 	</dependencies>
 

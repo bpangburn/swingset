@@ -474,3 +474,4 @@ NOTE: undo/redo SSCommon.actionPerformed catches/logs SQLException,
     posting modification messages.
 
 Fixed with postRowSetUndoRedo().
+

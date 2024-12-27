@@ -66,6 +66,7 @@ import javax.swing.SwingUtilities;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.util.EventListener;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -76,7 +77,6 @@ import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
 import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.RowSetModificationEvent;
-import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -357,12 +357,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * the nullItem must be set to null.</b>
 	 * @see #createNullItem(com.nqadmin.swingset.models.OptionMappingSwingModel.Remodel)
 	 */
-	transient protected SSListItem nullItem;
-
-	/**
-	 * Common fields shared across SwingSet components
-	 */
-	private final SSCommon ssCommon;
+	protected SSListItem nullItem;
 
 	/**
 	 * This is used when moving to a new row when getAllowNull() == false 
@@ -378,7 +373,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	/**
 	 * The combo model.
 	 */
-	transient protected OptionMappingSwingModel<M,O,O2> optionModel;
+	protected OptionMappingSwingModel<M,O,O2> optionModel;
 
 	//////////////////////////////////////////////////////////////////////////
 	//
@@ -418,7 +413,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	public SSBaseComboBox() {
 		addItemListener(new SSBaseComboBoxItemListener());
-		ssCommon = finishSSCommon();
+		finishSSCommon();
 	}
 
 	/**
@@ -568,7 +563,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		return result;
 	}
 
-	transient private final List<M> generatedMappingOptions = new ArrayList<>();
+	private final List<M> generatedMappingOptions = new ArrayList<>();
 	private int addMissingMappingOption(BaseModel<M,O,O2>.Remodel remodel, M _mapping) {
 		int index = -1;
 		if(_mapping != null) {
@@ -832,14 +827,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	//
 	// Here's SwingSet scaffolding and nullItem maintenance.
 	//
-	
-	/**
-	 * {@inheritDoc }
-	 */
-	@Override
-	public SSBaseComboBoxListener getSSComponentListener() {
-		return new SSBaseComboBoxListener();
-	}
 
 	/**
 	 * By default, the combo is not editable; Glazed lists will change.
@@ -1021,9 +1008,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText().
 	 * <p>
-	 * Call to this method should be coming from SSCommon and should already have
-	 * the Component listener removed.
-	 * <p>
 	 * This is a quick fix for https://github.com/bpangburn/swingset/issues/46
 	 * As discussed in Issue 46, @errael has proposed a more thorough fix to work
 	 * with any Mapping type, but it requires additional dependencies (Guava)
@@ -1034,8 +1018,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * As written this method will only work with the two current implementations of
 	 * SSBaseComboBox: SSComboBox where M is Integer and SSDBComboBox where M is Long.
 	 */
-	@Override
-	public void updateSSComponent() {
+	private void updateComponent() {
 		// TODO Modify this class similar to updateSSComponent() in SSFormattedTextField and only limit JDBC types accepted
 		try {
 			// If initialization is taking place then there won't be any mappings so don't try to update anything yet.
@@ -1078,13 +1061,57 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			JOptionPane.showMessageDialog(this, sf(
 					"Encountered database value of '%s' for column [%s], which cannot be converted to a number.", getBoundColumnText(), getColumnForLog()));
 			logger.log(Level.ERROR, () -> sf("%s: Number Format Exception.", getColumnForLog()), nfe);
-		} catch (Exception e) {
+		} catch (Exception e) { // TODO: Argh.
 			JOptionPane.showMessageDialog(this, sf(
 					"Expecting SSComboBox or SSDBComboBox, but component for column [%s] is of type %s.", this.getClass(), getColumnForLog()));
 			logger.log(Level.ERROR, getColumnForLog() + ": Unknown SwingSet component of " + this.getClass() + ".", e);
 		} finally {
 			cleanupMissingMappingOptions();
 		}
+	}
+
+	/** {@inheritDoc } */
+	@Override
+	public void cleanField()
+	{
+		setSelectionPending(true);
+	}
+
+	private Hook hook;
+
+	/** {@inheritDoc } */
+	@Override
+	public final Hook getSSComponentHook()
+	{
+		if (hook == null)
+			hook = new Hook(this) {
+				@Override
+				protected void updateSSComponent()
+				{
+					updateComponent();
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected SSBaseComboBoxListener getSSComponentListener() {
+					return new SSBaseComboBoxListener();
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void addSSComponentListener(EventListener eventListener)
+				{
+					addActionListener((ActionListener) eventListener);
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void removeSSComponentListener(EventListener eventListener)
+				{
+					removeActionListener((ActionListener) eventListener);
+				}
+			};
+		return hook;
 	}
 
 	//
@@ -1218,29 +1245,4 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		return sf("%s{item=%s, %s}", getClass().getSimpleName(),
 				getSelectedItem(), SSUtils.ssComponentToString(this));
 	}
-
-	/**
-	 * Returns ssCommon for the current Swingset component.
-	 *
-	 * @return common SwingSet component data and methods
-	 */
-    @Override
-	public SSCommon getSSCommon() {
-		if (ssCommon == null)
-			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
-		return ssCommon;
-	}
-
-	private SSCommon partialSSCommon;
-
-	/**
-	 * Either return a new create ssCommon or 
-	 * Only call from constructor; "ssCommon = finishSSCommon()".
-	 */
-	private SSCommon finishSSCommon() {
-		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
-		partialSSCommon = null;
-		return rv;
-	}
-
 }

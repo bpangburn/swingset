@@ -41,10 +41,11 @@ import javax.sql.RowSet;
 import javax.swing.JTextArea;
 
 import java.lang.System.Logger;
+import java.util.EventListener;
 
 import static java.lang.System.Logger.Level.*;
 
-import com.nqadmin.swingset.utils.SSCommon;
+import com.nqadmin.swingset.utils.SSCommon.SSDocumentListener;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -70,15 +71,10 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	private static Logger logger = SSUtils.getLogger();
 
 	/**
-	 * Common fields shared across SwingSet components
-	 */
-	private final SSCommon ssCommon;
-
-	/**
 	 * Empty constructor needed for deserialization.
 	 */
 	public SSTextArea() {
-		ssCommon = finishSSCommon();
+		finishSSCommon();
 	}
 
 	/**
@@ -90,7 +86,7 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	 */
 	public SSTextArea(final int _rows, final int _columns) {
 		super(_rows, _columns);
-		ssCommon = finishSSCommon();
+		finishSSCommon();
 	}
 
 	/**
@@ -115,27 +111,55 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 		setWrapStyleWord(true);
 	}
 
-	/**
-	 * {@inheritDoc }
-	 */
+	/** {@inheritDoc } */
 	@Override
-	public SSCommon.SSDocumentListener getSSComponentListener() {
-		return getSSCommon().getSSDocumentListener();
+	public void cleanField()
+	{
+		setText("");
 	}
 
-	/**
-	 * Updates the value stored and displayed in the SwingSet component based on
-	 * getBoundColumnText()
-	 * <p>
-	 * Call to this method should be coming from SSCommon and should already have
-	 * the Component listener removed
-	 */
+	private Hook hook;
+
+	/** {@inheritDoc } */
 	@Override
-	public void updateSSComponent() {
-		
-		final String text = getBoundColumnText();
-		logger.log(DEBUG, ()->sf("%s: Setting text area to %s.", getColumnForLog(), text));
-		setText(text);
+	public final Hook getSSComponentHook()
+	{
+		if (hook == null)
+			hook = new Hook(this) {
+				/**
+				 * Updates the value stored and displayed in the SwingSet
+				 * component based on getBoundColumnText()
+				 */
+				@Override
+				protected void updateSSComponent() {
+					
+					final String text = getBoundColumnText();
+					logger.log(DEBUG, ()->sf("%s: Setting text area to %s.", getColumnForLog(), text));
+					setText(text);
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected SSDocumentListener getSSComponentListener() {
+					return getSSCommon().getSSDocumentListener();
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void addSSComponentListener(EventListener eventListener)
+				{
+					getDocument().addDocumentListener((SSDocumentListener)eventListener);
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void removeSSComponentListener(EventListener eventListener)
+				{
+					getDocument().removeDocumentListener((SSDocumentListener)eventListener);
+				}
+				
+			};
+		return hook;
 	}
 
 	/** {@inheritDoc} */
@@ -144,29 +168,5 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	{
 		return sf("%s{text=%s, %s}", getClass().getSimpleName(),
 				getText(), SSUtils.ssComponentToString(this));
-	}
-
-	/**
-	 * Returns ssCommon for the current Swingset component.
-	 *
-	 * @return common SwingSet component data and methods
-	 */
-    @Override
-	public SSCommon getSSCommon() {
-		if (ssCommon == null)
-			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
-		return ssCommon;
-	}
-
-	private SSCommon partialSSCommon;
-
-	/**
-	 * Either return a new create ssCommon or 
-	 * Only call from constructor; "ssCommon = finishSSCommon()".
-	 */
-	private SSCommon finishSSCommon() {
-		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
-		partialSSCommon = null;
-		return rv;
 	}
 } // end public class SSTextArea extends JTextArea {

@@ -347,7 +347,8 @@ public class DateTime
 		JDBCType jdbcType = comp.getBoundColumnJDBCType();
 		// TODO: should there be a way to do a switch on type, use getDate...?
 		Object o = comp.getRowSet().getObject(comp.getBoundColumnIndex());
-		return getDateTimeText(o, jdbcType);
+		// TODO: derived 3rd arg from comp.getSSFormat
+		return getDateTimeText(o, jdbcType, null);
 	}
 
 	/**
@@ -361,43 +362,51 @@ public class DateTime
 	public static String getDateTimeText(Object jdbcDateTimeObject, RSC comp)
 	{
 		JDBCType jdbcType = comp.getBoundColumnJDBCType();
-		return getDateTimeText(jdbcDateTimeObject, jdbcType);
+		// TODO: derived 3rd arg from comp.getSSFormat
+		return getDateTimeText(jdbcDateTimeObject, jdbcType, null);
 	}
 
 	/**
 	 * Using the formatter for the column's specifiedJDBCType,
-	 * format the column's specified value.
+	 * format the column's specified value. 
 	 * Return empty string if column is null.
+	 * <p>
+	 * The corresponding java.sql and java.time objects are handled the same;
+	 * for example, Date and LocalDate.
+	 * 
 	 * @param jdbcDateTimeObject convert this to text
-	 * @param jdbcType
+	 * @param jdbcTypefix
 	 * @return date/time text for column
 	 * @throws SQLException if database access error
 	 */
-	private static String getDateTimeText(Object jdbcDateTimeObject, JDBCType jdbcType)
+	private static String getDateTimeText(Object jdbcDateTimeObject,
+										  JDBCType jdbcType,
+										  DateTimeFormatter _formatter)
 	{
 		if(jdbcDateTimeObject instanceof String s)
 			return s;
-		DateTimeFormatter formatter = getDateTimeFormatter(jdbcType);
+		if (jdbcDateTimeObject == null)
+			return "";
+		DateTimeFormatter formatter = _formatter != null
+				? _formatter : getDateTimeFormatter(jdbcType);
 		if (formatter == null)
 			throw new IllegalArgumentException(sf("%s not handled", jdbcType));
+
 		switch(jdbcType) {
 		case TIME -> {
-			Time time = (Time) jdbcDateTimeObject;
-			if(time == null)
-				return "";
-			return time.toLocalTime().format(formatter);
+			LocalTime lt = jdbcDateTimeObject instanceof LocalTime lt1
+					? lt1 : ((Time)jdbcDateTimeObject).toLocalTime();
+			return lt.format(formatter);
 		}
 		case DATE -> {
-			Date date = (Date) jdbcDateTimeObject;
-			if(date == null)
-				return "";
-			return date.toLocalDate().format(formatter);
+			LocalDate ld = jdbcDateTimeObject instanceof LocalDate ld1
+					? ld1 : ((Date)jdbcDateTimeObject).toLocalDate();
+			return ld.format(formatter);
 		}
 		case TIMESTAMP -> {
-			Timestamp timestamp = (Timestamp) jdbcDateTimeObject;
-			if(timestamp == null)
-				return "";
-			return timestamp.toLocalDateTime().format(formatter);
+			LocalDateTime ldt = jdbcDateTimeObject instanceof LocalDateTime ldt1
+					? ldt1 : ((Timestamp)jdbcDateTimeObject).toLocalDateTime();
+			return ldt.format(formatter);
 		}
 		default -> {
 			// Impossible since have a formatter.

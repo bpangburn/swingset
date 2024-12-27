@@ -63,6 +63,7 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
+import java.util.EventListener;
 
 import javax.swing.JComponent;
 import javax.swing.border.Border;
@@ -73,7 +74,6 @@ import com.nqadmin.swingset.decorators.BorderDecorator;
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.decorators.Decorator;
-import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -169,15 +169,10 @@ public class SSImage extends JPanel implements SSComponentInterface
 	protected Dimension preferredSize = new Dimension(200, 200);
 
 	/**
-	 * Common fields shared across SwingSet components
-	 */
-	private final SSCommon ssCommon;
-
-	/**
 	 * Construct a default SSImage Object.
 	 */
 	public SSImage() {
-		ssCommon = finishSSCommon();
+		finishSSCommon();
 	}
 
 	// TODO: Why do decorators interfere with SSImage?
@@ -311,12 +306,6 @@ public class SSImage extends JPanel implements SSComponentInterface
 		return preferredSize;
 	}
 
-	/** {@inheritDoc } */
-	@Override
-	public SSImageListener getSSComponentListener() {
-		return new SSImageListener();
-	}
-
 	/**
 	 * Sets the preferred size of the image component.
 	 *
@@ -335,6 +324,13 @@ public class SSImage extends JPanel implements SSComponentInterface
 		super.setPreferredSize(_preferredSize);
 	}
 
+	/** {@inheritDoc } */
+	@Override
+	public void cleanField()
+	{
+		clearImage();
+	}
+
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText().
@@ -342,8 +338,7 @@ public class SSImage extends JPanel implements SSComponentInterface
 	 * Call to this method should be coming from SSCommon and should already have
 	 * the Component listener removed.
 	 */
-	@Override
-	public void updateSSComponent() {
+	public void updateComponent() {
 
 		// TODO: If CachedRowSet, BLOBs don't work. As a convenience could,
 		//		 grab a connection, find the primary keys, and read the BLOB.
@@ -375,35 +370,48 @@ public class SSImage extends JPanel implements SSComponentInterface
 
 	}
 
+	private Hook hook;
+
+	/** {@inheritDoc } */
+	@Override
+	public final Hook getSSComponentHook()
+	{
+		if (hook == null)
+			hook = new Hook(this) {
+				@Override
+				protected void updateSSComponent()
+				{
+					updateComponent();
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected SSImageListener getSSComponentListener() {
+					return new SSImageListener();
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void addSSComponentListener(EventListener eventListener)
+				{
+					getBtnUpdateImage().addActionListener((ActionListener) eventListener);
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void removeSSComponentListener(EventListener eventListener)
+				{
+					getBtnUpdateImage().removeActionListener((ActionListener) eventListener);
+				}
+			};
+		return hook;
+	}
+
 	/** {@inheritDoc} */
 	@Override
 	public String toString()
 	{
 		return sf("%s{file=%s, %s}", getClass().getSimpleName(),
 				path != null ? path.toString() : "", SSUtils.ssComponentToString(this));
-	}
-
-	/**
-	 * Returns ssCommon for the current Swingset component.
-	 *
-	 * @return common SwingSet component data and methods
-	 */
-    @Override
-	public SSCommon getSSCommon() {
-		if (ssCommon == null)
-			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
-		return ssCommon;
-	}
-
-	private SSCommon partialSSCommon;
-
-	/**
-	 * Either return a new create ssCommon or 
-	 * Only call from constructor; "ssCommon = finishSSCommon()".
-	 */
-	private SSCommon finishSSCommon() {
-		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
-		partialSSCommon = null;
-		return rv;
 	}
 }

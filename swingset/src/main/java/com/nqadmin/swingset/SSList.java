@@ -61,6 +61,7 @@ import javax.swing.event.ListSelectionListener;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.util.EventListener;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -70,7 +71,6 @@ import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSDbArrayModel;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.navigate.NavigateActions;
-import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -156,11 +156,6 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	private SSCollectionModel selectedDBModel;
 
 	/**
-	 * Common fields shared across SwingSet components
-	 */
-	private final SSCommon ssCommon;
-
-	/**
 	 * Creates an object of SSList with mapping type of {@code JDBCType.INTEGER}.
 	 */
 	public SSList() {
@@ -185,8 +180,10 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	 */
 	@SuppressWarnings("LeakingThisInConstructor")
 	public SSList(SSCollectionModel _collectionModel) {
-		ssCommon = finishSSCommon();
 		this.selectedDBModel = _collectionModel;
+
+		finishSSCommon();
+
 		// last line of constructor safe to access this
 		Model.install(this);
 
@@ -248,14 +245,6 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 		return Arrays.stream(getSelectedIndices())
 				.mapToObj((index) -> optionSwingModel.getOptions().get(index))
 				.collect(Collectors.toList());
-	}
-	
-	/**
-	 * {@inheritDoc }
-	 */
-	@Override
-	public SSListListener getSSComponentListener() {
-		return new SSListListener();
 	}
 
 	/**
@@ -385,6 +374,13 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 		//SwingUtilities.invokeLater(() -> this.hidePopup());
 	}
 
+	/** {@inheritDoc } */
+	@Override
+	public void cleanField()
+	{
+		clearSelection();
+	}
+
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
 	 * getBoundColumnText()
@@ -392,8 +388,7 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	 * Call to this method should be coming from SSCommon and should already have
 	 * the Component listener removed
 	 */
-	@Override
-	public void updateSSComponent() {
+	public void updateComponent() {
 
 		if (optionSwingModel == null) {
 			return;
@@ -406,7 +401,7 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 		//
 		try {
 			if (getRowSet().getRow() > 0) {
-			    array = selectedDBModel.readData(this);
+				array = selectedDBModel.readData(SSList.this);
 			}
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, () -> sf("%s: SQL Exception.", getColumnForLog()), se);
@@ -421,6 +416,44 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 		Object[] finalArray = array;
 		logger.log(DEBUG, () -> sf("%s: Updating component with array of %s.", getColumnForLog(), Arrays.toString(finalArray)));
 		setSelectedValues(finalArray);
+	}
+
+	private Hook hook;
+
+	/** {@inheritDoc } */
+	@Override
+	public final Hook getSSComponentHook()
+	{
+		if (hook == null)
+			hook = new Hook(this) {
+				@Override
+				protected void updateSSComponent()
+				{
+					updateComponent();
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected SSListListener getSSComponentListener() {
+					return new SSListListener();
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void addSSComponentListener(EventListener eventListener)
+				{
+					addListSelectionListener((ListSelectionListener) eventListener);
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void removeSSComponentListener(EventListener eventListener)
+				{
+					removeListSelectionListener((ListSelectionListener) eventListener);
+				}
+				
+			};
+		return hook;
 	}
 
 	/**
@@ -499,29 +532,5 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 	{
 		return sf("%s{items=%s, %s}", getClass().getSimpleName(),
 				getSelectedMappings(), SSUtils.ssComponentToString(this));
-	}
-
-	/**
-	 * Returns ssCommon for the current Swingset component.
-	 *
-	 * @return common SwingSet component data and methods
-	 */
-    @Override
-	public SSCommon getSSCommon() {
-		if (ssCommon == null)
-			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
-		return ssCommon;
-	}
-
-	private SSCommon partialSSCommon;
-
-	/**
-	 * Either return a new create ssCommon or 
-	 * Only call from constructor; "ssCommon = finishSSCommon()".
-	 */
-	private SSCommon finishSSCommon() {
-		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
-		partialSSCommon = null;
-		return rv;
 	}
 }

@@ -45,10 +45,10 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import java.lang.System.Logger;
+import java.util.EventListener;
 
 import static java.lang.System.Logger.Level.*;
 
-import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -95,15 +95,12 @@ public class SSLabel extends JLabel implements SSComponentInterface
 	/** Log4j Logger for component */
 	private static Logger logger = SSUtils.getLogger();
 
-	/** Common fields shared across SwingSet components */
-	private final SSCommon ssCommon;
-
 	/**
 	 * Empty constructor needed for deserialization. Creates a SSLabel instance with
 	 * no image and no text.
 	 */
 	public SSLabel() {
-		ssCommon = finishSSCommon();
+		finishSSCommon();
 	}
 
 	/**
@@ -113,7 +110,7 @@ public class SSLabel extends JLabel implements SSComponentInterface
 	 */
 	public SSLabel(final Icon _image) {
 		super(_image);
-		ssCommon = finishSSCommon();
+		finishSSCommon();
 	}
 
 	/**
@@ -124,7 +121,7 @@ public class SSLabel extends JLabel implements SSComponentInterface
 	 */
 	public SSLabel(final Icon _image, final int _horizontalAlignment) {
 		super(_image, _horizontalAlignment);
-		ssCommon = finishSSCommon();
+		finishSSCommon();
 	}
 
 	/**
@@ -140,26 +137,54 @@ public class SSLabel extends JLabel implements SSComponentInterface
 		bind(_rowSet, _boundColumnName);
 	}
 
-	/**
-	 * {@inheritDoc }
-	 */
+	/** {@inheritDoc } */
 	@Override
-	public SSLabelListener getSSComponentListener() {
-		return new SSLabelListener();
+	public void cleanField()
+	{
+		setText("");
 	}
 
-	/**
-	 * Updates the value stored and displayed in the SwingSet component based on
-	 * getBoundColumnText()
-	 * <p>
-	 * Call to this method should be coming from SSCommon and should already have
-	 * the Component listener removed
-	 */
+	private Hook hook;
+
+	/** {@inheritDoc } */
 	@Override
-	public void updateSSComponent() {
-		final String text = getBoundColumnText();
-		logger.log(DEBUG, ()->sf("%s: Setting label to %s.", getColumnForLog(), text));
-		setText(text);
+	public final Hook getSSComponentHook()
+	{
+		if (hook == null)
+			hook = new Hook(this) {
+				/**
+				 * Updates the value stored and displayed in the SwingSet
+				 * component based on getBoundColumnText()
+				 */
+				@Override
+				protected void updateSSComponent() {
+					final String text = getBoundColumnText();
+					logger.log(DEBUG, ()->sf("%s: Setting label to %s.", getColumnForLog(), text));
+					setText(text);
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected SSLabelListener getSSComponentListener() {
+					return new SSLabelListener();
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void addSSComponentListener(EventListener eventListener)
+				{
+					addPropertyChangeListener("text", ((PropertyChangeListener) eventListener));
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void removeSSComponentListener(EventListener eventListener)
+				{
+					removePropertyChangeListener("text", ((PropertyChangeListener) eventListener));
+				}
+				
+			};
+		return hook;
 	}
 
 	/** {@inheritDoc} */
@@ -168,29 +193,5 @@ public class SSLabel extends JLabel implements SSComponentInterface
 	{
 		return sf("%s{text=%s, %s}", getClass().getSimpleName(),
 				getText(), SSUtils.ssComponentToString(this));
-	}
-
-	/**
-	 * Returns ssCommon for the current Swingset component.
-	 *
-	 * @return common SwingSet component data and methods
-	 */
-    @Override
-	public SSCommon getSSCommon() {
-		if (ssCommon == null)
-			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
-		return ssCommon;
-	}
-
-	private SSCommon partialSSCommon;
-
-	/**
-	 * Either return a new create ssCommon or 
-	 * Only call from constructor; "ssCommon = finishSSCommon()".
-	 */
-	private SSCommon finishSSCommon() {
-		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
-		partialSSCommon = null;
-		return rv;
 	}
 } // end public class SSLabel extends JLabel {

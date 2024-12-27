@@ -69,9 +69,11 @@ import com.nqadmin.swingset.navigate.RowSetModificationEvent;
 
 /**
  * Interface with default methods shared by most SwingSet components.
+ * There are only a few methods that must be implemented.
  * <p>
  * Developer needs to insure that each implementation has an SSCommon data
  * member that is instantiated in the Component's constructor.
+ * {@link com.nqadmin.swingset.SSCheckBox} is a simple and small example.
  * <p>
  * IMPORTANT: Do not call {@link #updateSSComponent()} directly from 
  * SwingSet components unless you disable/enable the component listener.
@@ -79,29 +81,143 @@ import com.nqadmin.swingset.navigate.RowSetModificationEvent;
  */
 public interface SSComponentInterface extends RSC
 {
-	/**
-	 * Adds listener for RowSet to trigger update to SwingSet component.
-	 * <p>
-	 * IMPORTANT: All listeners related to binding should be added/removed
-	 * using getSSCommon().
-	 * 
-	 * @param _component SwingSet component for which RowSet listener should be added
+	/** Initialize component to an empty or default value.
+	 * Action could be conditioned on getAllowNull() or whatever.
 	 */
-	static void addRowSetListener(SSComponentInterface _component) {
-		_component.getSSCommon().addRowSetListener();
+	void cleanField();
+
+	/**
+	 * Return the {@linkplain Hook} used by SSCommon.
+	 * <p>
+	 * <b>Generally should not be used except by SSCommon</b>.
+	 * @return Hook
+	 */
+	Hook getSSComponentHook();
+	
+	/**
+	 * An SSComponent must create a Hook.
+	 * <p>
+	 * <b>Generally should not be used except by SSCommon</b>.
+	 */
+	abstract class Hook
+	{
+		private final SSComponentInterface ssComponent;
+
+		/**
+		 * Create.
+		 * @param ssComponent
+		 */
+		protected Hook(SSComponentInterface ssComponent)
+		{
+			this.ssComponent = ssComponent;
+		}
+
+		/**
+		 * Updates the value stored and displayed in the SwingSet component
+		 * based on the object obtained from getBoundColumnText().
+		 * Use {@code ssComponent.getSSCommon().updateSSComponent()}.
+		 * <p>
+		 * This method is invoked by SSCommon and insures removal (and subsequent
+		 * restoration) of the component's listener.
+		 */
+		protected abstract void updateSSComponent();
+
+		/**
+		 * Return the listener that should detect a change in value for the current
+		 * component.
+		 * <p>
+		 * IMPORTANT: A component will have exactly one listener for component
+		 * changes related to RowSet binding so this method will only be called
+		 * one time in the SSCommon constructor to obtain that listener.
+		 * <p>
+		 * Generally the developer will need to return an instance of an inner class
+		 * that implements the appropriate listener for the JComponent
+		 * involved (e.g., ItemListener for a class extending JCheckBox, ChangeListener
+		 * for a class extending JSlider, DocumentListener for a class extending
+		 * JTextField, etc.).
+		 * <p>
+		 * If the component is JTextComponent then the implementation can return
+		 * an instance of SSCommon.SSCommonDocumentListener().
+		 * <p>
+		 * A typical implementation might look like: {@code
+		 * 	return new SSCheckBoxListener();
+		 * }
+		 * 
+		 * OR (for a JTextComponent): {@code
+		 * 	return getSSCommon().getSSDocumentListener();
+		 * }
+		 * 
+		 * @return single change listener for the current SwingSet component to trigger RowSet update
+		 */
+		protected abstract EventListener getSSComponentListener();
+
+		/**
+		 * Method to add SSComponent listener. DO NOT CALL THIS METHOD DIRECTLY;
+		 * use {@code ssComponent.getSSCommon().addSSComponentListener()}.
+		 * <p>
+		 * IMPORTANT: All listeners related to binding should be added/removed
+		 * using getSSCommon().
+		 * 
+		 * @param eventListener 
+		 */
+		protected abstract void addSSComponentListener(EventListener eventListener);
+
+		/**
+		 * Method to remove SSComponent listener. DO NOT CALL THIS METHOD DIRECTLY;
+		 * use {@code ssComponent.getSSCommon().removeSSComponentListener()}.
+		 * <p>
+		 * IMPORTANT: All listeners related to binding should be added/removed
+		 * using getSSCommon().
+		 * 
+		 * @param eventListener
+		 */
+		protected abstract void removeSSComponentListener(EventListener eventListener);
+
+		private SSCommon ssCommon;
+		/**
+		 * Returns ssCommon for the current Swingset component.
+		 *
+		 * @return common SwingSet component data and methods
+		 */
+		protected final SSCommon getSSCommon() {
+			if (ssCommon == null)
+				return ssCommon = SSCommon.createStart(ssComponent);
+			return ssCommon;
+		}
+
+		/**
+		 * This should be invoked as the last statement
+		 * in the SSComponent's constructor, but before bind.
+		 */
+		protected final void finishSSCommon() {
+			ssCommon = SSCommon.createFinish(ssComponent, ssCommon);
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////
+	//
+	// The methods beyond this point have default implementations.
+	// Typically, they are convenience methods that bounce to SSCommon
+	// and they should NOT be overridden.
+	//
+
+	/**
+	 * Returns the SSCommon associated with this Swingset component.
+	 *
+	 * @return common SwingSet component data and methods
+	 */
+	default SSCommon getSSCommon() {
+		return getSSComponentHook().getSSCommon();
 	}
 
 	/**
-	 * Adds listener for SwingSet component to trigger update to RowSet.
-	 * <p>
-	 * IMPORTANT: All listeners related to binding should be added/removed
-	 * using getSSCommon().
-	 * 
-	 * @param _component SwingSet component for which value change listener should be added
+	 * This should be invoked as the last statement
+	 * in the SSComponent's constructor, but before bind.
 	 */
-	static void addSSComponentListener(SSComponentInterface _component) {
-		_component.getSSCommon().addSSComponentListener();
+	default void finishSSCommon() {
+		getSSComponentHook().finishSSCommon();
 	}
+
 
 	/** Invoked during bind, component should verify that jdbcType is ok.
 	 * @param jdbcType column JDBCType
@@ -121,8 +237,8 @@ public interface SSComponentInterface extends RSC
 	 * @param _rowSet datasource to be used.
 	 * @param _boundColumnName Name of the column to which this check box should be bound
 	 */
-	default void bind(final RowSet _rowSet, final String _boundColumnName) {
-			// throws java.sql.SQLException {
+	default void bind(final RowSet _rowSet, final String _boundColumnName)
+	{
 		try {
 			checkColumnType(RowSetOps.getJDBCColumnType(_rowSet, _boundColumnName));
 		} catch (SQLException ex) {
@@ -250,19 +366,6 @@ public interface SSComponentInterface extends RSC
 	}
 
 	/**
-	 * Returns the ssCommon data member of the Swingset component.
-	 * <p>
-	 * A typical implementation might look like: {@code
-	 *	if (ssCommon == null)
-	 *		return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
-	 * 	return ssCommon;
-	 * }
-	 *
-	 * @return shared/common SwingSet component data and methods
-	 */
-	SSCommon getSSCommon();
-
-	/**
 	 * Returns the Connection to the database.
 	 *
 	 * @return the connection
@@ -279,84 +382,6 @@ public interface SSComponentInterface extends RSC
 	@Override
 	default RowSet getRowSet() {
 		return getSSCommon().getRowSet();
-	}
-	
-	/**
-	 * Return the listener that should detect a change in value for the current
-	 * component.
-	 * <p>
-	 * IMPORTANT: A component will have exactly one listener for component
-	 * changes related to RowSet binding so this method will only be called
-	 * one time in the SSCommon constructor to obtain that listener.
-	 * <p>
-	 * Generally the developer will need to return an instance of an inner class
-	 * that implements the appropriate listener for the JComponent
-	 * involved (e.g., ItemListener for a class extending JCheckBox, ChangeListener
-	 * for a class extending JSlider, DocumentListener for a class extending
-	 * JTextField, etc.).
-	 * <p>
-	 * If the component is JTextComponent then the implementation can return
-	 * an instance of SSCommon.SSCommonDocumentListener().
-	 * <p>
-	 * A typical implementation might look like: {@code
-	 * 	return new SSCheckBoxListener();
-	 * }
-	 * 
-	 * OR (for a JTextComponent): {@code
-	 * 	return getSSCommon().getSSDocumentListener();
-	 * }
-	 * 
-	 * @return single change listener for the current SwingSet component to trigger RowSet update
-	 */
-	EventListener getSSComponentListener();
-	
-	/**
-	 * Indicates if the components RowSet listener is added/enabled.
-	 * 
-	 * @param _component SwingSet component to be checked for a RowSet listener
-	 *
-	 * @return true if the component's RowSet listener is added/enabled, otherwise false
-	 */
-	static boolean isRowSetListenerAdded(SSComponentInterface _component) {
-		return _component.getSSCommon().isRowSetListenerAdded();
-	}
-
-	/**
-	 * Indicates if the components value change listener is currently added/enabled.
-	 * <p>
-	 * IMPORTANT: All listeners related to binding should be added/removed
-	 * using getSSCommon().
-	 * 
-	 * @param _component SwingSet component to be checked for a value change listener
-	 * 
-	 * @return true if the component's value change listener is added/enabled, otherwise false
-	 */
-	static boolean isSSComponentListenerAdded(SSComponentInterface _component) {
-		return _component.getSSCommon().isSSComponentListenerAdded();
-	}
-
-	/**
-	 * Removes listener for RowSet to trigger update to SwingSet component.
-	 * <p>
-	 * IMPORTANT: All listeners related to binding should be added/removed
-	 * using getSSCommon().
-	 * 
-	 * @param _component SwingSet component for which RowSet listener should be removed
-	 */
-	static void removeRowSetListener(SSComponentInterface _component) {
-		_component.getSSCommon().removeRowSetListener();
-	}
-
-	/**
-	 * Removes listener for SwingSet component to trigger update to RowSet.
-	 * <p>
-	 * IMPORTANT: All listeners related to binding should be added/removed
-	 * using getSSCommon().
-	 * 
-	 * @param _component SwingSet component for which value change listener should be removed
-	 */
-	static void removeSSComponentListener(SSComponentInterface _component) {
-		_component.getSSCommon().removeSSComponentListener();
 	}
 
 	/**
@@ -452,15 +477,6 @@ public interface SSComponentInterface extends RSC
 	default void setConnection(final Connection _connection) {
 		getSSCommon().setConnection(_connection);
 	}
-
-	/**
-	 * Updates the value stored and displayed in the SwingSet component based on
-	 * getBoundColumnText().
-	 * <p>
-	 * IMPORTANT. Any call to this method should be coming from SSCommon to insure
-	 * removal (and subsequent restoration) of the component's value change listener.
-	 */
-	void updateSSComponent();
 
 	/** {@inheritDoc} */
 	default boolean checkRowOK() {

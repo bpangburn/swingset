@@ -122,6 +122,15 @@ public class ConvertTypeTest
 				JDBCType.TIMESTAMP, java.sql.Time.class, allow));
 		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
 				JDBCType.TIMESTAMP, java.sql.Timestamp.class, allow));
+
+		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
+				JDBCType.DATE, LocalDate.class, allow));
+		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
+				JDBCType.TIME, LocalTime.class, allow));
+		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
+				JDBCType.TIMESTAMP, LocalDateTime.class, allow));
+		assertDoesNotThrow(()->ConvertType.assertConvertFromJdbcType(
+				JDBCType.DATE, LocalDateTime.class, allow));
 	}
 
 	/** x
@@ -198,7 +207,7 @@ public class ConvertTypeTest
 	@SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
 	public void testConvertObjectType_Object_JDBCType() throws Exception
 	{
-		System.out.println("convertObjectType");
+		System.out.println("convertObjectType_JDBCType");
 		Object rv;
 
 		LocalDateTime ldt = LocalDateTime.of(2111, 11, 11, 11, 11, 11);
@@ -295,22 +304,65 @@ public class ConvertTypeTest
 		assertEquals(t, rv);
 	}
 
-	//
-	// TODO: the other date conversions to non-jdbc things
+	/**
+	 * Test of convertObjectType method, of class ConvertType.
+	 * @throws java.lang.Exception
+	 */
+	@Test
+	@SuppressWarnings("ThrowableResultIgnored")
+	public void testConvertObjectType_Object_Class() throws Exception
+	{
+		System.out.println("convertObjectType_Class");
+		Object rv;
 
-	// /**
-	//  * Test of convertObjectType method, of class ConvertType.
-	//  */
-	// @Test
-	// public void testConvertObjectType_Object_Class() throws Exception
-	// {
-	// 	System.out.println("convertObjectType");
-	// 	Object expResult = null;
-	// 	Object result = ConvertType.convertObjectType(null);
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+		LocalDateTime ldt = LocalDateTime.of(2111, 11, 11, 11, 11, 11);
+		LocalDate ld = LocalDate.of(2111, 11, 11);
+		LocalTime lt = LocalTime.of(11, 11, 11);
+
+		java.sql.Timestamp ts = Timestamp.valueOf(ldt);
+		java.sql.Date d = java.sql.Date.valueOf(ld);
+		java.sql.Time t = java.sql.Time.valueOf(lt);
+
+		// Date ud = new java.util.Date(ts.getTime());
+
+		// to LocalDateTime
+		rv = convertObjectType(ts, LocalDateTime.class);
+		assertEquals(LocalDateTime.class, rv.getClass());
+		assertEquals(ldt, rv);
+
+		rv = convertObjectType(d, LocalDateTime.class);
+		assertEquals(LocalDateTime.class, rv.getClass());
+		assertEquals(ld.atStartOfDay(), rv);
+
+		assertThrows(SSSQLConversionException.class,
+				()->convertObjectType(t, LocalDateTime.class));
+
+
+		// to LocalDate
+		// TODO???
+		assertThrows(SSSQLConversionException.class,
+				()->convertObjectType(ts, LocalDate.class));
+
+		rv = convertObjectType(d, LocalDate.class);
+		assertEquals(LocalDate.class, rv.getClass());
+		assertEquals(ld, rv);
+
+		assertThrows(SSSQLConversionException.class,
+				()->convertObjectType(t, LocalDate.class));
+
+
+		// to LocalTime
+		// TODO???
+		assertThrows(SSSQLConversionException.class,
+				()->convertObjectType(ts, LocalTime.class));
+
+		assertThrows(SSSQLConversionException.class,
+				()->convertObjectType(d, LocalTime.class));
+
+		rv = convertObjectType(t, LocalTime.class);
+		assertEquals(LocalTime.class, rv.getClass());
+		assertEquals(lt, rv);
+	}
 
 
 

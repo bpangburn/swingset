@@ -49,10 +49,7 @@ import java.awt.event.ActionEvent;
 
 import com.nqadmin.swingset.decorators.BorderDecorator;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeListener;
 import java.sql.Connection;
 import java.sql.JDBCType;
 import java.sql.SQLException;
@@ -73,10 +70,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
@@ -90,17 +85,10 @@ import java.util.function.Supplier;
 
 import static java.lang.System.Logger.Level.*;
 
-import com.nqadmin.swingset.SSBaseComboBox;
-import com.nqadmin.swingset.SSCheckBox;
-import com.nqadmin.swingset.SSImage;
-import com.nqadmin.swingset.SSLabel;
-import com.nqadmin.swingset.SSList;
-import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.datasources.SSSQLInternalException;
 import com.nqadmin.swingset.datasources.SSSQLNullException;
-import com.nqadmin.swingset.formatting.SSFormattedTextField;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.formatting.SSFormat;
@@ -157,12 +145,8 @@ public class SSCommon
 	 * @param partialSSCommon if non null return it
 	 * @return partially constructed ssCommon
 	 */
-	public static SSCommon createStart(SSComponentInterface ssComponent,
-									   SSCommon partialSSCommon) {
-		if (partialSSCommon != null && ssComponent != partialSSCommon.ssComponent)
-			throw new IllegalArgumentException("ssComponent mismatch");
-		return partialSSCommon == null ? new SSCommon(ssComponent, false)
-										: partialSSCommon;
+	static SSCommon createStart(SSComponentInterface ssComponent) {
+		return new SSCommon(ssComponent, false);
 	}
 
 	/**
@@ -178,8 +162,8 @@ public class SSCommon
 	 * @param partialSSCommon if non null finish it's construction
 	 * @return fully constructed SSCommon
 	 */
-	public static SSCommon createFinish(SSComponentInterface ssComponent,
-										SSCommon partialSSCommon) {
+	static SSCommon createFinish(SSComponentInterface ssComponent,
+								 SSCommon partialSSCommon) {
 		if (partialSSCommon != null && ssComponent != partialSSCommon.ssComponent)
 			throw new IllegalArgumentException("ssComponent mismatch");
 		return partialSSCommon == null ? new SSCommon(ssComponent, true)
@@ -255,16 +239,11 @@ public class SSCommon
 						ok = setBoundColumnText(text);
 					} finally {
 						if (!ok) {
-							// TODO:
-							// How about moving a state tracking variable to
-							// add/removeSSDocumentListener()?
-							// addSSDocumentListener() then uses listenerNeedsRestoration.
-
 							// restore previous text value
 							if(previousValue != null) {
 								if (ssComponentListenerAdded) {
 									// avoid generating events while restoring text
-									removeSSDocumentListener();
+									removeSSComponentListener();
 									listenerNeedsRestoration = true;
 								}
 								try {
@@ -273,7 +252,7 @@ public class SSCommon
 								} finally {
 									if (listenerNeedsRestoration) {
 										listenerNeedsRestoration = false;
-										addSSDocumentListener();
+										addSSComponentListener();
 									}
 								}
 							}
@@ -443,9 +422,7 @@ public class SSCommon
 
 	} // end protected class SSRowSetListener
 
-	/**
-	 * Log4j Logger for component
-	 */
+	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
 
 	/**
@@ -545,7 +522,7 @@ public class SSCommon
 	 *
 	 * @param ssComponent SwingSet component having this SSCommon instance as a
 	 *                     datamember
-	 * @param finishInit when false, the user must call 
+	 * @param finishInit if false, the SSComponent still needs to call finishSSCommon.
 	 */
 	private SSCommon(SSComponentInterface ssComponent, boolean finishInit) {
 		this.ssComponent = ssComponent;
@@ -556,18 +533,36 @@ public class SSCommon
 	}
 
 	//
-	// TODO: long term get rid of this half init stuff. Maybe a builder...
+	// TODO: long term get rid of this half init stuff. Maybe a builder...???
 	//
 
 	/** Can use this to error if doing something that required fully constructed. */
-	private boolean didFinishInit;
+	private boolean isFullyInitialized;
+
+	/**
+	 * Check if this SSCommon is initialized.
+	 * Throw {@linkplain IllegalStateException} if not ready for prime time.
+	 */
+	public void verifyInitialized() {
+		if (!isFullyInitialized)
+			throw new IllegalStateException("Missing SSComponent's finishSSCommon");
+	}
+
+	/**
+	 * Check if this SSCommon is initialized.
+	 * Throw {@linkplain IllegalStateException} if not ready for prime time.
+	 * @return
+	 */
+	public boolean isInitialized() {
+		return isFullyInitialized;
+	}
 
 	/**
 	 * Finish the initialization, used if "half" construction.
 	 */
 	private SSCommon finishInit() {
-		if (!didFinishInit) {
-			didFinishInit = true;
+		if (!isFullyInitialized) {
+			isFullyInitialized = true;
 			initDecorator();
 			init();
 		}
@@ -603,19 +598,21 @@ public class SSCommon
 			}
 		});
 	}
-
+	
 	/**
-	 * Method to add a document listener when the SwingSet component is a
-	 * JTextComponent.
+	 * Indicates if the components RowSet listener is added/enabled
+	 *
+	 * @return true if the components RowSet listener is added/enabled, otherwise false
 	 */
-	private void addSSDocumentListener() {
-		((JTextComponent) getSSComponent()).getDocument().addDocumentListener((SSDocumentListener)eventListener);
+	public final boolean isRowSetListenerAdded() {
+		return rowSetListenerAdded;
 	}
 
 	/**
 	 * Method to add the RowSet listener.
 	 */
-	public void addRowSetListener() {
+	public void addRowSetListener()
+	{
 		if (rowSetListener==null) {
 			rowSetListener = new SSRowSetListener();
 		}
@@ -625,6 +622,29 @@ public class SSCommon
 			logger.log(DEBUG, () -> sf("%s - RowSet Listener added.", getColumnForLog()));
 		}
 	}
+
+	/**
+	 * Method to remove the RowSet listener.
+	 */
+	public final void removeRowSetListener()
+	{
+		// rowSetListenerAdded==true indicates that rowset is not null, and we
+		// do not let the user call setRowSet(null), so not checking
+		if (rowSetListenerAdded) {
+			rowSet.removeRowSetListener(rowSetListener);
+			rowSetListenerAdded = false;
+			logger.log(DEBUG, () -> sf("%s - RowSet Listener removed.", getColumnForLog()));
+		}
+	}
+
+	/**
+	 * Indicates if the components value change listener is currently added/enabled
+	 *
+	 * @return true if the components value change listener is added/enabled, otherwise false
+	 */
+	public final boolean isSSComponentListenerAdded() {
+		return ssComponentListenerAdded;
+	}
 	
 	/**
 	 * Method to add any SwingSet Component listener(s).
@@ -633,42 +653,40 @@ public class SSCommon
 	// TODO: Create SSComponent.addListener()/removeListener.
 	//       Then get rid of this switch statement.
 	//
-	public final void addSSComponentListener() {
-		
+	public final void addSSComponentListener()
+	{
 		// Probably should not have a null eventListener here, but just in case
 		if (eventListener==null) {
 			return;
 		}
+		verifyInitialized();
 		
 		if (!ssComponentListenerAdded) {
-			
+			getSSComponent().getSSComponentHook().addSSComponentListener(eventListener);
 			ssComponentListenerAdded = true;
-			/* JDK-21 and preview for "_" */
-			switch(ssComponent) {
-			case SSCheckBox c -> c.addItemListener((ItemListener) eventListener);
-			case SSBaseComboBox<?,?,?> c -> c.addActionListener((ActionListener) eventListener);
-			case SSImage c -> c.getBtnUpdateImage().addActionListener((ActionListener) eventListener);
-			case SSLabel c -> c.addPropertyChangeListener("text", ((PropertyChangeListener) eventListener));
-			case SSList c -> c.addListSelectionListener((ListSelectionListener) eventListener);
-			case SSSlider c -> c.addChangeListener((ChangeListener) eventListener);
-			case SSFormattedTextField c -> c.addPropertyChangeListener("value", ((PropertyChangeListener) eventListener));
-			case JTextComponent x -> addSSDocumentListener();
-
-			default -> {
-				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
-				String message = sf("%s - Encountered unknown Component Event Listener for: %s. Unable to add component listener.",
-						getColumnForLog(), ssComponent.getClass().getSimpleName());
-				logger.log(ERROR, message);
-				JOptionPane.showMessageDialog((JComponent)getSSComponent(), message, "Unknown Component Event Listener", JOptionPane.ERROR_MESSAGE);
-				
-				// INDICATE FAILURE TO ADD LISTENER
-				ssComponentListenerAdded = false;
-			}
-			}
 		}
-
 		if (ssComponentListenerAdded) {
 			logger.log(DEBUG, () -> sf("%s - Component Listener added.", getColumnForLog()));
+		}
+	}
+	
+	/**
+	 * Method to add any SwingSet Component listener(s).
+	 */
+	public final void removeSSComponentListener()
+	{
+		// Probably should not have a null eventListener here, but just in case
+		if (eventListener==null) {
+			return;
+		}
+		verifyInitialized();
+		
+		if (ssComponentListenerAdded) {
+			ssComponentListenerAdded = false;
+			getSSComponent().getSSComponentHook().removeSSComponentListener(eventListener);
+		}
+		if (!ssComponentListenerAdded) {
+			logger.log(DEBUG, () -> sf("%s - Component Listener removed.", getColumnForLog()));
 		}
 	}
 
@@ -676,10 +694,11 @@ public class SSCommon
 	/**
 	 * Updates the SSComponent with a valid RowSet and Column (Name or Index)
 	 */
-	private void bind() {
-		
+	private void bind()
+	{
+		verifyInitialized();
 		if (eventListener==null) {
-			eventListener = getSSComponent().getSSComponentListener();
+			eventListener = getSSComponent().getSSComponentHook().getSSComponentListener();
 		}
 
 		// By default, if bind fails or database error,
@@ -723,7 +742,9 @@ public class SSCommon
 	 * @param _boundColumnIndex index of the column to which this check box should
 	 *                          be bound
 	 */
-	public void bind(final RowSet _rowSet, final int _boundColumnIndex) {// throws java.sql.SQLException {
+	public void bind(final RowSet _rowSet, final int _boundColumnIndex)
+	{
+		verifyInitialized();
 		// INDICATE THAT WE'RE UPDATING THE BINDINGS
 		inBinding = true;
 		try {
@@ -755,7 +776,7 @@ public class SSCommon
 	 *                         bound
 	 */
 	public void bind(final RowSet _rowSet, final String _boundColumnName)
-	{ // throws java.sql.SQLException {
+	{
 		try {
 			bind(_rowSet, RowSetOps.getColumnIndex(_rowSet, _boundColumnName));
 		} catch (final SQLException se) {
@@ -955,85 +976,6 @@ public class SSCommon
 		getSSComponent().configureTraversalKeys();
 		getSSComponent().setupUndoRedoKeys();
 		getSSComponent().customInit();
-	}
-	
-	/**
-	 * Indicates if the components RowSet listener is added/enabled
-	 *
-	 * @return true if the components RowSet listener is added/enabled, otherwise false
-	 */
-	public final boolean isRowSetListenerAdded() {
-		return rowSetListenerAdded;
-	}
-
-	/**
-	 * Indicates if the components value change listener is currently added/enabled
-	 *
-	 * @return true if the components value change listener is added/enabled, otherwise false
-	 */
-	public final boolean isSSComponentListenerAdded() {
-		return ssComponentListenerAdded;
-	}
-	
-	/**
-	 * Method to add any SwingSet Component listener(s).
-	 */
-	public final void removeSSComponentListener() {
-		
-		// Probably should not have a null eventListener here, but just in case
-		if (eventListener==null) {
-			return;
-		}
-		
-		if (ssComponentListenerAdded) {
-			
-			ssComponentListenerAdded = false;
-			/* JDK-21 and preview for "_" */
-			switch(ssComponent) {
-			case SSCheckBox c -> c.removeItemListener((ItemListener) eventListener);
-			case SSBaseComboBox<?,?,?> c -> c.removeActionListener((ActionListener) eventListener);
-			case SSImage c -> c.getBtnUpdateImage().removeActionListener((ActionListener) eventListener);
-			case SSLabel c -> c.removePropertyChangeListener("text", ((PropertyChangeListener) eventListener));
-			case SSList c -> c.removeListSelectionListener((ListSelectionListener) eventListener);
-			case SSSlider c -> c.removeChangeListener((ChangeListener) eventListener);
-			case SSFormattedTextField c -> c.removePropertyChangeListener("value", ((PropertyChangeListener) eventListener));
-			case JTextComponent x -> removeSSDocumentListener();
-			default -> {
-				// DIPLAY WARNING FOR UNKNOWN EVENT LISTENER
-				String message = sf("%s - Encountered unknown Component Event Listener for: %s. Unable to remove component listener.",
-						getColumnForLog(), ssComponent.getClass().getSimpleName());
-				logger.log(ERROR, message);
-				JOptionPane.showMessageDialog((JComponent)getSSComponent(), message, "Unknown Component Event Listener", JOptionPane.ERROR_MESSAGE);
-				
-				// INDICATE FAILURE TO REMOVE LISTENER
-				ssComponentListenerAdded = true;
-			}
-			}
-		}
-		if (!ssComponentListenerAdded) {
-			logger.log(DEBUG, () -> sf("%s - Component Listener removed.", getColumnForLog()));
-		}
-	}
-
-	/**
-	 * Method to remove a Document listener when the SwingSet component is a
-	 * JTextComponent.
-	 */
-	private void removeSSDocumentListener() {
-		((JTextComponent) getSSComponent()).getDocument().removeDocumentListener((SSDocumentListener)eventListener);
-	}
-
-	/**
-	 * Method to remove the RowSet listener.
-	 */
-	public final void removeRowSetListener() {
-		// rowSetListenerAdded==true indicates that rowset is not null and we do not let the user call setRowSet(null), so not checking
-		// rowSetListenerAdded==true indicates that rowSetListener is not null, so not checking
-		if (rowSetListenerAdded) {
-			rowSet.removeRowSetListener(rowSetListener);
-			rowSetListenerAdded = false;
-			logger.log(DEBUG, () -> sf("%s - RowSet Listener removed.", getColumnForLog()));
-		}
 	}
 
 	/**
@@ -1411,9 +1353,10 @@ public class SSCommon
 		// a listener is likely not handled properly.
 		// Maybe incorporate SwingUtilities.invokeLater()? 
 		logger.log(TRACE, () -> sf("Updating component %s.", getColumnForLog()));
+		verifyInitialized();
 		
 		removeSSComponentListener();
-		ssComponent.updateSSComponent();
+		ssComponent.getSSComponentHook().updateSSComponent();
 		addSSComponentListener();
 		decorate();
 	}

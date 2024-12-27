@@ -50,10 +50,12 @@ import javax.swing.JTextField;
 import javax.swing.text.Document;
 
 import java.lang.System.Logger;
+import java.util.EventListener;
 
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.utils.SSCommon;
+import com.nqadmin.swingset.utils.SSCommon.SSDocumentListener;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -73,11 +75,6 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 
 	/** Logger for component */
 	private static Logger logger = SSUtils.getLogger();
-
-	/**
-	 * Common fields shared across SwingSet components
-	 */
-	private final SSCommon ssCommon;
 
 	/**
 	 * Constructs a new, empty text field.
@@ -108,7 +105,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	/** All the constructors feed through here */
 	private SSTextField(String _text, final RowSet _rowSet, final String _boundColumnName) {
 		super(_text);
-		ssCommon = finishSSCommon();
+		finishSSCommon();
 		if (_rowSet != null) {
 			bind(_rowSet, _boundColumnName);
 		}
@@ -141,27 +138,55 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 		});
 	}
 
-	/**
-	 * {@inheritDoc }
-	 */
+	/** {@inheritDoc } */
 	@Override
-	public SSCommon.SSDocumentListener getSSComponentListener() {
-		return getSSCommon().getSSDocumentListener();
+	public void cleanField()
+	{
+		setText("");
 	}
 
-	/**
-	 * Updates the value stored and displayed in the SwingSet component based on
-	 * getBoundColumnText()
-	 * <p>
-	 * Call to this method should be coming from SSCommon and should already have
-	 * the Component listener removed
-	 */
-	@Override
-	public void updateSSComponent() {
+	private Hook hook;
 
-		final String text = getBoundColumnText();
-		logger.log(DEBUG, ()->sf("%s: Setting text field to %s.", getColumnForLog(), text));
-		setText(text);
+	/** {@inheritDoc } */
+	@Override
+	public final Hook getSSComponentHook()
+	{
+		if (hook == null)
+			hook = new Hook(this) {
+				/**
+				 * Updates the value stored and displayed in the SwingSet
+				 * component based on getBoundColumnText()
+				 */
+				@Override
+				protected void updateSSComponent() {
+					
+					final String text = getBoundColumnText();
+					logger.log(DEBUG, ()->sf("%s: Setting text field to %s.", getColumnForLog(), text));
+					setText(text);
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected SSCommon.SSDocumentListener getSSComponentListener() {
+					return getSSCommon().getSSDocumentListener();
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void addSSComponentListener(EventListener eventListener)
+				{
+					getDocument().addDocumentListener((SSDocumentListener)eventListener);
+				}
+				
+				/** {@inheritDoc } */
+				@Override
+				protected void removeSSComponentListener(EventListener eventListener)
+				{
+					getDocument().removeDocumentListener((SSDocumentListener)eventListener);
+				}
+				
+			};
+		return hook;
 	}
 
 	/** {@inheritDoc} */
@@ -172,32 +197,4 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 				getText(), SSUtils.ssComponentToString(this));
 	}
 
-	/**
-	 * Returns ssCommon for the current Swingset component.
-	 *
-	 * @return common SwingSet component data and methods
-	 */
-    @Override
-	public SSCommon getSSCommon() {
-		if (ssCommon == null)
-			return partialSSCommon = SSCommon.createStart(this, partialSSCommon);
-		return ssCommon;
-	}
-
-	//
-	// TODO: long term get rid of this half init stuff. Maybe a builder...
-	// NOTE: this variable could be used in methods that require a fully
-	//		 constructed SSCommon for error checking.
-	//
-	private SSCommon partialSSCommon;
-
-	/**
-	 * Either return a new create ssCommon or 
-	 * Only call from constructor; "ssCommon = finishSSCommon()".
-	 */
-	private SSCommon finishSSCommon() {
-		SSCommon rv = SSCommon.createFinish(this, partialSSCommon);
-		partialSSCommon = null;
-		return rv;
-	}
 } // end public class SSTextField extends JTextField {

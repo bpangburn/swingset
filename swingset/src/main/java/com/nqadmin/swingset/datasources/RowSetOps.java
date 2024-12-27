@@ -793,31 +793,32 @@ public class RowSetOps {
 	 * to the database.
 	 *
 	 * @param comp The SSComponent doing the update
-	 * @param _updatedValue value to write to underlying RowSet column
+	 * @param updatedValue value to write to underlying RowSet column
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	public static void updateColumnObject(final SSComponentInterface comp, final Object _updatedValue) throws SSSQLNullException, SQLException, NumberFormatException
+	public static void updateColumnObject(SSComponentInterface comp, Object updatedValue)
+			throws SSSQLNullException, SQLException, NumberFormatException
 	{
-		if (_updatedValue instanceof String s) {
+		if (updatedValue instanceof String s) {
 			// This method doesn't have all the string checks,
 			// use updateColumnText if String Object.
 			updateColumnText(comp, s);
 			return;
 		}
-		final RowSet _rowSet = comp.getRowSet();
-		final int _columnIndex = comp.getBoundColumnIndex();
-		boolean _allowNull = comp.getAllowNull();
-		logger.log(DEBUG,  comp.getColumnForLog() + " Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
+		final RowSet rowSet = comp.getRowSet();
+		final int columnIndex = comp.getBoundColumnIndex();
+		boolean allowNull = comp.getAllowNull();
+		logger.log(DEBUG,  comp.getColumnForLog() + " Update to: " + updatedValue + ". Allow null? [" + allowNull + "]");
 
 		NavigateActions.captureInitialValue(comp); // undo/redo
 
 		boolean did_update = false;
 		try {
 			// On insert row, write null and do not perform other checks.
-			if (_updatedValue == null) {
-				if (RowSetState.isInserting(_rowSet) || _allowNull) {
-					_rowSet.updateNull(_columnIndex);
+			if (updatedValue == null) {
+				if (RowSetState.isInserting(rowSet) || allowNull) {
+					rowSet.updateNull(columnIndex);
 					did_update = true;
 					return;
 				} else
@@ -835,17 +836,17 @@ public class RowSetOps {
 			// TODO: It's weird that updateObject(idx,obj,type) javadoc says
 			//		 "type to be sent to the database". Does that mean the specified
 			//		 conversions for setObject kick in at that point?
-			Object obj = convertObjectType(_updatedValue, jdbcType);
-			updateColumnObjectDirect(_rowSet, _columnIndex, obj, jdbcType);
+			Object obj = convertObjectType(updatedValue, jdbcType);
+			updateColumnObjectDirect(rowSet, columnIndex, obj, jdbcType);
 			did_update = true;
 		} finally {
 			if (did_update)
-				postRowSetModified(comp, _updatedValue);
+				postRowSetModified(comp, updatedValue);
 		}
 	}
 
-	/** Use this to force "n" acceptChanges conflicts after modifying
-	 * a character column in the database.
+	/** DEBUG ASSIST: Use this to force "n" acceptChanges conflicts after
+	 * modifying a character column in the database.
 	 * Only works with CachedRowSet and after
 	 * {@linkplain #updateColumnText(com.nqadmin.swingset.utils.SSComponentInterface, java.lang.String)}.
 	 */

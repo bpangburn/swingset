@@ -179,6 +179,19 @@ public class ConvertType
 			case DATE, TIME -> true;
 			default -> false;
 		};
+		case LOCALDATE -> switch (sourceJDBC) {
+			case DATE -> true;
+			default -> false;
+		};
+		case LOCALTIME -> switch (sourceJDBC) {
+			case TIME -> true;
+			default -> false;
+		};
+		case LOCALDATETIME -> switch (sourceJDBC) {
+			case TIMESTAMP -> true;
+			case DATE -> true;
+			default -> false;
+		};
 		default -> false;
 		};
 	}
@@ -458,16 +471,6 @@ public class ConvertType
 			}
 			}
 		}
-		case LOCALDATE -> {
-			switch(source) {
-			case DATE -> { return ((java.sql.Date)sourceValue).toLocalDate(); }
-			}
-		}
-		case LOCALTIME -> {
-			switch(source) {
-			case TIME -> { return ((java.sql.Time)sourceValue).toLocalTime(); }
-			}
-		}
 		case LOCALDATETIME -> {
 			switch(source) {
 			case TIMESTAMP -> {
@@ -479,6 +482,18 @@ public class ConvertType
 			// case TIME -> {
 			// 	LocalTime lt = ((java.sql.Time)sourceValue).toLocalTime()...;
 			// }
+		}
+		case LOCALDATE -> {
+			switch(source) {
+			//case TIMESTAMP -> { } ???
+			case DATE -> { return ((java.sql.Date)sourceValue).toLocalDate(); }
+			}
+		}
+		case LOCALTIME -> {
+			switch(source) {
+			//case TIMESTAMP -> { } ???
+			case TIME -> { return ((java.sql.Time)sourceValue).toLocalTime(); }
+			}
 		} }
 		return CanNotConvert;
 	}
