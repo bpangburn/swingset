@@ -43,6 +43,7 @@
 package com.nqadmin.swingset.utils;
 
 import java.awt.AWTKeyStroke;
+import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 
@@ -83,6 +84,8 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.nio.file.Path;
 import java.util.function.Supplier;
 
 import static java.lang.System.Logger.Level.*;
@@ -1247,6 +1250,35 @@ public class SSCommon
 		JOptionPane.showMessageDialog((JComponent)getSSComponent(),
 				"Please add a row before entering data.",
 				"", JOptionPane.WARNING_MESSAGE);
+	}
+
+	/**
+	 * Report problem accessing image file to user.
+	 * @param title dialog title
+	 * @param path file path
+	 * @param ex error
+	 */
+	public void reportError(String title, Path path, Exception ex)
+	{
+		String pathName = path != null ? path.toAbsolutePath().toString() : "";
+		logger.log(Level.ERROR, () -> sf("%s: IO Exception %s: file %s: %s",
+				getColumnForLog(), ex.getClass().getSimpleName(),
+				pathName, ex.getMessage()));
+
+		// TODO: Alter message according to parameters.
+		//		 For example, if path is null, leave out "file: 'xxx'"
+
+		String msg = sf("<html>"
+				+ "<center>%s</center>"
+				+ "<br/>Details:<br/>"
+				+ "<center>DB column: %s</center>"
+				+ "<center>File: '%s'</center>"
+				+ "<center>Exception: %s</center>",
+				ex.getLocalizedMessage(), getColumnForLog(),
+				pathName, ex.getClass().getSimpleName()
+		);
+		JOptionPane.showMessageDialog((Component)getSSComponent(), msg,
+				title, JOptionPane.ERROR_MESSAGE);
 	}
 
 	/**

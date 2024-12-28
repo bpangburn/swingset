@@ -44,8 +44,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -60,6 +58,11 @@ import javax.swing.ScrollPaneConstants;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.EnumSet;
 
 import javax.swing.JComponent;
 import javax.swing.border.Border;
@@ -75,6 +78,7 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.nio.file.StandardOpenOption.READ;
 
 // SSImage.java
 //
@@ -88,7 +92,7 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 public class SSImage extends JPanel implements SSComponentInterface
 {
 	// TODO: try to get this initialized
-	private String fName = "";
+	private Path path;
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
 	 * database column
@@ -106,50 +110,42 @@ public class SSImage extends JPanel implements SSComponentInterface
 
 			try {
 				if (getRowSet() != null) {
-					// FileInputStream inStream = null;
-					File inFile;
 					final JFileChooser fileChooser = new JFileChooser();
 					if (fileChooser.showOpenDialog(btnUpdateImage) == JFileChooser.APPROVE_OPTION) {
-						inFile = fileChooser.getSelectedFile();
-						try (FileInputStream inStream = new FileInputStream(inFile)) {
-							final int totalLength = (int) inFile.length();
-							final byte[] bytes = new byte[totalLength];
-							int bytesRead = inStream.read(bytes);
-							while (bytesRead < totalLength) {
-								final int read = inStream.read(bytes, bytesRead, totalLength - bytesRead);
-								if (read == -1) {
-									break;
-								}
-								bytesRead += read;
-							}
-							// inStream.close();
-							getRowSet().updateBytes(getBoundColumnName(), bytes);
-							img = new ImageIcon(bytes);
-							lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
-							lblImage.setIcon(img);
-							lblImage.setText("");
-							fName = inFile.getPath();
-							// TODO: why is updateUI here?
-							updateUI();
+						path = fileChooser.getSelectedFile().toPath();
+						ByteBuffer bb;
+						try (SeekableByteChannel rbc
+								= Files.newByteChannel(path, EnumSet.of(READ))) {
+							final int totalLength = (int) rbc.size();
+							bb = ByteBuffer.allocate(totalLength);
+							int bytesRead = rbc.read(bb);
+							if (totalLength != bytesRead)
+								throw new IOException(sf("Image read expected %d bytes, got %d",
+										totalLength, bytesRead));
 						}
-					} else {
-						return;
+						byte[] bytes = bb.array();
+
+						getRowSet().updateBytes(getBoundColumnName(), bytes);
+						img = new ImageIcon(bytes);
+						lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
+						lblImage.setIcon(img);
+						lblImage.setText("");
+						// TODO: why is updateUI here?
+						updateUI();
 					}
 				}
 			} catch (final SQLException se) {
 				logger.log(Level.ERROR, getColumnForLog() + ": SQL Exception.", se);
 			} catch (final IOException ioe) {
-				logger.log(Level.ERROR, getColumnForLog() + ": IO Exception.", ioe);
+				getSSCommon().reportError("Error accessing image file", path, ioe);
+			} finally {
+				getSSCommon().addRowSetListener();
 			}
-
-			getSSCommon().addRowSetListener();
 		}
 
 	} // end private class SSImageListener
 
-	/**
-	 * Log4j Logger for component
-	 */
+	/** Logger for component */
 	private static Logger logger = SSUtils.getLogger();
 
 	/**
@@ -384,7 +380,7 @@ public class SSImage extends JPanel implements SSComponentInterface
 	public String toString()
 	{
 		return sf("%s{file=%s, %s}", getClass().getSimpleName(),
-				fName, SSUtils.ssComponentToString(this));
+				path != null ? path.toString() : "", SSUtils.ssComponentToString(this));
 	}
 
 	/**
