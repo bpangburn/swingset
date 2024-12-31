@@ -868,6 +868,7 @@ public class SSCommon
 				value = RowSetOps.getColumnObject(ssComponent, type);
 			}
 		} catch (final SQLException se) {
+			// TODO: Shouldn't an error be propogated? Related methods as well.
 			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
 		}
 

@@ -51,7 +51,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.EnumSet;
 import java.util.Optional;
 
 import javax.sql.RowSet;
@@ -61,6 +60,7 @@ import javax.sql.rowset.spi.SyncProviderException;
 import java.lang.System.Logger;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.sql.rowset.spi.SyncResolver;
@@ -75,6 +75,7 @@ import com.nqadmin.swingset.utils.SSArray;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
+import static com.google.common.collect.Sets.immutableEnumSet;
 import static com.nqadmin.swingset.navigate.Utils.postRowSetModified;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
@@ -636,15 +637,16 @@ public class RowSetOps {
 	 *
 	 * @see "https://docs.oracle.com/javase/7/docs/api/java/sql/Types.html"
 	 *
-	 * @param _columnName - name of the column
+	 * @param columnName - name of the column
 	 *
-	 * @param _resultSet ResultSet on which to operate
+	 * @param resultSet ResultSet on which to operate
 	 * @return JDBCType of the column
 	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
-	public static int getColumnType(final ResultSet _resultSet, final String _columnName) throws SQLException {
-		return _resultSet.getMetaData().getColumnType(getColumnIndex(_resultSet, _columnName));
+	public static int getColumnType(ResultSet resultSet, String columnName)
+			throws SQLException {
+		return resultSet.getMetaData().getColumnType(getColumnIndex(resultSet, columnName));
 	}
 
 	/**
@@ -653,15 +655,15 @@ public class RowSetOps {
 	 *
 	 * @see java.sql.JDBCType
 	 *
-	 * @param _columnName - name of the column
+	 * @param columnName - name of the column
 	 *
-	 * @param _resultSet ResultSet on which to operate
+	 * @param resultSet ResultSet on which to operate
 	 * @return JDBCType of the column
 	 *
 	 * @throws SQLException - if a database access error occurs
 	 */
-	public static JDBCType getJDBCColumnType(final ResultSet _resultSet, final String _columnName) throws SQLException {
-		return getJDBCType(getColumnType(_resultSet, _columnName));
+	public static JDBCType getJDBCColumnType(ResultSet resultSet, String columnName) throws SQLException {
+		return getJDBCType(getColumnType(resultSet, columnName));
 	}
 
 	/**
@@ -693,13 +695,23 @@ public class RowSetOps {
 		return findJavaTypeClass(type);
 	}
 
-	private static final EnumSet<JDBCType> textUpdateEmptyOK = EnumSet.of(
+	/**
+	 * Jdbc types that can be set to an empty string.
+	 */
+	public static final Set<JDBCType> textUpdateEmptyOK = immutableEnumSet(
 			JDBCType.CHAR,
 			JDBCType.VARCHAR,
-			JDBCType.LONGVARCHAR
+			JDBCType.LONGVARCHAR,
+
+			JDBCType.NCHAR,
+			JDBCType.NVARCHAR,
+			JDBCType.LONGNVARCHAR
 	);
 	
-	private static final EnumSet<JDBCType> textUpdateOK = EnumSet.of(
+	/**
+	 * Jdbc types that can be set to a non-empty string.
+	 */
+	public static final Set<JDBCType> textUpdateOK = immutableEnumSet(
 			JDBCType.INTEGER,
 			JDBCType.SMALLINT,
 			JDBCType.TINYINT,
@@ -716,7 +728,11 @@ public class RowSetOps {
 			JDBCType.TIMESTAMP,
 			JDBCType.CHAR,
 			JDBCType.VARCHAR,
-			JDBCType.LONGVARCHAR
+			JDBCType.LONGVARCHAR,
+
+			JDBCType.NCHAR,
+			JDBCType.NVARCHAR,
+			JDBCType.LONGNVARCHAR
 	);
 
 	/**
@@ -883,11 +899,11 @@ public class RowSetOps {
 	/**
 	 *
 	 * @param comp
-	 * @param _updatedValue
+	 * @param updatedValue
 	 * @throws SQLException
 	 */
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public static void checkForceConflict(final SSComponentInterface comp, final String _updatedValue)
+	public static void checkForceConflict(SSComponentInterface comp, String updatedValue)
 			throws SQLException
 	{
 		// Only do this for strings.
@@ -904,7 +920,7 @@ public class RowSetOps {
 			rs.absolute(comp.getRowSet().getRow());
 			System.err.printf("FORCE_CONFLICT: %s\n",
 					rs.getObject(comp.getBoundColumnIndex()));
-			rs.updateString(comp.getBoundColumnIndex(), _updatedValue + "_ForceConflict");
+			rs.updateString(comp.getBoundColumnIndex(), updatedValue + "_ForceConflict");
 			rs.updateRow();
 		}
 	}
@@ -918,17 +934,19 @@ public class RowSetOps {
 	 * to the database.
 	 *
 	 * @param comp The SSComponent doing the update
-	 * @param _updatedValue string to be type-converted as needed and updated in
+	 * @param updatedValue string to be type-converted as needed and updated in
 	 *                      underlying RowSet column
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 * @throws NumberFormatException thrown if unable to parse a string to number format
 	 */
-	public static void updateColumnText(final SSComponentInterface comp, final String _updatedValue) throws SSSQLNullException, SQLException, NumberFormatException
+	public static void updateColumnText(SSComponentInterface comp, String updatedValue)
+			throws SSSQLNullException, SQLException, NumberFormatException
 	{ 
-		// checkForceConflict(comp, _updatedValue);
-		updateColumnText(comp, comp.getRowSet(), _updatedValue,
-						 comp.getBoundColumnName(), comp.getAllowNull());
+		// TODO: This is only for debug
+		// checkForceConflict(comp, updatedValue);
+		updateColumnText(comp, comp.getRowSet(), updatedValue,
+						 comp.getBoundColumnIndex(), comp.getAllowNull());
 	}
 
 	/**
@@ -940,39 +958,42 @@ public class RowSetOps {
 	 * to the database.
 	 *
 	 * @param comp The SSComponent doing the update
-	 * @param _rowSet RowSet on which to operate
-	 * @param _updatedValue string to be type-converted as needed and updated in
+	 * @param rowSet RowSet on which to operate
+	 * @param updatedValue string to be type-converted as needed and updated in
 	 *                      underlying RowSet column
-	 * @param _columnName   name of the database column
-	 * @param _allowNull 	indicates if Component and underlying column can contain null values
+	 * @param columnIndex   name of the database column
+	 * @param allowNull 	indicates if Component and underlying column can contain null values
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 * @throws NumberFormatException thrown if unable to parse a string to number format
 	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
 	 */
-	private static void updateColumnText(final SSComponentInterface comp, final RowSet
-			_rowSet, final String _updatedValue, final String _columnName,
-			final boolean _allowNull)
+	// TODO: test this and conversions
+	private static void updateColumnText(SSComponentInterface comp, RowSet
+			rowSet, String updatedValue, int columnIndex, boolean allowNull)
 			throws SSSQLNullException, SQLException, NumberFormatException
 	{
-		int row = logger.isLoggable(DEBUG) ? _rowSet.getRow() : -1;
+		int row = logger.isLoggable(DEBUG) ? rowSet.getRow() : -1;
 		logger.log(DEBUG, () -> sf("[%s] row %d. Update to: %s. Allow null? [%s]",
-				   _columnName, row, _updatedValue, _allowNull));
+				   comp.getColumnForLog(), row, updatedValue, allowNull));
 
-		JDBCType jdbcType = getJDBCType(getColumnType(_rowSet, _columnName));
+		JDBCType jdbcType = getJDBCType(getColumnType(rowSet, columnIndex));
 		
 		if (!textUpdateOK.contains(jdbcType)) {
-			logger.log(ERROR, "Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
+			logger.log(ERROR, "Unsupported data type of " + jdbcType.getName() + " for column " + comp.getColumnForLog() + ".");
 			return;
 		}
 
 		NavigateActions.captureInitialValue(comp); // undo/redo
 
 		boolean did_update = false;
+		Object dbValue = null;
 		try {
-			// On insert row, write null if updatedValue is null or empty string, and do not perform other checks.
-			if ((_updatedValue == null || _updatedValue.isEmpty()) && RowSetState.isInserting(_rowSet)) {
-				_rowSet.updateNull(_columnName);
+			// On insert row, write null if updatedValue is null or empty string,
+			// and do not perform other checks.
+			// TODO: isBlank???
+			if ((updatedValue == null || updatedValue.isEmpty()) && RowSetState.isInserting(rowSet)) {
+				rowSet.updateNull(columnIndex);
 				did_update = true;
 				return;
 			}
@@ -987,29 +1008,24 @@ public class RowSetOps {
 			* We want to enter this code under 3 conditions:
 			*  1. updateColumnText() is passed a null string
 			*  2. updateColumnText() is passed an empty string (any column type)
-			*  3. updateColumnText() is passed a 'blank' (whitespace) string for a non-character-based field
-			*     (e.g., "" or "   " for a double)
+			*  3. updateColumnText() is passed a 'blank' (whitespace) string
+			*     for a non-character-based field (e.g., "" or "   " for a double)
 			*
-			* If !_allowNull then a character based field with 0 or more blank spaced will be allowed
-			* and code will continue to the switch/case statement below.
+			* If !allowNull then a character based field with 0 or more blank spaced
+			* will be allowed and code will continue to the switch/case statement below.
 			*/
-			if (_updatedValue == null
-					|| _updatedValue.isEmpty()
-					|| (_updatedValue.trim().isEmpty() && !textUpdateEmptyOK.contains(jdbcType))) {
-				//
-				// TODO: Switch to isBlank) for Java 11+
-				//
-				// Java 11: || (_updatedValue.isBlank() && !textUpdateEmptyOK.contains(jdbcType))) {
-				//
-				if (_allowNull) {
-					_rowSet.updateNull(_columnName);
+			if (updatedValue == null
+					|| updatedValue.isEmpty()
+					|| (updatedValue.isBlank() && !textUpdateEmptyOK.contains(jdbcType))) {
+				if (allowNull) {
+					rowSet.updateNull(columnIndex);
 					did_update = true;
 					return;
 				} else if (!textUpdateEmptyOK.contains(jdbcType)) {
 					// This will throw an exception for a non-char type, but allow
 					// a char-based type with an empty string to continue to the
 					// switch/case below and write the empty string via
-					// _rowSet.updateString(_columnName, _updatedValue)
+					// rowSet.updateString(_columnName, _updatedValue)
 					//
 					// Note that if there is a UNIQUE constraint on such a text
 					// column then repeatedly writing the same number (0 to N)
@@ -1022,66 +1038,29 @@ public class RowSetOps {
 					throw new SSSQLNullException("Null values are not allowed for this field.");
 				}
 			}
-			assert(_updatedValue != null);
+			assert(updatedValue != null);
 			
 			/*
-			* SECOND - WRITING NON-NULL VALUES TO DATABASE BASED ON APPROPRIATE STRING CONVERSIONS
-			*/
-			//
-			// TODO: could probably use
-			//			_rowSet.updateObject(_columnName, _udpateValue)
-			//		 for everything except maybe for time/date related.
-			//		 But first verify that updateObject catches conversion issues.
-			//
+			 * SECOND - update non-null values based on string conversions
+			 */
 			switch (jdbcType) {
 			
-			case INTEGER, SMALLINT, TINYINT -> {
-				final int intValue = Integer.parseInt(_updatedValue);
-				_rowSet.updateInt(_columnName, intValue);
-			}
-			case BIGINT -> {
-				final long longValue = Long.parseLong(_updatedValue);
-				_rowSet.updateLong(_columnName, longValue);
-			}
-			case REAL -> {
-				final float floatValue = Float.parseFloat(_updatedValue);
-				_rowSet.updateFloat(_columnName, floatValue);
-			}
-			case DOUBLE, FLOAT -> {
-				final double doubleValue = Double.parseDouble(_updatedValue);
-				_rowSet.updateDouble(_columnName, doubleValue);
-			}
-			case DECIMAL, NUMERIC -> {
-				final BigDecimal bigdValue = new BigDecimal(_updatedValue);
-				_rowSet.updateBigDecimal(_columnName, bigdValue);
-			}
-			case BOOLEAN, BIT -> {
-				final boolean boolValue = Boolean.parseBoolean(_updatedValue);
-				_rowSet.updateBoolean(_columnName, boolValue);
-			}
-			case DATE -> {
-				Date date = (Date) getSQLDateTimeObject(_updatedValue, comp);
-				_rowSet.updateDate(_columnName, date);
-			}
-			case TIME -> {
-				Time time = (Time) getSQLDateTimeObject(_updatedValue, comp);
-				_rowSet.updateTime(_columnName, time);
-			}
-			case TIMESTAMP -> {
-				Timestamp timestamp = (Timestamp) getSQLDateTimeObject(_updatedValue, comp);
-				_rowSet.updateTimestamp(_columnName, timestamp);
-			}
-			case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR
-					-> _rowSet.updateString(_columnName, _updatedValue);
-			default -> //
+			case INTEGER, SMALLINT, TINYINT, BIGINT,
+					REAL, DOUBLE, FLOAT, DECIMAL, NUMERIC,
+					BOOLEAN, BIT,
+					CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR ->
+				dbValue = convertObjectType(updatedValue, jdbcType);
+			case DATE, TIME, TIMESTAMP -> // TODO: use convertObjectType when...
+				dbValue = getSQLDateTimeObject(updatedValue, comp);
+			default ->
 				// TODO: SSSQLExceptionUnhandledType
-				//
 				throw new IllegalStateException("switch cases out of sync");
 			} // end switch
+			rowSet.updateObject(columnIndex, dbValue);
 			did_update = true;
 		} finally {
 			if (did_update)
-				postRowSetModified(comp, _updatedValue);
+				postRowSetModified(comp, dbValue);
 
 		}
 

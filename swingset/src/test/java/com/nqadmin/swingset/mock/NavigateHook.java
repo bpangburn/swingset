@@ -63,6 +63,7 @@ public class NavigateHook
 	public void last() { actionMap.get(NAV_LAST).actionPerformed(null); }
 	public void next() { actionMap.get(NAV_NEXT).actionPerformed(null); }
 	public void prev() { actionMap.get(NAV_PREVIOUS).actionPerformed(null); }
+	public void commit() { actionMap.get(NAV_COMMIT).actionPerformed(null); }
 
 	public void go(int row) {
 		ModelAct spinModel = getSpinModelAct();

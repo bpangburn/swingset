@@ -268,6 +268,7 @@ public class ConvertType
 	 * Convert the specified object to the object type
 	 * for the specified JDBCType.
 	 * This is not just casting; for example Boolen to Integer.
+	 * The same object may be returned.
 	 * <p>
 	 * Note the spec B.2 vs B.4 updater methods vs setObject;
 	 * and B.5 for setObject when a target type is specified.
@@ -296,6 +297,8 @@ public class ConvertType
 
 	/**
 	 * Convert specified value to specified type; this can be more than a cast.
+	 * The same object may be returned.
+	 * 
 	 * @param <T> target type
 	 * @param value value to convert
 	 * @param type class of target type
@@ -396,12 +399,17 @@ public class ConvertType
 			}
 		}
 		case String s -> {
+			// TODO: should empty string to numeric return null?
 			try {
 				switch(target) {
+				case BOOL -> { return Boolean.valueOf(s); }
+
 				case LONG -> { return Long.valueOf(s); }
 				case INT -> { return Integer.valueOf(s); }
+
 				case SHORT -> { return Short.valueOf(s); }
 				case BYTE -> { return Byte.valueOf(s); }
+
 				case FLOAT -> { return Float.valueOf(s); }
 				case DOUBLE -> { return Double.valueOf(s); }
 				case BIGD -> { return new BigDecimal(s); }
@@ -543,8 +551,9 @@ public class ConvertType
 	}
 
 	/**
-	 * Cast the object to {@code JDBCType}.The idea is to verify
- the the object is of the correct type.
+	 * Cast the object to {@code JDBCType}.The idea is to verify the the object
+	 * is of the correct type.
+	 * 
 	 * @param object object to cast
 	 * @param jdbcType cast object to this JDBCType
 	 * @return Essentially the same Object that was input
@@ -678,6 +687,125 @@ public class ConvertType
 		{
 			return isDateTime;
 		}
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+
+	//
+	// The following is taken from an ancient branch, swingset_bus.
+	// It's part of deriving the real type from the generic type
+	// stuff used in SSBaseComboBox::updateComponent.
+	//
+
+	// From swingset_bus RowSetOps.java
+
+	// /**
+	//  * Using the JDBCType from metadata convert a String to an Object.
+	//  * @param _resultSet get metadata from here
+	//  * @param _columnName column name
+	//  * @param _text string value
+	//  * @return object of value
+	//  * @throws NumberFormatException conversion error
+	//  * @throws SQLException database access error
+	//  */
+	// public static Object parseText(final ResultSet _resultSet, final String _columnName, final String _text)
+	// throws NumberFormatException, SQLException {
+	// 	JDBCType jdbcType = getJDBCColumnType(_resultSet, _columnName);
+	// 	if (!textUpdateOK.contains(jdbcType)) {
+	// 		throw new IllegalArgumentException("Unsupported parseText data type: " + jdbcType.getName() + " for " + _columnName);
+	// 	}
+	// 	return parseText(jdbcType, _text);
+	// }
+
+	// /**
+	//  * Using the JDBCType from metadata convert a String to an Object.
+	//  * @param _resultSet get metadata from here
+	//  * @param _columnIndex column index
+	//  * @param _text string value
+	//  * @return object of value
+	//  * @throws NumberFormatException conversion error
+	//  * @throws SQLException database access error
+	//  */
+	// public static Object parseText(final ResultSet _resultSet, final int _columnIndex, final String _text)
+	// throws NumberFormatException, SQLException {
+	// 	JDBCType jdbcType = getJDBCColumnType(_resultSet, _columnIndex);
+	// 	if (!textUpdateOK.contains(jdbcType)) {
+	// 		throw new IllegalArgumentException("Unsupported parseText data type: " + jdbcType.getName() + " for " + getColumnName(_resultSet, _columnIndex));
+	// 	}
+	// 	return parseText(jdbcType, _text);
+	// }
+
+
+	//
+	// JUST USED convertObjectType. Cool.
+	//
+
+	/**
+	 * Using the JDBCType convert a String to an Object.
+	 * @param _jdbcType convert to Object type associated with this type.
+	 * @param _text string value
+	 * @return object of value
+	 * @throws NumberFormatException conversion error
+	 */
+	@SuppressWarnings("unused")
+	private static Object parseText_NOT_USED(final JDBCType _jdbcType, final String _text)
+	throws NumberFormatException {
+		// if (!textUpdateOK.contains(_jdbcType)) {
+		// 	throw new IllegalArgumentException("Unsupported parseText data type: " + _jdbcType.getName());
+		// }
+
+		Object value;
+
+		switch (_jdbcType) {
+	
+		case INTEGER -> value = Integer.valueOf(_text);
+
+		case SMALLINT -> value = Short.valueOf(_text);
+
+		case TINYINT -> value = Byte.valueOf(_text);
+			
+		case BIGINT -> value = Long.valueOf(_text);
+			
+		case REAL -> value = Float.valueOf(_text);
+			
+		case FLOAT, DOUBLE -> value = Double.valueOf(_text);
+		case DECIMAL, NUMERIC -> value = new BigDecimal(_text);
+			
+		case BOOLEAN, BIT -> // CONVERT THE GIVEN STRING TO BOOLEAN TYPE
+			value = Boolean.valueOf(_text);
+		case DATE -> {
+			// TODO Good to get rid of getSQLDate if possible.
+			if (_text.length() == 10) {
+				//*****// value = SSCommon.getSQLDate(_text);
+				value = null;
+			} else {
+				// 2020-12-01_BP: Might as well at least try to process a date that is other than 10 characters
+				value = java.sql.Date.valueOf(_text);
+			}
+			}
+			
+		case TIME -> value = java.sql.Time.valueOf(_text);
+		case TIMESTAMP -> {
+			// TODO: We're not doing anything here
+			// TODO: Probably a better way to handle date to timestamp conversion. Formatter? Get rid of getSQLDate() if possible.
+			// CONVERT ANY 10 CHARACTER DATE (e.g., yyyy-mm-dd, mm/dd/yyyy to a date/time)
+			if (_text.length() == 10) {
+				//*****// value = new Timestamp(SSCommon.getSQLDate(_text).getTime());
+				value = null;
+			} else {
+				// Per ER email 2020-11-25, we weren't even trying to handle a legitimate timestamp
+				value = java.sql.Timestamp.valueOf(_text);
+			}
+			}
+			
+		case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR -> value = _text;
+			
+		default -> throw new IllegalStateException("switch cases out of sync");
+		} // end switch
+
+		return value;
 	}
 
 }

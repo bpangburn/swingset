@@ -40,7 +40,9 @@ package com.nqadmin.swingset.demo;
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
 import com.nqadmin.swingset.datasources.RowSetOps.ForceConflict;
+
 import static com.nqadmin.swingset.demo.DemoUtil.configureJavaUtilLogger;
+
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -70,29 +72,45 @@ import javax.swing.SwingUtilities;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+
 import static java.lang.System.Logger.Level.*;
+
 import org.h2.tools.RunScript;
 
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSMysqlSetModel;
 import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSUtils;
+
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+
 import com.nqadmin.swingset.utils.SSVersion;
 import com.raelity.lib.ui.Screens;
 
 import gnu.getopt.Getopt;
+
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Collections;
+
 import javax.swing.BoxLayout;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
+
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
+
 import java.util.Objects;
+import java.util.stream.Collectors;
+
 import javax.sql.RowSet;
+import javax.sql.rowset.spi.SyncFactory;
+import javax.sql.rowset.spi.SyncFactoryException;
+import javax.sql.rowset.spi.SyncProvider;
+
+import org.openide.util.Exceptions;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
@@ -833,6 +851,18 @@ public class MainClass extends JFrame
 				System.getProperty("java.version.date"),
 				System.getProperty("os.name"));
 		System.err.printf("SwingSet: %s\n", SSVersion.get().toString());
+
+		try {
+			for (SyncProvider sp : Collections.list(SyncFactory.getRegisteredProviders())) {
+				Class<?> c = sp.getClass();
+				System.err.printf("SyncProvider: %s\n", c.getName());
+				for (Class<?> iface : c.getInterfaces()) {
+					System.err.println("    " + iface.getName());
+				}
+			}
+		} catch (SyncFactoryException ex) {
+			logger.log(DEBUG, "SyncFactory.getRegisteredProviders()", ex);
+		}
 
 		Getopt g = new Getopt(cmdName, _args, "hvdinrp:s:");
 

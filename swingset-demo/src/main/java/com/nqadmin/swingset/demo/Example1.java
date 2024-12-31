@@ -201,7 +201,8 @@ public class Example1 extends JFrame {
 			}
 
 			/**
-			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
+			 * Obtain and set the PK value for the new record & perform any other
+			 * actions needed before an insert.
 			 */
 			@Override
 			public void performPreInsertOps()

@@ -30,6 +30,8 @@
 package com.nqadmin.swingset.datasources;
 
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -46,6 +48,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.NavigateHook;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -178,6 +181,137 @@ public class RowSetOpsTest
 		assertTrue(fetch2 instanceof java.sql.Timestamp);
 		assertEquals(fetch, new Date(fetch2.getTime()));
 	}
+
+	RowSet g_rs;
+	NavigateHook g_nav;
+
+	private void updateColumnText(String col, String sVal, Object val)
+			throws Exception
+	{
+		System.out.println("    " + col);
+		SSComponentInterface comp = new SSTextField(g_rs, col);
+		RowSetOps.updateColumnText(comp, sVal);
+		g_nav.commit();
+		Object co = RowSetOps.getColumnObject(comp);
+		//assertTrue(co.getClass() == val.getClass());
+		if (val instanceof BigDecimal bd)
+			assertEquals(bd.compareTo((BigDecimal) co), 0);
+		else
+			assertEquals(val, co);
+	}
+
+	/**
+	 * Test of updateColumnText method, of class RowSetOps.
+	 * @throws java.lang.Exception
+	 */
+	@Test
+	@SuppressWarnings("ResultOfObjectAllocationIgnored")
+	public void testUpdateColumnText() throws Exception
+	{
+		System.out.println("updateColumnText");
+		RowSet rs;
+		NavigateHook nav;
+
+		g_rs = H2.getRowSet("""
+            CREATE TABLE tbl
+            (
+                c_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,
+
+            	c_integer integer,
+            	c_smallint smallint,
+            	c_tinyint tinyint,
+            	c_bigint bigint,
+            	c_decimal decimal(10,5),
+            	c_numeric numeric,
+
+            	c_real real,
+            	c_double double,
+            	c_float float,
+
+            	c_boolean boolean,
+            	// c_bit bit,
+
+            	c_char char(3),
+            	c_varchar varchar,
+
+            	// c_longvarchar longvarchar,
+            	// c_nvarchar nvarchar,
+            	// c_longnvarchar longnvarchar
+
+            	c_nchar nchar(5)
+            );
+
+			INSERT INTO tbl VALUES
+				(1,
+                    1, 1, 1, 1, 1, 1,
+                    1.0, 1.0, 1.0,
+                    false,
+                    'aaa', 'a', 'a'
+                    )
+			;
+            """);
+		g_rs.setCommand("SELECT * FROM tbl");
+		g_nav = new NavigateHook(g_rs);
+
+		updateColumnText("c_integer", "13", 13);
+		updateColumnText("c_smallint", "14", 14);
+		updateColumnText("c_tinyint", "15", 15);
+		updateColumnText("c_bigint", "16", 16L);
+		updateColumnText("c_decimal", "17.1", new BigDecimal("17.1"));
+		updateColumnText("c_numeric", "18", new BigDecimal("18"));
+
+		updateColumnText("c_real", "19.3", 19.3F);
+		updateColumnText("c_double", "20.3", 20.3);
+		updateColumnText("c_float", "21.3", 21.3);
+
+		updateColumnText("c_boolean", "true", true);
+
+		updateColumnText("c_char", "one", "one");
+		updateColumnText("c_varchar", "two", "two");
+		updateColumnText("c_nchar", "three", "three");
+
+		g_rs = null;
+		g_nav = null;
+
+		// Date types
+
+		rs = H2.getRowSet("""
+            CREATE TABLE tbl
+            (
+                c_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,
+            	c_date DATE,
+            	c_time TIME,
+				c_timestamp TIMESTAMP
+            );
+
+			INSERT INTO tbl VALUES	(1, '2000-01-11','11:11:11','2000-01-11 11:11:11'),
+									(2, '2000-02-22','22:22:22','2000-02-22 22:22:22') ;
+            """);
+		rs.setCommand("SELECT * FROM tbl");
+		nav = new NavigateHook(rs);
+
+		String sDate = "2222-02-22";
+		String sTime = "12:12:12";
+		String sTimestamp = "2222-02-22 22:22:22";
+		SSComponentInterface comp1 = new SSTextField(rs, "c_date");
+		SSComponentInterface comp2 = new SSTextField(rs, "c_time");
+		SSComponentInterface comp3 = new SSTextField(rs, "c_timestamp");
+		RowSetOps.updateColumnText(comp1, sDate);
+		RowSetOps.updateColumnText(comp2, sTime);
+		RowSetOps.updateColumnText(comp3, sTimestamp);
+		nav.commit();
+
+		Object co;
+		co = RowSetOps.getColumnObject(comp1);
+		assertEquals(java.sql.Date.valueOf(sDate), co);
+		co = RowSetOps.getColumnObject(comp2);
+		assertEquals(java.sql.Time.valueOf(sTime), co);
+		co = RowSetOps.getColumnObject(comp3);
+		assertEquals(java.sql.Timestamp.valueOf(sTimestamp), co);
+	}
+
+
+
 
 /**
 	 * Test of getColumnObject method, of class RowSetOps.
@@ -513,20 +647,6 @@ public class RowSetOpsTest
 //		SSComponentInterface comp = null;
 //		String _updatedValue = "";
 //		RowSetOps.checkForceConflict(comp, _updatedValue);
-//		// TODO review the generated test code and remove the default call to fail.
-//		fail("The test case is a prototype.");
-//	}
-//
-//	/**
-//	 * Test of updateColumnText method, of class RowSetOps.
-//	 */
-//	@Test
-//	public void testUpdateColumnText() throws Exception
-//	{
-//		System.out.println("updateColumnText");
-//		SSComponentInterface comp = null;
-//		String _updatedValue = "";
-//		RowSetOps.updateColumnText(comp, _updatedValue);
 //		// TODO review the generated test code and remove the default call to fail.
 //		fail("The test case is a prototype.");
 //	}

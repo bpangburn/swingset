@@ -234,19 +234,19 @@ public interface SSComponentInterface extends RSC
 	 * Takes care of setting RowSet and Column Name for ssCommon and then calls
 	 * bind(this.ssCommon);
 	 *
-	 * @param _rowSet datasource to be used.
-	 * @param _boundColumnName Name of the column to which this check box should be bound
+	 * @param rowSet datasource to be used.
+	 * @param boundColumnName Name of the column to which this check box should be bound
 	 */
-	default void bind(final RowSet _rowSet, final String _boundColumnName)
+	default void bind(RowSet rowSet, String boundColumnName)
 	{
 		try {
-			checkColumnType(RowSetOps.getJDBCColumnType(_rowSet, _boundColumnName));
+			checkColumnType(RowSetOps.getJDBCColumnType(rowSet, boundColumnName));
 		} catch (SQLException ex) {
 			throw new IllegalArgumentException("SQLException getting column type", ex);
 		}
-		getSSCommon().bind(_rowSet, _boundColumnName);
+		getSSCommon().bind(rowSet, boundColumnName);
 		// Primary keys for SyncResolver, joins
-		if (_rowSet instanceof CachedRowSet)
+		if (rowSet instanceof CachedRowSet)
 			SSUtils.setupDefaultPrimaryKeys(this);
 	}
 

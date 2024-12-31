@@ -1238,21 +1238,20 @@ public class NavigateActions
 	
 	/**
 	 * Common code to commit changes to the database from the rowset if
-	 * modifications are allowed; called before every action.
-	 * After committing, it performs any
-	 * post-update operations.
-	 * <p>
+	 * modifications are allowed; called before every action.After committing, it performs any
+ post-update operations.<p>
 	 * If modification==false, then skip the update and return as
 	 * successful, unless we have an empty rowset. 
 	 * 
-	 * @param _performPostUpdateOps true if performPostUpdateOps() should
+	 * @param performPostUpdateOps true if performPostUpdateOps() should
 	 * 	be called after successful update, otherwise false
 	 * 
 	 * @return true unless there are no records OR dBNav.allowUpdate() returns false
 	 * @throws SQLException SQL Exception if rowset call to updateRow() fails
 	 */
-	private boolean commitChangesToDatabase(final boolean _performPostUpdateOps) throws SQLException {
-		
+	private boolean commitChangesToDatabase(final boolean performPostUpdateOps)
+			throws SQLException
+	{
 		boolean result = true;
 		
 		// check for an empty rowset 
@@ -1278,7 +1277,7 @@ public class NavigateActions
 		//
 		// note that where modifications are set to false, we're pretending to have
 		// successfully updated the database
-		if (result && _performPostUpdateOps) {
+		if (result && performPostUpdateOps) {
 			dBNav.performPostUpdateOps();
 		}
 		
