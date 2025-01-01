@@ -103,6 +103,12 @@ Rename NavigateActions to Navigation?
 Add cleanField to SSComponentInterface. Use it from SSDBNavImpl#setComponents.
 But then again the helper classes provide ways to set it...
 
+---
+Regarding date/time formatting/parse consider RsolverStyle.
+Could be overall option; or just part of the format, e.g.
+SSFormat.DATE_MMDDYYYY_SLASH_SMART, SSFormat.DATE_MMDDYYYY_SLASH_LENIENT, 
+and _STRICT is the default.
+
 ================================================================================
 =========================== CLEANUP ============================================
 ================================================================================

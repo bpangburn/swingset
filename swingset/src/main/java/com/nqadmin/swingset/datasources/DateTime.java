@@ -41,6 +41,7 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
@@ -80,6 +81,11 @@ public class DateTime
 	private static final Map<JDBCType, DateTimeFormatter> dateTimeFormatterMap
 			= new EnumMap<>(JDBCType.class);
 
+	private static DateTimeFormatter strict(DateTimeFormatter dtf)
+	{
+		return dtf.withResolverStyle(ResolverStyle.STRICT);
+	}
+
 	/** A style is one or more formats. Used to specify date types for parse. */
 	public enum DateParseStyle {
 		/** Custom Month/Day/Year */
@@ -91,9 +97,11 @@ public class DateTime
 	}
 	private static DateParseStyle date_parse = DateParseStyle.ALL;
 
-	private static DateTimeFormatter date_formatter = getMDYFormatter();
-	private static DateTimeFormatter time_formatter = DateTimeFormatter.ISO_LOCAL_TIME;
-	private static DateTimeFormatter timestamp_formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+	private static DateTimeFormatter date_formatter = strict(getMDYFormatter());
+	private static DateTimeFormatter time_formatter
+			= strict(DateTimeFormatter.ISO_LOCAL_TIME);
+	private static DateTimeFormatter timestamp_formatter
+			= strict(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
 	static {
 		if (Boolean.FALSE) {
@@ -157,17 +165,17 @@ public class DateTime
 	private static final ImmutableMap<SSFormat,List<DateTimeFormatter>> ssFormatters
 			= new ImmutableMap.Builder<SSFormat, List<DateTimeFormatter>>()
 					.put(SSFormat.DATE_MMDDYYYY_SLASH,
-							List.of(DateTimeFormatter.ofPattern("M/d/uuuu"),
-									DateTimeFormatter.ofPattern("MMdduuuu")))
+							List.of(strict(DateTimeFormatter.ofPattern("M/d/uuuu")),
+									strict(DateTimeFormatter.ofPattern("MMdduuuu"))))
 					.put(SSFormat.DATE_DDMMYYYY_SLASH,
-							List.of(DateTimeFormatter.ofPattern("d/M/uuuu"),
-									DateTimeFormatter.ofPattern("ddMMuuuu")))
+							List.of(strict(DateTimeFormatter.ofPattern("d/M/uuuu")),
+									strict(DateTimeFormatter.ofPattern("ddMMuuuu"))))
 					.put(SSFormat.TIME_HHMMSS,
-							List.of(DateTimeFormatter.ISO_LOCAL_TIME,
-									DateTimeFormatter.ofPattern("HHmmss")))
+							List.of(strict(DateTimeFormatter.ISO_LOCAL_TIME),
+									strict(DateTimeFormatter.ofPattern("HHmmss"))))
 					.put(SSFormat.TIMESTAMP_YYYYMMDD_STROKE_HHMMSS_SSSZ,
-							List.of(DateTimeFormatter
-									.ofPattern("uuuu-M-d HH:mm:ss[.SSS[ xxx]]")))
+							List.of(strict(DateTimeFormatter
+									.ofPattern("uuuu-M-d HH:mm:ss[.SSS[ xxx]]"))))
 			.buildOrThrow();
 
 	private static List<DateTimeFormatter> getInternalDateTimeParsers(RSC comp)
@@ -190,22 +198,22 @@ public class DateTime
 						new ArrayList<>(switch(date_parse) {
 						case MDY -> List.of(getMDYParser());
 						case ISO -> List.of(
-								DateTimeFormatter.BASIC_ISO_DATE,
-								DateTimeFormatter.ISO_LOCAL_DATE);
+								strict(DateTimeFormatter.BASIC_ISO_DATE),
+								strict(DateTimeFormatter.ISO_LOCAL_DATE));
 						case ALL -> List.of(
 								getMDYParser(),
-								DateTimeFormatter.BASIC_ISO_DATE,
-								DateTimeFormatter.ISO_LOCAL_DATE);
+								strict(DateTimeFormatter.BASIC_ISO_DATE),
+								strict(DateTimeFormatter.ISO_LOCAL_DATE));
 						default -> null;
 						});
 					case TIME -> new ArrayList<>(List.of(
-							DateTimeFormatter.ISO_LOCAL_TIME));
+							strict(DateTimeFormatter.ISO_LOCAL_TIME)));
 					case TIMESTAMP -> {
 						ArrayList<DateTimeFormatter> l;
 						l = new ArrayList<>(getLongTimestampParsers());
-						l.addAll(List.of(DateTimeFormatter.ISO_LOCAL_DATE_TIME,
-										 //DateTimeFormatter.ofPattern("uuuu-M-d HH:mm:ss"),
-										 DateTimeFormatter.ISO_LOCAL_DATE));
+						l.addAll(List.of(strict(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+										 //strict(DateTimeFormatter.ofPattern("uuuu-M-d HH:mm:ss"),
+										 strict(DateTimeFormatter.ISO_LOCAL_DATE)));
 						yield l;
 					}
 					default -> null;
@@ -234,20 +242,20 @@ public class DateTime
 
 	private static DateTimeFormatter getMDYFormatter()
 	{
-		return DateTimeFormatter.ofPattern("MM/dd/uuuu");
+		return strict(DateTimeFormatter.ofPattern("MM/dd/uuuu"));
 	}
 
 	private static DateTimeFormatter getMDYParser()
 	{
-		return DateTimeFormatter.ofPattern("M/d/uuuu");
+		return strict(DateTimeFormatter.ofPattern("M/d/uuuu"));
 	}
 
 	// These patterns have optional fraction and TZ.
 	// The one with '-' is like ISO, but no 'T'.
 	private static List<DateTimeFormatter> getLongTimestampParsers()
 	{
-		return List.of(DateTimeFormatter.ofPattern("M/d/uuuu HH:mm:ss[.SSS [xxx]]"),
-					   DateTimeFormatter.ofPattern("uuuu-M-d HH:mm:ss[.SSS[ xxx]]"));
+		return List.of(strict(DateTimeFormatter.ofPattern("M/d/uuuu HH:mm:ss[.SSS [xxx]]")),
+					   strict(DateTimeFormatter.ofPattern("uuuu-M-d HH:mm:ss[.SSS[ xxx]]")));
 	}
 
 	private record DtoParse(Temporal dto, boolean isError, Exception ex) {}
