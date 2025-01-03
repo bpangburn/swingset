@@ -76,9 +76,9 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.checkConvertToJdbcType;
-import static com.nqadmin.swingset.datasources.ConvertType.convertObjectType;
 import static com.nqadmin.swingset.navigate.Utils.postRowSetModifiedError;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
 
 // TODO: Review state transitions (where it can happen).
 //		 Make sure to decorate at these points.
@@ -226,8 +226,8 @@ public class SSFormattedTextField extends JFormattedTextField
 			try {
 				// This avoids extra dialogs.
 				JDBCType jdbcType = getBoundColumnJDBCType();
-				Object v1 = convertObjectType(pce.getOldValue(), jdbcType);
-				Object v2 = convertObjectType(pce.getNewValue(), jdbcType);
+				Object v1 = convertToType(pce.getOldValue(), jdbcType);
+				Object v2 = convertToType(pce.getNewValue(), jdbcType);
 				// Avoid dialog if old and new are equal
 				return !Objects.equals(v1, v2);
 			} catch (SQLException ex) {
@@ -463,7 +463,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				// Avoid need for "(newValue instanceof Date) ||".
 				// See RowSetOps.updateColumnObject().
 				final Object newValue = Boolean.TRUE
-						? convertObjectType(dbValue, jdbcType) : dbValue;
+						? convertToType(dbValue, jdbcType) : dbValue;
 
 				// Only support some Java types for JFormattedTextFields.
 				// TODO: Wonder if "newValue instanceof Number" would work.

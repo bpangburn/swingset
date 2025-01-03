@@ -63,10 +63,6 @@ import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 import com.nqadmin.swingset.navigate.RowSetModificationEvent;
 
-// SSComponentInterface.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Interface with default methods shared by most SwingSet components.
  * There are only a few methods that must be implemented.

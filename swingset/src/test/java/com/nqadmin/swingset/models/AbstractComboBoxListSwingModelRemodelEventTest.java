@@ -42,7 +42,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * This is a copy of AbstractComboBoxListSwingModelEventTest just for events.
- * @author err
  */
 @SuppressWarnings("javadoc")
 public class AbstractComboBoxListSwingModelRemodelEventTest {

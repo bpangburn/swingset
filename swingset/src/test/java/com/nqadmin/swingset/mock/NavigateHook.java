@@ -40,7 +40,6 @@ import static com.nqadmin.swingset.navigate.NavAction.*;
 
 /**
  *
- * @author err
  */
 public class NavigateHook
 {

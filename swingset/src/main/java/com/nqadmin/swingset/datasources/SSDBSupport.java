@@ -53,8 +53,6 @@ import com.nqadmin.swingset.utils.CentralLookup;
 
 /**
  * Database specific handling and database access strategy.
- * 
- * @author err
  */
 public interface SSDBSupport {
 

@@ -1,8 +1,10 @@
+TextDecorator API
+
 ================================================================================
 ============================= BUGS =============================================
 ================================================================================
 
----
+--- minor display artifact
 If at bottom of stack, then Redo to an error, swithes from canNavigate btns to
 only RevertChanges btn. There is a brief flash of the commit button on the way,
 minor issue to ignore for now.
@@ -10,53 +12,6 @@ minor issue to ignore for now.
 ================================================================================
 ============================= HMMMM ============================================
 ================================================================================
-
----
-Should convert have an overflow exception?
-E.g. for Long --> Integer.
-
-Note string parsing does check for overflow. (at least Integer.parseInt() does)
-Test...
-
----
-Add variable SORT_REMOVE_KEYS to SSDataGrid, an option eventually.
-
----
-NavigateActions is tied to a rowset; and that object may be shared. Maybe better
-situation, have a thin object, e.g. Navigation, that references, and delegates
-to, a NavigateActions. Then Navigation is the model that is usually used, and it
-can fire events (or send a message over the bus) when its rowset changes. As is
-common, multiple components can use the same Navigation. NavigateActions is
-still there pretty much as is, but hidden inside a Navigation. An example of
-where this is wanted; an SSDataNavigator has a Navigation model, if the rowset
-in the Navigation changes, the SSDataNavigator detects this event and adjusts
-accordingly.
-
----
-RowSetState why not both weak keys and weak values. Problem is that state
-for inserting/acceptingChanges is allowed without NavigateActions.
-
----
-Should the methods in SSDataNavigator that delegate to getNavigatorActions()
-be deprecated? If NavigatorActions are considered a model, then there's
-some precedence to keep some of them for convenience.
-
----
-re-indent swingset
-// vi:set ts=8 sw=4 sts=4 noet:
-
----
-catch SQLFeatureNotSupportedException and do conversion manually? Option?
-Or run a program that checks what works and produces something that can be
-given to SS for configuration.
-
----
-In Field's componentValidate "null&&nullOK" check.
-What can be done as default for SSComponent in general?
-
----
-NumberField
-    The use of Locale is inconsistent
 
 ---
 Cleanup
@@ -95,15 +50,42 @@ utils/SSMsg - NOTE: RowSetOps CreateMessage(RSC)
 ---
 Examine SSFormattedTextField::updateSSComponent
 
----
-Use DateTime for MaskFormatter's converter.
-Use DateTimeFormatter instead of DateFormatter in Fields, consider
-relationship with DateTime.java.
+
+
+
+---Navigation Model
+NavigateActions is tied to a rowset; and that object may be shared. Maybe better
+situation, have a thin object, e.g. Navigation, that references, and delegates
+to, a NavigateActions. Then Navigation is the model that is usually used, and it
+can fire events (or send a message over the bus) when its rowset changes. As is
+common, multiple components can use the same Navigation. NavigateActions is
+still there pretty much as is, but hidden inside a Navigation. An example of
+where this is wanted; an SSDataNavigator has a Navigation model, if the rowset
+in the Navigation changes, the SSDataNavigator detects this event and adjusts
+accordingly.
 
 ---
-Rename SSDataNavigator to SSNavigatorBar?
-Rename NavigateActions to Navigation?
+Should the methods in SSDataNavigator that delegate to getNavigatorActions()
+be deprecated? If NavigatorActions are considered a model, then there's
+some precedence to keep some of them for convenience.
 
+---
+re-indent swingset
+// vi:set ts=8 sw=4 sts=4 noet:
+
+--- Conversion enable
+catch SQLFeatureNotSupportedException and do conversion manually;
+first check specified configuration for DB?
+In exception, fill in "Boolean convert[from,to]" as needed,
+or maybe check supportsConvert(int fromType, int toType).
+Run a program that checks what works and produces something that can be
+given to SS for configuration.
+
+---
+NumberField
+    The use of Locale is inconsistent
+
+    TEST/VERIFY: override mask formatters and/or derive from base formatters.
 
 ---
 Regarding date/time formatting/parse consider RsolverStyle.
@@ -115,21 +97,16 @@ and _STRICT is the default.
 =========================== CLEANUP ============================================
 ================================================================================
 
-Get rid of the @author tags.
-
 ---
 In NavigateActions, should the static methods have instance counterparts,
 e.g. hasActiveRow. Then could make direct queries when a Navigation is available.
 
 ---
-Want checkRowOK() done in RowSetOps.update*, might throw "no records"
-exception, caught in SSCommon. Problem with SSFTF and arrays (SSList).
-But ... Maybe don't want that, the check really belongs in listener.
-Having the check in the component listener does seem like the right place.
-Wonder about generating a hidden listener wrapper.
-
----
 When onInsertRow, visual indication new record. Color the "Add record" icon; Yellow?
+---
+RowSetState, part of Navigation, needs to broadcast state changes, inserting.
+Then NavigatorBar can use that info to give a visual indicator.
+
 
 ---
 When no records and not insertRow, visual indication that can't edit.
@@ -208,11 +185,24 @@ Add Calendar conversions? Skip it, go directly to java.time.
 
 
 ================================================================================
+============================ OTHER =============================================
+================================================================================
+
+Chart components.
+    https://github.com/jfree/jfreechart
+        https://www.jfree.org/jfreechart/
+    https://github.com/jfree/orson-charts
+        3D charts - recommended by jfreechart
+    https://github.com/knowm/XChart
+
+
+================================================================================
 ============================ TOOLS =============================================
 ================================================================================
 
-Java program using jdbc that tried a lot of stuff on a DB and reports compatibility.
-Goal is to produce DB plugin info that can be directly used by SS.
+DbCap - database capabilities
+    Java program using jdbc that tried a lot of stuff on a DB and reports compatibility.
+    Goal is to produce DB plugin info that can be directly used by SS.
 
 Get list of SyncProvider
 What conversions are suppport for updateXxx
@@ -260,17 +250,25 @@ Field tooltip with format/...
 Document SSComponent as groups
 
 Should SSCommon only be used internaly and from SSComponent?
-SSComponent package access only.
+SSComponent package access only. See proposed @SSCommon annotation.
 
-Minimal use, if at all, by implementations of SSComponent.
+Does sscommon ever need to be referenced outide of SSComponent?
+At least for instance methods. Maybe static methods are ok public.
+
+Minimal direct use, if at all, by implementations of SSComponent.
 
 For example, setDecorator/setValidator/setTextDecorator only publicly
 through SSComponent.
 
 ---
-TextDecorator capable SSTextField
+TextDecorator capable SSTextField or any SSComponent
+
 Improve API for textDecorator, get rid of SSFormattedTextField::TextDecEnbl
-- make it a property for any SSComponent.
+- TextDecorator a property for any SSComponent defines how the text is descorated.
+  Also defines algorithm for how to apply decoration.
+
+TextDecorator takes object value and JDBCtype.
+decorator focus proxy?
 
 ============== FLUENT API
 
@@ -280,7 +278,9 @@ Wonder if rxjava-jdbc could be useful as part of a fluent jdbc capability.
 
 ============== ERRORS
 
-Make sure error dialogs clearly differentiate (as much as possible)
++++ exceptions without generating errors or retry
+
+Make sure error dialogs and logging clearly differentiate (as much as possible)
 user error, database error, internal error.
 
 There are several places where a database exception is logged but there is
@@ -288,6 +288,12 @@ no notification to the user, e.g. SSCommon::getBoundColumnObject().
 What are good ways to handle this. Option to close app, retry...
 Maybe the SQLException can be examined to provide better info and hints.
 Might need plugin per database type to help decode exception.
+
+updateColumnText can get sql exception, e.g. chars don't fit.
+This brings up a dialog, and during testing if click OK
+there is no error.
+In RowSetOps could 'catch(SQLException ex) {excount++; throw ex;}
+and a getExCount(). Maybe the counter could be in postRowSetError.
 
 
 ============== EVENTS
@@ -358,7 +364,14 @@ SS-5 commit with some 4.1 applicable fixes
 
 Have an annotation, e.g. @SSCompMethod NewM() {...}, used on something in SSCommon, and that
 automagically becomes "default NewM() { getSSCommon.NewM(); }" really want these things
-to be "final" in SSComponent.
+to be "final" in SSComponent. HARD TO DO and COMPILE.
+
+@SSCommon
+    - marks a default interface in SSComponent that delagates to SSCommon
+    - Compile error if overridden
+    - Would like to autogenerate the delagation code, but just "nice to have"
+@OverrideSSCommon
+    - Prevents the error normally generated by overridding @SSCommon
 
 ============== EVENTBUS
 
@@ -387,6 +400,9 @@ EventBus replacement
     Note rxjava-jdbc https://github.com/davidmoten/rxjava-jdbc
 
 ============== CONVERT
+
+SS ConvertType is extensive, it can do B.5. 
+SS handles conversions as defined by B.5 for RowSet when doing ResultSet update.
 
 Allow character conversions to whatever.
 
@@ -480,4 +496,31 @@ Any issues involved with prepared statements?
 
 SyncProvider/SyncResolver. Find with nice UI.
 https://docs.oracle.com/javase/tutorial/jdbc/basics/cachedrowset.html
+
+Why is ResultSet's updateXxx used? Would RowSet's setXxx be better?
+The updateXxx methods handle the primary keys automatically.
+At least for H2, with an updateRow, the row is read to plug in the values
+from the data base that have not been modified. Can this give INCONSISTENT row?
+If OK with inconsistent row, could using a prepared statement to write, instead
+of the update row, avoid the DB read?
+
+Wonder how other DBs handle this?
+
+Any issues with various ResultSet "type". Concurrency, Holdability, ...
+
+Working with and/or interactions with TypeMap.
+
+Interactions with stored procedures? Probably not, SS is for RowSet.
+Possbile that future enhancements might make some things easier,
+but who know what stuff.
+
+Handle tables without a key.
+
+Bug with column name when "as xxx" phrase.
+
+--- H2 notes
+
+- for H2, DatabaseMetaData.supportsConvert() does "return true".
+- updateObject does the conversions specified by appendix B.5 for setObject.
+- overflow exceptions possible when narrowing
 

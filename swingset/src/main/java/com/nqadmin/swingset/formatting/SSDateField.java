@@ -51,11 +51,6 @@ import javax.swing.text.DefaultFormatterFactory;
 
 import com.nqadmin.swingset.utils.SSUtils;
 
-
-// SSDateField.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Used to link a SSFormattedTextField to a date column in a database.
  */

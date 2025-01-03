@@ -101,10 +101,6 @@ import static com.nqadmin.swingset.datasources.DateTime.getDateTimeText;
 import static com.nqadmin.swingset.datasources.DateTime.getSQLDateTimeObject;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
-// SSDataGrid.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * SSDataGrid provides a way to display information from a database in a table
  * format (aka "spreadsheet" or "datasheet" view). The SSDataGrid takes a
@@ -182,14 +178,17 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * </pre>
  */
 @SuppressWarnings("serial")
-public class SSDataGrid extends JTable {
-
+public class SSDataGrid extends JTable
+{
 	// TODO BUG? there's no programatic way to change COPY/PASTE.
 	//		For example to do keyAdapter.setAlloowInsertaion false.
 	// TODO Add documentation for CUT/PASTE keys/operation.
 
 	// TODO Add support for JFormattedTextField.
 	// TODO Add support for GlazedList table features.
+
+	// TODO: make this a visible option?
+	private static final boolean REMOVE_KEYS_IF_PRIMARY_UNSORTED = true;
 
 	/**
 	 * Editor for check box fields.
@@ -926,8 +925,8 @@ public class SSDataGrid extends JTable {
 			// The primary sorting key may get some special handling
 			if(!keys.isEmpty() && keys.get(0).getColumn() == column) {
 				if(keys.get(0).getSortOrder() == SortOrder.DESCENDING) {
-					// cycle from descending no sort on this key
-					if(Boolean.TRUE) {
+					// cycle from descending no sort on primary key
+					if(REMOVE_KEYS_IF_PRIMARY_UNSORTED) {
 						// Like removing all keys.
 						// Next toggle restores sorts.
 						keys.set(0, new SortKey(column, SortOrder.UNSORTED));

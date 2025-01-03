@@ -63,7 +63,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *
- * @author err
  */
 @SuppressWarnings("javadoc")
 public class SSListItemFormatTest {

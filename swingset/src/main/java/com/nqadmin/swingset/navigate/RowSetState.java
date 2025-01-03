@@ -64,7 +64,6 @@ public class RowSetState
 	private boolean preInsertOps;
 	private WeakReference<NavigateActions> refNavigateActions = new WeakReference<>(null);
 
-	// don't have to worry about concurrency, always EDT
 	private static final Map<RowSet,RowSetState> rowSetState
 			= new MapMaker().weakKeys().makeMap();
 

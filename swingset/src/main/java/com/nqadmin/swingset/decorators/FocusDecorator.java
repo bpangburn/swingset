@@ -103,24 +103,14 @@ public abstract class FocusDecorator
 	 */
 	@Override
 	public <E extends Enum<E>> void decorateText(E _style) {
-		Color color;
-		if (_style instanceof TextDecorationStyle) {
-			TextDecorationStyle style = (TextDecorationStyle) _style;
-			switch (style) {
-			case NEGATIVE_NUMBER:
-				color = Color.RED;
-				break;
-			case RESET:
-				color = Color.BLACK;
-				break;
-			case NO_CHANGE: // fallthrough
-			default:
-				color = null;
-				break;
-			}
-			textColor = color;
-			if (color != null) {
-				jc().setForeground(color);
+		if (_style instanceof TextDecorationStyle style) {
+			textColor = switch (style) {
+			case NEGATIVE_NUMBER  -> Color.RED;
+			case RESET            -> Color.BLACK;
+			case NO_CHANGE        -> null;
+			};
+			if (textColor != null) {
+				jc().setForeground(textColor);
 			}
 		}
 	}

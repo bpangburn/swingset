@@ -53,10 +53,6 @@ import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
-// SSTimeField.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Used to link a SSTimeField to a time column in a database.
  */

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="TRACE">
+<Configuration status="DEBUG">
     <Appenders>
         <Console name="ConsoleAppender" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss} [%t] %-5level %logger{36}.%M() - %msg%n" />
@@ -10,11 +10,11 @@
     </Appenders>
 
     <Loggers>
-        <logger name="com.nqadmin.swingset" additivity="false" level="TRACE">
+        <logger name="com.nqadmin.swingset" additivity="false" level="DEBUG">
             <AppenderRef ref="ConsoleAppender" />
             <AppenderRef ref="FileAppender"/>
         </logger>
-        <logger name="com.nqadmin.swingset.demo" additivity="false" level="TRACE">
+        <logger name="com.nqadmin.swingset.demo" additivity="false" level="DEBUG">
             <AppenderRef ref="ConsoleAppender" />
             <AppenderRef ref="FileAppender"/>
         </logger>

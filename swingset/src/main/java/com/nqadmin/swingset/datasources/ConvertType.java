@@ -62,7 +62,8 @@ import static java.sql.JDBCType.*;
 import static com.nqadmin.swingset.datasources.ConvertType.Clazz.getClazz;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
-// TODO: Wonder if a "X --> Y" sparse matrix filled with converters...
+// TODO: Wonder if a "X --> Y" sparse matrix filled with converters... guava table.
+// There's /junk/repo/h2database/h2/src/main/org/h2/value/Value.java with conversions.
 
 /**
  * Different database jdbc drivers support different type conversion;
@@ -96,6 +97,16 @@ public class ConvertType
 		// overrideJdbcToJavaType.put(JDBCType.SMALLINT, Byte.class);
 		// overrideJdbcToJavaType.put(JDBCType.TINYINT, Short.class);
 	}
+
+	// Only types listed here allowed for "findJavaTypeClass()";
+	// overrideJdbcStandard above is checked first/before.
+	private static final Set<JDBCType> handledJavaTypeClass = EnumSet.of(
+			INTEGER, SMALLINT, TINYINT, BIGINT,
+			REAL, FLOAT, DOUBLE, DECIMAL, NUMERIC,
+			BIT, BOOLEAN,
+			DATE, TIME, TIMESTAMP,
+			CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR
+	);
 
 	/**
 	 * Throw if the specified JDBCType is not convertible, using methods in this
@@ -286,7 +297,7 @@ public class ConvertType
 	 */
 	// TODO: move to the following?
 	//@see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B.5 Conversions by setObject and setNull from Java Object Types to JDBC Types
-	public static Object convertObjectType(Object value, JDBCType jdbcType)
+	public static Object convertToType(Object value, JDBCType jdbcType)
 			throws SQLException
 	{
 		Class<?> type = findJavaTypeClass(jdbcType);
@@ -309,7 +320,7 @@ public class ConvertType
 	 * @throws com.nqadmin.swingset.datasources.SSSQLConversionException
 	 */
 	// TODO: handle primitive types??? See enum Clazz for notes.
-	public static <T> T convertObjectType(Object value, Class<T> type)
+	public static <T> T convertToType(Object value, Class<T> type)
 			throws SSSQLConversionException
 	{
 		@SuppressWarnings("unchecked")
@@ -319,6 +330,9 @@ public class ConvertType
 					value.getClass().getName(), type.getClass().getName()));
 		return type.cast(target); // TODO: Don't really need the cast, but it's cheap.
 	}
+
+	private static BigDecimal bdMaxLong = BigDecimal.valueOf(Long.MAX_VALUE);
+	private static BigDecimal bdMinLong = BigDecimal.valueOf(Long.MIN_VALUE);
 
 	/** Return something of the specified type,
 	 * unless can't convert then "CanNotConvert" Object is returned.
@@ -341,12 +355,25 @@ public class ConvertType
 		}
 
 		if(source.isNumeric() && target.isNumeric()) {
+			// Throw if detect overflow/underflow
+			// Match.toIntExact(longVal)
 			Number n = (Number) sourceValue;
+			Number result = 0;
+			boolean bigdOflow = false;
 			switch(target) {
-			case LONG -> { return n.longValue(); }
-			case INT -> { return n.intValue(); }
-			case SHORT -> { return n.shortValue(); }
-			case BYTE -> { return n.byteValue(); }
+			case LONG -> {
+				result = n.longValue();
+				if (source == Clazz.BIGD) {
+					BigDecimal bd = (BigDecimal)n;
+					if (bdMinLong.compareTo(bd) <= 0
+							&& bd.compareTo(bdMaxLong) <= 0)
+						return result;
+					bigdOflow = true;
+				}
+			}
+			case INT -> { result = n.intValue(); }
+			case SHORT -> { result = n.shortValue(); }
+			case BYTE -> { result = n.byteValue(); }
 			case FLOAT -> { return n.floatValue(); }
 			case DOUBLE -> { return n.doubleValue(); }
 			case BIGD -> {
@@ -357,9 +384,11 @@ public class ConvertType
 				case FLOAT, DOUBLE -> { return BigDecimal.valueOf(n.doubleValue()); }
 				case BIGD -> { return n; }	// Should have been caught at entry.
 				}
-			}
-			}
-			assert false;
+			} }
+			if (result.longValue() != n.longValue() || bigdOflow)
+				throw new SSSQLConversionException(sf("Convert %s to %s: %s",
+						n, target, "overflow"));
+			return result;
 		}
 
 		switch (sourceValue) {
@@ -570,14 +599,6 @@ public class ConvertType
 		}
 	}
 
-	private static final Set<JDBCType> handledJavaTypeClass = EnumSet.of(
-			INTEGER, SMALLINT, TINYINT, BIGINT,
-			REAL, FLOAT, DOUBLE, DECIMAL, NUMERIC,
-			BIT, BOOLEAN,
-			DATE, TIME, TIMESTAMP,
-			CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR
-	);
-
 	/**
 	 * Determine the Java type class for the given database type.
 	 * @param jdbcType JDBCType of interest
@@ -601,7 +622,7 @@ public class ConvertType
 
 		return JdbcDataTypeConversionTables.jdbcTypeToClassStrict(jdbcType);
 
-		// No coversion for the following
+		// NOTE: No coversion for the following:
 		// ARRAY BINARY VARBINARY LONGVARBINARY CLOB BLOB REF DATALINK
 		// ROWID NCLOB SQLXML DISTINCT STRUCT JAVA_OBJECT
 	}
@@ -613,28 +634,28 @@ public class ConvertType
 		STRING(String.class),
 		BOOL(Boolean.class),
 
-		// TODO: how to handle primitives
+		// TODO: how to handle primitives?
 		//		- INT(List.of(Integer.class, int.class))
 		//		- PINT
 		//		- don't have primitives *** this seems right
 
-		INT(Integer.class,			true, false),
-		SHORT(Short.class,			true, false),
-		BYTE(Byte.class,			true, false),
-		LONG(Long.class,			true, false),
+		INT(Integer.class,			true, true),
+		SHORT(Short.class,			true, true),
+		BYTE(Byte.class,			true, true),
+		LONG(Long.class,			true, true),
 		
 		FLOAT(Float.class,			true, false),
 		DOUBLE(Double.class,		true, false),
 		BIGD(BigDecimal.class,		true, false),
 
-		UTILDATE(Date.class,				false, true),
-		DATE(java.sql.Date.class,			false, true),
-		TIME(java.sql.Time.class,			false, true),
-		TIMESTAMP(java.sql.Timestamp.class,	false, true),
+		UTILDATE(Date.class,				true),
+		DATE(java.sql.Date.class,			true),
+		TIME(java.sql.Time.class,			true),
+		TIMESTAMP(java.sql.Timestamp.class,	true),
 
-		LOCALDATE(java.time.LocalDate.class,			false, true),
-		LOCALTIME(java.time.LocalTime.class,			false, true),
-		LOCALDATETIME(java.time.LocalDateTime.class,	false, true),
+		LOCALDATE(java.time.LocalDate.class,			true),
+		LOCALTIME(java.time.LocalTime.class,			true),
+		LOCALDATETIME(java.time.LocalDateTime.class,	true),
 
 		// TODO: OFFSETTIME, OFFSETDATETIME
 		;
@@ -645,22 +666,53 @@ public class ConvertType
 		}
 
 		private final boolean isNumeric;
+		private final boolean isIntegral;
 		private final boolean isDateTime;
+
+		// Not a number, not a date/time.
 		Clazz(Class<?> clazz)
 		{
-			this(clazz, false, false);
+			mapClazz.put(clazz, this);
+			this.isNumeric = false;
+			this.isIntegral = false;
+			this.isDateTime = false;
 		}
+
+		// A number value.
 		@SuppressWarnings("LeakingThisInConstructor")
-		Clazz(Class<?> clazz, boolean isNumeric, boolean isDateTime)
+		Clazz(Class<?> clazz, boolean isNumeric, boolean isIntegral)
 		{
 			mapClazz.put(clazz, this);
 			this.isNumeric = isNumeric;
+			this.isIntegral = isIntegral;
+			this.isDateTime = false;
+		}
+		
+		// A Date/Time value.
+		@SuppressWarnings("LeakingThisInConstructor")
+		Clazz(Class<?> clazz, boolean isDateTime)
+		{
+			if (!isDateTime)
+				throw new IllegalArgumentException();
+			mapClazz.put(clazz, this);
+			this.isNumeric = false;
+			this.isIntegral = false;
 			this.isDateTime = isDateTime;
 		}
 
 		boolean isNumeric()
 		{
 			return isNumeric;
+		}
+
+		public boolean isIntegral()
+		{
+			return isNumeric && isIntegral;
+		}
+
+		public boolean isFloating()
+		{
+			return isNumeric && !isIntegral;
 		}
 
 		boolean isDateTime()
@@ -769,7 +821,8 @@ public class ConvertType
 		case TIME -> value = java.sql.Time.valueOf(_text);
 		case TIMESTAMP -> {
 			// TODO: We're not doing anything here
-			// TODO: Probably a better way to handle date to timestamp conversion. Formatter? Get rid of getSQLDate() if possible.
+			// TODO: Probably a better way to handle date to timestamp conversion.
+			//		 Formatter? Get rid of getSQLDate() if possible.
 			// CONVERT ANY 10 CHARACTER DATE (e.g., yyyy-mm-dd, mm/dd/yyyy to a date/time)
 			if (_text.length() == 10) {
 				//*****// value = new Timestamp(SSCommon.getSQLDate(_text).getTime());

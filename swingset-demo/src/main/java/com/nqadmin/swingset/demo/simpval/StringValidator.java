@@ -40,10 +40,12 @@ package com.nqadmin.swingset.demo.simpval;
 import org.netbeans.validation.api.AbstractValidator;
 
 /**
- *
- * @author err
+ * A validator that handles a string.
  */
 public abstract class StringValidator extends AbstractValidator<String> {
+	/**
+	 * Specify the validator handles a string.
+	 */
     protected StringValidator() {
         super (String.class);
     }

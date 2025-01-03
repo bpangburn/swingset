@@ -31,7 +31,6 @@ package com.nqadmin.swingset.datasources;
 
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -56,8 +55,7 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- *
- * @author err
+ * RowSetOpsTest.
  */
 public class RowSetOpsTest
 {

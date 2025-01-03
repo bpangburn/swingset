@@ -81,18 +81,14 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
 import static com.nqadmin.swingset.datasources.ConvertType.getJDBCType;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
-import static com.nqadmin.swingset.datasources.ConvertType.convertObjectType;
 import static com.nqadmin.swingset.datasources.DateTime.getSQLDateTimeObject;
-
-// RowSetOps.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+import static com.nqadmin.swingset.datasources.JdbcDataTypeConversionTables.jdbcTypeToClass; 
+import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
 
 /**
  * Utility class for working with {@link RowSet}s and {@link ResultSet}s.
  * Some methods for converting to/from text from/to objects according
  * to database type. Several convenience methods for accessing metadata.
- * 
  * 
  * @since 4.0.0
  */
@@ -477,7 +473,7 @@ public class RowSetOps {
 		Object objectValue = NavigateActions.isUndoRedoEnabled(comp)
 				? NavigateActions.fetchCurrentValue(comp)
 				: comp.getRowSet().getObject(comp.getBoundColumnIndex());
-		return convertObjectType(objectValue, type);
+		return convertToType(objectValue, type);
 	}
 
 	/**
@@ -852,7 +848,7 @@ public class RowSetOps {
 			// TODO: It's weird that updateObject(idx,obj,type) javadoc says
 			//		 "type to be sent to the database". Does that mean the specified
 			//		 conversions for setObject kick in at that point?
-			Object obj = convertObjectType(updatedValue, jdbcType);
+			Object obj = convertToType(updatedValue, jdbcType);
 			updateColumnObjectDirect(rowSet, columnIndex, obj, jdbcType);
 			did_update = true;
 		} finally {
@@ -907,8 +903,8 @@ public class RowSetOps {
 			throws SQLException
 	{
 		// Only do this for strings.
-		if(findJavaTypeClass(comp.getBoundColumnJDBCType()) != String.class)
-			return;
+		if (jdbcTypeToClass(comp.getBoundColumnJDBCType()) != String.class)
+				return;
 
 		ForceConflict fc = defLookup(ForceConflict.class);
 		if (fc == null || !fc.doForce())
@@ -1049,7 +1045,7 @@ public class RowSetOps {
 					REAL, DOUBLE, FLOAT, DECIMAL, NUMERIC,
 					BOOLEAN, BIT,
 					CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR ->
-				dbValue = convertObjectType(updatedValue, jdbcType);
+				dbValue = convertToType(updatedValue, jdbcType);
 			case DATE, TIME, TIMESTAMP -> // TODO: use convertObjectType when...
 				dbValue = getSQLDateTimeObject(updatedValue, comp);
 			default ->

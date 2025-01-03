@@ -96,14 +96,11 @@ import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 import com.nqadmin.swingset.navigate.RowSetState;
 
-import static com.nqadmin.swingset.datasources.ConvertType.convertObjectType;
 import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingChanges;
 import static com.nqadmin.swingset.navigate.Utils.postRowSetModifiedError;
+import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
-
-// SSCommon.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
 
 /**
  * Datasource binding data members and methods common to all SwingSet
@@ -569,13 +566,15 @@ public class SSCommon
 		return this;
 	}
 
+	/** Put this in the global lookup to create debug row set listeners */
+	public static class DebugRowSetListener {
+	}
 
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	private void debugTrackRowSetListener()
 	{
-		// TODO: add a lookup
-		// if (Boolean.TRUE)
-		// 	return;
+		if (defLookup(DebugRowSetListener.class) == null)
+			return;
 		if (getRowSet() == null)
 			return;
 		getRowSet().addRowSetListener(new RowSetListener()
@@ -1350,7 +1349,7 @@ public class SSCommon
 		
 		Object obj = value;
 		if (Boolean.TRUE)
-			obj = convertObjectType(obj, getBoundColumnJDBCType());
+			obj = convertToType(obj, getBoundColumnJDBCType());
 		// NOTE: following does not generate any events
 		getRowSet().updateObject(getBoundColumnIndex(), obj);
 		// NOTE: Previous line sets value in RowSet's pending update.

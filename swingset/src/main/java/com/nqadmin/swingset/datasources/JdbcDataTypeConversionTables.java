@@ -140,7 +140,7 @@ public class JdbcDataTypeConversionTables {
 	 * The JDBC 4.2 spec only has one class listed per JDBCType since they
 	 * are the types returned by getObject for a given type. However, for
 	 * certain types (not constrained to JDBC 1.0) newer JDK types are
-	 * recommended and or course there are the new *WITH_TIMEZONE types.
+	 * recommended and of course there are the new *WITH_TIMEZONE types.
 	 * Since this is a list multimap, the updated information is included
 	 * and is provided by the default method
 	 * {@link #jdbcTypeToClass(java.sql.JDBCType) }; see that method's javadoc
@@ -162,8 +162,7 @@ public class JdbcDataTypeConversionTables {
 		ListMultimap<JDBCType, Class<?>> table3 = MultimapBuilder
 				.enumKeys(JDBCType.class)
 				.arrayListValues(2)
-				.build()
-				;
+				.build();
 		table3.put(CHAR, String.class);
 		table3.put(VARCHAR, String.class);
 		table3.put(LONGVARCHAR, String.class);

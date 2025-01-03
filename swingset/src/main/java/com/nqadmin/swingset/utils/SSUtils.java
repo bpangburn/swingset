@@ -66,8 +66,7 @@ import com.nqadmin.swingset.datasources.SSDBSupport;
 
 
 /**
- *
- * @author err
+ * General.
  */
 public class SSUtils {
 	private SSUtils() {}

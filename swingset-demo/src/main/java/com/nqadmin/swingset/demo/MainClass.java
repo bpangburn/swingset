@@ -103,14 +103,13 @@ import javax.swing.PopupFactory;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.spi.SyncFactory;
 import javax.sql.rowset.spi.SyncFactoryException;
 import javax.sql.rowset.spi.SyncProvider;
 
-import org.openide.util.Exceptions;
+import com.nqadmin.swingset.utils.SSCommon;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
@@ -141,12 +140,16 @@ public class MainClass extends JFrame
 
 	static {
 		if(Boolean.FALSE) {
+			Objects.nonNull(new SSCommon.DebugRowSetListener());
+			Objects.nonNull(new ForceConflict(0));
 			Objects.nonNull(new H2Trace(""));
 			Objects.nonNull(new MainClass().new LogManListener());
 		}
 	}
 
 	static class LoadDemoImages {}
+	// https://h2database.com/html/features.html#trace_options
+	// lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
 	static class H2Trace {
 		private final String flags;
 		H2Trace() { this.flags = ""; }
@@ -287,13 +290,14 @@ public class MainClass extends JFrame
 
 	}
 
-	/**
-	 * component dimensions
-	 */
+	/** component dimension */
 	protected static final int buttonHeight = 25;
+	/** component dimension */
 	protected static final int buttonWidth = 250;
+	/** component dimension */
 	protected static final Dimension buttonDim = new Dimension(buttonWidth, buttonHeight);
 
+	/** component dimension */
 	protected static final int gridColumnWidth = 60;
 
 	private static final int labelHeight = 20;
@@ -301,24 +305,32 @@ public class MainClass extends JFrame
 	private static final int labelHeightVeryTall = 100; // used for images
 	private static final int labelWidth = 200;
 
+	/** component dimension default*/
 	protected static final Dimension labelDim = new Dimension(labelWidth, labelHeight);
-	protected static final Dimension labelDimTall = new Dimension(labelWidth, labelHeightTall); // used for lists,
-																								// textareas
-	protected static final Dimension labelDimVeryTall = new Dimension(labelWidth, labelHeightVeryTall); // used for
-																										// images
+	/** component dimension for lists, text areas */
+	protected static final Dimension labelDimTall = new Dimension(labelWidth, labelHeightTall);
+	/** component dimension for images */
+	protected static final Dimension labelDimVeryTall = new Dimension(labelWidth, labelHeightVeryTall);
 
 	private static final int ssHeight = 20;
 	private static final int ssHeightTall = 100; // used for lists, textareas
 	private static final int ssHeightVeryTall = 200; // used for images
 	private static final int ssWidth = 240;
 
+	/** component dimension default*/
 	protected static final Dimension ssDim = new Dimension(ssWidth, ssHeight);
-	protected static final Dimension ssDimTall = new Dimension(ssWidth, ssHeightTall); // used for lists, textareas
-	protected static final Dimension ssDimVeryTall = new Dimension(ssWidth, ssHeightVeryTall); // used for images
+	/** component dimension for lists, text areas */
+	protected static final Dimension ssDimTall = new Dimension(ssWidth, ssHeightTall);
+	/** component dimension for images */
+	protected static final Dimension ssDimVeryTall = new Dimension(ssWidth, ssHeightVeryTall);
 
+	/** component dimension */
 	protected static final int childScreenHeight = 400;
+	/** component dimension */
 	protected static final int childScreenHeightTall = 800;
+	/** component dimension */
 	protected static final int childScreenWidth = 600;
+	/** component dimension */
 	protected static final int childScreenCount = 10;
 
 	private Connection dbConnection = null;
@@ -842,7 +854,8 @@ public class MainClass extends JFrame
 		lkup.add(new H2Trace());
 		//lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
 		//lkup.add(new H2Workaround()); // fixed in H2 Version 2.3.230 (2024-07-15
-		lkup.add(new ForceConflict(0));
+		//lkup.add(new ForceConflict(0));
+		//lkup.add(new SSCommon.DebugRowSetListener());
 
 		boolean some_error = false;
 		System.err.printf("java:%s vm:%s date:%s os:%s\n",

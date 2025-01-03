@@ -30,11 +30,14 @@
 package com.nqadmin.swingset.datasources;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.JDBCType;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
 import java.util.Date;
 import java.util.EnumSet;
 
@@ -44,12 +47,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static com.nqadmin.swingset.datasources.ConvertType.convertObjectType;
+import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
 import static org.junit.jupiter.api.Assertions.*;
+import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
 
 /**
- *
- * @author err
+ * ConvertTypeTest.
  */
 public class ConvertTypeTest
 {
@@ -142,61 +145,106 @@ public class ConvertTypeTest
 		System.out.println("convertStringToNumber");
 		Object rv;
 		
-		rv = convertObjectType("123", JDBCType.TINYINT);
+		rv = convertToType("123", JDBCType.TINYINT);
 		assertEquals(Integer.class, rv.getClass());
 		assertEquals(123, rv);
-		rv = convertObjectType("123", JDBCType.SMALLINT);
+		rv = convertToType("123", JDBCType.SMALLINT);
 		assertEquals(Integer.class, rv.getClass());
 		assertEquals((Integer)123, rv);
-		rv = convertObjectType("123", JDBCType.INTEGER);
+		rv = convertToType("123", JDBCType.INTEGER);
 		assertEquals(Integer.class, rv.getClass());
 		assertEquals((Integer)123, rv);
-		rv = convertObjectType("123", JDBCType.BIGINT);
+		rv = convertToType("123", JDBCType.BIGINT);
 		assertEquals(Long.class, rv.getClass());
 		assertEquals(123L, rv);
-		rv = convertObjectType("123", JDBCType.REAL);
+		rv = convertToType("123", JDBCType.REAL);
 		assertEquals(Float.class, rv.getClass());
 		assertEquals(123F, rv);
-		rv = convertObjectType("123", JDBCType.FLOAT);
+		rv = convertToType("123", JDBCType.FLOAT);
 		assertEquals(Double.class, rv.getClass());
 		assertEquals(123D, rv);
-		rv = convertObjectType("123", JDBCType.DOUBLE);
+		rv = convertToType("123", JDBCType.DOUBLE);
 		assertEquals(Double.class, rv.getClass());
 		assertEquals(123D, rv);
-		rv = convertObjectType("123", JDBCType.NUMERIC);
+		rv = convertToType("123", JDBCType.NUMERIC);
 		assertEquals(BigDecimal.class, rv.getClass());
 		assertEquals(BigDecimal.valueOf(123), rv);
-		rv = convertObjectType("123", JDBCType.DECIMAL);
+		rv = convertToType("123", JDBCType.DECIMAL);
 		assertEquals(BigDecimal.class, rv.getClass());
 		assertEquals(BigDecimal.valueOf(123), rv);
 
 		// Java types
-		rv = convertObjectType("123", Byte.class);
+		rv = convertToType("123", Byte.class);
 		assertEquals(Byte.class, rv.getClass());
 		assertEquals((byte)123, rv);
-		rv = convertObjectType("123", Short.class);
+		rv = convertToType("123", Short.class);
 		assertEquals(Short.class, rv.getClass());
 		assertEquals((short)123, rv);
-		rv = convertObjectType("123", Integer.class);
+		rv = convertToType("123", Integer.class);
 		assertEquals(Integer.class, rv.getClass());
 		assertEquals(123, rv);
-		rv = convertObjectType("123", Long.class);
+		rv = convertToType("123", Long.class);
 		assertEquals(Long.class, rv.getClass());
 		assertEquals(123L, rv);
-		rv = convertObjectType("123", Float.class);
+		rv = convertToType("123", Float.class);
 		assertEquals(Float.class, rv.getClass());
 		assertEquals(123F, rv);
-		rv = convertObjectType("123", Double.class);
+		rv = convertToType("123", Double.class);
 		assertEquals(Double.class, rv.getClass());
 		assertEquals(123D, rv);
-		rv = convertObjectType("123", BigDecimal.class);
+		rv = convertToType("123", BigDecimal.class);
 		assertEquals(BigDecimal.class, rv.getClass());
 		assertEquals(BigDecimal.valueOf(123), rv);
+
+		assertThrows(SSSQLConversionException.class, () -> convertToType(
+				String.valueOf(Byte.MAX_VALUE + 1), Byte.class));
+		assertThrows(SSSQLConversionException.class, () -> convertToType(
+				String.valueOf(Short.MAX_VALUE + 1), Short.class));
+		assertThrows(SSSQLConversionException.class, () -> convertToType(
+				String.valueOf((long)Integer.MAX_VALUE + 1), Integer.class));
+		assertThrows(SSSQLConversionException.class, () -> convertToType(
+				BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.ONE).toString(),
+				Long.class));
 
 		// Primitive types ???
 		// rv = convertObjectType("123", long.class);
 		// assertEquals(Long.class, rv.getClass());
 		// assertEquals(123L, rv);
+	}
+
+	/** x
+	 * @throws java.lang.Exception */
+	@Test
+	@SuppressWarnings({"ThrowableResultIgnored", "UseOfSystemOutOrSystemErr"})
+	public void testConvertNumberToNumber() throws Exception
+	{
+		System.out.println("convertNumberToNumber");
+		@SuppressWarnings("unused")
+		Object rv;
+
+		rv = convertToType((long)Byte.MAX_VALUE, Byte.class);
+		assertEquals(Byte.MAX_VALUE, rv);
+		assertThrows(SSSQLConversionException.class,
+				() -> convertToType((long)(Byte.MAX_VALUE + 1), Byte.class));
+
+		rv = convertToType((long)Short.MAX_VALUE, Short.class);
+		assertEquals(Short.MAX_VALUE, rv);
+		assertThrows(SSSQLConversionException.class,
+				() -> convertToType((long)(Short.MAX_VALUE + 1), Short.class));
+
+		rv = convertToType((long)Integer.MAX_VALUE, Integer.class);
+		assertEquals(Integer.MAX_VALUE, rv);
+		assertThrows(SSSQLConversionException.class,
+				() -> convertToType((long)Integer.MAX_VALUE + 1, Integer.class));
+
+		rv = convertToType(Long.MAX_VALUE, Long.class);
+		assertEquals(Long.MAX_VALUE, rv);
+		rv = convertToType(BigDecimal.valueOf(Long.MAX_VALUE), Long.class);
+		assertEquals(Long.MAX_VALUE, rv);
+
+		assertThrows(SSSQLConversionException.class, () -> convertToType(
+				BigDecimal.valueOf(Long.MAX_VALUE).add(BigDecimal.ONE),
+				Long.class));
 	}
 
 	/**
@@ -221,85 +269,85 @@ public class ConvertTypeTest
 		Date ud = new java.util.Date(ts.getTime());
 
 		// to java.sql.TIMESTAMP
-		rv = convertObjectType(ud, JDBCType.TIMESTAMP);
+		rv = convertToType(ud, JDBCType.TIMESTAMP);
 		assertEquals(java.sql.Timestamp.class, rv.getClass());
 		assertEquals(ts, rv);
 
-		rv = convertObjectType(ts, JDBCType.TIMESTAMP);
+		rv = convertToType(ts, JDBCType.TIMESTAMP);
 		assertEquals(java.sql.Timestamp.class, rv.getClass());
 		assertEquals(ts, rv);
 
-		rv = convertObjectType(d, JDBCType.TIMESTAMP);
+		rv = convertToType(d, JDBCType.TIMESTAMP);
 		assertEquals(java.sql.Timestamp.class, rv.getClass());
 		assertEquals(java.sql.Timestamp.valueOf(ld.atStartOfDay()), rv);
 
-		rv = convertObjectType(t, JDBCType.TIMESTAMP);
+		rv = convertToType(t, JDBCType.TIMESTAMP);
 		assertEquals(java.sql.Timestamp.class, rv.getClass());
 		assertEquals(java.sql.Timestamp.valueOf(lt.atDate(LocalDate.EPOCH)), rv);
 
-		rv = convertObjectType(ldt, JDBCType.TIMESTAMP);
+		rv = convertToType(ldt, JDBCType.TIMESTAMP);
 		assertEquals(java.sql.Timestamp.class, rv.getClass());
 		assertEquals(ts, rv);
 
 		assertThrows(SSSQLConversionException.class,
-				()->convertObjectType(ld, JDBCType.TIMESTAMP));
+				()->convertToType(ld, JDBCType.TIMESTAMP));
 
 		assertThrows(SSSQLConversionException.class,
-					 ()->convertObjectType(lt, JDBCType.TIMESTAMP));
+					 ()->convertToType(lt, JDBCType.TIMESTAMP));
 
 
 		// to java.sql.DATE
-		rv = convertObjectType(ud, JDBCType.DATE);
+		rv = convertToType(ud, JDBCType.DATE);
 		assertEquals(java.sql.Date.class, rv.getClass());
 		assertEquals(d, rv);
 
-		rv = convertObjectType(ts, JDBCType.DATE);
+		rv = convertToType(ts, JDBCType.DATE);
 		assertEquals(java.sql.Date.class, rv.getClass());
 		assertEquals(d, rv);
 
-		rv = convertObjectType(d, JDBCType.DATE);
-		assertEquals(java.sql.Date.class, rv.getClass());
-		assertEquals(d, rv);
-
-		assertThrows(SSSQLConversionException.class,
-					 ()->convertObjectType(t, JDBCType.DATE));
-
-		rv = convertObjectType(ldt, JDBCType.DATE);
-		assertEquals(java.sql.Date.class, rv.getClass());
-		assertEquals(d, rv);
-
-		rv = convertObjectType(ld, JDBCType.DATE);
+		rv = convertToType(d, JDBCType.DATE);
 		assertEquals(java.sql.Date.class, rv.getClass());
 		assertEquals(d, rv);
 
 		assertThrows(SSSQLConversionException.class,
-					 ()->convertObjectType(lt, JDBCType.DATE));
+					 ()->convertToType(t, JDBCType.DATE));
+
+		rv = convertToType(ldt, JDBCType.DATE);
+		assertEquals(java.sql.Date.class, rv.getClass());
+		assertEquals(d, rv);
+
+		rv = convertToType(ld, JDBCType.DATE);
+		assertEquals(java.sql.Date.class, rv.getClass());
+		assertEquals(d, rv);
+
+		assertThrows(SSSQLConversionException.class,
+					 ()->convertToType(lt, JDBCType.DATE));
 
 
 		// to java.sql.TIME
-		rv = convertObjectType(ud, JDBCType.TIME);
+		rv = convertToType(ud, JDBCType.TIME);
 		assertEquals(java.sql.Time.class, rv.getClass());
 		assertEquals(t, rv);
 
-		rv = convertObjectType(ts, JDBCType.TIME);
-		assertEquals(java.sql.Time.class, rv.getClass());
-		assertEquals(t, rv);
-
-		assertThrows(SSSQLConversionException.class,
-				()->convertObjectType(d, JDBCType.TIME));
-
-		rv = convertObjectType(t, JDBCType.TIME);
-		assertEquals(java.sql.Time.class, rv.getClass());
-		assertEquals(t, rv);
-
-		rv = convertObjectType(ldt, JDBCType.TIME);
+		rv = convertToType(ts, JDBCType.TIME);
 		assertEquals(java.sql.Time.class, rv.getClass());
 		assertEquals(t, rv);
 
 		assertThrows(SSSQLConversionException.class,
-				()->convertObjectType(ld, JDBCType.TIME));
+				()->convertToType(d, JDBCType.TIME));
 
-		rv = convertObjectType(lt, JDBCType.TIME);
+		rv = convertToType(t, JDBCType.TIME);
+		assertEquals(java.sql.Time.class, rv.getClass());
+		assertEquals(t, rv);
+
+		rv = convertToType(ldt, JDBCType.TIME);
+		assertEquals(java.sql.Time.class, rv.getClass());
+		assertEquals(t, rv);
+
+		assertThrows(SSSQLConversionException.class,
+				()->convertToType(ld, JDBCType.TIME));
+
+		rv = convertToType(lt, JDBCType.TIME);
 		assertEquals(java.sql.Time.class, rv.getClass());
 		assertEquals(t, rv);
 	}
@@ -326,42 +374,60 @@ public class ConvertTypeTest
 		// Date ud = new java.util.Date(ts.getTime());
 
 		// to LocalDateTime
-		rv = convertObjectType(ts, LocalDateTime.class);
+		rv = convertToType(ts, LocalDateTime.class);
 		assertEquals(LocalDateTime.class, rv.getClass());
 		assertEquals(ldt, rv);
 
-		rv = convertObjectType(d, LocalDateTime.class);
+		rv = convertToType(d, LocalDateTime.class);
 		assertEquals(LocalDateTime.class, rv.getClass());
 		assertEquals(ld.atStartOfDay(), rv);
 
 		assertThrows(SSSQLConversionException.class,
-				()->convertObjectType(t, LocalDateTime.class));
+				()->convertToType(t, LocalDateTime.class));
 
 
 		// to LocalDate
 		// TODO???
 		assertThrows(SSSQLConversionException.class,
-				()->convertObjectType(ts, LocalDate.class));
+				()->convertToType(ts, LocalDate.class));
 
-		rv = convertObjectType(d, LocalDate.class);
+		rv = convertToType(d, LocalDate.class);
 		assertEquals(LocalDate.class, rv.getClass());
 		assertEquals(ld, rv);
 
 		assertThrows(SSSQLConversionException.class,
-				()->convertObjectType(t, LocalDate.class));
+				()->convertToType(t, LocalDate.class));
 
 
 		// to LocalTime
 		// TODO???
 		assertThrows(SSSQLConversionException.class,
-				()->convertObjectType(ts, LocalTime.class));
+				()->convertToType(ts, LocalTime.class));
 
 		assertThrows(SSSQLConversionException.class,
-				()->convertObjectType(d, LocalTime.class));
+				()->convertToType(d, LocalTime.class));
 
-		rv = convertObjectType(t, LocalTime.class);
+		rv = convertToType(t, LocalTime.class);
 		assertEquals(LocalTime.class, rv.getClass());
 		assertEquals(lt, rv);
+	}
+
+	/**
+	 * Test of findJavaTypeClass method, of class ConvertType.
+	 * @throws java.lang.Exception
+	 */
+	@Test
+	public void testFindJavaTypeClass() throws Exception
+	{
+		System.out.println("findJavaTypeClass");
+
+		Class<?> clazz;
+		
+		clazz = findJavaTypeClass(JDBCType.TIME_WITH_TIMEZONE);
+		assertEquals(OffsetTime.class, clazz);
+		
+		clazz = findJavaTypeClass(JDBCType.TIMESTAMP_WITH_TIMEZONE);
+		assertEquals(OffsetDateTime.class, clazz);
 	}
 
 

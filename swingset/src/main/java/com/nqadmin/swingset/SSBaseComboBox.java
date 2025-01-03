@@ -51,7 +51,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -85,10 +84,6 @@ import ca.odell.glazedlists.matchers.TextMatcherEditor;
 import ca.odell.glazedlists.swing.AutoCompleteSupport;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
-
-// SSBaseComboBox.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
  * OptionMapping base class for combo box that uses/handles
@@ -134,10 +129,8 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * <p>
 	 * NOTE: No guaranty whether ActionListener or FocusLister will be called first when focus is lost.
 	 */
-	protected class SSBaseComboBoxListener implements ActionListener, Serializable
+	protected class SSBaseComboBoxListener implements ActionListener
 	{
-		private static final long serialVersionUID = -3131533966245488092L;
-
 		/**
 		 * For JComboBox ActionListener and ItemListener are similar, but ActionListener
 		 * seems more appropriate since we don't care about the de-selection of the
@@ -155,50 +148,16 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			// Return if a combo navigator, SSSyncManager will have it's own
 			// listeners. This listener for keeping a bound column in sync.
 			if (isComboBoxNavigator()) {
-				logger.log(DEBUG, () -> sf("%s: Action Listener returning. No bound column.", getColumnForLog()));
-					return;
+				logger.log(DEBUG, () -> sf("%s: Action Listener isComboBoxNavigator.",
+						getColumnForLog()));
+				return;
 			}
 
-			logger.log(DEBUG, () -> sf("%s: About to update RowSet with %s.", getColumnForLog(), getSelectedItem()));
+			logger.log(DEBUG, () -> sf("%s: About to update RowSet with %s.",
+					getColumnForLog(), getSelectedItem()));
 
 			M mapping = getSelectedMapping();
-			dbChange(() -> setBoundColumnObject(mapping)); // was "updateRowset()
-		}
-	}
-	
-	/**
-	 * Common code to update the rowset based on getSelectedMapping().
-	 */
-	// TODO: remove, only for reference of outdated comments
-	@SuppressWarnings("unused")
-	private void updateRowset_REMOVE_THIS()
-	{
-		M mapping = getSelectedMapping();
-
-		// TODO: use setBoundColumnObject(mapping)
-		// TODO: move this into listener.
-	
-		if (mapping == null) {
-			logger.log(DEBUG, () -> sf("%s: Setting to null.", getColumnForLog()));
-			setBoundColumnText(null);
-		} else {
-			logger.log(DEBUG, () -> sf("%s: Setting to %s.",  getColumnForLog(), mapping));
-			// TODO: need to avoid setting to same value
-			// for NavGroupState. Wonder why, avoids event?
-			//setBoundColumnText(String.valueOf(mapping));
-
-			// not sure this is a reliable way to check.
-			// TODO: check should probably be in
-			//       setBoundColumnText or RowSetOps.updateColumnText
-
-			String tStringMapping = String.valueOf(mapping);
-			// 2021-02-22_BP: RowSet does not seem to support 'dirty' reads so 
-			// a call to getBoundColumnText() won't reflect any updates using
-			// setBoundColumnText() until after a call to updateRow().
-			
-			//if (!Objects.equals(getBoundColumnText(), tStringMapping)) {
-				setBoundColumnText(tStringMapping);
-			//}
+			dbChange(() -> setBoundColumnObject(mapping));
 		}
 	}
 

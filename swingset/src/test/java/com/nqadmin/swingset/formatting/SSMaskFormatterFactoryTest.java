@@ -62,7 +62,6 @@ import static com.nqadmin.swingset.formatting.FormatterAssist.userText;
  * of factory/builder pairs and seeing if they compile.
  * These can provide examples.
  * The tests verify that the data gets through the builder to the formatter.
- * @author err
  */
 @SuppressWarnings("javadoc")
 public class SSMaskFormatterFactoryTest {
