@@ -1,0 +1,9 @@
+
+Monitor rowset events
+    In SSCommon there's debugTrackRowSetListener
+
+CacheRowSet conflicts
+    lkup.add(new ForceConflict(0));
+        See MainClass.java
+
+    In RowSetOps there's checkForceConflict

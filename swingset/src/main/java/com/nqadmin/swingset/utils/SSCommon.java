@@ -573,8 +573,9 @@ public class SSCommon
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	private void debugTrackRowSetListener()
 	{
-		if (Boolean.TRUE)
-			return;
+		// TODO: add a lookup
+		// if (Boolean.TRUE)
+		// 	return;
 		if (getRowSet() == null)
 			return;
 		getRowSet().addRowSetListener(new RowSetListener()
@@ -598,6 +599,23 @@ public class SSCommon
 			}
 		});
 	}
+
+	/**
+	 * Used by an SSComponent when making a change to the database.
+	 * Typically used by a component listener. It avoids extra RowSet events.
+	 * @param r code that changes the database
+	 */
+	void dbChange(Runnable r)
+	{
+			if (!checkRowOK())
+				return;
+			removeRowSetListener();
+			try {
+				r.run();
+			} finally {
+				addRowSetListener();
+			}
+	}
 	
 	/**
 	 * Indicates if the components RowSet listener is added/enabled
@@ -611,7 +629,7 @@ public class SSCommon
 	/**
 	 * Method to add the RowSet listener.
 	 */
-	public void addRowSetListener()
+	private void addRowSetListener()
 	{
 		if (rowSetListener==null) {
 			rowSetListener = new SSRowSetListener();
@@ -626,7 +644,7 @@ public class SSCommon
 	/**
 	 * Method to remove the RowSet listener.
 	 */
-	public final void removeRowSetListener()
+	private void removeRowSetListener()
 	{
 		// rowSetListenerAdded==true indicates that rowset is not null, and we
 		// do not let the user call setRowSet(null), so not checking
@@ -745,11 +763,11 @@ public class SSCommon
 	public void bind(final RowSet _rowSet, final int _boundColumnIndex)
 	{
 		verifyInitialized();
-		// INDICATE THAT WE'RE UPDATING THE BINDINGS
+		// Indicate that we're updating the bindings.
 		inBinding = true;
 		try {
 			
-			// UPDATE ROWSET
+			// Update rowset.
 			removeRowSetListener();
 			setRowSet(_rowSet);
 			addRowSetListener();
@@ -1116,20 +1134,20 @@ public class SSCommon
 	/**
 	 * Updates the bound database column with the specified Object.
 	 *
-	 * @param _boundColumnObject value to write to bound database column
+	 * @param boundColumnObject value to write to bound database column
 	 * @return true if no error
 	 */
-	public boolean setBoundColumnObject(final Object _boundColumnObject) {
-		logger.log(DEBUG, () -> sf("%s: %s", getColumnForLog(), _boundColumnObject));
+	public boolean setBoundColumnObject(Object boundColumnObject) {
+		logger.log(DEBUG, () -> sf("%s: %s", getColumnForLog(), boundColumnObject));
 		boolean ok = false;
 		try {
-			RowSetOps.updateColumnObject(getSSComponent(), _boundColumnObject);
+			RowSetOps.updateColumnObject(getSSComponent(), boundColumnObject);
 			ok = true;
 		} catch(SQLException | NumberFormatException ex) {
-			userErrorReporting(_boundColumnObject, ex);
+			userErrorReporting(boundColumnObject, ex);
 		} finally {
 			if (!ok)
-				postRowSetModifiedError(getSSComponent(), _boundColumnObject);
+				postRowSetModifiedError(getSSComponent(), boundColumnObject);
 		}
 		return ok;
 	}

@@ -272,6 +272,7 @@ public class TestBaseComponents extends JFrame
 		lstSSList = new SSList(getCollectionModel());
 
 		populateComps();
+		activeComps.removeAll(EnumSet.of(DATE_PICKER));
 
 		//activeComps.removeAll(EnumSet.of(CHECK, LABEL));
 		//activeComps.clear();

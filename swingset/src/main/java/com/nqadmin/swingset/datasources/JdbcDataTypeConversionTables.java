@@ -30,15 +30,20 @@
 package com.nqadmin.swingset.datasources;
 
 import java.sql.JDBCType;
-import java.util.Collections;
-import java.util.EnumMap;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
 
 import static java.sql.JDBCType.*;
 
 import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.Multimaps;
 
 /**
  * Data Type Conversion Tables;
@@ -77,24 +82,36 @@ public class JdbcDataTypeConversionTables {
 	 * Use {@link #jdbcTypeToClassStrict(java.sql.JDBCType) } for strict
 	 * adherence to the spec.
 	 * 
-	 * @param _type JDBCType
+	 * @param type JDBCType
 	 * @return corresponding java object class
 	 */
-	public static Class<?> jdbcTypeToClass(JDBCType _type) {
-		ImmutableList<Class<?>> l = jdbcTypeToClass.get(_type);
+	public static Class<?> jdbcTypeToClass(JDBCType type) {
+		List<Class<?>> l = (List<Class<?>>)jdbcTypeToClass.get(type);
 		return l == null || l.isEmpty() ? null : l.get(0);
-		//return jdbcTypeToClass.get(_type).get(0);
 	}
+
+	@SuppressWarnings("unused")
+	private static final Set<JDBCType> hasStrictJavaTypeClass = EnumSet.of(
+			TINYINT, SMALLINT, DATE, TIME, TIMESTAMP
+	);
+
+	@SuppressWarnings("unused")
+	private static final Set<JDBCType> tzStrictJavaTypeClass = EnumSet.of(
+			TIME_WITH_TIMEZONE, TIMESTAMP_WITH_TIMEZONE
+	);
 
 	/**
 	 * Map JdbcType to Java Object Class;  JDBC 4.2 spec, Appendix B Table 3.
 	 * 
-	 * @param _type JDBCType
+	 * @param type JDBCType
 	 * @return corresponding java object class
 	 */
-	public static Class<?> jdbcTypeToClassStrict(JDBCType _type) {
-		ImmutableList<Class<?>> l = jdbcTypeToClass.get(_type);
-		return switch (_type) {
+	public static Class<?> jdbcTypeToClassStrict(JDBCType type) {
+		List<Class<?>> l = (List<Class<?>>)jdbcTypeToClass.get(type);
+
+		// TODO: Use EnumSets to decide?
+
+		return switch (type) {
 		case TINYINT, SMALLINT, DATE, TIME, TIMESTAMP -> l.get(1);
 		case TIME_WITH_TIMEZONE,TIMESTAMP_WITH_TIMEZONE -> null;
 		default -> l == null || l.isEmpty() ? null : l.get(0);
@@ -131,59 +148,64 @@ public class JdbcDataTypeConversionTables {
 	 * To get strict adherence to the spec,
 	 * use {@link #jdbcTypeToClassStrict(java.sql.JDBCType) }
 	 */
+	public static final Map<JDBCType, Collection<Class<?>>> jdbcTypeToClass = createTable3();
 
-	public static final Map<JDBCType, ImmutableList<Class<?>>> jdbcTypeToClass = createTable3();
+	// Want immutable EnumListMultimap, but it doesn't exist
+	// https://github.com/google/guava/issues/977
 
 	/**
 	 * Guava has no immutable enum multimap, so...
-	 * @return unmodifiable enum map
+	 * @return unmodifiable enum multimap
 	 */
-	private static Map<JDBCType, ImmutableList<Class<?>>> createTable3() {
-		ImmutableListMultimap<JDBCType, Class<?>> table3
-				= ImmutableListMultimap.<JDBCType, Class<?>>builder()
-					.put(CHAR, String.class)
-					.put(VARCHAR, String.class)
-					.put(LONGVARCHAR, String.class)
-					.put(NUMERIC, java.math.BigDecimal.class)
-					.put(DECIMAL, java.math.BigDecimal.class)
-					.put(BIT, Boolean.class)
-					.put(BOOLEAN, Boolean.class)
-					.putAll(TINYINT, Byte.class, Integer.class)
-					.putAll(SMALLINT, Short.class, Integer.class)
-					.put(INTEGER, Integer.class)
-					.put(BIGINT, Long.class)
-					.put(REAL, Float.class)
-					.put(FLOAT, Double.class)
-					.put(DOUBLE, Double.class)
-					.put(BINARY, byte[].class)
-					.put(VARBINARY, byte[].class)
-					.put(LONGVARBINARY, byte[].class)
-					.putAll(DATE, java.time.LocalDate.class, java.sql.Date.class)
-					.putAll(TIME, java.time.LocalTime.class, java.sql.Time.class)
-					.putAll(TIMESTAMP, java.time.LocalDateTime.class, java.sql.Timestamp.class)
-					.put(TIME_WITH_TIMEZONE, java.time.OffsetTime.class)
-					.put(TIMESTAMP_WITH_TIMEZONE, java.time.OffsetDateTime.class)
-					// DISTINCTObject type of underlying type.class)
-					.put(CLOB, java.sql.Clob.class)
-					.put(BLOB, java.sql.Blob.class)
-					.put(ARRAY, java.sql.Array.class)
-					// STRUCT java.sql.Struct or.class or java.sql.SQLData.class
-					.put(REF, java.sql.Ref.class)
-					.put(DATALINK, java.net.URL.class)
-					// JAVA_OBJECT Underlying Java class.class
-					.put(ROWID, java.sql.RowId.class)
-					.put(NCHAR, String.class)
-					.put(NVARCHAR, String.class)
-					.put(LONGNVARCHAR, String.class)
-					.put(NCLOB, java.sql.NClob.class)
-					.put(SQLXML, java.sql.SQLXML.class)
-					.build();
-		Map<JDBCType, ImmutableList<Class<?>>> m = new EnumMap<>(JDBCType.class);
-		table3.asMap().forEach((jdbcType, list) -> {
-			m.put(jdbcType, 
-				  new ImmutableList.Builder<Class<?>>().addAll(list).build());
-		});
-		return Collections.unmodifiableMap(m);
+	private static Map<JDBCType, Collection<Class<?>>> createTable3() {
+
+		ListMultimap<JDBCType, Class<?>> table3 = MultimapBuilder
+				.enumKeys(JDBCType.class)
+				.arrayListValues(2)
+				.build()
+				;
+		table3.put(CHAR, String.class);
+		table3.put(VARCHAR, String.class);
+		table3.put(LONGVARCHAR, String.class);
+		table3.put(NUMERIC, java.math.BigDecimal.class);
+		table3.put(DECIMAL, java.math.BigDecimal.class);
+		table3.put(BIT, Boolean.class);
+		table3.put(BOOLEAN, Boolean.class);
+
+		table3.putAll(TINYINT, List.of(Byte.class, Integer.class));
+		table3.putAll(SMALLINT, List.of(Short.class, Integer.class));
+
+		table3.put(INTEGER, Integer.class);
+		table3.put(BIGINT, Long.class);
+		table3.put(REAL, Float.class);
+		table3.put(FLOAT, Double.class);
+		table3.put(DOUBLE, Double.class);
+		table3.put(BINARY, byte[].class);
+		table3.put(VARBINARY, byte[].class);
+		table3.put(LONGVARBINARY, byte[].class);
+
+		table3.putAll(DATE, List.of(java.time.LocalDate.class, java.sql.Date.class));
+		table3.putAll(TIME, List.of(java.time.LocalTime.class, java.sql.Time.class));
+		table3.putAll(TIMESTAMP, List.of(java.time.LocalDateTime.class, java.sql.Timestamp.class));
+
+		table3.put(TIME_WITH_TIMEZONE, java.time.OffsetTime.class);
+		table3.put(TIMESTAMP_WITH_TIMEZONE, java.time.OffsetDateTime.class);
+		// DISTINCTObject type of underlying type.class);
+		table3.put(CLOB, java.sql.Clob.class);
+		table3.put(BLOB, java.sql.Blob.class);
+		table3.put(ARRAY, java.sql.Array.class);
+		// STRUCT java.sql.Struct or.class or java.sql.SQLData.class;
+		table3.put(REF, java.sql.Ref.class);
+		table3.put(DATALINK, java.net.URL.class);
+		// JAVA_OBJECT Underlying Java class.class;
+		table3.put(ROWID, java.sql.RowId.class);
+		table3.put(NCHAR, String.class);
+		table3.put(NVARCHAR, String.class);
+		table3.put(LONGNVARCHAR, String.class);
+		table3.put(NCLOB, java.sql.NClob.class);
+		table3.put(SQLXML, java.sql.SQLXML.class);
+
+		return Multimaps.unmodifiableListMultimap(table3).asMap();
 	}
 
 	/**

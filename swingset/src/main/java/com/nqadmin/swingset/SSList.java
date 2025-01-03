@@ -121,12 +121,8 @@ public class SSList extends JList<SSListItem> implements SSComponentInterface {
 			// While adjusting don't need to update the database.
 			if (e.getValueIsAdjusting())
 				return;
-			if (!checkRowOK())
-				return;
 
-			getSSCommon().removeRowSetListener();
-			updateRowSet();
-			getSSCommon().addRowSetListener();
+			dbChange(() -> updateRowSet());
 		}
 	}
 

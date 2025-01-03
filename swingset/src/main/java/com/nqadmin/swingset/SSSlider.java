@@ -81,14 +81,8 @@ public class SSSlider extends JSlider implements SSComponentInterface {
 			// While adjusting don't need to update the database.
 			if (getValueIsAdjusting())
 				return;
-			if (!checkRowOK())
-				return;
 
-			getSSCommon().removeRowSetListener();
-
-			setBoundColumnObject(getValue());
-
-			getSSCommon().addRowSetListener();
+			dbChange(() -> setBoundColumnObject(getValue()));
 		}
 
 	} // end protected class SSSliderListener implements ChangeListener, Serializable

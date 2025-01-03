@@ -218,6 +218,17 @@ public interface SSComponentInterface extends RSC
 		getSSComponentHook().finishSSCommon();
 	}
 
+	/**
+	 * Used when making a change to the database.
+	 * Typically used by a component listener. It avoids extra RowSet events.
+	 * May bring up a dialog if there is no row to change.
+	 * @param r code that changes the database
+	 */
+	default void dbChange(Runnable r)
+	{
+			getSSCommon().dbChange(r);
+	}
+
 
 	/** Invoked during bind, component should verify that jdbcType is ok.
 	 * @param jdbcType column JDBCType

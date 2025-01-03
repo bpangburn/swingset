@@ -55,6 +55,9 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
+import static java.sql.JDBCType.*;
 
 import static com.nqadmin.swingset.datasources.ConvertType.Clazz.getClazz;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -567,6 +570,14 @@ public class ConvertType
 		}
 	}
 
+	private static final Set<JDBCType> handledJavaTypeClass = EnumSet.of(
+			INTEGER, SMALLINT, TINYINT, BIGINT,
+			REAL, FLOAT, DOUBLE, DECIMAL, NUMERIC,
+			BIT, BOOLEAN,
+			DATE, TIME, TIMESTAMP,
+			CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR
+	);
+
 	/**
 	 * Determine the Java type class for the given database type.
 	 * @param jdbcType JDBCType of interest
@@ -585,45 +596,14 @@ public class ConvertType
 			return clazz;
 		}
 
-		switch (jdbcType) {
-			case INTEGER, SMALLINT, TINYINT	-> clazz = Integer.class;
-			case BIGINT -> clazz = Long.class;
-			case REAL -> clazz = Float.class;
-			case FLOAT, DOUBLE -> clazz = Double.class;
-			case DECIMAL, NUMERIC -> clazz = BigDecimal.class;
-			case BIT, BOOLEAN -> clazz = Boolean.class;
-			case DATE -> clazz = java.sql.Date.class;
-			case TIME -> clazz = java.sql.Time.class;
-			case TIMESTAMP -> clazz = java.sql.Timestamp.class;
-			case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR
-					-> clazz = String.class;
-			default ->
-				throw new SSSQLUnhandledTypeException(jdbcType.toString());
-		}
-		//case DATE: case TIME: case TIMESTAMP: clazz = java.util.Date.class; break;
+		if(!handledJavaTypeClass.contains(jdbcType))
+			throw new SSSQLUnhandledTypeException(jdbcType.toString());
 
-			// case ARRAY:
-			// 	clazz = java.sql.Array.class;
-			// 	break;
+		return JdbcDataTypeConversionTables.jdbcTypeToClassStrict(jdbcType);
 
-			// case BINARY:
-			// case VARBINARY:
-			// case LONGVARBINARY:
-			// 	clazz = byte[].class;
-			// 	break;
-
-			// case CLOB: clazz = java.sql.Clob.class; break;
-			// case BLOB: clazz = java.sql.Blob.class; break;
-			// case REF: clazz = java.sql.Ref.class; break;
-			// case DATALINK: clazz = java.net.URL.class; break;
-			// case ROWID: clazz = java.sql.RowId.class; break;
-			// case NCLOB: clazz = java.sql.NClob.class; break;
-			// case SQLXML: clazz = java.sql.SQLXML.class; break;
-		return clazz;
-
-		// case DISTINCT: Object type of underlying type
-		// case STRUCT: java.sql.Struct or java.sql.SQLData
-		// case JAVA_OBJECT: Underlying Java class
+		// No coversion for the following
+		// ARRAY BINARY VARBINARY LONGVARBINARY CLOB BLOB REF DATALINK
+		// ROWID NCLOB SQLXML DISTINCT STRUCT JAVA_OBJECT
 	}
 
 	private static final Object CanNotConvert = new Object();

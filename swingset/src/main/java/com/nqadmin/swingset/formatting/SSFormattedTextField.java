@@ -238,24 +238,18 @@ public class SSFormattedTextField extends JFormattedTextField
 		}
 
 		final Object currentValue = ftf.getValue();
-		
-		getSSCommon().removeRowSetListener();
 
-		try {
-			logger.log(INFO, ()->sf("%s: to database '%s' type %s.",
-					getColumnForLog(), currentValue,
-					currentValue == null ? null : currentValue.getClass().getName()));
-			
-			// The formatter says it's valid, but there's more to check
-			if (getSSCommon().decorate())
-				setBoundColumnObject(currentValue);
-			else
-				postRowSetModifiedError(ftf, currentValue);
-			
-		} finally {
-			getSSCommon().addRowSetListener();
-		}
-		
+		logger.log(INFO, ()->sf("%s: to database '%s' type %s.",
+				getColumnForLog(), currentValue,
+				currentValue == null ? null : currentValue.getClass().getName()));
+
+		// TODO:  Should "postRowSetModifiedError be covered by dbChange()?
+
+		// The formatter says it's valid, but there's more to check
+		if (getSSCommon().decorate())
+			dbChange(() -> setBoundColumnObject(currentValue));
+		else
+			postRowSetModifiedError(ftf, currentValue);
 	}
 	
 	/**

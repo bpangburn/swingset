@@ -1238,8 +1238,9 @@ public class NavigateActions
 	
 	/**
 	 * Common code to commit changes to the database from the rowset if
-	 * modifications are allowed; called before every action.After committing, it performs any
- post-update operations.<p>
+	 * modifications are allowed; called before every action.
+	 * After committing, it performs any post-update operations.
+	 * <p>
 	 * If modification==false, then skip the update and return as
 	 * successful, unless we have an empty rowset. 
 	 * 

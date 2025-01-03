@@ -97,50 +97,49 @@ public class SSImage extends JPanel implements SSComponentInterface
 	 * Listener(s) for the component's value used to propagate changes back to bound
 	 * database column
 	 */
-	protected class SSImageListener implements ActionListener {
-
+	protected class SSImageListener implements ActionListener
+	{
 		/** {@inheritDoc} */
 		@Override
-		public void actionPerformed(final ActionEvent ae)
+		public void actionPerformed(ActionEvent ae)
 		{
-			if(!checkRowOK())
+			if (getRowSet() == null)	// TODO: is this check needed?
 				return;
 
-			getSSCommon().removeRowSetListener();
-
-			try {
-				if (getRowSet() != null) {
-					final JFileChooser fileChooser = new JFileChooser();
-					if (fileChooser.showOpenDialog(btnUpdateImage) == JFileChooser.APPROVE_OPTION) {
-						path = fileChooser.getSelectedFile().toPath();
-						ByteBuffer bb;
-						try (SeekableByteChannel rbc
-								= Files.newByteChannel(path, EnumSet.of(READ))) {
-							final int totalLength = (int) rbc.size();
-							bb = ByteBuffer.allocate(totalLength);
-							int bytesRead = rbc.read(bb);
-							if (totalLength != bytesRead)
-								throw new IOException(sf("Image read expected %d bytes, got %d",
-										totalLength, bytesRead));
-						}
-						byte[] bytes = bb.array();
-
-						getRowSet().updateBytes(getBoundColumnName(), bytes);
-						img = new ImageIcon(bytes);
-						lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
-						lblImage.setIcon(img);
-						lblImage.setText("");
-						// TODO: why is updateUI here?
-						updateUI();
-					}
-				}
-			} catch (final SQLException se) {
-				logger.log(Level.ERROR, getColumnForLog() + ": SQL Exception.", se);
-			} catch (final IOException ioe) {
-				getSSCommon().reportError("Error accessing image file", path, ioe);
-			} finally {
-				getSSCommon().addRowSetListener();
+			JFileChooser fc = new JFileChooser();
+			if (fc.showOpenDialog(btnUpdateImage) != JFileChooser.APPROVE_OPTION) {
+				return;
 			}
+			Path tPath = fc.getSelectedFile().toPath();
+
+			dbChange(() -> {
+				try {
+					ByteBuffer bb;
+					try (SeekableByteChannel rbc
+							= Files.newByteChannel(tPath, EnumSet.of(READ))) {
+						int totalLength = (int) rbc.size();
+						bb = ByteBuffer.allocate(totalLength);
+						int bytesRead = rbc.read(bb);
+						if (totalLength != bytesRead)
+							throw new IOException(sf("Image expected %d bytes, got %d",
+									totalLength, bytesRead));
+					}
+					byte[] bytes = bb.array();
+					
+					// TODO: remove direct RowSet access
+					getRowSet().updateBytes(getBoundColumnName(), bytes);
+					path = tPath;
+
+					img = new ImageIcon(bytes);
+					lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
+					lblImage.setIcon(img);
+					lblImage.setText("");
+				} catch (SQLException se) {
+					logger.log(Level.ERROR, getColumnForLog() + ": SQL Exception.", se);
+				} catch (IOException ioe) {
+					getSSCommon().reportError("Error accessing image file", tPath, ioe);
+				}
+			});
 		}
 
 	} // end private class SSImageListener
@@ -234,7 +233,7 @@ public class SSImage extends JPanel implements SSComponentInterface
 	 * @param _boundColumnName - column in the rowSet to which the component should
 	 *                         be bound.
 	 */
-	public SSImage(final RowSet _rowSet, final String _boundColumnName)
+	public SSImage(RowSet _rowSet, String _boundColumnName)
 	{
 		this();
 		bind(_rowSet, _boundColumnName);
@@ -245,10 +244,10 @@ public class SSImage extends JPanel implements SSComponentInterface
 	 */
 	protected void addComponents() {
 		setLayout(new GridBagLayout());
-		final GridBagConstraints constraints = new GridBagConstraints();
+		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 0;
-		final JScrollPane scrollPane = new JScrollPane(lblImage, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+		JScrollPane scrollPane = new JScrollPane(lblImage, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scrollPane.setPreferredSize(new Dimension(200, 180));
 		btnUpdateImage.setPreferredSize(new Dimension(200, 20));
@@ -264,7 +263,7 @@ public class SSImage extends JPanel implements SSComponentInterface
 	public void clearImage() {
 		lblImage.setIcon(null);
 		lblImage.setText("No Picture");
-		final Dimension dimension = getPreferredSize();
+		Dimension dimension = getPreferredSize();
 		lblImage.setPreferredSize(new Dimension((int) dimension.getWidth(), (int) dimension.getHeight() - 20));
 		updateUI();
 	}
@@ -309,19 +308,18 @@ public class SSImage extends JPanel implements SSComponentInterface
 	/**
 	 * Sets the preferred size of the image component.
 	 *
-	 * @param _preferredSize - preferred size of the image component
+	 * @param preferredSize - preferred size of the image component
 	 */
-	// TODO: listen to preferredsize property to adjust btnUpdateImage.
+	// TODO: Listen to preferredsize property to adjust btnUpdateImage.
 	@Override
-	public void setPreferredSize(final Dimension _preferredSize) {
-		final Dimension oldValue = preferredSize;
-		preferredSize = _preferredSize;
+	public void setPreferredSize(Dimension preferredSize) {
+		Dimension oldValue = preferredSize;
+		this.preferredSize = preferredSize;
 		firePropertyChange("preferredSize", oldValue, preferredSize);
 
-		lblImage.setPreferredSize(
-				new Dimension((int) _preferredSize.getWidth(), (int) _preferredSize.getHeight() - 20));
-		btnUpdateImage.setPreferredSize(new Dimension((int) _preferredSize.getWidth(), 20));
-		super.setPreferredSize(_preferredSize);
+		lblImage.setPreferredSize(new Dimension((int) preferredSize.getWidth(), (int) preferredSize.getHeight() - 20));
+		btnUpdateImage.setPreferredSize(new Dimension((int) preferredSize.getWidth(), 20));
+		super.setPreferredSize(preferredSize);
 	}
 
 	/** {@inheritDoc } */
@@ -347,7 +345,7 @@ public class SSImage extends JPanel implements SSComponentInterface
 		//		 Seems like it, it's used just about everywhere else.
 
 		try {
-			final byte[] imageData = getRowSet().getRow() > 0 ? getRowSet().getBytes(getBoundColumnName()) : null;
+			byte[] imageData = getRowSet().getRow() > 0 ? getRowSet().getBytes(getBoundColumnName()) : null;
 			if (imageData != null) {
 				logger.log(DEBUG, () -> sf("%s: Setting non-null image.", getColumnForLog()));
 				img = new ImageIcon(imageData);
@@ -358,7 +356,7 @@ public class SSImage extends JPanel implements SSComponentInterface
 				img = null;
 				lblImage.setText("No Picture");
 			}
-		} catch (final SQLException se) {
+		} catch (SQLException se) {
 			logger.log(Level.ERROR, getColumnForLog() + ": SQL Exception.", se);
 			img = null;
 		}

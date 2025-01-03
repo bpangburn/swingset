@@ -48,14 +48,7 @@ public class DbDatePicker extends DatePicker implements SSComponentInterface
 		@Override
 		public void dateChanged(final DateChangeEvent dce)
 		{
-			if (!checkRowOK())
-				return;
-
-			getSSCommon().removeRowSetListener();
-
-			setBoundColumnObject(dce.getNewDate());
-
-			getSSCommon().addRowSetListener();
+			dbChange(() -> setBoundColumnObject(dce.getNewDate()));
 		}
 	}
 	/** System Logger for component. */

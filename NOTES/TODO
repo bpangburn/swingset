@@ -11,6 +11,14 @@ minor issue to ignore for now.
 ============================= HMMMM ============================================
 ================================================================================
 
+---
+Should convert have an overflow exception?
+E.g. for Long --> Integer.
+
+Note string parsing does check for overflow. (at least Integer.parseInt() does)
+Test...
+
+---
 Add variable SORT_REMOVE_KEYS to SSDataGrid, an option eventually.
 
 ---
@@ -45,9 +53,6 @@ given to SS for configuration.
 ---
 In Field's componentValidate "null&&nullOK" check.
 What can be done as default for SSComponent in general?
-
----
-TextDecorator capable SSTextField.
 
 ---
 NumberField
@@ -99,9 +104,6 @@ relationship with DateTime.java.
 Rename SSDataNavigator to SSNavigatorBar?
 Rename NavigateActions to Navigation?
 
----
-Add cleanField to SSComponentInterface. Use it from SSDBNavImpl#setComponents.
-But then again the helper classes provide ways to set it...
 
 ---
 Regarding date/time formatting/parse consider RsolverStyle.
@@ -253,6 +255,23 @@ Field tooltip with format/...
 ============================ ARCHITECTURE ==================================
 ============================================================================
 
+============== SSCOMPONENT/SSCOMMON
+
+Document SSComponent as groups
+
+Should SSCommon only be used internaly and from SSComponent?
+SSComponent package access only.
+
+Minimal use, if at all, by implementations of SSComponent.
+
+For example, setDecorator/setValidator/setTextDecorator only publicly
+through SSComponent.
+
+---
+TextDecorator capable SSTextField
+Improve API for textDecorator, get rid of SSFormattedTextField::TextDecEnbl
+- make it a property for any SSComponent.
+
 ============== FLUENT API
 
 (find the notes from ???)
@@ -343,14 +362,27 @@ to be "final" in SSComponent.
 
 ============== EVENTBUS
 
+About using JavaRx instead of EventBus. For EventBus disadvantages see
+    https://github.com/google/guava/wiki/EventBusExplained
+JavaRx has many features that are not needed for SS. Looking through the
+disadvantages, there is little that affects SS.
+It does have the advantages of a cleaner, albeit much more complex,
+UI; more complexity for
+little additional benefit. A real advantage would be if SS wants to use R8 and
+Proguard. If/when SS uses more features
+
 EventBus replacement
+
+    https://github.com/ReactiveX/RxJava
+    https://www.baeldung.com/java-9-reactive-streams
+    https://www.baeldung.com/rx-java
+    https://www.baeldung.com/rxjava-backpressure
+
     rxjava as event bus the right way
     https://kau.sh/blog/implementing-an-event-bus-with-rxjava-rxbus/
     https://medium.com/dionysis-lorentzos-blog/rxjava-as-event-bus-the-right-way-10a36bdd49ba
     https://metova.com/how-to-use-rxjava-as-an-event-bus/
     https://medium.com/android-news/super-simple-event-bus-with-rxjava-and-kotlin-f1f969b21003
-
-    https://www.baeldung.com/java-9-reactive-streams
 
     Note rxjava-jdbc https://github.com/davidmoten/rxjava-jdbc
 

@@ -144,27 +144,61 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		 * previously selected item.
 		 * 
 		 * Per https://docs.oracle.com/javase/tutorial/uiswing/components/combobox.html#listeners
-		 * ActionListener just tells us that the selection changed whereas ItemListener fires
-		 * separate events for deselection of previous item and selection of current item.
+		 * ActionListener just tells us that the selection changed whereas
+		 * ItemListener fires separate events for deselection of previous item
+		 * and selection of current item.
 		 *
 		 * {@inheritDoc} */
 		@Override
 		public void actionPerformed(final ActionEvent ae)
 		{
-			if (!checkRowOK())
-				return;
-			// If this is a combo navigator, SSSyncManager will have it's own listeners.
-			// This is just for keeping a bound column in sync.
-			//
-			// Could be combined with next block, but keeping them separate for debugging.
+			// Return if a combo navigator, SSSyncManager will have it's own
+			// listeners. This listener for keeping a bound column in sync.
 			if (isComboBoxNavigator()) {
 				logger.log(DEBUG, () -> sf("%s: Action Listener returning. No bound column.", getColumnForLog()));
-				return;
+					return;
 			}
-			
-			// UPDATE ROWSET
+
 			logger.log(DEBUG, () -> sf("%s: About to update RowSet with %s.", getColumnForLog(), getSelectedItem()));
-			updateRowset();
+
+			M mapping = getSelectedMapping();
+			dbChange(() -> setBoundColumnObject(mapping)); // was "updateRowset()
+		}
+	}
+	
+	/**
+	 * Common code to update the rowset based on getSelectedMapping().
+	 */
+	// TODO: remove, only for reference of outdated comments
+	@SuppressWarnings("unused")
+	private void updateRowset_REMOVE_THIS()
+	{
+		M mapping = getSelectedMapping();
+
+		// TODO: use setBoundColumnObject(mapping)
+		// TODO: move this into listener.
+	
+		if (mapping == null) {
+			logger.log(DEBUG, () -> sf("%s: Setting to null.", getColumnForLog()));
+			setBoundColumnText(null);
+		} else {
+			logger.log(DEBUG, () -> sf("%s: Setting to %s.",  getColumnForLog(), mapping));
+			// TODO: need to avoid setting to same value
+			// for NavGroupState. Wonder why, avoids event?
+			//setBoundColumnText(String.valueOf(mapping));
+
+			// not sure this is a reliable way to check.
+			// TODO: check should probably be in
+			//       setBoundColumnText or RowSetOps.updateColumnText
+
+			String tStringMapping = String.valueOf(mapping);
+			// 2021-02-22_BP: RowSet does not seem to support 'dirty' reads so 
+			// a call to getBoundColumnText() won't reflect any updates using
+			// setBoundColumnText() until after a call to updateRow().
+			
+			//if (!Objects.equals(getBoundColumnText(), tStringMapping)) {
+				setBoundColumnText(tStringMapping);
+			//}
 		}
 	}
 
@@ -714,12 +748,15 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				// or it is null. It is null when getAllowNull() is false
 				item = nullItem;
 				// BP_2021-02-16:
-				// We expect to get here if we have a child combo where the contents are requeried on each record.
-				// As soon as a navigation occurs, the component values are cleared and then the new value is loaded,
-				// but the combo has not been re-queried yet so there are no matches for setSelectedMapping() and we
-				// call setSelectedItem(nullItem). This is OK so long as the component listener used for binding
-				// is removed/disabled because the rowset will not get the null value. Later when the combo is
-				// requeried, the component will try to load the current column value from the rowset and this time
+				// We expect to get here if we have a child combo where the contents
+				// are requeried on each record. As soon as a navigation occurs, the
+				// component values are cleared and then the new value is loaded,
+				// but the combo has not been re-queried yet so there are no matches
+				// for setSelectedMapping() and we call setSelectedItem(nullItem).
+				// This is OK so long as the component listener used for binding
+				// is removed/disabled because the rowset will not get the null value.
+				// Later when the combo is // requeried, the component will try to load
+				// the current column value from the rowset and this time
 				// setSelectedMapping() should succeed.
 				if (getSSCommon().isSSComponentListenerAdded()) {
 					logger.log(WARNING, () -> sf("%s: No mapping available for %s in combobox, setSelectedItem(null)", getColumnForLog(), _mapping));
@@ -985,41 +1022,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				}
 			}
 		}
-	}
-	
-	/**
-	 * Common code to update the rowset based on getSelectedMapping().
-	 */
-	private void updateRowset() {
-		
-		getSSCommon().removeRowSetListener();
-		
-		M mapping = getSelectedMapping();
-	
-		if (mapping == null) {
-			logger.log(DEBUG, () -> sf("%s: Setting to null.", getColumnForLog()));
-			setBoundColumnText(null);
-		} else {
-			logger.log(DEBUG, () -> sf("%s: Setting to %s.",  getColumnForLog(), mapping));
-			// TODO: need to avoid setting to same value
-			// for NavGroupState. Wonder why, avoids event?
-			//setBoundColumnText(String.valueOf(mapping));
-
-			// not sure this is a reliable way to check.
-			// TODO: check should probably be in
-			//       setBoundColumnText or RowSetOps.updateColumnText
-
-			String tStringMapping = String.valueOf(mapping);
-			// 2021-02-22_BP: RowSet does not seem to support 'dirty' reads so 
-			// a call to getBoundColumnText() won't reflect any updates using
-			// setBoundColumnText() until after a call to updateRow().
-			
-			//if (!Objects.equals(getBoundColumnText(), tStringMapping)) {
-				setBoundColumnText(tStringMapping);
-			//}
-		}
-	
-		getSSCommon().addRowSetListener();
 	}
 	
 	/**
