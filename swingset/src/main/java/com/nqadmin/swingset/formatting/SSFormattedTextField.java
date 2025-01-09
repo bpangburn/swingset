@@ -71,7 +71,6 @@ import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.decorators.TextDecorationStyle;
 import com.nqadmin.swingset.decorators.TextDecorator;
 import com.nqadmin.swingset.navigate.NavigateActions;
-import com.nqadmin.swingset.utils.SSCommon;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -160,7 +159,6 @@ public class SSFormattedTextField extends JFormattedTextField
 				}
 				
 				// Perform component and custom validation.
-				// TODO: ok = getSSCommon.decorate();??? But still want exit decorate
 				if (ok)
 					ok = allValidate().all();
 				// If ok with null, make sure to use the null formatter. Needed?
@@ -177,7 +175,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				// Stop supressing "value" property change event handling.
 				verifyingText = false;
 			}
-			getSSCommon().decorate();
+			decorate();
 			return ok;
 		}
 	}
@@ -246,7 +244,7 @@ public class SSFormattedTextField extends JFormattedTextField
 		// TODO:  Should "postRowSetModifiedError be covered by dbChange()?
 
 		// The formatter says it's valid, but there's more to check
-		if (getSSCommon().decorate())
+		if (decorate())
 			dbChange(() -> setBoundColumnObject(currentValue));
 		else
 			postRowSetModifiedError(ftf, currentValue);
@@ -340,7 +338,7 @@ public class SSFormattedTextField extends JFormattedTextField
 		addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(final FocusEvent fe) {
-				if (getSSCommon().getDecorator() instanceof TextDecorator td) {
+				if (getDecorator() instanceof TextDecorator td) {
 					// Turn off any text decorations while focused
 					td.decorateText(TextDecorationStyle.RESET);
 				}
@@ -354,7 +352,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 		addPropertyChangeListener("editValid", (e)->{
 			logger.log(TRACE, sf("editValid: isValid %s", e.getNewValue()));
-			getSSCommon().decorate();
+			decorate();
 		});
 	}
 
@@ -498,7 +496,7 @@ public class SSFormattedTextField extends JFormattedTextField
 			setValue(null);
 		}
 		updateTextDecorator(); // For example: color red for negative number
-		getSSCommon().decorate();
+		decorate();
 	}
 
 	// TODO: is this needed? If it is, it should be in 
@@ -533,7 +531,7 @@ public class SSFormattedTextField extends JFormattedTextField
 		if (!isTextDecoratorEnabled())
 			return;
 		Object value = getValue();
-		if (getSSCommon().getDecorator() instanceof TextDecorator textDecorator) {
+		if (getDecorator() instanceof TextDecorator textDecorator) {
 			boolean isNeg = switch(value) {
 			case Double val ->		val < 0.0;
 			case Float val ->		val < 0.0;
@@ -587,7 +585,7 @@ public class SSFormattedTextField extends JFormattedTextField
 		logger.log(TRACE, ()->sf("new value %s", value));
 		checkNeedsNullFormatter();	// TODO: not needed? depends on metadata change
 		super.setValue(value);
-		getSSCommon().decorate();
+		decorate();
 	}
 
 	/**

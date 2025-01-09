@@ -1046,6 +1046,7 @@ public class RowSetOps {
 					BOOLEAN, BIT,
 					CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR ->
 				dbValue = convertToType(updatedValue, jdbcType);
+				//dbValue = updatedValue; // Let DB convert.
 			case DATE, TIME, TIMESTAMP -> // TODO: use convertObjectType when...
 				dbValue = getSQLDateTimeObject(updatedValue, comp);
 			default ->

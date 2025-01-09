@@ -63,6 +63,7 @@ import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
 
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.EventListener;
 
 import com.google.common.reflect.TypeToken;
@@ -619,7 +620,8 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 
 	}
 
-	private final EnumSet<MissingOptionControl> missingOptionControl = EnumSet.allOf(MissingOptionControl.class);
+	private final EnumSet<MissingOptionControl> missingOptionControl
+			= EnumSet.allOf(MissingOptionControl.class);
 
 	/**
 	 * Flags to control handling of Mapping, database value,
@@ -659,7 +661,9 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * @param flags new value
 	 * @return previous value
 	 */
-	public EnumSet<MissingOptionControl> setMissingOptionControl(EnumSet<MissingOptionControl> flags) {
+	public EnumSet<MissingOptionControl> setMissingOptionControl(
+			EnumSet<MissingOptionControl> flags)
+	{
 		EnumSet<MissingOptionControl> prev = missingOptionControl.clone();
 		missingOptionControl.clear();
 		missingOptionControl.addAll(flags);
@@ -674,13 +678,13 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * listener should already be turned off. Otherwise we want it on so the
 	 * ultimate call to setSelectedItem() will trigger an update the to RowSet.
 	 *
-	 * @param _mapping key of item value to assign to combobox,
+	 * @param mapping key of item value to assign to combobox,
 	 *                 which may or may not correlate to the combobox index
 	 */
-	public void setSelectedMapping(final M _mapping) {
+	public void setSelectedMapping(final M mapping) {
 		
 		logger.log(DEBUG, sf("%s: current value: %s, new value: %s.",
-				getColumnForLog(), getSelectedMapping(), _mapping ));
+				getColumnForLog(), getSelectedMapping(), mapping ));
 
 		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
 			if (!hasItems()) {
@@ -692,15 +696,15 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			}
 			
 			// only need to proceed if there is a change.
-			if (Objects.equals(_mapping, getSelectedMapping())) {
+			if (Objects.equals(mapping, getSelectedMapping())) {
 				return;
 			}
 			
-			int index = remodel.getMappings().indexOf(_mapping);
+			int index = remodel.getMappings().indexOf(mapping);
 			SSListItem item;
 			if (index != -1) {
 				item = remodel.get(index);
-			} else if((index = addMissingMappingOption(remodel, _mapping)) != -1) {
+			} else if((index = addMissingMappingOption(remodel, mapping)) != -1) {
 				item = remodel.get(index);
 			} else {
 				// nullItem is either special first list item
@@ -714,18 +718,23 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				// for setSelectedMapping() and we call setSelectedItem(nullItem).
 				// This is OK so long as the component listener used for binding
 				// is removed/disabled because the rowset will not get the null value.
-				// Later when the combo is // requeried, the component will try to load
+				// Later when the combo is requeried, the component will try to load
 				// the current column value from the rowset and this time
 				// setSelectedMapping() should succeed.
-				if (getSSCommon().isSSComponentListenerAdded()) {
-					logger.log(WARNING, () -> sf("%s: No mapping available for %s in combobox, setSelectedItem(null)", getColumnForLog(), _mapping));
+				if (SSUtils.isSSComponentListenerAddedDebug(this)) {
+					logger.log(Level.ERROR, () -> sf(
+							"%s: No mapping for %s in combobox, setSelectedItem(null)",
+							getColumnForLog(), mapping));
 				}
 			}
 			setSelectedItem(item);
-			
-			logger.log(TRACE, () -> sf("%s: eventList - [%s].", getColumnForLog(), remodel.getItemList().toString()));
-			logger.log(TRACE, () -> sf("%s: options - [%s].", getColumnForLog(), remodel.getOptions().toString()));
-			logger.log(TRACE, () -> sf("%s: mappings - [%s].", getColumnForLog(), remodel.getMappings().toString()));
+
+			logger.log(TRACE, () -> sf("%s: eventList - [%s].",
+					getColumnForLog(), remodel.getItemList().toString()));
+			logger.log(TRACE, () -> sf("%s: options - [%s].",
+					getColumnForLog(), remodel.getOptions().toString()));
+			logger.log(TRACE, () -> sf("%s: mappings - [%s].",
+					getColumnForLog(), remodel.getMappings().toString()));
 		}
 	}
 
@@ -856,8 +865,8 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * {@inheritDoc }
 	 */
 	@Override
-	public void setAllowNull(boolean _allowNull) {
-		getSSCommon().setAllowNull(_allowNull);
+	public void setAllowNull(boolean allowNull) {
+		SSComponentInterface.super.setAllowNull(allowNull);
 		adjustForNullItem();
 	}
 
@@ -921,7 +930,8 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	@Override
 	public boolean getAllowNull() {
-		return !isComboBoxNavigator() && getSSCommon().getAllowNull();
+		return !isComboBoxNavigator()
+				&& SSComponentInterface.super.getAllowNull();
 	}
 
 	/**

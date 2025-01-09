@@ -145,9 +145,9 @@ public class Example1 extends JFrame {
 			return valid;
 		};
 		if (!USE_SIMPLE_VALIDATION) {
-			txtSupplierName.getSSCommon().setValidator(TextComponentValidator.create(
+			txtSupplierName.setValidator(TextComponentValidator.create(
 					validateSupplierName));
-			txtSupplierCity.getSSCommon().setValidator(TextComponentValidator.create(
+			txtSupplierCity.setValidator(TextComponentValidator.create(
 					(str) -> !str.matches(".*X")));
 		} else {
 			SwingValidationGroup.setComponentName(txtSupplierName, "Supplier Name");

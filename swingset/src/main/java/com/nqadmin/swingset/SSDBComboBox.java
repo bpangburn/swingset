@@ -364,24 +364,29 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	}
 
 	/**
-	 * Executes the query specified with setQuery(), populates combobox, and turns on AutoCompleteSupport
-	 * <p>
-	 * @throws Exception exception that occurs querying data or turning on AutoComplete
+	 * Executes the query specified with setQuery(), populates combobox,
+	 * and turns on AutoCompleteSupport.
+	 * 
+	 * @throws Exception may occur querying data or turning on AutoComplete
 	 */
+	// See https://stackoverflow.com/questions/15210771/autocomplete-with-glazedlists
+	// for info on modifying lists.
+	// TODO: What's the deal with the Exception?
 	public void execute() throws Exception {
 
-		//System.out.println(getBoundColumnName() + " - " + "SSDBComboBox.execute() - setting execute count: " + executeCount++);
+		logger.log(DEBUG, () -> sf("%s setting execute count: %d",
+				getColumnForLog(), executeCount++));
 		// (re)query data
 		queryData();
 
-		// See https://stackoverflow.com/questions/15210771/autocomplete-with-glazedlists for info on modifying lists.
 
-		// since the list was likely blank when the component was bound we need to update the component again so it can get the text from the list
-		// we don't want to do this if the component is unbound as with an SSDBComboBox used for navigation.
+		// since the list was likely blank when the component was bound we need to update
+		// the component again so it can get the text from the list we don't want to do
+		// this if the component is unbound as with an SSDBComboBox used for navigation.
+		// TODO: rework combo navigation somehow; maybe there's a navigator "thing".
 		if (getRowSet() != null) {
-			// 2020-12-03_BP: If we call updateSSComponent() directly from a component, we MUST turn the component listeners off first, but cleaner to
 			// 	call using getSSCommon()
-			getSSCommon().updateSSComponent();
+			SSUtils.updateSSComponent_HACK(this);
 		}
 	}
 
@@ -525,8 +530,8 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 	 * {@inheritDoc }
 	 */
 	@Override
-	public void setBoundColumnName(String _boundColumnName) {
-		getSSCommon().setBoundColumnName(_boundColumnName);
+	public void setBoundColumnName(String boundColumnName) {
+		super.setBoundColumnName(boundColumnName);
 		adjustForNullItem();
 	}
 
@@ -546,7 +551,7 @@ public class SSDBComboBox extends SSBaseComboBox<Long, Object, Object>
 			logger.log(DEBUG, () -> sf("%s: Nulls allowed? [%s].", getColumnForLog(), getAllowNull()));
 			adjustForNullItem();
 
-			Statement statement = getSSCommon().getConnection().createStatement();
+			Statement statement = getConnection().createStatement();
 			rs = statement.executeQuery(getQuery());
 
 			//optionColumnType = getJDBCColumnType(rs, rs.findColumn(displayColumnName));

@@ -45,8 +45,9 @@ import java.util.EventListener;
 
 import static java.lang.System.Logger.Level.*;
 
-import com.nqadmin.swingset.utils.SSCommon.SSDocumentListener;
+import com.nqadmin.swingset.utils.SSTextSupport.SSDocumentListener;
 import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSTextSupport;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -141,7 +142,7 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 				/** {@inheritDoc } */
 				@Override
 				protected SSDocumentListener getSSComponentListener() {
-					return getSSCommon().getSSDocumentListener();
+					return SSTextSupport.getSSDocumentListener(SSTextArea.this);
 				}
 				
 				/** {@inheritDoc } */

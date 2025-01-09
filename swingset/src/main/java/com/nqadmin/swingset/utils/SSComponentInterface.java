@@ -42,6 +42,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
+import java.nio.file.Path;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EventListener;
@@ -59,6 +60,7 @@ import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.formatting.SSFormat;
+import com.nqadmin.swingset.formatting.SSFormattedTextField;
 import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 import com.nqadmin.swingset.navigate.RowSetModificationEvent;
@@ -175,7 +177,7 @@ public interface SSComponentInterface extends RSC
 		 *
 		 * @return common SwingSet component data and methods
 		 */
-		protected final SSCommon getSSCommon() {
+		final SSCommon getSSCommon() {
 			if (ssCommon == null)
 				return ssCommon = SSCommon.createStart(ssComponent);
 			return ssCommon;
@@ -418,7 +420,7 @@ public interface SSComponentInterface extends RSC
 	 *
 	 * @param _boundColumnIndex rowset column index to which the Component is to be bound
 	 */
-	default void setBoundColumnIndex(final int _boundColumnIndex) { // throws SQLException {
+	default void setBoundColumnIndex(final int _boundColumnIndex) {
 		getSSCommon().setBoundColumnIndex(_boundColumnIndex);
 	}
 
@@ -427,7 +429,7 @@ public interface SSComponentInterface extends RSC
 	 *
 	 * @param _boundColumnName the columnName to set
 	 */
-	default void setBoundColumnName(final String _boundColumnName) {// throws java.sql.SQLException {
+	default void setBoundColumnName(final String _boundColumnName) {
 		getSSCommon().setBoundColumnName(_boundColumnName);
 	}
 
@@ -537,6 +539,26 @@ public interface SSComponentInterface extends RSC
 	@Override
 	default SSFormat getSSFormat() { return getSSCommon().getSSFormat(); }
 
+	// There are three levels of componenent validation.
+	// 1 - baseValidate is inherit to the component structure,
+	//     for example a mask formatters valid indicator.
+	//     This "validation" might simply return state indicator.
+	//     Defaults true.
+	// 2 - componentValidate
+	//     TODO: this is fuzzy...
+	//     Defaults true.
+	// 3 - pluginValidate
+	//     Application specific validation for a component instance.
+
+	/**
+	 * Install the given validator into the component;
+	 * this is the pluginValidator.
+	 * @param validator validator to install
+	 */
+	default void setValidator(Validator validator) {
+		getSSCommon().setValidator(validator);
+	}
+
 	/**
 	 * A low level indication of whether or not the component data is valid.
 	 * For example, a mask formatter indicates valid; generally simple
@@ -583,4 +605,39 @@ public interface SSComponentInterface extends RSC
 	default Decorator createDefaultDecorator() {
 		return SSCommon.createDefaultDecorator();
 	}
+
+	/**
+	 * Install the given decorator.
+	 * @param deco decorator to install
+	 */
+	default void setDecorator(Decorator deco) {
+		getSSCommon().setDecorator(deco);
+	}
+
+	/**
+	 * Return the decorator used by this component.
+	 * @return the decorator
+	 */
+	default Decorator getDecorator() {
+		return getSSCommon().getDecorator();
+	}
+
+	/**
+	 * Run the decorator.
+	 * @return true if component data valid
+	 */
+	default boolean decorate() {
+		return getSSCommon().decorate();
+	}
+
+	/**
+	 * Report problem accessing image file to user.
+	 * @param title dialog title
+	 * @param path file path
+	 * @param ex error
+	 */
+	default void reportError(String title, Path path, Exception ex) {
+		getSSCommon().reportError(title, path, ex);
+	}
+
 }

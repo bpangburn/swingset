@@ -9,9 +9,42 @@ If at bottom of stack, then Redo to an error, swithes from canNavigate btns to
 only RevertChanges btn. There is a brief flash of the commit button on the way,
 minor issue to ignore for now.
 
+--- backing out text component error
+Example1 - status change "20" to "20x", conversion error.
+    SSDocumentListener.udpateTextComponent
+        does ssCommon.setBoundColumnText
+        does RowSetOps.updateColumnText
+        does convertToType("20x", INT)
+            gets exception
+    ssCommon.setBoundColumnText does
+        postRowSetModifiedError
+        and returns false
+    The SSDocumentListener
+        because setBoundColumnText fails (return false, also if thrown exception)
+        backs out the text field change;
+        but note that an error has already been posted
+
+    The nav state gets screwy. There's no error, but the component is in an error
+    state. There was "no change", because it was backed out. ^Z/^Y aren't quite
+    right.
+
+    The conversion to database type, should be part of validation.
+
+    This issue may relate to the issues with pluginValidate leaving things in
+    an unusual state. FIND THOSE COMMENTS...
+
+    
+
+Should decorator check component error state (from navigator)...
+
+
+
 ================================================================================
 ============================= HMMMM ============================================
 ================================================================================
+
+---
+Rename swingset/utils package to swingset/base
 
 ---
 Cleanup
@@ -106,16 +139,12 @@ When onInsertRow, visual indication new record. Color the "Add record" icon; Yel
 ---
 RowSetState, part of Navigation, needs to broadcast state changes, inserting.
 Then NavigatorBar can use that info to give a visual indicator.
-
-
----
-When no records and not insertRow, visual indication that can't edit.
-Disable all fields, and/or green border around "Add new record" icon.
-
 ---
 Navigation/rowset state change event. Like inInsertRow, noRecords, ...
 Need this so navigator UI can show things...
-
+---
+When no records and not insertRow, visual indication that can't edit.
+Disable all fields, and/or green border around "Add new record" icon.
 
 ---
 Navigator
@@ -132,10 +161,8 @@ Navigator
 Examine ConvertType both to/from convert?
 
 ---
-Rename convertObjectType to convertToType, or convertToJdbcType
-
----
-Add verifier to JTextField.
+Add verifier to JTextField, and other's, so it won't give up focus.
+Should this be in SSComponent? Options to control it.
 
 ---
 Broader use of RSC
@@ -245,9 +272,25 @@ Field tooltip with format/...
 ============================ ARCHITECTURE ==================================
 ============================================================================
 
+============== NAVIGATION
+
+Rework combo navigation somehow; maybe there's a navigator "thing"/interface.
+There's weirdness aound combo box navigation. Maybe SSSyncManager needs to be
+in navigation. Maybe navigation/utils need to be together. Maybe this combo
+navigator stuff needs specialized broadcast/events.
+
+See SSDBComboBox::execute() uses SSUtils.updateSSComponent_HACK.
+Maybe there needs to be broadcast/event about the query so that SSCommon can
+listen to it and do updateSSComponent_HACK as needed.
+
 ============== SSCOMPONENT/SSCOMMON
 
-Document SSComponent as groups
+The interface SSComponent acts like a class and delegates to SSCommon.
+This simulates multiple inheritance: class SSGui extends Gui implements SSComponent...
+Goal Hide SSCommon. Make SSCommon package accessible (not public).
+
+
+Document SSComponent as groups of methods.
 
 Should SSCommon only be used internaly and from SSComponent?
 SSComponent package access only. See proposed @SSCommon annotation.

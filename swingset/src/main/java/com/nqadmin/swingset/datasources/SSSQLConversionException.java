@@ -46,7 +46,7 @@ package com.nqadmin.swingset.datasources;
  * Type conversion Exception.
  */
 @SuppressWarnings("serial")
-public class SSSQLConversionException extends SSSQLInternalException
+public class SSSQLConversionException extends SSSQLException
 {
 
 	/**

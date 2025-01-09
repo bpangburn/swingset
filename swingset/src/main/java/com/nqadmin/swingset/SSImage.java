@@ -137,11 +137,10 @@ public class SSImage extends JPanel implements SSComponentInterface
 				} catch (SQLException se) {
 					logger.log(Level.ERROR, getColumnForLog() + ": SQL Exception.", se);
 				} catch (IOException ioe) {
-					getSSCommon().reportError("Error accessing image file", tPath, ioe);
+					reportError("Error accessing image file", tPath, ioe);
 				}
 			});
 		}
-
 	} // end private class SSImageListener
 
 	/** Logger for component */

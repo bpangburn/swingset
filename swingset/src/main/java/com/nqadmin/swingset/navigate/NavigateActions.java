@@ -945,7 +945,7 @@ public class NavigateActions
 					//		 up, but wait for the event bus...
 					//
 					dBNav.findSSComponents().forEach(
-							(ssc) -> ssc.getSSCommon().issueRowChanged());
+							(ssc) -> SSUtils.issueRowChanged_HACK(ssc));
 				}
 				setInserting(rowSet, false);
 				dBNav.performCancelOps();

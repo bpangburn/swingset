@@ -71,6 +71,34 @@ import com.nqadmin.swingset.datasources.SSDBSupport;
 public class SSUtils {
 	private SSUtils() {}
 
+	/** Temporary for hiding SSCommon; used from SSDBComboBox.
+	 * @param comp component to update
+	 */
+	public static void updateSSComponent_HACK(SSComponentInterface comp) {
+		comp.getSSCommon().updateSSComponent();
+	}
+
+	/**
+	 * Signal that the current row has changed for CachedRowSet.
+	 * @param comp to notify of row change
+	 */
+	public static void issueRowChanged_HACK(SSComponentInterface comp) {
+		comp.getSSCommon().issueRowChanged();
+	}
+
+	/**
+	 * Check if the SSComponent's listener is added for debug/logging.
+	 * @param comp 
+	 * @return true if the listener is added
+	 */
+	public static boolean isSSComponentListenerAddedDebug(SSComponentInterface comp) {
+		return comp.getSSCommon().isSSComponentListenerAdded();
+	}
+
+	/** Put this in the global lookup to create debug row set listeners */
+	public static class DebugRowSetListener {
+	}
+
 	/**
 	 * This is similar to LogManager.getLogger(), except that
 	 * if getLogger fails then this method returns the root logger.

@@ -54,9 +54,10 @@ import java.util.EventListener;
 
 import static java.lang.System.Logger.Level.*;
 
-import com.nqadmin.swingset.utils.SSCommon;
-import com.nqadmin.swingset.utils.SSCommon.SSDocumentListener;
 import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSTextSupport;
+import com.nqadmin.swingset.utils.SSTextSupport.SSDocumentListener;
+import com.nqadmin.swingset.utils.SSTextSupport.SSPlainDocument;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -65,13 +66,10 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * SSTextField extends the JTextField.
  */
 @SuppressWarnings("serial")
-public class SSTextField extends JTextField implements SSComponentInterface {
-
-	// TODO Consider adding an InputVerifier to prevent component from losing focus.
-	// See SSFormattedTextField. May be able to add to SSDocumentListener in
-	// SSCommon.
-	// TODO Convert masks to SSFormattedTextFields
-	// TODO Add YYYYMMDD mask.
+public class SSTextField extends JTextField implements SSComponentInterface
+{
+	// TODO Consider adding an InputVerifier to prevent component from
+	// losing focus; see SSFormattedTextField.
 
 	/** Logger for component */
 	private static Logger logger = SSUtils.getLogger();
@@ -117,7 +115,7 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 	 */
 	@Override
 	protected Document createDefaultModel() {
-		return getSSCommon().new SSPlainDocument();
+		return new SSPlainDocument(this);
 	}
 
 	/**
@@ -167,8 +165,8 @@ public class SSTextField extends JTextField implements SSComponentInterface {
 				
 				/** {@inheritDoc } */
 				@Override
-				protected SSCommon.SSDocumentListener getSSComponentListener() {
-					return getSSCommon().getSSDocumentListener();
+				protected SSDocumentListener getSSComponentListener() {
+					return SSTextSupport.getSSDocumentListener(SSTextField.this);
 				}
 				
 				/** {@inheritDoc } */

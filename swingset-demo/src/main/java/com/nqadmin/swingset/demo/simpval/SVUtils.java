@@ -92,12 +92,12 @@ public class SVUtils {
 	}
 
 	public static ValidationItem decorator(JTextComponent jtc, StringValidator sval) {
-		SSComponentInterface ssComp = (SSComponentInterface) jtc;
+		SSComponentInterface comp = (SSComponentInterface) jtc;
 		SSTextComponentValidationItem textVali = SVUtils.createDefaultTextValidator(
 				jtc, sval);
 		SimpValValidatorDecorator deco = new SimpValValidatorDecorator(textVali);
-		ssComp.getSSCommon().setDecorator(deco);
-		ssComp.getSSCommon().setValidator(deco.getValidator());
+		comp.setDecorator(deco);
+		comp.setValidator(deco.getValidator());
 		return textVali;
 	}
 	

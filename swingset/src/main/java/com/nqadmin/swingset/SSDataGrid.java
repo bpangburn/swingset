@@ -188,7 +188,7 @@ public class SSDataGrid extends JTable
 	// TODO Add support for GlazedList table features.
 
 	// TODO: make this a visible option?
-	private static final boolean REMOVE_KEYS_IF_PRIMARY_UNSORTED = true;
+	private static final boolean REMOVE_KEYS_IF_PRIMARY_UNSORTED = false;
 
 	/**
 	 * Editor for check box fields.
