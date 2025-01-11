@@ -1,21 +1,20 @@
-/*******************************************************************************
- * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
- * All rights reserved.
- * 
+/* *****************************************************************************
+ * Copyright (C) 2025, Ernie R Rael. All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,47 +26,34 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
- * Contributors:
- *   Prasanth R. Pasala
- *   Brian E. Pangburn
- *   Diego Gil
- *   Man "Bee" Vo
- *   Ernie R. Rael
- ******************************************************************************/
-/* *****************************************************************************
- * The conditions in the above copyright notice apply to this copyright notice.
- * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
-
-import java.sql.Connection;
-
 /**
- * See {@link DBComboBox2}.
+ * {@inheritDoc}
+ * @param <M> mapping type
+ * @param <O> option type
  */
 @SuppressWarnings("serial")
-public class SSDBComboBox extends DBComboBox2<Long, Object, Object>
+public abstract class ComboBox<M,O> extends ComboBox2<M, O, Object>
 {
-	/** {@inheritDoc} */
-	public SSDBComboBox()
-	{
+	/**
+	 * Creates an object of SSComboBox.
+	 */
+	public ComboBox() {
+		this(ModelType.SWING);
 	}
 
-	/** {@inheritDoc} */
-	public SSDBComboBox(Connection _connection,
-						String _primaryKeyColumnName, String _displayColumnName)
-	{
-		super(_connection, _primaryKeyColumnName, _displayColumnName);
+	/**
+	 * Creates an object of SSComboBox.
+	 * <p>
+	 * If useGlazedLists is specified, it is configured strict.
+	 * Use {@link #getAutoComplete() } to change its configuration
+	 * 
+	 * @param modelType whether to use SWING or GLAZED combo model
+	 */
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	public ComboBox(ModelType modelType) {
+		super(modelType);
 	}
-
-	/** {@inheritDoc} */
-	public SSDBComboBox(Connection _connection, String _query,
-						String _primaryKeyColumnName, String _displayColumnName)
-	{
-		super(_connection, _query, _primaryKeyColumnName, _displayColumnName);
-	}
-
 }

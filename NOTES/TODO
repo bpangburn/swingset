@@ -96,11 +96,12 @@ still there pretty much as is, but hidden inside a Navigation. An example of
 where this is wanted; an SSDataNavigator has a Navigation model, if the rowset
 in the Navigation changes, the SSDataNavigator detects this event and adjusts
 accordingly.
-
 ---
 Should the methods in SSDataNavigator that delegate to getNavigatorActions()
 be deprecated? If NavigatorActions are considered a model, then there's
 some precedence to keep some of them for convenience.
+---
+There are several deprecated methods in SSDataNavigator.
 
 ---
 re-indent swingset
@@ -282,6 +283,9 @@ navigator stuff needs specialized broadcast/events.
 See SSDBComboBox::execute() uses SSUtils.updateSSComponent_HACK.
 Maybe there needs to be broadcast/event about the query so that SSCommon can
 listen to it and do updateSSComponent_HACK as needed.
+
+See comment in SSBaseComboBox::setSelectionPending about when getAllowNull
+empty combo box shows an error.
 
 ============== SSCOMPONENT/SSCOMMON
 

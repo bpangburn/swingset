@@ -50,6 +50,7 @@ import javax.swing.JLabel;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.util.List;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
@@ -268,7 +269,7 @@ public class Example4 extends JFrame {
 			// SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES
 
 				// This is the normal case, specify an option for each mapping
-				cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
+				cmbPartColor.setOptions(List.of("Red", "Green", "Blue"));
 
 				// This is used to initialize some stuff for Example4Advanced
 				cmbPartColorChangeOptions();
@@ -279,7 +280,6 @@ public class Example4 extends JFrame {
 				cmbPartColor.bind(rowset, "color_code");
 				txtPartWeight.bind(rowset, "weight");
 				txtPartCity.bind(rowset, "city");
-				//SSComboBox.testComboAdjustForNull(cmbPartColor);
 
 			// SETUP SYNCMANAGER, WHICH WILL TAKE CARE OF KEEPING THE COMBO NAVIGATOR AND
 			// DATA NAVIGATOR IN SYNC.

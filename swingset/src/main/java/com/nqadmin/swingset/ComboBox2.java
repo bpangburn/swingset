@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
@@ -65,6 +65,10 @@ import javax.swing.SwingUtilities;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.util.EventListener;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 import com.google.common.reflect.TypeToken;
 
@@ -106,31 +110,27 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * @since 4.0.0
  *
  */
-//
-// TODO: There are more things that can be pulled into here.
-//
-//       Might want to put listItemFormat field in here.
-//
-//       Following are the same and can be moved into here
-//       after deprecated stuff is removed. There may be more.
-//       - getMappings()
-//       - getOptions()
-//       - 
-//
-//       Some things are only in one subclass, but feel like
-//       they belong in here.
-//       - removeMapping(M)
-//       - 
-//
 @SuppressWarnings("serial")
-public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> implements SSComponentInterface
+public abstract class ComboBox2<M,O,O2>
+		extends JComboBox<SSListItem> implements SSComponentInterface
 {
+	/** A convenience for variable declarations. Do not instantiate. */
+	protected abstract class Model extends OptionMappingSwingModel<M,O,O2> { }
+
+	/** Constructor argument to indicate whether or not to use GlazedList model. */
+	public enum ModelType {
+		/** use glazed model */
+		GLAZED,
+		/** use swing model */
+		SWING,
+	}
+
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to the rowset in certain instances.
 	 * <p>
 	 * NOTE: No guaranty whether ActionListener or FocusLister will be called first when focus is lost.
 	 */
-	protected class SSBaseComboBoxListener implements ActionListener
+	protected class ComboBox2Listener implements ActionListener
 	{
 		/**
 		 * For JComboBox ActionListener and ItemListener are similar, but ActionListener
@@ -166,7 +166,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * Listens/waits for selected item not nullItem. When not nullItem is
 	 * set, selectionPending set to false.
 	 */
-	private final class SSBaseComboBoxItemListener implements ItemListener
+	private final class ComboBox2ItemListener implements ItemListener
 	{
 		@Override
 		public void itemStateChanged(ItemEvent e)
@@ -205,7 +205,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		 * @param _jc install model into this
 		 * @return OptionMapping model
 		 */
-		protected static <M,O,O2>BaseModel<M,O,O2> install(SSBaseComboBox<M,O,O2> _jc) {
+		protected static <M,O,O2>BaseModel<M,O,O2> install(ComboBox2<M,O,O2> _jc) {
 			BaseModel<M,O,O2> model = new BaseModel<>();
 			AbstractComboBoxListSwingModel.install(_jc, model);
 
@@ -247,7 +247,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		 * @param _jc install auto completion into this
 		 * @return OptionMapping model
 		 */
-		protected static <M,O,O2>BaseGlazedModel<M,O,O2> install(SSBaseComboBox<M,O,O2> _jc) {
+		protected static <M,O,O2>BaseGlazedModel<M,O,O2> install(ComboBox2<M,O,O2> _jc) {
 			BaseGlazedModel<M,O,O2> model = new BaseGlazedModel<>();
 			model.autoComplete = AutoCompleteSupport.install(_jc, model.getEventList(), null, model.getListItemFormatDelegate());
 			
@@ -317,31 +317,26 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		/**
 		 * If null option, then show the mapping;
 		 * otherwise do the default formatting.
-		 * @param _sb display value goes here
-		 * @param _elemIndex which option to format
-		 * @param _listItem combobox list item
+		 * @param sb display value goes here
+		 * @param elemIndex which option to format
+		 * @param listItem combobox list item
 		 */
 		@Override
-		protected void appendValue(StringBuffer _sb, int _elemIndex, SSListItem _listItem) {
-			if (getOptionFormatIndex() == _elemIndex
-					&& getElem(_elemIndex, _listItem) == null
-					&& !Objects.equals(getNullItem(), _listItem)) {
-				Object key = getElem(getMappingFormatIndex(), _listItem);
-				_sb.append(key != null ? key.toString() : null)
+		protected void appendValue(StringBuffer sb, int elemIndex, SSListItem listItem) {
+			if (getOptionFormatIndex() == elemIndex
+					&& getElem(elemIndex, listItem) == null
+					&& !Objects.equals(getNullItem(), listItem)) {
+				Object key = getElem(getMappingFormatIndex(), listItem);
+				sb.append(key != null ? key.toString() : null)
 						.append(" - Option Not Found");
 			} else {
-				super.appendValue(_sb, _elemIndex, _listItem);
+				super.appendValue(sb, elemIndex, listItem);
 			}
 		}
 	}
 
-	/**
-	 * Log4j Logger for component
-	 */
+	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
-
-	// The actual type of the mapping.
-	private Class<M> mappingType;
 
 	/**
 	 * When {@link #getAllowNull() } is true, this is the null item;
@@ -372,6 +367,9 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	protected OptionMappingSwingModel<M,O,O2> optionModel;
 
+	// The actual type of the mapping.
+	private Class<M> mappingType;
+
 	/**
 	 * Return the actual type of the Mapping parameter.
 	 * @return the type
@@ -385,6 +383,42 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			mappingType = t;
 		}
 		return mappingType;
+	}
+
+	// The actual type of the option.
+	private Class<O> optionType;
+
+	/**
+	 * Return the actual type of the Mapping parameter.
+	 * @return the type
+	 */
+	final public Class<O> getOptionType() {
+		if (optionType == null) {
+			//@SuppressWarnings("unchecked")
+			TypeToken<O> typeToken = new TypeToken<O>(getClass()) { };
+			@SuppressWarnings("unchecked")
+			Class<O> t = (Class<O>) typeToken.getType();
+			optionType = t;
+		}
+		return optionType;
+	}
+
+	// The actual type of the option.
+	private Class<O2> option2Type;
+
+	/**
+	 * Return the actual type of the Mapping parameter.
+	 * @return the type
+	 */
+	final public Class<O2> getOption2Type() {
+		if (option2Type == null) {
+			//@SuppressWarnings("unchecked")
+			TypeToken<O2> typeToken = new TypeToken<O2>(getClass()) { };
+			@SuppressWarnings("unchecked")
+			Class<O2> t = (Class<O2>) typeToken.getType();
+			option2Type = t;
+		}
+		return option2Type;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -421,39 +455,47 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	}
 
 	/**
-	 * create SSBaseComboBox
+	 * Create SSBaseComboBox.
 	 */
-	public SSBaseComboBox() {
-		addItemListener(new SSBaseComboBoxItemListener());
-		finishSSCommon();
+	public ComboBox2() {
+		this(ModelType.SWING);
 	}
 
 	/**
-	 * create SSBaseComboBox
-	 * @param useGlazed use glazedlists
+	 * Create SSBaseComboBox.
+	 * @param modelType whether to use SWING or GLAZED combo model
 	 */
 	@SuppressWarnings("LeakingThisInConstructor")
-	public SSBaseComboBox(boolean useGlazed) {
-		this();
+	public ComboBox2(ModelType modelType) {
+		addItemListener(new ComboBox2ItemListener());
+		finishSSCommon();
 
-		if (useGlazed) {
-			optionModel = BaseGlazedModel.install(this);
-		} else {
-			optionModel = BaseModel.install(this);
+		try {
+			getMappingType();
+		} catch(ClassCastException ex) {
+			throw new IllegalStateException(
+					sf("Non generic subclass required, like '%s<...>(){}'",
+							getClass().getSimpleName()),
+					ex);
 		}
+
+		optionModel = switch(modelType) {
+		case GLAZED -> BaseGlazedModel.install(this);
+		case SWING -> BaseModel.install(this);
+		};
 		optionModel.setListItemFormat(new ShowMappingIfNullOption());
 	}
 
 	/**
-	 * Set the format to use with this model.
-	 * <br>TODO: consider deferring the actual change until row change
+	 * Set the format to use with this model. <br>
+	 * TODO: consider deferring the actual change until row change
 	 * 
-	 * @param _listItemFormat the format used with this model
+	 * @param listItemFormat the format used with this model
 	 */
-	public void setListItemFormat(SSListItemFormat _listItemFormat) {
+	public void setListItemFormat(SSListItemFormat listItemFormat) {
 		Object selectedItem = getSelectedItem();
 		boolean keep = Objects.equals(getEditor().getItem(), selectedItem);
-		optionModel.setListItemFormat(_listItemFormat);
+		optionModel.setListItemFormat(listItemFormat);
 		// A new format may change the target contents of the comboBox editor.
 		// When it does change, the contents of the combo editor is changed
 		// from ListItem to a String with the old value.
@@ -517,22 +559,24 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	}
 
 	/**
-	 * Control whether or not waiting for pending user selection. When selectionPending
-	 * is true, there is a nullItem and it is selected in the combo.
-	 * selectionPending is set to false automatically when a non nullItem is selected.
-	 * @param _selectionPending true selects a possibly tempory nullItem
+	 * Control whether or not waiting for pending user selection.
+	 * When * selectionPending is true, there is a nullItem and it is selected in
+	 * the * combo. selectionPending is set to false automatically when a non nullItem
+	 * is selected.
+	 *
+	 * @param selectionPending true selects a possibly tempory nullItem
 	 */
-	public void setSelectionPending(boolean _selectionPending) {
-		if (selectionPending == _selectionPending) {
+	public void setSelectionPending(boolean selectionPending) {
+		if (this.selectionPending == selectionPending) {
 			return;
 		}
-		selectionPending = _selectionPending;
+		this.selectionPending = selectionPending;
 
 		adjustForNullItem();
 		if (selectionPending) {
 			// Setting to true from false, select the nullItem;
 			// Events are a problem. After SSDBNavImpl.setSelectionPending
-			// the following ends up in SSBaseComboBoxListener.actionPerformed()
+			// the following ends up in ComboBox2Listener.actionPerformed()
 			// then into setBoundColumnText then exception in RowSetOps.updateColumnText.
 			// TODO: merge this into adjustForNullItem, to avoid extra unregister/register
 			//
@@ -552,8 +596,233 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	}
 
 	/**
+	 * Adds a list of strings as combo box items
+	 * with {@literal [0-N)} mapping.
+	 *
+	 * @param options the list of options that you want to appear in the combo box.
+	 */
+	public void setOptions(List<O> options) {
+		setOptions(options, null);
+	}
+
+	/**
+	 * Sets the options to be displayed in the list box along with
+	 * their corresponding mappings to database values. If {@code mappings}
+	 * is null, then a zero to N-1 mapping is automatically established.
+	 * 
+	 * @param options  options to be displayed in the list box.
+	 * @param mappings null or database values that correspond to the options, 1 to 1, in
+	 *					the list box.
+	 * @throws IllegalArgumentException if lists are not the same size.
+	 */
+	public void setOptions(List<O> options, List<M> mappings) {
+		enumOption = null;
+		setOptionsInternal(options, mappings);
+	}
+
+	/**
+	 * Returns the items displayed in the combo box.
+	 * <p>
+	 * <b>When getAllowNull() is true, the first list item is null/""</b>
+	 *
+	 * @return returns the items displayed in the combo box
+	 */
+	public List<O> getOptions() {
+		return optionModel.getOptions();
+	}
+
+	/**
+	 * when true, mappings were autoGenerated
+	 */
+	private boolean autoGeneratedMapping;
+
+	/**
+	 * Determine if mappings are autoGenerated {@literal [0-N)}
+	 * @return true if mappings are autoGenerated
+	 */
+	// TODO: public? Get rid of the field
+	protected boolean isAutoGeneratedMapping() {
+		return autoGeneratedMapping;
+	}
+
+	/**
+	 * Set up the specified mappings/options.
+	 * <p>
+	 * If _mappings is null, then autogenerate the mappings;
+	 * _mappings type must be Integer or Long.
+	 * @param options
+	 * @param _mappings
+	 */
+	protected void setOptionsInternal(List<O> options, List<M> _mappings) {
+		Objects.requireNonNull(options);
+		if (_mappings == null
+				&& getMappingType() != Integer.class
+				&& getMappingType() != Long.class)
+			throw new IllegalArgumentException(
+					"Auto generated mapping only avaialable for int/long mappings");
+		if (_mappings != null && options.size() != _mappings.size())
+			throw new IllegalArgumentException("Options and Mappings different length");
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
+
+			remodel.clear();
+			nullItem = null;
+
+			// TODO first item is nullItem if getAllowNull()==true.
+			//      Impacts mappings, getSelectedValue(), getSelectedIndex(), etc.
+
+			adjustForNullItem();
+
+			autoGeneratedMapping = false;
+			List<M> mappings = _mappings;
+			if (mappings == null) {
+				// Provide a [0,N) mapping
+				// TODO: in the future let it be implicit, don't create it?
+				List<Object> autoMapping;
+				if (getMappingType() == Integer.class)
+					autoMapping = IntStream.range(0, options.size())
+							.collect(ArrayList::new, List::add, List::addAll);
+				else // must be Long
+					autoMapping = LongStream.range(0, options.size())
+							.collect(ArrayList::new, List::add, List::addAll);
+				@SuppressWarnings("unchecked")
+				List<M> xxx = (List<M>)autoMapping;
+				mappings = xxx;
+				autoGeneratedMapping = true;
+			}
+
+			List<O> opts = optionModel.getDisconnectedList(options);
+			mappings = optionModel.getDisconnectedList(mappings);
+			
+			remodel.addAll(mappings, opts);
+		}
+	}
+
+	/**
+	 * Get the mappings currently in use.
+	 * <p>
+	 * <b>When getAllowNull() is true, the first list item is null/""</b>
+	 * @return the mappings
+	 */
+	public List<M> getMappings() {
+		return optionModel.getMappings();
+	}
+
+	/**
+	 * Removes an item from the combobox's item list where the
+	 * list item's mapping equals the param.
+	 * <p>
+	 * If more than one item is present in the combo for that value the first one is
+	 * changed.
+	 *
+	 * @param mapping keymapping value for the item that should be removed
+	 *
+	 * @return returns true on successful deletion otherwise returns false.
+	 */
+	public boolean removeMapping(M mapping) {
+		
+		boolean result = false;
+
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
+			// Get index of list item for mapping.
+			int index = remodel.getMappings().indexOf(mapping);
+			// Proceed if mapping was found.
+			if (index != -1) {
+				remodel.remove(index);
+				result = true;
+			}
+		} catch (final Exception e) {
+			logger.log(Level.ERROR, getColumnForLog() + ": Exception.", e);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Adds an item to the existing list of items in the combo box.
+	 *
+	 * @param option item that should be displayed in the combobox
+	 * @param mapping  mapping of _option, commonly a primary key
+	 */
+	public void addOption(O option, M mapping) {
+		addOption(option, null, mapping);
+	}
+	
+	/**
+	 * Adds an item to the existing list of items in the combo box.
+	 *
+	 * @param option item that should be displayed in the combobox
+	 * @param option2  second display item for combobox
+	 * @param mapping  mapping of _option, commonly a primary key
+	 */
+	public void addOption(O option, O2 option2, M mapping) {
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
+			final int index = remodel.getMappings().indexOf(mapping);
+			if (index >= 0) {
+				logger.log(WARNING, () -> sf("%s: Mapping of [%s] already exists. Creating duplicate Mapping with Option of '%s'.",
+					getColumnForLog(), mapping, option));
+			}
+			remodel.add(mapping, option, option2);
+		} catch (final Exception e) {
+			logger.log(Level.ERROR, getColumnForLog() + ": Exception.", e);
+		}
+	}
+
+	/**
+	 * Update an option of an item in the combobox's item list based on a mapping
+	 * value.
+	 * <p>
+	 * If more than one item is present in the combo for that mapping, only the
+	 * first one is changed.
+	 *
+	 * @param mapping typically a primary key value corresponding to the displayed
+	 *                 currentSelectedOption to be updated
+	 * @param option  currentSelectedOption that should be updated in the combobox
+	 *
+	 * @return returns true if update is successful otherwise returns false.
+	 */
+	public boolean updateOption(M mapping, O option) {
+
+		// 2021-02-28: @errael patched this method to deal with inconsistent
+		// updating of combo editor. See https://github.com/bpangburn/swingset/issues/85
+		
+		boolean result = false;
+
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
+			final int index = remodel.getMappings().indexOf(mapping);
+			if (index >= 0) {
+				boolean isSelectedItem = Objects.equals(mapping, getSelectedMapping());
+				remodel.setOption(index, option);
+				result = true;
+				// Changing what's in the ComboEditor, which may be done indirectly when
+				// modifying the current item, might change the currently selected item
+				// when GlazedList is set to STRICT. So something is needed to insure
+				// that the selected mapping before the change is the selected mapping
+				// after the change. Otherwise the first item in the list becomes
+				// selected. If the combo is used for navigation, this can trigger a
+				// change in the current row.
+				//
+				// The call to setSelectedItem() below has the added benefit of working
+				// around a possible bug in GlazedList
+				// (see https://github.com/glazedlists/glazedlists/issues/702),
+				// but it's likely best to keep this block even if the issue is
+				// determined to be a bug and resolved.
+				if (isSelectedItem) {
+					// Modifying the underlying list item that corresponds to the
+					// current selection; strict glazed may change the selection.
+					// Select the modified item so the same mapping is selected.
+					SSListItem item = remodel.get(index);
+					setSelectedItem(item);
+				}
+// TODO Confirm that eventList is not reordered by GlazedLists code.
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * Returns the mapping code corresponding to the currently selected item in the
-	 * combobox. Typically, this is the underlying database record
+	 * combobox. Commonly, this is an underlying database record
 	 * primary key value corresponding to the currently selected item.
 	 *
 	 * @return returns the value associated with the selected item
@@ -565,7 +834,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 
 		M result = null;
 
-		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			Object item = getSelectedItem();
 			if (item instanceof SSListItem lItem) {
 				result = remodel.getMapping(lItem);
@@ -576,14 +845,14 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	}
 
 	private final List<M> generatedMappingOptions = new ArrayList<>();
-	private int addMissingMappingOption(BaseModel<M,O,O2>.Remodel remodel, M _mapping) {
+	private int addMissingMappingOption(Model.Remodel remodel, M mapping) {
 		int index = -1;
-		if(_mapping != null) {
+		if(mapping != null) {
 			if(missingOptionControl.contains(MissingOptionControl.MOC_ADD)) {
-				remodel.add(_mapping, null);
-				index = remodel.getMappings().indexOf(_mapping);
-				logger.log(DEBUG, () -> "missingMappingOption added: " + _mapping);
-				generatedMappingOptions.add(_mapping);
+				remodel.add(mapping, null);
+				index = remodel.getMappings().indexOf(mapping);
+				logger.log(DEBUG, () -> "missingMappingOption added: " + mapping);
+				generatedMappingOptions.add(mapping);
 			}
 		}
 		return index;
@@ -592,15 +861,16 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	/**
 	 * If current selection does not have a null option,
 	 * then remove any created missingMappingOptionss from list.
-	 * Must be EDT
 	 */
 	private void cleanupMissingMappingOptions() {
+		if (!SwingUtilities.isEventDispatchThread())
+			throw new IllegalStateException("Must be EDT.");
 		if(generatedMappingOptions.isEmpty()
 				|| !missingOptionControl.contains(MissingOptionControl.MOC_CLEANUP))
 			return;
 		if(generatedMappingOptions.size() > 1)
 			logger.log(WARNING, () -> "size: " + generatedMappingOptions.size());
-		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			for (Iterator<M> it = generatedMappingOptions.iterator(); it.hasNext();) {
 				M missingMappingOption = it.next();
 				// Sequential records might have different missing options;
@@ -681,12 +951,12 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * @param mapping key of item value to assign to combobox,
 	 *                 which may or may not correlate to the combobox index
 	 */
-	public void setSelectedMapping(final M mapping) {
+	public void setSelectedMapping(M mapping) {
 		
 		logger.log(DEBUG, sf("%s: current value: %s, new value: %s.",
 				getColumnForLog(), getSelectedMapping(), mapping ));
 
-		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			if (!hasItems()) {
 				logger.log(WARNING, sf("%s: combobox is empty", getColumnForLog()));
 				// Doesn't have items, that doesn't mean that the list is empty.
@@ -748,7 +1018,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	public O getSelectedOption() {
 		O result = null;
 
-		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			Object item = getSelectedItem();
 			if (item instanceof SSListItem lItem) {
 				result = remodel.getOption(lItem);
@@ -760,18 +1030,17 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 
 	/**
 	 * Finds the listItem having option that matches the specified option
-	 * and make it the selected listItem. If no matching item is found
-	 * the _option is used for {@link #setSelectedItem(java.lang.Object) 
-	 * setSelectedItem(_option)}
+	 * and make it the selected listItem. If no matching item is found the _option
+	 * is used for {@link #setSelectedItem(java.lang.Object) setSelectedItem(option)}.
 	 *
-	 * @param _option option value of list item
+	 * @param option option value of list item
 	 */
-	public void setSelectedOption(final O _option) {
+	public void setSelectedOption(O option) {
 
-		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			if(!hasItems()) {
 				logger.log(WARNING, sf("%s: combobox is empty", getColumnForLog()));
-				// Even if combo is empty, stick _option in editor. Do not return;
+				// Even if combo is empty, stick option in editor. Do not return;
 			}
 			
 			Object tItem = getSelectedItem();
@@ -782,25 +1051,117 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 					: tItem;
 			
 			// only need to proceed if there is a change.
-			if (Objects.equals(_option, currentSelectedOption)) {
+			if (Objects.equals(option, currentSelectedOption)) {
 				return;
 			}
 			
 			// find the first matching option in the list
-			final int index = remodel.getOptions().indexOf(_option);
+			final int index = remodel.getOptions().indexOf(option);
 			
 			Object item;
 			if (index != -1) {
 				item = remodel.get(index);
 			} else {
 				// Didn't find it in the list, so just use it as is.
-				item = _option != null ? _option : nullItem;
-				logger.log(WARNING, () -> sf("%s: option %s not in combobox, do setSelectedItem.", getColumnForLog(), _option));
+				item = option != null ? option : nullItem;
+				logger.log(WARNING, () -> sf("%s: option %s not in combobox, do setSelectedItem.", getColumnForLog(), option));
 			}
 			
 			setSelectedItem(item);
 		}
 	}
+	
+	/////////////////////////////////////////////////////////////////////////
+	//
+	// Using an enum as an option/mapping.
+	//
+
+	//
+	// TODO: Study use case for enums
+	// TODO: When an enum is specified, should there be a way to
+	//		specify a mapping as well? Two possibilities, the first
+	//		is like the general pattern, mapping should have the
+	//		same number of elements as there are enum values.
+	//		The second could also be provided as setOptions([], Function)
+	//		 1) setOptions(enum, mapping)
+	//		 2) setOptions(enum, Function<enum, Object>)
+	//			For example
+	//				setOptions(ComboEnum.class, (e) -> e.someMethod())
+	//				setOptions(ComboEnum.class, (e) -> someMap.get(e))
+
+	private Class<?> enumOption;
+
+	/**
+	 * Sets the options to be displayed in the combo box based on
+	 * the enum class' value's toString().Generate a {@literal [0-N)} mapping.
+	 * <p>
+	 * Convenience method, throws if option type/class is not String.
+	 *
+	 * @param <T> inferred enum type
+	 * @param enumOption enum class with values to display
+	 */
+	public <T extends Enum<T>> void setOptions(Class<T> enumOption) {
+
+		if (getOptionType() != String.class)
+			throw new IllegalArgumentException(
+					"Option type must be String for Enum options");
+
+		this.enumOption = enumOption;
+		List<String> l01 = Stream.of(enumOption.getEnumConstants())
+				.map(e -> e.toString()).collect(Collectors.toList());
+
+		@SuppressWarnings("unchecked")
+		List<O> l02 = (List<O>)l01;
+		setOptionsInternal(l02, null);
+	}
+
+	/**
+	 * Get the enum class currently displayed by this combo box.
+	 * If combo box is not displaying an enum, then reutrn null.
+	 * @return the enum class
+	 */
+	// TODO: public? Get rid of the field
+	protected Class<?>getEnumOption() {
+		return enumOption;
+	}
+	
+	/**
+	 * Finds the listItem that matches the specified enum and make it the selected
+	 * listItem.
+	 *
+	 * @param option select list item for this
+	 * @throws ClassCastException if _option is wrong enum type
+	 */
+	public void setSelectedEnum(Enum<?> option) {
+		if (enumOption == null) {
+			throw new IllegalStateException("SSComboBox values not an enum.");
+		}
+		Objects.requireNonNull(option, "Enum to be selected cannnot be null.");
+
+		// Verify the enum of of the correct type.
+		enumOption.cast(option);
+		// This could be performance optimized since itemList index == ordinal()
+		// within the current constraints of mapping == ordinal().
+		// But the whole nullItem comes into play to affect the index.
+		setSelectedMapping(getMappingType().cast(option.ordinal()));
+	}
+	
+	/**
+	 * Return the selected enum.
+	 * 
+	 * @return selected enum.
+	 * @throws IllegalStateException if not an enum.
+	 */
+	public Enum<?> getSelectedEnum() {
+		if (enumOption == null)
+			throw new IllegalStateException("SSComboBox values not an enum");
+		M mapping = getSelectedMapping();
+		if (mapping == null)
+			return null;
+		int enumIdx = ((Number)mapping).intValue();
+		return (Enum<?>)enumOption.getEnumConstants()[enumIdx];
+	}
+
 	
 	/////////////////////////////////////////////////////////////////////////
 	//
@@ -860,16 +1221,6 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		setEditable(false);
 	}
 
-	/**
-	 * After this, make some adjustments.
-	 * {@inheritDoc }
-	 */
-	@Override
-	public void setAllowNull(boolean allowNull) {
-		SSComponentInterface.super.setAllowNull(allowNull);
-		adjustForNullItem();
-	}
-
 // TODO: Review this. GlazedLists is probably still calling it so need to detect those calls.
 //	/**
 //	 * SwingSet combo boxes works under the assumption that the only time a combo is editable is when GlazedLists
@@ -898,12 +1249,24 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 		adjustForNullItem();
 	}
 
+	private static Object nullElement(Class<?> clazz)
+	{
+		return clazz == String.class ? "" : null;
+	}
+
 	/**
-	 * Create a null item for the itemList
+	 * Create a null item for the itemList.
+	 * This default implementation uses an empty string for a String,
+	 * and null for everything else.
 	 * @param remodel context for the creation of the nullItem.
 	 * @return the created null item.
 	 */
-	protected abstract SSListItem createNullItem(BaseModel<M,O,O2>.Remodel remodel);
+	protected SSListItem createNullItem(Model.Remodel remodel) {
+		@SuppressWarnings("unchecked") M m = (M) nullElement(getMappingType());
+		@SuppressWarnings("unchecked") O o = (O) nullElement(getOptionType());
+		@SuppressWarnings("unchecked") O2 o2 = (O2) nullElement(getOption2Type());
+		return remodel.createOptionMappingItem(m, o, o2);
+	}
 
 	/**
 	 * Return this ComboBox's nullItem.
@@ -920,6 +1283,16 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 */
 	protected boolean isComboBoxNavigator() {
 		return false;
+	}
+
+	/**
+	 * After this, make some adjustments.
+	 * {@inheritDoc }
+	 */
+	@Override
+	public void setAllowNull(boolean allowNull) {
+		SSComponentInterface.super.setAllowNull(allowNull);
+		adjustForNullItem();
 	}
 
 	/**
@@ -951,7 +1324,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 			// things are set up as wanted
 			return;
 		}
-		try (BaseModel<M,O,O2>.Remodel remodel = optionModel.getRemodel()) {
+		try (Model.Remodel remodel = optionModel.getRemodel()) {
 			// Need to add or remove the nullItem
 			// Since selection is based on item, not index, we only need
 			// to consider adjusting the selection if the current selection:
@@ -1048,8 +1421,8 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 				
 				/** {@inheritDoc } */
 				@Override
-				protected SSBaseComboBoxListener getSSComponentListener() {
-					return new SSBaseComboBoxListener();
+				protected ComboBox2Listener getSSComponentListener() {
+					return new ComboBox2Listener();
 				}
 				
 				/** {@inheritDoc } */
@@ -1086,7 +1459,7 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * @param comboBox combo box from which to remove listeners
 	 * @return array of ActionListeners removed from combo box (for adding back later)
 	 */
-	// TODO: Consider passing in SSBaseComboBox and identifying SSBaseComboBoxListener
+	// TODO: Consider passing in ComboBox2 and identifying ComboBox2Listener
 	static ActionListener[] unregisterAllActionListeners(JComboBox<?> comboBox) {
 		final ActionListener[] listeners = comboBox.getActionListeners();
 		for (ActionListener listener : listeners) {
@@ -1108,89 +1481,11 @@ public abstract class SSBaseComboBox<M,O,O2> extends JComboBox<SSListItem> imple
 	 * @param comboBox combo box for which to add listeners
 	 * @param listeners array of ActionListners to be 
 	 */
-	// TODO: Consider passing in SSBaseComboBox and identifying SSBaseComboBoxListener
+	// TODO: Consider passing in ComboBox2 and identifying ComboBox2Listener
 	static void registerAllActionListeners(JComboBox<?> comboBox, ActionListener[] listeners) {
 		for (ActionListener listener : listeners) {
 			comboBox.addActionListener(listener);
 		}
-	}
-
-	////////////////////////////////////////////////////////////////////////
-	//
-	// for testing
-	//
-
-	/**
-	 * Can call this from an example for example. Tested with example4.
-	 * @param combo test this
-	 */
-	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-	@SuppressWarnings({"all","UseOfSystemOutOrSystemErr"})
-	public static void testComboAdjustForNull(SSComboBox combo) {
-		tracker = 0;
-		trackout.clear();
-		track("start");
-		combo.setAllowNull(false);
-		p(combo); // example4: n 3, i 0, item {Red,0}
-
-		// to get into the mood
-		// my cause an EXCEPTION
-		track("select -1");
-		combo.setSelectedIndex(-1);
-		p(combo); // example4: n 3, i -1, item null
-
-		// should not see an exception
-		// and should see consistent state
-
-		track("allow null true");
-		combo.setAllowNull(true);
-		p(combo); // example4: n 4, i 0, item {,null}
-
-		// track("select 0");
-		// combo.setSelectedIndex(0);
-		// p(combo);
-
-		track("allow null false");
-		combo.setAllowNull(false);
-		p(combo); // example4: n 3, i -1, item null
-
-		// track("select -1");
-		// combo.setSelectedIndex(-1);
-		// p(combo);
-
-
-		System.err.println("summary");
-		trackout.forEach(s -> System.err.println(s));
-		System.err.println("done");
-	}
-	
-	private static final List<String> trackout = new ArrayList<>();
-	private static int tracker;
-	
-	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-	@SuppressWarnings({"all","UseOfSystemOutOrSystemErr"})
-	private static void track(String tag) {
-		String s = "tag: " + tracker + " " + tag;
-		trackout.add(s);
-		System.err.println(s);
-		tracker++;
-	}
-	
-	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-	@SuppressWarnings({"all","UseOfSystemOutOrSystemErr"})
-	private static void p(SSComboBox combo) {
-		String s = "allowNull " + combo.getAllowNull();
-		trackout.add(s);
-		System.err.println(s);
-		p(combo.getItemCount(), combo.getSelectedIndex(), combo.getSelectedItem());
-	}
-	
-	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-	@SuppressWarnings({"all","UseOfSystemOutOrSystemErr"})
-	private static void p(int n, int i, Object item) {
-		String s = sf("n %d, i %d, item %s", n, i, item);
-		trackout.add(s);
-		System.err.println(s);
 	}
 
 	/** {@inheritDoc} */

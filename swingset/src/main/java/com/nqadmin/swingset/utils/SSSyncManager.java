@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2025, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
 import java.awt.event.ActionEvent;
@@ -322,19 +327,6 @@ public class SSSyncManager {
 					System.identityHashCode(comboBox)));
 		}
 	}
-
-	/**
-	 * Creates a SSSyncManager with the specified combo box and data navigator.
-	 * 
-	 * @param comboBox combobox
-	 * @param dataNavigator data navigator
-	 * @deprecated use {@linkplain SSSyncManager#SSSyncManager(com.nqadmin.swingset.SSDBComboBox, com.nqadmin.swingset.navigate.NavigateActions) }
-	 */
-	@Deprecated
-	public SSSyncManager(SSDBComboBox comboBox, com.nqadmin.swingset.SSDataNavigator dataNavigator)
-	{
-		this(comboBox, dataNavigator.getNavigateActions());
-	}
 	
 	/**
 	 * Adds listener to the combo navigator
@@ -446,17 +438,6 @@ public class SSSyncManager {
 
 	public void setComboBox(final SSDBComboBox _comboBox) {
 		comboBox = _comboBox;
-	}
-
-	/**
-	 * Sets data navigator to be synchronized.
-	 *
-	 * @param dataNavigator data navigator to be synchronized
-	 * @deprecated use {@linkplain SSSyncManager#setDataNavigator(com.nqadmin.swingset.navigate.NavigateActions) }
-	 */
-	@Deprecated
-	public void setDataNavigator(com.nqadmin.swingset.SSDataNavigator dataNavigator) {
-		setDataNavigator(dataNavigator.getNavigateActions());
 	}
 
 	/**

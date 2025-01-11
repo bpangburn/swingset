@@ -54,14 +54,18 @@ import javax.swing.plaf.InternalFrameUI;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import org.apache.logging.log4j.LogManager;
+
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.util.List;
+
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.utils.SSFormViewScreenHelper;
 import com.nqadmin.swingset.utils.SSUtils;
+
 import javax.sql.RowSet;
 
 /**
@@ -265,7 +269,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	@Override
 	protected void populateSSComboBoxes() {
 		// SET COMBO OPTIONS
-		cmbPartColor.setOptions(new String[] { "Red", "Green", "Blue" });
+		cmbPartColor.setOptions(List.of("Red", "Green", "Blue"));
 	}
 
 	/**

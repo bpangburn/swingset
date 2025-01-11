@@ -37,18 +37,22 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
-import com.nqadmin.swingset.SSBaseComboBox.MissingOptionControl;
+import com.nqadmin.swingset.ComboBox2.MissingOptionControl;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
+
 import static com.nqadmin.swingset.navigate.NavAction.*;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.beans.PropertyChangeEvent;
 import java.sql.Connection;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
+
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
@@ -82,7 +86,7 @@ public class Example4Advanced extends Example4
 	void cmbPartColorChangeOptions() {
 		// This method must be called from Example4 before
 		// some other initialization, like bind, SSSyncManager.
-		cmbPartColor.setOptions(new String[] { "Green", "Blue" }, new int[] {1,2});
+		cmbPartColor.setOptions(List.of("Green", "Blue"), List.of(1,2));
 		//cmbPartColor.setOptions(new String[] { "Yellow", "Purple" }, new int[] {3,4});
 	}
 

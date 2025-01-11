@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2025, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
 import java.sql.Date;
@@ -61,23 +66,24 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- *
- */
-@SuppressWarnings("javadoc")
+/** x */
 public class SSListItemFormatTest {
 	
+	/** x */
 	public SSListItemFormatTest() {
 	}
 	
+	/** x */
 	@BeforeAll
 	public static void setUpClass() {
 	}
 	
+	/** x */
 	@AfterAll
 	public static void tearDownClass() {
 	}
 	
+	/** x */
 	@BeforeEach
 	public void setUp() {
 		LocalDate d1 = LocalDate.of(2021, Month.FEBRUARY, 13);
@@ -93,11 +99,9 @@ public class SSListItemFormatTest {
 
 		// 5 items in listItem
 		LI listInfo = new LI(5, itemList);
-
-		listItemOld = listInfo.createListItem(integer, string, date, time, timestamp);
-		fmtOld = new SSListItemFormat();
 	}
 	
+	/** x */
 	@AfterEach
 	public void tearDown() {
 	}
@@ -117,7 +121,6 @@ public class SSListItemFormatTest {
 		}
 	}
 
-	String string = "everything";
 	Float floatnum =  (float)3.14159;
 	Integer integer = 42;
 	Date date;
@@ -126,9 +129,6 @@ public class SSListItemFormatTest {
 
 	SSListItem listItem;
 	SSListItemFormat fmt;
-
-	SSListItem listItemOld;
-	SSListItemFormat fmtOld;
 
 	/**
 	 * Test of format method, of class SSListItemFormat.
@@ -304,213 +304,4 @@ public class SSListItemFormatTest {
 		currentFormat = fmt1.getFormat(JDBCType.TIMESTAMP);
 		assertEquals(currentFormat, f3);
 	}
-
-	/**
-	 * Test of format method, of class SSListItemFormat.
-	 * 
-	 * This is the only test method, and it tests a superclass method
-	 */
-	@Test
-	@SuppressWarnings({"deprecation", "UseOfSystemOutOrSystemErr"})
-	public void testFormatDeprecated() {
-		System.out.print("formatDeprecated");
-
-		// format everything in the list item
-		fmtOld.clear();
-		fmtOld.addElemType(0, JDBCType.INTEGER);
-		fmtOld.addElemType(1, JDBCType.VARCHAR);
-		fmtOld.addElemType(2, JDBCType.DATE);
-		fmtOld.addElemType(3, JDBCType.TIME);
-		fmtOld.addElemType(4, JDBCType.TIMESTAMP);
-		String format = fmtOld.format(listItemOld);
-		String expect = "42 | everything | 2021/02/13 | 04:25:26 | 2023/04/15T07:38:39";
-		assertEquals(expect, format);
-
-		// use toString by setting null
-		fmtOld.setPattern(JDBCType.DATE, null);
-		fmtOld.setPattern(JDBCType.TIME, null);
-		fmtOld.setPattern(JDBCType.TIMESTAMP, null);
-		format = fmtOld.format(listItemOld);
-		expect = "42 | everything | 2021-02-13 | 04:25:26 | 2023-04-15 07:38:39.0";
-		assertEquals(expect, format);
-
-		// change the order elements get formatted
-		// leave something out
-		// different format pattern
-		fmtOld.setPattern(JDBCType.DATE, "YY");
-		fmtOld.setPattern(JDBCType.TIME, "HH");
-		fmtOld.setPattern(JDBCType.TIMESTAMP, "YY*HH");
-		fmtOld.setSeparator(" @@@ ");
-		fmtOld.clear();
-		fmtOld.addElemType(4, JDBCType.TIMESTAMP);
-		fmtOld.addElemType(1, JDBCType.VARCHAR);
-		fmtOld.addElemType(3, JDBCType.TIME);
-		fmtOld.addElemType(2, JDBCType.DATE);
-		format = fmtOld.format(listItemOld);
-		expect = "23*07 @@@ everything @@@ 04 @@@ 21";
-		assertEquals(expect, format);
-	}
-	/**
-	 * Test of setDatePattern method, of class SSListItemFormat.
-	 */
-	@Test
-	@SuppressWarnings({"deprecation", "UseOfSystemOutOrSystemErr", "ThrowableResultIgnored"})
-	public void testSetPatternDeprecated() {
-		System.out.print("setDatePatternDeprecated");
-		SSListItemFormat fmt1 = new SSListItemFormat();
-
-		assertThrows(IllegalArgumentException.class,
-				() -> fmt1.setPattern(JDBCType.REF, null));
-
-		// check initial patterns
-		// by setting new pattern
-		// and the retrun value is the previous pattern
-		String previousPat;
-
-		previousPat = fmt1.setPattern(JDBCType.DATE, null);
-		assertEquals(SSListItemFormat.DATE_DEFAULT, previousPat);
-		previousPat = fmt1.setPattern(JDBCType.TIME, null);
-		assertEquals(SSListItemFormat.TIME_DEFAULT, previousPat);
-		previousPat = fmt1.setPattern(JDBCType.TIMESTAMP, null);
-		assertEquals(SSListItemFormat.TIMESTAMP_DEFAULT, previousPat);
-	}
-
-	/**
-	 * Test of getPattern method, of class SSListItemFormat.
-	 */
-	@Test
-	@SuppressWarnings({"deprecation", "UseOfSystemOutOrSystemErr", "ThrowableResultIgnored"})
-	public void testGetPatternDeprecated() {
-		System.out.print("getDatePatternDeprecated");
-		SSListItemFormat fmt1 = new SSListItemFormat();
-
-		assertThrows(IllegalArgumentException.class,
-				() -> fmt1.getPattern(JDBCType.REF));
-
-		// check initial patterns
-		// by getting the patterns
-		String currentPattern;
-
-		currentPattern = fmt1.getPattern(JDBCType.DATE);
-		assertEquals(SSListItemFormat.DATE_DEFAULT, currentPattern);
-		currentPattern = fmt1.getPattern(JDBCType.TIME);
-		assertEquals(SSListItemFormat.TIME_DEFAULT, currentPattern);
-		currentPattern = fmt1.getPattern(JDBCType.TIMESTAMP);
-		assertEquals(SSListItemFormat.TIMESTAMP_DEFAULT, currentPattern);
-
-		// set some arbitrary strings and read them back
-		fmt1.setPattern(JDBCType.DATE, "yyyy");
-		fmt1.setPattern(JDBCType.TIME, "HH");
-		fmt1.setPattern(JDBCType.TIMESTAMP, "MM");
-
-		currentPattern = fmt1.getPattern(JDBCType.DATE);
-		assertEquals(currentPattern, "yyyy");
-		currentPattern = fmt1.getPattern(JDBCType.TIME);
-		assertEquals(currentPattern, "HH");
-		currentPattern = fmt1.getPattern(JDBCType.TIMESTAMP);
-		assertEquals(currentPattern, "MM");
-	}
-
-	// /**
-	//  * Test of clear method, of class SSListItemFormat.
-	//  */
-	// //@Test
-	// public void testClear() {
-	// 	System.out.println("clear");
-	// 	SSListItemFormat instance = new SSListItemFormat();
-	// 	instance.clear();
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-
-	// /**
-	//  * Test of addElemType method, of class SSListItemFormat.
-	//  */
-	// //@Test
-	// public void testAddElemType() {
-	// 	System.out.println("addElemType");
-	// 	int _elemIndex = 0;
-	// 	JDBCType _jdbcType = null;
-	// 	SSListItemFormat instance = new SSListItemFormat();
-	// 	instance.addElemType(_elemIndex, _jdbcType);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-
-
-	// /**
-	//  * Test of getSeparator method, of class SSListItemFormat.
-	//  */
-	// //@Test
-	// public void testGetSeparator() {
-	// 	System.out.println("getSeparator");
-	// 	SSListItemFormat instance = new SSListItemFormat();
-	// 	String expResult = "";
-	// 	String result = instance.getSeparator();
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-
-	// /**
-	//  * Test of setSeparator method, of class SSListItemFormat.
-	//  */
-	// //@Test
-	// public void testSetSeparator() {
-	// 	System.out.println("setSeparator");
-	// 	String separator = "";
-	// 	SSListItemFormat instance = new SSListItemFormat();
-	// 	instance.setSeparator(separator);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-
-	// /**
-	//  * Test of parseObject method, of class SSListItemFormat.
-	//  */
-	// //@Test
-	// public void testParseObject() {
-	// 	System.out.println("parseObject");
-	// 	String source = "";
-	// 	ParsePosition pos = null;
-	// 	SSListItemFormat instance = new SSListItemFormat();
-	// 	Object expResult = null;
-	// 	Object result = instance.parseObject(source, pos);
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-
-	// /**
-	//  * Test of format method, of class SSListItemFormat.
-	//  */
-	// //@Test
-	// public void testFormat3args() {
-	// 	System.out.println("format");
-	// 	Object _listItem = null;
-	// 	StringBuffer toAppendTo = null;
-	// 	FieldPosition pos = null;
-	// 	SSListItemFormat instance = new SSListItemFormat();
-	// 	StringBuffer expResult = null;
-	// 	StringBuffer result = instance.format(_listItem, toAppendTo, pos);
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-
-	// /**
-	//  * Test of appendValue method, of class SSListItemFormat.
-	//  */
-	// //@Test
-	// public void testAppendValue() {
-	// 	System.out.println("appendValue");
-	// 	StringBuffer _sb = null;
-	// 	int _elemIndex = 0;
-	// 	AbstractComboBoxListSwingModel.ListItem0 _listItem = null;
-	// 	SSListItemFormat instance = new SSListItemFormat();
-	// 	instance.appendValue(_sb, _elemIndex, _listItem);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-	
 }

@@ -29,6 +29,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,6 +38,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import com.nqadmin.swingset.models.OptionMappingSwingModel;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -109,248 +112,77 @@ public class SSListTest
 		assertEquals(List.of("one", "two"), result);
 	}
 
-	// /**
-	//  * Test of getMappings method, of class SSList.
-	//  */
-	// @Test
-	// public void testGetMappings()
-	// {
-	// 	System.out.println("getMappings");
-	// 	SSList instance = new SSList();
-	// 	List<Object> expResult = null;
-	// 	List<Object> result = instance.getMappings();
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+	/**
+	 * Test of list shadows.
+	 */
+	@Test
+	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "ConvertToTryWithResources", "ThrowableResultIgnored"})
+	public void testShadows()
+	{
+		System.out.println("Shadows");
 
-	// /**
-	//  * Test of getOptions method, of class SSList.
-	//  */
-	// @Test
-	// public void testGetOptions()
-	// {
-	// 	System.out.println("getOptions");
-	// 	SSList instance = new SSList();
-	// 	List<String> expResult = null;
-	// 	List<String> result = instance.getOptions();
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+		SSList ssList = new SSList();
+		OptionMappingSwingModel<Object, String, Object> optionModel = ssList.getOptionModel();
+		List<String> listItems = List.of("LI 1","LI 2", "LI 3", "LI 4", "LI 5", "LI 6", "LI 7");
+		List<Object> listCodes = List.of(1,2,3,4,5,6,7);
+		List<String> otherOptions = List.of("one", "two", "three", "four");
+		List<Object> otherMappings = List.of("oneM", "twoM", "threeM", "fourM");
+		OptionMappingSwingModel<Object, String, Object>.Remodel remodel
+				= optionModel.getRemodel();
 
-	// /**
-	//  * Test of getSelectedValues method, of class SSList.
-	//  */
-	// @Test
-	// public void testGetSelectedValues()
-	// {
-	// 	System.out.println("getSelectedValues");
-	// 	SSList instance = new SSList();
-	// 	Object[] expResult = null;
-	// 	Object[] result = instance.getSelectedValues();
-	// 	assertArrayEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+		// Set up a map with "LI N" --> N, for example: "LI 1" --> 1
+		ssList.setOptions(listItems, listCodes);
 
-	// /**
-	//  * Test of getSelectedValuesList method, of class SSList.
-	//  */
-	// @Test
-	// public void testGetSelectedValuesList()
-	// {
-	// 	System.out.println("getSelectedValuesList");
-	// 	SSList instance = new SSList();
-	// 	List<SSListItem> expResult = null;
-	// 	List<SSListItem> result = instance.getSelectedValuesList();
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+		List<Object> mappings = optionModel.getMappings();
+		boolean isShadow = optionModel.hasShadow(mappings);
+		assertEquals(true, isShadow);
+		isShadow = optionModel.hasShadow(listCodes);
+		assertEquals(false, isShadow);
 
-	// /**
-	//  * Test of getSSComponentListener method, of class SSList.
-	//  */
-	// @Test
-	// public void testGetSSComponentListener()
-	// {
-	// 	System.out.println("getSSComponentListener");
-	// 	SSList instance = new SSList();
-	// 	SSList.SSListListener expResult = null;
-	// 	SSList.SSListListener result = instance.getSSComponentListener();
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+		String expect1 = "{LI 1,1}{LI 2,2}{LI 3,3}{LI 4,4}{LI 5,5}{LI 6,6}{LI 7,7}";
+		String expect0 = "{LI 1,0}{LI 2,1}{LI 3,2}{LI 4,3}{LI 5,4}{LI 6,5}{LI 7,6}";
 
-	// /**
-	//  * Test of setModel method, of class SSList.
-	//  */
-	// @Test
-	// public void testSetModel()
-	// {
-	// 	System.out.println("setModel");
-	// 	ListModel<SSListItem> _model = null;
-	// 	SSList instance = new SSList();
-	// 	instance.setModel(_model);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+		assertEquals(expect1, optionModel.dump());
+		// auto generated, [0,N)
+		ssList.setOptions(listItems);
+		assertEquals(expect0, optionModel.dump());
 
-	// /**
-	//  * Test of getOptionModel method, of class SSList.
-	//  */
-	// @Test
-	// public void testGetOptionModel()
-	// {
-	// 	System.out.println("getOptionModel");
-	// 	SSList instance = new SSList();
-	// 	OptionMappingSwingModel<Object, String, Object> expResult = null;
-	// 	OptionMappingSwingModel<Object, String, Object> result = instance.getOptionModel();
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+		// back to original
+		ssList.setOptions(listItems, listCodes);
+		assertEquals(expect1, optionModel.dump());
+		
+		ssList.setOptions(otherOptions); // WARN old discarded
+		assertEquals("{one,0}{two,1}{three,2}{four,3}", optionModel.dump());
 
-	// /**
-	//  * Test of setOptions method, of class SSList.
-	//  */
-	// @Test
-	// public void testSetOptions_List()
-	// {
-	// 	System.out.println("setOptions");
-	// 	List<String> _options = null;
-	// 	SSList instance = new SSList();
-	// 	instance.setOptions(_options);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+		// back to original
+		ssList.setOptions(listItems, listCodes);
+		assertEquals(expect1, optionModel.dump());
 
-	// /**
-	//  * Test of setOptions method, of class SSList.
-	//  */
-	// @Test
-	// public void testSetOptions_Class()
-	// {
-	// 	System.out.println("setOptions");
-	// 	SSList instance = new SSList();
-	// 	instance.setOptions(null);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+		remodel.clear();
+		assertEquals("", optionModel.dump());
 
-	// /**
-	//  * Test of setOptions method, of class SSList.
-	//  */
-	// @Test
-	// public void testSetOptions_List_List()
-	// {
-	// 	System.out.println("setOptions");
-	// 	List<String> _options = null;
-	// 	List<Object> _mappings = null;
-	// 	SSList instance = new SSList();
-	// 	instance.setOptions(_options, _mappings);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+		// different sizes
+		assertThrows(IllegalArgumentException.class,
+					 () -> ssList.setOptions(otherOptions, listCodes));
+		assertEquals("", optionModel.dump());
 
-	// /**
-	//  * Test of setSelectedValues method, of class SSList.
-	//  */
-	// @Test
-	// public void testSetSelectedValues()
-	// {
-	// 	System.out.println("setSelectedValues");
-	// 	Object[] _selectedMappings = null;
-	// 	SSList instance = new SSList();
-	// 	instance.setSelectedValues(_selectedMappings);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+		// check shadows
+		// If shadows are used, there are exceptions and empty lists; but
+		// shadows should be copied when populating SSList, see getDisconnectedList()
 
-	// /**
-	//  * Test of updateRowSet method, of class SSList.
-	//  */
-	// @Test
-	// public void testUpdateRowSet()
-	// {
-	// 	System.out.println("updateRowSet");
-	// 	SSList instance = new SSList();
-	// 	instance.updateRowSet();
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+		String expect = "{one,oneM}{two,twoM}{three,threeM}{four,fourM}";
+		ssList.setOptions(otherOptions , otherMappings);
+		assertEquals(expect, optionModel.dump());
 
-	// /**
-	//  * Test of undoRedoUpdateObject method, of class SSList.
-	//  */
-	// @Test
-	// public void testUndoRedoUpdateObject() throws Exception
-	// {
-	// 	System.out.println("undoRedoUpdateObject");
-	// 	NavigateActions.UndoRedo cmd = null;
-	// 	Object value = null;
-	// 	SSList instance = new SSList();
-	// 	instance.undoRedoUpdateObject(cmd, value);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+		ssList.setOptions(optionModel.getOptions(), otherMappings);
+		assertEquals(expect, optionModel.dump());
 
-	// /**
-	//  * Test of updateSSComponent method, of class SSList.
-	//  */
-	// @Test
-	// public void testUpdateSSComponent()
-	// {
-	// 	System.out.println("updateSSComponent");
-	// 	SSList instance = new SSList();
-	// 	instance.updateSSComponent();
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+		ssList.setOptions(otherOptions, optionModel.getMappings());
+		assertEquals(expect, optionModel.dump());
 
-	// /**
-	//  * Test of testStuff method, of class SSList.
-	//  */
-	// @Test
-	// public void testTestStuff()
-	// {
-	// 	System.out.println("testStuff");
-	// 	SSList ssList = null;
-	// 	SSList.testStuff(ssList);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
+		ssList.setOptions(optionModel.getOptions(), optionModel.getMappings());
+		assertEquals(expect, optionModel.dump());
 
-	// /**
-	//  * Test of toString method, of class SSList.
-	//  */
-	// @Test
-	// public void testToString()
-	// {
-	// 	System.out.println("toString");
-	// 	SSList instance = new SSList();
-	// 	String expResult = "";
-	// 	String result = instance.toString();
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-
-	// /**
-	//  * Test of getSSCommon method, of class SSList.
-	//  */
-	// @Test
-	// public void testGetSSCommon()
-	// {
-	// 	System.out.println("getSSCommon");
-	// 	SSList instance = new SSList();
-	// 	SSCommon expResult = null;
-	// 	SSCommon result = instance.getSSCommon();
-	// 	assertEquals(expResult, result);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-	
+		remodel.close();
+	}
 }

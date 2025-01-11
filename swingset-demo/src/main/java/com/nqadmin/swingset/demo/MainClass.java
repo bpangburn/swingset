@@ -233,7 +233,7 @@ public class MainClass extends JFrame
 		Popup popup;
 
 		public ComboRowSetSource() {
-			super(false);
+			super(ModelType.SWING);
 			setMaximumSize(new Dimension(210, 25));
 			setAllowNull(false);
 			DemoUtil.RowSetSource rsSource = DemoUtil.getWhichRowSetDefault();

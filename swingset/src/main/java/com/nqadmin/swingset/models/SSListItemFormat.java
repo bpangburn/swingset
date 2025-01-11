@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2025, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
 import java.sql.JDBCType;
@@ -220,52 +225,6 @@ public class SSListItemFormat extends Format {
 	 */
 	public Format getFormat(JDBCType _jdbcType) {
 		return formats.get(_jdbcType);
-	}
-
-	/**
-	 * Set SimpleDateFormat's format pattern to use for the specified jdbc type.
-	 * Only DATE, TIME, TIMESTAMP jdbctype are allowed. If the pattern
-	 * is null, then toString is used for the specified type.
-	 * 
-	 * @param _jdbcType all elements of this type use the specified pattern
-	 * @param _pattern format pattern
-	 * @return the previous format string
-	 * @deprecated Use {@link #setFormat(java.sql.JDBCType, java.text.Format) }
-	 */
-	@Deprecated
-	public String setPattern(JDBCType _jdbcType, String _pattern) {
-		if (!formats.containsKey(_jdbcType)) {
-			throw new IllegalArgumentException("JDBCType " + _jdbcType + " not handled");
-		}
-		String pat = null;
-		Format f;
-		if (_pattern == null) {
-			f = formats.put(_jdbcType, null);
-		} else {
-			f = formats.put(_jdbcType, new SimpleDateFormat(_pattern));
-		}
-		if (f instanceof SimpleDateFormat sdf) {
-			pat = sdf.toPattern();
-		}
-		return pat;
-	}
-
-	/**
-	 * Get the pattern used for the specified JDBCType.
-	 * @param _jdbcType the JDBCTyep
-	 * @return the pattern or null
-	 */
-	@Deprecated
-	public String getPattern(JDBCType _jdbcType) {
-		if (!formats.containsKey(_jdbcType)) {
-			throw new IllegalArgumentException("JDBCType " + _jdbcType + " not handled");
-		}
-		String pat = null;
-		Format f = formats.get(_jdbcType);
-		if (f instanceof SimpleDateFormat sdf) {
-			pat = sdf.toPattern();
-		}
-		return pat;
 	}
 
 	/**
