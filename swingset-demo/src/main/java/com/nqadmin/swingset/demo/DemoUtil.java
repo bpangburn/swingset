@@ -71,32 +71,26 @@ import org.openide.util.Exceptions;
  * JdbcRowSet implementation, which allows the direct assignment of a connection
  * to the RowSet for its use. This is useful in environments where a
  * {@link RowSetProvider} can not be used. For example
- * <pre>
- * {@code 
+ * {@snippet :
  *    rowSet = new JdbcRowSetImpl(connection);
  * }
- * </pre>
  * <p>
  * The demo contains two different DataSource implementations. One is trivial
  * and allows a given connection to be associated with a factory provided
  * RowSet. This scheme is semantically equivalent to the previously mentioned
  * mechanism, but without requiring a custom RowSet implementation.
  * It is used like
- * <pre>
- * {@code 
+ * {@snippet :
  *    rs = RowSetProvider.newFactory().createJdbcRowSet();
  *    rs.setDataSourceName(getDsName(connection));
  * }
- * </pre>
  * <p>
  * Here is an example for the third way using connection pool,
  * based on a connection pool provided by the database.
- * <pre>
- * {@code 
+ * {@snippet :
  *    rs = RowSetProvider.newFactory().createCachedRowSet();
  *    rs.setDataSourceName(DataSourcePool.DATA_SOURCE_NAME);
  * }
- * </pre>
  */
 public class DemoUtil { 
 	private DemoUtil() { }

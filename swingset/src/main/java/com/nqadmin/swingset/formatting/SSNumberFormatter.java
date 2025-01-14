@@ -53,7 +53,10 @@ public class SSNumberFormatter extends NumberFormatter implements FormatterAssis
 		setCommitsOnValidEdit(true);
 	}
 	
-	/** {@inheritDoc } */
+	/**
+	 * The Format associated with the FormattedTextField.
+	 * @return format
+	 */
 	@Override
 	public SSFormat getSSFormat() {
 		if(getFormattedTextField() instanceof SSFormattedTextField ftf)

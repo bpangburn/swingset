@@ -694,7 +694,7 @@ final class SSCommon
 	/**
 	 * Returns an Object of the specified type
 	 * representing the value in the bound database column.
-	 * <p>
+	 *
 	 * Note a null is never converted into ""; use getBoundColumnText for that.
 	 * @param <T> type to return
 	 * @param type Class of returned type

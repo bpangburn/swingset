@@ -75,16 +75,16 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * to set up a different formatting specification.
  * <p>
  * Each JDBCType can have a default Format specified; use
- * {@link #setFormat(java.sql.JDBCType, java.text.Format) }.
- * There are preset defaults for the data/time types
- * <pre>
- * {@code
- * The builtin default Formats {@link java.text.SimpleDateFormat} are:
- *    JDBCType.DATE       "yyyy/MM/dd"
- *    JDBCType.TIME,      "HH:mm:ss"
- *    JDBCType.TIMESTAMP, "yyyy/MM/dd'T'HH:mm:ss"
+ * {@link #setFormat(java.sql.JDBCType, java.text.Format) }
+ * to set a Format for a type.
+ * There are preset defaults for the date/time types
+ * {@snippet :
+ * // @link substring="SimpleDateFormat" target="java.text.SimpleDateFormat" type="link" :
+ * These builtin defaults use SimpleDateFormat; the initial patterns are:
+ *    JDBCType.DATE        "yyyy-MM-dd"              ISO_LOCAL_DATE
+ *    JDBCType.TIME        "HH:mm:ss"                ISO_LOCAL_TIME
+ *    JDBCType.TIMESTAMP   "yyyy-MM-dd'T'HH:mm:ss"   ISO_LOCAL_DATE_TIME
  * }
- * </pre>
  * When an elem is formatted, first a format assigned to the elem is checked,
  * then the default format for the elem type is checked,
  * if neither is available, then toString() is used to format the elem.
@@ -99,15 +99,17 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * 
  * @since 4.0.0
  */
+// TODO: Change to use java.time formatters.
+// TODO: API for specifying system wide defaults? Lookup?
 @SuppressWarnings("serial")
 public class SSListItemFormat extends Format {
 	//TODO: Put default formats into a common location (not in SSListItemFormat).
 	/** default date format */
-	public static final String DATE_DEFAULT = "yyyy/MM/dd";
+	public static final String DATE_DEFAULT = "yyyy-MM-dd";
 	/** default time format */
 	public static final String TIME_DEFAULT = "HH:mm:ss";
 	/** default timestamp format */
-	public static final String TIMESTAMP_DEFAULT = "yyyy/MM/dd'T'HH:mm:ss";
+	public static final String TIMESTAMP_DEFAULT = "yyyy-MM-dd'T'HH:mm:ss";
 	/** default elem separator */
 	public static final String DEFAULT_SEPARATOR = " | ";
 	private static final FieldPosition FP0 = new FieldPosition(0);

@@ -59,10 +59,6 @@ import com.nqadmin.swingset.navigate.RowNumberSpinner;
 
 import static com.nqadmin.swingset.navigate.NavAction.*;
 
-// SSDataNavigator.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Component that can be used for data navigation. It provides buttons for
  * navigation, insertion, and deletion of records in a RowSet. The
@@ -120,7 +116,7 @@ public class SSDataNavigator extends JPanel
 		rowSpinnerSize = new Dimension(65, 20);
 		buttonSize = new Dimension(40, 20);
 
-		RowNumberSpinner.removeTinyArrows(rowNumberSpinner, rowSpinnerSize);
+		rowNumberSpinner.removeTinyArrows(rowSpinnerSize);
 
 		rowNumberSpinner.setWindowUpDownKeysEnable(true);
 
@@ -381,7 +377,7 @@ public class SSDataNavigator extends JPanel
 
 	/**
 	 * @return the navCombo
-	 * @deprecated use {@linkplain NavigateActions#getNavCombo() 
+	 * @deprecated use {@linkplain NavigateActions#getNavCombo() }
 	 */
 	@Deprecated
 	public SSDBComboBox getNavCombo() {

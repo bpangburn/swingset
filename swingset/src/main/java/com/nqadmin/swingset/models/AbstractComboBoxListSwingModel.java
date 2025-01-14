@@ -1206,9 +1206,9 @@ public abstract class AbstractComboBoxListSwingModel {
 	/**
 	 * This returns a Remodel which has method for
 	 * reading and writing the itemList and its contained listItems.
+	 * <p>
 	 * This is typically used in a try with resources
-	 * <pre>
-	 * {@code
+	 * {@snippet :
 	 *     class ListInfo extends XxxListInfo {...}
 	 * 
 	 *     try (ListInfo.Remodel remodel = listInfo.getRemodel()) {
@@ -1217,7 +1217,6 @@ public abstract class AbstractComboBoxListSwingModel {
 	 *     	else { ... }
 	 *     }
 	 * }
-	 * </pre>
 	 * 
 	 * @return a Remodel permit
 	 */
@@ -1468,8 +1467,8 @@ public abstract class AbstractComboBoxListSwingModel {
 	/**
 	 * The access methods for an SSListItem.
 	 * An SSListItem typically has 1, 2 or 3 Objects in it.
-	 * The first Object is often a key, the next
-	 * 1 or 2 objects are typically database columns related to the key.
+	 * The first Object is often a key column value, the next
+	 * 1 or 2 objects are typically database column values related to the key.
 	 */
 	protected interface ListItem0 extends SSListItem {
 		/**

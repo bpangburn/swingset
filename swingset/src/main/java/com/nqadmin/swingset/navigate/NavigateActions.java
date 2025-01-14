@@ -89,10 +89,6 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 //TODO: Handle CachedRowSet Paging
 
-// SSDataNavigator.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * {@linkplain NavigateActions} contains Actions and models use for RowSet
  * navigation and state; there is at most one set of Actions and models for a RowSet.

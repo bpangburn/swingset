@@ -86,14 +86,8 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * if not specified {@link com.nqadmin.swingset.models.SSDbArrayModel} is
  * used by default and this model saves the selected mappings in a column of
  * type {@code JDBCType.ARRAY}.
- * <pre>
- * {@code 
- * SSList list = new SSList(JDBCType.DOUBLE);
- * List<String> options = {"VLarge", "large", "medium", "small", "VSmall};
- * List<Double> mappings = {100.0, 10.0, 5.0, 1.0, 0.1};
- * list.setOptions(options, mappings);
- * list.bind(myRowset, "my_column");}
- * </pre>
+ * 
+ * {@snippet class=ListSnippets region=init1}
  * From the example above, if three values VLarge, medium, small are selected the
  * array element in the database will store {100.0,5.0,1.0}
  * 

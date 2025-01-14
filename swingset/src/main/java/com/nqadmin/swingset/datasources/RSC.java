@@ -138,8 +138,12 @@ public interface RSC
 	//Object getBoundColumnObject() throws SQLException;
 
 	/**
-	 * @param <T>
-	 * @param clazz
+	 * Returns an Object of the specified type
+	 * representing the value in the bound database column.
+	 *
+	 * Note a null is never converted into ""; use getBoundColumnText for that.
+	 * @param <T> type to return
+	 * @param clazz Class of returned type
 	 * @return column object
 	 */
 	<T> T getBoundColumnObject(Class<T> clazz);

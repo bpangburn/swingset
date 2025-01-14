@@ -69,10 +69,13 @@ import static javax.swing.KeyStroke.getKeyStroke;
  * the action contains a {@link javax.swing.SpinnerNumberModel} which
  * tracks the RowSet's current row and its limits.
  * <p>
- * There are some static helper methods for configuring a JSpinner:
- * {@link #removeTinyArrows(javax.swing.JSpinner, java.awt.Dimension)},
- * {@link #inWindowUpDownKeys(javax.swing.JComponent)},
- * and {@link #disableUpDownKeys(javax.swing.JComponent)}.
+ * There are some methods for configuring this Spinner:
+ * <ul>
+ * <li>{@link #removeTinyArrows(java.awt.Dimension)}
+ * <li>{@link #setWindowUpDownKeysEnable(boolean) }
+ * <li>{@link #setUpDownKeysEnable(boolean) }
+ * </ul>
+ * These methods are accessible through {@link com.nqadmin.swingset.SSDataNavigator} methods.
  */
 @SuppressWarnings("serial")
 public class RowNumberSpinner extends JSpinner
@@ -141,17 +144,16 @@ public class RowNumberSpinner extends JSpinner
 	}
 
 	/**
-	 * Customize the spinner to get rid of the tiny spinner up/down arrows.
-	 * There's also example code to disable/enable the keyboard up/down arrows.
-	 * @param spinner the spinnner to customize
-	 * @param targetSize used to set the width after removing the arrows
+	 * Customize the spinner to get rid of the tiny spinner up/down arrows.There's also example code to disable/enable the keyboard up/down arrows.
+	 * @param targetSpinnerSize used to set the width after removing the arrows
 	 */
 	//https://stackoverflow.com/questions/16284594/disable-up-and-down-arrow-buttons-on-jspinner
-	public static void removeTinyArrows(JSpinner spinner, Dimension targetSize)
+	//public static void removeTinyArrows(JSpinner spinner, Dimension targetSpinnerSize)
+	public void removeTinyArrows(Dimension targetSpinnerSize)
 	{
-		Dimension d = spinner.getPreferredSize();
-		d.width = targetSize.width;
-		spinner.setUI(new BasicSpinnerUI() {
+		Dimension d = getPreferredSize();
+		d.width = targetSpinnerSize.width;
+		setUI(new BasicSpinnerUI() {
 			@Override
 			protected Component createNextButton() {
 				return null;
@@ -162,8 +164,7 @@ public class RowNumberSpinner extends JSpinner
 				return null;
 			}
 		});
-		spinner.setPreferredSize(d);
-
+		setPreferredSize(d);
 	}
 
 	/**
@@ -214,7 +215,7 @@ public class RowNumberSpinner extends JSpinner
 	/**
 	 * Disable the up/down arrow keys for this spinner component.
 	 * When disabling, window up/down keys are disabled
-	 * using {@link RowNumberSpinner#setWindowUpDownKeysEnable(boolean)}.
+	 * using {@link #setWindowUpDownKeysEnable(boolean)}.
 	 * 
 	 * @param enable true enables default
 	 */

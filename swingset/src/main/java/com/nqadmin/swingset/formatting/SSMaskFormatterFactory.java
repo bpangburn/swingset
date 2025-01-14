@@ -80,11 +80,11 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * <p>
  * Here's a code snippet that creates a {@link SSMaskFormatterFactory}
  * that handles a {@link java.util.Date} field.
- * <pre>{@code
+ * {@snippet :
  *     new SSMaskFormatterFactory.Builder<>("##/##/####")
  *             .converter(new DateFormatter(new SimpleDateFormat("MMddyyyy")))
  *             .placeholder('_').build();
- * }</pre>
+ * }
  * With this snippet, if the text field has AllowNull true and the Value is
  * null, then the text field is empty/blank; if the user then enters "1", 
  * the text field displays "1_/__/____"/; if then backspace, the field
@@ -101,19 +101,7 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * Finer control over the edit input characters can be obtained by
  * overriding the Builder's getSSMaskFormatter to create a
  * subclass of SSMaskFormatter which has a custom DocumentFilter. For example:
- * <pre>{@code
- * static class CustomBuilder extends SSMaskFormatterFactory.Builder<CustomBuilder> {
- * 	   CustomBuilder(String mask) {
- * 	   	super(mask);
- * 	   }
- * 	   @Override
- * 	   protected SSMaskFormatter getSSMaskFormatter(
- * 	   		SSMaskFormatterFactory.Builder<?> builder) throws ParseException {
- * 	   	return new CustomSSMaskFormatter(self());
- * 	   }
- * }
- * }</pre>
- * Use this custom formatter as: {@code new CustomBuilder(formatMask)...build();}.
+ * {@snippet class=SSMaskFormatterFactorySnippets region=init1}
  * <p>
  */
 @SuppressWarnings("serial")
@@ -128,7 +116,8 @@ public class SSMaskFormatterFactory extends FormatterFactory
 	 *
 	 * @param <T>
 	 * @see <em>Effective Java</em> Item 2 about override.
-	 * @see https://www.baeldung.com/java-builder-pattern-inheritance
+	 * @see <a href="https://www.baeldung.com/java-builder-pattern-inheritance">
+	 * Baeldung's java-builder-pattern-inheritance</a>
 	 */
 	public static class Builder<T extends Builder<T>>
 			extends FormatterFactory.Builder<T>
@@ -189,12 +178,11 @@ public class SSMaskFormatterFactory extends FormatterFactory
 
 		/**
 		 * Override this to provide custom SSMaskFormatter.
-		 * @param builder
 		 * @return
 		 * @throws ParseException 
 		 */
 		// TODO: use builder not getConver...
-		private SSMaskFormatter getSSMaskFormatter() throws ParseException
+		protected SSMaskFormatter getSSMaskFormatter() throws ParseException
 		{
 			Objects.requireNonNull(mask, "must specify mask");
 			SSMaskFormatter mf = new SSMaskFormatter(this);
@@ -268,7 +256,7 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		 * @throws ParseException 
 		 */
 		// package so tests can access
-		SSMaskFormatter(Builder<?> builder) throws ParseException
+		protected SSMaskFormatter(Builder<?> builder) throws ParseException
 		{
 			super(builder != null ? builder.mask : "");
 			if (builder != null) {
@@ -457,8 +445,12 @@ public class SSMaskFormatterFactory extends FormatterFactory
 			return noDuplicates;
 		}
 		
+		// For some reason, says it doesn't override anything when running javadoc.
+		// {@inheritDoc }
 		/**
-		 * {@inheritDoc }
+		 * Most formats show extra characters that user use has not input.
+		 * For a mask this probably includes mask literals and placeholder characters.
+		 * @return characters not input by the user
 		 */
 		@Override
 		public String getFormatLiterals()

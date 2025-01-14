@@ -67,15 +67,8 @@ import com.nqadmin.swingset.navigate.RowSetModificationEvent;
 
 /**
  * Interface with default methods shared by most SwingSet components.
- * There are only a few methods that must be implemented.
- * <p>
- * Developer needs to insure that each implementation has an SSCommon data
- * member that is instantiated in the Component's constructor.
- * {@link com.nqadmin.swingset.SSCheckBox} is a simple and small example.
- * <p>
- * IMPORTANT: Do not call {@link #updateSSComponent()} directly from 
- * SwingSet components unless you disable/enable the component listener.
- * Best practice is to call {@code #getSSCommon().updateSSComponent()}
+ * This interface acts like a class to simulate multiple inheritance.
+ * There are only a few methods, and the class Hook, that need to be implemented.
  */
 public interface SSComponentInterface extends RSC
 {
@@ -204,6 +197,7 @@ public interface SSComponentInterface extends RSC
 	 *
 	 * @return common SwingSet component data and methods
 	 */
+	@SuppressWarnings("NonPublicExported")
 	default SSCommon getSSCommon() {
 		return getSSComponentHook().getSSCommon();
 	}
@@ -328,7 +322,13 @@ public interface SSComponentInterface extends RSC
 		return getSSCommon().getBoundColumnName();
 	}
 
-	/** {@inheritDoc } */
+	/**
+	 * Returns an Object 
+	 * representing the value in the bound database column.
+	 * <p>
+	 * Note a null is never converted into ""; use getBoundColumnText for that.
+	 * @return value
+	 */
 	// TODO: put this in RSC?
 	default Object getBoundColumnObject() {
 		return getSSCommon().getBoundColumnObject();
@@ -487,12 +487,24 @@ public interface SSComponentInterface extends RSC
 		getSSCommon().setConnection(_connection);
 	}
 
-	/** {@inheritDoc} */
+	/**
+	 * Determine if there's a row that can be modified; dialog if not.
+	 * Typically used in an SSComponent's listener.
+	 * @return true if there's a row
+	 */
 	default boolean checkRowOK() {
 		return getSSCommon().checkRowOK();
 	}
 
-	/** {@inheritDoc} */
+	/**
+	 * Determine if there's a row that can be modified; optionally dialog if not.
+	 * If there's no row, only dialog if dialogOK is true.
+	 * A nested check never does the dialog.
+	 * Typically used in an SSComponent's listener.
+	 *
+	 * @param dialogOK if null or evaluates true then dialog if no row.
+	 * @return true if there's a row
+	 */
 	default boolean checkRowOK(Supplier<Boolean> dialogOK) {
 		return getSSCommon().checkRowOK(dialogOK);
 	}

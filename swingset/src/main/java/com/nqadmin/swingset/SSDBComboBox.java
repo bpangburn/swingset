@@ -51,19 +51,33 @@ import java.sql.Connection;
 @SuppressWarnings("serial")
 public class SSDBComboBox extends DBComboBox2<Long, Object, Object>
 {
-	/** {@inheritDoc} */
+	/**
+	 * Create SSDBComboBox
+	 */
 	public SSDBComboBox()
 	{
 	}
 
-	/** {@inheritDoc} */
+	/**
+	 * Create SSDBComboBox
+	 * 
+	 * @param _connection
+	 * @param _primaryKeyColumnName
+	 * @param _displayColumnName 
+	 */
 	public SSDBComboBox(Connection _connection,
 						String _primaryKeyColumnName, String _displayColumnName)
 	{
 		super(_connection, _primaryKeyColumnName, _displayColumnName);
 	}
 
-	/** {@inheritDoc} */
+	/**
+	 * Create SSDBComboBox
+	 * @param _connection
+	 * @param _query
+	 * @param _primaryKeyColumnName
+	 * @param _displayColumnName 
+	 */
 	public SSDBComboBox(Connection _connection, String _query,
 						String _primaryKeyColumnName, String _displayColumnName)
 	{

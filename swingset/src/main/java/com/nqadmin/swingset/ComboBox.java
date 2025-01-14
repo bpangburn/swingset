@@ -30,7 +30,8 @@
 package com.nqadmin.swingset;
 
 /**
- * {@inheritDoc}
+ * A ComboBox that takes only two generices.
+ * See {@link ComboBox2} for documentation.
  * @param <M> mapping type
  * @param <O> option type
  */

@@ -111,7 +111,7 @@ public class SSTextField extends JTextField implements SSComponentInterface
 
 	/**
 	 * Part of the scheme to keep text field in sync with data base.
-	 * See {@link SSCommon.SSPlainDocument}.
+	 * See {@link SSTextSupport.SSPlainDocument}.
 	 */
 	@Override
 	protected Document createDefaultModel() {

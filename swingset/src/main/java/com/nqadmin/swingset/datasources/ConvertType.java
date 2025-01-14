@@ -559,13 +559,9 @@ public class ConvertType
 	 * If an array or even a collection of the accurate type is desired,
 	 * you can do the follow which is type safe, no compiler warnings.
 	 * There will be an exception if something is afoul.
-	 * <pre>
-	 * {@code
-	 * Object[] arr = f(); // But I "know" the elements are Integer
-	 * Integer[] newarr = (Integer[]) castJDBCToJava(JDBCType.INTEGER, arr);
-	 * List<Integer> properList = Arrays.asList(newarr);
-	 * }
-	 * </pre>
+	 * 
+	 * {@snippet class=ConvertTypeSnippets region=convert_array}
+	 * 
 	 * @param objects array of objects to cast
 	 * @param jdbcType cast objects to this JDBCType
 	 * @return array of corresponding type to the cast input objects

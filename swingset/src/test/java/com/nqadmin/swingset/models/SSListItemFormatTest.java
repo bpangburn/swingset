@@ -153,7 +153,14 @@ public class SSListItemFormatTest {
 		fmt.addElemType(3, JDBCType.TIME);
 		fmt.addElemType(4, JDBCType.TIMESTAMP);
 		String format = fmt.format(listItem);
-		String expect = "42 | 3.14159 | 2021/02/13 | 04:25:26 | 2023/04/15T07:38:39";
+		String expect = "42 | 3.14159 | 2021-02-13 | 04:25:26 | 2023-04-15T07:38:39";
+		assertEquals(expect, format);
+
+		// use '/' instead of '-' in date
+		fmt.setFormat(JDBCType.DATE, new SimpleDateFormat("yyyy/MM/dd"));
+		fmt.setFormat(JDBCType.TIMESTAMP, new SimpleDateFormat("yyyy/MM/dd'T'HH:mm:ss"));
+		format = fmt.format(listItem);
+		expect = "42 | 3.14159 | 2021/02/13 | 04:25:26 | 2023/04/15T07:38:39";
 		assertEquals(expect, format);
 
 		// use toString by setting null

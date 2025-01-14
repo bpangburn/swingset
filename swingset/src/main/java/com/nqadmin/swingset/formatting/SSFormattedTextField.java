@@ -88,19 +88,17 @@ import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
  * It operates as a {@link SSComponentInterface}.
  * It locks focus while data is invalid and updates the database while editing.
  *
- * Note {@link #allValidate()} is used to do validation; it does
- * {@linkplain #isDataValid() } and maybe {@linkplain SSCommon#validate() }.
+ * Note {@link #allValidate()} is used to do validation.
  *
  * The component can implement {@link #componentValidate() } to add additional
  * checks (like date validation) beyond what is provided by the
  * Formatter/FormatterFactory (which generally only handles display of values
  * and/or character masks). Add application validity checks with
- * {@link SSCommon#setValidator(com.nqadmin.swingset.decorators.Validator)}.
+ * {@link #setValidator(com.nqadmin.swingset.decorators.Validator)}.
+ * <br>see {@link FormattedTextFieldVerifier} which locks focus while data is invalid.
+ * <br>see {@link SSFormattedTextFieldListener} which may update the database.
  *
- * @see https://docs.oracle.com/javase/8/docs/api/javax/swing/JFormattedTextField.html
- * @see https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/JFormattedTextField.html
- * @see {@link FormattedTextFieldVerifier} which locks focus while data is invalid.
- * @see {@link SSFormattedTextFieldListener} which may update the database.
+ * @see <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/JFormattedTextField.html">JFormattedTextField</a>
  */
 
 @SuppressWarnings("serial")
@@ -112,7 +110,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * JFormattedTextField has invalid data.If non empty text do stringToValue
 	 * validation check, then use {@link #allValidate()} for more validation checks.
 	 * If the data is valid and the value is null then do
-	 * {@link #setValue(null) } to make sure the null formatter is used subsequently.
+	 * "setValue(null)" to make sure the null formatter is used subsequently.
 	 * <p>
 	 * If weird errors occur, return true to avoid a focus lock hang.
 	 */

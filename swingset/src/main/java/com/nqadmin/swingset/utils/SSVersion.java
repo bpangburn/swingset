@@ -54,25 +54,24 @@ import static java.lang.System.Logger.Level.*;
 
 /**
  * Version string is of the form "{@literal <digits>.<digits>.<digits>-SNAPSHOT}"
- * where "-SNAPSHOT" is optional and missing components are 0.
+ * where "-SNAPSHOT" is optional and missing components are 0; so 4.1 is treated
+ * as 4.1.0.
  * <p>
  * In addition, a version may end in {@literal -<anything>} and is
- * considered pre-release. The pre-release string is converted to lower case.
+ * considered pre-release. The pre-release string is converted to lower case.<br>
  * For comparisons regular-release {@literal >} pre-release {@literal >} snapshot.<br>
  * For example 1.2.3 {@literal >} 1.2.3-RC1 {@literal >} 1.2.3-SNAPSHOT.<br>
  * For example 1.2.3-RC2 {@literal >} 1.2.3-RC1
  * <p>
  * 
  *{@linkplain SSVersion} is comparable, for example,
- * <pre>
- * {@code
+ * {@snippet :
  * if (SSVersion.get().compareTo(SSVersion.get("4.0.11")) >= 0) {
  *     // Do this for SwingSet version 4.0.11 and later
  * }
  * assert SSVersion.get("4.0").compareTo(SSVersion.get("4.0.0")) == 0;
  * assert SSVersion.get("4.0.11-SNAPSHOT").compareTo(SSVersion.get("4.0.11")) < 0;
  * }
- * </pre>
  */
 public class SSVersion implements Comparable<SSVersion> {
 	/** Log4j Logger for component */

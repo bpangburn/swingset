@@ -93,7 +93,7 @@ public class SSFormatterFactory extends FormatterFactory
 		}
 	}
 
-	/** {@inheritdoc}
+	/** SSFormatterFactory builder.
 	 * @param <T>
 	 */
 	public static class Builder<T extends Builder<T>>

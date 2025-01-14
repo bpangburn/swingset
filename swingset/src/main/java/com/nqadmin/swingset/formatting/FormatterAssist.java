@@ -82,7 +82,7 @@ interface FormatterAssist
 	 * This method is invoked by the formatter when it is almost done.
 	 * After setEditValid, if the text field does not have
 	 * user input, set the value to null (which switches the formatter).
-	 * @param valid
+	 * @param ftf
 	 */
 	default void assistSetEditValidMaySwitchNull(JFormattedTextField ftf) {
 		// Check for empty string input.

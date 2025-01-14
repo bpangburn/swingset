@@ -18,6 +18,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+		<snippet_path>
+			${project.basedir}/../swingset-demo/src/main/java/snippet_files
+		</snippet_path>
+
 		<!-- MAVEN AND JAVA VERSIONS -->
 		<version.maven>3.8.7</version.maven>
 		<version.java>21</version.java>
@@ -404,7 +408,11 @@
 						<configuration>
 							<release>${version.java}</release>
 							<failOnError>false</failOnError>
-							<additionalOptions>-html5</additionalOptions>
+							<additionalOptions>
+								-html5
+								--snippet-path ${snippet_path}
+								-sourcetab 4
+							</additionalOptions>
 							<doclint>all,-missing,-html</doclint>
 <!--
 							<links>

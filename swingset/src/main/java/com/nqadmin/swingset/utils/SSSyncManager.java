@@ -170,6 +170,7 @@ public class SSSyncManager {
 						// so if for some reason item is in combo but deleted in rowset
 						// To avoid infinite loop in such scenario
 						if (count > (numRecords + OVERLAP_TO_CHECK)) {
+							// TODO: is this needed?
 							comboBox.repaint();
 							logger.log(WARNING, "SSSyncManager unable to find a record matching the selection in the dropdown list: " + comboBox.getSelectedStringValue() + ".");
 							// JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin

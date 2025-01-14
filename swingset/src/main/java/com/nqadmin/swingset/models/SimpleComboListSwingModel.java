@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2025, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 
 package com.nqadmin.swingset.models;
 
@@ -43,55 +48,27 @@ import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.ListModel;
 
-/** Simple JList or JComboBox models that handle SSLIstItem 
- * without locking or listItemFormat.
+/** Simple JList or JComboBox model that handle SSLIstItem 
+ * without locking or listItemFormat. An instance is used as
+ * either a {@link javax.swing.ComboBoxModel} or a
+ * {@link javax.swing.ListModel}.
  * <p>
  * Example usage as an inner
  * class where all the combo data is accessed from an outer class
  * by the index in the comboList.
- * <pre>
- * {@code 
- * // outer class does
- * 	ComboBoxModel<MyComboModels.MyComboItem> model
- * 		= new MyComboModels().getComboModel()
- * }
  * 
- * private final class MyComboModels extends SimpleComboListSwingModels {
- * 	
- * 	private MyComboModels() {
- * 		super(2, new ArrayList{@literal <>}(items.length));
- * 		// initialization
- * 		for (int i = 0; i {@literal <} items.length; i++) {
- * 			getRemodel().add(new MyComboItem(i));
- * 		}
- * 	}
- * 
- * 	public ComboBoxModel{@literal <MyComboItem>} getComboModel() {
- * 		return (ComboBoxModel{@literal <MyComboItem>}) super.getComboModel();
- * 	}
- * 
- * 	class MyComboItem implements ListItem0, Cloneable {
- * 		private final int listIdx;
- * 
- * 		public MyComboItem(int _listIdx) { listIdx = _listIdx; }
- * 		// ...
- * 	}
- * }
- * }
- * </pre>
- *
+ * {@snippet class=SimpleComboListSwingModelsSnippets region=init1}
  */
-
-public abstract class SimpleComboListSwingModels extends AbstractComboBoxListSwingModel
+// TODO: add <T> to avoid user's cast of get*Model() ???
+public abstract class SimpleComboListSwingModel extends AbstractComboBoxListSwingModel
 {
-
 	/**
-	 * Bounce to super. Typical usage:
-	 * @param _itemNumElems see super
-	 * @param _itemList  see super
+	 * Bounce to super.Typical usage:
+	 * @param itemNumElems see super
+	 * @param itemList  see super
 	 */
-	public SimpleComboListSwingModels(int _itemNumElems, List<SSListItem> _itemList) {
-		super(_itemNumElems, _itemList);
+	public SimpleComboListSwingModel(int itemNumElems, List<SSListItem> itemList) {
+		super(itemNumElems, itemList);
 	}
 
 	/**
@@ -120,7 +97,7 @@ public abstract class SimpleComboListSwingModels extends AbstractComboBoxListSwi
 
 	/** {@inheritDoc} */
 	@Override
-	protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel _remodel) {
+	protected void remodelReleaseWriteLock(AbstractComboBoxListSwingModel.Remodel remodel) {
 	}
 
 	/**
@@ -135,5 +112,4 @@ public abstract class SimpleComboListSwingModels extends AbstractComboBoxListSwi
 		// default is no locking, re-use the model.
 		return remodel;
 	}
-    
 }

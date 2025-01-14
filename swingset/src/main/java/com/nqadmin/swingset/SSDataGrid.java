@@ -93,7 +93,7 @@ import com.nqadmin.swingset.datasources.RSC;
 import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
-import com.nqadmin.swingset.models.SimpleComboListSwingModels;
+import com.nqadmin.swingset.models.SimpleComboListSwingModel;
 import com.nqadmin.swingset.utils.SSUtils;
 import com.raelity.jdk.sun.swing.table.TableSortHeaderRenderer;
 
@@ -139,43 +139,16 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * If you specify the column numbers you can do before or after setting the
  * RowSet, it does not matter.
  * <p>
- * You can simply remember this order 1.Set the headers 2.Set the RowSet 3.Any
- * other function calls.
- * <pre>
- * Simple Example:
- *
- *{@code
- * // SET THE HEADER BEFORE SETTING THE SSROWSET
- * 	dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
- * 	dataGrid.setRowSet(rowSet);
- *
- * // HIDE THE PART ID COLUMN
- * // THIS SETS THE WIDTH OF THE COLUMN TO 0
- * 	dataGrid.setHiddenColumns(new String[]{"part_id"});
- *
- * 	dataGrid.setMessageWindow(this);
- * 	dataGrid.setUneditableColumns(new String[]{"part_id"});
- *
- * 	dataGrid.setComboRenderer("color_code",new String[]{"Red","Green","Blue"}, new Integer[]{new Integer(0),new Integer(1),new Integer(2)});
- * 	dataGrid.setDefaultValues(new int[]{1,2,3},new Object[]{new Integer(0), new Integer(20),new String("New Orleans")});
- *
- * 	dataGrid.setPrimaryColumn("part_id");
- * 	dataGrid.setSSDataValue(new SSDataValue(){ public Object getPrimaryColumnValue() {
- * 		// YOUR PRIMARY KEY VALUE GENERATION GOES HERE
- * 		// IF IT'S SOME THING USER ENTERS THEN NO PROBLEM
- * 		// IF IT'S AN AUTO INCREMENT FIELD THEN IT DEPENDS ON
- * 		// THE DATABASE DRIVER YOU ARE USING.
- * 		// IF THE UPDATEROW CAN RETRIEVE THE VALUES FOR THE ROW WITHOUT KNOWING THE PRIMARY KEY VALUE ITS FINE
- * 		// BUT POSTGRES CAN'T UPDATE ROW WITHOUT THE PRIMARY / COLUMN.
- *
- * 		// YOUR PRIMARY KEY VALUE GENERATION GOES HERE. ........ ........ ........
- *
- * 		}
- * 	});
- * }
+ * You can simply remember this order
+ * <ol>
+ * <li>Set the headers
+ * <li>Set the RowSet
+ * <li>Any other function calls.
+ * </ol>
+ * <b>Simple Example</b>:
+ * {@snippet class=DataGridSnippets region=init1}
  *
  * Also See Examples 5, 6, 7 in the samples.
- * </pre>
  */
 @SuppressWarnings("serial")
 public class SSDataGrid extends JTable
@@ -361,7 +334,7 @@ public class SSDataGrid extends JTable
 		/** Simple combox model that maps each combobox item to
 		 * the index into this ComboEditor's items array.
 		 */
-		private final class GridComboModels extends SimpleComboListSwingModels {
+		private final class GridComboModels extends SimpleComboListSwingModel {
 			
 			private GridComboModels() {
 				super(2, new ArrayList<>(items.length));

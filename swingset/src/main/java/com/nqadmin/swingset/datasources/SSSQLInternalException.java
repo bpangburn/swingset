@@ -49,28 +49,31 @@ package com.nqadmin.swingset.datasources;
 public class SSSQLInternalException extends SSSQLException
 {
 
-	/** Internal errror.
-	 * {@inheritDoc} */
+	/** Internal error. */
 	public SSSQLInternalException()
 	{
 	}
 
-	/** Internal errror.
-	 * {@inheritDoc} */
+	/** Internal error.
+	 * @param message
+	 */
 	public SSSQLInternalException(String message)
 	{
 		super(message);
 	}
 
-	/** Internal errror.
-	 * {@inheritDoc} */
+	/** Internal error.
+	 * @param message
+	 * @param cause
+	 */
 	public SSSQLInternalException(String message, Throwable cause)
 	{
 		super(message, cause);
 	}
 
-	/** Internal errror.
-	 * {@inheritDoc} */
+	/** Internal error.
+	 * @param cause
+	 */
 	public SSSQLInternalException(Throwable cause)
 	{
 		super(cause);

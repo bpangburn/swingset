@@ -113,64 +113,22 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * Note, if changing both a rowSet and column name consider using the bind()
  * method rather than individual setRowSet() and setColumName() calls.
  * <p>
- * e.g.
+ * <b>Example</b>: consider two tables
+ * <ol>
+ * <li>part_data (part_id, part_name, ...)
+ * <li>shipment_data (shipment_id, part_id, quantity, ...)
+ * </ol>
  * <p>
- * Consider two tables: 1. part_data (part_id, part_name, ...) 2. shipment_data
- * (shipment_id, part_id, quantity, ...)
- * <p>
- * Assume you would like to develop a screen for the shipment table and you want
- * to have a screen with a combobox where the user can choose a part and a
- * textbox where the user can specify a quantity.
+ * Assume you would like to develop a screen for the shipment_data table and
+ * you want to have a screen with a combobox where the user can choose a part
+ * and a textbox where the user can specify a quantity.
  * <p>
  * In the combobox you would want to display the part name rather than part_id
  * so that it is easier for the user to choose. At the same time you want to
  * store the id of the part chosen by the user in the shipment table.
- * <pre>
- * {@code
- * Connection connection = null;
- * RowSet rowSet = null;
- * SSDataNavigator navigator = null;
- * SSDBComboBox combo = null;
- *
- * try {
- *
- * // CREATE A DATABASE CONNECTION OBJECT
- * Connection connection = new Connection(........);
- *
- * // CREATE AN INSTANCE OF SSJDBCROWSETIMPL
- * JdbcRowsetImpl rowSet = new JdbcRowsetImpl(connection);
- * rowSet.setCommand("SELECT * FROM shipment_data;");
- *
- * // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE SSROWSET.
- * // IF YOU ARE NOT USING THE DATA NAVIGATOR YOU HAVE TO INCLUDE THOSE.
- * // rowSet.execute();
- * // rowSet.next();
- * SSDataNavigator navigator = new SSDataNavigator(rowSet);
- *
- * // QUERY FOR THE COMBOBOX.
- * String query = "SELECT * FROM part_data;";
- *
- * // CREATE AN INSTANCE OF THE SSDBCOMBOBOX WITH THE CONNECTION OBJECT
- * // QUERY AND COLUMN NAMES
- * combo = new SSDBComboBox(connection,query,"part_id","part_name");
  * 
- * // EXECUTE THE QUERY
- * combo.execute();
+ * {@snippet class=ComboBoxSnippets region=init}
  * 
- * // THIS BASICALLY SPECIFIES THE COLUMN AND THE ROWSET WHERE UPDATES HAVE
- * // TO BE MADE.
- * combo.bind(rowSet,"part_id");
-
- * } catch(Exception e) {
- *	// EXCEPTION HANDLER HERE...
- * }
- *
- * // ADD THE SSDBCOMBOBOX TO THE JFRAME
- * getContentPane().add(combo.getComboBox());
- * 
- * }
- * </pre>
- * <p>
  * Initially no Option2.
  * @param <M> mapping type
  * @param <O> option type

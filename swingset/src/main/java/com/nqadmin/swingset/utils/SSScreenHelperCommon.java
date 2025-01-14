@@ -77,13 +77,15 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * value in a WHERE clause if there is no mapping/null mapping
 	 * for a SSDBComboBox. Null could cause an SQL Exception, but
 	 * an arbitrary should just return with 0 records.
-	 * <p><pre>
+	 * <p>
+	 * {@snippet :
 	 * For example:
 	 *     "SELECT * FROM part_data WHERE part_id = {null};"
 	 * may throw an SQL Exception whereas:
 	 *     "SELECT * FROM part_data WHERE part_id = -998877;"
 	 * should execute properly with 0 records returned.
-	 * </pre><p>
+	 * }
+	 * <p>
 	 * ASSUMES that -998877 would never be a primary/foreign key value.
 	 */
 	// TODO: find a better way
@@ -193,22 +195,20 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	
 	/**
 	 * Adds and configures any required buttons to the main application toolbar.
-	 *
-	 * <pre>
+	 * <p>
 	 * Separators added with:
-	 * {@code
-	 * 	getRootFrame().getToolBar().addSeparator();
+	 * {@snippet :
+	 * getRootFrame().getToolBar().addSeparator();
 	 * }
-	 *
+	 * <p>
 	 * Buttons added with:
-	 * {@code
+	 * {@snippet :
 	 *  btnMyButtonName = getRootFrame().addToolBarButton(new AbstractAction() {
 	 *  	public void actionPerformed(ActionEvent ae) {
 	 *          myButtonNameActionMethod();
 	 *      }
 	 *  }, "My Button Description", "images/myButtonGraphic.gif");
 	 * }
-	 * </pre>
 	 */
 	protected abstract void configureToolBars();
 

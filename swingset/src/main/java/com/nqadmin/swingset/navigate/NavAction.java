@@ -68,8 +68,11 @@ public enum NavAction
 	NAV_ADD,
 	/** Delete record. */
 	NAV_DELETE,
-	/** specialized action for goto the row number. */
+	/** A specialized action for "goto row number".
+	 * This action has a Property, see {@link javax.swing.Action#getValue(java.lang.String)},
+	 * named "SPINNER_MODEL" whose value is a
+	 * {@link javax.swing.SpinnerNumberModel} which models the ResultSet's current row.
+	 */
 	NAV_GOTOROW,
 	;
-	
 }

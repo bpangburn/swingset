@@ -397,11 +397,11 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	
 	/**
 	 * Used to set the SSCellEditing for the SSDataGrid to activate/deactivate cells or validate cell values.
-	 * <pre>
+	 * {@snippet :
 	 * dataGrid.setSSCellEditing(new SSCellEditing() {
-	 *  // implement the methods in SSCellEditing
+	 *     // implement the methods in SSCellEditing
 	 * });
-	 * </pre>
+	 * }
 	 */
 	protected abstract void configureSSCellEditing(); 
 	
