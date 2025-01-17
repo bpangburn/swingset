@@ -433,10 +433,14 @@ Proguard. If/when SS uses more features
 
 EventBus replacement
 
+    rxjava - there are .blocking*() methods
+
     https://github.com/ReactiveX/RxJava
     https://www.baeldung.com/java-9-reactive-streams
     https://www.baeldung.com/rx-java
     https://www.baeldung.com/rxjava-backpressure
+
+    https://www.baeldung.com/rx-relay       an event bus
 
     rxjava as event bus the right way
     https://kau.sh/blog/implementing-an-event-bus-with-rxjava-rxbus/

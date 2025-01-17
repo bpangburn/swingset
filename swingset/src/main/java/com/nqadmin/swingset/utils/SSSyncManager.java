@@ -101,10 +101,10 @@ public class SSSyncManager {
 					return;
 				}
 
-				comboPK = comboBox.getSelectedMapping();
+				comboPK = comboBox.getChosenKey();
 				logger.log(DEBUG, ()->sf("COMBO NAVIGATOR: getSelectedMapping() returned: %s.", comboPK));
 				
-				// getSelectedMapping() could return null during initialization.
+				// getChosenKey() could return null during initialization.
 				// We check for null/empty rowset in the prior block.
 				if (comboPK==null) {
 					logger.log(WARNING, "Null selected in Combo Navigator.");
@@ -124,7 +124,7 @@ public class SSSyncManager {
 					navigateActions.updatePresentRow();
 					
 					// long indexOfId = SSSyncManager.this.comboBox.itemMap.get(this.id) + 1;
-					final int indexOfPK = comboBox.getMappings().indexOf(comboPK) + 1;
+					final int indexOfPK = comboBox.getKeys().indexOf(comboPK) + 1;
 					//int index = (int) indexOfPK;
 					logger.log(DEBUG, ()->sf("Rowset PK=%s, Combo PK=%s, Target rowset record # should be %s.",
 							rowsetPK, comboPK, indexOfPK));
@@ -378,14 +378,14 @@ public class SSSyncManager {
 
 				// CHECK IF THE COMBO BOX IS DISPLAYING THE SAME ONE.
 				if ((comboBox.getSelectedStringValue() == null)
-						|| !Objects.equals(comboBox.getSelectedMapping(), currentRowPK)) {
+						|| !Objects.equals(comboBox.getChosenKey(), currentRowPK)) {
 					// IF NOT CHANGE THE SELECTION OF THE COMBO BOX.
 					// this.comboBox.setSelectedStringValue(this.rowset.getString(this.columnName));
-					comboBox.setSelectedMapping(currentRowPK);
+					comboBox.setChosenKey(currentRowPK);
 				}
 			} else {
 				//comboBox.setSelectedIndex(-1);
-				comboBox.setSelectedMapping(null);
+				comboBox.setChosenKey(null);
 			}
 		} catch (final SQLException se) {
 			logger.log(ERROR, "SQL Exception.", se);

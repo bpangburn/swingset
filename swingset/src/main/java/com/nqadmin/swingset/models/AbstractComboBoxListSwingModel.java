@@ -116,14 +116,14 @@ import static com.nqadmin.swingset.utils.SSUtils.objectID;
  * are done through a Remodel Object see {@link #getRemodel() }. The
  * remodel object is "try with resource" compatible and subclasses
  * may implement locking in their implementations of takeWriteLock()
- * and releaseWriteLock(). See {@link GlazedListsOptionMappingInfo}
+ * and releaseWriteLock(). See {@link GlazedListsKeyDisplayValueInfo}
  * for an example.
  * <p>
  * Compatible with GlazedLists AutoComplete feature;
  * in which case an EventList is set in the constructor.
  * 
- * @see GlazedListsOptionMappingInfo SSDBComboBox
- *		for use with GlazedLists AutoComplete feature
+ * See {@link GlazedListsKeyDisplayValueInfo} usage in SSDBCombox
+ *		for use Glazed AutoComplete feature
  * @since 4.0.0
  */
 //
@@ -208,47 +208,46 @@ public abstract class AbstractComboBoxListSwingModel {
 
 	/**
 	 * Construct an empty list info container.
-	 * @param _itemNumElems number of elements in an SSListItem
+	 * @param itemNumElems number of elements in an SSListItem
 	 */
-	protected AbstractComboBoxListSwingModel(int _itemNumElems) {
-		this(_itemNumElems, null);
+	protected AbstractComboBoxListSwingModel(int itemNumElems) {
+		this(itemNumElems, null);
 		if(Boolean.FALSE) { Objects.isNull(sliceInfo(null)); }
 	}
 
 	/**
 	 * Construct a info container; if the specified itemList is
-	 * null an array list is created. Only use this method directly
-	 * if you are sure you must.
-	 * <p>
+	 * null an array list is created.Only use this method directly
+ if you are sure you must.<p>
 	 * If an itemList is passed in, <b>lose the reference</b>;
 	 * if the list, or its contents, are modified directly
 	 * then swing model events are lost.
-	 * @param _itemNumElems number of elements in an SSListItem
-	 * @param _itemList list to manage, may be null
+	 * @param itemNumElems number of elements in an SSListItem
+	 * @param itemList list to manage, may be null
 	 */
 	
 	
-	protected AbstractComboBoxListSwingModel(int _itemNumElems, List<SSListItem> _itemList) {
+	protected AbstractComboBoxListSwingModel(int itemNumElems, List<SSListItem> itemList) {
 		this.listItemFormatDelegate = new FormatDelegate();
-		if(_itemList != null && !_itemList.isEmpty()) {
+		if(itemList != null && !itemList.isEmpty()) {
 			throw new IllegalArgumentException("item list must be empty");
 		}
 
-		itemList = _itemList != null ? _itemList : new ArrayList<>();
-		this.itemNumElems = _itemNumElems;
-		setupNumElems(_itemNumElems);
-		modelProxy = new ComboBoxModelProxy();
+		this.itemList = itemList != null ? itemList : new ArrayList<>();
+		this.itemNumElems = itemNumElems;
+		setupNumElems(itemNumElems);
+		this.modelProxy = new ComboBoxModelProxy();
 	}
 
 	/**
 	 * Used for testing to set combo handling flag.
-	 * @param _itemNumElems number of elements in an SSListItem
-	 * @param _isCombo in a combo box
+	 * @param itemNumElems number of elements in an SSListItem
+	 * @param isCombo in a combo box
 	 */
-	/*package-test*/ AbstractComboBoxListSwingModel(int _itemNumElems, boolean _isCombo) {
-		this(_itemNumElems);
+	/*package-test*/ AbstractComboBoxListSwingModel(int itemNumElems, boolean isCombo) {
+		this(itemNumElems);
 		
-		comboBoxModel = _isCombo;
+		comboBoxModel = isCombo;
 	}
 
 	/*package-test*/ boolean isComboBoxModel() {
@@ -261,8 +260,8 @@ public abstract class AbstractComboBoxListSwingModel {
 
 	static class EventLoggingDataListener implements ListDataListener {
 		private final ListModel<?> model;
-		public EventLoggingDataListener(ListModel<?> _model) {
-			model = _model;
+		public EventLoggingDataListener(ListModel<?> model) {
+			this.model = model;
 		}
 
 		private String getMsg(ListDataEvent e) {
@@ -296,22 +295,22 @@ public abstract class AbstractComboBoxListSwingModel {
 	/**
 	 * If event logging is enabled, log the model
 	 * unless the model is already logging.
-	 * @param _model the model to log
+	 * @param model the model to log
 	 */
 	// TODO: refine method for adding a model; maybe custom String tag.
-	public static void addEventLogging(ListModel<?> _model) {
-		Objects.requireNonNull(_model);
+	public static void addEventLogging(ListModel<?> model) {
+		Objects.requireNonNull(model);
 		if (!eventLogger.isLoggable(TRACE)) {
 			return;
 		}
 		if (weakModelSet == null) {
 			weakModelSet = Collections.newSetFromMap(new WeakHashMap<>());
 		}
-		if (weakModelSet.contains(_model)) {
+		if (weakModelSet.contains(model)) {
 			return;
 		}
-		weakModelSet.add(_model);
-		_model.addListDataListener(new EventLoggingDataListener(_model));
+		weakModelSet.add(model);
+		model.addListDataListener(new EventLoggingDataListener(model));
 	}
 	private static Set<ListModel<?>> weakModelSet;
 
@@ -327,88 +326,89 @@ public abstract class AbstractComboBoxListSwingModel {
 	/**
 	 * Special case usage, grab the model configured for a JComboBox.
 	 * @param <T> model elements
-	 * @param _model the model source
+	 * @param model the model source
 	 * @return the model
 	 */
-	protected static <T>MutableComboBoxModel<T> getSimpleComboBoxModel(AbstractComboBoxListSwingModel _model) {
-		if(_model.installed) {
+	protected static <T>MutableComboBoxModel<T> getSimpleComboBoxModel(
+			AbstractComboBoxListSwingModel model)
+	{
+		if(model.installed) {
 			throw new IllegalStateException("model already installed");
 		}
-		_model.installed = true;
-		_model.comboBoxModel = true;
+		model.installed = true;
+		model.comboBoxModel = true;
 		@SuppressWarnings("unchecked")
-		MutableComboBoxModel<T> m = (MutableComboBoxModel<T>) _model.modelProxy;
+		MutableComboBoxModel<T> m = (MutableComboBoxModel<T>) model.modelProxy;
 		return m;
 	}
 
 	/**
 	 * Special case usage, grab the model configured for a JList.
 	 * @param <T> model elements
-	 * @param _model the model source
+	 * @param model the model source
 	 * @return the model
 	 */
-	protected static <T>ListModel<T> getSimpleListModel(AbstractComboBoxListSwingModel _model) {
-		if(_model.installed) {
+	protected static <T>ListModel<T> getSimpleListModel(AbstractComboBoxListSwingModel model) {
+		if(model.installed) {
 			throw new IllegalStateException("model already installed");
 		}
-		_model.installed = true;
-		_model.comboBoxModel = false;
+		model.installed = true;
+		model.comboBoxModel = false;
 		@SuppressWarnings("unchecked")
-		ListModel<T> m = (ListModel<T>) _model.modelProxy;
+		ListModel<T> m = (ListModel<T>) model.modelProxy;
 		return m;
 	}
 
 	/**
 	 * Installs a ListCellRenderer into the JComponent which
 	 * uses {@link #getListItemFormat() }
-	 * to get the value to render. The renderer is either 
-	 * a {@code DefaultListCellRenderer} or a {@code  BasicComboBoxRenderer}
-	 * as appropriate.
-	 * <p>
+ to get the value to useRender.The renderer is either 
+ a 	{@code DefaultListCellRenderer} or a {@code  BasicComboBoxRenderer}
+ as appropriate.<p>
 	 * The model is installed into the JComponent as a convenience.
 	 * 
-	 * @param _jc Jcomponent to set up with model; must be JList or JComboBox
-	 * @param _model associated model
+	 * @param jc Jcomponent to set up with model; must be JList or JComboBox
+	 * @param model associated model
 	 */
-	public static void install(JComponent _jc, AbstractComboBoxListSwingModel _model) {
-		install(_jc, _model, null);
+	public static void install(JComponent jc, AbstractComboBoxListSwingModel model) {
+		install(jc, model, null);
 	}
 
 	/**
-	 * Installs the specified ListCellRenderer into the JComponent. 
-	 * The model is installed into the JComponent as a convenience.
+	 * Installs the specified ListCellRenderer into the JComponent.The model is installed into the JComponent as a convenience.
 	 * 
-	 * @param _jc Jcomponent to set up with model
-	 * @param _model associated model
-	 * @param _render list cell renderer
-	 * @throws IllegalArgumentException if _jc is not JList or JComboBox
+	 * @param jc Jcomponent to set up with model
+	 * @param model associated model
+	 * @param render list cell renderer
+	 * @throws IllegalArgumentException if jc is not JList or JComboBox
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	// TODO Remove warning suppression post Java 8.
-	public static void install(JComponent _jc, AbstractComboBoxListSwingModel _model,
-			ListCellRenderer<?> _render) {
-		Objects.requireNonNull(_jc);
-		Objects.requireNonNull(_model);
-		if(_model.installed) {
+	public static void install(JComponent jc, AbstractComboBoxListSwingModel model,
+			ListCellRenderer<?> render) {
+		Objects.requireNonNull(jc);
+		Objects.requireNonNull(model);
+		if(model.installed) {
 			throw new IllegalStateException("model already installed");
 		}
 
-		_model.installed = true;
+		model.installed = true;
 
-		switch (_jc) {
+		switch (jc) {
+
 		case JList jl -> {
-			ListCellRenderer<?> render = _render == null
-					? _model.new LocalListCellRenderer() : _render;
-			jl.setCellRenderer(render);
-			jl.setModel(_model.modelProxy);
-			_model.comboBoxModel = false;
+			ListCellRenderer<?> useRender = render == null
+					? model.new LocalListCellRenderer() : render;
+			jl.setCellRenderer(useRender);
+			jl.setModel(model.modelProxy);
+			model.comboBoxModel = false;
 		}
 		case JComboBox jcb -> {
-			ListCellRenderer<?> render = _render == null
-					? _model.new LocalComboBoxCellRenderer() : _render;
-			jcb.setRenderer(render);
-			jcb.setModel(_model.modelProxy);
-			_model.comboBoxModel = true;
+			ListCellRenderer<?> useRender = render == null
+					? model.new LocalComboBoxCellRenderer() : render;
+			jcb.setRenderer(useRender);
+			jcb.setModel(model.modelProxy);
+			model.comboBoxModel = true;
 		}
 		default -> throw new IllegalArgumentException("must be JList or JComboBox");
 		}
@@ -453,10 +453,10 @@ public abstract class AbstractComboBoxListSwingModel {
 	/**
 	 * Set the format to use with this model.
 	 * 
-	 * @param _listItemFormat the format used with this model
+	 * @param listItemFormat the format used with this model
 	 */
-	public void setListItemFormat(SSListItemFormat _listItemFormat) {
-		listItemFormatDelegate.listItemFormat = _listItemFormat;
+	public void setListItemFormat(SSListItemFormat listItemFormat) {
+		listItemFormatDelegate.listItemFormat = listItemFormat;
 		if(modelProxy != null && !itemList.isEmpty()) {
 			// assume everything changed
 			modelProxy.fire.doFireContentsChanged(this, 0, itemList.size() - 1);
@@ -523,7 +523,7 @@ public abstract class AbstractComboBoxListSwingModel {
 	// The list is managed/modified using a Remodel object.
 	// The Remodel has hooks for locking; the are used when
 	// Glazedlists and it's EventList are used,
-	// see GlazedListsOptionMappingInfo.
+	// see GlazedListsKeyDisplayValueInfo.
 	//
 	// Locking is not provided when this class' proxy is installed
 	// into a JList/JComboBox.
@@ -732,15 +732,15 @@ public abstract class AbstractComboBoxListSwingModel {
 		}
 	}
 
-	private void comboAdjustSelectedForRemove(int _index) {
+	private void comboAdjustSelectedForRemove(int index) {
 		if (comboBoxModel) {
-			if ( modelProxy.getElementAt( _index ) == modelProxy.selectedObject ) {
-				if ( _index == 0 ) {
-					modelProxy.setSelectedItem( modelProxy.getSize() == 1
-							? null : modelProxy.getElementAt( _index + 1 ) );
+			if ( modelProxy.getElementAt(index ) == modelProxy.selectedObject ) {
+				if ( index == 0 ) {
+					modelProxy.setSelectedItem(modelProxy.getSize() == 1
+							? null : modelProxy.getElementAt(index + 1 ) );
 				}
 				else {
-					modelProxy.setSelectedItem( modelProxy.getElementAt( _index - 1 ) );
+					modelProxy.setSelectedItem(modelProxy.getElementAt(index - 1 ) );
 				}
 			}
 		}
@@ -828,12 +828,12 @@ public abstract class AbstractComboBoxListSwingModel {
 
 		/**
 		 * state info
-		 * @param _elemIndex elem index
-		 * @param _isValid true if it's valid
+		 * @param elemIndex elem index
+		 * @param isValid true if it's valid
 		 */
-		public SliceInfo(int _elemIndex, boolean _isValid) {
-			elemIndex = _elemIndex;
-			isValid = _isValid;
+		public SliceInfo(int elemIndex, boolean isValid) {
+			this.elemIndex = elemIndex;
+			this.isValid = isValid;
 		}
 
 		/**
@@ -879,14 +879,13 @@ public abstract class AbstractComboBoxListSwingModel {
 	 * An exception is thrown if the item list is not empty.
 	 * Currently only 2 or 3 items are allowed.
 	 * ElementSlices are marked valid/invalid as appropriate.
-	 * @param _itemNumElems number of elements in SSListItem
+	 * @param itemNumElems number of elements in SSListItem
 	 */
-	protected void setItemNumElems(int _itemNumElems) {
-		// Using '_' for remodel failed by maven enforcer.
+	protected void setItemNumElems(int itemNumElems) {
 		try (Remodel remodel = getRemodel()) {
-			setupNumElems(_itemNumElems);
+			setupNumElems(itemNumElems);
 		}
-		itemNumElems = _itemNumElems;
+		this.itemNumElems = itemNumElems;
 	}
 
 	/**
@@ -913,22 +912,22 @@ public abstract class AbstractComboBoxListSwingModel {
 	/**
 	 * From the list item at the specified list item index,
 	 * get the element at the specified element position.
-	 * @param _listItemIndex index of the list item
-	 * @param _elemIndex which element to extract
+	 * @param listItemIndex index of the list item
+	 * @param elemIndex which element to extract
 	 * @return the element extracted from the list item.
 	 */
-	private Object getElem(int _listItemIndex, int _elemIndex) {
-		return getElem(itemList.get(_listItemIndex), _elemIndex);
+	private Object getElem(int listItemIndex, int elemIndex) {
+		return getElem(itemList.get(listItemIndex), elemIndex);
 	}
 
 	/**
 	 * Get an element from the list item at the specified position.
-	 * @param _listItem extract an element from this
-	 * @param _elemIndex which element to extract
+	 * @param listItem extract an element from this
+	 * @param elemIndex which element to extract
 	 * @return the element extracted from the list item.
 	 */
-	private static Object getElem(SSListItem _listItem, int _elemIndex) {
-		return ((ListItem0)_listItem).getElem(_elemIndex);
+	private static Object getElem(SSListItem listItem, int elemIndex) {
+		return ((ListItem0)listItem).getElem(elemIndex);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -941,20 +940,20 @@ public abstract class AbstractComboBoxListSwingModel {
 	// If the models want locking, thier methods must handle locking
 	//
 
-	private boolean add(SSListItem _listItem) {
+	private boolean add(SSListItem listItem) {
 		int addAt = itemList.size();
-		boolean isChanged = itemList.add(_listItem);
+		boolean isChanged = itemList.add(listItem);
 		if (isChanged) {
             modelProxy.fire.doFireIntervalAdded(this, addAt, addAt);
-			comboAdjustSelectedAfterAdd(_listItem);
+			comboAdjustSelectedAfterAdd(listItem);
 		}
 		return isChanged;
 	}
 
-	private void add(int _index, SSListItem _listItem) {
-		itemList.add(_index, _listItem);
-		modelProxy.fire.doFireIntervalAdded(this, _index, _index);
-		comboAdjustSelectedAfterAdd(_listItem);
+	private void add(int index, SSListItem listItem) {
+		itemList.add(index, listItem);
+		modelProxy.fire.doFireIntervalAdded(this, index, index);
+		comboAdjustSelectedAfterAdd(listItem);
 	}
 
 	private boolean internalAddAll(Collection<? extends SSListItem> newItems) {
@@ -978,9 +977,9 @@ public abstract class AbstractComboBoxListSwingModel {
 		return isChanged;
 	}
 
-	private SSListItem set(int _index, SSListItem _newItem) {
-		SSListItem oldVal = itemList.set(_index, _newItem);
-		modelProxy.fire.doFireContentsChanged(this, _index, _index);
+	private SSListItem set(int index, SSListItem newItem) {
+		SSListItem oldVal = itemList.set(index, newItem);
+		modelProxy.fire.doFireContentsChanged(this, index, index);
 		return oldVal;
 	}
 
@@ -994,15 +993,15 @@ public abstract class AbstractComboBoxListSwingModel {
 		}
 	}
 
-	private SSListItem remove(int _index) {
-		comboAdjustSelectedForRemove(_index);
-		SSListItem item = itemList.remove(_index);
-        modelProxy.fire.doFireIntervalRemoved(this, _index, _index);
+	private SSListItem remove(int index) {
+		comboAdjustSelectedForRemove(index);
+		SSListItem item = itemList.remove(index);
+        modelProxy.fire.doFireIntervalRemoved(this, index, index);
 		return item;
 	}
 
-	private boolean remove(Object _listItem) {
-		int index = itemList.indexOf(_listItem);
+	private boolean remove(Object listItem) {
+		int index = itemList.indexOf(listItem);
 		if(index < 0) {
 			return false;
 		}
@@ -1014,9 +1013,9 @@ public abstract class AbstractComboBoxListSwingModel {
 	/**
 	 * Using the list item at the specified list item index,
 	 * replace an element in the list item at the specified position.
-	 * @param _listItemIndex operate on the list item at this index
-	 * @param _elemIndex index of elem to replace
-	 * @param _newElem elem to put into the list item
+	 * @param listItemIndex operate on the list item at this index
+	 * @param elemIndex index of elem to replace
+	 * @param newElem elem to put into the list item
 	 * @return the previous contents of the list item at the specified position
 	 */
 	// NOTE: setElem(listItem, elemIndex, newElem)
@@ -1031,27 +1030,27 @@ public abstract class AbstractComboBoxListSwingModel {
 	// But it doesn't seem worth the testing for a miniscule performance gain.
 	// Don't want to fire everything changed since that's
 	// probably be a big performance loss in most cases.
-	private Object setElem(int _listItemIndex, int _elemIndex, Object _newElem) {
-		ListItemWrite0 listItem = (ListItemWrite0) itemList.get(_listItemIndex);
+	private Object setElem(int listItemIndex, int elemIndex, Object newElem) {
+		ListItemWrite0 listItem = (ListItemWrite0) itemList.get(listItemIndex);
 		try {
 			listItem = (ListItemWrite0) listItem.clone();
 		} catch (CloneNotSupportedException ex) {
 		}
-		Object oldElem = listItem.getElem(_elemIndex);
-		listItem.setElem(_elemIndex, _newElem);
-		itemList.set(_listItemIndex, listItem);
-		modelProxy.fire.doFireContentsChanged(this, _listItemIndex, _listItemIndex);
+		Object oldElem = listItem.getElem(elemIndex);
+		listItem.setElem(elemIndex, newElem);
+		itemList.set(listItemIndex, listItem);
+		modelProxy.fire.doFireContentsChanged(this, listItemIndex, listItemIndex);
 		return oldElem;
 	}
 	
 	/**
 	 * for testing 
-	 * @param _listItem clone this
+	 * @param listItem clone this
 	 * @return clone
 	 */
-	SSListItem getClone(SSListItem _listItem) {
+	SSListItem getClone(SSListItem listItem) {
 		try {
-			return (SSListItem) ((ListItemWrite0)_listItem).clone();
+			return (SSListItem) ((ListItemWrite0)listItem).clone();
 		} catch (CloneNotSupportedException ex) {
 		}
 		return null;
@@ -1248,8 +1247,8 @@ public abstract class AbstractComboBoxListSwingModel {
 	 * the item list or its contents it should call verifyOpened
 	 * as its first statement; this avoids modifications
 	 * after the lock is released.
-	 * 
-	 * @see GlazedListsOptionMappingInfo for example of Remodel locking
+	 * <p>
+	 * See {@link GlazedListsKeyDisplayValueInfo} for example of Remodel locking
 	 */
 	protected abstract class Remodel implements AutoCloseable {
 
@@ -1297,55 +1296,55 @@ public abstract class AbstractComboBoxListSwingModel {
 		}
 
 		/**
-		 * @param _listItem listItem to find in the itemList
+		 * @param listItem listItem to find in the itemList
 		 * @return index of listItem in the itemList
 		 */
-		public int indexOf(Object _listItem) {
+		public int indexOf(Object listItem) {
 			verifyOpened();
-			return itemList.indexOf(_listItem);
+			return itemList.indexOf(listItem);
 		}
 
 		/**
 		 * Return the list item at the specified position in this item list.
-		 * @param _index index of the item to return
+		 * @param index index of the item to return
 		 * @return the item at the specified position
 		 */
-		public SSListItem get(int _index) {
+		public SSListItem get(int index) {
 			verifyOpened();
-			return itemList.get(_index);
+			return itemList.get(index);
 		}
 
 		/**
 		 * Appends the specified list item to the end of this list.
-		 * @param _newItem item to be appended to this list
+		 * @param newItem item to be appended to this list
 		 * @return true if the item was appended
 		 */
-		public boolean add(SSListItem _newItem) {
+		public boolean add(SSListItem newItem) {
 			verifyOpened();
-			return AbstractComboBoxListSwingModel.this.add(_newItem);
+			return AbstractComboBoxListSwingModel.this.add(newItem);
 			// isModifiedLength = true;
 		}
 
 		/**
 		 * Inserts the specified list item at the specified position in this list.
-		 * @param _index index at which the specified item is to be inserted
-		 * @param _newItem list item to inserted
+		 * @param index index at which the specified item is to be inserted
+		 * @param newItem list item to inserted
 		 */
-		public void add(int _index, SSListItem _newItem) {
+		public void add(int index, SSListItem newItem) {
 			verifyOpened();
-			AbstractComboBoxListSwingModel.this.add(_index, _newItem);
+			AbstractComboBoxListSwingModel.this.add(index, newItem);
 			// isModifiedLength = true;
 		}
 
 		/**
 		 * Appends all of the list items in the specified list
 		 * to the end of this list.
-		 * @param _newItems items to add to this list.
+		 * @param newItems items to add to this list.
 		 * @return true if the list changed
 		 */
-		public boolean addAll(Collection<? extends SSListItem> _newItems) {
+		public boolean addAll(Collection<? extends SSListItem> newItems) {
 			verifyOpened();
-			return AbstractComboBoxListSwingModel.this.internalAddAll(_newItems);
+			return AbstractComboBoxListSwingModel.this.internalAddAll(newItems);
 			// isModifiedLength = true;
 		}
 
@@ -1353,26 +1352,26 @@ public abstract class AbstractComboBoxListSwingModel {
 		 * Appends all of the list items in the specified list
 		 * to the end of this list.
 		 * 
-		 * @param _index insert the items at this position in the list
-		 * @param _newItems items to add to this list.
+		 * @param index insert the items at this position in the list
+		 * @param newItems items to add to this list.
 		 * @return true if the list changed
 		 */
-		public boolean addAll(int _index, Collection<? extends SSListItem> _newItems) {
+		public boolean addAll(int index, Collection<? extends SSListItem> newItems) {
 			verifyOpened();
-			return AbstractComboBoxListSwingModel.this.internalAddAll(_index, _newItems);
+			return AbstractComboBoxListSwingModel.this.internalAddAll(index, newItems);
 			// isModifiedLength = true;
 		}
 
 		/**
 		 * Replaces the item at the specified position in the list
 		 * with the specified item.
-		 * @param _index index of the item to replace
-		 * @param _newItem item to store at the index
+		 * @param index index of the item to replace
+		 * @param newItem item to store at the index
 		 * @return the list item that was at that position
 		 */
-		public SSListItem set(int _index, SSListItem _newItem) {
+		public SSListItem set(int index, SSListItem newItem) {
 			verifyOpened();
-			return AbstractComboBoxListSwingModel.this.set(_index, _newItem);
+			return AbstractComboBoxListSwingModel.this.set(index, newItem);
 		}
 
 		/** remove all list items from the itemList */
@@ -1384,62 +1383,62 @@ public abstract class AbstractComboBoxListSwingModel {
 		
 		/**
 		 * Remove the listItem at the specified position from the itemList.
-		 * @param _index remove listItem at this position
+		 * @param index remove listItem at this position
 		 * @return the listItem that was removed from the list
 		 */
-		public SSListItem remove(int _index) {
+		public SSListItem remove(int index) {
 			verifyOpened();
-			SSListItem item = AbstractComboBoxListSwingModel.this.remove(_index);
+			SSListItem item = AbstractComboBoxListSwingModel.this.remove(index);
 			// isModifiedLength = true;
 			return item;
 		}
 
 		/**
 		 * Remove the listItem from ite itemList.
-		 * @param _listItem item to remove from item list
+		 * @param listItem item to remove from item list
 		 * @return true if the item was removed
 		 */
-		public boolean remove(Object _listItem) {
+		public boolean remove(Object listItem) {
 			verifyOpened();
-			return AbstractComboBoxListSwingModel.this.remove(_listItem);
+			return AbstractComboBoxListSwingModel.this.remove(listItem);
 			// isModifiedLength = true;
 		}
 		
 		/**
 		 * From the list item at the specified list item index,
 		 * get the element at the specified element position.
-		 * @param _listItemIndex index of the list item
-		 * @param _elemIndex which element to extract
+		 * @param listItemIndex index of the list item
+		 * @param elemIndex which element to extract
 		 * @return the element extracted from the list item.
 		 */
-		public Object getElem(int _listItemIndex, int _elemIndex) {
+		public Object getElem(int listItemIndex, int elemIndex) {
 			verifyOpened();
-			return AbstractComboBoxListSwingModel.this.getElem(_listItemIndex, _elemIndex);
+			return AbstractComboBoxListSwingModel.this.getElem(listItemIndex, elemIndex);
 		}
 		
 		/**
 		 * From the list item,
 		 * get the element at the specified element position.
-		 * @param _listItem the list item
-		 * @param _elemIndex which element to extract
+		 * @param listItem the list item
+		 * @param elemIndex which element to extract
 		 * @return the element extracted from the list item.
 		 */
-		public Object getElem(SSListItem _listItem, int _elemIndex) {
+		public Object getElem(SSListItem listItem, int elemIndex) {
 			verifyOpened();
-			return AbstractComboBoxListSwingModel.getElem(_listItem, _elemIndex);
+			return AbstractComboBoxListSwingModel.getElem(listItem, elemIndex);
 		}
 		
 		/**
 		 * With the list item at the specified list item index,
 		 * replace an element in the list item at the specified position.
-		 * @param _listItemIndex operate on the list item at this index
-		 * @param _elemIndex index of elem to replace
-		 * @param _newElem elem to put into the list item
+		 * @param listItemIndex operate on the list item at this index
+		 * @param elemIndex index of elem to replace
+		 * @param newElem elem to put into the list item
 		 * @return the previous contents of the list item at the specified position
 		 */
-		public Object setElem(int _listItemIndex, int _elemIndex, Object _newElem) {
+		public Object setElem(int listItemIndex, int elemIndex, Object newElem) {
 			verifyOpened();
-			return AbstractComboBoxListSwingModel.this.setElem(_listItemIndex, _elemIndex, _newElem);
+			return AbstractComboBoxListSwingModel.this.setElem(listItemIndex, elemIndex, newElem);
 		}
 
 		/**
@@ -1737,8 +1736,8 @@ public abstract class AbstractComboBoxListSwingModel {
 
 		@SuppressWarnings("unused")
 		// TODO Unused warning is a false positive. Used by reflection.
-		public ListItemAsArray(Object [] _elems) {
-			elems = Arrays.copyOf(_elems, _elems.length);
+		public ListItemAsArray(Object [] elems) {
+			this.elems = Arrays.copyOf(elems, elems.length);
 		}
 
 		@Override

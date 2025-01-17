@@ -197,7 +197,7 @@ public class Example2 extends JFrame
 		// 		10 -> BAD
 		// 		20 -> BETTER
 		// 		30 -> GOOD
-		cmbSupplierStatus.setOptions(List.of("Bad", "Better", "Good"),
+		cmbSupplierStatus.setDisplayValues(List.of("Bad", "Better", "Good"),
 									 List.of(10, 20, 30));
 		
 		// BIND THE COMPONENTS TO THE DATABASE COLUMNS

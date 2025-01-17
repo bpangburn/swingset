@@ -60,6 +60,7 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * 
  * @since 4.0.0
  */
+// TODO: <K>
 public interface SSCollectionModel {
 
 	/**

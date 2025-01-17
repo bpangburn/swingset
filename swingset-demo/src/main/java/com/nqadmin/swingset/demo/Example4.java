@@ -269,7 +269,7 @@ public class Example4 extends JFrame {
 			// SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES
 
 				// This is the normal case, specify an option for each mapping
-				cmbPartColor.setOptions(List.of("Red", "Green", "Blue"));
+				cmbPartColor.setDisplayValues(List.of("Red", "Green", "Blue"));
 
 				// This is used to initialize some stuff for Example4Advanced
 				cmbPartColorChangeOptions();

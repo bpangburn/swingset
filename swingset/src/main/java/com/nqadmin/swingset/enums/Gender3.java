@@ -40,8 +40,8 @@ package com.nqadmin.swingset.enums;
 /**
  * Predefined gender options.
  * 
- * @see com.nqadmin.swingset.SSComboBox#setOptions(java.lang.Class)
- * @see com.nqadmin.swingset.SSList#setOptions(java.lang.Class)
+ * @see com.nqadmin.swingset.SSComboBox#setDisplayValues(java.lang.Class)
+ * @see com.nqadmin.swingset.SSList#setDisplayValues(java.lang.Class)
  * @since 4.0
  */
 public enum Gender3 {

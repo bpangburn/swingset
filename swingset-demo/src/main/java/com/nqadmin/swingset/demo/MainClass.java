@@ -237,20 +237,20 @@ public class MainClass extends JFrame
 			setMaximumSize(new Dimension(210, 25));
 			setAllowNull(false);
 			DemoUtil.RowSetSource rsSource = DemoUtil.getWhichRowSetDefault();
-			setOptions(DemoUtil.RowSetSource.class);
-			setSelectedEnum(rsSource);
+			setDisplayValues(DemoUtil.RowSetSource.class);
+			setChosenEnum(rsSource);
 			btnRowSetSource.setText("RowSet: " + rsSource.toString());
 		}
 
 		@Override
-		public DemoUtil.RowSetSource getSelectedEnum() {
-			return (DemoUtil.RowSetSource) super.getSelectedEnum();
+		public DemoUtil.RowSetSource getChosenEnum() {
+			return (DemoUtil.RowSetSource) super.getChosenEnum();
 		}
 
 		@Override
 		public void setSelectedItem(Object anObject) {
 			super.setSelectedItem(anObject);
-			DemoUtil.RowSetSource rsSource = getSelectedEnum();
+			DemoUtil.RowSetSource rsSource = getChosenEnum();
 			DemoUtil.setWhichRowSetDefault(rsSource);
 			btnRowSetSource.setText("RowSet: " + rsSource.toString());
 			if (popup == null) {

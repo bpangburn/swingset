@@ -269,7 +269,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 	@Override
 	protected void populateSSComboBoxes() {
 		// SET COMBO OPTIONS
-		cmbPartColor.setOptions(List.of("Red", "Green", "Blue"));
+		cmbPartColor.setDisplayValues(List.of("Red", "Green", "Blue"));
 	}
 
 	/**
@@ -341,9 +341,9 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 //				logger.debug("Running on EDT? " + SwingUtilities.isEventDispatchThread());
 //				logger.debug("Attempting to update combo navigator Option to: " + update);
 
-				getComboNav().updateOption(partID, update);
+				getComboNav().updateDisplayValue(partID, update);
 				
-//				logger.debug("Combo navigator Option after call to getComboNav().updateOption(): " + getComboNav().getSelectedOption());
+//				logger.debug("Combo navigator Option after call to getComboNav().updateDisplayValue(): " + getComboNav().getChosenDisplayValue());
 				
 				getSyncManager().sync();
 

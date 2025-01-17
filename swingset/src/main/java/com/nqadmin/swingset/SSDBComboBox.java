@@ -43,6 +43,8 @@
 package com.nqadmin.swingset;
 
 
+import com.nqadmin.swingset.core.DBComboBox2;
+
 import java.sql.Connection;
 
 /**

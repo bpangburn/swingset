@@ -421,18 +421,18 @@ public class TestBaseComponents extends JFrame
 		if (activeComps.contains(COMBO)) {
 			// TODO if getAllowNull() is true then add blank item to SSComboBox
 			cmbSSComboBox.setAllowNull(true);
-			cmbSSComboBox.setOptions(Arrays.asList(comboItems), Arrays.asList(comboCodesIntegers));
+			cmbSSComboBox.setDisplayValues(Arrays.asList(comboItems), Arrays.asList(comboCodesIntegers));
 		}
 		if (activeComps.contains(ENUM_COMBO)) {
 			cmbEnumSSComboBox.setAllowNull(true);
-			cmbEnumSSComboBox.setOptions(ComboEnum.class);
+			cmbEnumSSComboBox.setDisplayValues(ComboEnum.class);
 		}
 		
 		// NOTE following enum has [0,N) mapping, but DB is [1,N]
 		//      Fortunately test DB doesn't have a "7" in ss_list array
-		//lstSSList.setOptions(ListEnum.class);
+		//lstSSList.setDisplayValues(ListEnum.class);
 		if (activeComps.contains(LIST)) {
-			lstSSList.setOptions(Arrays.asList(listItems), Arrays.asList(listCodes));
+			lstSSList.setDisplayValues(Arrays.asList(listItems), Arrays.asList(listCodes));
 		}
 		
 		if (activeComps.contains(DB_COMBO)) {

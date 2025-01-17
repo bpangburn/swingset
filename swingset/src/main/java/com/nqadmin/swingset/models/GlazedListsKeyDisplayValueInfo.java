@@ -37,37 +37,33 @@
  ******************************************************************************/
 package com.nqadmin.swingset.models;
 
-
 import ca.odell.glazedlists.EventList;
 
-// OptionMappingSwingModel.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
- * This class adds support for GlazedLists locking,
- * see {@link OptionMappingSwingModel.Remodel}.
- * @param <M> mapping type; mapping is typically primary key
- * @param <O> option type; option provides display string
- * @param <O2>  option2 type; if present, supplementary display string
+ * This class adds support for GlazedLists EventList and locking,
+ * see {@link KeyDisplayValueSwingModel.Remodel}.
+ * @param <K> key type; key is typically primary key
+ * @param <D> displayValue type; displayValue provides display string
+ * @param <D2>  displayValue2 type; if present, supplementary display string
  * 
  * @see <a href="https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html" target="_blank" rel="noopener noreferrer">GlazedLists AutoCompletion javadoc</a>
  * @see <a href="https://publicobject.com/glazedlistsdeveloper/screencasts/autocompletesupport/AutoCompleteSupport.wmv" target="_blank" rel="noopener noreferrer">GlazedLists AutoCompletion Video</a>
  * 
  * @since 4.0.0
  */
-public class GlazedListsOptionMappingInfo<M,O,O2> extends OptionMappingSwingModel<M,O,O2> {
+public class GlazedListsKeyDisplayValueInfo<K,D,D2> extends KeyDisplayValueSwingModel<K,D,D2> {
 	private final EventList<SSListItem> eventList;
 	private boolean hasReturnedEventList;
 
 	/**
 	 * Create an empty ComboInfo.
-	 * @param _option2Enabled true says to provide an options2 field in SSListItem
-	 * @param _eventList which is installed into AutoCompleteSupport
+	 * @param displayValue2Enabled true says to provide an options2 field in SSListItem
+	 * @param eventList which is installed into AutoCompleteSupport
 	 */
-	public GlazedListsOptionMappingInfo(boolean _option2Enabled, EventList<SSListItem> _eventList) {
-		super(_option2Enabled, _eventList);
-		eventList = _eventList;
+	public GlazedListsKeyDisplayValueInfo(boolean displayValue2Enabled,
+										  EventList<SSListItem> eventList) {
+		super(displayValue2Enabled, eventList);
+		this.eventList = eventList;
 	}
 
 	/**
@@ -83,11 +79,6 @@ public class GlazedListsOptionMappingInfo<M,O,O2> extends OptionMappingSwingMode
 		hasReturnedEventList = true;
 		return temp;
 	}
-
-	// protected GlazedListsOptionMappingInfo(int itemNumElems, List<SSListItem> itemList) {
-	// 	super(itemNumElems, itemList);
-	// 	eventList = (EventList<SSListItem>) itemList;
-	// }
 
 	/**
 	 * The Remodel is the core object to support locked access to this object.

@@ -51,7 +51,6 @@ import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
-import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * A support class for undo/redo on a single row in a rowsest.

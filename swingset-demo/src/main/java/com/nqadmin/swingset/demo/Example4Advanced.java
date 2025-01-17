@@ -37,7 +37,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
-import com.nqadmin.swingset.ComboBox2.MissingOptionControl;
+import com.nqadmin.swingset.core.ComboBox2.MissingDisplayValueControl;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
 
@@ -68,13 +68,12 @@ import static java.lang.System.Logger.Level.*;
 
 /**
  * Demonstrate some advanced features of SSCombobox
- * and using Navigator actions.
- * <ul>
- * <li>Using a custom ListItemFormat for null/missing Option</li>
- * <li>MissingOptionControl</li>
- * <li>Assigning navigator actions to function keys</li>
- * <li>Buttons that invoke navigation actions</li>
- * </ul>
+ * and using Navigator actions.<ul>
+ <li>Using a custom ListItemFormat for null/missing Option</li>
+ <li>MissingDisplayValueControl</li>
+ <li>Assigning navigator actions to function keys</li>
+ <li>Buttons that invoke navigation actions</li>
+ </ul>
  */
 @SuppressWarnings("serial")
 public class Example4Advanced extends Example4
@@ -86,8 +85,8 @@ public class Example4Advanced extends Example4
 	void cmbPartColorChangeOptions() {
 		// This method must be called from Example4 before
 		// some other initialization, like bind, SSSyncManager.
-		cmbPartColor.setOptions(List.of("Green", "Blue"), List.of(1,2));
-		//cmbPartColor.setOptions(new String[] { "Yellow", "Purple" }, new int[] {3,4});
+		cmbPartColor.setDisplayValues(List.of("Green", "Blue"), List.of(1,2));
+		//cmbPartColor.setDisplayValues(new String[] { "Yellow", "Purple" }, new int[] {3,4});
 	}
 
 	/**
@@ -111,9 +110,9 @@ public class Example4Advanced extends Example4
 		cmbPartColor.setListItemFormat(new SSListItemFormat() {
 			@Override
 			protected void appendValue(StringBuffer _sb, int _elemIndex, SSListItem _listItem) {
-				if (cmbPartColor.getOptionFormatIndex() == _elemIndex
+				if (cmbPartColor.getDisplayValueFormatIndex() == _elemIndex
 						&& getElem(_elemIndex, _listItem) == null) {
-					Object key = getElem(cmbPartColor.getMappingFormatIndex(), _listItem);
+					Object key = getElem(cmbPartColor.getKeyFormatIndex(), _listItem);
 					_sb.append(key != null ? key.toString() : null)
 							.append(" - BUG: MISSING OPTION");
 				} else {
@@ -128,18 +127,17 @@ public class Example4Advanced extends Example4
 		// Here we just get the current value, log it and put it back;
 		// so we're still using the default handling. See javadoc as needed.
 
-		// Get previous value of MissingOptionControl
-		EnumSet<MissingOptionControl> mmc = cmbPartColor.setMissingOptionControl(
-				EnumSet.noneOf(MissingOptionControl.class));
+		// Get previous value of MissingDisplayValueControl
+		EnumSet<MissingDisplayValueControl> mmc = cmbPartColor.setMissingDisplayValueControl(EnumSet.noneOf(MissingDisplayValueControl.class));
 		// restore the default
-		cmbPartColor.setMissingOptionControl(mmc);
+		cmbPartColor.setMissingDisplayValueControl(mmc);
 
 		// With the following two lines retain the missing mapping option in list
 		// for all records, even those without a missing option.
-		//mmc.remove(MissingOptionControl.MOC_CLEANUP);
-		//cmbPartColor.setMissingOptionControl(mmc);
+		//mmc.remove(MissingDisplayValueControl.MC_CLEANUP);
+		//cmbPartColor.setMissingDisplayValueControl(mmc);
 
-		// log the MissingOptionControl values
+		// log the MissingDisplayValueControl values
 		logger.log(INFO, () -> ("MissingMappingFlags: " + mmc));
 
 
@@ -273,10 +271,10 @@ public class Example4Advanced extends Example4
 			cmbPartColor.setListItemFormat(new SSListItemFormat() {
 				@Override
 				protected void appendValue(StringBuffer _sb, int _elemIndex, SSListItem _listItem) {
-					if (cmbPartColor.getOptionFormatIndex() == _elemIndex
+					if (cmbPartColor.getDisplayValueFormatIndex() == _elemIndex
 							&& getElem(_elemIndex, _listItem) == null
 							&& !Objects.equals(cmbPartColor.getNullItem(), _listItem)) {
-						Object key = getElem(cmbPartColor.getMappingFormatIndex(), _listItem);
+						Object key = getElem(cmbPartColor.getKeyFormatIndex(), _listItem);
 						_sb.append(key != null ? key.toString() : null)
 								.append(" - change: ")
 								.append(captureCountChange);

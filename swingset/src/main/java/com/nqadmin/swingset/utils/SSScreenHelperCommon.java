@@ -330,7 +330,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 * @return Long containing selectedMapping if not null, otherwise hopefullyNoPKValue
 	 */
 	public static Long getPKForQuery(com.nqadmin.swingset.SSDBComboBox _combo) {
-		Long result = _combo.getSelectedMapping();
+		Long result = _combo.getChosenKey();
 		if (result==null) {
 			result = hopefullyNoPKValue;
 		}

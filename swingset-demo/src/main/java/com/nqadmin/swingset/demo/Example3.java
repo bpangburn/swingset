@@ -192,7 +192,7 @@ public class Example3 extends JFrame {
 
 				// SET OTHER DEFAULTS
 					 logger.log(DEBUG, "Setting default for Supplier Name mapping to 2.");
-					 cmbSupplierName.setSelectedMapping((long) 2);
+					 cmbSupplierName.setChosenKey((long) 2);
 //					 cmbPartName.setSelectedValue(0);
 //					 txtQuantity.setText("0");
 
@@ -283,8 +283,8 @@ public class Example3 extends JFrame {
 		// DISABLE THE PRIMARY KEY
 			txtSupplierPartID.setEnabled(false);
 			
-//			cmbSupplierName.addOption("Adams2", (long)5);
-//			cmbSupplierName.updateOption((long)55, "Hello");
+//			cmbSupplierName.addDisplayValue("Adams2", (long)5);
+//			cmbSupplierName.updateDisplayValue((long)55, "Hello");
 
 		// MAKE THE JFRAME VISIBLE
 			setVisible(true);

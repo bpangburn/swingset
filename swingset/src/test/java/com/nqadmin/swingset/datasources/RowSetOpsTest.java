@@ -308,10 +308,7 @@ public class RowSetOpsTest
 		assertEquals(java.sql.Timestamp.valueOf(sTimestamp), co);
 	}
 
-
-
-
-/**
+	/**
 	 * Test of getColumnObject method, of class RowSetOps.
 	 * @throws java.lang.Exception
 	 */

@@ -40,7 +40,7 @@
  * Additions and modifications made by Ernie R. Rael are
  * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
-package com.nqadmin.swingset;
+package com.nqadmin.swingset.core;
 
 import static com.nqadmin.swingset.datasources.RowSetOps.getJDBCColumnType;
 
@@ -67,13 +67,10 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
  * Similar to the SSComboBox, but used when both the 'bound' values and the
- * 'display' values are pulled from a database table.The bound value is called the 'mapping' and the display value the 'option'.
- * An 'option2' may be specified; in that case the display value
- for the mapping is a composite of option and option2.
- Generally the mapping 
+ * 'display' values are pulled from a database table.The bound value is called the 'mapping' and the display value the 'option'.An 'option2' may be specified; in that case the display value
+ for the mapping is a composite of option and option2.Generally the mapping 
  represents a foreign key to another table, and the combobox needs to display
- a list of one (or more) columns from the other table.
- <p>
+ a list of one (or more) columns from the other table.<p>
  Several methods inherited from ComboBox2 directly manipulate the
  combobox contents. These methods throw UnsupportedOperationException.
  <p>
@@ -83,18 +80,18 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * that are based on index in the combo box list, unless you're sure...</b>
  * 
  * For example use 
- * {@link ComboBox2#getSelectedMapping() getSelectedMapping()}
+ * {@link ComboBox2#getChosenKey() getChosenKey()}
  * not something that is based on {@code getSelectedIndex()}.
  * Change the current combo box item with methods
  * such as:
- * {@link ComboBox2#setSelectedMapping(java.lang.Object) setSelectedMapping(Long)}
+ * {@link ComboBox2#setChosenKey(java.lang.Object) setChosenKey(Long)}
  * and
- * {@link ComboBox2#setSelectedOption(java.lang.Object) setSelectedOption(String)}.
+ * {@link ComboBox2#setChosenDisplayValue(java.lang.Object) setChosenDisplayValue(String)}.
  * Use the methods {@link ComboBox2#hasItems() hasItems() } and
  * {@link ComboBox2#hasSelection() hasSelection() } which take into account
  * {@code getAllowNull()}.
  * <p>
- * Notice that {@link #getSelectedMapping() }
+ * Notice that {@link #getChosenKey() }
  * returns null in two situations related to {@link #getAllowNull() }
  * <ul>
  *   <li>nothing is selected in this combo box
@@ -106,9 +103,9 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * when {@code getAllowNull()} is true.
  * <p>
  * If subclasses need to work directly with the combo box model,
- * refer to {@link com.nqadmin.swingset.models.OptionMappingSwingModel}
+ * refer to {@link com.nqadmin.swingset.models.KeyDisplayValueSwingModel}
  * and especially
- * {@link com.nqadmin.swingset.models.OptionMappingSwingModel.Remodel}
+ * {@link com.nqadmin.swingset.models.KeyDisplayValueSwingModel.Remodel}
  * <p>
  * Note, if changing both a rowSet and column name consider using the bind()
  * method rather than individual setRowSet() and setColumName() calls.
@@ -129,13 +126,13 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * 
  * {@snippet class=ComboBoxSnippets region=init}
  * 
- * Initially no Option2.
- * @param <M> mapping type
- * @param <O> option type
- * @param <O2> option2 type
+ * Initially no DisplayValue2.
+ * @param <K> key type
+ * @param <D> displayValue type
+ * @param <D2> displayValue2 type
  */
 @SuppressWarnings("serial")
-public class DBComboBox2<M,O,O2> extends ComboBox2<M,O,O2>
+public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 {
 	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
@@ -164,9 +161,9 @@ public class DBComboBox2<M,O,O2> extends ComboBox2<M,O,O2>
 	protected int executeCount = 0;
 
 	/**
-	 * The column name used to query the values for the bound column mappings.
+	 * The column name used to query the values for the bound column keys.
 	 * This is generally the PK of the table to which a foreign key is mapped.
-	 * NOTE: This is NOT the bound column. It is the source of the mappings.
+	 * NOTE: This is NOT the bound column. It is the source of the keys.
 	 */
 	protected String primaryKeyColumnName = "";
 
@@ -213,9 +210,9 @@ public class DBComboBox2<M,O,O2> extends ComboBox2<M,O,O2>
 	 *
 	 * @param connection           database connection to be used.
 	 * @param primaryKeyColumnName column name used to query/generate the combo
-	 *                              Mappings
+	 *                             Keys
 	 * @param displayColumnName    column name used to query/generate the combo
-	 *                              Options
+	 *                             DisplayValues
 	 */
 	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
 	@SuppressWarnings({ "all", "OverridableMethodCallInConstructor" })
@@ -230,8 +227,8 @@ public class DBComboBox2<M,O,O2> extends ComboBox2<M,O,O2>
 	 * @param connection         database connection to be used.
 	 * @param query                query to be used to retrieve the values to display in
 	 *                              the combo from the database.
-	 * @param primaryKeyColumnName column name used to query/generate the combo Mappings
-	 * @param displayColumnName    column name used to query/generate the combo Options
+	 * @param primaryKeyColumnName column name used to query/generate the combo Keys
+	 * @param displayColumnName    column name used to query/generate the combo DisplayValues
 	 */
 	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
 	@SuppressWarnings({"all","OverridableMethodCallInConstructor"})
@@ -293,20 +290,20 @@ public class DBComboBox2<M,O,O2> extends ComboBox2<M,O,O2>
 	// NOTE: IF A LIST OF THE STRINGS IN COMBOBOX IS WANTED,
 	//		 THEN THE FOLLOWING CAN BE USED.
 
-	// List<String> options = new ArrayList<>();
+	// List<String> displayValues = new ArrayList<>();
 	// try (Model.Remodel remodel = comboInfo.getRemodel()) {
 	// 	List<SSListItem> items = remodel.getEventList();
 	// 	for(SSListItem item : items) {
-	// 		options.add(listItemFormat.format(item));
+	// 		displayValues.add(listItemFormat.format(item));
 	// 	}
 	// }
-	// return options;
+	// return displayValues;
 
 	/**
 	 * Retrieves the database column (normally a primary key) from which
-	 * to query the mappings for the bound column.
+	 * to query the keys for the bound column.
 	 *
-	 * @return name of the PK value to query for the bound column mappings
+	 * @return name of the PK value to query for the bound column keys
 	 */
 	public String getPrimaryKeyColumnName() {
 		return primaryKeyColumnName;
@@ -352,7 +349,7 @@ public class DBComboBox2<M,O,O2> extends ComboBox2<M,O,O2>
 		return separator;
 	}
 
-	private boolean hasOption2() {
+	private boolean hasDisplayValue2() {
 		return secondDisplayColumnName != null && !secondDisplayColumnName.isEmpty();
 	}
 
@@ -379,7 +376,7 @@ public class DBComboBox2<M,O,O2> extends ComboBox2<M,O,O2>
 	 */
 	private void queryData() {
 		// this.data.getReadWriteLock().writeLock().lock();
-		try (Model.Remodel remodel = optionModel.getRemodel()) {
+		try (Model.Remodel remodel = keyVisual.getRemodel()) {
 			logger.log(TRACE, () -> sf("%s Clearing eventList.", getColumnForLog()));
 			remodel.clear();
 			nullItem = null;
@@ -392,10 +389,10 @@ public class DBComboBox2<M,O,O2> extends ComboBox2<M,O,O2>
 			try (ResultSet rs = statement.executeQuery(getQuery());) {
 				// Configure the listItemFormat with this queries column types
 				listItemFormat.clear();
-				listItemFormat.addElemType(optionModel.getOptionListItemElemIndex(),
+				listItemFormat.addElemType(keyVisual.getDisplayValueListItemElemIndex(),
 						getJDBCColumnType(rs, rs.findColumn(displayColumnName)));
-				if (hasOption2()) {
-					listItemFormat.addElemType(optionModel.getOption2ListItemElemIndex(),
+				if (hasDisplayValue2()) {
+					listItemFormat.addElemType(keyVisual.getDisplayValue2ListItemElemIndex(),
 							getJDBCColumnType(rs, rs.findColumn(secondDisplayColumnName)));
 				}
 				
@@ -408,22 +405,22 @@ public class DBComboBox2<M,O,O2> extends ComboBox2<M,O,O2>
 					// TODO: Can't use RowSetOps.getColumnObject(comp, class)
 					//       because RSC take a RowSet (not a ResultSet),
 					//       maybe more so because there's the undo/redo stuff.
-					M pk = convertToType(rs.getObject(getPrimaryKeyColumnName()),
-										 getMappingType());
-					O opt = convertToType(rs.getObject(displayColumnName),
-										  getOptionType());
+					K pk = convertToType(rs.getObject(getPrimaryKeyColumnName()),
+										 getKeyType());
+					D opt = convertToType(rs.getObject(displayColumnName),
+										  getDisplayValueType());
 					logger.log(TRACE, () -> sf("%s pk: %s, opt: %s",
 							pk, getColumnForLog(), opt));
-					O2 opt2;
-					if (hasOption2()) {
+					D2 opt2;
+					if (hasDisplayValue2()) {
 						opt2 = convertToType(rs.getObject(secondDisplayColumnName),
-											 getOption2Type());
+											 getDisplayValue2Type());
 						logger.log(TRACE, () -> sf("%s opt2: %s", getColumnForLog(), opt2));
 					} else {
 						opt2 = null;
 					}
 					
-					newItems.add(remodel.createOptionMappingItem(pk, opt, opt2));
+					newItems.add(remodel.createKeyDisplayValueItem(pk, opt, opt2));
 				}
 				remodel.addAll(newItems);
 			}
@@ -460,10 +457,10 @@ public class DBComboBox2<M,O,O2> extends ComboBox2<M,O,O2>
 	}
 
 	/**
-	 * Sets database column (normally a primary key) from which to query the mappings
+	 * Sets database column (normally a primary key) from which to query the keys
 	 * for the bound column.
 	 *
-	 * @param primaryKeyColumnName name of the PK value to query for the bound column mappings
+	 * @param primaryKeyColumnName name of the PK value to query for the bound column keys
 	 */
 	public void setPrimaryKeyColumnName(final String primaryKeyColumnName) {
 		final String oldValue = this.primaryKeyColumnName;
@@ -495,7 +492,7 @@ public class DBComboBox2<M,O,O2> extends ComboBox2<M,O,O2>
 	public void setSecondDisplayColumnName(final String secondDisplayColumnName) {
 		final String oldValue = this.secondDisplayColumnName;
 		this.secondDisplayColumnName = secondDisplayColumnName;
-		optionModel.setOption2Enabled(hasOption2());
+		keyVisual.setDisplayValue2Enabled(hasDisplayValue2());
 		firePropertyChange("secondDisplayColumnName", oldValue, this.secondDisplayColumnName);
 	}
 
@@ -513,29 +510,29 @@ public class DBComboBox2<M,O,O2> extends ComboBox2<M,O,O2>
 
 	/**
 	 * {@inheritDoc }
-	 * @throws IllegalStateException if option2 enabled
+	 * @throws IllegalStateException if displayValue2 enabled
 	 */
 	@Override
-	public void setSelectedOption(O option) {
-		if (hasOption2()) {
-			throw new IllegalStateException("option2 enabled");
+	public void setChosenDisplayValue(D displayValue) {
+		if (hasDisplayValue2()) {
+			throw new IllegalStateException("displayValue2 enabled");
 		}
-		super.setSelectedOption(option);
+		super.setChosenDisplayValue(displayValue);
 	}
 
 	/** {@inheritDoc } */
 	@Override
-	public boolean updateOption(M mapping, O option)
+	public boolean updateDisplayValue(K key, D displayValue)
 	{
 		boolean result = false;
 		try {
-			result = super.updateOption(mapping, option);
+			result = super.updateDisplayValue(key, displayValue);
 		} catch (final Exception e) {
 			logger.log(Level.ERROR, getColumnForLog() + ": Exception.", e);
 		}
 		if (!result) {
-			logger.log(WARNING, () -> sf("%s: Unable to update Mapping of [%s] with Option of '%s'.",
-				getColumnForLog(), mapping, option));
+			logger.log(WARNING, () -> sf("%s: Unable to update Keys of [%s] with DisplayValue of '%s'.",
+				getColumnForLog(), key, displayValue));
 		}
 
 		return result;
@@ -543,21 +540,21 @@ public class DBComboBox2<M,O,O2> extends ComboBox2<M,O,O2>
 
 	/**
 	 * Unconditionally throws UnsupportedOperationException.
-	 * @param options
-	 * @param mappings 
+	 * @param displayValues
+	 * @param keys 
 	 */
 	@Override
-	public void setOptions(List<O> options, List<M> mappings)
+	public void setDisplayValues(List<D> displayValues, List<K> keys)
 	{
 		throw new UnsupportedOperationException("SSDBComboBox doesn't support");
 	}
 
 	/**
 	 * Unconditionally throws UnsupportedOperationException.
-	 * @param options 
+	 * @param displayValues 
 	 */
 	@Override
-	public void setOptions(List<O> options)
+	public void setDisplayValues(List<D> displayValues)
 	{
 		throw new UnsupportedOperationException("SSDBComboBox doesn't support");
 	}
@@ -565,10 +562,10 @@ public class DBComboBox2<M,O,O2> extends ComboBox2<M,O,O2>
 	/**
 	 * Unconditionally throws UnsupportedOperationException.
 	 * @param <T>
-	 * @param enumOption 
+	 * @param enumDisplayValues 
 	 */
 	@Override
-	public <T extends Enum<T>> void setOptions(Class<T> enumOption) {
+	public <T extends Enum<T>> void setDisplayValues(Class<T> enumDisplayValues) {
 		throw new UnsupportedOperationException("SSDBComboBox doesn't support");
 	}
 

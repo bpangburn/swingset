@@ -1,6 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
- * All rights reserved.
+ * Copyright (C) 2025, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,42 +26,34 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- * Contributors:
- *   Prasanth R. Pasala
- *   Brian E. Pangburn
- *   Diego Gil
- *   Man "Bee" Vo
- *   Ernie R. Rael
  * ****************************************************************************/
-package com.nqadmin.swingset.enums;
+package com.nqadmin.swingset.core;
 
 /**
- * Predefined include/exclude options.
- * 
- * @see com.nqadmin.swingset.SSComboBox#setDisplayValues(java.lang.Class)
- * @see com.nqadmin.swingset.SSList#setDisplayValues(java.lang.Class)
- * @since 4.0
+ * A ComboBox that takes only two generices.See {@link ComboBox2} for documentation.
+ * @param <K> mapping type
+ * @param <D> option type
  */
-public enum IncludeExclude {
-	/** Predefined "include" option. */
-	INCLUDE("Include"),
-	/** Predefined "exclude" option. */
-	EXCLUDE("Exclude");
-
-	private final String displayValue;
-
-	private IncludeExclude(String _displayValue) {
-		displayValue = _displayValue;
-	}
-	
+@SuppressWarnings("serial")
+public abstract class ComboBox1<K,D> extends ComboBox2<K, D, Object>
+{
 	/**
-	 * Generate user visible display string.
-	 * @return string to display
+	 * Creates an object of SSComboBox.
 	 */
-	@Override
-	public String toString() {
-		// TODO: lookup internationalization
-		return displayValue;
+	public ComboBox1() {
+		this(ModelType.SWING);
+	}
+
+	/**
+	 * Creates an object of SSComboBox.
+	 * <p>
+	 * If useGlazedLists is specified, it is configured strict.
+	 * Use {@link #getAutoComplete() } to change its configuration
+	 * 
+	 * @param modelType whether to use SWING or GLAZED combo model
+	 */
+	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	public ComboBox1(ModelType modelType) {
+		super(modelType);
 	}
 }

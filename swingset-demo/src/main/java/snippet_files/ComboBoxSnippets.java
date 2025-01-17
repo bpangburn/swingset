@@ -2,10 +2,14 @@ package snippet_files;
 
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.util.List;
 
+import javax.sql.RowSet;
 import javax.sql.rowset.JdbcRowSet;
 import javax.swing.JFrame;
 
+import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.navigate.NavigateActions;
 
@@ -60,4 +64,27 @@ public class ComboBoxSnippets extends JFrame
 		getContentPane().add(combo);
 	}
 	// @end region=init
+
+	void autoGen() {
+		// @start region=auto_gen
+		SSComboBox combo = new SSComboBox();
+		List<String> options = List.of("111", "2222", "33333");
+		combo.setDisplayValues(options);
+		// @end region=auto_gen
+	}
+
+	RowSet rowSet;
+
+	void customKey() {
+		// @start region=custom_key
+		SSComboBox combo = new SSComboBox();
+		List<String> options = List.of("111", "2222", "33333");
+		List<Integer> mappings = List.of(1, 5, 7 );
+		combo.setDisplayValues(options, mappings);
+		
+		// Next line is assuming myrowSet has been initialized
+		// and "my_column" is a column in myrowSet.
+		combo.bind(rowSet,"my_column");
+		// @end region=custom_key
+	}
 }

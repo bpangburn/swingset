@@ -42,413 +42,50 @@
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
-import static com.nqadmin.swingset.models.OptionMappingSwingModel.asOptionMappingSwingModel;
+
+import com.nqadmin.swingset.core.List1;
 
 import java.sql.JDBCType;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
-import javax.swing.JList;
-import javax.swing.ListModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-import java.util.EventListener;
-
-import static java.lang.System.Logger.Level.*;
-
-import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
-import com.nqadmin.swingset.models.OptionMappingSwingModel;
 import com.nqadmin.swingset.models.SSCollectionModel;
-import com.nqadmin.swingset.models.SSDbArrayModel;
-import com.nqadmin.swingset.models.SSListItem;
-import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.utils.SSComponentInterface;
-import com.nqadmin.swingset.utils.SSUtils;
-
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
- * Provides a way to display a list of elements and map them to corresponding
- * database codes.
- * These mappings are typically provided by {@code setOptions} method;
- * if provided mappings are null they default to zero to N-1.
- * The mappings for the selected {@code JList} values are stored in a DB as
- * controlled by a {@link com.nqadmin.swingset.models.SSCollectionModel};
- * if not specified {@link com.nqadmin.swingset.models.SSDbArrayModel} is
- * used by default and this model saves the selected mappings in a column of
- * type {@code JDBCType.ARRAY}.
- * 
- * {@snippet class=ListSnippets region=init1}
- * From the example above, if three values VLarge, medium, small are selected the
- * array element in the database will store {100.0,5.0,1.0}
- * 
- * @see OptionMappingSwingModel
+ * See {@link List1}.
  */
-// TODO: this should be class SSList<M,O>
+// TODO: Long or Integer?
 @SuppressWarnings("serial")
-public class SSList extends JList<SSListItem> implements SSComponentInterface {
-
+public class SSList extends List1<Object,String> implements SSComponentInterface
+{
 	/**
-	 * Listener(s) for the component's value used to propagate changes back to bound
-	 * text field.
+	 * Creates an object of SSList with key type of {@code JDBCType.INTEGER}.
 	 */
-	@SuppressWarnings("serial")
-	protected class SSListListener implements ListSelectionListener
+	public SSList()
 	{
-		/** {@inheritDoc} */
-		@Override
-		public void valueChanged(final ListSelectionEvent e)
-		{
-			// While adjusting don't need to update the database.
-			if (e.getValueIsAdjusting())
-				return;
-
-			dbChange(() -> updateRowSet());
-		}
-	}
-
-	private static class Model extends OptionMappingSwingModel<Object, String, Object> {
-		static Model install(JList<SSListItem> _jl) {
-			Model model = new Model();
-			AbstractComboBoxListSwingModel.install(_jl, model);
-			return model;
-		}
-
-		private Model() {
-			// false means no Options2
-			super(false);
-		}
-	}
-
-	private Model optionSwingModel;
-
-	/**
-	 * Log4j Logger for component
-	 */
-	private static final Logger logger = SSUtils.getLogger();
-
-	/**
-	 * This model read/write the database
-	 */
-	private SSCollectionModel selectedDBModel;
-
-	/**
-	 * Creates an object of SSList with mapping type of {@code JDBCType.INTEGER}.
-	 */
-	public SSList() {
 		// 2022-05-04: Changing from JDBCType.NULL to INTEGER as that will be the most likely
-		//  mapping type and NULL is known to generate errors.
+		//  key type and NULL is known to generate errors.
 		this(JDBCType.INTEGER);
 	}
 
 	/**
-	 * Creates an object of SSList with default
-	 * of {@link com.nqadmin.swingset.models.SSDbArrayModel}.
+	 * Creates a List1 with default
+	 * of {@link com.nqadmin.swingset.models.SSDbArrayModel}
+	 * of specified jdbcType.
 	 *
-	 * @param _jdbcType type of mapping of database elements
+	 * @param jdbcType type of key of database elements
 	 */
-	public SSList(JDBCType _jdbcType) {
-		// TODO: select proper model through the **DbPlugin**.
-		this(new SSDbArrayModel(_jdbcType));
+	public SSList(JDBCType jdbcType)
+	{
+		super(jdbcType);
 	}
 
 	/**
-	 * @param _collectionModel model to read/write the database
-	 */
-	@SuppressWarnings("LeakingThisInConstructor")
-	public SSList(SSCollectionModel _collectionModel) {
-		this.selectedDBModel = _collectionModel;
-
-		finishSSCommon();
-
-		// last line of constructor safe to access this
-		Model.install(this);
-
-		// uncomment this to run some tests
-		// testStuff(this);
-	}
-
-	/**
-	 * Returns the underlying values for each of the items in the list box (e.g. the
-	 * database values that map to the items displayed in the list box)
+	 * Creates a List1 with specified model.
 	 *
-	 * @return the mapping values for the items displayed in the list box
+	 * @param collectionModel model to read/write the database
 	 */
-	public List<Object> getMappings() {
-		return  optionSwingModel.getMappings();
-	}
-
-	/**
-	 * Returns the items displayed in the list box.
-	 *
-	 * @return the items displayed in the list box
-	 */
-	public List<String> getOptions() {
-		return optionSwingModel.getOptions();
-	}
-
-	/**
-	 * Leave this here so it's use can be detected.
-	 * @deprecated Use {@link #getSelectedMappings()} instead.
-	 */
-	@Deprecated
-	@Override
-	public Object[] getSelectedValues() {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Leave this here so it's use can be detected.
-	 * @deprecated Use {@link #getSelectedMappings()} instead.
-	 */
-	@Deprecated
-	@Override
-	public List<SSListItem> getSelectedValuesList()
+	public SSList(SSCollectionModel collectionModel)
 	{
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @return a list with the mappings values corresponding to the selected indices
-	 */
-	public List<Object> getSelectedMappings() {
-		return Arrays.stream(getSelectedIndices())
-				.mapToObj((index) -> optionSwingModel.getMappings().get(index))
-				.collect(Collectors.toList());
-	}
-	
-	/**
-	 * @return a list with the options values corresponding to the selected indices
-	 */
-	public List<Object> getSelectedOptions() {
-		return Arrays.stream(getSelectedIndices())
-				.mapToObj((index) -> optionSwingModel.getOptions().get(index))
-				.collect(Collectors.toList());
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * Set up OptionMappingSwingModel if parameter matches.
-	 */
-	// TODO: Tag the models with an interface, exception if not.
-	//		 Then setListData will cause an exception.
-	@Override
-	public void setModel(ListModel<SSListItem> _model) {
-		OptionMappingSwingModel<?, ?, ?> model = asOptionMappingSwingModel(_model);
-		optionSwingModel = model instanceof Model ? (Model)model : null;
-
-		super.setModel(_model);
-	}
-
-	/**
-	 * Convenience method for accessing the model with proper casting.
-	 * 
-	 * @return mapping list model with proper casting
-	 */
-	//
-	// TODO: Don't think this is needed, or desirable, but for testing...
-	//
-	OptionMappingSwingModel<Object, String, Object> getOptionModel() {
-		return optionSwingModel;
-	}
-
-	/**
-	 * Sets the options to be displayed in the list box;
-	 * a zero to N-1 mapping is established.
-	 * 
-	 * @param _options  options to be displayed in the list box.
-	 */
-	public void setOptions(List<String> _options) {
-		setOptions(_options, null);
-	}
-
-	/**
-	 * Sets the options to be displayed in the combo box based on
-	 * the enum class' value's toString(). Generate a {@literal [0-N)}
-	 * mapping.
-	 *
-	 * @param <T> inferred enum type
-	 * @param _enumOptions enum class with values to display
-	 */
-	public <T extends Enum<T>> void setOptions(Class<T> _enumOptions) {
-		// Could mark known enums for special handling,
-		// Could have a special method for getting the display string.
-		// But what's wrong with toString()
-
-		setOptions(Stream.of(_enumOptions.getEnumConstants())
-				.map((t) -> t.toString()).collect(Collectors.toList()));
-	}
-
-	/**
-	 * Sets the options to be displayed in the list box along with
-	 * their corresponding mappings to database values. If {@code _mappings}
-	 * is null, then a zero to N-1 mapping is automatically established.
-	 * 
-	 * @param _options  options to be displayed in the list box.
-	 * @param _mappings null or database values that correspond to the options, 1 to 1, in
-	 *					the list box.
-	 * @throws IllegalArgumentException if lists are not the same size.
-	 */
-	public void setOptions(List<String> _options, List<Object> _mappings) {
-		Objects.requireNonNull(_options);
-		try (Model.Remodel remodel = optionSwingModel.getRemodel()) {
-			if (_mappings != null && _options.size() != _mappings.size()) {
-				throw new IllegalArgumentException("Options and Mappings must be the same length");
-			}
-			
-			//autoGeneratedMapping = false;
-			List<Object> mappings1 = _mappings;
-			if (mappings1 == null) {
-				// TODO: handle both INT and LONG
-				// Provide a [0,N) mapping
-				mappings1 = IntStream.range(0, _options.size())
-						.collect(ArrayList::new, List::add, List::addAll);
-				//autoGeneratedMapping = true;
-			}
-
-			List<String> opts = optionSwingModel.getDisconnectedList(_options);
-			mappings1 = optionSwingModel.getDisconnectedList(mappings1);
-			
-			remodel.clear();
-			remodel.addAll(mappings1, opts);
-		}
-	}
-
-	/**
-	 * Selects appropriate elements in the list box
-	 *
-	 * @param _selectedMappings Values to be selected in list
-	 */
-	public void setSelectedValues(final Object[] _selectedMappings) {
-		setSelectedIndices(Arrays.stream(_selectedMappings)
-				.mapToInt(o -> optionSwingModel.getMappings().indexOf(o))
-				.toArray());
-	}
-
-	/**
-	 * updates the corresponding column of the rowset with the values selected in
-	 * the list
-	 */
-	protected void updateRowSet() {
-		try {
-			selectedDBModel.writeData(this, getSelectedMappings().toArray());
-		} catch (final SQLException se) {
-			logger.log(Level.ERROR, () -> sf("%s: SQL Exception.", getColumnForLog()), se);
-		}
-	}
-
-	/** {@inheritDoc } */
-	@Override
-	public void undoRedoUpdateObject(NavigateActions.UndoRedo cmd, Object value) throws SQLException
-	{
-		SSComponentInterface.super.undoRedoUpdateObject(cmd, value);
-		// TODO: does the following seem right
-				// - If there is a selection, and none of the selection is visible
-				//   then pick something an make sure it's visible.
-				// - Diff the selection change and do a highlight based on that.
-				//   If change adds something, then disply it.
-				//   If change takes something away, what's the right thing.
-
-		// After doing the undo/redo, make sure something selected is visible
-		//SwingUtilities.invokeLater(() -> this.hidePopup());
-	}
-
-	/** {@inheritDoc } */
-	@Override
-	public void cleanField()
-	{
-		clearSelection();
-	}
-
-	/**
-	 * Updates the value stored and displayed in the SwingSet component based on
-	 * getBoundColumnText()
-	 * <p>
-	 * Call to this method should be coming from SSCommon and should already have
-	 * the Component listener removed
-	 */
-	public void updateComponent() {
-
-		if (optionSwingModel == null) {
-			return;
-		}
-
-		Object[] array = null;
-		//
-		// TODO: Should getBoundColumnObject() be used here?
-		//		 Seems like it, it's used just about everywhere else.
-		//
-		try {
-			if (getRowSet().getRow() > 0) {
-				array = selectedDBModel.readData(SSList.this);
-			}
-		} catch (final SQLException se) {
-			logger.log(Level.ERROR, () -> sf("%s: SQL Exception.", getColumnForLog()), se);
-		}
-		
-		if (array == null) {
-			logger.log(DEBUG, () -> sf("%s: Array is null. Clearing selection.", getColumnForLog()));
-			clearSelection();
-			return;
-		}
-
-		Object[] finalArray = array;
-		logger.log(DEBUG, () -> sf("%s: Updating component with array of %s.", getColumnForLog(), Arrays.toString(finalArray)));
-		setSelectedValues(finalArray);
-	}
-
-	private Hook hook;
-
-	/** {@inheritDoc } */
-	@Override
-	public final Hook getSSComponentHook()
-	{
-		if (hook == null)
-			hook = new Hook(this) {
-				@Override
-				protected void updateSSComponent()
-				{
-					updateComponent();
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected SSListListener getSSComponentListener() {
-					return new SSListListener();
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected void addSSComponentListener(EventListener eventListener)
-				{
-					addListSelectionListener((ListSelectionListener) eventListener);
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected void removeSSComponentListener(EventListener eventListener)
-				{
-					removeListSelectionListener((ListSelectionListener) eventListener);
-				}
-				
-			};
-		return hook;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public String toString()
-	{
-		return sf("%s{items=%s, %s}", getClass().getSimpleName(),
-				getSelectedMappings(), SSUtils.ssComponentToString(this));
+		super(collectionModel);
 	}
 }

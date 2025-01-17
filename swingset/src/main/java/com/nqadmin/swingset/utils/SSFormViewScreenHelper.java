@@ -168,7 +168,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			// FOR SOME DATABASES LIKE H2, WE HAVE TO REQUERY THE ROWSET
 				updateScreen();
 			} else {
-				getComboNav().removeMapping(pkOfDeletedRecord);
+				getComboNav().removeKey(pkOfDeletedRecord);
 			}
 			ssDBNavPerformPostDeletionOps();
 			pkOfDeletedRecord=null;
@@ -624,7 +624,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * Set the Options for any SSComboBoxes (not SSDBComboBoxes).
 	 * <p>
 	 * E.g.,
-	 * {@code #mySSCombobox.setOptions(Arrays.asList(new String[] { "Red", "Green", "Blue" }));}
+	 * {@code #mySSCombobox.setDisplayValues(Arrays.asList(new String[] { "Red", "Green", "Blue" }));}
 	 */
 	protected abstract void populateSSComboBoxes();
 	

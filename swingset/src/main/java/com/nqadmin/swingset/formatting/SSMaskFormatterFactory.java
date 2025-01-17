@@ -255,7 +255,6 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		 * @param builder (null is for testing)
 		 * @throws ParseException 
 		 */
-		// package so tests can access
 		protected SSMaskFormatter(Builder<?> builder) throws ParseException
 		{
 			super(builder != null ? builder.mask : "");

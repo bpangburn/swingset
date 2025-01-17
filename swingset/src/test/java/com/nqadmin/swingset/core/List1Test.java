@@ -27,9 +27,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset;
+package com.nqadmin.swingset.core;
 
-import java.util.Arrays;
+import java.sql.JDBCType;
+
+
 import java.util.Collections;
 import java.util.List;
 
@@ -39,18 +41,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.nqadmin.swingset.models.OptionMappingSwingModel;
+import com.nqadmin.swingset.models.KeyDisplayValueSwingModel;
+import com.nqadmin.swingset.utils.SSComponentInterface;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * SSListTest.
+ * List1.
  */
-public class SSListTest
+public class List1Test
 {
 	
 	/** x */
-	public SSListTest()
+	public List1Test()
 	{
 	}
 	
@@ -79,37 +82,53 @@ public class SSListTest
 	}
 
 	/**
-	 * Test of getSelectedMappings method, of class SSList;
-	 * Also getSelectedOptions.
+	 * MyList
+	 */
+	@SuppressWarnings("serial")
+	class MyList extends List1<Object,String> implements SSComponentInterface
+	{
+		/** x */
+		public MyList()
+		{
+			// 2022-05-04: Changing from JDBCType.NULL to INTEGER as that will
+			// be the most likely key type and NULL is known to generate errors.
+			super(JDBCType.INTEGER);
+		}
+	}
+
+	/**
+	 * Test of getChosenKeys method, of class List1;
+ Also getChosenDisplayValues.
 	 */
 	@Test
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public void testGetSelectedMappingsAndOptions()
+	public void testGetChosenMappingsAndOptions()
 	{
-		System.out.println("getSelectedMappings");
+		System.out.println("getChosenKeys");
 
-		SSList list = new SSList();
-		List<Object> result;
+		MyList list = new MyList();
+		List<Object> resultKeys;
+		List<String> resultDisplayValues;
 
-		result = list.getSelectedMappings();
-		assertEquals(Collections.emptyList(), result);
-		result = list.getSelectedOptions();
-		assertEquals(Collections.emptyList(), result);
+		resultKeys = list.getChosenKeys();
+		assertEquals(Collections.emptyList(), resultKeys);
+		resultDisplayValues = list.getChosenDisplayValues();
+		assertEquals(Collections.emptyList(), resultDisplayValues);
 
 		List<String> options = List.of("zero", "one", "two", "three");
-		list.setOptions(options);
+		list.setDisplayValues(options);
 
-		result = list.getSelectedMappings();
-		assertEquals(Collections.emptyList(), result);
-		result = list.getSelectedOptions();
-		assertEquals(Collections.emptyList(), result);
+		resultKeys = list.getChosenKeys();
+		assertEquals(Collections.emptyList(), resultKeys);
+		resultDisplayValues = list.getChosenDisplayValues();
+		assertEquals(Collections.emptyList(), resultDisplayValues);
 
-		list.setSelectedValues(new Integer[] {1, 2});
+		list.setChosenKeys(new Integer[] {1, 2});
 
-		result = list.getSelectedMappings();
-		assertEquals(List.of(1, 2), result);
-		result = list.getSelectedOptions();
-		assertEquals(List.of("one", "two"), result);
+		resultKeys = list.getChosenKeys();
+		assertEquals(List.of(1, 2), resultKeys);
+		resultDisplayValues = list.getChosenDisplayValues();
+		assertEquals(List.of("one", "two"), resultDisplayValues);
 	}
 
 	/**
@@ -121,19 +140,19 @@ public class SSListTest
 	{
 		System.out.println("Shadows");
 
-		SSList ssList = new SSList();
-		OptionMappingSwingModel<Object, String, Object> optionModel = ssList.getOptionModel();
+		MyList myList = new MyList();
+		KeyDisplayValueSwingModel<Object, String, Object> optionModel = myList.getSwingModel();
 		List<String> listItems = List.of("LI 1","LI 2", "LI 3", "LI 4", "LI 5", "LI 6", "LI 7");
 		List<Object> listCodes = List.of(1,2,3,4,5,6,7);
 		List<String> otherOptions = List.of("one", "two", "three", "four");
 		List<Object> otherMappings = List.of("oneM", "twoM", "threeM", "fourM");
-		OptionMappingSwingModel<Object, String, Object>.Remodel remodel
+		KeyDisplayValueSwingModel<Object, String, Object>.Remodel remodel
 				= optionModel.getRemodel();
 
 		// Set up a map with "LI N" --> N, for example: "LI 1" --> 1
-		ssList.setOptions(listItems, listCodes);
+		myList.setDisplayValues(listItems, listCodes);
 
-		List<Object> mappings = optionModel.getMappings();
+		List<Object> mappings = optionModel.getKeys();
 		boolean isShadow = optionModel.hasShadow(mappings);
 		assertEquals(true, isShadow);
 		isShadow = optionModel.hasShadow(listCodes);
@@ -144,18 +163,18 @@ public class SSListTest
 
 		assertEquals(expect1, optionModel.dump());
 		// auto generated, [0,N)
-		ssList.setOptions(listItems);
+		myList.setDisplayValues(listItems);
 		assertEquals(expect0, optionModel.dump());
 
 		// back to original
-		ssList.setOptions(listItems, listCodes);
+		myList.setDisplayValues(listItems, listCodes);
 		assertEquals(expect1, optionModel.dump());
 		
-		ssList.setOptions(otherOptions); // WARN old discarded
+		myList.setDisplayValues(otherOptions); // WARN old discarded
 		assertEquals("{one,0}{two,1}{three,2}{four,3}", optionModel.dump());
 
 		// back to original
-		ssList.setOptions(listItems, listCodes);
+		myList.setDisplayValues(listItems, listCodes);
 		assertEquals(expect1, optionModel.dump());
 
 		remodel.clear();
@@ -163,24 +182,24 @@ public class SSListTest
 
 		// different sizes
 		assertThrows(IllegalArgumentException.class,
-					 () -> ssList.setOptions(otherOptions, listCodes));
+					 () -> myList.setDisplayValues(otherOptions, listCodes));
 		assertEquals("", optionModel.dump());
 
 		// check shadows
 		// If shadows are used, there are exceptions and empty lists; but
-		// shadows should be copied when populating SSList, see getDisconnectedList()
+		// shadows should be copied when populating List1, see getDisconnectedList()
 
 		String expect = "{one,oneM}{two,twoM}{three,threeM}{four,fourM}";
-		ssList.setOptions(otherOptions , otherMappings);
+		myList.setDisplayValues(otherOptions , otherMappings);
 		assertEquals(expect, optionModel.dump());
 
-		ssList.setOptions(optionModel.getOptions(), otherMappings);
+		myList.setDisplayValues(optionModel.getDisplayValues(), otherMappings);
 		assertEquals(expect, optionModel.dump());
 
-		ssList.setOptions(otherOptions, optionModel.getMappings());
+		myList.setDisplayValues(otherOptions, optionModel.getKeys());
 		assertEquals(expect, optionModel.dump());
 
-		ssList.setOptions(optionModel.getOptions(), optionModel.getMappings());
+		myList.setDisplayValues(optionModel.getDisplayValues(), optionModel.getKeys());
 		assertEquals(expect, optionModel.dump());
 
 		remodel.close();

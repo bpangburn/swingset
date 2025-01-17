@@ -62,7 +62,7 @@
  * is generally the item which is visible in a {@code JComboBox}
  * or {@code JList}. Additionally these classes implement ListModel
  * and MutableComboBoxModel; they can be installed into either.
- * {@link com.nqadmin.swingset.models.GlazedListsOptionMappingInfo}
+ * {@link com.nqadmin.swingset.models.GlazedListsKeyDisplayValueInfo}
  * works with {@code GlazedLists} auto completion.
  * 
  * @since 4.0.0

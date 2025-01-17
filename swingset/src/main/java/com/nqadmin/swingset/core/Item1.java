@@ -27,34 +27,34 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset;
+package com.nqadmin.swingset.core;
+
+import com.nqadmin.swingset.models.SSListItem;
 
 /**
- * A ComboBox that takes only two generices.
- * See {@link ComboBox2} for documentation.
- * @param <M> mapping type
- * @param <O> option type
+ * An item that acts kind of like a standalone SSListItem.
+ * 
+ * @param <K>
+ * @param <D> 
  */
-@SuppressWarnings("serial")
-public abstract class ComboBox<M,O> extends ComboBox2<M, O, Object>
+public class Item1<K,D> extends Item2<K,D,Object>
 {
 	/**
-	 * Creates an object of SSComboBox.
+	 * Create immutable item.
+	 * @param key
+	 * @param displayValue
 	 */
-	public ComboBox() {
-		this(ModelType.SWING);
+	public Item1(K key, D displayValue)
+	{
+		super(key, displayValue);
 	}
-
+	
 	/**
-	 * Creates an object of SSComboBox.
-	 * <p>
-	 * If useGlazedLists is specified, it is configured strict.
-	 * Use {@link #getAutoComplete() } to change its configuration
-	 * 
-	 * @param modelType whether to use SWING or GLAZED combo model
+	 * Create immutable item based on SSListItem.
+	 * @param listItem
 	 */
-	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-	public ComboBox(ModelType modelType) {
-		super(modelType);
+	public Item1(SSListItem listItem)
+	{
+		super(listItem, false);
 	}
 }
