@@ -217,7 +217,7 @@ public abstract class AbstractComboBoxListSwingModel {
 
 	/**
 	 * Construct a info container; if the specified itemList is
-	 * null an array list is created.Only use this method directly
+	 * null an array list is created. Only use this method directly
  if you are sure you must.<p>
 	 * If an itemList is passed in, <b>lose the reference</b>;
 	 * if the list, or its contents, are modified directly
@@ -375,7 +375,7 @@ public abstract class AbstractComboBoxListSwingModel {
 	}
 
 	/**
-	 * Installs the specified ListCellRenderer into the JComponent.The model is installed into the JComponent as a convenience.
+	 * Installs the specified ListCellRenderer into the JComponent. The model is installed into the JComponent as a convenience.
 	 * 
 	 * @param jc Jcomponent to set up with model
 	 * @param model associated model
@@ -1112,7 +1112,7 @@ public abstract class AbstractComboBoxListSwingModel {
 	}
 
 	/**
-	 * Create a list slice of the item list.There is no checking on the
+	 * Create a list slice of the item list. There is no checking on the
  element index.<p>
 	 * If a returned element slice is not valid according to the
 	 * itemNumElems property, {@link #setItemNumElems},

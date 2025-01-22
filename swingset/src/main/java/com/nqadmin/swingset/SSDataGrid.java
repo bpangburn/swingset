@@ -1492,7 +1492,7 @@ public class SSDataGrid extends JTable
 	/**
 	 * Sets the column numbers that should be hidden. The SSDataGrid sets the column
 	 * width of these columns to 0. The columns are set to zero width rather than
-	 * removing the column from the table. Thus preserving the column numbering.If a
+	 * removing the column from the table. Thus preserving the column numbering. If a
 	 * column is removed then the column numbers for columns after the removed
 	 * column will change. Make sure that you specify the hidden column numbers in
 	 * the uneditable column list.

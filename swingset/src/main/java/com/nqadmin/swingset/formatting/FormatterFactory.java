@@ -49,7 +49,7 @@ public abstract class FormatterFactory extends DefaultFormatterFactory
 	private final BiFunction<JFormattedTextField, AbstractFormatter, Boolean> containsUserText;
 
 	/**
-	 * To build a new FormatterFactory with the specified parameters.Unless noted,
+	 * To build a new FormatterFactory with the specified parameters. Unless noted,
 	 * a parameter is used when constructing the MaskFormatter.<p>
 	 * <p>
 	 * @see <em>Effective Java</em> Item 2 about override.
@@ -73,7 +73,7 @@ public abstract class FormatterFactory extends DefaultFormatterFactory
 		 * @return  builder */
 		public T ssFormat(SSFormat val) { ssFormat = val; return self(); }
 		/**
-		 *  This overrides the default check for user input data present.The default
+		 *  This overrides the default check for user input data present. The default
 		 * check is done using {@link FormatterAssist#userText(java.lang.String,
 		 * java.lang.String, java.lang.String, java.lang.Character)}. If set, this
 		 * is used by {@link SSFormattedTextField#containsUserText() }.

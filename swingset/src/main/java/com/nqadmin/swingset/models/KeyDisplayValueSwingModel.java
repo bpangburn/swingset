@@ -173,7 +173,7 @@ public class KeyDisplayValueSwingModel<K,D,D2> extends AbstractComboBoxListSwing
 	
 	/**
 	 * Change whether the layout of an SSListItem managed by this class
-	 * contains an displayValue.An exception is thrown if the item list is not empty. An
+	 * contains an displayValue. An exception is thrown if the item list is not empty. An
  existing displayValue2 list {@link #getDisplayValues2}
 	 * is invalidated or validated accordingly.
 	 * @param displayValue2Enabled true if list item shall contain displayValue
@@ -433,7 +433,7 @@ public class KeyDisplayValueSwingModel<K,D,D2> extends AbstractComboBoxListSwing
 		}
 		
 		/**
-		 * Add list items with the specified contents.The input lists shall be the same size.
+		 * Add list items with the specified contents. The input lists shall be the same size.
 		 * @param keys list of key values (primary keys)
 		 * @param displayValues list of display info 
 		 * @return the new list item
@@ -443,7 +443,7 @@ public class KeyDisplayValueSwingModel<K,D,D2> extends AbstractComboBoxListSwing
 		}
 
 		/**
-		 * Add list items with the specified contents.The input lists shall be the same size.
+		 * Add list items with the specified contents. The input lists shall be the same size.
 		 * @param keys list of values (often a primary key)
 		 * @param displayValues display info derived from this
 		 * @param displayValues2 additional display info
@@ -461,7 +461,7 @@ public class KeyDisplayValueSwingModel<K,D,D2> extends AbstractComboBoxListSwing
 
 		/**
 		 * Create an SSListItem with the specified contents
-		 * and add it to the item list.The input lists shall be the same size.
+		 * and add it to the item list. The input lists shall be the same size.
 		 * @param key list of key values key value (primary key)
 		 * @param displayValue display info
 		 * @return the new list item
@@ -472,7 +472,7 @@ public class KeyDisplayValueSwingModel<K,D,D2> extends AbstractComboBoxListSwing
 
 		/**
 		 * Create an SSListItem with the specified contents
-		 * and add it to the item list.The input lists shall be the same size.
+		 * and add it to the item list. The input lists shall be the same size.
 		 * @param key commonly a primary key
 		 * @param displayValue display info derived from this
 		 * @param displayValue2 additional display info

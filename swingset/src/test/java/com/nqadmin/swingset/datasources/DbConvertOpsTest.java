@@ -141,7 +141,7 @@ public class DbConvertOpsTest
 	{
 		System.out.println("Metadata");
 
-		g_rs = H2.getRowSet("""
+		g_rs = H2.getRowSetCleanDB("""
             CREATE TABLE tbl
             (
                 c_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,
@@ -209,7 +209,7 @@ public class DbConvertOpsTest
 	{
 		System.out.println("NumericConversions by updateObject");
 
-		g_rs = H2.getRowSet("""
+		g_rs = H2.getRowSetCleanDB("""
             CREATE TABLE tbl
             (
                 c_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,
@@ -301,7 +301,7 @@ public class DbConvertOpsTest
 	{
 		System.out.println("DateConversions");
 
-		g_rs = H2.getRowSet("""
+		g_rs = H2.getRowSetCleanDB("""
             CREATE TABLE tbl
             (
                 c_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,
@@ -405,7 +405,7 @@ public class DbConvertOpsTest
 		// updateColumnText("c_nchar", "three", "three");
 
 
-		// g_rs = H2.getRowSet("""
+		// g_rs = H2.getRowSetCleanDB("""
         //     CREATE TABLE tbl
         //     (
         //         c_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,

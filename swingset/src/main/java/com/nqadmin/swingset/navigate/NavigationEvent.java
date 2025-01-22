@@ -27,33 +27,32 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset.core;
+package com.nqadmin.swingset.navigate;
+
+import java.util.EventObject;
 
 /**
- * A ComboBox that takes only two generices. See {@link ComboBox2} for documentation.
- * @param <K> mapping type
- * @param <D> option type
+ * Base for events broadcast from {@link NavigationModel}.
  */
 @SuppressWarnings("serial")
-public abstract class ComboBox1<K,D> extends ComboBox2<K, D, Object>
+public abstract class NavigationEvent extends EventObject
 {
 	/**
-	 * Creates an object of SSComboBox.
+	 * 
+	 * @param source originating NavigationModel
 	 */
-	public ComboBox1() {
-		this(ModelType.SWING);
+	public NavigationEvent(NavigationModel source)
+	{
+		super(source);
 	}
 
 	/**
-	 * Creates an object of SSComboBox.
-	 * <p>
-	 * If useGlazedLists is specified, it is configured strict.
-	 * Use {@link #getAutoComplete() } to change its configuration
-	 * 
-	 * @param modelType whether to use SWING or GLAZED combo model
+	 * A NavigationModel.
+	 * @return NavigationModel that issued the event
 	 */
-	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-	public ComboBox1(ModelType modelType) {
-		super(modelType);
+	@Override
+	public NavigationModel getSource() {
+		return (NavigationModel) super.getSource();
 	}
+			
 }

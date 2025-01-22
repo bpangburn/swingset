@@ -326,7 +326,7 @@ public class SSMaskFormatterFactory extends FormatterFactory
 		/**
 		 * First convert the string with super.stringToValue,
 		 * then use the converter (if there is one) to create
-		 * the value object.This may be setEditValid arg.
+		 * the value object. This may be setEditValid arg.
 		 * @param masked
 		 * @return value for SSFTF
 		 * @throws ParseException 

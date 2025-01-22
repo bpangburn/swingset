@@ -44,6 +44,9 @@ Should decorator check component error state (from navigator)...
 ================================================================================
 
 ---
+Change RowSet to ResultSet as much as possbile.
+
+---
 Rename swingset/utils package to swingset/base
 
 ---

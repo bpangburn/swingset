@@ -76,7 +76,7 @@ public class Utils
 	{
 		// May want to extend to handling local EventBus per Frame/Panel;
 		// Use either/both source/rs to find a local eventBus.
-		getLocalEventBus(source, source.getRowSet())
+		Utils.getGlobalEventBus(source, source.getRowSet())
 				.post(new RowSetModificationEvent(source, value));
 	}
 
@@ -87,7 +87,7 @@ public class Utils
 	 */
 	public static void postRowSetModifiedError(SSComponentInterface source, Object value)
 	{
-		getLocalEventBus(source, source.getRowSet())
+		Utils.getGlobalEventBus(source, source.getRowSet())
 				.post(new RowSetModificationEvent(source, value, true));
 	}
 
@@ -100,7 +100,7 @@ public class Utils
 	public static void postRowSetUndoRedo(SSComponentInterface source, Object value,
 									boolean isError)
 	{
-		getLocalEventBus(source, source.getRowSet())
+		Utils.getGlobalEventBus(source, source.getRowSet())
 				.post(new RowSetUndoRedoEvent(source, value, isError));
 	}
 	
@@ -142,14 +142,15 @@ public class Utils
 
 	// Maybe get rid of this idea of localEventBus.
 
+	// Find the EventBus associated with the NavGroup to which
+	// the component belongs.
 	/**
-	 * Find the EventBus associated with the NavGroup to which
-	 * the component belongs.
+	 * Find the global event bus; arguments are ignored.
 	 * @param component typically JComponent that wants the eventBus
 	 * @param rs RowSet involved in EventBus
 	 * @return component's NavGroup EventBus
 	 */
-	public static EventBus getLocalEventBus(Object component, RowSet rs)
+	public static EventBus getGlobalEventBus(Object component, RowSet rs)
 	{
 		// TODO: per navigator or per row set or per NavGroup event bus
 		// TODO: get rid of this method, create local event bus

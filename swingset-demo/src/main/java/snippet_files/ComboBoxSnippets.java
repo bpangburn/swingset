@@ -11,6 +11,8 @@ import javax.swing.JFrame;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
+import com.nqadmin.swingset.core.ComboBox1;
+import com.nqadmin.swingset.core.Item1;
 import com.nqadmin.swingset.navigate.NavigateActions;
 
 /**
@@ -87,4 +89,20 @@ public class ComboBoxSnippets extends JFrame
 		combo.bind(rowSet,"my_column");
 		// @end region=custom_key
 	}
+
+	/** x */
+	@SuppressWarnings("serial")
+	// @start region=chosen_item
+	public class ComboBoxIntString extends ComboBox1<Integer, String> {
+		public static class Item extends Item1<Integer, String> {
+			public Item(Integer getKey, String getDisplayValue) {
+				super(getKey, getDisplayValue);
+			}
+		}
+		@Override
+		public Item getChosenItem() {
+			return new Item(getChosenKey(), getChosenDisplayValue());
+		}
+	}
+	// @end region=chosen_item
 }

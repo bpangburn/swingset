@@ -46,7 +46,7 @@ import com.nqadmin.swingset.core.ComboBox1;
 
 /**
  * This class provides a ComboBox with an Integer key and String value.
- * See {@link ComboBox2} for detailed documentation.
+ * See {@link com.nqadmin.swingset.core.ComboBox2} for detailed documentation.
  */
 @SuppressWarnings("serial")
 public class SSComboBox extends ComboBox1<Integer, String>

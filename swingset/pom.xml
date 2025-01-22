@@ -139,6 +139,11 @@
 			<artifactId>org-openide-util-lookup</artifactId>
 			<version>${version.netbeans}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.netbeans.api</groupId>
+			<artifactId>org-openide-util</artifactId>
+			<version>${version.netbeans}</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 		<dependency>
 			<groupId>com.google.guava</groupId>

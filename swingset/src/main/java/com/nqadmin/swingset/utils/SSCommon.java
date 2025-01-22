@@ -46,10 +46,10 @@ import java.awt.AWTKeyStroke;
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
-
-import com.nqadmin.swingset.decorators.BorderDecorator;
-
 import java.awt.event.KeyEvent;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.JDBCType;
 import java.sql.SQLException;
@@ -58,6 +58,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
@@ -71,31 +72,31 @@ import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-import java.nio.file.Path;
-import java.util.function.Supplier;
-
-import static java.lang.System.Logger.Level.*;
-
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.datasources.SSSQLConversionException;
 import com.nqadmin.swingset.datasources.SSSQLInternalException;
 import com.nqadmin.swingset.datasources.SSSQLNullException;
+import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.formatting.SSFormat;
 import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
+import com.nqadmin.swingset.navigate.NavigationModel;
+import com.nqadmin.swingset.navigate.NavigationRowSetEvent;
 import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.utils.SSUtils.DebugRowSetListener;
+import com.raelity.lib.eventbus.WeakEventBus;
+import com.raelity.lib.eventbus.WeakSubscribe;
 
+import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
 import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingChanges;
+import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
 import static com.nqadmin.swingset.navigate.Utils.postRowSetModifiedError;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
-import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Datasource binding data members and methods common to all SwingSet
@@ -162,13 +163,58 @@ final class SSCommon
 										: partialSSCommon.finishInit();
 	}
 
+	private final BusReceiver busReceiver; // Must have a strong reference.
 
 	/**
 	 * Listener(s) for the underlying RowSet used to update the bound SwingSet
-	 * component. When working with a {@linkplain javax.sql.rowset.CachedRowSet} there are
-	 * extra steps involved which require the listener to ignore some events,
-	 * see {@link RowSetState#acceptChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable) }.
+	 * component.
+	 * When working with a {@linkplain javax.sql.rowset.CachedRowSet} there are
+	 * extra steps involved which require the listener to ignore some events, see
+	 * {@link NavigationModel#addRowSetEvent(com.nqadmin.swingset.navigate.NavigationRowSetEvent.RowSetEventType, javax.sql.RowSetEvent) } and
+	 * {@link RowSetState#acceptChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable) }.
 	 */
+	class BusReceiver {
+		/**
+		 * Catch RowSet events; update the component's display.
+		 * Ignore events that came from this component; they are handled internally.
+		 * Only events from "our" RowSet are handled.
+		 * @param ev 
+		 */
+		@WeakSubscribe
+		public void handleRowSetEvent(NavigationRowSetEvent ev)
+		{
+			logger.log(DEBUG, () -> sf("%s %s %s",
+					getColumnForLog(), getRowSet(), ev.toString()));
+
+			// TODO: ev.getModel != getModel /// not RowSet ???
+
+			if (ev.getComponent() != getSSComponent()
+					&& ev.getRowSet() == getRowSet()) {
+				if (!NavigationModel.ENABLED)
+					return;
+				updateSSComponent();
+			}
+		}
+	}
+
+	/**
+	 * When the database row changes we want to trigger a change to the bound
+	 * Component display/value.
+	 * <p>
+	 * In {@link NavigationModel}, when a navigation is performed (first, previous,
+	 * next, last) a call may be made to updateRow() to flush the rowset to the 
+	 * underlying database prior to a call to first(), previous(), next(),
+	 * or last(). updateRow() triggers rowChanged, but we don't want to update
+	 * the components for the database flush.
+	 * <p>
+	 * Calls to first(), previous(), next(), and last() trigger cursorMoved.
+	 * For a navigation we will updated the components following cursorMoved.
+	 * <p>
+	 * In JdbcRowSetImpl, notifyRowChanged() is called for insertRow(),
+	 * updateRow(), deleteRow(), &amp; cancelRowUpdates(). We only want to block
+	 * component updates for calls resulting from updateRow().
+	 */
+
 	protected class SSRowSetListener implements RowSetListener
 	{
 		// variables needed to consolidate multiple calls
@@ -188,23 +234,6 @@ final class SSCommon
 			performUpdateSSComponent();
 		}
 
-		/**
-		 * When the database row changes we want to trigger a change to the bound
-		 * Component display/value.
-		 * <p>
-		 * In SSDataNavigator, when a navigation is performed (first, previous,
-		 * next, last) a call is made to updateRow() to flush the rowset to the 
-		 * underlying database prior to a call to first(), previous(), next(),
-		 * or last(). updateRow() triggers rowChanged, but we don't want to update
-		 * the components for the database flush.
-		 * <p>
-		 * Calls to first(), previous(), next(), and last() trigger cursorMoved.
-		 * For a navigation we will updated the components following cursorMoved.
-		 * <p>
-		 * In JdbcRowSetImpl, notifyRowChanged() is called for insertRow(),
-		 * updateRow(), deleteRow(), &amp; cancelRowUpdates(). We only want to block
-		 * component updates for calls resulting from updateRow().
-		 */
 		@Override
 		public void rowChanged(RowSetEvent event) {
 			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
@@ -239,6 +268,8 @@ final class SSCommon
 				if (lastNotifiedChange != lastChange) {
 					lastNotifiedChange = lastChange;
 
+					if (NavigationModel.ENABLED)
+						return;
 					updateSSComponent();
 				}
 			});
@@ -344,13 +375,14 @@ final class SSCommon
 	 * The caller should invoke SSCommon in the constructor.
 	 *
 	 * @param ssComponent SwingSet component having this SSCommon instance as a
-	 *                     datamember
+	 *                     data member
 	 * @param finishInit if false, the SSComponent still needs to call finishSSCommon.
 	 */
 	private SSCommon(SSComponentInterface ssComponent, boolean finishInit) {
 		this.ssComponent = ssComponent;
 		decorator = Decorator.nullDecorator;
 		validator = Validator.nullValidator;
+		busReceiver = new BusReceiver();
 		if (finishInit)
 			finishInit();
 	}
@@ -358,6 +390,21 @@ final class SSCommon
 	//
 	// TODO: long term get rid of this half init stuff. Maybe a builder...???
 	//
+
+	/**
+	 * Finish the initialization, used if "half" construction.
+	 */
+	private SSCommon finishInit() {
+		if (!isFullyInitialized) {
+			isFullyInitialized = true;
+			initDecorator();
+			init();
+
+			// TODO: Get rid of this; use navigationModel.register
+			WeakEventBus.register(busReceiver, getGlobalEventBus());
+		}
+		return this;
+	}
 
 	/** Can use this to error if doing something that required fully constructed. */
 	private boolean isFullyInitialized;
@@ -379,18 +426,6 @@ final class SSCommon
 	@SuppressWarnings("unused")
 	boolean isInitialized() {
 		return isFullyInitialized;
-	}
-
-	/**
-	 * Finish the initialization, used if "half" construction.
-	 */
-	private SSCommon finishInit() {
-		if (!isFullyInitialized) {
-			isFullyInitialized = true;
-			initDecorator();
-			init();
-		}
-		return this;
 	}
 
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
@@ -431,11 +466,13 @@ final class SSCommon
 	{
 			if (!checkRowOK())
 				return;
+			NavigationModel.startNavigationEvent(getNavigationModel(), getSSComponent());
 			removeRowSetListener();
 			try {
 				r.run();
 			} finally {
 				addRowSetListener();
+				NavigationModel.finishNavigationEvent(getNavigationModel());
 			}
 	}
 	
@@ -590,6 +627,7 @@ final class SSCommon
 		inBinding = true;
 		try {
 			
+			// TODO: WORK WITH A NavigationModel
 			// Update rowset.
 			removeRowSetListener();
 			setRowSet(rowSet);
@@ -1069,6 +1107,7 @@ final class SSCommon
 	 *
 	 * @param _rowSet RowSet to which the component is bound
 	 */
+	// TODO: Fix this, and getNavigationModel to use model.
 	void setRowSet(RowSet _rowSet) {
 		Objects.requireNonNull(_rowSet);
 		rowSet = _rowSet;
@@ -1076,6 +1115,20 @@ final class SSCommon
 			bind();
 		}
 		debugTrackRowSetListener();
+		if (navigationModel == null)
+			navigationModel = new NavigationModel(rowSet);
+		if (navigationModel.getRowSet() != _rowSet)
+			navigationModel.setRowSet(rowSet);
+	}
+
+	// TODO: STATIC, for initial testing.
+	private static NavigationModel navigationModel;
+	private NavigationModel getNavigationModel() {
+		if (navigationModel == null) {
+			navigationModel = rowSet != null
+					? new NavigationModel(rowSet) : NavigationModel.getDummy(rowSet);
+		}
+		return navigationModel;
 	}
 
 	/**
@@ -1171,6 +1224,10 @@ final class SSCommon
 		//		 value to display from undoRedo; the update values
 		//		 can not always be reliably read JdbcRowSet vs CachedRowSet.
 		issueRowChanged();
+
+		// TODO: NavigationModel UNDO/REDO
+		if (NavigationModel.ENABLED)
+			updateSSComponent();
 	}
 
 	/**
@@ -1184,7 +1241,7 @@ final class SSCommon
 		// If you see this in the logs back to back for the same component
 		// a listener is likely not handled properly.
 		// Maybe incorporate SwingUtilities.invokeLater()? 
-		logger.log(TRACE, () -> sf("Updating component %s.", getColumnForLog()));
+		logger.log(TRACE, () -> sf("Updating component %s", getColumnForLog()));
 		verifyInitialized();
 		
 		removeSSComponentListener();
@@ -1244,8 +1301,11 @@ final class SSCommon
 	/**
 	 * Issue a row changed event if there's an active RowSetListener.
 	 */
+	// TODO: Cleanup issueRowChanged for NavigationModel
+	//       Want to run updateCompent as through from a RowSetListener.
+	//       Why not call it directly?
 	void issueRowChanged() {
-		if(rowSetListenerAdded) {
+		if(isRowSetListenerAdded()) {
 			// TODO: could create a valid event, but since it is not used...
 			rowSetListener.rowChanged(null);
 		}

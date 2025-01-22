@@ -45,15 +45,14 @@ package com.nqadmin.swingset.utils;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Toolkit;
-
 import java.lang.StackWalker.Option;
-
 import java.lang.System.Logger;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -268,6 +267,25 @@ public class SSUtils {
 			return "null";
 		}
 		return sf("%s@%X", o.getClass().getSimpleName(), System.identityHashCode(o));
+	}
+
+	private static boolean isJunit;
+	private static boolean didJunitCheck;
+	/**
+	 * @return true if junit is running.
+	 */
+	public static boolean isJunit() {
+		if (!didJunitCheck) {
+			StackWalker walker = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE);
+			Optional<StackWalker.StackFrame> frame = walker.walk(s -> s
+					//.filter((f)->{System.err.println("    "+f.getClassName());return true; })
+					.filter((f) -> f.getClassName().startsWith("org.junit"))
+					.findFirst());
+			if (frame.isPresent())
+				isJunit = true;
+			didJunitCheck = true;
+		}
+		return isJunit;
 	}
 
 }

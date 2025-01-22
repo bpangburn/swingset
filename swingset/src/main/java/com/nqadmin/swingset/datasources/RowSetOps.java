@@ -325,7 +325,7 @@ public class RowSetOps {
 	}
 
 	/**
-	 * Determine if the specified column is nullable.If the nullability
+	 * Determine if the specified column is nullable. If the nullability
 	 * of the column is unknown, then an empty Optional is returned.
 	 * @param _resultSet RowSet on which to operate
 	 * @param _columnName column name

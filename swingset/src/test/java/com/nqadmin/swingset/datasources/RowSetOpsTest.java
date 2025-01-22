@@ -98,7 +98,7 @@ public class RowSetOpsTest
 	public void testDB() throws Exception
 	{
 		System.out.println("DB");
-		RowSet rs = H2.getRowSet(null);
+		RowSet rs = H2.getRowSetCleanDB(null);
 		rs.setCommand("SELECT * FROM tbl");
 		@SuppressWarnings("UnusedAssignment")
 		NavigateHook nav = new NavigateHook(rs);
@@ -118,7 +118,7 @@ public class RowSetOpsTest
 		fetch = RowSetOps.getColumnObject(RSC.getEx(rs, 5));
 		assertEquals(t1, fetch);
 
-		rs = H2.getRowSet("""
+		rs = H2.getRowSetCleanDB("""
             CREATE TABLE tbl
             (
             	c_date DATE,
@@ -167,7 +167,7 @@ public class RowSetOpsTest
 	{
 		System.out.println("getColumnObject");
 
-		RowSet rs = H2.getRowSet(null);
+		RowSet rs = H2.getRowSetCleanDB(null);
 		rs.setCommand("SELECT * FROM tbl");
 		new NavigateHook(rs);
 
@@ -210,7 +210,7 @@ public class RowSetOpsTest
 		RowSet rs;
 		NavigateHook nav;
 
-		g_rs = H2.getRowSet("""
+		g_rs = H2.getRowSetCleanDB("""
             CREATE TABLE tbl
             (
                 c_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,
@@ -273,7 +273,7 @@ public class RowSetOpsTest
 
 		// Date types
 
-		rs = H2.getRowSet("""
+		rs = H2.getRowSetCleanDB("""
             CREATE TABLE tbl
             (
                 c_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,

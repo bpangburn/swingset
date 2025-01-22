@@ -33,6 +33,7 @@ import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Objects;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.JdbcRowSet;
@@ -58,6 +59,23 @@ public class H2
 	private static Connection conn;
 
 	public static RowSet getRowSet(String sql)
+			throws SQLException, ClassNotFoundException {
+		Objects.requireNonNull(sql);
+		execute(sql);
+		JdbcRowSet rs = RowSetProvider.newFactory().createJdbcRowSet();
+		rs.setUrl(dbUrl());
+		return rs;
+	}
+
+	/**
+	 * Starting with an empty data base, run some sql commands.
+	 * SQL_INIT is the default sql script if sql is null.
+	 * @param sql initialization command
+	 * @return
+	 * @throws SQLException
+	 * @throws ClassNotFoundException 
+	 */
+	public static RowSet getRowSetCleanDB(String sql)
 			throws SQLException, ClassNotFoundException {
 		clean();
 		execute(sql != null ? sql : SQL_INIT);
@@ -92,7 +110,8 @@ public class H2
 		return c;
 	}
 	
-	private static final String SQL_INIT =
+	/** The default sql script to initialize the database */
+	public static final String SQL_INIT =
 		"""
 		DROP TABLE IF EXISTS tbl;
 		DROP SEQUENCE IF EXISTS tbl_seq;

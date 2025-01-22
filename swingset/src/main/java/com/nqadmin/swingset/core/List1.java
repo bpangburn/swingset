@@ -222,7 +222,7 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 	 */
 	// TODO: provide D2
 	// TODO: OPTIM: only get the SSListItem once.
-	Item2<K,D,Object> getChosenItem() {
+	public Item2<K,D,Object> getChosenItem() {
 		return new Item2<>(getChosenKey(), getChosenDisplayValue());
 	}
 
@@ -439,6 +439,7 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 	 * updates the corresponding column of the rowset with the values selected in
 	 * the list
 	 */
+	// TODO: quiet failure.
 	protected void updateRowSet() {
 		try {
 			chosenDBModel.writeData(this, getChosenKeys().toArray());

@@ -67,7 +67,7 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
  * Similar to the SSComboBox, but used when both the 'bound' values and the
- * 'display' values are pulled from a database table.The bound value is called the 'mapping' and the display value the 'option'.An 'option2' may be specified; in that case the display value
+ * 'display' values are pulled from a database table. The bound value is called the 'mapping' and the display value the 'option'. An 'option2' may be specified; in that case the display value
  for the mapping is a composite of option and option2.Generally the mapping 
  represents a foreign key to another table, and the combobox needs to display
  a list of one (or more) columns from the other table.<p>
@@ -434,7 +434,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 
 	/**
 	 * When a display column is of type date you can choose the format in which it
-	 * has to be displayed.For the pattern refer SimpleDateFormat in java.text package.
+	 * has to be displayed. For the pattern refer SimpleDateFormat in java.text package.
 	 *
 	 * @param dateFormat pattern in which dates have to be displayed
 	 */

@@ -27,33 +27,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset.core;
+package com.nqadmin.swingset.navigate;
 
 /**
- * A ComboBox that takes only two generices. See {@link ComboBox2} for documentation.
- * @param <K> mapping type
- * @param <D> option type
+ * This event signals the source {@link NavigationModel} has a different
+ * associated {@link javax.sql.RowSet}. Use {@link NavigationModel#getRowSet()}
+ * to get the RowSet.
  */
 @SuppressWarnings("serial")
-public abstract class ComboBox1<K,D> extends ComboBox2<K, D, Object>
+public class NavigationModelNewRowSetEvent extends NavigationEvent
 {
 	/**
-	 * Creates an object of SSComboBox.
+	 * Constructs a NavigationEvent.
+	 * @param source NavigationModel get got a different RowSet
 	 */
-	public ComboBox1() {
-		this(ModelType.SWING);
-	}
-
-	/**
-	 * Creates an object of SSComboBox.
-	 * <p>
-	 * If useGlazedLists is specified, it is configured strict.
-	 * Use {@link #getAutoComplete() } to change its configuration
-	 * 
-	 * @param modelType whether to use SWING or GLAZED combo model
-	 */
-	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-	public ComboBox1(ModelType modelType) {
-		super(modelType);
+	public NavigationModelNewRowSetEvent(NavigationModel source)
+	{
+		super(source);
 	}
 }

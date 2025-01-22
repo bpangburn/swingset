@@ -90,7 +90,7 @@ public class ComboBox2Test
 		/**
 		 * For getChosenItem
 		 */
-		public class Item extends Item1<Integer, String> {
+		public static class Item extends Item1<Integer, String> {
 			/**
 			 * @param getKey
 			 * @param getDisplayValue 
@@ -118,7 +118,7 @@ public class ComboBox2Test
 		/**
 		 * For getChosenItem
 		 */
-		public class Item extends Item2<Integer, String, Long> {
+		public static class Item extends Item2<Integer, String, Long> {
 			/**
 			 * @param getKey
 			 * @param displayValue 
