@@ -29,29 +29,36 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
+import java.util.EnumSet;
+import java.util.EventObject;
 import java.util.Set;
 
 import javax.sql.RowSet;
 
 import com.nqadmin.swingset.datasources.RSC;
+import com.nqadmin.swingset.navigate.RowsModelEventHandling.RowsEventSource;
 
-import static com.google.common.collect.Sets.immutableEnumSet;
+import static com.nqadmin.swingset.navigate.RowsModel.logger;
+import static com.nqadmin.swingset.utils.SSUtils.isJunit;
+import static com.nqadmin.swingset.utils.SSUtils.objectID;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * An Event object that bundles events generated through  one or more operatrions
  * on a {@link javax.sql.RowSet}.
- * The event can originate from a {@link NavAction}, from an
+ * The event can originate from a {@link RowsAction}, from an
  * {@link RSC}/SSComponent, or
- * from something else, use {@link #getOperatorKind} to determine the kind;
- * and use {@link #getComponent() } or {@link #getNavAction() } for
+ * from something else, use {@link #getKindOperator} to determine the kind;
+ * and use {@link #getOperComponent()} or {@link #getOperAct()} for
  * the specific operator.
  * The property {@link RowSetEventType} indicates which RowSet events are bundled.
- * Use the NavigationModel to get the RowSet.
+ * Use the RowsModel to get the RowSet.
  */
 @SuppressWarnings("serial")
-public class NavigationRowSetEvent extends NavigationEvent
+public class RowsEvent extends EventObject implements RowsModelEvent
 {
+
 	/** The type of NaviagionRowSetEvent events */
 	public enum RowSetEventType {
 		/** See {@link javax.sql.RowSetListener#cursorMoved(javax.sql.RowSetEvent) } */
@@ -62,53 +69,92 @@ public class NavigationRowSetEvent extends NavigationEvent
 		ROW_SET_CHANGED,
 	}
 
-	/** The type of behavior which caused this event. */
+	/** The type of RowSet operation which caused this event. */
 	// TODO: originatingComponentType
+	// TODO: KindOperator ???
 	public enum OperatorKind {
-		/** A navigation action, typically a user button push, generated this event */
-		NAV,
-		/** An SSComponent's action generated this event, e.g. user input. */
+		/** A {@link RowsAction}, typically a button push, generated this event */
+		ACTION,
+		/** An SSComponent's action generated this event, like user input. */
 		COMPONENT,
-		/** The event originated from outside of SS. */
+		/** Other bracketed event, like SSSyncManger. */
+		OTHER,
+		/** Direct RowSet operation; not bracketed.
+		 * Alternate SSSyncManager handling or outside of SS. */
+		ANON,
+		/** Initialization that should never show up in use. */
 		UNKNOWN,
 	}
 
-	private final RowSet rs;
-	private final OperatorKind operatorKind;
-	private final Object operator;
+	private static int generation;
+
+	/** NOTE: rowSetEventTypes may "grow" before dispatch */
 	private final Set<RowSetEventType> rowSetEventTypes;
+	private final int gen;
 
 	/**
-	 * An Event object generated for a NavAction on a RowSet.
+	 * An Event object generated for a RowsAction on a RowSet.
 	 * @param source
 	 * @param rs
 	 * @param operatorKind
-	 * @param operator Either a NavAction or RSC/component; may be null
+	 * @param operator Either a RowsAction or RSC/component; may be null
 	 * @param rowSetEventTypes
 	 */
-	NavigationRowSetEvent(NavigationModel source,
-								 RowSet rs,
-								 OperatorKind operatorKind,
-								 Object operator,
-								 Set<RowSetEventType> rowSetEventTypes)
+	RowsEvent(RowsEventSource source, Set<RowSetEventType> rowSetEventTypes)
 	{
 		super(source);
-		this.rs = rs;
-		this.operatorKind = operatorKind;
-		this.operator = operator;
-		this.rowSetEventTypes = immutableEnumSet(rowSetEventTypes);
+		this.rowSetEventTypes = EnumSet.copyOf(rowSetEventTypes);
+		this.gen = ++generation;
 
-		switch (operatorKind) {
+		switch (source.operatorKind()) {
 		case COMPONENT -> {
-			if (!(operator instanceof RSC))
+			if (!(source.operator() instanceof RSC))
 				throw new IllegalArgumentException(sf("%s must have a component"));
 		}
-		case NAV -> {
-			if (!(operator instanceof NavAction))
-				throw new IllegalArgumentException(sf("%s must have a component"));
+		case ACTION -> {
+			if (!(source.operator() instanceof RowsAction))
+				throw new IllegalArgumentException(sf("%s must have an action"));
 		}
 		case null,default -> {}
 		}
+	}
+	RowsEvent(RowsEventSource source, RowSetEventType rowSetEventType)
+	{
+		this(source, EnumSet.of(rowSetEventType));
+	}
+
+	boolean absorb(RowsEvent rev)
+	{
+		// UNKNOWN never matches
+		if (getSource().operatorKind() == OperatorKind.UNKNOWN
+				|| !getSource().equals(rev.getSource())) {
+			return false;
+		}
+
+		if (isJunit())
+			System.out.println("absorb: " + rev.rowSetEventTypes);
+		else
+			logger.log(TRACE, () -> sf("absorb: %s", rev.rowSetEventTypes));
+		rowSetEventTypes.addAll(rev.rowSetEventTypes);
+		return true;
+	}
+
+	// TODO: Other versions of absorb? Or maybe can absorb?
+
+	/** {@inheritDoc } */
+	@Override
+	@SuppressWarnings("NonPublicExported")
+	public final RowsEventSource getSource() {
+		return (RowsEventSource) source;
+	}
+
+	/**
+	 * A RowsModel.
+	 * @return RowsModel that issued the event
+	 */
+	@Override
+	public RowsModel getRowsModel() {
+		return getSource().rowsModel();
 	}
 
 	/**
@@ -117,7 +163,7 @@ public class NavigationRowSetEvent extends NavigationEvent
 	 */
 	public RowSet getRowSet()
 	{
-		return rs;
+		return getSource().rs();
 	}
 
 	/**
@@ -133,13 +179,13 @@ public class NavigationRowSetEvent extends NavigationEvent
 	 * The actions on the rowset that generated the events.
 	 * Null if the OperatorKind is not a NavAction.
 	 * 
-	 * @return the NavAction that generated the events.
+	 * @return the RowsAction that generated the events.
 	 */
-	public NavAction getNavAction()
+	public RowsAction getOperAct()
 	{
-		if (operatorKind != OperatorKind.NAV)
+		if (getSource().operatorKind() != OperatorKind.ACTION)
 			return null;
-		return (NavAction) operator;
+		return (RowsAction) getSource().operator();
 	}
 
 	/**
@@ -147,29 +193,44 @@ public class NavigationRowSetEvent extends NavigationEvent
 	 * Null if the OperatorKind is not an SSComponent.
 	 * @return the component that originated the events
 	 */
-	public RSC getComponent()
+	public RSC getOperComponent()
 	{
-		if (operatorKind != OperatorKind.COMPONENT)
+		if (getSource().operatorKind() != OperatorKind.COMPONENT)
 			return null;
-		return (RSC) operator;
+		return (RSC) getSource().operator();
+	}
+
+	/**
+	 * The operator that originated the event;
+	 * use {@link #getKindOperator() } to determine the kind.
+	 * This is the operator no matter the OperatorKind.
+	 * @return the object that originated the events
+	 */
+	public Object getOperAny()
+	{
+		return getSource().operator();
 	}
 
 	/**
 	 * The source of the rowset operatorKind that generated the events.
 	 * @return 
 	 */
-	public OperatorKind getOperatorKind()
+	public OperatorKind getKindOperator()
 	{
-		return operatorKind;
+		return getSource().operatorKind();
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public String toString()
 	{
-		return "NavigationRowSetEvent{" + "rs=" + rs
-				+ ", operatorKind=" + operatorKind
-				+ ", operator=" + operator
-				+ ", rowSetEventTypes=" + rowSetEventTypes + '}';
+		return sf("RowsEvent{%d, %s, %s, %s, %s, %s}",
+				gen,
+				objectID(getSource().rowsModel()),
+				objectID(getSource().rs()),
+				getSource().operatorKind(),
+				getSource().operator() instanceof RowsAction
+						? getSource().operator() : objectID(getSource().operator()),
+				rowSetEventTypes);
 	}
 }

@@ -40,6 +40,8 @@ package com.nqadmin.swingset.demo;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -48,18 +50,17 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-import static java.lang.System.Logger.Level.*;
-
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.formatting.SSDateField;
-import static com.nqadmin.swingset.formatting.SSFormat.DATE_MMDDYYYY_SLASH;
 import com.nqadmin.swingset.formatting.SSIntegerField;
+import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static com.nqadmin.swingset.formatting.SSFormat.DATE_MMDDYYYY_SLASH;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * This example displays data from the supplier_part_data table.
@@ -102,6 +103,7 @@ public class Example3 extends JFrame {
 	Connection connection = null;
 	RowSet rowset = null;
 	SSDataNavigator navigator = null;
+	RowsModel rowsModel;
 
 	/**
 	 * Constructor for Example3
@@ -112,40 +114,36 @@ public class Example3 extends JFrame {
 	public Example3(final Connection _dbConn) {
 
 		// SET SCREEN TITLE
-			super("Example3");
-			DemoUtil.initExampleFrame(this, null);
+		super("Example3");
+		DemoUtil.initExampleFrame(this, null);
 
 		// SET CONNECTION
-			connection = _dbConn;
+		connection = _dbConn;
 
 		// SET SCREEN DIMENSIONS
-			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
+		setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 			
 		// SET SCREEN POSITION
-			setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+		setLocation(DemoUtil.getChildScreenLocation(this.getName()));
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-			try {
-				rowset = DemoUtil.getNewRowSet(connection);
-				rowset.setCommand("SELECT * FROM supplier_part_data");
-				navigator = new SSDataNavigator(rowset);
-			} catch (final SQLException se) {
-				logger.log(Level.ERROR, "SQL Exception.", se);
-			}
+		try {
+			rowset = DemoUtil.getNewRowSet(connection);
+			rowset.setCommand("SELECT * FROM supplier_part_data");
+			rowsModel = RowsModel.create(rowset);
+			navigator = new SSDataNavigator(rowsModel);
+		} catch (final SQLException se) {
+			logger.log(Level.ERROR, "SQL Exception.", se);
+		}
 
 		/**
 		 * Various navigator overrides needed to support H2
 		 * H2 does not fully support updatable rowset so it must be
 		 * re-queried following insert and delete with rowset.execute()
 		 */
-		navigator.getNavigateActions().setDBNav(new SSDBNavImpl(this) {
+		rowsModel.setDBNav(new SSDBNavImpl(this) {
 			/**
-			 * unique serial id
-			 */
-			private static final long serialVersionUID = 4343059684161003109L;
-
-			/**
-			 * Requery the rowset following a deletion. This is needed for H2.
+			 * Re-query the rowset following a deletion. This is needed for H2.
 			 */
 			@Override
 			public void performPostDeletionOps() {
@@ -179,28 +177,25 @@ public class Example3 extends JFrame {
 				// SSDBNavImpl will clear the component values
 				super.performPreInsertOps();
 
-				try {
-
 				// GET THE NEW RECORD ID.
-					final ResultSet rs = connection
-							.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-							.executeQuery("SELECT nextval('supplier_part_data_seq') as nextVal;");
+				// .createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+				try (ResultSet rs = connection
+						.createStatement()
+						.executeQuery("SELECT nextval('supplier_part_data_seq') as nextVal;"))
+				{
 					rs.next();
-					final int supplierPartID = rs.getInt("nextVal");
+					int supplierPartID = rs.getInt("nextVal");
 					txtSupplierPartID.setText(String.valueOf(supplierPartID));
-					rs.close();
-
-				// SET OTHER DEFAULTS
-					 logger.log(DEBUG, "Setting default for Supplier Name mapping to 2.");
-					 cmbSupplierName.setChosenKey((long) 2);
-//					 cmbPartName.setSelectedValue(0);
-//					 txtQuantity.setText("0");
-
 				} catch(final SQLException se) {
 					logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
 				} catch(final Exception e) {
 					logger.log(Level.ERROR, "Exception occured initializing new record.",e);
 				}
+				// SET OTHER DEFAULTS
+				logger.log(DEBUG, "Setting default for Supplier Name mapping to 2.");
+				cmbSupplierName.setChosenKey((long) 2);
+//					 cmbPartName.setSelectedValue(0);
+//					 txtQuantity.setText("0");
 
 			}
 
@@ -214,12 +209,12 @@ public class Example3 extends JFrame {
 			cmbPartName = new SSDBComboBox(connection, query, "part_id", "part_name");
 
 		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
-			txtSupplierPartID.bind(rowset, "supplier_part_id");
-			cmbSupplierName.bind(rowset, "supplier_id");
+			txtSupplierPartID.bind(rowsModel, "supplier_part_id");
+			cmbSupplierName.bind(rowsModel, "supplier_id");
 			cmbPartName.setAllowNull(false);
-			cmbPartName.bind(rowset, "part_id");
-			txtQuantity.bind(rowset, "quantity");
-			txtShipDate.bind(rowset, "ship_date");
+			cmbPartName.bind(rowsModel, "part_id");
+			txtQuantity.bind(rowsModel, "quantity");
+			txtShipDate.bind(rowsModel, "ship_date");
 
 		// RUN DB COMBO QUERIES
 			try {

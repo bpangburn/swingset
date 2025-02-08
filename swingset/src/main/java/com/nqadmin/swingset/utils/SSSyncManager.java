@@ -42,164 +42,279 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Serializable;
+import java.lang.System.Logger;
 import java.sql.SQLException;
+import java.util.Objects;
 
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
 import javax.swing.SwingUtilities;
 
-import java.lang.System.Logger;
-import java.util.Objects;
-
-import static java.lang.System.Logger.Level.*;
-
 import com.nqadmin.swingset.SSDBComboBox;
-import com.nqadmin.swingset.navigate.NavigateActions;
+import com.nqadmin.swingset.navigate.RowsModel;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
-//import com.nqadmin.swingset.models.SSListItem;
-
-// SSSyncManager.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+import static java.lang.System.Logger.Level.*;
 
 /**
- * Used to synchronize a data navigator and a navigation combobox.
+ * Used to synchronize a data navigator and a navigation ComboBox.
  * <p>
  * IMPORTANT: The SSDBComboBox and the RowSet queries should select the same
  * records and in the same order. Otherwise the SSSyncManager will spend a lot of
  * time looping through records to match.
  */
-public class SSSyncManager {
-
+// TODO: SSSyncManager combo key is hardcoded to Long.
+//       NOTE: note combo listener uses int
+public class SSSyncManager
+{
 	/**
 	 * Listener for combo box to update data navigator when combo box-based
 	 * navigation occurs.
 	 */
-	protected class SyncComboListener implements ActionListener {
-		
-		private int actionPerformedCount = 0;
-
-		private Long comboPK;
+	protected class SyncComboListener implements ActionListener
+	{
 
 		// WHEN THERE IS A CHANGE IN THIS VALUE MOVE THE ROWSET SO THAT
 		// ITS POSITIONED AT THE RIGHT RECORD.
 		/** {@inheritDoc } */
 		@Override
-		public void actionPerformed(final ActionEvent ae) {
-
-			// ADD/REMOVE METHODS HAVE A CHECK TO ADD/REMOVE ONLY ONCE
-			removeRowsetListener();
-
-			try {
-				// NOTHING TO DO FOR AN EMPTY/NULL ROWSET
-				if ((rowset == null) || (rowset.getRow() < 1)) {
-					return;
-				}
-
-				comboPK = comboBox.getChosenKey();
-				logger.log(DEBUG, ()->sf("COMBO NAVIGATOR: getSelectedMapping() returned: %s.", comboPK));
-				
-				// getChosenKey() could return null during initialization.
-				// We check for null/empty rowset in the prior block.
-				if (comboPK==null) {
-					logger.log(WARNING, "Null selected in Combo Navigator.");
-					return;
-				}
-				
-				// Note that the rowset count starts at 1 whereas combobox index starts at 0.
-
-				final long rowsetPK = rowset.getLong(syncColumnName);
-
-				if (comboPK != rowsetPK) {
-					// UPDATE THE PRESENT ROW BEFORE MOVING TO ANOTHER ROW.
-					// This code was removed to improve performance.
-					//
-					// 2020-12-02_BP: adding back
-					// 2021-02-26_BP: moving inside 'if (comboPK != rowsetPK) {' block
-					navigateActions.updatePresentRow();
-					
-					// long indexOfId = SSSyncManager.this.comboBox.itemMap.get(this.id) + 1;
-					final int indexOfPK = comboBox.getKeys().indexOf(comboPK) + 1;
-					//int index = (int) indexOfPK;
-					logger.log(DEBUG, ()->sf("Rowset PK=%s, Combo PK=%s, Target rowset record # should be %s.",
-							rowsetPK, comboPK, indexOfPK));
-					rowset.absolute(indexOfPK);
-					final int numRecords = comboBox.getItemCount();
-					int count = 0;
-
-					// IF AFTER POSITIONING THE ROWSET INDEX AT THE COMBO INDEX, THE VALUES DON'T MATCH,
-					// PERFORM A MANUAL LOOP TO TRY TO FIND A MATCH
-					// PRESUMING RECORDS COULD BE ADDED/DELETED BY OTHER CONNECTIONS, DON'T LOOP
-					// THROUGH ALL OF THE RECORDS MORE THAN ONCE PLUS A CUSHION OF overlapToCheck
-					while (comboPK != rowset.getLong(syncColumnName)) {
-						if (!rowset.next()) {
-							rowset.beforeFirst();
-							rowset.next();
-						}
-
-						count++;
-
-						logger.log(WARNING, "SSSyncManager RowSet and SSDBComboBox values do not match for the same index. This can be caused by SSDBComboBox and RowSet "
-								+ " queries not selecting the same records in the same order. Looping through each record for a match. Pass # "
-										+ count + ".");
-
-						// Often records are just slightly out of order so a better strategy would be to move backwards by some small offset
-						// and then search forward rather than potentially searching through all records to make a full loop.
-						if (count==1) {
-							// If there are only a few records, just start at first record
-							int rowsetSearchFrom = 1;
-
-							if (numRecords>OFFSET_TO_CHECK) {
-								rowsetSearchFrom = indexOfPK - OFFSET_TO_CHECK;
-							}
-							if (rowsetSearchFrom<1) {
-								rowsetSearchFrom += numRecords;
-							}
-							if (rowsetSearchFrom>numRecords) {
-								rowsetSearchFrom -= numRecords;
-							}
-							rowset.absolute(rowsetSearchFrom);
-						}
-
-						// number of items in combo is the number of records in resultset.
-						// so if for some reason item is in combo but deleted in rowset
-						// To avoid infinite loop in such scenario
-						if (count > (numRecords + OVERLAP_TO_CHECK)) {
-							// TODO: is this needed?
-							comboBox.repaint();
-							logger.log(WARNING, "SSSyncManager unable to find a record matching the selection in the dropdown list: " + comboBox.getSelectedStringValue() + ".");
-							// JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin
-							// about this","Row not found",JOptionPane.OK_OPTION);
-							break;
-						}
-					}
-				}
-
-
-			} catch (final SQLException se) {
-				logger.log(ERROR, "SQL Exception.", se);
-			} finally {
-				logger.log(DEBUG, ()->sf("SyncComboListener actionPerformedCount=%s", actionPerformedCount++));
-				addRowsetListener();
-			}
+		public void actionPerformed(ActionEvent ae)
+		{
+			// Let the combo box close to avoid NetBeans breakpoint hang.
+			EventQueue.invokeLater(() -> handleComboEvent(ae));
 		}
 	} // protected class SyncComboListener implements ActionListener {
+
+	private int actionPerformedCount = 0;
+	private void handleComboEvent(@SuppressWarnings("unused") ActionEvent ae)
+	{
+		// ADD/REMOVE METHODS HAVE A CHECK TO ADD/REMOVE ONLY ONCE
+		removeRowsetListener();
+		
+		try {
+			if (Boolean.FALSE) { handleComboEvent01(); handleComboEvent02(); }
+			
+			//handleComboEvent01();
+			
+			// This seems the most efficient.
+			rowsModel.rsOp(comboBox, () -> handleComboEvent01());
+			
+			// Individually wrapped.
+			//handleComboEvent02();
+			
+		} catch (final SQLException se) {
+			logger.log(ERROR, "SQL Exception.", se);
+		} finally {
+			logger.log(DEBUG, ()->sf("SyncComboListener actionPerformedCount=%s",
+					actionPerformedCount++));
+			addRowsetListener();
+		}
+		
+	}
+
+	// direct use of getRowSet()
+	private void handleComboEvent01() throws SQLException
+	{
+		// Nothing to do for an empty/null rowset.
+		if ((getRowSet() == null) || (getRowSet().getRow() < 1)) {
+			return;
+		}
+		
+		Long comboPK = comboBox.getChosenKey();
+		logger.log(DEBUG, ()->sf("COMBO NAVIGATOR: getChosenKey() returned: %s.", comboPK));
+		
+		// getChosenKey() could return null during initialization.
+		// We check for null/empty rowset in the prior block.
+		if (comboPK==null) {
+			logger.log(WARNING, "Null selected in Combo Navigator.");
+			return;
+		}
+		
+		// Note that the rowset count starts at 1 whereas combobox index starts at 0.
+		
+		final long rowsetPK = getRowSet().getLong(syncColumnName);
+		
+		if (comboPK != rowsetPK) {
+			// Update the present row before moving to another row.
+			// This code was removed to improve performance.
+			//
+			// 2020-12-02_BP: adding back
+			// 2021-02-26_BP: moving inside 'if (comboPK != rowsetPK) {' block
+			// TODO: does autocommit/canModify/dirty need to be checked?
+			rowsModel.updatePresentRow();
+			
+			final int indexOfPK = comboBox.getKeys().indexOf(comboPK) + 1;
+			logger.log(DEBUG, ()->sf("Rowset PK=%s, Combo PK=%s, Target rowset record # should be %s.",
+					rowsetPK, comboPK, indexOfPK));
+			
+			// BUG_Absolute
+			getRowSet().absolute(indexOfPK);
+			
+			final int numRecords = comboBox.getItemCount();
+			int count = 0;
+			
+			// If after positioning the rowset index at the combo index, the values
+			// don't match, perform a manual loop to try to find a match presuming
+			// records could be added/deleted by other connections, don't loop through
+			// all of the records more than once plus a cushion of "OFFSET_TO_CHECK"
+			while (comboPK != getRowSet().getLong(syncColumnName)) {
+				// BUG_Absolute
+				if (!getRowSet().next()) {
+					getRowSet().beforeFirst();
+					getRowSet().next();
+				}
+				
+				count++;
+				
+				logger.log(WARNING, "SSSyncManager RowSet and SSDBComboBox values "
+						+ "do not match for the same index. This can be caused by "
+						+ "SSDBComboBox and RowSet queries not selecting the same "
+						+ "records in the same order. Looping through each record "
+						+ "for a match. Check # " + count + ".");
+				
+				// Often records are just slightly out of order so a better
+				// strategy would be to move backwards by some small offset
+				// and then search forward rather than potentially searching
+				// through all records to make a full loop.
+				if (count==1) {
+					// If there are only a few records, just start at first record
+					int rowsetSearchFrom = 1;
+					
+					if (numRecords>OFFSET_TO_CHECK) {
+						rowsetSearchFrom = indexOfPK - OFFSET_TO_CHECK;
+					}
+					if (rowsetSearchFrom<1) {
+						rowsetSearchFrom += numRecords;
+					}
+					if (rowsetSearchFrom>numRecords) {
+						rowsetSearchFrom -= numRecords;
+					}
+					// BUG_Absolute
+					getRowSet().absolute(rowsetSearchFrom);
+				}
+				
+				// number of items in combo is the number of records in resultset.
+				// so if for some reason item is in combo but deleted in rowset
+				// To avoid infinite loop in such scenario
+				if (count > (numRecords + OVERLAP_TO_CHECK)) {
+					// TODO: is this needed?
+					comboBox.repaint();
+					logger.log(WARNING, "SSSyncManager unable to find a record matching the selection in the dropdown list: " + comboBox.getSelectedStringValue() + ".");
+					// JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin
+					// about this","Row not found",JOptionPane.OK_OPTION);
+					break;
+				}
+			}
+		}
+	}
+
+	// WORKS: rsOp() wrapped use of getRowSet().
+	private void handleComboEvent02() throws SQLException
+	{
+		// Nothing to do for an empty/null rowset.
+		if ((getRowSet() == null) || (getRowSet().getRow() < 1)) {
+			return;
+		}
+		
+		Long comboPK = comboBox.getChosenKey();
+		logger.log(DEBUG, ()->sf("COMBO NAVIGATOR: getChosenKey() returned: %s.", comboPK));
+		
+		// getChosenKey() could return null during initialization.
+		// We check for null/empty rowset in the prior block.
+		if (comboPK==null) {
+			logger.log(WARNING, "Null selected in Combo Navigator.");
+			return;
+		}
+		
+		// Note that the rowset count starts at 1 whereas combobox index starts at 0.
+		
+		final long rowsetPK = getRowSet().getLong(syncColumnName);
+		
+		if (comboPK != rowsetPK) {
+			// Update the present row before moving to another row.
+			// This code was removed to improve performance.
+			//
+			// 2020-12-02_BP: adding back
+			// 2021-02-26_BP: moving inside 'if (comboPK != rowsetPK) {' block
+			// TODO: does autocommit/canModify/dirty need to be checked?
+			rowsModel.updatePresentRow();
+			
+			final int indexOfPK = comboBox.getKeys().indexOf(comboPK) + 1;
+			logger.log(DEBUG, ()->sf("Rowset PK=%s, Combo PK=%s, Target rowset record # should be %s.",
+					rowsetPK, comboPK, indexOfPK));
+			
+			// BUG_Absolute
+			rowsModel.rsOp(SSSyncManager.this, () -> getRowSet().absolute(indexOfPK));
+			
+			final int numRecords = comboBox.getItemCount();
+			int count = 0;
+			
+			// If after positioning the rowset index at the combo index, the values
+			// don't match, perform a manual loop to try to find a match presuming
+			// records could be added/deleted by other connections, don't loop through
+			// all of the records more than once plus a cushion of "OFFSET_TO_CHECK"
+			while (comboPK != getRowSet().getLong(syncColumnName)) {
+				// BUG_Absolute
+				rowsModel.rsOp(SSSyncManager.this, () -> {
+					if (!getRowSet().next()) {
+						getRowSet().beforeFirst();
+						getRowSet().next();
+					}
+				});
+				
+				count++;
+				
+				logger.log(WARNING, "SSSyncManager RowSet and SSDBComboBox values "
+						+ "do not match for the same index. This can be caused by "
+						+ "SSDBComboBox and RowSet queries not selecting the same "
+						+ "records in the same order. Looping through each record "
+						+ "for a match. Check # " + count + ".");
+				
+				// Often records are just slightly out of order so a better
+				// strategy would be to move backwards by some small offset
+				// and then search forward rather than potentially searching
+				// through all records to make a full loop.
+				if (count==1) {
+					// If there are only a few records, just start at first record
+					int rowsetSearchFrom = 1;
+					
+					if (numRecords>OFFSET_TO_CHECK) {
+						rowsetSearchFrom = indexOfPK - OFFSET_TO_CHECK;
+					}
+					if (rowsetSearchFrom<1) {
+						rowsetSearchFrom += numRecords;
+					}
+					if (rowsetSearchFrom>numRecords) {
+						rowsetSearchFrom -= numRecords;
+					}
+					// BUG_Absolute
+					int from = rowsetSearchFrom;
+					rowsModel.rsOp(SSSyncManager.this, () -> getRowSet().absolute(from));
+				}
+				
+				// number of items in combo is the number of records in resultset.
+				// so if for some reason item is in combo but deleted in rowset
+				// To avoid infinite loop in such scenario
+				if (count > (numRecords + OVERLAP_TO_CHECK)) {
+					// TODO: is this needed?
+					comboBox.repaint();
+					logger.log(WARNING, "SSSyncManager unable to find a record matching the selection in the dropdown list: " + comboBox.getSelectedStringValue() + ".");
+					// JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin
+					// about this","Row not found",JOptionPane.OK_OPTION);
+					break;
+				}
+			}
+		}
+	}
 
 	/**
 	 * Listener for rowset.
 	 */
-	protected class SyncRowSetListener implements RowSetListener, Serializable {
-
-		/**
-		 * unique serial ID 
-		 */
-		private static final long serialVersionUID = -7584919356924575482L;
-		
+	protected class SyncRowSetListener implements RowSetListener {
 		/**
 		 * variables needed to consolidate multiple calls
 		 */
@@ -252,9 +367,7 @@ public class SSSyncManager {
 
 	}
 
-	/**
-	 * Log4j Logger for component
-	 */
+	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
 
 	/**
@@ -269,60 +382,38 @@ public class SSSyncManager {
 	 */
 	private static final int OVERLAP_TO_CHECK = 7;
 
-	/**
-	 * SSDBComboBox used for record navigation.
-	 */
+	/** SSDBComboBox used for record navigation. */
 	private SSDBComboBox comboBox;
 
-	/**
-	 * Listener on combo box to detect combo-based navigations.
-	 */
+	/** Listener on combo box to detect combo-based navigations. */
 	private final SyncComboListener comboListener = new SyncComboListener();
 	
-	/**
-	 * Indicates if combo navigator listener is added (or removed)
-	 */
+	/** Indicates if combo navigator listener is added (or removed) */
 	private boolean comboListenerAdded = false;
 
-	/**
-	 * NavigateActions to be synchronized with navigation combo box.
-	 */
-	private NavigateActions navigateActions;
+	private RowsModel rowsModel;
 
-	/**
-	 * RowSet navigated with data navigator and combo box.
-	 */
-	private RowSet rowset;
-
-	/**
-	 * Listener on RowSet to detect data navigator-based navigations.
-	 */
+	/** Listener on RowSet to detect data navigator-based navigations. */
 	private final SyncRowSetListener rowsetListener = new SyncRowSetListener();
 	
-	/**
-	 * Indicates if rowset listener is added (or removed)
-	 */
+	/** Indicates if rowset listener is added (or removed) */
 	private boolean rowsetListenerAdded = false;
 	
 
-	/**
-	 * RowSet column used as basis for synchronization.
-	 */
+	/** RowSet column used as basis for synchronization. */
 	private String syncColumnName;
 
 
 	/**
 	 * Creates a SSSyncManager with the specified combo box and data navigator.
 	 *
-	 * @param comboBox      SSDBComboBox used for record navigation
-	 * @param navigateActions NavigateActions to be synchronized with navigation
-	 *                       combo box
+	 * @param comboBox   SSDBComboBox used for record navigation
+	 * @param rowsModel  RowsModel to be synchronized with navigation combo box
 	 */
-	public SSSyncManager(SSDBComboBox comboBox, NavigateActions navigateActions) {
+	public SSSyncManager(SSDBComboBox comboBox, RowsModel rowsModel) {
 		this.comboBox = comboBox;
-		this.navigateActions = navigateActions;
-		this.rowset = navigateActions.getRowSet();
-		navigateActions.setNavCombo(comboBox);
+		this.rowsModel = rowsModel;
+		rowsModel.setNavCombo(comboBox);
 		if (comboBox.getLogColumnName() == null) {
 			comboBox.setLogColumnName(sf("**ComboBoxNavigator@%x**",
 					System.identityHashCode(comboBox)));
@@ -352,7 +443,7 @@ public class SSSyncManager {
 	 */
 	private void addRowsetListener() {
 		if (!rowsetListenerAdded) {
-			navigateActions.getRowSet().addRowSetListener(rowsetListener);
+			getRowSet().addRowSetListener(rowsetListener);
 			rowsetListenerAdded = true;
 		}
 	}
@@ -370,9 +461,9 @@ public class SSSyncManager {
 		removeComboListener();
 
 		try {
-			if ((rowset != null) && (rowset.getRow() > 0)) {
+			if ((getRowSet() != null) && (getRowSet().getRow() > 0)) {
 				// GET THE PRIMARY KEY FOR THE CURRENT RECORD IN THE ROWSET
-				final Long currentRowPK = rowset.getLong(syncColumnName);
+				final Long currentRowPK = getRowSet().getLong(syncColumnName);
 
 				logger.log(DEBUG, ()->sf("SSSyncManager().adjustValue() - RowSet value: %s", currentRowPK));
 
@@ -403,6 +494,10 @@ public class SSSyncManager {
 		removeListeners();
 	}
 
+	private RowSet getRowSet() {
+		return rowsModel.getRowSet();
+	}
+
 	/**
 	 * Removes listener from the combo navigator
 	 */
@@ -426,7 +521,7 @@ public class SSSyncManager {
 	 */
 	private void removeRowsetListener() {
 		if (rowsetListenerAdded) {
-			navigateActions.getRowSet().removeRowSetListener(rowsetListener);
+			getRowSet().removeRowSetListener(rowsetListener);
 			rowsetListenerAdded = false;
 		}
 	}
@@ -442,13 +537,12 @@ public class SSSyncManager {
 	}
 
 	/**
-	 * Sets navigate actions to synchronize.
+	 * Sets RowsModel actions to synchronize.
 	 *
-	 * @param navigateActions data navigator to be synchronized
+	 * @param rowsModel rowsModel to be synchronized
 	 */
-	public void setDataNavigator(NavigateActions navigateActions) {
-		this.navigateActions = navigateActions;
-		this.rowset = navigateActions.getRowSet();
+	public void setRowsModel(RowsModel rowsModel) {
+		this.rowsModel = rowsModel;
 	}
 	
 	/**

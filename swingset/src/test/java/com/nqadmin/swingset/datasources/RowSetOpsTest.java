@@ -41,17 +41,19 @@ import java.util.Date;
 
 import javax.sql.RowSet;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.NavigateHook;
+import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
+import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -181,13 +183,14 @@ public class RowSetOpsTest
 	}
 
 	RowSet g_rs;
+	RowsModel g_rm;
 	NavigateHook g_nav;
 
 	private void updateColumnText(String col, String sVal, Object val)
 			throws Exception
 	{
 		System.out.println("    " + col);
-		SSComponentInterface comp = new SSTextField(g_rs, col);
+		SSComponentInterface comp = new SSTextField(g_rm = findRowsModel(g_rs), col);
 		RowSetOps.updateColumnText(comp, sVal);
 		g_nav.commit();
 		Object co = RowSetOps.getColumnObject(comp);
@@ -291,9 +294,9 @@ public class RowSetOpsTest
 		String sDate = "2222-02-22";
 		String sTime = "12:12:12";
 		String sTimestamp = "2222-02-22 22:22:22";
-		SSComponentInterface comp1 = new SSTextField(rs, "c_date");
-		SSComponentInterface comp2 = new SSTextField(rs, "c_time");
-		SSComponentInterface comp3 = new SSTextField(rs, "c_timestamp");
+		SSComponentInterface comp1 = new SSTextField(findRowsModel(rs), "c_date");
+		SSComponentInterface comp2 = new SSTextField(findRowsModel(rs), "c_time");
+		SSComponentInterface comp3 = new SSTextField(findRowsModel(rs), "c_timestamp");
 		RowSetOps.updateColumnText(comp1, sDate);
 		RowSetOps.updateColumnText(comp2, sTime);
 		RowSetOps.updateColumnText(comp3, sTimestamp);

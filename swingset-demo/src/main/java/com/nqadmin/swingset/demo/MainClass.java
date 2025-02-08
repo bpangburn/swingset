@@ -37,15 +37,14 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
-import com.nqadmin.swingset.SSComboBox;
-import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
-import com.nqadmin.swingset.datasources.RowSetOps.ForceConflict;
-
-import static com.nqadmin.swingset.demo.DemoUtil.configureJavaUtilLogger;
-
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -54,60 +53,53 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Supplier;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-
-import static java.lang.System.Logger.Level.*;
-
-import org.h2.tools.RunScript;
-
-import com.nqadmin.swingset.models.SSCollectionModel;
-import com.nqadmin.swingset.models.SSMysqlSetModel;
-import com.nqadmin.swingset.utils.CentralLookup;
-import com.nqadmin.swingset.utils.SSUtils;
-
-import static com.nqadmin.swingset.utils.SSUtils.sf;
-
-import com.nqadmin.swingset.utils.SSVersion;
-import com.raelity.lib.ui.Screens;
-
-import gnu.getopt.Getopt;
-
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.Collections;
-
-import javax.swing.BoxLayout;
-import javax.swing.Popup;
-import javax.swing.PopupFactory;
-
-import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
-
-import java.util.Objects;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.spi.SyncFactory;
 import javax.sql.rowset.spi.SyncFactoryException;
 import javax.sql.rowset.spi.SyncProvider;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.Popup;
+import javax.swing.PopupFactory;
+import javax.swing.SwingUtilities;
+
+import org.h2.tools.RunScript;
+
+import com.nqadmin.swingset.SSComboBox;
+import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
+import com.nqadmin.swingset.datasources.RowSetOps.ForceConflict;
+import com.nqadmin.swingset.models.SSCollectionModel;
+import com.nqadmin.swingset.models.SSMysqlSetModel;
+import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.utils.CentralLookup;
+import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.SSVersion;
+import com.raelity.lib.ui.Screens;
+
+import gnu.getopt.Getopt;
+
+import static com.nqadmin.swingset.demo.DemoUtil.configureJavaUtilLogger;
+import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
@@ -138,6 +130,7 @@ public class MainClass extends JFrame
 
 	static {
 		if(Boolean.FALSE) {
+			// Get rid of unused warnings
 			Objects.nonNull(new SSUtils.DebugRowSetListener());
 			Objects.nonNull(new ForceConflict(0));
 			Objects.nonNull(new H2Trace(""));
@@ -169,23 +162,26 @@ public class MainClass extends JFrame
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 			final Map<String, Object> hints = new HashMap<>(globalHints);
+			RowsModel.dumpAllEvents("New Window:");
 
-			if (ae.getSource().equals(btnExample1)) {
+			Object source = ae.getSource();
+
+			if (source == btnExample1) {
 				logger.log(DEBUG, "**** Opening Example1 ****");
 				new Example1(dbConnection);
-			} else if (ae.getSource().equals(btnExample2)) {
+			} else if (source == btnExample2) {
 				logger.log(DEBUG, "**** Opening Example2 ****");
 				new Example2(dbConnection);
-			} else if (ae.getSource().equals(btnExample3)) {
+			} else if (source == btnExample3) {
 				logger.log(DEBUG, "**** Opening Example3 ****");
 				new Example3(dbConnection);
-			} else if (ae.getSource().equals(btnExample4)) {
+			} else if (source == btnExample4) {
 				logger.log(DEBUG, "**** Opening Example4 ****");
 				new Example4(dbConnection);
-			} else if (ae.getSource().equals(btnExample4Advanced)) {
+			} else if (source == btnExample4Advanced) {
 				logger.log(DEBUG, "**** Opening Example4Advanced ****");
 				new Example4Advanced(dbConnection);
-			} else if (ae.getSource().equals(btnExample4UsingHelper)) {
+			} else if (source == btnExample4UsingHelper) {
 				logger.log(DEBUG, "**** Opening Example4UsingHelper ****");
 				JFrame e4JFrame = new JFrame("Example4 Using Helper");
 				e4JFrame.setLocation(DemoUtil.getChildScreenLocation("Example4UsingHelper"));
@@ -195,16 +191,16 @@ public class MainClass extends JFrame
 				e4JFrame.pack();
 				// screen dimensions handled by SSScreenHelperCommon.setScreenSize()
 				e4JFrame.setVisible(true);
-			} else if (ae.getSource().equals(btnExample5)) {
+			} else if (source == btnExample5) {
 				logger.log(DEBUG, "**** Opening Example5 ****");
 				new Example5(dbConnection);
-			} else if (ae.getSource().equals(btnExample6)) {
+			} else if (source == btnExample6) {
 				logger.log(DEBUG, "**** Opening Example6 ****");
 				new Example6(dbConnection);
-			} else if (ae.getSource().equals(btnExample7)) {
+			} else if (source == btnExample7) {
 				logger.log(DEBUG, "**** Opening Example7 ****");
 				new Example7(dbConnection);
-			} else if (ae.getSource().equals(btnExample7UsingHelper)) {
+			} else if (source == btnExample7UsingHelper) {
 				logger.log(DEBUG, "**** Opening Example7UsingHelper ****");
 				JFrame e7JFrame = new JFrame("Example7 Using Helper");
 				Example7UsingHelper example7 = new Example7UsingHelper(dbConnection, null);
@@ -214,14 +210,14 @@ public class MainClass extends JFrame
 				//e7JFrame.pack(); // NOT USING .pack() FOR DATA GRID SCREENS
 				e7JFrame.setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 				e7JFrame.setVisible(true);
-			} else if (ae.getSource().equals(btnTestBase)) {
+			} else if (source == btnTestBase) {
 				logger.log(DEBUG, "**** Opening TestBaseComponents ****");
 				new TestBaseComponents(dbConnection, hints);
-			} else if (ae.getSource().equals(btnTestGrid)) {
+			} else if (source == btnTestGrid) {
 				logger.log(DEBUG, "**** TestGridComponents not implemented ****");
 				// TODO
 				// new TestGridComponents(dbConnection);
-			} else if (ae.getSource().equals(btnTestFormatted)) {
+			} else if (source == btnTestFormatted) {
 				logger.log(DEBUG, "**** Opening TestFormattedComponents ****");
 				new TestFormattedComponents(dbConnection);
 			}
@@ -353,10 +349,10 @@ public class MainClass extends JFrame
 	private ComboRowSetSource comboRowSetSource = new ComboRowSetSource();
 	private JButton btnLogMan = new JButton("Manage Logging");
 
-	/**
-	 * Log4j2 Logger
-	 */
+	/** Logger */
 	private static final Logger logger = SSUtils.getLogger();
+
+	static DatabaseMetaData dbMeta;
 
 	/**
 	 * Constructor for MainClass
@@ -390,6 +386,12 @@ public class MainClass extends JFrame
 			System.exit(1);
 		}
 
+		try {
+			dbMeta = dbConnection.getMetaData();
+			Objects.isNull(dbMeta);
+		} catch (SQLException ex) {
+		}
+		
 		CentralLookup.getDefault().add(new DefaultSSDBSupport(dbConnection) {
 			@Override
 			public RowSet getJdbcRowSet(RowSet rs) throws SQLException
@@ -399,6 +401,7 @@ public class MainClass extends JFrame
 		});
 
 		// ADD ACTION LISTENERS FOR BUTTONS
+		// TODO: can share listener OR add arg that can be switched on.
 		btnExample1.addActionListener(new MyButtonListener());
 		btnExample2.addActionListener(new MyButtonListener());
 		btnExample3.addActionListener(new MyButtonListener());
@@ -846,6 +849,7 @@ public class MainClass extends JFrame
 	public static void main(final String[] _args)
 	{
 		configureJavaUtilLogger();
+		Screens.setPrefGraphicsDev("SWINGSET_PREFERRED_SCREEN");
 
 		CentralLookup lkup = CentralLookup.getDefault();
 		lkup.add(new LoadDemoImages());

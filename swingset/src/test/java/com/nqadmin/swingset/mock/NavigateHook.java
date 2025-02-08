@@ -34,35 +34,30 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.SpinnerNumberModel;
 
-import com.nqadmin.swingset.navigate.NavigateActions;
+import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.utils.SSUtils;
 
-import static com.nqadmin.swingset.navigate.NavAction.*;
+import static com.nqadmin.swingset.navigate.RowsAction.*;
 
 /**
  *
  */
 public class NavigateHook
 {
-	private final NavigateActions navActs;
 	private final ActionMap actionMap;
+	private final RowsModel rowsModel;
 
-	//public Navigate(NavigateActions navActs)
 	public NavigateHook(RowSet rs)
 	{
-		this.navActs = NavigateActions.get(rs);
-		actionMap = navActs.createActionMap();
-	}
-
-	public NavigateActions getNavActs()
-	{
-		return navActs;
+		this.rowsModel = SSUtils.findRowsModel(rs);
+		this.actionMap = rowsModel.fillNavActionMap(null);
 	}
 	
-	public void first() { actionMap.get(NAV_FIRST).actionPerformed(null); }
-	public void last() { actionMap.get(NAV_LAST).actionPerformed(null); }
-	public void next() { actionMap.get(NAV_NEXT).actionPerformed(null); }
-	public void prev() { actionMap.get(NAV_PREVIOUS).actionPerformed(null); }
-	public void commit() { actionMap.get(NAV_COMMIT).actionPerformed(null); }
+	public void first() { actionMap.get(ACT_FIRST).actionPerformed(null); }
+	public void last() { actionMap.get(ACT_LAST).actionPerformed(null); }
+	public void next() { actionMap.get(ACT_NEXT).actionPerformed(null); }
+	public void prev() { actionMap.get(ACT_PREVIOUS).actionPerformed(null); }
+	public void commit() { actionMap.get(ACT_COMMIT).actionPerformed(null); }
 
 	public void go(int row) {
 		ModelAct spinModel = getSpinModelAct();
@@ -81,7 +76,7 @@ public class NavigateHook
 
 	private record ModelAct(SpinnerNumberModel model, Action action){}
 	private ModelAct getSpinModelAct() {
-		Action act = actionMap.get(NAV_GOTOROW);
+		Action act = actionMap.get(ACT_GOTOROW);
 		Object value = act.getValue("SPINNER_MODEL");
 		return new ModelAct((SpinnerNumberModel) value, act);
 	}

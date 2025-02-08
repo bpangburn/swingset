@@ -81,11 +81,37 @@ public class RowNumberSpinnerTest
 	{
 	}
 
+	RowSet getRS1() throws SQLException, ClassNotFoundException
+	{
+		RowSet rs = H2.getRowSet("""
+			CREATE TABLE tbl1
+			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, c_tinyint tinyint);
+            INSERT INTO tbl1 VALUES
+            	(11, 1), (12, 1), (13, 1), (14, 1)
+            ;
+            """);
+		rs.setCommand("SELECT * FROM tbl1");
+		return rs;
+	}
+
+	RowSet getRS2() throws SQLException, ClassNotFoundException
+	{
+		RowSet rs = H2.getRowSet("""
+			CREATE TABLE tbl2
+			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, c_tinyint tinyint);
+            INSERT INTO tbl2 VALUES
+            	(21, 1), (22, 1), (23, 1), (24, 1), (25, 1)
+            ;
+            """);
+		rs.setCommand("SELECT * FROM tbl2");
+		return rs;
+	}
+
 	// record r(int x){}
 
 	// private record SpinnerModelAct(SpinnerNumberModel model, Action action){}
-	// private SpinnerModelAct getSpinModelAct(NavigationModel m) {
-	// 	Action act = m.getAction(NavAction.NAV_GOTOROW);
+	// private SpinnerModelAct getSpinModelAct(RowsModel m) {
+	// 	Action act = m.getAction(RowsAction.ACT_GOTOROW);
 	// 	Object value = act.getValue(NavigateActions.KEY_SPINNER_MODEL);
 	// 	return new SpinnerModelAct((SpinnerNumberModel) value, act);
 	// }
@@ -99,28 +125,16 @@ public class RowNumberSpinnerTest
 	{
 		System.out.println("setAction");
 
-		RowSet rs1 = H2.getRowSetCleanDB("""
-			CREATE TABLE tbl1
-			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, c_tinyint tinyint);
-            INSERT INTO tbl1 VALUES
-            	(11, 1), (12, 1), (13, 1), (14, 1)
-            ;
-            """);
-		rs1.setCommand("SELECT * FROM tbl1");
-		NavigationModel model1 = new NavigationModel(rs1);
+		H2.clean();
 
-		RowSet rs2 = H2.getRowSetCleanDB("""
-			CREATE TABLE tbl2
-			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, c_tinyint tinyint);
-            INSERT INTO tbl2 VALUES
-            	(21, 1), (22, 1), (23, 1), (24, 1), (25, 1)
-            ;
-            """);
-		rs2.setCommand("SELECT * FROM tbl2");
-		NavigationModel model2 = new NavigationModel(rs2);
+		RowSet rs1 = getRS1();
+		RowsModel model1 = RowsModel.create(rs1);
+
+		RowSet rs2 = getRS2();
+		RowsModel model2 = RowsModel.create(rs2);
 		
 		RowNumberSpinner spinner = new RowNumberSpinner();
-		spinner.setAction(model1.getAction(NavAction.NAV_GOTOROW));
+		spinner.setAction(model1.getAction(RowsAction.ACT_GOTOROW));
 
 		// Verify that there is only one actionPerformed per setValue.
 		// Verify that the correct rowSet cursor is modified,
@@ -143,7 +157,7 @@ public class RowNumberSpinnerTest
 		assertEquals(2, rs1_row);
 		assertEquals(1, checkGoto());
 
-		spinner.setAction(model2.getAction(NavAction.NAV_GOTOROW));
+		spinner.setAction(model2.getAction(RowsAction.ACT_GOTOROW));
 		spinner.setValue(3);
 		rs2_row = rs2.getRow();
 		assertEquals(3, rs2_row);
@@ -155,7 +169,7 @@ public class RowNumberSpinnerTest
 		assertEquals(2, rs1_row);
 		assertEquals(1, checkGoto());
 
-		spinner.setAction(model1.getAction(NavAction.NAV_GOTOROW));
+		spinner.setAction(model1.getAction(RowsAction.ACT_GOTOROW));
 		spinner.setValue(3);
 		rs1_row = rs1.getRow();
 		assertEquals(3, rs1_row);
@@ -171,7 +185,7 @@ public class RowNumberSpinnerTest
 	private int nGoto;
 	private int checkGoto() {
 		int prevGoto = nGoto;
-		nGoto = NavigateActions.getCount(NavAction.NAV_GOTOROW);
+		nGoto = NavigateActions.getCount(RowsAction.ACT_GOTOROW);
 		int n = nGoto - prevGoto;
 		//System.err.printf("N_GOTO: %d\n", n);
 		return n;
@@ -180,7 +194,7 @@ public class RowNumberSpinnerTest
 	@SuppressWarnings("unused")
 	private void checkRowSetPos(int r1, RowSet rs1, int r2, RowSet rs2) throws SQLException {
 		// int prevGoto = nGoto;
-		// nGoto = NavigateActions.getCount(NavAction.NAV_GOTOROW);
+		// nGoto = NavigateActions.getCount(RowsAction.ACT_GOTOROW);
 		// int n = nGoto - prevGoto;
 		System.err.printf("POS: rs1%s %d, rs2%s %d\n",
 				rs1.getRow() != r1 ? " ERROR" : "", r1,
@@ -199,15 +213,9 @@ public class RowNumberSpinnerTest
 	{
 		System.out.println("setModel");
 
-		RowSet rs1 = H2.getRowSetCleanDB("""
-			CREATE TABLE tbl1
-			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, c_tinyint tinyint);
-            INSERT INTO tbl1 VALUES
-            	(11, 1), (12, 1), (13, 1), (14, 1)
-            ;
-            """);
-		rs1.setCommand("SELECT * FROM tbl1");
-		NavigationModel navModel = new NavigationModel(rs1);
+		H2.clean();
+		RowSet rs1 = getRS1();
+		RowsModel navModel = RowsModel.create(rs1);
 
 		RowNumberSpinner spinner = new RowNumberSpinner();
 		SpinnerNumberModel defaultSpinnerModel = spinner.getModel();
@@ -216,7 +224,7 @@ public class RowNumberSpinnerTest
 					 () -> spinner.setModel(new SpinnerNumberModel()));
 		assertTrue(defaultSpinnerModel == spinner.getModel());
 
-		spinner.setAction(navModel.getAction(NavAction.NAV_GOTOROW));
+		spinner.setAction(navModel.getAction(RowsAction.ACT_GOTOROW));
 		assertFalse(defaultSpinnerModel == spinner.getModel());
 	}
 

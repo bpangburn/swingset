@@ -41,6 +41,8 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -51,9 +53,6 @@ import javax.swing.KeyStroke;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.table.TableCellEditor;
-
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 
 import com.nqadmin.swingset.SSDataGrid;
 
@@ -322,8 +321,8 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * @throws SQLException exception thrown while initializing rowset
 	 * @throws Exception exception thrown while initializing rowset
 	 */
-	private void initRowset() throws SQLException, Exception {
-		setRowset(getNewRowSet(getConnection()));
+	private void initNewRowset() throws SQLException, Exception {
+		setRowsModel(SSUtils.findRowsModel(getNewRowSet(getConnection())));
 		updateRowset();
 	}
 	
@@ -336,7 +335,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 		try {
 			// SETUP QUERY, DEFAULTS, and BUILD SCREEN
 			// SET ROWSET QUERY
-			initRowset();
+			initNewRowset();
 			
 			// SET TABLE/GRID HEADERS
 			dataGrid.setHeaders(getHeaders());

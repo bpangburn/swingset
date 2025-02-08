@@ -41,18 +41,18 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.function.Supplier;
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.sql.RowSet;
@@ -72,17 +72,17 @@ import com.nqadmin.swingset.SSList;
 import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.SSTextArea;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.demo.datepicker.DbDatePicker;
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSDbArrayModel;
+import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
-import com.nqadmin.swingset.demo.datepicker.DbDatePicker;
 
-import static com.nqadmin.swingset.demo.TestBaseComponents.Comps.*;
 import static com.nqadmin.swingset.demo.TestBaseComponents.CompDim.*;
+import static com.nqadmin.swingset.demo.TestBaseComponents.Comps.*;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
-
 import static java.lang.System.Logger.Level.*;
 
 
@@ -218,7 +218,7 @@ public class TestBaseComponents extends JFrame
 	 * bound component declarations
 	 */
 	SSTextField txtSwingSetBaseTestPK = new SSTextField();
-	SSCheckBox chkSSCheckBox = new SSCheckBox();
+	SSCheckBox chkSSCheckBox = new SSCheckBox("labeled checkbox");
 	SSComboBox cmbSSComboBox = new SSComboBox();
 	SSComboBox cmbEnumSSComboBox = new SSComboBox();
 	SSDBComboBox cmbSSDBComboBox = new SSDBComboBox();
@@ -236,6 +236,7 @@ public class TestBaseComponents extends JFrame
 	Connection connection = null;
 	RowSet rowset = null;
 	SSDataNavigator navigator = null;
+	RowsModel rowsModel;
 
 	/**
 	 * combo navigator and sync manger
@@ -270,10 +271,10 @@ public class TestBaseComponents extends JFrame
 		// INITIALIZE SOME DYNAMIC INFORMATION
 		hints =  _hints;
 		lstSSList = new SSList(getCollectionModel());
-
+		
 		populateComps();
 		activeComps.removeAll(EnumSet.of(DATE_PICKER));
-
+		
 		//activeComps.removeAll(EnumSet.of(CHECK, LABEL));
 		//activeComps.clear();
 		//activeComps.addAll(EnumSet.of(
@@ -298,18 +299,19 @@ public class TestBaseComponents extends JFrame
 			String sql = sf("SELECT %s FROM swingset_base_test_data", getColumnsSQL());
 			logger.log(INFO, sql);
 			rowset.setCommand(sql);
-			navigator = new SSDataNavigator(rowset);
+			rowsModel = RowsModel.create(rowset);
+			navigator = new SSDataNavigator(rowsModel);
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, "SQL Exception.", se);
 		}
-
+		
 		/**
 		 * Various navigator overrides needed to support H2
 		 * <p>
 		 * H2 does not fully support updatable rowset so it must be
 		 * re-queried following insert and delete with rowset.execute()
 		 */
-		navigator.getNavigateActions().setDBNav(new SSDBNavImpl(this)
+		rowsModel.setDBNav(new SSDBNavImpl(this)
 		{
 			/**
 			 * Requery the rowset following a deletion. This is needed for H2.
@@ -347,7 +349,7 @@ public class TestBaseComponents extends JFrame
 			public void performPreInsertOps() {
 				//
 				// WHERE IS THE PRIMARY KEY SET? See example1
-				// 
+				//
 				
 				// SSDBNavImpl will clear the component values
 				super.performPreInsertOps();
@@ -364,7 +366,7 @@ public class TestBaseComponents extends JFrame
 				super.performRefreshOps();
 				if (syncManager == null)
 					return;
-
+				
 				syncManager.async();
 				try {
 					cmbSSDBComboNav.execute();
@@ -384,11 +386,11 @@ public class TestBaseComponents extends JFrame
 				super.performCancelOps();
 				if (cmbSSDBComboNav == null)
 					return;
-
+				
 				cmbSSDBComboNav.setEnabled(true);
 			}
 		});
-
+		
 		
 		if (!activeComps.contains(NAV)) {
 			cmbSSDBComboNav = null;
@@ -412,7 +414,7 @@ public class TestBaseComponents extends JFrame
 			// YOU HAVE TO CALL THE .async() METHOD
 			//
 			// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
-			syncManager = new SSSyncManager(cmbSSDBComboNav, navigator.getNavigateActions());
+			syncManager = new SSSyncManager(cmbSSDBComboNav, rowsModel);
 			syncManager.setSyncColumnName("swingset_base_test_pk");
 			syncManager.sync();
 		}
@@ -444,14 +446,14 @@ public class TestBaseComponents extends JFrame
 		
 		// SET SLIDER RANGE
 		sliSSSlider.setMaximum(25);
-
+		
 		// SSComponents are setup, save info that may have changed.
 		replaceComponent(NAV, cmbSSDBComboNav);
 		replaceComponent(DB_COMBO, cmbSSDBComboBox);
-
+		
 		// Bind the components to their database columns.
 		buildGui_bind();
-
+		
 		if (activeComps.contains(DB_COMBO)) {
 			// Run db combo queries.
 			try {
@@ -462,10 +464,10 @@ public class TestBaseComponents extends JFrame
 				logger.log(Level.ERROR, "Exception.", e);
 			}
 		}
-
+		
 		// Set the dimensions of the labels and components.
 		buildGui_dim();
-
+		
 		JScrollPane lstScrollPane = null;
 		if (activeComps.contains(LIST)) {
 			// NEED TO MAKE SURE LIST IS TALLER THAN THE SCROLLPANE TO SEE THE SCROLLBAR
@@ -473,15 +475,15 @@ public class TestBaseComponents extends JFrame
 			lstScrollPane = new JScrollPane(lstSSList);
 			lstScrollPane.setPreferredSize(MainClass.ssDimTall);
 		}
-
+		
 		// Setup the container and layout the components.
 		final Container contentPane = getContentPane();
 		contentPane.setLayout(new GridBagLayout());
 		final GridBagConstraints constraints = new GridBagConstraints();
-
+		
 		// Add the components, there's a special case with the list scroll pane.
 		buildGui_add(contentPane, constraints, lstScrollPane);
-
+		
 		constraints.gridx = 0;
 		constraints.gridwidth = 2;
 		contentPane.add(navigator, constraints);
@@ -529,7 +531,7 @@ public class TestBaseComponents extends JFrame
 	{
 		for (Comp comp : getActiveCompInfo()) {
 			if (comp.col != null)
-				comp.comp.bind(rowset, comp.col);
+				comp.comp.bind(rowsModel, comp.col);
 		}
 	}
 

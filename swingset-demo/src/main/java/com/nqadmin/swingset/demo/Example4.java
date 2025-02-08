@@ -40,23 +40,23 @@ package com.nqadmin.swingset.demo;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-import java.util.List;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -76,17 +76,13 @@ import com.nqadmin.swingset.utils.SSUtils;
  * records and in the same order. Otherwise the SSSyncManager will spend a lot of
  * time looping through records to match.
  */
+@SuppressWarnings("serial")
 public class Example4 extends JFrame {
 
 	/**
 	 * Log4j2 Logger
 	 */
     static final Logger logger = SSUtils.getLogger();
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -6594890166578252237L;
 	
 	/**
 	 * screen label declarations
@@ -111,8 +107,8 @@ public class Example4 extends JFrame {
 	 * database component declarations
 	 */
 	Connection connection = null;
-	RowSet rowset = null;
 	SSDataNavigator navigator = null;
+	RowsModel rowsModel;
 
 	/**
 	 * combo navigator and sync manger
@@ -125,139 +121,121 @@ public class Example4 extends JFrame {
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
+	@SuppressWarnings({"LeakingThisInConstructor", "OverridableMethodCallInConstructor"})
 	public Example4(final Connection _dbConn) {
-
+		
 		// SET SCREEN TITLE
-			super("Example4");
-			DemoUtil.initExampleFrame(this, null);
-
+		super("Example4");
+		DemoUtil.initExampleFrame(this, null);
+		
 		// SET CONNECTION
-			connection = _dbConn;
-
+		connection = _dbConn;
+		
 		// SET SCREEN DIMENSIONS
-			setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
-			
+		setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
+		
 		// SET SCREEN POSITION
-			setLocation(DemoUtil.getChildScreenLocation(this.getName()));
-
+		setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+		
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-			try {
-				rowset = DemoUtil.getNewRowSet(connection);
-				rowset.setCommand("SELECT * FROM part_data;");
-				navigator = new SSDataNavigator(rowset);
-			} catch (final SQLException se) {
-				logger.log(Level.ERROR, "SQL Exception.", se);
-			}
+		try {
+			RowSet rowset = DemoUtil.getNewRowSet(connection);
+			rowset.setCommand("SELECT * FROM part_data;");
+			rowsModel = RowsModel.create(rowset);
+			navigator = new SSDataNavigator(rowsModel);
+		} catch (final SQLException se) {
+			logger.log(Level.ERROR, "SQL Exception.", se);
+		}
 
-
+		// DEBUG
+		//rowsModel.setWritable(false);
+		
+		
+		/**
+		 * Various navigator overrides needed to support H2
+		 * H2 does not fully support updatable rowset so it must be
+		 * re-queried following insert and delete with rowset.execute()
+		 */
+		rowsModel.setDBNav(new SSDBNavImpl(this) {
 			/**
-			 * Various navigator overrides needed to support H2
-			 * H2 does not fully support updatable rowset so it must be
-			 * re-queried following insert and delete with rowset.execute()
+			 * Re-enable DB Navigator following insertion Cancel
 			 */
-			navigator.getNavigateActions().setDBNav(new SSDBNavImpl(this) {
-				/**
-				 * unique serial id
-				 */
-				private static final long serialVersionUID = 9018468389405536891L;
-
-				/**
-				 * Re-enable DB Navigator following insertion Cancel
-				 */
-				@Override
-				public void performCancelOps() {
-					super.performCancelOps();
-					cmbSelectPart.setEnabled(true);
+			@Override
+			public void performCancelOps() {
+				super.performCancelOps();
+				cmbSelectPart.setEnabled(true);
+			}
+			
+			/**
+			 * Requery the rowset following a deletion. This is needed for H2.
+			 */
+			@Override
+			public void performPostDeletionOps() {
+				super.performPostDeletionOps();
+				try {
+					rowsModel.getRowSet().execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				}
-
-				/**
-				 * Requery the rowset following a deletion. This is needed for H2.
-				 */
-				@Override
-				public void performPostDeletionOps() {
-					super.performPostDeletionOps();
-					try {
-						rowset.execute();
-					} catch (final SQLException se) {
-						logger.log(Level.ERROR, "SQL Exception.", se);
-					}
-					performRefreshOps();
+				performRefreshOps();
+			}
+			
+			/**
+			 * Re-query the rowset following an insertion. This is needed for H2.
+			 */
+			@Override
+			public void performPostInsertOps() {
+				super.performPostInsertOps();
+				cmbSelectPart.setEnabled(true);
+				try {
+					rowsModel.getRowSet().execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
 				}
-
-				/**
-				 * Requery the rowset following an insertion. This is needed for H2.
-				 */
-				@Override
-				public void performPostInsertOps() {
-					super.performPostInsertOps();
-					cmbSelectPart.setEnabled(true);
-					try {
-						rowset.execute();
-					} catch (final SQLException se) {
-						logger.log(Level.ERROR, "SQL Exception.", se);
-					}
-					performRefreshOps();
-				}
-
-				/**
-				 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
-				 */
-				@Override
-				public void performPreInsertOps() {
-
-					// SSDBNavImpl will clear the component values
-					super.performPreInsertOps();
-
-					try {
-
+				performRefreshOps();
+			}
+			
+			/**
+			 * Obtain and set the PK value for the new record & perform any
+			 * other actions needed before an insert.
+			 */
+			@Override
+			public void performPreInsertOps() {
+				
+				// SSDBNavImpl will clear the component values
+				super.performPreInsertOps();
+				
+				try (ResultSet rs = connection
+						.createStatement()
+						.executeQuery("SELECT nextval('part_data_seq') as nextVal;");)
+				{
 					// GET THE NEW RECORD ID.
-						final ResultSet rs = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-								.executeQuery("SELECT nextval('part_data_seq') as nextVal;");
-						rs.next();
-						final int partID = rs.getInt("nextVal");
-						txtPartID.setText(String.valueOf(partID));
-						rs.close();
-
-					// DISABLE PART SELECTOR
-						cmbSelectPart.setEnabled(false);
-
-					// SET OTHER DEFAULTS
+					rs.next();
+					final int partID = rs.getInt("nextVal");
+					txtPartID.setText(String.valueOf(partID));
+				} catch(final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
+				} catch(final Exception e) {
+					logger.log(Level.ERROR, "Exception occured initializing new record.",e);
+				}
+				// DISABLE PART SELECTOR
+				cmbSelectPart.setEnabled(false);
+				
+				// SET OTHER DEFAULTS
 //						txtPartName.setText(null);
 //						cmbPartColor.setSelectedValue(0);
 //						txtPartWeight.setText("0");
 //						txtPartCity.setText(null);
-
-					} catch(final SQLException se) {
-						logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
-					} catch(final Exception e) {
-						logger.log(Level.ERROR, "Exception occured initializing new record.",e);
-					}
-
-				}
-
-				/**
-				 * Manage sync manager during a Refresh
-				 */
-				@Override
-				public void performRefreshOps() {
-					super.performRefreshOps();
-					syncManager.async();
-					try {
-						cmbSelectPart.execute();
-					} catch (final SQLException se) {
-						logger.log(Level.ERROR, "SQL Exception.", se);
-					} catch (final Exception e) {
-						logger.log(Level.ERROR, "Exception.", e);
-					}
-					syncManager.sync();
-				}
-
-			});
-
-			// SETUP NAVIGATOR QUERY
-				final String query = "SELECT * FROM part_data;";
-				cmbSelectPart = new SSDBComboBox(connection, query, "part_id", "part_name");
-
+				
+			}
+			
+			/**
+			 * Manage sync manager during a Refresh
+			 */
+			@Override
+			public void performRefreshOps() {
+				super.performRefreshOps();
+				syncManager.async();
 				try {
 					cmbSelectPart.execute();
 				} catch (final SQLException se) {
@@ -265,97 +243,117 @@ public class Example4 extends JFrame {
 				} catch (final Exception e) {
 					logger.log(Level.ERROR, "Exception.", e);
 				}
-
-			// SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES
-
-				// This is the normal case, specify an option for each mapping
-				cmbPartColor.setDisplayValues(List.of("Red", "Green", "Blue"));
-
-				// This is used to initialize some stuff for Example4Advanced
-				cmbPartColorChangeOptions();
-
-			// BIND THE COMPONENTS TO THE DATABASE COLUMNS
-				txtPartID.bind(rowset, "part_id");
-				txtPartName.bind(rowset, "part_name");
-				cmbPartColor.bind(rowset, "color_code");
-				txtPartWeight.bind(rowset, "weight");
-				txtPartCity.bind(rowset, "city");
-
-			// SETUP SYNCMANAGER, WHICH WILL TAKE CARE OF KEEPING THE COMBO NAVIGATOR AND
-			// DATA NAVIGATOR IN SYNC.
-			//
-			// BEFORE CHANGING THE QUERY OR RE-EXECUTING THE QUERY FOR THE COMBO BOX,
-			// YOU HAVE TO CALL THE .async() METHOD
-			//
-			// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
-				syncManager = new SSSyncManager(cmbSelectPart, navigator.getNavigateActions());
-				syncManager.setSyncColumnName("part_id");
 				syncManager.sync();
-
-			// SET LABEL DIMENSIONS
-				lblSelectPart.setPreferredSize(MainClass.labelDim);
-				lblPartID.setPreferredSize(MainClass.labelDim);
-				lblPartName.setPreferredSize(MainClass.labelDim);
-				lblPartColor.setPreferredSize(MainClass.labelDim);
-				lblPartWeight.setPreferredSize(MainClass.labelDim);
-				lblPartCity.setPreferredSize(MainClass.labelDim);
-
-			// SET BOUND COMPONENT DIMENSIONS
-				cmbSelectPart.setPreferredSize(MainClass.ssDim);
-				txtPartID.setPreferredSize(MainClass.ssDim);
-				txtPartName.setPreferredSize(MainClass.ssDim);
-				cmbPartColor.setPreferredSize(MainClass.ssDim);
-				txtPartWeight.setPreferredSize(MainClass.ssDim);
-				txtPartCity.setPreferredSize(MainClass.ssDim);
-
-			// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-				final Container contentPane = getContentPane();
-				final GridBagConstraints constraints = new GridBagConstraints();
-				contentPane.setLayout(new GridBagLayout());
-
-				constraints.gridx = 0;
-				constraints.gridy = 0;
-				contentPane.add(lblSelectPart, constraints);
-				constraints.gridy = 1;
-				contentPane.add(lblPartID, constraints);
-				constraints.gridy = 2;
-				contentPane.add(lblPartName, constraints);
-				constraints.gridy = 3;
-				contentPane.add(lblPartColor, constraints);
-				constraints.gridy = 4;
-				contentPane.add(lblPartWeight, constraints);
-				constraints.gridy = 5;
-				contentPane.add(lblPartCity, constraints);
-
-				constraints.gridx = 1;
-				constraints.gridy = 0;
-				contentPane.add(cmbSelectPart, constraints);
-				constraints.gridy = 1;
-				contentPane.add(txtPartID, constraints);
-				constraints.gridy = 2;
-				contentPane.add(txtPartName, constraints);
-				constraints.gridy = 3;
-				contentPane.add(cmbPartColor, constraints);
-				constraints.gridy = 4;
-				contentPane.add(txtPartWeight, constraints);
-				constraints.gridy = 5;
-				contentPane.add(txtPartCity, constraints);
-
-				constraints.gridx = 0;
-				constraints.gridy = 6;
-				constraints.gridwidth = 2;
-				contentPane.add(navigator, constraints);
-
-				constraints.gridy = 7;
-				constraints.gridwidth = 1;
-				
-			// DISABLE THE PRIMARY KEY
-				txtPartID.setEnabled(false);
-
-			// MAKE THE JFRAME VISIBLE
-				setVisible(true);
-				pack();
 			}
+			
+		});
+		
+		// Setup navigator query.
+		// Use the "order by" to exercise SSSyncManager's "perform a manual loop"
+		final String query = Boolean.FALSE
+				? "SELECT * FROM part_data;"
+				: "SELECT * FROM part_data order by part_name;";
+		cmbSelectPart = new SSDBComboBox(connection, query, "part_id", "part_name");
+		
+		try {
+			cmbSelectPart.execute();
+		} catch (final SQLException se) {
+			logger.log(Level.ERROR, "SQL Exception.", se);
+		} catch (final Exception e) {
+			logger.log(Level.ERROR, "Exception.", e);
+		}
+		
+		// Setup the part color combo box options to be displayed and their
+		// corresponding values.
+		
+		// This is the normal case, specify an option for each mapping
+		cmbPartColor.setDisplayValues(List.of("Red", "Green", "Blue"));
+		
+		// This is used to initialize some stuff for Example4Advanced
+		cmbPartColorChangeOptions();
+		
+		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
+		txtPartID.bind(rowsModel, "part_id");
+		txtPartName.bind(rowsModel, "part_name");
+		cmbPartColor.bind(rowsModel, "color_code");
+		txtPartWeight.bind(rowsModel, "weight");
+		txtPartCity.bind(rowsModel, "city");
+		
+		// SETUP SYNCMANAGER, WHICH WILL TAKE CARE OF KEEPING THE COMBO NAVIGATOR AND
+		// DATA NAVIGATOR IN SYNC.
+		//
+		// BEFORE CHANGING THE QUERY OR RE-EXECUTING THE QUERY FOR THE COMBO BOX,
+		// YOU HAVE TO CALL THE .async() METHOD
+		//
+		// AFTER CALLING .execute() ON THE COMBO NAVIGATOR, CALL THE .sync() METHOD
+		syncManager = new SSSyncManager(cmbSelectPart, rowsModel);
+		syncManager.setSyncColumnName("part_id");
+		syncManager.sync();
+		
+		// SET LABEL DIMENSIONS
+		lblSelectPart.setPreferredSize(MainClass.labelDim);
+		lblPartID.setPreferredSize(MainClass.labelDim);
+		lblPartName.setPreferredSize(MainClass.labelDim);
+		lblPartColor.setPreferredSize(MainClass.labelDim);
+		lblPartWeight.setPreferredSize(MainClass.labelDim);
+		lblPartCity.setPreferredSize(MainClass.labelDim);
+		
+		// SET BOUND COMPONENT DIMENSIONS
+		cmbSelectPart.setPreferredSize(MainClass.ssDim);
+		txtPartID.setPreferredSize(MainClass.ssDim);
+		txtPartName.setPreferredSize(MainClass.ssDim);
+		cmbPartColor.setPreferredSize(MainClass.ssDim);
+		txtPartWeight.setPreferredSize(MainClass.ssDim);
+		txtPartCity.setPreferredSize(MainClass.ssDim);
+		
+		// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
+		final Container contentPane = getContentPane();
+		final GridBagConstraints constraints = new GridBagConstraints();
+		contentPane.setLayout(new GridBagLayout());
+		
+		constraints.gridx = 0;
+		constraints.gridy = 0;
+		contentPane.add(lblSelectPart, constraints);
+		constraints.gridy = 1;
+		contentPane.add(lblPartID, constraints);
+		constraints.gridy = 2;
+		contentPane.add(lblPartName, constraints);
+		constraints.gridy = 3;
+		contentPane.add(lblPartColor, constraints);
+		constraints.gridy = 4;
+		contentPane.add(lblPartWeight, constraints);
+		constraints.gridy = 5;
+		contentPane.add(lblPartCity, constraints);
+		
+		constraints.gridx = 1;
+		constraints.gridy = 0;
+		contentPane.add(cmbSelectPart, constraints);
+		constraints.gridy = 1;
+		contentPane.add(txtPartID, constraints);
+		constraints.gridy = 2;
+		contentPane.add(txtPartName, constraints);
+		constraints.gridy = 3;
+		contentPane.add(cmbPartColor, constraints);
+		constraints.gridy = 4;
+		contentPane.add(txtPartWeight, constraints);
+		constraints.gridy = 5;
+		contentPane.add(txtPartCity, constraints);
+		
+		constraints.gridx = 0;
+		constraints.gridy = 6;
+		constraints.gridwidth = 2;
+		contentPane.add(navigator, constraints);
+		
+		constraints.gridy = 7;
+		constraints.gridwidth = 1;
+		
+		// DISABLE THE PRIMARY KEY
+		txtPartID.setEnabled(false);
+		
+		// MAKE THE JFRAME VISIBLE
+		setVisible(true);
+		pack();
+	}
 
 	void cmbPartColorChangeOptions() {}
 }

@@ -56,12 +56,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.JoinRowSet;
 
+import com.google.common.collect.MapMaker;
 import com.nqadmin.swingset.datasources.SSDBSupport;
+import com.nqadmin.swingset.navigate.RowsModel;
 
 
 /**
@@ -83,6 +86,35 @@ public class SSUtils {
 	 */
 	public static void issueRowChanged_HACK(SSComponentInterface comp) {
 		comp.getSSCommon().issueRowChanged();
+	}
+
+	/**
+	 * Use this if you want a 1-1 correspondence between RowSet and RowsModel.
+	 * <p>
+	 * Can also use as a transition aid to RowsModel.
+	 * @param rs
+	 * @return 
+	 */
+	public static RowsModel findRowsModel(RowSet rs) {
+		boolean makeNew = false;
+		if (!rs2rowsModel.containsKey(rs))
+			makeNew = true;
+		RowsModel navm = rs2rowsModel.computeIfAbsent(rs, (rs01) -> RowsModel.create(rs01));
+		if (makeNew)
+			System.err.printf("\n***** Allocate new model %s for %s *****\n\n",
+					objectID(navm), objectID(rs));
+		return navm;
+	}
+	private static ConcurrentMap<RowSet, RowsModel> rs2rowsModel = new MapMaker()
+			.concurrencyLevel(1).weakKeys().weakValues().makeMap();
+	/** DEBUG/FOR-NOW/... RETURN null if none */
+	public static void registerNewRowsModel(RowSet rs, RowsModel rowsModel) {
+		if (rs2rowsModel.get(rs) != null)
+			throw new IllegalStateException("RowModel already exists");
+		rs2rowsModel.put(rs, rowsModel);
+	}
+	public static RowsModel existingRowsModel(RowSet rs) {
+		return rs2rowsModel.get(rs);
 	}
 
 	/**

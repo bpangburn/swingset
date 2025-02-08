@@ -40,16 +40,22 @@ package com.nqadmin.swingset.demo;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.function.Function;
 
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
+import org.netbeans.validation.api.ui.ValidationGroup;
+import org.netbeans.validation.api.ui.ValidationItem;
+import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
+import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
@@ -57,13 +63,8 @@ import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.decorators.TextComponentValidator;
 import com.nqadmin.swingset.demo.simpval.SVUtils;
 import com.nqadmin.swingset.demo.simpval.StringValidator;
+import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSUtils;
-import java.util.function.Function;
-import javax.swing.JPanel;
-import org.netbeans.validation.api.ui.ValidationGroup;
-import org.netbeans.validation.api.ui.ValidationItem;
-import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
-import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
 /**
  * This example displays data from the supplier_data table.
@@ -100,9 +101,10 @@ public class Example1 extends JFrame {
 	/**
 	 * database component declarations
 	 */
-	Connection connection = null;
-	RowSet rowset = null;
-	SSDataNavigator navigator = null;
+	Connection connection;
+	RowSet rowset;
+	SSDataNavigator navigator;
+	RowsModel rowsModel;
 
 	private void cleanup()
 	{
@@ -160,7 +162,9 @@ public class Example1 extends JFrame {
 		try {
 			rowset = DemoUtil.getNewRowSet(connection);
 			rowset.setCommand("SELECT * FROM supplier_data");
-			navigator = new SSDataNavigator(rowset);
+
+			rowsModel = RowsModel.create(rowset);
+			navigator = new SSDataNavigator(rowsModel);
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, "SQL Exception.", se);
 		}
@@ -170,10 +174,10 @@ public class Example1 extends JFrame {
 		 * H2 does not fully support updatable rowset so it must be
 		 * re-queried following insert and delete with rowset.execute()
 		 */
-		navigator.getNavigateActions().setDBNav(new SSDBNavImpl(this)
+		rowsModel.setDBNav(new SSDBNavImpl(this)
 		{
 			/**
-			 * Requery the rowset following a deletion. This is needed for H2.
+			 * Re-query the RowSet following a deletion. This is needed for H2.
 			 */
 			@Override
 			public void performPostDeletionOps()
@@ -233,10 +237,10 @@ public class Example1 extends JFrame {
 		});
 
 		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
-		txtSupplierID.bind(rowset, "supplier_id");
-		txtSupplierName.bind(rowset, "supplier_name");
-		txtSupplierCity.bind(rowset, "city");
-		txtSupplierStatus.bind(rowset, "status");
+		txtSupplierID.bind(rowsModel, "supplier_id");
+		txtSupplierName.bind(rowsModel, "supplier_name");
+		txtSupplierCity.bind(rowsModel, "city");
+		txtSupplierStatus.bind(rowsModel, "status");
 		
 		// SET LABEL DIMENSIONS
 		lblSupplierID.setPreferredSize(MainClass.labelDim);

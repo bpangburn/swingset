@@ -29,30 +29,11 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
-import java.util.EventObject;
-
 /**
- * Base for events broadcast from {@link NavigationModel}.
+ * Tag for events broadcast from {@link RowsModel}.
  */
-@SuppressWarnings("serial")
-public abstract class NavigationEvent extends EventObject
+interface RowsModelEvent
 {
-	/**
-	 * 
-	 * @param source originating NavigationModel
-	 */
-	public NavigationEvent(NavigationModel source)
-	{
-		super(source);
-	}
-
-	/**
-	 * A NavigationModel.
-	 * @return NavigationModel that issued the event
-	 */
-	@Override
-	public NavigationModel getSource() {
-		return (NavigationModel) super.getSource();
-	}
-			
+	RowsModel getRowsModel();
 }
+

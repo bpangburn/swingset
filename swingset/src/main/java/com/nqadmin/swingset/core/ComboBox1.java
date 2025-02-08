@@ -38,14 +38,14 @@ package com.nqadmin.swingset.core;
 public abstract class ComboBox1<K,D> extends ComboBox2<K, D, Object>
 {
 	/**
-	 * Creates an object of SSComboBox.
+	 * Creates an object of ComboBox.
 	 */
 	public ComboBox1() {
 		this(ModelType.SWING);
 	}
 
 	/**
-	 * Creates an object of SSComboBox.
+	 * Creates an object of ComboBox.
 	 * <p>
 	 * If useGlazedLists is specified, it is configured strict.
 	 * Use {@link #getAutoComplete() } to change its configuration

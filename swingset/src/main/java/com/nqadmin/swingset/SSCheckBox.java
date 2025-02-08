@@ -38,36 +38,16 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
-import java.awt.Insets;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-
 import javax.sql.RowSet;
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
 
-import java.lang.System.Logger;
-import java.sql.JDBCType;
-import java.util.EnumSet;
-import java.util.EventListener;
+import com.nqadmin.swingset.core.CheckBox;
+import com.nqadmin.swingset.navigate.RowsModel;
 
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-
-import com.nqadmin.swingset.decorators.BorderDecorator;
-
-import static java.lang.System.Logger.Level.*;
-
-import com.nqadmin.swingset.utils.SSComponentInterface;
-import com.nqadmin.swingset.utils.SSUtils;
-
-import static com.nqadmin.swingset.utils.SSUtils.sf;
-import static java.sql.JDBCType.*;
-import static com.nqadmin.swingset.datasources.ConvertType.assertConvertFromJdbcType;
+import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
 // SSCheckBox.java
 //
@@ -85,30 +65,33 @@ import static com.nqadmin.swingset.datasources.ConvertType.assertConvertFromJdbc
  * values returned for the checked and unchecked SSCheckBox states.
  */
 @SuppressWarnings("serial")
-public class SSCheckBox extends JCheckBox implements SSComponentInterface
+public class SSCheckBox extends CheckBox
 {
-	/**
-	 * Listener(s) for the component's value used to propagate changes back to bound
-	 * database column
-	 */
-	protected class SSCheckBoxListener implements ItemListener
-	{
-		/** {@inheritDoc} */
-		@Override
-		public void itemStateChanged(final ItemEvent ie)
-		{
-			dbChange(() -> setBoundColumnObject(isSelected()));
-		}
-	} // end private class SSCheckBoxListener
-
-	/** System Logger for component. */
-	private static final Logger logger = SSUtils.getLogger();
-
 	/**
 	 * Creates an object of SSCheckBox.
 	 */
 	public SSCheckBox() {
-		this(null);
+		super();
+	}
+
+	/**
+	 * Creates an object of SSCheckBox.
+	 *
+	 * @param _text Checkbox label
+	 */
+	public SSCheckBox(String _text) {
+		super(_text);
+	}
+	
+	/**
+	 * Creates an object of SSCheckBox binding it to the specified column in the
+	 * given RowSet.
+	 *
+	 * @param rowsModel        datasource to be used.
+	 * @param boundColumnName name of the column to which this check box should be
+	 */
+	public SSCheckBox(RowsModel rowsModel, String boundColumnName) {
+		super(rowsModel, boundColumnName);
 	}
 	
 	/**
@@ -117,114 +100,11 @@ public class SSCheckBox extends JCheckBox implements SSComponentInterface
 	 *
 	 * @param _rowSet        datasource to be used.
 	 * @param _boundColumnName name of the column to which this check box should be
-	 *                         bound
+	 * @deprecated use RowsModel insted of RowSet
 	 */
-	@SuppressWarnings("OverridableMethodCallInConstructor")
-	public SSCheckBox(final RowSet _rowSet, final String _boundColumnName) {
-		this(null);
-		bind(_rowSet, _boundColumnName);
-	}
-
-	/**
-	 * Creates an object of SSCheckBox.
-	 *
-	 * @param _text Checkbox label
-	 */
-	public SSCheckBox(final String _text) {
-		super(_text);
-		logger.log(DEBUG, () -> sf("original border: %s",
-				BorderDecorator.asString(getBorder(), this)));
-		// JCheckBox disables painting the borders.
-		// Replace the JCheckBox border with an empty border.
-		Border b = getBorder();
-		if (b instanceof CompoundBorder cb) {
-			Insets oInsets = toInsets(cb.getOutsideBorder());
-			Insets iInsets = toInsets(cb.getInsideBorder());
-			b = BorderFactory.createCompoundBorder(
-					BorderFactory.createEmptyBorder(
-							oInsets.top, oInsets.left, oInsets.bottom, oInsets.right),
-					BorderFactory.createEmptyBorder(
-							iInsets.top, iInsets.left, iInsets.bottom, iInsets.right));
-		} else {
-			Insets i = getInsets();
-			b = BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right);
-		}
-		setBorder(b);
-		setBorderPainted(true);
-		finishSSCommon();
-	}
-
-	private Insets toInsets(Border b)
-	{
-		return b.getBorderInsets(this);
-	}
-
-	/** {@inheritDoc } */
-	@Override
-	public void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException
-	{
-		assertConvertFromJdbcType(jdbcType, Boolean.class,
-				EnumSet.of(BIT, BOOLEAN, INTEGER, SMALLINT, TINYINT));
-	}
-
-	/** {@inheritDoc } */
-	@Override
-	public void cleanField()
-	{
-		setSelected(false);
-	}
-
-	private Hook hook;
-
-	/** {@inheritDoc } */
-	@Override
-	public final Hook getSSComponentHook()
-	{
-		if (hook == null)
-			hook = new Hook(this) {
-				/**
-				 * Updates the value stored and displayed in the SwingSet component
-				 * based on getBoundColumnText()
-				 */
-				@Override
-				protected void updateSSComponent()
-				{
-					logger.log(DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), getBoundColumnText()));
-					
-					Boolean value = getBoundColumnObject(Boolean.class);
-					setSelected(value == null ? false : value);
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected SSCheckBoxListener getSSComponentListener() {
-					return new SSCheckBoxListener();
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected void addSSComponentListener(EventListener eventListener)
-				{
-					addItemListener((ItemListener) eventListener);
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected void removeSSComponentListener(EventListener eventListener)
-				{
-					removeItemListener((ItemListener) eventListener);
-				}
-				
-			};
-		return hook;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public String toString()
-	{
-		return sf("SSCheckBox{selected=%s, %s}",
-				isSelected(), SSUtils.ssComponentToString(this));
+	@Deprecated
+	public SSCheckBox(RowSet _rowSet, String _boundColumnName) {
+		super(findRowsModel(_rowSet), _boundColumnName);
 	}
 
 } // end public class SSCheckBox

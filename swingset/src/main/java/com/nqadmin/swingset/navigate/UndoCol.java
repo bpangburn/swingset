@@ -50,8 +50,6 @@ import java.util.Objects;
 import javax.swing.text.JTextComponent;
 
 import com.nqadmin.swingset.datasources.RSC;
-import com.nqadmin.swingset.formatting.SSFormattedTextField;
-import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 
 import static com.nqadmin.swingset.navigate.RowSetState.isPreInsertOps;
 import static com.nqadmin.swingset.utils.SSUtils.sf;

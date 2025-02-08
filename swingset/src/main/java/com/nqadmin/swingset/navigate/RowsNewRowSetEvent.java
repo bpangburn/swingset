@@ -1,6 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
- * All rights reserved.
+ * Copyright (C) 2025, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,52 +26,34 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- * Contributors:
- *   Prasanth R. Pasala
- *   Brian E. Pangburn
- *   Diego Gil
- *   Man "Bee" Vo
- *   Ernie R. Rael
- * ****************************************************************************/
-/* *****************************************************************************
- * The conditions in the above copyright notice apply to this copyright notice.
- * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
-import javax.sql.RowSet;
+import java.util.EventObject;
 
 /**
- * Actions for working with {@link RowSet}s; used with
- * {@linkplain com.nqadmin.swingset.navigate.NavigateActions}.
+ * This event signals the source {@link RowsModel} has a different
+ * associated {@link javax.sql.RowSet}.Use {@link RowsModel#getRowSet()}
+ to get the RowSet.
  */
-public enum NavAction
+@SuppressWarnings("serial")
+public class RowsNewRowSetEvent extends EventObject implements RowsModelEvent
 {
-	/** Go to first record. */
-	NAV_FIRST,
-	/** Go to previous record. */
-	NAV_PREVIOUS,
-	/** Go to next record. */
-	NAV_NEXT,
-	/** Go to last record. */
-	NAV_LAST,
-	/** Commit current record to data base. */
-	NAV_COMMIT,
-	/** Undo changes to current record. */
-	NAV_REVERT,
-	/** Refresh record. */
-	NAV_REFRESH,
-	/** Add record. */
-	NAV_ADD,
-	/** Delete record. */
-	NAV_DELETE,
-	/** A specialized action for "goto row number".
-	 * This action has a Property, see {@link javax.swing.Action#getValue(java.lang.String)},
-	 * NavigateActions.KEY_SPINNER_MODEL, whose value is a
-	 * {@link javax.swing.SpinnerNumberModel} which models the ResultSet's current row.
+	/**
+	 * Constructs a RowsModelEvent.
+	 * @param source RowsModel get got a different RowSet
 	 */
-	NAV_GOTOROW,
-	;
+	public RowsNewRowSetEvent(RowsModel source)
+	{
+		super(source);
+	}
+
+	/**
+	 * A RowsModel.
+	 * @return RowsModel that issued the event
+	 */
+	@Override
+	public RowsModel getRowsModel() {
+		return (RowsModel) getSource();
+	}
 }

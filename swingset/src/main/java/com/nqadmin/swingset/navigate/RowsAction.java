@@ -1,21 +1,21 @@
-/*******************************************************************************
- * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+/* *****************************************************************************
+ * Copyright (C) 2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the copyright holder nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,73 +27,60 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * Contributors:
  *   Prasanth R. Pasala
  *   Brian E. Pangburn
  *   Diego Gil
  *   Man "Bee" Vo
  *   Ernie R. Rael
- ******************************************************************************/
+ * ****************************************************************************/
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
-package com.nqadmin.swingset;
+package com.nqadmin.swingset.navigate;
 
 import javax.sql.RowSet;
 
-import com.nqadmin.swingset.core.Image;
-import com.nqadmin.swingset.navigate.RowsModel;
-
-import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
-
-// SSImage.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
- * Used to load, store, and display images stored in a database.
+ * Actions for working with {@link RowSet}s; used with
+ * {@linkplain com.nqadmin.swingset.navigate.NavigateActions}.
  */
-// TODO: SSImage make all the load/store buttons/capabilities optional.
-@SuppressWarnings("serial")
-public class SSImage extends Image
+// TODO: RowsAction not RowsAction???
+public enum RowsAction
 {
-	/**
-	 * Construct a default SSImage Object.
+	/** Go to first record. */
+	ACT_FIRST,
+	/** Go to last record. */
+	ACT_LAST,
+	/** Go to next record. */
+	ACT_NEXT,
+	/** Go to previous record. */
+	ACT_PREVIOUS,
+	/** Commit current record to data base. */
+	ACT_COMMIT,
+	/** Undo changes to current record. */
+	ACT_REVERT,
+	/** Refresh record. */
+	ACT_REFRESH,
+	/** Add record. */
+	ACT_ADD,
+	/** Delete record. */
+	ACT_DELETE,
+	/** A specialized action for "goto row number".
+	 * This action has a Property, see {@link javax.swing.Action#getValue(java.lang.String)},
+	 * NavigateActions.KEY_SPINNER_MODEL, whose value is a
+	 * {@link javax.swing.SpinnerNumberModel} which models the ResultSet's current row.
 	 */
-	public SSImage() {
-		super();
-	}
-
+	ACT_GOTOROW,
+	;
 	/**
-	 * Constructs a SSImage Object bound to the specified column in the specified
-	 * rowSet.
-	 *
-	 * @param rowsModel          - RowSet from/to which data has to be read/written
-	 * @param _boundColumnName - column in the rowSet to which the component should
-	 *                         be bound.
-	 */
-	public SSImage(RowsModel rowsModel, String _boundColumnName)
-	{
-		
-		super(rowsModel, _boundColumnName);
-	}
-
-	/**
-	 * Constructs a SSImage Object bound to the specified column in the specified
-	 * rowSet.
-	 *
-	 * @param rowSet          - RowSet from/to which data has to be read/written
-	 * @param _boundColumnName - column in the rowSet to which the component should
-	 *                         be bound.
-	 * @deprecated use RowsModel insted of RowSet
-	 */
-	@Deprecated
-	public SSImage(RowSet rowSet, String _boundColumnName)
-	{
-		super(findRowsModel(rowSet), _boundColumnName);
-	}
-
+	 * Following could be used by spinner as event's command to indicate that if
+	 * already on the row don't need to do "rs.absolute()".
+	 * But that might be the default behavior anyway, in which case this would
+	 * be a no-op.
+	*/
+	public static final String OK_SKIP_CURSOR_MOVE = "MAY_SKIP_GOTOROW";
 }

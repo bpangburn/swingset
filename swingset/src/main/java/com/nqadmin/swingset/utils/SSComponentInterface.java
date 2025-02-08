@@ -43,15 +43,14 @@
 package com.nqadmin.swingset.utils;
 
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EventListener;
-
-import javax.sql.RowSet;
-
-import java.sql.Connection;
+import java.util.Objects;
 import java.util.function.Supplier;
 
+import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
 import javax.swing.JComponent;
 
@@ -61,9 +60,11 @@ import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.formatting.SSFormat;
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
-import com.nqadmin.swingset.navigate.NavigateActions;
-import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
 import com.nqadmin.swingset.navigate.RowSetModificationEvent;
+import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.navigate.UndoRedo;
+
+import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
 /**
  * Interface with default methods shared by most SwingSet components.
@@ -237,20 +238,34 @@ public interface SSComponentInterface extends RSC
 	 * Takes care of setting RowSet and Column Name for ssCommon and then calls
 	 * bind(this.ssCommon);
 	 *
-	 * @param rowSet datasource to be used.
+	 * @param rowsModel holds RowSet to be used.
 	 * @param boundColumnName Name of the column to which this check box should be bound
 	 */
-	default void bind(RowSet rowSet, String boundColumnName)
+	default void bind(RowsModel rowsModel, String boundColumnName)
 	{
+		Objects.requireNonNull(rowsModel);
+		RowSet rs = rowsModel.getRowSet();
 		try {
-			checkColumnType(RowSetOps.getJDBCColumnType(rowSet, boundColumnName));
+			checkColumnType(RowSetOps.getJDBCColumnType(rs, boundColumnName));
 		} catch (SQLException ex) {
 			throw new IllegalArgumentException("SQLException getting column type", ex);
 		}
-		getSSCommon().bind(rowSet, boundColumnName);
+		getSSCommon().bind(rowsModel, boundColumnName);
 		// Primary keys for SyncResolver, joins
-		if (rowSet instanceof CachedRowSet)
+		if (rs instanceof CachedRowSet)
 			SSUtils.setupDefaultPrimaryKeys(this);
+	}
+
+	/**
+	 * Transition support.
+	 * @param rowSet
+	 * @param boundColumnName
+	 * @deprecated use RowsModel not RowSet
+	 */
+	@Deprecated
+	default void bind(RowSet rowSet, String boundColumnName)
+	{
+		bind(findRowsModel(rowSet), boundColumnName);
 	}
 
 	/**
@@ -466,17 +481,6 @@ public interface SSComponentInterface extends RSC
 	default void setBoundColumnText(final String _boundColumnText) {
 		getSSCommon().setBoundColumnText(_boundColumnText);
 	}
-	
-	/**
-	 * Sets the RowSet to hold queried data from the database.
-	 *
-	 * @param _rowSet datasource
-	 *
-	 * @throws java.sql.SQLException - if a database access error occurs
-	 */
-	default void setRowSet(final RowSet _rowSet) throws java.sql.SQLException {
-		getSSCommon().setRowSet(_rowSet);
-	}
 
 	/**
 	 * Sets the Connection to the database
@@ -522,7 +526,7 @@ public interface SSComponentInterface extends RSC
 	 * @throws java.sql.SQLException
 	 */
 	default void addUndoableChange(RowSetModificationEvent ev) throws SQLException {
-		NavigateActions.addUndoableChange(ev);
+		UndoRedo.addUndoableChange(ev);
 	}
 
 	/**

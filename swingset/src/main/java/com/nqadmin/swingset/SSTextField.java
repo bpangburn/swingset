@@ -42,43 +42,26 @@
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 
 import javax.sql.RowSet;
-import javax.swing.JTextField;
-import javax.swing.text.Document;
 
-import java.lang.System.Logger;
-import java.util.EventListener;
+import com.nqadmin.swingset.core.TextField;
+import com.nqadmin.swingset.navigate.RowsModel;
 
-import static java.lang.System.Logger.Level.*;
+import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
-import com.nqadmin.swingset.utils.SSComponentInterface;
-import com.nqadmin.swingset.utils.SSTextSupport;
-import com.nqadmin.swingset.utils.SSTextSupport.SSDocumentListener;
-import com.nqadmin.swingset.utils.SSTextSupport.SSPlainDocument;
-import com.nqadmin.swingset.utils.SSUtils;
-
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
  * SSTextField extends the JTextField.
  */
 @SuppressWarnings("serial")
-public class SSTextField extends JTextField implements SSComponentInterface
+public class SSTextField extends TextField
 {
-	// TODO Consider adding an InputVerifier to prevent component from
-	// losing focus; see SSFormattedTextField.
-
-	/** Logger for component */
-	private static Logger logger = SSUtils.getLogger();
-
 	/**
 	 * Constructs a new, empty text field.
 	 */
 	public SSTextField() {
-		this(null);
+		super();
 	}
 
 	/**
@@ -86,113 +69,28 @@ public class SSTextField extends JTextField implements SSComponentInterface
 	 * @param _text initial text
 	 */
 	public SSTextField(String _text) {
-		this(null, null, null);
+		super(_text);
+	}
+
+	/**
+	 * Creates a SSTextField instance and binds it to the specified RowSet column.
+	 *
+	 * @param rowsModel          datasource to be used
+	 * @param _boundColumnName name of the column to which this label should be bound
+	 */
+	public SSTextField(RowsModel rowsModel, String _boundColumnName) {
+		super(rowsModel, _boundColumnName);
 	}
 
 	/**
 	 * Creates a SSTextField instance and binds it to the specified RowSet column.
 	 *
 	 * @param _rowSet          datasource to be used.
-	 * @param _boundColumnName name of the column to which this label should be
-	 *                         bound
+	 * @param _boundColumnName name of the column to which this label should be bound
+	 * @deprecated use RowsModel insted of RowSet
 	 */
+	@Deprecated
 	public SSTextField(final RowSet _rowSet, final String _boundColumnName) {
-		this(null, _rowSet, _boundColumnName);
+		super(findRowsModel(_rowSet), _boundColumnName);
 	}
-
-	/** All the constructors feed through here */
-	private SSTextField(String _text, final RowSet _rowSet, final String _boundColumnName) {
-		super(_text);
-		finishSSCommon();
-		if (_rowSet != null) {
-			bind(_rowSet, _boundColumnName);
-		}
-	}
-
-	/**
-	 * Part of the scheme to keep text field in sync with data base.
-	 * See {@link SSTextSupport.SSPlainDocument}.
-	 */
-	@Override
-	protected Document createDefaultModel() {
-		return new SSPlainDocument(this);
-	}
-
-	/**
-	 * Add focus listener that selects all text.
-	 * Add key listener for when this is used with mask. Use Mask Formatters.
-	 */
-	@Override
-	public void customInit()
-	{
-		// ADD FOCUS LISTENER TO THE TEXT FIELD SO THAT WHEN THE FOCUS IS GAINED
-		// COMPLETE TEXT SHOULD BE SELECTED
-		addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(final FocusEvent fe) {
-				// TODO: Turn off any TextDecorator while focused
-				SSTextField.this.selectAll();
-			}
-		});
-	}
-
-	/** {@inheritDoc } */
-	@Override
-	public void cleanField()
-	{
-		setText("");
-	}
-
-	private Hook hook;
-
-	/** {@inheritDoc } */
-	@Override
-	public final Hook getSSComponentHook()
-	{
-		if (hook == null)
-			hook = new Hook(this) {
-				/**
-				 * Updates the value stored and displayed in the SwingSet
-				 * component based on getBoundColumnText()
-				 */
-				@Override
-				protected void updateSSComponent() {
-					
-					final String text = getBoundColumnText();
-					logger.log(DEBUG, ()->sf("%s: Setting text field to %s.", getColumnForLog(), text));
-					setText(text);
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected SSDocumentListener getSSComponentListener() {
-					return SSTextSupport.getSSDocumentListener(SSTextField.this);
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected void addSSComponentListener(EventListener eventListener)
-				{
-					getDocument().addDocumentListener((SSDocumentListener)eventListener);
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected void removeSSComponentListener(EventListener eventListener)
-				{
-					getDocument().removeDocumentListener((SSDocumentListener)eventListener);
-				}
-				
-			};
-		return hook;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public String toString()
-	{
-		return sf("%s{text=%s, %s}", getClass().getSimpleName(),
-				getText(), SSUtils.ssComponentToString(this));
-	}
-
-} // end public class SSTextField extends JTextField {
+}

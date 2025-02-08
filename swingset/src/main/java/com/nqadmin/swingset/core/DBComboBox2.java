@@ -42,8 +42,8 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
-import static com.nqadmin.swingset.datasources.RowSetOps.getJDBCColumnType;
-
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
@@ -53,20 +53,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-
-import static java.lang.System.Logger.Level.*;
-
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
+import static com.nqadmin.swingset.datasources.RowSetOps.getJDBCColumnType;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
 /**
- * Similar to the SSComboBox, but used when both the 'bound' values and the
+ * Similar to the ComboBox, but used when both the 'bound' values and the
  * 'display' values are pulled from a database table. The bound value is called the 'mapping' and the display value the 'option'. An 'option2' may be specified; in that case the display value
  for the mapping is a composite of option and option2.Generally the mapping 
  represents a foreign key to another table, and the combobox needs to display
@@ -192,7 +189,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	private static final ModelType USE_GLAZED_MODEL = ModelType.GLAZED;
 
 	/**
-	 * Creates an object of the SSDBComboBox.
+	 * Creates an object of the DBComboBox.
 	 */
 	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
 	public DBComboBox2() {
@@ -204,9 +201,9 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	}
 	
 	/**
-	 * Constructs a SSDBComboBox with the given parameters. It is best practice
+	 * Constructs a DBComboBox with the given parameters. It is best practice
 	 * to pair setQuery() and execute() when building a screen where
-	 * SSDBComboBoxes may need to be re-queried so this is the preferred constructor.
+	 * DBComboBoxes may need to be re-queried so this is the preferred constructor.
 	 *
 	 * @param connection           database connection to be used.
 	 * @param primaryKeyColumnName column name used to query/generate the combo
@@ -222,7 +219,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	}
 
 	/**
-	 * Constructs a SSDBComboBox with the given parameters.
+	 * Constructs a DBComboBox with the given parameters.
 	 *
 	 * @param connection         database connection to be used.
 	 * @param query                query to be used to retrieve the values to display in
@@ -260,7 +257,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 
 		// since the list was likely blank when the component was bound we need to update
 		// the component again so it can get the text from the list we don't want to do
-		// this if the component is unbound as with an SSDBComboBox used for navigation.
+		// this if the component is unbound as with an DBComboBox used for navigation.
 		// TODO: rework combo navigation somehow; maybe there's a navigator "thing".
 		if (getRowSet() != null) {
 			// 	call using getSSCommon()
@@ -546,7 +543,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	@Override
 	public void setDisplayValues(List<D> displayValues, List<K> keys)
 	{
-		throw new UnsupportedOperationException("SSDBComboBox doesn't support");
+		throw new UnsupportedOperationException("DBComboBox doesn't support");
 	}
 
 	/**
@@ -556,7 +553,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	@Override
 	public void setDisplayValues(List<D> displayValues)
 	{
-		throw new UnsupportedOperationException("SSDBComboBox doesn't support");
+		throw new UnsupportedOperationException("DBComboBox doesn't support");
 	}
 
 	/**
@@ -566,7 +563,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 */
 	@Override
 	public <T extends Enum<T>> void setDisplayValues(Class<T> enumDisplayValues) {
-		throw new UnsupportedOperationException("SSDBComboBox doesn't support");
+		throw new UnsupportedOperationException("DBComboBox doesn't support");
 	}
 
-} // end public class SSDBComboBox
+} // end public class DBComboBox

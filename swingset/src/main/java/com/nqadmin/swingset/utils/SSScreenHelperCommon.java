@@ -40,7 +40,12 @@ package com.nqadmin.swingset.utils;
 import java.awt.Component;
 import java.awt.Container;
 import java.beans.PropertyVetoException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 import javax.sql.RowSet;
@@ -51,16 +56,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-
-import static java.lang.System.Logger.Level.*;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import com.nqadmin.swingset.navigate.RowsModel;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
 //SSScreenHelperCommon.java
 //
@@ -91,15 +90,8 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	// TODO: find a better way
 	public final static long hopefullyNoPKValue = -998877;
 
-	/**
-	 * Log4j Logger for component
-	 */
+	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
-
-	/**
-	 * unique serial ID
-	 */
-	private static final long serialVersionUID = 9108320379306383142L;
 	
 	/**
 	 * SwingSet properties
@@ -107,7 +99,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	protected static final Properties ssProps = SSProperties.getProperties();
 
 	private Connection connection; // Database connection.
-	private RowSet rowset; // Rowset to be used for screen/form.
+	private RowsModel rowsModel; // RowsModel to be used for screen/form.
 	private String pkColumn; // Primary key column name for rowset.
 	
 	private Long parentID = null; // Primary key value of parent record (FK for current rowset).
@@ -346,10 +338,19 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 
 	/**
-	 * @return the rowset
+	 * @return the RowsModel
 	 */
+	protected RowsModel getRowsModel() {
+		return rowsModel;
+	}
+
+	/**
+	 * @return the rowset
+	 * @deprecated 
+	 */
+	@Deprecated
 	protected RowSet getRowset() {
-		return rowset;
+		return rowsModel.getRowSet();
 	}
 	
 	/**
@@ -472,12 +473,21 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	protected void setPkColumn(final String _pkColumn) {
 		pkColumn = _pkColumn;
 	}
+
+	/**
+	 * @param rowsModel 
+	 */
+	protected void setRowsModel(RowsModel rowsModel) {
+		this.rowsModel = rowsModel;
+	}
 	
 	/**
 	 * @param _rowset rowset to be used by the screen/form
+	 * @deprecated use RowsModel
 	 */
+	@Deprecated
 	protected void setRowset(final RowSet _rowset) {
-		rowset = _rowset;
+		setRowsModel(SSUtils.findRowsModel(_rowset));
 	}
 	
 	/**
@@ -551,8 +561,8 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	protected void updateRowset() throws SQLException, Exception {
 		String query = getRowsetQuery();
 		logger.log(DEBUG, ()->sf("Rowset query: [%s].", query));
-		getRowset().setCommand(query);
-		getRowset().execute();
+		getRowsModel().getRowSet().setCommand(query);
+		getRowsModel().getRowSet().execute();
 	}
 	
 	/**

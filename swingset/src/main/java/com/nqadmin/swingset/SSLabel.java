@@ -35,24 +35,20 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2025, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import javax.sql.RowSet;
 import javax.swing.Icon;
-import javax.swing.JLabel;
 
-import java.lang.System.Logger;
-import java.util.EventListener;
+import com.nqadmin.swingset.core.Label;
+import com.nqadmin.swingset.navigate.RowsModel;
 
-import static java.lang.System.Logger.Level.*;
-
-import com.nqadmin.swingset.utils.SSComponentInterface;
-import com.nqadmin.swingset.utils.SSUtils;
-
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
 // SSLabel.java
 //
@@ -64,40 +60,14 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * except of course to set a label's value from a RowSet.
  */
 @SuppressWarnings("serial")
-public class SSLabel extends JLabel implements SSComponentInterface
+public class SSLabel extends Label
 {
-	// TODO: Come up with general way to allow selective prop change disable.
-	@SuppressWarnings("FieldMayBeFinal")
-	private boolean allowPropertyChangePropagation = false;
-	/**
-	 * Listener for label changed externally; propagate the value to the
-	 * database column. By default not enabled.
-	 */
-	protected class SSLabelListener implements PropertyChangeListener
-	{
-		/** Propogate "text" property change to database.
-		 * {@inheritDoc} */
-		@Override
-		public void propertyChange(final PropertyChangeEvent pce)
-		{
-			if (!allowPropertyChangePropagation)
-				return;
-			if (!"text".equals(pce.getPropertyName()))
-				return;
-
-			dbChange(() -> setBoundColumnText(getText()));
-		}
-	} // end protected class SSLabelListener
-
-	/** Log4j Logger for component */
-	private static Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Empty constructor needed for deserialization. Creates a SSLabel instance with
 	 * no image and no text.
 	 */
 	public SSLabel() {
-		finishSSCommon();
 	}
 
 	/**
@@ -107,7 +77,6 @@ public class SSLabel extends JLabel implements SSComponentInterface
 	 */
 	public SSLabel(final Icon _image) {
 		super(_image);
-		finishSSCommon();
 	}
 
 	/**
@@ -118,7 +87,18 @@ public class SSLabel extends JLabel implements SSComponentInterface
 	 */
 	public SSLabel(final Icon _image, final int _horizontalAlignment) {
 		super(_image, _horizontalAlignment);
-		finishSSCommon();
+	}
+
+	/**
+	 * Creates a SSLabel instance with no image and binds it to the specified RowSet
+	 * column.
+	 *
+	 * @param rowsModel          datasource to be used.
+	 * @param boundColumnName name of the column to which this label should be
+	 *                         bound
+	 */
+	public SSLabel(RowsModel rowsModel, String boundColumnName) {
+		super(rowsModel, boundColumnName);
 	}
 
 	/**
@@ -128,67 +108,10 @@ public class SSLabel extends JLabel implements SSComponentInterface
 	 * @param _rowSet          datasource to be used.
 	 * @param _boundColumnName name of the column to which this label should be
 	 *                         bound
+	 * @deprecated use RowsModel insted of RowSet
 	 */
+	@Deprecated
 	public SSLabel(final RowSet _rowSet, final String _boundColumnName) {
-		this();
-		bind(_rowSet, _boundColumnName);
-	}
-
-	/** {@inheritDoc } */
-	@Override
-	public void cleanField()
-	{
-		setText("");
-	}
-
-	private Hook hook;
-
-	/** {@inheritDoc } */
-	@Override
-	public final Hook getSSComponentHook()
-	{
-		if (hook == null)
-			hook = new Hook(this) {
-				/**
-				 * Updates the value stored and displayed in the SwingSet
-				 * component based on getBoundColumnText()
-				 */
-				@Override
-				protected void updateSSComponent() {
-					final String text = getBoundColumnText();
-					logger.log(DEBUG, ()->sf("%s: Setting label to %s.", getColumnForLog(), text));
-					setText(text);
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected SSLabelListener getSSComponentListener() {
-					return new SSLabelListener();
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected void addSSComponentListener(EventListener eventListener)
-				{
-					addPropertyChangeListener("text", ((PropertyChangeListener) eventListener));
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected void removeSSComponentListener(EventListener eventListener)
-				{
-					removePropertyChangeListener("text", ((PropertyChangeListener) eventListener));
-				}
-				
-			};
-		return hook;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public String toString()
-	{
-		return sf("%s{text=%s, %s}", getClass().getSimpleName(),
-				getText(), SSUtils.ssComponentToString(this));
+		super(findRowsModel(_rowSet), _boundColumnName);
 	}
 } // end public class SSLabel extends JLabel {

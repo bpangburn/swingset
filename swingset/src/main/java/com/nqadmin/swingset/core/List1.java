@@ -43,14 +43,18 @@
 package com.nqadmin.swingset.core;
 
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EventListener;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import javax.swing.JList;
@@ -58,26 +62,19 @@ import javax.swing.ListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-import java.util.EventListener;
-import java.util.stream.LongStream;
-
 import com.google.common.reflect.TypeToken;
-
-import static java.lang.System.Logger.Level.*;
-
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
 import com.nqadmin.swingset.models.KeyDisplayValueSwingModel;
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSDbArrayModel;
 import com.nqadmin.swingset.models.SSListItem;
-import com.nqadmin.swingset.navigate.NavigateActions;
+import com.nqadmin.swingset.navigate.UndoRedo;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static com.nqadmin.swingset.models.KeyDisplayValueSwingModel.asKeyDisplayValueSwingModel;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Provides a way to display a list of elements and map them to corresponding
@@ -450,7 +447,7 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 
 	/** {@inheritDoc } */
 	@Override
-	public void undoRedoUpdateObject(NavigateActions.UndoRedo cmd, Object value) throws SQLException
+	public void undoRedoUpdateObject(UndoRedo cmd, Object value) throws SQLException
 	{
 		SSComponentInterface.super.undoRedoUpdateObject(cmd, value);
 		// TODO: does the following seem right

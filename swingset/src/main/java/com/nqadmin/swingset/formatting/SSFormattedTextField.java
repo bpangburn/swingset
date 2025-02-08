@@ -47,37 +47,34 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.math.BigDecimal;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.EventListener;
+import java.util.Objects;
 
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultFormatterFactory;
-
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-import java.math.BigDecimal;
-import java.util.EventListener;
-import java.util.Objects;
-
 import javax.swing.text.MaskFormatter;
-
-import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.decorators.TextDecorationStyle;
 import com.nqadmin.swingset.decorators.TextDecorator;
-import com.nqadmin.swingset.navigate.NavigateActions;
+import com.nqadmin.swingset.navigate.Utils;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.checkConvertToJdbcType;
+import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
 import static com.nqadmin.swingset.navigate.Utils.postRowSetModifiedError;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
-import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
+import static java.lang.System.Logger.Level.*;
 
 // TODO: Review state transitions (where it can happen).
 //		 Make sure to decorate at these points.
@@ -432,7 +429,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				// If no records, no columns, bail.
 				// TODO: is this check needed?
 
-				if (!NavigateActions.hasActiveRow(this)
+				if (!Utils.hasActiveRow(this)
 					|| RowSetOps.getColumnCount(getRowSet())==0) {
 					// TODO: should this check allow null?
 					setValue(null);

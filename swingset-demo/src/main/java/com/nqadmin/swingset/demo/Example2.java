@@ -40,23 +40,23 @@ package com.nqadmin.swingset.demo;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSUtils;
-import java.util.List;
 
 /**
  * This example displays data from the supplier_data table.
@@ -95,6 +95,7 @@ public class Example2 extends JFrame
 	Connection connection = null;
 	RowSet rowset = null;
 	SSDataNavigator navigator = null;
+	RowsModel rowsModel;
 
 	/**
 	 * Constructor for Example2
@@ -121,7 +122,8 @@ public class Example2 extends JFrame
 		try {
 			rowset = DemoUtil.getNewRowSet(connection);
 			rowset.setCommand("SELECT * FROM supplier_data");
-			navigator = new SSDataNavigator(rowset);
+			rowsModel = RowsModel.create(rowset);
+			navigator = new SSDataNavigator(rowsModel);
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, "SQL Exception.", se);
 		}
@@ -131,7 +133,7 @@ public class Example2 extends JFrame
 		 * H2 does not fully support updatable rowset so it must be
 		 * re-queried following insert and delete with rowset.execute()
 		 */
-		navigator.getNavigateActions().setDBNav(new SSDBNavImpl(this)
+		rowsModel.setDBNav(new SSDBNavImpl(this)
 		{
 			/**
 			 * Requery the rowset following a deletion. This is needed for H2.
@@ -201,10 +203,10 @@ public class Example2 extends JFrame
 									 List.of(10, 20, 30));
 		
 		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
-		txtSupplierID.bind(rowset, "supplier_id");
-		txtSupplierName.bind(rowset, "supplier_name");
-		txtSupplierCity.bind(rowset, "city");
-		cmbSupplierStatus.bind(rowset, "status");
+		txtSupplierID.bind(rowsModel, "supplier_id");
+		txtSupplierName.bind(rowsModel, "supplier_name");
+		txtSupplierCity.bind(rowsModel, "city");
+		cmbSupplierStatus.bind(rowsModel, "status");
 		//this.cmbSupplierStatus.setSelectedIndex(1);
 		
 		// SET LABEL DIMENSIONS

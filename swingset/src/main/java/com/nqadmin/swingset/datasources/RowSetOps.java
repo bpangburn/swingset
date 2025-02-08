@@ -42,6 +42,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.datasources;
 
+import java.lang.System.Logger;
 import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.Date;
@@ -51,39 +52,34 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.spi.SyncProviderException;
-
-import java.lang.System.Logger;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.sql.rowset.spi.SyncResolver;
 
 import com.nqadmin.swingset.datasources.Utils.ConflictRow;
-
-import static java.lang.System.Logger.Level.*;
-
-import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.navigate.RowSetState;
+import com.nqadmin.swingset.navigate.UndoRedo;
 import com.nqadmin.swingset.utils.SSArray;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.google.common.collect.Sets.immutableEnumSet;
-import static com.nqadmin.swingset.navigate.Utils.postRowSetModified;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
 import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
 import static com.nqadmin.swingset.datasources.ConvertType.getJDBCType;
-import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 import static com.nqadmin.swingset.datasources.DateTime.getSQLDateTimeObject;
-import static com.nqadmin.swingset.datasources.JdbcDataTypeConversionTables.jdbcTypeToClass; 
-import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
+import static com.nqadmin.swingset.datasources.JdbcDataTypeConversionTables.jdbcTypeToClass;
+import static com.nqadmin.swingset.navigate.Utils.postRowSetModified;
+import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Utility class for working with {@link RowSet}s and {@link ResultSet}s.
@@ -351,8 +347,8 @@ public class RowSetOps {
 		try {
 			if (getColumnCount(comp.getRowSet())==0)
 				return null;
-			return (Array)(NavigateActions.isUndoRedoEnabled(comp)
-					? NavigateActions.fetchCurrentValue(comp)
+			return (Array)(UndoRedo.isUndoRedoEnabled(comp)
+					? UndoRedo.fetchCurrentValue(comp)
 					: comp.getRowSet().getArray(comp.getBoundColumnIndex()));
 		} catch (SQLException ex) {
 			logger.log(ERROR, "SQL Exception for column " + comp.getBoundColumnName() + ".", ex);
@@ -371,8 +367,8 @@ public class RowSetOps {
 	 */
 	public static Object getColumnObject(RSC comp) throws SQLException
 	{
-		return NavigateActions.isUndoRedoEnabled(comp)
-				? NavigateActions.fetchCurrentValue(comp)
+		return UndoRedo.isUndoRedoEnabled(comp)
+				? UndoRedo.fetchCurrentValue(comp)
 				: comp.getRowSet().getObject(comp.getBoundColumnIndex());
 	}
 
@@ -470,8 +466,8 @@ public class RowSetOps {
 	private static <T> T getColumnObject1(RSC comp, Class<T> type)
 			throws SQLException
 	{
-		Object objectValue = NavigateActions.isUndoRedoEnabled(comp)
-				? NavigateActions.fetchCurrentValue(comp)
+		Object objectValue = UndoRedo.isUndoRedoEnabled(comp)
+				? UndoRedo.fetchCurrentValue(comp)
 				: comp.getRowSet().getObject(comp.getBoundColumnIndex());
 		return convertToType(objectValue, type);
 	}
@@ -557,8 +553,8 @@ public class RowSetOps {
 				return null;
 			}
 
-			Object objectValue = NavigateActions.isUndoRedoEnabled(comp)
-					? NavigateActions.fetchCurrentValue(comp)
+			Object objectValue = UndoRedo.isUndoRedoEnabled(comp)
+					? UndoRedo.fetchCurrentValue(comp)
 					: comp.getRowSet().getObject(comp.getBoundColumnIndex());
 			if (objectValue == null)
 				return null;
@@ -768,7 +764,7 @@ public class RowSetOps {
 	{
 		logger.log(DEBUG, "[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
-		NavigateActions.captureInitialValue(comp); // undo/redo
+		UndoRedo.captureInitialValue(comp); // undo/redo
 
 		// On insert row, write null if updatedValue is null, and do not perform other checks. 
 		boolean did_update = false;
@@ -823,7 +819,7 @@ public class RowSetOps {
 		boolean allowNull = comp.getAllowNull();
 		logger.log(DEBUG,  comp.getColumnForLog() + " Update to: " + updatedValue + ". Allow null? [" + allowNull + "]");
 
-		NavigateActions.captureInitialValue(comp); // undo/redo
+		UndoRedo.captureInitialValue(comp); // undo/redo
 
 		boolean did_update = false;
 		try {
@@ -980,7 +976,7 @@ public class RowSetOps {
 			return;
 		}
 
-		NavigateActions.captureInitialValue(comp); // undo/redo
+		UndoRedo.captureInitialValue(comp); // undo/redo
 
 		boolean did_update = false;
 		Object dbValue = null;

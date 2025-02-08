@@ -1,5 +1,28 @@
 TextDecorator API
 
+Forgot to mention (I think) that I think a default implementation of SSDBNav
+stuff base on meta data might work. It only recently occured to me that this
+stuff is about, at least partly, making new/removed rows visible. Wonder if
+keeping remove/delete info might avoid otherwise unneeded database accesses.
+
+================================================================================
+
+Convert/move to core
+
+    SSDBNavImpl, SSDBNav - rewrite use meta data
+
+    SSCellEditing.java
+    SSDataGridAdapter.java
+    SSDataGridHandle.java
+    SSDataGrid.java
+    SSDataValue.java
+    SSTableKeyAdapter.java
+    SSTableModel.java
+
+    SSDataNavigator???
+
+SSTextSupport --> TextSupport
+
 ================================================================================
 ============================= BUGS =============================================
 ================================================================================

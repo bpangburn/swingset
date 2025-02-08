@@ -82,7 +82,7 @@ import static javax.swing.KeyStroke.getKeyStroke;
 @SuppressWarnings("serial")
 public class RowNumberSpinner extends JSpinner
 {
-	private NavGotoRowAction gotoRowAction; // TODO: replace with NavigationModel?
+	private NavGotoRowAction gotoRowAction; // TODO: replace with RowsModel?
 
 	/**
 	 * Construct spinner for row number in a data navigator.
@@ -103,7 +103,7 @@ public class RowNumberSpinner extends JSpinner
 	 * {@inheritDoc}
 	 * 
 	 * <b>An exception is thrown</b>
-	 * @deprecated use {@link #setModel(com.nqadmin.swingset.navigate.NavigationModel) }.
+	 * @deprecated use {@link #setModel(com.nqadmin.swingset.navigate.RowsModel) }.
 	 */
 	@Override
 	@Deprecated
@@ -117,11 +117,11 @@ public class RowNumberSpinner extends JSpinner
 	/**
 	 * Sets the model to the SpinnerNumberModel associated with a
 	 * given RowSet's NavigateActions's NavGotoRowAction.
-	 * @param navModel 
+	 * @param rowsModel 
 	 */
-	public void setModel(NavigationModel navModel)
+	public void setModel(RowsModel rowsModel)
 	{
-		setAction(navModel.getAction(NavAction.NAV_GOTOROW));
+		setAction(rowsModel.getAction(RowsAction.ACT_GOTOROW));
 	}
 
 
@@ -135,7 +135,7 @@ public class RowNumberSpinner extends JSpinner
 	private final ChangeListener changeListener = (evt) -> {
 		//System.err.println("changeListener: " + objectID(gotoRowAction));
 		gotoRowAction.actionPerformed(new ActionEvent(RowNumberSpinner.this,
-				AWTEvent.RESERVED_ID_MAX + 1, ""));
+				AWTEvent.RESERVED_ID_MAX + 1, RowsAction.OK_SKIP_CURSOR_MOVE));
 	};
 
 	/** 

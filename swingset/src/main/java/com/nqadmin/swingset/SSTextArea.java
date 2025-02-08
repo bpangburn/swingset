@@ -35,22 +35,19 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2025, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset;
 
 import javax.sql.RowSet;
-import javax.swing.JTextArea;
 
-import java.lang.System.Logger;
-import java.util.EventListener;
+import com.nqadmin.swingset.core.TextArea;
+import com.nqadmin.swingset.navigate.RowsModel;
 
-import static java.lang.System.Logger.Level.*;
-
-import com.nqadmin.swingset.utils.SSTextSupport.SSDocumentListener;
-import com.nqadmin.swingset.utils.SSComponentInterface;
-import com.nqadmin.swingset.utils.SSTextSupport;
-import com.nqadmin.swingset.utils.SSUtils;
-
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
 // SSTextArea.java
 //
@@ -60,22 +57,12 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * SSTextArea extends the JTextArea to add RowSet binding.
  */
 @SuppressWarnings("serial")
-public class SSTextArea extends JTextArea implements SSComponentInterface {
-
-	// TODO Consider adding an InputVerifier to prevent component from losing focus.
-	// See SSFormattedTextField. May be able to add to SSDocumentListener in
-	// SSCommon.
-
-	/**
-	 * Log4j Logger for component
-	 */
-	private static Logger logger = SSUtils.getLogger();
+public class SSTextArea extends TextArea {
 
 	/**
 	 * Empty constructor needed for deserialization.
 	 */
 	public SSTextArea() {
-		finishSSCommon();
 	}
 
 	/**
@@ -87,7 +74,17 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	 */
 	public SSTextArea(final int _rows, final int _columns) {
 		super(_rows, _columns);
-		finishSSCommon();
+	}
+
+	/**
+	 * Creates a multi-line text box and binds it to the specified RowSet column.
+	 *
+	 * @param rowsModel          datasource to be used.
+	 * @param boundColumnName name of the column to which this text area should be
+	 *                         bound
+	 */
+	public SSTextArea(RowsModel rowsModel, String boundColumnName) {
+		super(rowsModel, boundColumnName);
 	}
 
 	/**
@@ -96,78 +93,11 @@ public class SSTextArea extends JTextArea implements SSComponentInterface {
 	 * @param _rowSet          datasource to be used.
 	 * @param _boundColumnName name of the column to which this text area should be
 	 *                         bound
+	 * @deprecated use RowsModel insted of RowSet
 	 */
+	@Deprecated
 	public SSTextArea(final RowSet _rowSet, final String _boundColumnName) {
-		this();
-		bind(_rowSet, _boundColumnName);
+		super(findRowsModel(_rowSet), _boundColumnName);
 	}
 
-	/**
-	 * Set word linewrap.
-	 */
-	@Override
-	public void customInit()
-	{
-		setLineWrap(true);
-		setWrapStyleWord(true);
-	}
-
-	/** {@inheritDoc } */
-	@Override
-	public void cleanField()
-	{
-		setText("");
-	}
-
-	private Hook hook;
-
-	/** {@inheritDoc } */
-	@Override
-	public final Hook getSSComponentHook()
-	{
-		if (hook == null)
-			hook = new Hook(this) {
-				/**
-				 * Updates the value stored and displayed in the SwingSet
-				 * component based on getBoundColumnText()
-				 */
-				@Override
-				protected void updateSSComponent() {
-					
-					final String text = getBoundColumnText();
-					logger.log(DEBUG, ()->sf("%s: Setting text area to %s.", getColumnForLog(), text));
-					setText(text);
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected SSDocumentListener getSSComponentListener() {
-					return SSTextSupport.getSSDocumentListener(SSTextArea.this);
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected void addSSComponentListener(EventListener eventListener)
-				{
-					getDocument().addDocumentListener((SSDocumentListener)eventListener);
-				}
-				
-				/** {@inheritDoc } */
-				@Override
-				protected void removeSSComponentListener(EventListener eventListener)
-				{
-					getDocument().removeDocumentListener((SSDocumentListener)eventListener);
-				}
-				
-			};
-		return hook;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public String toString()
-	{
-		return sf("%s{text=%s, %s}", getClass().getSimpleName(),
-				getText(), SSUtils.ssComponentToString(this));
-	}
 } // end public class SSTextArea extends JTextArea {

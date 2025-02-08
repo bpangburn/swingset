@@ -81,11 +81,10 @@ import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.formatting.SSFormat;
-import com.nqadmin.swingset.navigate.NavigateActions;
-import com.nqadmin.swingset.navigate.NavigateActions.UndoRedo;
-import com.nqadmin.swingset.navigate.NavigationModel;
-import com.nqadmin.swingset.navigate.NavigationRowSetEvent;
 import com.nqadmin.swingset.navigate.RowSetState;
+import com.nqadmin.swingset.navigate.RowsEvent;
+import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.navigate.UndoRedo;
 import com.nqadmin.swingset.utils.SSUtils.DebugRowSetListener;
 import com.raelity.lib.eventbus.WeakEventBus;
 import com.raelity.lib.eventbus.WeakSubscribe;
@@ -93,8 +92,10 @@ import com.raelity.lib.eventbus.WeakSubscribe;
 import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
 import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingChanges;
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
+import static com.nqadmin.swingset.navigate.Utils.hasActiveRow;
 import static com.nqadmin.swingset.navigate.Utils.postRowSetModifiedError;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
+import static com.nqadmin.swingset.utils.SSUtils.objectID;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
@@ -170,8 +171,8 @@ final class SSCommon
 	 * component.
 	 * When working with a {@linkplain javax.sql.rowset.CachedRowSet} there are
 	 * extra steps involved which require the listener to ignore some events, see
-	 * {@link NavigationModel#addRowSetEvent(com.nqadmin.swingset.navigate.NavigationRowSetEvent.RowSetEventType, javax.sql.RowSetEvent) } and
-	 * {@link RowSetState#acceptChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable) }.
+	 * {@link RowsModel#addRowSetEvent(com.nqadmin.swingset.navigate.NavigationRowSetEvent.RowSetEventType, javax.sql.RowSetEvent)} and
+	 * {@link RowSetState#acceptChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable)}.
 	 */
 	class BusReceiver {
 		/**
@@ -181,16 +182,16 @@ final class SSCommon
 		 * @param ev 
 		 */
 		@WeakSubscribe
-		public void handleRowSetEvent(NavigationRowSetEvent ev)
+		public void handleRowSetEvent(RowsEvent ev)
 		{
 			logger.log(DEBUG, () -> sf("%s %s %s",
-					getColumnForLog(), getRowSet(), ev.toString()));
+					getColumnForLog(), objectID(getRowSet()), ev.toString()));
 
 			// TODO: ev.getModel != getModel /// not RowSet ???
 
-			if (ev.getComponent() != getSSComponent()
+			if (ev.getOperComponent() != getSSComponent()
 					&& ev.getRowSet() == getRowSet()) {
-				if (!NavigationModel.ENABLED)
+				if (!RowsModel.ENABLED)
 					return;
 				updateSSComponent();
 			}
@@ -201,7 +202,7 @@ final class SSCommon
 	 * When the database row changes we want to trigger a change to the bound
 	 * Component display/value.
 	 * <p>
-	 * In {@link NavigationModel}, when a navigation is performed (first, previous,
+	 * In {@link RowsModel}, when a navigation is performed (first, previous,
 	 * next, last) a call may be made to updateRow() to flush the rowset to the 
 	 * underlying database prior to a call to first(), previous(), next(),
 	 * or last(). updateRow() triggers rowChanged, but we don't want to update
@@ -227,7 +228,7 @@ final class SSCommon
 		 */
 		@Override
 		public void cursorMoved(RowSetEvent event) {
-			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
+			if (isAcceptingChanges(getRowSet())) { // only possible if CachedRowSet
 				return;
 			}
 			logger.log(TRACE, () -> sf("%s - RowSet cursor moved.", getColumnForLog()));
@@ -236,7 +237,7 @@ final class SSCommon
 
 		@Override
 		public void rowChanged(RowSetEvent event) {
-			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
+			if (isAcceptingChanges(getRowSet())) { // only possible if CachedRowSet
 				return;
 			}
 			logger.log(TRACE, () -> sf("%s - RowSet row changed.", getColumnForLog()));
@@ -249,7 +250,7 @@ final class SSCommon
 		 */
 		@Override
 		public void rowSetChanged(RowSetEvent event) {
-			if (isAcceptingChanges(rowSet)) { // only possible if CachedRowSet
+			if (isAcceptingChanges(getRowSet())) { // only possible if CachedRowSet
 				return;
 			}
 			logger.log(TRACE, () -> sf("%s - RowSet changed.", getColumnForLog()));
@@ -268,7 +269,7 @@ final class SSCommon
 				if (lastNotifiedChange != lastChange) {
 					lastNotifiedChange = lastChange;
 
-					if (NavigationModel.ENABLED)
+					if (RowsModel.ENABLED)
 						return;
 					updateSSComponent();
 				}
@@ -350,9 +351,9 @@ final class SSCommon
 	private Connection connection = null;
 
 	/**
-	 * RowSet from which component will get/set values.
+	 * RowsModel from which component will get/set values.
 	 */
-	private RowSet rowSet = null;
+	private RowsModel rowsModel;
 	
 	/**
 	 * Indicates if rowset listener is added (or removed)
@@ -400,7 +401,7 @@ final class SSCommon
 			initDecorator();
 			init();
 
-			// TODO: Get rid of this; use navigationModel.register
+			// TODO: Get rid of this; use rowsModel.register
 			WeakEventBus.register(busReceiver, getGlobalEventBus());
 		}
 		return this;
@@ -466,13 +467,13 @@ final class SSCommon
 	{
 			if (!checkRowOK())
 				return;
-			NavigationModel.startNavigationEvent(getNavigationModel(), getSSComponent());
+			RowsModel.startRowsEvent(getRowsModel(), getSSComponent());
 			removeRowSetListener();
 			try {
 				r.run();
 			} finally {
 				addRowSetListener();
-				NavigationModel.finishNavigationEvent(getNavigationModel());
+				RowsModel.finishRowsEvent(getRowsModel());
 			}
 	}
 	
@@ -493,8 +494,8 @@ final class SSCommon
 		if (rowSetListener==null) {
 			rowSetListener = new SSRowSetListener();
 		}
-		if (!rowSetListenerAdded && rowSet!=null) {
-			rowSet.addRowSetListener(rowSetListener);
+		if (!rowSetListenerAdded && getRowSet()!=null) {
+			getRowSet().addRowSetListener(rowSetListener);
 			rowSetListenerAdded = true;
 			logger.log(DEBUG, () -> sf("%s - RowSet Listener added.", getColumnForLog()));
 		}
@@ -508,7 +509,7 @@ final class SSCommon
 		// rowSetListenerAdded==true indicates that rowset is not null, and we
 		// do not let the user call setRowSet(null), so not checking
 		if (rowSetListenerAdded) {
-			rowSet.removeRowSetListener(rowSetListener);
+			getRowSet().removeRowSetListener(rowSetListener);
 			rowSetListenerAdded = false;
 			logger.log(DEBUG, () -> sf("%s - RowSet Listener removed.", getColumnForLog()));
 		}
@@ -575,6 +576,7 @@ final class SSCommon
 	private void bind()
 	{
 		verifyInitialized();
+		debugTrackRowSetListener();
 		if (eventListener==null) {
 			eventListener = getSSComponent().getSSComponentHook().getSSComponentListener();
 		}
@@ -583,23 +585,25 @@ final class SSCommon
 		// isNullable metadata is unknown.
 		isNullable = Optional.empty();
 
-		// TODO consider updating Component to null/zero/empty string if not valid column name, column index, or rowset
+		// TODO consider updating Component to null/zero/empty string if not valid column name,
+		// column index, or rowset
 		
 		// CHECK FOR NULL COLUMN/ROWSET
-		if (((boundColumnName == null) && (boundColumnIndex == NO_COLUMN_INDEX)) || (rowSet == null)) {
+		if (((boundColumnName == null)
+				&& (boundColumnIndex == NO_COLUMN_INDEX)) || (getRowSet() == null)) {
 			logger.log(WARNING, () -> sf("Binding failed: column name=%s, column index=%s%s.",
-					boundColumnName, boundColumnIndex, rowSet==null ? ", rowset=null" : ""));
+					boundColumnName, boundColumnIndex, getRowSet()==null ? ", rowset=null" : ""));
 			return;
 		}
 
 		logger.log(TRACE, () -> sf("Column bind succeeded: name=%s, index=%d %s.",
-				boundColumnName, boundColumnIndex, rowSet==null ? ", rowset=null" : ""));
+				boundColumnName, boundColumnIndex, getRowSet()==null ? ", rowset=null" : ""));
 
 		//
 		// This is used a lot, just get it now.
 		// If doing this lazy elsewhere, flush the cache here.
 
-		isNullable = RowSetOps.isNullable(rowSet, boundColumnIndex);
+		isNullable = RowSetOps.isNullable(getRowSet(), boundColumnIndex);
 		logger.log(TRACE, () -> sf("Column isNullable: %s.", isNullable));
 
 		// Provide notification of a change in metadata
@@ -617,20 +621,19 @@ final class SSCommon
 	 * bind() to update Component;
 	 *
 	 * @param rowSet         datasource to be used
-	 * @param boundColumnIndex index of the column to which this check box should
-	 *                          be bound
+	 * @param boundColumnIndex index of the column to which this check box should be bound
 	 */
-	void bind(RowSet rowSet, int boundColumnIndex)
+	void bind(RowsModel rowsModel, int boundColumnIndex)
 	{
+		Objects.requireNonNull(rowsModel);
 		verifyInitialized();
 		// Indicate that we're updating the bindings.
 		inBinding = true;
 		try {
 			
-			// TODO: WORK WITH A NavigationModel
 			// Update rowset.
 			removeRowSetListener();
-			setRowSet(rowSet);
+			this.rowsModel = rowsModel;
 			addRowSetListener();
 			
 			// STORE COLUMN INDEX & NAME
@@ -651,15 +654,16 @@ final class SSCommon
 	 * bind() to update Component;
 	 *
 	 * @param _rowSet        datasource to be used
-	 * @param _boundColumnName name of the column to which this check box should be
+	 * @param boundColumnName name of the column to which this check box should be
 	 *                         bound
 	 */
-	void bind(RowSet _rowSet, String _boundColumnName)
+	void bind(RowsModel rowsModel, String boundColumnName)
 	{
 		try {
-			bind(_rowSet, RowSetOps.getColumnIndex(_rowSet, _boundColumnName));
+			bind(rowsModel,
+				 RowSetOps.getColumnIndex(rowsModel.getRowSet(), boundColumnName));
 		} catch (SQLException se) {
-			logger.log(ERROR, "[" + _boundColumnName + "] - Failed to retrieve column index while binding.", se);
+			logger.log(ERROR, "[" + boundColumnName + "] - Failed to retrieve column index while binding.", se);
 		}
 	}
 
@@ -719,7 +723,7 @@ final class SSCommon
 		Object value = null;
 
 		try {
-			if (NavigateActions.hasActiveRow(getSSComponent())) {
+			if (hasActiveRow(getSSComponent())) {
 				value = RowSetOps.getColumnObject(ssComponent);
 			}
 		} catch (SQLException se) {
@@ -769,12 +773,7 @@ final class SSCommon
 		String value = "";
 
 		try {
-			if (NavigateActions.hasActiveRow(ssComponent)) {
-				// if (NavigateActions.ENABLE_UNDO_REDO) {
-				// 	value = RowSetOps.getColumnObjectText(ssComponent);
-				// } else {
-				// 	value = RowSetOps.getColumnText(getSSComponent());
-				// }
+			if (hasActiveRow(ssComponent)) {
 				value = RowSetOps.getColumnObjectText(ssComponent);
 				if (!getAllowNull() && (value == null)) {
 					value = "";
@@ -822,7 +821,15 @@ final class SSCommon
 	 * @return RowSet to which the SwingSet component is bound
 	 */
 	RowSet getRowSet() {
-		return rowSet;
+		return rowsModel != null ? getRowsModel().getRowSet() : null;
+	}
+
+	/**
+	 * Returns the RowsModel to which the SwingSet component is bound.
+	 * @return 
+	 */
+	RowsModel getRowsModel() {
+		return rowsModel;
 	}
 
 	/**
@@ -1103,35 +1110,6 @@ final class SSCommon
 	}
 
 	/**
-	 * Sets the RowSet to which the Component is bound.
-	 *
-	 * @param _rowSet RowSet to which the component is bound
-	 */
-	// TODO: Fix this, and getNavigationModel to use model.
-	void setRowSet(RowSet _rowSet) {
-		Objects.requireNonNull(_rowSet);
-		rowSet = _rowSet;
-		if (!inBinding) {
-			bind();
-		}
-		debugTrackRowSetListener();
-		if (navigationModel == null)
-			navigationModel = new NavigationModel(rowSet);
-		if (navigationModel.getRowSet() != _rowSet)
-			navigationModel.setRowSet(rowSet);
-	}
-
-	// TODO: STATIC, for initial testing.
-	private static NavigationModel navigationModel;
-	private NavigationModel getNavigationModel() {
-		if (navigationModel == null) {
-			navigationModel = rowSet != null
-					? new NavigationModel(rowSet) : NavigationModel.getDummy(rowSet);
-		}
-		return navigationModel;
-	}
-
-	/**
 	 * Transfers focus to next Swing Component on the screen when either
 	 * Shift-Down-Arrow or Enter are pressed; previous is Shift-Up-Arrow.
 	 * 
@@ -1184,14 +1162,14 @@ final class SSCommon
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				NavigateActions.undoRedo(comp, UndoRedo.UNDO);
+				UndoRedo.undoRedo(comp, UndoRedo.UNDO);
 			}
 		});
 		am.put(REDO_ACTION_KEY, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				NavigateActions.undoRedo(comp, UndoRedo.REDO);
+				UndoRedo.undoRedo(comp, UndoRedo.REDO);
 			}
 		});
 		am.setParent(jc.getActionMap());
@@ -1208,7 +1186,7 @@ final class SSCommon
 	 */
 	void undoRedoUpdateObject(UndoRedo cmd, Object value) throws SQLException
 	{
-		if (!NavigateActions.isUndoRedoEnabled(ssComponent))
+		if (!UndoRedo.isUndoRedoEnabled(ssComponent))
 			throw new IllegalStateException("UNDO/REDO disabled");
 		logger.log(DEBUG, () -> sf("%s: %s", cmd, value));
 
@@ -1225,8 +1203,8 @@ final class SSCommon
 		//		 can not always be reliably read JdbcRowSet vs CachedRowSet.
 		issueRowChanged();
 
-		// TODO: NavigationModel UNDO/REDO
-		if (NavigationModel.ENABLED)
+		// TODO: RowsModel UNDO/REDO
+		if (RowsModel.ENABLED)
 			updateSSComponent();
 	}
 
@@ -1278,7 +1256,7 @@ final class SSCommon
 		// to give multiple dialogs.
 		if (doingCheckRowOK) 
 			try {
-				return NavigateActions.hasActiveRow(getSSComponent());
+				return hasActiveRow(getSSComponent());
 			} catch (SQLException ex) {
 				return false;
 			}
@@ -1286,7 +1264,7 @@ final class SSCommon
 		doingCheckRowOK = true;
 		try {
 			try {
-				if (NavigateActions.hasActiveRow(getSSComponent()))
+				if (hasActiveRow(getSSComponent()))
 					return true;
 			} catch (SQLException ex) {
 			}
@@ -1301,7 +1279,7 @@ final class SSCommon
 	/**
 	 * Issue a row changed event if there's an active RowSetListener.
 	 */
-	// TODO: Cleanup issueRowChanged for NavigationModel
+	// TODO: Cleanup issueRowChanged for RowsModel
 	//       Want to run updateCompent as through from a RowSetListener.
 	//       Why not call it directly?
 	void issueRowChanged() {

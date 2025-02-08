@@ -41,7 +41,7 @@ import com.nqadmin.swingset.core.ComboBox2.MissingDisplayValueControl;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
 
-import static com.nqadmin.swingset.navigate.NavAction.*;
+import static com.nqadmin.swingset.navigate.RowsAction.*;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 import java.awt.Container;
@@ -153,15 +153,15 @@ public class Example4Advanced extends Example4
 		// See https://docs.oracle.com/javase/tutorial/uiswing/misc/action.html
 			
 		// Hotkeys/mnemonics
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F3"), NAV_FIRST);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F4"), NAV_PREVIOUS);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F5"), NAV_NEXT);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F6"), NAV_LAST);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F7"), NAV_COMMIT);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F8"), NAV_REVERT);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F9"), NAV_REFRESH);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F10"), NAV_ADD);
-		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F11"), NAV_DELETE);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F3"), ACT_FIRST);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F4"), ACT_PREVIOUS);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F5"), ACT_NEXT);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F6"), ACT_LAST);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F7"), ACT_COMMIT);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F8"), ACT_REVERT);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F9"), ACT_REFRESH);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F10"), ACT_ADD);
+		navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F11"), ACT_DELETE);
 
 		final Container contentPane = getContentPane();
 		final GridBagConstraints constraints = new GridBagConstraints();
@@ -169,12 +169,12 @@ public class Example4Advanced extends Example4
 		// Do something with the "Extra" buttons
 
 		// goto First record
-		extraButton1.setAction(navigator.getActionMap().get(NAV_FIRST));
+		extraButton1.setAction(navigator.getActionMap().get(ACT_FIRST));
 		constraints.gridx = 0;
 		contentPane.add(extraButton1, constraints);
 		
 		// goto Last record
-		extraButton2.setAction(navigator.getActionMap().get(NAV_LAST));
+		extraButton2.setAction(navigator.getActionMap().get(ACT_LAST));
 		constraints.gridx = 1;
 		contentPane.add(extraButton2, constraints);
 
@@ -183,8 +183,8 @@ public class Example4Advanced extends Example4
 		testFormatChange();
 
 		navigator.addPropertyChangeListener("rowSet", (PropertyChangeEvent evt) -> {
-			extraButton1.setAction(navigator.getActionMap().get(NAV_FIRST));
-			extraButton2.setAction(navigator.getActionMap().get(NAV_LAST));
+			extraButton1.setAction(navigator.getActionMap().get(ACT_FIRST));
+			extraButton2.setAction(navigator.getActionMap().get(ACT_LAST));
 		});
 
 	}

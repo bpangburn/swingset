@@ -31,11 +31,7 @@ package com.nqadmin.swingset.datasources;
 
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.Date;
-import java.sql.JDBCType;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -45,10 +41,10 @@ import java.util.function.Function;
 
 import javax.sql.RowSet;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.nqadmin.swingset.mock.H2;
@@ -58,6 +54,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * This is not SS directly; examine how DB does automatic conversions.
  */
+@SuppressWarnings("StaticNonFinalUsedInInitialization")
 public class DbConvertOpsTest
 {
 	
@@ -91,85 +88,6 @@ public class DbConvertOpsTest
 	}
 
 	RowSet g_rs;
-
-	/** x
-	 * @throws java.lang.Exception */
-	//
-	// TODO: Try conversions, check overflow.
-	//		 Notice with H2 "supportsConvert" is unconditionally true.
-	//
-	// @Test
-	@SuppressWarnings({"ResultOfObjectAllocationIgnored", "ThrowableResultIgnored"})
-	public void testSupportsConvert() throws Exception
-	{
-		System.out.println("SupportsConvert");
-		Connection con = H2.getCon();
-		DatabaseMetaData md = con.getMetaData();
-
-		if(!md.supportsConvert()) {
-			System.out.println("    DOES NOT SUPPORT CONVERT");
-			return;
-		}
-		for (JDBCType t1 : JDBCType.values()) {
-			System.out.printf("    %s conversion from to\n", t1);
-			boolean has_no_convert = false;
-			for (JDBCType t2 : JDBCType.values()) {
-				boolean supportsConvert = md.supportsConvert(
-						t1.getVendorTypeNumber(), t2.getVendorTypeNumber());
-				//System.out.printf("\t%s\t%s\n", supportsConvert ? "YES" : "No", t2);
-				if (supportsConvert)
-					;
-				else {
-					System.out.printf("\t%s\t%s\n", "No", t2);
-					has_no_convert = true;
-				}
-			}
-			if (!has_no_convert)
-				System.out.printf("\tconverts ANYTHING\n");
-		}
-	}
-
-	/** x
-	 * @throws java.lang.Exception */
-	//
-	// TODO: Try conversions, check overflow.
-	//		 Notice with H2 "supportsConvert" is unconditionally true.
-	//
-	// @Test
-	@SuppressWarnings({"ResultOfObjectAllocationIgnored", "ThrowableResultIgnored"})
-	public void testMetadata() throws Exception
-	{
-		System.out.println("Metadata");
-
-		g_rs = H2.getRowSetCleanDB("""
-            CREATE TABLE tbl
-            (
-                c_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,
-
-            	c_tinyint tinyint,
-				c_real real
-            );
-
-			INSERT INTO tbl VALUES
-				(1, 1, 1)
-			;
-            """);
-		g_rs.setCommand("SELECT * FROM tbl");
-		g_rs.execute();
-		g_rs.next();
-
-		DatabaseMetaData md = H2.getCon().getMetaData();
-		System.out.println("ownUpdatesAreVisible: " + md.ownUpdatesAreVisible(
-				ResultSet.TYPE_SCROLL_INSENSITIVE
-		));
-		// ownUpdatesAreVisible: true
-		g_rs.updateObject("c_tinyint", 7);
-		Object o = g_rs.getObject("c_tinyint"); // returns 1
-		System.out.println("" + o);
-		g_rs.updateRow();
-		o = g_rs.getObject("c_tinyint"); // returns 7
-		System.out.println("" + o);
-	}
 
 	private final Object NO_EXPECT = new Object();
 

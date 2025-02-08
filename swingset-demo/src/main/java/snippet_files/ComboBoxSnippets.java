@@ -2,7 +2,6 @@ package snippet_files;
 
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.util.List;
 
 import javax.sql.RowSet;
@@ -13,7 +12,7 @@ import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.core.ComboBox1;
 import com.nqadmin.swingset.core.Item1;
-import com.nqadmin.swingset.navigate.NavigateActions;
+import com.nqadmin.swingset.navigate.RowsModel;
 
 /**
  * javadoc examples.
@@ -21,7 +20,7 @@ import com.nqadmin.swingset.navigate.NavigateActions;
 @SuppressWarnings("serial")
 public class ComboBoxSnippets extends JFrame
 {
-	NavigateActions navigator;
+	RowsModel rowsModel;
 	SSDBComboBox combo;
 
 	// @start region=init
@@ -38,11 +37,11 @@ public class ComboBoxSnippets extends JFrame
 			// Table to examine and traverse.
 			rowSet.setCommand("SELECT * FROM shipment_data;");
 			
-			// NavigateActions does execute() and next() on the rowSet.
-			// If you are not using the data navigator you have to include those.
+			// RowsModel does execute() and next() on the rowSet.
+			// If you are not using the RowsModel you have to include:
 			//     rowSet.execute();
 			//     rowSet.next();
-			navigator = NavigateActions.get(rowSet);
+			rowsModel = RowsModel.create(rowSet);
 			
 			// Query for the combobox to map part_id to part_name.
 			String query = "SELECT * FROM part_data;";
@@ -56,7 +55,7 @@ public class ComboBoxSnippets extends JFrame
 			
 			// This basically specifies the column and the rowset where updates have
 			// to be made.
-			combo.bind(rowSet,"part_id");
+			combo.bind(rowsModel,"part_id");
 			
 		} catch (Exception ex) {
 			// Exception handler here...
@@ -67,6 +66,7 @@ public class ComboBoxSnippets extends JFrame
 	}
 	// @end region=init
 
+	@SuppressWarnings("unused")
 	void autoGen() {
 		// @start region=auto_gen
 		SSComboBox combo = new SSComboBox();
@@ -77,6 +77,7 @@ public class ComboBoxSnippets extends JFrame
 
 	RowSet rowSet;
 
+	@SuppressWarnings("unused")
 	void customKey() {
 		// @start region=custom_key
 		SSComboBox combo = new SSComboBox();
@@ -84,9 +85,9 @@ public class ComboBoxSnippets extends JFrame
 		List<Integer> mappings = List.of(1, 5, 7 );
 		combo.setDisplayValues(options, mappings);
 		
-		// Next line is assuming myrowSet has been initialized
+		// Next line is assuming rowSet has been initialized
 		// and "my_column" is a column in myrowSet.
-		combo.bind(rowSet,"my_column");
+		combo.bind(rowSet, "my_column");
 		// @end region=custom_key
 	}
 

@@ -38,6 +38,8 @@
 package com.nqadmin.swingset.utils;
 
 import java.awt.Container;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -47,17 +49,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-
-import static java.lang.System.Logger.Level.*;
-
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.navigate.NavigateActions;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
+
+import static java.lang.System.Logger.Level.*;
 
 //SSFormViewScreenHelper.java
 //
@@ -199,7 +197,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		public void performPreDeletionOps() {
 			logger.log(DEBUG, "");
 			try {
-				pkOfDeletedRecord = getRowset().getLong(getPkColumn());
+				pkOfDeletedRecord = getRowsModel().getRowSet().getLong(getPkColumn());
 			} catch (final SQLException se) {
 				logger.log(Level.ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(container, "Database error while attempting to get ID of record to be deleted.");
@@ -267,7 +265,6 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	private String comboNavDisplayColumn2 = null; // name of the 2nd database column to display in the combo navigator
 	private String comboNavSeparator = null; // character(s) used to separate the display of the 1st and 2nd columns  of the combo navigator
 	
-	private NavigateActions navigateActions; // Navigate actions.
 	private SSSyncManager syncManager; // SYNC DB NAV COMBO and NAVIGATION
 	private SSDataNavigator dataNavigator; // Data navigator.
 	
@@ -361,7 +358,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 */
 	private void activateSyncManager() {
 		if (getSyncManager() == null) {
-			setSyncManager(new SSSyncManager(getComboNav(), getNavigateActions()));
+			setSyncManager(new SSSyncManager(getComboNav(), getRowsModel()));
 			getSyncManager().setSyncColumnName(getPkColumn());
 		}
 
@@ -394,7 +391,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			// UPDATE PRESENT ROW WHEN SCREEN LOOSES FOCUS
 			@Override
 			public void internalFrameDeactivated(final InternalFrameEvent ife) {
-				getNavigateActions().updatePresentRow();
+				getRowsModel().updatePresentRow();
 			}
 		});
 
@@ -472,15 +469,8 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 */
 	protected SSDataNavigator getDataNavigator() {
 		if (dataNavigator == null)
-			dataNavigator = new SSDataNavigator(getRowset());
+			dataNavigator = new SSDataNavigator(getRowsModel());
 		return dataNavigator;
-	}
-
-	/**
-	 * @return the navigateActions
-	 */
-	protected NavigateActions getNavigateActions() {
-		return navigateActions;
 	}
 	
 	/**
@@ -535,9 +525,9 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	/**
 	 * Initialize navigateActions
 	 */
-	private void initNavigatorActions() {
-		updateNavigateActions();
-		getNavigateActions().setDBNav(new FormHelperSSDBNavImpl(this));
+	private void initDataNavigator() {
+		updateDataNavigator();
+		getRowsModel().setDBNav(new FormHelperSSDBNavImpl(this));
 	}
 
 	/**
@@ -546,8 +536,8 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * @throws SQLException exception thrown while initializing rowset
 	 * @throws Exception exception thrown while initializing rowset
 	 */
-	private void initRowset() throws SQLException, Exception {
-		setRowset(getNewRowSet(getConnection()));
+	private void initNewRowset() throws SQLException, Exception {
+		setRowsModel(SSUtils.findRowsModel(getNewRowSet(getConnection())));
 		updateRowset();
 	}
 	
@@ -560,16 +550,16 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 
 			// SETUP QUERY, DEFAULTS, and BUILD SCREEN
 			// SET ROWSET QUERY
-			initRowset();
+			initNewRowset();
 
 			// INITIALIZE NAVIGATION ACTIONS
-			initNavigatorActions();
+			initDataNavigator();
 			
 			// INITIALIZE COMBO NAVIGATOR
 			initComboNav();
 			
 			// BIND PRIMARY KEY
-			txtPrimaryKey.bind(getRowset(), getPkColumn());
+			txtPrimaryKey.bind(getRowsModel(), getPkColumn());
 			
 			// ADD OPTIONS FOR ANY SSComboBoxes()
 			populateSSComboBoxes();
@@ -666,13 +656,6 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		if (_comboNavSeparator!=null) {
 			comboNavSeparator = _comboNavSeparator;
 		}
-	}
-
-	/**
-	 * @param _navigateActions the navigate actions to use for this screen/form
-	 */
-	private void setNavigateActions(NavigateActions _navigateActions) {
-		navigateActions = _navigateActions;
 	}
 	
 	/**
@@ -798,9 +781,8 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	/**
 	 * Update navigate actions with latest rowset
 	 */
-	private void updateNavigateActions() {
-		getDataNavigator().setRowSet(getRowset());
-		setNavigateActions(NavigateActions.get(getRowset()));
+	private void updateDataNavigator() {
+		getDataNavigator().setRowsModel(getRowsModel());
 	}
 
 	/**
@@ -821,7 +803,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			updateRowset();
 
 			// SET NEW ROWSET FOR NAVIGATOR.
-			updateNavigateActions();
+			updateDataNavigator();
 			
 			// UPDATE THE COMBO NAVIGATOR
 			updateComboNav();

@@ -19,21 +19,20 @@ package snippet_files;
 import java.sql.JDBCType;
 import java.util.List;
 
-import javax.sql.RowSet;
-
 import com.nqadmin.swingset.SSList;
+import com.nqadmin.swingset.navigate.RowsModel;
 
 /**
  * xxx
  */
 public class ListSnippets {
 	SSList list;
-	RowSet rowSet;
+	RowsModel rowsModel;
 
 	// @start region=init1
 	/**
 	 * Create an SSList, initialize its contents,
-	 * bind the list selection to a column in the RowSet.
+	 * bind the list selection to a column in the RowsModel.
 	 */
 	@SuppressWarnings("unused")
 	void init() {
@@ -41,7 +40,7 @@ public class ListSnippets {
 		List<String> options = List.of("VLarge", "large", "medium", "small", "VSmall");
 		List<Object> mappings = List.of(100.0, 10.0, 5.0, 1.0, 0.1);
 		list.setDisplayValues(options, mappings);
-		list.bind(rowSet, "my_column");
+		list.bind(rowsModel, "my_column");
 	}
 	// @end region=init1
 }
