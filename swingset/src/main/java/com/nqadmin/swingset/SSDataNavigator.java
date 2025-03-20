@@ -91,14 +91,6 @@ public class SSDataNavigator extends JPanel
 	private final ActionMap navActionMap;
 
 	/**
-	 * Creates a object of SSDataNavigator. Note: you have to set the RowSet
-	 * before you can start using it.
-	 */
-	public SSDataNavigator() {
-		this((RowsModel)null);
-	}
-
-	/**
 	 * Constructs a SSDataNavigator for the given RowSet
 	 *
 	 * @param rowSet
@@ -140,6 +132,11 @@ public class SSDataNavigator extends JPanel
 	@SuppressWarnings("LeakingThisInConstructor")
 	public SSDataNavigator(RowsModel rowsModel, Dimension _buttonSize)
 	{
+		Objects.requireNonNull(rowsModel);
+		rowNumberSpinner = new RowNumberSpinner(rowsModel);
+		uiComponents = uiComponents();
+		uiButtons = uiButtons();
+
 		parentActionMap = getActionMap();
 		navActionMap = new ActionMap();
 		// Insert the navigate actions in front of the original actions.
@@ -174,32 +171,30 @@ public class SSDataNavigator extends JPanel
 
 
 	/**
-	 * Set the navigator to use a different row set;
+	 * Set the navigator to use a different RowsModel ;
 	 * swap in the new navigate ActionMap.
 	 *
 	 * @param rowsModel data for navigator
+	 * @deprecated maybe temporarily, use RowsModel.setRowSet
 	 */
 	// TODO: setModel(RowsModel)
+	@Deprecated
 	public final void setRowsModel(RowsModel rowsModel)
 	{
 		// Could allow null, use dummy with all buttons disabled
 		Objects.requireNonNull(rowsModel);
 
-		RowSet oldValue = rowsModel.getRowSet();
 		installRowsModel(rowsModel);
-		firePropertyChange("rowSet", oldValue, rowsModel);
 	}
 
 	/**
 	 * Set the navigator to use a different row set;
 	 * swap in the new navigate ActionMap.
 	 *
-	 * @param rowSet data for navigator
+	 * @param RowsModel for navigator
 	 */
 	private void installRowsModel(RowsModel rowsModel)
 	{
-		RowSet rowSet = rowsModel.getRowSet();
-
 		// Fill Actions for the navigator with actions from the new rowsModel/RowSet.
 		rowsModel.fillNavActionMap(navActionMap);
 
@@ -214,7 +209,6 @@ public class SSDataNavigator extends JPanel
 		addButton.setAction(navActionMap.get(ACT_ADD));
 		deleteButton.setAction(navActionMap.get(ACT_DELETE));
 
-		rowNumberSpinner.setAction(navActionMap.get(ACT_GOTOROW));
 		updateLblRowCount();
 	}
 
@@ -560,38 +554,47 @@ public class SSDataNavigator extends JPanel
 	private final JLabel lblRowCount = new JLabel();
 
 	/** Component for viewing/changing the current record number. */
-	protected final RowNumberSpinner rowNumberSpinner = new RowNumberSpinner();
+	protected final RowNumberSpinner rowNumberSpinner;
 
 	/** Current record spinner dimensions. */
 	private final Dimension rowSpinnerSize;
 
+	private final List<JComponent> uiComponents;
+	private final List<AbstractButton> uiButtons;
+
 	/** These are added in order to this JPanel */
-	private final List<JComponent> uiComponents = List.of(
-		firstButton,
-		previousButton,
-		rowNumberSpinner,
-		nextButton,
-		lastButton,
-		commitButton,
-		undoButton,
-		refreshButton,
-		addButton,
-		deleteButton,
-		lblRowCount
-	);
+	private final List<JComponent> uiComponents()
+	{
+		return List.of(
+				firstButton,
+				previousButton,
+				rowNumberSpinner,
+				nextButton,
+				lastButton,
+				commitButton,
+				undoButton,
+				refreshButton,
+				addButton,
+				deleteButton,
+				lblRowCount
+		);
+	}
 
 	/** The buttons can often be handled en masse */
-	private final List<AbstractButton> uiButtons = List.of(
-		firstButton,
-		previousButton,
-		nextButton,
-		lastButton,
-		commitButton,
-		undoButton,
-		refreshButton,
-		addButton,
-		deleteButton
-	);
+	private final List<AbstractButton> uiButtons()
+	{
+		return List.of(
+				firstButton,
+				previousButton,
+				nextButton,
+				lastButton,
+				commitButton,
+				undoButton,
+				refreshButton,
+				addButton,
+				deleteButton
+		);
+	}
 
 
 } // end public class SSDataNavigator extends JPanel {

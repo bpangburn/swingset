@@ -34,6 +34,8 @@ import java.lang.System.Logger;
 import java.lang.ref.WeakReference;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -46,6 +48,7 @@ import javax.swing.SpinnerNumberModel;
 
 import org.openide.util.WeakListeners;
 
+import com.google.common.collect.MapMaker;
 import com.google.common.eventbus.EventBus;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNav;
@@ -59,15 +62,15 @@ import com.raelity.lib.eventbus.WeakEventBus;
 import static com.nqadmin.swingset.navigate.RowsAction.*;
 import static com.nqadmin.swingset.navigate.RowsModelEventHandling.postAsync;
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
+import static com.nqadmin.swingset.utils.SSUtils.objectID;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
  * The RowsModel is associated with a {@link javax.sql.RowSet}.
- * Using {@link NavigateActions} and {@link RowsAction} it encapsulates RowSet
+ * Using {@link NavigateState} and {@link RowsAction} it encapsulates RowSet
  * traversal and their associated {@link javax.swing.Action}s which can be
- * plugged into UI components; it broadcasts RowSet events.
- * <p>
+ * plugged into UI components; it broadcasts RowSet events.<p>
  * {@link RowsModelEvent}s are broadcast when the model's RowSet is changed
  * and when the current RowSet notifies of eventsNextQ. RowSet eventsNextQ are coalesced
  * when they occur in operations which are delineated by
@@ -79,28 +82,24 @@ import static java.lang.System.Logger.Level.*;
  */
 //
 // NOTE: The RowSet must be "executable".
-//       Execution happens in NavigateActions::setupRowSet() via RowsModel.
+//       Execution happens in NavigateState::setupRowSet() via RowsModel.
 //       Should RowsModel try to execute if no command?
 //       Handle an "empty"/"null"/non-executable RowSet?
 //       Is there a way to tell if current command has been executed?
-//
-// TODO: wrap the action and go indirect to the navActs.
 //
 // TODO: see test's NavigateHook
 //
 public class RowsModel
 {
-	static final String KEY_SPINNER_MODEL = "SPINNER_MODEL";
-
 	/** Logger for component */
 	static final Logger logger = SSUtils.getLogger();
 
-	private NavigateActions navActs;
-
-	// // For use ONLY with dummy
-	// private RowsModel() {
-	// 	rowSetListener = null;
-	// }
+	// Used like a WeakHashSet
+	private static final Map<RowsModel,Boolean> activeRowModels
+			= new MapMaker().weakKeys().makeMap();
+	
+	private NavigateState navState;
+	private final RowsActions rowsActions;
 
 	/** simplify switches back/forth */
 	public static boolean ENABLED = true;
@@ -121,32 +120,63 @@ public class RowsModel
 	}
 
 	/**
+	 * Find the RowsModels that currently hold the specified RowSet.
+	 * @param rs
+	 * @return 
+	 */
+	static List<RowsModel> getActiveRowModels(RowSet rs)
+	{
+		return activeRowModels.keySet().stream()
+			.filter(rowsModel -> rowsModel.getRowSet() == rs)
+			.toList();
+	}
+
+	/**
 	 * Create one associated with the given RowSet.
 	 * @param rs
 	 */
-	private RowsModel(RowSet rs) {
+	// TODO: handle null RowSet; important, consider empty DataNavigator, build UI first.
+	private RowsModel(RowSet rs)
+	{
 		// TODO: Could allow null RowSet as empty model.
 		Objects.requireNonNull(rs);
 		SSUtils.registerNewRowsModel(rs, this);
+
+		activeRowModels.putIfAbsent(this, true);
+
+		this.rowsActions = new RowsActions(this);
+
+		setNavState(rs);
+
 		rowSetListener = new SimpleRowSetListener();
-		this.navActs = NavigateActions.get(rs);
 		rowSetListener.registerTo(rs);
 	}
 
-	private void check() {
-		if (navActs == null)
-			throw new IllegalStateException("No RowSet");
+	/**
+	 * Get and set NavigationState. Two step process because when navState hooks into
+	 * the RowSet, it uses the RowsModel.
+	 * <br>TODO: clean up the RowsModel/NavState initialization.
+	 * 
+	 * @param rs 
+	 */
+	private void setNavState(RowSet rs)
+	{
+		navState = NavigateState.getOrCreate(rs);
+
+		if (navState.getRowSet() == null)
+			navState.setupRowSet(rs);
 	}
 
 	/**
 	 * Change the RowSet associated with this model.
 	 * @param rs new RowSet for this model
 	 */
+	// TODO: Could allow null RowSet as empty model.
 	public void setRowSet(RowSet rs) {
-		// TODO: Could allow null RowSet as empty model.
+		logger.log(DEBUG, () -> sf("RowsModel change rowSet from %s to %s", objectID(getRowSet()), objectID(rs)));
 		Objects.requireNonNull(rs);
 		rowSetListener.unregisterFrom(rs);
-		this.navActs = NavigateActions.get(rs);
+		setNavState(rs);
 		rowSetListener.registerTo(rs);
 		post(new RowsNewRowSetEvent(this));
 	}
@@ -156,8 +186,11 @@ public class RowsModel
 	 * @return row set
 	 */
 	public RowSet getRowSet() {
-		check();
-		return navActs.getRowSet();
+		return navState.getRowSet();
+	}
+
+	NavigateState getNavState() {
+		return navState;
 	}
 
 	/**
@@ -167,11 +200,10 @@ public class RowsModel
 	 * @return 
 	 */
 	// TODO: javadoc says "action this model", but action is RowSet assoc.
-	//       Wrap the action and go indirect to the navActs.
+	//       Wrap the action and go indirect to the navState.
 	//       Cache the wrapped actions.
 	public Action getAction(RowsAction navAction) {
-		check();
-		return navActs.get(navAction);
+		return rowsActions.get(navAction);
 	}
 
 	/**
@@ -186,28 +218,16 @@ public class RowsModel
 		return am;
 	}
 
-	// /**
-	//  * 
-	//  * @return 
-	//  * @deprecated 
-	//  */
-	// @Deprecated
-	// public NavigateActions getNavActs() {
-	// 	check();
-	// 	return navActs;
-	// }
-
 	/**
 	 * Return the associated RowSet's current row number.
 	 * @return row number
 	 */
 	public int getRow() {
-		check();
-		int spin_row = getSpinModel_Action().model.getNumber().intValue();
+		int spin_row = getSpinnerModel().getNumber().intValue();
 		if (Boolean.TRUE) {
 			int rs_row = -1;
 			try {
-				rs_row = navActs.getRowSet().getRow();
+				rs_row = getRowSet().getRow();
 			} catch (SQLException ex) {
 			}
 			if (spin_row != rs_row) {
@@ -218,26 +238,24 @@ public class RowsModel
 	}
 
 	/** Move the ResultSet cursor to the first row. */
-	public void first() { check(); navActs.run(ACT_FIRST); }
+	public void first() { rowsActions.run(ACT_FIRST); }
 	/** Move the ResultSet cursor to the last row. */
-	public void last() { check(); navActs.run(ACT_LAST); }
+	public void last() { rowsActions.run(ACT_LAST); }
 	/** Move the ResultSet cursor to the next row. */
-	public void next() { check(); navActs.run(ACT_NEXT); }
+	public void next() { rowsActions.run(ACT_NEXT); }
 	/** Move the ResultSet cursor to the previous row. */
-	public void previous() { check(); navActs.run(ACT_PREVIOUS); }
+	public void previous() { rowsActions.run(ACT_PREVIOUS); }
 	/** Update the database with the new contents of the current row. */
-	public void commit() { check(); navActs.run(ACT_COMMIT); }
+	public void commit() { rowsActions.run(ACT_COMMIT); }
 
 	/**
 	 * Move the RowSet cursor to the specified row.
 	 * @param row target cursor row
 	 */
 	public void setRow(int row) {
-		check();
-		Model_Action spinModel_Action = getSpinModel_Action();
-		if (spinModel_Action.model != null) {
-			spinModel_Action.model.setValue(row);
-			//spinModel_Action.action.actionPerformed(null); // Just a repeat
+		SpinnerNumberModel spinnerModel = getSpinnerModel();
+		if (spinnerModel != null) {
+			spinnerModel.setValue(row);
 		}
 	}
 
@@ -246,10 +264,9 @@ public class RowsModel
 	 * @return count of rows
 	 */
 	public int getRowCount() {
-		check();
-		Model_Action spinModel_Action = getSpinModel_Action();
-		if (spinModel_Action.model != null)
-			return (Integer)spinModel_Action.model.getMaximum();
+		SpinnerNumberModel spinnerModel = getSpinnerModel();
+		if (spinnerModel != null)
+			return (Integer)spinnerModel.getMaximum();
 		return -1;
 	}
 
@@ -262,11 +279,9 @@ public class RowsModel
 		return getRowCount() == 0;
 	}
 
-	private record Model_Action(SpinnerNumberModel model, Action action){}
-	private Model_Action getSpinModel_Action() {
-		Action action = navActs.get(ACT_GOTOROW);
-		Object value = action.getValue(KEY_SPINNER_MODEL);
-		return new Model_Action((SpinnerNumberModel) value, action);
+	// NOTE: SpinnerModel locked to RowSet
+	SpinnerNumberModel getSpinnerModel() {
+		return navState.rowNumberModel;
 	}
 
 	/** Like Runnable, but may throw SQLException */
@@ -448,14 +463,6 @@ public class RowsModel
 	//
 	// Behavioral/State method - taken from SSDataNavigation
 	//
-
-	// /**
-	//  * Get the NavigateActions used by this GUI element.
-	//  * @return associated NavigateActions
-	//  */
-	// public NavigateActions getNavigateActions() {
-	// 	return navActs;
-	// }
 	
 	/**
 	 * Method to cause the navigator to skip the execute() function call on the
@@ -464,7 +471,7 @@ public class RowsModel
 	 * @param callExecute false if using MySQL database - otherwise true
 	 */
 	public void setCallExecute(final boolean callExecute) {
-		navActs.setCallExecute(callExecute);
+		navState.setCallExecute(callExecute);
 	}
 
 	/**
@@ -474,7 +481,7 @@ public class RowsModel
 	 * @return value of execute() indicator
 	 */
 	public boolean getCallExecute() {
-		return navActs.getCallExecute();
+		return navState.getCallExecute();
 	}
 
 	/**
@@ -485,7 +492,7 @@ public class RowsModel
 	 * @param confirmDeletes indicates whether or not to confirm deletions
 	 */
 	public void setConfirmDeletes(boolean confirmDeletes) {
-		navActs.setConfirmDeletes(confirmDeletes);
+		navState.setConfirmDeletes(confirmDeletes);
 	}
 
 	/**
@@ -495,7 +502,7 @@ public class RowsModel
 	 *         deletes a record, else false.
 	 */
 	public boolean getConfirmDeletes() {
-		return navActs.getConfirmDeletes();
+		return navState.getConfirmDeletes();
 	}
 
 	/**
@@ -505,8 +512,9 @@ public class RowsModel
 	 *
 	 * @param dBNav implementation of the SSDBNav interface
 	 */
+	// TODO: should dBNav be local to this class? Hm, does seem like a rowset thing.
 	public void setDBNav(SSDBNav dBNav) {
-		navActs.setDBNav(dBNav);
+		navState.setDBNav(dBNav);
 	}
 
 	/**
@@ -516,7 +524,7 @@ public class RowsModel
 	 * @return any custom implementation of the SSDBNav interface
 	 */
 	public SSDBNav getDBNav() {
-		return navActs.getDBNav();
+		return navState.getDBNav();
 	}
 
 	/**
@@ -526,7 +534,7 @@ public class RowsModel
 	 * @param deletion indicates whether or not to allow deletions
 	 */
 	public void setDeletion(boolean deletion) {
-		navActs.setDeletion(deletion);
+		navState.setDeletion(deletion);
 	}
 
 	/**
@@ -535,7 +543,7 @@ public class RowsModel
 	 * @return returns true if deletions are allowed, else false.
 	 */
 	public boolean getDeletion() {
-		return navActs.getDeletion();
+		return navState.getDeletion();
 	}
 
 	/**
@@ -544,7 +552,7 @@ public class RowsModel
 	 * @return returns true if insertions are allowed, else false.
 	 */
 	public boolean getInsertion() {
-		return navActs.getInsertion();
+		return navState.getInsertion();
 	}
 
 	/**
@@ -554,7 +562,7 @@ public class RowsModel
 	 * @param insertion indicates whether or not to allow insertions
 	 */
 	public void setInsertion(boolean insertion) {
-		navActs.setInsertion(insertion);
+		navState.setInsertion(insertion);
 	}
 
 	/**
@@ -565,7 +573,7 @@ public class RowsModel
 	 * @param writable true to enable writable-related actions; false to disable
 	 */
 	public void setWritable(boolean writable) {
-		navActs.setWritable(writable);
+		navState.setWritable(writable);
 	}
 
 	/**
@@ -575,7 +583,7 @@ public class RowsModel
 	 *         database, else false.
 	 */
 	public boolean getWritable() {
-		return navActs.getWritable();
+		return navState.getWritable();
 	}
 
 	/**
@@ -588,7 +596,7 @@ public class RowsModel
 	 */
 	@Deprecated
 	public void setModification(boolean modification) {
-		navActs.setWritable(modification);
+		navState.setWritable(modification);
 	}
 
 	/**
@@ -600,14 +608,14 @@ public class RowsModel
 	 */
 	@Deprecated
 	public boolean getModification() {
-		return navActs.getWritable();
+		return navState.getWritable();
 	}
 
 	/**
 	 * @param navCombo the navCombo to set
 	 */
 	public void setNavCombo(SSDBComboBox navCombo) {
-		navActs.setNavCombo(navCombo);
+		navState.setNavCombo(navCombo);
 	}
 
 	/**
@@ -615,7 +623,7 @@ public class RowsModel
 	 */
 	// TODO: what's this about
 	public SSDBComboBox getNavCombo() {
-		return navActs.getNavCombo();
+		return navState.getNavCombo();
 	}
 
 	/**
@@ -625,21 +633,21 @@ public class RowsModel
 	 */
 	public boolean containsRows()
 	{
-		return navActs.containsRows();
+		return navState.containsRows();
 	}
 
 	/**
 	 * @return boolean indicating if the navigator is on an insert row
 	 */
 	public boolean isOnInsertRow() {
-		return navActs.isOnInsertRow();
+		return navState.isOnInsertRow();
 	}
 
 	/**
 	 * Writes the present row back to the RowSet.
 	 * 
 	 * This is typically done when commit it pressed,
-	 * but it may be done programmaticaly.
+	 * but it may be done programmatically.
 	 * 
 	 * //		This is done automatically when
 	 * //		any navigation takes place, but can also be called manually.
@@ -647,7 +655,7 @@ public class RowsModel
 	 * @return returns true if update succeeds else false.
 	 */
 	public boolean updatePresentRow() {
-		return navActs.updatePresentRow();
+		return navState.updatePresentRow();
 	}
 
 	// //////////////////////////////////////////////////////////////////////

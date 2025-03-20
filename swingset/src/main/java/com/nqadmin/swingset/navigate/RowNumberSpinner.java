@@ -47,6 +47,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.System.Logger;
 
 import javax.swing.Action;
 import javax.swing.ComponentInputMap;
@@ -57,10 +58,16 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSpinnerUI;
 
-import com.nqadmin.swingset.navigate.NavigateActions.NavGotoRowAction;
+import com.nqadmin.swingset.navigate.RowsActions.NavGotoRowAction;
+import com.nqadmin.swingset.utils.SSUtils;
+import com.raelity.lib.eventbus.WeakEventBus;
+import com.raelity.lib.eventbus.WeakSubscribe;
 
+import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_UP;
+import static java.lang.System.Logger.Level.*;
 import static javax.swing.KeyStroke.getKeyStroke;
 
 /**
@@ -82,13 +89,37 @@ import static javax.swing.KeyStroke.getKeyStroke;
 @SuppressWarnings("serial")
 public class RowNumberSpinner extends JSpinner
 {
-	private NavGotoRowAction gotoRowAction; // TODO: replace with RowsModel?
+	private static final Logger logger = SSUtils.getLogger();
+	//private NavGotoRowAction gotoRowAction;
+	private RowsModel rowsModel;
 
 	/**
 	 * Construct spinner for row number in a data navigator.
+	 * @param rowsModel
 	 */
-	public RowNumberSpinner()
+	public RowNumberSpinner(RowsModel rowsModel)
 	{
+		this.rowsModel = rowsModel;
+		busReceiver = new BusReceiver();
+		WeakEventBus.register(busReceiver, getGlobalEventBus());
+
+		setAction();
+	}
+
+	BusReceiver busReceiver; // Must have a strong reference.
+	class BusReceiver
+	{
+		// Each RowSet has it's own SpinnerModel.
+		// Need to note model change to update spinner, no gain in wrapping spinner model.
+		@WeakSubscribe
+		public void handleNewRowSetEvent(RowsNewRowSetEvent ev)
+		{
+			if (ev.getRowsModel() != rowsModel)
+				return;
+			System.err.printf("%s", ev.toString());
+			logger.log(DEBUG, () -> sf("Change spinner rowSet/model %s", ev.toString()));
+			internalChangeSpinnerModel();
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -102,28 +133,15 @@ public class RowNumberSpinner extends JSpinner
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * <b>An exception is thrown</b>
-	 * @deprecated use {@link #setModel(com.nqadmin.swingset.navigate.RowsModel) }.
+	 * <b>An exception is thrown if invoked unexpectedly.</b>
 	 */
 	@Override
-	@Deprecated
 	public void setModel(SpinnerModel model)
 	{
 		if(!actionSetModel)
-			throw new IllegalCallerException("Use the other setModel");
+			throw new IllegalCallerException("Can not change the model");
 		super.setModel(model);
 	}
-
-	/**
-	 * Sets the model to the SpinnerNumberModel associated with a
-	 * given RowSet's NavigateActions's NavGotoRowAction.
-	 * @param rowsModel 
-	 */
-	public void setModel(RowsModel rowsModel)
-	{
-		setAction(rowsModel.getAction(RowsAction.ACT_GOTOROW));
-	}
-
 
 	/** Use this to track enabled. */
 	private final PropertyChangeListener pclEnableDisableAction = (evt) -> {
@@ -133,36 +151,38 @@ public class RowNumberSpinner extends JSpinner
 
 	/** forward spinner events to goto row action */
 	private final ChangeListener changeListener = (evt) -> {
-		//System.err.println("changeListener: " + objectID(gotoRowAction));
-		gotoRowAction.actionPerformed(new ActionEvent(RowNumberSpinner.this,
+		rowsModel.getAction(RowsAction.ACT_GOTOROW)
+				.actionPerformed(new ActionEvent(RowNumberSpinner.this,
 				AWTEvent.RESERVED_ID_MAX + 1, RowsAction.OK_SKIP_CURSOR_MOVE));
 	};
+
+	private void internalChangeSpinnerModel()
+	{
+		// If JSpinner setModel doesn't come from right here,
+		// an exception is thrown.
+		actionSetModel = true;
+		try {
+			setModel(rowsModel.getSpinnerModel());
+		} finally {
+			actionSetModel = false;
+		}
+	}
 
 	/** 
 	 * Listen to the specified action for Spinner enabled; send events to it.
 	 * The action contains the model for the JSpinner.
 	 * @param action provides enabled
 	 */
-	// TODO: make setAction private (or maybe package) in favor of setModel(nav model)
-	public void setAction(Action action) {
-		if(!(action instanceof NavGotoRowAction tmpGotoRowAction))
+	private void setAction() {
+		Action action = rowsModel.getAction(RowsAction.ACT_GOTOROW);
+
+		if(!(action instanceof NavGotoRowAction gotoRowAction))
 			throw new IllegalArgumentException("Must be NavGotoRowAction");
 
-		if (gotoRowAction != null)
-			gotoRowAction.removePropertyChangeListener(pclEnableDisableAction);
 		removeChangeListener(changeListener);
 
-		gotoRowAction = tmpGotoRowAction;
+		internalChangeSpinnerModel();
 
-		// Set the JSpinner model taken from the gotAction.
-		// If JSpinner setModel doesn't come from right here,
-		// an exception is thrown.
-		actionSetModel = true;
-		try {
-			setModel(gotoRowAction.rowNumberModel());
-		} finally {
-			actionSetModel = false;
-		}
 		// Copy the enable/disable state.
 		setEnabled(gotoRowAction.isEnabled());
 

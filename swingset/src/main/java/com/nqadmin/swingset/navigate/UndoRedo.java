@@ -132,8 +132,8 @@ public enum UndoRedo
 	{
 		if (!isUndoRedoEnabled(comp))
 			return;
-		NavigateActions navActs = NavigateActions.get(comp.getRowSet());
-		navActs.undoRow.captureInitialValue(comp);
+		NavigateState navState = NavigateState.get(comp.getRowSet());
+		navState.undoRow.captureInitialValue(comp);
 	}
 
 	/**
@@ -147,8 +147,8 @@ public enum UndoRedo
 	{
 		if (!isUndoRedoEnabled(comp))
 			throw new IllegalStateException("UNDO/REDO disabled");
-		NavigateActions navActs = NavigateActions.get(comp.getRowSet());
-		return navActs.undoRow.fetchCurrentValue(comp);
+		NavigateState navState = NavigateState.get(comp.getRowSet());
+		return navState.undoRow.fetchCurrentValue(comp);
 	}
 
 	/**
@@ -163,8 +163,8 @@ public enum UndoRedo
 		logger.log(DEBUG, () -> sf("%s: %s for %s", cmd,
 				comp.getClass().getSimpleName(), comp.getBoundColumnName()));
 		try {
-			NavigateActions navActs = NavigateActions.get(comp.getRowSet());
-			Object value = navActs.doUndoRedo(comp, cmd);
+			NavigateState navState = NavigateState.get(comp.getRowSet());
+			Object value = navState.doUndoRedo(comp, cmd);
 			// Wait until value propogates to the component.
 			if (value != UndoCol.none)
 				SwingUtilities.invokeLater(() -> {
@@ -185,8 +185,8 @@ public enum UndoRedo
 	{
 		if (!isUndoRedoEnabled(comp))
 			return;
-		NavigateActions navActs = NavigateActions.get(comp.getRowSet());
-		navActs.undoRow.focusChange(null);
+		NavigateState navState = NavigateState.get(comp.getRowSet());
+		navState.undoRow.focusChange(null);
 	}
 
 	/**
@@ -198,8 +198,8 @@ public enum UndoRedo
 	{
 		if (!isUndoRedoEnabled(ev.getSource()))
 			return;
-		NavigateActions navActs = NavigateActions.get(ev.getSource().getRowSet());
-		navActs.undoRow.addChange(ev);
+		NavigateState navState = NavigateState.get(ev.getSource().getRowSet());
+		navState.undoRow.addChange(ev);
 	}
 
 }

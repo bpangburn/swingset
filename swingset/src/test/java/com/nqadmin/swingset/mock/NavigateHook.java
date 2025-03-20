@@ -35,7 +35,6 @@ import javax.swing.ActionMap;
 import javax.swing.SpinnerNumberModel;
 
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.navigate.RowsAction.*;
 
@@ -49,8 +48,14 @@ public class NavigateHook
 
 	public NavigateHook(RowSet rs)
 	{
-		this.rowsModel = SSUtils.findRowsModel(rs);
+		//this.rowsModel = SSUtils.findRowsModel(rs);
+		this.rowsModel = RowsModel.create(rs);
 		this.actionMap = rowsModel.fillNavActionMap(null);
+	}
+
+	public RowsModel getRowsModel()
+	{
+		return rowsModel;
 	}
 	
 	public void first() { actionMap.get(ACT_FIRST).actionPerformed(null); }
@@ -68,10 +73,12 @@ public class NavigateHook
 	}
 
 	public int rowCount() {
-		ModelAct spinModel = getSpinModelAct();
-		if (spinModel.model != null)
-			return (Integer)spinModel.model.getMaximum();
-		return -1;
+		//ModelAct spinModel = getSpinModelAct();
+		//if (spinModel.model != null)
+		//	return (Integer)spinModel.model.getMaximum();
+		//return -1;
+
+		return rowsModel.getRowCount();
 	}
 
 	private record ModelAct(SpinnerNumberModel model, Action action){}

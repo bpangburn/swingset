@@ -782,6 +782,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	 * Update navigate actions with latest rowset
 	 */
 	private void updateDataNavigator() {
+		// TODO: want to change RowSet, not RowsModel
 		getDataNavigator().setRowsModel(getRowsModel());
 	}
 

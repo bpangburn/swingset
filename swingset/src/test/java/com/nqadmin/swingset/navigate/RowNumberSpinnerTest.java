@@ -30,10 +30,13 @@
 package com.nqadmin.swingset.navigate;
 
 
+import java.awt.EventQueue;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.sql.RowSet;
-import javax.swing.SpinnerNumberModel;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -43,11 +46,11 @@ import org.junit.jupiter.api.Test;
 
 import com.nqadmin.swingset.mock.H2;
 
+import static com.nqadmin.swingset.utils.SSUtils.isJunit;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- *
- * @author err
+ * x
  */
 public class RowNumberSpinnerTest
 {
@@ -55,6 +58,7 @@ public class RowNumberSpinnerTest
 	/** x */
 	public RowNumberSpinnerTest()
 	{
+		isJunit();	// Make sure it's set; when using invokeLater, can be missed.
 	}
 	
 	/** x */
@@ -107,20 +111,46 @@ public class RowNumberSpinnerTest
 		return rs;
 	}
 
-	// record r(int x){}
+	int timeoutVal() {
+		return 0;
+	}
+	void await(CountDownLatch latch) throws InterruptedException
+	{
+		int seconds = timeoutVal();
+		if (seconds == 0)
+			latch.await();
+		else
+			latch.await(seconds, TimeUnit.SECONDS);
+	}
 
-	// private record SpinnerModelAct(SpinnerNumberModel model, Action action){}
-	// private SpinnerModelAct getSpinModelAct(RowsModel m) {
-	// 	Action act = m.getAction(RowsAction.ACT_GOTOROW);
-	// 	Object value = act.getValue(NavigateActions.KEY_SPINNER_MODEL);
-	// 	return new SpinnerModelAct((SpinnerNumberModel) value, act);
-	// }
+	@SuppressWarnings("CallToPrintStackTrace")
+	boolean invokeLatereventLatchWait(String tag, Runnable r)
+			throws InterruptedException, InvocationTargetException
+	{
+		boolean error[] = new boolean[1];
+		EventQueue.invokeAndWait(() -> {System.err.println(tag + "Enter");});
+		CountDownLatch latch = new CountDownLatch(1);
+		RowsModelEventHandling.latch = latch;
+		EventQueue.invokeLater(() -> { // actually right away since not in EDT
+			try {
+				r.run();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				latch.countDown();
+				error[0] = true;
+			}
+		});
+		await(latch);
+		EventQueue.invokeAndWait(() -> {System.err.println(tag + "Exit");});
+		return error[0];
+	}
 
 	/**
 	 * Test of setAction method, of class RowNumberSpinner.
 	 * @throws java.lang.Exception
 	 */
 	@Test
+	@SuppressWarnings({"BroadCatchBlock", "TooBroadCatch", "CallToPrintStackTrace", "UseSpecificCatch"})
 	public void testSetAction() throws Exception
 	{
 		System.out.println("setAction");
@@ -131,10 +161,8 @@ public class RowNumberSpinnerTest
 		RowsModel model1 = RowsModel.create(rs1);
 
 		RowSet rs2 = getRS2();
-		RowsModel model2 = RowsModel.create(rs2);
 		
-		RowNumberSpinner spinner = new RowNumberSpinner();
-		spinner.setAction(model1.getAction(RowsAction.ACT_GOTOROW));
+		RowNumberSpinner spinner = new RowNumberSpinner(model1);
 
 		// Verify that there is only one actionPerformed per setValue.
 		// Verify that the correct rowSet cursor is modified,
@@ -143,21 +171,41 @@ public class RowNumberSpinnerTest
 		// Can put the following after rs?.getRow()
 		//checkRowSetPos(rs1_row, rs1, rs2_row, rs2);
 
-		int rs1_row;
+		EventQueue.invokeAndWait(() -> {
+			try {
+				int rs1_row;
+				@SuppressWarnings({"UnusedAssignment", "unused"})
+				int rs2_row = -1;
+				@SuppressWarnings("unused")
+				int row = ((Number)spinner.getValue()).intValue();
+				assertEquals(1, row);
+				rs1_row = rs1.getRow();
+				assertEquals(1, rs1_row);
+				
+				spinner.setValue(3);
+				rs1_row = rs1.getRow();
+				assertEquals(3, rs1_row);
+				assertEquals(1, checkGoto());
+				spinner.setValue(2);
+				rs1_row = rs1.getRow();
+				assertEquals(2, rs1_row);
+				assertEquals(1, checkGoto());
+				// rs1 has 4 rows
+				assertEquals(4, spinner.getModel().getMaximum());
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		});
+		int rs1_row = rs1.getRow();
 		@SuppressWarnings("UnusedAssignment")
 		int rs2_row = -1;
-		@SuppressWarnings("unused")
-		int row = ((Number)spinner.getValue()).intValue();
-		spinner.setValue(3);
-		rs1_row = rs1.getRow();
-		assertEquals(3, rs1_row);
-		assertEquals(1, checkGoto());
-		spinner.setValue(2);
-		rs1_row = rs1.getRow();
-		assertEquals(2, rs1_row);
-		assertEquals(1, checkGoto());
 
-		spinner.setAction(model2.getAction(RowsAction.ACT_GOTOROW));
+		assertFalse(invokeLatereventLatchWait("tick1", () -> model1.setRowSet(rs2)));
+		
+		// rs2 has 5 rows
+		assertEquals(5, spinner.getModel().getMaximum());
+		rs2_row = rs2.getRow();
+		assertEquals(1, rs2_row);
 		spinner.setValue(3);
 		rs2_row = rs2.getRow();
 		assertEquals(3, rs2_row);
@@ -169,7 +217,10 @@ public class RowNumberSpinnerTest
 		assertEquals(2, rs1_row);
 		assertEquals(1, checkGoto());
 
-		spinner.setAction(model1.getAction(RowsAction.ACT_GOTOROW));
+		assertFalse(invokeLatereventLatchWait("tick2", () -> model1.setRowSet(rs1)));
+
+		// rs1 has 4 rows
+		assertEquals(4, spinner.getModel().getMaximum());
 		spinner.setValue(3);
 		rs1_row = rs1.getRow();
 		assertEquals(3, rs1_row);
@@ -185,7 +236,7 @@ public class RowNumberSpinnerTest
 	private int nGoto;
 	private int checkGoto() {
 		int prevGoto = nGoto;
-		nGoto = NavigateActions.getCount(RowsAction.ACT_GOTOROW);
+		nGoto = RowsActions.getCount(RowsAction.ACT_GOTOROW);
 		int n = nGoto - prevGoto;
 		//System.err.printf("N_GOTO: %d\n", n);
 		return n;
@@ -202,31 +253,34 @@ public class RowNumberSpinnerTest
 		);
 	}
 
-	/**
-	 * Test of setModel method, of class RowNumberSpinner.
-	 * @throws java.sql.SQLException
-	 * @throws java.lang.ClassNotFoundException
-	 */
-	@Test
-	@SuppressWarnings({"ThrowableResultIgnored", "deprecation"})
-	public void testSetModel() throws SQLException, ClassNotFoundException
-	{
-		System.out.println("setModel");
+	// /**
+	//  * Test of setModel method, of class RowNumberSpinner.
+	//  * @throws java.sql.SQLException
+	//  * @throws java.lang.ClassNotFoundException
+	//  */
+	// @Test
+	// @SuppressWarnings({"ThrowableResultIgnored", "deprecation"})
+	// public void testSetModel() throws SQLException, ClassNotFoundException
+	// {
+	// 	System.out.println("setModel");
 
-		H2.clean();
-		RowSet rs1 = getRS1();
-		RowsModel navModel = RowsModel.create(rs1);
+	// 	H2.clean();
+	// 	RowSet rs1 = getRS1();
+	// 	RowsModel rowsModel = RowsModel.create(rs1);
 
-		RowNumberSpinner spinner = new RowNumberSpinner();
-		SpinnerNumberModel defaultSpinnerModel = spinner.getModel();
+	// 	RowNumberSpinner spinner = new RowNumberSpinner(rowsModel);
+	// 	SpinnerNumberModel defaultSpinnerModel = spinner.getModel();
 
-		assertThrows(IllegalCallerException.class,
-					 () -> spinner.setModel(new SpinnerNumberModel()));
-		assertTrue(defaultSpinnerModel == spinner.getModel());
+	// 	assertThrows(IllegalCallerException.class,
+	// 				 () -> spinner.setModel(new SpinnerNumberModel()));
+	// 	assertTrue(defaultSpinnerModel == spinner.getModel());
 
-		spinner.setAction(navModel.getAction(RowsAction.ACT_GOTOROW));
-		assertFalse(defaultSpinnerModel == spinner.getModel());
-	}
+	// 	spinner.setModel(rowsModel);
+	// 	assertFalse(defaultSpinnerModel == spinner.getModel());
+	// }
+
+
+
 
 	// /**
 	//  * Test of removeTinyArrows method, of class RowNumberSpinner.

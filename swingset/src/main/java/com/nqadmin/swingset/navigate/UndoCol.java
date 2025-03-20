@@ -179,7 +179,7 @@ final class UndoCol
 		assert curIdx == changes.size() - 1 : "curIdx must be last item";
 
 		changes.set(curIdx, me.getValue());
-		NavigateActions.getLogger().log(DEBUG, () -> sf("UNDO/REDO change: %s - %s", me.getColumnName(), changes));
+		NavigateState.getLogger().log(DEBUG, () -> sf("UNDO/REDO change: %s - %s", me.getColumnName(), changes));
 	}
 
 	boolean isDirty()

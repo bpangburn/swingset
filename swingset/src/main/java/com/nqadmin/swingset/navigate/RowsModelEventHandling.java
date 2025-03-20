@@ -31,11 +31,10 @@ package com.nqadmin.swingset.navigate;
 
 import java.awt.EventQueue;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
@@ -440,9 +439,12 @@ public class RowsModelEventHandling
 
 	//////////////////////////////////////////////////////////////////////
 
-	private static final List<RowsModelEvent> allEvents = new ArrayList<>();
-	static void addToAllEvents(RowsModelEvent event) {
-		allEvents.add(event);
+	private static final int N_EVENTS = 50;
+	private static final Queue<RowsModelEvent> latestEvents = new ArrayDeque<>();
+	private static void addToAllEvents(RowsModelEvent event) {
+		while (latestEvents.size() >= N_EVENTS)
+			latestEvents.remove();
+		latestEvents.add(event);
 	}
 
 	/**
@@ -450,8 +452,8 @@ public class RowsModelEventHandling
 	 * @param tag
 	 */
 	public static void dumpAllEvents(String tag) {
-		System.err.printf("******* %s All Events (%d) *******\n", tag, allEvents.size());
-		allEvents.forEach((ev) -> System.err.println("    " + ev));
+		System.err.printf("******* %s All Events (%d) *******\n", tag, latestEvents.size());
+		latestEvents.forEach((ev) -> System.err.println("    " + ev));
 	}
 
 	static void verifyEDT() {

@@ -62,7 +62,7 @@ public class RowSetState
 	private boolean inserting;
 	private boolean acceptingChanges;
 	private boolean preInsertOps;
-	private WeakReference<NavigateActions> refNavigateActions = new WeakReference<>(null);
+	private WeakReference<NavigateState> refNavigateState = new WeakReference<>(null);
 
 	private static final Map<RowSet,RowSetState> rowSetState
 			= new MapMaker().weakKeys().makeMap();
@@ -78,9 +78,9 @@ public class RowSetState
 	}
 
 	// NOTE: only invoked from one method which is syncronized.
-	static void setNavigateActions(RowSet rs, NavigateActions navigator) {
+	static void setNavigateState(RowSet rs, NavigateState navigator) {
 		if (rs != null) {
-			getRowSetState(rs).refNavigateActions = new WeakReference<>(navigator);
+			getRowSetState(rs).refNavigateState = new WeakReference<>(navigator);
 		}
 	}
 
@@ -171,8 +171,8 @@ public class RowSetState
 	 * @param rs get information for this RowSet
 	 * @return the associated data navigator
 	 */
-	static NavigateActions getNavigateActions(RowSet rs) {
-		return rs == null ? null : getRowSetState(rs).refNavigateActions.get();
+	static NavigateState getNavigateState(RowSet rs) {
+		return rs == null ? null : getRowSetState(rs).refNavigateState.get();
 	}
 	
 }

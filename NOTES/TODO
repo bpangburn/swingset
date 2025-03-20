@@ -1,9 +1,5 @@
 TextDecorator API
 
-Forgot to mention (I think) that I think a default implementation of SSDBNav
-stuff base on meta data might work. It only recently occured to me that this
-stuff is about, at least partly, making new/removed rows visible. Wonder if
-keeping remove/delete info might avoid otherwise unneeded database accesses.
 
 ================================================================================
 
@@ -22,6 +18,53 @@ Convert/move to core
     SSDataNavigator???
 
 SSTextSupport --> TextSupport
+
+================================================================================
+
+What happens if on insert row and do an execute?
+    Assume? and execute will generate a "RowSetListener.rowSetChanged()"
+    Use this to get off the insert row.
+
+================================================================================
+
+Looking at Navigation
+
+An SS screen shows data from a single row of a ResultSet and there is a navigation bar
+which changes which row is displayed. The nav bar also controls insert/delete/modify.
+In this context a screen is a collection of components, not a window; a window could
+have several screens. Typically SS works with ResultSets that are
+ResultSet.TYPE_SCROLL_INSENSITIVE and ResultSet.CONCUR_UPDATABLE; they allow random
+access and can be modified.
+
+By default, when the ResultSet is modified, the database is updated and the ResultSet's
+query is re-executed. This preserves how things display, consider an "ORDER BY" clause.
+The re-execution is handled by DBNav pre/post ops.
+
+Cursor Navigation
+-----------------
+A screens displays information for the cursor, which is the current row. If two screens
+are displaying data from the same row set, they will be displaying the same data since
+the ResultSet only has one cursor.
+
+Random Navigation (not currently implemented)
+-----------------
+Since usually a ResultSet supports random access, there's no reason why the row being
+displayed has to be the cursor row. In particluar, two screen for the same ResultSet
+could show different rows.
+
+Notes
+-----
+- The number of rows is the only thing that must be shared.
+  The current row can be kept by the navigation bar.
+- Non scrollable ResultSet, TYPE_FORWARD_ONLY, could be better handled.
+  For example Prev/First disabled.
+
+
+================================================================================
+
+Using metadata to detect deleted rows.
+    DatabaseMetaData.ownDeletesAreVisible vs DatabaseMetaData.deletesAreDetected Controversy
+    https://stackoverflow.com/questions/38214241/databasemetadata-owndeletesarevisible-vs-databasemetadata-deletesaredetected-con
 
 ================================================================================
 ============================= BUGS =============================================

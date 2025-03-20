@@ -249,7 +249,7 @@
 				<configuration>
 					<compilerId>frgaal</compilerId>
 					<source>21</source>
-					<target>11</target>
+					<target>17</target>
 					<compilerArgs>
 						<arg>-Xlint:deprecation</arg>
 						<!--only needed when using preview language features-->
