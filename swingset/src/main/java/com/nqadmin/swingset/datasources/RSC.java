@@ -48,6 +48,7 @@ import java.sql.SQLException;
 import javax.sql.RowSet;
 
 import com.nqadmin.swingset.formatting.SSFormat;
+import com.nqadmin.swingset.navigate.RowsModel;
 
 /**
  * This interface is an accessor to a {@linkplain RowSet} and one of its
@@ -66,20 +67,20 @@ import com.nqadmin.swingset.formatting.SSFormat;
 public interface RSC
 {
 	/**
-	 * Construct and return an object representing a RowSet column.
+	 * Construct and return an object representing a RowsModel column.
 	 * <p>
 	 * TODO: SO FAR ONLY USED WITH/FROM GRID. Issue with getColumnObject undo/redo.
-	 * @param rs
+	 * @param rowsModel
 	 * @param columnIndex
 	 * @return
 	 * @throws SSSQLRuntimeException
 	 */
-	static RSC get(RowSet rs, int columnIndex) {
+	static RSC get(RowsModel rowsModel, int columnIndex) {
 		//
 		// TODO: accept format, implement in SimpleRSC
 		//
 		try {
-			return new SimpleRSC(rs, columnIndex);
+			return new SimpleRSC(rowsModel, columnIndex);
 		} catch (SQLException ex) {
 			throw new SSSQLRuntimeException(ex);
 		}
@@ -89,27 +90,32 @@ public interface RSC
 	 * Construct and return an object representing a RowSet column.
 	 * <p>
 	 * TODO: NOT USED
-	 * @param rs
+	 * @param rowsModel
 	 * @param columnIndex
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
-	static RSC getEx(RowSet rs, int columnIndex) throws SQLException {
-		return new SimpleRSC(rs, columnIndex);
+	static RSC getEx(RowsModel rowsModel, int columnIndex) throws SQLException {
+		return new SimpleRSC(rowsModel, columnIndex);
 	}
 
 	/**
 	 * Construct and return an object representing a RowSet column.
 	 * <p>
 	 * TODO: NOT USED
-	 * @param rs
+	 * @param rowsModel
 	 * @param columnName 
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
-	static RSC getEx(RowSet rs, String columnName) throws SQLException {
-		return new SimpleRSC(rs, columnName);
+	static RSC getEx(RowsModel rowsModel, String columnName) throws SQLException {
+		return new SimpleRSC(rowsModel, columnName);
 	}
+
+	/**
+	 * @return the RowsModel
+	 */
+	RowsModel getRowsModel();
 
 	/**
 	 * @return the row set

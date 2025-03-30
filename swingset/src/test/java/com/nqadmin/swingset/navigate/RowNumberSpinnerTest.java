@@ -31,10 +31,8 @@ package com.nqadmin.swingset.navigate;
 
 
 import java.awt.EventQueue;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import javax.sql.RowSet;
 
@@ -45,8 +43,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.nqadmin.swingset.mock.H2;
+import com.nqadmin.swingset.mock.TestLogging;
 
+import static com.nqadmin.swingset.navigate.Support.getRS1_4;
+import static com.nqadmin.swingset.navigate.Support.getRS2_5;
+import static com.nqadmin.swingset.utils.SSUtils.getLoggerName;
 import static com.nqadmin.swingset.utils.SSUtils.isJunit;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.util.logging.Level.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -54,17 +58,19 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class RowNumberSpinnerTest
 {
+	private static final Logger LOG = Logger.getLogger(getLoggerName());
 	
 	/** x */
 	public RowNumberSpinnerTest()
 	{
-		isJunit();	// Make sure it's set; when using invokeLater, can be missed.
 	}
-	
+
 	/** x */
 	@BeforeAll
 	public static void setUpClass()
 	{
+		isJunit();	// Make sure it's set; when using invokeLater, can be missed.
+		TestLogging.load();
 	}
 	
 	/** x */
@@ -85,66 +91,6 @@ public class RowNumberSpinnerTest
 	{
 	}
 
-	RowSet getRS1() throws SQLException, ClassNotFoundException
-	{
-		RowSet rs = H2.getRowSet("""
-			CREATE TABLE tbl1
-			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, c_tinyint tinyint);
-            INSERT INTO tbl1 VALUES
-            	(11, 1), (12, 1), (13, 1), (14, 1)
-            ;
-            """);
-		rs.setCommand("SELECT * FROM tbl1");
-		return rs;
-	}
-
-	RowSet getRS2() throws SQLException, ClassNotFoundException
-	{
-		RowSet rs = H2.getRowSet("""
-			CREATE TABLE tbl2
-			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, c_tinyint tinyint);
-            INSERT INTO tbl2 VALUES
-            	(21, 1), (22, 1), (23, 1), (24, 1), (25, 1)
-            ;
-            """);
-		rs.setCommand("SELECT * FROM tbl2");
-		return rs;
-	}
-
-	int timeoutVal() {
-		return 0;
-	}
-	void await(CountDownLatch latch) throws InterruptedException
-	{
-		int seconds = timeoutVal();
-		if (seconds == 0)
-			latch.await();
-		else
-			latch.await(seconds, TimeUnit.SECONDS);
-	}
-
-	@SuppressWarnings("CallToPrintStackTrace")
-	boolean invokeLatereventLatchWait(String tag, Runnable r)
-			throws InterruptedException, InvocationTargetException
-	{
-		boolean error[] = new boolean[1];
-		EventQueue.invokeAndWait(() -> {System.err.println(tag + "Enter");});
-		CountDownLatch latch = new CountDownLatch(1);
-		RowsModelEventHandling.latch = latch;
-		EventQueue.invokeLater(() -> { // actually right away since not in EDT
-			try {
-				r.run();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				latch.countDown();
-				error[0] = true;
-			}
-		});
-		await(latch);
-		EventQueue.invokeAndWait(() -> {System.err.println(tag + "Exit");});
-		return error[0];
-	}
-
 	/**
 	 * Test of setAction method, of class RowNumberSpinner.
 	 * @throws java.lang.Exception
@@ -153,14 +99,12 @@ public class RowNumberSpinnerTest
 	@SuppressWarnings({"BroadCatchBlock", "TooBroadCatch", "CallToPrintStackTrace", "UseSpecificCatch"})
 	public void testSetAction() throws Exception
 	{
-		System.out.println("setAction");
+		LOG.log(INFO, "setAction");
 
 		H2.clean();
-
-		RowSet rs1 = getRS1();
+		RowSet rs1 = getRS1_4();
 		RowsModel model1 = RowsModel.create(rs1);
-
-		RowSet rs2 = getRS2();
+		RowSet rs2 = getRS2_5();
 		
 		RowNumberSpinner spinner = new RowNumberSpinner(model1);
 
@@ -173,15 +117,13 @@ public class RowNumberSpinnerTest
 
 		EventQueue.invokeAndWait(() -> {
 			try {
+				checkGoto(); // initialize state
 				int rs1_row;
-				@SuppressWarnings({"UnusedAssignment", "unused"})
-				int rs2_row = -1;
-				@SuppressWarnings("unused")
+				//int rs2_row;
 				int row = ((Number)spinner.getValue()).intValue();
 				assertEquals(1, row);
 				rs1_row = rs1.getRow();
 				assertEquals(1, rs1_row);
-				
 				spinner.setValue(3);
 				rs1_row = rs1.getRow();
 				assertEquals(3, rs1_row);
@@ -194,13 +136,15 @@ public class RowNumberSpinnerTest
 				assertEquals(4, spinner.getModel().getMaximum());
 			} catch (Exception ex) {
 				ex.printStackTrace();
+				assertTrue(false);
 			}
 		});
 		int rs1_row = rs1.getRow();
-		@SuppressWarnings("UnusedAssignment")
-		int rs2_row = -1;
+		int rs2_row;
 
-		assertFalse(invokeLatereventLatchWait("tick1", () -> model1.setRowSet(rs2)));
+		assertTrue(Support.invokeLaterEventLatchWait(
+				"tick1", () -> model1.setRowSet(rs2), s -> LOG.log(INFO, s)));
+		checkGoto(); // initialize state
 		
 		// rs2 has 5 rows
 		assertEquals(5, spinner.getModel().getMaximum());
@@ -217,7 +161,9 @@ public class RowNumberSpinnerTest
 		assertEquals(2, rs1_row);
 		assertEquals(1, checkGoto());
 
-		assertFalse(invokeLatereventLatchWait("tick2", () -> model1.setRowSet(rs1)));
+		assertTrue(Support.invokeLaterEventLatchWait(
+				"tick2", () -> model1.setRowSet(rs1), s -> LOG.log(INFO, s)));
+		checkGoto(); // initialize state
 
 		// rs1 has 4 rows
 		assertEquals(4, spinner.getModel().getMaximum());
@@ -234,11 +180,12 @@ public class RowNumberSpinnerTest
 	}
 	
 	private int nGoto;
+	/** return number of goto actions */
 	private int checkGoto() {
 		int prevGoto = nGoto;
 		nGoto = RowsActions.getCount(RowsAction.ACT_GOTOROW);
 		int n = nGoto - prevGoto;
-		//System.err.printf("N_GOTO: %d\n", n);
+		//System.out.printf("N_GOTO: %d\n", n);
 		return n;
 	}
 
@@ -247,10 +194,10 @@ public class RowNumberSpinnerTest
 		// int prevGoto = nGoto;
 		// nGoto = NavigateActions.getCount(RowsAction.ACT_GOTOROW);
 		// int n = nGoto - prevGoto;
-		System.err.printf("POS: rs1%s %d, rs2%s %d\n",
+		LOG.log(INFO, sf("POS: rs1%s %d, rs2%s %d\n",
 				rs1.getRow() != r1 ? " ERROR" : "", r1,
 				rs2.getRow() != r2 ? " ERROR" : "", r2
-		);
+		));
 	}
 
 	// /**
@@ -265,7 +212,7 @@ public class RowNumberSpinnerTest
 	// 	System.out.println("setModel");
 
 	// 	H2.clean();
-	// 	RowSet rs1 = getRS1();
+	// 	RowSet rs1 = getRS1_4();
 	// 	RowsModel rowsModel = RowsModel.create(rs1);
 
 	// 	RowNumberSpinner spinner = new RowNumberSpinner(rowsModel);

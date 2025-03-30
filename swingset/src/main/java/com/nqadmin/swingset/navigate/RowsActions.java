@@ -88,10 +88,8 @@ final class RowsActions
 		return countActionPerform[navAction.ordinal()];
 	}
 
-	void startNavigationAction(RowsAction navAction) {
-		// TODO: TEMPORARY RowsModel
-		//rowsModel = RowsModel.create(getRowSet());
-
+	void startNavigationAction(RowsAction navAction)
+	{
 		logger.log(DEBUG, () -> sf("%s button clicked", navAction));
 		countActionPerform[navAction.ordinal()]++;
 		getNavState().removeRowsetListener();    // TODO: not needed for RowsModel

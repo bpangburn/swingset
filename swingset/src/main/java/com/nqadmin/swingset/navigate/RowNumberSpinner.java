@@ -64,6 +64,7 @@ import com.raelity.lib.eventbus.WeakEventBus;
 import com.raelity.lib.eventbus.WeakSubscribe;
 
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
+import static com.nqadmin.swingset.utils.SSUtils.isJunitPrint;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.awt.event.KeyEvent.VK_DOWN;
 import static java.awt.event.KeyEvent.VK_UP;
@@ -71,12 +72,10 @@ import static java.lang.System.Logger.Level.*;
 import static javax.swing.KeyStroke.getKeyStroke;
 
 /**
- * Spinner for {@linkplain javax.sql.RowSet}'s row number that accepts an Action;
- * it listens to an Action for enabled and forwards events to the Action.
- * The action is associated with the RowSet's {@link NavigateActions}.
- * Note setAction must be called for things to work properly;
- * the action contains a {@link javax.swing.SpinnerNumberModel} which
- * tracks the ResultSet's current row and its limits.
+ * A {@code JSpinner} for {@linkplain javax.sql.RowSet}'s row number;
+ * the {@code JSpinner} is associated with a {@code RowsModel}.
+ * The {@code JSpinner} uses a {@code SpinnerNumberModel} which tracks
+ * the {@code RowsModel}'s {@code ResultSet}'s current row and its limits.
  * <p>
  * There are some methods for configuring this Spinner:
  * <ul>
@@ -85,6 +84,10 @@ import static javax.swing.KeyStroke.getKeyStroke;
  * <li>{@link #setUpDownKeysEnable(boolean) }
  * </ul>
  * These methods are accessible through {@link com.nqadmin.swingset.SSDataNavigator} methods.
+ * <p>
+ * There's a Spinner API tweak such that {@code setModel()}
+ * sends a {@code ChangeEvent}. This is convenient when considering the spinner
+ * as part of a navigator and {@code RowsModel.setRowSet()}.
  */
 @SuppressWarnings("serial")
 public class RowNumberSpinner extends JSpinner
@@ -112,12 +115,14 @@ public class RowNumberSpinner extends JSpinner
 		// Each RowSet has it's own SpinnerModel.
 		// Need to note model change to update spinner, no gain in wrapping spinner model.
 		@WeakSubscribe
-		public void handleNewRowSetEvent(RowsNewRowSetEvent ev)
+		public void handleNewRowSetEvent(RowsModelNewRowSetEvent ev)
 		{
 			if (ev.getRowsModel() != rowsModel)
 				return;
-			System.err.printf("%s", ev.toString());
-			logger.log(DEBUG, () -> sf("Change spinner rowSet/model %s", ev.toString()));
+			if (isJunitPrint())
+				System.err.printf("RowNumberSpinner: %s\n", ev.toString());
+			else
+				logger.log(DEBUG, () -> sf("Change spinner rowSet/model %s", ev.toString()));
 			internalChangeSpinnerModel();
 		}
 	}
@@ -163,6 +168,7 @@ public class RowNumberSpinner extends JSpinner
 		actionSetModel = true;
 		try {
 			setModel(rowsModel.getSpinnerModel());
+			fireStateChanged(); // Treat a model change as a state change
 		} finally {
 			actionSetModel = false;
 		}

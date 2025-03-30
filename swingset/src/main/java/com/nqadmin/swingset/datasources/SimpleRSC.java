@@ -48,9 +48,11 @@ import java.sql.SQLException;
 
 import javax.sql.RowSet;
 
+import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
+import static com.nqadmin.swingset.utils.SSUtils.objectID;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -67,33 +69,41 @@ import static java.lang.System.Logger.Level.*;
 //
 public class SimpleRSC implements RSC
 {
-	private final RowSet rs;
+	private final RowsModel rowsModel;
 	private final int index;
 	private final String name;
 	private static final Logger logger = SSUtils.getLogger();
 
-	private SimpleRSC(RowSet rs, Integer index, String name) throws SQLException
+	private SimpleRSC(RowsModel rowsModel, Integer index, String name) throws SQLException
 	{
-		this.rs = rs;
+		this.rowsModel = rowsModel;
+		RowSet rs = rowsModel.getRowSet();
 		this.index = index != null ? index : RowSetOps.getColumnIndex(rs, name);
 		this.name = name != null ? name : RowSetOps.getColumnName(rs, index);
 	}
 
-	SimpleRSC(RowSet rs, int index) throws SQLException
+	SimpleRSC(RowsModel rowsModel, int index) throws SQLException
 	{
-		this(rs, index, null);
+		this(rowsModel, index, null);
 	}
 
-	SimpleRSC(RowSet rs, String name) throws SQLException
+	SimpleRSC(RowsModel rowsModel, String name) throws SQLException
 	{
-		this(rs, null, name);
+		this(rowsModel, null, name);
 	}
 	
 	/** {@inheritDoc} */
 	@Override
-	public RowSet getRowSet()
+	public final RowSet getRowSet()
 	{
-		return rs;
+		return rowsModel.getRowSet();
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public final RowsModel getRowsModel()
+	{
+		return rowsModel;
 	}
 
 	/** {@inheritDoc} */
@@ -115,7 +125,7 @@ public class SimpleRSC implements RSC
 	public JDBCType getBoundColumnJDBCType()
 	{
 		try {
-			return RowSetOps.getJDBCColumnType(rs, index);
+			return RowSetOps.getJDBCColumnType(getRowSet(), index);
 		} catch (SQLException ex) {
 			throw new SSSQLRuntimeException(ex);
 		}
@@ -148,7 +158,6 @@ public class SimpleRSC implements RSC
 	@Override
 	public <T> T getBoundColumnObject(Class<T> clazz)
 	{
-
 		T value = null;
 		
 		try {
@@ -186,7 +195,7 @@ public class SimpleRSC implements RSC
 	@Override
 	public boolean getAllowNull()
 	{
-		return RowSetOps.isNullable(rs, index).orElse(true);
+		return RowSetOps.isNullable(getRowSet(), index).orElse(true);
 	}
 
 	/** {@inheritDoc} */
@@ -205,7 +214,7 @@ public class SimpleRSC implements RSC
 
 	private int getColumnCount() {
 		try {
-			return rs.getMetaData().getColumnCount();
+			return getRowSet().getMetaData().getColumnCount();
 		} catch (final SQLException ex) {
 			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", ex);
 			throw new SSSQLRuntimeException(ex);
@@ -216,6 +225,7 @@ public class SimpleRSC implements RSC
 	@Override
 	public String toString()
 	{
-		return String.format("SimpleRSC{%s, [%s], %d}", SSUtils.objectID(rs), name, index);
+		return String.format("SimpleRSC{%s %s, [%s], %d}",
+				objectID(getRowsModel()), objectID(getRowSet()), name, index);
 	}
 }

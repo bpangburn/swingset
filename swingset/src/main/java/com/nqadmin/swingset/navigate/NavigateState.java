@@ -67,13 +67,13 @@ import com.nqadmin.swingset.utils.SSUtils;
 import com.raelity.lib.eventbus.WeakEventBus;
 import com.raelity.lib.eventbus.WeakSubscribe;
 
+import static com.nqadmin.swingset.navigate.RowSetState.setNavigateState;
 import static com.nqadmin.swingset.navigate.RowsAction.*;
 import static com.nqadmin.swingset.navigate.UndoRedo.isUndoRedoEnabled;
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
-import static com.nqadmin.swingset.navigate.RowSetState.setNavigateState;
 
 //TODO: Handle CachedRowSet Paging
 
@@ -170,35 +170,12 @@ final class NavigateState
 	}
 
 	/**
-	 * Return the navigate actions for the given {@linkplain RowSet}.
-	 * @param rowSet rowSet
-	 * @return actions
-	 */
-	synchronized static NavigateState get(RowSet rowSet)
-	{
-		if (rowSet == null)
-			return dummy();
-		RowsModel rowsModel = SSUtils.existingRowsModel(rowSet);
-		if (rowsModel == null)
-			//System.err.println("No RowModel");
-			throw new IllegalStateException("No RowModel");
-
-
-		NavigateState navState = RowSetState.getNavigateState(rowSet);
-		if (navState == null)
-			setNavigateState(rowSet, navState = new NavigateState(rowSet));
-		return navState;
-	}
-
-	/**
-	 * Return NavState for the RowSet. If one's not found
+	 * Return NavState for the RowSet. If one's not found, navState.getRowSet is null.
 	 * @param rowSet
 	 * @return 
 	 */
 	synchronized static NavigateState getOrCreate(RowSet rowSet)
 	{
-		if (Boolean.FALSE)
-			return NavigateState.get(rowSet);
 		Objects.requireNonNull(rowSet);
 		NavigateState navState = RowSetState.getNavigateState(rowSet);
 		if (navState == null)

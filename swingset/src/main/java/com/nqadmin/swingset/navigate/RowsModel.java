@@ -87,8 +87,6 @@ import static java.lang.System.Logger.Level.*;
 //       Handle an "empty"/"null"/non-executable RowSet?
 //       Is there a way to tell if current command has been executed?
 //
-// TODO: see test's NavigateHook
-//
 public class RowsModel
 {
 	/** Logger for component */
@@ -124,11 +122,24 @@ public class RowsModel
 	 * @param rs
 	 * @return 
 	 */
+	// TODO: should this really be public?
 	static List<RowsModel> getActiveRowModels(RowSet rs)
 	{
 		return activeRowModels.keySet().stream()
 			.filter(rowsModel -> rowsModel.getRowSet() == rs)
 			.toList();
+	}
+
+	/**
+	 * TEMPORARY; typically for debug/transition; find any RowModel for the RowSet.
+	 * @param rs
+	 * @return 
+	 */
+	public static RowsModel getActiveRowModel(RowSet rs)
+	{
+		return activeRowModels.keySet().stream()
+			.filter(rowsModel -> rowsModel.getRowSet() == rs)
+			.findAny().orElse(null);
 	}
 
 	/**
@@ -140,7 +151,6 @@ public class RowsModel
 	{
 		// TODO: Could allow null RowSet as empty model.
 		Objects.requireNonNull(rs);
-		SSUtils.registerNewRowsModel(rs, this);
 
 		activeRowModels.putIfAbsent(this, true);
 
@@ -175,10 +185,10 @@ public class RowsModel
 	public void setRowSet(RowSet rs) {
 		logger.log(DEBUG, () -> sf("RowsModel change rowSet from %s to %s", objectID(getRowSet()), objectID(rs)));
 		Objects.requireNonNull(rs);
-		rowSetListener.unregisterFrom(rs);
+		rowSetListener.unregisterFrom(getRowSet());
 		setNavState(rs);
 		rowSetListener.registerTo(rs);
-		post(new RowsNewRowSetEvent(this));
+		post(new RowsModelNewRowSetEvent(this));
 	}
 
 	/**

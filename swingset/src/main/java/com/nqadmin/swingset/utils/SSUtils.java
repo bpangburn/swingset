@@ -56,13 +56,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Handler;
+import java.util.logging.LogManager;
+import java.util.logging.SimpleFormatter;
 
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.JoinRowSet;
 
-import com.google.common.collect.MapMaker;
 import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.navigate.RowsModel;
 
@@ -89,32 +90,23 @@ public class SSUtils {
 	}
 
 	/**
-	 * Use this if you want a 1-1 correspondence between RowSet and RowsModel.
+	 * Use this if you want a 1-1 correspondence between {@code RowSet} and {@code RowsModel};
+	 * for 1-1 only this method should be used. If an existing RowsModel for the RowSet is
+	 * not found, a new RowsModel is created.
+	 * If {@link RowsModel#create(javax.sql.RowSet) }
+	 * is used multiple RowsModel can be created for the same RowsModel;
+	 * and see {@link RowsModel#getActiveRowModels(javax.sql.RowSet) }
 	 * <p>
 	 * Can also use as a transition aid to RowsModel.
 	 * @param rs
 	 * @return 
 	 */
+	// TODO: could throw exception if more than one model for specified RowSet.
 	public static RowsModel findRowsModel(RowSet rs) {
-		boolean makeNew = false;
-		if (!rs2rowsModel.containsKey(rs))
-			makeNew = true;
-		RowsModel navm = rs2rowsModel.computeIfAbsent(rs, (rs01) -> RowsModel.create(rs01));
-		if (makeNew)
-			System.err.printf("\n***** Allocate new model %s for %s *****\n\n",
-					objectID(navm), objectID(rs));
-		return navm;
-	}
-	private static ConcurrentMap<RowSet, RowsModel> rs2rowsModel = new MapMaker()
-			.concurrencyLevel(1).weakKeys().weakValues().makeMap();
-	/** DEBUG/FOR-NOW/... RETURN null if none */
-	public static void registerNewRowsModel(RowSet rs, RowsModel rowsModel) {
-		if (rs2rowsModel.get(rs) != null)
-			throw new IllegalStateException("RowModel already exists");
-		rs2rowsModel.put(rs, rowsModel);
-	}
-	public static RowsModel existingRowsModel(RowSet rs) {
-		return rs2rowsModel.get(rs);
+		RowsModel rowsModel = RowsModel.getActiveRowModel(rs);
+		if (rowsModel == null)
+			rowsModel = RowsModel.create(rs);
+		return rowsModel;
 	}
 
 	/**
@@ -131,6 +123,7 @@ public class SSUtils {
 	}
 
 	/**
+	 * Return the Logger for the caller.
 	 * This is similar to LogManager.getLogger(), except that
 	 * if getLogger fails then this method returns the root logger.
 	 * So this is suitable for UI components that might get instantiated
@@ -144,6 +137,16 @@ public class SSUtils {
 		Class<?> cc = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE)
 				.getCallerClass();
 		return getLogger(cc.getName());
+	}
+
+	/**
+	 * Return the logger name for the caller.
+	 * @return logger name
+	 */
+	public static String getLoggerName() {
+		Class<?> cc = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE)
+				.getCallerClass();
+		return cc.getName();
 	}
 
 	/**
@@ -308,9 +311,9 @@ public class SSUtils {
 	 */
 	public static boolean isJunit() {
 		if (!didJunitCheck) {
+			//.filter((f)->{System.err.println("    "+f.getClassName());return true; })
 			StackWalker walker = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE);
 			Optional<StackWalker.StackFrame> frame = walker.walk(s -> s
-					//.filter((f)->{System.err.println("    "+f.getClassName());return true; })
 					.filter((f) -> f.getClassName().startsWith("org.junit"))
 					.findFirst());
 			if (frame.isPresent())
@@ -318,6 +321,31 @@ public class SSUtils {
 			didJunitCheck = true;
 		}
 		return isJunit;
+	}
+
+	/** true if in JUnit and NOT using JUnit logging
+	 * @return  */
+	public static boolean isJunitPrint()
+	{
+		if (!isJunit())
+			return false;
+		java.util.logging.Logger juLog = LogManager.getLogManager().getLogger("com.nqadmin.swingset");
+		if (juLog != null) {
+			Handler[] handlers = juLog.getHandlers();
+			if (handlers.length > 0
+					&& handlers[0].getFormatter() instanceof TestFormatterBase)
+				return false;
+		}
+		return true;
+	}
+
+	/**
+	 * This is used to distinguish formatter used in JUnit tests.
+	 * Define it here for use by isJunitPrint.
+	 * This is extended by the unit test logging infrastructure.
+	 */
+	public static class TestFormatterBase extends SimpleFormatter
+	{
 	}
 
 }

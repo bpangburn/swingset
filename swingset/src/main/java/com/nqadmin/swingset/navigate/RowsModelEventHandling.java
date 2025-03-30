@@ -51,6 +51,7 @@ import static com.nqadmin.swingset.navigate.RowsModel.getEventBus;
 import static com.nqadmin.swingset.navigate.RowsModel.logger;
 import static com.nqadmin.swingset.navigate.RowsModel.post;
 import static com.nqadmin.swingset.utils.SSUtils.isJunit;
+import static com.nqadmin.swingset.utils.SSUtils.isJunitPrint;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.awt.EventQueue.isDispatchThread;
@@ -58,6 +59,11 @@ import static java.lang.System.Logger.Level.*;
 
 /**
  * Various ways to handle RowsModel events...
+ * These event types are generated in here
+ * <ul>
+ * <li>RowsEvent derived from RowSetEvent
+ * </ul>
+ * Multiple RowSetEvent maybe coalesced into a single RowsEvent.
  */
 public class RowsModelEventHandling
 {
@@ -247,7 +253,7 @@ public class RowsModelEventHandling
 			RowsEventSource eventSource = getCurrentEventSource();
 			
 			if (eventSource == IDLE_EVENT) {
-				if (isJunit())
+				if (isJunitPrint())
 					System.out.println("Anonymous RowSet");
 				else
 					logger.log(WARNING, "Anonymous RowSet event"); //, new Throwable());
@@ -256,7 +262,7 @@ public class RowsModelEventHandling
 			if (eventSource.rs != rs) { // IDLE_EVENT or OutOfTheBlue RowSet.
 				if (eventSource.rs != null)
 					logger.log(ERROR, "WRONG ROW SET");
-				if (!isJunit())
+				if (!isJunitPrint())
 					logger.log(WARNING, () -> sf("Different RowSet: orig %s, new %s",
 							eventSource.rs, rs)); //, new Throwable());
 
@@ -270,7 +276,7 @@ public class RowsModelEventHandling
 			}
 			
 			if (!eventTypes.isEmpty()) {
-				if (isJunit() && !eventTypes.isEmpty())
+				if (isJunitPrint())
 					System.out.println("merge: " + eventTypes);
 				else
 					logger.log(TRACE, () -> sf("merge: %s", eventTypes));

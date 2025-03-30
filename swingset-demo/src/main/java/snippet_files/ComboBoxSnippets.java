@@ -85,9 +85,9 @@ public class ComboBoxSnippets extends JFrame
 		List<Integer> mappings = List.of(1, 5, 7 );
 		combo.setDisplayValues(options, mappings);
 		
-		// Next line is assuming rowSet has been initialized
-		// and "my_column" is a column in myrowSet.
-		combo.bind(rowSet, "my_column");
+		// Next line is assuming rowsModel has been initialized
+		// and "my_column" is a column in it's rowSet.
+		combo.bind(rowsModel, "my_column");
 		// @end region=custom_key
 	}
 

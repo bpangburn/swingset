@@ -84,6 +84,7 @@ import com.nqadmin.swingset.formatting.SSFormat;
 import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.navigate.RowsEvent;
 import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.navigate.RowsModelNewRowSetEvent;
 import com.nqadmin.swingset.navigate.UndoRedo;
 import com.nqadmin.swingset.utils.SSUtils.DebugRowSetListener;
 import com.raelity.lib.eventbus.WeakEventBus;
@@ -195,6 +196,16 @@ final class SSCommon
 					return;
 				updateSSComponent();
 			}
+		}
+
+		@WeakSubscribe
+		@SuppressWarnings("CallToPrintStackTrace")
+		public void handleNewRowSetEvent(RowsModelNewRowSetEvent ev)
+		{
+			if (ev.getRowsModel() != rowsModel)
+				return;
+			// TODO: catch exceptions for bus
+			updateSSComponent();
 		}
 	}
 

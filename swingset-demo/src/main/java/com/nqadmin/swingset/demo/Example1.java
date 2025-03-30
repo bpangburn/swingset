@@ -76,10 +76,6 @@ import com.nqadmin.swingset.utils.SSUtils;
 
 @SuppressWarnings("serial")
 public class Example1 extends JFrame {
-
-	/**
-	 * Log4j2 Logger
-	 */
     private static final Logger logger = SSUtils.getLogger();
 
 	/**
@@ -157,15 +153,38 @@ public class Example1 extends JFrame {
 					validateSupplierName, () -> "Supplier can not end with 'oops..'");
 			decoSupplierName = SVUtils.decorator(txtSupplierName, validator);
 		}
+
+		RowSetButtons rsButtons = new RowSetButtons() {
+			@Override
+			void nextRowSetButtonPush()
+			{
+				logger.log(Level.INFO, "nextRowSetButtonPush");
+				try {
+					rowsModel.setRowSet(getTableLoopRowSet());
+				} catch (SQLException | ClassNotFoundException ex) {
+					logger.log(Level.ERROR, "", ex);
+				}
+			}
+		};
 		
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 		try {
-			rowset = DemoUtil.getNewRowSet(connection);
-			rowset.setCommand("SELECT * FROM supplier_data");
+			if (Boolean.FALSE) {
+				rsButtons.tableLoopIncr(); // at beginning of cycling
+				RowSet tRowSet = rsButtons.getTableLoopRowSet();
+				if (tRowSet != null) {
+					rowsModel = RowsModel.create(tRowSet);
+					rowset = rowsModel.getRowSet();
+				}
+			}
+			if (rowsModel == null) {
+				rowset = DemoUtil.getNewRowSet(connection);
+				rowset.setCommand("SELECT * FROM supplier_data");
+				rowsModel = RowsModel.create(rowset);
+			}
 
-			rowsModel = RowsModel.create(rowset);
 			navigator = new SSDataNavigator(rowsModel);
-		} catch (final SQLException se) {
+		} catch (SQLException | ClassNotFoundException se) {
 			logger.log(Level.ERROR, "SQL Exception.", se);
 		}
 		
@@ -288,6 +307,11 @@ public class Example1 extends JFrame {
 		constraints.gridy = 4;
 		constraints.gridwidth = 2;
 		contentPane.add(navigator, constraints);
+		
+		constraints.gridx = 0;
+		constraints.gridy = 5;
+		constraints.gridwidth = 2;
+		contentPane.add(rsButtons, constraints);
 		
 		// DISABLE THE PRIMARY KEY
 		txtSupplierID.setEnabled(false);

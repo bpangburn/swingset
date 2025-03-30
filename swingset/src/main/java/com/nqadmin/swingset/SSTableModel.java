@@ -38,6 +38,7 @@
 package com.nqadmin.swingset;
 
 import java.awt.Component;
+import java.lang.System.Logger;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -46,26 +47,23 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import javax.sql.RowSet;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
-import java.lang.System.Logger;
-import java.util.function.Supplier;
-
 import com.nqadmin.swingset.datasources.DateTime;
 import com.nqadmin.swingset.datasources.RSC;
-
-import static java.lang.System.Logger.Level.*;
-
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
 import static com.nqadmin.swingset.datasources.DateTime.getSQLDateTimeObject;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static com.nqadmin.swingset.datasources.RowSetOps.updateColumnObjectDirect;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
 // SSTableModel.java
 //
@@ -151,6 +149,7 @@ public class SSTableModel extends AbstractTableModel {
 	private transient int rowCount = 0;
 
 	transient private RowSet rowset = null;
+	transient private RowsModel rowsModel = null;
 
 	/**
 	 * List of uneditable columns.
@@ -334,7 +333,7 @@ public class SSTableModel extends AbstractTableModel {
 
 			// Column numbers in ssrowset start from 1 where as column numbering
 			// for jtable start from 0.
-			value = RowSetOps.getColumnObjectLegacy(RSC.get(rowset, _column + 1));
+			value = RowSetOps.getColumnObjectLegacy(RSC.get(rowsModel, _column + 1));
 		} catch (final SQLException se) {
 			logger.log(ERROR, "SQL Exception while retrieving value.",  se);
 			if (component != null) {
@@ -629,8 +628,10 @@ public class SSTableModel extends AbstractTableModel {
 	 *
 	 * @param _rowset RowSet object whose records has to be displayed in JTable.
 	 */
-	void setRowSet(final RowSet _rowset) {
-		rowset = _rowset;
+	// TODO: handle RowsModel.setRowSet()
+	void setRowsModel(RowsModel rowsModel) {
+		this.rowsModel = rowsModel;
+		this.rowset = rowsModel.getRowSet();
 		init(false);
 	}
 	
@@ -709,7 +710,7 @@ public class SSTableModel extends AbstractTableModel {
 		// If copying values the date will come as string so convert it to date object.
 		if (DateTime.isHandledDateTimeJDBCType(type)
 				&& valueCopy instanceof String string) {
-			valueCopy = getSQLDateTimeObject(string, RSC.get(rowset, _column + 1));
+			valueCopy = getSQLDateTimeObject(string, RSC.get(rowsModel, _column + 1));
 		}
 
 		// IF CELL EDITING INTERFACE IMPLEMENTATION IS PROVIDED INFO THE USER

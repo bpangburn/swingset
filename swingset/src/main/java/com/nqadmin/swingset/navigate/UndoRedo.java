@@ -132,7 +132,7 @@ public enum UndoRedo
 	{
 		if (!isUndoRedoEnabled(comp))
 			return;
-		NavigateState navState = NavigateState.get(comp.getRowSet());
+		NavigateState navState = comp.getRowsModel().getNavState();
 		navState.undoRow.captureInitialValue(comp);
 	}
 
@@ -147,7 +147,7 @@ public enum UndoRedo
 	{
 		if (!isUndoRedoEnabled(comp))
 			throw new IllegalStateException("UNDO/REDO disabled");
-		NavigateState navState = NavigateState.get(comp.getRowSet());
+		NavigateState navState = comp.getRowsModel().getNavState();
 		return navState.undoRow.fetchCurrentValue(comp);
 	}
 
@@ -163,7 +163,7 @@ public enum UndoRedo
 		logger.log(DEBUG, () -> sf("%s: %s for %s", cmd,
 				comp.getClass().getSimpleName(), comp.getBoundColumnName()));
 		try {
-			NavigateState navState = NavigateState.get(comp.getRowSet());
+			NavigateState navState = comp.getRowsModel().getNavState();
 			Object value = navState.doUndoRedo(comp, cmd);
 			// Wait until value propogates to the component.
 			if (value != UndoCol.none)
@@ -185,7 +185,7 @@ public enum UndoRedo
 	{
 		if (!isUndoRedoEnabled(comp))
 			return;
-		NavigateState navState = NavigateState.get(comp.getRowSet());
+		NavigateState navState = comp.getRowsModel().getNavState();
 		navState.undoRow.focusChange(null);
 	}
 
@@ -198,7 +198,7 @@ public enum UndoRedo
 	{
 		if (!isUndoRedoEnabled(ev.getSource()))
 			return;
-		NavigateState navState = NavigateState.get(ev.getSource().getRowSet());
+		NavigateState navState = ev.getSource().getRowsModel().getNavState();
 		navState.undoRow.addChange(ev);
 	}
 

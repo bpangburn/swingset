@@ -24,6 +24,7 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 
 import com.nqadmin.swingset.SSDataGrid;
+import com.nqadmin.swingset.navigate.RowsModel;
 
 /**
  *
@@ -33,6 +34,7 @@ public class DataGridSnippets extends JFrame
 {
 	SSDataGrid dataGrid;
 	RowSet rowSet;
+	RowsModel rowsModel;
 
 	// @start region=init1
 	/**
@@ -41,9 +43,9 @@ public class DataGridSnippets extends JFrame
 	 * @throws SQLException 
 	 */
 	void init(SSDataGrid dataGrid) throws SQLException {
-		// Set the header before setting the RowSet.
+		// Set the header before setting the RowsModel.
 		dataGrid.setHeaders(new String[]{"Part Name", "Color Code", " Weight", "City"});
-		dataGrid.setRowSet(rowSet);
+		dataGrid.setRowsModel(rowsModel);
 		
 		// HIDE THE PART ID COLUMN
 		dataGrid.setHiddenColumnsByName(List.of("part_id"));

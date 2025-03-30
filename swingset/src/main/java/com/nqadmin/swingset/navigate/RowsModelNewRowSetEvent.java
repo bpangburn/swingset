@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2025, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,64 +27,33 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset.mock;
+package com.nqadmin.swingset.navigate;
 
-import javax.sql.RowSet;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.SpinnerNumberModel;
-
-import com.nqadmin.swingset.navigate.RowsModel;
-
-import static com.nqadmin.swingset.navigate.RowsAction.*;
+import java.util.EventObject;
 
 /**
- *
+ * This event signals the source {@link RowsModel} has a different
+ * associated {@link javax.sql.RowSet}.Use {@link RowsModel#getRowSet()}
+ to get the RowSet.
  */
-public class NavigateHook
+@SuppressWarnings("serial")
+public class RowsModelNewRowSetEvent extends EventObject implements RowsModelEvent
 {
-	private final ActionMap actionMap;
-	private final RowsModel rowsModel;
-
-	public NavigateHook(RowSet rs)
+	/**
+	 * Constructs a RowsModelEvent.
+	 * @param source RowsModel get got a different RowSet
+	 */
+	public RowsModelNewRowSetEvent(RowsModel source)
 	{
-		//this.rowsModel = SSUtils.findRowsModel(rs);
-		this.rowsModel = RowsModel.create(rs);
-		this.actionMap = rowsModel.fillNavActionMap(null);
+		super(source);
 	}
 
-	public RowsModel getRowsModel()
-	{
-		return rowsModel;
-	}
-	
-	public void first() { actionMap.get(ACT_FIRST).actionPerformed(null); }
-	public void last() { actionMap.get(ACT_LAST).actionPerformed(null); }
-	public void next() { actionMap.get(ACT_NEXT).actionPerformed(null); }
-	public void prev() { actionMap.get(ACT_PREVIOUS).actionPerformed(null); }
-	public void commit() { actionMap.get(ACT_COMMIT).actionPerformed(null); }
-
-	public void go(int row) {
-		ModelAct spinModel = getSpinModelAct();
-		if (spinModel.model != null) {
-			spinModel.model.setValue(row);
-			spinModel.action.actionPerformed(null);
-		}
-	}
-
-	public int rowCount() {
-		//ModelAct spinModel = getSpinModelAct();
-		//if (spinModel.model != null)
-		//	return (Integer)spinModel.model.getMaximum();
-		//return -1;
-
-		return rowsModel.getRowCount();
-	}
-
-	private record ModelAct(SpinnerNumberModel model, Action action){}
-	private ModelAct getSpinModelAct() {
-		Action act = actionMap.get(ACT_GOTOROW);
-		Object value = act.getValue("SPINNER_MODEL");
-		return new ModelAct((SpinnerNumberModel) value, act);
+	/**
+	 * A RowsModel.
+	 * @return RowsModel that issued the event
+	 */
+	@Override
+	public RowsModel getRowsModel() {
+		return (RowsModel) getSource();
 	}
 }

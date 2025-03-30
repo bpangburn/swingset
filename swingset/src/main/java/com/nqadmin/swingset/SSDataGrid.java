@@ -45,7 +45,10 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.lang.reflect.Constructor;
+import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -76,30 +79,24 @@ import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-import java.sql.Date;
-
-import javax.swing.table.JTableHeader;
-
 import com.nqadmin.swingset.datasources.RSC;
-
-import static java.lang.System.Logger.Level.*;
-
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.models.SimpleComboListSwingModel;
+import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSUtils;
 import com.raelity.jdk.sun.swing.table.TableSortHeaderRenderer;
 
 import static com.nqadmin.swingset.datasources.DateTime.getDateTimeText;
 import static com.nqadmin.swingset.datasources.DateTime.getSQLDateTimeObject;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * SSDataGrid provides a way to display information from a database in a table
@@ -447,7 +444,7 @@ public class SSDataGrid extends JTable
 		@Override
 		public Object getCellEditorValue() {
 			String strDate= ((JTextField)getComponent()).getText();
-			return (Date)getSQLDateTimeObject(strDate, RSC.get(rowSet, cIdx + 1));
+			return (Date)getSQLDateTimeObject(strDate, RSC.get(rowsModel, cIdx + 1));
 		}
 		
 		@Override
@@ -457,7 +454,7 @@ public class SSDataGrid extends JTable
 			JTextField tf= ((JTextField)getComponent());
 			tf.setBorder(new LineBorder(Color.black));
 			try {
-				tf.setText(getDateTimeText(value, RSC.get(rowSet, cIdx + 1)));
+				tf.setText(getDateTimeText(value, RSC.get(rowsModel, cIdx + 1)));
 			}
 			catch (Exception e) {
 				tf.setText("");
@@ -466,7 +463,7 @@ public class SSDataGrid extends JTable
 		}
 		
 		public boolean parseDate(String value) {
-			Object dto = getSQLDateTimeObject(value, RSC.get(rowSet, cIdx + 1));
+			Object dto = getSQLDateTimeObject(value, RSC.get(rowsModel, cIdx + 1));
 			return dto != null;
 		}
 		
@@ -598,7 +595,7 @@ public class SSDataGrid extends JTable
 		@Override
 		public void setValue(final Object value) {
 			if (value instanceof java.sql.Date date) {
-				String strDate = getDateTimeText(date, RSC.get(rowSet, cIdx + 1));
+				String strDate = getDateTimeText(date, RSC.get(rowsModel, cIdx + 1));
 				setHorizontalAlignment(SwingConstants.CENTER);
 				setText(strDate);
 			} else {
@@ -816,6 +813,7 @@ public class SSDataGrid extends JTable
 	 * RowSet from which component will get/set values.
 	 */
 	private RowSet rowSet = null;
+	private RowsModel rowsModel = null;
 
 	/**
 	 * Constructs an empty data grid.
@@ -843,14 +841,26 @@ public class SSDataGrid extends JTable
 	}
 
 	/**
+	 * Constructs a data grid with the data source set to the given RowsModel.
+	 *
+	 * @param rowsModel RowSet from which values have to be retrieved.
+	 */
+	public SSDataGrid(RowsModel rowsModel) {
+		this();
+		this.rowsModel = rowsModel;
+		this.rowSet = rowsModel.getRowSet();
+		bind();
+	}
+
+	/**
 	 * Constructs a data grid with the data source set to the given RowSet.
 	 *
-	 * @param _rowSet RowSet from which values have to be retrieved.
+	 * @param rowSet RowSet from which values have to be retrieved.
+	 * @deprecated use RowsModel
 	 */
-	public SSDataGrid(final RowSet _rowSet) {
-		this();
-		rowSet = _rowSet;
-		bind();
+	@Deprecated
+	public SSDataGrid(RowSet rowSet) {
+		this(RowsModel.create(rowSet));
 	}
 
 	/**
@@ -982,7 +992,7 @@ public class SSDataGrid extends JTable
 			}
 
 			// SPECIFY THE SSROWSET TO THE TABLE MODEL.
-			getModel().setRowSet(rowSet);
+			getModel().setRowsModel(rowsModel);
 
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, "SQL Exception.", se);
@@ -1136,8 +1146,17 @@ public class SSDataGrid extends JTable
 	 *
 	 * @return returns the RowSet being used.
 	 */
-	public RowSet getRowSet() {
-		return rowSet;
+	public final RowSet getRowSet() {
+		return rowsModel.getRowSet();
+	}
+
+	/**
+	 * Returns the RowSet being used to get the values.
+	 *
+	 * @return returns the RowSet being used.
+	 */
+	public final RowsModel getRowsModel() {
+		return rowsModel;
 	}
 
 	/**
@@ -1608,12 +1627,26 @@ public class SSDataGrid extends JTable
 	/**
 	 * Sets the new RowSet for the combo box.
 	 *
-	 * @param _rowSet RowSet to which the combo has to update values.
+	 * @param rowSet RowSet to which the combo has to update values.
+	 * @deprecated use RowsModel.setRowSet
 	 */
-	public void setRowSet(final RowSet _rowSet) {
-		final RowSet oldValue = rowSet;
-		rowSet = _rowSet;
-		firePropertyChange("rowSet", oldValue, rowSet);
+	// TODO: handle RowsModel.setRowSet()
+	@Deprecated
+	public void setRowSet(RowSet rowSet) {
+		this.rowsModel = RowsModel.create(rowSet);
+		this.rowSet = rowSet;
+		bind();
+	}
+
+	/**
+	 * Sets the new RowSet for the combo box.
+	 *
+	 * @param rowSet RowSet to which the combo has to update values.
+	 */
+	// TODO: handle RowsModel.setRowSet()
+	public void setRowsModel(RowsModel rowsModel) {
+		this.rowsModel = rowsModel;
+		this.rowSet = rowsModel.getRowSet();
 		bind();
 	}
 

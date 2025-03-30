@@ -43,14 +43,19 @@
 package com.nqadmin.swingset.navigate;
 
 import java.awt.KeyboardFocusManager;
+import java.lang.System.Logger.Level;
 import java.sql.SQLException;
 
 import javax.sql.RowSet;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.SubscriberExceptionContext;
+import com.google.common.eventbus.SubscriberExceptionHandler;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSComponentInterface;
+
+import static com.nqadmin.swingset.utils.SSUtils.getLogger;
 
 /**
  * TODO: Replace EventBUs with https://dagger.dev/ and RxJava
@@ -58,6 +63,9 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  */
 public class Utils
 {
+
+	private static final System.Logger logger = getLogger();
+
 	private Utils() { }
 
 	/**
@@ -100,8 +108,7 @@ public class Utils
 	{
 		// May want to extend to handling local EventBus per Frame/Panel;
 		// Use either/both source/rs to find a local eventBus.
-		Utils.getGlobalEventBus(source, source.getRowSet())
-				.post(new RowSetModificationEvent(source, value));
+		getGlobalEventBus().post(new RowSetModificationEvent(source, value));
 	}
 
 	/**
@@ -111,8 +118,7 @@ public class Utils
 	 */
 	public static void postRowSetModifiedError(SSComponentInterface source, Object value)
 	{
-		Utils.getGlobalEventBus(source, source.getRowSet())
-				.post(new RowSetModificationEvent(source, value, true));
+		getGlobalEventBus().post(new RowSetModificationEvent(source, value, true));
 	}
 
 	/**
@@ -124,8 +130,7 @@ public class Utils
 	public static void postRowSetUndoRedo(SSComponentInterface source, Object value,
 									boolean isError)
 	{
-		Utils.getGlobalEventBus(source, source.getRowSet())
-				.post(new RowSetUndoRedoEvent(source, value, isError));
+		getGlobalEventBus().post(new RowSetUndoRedoEvent(source, value, isError));
 	}
 	
 	// Notes on implementing a weak subscriber
@@ -150,7 +155,7 @@ public class Utils
 		if (globalEventBus == null) {
 			globalEventBus = CentralLookup.getDefault().lookup(EventBus.class);
 			if(globalEventBus == null) {
-				globalEventBus = new EventBus("SwingSetGlobal");
+				globalEventBus = new EventBus(new BusExceptionMonitor());
 				CentralLookup.getDefault().add(globalEventBus);
 			}
 
@@ -163,23 +168,17 @@ public class Utils
 		}
 		return globalEventBus;
 	}
-
-	// Maybe get rid of this idea of localEventBus.
-
-	// Find the EventBus associated with the NavGroup to which
-	// the component belongs.
-	/**
-	 * Find the global event bus; arguments are ignored.
-	 * @param component typically JComponent that wants the eventBus
-	 * @param rs RowSet involved in EventBus
-	 * @return component's NavGroup EventBus
-	 */
-	public static EventBus getGlobalEventBus(Object component, RowSet rs)
-	{
-		// TODO: per navigator or per row set or per NavGroup event bus
-		// TODO: get rid of this method, create local event bus
-		//       as client property of root pane/panel of NavGroup
-		return getGlobalEventBus();
-	}
 	
+	private static class BusExceptionMonitor implements SubscriberExceptionHandler
+	{
+		@Override
+		public void handleException(Throwable exception, SubscriberExceptionContext context)
+		{
+			logger.log(Level.ERROR, "BusException", exception);
+			logger.log(Level.ERROR, "    " + context.getEventBus());
+			logger.log(Level.ERROR, "    " + context.getEvent());
+			logger.log(Level.ERROR, "    " + context.getSubscriber());
+			logger.log(Level.ERROR, "    " + context.getSubscriberMethod());
+		}
+	}
 }

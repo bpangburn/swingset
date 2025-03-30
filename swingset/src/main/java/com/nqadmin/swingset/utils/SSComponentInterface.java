@@ -409,6 +409,16 @@ public interface SSComponentInterface extends RSC
 	}
 
 	/**
+	 * Returns the RowSet containing queried data from the database.
+	 *
+	 * @return the rowSet
+	 */
+	@Override
+	default RowsModel getRowsModel() {
+		return getSSCommon().getRowsModel();
+	}
+
+	/**
 	 * Sets the allowNull flag for the bound database column.
 	 *
 	 * @param _allowNull flag to indicate if the bound database column can be null

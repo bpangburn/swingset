@@ -37,21 +37,18 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import java.awt.BorderLayout;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.sql.RowSet;
-import java.sql.ResultSet;
 import javax.swing.JFrame;
-
-import org.apache.logging.log4j.LogManager;
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-import static java.lang.System.Logger.Level.*;
 
 import com.nqadmin.swingset.SSDataGrid;
 import com.nqadmin.swingset.utils.SSUtils;
-import java.awt.BorderLayout;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view
@@ -60,17 +57,10 @@ import java.awt.BorderLayout;
  * For an editable table, users can delete rows by selecting the row to be deleted
  * and pressing Ctrl-X. By default, a confirmation message is displayed before deletion.
  */
+@SuppressWarnings("serial")
 public class Example5 extends JFrame {
 
-	/**
-	 * Log4j2 Logger
-	 */
     private static final Logger logger = SSUtils.getLogger();
-
-	/**
-	 * unique serial id
-	 */
-	private static final long serialVersionUID = -5126011569315467420L;
 	
 	/**
 	 * data grid

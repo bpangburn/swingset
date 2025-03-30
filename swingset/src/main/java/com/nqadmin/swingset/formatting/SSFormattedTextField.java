@@ -232,7 +232,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 		final Object currentValue = ftf.getValue();
 
-		logger.log(INFO, ()->sf("%s: to database '%s' type %s.",
+		logger.log(DEBUG, ()->sf("%s: to database '%s' type %s.",
 				getColumnForLog(), currentValue,
 				currentValue == null ? null : currentValue.getClass().getName()));
 

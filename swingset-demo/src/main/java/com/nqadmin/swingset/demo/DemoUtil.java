@@ -5,42 +5,32 @@
  */
 package com.nqadmin.swingset.demo;
  
-import com.nqadmin.rowset.JdbcRowSetImpl;
-import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import java.awt.EventQueue;
 import java.awt.Point;
-import java.io.BufferedReader;  
+import java.awt.Rectangle;  
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.io.IOException;
- 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.System.Logger;
+import java.lang.ref.WeakReference;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.lang.System.Logger;
-import static java.lang.System.Logger.Level.*;
-import com.raelity.lib.ui.Screens;
-import com.raelity.logman.LocalLogCom;
-import com.raelity.logman.LogCom;
-import com.raelity.logman.LogUtil;
-import com.raelity.logman.ui.LogUI;
-import com.raelity.logman.ui.SwingLogTree;
-import java.awt.EventQueue;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.lang.ref.WeakReference;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.prefs.Preferences;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -52,7 +42,20 @@ import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
+
 import org.openide.util.Exceptions;
+
+import com.nqadmin.rowset.JdbcRowSetImpl;
+import com.raelity.lib.ui.Screens;
+import com.raelity.logman.LocalLogCom;
+import com.raelity.logman.LogCom;
+import com.raelity.logman.LogUtil;
+import com.raelity.logman.ui.LogUI;
+import com.raelity.logman.ui.SwingLogTree;
+
+import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
  
 /**
@@ -96,6 +99,11 @@ public class DemoUtil {
 	private DemoUtil() { }
 	private static final Logger logger = System.getLogger(MainClass.class.getName());
 
+	/**
+	 * x
+	 * @param frame
+	 * @param runOnClose
+	 */
 	public static void initExampleFrame(JFrame frame, Runnable runOnClose)
 	{
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -303,7 +311,7 @@ public class DemoUtil {
 	private static final java.util.logging.Logger swingsetLogger
 			= java.util.logging.Logger .getLogger("com.nqadmin.swingset");
 	/** This does nothing if java.util.logging is not used */
-	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "UseSpecificCatch", "CallToPrintStackTrace"})
+	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "UseSpecificCatch", "CallToPrintStackTrace", "BroadCatchBlock", "TooBroadCatch"})
 	static void configureJavaUtilLogger()
 	{
 		// If log4j-jpl is in classpath, assume java.util.logging not used.
@@ -476,6 +484,39 @@ public class DemoUtil {
             LogUI.saveVisualPrefs(bounds, logTree);
         }
     }
+
+	/**
+	 * x
+	 */
+	public enum DemoDriver {
+		/** x */
+		H2_MEM("jdbc:h2:mem:");
+
+		private final String url;
+
+		private DemoDriver(String url)
+		{
+			this.url = url;
+		}
+
+		/** x
+		 * @return  */
+		public String url() { return url; }
+	}
+
+	/** x
+	 * @param dd
+	 * @return 
+	 */
+	public static boolean hasDriver(DemoDriver dd) {
+		String url = dd.url();
+		Object driver = null;
+		try {
+			driver = DriverManager.getDriver(url);
+		} catch (SQLException ex) {
+		}
+		return driver != null;
+	}
 
 	/**
 	 * Create connection using properties; the properties are passed to
@@ -665,7 +706,7 @@ public class DemoUtil {
     } 
 
 	private static class LineReader {
-		private BufferedReader br;
+		private final BufferedReader br;
 		private int lino;
 
 		private LineReader(BufferedReader _br) {

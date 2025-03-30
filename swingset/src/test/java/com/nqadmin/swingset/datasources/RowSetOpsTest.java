@@ -38,6 +38,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.logging.Logger;
 
 import javax.sql.RowSet;
 
@@ -49,11 +50,13 @@ import org.junit.jupiter.api.Test;
 
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.mock.H2;
-import com.nqadmin.swingset.mock.NavigateHook;
+import com.nqadmin.swingset.mock.TestLogging;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
-import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
+import static com.nqadmin.swingset.utils.SSUtils.getLoggerName;
+import static com.nqadmin.swingset.utils.SSUtils.isJunit;
+import static java.util.logging.Level.INFO;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -61,6 +64,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class RowSetOpsTest
 {
+	private static final Logger LOG = Logger.getLogger(getLoggerName());
 	
 	/** x */
 	public RowSetOpsTest()
@@ -71,6 +75,8 @@ public class RowSetOpsTest
 	@BeforeAll
 	public static void setUpClass()
 	{
+		isJunit();	// Make sure it's set; when using invokeLater, can be missed.
+		TestLogging.load();
 	}
 	
 	/** x */
@@ -91,6 +97,11 @@ public class RowSetOpsTest
 	{
 	}
 
+	private RowsModel getRowsModel(RowSet rs)
+	{
+		return RowsModel.create(rs);
+	}
+
 	/**
 	 * Check out that we can use an embedded H2 for our tests.
 	 * @throws Exception 
@@ -99,11 +110,10 @@ public class RowSetOpsTest
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testDB() throws Exception
 	{
-		System.out.println("DB");
+		LOG.log(INFO, "DB");
 		RowSet rs = H2.getRowSetCleanDB(null);
 		rs.setCommand("SELECT * FROM tbl");
-		@SuppressWarnings("UnusedAssignment")
-		NavigateHook nav = new NavigateHook(rs);
+		RowsModel rowsModel = getRowsModel(rs);
 
 		Object fetch;
 		// Expected from the database
@@ -114,10 +124,10 @@ public class RowSetOpsTest
 				ZoneId.systemDefault()).toInstant());
 		Time t2 = java.sql.Time.valueOf(LocalTime.of(22, 22, 22));
 
-		fetch = RowSetOps.getColumnObject(RSC.getEx(rs, 4));
+		fetch = RowSetOps.getColumnObject(RSC.getEx(rowsModel, 4));
 		assertEquals(d1, fetch);
 
-		fetch = RowSetOps.getColumnObject(RSC.getEx(rs, 5));
+		fetch = RowSetOps.getColumnObject(RSC.getEx(rowsModel, 5));
 		assertEquals(t1, fetch);
 
 		rs = H2.getRowSetCleanDB("""
@@ -132,30 +142,29 @@ public class RowSetOpsTest
 									('2000-02-22','22:22:22','2222-02-22') ;
             """);
 		rs.setCommand("SELECT * FROM tbl");
-		nav = new NavigateHook(rs);
+		rowsModel = getRowsModel(rs);
 
-		assertEquals(2, nav.rowCount());
-		fetch = RowSetOps.getColumnObject(RSC.getEx(rs, 1));
+		assertEquals(2, rowsModel.getRowCount());
+		fetch = RowSetOps.getColumnObject(RSC.getEx(rowsModel, 1));
 		assertEquals(d1, fetch);
-		fetch = RowSetOps.getColumnObject(RSC.getEx(rs, 2));
+		fetch = RowSetOps.getColumnObject(RSC.getEx(rowsModel, 2));
 		assertEquals(t1, fetch);
 
-		nav.next();
-		fetch = RowSetOps.getColumnObject(RSC.getEx(rs, 1));
+		rowsModel.next();
+		fetch = RowSetOps.getColumnObject(RSC.getEx(rowsModel, 1));
 		assertEquals(d2, fetch);
-		fetch = RowSetOps.getColumnObject(RSC.getEx(rs, 2));
+		fetch = RowSetOps.getColumnObject(RSC.getEx(rowsModel, 2));
 		assertEquals(t2, fetch);
 
 		if (Boolean.FALSE) {
-			nav.go(2);
+			rowsModel.setRow(2);
 		}
 
 		Timestamp ts = (Timestamp) rs.getObject(3);
-		LocalDateTime ldt = RowSetOps.getColumnObject(RSC.getEx(rs, 3),
+		LocalDateTime ldt = RowSetOps.getColumnObject(RSC.getEx(rowsModel, 3),
 													  LocalDateTime.class);
 		Timestamp ts2 = Timestamp.valueOf(ldt);
 		assertEquals(ts, ts2);
-		System.err.println("");
 	}
 
 	/**
@@ -167,32 +176,31 @@ public class RowSetOpsTest
 	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "ResultOfObjectAllocationIgnored"})
 	public void testGetColumnObject_RSC_Class() throws Exception
 	{
-		System.out.println("getColumnObject");
+		LOG.log(INFO, "getColumnObject");
 
 		RowSet rs = H2.getRowSetCleanDB(null);
 		rs.setCommand("SELECT * FROM tbl");
-		new NavigateHook(rs);
+		RowsModel rowsModel = getRowsModel(rs);
 
 		Object fetch;
 		Timestamp fetch2;
-		fetch = RowSetOps.getColumnObject(RSC.getEx(rs, "c_date"));
-		fetch2 = RowSetOps.getColumnObject(RSC.getEx(rs, "c_date"), Timestamp.class);
+		fetch = RowSetOps.getColumnObject(RSC.getEx(rowsModel, "c_date"));
+		fetch2 = RowSetOps.getColumnObject(RSC.getEx(rowsModel, "c_date"), Timestamp.class);
 		assertTrue(fetch instanceof java.sql.Date);
 		assertTrue(fetch2 instanceof java.sql.Timestamp);
 		assertEquals(fetch, new Date(fetch2.getTime()));
 	}
 
-	RowSet g_rs;
 	RowsModel g_rm;
-	NavigateHook g_nav;
 
+	@SuppressWarnings("LoggerStringConcat")
 	private void updateColumnText(String col, String sVal, Object val)
 			throws Exception
 	{
-		System.out.println("    " + col);
-		SSComponentInterface comp = new SSTextField(g_rm = findRowsModel(g_rs), col);
+		LOG.log(INFO, "    " + col);
+		SSComponentInterface comp = new SSTextField(g_rm, col);
 		RowSetOps.updateColumnText(comp, sVal);
-		g_nav.commit();
+		g_rm.commit();
 		Object co = RowSetOps.getColumnObject(comp);
 		//assertTrue(co.getClass() == val.getClass());
 		if (val instanceof BigDecimal bd)
@@ -209,11 +217,11 @@ public class RowSetOpsTest
 	@SuppressWarnings("ResultOfObjectAllocationIgnored")
 	public void testUpdateColumnText() throws Exception
 	{
-		System.out.println("updateColumnText");
+		LOG.log(INFO, "updateColumnText");
 		RowSet rs;
-		NavigateHook nav;
+		RowsModel rowsModel;
 
-		g_rs = H2.getRowSetCleanDB("""
+		rs = H2.getRowSetCleanDB("""
             CREATE TABLE tbl
             (
                 c_pk INTEGER DEFAULT nextval('tbl_seq') NOT NULL PRIMARY KEY,
@@ -251,8 +259,8 @@ public class RowSetOpsTest
                     )
 			;
             """);
-		g_rs.setCommand("SELECT * FROM tbl");
-		g_nav = new NavigateHook(g_rs);
+		rs.setCommand("SELECT * FROM tbl");
+		g_rm = getRowsModel(rs);
 
 		updateColumnText("c_integer", "13", 13);
 		updateColumnText("c_smallint", "14", 14);
@@ -271,8 +279,8 @@ public class RowSetOpsTest
 		updateColumnText("c_varchar", "two", "two");
 		updateColumnText("c_nchar", "three", "three");
 
-		g_rs = null;
-		g_nav = null;
+		//g_rs = null;
+		//g_nav = null;
 
 		// Date types
 
@@ -289,18 +297,18 @@ public class RowSetOpsTest
 									(2, '2000-02-22','22:22:22','2000-02-22 22:22:22') ;
             """);
 		rs.setCommand("SELECT * FROM tbl");
-		nav = new NavigateHook(rs);
+		rowsModel = getRowsModel(rs);
 
 		String sDate = "2222-02-22";
 		String sTime = "12:12:12";
 		String sTimestamp = "2222-02-22 22:22:22";
-		SSComponentInterface comp1 = new SSTextField(findRowsModel(rs), "c_date");
-		SSComponentInterface comp2 = new SSTextField(findRowsModel(rs), "c_time");
-		SSComponentInterface comp3 = new SSTextField(findRowsModel(rs), "c_timestamp");
+		SSComponentInterface comp1 = new SSTextField(rowsModel, "c_date");
+		SSComponentInterface comp2 = new SSTextField(rowsModel, "c_time");
+		SSComponentInterface comp3 = new SSTextField(rowsModel, "c_timestamp");
 		RowSetOps.updateColumnText(comp1, sDate);
 		RowSetOps.updateColumnText(comp2, sTime);
 		RowSetOps.updateColumnText(comp3, sTimestamp);
-		nav.commit();
+		rowsModel.commit();
 
 		Object co;
 		co = RowSetOps.getColumnObject(comp1);
@@ -319,7 +327,7 @@ public class RowSetOpsTest
 	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "ResultOfObjectAllocationIgnored"})
 	public void testGetColumnObject_RSC() throws Exception
 	{
-		System.out.println("getColumnObject");
+		LOG.log(INFO, "getColumnObject");
 		RSC comp = null;
 		Object expResult = null;
 		Object result = RowSetOps.getColumnObject(comp);
@@ -336,7 +344,7 @@ public class RowSetOpsTest
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testUpdateColumnObject() throws Exception
 	{
-		System.out.println("updateColumnObject");
+		LOG.log(INFO, "updateColumnObject");
 		SSComponentInterface comp = null;
 		Object _updatedValue = null;
 		RowSetOps.updateColumnObject(comp, _updatedValue);
@@ -353,7 +361,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testInsertRow() throws Exception
 //	{
-//		System.out.println("insertRow");
+//		LOG.log(INFO, "insertRow");
 //		ResultSet _resultSet = null;
 //		RowSetOps.insertRow(_resultSet);
 //		// TODO review the generated test code and remove the default call to fail.
@@ -366,7 +374,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testUpdateRow() throws Exception
 //	{
-//		System.out.println("updateRow");
+//		LOG.log(INFO, "updateRow");
 //		ResultSet _resultSet = null;
 //		RowSetOps.updateRow(_resultSet);
 //		// TODO review the generated test code and remove the default call to fail.
@@ -379,7 +387,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testDeleteRow() throws Exception
 //	{
-//		System.out.println("deleteRow");
+//		LOG.log(INFO, "deleteRow");
 //		ResultSet _resultSet = null;
 //		RowSetOps.deleteRow(_resultSet);
 //		// TODO review the generated test code and remove the default call to fail.
@@ -392,7 +400,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnCount() throws Exception
 //	{
-//		System.out.println("getColumnCount");
+//		LOG.log(INFO, "getColumnCount");
 //		ResultSet _resultSet = null;
 //		int expResult = 0;
 //		int result = RowSetOps.getColumnCount(_resultSet);
@@ -407,7 +415,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnIndex() throws Exception
 //	{
-//		System.out.println("getColumnIndex");
+//		LOG.log(INFO, "getColumnIndex");
 //		ResultSet _resultSet = null;
 //		String _columnName = "";
 //		int expResult = 0;
@@ -423,7 +431,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnName() throws Exception
 //	{
-//		System.out.println("getColumnName");
+//		LOG.log(INFO, "getColumnName");
 //		ResultSet _resultSet = null;
 //		int _columnIndex = 0;
 //		String expResult = "";
@@ -439,7 +447,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testIsNullable_ResultSet_int()
 //	{
-//		System.out.println("isNullable");
+//		LOG.log(INFO, "isNullable");
 //		ResultSet _resultSet = null;
 //		int _columnIndex = 0;
 //		Optional<Boolean> expResult = null;
@@ -455,7 +463,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testIsNullable_ResultSet_String()
 //	{
-//		System.out.println("isNullable");
+//		LOG.log(INFO, "isNullable");
 //		ResultSet _resultSet = null;
 //		String _columnName = "";
 //		Optional<Boolean> expResult = null;
@@ -471,7 +479,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnArray()
 //	{
-//		System.out.println("getColumnArray");
+//		LOG.log(INFO, "getColumnArray");
 //		SSComponentInterface comp = null;
 //		Array expResult = null;
 //		Array result = RowSetOps.getColumnArray(comp);
@@ -486,7 +494,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnObjectLegacy() throws Exception
 //	{
-//		System.out.println("getColumnObjectLegacy");
+//		LOG.log(INFO, "getColumnObjectLegacy");
 //		RSC comp = null;
 //		Object expResult = null;
 //		Object result = RowSetOps.getColumnObjectLegacy(comp);
@@ -501,7 +509,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnText()
 //	{
-//		System.out.println("getColumnText");
+//		LOG.log(INFO, "getColumnText");
 //		SSComponentInterface comp = null;
 //		String expResult = "";
 //		String result = RowSetOps.getColumnText(comp);
@@ -516,7 +524,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnObjectText()
 //	{
-//		System.out.println("getColumnObjectText");
+//		LOG.log(INFO, "getColumnObjectText");
 //		RSC comp = null;
 //		String expResult = "";
 //		String result = RowSetOps.getColumnObjectText(comp);
@@ -531,7 +539,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnType_ResultSet_int() throws Exception
 //	{
-//		System.out.println("getColumnType");
+//		LOG.log(INFO, "getColumnType");
 //		ResultSet _resultSet = null;
 //		int _columnIndex = 0;
 //		int expResult = 0;
@@ -547,7 +555,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetJDBCColumnType_ResultSet_int() throws Exception
 //	{
-//		System.out.println("getJDBCColumnType");
+//		LOG.log(INFO, "getJDBCColumnType");
 //		ResultSet _resultSet = null;
 //		int _columnIndex = 0;
 //		JDBCType expResult = null;
@@ -563,7 +571,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetColumnType_ResultSet_String() throws Exception
 //	{
-//		System.out.println("getColumnType");
+//		LOG.log(INFO, "getColumnType");
 //		ResultSet _resultSet = null;
 //		String _columnName = "";
 //		int expResult = 0;
@@ -579,7 +587,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetJDBCColumnType_ResultSet_String() throws Exception
 //	{
-//		System.out.println("getJDBCColumnType");
+//		LOG.log(INFO, "getJDBCColumnType");
 //		ResultSet _resultSet = null;
 //		String _columnName = "";
 //		JDBCType expResult = null;
@@ -595,7 +603,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetClassColumnType_ResultSet_String() throws Exception
 //	{
-//		System.out.println("getClassColumnType");
+//		LOG.log(INFO, "getClassColumnType");
 //		ResultSet _resultSet = null;
 //		String _columnName = "";
 //		Class expResult = null;
@@ -611,7 +619,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testGetClassColumnType_ResultSet_int() throws Exception
 //	{
-//		System.out.println("getClassColumnType");
+//		LOG.log(INFO, "getClassColumnType");
 //		ResultSet _resultSet = null;
 //		int _columnIndex = 0;
 //		Class expResult = null;
@@ -627,7 +635,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testUpdateColumnArray() throws Exception
 //	{
-//		System.out.println("updateColumnArray");
+//		LOG.log(INFO, "updateColumnArray");
 //		SSComponentInterface comp = null;
 //		SSArray _updatedValue = null;
 //		RowSetOps.updateColumnArray(comp, _updatedValue);
@@ -641,7 +649,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testCheckForceConflict() throws Exception
 //	{
-//		System.out.println("checkForceConflict");
+//		LOG.log(INFO, "checkForceConflict");
 //		SSComponentInterface comp = null;
 //		String _updatedValue = "";
 //		RowSetOps.checkForceConflict(comp, _updatedValue);
@@ -655,7 +663,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testUpdateColumnObjectDirect_4args() throws Exception
 //	{
-//		System.out.println("updateColumnObjectDirect");
+//		LOG.log(INFO, "updateColumnObjectDirect");
 //		RowSet _rowSet = null;
 //		int _columnIndex = 0;
 //		Object _value = null;
@@ -671,7 +679,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testUpdateColumnObjectDirect_3args() throws Exception
 //	{
-//		System.out.println("updateColumnObjectDirect");
+//		LOG.log(INFO, "updateColumnObjectDirect");
 //		RowSet _rowSet = null;
 //		int _columnIndex = 0;
 //		Object _value = null;
@@ -686,7 +694,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testUpdateColumnObject1() throws Exception
 //	{
-//		System.out.println("updateColumnObject1");
+//		LOG.log(INFO, "updateColumnObject1");
 //		RowSet _rowSet = null;
 //		int _columnIndex = 0;
 //		Object _value = null;
@@ -701,7 +709,7 @@ public class RowSetOpsTest
 //	@Test
 //	public void testUpdateColumnObject2() throws Exception
 //	{
-//		System.out.println("updateColumnObject2");
+//		LOG.log(INFO, "updateColumnObject2");
 //		RowSet _rowSet = null;
 //		int _columnIndex = 0;
 //		Object _value = null;
