@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
@@ -70,7 +70,6 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.datasources.RowSetOps;
@@ -168,8 +167,7 @@ final class SSCommon
 	private final BusReceiver busReceiver; // Must have a strong reference.
 
 	/**
-	 * Listener(s) for the underlying RowSet used to update the bound SwingSet
-	 * component.
+	 * RowSet Listeners to update the bound SwingSet component.
 	 * When working with a {@linkplain javax.sql.rowset.CachedRowSet} there are
 	 * extra steps involved which require the listener to ignore some events, see
 	 * {@link RowsModel#addRowSetEvent(com.nqadmin.swingset.navigate.NavigationRowSetEvent.RowSetEventType, javax.sql.RowSetEvent)} and
@@ -188,6 +186,10 @@ final class SSCommon
 			logger.log(DEBUG, () -> sf("%s %s %s",
 					getColumnForLog(), objectID(getRowSet()), ev.toString()));
 
+			// XXX needs testing
+			if (isAcceptingChanges(getRowSet())) // only possible if CachedRowSet
+				return;
+
 			// TODO: ev.getModel != getModel /// not RowSet ???
 
 			if (ev.getOperComponent() != getSSComponent()
@@ -204,89 +206,36 @@ final class SSCommon
 		{
 			if (ev.getRowsModel() != rowsModel)
 				return;
+
+			// XXX needs testing
+			if (isAcceptingChanges(getRowSet())) // only possible if CachedRowSet
+				return;
+
 			// TODO: catch exceptions for bus
 			updateSSComponent();
 		}
 	}
 
-	/**
-	 * When the database row changes we want to trigger a change to the bound
-	 * Component display/value.
-	 * <p>
-	 * In {@link RowsModel}, when a navigation is performed (first, previous,
-	 * next, last) a call may be made to updateRow() to flush the rowset to the 
-	 * underlying database prior to a call to first(), previous(), next(),
-	 * or last(). updateRow() triggers rowChanged, but we don't want to update
-	 * the components for the database flush.
-	 * <p>
-	 * Calls to first(), previous(), next(), and last() trigger cursorMoved.
-	 * For a navigation we will updated the components following cursorMoved.
-	 * <p>
-	 * In JdbcRowSetImpl, notifyRowChanged() is called for insertRow(),
-	 * updateRow(), deleteRow(), &amp; cancelRowUpdates(). We only want to block
-	 * component updates for calls resulting from updateRow().
-	 */
+	// /**
+	//  * When the database row changes we want to trigger a change to the bound
+	//  * Component display/value.
+	//  * <p>
+	//  * In {@link RowsModel}, when a navigation is performed (first, previous,
+	//  * next, last) a call may be made to updateRow() to flush the rowset to the 
+	//  * underlying database prior to a call to first(), previous(), next(),
+	//  * or last(). updateRow() triggers rowChanged, but we don't want to update
+	//  * the components for the database flush.
+	//  * <p>
+	//  * Calls to first(), previous(), next(), and last() trigger cursorMoved.
+	//  * For a navigation we will updated the components following cursorMoved.
+	//  * <p>
+	//  * In JdbcRowSetImpl, notifyRowChanged() is called for insertRow(),
+	//  * updateRow(), deleteRow(), &amp; cancelRowUpdates(). We only want to block
+	//  * component updates for calls resulting from updateRow().
+	//  */
 
-	protected class SSRowSetListener implements RowSetListener
-	{
-		// variables needed to consolidate multiple calls
-		private int lastChange = 0;
-		private int lastNotifiedChange = 0;
-
-		/**
-		 * When the cursor moves we want to trigger a change to the bound Component
-		 * display/value.
-		 */
-		@Override
-		public void cursorMoved(RowSetEvent event) {
-			if (isAcceptingChanges(getRowSet())) { // only possible if CachedRowSet
-				return;
-			}
-			logger.log(TRACE, () -> sf("%s - RowSet cursor moved.", getColumnForLog()));
-			performUpdateSSComponent();
-		}
-
-		@Override
-		public void rowChanged(RowSetEvent event) {
-			if (isAcceptingChanges(getRowSet())) { // only possible if CachedRowSet
-				return;
-			}
-			logger.log(TRACE, () -> sf("%s - RowSet row changed.", getColumnForLog()));
-			performUpdateSSComponent();
-		}
-
-		/**
-		 * When the RowSet is modified we want to trigger a change to the bound
-		 * Component display/value.
-		 */
-		@Override
-		public void rowSetChanged(RowSetEvent event) {
-			if (isAcceptingChanges(getRowSet())) { // only possible if CachedRowSet
-				return;
-			}
-			logger.log(TRACE, () -> sf("%s - RowSet changed.", getColumnForLog()));
-			performUpdateSSComponent();
-		}
-		
-
-		private void performUpdateSSComponent() {
-			lastChange++;
-			logger.log(TRACE, () -> sf("%s - performUpdates(): lastChange=%s, lastNotifiedChange=%s",
-					getColumnForLog(), lastChange, lastNotifiedChange));
-			
-			// Delay execution of logic until all listener methods are called for current event
-			// Based on: https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
-			SwingUtilities.invokeLater(() -> {
-				if (lastNotifiedChange != lastChange) {
-					lastNotifiedChange = lastChange;
-
-					if (RowsModel.ENABLED)
-						return;
-					updateSSComponent();
-				}
-			});
-		}
-	} // end protected class SSRowSetListener
+	// protected class SSRowSetListener implements RowSetListener
+	// ...
 
 	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
@@ -369,6 +318,7 @@ final class SSCommon
 	/**
 	 * Indicates if rowset listener is added (or removed)
 	 */
+	// XXX
 	private boolean rowSetListenerAdded = false;
 	
 	/**
@@ -376,10 +326,10 @@ final class SSCommon
 	 */
 	private boolean ssComponentListenerAdded = false;
 
-	/**
-	 * Underlying RowSet listener.
-	 */
-	private SSRowSetListener rowSetListener = null;
+	// /**
+	//  * Underlying RowSet listener.
+	//  */
+	// private SSRowSetListener rowSetListener = null;
 
 	/**
 	 * Constructor that has a flag to only "half" initialize; typically half
@@ -479,11 +429,11 @@ final class SSCommon
 			if (!checkRowOK())
 				return;
 			RowsModel.startRowsEvent(getRowsModel(), getSSComponent());
-			removeRowSetListener();
+			disableRowSetListening();
 			try {
 				r.run();
 			} finally {
-				addRowSetListener();
+				enableRowSetListening();
 				RowsModel.finishRowsEvent(getRowsModel());
 			}
 	}
@@ -494,19 +444,21 @@ final class SSCommon
 	 * @return true if the components RowSet listener is added/enabled, otherwise false
 	 */
 	boolean isRowSetListenerAdded() {
+		// XXX
 		return rowSetListenerAdded;
 	}
 
 	/**
 	 * Method to add the RowSet listener.
 	 */
-	private void addRowSetListener()
+	private void enableRowSetListening()
 	{
-		if (rowSetListener==null) {
-			rowSetListener = new SSRowSetListener();
-		}
+		// XXX
+		// if (rowSetListener==null) {
+		// 	rowSetListener = new SSRowSetListener();
+		// }
 		if (!rowSetListenerAdded && getRowSet()!=null) {
-			getRowSet().addRowSetListener(rowSetListener);
+			//getRowSet().enableRowSetListening(rowSetListener);
 			rowSetListenerAdded = true;
 			logger.log(DEBUG, () -> sf("%s - RowSet Listener added.", getColumnForLog()));
 		}
@@ -515,12 +467,13 @@ final class SSCommon
 	/**
 	 * Method to remove the RowSet listener.
 	 */
-	private void removeRowSetListener()
+	private void disableRowSetListening()
 	{
+		// XXX
 		// rowSetListenerAdded==true indicates that rowset is not null, and we
 		// do not let the user call setRowSet(null), so not checking
 		if (rowSetListenerAdded) {
-			getRowSet().removeRowSetListener(rowSetListener);
+			//getRowSet().disableRowSetListening(rowSetListener);
 			rowSetListenerAdded = false;
 			logger.log(DEBUG, () -> sf("%s - RowSet Listener removed.", getColumnForLog()));
 		}
@@ -551,7 +504,7 @@ final class SSCommon
 			ssComponentListenerAdded = true;
 		}
 		if (ssComponentListenerAdded) {
-			logger.log(DEBUG, () -> sf("%s - Component Listener added.", getColumnForLog()));
+			logger.log(TRACE, () -> sf("%s - Component Listener added.", getColumnForLog()));
 		}
 	}
 	
@@ -571,7 +524,7 @@ final class SSCommon
 			getSSComponent().getSSComponentHook().removeSSComponentListener(eventListener);
 		}
 		if (!ssComponentListenerAdded) {
-			logger.log(DEBUG, () -> sf("%s - Component Listener removed.", getColumnForLog()));
+			logger.log(TRACE, () -> sf("%s - Component Listener removed.", getColumnForLog()));
 		}
 	}
 
@@ -643,9 +596,9 @@ final class SSCommon
 		try {
 			
 			// Update rowset.
-			removeRowSetListener();
+			disableRowSetListening();
 			this.rowsModel = rowsModel;
-			addRowSetListener();
+			enableRowSetListening();
 			
 			// STORE COLUMN INDEX & NAME
 			setBoundColumnIndex(boundColumnIndex);
@@ -1295,9 +1248,19 @@ final class SSCommon
 	//       Why not call it directly?
 	void issueRowChanged() {
 		if(isRowSetListenerAdded()) {
+			// XXX
 			// TODO: could create a valid event, but since it is not used...
-			rowSetListener.rowChanged(null);
+			//rowSetListener.rowChanged(null);
+
+			// Following used to be in SSRowSetListener.
+			if (isAcceptingChanges(getRowSet())) // only possible if CachedRowSet
+				return;
+			// XXX
+			logger.log(TRACE, () -> sf("%s - RowSet changed.", getColumnForLog()));
+			// Use invokeLater for updateSSComponent? It was when part of listener.
+			updateSSComponent();
 		}
+		else logger.log(WARNING, () -> sf("%s - NO LISTENER.", getColumnForLog()));
 	}
 
 	///////////////////////////////////////////////////////////////////////////

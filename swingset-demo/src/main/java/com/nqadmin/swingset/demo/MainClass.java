@@ -162,7 +162,7 @@ public class MainClass extends JFrame
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 			final Map<String, Object> hints = new HashMap<>(globalHints);
-			RowsModel.dumpAllEvents("New Window:");
+			RowsModel.dumpLatestEvents("New Window:");
 
 			Object source = ae.getSource();
 

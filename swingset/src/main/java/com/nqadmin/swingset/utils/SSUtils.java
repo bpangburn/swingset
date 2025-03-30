@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
@@ -301,7 +301,25 @@ public class SSUtils {
 		if (o == null) {
 			return "null";
 		}
-		return sf("%s@%X", o.getClass().getSimpleName(), System.identityHashCode(o));
+		String s = switch(o) {
+		case RowSet rs -> sf("%s[%s]@%X",
+				o.getClass().getSimpleName(), tableName(rs), System.identityHashCode(o));
+		default -> sf("%s@%X",
+				o.getClass().getSimpleName(), System.identityHashCode(o));
+		};
+		return s;
+	}
+
+	/**
+	 * Return the name of the table where column 1 came from.
+	 * @param rs
+	 * @return 
+	 */
+	public static String tableName(RowSet rs) {
+		try {
+			return rs.getMetaData().getTableName(1);
+		} catch (SQLException ex) { }
+		return null;
 	}
 
 	private static boolean isJunit;

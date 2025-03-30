@@ -3,6 +3,43 @@ TextDecorator API
 
 ================================================================================
 
+Why maintain currentRow and rowCount in navigateState? How much perf gain?
+
+================================================================================
+
+Want two layers of Action control. RowSet and DataNavActions. Also RowsModel control?
+
+Note there is also DBNav with allowDeletion, allowInsertion, allowUpdate.
+Consider DBNav the RowSet control?
+TODO: in DBNav seperate allow* from perform*Ops. Inheritance?
+
+What's the right interaction between RowSet/DataNavActions/DBNav/[sg]etMethods
+
+DataNavActions is per window. Enable/disable writing/updating/inserting.
+
+This mean the DataNavActions needs actions backed by RowSet actions.
+
+
+External controls
+    - callExecute
+    - confirmDeletes
+    - deletion (enableDeletion, deleteOK)
+    - insertion (enableInsertion, insertOK)
+    - writeable (writeOK)
+
+    - DBNav
+    - NavCombo
+
+In RowsActions, ACT_REFRESH has "if (callExecute)", when false does nothing.
+There is a kicker "getNavState().dBNav.performRefreshOps()" after the if.
+This seems to be related to syncManager; used in a few examples. It triggers
+execution of the nav comboBox. ACT_REFRESH should probably be disable when
+callExecute is false (since nothing happens). But the use/meaning of callExecute
+is under investigation. Also, in the examined performRefreshOps() the
+"syncManager.sync()" should be in a finally clause.
+
+================================================================================
+
 Convert/move to core
 
     SSDBNavImpl, SSDBNav - rewrite use meta data

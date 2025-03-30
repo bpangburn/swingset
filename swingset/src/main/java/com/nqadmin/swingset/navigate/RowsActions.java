@@ -92,13 +92,13 @@ final class RowsActions
 	{
 		logger.log(DEBUG, () -> sf("%s button clicked", navAction));
 		countActionPerform[navAction.ordinal()]++;
-		getNavState().removeRowsetListener();    // TODO: not needed for RowsModel
+		getNavState().removeRowsetListener(navAction.toString());    // TODO: not needed for RowsModel???
 		RowsModel.startRowsEvent(rowsModel, navAction);
 	}
 
-	void finishNavigationAction() {
+	void finishNavigationAction(RowsAction navAction) {
 		RowsModel.finishRowsEvent(rowsModel);
-		getNavState().addRowsetListener();    // TODO: not needed for RowsModel
+		getNavState().addRowsetListener(navAction.toString());    // TODO: not needed for RowsModel???
 	}
 
 	static Component dlgParent(EventObject e)
@@ -184,7 +184,7 @@ final class RowsActions
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 			} finally {
-				finishNavigationAction();
+				finishNavigationAction(ACT_FIRST);
 			}
 		}
 	} // end NavFirstAction
@@ -233,7 +233,7 @@ final class RowsActions
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 			} finally {
-				finishNavigationAction();
+				finishNavigationAction(ACT_PREVIOUS);
 			}
 		}
 	} // end NavPreviousAction
@@ -275,7 +275,7 @@ final class RowsActions
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 			} finally {
-				finishNavigationAction();
+				finishNavigationAction(ACT_NEXT);
 			}
 		}
 	} // end NavNextAction
@@ -317,7 +317,7 @@ final class RowsActions
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while updating row or moving the cursor.\n" + se.getMessage());
 			} finally {
-				finishNavigationAction();
+				finishNavigationAction(ACT_LAST);
 			}
 		}
 	} // end NavLastAction
@@ -403,7 +403,7 @@ final class RowsActions
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while saving row.\n" + se.getMessage());
 			} finally {
-				finishNavigationAction();
+				finishNavigationAction(ACT_COMMIT);
 			}
 		}
 	} // end NavCommitAction
@@ -478,7 +478,7 @@ final class RowsActions
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while reverting changes.\n" + se.getMessage());
 			} finally {
-				finishNavigationAction();
+				finishNavigationAction(ACT_REVERT);
 			}
 		}
 	} // end NavRevertRecordAction
@@ -506,8 +506,10 @@ final class RowsActions
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			startNavigationAction(ACT_REFRESH);
+			// TODO: refresh: should this be enabled if callExecute if false?
+			// TODO: use performRefreshOps? Let it return false if handle it here?
 			try {
-				if (getNavState().callExecute) {
+				if (Boolean.TRUE /*|| getNavState().callExecute*/) {
 					getRowSet().execute();
 					
 					if (!getRowSet().next()) {
@@ -531,7 +533,7 @@ final class RowsActions
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured refreshing the data.\n" + se.getMessage());
 			} finally {
-				finishNavigationAction();
+				finishNavigationAction(ACT_REFRESH);
 			}
 		}
 	} // end NavRefreshAction
@@ -622,7 +624,7 @@ final class RowsActions
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while moving to insert row.\n" + se.getMessage());
 			} finally {
-				finishNavigationAction();
+				finishNavigationAction(ACT_ADD);
 			}
 		}
 	} // end NavAddAction
@@ -698,7 +700,7 @@ final class RowsActions
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while deleting row.\n" + se.getMessage());
 			} finally {
-				finishNavigationAction();
+				finishNavigationAction(ACT_DELETE);
 			}
 		}
 	} // end NavDeleteAction
@@ -743,22 +745,22 @@ final class RowsActions
 				//       
 				if (!getNavState().commitChangesToDatabase(true))
 					return;
-				
-				logger.log(DEBUG, "Record number manually updated to " + row + ".");
+
+				logger.log(DEBUG, () -> "Record number manually updated to " + row + ".");
 				if ((row <= getNavState().rowCount) && (row > 0)
 						&& !(getRowSet().getRow() == row && e != null
 							&& RowsAction.OK_SKIP_CURSOR_MOVE.equals(e.getActionCommand()))) {
 					getRowSet().absolute(row);
+					getNavState().freshRow(); // Only happens if the row changed.
 				}
 				
-				getNavState().freshRow();
 				getNavState().updateNavigator();
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(null, //NavigateActions.this,
 						"Exception occured while going to row.\n" + se.getMessage());
 			} finally {
-				finishNavigationAction();
+				finishNavigationAction(ACT_GOTOROW);
 			}
 		}
 	}

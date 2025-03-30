@@ -1,23 +1,38 @@
-/*
- * Portions created by Ernie Rael are
- * Copyright (C) 2025 Ernie Rael.  All Rights Reserved.
+/* *****************************************************************************
+ * Copyright (C) 2025, Ernie R Rael. All rights reserved.
  *
- * The contents of this file are subject to the Mozilla Public
- * License Version 1.1 (the "License"); you may not use this file
- * except in compliance with the License. You may obtain a copy of
- * the License at http://www.mozilla.org/MPL/
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Software distributed under the License is distributed on an "AS
- * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * rights and limitations under the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
  *
- * Contributor(s): Ernie Rael <errael@raelity.com>
- */
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.sql.RowSet;
@@ -36,8 +51,57 @@ public class DemoExtraDB
 
 	private static final Logger logger = SSUtils.getLogger();
 
-	private static final Map<Integer,RowSet> simpleSupplierData = new MapMaker().weakValues().makeMap();
+	// NOTE: During play, might not want the RowSet to just disapear.
+	//private static final Map<Integer,RowSet> simpleSupplierData = new MapMaker().weakValues().makeMap();
+	private static final Map<Integer,RowSet> simpleSupplierData = new MapMaker().makeMap();
 
+	/** Verify initial state; cursors position same as table index */
+	static void check()
+	{
+		if (Boolean.TRUE)
+			return;
+		simpleSupplierData.forEach((idx, rs) -> {
+			try {
+				if (rs.getRow() != idx) {
+					String s = sf("*********** %s MISMATCHED ROW POSITION ***********",
+							rs.getMetaData().getTableName(1));
+					System.err.println(s);
+					logger.log(Level.ERROR, s);
+				}
+			} catch (SQLException ex) {
+			}
+		});
+	};
+
+	static boolean isExecuted(RowSet rs)
+	{
+		boolean rc = false;
+		try {
+			rs.getRow();
+			rc = true;
+		} catch (SQLException ex) { }
+		return rc;
+	}
+
+	static Integer findIdxTbl(RowSet rs)
+	{
+		for (Map.Entry<Integer, RowSet> entry : simpleSupplierData.entrySet()) {
+			if (entry.getValue() == rs)
+				return entry.getKey();
+		}
+		return null;
+	}
+
+	static void derefSupplierData(RowSet rs)
+	{
+		for (Iterator<Map.Entry<Integer, RowSet>> iterator
+				= simpleSupplierData.entrySet().iterator(); iterator.hasNext();) {
+			Map.Entry<Integer, RowSet> next = iterator.next();
+			if (next.getValue() != rs)
+				iterator.remove();
+		}
+	}
+	
 	/**
 	 * Return the RowsModel for the specified table; shared if already exists.
 	 * If it doesn't already exist, the table is created with the specified number of rows.
@@ -57,13 +121,15 @@ public class DemoExtraDB
 	static RowSet findSimpleSupplierData(int idxTbl, int nRow)
 			throws SQLException, ClassNotFoundException
 	{
-		logger.log(Logger.Level.INFO, () -> sf("Using tbl%d, nRows %d", idxTbl, nRow));
 		if (!DemoUtil.hasDriver(DemoUtil.DemoDriver.H2_MEM))
 			return null;
 		RowSet rowSet = simpleSupplierData.get(idxTbl);
-		if (rowSet != null)
+		if (rowSet != null) {
+			logger.log(Level.INFO, () -> sf("Reuse tbl%d, nRows %d", idxTbl, nRow));
 			return rowSet;
+		}
 
+		logger.log(Level.INFO, () -> sf("Create tbl%d, nRows %d", idxTbl, nRow));
 		rowSet = createSimpleSupplierData(idxTbl, nRow);
 		simpleSupplierData.put(idxTbl, rowSet);
 		return rowSet;
@@ -77,6 +143,7 @@ public class DemoExtraDB
 			throws SQLException, ClassNotFoundException
 	{
 		StringBuilder sb = new StringBuilder("""
+            DROP TABLE IF EXISTS tbl{tbl};
             CREATE TABLE tbl{tbl}
             (
                  supplier_id INTEGER DEFAULT NOT NULL PRIMARY KEY,

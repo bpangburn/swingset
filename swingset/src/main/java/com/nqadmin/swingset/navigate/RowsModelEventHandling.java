@@ -44,7 +44,7 @@ import javax.sql.RowSet;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
-import com.nqadmin.swingset.navigate.RowsModel.EnqueueRowsEvent;
+import com.nqadmin.swingset.navigate.RowsModel.EnqueueRowsModelEvent;
 
 import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingChanges;
 import static com.nqadmin.swingset.navigate.RowsModel.getEventBus;
@@ -94,7 +94,7 @@ public class RowsModelEventHandling
 	 * the source is represented as a RowsEventSource.
 	 * The preferred way to operate on a RowSet is like "rsOp(() -> {doStuff})"
 	 * (or a similar construct)
-	 * which brackets the "stuff" with startRowsEvent and firstRowsEvent.
+	 * which brackets the "stuff" with startRowsEvent and finishRowsEvent.
 	 * This makes it simple to coalesce events.
 	 * <p>
 	 * But all RowSet operations may not be bracketed. If a non-bracketed action
@@ -103,7 +103,7 @@ public class RowsModelEventHandling
 	 * <p>
 	 * This is constructed as a static singleton in RowsModel.java.
 	 */
-	static abstract class EnqueueRowsEventBase implements EnqueueRowsEvent
+	static abstract class EnqueueRowsEventBase implements EnqueueRowsModelEvent
 	{
 		//
 		// TODO: fix this comment, operations can be nested and/or anonymous.
@@ -158,6 +158,11 @@ public class RowsModelEventHandling
 
 		// Additional strategies
 		// Merge eventsNextQ for same RowSet.
+
+		@Override
+		public void startRowsEvent(RowsModel model, Object compOrNav) {
+			startRowsEvent(null, model, compOrNav);
+		}
 
 		/**
 		 * Invoke this when starting an Operation that manipulates a RowSet.
@@ -217,6 +222,13 @@ public class RowsModelEventHandling
 			return sb;
 		}
 
+		@Override
+		public void postNewRowSetEvent(RowsModel model)
+		{
+			flushPendingEvent(getCurrentEventSource());
+			post(new RowsModelNewRowSetEvent(model));
+		}
+
 		protected abstract void flushPendingEvent(RowsEventSource eventSource);
 	}
 
@@ -227,13 +239,6 @@ public class RowsModelEventHandling
 		//protected final List<RowSetEventType> eventTypes = new ArrayList<>(6);
 		protected final Set<RowSetEventType> eventTypes
 				= EnumSet.noneOf(RowSetEventType.class);
-
-		@Override
-		public void addRowSetEvents(Set<RowSetEventType> rsEventTypes, RowSet rs)
-		{
-			verifyEDT();
-			throw new UnsupportedOperationException("Not supported.");
-		}
 		
 		/**
 		 * NOTE: Events that occur while processing CachedRowSet changes back to
@@ -281,6 +286,8 @@ public class RowsModelEventHandling
 				else
 					logger.log(TRACE, () -> sf("merge: %s", eventTypes));
 			}
+
+			// Merge for same row set.
 			eventTypes.add(rsEventType);
 		}
 		
@@ -347,7 +354,7 @@ public class RowsModelEventHandling
 	 */
 	static void postAsync(RowsModelEvent event) {
 		verifyEDT();
-		addToAllEvents(event);
+		addToEventHistory(event);
 
 		// TODO: OPTIM: but is it possible?
 		//       When in EDT
@@ -392,9 +399,9 @@ public class RowsModelEventHandling
 	/** Dispatch events invokeLater. */
 	private static void dispatchLoop() {
 		if (!eventsActiveQ.isEmpty())
-			throw new IllegalStateException("starting dispatchLoop, Q not empty");
+			throw new IllegalStateException("starting dispatchLoop, active Q not empty");
 		if (eventsNextQ.isEmpty())
-			throw new IllegalStateException("starting dispatchLoop, Q empty");
+			throw new IllegalStateException("starting dispatchLoop, next Q empty");
 		if (dispatchLoopRunning)
 			throw new IllegalStateException("starting dispatchLoop, dispatchLoopRunning");
 
@@ -404,11 +411,11 @@ public class RowsModelEventHandling
 		eventsActiveQ = eventsNextQ;
 		eventsNextQ = new ArrayDeque<>(4);
 
-		RowsModelEvent curEv;
-		while ((curEv = eventsActiveQ.poll()) != null) {
-			logger.log(TRACE, "####### dispatch start: " + curEv);
+		while (!eventsActiveQ.isEmpty()) {
+			RowsModelEvent curEv = eventsActiveQ.poll();
+			logger.log(TRACE, () -> "####### dispatch start: " + curEv);
 			getEventBus().post(curEv);
-			logger.log(TRACE, "####### dispatch end: " + curEv);
+			logger.log(TRACE, () -> "####### dispatch end: " + curEv);
 		}
 
 		dispatchLoopRunning = false;
@@ -447,19 +454,22 @@ public class RowsModelEventHandling
 
 	private static final int N_EVENTS = 50;
 	private static final Queue<RowsModelEvent> latestEvents = new ArrayDeque<>();
-	private static void addToAllEvents(RowsModelEvent event) {
+	private static void addToEventHistory(RowsModelEvent event) {
 		while (latestEvents.size() >= N_EVENTS)
 			latestEvents.remove();
 		latestEvents.add(event);
 	}
 
+	@SuppressWarnings("FieldMayBeFinal")
+	private static int N_DUMP = 20;
+
 	/**
 	 * 
 	 * @param tag
 	 */
-	public static void dumpAllEvents(String tag) {
+	public static void dumpLatestEvents(String tag) {
 		System.err.printf("******* %s All Events (%d) *******\n", tag, latestEvents.size());
-		latestEvents.forEach((ev) -> System.err.println("    " + ev));
+		latestEvents.stream().limit(N_DUMP).forEach((ev) -> System.err.println("    " + ev));
 	}
 
 	static void verifyEDT() {
@@ -467,312 +477,3 @@ public class RowsModelEventHandling
 			logger.log(ERROR, "Should be EDT", new Throwable());
 	}
 }
-
-	// /**
-	//  * A single RowSet op may invoke listener for mutliple things.
-	//  */
-	// // PROBLEM: With the invoke later have to consider that the "finish" needs
-	// //          to be syncronized/come-after.
-	// @SuppressWarnings("unused")
-	// private class AsyncRowSetListener extends RowSetListenerBase
-	// {
-	// 	/** Variables needed to consolidate multiple calls. */
-	// 	private int lastChange = 0;
-	// 	private int lastNotifiedChange = 0;
-
-	// 	@Override
-	// 	public void rowSetChanged(RowSetEvent event)
-	// 	{
-	// 		addEvent(RowSetEventType.ROW_SET_CHANGED, (RowSet) event.getSource());
-	// 	}
-
-	// 	@Override
-	// 	public void rowChanged(RowSetEvent event)
-	// 	{
-	// 		addEvent(RowSetEventType.ROW_CHANGED, (RowSet) event.getSource());
-	// 	}
-
-	// 	@Override
-	// 	public void cursorMoved(RowSetEvent event)
-	// 	{
-	// 		addEvent(RowSetEventType.CURSOR_MOVED, (RowSet) event.getSource());
-	// 	}
-
-	// 	private final Set<RowSetEventType> whichEv = EnumSet.noneOf(RowSetEventType.class);
-	// 	private void addEvent(RowSetEventType rsEventType, RowSet rs)
-	// 	{
-	// 		lastChange++;
-	// 		whichEv.add(rsEventType);
-
-	// 		// Delay logic until all listener methods are called for current event.
-	// 		// May be further coalescing.
-	// 		// https://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
-	// 		SwingUtilities.invokeLater(() -> {
-	// 			if (lastNotifiedChange != lastChange) {
-	// 				lastNotifiedChange = lastChange;
-
-	// 				addRowSetEvents(whichEv, rs);
-	// 				whichEv.clear();
-	// 			}
-	// 		});
-	// 	}
-	// };
-
-	// private static List<RowsModelEvent> eventsImmediate = new ArrayList<>();
-	// private static boolean eventsBusy;
-	// static void postImmediate(RowsModelEvent event) {
-	// 	verifyEDT();
-	// 	addToAllEvents(event);
-	// 	eventsImmediate.add(event);
-	// 	dumpQueuedEvents("ENQUEUE", eventsImmediate);
-	// 	if (eventsImmediate.size() > 1) {
-	// 		if (!eventsBusy)
-	// 			throw new IllegalStateException("should be busy");
-	// 		System.err.println("post, busy, returning");
-	// 		return;
-	// 	}
-	// 	eventsBusy = true;
-	// 	try {
-	// 		while (!eventsImmediate.isEmpty()) {
-	// 			getEventBus().post(eventsImmediate.get(0));
-	// 			dumpQueuedEvents("DEQUEUE", eventsImmediate);
-	// 			eventsImmediate.remove(0);
-	// 		}
-	// 	} finally {
-	// 		eventsBusy = false;
-	// 	}
-	// }
-
-	// /** If event comes in and no current model, start flushing. */
-	// @SuppressWarnings("unused")
-	// static class FlushNotCurrent extends EnqueueRowsEventBase
-	// {
-	// 	/** If there's confusion, eg unexpected events,
-	// 	 * events go out singularly until re-sync. */
-	// 	protected boolean flushIndividualEvents;
-	// 	protected final List<RowSetEventType> eventTypes = new ArrayList<>(6);
-
-	// 	@Override
-	// 	public void addRowSetEvents(Set<RowSetEventType> rsEventTypes, RowSet rs)
-	// 	{
-	// 		verifyEDT();
-	// 		throw new UnsupportedOperationException("Not supported.");
-	// 	}
-	// 	
-	// 	/**
-	// 	 * NOTE: Events that occur while processing CachedRowSet changes back to
-	// 	 * database are discarded.
-	// 	 *
-	// 	 * @param rsEventType
-	// 	 * @param rs
-	// 	 */
-	// 	@Override
-	// 	public void addRowSetEvent(RowSetEventType rsEventType, RowSet rs) {
-	// 		verifyEDT();
-	// 		if (isAcceptingChanges(rs)) // only possible if CachedRowSet
-	// 			return;
-	// 		logger.log(TRACE, () -> sf(
-	// 				"####### rs %s evType %s", objectID(rs), rsEventType));
-	// 		
-	// 		Objects.requireNonNull(eventSource.operatorKind);
-	// 		if (eventSource.operatorKind == OperatorKind.UNKNOWN)
-	// 			logger.log(WARNING, "Anonymous RowSet event", new Throwable());
-	// 		
-	// 		if (eventSource.rs != rs) {
-	// 			if (eventSource.rs != null)
-	// 				logger.log(ERROR, "WRONG ROW SET");
-	// 			logger.log(WARNING, () -> sf("Different RowSet orig %s, new %s",
-	// 					eventSource.rs, rs), new Throwable());
-	// 			if (eventSource.rs == null) {
-	// 				//eventSource.rs = rs;
-	// 				eventSource = new RowsEventSource(eventSource.rowsModel, rs,
-	// 						eventSource.operatorKind, eventSource.operator);
-	// 			}
-	// 			flushIndividualEvents = true;
-	// 		}
-	// 		
-	// 		boolean hasDup = false;
-	// 		if (eventSource.operatorKind != OperatorKind.UNKNOWN) {
-	// 			//
-	// 			// TODO: ??? if wrong rowset, flush current and clear operatorKind
-	// 			//
-	// 			if (eventTypes.contains(rsEventType)) {
-	// 				//System.err.println("MULTIPLE EVENTS OF SAME TYPE");
-	// 				hasDup = true;
-	// 			}
-	// 		}
-	// 		
-	// 		// TODO: SYNCHRO?
-	// 		eventTypes.add(rsEventType);
-	// 		
-	// 		// Send the event is not associated with a known operation or RowSet.
-	// 		if (flushIndividualEvents || eventSource.operatorKind == OperatorKind.UNKNOWN)
-	// 			finishRowsEventInternal(null, rs);
-	// 		
-	// 		if (hasDup) {
-	// 			// if (isJunit()) System.err.println("Multiple: " + eventTypes);
-	// 			logger.log(DEBUG, () -> "Multiple: " + eventTypes);
-	// 		}
-	// 	}
-	// 	
-	// 	/**
-	// 	 * Invoke this when finishing an Operation that manipulates a RowSet.
-	// 	 * All the RowSet events that occurred during the operation are
-	// 	 * coalesced into a single event.
-	// 	 * @param model must match the model associated with startRowsEvent
-	// 	 */
-	// 	@Override
-	// 	public RowsEventSource finishRowsEvent(RowsModel model) {
-	// 		verifyEDT();
-	// 		finishRowsEventInternal(model, null);
-	// 		flushIndividualEvents = false;
-	// 		// TODO: delete class or fixup return.
-	// 		return null;
-	// 	}
-	// 	
-	// 	@SuppressWarnings("CallToPrintStackTrace")
-	// 	private void finishRowsEventInternal(RowsModel _model, RowSet _rs)
-	// 	{
-	// 		super.finishRowsEvent(_model);
-
-	// 		//
-	// 		// TODO: when there's a "flush...", a startNav will set sourceModel
-	// 		//       and a subsequent addRowSetEvent does finish which clears
-	// 		//       sourceModel. So the following can easily trigger.
-	// 		//
-	// 		
-	// 		//if (_model != null && sourceModel != null && _model != sourceModel)
-	// 		//if (_model != null && _model != sourceModel)
-	// 		
-	// 		if (!flushIndividualEvents && _model != null && _model != eventSource.rowsModel)
-	// 			throw new IllegalStateException("Different model");
-	// 		
-	// 		RowSet rs = _rs != null ? _rs : eventSource.rs();
-	// 		@SuppressWarnings("unused")
-	// 		RowsModel model = _model != null ? _model : getDummy(rs);
-	// 		
-	// 		// TODO: add the RowSet, consider case where model == null ... UNKNOWN
-	// 		RowsEvent ev;
-	// 		
-	// 		// Only create an event if there were RowSetEvents
-	// 		// TODO: if needed, have a different event type for start/finish without event.
-	// 		if (eventTypes.isEmpty()) {
-	// 			ev = null;
-	// 			Supplier<String> msg = () -> sf("RowsEvent %s: No RowSet event", eventSource.operatorKind);
-	// 			if(isJunit())System.out.println(msg.get());
-	// 			logger.log(TRACE, msg);
-	// 		} else {
-	// 			//ev = new RowsEvent(model, rs,
-	// 			//		eventSource.operatorKind, eventSource.operator,
-	// 			ev = new RowsEvent(eventSource,
-	// 					eventTypes.isEmpty()
-	// 							? EnumSet.noneOf(RowSetEventType.class)
-	// 							: EnumSet.copyOf(eventTypes));
-	// 			if(isJunit())System.out.println(ev.toString());
-	// 			logger.log(TRACE, () -> sf(""+ev));
-	// 		}
-	// 		
-	// 		if (eventSource.operatorKind == OperatorKind.COMPONENT && ev != null) {
-	// 			System.err.printf("\n\n***** COMPONENT EVENTS %s *****\n\n", ev);
-	// 			new Exception().printStackTrace(System.out);
-	// 		}
-	// 		
-	// 		eventSource = IDLE_EVENT;
-	// 		// sourceModel = null;
-	// 		// sourceRowSet = null;
-	// 		// operatorKind = OperatorKind.UNKNOWN;
-	// 		// originatingObject = null;
-	// 		eventTypes.clear();
-	// 		
-	// 		if (ev != null)
-	// 			post(ev);
-	// 	}
-	// }
-
-	// /**
-	//  * The addRowSetEvents is done via invokeLater. This means that code like
-	//  * {@code dbChange(() -> rs.Xxx()} completes without any event handling.
-	//  */
-	// @SuppressWarnings("unused")
-	// static class AsyncEvents extends EnqueueRowsEventBase
-	// {
-	// 	/** If there's confusion, eg unexpected events,
-	// 	 * events go out singularly until re-sync. */
-	// 	protected boolean flushIndividualEvents;
-	// 	private Set<RowSetEventType> eventTypes;
-	// 	@Override
-	// 	public void addRowSetEvent(RowSetEventType rsEventType, RowSet rs)
-	// 	{
-	// 		verifyEDT();
-	// 		throw new UnsupportedOperationException("Not supported.");
-	// 	}
-
-	// 	/**
-	// 	 * Can be called in these states.
-	// 	 * <pre>
-	// 	 * - no event in progress
-	// 	 * - bracketed event in progress
-	// 	 *   - different row set
-	// 	 *   - matching row set, normal case
-	// 	 * </pre>
-	// 	 * 
-	// 	 * @param rsEventTypes
-	// 	 * @param rs 
-	// 	 */
-	// 	@Override
-	// 	public void addRowSetEvents(Set<RowSetEventType> rsEventTypes, RowSet rs)
-	// 	{
-	// 		verifyEDT();
-	// 		if (isAcceptingChanges(rs)) // only possible if CachedRowSet
-	// 			return;
-	// 		
-	// 		// ???
-	// 		Objects.requireNonNull(eventSource.operatorKind);
-
-	// 		if (eventSource == IDLE_EVENT) {
-	// 			// No event in progress.
-	// 			logger.log(WARNING, "Anonymous RowSet event", new Throwable());
-	// 			post(new RowsEvent(
-	// 					new RowsEventSource(getDummy(rs), rs, OperatorKind.UNKNOWN, null),
-	// 					rsEventTypes));
-	// 			return; // Still no event in progress.
-	// 		}
-
-	// 		// Bracketed event in progress.
-	// 		if (eventSource.rs != rs) {
-	// 			// Different RowSet. Should generally be impossible.
-	// 			// It could only happen if bracketed ops manipulate multiple RowSets;
-	// 			// or if there is an actor outside of SS.
-	// 			if (eventSource.rs != null)
-	// 				logger.log(ERROR, "WRONG ROW SET");
-	// 			logger.log(WARNING, () -> sf(
-	// 					"Different RowSet orig %s, new %s", eventSource.rs, rs));
-	// 			postInProgress();
-	// 			flushIndividualEvents = true;
-	// 		}
-/*
-	// 		if (eventSource.rs != rs) {
-	// 			// This should be impossible since there is no nested event handling.
-	// 			if (eventSource.rs != null)
-	// 				logger.log(ERROR, "WRONG ROW SET");
-	// 			logger.log(WARNING, () -> sf("Different RowSet orig %s, new %s", sourceRowSet, rs));
-	// 			if (sourceRowSet == null)
-	// 				sourceRowSet = rs;
-	// 			//flushIndividualEvents = true;
-	// 			// TODO: 
-	// 		}
-*/
-	// 	}
-
-	// 	@Override
-	// 	public RowsEventSource finishRowsEvent(RowsModel model)
-	// 	{
-	// 		return super.finishRowsEvent(model);
-	// 	}
-
-	// 	private void postInProgress()
-	// 	{
-	// 		post(new RowsEvent(eventSource, eventTypes));
-	// 		eventSource = IDLE_EVENT;
-	// 	}
-	// }

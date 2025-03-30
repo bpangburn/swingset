@@ -38,11 +38,10 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
-import java.lang.ref.WeakReference;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -62,7 +61,12 @@ public class RowSetState
 	private boolean inserting;
 	private boolean acceptingChanges;
 	private boolean preInsertOps;
-	private WeakReference<NavigateState> refNavigateState = new WeakReference<>(null);
+	private NavigateState navigateState;
+
+	private RowSetState() { }
+
+	///////////////////////////////////////////////////////////////////////////
+	// Instance above, static below
 
 	private static final Map<RowSet,RowSetState> rowSetState
 			= new MapMaker().weakKeys().makeMap();
@@ -71,6 +75,15 @@ public class RowSetState
 		return rowSetState.computeIfAbsent(rs, k -> new RowSetState());
 	}
 
+	// /**
+	//  * True if this is a known rowset.
+	//  * @param rs
+	//  * @return
+	//  */
+	// public static boolean hasRowSetState(RowSet rs) {
+	// 	return rowSetState.containsKey(rs);
+	// }
+
 	static void setInserting(RowSet rs, boolean flag) {
 		if (rs != null) {
 			getRowSetState(rs).inserting = flag;
@@ -78,9 +91,9 @@ public class RowSetState
 	}
 
 	// NOTE: only invoked from one method which is syncronized.
-	static void setNavigateState(RowSet rs, NavigateState navigator) {
+	static void setNavigateState(RowSet rs, NavigateState navState) {
 		if (rs != null) {
-			getRowSetState(rs).refNavigateState = new WeakReference<>(navigator);
+			getRowSetState(rs).navigateState = navState;
 		}
 	}
 
@@ -172,7 +185,7 @@ public class RowSetState
 	 * @return the associated data navigator
 	 */
 	static NavigateState getNavigateState(RowSet rs) {
-		return rs == null ? null : getRowSetState(rs).refNavigateState.get();
+		return rs == null ? null : getRowSetState(rs).navigateState;
 	}
 	
 }

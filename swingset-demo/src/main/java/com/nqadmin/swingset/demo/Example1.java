@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2025, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
 import java.awt.Container;
@@ -65,6 +70,7 @@ import com.nqadmin.swingset.demo.simpval.SVUtils;
 import com.nqadmin.swingset.demo.simpval.StringValidator;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSUtils;
+
 
 /**
  * This example displays data from the supplier_data table.
@@ -158,12 +164,7 @@ public class Example1 extends JFrame {
 			@Override
 			void nextRowSetButtonPush()
 			{
-				logger.log(Level.INFO, "nextRowSetButtonPush");
-				try {
-					rowsModel.setRowSet(getTableLoopRowSet());
-				} catch (SQLException | ClassNotFoundException ex) {
-					logger.log(Level.ERROR, "", ex);
-				}
+				createAssignDebugRowSet(logger, rowsModel);
 			}
 		};
 		

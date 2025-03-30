@@ -31,13 +31,13 @@ package com.nqadmin.swingset.navigate;
 
 
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.lang.ref.WeakReference;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
@@ -149,6 +149,7 @@ public class RowsModel
 	// TODO: handle null RowSet; important, consider empty DataNavigator, build UI first.
 	private RowsModel(RowSet rs)
 	{
+		logger.log(Level.INFO, () -> sf("new RowsModel %s for %s", objectID(this), objectID(rs)));
 		// TODO: Could allow null RowSet as empty model.
 		Objects.requireNonNull(rs);
 
@@ -165,6 +166,7 @@ public class RowsModel
 	/**
 	 * Get and set NavigationState. Two step process because when navState hooks into
 	 * the RowSet, it uses the RowsModel.
+	 * 
 	 * <br>TODO: clean up the RowsModel/NavState initialization.
 	 * 
 	 * @param rs 
@@ -183,12 +185,13 @@ public class RowsModel
 	 */
 	// TODO: Could allow null RowSet as empty model.
 	public void setRowSet(RowSet rs) {
-		logger.log(DEBUG, () -> sf("RowsModel change rowSet from %s to %s", objectID(getRowSet()), objectID(rs)));
+		logger.log(Level.INFO, () -> sf("RowsModel %s change rowSet from %s to %s",
+				objectID(this), objectID(getRowSet()), objectID(rs)));
 		Objects.requireNonNull(rs);
 		rowSetListener.unregisterFrom(getRowSet());
 		setNavState(rs);
 		rowSetListener.registerTo(rs);
-		post(new RowsModelNewRowSetEvent(this));
+		enq.postNewRowSetEvent(this);
 	}
 
 	/**
@@ -429,12 +432,7 @@ public class RowsModel
 		postAsync(event);
 	}
 
-	// /** from the RowSet event */
-	// private static void addRowSetEvents(Set<RowSetEventType> rsEventTypes, RowSet rs) {
-	// 	enq.addRowSetEvents(rsEventTypes, rs);
-	// }
-
-	private static final EnqueueRowsEvent enq = new SimpleEvents();
+	private static final SimpleEvents enq = new SimpleEvents();
 
 	//
 	// TODO: How to find the right event bus for Navigation Model?
@@ -450,28 +448,26 @@ public class RowsModel
 		return getGlobalEventBus();
 	}
 
-	interface EnqueueRowsEvent
+	interface EnqueueRowsModelEvent
 	{
-		default void startRowsEvent(RowsModel model, Object compOrNav) {
-			startRowsEvent(null, model, compOrNav);
-		}
+		void startRowsEvent(RowsModel model, Object compOrNav);
 		void startRowsEvent(OperatorKind _operatorKind, RowsModel model, Object compOrNav);
 		void addRowSetEvent(RowSetEventType rsEventType, RowSet rs);
-		void addRowSetEvents(Set<RowSetEventType> rsEventTypes, RowSet rs);
 		RowsEventSource finishRowsEvent(RowsModel model);
+		void postNewRowSetEvent(RowsModel model);
 	}
 
 	/**
 	 * 
 	 * @param tag 
 	 */
-	public static void dumpAllEvents(String tag) {
-		RowsModelEventHandling.dumpAllEvents(tag);
+	public static void dumpLatestEvents(String tag) {
+		RowsModelEventHandling.dumpLatestEvents(tag);
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	//
-	// Behavioral/State method - taken from SSDataNavigation
+	// Config behavioral methods - taken from SSDataNavigation
 	//
 	
 	/**
@@ -479,9 +475,11 @@ public class RowsModel
 	 * underlying RowSet. This is necessary for MySQL (see FAQ).
 	 *
 	 * @param callExecute false if using MySQL database - otherwise true
+	 * @deprecated need to define a new strategy
 	 */
+	@Deprecated
 	public void setCallExecute(final boolean callExecute) {
-		navState.setCallExecute(callExecute);
+		//navState.setCallExecute(callExecute);
 	}
 
 	/**
@@ -491,7 +489,8 @@ public class RowsModel
 	 * @return value of execute() indicator
 	 */
 	public boolean getCallExecute() {
-		return navState.getCallExecute();
+		//return navState.getCallExecute();
+		return false;
 	}
 
 	/**
@@ -667,49 +666,4 @@ public class RowsModel
 	public boolean updatePresentRow() {
 		return navState.updatePresentRow();
 	}
-
-	// //////////////////////////////////////////////////////////////////////
-	// //
-	// // Dummy model to avoid NPE
-	// //
-	// /**
-	//  * TEMP: Can use this when there is no RowSet.
-	//  * JUST BUILD IT WITH A ROW SET.
-	//  * @return 
-	//  */
-	// public static RowsModel getDummy() {
-	// 	return new DummyNavigationModel(null);
-	// }
-	// /**
-	//  * TEMP: Can use this when there is no RowSet.
-	//  * @param rs
-	//  * @return 
-	//  */
-	// // TODO: try to find an existing model for the param RowSet ???
-	// public static RowsModel getDummy(RowSet rs) {
-	// 	return new DummyNavigationModel(rs);
-	// }
-
-	// //public class DummyNavigationModel {
-	// // TODO: method isDummy() ???
-	// private static class DummyNavigationModel extends RowsModel {
-	// 	public DummyNavigationModel(RowSet rs)
-	// 	{
-	// 		this.rs = rs;
-	// 	}
-
-	// 	RowSet rs;
-	// 	@Override public void setRowSet(RowSet rs) { this.rs = rs; }
-	// 	@Override public RowSet getRowSet() { return rs; }
-
-	// 	@Override public Action getAction(RowsAction navAction) { return null; }
-	// 	@Override public int getRow() { return -1; } 
-	// 	@Override public void first() { } 
-	// 	@Override public void last() { } 
-	// 	@Override public void next() { } 
-	// 	@Override public void previous() { } 
-	// 	@Override public void commit() { } 
-	// 	@Override public void setRow(int row) { } 
-	// 	@Override public int getRowCount() { return -1; }
-	// }
 }

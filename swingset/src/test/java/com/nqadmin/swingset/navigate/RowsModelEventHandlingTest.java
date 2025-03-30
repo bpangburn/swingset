@@ -568,14 +568,14 @@ public class RowsModelEventHandlingTest
 	// }
 
 	// /**
-	//  * Test of dumpAllEvents method, of class RowsModelEventHandling.
+	//  * Test of dumpLatestEvents method, of class RowsModelEventHandling.
 	//  */
 	// @Test
 	// public void testDumpAllEvents()
 	// {
-	// 	System.out.println("dumpAllEvents");
+	// 	System.out.println("dumpLatestEvents");
 	// 	String tag = "";
-	// 	RowsModelEventHandling.dumpAllEvents(tag);
+	// 	RowsModelEventHandling.dumpLatestEvents(tag);
 	// 	// TODO review the generated test code and remove the default call to fail.
 	// 	fail("The test case is a prototype.");
 	// }

@@ -1,28 +1,43 @@
-/*
- * Portions created by Ernie Rael are
- * Copyright (C) 2025 Ernie Rael.  All Rights Reserved.
+/* *****************************************************************************
+ * Copyright (C) 2025, Ernie R Rael. All rights reserved.
  *
- * The contents of this file are subject to the Mozilla Public
- * License Version 1.1 (the "License"); you may not use this file
- * except in compliance with the License. You may obtain a copy of
- * the License at http://www.mozilla.org/MPL/
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Software distributed under the License is distributed on an "AS
- * IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * rights and limitations under the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
  *
- * Contributor(s): Ernie Rael <errael@raelity.com>
- */
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.SQLException;
 
 import javax.sql.RowSet;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -37,6 +52,34 @@ public class RowSetButtons extends JPanel
 
 	/** Override for notification of "next" button press. */
 	void nextRowSetButtonPush() {
+	}
+
+	/**
+	 * Assign the next RowSet to the rowsModeol.
+	 * Set the cursor to the table name index for newly created RowSets.
+	 * Typically used from nextRowSetButtonPush().
+	 */
+	void createAssignDebugRowSet(Logger l, RowsModel rowsModel)
+	{
+		l.log(Level.INFO, "nextRowSetButtonPush");
+		try {
+			RowSet rs = getTableLoopRowSet();
+			boolean newRowSet = !DemoExtraDB.isExecuted(rs);
+			if (newRowSet) {
+				rs.execute();
+				rs.absolute(DemoExtraDB.findIdxTbl(rs));
+			}
+			rowsModel.setRowSet(rs); // SetRowSet should leave the row
+
+			// DON'T LIKE INVOKELATER NEEDED.
+			// if (newRowSet)
+			// 	rowsModel.setRow(DemoExtraDB.findIdxTbl(rs)); //invokeLater...
+			// else
+			// 	DemoExtraDB.check();
+			DemoExtraDB.check();
+		} catch (SQLException | ClassNotFoundException ex) {
+			l.log(Level.ERROR, (String) null, ex);
+		}
 	}
 
 	// Default table cycle: 2, 3, 4, 2, 3, 4, ...
@@ -58,12 +101,27 @@ public class RowSetButtons extends JPanel
 		JButton button;
 		String text;
 
-		text = "<html><center>next<br>RowSet</center></html>";
+		text = "<html><center>next<br>RS</center></html>";
 		button = new JButton(text);
 		add(button);
 		button.addActionListener((e) -> {
 			tableLoopIncr();
 			nextRowSetButtonPush();
+		});
+
+		// TODO: could toggle weak/strong
+		text = "<html><center>dref<br>RS</center></html>";
+		button = new JButton(text);
+		add(button);
+		button.addActionListener((e) -> {
+			DemoExtraDB.derefSupplierData(null);
+		});
+
+		text = "<html><center>garb<br>coll</center></html>";
+		button = new JButton(text);
+		add(button);
+		button.addActionListener((e) -> {
+			System.gc();
 		});
 	}
 
@@ -74,9 +132,10 @@ public class RowSetButtons extends JPanel
 	/** Return the RowSet for the current table loop iteration.
 	 */
 	RowSet getTableLoopRowSet() throws SQLException, ClassNotFoundException {
-		logger.log(Logger.Level.INFO, () -> sf("Using tbl%d, nRows %d",
-				tableLoopBase + tableLoopIndex, tableLoopRowCountBase));
-		return DemoExtraDB.findSimpleSupplierData(tableLoopBase + tableLoopIndex, tableLoopRowCountBase + tableLoopIndex);
+		RowSet rs = DemoExtraDB.findSimpleSupplierData(tableLoopBase + tableLoopIndex, tableLoopRowCountBase + tableLoopIndex);
+		logger.log(Level.INFO, () -> sf("Using tbl%d, nRows %d",
+				tableLoopBase + tableLoopIndex, tableLoopRowCountBase + tableLoopIndex));
+		return rs;
 	}
 
 	@SuppressWarnings("unused")
