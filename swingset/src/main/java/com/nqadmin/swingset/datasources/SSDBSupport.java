@@ -69,6 +69,15 @@ public interface SSDBSupport {
 	 */
 	Connection getTemporaryConnection(RowSet rs) throws SQLException;
 
+	/**
+	 * Return a connection that connects to the database where the row set comes from;
+	 * Close when finished.
+	 * Tries url, dataSource, fallback.
+	 * @param rs row set from target database
+	 * @return connection
+	 */
+	Connection getConnection(RowSet rs) throws SQLException;
+
 	/** A row set with a connection (dataSource, url, or whatever)
 	 * that connects to same database as specified row set.
 	 * Should be closed when done with it.

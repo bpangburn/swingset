@@ -29,6 +29,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
+import java.lang.System.Logger;
 import java.util.EnumSet;
 import java.util.EventObject;
 import java.util.Set;
@@ -37,8 +38,8 @@ import javax.sql.RowSet;
 
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.RowsEventSource;
+import com.nqadmin.swingset.utils.SSUtils;
 
-import static com.nqadmin.swingset.navigate.RowsModel.logger;
 import static com.nqadmin.swingset.utils.SSUtils.isJunit;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -58,6 +59,7 @@ import static java.lang.System.Logger.Level.*;
 @SuppressWarnings("serial")
 public class RowsEvent extends EventObject implements RowsModelEvent
 {
+	private static final Logger logger = SSUtils.getLogger();
 
 	/** The type of NaviagionRowSetEvent events */
 	public enum RowSetEventType {

@@ -48,14 +48,15 @@ import java.awt.Toolkit;
 import java.lang.StackWalker.Option;
 import java.lang.System.Logger;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.JDBCType;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
 import java.util.logging.SimpleFormatter;
@@ -91,7 +92,8 @@ public class SSUtils {
 
 	/**
 	 * Use this if you want a 1-1 correspondence between {@code RowSet} and {@code RowsModel};
-	 * for 1-1 only this method should be used. If an existing RowsModel for the RowSet is
+	 * for 1-1 only this method should be used.
+	 * If an existing RowsModel for the RowSet is
 	 * not found, a new RowsModel is created.
 	 * If {@link RowsModel#create(javax.sql.RowSet) }
 	 * is used multiple RowsModel can be created for the same RowsModel;
@@ -119,7 +121,7 @@ public class SSUtils {
 	}
 
 	/** Put this in the global lookup to create debug row set listeners */
-	public static class DebugRowSetListener {
+	public static class DebugRowSetListenerFlag {
 	}
 
 	/**
@@ -232,6 +234,78 @@ public class SSUtils {
 		} catch (SQLException ex) {
 		}
 	}
+	public static Set<Integer> getPrimaryKeyColumnsForTable(Connection connection, String tableName) throws SQLException
+	{
+		return getPrimaryKeyColumnsForTable(connection.getMetaData(), tableName);
+	}
+
+	// TODO: Think this is wrong; a misinterpretation of KEY_SEQ (but depends on crs)
+	public static Set<Integer> getPrimaryKeyColumnsForTable(DatabaseMetaData dbMetaData, String tableName) throws SQLException
+	{
+		throw new IllegalCallerException();
+	}
+
+	public record KeyInfo(int keySeq, String columnName){}
+
+	// TODO: keys: should spec catalog/schema?
+	/**
+	 * @param dbMetaData
+	 * @param tableName
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<KeyInfo> getPrimaryKeyInfoForTable(DatabaseMetaData dbMetaData, String tableName) throws SQLException
+	{
+		try(ResultSet pKeys = dbMetaData.getPrimaryKeys(null,null,tableName);) {
+			List<KeyInfo> keyInfo = new ArrayList<>(3);
+			while(pKeys.next()) {
+				keyInfo.add(new KeyInfo(pKeys.getInt("KEY_SEQ"), pKeys.getString("COLUMN_NAME")));
+			}
+			return keyInfo;
+		}
+	}
+
+	// NOTES on isKey
+	// TODO: isKey: Use a wrapper for the value, to represent no table, sql error, ...
+	// TODO: isKey: How to get tableName/columnName for result set column consider joins...
+	// TODO: isKey: How to set if automatic detection not wanted.
+	// TODO: isKey: Should this be in RowSetOps
+	// TODO: isKey: columnName/columnLabel
+	// dbMetaData.getDatabaseProductName()
+
+	/**
+	 * Find {@link KeyInfo} for table associated with the specified column.
+	 * Starting with the column's RowSet, get the dbMetaData, determine keys.
+	 * @param rs
+	 * @param _columnName
+	 * @return
+	 * @throws SQLException
+	 */
+	// TODO: isKey: lookup specializations for databases to access special result set info.
+	//public static List<KeyInfo> getPrimaryKeyInfoForTable(RSC comp)
+	public static List<KeyInfo> getPrimaryKeyInfoForTable(RowSet rs, String _columnName)
+			throws SQLException
+	{
+		// TODO: isKey: this doesn't seem reliable. Consider join...
+		// TODO: isKey: For now assume column names match
+
+		String columnName = _columnName.toUpperCase();
+		//RowSet rs = comp.getRowSet();
+		int colIdx = rs.findColumn(columnName);
+		ResultSetMetaData rsMetaData = rs.getMetaData();
+		String tableName = rsMetaData.getTableName(colIdx);
+		DatabaseMetaData dbMetaData;
+
+		try (Connection conn = SSDBSupport.getDefault().getConnection(rs);) {
+			dbMetaData = conn.getMetaData();
+			// TODO: just call all the names keys. Buggy if join ...
+			//List<SSUtils.KeyInfo> keyInfos = SSUtils.getPrimaryKeyInfoForTable(dbMetaData, tableName);
+			return getPrimaryKeyInfoForTable(dbMetaData, tableName);
+		}
+	}
+
+	
+	// https://stackoverflow.com/questions/21328371/get-primary-key-column-from-resultset-java
 
 	//public static Set<Integer> getPrimaryKeyColumnsForTable(RowSet rs, int columnIndex)
 	//		throws SQLException
@@ -250,29 +324,26 @@ public class SSUtils {
 	//	}
 	//}
 
-	// https://stackoverflow.com/questions/21328371/get-primary-key-column-from-resultset-java
+	////////////////////////////////////////////////////////////////////////////
+	//
+	// Common Messages
+	//
 
 	/**
-	 *
-	 * @param connection
-	 * @param tableName
-	 * @return
-	 * @throws SQLException
+	 * 
+	 * @param oldType
+	 * @param newType
+	 * @return 
 	 */
-
-	public static Set<Integer> getPrimaryKeyColumnsForTable(Connection connection, String tableName) throws SQLException
-	{
-		try(ResultSet pkColumns= connection.getMetaData().getPrimaryKeys(null,null,tableName);) {
-			SortedSet<Integer> pkColumnSet = new TreeSet<>();
-			while(pkColumns.next()) {
-				Integer pkPosition = pkColumns.getInt("KEY_SEQ");
-				//String pkColumnName = pkColumns.getString("COLUMN_NAME");
-				//System.out.println(""+pkColumnName+" is the "+pkPosition+". column of the primary key of the table "+tableName);
-				pkColumnSet.add(pkPosition);
-			}
-			return pkColumnSet;
-		}
+	public static String JDBCTypeMismatch(JDBCType oldType, JDBCType newType) {
+		return sf("JDBCType mismatch: old %s, new %s", oldType, newType);
 	}
+
+	public static String NullabilityMismatch(boolean oldVal, boolean newVal) {
+		return sf("Nullability mismatch: old %s, new %s", oldVal, newVal);
+	}
+
+
 
 	////////////////////////////////////////////////////////////////////////////
 	//

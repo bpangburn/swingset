@@ -55,7 +55,6 @@ import javax.sql.rowset.CachedRowSet;
 import javax.swing.JComponent;
 
 import com.nqadmin.swingset.datasources.RSC;
-import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.formatting.SSFormat;
@@ -233,7 +232,17 @@ public interface SSComponentInterface extends RSC
 	}
 
 	/**
-	 * Sets the rowSet and column name to which the component is to be bound.
+	 * Invoked at the end of bind; default sets up primary keys for CachedRowSet.
+	 */
+	default void finishBind()
+	{
+		// Primary keys for SyncResolver, joins
+		if (getRowSet() instanceof CachedRowSet)
+			SSUtils.setupDefaultPrimaryKeys(this);
+	}
+	
+	/**
+	 * Sets the RowsModel and column name to which the component is to be bound.
 	 * <p>
 	 * Takes care of setting RowSet and Column Name for ssCommon and then calls
 	 * bind(this.ssCommon);
@@ -244,16 +253,12 @@ public interface SSComponentInterface extends RSC
 	default void bind(RowsModel rowsModel, String boundColumnName)
 	{
 		Objects.requireNonNull(rowsModel);
-		RowSet rs = rowsModel.getRowSet();
-		try {
-			checkColumnType(RowSetOps.getJDBCColumnType(rs, boundColumnName));
-		} catch (SQLException ex) {
-			throw new IllegalArgumentException("SQLException getting column type", ex);
-		}
 		getSSCommon().bind(rowsModel, boundColumnName);
-		// Primary keys for SyncResolver, joins
-		if (rs instanceof CachedRowSet)
-			SSUtils.setupDefaultPrimaryKeys(this);
+	}
+
+	default boolean isFullyBound()
+	{
+		return getSSCommon().isFullyBound();
 	}
 
 	/**
@@ -441,19 +446,12 @@ public interface SSComponentInterface extends RSC
 	}
 
 	/**
-	 * Sets the rowset column index to which the Component is to be bound.
-	 *
-	 * @param _boundColumnIndex rowset column index to which the Component is to be bound
-	 */
-	default void setBoundColumnIndex(final int _boundColumnIndex) {
-		getSSCommon().setBoundColumnIndex(_boundColumnIndex);
-	}
-
-	/**
 	 * Sets the database column name bound to the Swingset component
 	 *
 	 * @param _boundColumnName the columnName to set
+	 * @deprecated Use bind()
 	 */
+	@Deprecated
 	default void setBoundColumnName(final String _boundColumnName) {
 		getSSCommon().setBoundColumnName(_boundColumnName);
 	}

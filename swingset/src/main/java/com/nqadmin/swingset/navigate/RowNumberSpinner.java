@@ -156,6 +156,8 @@ public class RowNumberSpinner extends JSpinner
 
 	/** forward spinner events to goto row action */
 	private final ChangeListener changeListener = (evt) -> {
+		if (rowsModel.getRowSet() == null)
+			return;
 		rowsModel.getAction(RowsAction.ACT_GOTOROW)
 				.actionPerformed(new ActionEvent(RowNumberSpinner.this,
 				AWTEvent.RESERVED_ID_MAX + 1, RowsAction.OK_SKIP_CURSOR_MOVE));
@@ -167,7 +169,10 @@ public class RowNumberSpinner extends JSpinner
 		// an exception is thrown.
 		actionSetModel = true;
 		try {
-			setModel(rowsModel.getSpinnerModel());
+			if (rowsModel.getRowSet() == null)
+				setModel( new SpinnerNumberModel());
+			else
+				setModel(rowsModel.getSpinnerModel());
 			fireStateChanged(); // Treat a model change as a state change
 		} finally {
 			actionSetModel = false;

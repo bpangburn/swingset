@@ -30,6 +30,7 @@
 package com.nqadmin.swingset.navigate;
 
 import java.awt.EventQueue;
+import java.lang.System.Logger;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.EnumSet;
@@ -45,10 +46,10 @@ import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.RowsModel.EnqueueRowsModelEvent;
+import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingChanges;
 import static com.nqadmin.swingset.navigate.RowsModel.getEventBus;
-import static com.nqadmin.swingset.navigate.RowsModel.logger;
 import static com.nqadmin.swingset.navigate.RowsModel.post;
 import static com.nqadmin.swingset.utils.SSUtils.isJunit;
 import static com.nqadmin.swingset.utils.SSUtils.isJunitPrint;
@@ -67,6 +68,7 @@ import static java.lang.System.Logger.Level.*;
  */
 public class RowsModelEventHandling
 {
+	private static final Logger logger = SSUtils.getLogger();
 	private RowsModelEventHandling() { }
 
 	record RowsEventSource(RowsModel rowsModel,
@@ -197,14 +199,14 @@ public class RowsModelEventHandling
 					model, model.getRowSet(), operatorKind, compOrNav);
 			pushEventSource(eventSource);
 
-			logger.log(DEBUG, () -> dumpEventSourceStack("startRowsEvent-push", null, "####### ").toString());
+			logger.log(DEBUG, () -> dumpEventSourceStack("push", null, "####### ").toString());
 		}
 
 		@Override
 		public RowsEventSource finishRowsEvent(RowsModel model)
 		{
 			logger.log(DEBUG, () -> dumpEventSourceStack(
-					"finishRowsEvent-pop", null, "####### ").toString());
+					"pop", null, "####### ").toString());
 			RowsEventSource finishingEventSource = popEventSource();
 			if (finishingEventSource.rowsModel() != model)
 				throw new IllegalStateException("Different model");
@@ -215,8 +217,16 @@ public class RowsModelEventHandling
 		{
 			Deque<RowsEventSource> evs = eventSourceStack;
 			StringBuilder sb = _sb != null ? _sb : new StringBuilder();
-			sb.append(sf("******* %s%s Event Sources (%d) *******\n", tag2, tag, evs.size()));
-			evs.forEach(ev -> sb.append("    ").append(tag2).append(ev).append('\n'));
+
+			// If not TRACE, then include info for TOS
+			if (logger.isLoggable(TRACE))
+				sb.append(sf("%s%s Source Stack (%d)\n", tag2, tag, evs.size()));
+			else
+				sb.append(sf("******* %s (%d) %s\n", tag, evs.size(),evs.peek()));
+
+			// Only add the stack if TRACE.
+			if (logger.isLoggable(TRACE))
+				evs.forEach(ev -> sb.append("    ").append(tag2).append(ev).append('\n'));
 			// Remove trailing newline.
 			sb.setLength(sb.length() - 1);
 			return sb;
@@ -253,7 +263,7 @@ public class RowsModelEventHandling
 			Objects.requireNonNull(rs);
 			if (isAcceptingChanges(rs)) // only possible if CachedRowSet
 				return;
-			logger.log(TRACE, () -> sf(
+			logger.log(DEBUG, () -> sf(
 					"####### rs %s evType %s", objectID(rs), rsEventType));
 			RowsEventSource eventSource = getCurrentEventSource();
 			
@@ -435,16 +445,19 @@ public class RowsModelEventHandling
 	}
 	static CountDownLatch latch;
 
-	// static void dumpQueuedEvents(String tag, List<RowsModelEvent> evs) {
-	// 	System.err.printf("******* %s Events (%d) *******\n", tag, evs.size());
-	// 	evs.forEach((ev) -> System.err.println("    " + ev));
-	// }
-
 	static StringBuilder dumpQueuedEvents(String tag, Deque<RowsModelEvent> evs,
 			StringBuilder _sb, String tag2) {
 		StringBuilder sb = _sb != null ? _sb : new StringBuilder();
-		sb.append(sf("******* %s%s Events (%d) *******\n", tag2, tag, evs.size()));
-		evs.forEach(ev -> sb.append("    ").append(tag2).append(ev).append('\n'));
+		
+		// If not TRACE, then include info for TOS
+		if (logger.isLoggable(TRACE))
+			sb.append(sf("%s%s Events (%d)\n", tag2, tag, evs.size()));
+		else
+			sb.append(sf("******* %s Events (%d) %s\n", tag, evs.size(), evs.peek()));
+
+		// Only add the stack if TRACE.
+		if (logger.isLoggable(TRACE))
+			evs.forEach(ev -> sb.append("    ").append(tag2).append(ev).append('\n'));
 		// Remove trailing newline.
 		sb.setLength(sb.length() - 1);
 		return sb;

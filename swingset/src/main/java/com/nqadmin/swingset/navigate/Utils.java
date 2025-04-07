@@ -172,13 +172,15 @@ public class Utils
 	private static class BusExceptionMonitor implements SubscriberExceptionHandler
 	{
 		@Override
+		@SuppressWarnings("CallToPrintStackTrace")
 		public void handleException(Throwable exception, SubscriberExceptionContext context)
 		{
-			logger.log(Level.ERROR, "BusException", exception);
-			logger.log(Level.ERROR, "    " + context.getEventBus());
-			logger.log(Level.ERROR, "    " + context.getEvent());
-			logger.log(Level.ERROR, "    " + context.getSubscriber());
-			logger.log(Level.ERROR, "    " + context.getSubscriberMethod());
+			exception.printStackTrace();
+			logger.log(Level.ERROR, () -> "BusException", exception);
+			logger.log(Level.ERROR, () -> "    " + context.getEventBus());
+			logger.log(Level.ERROR, () -> "    " + context.getEvent());
+			logger.log(Level.ERROR, () -> "    " + context.getSubscriber());
+			logger.log(Level.ERROR, () -> "    " + context.getSubscriberMethod());
 		}
 	}
 }

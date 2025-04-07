@@ -152,8 +152,7 @@ public class SSDataNavigator extends JPanel
 			updateLblRowCount();
 		});
 
-		if (rowsModel != null)
-			setRowsModel(rowsModel);
+		setRowsModel(rowsModel);
 		hideActionText(); // suppress the Action name from appearing next to the button icon.
 		createPanel();
 	}
@@ -181,8 +180,10 @@ public class SSDataNavigator extends JPanel
 	@Deprecated
 	public final void setRowsModel(RowsModel rowsModel)
 	{
-		// Could allow null, use dummy with all buttons disabled
 		Objects.requireNonNull(rowsModel);
+		if (this.rowsModel != null)
+			throw new IllegalStateException("RowsModel already set");
+		this.rowsModel = rowsModel;
 
 		installRowsModel(rowsModel);
 	}
@@ -214,7 +215,8 @@ public class SSDataNavigator extends JPanel
 
 	private void updateLblRowCount()
 	{
-		lblRowCount.setText("of " + rowNumberSpinner.getModel().getMaximum());
+		Comparable<?> max = rowNumberSpinner.getModel().getMaximum();
+		lblRowCount.setText(max != null ? "of " + max : "");
 	}
 
 	/**

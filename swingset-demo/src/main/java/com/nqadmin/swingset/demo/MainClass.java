@@ -131,7 +131,7 @@ public class MainClass extends JFrame
 	static {
 		if(Boolean.FALSE) {
 			// Get rid of unused warnings
-			Objects.nonNull(new SSUtils.DebugRowSetListener());
+			Objects.nonNull(new SSUtils.DebugRowSetListenerFlag());
 			Objects.nonNull(new ForceConflict(0));
 			Objects.nonNull(new H2Trace(""));
 			Objects.nonNull(new MainClass().new LogManListener());
@@ -372,7 +372,7 @@ public class MainClass extends JFrame
 		});
 
 		// ECHO WORKING DIRECTORY
-		logger.log(INFO, "Working Directory = " + System.getProperty("user.dir"));
+		logger.log(INFO, () -> sf("Working Directory = %s", System.getProperty("user.dir")));
 
 		// INITIALIZE DATABASE
 		if ("h2".equals(dbname)) {
@@ -489,7 +489,7 @@ public class MainClass extends JFrame
 			if (RUN_DEMO_SQL_SCRIPTS) {
 				inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
 				if (inStreamDemo == null) {
-					logger.log(Level.ERROR, "Please add the file " + DATABASE_SCRIPT_DEMO
+					logger.log(Level.ERROR, () -> "Please add the file " + DATABASE_SCRIPT_DEMO
 							+ " to the classpath, package " + getClass().getPackage().getName());
 					has_startup_error = true;
 				}
@@ -498,7 +498,7 @@ public class MainClass extends JFrame
 			if (RUN_TEST_SQL_SCRIPTS) {
 				inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
 				if (inStreamTest == null) {
-					logger.log(Level.ERROR, "Please add the file "
+					logger.log(Level.ERROR, () -> "Please add the file "
 							+ DATABASE_SCRIPT_TEST + " and " + DATABASE_SCRIPT_TEST_IMAGES
 							+ " to the classpath, package "
 							+ getClass().getPackage().getName());
@@ -509,7 +509,7 @@ public class MainClass extends JFrame
 			if (RUN_DEBUG_SQL_SCRIPTS) {
 				inStreamDebug = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEBUG);
 				if (inStreamDebug == null) {
-					logger.log(Level.ERROR, "Please add the file " + DATABASE_SCRIPT_DEBUG
+					logger.log(Level.ERROR, () -> "Please add the file " + DATABASE_SCRIPT_DEBUG
 							+ " to the classpath, package " + getClass().getPackage().getName());
 					has_startup_error = true;
 				}
@@ -857,7 +857,7 @@ public class MainClass extends JFrame
 		//lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
 		//lkup.add(new H2Workaround()); // fixed in H2 Version 2.3.230 (2024-07-15
 		//lkup.add(new ForceConflict(0));
-		//lkup.add(new SSUtils.DebugRowSetListener());
+		//lkup.add(new SSUtils.DebugRowSetListenerFlag());
 
 		boolean some_error = false;
 		System.err.printf("java:%s vm:%s date:%s os:%s\n",

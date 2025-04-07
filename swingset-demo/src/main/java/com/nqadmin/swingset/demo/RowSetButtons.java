@@ -46,12 +46,25 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
  * x
  */
 @SuppressWarnings("serial")
-public class RowSetButtons extends JPanel
+public abstract class RowSetButtons extends JPanel
 {
     private static final Logger logger = SSUtils.getLogger();
 
+	record ScreenInfo(Logger logger, RowsModel rowsModel){}
+
+	abstract ScreenInfo getScreenInfo();
+
 	/** Override for notification of "next" button press. */
 	void nextRowSetButtonPush() {
+		ScreenInfo lm = getScreenInfo();
+		createAssignDebugRowSet(lm.logger, lm.rowsModel);
+	}
+
+	/** Override for notification of "null" button press. */
+	void nullRowSet() {
+		ScreenInfo si = getScreenInfo();
+		si.logger.log(Level.INFO, "nullRowSet");
+		si.rowsModel.setRowSet(null);
 	}
 
 	/**
@@ -107,6 +120,13 @@ public class RowSetButtons extends JPanel
 		button.addActionListener((e) -> {
 			tableLoopIncr();
 			nextRowSetButtonPush();
+		});
+
+		text = "<html><center>null<br>RS</center></html>";
+		button = new JButton(text);
+		add(button);
+		button.addActionListener((e) -> {
+			nullRowSet();
 		});
 
 		// TODO: could toggle weak/strong

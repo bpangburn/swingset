@@ -71,7 +71,7 @@ public class TextField extends JTextField implements SSComponentInterface
 	// losing focus; see FormattedTextField.
 
 	/** Logger for component */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Constructs a new, empty text field.

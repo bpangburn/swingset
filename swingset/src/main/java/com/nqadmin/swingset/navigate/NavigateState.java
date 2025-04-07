@@ -43,7 +43,6 @@
 package com.nqadmin.swingset.navigate;
 
 import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
@@ -76,7 +75,6 @@ import static java.lang.System.Logger.Level.*;
 
 /*
  * External controls
- *     - callExecute
  *     - confirmDeletes
  *     - DBNav
  *     - deletion (enableDeletion, deleteOK)
@@ -85,8 +83,9 @@ import static java.lang.System.Logger.Level.*;
  *     - NavCombo
  */
 
-/** * {@link NavigateState} contains RowSet state which get reflected in RowsActions.There are {@linkplain Action}s for navigation, insertion, and deletion of records
- in a RowSet.
+/** * {@link NavigateState} contains RowSet state which get reflected in RowsActions.
+ * There are {@linkplain Action}s for navigation, insertion, and deletion of
+ * records in a RowSet.
  * There are {@linkplain ButtonModel}s for state, such as row dirty
  * that could be connected to a commit UI component. Readonly versions of the
  * state buttons are available.
@@ -185,6 +184,20 @@ final class NavigateState
 		if (navState == null)
 			setNavigateState(rowSet, navState = new NavigateState(null));
 		return navState;
+	}
+
+	/**
+	 * Return NavState for the RowSet.
+	 * If existing one, for given rowSet, not found;
+	 * the returned navState.getRowSet is null;
+	 * setupRowSet must be invoked before other usage. 
+	 * @param rowSet
+	 * @return 
+	 */
+	synchronized static NavigateState get(RowSet rowSet)
+	{
+		Objects.requireNonNull(rowSet);
+		return RowSetState.getNavigateState(rowSet);
 	}
 
 
@@ -394,20 +407,7 @@ final class NavigateState
 	private void setupRowSet()
 	{
 		try {
-			int initial_row = 0;
-			// TODO: this is dbms/app specific
-			// if (callExecute) {
-			// 	getRowSet().execute();
-			// }
-			try {
-				initial_row = getRowSet().getRow();
-				if (initial_row == 0)
-					getRowSet().beforeFirst();
-			} catch (SQLException ex) {
-				logger.log(Level.ERROR, () -> sf("'getRow()': %s. Will execute query", ex.getMessage()));
-				// TODO: take out the callExecute error recovery, propogate the exception
-				getRowSet().execute();
-			}
+			int initial_row = RowsModel.verifyExecuted(getRowSet());
 
 			if (initial_row != 0) {
 				getRowSet().last();
@@ -415,12 +415,12 @@ final class NavigateState
 				getRowSet().absolute(initial_row);
 				currentRow = initial_row;
 			} else {
-				// SEE IF THERE ARE ANY ROWS IN THE GIVEN SSROWSET
+				// See if there are any rows in the given ssrowset.
 				if (!getRowSet().next()) {
 					rowCount = 0;
 					currentRow = 0;
 				} else {
-					// IF THERE ARE ROWS GET THE ROW COUNT
+					// If there are rows get the row count.
 					getRowSet().last();
 					rowCount = getRowSet().getRow();
 					getRowSet().first();
@@ -431,8 +431,8 @@ final class NavigateState
 			logger.log(ERROR, "SQL Exception.", se);
 		}
 		
-		// ADD ROWSET LISTENER
-		addRowsetListener("setupRowSet");
+		// Add rowset listener.
+		enableRowsetListeningFlag("setupRowSet");
 
 		try {
 			// freshRow();	// ************************** remove, setupRow only happens once.
@@ -603,10 +603,9 @@ final class NavigateState
 	/**
 	 * Adds listener to the rowset
 	 */
-	/*private*/ void addRowsetListener(String tag) {
+	/*private*/ void enableRowsetListeningFlag(String tag) {
 		// XXX
 		if (!rowsetListenerAdded) {
-			//getRowSet().addRowSetListener(rowsetListener);
 			rowsetListenerAdded = true;
 			logger.log(DEBUG, () -> sf("RowsetListener: %s: %s: is ON.", objectID(getRowSet()), tag));
 		}
@@ -615,10 +614,9 @@ final class NavigateState
 	/**
 	 * Removes listener from the rowset
 	 */
-	/*private*/ void removeRowsetListener(String tag) {
+	/*private*/ void disableRowsetListeningFlag(String tag) {
 		// XXX
 		if (rowsetListenerAdded) {
-			//getRowSet().removeRowSetListener(rowsetListener);
 			rowsetListenerAdded = false;
 			logger.log(DEBUG, () -> sf("RowsetListener: %s: %s: is OFF.", objectID(getRowSet()), tag));
 		}
@@ -633,8 +631,6 @@ final class NavigateState
 	 * Indicator to cause the navigator to skip the execute() function call on the
 	 * specified RowSet. Must be false for MySQL (see FAQ).
 	 */
-	// // TODO: get rid of callExecute, incorporate into setupRowSet(rs), was for navigator.
-	// /*private*/ boolean callExecute = true;
 
 	/** Indicator to force confirmation of RowSet deletions. */
 	/*private*/ boolean confirmDeletes = true;
@@ -647,30 +643,6 @@ final class NavigateState
 
 	/** Indicator to allow/disallow changes to the RowSet. */
 	private boolean writable = true;
-
-	// /**
-	//  * Method to cause the navigator to skip the execute() function call on the
-	//  * underlying RowSet. This is necessary for MySQL (see FAQ).
-	//  *
-	//  * @param _callExecute false if using MySQL database - otherwise true
-	//  */
-	// public void setCallExecute(final boolean _callExecute) {
-	// 	//final boolean oldValue = callExecute;
-	// 	callExecute = _callExecute;
-
-	// 	// TODO: what is this about?
-	// 	// firePropertyChange("callExecute", oldValue, callExecute);
-	// }
-
-	// /**
-	//  * Indicates if the navigator will skip the execute function call on the
-	//  * underlying RowSet (needed for MySQL - see FAQ).
-	//  *
-	//  * @return value of execute() indicator
-	//  */
-	// public boolean getCallExecute() {
-	// 	return callExecute;
-	// }
 
 	/**
 	 * Sets the confirm deletion indicator. If set to true, every time delete button

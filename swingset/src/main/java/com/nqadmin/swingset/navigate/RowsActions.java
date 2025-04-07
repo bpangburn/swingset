@@ -92,13 +92,13 @@ final class RowsActions
 	{
 		logger.log(DEBUG, () -> sf("%s button clicked", navAction));
 		countActionPerform[navAction.ordinal()]++;
-		getNavState().removeRowsetListener(navAction.toString());    // TODO: not needed for RowsModel???
+		getNavState().disableRowsetListeningFlag(navAction.toString());    // TODO: not needed for RowsModel???
 		RowsModel.startRowsEvent(rowsModel, navAction);
 	}
 
 	void finishNavigationAction(RowsAction navAction) {
 		RowsModel.finishRowsEvent(rowsModel);
-		getNavState().addRowsetListener(navAction.toString());    // TODO: not needed for RowsModel???
+		getNavState().enableRowsetListeningFlag(navAction.toString());    // TODO: not needed for RowsModel???
 	}
 
 	static Component dlgParent(EventObject e)
@@ -111,7 +111,7 @@ final class RowsActions
 		get(navAction).actionPerformed(null);
 	}
 	Action get(RowsAction navAction) {
-		return actions.computeIfAbsent(navAction, key -> switch(key) {
+		Action action = actions.computeIfAbsent(navAction, key -> switch(key) {
 		case ACT_FIRST		-> new NavFirstAction();
 		case ACT_PREVIOUS	-> new NavPreviousAction();
 		case ACT_NEXT		-> new NavNextAction();
@@ -123,24 +123,14 @@ final class RowsActions
 		case ACT_DELETE		-> new NavDeleteAction();
 		case ACT_GOTOROW	-> new NavGotoRowAction();
 		});
-		//return actions.get(navAction);
+		if (rowsModel.getRowSet() == null)
+			action.setEnabled(false);
+		return action;
 	}
 
-	// private void initActions()
-	// {
-	// 	if (!actions.isEmpty())
-	// 		return;
-	// 	actions.put(ACT_FIRST,		new NavFirstAction());
-	// 	actions.put(ACT_PREVIOUS,	new NavPreviousAction());
-	// 	actions.put(ACT_NEXT,		new NavNextAction());
-	// 	actions.put(ACT_LAST,		new NavLastAction());
-	// 	actions.put(ACT_COMMIT,		new NavCommitAction());
-	// 	actions.put(ACT_REVERT,		new NavRevertRecordAction());
-	// 	actions.put(ACT_REFRESH,	new NavRefreshAction());
-	// 	actions.put(ACT_ADD,		new NavAddAction());
-	// 	actions.put(ACT_DELETE,		new NavDeleteAction());
-	// 	actions.put(ACT_GOTOROW,	new NavGotoRowAction());
-	// }
+	void disableAllActions() {
+		actions.forEach((k, v) -> { v.setEnabled(false); });
+	}
 	
 	/**
 	 * Action for the "First" button on the navigator.
@@ -509,22 +499,24 @@ final class RowsActions
 			// TODO: refresh: should this be enabled if callExecute if false?
 			// TODO: use performRefreshOps? Let it return false if handle it here?
 			try {
-				if (Boolean.TRUE /*|| getNavState().callExecute*/) {
-					getRowSet().execute();
-					
-					if (!getRowSet().next()) {
-						// THERE ARE NO RECORDS IN THE ROWSET
-						getNavState().rowCount = 0;
-					} else {
-						// WE HAVE ROWS GET THE ROW COUNT AND MOVE BACK TO FIRST ROW
-						getRowSet().last();
-						getNavState().rowCount = getRowSet().getRow();
-						getRowSet().first();
-					}
-					
-					getNavState().freshRow();
-					getNavState().updateNavigator();
+				//if (Boolean.TRUE /*|| getNavState().callExecute*/) {
+
+				getRowSet().execute();
+				
+				if (!getRowSet().next()) {
+					// THERE ARE NO RECORDS IN THE ROWSET
+					getNavState().rowCount = 0;
+				} else {
+					// WE HAVE ROWS GET THE ROW COUNT AND MOVE BACK TO FIRST ROW
+					getRowSet().last();
+					getNavState().rowCount = getRowSet().getRow();
+					getRowSet().first();
 				}
+				
+				getNavState().freshRow();
+				getNavState().updateNavigator();
+
+				//}
 
 				getNavState().dBNav.performRefreshOps();
 				

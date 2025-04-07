@@ -62,6 +62,7 @@ import org.netbeans.validation.api.ui.ValidationItem;
 import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
 import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
+import com.nqadmin.swingset.SSDBNav;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
@@ -104,7 +105,6 @@ public class Example1 extends JFrame {
 	 * database component declarations
 	 */
 	Connection connection;
-	RowSet rowset;
 	SSDataNavigator navigator;
 	RowsModel rowsModel;
 
@@ -116,6 +116,10 @@ public class Example1 extends JFrame {
 		//navigator = null;
 	}
 
+	RowSet getRowSet() {
+		return rowsModel.getRowSet();
+	}
+
 	/**
 	 * Constructor for Example1
 	 * <p>
@@ -124,22 +128,22 @@ public class Example1 extends JFrame {
 	@SuppressWarnings("LeakingThisInConstructor")
 	public Example1(final Connection _dbConn)
 	{
-		// SET SCREEN TITLE
+		// Set screen title.
 		super("Example1");
 		DemoUtil.initExampleFrame(this, this::cleanup);
 		
 		JFrame frame = this;
 		
-		// SET CONNECTION
+		// Set connection.
 		connection = _dbConn;
 		
-		// SET SCREEN DIMENSIONS
+		// Set screen dimensions.
 		setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 		
-		// SET SCREEN POSITION
+		// Set screen position.
 		setLocation(DemoUtil.getChildScreenLocation(this.getName()));
 		
-		// SET A VALIDATOR (may be a no-op is disabled in SwingSet library)
+		// Set a validator.
 		final boolean USE_SIMPLE_VALIDATION = false;
 		//SSTextComponentValidationItem valSupplierName = null;
 		ValidationItem decoSupplierName = null;
@@ -160,41 +164,22 @@ public class Example1 extends JFrame {
 			decoSupplierName = SVUtils.decorator(txtSupplierName, validator);
 		}
 
-		RowSetButtons rsButtons = new RowSetButtons() {
+		RowSetButtons rsButtons = new RowSetButtons()
+		{
 			@Override
-			void nextRowSetButtonPush()
+			RowSetButtons.ScreenInfo getScreenInfo()
 			{
-				createAssignDebugRowSet(logger, rowsModel);
+				return new ScreenInfo(logger, rowsModel);
 			}
 		};
-		
-		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-		try {
-			if (Boolean.FALSE) {
-				rsButtons.tableLoopIncr(); // at beginning of cycling
-				RowSet tRowSet = rsButtons.getTableLoopRowSet();
-				if (tRowSet != null) {
-					rowsModel = RowsModel.create(tRowSet);
-					rowset = rowsModel.getRowSet();
-				}
-			}
-			if (rowsModel == null) {
-				rowset = DemoUtil.getNewRowSet(connection);
-				rowset.setCommand("SELECT * FROM supplier_data");
-				rowsModel = RowsModel.create(rowset);
-			}
-
-			navigator = new SSDataNavigator(rowsModel);
-		} catch (SQLException | ClassNotFoundException se) {
-			logger.log(Level.ERROR, "SQL Exception.", se);
-		}
 		
 		/**
 		 * Various navigator overrides needed to support H2
 		 * H2 does not fully support updatable rowset so it must be
 		 * re-queried following insert and delete with rowset.execute()
 		 */
-		rowsModel.setDBNav(new SSDBNavImpl(this)
+		//rowsModel.setDBNav(new SSDBNavImpl(this)
+		SSDBNav dbNav = new SSDBNavImpl(this)
 		{
 			/**
 			 * Re-query the RowSet following a deletion. This is needed for H2.
@@ -204,7 +189,7 @@ public class Example1 extends JFrame {
 			{
 				super.performPostDeletionOps();
 				try {
-					rowset.execute();
+					getRowSet().execute();
 				} catch (final SQLException se) {
 					logger.log(Level.ERROR, "SQL Exception.", se);
 				}
@@ -218,7 +203,7 @@ public class Example1 extends JFrame {
 			{
 				super.performPostInsertOps();
 				try {
-					rowset.execute();
+					getRowSet().execute();
 				} catch (final SQLException se) {
 					logger.log(Level.ERROR, "SQL Exception.", se);
 				}
@@ -235,10 +220,10 @@ public class Example1 extends JFrame {
 				super.performPreInsertOps();
 
 				try (final ResultSet rs = connection.createStatement(
-							ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+						ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
 						.executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");
-				) {
-					// GET THE NEW RECORD ID.
+						) {
+					// Get the new record id.
 					rs.next();
 					final int supplierID = rs.getInt("nextVal");
 					txtSupplierID.setText(String.valueOf(supplierID));
@@ -254,27 +239,52 @@ public class Example1 extends JFrame {
 					logger.log(Level.ERROR, "Exception occured initializing new record.", e);
 				}
 			}
-		});
-
-		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
-		txtSupplierID.bind(rowsModel, "supplier_id");
-		txtSupplierName.bind(rowsModel, "supplier_name");
-		txtSupplierCity.bind(rowsModel, "city");
-		txtSupplierStatus.bind(rowsModel, "status");
+		};
 		
-		// SET LABEL DIMENSIONS
+		// Initialize database connection and components.
+		try {
+			if (Boolean.FALSE) {
+				rsButtons.tableLoopIncr(); // at beginning of cycling
+				RowSet tRowSet = rsButtons.getTableLoopRowSet();
+				if (tRowSet != null) {
+					rowsModel = RowsModel.create(tRowSet, dbNav);
+				}
+			}
+			if (Boolean.FALSE) {
+				// start out null
+				rowsModel = RowsModel.create(null, dbNav);
+			}
+			if (rowsModel == null) {
+				RowSet rs = DemoUtil.getNewRowSet(connection);
+				rs.setCommand("SELECT * FROM supplier_data");
+				rs.execute();
+				rowsModel = RowsModel.create(rs, dbNav);
+			}
+
+			navigator = new SSDataNavigator(rowsModel);
+		} catch (SQLException | ClassNotFoundException se) {
+			logger.log(Level.ERROR, "SQL Exception.", se);
+		}
+
+		// Bind the components to the RowsModel and the database columns.
+		rowsModel.bind(txtSupplierID, "supplier_id");
+		rowsModel.bind(txtSupplierName, "supplier_name");
+		rowsModel.bind(txtSupplierCity, "city");
+		rowsModel.bind(txtSupplierStatus, "status");
+		
+		// Set label dimensions.
 		lblSupplierID.setPreferredSize(MainClass.labelDim);
 		lblSupplierName.setPreferredSize(MainClass.labelDim);
 		lblSupplierCity.setPreferredSize(MainClass.labelDim);
 		lblSupplierStatus.setPreferredSize(MainClass.labelDim);
 		
-		// SET BOUND COMPONENT DIMENSIONS
+		// Set bound component dimensions.
 		txtSupplierID.setPreferredSize(MainClass.ssDim);
 		txtSupplierName.setPreferredSize(MainClass.ssDim);
 		txtSupplierCity.setPreferredSize(MainClass.ssDim);
 		txtSupplierStatus.setPreferredSize(MainClass.ssDim);
 		
-		// SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
+		// Setup the container and layout the components.
 		final Container contentPane = new JPanel();
 		contentPane.setLayout(new GridBagLayout());
 		final GridBagConstraints constraints = new GridBagConstraints();
@@ -314,10 +324,10 @@ public class Example1 extends JFrame {
 		constraints.gridwidth = 2;
 		contentPane.add(rsButtons, constraints);
 		
-		// DISABLE THE PRIMARY KEY
+		// Disable the primary key.
 		txtSupplierID.setEnabled(false);
 		
-		// SET UP THE SIMPLE VALIDATION PANEL
+		// Set up the simple validation panel.
 		JPanel uiPanel;
 		if (USE_SIMPLE_VALIDATION) {
 			ValidationPanel valiPanel = new ValidationPanel();
@@ -328,7 +338,7 @@ public class Example1 extends JFrame {
 		} else {
 			uiPanel = (JPanel) contentPane;
 		}
-		// MAKE THE JFRAME VISIBLE
+		// Make the jframe visible.
 		frame.add(uiPanel);
 		frame.pack();
 		frame.setVisible(true);

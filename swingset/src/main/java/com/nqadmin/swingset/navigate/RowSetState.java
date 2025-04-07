@@ -42,15 +42,30 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
+import java.lang.ref.WeakReference;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.RowSet;
+import javax.sql.RowSetEvent;
+import javax.sql.RowSetListener;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.spi.SyncProviderException;
 
-import com.google.common.collect.MapMaker;
+import org.openide.util.WeakListeners;
 
+import com.google.common.collect.MapMaker;
+import com.nqadmin.swingset.datasources.RSC;
+import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.utils.SSUtils.DebugRowSetListenerFlag;
+
+import static com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType.*;
+import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
+import static com.nqadmin.swingset.utils.SSUtils.objectID;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
  * Track some global state for a row set.
@@ -62,17 +77,130 @@ public class RowSetState
 	private boolean acceptingChanges;
 	private boolean preInsertOps;
 	private NavigateState navigateState;
+	private final WeakReference<RowSet> rsRef;
 
-	private RowSetState() { }
+	private RowSetState(RowSet rs) {
+		keys = new HashMap<>();
+		rsRef = new WeakReference<>(rs);
+		debugRowSetListener = DebugRowSetListener.create(rs); // May be null.
+	}
+
+	private final Map<String, Boolean> keys;
+	/**
+	 * Determine if the column in our rowset is a primary key.
+	 * Return false if problem is encountered.
+	 * @param _columnName
+	 * @return true if primary key else false
+	 */
+	// TODO: isKey: base this on labelName, not columnName.
+	public Boolean isKey(String _columnName)
+	{
+		String columnName = _columnName.toUpperCase();
+		Boolean rv = keys.get(columnName);
+		if (rv != null)
+			return rv;
+		
+		// This is frequently used, create a map entry for each column
+		// Saving each RowSets column minimizes metadata access.
+		// May want to cache more metadata info in the future.
+		try {
+			List<String> names = SSUtils.getPrimaryKeyInfoForTable(rsRef.get(), columnName)
+					.stream()
+					.map((ki) -> ki.columnName())
+					.toList();
+			ResultSetMetaData rsMetaData = rsRef.get().getMetaData();
+			for(int i = 1; i <= rsMetaData.getColumnCount(); i++) {
+				String name = rsMetaData.getColumnName(i);
+				keys.put(name, names.contains(name));
+			}
+			
+		} catch (SQLException ex) {
+			// TODO: isKey: SQLEx report
+			return null;
+		}
+		return keys.get(columnName);
+	}
+
+	/**
+	 * Find out if this RowSet is on the insert row.
+	 * @return true if on the insert row
+	 */
+	public boolean isInserting() {
+		return inserting;
+	}
+
+	/**
+	 * Find out if this RowSet is
+	 * a {@linkplain CachedRowSet} doing {@linkplain CachedRowSet#acceptChanges}.
+	 * @return true if executing acceptingChanges
+	 */
+	public boolean isAcceptingChanges() {
+		return acceptingChanges;
+	}
+
+	// TODO: make more stuff instance accessible.
+
+
+	private final RowSetListener debugRowSetListener; // Strong reference needed.
+	private static class DebugRowSetListener implements RowSetListener {
+		static RowSetListener create(RowSet rs)
+		{
+			if (defLookup(DebugRowSetListenerFlag.class) == null)
+				return null;
+			DebugRowSetListener l = new DebugRowSetListener();
+			rs.addRowSetListener(WeakListeners.create(
+					RowSetListener.class, l, rs));
+			return l;
+		}
+
+		@Override
+		public void rowSetChanged(RowSetEvent event)
+		{
+			String s = sf("DEBUG: %s: %s", ROW_SET_CHANGED, objectID(event.getSource()));
+			System.err.println(s);
+		}
+		
+		@Override
+		public void rowChanged(RowSetEvent event)
+		{
+			String s = sf("DEBUG: %s: %s", ROW_CHANGED, objectID(event.getSource()));
+			System.err.println(s);
+		}
+		
+		@Override
+		public void cursorMoved(RowSetEvent event)
+		{
+			String s = sf("DEBUG: %s: %s", CURSOR_MOVED, objectID(event.getSource()));
+			System.err.println(s);
+		}
+	}
 
 	///////////////////////////////////////////////////////////////////////////
 	// Instance above, static below
 
+	/**
+	 * Find the data navigator for the specified RowSet.
+	 * <p>
+	 * Originally added to support SSComponentInterface.getSSDataNavigator(),
+	 * see discussion #93,
+	 * but may come in handy when implementing ActionMap interface.
+	 * @param rs get information for this RowSet
+	 * @return the associated data navigator
+	 */
+	static NavigateState getNavigateState(RowSet rs) {
+		return rs == null ? null : getRowSetState(rs).navigateState;
+	}
+
 	private static final Map<RowSet,RowSetState> rowSetState
 			= new MapMaker().weakKeys().makeMap();
 
-	private static RowSetState getRowSetState(RowSet rs) {
-		return rowSetState.computeIfAbsent(rs, k -> new RowSetState());
+	/**
+	 * Only use the returned RowSetState's methods while RowSet has a reference.
+	 * @param rs
+	 * @return RowSetState kept alive by RowSet reference
+	 */
+	public static RowSetState getRowSetState(RowSet rs) {
+		return rowSetState.computeIfAbsent(rs, k -> new RowSetState(rs));
 	}
 
 	// /**
@@ -98,12 +226,22 @@ public class RowSetState
 	}
 
 	/**
+	 * Determine if the column in our rowset is a primary key.
+	 * Return false if problem is encountered.
+	 * @param comp
+	 * @return true if primary key else false
+	 */
+	public static boolean isKey(RSC comp) {
+		return getRowSetState(comp.getRowSet()).isKey(comp.getBoundColumnName());
+	}
+
+	/**
 	 * Find out if the specified RowSet is on the insert row.
 	 * @param rs get state for this RowSet
 	 * @return true if on the insert row
 	 */
 	public static boolean isInserting(RowSet rs) {
-		return rs == null ? false : getRowSetState(rs).inserting;
+		return rs == null ? false : getRowSetState(rs).isInserting();
 	}
 
 	static void setPreInsertOps(RowSet rs, boolean flag) {
@@ -134,7 +272,7 @@ public class RowSetState
 	 * @return true if executing acceptingChanges
 	 */
 	public static boolean isAcceptingChanges(RowSet rs) {
-		return rs == null ? false : getRowSetState(rs).acceptingChanges;
+		return rs == null ? false : getRowSetState(rs).isAcceptingChanges();
 	}
 
 	/**
@@ -173,19 +311,6 @@ public class RowSetState
 		}
 		if (sqlEx != null)
 			throw sqlEx;
-	}
-
-	/**
-	 * Find the data navigator for the specified RowSet.
-	 * <p>
-	 * Originally added to support SSComponentInterface.getSSDataNavigator(),
-	 * see discussion #93,
-	 * but may come in handy when implementing ActionMap interface.
-	 * @param rs get information for this RowSet
-	 * @return the associated data navigator
-	 */
-	static NavigateState getNavigateState(RowSet rs) {
-		return rs == null ? null : getRowSetState(rs).navigateState;
 	}
 	
 }

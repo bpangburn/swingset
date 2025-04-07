@@ -33,11 +33,11 @@ package com.nqadmin.swingset.navigate;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.lang.ref.WeakReference;
+import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
@@ -52,16 +52,20 @@ import com.google.common.collect.MapMaker;
 import com.google.common.eventbus.EventBus;
 import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNav;
+import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.RowsEventSource;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.SimpleEvents;
+import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 import com.raelity.lib.eventbus.WeakEventBus;
 
 import static com.nqadmin.swingset.navigate.RowsAction.*;
 import static com.nqadmin.swingset.navigate.RowsModelEventHandling.postAsync;
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
+import static com.nqadmin.swingset.utils.SSUtils.JDBCTypeMismatch;
+import static com.nqadmin.swingset.utils.SSUtils.NullabilityMismatch;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
@@ -90,14 +94,20 @@ import static java.lang.System.Logger.Level.*;
 public class RowsModel
 {
 	/** Logger for component */
-	static final Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
-	// Used like a WeakHashSet
+	// Used like a WeakHashSet.
 	private static final Map<RowsModel,Boolean> activeRowModels
+			= new MapMaker().weakKeys().makeMap();
+
+	// Track the component bound column names.
+	private final Map<SSComponentInterface,String> bindings
 			= new MapMaker().weakKeys().makeMap();
 	
 	private NavigateState navState;
 	private final RowsActions rowsActions;
+
+	private SSDBNav defaultDbNav;
 
 	/** simplify switches back/forth */
 	public static boolean ENABLED = true;
@@ -109,11 +119,26 @@ public class RowsModel
 	 *       Previously, the query was executed by SSDataNavigator.
 	 * @param rs
 	 * @return 
+	 * @deprecated 
 	 */
+	@Deprecated
 	public static RowsModel create(RowSet rs) {
-		// For Now
-		RowsModel rowsModel = new RowsModel(rs);
-		//return SSUtils.findRowsModel(rs);
+		RowsModel rowsModel = create(rs, null);
+		return rowsModel;
+	}
+
+	/**
+	 * Create and return a new RowsModel for the specified RowSet.
+	 * <p>
+	 * NOTE: the RowSet must have a query to execute. (IS THIS OK?)
+	 *       Previously, the query was executed by SSDataNavigator.
+	 * @param rs
+	 * @param dbNav
+	 * @return 
+	 */
+	// TODO: dbNav should be picked up by DB/TBL
+	public static RowsModel create(RowSet rs, SSDBNav dbNav) {
+		RowsModel rowsModel = new RowsModel(rs, dbNav);
 		return rowsModel;
 	}
 
@@ -147,17 +172,18 @@ public class RowsModel
 	 * @param rs
 	 */
 	// TODO: handle null RowSet; important, consider empty DataNavigator, build UI first.
-	private RowsModel(RowSet rs)
+	private RowsModel(RowSet rs, SSDBNav dbNav)
 	{
 		logger.log(Level.INFO, () -> sf("new RowsModel %s for %s", objectID(this), objectID(rs)));
-		// TODO: Could allow null RowSet as empty model.
-		Objects.requireNonNull(rs);
+
+		if (dbNav != null)
+			defaultDbNav = dbNav;
 
 		activeRowModels.putIfAbsent(this, true);
 
 		this.rowsActions = new RowsActions(this);
 
-		setNavState(rs);
+		setNavState(rs, defaultDbNav);
 
 		rowSetListener = new SimpleRowSetListener();
 		rowSetListener.registerTo(rs);
@@ -171,27 +197,115 @@ public class RowsModel
 	 * 
 	 * @param rs 
 	 */
-	private void setNavState(RowSet rs)
+	private void setNavState(RowSet rs, SSDBNav dbNav)
 	{
+		if (rs == null) {
+			navState = null;
+			rowsActions.disableAllActions();
+			return;
+		}
 		navState = NavigateState.getOrCreate(rs);
+		if (navState != null)
+			navState.setDBNav(dbNav);
 
 		if (navState.getRowSet() == null)
 			navState.setupRowSet(rs);
 	}
 
+	// TODO: verifyExecuted HACK, remove this and require executed row set 
+	/**
+	 * 
+	 * @param rs
+	 * @return
+	 * @throws SQLException 
+	 */
+	static int verifyExecuted(RowSet rs) {
+		int initial_row = 0;
+		try {
+			initial_row = rs.getRow();
+			if (initial_row == 0)
+				rs.beforeFirst();
+		} catch (SQLException ex) {
+			try {
+				logger.log(Level.ERROR, () -> sf("'getRow()': %s. Will execute query", ex.getMessage()));
+				// TODO: take out the callExecute error recovery, propogate the exception
+				rs.execute();
+			} catch (SQLException ex1) {
+				logger.log(Level.ERROR, "execute() SQL Exception", ex1);
+			}
+		}
+		return initial_row;
+	}
+
 	/**
 	 * Change the RowSet associated with this model.
 	 * @param rs new RowSet for this model
+	 * @param dbNav
 	 */
-	// TODO: Could allow null RowSet as empty model.
-	public void setRowSet(RowSet rs) {
+	public void setRowSet(RowSet rs, SSDBNav dbNav) {
 		logger.log(Level.INFO, () -> sf("RowsModel %s change rowSet from %s to %s",
 				objectID(this), objectID(getRowSet()), objectID(rs)));
-		Objects.requireNonNull(rs);
+
+		if (rs != null) {
+			verifyExecuted(rs);
+			// Check for component binding compatibility here
+			// to avoid exception buried in event handler.
+			for (Map.Entry<SSComponentInterface, String> entry : bindings.entrySet()) {
+				SSComponentInterface comp = entry.getKey();
+				if (!comp.isFullyBound())
+					continue;
+
+				// verify same column type and nullable.
+				String colName = entry.getValue();
+				JDBCType oldType = comp.getBoundColumnJDBCType();
+				JDBCType newType = JDBCType.NULL;
+				try {
+					newType = RowSetOps.getJDBCColumnType(rs, colName);
+				} catch (SQLException ex) {
+					logger.log(Level.ERROR, (String) null, ex);
+				}
+				if (newType != oldType)
+					throw new IllegalArgumentException(JDBCTypeMismatch(oldType, newType));
+				boolean oldVal = comp.getAllowNull();
+				boolean newVal = RowSetOps.isNullable(rs, colName).get();
+				if (oldVal != newVal)
+					throw new IllegalArgumentException(NullabilityMismatch(oldVal, newVal));
+			}
+		}
+
 		rowSetListener.unregisterFrom(getRowSet());
-		setNavState(rs);
+		setNavState(rs, dbNav);
+
 		rowSetListener.registerTo(rs);
 		enq.postNewRowSetEvent(this);
+	}
+
+	/**
+	 * Change the RowSet associated with this model.
+	 * @param rs new RowSet for this model
+	 * @deprecated 
+	 */
+	// TODO: handle setRowSet only if there's already a dbNav.
+	@Deprecated
+	public void setRowSet(RowSet rs) {
+		setRowSet(rs, defaultDbNav);
+	}
+
+	/**
+	 * 
+	 * @param comp
+	 * @param columnName
+	 */
+	public void bind(SSComponentInterface comp, String columnName) {
+		if (bindings.containsKey(comp))
+			throw new IllegalArgumentException("Component already bound to this model");
+		bindings.put(comp, columnName);
+		try {
+			comp.bind(this, columnName);
+		} catch (Exception ex) {
+			bindings.remove(comp);
+			throw ex;
+		}
 	}
 
 	/**
@@ -199,7 +313,7 @@ public class RowsModel
 	 * @return row set
 	 */
 	public RowSet getRowSet() {
-		return navState.getRowSet();
+		return navState != null ? navState.getRowSet() : null;
 	}
 
 	NavigateState getNavState() {
@@ -350,18 +464,22 @@ public class RowsModel
 	 */
 	private abstract class RowSetListenerBase implements RowSetListener {
 		private WeakReference<RowSetListener> refWeakRowSetListener;
+
 		protected void registerTo(RowSet rs) {
 			if(refWeakRowSetListener != null)
 				throw new IllegalStateException("Already using listener");
 			RowSetListener wrsl = WeakListeners.create(RowSetListener.class, this, rs);
 			refWeakRowSetListener = new WeakReference<>(wrsl);
-			rs.addRowSetListener(wrsl);
+			if (rs != null)
+				rs.addRowSetListener(wrsl);
 		}
 
 		protected void unregisterFrom(RowSet rs) {
 			if (refWeakRowSetListener != null) {
-				RowSetListener wrsl = refWeakRowSetListener.get();
-				rs.removeRowSetListener(wrsl);
+				if (rs != null) {
+					RowSetListener wrsl = refWeakRowSetListener.get();
+					rs.removeRowSetListener(wrsl);
+				}
 				refWeakRowSetListener.clear();
 				refWeakRowSetListener = null;
 			}
@@ -471,25 +589,21 @@ public class RowsModel
 	//
 	
 	/**
-	 * Method to cause the navigator to skip the execute() function call on the
-	 * underlying RowSet. This is necessary for MySQL (see FAQ).
-	 *
-	 * @param callExecute false if using MySQL database - otherwise true
+	 * This is necessary for ancient MySQL jdbc driver (see FAQ).
+	 * @param callExecute
 	 * @deprecated need to define a new strategy
 	 */
 	@Deprecated
 	public void setCallExecute(final boolean callExecute) {
-		//navState.setCallExecute(callExecute);
 	}
 
 	/**
-	 * Indicates if the navigator will skip the execute function call on the
-	 * underlying RowSet (needed for MySQL - see FAQ).
-	 *
-	 * @return value of execute() indicator
+	 * This is necessary for ancient MySQL jdbc driver (see FAQ).
+	 * @return 
+	 * @deprecated need to define a new strategy
 	 */
+	@Deprecated
 	public boolean getCallExecute() {
-		//return navState.getCallExecute();
 		return false;
 	}
 
@@ -519,9 +633,25 @@ public class RowsModel
 	 * interface can be implemented by the developer to perform custom actions when
 	 * the insert action is pressed
 	 *
+	 * @param rs
 	 * @param dBNav implementation of the SSDBNav interface
 	 */
+	// TODO: how to get the DBNav? Lookup and needs to be split.
 	// TODO: should dBNav be local to this class? Hm, does seem like a rowset thing.
+	public void setDBNav(RowSet rs, SSDBNav dBNav) {
+		NavigateState nState = NavigateState.get(rs);
+		nState.setDBNav(dBNav);
+	}
+
+	/**
+	 * Function that passes the implementation of the SSDBNav interface. This
+	 * interface can be implemented by the developer to perform custom actions when
+	 * the insert action is pressed
+	 *
+	 * @param dBNav implementation of the SSDBNav interface
+	 * @deprecated use setDBNav(Rowset, SSDBNav)
+	 */
+	@Deprecated
 	public void setDBNav(SSDBNav dBNav) {
 		navState.setDBNav(dBNav);
 	}

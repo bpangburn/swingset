@@ -133,4 +133,83 @@ public class H2
 		MERGE INTO tbl VALUES ( 2,'text-2',7,'2000-02-22','22:22:22','2222-02-22',ARRAY[3,4,5]) ;
 
         """;
+
+	/**
+	 * Create and return the RowSet for the specified table.
+	 * Exception if the table already exists.
+	 */
+	public static RowSet createSimpleSupplierData(int idxTbl, int nRow)
+			throws SQLException, ClassNotFoundException
+	{
+		return createSimpleSupplierData(idxTbl, nRow, idxTbl);
+	}
+
+	public static RowSet createSimpleSupplierData(int idxTbl, int nRow, int start_idx)
+			throws SQLException, ClassNotFoundException
+	{
+		RowSet rowset = getRowSet(createSimpleSupplierDataSql(idxTbl, nRow, start_idx));
+		rowset.setCommand("SELECT * FROM tbl" + String.valueOf(idxTbl));
+		return rowset;
+	}
+
+	//
+	// The start_idx is all about giving columnNames a different columnIndex for testing.
+	//
+
+	/**
+	 * Create and return the RowSet for the specified table.
+	 * Exception if the table already exists.
+	 */
+	private static String createSimpleSupplierDataSql(int idxTbl, int nRow, int start_idx)
+			throws SQLException, ClassNotFoundException
+	{
+		String colDefs[] = new String[] {
+			"supplier_id INTEGER DEFAULT NOT NULL PRIMARY KEY",
+			"supplier_name varchar(50)",
+			"status smallint",
+			"city varchar(50)"
+		};
+		//String colDefsTemplate = "%s, %s, %s, %s";
+		String colVals[] = new String[] {
+			"{tbl}0{row}",
+			"'name{tbl}{row}'",
+			"{tbl}{row}",
+			"'city{tbl}{row}'" };
+		//String colValsTemplate = "%s, %s, %s, %s";
+
+		//StringBuilder sb = new StringBuilder("""
+		String createSql = """
+            DROP TABLE IF EXISTS tbl{tbl};
+            CREATE TABLE tbl{tbl}
+            (
+            {colDefs}
+            );
+            INSERT INTO tbl{tbl} VALUES
+            """;
+		StringBuilder sb = new StringBuilder(
+				createSql.replace("{colDefs}", rotate(colDefs, "    ", '\n', start_idx)));
+		
+		String valsTemplate = "    (" + rotate(colVals, "", ' ', start_idx) + "),\n";
+		for (int row = 1; row <= nRow; row++) {
+			String s = valsTemplate.replace("{row}", String.valueOf(row));
+			sb.append(s);
+		}
+		// replace last line's trailing ",\n" with ";"
+		sb.replace(sb.length() - 2, Integer.MAX_VALUE, ";");
+
+		return sb.toString().replace("{tbl}", "" + String.valueOf(idxTbl));
+	}
+
+	/** Create a single comma seperated string with values from rotating input array */
+	private static String rotate(String[] strings, String pre, char end_char, int start_idx)
+	{
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < strings.length; i++) {
+			String string = strings[(start_idx + i) % strings.length];
+			sb.append(pre).append(string).append(',').append(end_char);
+		}
+		sb.setLength(sb.length() - 2); // remove trailing ",x"
+
+		return sb.toString();
+	}
 }

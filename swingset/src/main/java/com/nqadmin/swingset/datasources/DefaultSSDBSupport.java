@@ -43,6 +43,7 @@
 package com.nqadmin.swingset.datasources;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import javax.sql.RowSet;
@@ -50,7 +51,7 @@ import javax.sql.RowSet;
 /**
  *
  */
-public abstract class DefaultSSDBSupport implements SSDBSupport
+public class DefaultSSDBSupport implements SSDBSupport
 {
 	private Connection fallbackConnection;
 
@@ -65,9 +66,28 @@ public abstract class DefaultSSDBSupport implements SSDBSupport
 	}
 
 
+	// TODO: maybe this should be getSharedConnection(rs)
 	@Override
 	public Connection getTemporaryConnection(RowSet rs) throws SQLException
 	{
+		return fallbackConnection;
+	}
+
+	/**
+	 * {@inheritDoc }
+	 * @param rs
+	 * @return
+	 * @throws SQLException 
+	 */
+	@Override
+	public Connection getConnection(RowSet rs) throws SQLException
+	{
+		String url = rs.getUrl();
+		if (url != null) {
+			return DriverManager.getConnection(url);
+		}
+		// TODO: getConnection: use DataSourceName
+
 		return fallbackConnection;
 	}
 

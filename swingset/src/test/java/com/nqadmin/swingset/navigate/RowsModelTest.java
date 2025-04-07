@@ -29,7 +29,14 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
+import java.awt.Container;
 import java.awt.EventQueue;
+import java.lang.System.Logger.Level;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.sql.RowSet;
@@ -40,9 +47,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.core.TextField;
+import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.TestLogging;
+import com.nqadmin.swingset.utils.CentralLookup;
 
 import static com.nqadmin.swingset.navigate.Support.getRS1_4;
 import static com.nqadmin.swingset.navigate.Support.getRS2_5;
@@ -67,6 +77,7 @@ public class RowsModelTest
 	{
 		isJunit();	// Make sure it's set; when using invokeLater, can be missed.
 		TestLogging.load();
+		CentralLookup.getDefault().add(new DefaultSSDBSupport());
 	}
 	
 	/** x */
@@ -86,6 +97,126 @@ public class RowsModelTest
 	public void tearDown()
 	{
 	}
+
+	private RowSet getRS1() throws SQLException, ClassNotFoundException
+	{
+		RowSet rs = H2.getRowSet("""
+			CREATE TABLE tbl1
+			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, some_int tinyint);
+            INSERT INTO tbl1 VALUES
+				(11, 1), (12, 1), (13, 1), (14, 1), (15, 1)
+            ;
+            """);
+		rs.setCommand("SELECT * FROM tbl1");
+		return rs;
+	}
+
+	private RowSet getRS1NotNull() throws SQLException, ClassNotFoundException
+	{
+		RowSet rs = H2.getRowSet("""
+			CREATE TABLE tbl1NN
+			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, some_int tinyint not null);
+            INSERT INTO tbl1NN VALUES
+				(11, 1), (12, 1), (13, 1), (14, 1), (15, 1)
+            ;
+            """);
+		rs.setCommand("SELECT * FROM tbl1NN");
+		return rs;
+	}
+
+	private RowSet getRS2() throws SQLException, ClassNotFoundException
+	{
+		// This table has a different type for some_int
+		RowSet rs = H2.getRowSet("""
+			CREATE TABLE tbl2
+			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, some_int int);
+            INSERT INTO tbl2 VALUES
+            	(21, 1), (22, 1), (23, 1), (24, 1), (25, 1)
+            ;
+            """);
+		rs.setCommand("SELECT * FROM tbl2");
+		return rs;
+	}
+
+	//SSDBNav dbNav = new SSDBNavImpl(this)
+	class DbNav extends SSDBNavImpl
+	{
+		private final RowsModel rowsModel;
+		private final Connection connection;
+
+		public DbNav(Container container, RowsModel rowsModel)
+				throws ClassNotFoundException, SQLException
+		{
+			super(container);
+			this.rowsModel = rowsModel;
+			this.connection = H2.getCon();
+		}
+
+		private RowSet getRowSet() { return rowsModel.getRowSet(); }
+
+		/**
+		 * Re-query the RowSet following a deletion. This is needed for H2.
+		 */
+		@Override
+		public void performPostDeletionOps()
+		{
+			super.performPostDeletionOps();
+			try {
+				getRowSet().execute();
+			} catch (final SQLException se) {
+				logger.log(Level.ERROR, "SQL Exception.", se);
+			}
+		}
+
+		/**
+		 * Requery the rowset following an insertion. This is needed for H2.
+		 */
+		@Override
+		public void performPostInsertOps()
+		{
+			super.performPostInsertOps();
+			try {
+				getRowSet().execute();
+			} catch (final SQLException se) {
+				logger.log(Level.ERROR, "SQL Exception.", se);
+			}
+		}
+
+		/**
+		 * Obtain and set the PK value for the new record & perform any other
+		 * actions needed before an insert.
+		 */
+		@Override
+		public void performPreInsertOps()
+		{
+			// SSDBNavImpl will clear the component values
+			super.performPreInsertOps();
+
+			try (final ResultSet rs = connection.createStatement(
+					ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+					.executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");
+					) {
+				// Get the new record id.
+				rs.next();
+
+				//
+				// NOTE: insert NOT_USED
+				//
+				// final int supplierID = rs.getInt("nextVal");
+				// txtSupplierID.setText(String.valueOf(supplierID));
+				
+				// // SET OTHER DEFAULTS
+				//  txtSupplierName.setText(null);
+				//  txtSupplierCity.setText(null);
+				//  txtSupplierStatus.setText("0");
+
+			} catch(final SQLException se) {
+				logger.log(Level.ERROR, "SQL Exception occured initializing new record.", se);
+			} catch(final Exception e) {
+				logger.log(Level.ERROR, "Exception occured initializing new record.", e);
+			}
+		}
+	};
 
 	/**
 	 * Test of create method, of class RowsModel.
@@ -137,6 +268,162 @@ public class RowsModelTest
 		//				throw new IllegalStateException("Fake Exception");
 		// to force a BusReceiver exception
 		assertEquals("a2", tf.getText());
+	}
+
+	/**
+	 * Test of bind() method, of class RowsModel.
+	 * @throws java.lang.Exception
+	 */
+	@Test
+	public void testBind() throws Exception
+	{
+		LOG.log(INFO, "bind");
+		String keyCol = "supplier_id";
+		List<Exception> exs = new ArrayList<>();
+
+		H2.clean();
+
+		// Create two RowSets, the same columnNames have different column indexes.
+		RowSet rs1 = H2.createSimpleSupplierData(7, 5, 0);
+		RowSet rs2 = H2.createSimpleSupplierData(8, 6, 1);
+
+		RowsModel rowsModel = RowsModel.create(null);
+		TextField tf = new TextField();
+		DbNav _dbNav = null;
+		try {
+			_dbNav = new DbNav(tf, rowsModel);
+		} catch (ClassNotFoundException | SQLException ex) {
+			exs.add(ex);
+		}
+		assertTrue(exs.isEmpty());
+		DbNav dbNav = _dbNav;
+		
+		// Make sure the row sets are set up correctly, different nRow, colIdx.
+		rowsModel.setRowSet(rs1, dbNav);
+		assertEquals(5, rowsModel.getRowCount());
+		assertEquals(1, rowsModel.getRowSet().findColumn(keyCol));
+		rowsModel.setRowSet(rs2, dbNav);
+		assertEquals(6, rowsModel.getRowCount());
+		assertEquals(4, rowsModel.getRowSet().findColumn(keyCol));
+
+		int idInt;
+		String id;
+
+		rowsModel.setRowSet(null, dbNav);
+		rowsModel.bind(tf, keyCol);
+
+		rowsModel.setRowSet(rs1, dbNav);
+		EventQueue.invokeAndWait(() -> { });
+		idInt = rowsModel.getRowSet().getInt(keyCol);
+		assertEquals(701, idInt);
+		id = tf.getText();
+		assertEquals("701", id);
+
+		rowsModel.setRowSet(rs2, dbNav);
+		EventQueue.invokeAndWait(() -> { });
+		idInt = rowsModel.getRowSet().getInt(keyCol);
+		assertEquals(801, idInt);
+		id = tf.getText();
+		assertEquals("801", id);
+	}
+
+	/**
+	 * Test of setRowSet method, of class RowsModel.
+	 * @throws java.lang.Exception
+	 */
+	@Test
+	@SuppressWarnings("LoggerStringConcat")
+	public void testSetRowSetError() throws Exception
+	{
+		LOG.log(INFO, "setRowSetError");
+		String some_int = "some_int";
+		List<Exception> exs = new ArrayList<>();
+
+		H2.clean();
+
+		RowsModel rowsModel = RowsModel.create(null);
+		TextField tf = new TextField();
+		DbNav _dbNav = null;
+		try {
+			_dbNav = new DbNav(tf, rowsModel);
+		} catch (ClassNotFoundException | SQLException ex) {
+			exs.add(ex);
+		}
+		assertTrue(exs.isEmpty());
+		DbNav dbNav = _dbNav;
+
+		// Create two RowSets, the same columnNames have different column indexes.
+		RowSet rs1 = getRS1();
+		RowSet rs2 = getRS2();
+
+		// setRowSet(rs1)
+		EventQueue.invokeLater(() -> {
+			rowsModel.bind(tf, some_int);
+			try {
+				rowsModel.setRowSet(rs1, dbNav);
+			} catch(Exception ex) {
+				exs.add(ex);
+			}
+		});
+		EventQueue.invokeAndWait(() -> { });
+		assertTrue(exs.isEmpty());
+
+		// setRowSet(rs2) expect an error since there's a type difference
+		EventQueue.invokeLater(() -> {
+			try {
+				rowsModel.setRowSet(rs2, dbNav);
+			} catch(Exception ex) {
+				exs.add(ex);
+			}
+		});
+		EventQueue.invokeAndWait(() -> { });
+		assertEquals(1, exs.size());
+		Exception exx = assertInstanceOf(IllegalArgumentException.class, exs.get(0));
+		assertTrue(exx.getMessage().startsWith("JDBCType mismatch"), exx.getMessage());
+
+		//
+		// Verify exception if different nullability.
+		//
+		exs.clear();
+		RowSet rs1NN = getRS1NotNull();
+
+		RowsModel rowsModelNN = RowsModel.create(null);
+		TextField tfNN = new TextField();
+
+		_dbNav = null;
+		try {
+			_dbNav = new DbNav(tfNN, rowsModelNN);
+		} catch (ClassNotFoundException | SQLException ex) {
+			exs.add(ex);
+		}
+		assertTrue(exs.isEmpty());
+		DbNav dbNavNN = _dbNav;
+
+		// setRowSet(rs1)
+		EventQueue.invokeLater(() -> {
+			rowsModelNN.bind(tfNN, some_int);
+			try {
+				rowsModelNN.setRowSet(rs1, dbNavNN);
+			} catch(Exception ex) {
+				exs.add(ex);
+			}
+		});
+		EventQueue.invokeAndWait(() -> { });
+		assertTrue(exs.isEmpty());
+
+		// setRowSet(rs1NN) expect an error since there's a type difference
+		RowsModel.verifyExecuted(rs1NN);
+		EventQueue.invokeLater(() -> {
+			try {
+				rowsModelNN.setRowSet(rs1NN, dbNavNN);
+			} catch(Exception ex) {
+				exs.add(ex);
+			}
+		});
+		EventQueue.invokeAndWait(() -> { });
+		assertEquals(1, exs.size());
+		Exception ex = assertInstanceOf(IllegalArgumentException.class, exs.get(0));
+		assertTrue(ex.getMessage().startsWith("Nullability mismatch"), ex.getMessage());
 	}
 
 	// /**
@@ -431,35 +718,6 @@ public class RowsModelTest
 	// 	System.out.println("dumpLatestEvents");
 	// 	String tag = "";
 	// 	RowsModel.dumpLatestEvents(tag);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-
-	// /**
-	//  * Test of setCallExecute method, of class RowsModel.
-	//  */
-	// @Test
-	// public void testSetCallExecute()
-	// {
-	// 	System.out.println("setCallExecute");
-	// 	boolean callExecute = false;
-	// 	RowsModel instance = null;
-	// 	instance.setCallExecute(callExecute);
-	// 	// TODO review the generated test code and remove the default call to fail.
-	// 	fail("The test case is a prototype.");
-	// }
-
-	// /**
-	//  * Test of getCallExecute method, of class RowsModel.
-	//  */
-	// @Test
-	// public void testGetCallExecute()
-	// {
-	// 	System.out.println("getCallExecute");
-	// 	RowsModel instance = null;
-	// 	boolean expResult = false;
-	// 	boolean result = instance.getCallExecute();
-	// 	assertEquals(expResult, result);
 	// 	// TODO review the generated test code and remove the default call to fail.
 	// 	fail("The test case is a prototype.");
 	// }
