@@ -3,6 +3,7 @@ TextDecorator API
 ================================================================================
 
 Why maintain currentRow and rowCount in navigateState? How much perf gain?
+Use a method to access, simplifies flipping.
 
 SSDataNavigator - clean up the setRowSet/setRowsModel stuff.
 
@@ -11,6 +12,10 @@ RowsModel.setRowSet() - better dbNav handling
       (temp kludge until DBNav splits to DB/NavigatorState).
     - Tweak (interim) RowsModel.create()
       can provide RowSet's SSDBNav and its default usage.
+
+Split DBNav into DB-stuff/NavigatorState. 
+
+Is RowsAction.foreceEvent needed? Always generate event.
 
 ================================================================================
 
@@ -181,11 +186,41 @@ Should decorator check component error state (from navigator)...
 ============================= HMMMM ============================================
 ================================================================================
 
+
+=== RENAME/MOVE
+
+Rename swingset/utils package to swingset/base
+
+Put SSComponent and SSCommon in package with RowsModel.
+Rename package "core" to "seesaw". Rename "navigate" to "core"
+
+RENAME RowsModelEventHandling to RowSetEventHandling
+
+Rename to SSComponent from SSComponentInterface
+Rename SSDataNavigator to SSNavigatorBar ???
+Rename NavigateActions to Navigation? BETTER: make Navigation a model.
+
+Rename SSCommon to SSBase ???
+
+move SSCommon to core/Base.java
+
+Rename package swingset.utils to swingset.base
+
+In combobox rename "Mapping" to "MapKey"; "Option" to "Display". (display?)
+
+TODO: ComboBox2/ComboBox: class ComboBox2<M,O,O2> extends ComboBox<M,O>?
+
+Rename ssCommon to ssCommonUseGetSSCommon.
+
+================================================================================
+
 ---
 Change RowSet to ResultSet as much as possbile.
 
+Broader use of RSC
+Format field in RSC? For output format. (parse can be multiple)
+
 ---
-Rename swingset/utils package to swingset/base
 
 ---
 Cleanup
@@ -307,14 +342,9 @@ Add verifier to JTextField, and other's, so it won't give up focus.
 Should this be in SSComponent? Options to control it.
 
 ---
-Broader use of RSC
-Format field in RSC? For output format. (parse can be multiple)
-
----
 setValidator in SSCommon, but not SSComponentInterface. Needed this in general?
 
 ---
-Make getSSCommon final. Rename ssCommon to ssCommonUseGetSSCommon.
 
 ---
 Get rid of all direct row set access; always go through RowSetOps.
@@ -354,8 +384,16 @@ Add Calendar conversions? Skip it, go directly to java.time.
 
 
 ================================================================================
+============================ EXTEND ============================================
+================================================================================
+
+JavaFX interoperability.
+
+================================================================================
 ============================ OTHER =============================================
 ================================================================================
+
+=== CHART
 
 Chart components.
     https://github.com/jfree/jfreechart
@@ -364,6 +402,18 @@ Chart components.
         3D charts - recommended by jfreechart
     https://github.com/knowm/XChart
 
+=== WEAK LISTENERS
+
+Search excerpt: weak listener java
+
+Using libraries:
+- JavaFX: The JavaFX library provides built-in weak listener implementations,
+  such as WeakChangeListener and WeakInvalidationListener.
+- NetBeans: The NetBeans platform provides the WeakListeners class, which
+  allows you to easily create weak listeners for any listener interface. 
+
+Netbeans' docs are:
+https://bits.netbeans.org/dev/javadoc/org-openide-util/org/openide/util/WeakListeners.html
 
 ================================================================================
 ============================ TOOLS =============================================
@@ -413,6 +463,18 @@ Field tooltip with format/...
 ============================================================================
 ============================ ARCHITECTURE ==================================
 ============================================================================
+
+        NAVIGATION
+        SSCOMPONENT/SSCOMMON
+        FLUENT API
+        ERRORS
+        EVENTS
+        OPTIONS
+        ANNOTATIONS
+        EVENTBUS
+        CONVERT
+
+--------------
 
 ============== NAVIGATION
 

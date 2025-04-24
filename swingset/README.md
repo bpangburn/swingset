@@ -77,11 +77,13 @@ Git/Maven:
 
   After cloning, you can use an IDE, e.g. Eclipse or NetBeans, to compile/run.
   Or you can use mvn directly and then run as shown here. Note that compiled
-  jar files will be in the ./target subdirectory.
+  jar files will be in the ./target subdirectory. See the demo README.md 
+  compilation instructions for getting the built jar files into the local
+  maven repository.
   
   SwingSet Library:
     `cd ./swingset/swingset/`
-    `mvn clean package -Prelease`
+    `mvn clean package -Prelease`   # javadoc target/reports/apidocs/index.html
 
 ## DEPENDENCY INTEGRATION
 

@@ -807,7 +807,7 @@ final class NavigateState
 	/*private*/ void freshInsertRow()
 	{
 		logger.log(TRACE, "freshInsertRow");
-		undoRow.clearInsertRow();
+		undoRow.clearInsertRow(getRowSet());
 		errorComponents.clear();
 	}
 

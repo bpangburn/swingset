@@ -42,7 +42,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
-import java.util.EventObject;
 
 import javax.sql.RowSet;
 
@@ -59,7 +58,7 @@ import static com.nqadmin.swingset.utils.SSUtils.objectID;
 // Subclasses could have type, eg ERROR; type could event be enumSet.
 // 
 @SuppressWarnings("serial")
-public class RowSetModificationEvent extends EventObject
+public class RowSetModificationEvent extends EventObjectBacktrace
 {
 	final private Object value;
 	final private boolean error;

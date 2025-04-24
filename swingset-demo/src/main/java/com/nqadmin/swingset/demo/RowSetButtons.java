@@ -51,13 +51,12 @@ public abstract class RowSetButtons extends JPanel
     private static final Logger logger = SSUtils.getLogger();
 
 	record ScreenInfo(Logger logger, RowsModel rowsModel){}
-
 	abstract ScreenInfo getScreenInfo();
 
 	/** Override for notification of "next" button press. */
 	void nextRowSetButtonPush() {
 		ScreenInfo lm = getScreenInfo();
-		createAssignDebugRowSet(lm.logger, lm.rowsModel);
+		setNextDebugRowSet(lm.logger, lm.rowsModel);
 	}
 
 	/** Override for notification of "null" button press. */
@@ -72,7 +71,7 @@ public abstract class RowSetButtons extends JPanel
 	 * Set the cursor to the table name index for newly created RowSets.
 	 * Typically used from nextRowSetButtonPush().
 	 */
-	void createAssignDebugRowSet(Logger l, RowsModel rowsModel)
+	void setNextDebugRowSet(Logger l, RowsModel rowsModel)
 	{
 		l.log(Level.INFO, "nextRowSetButtonPush");
 		try {
@@ -108,6 +107,7 @@ public abstract class RowSetButtons extends JPanel
 	RowSetButtons()
 	{
 		init();
+		create();
 	}
 
 	private void init() {
@@ -137,6 +137,13 @@ public abstract class RowSetButtons extends JPanel
 			DemoExtraDB.derefSupplierData(null);
 		});
 
+		text = "<html><center>clean<br>DB</center></html>";
+		button = new JButton(text);
+		add(button);
+		button.addActionListener((e) -> {
+			create();
+		});
+
 		text = "<html><center>garb<br>coll</center></html>";
 		button = new JButton(text);
 		add(button);
@@ -145,8 +152,29 @@ public abstract class RowSetButtons extends JPanel
 		});
 	}
 
+	private void create() {
+		try {
+			H2Demo.clean();
+			for (int i = 0; i < tableLoopCount; i++) {
+				tableLoopIncr();
+				createTableLoopRowSet();
+			}
+			this.tableLoopIndex = tableLoopCount - 1; // next will be first of sequence
+		} catch (SQLException | ClassNotFoundException ex) {
+			logger.log(Level.ERROR, (String) null, ex);
+		}
+	}
+
 	void tableLoopIncr() {
 		tableLoopIndex = ++tableLoopIndex % tableLoopCount;
+	}
+
+	/** Create the RowSet for the current table loop iteration.
+	 */
+	private void createTableLoopRowSet() throws SQLException, ClassNotFoundException {
+		DemoExtraDB.createSimpleSupplierData(tableLoopBase + tableLoopIndex, tableLoopRowCountBase + tableLoopIndex);
+		logger.log(Level.INFO, () -> sf("Creating tbl%d, nRows %d",
+				tableLoopBase + tableLoopIndex, tableLoopRowCountBase + tableLoopIndex));
 	}
 
 	/** Return the RowSet for the current table loop iteration.

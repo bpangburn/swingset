@@ -31,7 +31,6 @@ package com.nqadmin.swingset.navigate;
 
 import java.lang.System.Logger;
 import java.util.EnumSet;
-import java.util.EventObject;
 import java.util.Set;
 
 import javax.sql.RowSet;
@@ -46,7 +45,7 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
- * An Event object that bundles events generated through  one or more operatrions
+ * An Event object that bundles events generated through  one or more operations
  * on a {@link javax.sql.RowSet}.
  * The event can originate from a {@link RowsAction}, from an
  * {@link RSC}/SSComponent, or
@@ -57,7 +56,7 @@ import static java.lang.System.Logger.Level.*;
  * Use the RowsModel to get the RowSet.
  */
 @SuppressWarnings("serial")
-public class RowsEvent extends EventObject implements RowsModelEvent
+public class RowsEvent extends EventObjectBacktrace implements RowsModelEvent
 {
 	private static final Logger logger = SSUtils.getLogger();
 
@@ -165,7 +164,7 @@ public class RowsEvent extends EventObject implements RowsModelEvent
 	 */
 	public RowSet getRowSet()
 	{
-		return getSource().rs();
+		return getSource().rowSet();
 	}
 
 	/**
@@ -229,7 +228,7 @@ public class RowsEvent extends EventObject implements RowsModelEvent
 		return sf("RowsEvent{%d, %s, %s, %s, %s, %s}",
 				gen,
 				objectID(getSource().rowsModel()),
-				objectID(getSource().rs()),
+				objectID(getSource().rowSet()),
 				getSource().operatorKind(),
 				getSource().operator() instanceof RowsAction
 						? getSource().operator() : objectID(getSource().operator()),

@@ -29,69 +29,32 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
-import javax.sql.RowSet;
+import java.util.EventObject;
 
-import static com.nqadmin.swingset.utils.SSUtils.objectID;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static com.nqadmin.swingset.navigate.Utils.recordEventBacktrace;
 
 /**
- * This event signals the source {@link RowsModel} has a different
- * associated {@link javax.sql.RowSet}.Use {@link RowsModel#getRowSet()}
- * to get the RowSet.
+ * Provides a backtrace of when the event is generated
  */
 @SuppressWarnings("serial")
-public class RowsModelNewRowSetEvent extends EventObjectBacktrace implements RowsModelEvent
+public class EventObjectBacktrace extends EventObject
 {
-	private final RowSet newRowSet;
-	private final RowSet oldRowSet;
+	private final Throwable backtrace;
 
 	/**
-	 * Constructs a RowsModelEvent.
-	 * @param source RowsModel got a different RowSet
-	 * @param oldRowSet
+	 * @param source
 	 */
-	public RowsModelNewRowSetEvent(RowsModel source, RowSet oldRowSet)
+	public EventObjectBacktrace(Object source)
 	{
 		super(source);
-		this.newRowSet = source.getRowSet();
-		this.oldRowSet = oldRowSet;
+		this.backtrace = recordEventBacktrace() ? new Throwable("EventObjectBacktrace") : null;
 	}
 
 	/**
-	 * A RowsModel.
-	 * @return RowsModel that issued the event
+	 * @return where the event was created, may be null.
 	 */
-	@Override
-	public RowsModel getRowsModel() {
-		return (RowsModel) getSource();
-	}
-
-	/**
-	 * The old {@linkplain RowSet}.
-	 * @return previous for this model
-	 */
-	public RowSet getNewRowSet()
+	Throwable getEventBacktrace()
 	{
-		return newRowSet;
+		return backtrace;
 	}
-
-	/**
-	 * The old {@linkplain RowSet}.
-	 * @return previous for this model
-	 */
-	public RowSet getOldRowSet()
-	{
-		return oldRowSet;
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public String toString()
-	{
-		return sf("RowsModelNewRowSetEvent{%s, %s, old %s}",
-				objectID(getRowsModel()),
-				objectID(getNewRowSet()),
-				objectID(getOldRowSet()));
-	}
-
 }

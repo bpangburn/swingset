@@ -236,6 +236,14 @@ public class RowSetState
 	}
 
 	/**
+	 * Is the current row of the RowSet dirty?
+	 * @return is dirty
+	 */
+	public boolean isDirty() {
+		return navigateState != null && navigateState.undoRow.isDirty();
+	}
+
+	/**
 	 * Find out if the specified RowSet is on the insert row.
 	 * @param rs get state for this RowSet
 	 * @return true if on the insert row

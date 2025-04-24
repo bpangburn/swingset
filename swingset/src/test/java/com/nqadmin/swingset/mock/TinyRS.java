@@ -27,25 +27,69 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset.navigate;
+package com.nqadmin.swingset.mock;
 
-import java.awt.EventQueue;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import javax.sql.RowSet;
 
-import com.nqadmin.swingset.mock.H2;
-
 /**
- * x
+ *
+ * @author err
  */
-public class Support
+public class TinyRS
 {
-	private Support() { }
+	private TinyRS() { }
+
+	public static RowSet getRS1() throws SQLException, ClassNotFoundException
+	{
+		RowSet rs = H2.getRowSet("""
+			CREATE TABLE tbl1
+			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, some_int tinyint);
+            INSERT INTO tbl1 VALUES
+				(11, 1), (12, 1), (13, 1), (14, 1), (15, 1)
+            ;
+            """);
+		rs.setCommand("SELECT * FROM tbl1");
+		return rs;
+	}
+
+	public static RowSet getRSEmpty() throws SQLException, ClassNotFoundException
+	{
+		RowSet rs = H2.getRowSet("""
+			CREATE TABLE tbl1Empty
+			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, some_int tinyint);
+            """);
+		rs.setCommand("SELECT * FROM tbl1Empty");
+		return rs;
+	}
+
+	public static RowSet getRS1NotNull() throws SQLException, ClassNotFoundException
+	{
+		RowSet rs = H2.getRowSet("""
+			CREATE TABLE tbl1NN
+			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, some_int tinyint not null);
+            INSERT INTO tbl1NN VALUES
+				(11, 1), (12, 1), (13, 1), (14, 1), (15, 1)
+            ;
+            """);
+		rs.setCommand("SELECT * FROM tbl1NN");
+		return rs;
+	}
+
+	public static RowSet getRS2() throws SQLException, ClassNotFoundException
+	{
+		// This table has a different type for some_int
+		RowSet rs = H2.getRowSet("""
+			CREATE TABLE tbl2
+			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, some_int int);
+            INSERT INTO tbl2 VALUES
+            	(21, 1), (22, 1), (23, 1), (24, 1), (25, 1), (26, 1)
+            ;
+            """);
+		rs.setCommand("SELECT * FROM tbl2");
+		return rs;
+	}
 
 	/**
 	 * x
@@ -83,58 +127,6 @@ public class Support
             """);
 		rs.setCommand("SELECT * FROM tbl2");
 		return rs;
-	}
-
-	/** x
-	 * @return 
-	 */
-	public static int timeoutVal() {
-		return 0;
-	}
-
-	/**
-	 * x
-	 * @param latch
-	 * @throws InterruptedException
-	 */
-	public static void await(CountDownLatch latch) throws InterruptedException
-	{
-		int seconds = timeoutVal();
-		if (seconds == 0)
-			latch.await();
-		else
-			latch.await(seconds, TimeUnit.SECONDS);
-	}
-
-	/**
-	 * x
-	 * @param tag
-	 * @param r
-	 * @param msg
-	 * @return
-	 * @throws InterruptedException
-	 * @throws InvocationTargetException
-	 */
-	@SuppressWarnings("CallToPrintStackTrace")
-	public static boolean invokeLaterEventLatchWait(String tag, Runnable r, Consumer<String> msg)
-			throws InterruptedException, InvocationTargetException
-	{
-		boolean ok[] = new boolean[] {true};
-		EventQueue.invokeAndWait(() -> {msg.accept(tag + "Enter");});
-		CountDownLatch latch = new CountDownLatch(1);
-		RowsModelEventHandling.latch = latch;
-		EventQueue.invokeLater(() -> { // typically right away since probably not in EDT
-			try {
-				r.run();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				latch.countDown();
-				ok[0] = false;
-			}
-		});
-		await(latch);
-		EventQueue.invokeAndWait(() -> {msg.accept(tag + "Exit");});
-		return ok[0];
 	}
 	
 }

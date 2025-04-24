@@ -35,7 +35,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
@@ -72,7 +71,7 @@ public class RowsModelEventHandling
 	private RowsModelEventHandling() { }
 
 	record RowsEventSource(RowsModel rowsModel,
-						   RowSet rs,
+						   RowSet rowSet,
 						   OperatorKind operatorKind,
 						   Object operator) {
 		@Override
@@ -80,7 +79,7 @@ public class RowsModelEventHandling
 		{
 			return sf("RowsEventSource{%s, %s, %s, %s}",
 					objectID(rowsModel),
-					objectID(rs),
+					objectID(rowSet),
 					operatorKind,
 					operator instanceof RowsAction
 							? operator : objectID(operator));
@@ -233,10 +232,10 @@ public class RowsModelEventHandling
 		}
 
 		@Override
-		public void postNewRowSetEvent(RowsModel model)
+		public void postNewRowSetEvent(RowsModel model, RowSet oldRowSet)
 		{
 			flushPendingEvent(getCurrentEventSource());
-			post(new RowsModelNewRowSetEvent(model));
+			post(new RowsModelNewRowSetEvent(model, oldRowSet));
 		}
 
 		protected abstract void flushPendingEvent(RowsEventSource eventSource);
@@ -274,12 +273,12 @@ public class RowsModelEventHandling
 					logger.log(WARNING, "Anonymous RowSet event"); //, new Throwable());
 			}
 			
-			if (eventSource.rs != rs) { // IDLE_EVENT or OutOfTheBlue RowSet.
-				if (eventSource.rs != null)
+			if (eventSource.rowSet != rs) { // IDLE_EVENT or OutOfTheBlue RowSet.
+				if (eventSource.rowSet != null)
 					logger.log(ERROR, "WRONG ROW SET");
 				if (!isJunitPrint())
 					logger.log(WARNING, () -> sf("Different RowSet: orig %s, new %s",
-							eventSource.rs, rs)); //, new Throwable());
+							eventSource.rowSet, rs)); //, new Throwable());
 
 				flushPendingEvent(eventSource);
 
@@ -323,9 +322,13 @@ public class RowsModelEventHandling
 			// TODO: add the RowSet, consider case where model == null ... UNKNOWN
 			RowsEvent ev;
 			
-			// Only create an event if there were RowSetEvents
+			// Only create an event if there were RowSetEvents;
+			// except for an ACTION with forceEvent.
 			// TODO: if needed, have a different event type for start/finish without event.
-			if (eventTypes.isEmpty()) {
+			// TODO: is the forceEvent() stuff needed? Always generate an event?
+			if (eventTypes.isEmpty()
+					&& !(eventSource.operatorKind == OperatorKind.ACTION
+						&& ((RowsAction)eventSource.operator).forceEvent())) {
 				ev = null;
 				Supplier<String> msg = () -> sf("RowsEvent %s: No RowSet event",
 						eventSource.operatorKind);
@@ -364,7 +367,6 @@ public class RowsModelEventHandling
 	 */
 	static void postAsync(RowsModelEvent event) {
 		verifyEDT();
-		addToEventHistory(event);
 
 		// TODO: OPTIM: but is it possible?
 		//       When in EDT
@@ -384,6 +386,8 @@ public class RowsModelEventHandling
 			logger.log(TRACE, () -> "####### postAsync: absorbed " + event);
 			return; 
 		}
+
+		//addToEventHistory(event);
 		eventsNextQ.add(event);
 
 		logger.log(TRACE, () -> "####### postAsync: " + event);
@@ -424,6 +428,7 @@ public class RowsModelEventHandling
 		while (!eventsActiveQ.isEmpty()) {
 			RowsModelEvent curEv = eventsActiveQ.poll();
 			logger.log(TRACE, () -> "####### dispatch start: " + curEv);
+			Utils.addToEventHistory((EventObjectBacktrace) curEv);
 			getEventBus().post(curEv);
 			logger.log(TRACE, () -> "####### dispatch end: " + curEv);
 		}
@@ -443,8 +448,14 @@ public class RowsModelEventHandling
 				latch.countDown();
 		}
 	}
+	// For unit tests.
 	static CountDownLatch latch;
+	@SuppressWarnings("unused")
+	static boolean isBusy() {
+		return dispatchLoopActivated || dispatchLoopRunning;
+	}
 
+	// Dump stuff queued up for dispatch.
 	static StringBuilder dumpQueuedEvents(String tag, Deque<RowsModelEvent> evs,
 			StringBuilder _sb, String tag2) {
 		StringBuilder sb = _sb != null ? _sb : new StringBuilder();
@@ -461,28 +472,6 @@ public class RowsModelEventHandling
 		// Remove trailing newline.
 		sb.setLength(sb.length() - 1);
 		return sb;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-
-	private static final int N_EVENTS = 50;
-	private static final Queue<RowsModelEvent> latestEvents = new ArrayDeque<>();
-	private static void addToEventHistory(RowsModelEvent event) {
-		while (latestEvents.size() >= N_EVENTS)
-			latestEvents.remove();
-		latestEvents.add(event);
-	}
-
-	@SuppressWarnings("FieldMayBeFinal")
-	private static int N_DUMP = 20;
-
-	/**
-	 * 
-	 * @param tag
-	 */
-	public static void dumpLatestEvents(String tag) {
-		System.err.printf("******* %s All Events (%d) *******\n", tag, latestEvents.size());
-		latestEvents.stream().limit(N_DUMP).forEach((ev) -> System.err.println("    " + ev));
 	}
 
 	static void verifyEDT() {

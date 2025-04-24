@@ -45,6 +45,8 @@ package com.nqadmin.swingset.navigate;
 import java.io.PrintStream;
 import java.sql.SQLException;
 
+import javax.sql.RowSet;
+
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.utils.SSComponentInterface;
@@ -71,6 +73,14 @@ final class UndoRow
 		cols = null;
 	}
 
+	private void setupCols(RowSet rowSet) throws SQLException
+	{
+		if (cols == null) {
+			int n = RowSetOps.getColumnCount(rowSet);
+			cols = new UndoCol[n + 1];	// cols[0] not used
+		}
+	}
+
 	/**
 	 * Moving to the insertRow; capture preIsertOps' values from the undo/redo stack.
 	 * cols is fully built (not lazily).
@@ -80,8 +90,14 @@ final class UndoRow
 	//		 but that's a whole new thing. And don't want to prevent
 	//		 multiple components from binding to the same column.
 	//		 So access to at least one of a column's components.
-	void clearInsertRow()
+	void clearInsertRow(RowSet rowSet)
 	{
+		try {
+			setupCols(rowSet);
+		} catch (SQLException ex) {
+			// TODO: random exception strategy
+			System.getLogger(UndoRow.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+		}
 		//dump(cols);
 		UndoCol[] insertRowCols = new UndoCol[cols.length];
 		for (int i = 1; i < cols.length; i++) {
@@ -109,10 +125,7 @@ final class UndoRow
 	/** return the column involved in the modification event */
 	private UndoCol getCol(RSC comp) throws SQLException
 	{
-		if (cols == null) {
-			int n = RowSetOps.getColumnCount(comp.getRowSet());
-			cols = new UndoCol[n + 1];	// cols[0] not used
-		}
+		setupCols(comp.getRowSet());
 		int columnIdx = comp.getBoundColumnIndex();
 		UndoCol col = cols[columnIdx];
 		if (col == null) {

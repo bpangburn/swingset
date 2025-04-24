@@ -246,8 +246,19 @@ public class RowsModel
 		logger.log(Level.INFO, () -> sf("RowsModel %s change rowSet from %s to %s",
 				objectID(this), objectID(getRowSet()), objectID(rs)));
 
+		if (isDirty())
+			//throw new IllegalStateException("trying to replace dirty RowSet");
+			logger.log(INFO, "oldRS dirty");
+
 		if (rs != null) {
 			verifyExecuted(rs);
+
+			// TODO: Probably need a setRowSet variant that allows replacing dirty rowSet
+			NavigateState newNS = NavigateState.get(rs);
+			if (newNS != null && newNS.undoRow.isDirty())
+				//throw new IllegalStateException("newRS dirty; row gets committed");
+				logger.log(INFO, "newRS dirty");
+
 			// Check for component binding compatibility here
 			// to avoid exception buried in event handler.
 			for (Map.Entry<SSComponentInterface, String> entry : bindings.entrySet()) {
@@ -273,11 +284,12 @@ public class RowsModel
 			}
 		}
 
-		rowSetListener.unregisterFrom(getRowSet());
+		RowSet oldRowSet = getRowSet();
+		rowSetListener.unregisterFrom(oldRowSet);
 		setNavState(rs, dbNav);
 
 		rowSetListener.registerTo(rs);
-		enq.postNewRowSetEvent(this);
+		enq.postNewRowSetEvent(this, oldRowSet);
 	}
 
 	/**
@@ -404,6 +416,15 @@ public class RowsModel
 	public boolean isEmpty() {
 		//return !rs.isBeforeFirst() && rs.getRow() == 0;
 		return getRowCount() == 0;
+	}
+
+	/**
+	 * Is the current row of this dirty?
+	 * @return is dirty
+	 */
+	public boolean isDirty() {
+		//return getNavState().undoRow.isDirty();
+		return getNavState() != null && getNavState().undoRow.isDirty();
 	}
 
 	// NOTE: SpinnerModel locked to RowSet
@@ -572,15 +593,7 @@ public class RowsModel
 		void startRowsEvent(OperatorKind _operatorKind, RowsModel model, Object compOrNav);
 		void addRowSetEvent(RowSetEventType rsEventType, RowSet rs);
 		RowsEventSource finishRowsEvent(RowsModel model);
-		void postNewRowSetEvent(RowsModel model);
-	}
-
-	/**
-	 * 
-	 * @param tag 
-	 */
-	public static void dumpLatestEvents(String tag) {
-		RowsModelEventHandling.dumpLatestEvents(tag);
+		void postNewRowSetEvent(RowsModel model, RowSet oldRowSet);
 	}
 
 	//////////////////////////////////////////////////////////////////////

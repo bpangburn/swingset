@@ -29,7 +29,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
-import java.util.EventObject;
 
 import javax.sql.RowSet;
 
@@ -40,7 +39,7 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  * The contents of the undo/redo stack is unchanged; note the error.
  */
 @SuppressWarnings("serial")
-public class RowSetUndoRedoEvent extends EventObject
+public class RowSetUndoRedoEvent extends EventObjectBacktrace
 {
 	final private Object value;
 	final private boolean error;

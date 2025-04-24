@@ -229,7 +229,7 @@ public class SSUtils {
 				return;
 			String tableName = crs.getMetaData().getTableName(comp.getBoundColumnIndex());
 			Set<Integer> key = getPrimaryKeyColumnsForTable(
-					SSDBSupport.getDefault().getTemporaryConnection(crs), tableName);
+					SSDBSupport.getDefault().getSharedConnection(crs), tableName);
 			crs.setKeyColumns(key.stream().mapToInt(i -> i).toArray());
 		} catch (SQLException ex) {
 		}
@@ -294,14 +294,14 @@ public class SSUtils {
 		int colIdx = rs.findColumn(columnName);
 		ResultSetMetaData rsMetaData = rs.getMetaData();
 		String tableName = rsMetaData.getTableName(colIdx);
-		DatabaseMetaData dbMetaData;
 
-		try (Connection conn = SSDBSupport.getDefault().getConnection(rs);) {
-			dbMetaData = conn.getMetaData();
-			// TODO: just call all the names keys. Buggy if join ...
-			//List<SSUtils.KeyInfo> keyInfos = SSUtils.getPrimaryKeyInfoForTable(dbMetaData, tableName);
-			return getPrimaryKeyInfoForTable(dbMetaData, tableName);
-		}
+		// TODO: just call all the names keys. Buggy if join ...
+		List<KeyInfo> ki = SSDBSupport.getDefault().runWithConnection(rs,
+				conn -> {
+					DatabaseMetaData dbMetaData = conn.getMetaData();
+					return getPrimaryKeyInfoForTable(dbMetaData, tableName);
+				});
+		return ki;
 	}
 
 	
@@ -330,7 +330,7 @@ public class SSUtils {
 	//
 
 	/**
-	 * 
+	 * Error msg.
 	 * @param oldType
 	 * @param newType
 	 * @return 
@@ -339,6 +339,12 @@ public class SSUtils {
 		return sf("JDBCType mismatch: old %s, new %s", oldType, newType);
 	}
 
+	/**
+	 * Error msg.
+	 * @param oldVal
+	 * @param newVal
+	 * @return
+	 */
 	public static String NullabilityMismatch(boolean oldVal, boolean newVal) {
 		return sf("Nullability mismatch: old %s, new %s", oldVal, newVal);
 	}

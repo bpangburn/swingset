@@ -46,7 +46,7 @@ import javax.sql.RowSet;
 
 /**
  * Actions for working with {@link RowSet}s; used with
- * {@linkplain com.nqadmin.swingset.navigate.NavigateActions}.
+ * {@link com.nqadmin.swingset.navigate.RowsActions}.
  */
 // TODO: RowsAction not RowsAction???
 public enum RowsAction
@@ -66,7 +66,7 @@ public enum RowsAction
 	/** Refresh record. */
 	ACT_REFRESH,
 	/** Add record. */
-	ACT_ADD,
+	ACT_ADD(true), // This action has no associated RowSet event.
 	/** Delete record. */
 	ACT_DELETE,
 	/** A specialized action for "goto row number".
@@ -76,6 +76,24 @@ public enum RowsAction
 	 */
 	ACT_GOTOROW,
 	;
+
+	private final boolean forceEvent;
+
+	private RowsAction()
+	{
+		forceEvent = false;
+	}
+
+	private RowsAction(boolean special)
+	{
+		forceEvent = special;
+	}
+
+	public boolean forceEvent()
+	{
+		return forceEvent;
+	}
+
 	/**
 	 * Following could be used by spinner as event's command to indicate that if
 	 * already on the row don't need to do "rs.absolute()".

@@ -710,11 +710,6 @@ final class RowsActions
 		{
 		}
 
-		// SpinnerNumberModel rowNumberModel()
-		// {
-		// 	return getNavState().rowNumberModel;
-		// }
-
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
@@ -735,17 +730,26 @@ final class RowsActions
 				//       value could be OK, NOT_WRITEABLE, ERROR...
 				//       Only return if error.
 				//       
-				if (!getNavState().commitChangesToDatabase(true))
-					return;
+
+				// TODO: check row is dirty.
+				//       In normal operation control from autoCommit prevents getting here.
+				//       Except that setRowSet gets in here from spinner.
+				//       In here for *new* RowSet, the old has been stashed.
+				// //       BUG: Skip the commit if part of setRowSet's new row,
+				// //            otherwise when new rowSet is dirty it gets commited.
+				// //boolean dirty = getNavState().undoRow.isDirty();
 
 				logger.log(DEBUG, () -> "Record number manually updated to " + row + ".");
 				if ((row <= getNavState().rowCount) && (row > 0)
 						&& !(getRowSet().getRow() == row && e != null
 							&& RowsAction.OK_SKIP_CURSOR_MOVE.equals(e.getActionCommand()))) {
+					logger.log(WARNING, "skipping commit and cursor move");
+					if (!getNavState().commitChangesToDatabase(true))
+						return;
 					getRowSet().absolute(row);
-					getNavState().freshRow(); // Only happens if the row changed.
+					getNavState().freshRow(); // only do this if row changed and commit
 				}
-				
+
 				getNavState().updateNavigator();
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
