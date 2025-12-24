@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="https://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <!-- Model Version -->
+    <modelVersion>4.0.0</modelVersion>
 
 	<!-- NOT SPECIFYING PARENT SO EACH MODULE STANDS ALONE -->
 
 	<groupId>com.nqadmin.swingset</groupId>
 	<artifactId>swingset</artifactId>
-	<version>4.0.12</version>
+	<version>4.0.13</version>
 	<packaging>jar</packaging>
 
 	<name>swingset</name>
@@ -19,38 +22,38 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- MAVEN AND JAVA VERSIONS -->
-		<version.maven>3.6.3</version.maven>
+		<version.maven>3.9.6</version.maven>
 		<version.java>8</version.java>
 
 		<!-- DEPENDENCIES -->
 		<!--<version.glazedlists>1.11.0</version.glazedlists> -->
 		<version.glazedlists>1.11.1203</version.glazedlists>
-		<version.log4j>2.22.0</version.log4j>
+		<version.log4j-api>2.25.3</version.log4j-api>
 		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
 
 		<!-- PLUGINS -->
 		<!-- Shared by swingset-parent, swingset, and swingset-demo -->
-		<version.versions-maven-plugin>2.16.2</version.versions-maven-plugin>
-		<version.maven-enforcer-plugin>3.4.1</version.maven-enforcer-plugin>
-		<version.maven-clean-plugin>3.3.2</version.maven-clean-plugin>
-		<version.maven-deploy-plugin>3.1.1</version.maven-deploy-plugin>
-		<version.maven-install-plugin>3.1.1</version.maven-install-plugin>
-		<version.maven-site-plugin>4.0.0-M12</version.maven-site-plugin>
+		<version.versions-maven-plugin>2.20.1</version.versions-maven-plugin>
+		<version.maven-enforcer-plugin>3.6.2</version.maven-enforcer-plugin>
+		<version.maven-clean-plugin>3.5.0</version.maven-clean-plugin>
+		<version.maven-deploy-plugin>3.1.4</version.maven-deploy-plugin>
+		<version.maven-install-plugin>3.1.4</version.maven-install-plugin>
+		<version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
 
 		<!-- Shared by swingset and swingset-demo -->
-		<version.maven-jar-plugin>3.3.0</version.maven-jar-plugin>
-		<version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
-		<version.maven-compiler-plugin>3.11.0</version.maven-compiler-plugin>
-		<version.dependency-check-maven>9.0.7</version.dependency-check-maven>
-		<version.maven-gpg-plugin>3.1.0</version.maven-gpg-plugin>
-		<version.maven-surefire-plugin>3.2.3</version.maven-surefire-plugin>
-		<version.maven-source-plugin>3.3.0</version.maven-source-plugin>
+		<version.maven-jar-plugin>3.5.0</version.maven-jar-plugin>
+		<version.maven-resources-plugin>3.4.0</version.maven-resources-plugin>
+		<version.maven-compiler-plugin>3.14.1</version.maven-compiler-plugin>
+		<version.dependency-check-maven>12.1.9</version.dependency-check-maven>
+		<version.maven-gpg-plugin>3.2.8</version.maven-gpg-plugin>
+		<version.maven-surefire-plugin>3.5.4</version.maven-surefire-plugin>
+		<version.maven-source-plugin>3.4.0</version.maven-source-plugin>
 
 		<!-- swingset-only -->
-		<version.maven-javadoc-plugin>3.6.3</version.maven-javadoc-plugin>
-		<version.nexus-staging-maven-plugin>1.6.13</version.nexus-staging-maven-plugin>
-		<version.maven-failsafe-plugin>3.2.3</version.maven-failsafe-plugin>
-		<version.junit-jupiter-any>5.10.1</version.junit-jupiter-any>
+		<version.maven-javadoc-plugin>3.12.0</version.maven-javadoc-plugin>
+		<version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
+		<version.maven-failsafe-plugin>3.5.4</version.maven-failsafe-plugin>
+		<version.junit-jupiter>5.14.1</version.junit-jupiter>
 	</properties>
 
 	<licenses>
@@ -128,7 +131,7 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>${version.log4j}</version>
+			<version>${version.log4j-api}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.nqadmin.rowset/jdbcrowsetimpl -->
 		<dependency>
@@ -149,26 +152,12 @@
 			<version>${version.maven-failsafe-plugin}</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter -->
 		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<version>${version.junit-jupiter-any}</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params -->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-params</artifactId>
-			<version>${version.junit-jupiter-any}</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<version>${version.junit-jupiter-any}</version>
-			<scope>test</scope>
+		    <groupId>org.junit.jupiter</groupId>
+		    <artifactId>junit-jupiter</artifactId>
+		    <version>${version.junit-jupiter}</version>
+		    <scope>test</scope>
 		</dependency>
 	</dependencies>
 

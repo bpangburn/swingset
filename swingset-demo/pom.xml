@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="https://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <!-- Model Version -->
+    <modelVersion>4.0.0</modelVersion>
 
 	<!-- NOT SPECIFYING PARENT SO EACH MODULE STANDS ALONE -->
 
 	<groupId>com.nqadmin.swingset.demo</groupId>
 	<artifactId>swingset-demo</artifactId>
-	<version>4.0.12</version>
+	<version>4.0.13</version>
 	<packaging>jar</packaging>
 
 	<name>swingset-demo</name>
@@ -19,37 +22,38 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- MAVEN AND JAVA VERSIONS -->
-		<version.maven>3.6.3</version.maven>
+		<version.maven>3.9.6</version.maven>
 		<version.java>8</version.java>
 
 		<!-- DEPENDENCIES -->
 		<!-- primary swingset-demo dependencies -->
-		<version.swingset>4.0.12</version.swingset>
-		<version.log4j>2.22.0</version.log4j>
-		<version.h2>2.2.224</version.h2>
+		<version.swingset>4.0.13</version.swingset>
+		<version.log4j-api>2.25.3</version.log4j-api>
+		<version.log4j-core>2.25.3</version.log4j-core>
+		<version.h2>2.4.240</version.h2>
 		<version.java-getopt>1.0.13</version.java-getopt>
 		<version.raelity-lib>1.2.0</version.raelity-lib>
 
 		<!-- PLUGINS -->
 		<!-- Shared by swingset-parent, swingset, and swingset-demo -->
-		<version.versions-maven-plugin>2.16.2</version.versions-maven-plugin>
-		<version.maven-enforcer-plugin>3.4.1</version.maven-enforcer-plugin>
-		<version.maven-clean-plugin>3.3.2</version.maven-clean-plugin>
-		<version.maven-deploy-plugin>3.1.1</version.maven-deploy-plugin>
-		<version.maven-install-plugin>3.1.1</version.maven-install-plugin>
-		<version.maven-site-plugin>4.0.0-M12</version.maven-site-plugin>
+		<version.versions-maven-plugin>2.20.1</version.versions-maven-plugin>
+		<version.maven-enforcer-plugin>3.6.2</version.maven-enforcer-plugin>
+		<version.maven-clean-plugin>3.5.0</version.maven-clean-plugin>
+		<version.maven-deploy-plugin>3.1.4</version.maven-deploy-plugin>
+		<version.maven-install-plugin>3.1.4</version.maven-install-plugin>
+		<version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
 
 		<!-- Shared by swingset and swingset-demo -->
-		<version.maven-jar-plugin>3.3.0</version.maven-jar-plugin>
-		<version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
-		<version.maven-compiler-plugin>3.11.0</version.maven-compiler-plugin>
-		<version.dependency-check-maven>9.0.7</version.dependency-check-maven>
-		<version.maven-gpg-plugin>3.1.0</version.maven-gpg-plugin>
-		<version.maven-surefire-plugin>3.2.3</version.maven-surefire-plugin>
-		<version.maven-source-plugin>3.3.0</version.maven-source-plugin>
+		<version.maven-jar-plugin>3.5.0</version.maven-jar-plugin>
+		<version.maven-resources-plugin>3.4.0</version.maven-resources-plugin>
+		<version.maven-compiler-plugin>3.14.1</version.maven-compiler-plugin>
+		<version.dependency-check-maven>12.1.9</version.dependency-check-maven>
+		<version.maven-gpg-plugin>3.2.8</version.maven-gpg-plugin>
+		<version.maven-surefire-plugin>3.5.4</version.maven-surefire-plugin>
+		<version.maven-source-plugin>3.4.0</version.maven-source-plugin>
 		
 		<!-- swingset-demo-only -->
-		<version.maven-assembly-plugin>3.6.0</version.maven-assembly-plugin>
+		<version.maven-assembly-plugin>3.8.0</version.maven-assembly-plugin>
 	</properties>
 
 	<licenses>
@@ -93,14 +97,14 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>${version.log4j}</version>
+			<version>${version.log4j-api}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>${version.log4j}</version>
+			<version>${version.log4j-core}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/gnu.getopt/java-getopt -->
