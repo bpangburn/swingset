@@ -20,7 +20,7 @@
 
 		<!-- MAVEN AND JAVA VERSIONS -->
 		<version.maven>3.6.3</version.maven>
-		<version.java>21</version.java>
+		<version.java>24</version.java>
 
 		<!-- DEPENDENCIES -->
 		<!-- primary swingset-demo dependencies -->
@@ -193,12 +193,12 @@
 					<dependency>
 						<groupId>org.frgaal</groupId>
 						<artifactId>compiler-maven-plugin</artifactId>
-						<version>21.0.0</version>
+						<version>24.0.0</version>
 					</dependency>
 				</dependencies>
 				<configuration>
 					<compilerId>frgaal</compilerId>
-					<source>21</source>
+					<source>24</source>
 					<target>17</target>
 					<compilerArgs>
 						<arg>-Xlint:deprecation</arg>

@@ -24,7 +24,7 @@
 
 		<!-- MAVEN AND JAVA VERSIONS -->
 		<version.maven>3.8.7</version.maven>
-		<version.java>21</version.java>
+		<version.java>24</version.java>
 
 		<!-- DEPENDENCIES -->
 		<!--<version.glazedlists>1.11.0</version.glazedlists> -->
@@ -57,7 +57,7 @@
 		<version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
 		<version.maven-failsafe-plugin>3.5.2</version.maven-failsafe-plugin>
 		<!-- testing --> 
-		<version.junit-jupiter-any>5.11.4</version.junit-jupiter-any>
+		<version.junit-jupiter>5.11.4</version.junit-jupiter>
 		<version.mockito>5.14.2</version.mockito>
 		<version.h2>2.3.232</version.h2>
 		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
@@ -115,18 +115,7 @@
 	</repositories>
 
 	<dependencies>
-		<!-- MAIN GLAZED LIST ARTIFACT - CURRENTLY DISABLED AWAITING NEXT RELEASE FEATURES:
-		     https://github.com/glazedlists/glazedlists -->
-		<!-- https://mvnrepository.com/artifact/com.glazedlists/glazedlists -->
-		<!-- 
-		<dependency>
-			<groupId>com.glazedlists</groupId>
-			<artifactId>glazedlists</artifactId> 
-			<version>${version.glazedlists}</version>
-		</dependency>
-		-->
-
-		<!-- ERNIE RAEL'S CUSTOM GLAZEDLIST ARTIFACT -->
+		<!-- ORIGINAL GLAZED LIST https://github.com/glazedlists/glazedlists -->
 		<!-- https://mvnrepository.com/artifact/com.raelity.3rdparty.com.glazedlists -->
 		<dependency>
 			<groupId>com.raelity.3rdparty.com.glazedlists</groupId>
@@ -174,25 +163,11 @@
 			<version>${version.maven-failsafe-plugin}</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<version>${version.junit-jupiter-any}</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params -->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-params</artifactId>
-			<version>${version.junit-jupiter-any}</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<version>${version.junit-jupiter-any}</version>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${version.junit-jupiter}</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
@@ -243,18 +218,18 @@
 					<dependency>
 						<groupId>org.frgaal</groupId>
 						<artifactId>compiler-maven-plugin</artifactId>
-						<version>21.0.0</version>
+						<version>24.0.0</version>
 					</dependency>
 				</dependencies>
 				<configuration>
 					<compilerId>frgaal</compilerId>
-					<source>21</source>
+					<source>24</source>
 					<target>17</target>
 					<compilerArgs>
 						<arg>-Xlint:deprecation</arg>
+						<arg>-proc:full</arg> <!-- needed starting jdk23  -->
 						<!--only needed when using preview language features-->
 						<!-- <arg>- -enable-preview</arg> -->
-						<arg>--enable-preview</arg>
 					</compilerArgs>
 				</configuration>
 			</plugin>
@@ -338,15 +313,24 @@
 			</plugin>
 
 			<!--$NO-MVN-MAN-VER$-->
+			<!-- annotationProcessorPaths needed starting jdk23  -->
 			<!-- Included above with frgaal
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${version.maven-compiler-plugin}</version>
 
-				<configuration>
-					<release>${version.java}</release>
-				</configuration>
+                                <configuration>
+                                    <release>${version.java}</release>
+
+                                    <annotationProcessorPaths>
+                                        <path>
+                                            <groupId>com.raelity.lib</groupId>
+                                            <artifactId>weak-event-bus-receiver</artifactId>
+                                            <version>${version.weak-event-bus-receiver}</version>
+                                        </path>
+                                    </annotationProcessorPaths>
+                                </configuration>
 			</plugin>
 			-->
 			<plugin>
@@ -418,12 +402,12 @@
 								--snippet-path ${snippet_path}
 								-sourcetab 4
 							</additionalOptions>
+                                                        <!-- TODO: don't supress "missing" -->
+                                                        <!-- TODO: don't supress "html" -->
 							<doclint>all,-missing,-html</doclint>
-<!--
 							<links>
-								<link>https://javadoc.io/static/com.glazedlists/glazedlists/${version.glazedlists}</link>
+								<link>https://javadoc.io/static/com.raelity.3rdparty.com.glazedlists/glazedlists/${version.glazedlists}</link>
 							</links>
--->
 						</configuration>
 						<executions>
 							<execution>
