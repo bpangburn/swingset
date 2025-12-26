@@ -34,6 +34,7 @@
 		<version.maven-deploy-plugin>3.1.4</version.maven-deploy-plugin>
 		<version.maven-install-plugin>3.1.4</version.maven-install-plugin>
 		<version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
+		<version.dependency-check-maven>12.1.9</version.dependency-check-maven>
 	</properties>
 
 	<build>
@@ -95,6 +96,27 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
 				<version>${version.maven-site-plugin}</version>
+			</plugin>
+			
+			<plugin>
+	      		<groupId>org.owasp</groupId>
+	     		<artifactId>dependency-check-maven</artifactId>
+	      		<version>${version.dependency-check-maven}</version>
+	
+				<executions>
+					<execution>
+						<id>owasp-check</id>
+						<phase>verify</phase>  <!-- optional but recommended -->
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+					
+				<configuration>
+					<nvdApiServerId>nvd</nvdApiServerId>
+					<ossIndexServerId>ossindex</ossIndexServerId>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

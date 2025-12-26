@@ -42,12 +42,12 @@
 		<version.maven-deploy-plugin>3.1.4</version.maven-deploy-plugin>
 		<version.maven-install-plugin>3.1.4</version.maven-install-plugin>
 		<version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
+		<version.dependency-check-maven>12.1.9</version.dependency-check-maven>
 
 		<!-- Shared by swingset and swingset-demo -->
 		<version.maven-jar-plugin>3.5.0</version.maven-jar-plugin>
 		<version.maven-resources-plugin>3.4.0</version.maven-resources-plugin>
 		<version.maven-compiler-plugin>3.14.1</version.maven-compiler-plugin>
-		<version.dependency-check-maven>12.1.9</version.dependency-check-maven>
 		<version.maven-gpg-plugin>3.2.8</version.maven-gpg-plugin>
 		<version.maven-surefire-plugin>3.5.4</version.maven-surefire-plugin>
 		<version.maven-source-plugin>3.4.0</version.maven-source-plugin>
@@ -209,20 +209,46 @@
 					<release>${version.java}</release>
 				</configuration>
 			</plugin>
+			
+			<plugin>
+	      		<groupId>org.owasp</groupId>
+	     		<artifactId>dependency-check-maven</artifactId>
+	      		<version>${version.dependency-check-maven}</version>
+	
+				<executions>
+					<execution>
+						<id>owasp-check</id>
+						<phase>verify</phase>  <!-- optional but recommended -->
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+					
+				<configuration>
+					<nvdApiServerId>nvd</nvdApiServerId>
+					<ossIndexServerId>ossindex</ossIndexServerId>
+				</configuration>
+			</plugin>
+			
 		</plugins>
 	</build>
 
 	<profiles>
-		<profile>
+		<!-- <profile> -->
 			<!-- invoked during verify phase -->
 			<!-- https://jeremylong.github.io/DependencyCheck/dependency-check-maven/ -->
+			<!-- 
 			<id>owasp-check</id>
 			<build>
 				<plugins>
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>${version.dependency-check-maven}</version>
+						<configuration>
+    						<nvdApiServerId>nvd</nvdApiServerId>
+  						</configuration>
+  						<version>${version.dependency-check-maven}</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
@@ -235,6 +261,7 @@
 				</plugins>
 			</build>
 		</profile>
+		-->
 
 		<profile>
 			<id>release</id>

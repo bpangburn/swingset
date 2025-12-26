@@ -39,19 +39,19 @@
 		<version.maven-deploy-plugin>3.1.4</version.maven-deploy-plugin>
 		<version.maven-install-plugin>3.1.4</version.maven-install-plugin>
 		<version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
+		<version.dependency-check-maven>12.1.9</version.dependency-check-maven>
 
 		<!-- Shared by swingset and swingset-demo -->
 		<version.maven-jar-plugin>3.5.0</version.maven-jar-plugin>
 		<version.maven-resources-plugin>3.4.0</version.maven-resources-plugin>
 		<version.maven-compiler-plugin>3.14.1</version.maven-compiler-plugin>
-		<version.dependency-check-maven>12.1.9</version.dependency-check-maven>
 		<version.maven-gpg-plugin>3.2.8</version.maven-gpg-plugin>
 		<version.maven-surefire-plugin>3.5.4</version.maven-surefire-plugin>
 		<version.maven-source-plugin>3.4.0</version.maven-source-plugin>
 
 		<!-- swingset-only -->
 		<version.maven-javadoc-plugin>3.12.0</version.maven-javadoc-plugin>
-		<version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
+		<version.central-publishing>0.9.0</version.central-publishing>
 		<version.maven-failsafe-plugin>3.5.4</version.maven-failsafe-plugin>
 		<version.junit-jupiter>5.14.1</version.junit-jupiter>
 	</properties>
@@ -84,6 +84,7 @@
 		<developerConnection>scm:git:git@github.com:bpangburn/swingset.git</developerConnection>
 	</scm>
 
+	<!-- 
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
@@ -94,8 +95,10 @@
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
+	-->
 
 	<!-- SUPPORT SNAPSHOT DEPENDENCIES AS NEEDED -->
+	<!-- 
 	<repositories>
 		<repository>
 			<id>oss-sonatype</id>
@@ -106,6 +109,7 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	-->
 
 	<dependencies>
 		<!-- MAIN GLAZED LIST ARTIFACT - CURRENTLY DISABLED AWAITING NEXT RELEASE FEATURES:
@@ -252,21 +256,46 @@
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>${version.maven-failsafe-plugin}</version>
 			</plugin>
+			
+			<plugin>
+	      		<groupId>org.owasp</groupId>
+	     		<artifactId>dependency-check-maven</artifactId>
+	      		<version>${version.dependency-check-maven}</version>
+	
+				<executions>
+					<execution>
+						<id>owasp-check</id>
+						<phase>verify</phase>  <!-- optional but recommended -->
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+					
+				<configuration>
+					<nvdApiServerId>nvd</nvdApiServerId>
+					<ossIndexServerId>ossindex</ossIndexServerId>
+				</configuration>
+			</plugin>
 
 		</plugins>
 	</build>
 
 	<profiles>
-		<profile>
+		<!-- <profile> -->
 			<!-- invoked during verify phase -->
 			<!-- https://jeremylong.github.io/DependencyCheck/dependency-check-maven/ -->
+			<!-- 
 			<id>owasp-check</id>
 			<build>
 				<plugins>
 					<plugin>
 						<groupId>org.owasp</groupId>
 						<artifactId>dependency-check-maven</artifactId>
-						<version>${version.dependency-check-maven}</version>
+						<configuration>
+    						<nvdApiServerId>nvd</nvdApiServerId>
+  						</configuration>
+  						<version>${version.dependency-check-maven}</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
@@ -279,6 +308,7 @@
 				</plugins>
 			</build>
 		</profile>
+		-->
 
 		<profile>
 			<id>release</id>
@@ -336,7 +366,18 @@
 							</execution>
 						</executions>
 					</plugin>
+					
+					<plugin>
+						<groupId>org.sonatype.central</groupId>
+						<artifactId>central-publishing-maven-plugin</artifactId>
+						<version>${version.central-publishing}</version>
+						<extensions>true</extensions>
+						<configuration>
+							<publishingServerId>central</publishingServerId>
+						</configuration>
+					</plugin>
 
+<!-- 
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
@@ -357,6 +398,7 @@
 							<autoReleaseAfterClose>false</autoReleaseAfterClose>
 						</configuration>
 					</plugin>
+-->					
 				</plugins>
 			</build>
 		</profile>
@@ -396,7 +438,7 @@
 								<additionalOptions>-html5</additionalOptions>
 								<doclint>all,-missing,-html</doclint>
 								<links>
-									<link>https://javadoc.io/static/com.glazedlists/glazedlists/${version.glazedlists}</link>
+									<link>https://javadoc.io/static/com.raelity.3rdparty.com.glazedlists/glazedlists/${version.glazedlists}</link>
 								</links>
 							</configuration>
 						</plugin>
