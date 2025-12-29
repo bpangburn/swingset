@@ -188,9 +188,9 @@ public class RowsModelEventHandling
 				operatorKind = _operatorKind;
 			else {
 				operatorKind = switch (compOrNav) {
-				case @SuppressWarnings("unused") RSC x        -> OperatorKind.COMPONENT;
-				case @SuppressWarnings("unused") RowsAction x -> OperatorKind.ACTION;
-				case null                                     -> OperatorKind.UNKNOWN;
+				case RSC _        -> OperatorKind.COMPONENT;
+				case RowsAction _ -> OperatorKind.ACTION;
+				case null         -> OperatorKind.UNKNOWN;
 				default -> throw new IllegalArgumentException("Must be RSC or RowsAction");
 				};
 			}

@@ -39,6 +39,7 @@ package com.nqadmin.swingset;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.lang.System.Logger;
 import java.util.List;
 
 import javax.swing.JLayeredPane;
@@ -47,12 +48,10 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
-import java.lang.System.Logger;
-
-import static java.lang.System.Logger.Level.*;
-
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
+
+import static java.lang.System.Logger.Level.*;
 
 // SSDBNavImpl.java
 //
@@ -137,10 +136,10 @@ public class SSDBNavImpl implements SSDBNav {
 			case JTabbedPane c ->	setComponents(c);
 			case JScrollPane c ->	setComponents(c.getViewport());
 
-			// case JLabel c ->						{ Objects.isNull(c); }
-			// case JButton c ->						{ Objects.isNull(c); }
-			// case JMenuBar c ->						{ Objects.isNull(c); }
-			// case BasicInternalFrameTitlePane c ->	{ Objects.isNull(c); }
+			// case JLabel _ ->						{ }
+			// case JButton _ ->						{ }
+			// case JMenuBar _ ->						{ }
+			// case BasicInternalFrameTitlePane _ ->	{ }
 			default -> {
 				// logger.log(WARNING, "Encountered unknown component type of: " + comp.getClass().getSimpleName() + ". Unable to clear component.");
 			}

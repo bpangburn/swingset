@@ -929,15 +929,15 @@ final class SSCommon
 			ex_title = "Conversion Error";
 			ex_msg = e.getLocalizedMessage();
 		}
-		case SSSQLNullException x -> { Objects.isNull(x);
+		case SSSQLNullException _ -> {
 			ex_title = "Null Exception";
 			ex_msg = "Null values are not allowed for " + getBoundColumnName();
 		}
-		case SQLException x -> { Objects.isNull(x);
+		case SQLException _ -> {
 			ex_title = "SQL Exception";
 			ex_msg = "SQL Exception encountered for " + getBoundColumnName();
 		}
-		case NumberFormatException x -> { Objects.isNull(x);
+		case NumberFormatException _ -> {
 			ex_title = "Number Format Exception";
 			ex_msg = "Number Format Exception encountered for " + getBoundColumnName() + " converting " + value + " to a number.";
 		}
