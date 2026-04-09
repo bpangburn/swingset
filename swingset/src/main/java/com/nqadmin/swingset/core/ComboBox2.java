@@ -1243,8 +1243,7 @@ public abstract class ComboBox2<K,D,D2>
 	/**
 	 * When dealing with GlazedLists (1.11) restore expected combo behavior.
 	 * <p>
-	 * Per GL JavaDoc:
-	 * https://javadoc.io/doc/com.glazedlists/glazedlists/latest/ca/odell/glazedlists/swing/AutoCompleteSupport.html
+	 * Per GL JavaDoc: {@link ca.odell.glazedlists.swing.AutoCompleteSupport}
 	 *<p>
 	 *  4. typing the up arrow key when the popup is visible and the selected element is the first element causes the autocompletion to be cleared and the popup's selection to be removed.
 	 *  6. typing the down arrow key when the popup is visible and the selected element is the last element causes the autocompletion to be cleared and the popup's selection to be removed

@@ -196,8 +196,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * nothing if {@link #allValidate()} via decorate indicates invalid.
 	 * @param pce "value" from property change event
 	 */
-	private void handleValuePropertyChange(
-			@SuppressWarnings("unused") PropertyChangeEvent pce)
+	private void handleValuePropertyChange(PropertyChangeEvent pce)
 	{
 		final SSFormattedTextField ftf = this;
 

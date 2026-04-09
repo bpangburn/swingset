@@ -1642,7 +1642,7 @@ public class SSDataGrid extends JTable
 	/**
 	 * Sets the new RowSet for the combo box.
 	 *
-	 * @param rowSet RowSet to which the combo has to update values.
+	 * @param rowsModel RowsModel to which the combo has to update values.
 	 */
 	// TODO: handle RowsModel.setRowSet()
 	public void setRowsModel(RowsModel rowsModel) {

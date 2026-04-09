@@ -256,6 +256,12 @@ public interface SSComponentInterface extends RSC
 		getSSCommon().bind(rowsModel, boundColumnName);
 	}
 
+	/**
+	 * Indicate whether or not the Component has been bound to a RowSet.
+	 * A fully bound component has information based on RowSet's metadata,
+	 * for example jdbc column type and isNullable.
+	 * @return true if fullyBound
+	 */
 	default boolean isFullyBound()
 	{
 		return getSSCommon().isFullyBound();

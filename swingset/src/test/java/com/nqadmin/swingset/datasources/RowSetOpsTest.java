@@ -52,6 +52,7 @@ import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.TestLogging;
 import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 
 import static com.nqadmin.swingset.utils.SSUtils.getLoggerName;
@@ -77,6 +78,7 @@ public class RowSetOpsTest
 	{
 		isJunit();	// Make sure it's set; when using invokeLater, can be missed.
 		TestLogging.load();
+		CentralLookup.getDefault().replace(SSDBSupport.class, new DefaultSSDBSupport());
 	}
 	
 	/** x */
@@ -110,7 +112,7 @@ public class RowSetOpsTest
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testDB() throws Exception
 	{
-		LOG.log(INFO, "DB");
+		LOG.log(INFO, "TEST: DB");
 		RowSet rs = H2.getRowSetCleanDB(null);
 		rs.setCommand("SELECT * FROM tbl");
 		RowsModel rowsModel = getRowsModel(rs);
@@ -176,7 +178,7 @@ public class RowSetOpsTest
 	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "ResultOfObjectAllocationIgnored"})
 	public void testGetColumnObject_RSC_Class() throws Exception
 	{
-		LOG.log(INFO, "getColumnObject");
+		LOG.log(INFO, "TEST: getColumnObject");
 
 		RowSet rs = H2.getRowSetCleanDB(null);
 		rs.setCommand("SELECT * FROM tbl");
@@ -217,7 +219,7 @@ public class RowSetOpsTest
 	@SuppressWarnings("ResultOfObjectAllocationIgnored")
 	public void testUpdateColumnText() throws Exception
 	{
-		LOG.log(INFO, "updateColumnText");
+		LOG.log(INFO, "TEST: updateColumnText");
 		RowSet rs;
 		RowsModel rowsModel;
 
@@ -283,7 +285,6 @@ public class RowSetOpsTest
 		//g_nav = null;
 
 		// Date types
-
 		rs = H2.getRowSetCleanDB("""
             CREATE TABLE tbl
             (
@@ -327,7 +328,7 @@ public class RowSetOpsTest
 	@SuppressWarnings({"UseOfSystemOutOrSystemErr", "ResultOfObjectAllocationIgnored"})
 	public void testGetColumnObject_RSC() throws Exception
 	{
-		LOG.log(INFO, "getColumnObject");
+		LOG.log(INFO, "TEST: getColumnObject");
 		RSC comp = null;
 		Object expResult = null;
 		Object result = RowSetOps.getColumnObject(comp);
@@ -344,7 +345,7 @@ public class RowSetOpsTest
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
 	public void testUpdateColumnObject() throws Exception
 	{
-		LOG.log(INFO, "updateColumnObject");
+		LOG.log(INFO, "TEST: updateColumnObject");
 		SSComponentInterface comp = null;
 		Object _updatedValue = null;
 		RowSetOps.updateColumnObject(comp, _updatedValue);

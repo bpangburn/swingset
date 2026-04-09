@@ -30,7 +30,6 @@
 package com.nqadmin.swingset.navigate;
 
 
-import java.awt.EventQueue;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
@@ -44,9 +43,11 @@ import org.junit.jupiter.api.Test;
 
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.TestLogging;
+import com.nqadmin.swingset.mock.TinyRS;
+import com.nqadmin.swingset.navigate.EQ.BusReceiver;
+import com.raelity.lib.eventbus.WeakEventBus;
 
-import static com.nqadmin.swingset.navigate.Support.getRS1_4;
-import static com.nqadmin.swingset.navigate.Support.getRS2_5;
+import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
 import static com.nqadmin.swingset.utils.SSUtils.getLoggerName;
 import static com.nqadmin.swingset.utils.SSUtils.isJunit;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -89,7 +90,12 @@ public class RowNumberSpinnerTest
 	@AfterEach
 	public void tearDown()
 	{
+		if (busReceiver != null)
+			WeakEventBus.unregister(busReceiver, getGlobalEventBus());
+		busReceiver = null;
 	}
+
+	BusReceiver busReceiver; // Strong Reference
 
 	/**
 	 * Test of setAction method, of class RowNumberSpinner.
@@ -101,10 +107,13 @@ public class RowNumberSpinnerTest
 	{
 		LOG.log(INFO, "setAction");
 
+		busReceiver = EQ.setupBusReceiver();
+		EQ.GetRowsModelEvent events = busReceiver.events();
+
 		H2.clean();
-		RowSet rs1 = getRS1_4();
+		RowSet rs1 = TinyRS.getRS1_4();
 		RowsModel model1 = RowsModel.create(rs1);
-		RowSet rs2 = getRS2_5();
+		RowSet rs2 = TinyRS.getRS2_5();
 		
 		RowNumberSpinner spinner = new RowNumberSpinner(model1);
 
@@ -112,70 +121,76 @@ public class RowNumberSpinnerTest
 		// Verify that the correct rowSet cursor is modified,
 		// and that the "other" rowSet cursor is not modified.
 
-		// Can put the following after rs?.getRow()
-		//checkRowSetPos(rs1_row, rs1, rs2_row, rs2);
-
-		EventQueue.invokeAndWait(() -> {
-			try {
-				checkGoto(); // initialize state
-				int rs1_row;
-				//int rs2_row;
-				int row = ((Number)spinner.getValue()).intValue();
-				assertEquals(1, row);
-				rs1_row = rs1.getRow();
-				assertEquals(1, rs1_row);
-				spinner.setValue(3);
-				rs1_row = rs1.getRow();
-				assertEquals(3, rs1_row);
-				assertEquals(1, checkGoto());
-				spinner.setValue(2);
-				rs1_row = rs1.getRow();
-				assertEquals(2, rs1_row);
-				assertEquals(1, checkGoto());
-				// rs1 has 4 rows
-				assertEquals(4, spinner.getModel().getMaximum());
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				assertTrue(false);
-			}
-		});
-		int rs1_row = rs1.getRow();
-		int rs2_row;
-
-		assertTrue(Support.invokeLaterEventLatchWait(
-				"tick1", () -> model1.setRowSet(rs2), s -> LOG.log(INFO, s)));
 		checkGoto(); // initialize state
-		
+		int row = ((Number)spinner.getValue()).intValue();
+		assertEquals(1, row);
+		assertEquals(1, rs1.getRow());
+
+		assertTrue(EQ.invokeLatchWait("tick1", s -> LOG.log(INFO, s), null,
+				() -> spinner.setValue(3)));
+		assertEquals(1, events.size());
+		assertEquals(3, rs1.getRow());
+		assertEquals(1, checkGoto());
+
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick2", s -> LOG.log(INFO, s), null,
+				() -> spinner.setValue(2)));
+		assertEquals(1, events.size());
+		assertEquals(2, rs1.getRow());
+		assertEquals(1, checkGoto());
+		// rs1 has 4 rows
+		assertEquals(4, spinner.getModel().getMaximum());
+
+
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick3", s -> LOG.log(INFO, s), null,
+				() -> model1.setRowSet(rs2)));
+		assertEquals(1, events.size());
+		checkGoto(); // initialize state
 		// rs2 has 5 rows
 		assertEquals(5, spinner.getModel().getMaximum());
-		rs2_row = rs2.getRow();
-		assertEquals(1, rs2_row);
-		spinner.setValue(3);
-		rs2_row = rs2.getRow();
-		assertEquals(3, rs2_row);
-		assertEquals(2, rs1_row);
-		assertEquals(1, checkGoto());
-		spinner.setValue(2);
-		rs2_row = rs2.getRow();
-		assertEquals(2, rs2_row);
-		assertEquals(2, rs1_row);
+		assertEquals(1, rs2.getRow());
+
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick4", s -> LOG.log(INFO, s), null,
+				() -> spinner.setValue(3)));
+		assertEquals(1, events.size());
+		assertEquals(3, rs2.getRow());
+		assertEquals(2, rs1.getRow());
 		assertEquals(1, checkGoto());
 
-		assertTrue(Support.invokeLaterEventLatchWait(
-				"tick2", () -> model1.setRowSet(rs1), s -> LOG.log(INFO, s)));
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick5", s -> LOG.log(INFO, s), null,
+				() -> spinner.setValue(2)));
+		assertEquals(1, events.size());
+		assertEquals(2, rs2.getRow());
+		assertEquals(2, rs1.getRow());
+		assertEquals(1, checkGoto());
+
+
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick6", s -> LOG.log(INFO, s), null,
+				() -> model1.setRowSet(rs1)));
+		assertEquals(1, events.size());
 		checkGoto(); // initialize state
 
 		// rs1 has 4 rows
 		assertEquals(4, spinner.getModel().getMaximum());
-		spinner.setValue(3);
-		rs1_row = rs1.getRow();
-		assertEquals(3, rs1_row);
-		assertEquals(2, rs2_row);
+
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick7", s -> LOG.log(INFO, s), null,
+				() -> spinner.setValue(3)));
+		assertEquals(1, events.size());
+		assertEquals(3, rs1.getRow());
+		assertEquals(2, rs2.getRow());
 		assertEquals(1, checkGoto());
-		spinner.setValue(2);
-		rs1_row = rs1.getRow();
-		assertEquals(2, rs1_row);
-		assertEquals(2, rs2_row);
+
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick8", s -> LOG.log(INFO, s), null,
+				() -> spinner.setValue(2)));
+		assertEquals(1, events.size());
+		assertEquals(2, rs1.getRow());
+		assertEquals(2, rs2.getRow());
 		assertEquals(1, checkGoto());
 	}
 	

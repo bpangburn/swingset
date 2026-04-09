@@ -45,6 +45,8 @@ package com.nqadmin.swingset.navigate;
 import java.awt.KeyboardFocusManager;
 import java.lang.System.Logger.Level;
 import java.sql.SQLException;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 import javax.sql.RowSet;
 
@@ -54,8 +56,11 @@ import com.google.common.eventbus.SubscriberExceptionHandler;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.getLogger;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * TODO: Replace EventBUs with https://dagger.dev/ and RxJava
@@ -63,7 +68,6 @@ import static com.nqadmin.swingset.utils.SSUtils.getLogger;
  */
 public class Utils
 {
-
 	private static final System.Logger logger = getLogger();
 
 	private Utils() { }
@@ -100,6 +104,20 @@ public class Utils
 	//
 
 	/**
+	 * @return true means save the backtrace in the Event.
+	 */
+	static boolean recordEventBacktrace()
+	{
+		return SSUtils.isJunit() || logger.isLoggable(DEBUG);
+	}
+
+	private static void postFieldEvent(EventObjectBacktrace eo)
+	{
+		addToEventHistory(eo);
+		getGlobalEventBus().post(eo);
+	}
+
+	/**
 	 * Post a modification event; prefer a local eventBus.
 	 * @param source SSComponent modifying the rowset
 	 * @param value new value
@@ -108,7 +126,7 @@ public class Utils
 	{
 		// May want to extend to handling local EventBus per Frame/Panel;
 		// Use either/both source/rs to find a local eventBus.
-		getGlobalEventBus().post(new RowSetModificationEvent(source, value));
+		postFieldEvent(new RowSetModificationEvent(source, value));
 	}
 
 	/**
@@ -118,7 +136,7 @@ public class Utils
 	 */
 	public static void postRowSetModifiedError(SSComponentInterface source, Object value)
 	{
-		getGlobalEventBus().post(new RowSetModificationEvent(source, value, true));
+		postFieldEvent(new RowSetModificationEvent(source, value, true));
 	}
 
 	/**
@@ -130,7 +148,7 @@ public class Utils
 	public static void postRowSetUndoRedo(SSComponentInterface source, Object value,
 									boolean isError)
 	{
-		getGlobalEventBus().post(new RowSetUndoRedoEvent(source, value, isError));
+		postFieldEvent(new RowSetUndoRedoEvent(source, value, isError));
 	}
 	
 	// Notes on implementing a weak subscriber
@@ -176,11 +194,67 @@ public class Utils
 		public void handleException(Throwable exception, SubscriberExceptionContext context)
 		{
 			exception.printStackTrace();
-			logger.log(Level.ERROR, () -> "BusException", exception);
+			logger.log(Level.ERROR, () -> "BusException: " + exception.getMessage());
 			logger.log(Level.ERROR, () -> "    " + context.getEventBus());
-			logger.log(Level.ERROR, () -> "    " + context.getEvent());
 			logger.log(Level.ERROR, () -> "    " + context.getSubscriber());
 			logger.log(Level.ERROR, () -> "    " + context.getSubscriberMethod());
+			if (context.getEvent() instanceof EventObjectBacktrace eobt
+					&& eobt.getEventBacktrace() != null)
+				logger.log(Level.ERROR, () -> "    " + context.getEvent(), eobt.getEventBacktrace());
+			else
+				logger.log(Level.ERROR, () -> "    " + context.getEvent());
+			StringBuilder sb = new StringBuilder("    ");
+			logger.log(Level.ERROR, () -> latestEvents("Where", 20, sb).toString());
 		}
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	//
+	// Event tracking for debug
+	//
+
+	private record EventHistoryItem(String ev, Throwable bt){}
+
+	private static final int N_EVENTS = 50;
+	private static final Queue<EventHistoryItem> latestEvents = new ArrayDeque<>();
+	static void addToEventHistory(EventObjectBacktrace event) {
+		if (!SSUtils.isJunit() && !logger.isLoggable(DEBUG))
+			return;
+		while (latestEvents.size() >= N_EVENTS)
+			latestEvents.remove();
+		// Convert event to String so there are no references
+		// (like RowSet, RowsModel) in the history.
+		latestEvents.add(new EventHistoryItem(event.toString(), event.getEventBacktrace()));
+	}
+
+	@SuppressWarnings("FieldMayBeFinal")
+	private static int N_DUMP = 20;
+
+	/**
+	 * 
+	 * @param tag 
+	 */
+	public static void dumpLatestEvents(String tag) {
+		StringBuilder sb = latestEvents(tag, N_DUMP, null);
+		System.err.println(sb.toString());
+		//logger.log(INFO, sb.toString());
+	}
+
+	/**
+	 * 
+	 * @param tag
+	 * @param limit
+	 * @param _sb
+	 * @return 
+	 */
+	public static StringBuilder latestEvents(String tag, int limit, StringBuilder _sb) {
+		StringBuilder sb = _sb == null ? new StringBuilder() : _sb;
+		sb.append(sf("******* %s All Events (%d) *******\n", tag, latestEvents.size()));
+		latestEvents.stream().limit(limit)
+				.forEach((evhist) -> sb.append("    ")
+						.append(evhist.ev())
+						.append('\n'));
+		sb.setLength(sb.length() - 1);
+		return sb;
 	}
 }

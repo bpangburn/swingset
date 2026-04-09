@@ -324,9 +324,6 @@ public class Example1 extends JFrame {
 		constraints.gridwidth = 2;
 		contentPane.add(rsButtons, constraints);
 		
-		// Disable the primary key.
-		txtSupplierID.setEnabled(false);
-		
 		// Set up the simple validation panel.
 		JPanel uiPanel;
 		if (USE_SIMPLE_VALIDATION) {

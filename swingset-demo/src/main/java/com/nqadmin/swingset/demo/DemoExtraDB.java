@@ -36,10 +36,13 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.sql.RowSet;
+import javax.sql.rowset.RowSetProvider;
 
 import com.google.common.collect.MapMaker;
+import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.utils.SSUtils;
 
+import static com.nqadmin.swingset.demo.H2Demo.dbUrl;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
@@ -92,19 +95,25 @@ public class DemoExtraDB
 		return null;
 	}
 
-	static void derefSupplierData(RowSet rs)
+	static void derefSupplierData(RowSet keepRS)
 	{
-		for (Iterator<Map.Entry<Integer, RowSet>> iterator
-				= simpleSupplierData.entrySet().iterator(); iterator.hasNext();) {
-			Map.Entry<Integer, RowSet> next = iterator.next();
-			if (next.getValue() != rs)
-				iterator.remove();
+		for (Iterator<Map.Entry<Integer, RowSet>> it
+				= simpleSupplierData.entrySet().iterator(); it.hasNext();) {
+			Map.Entry<Integer, RowSet> cur = it.next();
+			RowSet rs = cur.getValue();
+			if (rs != keepRS) {
+				// TODO: Could monitor rowSet objects and check this when collected.
+				if (RowSetState.getRowSetState(rs).isDirty())
+					logger.log(Level.WARNING, () -> 
+							sf("deref dirty RowSet %s", SSUtils.objectID(rs)));
+				it.remove();
+			}
 		}
 	}
 	
 	/**
-	 * Return the RowsModel for the specified table; shared if already exists.
-	 * If it doesn't already exist, the table is created with the specified number of rows.
+	 * Return the RowSet for the specified table; shared if already exists.
+	 * If it doesn't exist, the table is queried.
 	 * <p>
 	 * Each row of the table looks like
 	 * <pre>
@@ -129,26 +138,25 @@ public class DemoExtraDB
 			return rowSet;
 		}
 
-		logger.log(Level.INFO, () -> sf("Create tbl%d, nRows %d", idxTbl, nRow));
-		rowSet = createSimpleSupplierData(idxTbl, nRow);
+		logger.log(Level.INFO, () -> sf("Query tbl%d", idxTbl));
+		rowSet = RowSetProvider.newFactory().createJdbcRowSet();
+		rowSet.setUrl(dbUrl());
+		rowSet.setCommand("SELECT * FROM tbl" + String.valueOf(idxTbl));
 		simpleSupplierData.put(idxTbl, rowSet);
 		return rowSet;
 	}
 
-	//
-	// Something very similar also in tests H2.java
-	//
-
 	/**
-	 * Create and return the RowSet for the specified table.
+	 * Create and return the RowSet for the specified table; cache it.
 	 * Exception if the table already exists.
 	 */
 	static RowSet createSimpleSupplierData(int idxTbl, int nRow)
 			throws SQLException, ClassNotFoundException
 	{
-		RowSet rowset = H2Demo.getRowSet(createSimpleSupplierDataSql(idxTbl, nRow, idxTbl));
-		rowset.setCommand("SELECT * FROM tbl" + String.valueOf(idxTbl));
-		return rowset;
+		RowSet rowSet = H2Demo.getRowSet(createSimpleSupplierDataSql(idxTbl, nRow, idxTbl));
+		rowSet.setCommand("SELECT * FROM tbl" + String.valueOf(idxTbl));
+		simpleSupplierData.put(idxTbl, rowSet);
+		return rowSet;
 	}
 
 	//
@@ -165,7 +173,7 @@ public class DemoExtraDB
 		String colDefs[] = new String[] {
 			"supplier_id INTEGER DEFAULT NOT NULL PRIMARY KEY",
 			"supplier_name varchar(50)",
-			"status smallint",
+			"status smallint not null",
 			"city varchar(50)"
 		};
 		//String colDefsTemplate = "%s, %s, %s, %s";
@@ -178,7 +186,6 @@ public class DemoExtraDB
 
 		//StringBuilder sb = new StringBuilder("""
 		String createSql = """
-            DROP TABLE IF EXISTS tbl{tbl};
             CREATE TABLE tbl{tbl}
             (
             {colDefs}

@@ -56,25 +56,58 @@ import com.nqadmin.swingset.utils.CentralLookup;
  */
 public interface SSDBSupport {
 
+	/**
+	 * Find the default.
+	 * @return
+	 */
 	static SSDBSupport getDefault() {
 		SSDBSupport support = CentralLookup.getDefault().lookup(SSDBSupport.class);
 		return support;
 	}
 
 	/**
-	 * Return a connection for short term use that connects to the
-	 * database where the row set comes from.
+	 * Like Function, but only has apply method that throws SQLException.
+	 * @param <T>
+	 * @param <R>
+	 */
+	interface DbFunc<T,R> {
+
+		/**
+		 * Run the function.
+		 * @param t
+		 * @return
+		 * @throws SQLException
+		 */
+		public R apply(T t) throws SQLException;
+	}
+
+	/**
+	 * Run the function with a connection to the database associated
+	 * with the specified {@code RowSet}, return the result.
+	 * @param <R>
+	 * @param rs
+	 * @param func
+	 * @return
+	 * @throws java.sql.SQLException
+	 */
+	<R> R runWithConnection(RowSet rs, DbFunc<Connection, R> func) throws SQLException;
+
+	/**
+	 * Return a connection, that <em>should not be closed</em>, for short term use that
+	 * connects to the database where the row set comes from.
 	 * @param rs row set from target database
 	 * @return connection
+	 * @throws java.sql.SQLException
 	 */
-	Connection getTemporaryConnection(RowSet rs) throws SQLException;
+	Connection getSharedConnection(RowSet rs) throws SQLException;
 
 	/**
 	 * Return a connection that connects to the database where the row set comes from;
-	 * Close when finished.
-	 * Tries url, dataSource, fallback.
+	 * <em>close when finished</em>.
+	 * Tries url, dataSource.
 	 * @param rs row set from target database
 	 * @return connection
+	 * @throws java.sql.SQLException
 	 */
 	Connection getConnection(RowSet rs) throws SQLException;
 
@@ -83,6 +116,7 @@ public interface SSDBSupport {
 	 * Should be closed when done with it.
 	 * @param rs row set from target database
 	 * @return rowset for "temporary" use.
+	 * @throws java.sql.SQLException
 	 */
 	RowSet getJdbcRowSet(RowSet rs) throws SQLException;
 }

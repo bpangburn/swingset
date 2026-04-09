@@ -30,16 +30,15 @@
 package com.nqadmin.swingset.navigate;
 
 import java.awt.Container;
-import java.awt.EventQueue;
 import java.lang.System.Logger.Level;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import javax.sql.RowSet;
+import javax.swing.JPanel;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -50,12 +49,15 @@ import org.junit.jupiter.api.Test;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.core.TextField;
 import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
+import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.TestLogging;
+import com.nqadmin.swingset.mock.TinyRS;
+import com.nqadmin.swingset.navigate.EQ.BusReceiver;
 import com.nqadmin.swingset.utils.CentralLookup;
+import com.raelity.lib.eventbus.WeakEventBus;
 
-import static com.nqadmin.swingset.navigate.Support.getRS1_4;
-import static com.nqadmin.swingset.navigate.Support.getRS2_5;
+import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
 import static com.nqadmin.swingset.utils.SSUtils.getLoggerName;
 import static com.nqadmin.swingset.utils.SSUtils.isJunit;
 import static java.util.logging.Level.*;
@@ -77,7 +79,7 @@ public class RowsModelTest
 	{
 		isJunit();	// Make sure it's set; when using invokeLater, can be missed.
 		TestLogging.load();
-		CentralLookup.getDefault().add(new DefaultSSDBSupport());
+		CentralLookup.getDefault().replace(SSDBSupport.class, new DefaultSSDBSupport());
 	}
 	
 	/** x */
@@ -96,52 +98,18 @@ public class RowsModelTest
 	@AfterEach
 	public void tearDown()
 	{
+		if (oneTestBusReceiver != null)
+			WeakEventBus.unregister(oneTestBusReceiver, getGlobalEventBus());
+		oneTestBusReceiver = null;
 	}
 
-	private RowSet getRS1() throws SQLException, ClassNotFoundException
-	{
-		RowSet rs = H2.getRowSet("""
-			CREATE TABLE tbl1
-			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, some_int tinyint);
-            INSERT INTO tbl1 VALUES
-				(11, 1), (12, 1), (13, 1), (14, 1), (15, 1)
-            ;
-            """);
-		rs.setCommand("SELECT * FROM tbl1");
-		return rs;
-	}
-
-	private RowSet getRS1NotNull() throws SQLException, ClassNotFoundException
-	{
-		RowSet rs = H2.getRowSet("""
-			CREATE TABLE tbl1NN
-			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, some_int tinyint not null);
-            INSERT INTO tbl1NN VALUES
-				(11, 1), (12, 1), (13, 1), (14, 1), (15, 1)
-            ;
-            """);
-		rs.setCommand("SELECT * FROM tbl1NN");
-		return rs;
-	}
-
-	private RowSet getRS2() throws SQLException, ClassNotFoundException
-	{
-		// This table has a different type for some_int
-		RowSet rs = H2.getRowSet("""
-			CREATE TABLE tbl2
-			( c_pk INTEGER DEFAULT NOT NULL PRIMARY KEY, some_int int);
-            INSERT INTO tbl2 VALUES
-            	(21, 1), (22, 1), (23, 1), (24, 1), (25, 1)
-            ;
-            """);
-		rs.setCommand("SELECT * FROM tbl2");
-		return rs;
-	}
+	BusReceiver oneTestBusReceiver; // Strong Reference
 
 	//SSDBNav dbNav = new SSDBNavImpl(this)
 	class DbNav extends SSDBNavImpl
 	{
 		private final RowsModel rowsModel;
+		@SuppressWarnings("unused")
 		private final Connection connection;
 
 		public DbNav(Container container, RowsModel rowsModel)
@@ -191,30 +159,7 @@ public class RowsModelTest
 		{
 			// SSDBNavImpl will clear the component values
 			super.performPreInsertOps();
-
-			try (final ResultSet rs = connection.createStatement(
-					ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-					.executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");
-					) {
-				// Get the new record id.
-				rs.next();
-
-				//
-				// NOTE: insert NOT_USED
-				//
-				// final int supplierID = rs.getInt("nextVal");
-				// txtSupplierID.setText(String.valueOf(supplierID));
-				
-				// // SET OTHER DEFAULTS
-				//  txtSupplierName.setText(null);
-				//  txtSupplierCity.setText(null);
-				//  txtSupplierStatus.setText("0");
-
-			} catch(final SQLException se) {
-				logger.log(Level.ERROR, "SQL Exception occured initializing new record.", se);
-			} catch(final Exception e) {
-				logger.log(Level.ERROR, "Exception occured initializing new record.", e);
-			}
+			// Stuff removed when copied from Example1.java
 		}
 	};
 
@@ -224,7 +169,7 @@ public class RowsModelTest
 	// @Test
 	public void testCreate()
 	{
-		LOG.log(INFO, "create");
+		LOG.log(INFO, "TEST: create");
 		RowSet rs = null;
 		RowsModel expResult = null;
 		RowsModel result = RowsModel.create(rs);
@@ -241,27 +186,32 @@ public class RowsModelTest
 	@SuppressWarnings("LoggerStringConcat")
 	public void testSetRowSet() throws Exception
 	{
-		LOG.log(INFO, "setRowSet");
+		LOG.log(INFO, "TEST: setRowSet");
+
+		oneTestBusReceiver = EQ.setupBusReceiver();
+		EQ.GetRowsModelEvent events = oneTestBusReceiver.events();
 
 		H2.clean();
-		RowSet rs1 = getRS1_4();
+		RowSet rs1 = TinyRS.getRS1_4();
 		RowsModel rowsModel = RowsModel.create(rs1);
-		RowSet rs2 = getRS2_5();
+		RowSet rs2 = TinyRS.getRS2_5();
 		
 		TextField[] p_tf = new TextField[1];
-		EventQueue.invokeAndWait(() -> {
-			p_tf[0] = new TextField(rowsModel, "c_char");
-		});
+		String[] p_s = new String[1];
 
+		assertTrue(EQ.invokeWait("tick0", s -> LOG.log(INFO, s), null,
+				() -> {
+					p_tf[0] = new TextField(rowsModel, "c_char");
+					p_s[0] = p_tf[0].getText();
+				}));
+		assertEquals(0, events.size()); // rowsModel.getRowSet() is null, no events
 		TextField tf = p_tf[0];
-		EventQueue.invokeAndWait(() -> {
-			assertEquals("a1", tf.getText());
-		});
+		assertEquals("a1", p_s[0]);
 
-		assertTrue(Support.invokeLaterEventLatchWait(
-				"tick1", () -> rowsModel.setRowSet(rs2), s -> LOG.log(INFO, s)));
+		assertTrue(EQ.invokeLatchWait("tick1", s -> LOG.log(INFO, s), null,
+								 () -> rowsModel.setRowSet(rs2)));
+		assertEquals(1, events.size());
 
-		EventQueue.invokeAndWait(() -> { });
 		// Change TextField's updateSSComponent as
 		//			setText(text);
 		//			if ("a2".equals(text))
@@ -277,9 +227,13 @@ public class RowsModelTest
 	@Test
 	public void testBind() throws Exception
 	{
-		LOG.log(INFO, "bind");
+		LOG.log(INFO, "TEST: bind");
 		String keyCol = "supplier_id";
+		String cityCol = "city";
 		List<Exception> exs = new ArrayList<>();
+
+		oneTestBusReceiver = EQ.setupBusReceiver();
+		EQ.GetRowsModelEvent events = oneTestBusReceiver.events();
 
 		H2.clean();
 
@@ -299,28 +253,46 @@ public class RowsModelTest
 		DbNav dbNav = _dbNav;
 		
 		// Make sure the row sets are set up correctly, different nRow, colIdx.
-		rowsModel.setRowSet(rs1, dbNav);
+		assertTrue(EQ.invokeLatchWait("tick1", s -> LOG.log(INFO, s), null,
+				() -> rowsModel.setRowSet(rs1, dbNav)));
+		assertEquals(1, events.size());
 		assertEquals(5, rowsModel.getRowCount());
 		assertEquals(1, rowsModel.getRowSet().findColumn(keyCol));
-		rowsModel.setRowSet(rs2, dbNav);
+
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick2", s -> LOG.log(INFO, s), null,
+				() -> rowsModel.setRowSet(rs2, dbNav)));
+		assertEquals(1, events.size());
 		assertEquals(6, rowsModel.getRowCount());
 		assertEquals(4, rowsModel.getRowSet().findColumn(keyCol));
+
+		rowsModel.setRowSet(null, dbNav);
+		rowsModel.bind(tf, keyCol);
+		// Try to bind tfInt again to a different column.
+		Exception exx = assertThrows(IllegalArgumentException.class, () -> rowsModel.bind(tf, cityCol));
+		assertTrue(exx.getMessage().startsWith("Component already bound to this model"), exx.getMessage());
+
+		// Try to bind tfInt to a different model.
+		RowsModel rowsModel2 = RowsModel.create(null);
+		exx = assertThrows(IllegalStateException.class, () -> rowsModel2.bind(tf, keyCol));
+		assertTrue(exx.getMessage().startsWith("Component already bound to a model"), exx.getMessage());
+
+		// Back to the originally scheduled programming.
+
+		// Check that bound TextField updates after rowsModel.setRowSet.
 
 		int idInt;
 		String id;
 
-		rowsModel.setRowSet(null, dbNav);
-		rowsModel.bind(tf, keyCol);
-
-		rowsModel.setRowSet(rs1, dbNav);
-		EventQueue.invokeAndWait(() -> { });
+		assertTrue(EQ.invokeLatchWait("tick3", s -> LOG.log(INFO, s), null,
+				() -> rowsModel.setRowSet(rs1, dbNav)));
 		idInt = rowsModel.getRowSet().getInt(keyCol);
 		assertEquals(701, idInt);
 		id = tf.getText();
 		assertEquals("701", id);
 
-		rowsModel.setRowSet(rs2, dbNav);
-		EventQueue.invokeAndWait(() -> { });
+		assertTrue(EQ.invokeLatchWait("tick4", s -> LOG.log(INFO, s), null,
+				() -> rowsModel.setRowSet(rs2, dbNav)));
 		idInt = rowsModel.getRowSet().getInt(keyCol);
 		assertEquals(801, idInt);
 		id = tf.getText();
@@ -335,9 +307,12 @@ public class RowsModelTest
 	@SuppressWarnings("LoggerStringConcat")
 	public void testSetRowSetError() throws Exception
 	{
-		LOG.log(INFO, "setRowSetError");
+		LOG.log(INFO, "TEST: setRowSetError");
 		String some_int = "some_int";
 		List<Exception> exs = new ArrayList<>();
+
+		oneTestBusReceiver = EQ.setupBusReceiver();
+		EQ.GetRowsModelEvent events = oneTestBusReceiver.events();
 
 		H2.clean();
 
@@ -353,30 +328,26 @@ public class RowsModelTest
 		DbNav dbNav = _dbNav;
 
 		// Create two RowSets, the same columnNames have different column indexes.
-		RowSet rs1 = getRS1();
-		RowSet rs2 = getRS2();
+		RowSet rs1 = TinyRS.getRS1();
+		RowSet rs2 = TinyRS.getRS2();
+
+		//
+		// Verify exception if different JDBCType.
+		//
 
 		// setRowSet(rs1)
-		EventQueue.invokeLater(() -> {
-			rowsModel.bind(tf, some_int);
-			try {
-				rowsModel.setRowSet(rs1, dbNav);
-			} catch(Exception ex) {
-				exs.add(ex);
-			}
-		});
-		EventQueue.invokeAndWait(() -> { });
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick1", s -> LOG.log(INFO, s), exs,
+					  () -> {
+						  rowsModel.bind(tf, some_int);
+						  rowsModel.setRowSet(rs1, dbNav);
+					  }));
 		assertTrue(exs.isEmpty());
 
 		// setRowSet(rs2) expect an error since there's a type difference
-		EventQueue.invokeLater(() -> {
-			try {
-				rowsModel.setRowSet(rs2, dbNav);
-			} catch(Exception ex) {
-				exs.add(ex);
-			}
-		});
-		EventQueue.invokeAndWait(() -> { });
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick2", s -> LOG.log(INFO, s), exs,
+					  () -> rowsModel.setRowSet(rs2, dbNav)));
 		assertEquals(1, exs.size());
 		Exception exx = assertInstanceOf(IllegalArgumentException.class, exs.get(0));
 		assertTrue(exx.getMessage().startsWith("JDBCType mismatch"), exx.getMessage());
@@ -385,7 +356,7 @@ public class RowsModelTest
 		// Verify exception if different nullability.
 		//
 		exs.clear();
-		RowSet rs1NN = getRS1NotNull();
+		RowSet rs1NN = TinyRS.getRS1NotNull();
 
 		RowsModel rowsModelNN = RowsModel.create(null);
 		TextField tfNN = new TextField();
@@ -400,30 +371,110 @@ public class RowsModelTest
 		DbNav dbNavNN = _dbNav;
 
 		// setRowSet(rs1)
-		EventQueue.invokeLater(() -> {
-			rowsModelNN.bind(tfNN, some_int);
-			try {
-				rowsModelNN.setRowSet(rs1, dbNavNN);
-			} catch(Exception ex) {
-				exs.add(ex);
-			}
-		});
-		EventQueue.invokeAndWait(() -> { });
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick3", s -> LOG.log(INFO, s), exs,
+					  () -> {
+						  rowsModelNN.bind(tfNN, some_int);
+						  rowsModelNN.setRowSet(rs1, dbNavNN);
+					  }));
 		assertTrue(exs.isEmpty());
 
 		// setRowSet(rs1NN) expect an error since there's a type difference
 		RowsModel.verifyExecuted(rs1NN);
-		EventQueue.invokeLater(() -> {
-			try {
-				rowsModelNN.setRowSet(rs1NN, dbNavNN);
-			} catch(Exception ex) {
-				exs.add(ex);
-			}
-		});
-		EventQueue.invokeAndWait(() -> { });
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick4", s -> LOG.log(INFO, s), exs,
+					  () -> rowsModelNN.setRowSet(rs1NN, dbNavNN)));
 		assertEquals(1, exs.size());
 		Exception ex = assertInstanceOf(IllegalArgumentException.class, exs.get(0));
 		assertTrue(ex.getMessage().startsWith("Nullability mismatch"), ex.getMessage());
+	}
+
+	/**
+	 * Test, an empty RowSet with class RowsModel.
+	 * @throws java.lang.Exception
+	 */
+	@Test
+	public void testRowSetEmpty() throws Exception
+	{
+		LOG.log(INFO, "TEST: RowSetEmpty");
+		String keyCol = "c_pk";
+		String intCol = "some_int";
+		List<Exception> exs = new ArrayList<>();
+
+		oneTestBusReceiver = EQ.setupBusReceiver();
+		EQ.GetRowsModelEvent events = oneTestBusReceiver.events();
+
+		H2.clean();
+
+		// Create two RowSets, the same columnNames have different column indexes.
+		RowSet rsEmpty = TinyRS.getRSEmpty();
+
+		RowsModel rowsModel = RowsModel.create(null);
+		JPanel jpanel = new JPanel();
+		DbNav _dbNav = null;
+		try {
+			_dbNav = new DbNav(jpanel, rowsModel);
+		} catch (ClassNotFoundException | SQLException ex) {
+			exs.add(ex);
+		}
+		assertTrue(exs.isEmpty());
+		DbNav dbNav = _dbNav;
+
+		TextField tfKey = new TextField();
+		TextField tfInt = new TextField();
+		assertTrue(EQ.invokeWait("tick1", s -> LOG.log(INFO, s), null,
+				() -> {
+					jpanel.add(tfKey);
+					jpanel.add(tfInt);
+					
+					rowsModel.bind(tfKey, keyCol);
+					rowsModel.bind(tfInt, intCol);
+				}));
+		assertEquals(0, events.size()); // rowsModel.getRowSet() is null, no events
+
+		// "tfKey.isEnabled" is always false since key.
+
+		assertEquals(false, tfKey.isEnabled());
+		assertEquals(false, tfInt.isEnabled());    // null RowSet so disabled.
+
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick2", s -> LOG.log(INFO, s), null,
+				() -> rowsModel.setRowSet(rsEmpty, dbNav)));
+		assertEquals(false, tfKey.isEnabled());
+		assertEquals(false, tfInt.isEnabled());    // empty RowSet so disabled.
+
+		assertEquals(1, events.size());
+		assertInstanceOf(RowsModelNewRowSetEvent.class, events.oget(0));
+		assertEquals(0, rowsModel.getRowCount());
+		assertEquals(1, rowsModel.getRowSet().findColumn(keyCol));
+		assertEquals(2, rowsModel.getRowSet().findColumn(intCol));
+
+		// In insert mode, fields are enabled
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick3", s -> LOG.log(INFO, s), null,
+				() -> rowsModel.getAction(RowsAction.ACT_ADD).actionPerformed(null)));
+		assertEquals(1, events.size());
+		assertInstanceOf(RowsEvent.class, events.oget(0));
+		assertTrue(RowSetState.isInserting(rowsModel.getRowSet()));
+		assertEquals(false, tfKey.isEnabled());
+		assertEquals(true, tfInt.isEnabled());    // on insert row so enabled.
+
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick4", s -> LOG.log(INFO, s), null,
+				() -> rowsModel.getAction(RowsAction.ACT_REVERT).actionPerformed(null)));
+		assertEquals(1, events.size());
+		assertInstanceOf(RowsEvent.class, events.oget(0));
+		assertFalse(RowSetState.isInserting(rowsModel.getRowSet()));
+		assertEquals(false, tfKey.isEnabled());
+		assertEquals(false, tfInt.isEnabled());    // not insert row, empty, so not enabled
+
+		// Check initial state when there are rows.
+		events.clear();
+		assertTrue(EQ.invokeLatchWait("tick5", s -> LOG.log(INFO, s), null,
+				() -> rowsModel.setRowSet(TinyRS.getRS1(), dbNav)));
+		assertEquals(1, events.size());
+		assertEquals(false, tfKey.isEnabled());
+		assertEquals(true, tfInt.isEnabled());    // has rows so enabled.
 	}
 
 	// /**
@@ -710,14 +761,14 @@ public class RowsModelTest
 	// }
 
 	// /**
-	//  * Test of dumpLatestEvents method, of class RowsModel.
+	//  * Test of latestEvents method, of class RowsModel.
 	//  */
 	// @Test
 	// public void testDumpAllEvents()
 	// {
-	// 	System.out.println("dumpLatestEvents");
+	// 	System.out.println("latestEvents");
 	// 	String tag = "";
-	// 	RowsModel.dumpLatestEvents(tag);
+	// 	RowsModel.latestEvents(tag);
 	// 	// TODO review the generated test code and remove the default call to fail.
 	// 	fail("The test case is a prototype.");
 	// }

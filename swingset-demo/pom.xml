@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="https://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
 
-	<!-- NOT SPECIFYING PARENT SO EACH MODULE STANDS ALONE -->
+	<parent>
+		<groupId>com.nqadmin.swingset</groupId>
+		<artifactId>swingset-parent</artifactId>
+		<version>5.0.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
 
+	<!-- Keep your existing demo coordinates -->
 	<groupId>com.nqadmin.swingset.demo</groupId>
 	<artifactId>swingset-demo</artifactId>
-	<version>5.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>swingset-demo</name>
@@ -16,46 +23,8 @@
 	<url>https://github.com/bpangburn/swingset</url>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-		<!-- MAVEN AND JAVA VERSIONS -->
-		<version.maven>3.6.3</version.maven>
-		<version.java>21</version.java>
-
-		<!-- DEPENDENCIES -->
-		<!-- primary swingset-demo dependencies -->
-		<version.swingset>5.0.0-SNAPSHOT</version.swingset>
-		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
-		<version.log4j>2.24.1</version.log4j>
-		<version.h2>2.3.232</version.h2>
-		<version.java-getopt>1.0.13</version.java-getopt>
-		<version.raelity-lib>1.2.0</version.raelity-lib>
-
-		<!-- PLUGINS -->
-		<!-- Shared by swingset-parent, swingset, and swingset-demo -->
-		<version.versions-maven-plugin>2.17.1</version.versions-maven-plugin>
-		<version.maven-enforcer-plugin>3.5.0</version.maven-enforcer-plugin>
-		<version.maven-clean-plugin>3.4.0</version.maven-clean-plugin>
-		<version.maven-deploy-plugin>3.1.3</version.maven-deploy-plugin>
-		<version.maven-install-plugin>3.1.3</version.maven-install-plugin>
-		<version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
-
-		<!-- Shared by swingset and swingset-demo -->
-		<version.maven-jar-plugin>3.4.2</version.maven-jar-plugin>
-		<version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
-		<version.maven-compiler-plugin>3.13.0</version.maven-compiler-plugin>
-		<version.dependency-check-maven>11.1.0</version.dependency-check-maven>
-		<version.maven-gpg-plugin>3.2.7</version.maven-gpg-plugin>
-		<version.maven-surefire-plugin>3.5.1</version.maven-surefire-plugin>
-		<version.maven-source-plugin>3.3.1</version.maven-source-plugin>
-		
-		<!-- swingset-demo-only -->
-		<version.maven-assembly-plugin>3.7.1</version.maven-assembly-plugin>
-		<version.ldatepicker>11.2.1</version.ldatepicker>
-		<!--
-		<version.ldatepicker>11.2.300</version.ldatepicker>
-		-->
-		<version.logman>2.3.1</version.logman>
+		<!-- Never publish demo artifacts to Maven Central -->
+		<maven.deploy.skip>true</maven.deploy.skip>
 	</properties>
 
 	<licenses>
@@ -74,32 +43,36 @@
 		</developer>
 		<developer>
 			<name>Brian E. Pangburn</name>
-			<email>swingset@pangburngroup.com</email>
+			<email>brian@pangburngroup.com</email>
 			<organization>The Pangburn Group, Inc.</organization>
 			<organizationUrl>https://pangburngroup.com</organizationUrl>
 		</developer>
 	</developers>
 
 	<dependencies>
-		<!-- local dependency on swingset -->
 		<dependency>
 			<groupId>com.nqadmin.swingset</groupId>
 			<artifactId>swingset</artifactId>
-			<version>${version.swingset}</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.nqadmin.rowset/jdbcrowsetimpl -->
 		<dependency>
 			<groupId>com.nqadmin.rowset</groupId>
 			<artifactId>jdbcrowsetimpl</artifactId>
-			<version>${version.jdbcrowsetimpl}</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>${version.h2}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>gnu.getopt</groupId>
+			<artifactId>java-getopt</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.raelity</groupId>
+			<artifactId>raelity-lib</artifactId>
 		</dependency>
 
 		<!--
@@ -109,299 +82,82 @@
 			This single dependency can be removed to take
 			log4j out of the picture; or can comment out all 3.
 		-->
-		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-jpl -->
-		<!--
-		-->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-jpl</artifactId>
-			<version>${version.log4j}</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
+
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>${version.log4j}</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>${version.log4j}</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/gnu.getopt/java-getopt -->
 		<dependency>
-			<groupId>gnu.getopt</groupId>
-			<artifactId>java-getopt</artifactId>
-			<version>${version.java-getopt}</version>
+			<!-- TODO: don't include simplevalidation -->
+			<groupId>com.raelity.logman</groupId>
+			<artifactId>logman-lib</artifactId>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.raelity/raelity-lib -->
-		<dependency>
-			<groupId>com.raelity</groupId>
-			<artifactId>raelity-lib</artifactId>
-			<version>${version.raelity-lib}</version>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/com.mastfrog/simplevalidation-standalone -->
-		<!-- pick up simplevalidation from logman-lib -->
 		<!-- pick up simplevalidation from logman-lib
 		<dependency>
 			<groupId>com.mastfrog</groupId>
 			<artifactId>simplevalidation-standalone</artifactId>
-			<version>1.14.1</version>
 		</dependency>
 		-->
 
 		<dependency>
 			<groupId>com.github.lgooddatepicker</groupId>
 			<artifactId>LGoodDatePicker</artifactId>
-			<version>${version.ldatepicker}</version>
 		</dependency>
 <!--
 		<dependency>
 			<groupId>com.raelity.3rdparty.com.github.lgooddatepicker</groupId>
 			<artifactId>LGoodDatePicker</artifactId>
-			<version>${version.ldatepicker}</version>
 		</dependency>
 -->
-		<!-- https://mvnrepository.com/artifact/com.raelity.logman/logman-lib -->
-		<dependency>
-			<groupId>com.raelity.logman</groupId>
-			<artifactId>logman-lib</artifactId>
-			<version>${version.logman}</version>
-		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-			<!--
-			https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>versions-maven-plugin</artifactId>
-				<version>${version.versions-maven-plugin}</version>
-			</plugin>
 
-			<!-- Added from https://github.com/eppleton/frgaal -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${version.maven-compiler-plugin}</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.frgaal</groupId>
-						<artifactId>compiler-maven-plugin</artifactId>
-						<version>21.0.0</version>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<compilerId>frgaal</compilerId>
-					<source>21</source>
-					<target>17</target>
-					<compilerArgs>
-						<arg>-Xlint:deprecation</arg>
-						<!--only needed when using preview language features-->
-						<!-- <arg>- -enable-preview</arg> -->
-						<arg>--enable-preview</arg>
-					</compilerArgs>
-				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>${version.maven-jar-plugin}</version>
-				<configuration>
-					<archive>
-						<manifestEntries>
-							<Multi-Release>true</Multi-Release>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-			<!-- End frgaal -->
 
-			<!-- Maven Enforcer forces specified version of Java and Maven -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>${version.maven-enforcer-plugin}</version>
+				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>enforce-versions</id>
+						<phase>package</phase>
 						<goals>
-							<goal>enforce</goal>
+							<goal>single</goal>
 						</goals>
 						<configuration>
-							<rules>
-								<requirePluginVersions>
-									<message>Best Practice is to always define plugin versions!</message>
-									<banLatest>true</banLatest>
-									<banRelease>true</banRelease>
-									<banSnapshots>true</banSnapshots>
-								</requirePluginVersions>
-								
-								<requireMavenVersion>
-									<version>${version.maven}</version>
-								</requireMavenVersion>
-								
-								<requireJavaVersion>
-									<version>${version.java}</version>
-								</requireJavaVersion>
-							</rules>
+							<archive>
+								<manifest>
+									<mainClass>
+										com.nqadmin.swingset.demo.MainClass</mainClass>
+								</manifest>
+								<manifestEntries>
+									<Multi-Release>true</Multi-Release>
+								</manifestEntries>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>${version.maven-clean-plugin}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>${version.maven-deploy-plugin}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-install-plugin</artifactId>
-				<version>${version.maven-install-plugin}</version>
-			</plugin>
-			<!-- Included above with frgaal
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>${version.maven-jar-plugin}</version>
-			</plugin>
-			-->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>${version.maven-resources-plugin}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-				<version>${version.maven-site-plugin}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>${version.maven-surefire-plugin}</version>
-			</plugin>
 
-			<!-- Included above with frgaal
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${version.maven-compiler-plugin}</version>
-
-				<configuration>
-					<release>${version.java}</release>
-				</configuration>
-			</plugin>
-			-->
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<!-- invoked during verify phase -->
-			<!-- https://jeremylong.github.io/DependencyCheck/dependency-check-maven/ -->
-			<id>owasp-check</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.owasp</groupId>
-						<artifactId>dependency-check-maven</artifactId>
-						<version>${version.dependency-check-maven}</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>check</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>${version.maven-source-plugin}</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<phase>package</phase>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-
-						<artifactId>maven-assembly-plugin</artifactId>
-
-						<version>${version.maven-assembly-plugin}</version><!--$NO-MVN-MAN-VER$ -->
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<archive>
-										<manifest>
-											<mainClass>
-												com.nqadmin.swingset.demo.MainClass
-											</mainClass>
-										</manifest>
-										<manifestEntries>
-											<Multi-Release>true</Multi-Release>
-										</manifestEntries>
-									</archive>
-									<descriptorRefs>
-										<descriptorRef>jar-with-dependencies</descriptorRef>
-									</descriptorRefs>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>${version.maven-gpg-plugin}</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-								<configuration>
-									<keyname>${gpg.keyname}</keyname>
-									<passphraseServerId>${gpg.keyname}</passphraseServerId>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 </project>

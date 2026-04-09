@@ -46,10 +46,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import javax.sql.RowSet;
 
 /**
- *
+ * TODO: instead of RowSet should take RSC since different columns
+ *       could be from different database.
  */
 public class DefaultSSDBSupport implements SSDBSupport
 {
@@ -65,12 +69,41 @@ public class DefaultSSDBSupport implements SSDBSupport
 		this.fallbackConnection = tempConn;
 	}
 
-
-	// TODO: maybe this should be getSharedConnection(rs)
+	/**
+	 * {@inheritDoc }
+	 * 
+	 * @param <R>
+	 * @param rs
+	 * @param func
+	 * @return 
+	 */
 	@Override
-	public Connection getTemporaryConnection(RowSet rs) throws SQLException
+	public <R> R runWithConnection(RowSet rs, DbFunc<Connection, R> func)
+			throws SQLException
 	{
-		return fallbackConnection;
+		Connection conn01 = SSDBSupport.getDefault().getSharedConnection(rs);
+		if (conn01 != null)
+			return func.apply(conn01);
+
+		try (Connection conn = SSDBSupport.getDefault().getConnection(rs);) {
+			return func.apply(conn);
+		}
+	}
+
+	/**
+	 * {@inheritDoc }
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	@Override
+	public Connection getSharedConnection(RowSet rs) throws SQLException
+	{
+		if (fallbackConnection != null
+				&& fallbackConnection.getCatalog()
+						.equals(rs.getMetaData().getCatalogName(1)))
+			return fallbackConnection;
+		return null;
 	}
 
 	/**
@@ -82,14 +115,27 @@ public class DefaultSSDBSupport implements SSDBSupport
 	@Override
 	public Connection getConnection(RowSet rs) throws SQLException
 	{
+		String dsName = rs.getDataSourceName();
+		if (dsName != null) {
+			try {
+				if (ctx == null)
+					ctx = new InitialContext();
+				// TODO: keep a local map of dsName to DataSource ???
+				DataSource ds = (DataSource)ctx.lookup(dsName);
+				return ds.getConnection();
+			} catch (NamingException ex) {
+			}
+		}
+
 		String url = rs.getUrl();
 		if (url != null) {
 			return DriverManager.getConnection(url);
 		}
-		// TODO: getConnection: use DataSourceName
-
-		return fallbackConnection;
+		
+		return null;
 	}
+	private InitialContext ctx;
+
 
 	/**
 	 *

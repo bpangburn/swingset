@@ -88,7 +88,7 @@ import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
 import com.nqadmin.swingset.datasources.RowSetOps.ForceConflict;
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSMysqlSetModel;
-import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.navigate.Utils;
 import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSUtils;
 import com.nqadmin.swingset.utils.SSVersion;
@@ -162,7 +162,7 @@ public class MainClass extends JFrame
 		@Override
 		public void actionPerformed(final ActionEvent ae) {
 			final Map<String, Object> hints = new HashMap<>(globalHints);
-			RowsModel.dumpLatestEvents("New Window:");
+			Utils.dumpLatestEvents("New Window:");
 
 			Object source = ae.getSource();
 
@@ -396,7 +396,7 @@ public class MainClass extends JFrame
 			@Override
 			public RowSet getJdbcRowSet(RowSet rs) throws SQLException
 			{
-				return DemoUtil.getNewRowSet(getTemporaryConnection(rs), DemoUtil.RowSetSource.POOL_JDBC);
+				return DemoUtil.getNewRowSet(getSharedConnection(rs), DemoUtil.RowSetSource.POOL_JDBC);
 			}
 		});
 

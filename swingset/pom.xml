@@ -1,67 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="https://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
 
-	<!-- NOT SPECIFYING PARENT SO EACH MODULE STANDS ALONE -->
+	<parent>
+		<groupId>com.nqadmin.swingset</groupId>
+		<artifactId>swingset-parent</artifactId>
+		<version>5.0.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
 
-	<groupId>com.nqadmin.swingset</groupId>
+	<properties>
+		<snippet_path>
+                        ${project.basedir}/../swingset-demo/src/main/java/snippet_files
+		</snippet_path>
+        </properties>
+
 	<artifactId>swingset</artifactId>
-	<version>5.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>swingset</name>
-	<description>Data-aware replacements for many of the standard Java Swing components</description>
+	<description>Swingset library</description>
 	<url>https://github.com/bpangburn/swingset</url>
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-		<snippet_path>
-			${project.basedir}/../swingset-demo/src/main/java/snippet_files
-		</snippet_path>
-
-		<!-- MAVEN AND JAVA VERSIONS -->
-		<version.maven>3.8.7</version.maven>
-		<version.java>21</version.java>
-
-		<!-- DEPENDENCIES -->
-		<!--<version.glazedlists>1.11.0</version.glazedlists> -->
-		<version.glazedlists>1.11.1203</version.glazedlists>
-		<version.table-sort-header>1.0.1</version.table-sort-header>
-		<version.google-guava>33.4.0-jre</version.google-guava>
-		<version.netbeans>RELEASE240</version.netbeans>
-		<version.weak-event-bus-receiver>1.0.0</version.weak-event-bus-receiver>
-
-		<!-- PLUGINS -->
-		<!-- Shared by swingset-parent, swingset, and swingset-demo -->
-		<version.versions-maven-plugin>2.18.0</version.versions-maven-plugin>
-		<version.maven-enforcer-plugin>3.5.0</version.maven-enforcer-plugin>
-		<version.maven-clean-plugin>3.4.0</version.maven-clean-plugin>
-		<version.maven-deploy-plugin>3.1.3</version.maven-deploy-plugin>
-		<version.maven-install-plugin>3.1.3</version.maven-install-plugin>
-		<version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
-
-		<!-- Shared by swingset and swingset-demo -->
-		<version.maven-jar-plugin>3.4.2</version.maven-jar-plugin>
-		<version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
-		<version.maven-compiler-plugin>3.13.0</version.maven-compiler-plugin>
-		<version.dependency-check-maven>11.1.1</version.dependency-check-maven>
-		<version.maven-gpg-plugin>3.2.7</version.maven-gpg-plugin>
-		<version.maven-surefire-plugin>3.5.2</version.maven-surefire-plugin>
-		<version.maven-source-plugin>3.3.1</version.maven-source-plugin>
-
-		<!-- swingset-only -->
-		<version.maven-javadoc-plugin>3.11.2</version.maven-javadoc-plugin>
-		<version.nexus-staging-maven-plugin>1.7.0</version.nexus-staging-maven-plugin>
-		<version.maven-failsafe-plugin>3.5.2</version.maven-failsafe-plugin>
-		<!-- testing --> 
-		<version.junit-jupiter-any>5.11.4</version.junit-jupiter-any>
-		<version.mockito>5.14.2</version.mockito>
-		<version.h2>2.3.232</version.h2>
-		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
-	</properties>
 
 	<licenses>
 		<license>
@@ -79,7 +42,7 @@
 		</developer>
 		<developer>
 			<name>Brian E. Pangburn</name>
-			<email>swingset@pangburngroup.com</email>
+			<email>brian@pangburngroup.com</email>
 			<organization>The Pangburn Group, Inc.</organization>
 			<organizationUrl>https://pangburngroup.com</organizationUrl>
 		</developer>
@@ -91,407 +54,75 @@
 		<developerConnection>scm:git:git@github.com:bpangburn/swingset.git</developerConnection>
 	</scm>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
-
-	<!-- SUPPORT SNAPSHOT DEPENDENCIES AS NEEDED -->
-	<repositories>
-		<repository>
-			<id>oss-sonatype</id>
-			<name>oss-sonatype</name>
-			<url> https://oss.sonatype.org/content/repositories/snapshots/ </url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-
 	<dependencies>
-		<!-- MAIN GLAZED LIST ARTIFACT - CURRENTLY DISABLED AWAITING NEXT RELEASE FEATURES:
-		     https://github.com/glazedlists/glazedlists -->
-		<!-- https://mvnrepository.com/artifact/com.glazedlists/glazedlists -->
-		<!-- 
-		<dependency>
-			<groupId>com.glazedlists</groupId>
-			<artifactId>glazedlists</artifactId> 
-			<version>${version.glazedlists}</version>
-		</dependency>
-		-->
-
-		<!-- ERNIE RAEL'S CUSTOM GLAZEDLIST ARTIFACT -->
-		<!-- https://mvnrepository.com/artifact/com.raelity.3rdparty.com.glazedlists -->
 		<dependency>
 			<groupId>com.raelity.3rdparty.com.glazedlists</groupId>
 			<artifactId>glazedlists</artifactId>
-			<version>${version.glazedlists}</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.netbeans.api/org-openide-util-lookup -->
 		<dependency>
 			<groupId>org.netbeans.api</groupId>
 			<artifactId>org-openide-util-lookup</artifactId>
-			<version>${version.netbeans}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.netbeans.api</groupId>
 			<artifactId>org-openide-util</artifactId>
-			<version>${version.netbeans}</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>${version.google-guava}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.raelity.jdk</groupId>
 			<artifactId>table-sort-header-renderer</artifactId>
-			<version>${version.table-sort-header}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.raelity.lib</groupId>
 			<artifactId>weak-event-bus-receiver</artifactId>
-			<version>${version.weak-event-bus-receiver}</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
-		<dependency>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-surefire-plugin</artifactId>
-			<version>${version.maven-surefire-plugin}</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-failsafe-plugin -->
-		<dependency>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-failsafe-plugin</artifactId>
-			<version>${version.maven-failsafe-plugin}</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<version>${version.junit-jupiter-any}</version>
+			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params -->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-params</artifactId>
-			<version>${version.junit-jupiter-any}</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<version>${version.junit-jupiter-any}</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>${version.mockito}</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-junit-jupiter</artifactId>
-			<version>${version.mockito}</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>${version.h2}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
 		<plugins>
-			<!--
-			https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>versions-maven-plugin</artifactId>
-				<version>${version.versions-maven-plugin}</version>
-			</plugin>
-
-			<!-- Added from https://github.com/eppleton/frgaal -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${version.maven-compiler-plugin}</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.frgaal</groupId>
-						<artifactId>compiler-maven-plugin</artifactId>
-						<version>21.0.0</version>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<compilerId>frgaal</compilerId>
-					<source>21</source>
-					<target>17</target>
-					<compilerArgs>
-						<arg>-Xlint:deprecation</arg>
-						<!--only needed when using preview language features-->
-						<!-- <arg>- -enable-preview</arg> -->
-						<arg>--enable-preview</arg>
-					</compilerArgs>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>${version.maven-jar-plugin}</version>
-				<configuration>
-					<archive>
-						<manifestEntries>
-							<Multi-Release>true</Multi-Release>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-			<!-- End frgaal -->
-
-			<!-- Maven Enforcer forces specified version of Java and Maven -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>${version.maven-enforcer-plugin}</version>
-				<executions>
-					<execution>
-						<id>enforce-versions</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<requirePluginVersions>
-									<message>Best Practice is to always define plugin versions!</message>
-									<banLatest>true</banLatest>
-									<banRelease>true</banRelease>
-									<banSnapshots>true</banSnapshots>
-								</requirePluginVersions>
-
-								<requireMavenVersion>
-									<version>${version.maven}</version>
-								</requireMavenVersion>
-
-								<requireJavaVersion>
-									<version>${version.java}</version>
-								</requireJavaVersion>
-							</rules>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>${version.maven-clean-plugin}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>${version.maven-deploy-plugin}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-install-plugin</artifactId>
-				<version>${version.maven-install-plugin}</version>
-			</plugin>
-			<!-- Included above with frgaal
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>${version.maven-jar-plugin}</version>
-			</plugin>
-			-->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>${version.maven-resources-plugin}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-				<version>${version.maven-site-plugin}</version>
 			</plugin>
 
-			<!--$NO-MVN-MAN-VER$-->
-			<!-- Included above with frgaal
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${version.maven-compiler-plugin}</version>
-
-				<configuration>
-					<release>${version.java}</release>
-				</configuration>
-			</plugin>
-			-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>${version.maven-surefire-plugin}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>${version.maven-failsafe-plugin}</version>
 			</plugin>
 
+                        <!-- include following for display-variable-value -->
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-antrun-plugin</artifactId>
+                        </plugin>
 		</plugins>
 	</build>
 
 	<profiles>
-		<profile>
-			<!-- invoked during verify phase -->
-			<!-- https://jeremylong.github.io/DependencyCheck/dependency-check-maven/ -->
-			<id>owasp-check</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.owasp</groupId>
-						<artifactId>dependency-check-maven</artifactId>
-						<version>${version.dependency-check-maven}</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>check</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>${version.maven-source-plugin}</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<phase>package</phase>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>${version.maven-javadoc-plugin}</version>
-						<configuration>
-							<release>${version.java}</release>
-							<failOnError>false</failOnError>
-							<additionalOptions>
-								-html5
-								--snippet-path ${snippet_path}
-								-sourcetab 4
-							</additionalOptions>
-							<doclint>all,-missing,-html</doclint>
-<!--
-							<links>
-								<link>https://javadoc.io/static/com.glazedlists/glazedlists/${version.glazedlists}</link>
-							</links>
--->
-						</configuration>
-						<executions>
-							<execution>
-								<id>attach-javadoc</id>
-								<phase>package</phase>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>${version.maven-gpg-plugin}</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-								<configuration>
-									<keyname>${gpg.keyname}</keyname>
-									<passphraseServerId>${gpg.keyname}</passphraseServerId>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>${version.nexus-staging-maven-plugin}</version>
-						<executions>
-							<execution>
-								<id>default-deploy</id>
-								<phase>deploy</phase>
-								<goals>
-									<goal>deploy</goal>
-								</goals>
-							</execution>
-						</executions>
-						<extensions>true</extensions>
-						<configuration>
-							<serverId>ossrh</serverId>
-							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>false</autoReleaseAfterClose>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<!-- java-9-plus profile
-			* set javac release=8
-			* javadoc
-			  - target html5
-			  - Newer javadoc complains about private methods/fields missing javadoc.
-			    So, at least for now, add "all,-missing"
-			  - Add ",-html" to avoid 'rel=' issue.
-
-			  Removing these checks is not too bad since there's a lot of
-			  dependency on the IDE for most checking.
-		-->
-		
-		
 		<!-- Hopefully we can comment this out now that we're requiring Java 11+.
 		<profile>
 			<id>java-9-plus</id>
@@ -503,21 +134,13 @@
 					<plugins>
 						<plugin>
 							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-compiler-plugin</artifactId>
-							<version>${version.maven-compiler-plugin}</version>
-							<configuration>
-								<release>${version.java}</release>
-							</configuration>
-						</plugin>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
 							<artifactId>maven-javadoc-plugin</artifactId>
-							<version>${version.maven-javadoc-plugin}</version>
 							<configuration>
 								<additionalOptions>-html5</additionalOptions>
 								<doclint>all,-missing,-html</doclint>
 								<links>
-									<link>https://javadoc.io/static/com.glazedlists/glazedlists/${version.glazedlists}</link>
+									<link>
+										https://javadoc.io/static/com.raelity.3rdparty.com.glazedlists/glazedlists/${version.glazedlists}</link>
 								</links>
 							</configuration>
 						</plugin>
@@ -526,7 +149,6 @@
 			</build>
 		</profile>
 		-->
-		
 	</profiles>
 
 </project>
