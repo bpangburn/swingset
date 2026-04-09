@@ -188,10 +188,16 @@ public class RowsModelEventHandling
 				operatorKind = _operatorKind;
 			else {
 				operatorKind = switch (compOrNav) {
-				case RSC _        -> OperatorKind.COMPONENT;
-				case RowsAction _ -> OperatorKind.ACTION;
-				case null         -> OperatorKind.UNKNOWN;
-				default -> throw new IllegalArgumentException("Must be RSC or RowsAction");
+			    case RSC ignored        -> OperatorKind.COMPONENT;
+			    case RowsAction ignored -> OperatorKind.ACTION;
+			    case null               -> OperatorKind.UNKNOWN;
+			    default -> throw new IllegalArgumentException("Must be RSC or RowsAction");
+// TODO: 2026-04-09_BP: Eclipse doesn't like Java 21 Preview features			    
+//				operatorKind = switch (compOrNav) {
+//				case RSC _        -> OperatorKind.COMPONENT;
+//				case RowsAction _ -> OperatorKind.ACTION;
+//				case null         -> OperatorKind.UNKNOWN;
+//				default -> throw new IllegalArgumentException("Must be RSC or RowsAction");
 				};
 			}
 			RowsEventSource eventSource = new RowsEventSource(

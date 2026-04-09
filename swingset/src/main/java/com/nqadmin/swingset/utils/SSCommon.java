@@ -929,18 +929,31 @@ final class SSCommon
 			ex_title = "Conversion Error";
 			ex_msg = e.getLocalizedMessage();
 		}
-		case SSSQLNullException _ -> {
+		case SSSQLNullException ignored -> {
 			ex_title = "Null Exception";
 			ex_msg = "Null values are not allowed for " + getBoundColumnName();
 		}
-		case SQLException _ -> {
+		case SQLException ignored -> {
 			ex_title = "SQL Exception";
 			ex_msg = "SQL Exception encountered for " + getBoundColumnName();
 		}
-		case NumberFormatException _ -> {
+		case NumberFormatException ignored -> {
 			ex_title = "Number Format Exception";
 			ex_msg = "Number Format Exception encountered for " + getBoundColumnName() + " converting " + value + " to a number.";
 		}
+// TODO: 2026-04-09_BP: Eclipse doesn't like Java 21 Preview features			    
+//		case SSSQLNullException _ -> {
+//			ex_title = "Null Exception";
+//			ex_msg = "Null values are not allowed for " + getBoundColumnName();
+//		}
+//		case SQLException _ -> {
+//			ex_title = "SQL Exception";
+//			ex_msg = "SQL Exception encountered for " + getBoundColumnName();
+//		}
+//		case NumberFormatException _ -> {
+//			ex_title = "Number Format Exception";
+//			ex_msg = "Number Format Exception encountered for " + getBoundColumnName() + " converting " + value + " to a number.";
+//		}
 		default -> {}
 		}
 		logger.log(WARNING, getBoundColumnName() + " - " + ex_title + ".", ex);
