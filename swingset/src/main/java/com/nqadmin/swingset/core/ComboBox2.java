@@ -52,6 +52,8 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.EventListener;
 import java.util.Iterator;
@@ -1565,4 +1567,209 @@ public abstract class ComboBox2<K,D,D2>
 		return sf("%s{item=%s, %s}", getClass().getSimpleName(),
 				getSelectedItem(), SSUtils.ssComponentToString(this));
 	}
+	
+	
+//=====================================================================================
+// 2026-01-05_BP: The code BELOW is needed for SwingSet 4.0.x compatibility
+//=====================================================================================
+	
+	/**
+	 * Adds an item to the existing list of items in the combo box.
+	 *
+	 * @param displayValue item that should be displayed in the combobox
+	 * @param key  key of displayValue, commonly a primary key
+	 */
+	@Deprecated
+	public void addOption(D displayValue, K key) {
+		addDisplayValue(displayValue, null, key);
+	}
+	
+	/**
+	 * Adds an item to the existing list of items in the combo box.
+	 *
+	 * @param displayValue item that should be displayed in the combobox
+	 * @param displayValue2  second display item for combobox
+	 * @param key  key of displayValue, commonly a primary key
+	 */
+	@Deprecated
+	public void addOption(D displayValue, D2 displayValue2, K key) {
+		addDisplayValue(displayValue, displayValue2, key);
+	}
+	
+	/**
+	 * Return the selected enum.
+	 * 
+	 * @return selected enum.
+	 * @throws IllegalStateException if not an enum.
+	 */
+	@Deprecated
+	public Enum<?> getSelectedEnum() {
+		return getChosenEnum();
+	}
+	
+	/**
+	 * Returns the key code corresponding to the currently selected item in the
+	 * combobox. Commonly, this is an underlying database record
+	 * primary key value corresponding to the currently selected item.
+	 *
+	 * @return returns the value associated with the selected item
+	 * OR null if nothing is selected.
+	 */
+	@Deprecated
+	public K getSelectedMapping() {
+		return getChosenKey();
+	}
+	
+	/**
+	 * Returns the Option corresponding to the currently selected item in the
+	 * combobox.
+	 *
+	 * @return returns the Option object associated with the selected item
+	 * OR null if nothing is selected.
+	 */
+	@Deprecated
+	public D getSelectedOption() {
+		return getChosenDisplayValue();
+	}
+	
+	/**
+	 * Adds an array of strings as combo box items
+	 * with {@literal [0-N)} mapping.
+	 * <p>
+	 * Convenience method for {@link #setOptions(java.util.List) }
+	 *
+	 * @param _options the list of options that you want to appear in the combo box.
+	 */
+	@Deprecated
+	public void setOptions(final String[] _options) {
+		//setDisplayValues(_options, null);
+		setOptions(_options, null);
+	}
+
+	/**
+	 * Sets the options to be displayed in the combo box and their corresponding
+	 * values. If _mappings is null generate a {@literal [0-N)} mapping.
+	 * 
+	 * Convenience method for
+	 * {@link #setOptions(java.util.List, java.util.List)}.
+	 *
+	 * @param _options  options to be displayed in the combo box.
+	 * @param _mappings integer values that correspond to the options in the combo
+	 *                  box. May be null for {@literal [0-N)} mapping
+	 *
+	 * @return returns true if the options and mappings are set successfully -
+	 *         returns false if the size of arrays do not match or if the values
+	 *         could not be set
+	 */
+	@Deprecated
+	public boolean setOptions(final String[] _options, final int[] _mappings) {
+		
+//		setDisplayValues(_options == null ? Collections.emptyList() : (List<D>) Arrays.asList(_options),
+//				_mappings == null ? Collections.emptyList() : (List<K>) Arrays.asList(_mappings));
+		
+		setDisplayValues(_options == null ? Collections.emptyList() :  (List<D>) Arrays.asList(_options),
+				_mappings == null ? Collections.emptyList() : (List<K>) Arrays.asList(_mappings));
+
+		return true;
+	}
+	
+	/**
+	 * Sets the options to be displayed in the list box along with
+	 * their corresponding mappings to database values. If {@code _mappings}
+	 * is null, then a zero to N-1 mapping is automatically established.
+	 * 
+	 * @param displayValues  options to be displayed in the list box.
+	 * @throws IllegalArgumentException if lists are not the same size.
+	 */
+	@Deprecated
+	public void setOptions(List<D> displayValues) {
+		setDisplayValues(displayValues);
+	}
+
+	/**
+	 * Sets the options to be displayed in the list box along with
+	 * their corresponding mappings to database values. If {@code _mappings}
+	 * is null, then a zero to N-1 mapping is automatically established.
+	 * 
+	 * @param displayValues  options to be displayed in the list box.
+	 * @param keys null or database values that correspond to the options, 1 to 1, in
+	 *					the list box.
+	 * @throws IllegalArgumentException if lists are not the same size.
+	 */
+	@Deprecated
+	public void setOptions(List<D> displayValues, List<K> keys) {
+		setDisplayValues(displayValues, keys);
+	}
+	
+	/**
+	 * Sets the options to be displayed in the combo box based on
+	 * the enum class' value's toString(). Generate a {@literal [0-N)}
+	 * mapping.
+	 *
+	 * @param <T> inferred enum type
+	 * @param _enumOptions enum class with values to display
+	 */
+	@Deprecated
+	public <T extends Enum<T>> void setOptions(Class<T> _enumOptions) {
+		setDisplayValues(_enumOptions);
+	}
+	
+	/**
+	 * Finds the listItem that matches the specified enum and make it the selected
+	 * listItem.
+	 *
+	 * @param _option select list item for this
+	 * @throws ClassCastException if _option is wrong enum type
+	 */
+	public void setSelectedEnum(Enum<?> _option) {
+		setChosenEnum(_option);
+	}
+	
+	/**
+	 * Sets the selected ComboBox item according to the specified mapping/key.
+	 * The selectedItem is set to nullItem or null if mapping not found.
+	 * <p>
+	 * If called from updateSSComponent() from a RowSet change then the Component
+	 * listener should already be turned off. Otherwise we want it on so the
+	 * ultimate call to setSelectedItem() will trigger an update the to RowSet.
+	 *
+	 * @param _mapping key of item value to assign to combobox,
+	 *                 which may or may not correlate to the combobox index
+	 */
+	public void setSelectedMapping(final K _mapping) {
+		setChosenKey(_mapping);
+	}
+	
+	/**
+	 * Finds the listItem having option that matches the specified option
+	 * and make it the selected listItem. If no matching item is found
+	 * the _option is used for {@link #setSelectedItem(java.lang.Object) 
+	 * setSelectedItem(_option)}
+	 *
+	 * @param _option option value of list item
+	 */
+	public void setSelectedOption(final D _option) {
+		setChosenDisplayValue(_option);
+	}
+	
+	/**
+	 * Update an option of an item in the combobox's item list based on a mapping
+	 * value.
+	 * <p>
+	 * If more than one item is present in the combo for that mapping, only the
+	 * first one is changed.
+	 *
+	 * @param _mapping typically a primary key value corresponding to the displayed
+	 *                 currentSelectedOption to be updated
+	 * @param _option  currentSelectedOption that should be updated in the combobox
+	 *
+	 * @return returns true if update is successful otherwise returns false.
+	 */
+	public boolean updateOption(final K _mapping, final D _option) {
+		return updateDisplayValue(_mapping, _option);
+	}
+
+//=====================================================================================
+// 2026-01-05_BP: The code ABOVE is needed for SwingSet 4.0.x compatibility
+//=====================================================================================
 }

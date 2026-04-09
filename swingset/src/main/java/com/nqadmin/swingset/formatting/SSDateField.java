@@ -57,6 +57,70 @@ import com.nqadmin.swingset.utils.SSUtils;
 
 @SuppressWarnings("serial")
 public class SSDateField extends DateTimeField {
+	
+	
+//=====================================================================================
+// 2026-01-06_BP: The code BELOW is needed for SwingSet 4.0.x compatibility
+//=====================================================================================
+	
+	/**
+	 * Constant for dd/MM/yyyy date format
+	 * @deprecated use {@link SSFormat#DATE_DDMMYYYY_SLASH}
+	 */
+	@Deprecated
+	public static final int DDMMYYYY = 1;
+
+	/**
+	 * Constant for MM/dd/yyyy date format
+	 * @deprecated use {@link SSFormat#DATE_MMDDYYYY_SLASH}
+	 */
+	@Deprecated
+	public static final int MMDDYYYY = 0;
+
+	/**
+	 * Constant for yyyy-MM-dd date format
+	 * @deprecated use {@link SSFormat#DATE_YYYYMMDD_STROKE}
+	 */
+	@Deprecated
+	public static final int YYYYMMDD = 2;
+	
+	/**
+	 * Returns Format enum for old style constant.
+	 * @param _format int constant for style
+	 * @return enum
+	 * @deprecated use enum, never int constants
+	 */
+	// NOTE: package private
+	@Deprecated
+	static SSFormat getFormat(final int _format) {
+		switch (_format) {
+		case MMDDYYYY:
+			return SSFormat.DATE_MMDDYYYY_SLASH;
+		case DDMMYYYY:
+			return SSFormat.DATE_DDMMYYYY_SLASH;
+		case YYYYMMDD:
+			return SSFormat.DATE_YYYYMMDD_STROKE;
+		default:
+			return SSFormat.DATE;
+		}
+	}
+	
+	/**
+	 *  Creates a new instance of SSDateField with the specified format
+	 *  @param format - format to be used while the date field is in edit mode
+	 *  allowed values are MMDDYYYY or DDMMYYYY
+	 * @deprecated use {@link SSDateField#SSDateField(SSFormat) }
+	 */
+	@Deprecated
+	public SSDateField(final int format) {
+		this(getFormat(format));
+	}
+		
+//=====================================================================================
+// 2026-01-06_BP: The code ABOVE is needed for SwingSet 4.0.x compatibility
+//=====================================================================================
+		
+	
 	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
 

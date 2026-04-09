@@ -49,6 +49,7 @@ import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EventListener;
 import java.util.List;
 import java.util.Objects;
@@ -550,4 +551,94 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 		return sf("%s{items=%s, %s}", getClass().getSimpleName(),
 				getChosenKeys(), SSUtils.ssComponentToString(this));
 	}
+	
+	
+//=====================================================================================
+// 2026-01-12_BP: The code BELOW is needed for SwingSet 4.0.x compatibility
+//=====================================================================================
+	
+	/**
+	 * @return a list with the mappings values corresponding to the selected indices
+	 */
+	public List<K> getSelectedMappings() {
+		return getChosenKeys();
+	}
+	
+	/**
+	 * Sets the options to be displayed in the combo box and their corresponding
+	 * values. If _mappings is null generate a {@literal [0-N)} mapping.
+	 * 
+	 * Convenience method for
+	 * {@link #setOptions(java.util.List, java.util.List)}.
+	 *
+	 * @param _options  options to be displayed in the list.
+	 * @param _mappings integer values that correspond to the options in the list.
+	 *                  May be null for {@literal [0-N)} mapping
+	 *
+	 * @return returns true if the options and mappings are set successfully -
+	 *         returns false if the size of arrays do not match or if the values
+	 *         could not be set
+	 */
+	@Deprecated
+	public boolean setOptions(final D[] _options, final K[] _mappings) {
+		
+//		setDisplayValues(_options == null ? Collections.emptyList() : (List<D>) Arrays.asList(_options),
+//				_mappings == null ? Collections.emptyList() : (List<K>) Arrays.asList(_mappings));
+		
+		setDisplayValues(_options == null ? Collections.emptyList() :  (List<D>) Arrays.asList(_options),
+				_mappings == null ? Collections.emptyList() : (List<K>) Arrays.asList(_mappings));
+
+		return true;
+	}
+	
+	/**
+	 * Sets the options to be displayed in the list box;
+	 * a zero to N-1 mapping is established.
+	 * 
+	 * @param _options  options to be displayed in the list box.
+	 */
+	public void setOptions(List<D> _options) {
+		setDisplayValues(_options, null);
+	}
+
+	/**
+	 * Sets the options to be displayed in the combo box based on
+	 * the enum class' value's toString(). Generate a {@literal [0-N)}
+	 * mapping.
+	 *
+	 * @param <T> inferred enum type
+	 * @param _enumOptions enum class with values to display
+	 */
+	public <T extends Enum<T>> void setOptions(Class<T> _enumOptions) {
+		setDisplayValues(_enumOptions);
+	}
+
+	/**
+	 * Sets the options to be displayed in the list box along with
+	 * their corresponding mappings to database values. If {@code _mappings}
+	 * is null, then a zero to N-1 mapping is automatically established.
+	 * 
+	 * @param _options  options to be displayed in the list box.
+	 * @param _mappings null or database values that correspond to the options, 1 to 1, in
+	 *					the list box.
+	 * @throws IllegalArgumentException if lists are not the same size.
+	 */
+	public void setOptions(List<D> _options, List<K> _mappings) {
+		setDisplayValues(_options, _mappings);
+	}
+	
+	/**
+	 * Selects appropriate elements in the list box
+	 *
+	 * @param _selectedMappings Values to be selected in list
+	 */
+	public void setSelectedValues(final Object[] _selectedMappings) {
+		setChosenKeys(_selectedMappings);
+	}
+
+//=====================================================================================
+// 2026-01-05_BP: The code ABOVE is needed for SwingSet 4.0.x compatibility
+//=====================================================================================
+	
+	
 }
