@@ -96,7 +96,7 @@ public class SSUtils {
 	 * If an existing RowsModel for the RowSet is
 	 * not found, a new RowsModel is created.
 	 * If {@link RowsModel#create(javax.sql.RowSet) }
-	 * is used multiple RowsModel can be created for the same RowsModel;
+	 * is used multiple RowsModel can be created for the same RowSet;
 	 * and see {@link RowsModel#getActiveRowModels(javax.sql.RowSet) }
 	 * <p>
 	 * Can also use as a transition aid to RowsModel.

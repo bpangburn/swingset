@@ -43,6 +43,7 @@ import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.sql.RowSet;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -53,6 +54,7 @@ import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 import static java.lang.System.Logger.Level.*;
@@ -258,7 +260,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 		}
 	}
 	
-	private static Logger logger = SSUtils.getLogger(); // Log4j Logger for component
+	private static final Logger logger = SSUtils.getLogger();
 
 	private SSDBComboBox comboNav; // Combo navigator.
 	private String comboNavDisplayColumn1 = null; // name of the 1st database column to display in the combo navigator
@@ -523,22 +525,16 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	}
 
 	/**
-	 * Initialize navigateActions
-	 */
-	private void initDataNavigator() {
-		updateDataNavigator();
-		getRowsModel().setDBNav(new FormHelperSSDBNavImpl(this));
-	}
-
-	/**
 	 * Initialize rowset and loads sql query results
 	 * 
 	 * @throws SQLException exception thrown while initializing rowset
 	 * @throws Exception exception thrown while initializing rowset
 	 */
-	private void initNewRowset() throws SQLException, Exception {
-		setRowsModel(SSUtils.findRowsModel(getNewRowSet(getConnection())));
-		updateRowset();
+	private void initRowsModel() throws SQLException, Exception {
+		RowSet rs = getNewRowSet(getConnection());
+		rs.setCommand(getRowsetQuery());
+		rs.execute();
+		setRowsModel(RowsModel.create(rs, new FormHelperSSDBNavImpl(this)));
 	}
 	
 	/**
@@ -550,10 +546,8 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 
 			// SETUP QUERY, DEFAULTS, and BUILD SCREEN
 			// SET ROWSET QUERY
-			initNewRowset();
-
 			// INITIALIZE NAVIGATION ACTIONS
-			initDataNavigator();
+			initRowsModel();
 			
 			// INITIALIZE COMBO NAVIGATOR
 			initComboNav();

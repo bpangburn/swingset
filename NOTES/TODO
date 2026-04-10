@@ -13,6 +13,9 @@ RowsModel.setRowSet() - better dbNav handling
     - Tweak (interim) RowsModel.create()
       can provide RowSet's SSDBNav and its default usage.
 
+      If there actually should be a default dbNav, shouldn't just be picked
+      up from the first dbNav that create sees. If null, use "new SSDBNav(){}"
+
 Split DBNav into DB-stuff/NavigatorState. 
 
 Is RowsAction.foreceEvent needed? Always generate event.

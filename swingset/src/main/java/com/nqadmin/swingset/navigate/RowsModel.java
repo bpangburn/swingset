@@ -107,7 +107,7 @@ public class RowsModel
 	private NavigateState navState;
 	private final RowsActions rowsActions;
 
-	private SSDBNav defaultDbNav;
+	private SSDBNav defaultDbNav; // TODO: remove this, buggy, for transitional.
 
 	/** simplify switches back/forth */
 	public static boolean ENABLED = true;
@@ -219,10 +219,9 @@ public class RowsModel
 	 * @return
 	 * @throws SQLException 
 	 */
-	static int verifyExecuted(RowSet rs) {
-		int initial_row = 0;
+	static void verifyExecuted(RowSet rs) {
 		try {
-			initial_row = rs.getRow();
+			int initial_row = rs.getRow(); // exception if RowSet not executed.
 			if (initial_row == 0)
 				rs.beforeFirst();
 		} catch (SQLException ex) {
@@ -234,7 +233,6 @@ public class RowsModel
 				logger.log(Level.ERROR, "execute() SQL Exception", ex1);
 			}
 		}
-		return initial_row;
 	}
 
 	/**

@@ -407,7 +407,8 @@ final class NavigateState
 	private void setupRowSet()
 	{
 		try {
-			int initial_row = RowsModel.verifyExecuted(getRowSet());
+			RowsModel.verifyExecuted(getRowSet());
+			int initial_row = getRowSet().getRow();
 
 			if (initial_row != 0) {
 				getRowSet().last();

@@ -46,6 +46,7 @@ import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.sql.RowSet;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -54,7 +55,9 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.table.TableCellEditor;
 
+import com.nqadmin.swingset.SSDBNav;
 import com.nqadmin.swingset.SSDataGrid;
+import com.nqadmin.swingset.navigate.RowsModel;
 
 //SSDataGridScreenHelper.java
 //
@@ -321,9 +324,11 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 	 * @throws SQLException exception thrown while initializing rowset
 	 * @throws Exception exception thrown while initializing rowset
 	 */
-	private void initNewRowset() throws SQLException, Exception {
-		setRowsModel(SSUtils.findRowsModel(getNewRowSet(getConnection())));
-		updateRowset();
+	private void initRowsModel() throws SQLException, Exception {
+		RowSet rs = getNewRowSet(getConnection());
+		rs.setCommand(getRowsetQuery());
+		rs.execute();
+		setRowsModel(RowsModel.create(rs, new SSDBNav(){}));
 	}
 	
 	/**
@@ -335,13 +340,13 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 		try {
 			// SETUP QUERY, DEFAULTS, and BUILD SCREEN
 			// SET ROWSET QUERY
-			initNewRowset();
+			initRowsModel();
 			
 			// SET TABLE/GRID HEADERS
 			dataGrid.setHeaders(getHeaders());
 
 			// SET ROWSET FOR DATAGRID
-			dataGrid.setRowSet(getRowset());
+			dataGrid.setRowsModel(getRowsModel());
 			
 			// SET PRIMARY COLUMN
 			dataGrid.setPrimaryColumn(getPkColumn());
