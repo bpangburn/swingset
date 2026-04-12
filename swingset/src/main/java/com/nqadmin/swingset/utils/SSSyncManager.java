@@ -170,11 +170,12 @@ public class SSSyncManager
 				
 				count++;
 				
-				logger.log(WARNING, "SSSyncManager RowSet and SSDBComboBox values "
+				final int tcount = count;
+				logger.log(WARNING, () -> "SSSyncManager RowSet and SSDBComboBox values "
 						+ "do not match for the same index. This can be caused by "
 						+ "SSDBComboBox and RowSet queries not selecting the same "
 						+ "records in the same order. Looping through each record "
-						+ "for a match. Check # " + count + ".");
+						+ "for a match. Check # " + tcount + ".");
 				
 				// Often records are just slightly out of order so a better
 				// strategy would be to move backwards by some small offset
@@ -203,7 +204,7 @@ public class SSSyncManager
 				if (count > (numRecords + OVERLAP_TO_CHECK)) {
 					// TODO: is this needed?
 					comboBox.repaint();
-					logger.log(WARNING, "SSSyncManager unable to find a record matching the selection in the dropdown list: " + comboBox.getSelectedStringValue() + ".");
+					logger.log(WARNING, () -> "SSSyncManager unable to find a record matching the selection in the dropdown list: " + comboBox.getSelectedStringValue() + ".");
 					// JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin
 					// about this","Row not found",JOptionPane.OK_OPTION);
 					break;
@@ -268,11 +269,12 @@ public class SSSyncManager
 				
 				count++;
 				
-				logger.log(WARNING, "SSSyncManager RowSet and SSDBComboBox values "
+				final int tcount = count;
+				logger.log(WARNING, () -> "SSSyncManager RowSet and SSDBComboBox values "
 						+ "do not match for the same index. This can be caused by "
 						+ "SSDBComboBox and RowSet queries not selecting the same "
 						+ "records in the same order. Looping through each record "
-						+ "for a match. Check # " + count + ".");
+						+ "for a match. Check # " + tcount + ".");
 				
 				// Often records are just slightly out of order so a better
 				// strategy would be to move backwards by some small offset
@@ -302,7 +304,7 @@ public class SSSyncManager
 				if (count > (numRecords + OVERLAP_TO_CHECK)) {
 					// TODO: is this needed?
 					comboBox.repaint();
-					logger.log(WARNING, "SSSyncManager unable to find a record matching the selection in the dropdown list: " + comboBox.getSelectedStringValue() + ".");
+					logger.log(WARNING, () -> "SSSyncManager unable to find a record matching the selection in the dropdown list: " + comboBox.getSelectedStringValue() + ".");
 					// JOptionPane.showInternalMessageDialog(this,"Record deleted. Info the admin
 					// about this","Row not found",JOptionPane.OK_OPTION);
 					break;
@@ -413,7 +415,7 @@ public class SSSyncManager
 	public SSSyncManager(SSDBComboBox comboBox, RowsModel rowsModel) {
 		this.comboBox = comboBox;
 		this.rowsModel = rowsModel;
-		rowsModel.setNavCombo(comboBox);
+		rowsModel.setNavCombo(comboBox, this);
 		if (comboBox.getLogColumnName() == null) {
 			comboBox.setLogColumnName(sf("**ComboBoxNavigator@%x**",
 					System.identityHashCode(comboBox)));

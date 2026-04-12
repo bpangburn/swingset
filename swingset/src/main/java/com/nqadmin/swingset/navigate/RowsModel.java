@@ -58,6 +58,7 @@ import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.RowsEventSource;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.SimpleEvents;
 import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
 import com.raelity.lib.eventbus.WeakEventBus;
 
@@ -140,6 +141,21 @@ public class RowsModel
 	public static RowsModel create(RowSet rs, SSDBNav dbNav) {
 		RowsModel rowsModel = new RowsModel(rs, dbNav);
 		return rowsModel;
+	}
+
+	/**
+	 * @return
+	 */
+	public static int count() {
+		// Can't depend on size() method when weakKeys.
+		return SSUtils.size(activeRowModels);
+	}
+
+	/**
+	 * @return
+	 */
+	public static int navCount() {
+		return NavigateState.count();
 	}
 
 	/**
@@ -245,7 +261,7 @@ public class RowsModel
 				objectID(this), objectID(getRowSet()), objectID(rs)));
 
 		if (isDirty())
-			//throw new IllegalStateException("trying to replace dirty RowSet");
+			//throw new IllegalStateException("oldRS dirty"); ???
 			logger.log(INFO, "oldRS dirty");
 
 		if (rs != null) {
@@ -254,7 +270,7 @@ public class RowsModel
 			// TODO: Probably need a setRowSet variant that allows replacing dirty rowSet
 			NavigateState newNS = NavigateState.get(rs);
 			if (newNS != null && newNS.undoRow.isDirty())
-				//throw new IllegalStateException("newRS dirty; row gets committed");
+				//throw new IllegalStateException("newRS dirty"); ???
 				logger.log(INFO, "newRS dirty");
 
 			// Check for component binding compatibility here
@@ -288,6 +304,11 @@ public class RowsModel
 
 		rowSetListener.registerTo(rs);
 		enq.postNewRowSetEvent(this, oldRowSet);
+	}
+
+	// TODO: is this path OK?
+	void syncSyncManager() {
+		getNavState().syncSyncManager();
 	}
 
 	/**
@@ -763,15 +784,25 @@ public class RowsModel
 
 	/**
 	 * @param navCombo the navCombo to set
+	 * @deprecated use {@linkplain RowsModel#setNavCombo(com.nqadmin.swingset.SSDBComboBox, com.nqadmin.swingset.utils.SSSyncManager) }
 	 */
+	@Deprecated
 	public void setNavCombo(SSDBComboBox navCombo) {
-		navState.setNavCombo(navCombo);
+		setNavCombo(navCombo, null);
+	}
+
+	/**
+	 * @param navCombo the navCombo used with this RowsModel
+	 * @param syncer
+	 */
+	public void setNavCombo(SSDBComboBox navCombo, SSSyncManager syncer) {
+		navState.setNavCombo(navCombo, syncer);
 	}
 
 	/**
 	 * @return the navCombo
 	 */
-	// TODO: what's this about
+	// TODO: what's this about? Remove it.
 	public SSDBComboBox getNavCombo() {
 		return navState.getNavCombo();
 	}

@@ -55,8 +55,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
 import java.util.logging.SimpleFormatter;
@@ -206,6 +208,25 @@ public class SSUtils {
 
 		// TODO:
 		// UIManager.getLookAndFeel().provideErrorFeedback(JFormattedTextField.this);
+	}
+
+	/**
+	 * Get the size of a map taking into account possible weak keys.
+	 * 
+	 * @param map get size of this map
+	 * @return map size
+	 */
+	@SuppressWarnings("null")
+	public static int size(Map<?,?> map)
+	{
+		if (!(map instanceof ConcurrentMap))
+			return map.size();
+		// Can't depend on size() method when weakKeys.
+		int counter = 0;
+		for (Map.Entry<?, ?> _ : map.entrySet()) {
+			counter++;
+		}
+		return counter;
 	}
 
 	/**

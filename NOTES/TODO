@@ -61,6 +61,8 @@ External controls
     - DBNav
     - NavCombo
 
+Allow multiple NavCombo for a RowSet?
+
 In RowsActions, ACT_REFRESH has "if (callExecute)", when false does nothing; with
 an unconditional "getNavState().dBNav.performRefreshOps()" after the if. The
 implmentations of dBNav.performRefreshOps() are related to syncManager; used in a

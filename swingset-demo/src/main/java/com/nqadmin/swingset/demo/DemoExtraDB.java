@@ -103,7 +103,7 @@ public class DemoExtraDB
 			RowSet rs = cur.getValue();
 			if (rs != keepRS) {
 				// TODO: Could monitor rowSet objects and check this when collected.
-				if (RowSetState.getRowSetState(rs).isDirty())
+				if (RowSetState.isDirty(rs))
 					logger.log(Level.WARNING, () -> 
 							sf("deref dirty RowSet %s", SSUtils.objectID(rs)));
 				it.remove();

@@ -421,7 +421,7 @@ public class RowSetOps {
 		case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR ->
 									rs.getString(cIdx);
 		default -> {
-			logger.log(WARNING, "Unknown data type of " + comp.getBoundColumnJDBCType());
+			logger.log(WARNING, () -> "Unknown data type of " + comp.getBoundColumnJDBCType());
 			yield rs.getObject(cIdx);
 		}
 		};
@@ -573,7 +573,7 @@ public class RowSetOps {
 			case DATE, TIME, TIMESTAMP ->
 				value = DateTime.getDateTimeText(objectValue, comp);
 			default -> // TODO: SSSQLExceptionUnhandledType
-				logger.log(ERROR, "Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
+				logger.log(ERROR, () -> "Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
 			} // end switch
 			//
 			// TODO: Convert this to use java.time.LocalDate, LocalTime,
@@ -762,7 +762,7 @@ public class RowSetOps {
 	 */
 	private static void updateColumnArray(final SSComponentInterface comp, final RowSet _rowSet, final SSArray _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException
 	{
-		logger.log(DEBUG, "[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
+		logger.log(DEBUG, () -> "[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
 		UndoRedo.captureInitialValue(comp); // undo/redo
 
@@ -817,7 +817,7 @@ public class RowSetOps {
 		final RowSet rowSet = comp.getRowSet();
 		final int columnIndex = comp.getBoundColumnIndex();
 		boolean allowNull = comp.getAllowNull();
-		logger.log(DEBUG,  comp.getColumnForLog() + " Update to: " + updatedValue + ". Allow null? [" + allowNull + "]");
+		logger.log(DEBUG, () -> comp.getColumnForLog() + " Update to: " + updatedValue + ". Allow null? [" + allowNull + "]");
 
 		UndoRedo.captureInitialValue(comp); // undo/redo
 
@@ -972,7 +972,7 @@ public class RowSetOps {
 		JDBCType jdbcType = getJDBCType(getColumnType(rowSet, columnIndex));
 		
 		if (!textUpdateOK.contains(jdbcType)) {
-			logger.log(ERROR, "Unsupported data type of " + jdbcType.getName() + " for column " + comp.getColumnForLog() + ".");
+			logger.log(ERROR, () -> "Unsupported data type of " + jdbcType.getName() + " for column " + comp.getColumnForLog() + ".");
 			return;
 		}
 
@@ -1168,7 +1168,7 @@ public class RowSetOps {
 				//
 				// TODO: SSSQLExceptionUnhandledType
 				//
-				-> logger.log(ERROR, "Unknown data type of " + type);
+				-> logger.log(ERROR, () -> "Unknown data type of " + type);
 		}
 	}
 

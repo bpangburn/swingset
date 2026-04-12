@@ -84,6 +84,7 @@ Git/Maven:
   SwingSet Library:
     `cd ./swingset/swingset/`
     `mvn clean package -Prelease`   # javadoc target/reports/apidocs/index.html
+        # jar:file:///.../target/swingset-5.0.0-SNAPSHOT-javadoc.jar!/index.html
 
 ## DEPENDENCY INTEGRATION
 

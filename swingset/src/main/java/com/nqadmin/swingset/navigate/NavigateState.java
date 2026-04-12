@@ -46,6 +46,7 @@ import java.lang.System.Logger;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -54,16 +55,17 @@ import javax.swing.Action;
 import javax.swing.ButtonModel;
 import javax.swing.SpinnerNumberModel;
 
+import com.google.common.collect.MapMaker;
 import com.nqadmin.swingset.*;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
 import com.raelity.lib.eventbus.WeakEventBus;
 import com.raelity.lib.eventbus.WeakSubscribe;
 
-import static com.nqadmin.swingset.navigate.RowSetState.setNavigateState;
 import static com.nqadmin.swingset.navigate.RowsAction.*;
 import static com.nqadmin.swingset.navigate.UndoRedo.isUndoRedoEnabled;
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
@@ -160,7 +162,7 @@ final class NavigateState
 	////////////////////////////////////////////////////////////////////////////
 	//
 	// TODO: Consider
-	// Should the usage of these static access functions should probably
+	// The usage of these static access functions should probably
 	// be reduced, if not eliminated, in favor of including a navAction
 	// reference in the SSComponent.
 	//
@@ -180,9 +182,20 @@ final class NavigateState
 	synchronized static NavigateState getOrCreate(RowSet rowSet)
 	{
 		Objects.requireNonNull(rowSet);
-		NavigateState navState = RowSetState.getNavigateState(rowSet);
-		if (navState == null)
-			setNavigateState(rowSet, navState = new NavigateState(null));
+		//NavigateState navState = RowSetState.getNavigateState(rowSet);
+		NavigateState navState = get(rowSet);
+		if (navState == null) {
+			// RowSetState.setNavigateState(rowSet, navState = new NavigateState(null));
+			navState = new NavigateState(null); // TODO: why null?
+			if (navState.rowSetState != null)
+				throw new IllegalStateException("navState.rowSetState not null");
+
+			// At least for now, some of the RowSetState can be there without NavState.
+			// if (RowSetState.getExistingRowSetState(rowSet) != null)
+			// 	throw new IllegalStateException("RowSetState.get... not null");
+
+			navState.rowSetState = RowSetState.getRowSetState(rowSet);
+		}
 		return navState;
 	}
 
@@ -197,7 +210,19 @@ final class NavigateState
 	synchronized static NavigateState get(RowSet rowSet)
 	{
 		Objects.requireNonNull(rowSet);
-		return RowSetState.getNavigateState(rowSet);
+		//return RowSetState.getNavigateState(rowSet);
+		return navigateState.get(rowSet);
+	}
+
+	private static final Map<RowSet,NavigateState> navigateState
+			= new MapMaker().weakKeys().weakValues().makeMap();
+
+	/**
+	 * @return
+	 */
+	static int count() {
+		// Can't depend on size() method when weakKeys.
+		return SSUtils.size(navigateState);
 	}
 
 
@@ -347,7 +372,9 @@ final class NavigateState
 	 * <p>
 	 * TODO Consider writing a PropertyChangeListener for onInsertRow instead.
 	 */
-	/*private*/ SSDBComboBox navCombo = null;
+	private SSDBComboBox navCombo = null;
+
+	private SSSyncManager syncer = null;
 
 	/** Number of rows in RowSet. Set to zero if next() method returns false. */
 	/*private*/ int rowCount = 0;
@@ -358,6 +385,8 @@ final class NavigateState
 	/** Indicates if rowset listener is added (or removed) */
 	// XXX
 	/*private*/ boolean rowsetListenerAdded = false;
+
+	private RowSetState rowSetState;
 
 	/**
 	 * Create actions and models for the RowSet.Note that _rowSet may be null for a Dummy.
@@ -395,6 +424,7 @@ final class NavigateState
 		if (this.rowSet != null)
 			throw new IllegalStateException("NavState already has a RowSet");
 		this.rowSet = rowSet;
+		navigateState.put(rowSet, this);
 		setupRowSet();
 	}
 
@@ -771,19 +801,27 @@ final class NavigateState
 		return dBNav;
 	}
 
-	/**
-	 * @param navCombo the navCombo to set
-	 */
-	public void setNavCombo(SSDBComboBox navCombo) {
+	// TODO: handle multipble navCombo?
+	void setNavCombo(SSDBComboBox navCombo, SSSyncManager syncer) {
+		Objects.requireNonNull(navCombo);
+		// TODO: Objects.requireNonNull(syncer);
+		if (this.navCombo != null)
+			throw new IllegalStateException("navCombo already set");
 		this.navCombo = navCombo;
+		this.syncer = syncer;
 	}
 
 	/**
 	 * @return the navCombo
 	 */
 	// TODO: what's this about
-	public SSDBComboBox getNavCombo() {
+	/*public*/ SSDBComboBox getNavCombo() {
 		return navCombo;
+	}
+
+	void syncSyncManager() {
+		if (syncer != null)
+			syncer.sync();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -794,6 +832,11 @@ final class NavigateState
 	/** Indicator that current row is dirty. */
 	//private boolean isRowModified = false;
 
+	void setNavComboEnabled(boolean b)
+	{
+		if (navCombo != null)
+			navCombo.setEnabled(b);
+	}
 
 	/** Going to a new row, or undo updates, or refresh row. */
 	/*private*/ void freshRow()
@@ -926,6 +969,7 @@ final class NavigateState
 		updateEnable(ACT_NEXT, canNavigate && !atLast);
 		updateEnable(ACT_LAST, canNavigate && !atLast);
 		updateEnable(ACT_GOTOROW, canNavigate);
+		setNavComboEnabled(canNavigate);
 
 		// Handle commit, undo
 		boolean commitUndoOk = writable

@@ -424,7 +424,8 @@ final class RowsActions
 			startNavigationAction(ACT_REVERT);
 			try {
 				// CALL MOVE TO CURRENT ROW IF ON INSERT ROW.
-				if (RowSetState.isInserting(getRowSet())) {
+				boolean wasInserting = RowSetState.isInserting(getRowSet());
+				if (wasInserting) {
 					getRowSet().moveToCurrentRow();
 				}
 
@@ -452,9 +453,10 @@ final class RowsActions
 								(ssc) -> SSUtils.issueRowChanged_HACK(ssc));
 					}
 				}
+
 				setInserting(getRowSet(), false);
 				getNavState().dBNav.performCancelOps();
-				
+
 				// Only attempt to refresh row if we have at least one record
 				if (getRowSet().getRow() > 0) {
 					getRowSet().refreshRow();
@@ -462,7 +464,8 @@ final class RowsActions
 				
 				getNavState().freshRow();
 				getNavState().updateNavigator();
-				
+				if (wasInserting)
+					rowsModel.syncSyncManager(); // TODO does this seem right.
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
 				JOptionPane.showMessageDialog(dlgParent(e),
@@ -559,9 +562,6 @@ final class RowsActions
 				// Move to insert row, update status, and update combo navigator (if applicable)
 				getRowSet().moveToInsertRow();
 				setInserting(getRowSet(), true);
-				if (getNavState().navCombo!=null) {
-					getNavState().navCombo.setEnabled(false);
-				}
 
 				//
 				// TODO:
