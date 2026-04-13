@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset;
 
 import java.awt.Component;
@@ -84,7 +89,7 @@ public class SSTableModel extends AbstractTableModel {
 	/**
 	 * Log4j Logger for component
 	 */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Indicator to determine if insertions are allowed.
@@ -262,7 +267,7 @@ public class SSTableModel extends AbstractTableModel {
 	public String getColumnName(final int _columnNumber) {
 		if (headers != null) {
 			if (_columnNumber < headers.length) {
-				logger.log(DEBUG, "Sending header " + headers[_columnNumber]);
+				logger.log(DEBUG, () -> "Sending header " + headers[_columnNumber]);
 				return headers[_columnNumber];
 			}
 		}
@@ -512,7 +517,7 @@ public class SSTableModel extends AbstractTableModel {
 			while (iterator.hasNext()) {
 				final Integer column = (Integer) iterator.next();
 
-				logger.log(DEBUG, "Column number is:" + column);
+				logger.log(DEBUG, () -> "Column number is:" + column);
 				
 				// COLUMNS SPECIFIED START FROM 0 BUT FOR SSROWSET THEY START FROM 1
 				//final int type = rowset.getColumnType(column.intValue() + 1);

@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
@@ -565,6 +565,7 @@ public class SSDataNavigator extends JPanel
 	private final List<AbstractButton> uiButtons;
 
 	/** These are added in order to this JPanel */
+	@SuppressWarnings("FinalPrivateMethod")
 	private final List<JComponent> uiComponents()
 	{
 		return List.of(
@@ -583,6 +584,7 @@ public class SSDataNavigator extends JPanel
 	}
 
 	/** The buttons can often be handled en masse */
+	@SuppressWarnings("FinalPrivateMethod")
 	private final List<AbstractButton> uiButtons()
 	{
 		return List.of(

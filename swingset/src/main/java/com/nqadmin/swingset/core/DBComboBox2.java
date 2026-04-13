@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
@@ -64,13 +64,15 @@ import static java.lang.System.Logger.Level.*;
 
 /**
  * Similar to the ComboBox, but used when both the 'bound' values and the
- * 'display' values are pulled from a database table. The bound value is called the 'mapping' and the display value the 'option'. An 'option2' may be specified; in that case the display value
- for the mapping is a composite of option and option2.Generally the mapping 
- represents a foreign key to another table, and the combobox needs to display
- a list of one (or more) columns from the other table.<p>
- Several methods inherited from ComboBox2 directly manipulate the
- combobox contents. These methods throw UnsupportedOperationException.
- <p>
+ * 'display' values are pulled from a database table. The bound value is called
+ * the 'mapping' and the display value the 'option'. An 'option2' may be
+ * specified; in that case the display value for the mapping is a composite of
+ * option and option2.Generally the mapping represents a foreign key to another
+ * table, and the combobox needs to display a list of one (or more) columns from
+ * the other table.<p>
+ * Several methods inherited from ComboBox2 directly manipulate the combobox
+ * contents. These methods throw UnsupportedOperationException.
+ * <p>
  * <b>Warning. This combobox may use GlazedLists which changes the contents
  * of the combo box and an item is automatically
  * inserted when {@link #getAllowNull()} is true. Do not use methods
