@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
@@ -55,8 +55,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
 import java.util.logging.SimpleFormatter;
@@ -96,7 +98,7 @@ public class SSUtils {
 	 * If an existing RowsModel for the RowSet is
 	 * not found, a new RowsModel is created.
 	 * If {@link RowsModel#create(javax.sql.RowSet) }
-	 * is used multiple RowsModel can be created for the same RowsModel;
+	 * is used multiple RowsModel can be created for the same RowSet;
 	 * and see {@link RowsModel#getActiveRowModels(javax.sql.RowSet) }
 	 * <p>
 	 * Can also use as a transition aid to RowsModel.
@@ -206,6 +208,25 @@ public class SSUtils {
 
 		// TODO:
 		// UIManager.getLookAndFeel().provideErrorFeedback(JFormattedTextField.this);
+	}
+
+	/**
+	 * Get the size of a map taking into account possible weak keys.
+	 * 
+	 * @param map get size of this map
+	 * @return map size
+	 */
+	@SuppressWarnings("null")
+	public static int size(Map<?,?> map)
+	{
+		if (!(map instanceof ConcurrentMap))
+			return map.size();
+		// Can't depend on size() method when weakKeys.
+		int counter = 0;
+		for (Map.Entry<?, ?> _ : map.entrySet()) {
+			counter++;
+		}
+		return counter;
 	}
 
 	/**

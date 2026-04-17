@@ -553,7 +553,12 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 
 	/**
-	 * Updates rowset with sql query results
+	 * Updates rowset with sql query results.
+	 * 
+	 * TODO: Should the idea be something like
+	 *			theScreen.getRowsModel.setRowSet(rs)
+	 *	 Note that the rs has the query,
+	 *	 Or maybe the intent of this is setQuery() or updateQuery or...
 	 *
 	 * @throws SQLException SQL exception thrown while updating the rowset
 	 * @throws Exception exception thrown while updating the rowset

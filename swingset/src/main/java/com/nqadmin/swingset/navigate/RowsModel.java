@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2025, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2025-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -58,6 +58,7 @@ import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.RowsEventSource;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.SimpleEvents;
 import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
 import com.raelity.lib.eventbus.WeakEventBus;
 
@@ -107,7 +108,7 @@ public class RowsModel
 	private NavigateState navState;
 	private final RowsActions rowsActions;
 
-	private SSDBNav defaultDbNav;
+	private SSDBNav defaultDbNav; // TODO: remove this, buggy, for transitional.
 
 	/** simplify switches back/forth */
 	public static boolean ENABLED = true;
@@ -140,6 +141,21 @@ public class RowsModel
 	public static RowsModel create(RowSet rs, SSDBNav dbNav) {
 		RowsModel rowsModel = new RowsModel(rs, dbNav);
 		return rowsModel;
+	}
+
+	/**
+	 * @return
+	 */
+	public static int count() {
+		// Can't depend on size() method when weakKeys.
+		return SSUtils.size(activeRowModels);
+	}
+
+	/**
+	 * @return
+	 */
+	public static int navCount() {
+		return NavigateState.count();
 	}
 
 	/**
@@ -219,10 +235,9 @@ public class RowsModel
 	 * @return
 	 * @throws SQLException 
 	 */
-	static int verifyExecuted(RowSet rs) {
-		int initial_row = 0;
+	static void verifyExecuted(RowSet rs) {
 		try {
-			initial_row = rs.getRow();
+			int initial_row = rs.getRow(); // exception if RowSet not executed.
 			if (initial_row == 0)
 				rs.beforeFirst();
 		} catch (SQLException ex) {
@@ -234,7 +249,6 @@ public class RowsModel
 				logger.log(Level.ERROR, "execute() SQL Exception", ex1);
 			}
 		}
-		return initial_row;
 	}
 
 	/**
@@ -247,7 +261,7 @@ public class RowsModel
 				objectID(this), objectID(getRowSet()), objectID(rs)));
 
 		if (isDirty())
-			//throw new IllegalStateException("trying to replace dirty RowSet");
+			//throw new IllegalStateException("oldRS dirty"); ???
 			logger.log(INFO, "oldRS dirty");
 
 		if (rs != null) {
@@ -256,7 +270,7 @@ public class RowsModel
 			// TODO: Probably need a setRowSet variant that allows replacing dirty rowSet
 			NavigateState newNS = NavigateState.get(rs);
 			if (newNS != null && newNS.undoRow.isDirty())
-				//throw new IllegalStateException("newRS dirty; row gets committed");
+				//throw new IllegalStateException("newRS dirty"); ???
 				logger.log(INFO, "newRS dirty");
 
 			// Check for component binding compatibility here
@@ -290,6 +304,11 @@ public class RowsModel
 
 		rowSetListener.registerTo(rs);
 		enq.postNewRowSetEvent(this, oldRowSet);
+	}
+
+	// TODO: is this path OK?
+	void syncSyncManager() {
+		getNavState().syncSyncManager();
 	}
 
 	/**
@@ -765,15 +784,25 @@ public class RowsModel
 
 	/**
 	 * @param navCombo the navCombo to set
+	 * @deprecated use {@linkplain RowsModel#setNavCombo(com.nqadmin.swingset.SSDBComboBox, com.nqadmin.swingset.utils.SSSyncManager) }
 	 */
+	@Deprecated
 	public void setNavCombo(SSDBComboBox navCombo) {
-		navState.setNavCombo(navCombo);
+		setNavCombo(navCombo, null);
+	}
+
+	/**
+	 * @param navCombo the navCombo used with this RowsModel
+	 * @param syncer
+	 */
+	public void setNavCombo(SSDBComboBox navCombo, SSSyncManager syncer) {
+		navState.setNavCombo(navCombo, syncer);
 	}
 
 	/**
 	 * @return the navCombo
 	 */
-	// TODO: what's this about
+	// TODO: what's this about? Remove it.
 	public SSDBComboBox getNavCombo() {
 		return navState.getNavCombo();
 	}

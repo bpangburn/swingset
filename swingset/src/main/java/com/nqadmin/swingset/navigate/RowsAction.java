@@ -38,11 +38,12 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
 import javax.sql.RowSet;
+import javax.sql.RowSetEvent;
 
 /**
  * Actions for working with {@link RowSet}s; used with
@@ -89,6 +90,12 @@ public enum RowsAction
 		forceEvent = special;
 	}
 
+	/**
+	 * Flag means to create a {@link RowsEvent} for this {@code RowsAction}
+	 * even if there is no associated {@link RowSetEvent}.
+	 * 
+	 * @return true means unconditionally create event
+	 */
 	public boolean forceEvent()
 	{
 		return forceEvent;

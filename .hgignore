@@ -9,5 +9,4 @@ syntax: glob
 *.rej
 
 syntax: rootglob
-NOTES/DOING
 tags

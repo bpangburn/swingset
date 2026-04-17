@@ -95,6 +95,7 @@ import static java.lang.System.Logger.Level.*;
  *    rs.setDataSourceName(DataSourcePool.DATA_SOURCE_NAME);
  * }
  */
+@SuppressWarnings("ClassWithMultipleLoggers")
 public class DemoUtil { 
 	private DemoUtil() { }
 	private static final Logger logger = System.getLogger(MainClass.class.getName());
@@ -532,7 +533,7 @@ public class DemoUtil {
 		try {
 			conn = DriverManager.getConnection(url, props);
 		} catch (SQLException ex) {
-			logger.log(ERROR, "SQL Exception. " + ex.getMessage());
+			logger.log(ERROR, () -> "SQL Exception. " + ex.getMessage());
 		}
 		return conn;
 	}

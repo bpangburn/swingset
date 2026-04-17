@@ -100,7 +100,8 @@ Git/Maven:
     
   SwingSet Demo:
     `cd ./swingset/swingset-demo/`
-    `mvn clean package -Prelease`
+    `### mvn clean package -Prelease`
+    `mvn clean package`
     `cd target`
     `java -jar swingset-demo-X.Y.Z-jar-with-dependencies.jar`
 

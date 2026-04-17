@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2025, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2025-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -37,6 +37,7 @@ import javax.sql.RowSet;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -110,6 +111,11 @@ public abstract class RowSetButtons extends JPanel
 		create();
 	}
 
+	private void outStuff() {
+		logger.log(Level.INFO, () -> sf("Active: RSState %d, NavState %d, RModel %d",
+				RowSetState.count(), RowsModel.navCount(), RowsModel.count()));
+	}
+
 	private void init() {
 		JButton button;
 		String text;
@@ -120,6 +126,7 @@ public abstract class RowSetButtons extends JPanel
 		button.addActionListener((e) -> {
 			tableLoopIncr();
 			nextRowSetButtonPush();
+			outStuff();
 		});
 
 		text = "<html><center>null<br>RS</center></html>";
@@ -127,6 +134,7 @@ public abstract class RowSetButtons extends JPanel
 		add(button);
 		button.addActionListener((e) -> {
 			nullRowSet();
+			outStuff();
 		});
 
 		// TODO: could toggle weak/strong
@@ -135,6 +143,7 @@ public abstract class RowSetButtons extends JPanel
 		add(button);
 		button.addActionListener((e) -> {
 			DemoExtraDB.derefSupplierData(null);
+			outStuff();
 		});
 
 		text = "<html><center>clean<br>DB</center></html>";
@@ -142,6 +151,7 @@ public abstract class RowSetButtons extends JPanel
 		add(button);
 		button.addActionListener((e) -> {
 			create();
+			outStuff();
 		});
 
 		text = "<html><center>garb<br>coll</center></html>";
@@ -149,6 +159,7 @@ public abstract class RowSetButtons extends JPanel
 		add(button);
 		button.addActionListener((e) -> {
 			System.gc();
+			outStuff();
 		});
 	}
 

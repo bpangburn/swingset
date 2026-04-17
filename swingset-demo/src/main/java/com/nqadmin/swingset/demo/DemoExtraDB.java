@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2025, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2025-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -103,7 +103,7 @@ public class DemoExtraDB
 			RowSet rs = cur.getValue();
 			if (rs != keepRS) {
 				// TODO: Could monitor rowSet objects and check this when collected.
-				if (RowSetState.getRowSetState(rs).isDirty())
+				if (RowSetState.isDirty(rs))
 					logger.log(Level.WARNING, () -> 
 							sf("deref dirty RowSet %s", SSUtils.objectID(rs)));
 				it.remove();

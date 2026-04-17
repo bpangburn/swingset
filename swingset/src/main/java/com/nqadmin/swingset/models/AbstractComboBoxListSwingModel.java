@@ -35,9 +35,15 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
 import java.awt.Component;
+import java.lang.System.Logger;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -67,13 +73,11 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
-import java.lang.System.Logger;
-import static java.lang.System.Logger.Level.*;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
-
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
 // AbstractComboBoxListSwingModel.java
 //
@@ -153,10 +157,10 @@ public abstract class AbstractComboBoxListSwingModel {
 	private final ComboBoxModelProxy modelProxy;
 	
 	/** System Logger for component */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/** System Logger for component */
-	private static Logger eventLogger = SSUtils.getLogger(
+	private static final Logger eventLogger = SSUtils.getLogger(
 			AbstractComboBoxListSwingModel.class.getName() + ".events");
 
 	/**
@@ -217,8 +221,9 @@ public abstract class AbstractComboBoxListSwingModel {
 
 	/**
 	 * Construct a info container; if the specified itemList is
-	 * null an array list is created. Only use this method directly
- if you are sure you must.<p>
+	 * null an array list is created.
+	 * Only use this constructor directly if you are sure you must.
+	 * <p>
 	 * If an itemList is passed in, <b>lose the reference</b>;
 	 * if the list, or its contents, are modified directly
 	 * then swing model events are lost.
@@ -360,11 +365,12 @@ public abstract class AbstractComboBoxListSwingModel {
 	}
 
 	/**
-	 * Installs a ListCellRenderer into the JComponent which
-	 * uses {@link #getListItemFormat() }
- to get the value to useRender.The renderer is either 
- a 	{@code DefaultListCellRenderer} or a {@code  BasicComboBoxRenderer}
- as appropriate.<p>
+	 * Creates and installs a ListCellRenderer into the JComponent. The new
+	 * renderer uses {@link #getListItemFormat() }
+	 * to get the value to render. The renderer is either 
+	 * a {@code DefaultListCellRenderer} or a {@code  BasicComboBoxRenderer}
+	 * as appropriate.
+	 * <p>
 	 * The model is installed into the JComponent as a convenience.
 	 * 
 	 * @param jc Jcomponent to set up with model; must be JList or JComboBox
@@ -375,11 +381,13 @@ public abstract class AbstractComboBoxListSwingModel {
 	}
 
 	/**
-	 * Installs the specified ListCellRenderer into the JComponent. The model is installed into the JComponent as a convenience.
+	 * Installs the specified ListCellRenderer into the JComponent.
+	 * The model is installed into the JComponent as a convenience.
+	 * If render is null, a new renderer is created from model.
 	 * 
 	 * @param jc Jcomponent to set up with model
 	 * @param model associated model
-	 * @param render list cell renderer
+	 * @param render list cell renderer, may be null
 	 * @throws IllegalArgumentException if jc is not JList or JComboBox
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -882,7 +890,7 @@ public abstract class AbstractComboBoxListSwingModel {
 	 * @param itemNumElems number of elements in SSListItem
 	 */
 	protected void setItemNumElems(int itemNumElems) {
-		try (Remodel remodel = getRemodel()) {
+		try (Remodel _ = getRemodel()) {
 			setupNumElems(itemNumElems);
 		}
 		this.itemNumElems = itemNumElems;

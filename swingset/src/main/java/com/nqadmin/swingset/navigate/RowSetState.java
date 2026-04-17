@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
@@ -76,7 +76,7 @@ public class RowSetState
 	private boolean inserting;
 	private boolean acceptingChanges;
 	private boolean preInsertOps;
-	private NavigateState navigateState;
+	//private NavigateState navigateState;
 	private final WeakReference<RowSet> rsRef;
 
 	private RowSetState(RowSet rs) {
@@ -93,7 +93,7 @@ public class RowSetState
 	 * @return true if primary key else false
 	 */
 	// TODO: isKey: base this on labelName, not columnName.
-	public Boolean isKey(String _columnName)
+	private Boolean isKey(String _columnName)
 	{
 		String columnName = _columnName.toUpperCase();
 		Boolean rv = keys.get(columnName);
@@ -125,7 +125,7 @@ public class RowSetState
 	 * Find out if this RowSet is on the insert row.
 	 * @return true if on the insert row
 	 */
-	public boolean isInserting() {
+	private boolean isInserting() {
 		return inserting;
 	}
 
@@ -134,13 +134,26 @@ public class RowSetState
 	 * a {@linkplain CachedRowSet} doing {@linkplain CachedRowSet#acceptChanges}.
 	 * @return true if executing acceptingChanges
 	 */
-	public boolean isAcceptingChanges() {
+	private boolean isAcceptingChanges() {
 		return acceptingChanges;
+	}
+
+	/**
+	 * Is the current row of the RowSet dirty?
+	 * @return is dirty
+	 */
+	private boolean isDirty() {
+		return getNavigateState() != null && getNavigateState().undoRow.isDirty();
+	}
+
+	NavigateState getNavigateState() {
+		return NavigateState.get(rsRef.get());
 	}
 
 	// TODO: make more stuff instance accessible.
 
 
+	@SuppressWarnings("unused")
 	private final RowSetListener debugRowSetListener; // Strong reference needed.
 	private static class DebugRowSetListener implements RowSetListener {
 		static RowSetListener create(RowSet rs)
@@ -178,21 +191,30 @@ public class RowSetState
 	///////////////////////////////////////////////////////////////////////////
 	// Instance above, static below
 
-	/**
-	 * Find the data navigator for the specified RowSet.
-	 * <p>
-	 * Originally added to support SSComponentInterface.getSSDataNavigator(),
-	 * see discussion #93,
-	 * but may come in handy when implementing ActionMap interface.
-	 * @param rs get information for this RowSet
-	 * @return the associated data navigator
-	 */
-	static NavigateState getNavigateState(RowSet rs) {
-		return rs == null ? null : getRowSetState(rs).navigateState;
-	}
+	// /**
+	//  * Find the data navigator for the specified RowSet.
+	//  * <p>
+	//  * Originally added to support SSComponentInterface.getSSDataNavigator(),
+	//  * see discussion #93,
+	//  * but may come in handy when implementing ActionMap interface.
+	//  * @param rs get information for this RowSet
+	//  * @return the associated data navigator
+	//  */
+	// static NavigateState getNavigateState(RowSet rs) {
+	// 	return rs == null ? null : getRowSetState(rs).getNavigateState();
+	// }
 
 	private static final Map<RowSet,RowSetState> rowSetState
 			= new MapMaker().weakKeys().makeMap();
+			//= new MapMaker().weakKeys().weakValues().makeMap();
+
+	/**
+	 * @return
+	 */
+	public static int count() {
+		// Can't depend on size() method when weakKeys.
+		return SSUtils.size(rowSetState);
+	}
 
 	/**
 	 * Only use the returned RowSetState's methods while RowSet has a reference.
@@ -201,6 +223,15 @@ public class RowSetState
 	 */
 	public static RowSetState getRowSetState(RowSet rs) {
 		return rowSetState.computeIfAbsent(rs, k -> new RowSetState(rs));
+	}
+
+	/**
+	 * Only use the returned RowSetState's methods while RowSet has a reference.
+	 * @param rs
+	 * @return RowSetState kept alive by RowSet reference
+	 */
+	public static RowSetState getExistingRowSetState(RowSet rs) {
+		return rowSetState.get(rs);
 	}
 
 	// /**
@@ -218,12 +249,12 @@ public class RowSetState
 		}
 	}
 
-	// NOTE: only invoked from one method which is syncronized.
-	static void setNavigateState(RowSet rs, NavigateState navState) {
-		if (rs != null) {
-			getRowSetState(rs).navigateState = navState;
-		}
-	}
+	// // NOTE: only invoked from one method which is syncronized.
+	// static void setNavigateState(RowSet rs, NavigateState navState) {
+	// 	if (rs != null) {
+	// 		getRowSetState(rs).navigateState = navState;
+	// 	}
+	// }
 
 	/**
 	 * Determine if the column in our rowset is a primary key.
@@ -239,8 +270,9 @@ public class RowSetState
 	 * Is the current row of the RowSet dirty?
 	 * @return is dirty
 	 */
-	public boolean isDirty() {
-		return navigateState != null && navigateState.undoRow.isDirty();
+	public static boolean isDirty(RowSet rs) {
+		//return navigateState != null && navigateState.undoRow.isDirty();
+		return rs == null ? false : getRowSetState(rs).isDirty();
 	}
 
 	/**

@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
@@ -164,7 +164,7 @@ public class SSFormattedTextField extends JFormattedTextField
 					updateTextDecorator();
 			} catch (final Exception e) {
 				// TODO: Not right. What runtime exceptions should be looked for?
-				logger.log(Level.ERROR, getColumnForLog() + ": PROGRAM/RUNTIME ERROR");
+				logger.log(Level.ERROR, () -> getColumnForLog() + ": PROGRAM/RUNTIME ERROR");
 				ok = false;
 			} finally {
 				// Stop supressing "value" property change event handling.
@@ -251,7 +251,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	private boolean verifyingText = false;
 
 	/** Logger for component */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 		
 	/** Creates a new instance of SSFormattedTextField */
 	public SSFormattedTextField() {
