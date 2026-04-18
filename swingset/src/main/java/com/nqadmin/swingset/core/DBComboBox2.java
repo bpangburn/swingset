@@ -363,8 +363,12 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	/**
 	 * After this, make some adjustments.
 	 * {@inheritDoc }
+	 * 
+	 * Deprecated in SSComponentInterface.
+	 * @deprecated Use bind()
 	 */
 	@Override
+	@Deprecated
 	public void setBoundColumnName(String boundColumnName) {
 		super.setBoundColumnName(boundColumnName);
 		adjustForNullItem();
