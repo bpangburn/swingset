@@ -101,7 +101,7 @@ public class RowSetOpsTest
 
 	private RowsModel getRowsModel(RowSet rs)
 	{
-		return RowsModel.create(rs);
+		return RowsModel.create(rs, null);
 	}
 
 	/**

@@ -68,7 +68,7 @@ public abstract class RowSetButtons extends JPanel
 	}
 
 	/**
-	 * Assign the next RowSet to the rowsModeol.
+	 * Assign the next RowSet to the rowsModel.
 	 * Set the cursor to the table name index for newly created RowSets.
 	 * Typically used from nextRowSetButtonPush().
 	 */
