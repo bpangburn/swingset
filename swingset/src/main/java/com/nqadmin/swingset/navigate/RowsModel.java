@@ -108,8 +108,6 @@ public class RowsModel
 	private NavigateState navState;
 	private final RowsActions rowsActions;
 
-	private SSDBNav defaultDbNav; // TODO: remove this, buggy, for transitional.
-
 	/** simplify switches back/forth */
 	public static boolean ENABLED = true;
 
@@ -190,16 +188,16 @@ public class RowsModel
 	// TODO: handle null RowSet; important, consider empty DataNavigator, build UI first.
 	private RowsModel(RowSet rs, SSDBNav dbNav)
 	{
+		// TODO: get rid of junit test after tests are fully RowsModel ported.
+		if (!SSUtils.isJunit() && rs != null && !verifyExecuted(rs))
+			logger.log(Level.ERROR, "RowSet not executed", new Exception());
 		logger.log(Level.INFO, () -> sf("new RowsModel %s for %s", objectID(this), objectID(rs)));
-
-		if (dbNav != null)
-			defaultDbNav = dbNav;
 
 		activeRowModels.putIfAbsent(this, true);
 
 		this.rowsActions = new RowsActions(this);
 
-		setNavState(rs, defaultDbNav);
+		setNavState(rs, dbNav);
 
 		rowSetListener = new SimpleRowSetListener();
 		rowSetListener.registerTo(rs);
@@ -230,16 +228,17 @@ public class RowsModel
 
 	// TODO: verifyExecuted HACK, remove this and require executed row set 
 	/**
-	 * 
+	 * Check if RowSet is executed. If not executed, then execute it.
 	 * @param rs
-	 * @return
+	 * @return true if was executed
 	 * @throws SQLException 
 	 */
-	static void verifyExecuted(RowSet rs) {
+	static boolean verifyExecuted(RowSet rs) {
 		try {
 			int initial_row = rs.getRow(); // exception if RowSet not executed.
 			if (initial_row == 0)
 				rs.beforeFirst();
+			return true;
 		} catch (SQLException ex) {
 			try {
 				logger.log(Level.ERROR, () -> sf("'getRow()': %s. Will execute query", ex.getMessage()));
@@ -248,6 +247,7 @@ public class RowsModel
 			} catch (SQLException ex1) {
 				logger.log(Level.ERROR, "execute() SQL Exception", ex1);
 			}
+			return false;
 		}
 	}
 
@@ -312,14 +312,12 @@ public class RowsModel
 	}
 
 	/**
-	 * Change the RowSet associated with this model.
+	 * Change the RowSet associated with this model using current SSDBNav.
 	 * @param rs new RowSet for this model
-	 * @deprecated 
 	 */
 	// TODO: handle setRowSet only if there's already a dbNav.
-	@Deprecated
 	public void setRowSet(RowSet rs) {
-		setRowSet(rs, defaultDbNav);
+		setRowSet(rs, getDBNav());
 	}
 
 	/**
@@ -695,7 +693,7 @@ public class RowsModel
 	 * @return any custom implementation of the SSDBNav interface
 	 */
 	public SSDBNav getDBNav() {
-		return navState.getDBNav();
+		return navState != null ? navState.getDBNav() : null;
 	}
 
 	/**

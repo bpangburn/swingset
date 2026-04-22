@@ -57,7 +57,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
@@ -249,21 +248,21 @@ public class SSUtils {
 			if (crs.getKeyColumns() != null)
 				return;
 			String tableName = crs.getMetaData().getTableName(comp.getBoundColumnIndex());
-			Set<Integer> key = getPrimaryKeyColumnsForTable(
+			int[] keys = getPrimaryKeyColumnsForTable(
 					SSDBSupport.getDefault().getSharedConnection(crs), tableName);
-			crs.setKeyColumns(key.stream().mapToInt(i -> i).toArray());
+			crs.setKeyColumns(keys);
 		} catch (SQLException ex) {
 		}
 	}
-	public static Set<Integer> getPrimaryKeyColumnsForTable(Connection connection, String tableName) throws SQLException
+	private static int[] getPrimaryKeyColumnsForTable(Connection connection, String tableName) throws SQLException
 	{
 		return getPrimaryKeyColumnsForTable(connection.getMetaData(), tableName);
 	}
 
-	// TODO: Think this is wrong; a misinterpretation of KEY_SEQ (but depends on crs)
-	public static Set<Integer> getPrimaryKeyColumnsForTable(DatabaseMetaData dbMetaData, String tableName) throws SQLException
+	private static int[] getPrimaryKeyColumnsForTable(DatabaseMetaData dbMetaData, String tableName) throws SQLException
 	{
-		throw new IllegalCallerException();
+		List<KeyInfo> kinfo = getPrimaryKeyInfoForTable(dbMetaData, tableName);
+		return kinfo.stream().mapToInt(ki -> ki.keySeq).toArray();
 	}
 
 	public record KeyInfo(int keySeq, String columnName){}

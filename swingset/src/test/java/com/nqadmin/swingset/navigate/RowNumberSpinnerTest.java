@@ -112,7 +112,7 @@ public class RowNumberSpinnerTest
 
 		H2.clean();
 		RowSet rs1 = TinyRS.getRS1_4();
-		RowsModel model1 = RowsModel.create(rs1);
+		RowsModel model1 = RowsModel.create(rs1, null);
 		RowSet rs2 = TinyRS.getRS2_5();
 		
 		RowNumberSpinner spinner = new RowNumberSpinner(model1);

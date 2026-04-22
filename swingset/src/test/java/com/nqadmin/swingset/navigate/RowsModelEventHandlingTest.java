@@ -136,10 +136,10 @@ public class RowsModelEventHandlingTest
 		H2.clean();
 
 		RowSet rs1 = TinyRS.getRS1();
-		RowsModel model1 = RowsModel.create(rs1);
+		RowsModel model1 = RowsModel.create(rs1, null);
 
 		RowSet rs2 = TinyRS.getRS2();
-		RowsModel model2 = RowsModel.create(rs2);
+		RowsModel model2 = RowsModel.create(rs2, null);
 
 		oneTestBusReceiver = EQ.setupBusReceiver();
 		EQ.GetRowsModelEvent events = oneTestBusReceiver.events();
@@ -198,7 +198,7 @@ public class RowsModelEventHandlingTest
 		assertFalse(RowSetState.isInserting(model2.getRowSet()));
 
 		// Opening insert row on *empty* rowSet
-		RowsModel model3 = RowsModel.create(TinyRS.getRSEmpty());
+		RowsModel model3 = RowsModel.create(TinyRS.getRSEmpty(), null);
 		System.out.println("=== empty insert");
 		events.clear();
 		assertTrue(EQ.invokeLatchWait("tick6", s -> System.out.println(s),
@@ -229,10 +229,10 @@ public class RowsModelEventHandlingTest
 		H2.clean();
 
 		RowSet rs1 = TinyRS.getRS1();
-		RowsModel model1 = RowsModel.create(rs1);
+		RowsModel model1 = RowsModel.create(rs1, null);
 
 		RowSet rs2 = TinyRS.getRS2();
-		RowsModel model2 = RowsModel.create(rs2);
+		RowsModel model2 = RowsModel.create(rs2, null);
 
 		oneTestBusReceiver = EQ.setupBusReceiver();
 		EQ.GetRowsModelEvent events = oneTestBusReceiver.events();
@@ -319,10 +319,10 @@ public class RowsModelEventHandlingTest
 		H2.clean();
 
 		RowSet rs1 = TinyRS.getRS1();
-		RowsModel model1 = RowsModel.create(rs1);
+		RowsModel model1 = RowsModel.create(rs1, null);
 
 		RowSet rs2 = TinyRS.getRS2();
-		RowsModel model2 = RowsModel.create(rs2);
+		RowsModel model2 = RowsModel.create(rs2, null);
 
 		oneTestBusReceiver = EQ.setupBusReceiver();
 		EQ.GetRowsModelEvent events = oneTestBusReceiver.events();

@@ -431,9 +431,6 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 			// UPDATE/REQUERY ROWSET
 			updateRowset();
 			
-			// UPDATE DATAGRID ROWSET
-			dataGrid.setRowSet(getRowset());
-			
 			// UPDATE SELECTION CRITERIA FOR ANY OTHER SSDBCombos
 			updateSSDBComboBoxes();
 			

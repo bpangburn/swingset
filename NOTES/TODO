@@ -22,6 +22,10 @@ Is RowsAction.foreceEvent needed? Always generate event.
 
 ================================================================================
 
+rename: finishSSCommon to completeSSCommon?
+
+================================================================================
+
 Can a RowSet be in two RowsModel
 
 In RowsModel.setRowSet() if prev undoRow.isDirty() should this require override?

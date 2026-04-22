@@ -53,6 +53,7 @@ import javax.swing.JLabel;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
+import com.nqadmin.swingset.SSDBNav;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
@@ -141,7 +142,8 @@ public class Example4 extends JFrame {
 		try {
 			RowSet rowset = DemoUtil.getNewRowSet(connection);
 			rowset.setCommand("SELECT * FROM part_data;");
-			rowsModel = RowsModel.create(rowset);
+			rowset.execute();
+			rowsModel = RowsModel.create(rowset, createDbNav());
 			navigator = new SSDataNavigator(rowsModel);
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, "SQL Exception.", se);
@@ -149,104 +151,6 @@ public class Example4 extends JFrame {
 
 		// DEBUG
 		//rowsModel.setWritable(false);
-		
-		
-		/**
-		 * Various navigator overrides needed to support H2
-		 * H2 does not fully support updatable rowset so it must be
-		 * re-queried following insert and delete with rowset.execute()
-		 */
-		rowsModel.setDBNav(new SSDBNavImpl(this) {
-			/**
-			 * Re-enable DB Navigator following insertion Cancel
-			 */
-			@Override
-			public void performCancelOps() {
-				super.performCancelOps();
-				cmbSelectPart.setEnabled(true);
-			}
-			
-			/**
-			 * Requery the rowset following a deletion. This is needed for H2.
-			 */
-			@Override
-			public void performPostDeletionOps() {
-				super.performPostDeletionOps();
-				try {
-					rowsModel.getRowSet().execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-				performRefreshOps();
-			}
-			
-			/**
-			 * Re-query the rowset following an insertion. This is needed for H2.
-			 */
-			@Override
-			public void performPostInsertOps() {
-				super.performPostInsertOps();
-				cmbSelectPart.setEnabled(true);
-				try {
-					rowsModel.getRowSet().execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-				performRefreshOps();
-			}
-			
-			/**
-			 * Obtain and set the PK value for the new record & perform any
-			 * other actions needed before an insert.
-			 */
-			@Override
-			public void performPreInsertOps() {
-				
-				// SSDBNavImpl will clear the component values
-				super.performPreInsertOps();
-				
-				try (ResultSet rs = connection
-						.createStatement()
-						.executeQuery("SELECT nextval('part_data_seq') as nextVal;");)
-				{
-					// GET THE NEW RECORD ID.
-					rs.next();
-					final int partID = rs.getInt("nextVal");
-					txtPartID.setText(String.valueOf(partID));
-				} catch(final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
-				} catch(final Exception e) {
-					logger.log(Level.ERROR, "Exception occured initializing new record.",e);
-				}
-				// DISABLE PART SELECTOR
-				cmbSelectPart.setEnabled(false);
-				
-				// SET OTHER DEFAULTS
-//						txtPartName.setText(null);
-//						cmbPartColor.setSelectedValue(0);
-//						txtPartWeight.setText("0");
-//						txtPartCity.setText(null);
-				
-			}
-			
-			/**
-			 * Manage sync manager during a Refresh
-			 */
-			@Override
-			public void performRefreshOps() {
-				super.performRefreshOps();
-				syncManager.async();
-				try {
-					cmbSelectPart.execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				} catch (final Exception e) {
-					logger.log(Level.ERROR, "Exception.", e);
-				}
-				syncManager.sync();
-			}
-			
-		});
 		
 		// Setup navigator query.
 		// Use the "order by" to exercise SSSyncManager's "perform a manual loop"
@@ -353,6 +257,102 @@ public class Example4 extends JFrame {
 		// MAKE THE JFRAME VISIBLE
 		setVisible(true);
 		pack();
+	}
+
+	private SSDBNav createDbNav() {
+		
+		return new SSDBNavImpl(this) {
+			/**
+			 * Re-enable DB Navigator following insertion Cancel
+			 */
+			@Override
+			public void performCancelOps() {
+				super.performCancelOps();
+				cmbSelectPart.setEnabled(true);
+			}
+			
+			/**
+			 * Requery the rowset following a deletion. This is needed for H2.
+			 */
+			@Override
+			public void performPostDeletionOps() {
+				super.performPostDeletionOps();
+				try {
+					rowsModel.getRowSet().execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				}
+				performRefreshOps();
+			}
+			
+			/**
+			 * Re-query the rowset following an insertion. This is needed for H2.
+			 */
+			@Override
+			public void performPostInsertOps() {
+				super.performPostInsertOps();
+				cmbSelectPart.setEnabled(true);
+				try {
+					rowsModel.getRowSet().execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				}
+				performRefreshOps();
+			}
+			
+			/**
+			 * Obtain and set the PK value for the new record & perform any
+			 * other actions needed before an insert.
+			 */
+			@Override
+			public void performPreInsertOps() {
+				
+				// SSDBNavImpl will clear the component values
+				super.performPreInsertOps();
+				
+				try (ResultSet rs = connection
+						.createStatement()
+						.executeQuery("SELECT nextval('part_data_seq') as nextVal;");)
+				{
+					// GET THE NEW RECORD ID.
+					rs.next();
+					final int partID = rs.getInt("nextVal");
+					txtPartID.setText(String.valueOf(partID));
+				} catch(final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
+				} catch(final Exception e) {
+					logger.log(Level.ERROR, "Exception occured initializing new record.",e);
+				}
+				// DISABLE PART SELECTOR
+				cmbSelectPart.setEnabled(false);
+				
+				// SET OTHER DEFAULTS
+//						txtPartName.setText(null);
+//						cmbPartColor.setSelectedValue(0);
+//						txtPartWeight.setText("0");
+//						txtPartCity.setText(null);
+				
+			}
+			
+			/**
+			 * Manage sync manager during a Refresh
+			 */
+			@Override
+			public void performRefreshOps() {
+				super.performRefreshOps();
+				syncManager.async();
+				try {
+					cmbSelectPart.execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				} catch (final Exception e) {
+					logger.log(Level.ERROR, "Exception.", e);
+				}
+				syncManager.sync();
+			}
+			
+		};
+
 	}
 
 	void cmbPartColorChangeOptions() {}

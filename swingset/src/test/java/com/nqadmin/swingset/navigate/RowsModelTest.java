@@ -172,7 +172,7 @@ public class RowsModelTest
 		LOG.log(INFO, "TEST: create");
 		RowSet rs = null;
 		RowsModel expResult = null;
-		RowsModel result = RowsModel.create(rs);
+		RowsModel result = RowsModel.create(rs, null);
 		assertEquals(expResult, result);
 		// TODO review the generated test code and remove the default call to fail.
 		fail("The test case is a prototype.");
@@ -193,7 +193,7 @@ public class RowsModelTest
 
 		H2.clean();
 		RowSet rs1 = TinyRS.getRS1_4();
-		RowsModel rowsModel = RowsModel.create(rs1);
+		RowsModel rowsModel = RowsModel.create(rs1, null);
 		RowSet rs2 = TinyRS.getRS2_5();
 		
 		TextField[] p_tf = new TextField[1];
@@ -241,7 +241,7 @@ public class RowsModelTest
 		RowSet rs1 = H2.createSimpleSupplierData(7, 5, 0);
 		RowSet rs2 = H2.createSimpleSupplierData(8, 6, 1);
 
-		RowsModel rowsModel = RowsModel.create(null);
+		RowsModel rowsModel = RowsModel.create(null, null);
 		TextField tf = new TextField();
 		DbNav _dbNav = null;
 		try {
@@ -273,7 +273,7 @@ public class RowsModelTest
 		assertTrue(exx.getMessage().startsWith("Component already bound to this model"), exx.getMessage());
 
 		// Try to bind tfInt to a different model.
-		RowsModel rowsModel2 = RowsModel.create(null);
+		RowsModel rowsModel2 = RowsModel.create(null, null);
 		exx = assertThrows(IllegalStateException.class, () -> rowsModel2.bind(tf, keyCol));
 		assertTrue(exx.getMessage().startsWith("Component already bound to a model"), exx.getMessage());
 
@@ -316,7 +316,7 @@ public class RowsModelTest
 
 		H2.clean();
 
-		RowsModel rowsModel = RowsModel.create(null);
+		RowsModel rowsModel = RowsModel.create(null, null);
 		TextField tf = new TextField();
 		DbNav _dbNav = null;
 		try {
@@ -358,7 +358,7 @@ public class RowsModelTest
 		exs.clear();
 		RowSet rs1NN = TinyRS.getRS1NotNull();
 
-		RowsModel rowsModelNN = RowsModel.create(null);
+		RowsModel rowsModelNN = RowsModel.create(null, null);
 		TextField tfNN = new TextField();
 
 		_dbNav = null;
@@ -409,7 +409,7 @@ public class RowsModelTest
 		// Create two RowSets, the same columnNames have different column indexes.
 		RowSet rsEmpty = TinyRS.getRSEmpty();
 
-		RowsModel rowsModel = RowsModel.create(null);
+		RowsModel rowsModel = RowsModel.create(null, null);
 		JPanel jpanel = new JPanel();
 		DbNav _dbNav = null;
 		try {

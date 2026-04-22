@@ -773,14 +773,6 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	}
 
 	/**
-	 * Update navigate actions with latest rowset
-	 */
-	private void updateDataNavigator() {
-		// TODO: want to change RowSet, not RowsModel
-		getDataNavigator().setRowsModel(getRowsModel());
-	}
-
-	/**
 	 * Updates the rowset, data navigator, combo navigator, and any DB comboboxes.
 	 * 
 	 * Generally the developer should call this when the entire screen should be refreshed due to
@@ -797,9 +789,6 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 			// SET THE NEW QUERY FOR ROWSET
 			updateRowset();
 
-			// SET NEW ROWSET FOR NAVIGATOR.
-			updateDataNavigator();
-			
 			// UPDATE THE COMBO NAVIGATOR
 			updateComboNav();
 
