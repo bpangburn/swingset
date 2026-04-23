@@ -102,9 +102,12 @@ public class Example3 extends JFrame {
 	 * database component declarations
 	 */
 	Connection connection = null;
-	RowSet rowset = null;
 	SSDataNavigator navigator = null;
 	RowsModel rowsModel;
+
+	RowSet getRowSet() {
+		return rowsModel.getRowSet();
+	}
 
 	/**
 	 * Constructor for Example3
@@ -129,7 +132,7 @@ public class Example3 extends JFrame {
 
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 		try {
-			rowset = DemoUtil.getNewRowSet(connection);
+			RowSet rowset = DemoUtil.getNewRowSet(connection);
 			rowset.setCommand("SELECT * FROM supplier_part_data");
 			rowset.execute();
 			rowsModel = RowsModel.create(rowset, createDbNav());
@@ -238,7 +241,7 @@ public class Example3 extends JFrame {
 			public void performPostDeletionOps() {
 				super.performPostDeletionOps();
 				try {
-					rowset.execute();
+					getRowSet().execute();
 				} catch (final SQLException se) {
 					logger.log(Level.ERROR, "SQL Exception.", se);
 				}
@@ -251,7 +254,7 @@ public class Example3 extends JFrame {
 			public void performPostInsertOps() {
 				super.performPostInsertOps();
 				try {
-					rowset.execute();
+					getRowSet().execute();
 				} catch (final SQLException se) {
 					logger.log(Level.ERROR, "SQL Exception.", se);
 				}

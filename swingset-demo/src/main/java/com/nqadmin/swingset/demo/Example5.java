@@ -48,6 +48,7 @@ import javax.sql.RowSet;
 import javax.swing.JFrame;
 
 import com.nqadmin.swingset.SSDataGrid;
+import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSUtils;
 
 /**
@@ -66,18 +67,19 @@ public class Example5 extends JFrame {
 	 * data grid
 	 */
 	SSDataGrid dataGrid = null;
+	RowsModel rowsModel;
 	
 	/**
 	 * database component declarations
 	 */
 	Connection connection = null;
-	RowSet rowset = null;
 
 	/**
 	 * Constructor for Example5
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
+	@SuppressWarnings("LeakingThisInConstructor")
 	public Example5(final Connection _dbConn) {
 
 		// SET SCREEN TITLE
@@ -120,13 +122,15 @@ public class Example5 extends JFrame {
 		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
 			try {
 			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-				rowset = DemoUtil.getNewRowSet(connection);
+				RowSet rowset = DemoUtil.getNewRowSet(connection);
 				rowset.setCommand("SELECT * FROM part_data ORDER BY part_name;");
+				rowset.execute();
+				rowsModel = RowsModel.create(rowset, null);
 
 			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
 				dataGrid = new SSDataGrid();
 				dataGrid.setHeaders(new String[] { "Part ID", "Part Name", "Color Code", "Weight", "City" });
-				dataGrid.setRowSet(rowset);
+				dataGrid.setRowsModel(rowsModel);
 				dataGrid.setMessageWindow(this);
 
 			// DISABLES NEW INSERTIONS TO THE DATABASE.

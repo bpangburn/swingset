@@ -36,12 +36,10 @@ public class ComboBoxSnippets extends JFrame
 		try {
 			// Table to examine and traverse.
 			rowSet.setCommand("SELECT * FROM shipment_data;");
+			rowSet.execute();
 			
-			// RowsModel does execute() and next() on the rowSet.
-			// If you are not using the RowsModel you have to include:
-			//     rowSet.execute();
-			//     rowSet.next();
-			rowsModel = RowsModel.create(rowSet);
+			// 2nd arg is SSDBNav, if null use default.
+			rowsModel = RowsModel.create(rowSet, null);
 			
 			// Query for the combobox to map part_id to part_name.
 			String query = "SELECT * FROM part_data;";
@@ -53,9 +51,8 @@ public class ComboBoxSnippets extends JFrame
 			// Execute the query.
 			combo.execute();
 			
-			// This basically specifies the column and the rowset where updates have
-			// to be made.
-			combo.bind(rowsModel,"part_id");
+			// Specifies the column bound to the combo.
+			rowsModel.bind(combo, "part_id");
 			
 		} catch (Exception ex) {
 			// Exception handler here...

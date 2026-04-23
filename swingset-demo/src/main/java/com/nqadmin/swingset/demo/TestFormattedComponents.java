@@ -51,6 +51,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import com.nqadmin.swingset.SSDBComboBox;
+import com.nqadmin.swingset.SSDBNav;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
@@ -131,7 +132,6 @@ public class TestFormattedComponents extends JFrame {
 	 * database component declarations
 	 */
 	Connection connection = null;
-	RowSet rowset = null;
 	SSDataNavigator navigator = null;
 	RowsModel rowsModel;
 
@@ -140,6 +140,10 @@ public class TestFormattedComponents extends JFrame {
 	 */
 	SSDBComboBox cmbSSDBComboNav = new SSDBComboBox(); // SSDBComboBox used just for navigation
 	SSSyncManager syncManager;
+
+	RowSet getRowSet() {
+		return rowsModel.getRowSet();
+	}
 
 	/**
 	 * Constructor for Formatted Component Test
@@ -164,89 +168,14 @@ public class TestFormattedComponents extends JFrame {
 		
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 		try {
-			rowset = DemoUtil.getNewRowSet(connection);
+			RowSet rowset = DemoUtil.getNewRowSet(connection);
 			rowset.setCommand("SELECT * FROM swingset_formatted_test_data;");
-			rowsModel = RowsModel.create(rowset);
+			rowset.execute();
+			rowsModel = RowsModel.create(rowset, createDbNav());
 			navigator = new SSDataNavigator(rowsModel);
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, "SQL Exception.", se);
 		}
-		
-		/**
-		 * Various navigator overrides needed to support H2
-		 * <p>
-		 * H2 does not fully support updatable rowset so it must be
-		 * re-queried following insert and delete with rowset.execute()
-		 */
-		rowsModel.setDBNav(new SSDBNavImpl(this) {
-			/**
-			 * Re-enable DB Navigator following insertion Cancel
-			 */
-			@Override
-			public void performCancelOps() {
-				super.performCancelOps();
-				cmbSSDBComboNav.setEnabled(true);
-			}
-			
-			/**
-			 * Requery the rowset following a deletion. This is needed for H2.
-			 */
-			@Override
-			public void performPostDeletionOps() {
-				super.performPostDeletionOps();
-				try {
-					rowset.execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-				performRefreshOps();
-			}
-			
-			/**
-			 * Re-query the rowset following an insertion. This is needed for H2.
-			 */
-			@Override
-			public void performPostInsertOps() {
-				super.performPostInsertOps();
-				//TestFormattedComponents.this.cmbSSDBComboNav.setEnabled(true);
-				try {
-					rowset.execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-				performRefreshOps();
-			}
-			
-			/**
-			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
-			 */
-			@Override
-			public void performPreInsertOps() {
-				
-				// SSDBNavImpl will clear the component values
-				super.performPreInsertOps();
-				
-				setDefaultValues();
-			}
-			
-			/**
-			 * Manage sync manager during a Refresh
-			 */
-			@Override
-			public void performRefreshOps() {
-				super.performRefreshOps();
-				syncManager.async();
-				try {
-					cmbSSDBComboNav.execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				} catch (final Exception e) {
-					logger.log(Level.ERROR, "Exception.", e);
-				}
-				syncManager.sync();
-			}
-			
-		});
 		
 		// SETUP NAVIGATOR QUERY
 		final String query = "SELECT * FROM swingset_formatted_test_data;";
@@ -425,6 +354,84 @@ public class TestFormattedComponents extends JFrame {
 		// MAKE THE JFRAME VISIBLE
 		setVisible(true);
 		pack();
+	}
+
+	private SSDBNav createDbNav() {
+		/**
+		 * Various navigator overrides needed to support H2
+		 * <p>
+		 * H2 does not fully support updatable rowset so it must be
+		 * re-queried following insert and delete with rowset.execute()
+		 */
+		return new SSDBNavImpl(this) {
+			/**
+			 * Re-enable DB Navigator following insertion Cancel
+			 */
+			@Override
+			public void performCancelOps() {
+				super.performCancelOps();
+				cmbSSDBComboNav.setEnabled(true);
+			}
+			
+			/**
+			 * Requery the rowset following a deletion. This is needed for H2.
+			 */
+			@Override
+			public void performPostDeletionOps() {
+				super.performPostDeletionOps();
+				try {
+					getRowSet().execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				}
+				performRefreshOps();
+			}
+			
+			/**
+			 * Re-query the rowset following an insertion. This is needed for H2.
+			 */
+			@Override
+			public void performPostInsertOps() {
+				super.performPostInsertOps();
+				//TestFormattedComponents.this.cmbSSDBComboNav.setEnabled(true);
+				try {
+					getRowSet().execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				}
+				performRefreshOps();
+			}
+			
+			/**
+			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
+			 */
+			@Override
+			public void performPreInsertOps() {
+				
+				// SSDBNavImpl will clear the component values
+				super.performPreInsertOps();
+				
+				setDefaultValues();
+			}
+			
+			/**
+			 * Manage sync manager during a Refresh
+			 */
+			@Override
+			public void performRefreshOps() {
+				super.performRefreshOps();
+				syncManager.async();
+				try {
+					cmbSSDBComboNav.execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				} catch (final Exception e) {
+					logger.log(Level.ERROR, "Exception.", e);
+				}
+				syncManager.sync();
+			}
+			
+		};
 	}
 
 	/**

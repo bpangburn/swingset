@@ -37,6 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,10 +47,8 @@ import java.sql.Statement;
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-
 import com.nqadmin.swingset.SSDataGrid;
+import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSUtils;
 
 /**
@@ -70,12 +70,12 @@ public class Example7 extends JFrame {
 	 * data grid
 	 */
 	SSDataGrid dataGrid = null;
+	RowsModel rowsModel;
 	
 	/**
 	 * database component declarations
 	 */
 	Connection connection = null;
-	RowSet rowset = null;
 
 	/**
 	 * Constructor for Example7
@@ -110,13 +110,15 @@ public class Example7 extends JFrame {
 		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
 			try {
 			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-				rowset = DemoUtil.getNewRowSet(connection);
+				RowSet rowset = DemoUtil.getNewRowSet(connection);
 				rowset.setCommand("SELECT supplier_part_id, supplier_id, part_id, quantity, ship_date FROM supplier_part_data ORDER BY supplier_id, part_id;");
+				rowset.execute();
+				rowsModel = RowsModel.create(rowset, null);
 
 			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
 				dataGrid = new SSDataGrid();
 				dataGrid.setHeaders(new String[] { "Supplier-Part ID", "Supplier Name", "Part Name", "Quantity", "Ship Date" });
-				dataGrid.setRowSet(rowset);
+				dataGrid.setRowsModel(rowsModel);
 				dataGrid.setMessageWindow(this);
 
 			// DISABLES NEW INSERTIONS TO THE DATABASE. - NOT CURRENTLY WORKING FOR H2

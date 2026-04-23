@@ -64,6 +64,7 @@ import javax.swing.JScrollPane;
 import com.nqadmin.swingset.SSCheckBox;
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
+import com.nqadmin.swingset.SSDBNav;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSImage;
@@ -234,7 +235,6 @@ public class TestBaseComponents extends JFrame
 	 * database component declarations
 	 */
 	Connection connection = null;
-	RowSet rowset = null;
 	SSDataNavigator navigator = null;
 	RowsModel rowsModel;
 
@@ -243,6 +243,10 @@ public class TestBaseComponents extends JFrame
 	 */
 	final SSDBComboBox cmbSSDBComboNav; // SSDBComboBox used just for navigation
 	final SSSyncManager syncManager;
+
+	RowSet getRowSet() {
+		return rowsModel.getRowSet();
+	}
 
 	/**
 	 * Method to obtain proper data structure/model for SSList based on database used
@@ -295,101 +299,16 @@ public class TestBaseComponents extends JFrame
 		
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 		try {
-			rowset = DemoUtil.getNewRowSet(connection);
+			RowSet rowset = DemoUtil.getNewRowSet(connection);
 			String sql = sf("SELECT %s FROM swingset_base_test_data", getColumnsSQL());
 			logger.log(INFO, sql);
 			rowset.setCommand(sql);
-			rowsModel = RowsModel.create(rowset);
+			rowset.execute();
+			rowsModel = RowsModel.create(rowset, createDbNav());
 			navigator = new SSDataNavigator(rowsModel);
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, "SQL Exception.", se);
 		}
-		
-		/**
-		 * Various navigator overrides needed to support H2
-		 * <p>
-		 * H2 does not fully support updatable rowset so it must be
-		 * re-queried following insert and delete with rowset.execute()
-		 */
-		rowsModel.setDBNav(new SSDBNavImpl(this)
-		{
-			/**
-			 * Requery the rowset following a deletion. This is needed for H2.
-			 */
-			@Override
-			public void performPostDeletionOps() {
-				super.performPostDeletionOps();
-				try {
-					rowset.execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-				performRefreshOps();
-			}
-			
-			/**
-			 * Requery the rowset following an insertion. This is needed for H2.
-			 */
-			@Override
-			public void performPostInsertOps() {
-				super.performPostInsertOps();
-				//TestBaseComponents.this.cmbSSDBComboNav.setEnabled(true);
-				try {
-					rowset.execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-				performRefreshOps();
-			}
-			
-			/**
-			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
-			 */
-			@Override
-			public void performPreInsertOps() {
-				//
-				// WHERE IS THE PRIMARY KEY SET? See example1
-				//
-				
-				// SSDBNavImpl will clear the component values
-				super.performPreInsertOps();
-				
-				setDefaultValues();
-				
-			}
-			
-			/**
-			 * Manage sync manager during a Refresh
-			 */
-			@Override
-			public void performRefreshOps() {
-				super.performRefreshOps();
-				if (syncManager == null)
-					return;
-				
-				syncManager.async();
-				try {
-					cmbSSDBComboNav.execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				} catch (final Exception e) {
-					logger.log(Level.ERROR, "Exception.", e);
-				}
-				syncManager.sync();
-			}
-			
-			/**
-			 * Re-enable DB Navigator following insertion Cancel
-			 */
-			@Override
-			public void performCancelOps() {
-				super.performCancelOps();
-				if (cmbSSDBComboNav == null)
-					return;
-				
-				cmbSSDBComboNav.setEnabled(true);
-			}
-		});
 		
 		
 		if (!activeComps.contains(NAV)) {
@@ -498,6 +417,94 @@ public class TestBaseComponents extends JFrame
 			lstScrollPane.setPreferredSize(MainClass.ssDimTall);
 		}
 		pack();
+	}
+
+	private SSDBNav createDbNav() {
+		/**
+		 * Various navigator overrides needed to support H2
+		 * <p>
+		 * H2 does not fully support updatable rowset so it must be
+		 * re-queried following insert and delete with rowset.execute()
+		 */
+		return new SSDBNavImpl(this)
+		{
+			/**
+			 * Requery the rowset following a deletion. This is needed for H2.
+			 */
+			@Override
+			public void performPostDeletionOps() {
+				super.performPostDeletionOps();
+				try {
+					getRowSet().execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				}
+				performRefreshOps();
+			}
+			
+			/**
+			 * Requery the rowset following an insertion. This is needed for H2.
+			 */
+			@Override
+			public void performPostInsertOps() {
+				super.performPostInsertOps();
+				//TestBaseComponents.this.cmbSSDBComboNav.setEnabled(true);
+				try {
+					getRowSet().execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				}
+				performRefreshOps();
+			}
+			
+			/**
+			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
+			 */
+			@Override
+			public void performPreInsertOps() {
+				//
+				// WHERE IS THE PRIMARY KEY SET? See example1
+				//
+				
+				// SSDBNavImpl will clear the component values
+				super.performPreInsertOps();
+				
+				setDefaultValues();
+				
+			}
+			
+			/**
+			 * Manage sync manager during a Refresh
+			 */
+			@Override
+			public void performRefreshOps() {
+				super.performRefreshOps();
+				if (syncManager == null)
+					return;
+				
+				syncManager.async();
+				try {
+					cmbSSDBComboNav.execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				} catch (final Exception e) {
+					logger.log(Level.ERROR, "Exception.", e);
+				}
+				syncManager.sync();
+			}
+			
+			/**
+			 * Re-enable DB Navigator following insertion Cancel
+			 */
+			@Override
+			public void performCancelOps() {
+				super.performCancelOps();
+				if (cmbSSDBComboNav == null)
+					return;
+				
+				cmbSSDBComboNav.setEnabled(true);
+			}
+		};
 	}
 
 	/** Some components aren't fully initialized until well after startup,
