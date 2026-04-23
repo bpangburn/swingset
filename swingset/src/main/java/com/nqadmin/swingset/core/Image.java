@@ -49,6 +49,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
@@ -59,7 +61,11 @@ import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.EnumSet;
 import java.util.EventListener;
+import java.util.Iterator;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -122,26 +128,37 @@ public class Image extends JPanel implements SSComponentInterface
 									totalLength, bytesRead));
 					}
 					byte[] bytes = bb.array();
+
+					ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+					ImageInputStream iis = ImageIO.createImageInputStream(bais);
+					if (Boolean.FALSE) getImageFormat(iis);
+					BufferedImage bimg = ImageIO.read(iis); // NOTE: usually closes iis
+					if (bimg == null) {
+						iis.close();
+						throw new IOException("Unknown image format");
+					}
+
+					// create icon before writing to database in case of error
+					img = new ImageIcon(bimg);
 					
 					// TODO: remove direct RowSet access
 					getRowSet().updateBytes(getBoundColumnName(), bytes);
 					path = tPath;
 
-					img = new ImageIcon(bytes);
 					lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
 					lblImage.setIcon(img);
 					lblImage.setText("");
 				} catch (SQLException se) {
 					logger.log(Level.ERROR, getColumnForLog() + ": SQL Exception.", se);
 				} catch (IOException ioe) {
-					reportError("Error accessing image file", tPath, ioe);
+					SSUtils.reportError(logger, Image.this, "Error accessing image file", tPath, ioe);
 				}
 			});
 		}
 	} // end private class ImageListener
 
 	/** Logger for component */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Button to update the image.
@@ -362,6 +379,26 @@ public class Image extends JPanel implements SSComponentInterface
 		// TODO Confirm updateUI is needed here.
 		updateUI();
 
+	}
+
+	// only here for play at this time
+	// TODO: could incorporate this into main
+	//		 by continue with reading after getting format
+	private String getImageFormat(ImageInputStream iis) throws IOException
+	{
+		String formatName = null;
+		Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
+		if (readers.hasNext()) {
+			ImageReader reader = readers.next();
+			formatName = reader.getFormatName(); // Returns "JPEG", "png", etc.
+			//System.out.println("Image Format: " + formatName);
+			
+			// Optionally continue reading the image with the same reader
+			//reader.setInput(iis);
+			//BufferedImage image = reader.read(0);
+		} else
+			throw new IOException("Unknown image format");
+		return formatName;
 	}
 
 	private Hook hook;

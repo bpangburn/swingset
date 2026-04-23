@@ -42,7 +42,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
-import java.nio.file.Path;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EventListener;
@@ -644,15 +643,4 @@ public interface SSComponentInterface extends RSC
 	default boolean decorate() {
 		return getSSCommon().decorate();
 	}
-
-	/**
-	 * Report problem accessing image file to user.
-	 * @param title dialog title
-	 * @param path file path
-	 * @param ex error
-	 */
-	default void reportError(String title, Path path, Exception ex) {
-		getSSCommon().reportError(title, path, ex);
-	}
-
 }

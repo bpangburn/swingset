@@ -47,6 +47,8 @@ import java.awt.Container;
 import java.awt.Toolkit;
 import java.lang.StackWalker.Option;
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.JDBCType;
@@ -65,6 +67,7 @@ import java.util.logging.SimpleFormatter;
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.JoinRowSet;
+import javax.swing.JOptionPane;
 
 import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.navigate.RowsModel;
@@ -195,6 +198,38 @@ public class SSUtils {
 			default -> { }
 			}
 		}
+	}
+
+	/**
+	 * Report problem accessing image file to user.
+	 * @param logger
+	 * @param comp
+	 * @param title dialog title
+	 * @param path file path
+	 * @param ex error
+	 */
+	// TODO: Only used from Image.java. Does this belong in Image.java?
+	public static void reportError(Logger logger, SSComponentInterface comp, String title, Path path, Exception ex)
+	{
+		String pathName = path != null ? path.toAbsolutePath().toString() : "";
+		logger.log(Level.ERROR, () -> sf("%s: IO Exception %s: file %s: %s",
+				comp.getColumnForLog(), ex.getClass().getSimpleName(),
+				pathName, ex.getMessage()));
+
+		// TODO: Alter message according to parameters.
+		//		 For example, if path is null, leave out "file: 'xxx'"
+
+		String msg = sf("<html>"
+				+ "<center>%s</center>"
+				+ "<br/>Details:<br/>"
+				+ "<center>DB column: %s</center>"
+				+ "<center>File: '%s'</center>"
+				+ "<center>Exception: %s</center>",
+				ex.getLocalizedMessage(), comp.getColumnForLog(),
+				pathName, ex.getClass().getSimpleName()
+		);
+		JOptionPane.showMessageDialog((Component)comp, msg,
+				title, JOptionPane.ERROR_MESSAGE);
 	}
 
 	/**
