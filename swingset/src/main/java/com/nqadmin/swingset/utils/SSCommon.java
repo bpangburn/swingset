@@ -50,7 +50,6 @@ import java.awt.event.KeyEvent;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.nio.file.Path;
-import java.sql.Connection;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EventListener;
@@ -142,7 +141,7 @@ final class SSCommon
 	}
 
 	/**
-	 * Get a fully constructed SSCommon. If {@linkplain partialSSCommon} is not null
+	 * Form a fully constructed SSCommon. If {@linkplain partialSSCommon} is not null
 	 * then finish it's construction, otherwise create and return a new SSCommon.
 	 * Doing "SSCommon.createFinish(this, null)" is equivalent to "new SSCommon(this)".
 	 * <p>
@@ -336,9 +335,6 @@ final class SSCommon
 
 	/** parent SwingSet component */
 	private final SSComponentInterface ssComponent;
-
-	/** database connection */
-	private Connection connection = null;
 
 	/** RowsModel from which component will get/set values. */
 	private RowsModel rowsModel;
@@ -553,7 +549,7 @@ final class SSCommon
 		if (doStart)
 			startBind(rowsModel, boundColumnName);
 		else
-			finishBind();
+			completeBind();
 
 		if (rs != null)
 			getSSComponent().finishBind(); // Primary keys for SyncResolver, joins
@@ -597,7 +593,7 @@ final class SSCommon
 				jc.setEnabled(false);
 			return;
 		}
-		finishBind();
+		completeBind();
 		
 		// Update component.
 		// For an SSDBComboBox, we have likely not yet called execute to populate the
@@ -607,7 +603,7 @@ final class SSCommon
 		updateSSComponent();
 	}
 
-	private void finishBind()
+	private void completeBind()
 	{
 		try {
 			boundColumnJDBCType = JDBCType.valueOf(
@@ -987,24 +983,6 @@ final class SSCommon
 		);
 		JOptionPane.showMessageDialog((Component)getSSComponent(), msg,
 				title, JOptionPane.ERROR_MESSAGE);
-	}
-
-	/**
-	 * Sets the Connection to the database
-	 *
-	 * @param _connection the connection to set
-	 */
-	void setConnection(Connection _connection) {
-		connection = _connection;
-	}
-
-	/**
-	 * Returns the Connection to the database
-	 *
-	 * @return the connection
-	 */
-	Connection getConnection() {
-		return connection;
 	}
 
 	/**

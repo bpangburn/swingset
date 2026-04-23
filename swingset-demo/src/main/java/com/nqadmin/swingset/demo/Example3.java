@@ -51,6 +51,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import com.nqadmin.swingset.SSDBComboBox;
+import com.nqadmin.swingset.SSDBNav;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
@@ -130,76 +131,12 @@ public class Example3 extends JFrame {
 		try {
 			rowset = DemoUtil.getNewRowSet(connection);
 			rowset.setCommand("SELECT * FROM supplier_part_data");
-			rowsModel = RowsModel.create(rowset);
+			rowset.execute();
+			rowsModel = RowsModel.create(rowset, createDbNav());
 			navigator = new SSDataNavigator(rowsModel);
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, "SQL Exception.", se);
 		}
-
-		/**
-		 * Various navigator overrides needed to support H2
-		 * H2 does not fully support updatable rowset so it must be
-		 * re-queried following insert and delete with rowset.execute()
-		 */
-		rowsModel.setDBNav(new SSDBNavImpl(this) {
-			/**
-			 * Re-query the rowset following a deletion. This is needed for H2.
-			 */
-			@Override
-			public void performPostDeletionOps() {
-				super.performPostDeletionOps();
-				try {
-					rowset.execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-			}
-
-			/**
-			 * Requery the rowset following an insertion. This is needed for H2.
-			 */
-			@Override
-			public void performPostInsertOps() {
-				super.performPostInsertOps();
-				try {
-					rowset.execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-			}
-
-			/**
-			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
-			 */
-			@Override
-			public void performPreInsertOps() {
-
-				// SSDBNavImpl will clear the component values
-				super.performPreInsertOps();
-
-				// GET THE NEW RECORD ID.
-				// .createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-				try (ResultSet rs = connection
-						.createStatement()
-						.executeQuery("SELECT nextval('supplier_part_data_seq') as nextVal;"))
-				{
-					rs.next();
-					int supplierPartID = rs.getInt("nextVal");
-					txtSupplierPartID.setText(String.valueOf(supplierPartID));
-				} catch(final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
-				} catch(final Exception e) {
-					logger.log(Level.ERROR, "Exception occured initializing new record.",e);
-				}
-				// SET OTHER DEFAULTS
-				logger.log(DEBUG, "Setting default for Supplier Name mapping to 2.");
-				cmbSupplierName.setChosenKey((long) 2);
-//					 cmbPartName.setSelectedValue(0);
-//					 txtQuantity.setText("0");
-
-			}
-
-		});
 
 		// SETUP DB COMBO QUERIES
 			String query = "SELECT * FROM supplier_data;";
@@ -209,12 +146,13 @@ public class Example3 extends JFrame {
 			cmbPartName = new SSDBComboBox(connection, query, "part_id", "part_name");
 
 		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
-			txtSupplierPartID.bind(rowsModel, "supplier_part_id");
-			cmbSupplierName.bind(rowsModel, "supplier_id");
 			cmbPartName.setAllowNull(false);
-			cmbPartName.bind(rowsModel, "part_id");
-			txtQuantity.bind(rowsModel, "quantity");
-			txtShipDate.bind(rowsModel, "ship_date");
+
+			rowsModel.bind(txtSupplierPartID, "supplier_part_id");
+			rowsModel.bind(cmbSupplierName, "supplier_id");
+			rowsModel.bind(cmbPartName, "part_id");
+			rowsModel.bind(txtQuantity, "quantity");
+			rowsModel.bind(txtShipDate, "ship_date");
 
 		// RUN DB COMBO QUERIES
 			try {
@@ -286,4 +224,69 @@ public class Example3 extends JFrame {
 			pack();
 	}
 
+	/**
+	 * Various navigator overrides needed to support H2
+	 * H2 does not fully support updatable rowset so it must be
+	 * re-queried following insert and delete with rowset.execute()
+	 */
+	private SSDBNav createDbNav() {
+		return new SSDBNavImpl(this) {
+			/**
+			 * Re-query the rowset following a deletion. This is needed for H2.
+			 */
+			@Override
+			public void performPostDeletionOps() {
+				super.performPostDeletionOps();
+				try {
+					rowset.execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				}
+			}
+
+			/**
+			 * Requery the rowset following an insertion. This is needed for H2.
+			 */
+			@Override
+			public void performPostInsertOps() {
+				super.performPostInsertOps();
+				try {
+					rowset.execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				}
+			}
+
+			/**
+			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
+			 */
+			@Override
+			public void performPreInsertOps() {
+
+				// SSDBNavImpl will clear the component values
+				super.performPreInsertOps();
+
+				// GET THE NEW RECORD ID.
+				// .createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+				try (ResultSet rs = connection
+						.createStatement()
+						.executeQuery("SELECT nextval('supplier_part_data_seq') as nextVal;"))
+				{
+					rs.next();
+					int supplierPartID = rs.getInt("nextVal");
+					txtSupplierPartID.setText(String.valueOf(supplierPartID));
+				} catch(final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
+				} catch(final Exception e) {
+					logger.log(Level.ERROR, "Exception occured initializing new record.",e);
+				}
+				// SET OTHER DEFAULTS
+				logger.log(DEBUG, "Setting default for Supplier Name mapping to 2.");
+				cmbSupplierName.setChosenKey((long) 2);
+//					 cmbPartName.setSelectedValue(0);
+//					 txtQuantity.setText("0");
+			}
+
+		};
+	}
 }

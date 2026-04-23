@@ -247,22 +247,24 @@ public class SSUtils {
 		try {
 			if (crs.getKeyColumns() != null)
 				return;
-			String tableName = crs.getMetaData().getTableName(comp.getBoundColumnIndex());
-			int[] keys = getPrimaryKeyColumnsForTable(
-					SSDBSupport.getDefault().getSharedConnection(crs), tableName);
+			int[] keys = getPrimaryKeyColumns(
+					SSDBSupport.getDefault().getSharedConnection(crs), crs);
 			crs.setKeyColumns(keys);
 		} catch (SQLException ex) {
 		}
 	}
-	private static int[] getPrimaryKeyColumnsForTable(Connection connection, String tableName) throws SQLException
+	private static int[] getPrimaryKeyColumns(Connection connection, CachedRowSet crs) throws SQLException
 	{
-		return getPrimaryKeyColumnsForTable(connection.getMetaData(), tableName);
+		return getPrimaryKeyColumns(connection.getMetaData(), crs);
 	}
 
-	private static int[] getPrimaryKeyColumnsForTable(DatabaseMetaData dbMetaData, String tableName) throws SQLException
+	private static int[] getPrimaryKeyColumns(DatabaseMetaData dbMetaData, CachedRowSet crs) throws SQLException
 	{
-		List<KeyInfo> kinfo = getPrimaryKeyInfoForTable(dbMetaData, tableName);
-		return kinfo.stream().mapToInt(ki -> ki.keySeq).toArray();
+		List<KeyInfo> kinfo = getPrimaryKeyInfoForTable(dbMetaData, crs.getTableName().toUpperCase());
+		int[] keyCols = new int[kinfo.size()];
+		for (KeyInfo ki : kinfo)
+			keyCols[ki.keySeq - 1] = crs.findColumn(ki.columnName);
+		return keyCols;
 	}
 
 	public record KeyInfo(int keySeq, String columnName){}
