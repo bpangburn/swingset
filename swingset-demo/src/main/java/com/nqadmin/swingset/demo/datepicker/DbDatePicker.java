@@ -16,23 +16,22 @@
  */
 package com.nqadmin.swingset.demo.datepicker;
 
-import com.github.lgooddatepicker.components.DatePicker;
-import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
-import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
-import com.nqadmin.swingset.utils.SSComponentInterface;
-import com.nqadmin.swingset.utils.SSUtils;
-
 import java.lang.System.Logger;
 import java.sql.JDBCType;
 import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.EventListener;
 
-import javax.sql.RowSet;
+import com.github.lgooddatepicker.components.DatePicker;
+import com.github.lgooddatepicker.components.DatePickerSettings;
+import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
+import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
+import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSUtils;
 
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static com.nqadmin.swingset.datasources.ConvertType.assertConvertFromJdbcType;
-
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.sql.JDBCType.DATE;
 
@@ -59,22 +58,31 @@ public class DbDatePicker extends DatePicker implements SSComponentInterface
 	 */
 	public DbDatePicker()
 	{
+		super(initialSettings());
+
 		//setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
 		finishSSCommon();
+	}
+
+	private static DatePickerSettings initialSettings()
+	{
+		DatePickerSettings dps = new DatePickerSettings();
+		return dps;
 	}
 
 	/**
 	 * Create date picker and bind it to the specified column in the
 	 * given RowSet.
 	 *
-	 * @param rowSet        datasource to be used.
+	 * @param rowsModel       datasource to be used.
 	 * @param boundColumnName name of the column to which this check box should
 	 *                        be bound
 	 */
-	public DbDatePicker(RowSet rowSet, String boundColumnName)
+	@SuppressWarnings("LeakingThisInConstructor")
+	public DbDatePicker(RowsModel rowsModel, String boundColumnName)
 	{
 		this();
-		bind(rowSet, boundColumnName);
+		rowsModel.bind(this, boundColumnName);
 	}
 
 	/** {@inheritDoc} */

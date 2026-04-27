@@ -118,6 +118,20 @@ public class TestBaseComponents extends JFrame
 	private Map<Comps, Comp> compInfo = new EnumMap<>(Comps.class);
 	private EnumSet<Comps> activeComps = EnumSet.allOf(Comps.class);
 
+	 // Thing in this set will not have their preferred height made smaller.
+	private EnumSet<Comps> keepMinHeight = EnumSet.of(
+			// H1
+			// Commnet out the next line to get original test behavior
+			NAV, PK, CHECK, COMBO, ENUM_COMBO, DB_COMBO, LABEL, SLIDER, TEXT_FIELD,
+			DATE_PICKER
+
+			// H2
+			// LIST, TEXT_AREA,
+
+			// H3
+			// IMAGE
+	);
+
 	private void populateComps()
 	{
 		// This list must be in the same order as the Comps enum.
@@ -277,7 +291,7 @@ public class TestBaseComponents extends JFrame
 		lstSSList = new SSList(getCollectionModel());
 		
 		populateComps();
-		activeComps.removeAll(EnumSet.of(DATE_PICKER));
+		//activeComps.remove(DATE_PICKER);
 		
 		//activeComps.removeAll(EnumSet.of(CHECK, LABEL));
 		//activeComps.clear();
@@ -402,7 +416,7 @@ public class TestBaseComponents extends JFrame
 		
 		// Add the components, there's a special case with the list scroll pane.
 		buildGui_add(contentPane, constraints, lstScrollPane);
-		
+
 		constraints.gridx = 0;
 		constraints.gridwidth = 2;
 		contentPane.add(navigator, constraints);
@@ -527,10 +541,17 @@ public class TestBaseComponents extends JFrame
 	}
 
 	/** For enabled components, return list of records. */
-	private List<Comp> getActiveCompInfo()
+	private List<Comps> getActiveComps()
 	{
 		return activeComps.stream()
 				.filter((eComp) -> eComp != STAR)
+				.collect(Collectors.toList());
+	}
+
+	/** For enabled components, return list of records. */
+	private List<Comp> getActiveCompInfo()
+	{
+		return getActiveComps().stream()
 				.map((eComp) -> compInfo.get(eComp)).collect(Collectors.toList());
 	}
 
@@ -538,23 +559,32 @@ public class TestBaseComponents extends JFrame
 	{
 		for (Comp comp : getActiveCompInfo()) {
 			if (comp.col != null)
-				comp.comp.bind(rowsModel, comp.col);
+				rowsModel.bind(comp.comp, comp.col);
 		}
 	}
 
 	private void buildGui_dim()
 	{
-		for (Comp comp : getActiveCompInfo()) {
-			comp.label.setPreferredSize( switch (comp.dim) {
+		for (Comps c : getActiveComps()) {
+			Comp ci = compInfo.get(c);
+			ci.label.setPreferredSize( switch (ci.dim) {
 				case H1 -> MainClass.labelDim;
 				case H2 -> MainClass.labelDimTall;
 				case H3 -> MainClass.labelDimVeryTall;
 			});
-			((JComponent)comp.comp).setPreferredSize( switch (comp.dim) {
+
+			Dimension targetDim = new Dimension(switch (ci.dim) {
 				case H1 -> MainClass.ssDim;
 				case H2 -> MainClass.ssDimTall;
 				case H3 -> MainClass.ssDimVeryTall;
 			});
+			JComponent jc = (JComponent)ci.comp;
+			if (keepMinHeight.contains(c)) {
+				int curHeight = jc.getPreferredSize().height;
+				if (curHeight > targetDim.height)
+					targetDim.height = curHeight;
+			}
+			jc.setPreferredSize(targetDim);
 		}
 	}
 
