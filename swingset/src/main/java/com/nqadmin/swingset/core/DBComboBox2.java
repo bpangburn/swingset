@@ -166,10 +166,8 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 */
 	protected String primaryKeyColumnName = "";
 
-//	/**
-//	 * String typed by user into combobox
-//	 */
-//	protected String priorEditorText = "";
+	/** database connection to populate combobox */
+	private Connection connection = null;
 
 	/**
 	 * Query used to populate combo box.
@@ -230,6 +228,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 * @param displayColumnName    column name used to query/generate the combo DisplayValues
 	 */
 	// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
+	// TODO: Need to handle multi-column key?
 	@SuppressWarnings({"all","OverridableMethodCallInConstructor"})
 	public DBComboBox2(Connection connection, String query,
 			String primaryKeyColumnName, String displayColumnName) {
@@ -297,25 +296,6 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	// 	}
 	// }
 	// return displayValues;
-
-	/**
-	 * Retrieves the database column (normally a primary key) from which
-	 * to query the keys for the bound column.
-	 *
-	 * @return name of the PK value to query for the bound column keys
-	 */
-	public String getPrimaryKeyColumnName() {
-		return primaryKeyColumnName;
-	}
-
-	/**
-	 * Returns the query used to retrieve values from database for the combo box.
-	 *
-	 * @return returns the query used.
-	 */
-	public String getQuery() {
-		return query;
-	}
 
 	/**
 	 * Returns the second column name whose values are also displayed in the combo
@@ -436,6 +416,24 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	}
 
 	/**
+	 * Sets the Connection to the database to populate combobox.
+	 *
+	 * @param _connection the connection to set
+	 */
+	private void setConnection(Connection connection) {
+		this.connection = connection;
+	}
+
+	/**
+	 * Returns the Connection to the database to populate combobox.
+	 *
+	 * @return the connection
+	 */
+	private Connection getConnection() {
+		return connection;
+	}
+
+	/**
 	 * When a display column is of type date you can choose the format in which it
 	 * has to be displayed. For the pattern refer SimpleDateFormat in java.text package.
 	 *
@@ -472,15 +470,35 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	}
 
 	/**
+	 * Retrieves the database column (normally a primary key) from which
+	 * to query the keys for the bound column.
+	 *
+	 * @return name of the PK value to query for the bound column keys
+	 */
+	public String getPrimaryKeyColumnName() {
+		return primaryKeyColumnName;
+	}
+
+	/**
 	 * Sets the query used to display items in the combo box.
 	 *
 	 * @param query query to be used to get values from database (to display combo
 	 *               box items)
 	 */
+	// get rid of this, add query as argument to execute()?
 	public void setQuery(final String query) {
 		final String oldValue = this.query;
 		this.query = query;
 		firePropertyChange("query", oldValue, this.query);
+	}
+
+	/**
+	 * Returns the query used to retrieve values from database for the combo box.
+	 *
+	 * @return returns the query used.
+	 */
+	public String getQuery() {
+		return query;
 	}
 
 	/**

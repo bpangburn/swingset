@@ -42,8 +42,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
-import java.nio.file.Path;
-import java.sql.Connection;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EventListener;
@@ -188,8 +186,48 @@ public interface SSComponentInterface extends RSC
 	////////////////////////////////////////////////////////////////////////////
 	//
 	// The methods beyond this point have default implementations.
-	// Typically, they are convenience methods that bounce to SSCommon
-	// and they should NOT be overridden.
+	//
+	// The first group are commonly overriden.
+	//
+
+	/**
+	 * Method to allow Developer to add functionality when SwingSet component is
+	 * instantiated.
+	 * <p>
+	 * It will actually be called from SSCommon.init() once the SSCommon data member
+	 * is instantiated.
+	 */
+	default void customInit() {}
+
+	/** Invoked during bind, component should verify that jdbcType is ok.
+	 * @param jdbcType column JDBCType
+	 * @throws IllegalArgumentException if can't handle JDBCType
+	 */
+	default void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException { }
+
+	/**
+	 * Override this method for notification of a change in metadata.
+	 * Typically from setRowSet() or bind().
+	 */
+	default void metadataChange() { }
+
+	/**
+	 * Invoked at the end of bind; default sets up primary keys for CachedRowSet.
+	 * Invoke super if override.
+	 */
+	// TODO: currently called once per column, only needed once per RowSet?
+	default void finishBind()
+	{
+		// Primary keys for SyncResolver, joins
+		if (getRowSet() instanceof CachedRowSet)
+			SSUtils.setupDefaultPrimaryKeys(this);
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////
+	//
+	// The rest of these methods are convenience methods that bounce
+	// to SSCommon and typically are not overridden.
 	//
 
 	/**
@@ -219,26 +257,6 @@ public interface SSComponentInterface extends RSC
 	default void dbChange(Runnable r)
 	{
 			getSSCommon().dbChange(r);
-	}
-
-
-	/** Invoked during bind, component should verify that jdbcType is ok.
-	 * @param jdbcType column JDBCType
-	 * @throws AssertionError if can't handle JDBCType
-	 */
-	// TODO: checkColumnType use a different exception?
-	default void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException
-	{
-	}
-
-	/**
-	 * Invoked at the end of bind; default sets up primary keys for CachedRowSet.
-	 */
-	default void finishBind()
-	{
-		// Primary keys for SyncResolver, joins
-		if (getRowSet() instanceof CachedRowSet)
-			SSUtils.setupDefaultPrimaryKeys(this);
 	}
 	
 	/**
@@ -280,28 +298,12 @@ public interface SSComponentInterface extends RSC
 	}
 
 	/**
-	 * Override this method for notification of a change in metadata.
-	 * Typically from setRowSet() or bind().
-	 */
-	default void metadataChange() {
-	}
-
-	/**
 	 * Setup additional focus transfer keys.
 	 */
 	default void configureTraversalKeys()
 	{
 		SSCommon.configureTraversalKeys((JComponent)this);
 	}
-
-	/**
-	 * Method to allow Developer to add functionality when SwingSet component is
-	 * instantiated.
-	 * <p>
-	 * It will actually be called from SSCommon.init() once the SSCommon data member
-	 * is instantiated.
-	 */
-	default void customInit() {}
 
 	/**
 	 * Retrieves the allowNull flag for the bound database column.
@@ -401,15 +403,6 @@ public interface SSComponentInterface extends RSC
 	}
 
 	/**
-	 * Returns the Connection to the database.
-	 *
-	 * @return the connection
-	 */
-	default Connection getConnection() {
-		return getSSCommon().getConnection();
-	}
-
-	/**
 	 * Returns the RowSet containing queried data from the database.
 	 *
 	 * @return the rowSet
@@ -494,15 +487,6 @@ public interface SSComponentInterface extends RSC
 	 */
 	default void setBoundColumnText(final String _boundColumnText) {
 		getSSCommon().setBoundColumnText(_boundColumnText);
-	}
-
-	/**
-	 * Sets the Connection to the database
-	 *
-	 * @param _connection the connection to set
-	 */
-	default void setConnection(final Connection _connection) {
-		getSSCommon().setConnection(_connection);
 	}
 
 	/**
@@ -659,15 +643,4 @@ public interface SSComponentInterface extends RSC
 	default boolean decorate() {
 		return getSSCommon().decorate();
 	}
-
-	/**
-	 * Report problem accessing image file to user.
-	 * @param title dialog title
-	 * @param path file path
-	 * @param ex error
-	 */
-	default void reportError(String title, Path path, Exception ex) {
-		getSSCommon().reportError(title, path, ex);
-	}
-
 }

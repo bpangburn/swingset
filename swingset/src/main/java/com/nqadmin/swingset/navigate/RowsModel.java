@@ -234,21 +234,25 @@ public class RowsModel
 	 * @throws SQLException 
 	 */
 	static boolean verifyExecuted(RowSet rs) {
+		String msg;
 		try {
-			int initial_row = rs.getRow(); // exception if RowSet not executed.
-			if (initial_row == 0)
-				rs.beforeFirst();
-			return true;
+			boolean ok = rs.getMetaData() != null
+					? rs.getMetaData().getColumnCount() > 0 : false; // CachedRowSet
+			if (ok)
+				return true;
+			msg = "no exception";
 		} catch (SQLException ex) {
-			try {
-				logger.log(Level.ERROR, () -> sf("'getRow()': %s. Will execute query", ex.getMessage()));
-				// TODO: take out the callExecute error recovery, propogate the exception
-				rs.execute();
-			} catch (SQLException ex1) {
-				logger.log(Level.ERROR, "execute() SQL Exception", ex1);
-			}
-			return false;
+			msg = ex.getMessage();
 		}
+		String fMsg = msg;
+		try {
+			logger.log(Level.ERROR, () -> sf("%s. Will execute query", fMsg));
+			// TODO: take out the callExecute error recovery, propogate the exception
+			rs.execute();
+		} catch (SQLException ex1) {
+			logger.log(Level.ERROR, "execute() SQL Exception", ex1);
+		}
+		return false;
 	}
 
 	/**

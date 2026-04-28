@@ -47,6 +47,8 @@ import java.awt.Container;
 import java.awt.Toolkit;
 import java.lang.StackWalker.Option;
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.JDBCType;
@@ -65,6 +67,7 @@ import java.util.logging.SimpleFormatter;
 import javax.sql.RowSet;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.JoinRowSet;
+import javax.swing.JOptionPane;
 
 import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.navigate.RowsModel;
@@ -198,6 +201,38 @@ public class SSUtils {
 	}
 
 	/**
+	 * Report problem accessing image file to user.
+	 * @param logger
+	 * @param comp
+	 * @param title dialog title
+	 * @param path file path
+	 * @param ex error
+	 */
+	// TODO: Only used from Image.java. Does this belong in Image.java?
+	public static void reportError(Logger logger, SSComponentInterface comp, String title, Path path, Exception ex)
+	{
+		String pathName = path != null ? path.toAbsolutePath().toString() : "";
+		logger.log(Level.ERROR, () -> sf("%s: IO Exception %s: file %s: %s",
+				comp.getColumnForLog(), ex.getClass().getSimpleName(),
+				pathName, ex.getMessage()));
+
+		// TODO: Alter message according to parameters.
+		//		 For example, if path is null, leave out "file: 'xxx'"
+
+		String msg = sf("<html>"
+				+ "<center>%s</center>"
+				+ "<br/>Details:<br/>"
+				+ "<center>DB column: %s</center>"
+				+ "<center>File: '%s'</center>"
+				+ "<center>Exception: %s</center>",
+				ex.getLocalizedMessage(), comp.getColumnForLog(),
+				pathName, ex.getClass().getSimpleName()
+		);
+		JOptionPane.showMessageDialog((Component)comp, msg,
+				title, JOptionPane.ERROR_MESSAGE);
+	}
+
+	/**
 	 * Notify the user of something...
 	 */
 	// TODO: add option to flash window/panel...
@@ -247,22 +282,24 @@ public class SSUtils {
 		try {
 			if (crs.getKeyColumns() != null)
 				return;
-			String tableName = crs.getMetaData().getTableName(comp.getBoundColumnIndex());
-			int[] keys = getPrimaryKeyColumnsForTable(
-					SSDBSupport.getDefault().getSharedConnection(crs), tableName);
+			int[] keys = getPrimaryKeyColumns(
+					SSDBSupport.getDefault().getSharedConnection(crs), crs);
 			crs.setKeyColumns(keys);
 		} catch (SQLException ex) {
 		}
 	}
-	private static int[] getPrimaryKeyColumnsForTable(Connection connection, String tableName) throws SQLException
+	private static int[] getPrimaryKeyColumns(Connection connection, CachedRowSet crs) throws SQLException
 	{
-		return getPrimaryKeyColumnsForTable(connection.getMetaData(), tableName);
+		return getPrimaryKeyColumns(connection.getMetaData(), crs);
 	}
 
-	private static int[] getPrimaryKeyColumnsForTable(DatabaseMetaData dbMetaData, String tableName) throws SQLException
+	private static int[] getPrimaryKeyColumns(DatabaseMetaData dbMetaData, CachedRowSet crs) throws SQLException
 	{
-		List<KeyInfo> kinfo = getPrimaryKeyInfoForTable(dbMetaData, tableName);
-		return kinfo.stream().mapToInt(ki -> ki.keySeq).toArray();
+		List<KeyInfo> kinfo = getPrimaryKeyInfoForTable(dbMetaData, crs.getTableName().toUpperCase());
+		int[] keyCols = new int[kinfo.size()];
+		for (KeyInfo ki : kinfo)
+			keyCols[ki.keySeq - 1] = crs.findColumn(ki.columnName);
+		return keyCols;
 	}
 
 	public record KeyInfo(int keySeq, String columnName){}

@@ -99,6 +99,7 @@ public class DefaultSSDBSupport implements SSDBSupport
 	@Override
 	public Connection getSharedConnection(RowSet rs) throws SQLException
 	{
+		// TODO: Probably should handle more than one connection, like multiple databases
 		if (fallbackConnection != null
 				&& fallbackConnection.getCatalog()
 						.equals(rs.getMetaData().getCatalogName(1)))

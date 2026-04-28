@@ -64,6 +64,7 @@ import javax.swing.JScrollPane;
 import com.nqadmin.swingset.SSCheckBox;
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
+import com.nqadmin.swingset.SSDBNav;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSImage;
@@ -116,6 +117,20 @@ public class TestBaseComponents extends JFrame
 	private record Comp(String col, SSComponentInterface comp, JLabel label, CompDim dim){};
 	private Map<Comps, Comp> compInfo = new EnumMap<>(Comps.class);
 	private EnumSet<Comps> activeComps = EnumSet.allOf(Comps.class);
+
+	 // Thing in this set will not have their preferred height made smaller.
+	private EnumSet<Comps> keepMinHeight = EnumSet.of(
+			// H1
+			// Commnet out the next line to get original test behavior
+			NAV, PK, CHECK, COMBO, ENUM_COMBO, DB_COMBO, LABEL, SLIDER, TEXT_FIELD,
+			DATE_PICKER
+
+			// H2
+			// LIST, TEXT_AREA,
+
+			// H3
+			// IMAGE
+	);
 
 	private void populateComps()
 	{
@@ -234,7 +249,6 @@ public class TestBaseComponents extends JFrame
 	 * database component declarations
 	 */
 	Connection connection = null;
-	RowSet rowset = null;
 	SSDataNavigator navigator = null;
 	RowsModel rowsModel;
 
@@ -243,6 +257,10 @@ public class TestBaseComponents extends JFrame
 	 */
 	final SSDBComboBox cmbSSDBComboNav; // SSDBComboBox used just for navigation
 	final SSSyncManager syncManager;
+
+	RowSet getRowSet() {
+		return rowsModel.getRowSet();
+	}
 
 	/**
 	 * Method to obtain proper data structure/model for SSList based on database used
@@ -273,7 +291,7 @@ public class TestBaseComponents extends JFrame
 		lstSSList = new SSList(getCollectionModel());
 		
 		populateComps();
-		activeComps.removeAll(EnumSet.of(DATE_PICKER));
+		//activeComps.remove(DATE_PICKER);
 		
 		//activeComps.removeAll(EnumSet.of(CHECK, LABEL));
 		//activeComps.clear();
@@ -295,101 +313,16 @@ public class TestBaseComponents extends JFrame
 		
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 		try {
-			rowset = DemoUtil.getNewRowSet(connection);
+			RowSet rowset = DemoUtil.getNewRowSet(connection);
 			String sql = sf("SELECT %s FROM swingset_base_test_data", getColumnsSQL());
 			logger.log(INFO, sql);
 			rowset.setCommand(sql);
-			rowsModel = RowsModel.create(rowset);
+			rowset.execute();
+			rowsModel = RowsModel.create(rowset, createDbNav());
 			navigator = new SSDataNavigator(rowsModel);
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, "SQL Exception.", se);
 		}
-		
-		/**
-		 * Various navigator overrides needed to support H2
-		 * <p>
-		 * H2 does not fully support updatable rowset so it must be
-		 * re-queried following insert and delete with rowset.execute()
-		 */
-		rowsModel.setDBNav(new SSDBNavImpl(this)
-		{
-			/**
-			 * Requery the rowset following a deletion. This is needed for H2.
-			 */
-			@Override
-			public void performPostDeletionOps() {
-				super.performPostDeletionOps();
-				try {
-					rowset.execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-				performRefreshOps();
-			}
-			
-			/**
-			 * Requery the rowset following an insertion. This is needed for H2.
-			 */
-			@Override
-			public void performPostInsertOps() {
-				super.performPostInsertOps();
-				//TestBaseComponents.this.cmbSSDBComboNav.setEnabled(true);
-				try {
-					rowset.execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-				performRefreshOps();
-			}
-			
-			/**
-			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
-			 */
-			@Override
-			public void performPreInsertOps() {
-				//
-				// WHERE IS THE PRIMARY KEY SET? See example1
-				//
-				
-				// SSDBNavImpl will clear the component values
-				super.performPreInsertOps();
-				
-				setDefaultValues();
-				
-			}
-			
-			/**
-			 * Manage sync manager during a Refresh
-			 */
-			@Override
-			public void performRefreshOps() {
-				super.performRefreshOps();
-				if (syncManager == null)
-					return;
-				
-				syncManager.async();
-				try {
-					cmbSSDBComboNav.execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				} catch (final Exception e) {
-					logger.log(Level.ERROR, "Exception.", e);
-				}
-				syncManager.sync();
-			}
-			
-			/**
-			 * Re-enable DB Navigator following insertion Cancel
-			 */
-			@Override
-			public void performCancelOps() {
-				super.performCancelOps();
-				if (cmbSSDBComboNav == null)
-					return;
-				
-				cmbSSDBComboNav.setEnabled(true);
-			}
-		});
 		
 		
 		if (!activeComps.contains(NAV)) {
@@ -483,7 +416,7 @@ public class TestBaseComponents extends JFrame
 		
 		// Add the components, there's a special case with the list scroll pane.
 		buildGui_add(contentPane, constraints, lstScrollPane);
-		
+
 		constraints.gridx = 0;
 		constraints.gridwidth = 2;
 		contentPane.add(navigator, constraints);
@@ -498,6 +431,94 @@ public class TestBaseComponents extends JFrame
 			lstScrollPane.setPreferredSize(MainClass.ssDimTall);
 		}
 		pack();
+	}
+
+	private SSDBNav createDbNav() {
+		/**
+		 * Various navigator overrides needed to support H2
+		 * <p>
+		 * H2 does not fully support updatable rowset so it must be
+		 * re-queried following insert and delete with rowset.execute()
+		 */
+		return new SSDBNavImpl(this)
+		{
+			/**
+			 * Requery the rowset following a deletion. This is needed for H2.
+			 */
+			@Override
+			public void performPostDeletionOps() {
+				super.performPostDeletionOps();
+				try {
+					getRowSet().execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				}
+				performRefreshOps();
+			}
+			
+			/**
+			 * Requery the rowset following an insertion. This is needed for H2.
+			 */
+			@Override
+			public void performPostInsertOps() {
+				super.performPostInsertOps();
+				//TestBaseComponents.this.cmbSSDBComboNav.setEnabled(true);
+				try {
+					getRowSet().execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				}
+				performRefreshOps();
+			}
+			
+			/**
+			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
+			 */
+			@Override
+			public void performPreInsertOps() {
+				//
+				// WHERE IS THE PRIMARY KEY SET? See example1
+				//
+				
+				// SSDBNavImpl will clear the component values
+				super.performPreInsertOps();
+				
+				setDefaultValues();
+				
+			}
+			
+			/**
+			 * Manage sync manager during a Refresh
+			 */
+			@Override
+			public void performRefreshOps() {
+				super.performRefreshOps();
+				if (syncManager == null)
+					return;
+				
+				syncManager.async();
+				try {
+					cmbSSDBComboNav.execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				} catch (final Exception e) {
+					logger.log(Level.ERROR, "Exception.", e);
+				}
+				syncManager.sync();
+			}
+			
+			/**
+			 * Re-enable DB Navigator following insertion Cancel
+			 */
+			@Override
+			public void performCancelOps() {
+				super.performCancelOps();
+				if (cmbSSDBComboNav == null)
+					return;
+				
+				cmbSSDBComboNav.setEnabled(true);
+			}
+		};
 	}
 
 	/** Some components aren't fully initialized until well after startup,
@@ -520,10 +541,17 @@ public class TestBaseComponents extends JFrame
 	}
 
 	/** For enabled components, return list of records. */
-	private List<Comp> getActiveCompInfo()
+	private List<Comps> getActiveComps()
 	{
 		return activeComps.stream()
 				.filter((eComp) -> eComp != STAR)
+				.collect(Collectors.toList());
+	}
+
+	/** For enabled components, return list of records. */
+	private List<Comp> getActiveCompInfo()
+	{
+		return getActiveComps().stream()
 				.map((eComp) -> compInfo.get(eComp)).collect(Collectors.toList());
 	}
 
@@ -531,23 +559,32 @@ public class TestBaseComponents extends JFrame
 	{
 		for (Comp comp : getActiveCompInfo()) {
 			if (comp.col != null)
-				comp.comp.bind(rowsModel, comp.col);
+				rowsModel.bind(comp.comp, comp.col);
 		}
 	}
 
 	private void buildGui_dim()
 	{
-		for (Comp comp : getActiveCompInfo()) {
-			comp.label.setPreferredSize( switch (comp.dim) {
+		for (Comps c : getActiveComps()) {
+			Comp ci = compInfo.get(c);
+			ci.label.setPreferredSize( switch (ci.dim) {
 				case H1 -> MainClass.labelDim;
 				case H2 -> MainClass.labelDimTall;
 				case H3 -> MainClass.labelDimVeryTall;
 			});
-			((JComponent)comp.comp).setPreferredSize( switch (comp.dim) {
+
+			Dimension targetDim = new Dimension(switch (ci.dim) {
 				case H1 -> MainClass.ssDim;
 				case H2 -> MainClass.ssDimTall;
 				case H3 -> MainClass.ssDimVeryTall;
 			});
+			JComponent jc = (JComponent)ci.comp;
+			if (keepMinHeight.contains(c)) {
+				int curHeight = jc.getPreferredSize().height;
+				if (curHeight > targetDim.height)
+					targetDim.height = curHeight;
+			}
+			jc.setPreferredSize(targetDim);
 		}
 	}
 

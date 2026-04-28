@@ -52,6 +52,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import com.nqadmin.swingset.SSComboBox;
+import com.nqadmin.swingset.SSDBNav;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
@@ -93,9 +94,12 @@ public class Example2 extends JFrame
 	 * database component declarations
 	 */
 	Connection connection = null;
-	RowSet rowset = null;
 	SSDataNavigator navigator = null;
 	RowsModel rowsModel;
+
+	RowSet getRowSet() {
+		return rowsModel.getRowSet();
+	}
 
 	/**
 	 * Constructor for Example2
@@ -120,79 +124,14 @@ public class Example2 extends JFrame
 		
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 		try {
-			rowset = DemoUtil.getNewRowSet(connection);
+			RowSet rowset = DemoUtil.getNewRowSet(connection);
 			rowset.setCommand("SELECT * FROM supplier_data");
-			rowsModel = RowsModel.create(rowset);
+			rowset.execute();
+			rowsModel = RowsModel.create(rowset, createDbNav());
 			navigator = new SSDataNavigator(rowsModel);
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, "SQL Exception.", se);
 		}
-		
-		/**
-		 * Various navigator overrides needed to support H2
-		 * H2 does not fully support updatable rowset so it must be
-		 * re-queried following insert and delete with rowset.execute()
-		 */
-		rowsModel.setDBNav(new SSDBNavImpl(this)
-		{
-			/**
-			 * Requery the rowset following a deletion. This is needed for H2.
-			 */
-			@Override
-			public void performPostDeletionOps()
-			{
-				super.performPostDeletionOps();
-				try {
-					rowset.execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-			}
-
-			/**
-			 * Requery the rowset following an insertion. This is needed for H2.
-			 */
-			@Override
-			public void performPostInsertOps()
-			{
-				super.performPostInsertOps();
-				try {
-					rowset.execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-			}
-
-			/**
-			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
-			 */
-			@Override
-			public void performPreInsertOps()
-			{
-				// SSDBNavImpl will clear the component values
-				super.performPreInsertOps();
-				
-				try (final ResultSet rs = connection.createStatement(
-							ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-						.executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");
-				) {
-					// GET THE NEW RECORD ID.
-					rs.next();
-					final int supplierID = rs.getInt("nextVal");
-					txtSupplierID.setText(String.valueOf(supplierID));
-					
-					// // SET OTHER DEFAULTS
-					// 	 txtSupplierName.setText(null);
-					// 	 txtSupplierCity.setText(null);
-					// 	 cmbSupplierStatus.setSelectedValue(0);
-					
-				} catch(final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
-				} catch(final Exception e) {
-					logger.log(Level.ERROR, "Exception occured initializing new record.",e);
-				}
-			}
-		});
 
 		// SETUP THE COMBO BOX OPTIONS TO BE DISPLAYED AND THEIR CORRESPONDING VALUES
 		//	 LETS ASSUME THE STATUS CODE TO TEXT MAPPINGS
@@ -259,4 +198,71 @@ public class Example2 extends JFrame
 		pack();
 	}
 
+	private SSDBNav createDbNav() {
+		/**
+		 * Various navigator overrides needed to support H2
+		 * H2 does not fully support updatable rowset so it must be
+		 * re-queried following insert and delete with rowset.execute()
+		 */
+		return new SSDBNavImpl(this)
+		{
+			/**
+			 * Requery the rowset following a deletion. This is needed for H2.
+			 */
+			@Override
+			public void performPostDeletionOps()
+			{
+				super.performPostDeletionOps();
+				try {
+					getRowSet().execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				}
+			}
+
+			/**
+			 * Requery the rowset following an insertion. This is needed for H2.
+			 */
+			@Override
+			public void performPostInsertOps()
+			{
+				super.performPostInsertOps();
+				try {
+					getRowSet().execute();
+				} catch (final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception.", se);
+				}
+			}
+
+			/**
+			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
+			 */
+			@Override
+			public void performPreInsertOps()
+			{
+				// SSDBNavImpl will clear the component values
+				super.performPreInsertOps();
+				
+				try (final ResultSet rs = connection.createStatement(
+							ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
+						.executeQuery("SELECT nextval('supplier_data_seq') as nextVal;");
+				) {
+					// GET THE NEW RECORD ID.
+					rs.next();
+					final int supplierID = rs.getInt("nextVal");
+					txtSupplierID.setText(String.valueOf(supplierID));
+					
+					// // SET OTHER DEFAULTS
+					// 	 txtSupplierName.setText(null);
+					// 	 txtSupplierCity.setText(null);
+					// 	 cmbSupplierStatus.setSelectedValue(0);
+					
+				} catch(final SQLException se) {
+					logger.log(Level.ERROR, "SQL Exception occured initializing new record.",se);
+				} catch(final Exception e) {
+					logger.log(Level.ERROR, "Exception occured initializing new record.",e);
+				}
+			}
+		};
+	}
 }

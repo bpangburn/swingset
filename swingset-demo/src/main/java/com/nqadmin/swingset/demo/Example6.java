@@ -37,20 +37,18 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.sql.RowSet;
 import javax.swing.JFrame;
 
-import org.apache.logging.log4j.LogManager;
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-import static java.lang.System.Logger.Level.*;
-
 import com.nqadmin.swingset.SSDataGrid;
-import com.nqadmin.swingset.SSDataValue;
+import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSUtils;
 
 /**
@@ -58,6 +56,7 @@ import com.nqadmin.swingset.utils.SSUtils;
  * to display a tabular view of the part_data table. It adds a
  * ComboRenderer for the color column.
  */
+@SuppressWarnings("serial")
 public class Example6 extends JFrame {
 
 	/**
@@ -74,18 +73,19 @@ public class Example6 extends JFrame {
 	 * data grid
 	 */
 	SSDataGrid dataGrid = null;
+	RowsModel rowsModel;
 	
 	/**
 	 * database component declarations
 	 */
 	Connection connection = null;
-	RowSet rowset = null;
 
 	/**
 	 * Constructor for Example6
 	 * <p>
 	 * @param _dbConn - database connection
 	 */
+	@SuppressWarnings("LeakingThisInConstructor")
 	public Example6(final Connection _dbConn) {
 
 		// SET SCREEN TITLE
@@ -108,18 +108,21 @@ public class Example6 extends JFrame {
 	/**
 	 * Initialize the screen & datagrid
 	 */
+	@SuppressWarnings({"BroadCatchBlock", "TooBroadCatch"})
 	private void init() {
 
 		// INTERACT WITH DATABASE IN TRY/CATCH BLOCK
 			try {
 			// INITIALIZE DATABASE CONNECTION AND COMPONENTS
-				rowset = DemoUtil.getNewRowSet(connection);
+				RowSet rowset = DemoUtil.getNewRowSet(connection);
 				rowset.setCommand("SELECT * FROM part_data ORDER BY part_name;");
+				rowset.execute();
+				rowsModel = RowsModel.create(rowset, null);
 
 			// SETUP THE DATA GRID - SET THE HEADER BEFORE SETTING THE ROWSET
 				dataGrid = new SSDataGrid();
 				dataGrid.setHeaders(new String[] { "Part ID", "Part Name", "Color Code", "Weight", "City" });
-				dataGrid.setRowSet(rowset);
+				dataGrid.setRowsModel(rowsModel);
 				dataGrid.setMessageWindow(this);
 
 			// DISABLES NEW INSERTIONS TO THE DATABASE. - NOT CURRENTLY WORKING FOR H2
@@ -138,28 +141,23 @@ public class Example6 extends JFrame {
 						new Object[] { "", 1, 20, "Default City" });
 
 				dataGrid.setPrimaryColumn("part_id");
-				dataGrid.setSSDataValue(new SSDataValue() {
-					@Override
-					public Object getPrimaryColumnValue() {
-
-						int partID = 0;
-
-						try {
+				dataGrid.setSSDataValue(() -> {
+					int partID = 0;
+					
+					try {
 						// GET THE NEW RECORD ID.
-							final ResultSet rs = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-									.executeQuery("SELECT nextval('part_data_seq') as nextVal;");
+						Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+						try (ResultSet rs = statement.executeQuery("SELECT nextval('part_data_seq') as nextVal;")) {
 							rs.next();
 							partID = rs.getInt("nextVal");
-							rs.close();
-
-						} catch(final SQLException se) {
-							logger.log(Level.ERROR, "SQL Exception occured obtaining primary key value for new record.",se);
-						} catch(final Exception e) {
-							logger.log(Level.ERROR, "Exception occured obtaining primary key value for new record.",e);
 						}
-
-						return partID;
+					} catch(SQLException se) {
+						logger.log(Level.ERROR, "SQL Exception occured obtaining primary key value for new record.",se);
+					} catch(Exception e) {
+						logger.log(Level.ERROR, "Exception occured obtaining primary key value for new record.",e);
 					}
+					
+					return partID;
 				});
 
 			} catch (final SQLException se) {

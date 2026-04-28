@@ -22,7 +22,6 @@ Is RowsAction.foreceEvent needed? Always generate event.
 
 ================================================================================
 
-rename: finishSSCommon to completeSSCommon?
 
 ================================================================================
 
@@ -66,6 +65,8 @@ External controls
     - NavCombo
 
 Allow multiple NavCombo for a RowSet?
+
+In DBComboBox2 get rid of [sg]etQuery? Add query argument to execute?
 
 In RowsActions, ACT_REFRESH has "if (callExecute)", when false does nothing; with
 an unconditional "getNavState().dBNav.performRefreshOps()" after the if. The
