@@ -37,8 +37,13 @@
  ******************************************************************************/
 package com.nqadmin.swingset.utils;
 
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.WARNING;
+
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Frame;
 import java.beans.PropertyVetoException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
@@ -56,10 +61,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
+import com.nqadmin.rowset.JdbcRowSetImpl;
 import com.nqadmin.swingset.navigate.RowsModel;
-
-import static com.nqadmin.swingset.utils.SSUtils.sf;
-import static java.lang.System.Logger.Level.*;
 
 //SSScreenHelperCommon.java
 //
@@ -230,11 +233,25 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	}
 
 	/**
+	 * TODO: 2026-04-28_BP: We may want to add/use code from:
+	 * 		com.nqadmin.swingset.demo.DemoUtil.getNewRowSet(Connection)
+	 * 		to have more flexible connection/rowset options.
+	 * 
+	 * 		For now, I'm just hard-coding this to assume that connectionOrDataSource is a java.sql.Connection
+	 * 		and returning a com.nqadmin.rowset.JdbcRowSetImpl rowset.
+	 * 
+	 * 		Don't want to implement in SSFormViewScreenHelper and/or SSDataGridScreenHelper or screens that
+	 * 		extend them.
+	 * 
 	 * @param connectionOrDataSource either Connection or String dataSourceName
 	 * @return a new rowset
 	 * @throws java.sql.SQLException
 	 */
-	protected abstract RowSet getNewRowSet(Object connectionOrDataSource) throws SQLException;
+	protected RowSet getNewRowSet(Object connectionOrDataSource) throws SQLException {
+	
+		return new JdbcRowSetImpl((Connection) connectionOrDataSource);
+		
+	}
 	
 	/**
 	 * Builds and returns custom menu bar and with applicable listeners.
@@ -605,5 +622,23 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	 */
 	protected abstract void updateSSDBComboBoxes();
 
+	
+//=====================================================================================
+// 2026-04-28_BP: The code BELOW is needed for SwingSet 4.0.x compatibility
+//=====================================================================================
+
+	/**
+	 * @return Parent window/container.
+	 *
+	 * @deprecated Starting in 4.0.0+ use {@link #getRootFrame()} instead.
+	 */
+	@Deprecated
+	protected Frame getMainFrame() {
+		return getRootFrame();
+	}
+	
+//=====================================================================================
+// 2026-04-28_BP: The code ABOVE is needed for SwingSet 4.0.x compatibility
+//=====================================================================================
 
 }
