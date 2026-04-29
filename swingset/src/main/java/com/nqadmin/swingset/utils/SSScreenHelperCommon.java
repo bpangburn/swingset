@@ -62,6 +62,8 @@ import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
 import com.nqadmin.rowset.JdbcRowSetImpl;
+import com.nqadmin.swingset.datasources.AppSSDBSupport;
+import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.navigate.RowsModel;
 
 //SSScreenHelperCommon.java
@@ -251,6 +253,18 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 	
 		return new JdbcRowSetImpl((Connection) connectionOrDataSource);
 		
+	}
+	
+	protected void initializeCentralLookup (Object connectionOrDataSource) {
+		logger.log(DEBUG, "Initializing CentralLookup.");
+		logger.log(DEBUG, "  CentralLookup.getDefault() before .replace() = " + CentralLookup.getDefault() + ".");
+//		if (CentralLookup.getDefault()==null) {
+//			logger.log(DEBUG, "CentralLookup.getDefault() returned null.");
+//			CentralLookup.getDefault().replace(SSDBSupport.class, new DefaultSSDBSupport(getConnection()));
+//		}
+		
+		CentralLookup.getDefault().replace(SSDBSupport.class, new AppSSDBSupport((Connection) connectionOrDataSource));
+		logger.log(DEBUG, "  CentralLookup.getDefault() after .replace() = " + CentralLookup.getDefault() + ".");
 	}
 	
 	/**

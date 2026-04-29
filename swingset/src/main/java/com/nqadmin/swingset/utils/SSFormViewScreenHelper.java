@@ -543,11 +543,22 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
 	@Override
 	protected void initScreen() {
 		try {
+			// INITIALIZE CENTRALLOOKUP (IF NEEDED)
+			initializeCentralLookup(getConnection());
 
 			// SETUP QUERY, DEFAULTS, and BUILD SCREEN
 			// SET ROWSET QUERY
 			// INITIALIZE NAVIGATION ACTIONS
 			initRowsModel();
+			
+			// METADATA DEBUGGING
+			logger.log(DEBUG, "rowset class = " + getRowsModel().getRowSet().getClass().getName());
+			logger.log(DEBUG, "dataSourceName = " + getRowsModel().getRowSet().getDataSourceName());
+			logger.log(DEBUG, "url = " + getRowsModel().getRowSet().getUrl());
+			logger.log(DEBUG, "tableName = " + getRowsModel().getRowSet().getMetaData().getTableName(1));
+			logger.log(DEBUG, "catalogName = " + getRowsModel().getRowSet().getMetaData().getCatalogName(1));
+			logger.log(DEBUG, "conn catalog = " + getConnection().getCatalog());
+			logger.log(DEBUG, "conn schema = " + getConnection().getSchema());
 			
 			// INITIALIZE COMBO NAVIGATOR
 			initComboNav();

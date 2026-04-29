@@ -72,23 +72,46 @@ public class DefaultSSDBSupport implements SSDBSupport
 	/**
 	 * {@inheritDoc }
 	 * 
+	 * Changes below allow AppSSDBSupport.getSharedConnection(...) override to be used polymorphically.
+	 * The current branch’s SSDBSupport interface has DbFunc<T, R> and
+	 * runWithConnection(RowSet, DbFunc<Connection, R>), while DefaultSSDBSupport currently does
+	 * the global lookup again inside runWithConnection(...). 
+	 * 
 	 * @param <R>
 	 * @param rs
 	 * @param func
 	 * @return 
 	 */
 	@Override
-	public <R> R runWithConnection(RowSet rs, DbFunc<Connection, R> func)
-			throws SQLException
-	{
-		Connection conn01 = SSDBSupport.getDefault().getSharedConnection(rs);
-		if (conn01 != null)
-			return func.apply(conn01);
+	public <R> R runWithConnection(RowSet rs, DbFunc<Connection, R> func) throws SQLException {
+	    Connection conn01 = getSharedConnection(rs);
+	    if (conn01 != null) {
+	        return func.apply(conn01);
+	    }
 
-		try (Connection conn = SSDBSupport.getDefault().getConnection(rs);) {
-			return func.apply(conn);
-		}
+	    Connection conn = getConnection(rs);
+	    if (conn == null) {
+	        throw new SQLException("No database connection available for RowSet. "
+	                + "dataSourceName=" + rs.getDataSourceName()
+	                + ", url=" + rs.getUrl());
+	    }
+
+	    try (conn) {
+	        return func.apply(conn);
+	    }
 	}
+//	@Override
+//	public <R> R runWithConnection(RowSet rs, DbFunc<Connection, R> func)
+//			throws SQLException
+//	{
+//		Connection conn01 = SSDBSupport.getDefault().getSharedConnection(rs);
+//		if (conn01 != null)
+//			return func.apply(conn01);
+//
+//		try (Connection conn = SSDBSupport.getDefault().getConnection(rs);) {
+//			return func.apply(conn);
+//		}
+//	}
 
 	/**
 	 * {@inheritDoc }
@@ -106,6 +129,18 @@ public class DefaultSSDBSupport implements SSDBSupport
 			return fallbackConnection;
 		return null;
 	}
+// TODO 2026-04-29_BP: Consider the following to make getSharedConnection() less strict and eliminate the need for AppSSDBSupport to support Postgres. 
+//	@Override
+//	public Connection getSharedConnection(RowSet rs) throws SQLException {
+//	    if (fallbackConnection == null || fallbackConnection.isClosed()) {
+//	        return null;
+//	    }
+//
+//	    // If the application explicitly supplied a fallback connection,
+//	    // trust it unless there is a strong reason not to.
+//	    return fallbackConnection;
+//	}
+	
 
 	/**
 	 * {@inheritDoc }

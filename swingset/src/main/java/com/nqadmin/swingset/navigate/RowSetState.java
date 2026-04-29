@@ -86,40 +86,85 @@ public class RowSetState
 	}
 
 	private final Map<String, Boolean> keys;
+	
 	/**
 	 * Determine if the column in our rowset is a primary key.
 	 * Return false if problem is encountered.
+	 * 
+	 * 2026-04-29_BP: PostgreSQL commonly reports unquoted identifiers as lowercase. So keys.put(name, ...) may store lowercase keys,
+	 * but the final keys.get(columnName) asks for uppercase. That returns null, and then the public boolean isKey(...)
+	 * method auto-unboxes the Boolean and crashes. The current code also returns null on SQLException,
+	 * despite the comment saying “Return false if problem is encountered.” 
+	 * 
 	 * @param _columnName
 	 * @return true if primary key else false
 	 */
 	// TODO: isKey: base this on labelName, not columnName.
-	private Boolean isKey(String _columnName)
-	{
-		String columnName = _columnName.toUpperCase();
-		Boolean rv = keys.get(columnName);
-		if (rv != null)
-			return rv;
-		
-		// This is frequently used, create a map entry for each column
-		// Saving each RowSets column minimizes metadata access.
-		// May want to cache more metadata info in the future.
-		try {
-			List<String> names = SSUtils.getPrimaryKeyInfoForTable(rsRef.get(), columnName)
-					.stream()
-					.map((ki) -> ki.columnName())
-					.toList();
-			ResultSetMetaData rsMetaData = rsRef.get().getMetaData();
-			for(int i = 1; i <= rsMetaData.getColumnCount(); i++) {
-				String name = rsMetaData.getColumnName(i);
-				keys.put(name, names.contains(name));
-			}
-			
-		} catch (SQLException ex) {
-			// TODO: isKey: SQLEx report
-			return null;
-		}
-		return keys.get(columnName);
+	private Boolean isKey(String _columnName) {
+	    if (_columnName == null) {
+	        return false;
+	    }
+
+	    RowSet rs = rsRef.get();
+	    if (rs == null) {
+	        return false;
+	    }
+
+	    String columnName = _columnName.toUpperCase();
+
+	    Boolean rv = keys.get(columnName);
+	    if (rv != null) {
+	        return rv;
+	    }
+
+	    try {
+	        List<String> names = SSUtils.getPrimaryKeyInfoForTable(rs, columnName)
+	                .stream()
+	                .map(SSUtils.KeyInfo::columnName)
+	                .map(String::toUpperCase)
+	                .toList();
+
+	        ResultSetMetaData rsMetaData = rs.getMetaData();
+
+	        for (int i = 1; i <= rsMetaData.getColumnCount(); i++) {
+	            String name = rsMetaData.getColumnName(i);
+	            String normalizedName = name.toUpperCase();
+
+	            keys.put(normalizedName, names.contains(normalizedName));
+	        }
+	    } catch (SQLException ex) {
+	        return false;
+	    }
+
+	    return Boolean.TRUE.equals(keys.get(columnName));
 	}
+//	private Boolean isKey(String _columnName)
+//	{
+//		String columnName = _columnName.toUpperCase();
+//		Boolean rv = keys.get(columnName);
+//		if (rv != null)
+//			return rv;
+//		
+//		// This is frequently used, create a map entry for each column
+//		// Saving each RowSets column minimizes metadata access.
+//		// May want to cache more metadata info in the future.
+//		try {
+//			List<String> names = SSUtils.getPrimaryKeyInfoForTable(rsRef.get(), columnName)
+//					.stream()
+//					.map((ki) -> ki.columnName())
+//					.toList();
+//			ResultSetMetaData rsMetaData = rsRef.get().getMetaData();
+//			for(int i = 1; i <= rsMetaData.getColumnCount(); i++) {
+//				String name = rsMetaData.getColumnName(i);
+//				keys.put(name, names.contains(name));
+//			}
+//			
+//		} catch (SQLException ex) {
+//			// TODO: isKey: SQLEx report
+//			return null;
+//		}
+//		return keys.get(columnName);
+//	}
 
 	/**
 	 * Find out if this RowSet is on the insert row.
@@ -259,11 +304,17 @@ public class RowSetState
 	/**
 	 * Determine if the column in our rowset is a primary key.
 	 * Return false if problem is encountered.
+	 * 
+	 * 2026-04-29_BP: fix to treat null as false
+	 * 
 	 * @param comp
 	 * @return true if primary key else false
 	 */
+//	public static boolean isKey(RSC comp) {
+//		return getRowSetState(comp.getRowSet()).isKey(comp.getBoundColumnName());
+//	}
 	public static boolean isKey(RSC comp) {
-		return getRowSetState(comp.getRowSet()).isKey(comp.getBoundColumnName());
+		return Boolean.TRUE.equals(getRowSetState(comp.getRowSet()).isKey(comp.getBoundColumnName()));
 	}
 
 	/**
