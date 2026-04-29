@@ -281,6 +281,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 * @return returns the name of the column used to get values for combo box
 	 *         items.
 	 */
+	// TODO: 2026-04-29_BP: Make this private?
 	public String getDisplayColumnName() {
 		return displayColumnName;
 	}
@@ -304,6 +305,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 * @return returns the name of the column used to get values for combo box
 	 *         items. returns NULL if the second display column is not provided.
 	 */
+	// TODO: 2026-04-29_BP: Make this private?
 	public String getSecondDisplayColumnName() {
 		return secondDisplayColumnName;
 	}
@@ -451,6 +453,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 *
 	 * @param displayColumnName column name whose values have to be displayed.
 	 */
+	// TODO: 2026-04-29_BP: Make this private?
 	public void setDisplayColumnName(final String displayColumnName) {
 		final String oldValue = this.displayColumnName;
 		this.displayColumnName = displayColumnName;
@@ -463,6 +466,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 *
 	 * @param primaryKeyColumnName name of the PK value to query for the bound column keys
 	 */
+	// TODO: 2026-04-29_BP: Make this private?
 	public void setPrimaryKeyColumnName(final String primaryKeyColumnName) {
 		final String oldValue = this.primaryKeyColumnName;
 		this.primaryKeyColumnName = primaryKeyColumnName;
@@ -475,6 +479,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 *
 	 * @return name of the PK value to query for the bound column keys
 	 */
+	// TODO: 2026-04-29_BP: Make this private?
 	public String getPrimaryKeyColumnName() {
 		return primaryKeyColumnName;
 	}
@@ -510,6 +515,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 *                                 in the combo in addition to the first column
 	 *                                 name.
 	 */
+	// TODO: 2026-04-29_BP: Make this private? Used in SSFormViewScreenHelper. Maybe set in a Constructor? 
 	public void setSecondDisplayColumnName(final String secondDisplayColumnName) {
 		final String oldValue = this.secondDisplayColumnName;
 		this.secondDisplayColumnName = secondDisplayColumnName;
@@ -522,6 +528,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 *
 	 * @param separator separator to be used.
 	 */
+	// TODO: 2026-04-29_BP: Make this private? Used in SSFormViewScreenHelper. Maybe set in a Constructor? 
 	public void setSeparator(final String separator) {
 		final String oldValue = this.separator;
 		this.separator = separator;
