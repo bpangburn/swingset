@@ -1660,17 +1660,32 @@ public abstract class ComboBox2<K,D,D2>
 	 *         returns false if the size of arrays do not match or if the values
 	 *         could not be set
 	 */
+	// 2026-04-29_BP: updating so that keys = Collections.emptyList() does not create a key count mismatch
 	@Deprecated
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public boolean setOptions(final String[] _options, final int[] _mappings) {
-		
-//		setDisplayValues(_options == null ? Collections.emptyList() : (List<D>) Arrays.asList(_options),
-//				_mappings == null ? Collections.emptyList() : (List<K>) Arrays.asList(_mappings));
-		
-		setDisplayValues(_options == null ? Collections.emptyList() :  (List<D>) Arrays.asList(_options),
-				_mappings == null ? Collections.emptyList() : (List<K>) Arrays.asList(_mappings));
+		List displayValues = _options == null ? Collections.emptyList() : Arrays.asList(_options);
 
+		List keys = null;
+
+		if (_mappings != null) {
+			keys = Arrays.stream(_mappings).boxed().collect(Collectors.toList());
+		}
+
+		setDisplayValues(displayValues, keys);
 		return true;
 	}
+//	@Deprecated
+//	public boolean setOptions(final String[] _options, final int[] _mappings) {
+//		
+////		setDisplayValues(_options == null ? Collections.emptyList() : (List<D>) Arrays.asList(_options),
+////				_mappings == null ? Collections.emptyList() : (List<K>) Arrays.asList(_mappings));
+//		
+//		setDisplayValues(_options == null ? Collections.emptyList() :  (List<D>) Arrays.asList(_options),
+//				_mappings == null ? Collections.emptyList() : (List<K>) Arrays.asList(_mappings));
+//
+//		return true;
+//	}
 	
 	/**
 	 * Sets the options to be displayed in the list box along with
