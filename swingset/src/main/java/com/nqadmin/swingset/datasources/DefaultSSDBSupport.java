@@ -38,13 +38,14 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.datasources;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Objects;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -81,13 +82,19 @@ public class DefaultSSDBSupport implements SSDBSupport
 	public <R> R runWithConnection(RowSet rs, DbFunc<Connection, R> func)
 			throws SQLException
 	{
-		Connection conn01 = SSDBSupport.getDefault().getSharedConnection(rs);
+		Connection conn01 = getSharedConnection(rs);
 		if (conn01 != null)
 			return func.apply(conn01);
 
-		try (Connection conn = SSDBSupport.getDefault().getConnection(rs);) {
-			return func.apply(conn);
-		}
+	    Connection conn = getConnection(rs);
+	    if (conn == null)
+	        throw new SQLException("No database connection available for RowSet. "
+	                + "dataSourceName=" + rs.getDataSourceName()
+	                + ", url=" + rs.getUrl());
+
+	    try (conn) {
+	        return func.apply(conn);
+	    }
 	}
 
 	/**
@@ -96,13 +103,18 @@ public class DefaultSSDBSupport implements SSDBSupport
 	 * @return
 	 * @throws SQLException
 	 */
+	// TODO: Probably should handle more than one connection, like multiple databases
+	// TODO: Is there a better way to tell if connections is good for the RowSet?
+	// TODO: Seems to require that all column from same catalog; OK?
 	@Override
 	public Connection getSharedConnection(RowSet rs) throws SQLException
 	{
-		// TODO: Probably should handle more than one connection, like multiple databases
-		if (fallbackConnection != null
-				&& fallbackConnection.getCatalog()
-						.equals(rs.getMetaData().getCatalogName(1)))
+		if (fallbackConnection == null)
+			return null;
+		if (fallbackConnection.isClosed())
+			throw new IllegalStateException("Shared connection isClosed");
+		if (Objects.equals(fallbackConnection.getCatalog(),
+				rs.getMetaData().getCatalogName(1)))
 			return fallbackConnection;
 		return null;
 	}

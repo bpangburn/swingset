@@ -1,5 +1,9 @@
 TextDecorator API
 
+Names case conversion. Per dbms/platform plugin. Maybe only needed for metadata
+access. For example, H2 converts column_name to COLUMN_NAME. Currently using
+map with case insensitive key. See RowSetState TreeMap
+
 ================================================================================
 
 Why maintain currentRow and rowCount in navigateState? How much perf gain?

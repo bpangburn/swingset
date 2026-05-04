@@ -45,9 +45,9 @@ package com.nqadmin.swingset.navigate;
 import java.lang.ref.WeakReference;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
@@ -80,45 +80,53 @@ public class RowSetState
 	private final WeakReference<RowSet> rsRef;
 
 	private RowSetState(RowSet rs) {
-		keys = new HashMap<>();
 		rsRef = new WeakReference<>(rs);
 		debugRowSetListener = DebugRowSetListener.create(rs); // May be null.
 	}
-
-	private final Map<String, Boolean> keys;
+	// TODO: fix when case sensitivity handled in plugin.
+	// Ignore case for column names as key.
+	private final Map<String, Boolean> keys = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 	/**
 	 * Determine if the column in our rowset is a primary key.
-	 * Return false if problem is encountered.
-	 * @param _columnName
+	 * Throw an exception if problem is encountered.
+	 * 
+	 * @param _columnName Must be a column in associated RowSet.
 	 * @return true if primary key else false
 	 */
-	// TODO: isKey: base this on labelName, not columnName.
-	private Boolean isKey(String _columnName)
+	// TODO: isKey: base this on labelName, not columnName?
+	private boolean isKey(String columnName)
 	{
-		String columnName = _columnName.toUpperCase();
+		if (columnName == null) // POSSIBLE?. IF POSSIBLE, WHY CAN'T IT BE A KEY?
+			throw new IllegalArgumentException("null column name");
+		RowSet rs = rsRef.get();
+		if (rs == null)
+			throw new IllegalStateException("must be a rowset");
+
 		Boolean rv = keys.get(columnName);
 		if (rv != null)
 			return rv;
-		
-		// This is frequently used, create a map entry for each column
+		// This method is frequently used, create a map entry for each column
 		// Saving each RowSets column minimizes metadata access.
 		// May want to cache more metadata info in the future.
 		try {
-			List<String> names = SSUtils.getPrimaryKeyInfoForTable(rsRef.get(), columnName)
+			List<String> names = SSUtils.getPrimaryKeyInfoForTable(rs, columnName)
 					.stream()
 					.map((ki) -> ki.columnName())
 					.toList();
-			ResultSetMetaData rsMetaData = rsRef.get().getMetaData();
+			ResultSetMetaData rsMetaData = rs.getMetaData();
 			for(int i = 1; i <= rsMetaData.getColumnCount(); i++) {
 				String name = rsMetaData.getColumnName(i);
 				keys.put(name, names.contains(name));
 			}
 			
 		} catch (SQLException ex) {
-			// TODO: isKey: SQLEx report
-			return null;
+			// TODO: isKey: random SQLEX report. No exception?
+			throw new IllegalStateException(ex);
 		}
-		return keys.get(columnName);
+		rv = keys.get(columnName);
+		if (rv == null)
+			throw new IllegalArgumentException(sf("Column not in RowSet: %s", columnName));
+		return rv;
 	}
 
 	/**
@@ -268,6 +276,7 @@ public class RowSetState
 
 	/**
 	 * Is the current row of the RowSet dirty?
+	 * @param rs
 	 * @return is dirty
 	 */
 	public static boolean isDirty(RowSet rs) {

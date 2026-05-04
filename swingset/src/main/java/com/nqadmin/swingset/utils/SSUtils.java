@@ -201,38 +201,6 @@ public class SSUtils {
 	}
 
 	/**
-	 * Report problem accessing image file to user.
-	 * @param logger
-	 * @param comp
-	 * @param title dialog title
-	 * @param path file path
-	 * @param ex error
-	 */
-	// TODO: Only used from Image.java. Does this belong in Image.java?
-	public static void reportError(Logger logger, SSComponentInterface comp, String title, Path path, Exception ex)
-	{
-		String pathName = path != null ? path.toAbsolutePath().toString() : "";
-		logger.log(Level.ERROR, () -> sf("%s: IO Exception %s: file %s: %s",
-				comp.getColumnForLog(), ex.getClass().getSimpleName(),
-				pathName, ex.getMessage()));
-
-		// TODO: Alter message according to parameters.
-		//		 For example, if path is null, leave out "file: 'xxx'"
-
-		String msg = sf("<html>"
-				+ "<center>%s</center>"
-				+ "<br/>Details:<br/>"
-				+ "<center>DB column: %s</center>"
-				+ "<center>File: '%s'</center>"
-				+ "<center>Exception: %s</center>",
-				ex.getLocalizedMessage(), comp.getColumnForLog(),
-				pathName, ex.getClass().getSimpleName()
-		);
-		JOptionPane.showMessageDialog((Component)comp, msg,
-				title, JOptionPane.ERROR_MESSAGE);
-	}
-
-	/**
 	 * Notify the user of something...
 	 */
 	// TODO: add option to flash window/panel...
@@ -295,7 +263,14 @@ public class SSUtils {
 
 	private static int[] getPrimaryKeyColumns(DatabaseMetaData dbMetaData, CachedRowSet crs) throws SQLException
 	{
-		List<KeyInfo> kinfo = getPrimaryKeyInfoForTable(dbMetaData, crs.getTableName().toUpperCase());
+		ResultSetMetaData rsMetaData = crs.getMetaData();
+
+		int colIdx = 1; // columns from same CachedRowSet; should have same stuff. TRUE?
+		String catalog = rsMetaData.getCatalogName(colIdx);
+		String schema  = rsMetaData.getSchemaName(colIdx);
+		String table   = rsMetaData.getTableName(colIdx);
+		List<KeyInfo> kinfo = getPrimaryKeyInfoForTable(dbMetaData, catalog, schema, table);
+
 		int[] keyCols = new int[kinfo.size()];
 		for (KeyInfo ki : kinfo)
 			keyCols[ki.keySeq - 1] = crs.findColumn(ki.columnName);
@@ -307,13 +282,19 @@ public class SSUtils {
 	// TODO: keys: should spec catalog/schema?
 	/**
 	 * @param dbMetaData
+	 * @param catalog
+	 * @param schema
 	 * @param tableName
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<KeyInfo> getPrimaryKeyInfoForTable(DatabaseMetaData dbMetaData, String tableName) throws SQLException
+	public static List<KeyInfo> getPrimaryKeyInfoForTable(DatabaseMetaData dbMetaData,
+			String catalog, String schema, String tableName) throws SQLException
 	{
-		try(ResultSet pKeys = dbMetaData.getPrimaryKeys(null,null,tableName);) {
+		// TODO: some versions of Postgress require null catalog. But in this file
+		//       catalog comes from rsMetaData.getCatalogName() which I'm guessing
+		//       returns null.
+		try(ResultSet pKeys = dbMetaData.getPrimaryKeys(catalog,schema,tableName);) {
 			List<KeyInfo> keyInfo = new ArrayList<>(3);
 			while(pKeys.next()) {
 				keyInfo.add(new KeyInfo(pKeys.getInt("KEY_SEQ"), pKeys.getString("COLUMN_NAME")));
@@ -331,32 +312,47 @@ public class SSUtils {
 	// dbMetaData.getDatabaseProductName()
 
 	/**
+	 *
+	 * @param rs
+	 * @param columnName
+	 * @return
+	 * @throws SQLException
+	 */
+
+	public static List<KeyInfo> getPrimaryKeyInfoForTable(RowSet rs, String columnName)
+			throws SQLException
+	{
+	return getPrimaryKeyInfoForTable(rs, rs.findColumn(columnName));
+
+	}
+	/**
 	 * Find {@link KeyInfo} for table associated with the specified column.
 	 * Starting with the column's RowSet, get the dbMetaData, determine keys.
 	 * @param rs
-	 * @param _columnName
+	 * @param colIdx
 	 * @return
 	 * @throws SQLException
 	 */
 	// TODO: isKey: lookup specializations for databases to access special result set info.
 	//public static List<KeyInfo> getPrimaryKeyInfoForTable(RSC comp)
-	public static List<KeyInfo> getPrimaryKeyInfoForTable(RowSet rs, String _columnName)
+	public static List<KeyInfo> getPrimaryKeyInfoForTable(RowSet rs, int colIdx)
 			throws SQLException
 	{
 		// TODO: isKey: this doesn't seem reliable. Consider join...
 		// TODO: isKey: For now assume column names match
 
-		String columnName = _columnName.toUpperCase();
-		//RowSet rs = comp.getRowSet();
-		int colIdx = rs.findColumn(columnName);
 		ResultSetMetaData rsMetaData = rs.getMetaData();
-		String tableName = rsMetaData.getTableName(colIdx);
+
+		String catalog = rsMetaData.getCatalogName(colIdx);
+		String schema  = rsMetaData.getSchemaName(colIdx);
+		String table   = rsMetaData.getTableName(colIdx);
 
 		// TODO: just call all the names keys. Buggy if join ...
 		List<KeyInfo> ki = SSDBSupport.getDefault().runWithConnection(rs,
 				conn -> {
 					DatabaseMetaData dbMetaData = conn.getMetaData();
-					return getPrimaryKeyInfoForTable(dbMetaData, tableName);
+					// TODO: some versions of Postgress require null catalog
+					return getPrimaryKeyInfoForTable(dbMetaData, catalog, schema, table);
 				});
 		return ki;
 	}
@@ -404,6 +400,38 @@ public class SSUtils {
 	 */
 	public static String NullabilityMismatch(boolean oldVal, boolean newVal) {
 		return sf("Nullability mismatch: old %s, new %s", oldVal, newVal);
+	}
+
+	/**
+	 * Report problem accessing image file to user.
+	 * @param logger
+	 * @param comp
+	 * @param title dialog title
+	 * @param path file path
+	 * @param ex error
+	 */
+	// TODO: Only used from Image.java. Does this belong in Image.java?
+	public static void reportError(Logger logger, SSComponentInterface comp, String title, Path path, Exception ex)
+	{
+		String pathName = path != null ? path.toAbsolutePath().toString() : "";
+		logger.log(Level.ERROR, () -> sf("%s: IO Exception %s: file %s: %s",
+				comp.getColumnForLog(), ex.getClass().getSimpleName(),
+				pathName, ex.getMessage()));
+
+		// TODO: Alter message according to parameters.
+		//		 For example, if path is null, leave out "file: 'xxx'"
+
+		String msg = sf("<html>"
+				+ "<center>%s</center>"
+				+ "<br/>Details:<br/>"
+				+ "<center>DB column: %s</center>"
+				+ "<center>File: '%s'</center>"
+				+ "<center>Exception: %s</center>",
+				ex.getLocalizedMessage(), comp.getColumnForLog(),
+				pathName, ex.getClass().getSimpleName()
+		);
+		JOptionPane.showMessageDialog((Component)comp, msg,
+				title, JOptionPane.ERROR_MESSAGE);
 	}
 
 
