@@ -26,6 +26,13 @@ Is RowsAction.foreceEvent needed? Always generate event.
 
 ================================================================================
 
+Document that some row set state changes, like moving to insert row, are not
+detectable. Such changes have to be made through the lib. Maybe want API
+to inform lib of state changes, not sure why it would be needed.
+
+Document things that must be done only through the lib, or maybe they can be
+done externally, but be done atomically.
+
 
 ================================================================================
 
@@ -167,6 +174,7 @@ only RevertChanges btn. There is a brief flash of the commit button on the way,
 minor issue to ignore for now.
 
 --- backing out text component error
+validation issue interacting with database errors
 Example1 - status change "20" to "20x", conversion error.
     SSDocumentListener.udpateTextComponent
         does ssCommon.setBoundColumnText

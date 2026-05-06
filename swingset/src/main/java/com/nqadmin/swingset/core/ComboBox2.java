@@ -545,7 +545,7 @@ public abstract class ComboBox2<K,D,D2>
 	 * 
 	 * @param listItemFormat the format used with this model
 	 */
-	public void setListItemFormat(SSListItemFormat listItemFormat) {
+	public final void setListItemFormat(SSListItemFormat listItemFormat) {
 		Object selectedItem = getSelectedItem();
 		boolean keep = Objects.equals(getEditor().getItem(), selectedItem);
 		keyVisual.setListItemFormat(listItemFormat);
@@ -562,7 +562,7 @@ public abstract class ComboBox2<K,D,D2>
 	 * Return the listItemFormat associated with this combobox.
 	 * @return the associated listItemFormat
 	 */
-	public SSListItemFormat getListItemFormat() {
+	public final SSListItemFormat getListItemFormat() {
 		return keyVisual.getListItemFormat();
 	}
 
