@@ -45,9 +45,9 @@ package com.nqadmin.swingset.navigate;
 import java.lang.ref.WeakReference;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
@@ -80,63 +80,55 @@ public class RowSetState
 	private final WeakReference<RowSet> rsRef;
 
 	private RowSetState(RowSet rs) {
-		keys = new HashMap<>();
 		rsRef = new WeakReference<>(rs);
 		debugRowSetListener = DebugRowSetListener.create(rs); // May be null.
 	}
 
-	private final Map<String, Boolean> keys;
+	// TODO: fix when case sensitivity handled in plugin.
+	// Ignore case for column names as key.
+	private final Map<String, Boolean> keys = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 	
 	/**
 	 * Determine if the column in our rowset is a primary key.
-	 * Return false if problem is encountered.
+	 * Throw an exception if problem is encountered.
 	 * 
-	 * 2026-04-29_BP: PostgreSQL commonly reports unquoted identifiers as lowercase. So keys.put(name, ...) may store lowercase keys,
-	 * but the final keys.get(columnName) asks for uppercase. That returns null, and then the public boolean isKey(...)
-	 * method auto-unboxes the Boolean and crashes. The current code also returns null on SQLException,
-	 * despite the comment saying “Return false if problem is encountered.” 
-	 * 
-	 * @param _columnName
+	 * @param _columnName Must be a column in associated RowSet.
 	 * @return true if primary key else false
 	 */
-	// TODO: isKey: base this on labelName, not columnName.
-	private Boolean isKey(String _columnName) {
-	    if (_columnName == null) {
-	        return false;
-	    }
+	// TODO: isKey: base this on labelName, not columnName?
+	private boolean isKey(String columnName)
+	{
+		if (columnName == null) // POSSIBLE?. IF POSSIBLE, WHY CAN'T IT BE A KEY?
+			throw new IllegalArgumentException("null column name");
+		RowSet rs = rsRef.get();
+		if (rs == null)
+			throw new IllegalStateException("must be a rowset");
 
-	    RowSet rs = rsRef.get();
-	    if (rs == null) {
-	        return false;
-	    }
-
-	    String columnName = _columnName.toUpperCase();
-
-	    Boolean rv = keys.get(columnName);
-	    if (rv != null) {
-	        return rv;
-	    }
-
-	    try {
-	        List<String> names = SSUtils.getPrimaryKeyInfoForTable(rs, columnName)
-	                .stream()
-	                .map(SSUtils.KeyInfo::columnName)
-	                .map(String::toUpperCase)
-	                .toList();
-
-	        ResultSetMetaData rsMetaData = rs.getMetaData();
-
-	        for (int i = 1; i <= rsMetaData.getColumnCount(); i++) {
-	            String name = rsMetaData.getColumnName(i);
-	            String normalizedName = name.toUpperCase();
-
-	            keys.put(normalizedName, names.contains(normalizedName));
-	        }
-	    } catch (SQLException ex) {
-	        return false;
-	    }
-
-	    return Boolean.TRUE.equals(keys.get(columnName));
+		Boolean rv = keys.get(columnName);
+		if (rv != null)
+			return rv;
+		// This method is frequently used, create a map entry for each column
+		// Saving each RowSets column minimizes metadata access.
+		// May want to cache more metadata info in the future.
+		try {
+			List<String> names = SSUtils.getPrimaryKeyInfoForTable(rs, columnName)
+					.stream()
+					.map((ki) -> ki.columnName())
+					.toList();
+			ResultSetMetaData rsMetaData = rs.getMetaData();
+			for(int i = 1; i <= rsMetaData.getColumnCount(); i++) {
+				String name = rsMetaData.getColumnName(i);
+				keys.put(name, names.contains(name));
+			}
+			
+		} catch (SQLException ex) {
+			// TODO: isKey: random SQLEX report. No exception?
+			throw new IllegalStateException(ex);
+		}
+		rv = keys.get(columnName);
+		if (rv == null)
+			throw new IllegalArgumentException(sf("Column not in RowSet: %s", columnName));
+		return rv;
 	}
 //	private Boolean isKey(String _columnName)
 //	{
@@ -319,6 +311,7 @@ public class RowSetState
 
 	/**
 	 * Is the current row of the RowSet dirty?
+	 * @param rs
 	 * @return is dirty
 	 */
 	public static boolean isDirty(RowSet rs) {
