@@ -327,7 +327,7 @@ public class RowsModelTest
 		assertTrue(exs.isEmpty());
 		DbNav dbNav = _dbNav;
 
-		// Create two RowSets, the same columnNames have different column indexes.
+		// Create two RowSets, the same columnNames have different column types.
 		RowSet rs1 = TinyRS.getRS1();
 		RowSet rs2 = TinyRS.getRS2();
 

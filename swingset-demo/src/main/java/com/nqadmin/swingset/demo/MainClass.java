@@ -855,6 +855,7 @@ public class MainClass extends JFrame
 		lkup.add(new LoadDemoImages());
 		lkup.add(new H2Trace());
 		//lkup.replace(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
+		//SELECT VALUE FROM INFORMATION_SCHEMA.SETTINGS WHERE NAME = 'info.VERSION';
 		//lkup.add(new H2Workaround()); // fixed in H2 Version 2.3.230 (2024-07-15
 		//lkup.add(new ForceConflict(0));
 		//lkup.add(new SSUtils.DebugRowSetListenerFlag());

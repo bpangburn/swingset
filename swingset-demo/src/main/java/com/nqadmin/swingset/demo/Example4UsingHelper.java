@@ -129,14 +129,14 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
 		// updateScreen(); // Force a setRowSet() for testing.
 	}
 
-	/** {@inheritDoc}
-	 * The parameter is cast to a Connection.
-	 */
-	@Override
-	protected RowSet getNewRowSet(Object connectionOrDataSource) throws SQLException
-	{
-		return DemoUtil.getNewRowSet((Connection)connectionOrDataSource);
-	}
+//	/** {@inheritDoc}
+//	 * The parameter is cast to a Connection.
+//	 */
+//	@Override
+//	protected RowSet getNewRowSet(Object connectionOrDataSource) throws SQLException
+//	{
+//		return DemoUtil.getNewRowSet((Connection)connectionOrDataSource);
+//	}
 	
 
 	@Override

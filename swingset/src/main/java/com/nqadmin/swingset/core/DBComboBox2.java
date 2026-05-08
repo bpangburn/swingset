@@ -54,7 +54,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.nqadmin.swingset.models.SSListItem;
-import com.nqadmin.swingset.models.SSListItemFormat;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
@@ -69,7 +68,10 @@ import static java.lang.System.Logger.Level.*;
  * specified; in that case the display value for the mapping is a composite of
  * option and option2.Generally the mapping represents a foreign key to another
  * table, and the combobox needs to display a list of one (or more) columns from
- * the other table.<p>
+ * the other table.
+ * <p>
+ * The inherited {@link SSListItemFormat} is used, see {@link
+ * #getListItemFormat()}; it provides the default separator.
  * Several methods inherited from ComboBox2 directly manipulate the combobox
  * contents. These methods throw UnsupportedOperationException.
  * <p>
@@ -137,11 +139,6 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	private static final Logger logger = SSUtils.getLogger();
 
 	/**
-	 * Format an SSListItem. Used to AutoCompleteSupport.install.
-	 */
-	private final SSListItemFormat listItemFormat;
-
-	/**
 	 * Format for any date columns displayed in combo box.
 	 */
 	// TODO: Use a SSFormat.
@@ -180,11 +177,6 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 */
 	protected String secondDisplayColumnName = null;
 
-	/**
-	 * Alphanumeric separator used to separate values in multi-column comboboxes.
-	 */
-	protected String separator = " | ";
-
 	// TODO: configuration option
 	private static final ModelType USE_GLAZED_MODEL = ModelType.GLAZED;
 
@@ -195,9 +187,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	public DBComboBox2() {
 		super(USE_GLAZED_MODEL);
 
-		listItemFormat = getListItemFormat();
-		listItemFormat.setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
-		listItemFormat.setSeparator(separator);
+		getListItemFormat().setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
 	}
 	
 	/**
@@ -293,7 +283,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	// try (Model.Remodel remodel = comboInfo.getRemodel()) {
 	// 	List<SSListItem> items = remodel.getEventList();
 	// 	for(SSListItem item : items) {
-	// 		displayValues.add(listItemFormat.format(item));
+	// 		displayValues.add(getListItemFormat.format(item));
 	// 	}
 	// }
 	// return displayValues;
@@ -318,7 +308,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 */
 	public String getSelectedStringValue() {
 		Object currentItem = getSelectedItem();
-		return currentItem != null ? listItemFormat.format(currentItem) : null;
+		return currentItem != null ? getListItemFormat().format(currentItem) : null;
 	}
 
 	/**
@@ -327,7 +317,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 * @return separator used.
 	 */
 	public String getSeparator() {
-		return separator;
+		return getListItemFormat().getSeparator();
 	}
 
 	private boolean hasDisplayValue2() {
@@ -373,11 +363,11 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 			Statement statement = getConnection().createStatement();
 			try (ResultSet rs = statement.executeQuery(getQuery());) {
 				// Configure the listItemFormat with this queries column types
-				listItemFormat.clear();
-				listItemFormat.addElemType(keyVisual.getDisplayValueListItemElemIndex(),
+				getListItemFormat().clear();
+				getListItemFormat().addElemType(keyVisual.getDisplayValueListItemElemIndex(),
 						getJDBCColumnType(rs, rs.findColumn(displayColumnName)));
 				if (hasDisplayValue2()) {
-					listItemFormat.addElemType(keyVisual.getDisplayValue2ListItemElemIndex(),
+					getListItemFormat().addElemType(keyVisual.getDisplayValue2ListItemElemIndex(),
 							getJDBCColumnType(rs, rs.findColumn(secondDisplayColumnName)));
 				}
 				
@@ -445,7 +435,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 		final String oldValue = this.dateFormat;
 		this.dateFormat = dateFormat;
 		firePropertyChange("dateFormat", oldValue, this.dateFormat);
-		listItemFormat.setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
+		getListItemFormat().setFormat(JDBCType.DATE, new SimpleDateFormat(dateFormat));
 	}
 
 	/**
@@ -530,10 +520,9 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 */
 	// TODO: 2026-04-29_BP: Make this private? Used in SSFormViewScreenHelper. Maybe set in a Constructor? 
 	public void setSeparator(final String separator) {
-		final String oldValue = this.separator;
-		this.separator = separator;
-		firePropertyChange("separator", oldValue, this.separator);
-		listItemFormat.setSeparator(this.separator);
+		final String oldValue = getListItemFormat().getSeparator();
+		getListItemFormat().setSeparator(separator);
+		firePropertyChange("separator", oldValue, separator);
 	}
 
 	/**
