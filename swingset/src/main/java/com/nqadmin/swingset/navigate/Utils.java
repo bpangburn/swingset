@@ -136,7 +136,9 @@ public class Utils
 	 */
 	public static void postRowSetModifiedError(SSComponentInterface source, Object value)
 	{
-		postFieldEvent(new RowSetModificationEvent(source, value, true));
+		RowSetModificationEvent ev = new RowSetModificationEvent(source, value, true);
+		logger.log(DEBUG, () -> ev.toString());
+		postFieldEvent(ev);
 	}
 
 	/**
@@ -148,7 +150,10 @@ public class Utils
 	public static void postRowSetUndoRedo(SSComponentInterface source, Object value,
 									boolean isError)
 	{
-		postFieldEvent(new RowSetUndoRedoEvent(source, value, isError));
+		RowSetUndoRedoEvent ev = new RowSetUndoRedoEvent(source, value, isError);
+		if (isError)
+			logger.log(DEBUG, () -> ev.toString());
+		postFieldEvent(ev);
 	}
 	
 	// Notes on implementing a weak subscriber

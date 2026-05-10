@@ -45,11 +45,11 @@ package com.nqadmin.swingset.navigate;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.swing.text.JTextComponent;
 
 import com.nqadmin.swingset.datasources.RSC;
+import com.nqadmin.swingset.navigate.UndoRedo.Change;
 
 import static com.nqadmin.swingset.navigate.RowSetState.isPreInsertOps;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -68,7 +68,7 @@ final class UndoCol
 {
 	/** One item per change, changes.get(0) is the current value in the database;
 	 * or the value from preInsertOps. */
-	private final List<Object> changes;
+	private final List<Change> changes;
 	/** The index of the previous Value. */
 	private int curIdx;
 	/**
@@ -89,12 +89,12 @@ final class UndoCol
 
 	/**
 	 * Create UndoCol; initialize undo/redo stack from the value.
-	 * @param value ssComponent
+	 * @param change
 	 */
-	UndoCol(Object value)
+	UndoCol(Change change)
 	{
 		this();
-		changes.add(value);
+		changes.add(change);
 	}
 
 	/**
@@ -103,7 +103,7 @@ final class UndoCol
 	 */
 	UndoCol(RSC comp) throws SQLException
 	{
-		this(initialValue(comp));
+		this(new Change(initialValue(comp), false));
 	}
 
 	private static Object initialValue(RSC comp) throws SQLException
@@ -129,7 +129,7 @@ final class UndoCol
 	}
 
 	/** Return the undo (prevValue). MUST check hasPrev() first. */
-	private Object prevValue()
+	private Change prevValue()
 	{
 		needNewSlot = true;
 		--curIdx;
@@ -143,7 +143,7 @@ final class UndoCol
 	}
 
 	/** Return the redo (nextValue. MUST check hasNext() first. */
-	private Object nextValue()
+	private Change nextValue()
 	{
 		needNewSlot = true;
 		++curIdx;
@@ -160,7 +160,8 @@ final class UndoCol
 	{
 		// TODO: only do this if null?
 		// Don't push something on the top if it equals what's on the top.
-		if (Objects.equals(fetchCurrentValue(), me.getValue()))
+		Change newChange = new Change(me.getValue(), me.isError());
+		if (fetchCurrentChange().equals(newChange))
 			return;
 
 		if (needNewSlot) {
@@ -172,13 +173,12 @@ final class UndoCol
 			needNewSlot = false;
 		}
 		assert curIdx > 0 : "can not be on the original value";
-		// Clear possible entries after where the next entry goes.
-		// Start clearing from the end, going backwards, to avoid moving data.
-		for (int idx = changes.size() - 1; idx > curIdx; --idx)
-			changes.remove(idx);
+
+		// Remove entries after where the next entry goes.
+		changes.subList(curIdx+1, changes.size()).clear();
 		assert curIdx == changes.size() - 1 : "curIdx must be last item";
 
-		changes.set(curIdx, me.getValue());
+		changes.set(curIdx, newChange);
 		NavigateState.getLogger().log(DEBUG, () -> sf("UNDO/REDO change: %s - %s", me.getColumnName(), changes));
 	}
 
@@ -187,15 +187,13 @@ final class UndoCol
 		return curIdx != 0;
 	}
 
-	static final Object none = new Object() {
-		@Override public String toString() { return "UNDO/REDO NONE"; }
-	};
+	static final Change NO_CHANGE = new Change("UNDO/REDO NONE", false);
 
-	Object findUndoRedoValue(UndoRedo cmd)
+	Change findUndoRedoChange(UndoRedo cmd)
 	{
 		return switch(cmd) {
-		case UNDO -> hasPrev() ? prevValue() : none;
-		case REDO -> hasNext() ? nextValue() : none;
+		case UNDO -> hasPrev() ? prevValue() : NO_CHANGE;
+		case REDO -> hasNext() ? nextValue() : NO_CHANGE;
 		};
 	}
 
@@ -204,7 +202,7 @@ final class UndoCol
 	 * or it may be the value from a modification event.
 	 * @return value
 	 */
-	Object fetchCurrentValue()
+	Change fetchCurrentChange()
 	{
 		return changes.get(curIdx);
 	}

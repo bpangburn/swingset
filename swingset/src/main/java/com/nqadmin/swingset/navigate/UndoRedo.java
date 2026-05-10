@@ -53,6 +53,8 @@ public enum UndoRedo
 	/** Redo command */
 	REDO;
 
+	public record Change(Object value, boolean isError){};
+
 	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
 
@@ -142,13 +144,13 @@ public enum UndoRedo
 	 * @return current value
 	 * @throws SQLException
 	 */
-	public static Object fetchCurrentValue(RSC comp)
+	public static Change fetchCurrentChange(RSC comp)
 			throws SQLException
 	{
 		if (!isUndoRedoEnabled(comp))
 			throw new IllegalStateException("UNDO/REDO disabled");
 		NavigateState navState = comp.getRowsModel().getNavState();
-		return navState.undoRow.fetchCurrentValue(comp);
+		return navState.undoRow.fetchCurrentChange(comp);
 	}
 
 	/**
@@ -164,11 +166,12 @@ public enum UndoRedo
 				comp.getClass().getSimpleName(), comp.getBoundColumnName()));
 		try {
 			NavigateState navState = comp.getRowsModel().getNavState();
-			Object value = navState.doUndoRedo(comp, cmd);
+			Change change = navState.doUndoRedo(comp, cmd);
 			// Wait until value propogates to the component.
-			if (value != UndoCol.none)
+			if (change != UndoCol.NO_CHANGE)
 				SwingUtilities.invokeLater(() -> {
-					postRowSetUndoRedo(comp, value, !comp.allValidate().all());
+					postRowSetUndoRedo(comp, change.value(),
+							change.isError || !comp.allValidate().all());
 				});
 		} catch (SQLException ex) {
 			logger.log(ERROR, sf("%s:", cmd), ex);

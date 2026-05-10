@@ -76,6 +76,7 @@ import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
 import com.nqadmin.swingset.navigate.RowSetModificationEvent;
 import com.nqadmin.swingset.navigate.UndoRedo;
+import com.nqadmin.swingset.navigate.UndoRedo.Change;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -335,9 +336,9 @@ public abstract class ComboBox2<K,D,D2>
 
 	/** {@inheritDoc } */
 	@Override
-	public void undoRedoUpdateObject(UndoRedo cmd, Object value) throws SQLException
+	public void undoRedoUpdateObject(UndoRedo cmd, Change change) throws SQLException
 	{
-		SSComponentInterface.super.undoRedoUpdateObject(cmd, value);
+		SSComponentInterface.super.undoRedoUpdateObject(cmd, change);
 		SwingUtilities.invokeLater(() -> this.hidePopup());
 	}
 

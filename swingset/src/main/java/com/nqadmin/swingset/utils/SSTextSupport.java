@@ -32,14 +32,14 @@ package com.nqadmin.swingset.utils;
 
 import java.lang.System.Logger;
 
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
-import javax.swing.text.PlainDocument;
-import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.PlainDocument;
 
 import static com.nqadmin.swingset.navigate.Utils.postRowSetModifiedError;
 import static java.lang.System.Logger.Level.*;
@@ -212,34 +212,47 @@ public class SSTextSupport
 		{
 			String text = ((JTextComponent) ssCommon.getSSComponent()).getText();
 			// update decorator per keystroke.
-			if (!ssCommon.decorate()) {
-				postRowSetModifiedError(ssCommon.getSSComponent(), text);
-				return;
+			// ISSUE: when decorator uses NavigateState.errorComponents,
+			// as accessed through RowsModel.hasError(comp), that state may
+			// still be there, since it's updated by RowSet event,
+			// which comes from setBoundColumnText.
+			try {
+				ssCommon.pendingDbChange = true;
+				if (!ssCommon.decorate()) {
+					postRowSetModifiedError(ssCommon.getSSComponent(), text);
+					return;
+				}
+			} finally {
+				ssCommon.pendingDbChange = false;
 			}
 			boolean ok = true;
-			// boolean inErrorState = NavigateAcitons.inErrorState();
+			//boolean inErrorState = ssCommon.getRowsModel().hasError(ssCommon.getSSComponent());
 			try {
 				ok = ssCommon.setBoundColumnText(text);
 			} finally {
 				if (!ok) {
-					// restore previous text value
-					if (previousValue != null) {
-						if (ssCommon.isSSComponentListenerAdded()) {
-							// avoid generating events while restoring text
-							ssCommon.removeSSComponentListener();
-							listenerNeedsRestoration = true;
-						}
-						try {
-							logger.log(DEBUG, () -> SSUtils.sf("%s: restoring previous value '%s'", ssCommon.getColumnForLog(), previousValue));
-							((JTextComponent) ssCommon.getSSComponent()).setText(previousValue);
-						} finally {
-							if (listenerNeedsRestoration) {
-								listenerNeedsRestoration = false;
-								ssCommon.addSSComponentListener();
+					if (ssCommon.isRestoreOnError()) {
+						// restore previous text value
+						if (previousValue != null) {
+							if (ssCommon.isSSComponentListenerAdded()) {
+								// avoid generating events while restoring text
+								ssCommon.removeSSComponentListener();
+								listenerNeedsRestoration = true;
 							}
+							try {
+								logger.log(DEBUG, () -> SSUtils.sf("%s: restoring previous value '%s'", ssCommon.getColumnForLog(), previousValue));
+								((JTextComponent) ssCommon.getSSComponent()).setText(previousValue);
+							} finally {
+								if (listenerNeedsRestoration) {
+									listenerNeedsRestoration = false;
+									ssCommon.addSSComponentListener();
+								}
+							}
+							// RESTORE ERROR STATE
 						}
-						// RESTORE ERROR STATE
 					}
+					// Things may have changed, re-decorate.
+					ssCommon.decorate();
 				}
 				previousValue = null; // Seems safer, is this the right spot?
 			}

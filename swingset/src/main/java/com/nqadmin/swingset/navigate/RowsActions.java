@@ -122,6 +122,7 @@ final class RowsActions
 		case ACT_ADD		-> new NavAddAction();
 		case ACT_DELETE		-> new NavDeleteAction();
 		case ACT_GOTOROW	-> new NavGotoRowAction();
+		case ACT_REVERT_FORCE -> throw new IllegalStateException();
 		});
 		if (rowsModel.getRowSet() == null)
 			action.setEnabled(false);
@@ -421,7 +422,9 @@ final class RowsActions
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			startNavigationAction(ACT_REVERT);
+			RowsAction act_revert = getRowSet() instanceof CachedRowSet
+					? ACT_REVERT_FORCE : ACT_REVERT;
+			startNavigationAction(act_revert);
 			try {
 				// CALL MOVE TO CURRENT ROW IF ON INSERT ROW.
 				boolean wasInserting = RowSetState.isInserting(getRowSet());
@@ -438,21 +441,6 @@ final class RowsActions
 				// TODO: could cleanup/remove above comment and use issueRowChanged.
 
 				getRowSet().cancelRowUpdates();
-				if (getRowSet() instanceof CachedRowSet) {
-					//
-					// TODO: if there are RowSet listeners outside of the nav
-					//		 container, they won't be signaled. Could set something
-					//		 up, but wait for the event bus...
-					//
-					if (RowsModel.ENABLED) {
-						// TODO: TEST undo/redo for CachedRowSet with RowsModel
-						throw new IllegalStateException("NavigateActions-CachedRowSet-Undo/Redo");
-					} else {
-						// TODO: CachedRS: does this go all the way back to original items?
-						getNavState().dBNav.findSSComponents().forEach(
-								(ssc) -> SSUtils.issueRowChanged_HACK(ssc));
-					}
-				}
 
 				setInserting(getRowSet(), false);
 				getNavState().dBNav.performCancelOps();
@@ -471,7 +459,7 @@ final class RowsActions
 				JOptionPane.showMessageDialog(dlgParent(e),
 						"Exception occured while reverting changes.\n" + se.getMessage());
 			} finally {
-				finishNavigationAction(ACT_REVERT);
+				finishNavigationAction(act_revert);
 			}
 		}
 	} // end NavRevertRecordAction

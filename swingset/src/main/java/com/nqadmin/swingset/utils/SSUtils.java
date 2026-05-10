@@ -87,14 +87,6 @@ public class SSUtils {
 	}
 
 	/**
-	 * Signal that the current row has changed for CachedRowSet.
-	 * @param comp to notify of row change
-	 */
-	public static void issueRowChanged_HACK(SSComponentInterface comp) {
-		comp.getSSCommon().issueRowChanged();
-	}
-
-	/**
 	 * Use this if you want a 1-1 correspondence between {@code RowSet} and {@code RowsModel};
 	 * for 1-1 only this method should be used.
 	 * If an existing RowsModel for the RowSet is

@@ -347,8 +347,8 @@ public class RowSetOps {
 		try {
 			if (getColumnCount(comp.getRowSet())==0)
 				return null;
-			return (Array)(UndoRedo.isUndoRedoEnabled(comp)
-					? UndoRedo.fetchCurrentValue(comp)
+			return (UndoRedo.isUndoRedoEnabled(comp)
+					? (Array)UndoRedo.fetchCurrentChange(comp).value()
 					: comp.getRowSet().getArray(comp.getBoundColumnIndex()));
 		} catch (SQLException ex) {
 			logger.log(ERROR, "SQL Exception for column " + comp.getBoundColumnName() + ".", ex);
@@ -368,7 +368,7 @@ public class RowSetOps {
 	public static Object getColumnObject(RSC comp) throws SQLException
 	{
 		return UndoRedo.isUndoRedoEnabled(comp)
-				? UndoRedo.fetchCurrentValue(comp)
+				? UndoRedo.fetchCurrentChange(comp).value()
 				: comp.getRowSet().getObject(comp.getBoundColumnIndex());
 	}
 
@@ -467,7 +467,7 @@ public class RowSetOps {
 			throws SQLException
 	{
 		Object objectValue = UndoRedo.isUndoRedoEnabled(comp)
-				? UndoRedo.fetchCurrentValue(comp)
+				? UndoRedo.fetchCurrentChange(comp).value()
 				: comp.getRowSet().getObject(comp.getBoundColumnIndex());
 		return convertToType(objectValue, type);
 	}
@@ -554,7 +554,7 @@ public class RowSetOps {
 			}
 
 			Object objectValue = UndoRedo.isUndoRedoEnabled(comp)
-					? UndoRedo.fetchCurrentValue(comp)
+					? UndoRedo.fetchCurrentChange(comp).value()
 					: comp.getRowSet().getObject(comp.getBoundColumnIndex());
 			if (objectValue == null)
 				return null;
@@ -972,6 +972,7 @@ public class RowSetOps {
 		JDBCType jdbcType = getJDBCType(getColumnType(rowSet, columnIndex));
 		
 		if (!textUpdateOK.contains(jdbcType)) {
+			// TODO: internal error exception?
 			logger.log(ERROR, () -> "Unsupported data type of " + jdbcType.getName() + " for column " + comp.getColumnForLog() + ".");
 			return;
 		}
@@ -1052,7 +1053,7 @@ public class RowSetOps {
 			rowSet.updateObject(columnIndex, dbValue);
 			did_update = true;
 		} finally {
-			if (did_update)
+			if (did_update) // component is not in error
 				postRowSetModified(comp, dbValue);
 
 		}

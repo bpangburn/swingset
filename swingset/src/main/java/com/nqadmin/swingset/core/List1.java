@@ -70,6 +70,7 @@ import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSDbArrayModel;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.navigate.UndoRedo;
+import com.nqadmin.swingset.navigate.UndoRedo.Change;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -448,9 +449,9 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 
 	/** {@inheritDoc } */
 	@Override
-	public void undoRedoUpdateObject(UndoRedo cmd, Object value) throws SQLException
+	public void undoRedoUpdateObject(UndoRedo cmd, Change change) throws SQLException
 	{
-		SSComponentInterface.super.undoRedoUpdateObject(cmd, value);
+		SSComponentInterface.super.undoRedoUpdateObject(cmd, change);
 		// TODO: does the following seem right
 				// - If there is a selection, and none of the selection is visible
 				//   then pick something an make sure it's visible.
