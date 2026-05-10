@@ -49,8 +49,8 @@ import javax.sql.RowSet;
 
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.navigate.UndoRedo.Change;
 import com.nqadmin.swingset.utils.SSComponentInterface;
-import com.nqadmin.swingset.utils.SSUtils;
 
 
 /**
@@ -105,8 +105,11 @@ final class UndoRow
 			// if (prevCol == null)	// not so impossible
 			// 	NavigateActions.getLogger().log(ERROR,
 			// 			"clearInsertRow has null column; impossible");
-			insertRowCols[i] = new UndoCol(
-					prevCol != null ? prevCol.fetchCurrentValue() : null);
+
+			// TODO: prevCol null, where/how to get initial value
+			insertRowCols[i] = new UndoCol(prevCol != null
+					? prevCol.fetchCurrentChange()
+					: new UndoRedo.Change(null, false));
 		}
 		cols = insertRowCols;
 		//dump(cols);
@@ -182,9 +185,9 @@ final class UndoRow
 	}
 
 	/** return the current Value for the comp: the last rowset.updateXxx. */
-	Object fetchCurrentValue(RSC comp) throws SQLException
+	Change fetchCurrentChange(RSC comp) throws SQLException
 	{
-		return getCol(comp).fetchCurrentValue();
+		return getCol(comp).fetchCurrentChange();
 	}
 
 	/**
@@ -198,19 +201,14 @@ final class UndoRow
 	 * @return new value (only for logging)
 	 * @throws SQLException 
 	 */
-	Object doUndoRedo(SSComponentInterface comp, UndoRedo cmd) throws SQLException
+	Change undoRedoChange(SSComponentInterface comp, UndoRedo cmd) throws SQLException
 	{
 		if (cols == null)
-			return UndoCol.none;
+			return UndoCol.NO_CHANGE;
 		UndoCol col = cols[comp.getBoundColumnIndex()];
 		if (col == null)
-			return UndoCol.none;
-		Object value = col.findUndoRedoValue(cmd);
-		if (value == UndoCol.none)
-			SSUtils.beep();
-		else
-			comp.undoRedoUpdateObject(cmd, value);
-		return value;
+			return UndoCol.NO_CHANGE;
+		return col.findUndoRedoChange(cmd);
 	}
 
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")

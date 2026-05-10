@@ -60,6 +60,7 @@ import com.nqadmin.swingset.*;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
+import com.nqadmin.swingset.navigate.UndoRedo.Change;
 import com.nqadmin.swingset.utils.SSComponentInterface;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -256,8 +257,6 @@ final class NavigateState
 				// System.err.println("     ***** SKIP *****");
 				return;
 			}
-			 if (!RowsModel.ENABLED)
-			 	return;
 			if (ev.getEventTypes().contains(RowSetEventType.ROW_SET_CHANGED)) {
 				// Update the record count. Leave positioned at first row.
 				try {
@@ -310,15 +309,17 @@ final class NavigateState
 				} catch (SQLException ex) {
 					logger.log(ERROR, "Undo/redo exception", ex);
 				}
-				if(ev.isError()) {
+				int sz = errorComponents.size();
+				if(ev.isError())
 					errorComponents.add(ev.getSource());
-				} else {
+				else
 					errorComponents.remove(ev.getSource());
-				}
 
 				logger.log(TRACE, () -> ev.toString());
 				setRowModified();
 				updateActionState();
+				if (sz != errorComponents.size())
+					errorComponentsChanged(ev.getSource());
 			}
 		}
 
@@ -327,13 +328,15 @@ final class NavigateState
 		{
 			if (ev.matches(getRowSet())) {
 				// Our RowSet's row had an undo/redo.
-				if(ev.isError()) {
+				int sz = errorComponents.size();
+				if(ev.isError())
 					errorComponents.add(ev.getSource());
-				} else {
+				else
 					errorComponents.remove(ev.getSource());
-				}
 				logger.log(TRACE, () -> ev.toString());
 				updateActionState();
+				if (sz != errorComponents.size())
+					errorComponentsChanged(ev.getSource());
 			}
 		}
 
@@ -342,6 +345,11 @@ final class NavigateState
 		{
 			undoRow.focusChange(ev);
 		}
+	}
+
+	// Is this needed?
+	private void errorComponentsChanged(SSComponentInterface comp) {
+		comp.decorate();
 	}
 
 	BusReceiver busReceiver; // Must have a strong reference.
@@ -524,13 +532,22 @@ final class NavigateState
 	 * @throws java.sql.SQLException
 	 */
 	// TODO: Should this be public? NO, go through the static method in this class
-	Object doUndoRedo(SSComponentInterface comp, UndoRedo cmd) throws SQLException
+	Change doUndoRedo(SSComponentInterface comp, UndoRedo cmd) throws SQLException
 	{
 		if (!isUndoRedoEnabled(comp))
 			throw new IllegalStateException("UNDO/REDO disabled");
-		Object value = undoRow.doUndoRedo(comp, cmd);
+		Change change = undoRow.undoRedoChange(comp, cmd);
+		if (change == UndoCol.NO_CHANGE)
+			SSUtils.beep();
+		else {
+			if(change.isError())
+				errorComponents.add(comp);
+			else
+				errorComponents.remove(comp);
+			comp.undoRedoUpdateObject(cmd, change);
+		}
 		updateActionState();
-		return value;
+		return change;
 	}
 
 	/*private*/ final SpinnerNumberModel rowNumberModel;
@@ -773,6 +790,10 @@ final class NavigateState
 	 */
 	public boolean getWritable() {
 		return writable;
+	}
+
+	boolean hasError(SSComponentInterface comp) {
+		return errorComponents.contains(comp);
 	}
 
 	/**

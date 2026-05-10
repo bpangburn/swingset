@@ -202,6 +202,8 @@ Example1 - status change "20" to "20x", conversion error.
 
 Should decorator check component error state (from navigator)...
 
+---
+ACT_REVERT on cached row set.
 
 
 ================================================================================

@@ -328,13 +328,16 @@ public class RowsModelEventHandling
 			// TODO: is the forceEvent() stuff needed? Always generate an event?
 			if (eventTypes.isEmpty()
 					&& !(eventSource.operatorKind == OperatorKind.ACTION
-						&& ((RowsAction)eventSource.operator).forceEvent())) {
+						&& ((RowsAction)eventSource.operator).isForce())) {
 				ev = null;
 				Supplier<String> msg = () -> sf("RowsEvent %s: No RowSet event",
 						eventSource.operatorKind);
 				//if(isJunit())System.out.println(msg.get());
 				logger.log(TRACE, msg);
 			} else {
+				// If no event, default to ROW_CHANGED.
+				if (eventTypes.isEmpty())
+					eventTypes.add(RowSetEventType.ROW_CHANGED);
 				ev = new RowsEvent(eventSource, eventTypes);
 				//if(isJunit())System.out.println(ev.toString());
 				logger.log(TRACE, () -> sf(""+ev));

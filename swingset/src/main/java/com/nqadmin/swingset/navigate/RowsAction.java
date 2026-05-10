@@ -76,18 +76,27 @@ public enum RowsAction
 	 * {@link javax.swing.SpinnerNumberModel} which models the ResultSet's current row.
 	 */
 	ACT_GOTOROW,
+	/** Need with CachedRowSet since no RowSet events */
+	ACT_REVERT_FORCE(true, true),
 	;
 
-	private final boolean forceEvent;
+	private final boolean force;
+	private final boolean virtual;
 
 	private RowsAction()
 	{
-		forceEvent = false;
+		this(false, false);
 	}
 
-	private RowsAction(boolean special)
+	private RowsAction(boolean force)
 	{
-		forceEvent = special;
+		this(force, false);
+	}
+
+	private RowsAction(boolean force, boolean virtual)
+	{
+		this.force = force;
+		this.virtual = virtual;
 	}
 
 	/**
@@ -96,9 +105,18 @@ public enum RowsAction
 	 * 
 	 * @return true means unconditionally create event
 	 */
-	public boolean forceEvent()
+	public boolean isForce()
 	{
-		return forceEvent;
+		return force;
+	}
+
+	/**
+	 * Not a real event.
+	 * @return true means don't try to instantiate it
+	 */
+	public boolean isVirtual()
+	{
+		return virtual;
 	}
 
 	/**

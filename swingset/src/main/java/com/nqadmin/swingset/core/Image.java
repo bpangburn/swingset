@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2025-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
@@ -129,8 +129,9 @@ public class Image extends JPanel implements SSComponentInterface
 					}
 					byte[] bytes = bb.array();
 
-					ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-					ImageInputStream iis = ImageIO.createImageInputStream(bais);
+					// verify the bytes are a recognized image
+					ByteArrayInputStream bs = new ByteArrayInputStream(bytes);
+					ImageInputStream iis = ImageIO.createImageInputStream(bs);
 					if (Boolean.FALSE) getImageFormat(iis);
 					BufferedImage bimg = ImageIO.read(iis); // NOTE: usually closes iis
 					if (bimg == null) {

@@ -108,8 +108,12 @@ public class RowsModel
 	private NavigateState navState;
 	private final RowsActions rowsActions;
 
-	/** simplify switches back/forth */
-	public static boolean ENABLED = true;
+	// private static void issueRowChanged(RowsModel rowsModel)
+	// {
+	// 	// TODO: create a force/virtual ACT_ROW_CHANGED
+	// 	startRowsEvent(rowsModel, ACT_REVERT_FORCE);
+	// 	finishRowsEvent(rowsModel);
+	// }
 
 	/**
 	 * Create and return a new RowsModel for the specified RowSet.
@@ -374,7 +378,10 @@ public class RowsModel
 	 */
 	public ActionMap fillNavActionMap(ActionMap actionMap) {
 		ActionMap am = actionMap != null ? actionMap : new ActionMap();
-		Arrays.stream(RowsAction.values()).forEach(key -> am.put(key, getAction(key)));
+		Arrays.stream(RowsAction.values()).forEach(key -> {
+			if (!key.isVirtual())
+				am.put(key, getAction(key));
+		});
 		return am;
 	}
 
@@ -824,6 +831,17 @@ public class RowsModel
 	 */
 	public boolean isOnInsertRow() {
 		return navState.isOnInsertRow();
+	}
+
+	/**
+	 * @param comp
+	 * @return true if the component is in an error state
+	 */
+	public boolean hasError(SSComponentInterface comp) {
+		// TODO: check if row set has component's column name?
+		// if (!bindings.containsKey(comp))
+		// 	throw new IllegalArgumentException("Component not bound in RowsModel");
+		return navState.hasError(comp);
 	}
 
 	/**

@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
@@ -60,6 +60,7 @@ import com.nqadmin.swingset.formatting.SSFormattedTextField;
 import com.nqadmin.swingset.navigate.RowSetModificationEvent;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.navigate.UndoRedo;
+import com.nqadmin.swingset.navigate.UndoRedo.Change;
 
 import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
@@ -170,7 +171,7 @@ public interface SSComponentInterface extends RSC
 		 */
 		final SSCommon getSSCommon() {
 			if (ssCommon == null)
-				return ssCommon = SSCommon.createStart(ssComponent);
+				ssCommon = SSCommon.createStart(ssComponent);
 			return ssCommon;
 		}
 
@@ -532,16 +533,16 @@ public interface SSComponentInterface extends RSC
 	 * <p>
 	 * WARNING: do not override unless ...
 	 * @param cmd undo or redo
-	 * @param value new value
+	 * @param change new value
 	 * @throws java.sql.SQLException
 	 */
-	default void undoRedoUpdateObject(UndoRedo cmd, Object value) throws SQLException
+	default void undoRedoUpdateObject(UndoRedo cmd, Change change) throws SQLException
 	{
-		getSSCommon().undoRedoUpdateObject(cmd, value);
+		getSSCommon().undoRedoUpdateObject(cmd, change);
 	}
 
 	/**
-	 * A component may have a display/parse format.Especially used in
+	 * A component may have a display/parse format. Especially used in
 	 * conjunction with, but not limited to, {@linkplain SSFormattedTextField}.
 	 * @param format format for this component
 	 */
@@ -552,6 +553,11 @@ public interface SSComponentInterface extends RSC
 	 */
 	@Override
 	default SSFormat getSSFormat() { return getSSCommon().getSSFormat(); }
+
+	////////////////////////////////////////////////////////////////////////////
+	//
+	// Validation/Decoration
+	//
 
 	// There are three levels of componenent validation.
 	// 1 - baseValidate is inherit to the component structure,
@@ -597,7 +603,7 @@ public interface SSComponentInterface extends RSC
 	 * @param comp result of base and componentValidate()
 	 * @param all result of comp and pluginValidate()
 	 */
-	record validateResult(boolean base, boolean comp, boolean all){}
+	record validateResult(boolean base, boolean comp, boolean other, boolean all){}
 
 	/**
 	 * Run the validators: baseValidate, componentValidate, pluginValidate.
@@ -607,8 +613,14 @@ public interface SSComponentInterface extends RSC
 	default validateResult allValidate() {
 		boolean baseValid = baseValidate();
 		boolean compValid = baseValid && componentValidate();
-		boolean allValid = compValid && getSSCommon().pluginValidate();
-		return new validateResult(baseValid, compValid, allValid);
+		boolean otherValid = compValid;
+		if (compValid && !getSSCommon().pendingDbChange) {
+			RowsModel rowsModel = getRowsModel();
+			if (rowsModel != null && rowsModel.getRowSet() != null)
+				otherValid = !rowsModel.hasError(this);
+		}
+		boolean allValid = otherValid && getSSCommon().pluginValidate();
+		return new validateResult(baseValid, compValid, otherValid, allValid);
 	}
 
 	/**
