@@ -108,13 +108,6 @@ public class RowsModel
 	private NavigateState navState;
 	private final RowsActions rowsActions;
 
-	// private static void issueRowChanged(RowsModel rowsModel)
-	// {
-	// 	// TODO: create a force/virtual ACT_ROW_CHANGED
-	// 	startRowsEvent(rowsModel, ACT_REVERT_FORCE);
-	// 	finishRowsEvent(rowsModel);
-	// }
-
 	/**
 	 * Create and return a new RowsModel for the specified RowSet.
 	 * <p>
@@ -205,6 +198,17 @@ public class RowsModel
 
 		rowSetListener = new SimpleRowSetListener();
 		rowSetListener.registerTo(rs);
+	}
+
+	/**
+	 *
+	 * @param rowsModel
+	 */
+	public static void issueRowChanged(RowsModel rowsModel)
+	{
+		startRowsEvent(rowsModel, ACT_ROW_CHANGED);
+		addRowSetEvent(RowSetEventType.ROW_CHANGED, rowsModel.getRowSet());
+		finishRowsEvent(rowsModel);
 	}
 
 	/**
@@ -570,14 +574,14 @@ public class RowsModel
 
 	/**
 	 * Invoke this when starting an Operation that manipulates a RowSet.
-	 * @param _operatorKind
+	 * @param operatorKind
 	 * @param model
 	 * @param compOrNav
 	 */
-	public static void startRowsEvent(OperatorKind _operatorKind, RowsModel model,
+	public static void startRowsEvent(OperatorKind operatorKind, RowsModel model,
 			Object compOrNav)
 	{
-		enq.startRowsEvent(_operatorKind, model, compOrNav);
+		enq.startRowsEvent(operatorKind, model, compOrNav);
 	}
 
 	/** from the RowSet event */

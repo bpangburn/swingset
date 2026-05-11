@@ -78,6 +78,8 @@ public enum RowsAction
 	ACT_GOTOROW,
 	/** Need with CachedRowSet since no RowSet events */
 	ACT_REVERT_FORCE(true, true),
+	/** Send a row changed rowSet event */
+	ACT_ROW_CHANGED(true, true),
 	;
 
 	private final boolean force;

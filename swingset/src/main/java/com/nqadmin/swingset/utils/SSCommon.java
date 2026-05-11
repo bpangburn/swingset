@@ -1021,6 +1021,7 @@ final class SSCommon
 		
 		Object obj = change.value();
 		try {
+			// throw isn't a problem because value fetched from undo/redo stack.
 			obj = convertToType(obj, getBoundColumnJDBCType()); // may throw
 			// NOTE: following does not generate any events
 			getRowSet().updateObject(getBoundColumnIndex(), obj);
@@ -1029,7 +1030,7 @@ final class SSCommon
 				throw new IllegalStateException("EXCEPTION BUT NOT ERROR");
 		}
 
-		updateSSComponent();
+		RowsModel.issueRowChanged(rowsModel); // will cause updateSSComponent
 	}
 
 	/**

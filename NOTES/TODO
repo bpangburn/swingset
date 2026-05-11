@@ -173,34 +173,12 @@ If at bottom of stack, then Redo to an error, swithes from canNavigate btns to
 only RevertChanges btn. There is a brief flash of the commit button on the way,
 minor issue to ignore for now.
 
---- backing out text component error
-validation issue interacting with database errors
-Example1 - status change "20" to "20x", conversion error.
-    SSDocumentListener.udpateTextComponent
-        does ssCommon.setBoundColumnText
-        does RowSetOps.updateColumnText
-        does convertToType("20x", INT)
-            gets exception
-    ssCommon.setBoundColumnText does
-        postRowSetModifiedError
-        and returns false
-    The SSDocumentListener
-        because setBoundColumnText fails (return false, also if thrown exception)
-        backs out the text field change;
-        but note that an error has already been posted
 
-    The nav state gets screwy. There's no error, but the component is in an error
-    state. There was "no change", because it was backed out. ^Z/^Y aren't quite
-    right.
-
-    The conversion to database type, should be part of validation.
-
+--- backing out text component error (see DONE)
     This issue may relate to the issues with pluginValidate leaving things in
     an unusual state. FIND THOSE COMMENTS...
 
     
-
-Should decorator check component error state (from navigator)...
 
 ---
 ACT_REVERT on cached row set.
