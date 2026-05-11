@@ -84,7 +84,7 @@ public class ComboBoxSnippets extends JFrame
 		
 		// Next line is assuming rowsModel has been initialized
 		// and "my_column" is a column in it's rowSet.
-		combo.bind(rowsModel, "my_column");
+		rowsModel.bind(combo, "my_column");
 		// @end region=custom_key
 	}
 

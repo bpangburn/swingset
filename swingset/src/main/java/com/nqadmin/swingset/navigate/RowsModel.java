@@ -337,12 +337,13 @@ public class RowsModel
 	 * @param comp
 	 * @param columnName
 	 */
+	@SuppressWarnings("deprecation")
 	public void bind(SSComponentInterface comp, String columnName) {
 		if (bindings.containsKey(comp))
 			throw new IllegalArgumentException("Component already bound to this model");
 		bindings.put(comp, columnName);
 		try {
-			comp.bind(this, columnName);
+			comp.bind(this, columnName); // Only allowed from RowsModel
 		} catch (Exception ex) {
 			bindings.remove(comp);
 			throw ex;

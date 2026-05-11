@@ -193,13 +193,13 @@ public class Image extends JPanel implements SSComponentInterface
 	 * rowSet.
 	 *
 	 * @param rowsModel          - RowSet from/to which data has to be read/written
-	 * @param _boundColumnName - column in the rowSet to which the component should
+	 * @param boundColumnName - column in the rowSet to which the component should
 	 *                         be bound.
 	 */
-	public Image(RowsModel rowsModel, String _boundColumnName)
+	public Image(RowsModel rowsModel, String boundColumnName)
 	{
 		this();
-		bind(rowsModel, _boundColumnName);
+		rowsModel.bind(this, boundColumnName);
 	}
 
 	// TODO: Why do decorators interfere with Image?

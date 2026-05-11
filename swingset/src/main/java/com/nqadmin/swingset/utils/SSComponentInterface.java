@@ -45,7 +45,6 @@ package com.nqadmin.swingset.utils;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EventListener;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 import javax.sql.RowSet;
@@ -268,10 +267,12 @@ public interface SSComponentInterface extends RSC
 	 *
 	 * @param rowsModel holds RowSet to be used.
 	 * @param boundColumnName Name of the column to which this check box should be bound
+	 * 
+	 * @deprecated Use rowsModel.bind(sscomp, boundColumnName)
 	 */
+	@Deprecated
 	default void bind(RowsModel rowsModel, String boundColumnName)
 	{
-		Objects.requireNonNull(rowsModel);
 		getSSCommon().bind(rowsModel, boundColumnName);
 	}
 

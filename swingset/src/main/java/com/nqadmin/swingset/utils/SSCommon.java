@@ -312,6 +312,7 @@ final class SSCommon
 	// TODO: handle initialization through a plugin. When retrieving
 	//       value, pass table name, column name, comp. So need to wait
 	//       for bind/rowset. Have a flag to indicate been initialized.
+	private boolean beepOnError = true;
 	private boolean restoreOnError = false;
 	private boolean dialogOnError = false;
 
@@ -496,6 +497,7 @@ final class SSCommon
 	 *
 	 * @param rowsModel holds RowSet to be used.
 	 * @param boundColumnName Name of the column to which this check box should be bound
+	 * @param doStart true means do everything, false means just do last step
 	 */
 	private void bind(RowsModel rowsModel, String boundColumnName, boolean doStart)
 	{
@@ -828,8 +830,11 @@ final class SSCommon
 			if (isDialogOnError())
 				userErrorReporting(boundColumnArray, ex);
 		} finally {
-			if (!ok)
+			if (!ok) {
+				if (isBeepOnError())
+					SSUtils.beep();
 				postRowSetModifiedError(getSSComponent(), boundColumnArray);
+			}
 		}
 		boolean fOK = ok;
 		logger.log(DEBUG, () -> sf("return ok: %b", fOK));
@@ -852,8 +857,11 @@ final class SSCommon
 			if (isDialogOnError())
 				userErrorReporting(boundColumnObject, ex);
 		} finally {
-			if (!ok)
+			if (!ok) {
+				if (isBeepOnError())
+					SSUtils.beep();
 				postRowSetModifiedError(getSSComponent(), boundColumnObject);
+			}
 		}
 		boolean fOK = ok;
 		logger.log(DEBUG, () -> sf("return ok: %b", fOK));
@@ -876,14 +884,22 @@ final class SSCommon
 			if (isDialogOnError())
 				userErrorReporting(_boundColumnText, ex);
 		} finally {
-			if (!ok && !isRestoreOnError())
-				postRowSetModifiedError(getSSComponent(), _boundColumnText);
+			if (!ok) {
+				if (isBeepOnError())
+					SSUtils.beep();
+				if (!isRestoreOnError())
+					postRowSetModifiedError(getSSComponent(), _boundColumnText);
+			}
 		}
 		boolean fOK = ok;
 		logger.log(DEBUG, () -> sf("return ok: %b", fOK));
 		return ok;
 	}
 
+	// TODO: make these three available through SSComponent.
+	boolean isBeepOnError() {
+		return beepOnError;
+	}
 	boolean isRestoreOnError() {
 		return restoreOnError;
 	}

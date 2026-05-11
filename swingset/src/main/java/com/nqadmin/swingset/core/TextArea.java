@@ -99,7 +99,7 @@ public class TextArea extends JTextArea implements SSComponentInterface {
 	 */
 	public TextArea(RowsModel rowsModel, String boundColumnName) {
 		this();
-		bind(rowsModel, boundColumnName);
+		rowsModel.bind(this, boundColumnName);
 	}
 
 	/**

@@ -4,6 +4,10 @@ Names case conversion. Per dbms/platform plugin. Maybe only needed for metadata
 access. For example, H2 converts column_name to COLUMN_NAME. Currently using
 map with case insensitive key. See RowSetState TreeMap
 
+DBMS plugin for interpretation of SQL Exceptions to assist in better messages
+and/or error handling. For example, determine if error is a constraint violation
+and print the violated constraint.
+
 ================================================================================
 
 Why maintain currentRow and rowCount in navigateState? How much perf gain?
@@ -546,6 +550,15 @@ This brings up a dialog, and during testing if click OK
 there is no error.
 In RowSetOps could 'catch(SQLException ex) {excount++; throw ex;}
 and a getExCount(). Maybe the counter could be in postRowSetError.
+
+For example1, status enter 2000, click commit. get dialog but no indication
+of which column is a problem. For H2 dialog says constraint error. Plugin
+to help decode error. This shows set command, what about values?
+        Exception occured while saving row.
+        "Check constraint violation: "CONSTRAINT_37: ";
+        SQL statement: UPDATE "PUBLIC"."SUPPLIER_DATA"
+            SET "SUPPLIER_ID"=? ,"SUPPLIER_NAME"=? ,"STATUS"=? ,"CITY"=?
+            WHERE "SUPPLIER_ID"=? [23513-240]"
 
 
 ============== EVENTS

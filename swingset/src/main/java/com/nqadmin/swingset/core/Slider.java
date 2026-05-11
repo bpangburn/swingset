@@ -129,7 +129,7 @@ public class Slider extends JSlider implements SSComponentInterface
 	 */
 	public Slider(RowsModel rowsModel, String boundColumnName) throws java.sql.SQLException {
 		this();
-		bind(rowsModel, boundColumnName);
+		rowsModel.bind(this, boundColumnName);
 	}
 
 	/** {@inheritDoc } */

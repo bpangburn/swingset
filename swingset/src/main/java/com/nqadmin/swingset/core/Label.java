@@ -129,7 +129,7 @@ public class Label extends JLabel implements SSComponentInterface
 	 */
 	public Label(RowsModel rowsModel, String boundColumnName) {
 		this();
-		bind(rowsModel, boundColumnName);
+		rowsModel.bind(this, boundColumnName);
 	}
 
 	/** {@inheritDoc } */

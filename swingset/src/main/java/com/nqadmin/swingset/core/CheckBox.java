@@ -113,7 +113,7 @@ public class CheckBox extends JCheckBox implements SSComponentInterface
 	 */
 	public CheckBox(RowsModel rowsModel, final String boundColumnName) {
 		this(null);
-		bind(rowsModel, boundColumnName);
+		rowsModel.bind(this, boundColumnName);
 	}
 
 	/**

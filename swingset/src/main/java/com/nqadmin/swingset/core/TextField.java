@@ -102,9 +102,8 @@ public class TextField extends JTextField implements SSComponentInterface
 	private TextField(String text, RowsModel rowsModel, String boundColumnName) {
 		super(text);
 		finishSSCommon();
-		if (rowsModel != null) {
-			bind(rowsModel, boundColumnName);
-		}
+		if (rowsModel != null)
+			rowsModel.bind(this, boundColumnName);
 	}
 
 	/**
