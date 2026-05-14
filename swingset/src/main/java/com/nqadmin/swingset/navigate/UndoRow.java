@@ -50,7 +50,6 @@ import javax.sql.RowSet;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
-import com.nqadmin.swingset.utils.SSComponent;
 
 
 /**
@@ -179,7 +178,7 @@ final class UndoRow
 	 * Force the capture of the database column for the comp;
 	 * does nothing if the column is already captured.
 	 */
-	void captureInitialValue(SSComponent comp) throws SQLException
+	void captureInitialValue(RSC comp) throws SQLException
 	{
 		getCol(comp);
 	}
@@ -196,12 +195,12 @@ final class UndoRow
 	 * If there's nothing to do, for example UNDO but there has been
 	 * no changes, then do nothing.
 	 * 
-	 * @param comp SSComponent to adjust
+	 * @param comp rowset/col to adjust
 	 * @param cmd undo/redo
 	 * @return new value (only for logging)
 	 * @throws SQLException 
 	 */
-	Change undoRedoChange(SSComponent comp, UndoRedo cmd) throws SQLException
+	Change undoRedoChange(RSC comp, UndoRedo cmd) throws SQLException
 	{
 		if (cols == null)
 			return UndoCol.NO_CHANGE;

@@ -42,7 +42,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
-import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.lang.System.Logger;
@@ -50,12 +49,11 @@ import java.sql.JDBCType;
 import java.util.EnumSet;
 import java.util.EventListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 
 import com.nqadmin.swingset.decorators.BorderDecorator;
+import com.nqadmin.swingset.decorators.Utils;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -127,27 +125,10 @@ public class CheckBox extends JCheckBox implements SSComponent
 				BorderDecorator.asString(getBorder(), this)));
 		// JCheckBox disables painting the borders.
 		// Replace the JCheckBox border with an empty border.
-		Border b = getBorder();
-		if (b instanceof CompoundBorder cb) {
-			Insets oInsets = toInsets(cb.getOutsideBorder());
-			Insets iInsets = toInsets(cb.getInsideBorder());
-			b = BorderFactory.createCompoundBorder(
-					BorderFactory.createEmptyBorder(
-							oInsets.top, oInsets.left, oInsets.bottom, oInsets.right),
-					BorderFactory.createEmptyBorder(
-							iInsets.top, iInsets.left, iInsets.bottom, iInsets.right));
-		} else {
-			Insets i = getInsets();
-			b = BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right);
-		}
+		Border b = Utils.createEmptyBorder(this);
 		setBorder(b);
 		setBorderPainted(true);
 		finishSSCommon();
-	}
-
-	private Insets toInsets(Border b)
-	{
-		return b.getBorderInsets(this);
 	}
 
 	/** {@inheritDoc } */

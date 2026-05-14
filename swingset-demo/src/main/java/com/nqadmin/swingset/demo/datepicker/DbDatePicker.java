@@ -26,6 +26,9 @@ import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
+import com.nqadmin.swingset.decorators.AlternateBorderDecorator;
+import com.nqadmin.swingset.decorators.BorderDecorator;
+import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -60,7 +63,11 @@ public class DbDatePicker extends DatePicker implements SSComponent
 	{
 		super(initialSettings());
 
+		// @SuppressWarnings("LeakingThisInConstructor")
+		// Border b = SSUtils.createEmptyBorder(this);
+		// setBorder(b);
 		//setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+
 		finishSSCommon();
 	}
 
@@ -107,6 +114,19 @@ public class DbDatePicker extends DatePicker implements SSComponent
 		} else {
 			setDateToToday();
 		}
+	}
+
+	/**
+	 * Highlight the date text field when this component gets focus.
+	 * {@inheritDoc }
+	 */
+	@Override
+	public Decorator createDefaultDecorator() {
+		Decorator decorator = SSComponent.super.createDefaultDecorator();
+		if (!(decorator instanceof BorderDecorator))
+			return decorator;
+
+		return new AlternateBorderDecorator(getComponentDateTextField());
 	}
 
 	private Hook hook;

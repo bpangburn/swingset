@@ -53,6 +53,9 @@ public enum UndoRedo
 	/** Redo command */
 	REDO;
 
+	/**
+	 * Value and error status of item on the undo/redo stack.
+	 */
 	public record Change(Object value, boolean isError){};
 
 	/** Logger for component */
@@ -126,10 +129,11 @@ public enum UndoRedo
 	 * Make sure the column's undo/redo stack is initialized; the
 	 * database value (an object) is the base.
 	 * This must be used before any updates are done to the rowset.
+	 * Does nothing if base already captured.
 	 * @param comp rowset/column
 	 * @throws SQLException
 	 */
-	public static void captureInitialValue(SSComponent comp)
+	public static void captureInitialValue(RSC comp)
 			throws SQLException
 	{
 		if (!isUndoRedoEnabled(comp))
@@ -140,7 +144,7 @@ public enum UndoRedo
 
 	/**
 	 * Return the current undo/redo value for the specified component.
-	 * @param comp ssComponent
+	 * @param comp rowset/column
 	 * @return current value
 	 * @throws SQLException
 	 */
@@ -182,9 +186,9 @@ public enum UndoRedo
 
 	/**
 	 * Make the next undo/redo change goes into a new slot.
-	 * @param comp ssComponent
+	 * @param comp rowset/col
 	 */
-	public static void newSlot(SSComponent comp)
+	public static void newSlot(RSC comp)
 	{
 		if (!isUndoRedoEnabled(comp))
 			return;

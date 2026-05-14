@@ -42,8 +42,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -68,15 +66,13 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 
+import com.nqadmin.swingset.decorators.AlternateBorderDecorator;
 import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.navigate.RowsModel;
@@ -220,37 +216,7 @@ public class Image extends JPanel implements SSComponent
 		if (!(decorator instanceof BorderDecorator))
 			return decorator;
 
-		return new BorderDecorator() {
-			@Override
-			protected Border getBorder(BorderState state)
-			{
-				// The default border when just running the demo is
-				// the CompoundBorder: [[3,3,3,3],[2,14,2,14]].
-				Color color = getBorderColor(state);
-				if (color == null)
-					return defaultBorder;
-
-				if (jc().getBorder() instanceof CompoundBorder cb) {
-					return BorderDecorator.lineEmpty_empty(
-							cb.getOutsideBorder().getBorderInsets(jc()),
-							cb.getInsideBorder().getBorderInsets(jc()),
-							color);
-				}
-				return empty_line(jc().getInsets(), color);
-			}
-
-			@Override
-			protected JComponent jc()
-			{
-				return btnUpdateImage;
-			}
-			
-			@Override
-			protected Component fcomp()
-			{
-				return btnUpdateImage;
-			}
-		};
+		return new AlternateBorderDecorator(btnUpdateImage);
 	}
 
 	/**
