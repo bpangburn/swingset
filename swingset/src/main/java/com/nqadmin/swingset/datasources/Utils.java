@@ -38,27 +38,25 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.datasources;
 
 import java.io.PrintStream;
-import java.sql.SQLException;
-
-import javax.sql.rowset.CachedRowSet;
-import javax.sql.rowset.spi.SyncResolver;
-
 import java.lang.System.Logger;
+import java.sql.SQLException;
 import java.sql.Wrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static java.lang.System.Logger.Level.*;
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.spi.SyncResolver;
 
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 import static javax.sql.rowset.spi.SyncResolver.DELETE_ROW_CONFLICT;
 import static javax.sql.rowset.spi.SyncResolver.INSERT_ROW_CONFLICT;
 import static javax.sql.rowset.spi.SyncResolver.NO_ROW_CONFLICT;

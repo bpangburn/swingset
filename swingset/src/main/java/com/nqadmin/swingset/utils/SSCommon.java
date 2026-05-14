@@ -135,7 +135,7 @@ final class SSCommon
 	 * @param partialSSCommon if non null return it
 	 * @return partially constructed ssCommon
 	 */
-	static SSCommon createStart(SSComponentInterface ssComponent) {
+	static SSCommon createStart(SSComponent ssComponent) {
 		return new SSCommon(ssComponent, false);
 	}
 
@@ -152,7 +152,7 @@ final class SSCommon
 	 * @param partialSSCommon if non null finish it's construction
 	 * @return fully constructed SSCommon
 	 */
-	static SSCommon createFinish(SSComponentInterface ssComponent,
+	static SSCommon createFinish(SSComponent ssComponent,
 								 SSCommon partialSSCommon) {
 		if (partialSSCommon != null && ssComponent != partialSSCommon.ssComponent)
 			throw new IllegalArgumentException("ssComponent mismatch");
@@ -339,7 +339,7 @@ final class SSCommon
 	private Optional<Boolean> isNullable = Optional.empty();
 
 	/** parent SwingSet component */
-	private final SSComponentInterface ssComponent;
+	private final SSComponent ssComponent;
 
 	/** RowsModel from which component will get/set values. */
 	private RowsModel rowsModel;
@@ -356,7 +356,7 @@ final class SSCommon
 	 *                     data member
 	 * @param finishInit if false, the SSComponent still needs to call finishSSCommon.
 	 */
-	private SSCommon(SSComponentInterface ssComponent, boolean finishInit) {
+	private SSCommon(SSComponent ssComponent, boolean finishInit) {
 		this.ssComponent = ssComponent;
 		decorator = Decorator.nullDecorator;
 		validator = Validator.nullValidator;
@@ -739,7 +739,7 @@ final class SSCommon
 	 * @return the parent/calling SwingSet JComponent implementing
 	 *         SSComponentInterface
 	 */
-	SSComponentInterface getSSComponent() {
+	SSComponent getSSComponent() {
 		return ssComponent;
 	}
 
@@ -985,7 +985,7 @@ final class SSCommon
 	 * Setup undo/redo action bindings for a component.
 	 * @param comp
 	 */
-	static void setupUndoRedoKeys(SSComponentInterface comp)
+	static void setupUndoRedoKeys(SSComponent comp)
 	{
 		logger.log(DEBUG, () -> sf("UndoRedoKeys: %s", comp.getClass().getSimpleName()));
 
@@ -1137,13 +1137,13 @@ final class SSCommon
 	private SSFormat ssFormat;
 	/**
 	 * @param ssFormat
-	 * @see SSComponentInterface#setFormat(com.nqadmin.swingset.formatting.SSFormat) 
+	 * @see SSComponent#setFormat(com.nqadmin.swingset.formatting.SSFormat) 
 	 */
 	void setSSFormat(SSFormat ssFormat) { this.ssFormat = ssFormat; }
 
 	/**
 	 * @return 
-	 * @see SSComponentInterface#getSSFormat() 
+	 * @see SSComponent#getSSFormat() 
 	 */
 	SSFormat getSSFormat() { return ssFormat; }
 

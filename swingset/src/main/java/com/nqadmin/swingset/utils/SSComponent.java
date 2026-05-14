@@ -68,7 +68,7 @@ import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
  * This interface acts like a class to simulate multiple inheritance.
  * There are only a few methods, and the class Hook, that need to be implemented.
  */
-public interface SSComponentInterface extends RSC
+public interface SSComponent extends RSC
 {
 	/** Initialize component to an empty or default value.
 	 * Action could be conditioned on getAllowNull() or whatever.
@@ -90,13 +90,13 @@ public interface SSComponentInterface extends RSC
 	 */
 	abstract class Hook
 	{
-		private final SSComponentInterface ssComponent;
+		private final SSComponent ssComponent;
 
 		/**
 		 * Create.
 		 * @param ssComponent
 		 */
-		protected Hook(SSComponentInterface ssComponent)
+		protected Hook(SSComponent ssComponent)
 		{
 			this.ssComponent = ssComponent;
 		}
@@ -427,10 +427,10 @@ public interface SSComponentInterface extends RSC
 	/**
 	 * Sets the allowNull flag for the bound database column.
 	 *
-	 * @param _allowNull flag to indicate if the bound database column can be null
+	 * @param allowNull flag to indicate if the bound database column can be null
 	 */
-	default void setAllowNull(final boolean _allowNull) {
-		getSSCommon().setAllowNull(_allowNull);
+	default void setAllowNull(final boolean allowNull) {
+		getSSCommon().setAllowNull(allowNull);
 	}
 
 	/**
@@ -438,31 +438,31 @@ public interface SSComponentInterface extends RSC
 	 * <p>
 	 * Used for SSList or other component where multiple items can be selected.
 	 *
-	 * @param _boundColumnArray Array to write to bound database column
+	 * @param boundColumnArray Array to write to bound database column
 	 * @throws SQLException thrown if there is a problem writing the array to the
 	 *                      RowSet
 	 */
-	default void setBoundColumnArray(final SSArray _boundColumnArray) throws SQLException {
-		getSSCommon().setBoundColumnArray(_boundColumnArray);
+	default void setBoundColumnArray(final SSArray boundColumnArray) throws SQLException {
+		getSSCommon().setBoundColumnArray(boundColumnArray);
 	}
 
 	/**
 	 * Sets the database column name bound to the Swingset component
 	 *
-	 * @param _boundColumnName the columnName to set
+	 * @param boundColumnName the columnName to set
 	 * @deprecated Use bind()
 	 */
 	@Deprecated
-	default void setBoundColumnName(final String _boundColumnName) {
-		getSSCommon().setBoundColumnName(_boundColumnName);
+	default void setBoundColumnName(final String boundColumnName) {
+		getSSCommon().setBoundColumnName(boundColumnName);
 	}
 
 	/**
 	 * Set the text for log entries; only used if boundColumnName is null.
-	 * @param _logColumnName show this in log entry if boundColumnName is null
+	 * @param logColumnName show this in log entry if boundColumnName is null
 	 */
-	default void setLogColumnName(final String _logColumnName) {
-		getSSCommon().setLogColumnName(_logColumnName);
+	default void setLogColumnName(final String logColumnName) {
+		getSSCommon().setLogColumnName(logColumnName);
 	}
 
 	/**
@@ -476,19 +476,19 @@ public interface SSComponentInterface extends RSC
 	/**
 	 * Sets the value of the bound database column
 	 *
-	 * @param _boundColumnObject the value to set in the bound database column
+	 * @param boundColumnObject the value to set in the bound database column
 	 */
-	default void setBoundColumnObject(final Object _boundColumnObject) {
-		getSSCommon().setBoundColumnObject(_boundColumnObject);
+	default void setBoundColumnObject(final Object boundColumnObject) {
+		getSSCommon().setBoundColumnObject(boundColumnObject);
 	}
 
 	/**
 	 * Sets the value of the bound database column
 	 *
-	 * @param _boundColumnText the value to set in the bound database column
+	 * @param boundColumnText the value to set in the bound database column
 	 */
-	default void setBoundColumnText(final String _boundColumnText) {
-		getSSCommon().setBoundColumnText(_boundColumnText);
+	default void setBoundColumnText(final String boundColumnText) {
+		getSSCommon().setBoundColumnText(boundColumnText);
 	}
 
 	/**

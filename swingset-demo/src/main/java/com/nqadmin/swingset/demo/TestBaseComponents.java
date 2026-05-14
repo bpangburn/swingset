@@ -77,7 +77,7 @@ import com.nqadmin.swingset.demo.datepicker.DbDatePicker;
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSDbArrayModel;
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -114,7 +114,7 @@ public class TestBaseComponents extends JFrame
 		H1, H2, H3
 	}
 
-	private record Comp(String col, SSComponentInterface comp, JLabel label, CompDim dim){};
+	private record Comp(String col, SSComponent comp, JLabel label, CompDim dim){};
 	private Map<Comps, Comp> compInfo = new EnumMap<>(Comps.class);
 	private EnumSet<Comps> activeComps = EnumSet.allOf(Comps.class);
 
@@ -523,7 +523,7 @@ public class TestBaseComponents extends JFrame
 
 	/** Some components aren't fully initialized until well after startup,
 	 * so replace the component in the info. */
-	private void replaceComponent(Comps eComp, SSComponentInterface comp)
+	private void replaceComponent(Comps eComp, SSComponent comp)
 	{
 		Comp info = compInfo.get(eComp);
 		compInfo.put(eComp, new Comp(info.col, comp, info.label, info.dim));

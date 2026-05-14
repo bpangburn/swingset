@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * Copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -58,12 +58,11 @@ import com.google.common.collect.ImmutableMap;
 import com.nqadmin.swingset.formatting.SSFormat;
 import com.nqadmin.swingset.utils.SSUtils;
 
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 import static java.sql.JDBCType.DATE;
 import static java.sql.JDBCType.TIME;
 import static java.sql.JDBCType.TIMESTAMP;
-
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 
 /**

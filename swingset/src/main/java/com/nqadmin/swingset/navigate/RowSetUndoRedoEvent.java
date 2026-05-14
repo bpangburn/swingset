@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2024-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,7 +32,7 @@ package com.nqadmin.swingset.navigate;
 
 import javax.sql.RowSet;
 
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 
 /**
  * Sent by an SSComponent when value changes from undo/redo.
@@ -52,7 +52,7 @@ public class RowSetUndoRedoEvent extends EventObjectBacktrace
 	 * @param value the value written to the rowSet
 	 * @param error true if the component value is in error
 	 */
-	public RowSetUndoRedoEvent( SSComponentInterface source, Object value,
+	public RowSetUndoRedoEvent( SSComponent source, Object value,
 							   boolean error)
 	{
 		super(source);
@@ -74,8 +74,8 @@ public class RowSetUndoRedoEvent extends EventObjectBacktrace
 	 * {@inheritDoc }
 	 */
 	@Override
-	public SSComponentInterface getSource() {
-		return (SSComponentInterface) super.getSource();
+	public SSComponent getSource() {
+		return (SSComponent) super.getSource();
 	}
 
 	/**

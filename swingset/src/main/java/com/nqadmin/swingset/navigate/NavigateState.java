@@ -61,7 +61,7 @@ import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
 import com.raelity.lib.eventbus.WeakEventBus;
@@ -348,7 +348,7 @@ final class NavigateState
 	}
 
 	// Is this needed?
-	private void errorComponentsChanged(SSComponentInterface comp) {
+	private void errorComponentsChanged(SSComponent comp) {
 		comp.decorate();
 	}
 
@@ -361,7 +361,7 @@ final class NavigateState
 	
 	// TODO: Also have Set<SSComponentInterface> modifiedComponents.
 	//		 Paint modified/OK fields with identifying color, e.g. yellow.
-	private final Set<SSComponentInterface> errorComponents;
+	private final Set<SSComponent> errorComponents;
 
 	/** Undo/redo this this rowset */
 	final UndoRow undoRow;
@@ -532,7 +532,7 @@ final class NavigateState
 	 * @throws java.sql.SQLException
 	 */
 	// TODO: Should this be public? NO, go through the static method in this class
-	Change doUndoRedo(SSComponentInterface comp, UndoRedo cmd) throws SQLException
+	Change doUndoRedo(SSComponent comp, UndoRedo cmd) throws SQLException
 	{
 		if (!isUndoRedoEnabled(comp))
 			throw new IllegalStateException("UNDO/REDO disabled");
@@ -792,7 +792,7 @@ final class NavigateState
 		return writable;
 	}
 
-	boolean hasError(SSComponentInterface comp) {
+	boolean hasError(SSComponent comp) {
 		return errorComponents.contains(comp);
 	}
 

@@ -42,10 +42,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
+import javax.sql.RowSet;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -53,20 +57,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.plaf.InternalFrameUI;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
-import org.apache.logging.log4j.LogManager;
-
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-import java.util.List;
-
-import static java.lang.System.Logger.Level.*;
-
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.utils.SSFormViewScreenHelper;
 import com.nqadmin.swingset.utils.SSUtils;
 
-import javax.sql.RowSet;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * This example displays data from the part_data table.

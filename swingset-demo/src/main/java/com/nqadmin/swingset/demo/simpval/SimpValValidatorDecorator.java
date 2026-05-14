@@ -39,7 +39,7 @@ package com.nqadmin.swingset.demo.simpval;
 
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 
 /**
  * A combined validator/decorator using the Simple Validation framework.
@@ -60,7 +60,7 @@ public class SimpValValidatorDecorator implements Decorator
 	}
 
 	@Override
-	public void install(SSComponentInterface component) {
+	public void install(SSComponent component) {
 		// No listeners to install
 	}
 

@@ -67,7 +67,7 @@ import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.decorators.TextDecorationStyle;
 import com.nqadmin.swingset.decorators.TextDecorator;
 import com.nqadmin.swingset.navigate.Utils;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.checkConvertToJdbcType;
@@ -82,7 +82,7 @@ import static java.lang.System.Logger.Level.*;
 
 /**
  * SSFormattedTextField extends the JFormattedTextField.This is the pivotal class for this package.
- * It operates as a {@link SSComponentInterface}.
+ * It operates as a {@link SSComponent}.
  * It locks focus while data is invalid and updates the database while editing.
  *
  * Note {@link #allValidate()} is used to do validation.
@@ -100,7 +100,7 @@ import static java.lang.System.Logger.Level.*;
 
 @SuppressWarnings("serial")
 public class SSFormattedTextField extends JFormattedTextField
-		implements SSComponentInterface {
+		implements SSComponent {
 
 	/**
 	 * This InputVerifier locks the focus down while the 
@@ -587,7 +587,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 */
 	@Override
 	public void metadataChange() {
-		SSComponentInterface.super.metadataChange();
+		SSComponent.super.metadataChange();
 		checkNeedsNullFormatter();
 	}
 
@@ -597,7 +597,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 */
 	@Override
 	public void setAllowNull(boolean allowNull) {
-		SSComponentInterface.super.setAllowNull(allowNull);
+		SSComponent.super.setAllowNull(allowNull);
 		checkNeedsNullFormatter();
 	}
 	

@@ -35,10 +35,15 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 
 package com.nqadmin.swingset.decorators;
 
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 
 /**
  * Component decorator gives a visual indication of the component state.
@@ -64,7 +69,7 @@ public interface Decorator
 	/** Install this decorator into the component. Installs listeners
 	 * @param component the componenet
 	 */
-	void install(SSComponentInterface component);
+	void install(SSComponent component);
 
 	/** Remove decorator/listeners from component. */
 	void uninstall();
@@ -77,7 +82,7 @@ public interface Decorator
 		@Override public boolean decorate() { return true; }
 
 		/** {@inheritDoc} */
-		@Override public void install(SSComponentInterface comp) { }
+		@Override public void install(SSComponent comp) { }
 
 		/** {@inheritDoc} */
 		@Override public void uninstall() { }

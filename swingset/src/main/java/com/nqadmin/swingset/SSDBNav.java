@@ -35,12 +35,17 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset;
 
 import java.util.Collections;
 import java.util.List;
 
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 // SSDBNav.java
@@ -185,7 +190,7 @@ public interface SSDBNav {
 	 * Find all the SSComponents in the navigator window.
 	 * @return
 	 */
-	default List<SSComponentInterface> findSSComponents() {
+	default List<SSComponent> findSSComponents() {
 		return Collections.emptyList();
 	}
 

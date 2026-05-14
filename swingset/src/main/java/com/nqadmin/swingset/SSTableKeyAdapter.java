@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset;
 
 import java.awt.Toolkit;
@@ -48,6 +53,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.System.Logger;
 import java.lang.reflect.Constructor;
 import java.sql.Date;
 import java.util.StringTokenizer;
@@ -55,13 +61,10 @@ import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
-import java.lang.System.Logger;
-
-import static java.lang.System.Logger.Level.*;
-
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
 // SSTableKeyAdapter.java
 //

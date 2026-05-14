@@ -29,11 +29,13 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import javax.swing.text.DefaultFormatterFactory;
+
 import com.nqadmin.swingset.formatting.Field;
 import com.nqadmin.swingset.formatting.SSFormat;
-import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
 import com.nqadmin.swingset.formatting.SSMaskFormatterFactory;
-import javax.swing.text.DefaultFormatterFactory;
+
+import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
 
 /**
  * A simple field for debug that is not in the formatting package.

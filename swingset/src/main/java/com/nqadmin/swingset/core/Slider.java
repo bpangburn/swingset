@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
@@ -54,7 +54,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.assertConvertFromJdbcType;
@@ -65,7 +65,7 @@ import static java.sql.JDBCType.*;
  * Used to link a JSlider to a numeric column in a database.
  */
 @SuppressWarnings("serial")
-public class Slider extends JSlider implements SSComponentInterface
+public class Slider extends JSlider implements SSComponent
 {
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound

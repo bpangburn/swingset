@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2024-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,9 +41,8 @@ import javax.swing.text.InternationalFormatter;
 
 import com.nqadmin.swingset.utils.SSUtils;
 
-import static java.lang.System.Logger.Level.*;
-
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * General NullAware formatter factory for SS.

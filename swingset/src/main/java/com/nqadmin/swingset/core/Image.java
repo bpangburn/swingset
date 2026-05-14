@@ -80,7 +80,7 @@ import javax.swing.border.CompoundBorder;
 import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -92,7 +92,7 @@ import static java.nio.file.StandardOpenOption.READ;
  */
 // TODO: Image make all the load/store buttons/capabilities optional.
 @SuppressWarnings("serial")
-public class Image extends JPanel implements SSComponentInterface
+public class Image extends JPanel implements SSComponent
 {
 	// TODO: try to get this initialized
 	private Path path;
@@ -216,7 +216,7 @@ public class Image extends JPanel implements SSComponentInterface
 	 */
 	@Override
 	public Decorator createDefaultDecorator() {
-		Decorator decorator = SSComponentInterface.super.createDefaultDecorator();
+		Decorator decorator = SSComponent.super.createDefaultDecorator();
 		if (!(decorator instanceof BorderDecorator))
 			return decorator;
 

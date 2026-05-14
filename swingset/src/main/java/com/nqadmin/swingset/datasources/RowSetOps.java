@@ -67,7 +67,7 @@ import com.nqadmin.swingset.datasources.Utils.ConflictRow;
 import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.navigate.UndoRedo;
 import com.nqadmin.swingset.utils.SSArray;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.google.common.collect.Sets.immutableEnumSet;
@@ -342,7 +342,7 @@ public class RowSetOps {
 	 * @param comp
 	 * @return
 	 */
-	public static Array getColumnArray(SSComponentInterface comp)
+	public static Array getColumnArray(SSComponent comp)
 	{
 		try {
 			if (getColumnCount(comp.getRowSet())==0)
@@ -495,7 +495,7 @@ public class RowSetOps {
 	 * @return text representation of data in specified column
 	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
 	 */
-	public static String getColumnText(final SSComponentInterface comp)
+	public static String getColumnText(final SSComponent comp)
 	{
 		final RowSet rowSet = comp.getRowSet();
 		final int cIdx = comp.getBoundColumnIndex();
@@ -740,7 +740,7 @@ public class RowSetOps {
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	public static void updateColumnArray(final SSComponentInterface comp, final SSArray _updatedValue) throws SSSQLNullException, SQLException {
+	public static void updateColumnArray(final SSComponent comp, final SSArray _updatedValue) throws SSSQLNullException, SQLException {
 		updateColumnArray(comp, comp.getRowSet(), _updatedValue, comp.getBoundColumnName(), comp.getAllowNull());
 	}
 
@@ -760,7 +760,7 @@ public class RowSetOps {
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	private static void updateColumnArray(final SSComponentInterface comp, final RowSet _rowSet, final SSArray _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException
+	private static void updateColumnArray(final SSComponent comp, final RowSet _rowSet, final SSArray _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException
 	{
 		logger.log(DEBUG, () -> "[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
@@ -805,7 +805,7 @@ public class RowSetOps {
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	public static void updateColumnObject(SSComponentInterface comp, Object updatedValue)
+	public static void updateColumnObject(SSComponent comp, Object updatedValue)
 			throws SSSQLNullException, SQLException, NumberFormatException
 	{
 		if (updatedValue instanceof String s) {
@@ -895,7 +895,7 @@ public class RowSetOps {
 	 * @throws SQLException
 	 */
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public static void checkForceConflict(SSComponentInterface comp, String updatedValue)
+	public static void checkForceConflict(SSComponent comp, String updatedValue)
 			throws SQLException
 	{
 		// Only do this for strings.
@@ -932,7 +932,7 @@ public class RowSetOps {
 	 * @throws SQLException  thrown if a database error is encountered
 	 * @throws NumberFormatException thrown if unable to parse a string to number format
 	 */
-	public static void updateColumnText(SSComponentInterface comp, String updatedValue)
+	public static void updateColumnText(SSComponent comp, String updatedValue)
 			throws SSSQLNullException, SQLException, NumberFormatException
 	{ 
 		// TODO: This is only for debug
@@ -961,7 +961,7 @@ public class RowSetOps {
 	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
 	 */
 	// TODO: test this and conversions
-	private static void updateColumnText(SSComponentInterface comp, RowSet
+	private static void updateColumnText(SSComponent comp, RowSet
 			rowSet, String updatedValue, int columnIndex, boolean allowNull)
 			throws SSSQLNullException, SQLException, NumberFormatException
 	{

@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2025, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2025-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -63,7 +63,7 @@ public class SSTextSupport
 	 * @return SSDocumentListener for a JTextComponent
 	 */
 	public static SSDocumentListener getSSDocumentListener(JTextComponent jtc) {
-		if (!(jtc instanceof SSComponentInterface comp))
+		if (!(jtc instanceof SSComponent comp))
 			throw new IllegalArgumentException("Not an SSComponent");
 		// TODO: assert not called before
 		return new SSTextSupport.SSDocumentListener(comp);
@@ -90,7 +90,7 @@ public class SSTextSupport
 		/** Create DocumentListener for the component.
 		 * @param comp associated component
 		 */
-		public SSPlainDocument(SSComponentInterface comp)
+		public SSPlainDocument(SSComponent comp)
 		{
 			this.ssCommon = comp.getSSCommon();
 		}
@@ -182,7 +182,7 @@ public class SSTextSupport
 		/** Create DocumentListener for the component.
 		 * @param comp associated component
 		 */
-		public SSDocumentListener(SSComponentInterface comp)
+		public SSDocumentListener(SSComponent comp)
 		{
 			this.ssCommon = comp.getSSCommon();
 		}

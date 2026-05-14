@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
@@ -52,7 +52,7 @@ import javax.swing.JTextField;
 import javax.swing.text.Document;
 
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSTextSupport;
 import com.nqadmin.swingset.utils.SSTextSupport.SSDocumentListener;
 import com.nqadmin.swingset.utils.SSTextSupport.SSPlainDocument;
@@ -65,7 +65,7 @@ import static java.lang.System.Logger.Level.*;
  * TextField extends the JTextField.
  */
 @SuppressWarnings("serial")
-public class TextField extends JTextField implements SSComponentInterface
+public class TextField extends JTextField implements SSComponent
 {
 	// TODO Consider adding an InputVerifier to prevent component from
 	// losing focus; see FormattedTextField.

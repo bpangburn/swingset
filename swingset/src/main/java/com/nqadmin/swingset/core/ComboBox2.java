@@ -75,7 +75,7 @@ import com.nqadmin.swingset.models.SSListItemFormat;
 import com.nqadmin.swingset.navigate.RowSetModificationEvent;
 import com.nqadmin.swingset.navigate.UndoRedo;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -165,7 +165,7 @@ import static java.lang.System.Logger.Level.*;
 @SuppressWarnings("serial")
 public abstract class ComboBox2<K,D,D2>
 		extends JComboBox<SSListItem>
-		implements SSComponentInterface
+		implements SSComponent
 {
 	/** A convenience for variable declarations. Do not instantiate. */
 	protected abstract class Model extends KeyDisplayValueSwingModel<K,D,D2> { }
@@ -328,7 +328,7 @@ public abstract class ComboBox2<K,D,D2>
 	@Override
 	public void addUndoableChange(RowSetModificationEvent ev) throws SQLException
 	{
-		SSComponentInterface.super.addUndoableChange(ev);
+		SSComponent.super.addUndoableChange(ev);
 		UndoRedo.newSlot(this);
 	}
 
@@ -336,7 +336,7 @@ public abstract class ComboBox2<K,D,D2>
 	@Override
 	public void undoRedoUpdateObject(UndoRedo cmd, Change change) throws SQLException
 	{
-		SSComponentInterface.super.undoRedoUpdateObject(cmd, change);
+		SSComponent.super.undoRedoUpdateObject(cmd, change);
 		SwingUtilities.invokeLater(() -> this.hidePopup());
 	}
 
@@ -1374,7 +1374,7 @@ public abstract class ComboBox2<K,D,D2>
 	 */
 	@Override
 	public void setAllowNull(boolean allowNull) {
-		SSComponentInterface.super.setAllowNull(allowNull);
+		SSComponent.super.setAllowNull(allowNull);
 		adjustForNullItem();
 	}
 
@@ -1387,7 +1387,7 @@ public abstract class ComboBox2<K,D,D2>
 	@Override
 	public boolean getAllowNull() {
 		return !isComboBoxNavigator()
-				&& SSComponentInterface.super.getAllowNull();
+				&& SSComponent.super.getAllowNull();
 	}
 
 	/**

@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 
 package com.nqadmin.swingset.decorators;
 
@@ -46,7 +51,7 @@ import java.awt.event.FocusListener;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 
 /**
  * Base class for decorators that use Focus.
@@ -55,7 +60,7 @@ public abstract class FocusDecorator
 		implements Decorator, FocusListener, TextDecorator
 {
 	/** this component */
-	private SSComponentInterface component;
+	private SSComponent component;
 	/** current color set by decorateText() */
 	protected Color textColor;
 
@@ -73,7 +78,7 @@ public abstract class FocusDecorator
 
 	/** {@inheritDoc} */
 	@Override
-	public void install(SSComponentInterface component) {
+	public void install(SSComponent component) {
 		this.component = component;
 		fcomp().addFocusListener(this);
 	}
@@ -119,7 +124,7 @@ public abstract class FocusDecorator
 	 * Return the component associated with this validator
 	 * @return the component
 	 */
-	public SSComponentInterface getComponent() {
+	public SSComponent getComponent() {
 		return component;
 	}
 

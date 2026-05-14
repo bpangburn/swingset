@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2025-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
@@ -57,7 +57,7 @@ import javax.swing.border.CompoundBorder;
 
 import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.assertConvertFromJdbcType;
@@ -77,7 +77,7 @@ import static java.sql.JDBCType.*;
  * values returned for the checked and unchecked CheckBox states.
  */
 @SuppressWarnings("serial")
-public class CheckBox extends JCheckBox implements SSComponentInterface
+public class CheckBox extends JCheckBox implements SSComponent
 {
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound

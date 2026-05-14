@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2025-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
@@ -51,7 +51,7 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -63,7 +63,7 @@ import static java.lang.System.Logger.Level.*;
  * except of course to set a label's value from a RowSet.
  */
 @SuppressWarnings("serial")
-public class Label extends JLabel implements SSComponentInterface
+public class Label extends JLabel implements SSComponent
 {
 	/** ugh */
 	// TODO: Come up with general way to allow selective prop change disable.

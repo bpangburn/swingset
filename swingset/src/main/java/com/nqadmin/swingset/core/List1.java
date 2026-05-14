@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
@@ -70,7 +70,7 @@ import com.nqadmin.swingset.models.SSDbArrayModel;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.navigate.UndoRedo;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.models.KeyDisplayValueSwingModel.asKeyDisplayValueSwingModel;
@@ -97,7 +97,7 @@ import static java.lang.System.Logger.Level.*;
  * @param <D> 
  */
 @SuppressWarnings("serial")
-public class List1<K,D> extends JList<SSListItem> implements SSComponentInterface
+public class List1<K,D> extends JList<SSListItem> implements SSComponent
 {
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
@@ -450,7 +450,7 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 	@Override
 	public void undoRedoUpdateObject(UndoRedo cmd, Change change) throws SQLException
 	{
-		SSComponentInterface.super.undoRedoUpdateObject(cmd, change);
+		SSComponent.super.undoRedoUpdateObject(cmd, change);
 		// TODO: does the following seem right
 				// - If there is a selection, and none of the selection is visible
 				//   then pick something an make sure it's visible.

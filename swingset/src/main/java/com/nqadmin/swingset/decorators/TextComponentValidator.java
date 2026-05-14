@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.decorators;
 
@@ -46,7 +46,7 @@ import java.util.function.Function;
 
 import javax.swing.text.JTextComponent;
 
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 
 /**
  * Validator with convenience methods for working with {@linkplain JTextComponent}.
@@ -54,7 +54,7 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
  */
 public abstract class TextComponentValidator implements Validator {
 	/** this component */
-	private SSComponentInterface component;
+	private SSComponent component;
 
 	/**
 	 * Create a validator for use with a {@linkplain JTextComponent};
@@ -74,7 +74,7 @@ public abstract class TextComponentValidator implements Validator {
 	 * @throws IllegalArgumentException if component is not a JTextComponent
 	 */
 	@Override
-	public void install(SSComponentInterface component) {
+	public void install(SSComponent component) {
 		if (!(component instanceof JTextComponent)) {
 			throw new IllegalArgumentException("Must be a JTextComponent");
 		}
@@ -90,7 +90,7 @@ public abstract class TextComponentValidator implements Validator {
 	 * Return the component associated with this validator
 	 * @return the component
 	 */
-	public SSComponentInterface getComponent() {
+	public SSComponent getComponent() {
 		return component;
 	}
 

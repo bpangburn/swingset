@@ -37,14 +37,12 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo.simpval;
 
-import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.utils.SSComponentInterface;
-import java.util.concurrent.locks.Condition;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
-import org.netbeans.validation.api.AbstractValidator;
+
 import org.netbeans.validation.api.Problems;
 import org.netbeans.validation.api.Validator;
 import org.netbeans.validation.api.ValidatorUtils;
@@ -52,6 +50,8 @@ import org.netbeans.validation.api.conversion.Converter;
 import org.netbeans.validation.api.ui.ValidationItem;
 import org.netbeans.validation.api.ui.ValidationStrategy;
 import org.netbeans.validation.api.ui.swing.SwingComponentDecorationFactory;
+
+import com.nqadmin.swingset.utils.SSComponent;
 
 /**
  * Helpers for working with Simple Validation framework.
@@ -92,7 +92,7 @@ public class SVUtils {
 	}
 
 	public static ValidationItem decorator(JTextComponent jtc, StringValidator sval) {
-		SSComponentInterface comp = (SSComponentInterface) jtc;
+		SSComponent comp = (SSComponent) jtc;
 		SSTextComponentValidationItem textVali = SVUtils.createDefaultTextValidator(
 				jtc, sval);
 		SimpValValidatorDecorator deco = new SimpValValidatorDecorator(textVali);

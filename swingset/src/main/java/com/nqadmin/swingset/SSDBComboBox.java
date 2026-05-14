@@ -38,14 +38,14 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
 
-import com.nqadmin.swingset.core.DBComboBox2;
-
 import java.sql.Connection;
+
+import com.nqadmin.swingset.core.DBComboBox2;
 
 /**
  * See {@link DBComboBox2}.

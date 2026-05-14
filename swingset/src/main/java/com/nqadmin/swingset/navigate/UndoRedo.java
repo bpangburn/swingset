@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2025, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2025-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,7 @@ import javax.sql.RowSet;
 import javax.swing.SwingUtilities;
 
 import com.nqadmin.swingset.datasources.RSC;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.navigate.Utils.postRowSetUndoRedo;
@@ -129,7 +129,7 @@ public enum UndoRedo
 	 * @param comp rowset/column
 	 * @throws SQLException
 	 */
-	public static void captureInitialValue(SSComponentInterface comp)
+	public static void captureInitialValue(SSComponent comp)
 			throws SQLException
 	{
 		if (!isUndoRedoEnabled(comp))
@@ -158,7 +158,7 @@ public enum UndoRedo
 	 * @param comp ssComponent
 	 * @param cmd undo or redo
 	 */
-	public static void undoRedo(SSComponentInterface comp, UndoRedo cmd)
+	public static void undoRedo(SSComponent comp, UndoRedo cmd)
 	{
 		if (!isUndoRedoEnabled(comp))
 			return;
@@ -184,7 +184,7 @@ public enum UndoRedo
 	 * Make the next undo/redo change goes into a new slot.
 	 * @param comp ssComponent
 	 */
-	public static void newSlot(SSComponentInterface comp)
+	public static void newSlot(SSComponent comp)
 	{
 		if (!isUndoRedoEnabled(comp))
 			return;

@@ -38,16 +38,14 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
 import java.sql.JDBCType;
 import java.sql.SQLException;
 
-import javax.sql.RowSet;
-
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 
 // SSCollectionModel.java
 //
@@ -74,7 +72,7 @@ public interface SSCollectionModel {
 	 * @return array of objects of the data
 	 * @throws SQLException if a database related error occurs
 	 */
-	Object[] readData(SSComponentInterface comp) throws SQLException;
+	Object[] readData(SSComponent comp) throws SQLException;
 
 	/**
 	 * Put the data from a java object array to the RowSet.
@@ -83,5 +81,5 @@ public interface SSCollectionModel {
 	 * @param data array of data to write to the database
 	 * @throws SQLException if a database related error occurs
 	 */
-	void writeData(SSComponentInterface comp, Object[] data) throws SQLException;
+	void writeData(SSComponent comp, Object[] data) throws SQLException;
 }

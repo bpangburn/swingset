@@ -57,7 +57,7 @@ import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.RowsEventSource;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.SimpleEvents;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
 import com.raelity.lib.eventbus.WeakEventBus;
@@ -102,7 +102,7 @@ public class RowsModel
 			= new MapMaker().weakKeys().makeMap();
 
 	// Track the component bound column names.
-	private final Map<SSComponentInterface,String> bindings
+	private final Map<SSComponent,String> bindings
 			= new MapMaker().weakKeys().makeMap();
 	
 	private NavigateState navState;
@@ -287,8 +287,8 @@ public class RowsModel
 
 			// Check for component binding compatibility here
 			// to avoid exception buried in event handler.
-			for (Map.Entry<SSComponentInterface, String> entry : bindings.entrySet()) {
-				SSComponentInterface comp = entry.getKey();
+			for (Map.Entry<SSComponent, String> entry : bindings.entrySet()) {
+				SSComponent comp = entry.getKey();
 				if (!comp.isFullyBound())
 					continue;
 
@@ -338,7 +338,7 @@ public class RowsModel
 	 * @param columnName
 	 */
 	@SuppressWarnings("deprecation")
-	public void bind(SSComponentInterface comp, String columnName) {
+	public void bind(SSComponent comp, String columnName) {
 		if (bindings.containsKey(comp))
 			throw new IllegalArgumentException("Component already bound to this model");
 		bindings.put(comp, columnName);
@@ -842,7 +842,7 @@ public class RowsModel
 	 * @param comp
 	 * @return true if the component is in an error state
 	 */
-	public boolean hasError(SSComponentInterface comp) {
+	public boolean hasError(SSComponent comp) {
 		// TODO: check if row set has component's column name?
 		// if (!bindings.containsKey(comp))
 		// 	throw new IllegalArgumentException("Component not bound in RowsModel");

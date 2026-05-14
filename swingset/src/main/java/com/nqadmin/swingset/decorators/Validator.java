@@ -35,9 +35,14 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.decorators;
 
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 
 /**
  * A validator allows a specialized validation condition on a per component
@@ -63,7 +68,7 @@ public interface Validator {
 	/** Install this validator into the component. Installs listeners
 	 * @param component the componenet
 	 */
-	default void install(SSComponentInterface component) {};
+	default void install(SSComponent component) {};
 
 	/** Remove validator/listeners from component. */
 	default void uninstall() {};

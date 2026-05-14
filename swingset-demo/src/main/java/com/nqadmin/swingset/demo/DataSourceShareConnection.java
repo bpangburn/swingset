@@ -42,16 +42,20 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
-import com.nqadmin.swingset.demo.MainClass.H2Trace;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.ConnectionBuilder;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
-import javax.sql.DataSource;
-import org.h2.jdbcx.JdbcDataSource;
-import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
-import java.sql.ConnectionBuilder;
 import java.sql.ShardingKeyBuilder;
+
+import javax.sql.DataSource;
+
+import org.h2.jdbcx.JdbcDataSource;
+
+import com.nqadmin.swingset.demo.MainClass.H2Trace;
+
+import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 
 /**
  * Provides a data source that returns a pre-specified connection; typically

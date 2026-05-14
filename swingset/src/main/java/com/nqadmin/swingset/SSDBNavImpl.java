@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset;
 
 import java.awt.Component;
@@ -48,7 +53,7 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static java.lang.System.Logger.Level.*;
@@ -123,7 +128,7 @@ public class SSDBNavImpl implements SSDBNav {
 			//logger.debug("Clearing component type of: {}. Loop index=" + i, () -> comps[i].getClass().getSimpleName());
 
 			switch (comp) {
-			case SSComponentInterface c -> c.cleanField();
+			case SSComponent c -> c.cleanField();
 
 			// TODO: could add "case Container c -> setComponects(c);"
 			//		 but note that any JComponent is a Container.
@@ -153,7 +158,7 @@ public class SSDBNavImpl implements SSDBNav {
 	 * @return List of SScomponents
 	 */
 	@Override
-	public List<SSComponentInterface> findSSComponents()
+	public List<SSComponent> findSSComponents()
 	{
 		return SSUtils.findSSComponents(container);
 	}

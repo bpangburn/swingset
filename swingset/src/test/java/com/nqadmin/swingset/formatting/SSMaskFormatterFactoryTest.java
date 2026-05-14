@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
 import java.text.ParseException;
@@ -42,20 +47,20 @@ import java.util.List;
 
 import javax.swing.text.MaskFormatter;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.nqadmin.swingset.formatting.FormatterAssist.LiteralsAndPositions;
 import com.nqadmin.swingset.formatting.SSMaskFormatterFactory.SSMaskFormatter;
 
-import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
 import static com.nqadmin.swingset.formatting.FormatterAssist.getLiteralsAndPositions;
+import static com.nqadmin.swingset.formatting.FormatterAssist.userText;
+import static com.nqadmin.swingset.formatting.SSFormat.CUSTOM;
 import static com.nqadmin.swingset.formatting.SSMaskFormatterFactory.SSMaskFormatter.FORMATTING_CHARS;
 import static org.junit.jupiter.api.Assertions.*;
-import static com.nqadmin.swingset.formatting.FormatterAssist.userText;
 
 /**
  * Most of the testing in here is to build class hierarchies

@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
@@ -50,7 +50,7 @@ import javax.sql.RowSet;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 
 
 /**
@@ -179,7 +179,7 @@ final class UndoRow
 	 * Force the capture of the database column for the comp;
 	 * does nothing if the column is already captured.
 	 */
-	void captureInitialValue(SSComponentInterface comp) throws SQLException
+	void captureInitialValue(SSComponent comp) throws SQLException
 	{
 		getCol(comp);
 	}
@@ -201,7 +201,7 @@ final class UndoRow
 	 * @return new value (only for logging)
 	 * @throws SQLException 
 	 */
-	Change undoRedoChange(SSComponentInterface comp, UndoRedo cmd) throws SQLException
+	Change undoRedoChange(SSComponent comp, UndoRedo cmd) throws SQLException
 	{
 		if (cols == null)
 			return UndoCol.NO_CHANGE;

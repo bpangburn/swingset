@@ -38,10 +38,11 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
+import java.lang.System.Logger;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.JDBCType;
@@ -50,15 +51,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import java.lang.System.Logger;
-
-import static java.lang.System.Logger.Level.*;
-
 import com.nqadmin.swingset.datasources.RowSetOps;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
 // SSAbstractStringCollectionModel.java
 //
@@ -109,14 +107,14 @@ public abstract class SSAbstractStringCollectionModel extends SSAbstractCollecti
 
 	/** {@inheritDoc} */
 	@Override
-	public Object[] readData(SSComponentInterface comp) throws SQLException {
+	public Object[] readData(SSComponent comp) throws SQLException {
 		String dbstring = RowSetOps.getColumnText(comp);
 		return toObjArray(getJDBCType(), dbstring);
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void writeData(SSComponentInterface comp, Object[] _data) throws SQLException {
+	public void writeData(SSComponent comp, Object[] _data) throws SQLException {
 		List<String> arr = new ArrayList<>(_data.length);
 		// Transform the array of object into an array of String representations
 		for(Object object : Arrays.asList(_data)) {

@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2024-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,15 +41,15 @@ import java.time.OffsetTime;
 import java.util.Date;
 import java.util.EnumSet;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
 import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
 import static org.junit.jupiter.api.Assertions.*;
-import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
 
 /**
  * ConvertTypeTest.

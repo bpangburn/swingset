@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 
 package com.nqadmin.swingset.decorators;
 
@@ -43,7 +48,7 @@ import java.lang.System.Logger;
 
 import javax.swing.UIManager;
 
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static java.lang.System.Logger.Level.*;
@@ -64,7 +69,7 @@ public class BackgroundDecorator extends FocusDecorator
 	/** Decorate the component using current state. */
 	@Override
 	public boolean decorate() {
-		SSComponentInterface.validateResult valid = getComponent().allValidate();
+		SSComponent.validateResult valid = getComponent().allValidate();
 		logger.log(TRACE, () -> String.format("%s focus: %s, compValid %s, allValid: %s",
 				jc().getClass().getSimpleName(), fcomp().isFocusOwner(), valid.comp(), valid.all()));
 

@@ -1,6 +1,6 @@
 /*
  * Portions created by Ernie Rael are
- * Copyright (C) 2024 Ernie Rael.  All Rights Reserved.
+ * Copyright (C) 2024-2026 Ernie Rael.  All Rights Reserved.
  *
  * The contents of this file are subject to the Mozilla Public
  * License Version 1.1 (the "License"); you may not use this file
@@ -27,7 +27,7 @@ import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.assertConvertFromJdbcType;
@@ -40,7 +40,7 @@ import static java.sql.JDBCType.DATE;
  * in the SS library.
  */
 @SuppressWarnings("serial")
-public class DbDatePicker extends DatePicker implements SSComponentInterface
+public class DbDatePicker extends DatePicker implements SSComponent
 {
 	private class DbDatePickerListener implements EventListener,DateChangeListener {
 		/** {@inheritDoc} */

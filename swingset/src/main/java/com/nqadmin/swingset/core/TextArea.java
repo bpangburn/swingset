@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2025-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
@@ -48,7 +48,7 @@ import java.util.EventListener;
 import javax.swing.JTextArea;
 
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSTextSupport;
 import com.nqadmin.swingset.utils.SSTextSupport.SSDocumentListener;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -60,7 +60,7 @@ import static java.lang.System.Logger.Level.*;
  * TextArea extends the JTextArea to add RowSet binding.
  */
 @SuppressWarnings("serial")
-public class TextArea extends JTextArea implements SSComponentInterface {
+public class TextArea extends JTextArea implements SSComponent {
 
 	// TODO Consider adding an InputVerifier to prevent component from losing focus.
 	//      Probably want component/system-wide option.

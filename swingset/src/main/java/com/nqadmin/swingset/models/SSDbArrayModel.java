@@ -38,32 +38,26 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
-import com.nqadmin.swingset.utils.SSArray;
-
+import java.lang.System.Logger;
 import java.sql.Array;
 import java.sql.JDBCType;
 import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import java.lang.System.Logger;
-
-import static java.lang.System.Logger.Level.*;
-
-import static com.nqadmin.swingset.datasources.RowSetOps.*;
-
-import java.util.Arrays;
-
 import com.nqadmin.swingset.datasources.RowSetOps;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSArray;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.castJDBCToJava;
+import static java.lang.System.Logger.Level.*;
 
 // SSDbArrayModel.java
 //
@@ -95,7 +89,7 @@ public class SSDbArrayModel extends SSAbstractCollectionModel {
 
 	/** {@inheritDoc } */
 	@Override
-	public Object[] readData(SSComponentInterface comp) throws SQLException {
+	public Object[] readData(SSComponent comp) throws SQLException {
 		List<Object> data = toObjList(getJDBCType(), RowSetOps.getColumnArray(comp));
 		if(data == null) {
 			return null;
@@ -105,7 +99,7 @@ public class SSDbArrayModel extends SSAbstractCollectionModel {
 
 	/** {@inheritDoc } */
 	@Override
-	public void writeData(SSComponentInterface comp, final Object[] _data) throws SQLException {
+	public void writeData(SSComponent comp, final Object[] _data) throws SQLException {
 		SSArray array = new SSArray(_data, getJDBCType());
 		RowSetOps.updateColumnArray(comp, array);
 	}
