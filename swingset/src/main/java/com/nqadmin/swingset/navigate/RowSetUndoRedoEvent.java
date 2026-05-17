@@ -32,10 +32,10 @@ package com.nqadmin.swingset.navigate;
 
 import javax.sql.RowSet;
 
-import com.nqadmin.swingset.utils.SSComponent;
+import com.nqadmin.swingset.datasources.RSC;
 
 /**
- * Sent by an SSComponent when value changes from undo/redo.
+ * Sent by a component when value changes from undo/redo.
  * The contents of the undo/redo stack is unchanged; note the error.
  */
 @SuppressWarnings("serial")
@@ -52,7 +52,7 @@ public class RowSetUndoRedoEvent extends EventObjectBacktrace
 	 * @param value the value written to the rowSet
 	 * @param error true if the component value is in error
 	 */
-	public RowSetUndoRedoEvent( SSComponent source, Object value,
+	public RowSetUndoRedoEvent(RSC source, Object value,
 							   boolean error)
 	{
 		super(source);
@@ -74,8 +74,8 @@ public class RowSetUndoRedoEvent extends EventObjectBacktrace
 	 * {@inheritDoc }
 	 */
 	@Override
-	public SSComponent getSource() {
-		return (SSComponent) super.getSource();
+	public RSC getSource() {
+		return (RSC) super.getSource();
 	}
 
 	/**

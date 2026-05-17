@@ -50,6 +50,7 @@ import javax.sql.RowSet;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
+import com.nqadmin.swingset.utils.SSComponent;
 
 
 /**
@@ -150,6 +151,14 @@ final class UndoRow
 		}
 	}
 
+	boolean isDirty(SSComponent comp)
+	{
+		if (cols == null)
+			return false;
+		UndoCol col = cols[comp.getBoundColumnIndex()];
+		return col != null && col.isDirty();
+	}
+
 	/** return true if there's a column value which is not from the database */
 	boolean isDirty()
 	{
@@ -203,10 +212,10 @@ final class UndoRow
 	Change undoRedoChange(RSC comp, UndoRedo cmd) throws SQLException
 	{
 		if (cols == null)
-			return UndoCol.NO_CHANGE;
+			return UndoRedo.NO_CHANGE;
 		UndoCol col = cols[comp.getBoundColumnIndex()];
 		if (col == null)
-			return UndoCol.NO_CHANGE;
+			return UndoRedo.NO_CHANGE;
 		return col.findUndoRedoChange(cmd);
 	}
 

@@ -243,6 +243,7 @@ public class RowsModelTest
 
 		RowsModel rowsModel = RowsModel.create(null, null);
 		TextField tf = new TextField();
+		TextField tf2 = new TextField();
 		DbNav _dbNav = null;
 		try {
 			_dbNav = new DbNav(tf, rowsModel);
@@ -270,7 +271,11 @@ public class RowsModelTest
 		rowsModel.bind(tf, keyCol);
 		// Try to bind tfInt again to a different column.
 		Exception exx = assertThrows(IllegalArgumentException.class, () -> rowsModel.bind(tf, cityCol));
-		assertTrue(exx.getMessage().startsWith("Component already bound to this model"), exx.getMessage());
+		assertTrue(exx.getMessage().matches("SSComponent of <.*,city> already bound.*<.*,supplier_id>"));
+		// Try to bind different text field to same column of tfInt, not an error
+		rowsModel.bind(tf2, keyCol);
+		// exx = assertThrows(IllegalArgumentException.class, () -> rowsModel.bind(tf2, keyCol));
+		// assertTrue(exx.getMessage().matches("ColumnName of <.*,supplier_id> already bound.*<.*,supplier_id>"));
 
 		// Try to bind tfInt to a different model.
 		RowsModel rowsModel2 = RowsModel.create(null, null);

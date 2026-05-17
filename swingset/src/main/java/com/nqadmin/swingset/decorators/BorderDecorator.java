@@ -74,11 +74,16 @@ public class BorderDecorator extends FocusDecorator
 	/** The type of border to use */
 	// TODO: may want to treat as bit field for: error/focus/warning/dirty
 	// TODO: may want ComponentState which is defined globally.
+	// TODO: green/yellow for focused, modified, no error
 	protected enum BorderState {
-		/** not focused no error */
+		/** not focused, no error, not modified */
 		DEFAULT,
-		/** focus gained, no error */
-		OK,
+		/** modified without focus */
+		MODIFIED,
+		/** modified with focus */
+		FOCUSED_MODIFIED,
+		/** focus gained, no error, not modified */
+		FOCUSED_OK,
 		/** error with/without focus */
 		ERROR
 	}
@@ -94,11 +99,18 @@ public class BorderDecorator extends FocusDecorator
 		logger.log(TRACE, () -> String.format("%s focus: %s, compValid %s, allValid: %s",
 				jc().getClass().getSimpleName(), fcomp().isFocusOwner(), valid.comp(), valid.all()));
 		Border b;
+		BorderState borderState = BorderState.DEFAULT;
 		if (valid.all()) {
-			b = getBorder(fcomp().isFocusOwner() ? BorderState.OK : BorderState.DEFAULT);
+			if (fcomp().isFocusOwner())
+				borderState = getComponent().isDirty()
+						? BorderState.FOCUSED_MODIFIED
+						: BorderState.FOCUSED_OK;
+			else if (getComponent().isDirty())
+				borderState = BorderState.MODIFIED;
 		} else {
-			b = getBorder(BorderState.ERROR);
+			borderState = BorderState.ERROR;
 		}
+		b = getBorder(borderState);
 
 		jc().setBorder(b);
 		// Why is the following here? It was in ss_formatted_text_field.
@@ -126,17 +138,16 @@ public class BorderDecorator extends FocusDecorator
 	 * @return 
 	 */
 	protected Border getBorder(BorderState state) {
-		Color color = getBorderColor(state);
-		if (color == null)
+		if (state == BorderState.DEFAULT)
 			return defaultBorder;
 		logger.log(TRACE, () -> String.format("%s %s",
-				color, asString(jc().getInsets())));
+				state, asString(jc().getInsets())));
 		Border b;
 		if (jc().getBorder() instanceof CompoundBorder cb) {
 			b = emptyLine_empty(cb.getOutsideBorder().getBorderInsets(jc()),
-					cb.getInsideBorder().getBorderInsets(jc()), color);
+					cb.getInsideBorder().getBorderInsets(jc()), state);
 		} else {
-			b = empty_line(jc().getInsets(), color);
+			b = empty_line(jc().getInsets(), state);
 		}
 		return b;
 	}
@@ -186,11 +197,13 @@ public class BorderDecorator extends FocusDecorator
 	 * @param state
 	 * @return
 	 */
-	protected Color getBorderColor(BorderState state)
+	protected static Color getBorderColor(BorderState state)
 	{
 		return switch(state) {
 		case DEFAULT -> null;
-		case OK -> Color.GREEN;
+		case MODIFIED -> Color.ORANGE;
+		case FOCUSED_MODIFIED -> Color.GREEN;
+		case FOCUSED_OK -> Color.GREEN;
 		case ERROR -> Color.RED;
 		};
 	}
@@ -212,6 +225,11 @@ public class BorderDecorator extends FocusDecorator
 	//        [_______][_______]
 	//
 
+	private static Border dashed(Color color)
+	{
+		return BorderFactory.createDashedBorder(color, 7, 3); // TODO: plugin numbers?
+	}
+
 	/**
 	 * Create a simple compound border with size specified by param i,
 	 * and a line on the inside of the param color.
@@ -219,17 +237,21 @@ public class BorderDecorator extends FocusDecorator
 	 * [_______][|]
 	 * <p>
 	 * @param i insets that specify size of output border
-	 * @param color color of line
+	 * @param state components border state
 	 * @return border
 	 */
-	public static Border empty_line(Insets i, Color color)
+	public static Border empty_line(Insets i, BorderState state)
 	{
+		Color color = getBorderColor(state);
+		Border decoratingBorder = state == BorderState.FOCUSED_MODIFIED
+				? dashed(color)
+				: BorderFactory.createLineBorder(color);
 		Border b = BorderFactory.createCompoundBorder(
 				BorderFactory.createEmptyBorder(Math.max(0, i.top - 1),
 						Math.max(0, i.left - 1),
 						Math.max(0, i.bottom - 1),
 						Math.max(0, i.right - 1)),
-				BorderFactory.createLineBorder(color));
+				decoratingBorder);
 		return b;
 	}
 
@@ -243,8 +265,9 @@ public class BorderDecorator extends FocusDecorator
 	 * @param color color of line
 	 * @return border
 	 */
-	public static Border line_empty(Insets i, Color color)
+	public static Border line_empty(Insets i, Color color) // TODO: BorderState
 	{
+		if (Boolean.TRUE) throw new IllegalCallerException("needs state/color fixup");
 		Border b = BorderFactory.createCompoundBorder(
 				BorderFactory.createLineBorder(color),
 				BorderFactory.createEmptyBorder(
@@ -266,8 +289,9 @@ public class BorderDecorator extends FocusDecorator
 	 * @param color line color
 	 * @return border, null if problem
 	 */
-	public static Border empty_lineSpace(Insets i, Color color)
+	public static Border empty_lineSpace(Insets i, Color color) // TODO: BorderState
 	{
+		if (Boolean.TRUE) throw new IllegalCallerException("needs state/color fixup");
 		Border b = BorderFactory.createCompoundBorder(
 				BorderFactory.createEmptyBorder(
 						Math.max(0, i.top - 2),
@@ -291,16 +315,20 @@ public class BorderDecorator extends FocusDecorator
 	 * <p>
 	 * @param outside
 	 * @param inside
-	 * @param color line color
+	 * @param state components border state
 	 * @return border
 	 */
-	public static Border emptyLine_empty(Insets outside, Insets inside, Color color)
+	public static Border emptyLine_empty(Insets outside, Insets inside, BorderState state)
 	{
 		Objects.requireNonNull(outside);
 		Objects.requireNonNull(inside);
-		Objects.requireNonNull(color);
+		Objects.requireNonNull(state);
 		//Insets inside = cb.getInsideBorder().getBorderInsets(jc());
 		//Insets outside = cb.getOutsideBorder().getBorderInsets(jc());
+		Color color = getBorderColor(state);
+		Border decoratingBorder = state == BorderState.FOCUSED_MODIFIED
+				? dashed(color)
+				: BorderFactory.createLineBorder(color);
 		Border b = BorderFactory.createCompoundBorder(
 				BorderFactory.createCompoundBorder(
 						BorderFactory.createEmptyBorder(
@@ -308,7 +336,7 @@ public class BorderDecorator extends FocusDecorator
 								Math.max(0, outside.left - 1),
 								Math.max(0, outside.bottom - 1),
 								Math.max(0, outside.right - 1)),
-						BorderFactory.createLineBorder(color)),
+						decoratingBorder),
 				BorderFactory.createEmptyBorder(
 						inside.top, inside.left, inside.bottom, inside.right));
 		return b;
@@ -325,19 +353,23 @@ public class BorderDecorator extends FocusDecorator
 	 * <p>
 	 * @param outside
 	 * @param inside
-	 * @param color line color
+	 * @param state components border state
 	 * @return border
 	 */
-	public static Border lineEmpty_empty(Insets outside, Insets inside, Color color)
+	public static Border lineEmpty_empty(Insets outside, Insets inside, BorderState state)
 	{
 		Objects.requireNonNull(outside);
 		Objects.requireNonNull(inside);
-		Objects.requireNonNull(color);
+		Objects.requireNonNull(state);
 		//Insets inside = cb.getInsideBorder().getBorderInsets(jc());
 		//Insets outside = cb.getOutsideBorder().getBorderInsets(jc());
+		Color color = getBorderColor(state);
+		Border decoratingBorder = state == BorderState.FOCUSED_MODIFIED
+				? dashed(color)
+				: BorderFactory.createLineBorder(color);
 		Border b = BorderFactory.createCompoundBorder(
 				BorderFactory.createCompoundBorder(
-						BorderFactory.createLineBorder(color),
+						decoratingBorder,
 						BorderFactory.createEmptyBorder(
 								Math.max(0, outside.top - 1),
 								Math.max(0, outside.left - 1),

@@ -98,8 +98,8 @@ final class UndoCol
 	}
 
 	/**
-	 * Create UndoCol; initialize undo/redo stack from SSComponent's database value;
-	 * @param comp ssComponent
+	 * Create UndoCol; initialize undo/redo stack from comp's database value;
+	 * @param comp RowSet Column
 	 */
 	UndoCol(RSC comp) throws SQLException
 	{
@@ -187,13 +187,11 @@ final class UndoCol
 		return curIdx != 0;
 	}
 
-	static final Change NO_CHANGE = new Change("UNDO/REDO NONE", false);
-
 	Change findUndoRedoChange(UndoRedo cmd)
 	{
 		return switch(cmd) {
-		case UNDO -> hasPrev() ? prevValue() : NO_CHANGE;
-		case REDO -> hasNext() ? nextValue() : NO_CHANGE;
+		case UNDO -> hasPrev() ? prevValue() : UndoRedo.NO_CHANGE;
+		case REDO -> hasNext() ? nextValue() : UndoRedo.NO_CHANGE;
 		};
 	}
 

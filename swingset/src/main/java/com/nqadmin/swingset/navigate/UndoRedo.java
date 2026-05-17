@@ -58,6 +58,8 @@ public enum UndoRedo
 	 */
 	public record Change(Object value, boolean isError){};
 
+	static final Change NO_CHANGE = new Change("UNDO/REDO NONE", false);
+
 	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
 
@@ -162,6 +164,7 @@ public enum UndoRedo
 	 * @param comp ssComponent
 	 * @param cmd undo or redo
 	 */
+	// TODO: SSComponent vs RSC
 	public static void undoRedo(SSComponent comp, UndoRedo cmd)
 	{
 		if (!isUndoRedoEnabled(comp))
@@ -172,7 +175,7 @@ public enum UndoRedo
 			NavigateState navState = comp.getRowsModel().getNavState();
 			Change change = navState.doUndoRedo(comp, cmd);
 			// Wait until value propogates to the component.
-			if (change != UndoCol.NO_CHANGE)
+			if (change != NO_CHANGE)
 				SwingUtilities.invokeLater(() -> {
 					postRowSetUndoRedo(comp, change.value(),
 							change.isError || !comp.allValidate().all());
@@ -201,6 +204,7 @@ public enum UndoRedo
 	 * @param ev
 	 * @throws SQLException
 	 */
+	// TODO: make this package visibility, go through rowsModel?
 	public static void addUndoableChange(RowSetModificationEvent ev) throws SQLException
 	{
 		if (!isUndoRedoEnabled(ev.getSource()))

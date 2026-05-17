@@ -75,6 +75,7 @@ import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.formatting.SSFormat;
+import com.nqadmin.swingset.navigate.RowSetModificationEvent;
 import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.navigate.RowsEvent;
 import com.nqadmin.swingset.navigate.RowsModel;
@@ -1017,7 +1018,20 @@ final class SSCommon
 		});
 		am.setParent(jc.getActionMap());
 		jc.setActionMap(am);
-	};
+	}
+
+	/**
+	 * Add a modification to the undo/redo stack.
+	 * @param ev
+	 * @throws SQLException
+	 */
+	public void addUndoableChange(RowSetModificationEvent ev) throws SQLException
+	{
+		if (ev.getSource() != ssComponent)
+			throw new IllegalStateException(sf("%s != %s", objectID(ev.getSource()), objectID(ssComponent)));
+		UndoRedo.addUndoableChange(ev);
+		decorate();
+	}
 
 	/**
 	 * Use the specified argument, which comes from an undo or redo command,

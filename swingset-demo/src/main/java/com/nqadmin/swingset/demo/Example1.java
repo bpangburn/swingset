@@ -50,6 +50,7 @@ import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.function.Function;
 
 import javax.sql.RowSet;
@@ -267,10 +268,11 @@ public class Example1 extends JFrame {
 		}
 
 		// Bind the components to the RowsModel and the database columns.
-		rowsModel.bind(txtSupplierID, "supplier_id");
-		rowsModel.bind(txtSupplierName, "supplier_name");
-		rowsModel.bind(txtSupplierCity, "city");
-		rowsModel.bind(txtSupplierStatus, "status");
+		rowsModel.bind(Map.of(
+				txtSupplierID, "supplier_id",
+				txtSupplierName, "supplier_name",
+				txtSupplierCity, "city",
+				txtSupplierStatus, "status"));
 		
 		// Set label dimensions.
 		lblSupplierID.setPreferredSize(MainClass.labelDim);

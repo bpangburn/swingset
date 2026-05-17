@@ -57,6 +57,7 @@ import javax.swing.SpinnerNumberModel;
 
 import com.google.common.collect.MapMaker;
 import com.nqadmin.swingset.*;
+import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
@@ -68,7 +69,6 @@ import com.raelity.lib.eventbus.WeakEventBus;
 import com.raelity.lib.eventbus.WeakSubscribe;
 
 import static com.nqadmin.swingset.navigate.RowsAction.*;
-import static com.nqadmin.swingset.navigate.UndoRedo.isUndoRedoEnabled;
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
@@ -299,45 +299,54 @@ final class NavigateState
 		@WeakSubscribe
 		public void handleRowDataChanged(RowSetModificationEvent ev)
 		{
-			if (ev.matches(getRowSet())) {
-				// Our RowSet's row has changed
-				
+			if (!ev.matches(getRowSet()))
+				return;
+
+			// Our RowSet's row has changed
+			try {
 				// TODO what about ev.getSource == null ?
-
-				try {
-					ev.getSource().addUndoableChange(ev);
-				} catch (SQLException ex) {
-					logger.log(ERROR, "Undo/redo exception", ex);
-				}
-				int sz = errorComponents.size();
-				if(ev.isError())
-					errorComponents.add(ev.getSource());
-				else
-					errorComponents.remove(ev.getSource());
-
-				logger.log(TRACE, () -> ev.toString());
-				setRowModified();
-				updateActionState();
-				if (sz != errorComponents.size())
-					errorComponentsChanged(ev.getSource());
+				// TODO: SSComp vs RSC
+				((SSComponent)ev.getSource()).addUndoableChange(ev);
+				// TODO: don't do the rest of this stuff if exception?
+			} catch (SQLException ex) {
+				logger.log(ERROR, "Undo/redo exception", ex);
 			}
+			int sz = errorComponents.size();
+			if(ev.isError())
+				errorComponents.add(ev.getSource());
+			else
+				errorComponents.remove(ev.getSource());
+			if (sz != errorComponents.size())
+				errorComponentsChanged(ev.getSource());
+			
+			logger.log(TRACE, () -> ev.toString());
+			setRowModified();
+			updateActionState();
 		}
 
 		@WeakSubscribe
 		public void handleRowUndoRedo(RowSetUndoRedoEvent ev)
 		{
-			if (ev.matches(getRowSet())) {
-				// Our RowSet's row had an undo/redo.
-				int sz = errorComponents.size();
-				if(ev.isError())
-					errorComponents.add(ev.getSource());
-				else
-					errorComponents.remove(ev.getSource());
-				logger.log(TRACE, () -> ev.toString());
-				updateActionState();
-				if (sz != errorComponents.size())
-					errorComponentsChanged(ev.getSource());
-			}
+			if (!ev.matches(getRowSet()))
+				return;
+
+			// Our RowSet's row had an undo/redo.
+			int sz = errorComponents.size();
+			if(ev.isError())
+				errorComponents.add(ev.getSource());
+			else
+				errorComponents.remove(ev.getSource());
+			if (sz != errorComponents.size())
+				errorComponentsChanged(ev.getSource());
+			logger.log(TRACE, () -> ev.toString());
+			updateActionState();
+		}
+
+		private void errorComponentsChanged(RSC rsc) {
+			if (rsc instanceof SSComponent comp)
+				comp.decorate();
+			else
+				throw new IllegalStateException();
 		}
 
 		@WeakSubscribe
@@ -345,11 +354,6 @@ final class NavigateState
 		{
 			undoRow.focusChange(ev);
 		}
-	}
-
-	// Is this needed?
-	private void errorComponentsChanged(SSComponent comp) {
-		comp.decorate();
 	}
 
 	BusReceiver busReceiver; // Must have a strong reference.
@@ -361,7 +365,7 @@ final class NavigateState
 	
 	// TODO: Also have Set<SSComponentInterface> modifiedComponents.
 	//		 Paint modified/OK fields with identifying color, e.g. yellow.
-	private final Set<SSComponent> errorComponents;
+	private final Set<RSC> errorComponents;
 
 	/** Undo/redo this this rowset */
 	final UndoRow undoRow;
@@ -532,12 +536,13 @@ final class NavigateState
 	 * @throws java.sql.SQLException
 	 */
 	// TODO: Should this be public? NO, go through the static method in this class
+	// TODO: SSComponent vs RSC
 	Change doUndoRedo(SSComponent comp, UndoRedo cmd) throws SQLException
 	{
-		if (!isUndoRedoEnabled(comp))
+		if (!UndoRedo.isUndoRedoEnabled(comp))
 			throw new IllegalStateException("UNDO/REDO disabled");
 		Change change = undoRow.undoRedoChange(comp, cmd);
-		if (change == UndoCol.NO_CHANGE)
+		if (change == UndoRedo.NO_CHANGE)
 			SSUtils.beep();
 		else {
 			if(change.isError())

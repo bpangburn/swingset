@@ -40,6 +40,8 @@ import javax.swing.border.CompoundBorder;
  * Useful when a component associated with an SSComponent is decorated
  * and/or an associated component is used to catch focus. The decorated
  * and focused components may or may not be the same.
+ *
+ * Notice that lineEmpty_empty give maximal room for the component.
  * See {@link BorderDecorator}
  */
 public class AlternateBorderDecorator extends BorderDecorator
@@ -85,9 +87,9 @@ public class AlternateBorderDecorator extends BorderDecorator
 			return BorderDecorator.lineEmpty_empty(
 					cb.getOutsideBorder().getBorderInsets(jc()),
 					cb.getInsideBorder().getBorderInsets(jc()),
-					color);
+					state);
 		}
-		return empty_line(jc().getInsets(), color);
+		return empty_line(jc().getInsets(), state);
 	}
 	
 	/**

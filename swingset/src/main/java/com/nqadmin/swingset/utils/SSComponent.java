@@ -526,7 +526,7 @@ public interface SSComponent extends RSC
 	 * @throws java.sql.SQLException
 	 */
 	default void addUndoableChange(RowSetModificationEvent ev) throws SQLException {
-		UndoRedo.addUndoableChange(ev);
+		getSSCommon().addUndoableChange(ev);
 	}
 
 	/**
@@ -622,6 +622,13 @@ public interface SSComponent extends RSC
 		}
 		boolean allValid = otherValid && getSSCommon().pluginValidate();
 		return new validateResult(baseValid, compValid, otherValid, allValid);
+	}
+
+	/**
+	 * @return true if this component is different from what's in the database
+	 */
+	default boolean isDirty() {
+		return getRowsModel() != null && getRowsModel().isDirty(this);
 	}
 
 	/**
