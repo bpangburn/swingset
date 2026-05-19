@@ -793,6 +793,68 @@ public class RowSetOps {
 	}
 
 	/**
+	 * Fetch the current raw value from the database; use columnReader if available.
+	 * Initial capture for undo/redo uses this method.
+	 * 
+	 * @param rsc
+	 * @return
+	 * @throws SQLException
+	 */
+	public static Object getColumnDirect(RSC rsc) throws SQLException
+	{
+		Objects.requireNonNull(rsc);
+
+		if (rsc instanceof SSComponent comp) {
+			SSDBSupport.DbReader<RowSet, Integer, SSComponent, ?> columnReader = comp.getColumnReader();
+			if (columnReader != null)
+				return comp.getColumnReader()
+						.apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp);
+		}
+		
+		return rsc.getRowSet().getObject(rsc.getBoundColumnIndex());
+	}
+
+	/**
+	 * Reads the data from the rowset's specified column
+	 * using the provided columnReader;
+	 * no object conversion.
+	 * There is no filtering, for example null conversion.
+	 * @param comp component
+	 * @return value
+	 * @throws java.sql.SQLException
+	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B-1
+	 */
+	public static Object getColumn(SSComponent comp) throws SQLException
+	{
+		return UndoRedo.isUndoRedoEnabled(comp)
+				? UndoRedo.fetchCurrentChange(comp).value()
+				: SSDBSupport.runDbReader(comp);
+	}
+
+	/**
+	 * Update the RowSet using {@code columnWriter}. ColumnWriter is
+	 * expected to do a rowSet.update*.
+	 * 
+	 * @param comp
+	 * @param value
+	 * @throws SQLException
+	 */
+	public static void updateColumn(SSComponent comp, Object value)
+			throws SQLException
+	{
+		UndoRedo.captureInitialValue(comp);
+
+		boolean did_update = false;
+		try {
+			SSDBSupport.runDbWriter(comp, value);
+			did_update = true;
+		} finally {
+			if (did_update)
+				postRowSetModified(comp, value);
+		}
+	}
+
+	/**
 	 * Method used by SwingSet component listeners to update the underlying
 	 * RowSet.
 	 * <p>

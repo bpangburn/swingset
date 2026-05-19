@@ -49,6 +49,7 @@ import java.util.List;
 import javax.swing.text.JTextComponent;
 
 import com.nqadmin.swingset.datasources.RSC;
+import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
 
 import static com.nqadmin.swingset.navigate.RowSetState.isPreInsertOps;
@@ -119,7 +120,7 @@ final class UndoCol
 			else
 				return null;
 		} else
-			return comp.getRowSet().getObject(comp.getBoundColumnIndex());
+			return RowSetOps.getColumnDirect(comp);
 	}
 
 	/** Check if there is an undo (previous) value. */

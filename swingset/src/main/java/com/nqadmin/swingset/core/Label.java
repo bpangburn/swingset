@@ -45,6 +45,8 @@ package com.nqadmin.swingset.core;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.sql.SQLException;
 import java.util.EventListener;
 
 import javax.swing.Icon;
@@ -55,7 +57,6 @@ import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
-import static java.lang.System.Logger.Level.*;
 
 /**
  * Used to display database values in a read-only JLabel.
@@ -84,12 +85,16 @@ public class Label extends JLabel implements SSComponent
 			if (!"text".equals(pce.getPropertyName()))
 				return;
 
-			dbChange(() -> setBoundColumnText(getText()));
+			try {
+				dbChange(() -> setBoundColumnText(getText()));
+			} catch (SQLException ex) {
+				logger.log(Level.ERROR, (String) null, ex);
+			}
 		}
 	} // end protected class LabelListener
 
 	/** Log4j Logger for component */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Empty constructor needed for deserialization. Creates a Label instance with
@@ -154,7 +159,7 @@ public class Label extends JLabel implements SSComponent
 				@Override
 				protected void updateSSComponent() {
 					final String text = getBoundColumnText();
-					logger.log(DEBUG, ()->sf("%s: Setting label to %s.", getColumnForLog(), text));
+					logger.log(Level.DEBUG, ()->sf("%s: Setting label to %s.", getColumnForLog(), text));
 					setText(text);
 				}
 				

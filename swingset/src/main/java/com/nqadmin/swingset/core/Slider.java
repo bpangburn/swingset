@@ -46,6 +46,7 @@ package com.nqadmin.swingset.core;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.sql.JDBCType;
+import java.sql.SQLException;
 import java.util.EnumSet;
 import java.util.EventListener;
 
@@ -81,13 +82,17 @@ public class Slider extends JSlider implements SSComponent
 			if (getValueIsAdjusting())
 				return;
 
-			dbChange(() -> setBoundColumnObject(getValue()));
+			try {
+				dbChange(() -> setBoundColumnObject(getValue()));
+			} catch (SQLException ex) {
+				logger.log(Level.ERROR, (String) null, ex);
+			}
 		}
 
 	} // end protected class SliderListener implements ChangeListener, Serializable
 
 	/** Logger for component */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Empty constructor needed for deserialization. Creates a horizontal slider

@@ -277,6 +277,16 @@ public class ConvertType
 		};
 	}
 
+	/**
+	 * 
+	 * @param jdbcType
+	 * @return true if param type is handled conversion type.
+	 */
+	public static boolean isHandledType(JDBCType jdbcType)
+	{
+		return handledJavaTypeClass.contains(jdbcType);
+	}
+
 	/** 
 	 * Convert the specified object to the object type
 	 * for the specified JDBCType.
@@ -612,7 +622,7 @@ public class ConvertType
 			return clazz;
 		}
 
-		if(!handledJavaTypeClass.contains(jdbcType))
+		if(!isHandledType(jdbcType))
 			throw new SSSQLUnhandledTypeException(jdbcType.toString());
 
 		return JdbcDataTypeConversionTables.jdbcTypeToClassStrict(jdbcType);

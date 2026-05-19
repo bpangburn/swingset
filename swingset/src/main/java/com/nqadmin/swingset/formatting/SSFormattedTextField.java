@@ -238,9 +238,16 @@ public class SSFormattedTextField extends JFormattedTextField
 		// TODO:  Should "postRowSetModifiedError be covered by dbChange()?
 
 		// The formatter says it's valid, but there's more to check
-		if (decorate())
-			dbChange(() -> setBoundColumnObject(currentValue));
-		else
+		boolean someError = true; // set false after successfull database update
+		if (decorate()) {
+			try {
+				dbChange(() -> setBoundColumnObject(currentValue));
+				someError = false;
+			} catch (SQLException ex) {
+				logger.log(Level.ERROR, (String) null, ex);
+			}
+		}
+		if (someError)
 			postRowSetModifiedError(ftf, currentValue);
 	}
 	

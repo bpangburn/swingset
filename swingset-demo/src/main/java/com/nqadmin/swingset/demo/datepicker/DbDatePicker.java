@@ -18,6 +18,7 @@ package com.nqadmin.swingset.demo.datepicker;
 
 import java.lang.System.Logger;
 import java.sql.JDBCType;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.EventListener;
@@ -50,7 +51,11 @@ public class DbDatePicker extends DatePicker implements SSComponent
 		@Override
 		public void dateChanged(final DateChangeEvent dce)
 		{
-			dbChange(() -> setBoundColumnObject(dce.getNewDate()));
+			try {
+				dbChange(() -> setBoundColumnObject(dce.getNewDate()));
+			} catch (SQLException ex) {
+				logger.log(Logger.Level.ERROR, (String) null, ex);
+			}
 		}
 	}
 	/** System Logger for component. */

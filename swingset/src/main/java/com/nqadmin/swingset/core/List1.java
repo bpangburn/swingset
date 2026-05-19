@@ -114,7 +114,11 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponent
 			if (e.getValueIsAdjusting())
 				return;
 
-			dbChange(() -> updateRowSet());
+			try {
+				dbChange(() -> updateRowSet());
+			} catch (SQLException ex) {
+				logger.log(Level.ERROR, (String) null, ex);
+			}
 		}
 	}
 

@@ -67,7 +67,11 @@ import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.datasources.ConvertType;
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.datasources.SSDBSupport.DbReader;
+import com.nqadmin.swingset.datasources.SSDBSupport.DbRunnable;
+import com.nqadmin.swingset.datasources.SSDBSupport.DbWriter;
 import com.nqadmin.swingset.datasources.SSSQLConversionException;
 import com.nqadmin.swingset.datasources.SSSQLInternalException;
 import com.nqadmin.swingset.datasources.SSSQLNullException;
@@ -85,7 +89,6 @@ import com.nqadmin.swingset.navigate.UndoRedo.Change;
 import com.raelity.lib.eventbus.WeakEventBus;
 import com.raelity.lib.eventbus.WeakSubscribe;
 
-import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
 import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingChanges;
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
 import static com.nqadmin.swingset.navigate.Utils.hasActiveRow;
@@ -306,6 +309,9 @@ final class SSCommon
 	/** true for component bound with RowSet not null. */
 	boolean fullyBound;
 
+	private DbReader<RowSet, Integer, SSComponent, ?> columnReader;
+	private DbWriter<RowSet, Integer, SSComponent, Object> columnWriter;
+
 	private Decorator decorator;
 	private Validator validator;
 
@@ -412,7 +418,7 @@ final class SSCommon
 	 * Typically used by a component listener. It avoids extra RowSet events.
 	 * @param r code that changes the database
 	 */
-	void dbChange(Runnable r)
+	void dbChange(DbRunnable r) throws SQLException
 	{
 		if (rowsModel.getRowSet() == null)
 			return;
@@ -640,6 +646,32 @@ final class SSCommon
 		return boundColumnName;
 	}
 
+	DbReader<RowSet, Integer, SSComponent, ?> getColumnReader() {
+		return columnReader;
+	}
+
+	DbWriter<RowSet, Integer, SSComponent, Object> getColumnWriter() {
+		return columnWriter;
+	}
+
+	void setColumnReader(DbReader<RowSet, Integer, SSComponent, ?> columnReader) {
+		// TODO: Want some checking like this, but there may be special circumstances.
+		//       For example, handling LONGVARCHAR may want stream.
+		// TODO: Need plugin support?
+		// if (ConvertType.isHandledType(getSSComponent().getBoundColumnJDBCType()))
+		// 	throw new IllegalArgumentException("Known JDBCType %s should not have columnReader");
+		this.columnReader = columnReader;
+	}
+
+	void setColumnWriter(DbWriter<RowSet, Integer, SSComponent, Object> columnWriter) {
+		this.columnWriter = columnWriter;
+	}
+
+	Object getColumn() throws SQLException {
+		return RowSetOps.getColumn(ssComponent);
+	}
+
+
 	/**
 	 * Returns an Object 
 	 * representing the value in the bound database column.
@@ -835,6 +867,36 @@ final class SSCommon
 				if (isBeepOnError())
 					SSUtils.beep();
 				postRowSetModifiedError(getSSComponent(), boundColumnArray);
+			}
+		}
+		boolean fOK = ok;
+		logger.log(DEBUG, () -> sf("return ok: %b", fOK));
+		return ok;
+	}
+
+	/**
+	 * Updates the bound database column with the specified Array.
+	 * <p>
+	 * Used for SSList or other component where multiple items can be selected.
+	 *
+	 * @throws SQLException thrown if there is a problem writing the array to the
+	 *                      RowSet
+	 */
+	boolean setColumn(Object value) {
+		//logger.log(DEBUG, () -> sf("%s: %s", getColumnForLog(), boundColumnArray));
+		logger.log(DEBUG, () -> sf("%s:", getColumnForLog()));
+		boolean ok = false;
+		try {
+			RowSetOps.updateColumn(getSSComponent(), value);
+			ok = true;
+		} catch(SQLException ex) {
+			if (isDialogOnError())
+				userErrorReporting(value, ex);
+		} finally {
+			if (!ok) {
+				if (isBeepOnError())
+					SSUtils.beep();
+				postRowSetModifiedError(getSSComponent(), value);
 			}
 		}
 		boolean fOK = ok;
@@ -1052,9 +1114,10 @@ final class SSCommon
 		Object obj = change.value();
 		try {
 			// throw isn't a problem because value fetched from undo/redo stack.
-			obj = convertToType(obj, getBoundColumnJDBCType()); // may throw
+			if (ConvertType.isHandledType(getBoundColumnJDBCType()))
+				obj = ConvertType.convertToType(obj, getBoundColumnJDBCType()); // may throw
 			// NOTE: following does not generate any events
-			getRowSet().updateObject(getBoundColumnIndex(), obj);
+			getRowSet().updateObject(getBoundColumnIndex(), obj); // TODO: RowSetOps
 		} catch (SQLException ex) {
 			if (!change.isError())
 				throw new IllegalStateException("EXCEPTION BUT NOT ERROR");

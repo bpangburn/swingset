@@ -211,7 +211,11 @@ public abstract class ComboBox2<K,D,D2>
 					getColumnForLog(), getSelectedItem()));
 
 			K key = getChosenKey();
-			dbChange(() -> setBoundColumnObject(key));
+			try {
+				dbChange(() -> setBoundColumnObject(key));
+			} catch (SQLException ex) {
+				logger.log(Level.ERROR, (String) null, ex);
+			}
 		}
 	}
 

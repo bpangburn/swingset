@@ -52,6 +52,10 @@ import javax.sql.rowset.CachedRowSet;
 import javax.swing.JComponent;
 
 import com.nqadmin.swingset.datasources.RSC;
+import com.nqadmin.swingset.datasources.SSDBSupport;
+import com.nqadmin.swingset.datasources.SSDBSupport.DbReader;
+import com.nqadmin.swingset.datasources.SSDBSupport.DbRunnable;
+import com.nqadmin.swingset.datasources.SSDBSupport.DbWriter;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.formatting.SSFormat;
@@ -253,8 +257,9 @@ public interface SSComponent extends RSC
 	 * Typically used by a component listener. It avoids extra RowSet events.
 	 * May bring up a dialog if there is no row to change.
 	 * @param r code that changes the database
+	 * @throws java.sql.SQLException
 	 */
-	default void dbChange(Runnable r)
+	default void dbChange(DbRunnable r) throws SQLException
 	{
 			getSSCommon().dbChange(r);
 	}
@@ -471,6 +476,94 @@ public interface SSComponent extends RSC
 	 */
 	default String getLogColumnName() {
 		return getSSCommon().getLogColumnName();
+	}
+
+	/**
+	 * Get the columnReader used by {@link #getColumn()} and internally
+	 * for capturing initial value.
+	 * This is useful for dealing with ColumnTypes that are are not
+	 * handled internally, like BLOB and VARBINARY. For exampe, see Image source code.
+	 * 
+	 * The {@code columnReader} is typically invoked like
+	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
+	 * The comp is rarely used, and provided for complex situations. The
+	 * columnReader return the value fetched from the datbase.
+	 * 
+	 * @return the DbReader used to fetch values from the database
+	 */
+	default DbReader<RowSet, Integer, SSComponent, ?> getColumnReader() {
+		return getSSCommon().getColumnReader();
+	}
+
+	/**
+	 * Set the columnReader used by {@link #getColumn()} and internally for capturing
+	 * initial value. This is useful for dealing with ColumnTypes that are are not
+	 * handled internally, like BLOB and VARBINARY. For exampe, see Image source code.
+	 * 
+	 * The {@code columnReader} is typically invoked like
+	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
+	 * The comp is rarely used, and provided for complex situations.
+	 * 
+	 * @param columnReader the DbReader used to fetch values from the database
+	 */
+	default void setColumnReader(DbReader<RowSet, Integer, SSComponent, ?> columnReader) {
+		getSSCommon().setColumnReader(columnReader);
+	}
+
+	/**
+	 * Get the columnWriter used by {@link #setColumn(Object)}.
+	 * This is useful for dealing with ColumnTypes that are are not
+	 * handled internally, like BLOB and VARBINARY. For exampe, see Image source code.
+	 * 
+	 * The {@code columnReader} is typically invoked like
+	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
+	 * The comp is rarely used, and provided for complex situations.
+	 * 
+	 * @return the DbWriter used to fetch values from the database
+	 */
+	default DbWriter<RowSet, Integer, SSComponent, Object> getColumnWriter() {
+		return getSSCommon().getColumnWriter();
+	}
+
+
+	/**
+	 * Set the columnWriter used by {@link #setColumn(Object)}.
+	 * This is useful for dealing with ColumnTypes that are are not
+	 * handled internally, like BLOB and VARBINARY. For exampe, see Image source code.
+	 * 
+	 * The {@code columnReader} is typically invoked like
+	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
+	 * The comp is rarely used, and provided for complex situations.
+	 * 
+	 * @param columnWriter the DbWriter used to fetch values from the database
+	 */
+	default void setColumnWriter(DbWriter<RowSet,Integer,SSComponent,Object> columnWriter) {
+		getSSCommon().setColumnWriter(columnWriter);
+	}
+
+	/**
+	 * Sets the value of the bound database column using the SSComponent's
+	 * {@link SSDBSupport#DbWriter}. See {@link #getColumnWriter() }.
+	 * NPE if no columnReader. Useful for dealing with JDBCTypes not handled
+	 * internally.
+	 * 
+	 * @return the value to display in the SSComponent, may be from undo/redo stack.
+	 * @throws java.sql.SQLException
+	 */
+	default Object getColumn() throws SQLException {
+		return getSSCommon().getColumn();
+	}
+
+	/**
+	 * Sets the value of the bound database column using the SSComponent's
+	 * {@link SSDBSupport#DbWriter}. See {@link #getColumnWriter() }.
+	 * NPE if no columnWriter. Useful for dealing with JDBCTypes not handled
+	 * internally.
+	 * 
+	 * @param value to write to the database, may write to the undo/redo stack.
+	 */
+	default void setColumn(Object value) {
+		getSSCommon().setColumn(value);
 	}
 
 	/**

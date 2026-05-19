@@ -31,6 +31,7 @@
 package com.nqadmin.swingset.utils;
 
 import java.lang.System.Logger;
+import java.sql.SQLException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -200,7 +201,11 @@ public class SSTextSupport
 			SwingUtilities.invokeLater(() -> {
 				if (lastNotifiedChange != lastChange) {
 					lastNotifiedChange = lastChange;
-					ssCommon.dbChange(() -> updateTextComponent());
+					try {
+						ssCommon.dbChange(() -> updateTextComponent());
+					} catch (SQLException ex) {
+						logger.log(Logger.Level.ERROR, (String) null, ex);
+					}
 				}
 			});
 		}

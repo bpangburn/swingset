@@ -189,6 +189,8 @@ final class UndoRow
 	 */
 	void captureInitialValue(RSC comp) throws SQLException
 	{
+		// TODO: have a fast path check if column already captured. java.util.BitSet?
+		//       Also want fast path to the undoRow from the component
 		getCol(comp);
 	}
 

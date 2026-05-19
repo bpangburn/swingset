@@ -49,6 +49,7 @@ import java.sql.SQLException;
 import javax.sql.RowSet;
 
 import com.nqadmin.swingset.utils.CentralLookup;
+import com.nqadmin.swingset.utils.SSComponent;
 
 
 /**
@@ -66,6 +67,16 @@ public interface SSDBSupport {
 	}
 
 	/**
+	 * Like Runnable, but throws.
+	 */
+	interface DbRunnable {
+		/**
+		 * @throws SQLException
+		 */
+		void run() throws SQLException;
+	}
+
+	/**
 	 * Like Function, but only has apply method that throws SQLException.
 	 * @param <T>
 	 * @param <R>
@@ -79,6 +90,102 @@ public interface SSDBSupport {
 		 * @throws SQLException
 		 */
 		public R apply(T t) throws SQLException;
+	}
+
+	/**
+	 * Like BiFunction, but throws SQLException.
+	 * 
+	 * @param <T>
+	 * @param <U>
+	 * @param <R>
+	 */
+	interface DbBiFunc<T,U,R> {
+
+		/**
+		 * Run the function
+		 * @param t
+		 * @param u
+		 * @return
+		 * @throws SQLException
+		 */
+		public R apply(T t, U u) throws SQLException;
+	}
+
+	/**
+	 * Three arg function taking rowSet,colIdx,comp that throws SQLException
+	 * and returns an Object.
+	 *
+	 * @param <T>
+	 * @param <U>
+	 * @param <V>
+	 * @param <R>
+	 */
+
+	interface DbReader<T,U,V,R>  {
+
+		/**
+		 * Run the function
+		 *
+		 * @param t
+		 * @param u
+		 * @param v
+		 * @return
+		 * @throws SQLException
+		 */
+
+		public R apply(T t, U u, V v) throws SQLException;
+	}
+
+	/**
+	 * Four arg function taking rowSet,colIdx,comp,value that throws SQLException
+	 * and returns an Object.
+	 *
+	 * @param <T>
+	 * @param <U>
+	 * @param <V>
+	 * @param <W>
+	 */
+	interface DbWriter<T,U,V,W>  {
+
+		/**
+		 * Run the function
+		 *
+		 * @param t
+		 * @param u
+		 * @param v
+		 * @param w
+		 * @throws SQLException
+		 */
+
+		public void apply(T t, U u, V v, W w) throws SQLException;
+	}
+
+	/**
+	 * For the typical simple cases run the columnRead to set the value.
+	 * Note that the columnWriter typically ignores the comp argument, but
+	 * there for special cases.
+	 *
+	 * @param comp
+	 * @return
+	 * @throws java.sql.SQLException
+	 */
+	static Object runDbReader(SSComponent comp) throws SQLException {
+		return comp.getColumnReader()
+				.apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp);
+	}
+
+	/**
+	 * For the typical simple cases run the columnWriter to set the value.
+	 * Note that the columnWriter typically ignores the comp argument, but
+	 * there for special cases.
+	 * 
+	 * @param comp
+	 * @param value
+	 * @throws SQLException
+	 */
+	static void runDbWriter(SSComponent comp, Object value) throws SQLException {
+		comp.getColumnWriter()
+				.apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp, value);
 	}
 
 	/**

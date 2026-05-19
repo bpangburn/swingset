@@ -45,7 +45,9 @@ package com.nqadmin.swingset.core;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.JDBCType;
+import java.sql.SQLException;
 import java.util.EnumSet;
 import java.util.EventListener;
 
@@ -60,7 +62,6 @@ import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.assertConvertFromJdbcType;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
-import static java.lang.System.Logger.Level.*;
 import static java.sql.JDBCType.*;
 
 /**
@@ -87,7 +88,11 @@ public class CheckBox extends JCheckBox implements SSComponent
 		@Override
 		public void itemStateChanged(final ItemEvent ie)
 		{
-			dbChange(() -> setBoundColumnObject(isSelected()));
+			try {
+				dbChange(() -> setBoundColumnObject(isSelected()));
+			} catch (SQLException ex) {
+				logger.log(Level.ERROR, (String) null, ex);
+			}
 		}
 	}
 
@@ -121,7 +126,7 @@ public class CheckBox extends JCheckBox implements SSComponent
 	 */
 	public CheckBox(final String _text) {
 		super(_text);
-		logger.log(DEBUG, () -> sf("original border: %s",
+		logger.log(Level.DEBUG, () -> sf("original border: %s",
 				BorderDecorator.asString(getBorder(), this)));
 		// JCheckBox disables painting the borders.
 		// Replace the JCheckBox border with an empty border.
@@ -161,7 +166,7 @@ public class CheckBox extends JCheckBox implements SSComponent
 				@Override
 				protected void updateSSComponent()
 				{
-					logger.log(DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), getBoundColumnText()));
+					logger.log(Level.DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), getBoundColumnText()));
 					
 					Boolean value = getBoundColumnObject(Boolean.class);
 					setSelected(value == null ? false : value);

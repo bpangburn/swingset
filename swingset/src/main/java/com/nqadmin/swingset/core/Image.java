@@ -56,10 +56,12 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EnumSet;
 import java.util.EventListener;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -82,6 +84,7 @@ import com.nqadmin.swingset.utils.SSUtils;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 import static java.nio.file.StandardOpenOption.READ;
+import static java.sql.JDBCType.*;
 
 /**
  * Used to load, store, and display images stored in a database.
@@ -93,8 +96,9 @@ public class Image extends JPanel implements SSComponent
 	// TODO: try to get this initialized
 	private Path path;
 	/**
-	 * Listener(s) for the component's value used to propagate changes back to bound
-	 * database column
+	 * This listener can read a file; create an image from the file;
+	 * write the image bits to the database, display the image.
+	 * The first step puts up a FileChooser.
 	 */
 	protected class ImageListener implements ActionListener
 	{
@@ -109,48 +113,60 @@ public class Image extends JPanel implements SSComponent
 			if (fc.showOpenDialog(btnUpdateImage) != JFileChooser.APPROVE_OPTION) {
 				return;
 			}
+
 			Path tPath = fc.getSelectedFile().toPath();
+			try {
+				img = createDbImageFromFile(tPath);
+			} catch (IOException ioe) {
+				SSUtils.reportError(logger, Image.this, "Error accessing image file", tPath, ioe);
+				return;
+			} catch (SQLException ex) {
+				logger.log(Level.ERROR, (String) null, ex);
+				return;
+			}
 
+			// Display the image
+			path = tPath;
+			
+			lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
+			lblImage.setIcon(img);
+			lblImage.setText("");
+		}
+
+		private ImageIcon createDbImageFromFile(Path tPath) throws SQLException, IOException
+		{
+			// Read the image into a byte array
+			ByteBuffer bb;
+			try (SeekableByteChannel rbc
+					= Files.newByteChannel(tPath, EnumSet.of(READ))) {
+				int totalLength = (int) rbc.size();
+				bb = ByteBuffer.allocate(totalLength);
+				int bytesRead = rbc.read(bb);
+				if (totalLength != bytesRead)
+					throw new IOException(sf("Image expected %d bytes, got %d",
+							totalLength, bytesRead));
+			}
+			byte[] bytes = bb.array();
+			
+			// Verify the bytes are a recognized image
+			ByteArrayInputStream bs = new ByteArrayInputStream(bytes);
+			ImageInputStream iis = ImageIO.createImageInputStream(bs);
+			if (Boolean.FALSE) getImageFormat(iis);
+			BufferedImage bimg = ImageIO.read(iis); // NOTE: usually closes iis
+			if (bimg == null) {
+				iis.close();
+				throw new IOException("Unknown image format");
+			}
+			
+			// Create icon before writing to database in case of error
+			ImageIcon imageIcon = new ImageIcon(bimg);
+			
+			// Stage the image to the database
 			dbChange(() -> {
-				try {
-					ByteBuffer bb;
-					try (SeekableByteChannel rbc
-							= Files.newByteChannel(tPath, EnumSet.of(READ))) {
-						int totalLength = (int) rbc.size();
-						bb = ByteBuffer.allocate(totalLength);
-						int bytesRead = rbc.read(bb);
-						if (totalLength != bytesRead)
-							throw new IOException(sf("Image expected %d bytes, got %d",
-									totalLength, bytesRead));
-					}
-					byte[] bytes = bb.array();
-
-					// verify the bytes are a recognized image
-					ByteArrayInputStream bs = new ByteArrayInputStream(bytes);
-					ImageInputStream iis = ImageIO.createImageInputStream(bs);
-					if (Boolean.FALSE) getImageFormat(iis);
-					BufferedImage bimg = ImageIO.read(iis); // NOTE: usually closes iis
-					if (bimg == null) {
-						iis.close();
-						throw new IOException("Unknown image format");
-					}
-
-					// create icon before writing to database in case of error
-					img = new ImageIcon(bimg);
-					
-					// TODO: remove direct RowSet access
-					getRowSet().updateBytes(getBoundColumnName(), bytes);
-					path = tPath;
-
-					lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
-					lblImage.setIcon(img);
-					lblImage.setText("");
-				} catch (SQLException se) {
-					logger.log(Level.ERROR, getColumnForLog() + ": SQL Exception.", se);
-				} catch (IOException ioe) {
-					SSUtils.reportError(logger, Image.this, "Error accessing image file", tPath, ioe);
-				}
+				setColumn(bytes);
 			});
+
+			return imageIcon;
 		}
 	} // end private class ImageListener
 
@@ -182,6 +198,13 @@ public class Image extends JPanel implements SSComponent
 	 */
 	public Image() {
 		finishSSCommon();
+
+		setColumnReader((rs, cidx, _) -> {
+			return rs.getBytes(cidx);
+		});
+		setColumnWriter((rs, cidx, _, value) -> {
+			rs.updateBytes(cidx, (byte[]) value);
+		});
 	}
 
 	/**
@@ -196,6 +219,15 @@ public class Image extends JPanel implements SSComponent
 	{
 		this();
 		rowsModel.bind(this, boundColumnName);
+	}
+
+	/** {@inheritDoc } */
+	@Override
+	public void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException
+	{
+		Set<JDBCType> allowed = Set.of(BLOB, BINARY, VARBINARY, LONGVARBINARY);
+		if (!allowed.contains(jdbcType))
+			throw new IllegalArgumentException("Image column type must be BLOB");
 	}
 
 	// TODO: Why do decorators interfere with Image?
@@ -317,15 +349,9 @@ public class Image extends JPanel implements SSComponent
 	 * the Component listener removed.
 	 */
 	public void updateComponent() {
-
-		// TODO: If CachedRowSet, BLOBs don't work. As a convenience could,
-		//		 grab a connection, find the primary keys, and read the BLOB.
-
-		// TODO: Should getBoundColumnObject() be used here?
-		//		 Seems like it, it's used just about everywhere else.
-
 		try {
-			byte[] imageData = getRowSet().getRow() > 0 ? getRowSet().getBytes(getBoundColumnName()) : null;
+			byte[] imageData = (byte[]) getColumn();
+
 			if (imageData != null) {
 				logger.log(DEBUG, () -> sf("%s: Setting non-null image.", getColumnForLog()));
 				img = new ImageIcon(imageData);
@@ -342,10 +368,6 @@ public class Image extends JPanel implements SSComponent
 		}
 
 		lblImage.setIcon(img);
-
-		// TODO Confirm updateUI is needed here.
-		updateUI();
-
 	}
 
 	// only here for play at this time
