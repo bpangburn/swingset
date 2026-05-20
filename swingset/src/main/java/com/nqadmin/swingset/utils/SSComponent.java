@@ -52,7 +52,6 @@ import javax.sql.rowset.CachedRowSet;
 import javax.swing.JComponent;
 
 import com.nqadmin.swingset.datasources.RSC;
-import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.datasources.SSDBSupport.DbReader;
 import com.nqadmin.swingset.datasources.SSDBSupport.DbRunnable;
 import com.nqadmin.swingset.datasources.SSDBSupport.DbWriter;
@@ -543,7 +542,7 @@ public interface SSComponent extends RSC
 
 	/**
 	 * Sets the value of the bound database column using the SSComponent's
-	 * {@link SSDBSupport#DbWriter}. See {@link #getColumnWriter() }.
+	 * {@link DbWriter}. See {@link #getColumnWriter() }.
 	 * NPE if no columnReader. Useful for dealing with JDBCTypes not handled
 	 * internally.
 	 * 
@@ -556,7 +555,7 @@ public interface SSComponent extends RSC
 
 	/**
 	 * Sets the value of the bound database column using the SSComponent's
-	 * {@link SSDBSupport#DbWriter}. See {@link #getColumnWriter() }.
+	 * {@link DbWriter}. See {@link #getColumnWriter() }.
 	 * NPE if no columnWriter. Useful for dealing with JDBCTypes not handled
 	 * internally.
 	 * 

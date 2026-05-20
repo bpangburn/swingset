@@ -70,7 +70,7 @@ import static java.lang.System.Logger.Level.*;
  * table, and the combobox needs to display a list of one (or more) columns from
  * the other table.
  * <p>
- * The inherited {@link SSListItemFormat} is used, see {@link
+ * The inherited {@link com.nqadmin.swingset.models.SSListItemFormat} is used, see {@link
  * #getListItemFormat()}; it provides the default separator.
  * Several methods inherited from ComboBox2 directly manipulate the combobox
  * contents. These methods throw UnsupportedOperationException.

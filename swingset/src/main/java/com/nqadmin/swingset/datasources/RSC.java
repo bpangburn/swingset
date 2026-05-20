@@ -52,13 +52,13 @@ import com.nqadmin.swingset.navigate.RowsModel;
 
 /**
  * This interface is an accessor to a {@linkplain RowSet} and one of its
- * columns; it is extended by {@link com.nqadmin.swingset.utils.SSComponentInterface}.
+ * columns; it is extended by {@link com.nqadmin.swingset.utils.SSComponent}.
  * Some components, in particular {@linkplain com.nqadmin.swingset.SSDataGrid},
  * have multiple columns; this
  * interface allows a lightweight object to provide row set access for
  * a specified column. Many
  * methods can declare a {@linkplain RSC} parameter instead of a
- * {@linkplain com.nqadmin.swingset.utils.SSComponentInterface}.
+ * {@linkplain com.nqadmin.swingset.utils.SSComponent}.
  */
 // TODO: getAllowNull() is an issue
 // TODO: some of these must carefully be specified to only use a subset of the
