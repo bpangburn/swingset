@@ -55,7 +55,6 @@ import javax.swing.JCheckBox;
 import javax.swing.border.Border;
 
 import com.nqadmin.swingset.decorators.BorderDecorator;
-import com.nqadmin.swingset.decorators.Utils;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -130,7 +129,7 @@ public class CheckBox extends JCheckBox implements SSComponent
 				BorderDecorator.asString(getBorder(), this)));
 		// JCheckBox disables painting the borders.
 		// Replace the JCheckBox border with an empty border.
-		Border b = Utils.createEmptyBorder(this);
+		Border b = BorderDecorator.createEmptyBorder(this);
 		setBorder(b);
 		setBorderPainted(true);
 		finishSSCommon();

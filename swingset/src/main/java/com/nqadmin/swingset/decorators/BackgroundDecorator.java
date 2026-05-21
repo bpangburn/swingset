@@ -65,6 +65,7 @@ public class BackgroundDecorator extends FocusDecorator
 	private final Color standardBackgroundColor = getDefaultBackgroundColor();
 	private Color focusBackgroundColor = new Color(204, 255, 255); // Tealish
 	private final Color errorBackgroundColor = Color.PINK;
+	private final Color modifiedBackgroundColor = Color.YELLOW;
 
 	/** Decorate the component using current state. */
 	@Override
@@ -74,14 +75,13 @@ public class BackgroundDecorator extends FocusDecorator
 				jc().getClass().getSimpleName(), fcomp().isFocusOwner(), valid.comp(), valid.all()));
 
 
+		ComponentState state = getComponentState(valid);
+		Color color = state.isError() ? errorBackgroundColor
+				: state.isModified() ? modifiedBackgroundColor
+				: state.isFocused() ? focusBackgroundColor
+				: standardBackgroundColor;
+		jc().setBackground(color);
 
-		//boolean dataValid = getComponent().getSSCommon().validate() && getComponent().isDataValid();
-		if (valid.all()) {
-			jc().setBackground(jc().isFocusOwner()
-					? focusBackgroundColor : standardBackgroundColor);
-		} else {
-			jc().setBackground(errorBackgroundColor);
-		}
 		return valid.all();
 	}
 

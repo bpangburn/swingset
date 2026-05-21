@@ -59,6 +59,63 @@ import com.nqadmin.swingset.utils.SSComponent;
 public abstract class FocusDecorator
 		implements Decorator, FocusListener, TextDecorator
 {
+	/** The state of a component. Used to create the proper decoration */
+	// TODO: may want to treat as bit field for: error/focus/warning/dirty
+	public enum ComponentState {
+		/** not focused, no error, not modified */
+		OK, // TODO: This is actually OK
+		/** focus gained, no error, not modified */
+		FOCUSED_OK,
+		/** modified without focus */
+		MODIFIED,
+		/** modified with focus */
+		FOCUSED_MODIFIED,
+		/** error with/without focus */
+		ERROR,
+		/** error with/without focus */
+		FOCUSED_ERROR;
+
+		boolean isFocused() {
+			return this == FOCUSED_OK || this == FOCUSED_MODIFIED
+					|| this == FOCUSED_ERROR;
+		}
+
+		boolean isModified() {
+			return this == MODIFIED || this == FOCUSED_MODIFIED;
+		}
+
+		boolean isError() {
+			return this == ERROR || this == FOCUSED_ERROR;
+		}
+
+		// TODO: isModified, isError
+	}
+
+	/**
+	 * Determine the state of the component.
+	 * @param valid
+	 * @return the component state
+	 */
+	public ComponentState getComponentState(SSComponent.validateResult valid) {
+		ComponentState borderState;
+		if (valid.all()) {
+			borderState = getComponent().isDirty()
+					? ComponentState.MODIFIED
+					: ComponentState.OK;
+		} else
+			borderState = ComponentState.ERROR;
+		if (fcomp().isFocusOwner()) {
+			borderState = switch(borderState) {
+			case OK -> ComponentState.FOCUSED_OK;
+			case MODIFIED -> ComponentState.FOCUSED_MODIFIED;
+			case ERROR -> ComponentState.FOCUSED_ERROR;
+			default -> throw new IllegalStateException("Unexpected value: " + (borderState));
+			};
+		}
+
+		return borderState;
+	}
+
 	/** this component */
 	private SSComponent component;
 	/** current color set by decorateText() */

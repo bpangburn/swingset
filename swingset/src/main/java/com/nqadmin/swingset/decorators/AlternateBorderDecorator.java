@@ -75,7 +75,7 @@ public class AlternateBorderDecorator extends BorderDecorator
 	 * {@inheritDoc }
 	 */
 	@Override
-	protected Border getBorder(BorderState state)
+	protected Border getBorder(ComponentState state)
 	{
 		// The default border when just running the demo is
 		// the CompoundBorder: [[3,3,3,3],[2,14,2,14]].
