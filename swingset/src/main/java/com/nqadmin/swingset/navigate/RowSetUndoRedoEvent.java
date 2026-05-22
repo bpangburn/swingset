@@ -62,11 +62,11 @@ public class RowSetUndoRedoEvent extends EventObjectBacktrace
 
 	/**
 	 * Test if this event is for the specified rowSet.
-	 * @param _rowSet check against this rowSet
+	 * @param rowSet check against this rowSet
 	 * @return true if the event is for the specified rowSet
 	 */
-	public boolean matches(RowSet _rowSet) {
-		return getSource().getRowSet() == _rowSet;
+	public boolean matches(RowSet rowSet) {
+		return getSource().getRowSet() == rowSet;
 	}
 
 	/**

@@ -271,7 +271,7 @@ final class SSCommon
 	//       value, pass table name, column name, comp. So need to wait
 	//       for bind/rowset. Have a flag to indicate been initialized.
 	private boolean beepOnError = true;
-	private boolean restoreOnError = false;
+	private final boolean restoreOnError = false; // easiest/safest?
 	private boolean dialogOnError = false;
 
 	boolean pendingDbChange;
@@ -1112,11 +1112,21 @@ final class SSCommon
 	boolean isBeepOnError() {
 		return beepOnError;
 	}
-	boolean isRestoreOnError() {
-		return restoreOnError;
+	@SuppressWarnings("unused")
+	void setBeepOnError(boolean beepOnError) {
+		this.beepOnError = beepOnError;
 	}
+
 	boolean isDialogOnError() {
 		return dialogOnError;
+	}
+	@SuppressWarnings("unused")
+	void setDialogOnError(boolean dialogOnError) {
+		this.dialogOnError = dialogOnError;
+	}
+
+	boolean isRestoreOnError() {
+		return restoreOnError;
 	}
 
 	/**
@@ -1223,17 +1233,16 @@ final class SSCommon
 		
 		Object obj = change.value();
 		try {
-			// throw isn't a problem because value fetched from undo/redo stack.
+			// throw shouldn't be a problem because value fetched from undo/redo stack.
 			if (ConvertType.isHandledType(getBoundColumnJDBCType()))
 				obj = ConvertType.convertToType(obj, getBoundColumnJDBCType()); // may throw
 			// NOTE: following does not generate any events
-			getRowSet().updateObject(getBoundColumnIndex(), obj); // TODO: RowSetOps
+			getRowSet().updateObject(getBoundColumnIndex(), obj); // TODO: Use RowSetOps?
 		} catch (SQLException ex) {
 			if (!change.isError())
 				throw new IllegalStateException("EXCEPTION BUT NOT ERROR");
 		}
-
-		RowsModel.issueRowChanged(rowsModel); // will cause updateSSComponent
+		updateSSComponent();
 	}
 
 	//////////////////////////////////////////////////////////////////////

@@ -206,7 +206,7 @@ public class RowsModel
 	}
 
 	/**
-	 *
+	 * This event will cause all components to update.
 	 * @param rowsModel
 	 */
 	public static void issueRowChanged(RowsModel rowsModel)

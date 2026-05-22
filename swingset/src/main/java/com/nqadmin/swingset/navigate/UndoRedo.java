@@ -178,7 +178,7 @@ public enum UndoRedo
 			if (change != NO_CHANGE)
 				SwingUtilities.invokeLater(() -> {
 					postRowSetUndoRedo(comp, change.value(),
-							change.isError || !comp.allValidate().all());
+							change.isError /*|| !comp.allValidate().all()*/);
 				});
 		} catch (SQLException ex) {
 			logger.log(ERROR, sf("%s:", cmd), ex);
