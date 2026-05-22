@@ -55,6 +55,7 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
 import com.nqadmin.swingset.utils.SSComponent;
+import com.nqadmin.swingset.utils.SSComponent.ValidationResult;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static java.lang.System.Logger.Level.*;
@@ -78,7 +79,7 @@ public class BorderDecorator extends FocusDecorator
 	/** Decorate the component using current state. */
 	@Override
 	public boolean decorate() {
-		SSComponent.validateResult valid = getComponent().allValidate();
+		ValidationResult valid = getComponent().allValidate();
 		logger.log(TRACE, () -> String.format("%s focus: %s, compValid %s, allValid: %s",
 				jc().getClass().getSimpleName(), fcomp().isFocusOwner(), valid.comp(), valid.all()));
 		Border b;

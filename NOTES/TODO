@@ -10,6 +10,10 @@ and print the violated constraint.
 
 ================================================================================
 
+setColumn()/getColumn() allow to pass in reader/writer?
+
+================================================================================
+
 Why maintain currentRow and rowCount in navigateState? How much perf gain?
 Use a method to access, simplifies flipping.
 

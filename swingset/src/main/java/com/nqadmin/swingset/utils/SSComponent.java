@@ -67,9 +67,21 @@ import com.nqadmin.swingset.navigate.UndoRedo.Change;
 import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
 /**
- * Interface with default methods shared by most SwingSet components.
- * This interface acts like a class to simulate multiple inheritance.
- * There are only a few methods, and the class Hook, that need to be implemented.
+ * This Interface presents a {@link RowSet} column as seen by the visual
+ * components in the library. It has default methods supporting binding
+ * a {@linkplain RowSet} column to this component, dbms access,
+ * undo/redo, validation, decoration. A database column is associated
+ * with this component via {@link RowsModel#bind(SSComponent,String) }.
+ * There are only a few methods, and the class Hook, that need to be implemented
+ * by the visual component: {@link #cleanField() }, {@link #getSSComponentHook() }.
+ * <p>
+ * There are several methods that can be overridden for
+ * customization, notification, and verification: {@link #customInit() },
+ * {@link #checkColumnType(JDBCType) }, {@link #metadataChange() },
+ * {@link #finishBind() }, {@link #baseValidate() }, {@link #componentValidate()},
+ * and {@link #createDefaultDecorator()}.
+ * <p>
+ * Typical usage: {@code class MyComponent extends SomeJComponent implements SScomponent}
  */
 public interface SSComponent extends RSC
 {
@@ -106,7 +118,7 @@ public interface SSComponent extends RSC
 
 		/**
 		 * Updates the value stored and displayed in the SwingSet component
-		 * based on the object obtained from getBoundColumnText().
+		 * based on value obtained with getColumn*().
 		 * Use {@code ssComponent.getSSCommon().updateSSComponent()}.
 		 * <p>
 		 * This method is invoked by SSCommon and insures removal (and subsequent
@@ -178,7 +190,8 @@ public interface SSComponent extends RSC
 		}
 
 		/**
-		 * This should be invoked as the last statement
+		 * Invoked by ssComponent.finishSSCommon which
+		 * should be invoked as the last statement
 		 * in the SSComponent's constructor, but before bind.
 		 */
 		protected final void finishSSCommon() {
@@ -192,6 +205,10 @@ public interface SSComponent extends RSC
 	//
 	// The first group are commonly overriden.
 	//
+	// There are also some validation/decoration related methods near the end
+	// of this file that are commonly overridden:
+	//			baseValidate, componentValidate, createDefaultDecorator.
+	//
 
 	/**
 	 * Method to allow Developer to add functionality when SwingSet component is
@@ -202,7 +219,9 @@ public interface SSComponent extends RSC
 	 */
 	default void customInit() {}
 
-	/** Invoked during bind, component should verify that jdbcType is ok.
+	/** Invoked during bind, component should verify that the database column's
+	 * JDBCType is ok and handled by this component.
+	 * 
 	 * @param jdbcType column JDBCType
 	 * @throws IllegalArgumentException if can't handle JDBCType
 	 */
@@ -215,7 +234,8 @@ public interface SSComponent extends RSC
 	default void metadataChange() { }
 
 	/**
-	 * Invoked at the end of bind; default sets up primary keys for CachedRowSet.
+	 * Invoked by the infrastructure at the end of bind;
+	 * default sets up primary keys for CachedRowSet.
 	 * Invoke super if override.
 	 */
 	// TODO: currently called once per column, only needed once per RowSet?
@@ -249,18 +269,6 @@ public interface SSComponent extends RSC
 	 */
 	default void finishSSCommon() {
 		getSSComponentHook().finishSSCommon();
-	}
-
-	/**
-	 * Used when making a change to the database.
-	 * Typically used by a component listener. It avoids extra RowSet events.
-	 * May bring up a dialog if there is no row to change.
-	 * @param r code that changes the database
-	 * @throws java.sql.SQLException
-	 */
-	default void dbChange(DbRunnable r) throws SQLException
-	{
-			getSSCommon().dbChange(r);
 	}
 	
 	/**
@@ -305,63 +313,37 @@ public interface SSComponent extends RSC
 
 	/**
 	 * Setup additional focus transfer keys.
+	 * Typically invoke super if override.
 	 */
 	default void configureTraversalKeys()
 	{
 		SSCommon.configureTraversalKeys((JComponent)this);
 	}
 
-	/**
-	 * Retrieves the allowNull flag for the bound database column.
-	 *
-	 * @return true if bound database column can contain null values, otherwise
-	 *         returns false
-	 */
-	@Override
-	default boolean getAllowNull() {
-		return getSSCommon().getAllowNull();
-	}
+	//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+	//
+	// Read/Write column data
+	//
 
 	/**
-	 * Returns the index of the database column to which the SwingSet component is
-	 * bound.
-	 *
-	 * @return returns the index of the column to which the SwingSet component is
-	 *         bound
-	 */
-	@Override
-	default int getBoundColumnIndex() {
-		return getSSCommon().getBoundColumnIndex();
-	}
-
-	/**
-	 * Returns the JDBCType enum representing the bound database column data type.
+	 * Returns a String representation of the value in the bound database column.
 	 * <p>
-	 * Based on java.sql.JDBCType
+	 * If null, it will return an empty string.
 	 *
-	 * @return the enum value corresponding to the data type of the bound column
+	 * @return the database value as String to display in the SSComponent, may be from undo/redo stack.
 	 */
 	@Override
-	default JDBCType getBoundColumnJDBCType() {
-		return getSSCommon().getBoundColumnJDBCType();
+	default String getBoundColumnText() {
+		return getSSCommon().getBoundColumnText();
 	}
 
 	/**
-	 * Returns the database column name bound to the Swingset component
-	 *
-	 * @return the bound column name
-	 */
-	@Override
-	default String getBoundColumnName() {
-		return getSSCommon().getBoundColumnName();
-	}
-
-	/**
-	 * Returns an Object 
-	 * representing the value in the bound database column.
+	 * Returns the Object for the bound database column
+	 * as returned by {@link RowSet#getObject(int) }.
 	 * <p>
 	 * Note a null is never converted into ""; use getBoundColumnText for that.
-	 * @return value
+	 * @return the value to display in the SSComponent, may be from undo/redo stack.
 	 */
 	// TODO: put this in RSC?
 	default Object getBoundColumnObject() {
@@ -374,171 +356,7 @@ public interface SSComponent extends RSC
 		return getSSCommon().getBoundColumnObject(type);
 	}
 
-	/**
-	 * Returns a String representing the value in the bound database column.
-	 * <p>
-	 * If null, it will return an empty string.
-	 *
-	 * @return String containing the value in the bound database column
-	 */
-	@Override
-	default String getBoundColumnText() {
-		return getSSCommon().getBoundColumnText();
-	}
-
-	/**
-	 * Returns the integer code representing the bound database column data type.
-	 * <p>
-	 * Based on java.sql.Types
-	 *
-	 * @return the data type of the bound column
-	 */
-	// TODO: deprecate
-	default int getBoundColumnType() {
-		return getSSCommon().getBoundColumnType();
-	}
-
-	/**
-	 * Returns the bound column name in square brackets
-	 *
-	 * @return the bound column name in square brackets
-	 */
-	@Override
-	default String getColumnForLog() {
-		return getSSCommon().getColumnForLog();
-	}
-
-	/**
-	 * Returns the RowSet containing queried data from the database.
-	 *
-	 * @return the rowSet
-	 */
-	@Override
-	default RowSet getRowSet() {
-		return getSSCommon().getRowSet();
-	}
-
-	/**
-	 * Returns the RowSet containing queried data from the database.
-	 *
-	 * @return the rowSet
-	 */
-	@Override
-	default RowsModel getRowsModel() {
-		return getSSCommon().getRowsModel();
-	}
-
-	/**
-	 * Sets the allowNull flag for the bound database column.
-	 *
-	 * @param allowNull flag to indicate if the bound database column can be null
-	 */
-	default void setAllowNull(final boolean allowNull) {
-		getSSCommon().setAllowNull(allowNull);
-	}
-
-	/**
-	 * Updates the bound database column with the specified Array.
-	 * <p>
-	 * Used for SSList or other component where multiple items can be selected.
-	 *
-	 * @param boundColumnArray Array to write to bound database column
-	 * @throws SQLException thrown if there is a problem writing the array to the
-	 *                      RowSet
-	 */
-	default void setBoundColumnArray(final SSArray boundColumnArray) throws SQLException {
-		getSSCommon().setBoundColumnArray(boundColumnArray);
-	}
-
-	/**
-	 * Sets the database column name bound to the Swingset component
-	 *
-	 * @param boundColumnName the columnName to set
-	 * @deprecated Use bind()
-	 */
-	@Deprecated
-	default void setBoundColumnName(final String boundColumnName) {
-		getSSCommon().setBoundColumnName(boundColumnName);
-	}
-
-	/**
-	 * Set the text for log entries; only used if boundColumnName is null.
-	 * @param logColumnName show this in log entry if boundColumnName is null
-	 */
-	default void setLogColumnName(final String logColumnName) {
-		getSSCommon().setLogColumnName(logColumnName);
-	}
-
-	/**
-	 * Get the text for log entries; only used if boundColumnName is null.
-	 * @return text for log entries, null if never set
-	 */
-	default String getLogColumnName() {
-		return getSSCommon().getLogColumnName();
-	}
-
-	/**
-	 * Get the columnReader used by {@link #getColumn()} and internally
-	 * for capturing initial value.
-	 * This is useful for dealing with ColumnTypes that are are not
-	 * handled internally, like BLOB and VARBINARY. For exampe, see Image source code.
-	 * 
-	 * The {@code columnReader} is typically invoked like
-	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
-	 * The comp is rarely used, and provided for complex situations. The
-	 * columnReader return the value fetched from the datbase.
-	 * 
-	 * @return the DbReader used to fetch values from the database
-	 */
-	default DbReader<RowSet, Integer, SSComponent, ?> getColumnReader() {
-		return getSSCommon().getColumnReader();
-	}
-
-	/**
-	 * Set the columnReader used by {@link #getColumn()} and internally for capturing
-	 * initial value. This is useful for dealing with ColumnTypes that are are not
-	 * handled internally, like BLOB and VARBINARY. For exampe, see Image source code.
-	 * 
-	 * The {@code columnReader} is typically invoked like
-	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
-	 * The comp is rarely used, and provided for complex situations.
-	 * 
-	 * @param columnReader the DbReader used to fetch values from the database
-	 */
-	default void setColumnReader(DbReader<RowSet, Integer, SSComponent, ?> columnReader) {
-		getSSCommon().setColumnReader(columnReader);
-	}
-
-	/**
-	 * Get the columnWriter used by {@link #setColumn(Object)}.
-	 * This is useful for dealing with ColumnTypes that are are not
-	 * handled internally, like BLOB and VARBINARY. For exampe, see Image source code.
-	 * 
-	 * The {@code columnReader} is typically invoked like
-	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
-	 * The comp is rarely used, and provided for complex situations.
-	 * 
-	 * @return the DbWriter used to fetch values from the database
-	 */
-	default DbWriter<RowSet, Integer, SSComponent, Object> getColumnWriter() {
-		return getSSCommon().getColumnWriter();
-	}
-
-
-	/**
-	 * Set the columnWriter used by {@link #setColumn(Object)}.
-	 * This is useful for dealing with ColumnTypes that are are not
-	 * handled internally, like BLOB and VARBINARY. For exampe, see Image source code.
-	 * 
-	 * The {@code columnReader} is typically invoked like
-	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
-	 * The comp is rarely used, and provided for complex situations.
-	 * 
-	 * @param columnWriter the DbWriter used to fetch values from the database
-	 */
-	default void setColumnWriter(DbWriter<RowSet,Integer,SSComponent,Object> columnWriter) {
-		getSSCommon().setColumnWriter(columnWriter);
-	}
+	// TODO: get[Bound]ColumnArray
 
 	/**
 	 * Sets the value of the bound database column using the SSComponent's
@@ -554,24 +372,49 @@ public interface SSComponent extends RSC
 	}
 
 	/**
-	 * Sets the value of the bound database column using the SSComponent's
-	 * {@link DbWriter}. See {@link #getColumnWriter() }.
-	 * NPE if no columnWriter. Useful for dealing with JDBCTypes not handled
-	 * internally.
+	 * Get the columnReader used by {@link #getColumn()} and internally,
+	 * when not null, for capturing initial value for undo/redo.
+	 * This is useful for dealing with ColumnTypes that are are not
+	 * handled internally, like BLOB and VARBINARY.
+	 * For exampe, see {@link com.nqadmin.swingset.core.Image} source code.
 	 * 
-	 * @param value to write to the database, may write to the undo/redo stack.
+	 * The {@code columnReader} is typically invoked like
+	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
+	 * The comp is rarely used, and provided for complex situations. The
+	 * columnReader return the value fetched from the datbase.
+	 * 
+	 * @return the DbReader used to fetch values from the database
 	 */
-	default void setColumn(Object value) {
-		getSSCommon().setColumn(value);
+	default DbReader<RowSet, Integer, SSComponent, ?> getColumnReader() {
+		return getSSCommon().getColumnReader();
 	}
 
 	/**
-	 * Sets the value of the bound database column
-	 *
-	 * @param boundColumnObject the value to set in the bound database column
+	 * Set the columnReader used by {@link #getColumn()} and internally for capturing
+	 * initial value. This is useful for dealing with ColumnTypes that are are not
+	 * handled internally, like BLOB and VARBINARY.
+	 * For exampe, see {@link com.nqadmin.swingset.core.Image} source code.
+	 * 
+	 * The {@code columnReader} is typically invoked like
+	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
+	 * The comp is rarely used, and provided for complex situations.
+	 * 
+	 * @param columnReader the DbReader used to fetch values from the database
 	 */
-	default void setBoundColumnObject(final Object boundColumnObject) {
-		getSSCommon().setBoundColumnObject(boundColumnObject);
+	default void setColumnReader(DbReader<RowSet, Integer, SSComponent, ?> columnReader) {
+		getSSCommon().setColumnReader(columnReader);
+	}
+
+	/**
+	 * Used when making a change to the database.
+	 * Typically used by a component listener. It avoids extra RowSet events.
+	 * May bring up a dialog if there is no row to change.
+	 * @param r code that changes the database
+	 * @throws java.sql.SQLException
+	 */
+	default void dbChange(DbRunnable r) throws SQLException
+	{
+			getSSCommon().dbChange(r);
 	}
 
 	/**
@@ -584,10 +427,240 @@ public interface SSComponent extends RSC
 	}
 
 	/**
+	 * Sets the value of the bound database column
+	 *
+	 * @param boundColumnObject the value to set in the bound database column
+	 */
+	default void setBoundColumnObject(final Object boundColumnObject) {
+		getSSCommon().setBoundColumnObject(boundColumnObject);
+	}
+
+	/**
+	 * Updates the bound database column with the specified Array.
+	 * <p>
+	 * Used for SSList or other component where multiple items can be selected.
+	 * See {@link com.nqadmin.swingset.core.List1} and
+	 * {@link com.nqadmin.swingset.models.SSCollectionModel} for low level
+	 * details on how arrays are read and written.
+	 *
+	 * @param boundColumnArray Array to write to bound database column
+	 * @throws SQLException thrown if there is a problem writing the array to the
+	 *                      RowSet
+	 */
+	default void setBoundColumnArray(final SSArray boundColumnArray) throws SQLException {
+		getSSCommon().setBoundColumnArray(boundColumnArray);
+	}
+
+	/**
+	 * Sets the value of the bound database column using the SSComponent's
+	 * {@link DbWriter}. See {@link #getColumnWriter() }.
+	 * NPE if no columnWriter. Useful for dealing with JDBCTypes not handled
+	 * internally.
+	 * 
+	 * @param value to write to the database, may write to the undo/redo stack.
+	 */
+	default void setColumn(Object value) {
+		getSSCommon().setColumn(value);
+	}
+
+	/**
+	 * Get the columnWriter used by {@link #setColumn(Object)}.
+	 * This is useful for dealing with ColumnTypes that are are not
+	 * handled internally, like BLOB and VARBINARY.
+	 * For exampe, see {@link com.nqadmin.swingset.core.Image} source code.
+	 * 
+	 * The {@code columnReader} is typically invoked like
+	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
+	 * The comp is rarely used, and provided for complex situations.
+	 * 
+	 * @return the DbWriter used to fetch values from the database
+	 */
+	default DbWriter<RowSet, Integer, SSComponent, Object> getColumnWriter() {
+		return getSSCommon().getColumnWriter();
+	}
+
+	/**
+	 * Set the columnWriter used by {@link #setColumn(Object)}.
+	 * This is useful for dealing with ColumnTypes that are are not
+	 * handled internally, like BLOB and VARBINARY.
+	 * For exampe, see {@link com.nqadmin.swingset.core.Image} source code.
+	 * 
+	 * The {@code columnReader} is typically invoked like
+	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
+	 * The comp is rarely used, and provided for complex situations.
+	 * 
+	 * @param columnWriter the DbWriter used to fetch values from the database
+	 */
+	default void setColumnWriter(DbWriter<RowSet,Integer,SSComponent,Object> columnWriter) {
+		getSSCommon().setColumnWriter(columnWriter);
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+	//
+	// Column information, like index/name, some derived from metadata
+	//
+
+	/**
+	 * Retrieves the allowNull flag for the bound database column.
+	 * Initialized from RowSet metadata. May be overridden.
+	 *
+	 * @return true if bound database column can contain null values, otherwise
+	 *         returns false
+	 */
+	@Override
+	default boolean getAllowNull() {
+		return getSSCommon().getAllowNull();
+	}
+
+	/**
+	 * Sets the allowNull flag for the bound database column.
+	 * This overrides the RowSet metadata.
+	 * Set to null to go back to the database metadata.
+	 *
+	 * @param allowNull flag to indicate if the bound database column can be null
+	 */
+	default void setAllowNull(final boolean allowNull) {
+		getSSCommon().setAllowNull(allowNull);
+	}
+
+	/**
+	 * @return true if this component's value is different from what's in the database
+	 */
+	default boolean isDirty() {
+		return getRowsModel() != null && getRowsModel().isDirty(this);
+	}
+
+	/**
+	 * A component may have a display/parse format. Especially used in
+	 * conjunction with, but not limited to, {@linkplain SSFormattedTextField}.
+	 * @param format format for this component
+	 */
+	default void setSSFormat(SSFormat format) { getSSCommon().setSSFormat(format); }
+
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	default SSFormat getSSFormat() { return getSSCommon().getSSFormat(); }
+
+	/**
+	 * Returns the index of the database column to which the SwingSet component is
+	 * bound.
+	 *
+	 * @return returns the index of the column to which the SwingSet component is
+	 *         bound
+	 */
+	@Override
+	default int getBoundColumnIndex() {
+		return getSSCommon().getBoundColumnIndex();
+	}
+
+	/**
+	 * Returns the database column name bound to the Swingset component
+	 *
+	 * @return the bound column name
+	 */
+	@Override
+	default String getBoundColumnName() {
+		return getSSCommon().getBoundColumnName();
+	}
+
+	/**
+	 * Returns the JDBCType representing the bound database column data type.
+	 *
+	 * @return the enum value corresponding to the data type of the bound column
+	 */
+	@Override
+	default JDBCType getBoundColumnJDBCType() {
+		return getSSCommon().getBoundColumnJDBCType();
+	}
+
+	/**
+	 * Returns the integer code representing the bound database column data type.
+	 * <p>
+	 * Based on java.sql.Types
+	 *
+	 * @return the data type of the bound column
+	 * @deprecated use getBoundColumnJDBCType
+	 */
+	@Deprecated
+	default int getBoundColumnType() {
+		return getBoundColumnJDBCType().getVendorTypeNumber();
+	}
+
+	/**
+	 * Returns the bound column name in square brackets
+	 *
+	 * @return the bound column name in square brackets
+	 */
+	@Override
+	default String getColumnForLog() {
+		return getSSCommon().getColumnForLog();
+	}
+
+	/**
+	 * Get the backup text for log entries which is only used if boundColumnName is null.
+	 * 
+	 * @return text for log entries, null if never set
+	 */
+	default String getLogColumnName() {
+		return getSSCommon().getLogColumnName();
+	}
+
+	/**
+	 * Set the text for log entries which is only used if boundColumnName is null.
+	 * @param logColumnName show this in log entry if boundColumnName is null
+	 */
+	default void setLogColumnName(final String logColumnName) {
+		getSSCommon().setLogColumnName(logColumnName);
+	}
+
+	/**
+	 * Sets the database column name bound to the Swingset component
+	 *
+	 * @param boundColumnName the columnName to set
+	 * @deprecated Use bind()
+	 */
+	@Deprecated
+	default void setBoundColumnName(final String boundColumnName) {
+		getSSCommon().setBoundColumnName(boundColumnName);
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+	//
+	// General state, like around the RowSet.
+	//
+
+	/**
+	 * Returns the RowsModel, encapulating a RowSet, associated with this
+	 * components column.
+	 *
+	 * @return the rowsModel
+	 */
+	@Override
+	default RowsModel getRowsModel() {
+		return getSSCommon().getRowsModel();
+	}
+
+	/**
+	 * Returns the RowSet containing queried data from the database.
+	 *
+	 * @return the rowSet
+	 */
+	// TODO: deprecate in favor of RowsModel, it's widely used.
+	@Override
+	default RowSet getRowSet() {
+		return getSSCommon().getRowSet();
+	}
+
+	/**
 	 * Determine if there's a row that can be modified; dialog if not.
 	 * Typically used in an SSComponent's listener.
 	 * @return true if there's a row
 	 */
+	// TODO: move to Utils or SSUtils. Around hasActiveRow.
 	default boolean checkRowOK() {
 		return getSSCommon().checkRowOK();
 	}
@@ -604,6 +677,12 @@ public interface SSComponent extends RSC
 	default boolean checkRowOK(Supplier<Boolean> dialogOK) {
 		return getSSCommon().checkRowOK(dialogOK);
 	}
+
+	//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+	//
+	// Undo/Redo related
+	//
 
 	/**
 	 * Setup action bindings for undo/redo.
@@ -634,20 +713,8 @@ public interface SSComponent extends RSC
 		getSSCommon().undoRedoUpdateObject(cmd, change);
 	}
 
-	/**
-	 * A component may have a display/parse format. Especially used in
-	 * conjunction with, but not limited to, {@linkplain SSFormattedTextField}.
-	 * @param format format for this component
-	 */
-	default void setSSFormat(SSFormat format) { getSSCommon().setSSFormat(format); }
-
-	/**
-	 * {@inheritDoc }
-	 */
-	@Override
-	default SSFormat getSSFormat() { return getSSCommon().getSSFormat(); }
-
-	////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
 	//
 	// Validation/Decoration
 	//
@@ -673,14 +740,18 @@ public interface SSComponent extends RSC
 	}
 
 	/**
-	 * A low level indication of whether or not the component data is valid.
+	 * Override this to do a low level validation of whether or not the
+	 * component data is valid.
 	 * For example, a mask formatter indicates valid; generally simple
 	 * constraints that are context independent; e.g. {@literal month <= 12}.
 	 * There may be additional checks defined by {@link #componentValidate() }
-	 * and/or a {@link Validator}; those are not considered here.
-	 * This might be determined by stringToValue.
+	 * and/or a {@link Validator}, see
+	 * {@link #setValidator(Validator) }; those are check after baseValidate.
+	 * The default implementation returns true.
+	 * 
 	 * @return false for error in data, otherwise true
 	 */
+	 //{@link #setValidator(com.nqadmin.swingset.decorators.Validator) }; those are check after baseValidate.
 	default boolean baseValidate() { return true; }
 
 	/**
@@ -694,16 +765,19 @@ public interface SSComponent extends RSC
 	 * 
 	 * @param base result of baseValidate()
 	 * @param comp result of base and componentValidate()
-	 * @param all result of comp and pluginValidate()
+	 * @param other this component is the target of an error event,
+	 * see {@link RowsModel#hasError(SSComponent) }
+	 * @param all true if everything validated
 	 */
-	record validateResult(boolean base, boolean comp, boolean other, boolean all){}
+	record ValidationResult(boolean base, boolean comp, boolean other, boolean all){}
 
 	/**
-	 * Run the validators: baseValidate, componentValidate, pluginValidate.
+	 * Run the validators: baseValidate, componentValidate, pluginValidate;
+	 * and possibly check RowsModel.hasError().
 	 * The checks are done in order, they stop with any failure.
 	 * @return result
 	 */
-	default validateResult allValidate() {
+	default ValidationResult allValidate() {
 		boolean baseValid = baseValidate();
 		boolean compValid = baseValid && componentValidate();
 		boolean otherValid = compValid;
@@ -713,31 +787,20 @@ public interface SSComponent extends RSC
 				otherValid = !rowsModel.hasError(this);
 		}
 		boolean allValid = otherValid && getSSCommon().pluginValidate();
-		return new validateResult(baseValid, compValid, otherValid, allValid);
-	}
-
-	/**
-	 * @return true if this component is different from what's in the database
-	 */
-	default boolean isDirty() {
-		return getRowsModel() != null && getRowsModel().isDirty(this);
+		return new ValidationResult(baseValid, compValid, otherValid, allValid);
 	}
 
 	/**
 	 * Create and return the default {@link Decorator}
-	 * used during construction.
+	 * setup during construction. The default is generally good for
+	 * a single {@linkplain JComponent}, for example a {@linkplain com.nqadmin.swingset.SSTextField}.
+	 * When a visual component is made up of multiple components a custom
+	 * border may be required.
+	 * 
 	 * @return decorator
 	 */
 	default Decorator createDefaultDecorator() {
 		return SSCommon.createDefaultDecorator();
-	}
-
-	/**
-	 * Install the given decorator.
-	 * @param deco decorator to install
-	 */
-	default void setDecorator(Decorator deco) {
-		getSSCommon().setDecorator(deco);
 	}
 
 	/**
@@ -746,6 +809,14 @@ public interface SSComponent extends RSC
 	 */
 	default Decorator getDecorator() {
 		return getSSCommon().getDecorator();
+	}
+
+	/**
+	 * Install the given decorator.
+	 * @param deco decorator to install
+	 */
+	default void setDecorator(Decorator deco) {
+		getSSCommon().setDecorator(deco);
 	}
 
 	/**

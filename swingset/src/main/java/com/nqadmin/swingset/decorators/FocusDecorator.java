@@ -52,6 +52,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
 import com.nqadmin.swingset.utils.SSComponent;
+import com.nqadmin.swingset.utils.SSComponent.ValidationResult;
 
 /**
  * Base class for decorators that use Focus.
@@ -96,7 +97,7 @@ public abstract class FocusDecorator
 	 * @param valid
 	 * @return the component state
 	 */
-	public ComponentState getComponentState(SSComponent.validateResult valid) {
+	public ComponentState getComponentState(ValidationResult valid) {
 		ComponentState borderState;
 		if (valid.all()) {
 			borderState = getComponent().isDirty()

@@ -793,7 +793,8 @@ public class RowSetOps {
 	}
 
 	/**
-	 * Fetch the current raw value from the database; use columnReader if available.
+	 * Fetch the current raw value from the database, the undo/redo stack is
+	 * not referenced; use columnReader if available.
 	 * Initial capture for undo/redo uses this method.
 	 * 
 	 * @param rsc
