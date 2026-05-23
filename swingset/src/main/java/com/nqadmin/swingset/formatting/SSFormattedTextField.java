@@ -60,7 +60,11 @@ import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.DocumentFilter;
 import javax.swing.text.MaskFormatter;
 
 import com.nqadmin.swingset.datasources.RowSetOps;
@@ -81,7 +85,8 @@ import static java.lang.System.Logger.Level.*;
 // TODO: Remove extraneous decorate.
 
 /**
- * SSFormattedTextField extends the JFormattedTextField.This is the pivotal class for this package.
+ * SSFormattedTextField extends the JFormattedTextField.
+ * This is the pivotal class for this package.
  * It operates as a {@link SSComponent}.
  * It locks focus while data is invalid and updates the database while editing.
  *
@@ -259,37 +264,40 @@ public class SSFormattedTextField extends JFormattedTextField
 
 	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
+
+	// WE DON'T WANT TO REPLICATE THE JFormattedTextField CONSTRUCTOR THAT ACCEPTS
+	// AN OBJECT. FOR SWINGSET THAT SHOULD BE HANDLED SEPARATELY WITH BINDING.
 		
 	/** Creates a new instance of SSFormattedTextField */
 	public SSFormattedTextField() {
-		finishSSCommon();
+		// There is little reason to use this constructor,
+		// maybe if there's a custom validator, and verify locks focus.
+		// Provide this formatter so that modified visual state works.
+		this(new DecoratingFormatter());
 	}
-
+	
 	/**
 	 * Creates a new instance of SSFormattedTextField
 	 *
-	 * @param _formatter AbstractFormatter to use for formatting.
+	 * @param formatter AbstractFormatter to use for formatting.
 	 * 
 	 * TODO: Consider using this() to force all constructors through one method
 	 * so that any constructor customizations don't have to be duplicated. 
 	 */
-	public SSFormattedTextField(final AbstractFormatter _formatter) {
-		this(new DefaultFormatterFactory(_formatter));
+	public SSFormattedTextField(final AbstractFormatter formatter) {
+		this(new DefaultFormatterFactory(formatter));
 	}
 
 	/**
 	 * Creates a new instance of SSFormattedTextField
 	 *
-	 * @param _factory AbstractFormatterFactory used for formatting.
+	 * @param factory AbstractFormatterFactory used for formatting.
 	 */
 	@SuppressWarnings("OverridableMethodCallInConstructor")
-	public SSFormattedTextField(final AbstractFormatterFactory _factory) {
-		super(_factory);
+	public SSFormattedTextField(final AbstractFormatterFactory factory) {
+		super(factory);
 		finishSSCommon();
 	}
-
-	// WE DON'T WANT TO REPLICATE THE JFormattedTextField CONSTRUCTOR THAT ACCEPTS
-	// AN OBJECT. FOR SWINGSET THAT SHOULD BE HANDLED SEPARATELY WITH BINDING.
 
 	/**
 	 * Creates a new instance of SSFormattedTextField
@@ -297,8 +305,53 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * @param format Format used to look up an AbstractFormatter
 	 */
 	public SSFormattedTextField(SSFormat format) {
-		super(format);
-		finishSSCommon();
+		this(lookupAbstractFormatter(format));
+	}
+	private static AbstractFormatter lookupAbstractFormatter(@SuppressWarnings("unused") SSFormat format) {
+		// For this to work need a way to register/lookup AbstractFormatter
+		if (Boolean.TRUE)
+			throw new IllegalCallerException("Not implemented");
+		return null;
+	}
+
+	/**
+	 * Decorate after each text change.
+	 * This is only so that the no arg constructor acts as expected.
+	 * Any custom formatter is expected to decorate as needed.
+	 */
+	private static class DecoratingFormatter extends DefaultFormatter {
+		private SSFormattedTextField ftf;
+
+		@Override
+		public void install(JFormattedTextField ftf)
+		{
+			super.install(ftf);
+			this.ftf = ftf instanceof SSFormattedTextField comp ? comp : null;
+		}
+		
+		@Override
+		protected DocumentFilter getDocumentFilter()
+		{
+			return new DocumentFilter() {
+				@Override
+				public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException
+				{ super.replace(fb, offset, length, text, attrs); modified(); }
+
+				@Override
+				public void insertString(DocumentFilter.FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException
+				{ super.insertString(fb, offset, string, attr); modified(); }
+
+				@Override
+				public void remove(DocumentFilter.FilterBypass fb, int offset, int length) throws BadLocationException
+				{ super.remove(fb, offset, length); modified(); }
+
+				private void modified() {
+					if (ftf == null)
+						return;
+					Utils.postRowSetModified(ftf, ftf.getText());
+				}
+			};
+		}
 	}
 
 	/**

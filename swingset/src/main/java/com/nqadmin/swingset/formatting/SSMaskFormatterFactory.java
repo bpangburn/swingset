@@ -216,7 +216,7 @@ public class SSMaskFormatterFactory extends FormatterFactory
 			SSMaskFormatter mf = builder.getSSMaskFormatter();
 			setDefaultFormatter(mf);
 		} catch (ParseException ex) {
-			logger.log(ERROR, "Bad mask format: " + builder.mask);
+			logger.log(ERROR, () -> "Bad mask format: " + builder.mask);
 		}
 	}
 
