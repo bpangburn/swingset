@@ -77,6 +77,7 @@ import com.nqadmin.swingset.datasources.SSSQLInternalException;
 import com.nqadmin.swingset.datasources.SSSQLNullException;
 import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
+import com.nqadmin.swingset.decorators.DecoratorSupplier;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.formatting.SSFormat;
 import com.nqadmin.swingset.navigate.RowSetModificationEvent;
@@ -1295,8 +1296,20 @@ final class SSCommon
 	//
 
 	static Decorator createDefaultDecorator() {
+		CentralLookup lkup = CentralLookup.getDefault();
+		Decorator.DecoratorStyle style = lkup.lookup(Decorator.DecoratorStyle.class);
+		if (style == null) {
+			logger.log(Level.ERROR, "Lookup of default DecoratorStyle returns null");
+			style = Decorator.DecoratorStyle.BORDER;
+		}
+
+		var decos = lkup.lookupAll(DecoratorSupplier.class);
+		for (var deco : decos) {
+			if (deco.getStyle().equals(style))
+				return deco.get();
+		}
+		logger.log(Level.ERROR, sf("Style '%s' not found in lookup", style));
 		return new BorderDecorator();
-		//return new BackgroundDecorator();
 	}
 
 	/**

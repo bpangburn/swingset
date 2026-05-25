@@ -38,6 +38,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.nqadmin.swingset.mock.Util;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -55,6 +57,7 @@ public class NumberFieldTest
 	@BeforeAll
 	public static void setUpClass()
 	{
+		Util.initLookup();
 	}
 	
 	/** x */

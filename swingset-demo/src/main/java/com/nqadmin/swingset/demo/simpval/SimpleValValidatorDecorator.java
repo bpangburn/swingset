@@ -35,22 +35,66 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
+package com.nqadmin.swingset.demo.simpval;
 
-package com.nqadmin.swingset.decorators;
+import com.nqadmin.swingset.decorators.Decorator;
+import com.nqadmin.swingset.decorators.Validator;
+import com.nqadmin.swingset.utils.SSComponent;
 
 /**
- * Optional decorate interface to change text style.
+ * A combined validator/decorator using the Simple Validation framework.
  */
-public interface TextDecorator
+public class SimpleValValidatorDecorator implements Decorator
 {
+	private final SSTextComponentValidationItem valItem;
+	/** decorator name */
+	public static final Decorator.DecoratorStyle decoratorStyle = new Decorator.DecoratorStyle("SimpleValidatorDecorator");
+
+	public SimpleValValidatorDecorator(SSTextComponentValidationItem valItem) {
+		this.valItem = valItem;
+		this.validator = () -> valItem.validate();
+	}
+
+	@Override
+	public boolean decorate() {
+		valItem.performValidation();
+		return !valItem.hasFatalProblem();
+	}
+
+	@Override
+	public void install(SSComponent component) {
+		// No listeners to install
+	}
+
+	@Override
+	public void uninstall() {
+	}
+
+	// TODO: this does decoration as well. Does SwingSet need a split architecture?
+	private final Validator validator;
 
 	/**
-	 * Modify the text according to style; commonly modifies text color.
-	 * Signature of {@literal "enum<?>"} is so plugin authors can override and
-	 * define their own styles.
-	 * @param _style why the text is decorated
-	 * @param <E> any enum can be used
+	 * Get the SwingSet validator.
+	 * TODO: Note that this does decoration as well.
+	 * @return 
 	 */
-	<E extends Enum<E>> void decorateText(E _style);
-    
+	public Validator getValidator() {
+		return validator;
+	}
+
+	/**
+	 * SimpleValidatorDecorator style
+	 * @return
+	 */
+	@Override
+	public Decorator.DecoratorStyle getStyle()
+	{
+		return decoratorStyle;
+	}
+	
 }

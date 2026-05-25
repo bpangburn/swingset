@@ -14,6 +14,14 @@ setColumn()/getColumn() allow to pass in reader/writer?
 
 ================================================================================
 
+Have a public method somewhere to fill in missing things in lookup;
+log warning/error for missing items.
+Best if this is called automatically. Maybe scatter static { initLookup(); }
+in several classes that have to be loaded before you can really do anything
+with SS. SSCommon, RowsModel.
+
+================================================================================
+
 Why maintain currentRow and rowCount in navigateState? How much perf gain?
 Use a method to access, simplifies flipping.
 

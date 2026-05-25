@@ -1,6 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
- * All rights reserved.
+ * Copyright (C) 2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,57 +26,34 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- * Contributors:
- *   Prasanth R. Pasala
- *   Brian E. Pangburn
- *   Diego Gil
- *   Man "Bee" Vo
- *   Ernie R. Rael
  * ****************************************************************************/
-package com.nqadmin.swingset.demo.simpval;
+package com.nqadmin.swingset.mock;
 
+import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
+import com.nqadmin.swingset.datasources.SSDBSupport;
+import com.nqadmin.swingset.decorators.BackgroundDecorator;
+import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
-import com.nqadmin.swingset.decorators.Validator;
-import com.nqadmin.swingset.utils.SSComponent;
+import com.nqadmin.swingset.decorators.DecoratorSupplier;
+import com.nqadmin.swingset.utils.CentralLookup;
 
 /**
- * A combined validator/decorator using the Simple Validation framework.
+ * x
  */
-public class SimpValValidatorDecorator implements Decorator
+public class Util
 {
-	private final SSTextComponentValidationItem valItem;
-
-	public SimpValValidatorDecorator(SSTextComponentValidationItem valItem) {
-		this.valItem = valItem;
-		this.validator = () -> valItem.validate();
-	}
-
-	@Override
-	public boolean decorate() {
-		valItem.performValidation();
-		return !valItem.hasFatalProblem();
-	}
-
-	@Override
-	public void install(SSComponent component) {
-		// No listeners to install
-	}
-
-	@Override
-	public void uninstall() {
-	}
-
-	// TODO: this does decoration as well. Does SwingSet need a split architecture?
-	private final Validator validator;
-
 	/**
-	 * Get the SwingSet validator.
-	 * TODO: Note that this does decoration as well.
-	 * @return 
+	 * x
 	 */
-	public Validator getValidator() {
-		return validator;
+	public static void initLookup() {
+		CentralLookup lkup = CentralLookup.getDefault();
+		lkup.replace(SSDBSupport.class, new DefaultSSDBSupport());
+		lkup.add(Decorator.DecoratorStyle.BORDER);
+		lkup.add(new DecoratorSupplier(() -> {return new BorderDecorator();}));
+		lkup.add(new DecoratorSupplier(() -> {return new BackgroundDecorator();}));
 	}
-	
+
+	private Util()
+	{
+	}
 }

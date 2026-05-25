@@ -148,7 +148,9 @@ public abstract class FocusDecorator
 	}
 
 	/**
-	 * Based on JComponent type, determine Component that gets focus.
+	 * Return the Component that gets focus when the associated SSComponent
+	 * is focused.
+	 * 
 	 * @return focus target
 	 */
 	// TODO: fcomp() - maybe just return jc() and dynamically override
@@ -159,10 +161,8 @@ public abstract class FocusDecorator
 				: ((JComboBox)jc()).getEditor().getEditorComponent();
 	}
 
-	/** {@inheritDoc}
-	 * Put here for convenience; Signature of {@literal "enum<?>"} is so plugin authors
-	 * can override and define their own styles.
-	 * Change the color of the text according * to _style.
+	/**
+	 * Set the color of the text/foreground according to _style.
 	 */
 	@Override
 	public <E extends Enum<E>> void decorateText(E _style) {
@@ -179,7 +179,8 @@ public abstract class FocusDecorator
 	}
 
 	/**
-	 * Return the component associated with this validator
+	 * Return the SSComponent associated with this decorator.
+	 * 
 	 * @return the component
 	 */
 	public SSComponent getComponent() {
@@ -187,8 +188,10 @@ public abstract class FocusDecorator
 	}
 
 	/**
-	 * Return the SSComponent as a JComponent.
-	 * @return the SSComponent
+	 * Return the JComponent that gets decorated.
+	 * It may not be the same as whats returned by {@link #getComponent() }.
+	 * 
+	 * @return the JComponent
 	 */
 	protected JComponent jc() {
 		return (JComponent) component;

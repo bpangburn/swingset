@@ -95,7 +95,7 @@ public class SVUtils {
 		SSComponent comp = (SSComponent) jtc;
 		SSTextComponentValidationItem textVali = SVUtils.createDefaultTextValidator(
 				jtc, sval);
-		SimpValValidatorDecorator deco = new SimpValValidatorDecorator(textVali);
+		SimpleValValidatorDecorator deco = new SimpleValValidatorDecorator(textVali);
 		comp.setDecorator(deco);
 		comp.setValidator(deco.getValidator());
 		return textVali;

@@ -75,7 +75,6 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import com.nqadmin.swingset.decorators.AlternateBorderDecorator;
-import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponent;
@@ -244,10 +243,7 @@ public class Image extends JPanel implements SSComponent
 	 */
 	@Override
 	public Decorator createDefaultDecorator() {
-		Decorator decorator = SSComponent.super.createDefaultDecorator();
-		if (!(decorator instanceof BorderDecorator))
-			return decorator;
-
+		// Decorator.DecoratorStyle style = def.lookup(Decorator.DecoratorStyle.class);
 		return new AlternateBorderDecorator(btnUpdateImage);
 	}
 

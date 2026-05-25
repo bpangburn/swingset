@@ -48,13 +48,11 @@ import org.junit.jupiter.api.Test;
 
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.core.TextField;
-import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
-import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.TestLogging;
 import com.nqadmin.swingset.mock.TinyRS;
+import com.nqadmin.swingset.mock.Util;
 import com.nqadmin.swingset.navigate.EQ.BusReceiver;
-import com.nqadmin.swingset.utils.CentralLookup;
 import com.raelity.lib.eventbus.WeakEventBus;
 
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
@@ -79,7 +77,7 @@ public class RowsModelTest
 	{
 		isJunit();	// Make sure it's set; when using invokeLater, can be missed.
 		TestLogging.load();
-		CentralLookup.getDefault().replace(SSDBSupport.class, new DefaultSSDBSupport());
+		Util.initLookup();
 	}
 	
 	/** x */

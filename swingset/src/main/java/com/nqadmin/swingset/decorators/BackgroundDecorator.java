@@ -111,5 +111,14 @@ public class BackgroundDecorator extends FocusDecorator
 	public void setFocusBackgroundColor(final Color _focusBackgroundColor) {
 		focusBackgroundColor = _focusBackgroundColor;
 	}
+
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public DecoratorStyle getStyle()
+	{
+		return DecoratorStyle.BACKGROUND;
+	}
     
 }

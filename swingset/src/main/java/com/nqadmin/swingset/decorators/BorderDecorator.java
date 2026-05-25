@@ -409,5 +409,14 @@ public class BorderDecorator extends FocusDecorator
 	public static String asString(Insets i) {
 		return String.format("[%d,%d,%d,%d]", i.top, i.left, i.bottom, i.right);
 	}
+
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public DecoratorStyle getStyle()
+	{
+		return DecoratorStyle.BORDER;
+	}
     
 }

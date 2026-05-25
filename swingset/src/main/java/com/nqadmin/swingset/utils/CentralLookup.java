@@ -58,9 +58,9 @@ InstanceContent
      * @param instance add this
      */
     public <T> void replace(Class<T> clazz, T instance) {
-        for(T o : this.lookupAll(clazz)) {
-            remove(o);
-        }
+		lookupAll(clazz).forEach(
+				o -> remove(o)
+		);
         add(instance);
     }
     /**

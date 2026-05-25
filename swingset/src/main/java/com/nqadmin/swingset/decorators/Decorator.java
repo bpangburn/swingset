@@ -53,6 +53,35 @@ import com.nqadmin.swingset.utils.SSComponent;
  */
 public interface Decorator
 {
+
+	/**
+	 * Decorator style.
+	 */
+	public static class DecoratorStyle {
+		private final String style;
+		// Well known border styles
+		/** BorderDecorator */
+		public static DecoratorStyle BORDER = new DecoratorStyle("BORDER");
+		/** BackgroundDecorator */
+		public static DecoratorStyle BACKGROUND = new DecoratorStyle("BACKGROUND");
+		/** no decoration */
+		public static DecoratorStyle NONE = new DecoratorStyle("NONE");
+
+		/** create named decorator style
+		 * @param style arbitrary string */
+		public DecoratorStyle(String style)
+		{
+			this.style = style;
+		}
+
+		/** {@inheritDoc } */
+		@Override
+		public String toString()
+		{
+			return "DecoratorStyle{" + "style=" + style + '}';
+		}
+	}
+
 	/** Decorate the component using current state.
 	 * The current state is typically obtained by getComponent().isDataValid()
 	 * @return true if the data is valid
@@ -73,6 +102,11 @@ public interface Decorator
 
 	/** Remove decorator/listeners from component. */
 	void uninstall();
+
+	/** This border's style, 
+	 * 
+	 * @return  decorator style */
+	DecoratorStyle getStyle();
     
 	/**
 	 * A decorator that does nothing.
@@ -86,5 +120,8 @@ public interface Decorator
 
 		/** {@inheritDoc} */
 		@Override public void uninstall() { }
+
+		/** {@inheritDoc} */
+		@Override public DecoratorStyle getStyle() { return DecoratorStyle.NONE; }
 	};
 }

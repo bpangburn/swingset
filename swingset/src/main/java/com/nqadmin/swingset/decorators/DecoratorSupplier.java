@@ -1,6 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
- * All rights reserved.
+ * Copyright (C) 2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,30 +26,49 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- * Contributors:
- *   Prasanth R. Pasala
- *   Brian E. Pangburn
- *   Diego Gil
- *   Man "Bee" Vo
- *   Ernie R. Rael
  * ****************************************************************************/
-
 package com.nqadmin.swingset.decorators;
 
+import java.util.function.Supplier;
+
 /**
- * Optional decorate interface to change text style.
+ * Like a factory for Decorator.
  */
-public interface TextDecorator
+public class DecoratorSupplier
 {
+	private final Supplier<Decorator> supplier;
+	private final Decorator.DecoratorStyle style;
+
+	/** create a decorator supplier
+	 * @param supplier */
+	public DecoratorSupplier(Supplier<Decorator> supplier)
+	{
+		this(supplier, supplier.get().getStyle());
+	}
+
+	/** create a decorator supplier
+	 * @param supplier
+	 * @param style
+	 */
+	public DecoratorSupplier(Supplier<Decorator> supplier, Decorator.DecoratorStyle style)
+	{
+		this.supplier = supplier;
+		this.style = style;
+	}
+	
+	/**
+	 * Create and return a decorator.
+	 * @return decorator
+	 */
+	public Decorator get() {
+		return supplier.get();
+	}
 
 	/**
-	 * Modify the text according to style; commonly modifies text color.
-	 * Signature of {@literal "enum<?>"} is so plugin authors can override and
-	 * define their own styles.
-	 * @param _style why the text is decorated
-	 * @param <E> any enum can be used
+	 * Decorator style.
+	 * @return decorator style
 	 */
-	<E extends Enum<E>> void decorateText(E _style);
-    
+	public Decorator.DecoratorStyle getStyle() {
+		return style;
+	}
 }

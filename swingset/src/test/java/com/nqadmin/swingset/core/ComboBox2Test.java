@@ -39,6 +39,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.nqadmin.swingset.mock.Util;
 import com.nqadmin.swingset.models.KeyDisplayValueSwingModel;
 
 import static com.nqadmin.swingset.models.KeyDisplayValueSwingModel.asKeyDisplayValueSwingModel;
@@ -59,6 +60,7 @@ public class ComboBox2Test
 	@BeforeAll
 	public static void setUpClass()
 	{
+		Util.initLookup();
 	}
 	
 	/** x */

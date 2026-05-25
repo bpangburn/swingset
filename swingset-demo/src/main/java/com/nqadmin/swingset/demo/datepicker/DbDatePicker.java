@@ -28,7 +28,6 @@ import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.nqadmin.swingset.decorators.AlternateBorderDecorator;
-import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponent;
@@ -127,10 +126,7 @@ public class DbDatePicker extends DatePicker implements SSComponent
 	 */
 	@Override
 	public Decorator createDefaultDecorator() {
-		Decorator decorator = SSComponent.super.createDefaultDecorator();
-		if (!(decorator instanceof BorderDecorator))
-			return decorator;
-
+		// Decorator.DecoratorStyle style = def.lookup(Decorator.DecoratorStyle.class);
 		return new AlternateBorderDecorator(getComponentDateTextField());
 	}
 

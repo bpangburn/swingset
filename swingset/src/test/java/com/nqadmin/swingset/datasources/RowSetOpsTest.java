@@ -51,8 +51,8 @@ import org.junit.jupiter.api.Test;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.TestLogging;
+import com.nqadmin.swingset.mock.Util;
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSComponent;
 
 import static com.nqadmin.swingset.utils.SSUtils.getLoggerName;
@@ -78,7 +78,7 @@ public class RowSetOpsTest
 	{
 		isJunit();	// Make sure it's set; when using invokeLater, can be missed.
 		TestLogging.load();
-		CentralLookup.getDefault().replace(SSDBSupport.class, new DefaultSSDBSupport());
+		Util.initLookup();
 	}
 	
 	/** x */
