@@ -64,9 +64,9 @@ public abstract class FocusDecorator
 	// TODO: may want to treat as bit field for: error/focus/warning/dirty
 	public enum ComponentState {
 		/** not focused, no error, not modified */
-		OK, // TODO: This is actually OK
+		CLEAN,
 		/** focus gained, no error, not modified */
-		FOCUSED_OK,
+		FOCUSED_CLEAN,
 		/** modified without focus */
 		MODIFIED,
 		/** modified with focus */
@@ -77,7 +77,7 @@ public abstract class FocusDecorator
 		FOCUSED_ERROR;
 
 		boolean isFocused() {
-			return this == FOCUSED_OK || this == FOCUSED_MODIFIED
+			return this == FOCUSED_CLEAN || this == FOCUSED_MODIFIED
 					|| this == FOCUSED_ERROR;
 		}
 
@@ -102,12 +102,14 @@ public abstract class FocusDecorator
 		if (valid.all()) {
 			borderState = getComponent().isDirty()
 					? ComponentState.MODIFIED
-					: ComponentState.OK;
+					: ComponentState.CLEAN;
 		} else
 			borderState = ComponentState.ERROR;
 		if (fcomp().isFocusOwner()) {
 			borderState = switch(borderState) {
-			case OK -> ComponentState.FOCUSED_OK;
+			case CLEAN -> ComponentState.FOCUSED_CLEAN;
+
+
 			case MODIFIED -> ComponentState.FOCUSED_MODIFIED;
 			case ERROR -> ComponentState.FOCUSED_ERROR;
 			default -> throw new IllegalStateException("Unexpected value: " + (borderState));

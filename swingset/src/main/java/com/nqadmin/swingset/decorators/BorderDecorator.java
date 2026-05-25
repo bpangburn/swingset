@@ -47,6 +47,7 @@ package com.nqadmin.swingset.decorators;
 import java.awt.Color;
 import java.awt.Insets;
 import java.lang.System.Logger;
+import java.util.Collection;
 import java.util.Objects;
 
 import javax.swing.BorderFactory;
@@ -54,6 +55,10 @@ import javax.swing.JComponent;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
+import org.openide.util.Lookup;
+import org.openide.util.LookupEvent;
+
+import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSComponent.ValidationResult;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -75,6 +80,73 @@ public class BorderDecorator extends FocusDecorator
 	/** Typically the border that the component started with;
 	 * not focus, no error. */
 	protected Border defaultBorder;
+
+	// ???: allow each border instance to have it's own painter
+	private static BorderDecoratorPaint bdp;
+	// Keep Lookup.Result to allow dynamic changes.
+	private static Lookup.Result<BorderDecoratorPaint> bdpResult;
+
+	/**
+	 * @return the object from lookup.
+	 */
+	protected static BorderDecoratorPaint getBorderDecoratorPaint()
+	{
+		if (bdp == null) {
+			bdpResult = CentralLookup.getDefault().lookupResult(BorderDecoratorPaint.class);
+			bdpResult.addLookupListener((LookupEvent le) -> {
+				// could assert le.getSource == bdpResult
+				Collection<? extends BorderDecoratorPaint> c = bdpResult.allInstances();
+				if (!c.isEmpty()) {
+					BorderDecoratorPaint next = c.iterator().next();
+					bdp = next;
+				}
+			});
+			Collection<? extends BorderDecoratorPaint> c = bdpResult.allInstances();
+			if (c.isEmpty())
+				throw new IllegalStateException("BorderDecoratorPaint not found");
+			bdp = c.iterator().next();
+		}
+		return bdp;
+	}
+
+	/**
+	 * Creates a Border that provides the visual state information for a
+	 * BorderDecorator. Typically one line wide, colored and possibly dashed.
+	 * <p>
+	 * One of these is typically in default CentralLookup.
+	 */
+	public static class BorderDecoratorPaint {
+		/**
+		 * Determine color for specified BorderState; null return means
+		 * use the defaultBorder.
+		 * @param state
+		 * @return
+		 */
+		public Color getBorderColor(ComponentState state)
+		{
+			return switch(state) {
+			case CLEAN -> null;
+			case FOCUSED_CLEAN -> Color.GREEN;
+			case MODIFIED, FOCUSED_MODIFIED  -> Color.ORANGE;
+			case ERROR, FOCUSED_ERROR -> Color.RED;
+			};
+		}
+		
+		/**
+		 * Determine border for specified ComponentState; typically a
+		 * solid or dashed border.
+		 * @param state
+		 * @return Border
+		 */
+		public Border getDecoratingBorder(ComponentState state)
+		{
+			Color color = getBorderColor(state);
+			Border decoratingBorder = state.isFocused() && state != ComponentState.FOCUSED_CLEAN
+					? BorderFactory.createDashedBorder(color, 13, 7)
+					: BorderFactory.createLineBorder(color);
+			return decoratingBorder;
+		}
+	}
 
 	/** Decorate the component using current state. */
 	@Override
@@ -112,7 +184,7 @@ public class BorderDecorator extends FocusDecorator
 	 * @return 
 	 */
 	protected Border getBorder(ComponentState state) {
-		if (state == ComponentState.OK)
+		if (state == ComponentState.CLEAN)
 			return defaultBorder;
 		logger.log(TRACE, () -> String.format("%s %s",
 				state, asString(jc().getInsets())));
@@ -166,19 +238,14 @@ public class BorderDecorator extends FocusDecorator
 	}
 
 	/**
-	 * Determine color for specified BorderState; null return means
-	 * use the defaultBorder.
+	 * Return a Border that displays the specified state.
+	 * See {@link BorderDecoratorPaint}.
 	 * @param state
 	 * @return
 	 */
-	protected static Color getBorderColor(ComponentState state)
+	public static Border getDecoratingBorder(ComponentState state)
 	{
-		return switch(state) {
-		case OK -> null;
-		case FOCUSED_OK -> Color.GREEN;
-		case MODIFIED,FOCUSED_MODIFIED  -> Color.ORANGE;
-		case ERROR,FOCUSED_ERROR -> Color.RED;
-		};
+		return getBorderDecoratorPaint().getDecoratingBorder(state);
 	}
 
 	/**
@@ -226,11 +293,6 @@ public class BorderDecorator extends FocusDecorator
 	//        [_______][_______]
 	//
 
-	private static Border dashed(Color color)
-	{
-		return BorderFactory.createDashedBorder(color, 13, 7); // TODO: plugin numbers?
-	}
-
 	/**
 	 * Create a simple compound border with size specified by param i,
 	 * and a line on the inside of the param color.
@@ -243,12 +305,9 @@ public class BorderDecorator extends FocusDecorator
 	 */
 	public static Border empty_line(Insets i, ComponentState state)
 	{
-		if (state == ComponentState.OK)
+		if (state == ComponentState.CLEAN)
 			throw new IllegalArgumentException();
-		Color color = getBorderColor(state);
-		Border decoratingBorder = state.isFocused() && state != ComponentState.FOCUSED_OK
-				? dashed(color)
-				: BorderFactory.createLineBorder(color);
+		Border decoratingBorder = getDecoratingBorder(state);
 		Border b = BorderFactory.createCompoundBorder(
 				BorderFactory.createEmptyBorder(Math.max(0, i.top - 1),
 						Math.max(0, i.left - 1),
@@ -328,10 +387,7 @@ public class BorderDecorator extends FocusDecorator
 		Objects.requireNonNull(state);
 		//Insets inside = cb.getInsideBorder().getBorderInsets(jc());
 		//Insets outside = cb.getOutsideBorder().getBorderInsets(jc());
-		Color color = getBorderColor(state);
-		Border decoratingBorder = state.isFocused() && state != ComponentState.FOCUSED_OK
-				? dashed(color)
-				: BorderFactory.createLineBorder(color);
+		Border decoratingBorder = getDecoratingBorder(state);
 		Border b = BorderFactory.createCompoundBorder(
 				BorderFactory.createCompoundBorder(
 						BorderFactory.createEmptyBorder(
@@ -366,10 +422,7 @@ public class BorderDecorator extends FocusDecorator
 		Objects.requireNonNull(state);
 		//Insets inside = cb.getInsideBorder().getBorderInsets(jc());
 		//Insets outside = cb.getOutsideBorder().getBorderInsets(jc());
-		Color color = getBorderColor(state);
-		Border decoratingBorder = state.isFocused() && state != ComponentState.FOCUSED_OK
-				? dashed(color)
-				: BorderFactory.createLineBorder(color);
+		Border decoratingBorder = getDecoratingBorder(state);
 		Border b = BorderFactory.createCompoundBorder(
 				BorderFactory.createCompoundBorder(
 						decoratingBorder,

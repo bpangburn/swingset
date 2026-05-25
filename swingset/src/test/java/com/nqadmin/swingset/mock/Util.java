@@ -31,10 +31,6 @@ package com.nqadmin.swingset.mock;
 
 import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
 import com.nqadmin.swingset.datasources.SSDBSupport;
-import com.nqadmin.swingset.decorators.BackgroundDecorator;
-import com.nqadmin.swingset.decorators.BorderDecorator;
-import com.nqadmin.swingset.decorators.Decorator;
-import com.nqadmin.swingset.decorators.DecoratorSupplier;
 import com.nqadmin.swingset.utils.CentralLookup;
 
 /**
@@ -48,9 +44,6 @@ public class Util
 	public static void initLookup() {
 		CentralLookup lkup = CentralLookup.getDefault();
 		lkup.replace(SSDBSupport.class, new DefaultSSDBSupport());
-		lkup.add(Decorator.DecoratorStyle.BORDER);
-		lkup.add(new DecoratorSupplier(() -> {return new BorderDecorator();}));
-		lkup.add(new DecoratorSupplier(() -> {return new BackgroundDecorator();}));
 	}
 
 	private Util()

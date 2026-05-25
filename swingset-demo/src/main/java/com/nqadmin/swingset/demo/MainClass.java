@@ -76,6 +76,7 @@ import javax.sql.rowset.spi.SyncFactoryException;
 import javax.sql.rowset.spi.SyncProvider;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
@@ -83,13 +84,8 @@ import javax.swing.SwingUtilities;
 
 import org.h2.tools.RunScript;
 
-import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
 import com.nqadmin.swingset.datasources.RowSetOps.ForceConflict;
-import com.nqadmin.swingset.decorators.BackgroundDecorator;
-import com.nqadmin.swingset.decorators.BorderDecorator;
-import com.nqadmin.swingset.decorators.Decorator;
-import com.nqadmin.swingset.decorators.DecoratorSupplier;
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSMysqlSetModel;
 import com.nqadmin.swingset.navigate.Utils;
@@ -133,11 +129,6 @@ public class MainClass extends JFrame
 	private static final Map<String, Object> globalHints = new HashMap<>();
 
 	static {
-		CentralLookup lkup = CentralLookup.getDefault();
-		lkup.replace(Decorator.DecoratorStyle.class, Decorator.DecoratorStyle.BORDER);
-		lkup.add(new DecoratorSupplier(() -> {return new BorderDecorator();}));
-		lkup.add(new DecoratorSupplier(() -> {return new BackgroundDecorator();}));
-
 		if(Boolean.FALSE) {
 			// Get rid of unused warnings
 			Objects.nonNull(new SSUtils.DebugRowSetListenerFlag());
@@ -233,23 +224,28 @@ public class MainClass extends JFrame
 		}
 	}
 
+	// Use a plain combobox to avoid using SS in main demo menu window
+	//private class ComboRowSetSource extends SSComboBox {
 	@SuppressWarnings("serial")
-	private class ComboRowSetSource extends SSComboBox {
+	private final class ComboRowSetSource extends JComboBox<DemoUtil.RowSetSource> {
 		Popup popup;
 
 		public ComboRowSetSource() {
-			super(ModelType.SWING);
+			//super(ModelType.SWING);
+			super(DemoUtil.RowSetSource.values());
 			setMaximumSize(new Dimension(210, 25));
-			setAllowNull(false);
+			//setAllowNull(false);
 			DemoUtil.RowSetSource rsSource = DemoUtil.getWhichRowSetDefault();
-			setDisplayValues(DemoUtil.RowSetSource.class);
-			setChosenEnum(rsSource);
+			//setDisplayValues(DemoUtil.RowSetSource.class);
+			//setChosenEnum(rsSource);
+			setSelectedItem(rsSource);
 			btnRowSetSource.setText("RowSet: " + rsSource.toString());
 		}
 
-		@Override
+		//@Override
 		public DemoUtil.RowSetSource getChosenEnum() {
-			return (DemoUtil.RowSetSource) super.getChosenEnum();
+			// return (DemoUtil.RowSetSource) super.getChosenEnum();
+			return (DemoUtil.RowSetSource) getSelectedItem();
 		}
 
 		@Override

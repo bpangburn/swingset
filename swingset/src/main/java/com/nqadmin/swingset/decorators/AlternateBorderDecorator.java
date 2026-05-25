@@ -29,7 +29,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.decorators;
 
-import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JComponent;
@@ -79,8 +78,7 @@ public class AlternateBorderDecorator extends BorderDecorator
 	{
 		// The default border when just running the demo is
 		// the CompoundBorder: [[3,3,3,3],[2,14,2,14]].
-		Color color = getBorderColor(state);
-		if (color == null)
+		if (state == ComponentState.CLEAN)
 			return defaultBorder;
 		
 		if (jc().getBorder() instanceof CompoundBorder cb) {

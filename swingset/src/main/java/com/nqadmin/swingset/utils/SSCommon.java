@@ -125,7 +125,7 @@ import static java.lang.System.Logger.Level.*;
  */
 final class SSCommon
 {
-
+	static { LookupDefaults.init(); }
 	/**
 	 * Constructor that has a flag to only "half" initialize; typically half
 	 * initialization is done iff SSCommon is needed before the constructor finishes.

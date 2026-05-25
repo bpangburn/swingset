@@ -62,6 +62,7 @@ import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.RowsEventSource;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.SimpleEvents;
+import com.nqadmin.swingset.utils.LookupDefaults;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -99,6 +100,7 @@ import static java.lang.System.Logger.Level.*;
 //
 public class RowsModel
 {
+	static { LookupDefaults.init(); }
 	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
 
