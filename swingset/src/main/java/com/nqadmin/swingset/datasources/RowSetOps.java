@@ -855,6 +855,31 @@ public class RowSetOps {
 		}
 	}
 
+	// /**
+	//  * Update the RowSet using {@code columnWriter}. ColumnWriter is
+	//  * expected to do a rowSet.update*.
+	//  * 
+	//  * @param comp
+	//  * @param value
+	//  * @param columnWriter
+	//  * @throws SQLException
+	//  */
+	// public static void updateColumn(SSComponent comp, Object value,
+	// 		DbWriter<RowSet, Integer, SSComponent, Object> columnWriter)
+	// 		throws SQLException
+	// {
+	// 	UndoRedo.captureInitialValue(comp);
+
+	// 	boolean did_update = false;
+	// 	try {
+	// 		SSDBSupport.runDbWriter(comp, value, columnWriter);
+	// 		did_update = true;
+	// 	} finally {
+	// 		if (did_update)
+	// 			postRowSetModified(comp, value);
+	// 	}
+	// }
+
 	/**
 	 * Method used by SwingSet component listeners to update the underlying
 	 * RowSet.
@@ -981,8 +1006,9 @@ public class RowSetOps {
 	}
 
 	/**
-	 * Method used by SwingSet component listeners to update the underlying
-	 * RowSet.
+	 * The String updatedValue is converted to an object and
+	 * {@link RowSet#updateObject(int, java.lang.Object) }
+	 * or {@link RowSet#updateNull(int) } is used.
 	 * <p>
 	 * When the user changes/edits the SwingSet column this method propagates the
 	 * change to the RowSet. A separate call is required to flush/commit the change

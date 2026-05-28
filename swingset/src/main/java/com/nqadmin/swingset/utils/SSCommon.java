@@ -46,6 +46,7 @@ import java.awt.AWTKeyStroke;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.lang.StackWalker.StackFrame;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.sql.JDBCType;
@@ -69,9 +70,10 @@ import javax.swing.KeyStroke;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.datasources.ConvertType;
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.datasources.SSDBSupport.ConsumerSQL;
 import com.nqadmin.swingset.datasources.SSDBSupport.DbReader;
-import com.nqadmin.swingset.datasources.SSDBSupport.DbRunnable;
 import com.nqadmin.swingset.datasources.SSDBSupport.DbWriter;
+import com.nqadmin.swingset.datasources.SSDBSupport.RunnableSQL;
 import com.nqadmin.swingset.datasources.SSSQLConversionException;
 import com.nqadmin.swingset.datasources.SSSQLInternalException;
 import com.nqadmin.swingset.datasources.SSSQLNullException;
@@ -98,6 +100,7 @@ import static com.nqadmin.swingset.utils.SSUtils.JDBCTypeMismatch;
 import static com.nqadmin.swingset.utils.SSUtils.NullabilityMismatch;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -272,6 +275,10 @@ final class SSCommon
 	//       value, pass table name, column name, comp. So need to wait
 	//       for bind/rowset. Have a flag to indicate been initialized.
 	private boolean beepOnError = true;
+	// DO NOT CHANGE restoreOnError WITHOUT VISITING setColumn
+	// AND if(!isResotreOnError()). Flag must be controlled in
+	// conjunction with SSTextSupport and any other callers
+	// to setColumn(DbWriter
 	private final boolean restoreOnError = false; // easiest/safest?
 	private boolean dialogOnError = false;
 
@@ -736,7 +743,7 @@ final class SSCommon
 	 * Typically used by a component listener. It avoids extra RowSet events.
 	 * @param r code that changes the database
 	 */
-	void dbChange(DbRunnable r) throws SQLException
+	void dbChange(RunnableSQL r) throws SQLException
 	{
 		if (rowsModel.getRowSet() == null)
 			return;
@@ -753,29 +760,12 @@ final class SSCommon
 	/**
 	 * Updates the bound database column with the specified String.
 	 *
-	 * @param _boundColumnText value to write to bound database column
+	 * @param boundColumnText value to write to bound database column
 	 * @return true if no error
 	 */
-	boolean setBoundColumnText(String _boundColumnText) {
-		logger.log(DEBUG, () -> sf("%s: '%s'", getColumnForLog(), _boundColumnText));
-		boolean ok = false;
-		try {
-			RowSetOps.updateColumnText(getSSComponent(), _boundColumnText);
-			ok = true;
-		} catch(SQLException | NumberFormatException ex) {
-			if (isDialogOnError())
-				userErrorReporting(_boundColumnText, ex);
-		} finally {
-			if (!ok) {
-				if (isBeepOnError())
-					SSUtils.beep();
-				if (!isRestoreOnError())
-					postRowSetModifiedError(getSSComponent(), _boundColumnText);
-			}
-		}
-		boolean fOK = ok;
-		logger.log(DEBUG, () -> sf("return ok: %b", fOK));
-		return ok;
+	boolean setBoundColumnText(String boundColumnText) {
+		return setColumn(boundColumnText, (value) ->
+				RowSetOps.updateColumnText(getSSComponent(), (String)value));
 	}
 
 	/**
@@ -785,24 +775,8 @@ final class SSCommon
 	 * @return true if no error
 	 */
 	boolean setBoundColumnObject(Object boundColumnObject) {
-		logger.log(DEBUG, () -> sf("%s: %s", getColumnForLog(), boundColumnObject));
-		boolean ok = false;
-		try {
-			RowSetOps.updateColumnObject(getSSComponent(), boundColumnObject);
-			ok = true;
-		} catch(SQLException | NumberFormatException ex) {
-			if (isDialogOnError())
-				userErrorReporting(boundColumnObject, ex);
-		} finally {
-			if (!ok) {
-				if (isBeepOnError())
-					SSUtils.beep();
-				postRowSetModifiedError(getSSComponent(), boundColumnObject);
-			}
-		}
-		boolean fOK = ok;
-		logger.log(DEBUG, () -> sf("return ok: %b", fOK));
-		return ok;
+		return setColumn(boundColumnObject, (value) ->
+				RowSetOps.updateColumnObject(getSSComponent(), value));
 	}
 
 	/**
@@ -815,24 +789,8 @@ final class SSCommon
 	 *                      RowSet
 	 */
 	boolean setBoundColumnArray(SSArray boundColumnArray) throws SQLException {
-		logger.log(DEBUG, () -> sf("%s: %s", getColumnForLog(), boundColumnArray));
-		boolean ok = false;
-		try {
-			RowSetOps.updateColumnArray(getSSComponent(), boundColumnArray);
-			ok = true;
-		} catch(SQLException ex) {
-			if (isDialogOnError())
-				userErrorReporting(boundColumnArray, ex);
-		} finally {
-			if (!ok) {
-				if (isBeepOnError())
-					SSUtils.beep();
-				postRowSetModifiedError(getSSComponent(), boundColumnArray);
-			}
-		}
-		boolean fOK = ok;
-		logger.log(DEBUG, () -> sf("return ok: %b", fOK));
-		return ok;
+		return setColumn(boundColumnArray, (value) ->
+				RowSetOps.updateColumnArray(getSSComponent(), (SSArray) value));
 	}
 
 	/**
@@ -843,26 +801,48 @@ final class SSCommon
 	 * @throws SQLException thrown if there is a problem writing the array to the
 	 *                      RowSet
 	 */
-	boolean setColumn(Object value) {
-		//logger.log(DEBUG, () -> sf("%s: %s", getColumnForLog(), boundColumnArray));
-		logger.log(DEBUG, () -> sf("%s:", getColumnForLog()));
+	boolean setColumn(Object val) {
+		return setColumn(val, (value) ->
+				RowSetOps.updateColumn(getSSComponent(), value));
+	}
+
+	/**
+	 * Update the database column with the specified consumer.
+	 * Common method to do RowSetOps.updateColumn*.
+	 *
+	 * @param value value to write to bound database column
+	 * @return true if no error
+	 */
+	boolean setColumn(Object value, ConsumerSQL<Object> op) {
+		logger.log(DEBUG, () -> sf("%s: '%s' {%s}", getColumnForLog(), value, getCaller(4)));
 		boolean ok = false;
 		try {
-			RowSetOps.updateColumn(getSSComponent(), value);
+			op.accept(value);
 			ok = true;
-		} catch(SQLException ex) {
+		} catch(SQLException | NumberFormatException ex) {
 			if (isDialogOnError())
 				userErrorReporting(value, ex);
 		} finally {
 			if (!ok) {
 				if (isBeepOnError())
 					SSUtils.beep();
-				postRowSetModifiedError(getSSComponent(), value);
+				if (!isRestoreOnError())
+					postRowSetModifiedError(getSSComponent(), value);
 			}
 		}
 		boolean fOK = ok;
 		logger.log(DEBUG, () -> sf("return ok: %b", fOK));
 		return ok;
+	}
+
+	private String getCaller(int skip) {
+		Optional<StackFrame> caller = StackWalker.getInstance(
+				Set.of(RETAIN_CLASS_REFERENCE), skip+1).walk(s ->
+						s.skip(skip)
+								.findFirst());
+		String meth = caller.isEmpty() ? null
+				: caller.get().getDeclaringClass().getSimpleName() + '.' + caller.get().getMethodName();
+		return meth;
 	}
 
 	DbWriter<RowSet, Integer, SSComponent, Object> getColumnWriter() {

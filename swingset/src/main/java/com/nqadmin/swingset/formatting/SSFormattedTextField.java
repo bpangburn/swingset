@@ -166,7 +166,7 @@ public class SSFormattedTextField extends JFormattedTextField
 					ftf.setValue(null); // Note: "verifyingText" skips pce.
 				// Update text decoration, e.g. red for negative.
 				if (ok)
-					updateTextDecorator();
+					decorateText();
 			} catch (final Exception e) {
 				// TODO: Not right. What runtime exceptions should be looked for?
 				logger.log(Level.ERROR, () -> getColumnForLog() + ": PROGRAM/RUNTIME ERROR");
@@ -549,7 +549,7 @@ public class SSFormattedTextField extends JFormattedTextField
 					getColumnForLog(), sqe));
 			setValue(null);
 		}
-		updateTextDecorator(); // For example: color red for negative number
+		decorateText(); // For example: color red for negative number
 		decorate();
 	}
 
@@ -581,7 +581,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	// Note: this might make more sense in NumberField.
 	// TODO: should this be updated while focused and any value change?
 	// TODO: should this be in SSComponentInterface?
-	public void updateTextDecorator() {
+	public void decorateText() {
 		if (!isTextDecoratorEnabled())
 			return;
 		Object value = getValue();

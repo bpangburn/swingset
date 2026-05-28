@@ -14,6 +14,11 @@ setColumn()/getColumn() allow to pass in reader/writer?
 
 ================================================================================
 
+Incorporate Brian TODO from April 29, "Added TODOs for possible cleanup"
+about making some methods private in DBComboBox2.
+
+================================================================================
+
 Why maintain currentRow and rowCount in navigateState? How much perf gain?
 Use a method to access, simplifies flipping.
 

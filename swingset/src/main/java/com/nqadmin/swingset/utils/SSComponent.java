@@ -52,9 +52,10 @@ import javax.sql.rowset.CachedRowSet;
 import javax.swing.JComponent;
 
 import com.nqadmin.swingset.datasources.RSC;
+import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.datasources.SSDBSupport.DbReader;
-import com.nqadmin.swingset.datasources.SSDBSupport.DbRunnable;
 import com.nqadmin.swingset.datasources.SSDBSupport.DbWriter;
+import com.nqadmin.swingset.datasources.SSDBSupport.RunnableSQL;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.formatting.SSFormat;
@@ -412,13 +413,17 @@ public interface SSComponent extends RSC
 	 * @param r code that changes the database
 	 * @throws java.sql.SQLException
 	 */
-	default void dbChange(DbRunnable r) throws SQLException
+	default void dbChange(RunnableSQL r) throws SQLException
 	{
 			getSSCommon().dbChange(r);
 	}
 
 	/**
-	 * Sets the value of the bound database column
+	 * Updates the value of the bound database column;
+	 * method used by SwingSet component listeners to update the underlying RowSet.
+	 * The real action, like null handling and conversion checking, happens
+	 * in {@link RowSetOps#updateColumnText(com.nqadmin.swingset.utils.SSComponent, java.lang.String) }.
+	 * Does not commit the update row.
 	 *
 	 * @param boundColumnText the value to set in the bound database column
 	 */
@@ -427,7 +432,9 @@ public interface SSComponent extends RSC
 	}
 
 	/**
-	 * Sets the value of the bound database column
+	 * Updates the value of the bound database column;
+	 * method used by SwingSet component listeners to update the underlying RowSet.
+	 * Does not commit the update row.
 	 *
 	 * @param boundColumnObject the value to set in the bound database column
 	 */
@@ -442,6 +449,7 @@ public interface SSComponent extends RSC
 	 * See {@link com.nqadmin.swingset.core.List1} and
 	 * {@link com.nqadmin.swingset.models.SSCollectionModel} for low level
 	 * details on how arrays are read and written.
+	 * Does not commit the update row.
 	 *
 	 * @param boundColumnArray Array to write to bound database column
 	 * @throws SQLException thrown if there is a problem writing the array to the
@@ -452,10 +460,13 @@ public interface SSComponent extends RSC
 	}
 
 	/**
+	 * Updates the value of the bound database column;
+	 * method used by SwingSet component listeners to update the underlying RowSet.
 	 * Sets the value of the bound database column using the SSComponent's
 	 * {@link DbWriter}. See {@link #getColumnWriter() }.
 	 * NPE if no columnWriter. Useful for dealing with JDBCTypes not handled
 	 * internally.
+	 * Does not commit the update row.
 	 * 
 	 * @param value to write to the database, may write to the undo/redo stack.
 	 */
@@ -469,11 +480,11 @@ public interface SSComponent extends RSC
 	 * handled internally, like BLOB and VARBINARY.
 	 * For exampe, see {@link com.nqadmin.swingset.core.Image} source code.
 	 * 
-	 * The {@code columnReader} is typically invoked like
-	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
+	 * The {@code columnWriter} is typically invoked like
+	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp, value)}.
 	 * The comp is rarely used, and provided for complex situations.
 	 * 
-	 * @return the DbWriter used to fetch values from the database
+	 * @return the DbWriter used to update to the database
 	 */
 	default DbWriter<RowSet, Integer, SSComponent, Object> getColumnWriter() {
 		return getSSCommon().getColumnWriter();
@@ -485,11 +496,11 @@ public interface SSComponent extends RSC
 	 * handled internally, like BLOB and VARBINARY.
 	 * For exampe, see {@link com.nqadmin.swingset.core.Image} source code.
 	 * 
-	 * The {@code columnReader} is typically invoked like
-	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
+	 * The {@code columnWriter} is typically invoked like
+	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp, value)}.
 	 * The comp is rarely used, and provided for complex situations.
 	 * 
-	 * @param columnWriter the DbWriter used to fetch values from the database
+	 * @param columnWriter the DbWriter used to update the database
 	 */
 	default void setColumnWriter(DbWriter<RowSet,Integer,SSComponent,Object> columnWriter) {
 		getSSCommon().setColumnWriter(columnWriter);
@@ -826,4 +837,18 @@ public interface SSComponent extends RSC
 	default boolean decorate() {
 		return getSSCommon().decorate();
 	}
+
+	// Methods that have the word Bound in them
+	// :g/Bound.*{/
+	// default String getBoundColumnText() { return getColumnText(); }
+	// default Object getBoundColumnObject() { return getColumnObject(); }
+	// default <T> T getBoundColumnObject(Class<T> type) { return getColumnObject(type); }
+	// default void setBoundColumnText(final String boundColumnText) { setColumnText(boundColumnText); }
+	// default void setBoundColumnObject(final Object boundColumnObject) { setColumnObject(boundColumnObject); }
+	// default void setBoundColumnArray(final SSArray boundColumnArray) throws SQLException { setColumnArray(boundColumnArray); }
+	// default int getBoundColumnIndex() { return getColumnIndex(); }
+	// default String getBoundColumnName() { return getColumnName(); }
+	// default JDBCType getBoundColumnJDBCType() { return getColumnJDBCType(); }
+	// default int getBoundColumnType() { return getColumnType(); }
+	// default void setBoundColumnName(final String boundColumnName) { setColumnName(boundColumnName); }
 }

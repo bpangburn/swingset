@@ -69,7 +69,7 @@ public interface SSDBSupport {
 	/**
 	 * Like Runnable, but throws.
 	 */
-	interface DbRunnable {
+	interface RunnableSQL {
 		/**
 		 * @throws SQLException
 		 */
@@ -77,11 +77,25 @@ public interface SSDBSupport {
 	}
 
 	/**
+	 *
+	 * @param <T>
+	 */
+	interface ConsumerSQL<T> {
+
+		/**
+		 *
+		 * @param t
+		 * @throws SQLException
+		 */
+		public void accept(T t) throws SQLException;
+	}
+
+	/**
 	 * Like Function, but only has apply method that throws SQLException.
 	 * @param <T>
 	 * @param <R>
 	 */
-	interface DbFunc<T,R> {
+	interface FuncSQL<T,R> {
 
 		/**
 		 * Run the function.
@@ -99,7 +113,7 @@ public interface SSDBSupport {
 	 * @param <U>
 	 * @param <R>
 	 */
-	interface DbBiFunc<T,U,R> {
+	interface BiFuncSQL<T,U,R> {
 
 		/**
 		 * Run the function
@@ -184,8 +198,24 @@ public interface SSDBSupport {
 	 * @throws SQLException
 	 */
 	static void runDbWriter(SSComponent comp, Object value) throws SQLException {
-		comp.getColumnWriter()
-				.apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp, value);
+		runDbWriter(comp, value, comp.getColumnWriter());
+	}
+
+	/**
+	 * For the typical simple cases run the columnWriter to set the value.
+	 * Note that the columnWriter typically ignores the comp argument, but
+	 * there for special cases.
+	 *
+	 * @param comp
+	 * @param value
+	 * @param columnWriter
+	 * @throws SQLException
+	 */
+	// TODO: any reason to make this public?
+	private static void runDbWriter(SSComponent comp, Object value,
+			DbWriter<RowSet, Integer, SSComponent, Object> columnWriter)
+			throws SQLException {
+		columnWriter.apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp, value);
 	}
 
 	/**
@@ -197,7 +227,7 @@ public interface SSDBSupport {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
-	<R> R runWithConnection(RowSet rs, DbFunc<Connection, R> func) throws SQLException;
+	<R> R runWithConnection(RowSet rs, FuncSQL<Connection, R> func) throws SQLException;
 
 	/**
 	 * Return a connection, that <em>should not be closed</em>, for short term use that

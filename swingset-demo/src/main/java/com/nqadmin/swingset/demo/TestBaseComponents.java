@@ -73,6 +73,7 @@ import com.nqadmin.swingset.SSList;
 import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.SSTextArea;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.decorators.AlternateBorderDecorator;
 import com.nqadmin.swingset.demo.datepicker.DbDatePicker;
 import com.nqadmin.swingset.models.SSCollectionModel;
 import com.nqadmin.swingset.models.SSDbArrayModel;
@@ -407,6 +408,7 @@ public class TestBaseComponents extends JFrame
 			lstSSList.setPreferredSize(new Dimension(MainClass.ssDimTall.width-20, MainClass.ssDimVeryTall.height));
 			lstScrollPane = new JScrollPane(lstSSList);
 			lstScrollPane.setPreferredSize(MainClass.ssDimTall);
+			lstSSList.setDecorator(new AlternateBorderDecorator(lstScrollPane, lstSSList));
 		}
 		
 		// Setup the container and layout the components.
