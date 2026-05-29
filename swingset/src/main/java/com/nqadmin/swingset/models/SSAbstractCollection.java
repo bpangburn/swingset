@@ -35,13 +35,23 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
+import java.lang.System.Logger;
 import java.sql.JDBCType;
+import java.sql.SQLDataException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
-// SSAbstractCollectionModel.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+import com.nqadmin.swingset.utils.SSUtils;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * This is the superclass for all collection models.
@@ -49,20 +59,57 @@ import java.sql.JDBCType;
  * 
  * @since 4.0.0
  */
-public abstract class SSAbstractCollectionModel implements SSCollectionModel {
+public abstract class SSAbstractCollection implements SSCollection {
 	private final JDBCType jdbcType;
+
+	/** logger */
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Indicate and save the type of the collection.
-	 * @param _jdbcType the collection type
+	 * @param jdbcType the collection type
 	 */
-	public SSAbstractCollectionModel(JDBCType _jdbcType) {
-		jdbcType = _jdbcType != null ? _jdbcType : JDBCType.NULL;
+	public SSAbstractCollection(JDBCType jdbcType) {
+		this.jdbcType = jdbcType != null ? jdbcType : JDBCType.NULL;
 	}
 
+	/** {@inheritDoc } */
 	@Override
 	public JDBCType getJDBCType() {
 		return jdbcType;
+	}
+
+	/**
+	 * Converts SQL array to object array. Turns array of primitives int
+	 * array of Objects.
+	 *
+	 * @param array SQL array
+	 * @return Object an array, can be of primitives or of Objects
+	 * @throws java.sql.SQLDataException
+	 */
+	// TODO: put this into ConvertType
+	public static List<?> convertArrayToObjectList(Object array) throws SQLDataException {
+		Objects.requireNonNull(array);
+		if (!array.getClass().isArray())
+			throw new IllegalArgumentException("Must be an array");
+		logger.log(DEBUG, () -> "SSList.toObjArray() contents: " + array);
+		
+		// TODO: Switch on type of array? dbArray.getClass().getComponentType()
+		//       java.lang.reflect.Array.get(Object array, int index)
+		int len = java.lang.reflect.Array.getLength(array);
+		try {
+			if (array.getClass().getComponentType().isPrimitive()) {
+				Object[] objects = new Object[len];
+				for (int i = 0; i < len; i++)
+					objects[i] = (java.lang.reflect.Array.get(array, i));
+				return Arrays.asList(objects);
+			} else {
+				return (List<?>) Arrays.asList((Object[])array);
+			}
+		} catch (final ClassCastException cce) {
+			logger.log(ERROR, "Class Cast Exception.", cce);
+			throw new SQLDataException(cce);
+		}
 	}
 
 }

@@ -42,44 +42,55 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
+import java.lang.System.Logger;
+import java.sql.Array;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 
 import com.nqadmin.swingset.utils.SSComponent;
-
-// SSCollectionModel.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+import com.nqadmin.swingset.utils.SSJDBCArray;
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
- * Read and write a collection of data items from/to database.
- * All items are the same jdbctype. How the items are stored is
- * independent of this interface.
+ * Implementation of SSCollectionModel as an array that uses a database
+ * {@code JDBCType.ARRAY} for storage. The order of items is preserved by
+ * {@link #readData(com.nqadmin.swingset.utils.SSComponent) readData} and
+ * {@link #writeData(com.nqadmin.swingset.utils.SSComponent, java.lang.Object[]) 
+ * writeData}.
  * 
  * @since 4.0.0
  */
-// TODO: <K>
-public interface SSCollectionModel {
+public class SSDbArray extends SSAbstractCollection {
 
 	/**
-	 * @return the type of array elements handled by this model
+	 * Create SSDbArrayModel
+	 * @param jdbcType type of elements in database array
 	 */
-	JDBCType getJDBCType();
+	public SSDbArray(final JDBCType jdbcType) {
+		super(jdbcType);
+	}
 
 	/**
-	 * Get the data from the comp's RowSet as a java object array.
-	 * @param comp has RowSet and column
-	 * @return array of objects of the data
-	 * @throws SQLException if a database related error occurs
+	 * Logger for component
 	 */
-	Object[] readData(SSComponent comp) throws SQLException;
+	private static final Logger logger = SSUtils.getLogger();
 
-	/**
-	 * Put the data from a java object array to the RowSet.
-	 *
-	 * @param comp has RowSet and column
-	 * @param data array of data to write to the database
-	 * @throws SQLException if a database related error occurs
-	 */
-	void writeData(SSComponent comp, Object[] data) throws SQLException;
+	/** {@inheritDoc } */
+	@Override
+	public Object readData(SSComponent comp) throws SQLException {
+		Array array = comp.getBoundColumnArray();
+		if (array == null)
+			return null;
+		return array.getArray();
+	}
+
+	/** {@inheritDoc } */
+	@Override
+	public void writeData(SSComponent comp, final Object data) throws SQLException {
+		if (!data.getClass().isArray())
+			throw new IllegalArgumentException("Must be an array");
+
+		SSJDBCArray array = new SSJDBCArray(data, getJDBCType());
+		comp.setBoundColumnArray(array);
+	}
 }

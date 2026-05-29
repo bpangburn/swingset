@@ -66,7 +66,6 @@ import javax.sql.rowset.spi.SyncResolver;
 import com.nqadmin.swingset.datasources.Utils.ConflictRow;
 import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.navigate.UndoRedo;
-import com.nqadmin.swingset.utils.SSArray;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -740,7 +739,7 @@ public class RowSetOps {
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	public static void updateColumnArray(final SSComponent comp, final SSArray _updatedValue) throws SSSQLNullException, SQLException {
+	public static void updateColumnArray(final SSComponent comp, final Array _updatedValue) throws SSSQLNullException, SQLException {
 		updateColumnArray(comp, comp.getRowSet(), _updatedValue, comp.getBoundColumnName(), comp.getAllowNull());
 	}
 
@@ -760,7 +759,7 @@ public class RowSetOps {
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	private static void updateColumnArray(final SSComponent comp, final RowSet _rowSet, final SSArray _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException
+	private static void updateColumnArray(final SSComponent comp, final RowSet _rowSet, final Array _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException
 	{
 		logger.log(DEBUG, () -> "[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 

@@ -86,8 +86,7 @@ import org.h2.tools.RunScript;
 
 import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
 import com.nqadmin.swingset.datasources.RowSetOps.ForceConflict;
-import com.nqadmin.swingset.models.SSCollectionModel;
-import com.nqadmin.swingset.models.SSMysqlSetModel;
+import com.nqadmin.swingset.models.SSDbStringCollection;
 import com.nqadmin.swingset.navigate.Utils;
 import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -100,6 +99,8 @@ import static com.nqadmin.swingset.demo.DemoUtil.configureJavaUtilLogger;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
+
+import com.nqadmin.swingset.models.SSCollection;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
@@ -753,7 +754,8 @@ public class MainClass extends JFrame
 		public void run() {
 			super.run();
 			globalHints.put("collectionModel",
-					(Supplier<SSCollectionModel>) () -> new SSMysqlSetModel(JDBCType.INTEGER));
+					(Supplier<SSCollection>) () ->
+							new SSDbStringCollection(JDBCType.INTEGER, SSDbStringCollection.COMMA_SEP));
 			// () -> new SSStringArrayModel(JDBCType.INTEGER));
 		}
 

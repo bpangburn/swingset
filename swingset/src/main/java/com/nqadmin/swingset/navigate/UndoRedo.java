@@ -104,29 +104,6 @@ public enum UndoRedo
 		return isUndoRedoEnabled(comp.getRowSet());
 	}
 
-	// /**
-	//  * Check if the rowSet's cursor is on a row or on the insert row.
-	//  * @param rs rowset for this component
-	//  * @return true if cursor on a row or insert row
-	//  * @throws SQLException 
-	//  */
-	// public static boolean hasActiveRow(RowSet rs) throws SQLException
-	// {
-	// 	return rs.getRow() != 0
-	// 			|| RowSetState.isInserting(rs);
-	// }
-
-	// /**
-	//  * Check if the rowSet's cursor is on a row or on the insert row.
-	//  * @param comp rowset for this component
-	//  * @return true if cursor on a row or insert row
-	//  * @throws SQLException 
-	//  */
-	// public static boolean hasActiveRow(RSC comp) throws SQLException
-	// {
-	// 	return hasActiveRow(comp.getRowSet());
-	// }
-
 	/**
 	 * Make sure the column's undo/redo stack is initialized; the
 	 * database value (an object) is the base.
@@ -140,8 +117,7 @@ public enum UndoRedo
 	{
 		if (!isUndoRedoEnabled(comp))
 			return;
-		NavigateState navState = comp.getRowsModel().getNavState();
-		navState.undoRow.captureInitialValue(comp);
+		comp.getRowsModel().getUndoRow().captureInitialValue(comp);
 	}
 
 	/**
@@ -155,8 +131,7 @@ public enum UndoRedo
 	{
 		if (!isUndoRedoEnabled(comp))
 			throw new IllegalStateException("UNDO/REDO disabled");
-		NavigateState navState = comp.getRowsModel().getNavState();
-		return navState.undoRow.fetchCurrentChange(comp);
+		return comp.getRowsModel().getUndoRow().fetchCurrentChange(comp);
 	}
 
 	/**
@@ -195,8 +170,7 @@ public enum UndoRedo
 	{
 		if (!isUndoRedoEnabled(comp))
 			return;
-		NavigateState navState = comp.getRowsModel().getNavState();
-		navState.undoRow.focusChange(null);
+		comp.getRowsModel().getUndoRow().focusChange(null);
 	}
 
 	/**
@@ -209,8 +183,7 @@ public enum UndoRedo
 	{
 		if (!isUndoRedoEnabled(ev.getSource()))
 			return;
-		NavigateState navState = ev.getSource().getRowsModel().getNavState();
-		navState.undoRow.addChange(ev);
+		ev.getSource().getRowsModel().getUndoRow().addChange(ev);
 	}
 
 }

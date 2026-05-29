@@ -10,12 +10,17 @@ and print the violated constraint.
 
 ================================================================================
 
-setColumn()/getColumn() allow to pass in reader/writer?
+setColumn()/getColumn() allow to pass in reader/writer? Consider ConsumerSQL.
 
 ================================================================================
 
 Incorporate Brian TODO from April 29, "Added TODOs for possible cleanup"
 about making some methods private in DBComboBox2.
+
+================================================================================
+
+SSCollectionModel. Provide better interoperability with primitive arrays.
+But considering there might be primitive generics at some point...
 
 ================================================================================
 

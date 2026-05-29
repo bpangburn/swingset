@@ -35,36 +35,49 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
 import java.sql.JDBCType;
+import java.sql.SQLException;
 
-// SSStringArrayModel.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+import com.nqadmin.swingset.utils.SSComponent;
 
 /**
- * Implementation of SSCollectionModel as an array that uses a database String.
- * The elements in the string are separated by the ascii Unit Separator
- * control character.
- * The order of items is preserved by 
- * {@link #readData(com.nqadmin.swingset.utils.SSComponentInterface) readData}
- * and {@link #writeData(com.nqadmin.swingset.utils.SSComponentInterface, java.lang.Object[]) writeData}
+ * Read and write a collection of data items from/to database.
+ * All items are the same jdbctype. How the items are stored is
+ * independent of this interface. There is no presumption that
+ * input/output data is copied; it should not be modified.
  * 
  * @since 4.0.0
  */
-public class SSStringArrayModel extends SSAbstractStringCollectionModel {
-	/**
-	 * The ascii UnitSeparator control character;
-	 * it delimits data items in database string.
-	 */
-	public static final char US = '\u001f';
+// TODO: <K>
+public interface SSCollection {
 
 	/**
-	 * Create model.
-	 * @param _jdbcType the jdbcType of the elements in the array.
+	 * @return the type of array elements handled by this model
 	 */
-	public SSStringArrayModel(JDBCType _jdbcType) {
-		super(_jdbcType, US, "UnitSeparator(0x1f)");
-	}
+	JDBCType getJDBCType();
+
+	/**
+	 * Get the data from the comp's RowSet.
+	 * 
+	 * @param comp has RowSet and column
+	 * @return an array, see {@link java.sql.Array#getArray() }
+	 * @throws SQLException if a database related error occurs
+	 */
+	Object readData(SSComponent comp) throws SQLException;
+
+	/**
+	 * Put the data from a java object array to the RowSet.
+	 *
+	 * @param comp has RowSet and column
+	 * @param data array of data to write to the database
+	 * @throws SQLException if a database related error occurs
+	 */
+	void writeData(SSComponent comp, Object data) throws SQLException;
 }

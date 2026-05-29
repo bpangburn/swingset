@@ -46,7 +46,7 @@ package com.nqadmin.swingset;
 import java.sql.JDBCType;
 
 import com.nqadmin.swingset.core.List1;
-import com.nqadmin.swingset.models.SSCollectionModel;
+import com.nqadmin.swingset.models.SSCollection;
 import com.nqadmin.swingset.utils.SSComponent;
 
 /**
@@ -68,7 +68,7 @@ public class SSList extends List1<Object,String> implements SSComponent
 
 	/**
 	 * Creates a List1 with default
-	 * of {@link com.nqadmin.swingset.models.SSDbArrayModel}
+	 * of {@link com.nqadmin.swingset.models.SSDbArray}
 	 * of specified jdbcType.
 	 *
 	 * @param jdbcType type of key of database elements
@@ -83,7 +83,7 @@ public class SSList extends List1<Object,String> implements SSComponent
 	 *
 	 * @param collectionModel model to read/write the database
 	 */
-	public SSList(SSCollectionModel collectionModel)
+	public SSList(SSCollection collectionModel)
 	{
 		super(collectionModel);
 	}

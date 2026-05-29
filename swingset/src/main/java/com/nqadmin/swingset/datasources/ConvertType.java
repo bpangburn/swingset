@@ -562,7 +562,7 @@ public class ConvertType
 	}
 
 	/**
-	 * Copy the elements of the _objects array into into
+	 * Copy the elements of the objects array into into
 	 * an array of the correct type for the {@code JDBCType}d objects.
 	 * <p>
 	 * If an array or even a collection of the accurate type is desired,

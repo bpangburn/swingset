@@ -29,7 +29,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
-
 import java.awt.Component;
 import java.awt.Window;
 import java.lang.System.Logger;
@@ -98,7 +97,7 @@ import static java.lang.System.Logger.Level.*;
 //       Handle an "empty"/"null"/non-executable RowSet?
 //       Is there a way to tell if current command has been executed?
 //
-public class RowsModel
+public final class RowsModel
 {
 	static { LookupDefaults.init(); }
 	/** Logger for component */
@@ -419,6 +418,10 @@ public class RowsModel
 
 	NavigateState getNavState() {
 		return navState;
+	}
+
+	UndoRow getUndoRow() {
+		return getNavState().undoRow;
 	}
 
 	/**

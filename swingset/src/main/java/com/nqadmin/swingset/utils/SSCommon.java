@@ -49,6 +49,7 @@ import java.awt.event.KeyEvent;
 import java.lang.StackWalker.StackFrame;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.sql.Array;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EventListener;
@@ -697,6 +698,26 @@ final class SSCommon
 	}
 
 	/**
+	 * Returns an Array from the bound database column.
+	 * <p>
+	 * @return value
+	 */
+	Array getBoundColumnArray()
+	{
+		Array value = null;
+
+		try {
+			if (hasActiveRow(getSSComponent())) {
+				value = RowSetOps.getColumnArray(ssComponent);
+			}
+		} catch (SQLException se) {
+			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
+		}
+
+		return value;
+	}
+
+	/**
 	 * Returns an Object of the specified type
 	 * representing the value in the bound database column.
 	 *
@@ -788,9 +809,9 @@ final class SSCommon
 	 * @throws SQLException thrown if there is a problem writing the array to the
 	 *                      RowSet
 	 */
-	boolean setBoundColumnArray(SSArray boundColumnArray) throws SQLException {
+	boolean setBoundColumnArray(Array boundColumnArray) throws SQLException {
 		return setColumn(boundColumnArray, (value) ->
-				RowSetOps.updateColumnArray(getSSComponent(), (SSArray) value));
+				RowSetOps.updateColumnArray(getSSComponent(), (Array) value));
 	}
 
 	/**

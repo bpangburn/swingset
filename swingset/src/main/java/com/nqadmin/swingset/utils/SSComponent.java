@@ -42,6 +42,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
+import java.sql.Array;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EventListener;
@@ -353,11 +354,19 @@ public interface SSComponent extends RSC
 
 	/** {@inheritDoc } */
 	@Override
-	default <T> T getBoundColumnObject(Class<T> type) {
-		return getSSCommon().getBoundColumnObject(type);
+	default <T> T getBoundColumnObject(Class<T> clazz) {
+		return getSSCommon().getBoundColumnObject(clazz);
 	}
 
-	// TODO: get[Bound]ColumnArray
+	/**
+	 * Returns the Array for the bound database column
+	 * as returned by {@link RowSet#getArray(int) }.
+	 * <p>
+	 * @return the value to display in the SSComponent, may be from undo/redo stack.
+	 */
+	default Array getBoundColumnArray() {
+		return getSSCommon().getBoundColumnArray();
+	}
 
 	/**
 	 * Sets the value of the bound database column using the SSComponent's
@@ -447,7 +456,7 @@ public interface SSComponent extends RSC
 	 * <p>
 	 * Used for SSList or other component where multiple items can be selected.
 	 * See {@link com.nqadmin.swingset.core.List1} and
-	 * {@link com.nqadmin.swingset.models.SSCollectionModel} for low level
+	 * {@link com.nqadmin.swingset.models.SSCollection} for low level
 	 * details on how arrays are read and written.
 	 * Does not commit the update row.
 	 *
@@ -455,7 +464,7 @@ public interface SSComponent extends RSC
 	 * @throws SQLException thrown if there is a problem writing the array to the
 	 *                      RowSet
 	 */
-	default void setBoundColumnArray(final SSArray boundColumnArray) throws SQLException {
+	default void setBoundColumnArray(final Array boundColumnArray) throws SQLException {
 		getSSCommon().setBoundColumnArray(boundColumnArray);
 	}
 
