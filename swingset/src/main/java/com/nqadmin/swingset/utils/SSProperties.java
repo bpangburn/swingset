@@ -49,10 +49,6 @@ import java.util.Properties;
 
 import static java.lang.System.Logger.Level.*;
 
-// SSProperties.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Loads GUI default properties for SwingSet
  */

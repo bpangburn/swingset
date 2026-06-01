@@ -49,10 +49,6 @@ import com.nqadmin.swingset.navigate.RowsModel;
 
 import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
-// SSTextArea.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * SSTextArea extends the JTextArea to add RowSet binding.
  */

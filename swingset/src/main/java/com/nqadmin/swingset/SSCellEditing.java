@@ -39,10 +39,6 @@ package com.nqadmin.swingset;
 
 import java.io.Serializable;
 
-// SSCellEditing.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * The SSCellEditing interface specifies the methods the SSTableModel will use
  * to determine whether or not a given cell can be edited or if a user-specified

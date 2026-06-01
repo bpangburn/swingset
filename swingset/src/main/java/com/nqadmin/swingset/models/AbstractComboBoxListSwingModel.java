@@ -79,10 +79,6 @@ import static com.nqadmin.swingset.utils.SSUtils.objectID;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
-// AbstractComboBoxListSwingModel.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * This class encapsulates the list and list data used for SwingSet 
  * list and combobox components. 

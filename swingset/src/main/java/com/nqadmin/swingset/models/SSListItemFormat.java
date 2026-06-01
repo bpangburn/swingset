@@ -59,10 +59,6 @@ import com.nqadmin.swingset.utils.SSUtils;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
-// SSListItemFormat.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Use this to produce a string representation of an SSListItem.
  * Configure the order in which the list item elements are formatted,

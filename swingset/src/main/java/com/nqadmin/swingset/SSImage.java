@@ -49,10 +49,6 @@ import com.nqadmin.swingset.navigate.RowsModel;
 
 import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
-// SSImage.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Used to load, store, and display images stored in a database.
  */

@@ -61,10 +61,6 @@ import com.nqadmin.swingset.navigate.RowsModel;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
-//SSScreenHelperCommon.java
-//
-//SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Helper class for designing SwingSet Form View screens.
  */

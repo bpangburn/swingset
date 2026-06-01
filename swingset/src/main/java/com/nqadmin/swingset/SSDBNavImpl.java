@@ -58,10 +58,6 @@ import com.nqadmin.swingset.utils.SSUtils;
 
 import static java.lang.System.Logger.Level.*;
 
-// SSDBNavImpl.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Custom implementation of SSDBNav that overrides performPreInsertOps() to
  * clear/reset the various database-aware fields on a screen when the user adds

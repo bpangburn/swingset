@@ -59,10 +59,6 @@ import com.nqadmin.swingset.SSDBNav;
 import com.nqadmin.swingset.SSDataGrid;
 import com.nqadmin.swingset.navigate.RowsModel;
 
-//SSDataGridScreenHelper.java
-//
-//SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Helper class for designing SSDataGrid screens.
  */

@@ -48,10 +48,6 @@ import java.util.List;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
-// SSDBNav.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Interface that provides a set of methods to perform custom operations before
  * a record is added, after a record is added, before a record is deleted and

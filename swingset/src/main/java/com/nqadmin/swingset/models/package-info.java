@@ -36,10 +36,6 @@
  *   Ernie R. Rael
  ******************************************************************************/
 
-// package-info.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * This package contains some very different kinds of model.
  * <ul>

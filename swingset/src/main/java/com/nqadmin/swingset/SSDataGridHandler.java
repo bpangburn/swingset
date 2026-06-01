@@ -37,10 +37,6 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
-// SSDataGridHandler.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * The SSDataGridHandler interface specifies set of methods that can be used to
  * determine whether or not a given row can be deleted, and operation to be

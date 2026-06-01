@@ -49,10 +49,6 @@ import com.nqadmin.swingset.navigate.RowsModel;
 
 import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
-// SSCheckBox.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Used to display values stored in the database as a boolean.
  * The SSCheckBox can be bound to a numeric or boolean database column. 

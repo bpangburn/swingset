@@ -37,10 +37,6 @@
  ******************************************************************************/
 package com.nqadmin.swingset.utils;
 
-// SSEnums.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Various Enumerations for SwingSet
  */

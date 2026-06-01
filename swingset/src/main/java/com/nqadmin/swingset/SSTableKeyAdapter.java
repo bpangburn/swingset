@@ -66,10 +66,6 @@ import com.nqadmin.swingset.utils.SSUtils;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
-// SSTableKeyAdapter.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Key adapter for JTable and SSDataGrid that manages cut and paste functionality
  * between a table and either another table or a spreadsheet.
