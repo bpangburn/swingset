@@ -64,9 +64,9 @@ import static java.lang.System.Logger.Level.*;
 /**
  * Similar to the ComboBox, but used when both the 'bound' values and the
  * 'display' values are pulled from a database table. The bound value is called
- * the 'mapping' and the display value the 'option'. An 'option2' may be
- * specified; in that case the display value for the mapping is a composite of
- * option and option2.Generally the mapping represents a foreign key to another
+ * the 'key' and the display value the 'option'. An 'option2' may be
+ * specified; in that case the display value for the key is a composite of
+ * option and option2.Generally the key represents a foreign key to another
  * table, and the combobox needs to display a list of one (or more) columns from
  * the other table.
  * <p>

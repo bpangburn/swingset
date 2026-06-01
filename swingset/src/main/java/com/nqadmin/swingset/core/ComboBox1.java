@@ -30,9 +30,11 @@
 package com.nqadmin.swingset.core;
 
 /**
- * A ComboBox that takes only two generices. See {@link ComboBox2} for documentation.
- * @param <K> mapping type
- * @param <D> option type
+ * A ComboBox that only has a single displayValue.
+ * See {@link ComboBox2} for documentation.
+ * 
+ * @param <K> key type
+ * @param <D> displayValue type
  */
 @SuppressWarnings("serial")
 public abstract class ComboBox1<K,D> extends ComboBox2<K, D, Object>

@@ -46,7 +46,6 @@ package com.nqadmin.swingset.core;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.sql.JDBCType;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -65,6 +64,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import com.google.common.reflect.TypeToken;
+import com.nqadmin.swingset.datasources.SSSQLRuntimeException;
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
 import com.nqadmin.swingset.models.KeyDisplayValueSwingModel;
 import com.nqadmin.swingset.models.SSCollection;
@@ -78,7 +78,7 @@ import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.models.KeyDisplayValueSwingModel.asKeyDisplayValueSwingModel;
-import static com.nqadmin.swingset.models.SSAbstractCollection.convertArrayToObjectList;
+import static com.nqadmin.swingset.models.SSCollection.convertArrayToObjectList;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
@@ -122,7 +122,7 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponent
 			try {
 				dbChange(() -> updateRowSet());
 			} catch (SQLException ex) {
-				logger.log(Level.ERROR, (String) null, ex);
+				logger.log(Level.ERROR, ex.getMessage(), ex);
 			}
 		}
 	}
@@ -190,42 +190,15 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponent
 	{
 		if (!collectionSet) {
 			try {
-				JDBCType collectionType = dbCollection.getJDBCType();
-				// also: DatabaseMetaData.getColumns() - TYPE_NAME is a column
-				ResultSetMetaData md = getRowSet().getMetaData();
-				int columnTyp = md.getColumnType(getBoundColumnIndex());
-				JDBCType columnType = JDBCType.valueOf(columnTyp);
-				dbCollection = switch (columnType) {
-				case ARRAY -> {
-					// May not be any rows, so only use metadata to determine elemtype
-					// if (Utils.hasActiveRow(this)) {
-					// 	Array array = this.getBoundColumnArray();
-					// 	elemtype = JDBCType.valueOf(array.getBaseType());
-					// }
-
-					// First word of column type is element type, eg "INTEGER ARRAY".
-					String typnam = md.getColumnTypeName(getBoundColumnIndex());
-					JDBCType elemtype = JDBCType.valueOf(typnam.split(" ")[0]);
-					if (collectionType != elemtype) {
-						String s = sf("collection type '%s' != ARRAY type '%s'",
-								dbCollection.getJDBCType(), elemtype);
-						logger.log(Level.ERROR, s);
-						throw new IllegalArgumentException(s);
-					}
-					yield new SSDbArray(elemtype);
-				}
-				case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR -> {
-					// TODO: have plugin specify default Delim
-					yield new SSDbStringCollection(collectionType, SSDbStringCollection.COMMA_SEP);
-				}
-				default -> {
-					String s = sf("Column type '%s' not handled for SSCollection.", columnType);
-					logger.log(Level.ERROR, s);
-					throw new IllegalArgumentException(s);
-				}
-				};
+				// Note: the JDBCType was specified when constructing "this"
+				dbCollection = SSCollection.getSuitableDbCollection(
+						this, dbCollection.getJDBCType());
+			} catch (IllegalArgumentException ex) {
+				logger.log(Level.ERROR, ex.getMessage(), ex);
+				throw ex;
 			} catch (SQLException ex) {
-				logger.log(Level.ERROR, (String) null, ex);
+				logger.log(Level.ERROR, ex.getMessage(), ex);
+				throw new SSSQLRuntimeException(ex);
 			} finally {
 				collectionSet = true;
 			}
@@ -569,8 +542,8 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponent
 			logger.log(DEBUG, () -> sf("%s: Updating component with array of %s.",
 					getColumnForLog(), Arrays.toString(Arrays
 							.copyOfRange(objArray, 0, Math.min(5, objArray.length)))));
-		} catch (SQLDataException ex) {
-			logger.log(Level.ERROR, (String) null, ex);
+		} catch (IllegalArgumentException | SQLDataException ex) {
+			logger.log(Level.ERROR, ex.getMessage(), ex);
 		}
 	}
 

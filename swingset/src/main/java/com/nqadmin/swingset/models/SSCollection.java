@@ -42,16 +42,26 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
+import java.sql.Array;
 import java.sql.JDBCType;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLDataException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 import com.nqadmin.swingset.utils.SSComponent;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 
 /**
  * Read and write a collection of data items from/to database.
  * All items are the same jdbctype. How the items are stored is
  * independent of this interface. There is no presumption that
  * input/output data is copied; it should not be modified.
+ * <p>
+ * Some static methods useful for working with collections.
  * 
  * @since 4.0.0
  */
@@ -80,4 +90,85 @@ public interface SSCollection {
 	 * @throws SQLException if a database related error occurs
 	 */
 	void writeData(SSComponent comp, Object data) throws SQLException;
+
+	/**
+	 * Create an SSCollection for holding elements of the specified type for
+	 * read/write of the component's table column.
+	 * 
+	 * @param comp The component
+	 * @param jdbcType element type of the collection
+	 * @return A collection that works with the component
+	 * @throws SQLException
+	 * @throws IllegalArgumentException if the component's column type is not
+	 * suitable for saving a collection of the specified jdbcType.
+	 */
+	public static SSCollection getSuitableDbCollection(SSComponent comp, JDBCType jdbcType) throws SQLException {
+
+		SSCollection dbCollection;
+		JDBCType collectionType = jdbcType;
+		// there's also: DatabaseMetaData.getColumns() - TYPE_NAME is a column
+		ResultSetMetaData md = comp.getRowSet().getMetaData();
+		int columnTyp = md.getColumnType(comp.getBoundColumnIndex());
+		JDBCType columnType = JDBCType.valueOf(columnTyp);
+		dbCollection = switch (columnType) {
+		case ARRAY -> {
+			// May not be any rows, so only use metadata to determine elemtype
+			// if (Utils.hasActiveRow(this)) {
+			// 	Array array = this.getBoundColumnArray();
+			// 	elemtype = JDBCType.valueOf(array.getBaseType());
+			// }
+			
+			// First word of column type is element type, eg "INTEGER ARRAY".
+			String typnam = md.getColumnTypeName(comp.getBoundColumnIndex());
+			JDBCType elemtype = JDBCType.valueOf(typnam.split(" ")[0]);
+			if (collectionType != elemtype) {
+				String s = sf("collection type '%s' != ARRAY type '%s'", jdbcType, elemtype);
+				throw new IllegalArgumentException(s);
+			}
+			yield new SSDbArray(elemtype);
+		}
+		case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR -> {
+			// TODO: have plugin specify default Delim
+			yield new SSDbStringCollection(collectionType, SSDbStringCollection.COMMA_SEP);
+		}
+		default -> {
+			String s = sf("Column type '%s' not handled for SSCollection.", columnType);
+			throw new IllegalArgumentException(s);
+		}
+		};
+		return dbCollection;
+	}
+
+	/**
+	 * Converts a java array to list. Turns array of primitives into
+	 * array of Objects.
+	 *
+	 * @param array a java array as described by {@link Array#getArray() }
+	 * @return List with elements corresponding to input array's elements.
+	 * @throws java.sql.SQLDataException
+	 */
+	// TODO: put this into ConvertType
+	public static List<?> convertArrayToObjectList(Object array) throws SQLDataException {
+		Objects.requireNonNull(array);
+		if (!array.getClass().isArray())
+			throw new IllegalArgumentException("Must be an array");
+		// logger.log(DEBUG, () -> "SSList.toObjArray() contents: " + array);
+		
+		// TODO: Switch on type of array? dbArray.getClass().getComponentType()
+		//       java.lang.reflect.Array.get(Object array, int index)
+		int len = java.lang.reflect.Array.getLength(array);
+		try {
+			if (array.getClass().getComponentType().isPrimitive()) {
+				Object[] objects = new Object[len];
+				for (int i = 0; i < len; i++)
+					objects[i] = java.lang.reflect.Array.get(array, i);
+				return Arrays.asList(objects);
+			} else {
+				return (List<?>) Arrays.asList((Object[])array);
+			}
+		} catch (final ClassCastException cce) {
+			// logger.log(ERROR, "Class Cast Exception.", cce);
+			throw new SQLDataException(cce);
+		}
+	}
 }

@@ -435,9 +435,10 @@ public interface SSComponent extends RSC
 	 * Does not commit the update row.
 	 *
 	 * @param boundColumnText the value to set in the bound database column
+	 * @return true if no error
 	 */
-	default void setBoundColumnText(final String boundColumnText) {
-		getSSCommon().setBoundColumnText(boundColumnText);
+	default boolean setBoundColumnText(final String boundColumnText) {
+		return getSSCommon().setBoundColumnText(boundColumnText);
 	}
 
 	/**
@@ -446,9 +447,10 @@ public interface SSComponent extends RSC
 	 * Does not commit the update row.
 	 *
 	 * @param boundColumnObject the value to set in the bound database column
+	 * @return true if no error
 	 */
-	default void setBoundColumnObject(final Object boundColumnObject) {
-		getSSCommon().setBoundColumnObject(boundColumnObject);
+	default boolean setBoundColumnObject(final Object boundColumnObject) {
+		return getSSCommon().setBoundColumnObject(boundColumnObject);
 	}
 
 	/**
@@ -461,11 +463,12 @@ public interface SSComponent extends RSC
 	 * Does not commit the update row.
 	 *
 	 * @param boundColumnArray Array to write to bound database column
+	 * @return true if no error
 	 * @throws SQLException thrown if there is a problem writing the array to the
 	 *                      RowSet
 	 */
-	default void setBoundColumnArray(final Array boundColumnArray) throws SQLException {
-		getSSCommon().setBoundColumnArray(boundColumnArray);
+	default boolean setBoundColumnArray(final Array boundColumnArray) throws SQLException {
+		return getSSCommon().setBoundColumnArray(boundColumnArray);
 	}
 
 	/**
@@ -478,9 +481,10 @@ public interface SSComponent extends RSC
 	 * Does not commit the update row.
 	 * 
 	 * @param value to write to the database, may write to the undo/redo stack.
+	 * @return true if no error
 	 */
-	default void setColumn(Object value) {
-		getSSCommon().setColumn(value);
+	default boolean setColumn(Object value) {
+		return getSSCommon().setColumn(value);
 	}
 
 	/**

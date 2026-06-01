@@ -42,14 +42,12 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
-import java.lang.System.Logger;
 import java.sql.Array;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSJDBCArray;
-import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * Implementation of SSCollectionModel as an array that uses a database
@@ -69,11 +67,6 @@ public class SSDbArray extends SSAbstractCollection {
 	public SSDbArray(final JDBCType jdbcType) {
 		super(jdbcType);
 	}
-
-	/**
-	 * Logger for component
-	 */
-	private static final Logger logger = SSUtils.getLogger();
 
 	/** {@inheritDoc } */
 	@Override

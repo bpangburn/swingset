@@ -806,6 +806,7 @@ final class SSCommon
 	 * Used for SSList or other component where multiple items can be selected.
 	 *
 	 * @param boundColumnArray Array to write to bound database column
+	 * @return true if no error
 	 * @throws SQLException thrown if there is a problem writing the array to the
 	 *                      RowSet
 	 */
@@ -819,6 +820,7 @@ final class SSCommon
 	 * <p>
 	 * Used for SSList or other component where multiple items can be selected.
 	 *
+	 * @return true if no error
 	 * @throws SQLException thrown if there is a problem writing the array to the
 	 *                      RowSet
 	 */
